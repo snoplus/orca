@@ -64,7 +64,8 @@
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol;
 - (void) setUpSysCallTable;
 
-#pragma mark •••Finders
+#pragma mark •••Finders and Makers
+- (id) findObject:(id) p;
 - (id) findObject:(id) p;
 - (id) findCrate:(id)p collection:objects;
 - (id) findCard:(id)p collection:objects;

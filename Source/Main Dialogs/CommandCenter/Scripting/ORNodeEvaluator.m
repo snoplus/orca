@@ -29,6 +29,7 @@
 #import "OrcaScript.tab.h"
 #import "ORAlarmCollection.h"
 #import "NSNotifications+Extensions.h"
+#import "ObjectFactory.h"
 
 @interface ORNodeEvaluator (Interpret_private)
 - (id)		processStatements:(id) p;
@@ -327,34 +328,45 @@
 
 
 #pragma mark •••Finders and Helpers
+
+- (id) makeObject:(id) p
+{
+	return [ObjectFactory makeObject:VARIABLENAME(0)];
+}
+
 - (id) findObject:(id) p
 {
 	//needs to return NSDecimalNumber holding the obj pointer.
 	Class theClass = NSClassFromString(VARIABLENAME(0));
-	NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
-	if([objects count] == 0)return _zero;
-	if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORVmeDaughterCard")])  return [self findVmeDaughterCard:p collection:objects];
-	else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCard")])  return [self findCard:p collection:objects];
-	else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCrate")])  return [self findCrate:p collection:objects];
+	if([theClass isEqualTo:[[[NSApp delegate] document] class]]){
+		return [[NSApp delegate] document];
+	}
 	else {
-		int numArgs = [[p nodeData] count];
-		if(numArgs == 1){
-			//use the first obj found
-			return [objects objectAtIndex:0];
-		}
+		NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
+		if([objects count] == 0)return _zero;
+		if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORVmeDaughterCard")])  return [self findVmeDaughterCard:p collection:objects];
+		else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCard")])  return [self findCard:p collection:objects];
+		else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCrate")])  return [self findCrate:p collection:objects];
 		else {
-			//assume node 1 holds a tag #
-			int tag = [NodeValue(1) longValue];
-			id anObj;
-			NSEnumerator* e = [objects objectEnumerator];
-			while(anObj = [e nextObject]){
-				if([anObj respondsToSelector:@selector(uniqueIdNumber)]){
-					if([anObj uniqueIdNumber] == tag) {
-						return anObj; 
+			int numArgs = [[p nodeData] count];
+			if(numArgs == 1){
+				//use the first obj found
+				return [objects objectAtIndex:0];
+			}
+			else {
+				//assume node 1 holds a tag #
+				int tag = [NodeValue(1) longValue];
+				id anObj;
+				NSEnumerator* e = [objects objectEnumerator];
+				while(anObj = [e nextObject]){
+					if([anObj respondsToSelector:@selector(uniqueIdNumber)]){
+						if([anObj uniqueIdNumber] == tag) {
+							return anObj; 
+						}
 					}
 				}
+				return _zero;
 			}
-			return _zero;
 		}
 	}
 }
@@ -531,6 +543,7 @@
 		case kObjList:		return [NodeValue(0) stringByAppendingFormat:@"%@",NodeValue(1)];
 		case kSelName:		return [self processSelectName:p];
 		case FIND:			return [self findObject:p];
+		case MAKE:			return [self makeObject:p];
 			
 			//math ops
 		case '=':			return [self setValue: NodeValue(1) forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
