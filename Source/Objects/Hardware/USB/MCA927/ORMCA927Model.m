@@ -818,37 +818,51 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) report
 {
-	NSLog(@"MCA 927 values\n");	
+	[self report:YES];
+}
+- (void) sync
+{
+	[self report:NO];
+}
+
+- (void) report:(BOOL)verbose
+{
 	NSFont* aFont = [NSFont fontWithName:@"Monaco" size:12];
 	unsigned long aValue0 = [self readReg:kCtlReg adc:0];
 	unsigned long aValue1 = [self readReg:kCtlReg adc:1];
 	unsigned long presetCtrl0 = [self readReg:kPresetCtl adc:0];
 	unsigned long presetCtrl1 = [self readReg:kPresetCtl adc:1];
-	NSLogFont(aFont,@"------------------------------------------------------\n");
-	NSLogFont(aFont,@"    Variable    |     Channel 0  \t |    Channel 1    \n");
-	NSLogFont(aFont,@"------------------------------------------------------\n");
-	NSLogFont(aFont,@"Coincidence mode|%17s |%17s\n",(aValue0&kGateCoinMask)?     "Coincident":"Aniticoincident",(aValue1&kGateCoinMask)?"Coincident":"Anitcoincident");
-	NSLogFont(aFont,@"    Gate Enabled|%17s |%17s\n",(aValue0&kGateEnableMask)?   "YES":"NO",(aValue1&kGateEnableMask)?"YES":"NO");
-	NSLogFont(aFont,@"UL Discriminator|%17s |%17s\n",(aValue0&kDisableULMask)?    "Disabled":"Enabled",(aValue1&kDisableULMask)?"Disabled":"Enabled");
-	NSLogFont(aFont,@"         Trigger|%17s |%17s\n",(aValue0&kEnableTriggerMask)?"Enabled":"Disabled",(aValue1&kEnableTriggerMask)?"Enabled":"Disabled");
-	NSLogFont(aFont,@"        ConvGain|%17s |%17s\n",[self convGainLabel:[self readReg:kConvGain adc:0]],[self convGainLabel:[self readReg:kConvGain adc:1]]);
-	NSLogFont(aFont,@" LiveTime Preset|%13.2f (%1s) |%13.2f (%1s)\n",[self readReg:kLtPreset adc:0]*0.02,      (presetCtrl0&kEnableLiveTimeMask)?"X":" ",[self readReg:kLtPreset adc:1]*0.02,     (presetCtrl1&kEnableLiveTimeMask)?"X":" ");
-	NSLogFont(aFont,@" RealTime Preset|%13.2f (%1s) |%13.2f (%1s)\n",[self readReg:kRtPreset adc:0]*0.02,      (presetCtrl0&kEnableRealTimeMask)?"X":" ",[self readReg:kRtPreset adc:1]*0.02,     (presetCtrl1&kEnableRealTimeMask)?"X":" ");
-	NSLogFont(aFont,@" ROI Peak Preset|%13d (%1s) |%13d (%1s)\n",[self readReg:kRoiPeakPreset adc:0], (presetCtrl0&kEnableRoiPeakMask)?"X":" ", [self readReg:kRoiPeakPreset adc:1],(presetCtrl1&kEnableRoiPeakMask)?"X":" ");
-	NSLogFont(aFont,@"      ROI Preset|%13d (%1s) |%13d (%1s)\n",[self readReg:kRoiPreset adc:0],     (presetCtrl0&kEnableRoiMask)?"X":" ",     [self readReg:kRoiPreset adc:1],    (presetCtrl1&kEnableRoiMask)?"X":" ");
-	NSLogFont(aFont,@" OverFlow Preset|              (%1s) |              (%1s)\n",(presetCtrl0&kEnableOverFlowMask)?"X":" ",(presetCtrl1&kEnableOverFlowMask)?"X":" ");
-	NSLogFont(aFont,@"       Live Time|%17.2f |%17.2f\n",[self readReg:kLiveTime adc:0]*0.02,[self readReg:kLiveTime adc:1]*0.02);
-	NSLogFont(aFont,@"       Real Time|%17.2f |%17.2f\n",[self readReg:kRealTime adc:0]*0.02,[self readReg:kRealTime adc:1]*0.02);
-	NSLogFont(aFont,@"------------------------------------------------------\n");
+	if(verbose){
+		NSLog(@"MCA 927 values\n");	
+		NSLogFont(aFont,@"------------------------------------------------------\n");
+		NSLogFont(aFont,@"    Variable    |     Channel 0  \t |    Channel 1    \n");
+		NSLogFont(aFont,@"------------------------------------------------------\n");
+		NSLogFont(aFont,@"Coincidence mode|%17s |%17s\n",(aValue0&kGateCoinMask)?     "Coincident":"Aniticoincident",(aValue1&kGateCoinMask)?"Coincident":"Anitcoincident");
+		NSLogFont(aFont,@"    Gate Enabled|%17s |%17s\n",(aValue0&kGateEnableMask)?   "YES":"NO",(aValue1&kGateEnableMask)?"YES":"NO");
+		NSLogFont(aFont,@"UL Discriminator|%17s |%17s\n",(aValue0&kDisableULMask)?    "Disabled":"Enabled",(aValue1&kDisableULMask)?"Disabled":"Enabled");
+		NSLogFont(aFont,@"         Trigger|%17s |%17s\n",(aValue0&kEnableTriggerMask)?"Enabled":"Disabled",(aValue1&kEnableTriggerMask)?"Enabled":"Disabled");
+		NSLogFont(aFont,@"        ConvGain|%17s |%17s\n",[self convGainLabel:[self readReg:kConvGain adc:0]],[self convGainLabel:[self readReg:kConvGain adc:1]]);
+		NSLogFont(aFont,@" LiveTime Preset|%13.2f (%1s) |%13.2f (%1s)\n",[self readReg:kLtPreset adc:0]*0.02,      (presetCtrl0&kEnableLiveTimeMask)?"X":" ",[self readReg:kLtPreset adc:1]*0.02,     (presetCtrl1&kEnableLiveTimeMask)?"X":" ");
+		NSLogFont(aFont,@" RealTime Preset|%13.2f (%1s) |%13.2f (%1s)\n",[self readReg:kRtPreset adc:0]*0.02,      (presetCtrl0&kEnableRealTimeMask)?"X":" ",[self readReg:kRtPreset adc:1]*0.02,     (presetCtrl1&kEnableRealTimeMask)?"X":" ");
+		NSLogFont(aFont,@" ROI Peak Preset|%13d (%1s) |%13d (%1s)\n",[self readReg:kRoiPeakPreset adc:0], (presetCtrl0&kEnableRoiPeakMask)?"X":" ", [self readReg:kRoiPeakPreset adc:1],(presetCtrl1&kEnableRoiPeakMask)?"X":" ");
+		NSLogFont(aFont,@"      ROI Preset|%13d (%1s) |%13d (%1s)\n",[self readReg:kRoiPreset adc:0],     (presetCtrl0&kEnableRoiMask)?"X":" ",     [self readReg:kRoiPreset adc:1],    (presetCtrl1&kEnableRoiMask)?"X":" ");
+		NSLogFont(aFont,@" OverFlow Preset|              (%1s) |              (%1s)\n",(presetCtrl0&kEnableOverFlowMask)?"X":" ",(presetCtrl1&kEnableOverFlowMask)?"X":" ");
+		NSLogFont(aFont,@"       Live Time|%17.2f |%17.2f\n",[self readReg:kLiveTime adc:0]*0.02,[self readReg:kLiveTime adc:1]*0.02);
+		NSLogFont(aFont,@"       Real Time|%17.2f |%17.2f\n",[self readReg:kRealTime adc:0]*0.02,[self readReg:kRealTime adc:1]*0.02);
+		NSLogFont(aFont,@"------------------------------------------------------\n");
+	}
 	aValue0 = [self readReg:kAcqStatus adc:0];
 	aValue1 = [self readReg:kAcqStatus adc:1];
-	NSLogFont(aFont,@"      Acquistion|%17s |%17s\n",(aValue0&kStartMask)?        "Running":"Stopped",(aValue1&kStartMask)?"Running":"Stopped");
-	NSLogFont(aFont,@"      Acq Status|%17s |%17s\n",aValue0&0x1?"Active":"--",aValue1&0x1?"Active":"--");
-	NSLogFont(aFont,@"     Acq Trigger|%17s |%17s\n",aValue0&0x2?"Armed":"--",aValue1&0x2?"Armed":"--");
-	NSLogFont(aFont,@"   Aux Counter 0|%17d |%17d\n",[self readReg:kAux0Counter adc:0],[self readReg:kAux0Counter adc:1]);
-	NSLogFont(aFont,@"   Aux Counter 1|%17d |%17d\n",[self readReg:kAux1Counter adc:0],[self readReg:kAux1Counter adc:1]);
-	NSLogFont(aFont,@"------------------------------------------------------\n");
-	NSLog(@"Firmware Version: %d\n",[self readReg:kVersion adc:1]);
+	
+	if(verbose){
+		NSLogFont(aFont,@"      Acquistion|%17s |%17s\n",(aValue0&kStartMask)?        "Running":"Stopped",(aValue1&kStartMask)?"Running":"Stopped");
+		NSLogFont(aFont,@"      Acq Status|%17s |%17s\n",aValue0&0x1?"Active":"--",aValue1&0x1?"Active":"--");
+		NSLogFont(aFont,@"     Acq Trigger|%17s |%17s\n",aValue0&0x2?"Armed":"--",aValue1&0x2?"Armed":"--");
+		NSLogFont(aFont,@"   Aux Counter 0|%17d |%17d\n",[self readReg:kAux0Counter adc:0],[self readReg:kAux0Counter adc:1]);
+		NSLogFont(aFont,@"   Aux Counter 1|%17d |%17d\n",[self readReg:kAux1Counter adc:0],[self readReg:kAux1Counter adc:1]);
+		NSLogFont(aFont,@"------------------------------------------------------\n");
+		NSLog(@"Firmware Version: %d\n",[self readReg:kVersion adc:1]);
+	}
 	[self setRunningStatus:0 withValue:(aValue0&kStartMask)];
 	[self setRunningStatus:1 withValue:(aValue1&kStartMask)];
 	if((aValue0&kStartMask) || (aValue1&kStartMask)){

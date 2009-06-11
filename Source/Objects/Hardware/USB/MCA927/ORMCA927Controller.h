@@ -131,6 +131,7 @@
 - (IBAction) zdtModeAction:(id)sender;
 - (IBAction) zdtSpeedAction:(id)sender;
 
+- (IBAction) syncAction:(id)sender;
 - (IBAction) reportAction:(id)sender;
 
 - (IBAction) startAllAcquistionAction:(id)sender;

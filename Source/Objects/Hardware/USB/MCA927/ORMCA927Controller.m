@@ -699,6 +699,19 @@
 	}
 }
 
+- (IBAction) syncAction:(id)sender
+{
+	@try {
+		[model sync];
+	}
+	@catch (NSException* localException) {
+		[self displayFPGAError];
+		NSLog(@"Report Failed\n");
+		NSLog(@"%@\n",localException);
+	}
+}
+
+
 
 - (IBAction) controlRegAction:(id)sender
 {

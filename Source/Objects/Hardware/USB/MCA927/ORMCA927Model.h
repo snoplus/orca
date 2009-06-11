@@ -187,6 +187,8 @@ typedef struct MCA927Registers {
 - (void) writeReg:(int)aReg adc:(int)adcIndex value:(unsigned long)aValue;
 - (unsigned long) readReg:(int)aReg adc:(int)adcIndex;
 - (void) report;
+- (void) sync;
+- (void) report:(BOOL)verbose;
 - (void) initBoard:(int)index;
 - (void) startAcquisition:(int)index;
 - (void) stopAcquisition:(int)index;
