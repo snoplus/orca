@@ -27,6 +27,7 @@
 	<array>
 		<string>function</string>
 		<string>find</string>
+		<string>make</string>
 		<string>waituntil</string>
 		<string>waitUntil</string>
 		<string>sleep</string>

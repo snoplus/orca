@@ -87,6 +87,7 @@ E			[Ee][+-]?{D}+
 "print"         return PRINT;
 "display"       return DISPLAY;
 "find"			return FIND;
+"make"			return MAKE;
 "break"			return BREAK;
 "exit"			return EXIT;
 "continue"		return CONTINUE;

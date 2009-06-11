@@ -31,7 +31,7 @@
 %token <cString> CONSTANT
 %token <cString> STRING
 %token <symKey> VARIABLE
-%token FUNCTION WHILE DO FOR IF PRINT LOGFILE FIND BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
+%token FUNCTION WHILE DO FOR IF PRINT LOGFILE FIND MAKE BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSARRAY
@@ -42,7 +42,7 @@
 %nonassoc NOT UMINUS INVERT
 
 %type <nPtr> program  functionCall statement arrayElement make_string  cat_string break_statement
-%type <nPtr> hex_str expr statement_list objC findObj selection_statement iteration_statement 
+%type <nPtr> hex_str expr statement_list objC findObj makeObj selection_statement iteration_statement 
 %type <nPtr> objVar objVar_list print_list log_list print_statement log_statement arg_list argName_list clear_statement
 %type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object
 %type <nPtr> case_statement case_list constant_expr point_str rect_str wait_statement alarm_statement
@@ -96,6 +96,7 @@ special_statement
 | MAKEARRAY arrayElement ';'		 { $$ = $2; }
 | VARIABLE '=' objC ';'				 { $$ = executionNode('=', identifierNode($1), $3,nil); }
 | VARIABLE '=' findObj ';'			 { $$ = executionNode('=', identifierNode($1), $3,nil); }
+| VARIABLE '=' makeObj ';'			 { $$ = executionNode('=', identifierNode($1), $3,nil); }
 | VARIABLE '=' make_string ';'		 { $$ = executionNode('=', identifierNode($1), $3,nil); }
 | VARIABLE '=' cat_string ';'		 { $$ = executionNode('=', identifierNode($1), $3,nil); }
 | VARIABLE '=' wait_statement ';'	 { $$ = executionNode('=', identifierNode($1), $3,nil); }
@@ -400,6 +401,10 @@ findObj
 | FIND '(' VARIABLE ')'									{ $$ = executionNode(FIND, identifierNode($3) ,nil); }
 ;
 
+//ex: make(ORRunModel)
+makeObj
+: MAKE '(' VARIABLE ')'						{ $$ = executionNode(MAKE, identifierNode($3), nil); }
+;
 
 //ex: doTest(1,a,c)
 functionCall
@@ -438,7 +443,8 @@ id stringNode(char* aString)
 	Node* p = [[Node alloc] init];
 	[p setType:typeStr];
 	[p setLine:num_lines+1];
-	[p setNodeData:[NSString stringWithCString:aString]];
+	NSString* s = [NSString stringWithCString:aString encoding:NSASCIIStringEncoding];
+	[p setNodeData:s];
     return [p autorelease];
 }
 
@@ -491,7 +497,8 @@ id executionNode(int oper, ...)
 	[leaf release];
 	
     va_end(ap);
-    return [p autorelease];
+   // return [p autorelease];
+    return p;
 }
 
 void addNode(id node)
