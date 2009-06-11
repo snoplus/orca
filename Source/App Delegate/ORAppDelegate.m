@@ -428,7 +428,8 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
         return documentIsOpen ? NO : YES;
     }
     if(theAction == @selector(showTemplates:)){
-		if([[[self document] group] count]==0 && ![[self document] isDocumentEdited])return YES;
+		if(![self document])return NO;
+		else if([[[self document] group] count]==0 && ![[self document] isDocumentEdited])return YES;
         else return documentIsOpen ? NO : YES;
     }
 	
