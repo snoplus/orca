@@ -171,9 +171,9 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 - (void) removeObjects:(NSArray*)someObjects
 {
     [[[self undoManager] prepareWithInvocationTarget:self] addObjects:someObjects];
-    [someObjects makeObjectsPerformSelector:@selector(disconnect)];
     [someObjects makeObjectsPerformSelector:@selector(setGuardian:) withObject:nil];
     [someObjects makeObjectsPerformSelector:@selector(sleep)];
+    [someObjects makeObjectsPerformSelector:@selector(disconnect)];
     [orcaObjects removeObjectsInArray:someObjects];
     
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
