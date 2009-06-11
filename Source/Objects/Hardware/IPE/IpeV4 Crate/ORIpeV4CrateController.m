@@ -74,10 +74,10 @@
 - (void) updateWindow
 {
 	[super updateWindow];
-	[self serviceChanged:nil];
+	//[self serviceChanged:nil];
 }
 
-- (void) serviceChanged:(NSNotification*)aNotification
+/*- (void) serviceChanged:(NSNotification*)aNotification
 {
 	if([[model adapter] serviceIsOpen] && [[model adapter] serviceIsAlive]){
 		[powerField setStringValue:@""];
@@ -87,6 +87,6 @@
 	}
 	
 }
-
+*/
 
 @end

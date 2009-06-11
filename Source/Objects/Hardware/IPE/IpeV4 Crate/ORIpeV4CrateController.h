@@ -31,7 +31,7 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) serviceChanged:(NSNotification*)aNotification;
+//- (void) serviceChanged:(NSNotification*)aNotification;
 
 
 @end
