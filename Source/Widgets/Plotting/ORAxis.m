@@ -18,7 +18,7 @@
 
 @interface ORAxis (private)
 - (double) startDrag:(NSPoint) p;		// start drag procedure and return grab value
-- (int) drag:(NSPoint)p withGrab:(double) val;// drag scale
+- (int) drag:(NSPoint)p;// drag scale
 - (void) adjustToPinLow:(double *)low withHigh:(double *)high;
 - (void) calcFrameOffsets;				// set scale parameters from CPane object size
 - (void) calcSci;				// calculate scaling factors
@@ -848,9 +848,10 @@ enum {
 
 		if(modifierKeys & NSCommandKeyMask)  [self markClick:mouseLoc];
 		else {
-			if(!(modifierKeys & NSControlKeyMask)) [[NSCursor closedHandCursor] push];
-
-			
+			if(!(modifierKeys & NSControlKeyMask)) {
+				[[NSCursor closedHandCursor] push];
+				[self setPin:[self minValue]];
+			}
 			if ([self isXAxis]) mouseLoc.x -= lowOffset;
 			else				mouseLoc.y -= lowOffset;
 			
@@ -860,8 +861,8 @@ enum {
 			nearPinFlag = [self nearPinPoint:mouseLoc];
 			
 			/* invert the pin if we are grabbing near the pin-point */
-				if (pinned == (nearPinFlag==0)) invertPin = YES;
-				else							invertPin = NO;
+			if (pinned == (nearPinFlag==0)) invertPin = YES;
+			else							invertPin = NO;
 			
 			
 			if([self mouse:mouseLoc inRect:[self bounds]]){
@@ -876,7 +877,7 @@ enum {
 {
     NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
     if(mDragInProgress){
-        [self drag:mouseLoc withGrab:mGrabValue];
+        [self drag:mouseLoc];
     }
 	else if(mMarkerDragInProgress){
 		[self markClick:mouseLoc];
@@ -1283,12 +1284,13 @@ enum {
     else 	pix = p.y;
     
     mDragInProgress = YES;
-   return([self convertPoint:pix] );
+	
+	return([self convertPoint:pix] );
 }
 
 /* Drag - drag the scale */
 /* log scale drag only works for pinned scales starting at zero */
--(int)drag:(NSPoint) p withGrab:(double) grabVal
+-(int)drag:(NSPoint) p
 {
     double		pix, tmp;
     double		newMin, newMax;
@@ -1299,7 +1301,7 @@ enum {
     if ([self isLog]) {
         
         newMin = 0;
-        if (pix && (tmp=grabVal*dpos/pix)<kMaxArgumentForExp) {
+        if (pix && (tmp=mGrabValue*dpos/pix)<kMaxArgumentForExp) {
             newMax = exp(tmp) - 1.0;
         } 
         else {
@@ -1310,9 +1312,10 @@ enum {
     else {
         if (pinned^invertPin | dragFlag) {
             if (pinPix != pix) {
-                newMin = (pinVal*pix - grabVal*pinPix) / (pix - pinPix);
+               // newMin = (pinVal*pix - mGrabValue*pinPix) / (pix - pinPix);
+				newMin = [self minValue];
                 if (pinPix) newMax = newMin + (pinVal-newMin)*dpos/pinPix;
-                else		newMax = newMin + (grabVal-newMin)*dpos/pix;
+                else		newMax = newMin + (mGrabValue-newMin)*dpos/pix;
                 
                 /* make sure scale range is not too small */
                 /* (we do this here instead of letting CheckRng() do it	*/
@@ -1344,7 +1347,7 @@ enum {
             
         }
         else {
-            newMin = grabVal - [self valueRange] * pix / dpos;
+            newMin = mGrabValue - [self valueRange] * pix / dpos;
             newMax = newMin + [self valueRange];
             
         }
