@@ -169,6 +169,10 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) showTemplates:(id)sender
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORShowTemplates" object:self];	
+}
 
 - (IBAction) showWindowList:(id)sender
 {
@@ -423,7 +427,11 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     if(theAction == @selector(openDocument:)){
         return documentIsOpen ? NO : YES;
     }
-    
+    if(theAction == @selector(showTemplates:)){
+		if([[[self document] group] count]==0 && ![[self document] isDocumentEdited])return YES;
+        else return documentIsOpen ? NO : YES;
+    }
+	
     return YES;
 }
 - (NSUndoManager*) undoManager

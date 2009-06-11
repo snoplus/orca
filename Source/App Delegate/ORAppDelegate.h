@@ -67,6 +67,7 @@
 - (IBAction) showGateKeeper:(id)sender;
 - (IBAction) showWindowList:(id)sender;
 - (IBAction) showORCARootServiceController:(id)sender;
+- (IBAction) showTemplates:(id)sender;
 
 #pragma mark ¥¥¥Accessors
 - (id) document;
