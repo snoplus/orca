@@ -1173,14 +1173,6 @@
 		8491FE440EC1DD270084BAD6 /* NSImage+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */; };
 		8491FE8B0EC1DF780084BAD6 /* ORSwitchImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491FE890EC1DF780084BAD6 /* ORSwitchImage.h */; };
 		8491FE8C0EC1DF780084BAD6 /* ORSwitchImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491FE8A0EC1DF780084BAD6 /* ORSwitchImage.m */; };
-		8492D7130B7A80770065F3DE /* ORGretinaModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8492D70F0B7A80770065F3DE /* ORGretinaModel.h */; };
-		8492D7140B7A80770065F3DE /* ORGretinaModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8492D7100B7A80770065F3DE /* ORGretinaModel.m */; };
-		8492D7150B7A80770065F3DE /* ORGretinaController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8492D7110B7A80770065F3DE /* ORGretinaController.h */; };
-		8492D7160B7A80770065F3DE /* ORGretinaController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8492D7120B7A80770065F3DE /* ORGretinaController.m */; };
-		8492D7280B7A85090065F3DE /* ORGretinaDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8492D7260B7A85090065F3DE /* ORGretinaDecoders.m */; };
-		8492D7290B7A85090065F3DE /* ORGretinaDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8492D7270B7A85090065F3DE /* ORGretinaDecoders.h */; };
-		8492D7520B7A891C0065F3DE /* Gretina.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8492D7500B7A891C0065F3DE /* Gretina.nib */; };
-		8492D7530B7A891C0065F3DE /* GretinaCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8492D7510B7A891C0065F3DE /* GretinaCard.gif */; };
 		8493CC420C99FA0700B46CD4 /* SBC_Linking.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493CC310C99FA0700B46CD4 /* SBC_Linking.h */; };
 		8493CC430C99FA0700B46CD4 /* SBC_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493CC320C99FA0700B46CD4 /* SBC_Link.h */; };
 		8493CC440C99FA0700B46CD4 /* SBC_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493CC330C99FA0700B46CD4 /* SBC_Link.m */; };
@@ -3096,14 +3088,6 @@
 		84929E8604439586005F64B1 /* ORTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTriggerModel.h; sourceTree = "<group>"; };
 		84929E8704439586005F64B1 /* ORTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTriggerModel.m; sourceTree = "<group>"; };
 		84929E8804439586005F64B1 /* Trigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Trigger.nib; sourceTree = "<group>"; };
-		8492D70F0B7A80770065F3DE /* ORGretinaModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORGretinaModel.h; sourceTree = "<group>"; };
-		8492D7100B7A80770065F3DE /* ORGretinaModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORGretinaModel.m; sourceTree = "<group>"; };
-		8492D7110B7A80770065F3DE /* ORGretinaController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGretinaController.h; path = Source/Objects/Hardware/Vme/Gretina/ORGretinaController.h; sourceTree = SOURCE_ROOT; };
-		8492D7120B7A80770065F3DE /* ORGretinaController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGretinaController.m; path = Source/Objects/Hardware/Vme/Gretina/ORGretinaController.m; sourceTree = SOURCE_ROOT; };
-		8492D7260B7A85090065F3DE /* ORGretinaDecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGretinaDecoders.m; path = Source/Objects/Hardware/Vme/Gretina/ORGretinaDecoders.m; sourceTree = SOURCE_ROOT; };
-		8492D7270B7A85090065F3DE /* ORGretinaDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGretinaDecoders.h; path = Source/Objects/Hardware/Vme/Gretina/ORGretinaDecoders.h; sourceTree = SOURCE_ROOT; };
-		8492D7500B7A891C0065F3DE /* Gretina.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Gretina.nib; path = Source/Objects/Hardware/Vme/Gretina/Gretina.nib; sourceTree = SOURCE_ROOT; };
-		8492D7510B7A891C0065F3DE /* GretinaCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = GretinaCard.gif; path = Source/Objects/Hardware/Vme/Gretina/GretinaCard.gif; sourceTree = SOURCE_ROOT; };
 		8493CC310C99FA0700B46CD4 /* SBC_Linking.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SBC_Linking.h; path = "Source/Objects/Hardware/SBC/SBC Link/SBC_Linking.h"; sourceTree = SOURCE_ROOT; };
 		8493CC320C99FA0700B46CD4 /* SBC_Link.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SBC_Link.h; path = "Source/Objects/Hardware/SBC/SBC Link/SBC_Link.h"; sourceTree = SOURCE_ROOT; };
 		8493CC330C99FA0700B46CD4 /* SBC_Link.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SBC_Link.m; path = "Source/Objects/Hardware/SBC/SBC Link/SBC_Link.m"; sourceTree = SOURCE_ROOT; };
@@ -6491,21 +6475,6 @@
 			path = Source/Objects/Hardware/Vme/Trigger;
 			sourceTree = SOURCE_ROOT;
 		};
-		8492D70E0B7A80770065F3DE /* Gretina */ = {
-			isa = PBXGroup;
-			children = (
-				8492D7100B7A80770065F3DE /* ORGretinaModel.m */,
-				8492D70F0B7A80770065F3DE /* ORGretinaModel.h */,
-				8492D7120B7A80770065F3DE /* ORGretinaController.m */,
-				8492D7110B7A80770065F3DE /* ORGretinaController.h */,
-				8492D7260B7A85090065F3DE /* ORGretinaDecoders.m */,
-				8492D7270B7A85090065F3DE /* ORGretinaDecoders.h */,
-				8492D7500B7A891C0065F3DE /* Gretina.nib */,
-				8492D7510B7A891C0065F3DE /* GretinaCard.gif */,
-			);
-			path = Gretina;
-			sourceTree = "<group>";
-		};
 		8493CC2F0C99FA0700B46CD4 /* SBC */ = {
 			isa = PBXGroup;
 			children = (
@@ -8905,7 +8874,6 @@
 				8467E6A406480F0A00A35E6A /* Trigger32 */,
 				84749D0A07D6526F001553EC /* MCarrier */,
 				845115E104030088005F64B1 /* IPCarrier */,
-				8492D70E0B7A80770065F3DE /* Gretina */,
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 				844445FE0E815C0D00A1440D /* XYCom200 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
@@ -9529,9 +9497,6 @@
 				84F7E2330B68281A00E52AA5 /* ORCrateLabelView.h in Headers */,
 				849E7C9A0B6957BF00353D50 /* ORADU200Controller.h in Headers */,
 				849E7C9C0B6957BF00353D50 /* ORADU200Model.h in Headers */,
-				8492D7130B7A80770065F3DE /* ORGretinaModel.h in Headers */,
-				8492D7150B7A80770065F3DE /* ORGretinaController.h in Headers */,
-				8492D7290B7A85090065F3DE /* ORGretinaDecoders.h in Headers */,
 				84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */,
 				842538530BC6E006004C8065 /* ORHP6622aController.h in Headers */,
 				842538550BC6E006004C8065 /* ORHP6622aModel.h in Headers */,
@@ -10194,8 +10159,6 @@
 				849E7C930B69570700353D50 /* ADU200.tif in Resources */,
 				849E7C990B6957BF00353D50 /* ADU200.nib in Resources */,
 				846A08F20B77BAAA00B811F4 /* NoADUDriverHelp.plist in Resources */,
-				8492D7520B7A891C0065F3DE /* Gretina.nib in Resources */,
-				8492D7530B7A891C0065F3DE /* GretinaCard.gif in Resources */,
 				84AD4CD70BA23300003C7ABE /* WindowList.nib in Resources */,
 				842538510BC6E006004C8065 /* HP6622a.nib in Resources */,
 				842538520BC6E006004C8065 /* HP6622a.tif in Resources */,
@@ -10897,9 +10860,6 @@
 				84F7E2340B68281A00E52AA5 /* ORCrateLabelView.m in Sources */,
 				849E7C9B0B6957BF00353D50 /* ORADU200Controller.m in Sources */,
 				849E7C9D0B6957BF00353D50 /* ORADU200Model.m in Sources */,
-				8492D7140B7A80770065F3DE /* ORGretinaModel.m in Sources */,
-				8492D7160B7A80770065F3DE /* ORGretinaController.m in Sources */,
-				8492D7280B7A85090065F3DE /* ORGretinaDecoders.m in Sources */,
 				84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */,
 				842538560BC6E006004C8065 /* ORHP6622aModel.m in Sources */,
 				842539500BCD4C29004C8065 /* ORHP6622aController.m in Sources */,
