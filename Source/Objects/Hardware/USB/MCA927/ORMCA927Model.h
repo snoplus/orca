@@ -18,10 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark •••Imported Files
-
-#import "ORHPPulserModel.h"
 #import "ORUSB.h"
 #import "ORDataTaker.h";
 
@@ -77,15 +74,14 @@ typedef struct MCA927Registers {
 
 @interface ORMCA927Model : OrcaObject <USBDevice,ORDataTaker> {
 	unsigned long   dataId;
-	NSLock* localLock;
+	NSLock*			localLock;
 	ORUSBInterface* usbInterface;
-    NSString* serialNumber;
-	ORAlarm*  noUSBAlarm;
-	ORAlarm*  noDriverAlarm;
-    NSString* fpgaFilePath;
-    BOOL useCustomFile;
-    int selectedChannel;
-    BOOL		  runningStatus[2];
+    NSString*		serialNumber;
+	ORAlarm*		noUSBAlarm;
+    NSString*		fpgaFilePath;
+    BOOL			useCustomFile;
+    int				selectedChannel;
+    BOOL			runningStatus[2];
     unsigned long liveTimeStatus[2];
     unsigned long realTimeStatus[2];
     unsigned long liveTime[2];

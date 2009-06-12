@@ -113,8 +113,11 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 - (void) connectionChanged
 {
 	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
-	if([interfaces count] == 1 && ![serialNumber length])serialNumber = [[interfaces objectAtIndex:0] serialNumber];
-	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
+	NSString* sn = serialNumber;
+	if([interfaces count] == 1 && ![sn length]){
+		sn = [[interfaces objectAtIndex:0] serialNumber];
+	}
+	[self setSerialNumber:sn]; //to force usbinterface at doc startup
 	[self checkUSBAlarm];
 	[[self objectConnectedTo:ORADU200USBNextConnection] connectionChanged];
 }
@@ -338,7 +341,8 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 
 - (void) interfaceRemoved:(NSNotification*)aNote
 {
-	if(usbInterface && serialNumber){
+	ORUSBInterface* theInterfaceRemoved = [[aNote userInfo] objectForKey:@"USBInterface"];
+	if((usbInterface == theInterfaceRemoved) && serialNumber){
 		[self setUsbInterface:nil];
 	}
 }

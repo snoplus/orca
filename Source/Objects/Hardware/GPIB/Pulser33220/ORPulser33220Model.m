@@ -141,8 +141,11 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 		[self setCanChangeConnectionProtocol:YES];
 	}
 	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
-	if([interfaces count] == 1 && ![serialNumber length])serialNumber = [[interfaces objectAtIndex:0] serialNumber];
-	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
+	NSString* sn = serialNumber;
+	if([interfaces count] == 1 && ![sn length]){
+		sn = [[interfaces objectAtIndex:0] serialNumber];
+	}
+	[self setSerialNumber:sn]; //to force usbinterface at doc startup
 	[self checkNoUsbAlarm];	
 	[[self objectConnectedTo:ORPulserUSBNextConnection] connectionChanged];
 	[self setUpImage];
@@ -411,7 +414,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 - (void) interfaceRemoved:(NSNotification*)aNote
 {
 	if(connectionProtocol == kHPPulserUseUSB){
-		if(usbInterface && serialNumber){
+		ORUSBInterface* theInterfaceRemoved = [[aNote userInfo] objectForKey:@"USBInterface"];
+		if((usbInterface == theInterfaceRemoved) && serialNumber){
 			[self setUsbInterface:nil];
 			[self checkNoUsbAlarm];			
 		}

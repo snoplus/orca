@@ -139,8 +139,6 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[usbInterface release];
 	[noUSBAlarm clearAlarm];
 	[noUSBAlarm release];
-    [noDriverAlarm clearAlarm];
-    [noDriverAlarm release];
     [serialNumber release];
 	[localLock release];
 	[dataSet release];
@@ -160,9 +158,11 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void) connectionChanged
 {
 	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
-	if([interfaces count] == 1 && ![serialNumber length])serialNumber = [[interfaces objectAtIndex:0] serialNumber];
-	
-	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
+	NSString* sn = serialNumber;
+	if([interfaces count] == 1 && ![sn length]){
+		sn = [[interfaces objectAtIndex:0] serialNumber];
+	}
+	[self setSerialNumber:sn]; //to force usbinterface at doc startup
 	[self checkUSBAlarm];
 	[[self objectConnectedTo:ORMCA927USBNextConnection] connectionChanged];
 }
@@ -561,14 +561,16 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) setUsbInterface:(ORUSBInterface*)anInterface
 {	
-	[usbInterface release];
-	usbInterface = anInterface;
-	[usbInterface retain];
-	[usbInterface setUsePipeType:kUSBInterrupt];
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORMCA927ModelUSBInterfaceChanged object: self];
+	if(anInterface != usbInterface){
+		[usbInterface release];
+		usbInterface = anInterface;
+		[usbInterface retain];
+		[usbInterface setUsePipeType:kUSBInterrupt];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName: ORMCA927ModelUSBInterfaceChanged object: self];
 
-	[self checkUSBAlarm];
+		[self checkUSBAlarm];
+	}
 }
 
 - (void)checkUSBAlarm
@@ -600,7 +602,8 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) interfaceRemoved:(NSNotification*)aNote
 {
-	if(usbInterface && serialNumber){
+	ORUSBInterface* theInterfaceRemoved = [[aNote userInfo] objectForKey:@"USBInterface"];
+	if((usbInterface == theInterfaceRemoved) && serialNumber){
 		[self setUsbInterface:nil];
 	}
 }
@@ -829,7 +832,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 }
 
 - (void) report:(BOOL)verbose
-{
+{	
 	NSFont* aFont = [NSFont fontWithName:@"Monaco" size:12];
 	unsigned long aValue0 = [self readReg:kCtlReg adc:0];
 	unsigned long aValue1 = [self readReg:kCtlReg adc:1];

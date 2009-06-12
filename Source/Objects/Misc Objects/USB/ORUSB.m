@@ -161,9 +161,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	while(anInterface = [e nextObject]){
 		if([[anInterface serialNumber] isEqualToString: serialNumber]){
 			id oldObj = [anInterface registeredObject];
-			[oldObj setUsbInterface:nil];
-			[anInterface setRegisteredObject:obj];
-			[obj setUsbInterface:anInterface];
+			if(oldObj!=obj){
+				[oldObj setUsbInterface:nil];
+				[anInterface setRegisteredObject:obj];
+				[obj setUsbInterface:anInterface];
+			}
 		}
 	}
 }
@@ -485,9 +487,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     
     if (messageType == kIOMessageServiceIsTerminated){    
 		NSLog(@"USB: %@ removed.\n",[usbCallbackData deviceName]);
+		NSDictionary* userInfo = nil;
+		if(usbCallbackData) userInfo = [NSDictionary dictionaryWithObject:usbCallbackData forKey:@"USBInterface"];
 		[interfaces removeObject:usbCallbackData];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceRemoved object:self userInfo:nil];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfacesChanged object:self userInfo:nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceRemoved object:self userInfo:userInfo];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfacesChanged object:self userInfo:userInfo];
 	}
 }
 

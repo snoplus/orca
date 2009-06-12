@@ -63,6 +63,8 @@
 	IBOutlet NSButton*		clearAllButton;
 	IBOutlet NSButton*		loadFpgaButton;
     IBOutlet NSButton*		logCB;
+    IBOutlet NSButton*		reportButton;
+    IBOutlet NSButton*		syncButton;
 
 	IBOutlet NSButton*		lockButton;
 
