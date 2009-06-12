@@ -449,7 +449,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 			NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: [kCrashLogDir stringByExpandingTildeInPath]];
 			// iterate over all the log files
 			while (filePath = [dirEnum nextObject]){
-				if([[filePath pathExtension] isEqualToString: @"crash"] && [filePath rangeOfString:@"Orca"].location != NSNotFound){
+				if([filePath hasPrefix:@"Orca"]){
 					NSString* contents = [NSString stringWithContentsOfFile:[[kCrashLogDir stringByExpandingTildeInPath] stringByAppendingPathComponent:filePath]];
 					if(contents){
 						NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:contents];
@@ -484,7 +484,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: [kCrashLogDir stringByExpandingTildeInPath]];
 	// iterate over all the log files
 	while (filePath = [dirEnum nextObject]){
-		if([[filePath pathExtension] isEqualToString: @"crash"] && [filePath rangeOfString:@"Orca"].location != NSNotFound){
+		if([filePath hasPrefix:@"Orca"]){
 			NSString* fullPath = [[kCrashLogDir stringByExpandingTildeInPath] stringByAppendingPathComponent:filePath];
 			if([fm fileExistsAtPath:lastCrashLogPath]){
 				[fm removeFileAtPath:lastCrashLogPath handler:nil];
