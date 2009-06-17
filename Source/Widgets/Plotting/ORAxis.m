@@ -852,6 +852,9 @@ enum {
 				[[NSCursor closedHandCursor] push];
 				[self setPin:[self minValue]];
 			}
+			else {
+				[self clearPin];
+			}
 			if ([self isXAxis]) mouseLoc.x -= lowOffset;
 			else				mouseLoc.y -= lowOffset;
 			
@@ -1312,7 +1315,7 @@ enum {
     else {
         if (pinned^invertPin | dragFlag) {
             if (pinPix != pix) {
-               // newMin = (pinVal*pix - mGrabValue*pinPix) / (pix - pinPix);
+                //newMin = (pinVal*pix - mGrabValue*pinPix) / (pix - pinPix);
 				newMin = [self minValue];
                 if (pinPix) newMax = newMin + (pinVal-newMin)*dpos/pinPix;
                 else		newMax = newMin + (mGrabValue-newMin)*dpos/pix;
