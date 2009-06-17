@@ -1287,6 +1287,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>BiStateView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -1664,6 +1672,8 @@
 				<string>id</string>
 				<key>openDocument</key>
 				<string>id</string>
+				<key>openRecentDocument</key>
+				<string>id</string>
 				<key>performClose</key>
 				<string>id</string>
 				<key>showAlarms</key>
@@ -1787,7 +1797,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ORFlippedView</string>
+				<string>ZFlowLayout</string>
 				<key>mDataSource</key>
 				<string>id</string>
 				<key>mXScale</key>

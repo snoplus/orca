@@ -68,6 +68,7 @@
 - (IBAction) showWindowList:(id)sender;
 - (IBAction) showORCARootServiceController:(id)sender;
 - (IBAction) showTemplates:(id)sender;
+- (IBAction) openRecentDocument:(id)sender;
 
 #pragma mark ¥¥¥Accessors
 - (id) document;

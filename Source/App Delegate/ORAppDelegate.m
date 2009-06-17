@@ -201,6 +201,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     [[watcher window] orderFront:nil];
     
 }
+
 - (IBAction) showProcessCenter:(id)sender
 {
     [[[ORProcessCenter sharedProcessCenter] window] orderFront:nil];
@@ -247,6 +248,12 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 {
     //we implement this method ONLY so we can do the validation of the menu item
     [[NSDocumentController sharedDocumentController] openDocument:sender];
+}
+
+- (IBAction) openRecentDocument:(id)sender
+{
+    //we implement this method ONLY so we can do the validation of the menu item
+	//nothing to do... everything is in the submenu and handled by the doc controller
 }
 
 - (IBAction) performClose:(id)sender
@@ -425,6 +432,9 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
         return documentIsOpen ? NO : YES;
     }
     if(theAction == @selector(openDocument:)){
+        return documentIsOpen ? NO : YES;
+    }
+    if(theAction == @selector(openRecentDocument:)){
         return documentIsOpen ? NO : YES;
     }
     if(theAction == @selector(showTemplates:)){
