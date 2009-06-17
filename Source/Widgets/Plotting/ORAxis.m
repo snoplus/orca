@@ -853,7 +853,7 @@ enum {
 				[self setPin:[self minValue]];
 			}
 			else {
-				[self clearPin];
+				if([self minValue]<0)[self clearPin];
 			}
 			if ([self isXAxis]) mouseLoc.x -= lowOffset;
 			else				mouseLoc.y -= lowOffset;
