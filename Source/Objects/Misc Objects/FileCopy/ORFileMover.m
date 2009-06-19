@@ -270,7 +270,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         [params addObject:[NSString stringWithFormat:@"%@",fullPath]];
         [params addObject:@"-u"];
         [params addObject:[NSString stringWithFormat:@"%@:%@",remoteUserName,remotePassWord]];
-        [params addObject:[NSString stringWithFormat:@"ftp://%@/%@",remoteHost,remotePath]];
+        [params addObject:[NSString stringWithFormat:@"sftp://%@/%@",remoteHost,remotePath]];
         //[params addObject:@"--create-dirs"];
 		
         if(verbose)[params addObject:@"-v"];
@@ -281,70 +281,64 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     else {
 	
         //make temp file for the script NOTE: expect must be installed!
-        //char* scriptFileName = tempnam([[@"~" stringByExpandingTildeInPath]cStringUsingEncoding:NSASCIIStringEncoding] ,"OrcaScriptXXX");
-        char* scriptFileName = tempnam("/tmp","OrcaScriptXXX");
-        FILE* scriptFilePtr = fopen(scriptFileName,"w+");
+		NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder:@"Scripts"];
+        char* scriptFileName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding],"OrcaScriptXXX");
+		NSString* scriptPath = [NSString stringWithUTF8String:scriptFileName];
+		free(scriptFileName);
 		BOOL isDir = NO;
 		[[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDir];
-        if(scriptFilePtr){
-            [self setScriptFilePath:[NSString stringWithCString:scriptFileName]];
+        if(scriptPath){
+            [self setScriptFilePath:scriptPath];
             //write the copy script to the temp file
-            fprintf(scriptFilePtr,"#!/usr/bin/expect --\n");
             
             switch ([self transferType]) {
                 case eUseSCP:
-                    //write script for scp
-					NSLog(@"spawn scp %s %s %s %s@%s:%s\n",isDir?"-r":"",verbose?"-v":"",[fullPath cStringUsingEncoding:NSASCIIStringEncoding],[remoteUserName cStringUsingEncoding:NSASCIIStringEncoding],[remoteHost cStringUsingEncoding:NSASCIIStringEncoding],[remotePath cStringUsingEncoding:NSASCIIStringEncoding]);
-					fprintf(scriptFilePtr,"spawn scp %s %s %s %s@%s:%s\n",isDir?"-r":"",verbose?"-v":"",[fullPath cStringUsingEncoding:NSASCIIStringEncoding],[remoteUserName cStringUsingEncoding:NSASCIIStringEncoding],[remoteHost cStringUsingEncoding:NSASCIIStringEncoding],[remotePath cStringUsingEncoding:NSASCIIStringEncoding]);
-					fprintf(scriptFilePtr,"expect {\n");
-					
-					//fprintf(scriptFilePtr,"\"* (yes/no)?\" { \n");
-					//fprintf(scriptFilePtr,"send \"yes\n\"\n");
-					//fprintf(scriptFilePtr,"}\n");
-					
-					fprintf(scriptFilePtr,"\"assword:\" { \n");
-					fprintf(scriptFilePtr,"send \"%s\n\"\n",[remotePassWord cStringUsingEncoding:NSASCIIStringEncoding]);
-					fprintf(scriptFilePtr,"}\n");
-						
-					fprintf(scriptFilePtr,"}\n");
-                    fprintf(scriptFilePtr,"expect eof\n");
+					{
+						NSString* bp = [[NSBundle mainBundle ]resourcePath];
+						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"]];
+						[theScript replace:@"<isDir>" with:isDir?@"-r":@""];
+						[theScript replace:@"<verbose>" with:isDir?@"-v":@""];
+						[theScript replace:@"<sourcePath>" with:fullPath];
+						[theScript replace:@"<userName>" with:remoteUserName];
+						[theScript replace:@"<host>" with:remoteHost];
+						[theScript replace:@"<destinationPath>" with:remotePath];
+						[theScript replace:@"<password>" with:remotePassWord];
+						[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+					}
                     break;
                     
                 case eUseSFTP:
                 case eUseFTP:
-                    
-                    if([self transferType] == eUseSFTP){
-                        fprintf(scriptFilePtr,"spawn sftp %s@%s\n",[remoteUserName cStringUsingEncoding:NSASCIIStringEncoding],[remoteHost cStringUsingEncoding:NSASCIIStringEncoding]);
+					{
+						NSString* bp = [[NSBundle mainBundle ]resourcePath];
+						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectScript"]];
+						
+						[theScript replace:@"<ftp>" with:[self transferType] == eUseSFTP?@"sftp":@"ftp"];
+						[theScript replace:@"<user>" with:remoteUserName];
+						[theScript replace:@"<host>" with:remoteHost];
+						[theScript replace:@"<password>" with:remotePassWord];
+						[theScript replace:@"<sourcePath>" with:fullPath];
+						[theScript replace:@"<destinationPath>" with:remotePath];
+						[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
                     }
-                    else {
-                        fprintf(scriptFilePtr,"spawn ftp %s@%s\n",[remoteUserName cStringUsingEncoding:NSASCIIStringEncoding],[remoteHost cStringUsingEncoding:NSASCIIStringEncoding]);
-                    }
-                    fprintf(scriptFilePtr,"expect \"* password:\"\n");
-                    fprintf(scriptFilePtr,"send \"%s\n\"\n",[remotePassWord cStringUsingEncoding:NSASCIIStringEncoding]);
-                    fprintf(scriptFilePtr,"expect \"* sftp>\"\n");
-                    fprintf(scriptFilePtr,"send \"put %s %s\n\"\n",[fullPath cStringUsingEncoding:NSASCIIStringEncoding],[remotePath cStringUsingEncoding:NSASCIIStringEncoding]);
-                    fprintf(scriptFilePtr,"expect \"* sftp>\"\n");
-                    fprintf(scriptFilePtr,"send \"quit\n\"\n");
-                    
                     break;
                     
                 case eUseCURL:
                     break;
                     
             }
-            fclose(scriptFilePtr);
+			
             //make the script executable
             NSFileManager     *fileManager = [NSFileManager defaultManager];
             BOOL fileOK = [fileManager fileExistsAtPath: fullPath];
             if ( fileOK ) {
                 NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
-                [fileManager changeFileAttributes:dict atPath:[NSString stringWithCString:scriptFileName]];
+                [fileManager changeFileAttributes:dict atPath:scriptPath];
                 
                 //set up the environment for unbuffered I/O
-                [task setLaunchPath:[NSString stringWithCString:scriptFileName]];
+                [task setLaunchPath:scriptPath];
 		
             }
-            free(scriptFileName);
         }
     }
     
