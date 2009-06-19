@@ -86,7 +86,8 @@
 - (NSData*) asData
 {
     //write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
-    char* tmpName = tempnam([[@"~" stringByExpandingTildeInPath]cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
+	NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder];
+    char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
 	NSString* thePath = [NSString stringWithCString:tmpName];
     [self writeToFile:thePath atomically:YES];
     NSData* data = [NSData dataWithContentsOfFile:thePath];
@@ -133,7 +134,8 @@
 + (id) dictionaryWithPList:(id)plist
 {
 	//write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
-	char* tmpName = tempnam([[@"~" stringByExpandingTildeInPath]cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
+	NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder];
+	char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
 	NSString* thePath = [NSString stringWithCString:tmpName];
 	[plist writeToFile:thePath atomically:YES];
 	NSDictionary* theResponse = [NSDictionary dictionaryWithContentsOfFile:thePath];
