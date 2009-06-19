@@ -166,6 +166,7 @@
 @implementation NSMutableString (NSStringWithExtensions)
 - (unsigned int)replace:(NSString *)target with:(NSString *)replacement
 {
+	if(!replacement)replacement = @"";
     return [self replaceOccurrencesOfString:target withString:replacement options:NSLiteralSearch range:NSMakeRange(0,[self length])];
 }
 @end
