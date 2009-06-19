@@ -348,10 +348,12 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 {   
     if(queueIsRunning) {
 		if([theWorkingFileMover transferType] == eUseCURL){
-			return [NSString stringWithFormat:@"Working: %d/%d",workingOnFile,startCount];
+			if(startCount > 1) return [NSString stringWithFormat:@"Working: %d/%d",workingOnFile,startCount];
+			else return [NSString stringWithFormat:@"Working"];
 		}
 		else {
-			return [NSString stringWithFormat:@"Working: %d/%d  %d%%",workingOnFile,startCount,[theWorkingFileMover percentDone]];
+			if(startCount > 1)return [NSString stringWithFormat:@"Working: %d/%d  %d%%",workingOnFile,startCount,[theWorkingFileMover percentDone]];
+			else return [NSString stringWithFormat:@"Working: %d%%",[theWorkingFileMover percentDone]];
 		}
     }
     else return @"Idle";
