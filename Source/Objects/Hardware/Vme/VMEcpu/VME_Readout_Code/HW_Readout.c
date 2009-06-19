@@ -163,7 +163,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
         memMapHandle = get_new_device(p->address, addressModifier, unitSize, 0); 
         if (memMapHandle == NULL) {
             sprintf(aPacket->message,"error: %d : %s\n",(int32_t)errno,strerror(errno));
-            p->errorCode = -1;
+            p->errorCode = errno;
             if(reply)writeBuffer(aPacket);
             return;
         }
@@ -226,7 +226,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
         returnDataPtr->errorCode = 0;
     } else {
         aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_VmeWriteBlockStruct);
-        returnDataPtr->errorCode = result;        
+        returnDataPtr->errorCode = errno;        
     }
 
     lptr = (int32_t*)returnDataPtr;
@@ -300,7 +300,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
         if (memMapHandle == NULL) {
             sprintf(aPacket->message,"error: %d : %s\n",
                 (int32_t)errno,strerror(errno));
-            p->errorCode = -1;
+            p->errorCode = errno;
             if(reply)writeBuffer(aPacket);
             return;
         }
@@ -342,7 +342,6 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     returnDataPtr->unitSize        = unitSize;
     returnDataPtr->numItems        = numItems;
     if(result == (numItems*unitSize)){
-        //printf("no read error\n");
         returnDataPtr->errorCode = 0;
         switch(unitSize){
             case 1: /*bytes*/
@@ -361,7 +360,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
         aPacket->cmdHeader.numberBytesinPayload    
             = sizeof(SBC_VmeReadBlockStruct);
         returnDataPtr->numItems  = 0;
-        returnDataPtr->errorCode = result;        
+        returnDataPtr->errorCode = errno;        
     }
 
     if(needToSwap) {
