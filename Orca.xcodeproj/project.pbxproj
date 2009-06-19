@@ -1598,6 +1598,8 @@
 		84B63CE809783832005B20A5 /* PushButton.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE109783832005B20A5 /* PushButton.nib */; };
 		84B63CE909783832005B20A5 /* PushButtonOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE209783832005B20A5 /* PushButtonOff.tif */; };
 		84B63CEA09783832005B20A5 /* PushButtonOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE309783832005B20A5 /* PushButtonOn.tif */; };
+		84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84B74ACF0FEAAB460033E658 /* ftpExpectScript */; };
+		84B74B3C0FEAB19E0033E658 /* scpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84B74B3B0FEAB19E0033E658 /* scpExpectScript */; };
 		84B771400DB3DFBB004798B2 /* ORCaen1720Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B7713E0DB3DFBB004798B2 /* ORCaen1720Decoder.h */; };
 		84B771410DB3DFBB004798B2 /* ORCaen1720Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7713F0DB3DFBB004798B2 /* ORCaen1720Decoder.m */; };
 		84B7F8D60820551F00721869 /* bigdotcolormask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7F8D30820551F00721869 /* bigdotcolormask.tif */; };
@@ -3536,6 +3538,8 @@
 		84B649B50406ECBA005F64B1 /* NcdMux.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = NcdMux.gif; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.gif"; sourceTree = SOURCE_ROOT; };
 		84B649B70407013B005F64B1 /* NcdMuxHWModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NcdMuxHWModel.h; sourceTree = "<group>"; };
 		84B649B80407013B005F64B1 /* NcdMuxHWModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NcdMuxHWModel.m; sourceTree = "<group>"; };
+		84B74ACF0FEAAB460033E658 /* ftpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ftpExpectScript; sourceTree = "<group>"; };
+		84B74B3B0FEAB19E0033E658 /* scpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = scpExpectScript; path = "Source/Objects/Misc Objects/FileCopy/scpExpectScript"; sourceTree = SOURCE_ROOT; };
 		84B7713E0DB3DFBB004798B2 /* ORCaen1720Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1720Decoder.h; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Decoder.h; sourceTree = SOURCE_ROOT; };
 		84B7713F0DB3DFBB004798B2 /* ORCaen1720Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Decoder.m; sourceTree = SOURCE_ROOT; };
 		84B7DF8604E1A425005F64B1 /* ORRateGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRateGroup.h; sourceTree = "<group>"; };
@@ -8201,6 +8205,8 @@
 				84DF917304D6D53C005F64B1 /* ORFileMover.m */,
 				848463A90625D65F00128299 /* ORSmartFolder.h */,
 				848463A60625D65F00128299 /* ORSmartFolder.m */,
+				84B74B3B0FEAB19E0033E658 /* scpExpectScript */,
+				84B74ACF0FEAAB460033E658 /* ftpExpectScript */,
 				848463B70625D76A00128299 /* SmartFolder.nib */,
 			);
 			name = FileMover;
@@ -10395,6 +10401,8 @@
 				8408B2270FDD560200B0206D /* cPCI.png in Resources */,
 				8408B23D0FDD579800B0206D /* IPE.png in Resources */,
 				8408B2830FDD5A9D00B0206D /* IPEV4.png in Resources */,
+				84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */,
+				84B74B3C0FEAB19E0033E658 /* scpExpectScript in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
