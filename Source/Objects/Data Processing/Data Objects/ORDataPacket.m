@@ -728,7 +728,8 @@
 - (NSData*) headerAsData
 {
     //write header to temp file because we want the form you get from a disk file...the string to property list isn't right.
-    char* name = tempnam([[@"~" stringByExpandingTildeInPath]cStringUsingEncoding:NSASCIIStringEncoding] ,"OrcaHeaderXXX");
+	NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder];
+    char* name = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"OrcaHeaderXXX");
     [self createFileFromHeader:[NSString stringWithCString:name]];
     NSData* dataBlock = [NSData dataWithContentsOfFile:[NSString stringWithCString:name]];
 	unsigned long headerLength        = [dataBlock length];											//in bytes

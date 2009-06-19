@@ -259,7 +259,9 @@
 		else [script replaceOccurrencesOfString:@"</ccLine/>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		NSFileManager* fm = [NSFileManager defaultManager];
 		
-		char* tmpName = tempnam([[@"~" stringByExpandingTildeInPath]cStringUsingEncoding:NSASCIIStringEncoding] ,"aMailScriptXXX");
+		
+		NSString* mailFolder = [[ORGlobal sharedGlobal] applicationSupportFolder:@"Mail"];
+		char* tmpName = tempnam([mailFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"aMailScriptXXX");
 		tempFilePath = [[NSString stringWithCString:tmpName] retain];
 		free(tmpName);
 		
