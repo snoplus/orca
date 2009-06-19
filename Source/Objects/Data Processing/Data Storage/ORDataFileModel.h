@@ -26,9 +26,11 @@
 @class ORDataPacket;
 @class ORQueue;
 @class ORSmartFolder;
+@class ORAlarm;
 
 #define kStopOnLimit	0
 #define kRestartOnLimit 1
+#define kMinDiskSpace   500 //MBytes
 
 @interface ORDataFileModel :  ORDataChainObject
 {
@@ -59,6 +61,7 @@
 		BOOL			useFolderStructure;
 		BOOL			useDatedFileNames;
 		int				sizeLimitReachedAction;
+		ORAlarm*		diskFullAlarm;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -92,6 +95,7 @@
 - (NSTimer*) fileSizeTimer;
 - (void) setFileSizeTimer:(NSTimer*)aTimer;
 - (void) getDataFileSize:(NSTimer*)aTimer;
+- (void) checkDiskStatus;
 
 - (BOOL)saveConfiguration;
 - (void)setSaveConfiguration:(BOOL)flag;

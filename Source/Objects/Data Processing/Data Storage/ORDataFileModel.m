@@ -24,6 +24,7 @@
 #import "ORDataPacket.h"
 #import "ORStatusController.h"
 #import "ORSmartFolder.h"
+#import "ORAlarm.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORDataFileModelUseDatedFileNamesChanged	= @"ORDataFileModelUseDatedFileNamesChanged";
@@ -38,7 +39,7 @@ NSString* ORDataFileSizeChangedNotification 		= @"The DataFile Size Has Changed"
 NSString* ORDataSaveConfigurationChangedNotification    = @"ORDataSaveConfigurationChangedNotification";
 NSString* ORDataFileModelSizeLimitReachedActionChanged	= @"ORDataFileModelSizeLimitReachedActionChanged";
 
-NSString* ORDataFileLock							= @"ORDataFileLock";
+NSString* ORDataFileLock					= @"ORDataFileLock";
 
 #pragma mark ¥¥¥Definitions
 static NSString *ORDataFileConnection 		= @"Data File Input Connector";
@@ -79,7 +80,8 @@ static const int currentVersion = 1;           // Current version
 {
     [filePrefix release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+	[diskFullAlarm clearAlarm];
+    [diskFullAlarm release];
     [filePointer release];
     [fileSizeTimer invalidate];
     [fileSizeTimer release];
@@ -441,6 +443,13 @@ static const int currentVersion = 1;           // Current version
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	
+	if(diskFullAlarm){
+		[diskFullAlarm clearAlarm];
+		[diskFullAlarm release];
+		diskFullAlarm = nil;
+	}
+	
     if(!dataBuffer)dataBuffer = [[NSMutableData dataWithCapacity:20*1024] retain];
     lastTime	 = [NSDate timeIntervalSinceReferenceDate];
     fileSegment = 1;
@@ -605,9 +614,8 @@ static const int currentVersion = 1;           // Current version
 	}
 	
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORDataFileSizeChangedNotification
-	 object: self];
-    
+		postNotificationName:ORDataFileSizeChangedNotification
+		object: self];
 }
 
 - (void) getDataFileSize:(NSTimer*)timer
@@ -619,6 +627,30 @@ static const int currentVersion = 1;           // Current version
     if (fsize = [fattrs objectForKey:NSFileSize]){
         [self setDataFileSize:[fsize intValue]];
     }
+	[self checkDiskStatus];
+}
+
+- (void) checkDiskStatus
+{
+	NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
+	NSDictionary* diskInfo = [[NSFileManager defaultManager] fileSystemAttributesAtPath:fullFileName];
+	unsigned freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
+	if(freeSpace < kMinDiskSpace * 1024 * 1024){
+		if(!diskFullAlarm){
+			diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
+			[diskFullAlarm setSticky:YES];
+			[diskFullAlarm setHelpString:[NSString stringWithFormat:@"The data disk is dangerously full. Less than %d MB Left. Runs will not be possible until space is available.", kMinDiskSpace]];
+		}
+			
+		[diskFullAlarm setAcknowledged:NO];
+		[diskFullAlarm postAlarm];
+			
+		NSString* reason = [NSString stringWithFormat:@"Disk Space size less than %d MB",kMinDiskSpace];
+		[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORRequestRunHalt
+							object:self
+							userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+		}
 }
 
 #pragma mark ¥¥¥Archival
