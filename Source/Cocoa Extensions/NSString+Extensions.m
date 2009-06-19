@@ -162,3 +162,10 @@
 	return [NSString stringWithUTF8String:p];
 }
 @end
+
+@implementation NSMutableString (NSStringWithExtensions)
+- (unsigned int)replace:(NSString *)target with:(NSString *)replacement
+{
+    return [self replaceOccurrencesOfString:target withString:replacement options:NSLiteralSearch range:NSMakeRange(0,[self length])];
+}
+@end

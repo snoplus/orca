@@ -45,5 +45,8 @@ typedef enum {
 + (NSString*) stringWithUSBDesc:(char*)aDesc;
 @end
 
+@interface NSMutableString (NSStringWithExtensions)
+- (unsigned int)replace:(NSString *)target with:(NSString *)replacement;
+@end
 
     
