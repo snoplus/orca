@@ -92,8 +92,36 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
     [super dealloc];
 }
 
+- (NSString*) applicationSupportFolder:(NSString*)subPath
+{
+	NSString*    path = [self applicationSupportFolder];
+    NSFileManager* fm = [NSFileManager defaultManager];
+	NSArray* parts = [subPath componentsSeparatedByString:@"/"];
+	NSEnumerator* e = [parts objectEnumerator];
+	NSString* part;
+	while(part = [e nextObject]){
+		path = [path stringByAppendingPathComponent:part];
+		if(![fm fileExistsAtPath:path]){
+			[fm createDirectoryAtPath:path attributes:nil];
+		}
+	}
+	return path;
+}
 
+- (NSString*) applicationSupportFolder
+{
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString* basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
+    
+    NSFileManager* fm = [NSFileManager defaultManager];
 
+	basePath = [basePath stringByAppendingPathComponent:@"ORCA"];
+	if(![fm fileExistsAtPath:basePath]){
+		[fm createDirectoryAtPath:basePath attributes:nil];
+	}
+
+    return basePath;
+}
 
 - (void) registerNotificationObservers
 {
@@ -112,8 +140,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
                    selector : @selector(documentClosed:)
                        name : ORDocumentClosedNotification
                      object : nil];
-    
-	
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification

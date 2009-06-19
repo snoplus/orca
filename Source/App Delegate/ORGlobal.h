@@ -18,17 +18,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
-
 @class ORAlarm;
 
 typedef enum {
 	kNormalRun,
 	kOfflineRun
 }eRunMode;
+
 //--------------------------------------------------------
-enum eRunState{
+enum eRunState {
     eRunStopped,
     eRunInProgress,
     eRunStarting,
@@ -41,9 +39,8 @@ typedef enum eRunType {
     eMaintenanceRunType = (1 << 0),
 }eRunType;
 
-
 extern NSString* runState[kNumRunStates];
-//--------------------------------------------------------
+
 //--------------------------------------------------------
 typedef enum ORTaskState {
     eTaskStopped,
@@ -53,38 +50,47 @@ typedef enum ORTaskState {
 }ORTaskState;
 
 extern NSString* ORTaskStateName[eMaxTaskState];
+
 //--------------------------------------------------------
 
-
 @interface ORGlobal : NSObject  {
-    BOOL	runInProgress;
-    short       tasksRunning;
-    short       tasksWaiting;
-    eRunMode    runMode;
-    ORAlarm*    runModeAlarm;
+    BOOL	 runInProgress;
+    short    tasksRunning;
+    short    tasksWaiting;
+    eRunMode runMode;
+    ORAlarm* runModeAlarm;
     unsigned long runType;
 	NSMutableDictionary* runVetos;
 	int cpuCount;
 }
 
 + (ORGlobal*) sharedGlobal;
+
+#pragma mark •••Initialization
 - (id) init;
+- (void) registerNotificationObservers;
+
+#pragma mark •••Notifications
+- (void) runStatusChanged:(NSNotification*)aNotification;
+- (void) taskStatusChanged:(NSNotification*)aNotification;
+- (void) documentClosed:(NSNotification*)aNotification;
+
+#pragma mark •••Run Info
 - (BOOL) runInProgress;
 - (BOOL) runStopped;
 - (BOOL) runRunning;
 - (void) setRunInProgress:(BOOL)state;
-- (void) registerNotificationObservers;
-- (void) runStatusChanged:(NSNotification*)aNotification;
-- (void) taskStatusChanged:(NSNotification*)aNotification;
-- (void) documentClosed:(NSNotification*)aNotification;
 - (unsigned long)runType;
-- (void)setRunType:(unsigned long)aRunType;
-
+- (void) setRunType:(unsigned long)aRunType;
 - (void) setRunMode:(eRunMode)aMode;
 - (eRunMode) runMode;
 - (NSString*) runModeString;
 - (void) checkRunMode;
+
+#pragma mark •••Helpers
 - (NSUndoManager*) undoManager;
+- (NSString*) applicationSupportFolder;
+- (NSString*) applicationSupportFolder:(NSString*)subPath;
 - (void) addRunVeto:(NSString*)vetoName comment:(NSString*)aComment;
 - (void) removeRunVeto:(NSString*)vetoName;
 - (void) listVetoReasons;
