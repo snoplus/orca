@@ -31,7 +31,6 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 - (id) init
 {
     self = [super init];
-    //[self setTransferType: eUseCURL];
     [self setTransferType: eUseSCP];
     
     allOutput = [[NSMutableString stringWithCapacity:512] retain];
@@ -197,17 +196,12 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     [fullPath autorelease];
     fullPath = [aFullPath copy];
 }
-// ----------------------------------------------------------
-// - percentDone:
-// ----------------------------------------------------------
+
 - (int) percentDone
 {
     return percentDone;
 }
 
-// ----------------------------------------------------------
-// - setPercentDone:
-// ----------------------------------------------------------
 - (void) setPercentDone: (int) aPercentDone
 {
     percentDone = aPercentDone;
@@ -251,7 +245,6 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                name : NSTaskDidTerminateNotification
              object : task];
     
-    
     [readHandle readInBackgroundAndNotify];
     
     NSDictionary* defaultEnvironment = [[NSProcessInfo processInfo] environment];
@@ -259,10 +252,8 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
     [task setEnvironment: environment];
     
-    
     if([self transferType] == eUseCURL){
 	
-        
         [task setLaunchPath:@"/usr/bin/curl"];
 	
         NSMutableArray* params = [NSMutableArray array];
@@ -279,7 +270,6 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 	
     }
     else {
-	
         //make temp file for the script NOTE: expect must be installed!
 		NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder:@"Scripts"];
         char* scriptFileName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding],"OrcaScriptXXX");
@@ -288,9 +278,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 		BOOL isDir = NO;
 		[[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDir];
         if(scriptPath){
-            [self setScriptFilePath:scriptPath];
-            //write the copy script to the temp file
-            
+            [self setScriptFilePath:scriptPath];            
             switch ([self transferType]) {
                 case eUseSCP:
 					{
@@ -325,7 +313,6 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                     
                 case eUseCURL:
                     break;
-                    
             }
 			
             //make the script executable
@@ -334,10 +321,8 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
             if ( fileOK ) {
                 NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
                 [fileManager changeFileAttributes:dict atPath:scriptPath];
-                
-                //set up the environment for unbuffered I/O
                 [task setLaunchPath:scriptPath];
-		
+				NSLog(@"Trying to send <%@> to %@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");
             }
         }
     }
@@ -377,6 +362,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 						}
 					}
                 break;
+					
                 case eUseFTP:
 					range = [allOutput rangeOfString:@"%"];
                     if(range.location  != NSNotFound){
@@ -389,6 +375,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                     //range = [allOutput rangeOfString:@"Transfer complete"];
                     //if(range.location  != NSNotFound)transferOK = YES;
                 break;
+					
                 case eUseSFTP:
                     range = [allOutput rangeOfString:@"Host is down"];
                     if(range.location  != NSNotFound){
@@ -411,6 +398,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                   //  range = [allOutput rangeOfString:@"Failure"];
                    // if(range.location  == NSNotFound)transferOK = YES;
                 break;
+					
                 case eUseCURL:
                     if([task terminationStatus] == 0)transferOK = YES;
                     else {
@@ -423,7 +411,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         
             
         if(transferOK){
-            NSLog(@"%@ copied to %@@%@:%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteUserName,remoteHost,remotePath);	
+            NSLog(@"%@ copied to %@@%@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteUserName,remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");	
             if ([delegate respondsToSelector:@selector(shouldRemoveFile:)]){
                 if([delegate shouldRemoveFile:fullPath]){
                     [[NSFileManager defaultManager] removeFileAtPath:fullPath handler:nil];
