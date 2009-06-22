@@ -14,24 +14,14 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+
 #import "ORCaenDataDecoder.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
-
-//--------------------------------------------------------------------------------
-// Implementation ORCaenDataDecoder
-//--------------------------------------------------------------------------------
 @implementation ORCaenDataDecoder
 
 #pragma mark ***Initialization
-//--------------------------------------------------------------------------------
-/*!
-* \method	init
- * \brief	Init routine which currently calls initStructs routine.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) init
 {
     self = [super init];
@@ -39,8 +29,6 @@
     
     return self;
 }
-
-
 
 //--------------------------------------------------------------------------------
 /*!
@@ -59,15 +47,15 @@
 {
     // Output buffer format.
     static CaenOutputFormats caenOutputFormats[kNumOutputFormats] = {
-    { "Geo",		0xf8000000, 27 },	// Header
-    { "WordType",       0x07000000, 24 },
-    { "Crate",		0x00ff0000, 16 },
-    { "ChanCount",      0x00003f00, 8 },	
-    { "ChanNum",	0x003f0000, 16 },	// Data word format including data.
-    { "UnderThres",     0x00002000, 13 },
-    { "Overflow",       0x00001000, 12 },
-    { "Data",		0x00000fff,  0 },
-    { "EventCounter",	0x00ffffff,  0 }	// The End of Block
+    { "Geo",		 0xf8000000, 27 },	// Header
+    { "WordType",    0x07000000, 24 },
+    { "Crate",		 0x00ff0000, 16 },
+    { "ChanCount",   0x00003f00, 8 },	
+    { "ChanNum",	 0x003f0000, 16 },	// Data word format including data.
+    { "UnderThres",  0x00002000, 13 },
+    { "Overflow",    0x00001000, 12 },
+    { "Data",		 0x00000fff,  0 },
+    { "EventCounter",0x00ffffff,  0 }	// The End of Block
 	}; 
     
     mCaenOutputFormats = caenOutputFormats;
@@ -75,142 +63,61 @@
     // CAEN Status Register.
     static CaenStatusRegFormats caenStatusRegFormats[kNumStatusRegFormats] = {
     { "BufferEmpty",	0x0002,	1},
-    { "BufferFull",	0x0004,	2 },
-    { "DSel0",		0x0010,	4 },
-    { "DSel1",		0x0020,	5 },
-    { "CSel0",		0x0040,	6 },
-    { "CSel1",		0x0080,	7 },
-    { "Busy",		0x0004,	0 },
-    { "DataReady",	0x0001,	0 },
+    { "BufferFull",		0x0004,	2 },
+    { "DSel0",			0x0010,	4 },
+    { "DSel1",			0x0020,	5 },
+    { "CSel0",			0x0040,	6 },
+    { "CSel1",			0x0080,	7 },
+    { "Busy",			0x0004,	0 },
+    { "DataReady",		0x0001,	0 },
 	};
     
     mCaenStatusRegFormats = caenStatusRegFormats;
 }
 
 #pragma mark ***General routines for any data word
-//--------------------------------------------------------------------------------
-/*!
-* \method	isHeader
- * \brief	Determine if this record is a header.
- * \param	pDataValue			- Any data value from the CAEN module.
- * \return	True - this word is a header.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) isHeader: (unsigned long) pDataValue
 {
     return( [self decodeValueOutput: pDataValue ofType: kCaen_WordType] == kCaen_Header );
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	isEndOfBlock
- * \brief	Determine if this record is the end of block record.
- * \param	pDataValue			- Any data value from the CAEN module.
- * \return	True - this word is the end-of-block record.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) isEndOfBlock: (unsigned long) pDataValue
 {
     return( [self decodeValueOutput: pDataValue ofType: kCaen_WordType] == kCaen_EndOfBlock );
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	isValidDatum
- * \brief	Determine if this record is a data record for a channel.
- * \param	pDataValue			- Any data value from the CAEN module.
- * \return	True - this word is a data record
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) isValidDatum: (unsigned long) pDataValue
 {
     return( [self decodeValueOutput: pDataValue ofType: kCaen_WordType] == kCaen_ValidDatum );
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	isNotValidDatum
- * \brief	Determine if this record is a not valid data.
- * \param	pDataValue			- Any data value from the CAEN module.
- * \return	True - this word is not a valid data record.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) isNotValidDatum: (unsigned long) pDataValue
 {
     return( [self decodeValueOutput: pDataValue ofType: kCaen_WordType] == kCaen_NotValidDatum );
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	GeoAddress
- * \brief	Return the decoded GeoAddress for CAEN module.
- * \param	pDataValue			- Any CAEN data word.
- * \return	The value in the GEO address - we overwrite this value with the record type.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) geoAddress: (unsigned long) pDataValue
 {
     return [self decodeValueOutput: pDataValue ofType: kCaen_GeoAddress];
 }
 
 #pragma mark ***Header decoders
-//--------------------------------------------------------------------------------
-/*!
-* \method	crate
- * \brief	Return the decoded crate number for the CAEN module.
- * \param	pHeader			- The header for the data.
- * \return	The crate number.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) crate: (unsigned long) pHeader
 {
     return [self decodeValueOutput: pHeader ofType: kCaen_Crate];
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	numMemorizedChannels
- * \brief	Return the decoded number of channels stored in buffer from CAEN device.
- * \param	pHeader			- The header for the data.
- * \return	The number of channels.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) numMemorizedChannels: (unsigned long) pHeader
 {
     return [self decodeValueOutput: pHeader ofType: kCaen_ChanCount];
 }
 
 #pragma mark ***Data word decoders
-//--------------------------------------------------------------------------------
-/*!
-* \method	channel
- * \brief	Return the channel in the CAEN device for this data word..
- * \param	pDataValue			- The data word.
- * \return	The channel number.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) channel: (unsigned long) pDataValue
 {
     return( [self decodeValueOutput: pDataValue ofType: kCaen_ChanNumber] );
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method 	adcValue
- * \brief	Return the data value.
- * \param	pDataValue			- The data word.
- * \return	The data value.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) adcValue: (unsigned long) pDataValue
 {
     return( [self decodeValueOutput: pDataValue ofType: kCaen_Data] );
@@ -218,73 +125,28 @@
 
 
 #pragma mark ***Status Register 1
-//--------------------------------------------------------------------------------
-/*!
-* \method	isBusy
- * \brief	Returns if buffer is empty.
- * \param	pStatusReg1			- The status register 1 value.
- * \return	True if device is busy converting.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) isBusy: (unsigned short) pStatusReg1
 {
     return [self decodeValueStatusReg: pStatusReg1 ofType: kCaen_Busy];
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	isBusy
- * \brief	Returns if buffer is empty.
- * \param	pStatusReg1			- The status register 1 value.
- * \return	True if data is ready for readout.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) isDataReady: (unsigned short) pStatusReg1
 {
     return [self decodeValueStatusReg: pStatusReg1 ofType: kCaen_DataReady];
 }
 
 #pragma mark ***Status Register 2
-//--------------------------------------------------------------------------------
-/*!
-* \method	isBufferEmpty
- * \brief	Returns if buffer is empty.
- * \param	pStatusReg2			- The status register 2 value..
- * \return	True if output buffer is empty.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) isBufferEmpty: (unsigned short) pStatusReg2
 {
     return [self decodeValueStatusReg: pStatusReg2 ofType: kCaen_BufferEmpty];
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	isBuffeFull
- * \brief	Returns if buffer is full.
- * \param	pStatusReg2			- The status register 2 value..
- * \return	True if output buffer is full.
- * \note	
- */
-//--------------------------------------------------------------------------------
 -(BOOL) isBufferFull:( unsigned short) pStatusReg2
 {
     return [self decodeValueStatusReg: pStatusReg2 ofType: kCaen_BufferFull];
 }
 
 #pragma mark ***Support functions.
-//--------------------------------------------------------------------------------
-/*!
-* \method	decodeValueStatusReg
- * \brief	Interprets value from register.
- * \param	pStatusRegValue			- The status register value.
- * \return	The value asked for.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) decodeValueStatusReg: (unsigned short) pStatusRegValue
                                  ofType: (unsigned short) pType
 {
@@ -292,15 +154,6 @@
     return val;
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	decodeValueOutput
- * \brief	Interprets value from register.
- * \param	pStatusRegValue			- The status register value.
- * \return	The value asked for.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) decodeValueOutput: (unsigned long) pOutputValue
                              ofType: (unsigned short) pType
 {
@@ -308,15 +161,6 @@
     return val;
 }
 
-//--------------------------------------------------------------------------------
-/*!
-* \method	printData
- * \brief	prints out the entire output data buffer - Used for debugging.
- * \param	pName
- * \param	theData	- a pointer to the data.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) printData: (NSString*) pName dataPacket: (ORDataPacket*) theDataPacket
 {
     short i;

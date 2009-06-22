@@ -541,12 +541,12 @@
     }
     
 	// Populate the channel popup
-    for (i = 0; i < 32; i++) {
+    for (i = 0; i < [model numberOfChannels]; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i] 
 								  atIndex:i];
     }
 	
-    [channelPopUp insertItemWithTitle:@"All" atIndex:32];
+    [channelPopUp insertItemWithTitle:@"All" atIndex:[model numberOfChannels]];
 	
     [self selectedRegIndexChanged:nil];
 	
