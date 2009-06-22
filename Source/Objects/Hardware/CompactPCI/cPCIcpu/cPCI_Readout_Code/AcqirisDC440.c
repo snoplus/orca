@@ -205,8 +205,8 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetVertical:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,2);
-				double fullScale,offset;
-				uint32_t coupling,bandwidth;
+				ViReal64 fullScale,offset;
+				ViInt32 coupling,bandwidth;
 				status = AcqrsD1_getVertical(argl(0),argl(1),&fullScale,&offset,&coupling,&bandwidth);
 				sprintf(aString,"%G,%G,%ld,%ld",fullScale,offset,coupling,bandwidth);
 				sendGetResponse(aPacket,status,aString);
@@ -216,8 +216,8 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetTrigSource:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,2);
-				uint32_t coupling,slope;
-				double level1,level2;
+				ViInt32 coupling,slope;
+				ViReal64 level1,level2;
 				status = AcqrsD1_getTrigSource(argl(0),argl(1),&coupling,&slope,&level1,&level2);
 				sprintf(aString,"%ld,%ld,%G,%G",coupling,slope,level1,level2);
 				sendGetResponse(aPacket,status,aString);
@@ -227,8 +227,8 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetTrigClass:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
-				uint32_t sourcePattern,trigClass,validatepattern,holdType;
-				double holdValue1,holdValue2;
+				ViInt32 sourcePattern,trigClass,validatepattern,holdType;
+				ViReal64 holdValue1,holdValue2;
 				status = AcqrsD1_getTrigClass(argl(0),&trigClass,&sourcePattern,&validatepattern,&holdType,&holdValue1,&holdValue2);
 				sprintf(aString,"%ld,%ld",trigClass,sourcePattern);
 				sendGetResponse(aPacket,status,aString);
@@ -239,8 +239,8 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetNbrChannels:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
-				uint32_t numChannels;
-				status = AcqrsD1_getNbrChannels(argl(0),&numChannels);
+				ViInt32 numChannels;
+				status = Acqrs_getNbrChannels(argl(0),&numChannels);
 				sprintf(aString,"%ld",numChannels);
 				sendGetResponse(aPacket,status,aString);
 			}
