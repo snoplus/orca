@@ -133,7 +133,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 			
 			aString[0] = '\0';
 			for (i = 0; i < NumInstruments; i++){
-				sprintf(&aString[strlen(aString)],"%ld,%ld,%s,",digitizer[i].instrumentID,digitizer[i].serialNumber,digitizer[i].name);
+				sprintf(&aString[strlen(aString)],"%d,%d,%s,",digitizer[i].instrumentID,digitizer[i].serialNumber,digitizer[i].name);
 			}
 		
 			aPacket->cmdHeader.destination	= kAcqirisDC440;
@@ -184,9 +184,9 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetMemory:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
-				int32_t numberSamples,nubmerSegments;
-				status = AcqrsD1_getMemory(argl(0),&numberSamples,&nubmerSegments);
-				sprintf(aString,"%ld,%ld",numberSamples,nubmerSegments);
+				ViInt32 numberSamples,numberSegments;
+				status = AcqrsD1_getMemory(argl(0),&numberSamples,&numberSegments);
+				sprintf(aString,"%ld,%ld",numberSamples,numberSegments);
 				sendGetResponse(aPacket,status,aString);
 			}
 		break;
