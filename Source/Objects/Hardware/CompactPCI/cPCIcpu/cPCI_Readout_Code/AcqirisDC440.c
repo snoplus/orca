@@ -346,11 +346,11 @@ char FindAcqirisDC440s(void)
 			AcqrsD1_calibrate(InstrumentID[i]);
 			acqirisInitFlag = 1;
 		}
-		char name[20];
-		int32_t serialNumber,busNumber,digitizerNumber;
+		ViChar name[20];
+		ViInt32 serialNumber,busNumber,digitizerNumber;
 		InstrumentID[i] = i;
-		AcqrsD1_getInstrumentData(InstrumentID[i],name,&serialNumber,&busNumber,&digitizerNumber);
-		strcpy(digitizer[i].name,name);
+		Acqrs_getInstrumentData(InstrumentID[i],name,&serialNumber,&busNumber,&digitizerNumber);
+		strcpy(digitizer[i].name,(const char *)name);
 		digitizer[i].busNumber		= busNumber;
 		digitizer[i].serialNumber	= serialNumber;
 		digitizer[i].instrumentID	= InstrumentID[i];
