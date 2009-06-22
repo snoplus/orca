@@ -26,7 +26,7 @@
 #include "SBC_Cmds.h"
 
 void ClearAcqirisInitFlag(void);
-ViStatus FindAcqirisDC440s(void);
+int32_t FindAcqirisDC440s(void);
 void ReleaseAcqirisDC440s(void);
 void processAcquirisDC440Command(SBC_Packet* aPacket);
 

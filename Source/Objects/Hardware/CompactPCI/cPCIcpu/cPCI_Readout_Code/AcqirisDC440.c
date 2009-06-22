@@ -330,7 +330,7 @@ void ClearAcqirisInitFlag(void)
 	acqirisInitFlag = 0;
 }
 
-ViStatus FindAcqirisDC440s(void)
+int32_t FindAcqirisDC440s(void)
 {
 // The following call will find the number of digitizers on the computer, regardless of
 // their connection(s) to ASBus.
