@@ -1395,14 +1395,6 @@
 		84A9566F077B796F00CAD99D /* ORCurve2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A9566D077B796F00CAD99D /* ORCurve2D.h */; };
 		84A95670077B796F00CAD99D /* ORCurve2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A9566E077B796F00CAD99D /* ORCurve2D.m */; };
 		84A9571F077B887100CAD99D /* Example2D.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9571E077B887100CAD99D /* Example2D.gif */; };
-		84AA480A0FEFC69C00356FFE /* ORWebController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AA48040FEFC69C00356FFE /* ORWebController.h */; };
-		84AA480B0FEFC69C00356FFE /* ORWebController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA48050FEFC69C00356FFE /* ORWebController.m */; };
-		84AA480C0FEFC69C00356FFE /* ORWebModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AA48060FEFC69C00356FFE /* ORWebModel.h */; };
-		84AA480D0FEFC69C00356FFE /* ORWebModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA48070FEFC69C00356FFE /* ORWebModel.m */; };
-		84AA480E0FEFC69C00356FFE /* Web.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AA48080FEFC69C00356FFE /* Web.nib */; };
-		84AA480F0FEFC69C00356FFE /* Web.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AA48090FEFC69C00356FFE /* Web.tif */; };
-		84AA48150FEFCBD000356FFE /* SimpleHTTPConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AA48130FEFCBD000356FFE /* SimpleHTTPConnection.h */; };
-		84AA48160FEFCBD000356FFE /* SimpleHTTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AA48140FEFCBD000356FFE /* SimpleHTTPConnection.m */; };
 		84AB8BB60D2314A500EC39F2 /* ORCmdHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BB40D2314A500EC39F2 /* ORCmdHistory.h */; };
 		84AB8BB70D2314A500EC39F2 /* ORCmdHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BB50D2314A500EC39F2 /* ORCmdHistory.m */; };
 		84AB8BC10D2314CD00EC39F2 /* crate_lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BB90D2314CD00EC39F2 /* crate_lib.m */; };
@@ -3328,14 +3320,6 @@
 		84A9566D077B796F00CAD99D /* ORCurve2D.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCurve2D.h; path = Source/Widgets/Plotting/ORCurve2D.h; sourceTree = SOURCE_ROOT; };
 		84A9566E077B796F00CAD99D /* ORCurve2D.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCurve2D.m; path = Source/Widgets/Plotting/ORCurve2D.m; sourceTree = SOURCE_ROOT; };
 		84A9571E077B887100CAD99D /* Example2D.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Example2D.gif; path = Source/Widgets/Plotting/Example2D.gif; sourceTree = SOURCE_ROOT; };
-		84AA48040FEFC69C00356FFE /* ORWebController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWebController.h; sourceTree = "<group>"; };
-		84AA48050FEFC69C00356FFE /* ORWebController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWebController.m; sourceTree = "<group>"; };
-		84AA48060FEFC69C00356FFE /* ORWebModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWebModel.h; sourceTree = "<group>"; };
-		84AA48070FEFC69C00356FFE /* ORWebModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWebModel.m; sourceTree = "<group>"; };
-		84AA48080FEFC69C00356FFE /* Web.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Web.nib; sourceTree = "<group>"; };
-		84AA48090FEFC69C00356FFE /* Web.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Web.tif; sourceTree = "<group>"; };
-		84AA48130FEFCBD000356FFE /* SimpleHTTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimpleHTTPConnection.h; path = "../../Dropbox/Simple HTTP Server/SimpleHTTPConnection.h"; sourceTree = SOURCE_ROOT; };
-		84AA48140FEFCBD000356FFE /* SimpleHTTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SimpleHTTPConnection.m; path = "../../Dropbox/Simple HTTP Server/SimpleHTTPConnection.m"; sourceTree = SOURCE_ROOT; };
 		84AA48320461DE37005F64B1 /* OfflineRunAlarmHelp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = OfflineRunAlarmHelp; path = "Source/Main Document/OfflineRunAlarmHelp"; sourceTree = SOURCE_ROOT; };
 		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -5298,7 +5282,6 @@
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
 				840B8135094E4D8D00B1B135 /* Label */,
 				847597450B5EF26500123411 /* SQL */,
-				84AA48030FEFC69C00356FFE /* WebConnection */,
 			);
 			name = "Misc Objects";
 			path = "Source/Objects/Misc Objects";
@@ -7038,22 +7021,6 @@
 			);
 			name = SBC_LAM;
 			path = Source/Objects/Hardware/SBC/SBC_LAM;
-			sourceTree = SOURCE_ROOT;
-		};
-		84AA48030FEFC69C00356FFE /* WebConnection */ = {
-			isa = PBXGroup;
-			children = (
-				84AA48130FEFCBD000356FFE /* SimpleHTTPConnection.h */,
-				84AA48140FEFCBD000356FFE /* SimpleHTTPConnection.m */,
-				84AA48040FEFC69C00356FFE /* ORWebController.h */,
-				84AA48050FEFC69C00356FFE /* ORWebController.m */,
-				84AA48060FEFC69C00356FFE /* ORWebModel.h */,
-				84AA48070FEFC69C00356FFE /* ORWebModel.m */,
-				84AA48080FEFC69C00356FFE /* Web.nib */,
-				84AA48090FEFC69C00356FFE /* Web.tif */,
-			);
-			name = WebConnection;
-			path = "Source/Objects/Misc Objects/WebConnection";
 			sourceTree = SOURCE_ROOT;
 		};
 		84AB8BB30D2314A500EC39F2 /* CmdHistory */ = {
@@ -9840,9 +9807,6 @@
 				8408A22A0FD85B3A00B0206D /* ORTemplates.h in Headers */,
 				84B74CE90FEBE9B90033E658 /* ORCaen965Controller.h in Headers */,
 				84B74CEB0FEBE9B90033E658 /* ORCaen965Model.h in Headers */,
-				84AA480A0FEFC69C00356FFE /* ORWebController.h in Headers */,
-				84AA480C0FEFC69C00356FFE /* ORWebModel.h in Headers */,
-				84AA48150FEFCBD000356FFE /* SimpleHTTPConnection.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10470,8 +10434,6 @@
 				84B74B3C0FEAB19E0033E658 /* scpExpectScript in Resources */,
 				84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */,
 				84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */,
-				84AA480E0FEFC69C00356FFE /* Web.nib in Resources */,
-				84AA480F0FEFC69C00356FFE /* Web.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11185,9 +11147,6 @@
 				8408A22B0FD85B3A00B0206D /* ORTemplates.m in Sources */,
 				84B74CEA0FEBE9B90033E658 /* ORCaen965Controller.m in Sources */,
 				84B74CEC0FEBE9B90033E658 /* ORCaen965Model.m in Sources */,
-				84AA480B0FEFC69C00356FFE /* ORWebController.m in Sources */,
-				84AA480D0FEFC69C00356FFE /* ORWebModel.m in Sources */,
-				84AA48160FEFCBD000356FFE /* SimpleHTTPConnection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
