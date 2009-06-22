@@ -46,7 +46,7 @@ ViInt32 StopAcquisition (ViSession dev,int32_t aStopOption);
 
 
 // ### Global variables ###
-int32_t NumInstruments;			// Number of instruments
+ViInt32 NumInstruments;			// Number of instruments
 ViSession InstrumentID[10];		// Array of instrument handles
 
 typedef struct digitizerInfo{
@@ -124,7 +124,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 {
 	int32_t status;
 	char *argv[32];
-	int32_t i;
+	ViInt32* i;
 	char aString[kMaxAsciiCmdLength];
 	switch(aPacket->cmdHeader.cmdID){		
 		case kAcqiris_GetSerialNumbers:
@@ -330,7 +330,7 @@ void ClearAcqirisInitFlag(void)
 	acqirisInitFlag = 0;
 }
 
-char FindAcqirisDC440s(void)
+ViStatus FindAcqirisDC440s(void)
 {
 // The following call will find the number of digitizers on the computer, regardless of
 // their connection(s) to ASBus.
