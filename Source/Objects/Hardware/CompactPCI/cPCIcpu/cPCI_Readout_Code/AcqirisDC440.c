@@ -240,7 +240,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
 				ViInt32 numChannels;
-				status = Acqrs_getNbrChannels(argl(0),&numChannels);
+				status = AcqrsD1_getNbrChannels(argl(0),&numChannels);
 				sprintf(aString,"%ld",numChannels);
 				sendGetResponse(aPacket,status,aString);
 			}
@@ -349,7 +349,7 @@ ViStatus FindAcqirisDC440s(void)
 		ViChar name[20];
 		ViInt32 serialNumber,busNumber,digitizerNumber;
 		InstrumentID[i] = i;
-		Acqrs_getInstrumentData(InstrumentID[i],name,&serialNumber,&busNumber,&digitizerNumber);
+		AcqrsD1_getInstrumentData(InstrumentID[i],name,&serialNumber,&busNumber,&digitizerNumber);
 		strcpy(digitizer[i].name,(const char *)name);
 		digitizer[i].busNumber		= busNumber;
 		digitizer[i].serialNumber	= serialNumber;
