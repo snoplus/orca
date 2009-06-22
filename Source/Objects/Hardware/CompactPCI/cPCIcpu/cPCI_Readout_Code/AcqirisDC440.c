@@ -124,7 +124,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 {
 	int32_t status;
 	char *argv[32];
-	ViInt32* i;
+	ViInt32 i;
 	char aString[kMaxAsciiCmdLength];
 	switch(aPacket->cmdHeader.cmdID){		
 		case kAcqiris_GetSerialNumbers:
