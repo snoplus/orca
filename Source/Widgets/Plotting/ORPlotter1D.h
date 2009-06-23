@@ -36,6 +36,7 @@
     BOOL			shiftKeyIsDown;
     BOOL			doNotDraw;
     BOOL			ignoreDoNotDrawFlag;
+	BOOL			setAllLinesBold;
 	CTGradient*		gradient;
 }
 
@@ -69,7 +70,8 @@
 - (void)setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag;
 - (void)setShowActiveGate:(BOOL)flag;
-
+- (void) setAllLinesBold:(BOOL)flag;
+- (BOOL) setAllLinesBold;
 - (ORAxis*) xScale;
 - (void) setXScale:(ORAxis*)newXScale;
 - (ORAxis*) yScale;

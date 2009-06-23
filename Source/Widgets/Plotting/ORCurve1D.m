@@ -380,8 +380,13 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 
 	NSColor* curveColor = [aPlot colorForDataSet:dataSetID];
 	
-	if([aPlot activeCurve] == self)[curveColor set];
-	else [[curveColor highlightWithLevel:.4]set];
+	if([aPlot setAllLinesBold]){
+		[curveColor set];
+	}
+	else {
+		if([aPlot activeCurve] == self)[curveColor set];
+		else [[curveColor highlightWithLevel:.4]set];
+	}
 	[theDataPath setLineWidth:.5];
 	[theDataPath stroke];
 }

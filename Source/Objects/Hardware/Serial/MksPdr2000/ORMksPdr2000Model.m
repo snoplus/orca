@@ -390,6 +390,7 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 	[self setPollTime:		[decoder decodeIntForKey:	 @"pollTime"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
+    [self setPressureScale:	[decoder decodeIntForKey:    @"pressureScale"]];
 	[[self undoManager] enableUndoRegistration];
 	int i;
 	for(i=0;i<2;i++){
@@ -407,6 +408,7 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
     [encoder encodeInt: pollTime		forKey: @"pollTime"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
+	[encoder encodeInt:pressureScale   forKey:@"pressureScale"];
 }
 
 #pragma mark ••• Commands

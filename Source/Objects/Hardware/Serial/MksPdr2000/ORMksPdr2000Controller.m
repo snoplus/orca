@@ -58,6 +58,7 @@
 
     [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+	[plotter0 setAllLinesBold:YES];
     [super awakeFromNib];
 }
 
@@ -365,8 +366,8 @@
 - (NSColor*) colorForDataSet:(int)set
 {
 	if(set==0)return [NSColor redColor];
-	else if(set==1)return [NSColor orangeColor];
-	else return [NSColor blackColor];
+	else if(set==1)return [NSColor blackColor];
+	else return [NSColor greenColor];
 }
 
 

@@ -55,6 +55,7 @@
 
     [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+	[plotter0 setUseGradient:YES];
     [super awakeFromNib];
 }
 

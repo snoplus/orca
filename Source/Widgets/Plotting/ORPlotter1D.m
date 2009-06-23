@@ -578,6 +578,15 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     ignoreDoNotDrawFlag = aFlag;
 }
 
+- (void) setAllLinesBold:(BOOL)flag
+{
+	setAllLinesBold = flag;
+}
+
+- (BOOL) setAllLinesBold
+{
+	return setAllLinesBold;
+}
 
 
 -(void)setFrame:(NSRect)aFrame
