@@ -635,7 +635,7 @@ static const int currentVersion = 1;           // Current version
 	NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
 	NSDictionary* diskInfo = [[NSFileManager defaultManager] fileSystemAttributesAtPath:fullFileName];
 	unsigned freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
-	if(freeSpace < kMinDiskSpace * 1024 * 1024){
+	if(freeSpace < kMinDiskSpace * 1024){
 		if(!diskFullAlarm){
 			diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
 			[diskFullAlarm setSticky:YES];
