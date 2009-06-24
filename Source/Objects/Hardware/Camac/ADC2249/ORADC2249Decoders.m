@@ -86,9 +86,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getStationKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
-    unsigned long  value = *ptr&0x00000fff;
+    unsigned long  value = *ptr&0x000003ff;
 	
-    [aDataSet histogram:value numBins:2048 sender:self  withKeys:@"ADC2249", crateKey,cardKey,channelKey,nil];
+    [aDataSet histogram:value numBins:1024 sender:self  withKeys:@"ADC2249", crateKey,cardKey,channelKey,nil];
 
     if(gatesInstalled){
         [super prepareData:aDataSet crate:crate card:card channel:channel value:value];

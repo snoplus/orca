@@ -227,12 +227,8 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 	}theTimeRef;
 
     @try {
-        
         //check the LAM
-        unsigned short dummy;
-		BOOL isLamSet = NO;
-		if(checkLAM)isLamSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8 data:&dummy]); //LAM status comes back in the Q bit
-		else isLamSet =YES;
+		BOOL isLamSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8]); //LAM status comes back in the Q bit
         if(isLamSet) { 
             if(onlineChannelCount){
 				resetDone = NO;
@@ -244,10 +240,10 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
                 for(i=0;i<onlineChannelCount;i++){
                     //read one adc channnel
                     unsigned short adcValue;
-                    [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
+                    [controller camacShortNAF:cachedStation a:onlineList[i] f:0 data:&adcValue];
 					if(!(suppressZeros && adcValue==0)){
 						if(IsShortForm(dataId)){
-							unsigned long data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0xfff);
+							unsigned long data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0x3ff);
 							[aDataPacket addLongsToFrameBuffer:&data length:1];
 						}
 						else {
@@ -270,25 +266,27 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
                     if(i == (kRegisterNumberADC2249- 1)) resetDone = YES;
                     
                 }
-                //read of last channel with this command clears
-				if(!resetDone) [controller camacShortNAF:[self stationNumber] a:11 f:2 data:&dummy]; 
-				[self enableLAMEnableLatch]; //for testing the lockup problem 4/9/09
-				//[self generalReset]; //this is an f9
 			}
-            
-            
+			//[self enableLAMEnableLatch];
+			//tests of reset conditions to try and prevent lockup mah 6/24/09
+			//[controller camacShortNAF:cachedStation a:0 f:24]; //disable LAM 
+			[controller camacShortNAF:cachedStation a:0 f:9]; //clear module and LAM
+			//[controller camacShortNAF:cachedStation a:0 f:10]; //clear LAM
+			//[controller camacShortNAF:cachedStation a:0 f:26]; //enable LAM
+			
   		}
-		}
-@catch(NSException* localException) {
-			NSLogError(@"",@"ADC2249 Card Error",nil);
-			[self incExceptionCount];
-			[localException raise];
-		}
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"ADC2249 Card Error",nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	[self disableLAMEnableLatch];
 }
 
 #pragma mark ¥¥¥Hardware Test functions
