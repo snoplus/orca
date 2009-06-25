@@ -21,11 +21,10 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
 
-
 @interface OR1DHistoController : ORDataController {
 	IBOutlet NSButton*		rebinCB;
 	IBOutlet NSTextField*	rebinNumberTextField;
-	id						calibrationPanel;
+	id						calibrationPanel;				
 }
 - (id) init;
 - (void) awakeFromNib;

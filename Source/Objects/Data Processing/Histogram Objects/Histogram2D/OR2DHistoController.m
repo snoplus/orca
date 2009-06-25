@@ -46,7 +46,7 @@
 	
 	[plotter setBackgroundColor:[NSColor colorWithCalibratedRed:1. green:1. blue:1. alpha:1]];
 	[plotter setGridColor:[NSColor grayColor]];
-	[plotter  setDrawWithGradient:YES];
+	[plotter  setUseGradient:YES];
 	
     NSSize minSize = [[self window] minSize];
     minSize.width = 335;
