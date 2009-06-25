@@ -44,7 +44,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 
 - (void) awakeFromNib
 {
-	[plotter setDrawWithGradient:YES];
+	[plotter setUseGradient:YES];
     [self registerNotificationObservers];
     [plotter setNeedsDisplay:YES];
     [self upTimeChanged:nil];
