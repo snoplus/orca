@@ -19,6 +19,7 @@
 #import "ORCARootServiceDefs.h"
 #import "CTGradient.h"
 #import "ORFlippedView.h"
+#import "ORPlotPublisher.h"
 
 NSString* ORPlotter1DDifferentiate		= @"ORPlotter1DDifferentiate";
 NSString* ORPlotter1DAverageWindow		= @"ORPlotter1DAverageWindow";
@@ -1108,9 +1109,29 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	}
 }
 
+
+- (NSView*) viewForPDF
+{
+	return viewForPDF;
+}
+
+- (IBAction) publishToPDF:(id)sender
+{
+	//NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
+	//model , @"ObjectToUpdate",
+	//								  nil];
+	
+	if(viewForPDF){
+		[ORPlotPublisherPane publishPlot:self];
+	}
+	//[self prepareToPublish];
+	//[self performSelector:@selector(dumpToPDF) withObject:nil afterDelay:0];
+}
+
 @end
 
 @implementation ORPlotter1D (private)
+
 
 //used only so there is some to draw when this object needs to be displayed
 //in Interface Builder and there is no data source.

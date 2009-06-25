@@ -13,8 +13,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
 @class ORAxis;
 @class ORGate1D;
 @class CTGradient;
@@ -22,11 +20,12 @@
 
 @interface ORPlotter1D : NSView <NSCoding>
 {
-    IBOutlet ORFlippedView*		analysisView;
+    IBOutlet ORFlippedView*	analysisView;
     IBOutlet NSDrawer*		analysisDrawer;
     IBOutlet ORAxis*		mXScale;
     IBOutlet ORAxis*		mYScale;
     IBOutlet  id            mDataSource;    
+	IBOutlet NSView*		viewForPDF;
 
     NSMutableArray*         curves;
     NSMutableDictionary*	attributes;
@@ -38,6 +37,9 @@
     BOOL			ignoreDoNotDrawFlag;
 	BOOL			setAllLinesBold;
 	CTGradient*		gradient;
+	NSColor*		savedColor;
+	NSColor*		savedGridColor;
+	BOOL			savedUseGradient;
 }
 
 - (void) dealloc;
@@ -86,24 +88,7 @@
 - (void) didEnd:(NSSavePanel *)sheet
 	 returnCode:(int)code
 	contextInfo:(void *)contextInfo;
-
 - (void) tileAnalysisPanels;
-
-- (IBAction) copy:(id)sender;
-- (IBAction) clearActiveGate:(id)sender;
-- (IBAction) clearActiveCurveGates:(id)sender;
-- (IBAction) clearAllGates:(id)sender;
-
-- (IBAction) analyze:(id)sender;
-- (IBAction) resetScales:(id)sender;
-- (IBAction) centerOnPeak:(id)sender;
-- (IBAction) xAndYAutoScale:(id)sender;
-- (IBAction) autoScale:(id)sender;
-- (IBAction) addGateAction:(id)sender;
-- (IBAction) removeGateAction:(id)sender;
-- (IBAction) differentiateAction:(id)sender;
-- (IBAction) averageWindowAction:(id)sender;
-- (IBAction) refresh:(id)sender;
 
 - (id)	initWithCoder:(NSCoder *)coder;
 - (void) encodeWithCoder:(NSCoder *)coder;
@@ -117,6 +102,7 @@
 - (void) setXLabel:(NSString*)xLabel yLabel:(NSString*)yLabel;	
 - (void) doFFT:(id)userInfo;
 - (void) autoScaleXAxis;
+- (NSView*) viewForPDF;
 
 //wrappers for KVO bindings
 - (void) setDataColor0:(NSColor*)aColor;
@@ -132,6 +118,23 @@
 - (NSColor*) dataColor3;
 - (NSColor*) dataColor4;
 - (NSColor*) dataColor5;
+
+- (IBAction) copy:(id)sender;
+- (IBAction) clearActiveGate:(id)sender;
+- (IBAction) clearActiveCurveGates:(id)sender;
+- (IBAction) clearAllGates:(id)sender;
+- (IBAction) analyze:(id)sender;
+- (IBAction) resetScales:(id)sender;
+- (IBAction) centerOnPeak:(id)sender;
+- (IBAction) xAndYAutoScale:(id)sender;
+- (IBAction) autoScale:(id)sender;
+- (IBAction) addGateAction:(id)sender;
+- (IBAction) removeGateAction:(id)sender;
+- (IBAction) differentiateAction:(id)sender;
+- (IBAction) averageWindowAction:(id)sender;
+- (IBAction) refresh:(id)sender;
+- (IBAction) publishToPDF:(id)sender;
+
 @end
 
 @interface NSObject (OR1DPlotDataSource1)
