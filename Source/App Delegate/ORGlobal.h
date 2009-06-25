@@ -89,8 +89,6 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 
 #pragma mark •••Helpers
 - (NSUndoManager*) undoManager;
-- (NSString*) applicationSupportFolder;
-- (NSString*) applicationSupportFolder:(NSString*)subPath;
 - (void) addRunVeto:(NSString*)vetoName comment:(NSString*)aComment;
 - (void) removeRunVeto:(NSString*)vetoName;
 - (void) listVetoReasons;
