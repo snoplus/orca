@@ -22,15 +22,17 @@
 #import "ORPlotter.h"
 
 @interface ORPlotPublisher (private)
+- (void) dumpAndStore;
 - (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) dumpToPDF;
+- (void) _saveFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) finish;
 @end
 
 @implementation ORPlotPublisher
 
 + (void) publishPlot:(id)aPlot 
 {
-	if([aPlot respondsToSelector:@selector(viewForPDF)]){
+	if([aPlot respondsToSelector:@selector(plotAsPDFData)]){
 		ORPlotPublisher* publisher = [[ORPlotPublisher alloc] initWithPlot:aPlot];
 		[publisher beginSheet];
 	}
@@ -94,21 +96,39 @@
 
 @implementation ORPlotPublisher (private)
 
-- (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) dumpAndStore
 {
-	[[plotter viewForPDF] setNeedsDisplay:YES];
-	if(returnCode == NSOKButton){
-		[self dumpToPDF];
-	}
-	//arghh... to eliminate some compiler warnings
-	[plotter setAttributes:oldAttributes];
-	
-	[self autorelease];
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save"];
+    [savePanel beginSheetForDirectory:NSHomeDirectory()
+								 file:@"Plot.pdf"
+					   modalForWindow:[plotter window]
+						modalDelegate:self
+					   didEndSelector:@selector(_saveFileDidEnd:returnCode:contextInfo:)
+						  contextInfo:nil];
 }
 
-- (void) dumpToPDF
+- (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	NSData* pdfData = [[plotter viewForPDF] dataWithPDFInsideRect: [[plotter viewForPDF] bounds]];
-	[pdfData writeToFile:[@"~/plotPDF.pdf" stringByExpandingTildeInPath] atomically:NO];
+	if(returnCode == NSOKButton){
+		[self dumpAndStore];
+	}
+	else [self finish];
+}
+
+- (void) _saveFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* savePath = [[sheet filenames] objectAtIndex:0];
+		NSData* pdfData = [plotter plotAsPDFData];
+		[pdfData writeToFile:[savePath stringByExpandingTildeInPath] atomically:NO];
+    }
+	[self finish];
+}
+
+- (void) finish
+{
+	[plotter setAttributes:oldAttributes];
+	[self autorelease];
 }
 @end

@@ -58,10 +58,10 @@
 - (NSColor*) gridColor;
 - (BOOL) isOpaque;
 - (id) dataSource;
-- (NSView*) viewForPDF;
 
 #pragma mark •••Drawing
 - (void) drawBackground;
+- (NSData*) plotAsPDFData;
 
 #pragma mark •••SubClasses Will Override
 - (void) setDataSource:(id)d;

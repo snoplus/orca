@@ -165,6 +165,11 @@ NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
 	[NSBezierPath strokeRect:bounds];
 }
 
+- (NSData*) plotAsPDFData
+{
+	return [viewForPDF dataWithPDFInsideRect: [viewForPDF bounds]];
+}
+
 #pragma mark •••SubClasses Will Override
 - (void)setDataSource:(id)d
 {
@@ -208,26 +213,17 @@ NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
     }
 }
 
-- (NSView*) viewForPDF
-{
-	return viewForPDF;
-}
-
 #pragma mark •••Actions
 - (IBAction) publishToPDF:(id)sender
-{
-	//NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
-	//model , @"ObjectToUpdate",
-	//								  nil];
-	
+{	
 	if(viewForPDF){
 		[ORPlotPublisher publishPlot:self];
 	}
-	//[self prepareToPublish];
-	//[self performSelector:@selector(dumpToPDF) withObject:nil afterDelay:0];
 }
 - (IBAction) analyze:(id)sender
 {
     [self doAnalysis];
 }
+
+
 @end
