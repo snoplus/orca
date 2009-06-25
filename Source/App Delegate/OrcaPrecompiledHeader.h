@@ -33,6 +33,7 @@
 #import "ORGroup.h"
 #import "ORSecurity.h"
 #import "ORGlobal.h"
+#import "ApplicationSupport.h"
 #import "StatusLog.h"
 #import "ORDocument.h"
 #import "ORAppDelegate.h"
