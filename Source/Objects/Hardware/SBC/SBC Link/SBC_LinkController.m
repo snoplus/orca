@@ -64,12 +64,12 @@
     [plotter setVectorMode:YES];
     [[plotter xScale] setRngLimitsLow:0 withHigh:300 withMinRng:300];
     [[plotter yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
-    [plotter setDrawWithGradient:YES];
+    [plotter setUseGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
 	
 	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
     [[histogram yScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
-    [histogram setDrawWithGradient:YES];
+    [histogram setUseGradient:YES];
 	
 	[payloadSizeSlider setMinValue:0];
 	[payloadSizeSlider setMaxValue:300];
