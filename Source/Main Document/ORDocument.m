@@ -612,8 +612,23 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		[[controller window] makeFirstResponder:[controller window]];
     }
     [controller release];
-    
-    
+}
+
+- (void) makeControllerPDF:(NSString*)aClassName forObject:(id)aModel
+{
+    id controller = [[NSClassFromString(aClassName) alloc] init];
+    if([controller isKindOfClass:[OrcaObjectController class]]){
+        [[controller window] setFrameOrigin:NSMakePoint(8000,8000)];
+        [controller setModel:aModel];
+		[[[controller window] contentView] setNeedsDisplay:YES];
+		[self performSelector:@selector(makePDFFromController:) withObject:[controller autorelease] afterDelay:0];
+	}
+}
+
+- (void) makePDFFromController:(id)aController
+{
+	NSData* pdfData = [[aController window] dataWithPDFInsideRect:[[[aController window] contentView]frame]];
+	[pdfData writeToFile:[@"~/ORCAPages/page.pdf" stringByExpandingTildeInPath] atomically:NO];
 }
 
 

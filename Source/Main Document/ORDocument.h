@@ -80,6 +80,7 @@
 #pragma mark ¥¥¥Orca Dialog Management
 - (void)    duplicateDialog:(id)dialog;
 - (void)    makeController:(NSString*)className forObject:(id)aModel;
+- (void) makeControllerPDF:(NSString*)aClassName forObject:(id)aModel;
 - (NSArray*)findControllersWithModel:(id)aModel;
 
 - (void)    objectsRemoved:(NSNotification*)aNote;
