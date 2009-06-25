@@ -271,7 +271,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     }
     else {
         //make temp file for the script NOTE: expect must be installed!
-		NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder:@"Scripts"];
+		NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Scripts"];
         char* scriptFileName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding],"OrcaScriptXXX");
 		NSString* scriptPath = [NSString stringWithUTF8String:scriptFileName];
 		free(scriptFileName);

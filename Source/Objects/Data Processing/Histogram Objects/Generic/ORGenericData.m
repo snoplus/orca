@@ -20,7 +20,6 @@
 
 
 #import "ORGenericData.h"
-#import "ORPlotter.h"
 
 @implementation ORGenericData
 - (id) init

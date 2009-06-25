@@ -260,7 +260,7 @@
 		NSFileManager* fm = [NSFileManager defaultManager];
 		
 		
-		NSString* mailFolder = [[ORGlobal sharedGlobal] applicationSupportFolder:@"Mail"];
+		NSString* mailFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Mail"];
 		char* tmpName = tempnam([mailFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"aMailScriptXXX");
 		tempFilePath = [[NSString stringWithCString:tmpName] retain];
 		free(tmpName);
