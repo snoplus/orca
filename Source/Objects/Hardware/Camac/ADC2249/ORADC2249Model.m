@@ -258,7 +258,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 							}
 
 							data[0] =  dataId | len;
-							data[1] =  includeTimingMask | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0xfff);
+							data[1] =  includeTimingMask | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0x3ff);
 
 							[aDataPacket addLongsToFrameBuffer:data length:len];
 						}
