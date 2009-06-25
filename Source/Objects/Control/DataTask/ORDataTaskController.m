@@ -25,8 +25,7 @@
 #import "ORDataTaker.h"
 #import "ORReadOutList.h"
 #import "ORValueBar.h"
-#import "ORPlotter1D.h"
-#import "ORScale.h"
+#import "ORPlotter.h"
 #import "ORAxis.h"
 
 #define ORDataTakerItem @"ORDataTaker Drag Item"
@@ -60,7 +59,7 @@
 {
     [super awakeFromNib];
     
-	[plotter setDrawWithGradient:YES];
+	[plotter setUseGradient:YES];
 	
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.ORDataTaker.selectedtab"];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
