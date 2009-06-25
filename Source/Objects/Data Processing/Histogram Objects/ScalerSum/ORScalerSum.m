@@ -20,7 +20,6 @@
 
 
 #import "ORScalerSum.h"
-#import "ORPlotter.h"
 
 @implementation ORScalerSum
 - (id) init
