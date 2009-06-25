@@ -18,12 +18,10 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-@class ORPlotPublisher;
 @class ORPlotter;
 
-@interface ORPlotPublisherPane : NSWindowController 
+@interface ORPlotPublisher : NSWindowController 
 {
-
 	IBOutlet NSButton*		cancelButton;
 	IBOutlet NSButton*		applyButton;
 	

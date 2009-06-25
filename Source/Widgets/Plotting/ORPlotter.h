@@ -52,13 +52,13 @@
 - (BOOL) useGradient;
 - (BOOL) analyze;
 - (void) setAnalyze:(BOOL)newAnalyze;
-- (void) doAnalysis;
 - (void) setBackgroundColor:(NSColor *)aColor;
 - (NSColor*) backgroundColor;
 - (void) setGridColor:(NSColor *)aColor;
 - (NSColor*) gridColor;
 - (BOOL) isOpaque;
 - (id) dataSource;
+- (NSView*) viewForPDF;
 
 #pragma mark •••Drawing
 - (void) drawBackground;
@@ -66,9 +66,11 @@
 #pragma mark •••SubClasses Will Override
 - (void) setDataSource:(id)d;
 - (void) initCurves;
+- (void) doAnalysis;
 
 #pragma mark •••Actions
 - (IBAction) analyze:(id)sender;
+- (IBAction) publishToPDF:(id)sender;
 
 #pragma mark •••Archival
 - (void) encodeWithCoder:(NSCoder *)coder;

@@ -1,4 +1,4 @@
-//  ORPlotPublisherPane.m
+//  ORPlotPublisher.m
 //  Orca
 //
 //  Created by Mark Howe on June 25, 2009.
@@ -21,18 +21,18 @@
 #import "ORPlotPublisher.h"
 #import "ORPlotter.h"
 
-@interface ORPlotPublisherPane (private)
+@interface ORPlotPublisher (private)
 - (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) dumpToPDF;
 @end
 
-@implementation ORPlotPublisherPane
+@implementation ORPlotPublisher
 
 + (void) publishPlot:(id)aPlot 
 {
 	if([aPlot respondsToSelector:@selector(viewForPDF)]){
-		ORPlotPublisherPane* publisherPane = [[ORPlotPublisherPane alloc] initWithPlot:aPlot];
-		[publisherPane beginSheet];
+		ORPlotPublisher* publisher = [[ORPlotPublisher alloc] initWithPlot:aPlot];
+		[publisher beginSheet];
 	}
 }
 
@@ -92,7 +92,7 @@
 
 
 
-@implementation ORPlotPublisherPane (private)
+@implementation ORPlotPublisher (private)
 
 - (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {

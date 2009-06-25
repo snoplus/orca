@@ -16,9 +16,6 @@
 #import "ORGate1D.h"
 #import "ORAnalysisPanel1D.h"
 #import "ORCARootServiceDefs.h"
-#import "CTGradient.h"
-#import "ORFlippedView.h"
-#import "ORPlotPublisher.h"
 
 NSString* ORPlotter1DDifferentiate		= @"ORPlotter1DDifferentiate";
 NSString* ORPlotter1DAverageWindow		= @"ORPlotter1DAverageWindow";
@@ -933,25 +930,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 		}
 		NSLog(@"----------------------------------------\n");
 	}
-}
-
-
-- (NSView*) viewForPDF
-{
-	return viewForPDF;
-}
-
-- (IBAction) publishToPDF:(id)sender
-{
-	//NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
-	//model , @"ObjectToUpdate",
-	//								  nil];
-	
-	if(viewForPDF){
-		[ORPlotPublisherPane publishPlot:self];
-	}
-	//[self prepareToPublish];
-	//[self performSelector:@selector(dumpToPDF) withObject:nil afterDelay:0];
 }
 
 @end

@@ -21,6 +21,7 @@
 #import "ORPlotter.h"
 #import "CTGradient.h"
 #import "ORFlippedView.h"
+#import "ORPlotPublisher.h"
 
 NSString* ORPlotterBackgroundColor	= @"ORPlotterBackgroundColor";
 NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
@@ -88,16 +89,6 @@ NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
 {
     analyze=newAnalyze;
     if(analyze)[self analyze:self];
-}
-
-- (IBAction) analyze:(id)sender
-{
-    [self doAnalysis];
-}
-
-- (void) doAnalysis
-{
-	//subclasses can override
 }
 
 - (void)setBackgroundColor:(NSColor *)aColor
@@ -185,6 +176,11 @@ NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
 	//subclasses need to override
 }
 
+- (void) doAnalysis
+{
+	//subclasses can override
+}
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -212,4 +208,26 @@ NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
     }
 }
 
+- (NSView*) viewForPDF
+{
+	return viewForPDF;
+}
+
+#pragma mark •••Actions
+- (IBAction) publishToPDF:(id)sender
+{
+	//NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
+	//model , @"ObjectToUpdate",
+	//								  nil];
+	
+	if(viewForPDF){
+		[ORPlotPublisher publishPlot:self];
+	}
+	//[self prepareToPublish];
+	//[self performSelector:@selector(dumpToPDF) withObject:nil afterDelay:0];
+}
+- (IBAction) analyze:(id)sender
+{
+    [self doAnalysis];
+}
 @end

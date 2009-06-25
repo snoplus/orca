@@ -65,7 +65,6 @@
 - (void) setXLabel:(NSString*)xLabel yLabel:(NSString*)yLabel;	
 - (void) doFFT:(id)userInfo;
 - (void) autoScaleXAxis;
-- (NSView*) viewForPDF;
 
 //wrappers for KVO bindings
 - (void) setDataColor0:(NSColor*)aColor;
@@ -95,7 +94,6 @@
 - (IBAction) differentiateAction:(id)sender;
 - (IBAction) averageWindowAction:(id)sender;
 - (IBAction) refresh:(id)sender;
-- (IBAction) publishToPDF:(id)sender;
 
 @end
 
