@@ -86,7 +86,7 @@
 - (NSData*) asData
 {
     //write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
-	NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder];
+	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
     char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
 	NSString* thePath = [NSString stringWithCString:tmpName];
     [self writeToFile:thePath atomically:YES];
@@ -134,7 +134,7 @@
 + (id) dictionaryWithPList:(id)plist
 {
 	//write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
-	NSString* tempFolder = [[ORGlobal sharedGlobal] applicationSupportFolder];
+	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
 	char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
 	NSString* thePath = [NSString stringWithCString:tmpName];
 	[plist writeToFile:thePath atomically:YES];
@@ -142,6 +142,10 @@
 	[[NSFileManager defaultManager] removeFileAtPath:[NSString stringWithCString:tmpName] handler:nil];
 	free(tmpName);
 	return theResponse;
+}
+- (NSString*) htmlFormat
+{
+	return @"";
 }
 @end
 
@@ -210,6 +214,8 @@
 		[aLock unlock];
 	}
 }
+
+
 
 @end
 
