@@ -108,10 +108,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     
     NSString* title= @"ADC2249 ADC Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* chan  = [NSString stringWithFormat:@"Chan     = %d\n",(*ptr&0x0000f000)>>12];
-    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%x\n",*ptr&0x00000fff];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n", (*ptr&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n", (*ptr&0x001f0000)>>16];
+    NSString* chan  = [NSString stringWithFormat:@"Chan     = %d\n", (*ptr&0x0000f000)>>12];
+    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%x\n",*ptr&0x000003ff];
 	NSCalendarDate* theTime = nil;
 	
 	if(length ==4){
