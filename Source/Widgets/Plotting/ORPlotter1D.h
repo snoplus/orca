@@ -12,82 +12,45 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORPlotter.h"
 
-@class ORAxis;
 @class ORGate1D;
-@class CTGradient;
-@class ORFlippedView;
 
-@interface ORPlotter1D : NSView <NSCoding>
+@interface ORPlotter1D : ORPlotter
 {
-    IBOutlet ORFlippedView*	analysisView;
-    IBOutlet NSDrawer*		analysisDrawer;
-    IBOutlet ORAxis*		mXScale;
-    IBOutlet ORAxis*		mYScale;
-    IBOutlet  id            mDataSource;    
-	IBOutlet NSView*		viewForPDF;
-
     NSMutableArray*         curves;
-    NSMutableDictionary*	attributes;
 	
-    BOOL			analyze;
     int				activeCurveIndex;
     BOOL			shiftKeyIsDown;
-    BOOL			doNotDraw;
     BOOL			ignoreDoNotDrawFlag;
 	BOOL			setAllLinesBold;
-	CTGradient*		gradient;
-	NSColor*		savedColor;
-	NSColor*		savedGridColor;
-	BOOL			savedUseGradient;
 }
 
 - (void) dealloc;
 - (void) setDefaults;
-- (void) initCurves;
-- (NSMutableDictionary *)attributes;
-- (void)setAttributes:(NSMutableDictionary *)anAttributes;
-- (BOOL) useGradient;
-- (void) setUseGradient:(BOOL)aflag;
 - (void) drawerDidOpen:(NSNotification*)aNote;
 
 - (void) forcedUpdate:(NSNotification*)aNote;
 - (void) windowResizing:(NSNotification*)aNote;
-- (void) setDrawWithGradient:(BOOL)flag;
 
 - (void) drawRect:(NSRect) rect;
 - (void) setFrame:(NSRect)aFrame;
-- (BOOL) isOpaque;
-- (id)  dataSource;
-- (void) setDataSource:(id)d; 
 - (int)activeCurveIndex;
 - (void)setActiveCurveIndex:(int)anactiveCurveIndex;
 - (id) activeCurve;
 - (id) curve:(int)aCurveIndex gate:(int)aGateIndex;
-- (void) setBackgroundColor:(NSColor*)c;
-- (void) setGridColor:(NSColor*)c;
-- (NSColor*) backgroundColor;
-- (NSColor*) gridColor;
 - (NSColor*)colorForDataSet:(int) aDataSet;
 - (void)setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag;
 - (void)setShowActiveGate:(BOOL)flag;
 - (void) setAllLinesBold:(BOOL)flag;
 - (BOOL) setAllLinesBold;
-- (ORAxis*) xScale;
-- (void) setXScale:(ORAxis*)newXScale;
-- (ORAxis*) yScale;
-- (void) setYScale:(ORAxis*)newYScale;
 - (double) plotHeight;
 - (double) plotWidth;
 - (double) channelWidth;
 - (NSArray*) curves;
 - (void) setCurves:(NSMutableArray*)anArray;
 
-- (void) savePDF:(id)sender;
-- (void) didEnd:(NSSavePanel *)sheet
-	 returnCode:(int)code
-	contextInfo:(void *)contextInfo;
 - (void) tileAnalysisPanels;
 
 - (id)	initWithCoder:(NSCoder *)coder;
@@ -123,7 +86,6 @@
 - (IBAction) clearActiveGate:(id)sender;
 - (IBAction) clearActiveCurveGates:(id)sender;
 - (IBAction) clearAllGates:(id)sender;
-- (IBAction) analyze:(id)sender;
 - (IBAction) resetScales:(id)sender;
 - (IBAction) centerOnPeak:(id)sender;
 - (IBAction) xAndYAutoScale:(id)sender;
@@ -168,8 +130,6 @@
 - (void) makeMainController;
 @end
 
-extern NSString* ORPlotter1DBackgroundColor;
-extern NSString* ORPlotter1DGridColor;
 extern NSString* ORPlotter1DataColor;
 extern NSString* ORPlotter1DActiveCurveChanged;
 extern NSString* ORPlotter1DDifferentiateChanged;

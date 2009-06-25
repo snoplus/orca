@@ -13,58 +13,33 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "ORPlotter.h"
 
-
-@class ORAxis;
-@class ORFlippedView;
 @class ORCurve2D;
 @class ORColorScale;
-@class CTGradient;
 
-@interface ORPlotter2D : NSView <NSCoding>
+@interface ORPlotter2D : ORPlotter
 {
-    IBOutlet ORFlippedView*   analysisView;
-    IBOutlet NSDrawer*		analysisDrawer;
     IBOutlet ORColorScale*	mColorScale;
     IBOutlet ORAxis*		mZScale;
-    IBOutlet ORAxis*		mXScale;
-    IBOutlet ORAxis*		mYScale;
-    IBOutlet  id            mDataSource;    
 
     id						curve;
-    NSMutableDictionary*	attributes;
 
-    BOOL			shiftKeyIsDown;
     BOOL			cmdKeyIsDown;
-    BOOL			doNotDraw;
     BOOL			ignoreDoNotDrawFlag;
     
     BOOL            vectorMode;
 	NSImage*		backgroundImage;
-	BOOL			useGradient;
-	CTGradient*		gradient;
-	BOOL			analyze;
 }
 
 - (id)   initWithFrame:(NSRect)aFrame;
 - (void) dealloc;
 - (void) setDefaults;
-- (void) initCurve;
-- (NSMutableDictionary *)attributes;
-- (void)setAttributes:(NSMutableDictionary *)anAttributes;
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag;
-- (void) setDrawWithGradient:(BOOL)flag;
 
 - (void) drawRect:(NSRect) rect;
 - (void) setFrame:(NSRect)aFrame;
-- (BOOL) isOpaque;
-- (id)  dataSource;
-- (void) setDataSource:(id)d; 
 - (void) setBackgroundImage:(NSImage*)anImage;
-- (void) setBackgroundColor:(NSColor*)c;
-- (void) setGridColor:(NSColor*)c;
-- (NSColor*) backgroundColor;
-- (NSColor*) gridColor;
 - (NSColor*)colorForDataSet:(int) aDataSet;
 - (void)setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
 
@@ -72,17 +47,11 @@
 - (void) setColorScale:(ORColorScale*)newColorScale;
 - (ORAxis*) zScale;
 - (void) setZScale:(ORAxis*)newZScale;
-- (ORAxis*) xScale;
-- (void) setXScale:(ORAxis*)newXScale;
-- (ORAxis*) yScale;
-- (void) setYScale:(ORAxis*)newYScale;
 - (double) plotHeight;
 - (double) plotWidth;
 - (double) channelWidth;
 - (ORCurve2D*) curve;
 - (void) setCurve:(ORCurve2D*)anArray;
-- (BOOL) analyze;
-- (void) setAnalyze:(BOOL)newAnalyze;
 
 - (IBAction) resetScales:(id)sender;
 - (IBAction) autoScale:(id)sender;
@@ -121,8 +90,6 @@
 - (NSColor*) plotter:(id)aPlotter colorForSet:(int)set;
 @end
 
-extern NSString* ORPlotter2DBackgroundColor;
-extern NSString* ORPlotter2DGridColor;
 extern NSString* ORPlotter2DataColor;
 extern NSString* ORPlotter2DMousePosition;
  

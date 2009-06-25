@@ -20,7 +20,6 @@
 
 
 #import "ORWaveform.h"
-#import "ORPlotter.h"
 #import "OR1DHisto.h"
 
 
@@ -230,7 +229,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 {
 	return YES;
 }
-- (int)	numberOfPointsInPlot:(ORPlotter*)aPlotter dataSet:(int)set
+- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
     return [self numberBins];
 }

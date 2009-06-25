@@ -20,8 +20,6 @@
 #import "ORGate2D.h"
 #import "ORAnalysisPanel2D.h"
 
-NSString* ORPlotter2DBackgroundColor    = @"ORPlotter2DBackgroundColor";
-NSString* ORPlotter2DGridColor          = @"ORPlotter2DGridColor";
 NSString* ORPlotter2DataColor           = @"ORPlotter2DataColor";
 NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 
@@ -53,12 +51,8 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 
 -(void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [gradient release];
 	[backgroundImage release];
     [curve release];
-    [attributes release];
     [super dealloc];
 }
 
@@ -67,7 +61,7 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 - (void) awakeFromNib
 {
     
-    [self initCurve];
+    [self initCurves];
 	[self setDefaults];
 
     //make sure the scales get drawn first so that the grid arrays have been
@@ -102,7 +96,7 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
         
         [self setBackgroundColor:[NSColor colorWithCalibratedRed:1. green:1. blue:1. alpha:0]];
         [self setGridColor:[NSColor grayColor]];
-		[self  setDrawWithGradient:YES];
+		[self  setUseGradient:YES];
     }
     [curve setDefaults];
     [[self undoManager] enableUndoRegistration];
@@ -114,7 +108,7 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     return [[[self window] windowController] undoManager];
 }
 
-- (void) initCurve
+- (void) initCurves
 {
     [self setCurve:[ORCurve2D curve:0]];    
 
@@ -123,61 +117,25 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     }
 }
 
-- (void) setDrawWithGradient:(BOOL)flag
-{
-	useGradient = flag;
-}
-
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {
     return YES;
 }
 
-- (NSMutableDictionary *)attributes 
-{
-    return attributes; 
-}
-
-- (void)setAttributes:(NSMutableDictionary *)anAttributes 
-{
-    [anAttributes retain];
-    [attributes release];
-    attributes = anAttributes;
-}
-
-
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [super encodeWithCoder:coder];
-    if([coder allowsKeyedCoding]){
-        [coder encodeObject:attributes forKey:@"ORPlotter2DAttributes"];
-    }
-    else {
-        [coder encodeObject:attributes];
-    }
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
     self =  [super initWithCoder:coder];
     [[self undoManager] disableUndoRegistration];
-    if([coder allowsKeyedCoding]){
-        [self setAttributes:[coder decodeObjectForKey:@"ORPlotter2DAttributes"]];
-    }
-    else {
-        [self setAttributes:[coder decodeObject]];
-    }
+	
+	if(!attributes)    [self setDefaults];
+	
     [[self undoManager] enableUndoRegistration];
     return self;
-}
-- (ORAxis*) xScale
-{
-    return mXScale;
-}
-- (void) setXScale:(ORAxis*)newXScale
-{
-    [mXScale autorelease];
-    mXScale=[newXScale retain];
 }
 
 - (ORColorScale*) colorScale
@@ -198,16 +156,6 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 {
     [mZScale autorelease];
     mZScale=[newZScale retain];
-}
-
-- (ORAxis*) yScale
-{
-    return mYScale;
-}
-- (void) setYScale:(ORAxis*)newYScale
-{
-    [mYScale autorelease];
-    mYScale=[newYScale retain];
 }
 
 - (double) plotHeight
@@ -255,39 +203,12 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
         [self drawRectFake:rect];
         return;
     }
-    
-    
-    NSRect bounds = [self bounds];
-
-	if(useGradient){
-		if(!gradient){
-			float red,green,blue,alpha;
-			NSColor* color = [self backgroundColor];
-			[color getRed:&red green:&green blue:&blue alpha:&alpha];
-		
-			red *= .75;
-			green *= .75;
-			blue *= .75;
-			//alpha = .75;
-		
-			NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
-		
-			[gradient release];
-			gradient = [[CTGradient gradientWithBeginningColor:color endingColor:endingColor] retain];
-		}
-		[gradient fillRect:bounds angle:270.];
-	}
-	else {
-		[[self backgroundColor] set];
-		[NSBezierPath fillRect:bounds];
-	}
-	[[NSColor darkGrayColor] set];
-	[NSBezierPath strokeRect:bounds];
-
+	
+    [self drawBackground];
+	
 	if(backgroundImage){
 		[backgroundImage compositeToPoint:NSMakePoint(0,-1) operation:NSCompositeSourceOver];
 	}
-    
     
     if(!doNotDraw || ignoreDoNotDrawFlag){
         if(!vectorMode){
@@ -309,37 +230,15 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     ignoreDoNotDrawFlag = aFlag;
 }
 
-- (BOOL)isOpaque
-{
-    return YES;
-}
-
-- (id)dataSource
-{
-    return mDataSource;
-}
 
 - (void)setDataSource:(id)d
 {
     [d retain];
     [mDataSource release];
     mDataSource = d;
-    [self initCurve];
+    [self initCurves];
     
     [self setNeedsDisplay: YES];
-}
-
-- (void)setBackgroundColor:(NSColor *)aColor
-{
-    [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotter2DBackgroundColor];
-	[gradient release];
-	gradient = nil;
-    [self setNeedsDisplay: YES];
-}
-
--(NSColor*)backgroundColor
-{
-    return [NSUnarchiver unarchiveObjectWithData:[attributes objectForKey:ORPlotter2DBackgroundColor]];
 }
 
 -(NSColor*)colorForDataSet:(int) aDataSet
@@ -359,18 +258,6 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     }
     [colorDictionary setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:[NSNumber numberWithInt:aDataSet]];
 }
-
-
-- (void)setGridColor:(NSColor *)aColor
-{
-    [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotter2DGridColor];
-    [self setNeedsDisplay: YES];
-}
-
--(NSColor*)gridColor{
-    return [NSUnarchiver unarchiveObjectWithData:[attributes objectForKey:ORPlotter2DGridColor]];
-}
-
 
 
 -(void)setFrame:(NSRect)aFrame
@@ -565,22 +452,6 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     [self setNeedsDisplay:YES];
 }
 
-
-- (IBAction) analyze:(id)sender
-{
-    [curve doAnalysis:self];
-}
-
-
-- (BOOL) analyze
-{
-    return analyze;
-}
-- (void) setAnalyze:(BOOL)newAnalyze
-{
-    analyze=newAnalyze;
-    if(analyze)[self analyze:self];
-}
 - (void) flagsChanged:(NSEvent *)theEvent
 {
     cmdKeyIsDown = ([theEvent modifierFlags] & NSCommandKeyMask)!=0;
@@ -594,6 +465,11 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     if([curve showActiveGate]){	
 		
 	}
+}
+
+- (void) doAnalysis
+{
+    [curve doAnalysis:self];
 }
 
 @end

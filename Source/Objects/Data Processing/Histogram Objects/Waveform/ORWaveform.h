@@ -26,7 +26,6 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORChannelData;
 @class ORWaveformController;
-@class ORPlotter;
 @class OR1DHisto;
 
 @interface ORWaveform : ORDataSetModel  {

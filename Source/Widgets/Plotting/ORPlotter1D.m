@@ -12,7 +12,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORPlotter1D.h"
-#import "ORAxis.h"
 #import "ORCurve1D.h"
 #import "ORGate1D.h"
 #import "ORAnalysisPanel1D.h"
@@ -23,8 +22,6 @@
 
 NSString* ORPlotter1DDifferentiate		= @"ORPlotter1DDifferentiate";
 NSString* ORPlotter1DAverageWindow		= @"ORPlotter1DAverageWindow";
-NSString* ORPlotter1DBackgroundColor	= @"ORPlotter1DBackgroundColor";
-NSString* ORPlotter1DGridColor			= @"ORPlotter1DGridColor";
 NSString* ORPlotter1DataColor			= @"ORPlotter1DataColor";
 NSString* ORPlotter1DActiveCurveChanged = @"ORPlotter1DActiveCurveChanged";
 NSString* ORPlotter1DDifferentiateChanged = @"ORPlotter1DDifferentiateChanged";
@@ -54,19 +51,9 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 -(void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [curves release];
-    [attributes release];
-    [gradient release];
-	
-    curves = nil;
-    attributes = nil;
-    
+    [curves release];	
     [super dealloc];
 }
-
-
 
 - (void) awakeFromNib
 {
@@ -127,21 +114,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     [mXScale setNeedsDisplay:YES];
 }
 
-- (BOOL) useGradient
-{
-	return [[attributes objectForKey:@"useGradient"] boolValue];
-}
-
-- (void) setUseGradient:(BOOL)aFlag
-{
-    [attributes setObject:[NSNumber numberWithBool:aFlag] forKey:@"useGradient"];	
-	[self setNeedsDisplay:YES];
-}
-
-- (void) setDrawWithGradient:(BOOL)flag
-{
-	[self setUseGradient:flag];
-}
 
 - (NSUndoManager*) undoManager
 {
@@ -202,66 +174,26 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     return YES;
 }
 
-- (NSMutableDictionary *)attributes 
-{
-    return attributes; 
-}
-
-- (void)setAttributes:(NSMutableDictionary *)anAttributes 
-{
-    [anAttributes retain];
-    [attributes release];
-    attributes = anAttributes;
-}
 
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [super encodeWithCoder:coder];
-    if([coder allowsKeyedCoding]){
-        [coder encodeObject:attributes forKey:@"ORPlotter1DAttributes"];
-    }
-    else {
-        [coder encodeObject:attributes];
-    }
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
     self =  [super initWithCoder:coder];
     [[self undoManager] disableUndoRegistration];
-    if([coder allowsKeyedCoding]){
-        [self setAttributes:[coder decodeObjectForKey:@"ORPlotter1DAttributes"]];
-    }
-    else {
-        [self setAttributes:[coder decodeObject]];
-    }
+	
 	if(!attributes)    [self setDefaults];
+	
 	if([self averageWindow]==0){
 		[self setAverageWindow:10];
 	}
 	
     [[self undoManager] enableUndoRegistration];
     return self;
-}
-- (ORAxis*) xScale
-{
-    return mXScale;
-}
-- (void) setXScale:(ORAxis*)newXScale
-{
-    [mXScale autorelease];
-    mXScale=[newXScale retain];
-}
-
-- (ORAxis*) yScale
-{
-    return mYScale;
-}
-- (void) setYScale:(ORAxis*)newYScale
-{
-    [mYScale autorelease];
-    mYScale=[newYScale retain];
 }
 
 - (id) curve:(int)aCurveIndex gate:(int)aGateIndex
@@ -311,34 +243,8 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     if(!curves){
 		[self initCurves];
 	}
-    
-    NSRect bounds = [self bounds];
-
-	if([self useGradient]){
-		if(!gradient){
-			float red,green,blue,alpha;
-			NSColor* color = [[self backgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
-			[color getRed:&red green:&green blue:&blue alpha:&alpha];
-		
-			red *= .75;
-			green *= .75;
-			blue *= .75;
-			//alpha = .75;
-		
-			NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
-		
-			[gradient release];
-			gradient = [[CTGradient gradientWithBeginningColor:color endingColor:endingColor] retain];
-		}
-		[gradient fillRect:bounds angle:270.];
-	}
-	else {
-		[[self backgroundColor] set];
-		[NSBezierPath fillRect:bounds];
-	}
-	[[NSColor darkGrayColor] set];
-	[NSBezierPath strokeRect:bounds];
-    
+	
+    [self drawBackground];    
     
     //draw the Grid
     [mXScale drawGridInFrame:[self frame] usingColor:[self gridColor]];
@@ -402,15 +308,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     [curves makeObjectsPerformSelector:@selector(doAnalysis:) withObject:self];
 }
 
-- (BOOL)isOpaque
-{
-    return YES;
-}
-
-- (id)dataSource
-{
-    return mDataSource;
-}
 
 - (void)setDataSource:(id)d
 {
@@ -465,36 +362,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 }
 
 
-- (void)setBackgroundColor:(NSColor *)aColor
-{
-    [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotter1DBackgroundColor];
-	[gradient release];
-	gradient = nil;
-    [self setNeedsDisplay:YES];
-    //[mYScale setNeedsDisplay:YES];
-    //[mXScale setNeedsDisplay:YES];
-}
-
--(NSColor*)backgroundColor
-{
-	NSData* d = [attributes objectForKey:ORPlotter1DBackgroundColor];
-	if(!d)return [NSColor whiteColor];
-    else return [NSUnarchiver unarchiveObjectWithData:d];
-}
-
-- (void)setGridColor:(NSColor *)aColor
-{
-    [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotter1DGridColor];
-    [self setNeedsDisplay:YES];
-    [mYScale setNeedsDisplay:YES];
-    [mXScale setNeedsDisplay:YES];
-}
-
--(NSColor*)gridColor{
-	NSData* d = [attributes objectForKey:ORPlotter1DGridColor];
-	if(!d) return [NSColor grayColor];
-    else return [NSUnarchiver unarchiveObjectWithData:d];
-}
 
 -(NSColor*)colorForDataSet:(int) aDataSet
 {
@@ -573,7 +440,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
 }
 
-
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag
 {
     ignoreDoNotDrawFlag = aFlag;
@@ -589,42 +455,13 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	return setAllLinesBold;
 }
 
-
--(void)setFrame:(NSRect)aFrame
+-(void) setFrame:(NSRect)aFrame
 {
     [super setFrame:aFrame];
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];
     [mXScale setNeedsDisplay:YES];
 }
-
-- (void)savePDF:(id)sender
-{
-    NSSavePanel *panel = [NSSavePanel savePanel];
-    [panel setRequiredFileType:@"pdf"];
-    [panel beginSheetForDirectory: nil
-                             file: nil
-                   modalForWindow: [self window]
-                    modalDelegate: self
-                   didEndSelector:
-        @selector(didEnd:returnCode:contextInfo:)
-                      contextInfo: nil];
-}
-
-- (void) didEnd:(NSSavePanel *)sheet
-    returnCode:(int)code
-   contextInfo:(void *)contextInfo
-{
-    NSRect r;
-    NSData *data;
-    
-    if (code == NSOKButton) {
-        r = [[self superview] bounds];
-        data = [[self superview] dataWithPDFInsideRect: r];
-        [data writeToFile: [sheet filename] atomically: YES];
-    }
-}
-
 
 - (IBAction) addGateAction:(id)sender
 {
@@ -1015,20 +852,9 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     [mXScale setNeedsDisplay:YES];
 }
 
-- (IBAction) analyze:(id)sender
+- (void) doAnalysis
 {
     [curves makeObjectsPerformSelector:@selector(doAnalysis:) withObject:self];
-}
-
-
-- (BOOL) analyze
-{
-    return analyze;
-}
-- (void) setAnalyze:(BOOL)newAnalyze
-{
-    analyze=newAnalyze;
-    if(analyze)[self analyze:self];
 }
 
 - (void) forcedUpdate:(NSNotification*)aNote
