@@ -51,7 +51,7 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[plotter setDrawWithGradient:YES];
+	[plotter setUseGradient:YES];
 	[[plotter yScale] setRngLimitsLow:-32768 withHigh:32768 withMinRng:128];
 }
 
