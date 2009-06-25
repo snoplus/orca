@@ -53,7 +53,7 @@
 {	
     [[plotter yScale] setRngLow:0.0 withHigh:1000.];
 	[[plotter yScale] setRngLimitsLow:0.0 withHigh:1000000000 withMinRng:10];
-	[plotter setDrawWithGradient:YES];
+	[plotter setUseGradient:YES];
 	
     [[plotter xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];

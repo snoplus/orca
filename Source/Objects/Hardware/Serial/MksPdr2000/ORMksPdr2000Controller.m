@@ -54,7 +54,7 @@
     [self populatePortListPopup];
     [[plotter0 yScale] setRngLow:0.0 withHigh:1000.];
 	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100000 withMinRng:10];
-	[plotter0 setDrawWithGradient:YES];
+	[plotter0 setUseGradient:YES];
 
     [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];

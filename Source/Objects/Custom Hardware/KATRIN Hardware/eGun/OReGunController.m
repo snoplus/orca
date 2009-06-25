@@ -47,7 +47,7 @@
 - (void) awakeFromNib
 {
     [xyPlot setVectorMode:YES];
-    [xyPlot setDrawWithGradient:YES];
+    [xyPlot setUseGradient:YES];
 	[[xyPlot xScale] setInteger:YES];
     [xyPlot setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
 	[super awakeFromNib];
