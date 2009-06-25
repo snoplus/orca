@@ -62,6 +62,7 @@
 		BOOL			useDatedFileNames;
 		int				sizeLimitReachedAction;
 		ORAlarm*		diskFullAlarm;
+		int				checkCount;
 }
 
 #pragma mark ¥¥¥Accessors
