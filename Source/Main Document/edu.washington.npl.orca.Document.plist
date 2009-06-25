@@ -117,6 +117,15 @@
 			<key>ToolTip</key>
 			<string>Open ORCA Help</string>
 		</dict>
+		<key>WebServer</key>
+		<dict>
+			<key>Action</key>
+			<string>showWebServer:</string>
+			<key>Label</key>
+			<string>WebServer</string>
+			<key>ToolTip</key>
+			<string>Open Web Server</string>
+		</dict>
 	</dict>
 </dict>
 </plist>
