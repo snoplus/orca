@@ -33,7 +33,6 @@
 - (unsigned int) uIntForKey:(NSString*)aKey;
 - (int) intForKey:(NSString*)aKey;
 - (BOOL) boolForKey:(NSString*)aKey;
-- (NSString*) htmlFormat;
 @end
 
 @interface NSMutableDictionary (OrcaExtensions)

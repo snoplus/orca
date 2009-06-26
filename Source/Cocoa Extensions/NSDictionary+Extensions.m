@@ -143,10 +143,7 @@
 	free(tmpName);
 	return theResponse;
 }
-- (NSString*) htmlFormat
-{
-	return @"";
-}
+
 @end
 
 @implementation NSMutableDictionary (OrcaExtensions)

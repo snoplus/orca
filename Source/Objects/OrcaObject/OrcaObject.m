@@ -718,8 +718,6 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 	return collection;
 }
 
-
-
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //subclass responsibility

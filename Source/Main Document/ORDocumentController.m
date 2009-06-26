@@ -32,7 +32,7 @@
 #import "ORDataTaker.h"
 #import "ORReadOutList.h"
 #import "ORTemplates.h"
-#import "WebServer.h"
+//#import "WebServer.h"
 
 int sortListUpFunc(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
 int sortListDnFunc(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
@@ -310,10 +310,10 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     [[NSApp  delegate] showORCARootServiceController:self];
 }
 
-- (IBAction) showWebServer:(NSToolbarItem*)item
-{
-    [[WebServer sharedWebServer] showWebServer:nil];
-}
+//- (IBAction) showWebServer:(NSToolbarItem*)item
+//{
+//    [[WebServer sharedWebServer] showWebServer:nil];
+//}
 
 - (IBAction) printDocument:(id)sender
 {

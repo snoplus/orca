@@ -965,15 +965,7 @@
 		8468E6FA06932C3F00B57CE8 /* NcdLogAmpTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */; };
 		8468E6FB06932C4000B57CE8 /* NcdLogAmpTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */; };
 		846A08F20B77BAAA00B811F4 /* NoADUDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */; };
-		846A5E790FF12415001CBD54 /* SimpleHTTPConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 846A5E710FF12415001CBD54 /* SimpleHTTPConnection.h */; };
-		846A5E7A0FF12415001CBD54 /* SimpleHTTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 846A5E720FF12415001CBD54 /* SimpleHTTPConnection.m */; };
-		846A5E7B0FF12415001CBD54 /* SimpleHTTPServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 846A5E730FF12415001CBD54 /* SimpleHTTPServer.h */; };
-		846A5E7C0FF12415001CBD54 /* SimpleHTTPServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 846A5E740FF12415001CBD54 /* SimpleHTTPServer.m */; };
-		846A5E7E0FF12415001CBD54 /* WebServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 846A5E760FF12415001CBD54 /* WebServer.h */; };
-		846A5E7F0FF12415001CBD54 /* WebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 846A5E770FF12415001CBD54 /* WebServer.m */; };
-		846A5E800FF12415001CBD54 /* WebServer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846A5E780FF12415001CBD54 /* WebServer.nib */; };
 		846A5EB30FF126B2001CBD54 /* WebServer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 846A5EB20FF126B2001CBD54 /* WebServer.gif */; };
-		846A5F5C0FF1522C001CBD54 /* home.html in Resources */ = {isa = PBXBuildFile; fileRef = 846A5F5B0FF1522C001CBD54 /* home.html */; };
 		846B8F0F0E15972A00C41F9D /* ICS8065Box.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F080E15972A00C41F9D /* ICS8065Box.tif */; };
 		846B8F100E15972A00C41F9D /* m8065Service.x in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F090E15972A00C41F9D /* m8065Service.x */; };
 		846B8F110E15972A00C41F9D /* ORICS8065.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F0A0E15972A00C41F9D /* ORICS8065.nib */; };
@@ -2891,15 +2883,7 @@
 		8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdLogAmpTask.h; sourceTree = "<group>"; };
 		8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdLogAmpTask.m; sourceTree = "<group>"; };
 		846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoADUDriverHelp.plist; path = Source/Objects/Hardware/USB/ADU200/NoADUDriverHelp.plist; sourceTree = SOURCE_ROOT; };
-		846A5E710FF12415001CBD54 /* SimpleHTTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimpleHTTPConnection.h; path = "Source/Main Dialogs/WebServer/SimpleHTTPConnection.h"; sourceTree = SOURCE_ROOT; };
-		846A5E720FF12415001CBD54 /* SimpleHTTPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SimpleHTTPConnection.m; path = "Source/Main Dialogs/WebServer/SimpleHTTPConnection.m"; sourceTree = SOURCE_ROOT; };
-		846A5E730FF12415001CBD54 /* SimpleHTTPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimpleHTTPServer.h; path = "Source/Main Dialogs/WebServer/SimpleHTTPServer.h"; sourceTree = SOURCE_ROOT; };
-		846A5E740FF12415001CBD54 /* SimpleHTTPServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SimpleHTTPServer.m; path = "Source/Main Dialogs/WebServer/SimpleHTTPServer.m"; sourceTree = SOURCE_ROOT; };
-		846A5E760FF12415001CBD54 /* WebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebServer.h; path = "Source/Main Dialogs/WebServer/WebServer.h"; sourceTree = SOURCE_ROOT; };
-		846A5E770FF12415001CBD54 /* WebServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebServer.m; path = "Source/Main Dialogs/WebServer/WebServer.m"; sourceTree = SOURCE_ROOT; };
-		846A5E780FF12415001CBD54 /* WebServer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WebServer.nib; path = "Source/Main Dialogs/WebServer/WebServer.nib"; sourceTree = SOURCE_ROOT; };
 		846A5EB20FF126B2001CBD54 /* WebServer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = WebServer.gif; path = "Source/Main Document/WebServer.gif"; sourceTree = SOURCE_ROOT; };
-		846A5F5B0FF1522C001CBD54 /* home.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = home.html; sourceTree = "<group>"; };
 		846B8F080E15972A00C41F9D /* ICS8065Box.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ICS8065Box.tif; path = Source/Objects/Hardware/GPIB/ICS8065/ICS8065Box.tif; sourceTree = SOURCE_ROOT; };
 		846B8F090E15972A00C41F9D /* m8065Service.x */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = m8065Service.x; path = Source/Objects/Hardware/GPIB/ICS8065/m8065Service.x; sourceTree = SOURCE_ROOT; };
 		846B8F0A0E15972A00C41F9D /* ORICS8065.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ORICS8065.nib; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065.nib; sourceTree = SOURCE_ROOT; };
@@ -6117,22 +6101,6 @@
 			path = Source/Experiments/Ncd/LogAmpTask;
 			sourceTree = SOURCE_ROOT;
 		};
-		846A5E700FF12415001CBD54 /* WebServer */ = {
-			isa = PBXGroup;
-			children = (
-				846A5E710FF12415001CBD54 /* SimpleHTTPConnection.h */,
-				846A5E720FF12415001CBD54 /* SimpleHTTPConnection.m */,
-				846A5E730FF12415001CBD54 /* SimpleHTTPServer.h */,
-				846A5E740FF12415001CBD54 /* SimpleHTTPServer.m */,
-				846A5E760FF12415001CBD54 /* WebServer.h */,
-				846A5E770FF12415001CBD54 /* WebServer.m */,
-				846A5F5B0FF1522C001CBD54 /* home.html */,
-				846A5E780FF12415001CBD54 /* WebServer.nib */,
-			);
-			name = WebServer;
-			path = "Source/Main Dialogs/WebServer";
-			sourceTree = SOURCE_ROOT;
-		};
 		846B8F070E15972A00C41F9D /* ICS8065 */ = {
 			isa = PBXGroup;
 			children = (
@@ -8831,7 +8799,6 @@
 				848E3BC509DB0B3E0003F7A2 /* MailCenter */,
 				84FB4E1E0D92F7560055813E /* BugReporter */,
 				842539F40BCD7BFE004C8065 /* ORCARootService */,
-				846A5E700FF12415001CBD54 /* WebServer */,
 			);
 			path = "Main Dialogs";
 			sourceTree = "<group>";
@@ -9873,9 +9840,6 @@
 				8408A22A0FD85B3A00B0206D /* ORTemplates.h in Headers */,
 				84B74CE90FEBE9B90033E658 /* ORCaen965Controller.h in Headers */,
 				84B74CEB0FEBE9B90033E658 /* ORCaen965Model.h in Headers */,
-				846A5E790FF12415001CBD54 /* SimpleHTTPConnection.h in Headers */,
-				846A5E7B0FF12415001CBD54 /* SimpleHTTPServer.h in Headers */,
-				846A5E7E0FF12415001CBD54 /* WebServer.h in Headers */,
 				84A1ACAD0FF3A4EE00D7F946 /* ORPlotPublisher.h in Headers */,
 				84A1AF8C0FF3BF1000D7F946 /* ORPlotter.h in Headers */,
 				84A1B1890FF3CE7400D7F946 /* ApplicationSupport.h in Headers */,
@@ -10506,9 +10470,7 @@
 				84B74B3C0FEAB19E0033E658 /* scpExpectScript in Resources */,
 				84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */,
 				84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */,
-				846A5E800FF12415001CBD54 /* WebServer.nib in Resources */,
 				846A5EB30FF126B2001CBD54 /* WebServer.gif in Resources */,
-				846A5F5C0FF1522C001CBD54 /* home.html in Resources */,
 				84A1ACAC0FF3A4EE00D7F946 /* PlotPublisher.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -11223,9 +11185,6 @@
 				8408A22B0FD85B3A00B0206D /* ORTemplates.m in Sources */,
 				84B74CEA0FEBE9B90033E658 /* ORCaen965Controller.m in Sources */,
 				84B74CEC0FEBE9B90033E658 /* ORCaen965Model.m in Sources */,
-				846A5E7A0FF12415001CBD54 /* SimpleHTTPConnection.m in Sources */,
-				846A5E7C0FF12415001CBD54 /* SimpleHTTPServer.m in Sources */,
-				846A5E7F0FF12415001CBD54 /* WebServer.m in Sources */,
 				84A1ACAE0FF3A4EE00D7F946 /* ORPlotPublisher.m in Sources */,
 				84A1AF8D0FF3BF1000D7F946 /* ORPlotter.m in Sources */,
 				84A1B18A0FF3CE7400D7F946 /* ApplicationSupport.m in Sources */,
