@@ -76,18 +76,19 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(WebServer);
 {
 	NSString* command = [[path absoluteString] lastPathComponent];
 	NSMutableString* pageTemplate = nil;
-	
-	if([command isEqualToString:@"ORCA"]) {	
+	if([command isEqualToString:@"favicon.ico"]){
+		[server replyWithData:nil  MIMEType:@"text/html"];	
+	}
+	else if([command isEqualToString:@"ORCA"]) {	
 		[validCommands release];
 		validCommands = nil;
 		validCommands = [[NSMutableArray array] retain];
 		NSArray* objects = [[[NSApp delegate] document] collectObjectsOfClass:[OrcaObject class]];
 		NSString* bp = [[NSBundle mainBundle ]resourcePath];
 		pageTemplate = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"home.html"]];
-		NSString* link = [NSString stringWithFormat:@"<a href=\"http://%@:%d/ORCA\"> Home</a>\r",hostAddress ,[server port]];
+		NSString* link = [NSString stringWithFormat:@"<a href=\"http://%@:%d/ORCA\"> Home</a><br/>\r",hostAddress ,[server port]];
 		NSEnumerator* e = [objects objectEnumerator];
 		id obj;
-		int i=0;
 		while(obj = [e nextObject]){
 			NSString* objLine = nil;
 			NSString* objName = nil;
@@ -97,8 +98,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(WebServer);
 			
 			if([objName length] && ![objName hasPrefix:@"ORGroup"]){
 				[validCommands addObject:objName];
-				if(++i%2)objLine = [NSString stringWithFormat:@"<br/><br/><a href=\"http://%@:%d/%@\"> %@</a>\r",hostAddress ,[server port],objName,objName];
-				else   objLine = [NSString stringWithFormat:@"<a href=\"http://%@:%d/%@\"> %@</a>\r",hostAddress ,[server port],objName,objName];
+				objLine = [NSString stringWithFormat:@"<a href=\"http://%@:%d/%@\"> %@</a><br/>\r",hostAddress ,[server port],objName,objName];
 
 				if(objLine)link = [link stringByAppendingString:objLine];
 			}
@@ -111,8 +111,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(WebServer);
 		if([validCommands containsObject:c]) {
 			NSString* bp = [[NSBundle mainBundle ]resourcePath];
 			pageTemplate = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"home.html"]];
-			NSString* link = [NSString stringWithFormat:@"<a href=\"http://%@:%d/ORCA\"> Home</a>\r",hostAddress ,[server port]];
-			link = [link stringByAppendingString:[self process:c]];
+			NSString* link = [NSString stringWithFormat:@"<a href=\"http://%@:%d/ORCA\"> Home</a><br/>\r",hostAddress ,[server port]];
+			NSString* s = [self process:c];
+			if([s length]) link = [link stringByAppendingString:s];
 			[pageTemplate replace:@"<Content>" with:link];
 		}
 	}
@@ -123,12 +124,19 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(WebServer);
 - (NSString*) process: (NSMutableString*) objName
 {
 	id theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
+	NSString* s = @"";
+	NSString* status = @"";
+	NSString* params = @"";
+	if(theObj && [theObj respondsToSelector:@selector(addStatusToDictionary:)]){
+		NSMutableDictionary* aDict = [NSMutableDictionary dictionary];
+		status = [[theObj addStatusToDictionary:aDict] htmlFormatAppendingToString:s];
+	}
 	if(theObj && [theObj respondsToSelector:@selector(addParametersToDictionary:)]){
 		NSMutableDictionary* aDict = [NSMutableDictionary dictionary];
-		return [[theObj addParametersToDictionary:aDict] htmlFormat];
-		
+		params = [[theObj addParametersToDictionary:aDict] htmlFormatAppendingToString:s];
 	}
-	else return nil;
+
+	return [s stringByAppendingFormat:@"%@<br/>%@\r",status,params];
 }
 
 @end
