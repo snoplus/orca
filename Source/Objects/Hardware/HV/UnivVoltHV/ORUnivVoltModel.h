@@ -41,7 +41,7 @@ typedef enum hveStatus hveStatus;
 	NSMutableArray*			mCircularBuffers;	// Array holding circular buffers of data one for each channel.  Used for
 												// plotting.
 	long					mPoints;			// number of points in each channel-data circular buffer.
-	NSNumber*				mPollTimeSecs; 
+	NSNumber*				mPollTimeMins; 
 	NSNumber*				mPlotterPoints;		// number of points in histogram displays.
 	ORAlarm*				mHVValueLmtsAlarm;	// If set have exceeded MVDZ window around demand voltage
 	ORAlarm*				mHVCurrentLmtsAlarm;	// If set have exceeded MCDZ window around current.
@@ -64,8 +64,8 @@ typedef enum hveStatus hveStatus;
 					 loadAll: (bool) aLoadAllValues;
 					 
 #pragma mark ••• Polling
-- (int) pollTimeSecs;
-- (void) setPollTimeSecs: (int) aPollTimeSecs;
+- (float) pollTimeMins;
+- (void) setPollTimeMins: (float) aPollTimeMins;
 - (void) startPolling;
 - (void) stopPolling;
 - (void) pollTask;
@@ -135,7 +135,7 @@ extern NSString* UVCardSlotChanged;
 
 extern NSString* UVChnlHVValuesChanged;
 
-extern NSString* UVPollTimeChanged;
+extern NSString* UVPollTimeMinsChanged;
 extern NSString* UVLastPollTimeChanged;
 extern NSString* UVNumPlotterPointsChanged;
 extern NSString* UVPlotterDataChanged;
@@ -143,7 +143,7 @@ extern NSString* UVStatusPollTaskChanged;
 
 extern NSString* UVAlarmChanged;
 
-extern NSString* HVkLastPollTime;
+extern NSString* HVkLastPollTimeMins;
 
 //extern NSString* UVErrorNotification;
 

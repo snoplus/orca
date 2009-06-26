@@ -117,7 +117,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
     [notifyCenter addObserver : self
                      selector : @selector( pollingTimeChanged: )
-                         name : UVPollTimeChanged
+                         name : UVPollTimeMinsChanged
 					   object : model];
 
     [notifyCenter addObserver : self
@@ -214,6 +214,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	[self pollingTimeChanged: nil];
 	[self pollingStatusChanged: nil];
 	[self numPlotterPointsChanged: nil];
+	[self miscAttributesChanged: nil];
 	
 	
 	[mChnlTable reloadData];	
@@ -318,8 +319,9 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (void) pollingTimeChanged: (NSNotification *) aNote
 {
-	[mPollingTimeSecsField setIntValue: [model pollTimeSecs]];
-	NSLog( @"Controller - notified of polling time change: %f\n", [mPollingTimeSecsField intValue]);
+	float pollTimeMinsValue = [model pollTimeMins];
+	[mPollingTimeMinsField setFloatValue: pollTimeMinsValue];
+	NSLog( @"Controller - notified of polling time change: %f\n", [mPollingTimeMinsField floatValue]);
 }
 
 - (void) pollingStatusChanged: (NSNotification*) aNote
@@ -331,7 +333,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (void) lastPollTimeChanged: (NSNotification*) aNote
 {
 	NSDictionary* pollObj = [aNote userInfo];
-	NSString* lastPollTime = [pollObj objectForKey: HVkLastPollTime];
+	NSString* lastPollTime = [pollObj objectForKey: HVkLastPollTimeMins];
 	NSLog( @"Last polltime %@\n", lastPollTime );
 	[mLastPoll setObjectValue: lastPollTime];
 }
@@ -473,7 +475,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (IBAction) pollTimeAction: (id) aSender
 {
-	[model setPollTimeSecs: [mPollingTimeSecsField intValue]];
+	[model setPollTimeMins: [mPollingTimeMinsField floatValue]];
 }
 
 - (IBAction) startStopPolling: (id) aSender
@@ -481,8 +483,8 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	if ( [model isPollingTaskRunning] ) {
 		[model stopPolling];
 	} else {
-		float pollingTimeMins = [mPollingTimeSecsField floatValue];
-		[model setPollTimeSecs: pollingTimeMins] ;
+		float pollingTimeMins = [mPollingTimeMinsField floatValue];
+		[model setPollTimeMins: pollingTimeMins] ;
 		[model startPolling];
 	}
 }
@@ -526,11 +528,14 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	retVal = 0.0;
 	if ( aChnl >= 0 ) {
 		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
+/* Used for debugging
 		if ( anX == 1 ) {
 			NSDictionary* storedData = [cbObj HVEntry: anX];
 			float value = [[storedData objectForKey: @"Value"] floatValue];//MAH -- key was wrong
 			NSLog( @"plotter: %f\n", value );
 		}
+*/
+	
 		if ( anX < [cbObj count] ) {			
 			NSDictionary* retDataObj = [cbObj HVEntry: anX];
 			NSNumber* hvValueObj = [retDataObj objectForKey: @"Value"]; //MAH -- key was wrong
@@ -544,11 +549,11 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (void) scaleAction: (NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [mPlottingObj1 yScale]){
-		[model setMiscAttributes:[[mPlottingObj1 xScale]attributes] forKey: @"HVPlot1YAttributes"];
+		[model setMiscAttributes:[[mPlottingObj1 yScale]attributes] forKey: @"HVPlot1YAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [mPlottingObj2 yScale]){
-		[model setMiscAttributes:[[mPlottingObj2 xScale]attributes] forKey: @"HVPlot2YAttributes"];
+		[model setMiscAttributes:[[mPlottingObj2 yScale]attributes] forKey: @"HVPlot2YAttributes"];
 	};	
 }
 
@@ -602,7 +607,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (unsigned long) secondsPerUnit: (id) aPlotter
 {
-	unsigned long sampleTime = [mPollingTimeSecsField intValue];
+	unsigned long sampleTime = [mPollingTimeMinsField intValue];
 	return( sampleTime );
 }
 

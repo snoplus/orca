@@ -42,9 +42,9 @@ NSString* HVkCurChnl = @"HVCurChnl";
 
 //NSString* HVkTimeStamp = @"HVTimeStamp";
 
-NSString* HVkPollTime = @"mPollTimeSecs";
+NSString* HVkPollTimeMins = @"mPollTimeMins";
 NSString* HVkPlotterPoints = @"mPlotterPoints";
-NSString* HVkLastPollTime = @"mLastPollTime";
+NSString* HVkLastPollTimeMins = @"mLastPollTimeMins";
 NSString* HVkChannel = @"Channel";
 
 // Order in which data is returned from DMP command.  Index in token array.
@@ -82,7 +82,7 @@ NSString* UVChnlMCDZChanged				= @"ChnlMCDZChanged";
 NSString* UVChnlHVLimitChanged			= @"ChnlHVLimitChanged";
 NSString* UVCardSlotChanged				= @"UVCardSlotChanged";
 
-NSString* UVPollTimeChanged				= @"UVPollTimeChanged";
+NSString* UVPollTimeMinsChanged			= @"UVPollTimeMinsChanged";
 NSString* UVLastPollTimeChanged			= @"UVLastPollTimeChanged";
 NSString* UVNumPlotterPointsChanged		= @"UVNumPlotterPointsChanged";
 NSString* UVPlotterDataChanged			= @"UVPlotterDataChanged";
@@ -459,19 +459,19 @@ NSString* UVkWrite = @"W";
 }
 
 #pragma mark •••Polling
-- (int) pollTimeSecs
+- (float) pollTimeMins
 {
-	return( [mPollTimeSecs intValue] );
+	return( [mPollTimeMins floatValue] );
 }
 
-- (void) setPollTimeSecs: (int) aPollTimeSecs
+- (void) setPollTimeMins: (float) aPollTimeMins
 {
 //    [[[self undoManager] prepareWithInvocationTarget: self] setPollTimeMinutes: aPollTimeMinutes];
-	[mPollTimeSecs release];
-    mPollTimeSecs = [NSNumber numberWithInt: aPollTimeSecs];
-	[mPollTimeSecs retain];
+	[mPollTimeMins release];
+    mPollTimeMins = [NSNumber numberWithFloat: aPollTimeMins];
+	[mPollTimeMins retain];
 //	NSLog( @"UnivVoltModel - Set polling time to %f\n", [mPollTimeSecs floatValue]);
-    [[NSNotificationCenter defaultCenter] postNotificationName: UVPollTimeChanged object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: UVPollTimeMinsChanged object: self];
 }
 
 
@@ -479,15 +479,16 @@ NSString* UVkWrite = @"W";
 {    
 	mPollTaskIsRunning = FALSE;
 	
-	float pollTimeSecs =  [mPollTimeSecs floatValue];
+	float pollTimeSecs =  [mPollTimeMins floatValue] * kMinutesToSecs;
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 	
-	if ( [mPollTimeSecs floatValue] > 0 ) {
-		[self pollTask];
+	if ( [mPollTimeMins floatValue] > 0 ) {
+//		[self performSelector: @Selector( pollTask ) withObject: nil affterDela];
+		
 		[self performSelector: @selector( pollTask ) withObject: nil afterDelay: pollTimeSecs];
 		mPollTaskIsRunning = TRUE;
-		NSLog( @"Started poll task with interval: %d seconds\n", pollTimeSecs);
+		NSLog( @"Started poll task with interval: %f Seconds\n", pollTimeSecs);
 		[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
 	}
 	else {
@@ -497,7 +498,7 @@ NSString* UVkWrite = @"W";
 
 - (void) stopPolling
 {	
-	NSLog( @"Stopped poll task with interval: %f\n", [mPollTimeSecs floatValue]);
+	NSLog( @"Stopped poll task with interval: %f\n", [mPollTimeMins floatValue]);
 	mPollTaskIsRunning = FALSE;
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
@@ -505,7 +506,7 @@ NSString* UVkWrite = @"W";
 
 - (void) pollTask
 {
-	float pollTimeSecs = kMinutesToSecs * [mPollTimeSecs floatValue];
+	float pollTimeSecs = kMinutesToSecs * [mPollTimeMins floatValue];
 	NSDate *now = [NSDate date];	
 
 	NSString* lastPollTime = [now descriptionWithCalendarFormat: @"%H:%M:%S"
@@ -516,14 +517,13 @@ NSString* UVkWrite = @"W";
 	NSLog( @"Last Poll Time ORUnivVoltModel: %@\n", lastPollTimeMsg );
 
 	// Send notification of latest poll time.
-	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: HVkLastPollTime]; 
+	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: HVkLastPollTimeMins];
 	[[NSNotificationCenter defaultCenter] postNotificationName:  UVLastPollTimeChanged object: self userInfo: retMsg];
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
-	[self fakeData: 0 channel: 0];	// fake data
-//	[self getValues: -1];			// real data
+//	[self fakeData: 0 channel: 0];	// fake data
+	[self getValues: -1];			// real data
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVPlotterDataChanged object: self];
-	NSLog( @"Plotter notification sent %@\n", lastPollTime );
 	[self performSelector: @selector( pollTask) withObject: nil afterDelay: pollTimeSecs];
 	mPollTaskIsRunning = TRUE;	
 }
@@ -1152,14 +1152,14 @@ NSString* UVkWrite = @"W";
     
     [[self undoManager] disableUndoRegistration];
 	[self setChannelArray: [decoder decodeObjectForKey: @"mChannelArray"]];
-	mPollTimeSecs = [decoder decodeObjectForKey: HVkPollTime];
+	mPollTimeMins = [decoder decodeObjectForKey: HVkPollTimeMins];
 	mPlotterPoints = [decoder decodeObjectForKey: HVkPlotterPoints];
 	if( !mChannelArray ) {
 		//first time.... set up the structure....
 		[self setChannelArray: [NSMutableArray array]];
 		int i;
 		
-		mPollTimeSecs = [NSNumber numberWithInt: 10];
+		mPollTimeMins = [NSNumber numberWithFloat: 0.10];
 		mPlotterPoints = [NSNumber numberWithInt: 1440];
 		// Put in dummy values for testing.
 		for( i = 0 ; i < UVkNumChannels; i++ )
@@ -1201,7 +1201,7 @@ NSString* UVkWrite = @"W";
 	}
 	
 	[mChannelArray retain];
-	[mPollTimeSecs retain];
+	[mPollTimeMins retain];
 	[mPlotterPoints retain];
     [[self undoManager] enableUndoRegistration]; 
 	
@@ -1217,7 +1217,7 @@ NSString* UVkWrite = @"W";
     [super encodeWithCoder:encoder];
 	[encoder encodeObject: mChannelArray forKey: @"mChannelArray"];
 //	NSNumber* pollingTime = [NSNumber numberWithFloat: mPollTimeSecs];
-	[encoder encodeObject: mPollTimeSecs forKey: HVkPollTime];
+	[encoder encodeObject: mPollTimeMins forKey: HVkPollTimeMins];
 	[encoder encodeObject:  mPlotterPoints forKey: HVkPlotterPoints];
 }
 
@@ -1331,7 +1331,7 @@ NSString* UVkWrite = @"W";
 				
 		NSNumber* mvdZ = [tmpChnl objectForKey: HVkMVDZ];
 		NSNumber* mcdz = [tmpChnl objectForKey: HVkMCDZ];
-		NSNumber* HVLimit = [NSNumber numberWithFloat: 3000.0];
+		NSNumber* HVLimit = [NSNumber numberWithFloat: 2300.0];
 		
 		int statusInt = 1;
 		float difference = abs( measuredHVFloat - [demandHV floatValue] );  
