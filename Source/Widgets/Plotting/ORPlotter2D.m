@@ -20,7 +20,6 @@
 #import "ORGate2D.h"
 #import "ORAnalysisPanel2D.h"
 
-NSString* ORPlotter2DataColor           = @"ORPlotter2DataColor";
 NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 
 
@@ -240,25 +239,6 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     
     [self setNeedsDisplay: YES];
 }
-
--(NSColor*)colorForDataSet:(int) aDataSet
-{
-    NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter2DataColor];
-    NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:aDataSet]];
-    if(!colorData)return [NSColor redColor];
-    else return [NSUnarchiver unarchiveObjectWithData:colorData];
-}
-
--(void) setDataColor:(NSColor*)aColor dataSet:(int) aDataSet
-{
-    NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter2DataColor];
-    if(!colorDictionary){
-        colorDictionary = [NSMutableDictionary dictionary];
-        [attributes setObject:colorDictionary forKey:ORPlotter2DataColor];
-    }
-    [colorDictionary setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:[NSNumber numberWithInt:aDataSet]];
-}
-
 
 -(void)setFrame:(NSRect)aFrame
 {

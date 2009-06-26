@@ -24,19 +24,28 @@
 {
 	IBOutlet NSButton*		cancelButton;
 	IBOutlet NSButton*		applyButton;
+	IBOutlet NSMatrix*		optionMatrix;
+	IBOutlet NSMatrix*		labelMatrix;
+	IBOutlet NSColorWell*	color1;
+	IBOutlet NSTextField*	dataSetField;
+	IBOutlet NSImageView*	previewImage;
 	
 	ORPlotter*				plotter;
 	NSMutableDictionary*    oldAttributes;
+	NSString*				oldXLabel;
+	NSString*				oldYLabel;
 }
 
 + (void) publishPlot:(id)aPlot;
 
 - (id) initWithPlot:(id)aPlot;
 - (void) beginSheet;
-- (void) publishPlot;
 
-- (IBAction) publish:(id)sender;
-- (IBAction) cancel:(id)sender;
+- (IBAction) labelingOptionsAction:(id) sender;
+- (IBAction) dataSetAction: (id) sender;
+- (IBAction) colorOptionsAction: (id) sender;
+- (IBAction) publish:(id) sender;
+- (IBAction) cancel:(id) sender;
 
 @end
 

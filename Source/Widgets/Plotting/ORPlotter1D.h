@@ -39,8 +39,6 @@
 - (void)setActiveCurveIndex:(int)anactiveCurveIndex;
 - (id) activeCurve;
 - (id) curve:(int)aCurveIndex gate:(int)aGateIndex;
-- (NSColor*)colorForDataSet:(int) aDataSet;
-- (void)setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag;
 - (void)setShowActiveGate:(BOOL)flag;
 - (void) setAllLinesBold:(BOOL)flag;
@@ -128,7 +126,6 @@
 - (void) makeMainController;
 @end
 
-extern NSString* ORPlotter1DataColor;
 extern NSString* ORPlotter1DActiveCurveChanged;
 extern NSString* ORPlotter1DDifferentiateChanged;
 extern NSString* ORPlotter1DAverageWindowChanged;

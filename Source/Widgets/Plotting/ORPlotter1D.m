@@ -19,7 +19,6 @@
 
 NSString* ORPlotter1DDifferentiate		= @"ORPlotter1DDifferentiate";
 NSString* ORPlotter1DAverageWindow		= @"ORPlotter1DAverageWindow";
-NSString* ORPlotter1DataColor			= @"ORPlotter1DataColor";
 NSString* ORPlotter1DActiveCurveChanged = @"ORPlotter1DActiveCurveChanged";
 NSString* ORPlotter1DDifferentiateChanged = @"ORPlotter1DDifferentiateChanged";
 NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
@@ -358,31 +357,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	return [[attributes objectForKey:ORPlotter1DAverageWindow] intValue];
 }
 
-
-
--(NSColor*)colorForDataSet:(int) aDataSet
-{
-
-	if([mDataSource willSupplyColors])  return [mDataSource colorForDataSet:aDataSet];
-	else {
-        NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
-        NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:aDataSet]];
-        if(!colorData)return [NSColor redColor];
-        else return [NSUnarchiver unarchiveObjectWithData:colorData];
-    }
-}
-
--(void) setDataColor:(NSColor*)aColor dataSet:(int) aDataSet
-{
-    NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
-    if(!colorDictionary){
-        colorDictionary = [NSMutableDictionary dictionary];
-        [attributes setObject:colorDictionary forKey:ORPlotter1DataColor];
-    }
-    [colorDictionary setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:[NSNumber numberWithInt:aDataSet]];
-	[self setNeedsDisplay:YES];
-}
-
 //wrappers for KVO bindings
 - (void) setDataColor0:(NSColor*)aColor { [self setDataColor:aColor dataSet:0]; }
 - (void) setDataColor1:(NSColor*)aColor { [self setDataColor:aColor dataSet:1]; }
@@ -393,7 +367,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (NSColor*) dataColor0
 {
-	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
 	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:0]];
 	if(!colorData)return [NSColor redColor];
 	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
@@ -401,7 +375,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (NSColor*) dataColor1
 {
-	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
 	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:1]];
 	if(!colorData)return [NSColor greenColor];
 	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
@@ -409,7 +383,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (NSColor*) dataColor2
 {
-	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
 	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:2]];
 	if(!colorData)return [NSColor blueColor];
 	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
@@ -417,21 +391,21 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (NSColor*) dataColor3
 {
-	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
 	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:3]];
 	if(!colorData)return [NSColor brownColor];
 	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
 }
 - (NSColor*) dataColor4
 {
-	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
 	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:4]];
 	if(!colorData)return [NSColor purpleColor];
 	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
 }
 - (NSColor*) dataColor5
 {
-	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
 	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:5]];
 	if(!colorData)return [NSColor orangeColor];
 	else return [NSUnarchiver unarchiveObjectWithData:colorData];	

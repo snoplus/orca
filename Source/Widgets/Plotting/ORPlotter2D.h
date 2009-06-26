@@ -40,8 +40,6 @@
 - (void) drawRect:(NSRect) rect;
 - (void) setFrame:(NSRect)aFrame;
 - (void) setBackgroundImage:(NSImage*)anImage;
-- (NSColor*)colorForDataSet:(int) aDataSet;
-- (void)setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
 
 - (ORColorScale*) colorScale;
 - (void) setColorScale:(ORColorScale*)newColorScale;
@@ -90,7 +88,6 @@
 - (NSColor*) plotter:(id)aPlotter colorForSet:(int)set;
 @end
 
-extern NSString* ORPlotter2DataColor;
 extern NSString* ORPlotter2DMousePosition;
  
 

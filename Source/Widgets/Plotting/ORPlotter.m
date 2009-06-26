@@ -25,6 +25,7 @@
 
 NSString* ORPlotterBackgroundColor	= @"ORPlotterBackgroundColor";
 NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
+NSString* ORPlotterDataColor		= @"ORPlotterDataColor";
 
 @implementation ORPlotter
 -(void) dealloc
@@ -91,14 +92,33 @@ NSString* ORPlotterGridColor		= @"ORPlotterGridColor";
     if(analyze)[self analyze:self];
 }
 
+-(NSColor*) colorForDataSet:(int) aDataSet
+{
+	if([mDataSource willSupplyColors])  return [mDataSource colorForDataSet:aDataSet];
+	else {
+        NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
+        NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:aDataSet]];
+        if(!colorData)return [NSColor redColor];
+        else return [NSUnarchiver unarchiveObjectWithData:colorData];
+    }
+}
 - (void)setBackgroundColor:(NSColor *)aColor
 {
     [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotterBackgroundColor];
 	[gradient release];
 	gradient = nil;
     [self setNeedsDisplay:YES];
-    //[mYScale setNeedsDisplay:YES];
-    //[mXScale setNeedsDisplay:YES];
+}
+
+-(void) setDataColor:(NSColor*)aColor dataSet:(int) aDataSet
+{
+    NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotterDataColor];
+    if(!colorDictionary){
+        colorDictionary = [NSMutableDictionary dictionary];
+        [attributes setObject:colorDictionary forKey:ORPlotterDataColor];
+    }
+    [colorDictionary setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:[NSNumber numberWithInt:aDataSet]];
+	[self setNeedsDisplay:YES];
 }
 
 -(NSColor*)backgroundColor

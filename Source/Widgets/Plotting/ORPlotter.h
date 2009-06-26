@@ -58,6 +58,8 @@
 - (NSColor*) gridColor;
 - (BOOL) isOpaque;
 - (id) dataSource;
+-(NSColor*) colorForDataSet:(int) aDataSet;
+- (void) setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
 
 #pragma mark •••Drawing
 - (void) drawBackground;
@@ -78,5 +80,10 @@
 
 @end
 
+@interface NSObject (ORPlotDataSource)
+- (BOOL)   	willSupplyColors;
+@end
+
 extern NSString* ORPlotterBackgroundColor;
 extern NSString* ORPlotterGridColor;
+extern NSString* ORPlotterDataColor;

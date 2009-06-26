@@ -20,6 +20,7 @@
 
 #import "ORPlotPublisher.h"
 #import "ORPlotter.h"
+#import "ORPlotter1D.h"
 
 @interface ORPlotPublisher (private)
 - (void) dumpAndStore;
@@ -48,20 +49,25 @@
 - (void) dealloc
 {
 	[oldAttributes release];
+	[oldXLabel release];
+	[oldYLabel release];
+	
 	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
-}
-
-- (void) loadUI:(ORPlotPublisher*) aCalibration
-{
+	[dataSetField setIntValue:0];
+	[color1 setColor:[plotter colorForDataSet:0]];
+	[previewImage setImage: [[[NSImage alloc] initWithData: [plotter plotAsPDFData]] autorelease]];
 }
 
 - (void) beginSheet
 {
 	oldAttributes = [[plotter attributes] mutableCopy];
+	oldXLabel = [[[plotter xScale] label] copy];
+	oldYLabel = [[[plotter yScale] label] copy];
+	
 	[plotter setBackgroundColor:[NSColor whiteColor]];
 	[plotter setGridColor:[NSColor whiteColor]];
 	[plotter setUseGradient:NO];
@@ -69,16 +75,8 @@
     [NSApp beginSheet:[self window] modalForWindow:[plotter window] modalDelegate:self didEndSelector:@selector(_publishingDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
-- (void) publishPlot
-{
-	if(![[self window] makeFirstResponder:[self window]]){
-		[[self window] endEditingFor:nil];		
-	}
-}
-
 - (IBAction) publish:(id)sender
 {	
-	[self publishPlot];
 	[[self window] orderOut:self];
     [NSApp endSheet:[self window] returnCode:NSOKButton];
 
@@ -90,12 +88,49 @@
     [NSApp endSheet:[self window] returnCode:NSCancelButton];
 }
 
+- (IBAction) labelingOptionsAction: (id) sender
+{
+	if([[optionMatrix cellWithTag:0] intValue]) {
+		[[plotter xScale] setLabel:[[labelMatrix cellWithTag:0] stringValue]];
+	}
+	else [[plotter xScale] setLabel:@""];
+	
+	if([[optionMatrix cellWithTag:1] intValue]) {
+		[[plotter yScale] setLabel:[[labelMatrix cellWithTag:1] stringValue]];
+	}
+	else [[plotter yScale] setLabel:@""];
+	
+	if([[optionMatrix cellWithTag:2] intValue]) [plotter setGridColor:[NSColor grayColor]];
+	else [plotter setGridColor:[NSColor whiteColor]];
+	
+	[previewImage setImage: [[[NSImage alloc] initWithData: [plotter plotAsPDFData]] autorelease]];
+
+}
+
+- (IBAction) dataSetAction: (id) sender
+{
+	int dataSet = [dataSetField intValue];
+	
+	if(dataSet < 0) dataSet = 0;
+	else if(dataSet>6)dataSet = 6;
+	
+	[dataSetField setIntValue:dataSet];
+	[color1 setColor:[plotter colorForDataSet:dataSet]];
+}
+
+- (IBAction) colorOptionsAction: (id) sender
+{
+	int dataSet = [dataSetField intValue];
+	[plotter setDataColor:[color1 color] dataSet:dataSet];
+
+	//this notification is a work around to force the legend to be redrawn with the right colors
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORPlotter1DActiveCurveChanged object:plotter];
+	[previewImage setImage: [[[NSImage alloc] initWithData: [plotter plotAsPDFData]] autorelease]];
+}
+
 @end
 
-
-
 @implementation ORPlotPublisher (private)
-
 - (void) dumpAndStore
 {
     NSSavePanel *savePanel = [NSSavePanel savePanel];
@@ -129,6 +164,11 @@
 - (void) finish
 {
 	[plotter setAttributes:oldAttributes];
+	[[plotter xScale] setLabel:oldXLabel];
+	[[plotter yScale] setLabel:oldYLabel];
+	[plotter setNeedsDisplay:YES];
+	//this notification is a work around to force the legend to be redrawn with the right colors
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORPlotter1DActiveCurveChanged object:plotter];
 	[self autorelease];
 }
 @end
