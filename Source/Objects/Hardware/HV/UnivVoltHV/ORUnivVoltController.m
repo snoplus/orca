@@ -22,6 +22,7 @@
 #import "ORUnivVoltHVCrateModel.h"
 #import "ORCircularBufferUV.h"
 #import "ORPlotter1D.h"
+#import "ORAxis.h"
 
 const int MAXcCHNLS_PER_PLOT = 6;
 
@@ -116,7 +117,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
     [notifyCenter addObserver : self
                      selector : @selector( pollingTimeChanged: )
-                         name : UVPollTimeMinutesChanged
+                         name : UVPollTimeChanged
 					   object : model];
 
     [notifyCenter addObserver : self
@@ -148,6 +149,16 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	                  selector: @selector( writeErrorMsg: )
 					     name : HVShortErrorNotification
 					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector( scaleAction: )
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector( miscAttributesChanged: )
+						 name : ORMiscAttributesChanged
+					   object : model];
 	
 }
 
@@ -201,7 +212,9 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	[self MCDZChanged: nil];
 	[self hvLimitChanged: nil];
 	[self pollingTimeChanged: nil];
+	[self pollingStatusChanged: nil];
 	[self numPlotterPointsChanged: nil];
+	
 	
 	[mChnlTable reloadData];	
 }
@@ -305,8 +318,8 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (void) pollingTimeChanged: (NSNotification *) aNote
 {
-	[mPollingTimeMinsField setFloatValue: [model pollTimeMinutes]];
-	NSLog( @"Controller - notified of polling time change: %f\n", [mPollingTimeMinsField floatValue]);
+	[mPollingTimeSecsField setIntValue: [model pollTimeSecs]];
+	NSLog( @"Controller - notified of polling time change: %f\n", [mPollingTimeSecsField intValue]);
 }
 
 - (void) pollingStatusChanged: (NSNotification*) aNote
@@ -394,7 +407,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (IBAction) setChnlEnabled: (id) aSender
 {
 	int enabled = [mChnlEnabled intValue];
-//	NSLog( @"ORController - SetEnabled( %d ): %d\n", mCurrentChnl, enabled );
+	NSLog( @"ORController - SetEnabled( %d ): %d\n", mCurrentChnl, enabled );
 	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
 
@@ -460,7 +473,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (IBAction) pollTimeAction: (id) aSender
 {
-	[model setPollTimeMinutes: [mPollingTimeMinsField floatValue]];
+	[model setPollTimeSecs: [mPollingTimeSecsField intValue]];
 }
 
 - (IBAction) startStopPolling: (id) aSender
@@ -468,8 +481,8 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	if ( [model isPollingTaskRunning] ) {
 		[model stopPolling];
 	} else {
-		float pollingTimeMins = [mPollingTimeMinsField floatValue];
-		[model setPollTimeMinutes: pollingTimeMins] ;
+		float pollingTimeMins = [mPollingTimeSecsField floatValue];
+		[model setPollTimeSecs: pollingTimeMins] ;
 		[model startPolling];
 	}
 }
@@ -527,19 +540,43 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	return (retVal);
 }
 
-
-/*
-- (double) getBarValue: (int) aTag
+//a fake action from the scale object
+- (void) scaleAction: (NSNotification*)aNotification
 {
-	ORCircularBufferUV* cbObj = [model circularBuffer: aTag ];
-	NSDictionary* retData = [cbObj HVEntry: aTag];
-	NSNumber*  hvMeasuredObj = [retDate objectForKey: ];
-	return( [hvMeasuredObj floatValue] );
+	if(aNotification == nil || [aNotification object] == [mPlottingObj1 yScale]){
+		[model setMiscAttributes:[[mPlottingObj1 xScale]attributes] forKey: @"HVPlot1YAttributes"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [mPlottingObj2 yScale]){
+		[model setMiscAttributes:[[mPlottingObj2 xScale]attributes] forKey: @"HVPlot2YAttributes"];
+	};	
 }
-*/
 
 
-
+- (void) miscAttributesChanged: (NSNotification*)aNote
+{
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString: @"HVPlot1YAttributes"]){
+		if( aNote == nil ) attrib = [model miscAttributesForKey: @"HVPlot1YAttributes"];
+		if( attrib ){
+			[[mPlottingObj1 yScale] setAttributes: attrib];
+			[mPlottingObj1 setNeedsDisplay: YES]; // Probably not needed.
+			[[mPlottingObj1 yScale] setNeedsDisplay: YES];
+//			[rateLogCB setState: [[attrib objectForKey: ORAxisUseLog] boolValue]];
+		}
+	}
+	if( aNote == nil || [key isEqualToString: @"HVPlot2YAttributes"]){
+		if( aNote == nil ) attrib = [model miscAttributesForKey: @"HVPlot2YAttributes"];
+		if( attrib ){
+			[[mPlottingObj2 yScale] setAttributes: attrib];
+			[mPlottingObj2 setNeedsDisplay: YES];
+			[[mPlottingObj2 yScale] setNeedsDisplay: YES];
+//			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+		}
+	}
+}
 
 - (int)	numberOfPointsInPlot: (id) aPlotter dataSet: (int) aChnl
 {
@@ -565,7 +602,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (unsigned long) secondsPerUnit: (id) aPlotter
 {
-	unsigned long sampleTime = [mPollingTimeMinsField intValue] * 60;
+	unsigned long sampleTime = [mPollingTimeSecsField intValue];
 	return( sampleTime );
 }
 

@@ -40,7 +40,7 @@
 	IBOutlet NSTextField*			mMCDZ;				// measured current dead zone.  "
 	IBOutlet NSTextField*			mHVLimit;
 	IBOutlet NSTextField*			mCmdStatus;			// Status of executed command.
-	IBOutlet NSTextField*			mPollingTimeMinsField;	// Number of minutes between refresh of data.
+	IBOutlet NSTextField*			mPollingTimeSecsField;	// Number of seconds between refresh of data.
 	IBOutlet NSTextField*			mLastPoll;			// Time when last poll conducted.
 	IBOutlet NSTextField*			mPointsXAxis;		// Number of points in x-axis for HV (y) vs time (x)
 	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.

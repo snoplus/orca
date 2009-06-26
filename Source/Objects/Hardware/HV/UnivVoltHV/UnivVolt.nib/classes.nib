@@ -92,6 +92,8 @@
 				<string>NSTextField</string>
 				<key>mPollingTimeMinsField</key>
 				<string>NSTextField</string>
+				<key>mPollingTimeSecsField</key>
+				<string>NSTextField</string>
 				<key>mRampDownRate</key>
 				<string>NSTextField</string>
 				<key>mRampUpRate</key>
