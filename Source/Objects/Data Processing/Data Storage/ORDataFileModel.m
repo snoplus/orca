@@ -627,18 +627,18 @@ static const int currentVersion = 1;           // Current version
     if (fsize = [fattrs objectForKey:NSFileSize]){
         [self setDataFileSize:[fsize intValue]];
     }
-//	checkCount++;
-//	if(!(checkCount%20)) {
-//		[self checkDiskStatus];
-//	}
+	checkCount++;
+	if(!(checkCount%20)) {
+		[self checkDiskStatus];
+	}
 }
 
 - (void) checkDiskStatus
 {
 	NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
 	NSDictionary* diskInfo = [[NSFileManager defaultManager] fileSystemAttributesAtPath:fullFileName];
-	unsigned freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
-	if(freeSpace < kMinDiskSpace * 1024){
+	long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
+	if(freeSpace < kMinDiskSpace * 1024 * 1024){
 		if(!diskFullAlarm){
 			diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
 			[diskFullAlarm setSticky:YES];
