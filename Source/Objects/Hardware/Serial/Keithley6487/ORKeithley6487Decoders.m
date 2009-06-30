@@ -34,7 +34,7 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Current encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time current taken in seconds since Jan 1, 1970
 //------------------------------------------------------------------------------------------------
-static NSString* kLakeShoreUnit[8] = {
+static NSString* kKeithleyUnit[8] = {
     //pre-make some keys for speed.
     @"Unit 0",  @"Unit 1",  @"Unit 2",  @"Unit 3",
     @"Unit 4",  @"Unit 5",  @"Unit 6",  @"Unit 7"
@@ -43,6 +43,12 @@ static NSString* kLakeShoreUnit[8] = {
 
 
 @implementation ORKeithley6487DecoderForCurrent
+
+- (NSString*) getUnitKey:(unsigned short)aUnit
+{
+    if(aUnit<8) return kKeithleyUnit[aUnit];
+    else return [NSString stringWithFormat:@"Unit %d",aUnit];			
+}
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
@@ -56,7 +62,8 @@ static NSString* kLakeShoreUnit[8] = {
 	[aDataSet loadTimeSeries:theCurrent.asFloat										
 					  atTime:dataPtr[3]
 					  sender:self 
-					withKeys:@"Keithley 6487",
+					withKeys:@"Keithley6487",
+							[self getUnitKey:dataPtr[1] & 0x0000ffff],
 							@"Current",
 							nil];
 	

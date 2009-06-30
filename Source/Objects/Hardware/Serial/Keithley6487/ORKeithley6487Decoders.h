@@ -18,8 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
 #import "ORBaseDecoder.h"
 
 @class ORDataPacket;

@@ -126,8 +126,8 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
             if(lineRange.location!= NSNotFound){
                 NSMutableString* theResponse = [[[buffer substringToIndex:lineRange.location+1] mutableCopy] autorelease];
                 [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
-				NSArray* lastCmdParts = [lastRequest componentsSeparatedByString:@" "];
-				NSString* lastCmd = [lastCmdParts objectAtIndex:0];
+				//NSArray* lastCmdParts = [lastRequest componentsSeparatedByString:@" "];
+				//NSString* lastCmd = [lastCmdParts objectAtIndex:0];
 				NSLog(@"Received: <%@>\n",theResponse);
 				//if([lastCmd isEqualToString: @"KRDG?"])      [self process_xrdg_response:theResponse args:lastCmdParts];
 				//else if([lastCmd isEqualToString: @"CRDG?"]) [self process_xrdg_response:theResponse args:lastCmdParts];

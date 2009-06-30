@@ -16,7 +16,6 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
 #pragma mark ***Imported Files
 
 @class ORPlotter1D;

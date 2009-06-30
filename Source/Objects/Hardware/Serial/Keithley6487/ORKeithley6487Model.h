@@ -67,7 +67,6 @@
 - (unsigned long) timeMeasured;
 - (void) setCurrent:(float)aValue;
 
-
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
