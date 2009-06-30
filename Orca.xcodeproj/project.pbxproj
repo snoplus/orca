@@ -1762,6 +1762,14 @@
 		84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */; };
 		84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D435B60798851B003D089F /* NoCamacDriverHelp.plist */; };
 		84D60BCB07428C7D0061F795 /* OrcaObjectController.m in Sources */ = {isa = PBXBuildFile; fileRef = F51E69EE03AE4776015F64B1 /* OrcaObjectController.m */; };
+		84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D791330FFA4CD000DC81D2 /* Keithley6487.gif */; };
+		84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D791340FFA4CD000DC81D2 /* Keithley6487.nib */; };
+		84D7913D0FFA4CD000DC81D2 /* ORKeithley6487Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D791350FFA4CD000DC81D2 /* ORKeithley6487Controller.h */; };
+		84D7913E0FFA4CD000DC81D2 /* ORKeithley6487Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D791360FFA4CD000DC81D2 /* ORKeithley6487Controller.m */; };
+		84D7913F0FFA4CD000DC81D2 /* ORKeithley6487Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D791370FFA4CD000DC81D2 /* ORKeithley6487Decoders.h */; };
+		84D791400FFA4CD000DC81D2 /* ORKeithley6487Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D791380FFA4CD000DC81D2 /* ORKeithley6487Decoders.m */; };
+		84D791410FFA4CD000DC81D2 /* ORKeithley6487Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D791390FFA4CD000DC81D2 /* ORKeithley6487Model.h */; };
+		84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */; };
 		84D852E60BE171AF00290BDC /* ORCARootServiceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */; };
 		84D967770CA03E50000C0C76 /* ORScriptController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D967710CA03E50000C0C76 /* ORScriptController.h */; };
 		84D967780CA03E50000C0C76 /* ORScriptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D967720CA03E50000C0C76 /* ORScriptController.m */; };
@@ -3778,6 +3786,14 @@
 		84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Decoders.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.h; sourceTree = SOURCE_ROOT; };
 		84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Decoders.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D435B60798851B003D089F /* NoCamacDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacDriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoCamacDriverHelp.plist"; sourceTree = SOURCE_ROOT; };
+		84D791330FFA4CD000DC81D2 /* Keithley6487.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Keithley6487.gif; path = Source/Objects/Hardware/Serial/Keithley6487/Keithley6487.gif; sourceTree = SOURCE_ROOT; };
+		84D791340FFA4CD000DC81D2 /* Keithley6487.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Keithley6487.nib; path = Source/Objects/Hardware/Serial/Keithley6487/Keithley6487.nib; sourceTree = SOURCE_ROOT; };
+		84D791350FFA4CD000DC81D2 /* ORKeithley6487Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKeithley6487Controller.h; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Controller.h; sourceTree = SOURCE_ROOT; };
+		84D791360FFA4CD000DC81D2 /* ORKeithley6487Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKeithley6487Controller.m; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Controller.m; sourceTree = SOURCE_ROOT; };
+		84D791370FFA4CD000DC81D2 /* ORKeithley6487Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKeithley6487Decoders.h; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Decoders.h; sourceTree = SOURCE_ROOT; };
+		84D791380FFA4CD000DC81D2 /* ORKeithley6487Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKeithley6487Decoders.m; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Decoders.m; sourceTree = SOURCE_ROOT; };
+		84D791390FFA4CD000DC81D2 /* ORKeithley6487Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKeithley6487Model.h; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Model.h; sourceTree = SOURCE_ROOT; };
+		84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKeithley6487Model.m; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Model.m; sourceTree = SOURCE_ROOT; };
 		84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceDefs.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceDefs.h"; sourceTree = SOURCE_ROOT; };
 		84D967710CA03E50000C0C76 /* ORScriptController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptController.h; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.h; sourceTree = SOURCE_ROOT; };
 		84D967720CA03E50000C0C76 /* ORScriptController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptController.m; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.m; sourceTree = SOURCE_ROOT; };
@@ -5814,6 +5830,7 @@
 				84098F4D0F964F0100036BE8 /* PDcu */,
 				840D56D70F39E9BF00F9A274 /* Pac */,
 				84B28D180F4C614000E2B056 /* XYScanner */,
+				84D791320FFA4CD000DC81D2 /* Keithley6487 */,
 				84B28D340F4C63A000E2B056 /* LakeShore210 */,
 				84B28D830F4C66BE00E2B056 /* VXM */,
 				84D258590FA7340B00626276 /* MotionNode */,
@@ -8180,6 +8197,22 @@
 			path = Source/Objects/Hardware/Serial/MotionNode;
 			sourceTree = SOURCE_ROOT;
 		};
+		84D791320FFA4CD000DC81D2 /* Keithley6487 */ = {
+			isa = PBXGroup;
+			children = (
+				84D791330FFA4CD000DC81D2 /* Keithley6487.gif */,
+				84D791340FFA4CD000DC81D2 /* Keithley6487.nib */,
+				84D791350FFA4CD000DC81D2 /* ORKeithley6487Controller.h */,
+				84D791360FFA4CD000DC81D2 /* ORKeithley6487Controller.m */,
+				84D791370FFA4CD000DC81D2 /* ORKeithley6487Decoders.h */,
+				84D791380FFA4CD000DC81D2 /* ORKeithley6487Decoders.m */,
+				84D791390FFA4CD000DC81D2 /* ORKeithley6487Model.h */,
+				84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */,
+			);
+			name = Keithley6487;
+			path = Source/Objects/Hardware/Serial/Keithley6487;
+			sourceTree = SOURCE_ROOT;
+		};
 		84D967700CA03E50000C0C76 /* Script */ = {
 			isa = PBXGroup;
 			children = (
@@ -9843,6 +9876,9 @@
 				84A1ACAD0FF3A4EE00D7F946 /* ORPlotPublisher.h in Headers */,
 				84A1AF8C0FF3BF1000D7F946 /* ORPlotter.h in Headers */,
 				84A1B1890FF3CE7400D7F946 /* ApplicationSupport.h in Headers */,
+				84D7913D0FFA4CD000DC81D2 /* ORKeithley6487Controller.h in Headers */,
+				84D7913F0FFA4CD000DC81D2 /* ORKeithley6487Decoders.h in Headers */,
+				84D791410FFA4CD000DC81D2 /* ORKeithley6487Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10472,6 +10508,8 @@
 				84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */,
 				846A5EB30FF126B2001CBD54 /* WebServer.gif in Resources */,
 				84A1ACAC0FF3A4EE00D7F946 /* PlotPublisher.nib in Resources */,
+				84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */,
+				84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11188,6 +11226,9 @@
 				84A1ACAE0FF3A4EE00D7F946 /* ORPlotPublisher.m in Sources */,
 				84A1AF8D0FF3BF1000D7F946 /* ORPlotter.m in Sources */,
 				84A1B18A0FF3CE7400D7F946 /* ApplicationSupport.m in Sources */,
+				84D7913E0FFA4CD000DC81D2 /* ORKeithley6487Controller.m in Sources */,
+				84D791400FFA4CD000DC81D2 /* ORKeithley6487Decoders.m in Sources */,
+				84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
