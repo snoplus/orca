@@ -627,10 +627,10 @@ static const int currentVersion = 1;           // Current version
     if (fsize = [fattrs objectForKey:NSFileSize]){
         [self setDataFileSize:[fsize intValue]];
     }
-	checkCount++;
-	if(!(checkCount%20)) {
-		[self checkDiskStatus];
-	}
+//	checkCount++;
+//	if(!(checkCount%20)) {
+//		[self checkDiskStatus];
+//	}
 }
 
 - (void) checkDiskStatus
