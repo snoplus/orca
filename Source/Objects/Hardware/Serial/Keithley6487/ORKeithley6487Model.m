@@ -43,7 +43,7 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 - (void) runStopped:(NSNotification*)aNote;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
-- (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs;
+//- (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs;
 @end
 
 @implementation ORKeithley6487Model
@@ -128,9 +128,9 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
                 [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
 				NSArray* lastCmdParts = [lastRequest componentsSeparatedByString:@" "];
 				NSString* lastCmd = [lastCmdParts objectAtIndex:0];
-
-				if([lastCmd isEqualToString: @"KRDG?"])      [self process_xrdg_response:theResponse args:lastCmdParts];
-				else if([lastCmd isEqualToString: @"CRDG?"]) [self process_xrdg_response:theResponse args:lastCmdParts];
+				NSLog(@"Received: <%@>\n",theResponse);
+				//if([lastCmd isEqualToString: @"KRDG?"])      [self process_xrdg_response:theResponse args:lastCmdParts];
+				//else if([lastCmd isEqualToString: @"CRDG?"]) [self process_xrdg_response:theResponse args:lastCmdParts];
 		
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
@@ -443,11 +443,11 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 	}
 }
 
-- (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs
-{
+//- (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs
+//{
 //	NSArray* t = [theResponse componentsSeparatedByString:@","];
 //	[self setCurrent:[[t objectAtIndex:i] floatValue]];
 //	if(shipCurrent) [self shipCurrent];
-}
+//}
 
 @end
