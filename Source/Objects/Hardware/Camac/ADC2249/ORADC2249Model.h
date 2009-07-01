@@ -42,7 +42,7 @@ enum EADC2249ModelConsts { kRegisterNumberADC2249 = 12 };
         unsigned long 	unChangingDataPart;
         unsigned short cachedStation;
         short onlineChannelCount;
-		short onlineList[kRegisterNumberADC2249];        
+		short onlineList[kRegisterNumberADC2249]; 
 }
 
 #pragma mark ¥¥¥Initialization

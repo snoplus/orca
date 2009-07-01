@@ -220,15 +220,18 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     BOOL resetDone;
-
+	
 	union {
 		NSTimeInterval asTimeInterval;
 		unsigned long asLongs[2];
 	}theTimeRef;
-
+	
     @try {
+        
         //check the LAM
-		BOOL isLamSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8]); //LAM status comes back in the Q bit
+		BOOL isLamSet = NO;
+		if(checkLAM)isLamSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8 ]); //LAM status comes back in the Q bit
+		else isLamSet =YES;
         if(isLamSet) { 
             if(onlineChannelCount){
 				resetDone = NO;
@@ -240,10 +243,10 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
                 for(i=0;i<onlineChannelCount;i++){
                     //read one adc channnel
                     unsigned short adcValue;
-                    [controller camacShortNAF:cachedStation a:onlineList[i] f:0 data:&adcValue];
+                    [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
 					if(!(suppressZeros && adcValue==0)){
 						if(IsShortForm(dataId)){
-							unsigned long data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0x3ff);
+							unsigned long data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0xfff);
 							[aDataPacket addLongsToFrameBuffer:&data length:1];
 						}
 						else {
@@ -256,24 +259,23 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 								data[2] = theTimeRef.asLongs[1];	//low part
 								data[3] = theTimeRef.asLongs[0];	//high part
 							}
-
+							
 							data[0] =  dataId | len;
-							data[1] =  includeTimingMask | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0x3ff);
-
+							data[1] =  includeTimingMask | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0xfff);
+							
 							[aDataPacket addLongsToFrameBuffer:data length:len];
 						}
 					}
                     if(i == (kRegisterNumberADC2249- 1)) resetDone = YES;
                     
                 }
+                //read of last channel clears lam , if last channel wasn't read clear lam here
+				if(!resetDone) {
+					[controller camacShortNAF:cachedStation a:0 f:9]; 
+				}
 			}
-			//[self enableLAMEnableLatch];
-			//tests of reset conditions to try and prevent lockup mah 6/24/09
-			//[controller camacShortNAF:cachedStation a:0 f:24]; //disable LAM 
-			[controller camacShortNAF:cachedStation a:0 f:9]; //clear module and LAM
-			//[controller camacShortNAF:cachedStation a:0 f:10]; //clear LAM
-			//[controller camacShortNAF:cachedStation a:0 f:26]; //enable LAM
-			
+            
+            
   		}
 	}
 	@catch(NSException* localException) {
@@ -290,6 +292,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 }
 
 #pragma mark ¥¥¥Hardware Test functions
+
 - (void) readNoReset
 {
     if(onlineMask){

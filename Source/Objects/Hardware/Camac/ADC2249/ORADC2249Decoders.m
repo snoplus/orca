@@ -86,9 +86,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getStationKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
-    unsigned long  value = *ptr&0x000003ff;
+    unsigned long  value = *ptr&0x00000fff;
 	
-    [aDataSet histogram:value numBins:1024 sender:self  withKeys:@"ADC2249", crateKey,cardKey,channelKey,nil];
+    [aDataSet histogram:value numBins:2048 sender:self  withKeys:@"ADC2249", crateKey,cardKey,channelKey,nil];
 
     if(gatesInstalled){
         [super prepareData:aDataSet crate:crate card:card channel:channel value:value];
@@ -111,7 +111,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n", (*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Station  = %d\n", (*ptr&0x001f0000)>>16];
     NSString* chan  = [NSString stringWithFormat:@"Chan     = %d\n", (*ptr&0x0000f000)>>12];
-    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%x\n",*ptr&0x000003ff];
+    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%x\n",*ptr&0x00000fff];
 	NSCalendarDate* theTime = nil;
 	
 	if(length ==4){
