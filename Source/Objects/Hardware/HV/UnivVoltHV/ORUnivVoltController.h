@@ -75,6 +75,8 @@
 - (void) scaleAction: (NSNotification*) aNotes;
 
 #pragma mark •••Actions
+- (IBAction) enableAllChannels: (id) aSender;
+- (IBAction) disableAllChannels: (id) aSender;
 - (IBAction) setAlarm: (id) aSender;
 - (IBAction) setChannelNumberField: (id) aSender;
 - (IBAction) setChannelNumberStepper: (id) aSender;

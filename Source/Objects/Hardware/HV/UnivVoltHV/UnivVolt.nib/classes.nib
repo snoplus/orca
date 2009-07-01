@@ -15,6 +15,10 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>disableAllChannels</key>
+				<string>id</string>
+				<key>enableAllChannels</key>
+				<string>id</string>
 				<key>hardwareValues</key>
 				<string>id</string>
 				<key>hardwareValuesOneChannel</key>

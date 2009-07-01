@@ -686,6 +686,17 @@ NSString* UVkWrite = @"W";
 	return( status );
 }
 
+- (void) setStatus: (int) aCurChannel status: (NSString*) aStatus
+{
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
+	[tmpChnl setObject: aStatus forKey: HVkStatus];
+	
+	// Create return dictionary with channel.  Then send notification that value has changed.
+//	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+//	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlStatusChanged object: self userInfo: chnlRet];	
+
+}
+
 - (float) MVDZ: (int) aCurChannel
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
@@ -778,6 +789,11 @@ NSString* UVkWrite = @"W";
 	return [[mCircularBuffers objectAtIndex:aChnl] count];
 }
 
+- (bool) updateFirst: (int) aCurrentChnl
+{
+	return( mUpdateFirst[ aCurrentChnl] );
+}
+
 #pragma mark •••Interpret Data
 - (void) interpretDataReturn: (NSNotification*) aNote
 {
@@ -838,6 +854,7 @@ NSString* UVkWrite = @"W";
 	{	
 		// Get chnl object from mChannelArray.  This object will be changed with new values from return.
 		NSMutableDictionary* chnlDictObj = [mChannelArray objectAtIndex: aCurChnl];
+		mUpdateFirst[ aCurChnl ] = YES;
      
 		// Record time.
 		mTimeStamp = [NSDate date];
@@ -1164,6 +1181,7 @@ NSString* UVkWrite = @"W";
 		// Put in dummy values for testing.
 		for( i = 0 ; i < UVkNumChannels; i++ )
 		{
+			mUpdateFirst[ i ] = NO;
 
 			NSNumber* chnl = [NSNumber numberWithInt: i];
 			NSNumber* measuredCurrent = [NSNumber numberWithFloat: ((float)i * 1.0)];
@@ -1172,7 +1190,7 @@ NSString* UVkWrite = @"W";
 			NSNumber* rampUpRate = [NSNumber numberWithFloat: 61.3];
 			NSNumber* rampDownRate = [NSNumber numberWithFloat: 61.3];
 			NSNumber* tripCurrent = [NSNumber numberWithFloat: 2550.0];
-			NSString* status = [NSString stringWithString: @"enabled"];
+			NSNumber* status = [NSNumber numberWithInt: 0];
 			NSNumber* enabled = [NSNumber numberWithInt: 1];
 			NSNumber* MVDZ = [NSNumber numberWithFloat: 1.5];
 			NSNumber* MCDZ = [NSNumber numberWithFloat: 1.3];

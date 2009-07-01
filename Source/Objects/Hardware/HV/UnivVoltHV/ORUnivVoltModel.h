@@ -48,6 +48,7 @@ typedef enum hveStatus hveStatus;
 	int						mWParams;
 	bool					mPollTaskIsRunning;
 	bool					mAlarmsEnabled;
+	bool					mUpdateFirst[ UVkNumChannels];	// If true have done at least one update to load values.
 	
 	double					mHVValues[ UVkNumChannels ];
 }
@@ -90,6 +91,7 @@ typedef enum hveStatus hveStatus;
 - (float) rampDownRate: (int) aCurrentChnl;
 - (void)  setRampDownRate: (float) aRampDownRate chnl: (int) aCurrentChnl;
 - (NSString*) status: (int) aCurrentChnl;
+- (void) setStatus: (int) aCurrentChnl status: (NSString*) aStatus;
 - (float) MVDZ: (int) aCurrentChnl;
 - (void)  setMVDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
 - (float) MCDZ: (int) aCurrentChnl;
@@ -100,7 +102,8 @@ typedef enum hveStatus hveStatus;
 - (bool) areAlarmsEnabled;
 - (void) enableAlarms: (bool) aFlag;
 - (int) stationNumber;
-- (int) numPointsInCB:(int)aChnl; //mah -- added to get the actual number of plots in CB rather
+- (int) numPointsInCB: (int)aChnl; //mah -- added to get the actual number of plots in CB rather
+- (bool) updateFirst: (int) aCurrentChnl;
 
 #pragma mark •••Interpret data
 - (void) interpretDataReturn: (NSNotification*) aNote;

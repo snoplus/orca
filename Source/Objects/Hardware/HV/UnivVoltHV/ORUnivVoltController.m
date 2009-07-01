@@ -167,11 +167,25 @@ const int MAXcCHNLS_PER_PLOT = 6;
 {
 	[super awakeFromNib];
 	
+	int i;
 	mCurrentChnl = 0;
 	mOrigChnl = 0;
 	NSLog( @"UnivVolt:AwakeFromNIB.  Current chnl: ", mCurrentChnl );
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[mChannelNumberField setIntValue: mCurrentChnl];
+	[mCmdStatus setStringValue: @"Undefined"];
+	
+	// Set all measured values to undefined
+	for ( i = 0; i < UVkNumChannels; i++ )
+	{
+		if ( [model updateFirst: i] ) {
+			
+		}
+		else
+		{
+			[model setStatus: i status: @"Undefined"];
+		}
+	}
 //	[mPointsXAxis setIntValue: [model plotterPoints]];
 	
 	[mChnlTable reloadData];
@@ -233,6 +247,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	int value =  [model chnlEnabled: mCurrentChnl];
 //	NSLog( @"ORController - EnabledChanged( %d ): %d\n", mCurrentChnl, value );
 	[mChnlEnabled setIntValue: value];
+	[mChnlTable reloadData];	
 }
 
 - (void) measuredCurrentChanged: (NSNotification*) aNote
@@ -240,6 +255,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 //	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMeasuredCurrent setFloatValue: [model measuredCurrent: mCurrentChnl]];
 	NSLog( @"Measured current: %g, for chnl: %d", [model measuredCurrent: mCurrentChnl], mCurrentChnl );
+	[mChnlTable reloadData];	
 }
 
 - (void) demandHVChanged: (NSNotification*) aNote
@@ -264,6 +280,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 		[cbObj insertHVEntry: dateObj hvValue: hvValue];
 	}
 	*/
+	[mChnlTable reloadData];	
 }
 
 - (void) tripCurrentChanged: (NSNotification*) aNote
@@ -297,6 +314,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 {
 	[self setCurrentChnl: (NSNotification*) aNote ];  
 	[mStatus setStringValue: [model status: mCurrentChnl]];
+	[mChnlTable reloadData];	
 }
 
 - (void) MVDZChanged: (NSNotification*) aNote
@@ -385,6 +403,24 @@ const int MAXcCHNLS_PER_PLOT = 6;
 }
 */
 #pragma mark •••Actions
+- (IBAction) enableAllChannels: (id) aSender
+{
+	int i;
+	for (i = 0; i < UVkNumChannels; i++ )
+	{
+		[model setChannelEnabled: 1 chnl: i];
+	}
+}
+
+- (IBAction) disableAllChannels: (id) aSender
+{
+	int i;
+	for (i = 0; i < UVkNumChannels; i++ )
+	{
+		[model setChannelEnabled: 0 chnl: i];
+	}
+}
+
 - (IBAction) setAlarm: (id) aSender
 {
 	[model areAlarmsEnabled] ? [model enableAlarms: NO] : [model enableAlarms: YES];
