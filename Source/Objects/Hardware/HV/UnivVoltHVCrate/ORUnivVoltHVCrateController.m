@@ -42,7 +42,7 @@
 	[super awakeFromNib];
 	
 	NSString* testString = [[NSString alloc] initWithString: @"See if anything appears in text view.\n"];
-	NSLog( @" IPAddress: %@\n", [model ipAddress] );
+	NSLog( @"UnivVoltHVCrateController - IPAddress: %@\n", [model ipAddress] );
 	[ipAddressTextField setStringValue: [model ipAddress]];
 //	[mReturnStringFromSocket setString: testString];
 //	[mReturnStringFromSocket appendString: testString1];
@@ -120,7 +120,7 @@
 - (void) writeErrorMsg: (NSNotification*) aNote
 {
 	NSDictionary* errorDict = [aNote userInfo];
-	NSLog( @"error: %@", [errorDict objectForKey: HVkErrorMsg] );
+	NSLog( @"UnivVoltHVCrateController - error: %@", [errorDict objectForKey: HVkErrorMsg] );
 	[outputArea setString: [errorDict objectForKey: HVkErrorMsg]];
 }
 
@@ -174,9 +174,9 @@
 }
 
 
-- (void) showError:(NSException*)anException name:(NSString*)name
+- (void) showError: (NSException*)anException name: (NSString*)name
 {
-    NSLog(@"Failed Cmd: %@ \n",name);
+    NSLog( @"UnivVoltHVCrateController - Failed Cmd: %@ \n",name );
     if([[anException name] isEqualToString: OExceptionNoUnivVoltHVCratePower]) {
         [model  doNoPowerAlert:anException action:[NSString stringWithFormat:@"%@",name]];
     }
@@ -195,21 +195,21 @@
 - (void) displayHVStatus: (NSNotification *) aNotes
 
 {
-	NSLog( @"HVStatus display: %@", [model hvStatus]);
+	NSLog( @"UnivVoltHVCrateController - HVStatus display: %@", [model hvStatus] );
 	[hvStatusField setStringValue: [model hvStatus]];
 }
 
 - (void) displayConfig: (NSNotification *) aNotes
 {
 	NSString* returnData = [model config];	
-	NSLog( @"Config display: %@", returnData);
+	NSLog( @"UnivVoltHVCrateController - Config display: %@", returnData );
 	[outputArea setString: returnData];
 }
 
 - (void) displayEnet: (NSNotification *) aNotes
 
 {
-	NSLog( @"Ethernet display: %@", [model ethernetConfig]);
+	NSLog( @"UnivVoltHVCrateController - Ethernet display: %@", [model ethernetConfig] );
 	[outputArea setString: [model ethernetConfig]];
 }
 

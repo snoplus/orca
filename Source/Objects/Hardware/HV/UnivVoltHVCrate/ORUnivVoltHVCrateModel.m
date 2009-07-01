@@ -194,7 +194,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	@finally
 	{
 	}
-	NSLog( @"ORUnivVoltHVCrateModel::awakeAfterDocumentLoaded\n" );
+	NSLog( @"ORUnivVoltHVCrateModel - awakeAfterDocumentLoaded\n" );
 }
 
 
@@ -425,7 +425,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	
 	@catch (NSException *exception) {
 
-			NSLog(@"queueCommand: Caught %@: %@", [exception name], [exception  reason]);
+			NSLog(@"ORUnivVoltHVCrateModel - queueCommand: Caught %@: %@", [exception name], [exception  reason]);
 	} 
 	
 	@finally
@@ -584,7 +584,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 				}
 		
 				// 3) Verify that last command issued corresponds to data return.
-				NSLog( @"Returned command '%@', recent command '%@'.", retCommand, queuedCommandStr );
+				NSLog( @"ORUnivVoltHVCrateModel - Returned command '%@', recent command '%@'\n.", retCommand, queuedCommandStr );
 				if ( [retCommand isEqualTo: storedCmdStr]  )
 				{
 					// Debug only. Print list of tokens.
@@ -627,7 +627,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	
 	@catch (NSException *exception) {
 
-			NSLog(@"handleDataReturn: Caught %@: %@", [exception name], [exception  reason]);
+			NSLog(@"ORUnivVoltHVCrateModel - handleDataReturn: Caught %@: %@", [exception name], [exception  reason]);
 	}
 	
 	@finally {	
@@ -651,21 +651,21 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 
 		if ( mMostRecentHVStatus != nil ) [mMostRecentHVStatus release];
 		mMostRecentHVStatus = [[NSString stringWithString: aRetString] retain];					
-		NSLog( @"Send notification about HVStatus change.");
+		NSLog( @"ORUnivVoltHVCrateModel - Send notification about HVStatus change.");
 		[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 	}
 				
 	else if ( [aCrateCmd isEqualTo: ORHVkCrateConfig] ) {
 		if ( mMostRecentConfig != nil ) [mMostRecentConfig release];
 			mMostRecentConfig = [[NSString stringWithString: aRetString] retain];
-			NSLog( @"Send notification about Config.");
+			NSLog( @"ORUnivVoltHVCrateModel - Send notification about Config.");
 			[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
 	}
 		
 	else if ( [aCrateCmd isEqualTo: ORHVkCrateEnet] ) {
 		if ( mMostRecentEnetConfig != nil ) [mMostRecentEnetConfig release];
 			mMostRecentEnetConfig = [[NSString stringWithString: aRetString] retain];
-			NSLog( @"Send notification about Enet Config.");
+			NSLog( @"ORUnivVoltHVCrateModel - Send notification about Enet Config.");
 			[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self];
 	} // end if statement about which command is applicable
 }
@@ -706,7 +706,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	
 	@catch (NSException *exception) {
 
-			NSLog(@"obtainConfig: Caught %@: %@", [exception name], [exception  reason]);
+			NSLog( @"ORUnivVoltHVCrateModel - obtainConfig: Caught %@: %@", [exception name], [exception  reason] );
 	} 
 	
 	@finally
@@ -730,7 +730,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-		NSLog(@"obtainEthernetConfig: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog( @"ORUnivVoltHVCrateModel - obtainEthernetConfig: Caught %@: %@", [exception name], [exception  reason] );
 	} 
 	
 	@finally
@@ -751,7 +751,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-			NSLog(@"connect: Caught %@: %@", [exception name], [exception  reason]);
+			NSLog( @"ORUnivVoltHVCrateModel - connect: Caught %@: %@", [exception name], [exception  reason] );
 	}
 	@finally{
 	} 
@@ -835,7 +835,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 		// Get amount of data and data itself.
 		lengthOfReturn = [aDataObject length];
 		[aDataObject getBytes: returnBufferArray length: lengthOfReturn];
-		NSLog( @"Return string '%s'  length: %d\n", returnBufferArray, lengthOfReturn );
+		NSLog( @"ORUnivVoltHVCrateModel - Return string '%s'  length: %d\n", returnBufferArray, lengthOfReturn );
 		
 		returnCodeArray[ NUMcCODENUM ] = '\0';
 		
@@ -925,7 +925,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	
 	@catch (NSException *exception) {
 
-		NSLog(@"interpretDataFromSocket: Caught %@: %@\n", [exception name], [exception  reason]);
+		NSLog( @"ORUnivVoltHVCrateModel - interpretDataFromSocket: Caught %@: %@\n", [exception name], [exception  reason] );
 	} 
 	
 	@finally{
@@ -953,7 +953,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 				          command: (NSString*) aCommand 
 			         returnString: (NSArray*) aRetTokens
 {
-	NSLog( @"Send notification data return - slot: %d, chnl: %d\n", [aSlotNum intValue], [aChnlNum intValue]);
+	NSLog( @"ORUnivVoltHVCrateModel - Send notification data return - slot: %d, chnl: %d\n", [aSlotNum intValue], [aChnlNum intValue]);
 	NSArray *keys = [NSArray arrayWithObjects: UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
 	NSArray *data = [NSArray arrayWithObjects:  aSlotNum, aChnlNum, aCommand, aRetTokens, nil];
 	NSDictionary* retDictObj = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
@@ -972,7 +972,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	NSDictionary* cmdDictObj = 0;
 	if ( [mCmdCmdQueue isEmpty] && mCmdsToProcess > 0)
 	{
-		NSLog( @"Error  - sendSingleCommand has empty cmd queue even though there should still be %d cmds to process.\n",
+		NSLog( @"ORUnivVoltHVCrateModel - Error  - sendSingleCommand has empty cmd queue even though there should still be %d cmds to process.\n",
 			mCmdsToProcess );
 	}
 	
@@ -993,7 +993,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 		fullCommand = [cmdDictObj objectForKey: UVkCommand];
 		const char* buffer = [fullCommand cStringUsingEncoding: NSASCIIStringEncoding];
 		
-		NSLog( @"SendCommandBasic - Command '%s',  length:%d\n", buffer, [fullCommand length] + 1 );
+		NSLog( @"ORUnivVoltHVCrateModel - SendCommandBasic - Command '%s',  length:%d\n", buffer, [fullCommand length] + 1 );
 		if (mSocket != nil )
 		{
 			[mSocket write: buffer length: [fullCommand length] + 1];	
@@ -1020,7 +1020,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-		NSLog(@"netsocketConnected: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog( @"ORUnivVoltHVCrateModel - netsocketConnected: Caught %@: %@", [exception name], [exception  reason] );
 	}
 	@finally
 	{
@@ -1040,7 +1040,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-		NSLog(@"netsocketConnected: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog( @"ORUnivVoltHVCrateModel - netsocketConnected: Caught %@: %@", [exception name], [exception  reason] );
 	}
 	@finally
 	{
@@ -1058,7 +1058,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-		NSLog(@"netsocketConnected: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog( @"ORUnivVoltHVCrateModel - netsocketConnected: Caught %@: %@", [exception name], [exception  reason] );
 	}
 	@finally
 	{

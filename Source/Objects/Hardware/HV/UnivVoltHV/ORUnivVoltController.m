@@ -170,7 +170,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	int i;
 	mCurrentChnl = 0;
 	mOrigChnl = 0;
-	NSLog( @"UnivVolt:AwakeFromNIB.  Current chnl: ", mCurrentChnl );
+	NSLog( @"UnivVoltController - AwakeFromNIB.  Current chnl: ", mCurrentChnl );
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[mChannelNumberField setIntValue: mCurrentChnl];
 	[mCmdStatus setStringValue: @"Undefined"];
@@ -254,7 +254,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 {
 //	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMeasuredCurrent setFloatValue: [model measuredCurrent: mCurrentChnl]];
-	NSLog( @"Measured current: %g, for chnl: %d", [model measuredCurrent: mCurrentChnl], mCurrentChnl );
+	NSLog( @"UnivVoltController - Measured current: %g, for chnl: %d", [model measuredCurrent: mCurrentChnl], mCurrentChnl );
 	[mChnlTable reloadData];	
 }
 
@@ -263,7 +263,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	float value;
 	[self setCurrentChnl: (NSNotification*) aNote ];  
 	value = [model demandHV: mCurrentChnl];
-	NSLog( @"Setting demand HV to: %f  for channel %d\n", value, mCurrentChnl);
+	NSLog( @"UnivVoltController - Setting demand HV to: %f  for channel %d\n", value, mCurrentChnl);
 	[mDemandHV setFloatValue: value];
 }
 
@@ -288,7 +288,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	float value;
 	[self setCurrentChnl: (NSNotification*) aNote ];  
 	value = [model tripCurrent: mCurrentChnl];
-	NSLog( @"tripCurrentChanged for chnl %d: %f\n", mCurrentChnl, value );
+	NSLog( @"UnivVoltController - tripCurrentChanged for chnl %d: %f\n", mCurrentChnl, value );
 	[mTripCurrent setFloatValue: value];
 }
 
@@ -297,7 +297,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	float value;
 	[self setCurrentChnl: (NSNotification*) aNote ]; 
 	value = [model rampUpRate: mCurrentChnl];
-	NSLog( @"RampUpRate %f for channel %d changed.\n", value, mCurrentChnl);
+	NSLog( @"UnivVoltController - RampUpRate %f for channel %d changed.\n", value, mCurrentChnl);
 	[mRampUpRate setFloatValue: [model rampUpRate: mCurrentChnl]];
 }
 
@@ -306,7 +306,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	float value;
 	[self setCurrentChnl: (NSNotification*) aNote ]; 
 	value = [model rampDownRate: mCurrentChnl];
-	NSLog( @"RampDownRate %f for channel %d changed.\n", value, mCurrentChnl);
+	NSLog( @"UnivVoltController - RampDownRate %f for channel %d changed.\n", value, mCurrentChnl);
 	[mRampDownRate setFloatValue: [model rampDownRate: mCurrentChnl]];
 }
 
@@ -339,7 +339,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 {
 	float pollTimeMinsValue = [model pollTimeMins];
 	[mPollingTimeMinsField setFloatValue: pollTimeMinsValue];
-	NSLog( @"Controller - notified of polling time change: %f\n", [mPollingTimeMinsField floatValue]);
+	NSLog( @"UnivVoltController - notified of polling time change: %f\n", [mPollingTimeMinsField floatValue]);
 }
 
 - (void) pollingStatusChanged: (NSNotification*) aNote
@@ -352,7 +352,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 {
 	NSDictionary* pollObj = [aNote userInfo];
 	NSString* lastPollTime = [pollObj objectForKey: HVkLastPollTimeMins];
-	NSLog( @"Last polltime %@\n", lastPollTime );
+	NSLog( @"UnivVoltController - Last polltime %@\n", lastPollTime );
 	[mLastPoll setObjectValue: lastPollTime];
 }
 
@@ -379,7 +379,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (void) writeErrorMsg: (NSNotification*) aNote
 {
 	NSDictionary* errorDict = [aNote userInfo];
-	NSLog( @"error: %@", [errorDict objectForKey: HVkErrorMsg] );
+	NSLog( @"UnivVoltController - error: %@", [errorDict objectForKey: HVkErrorMsg] );
 	[mCmdStatus setStringValue: [errorDict objectForKey: HVkErrorMsg]];
 }
 
@@ -445,7 +445,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (IBAction) setChnlEnabled: (id) aSender
 {
 	int enabled = [mChnlEnabled intValue];
-	NSLog( @"ORController - SetEnabled( %d ): %d\n", mCurrentChnl, enabled );
+	NSLog( @"UnivVoltController -  - SetEnabled( %d ): %d\n", mCurrentChnl, enabled );
 	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
 
@@ -457,7 +457,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (IBAction) setTripCurrent: (id) aSender
 {
 	float value = [mTripCurrent floatValue];
-	NSLog( @"Set trip current for channel %d to %f\n", mCurrentChnl, value );
+	NSLog( @"UnivVoltController - Set trip current for channel %d to %f\n", mCurrentChnl, value );
 	[model setTripCurrent: value chnl: mCurrentChnl];	
 }
 
@@ -493,19 +493,19 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (IBAction) hardwareValues: (id) aSender
 {
-	NSLog( @"Get hardware values\n" );
+	NSLog( @"UnivVoltController - Get hardware values\n" );
 	[model getValues: -1];
 }
 
 - (IBAction) setHardwareValesOneChannel: (id ) aSender;
 {
-	NSLog( @"Download params for chnl %d\n", mCurrentChnl );
+	NSLog( @"UnivVoltController - Download params for chnl %d\n", mCurrentChnl );
 	[model loadValues: mCurrentChnl];
 }
 
 - (IBAction) setHardwareValues: (id) aSender
 {
-	NSLog( @"Download hardware values\n" );
+	NSLog( @"UnivVoltController - Download hardware values\n" );
 	[model loadValues: -1];
 }
 
@@ -542,7 +542,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	int totalChnls;
 	
 	totalChnls = [model numChnlsEnabled];
-	NSLog( @"Total chnls: %d\n", totalChnls );
+	NSLog( @"UnivVoltController - Total chnls: %d\n", totalChnls );
 	
 	if ( aPlotter == mPlottingObj1 ) {
 		if ( totalChnls > MAXcCHNLS_PER_PLOT ) {

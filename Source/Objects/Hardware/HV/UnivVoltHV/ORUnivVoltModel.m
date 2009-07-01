@@ -488,7 +488,7 @@ NSString* UVkWrite = @"W";
 		
 		[self performSelector: @selector( pollTask ) withObject: nil afterDelay: pollTimeSecs];
 		mPollTaskIsRunning = TRUE;
-		NSLog( @"Started poll task with interval: %f Seconds\n", pollTimeSecs);
+		NSLog( @"ORUnivVoltModel - Started poll task with interval: %f Seconds\n", pollTimeSecs);
 		[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
 	}
 	else {
@@ -498,7 +498,7 @@ NSString* UVkWrite = @"W";
 
 - (void) stopPolling
 {	
-	NSLog( @"Stopped poll task with interval: %f\n", [mPollTimeMins floatValue]);
+	NSLog( @"ORUnivVoltModel - Stopped poll task with interval: %f\n", [mPollTimeMins floatValue]);
 	mPollTaskIsRunning = FALSE;
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
@@ -514,7 +514,7 @@ NSString* UVkWrite = @"W";
 													     locale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
 	NSString* lastPollTimeMsg = [NSString stringWithFormat: @"%@", lastPollTime];
 	
-	NSLog( @"Last Poll Time ORUnivVoltModel: %@\n", lastPollTimeMsg );
+	NSLog( @"ORUnivVoltModel - Last Poll Time ORUnivVoltModel: %@\n", lastPollTimeMsg );
 
 	// Send notification of latest poll time.
 	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: HVkLastPollTimeMins];
@@ -566,7 +566,7 @@ NSString* UVkWrite = @"W";
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
 	NSNumber* numObj = [tmpChnl objectForKey: HVkChannelEnabled];
 	int value = [numObj intValue];
-	NSLog( @"ORModel - ChnlEnabled( %d ): %d %@\n", aCurrentChnl, value, numObj );
+	NSLog( @"ORUnivVoltModel - ChnlEnabled( %d ): %d %@\n", aCurrentChnl, value, numObj );
 	return( value );
 }
 
@@ -578,7 +578,7 @@ NSString* UVkWrite = @"W";
 	[tmpChnl setObject: numObj forKey: HVkChannelEnabled];
 	
 	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
-	NSLog( @"ORModel - SetEnabled( %d ): %d  Number:Obj %@\n", aCurChannel, anEnabled, numObj );
+	NSLog( @"ORUnivVoltModel - SetEnabled( %d ): %d  Number:Obj %@\n", aCurChannel, anEnabled, numObj );
 
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged object: self userInfo: chnlRet];		
 }
@@ -621,7 +621,7 @@ NSString* UVkWrite = @"W";
 	
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
 	NSNumber* hvObj = [tmpChnl objectForKey: HVkMeasuredHV];
-	NSLog( @"Retrieved HV %@ for channel: %d\n", hvObj, aChnl );
+	NSLog( @"ORUnivVoltModel - Retrieved HV %@ for channel: %d\n", hvObj, aChnl );
 	return( [[tmpChnl objectForKey: HVkMeasuredHV] floatValue] );
 }
 
@@ -837,7 +837,7 @@ NSString* UVkWrite = @"W";
 		}				
 	}
 	@catch (NSException * e) {
-		NSLog( @"Caught exception '%@'.", [e reason] );
+		NSLog( @"ORUnivVoltModel - Caught exception '%@'.", [e reason] );
 	}
 	@finally {
 		
@@ -957,7 +957,7 @@ NSString* UVkWrite = @"W";
 //		[notifyCenter postNotificationName: UVChnlHVLimitChanged object: self userInfo: chnlDictObj];
 	}
 	@catch (NSException * e) {
-		NSLog( @"Caught exception in ORUnivVoltModel:interpretDMPReturn %@'.\n", [e reason] );
+		NSLog( @"ORUnivVoltModel - Caught exception in ORUnivVoltModel:interpretDMPReturn %@'.\n", [e reason] );
 	}
 	@finally {
 		
@@ -976,7 +976,7 @@ NSString* UVkWrite = @"W";
 	NSArray* tokens = [aReturnData objectForKey: UVkReturn];
 	for ( i = 3; i < 10; i++ ) {
 		NSString* oneParameter = [tokens objectAtIndex: i];
-		NSLog( @"Token %d, String: %@\n", i, oneParameter );
+		NSLog( @"ORUnivVoltModel - Token %d, String: %@\n", i, oneParameter );
 	}
 
 	// discover load command executed
@@ -989,7 +989,7 @@ NSString* UVkWrite = @"W";
 		if ( [command localizedCaseInsensitiveCompare: oneParamName] == NSOrderedSame ) 
 		{
 			// Now process data for all returned values
-			NSLog( @"Found command %@ in dictionary %@\n", command, oneParamName );
+			NSLog( @"ORUnivVoltModel - Found command %@ in dictionary %@\n", command, oneParamName );
 			for ( j = 0; j < HVkNumChannels; j++ )
 			{
 				NSNumber* curChnlNum = [NSNumber  numberWithInt: j];
@@ -999,7 +999,7 @@ NSString* UVkWrite = @"W";
 				{
 					NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: j];
 					NSString* parameter = [tokens objectAtIndex: j];
-					NSLog( @"Token %d, String: %@\n", i, parameter );
+					NSLog( @"ORUnivVoltModel - Token %d, String: %@\n", i, parameter );
 
 //					NSNumber* valueLoaded = [NSNumber numberWithFloat: aRampUpRate];
 //					[tmpChnl setObject: rampUpRate forKey: command];
@@ -1265,29 +1265,29 @@ NSString* UVkWrite = @"W";
 {
 	NSDictionary*	tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
 	
-	NSLog( @"Channel: %d\n", aCurrentChnl);
+	NSLog( @"ORUnivVoltModel - Channel: %d\n", aCurrentChnl);
 	
-	NSLog( @"Measured HV: %f\n", [[tmpChnl objectForKey: HVkMeasuredHV] floatValue] );
+	NSLog( @"ORUnivVoltModel - Measured HV: %f\n", [[tmpChnl objectForKey: HVkMeasuredHV] floatValue] );
 
-	NSLog( @"Measured Current: %g\n", [[tmpChnl objectForKey: HVkMeasuredCurrent] floatValue] );
+	NSLog( @"ORUnivVoltModel - Measured Current: %g\n", [[tmpChnl objectForKey: HVkMeasuredCurrent] floatValue] );
 
-	NSLog( @"Demand HV: %g\n", [[tmpChnl objectForKey: HVkDemandHV] floatValue] );
+	NSLog( @"ORUnivVoltModel - Demand HV: %g\n", [[tmpChnl objectForKey: HVkDemandHV] floatValue] );
 
-	NSLog( @"RampUpRate: %f\n", [[tmpChnl objectForKey: HVkRampUpRate] floatValue] );
+	NSLog( @"ORUnivVoltModel - RampUpRate: %f\n", [[tmpChnl objectForKey: HVkRampUpRate] floatValue] );
 
-	NSLog( @"RampDownRate: %f\n", [[tmpChnl objectForKey: HVkRampDownRate] floatValue] );
+	NSLog( @"ORUnivVoltModel - RampDownRate: %f\n", [[tmpChnl objectForKey: HVkRampDownRate] floatValue] );
 
-	NSLog( @"Trip current: %f\n", [[tmpChnl objectForKey: HVkTripCurrent] floatValue] );
+	NSLog( @"ORUnivVoltModel - Trip current: %f\n", [[tmpChnl objectForKey: HVkTripCurrent] floatValue] );
 
-	NSLog( @"Channel enabled: %d\n", [[tmpChnl objectForKey: HVkChannelEnabled] intValue] );
+	NSLog( @"ORUnivVoltModel - Channel enabled: %d\n", [[tmpChnl objectForKey: HVkChannelEnabled] intValue] );
 
-	NSLog( @"Status: %@\n", [tmpChnl objectForKey: HVkStatus] );
+	NSLog( @"ORUnivVoltModel - Status: %@\n", [tmpChnl objectForKey: HVkStatus] );
 	
-	NSLog( @"MVDZ: %f\n", [[tmpChnl objectForKey: HVkMCDZ] floatValue] );
+	NSLog( @"ORUnivVoltModel - MVDZ: %f\n", [[tmpChnl objectForKey: HVkMCDZ] floatValue] );
 	
-	NSLog( @"MCDZ: %f\n", [[tmpChnl objectForKey: HVkMCDZ] floatValue] );
+	NSLog( @"ORUnivVoltModel - MCDZ: %f\n", [[tmpChnl objectForKey: HVkMCDZ] floatValue] );
 
-	NSLog( @"HV limit: %f\n", [[tmpChnl objectForKey: HVkHVLimit] floatValue] );	
+	NSLog( @"ORUnivVoltModel - HV limit: %f\n", [[tmpChnl objectForKey: HVkHVLimit] floatValue] );	
 }
 
 //Added the following during a sweep to put the CrateView functionality into the Crate  objects MAH 11/18/08
@@ -1392,10 +1392,10 @@ NSString* UVkWrite = @"W";
 		// Used for debugging
 		NSMutableDictionary* tmpReadDictObj = [mChannelArray objectAtIndex: aCurrentChnl];
 		NSNumber* readBackHV = [tmpReadDictObj objectForKey: HVkMeasuredHV];
-		NSLog( @"Fake Measured HV: %@\n", readBackHV );
+		NSLog( @"ORUnivVoltModel - Fake Measured HV: %@\n", readBackHV );
 	}
 	@catch (NSException * e) {
-		NSLog( @"Caught exception ORUnivVoltModel::fakeData '%@'.", [e reason] );
+		NSLog( @"ORUnivVoltModel - Caught exception ORUnivVoltModel::fakeData '%@'.", [e reason] );
 	}
 	@finally {
 		
