@@ -916,11 +916,11 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 		returnCodeAsString = [[NSString alloc] initWithBytes: returnCodeArray length: 5 encoding: NSASCIIStringEncoding];
 		*aReturnCode = [returnCodeAsString intValue];
 		
-		NSLog( @"Return Code: %@, number: %d\n", returnCodeAsString, *aReturnCode);
+//		NSLog( @"Return Code: %@, number: %d\n", returnCodeAsString, *aReturnCode);
 		
 		// Convert modified char array to string.
 		returnStringFromSocket = [[[NSString alloc] initWithFormat: @"%s\n\0", returnBufferString] autorelease];
-		NSLog( @"Full return string:\n %@\n", returnStringFromSocket );
+//		NSLog( @"Full return string:\n %@\n", returnStringFromSocket );
    }
 	
 	@catch (NSException *exception) {
