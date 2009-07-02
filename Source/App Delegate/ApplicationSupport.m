@@ -58,4 +58,24 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ApplicationSupport);
     return basePath;
 }
 
+- (NSString*) hostAddress
+{
+	NSString* hostAddress = @"Unknown";
+	NSArray* names =  [[NSHost currentHost] addresses];
+	id aName;
+	int index = 0;
+	int n = [names count];
+	int i;
+	for(i=0;i<n;i++){
+		aName = [names objectAtIndex:i];
+		if([aName rangeOfString:@"::"].location == NSNotFound){
+			if([aName rangeOfString:@".0.0."].location == NSNotFound){
+				hostAddress = aName;
+				break;
+			}
+			index++;
+		}
+	}
+	return hostAddress;
+}	
 @end

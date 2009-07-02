@@ -24,5 +24,5 @@
 + (ApplicationSupport*) sharedApplicationSupport;
 - (NSString*) applicationSupportFolder;
 - (NSString*) applicationSupportFolder:(NSString*)subPath;
-
+- (NSString*) hostAddress;
 @end
