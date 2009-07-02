@@ -1770,6 +1770,7 @@
 		84D791400FFA4CD000DC81D2 /* ORKeithley6487Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D791380FFA4CD000DC81D2 /* ORKeithley6487Decoders.m */; };
 		84D791410FFA4CD000DC81D2 /* ORKeithley6487Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D791390FFA4CD000DC81D2 /* ORKeithley6487Model.h */; };
 		84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */; };
+		84D79B860FFD347400DC81D2 /* leftBug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D79B850FFD347400DC81D2 /* leftBug.tif */; };
 		84D852E60BE171AF00290BDC /* ORCARootServiceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */; };
 		84D967770CA03E50000C0C76 /* ORScriptController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D967710CA03E50000C0C76 /* ORScriptController.h */; };
 		84D967780CA03E50000C0C76 /* ORScriptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D967720CA03E50000C0C76 /* ORScriptController.m */; };
@@ -3794,6 +3795,7 @@
 		84D791380FFA4CD000DC81D2 /* ORKeithley6487Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKeithley6487Decoders.m; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D791390FFA4CD000DC81D2 /* ORKeithley6487Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKeithley6487Model.h; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Model.h; sourceTree = SOURCE_ROOT; };
 		84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKeithley6487Model.m; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Model.m; sourceTree = SOURCE_ROOT; };
+		84D79B850FFD347400DC81D2 /* leftBug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = leftBug.tif; path = "Source/Widgets/Bar Graph/leftBug.tif"; sourceTree = SOURCE_ROOT; };
 		84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceDefs.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceDefs.h"; sourceTree = SOURCE_ROOT; };
 		84D967710CA03E50000C0C76 /* ORScriptController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptController.h; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.h; sourceTree = SOURCE_ROOT; };
 		84D967720CA03E50000C0C76 /* ORScriptController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptController.m; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.m; sourceTree = SOURCE_ROOT; };
@@ -7595,6 +7597,7 @@
 		84B7DF9C04E1C53D005F64B1 /* Bar Graph */ = {
 			isa = PBXGroup;
 			children = (
+				84D79B850FFD347400DC81D2 /* leftBug.tif */,
 				84B7DF9F04E1C53D005F64B1 /* ORValueBar.m */,
 				84B7DF9E04E1C53D005F64B1 /* ORValueBar.h */,
 				84F7FA7F077896B000E8A6DA /* ORColorScale.h */,
@@ -10510,6 +10513,7 @@
 				84A1ACAC0FF3A4EE00D7F946 /* PlotPublisher.nib in Resources */,
 				84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */,
 				84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */,
+				84D79B860FFD347400DC81D2 /* leftBug.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
