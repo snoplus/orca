@@ -60,6 +60,7 @@
 - (id) dataSource;
 -(NSColor*) colorForDataSet:(int) aDataSet;
 - (void) setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
+- (int) numberDataSets;
 
 #pragma mark •••Drawing
 - (void) drawBackground;
@@ -81,7 +82,8 @@
 @end
 
 @interface NSObject (ORPlotDataSource)
-- (BOOL)   	willSupplyColors;
+- (BOOL) willSupplyColors;
+- (int)  numberOfDataSetsInPlot:(id)aPlotter;
 @end
 
 extern NSString* ORPlotterBackgroundColor;

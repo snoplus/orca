@@ -92,6 +92,11 @@ NSString* ORPlotterDataColor		= @"ORPlotterDataColor";
     if(analyze)[self analyze:self];
 }
 
+- (int) numberDataSets
+{
+	return [mDataSource numberOfDataSetsInPlot:self];
+}
+
 -(NSColor*) colorForDataSet:(int) aDataSet
 {
 	if([mDataSource willSupplyColors])  return [mDataSource colorForDataSet:aDataSet];
