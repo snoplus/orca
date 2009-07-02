@@ -25,6 +25,10 @@
 @interface ORAmi286Controller : OrcaObjectController
 {
     IBOutlet ORLevelMonitor*	monitor0;
+	IBOutlet NSButton*			sendOnAlarmCB;
+	IBOutlet NSTextField*		expiredTimeField;
+	IBOutlet NSButton*			sendOnExpiredCB;
+	IBOutlet NSButton*			sendOnValveChangeCB;
 	IBOutlet NSMatrix*			enabledMaskMatrix;
     IBOutlet ORLevelMonitor*	monitor1;
     IBOutlet ORLevelMonitor*	monitor2;
@@ -49,6 +53,9 @@
 	IBOutlet NSTextField*		alarmStatus1;
 	IBOutlet NSTextField*		alarmStatus2;
 	IBOutlet NSTextField*		alarmStatus3;
+	IBOutlet NSTableView*		addressList;
+	IBOutlet NSButton*			removeAddressButton;
+	IBOutlet NSButton*			eMailEnabledButton;
 	
 	BOOL updateScheduled;
 }
@@ -63,6 +70,10 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) sendOnAlarmChanged:(NSNotification*)aNote;
+- (void) expiredTimeChanged:(NSNotification*)aNote;
+- (void) sendOnExpiredChanged:(NSNotification*)aNote;
+- (void) sendOnValveChangeChanged:(NSNotification*)aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) shipLevelsChanged:(NSNotification*)aNotification;
@@ -79,9 +90,15 @@
 - (void) fillStateChanged:(NSNotification*)aNote;
 - (void) alarmLevelChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
-- (void) scaleAction:(NSNotification*)aNotification;
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) eMailEnabledChanged:(NSNotification*)aNote;
+- (void) tableViewSelectionDidChange:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) sendOnAlarmAction:(id)sender;
+- (IBAction) expiredTimeAction:(id)sender;
+- (IBAction) sendOnExpiredAction:(id)sender;
+- (IBAction) sendOnValveChangeAction:(id)sender;
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) shipLevelsAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
@@ -93,6 +110,9 @@
 - (IBAction) lowAlarmAction:(id)sender;
 - (IBAction) fillStateAction:(id)sender;
 - (IBAction) loadHardwareAction:(id)sender;
+- (IBAction) addAddress:(id)sender;
+- (IBAction) removeAddress:(id)sender;
+- (IBAction) eMailEnabledAction:(id)sender;
 
 #pragma mark ***DataSource
 - (float) levelMonitorLevel:(id)aLevelMonitor;

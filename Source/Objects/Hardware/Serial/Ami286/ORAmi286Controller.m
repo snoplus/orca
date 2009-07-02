@@ -44,7 +44,7 @@
 
 - (void) dealloc
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduledUpdate) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
@@ -130,7 +130,36 @@
                          name : ORAmi286AlarmLevelChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(eMailEnabledChanged:)
+                         name : ORAmi286EMailEnabledChanged
+                       object : model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(tableViewSelectionDidChange:)
+                         name : NSTableViewSelectionDidChangeNotification
+                       object : addressList];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(sendOnValveChangeChanged:)
+                         name : ORAmi286ModelSendOnValveChangeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sendOnExpiredChanged:)
+                         name : ORAmi286ModelSendOnExpiredChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(expiredTimeChanged:)
+                         name : ORAmi286ModelExpiredTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sendOnAlarmChanged:)
+                         name : ORAmi286ModelSendOnAlarmChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -149,10 +178,41 @@
 	[self shipLevelsChanged:nil];
 	[self updateTimePlot:nil];
 	[self updateMonitor:nil];
-	[self fillStateChanged:nil];
 	[self alarmLevelChanged:nil];
 	[self enabledMaskChanged:nil];
     [self miscAttributesChanged:nil];
+	[self eMailEnabledChanged:nil];
+	[addressList reloadData];
+	[self tableViewSelectionDidChange:nil];
+	[self sendOnValveChangeChanged:nil];
+	[self sendOnExpiredChanged:nil];
+	[self expiredTimeChanged:nil];
+	[self sendOnAlarmChanged:nil];
+}
+
+- (void) sendOnAlarmChanged:(NSNotification*)aNote
+{
+	[sendOnAlarmCB setIntValue: [model sendOnAlarm]];
+}
+
+- (void) expiredTimeChanged:(NSNotification*)aNote
+{
+	[expiredTimeField setIntValue: [model expiredTime]];
+}
+
+- (void) sendOnExpiredChanged:(NSNotification*)aNote
+{
+	[sendOnExpiredCB setIntValue: [model sendOnExpired]];
+}
+
+- (void) sendOnValveChangeChanged:(NSNotification*)aNote
+{
+	[sendOnValveChangeCB setIntValue: [model sendOnValveChange]];
+}
+
+- (void) eMailEnabledChanged:(NSNotification*)aNotification
+{
+	[eMailEnabledButton setState:[model emailEnabled]];
 }
 
 - (void) enabledMaskChanged:(NSNotification*)aNote
@@ -179,11 +239,11 @@
 {
 	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
 		[model setMiscAttributes:[[plotter0 xScale]attributes] forKey:@"XAttributes0"];
-	};
+	}
 	
 	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
 		[model setMiscAttributes:[[plotter0 yScale]attributes] forKey:@"YAttributes0"];
-	};
+	}
 }
 
 - (void) miscAttributesChanged:(NSNotification*)aNote
@@ -414,8 +474,27 @@
 	}
 }
 
-
 #pragma mark ***Actions
+- (void) sendOnAlarmAction:(id)sender
+{
+	[model setSendOnAlarm:[sender intValue]];	
+}
+
+- (void) expiredTimeAction:(id)sender
+{
+	[model setExpiredTime:[sender intValue]];	
+}
+
+- (void) sendOnExpiredAction:(id)sender
+{
+	[model setSendOnExpired:[sender intValue]];	
+}
+
+- (void) sendOnValveChangeAction:(id)sender
+{
+	[model setSendOnValveChange:[sender intValue]];	
+}
+
 - (IBAction) loadHardwareAction:(id)sender;
 {
 	@try {
@@ -488,7 +567,34 @@
 	[model setPollTime:[[sender selectedItem] tag]];
 }
 
-#pragma mark ¥¥¥Data Source
+- (IBAction) addAddress:(id)sender
+{
+	[model addEMail];
+	[addressList reloadData];
+	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:[[model eMailList] count]-1];
+	[addressList selectRowIndexes:indexSet byExtendingSelection:NO];
+}
+
+- (IBAction) removeAddress:(id)sender
+{
+	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
+	//to something a lot more complicated.
+	NSIndexSet* theSet = [addressList selectedRowIndexes];
+	unsigned current_index = [theSet firstIndex];
+    if(current_index != NSNotFound){
+		[model removeEMail:current_index];
+		[addressList reloadData];
+		NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:[[model eMailList] count]-1];
+		[addressList selectRowIndexes:indexSet byExtendingSelection:NO];
+	}
+}
+
+- (IBAction) eMailEnabledAction:(id)sender
+{
+	[model setEmailEnabled:[sender intValue]];
+}
+
+#pragma mark â€¢â€¢â€¢Data Source
 - (BOOL) willSupplyColors
 {
 	return YES;
@@ -501,7 +607,6 @@
 	else if(set==2)return [NSColor blueColor];
 	else return [NSColor blackColor];
 }
-
 
 - (int) numberOfDataSetsInPlot:(id)aPlotter
 {
@@ -523,9 +628,34 @@
 	else return 0;
 }
 
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
+- (unsigned long) secondsPerUnit:(id) aPlotter
 {
 	return [[model timeRate:0] sampleTime]; //all should be the same, just return value for rate 0
+}
+
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+	return [model addressAtIndex:rowIndex];
+}
+
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	NSMutableArray* theList = [model eMailList];
+	[theList replaceObjectAtIndex:rowIndex withObject:anObject];
+}
+
+// just returns the number of items we have.
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	return [[model eMailList] count];
+}
+
+- (void) tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+	if([aNotification object] == addressList || aNotification == nil){
+		int selectedIndex = [addressList selectedRow];
+		[removeAddressButton setEnabled:selectedIndex>=0];
+	}
 }
 
 - (void) setLevelMonitor:(ORLevelMonitor*)aMonitor lowAlarm:(float)aValue
@@ -554,6 +684,7 @@
 	else if(aLevelMonitor == monitor3) return [model hiAlarmLevel:3];
 	else return 0;
 }
+
 - (float) levelMonitorLowAlarmLevel:(id)aLevelMonitor
 {
 	if(aLevelMonitor == monitor0)      return [model lowAlarmLevel:0];
@@ -562,6 +693,7 @@
 	else if(aLevelMonitor == monitor3) return [model lowAlarmLevel:3];
 	else return 0;
 }
+
 - (float) levelMonitorLevel:(id)aLevelMonitor
 {
 	if(aLevelMonitor == monitor0)      return [model level:0];
@@ -570,11 +702,9 @@
 	else if(aLevelMonitor == monitor3) return [model level:3];
 	else return 0;
 }
-
 @end
 
 @implementation ORAmi286Controller (private)
-
 - (void) populatePortListPopup
 {
 	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];

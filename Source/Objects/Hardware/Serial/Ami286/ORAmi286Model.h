@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 
 @class ORSerialPort;
 @class ORTimeRate;
@@ -45,22 +45,49 @@
 		float		    lowAlarmLevel[4];
 		unsigned long	timeMeasured[4];
 		int				alarmStatus[4];
+		NSCalendarDate*	lastChange[4];
+		NSTimer*		expiredTimer[4];
 		unsigned char	enabledMask;
 		BOOL			unitsSet;
 		ORAlarm*		hiAlarm;
 		ORAlarm*		lowAlarm;
 		ORAlarm*		expiredAlarm;
+		NSMutableArray* eMailList;
+		BOOL			emailEnabled;
+		BOOL			eMailThreadRunning;
+		NSLock*			eMailLock;
+		BOOL			sendOnValveChange;
+		BOOL			sendOnExpired;
+		long			expiredTime;
+		BOOL			sendOnAlarm;
+		BOOL			ignoreSend;
+		BOOL			sendIsScheduled;
+		NSMutableArray* eMailReasons;
 }
 
-#pragma mark ¥¥¥Initialization
-
+#pragma mark â€¢â€¢â€¢Initialization
 - (id)   init;
 - (void) dealloc;
 
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
+- (BOOL) sendOnAlarm;
+- (void) setSendOnAlarm:(BOOL)aSendOnAlarm;
+- (long) expiredTime;
+- (void) setExpiredTime:(long)aExpiredTime;
+- (BOOL) sendOnExpired;
+- (void) setSendOnExpired:(BOOL)aSendOnExpired;
+- (BOOL) sendOnValveChange;
+- (void) setSendOnValveChange:(BOOL)aSendOnValveChange;
+- (void) addEMail;
+- (void) removeEMail:(unsigned) anIndex;
+- (NSString*) addressAtIndex:(unsigned)anIndex;
+- (BOOL) emailEnabled;
+- (void) setEmailEnabled:(BOOL)aEmailEnabled;
+- (NSMutableArray*) eMailList;
+- (void) setEMailList:(NSMutableArray*)aEMailList;
 - (unsigned char) enabledMask;
 - (void) setEnabledMask:(unsigned char)aEnableMask;
 - (ORTimeRate*)timeRate:(int)index;
@@ -84,6 +111,8 @@
 - (int) fillStatus:(int)index;
 - (void) setAlarmStatus:(int)index value:(int)aValue;
 - (int) alarmStatus:(int)index;
+- (void) setLastChange:(int)index;
+- (NSDate*) lastChange:(int)index;
 
 - (void) setFillState:(int)index value:(int)aValue;
 - (int) fillState:(int)index;
@@ -92,8 +121,9 @@
 - (void) setHiAlarmLevel:(int)index value:(float)aValue;
 - (float) hiAlarmLevel:(int)index;
 - (NSString*) fillStatusName:(int)i;
+- (NSString*) fillStateName:(int)i;
 
-#pragma mark ¥¥¥Data Records
+#pragma mark â€¢â€¢â€¢Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (unsigned long) dataId;
@@ -103,7 +133,7 @@
 
 - (void) shipLevelValues;
 
-#pragma mark ¥¥¥Commands
+#pragma mark â€¢â€¢â€¢Commands
 - (void) loadHardware;
 - (void) addCmdToQueue:(NSString*)aCmd;
 - (void) readLevels:(BOOL)ship;
@@ -114,10 +144,14 @@
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
 @end
 
-
+extern NSString* ORAmi286ModelSendOnAlarmChanged;
+extern NSString* ORAmi286ModelExpiredTimeChanged;
+extern NSString* ORAmi286ModelSendOnExpiredChanged;
+extern NSString* ORAmi286ModelSendOnValveChangeChanged;
+extern NSString* ORAmi286EMailEnabledChanged;
+extern NSString* ORAmi286EMailAddressesChanged;
 extern NSString* ORAmi286FillStateChanged;
 extern NSString* ORAmi286ModelEnabledMaskChanged;
 extern NSString* ORAmi286ModelShipLevelsChanged;
@@ -128,3 +162,4 @@ extern NSString* ORAmi286ModelPortNameChanged;
 extern NSString* ORAmi286ModelPortStateChanged;
 extern NSString* ORAmi286AlarmLevelChanged;
 extern NSString* ORAmi286Update;
+extern NSString* ORAmi286LastChange;

@@ -27,8 +27,13 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
+#import "ORMailer.h"
 
 #pragma mark •••External Strings
+NSString* ORAmi286ModelSendOnAlarmChanged		= @"ORAmi286ModelSendOnAlarmChanged";
+NSString* ORAmi286ModelExpiredTimeChanged		= @"ORAmi286ModelExpiredTimeChanged";
+NSString* ORAmi286ModelSendOnExpiredChanged		= @"ORAmi286ModelSendOnExpiredChanged";
+NSString* ORAmi286ModelSendOnValveChangeChanged = @"ORAmi286ModelSendOnValveChangeChanged";
 NSString* ORAmi286ModelEnabledMaskChanged		= @"ORAmi286ModelEnabledMaskChanged";
 NSString* ORAmi286ModelShipLevelsChanged		= @"ORAmi286ModelShipLevelsChanged";
 NSString* ORAmi286ModelPollTimeChanged			= @"ORAmi286ModelPollTimeChanged";
@@ -38,9 +43,13 @@ NSString* ORAmi286ModelPortStateChanged			= @"ORAmi286ModelPortStateChanged";
 NSString* ORAmi286FillStateChanged				= @"ORAmi286FillStateChanged";
 NSString* ORAmi286AlarmLevelChanged				= @"ORAmi286AlarmLevelChanged";
 NSString* ORAmi286Update						= @"ORAmi286Update";
-
+NSString* ORAmi286EMailEnabledChanged			= @"ORAmi286EMailEnabledChanged";
+NSString* ORAmi286EMailAddressesChanged			= @"ORAmi286EMailAddressesChanged";
+NSString* ORAmi286LastChange					= @"ORAmi286LastChange";
 
 NSString* ORAmi286Lock = @"ORAmi286Lock";
+
+#define kAmi286EMailDelay 60
 
 @interface ORAmi286Model (private)
 - (void) runStarted:(NSNotification*)aNote;
@@ -48,6 +57,14 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
+- (void) sendEMails;
+- (void) eMailThread;
+- (void) scheduleStatusSend;
+- (void) startExpiredTimer:(int)i;
+- (void) stopExpiredTimer:(int)i;
+- (void) addReason:(NSString*) aReason;
+- (void) clearReasons;
+
 @end
 
 @implementation ORAmi286Model
@@ -55,6 +72,9 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	self = [super init];
     [self registerNotificationObservers];
+	eMailLock = [[NSLock alloc] init];
+	ignoreSend = YES;
+	sendIsScheduled = NO;
 	return self;
 }
 
@@ -73,6 +93,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	int i;
 	for(i=0;i<4;i++){
 		[timeRates[i] release];
+		[lastChange[i] release];
+		[self stopExpiredTimer:i];
 	}
 	[hiAlarm clearAlarm];
 	[hiAlarm release];
@@ -82,8 +104,30 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	
 	[expiredAlarm clearAlarm];
 	[expiredAlarm release];
-	
+	[eMailLock release];
+	[eMailList release];
+	[self clearReasons];
 	[super dealloc];
+}
+
+- (void) sleep
+{
+	[super sleep];
+	int i;
+	for(i=0;i<4;i++){
+		[self stopExpiredTimer:i];
+	}
+}
+
+- (void) wakeUp
+{
+	[super wakeUp];
+	if(sendOnExpired){
+		int i;
+		for(i=0;i<4;i++){
+			[self startExpiredTimer:i];		
+		}		
+	}
 }
 
 - (void) setUpImage
@@ -178,8 +222,139 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 }
 
-
 #pragma mark •••Accessors
+
+- (BOOL) sendOnAlarm
+{
+    return sendOnAlarm;
+}
+
+- (void) setSendOnAlarm:(BOOL)aSendOnAlarm
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSendOnAlarm:sendOnAlarm];
+    
+    sendOnAlarm = aSendOnAlarm;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSendOnAlarmChanged object:self];
+}
+
+- (long) expiredTime
+{
+    return expiredTime;
+}
+
+- (void) setExpiredTime:(long)aExpiredTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setExpiredTime:expiredTime];
+    if(aExpiredTime<1)aExpiredTime = 1;
+    expiredTime = aExpiredTime;
+
+	int i;
+	for(i=0;i<4;i++){
+		[self startExpiredTimer:i];		
+	}		
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelExpiredTimeChanged object:self];
+}
+
+- (BOOL) sendOnExpired
+{
+    return sendOnExpired;
+}
+
+- (void) setSendOnExpired:(BOOL)aSendOnExpired
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSendOnExpired:sendOnExpired];
+    
+    sendOnExpired = aSendOnExpired;
+
+	if(sendOnExpired){
+		int i;
+		for(i=0;i<4;i++){
+			[self startExpiredTimer:i];
+		}
+	}
+	else {
+		int i;
+		for(i=0;i<4;i++){
+			[self stopExpiredTimer:i];
+		}
+	}
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSendOnExpiredChanged object:self];
+}
+
+- (BOOL) sendOnValveChange
+{
+    return sendOnValveChange;
+}
+
+- (void) setSendOnValveChange:(BOOL)aSendOnValveChange
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSendOnValveChange:sendOnValveChange];
+    
+    sendOnValveChange = aSendOnValveChange;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSendOnValveChangeChanged object:self];
+}
+
+- (BOOL) emailEnabled
+{
+    return emailEnabled;
+}
+
+- (void) setEmailEnabled:(BOOL)aEmailEnabled
+{
+    [[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setEmailEnabled:emailEnabled];
+    emailEnabled = aEmailEnabled;
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduleStatusSend) object:nil];
+	if(emailEnabled){
+		if(sendOnExpired){
+			int i;
+			for(i=0;i<4;i++){
+				[self startExpiredTimer:i];
+			}
+		}
+	}
+	else {
+		int i;
+		for(i=0;i<4;i++){
+			[self stopExpiredTimer:i];
+		}
+		[self clearReasons];
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286EMailEnabledChanged object:self];
+}
+
+- (NSMutableArray*) eMailList
+{
+    return eMailList;
+}
+
+- (void) setEMailList:(NSMutableArray*)aEMailList
+{
+    [aEMailList retain];
+    [eMailList release];
+    eMailList = aEMailList;
+}
+
+- (void) addEMail
+{
+	if(!eMailList)[self setEMailList:[NSMutableArray array]];
+	[eMailList addObject:@"eMail Address"];
+}
+
+- (void) removeEMail:(unsigned) anIndex
+{
+	[eMailList removeObjectAtIndex:anIndex];
+}
+
+- (NSString*) addressAtIndex:(unsigned)anIndex
+{
+	if(anIndex>=0 && anIndex<[eMailList count])return [eMailList objectAtIndex:anIndex];
+	else return nil;
+}
 
 - (unsigned char) enabledMask
 {
@@ -191,6 +366,10 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
     
     enabledMask = anEnabledMask;
+	
+	[[self undoManager] disableUndoRegistration];
+	[self setEmailEnabled:emailEnabled];
+	[[self undoManager] enableUndoRegistration];
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelEnabledMaskChanged object:self];
 }
@@ -252,10 +431,20 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	else return 0;
 }
 
-
 - (void) setFillStatus:(int)index value:(int)aValue;
 {
 	if(index>=0 && index<4){
+
+		if(fillStatus[index]!=aValue){
+			[self setLastChange:index];
+			if(sendOnValveChange){
+				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				[self addReason:[NSString stringWithFormat:@"Chan %d. Fill State Changed to %@ at %@\n",index,[self fillStatusName:aValue], time]];
+				[self scheduleStatusSend];
+			}
+			if(sendOnExpired)[self startExpiredTimer:index];
+		}
+		
 		fillStatus[index] = aValue;
 		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
@@ -265,12 +454,32 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 }
 
+- (NSDate*) lastChange:(int)index
+{
+	if(index>=0 && index<4)return lastChange[index];
+	else return 0;
+}
+
+- (void) setLastChange:(int)index;
+{
+	if(index>=0 && index<4){
+		
+		[lastChange[index] release];
+		lastChange[index] = [[NSCalendarDate date] retain];
+		
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
+		[[NSNotificationCenter defaultCenter] postNotificationName: ORAmi286LastChange
+															object:self 
+														  userInfo:userInfo];
+	}
+}
+
+
 - (int) alarmStatus:(int)index
 {
 	if(index>=0 && index<4)return alarmStatus[index];
 	else return 0;
 }
-
 
 - (void) setAlarmStatus:(int)index value:(int)aValue;
 {
@@ -288,6 +497,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 				[hiAlarm setSticky:YES];
 			}
 			[hiAlarm postAlarm];
+			if(sendOnAlarm){
+				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				[self addReason:[NSString stringWithFormat:@"Chan %d. Hi Alarm posted at %@\n",index,time]];
+				[self scheduleStatusSend];
+			}
 		}
 		else {
 			[hiAlarm clearAlarm];
@@ -300,6 +514,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 				[lowAlarm setSticky:YES];
 			}
 			[lowAlarm postAlarm];
+			if(sendOnAlarm){
+				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				[self addReason:[NSString stringWithFormat:@"Chan %d. Low Alarm posted at %@\n",index,time]];
+				[self scheduleStatusSend];
+			}
 		}
 		else {
 			[lowAlarm clearAlarm];
@@ -312,14 +531,17 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 				[expiredAlarm setSticky:YES];
 			}
 			[expiredAlarm postAlarm];
+			if(sendOnAlarm){
+				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				[self addReason:[NSString stringWithFormat:@"Chan %d. Expired Alarm posted at %@\n",index,time]];
+				[self scheduleStatusSend];
+			}
 		}
 		else {
 			[expiredAlarm clearAlarm];
 			[expiredAlarm release];
 			expiredAlarm = nil;
 		}
-		
-		
 	}
 }
 
@@ -329,12 +551,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	else return 0;
 }
 
-
 - (void) setFillState:(int)index value:(int)aValue;
 {
 	if(index>=0 && index<4){
 		[[[self undoManager] prepareWithInvocationTarget:self] setFillState:index value:fillState[index]];
-		
+				
 		fillState[index] = aValue;
 		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
@@ -343,7 +564,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 														  userInfo:userInfo];
 	}
 }
-
 
 - (NSString*) fillStatusName:(int)i
 {
@@ -357,6 +577,15 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 }
 
+- (NSString*) fillStateName:(int)i
+{
+	switch(i){
+		case 0: return @"Off";
+		case 1: return @"On";
+		case 2: return @"Auto";
+		default: return @"?";
+	}
+}
 
 - (float) level:(int)index
 {
@@ -364,7 +593,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	if(index>=0 && index<4 && (enabledMask&(1<<index)))return level[index];
 	else return 0.0;
 }
-
 
 - (void) setLevel:(int)index value:(float)aValue;
 {
@@ -383,10 +611,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		
 		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
 		[timeRates[index] addDataToTimeAverage:aValue];
-		
 	}
 }
-
 
 - (void) setLowAlarmLevel:(int)index value:(float)aValue
 {
@@ -509,8 +735,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
+	
+	[[self undoManager] disableUndoRegistration];
+	[self setEmailEnabled:emailEnabled];
+	[[self undoManager] enableUndoRegistration];
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelPortStateChanged object:self];
-    
 }
 
 
@@ -519,32 +749,53 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setSendOnAlarm:[decoder decodeBoolForKey:@"sendOnAlarm"]];
+	[self setExpiredTime:[decoder decodeInt32ForKey:@"expiredTime"]];
+	[self setSendOnExpired:[decoder decodeBoolForKey:@"sendOnExpired"]];
+	[self setSendOnValveChange:[decoder decodeBoolForKey:@"sendOnValveChange"]];
 	[self setEnabledMask:[decoder decodeBoolForKey:@"ORAmi286ModelEnabledMask"]];
 	[self setShipLevels:[decoder decodeBoolForKey:@"ORAmi286ModelShipLevels"]];
 	[self setPollTime:[decoder decodeIntForKey:@"ORAmi286ModelPollTime"]];
 	[self setPortWasOpen:[decoder decodeBoolForKey:@"ORAmi286ModelPortWasOpen"]];
     [self setPortName:[decoder decodeObjectForKey: @"portName"]];
-	[[self undoManager] enableUndoRegistration];
+    [self setEMailList:[decoder decodeObjectForKey: @"eMailList"]];
+    [self setEmailEnabled:[decoder decodeBoolForKey: @"emailEnabled"]];
+	
+	if(expiredTime == 0)[self setExpiredTime:60];
+	
+	if(!eMailList)[self setEMailList:[NSMutableArray array]];
+	
 	int i;
 	for(i=0;i<4;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
 		[self setLowAlarmLevel:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"LowAlarm%d",i]]];
 		[self setHiAlarmLevel:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"HiAlarm%d",i]]];
 		[self setFillState:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"FillState%d",i]]];
+		[self setLastChange:i];
 	}
     [self registerNotificationObservers];
-	
+	eMailLock = [[NSLock alloc] init];
+	ignoreSend = NO;
+	sendIsScheduled = NO;
+	[[self undoManager] enableUndoRegistration];
+
 	return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:sendOnAlarm forKey:@"sendOnAlarm"];
+    [encoder encodeInt32:expiredTime forKey:@"expiredTime"];
+    [encoder encodeBool:sendOnExpired forKey:@"sendOnExpired"];
+    [encoder encodeBool:sendOnValveChange forKey:@"sendOnValveChange"];
     [encoder encodeBool:enabledMask forKey:@"ORAmi286ModelEnabledMask"];
     [encoder encodeBool:shipLevels forKey:@"ORAmi286ModelShipLevels"];
     [encoder encodeInt:pollTime forKey:@"ORAmi286ModelPollTime"];
     [encoder encodeBool:portWasOpen forKey:@"ORAmi286ModelPortWasOpen"];
     [encoder encodeObject:portName forKey: @"portName"];
+    [encoder encodeObject:eMailList forKey: @"eMailList"];
+    [encoder encodeBool:emailEnabled forKey: @"emailEnabled"];
 	int i;
 	for(i=0;i<4;i++){
 		[encoder encodeFloat:lowAlarmLevel[i] forKey:[NSString stringWithFormat:@"LowAlarm%d",i]];
@@ -566,6 +817,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		}
 	}
 	[self loadAlarmsToHardware];
+	[self readLevels];
 }
 
 - (void) addCmdToQueue:(NSString*)aCmd
@@ -610,6 +862,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			[self setHighAlarm:i withValue:hiAlarmLevel[i]];
 		}
 	}
+	[self readLevels];
 }
 
 - (void) setLowAlarm:(int)chan withValue:(float)aValue
@@ -710,7 +963,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 	@catch(NSException* localException) {
 	}
-	
 }
 
 - (void) process_response:(NSString*)theResponse
@@ -737,5 +989,139 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		//device returns a '1' when finished.
 	}
 }
+
+- (void) startExpiredTimer:(int) index
+{
+	if(emailEnabled && (enabledMask&(1<<index))){
+		[self stopExpiredTimer:index];
+		expiredTimer[index] = [[NSTimer scheduledTimerWithTimeInterval:expiredTime*60 
+														 target:self 
+													   selector:@selector(changeTimerExpired:)
+													   userInfo:nil 
+														repeats: NO] retain];
+	}
+}
+
+- (void) stopExpiredTimer:(int) index
+{
+	[expiredTimer[index] invalidate];
+	[expiredTimer[index] release];
+	expiredTimer[index] = nil;
+}
+
+- (void) changeTimerExpired: (NSTimer*) aTimer
+{
+	int i;
+	for(i=0;i<4;i++){
+		if(enabledMask & (1<<i)) {
+			NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+			[self addReason:[NSString stringWithFormat:@"Chan %d. As of %@ NO CHANGE to Fill state (now %@) for at least %d minutes\n",i,time,[self fillStatusName:fillStatus[i]], expiredTime]];
+			[self scheduleStatusSend];
+		}
+	}
+}
+
+- (void) scheduleStatusSend
+{
+	if(!sendIsScheduled) {
+		sendIsScheduled = YES;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendEMails) object:nil];
+		[self performSelector:@selector(sendEMails) withObject:nil afterDelay:kAmi286EMailDelay];
+	}
+}
+		
+- (void) sendEMails
+{
+	if([serialPort isOpen]){ 
+		[NSThread detachNewThreadSelector:@selector(eMailThread) toTarget:self withObject:nil];
+	}
+	else sendIsScheduled = NO;
+
+}
+
+- (void) addReason:(NSString*) aReason
+{
+	[eMailLock lock];
+	if(!eMailReasons){
+		eMailReasons = [[NSMutableArray array] retain];
+		NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+		[eMailReasons addObject:[NSString stringWithFormat:@"EMailed originally triggered at %@\n",time]];
+	}
+	[eMailReasons addObject:aReason];
+	[eMailLock unlock];
+}
+
+- (void) clearReasons
+{
+	[eMailLock lock];
+	[eMailReasons release];
+	eMailReasons = nil;
+	[eMailLock unlock];
+}
+
+- (void) eMailThread
+{
+	if(eMailThreadRunning || ![eMailList count]) return;
+	
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	
+	[self retain]; //can't have the object go away
+	
+	eMailThreadRunning = YES;
+	
+	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:11.0]];
+	[eMailLock lock];
+	
+	NSString* hostAddress = [[ApplicationSupport sharedApplicationSupport] hostAddress];
+	NSString* receipients = [eMailList componentsJoinedByString:@","];
+	NSString* content = [NSString stringWithFormat:@"\n+++++++++++++++++++++++++++++++++++\nAutomatically generated by ORCA\nHost machine:%@\n",hostAddress!=nil?hostAddress:@"<Unable to get host address>"];
+	int i;
+	content = [content stringByAppendingString:@"---------------------------------------------\n"];
+	content = [content stringByAppendingString:@"     Level    Status   FillState  Last Change\n"];
+	content = [content stringByAppendingString:@"---------------------------------------------\n"];
+	for(i=0;i<4;i++){
+		const char* stat;
+		const char* fillStat;
+		if(i<2){
+			stat = [[self fillStatusName:[self fillStatus:i]] cStringUsingEncoding:NSASCIIStringEncoding];
+			fillStat = [[self fillStateName:[self fillState:i]] cStringUsingEncoding:NSASCIIStringEncoding];
+		}
+		else {
+			stat = "N/A";
+			fillStat = "N/A";
+		}
+		content = [content stringByAppendingFormat:@"%2d: %5.1f %10s %7s       %@\n",i,level[i],stat,fillStat,[lastChange[i] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"]];
+	}
+	
+	if([eMailReasons count]){
+		content = [content stringByAppendingString:@"---------------------------------------------\n"];
+		content = [content stringByAppendingString:@"\n\nReasons this alarm was triggered:\n"];
+		content = [content stringByAppendingFormat:@"%@\n",[eMailReasons componentsJoinedByString:@""]];
+		content = [content stringByAppendingString:@"---------------------------------------------\n"];
+		[eMailReasons release];
+		eMailReasons = nil;
+	}
+	
+	@synchronized([NSApp delegate]){
+		if(content){
+			NSFont*       labelFont  = [NSFont fontWithName:@"Monaco" size:12];
+			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys: labelFont,NSFontAttributeName,nil];
+			NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content attributes:attributes];
+			ORMailer* mailer = [ORMailer mailer];
+			[mailer setTo:receipients];
+			[mailer setSubject:@"Orca Ami286 Status"];
+			[mailer setBody:theContent];
+			[mailer send:self];
+		}
+	}
+	[eMailLock unlock];
+	
+	eMailThreadRunning = NO;
+	sendIsScheduled = NO;
+
+	[self autorelease]; //now it's OK for object to go away
+	[pool release];
+}
+
 
 @end
