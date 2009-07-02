@@ -213,6 +213,8 @@
 - (void) eMailEnabledChanged:(NSNotification*)aNotification
 {
 	[eMailEnabledButton setState:[model emailEnabled]];
+	if([model emailEnabled])[emailEnabledField setStringValue:@"E-Mail Alerts Enabled"];
+	else [emailEnabledField setStringValue:@""];
 }
 
 - (void) enabledMaskChanged:(NSNotification*)aNote

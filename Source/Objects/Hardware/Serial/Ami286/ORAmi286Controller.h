@@ -53,6 +53,7 @@
 	IBOutlet NSTextField*		alarmStatus1;
 	IBOutlet NSTextField*		alarmStatus2;
 	IBOutlet NSTextField*		alarmStatus3;
+	IBOutlet NSTextField*		emailEnabledField;
 	IBOutlet NSTableView*		addressList;
 	IBOutlet NSButton*			removeAddressButton;
 	IBOutlet NSButton*			eMailEnabledButton;
