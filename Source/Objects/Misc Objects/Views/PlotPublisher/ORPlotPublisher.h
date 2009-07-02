@@ -26,14 +26,17 @@
 	IBOutlet NSButton*		applyButton;
 	IBOutlet NSMatrix*		optionMatrix;
 	IBOutlet NSMatrix*		labelMatrix;
-	IBOutlet NSColorWell*	color1;
+	IBOutlet NSColorWell*	colorWell;
 	IBOutlet NSTextField*	dataSetField;
 	IBOutlet NSImageView*	previewImage;
+	IBOutlet NSTextField*	saveSetField;
 	
 	ORPlotter*				plotter;
 	NSMutableDictionary*    oldAttributes;
 	NSString*				oldXLabel;
 	NSString*				oldYLabel;
+	NSMutableDictionary*    newAttributes;
+
 }
 
 + (void) publishPlot:(id)aPlot;
@@ -46,6 +49,8 @@
 - (IBAction) colorOptionsAction: (id) sender;
 - (IBAction) publish:(id) sender;
 - (IBAction) cancel:(id) sender;
+- (IBAction) saveSetAction:(id) sender;
+- (IBAction) loadSetAction:(id) sender;
 
 @end
 

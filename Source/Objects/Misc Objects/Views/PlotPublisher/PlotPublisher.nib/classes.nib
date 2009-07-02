@@ -54,7 +54,11 @@
 				<string>id</string>
 				<key>labelingOptionsAction</key>
 				<string>id</string>
+				<key>loadSetAction</key>
+				<string>id</string>
 				<key>publish</key>
+				<string>id</string>
+				<key>saveSetAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -67,7 +71,7 @@
 				<string>NSButton</string>
 				<key>cancelButton</key>
 				<string>NSButton</string>
-				<key>color1</key>
+				<key>colorWell</key>
 				<string>NSColorWell</string>
 				<key>dataSetField</key>
 				<string>NSTextField</string>
@@ -77,6 +81,8 @@
 				<string>NSMatrix</string>
 				<key>previewImage</key>
 				<string>NSImageView</string>
+				<key>saveSetField</key>
+				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
