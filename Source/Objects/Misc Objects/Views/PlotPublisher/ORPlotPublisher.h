@@ -35,6 +35,7 @@
 	NSMutableDictionary*    oldAttributes;
 	NSString*				oldXLabel;
 	NSString*				oldYLabel;
+	NSString*				oldTitle;
 	NSMutableDictionary*    newAttributes;
 
 }
@@ -56,6 +57,7 @@
 
 
 @interface NSObject (ORPlotPublisher)
+- (NSTextField*) titleField;
 - (NSView*) viewForPDF;
 - (NSMutableDictionary*) attributes;
 - (void)setAttributes:(NSMutableDictionary *)anAttributes;

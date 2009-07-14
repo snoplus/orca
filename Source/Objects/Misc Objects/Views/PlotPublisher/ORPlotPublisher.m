@@ -27,9 +27,12 @@
 #define kPlotPublisherXLabelOption  0
 #define kPlotPublisherYLabelOption  1
 #define kPlotPublisherUseGridOption 2
+#define kPlotPublisherUseTitleOption 3
 
 #define kPlotPublisherXLabel  0
 #define kPlotPublisherYLabel  1
+#define kPlotPublisherTitle	  2
+
 
 @interface ORPlotPublisher (private)
 - (void) dumpAndStore;
@@ -64,6 +67,7 @@
 	[oldAttributes release];
 	[oldXLabel release];
 	[oldYLabel release];
+	[oldTitle release];
 	[newAttributes release];
 	
 	[super dealloc];
@@ -96,6 +100,7 @@
 	oldAttributes = [[plotter attributes] mutableCopy];
 	oldXLabel = [[[plotter xScale] label] copy];
 	oldYLabel = [[[plotter yScale] label] copy];
+	oldTitle  = [[[[plotter dataSource] titleField] stringValue] copy];
 	
 	[plotter setBackgroundColor:[NSColor whiteColor]];
 	[plotter setGridColor:[NSColor whiteColor]];
@@ -128,6 +133,12 @@
 		[[plotter yScale] setLabel:[[labelMatrix cellWithTag:kPlotPublisherYLabel] stringValue]];
 	}
 	else [[plotter yScale] setLabel:@""];
+
+	if([[optionMatrix cellWithTag:kPlotPublisherUseTitleOption] intValue]) {
+		[[[plotter dataSource]titleField] setStringValue:[[labelMatrix cellWithTag:kPlotPublisherTitle] stringValue]];
+	}
+	else [[[plotter dataSource]titleField] setStringValue:@""];
+	
 	
 	if([[optionMatrix cellWithTag:kPlotPublisherUseGridOption] intValue]) [plotter setGridColor:[NSColor grayColor]];
 	else [plotter setGridColor:[NSColor whiteColor]];
@@ -254,6 +265,7 @@
 	[plotter setAttributes:oldAttributes];
 	[[plotter xScale] setLabel:oldXLabel];
 	[[plotter yScale] setLabel:oldYLabel];
+	[[[plotter dataSource] titleField] setStringValue:oldTitle];
 	[plotter setNeedsDisplay:YES];
 	if([NSColorPanel sharedColorPanelExists]){
 		[[NSColorPanel sharedColorPanel] orderOut:self];
@@ -268,6 +280,7 @@
 	[[optionMatrix cellWithTag:kPlotPublisherUseGridOption] setIntValue:[[newAttributes objectForKey:@"useGradient"] intValue]];
 	[[optionMatrix cellWithTag:kPlotPublisherXLabelOption] setIntValue:[[newAttributes objectForKey:@"useXLabel"] intValue]];
 	[[optionMatrix cellWithTag:kPlotPublisherYLabelOption] setIntValue:[[newAttributes objectForKey:@"useYLabel"] intValue]];
+	[[optionMatrix cellWithTag:kPlotPublisherUseTitleOption] setIntValue:[[newAttributes objectForKey:@"useTitle"] intValue]];
 	[dataSetField setIntValue:[[newAttributes objectForKey:@"colorIndex"] intValue]];
 	
 	NSString* s = [newAttributes objectForKey:@"yLabel"];
@@ -277,6 +290,10 @@
 	s = [newAttributes objectForKey:@"xLabel"];
 	if(!s)s = @"";
 	[[labelMatrix cellWithTag:kPlotPublisherXLabel] setStringValue:s];
+
+	s = [newAttributes objectForKey:@"title"];
+	if(!s)s = @"";
+	[[labelMatrix cellWithTag:kPlotPublisherTitle] setStringValue:s];
 	
 	int i = [dataSetField intValue];
 	NSArray* colors = [newAttributes objectForKey:@"colors"];
@@ -299,6 +316,7 @@
 	[newAttributes setObject:[NSNumber numberWithBool:[[optionMatrix cellWithTag:kPlotPublisherUseGridOption] intValue]] forKey:@"useGradient"];
 	[newAttributes setObject:[NSNumber numberWithBool:[[optionMatrix cellWithTag:kPlotPublisherXLabelOption] intValue]] forKey:@"useXLabel"];
 	[newAttributes setObject:[NSNumber numberWithBool:[[optionMatrix cellWithTag:kPlotPublisherYLabelOption] intValue]] forKey:@"useYLabel"];
+	[newAttributes setObject:[NSNumber numberWithBool:[[optionMatrix cellWithTag:kPlotPublisherUseTitleOption] intValue]] forKey:@"useTitle"];
 	[newAttributes setObject:[[labelMatrix cellWithTag:kPlotPublisherYLabel] stringValue] forKey:@"yLabel"];
 	[newAttributes setObject:[[labelMatrix cellWithTag:kPlotPublisherXLabel] stringValue] forKey:@"xLabel"];
 	

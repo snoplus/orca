@@ -58,6 +58,7 @@
 - (void) openAnalysisDrawer;
 - (void) closeAnalysisDrawer;
 - (BOOL) analysisDrawerIsOpen;
+- (NSTextField*) titleField;
 
 - (IBAction) printDocument:(id)sender;
 

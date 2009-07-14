@@ -664,6 +664,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		mask |= 0x1;
 		[self writeReg:kCtlReg adc:index value:mask];
 		[self pollStatus];
+		NSLog(@"MCA927 %d Channel %d started\n",[self uniqueIdNumber], index);
 	}
 	else NSLog(@"MCA927 Channel %d already running... command to start ignored\n",index);
 }	
@@ -671,6 +672,8 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void) stopAcquisition:(int)index
 {
 	if(([self readReg:kAcqStatus adc:index]&kStartMask)){
+		NSLog(@"MCA927 %d Channel %d stopped\n",[self uniqueIdNumber], index);
+
 		[self writeReg:kStopAcq adc:index value:0x1];
 		[self writeReg:kStopAcq adc:index value:0x0];
 		unsigned long mask;

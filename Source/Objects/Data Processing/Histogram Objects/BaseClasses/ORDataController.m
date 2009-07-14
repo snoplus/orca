@@ -139,6 +139,11 @@
     [self miscAttributesChanged:nil];
 }
 
+- (NSTextField*) titleField
+{
+	return titleField;
+}
+
 - (void) serviceResponse:(NSNotification*)aNotification
 {
 	NSMutableDictionary* reponseInfo = [[aNotification userInfo] objectForKey:ORCARootServiceResponseKey];
