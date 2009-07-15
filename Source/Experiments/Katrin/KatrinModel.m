@@ -58,13 +58,34 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments];
+	
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Focal Plane" numSegments:kNumFocalPlaneSegments mapEntries:[self initMapEntries:0]];
 	[self addGroup:group];
 	[group release];
 	
-    group = [[ORSegmentGroup alloc] initWithName:@"Veto" numSegments:kNumVetoSegments];
+    group = [[ORSegmentGroup alloc] initWithName:@"Veto" numSegments:kNumVetoSegments mapEntries:[self initMapEntries:1]];
 	[self addGroup:group];
 	[group release];
+}
+
+- (NSArray*) initMapEntries:(int)index
+{
+	if(index==1)return [super initMapEntries:0]; //default set
+	else {
+		NSMutableArray* mapEntries = [NSMutableArray array];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kName",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kQuadrant",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCarouselSlot",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampSerial",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kORBCard",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kORBChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		return mapEntries;
+	}
 }
 
 - (int)  maxNumSegments

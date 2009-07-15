@@ -470,6 +470,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 				if([scanner scanUpToCharactersFromSet:quoteSet intoString:&embeddedString]){
 					[scanner scanString:@"\"" intoString:&part];
 					theProcessedString = [theProcessedString stringByAppendingString:part];
+					theProcessedString = [theProcessedString stringByAppendingString:@" "];
 					[embeddedStrings addObject:embeddedString];
 				}
 			}

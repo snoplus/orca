@@ -39,6 +39,7 @@
 
 - (id) init;
 - (void) registerNotificationObservers;
+- (NSMutableArray*) initMapEntries:(int)index;
 
 #pragma mark •••Accessors
 - (BOOL) showNames;
@@ -61,6 +62,11 @@
 - (ORSegmentGroup*) segmentGroup:(int)aSet;
 - (BOOL) somethingSelected;
 - (void) setSomethingSelected:(BOOL)aFlag;
+
+#pragma mark •••Convience Methods
+- (void) postAlarm:(NSString*)aName;
+- (void) postAlarm:(NSString*)aName severity:(int)aSeverity;
+- (void) postAlarm:(NSString*)aName severity:(int)aSeverity reason:(NSString*)aReason;
 
 #pragma mark •••Work Methods
 - (void) compileHistograms;

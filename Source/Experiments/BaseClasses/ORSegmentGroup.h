@@ -34,10 +34,12 @@
 	int				thresholdHistogram[1000];
 	int				gainHistogram[1000];
 	float			rate;
+	NSArray*		mapEntries;
+
 }
 
 #pragma mark •••Initialization
-- (id) initWithName:(NSString*)aName numSegments:(int)numSegments;
+- (id) initWithName:(NSString*)aName numSegments:(int)numSegments mapEntries:(NSArray*)someMapEntries;
 - (void) dealloc;
 - (NSUndoManager*) undoManager;
 
@@ -49,6 +51,8 @@
 - (void) unregisterRates;
 
 #pragma mark •••Accessors
+- (void) setMapEntries:(NSArray*)someMapEntries;
+- (NSArray*) mapEntries;
 - (int) numSegments;
 - (ORDetectorSegment*) segment:(int)index;
 - (id) segment:(int)index objectForKey:(id)aKey;

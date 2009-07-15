@@ -32,19 +32,22 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 @implementation ORSegmentGroup
 
 #pragma mark •••Initialization
-- (id) initWithName:(NSString*)aName numSegments:(int)numSegments;
+- (id) initWithName:(NSString*)aName numSegments:(int)numSegments mapEntries:(NSArray*)someMapEntries;
 {
 	[super init];
 	
     [[self undoManager] disableUndoRegistration];
 
 	[self setGroupName:aName];
+	[self setMapEntries:someMapEntries];
+	
 	segments = [[NSMutableArray array] retain];
 	int i;
 	for(i=0;i<numSegments;i++){
 		ORDetectorSegment* aSegment = [[ORDetectorSegment alloc] init];
 		[segments addObject:aSegment];
 		[aSegment setSegmentNumber:i];
+		[aSegment setMapEntries:someMapEntries];
 		[aSegment release];
 	}
 	
@@ -74,6 +77,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[segments release];
+	[mapEntries release];
 	[super dealloc];
 }
 
@@ -140,6 +144,18 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 }
 
 #pragma mark •••Accessors
+- (void) setMapEntries:(NSArray*)someMapEntries
+{
+    [mapEntries autorelease];
+    mapEntries = [someMapEntries retain];
+	[segments makeObjectsPerformSelector:@selector(setMapEntries:) withObject:mapEntries];
+}
+
+- (NSArray*) mapEntries
+{
+	return mapEntries;
+}
+
 - (int) numSegments
 {
 	return [segments count];
@@ -360,8 +376,10 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 			if(oldFormat){
 				index++;
 			}
-			else index = [aLine intValue];
-
+			else {
+				if(![aLine hasPrefix:@"--"]) index = [aLine intValue];
+				else index = -1;
+			}
 			if(index>=0 && index < [segments count]){
 				ORDetectorSegment* aSegment = [segments objectAtIndex:index];
 				[aSegment decodeLine:aLine];
@@ -426,12 +444,13 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
     [self setMapFile:[decoder decodeObjectForKey:@"MapFile"]];
     [self setAdcClassName:[decoder decodeObjectForKey:@"AdcClassName"]];
     [self setColorAxisAttributes:[decoder decodeObjectForKey:@"ColorAxisAttributes"]];
-	[self setSegments:[decoder decodeObjectForKey:@"Segments"]];
     [self setTotalRate:[decoder decodeObjectForKey:@"TotalRate"]];
-	
-    [[self undoManager] enableUndoRegistration];
+	[self setMapEntries:[decoder decodeObjectForKey:@"mapEntries"]];
+ 	[self setSegments:[decoder decodeObjectForKey:@"Segments"]];
+	[[self undoManager] enableUndoRegistration];
     
 	if(!adcClassName)[self setAdcClassName:@"ORAugerFltModel"];
+	[segments makeObjectsPerformSelector:@selector(setMapEntries:) withObject:mapEntries];
 
     //[self registerNotificationObservers];
     return self;
@@ -443,8 +462,9 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
     [encoder encodeObject:mapFile forKey:@"MapFile"];
     [encoder encodeObject:adcClassName forKey:@"AdcClassName"];
     [encoder encodeObject:colorAxisAttributes forKey:@"ColorAxisAttributes"];
-    [encoder encodeObject:segments forKey:@"Segments"];
     [encoder encodeObject:totalRate forKey:@"TotalRate"];
+	[encoder encodeObject:mapEntries forKey:@"mapEntries"];
+    [encoder encodeObject:segments forKey:@"Segments"];
 }
 
 

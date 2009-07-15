@@ -42,11 +42,13 @@
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Anode Plane" numSegments:kNumAnodeWires];
+	NSMutableArray* mapEntries = [self initMapEntries:0]; //the default set is good for both
+	
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Anode Plane" numSegments:kNumAnodeWires mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];
 	
-    group = [[ORSegmentGroup alloc] initWithName:@"Cathode Plane" numSegments:kNumCathodeWires];
+    group = [[ORSegmentGroup alloc] initWithName:@"Cathode Plane" numSegments:kNumCathodeWires mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];
 }

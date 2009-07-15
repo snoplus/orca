@@ -21,13 +21,10 @@
 
 #import "ORAdcInfoProviding.h"
 
-typedef  enum  kSegmentNameConstants { //don't change the order
-    kSegmentNumber,
-    kCardSlot,         
-    kChannel,
-	kName,      
-    kNumKeys //must be last
-}kSegmentNameConstants;
+#define  kSegmentNumber 0
+#define  kCardSlot		1   
+#define  kChannel		2
+#define	 kName			3  
 
 @interface ORDetectorSegment : NSObject
 {
@@ -40,13 +37,16 @@ typedef  enum  kSegmentNameConstants { //don't change the order
 	NSBezierPath*			shape;
 	NSBezierPath*			errorShape;
 	id<ORAdcInfoProviding>	hardwareCard;
+	NSArray*				mapEntries;
 }
 
 #pragma mark ¥¥¥Initialization
-- (id) init;
 - (void) dealloc;
 
 #pragma mark ¥¥¥Accessors
+- (void) setMapEntries:(NSArray*)someMapEntries;
+- (NSArray*) mapEntries;
+-(id) mapEntry:(int)index forKey:(id)aKey;
 - (id) description;
 - (NSString*) name;
 - (id) hardwareCard;

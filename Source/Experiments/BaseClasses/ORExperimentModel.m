@@ -107,6 +107,18 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 }
 
 #pragma mark •••Group Methods
+
+- (NSMutableArray*) initMapEntries:(int) index
+{
+	//default set -- subsclasses can override
+	NSMutableArray* mapEntries = [NSMutableArray array];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kName",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+	return mapEntries;
+}
+
 - (void) registerForRates
 {
 	[segmentGroups makeObjectsPerformSelector:@selector(registerForRates)];
@@ -400,6 +412,31 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     
 }
 
+- (void) postAlarm:(NSString*)aName
+{
+	[self postAlarm:aName severity:0 reason:@"No Reason Given"];
+}
+
+
+- (void) postAlarm:(NSString*)aName severity:(int)aSeverity
+{
+	[self postAlarm:aName severity:aSeverity reason:@"No Reason Given"];
+}
+
+- (void) postAlarm:(NSString*)aName severity:(int)aSeverity reason:(NSString*)aReason
+{
+	ORAlarm* anAlarm = [[ORAlarm alloc] initWithName:aName severity:MIN(kNumAlarmSeverityTypes-1,aSeverity)];
+	NSString* s = [NSString stringWithFormat:@"\n[%@] posted this alarm. Acknowledge it and it will go away.",[self fullID]];
+	if([aReason length]){
+		s = [s stringByAppendingFormat:@"\n\n Reason Posted: %@",aReason];
+	}
+	[anAlarm setHelpString:s];
+	
+	[anAlarm performSelectorOnMainThread:@selector(postAlarm) withObject:nil waitUntilDone:YES];
+	[anAlarm release];
+}
+
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -411,6 +448,8 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [self setDisplayType:[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
     [self setCaptureDate:[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
 	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
+	[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
+	[[segmentGroups objectAtIndex:1] setMapEntries:[self initMapEntries:1]];
     [[self undoManager] enableUndoRegistration];
     
     [self setHardwareCheck:2]; //unknown

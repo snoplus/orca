@@ -104,7 +104,6 @@
 - (IBAction) detailsLockAction:(id)sender;
 - (IBAction) initAction:(id)sender;
 
-
 #pragma mark •••Interface Management
 - (void) showNamesChanged:(NSNotification*)aNote;
 - (void) updateRunInfo:(NSNotification*)aNote;
