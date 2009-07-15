@@ -64,6 +64,7 @@
 - (void) setSomethingSelected:(BOOL)aFlag;
 
 #pragma mark •••Convience Methods
+- (void) clearAlarm:(NSString*)aName;
 - (void) postAlarm:(NSString*)aName;
 - (void) postAlarm:(NSString*)aName severity:(int)aSeverity;
 - (void) postAlarm:(NSString*)aName severity:(int)aSeverity reason:(NSString*)aReason;

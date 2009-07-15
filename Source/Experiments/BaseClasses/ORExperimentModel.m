@@ -27,6 +27,7 @@
 #import "ORRunModel.h"
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
+#import "ORAlarmCollection.h"
 
 NSString* ORExperimentModelShowNamesChanged = @"ORExperimentModelShowNamesChanged";
 NSString* ExperimentModelDisplayTypeChanged				 = @"ExperimentModelDisplayTypeChanged";
@@ -410,6 +411,11 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
         postNotificationName:ExperimentCaptureDateChangedNotification
                       object:self];
     
+}
+
+- (void) clearAlarm:(NSString*)aName
+{
+	[[ORAlarmCollection sharedAlarmCollection] performSelectorOnMainThread:@selector(removeAlarmWithName:) withObject:aName waitUntilDone:YES];	
 }
 
 - (void) postAlarm:(NSString*)aName
