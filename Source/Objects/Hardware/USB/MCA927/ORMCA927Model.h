@@ -96,7 +96,7 @@ typedef struct MCA927Registers {
     unsigned long upperDiscriminator[2];
     unsigned long lowerDiscriminator[2];
     unsigned long zdtMode[2];
-	unsigned long spectrum[4][0x3fff];
+	unsigned long spectrum[4][0x4000];
     unsigned long runOptions[2];
     BOOL		  autoClear[2];
 	BOOL		  startedFromMainRunControl[2];
