@@ -21,6 +21,8 @@
 
 @interface ORPacController : OrcaObjectController
 {
+	IBOutlet NSTabView*		tabView;
+	IBOutlet NSTableView*	rdacTableView;
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSButton*		setAllRDacsButton;
 	IBOutlet NSTextField*	rdacChannelTextField;
@@ -39,6 +41,12 @@
     IBOutlet NSButton*      readDacButton;
     IBOutlet NSButton*      selectModuleButton;
     IBOutlet NSMatrix*      lcmEnabledMatrix;
+
+    IBOutlet NSButton*      loadButton0;
+    IBOutlet NSButton*      loadButton1;
+    IBOutlet NSButton*      loadButton2;
+    IBOutlet NSButton*      loadButton3;
+    IBOutlet NSButton*      loadButtonAll;
 }
 
 #pragma mark •••Initialization
@@ -51,6 +59,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) rdacsChanged:(NSNotification*)aNote;
 - (void) setAllRDacsChanged:(NSNotification*)aNote;
 - (void) rdacChannelChanged:(NSNotification*)aNote;
 - (void) lcmEnabledChanged:(NSNotification*)aNote;
@@ -78,6 +87,7 @@
 - (IBAction) readDacAction:(id)sender;
 - (IBAction) lcmEnabledAction:(id)sender;
 - (IBAction) selectModuleAction:(id)sender;
+- (IBAction) loadRdcaAction:(id)sender;
 
 @end
 

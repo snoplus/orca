@@ -121,7 +121,12 @@
                      selector : @selector(setAllRDacsChanged:)
                          name : ORPacModelSetAllRDacsChanged
 						object: model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(rdacsChanged:)
+                         name : ORPacModelRDacsChanged
+						object: model];
+	
 }
 
 - (void) setModel:(id)aModel
@@ -143,7 +148,14 @@
 	[self lcmEnabledChanged:nil];
 	[self rdacChannelChanged:nil];
 	[self setAllRDacsChanged:nil];
+	[self rdacsChanged:nil];
 }
+
+- (void) rdacsChanged:(NSNotification*)aNote
+{
+	[rdacTableView reloadData];
+}
+
 
 - (void) setAllRDacsChanged:(NSNotification*)aNote
 {
@@ -232,6 +244,12 @@
     [readAdcsButton setEnabled:!locked];
     [lcmEnabledMatrix setEnabled:!locked];
     [selectModuleButton setEnabled:!locked];
+    [loadButtonAll setEnabled:!locked];
+    [loadButton0 setEnabled:!locked];
+    [loadButton1 setEnabled:!locked];
+    [loadButton2 setEnabled:!locked];
+    [loadButton3 setEnabled:!locked];
+    [rdacTableView setEnabled:!locked];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -285,7 +303,6 @@
 }
 
 #pragma mark •••Actions
-
 - (void) setAllRDacsAction:(id)sender
 {
 	[model setSetAllRDacs:[sender intValue]];
@@ -294,8 +311,16 @@
 
 - (IBAction) rdacChannelAction:(id)sender
 {
-	[model setRdacChannel:[sender intValue]];	
+	[model setRdacChannel:[sender intValue]];
+	[model setDacValue: [model rdac:[sender intValue]]];
 }
+
+- (IBAction) dacValueAction:(id)sender
+{
+	[model setDacValue:[sender intValue]];	
+	[model setRdac:[model rdacChannel] withValue:[sender intValue]];
+}
+
 - (IBAction) writeLcmEnabledAction:(id)sender
 {
 	[model enqueLcmEnable];	
@@ -316,11 +341,6 @@
 	[model setModule:[sender intValue]];	
 }
 
-- (IBAction) dacValueAction:(id)sender
-{
-	[model setDacValue:[sender intValue]];	
-}
-
 - (IBAction) writeDacAction:(id)sender
 {
 	[self endEditing];
@@ -332,7 +352,6 @@
 	[self endEditing];
 	[model readDac];
 }
-
 
 - (IBAction) lockAction:(id) sender
 {
@@ -359,6 +378,65 @@
 {
 	[self endEditing];
 	[model selectModule];
+}
+
+- (IBAction) loadRdcaAction:(id)sender
+{
+	int start,end;
+	int board = [sender tag];
+	if(board == 4){
+		start = 0;
+		end = 148;
+	}
+	else {
+		start = board + board*37;
+		end = start + 37;
+	}
+
+	int i;
+	for(i=start;i<end;i++){
+		[model enqueWriteRdac:i];
+	}
+}
+
+#pragma mark •••Table Data Source
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+	if([[aTableColumn identifier] isEqualToString:@"Channel"]) return [NSNumber numberWithInt:rowIndex];
+	else {
+		int board;
+		if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
+		else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
+		else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
+		else board = 3;
+		return [NSNumber numberWithInt:[model rdac:rowIndex + board*37]];
+	}
+}
+
+// just returns the number of items we have.
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	return 37;
+}
+
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	if([[aTableColumn identifier] isEqualToString:@"Channel"]) return;
+	int board;
+	if([[aTableColumn identifier] isEqualToString:@"Board0"])board = 0;
+	else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
+	else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
+	else board = 3;
+	[model setRdac:rowIndex+(board*37) withValue:[anObject intValue]];
+	if(rowIndex+(board*37) == [model rdacChannel]){
+		[model setDacValue:[anObject intValue]];
+	}
+}
+
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
+{
+    int index = [tabView indexOfTabViewItem:item];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.Pac.selectedtab"];
 }
 
 @end

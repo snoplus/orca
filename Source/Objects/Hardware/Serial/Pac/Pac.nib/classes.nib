@@ -86,6 +86,8 @@
 				<string>id</string>
 				<key>lcmEnabledAction</key>
 				<string>id</string>
+				<key>loadRdcaAction</key>
+				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
 				<key>moduleAction</key>
@@ -123,6 +125,16 @@
 				<string>NSTextField</string>
 				<key>lcmEnabledMatrix</key>
 				<string>NSMatrix</string>
+				<key>loadButton0</key>
+				<string>NSButton</string>
+				<key>loadButton1</key>
+				<string>NSButton</string>
+				<key>loadButton2</key>
+				<string>NSButton</string>
+				<key>loadButton3</key>
+				<string>NSButton</string>
+				<key>loadButtonAll</key>
+				<string>NSButton</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
 				<key>lockDocField</key>
@@ -139,6 +151,8 @@
 				<string>NSTextField</string>
 				<key>rdacChannelTextField</key>
 				<string>NSTextField</string>
+				<key>rdacTableView</key>
+				<string>NSTableView</string>
 				<key>readAdcsButton</key>
 				<string>NSButton</string>
 				<key>readDacButton</key>
@@ -147,6 +161,8 @@
 				<string>NSButton</string>
 				<key>setAllRDacsButton</key>
 				<string>NSButton</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
 				<key>timeMatrix</key>
 				<string>NSMatrix</string>
 				<key>writeDacButton</key>

@@ -163,6 +163,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	return kNumFocalPlaneSegments;
 }
 
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
 {

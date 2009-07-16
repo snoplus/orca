@@ -63,12 +63,13 @@
         NSMutableString*    buffer;
 		unsigned short		adc[8];
 		NSMutableData*		inComingData;
-		int					dacValue;
 		int					module;
 		int					preAmp;
 		BOOL				lcmEnabled;
 		int					rdacChannel;
-    BOOL setAllRDacs;
+		int					dacValue;
+		BOOL				setAllRDacs;
+		int					rdac[148];
 }
 
 #pragma mark •••Initialization
@@ -80,6 +81,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (int)  rdac:(int)index;
+- (void) setRdac:(int)index withValue:(int)aValue;
 - (BOOL) setAllRDacs;
 - (void) setSetAllRDacs:(BOOL)aSetAllRDacs;
 - (int) rdacChannel;
@@ -125,6 +128,7 @@
 - (void) enqueReadDac;
 - (void) enqueLcmEnable;
 - (void) enqueModuleSelect;
+- (void) enqueWriteRdac:(int)index;
 
 - (void) enqueShipCmd;
 - (void) readAdcs;
@@ -132,9 +136,7 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
-
 @end
-
 
 extern NSString* ORPacModelSetAllRDacsChanged;
 extern NSString* ORPacModelRdacChannelChanged;
@@ -147,3 +149,4 @@ extern NSString* ORPacLock;
 extern NSString* ORPacModelPortNameChanged;
 extern NSString* ORPacModelPortStateChanged;
 extern NSString* ORPacModelAdcChanged;
+extern NSString* ORPacModelRDacsChanged;
