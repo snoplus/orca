@@ -109,6 +109,17 @@
                      selector : @selector(secondaryMapFileChanged:)
                          name : ORSegmentGroupMapFileChanged
 						object: secondaryGroup];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(slowControlIsConnectedChanged:)
+                         name : KatrinModelSlowControlIsConnectedChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(slowControlNameChanged:)
+                         name : KatrinModelSlowControlNameChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -124,9 +135,18 @@
 
 	//details
 	[secondaryValuesView reloadData];
+	
+	[self slowControlIsConnectedChanged:nil];
+	[self slowControlNameChanged:nil];
 }
 
 #pragma mark ¥¥¥HW Map Actions
+
+- (void) slowControlNameAction:(id)sender
+{
+	[model setSlowControlName:[sender stringValue]];	
+}
+
 - (IBAction) secondaryAdcClassNameAction:(id)sender
 {
 	[secondaryGroup setAdcClassName:[sender titleOfSelectedItem]];	
@@ -184,6 +204,29 @@
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) slowControlNameChanged:(NSNotification*)aNote
+{
+	[slowControlNameField setStringValue: [model slowControlName]];
+}
+
+- (void) slowControlIsConnectedChanged:(NSNotification*)aNote
+{
+	NSString* s;
+	if([model slowControlIsConnected]){
+		[slowControlIsConnectedField setTextColor:[NSColor blackColor]];
+		[slowControlIsConnectedField1 setTextColor:[NSColor blackColor]];
+		s = @"Connected";
+	}
+	else {
+		s = @"NOT Connected";
+		[slowControlIsConnectedField setTextColor:[NSColor redColor]];
+		[slowControlIsConnectedField1 setTextColor:[NSColor redColor]];
+	}	
+	[slowControlIsConnectedField setStringValue:s];
+	[slowControlIsConnectedField1 setStringValue:s];
+}
+
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[super specialUpdate:aNote];

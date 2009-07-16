@@ -24,12 +24,25 @@
 #import "KatrinController.h"
 #import "ORSegmentGroup.h"
 #import "KatrinConstants.h"
+#import "ORSocketClient.h"
+#import "ORCommandCenter.h"
+
+NSString* KatrinModelSlowControlIsConnectedChanged = @"KatrinModelSlowControlIsConnectedChanged";
+NSString* KatrinModelSlowControlNameChanged		= @"KatrinModelSlowControlNameChanged";
 
 static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
 @implementation KatrinModel
 
 #pragma mark ¥¥¥Initialization
+- (void) wakeUp
+{
+	[super wakeUp];
+	BOOL exists = [[ORCommandCenter sharedCommandCenter] clientWithNameExists:slowControlName];
+	[self setSlowControlIsConnected: exists];
+
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"katrin"]];
@@ -54,6 +67,63 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[aConnector addRestrictedConnectionType: 'DB I']; //can only connect to DB Inputs
     [aConnector release];
 }
+
+- (void) registerNotificationObservers
+{
+	[super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(slowControlConnectionChanged:)
+                         name : ORCommandClientsChangedNotification
+                       object : nil];
+	
+}
+
+- (void) slowControlConnectionChanged:(NSNotification*)aNote
+{
+	ORSocketClient* theClient = [[aNote userInfo] objectForKey:@"client"];
+	if([[theClient name] isEqualToString:slowControlName]){
+		BOOL exists = [[[ORCommandCenter sharedCommandCenter]clients] containsObject:theClient];
+		[self setSlowControlIsConnected: [theClient isConnected] && exists];
+	}
+}
+
+#pragma mark ¥¥¥Accessors
+- (NSString*) slowControlName;
+{
+	return slowControlName;
+}
+
+- (void) setSlowControlName:(NSString*)aName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlowControlName:slowControlName];
+    
+	[slowControlName autorelease];
+    slowControlName = [aName copy];    
+	
+	BOOL exists = [[ORCommandCenter sharedCommandCenter] clientWithNameExists:slowControlName];
+	[self setSlowControlIsConnected: exists];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:KatrinModelSlowControlNameChanged object:self];
+	
+}
+
+- (BOOL) slowControlIsConnected
+{
+	return slowControlIsConnected;
+}
+
+- (void) setSlowControlIsConnected:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlowControlIsConnected:slowControlIsConnected];
+    
+    slowControlIsConnected = aState;    
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:KatrinModelSlowControlIsConnectedChanged object:self];
+	
+}
+
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
@@ -108,5 +178,25 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
 	return @"KatrinDetailsLock";
 }
+
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
+    
+    [self setSlowControlName:[decoder decodeObjectForKey:@"slowControlName"]];
+	[[self undoManager] enableUndoRegistration];
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeObject:slowControlName forKey:@"slowControlName"];
+}
+
+
 @end
 

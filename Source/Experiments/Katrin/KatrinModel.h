@@ -24,7 +24,17 @@
 
 @interface KatrinModel :  ORExperimentModel
 {
+	NSString* slowControlName;
+	int	      slowControlIsConnected;
 }
+#pragma mark ¥¥¥Accessors
+- (NSString*) slowControlName;
+- (void) setSlowControlName:(NSString*)aName;
+- (BOOL) slowControlIsConnected;
+- (void) setSlowControlIsConnected:(BOOL)aState;
+
+#pragma mark ¥¥¥Slow Control Connection Monitoring
+- (void) slowControlConnectionChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -35,4 +45,7 @@
 - (NSString*) experimentDetailsLock;
 
 @end
+
+extern NSString* KatrinModelSlowControlIsConnectedChanged;
+extern NSString* KatrinModelSlowControlNameChanged;
 

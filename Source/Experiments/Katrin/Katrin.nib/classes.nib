@@ -101,6 +101,8 @@
 				<string>id</string>
 				<key>secondaryAdcClassNameAction</key>
 				<string>id</string>
+				<key>slowControlNameAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>KatrinController</string>
@@ -128,6 +130,12 @@
 				<string>NSTableView</string>
 				<key>secondaryValuesView</key>
 				<string>NSTableView</string>
+				<key>slowControlIsConnectedField</key>
+				<string>NSTextField</string>
+				<key>slowControlIsConnectedField1</key>
+				<string>NSTextField</string>
+				<key>slowControlNameField</key>
+				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>ORExperimentController</string>

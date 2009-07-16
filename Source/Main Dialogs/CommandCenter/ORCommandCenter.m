@@ -197,6 +197,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     clients = someClients;
 }
 
+- (BOOL) clientWithNameExists:(NSString*)aName
+{
+    NSEnumerator* e = [clients objectEnumerator];
+    ORCommandClient* theClient;
+    while(theClient = [e nextObject]){
+        if([[theClient name] isEqualToString:aName])return YES;
+    }
+	return NO;
+}
+
 - (int) clientCount
 {
     return [clients count];
@@ -219,8 +229,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 #pragma mark •••Delegate Methods
 - (void) clientChanged:(id)aClient
 {
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aClient forKey:@"client"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCommandClientsChangedNotification
-                                                        object:self];
+                                                        object:self
+													  userInfo:userInfo];
 }
 
 - (void)netsocket:(NetSocket*)inNetSocket connectionAccepted:(NetSocket*)inNewNetSocket
@@ -231,7 +243,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     ORCommandClient* client = [[[ORCommandClient alloc] initWithNetSocket:inNewNetSocket] autorelease];
     [client setDelegate:self];
     [client setTimeConnected:[NSDate date]];
-    [self clientChanged:client];
     [self sendCurrentAlarms:client];
     [self sendCurrentRunStatus:client];
     
@@ -240,6 +251,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
         [self sendHeartBeat:client];
     }
     [clients addObject:client];
+    [self clientChanged:client];
 }
 
 - (void) clientDisconnected:(id)aClient

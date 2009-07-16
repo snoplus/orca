@@ -26,6 +26,9 @@
 @interface KatrinController : ORExperimentController {
 
     IBOutlet ORColorScale*	secondaryColorScale;
+	IBOutlet NSTextField*	slowControlNameField;
+	IBOutlet NSTextField*	slowControlIsConnectedField;
+	IBOutlet NSTextField*	slowControlIsConnectedField1;
     IBOutlet NSButton*		secondaryColorAxisLogCB;
     IBOutlet NSTextField*	secondaryRateField;
     IBOutlet NSTextField*	detectorTitle;
@@ -49,11 +52,14 @@
 - (void) loadSegmentGroups;
 
 #pragma mark ¥¥¥HW Map Actions
+- (IBAction) slowControlNameAction:(id)sender;
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
 
 #pragma mark ¥¥¥Detector Interface Management
+- (void) slowControlNameChanged:(NSNotification*)aNote;
+- (void) slowControlIsConnectedChanged:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥HW Map Interface Management

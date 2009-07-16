@@ -44,6 +44,7 @@
 	unsigned				historyIndex;
 	NSMutableArray*			history;
 	ORScriptIDEModel*		scriptIDEModel;
+
 }
 
 + (ORCommandCenter*) sharedCommandCenter;
@@ -64,6 +65,7 @@
 - (void) setClients:(NSMutableArray*)someClients;
 - (NSArray*)clients;
 - (int) clientCount;
+- (BOOL) clientWithNameExists:(NSString*)aName;
 - (void) taskListChanged:(NSNotification*)aNotification;
 - (void) documentClosed:(NSNotification*)aNotification;
 - (void) objectsAdded:(NSNotification*)aNotification;
