@@ -29,6 +29,7 @@
 @interface ORIpeFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSTextField* dataMaskTextField;
 		IBOutlet NSTextField*	thresholdOffsetField;
 		IBOutlet NSTextField*	ledOffField;
 		IBOutlet NSTextField*	interruptMaskField;
@@ -88,6 +89,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) dataMaskChanged:(NSNotification*)aNote;
 - (void) integrationTimeChanged:(NSNotification*)aNote;
 - (void) coinTimeChanged:(NSNotification*)aNote;
 - (void) thresholdOffsetChanged:(NSNotification*)aNote;
@@ -117,6 +119,7 @@
 - (void) readoutPagesChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) dataMaskTextFieldAction:(id)sender;
 - (IBAction) coinTimeAction:(id)sender;
 - (IBAction) integrationTimeAction:(id)sender;
 - (IBAction) thresholdOffsetAction:(id)sender;

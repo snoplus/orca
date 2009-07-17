@@ -105,6 +105,7 @@
     BOOL ledOff;
     unsigned long interruptMask;
 	unsigned long pageSize; //< Size of the readout pages - defined in slt dialog
+    unsigned long dataMask;
 
 	//-----------------------------------------
 	//place to cache some values so they don't have to be calculated every time thru the run loop.
@@ -126,6 +127,8 @@
 - (void) makeMainController;
 
 #pragma mark ¥¥¥Accessors
+- (unsigned long) dataMask;
+- (void) setDataMask:(unsigned long)aDataMask;
 - (int) thresholdOffset;
 - (void) setThresholdOffset:(int)aThresholdOffset;
 - (BOOL) ledOff;
@@ -301,6 +304,7 @@
 					 n:(int) n;
 @end
 
+extern NSString* ORIpeFLTModelDataMaskChanged;
 extern NSString* ORIpeFLTModelThresholdOffsetChanged;
 extern NSString* ORIpeFLTModelLedOffChanged;
 extern NSString* ORIpeFLTModelInterruptMaskChanged;

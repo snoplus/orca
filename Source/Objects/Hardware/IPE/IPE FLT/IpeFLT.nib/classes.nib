@@ -13,6 +13,36 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>analyze</key>
+				<string>id</string>
+				<key>publishToPDF</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ORFlippedView</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+				<key>viewForPDF</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>ORValueBar</string>
 			<key>LANGUAGE</key>
@@ -26,6 +56,14 @@
 				<key>mXScale</key>
 				<string>id</string>
 			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
 		</dict>
@@ -117,6 +155,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
@@ -166,6 +206,8 @@
 				<string>id</string>
 				<key>differentiateAction</key>
 				<string>id</string>
+				<key>refresh</key>
+				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>
 				<key>resetScales</key>
@@ -193,7 +235,7 @@
 				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>ORPlotter</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -201,6 +243,8 @@
 				<key>calibrateAction</key>
 				<string>id</string>
 				<key>coinTimeAction</key>
+				<string>id</string>
+				<key>dataMaskTextFieldAction</key>
 				<string>id</string>
 				<key>enableAllTriggersAction</key>
 				<string>id</string>
@@ -262,6 +306,8 @@
 				<key>calibrateButton</key>
 				<string>NSButton</string>
 				<key>coinTimeField</key>
+				<string>NSTextField</string>
+				<key>dataMaskTextField</key>
 				<string>NSTextField</string>
 				<key>gainTextFields</key>
 				<string>NSMatrix</string>

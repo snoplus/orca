@@ -229,9 +229,19 @@
                          name : ORIpeFLTModelIntegrationTimeChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(dataMaskChanged:)
+                         name : ORIpeFLTModelDataMaskChanged
+						object: model];
+
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) dataMaskChanged:(NSNotification*)aNote
+{
+	[dataMaskTextField setIntValue: [model dataMask]];
+}
 
 - (void) integrationTimeChanged:(NSNotification*)aNote
 {
@@ -284,6 +294,7 @@
 	[self thresholdOffsetChanged:nil];
 	[self integrationTimeChanged:nil];
 	[self coinTimeChanged:nil];
+	[self dataMaskChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -561,6 +572,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) dataMaskTextFieldAction:(id)sender
+{
+	[model setDataMask:[sender intValue]];	
+}
 
 - (IBAction) thresholdOffsetAction:(id)sender
 {

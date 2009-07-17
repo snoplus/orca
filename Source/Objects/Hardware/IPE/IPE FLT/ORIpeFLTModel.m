@@ -30,6 +30,7 @@
 #import "ORIpeFireWireCard.h"
 #import "ORTest.h"
 
+NSString* ORIpeFLTModelDataMaskChanged = @"ORIpeFLTModelDataMaskChanged";
 NSString* ORIpeFLTModelThresholdOffsetChanged	= @"ORIpeFLTModelThresholdOffsetChanged";
 NSString* ORIpeFLTModelLedOffChanged			= @"ORIpeFLTModelLedOffChanged";
 NSString* ORIpeFLTModelInterruptMaskChanged		= @"ORIpeFLTModelInterruptMaskChanged";
@@ -159,6 +160,21 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 
 #pragma mark ¥¥¥Accessors
+
+- (unsigned long) dataMask
+{
+    return dataMask;
+}
+
+- (void) setDataMask:(unsigned long)aDataMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDataMask:dataMask];
+    
+    dataMask = aDataMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelDataMaskChanged object:self];
+}
+
 - (BOOL) partOfEvent:(short)chan
 {
 	return (eventMask & (1L<<chan)) != 0;
@@ -1179,7 +1195,8 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	[self setTestEnabledArray:	[decoder decodeObjectForKey:@"testsEnabledArray"]];
 	[self setTestStatusArray:	[decoder decodeObjectForKey:@"testsStatusArray"]];
     [self setReadoutPages:		[decoder decodeIntForKey:@"ORIpeFLTModelReadoutPages"]];	// ak, 2.7.07
-	
+    [self setDataMask:			[decoder decodeInt32ForKey:@"ORIpeFLTModelDataMask"]];
+	if(dataMask ==0)dataMask=0xfff;
 	//make sure these objects exist and are populated with nil objects.
 	int i;	
 	if(!triggersEnabled){
@@ -1221,6 +1238,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt32:dataMask			forKey:@"ORIpeFLTModelDataMask"];
     [encoder encodeInt:thresholdOffset		forKey:@"ORIpeFLTModelThresholdOffset"];
     [encoder encodeInt32:interruptMask		forKey:@"ORIpeFLTModelInterruptMask"];
     [encoder encodeInt32:coinTime			forKey:@"coinTime"];
@@ -1386,6 +1404,8 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 				int i;
 				int j;
 				long addr =  memoryAddress | (aChan << kIpeFlt_ChannelAddress) | (fltPageStart<<10) | lStart; // ak, 5.10.07
+				unsigned long finalDataMask = dataMask;
+				if(finalDataMask==0)finalDataMask = 0x0fff;
 				for (j=0;j<readoutPages;j++){
 					
 					// Use block read mode.
@@ -1397,8 +1417,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 					// TODO: Add a control to enable or disable flags in the data
 					//       Better: Improve the display, define a variable number of
 					//               flags that can be defined and stored with the Orca settings.
+					// MAH:  07/17/09 added the data mask to make Brandon Happy.
 					for (i=0;i<2*fltSize;i++)
-						waveFormPtr[i] = waveFormPtr[i] & 0x0fff;					
+						waveFormPtr[i] = waveFormPtr[i] & finalDataMask;					
 					
 					wPtr += fltSize;				
 					addr = (addr + 1024) % 0x10000;
