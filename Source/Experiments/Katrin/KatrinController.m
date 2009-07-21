@@ -71,6 +71,17 @@
 
 -(void) awakeFromNib
 {
+	
+	detectorSize		= NSMakeSize(675,589);
+	slowControlsSize    = NSMakeSize(525,157);
+	detailsSize			= NSMakeSize(655,589);
+	focalPlaneSize		= NSMakeSize(827,589);
+	vetoSize			= NSMakeSize(463,589);
+	
+    blankView = [[NSView alloc] init];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+
+	
     [super awakeFromNib];
 	
 	if([secondaryGroup colorAxisAttributes])[[secondaryColorScale colorAxis] setAttributes:[[[secondaryGroup colorAxisAttributes] mutableCopy] autorelease]];
@@ -398,9 +409,35 @@
 //}
 
 
-- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
-    int index = [tabView indexOfTabViewItem:item];
+	
+    if([tabView indexOfTabViewItem:tabViewItem] == 0){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:detectorSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:slowControlsSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:detailsSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:focalPlaneSize];
+		[[self window] setContentView:tabView];
+    }
+	else if([tabView indexOfTabViewItem:tabViewItem] == 4){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:vetoSize];
+		[[self window] setContentView:tabView];
+    }
+	int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.KatrinController.selectedtab"];
 }
 

@@ -44,6 +44,13 @@
     IBOutlet NSTableView*	secondaryValuesView;
 
 	ORSegmentGroup* secondaryGroup;
+	NSView *blankView;
+    NSSize detectorSize;
+    NSSize slowControlsSize;
+    NSSize detailsSize;
+    NSSize focalPlaneSize;
+    NSSize vetoSize;
+
 }
 
 #pragma mark ¥¥¥Initialization

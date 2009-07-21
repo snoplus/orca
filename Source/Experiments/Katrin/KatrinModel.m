@@ -92,6 +92,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 #pragma mark ¥¥¥Accessors
 - (NSString*) slowControlName;
 {
+	if(!slowControlName)return @"";
 	return slowControlName;
 }
 
@@ -149,6 +150,8 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kName",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kQuadrant",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCarouselSlot",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kModuleAddress",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kModuleChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampSerial",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
