@@ -364,6 +364,8 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 {
     
     NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath]];
+	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
+	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
     NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
     NSEnumerator* e = [lines objectEnumerator];
     NSString* aLine;
