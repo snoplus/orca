@@ -1577,19 +1577,6 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>showWebServer</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>WebServer</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
 				<key>prettify</key>
 				<string>id</string>
 				<key>recolorCompleteFile</key>
