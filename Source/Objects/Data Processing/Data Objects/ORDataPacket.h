@@ -142,6 +142,7 @@
 					  subRunNumber:(unsigned long*)subRunNumber;
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

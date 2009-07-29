@@ -266,7 +266,7 @@
             }
             else NSLogError(decoderName,@"Data Description Item",@"Programming Error (no Object)",nil);
         }
-	}      
+	}   
 }
 
 
@@ -510,6 +510,7 @@
 			}
 			else {
 				anObj = [objectLookup objectForKey:[NSNumber  numberWithLong:keyMaskValue]];
+				if(!anObj)anObj = self; //must be header
 			}
 			fastLookupCache[keyMaskValue>>18] = anObj;
 		}
@@ -548,6 +549,7 @@
     if(!dPtr)return;
     id anObj = [objectLookup objectForKey:aKey];
     if(anObj)[anObj decodeData:dPtr  fromDataPacket:self intoDataSet:aDataSet];
+	else [self decodeData:dPtr  fromDataPacket:self intoDataSet:aDataSet];
 }
 
 - (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset forKey:(NSNumber*)aKey
@@ -573,7 +575,9 @@
 {
     NSData* theData = [dataArray objectAtIndex:0];
     unsigned long* dataPtr = ((unsigned long*)[theData bytes]) + anOffset;
-    return [[objectLookup objectForKey:aKey] dataRecordDescription:dataPtr];
+	id anObj = [objectLookup objectForKey:aKey];
+	if(anObj)return [anObj dataRecordDescription:dataPtr];
+	else return [self dataRecordDescription:dataPtr];
 }
 
 
@@ -616,6 +620,7 @@
 				aKey		  = [NSNumber  numberWithLong:ExtractDataId(val)];
 				decodedLength = ExtractLength(val);
 				anObj		  = [objectLookup objectForKey:aKey];
+				if(!anObj)anObj = self;
             }
 			
             if(anObj){
@@ -629,6 +634,9 @@
 					else if([sname hasSuffix:@"Run"]){
 						sname = [sname substringToIndex:[sname length]-3];
 						sname = [sname stringByAppendingString:@"Control"];
+					}
+					else if([sname hasSuffix:@"DataPacket"]){
+						sname = @"Header";
 					}
 					
                     [nameCatalog setObject:sname forKey:aKey]; 
@@ -1006,12 +1014,18 @@ static NSString *ORDataPacketFileHeader        = @"ORDataPacketFileHeader";
 	
 	if(theDataId == 0x0) {		//great, this is easy... it's the new form
 		unsigned long theLength = ExtractLength(val);
+		[aDataSet loadGenericData:@" " sender:self withKeys:@"Sub Run File Header",nil];
+		
 		return theLength;
 	}
 	else {	//crap -- old form.... eventually we'll depreciate this form	
 		//shouldn't get here using the old form but just in case...
 		return 0; //just to show we couldn't process.
 	}
+}
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+{
+	return @"Data Header";
 }
 
 @end

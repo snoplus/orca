@@ -816,7 +816,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	data[1] = 0x10 | ([self subRunNumber]&0xffff)<<16;
 	data[2] = lastRunNumberShipped;
 	data[3] = ut_time;
-	[dataPacket addLongsToFrameBuffer:data length:4];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+														object:[NSData dataWithBytes:data length:4*sizeof(long)]];
+
+	NSLog(@"Run %@ preparing for a new sub-run\n",[self fullRunNumberString]);
 }
 
 - (void) startNewSubRun
@@ -832,12 +835,23 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 	time_t ut_time = mktime(theTimeGMTAsStruct);
 	
+	//insert a header before the start of sub-run record
+	[[self dataPacket] makeFileHeader];
+	[[self dataPacket] generateObjectLookup];
+	NSMutableData* dataToBeInserted = [NSMutableData dataWithData:[[self dataPacket] headerAsData]];
+	
 	unsigned long data[4];
 	data[0] = dataId | 4;
 	data[1] = 0x20 | ([self subRunNumber]&0xffff)<<16;
 	data[2] = lastRunNumberShipped;
 	data[3] = ut_time;
-	[dataPacket addLongsToFrameBuffer:data length:4];
+	
+	[dataToBeInserted appendData:[NSMutableData dataWithBytes:data length:4*sizeof(long)]];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+														object:dataToBeInserted];
+
+	NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
 	
 }
 
