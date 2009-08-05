@@ -96,7 +96,10 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {
 	return NSMakeRange(baseAddress,0x1080);
 }
-
+- (NSString*) helpURL
+{
+	return @"VME/V862.html";
+}
 #pragma mark ***Register - General routines
 - (short) getNumberRegisters
 {

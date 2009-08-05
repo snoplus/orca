@@ -100,6 +100,11 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	return NSMakeRange(baseAddress,0x1204);
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/V1190.html";
+}
+
 #pragma mark ***Accessors
 - (void) setIntegrationTime:(double)newIntegrationTime
 {

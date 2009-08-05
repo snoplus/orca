@@ -97,6 +97,11 @@ static Caen419Registers reg[kNumRegisters] = {
 	return NSMakeRange(baseAddress,0x1E);
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/V419.html";
+}
+
 - (void) setDataIds:(id)assigner
 {
     dataId = [assigner assignDataIds:kLongForm];

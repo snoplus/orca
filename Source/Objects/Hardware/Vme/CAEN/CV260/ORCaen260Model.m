@@ -126,7 +126,10 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 {
 	return NSMakeRange(baseAddress,0xFE);
 }
-
+- (NSString*) helpURL
+{
+	return @"VME/V260.html";
+}
 #pragma mark •••Accessors
 #pragma mark ***Register - General routines
 - (short)          getNumberRegisters	{ return kNumberOfV260Registers; }
