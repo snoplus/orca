@@ -13,6 +13,34 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>click</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectFactory</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ObjectFactory</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>ORCrateLabelView</string>
 			<key>LANGUAGE</key>
@@ -53,6 +81,60 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>connectAction</key>
+				<string>id</string>
+				<key>executeCCycleAction</key>
+				<string>id</string>
+				<key>executeZCycleAction</key>
+				<string>id</string>
+				<key>getConfigParamAction</key>
+				<string>id</string>
+				<key>getEthernetParamAction</key>
+				<string>id</string>
+				<key>hvOffAction</key>
+				<string>id</string>
+				<key>hvOnAction</key>
+				<string>id</string>
+				<key>ipAddressTextFieldAction</key>
+				<string>id</string>
+				<key>panicAction</key>
+				<string>id</string>
+				<key>panicOffAction</key>
+				<string>id</string>
+				<key>setInhibitOffAction</key>
+				<string>id</string>
+				<key>setInhibitOnAction</key>
+				<string>id</string>
+				<key>showHVStatusAction</key>
+				<string>id</string>
+				<key>showHideAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORUnivVoltHVCrateController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>ethernetConnectButton</key>
+				<string>NSButton</string>
+				<key>hvStatusField</key>
+				<string>NSTextField</string>
+				<key>ipAddressTextField</key>
+				<string>NSTextField</string>
+				<key>ipConnectedTextField</key>
+				<string>NSTextField</string>
+				<key>outputArea</key>
+				<string>NSTextView</string>
+				<key>showHideButton</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>ORCrateController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -170,88 +252,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>click</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>OrcaObjectFactory</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ObjectFactory</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>sequenceCompleted</key>
-				<string>id</string>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>connectAction</key>
-				<string>id</string>
-				<key>executeCCycleAction</key>
-				<string>id</string>
-				<key>executeZCycleAction</key>
-				<string>id</string>
-				<key>getConfigParamAction</key>
-				<string>id</string>
-				<key>getEthernetParamAction</key>
-				<string>id</string>
-				<key>hvOffAction</key>
-				<string>id</string>
-				<key>hvOnAction</key>
-				<string>id</string>
-				<key>ipAddressTextFieldAction</key>
-				<string>id</string>
-				<key>panicAction</key>
-				<string>id</string>
-				<key>panicOffAction</key>
-				<string>id</string>
-				<key>setInhibitOffAction</key>
-				<string>id</string>
-				<key>setInhibitOnAction</key>
-				<string>id</string>
-				<key>showHVStatusAction</key>
-				<string>id</string>
-				<key>showHideAction</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORUnivVoltHVCrateController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>ethernetConnectButton</key>
-				<string>NSButton</string>
-				<key>hvStatusField</key>
-				<string>NSTextField</string>
-				<key>ipAddressTextField</key>
-				<string>NSTextField</string>
-				<key>ipConnectedTextField</key>
-				<string>NSTextField</string>
-				<key>outputArea</key>
-				<string>NSTextView</string>
-				<key>showHideButton</key>
-				<string>NSButton</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>ORCrateController</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

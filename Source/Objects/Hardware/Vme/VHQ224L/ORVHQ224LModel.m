@@ -99,8 +99,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 
 - (NSString*) helpURL
 {
-	return nil;
-	//return @"VME/VHQ224L.html";
+	return @"VME/VHQ224L.html";
 }
 
 - (NSRange)	memoryFootprint
