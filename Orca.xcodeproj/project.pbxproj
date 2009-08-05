@@ -1134,6 +1134,7 @@
 		848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = 848648AA0975CB2E001C459D /* ORProcessConnector.h */; };
 		848648AD0975CB2E001C459D /* ORProcessConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = 848648AB0975CB2E001C459D /* ORProcessConnector.m */; };
 		8486F4660CC6D02E00800B1E /* ORIpeDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */; };
+		848883CC10179CBA0043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */ = {isa = PBXBuildFile; fileRef = 848B03060D6505C6007FDEBD /* OrcaFilterScript.icns */; };
 		848CD35C08FB511B0046CD9D /* NSSplitView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */; };
 		848CD35D08FB511B0046CD9D /* NSSplitView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */; };
@@ -1425,6 +1426,18 @@
 		84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AD4C2D0BA21B7A003C7ABE /* ORWindowListController.h */; };
 		84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */; };
 		84AD4CD70BA23300003C7ABE /* WindowList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */; };
+		84AFC24A1029F35E009F4139 /* downRamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC23E1029F35E009F4139 /* downRamp.png */; };
+		84AFC24B1029F35E009F4139 /* highVoltage.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC23F1029F35E009F4139 /* highVoltage.png */; };
+		84AFC24C1029F35E009F4139 /* lowVoltage.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2401029F35E009F4139 /* lowVoltage.png */; };
+		84AFC24D1029F35E009F4139 /* ORVHQ224LController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AFC2411029F35E009F4139 /* ORVHQ224LController.h */; };
+		84AFC24E1029F35E009F4139 /* ORVHQ224LController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AFC2421029F35E009F4139 /* ORVHQ224LController.m */; };
+		84AFC24F1029F35E009F4139 /* ORVHQ224LDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AFC2431029F35E009F4139 /* ORVHQ224LDecoders.h */; };
+		84AFC2501029F35E009F4139 /* ORVHQ224LDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AFC2441029F35E009F4139 /* ORVHQ224LDecoders.m */; };
+		84AFC2511029F35E009F4139 /* ORVHQ224LModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AFC2451029F35E009F4139 /* ORVHQ224LModel.h */; };
+		84AFC2521029F35E009F4139 /* ORVHQ224LModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AFC2461029F35E009F4139 /* ORVHQ224LModel.m */; };
+		84AFC2531029F35E009F4139 /* upRamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2471029F35E009F4139 /* upRamp.png */; };
+		84AFC2541029F35E009F4139 /* VHQ224L.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2481029F35E009F4139 /* VHQ224L.nib */; };
+		84AFC2551029F35E009F4139 /* VHQ224L.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2491029F35E009F4139 /* VHQ224L.tif */; };
 		84B0CFBE08FC60BC00EBE23C /* Container.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFB808FC60BC00EBE23C /* Container.nib */; };
 		84B0CFBF08FC60BC00EBE23C /* Container.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFB908FC60BC00EBE23C /* Container.tif */; };
 		84B0CFC008FC60BC00EBE23C /* ORContainerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B0CFBA08FC60BC00EBE23C /* ORContainerController.m */; };
@@ -2029,8 +2042,6 @@
 		CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
-		CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */ = {isa = PBXBuildFile; fileRef = CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
-		CEEBAB960D663CB300BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -2140,7 +2151,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				CEEBAB960D663CB300BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */,
+				848883CC10179CBA0043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3069,6 +3080,7 @@
 		848648AA0975CB2E001C459D /* ORProcessConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORProcessConnector.h; sourceTree = "<group>"; };
 		848648AB0975CB2E001C459D /* ORProcessConnector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORProcessConnector.m; sourceTree = "<group>"; };
 		8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIpeDefs.h; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeDefs.h"; sourceTree = SOURCE_ROOT; };
+		84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Universal/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = SOURCE_ROOT; };
 		848B03070D6505C6007FDEBD /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/OrcaFilterScript.icns; sourceTree = "<group>"; };
 		848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSSplitView+Extensions.h"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSSplitView+Extensions.m"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.m"; sourceTree = SOURCE_ROOT; };
@@ -3372,6 +3384,18 @@
 		84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORWindowListController.m; path = "Source/Main Dialogs/WindowList/ORWindowListController.m"; sourceTree = SOURCE_ROOT; };
 		84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowList.nib; path = "Source/Main Dialogs/WindowList/WindowList.nib"; sourceTree = SOURCE_ROOT; };
 		84ADA288040ADF2D005F64B1 /* NcdMux.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdMux.nib; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.nib"; sourceTree = SOURCE_ROOT; };
+		84AFC23E1029F35E009F4139 /* downRamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = downRamp.png; path = Source/Objects/Hardware/Vme/VHQ224L/downRamp.png; sourceTree = SOURCE_ROOT; };
+		84AFC23F1029F35E009F4139 /* highVoltage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = highVoltage.png; path = Source/Objects/Hardware/Vme/VHQ224L/highVoltage.png; sourceTree = SOURCE_ROOT; };
+		84AFC2401029F35E009F4139 /* lowVoltage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lowVoltage.png; path = Source/Objects/Hardware/Vme/VHQ224L/lowVoltage.png; sourceTree = SOURCE_ROOT; };
+		84AFC2411029F35E009F4139 /* ORVHQ224LController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHQ224LController.h; path = Source/Objects/Hardware/Vme/VHQ224L/ORVHQ224LController.h; sourceTree = SOURCE_ROOT; };
+		84AFC2421029F35E009F4139 /* ORVHQ224LController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHQ224LController.m; path = Source/Objects/Hardware/Vme/VHQ224L/ORVHQ224LController.m; sourceTree = SOURCE_ROOT; };
+		84AFC2431029F35E009F4139 /* ORVHQ224LDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHQ224LDecoders.h; path = Source/Objects/Hardware/Vme/VHQ224L/ORVHQ224LDecoders.h; sourceTree = SOURCE_ROOT; };
+		84AFC2441029F35E009F4139 /* ORVHQ224LDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHQ224LDecoders.m; path = Source/Objects/Hardware/Vme/VHQ224L/ORVHQ224LDecoders.m; sourceTree = SOURCE_ROOT; };
+		84AFC2451029F35E009F4139 /* ORVHQ224LModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHQ224LModel.h; path = Source/Objects/Hardware/Vme/VHQ224L/ORVHQ224LModel.h; sourceTree = SOURCE_ROOT; };
+		84AFC2461029F35E009F4139 /* ORVHQ224LModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHQ224LModel.m; path = Source/Objects/Hardware/Vme/VHQ224L/ORVHQ224LModel.m; sourceTree = SOURCE_ROOT; };
+		84AFC2471029F35E009F4139 /* upRamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = upRamp.png; path = Source/Objects/Hardware/Vme/VHQ224L/upRamp.png; sourceTree = SOURCE_ROOT; };
+		84AFC2481029F35E009F4139 /* VHQ224L.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VHQ224L.nib; path = Source/Objects/Hardware/Vme/VHQ224L/VHQ224L.nib; sourceTree = SOURCE_ROOT; };
+		84AFC2491029F35E009F4139 /* VHQ224L.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VHQ224L.tif; path = Source/Objects/Hardware/Vme/VHQ224L/VHQ224L.tif; sourceTree = SOURCE_ROOT; };
 		84B0CFB808FC60BC00EBE23C /* Container.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Container.nib; path = Source/Objects/Container/Container.nib; sourceTree = SOURCE_ROOT; };
 		84B0CFB908FC60BC00EBE23C /* Container.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Container.tif; path = Source/Objects/Container/Container.tif; sourceTree = SOURCE_ROOT; };
 		84B0CFBA08FC60BC00EBE23C /* ORContainerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORContainerController.m; path = Source/Objects/Container/ORContainerController.m; sourceTree = SOURCE_ROOT; };
@@ -4094,7 +4118,6 @@
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
-		CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Universal/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = "<group>"; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
 		F51E695503AE4775015F64B1 /* ORAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAppDelegate.h; sourceTree = "<group>"; };
 		F51E695603AE4775015F64B1 /* ORAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAppDelegate.m; sourceTree = "<group>"; };
@@ -7152,6 +7175,26 @@
 			path = "Source/Main Dialogs/WindowList";
 			sourceTree = SOURCE_ROOT;
 		};
+		84AFC23D1029F35E009F4139 /* VHQ224L */ = {
+			isa = PBXGroup;
+			children = (
+				84AFC23E1029F35E009F4139 /* downRamp.png */,
+				84AFC23F1029F35E009F4139 /* highVoltage.png */,
+				84AFC2401029F35E009F4139 /* lowVoltage.png */,
+				84AFC2411029F35E009F4139 /* ORVHQ224LController.h */,
+				84AFC2421029F35E009F4139 /* ORVHQ224LController.m */,
+				84AFC2431029F35E009F4139 /* ORVHQ224LDecoders.h */,
+				84AFC2441029F35E009F4139 /* ORVHQ224LDecoders.m */,
+				84AFC2451029F35E009F4139 /* ORVHQ224LModel.h */,
+				84AFC2461029F35E009F4139 /* ORVHQ224LModel.m */,
+				84AFC2471029F35E009F4139 /* upRamp.png */,
+				84AFC2481029F35E009F4139 /* VHQ224L.nib */,
+				84AFC2491029F35E009F4139 /* VHQ224L.tif */,
+			);
+			name = VHQ224L;
+			path = Source/Objects/Hardware/Vme/VHQ224L;
+			sourceTree = SOURCE_ROOT;
+		};
 		84B0CFB708FC600900EBE23C /* Container */ = {
 			isa = PBXGroup;
 			children = (
@@ -7685,12 +7728,12 @@
 		84BAA29A0E92A81A00E19946 /* SIS3300 */ = {
 			isa = PBXGroup;
 			children = (
-				84BAA29B0E92A81A00E19946 /* ORSIS3300Controller.h */,
 				84BAA29C0E92A81A00E19946 /* ORSIS3300Controller.m */,
 				84BAA29D0E92A81A00E19946 /* ORSIS3300Decoders.h */,
 				84BAA29E0E92A81A00E19946 /* ORSIS3300Decoders.m */,
 				84BAA29F0E92A81A00E19946 /* ORSIS3300Model.h */,
 				84BAA2A00E92A81A00E19946 /* ORSIS3300Model.m */,
+				84BAA29B0E92A81A00E19946 /* ORSIS3300Controller.h */,
 				84BAA2A10E92A81A00E19946 /* SIS3300.nib */,
 				84BAA2A20E92A81A00E19946 /* SIS3300Card.gif */,
 			);
@@ -8745,7 +8788,7 @@
 		CE68866C0D0CE0E400FA4158 /* PlugIns */ = {
 			isa = PBXGroup;
 			children = (
-				CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */,
+				84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */,
 			);
 			name = PlugIns;
 			sourceTree = "<group>";
@@ -8978,6 +9021,7 @@
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 				844445FE0E815C0D00A1440D /* XYCom200 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
+				84AFC23D1029F35E009F4139 /* VHQ224L */,
 			);
 			path = Vme;
 			sourceTree = "<group>";
@@ -9882,6 +9926,9 @@
 				84D7913D0FFA4CD000DC81D2 /* ORKeithley6487Controller.h in Headers */,
 				84D7913F0FFA4CD000DC81D2 /* ORKeithley6487Decoders.h in Headers */,
 				84D791410FFA4CD000DC81D2 /* ORKeithley6487Model.h in Headers */,
+				84AFC24D1029F35E009F4139 /* ORVHQ224LController.h in Headers */,
+				84AFC24F1029F35E009F4139 /* ORVHQ224LDecoders.h in Headers */,
+				84AFC2511029F35E009F4139 /* ORVHQ224LModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10341,7 +10388,6 @@
 				84DB0B700D6279F500BB9855 /* FilterSyntaxDefinition.plist in Resources */,
 				84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */,
 				848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */,
-				CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
 				8428ADE00D7CACD00093D35E /* HeaderExplorer.gif in Resources */,
 				8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */,
 				84FDF5290D7E1EAE003AE119 /* KatrinSLT.nib in Resources */,
@@ -10514,6 +10560,12 @@
 				84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */,
 				84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */,
 				84D79B860FFD347400DC81D2 /* leftBug.tif in Resources */,
+				84AFC24A1029F35E009F4139 /* downRamp.png in Resources */,
+				84AFC24B1029F35E009F4139 /* highVoltage.png in Resources */,
+				84AFC24C1029F35E009F4139 /* lowVoltage.png in Resources */,
+				84AFC2531029F35E009F4139 /* upRamp.png in Resources */,
+				84AFC2541029F35E009F4139 /* VHQ224L.nib in Resources */,
+				84AFC2551029F35E009F4139 /* VHQ224L.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11233,6 +11285,9 @@
 				84D7913E0FFA4CD000DC81D2 /* ORKeithley6487Controller.m in Sources */,
 				84D791400FFA4CD000DC81D2 /* ORKeithley6487Decoders.m in Sources */,
 				84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */,
+				84AFC24E1029F35E009F4139 /* ORVHQ224LController.m in Sources */,
+				84AFC2501029F35E009F4139 /* ORVHQ224LDecoders.m in Sources */,
+				84AFC2521029F35E009F4139 /* ORVHQ224LModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
