@@ -77,7 +77,6 @@
 	if(slotRange.location < 0)return NO;
 	if(slotRange.location > [containerObj maxNumberOfObjects])return NO;
 	if(slotRange.location+slotRange.length > [containerObj maxNumberOfObjects])return NO;
-	
     NSEnumerator* e = [containerObj objectEnumerator];
     id anObj;
     while(anObj = [e nextObject]){
@@ -107,7 +106,8 @@
 			NSLog(@"%@ is illegal for that object\n",[containerObj nameForSlot:aSlot]);
 			return NO;
 		}
-        if(![self slotRangeEmpty:testRange]) {
+		
+		if([self objectInSlot:aSlot] != obj && [self objectInSlot:aSlot]!=nil) {
 			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj nameForSlot:aSlot]);
 			return NO;
 		}
@@ -117,24 +117,31 @@
 
 - (void) moveSelectedObjects:(NSPoint)delta
 {
-	int deltaSlot = ((delta.x > 0) || (delta.y >0))  ? 1 : -1;
+	int direction = ((delta.x > 0) || (delta.y >0))  ? 1 : -1;
 	NSArray* sortedSelection = [[containerObj selectedObjects] sortedArrayUsingSelector:@selector(sortCompare:)];
 	id anObj;
 	NSEnumerator* e;
+	if(direction<0) e = [sortedSelection objectEnumerator];
+	else			e = [sortedSelection reverseObjectEnumerator];
+	
 	//First, can they -all- be moved?
 	BOOL moveOK = YES;
-	if(deltaSlot<0) e = [sortedSelection objectEnumerator];
-	else			e = [sortedSelection reverseObjectEnumerator];
 	while(anObj = [e nextObject]){
+		
+		int objSlot	       = [containerObj slotForObj:anObj];
+		int numSlotsNeeded = [containerObj numberSlotsNeededFor:anObj];
 		int testSlot;
-		testSlot = [containerObj slotForObj:anObj] + deltaSlot;
-		if([containerObj slot:testSlot excludedFor:anObj]){
+		if(direction == -1) testSlot = objSlot-1;
+		else			    testSlot = objSlot+numSlotsNeeded;
+		NSRange testRange  = NSMakeRange(objSlot+direction,numSlotsNeeded);
+		NSRange legalRange = [containerObj legalSlotsForObj:anObj];
+		
+		if(NSIntersectionRange(legalRange,testRange).length!=numSlotsNeeded){
 			moveOK = NO;
 			break;
 		}
-		NSRange testRange = NSMakeRange(testSlot,[containerObj numberSlotsNeededFor:anObj]);
-		NSRange legalRange = [containerObj legalSlotsForObj:anObj];
-		if(NSIntersectionRange(legalRange,testRange).length!=[containerObj numberSlotsNeededFor:anObj]){
+		
+		if([containerObj slot:testSlot excludedFor:anObj]){
 			moveOK = NO;
 			break;
 		}
@@ -147,7 +154,7 @@
 	if(moveOK){		
 		e = [sortedSelection objectEnumerator];
 		while(anObj = [e nextObject]){
-			[containerObj place:anObj intoSlot:[containerObj slotForObj:anObj]+deltaSlot];
+			[containerObj place:anObj intoSlot:[containerObj slotForObj:anObj]+direction];
 		}		
 	}
 }
