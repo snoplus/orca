@@ -191,7 +191,7 @@ followed by waveform data (n x 1024 16-bit words)
 	bool isSwapped          = ePtr->eventID >> 31; 
 	
 	[aDataSet histogram:ePtr->energy 
-			  numBins:32768 
+			  numBins:65536 //-tb- 32768 
 			  sender:self  
 			  withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
 
@@ -374,7 +374,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitrate
  
     #if 1
 	[aDataSet histogram:ePtr->hitrate 
-					  numBins:32768 
+					  numBins:65536 //-tb- 32768 
 					  sender:self  
 					  withKeys: @"FLT",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
     #endif
@@ -520,7 +520,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 	  for (i=lastEnergy[chan]+1;i<=energy;i++){
 	    [aDataSet histogramWW:i
 		              weight:ePtr->hitrate
-					  numBins:32768 
+					  numBins:65536 //-tb- 32768 
 					  sender:self  
 					  withKeys: @"FLT",@"Hitrate",crateKey,stationKey,channelKey,nil];
 	  }
@@ -719,7 +719,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
             for(j=0;j<aValue;j++){
                 //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
                 [aDataSet histogram:energy 
-                            numBins:32768 
+                            numBins:65536 //-tb- 32768  
                              sender:self  
                            withKeys: @"FLT",
                  @"Histogram - TEST+DEBUG - (energy mode units)", // use better name -tb-
