@@ -21,23 +21,25 @@
 
 @interface ORMITPulserController : OrcaObjectController
 {
-    IBOutlet NSTextField*   lockDocField;
-	IBOutlet NSButton*		shipTemperaturesButton;
-    IBOutlet NSTextField*   tempUnitsField;
-	IBOutlet NSMatrix*		degreesInKelvinMatrix;
-    IBOutlet NSButton*      lockButton;
+	//pusler variables
+	IBOutlet NSTextField*	frequencyField;
+	IBOutlet NSStepper*		frequencyStepper;
+	IBOutlet NSTextField*	dutyCycleField;
+	IBOutlet NSStepper*		dutyCycleStepper;
+	IBOutlet NSTextField*	voltageField;
+	IBOutlet NSStepper*		voltageStepper;
+	IBOutlet NSPopUpButton* clockSpeedPU;
+    IBOutlet NSButton*      loadHwButton;
+	
+	//serial port and misc fields
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
-    IBOutlet NSButton*      readTempsButton;
-    IBOutlet NSMatrix*      tempMatrix;
-    IBOutlet NSMatrix*      timeMatrix;
+    IBOutlet NSButton*      lockButton;
 }
 
 #pragma mark ***Initialization
 - (id) init;
-- (void) dealloc;
 - (void) awakeFromNib;
 
 #pragma mark ***Notifications
@@ -45,13 +47,23 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) frequencyChanged:(NSNotification*)aNote;
+- (void) dutyCycleChanged:(NSNotification*)aNote;
+- (void) voltageChanged:(NSNotification*)aNote;
+- (void) clockSpeedChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNotification;
 - (void) portStateChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
+- (IBAction) loadHWAction:(id)sender;
+- (IBAction) frequencyAction:(id)sender;
+- (IBAction) dutyCycleAction:(id)sender;
+- (IBAction) voltageAction:(id)sender;
+- (IBAction) clockSpeedAction:(id)sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
+- (IBAction) lockAction:(id) sender;
 
 @end
 

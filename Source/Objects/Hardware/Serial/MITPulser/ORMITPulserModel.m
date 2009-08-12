@@ -26,45 +26,34 @@
 #import "ORSerialPortAdditions.h"
 
 #pragma mark ***External Strings
+NSString* ORMITPulserModelFrequencyChanged	= @"ORMITPulserModelFrequencyChanged";
+NSString* ORMITPulserModelDutyCycleChanged	= @"ORMITPulserModelDutyCycleChanged";
+NSString* ORMITPulserModelVoltageChanged	= @"ORMITPulserModelVoltageChanged";
+NSString* ORMITPulserModelClockSpeedChanged = @"ORMITPulserModelClockSpeedChanged";
 NSString* ORMITPulserModelSerialPortChanged = @"ORMITPulserModelSerialPortChanged";
 NSString* ORMITPulserModelPortNameChanged   = @"ORMITPulserModelPortNameChanged";
 NSString* ORMITPulserModelPortStateChanged  = @"ORMITPulserModelPortStateChanged";
 NSString* ORMITPulserLock = @"ORMITPulserLock";
 
 @interface ORMITPulserModel (private)
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
-- (void) timeout;
-- (void) processOneCommandFromQueue;
+- (void) sendCommand:(NSString*)aCommand;
 @end
 
 @implementation ORMITPulserModel
-- (id) init
-{
-	self = [super init];
-    [self registerNotificationObservers];
-	return self;
-}
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [buffer release];
-	[cmdQueue release];
-	[lastRequest release];
     [portName release];
     if([serialPort isOpen]){
         [serialPort close];
     }
     [serialPort release];
-
 	[super dealloc];
 }
 
 - (void) setUpImage
 {
-	[self setImage:[NSImage imageNamed:@"MITPulser.tif"]];
+	[self setImage:[NSImage imageNamed:@"MITPulser"]];
 }
 
 - (void) makeMainController
@@ -77,38 +66,56 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	return @"RS232/MITPulser.html";
 }
 
-- (void) registerNotificationObservers
+#pragma mark ***Accessors
+
+- (int) frequency
 {
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    return frequency;
+}
 
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
+- (void) setFrequency:(int)aFrequency
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFrequency:frequency];
+    frequency = aFrequency;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelFrequencyChanged object:self];
+}
 
-    [notifyCenter addObserver: self
-                     selector: @selector(runStarted:)
-                         name: ORRunStartedNotification
-                       object: nil];
+- (int) dutyCycle
+{
+    return dutyCycle;
+}
+
+- (void) setDutyCycle:(int)aDutyCycle
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDutyCycle:dutyCycle];
+    dutyCycle = aDutyCycle;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelDutyCycleChanged object:self];
+}
+
+- (int) voltage
+{
+    return voltage;
+}
+
+- (void) setVoltage:(int)aVoltage
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVoltage:voltage];
     
-    [notifyCenter addObserver: self
-                     selector: @selector(runStopped:)
-                         name: ORRunStoppedNotification
-                       object: nil];
+    voltage = aVoltage;
 
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelVoltageChanged object:self];
 }
 
-
-
-- (NSString*) lastRequest
+- (int) clockSpeed
 {
-	return lastRequest;
+    return clockSpeed;
 }
 
-- (void) setLastRequest:(NSString*)aRequest
+- (void) setClockSpeed:(int)aClockSpeed
 {
-	[lastRequest autorelease];
-	lastRequest = [aRequest copy];    
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockSpeed:clockSpeed];
+    clockSpeed = aClockSpeed;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelClockSpeedChanged object:self];
 }
 
 - (BOOL) portWasOpen
@@ -186,58 +193,77 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 
 
 #pragma mark *** Commands
-- (void) addCmdToQueue:(NSString*)aCmd
+- (void) loadHardware
 {
-    if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
-		if(!lastRequest){
-			[self processOneCommandFromQueue];
-		}
+	[self sendCommand: [self clockSpeedCommand]];
+	[self sendCommand: [self voltageCommand]];
+	[self sendCommand: [self dutyCycleCommand]];
+	[self sendCommand: [self frequencyCommand]];
+}
+
+- (NSString*) clockSpeedCommand
+{
+	//the clock speed is stored as the index of the popup. convert to the proper command here
+	switch(clockSpeed){
+		case 0:  return @""; //clock speed command for index 0
+		case 1:  return @""; //clock speed command for index 1
+		case 2:  return @""; //clock speed command for index 2
+		//case n:  return @""; //clock speed command for index n
+		default: return nil;
 	}
 }
 
-- (void) readTemps
+- (NSString*) voltageCommand
 {
-
-	[self addCmdToQueue:@"CRDG? 0"];
+	return @""; //format your voltage command as an NSString here
 }
 
+- (NSString*) dutyCycleCommand
+{
+	return @""; //format your duty cycle command as an NSString here
+}
 
+- (NSString*) frequencyCommand
+{
+	return @""; //format your frequency command as an NSString here
+}
+
+#pragma mark ***Archival
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
+    [self setFrequency:	[decoder decodeIntForKey:@"frequency"]];
+    [self setDutyCycle:	[decoder decodeIntForKey:@"dutyCycle"]];
+    [self setVoltage:	[decoder decodeIntForKey:@"voltage"]];
+    [self setClockSpeed:[decoder decodeIntForKey:@"clockSpeed"]];
+    [[self undoManager] enableUndoRegistration];    
+	
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt:frequency	forKey:@"frequency"];
+    [encoder encodeInt:dutyCycle	forKey:@"dutyCycle"];
+    [encoder encodeInt:voltage		forKey:@"voltage"];
+    [encoder encodeInt:clockSpeed	forKey:@"clockSpeed"];
+}
 @end
 
 @implementation ORMITPulserModel (private)
-- (void) runStarted:(NSNotification*)aNote
+- (void) sendCommand:(NSString*)aCommand
 {
-}
-
-- (void) runStopped:(NSNotification*)aNote
-{
-}
-
-- (void) timeout
-{
-	NSLogError(@"MIT Pulser",@"command timeout",nil);
-	[self setLastRequest:nil];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
-}
-
-- (void) processOneCommandFromQueue
-{
-	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
+	if(aCommand == nil)return;
 	
-	if([aCmd rangeOfString:@"?"].location != NSNotFound){
-		[self setLastRequest:aCmd];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-	}
-	if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
-	[serialPort writeString:aCmd];
-	if(!lastRequest){
-		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];
+	int i;
+	for(i=0;i<[aCommand length];i++){
+		NSString* partToSend = [NSString stringWithFormat:@"%@\n",[aCommand substringWithRange:NSMakeRange(i,1)]]; 
+		//Joe you may have to use @"%@\r" instead....what every your device needs
+		[serialPort writeString:partToSend];
+		usleep(1000); //sleep 1 mSec
 	}
 }
-
-
 @end

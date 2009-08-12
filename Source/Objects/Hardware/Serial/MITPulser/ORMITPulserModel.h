@@ -24,39 +24,52 @@
 @interface ORMITPulserModel : OrcaObject
 {
     @private
-        NSString*       portName;
-        BOOL            portWasOpen;
-        ORSerialPort*   serialPort;
-		NSString*		lastRequest;
-		NSMutableArray* cmdQueue;
-        NSMutableString*       buffer;
-		float testValue;
+        NSString*        portName;
+        BOOL             portWasOpen;
+        ORSerialPort*    serialPort;
+	
+		int				clockSpeed;
+		int				voltage;
+		int				dutyCycle;
+		int				frequency;
 }
 
 #pragma mark ***Initialization
-
-- (id)   init;
 - (void) dealloc;
 
-- (void) registerNotificationObservers;
-
 #pragma mark ***Accessors
+- (int) frequency;
+- (void) setFrequency:(int)aFrequency;
+- (int) dutyCycle;
+- (void) setDutyCycle:(int)aDutyCycle;
+- (int) voltage;
+- (void) setVoltage:(int)aVoltage;
+- (int) clockSpeed;
+- (void) setClockSpeed:(int)aClockSpeed;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
 
 #pragma mark ***Commands
-- (void) addCmdToQueue:(NSString*)aCmd;
-- (void) readTemps;
+- (void) loadHardware;
+- (NSString*) clockSpeedCommand;
+- (NSString*) voltageCommand;
+- (NSString*) dutyCycleCommand;
+- (NSString*) frequencyCommand;
 
+#pragma mark ***Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORMITPulserModelFrequencyChanged;
+extern NSString* ORMITPulserModelDutyCycleChanged;
+extern NSString* ORMITPulserModelVoltageChanged;
+extern NSString* ORMITPulserModelClockSpeedChanged;
 extern NSString* ORMITPulserModelSerialPortChanged;
 extern NSString* ORMITPulserLock;
 extern NSString* ORMITPulserModelPortNameChanged;

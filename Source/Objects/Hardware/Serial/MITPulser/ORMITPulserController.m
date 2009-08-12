@@ -23,7 +23,6 @@
 #import "ORMITPulserModel.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
-#define __CARBONSOUND__ //temp until undated to >10.3
 #import <Carbon/Carbon.h>
 #import "ORTimeRate.h"
 
@@ -39,12 +38,6 @@
 {
 	self = [super initWithWindowNibName:@"MITPulser"];
 	return self;
-}
-
-- (void) dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super dealloc];
 }
 
 - (void) awakeFromNib
@@ -80,9 +73,25 @@
                        object : nil];
                                               
     [notifyCenter addObserver : self
-					 selector : @selector(miscAttributesChanged:)
-						 name : ORMiscAttributesChanged
-					   object : model];
+                     selector : @selector(clockSpeedChanged:)
+                         name : ORMITPulserModelClockSpeedChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(voltageChanged:)
+                         name : ORMITPulserModelVoltageChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dutyCycleChanged:)
+                         name : ORMITPulserModelDutyCycleChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(frequencyChanged:)
+                         name : ORMITPulserModelFrequencyChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -91,8 +100,31 @@
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
+	[self clockSpeedChanged:nil];
+	[self voltageChanged:nil];
+	[self dutyCycleChanged:nil];
+	[self frequencyChanged:nil];
 }
 
+- (void) frequencyChanged:(NSNotification*)aNote
+{
+	[frequencyField setIntValue: [model frequency]];
+}
+
+- (void) dutyCycleChanged:(NSNotification*)aNote
+{
+	[dutyCycleField setIntValue: [model dutyCycle]];
+}
+
+- (void) voltageChanged:(NSNotification*)aNote
+{
+	[voltageField setIntValue: [model voltage]];
+}
+
+- (void) clockSpeedChanged:(NSNotification*)aNote
+{
+	[clockSpeedPU selectItemAtIndex: [model clockSpeed]];
+}
 
 - (void) checkGlobalSecurity
 {
@@ -103,22 +135,22 @@
 
 - (void) lockChanged:(NSNotification*)aNotification
 {
-
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    //BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMITPulserLock];
     BOOL locked = [gSecurity isLocked:ORMITPulserLock];
 
     [lockButton setState: locked];
 
-    [portListPopup setEnabled:!locked];
-    [openPortButton setEnabled:!locked];
-    
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORMITPulserLock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
-
+    [portListPopup setEnabled:	!locked];
+    [openPortButton setEnabled:	!locked];
+	[frequencyField setEnabled:!lockedOrRunningMaintenance];
+	[dutyCycleField setEnabled:!lockedOrRunningMaintenance];
+	[voltageField setEnabled:!lockedOrRunningMaintenance];
+	[frequencyStepper setEnabled:!lockedOrRunningMaintenance];
+	[dutyCycleStepper setEnabled:!lockedOrRunningMaintenance];
+	[voltageStepper setEnabled:!lockedOrRunningMaintenance];
+	[clockSpeedPU setEnabled:!lockedOrRunningMaintenance];
+	[loadHwButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -165,13 +197,30 @@
     [self portStateChanged:nil];
 }
 
-
 #pragma mark ***Actions
-
-
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORMITPulserLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (void) frequencyAction:(id)sender
+{
+	[model setFrequency:[sender intValue]];	
+}
+
+- (void) dutyCycleAction:(id)sender
+{
+	[model setDutyCycle:[sender intValue]];	
+}
+
+- (void) voltageAction:(id)sender
+{
+	[model setVoltage:[sender intValue]];	
+}
+
+- (void) clockSpeedAction:(id)sender
+{
+	[model setClockSpeed:[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) portListAction:(id) sender
@@ -182,6 +231,12 @@
 - (IBAction) openPortAction:(id)sender
 {
     [model openPort:![[model serialPort] isOpen]];
+}
+
+- (IBAction) loadHWAction:(id)sender
+{
+	[self endEditing];
+    [model loadHardware];
 }
 
 @end
