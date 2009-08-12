@@ -1354,6 +1354,12 @@
 		84A1AF8D0FF3BF1000D7F946 /* ORPlotter.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A1AF8B0FF3BF1000D7F946 /* ORPlotter.m */; };
 		84A1B1890FF3CE7400D7F946 /* ApplicationSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A1B1870FF3CE7400D7F946 /* ApplicationSupport.h */; };
 		84A1B18A0FF3CE7400D7F946 /* ApplicationSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A1B1880FF3CE7400D7F946 /* ApplicationSupport.m */; };
+		84A240591032ED28002AFA0B /* MITPulser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A240531032ED28002AFA0B /* MITPulser.nib */; };
+		84A2405B1032ED28002AFA0B /* ORMITPulserController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A240551032ED28002AFA0B /* ORMITPulserController.h */; };
+		84A2405C1032ED28002AFA0B /* ORMITPulserController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A240561032ED28002AFA0B /* ORMITPulserController.m */; };
+		84A2405D1032ED28002AFA0B /* ORMITPulserModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A240571032ED28002AFA0B /* ORMITPulserModel.h */; };
+		84A2405E1032ED28002AFA0B /* ORMITPulserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A240581032ED28002AFA0B /* ORMITPulserModel.m */; };
+		84A240DA1032F8B9002AFA0B /* MITPulser.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84A240D91032F8B9002AFA0B /* MITPulser.tif */; };
 		84A30C560A1E44D400DAE618 /* HPPulser33220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A30C530A1E44D400DAE618 /* HPPulser33220.nib */; };
 		84A30C570A1E44D400DAE618 /* ORPulser33220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */; };
 		84A30C580A1E44D400DAE618 /* ORPulser33220Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */; };
@@ -1929,6 +1935,14 @@
 		84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB630AE5569100A5AA4C /* my_alloc.h */; };
 		84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */; };
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
+		84FA638C102B041800B426A6 /* ORSIS3350Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA6384102B041800B426A6 /* ORSIS3350Controller.h */; };
+		84FA638D102B041800B426A6 /* ORSIS3350Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FA6385102B041800B426A6 /* ORSIS3350Controller.m */; };
+		84FA638E102B041800B426A6 /* ORSIS3350Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA6386102B041800B426A6 /* ORSIS3350Decoders.h */; };
+		84FA638F102B041800B426A6 /* ORSIS3350Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FA6387102B041800B426A6 /* ORSIS3350Decoders.m */; };
+		84FA6390102B041800B426A6 /* ORSIS3350Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FA6388102B041800B426A6 /* ORSIS3350Model.h */; };
+		84FA6392102B041800B426A6 /* SIS3350.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FA638A102B041800B426A6 /* SIS3350.nib */; };
+		84FA6393102B041800B426A6 /* SIS3350Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FA638B102B041800B426A6 /* SIS3350Card.gif */; };
+		84FA6619102B6E2300B426A6 /* ORSIS3350Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FA6618102B6E2300B426A6 /* ORSIS3350Model.m */; };
 		84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */; };
 		84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */; };
 		84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FAD2AF0EE46AF500746B91 /* RunScript.gif */; };
@@ -3308,6 +3322,12 @@
 		84A1AF8B0FF3BF1000D7F946 /* ORPlotter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPlotter.m; sourceTree = "<group>"; };
 		84A1B1870FF3CE7400D7F946 /* ApplicationSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationSupport.h; sourceTree = "<group>"; };
 		84A1B1880FF3CE7400D7F946 /* ApplicationSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationSupport.m; sourceTree = "<group>"; };
+		84A240531032ED28002AFA0B /* MITPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MITPulser.nib; path = Source/Objects/Hardware/Serial/MITPulser/MITPulser.nib; sourceTree = SOURCE_ROOT; };
+		84A240551032ED28002AFA0B /* ORMITPulserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMITPulserController.h; path = Source/Objects/Hardware/Serial/MITPulser/ORMITPulserController.h; sourceTree = SOURCE_ROOT; };
+		84A240561032ED28002AFA0B /* ORMITPulserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMITPulserController.m; path = Source/Objects/Hardware/Serial/MITPulser/ORMITPulserController.m; sourceTree = SOURCE_ROOT; };
+		84A240571032ED28002AFA0B /* ORMITPulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMITPulserModel.h; path = Source/Objects/Hardware/Serial/MITPulser/ORMITPulserModel.h; sourceTree = SOURCE_ROOT; };
+		84A240581032ED28002AFA0B /* ORMITPulserModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMITPulserModel.m; path = Source/Objects/Hardware/Serial/MITPulser/ORMITPulserModel.m; sourceTree = SOURCE_ROOT; };
+		84A240D91032F8B9002AFA0B /* MITPulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MITPulser.tif; path = Source/Objects/Hardware/Serial/MITPulser/MITPulser.tif; sourceTree = SOURCE_ROOT; };
 		84A30C530A1E44D400DAE618 /* HPPulser33220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser33220.nib; path = Source/Objects/Hardware/GPIB/Pulser33220/HPPulser33220.nib; sourceTree = SOURCE_ROOT; };
 		84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulser33220Controller.h; sourceTree = "<group>"; };
 		84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulser33220Controller.m; sourceTree = "<group>"; };
@@ -4004,6 +4024,14 @@
 		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
 		84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeReadWriteCommand.h; sourceTree = "<group>"; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
+		84FA6384102B041800B426A6 /* ORSIS3350Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3350Controller.h; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Controller.h; sourceTree = SOURCE_ROOT; };
+		84FA6385102B041800B426A6 /* ORSIS3350Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3350Controller.m; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Controller.m; sourceTree = SOURCE_ROOT; };
+		84FA6386102B041800B426A6 /* ORSIS3350Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3350Decoders.h; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Decoders.h; sourceTree = SOURCE_ROOT; };
+		84FA6387102B041800B426A6 /* ORSIS3350Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3350Decoders.m; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Decoders.m; sourceTree = SOURCE_ROOT; };
+		84FA6388102B041800B426A6 /* ORSIS3350Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3350Model.h; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Model.h; sourceTree = SOURCE_ROOT; };
+		84FA638A102B041800B426A6 /* SIS3350.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SIS3350.nib; path = Source/Objects/Hardware/Vme/SIS3350/SIS3350.nib; sourceTree = SOURCE_ROOT; };
+		84FA638B102B041800B426A6 /* SIS3350Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3350Card.gif; path = Source/Objects/Hardware/Vme/SIS3350/SIS3350Card.gif; sourceTree = SOURCE_ROOT; };
+		84FA6618102B6E2300B426A6 /* ORSIS3350Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3350Model.m; path = Source/Objects/Hardware/Vme/SIS3350/ORSIS3350Model.m; sourceTree = SOURCE_ROOT; };
 		84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunScriptModel.h; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptModel.h; sourceTree = SOURCE_ROOT; };
 		84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunScriptModel.m; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptModel.m; sourceTree = SOURCE_ROOT; };
 		84FAD2AF0EE46AF500746B91 /* RunScript.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = RunScript.gif; path = Source/Objects/Control/RunControl/RunScripts/RunScript.gif; sourceTree = SOURCE_ROOT; };
@@ -5859,6 +5887,7 @@
 				84B28D340F4C63A000E2B056 /* LakeShore210 */,
 				84B28D830F4C66BE00E2B056 /* VXM */,
 				84D258590FA7340B00626276 /* MotionNode */,
+				84A240521032ED28002AFA0B /* MITPulser */,
 			);
 			name = Serial;
 			path = Source/Objects/Hardware/Serial;
@@ -7008,6 +7037,20 @@
 			);
 			name = PlotPublisher;
 			path = "Source/Objects/Misc Objects/Views/PlotPublisher";
+			sourceTree = SOURCE_ROOT;
+		};
+		84A240521032ED28002AFA0B /* MITPulser */ = {
+			isa = PBXGroup;
+			children = (
+				84A240531032ED28002AFA0B /* MITPulser.nib */,
+				84A240D91032F8B9002AFA0B /* MITPulser.tif */,
+				84A240551032ED28002AFA0B /* ORMITPulserController.h */,
+				84A240561032ED28002AFA0B /* ORMITPulserController.m */,
+				84A240571032ED28002AFA0B /* ORMITPulserModel.h */,
+				84A240581032ED28002AFA0B /* ORMITPulserModel.m */,
+			);
+			name = MITPulser;
+			path = Source/Objects/Hardware/Serial/MITPulser;
 			sourceTree = SOURCE_ROOT;
 		};
 		84A4E8220C187A3E00CBC222 /* IP220 */ = {
@@ -8622,6 +8665,22 @@
 			path = "Source/Objects/Misc Objects/Workers";
 			sourceTree = SOURCE_ROOT;
 		};
+		84FA6383102B041800B426A6 /* SIS3350 */ = {
+			isa = PBXGroup;
+			children = (
+				84FA6618102B6E2300B426A6 /* ORSIS3350Model.m */,
+				84FA6388102B041800B426A6 /* ORSIS3350Model.h */,
+				84FA6384102B041800B426A6 /* ORSIS3350Controller.h */,
+				84FA6385102B041800B426A6 /* ORSIS3350Controller.m */,
+				84FA6386102B041800B426A6 /* ORSIS3350Decoders.h */,
+				84FA6387102B041800B426A6 /* ORSIS3350Decoders.m */,
+				84FA638A102B041800B426A6 /* SIS3350.nib */,
+				84FA638B102B041800B426A6 /* SIS3350Card.gif */,
+			);
+			name = SIS3350;
+			path = Source/Objects/Hardware/Vme/SIS3350;
+			sourceTree = SOURCE_ROOT;
+		};
 		84FAD2AA0EE46AF500746B91 /* RunScripts */ = {
 			isa = PBXGroup;
 			children = (
@@ -9021,6 +9080,7 @@
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 				844445FE0E815C0D00A1440D /* XYCom200 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
+				84FA6383102B041800B426A6 /* SIS3350 */,
 				84AFC23D1029F35E009F4139 /* VHQ224L */,
 			);
 			path = Vme;
@@ -9929,6 +9989,11 @@
 				84AFC24D1029F35E009F4139 /* ORVHQ224LController.h in Headers */,
 				84AFC24F1029F35E009F4139 /* ORVHQ224LDecoders.h in Headers */,
 				84AFC2511029F35E009F4139 /* ORVHQ224LModel.h in Headers */,
+				84FA638C102B041800B426A6 /* ORSIS3350Controller.h in Headers */,
+				84FA638E102B041800B426A6 /* ORSIS3350Decoders.h in Headers */,
+				84FA6390102B041800B426A6 /* ORSIS3350Model.h in Headers */,
+				84A2405B1032ED28002AFA0B /* ORMITPulserController.h in Headers */,
+				84A2405D1032ED28002AFA0B /* ORMITPulserModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10566,6 +10631,10 @@
 				84AFC2531029F35E009F4139 /* upRamp.png in Resources */,
 				84AFC2541029F35E009F4139 /* VHQ224L.nib in Resources */,
 				84AFC2551029F35E009F4139 /* VHQ224L.tif in Resources */,
+				84FA6392102B041800B426A6 /* SIS3350.nib in Resources */,
+				84FA6393102B041800B426A6 /* SIS3350Card.gif in Resources */,
+				84A240591032ED28002AFA0B /* MITPulser.nib in Resources */,
+				84A240DA1032F8B9002AFA0B /* MITPulser.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11288,6 +11357,11 @@
 				84AFC24E1029F35E009F4139 /* ORVHQ224LController.m in Sources */,
 				84AFC2501029F35E009F4139 /* ORVHQ224LDecoders.m in Sources */,
 				84AFC2521029F35E009F4139 /* ORVHQ224LModel.m in Sources */,
+				84FA638D102B041800B426A6 /* ORSIS3350Controller.m in Sources */,
+				84FA638F102B041800B426A6 /* ORSIS3350Decoders.m in Sources */,
+				84FA6619102B6E2300B426A6 /* ORSIS3350Model.m in Sources */,
+				84A2405C1032ED28002AFA0B /* ORMITPulserController.m in Sources */,
+				84A2405E1032ED28002AFA0B /* ORMITPulserModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
