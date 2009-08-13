@@ -77,6 +77,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFrequency:frequency];
     frequency = aFrequency;
+	if (frequency > clockSpeedValue) frequency = clockSpeedValue;     //  You can only be as fast as your clock
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelFrequencyChanged object:self];
 }
 
@@ -89,6 +90,8 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDutyCycle:dutyCycle];
     dutyCycle = aDutyCycle;
+	if (dutyCycle <= 0)  dutyCycle = 0;
+	if (dutyCycle >= 100)  dutyCycle = 100;	 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelDutyCycleChanged object:self];
 }
 
@@ -115,6 +118,9 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setClockSpeed:clockSpeed];
     clockSpeed = aClockSpeed;
+	clockSpeedValue = 1e+03;
+	if (aClockSpeed == 1) clockSpeedValue = 1e+06;
+	if (aClockSpeed == 2) clockSpeedValue = 1e+09;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelClockSpeedChanged object:self];
 }
 
@@ -180,9 +186,9 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     if(state) {
 		[serialPort setSpeed:9600];
-		[serialPort setParityOdd];
+		[serialPort setParityNone];
 		[serialPort setStopBits2:1];
-		[serialPort setDataBits:7];
+		[serialPort setDataBits:8];
         [serialPort open];
     }
     else      [serialPort close];
@@ -195,7 +201,6 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 #pragma mark *** Commands
 - (void) loadHardware
 {
-	[self sendCommand: [self clockSpeedCommand]];
 	[self sendCommand: [self voltageCommand]];
 	[self sendCommand: [self dutyCycleCommand]];
 	[self sendCommand: [self frequencyCommand]];
@@ -205,9 +210,9 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
 	//the clock speed is stored as the index of the popup. convert to the proper command here
 	switch(clockSpeed){
-		case 0:  return @""; //clock speed command for index 0
-		case 1:  return @""; //clock speed command for index 1
-		case 2:  return @""; //clock speed command for index 2
+		case 0:  return @"1000"; //clock speed command for index 0
+		case 1:  return @"1000000"; //clock speed command for index 1
+		case 2:  return @"1000000000"; //clock speed command for index 2
 		//case n:  return @""; //clock speed command for index n
 		default: return nil;
 	}
@@ -215,17 +220,22 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 
 - (NSString*) voltageCommand
 {
-	return @""; //format your voltage command as an NSString here
+	int voltageTicks = voltage;
+	return @"I"; //format your voltage command as an NSString here
 }
 
 - (NSString*) dutyCycleCommand
 {
-	return @""; //format your duty cycle command as an NSString here
+	int dutyTicks = 0;
+	if ((dutyCycle > 0) && (dutyCycle < 100)) dutyTicks = (500 / dutyCycle);
+	return @"D"; //format your duty cycle command as an NSString here
 }
 
 - (NSString*) frequencyCommand
 {
-	return @""; //format your frequency command as an NSString here
+	int frequencyTicks = 0;
+	if (frequency > 0) frequencyTicks = ((1/frequency)/(clockSpeedValue)/2);
+	return @"P"; //format your frequency command as an NSString here
 }
 
 #pragma mark ***Archival
@@ -234,10 +244,10 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setClockSpeed:[decoder decodeIntForKey:@"clockSpeed"]];
     [self setFrequency:	[decoder decodeIntForKey:@"frequency"]];
     [self setDutyCycle:	[decoder decodeIntForKey:@"dutyCycle"]];
     [self setVoltage:	[decoder decodeIntForKey:@"voltage"]];
-    [self setClockSpeed:[decoder decodeIntForKey:@"clockSpeed"]];
     [[self undoManager] enableUndoRegistration];    
 	
     return self;
@@ -246,10 +256,10 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:clockSpeed	forKey:@"clockSpeed"];
     [encoder encodeInt:frequency	forKey:@"frequency"];
     [encoder encodeInt:dutyCycle	forKey:@"dutyCycle"];
     [encoder encodeInt:voltage		forKey:@"voltage"];
-    [encoder encodeInt:clockSpeed	forKey:@"clockSpeed"];
 }
 @end
 

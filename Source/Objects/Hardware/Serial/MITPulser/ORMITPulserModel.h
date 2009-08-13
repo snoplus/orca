@@ -29,6 +29,7 @@
         ORSerialPort*    serialPort;
 	
 		int				clockSpeed;
+		int             clockSpeedValue;
 		int				voltage;
 		int				dutyCycle;
 		int				frequency;
