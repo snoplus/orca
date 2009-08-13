@@ -246,21 +246,21 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
 	int voltageBase = 10.;
 	int voltageTicks = voltageBase/(voltage/1000.);    
-	return [@"I" stringByAppendingFormat:@"%d\n",voltageTicks];;
+	return [@"I" stringByAppendingFormat:@"%x\n",voltageTicks];;
 }
 
 - (NSString*) dutyCycleCommand
 {
 	int dutyTicks = 0;
 	if ((dutyCycle > 0) && (dutyCycle < 100)) dutyTicks = (500 / dutyCycle);
-	return [@"D" stringByAppendingFormat:@"%d\n",dutyTicks];
+	return [@"D" stringByAppendingFormat:@"%x\n",dutyTicks];
 }
 
 - (NSString*) frequencyCommand
 {
 	int frequencyTicks = 0;
 	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
-	return  [@"P" stringByAppendingFormat:@"%d\n",frequencyTicks];
+	return  [@"P" stringByAppendingFormat:@"%x\n",frequencyTicks];
 }
 
 #pragma mark ***Archival
