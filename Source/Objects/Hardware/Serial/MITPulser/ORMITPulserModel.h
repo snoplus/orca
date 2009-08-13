@@ -29,7 +29,6 @@
         ORSerialPort*    serialPort;
 	
 		int				clockSpeed;
-		int             clockSpeedValue;
 		int				voltage;
 		int				dutyCycle;
 		int				frequency;
@@ -54,10 +53,11 @@
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
+- (void) setPower:(BOOL)state;
+- (float) actualClockSpeed;
 
 #pragma mark ***Commands
 - (void) loadHardware;
-- (NSString*) clockSpeedCommand;
 - (NSString*) voltageCommand;
 - (NSString*) dutyCycleCommand;
 - (NSString*) frequencyCommand;

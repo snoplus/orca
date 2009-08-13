@@ -77,7 +77,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFrequency:frequency];
     frequency = aFrequency;
-	if (frequency > clockSpeedValue) frequency = clockSpeedValue;     //  You can only be as fast as your clock
+	if (frequency > [self actualClockSpeed]) frequency = [self actualClockSpeed];     //  You can only be as fast as your clock
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelFrequencyChanged object:self];
 }
 
@@ -117,11 +117,18 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void) setClockSpeed:(int)aClockSpeed
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setClockSpeed:clockSpeed];
-    clockSpeed = aClockSpeed;
-	clockSpeedValue = 1e+03;
-	if (aClockSpeed == 1) clockSpeedValue = 1e+06;
-	if (aClockSpeed == 2) clockSpeedValue = 1e+09;
+	clockSpeed = aClockSpeed;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelClockSpeedChanged object:self];
+}
+
+- (float) actualClockSpeed
+{
+	switch ([self clockSpeed]){
+		case 0: 
+		default:  return 1e+03;
+		case 1:   return 1e+06;
+		case 2:   return 1e+09;
+	}
 }
 
 - (BOOL) portWasOpen
@@ -197,45 +204,61 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     
 }
 
+//put our parameters into any run header
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+    [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
+		
+    [objDictionary setObject:[NSNumber numberWithInt:clockSpeed]	forKey:@"clockSpeed"];
+    [objDictionary setObject:[NSNumber numberWithInt:voltage]		forKey:@"voltage"];
+    [objDictionary setObject:[NSNumber numberWithInt:dutyCycle]		forKey:@"dutyCycle"];
+    [objDictionary setObject:[NSNumber numberWithInt:frequency]		forKey:@"frequency"];
+	
+	[dictionary setObject:objDictionary forKey:[self identifier]];
+	return objDictionary;
+}
 
 #pragma mark *** Commands
 - (void) loadHardware
 {
+	//option 1 -- send one by one
 	[self sendCommand: [self voltageCommand]];
 	[self sendCommand: [self dutyCycleCommand]];
 	[self sendCommand: [self frequencyCommand]];
+	
+	//option 2 -- append all once
+	//NSString* bigCommand = [[NSString alloc] initWithFormat:@"%@%@%@",[self voltageCommand],[self dutyCycleCommand],[self frequencyCommand]];
+	//[self sendCommand: bigCommand];
+	//[bigCommand release];
 }
 
-- (NSString*) clockSpeedCommand
+- (void) setPower:(BOOL)state
 {
-	//the clock speed is stored as the index of the popup. convert to the proper command here
-	switch(clockSpeed){
-		case 0:  return @"1000"; //clock speed command for index 0
-		case 1:  return @"1000000"; //clock speed command for index 1
-		case 2:  return @"1000000000"; //clock speed command for index 2
-		//case n:  return @""; //clock speed command for index n
-		default: return nil;
-	}
+	//For the future...
+	//NSString* powerCommand;
+	//if(state == YES)	powerCommand = @"X0"; //format the on command
+	//else				powerCommand = @"X1"; //format the off command
+	//[self sendCommand: powerCommand];
 }
 
 - (NSString*) voltageCommand
 {
-	int voltageTicks = voltage;
-	return @"I"; //format your voltage command as an NSString here
+	return [@"I" stringByAppendingFormat:@"%d",voltage];;
 }
 
 - (NSString*) dutyCycleCommand
 {
 	int dutyTicks = 0;
 	if ((dutyCycle > 0) && (dutyCycle < 100)) dutyTicks = (500 / dutyCycle);
-	return @"D"; //format your duty cycle command as an NSString here
+	return [@"D" stringByAppendingFormat:@"%d",dutyTicks];
 }
 
 - (NSString*) frequencyCommand
 {
 	int frequencyTicks = 0;
-	if (frequency > 0) frequencyTicks = ((1/frequency)/(clockSpeedValue)/2);
-	return @"P"; //format your frequency command as an NSString here
+	if (frequency > 0) frequencyTicks = ((1/frequency)/([self actualClockSpeed])/2);
+	return  [@"P" stringByAppendingFormat:@"%d",frequencyTicks];
 }
 
 #pragma mark ***Archival
@@ -271,7 +294,6 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	int i;
 	for(i=0;i<[aCommand length];i++){
 		NSString* partToSend = [NSString stringWithFormat:@"%@\n",[aCommand substringWithRange:NSMakeRange(i,1)]]; 
-		//Joe you may have to use @"%@\r" instead....what every your device needs
 		[serialPort writeString:partToSend];
 		usleep(1000); //sleep 1 mSec
 	}

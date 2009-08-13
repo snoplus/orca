@@ -30,6 +30,8 @@
 	IBOutlet NSStepper*		voltageStepper;
 	IBOutlet NSPopUpButton* clockSpeedPU;
     IBOutlet NSButton*      loadHwButton;
+    IBOutlet NSButton*      onButton;
+    IBOutlet NSButton*      offButton;
 	
 	//serial port and misc fields
     IBOutlet NSTextField*   portStateField;
@@ -56,6 +58,8 @@
 - (void) portStateChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
+- (IBAction) turnPowerOn:(id)sender;
+- (IBAction) turnPowerOff:(id)sender;
 - (IBAction) loadHWAction:(id)sender;
 - (IBAction) frequencyAction:(id)sender;
 - (IBAction) dutyCycleAction:(id)sender;

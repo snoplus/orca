@@ -151,6 +151,8 @@
 	[voltageStepper setEnabled:!lockedOrRunningMaintenance];
 	[clockSpeedPU setEnabled:!lockedOrRunningMaintenance];
 	[loadHwButton setEnabled:!lockedOrRunningMaintenance];
+	[onButton setEnabled:!lockedOrRunningMaintenance];
+	[offButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -178,7 +180,6 @@
         }
     }
 }
-
 
 - (void) portNameChanged:(NSNotification*)aNotification
 {
@@ -237,6 +238,18 @@
 {
 	[self endEditing];
     [model loadHardware];
+}
+
+- (IBAction) turnPowerOn:(id)sender
+{
+	[self endEditing];
+    [model setPower:YES];
+}
+
+- (IBAction) turnPowerOff:(id)sender
+{
+	[self endEditing];
+    [model setPower:NO];
 }
 
 @end
