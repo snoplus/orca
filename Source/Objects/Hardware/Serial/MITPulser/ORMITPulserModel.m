@@ -244,21 +244,23 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 
 - (NSString*) voltageCommand
 {
-	return [@"I" stringByAppendingFormat:@"%d",voltage];;
+	int voltageBase = 10.;
+	int voltageTicks = voltageBase/(voltage/1000.);    
+	return [@"I" stringByAppendingFormat:@"%d\n",voltageTicks];;
 }
 
 - (NSString*) dutyCycleCommand
 {
 	int dutyTicks = 0;
 	if ((dutyCycle > 0) && (dutyCycle < 100)) dutyTicks = (500 / dutyCycle);
-	return [@"D" stringByAppendingFormat:@"%d",dutyTicks];
+	return [@"D" stringByAppendingFormat:@"%d\n",dutyTicks];
 }
 
 - (NSString*) frequencyCommand
 {
 	int frequencyTicks = 0;
-	if (frequency > 0) frequencyTicks = ((1/frequency)/([self actualClockSpeed])/2);
-	return  [@"P" stringByAppendingFormat:@"%d",frequencyTicks];
+	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
+	return  [@"P" stringByAppendingFormat:@"%d\n",frequencyTicks];
 }
 
 #pragma mark ***Archival
@@ -293,7 +295,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	
 	int i;
 	for(i=0;i<[aCommand length];i++){
-		NSString* partToSend = [NSString stringWithFormat:@"%@\n",[aCommand substringWithRange:NSMakeRange(i,1)]]; 
+		NSString* partToSend = [NSString stringWithFormat:@"%@",[aCommand substringWithRange:NSMakeRange(i,1)]]; 
 		[serialPort writeString:partToSend];
 		usleep(1000); //sleep 1 mSec
 	}
