@@ -151,10 +151,17 @@ static unsigned long adcGainOffsets[4]={
 unsigned long rblt_data[kMaxNumberWords];
 
 @interface ORSIS3350Model (private)
+- (void) runTaskStartedRingbufferSynchMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+- (void) runTaskStartedRingbufferASynchMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+- (void) runTaskStartedDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+- (void) runTaskStartedDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+- (void) runTaskStartedDirectMemoryStartMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+- (void) runTaskStartedDirectMemoryStopMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+
 - (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket			userInfo:(id)userInfo;
 - (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+- (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
+- (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
 - (void) takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
 - (void) takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
 
@@ -1153,12 +1160,22 @@ unsigned long rblt_data[kMaxNumberWords];
     theController   = [self adapter];
 	ledOn = YES;
 	firstTime = NO;
-
-	if(!moduleID)[self readModuleID:NO];
+	switch(operationMode){
+		case kOperationRingBufferAsync:			[self runTaskStartedRingbufferASynchMode:aDataPacket		userInfo:userInfo];	break;
+		case kOperationRingBufferSync:			[self runTaskStartedRingbufferSynchMode:aDataPacket			userInfo:userInfo];	break;
+		case kOperationDirectMemoryGateAsync:	[self runTaskStartedDirectMemoryGateASyncMode:aDataPacket	userInfo:userInfo];	break;
+		case kOperationDirectMemoryGateSync:	[self runTaskStartedDirectMemoryGateSyncMode:aDataPacket	userInfo:userInfo];	break;
+		case kOperationDirectMemoryStop:		[self runTaskStartedDirectMemoryStopMode:aDataPacket		userInfo:userInfo];	break;
+		case kOperationDirectMemoryStart:		[self runTaskStartedDirectMemoryStartMode:aDataPacket		userInfo:userInfo];	break;
+	}
 	
-	[self reset];
-	[self initBoard];
+	
+	if(!moduleID)[self readModuleID:NO];
 		
+	//test....
+	[self writeSampleStartAddress:0x0];
+	[self armSamplingLogic];
+
 	isRunning = YES;
 }
 
@@ -1387,6 +1404,11 @@ unsigned long rblt_data[kMaxNumberWords];
 
 @end
 @implementation ORSIS3350Model (private)
+- (void) runTaskStartedRingbufferSynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[self reset];
+	[self initBoard];
+}
 
 - (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -1420,6 +1442,12 @@ unsigned long rblt_data[kMaxNumberWords];
 		[self armSamplingLogic];
 	}
 } 
+
+- (void) runTaskStartedRingbufferASynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[self reset];
+	[self initBoard];
+}
 
 - (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -1455,6 +1483,12 @@ unsigned long rblt_data[kMaxNumberWords];
 	
 }
 
+- (void) runTaskStartedDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[self reset];
+	[self initBoard];
+}
+
 - (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
@@ -1487,6 +1521,11 @@ unsigned long rblt_data[kMaxNumberWords];
 	}
 }
 
+- (void) runTaskStartedDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[self reset];
+	[self initBoard];
+}
 
 - (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -1518,6 +1557,11 @@ unsigned long rblt_data[kMaxNumberWords];
 		[self clearTimeStamps];
 		[self armSamplingLogic];
 	}
+}
+- (void) runTaskStartedDirectMemoryStartMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[self reset];
+	[self initBoard];
 }
 
 - (void) takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1552,6 +1596,11 @@ unsigned long rblt_data[kMaxNumberWords];
 	}
 }
 
+- (void) runTaskStartedDirectMemoryStopMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[self reset];
+	[self initBoard];
+}
 
 - (void) takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
