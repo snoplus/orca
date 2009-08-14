@@ -151,12 +151,6 @@ static unsigned long adcGainOffsets[4]={
 unsigned long rblt_data[kMaxNumberWords];
 
 @interface ORSIS3350Model (private)
-- (void) runTaskStartedRingbufferSynchMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedRingbufferASynchMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryStartMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryStopMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
 
 - (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket			userInfo:(id)userInfo;
 - (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
@@ -229,6 +223,8 @@ unsigned long rblt_data[kMaxNumberWords];
 
 - (void) setMemoryWrapLength:(long)aMemoryWrapLength
 {
+	if(aMemoryWrapLength<0)aMemoryWrapLength=0;
+	else if(aMemoryWrapLength>0xffffff)aMemoryWrapLength = 0xffffff;
     [[[self undoManager] prepareWithInvocationTarget:self] setMemoryWrapLength:memoryWrapLength];
     memoryWrapLength = aMemoryWrapLength;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelMemoryWrapLengthChanged object:self];
@@ -241,7 +237,9 @@ unsigned long rblt_data[kMaxNumberWords];
 
 - (void) setEndAddressThreshold:(int)aEndAddressThreshold
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:endAddressThreshold];
+ 	if(aEndAddressThreshold<0)aEndAddressThreshold=0;
+	else if(aEndAddressThreshold>0xffffff)aEndAddressThreshold = 0xffffff;
+   [[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:endAddressThreshold];
     endAddressThreshold = aEndAddressThreshold;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelEndAddressThresholdChanged object:self];
 }
@@ -297,8 +295,8 @@ unsigned long rblt_data[kMaxNumberWords];
 
 - (void) setGateSyncLimitLength:(int)aGateSyncLimitLength
 {
-	if(aGateSyncLimitLength<0)						aGateSyncLimitLength = 0;
-	else if(aGateSyncLimitLength > powf(2.0,25)-8)	aGateSyncLimitLength = pow(2.0,25)-8;
+	if(aGateSyncLimitLength<0)					aGateSyncLimitLength = 0;
+	else if(aGateSyncLimitLength > 0xffffff-8)	aGateSyncLimitLength = 0xffffff-8;
     [[[self undoManager] prepareWithInvocationTarget:self] setGateSyncLimitLength:gateSyncLimitLength];
     gateSyncLimitLength = aGateSyncLimitLength;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelGateSyncLimitLengthChanged object:self];
@@ -705,7 +703,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	moduleID = result >> 16;
 	unsigned short majorRev = (result >> 8) & 0xff;
 	unsigned short minorRev = result & 0xff;
-	if(verbose)NSLog(@"SIS3350 ID: %x  Firmware:%x.%x\n",moduleID,majorRev,minorRev);
+	if(verbose)NSLog(@"%@ ID: %x  Firmware:%x.%x\n",[self fullID],moduleID,majorRev,minorRev);
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelIDChanged object:self];
 }
@@ -720,7 +718,7 @@ unsigned long rblt_data[kMaxNumberWords];
 					usingAddSpace:0x01];
 	float temperature = (float) ( ((result*9)/5) / 4.0); 
 	
-	if(verbose)NSLog(@"SIS3350 Temperature:%.0f\n",temperature);
+	if(verbose)NSLog(@"%@ Temperature:%.0f\n",[self fullID], temperature);
 	return temperature;
 }
 
@@ -779,7 +777,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	//put the inverse in the top bits to turn off everything else
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
 	aMask &= ~0xcc98cc98; //just leave the reserved bits zero
-	NSLog(@"Acq Reg: 0x%08x\n",aMask);
+	NSLog(@"%@ Acq Reg: 0x%08x\n",[self fullID],aMask);
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:baseAddress + kAcquisitionControlReg
                         numToWrite:1
@@ -883,7 +881,7 @@ unsigned long rblt_data[kMaxNumberWords];
 		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) );
 		
 		if (timeout_cnt >=  max_timeout) {
-			NSLog(@"SIS3350 Failed programing the DAC offset for channel %d\n",i); 
+			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
 			continue;
 		}
 		
@@ -906,7 +904,7 @@ unsigned long rblt_data[kMaxNumberWords];
 		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) );
 		
 		if (timeout_cnt >=  max_timeout) {
-			NSLog(@"SIS3350 Failed programing the DAC offset for channel %d\n",i); 
+			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
 			continue;
 		}
 	}
@@ -998,7 +996,8 @@ unsigned long rblt_data[kMaxNumberWords];
 - (void) printReport
 {   
 	NSFont* font = [NSFont fontWithName:@"Monaco" size:12];
-	NSLogFont(font,@"----------------------------\n");
+	NSLogFont(font,@"%@:\n",[self fullID]);
+	NSLogFont(font,@"-------------------------------------------\n");
 	NSLogFont(font,@"        OFF          ON      End Address\n");
 	NSLogFont(font,@"Chan Thresholds   Thresholds  Threshold\n");
 	int i;
@@ -1020,7 +1019,7 @@ unsigned long rblt_data[kMaxNumberWords];
 		NSLogFont(font,@" %2d %8d     %8d    %8d\n",i,(aThreshold&0x0fff0000)>>16, aThreshold&0x0fff,aEndThreshold);
 	}
 	
-	NSLogFont(font,@"----------------------------\n");
+	NSLogFont(font,@"-------------------------------------------\n");
 	NSLogFont(font,@"Chan   Trigger   PulseLen  SumGap  PeakTime\n");
 	for(i =0; i < 4; i++) {
 		unsigned long aValue;
@@ -1033,7 +1032,7 @@ unsigned long rblt_data[kMaxNumberWords];
 		NSLogFont(font,@" %2d      0x%x   %8d    %4d     %4d\n",i,(aValue>>24)&0x7, (aValue>>16)&0xff,(aValue>>8)&0x1f,aValue&0x1f);
 	}
 	
-	NSLogFont(font,@"----------------------------\n");
+	NSLogFont(font,@"-------------------------------------------\n");
 	unsigned long aValue = [self readAcqRegister];
 	NSLogFont(font,@"Status Mode      : %@\n",[self operationModeName:aValue & 0x7]);
 	NSLogFont(font,@"Clock Source     : %@\n",[self clockSourceName:(aValue>>12 & 0x3)]);
@@ -1043,10 +1042,12 @@ unsigned long rblt_data[kMaxNumberWords];
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
+
 - (void) setDataId: (unsigned long) DataId
 {
     dataId = DataId;
 }
+
 - (void) setDataIds:(id)assigner
 {
     dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
@@ -1076,6 +1077,7 @@ unsigned long rblt_data[kMaxNumberWords];
 {
 	return YES;
 }
+
 - (int) numberOfChannels
 {
     return kNumSIS3350Channels;
@@ -1085,17 +1087,103 @@ unsigned long rblt_data[kMaxNumberWords];
 {
     NSMutableArray* a = [NSMutableArray array];
     ORHWWizParam* p;
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Operation Mode"];
+    [p setFormat:@"##0" upperLimit:5 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setOperationMode:) getMethod:@selector(operationMode)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Clock Source"];
+    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Ring Buffer Size"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:8 units:@""];
+    [p setSetMethod:@selector(setRingBufferLen:) getMethod:@selector(ringBufferLen)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Ring Buffer PreDelay"];
+    [p setFormat:@"##0" upperLimit:0x1fff lowerLimit:0 stepSize:2 units:@""];
+    [p setSetMethod:@selector(setRingBufferPreDelay:) getMethod:@selector(ringBufferPreDelay)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Memory Wrap Length"];
+    [p setFormat:@"##0" upperLimit:0xffffff lowerLimit:0 stepSize:8 units:@""];
+    [p setSetMethod:@selector(setMemoryWrapLength:) getMethod:@selector(memoryWrapLength)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"End Threshold Address"];
+    [p setFormat:@"##0" upperLimit:0xffffff lowerLimit:0 stepSize:8 units:@""];
+    [p setSetMethod:@selector(setEndAddressThreshold:) getMethod:@selector(endAddressThreshold)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Freq M"];
+    [p setFormat:@"##0" upperLimit:255 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setFreqM:) getMethod:@selector(freqM)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Freq N"];
+    [p setFormat:@"##0" upperLimit:5 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setFreqN:) getMethod:@selector(freqN)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Memory Gate Extend"];
+    [p setFormat:@"##0" upperLimit:248 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setGateSyncExtendLength:) getMethod:@selector(gateSyncExtendLength)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Memory Gate Length"];
+    [p setFormat:@"##0" upperLimit:0xffffff-8 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setGateSyncLimitLength:) getMethod:@selector(gateSyncLimitLength)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Memory Start Length"];
+    [p setFormat:@"##0" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setMemoryStartModeLength:) getMethod:@selector(memoryStartModeLength)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Memory Trigger Delay"];
+    [p setFormat:@"##0" upperLimit:0xffffff-8 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setMemoryTriggerDelay:) getMethod:@selector(memoryTriggerDelay)];
+    [a addObject:p];
+	
+    //[objDictionary setObject:[NSNumber numberWithLong:maxNumEvents]				forKey:@"maxNumEvents"];
+    //[objDictionary setObject:[NSNumber numberWithLong:multiEvent]				forKey:@"multiEvent"];
+    //[objDictionary setObject:[NSNumber numberWithLong:memoryStartModeLength]	forKey:@"memoryStartModeLength"];
+   // [objDictionary setObject:[NSNumber numberWithLong:memoryTriggerDelay]		forKey:@"memoryTriggerDelay"];
+   // [objDictionary setObject:[NSNumber numberWithLong:invertLemo]				forKey:@"invertLemo"];
+   //[objDictionary setObject:[NSNumber numberWithLong:triggerMask]				forKey:@"triggerMask"];
+	
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Trigger Mode"];
+    [p setFormat:@"##0" upperLimit:4 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTriggerMode:withValue:) getMethod:@selector(triggerMode:)];
+    [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
+    [p setName:@"Threshold ON"];
+    [p setFormat:@"##0" upperLimit:0x3fff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold OFF"];
-    [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3fff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setThresholdOff:withValue:) getMethod:@selector(thresholdOff:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
@@ -1114,6 +1202,27 @@ unsigned long rblt_data[kMaxNumberWords];
 	[p setCanBeRamped:YES];
     [a addObject:p];
 	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Pulse Length"];
+    [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTrigPulseLen:withValue:) getMethod:@selector(trigPulseLen:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Gap Length"];
+    [p setFormat:@"##0" upperLimit:16 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setSumG:withValue:) getMethod:@selector(sumG:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Peak Length"];
+    [p setFormat:@"##0" upperLimit:16 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Init"];
@@ -1124,34 +1233,51 @@ unsigned long rblt_data[kMaxNumberWords];
 }
 
 
-- (NSArray*) wizardSelections
-{
-    NSMutableArray* a = [NSMutableArray array];
-    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORVmeCrateModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"ORSIS3350Model"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"ORSIS3350Model"]];
-    return a;
-}
-
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
-	if([param isEqualToString:@"Threshold"])	return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
-	if([param isEqualToString:@"ThresholdOff"])	return [[cardDictionary objectForKey:@"thresholdOffs"] objectAtIndex:aChannel];
-	if([param isEqualToString:@"Gain"])	return [[cardDictionary objectForKey:@"gains"] objectAtIndex:aChannel];
-	if([param isEqualToString:@"Dac Value"])	return [[cardDictionary objectForKey:@"dacValue"] objectAtIndex:aChannel];
+	if(     [param isEqualToString:@"Threshold ON"])	return [[cardDictionary objectForKey:@"thresholds"]		objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Threshold OFF"])	return [[cardDictionary objectForKey:@"thresholdOffs"]	objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Gain"])			return [[cardDictionary objectForKey:@"gains"]			objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Dac Value"])		return [[cardDictionary objectForKey:@"dacValues"]		objectAtIndex:aChannel];
+	else if([param isEqualToString:@"Pulse Length"])	return [[cardDictionary objectForKey:@"trigPulseLens"]	objectAtIndex:aChannel];
+	else if([param isEqualToString:@"Gap Length"])		return [[cardDictionary objectForKey:@"sumGs"]			objectAtIndex:aChannel];
+	else if([param isEqualToString:@"Peak Length"])		return [[cardDictionary objectForKey:@"peakingTimes"]	objectAtIndex:aChannel];
+	else if([param isEqualToString:@"Trigger Mode"])	return [[cardDictionary objectForKey:@"triggerModes"]	objectAtIndex:aChannel];
+	else if([param isEqualToString:@"Operation Mode"])	return [cardDictionary objectForKey:@"operationMode"];
+	else if([param isEqualToString:@"Clock Source"])	return [cardDictionary objectForKey:@"clockSource"];
+	else if([param isEqualToString:@"Ring Buffer Length"])		return [cardDictionary objectForKey:@"ringBufferLen"];
+	else if([param isEqualToString:@"Ring Buffer preDelay"])	return [cardDictionary objectForKey:@"ringBufferPreDelay"];
+	else if([param isEqualToString:@"Memory Wrap Length"])		return [cardDictionary objectForKey:@"memoryWrapLength"];
+	else if([param isEqualToString:@"End Threshold Address"])	return [cardDictionary objectForKey:@"endAddressThreshold"];
+	else if([param isEqualToString:@"Freq M"])					return [cardDictionary objectForKey:@"freqM"];
+	else if([param isEqualToString:@"Freq N"])					return [cardDictionary objectForKey:@"freqN"];
+	else if([param isEqualToString:@"Memory Gate Extend"])		return [cardDictionary objectForKey:@"gateSyncExtendLength"];
+	else if([param isEqualToString:@"Memory Gate Length"])		return [cardDictionary objectForKey:@"gateSyncLimitLength"];
+	else if([param isEqualToString:@"Memory Start Length"])		return [cardDictionary objectForKey:@"memoryStartModeLength"];
+	else if([param isEqualToString:@"Memory Trigger Delay"])	return [cardDictionary objectForKey:@"memoryTriggerDelay"];
+		
+	
     else return nil;
 }
 
+- (NSArray*) wizardSelections
+{
+    NSMutableArray* a = [NSMutableArray array];
+    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate"   className:@"ORVmeCrateModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel    name:@"Card"    className:@"ORSIS3350Model"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel   name:@"Channel" className:@"ORSIS3350Model"]];
+    return a;
+}
+
+#pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
     
-    //----------------------------------------------------------------------------------------
     // first add our description to the data description
-    
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSIS3350Model"];    
         
     [self startRates];
@@ -1160,29 +1286,15 @@ unsigned long rblt_data[kMaxNumberWords];
     theController   = [self adapter];
 	ledOn = YES;
 	firstTime = NO;
-	switch(operationMode){
-		case kOperationRingBufferAsync:			[self runTaskStartedRingbufferASynchMode:aDataPacket		userInfo:userInfo];	break;
-		case kOperationRingBufferSync:			[self runTaskStartedRingbufferSynchMode:aDataPacket			userInfo:userInfo];	break;
-		case kOperationDirectMemoryGateAsync:	[self runTaskStartedDirectMemoryGateASyncMode:aDataPacket	userInfo:userInfo];	break;
-		case kOperationDirectMemoryGateSync:	[self runTaskStartedDirectMemoryGateSyncMode:aDataPacket	userInfo:userInfo];	break;
-		case kOperationDirectMemoryStop:		[self runTaskStartedDirectMemoryStopMode:aDataPacket		userInfo:userInfo];	break;
-		case kOperationDirectMemoryStart:		[self runTaskStartedDirectMemoryStartMode:aDataPacket		userInfo:userInfo];	break;
-	}
 	
+	[self reset];
+	[self initBoard];
 	
 	if(!moduleID)[self readModuleID:NO];
-		
-	//test....
-	[self writeSampleStartAddress:0x0];
-	[self armSamplingLogic];
 
 	isRunning = YES;
 }
 
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card
-//**************************************************************************************
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {	
@@ -1216,7 +1328,7 @@ unsigned long rblt_data[kMaxNumberWords];
 {
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id				= kSIS3350; //should be unique
-	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
+	configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
 	configStruct->card_info[index].slot						= [self slot];
 	configStruct->card_info[index].crate					= [self crateNumber];
 	configStruct->card_info[index].add_mod					= addressModifier;
@@ -1366,8 +1478,8 @@ unsigned long rblt_data[kMaxNumberWords];
     [encoder encodeInt:endAddressThreshold		forKey:@"endAddressThreshold"];
     [encoder encodeInt:ringBufferPreDelay		forKey:@"ringBufferPreDelay"];
     [encoder encodeInt:ringBufferLen			forKey:@"ringBufferLen"];
-    [encoder encodeInt:gateSyncExtendLength	forKey:@"gateSyncExtendLength"];
-    [encoder encodeInt:gateSyncLimitLength	forKey:@"gateSyncLimitLength"];
+    [encoder encodeInt:gateSyncExtendLength		forKey:@"gateSyncExtendLength"];
+    [encoder encodeInt:gateSyncLimitLength		forKey:@"gateSyncLimitLength"];
     [encoder encodeInt32:maxNumEvents			forKey:@"maxNumEvents"];
     [encoder encodeInt:freqN					forKey:@"freqN"];
     [encoder encodeInt:freqM					forKey:@"freqM"];
@@ -1386,30 +1498,43 @@ unsigned long rblt_data[kMaxNumberWords];
     [encoder encodeObject:sumGs					forKey:@"sumGs"];
     [encoder encodeObject:trigPulseLens			forKey:@"trigPulseLens"];
     [encoder encodeObject:triggerModes			forKey:@"triggerMode"];
-
-	[encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
-
+	
+	[encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [objDictionary setObject:thresholds			forKey:@"thresholds"];	
-    [objDictionary setObject:thresholdOffs		forKey:@"thresholdOffs"];	
-    [objDictionary setObject:thresholdOffs		forKey:@"thresholdOffs"];	
-    [objDictionary setObject:gains				forKey:@"gains"];	
-    [objDictionary setObject:dacValues			forKey:@"dacValues"];	
-    return objDictionary;
+    [objDictionary setObject:thresholds											forKey:@"thresholds"];	
+    [objDictionary setObject:thresholdOffs										forKey:@"thresholdOffs"];	
+    [objDictionary setObject:gains												forKey:@"gains"];	
+    [objDictionary setObject:dacValues											forKey:@"dacValues"];	
+    [objDictionary setObject:trigPulseLens										forKey:@"trigPulseLens"];	
+    [objDictionary setObject:peakingTimes										forKey:@"peakingTimes"];	
+    [objDictionary setObject:sumGs												forKey:@"sumGs"];	
+    [objDictionary setObject:triggerModes										forKey:@"triggerModes"];
+    [objDictionary setObject:[NSNumber numberWithLong:memoryWrapLength]			forKey:@"memoryWrapLength"];	
+    [objDictionary setObject:[NSNumber numberWithLong:endAddressThreshold]		forKey:@"endAddressThreshold"];
+    [objDictionary setObject:[NSNumber numberWithLong:ringBufferPreDelay]		forKey:@"ringBufferPreDelay"];
+    [objDictionary setObject:[NSNumber numberWithLong:ringBufferLen]			forKey:@"ringBufferLen"];
+    [objDictionary setObject:[NSNumber numberWithLong:gateSyncExtendLength]		forKey:@"gateSyncExtendLength"];
+    [objDictionary setObject:[NSNumber numberWithLong:gateSyncLimitLength]		forKey:@"gateSyncLimitLength"];
+    [objDictionary setObject:[NSNumber numberWithLong:maxNumEvents]				forKey:@"maxNumEvents"];
+    [objDictionary setObject:[NSNumber numberWithLong:freqN]					forKey:@"freqN"];
+    [objDictionary setObject:[NSNumber numberWithLong:freqM]					forKey:@"freqM"];
+    [objDictionary setObject:[NSNumber numberWithLong:memoryStartModeLength]	forKey:@"memoryStartModeLength"];
+    [objDictionary setObject:[NSNumber numberWithLong:memoryTriggerDelay]		forKey:@"memoryTriggerDelay"];
+    [objDictionary setObject:[NSNumber numberWithLong:invertLemo]				forKey:@"invertLemo"];
+    [objDictionary setObject:[NSNumber numberWithLong:multiEvent]				forKey:@"multiEvent"];
+    [objDictionary setObject:[NSNumber numberWithLong:triggerMask]				forKey:@"triggerMask"];
+    [objDictionary setObject:[NSNumber numberWithLong:clockSource]				forKey:@"clockSource"];
+    [objDictionary setObject:[NSNumber numberWithLong:operationMode]			forKey:@"operationMode"];
+	
+	return objDictionary;
 }
-
 @end
-@implementation ORSIS3350Model (private)
-- (void) runTaskStartedRingbufferSynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
 
+@implementation ORSIS3350Model (private)
 - (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
@@ -1443,12 +1568,6 @@ unsigned long rblt_data[kMaxNumberWords];
 	}
 } 
 
-- (void) runTaskStartedRingbufferASynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
-
 - (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
@@ -1480,13 +1599,6 @@ unsigned long rblt_data[kMaxNumberWords];
 		[self clearTimeStamps];
 		[self armSamplingLogic];
 	}
-	
-}
-
-- (void) runTaskStartedDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
 }
 
 - (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1521,12 +1633,6 @@ unsigned long rblt_data[kMaxNumberWords];
 	}
 }
 
-- (void) runTaskStartedDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
-
 - (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
@@ -1557,11 +1663,6 @@ unsigned long rblt_data[kMaxNumberWords];
 		[self clearTimeStamps];
 		[self armSamplingLogic];
 	}
-}
-- (void) runTaskStartedDirectMemoryStartMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
 }
 
 - (void) takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1594,12 +1695,6 @@ unsigned long rblt_data[kMaxNumberWords];
 		[self clearTimeStamps];
 		[self armSamplingLogic];
 	}
-}
-
-- (void) runTaskStartedDirectMemoryStopMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
 }
 
 - (void) takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1721,7 +1816,6 @@ unsigned long rblt_data[kMaxNumberWords];
 		else {
 			lword_stop_index = (stopAddress/2) - stopDelayCounter;
 		}
-		
 		
 		// rearange
 		if (wrapped) { // all samples are vaild
