@@ -252,7 +252,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (NSString*) dutyCycleCommand
 {
 	int dutyTicks = 0;
-	if ((dutyCycle > 0) && (dutyCycle < 100)) dutyTicks = (500 / dutyCycle);
+	if ((dutyCycle > 0) && (dutyCycle < 100)) dutyTicks = (5.00 * dutyCycle);
 	return [@"D" stringByAppendingFormat:@"%x\n",dutyTicks];
 }
 
