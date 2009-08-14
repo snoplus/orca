@@ -46,6 +46,8 @@
 	BOOL			firstTime;
 	unsigned long   dataId;
 	NSMutableArray*	triggerModes;
+	NSMutableArray* gains;
+	NSMutableArray* dacValues;
 	NSMutableArray* thresholds;
 	NSMutableArray* thresholdOffs;
 	NSMutableArray* trigPulseLens;
@@ -112,16 +114,20 @@
 - (void) setTriggerMask:(int)aTriggerMask;
 - (int) clockSource;
 - (void) setClockSource:(int)aClockSource;
+- (NSString*) clockSourceName:(int)aValue;
 - (int) operationMode;
 - (void) setOperationMode:(int)aOperationMode;
+- (NSString*) operationModeName:(int)aValue;
 - (unsigned short) moduleID;
 
 
 - (int) triggerMode:(short)chan;
 - (void) setTriggerMode:(short)channel withValue:(long)aValue;
 
-- (long) gain:(int)aChannel;		//need to be implemented
-- (long) dacValue:(int)aChannel;	//need to be implemented
+- (long) gain:(int)aChannel;
+- (void) setGain:(int)aChannel withValue:(long)aValue;
+- (long) dacValue:(int)aChannel;
+- (void) setDacValue:(int)aChannel withValue:(long)aValue;
 
 - (void) setThresholdOff:(short)chan withValue:(int)aValue;
 - (int) thresholdOff:(short)chan;
@@ -146,7 +152,6 @@
 - (unsigned long) readEventCounter;
 - (void) readModuleID:(BOOL)verbose;
 - (float) readTemperature:(BOOL)verbose;
-- (void) writeThresholds:(BOOL)verbose;
 - (void) writeAcquisitionRegister;
 - (unsigned long) readAcquisitionRegister;
 - (void) writeControlStatusRegister;
@@ -161,7 +166,6 @@
 - (unsigned long) readAcqRegister;
 - (void) writeAdcMemoryPage:(unsigned long)aPage;
 - (void) writeSampleStartAddress:(unsigned long)aValue;
-- (void) checkEventStatus;
 - (void) clearTimeStamps;
 - (void) writeGains;
 - (void) writeDacOffsets;
@@ -218,3 +222,5 @@ extern NSString* ORSIS3350ModelPeakingTimeChanged;
 extern NSString* ORSIS3350SettingsLock;
 extern NSString* ORSIS3350RateGroupChangedNotification;
 extern NSString* ORSIS3350ModelIDChanged;
+extern NSString* ORSIS3350ModelGainChanged;
+extern NSString* ORSIS3350ModelDacValueChanged;

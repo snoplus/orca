@@ -58,6 +58,8 @@
 	IBOutlet NSPopUpButton*	triggerModePU3;	
 	NSPopUpButton* triggerModePU[kNumSIS3350Channels];////arggg -- can't put popup's in a matrix for some reason
 	
+	IBOutlet NSMatrix*		gainMatrix;
+	IBOutlet NSMatrix*		dacValueMatrix;
 	IBOutlet NSMatrix*		thresholdMatrix;
 	IBOutlet NSMatrix*		thresholdOffMatrix;
 	IBOutlet NSMatrix*		trigPulseLenMatrix;
@@ -73,7 +75,6 @@
     IBOutlet NSStepper*     integrationStepper;
     IBOutlet NSTextField*   integrationText;
     IBOutlet NSTextField*   totalRateText;
-    IBOutlet NSMatrix*      enabled2Matrix;
 
     IBOutlet ORValueBar*    rate0;
     IBOutlet ORValueBar*    totalRate;
@@ -82,6 +83,14 @@
     IBOutlet ORPlotter1D*   timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
 	IBOutlet NSTextField*	moduleIDField;
+
+	//labels
+	IBOutlet NSTextField*	thresholdOnLabel;
+	IBOutlet NSTextField*	thresholdOffLabel;
+	
+    NSView *blankView;
+    NSSize settingSize;
+    NSSize rateSize;
 	
 }
 
@@ -114,6 +123,8 @@
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) triggerModeChanged:(NSNotification*)aNote;
+- (void) gainChanged:(NSNotification*)aNote;
+- (void) dacValueChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
 - (void) thresholdOffChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
@@ -144,8 +155,6 @@
 - (IBAction) triggerMaskAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) operationModeAction:(id)sender;
-- (IBAction) armSampling:(id)sender;
-- (IBAction) disarmSampling:(id)sender;
 
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
@@ -154,6 +163,8 @@
 - (IBAction) probeBoardAction:(id)sender;
 
 - (IBAction) triggerModeAction:(id)sender;
+- (IBAction) gainAction:(id)sender;
+- (IBAction) dacValueAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) thresholdOffAction:(id)sender;
 - (IBAction) trigPulseLenAction:(id)sender;
@@ -161,7 +172,6 @@
 - (IBAction) peakingTimeAction:(id)sender;
 
 - (IBAction) readTemperatureAction:(id)sender;
-- (IBAction) checkEvent:(id)sender;
 
 #pragma mark •••Data Source
 - (double)  getBarValue:(int)tag;

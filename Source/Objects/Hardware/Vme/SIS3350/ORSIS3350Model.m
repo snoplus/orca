@@ -46,6 +46,8 @@ NSString* ORSIS3350ModelOperationModeChanged	= @"ORSIS3350ModelOperationModeChan
 NSString* ORSIS3350ModelStopTriggerChanged		= @"ORSIS3350ModelStopTriggerChanged";
 NSString* ORSIS3350RateGroupChangedNotification	= @"ORSIS3350RateGroupChangedNotification";
 NSString* ORSIS3350SettingsLock					= @"ORSIS3350SettingsLock";
+NSString* ORSIS3350ModelGainChanged				= @"ORSIS3350ModelGainChanged";
+NSString* ORSIS3350ModelDacValueChanged			= @"ORSIS3350ModelDacValueChanged";
 
 NSString* ORSIS3350ModelTriggerModeChanged		= @"ORSIS3350ModelTriggerModeChanged";
 NSString* ORSIS3350ModelThresholdChanged		= @"ORSIS3350ModelThresholdChanged";
@@ -76,6 +78,7 @@ NSString* ORSIS3350ModelIDChanged				= @"ORSIS3350ModelIDChanged";
 #define kVMETriggerRegister					0x0418   /*write only*/
 #define kTimeStampClearRegister				0x041C	 /*write only*/
 
+#define kMemoryWrapLengthRegAll				0x01000004
 #define kRingbufferLengthRegisterAll		0x01000020
 #define kRingbufferPreDelayRegisterAll		0x01000024
 #define kSampleStartAddressAll				0x01000008
@@ -105,6 +108,14 @@ static unsigned long thresholdRegOffsets[4]={
 	0x03000034,
 	0x0300003C
 };
+
+static unsigned long addressThresholdRegOffsets[4]={
+	0x02000028,
+	0x03000028,
+	0x02000028,
+	0x03000028
+};
+
 static unsigned long triggerPulseRegOffsets[4]={
 	0x02000030,
 	0x02000038,
@@ -112,7 +123,7 @@ static unsigned long triggerPulseRegOffsets[4]={
 	0x03000038
 };
 
-static unsigned long actualSampleAddressOffsets[4]={
+static unsigned long nextSampleAddressOffsets[4]={
 	0x02000010,
 	0x02000014,
 	0x03000010,
@@ -137,27 +148,22 @@ static unsigned long adcGainOffsets[4]={
 #define kMaxPageSampleLength 0x800000    // 8 MSample / 16 MByte	  
 #define kMaxSampleLength	 0x8000000	 // 128 MSample / 256 MByte
 
-unsigned long rblt_data[kMaxNumberWords] ;
+unsigned long rblt_data[kMaxNumberWords];
 
 @interface ORSIS3350Model (private)
-- (void) runTaskStartedRingbufferSynchMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedRingbufferASynchMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryStartMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-- (void) runTaskStartedDirectMemoryStopMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
-
 - (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket			userInfo:(id)userInfo;
 - (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
+- (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
+- (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo;
 - (void) takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
 - (void) takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
 
 - (void) readAndShip:(ORDataPacket*)aDataPacket
-			 channel: (unsigned int) aChannel 
-  sampleStartAddress:(unsigned int) aBufferSampleStartAddress 
-		sampleLength:(unsigned int) aBufferSampleLength;
+			 channel: (int) aChannel 
+  sampleStartAddress:(unsigned long) aBufferSampleStartAddress 
+	sampleEndAddress:(unsigned long) aBufferSampleEndAddress
+			 reOrder:(BOOL)reOrder;
+- (NSData*) reOrderOneEvent:(NSData*)theSourceData;
 @end
 
 @implementation ORSIS3350Model
@@ -406,6 +412,18 @@ unsigned long rblt_data[kMaxNumberWords] ;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelClockSourceChanged object:self];
 }
 
+- (NSString*) clockSourceName:(int)aValue
+{
+	switch (aValue) {
+		case 0: return @"Freq Synthesizer";
+		case 1: return @"Internal 100MHz";
+		case 2: return @"Extern LVDS";
+		case 3: return @"External BNC";
+		default:return @"Unknown";
+	}
+}
+
+
 - (int) operationMode
 {
     return operationMode;
@@ -417,6 +435,19 @@ unsigned long rblt_data[kMaxNumberWords] ;
 		[[[self undoManager] prepareWithInvocationTarget:self] setOperationMode:operationMode];
 		operationMode = aOperationMode;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelOperationModeChanged object:self];
+	}
+}
+
+- (NSString*) operationModeName:(int)aValue
+{
+	switch (aValue) {
+		case 0: return @"Ring Buffer aSync Mode";
+		case 1: return @"Ring Buffer Sync Mode";
+		case 2: return @"Direct Memory Gate aSync Mode";
+		case 3: return @"Direct Memory Gate Sync Mode";
+		case 4: return @"Direct Memory Stop Mode";
+		case 5: return @"Direct Memory Start Mode";
+		default:return @"Unknown Mode";
 	}
 }
 
@@ -435,9 +466,7 @@ unsigned long rblt_data[kMaxNumberWords] ;
     [waveFormRateGroup release];
     waveFormRateGroup = newRateGroup;
     
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORSIS3350RateGroupChangedNotification
-	 object:self];    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350RateGroupChangedNotification object:self];    
 }
 
 - (id) rateObject:(int)channel
@@ -489,6 +518,55 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelTriggerModeChanged object:self userInfo:userInfo];	
 }
 
+- (long) gain:(int)aChan
+{
+	if(!gains){
+		gains = [[NSMutableArray arrayWithCapacity:kNumSIS3350Channels] retain];
+		int i;
+		for(i=0;i<kNumSIS3350Channels;i++)[gains addObject:[NSNumber numberWithInt:0]];
+    }
+    return [[gains objectAtIndex:aChan] intValue];
+}
+
+- (void) setGain:(int)aChan withValue:(long)aValue 
+{ 
+	if(!gains){
+		gains = [[NSMutableArray arrayWithCapacity:kNumSIS3350Channels] retain];
+		int i;
+		for(i=0;i<kNumSIS3350Channels;i++)[gains addObject:[NSNumber numberWithInt:0]];
+    }
+	if(aValue<0)aValue = 0;
+	if(aValue>0x7f)aValue = 0x7f;
+    [[[self undoManager] prepareWithInvocationTarget:self] setGain:aChan withValue:[self gain:aChan]];
+    [gains replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelGainChanged object:self userInfo:userInfo];
+}
+
+- (long) dacValue:(int)aChan
+{
+	if(!dacValues){
+		dacValues = [[NSMutableArray arrayWithCapacity:kNumSIS3350Channels] retain];
+		int i;
+		for(i=0;i<kNumSIS3350Channels;i++)[dacValues addObject:[NSNumber numberWithInt:0]];
+    }
+    return [[dacValues objectAtIndex:aChan] intValue];
+}
+
+- (void) setDacValue:(int)aChan withValue:(long)aValue 
+{ 
+	if(!dacValues){
+		dacValues = [[NSMutableArray arrayWithCapacity:kNumSIS3350Channels] retain];
+		int i;
+		for(i=0;i<kNumSIS3350Channels;i++)[dacValues addObject:[NSNumber numberWithInt:0]];
+    }
+	if(aValue<0)aValue = 0;
+	if(aValue>0xffff)aValue = 0xffff;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacValue:aChan withValue:[self dacValue:aChan]];
+    [dacValues replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3350ModelDacValueChanged object:self userInfo:userInfo];
+}
 - (int) threshold:(short)aChan
 {
 	if(!thresholds){
@@ -613,9 +691,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {	
 	unsigned long result = 0;
 	[[self adapter] readLongBlock:&result
-                         atAddress:[self baseAddress] + kModuleIDReg
+                         atAddress:baseAddress + kModuleIDReg
                         numToRead:1
-                        withAddMod:[self addressModifier]
+                        withAddMod:addressModifier
                      usingAddSpace:0x01];
 	moduleID = result >> 16;
 	unsigned short majorRev = (result >> 8) & 0xff;
@@ -629,11 +707,11 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {	
 	unsigned long result = 0;
 	[[self adapter] readLongBlock:&result
-						atAddress:[self baseAddress] + kTemperatureRegister
+						atAddress:baseAddress + kTemperatureRegister
                         numToRead:1
-					   withAddMod:[self addressModifier]
+					   withAddMod:addressModifier
 					usingAddSpace:0x01];
-	float temperature = (float) ( ((result*9)/5) / 4.0)  ; 
+	float temperature = (float) ( ((result*9)/5) / 4.0); 
 	
 	if(verbose)NSLog(@"SIS3350 Temperature:%.0f\n",temperature);
 	return temperature;
@@ -641,8 +719,6 @@ unsigned long rblt_data[kMaxNumberWords] ;
 
 - (void) initBoard
 {  
-	[self writeThresholds:NO];
-	[self writeAdcMemoryPage:0];
 	[self writeControlStatusRegister];
 	[self writeAcquisitionRegister];
 	[self writeFreqSynthRegister];
@@ -652,8 +728,14 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	[self writeValue:gateSyncExtendLength  offset:kGateSyncExtendLengthReg];
 	[self writeValue:maxNumEvents          offset:kMaxNumEventsReg];
 	[self writeRingBufferParams];
-	[self writeValue:endAddressThreshold offset:kEndAddressThresholdAllDAC];
+	[self writeValue:endAddressThreshold	offset:kEndAddressThresholdAllDAC];
+	[self writeValue:memoryWrapLength		offset:kMemoryWrapLengthRegAll];
+	
 	[self writeTriggerSetupRegisters];
+	[self writeGains];
+	[self writeDacOffsets];
+	[self writeAdcMemoryPage:0];
+
 }
 
 
@@ -668,9 +750,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
 	aMask &= ~0xffeeffee; //just leave the reserved bits zero
 	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kControlStatus
+                         atAddress:baseAddress + kControlStatus
                         numToWrite:1
-                        withAddMod:[self addressModifier]
+                        withAddMod:addressModifier
                      usingAddSpace:0x01];
 }
 
@@ -681,20 +763,20 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	
 	aMask |= (operationMode & 0x7);
 	aMask |= (multiEvent    & 0x1)<<5;  //Multi-Event Mode
-	aMask |= (triggerMask   & 0x1)<<6;  //internal trigger
-	aMask |= (triggerMask   & 0x2)<<8;  //Lemo trigger
-	aMask |= (triggerMask   & 0x4)<<9;  //LDVS trigger
+	if(triggerMask   & 0x1)aMask |= 0x1<<6; //internal trigger
+	if(triggerMask   & 0x2)aMask |= 0x1<<8; //Lemo trigger
+	if(triggerMask   & 0x4)aMask |= 0x1<<9; //LDVS trigger
 	aMask |= (clockSource   & 0x3)<<12;
 	
 	
 	//put the inverse in the top bits to turn off everything else
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
-	aMask &= ~~0xcc98cc98; //just leave the reserved bits zero
-	
+	aMask &= ~0xcc98cc98; //just leave the reserved bits zero
+	NSLog(@"Acq Reg: 0x%08x\n",aMask);
 	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
+                         atAddress:baseAddress + kAcquisitionControlReg
                         numToWrite:1
-                        withAddMod:[self addressModifier]
+                        withAddMod:addressModifier
                      usingAddSpace:0x01];
 }
 
@@ -705,9 +787,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	aMask |= (freqN & 0x3) << 9;  
 	
 	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kFrequencySynthReg
+                         atAddress:baseAddress + kFrequencySynthReg
                         numToWrite:1
-                        withAddMod:[self addressModifier]
+                        withAddMod:addressModifier
                      usingAddSpace:0x01];
 }
 
@@ -715,9 +797,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue;
 	[[self adapter] readLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
+                         atAddress:baseAddress + kAcquisitionControlReg
                         numToRead:1
-                        withAddMod:[self addressModifier]
+                        withAddMod:addressModifier
                      usingAddSpace:0x01];
 	return aValue;
 }
@@ -726,9 +808,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kEventCounterReg
+						atAddress:baseAddress + kEventCounterReg
                         numToRead:1
-					   withAddMod:[self addressModifier]
+					   withAddMod:addressModifier
 					usingAddSpace:0x01];
 	return aValue;
 }
@@ -737,22 +819,12 @@ unsigned long rblt_data[kMaxNumberWords] ;
 - (void) writeAdcMemoryPage:(unsigned long)aPage
 {
 	[[self adapter] writeLongBlock:&aPage
-						 atAddress:[self baseAddress] + kAdcMemoryPageRegister
+						 atAddress:baseAddress + kAdcMemoryPageRegister
 						numToWrite:1
-						withAddMod:[self addressModifier]
+						withAddMod:addressModifier
 					 usingAddSpace:0x01];
 }
 
-- (long) gain:(int)aChannel
-{
-	//TDB 
-	return 10;
-}
-- (long) dacValue:(int)aChannel
-{
-	//TDB 
-	return 0;
-}
 
 - (void) writeGains
 {
@@ -760,9 +832,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	for(i=0;i<kNumSIS3350Channels;i++){
 		unsigned long aGain = [self gain:i];
 		[[self adapter] writeLongBlock:&aGain
-							 atAddress:[self baseAddress] + adcGainOffsets[i]
+							 atAddress:baseAddress + adcGainOffsets[i]
 							numToWrite:1
-							withAddMod:[self addressModifier]
+							withAddMod:addressModifier
 						 usingAddSpace:0x01];
 	}	
 }
@@ -770,38 +842,38 @@ unsigned long rblt_data[kMaxNumberWords] ;
 - (void) writeDacOffsets
 {
 	unsigned long data, addr;
-	unsigned int max_timeout, timeout_cnt;
+	unsigned long max_timeout, timeout_cnt;
 	int i;
 	for(i=0;i<kNumSIS3350Channels;i++){
-		unsigned int dac_select_no = i%2;
+		unsigned long dac_select_no = i%2;
 		unsigned long module_dac_control_status_addr = baseAddress + (i<=1 ? kADC12DacControlStatus : kADC34DacControlStatus);
 		data =  [self dacValue:i];
-		addr = module_dac_control_status_addr + 4 ; // DAC_DATA
+		addr = module_dac_control_status_addr + 4; // DAC_DATA
 		[[self adapter] writeLongBlock:&data
 							 atAddress:addr
 							numToWrite:1
-							withAddMod:[self addressModifier]
+							withAddMod:addressModifier
 						 usingAddSpace:0x01];
 		
 		data =  1 + (dac_select_no << 4); // write to DAC Register
-		addr = module_dac_control_status_addr ;
+		addr = module_dac_control_status_addr;
 		[[self adapter] writeLongBlock:&data
 							 atAddress:addr
 							numToWrite:1
-							withAddMod:[self addressModifier]
+							withAddMod:addressModifier
 						 usingAddSpace:0x01];
 		
-		max_timeout = 5000 ;
-		timeout_cnt = 0 ;
-		addr = module_dac_control_status_addr  ;
+		max_timeout = 5000;
+		timeout_cnt = 0;
+		addr = module_dac_control_status_addr;
 		do {
 			[[self adapter] readLongBlock:&data
-								 atAddress:addr
+								atAddress:addr
 								numToRead:1
-								withAddMod:[self addressModifier]
-							 usingAddSpace:0x01];
+							   withAddMod:addressModifier
+							usingAddSpace:0x01];
 			timeout_cnt++;
-		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) )    ;
+		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) );
 		
 		if (timeout_cnt >=  max_timeout) {
 			NSLog(@"SIS3350 Failed programing the DAC offset for channel %d\n",i); 
@@ -809,22 +881,22 @@ unsigned long rblt_data[kMaxNumberWords] ;
 		}
 		
 		data =  2 + (dac_select_no << 4); // Load DACs 
-		addr = module_dac_control_status_addr  ;
+		addr = module_dac_control_status_addr;
 		[[self adapter] writeLongBlock:&data
 							 atAddress:addr
 							numToWrite:1
-							withAddMod:[self addressModifier]
+							withAddMod:addressModifier
 						 usingAddSpace:0x01];
-		timeout_cnt = 0 ;
-		addr = module_dac_control_status_addr  ;
+		timeout_cnt = 0;
+		addr = module_dac_control_status_addr;
 		do {
 			[[self adapter] readLongBlock:&data
 								atAddress:addr
 								numToRead:1
-							   withAddMod:[self addressModifier]
+							   withAddMod:addressModifier
 							usingAddSpace:0x01];
 			timeout_cnt++;
-		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) )    ;
+		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) );
 		
 		if (timeout_cnt >=  max_timeout) {
 			NSLog(@"SIS3350 Failed programing the DAC offset for channel %d\n",i); 
@@ -836,18 +908,18 @@ unsigned long rblt_data[kMaxNumberWords] ;
 - (void) writeSampleStartAddress:(unsigned long)aValue
 {
 	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSampleStartAddressAll
+						 atAddress:baseAddress + kSampleStartAddressAll
 						numToWrite:1
-						withAddMod:[self addressModifier]
+						withAddMod:addressModifier
 					 usingAddSpace:0x01];
 }
 
 - (void) writeValue:(unsigned long)aValue offset:(long)anOffset
 {
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + anOffset
+                         atAddress:baseAddress + anOffset
                         numToWrite:1
-                        withAddMod:[self addressModifier]
+                        withAddMod:addressModifier
                      usingAddSpace:0x01];
 }
 
@@ -855,112 +927,111 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue = ringBufferLen;
 	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kRingbufferLengthRegisterAll
+						 atAddress:baseAddress + kRingbufferLengthRegisterAll
 						numToWrite:1
-						withAddMod:[self addressModifier]
+						withAddMod:addressModifier
 					 usingAddSpace:0x01];
 	
 	aValue = ringBufferPreDelay;
 	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kRingbufferPreDelayRegisterAll
+						 atAddress:baseAddress + kRingbufferPreDelayRegisterAll
 						numToWrite:1
-						withAddMod:[self addressModifier]
+						withAddMod:addressModifier
 					 usingAddSpace:0x01];
 }
 
 
 - (void) writeTriggerSetupRegisters
 {
+	
 	int i;
 	for(i=0;i<kNumSIS3350Channels;i++){
 		unsigned long aMask = 0x0;
 		unsigned long triggerModeMask = 0x0;
 		int triggerMode = [[triggerModes objectAtIndex:i]intValue];
-		if (triggerMode == 0) {  triggerModeMask = 0 ; }
-		if (triggerMode == 1) {  triggerModeMask = kTriggerEnabled ; }
-		if (triggerMode == 2) {  triggerModeMask = kTriggerEnabled + kTriggerGtMode ; }
-		if (triggerMode == 3) {  triggerModeMask = kTriggerEnabled + kFirTriggerMode ; }
-		if (triggerMode == 4) {  triggerModeMask = kTriggerEnabled + kFirTriggerMode  + kTriggerGtMode; }
-		aMask |= triggerMode;
+		if      (triggerMode == 0) {  triggerModeMask = 0; }
+		else if (triggerMode == 1) {  triggerModeMask = kTriggerEnabled; }
+		else if (triggerMode == 2) {  triggerModeMask = kTriggerEnabled + kTriggerGtMode; }
+		else if (triggerMode == 3) {  triggerModeMask = kTriggerEnabled + kFirTriggerMode; }
+		else if (triggerMode == 4) {  triggerModeMask = kTriggerEnabled + kFirTriggerMode  + kTriggerGtMode; }
+		aMask |= triggerModeMask;
 		aMask |= ([self trigPulseLen:i] & 0xFF) << 16;
 		aMask |= ([self sumG:i]         & 0x1F) <<  8;
 		aMask |= ([self peakingTime:i]  & 0x1F) <<  0;
-		
 		[[self adapter] writeLongBlock:&aMask
-							 atAddress:[self baseAddress] + triggerPulseRegOffsets[i]
+							 atAddress:baseAddress + triggerPulseRegOffsets[i]
 							numToWrite:1
-							withAddMod:[self addressModifier]
+							withAddMod:addressModifier
 						 usingAddSpace:0x01];
 	}
+	
+	for(i = 0; i < 4; i++) {
+		unsigned long thresValue = (([[thresholdOffs objectAtIndex:i] longValue] & 0xfff) << 16) | ([[thresholds objectAtIndex:i] longValue] &0xfff);
+		[[self adapter] writeLongBlock:&thresValue
+							 atAddress:baseAddress + thresholdRegOffsets[i]
+							numToWrite:1
+							withAddMod:addressModifier
+						 usingAddSpace:0x01];
+		
+	}
+	
 }
 
 - (unsigned long) readAcquisitionRegister
 {
 	unsigned long aValue = 0x0;
 	[[self adapter] readLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
+                         atAddress:baseAddress + kAcquisitionControlReg
                         numToRead:1
-                        withAddMod:[self addressModifier]
+                        withAddMod:addressModifier
                      usingAddSpace:0x01];
 	return aValue;
 }
 
-- (void) writeThresholds:(BOOL)verbose
-{   
-	int i;
-	if(verbose) NSLog(@"Writing Thresholds:\n");
-	for(i = 0; i < 4; i++) {
-		unsigned long thresValue = (([[thresholdOffs objectAtIndex:i] longValue] & 0xfff) << 16) | ([[thresholds objectAtIndex:i] longValue] &0xfff);
-		if(verbose) NSLog(@"%d: 0x%04x \n",i, thresValue );
-		[[self adapter] writeLongBlock:&thresValue
-							 atAddress:[self baseAddress] + thresholdRegOffsets[i]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-		
-	}
-}
-
-- (void) checkEventStatus
-{
-	unsigned long acqStatus = [self readAcqRegister];
-	NSLog(@"Acq Busy: %@\n",((acqStatus&kAcqStatusBusyFlag)==kAcqStatusBusyFlag)?@"YES":@"NO");
-	NSLog(@"End Address Threshold Flag: %@\n",((acqStatus&kAcqStatusEndAddressFlag)==kAcqStatusEndAddressFlag)?@"Set":@"Clear");
-	NSLog(@"Armed: %@\n",((acqStatus&kAcqStatusArmedFlag)==kAcqStatusArmedFlag)?@"YES":@"NO");
-	int i;
-	for(i=0;i<4;i++){
-		unsigned long aValue;
-		[[self adapter] readLongBlock: &aValue
-							atAddress: [self baseAddress] + actualSampleAddressOffsets[i]
-							numToRead: 1
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];
-		
-		NSLog(@"Address Counter %d: 0x%08x\n",i,aValue );
-	}
-}
-
 - (void) printReport
 {   
-	NSLog(@"----------------------------\n");
-	NSLog(@"Chan Thresholds   Thresholds\n");
-	NSLog(@"               OFF               ON   \n");
+	NSFont* font = [NSFont fontWithName:@"Monaco" size:12];
+	NSLogFont(font,@"----------------------------\n");
+	NSLogFont(font,@"        OFF          ON      End Address\n");
+	NSLogFont(font,@"Chan Thresholds   Thresholds  Threshold\n");
 	int i;
 	for(i =0; i < 4; i++) {
 		unsigned long aThreshold;
 		[[self adapter] readLongBlock: &aThreshold
-							atAddress: [self baseAddress] + thresholdRegOffsets[i]
+							atAddress: baseAddress + thresholdRegOffsets[i]
 							numToRead: 1
-						   withAddMod: [self addressModifier]
+						   withAddMod: addressModifier
 						usingAddSpace: 0x01];
 		
-		NSLog(@"%d           0x%04x         0x%04x\n",i,(aThreshold&0x0fff0000)>>16, aThreshold&0x0fff);
+		unsigned long aEndThreshold;
+		[[self adapter] readLongBlock: &aEndThreshold
+							atAddress: baseAddress + addressThresholdRegOffsets[i]
+							numToRead: 1
+						   withAddMod: addressModifier
+						usingAddSpace: 0x01];
+		
+		NSLogFont(font,@" %2d %8d     %8d    %8d\n",i,(aThreshold&0x0fff0000)>>16, aThreshold&0x0fff,aEndThreshold);
 	}
-	NSLog(@"----------------------------\n");
-	unsigned long aValue = [self readAcqRegister];;
-	NSLog(@"Status Mode: 0x%x\n",aValue & 0x7);
-	NSLog(@"MultiEvent: 0x%x\n",(aValue>>5) & 0x1);
-	NSLog(@"Internal Triggers: 0x%x\n",(aValue>>6) & 0x1);
+	
+	NSLogFont(font,@"----------------------------\n");
+	NSLogFont(font,@"Chan   Trigger   PulseLen  SumGap  PeakTime\n");
+	for(i =0; i < 4; i++) {
+		unsigned long aValue;
+		[[self adapter] readLongBlock: &aValue
+							atAddress: baseAddress + triggerPulseRegOffsets[i]
+							numToRead: 1
+						   withAddMod: addressModifier
+						usingAddSpace: 0x01];
+				
+		NSLogFont(font,@" %2d      0x%x   %8d    %4d     %4d\n",i,(aValue>>24)&0x7, (aValue>>16)&0xff,(aValue>>8)&0x1f,aValue&0x1f);
+	}
+	
+	NSLogFont(font,@"----------------------------\n");
+	unsigned long aValue = [self readAcqRegister];
+	NSLogFont(font,@"Status Mode      : %@\n",[self operationModeName:aValue & 0x7]);
+	NSLogFont(font,@"Clock Source     : %@\n",[self clockSourceName:(aValue>>12 & 0x3)]);
+	NSLogFont(font,@"MultiEvent       : %@\n",((aValue>>5) & 0x1)   ? @"YES":@"NO");
+	NSLogFont(font,@"Internal Triggers: %@\n",((aValue>>6) & 0x1) ? @"Enabled":@"Disabled");
 }
 
 #pragma mark •••Data Taker
@@ -1014,7 +1085,28 @@ unsigned long rblt_data[kMaxNumberWords] ;
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
-		
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Threshold OFF"];
+    [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setThresholdOff:withValue:) getMethod:@selector(thresholdOff:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Gain"];
+    [p setFormat:@"##0" upperLimit:0x7f lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setGain:withValue:) getMethod:@selector(gain:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Dac Value"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setDacValue:withValue:) getMethod:@selector(dacValue:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Init"];
@@ -1037,7 +1129,10 @@ unsigned long rblt_data[kMaxNumberWords] ;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
-	if([param isEqualToString:@"Threshold"])return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+	if([param isEqualToString:@"Threshold"])	return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+	if([param isEqualToString:@"ThresholdOff"])	return [[cardDictionary objectForKey:@"thresholdOffs"] objectAtIndex:aChannel];
+	if([param isEqualToString:@"Gain"])	return [[cardDictionary objectForKey:@"gains"] objectAtIndex:aChannel];
+	if([param isEqualToString:@"Dac Value"])	return [[cardDictionary objectForKey:@"dacValue"] objectAtIndex:aChannel];
     else return nil;
 }
 
@@ -1058,24 +1153,13 @@ unsigned long rblt_data[kMaxNumberWords] ;
     theController   = [self adapter];
 	ledOn = YES;
 	firstTime = NO;
-	switch(operationMode){
-		case kOperationRingBufferAsync:			[self runTaskStartedRingbufferASynchMode:aDataPacket		userInfo:userInfo];	break;
-		case kOperationRingBufferSync:			[self runTaskStartedRingbufferSynchMode:aDataPacket			userInfo:userInfo];	break;
-		case kOperationDirectMemoryGateAsync:	[self runTaskStartedDirectMemoryGateASyncMode:aDataPacket	userInfo:userInfo];	break;
-		case kOperationDirectMemoryGateSync:	[self runTaskStartedDirectMemoryGateSyncMode:aDataPacket	userInfo:userInfo];	break;
-		case kOperationDirectMemoryStop:		[self runTaskStartedDirectMemoryStopMode:aDataPacket		userInfo:userInfo];	break;
-		case kOperationDirectMemoryStart:		[self runTaskStartedDirectMemoryStartMode:aDataPacket		userInfo:userInfo];	break;
-	}
-	
-	
-	if(!moduleID)[self readModuleID:NO];
-		
-	//test....
-	[self writeSampleStartAddress:0x0];
-	[self armSamplingLogic];
 
+	if(!moduleID)[self readModuleID:NO];
 	
-	isRunning = NO;
+	[self reset];
+	[self initBoard];
+		
+	isRunning = YES;
 }
 
 //**************************************************************************************
@@ -1118,8 +1202,8 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
 	configStruct->card_info[index].slot						= [self slot];
 	configStruct->card_info[index].crate					= [self crateNumber];
-	configStruct->card_info[index].add_mod					= [self addressModifier];
-	configStruct->card_info[index].base_add					= [self baseAddress];
+	configStruct->card_info[index].add_mod					= addressModifier;
+	configStruct->card_info[index].base_add					= baseAddress;
     //configStruct->card_info[index].deviceSpecificData[0]	= bankSwitchMode;
     //configStruct->card_info[index].deviceSpecificData[1]	= [self numberOfSamples];
 	configStruct->card_info[index].deviceSpecificData[2]	= moduleID;
@@ -1134,9 +1218,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue = 1;
 	[[self adapter] writeLongBlock: &aValue
-						atAddress: [self baseAddress] + kResetRegister
+						atAddress: baseAddress + kResetRegister
 						numToWrite: 1
-					   withAddMod: [self addressModifier]
+					   withAddMod: addressModifier
 					usingAddSpace: 0x01];
 	
 }
@@ -1145,9 +1229,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue = 1;
 	[[self adapter] writeLongBlock: &aValue
-						atAddress: [self baseAddress] + kArmSamplingLogicRegister
+						atAddress: baseAddress + kArmSamplingLogicRegister
 						numToWrite: 1
-					   withAddMod: [self addressModifier]
+					   withAddMod: addressModifier
 					usingAddSpace: 0x01];
 	
 }
@@ -1156,9 +1240,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue = 1;
 	[[self adapter] writeLongBlock: &aValue
-						atAddress: [self baseAddress] + kDisarmSamplingLogicRegister
+						atAddress: baseAddress + kDisarmSamplingLogicRegister
 						numToWrite: 1
-					   withAddMod: [self addressModifier]
+					   withAddMod: addressModifier
 					usingAddSpace: 0x01];
 	
 }
@@ -1167,9 +1251,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue = 1;
 	[[self adapter] writeLongBlock: &aValue
-						atAddress: [self baseAddress] + kVMETriggerRegister
+						atAddress: baseAddress + kVMETriggerRegister
 						numToWrite: 1
-					   withAddMod: [self addressModifier]
+					   withAddMod: addressModifier
 					usingAddSpace: 0x01];
 	
 }
@@ -1178,9 +1262,9 @@ unsigned long rblt_data[kMaxNumberWords] ;
 {
 	unsigned long aValue = 1;
 	[[self adapter] writeLongBlock: &aValue
-						atAddress: [self baseAddress] + kTimeStampClearRegister
+						atAddress: baseAddress + kTimeStampClearRegister
 						numToWrite: 1
-					   withAddMod: [self addressModifier]
+					   withAddMod: addressModifier
 					usingAddSpace: 0x01];
 	
 }
@@ -1242,6 +1326,16 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	thresholdOffs	= [[decoder decodeObjectForKey:@"thresholdOffs"] retain];
 	sumGs			= [[decoder decodeObjectForKey:@"sumGs"] retain];
 	trigPulseLens	= [[decoder decodeObjectForKey:@"trigPulseLens"] retain];
+	gains			= [[decoder decodeObjectForKey:@"gains"] retain];
+	dacValues		= [[decoder decodeObjectForKey:@"dacValues"] retain];
+
+    [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
+    if(!waveFormRateGroup){
+        [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3350Channels groupTag:0] autorelease]];
+        [waveFormRateGroup setIntegrationTime:5];
+    }
+    [waveFormRateGroup resetRates];
+    [waveFormRateGroup calcRates];
 	
     [[self undoManager] enableUndoRegistration];
     
@@ -1267,12 +1361,17 @@ unsigned long rblt_data[kMaxNumberWords] ;
     [encoder encodeInt:triggerMask				forKey:@"triggerMask"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
     [encoder encodeInt:operationMode			forKey:@"operationMode"];
+    [encoder encodeObject:gains					forKey:@"gains"];
+    [encoder encodeObject:dacValues				forKey:@"dacValues"];
     [encoder encodeObject:thresholds			forKey:@"thresholds"];
     [encoder encodeObject:thresholdOffs			forKey:@"thresholdOffs"];
     [encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
     [encoder encodeObject:sumGs					forKey:@"sumGs"];
     [encoder encodeObject:trigPulseLens			forKey:@"trigPulseLens"];
     [encoder encodeObject:triggerModes			forKey:@"triggerMode"];
+
+	[encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
+
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -1280,40 +1379,37 @@ unsigned long rblt_data[kMaxNumberWords] ;
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds			forKey:@"thresholds"];	
     [objDictionary setObject:thresholdOffs		forKey:@"thresholdOffs"];	
+    [objDictionary setObject:thresholdOffs		forKey:@"thresholdOffs"];	
+    [objDictionary setObject:gains				forKey:@"gains"];	
+    [objDictionary setObject:dacValues			forKey:@"dacValues"];	
     return objDictionary;
 }
 
 @end
 @implementation ORSIS3350Model (private)
-- (void) runTaskStartedRingbufferSynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
 
 - (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
 		unsigned long status = [self readAcqRegister];
 		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
-			
 			// Read Stop Sample (Address) Counters
-			unsigned long stop_next_sample_addr[kNumSIS3350Channels] ;
 			int i;
 			for(i=0;i<kNumSIS3350Channels;i++){
-				[[self adapter] readLongBlock:&stop_next_sample_addr[i]
-									atAddress:[self baseAddress] + actualSampleAddressOffsets[i]
+			
+				unsigned long stop_next_sample_addr = 0;
+				[[self adapter] readLongBlock:&stop_next_sample_addr
+									atAddress:baseAddress + nextSampleAddressOffsets[i]
 									numToRead:1
-								   withAddMod:[self addressModifier]
+								   withAddMod:addressModifier
 								usingAddSpace:0x01];
 			
-				if (stop_next_sample_addr[i] > (2*kMaxAdcBufferLength))  {
+				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
 					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
 					return;
 				}
-				if (stop_next_sample_addr[i] != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleLength:stop_next_sample_addr[i]];
-					 
+				if (stop_next_sample_addr != 0) {
+					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
 				}
 			}
 			[self armSamplingLogic];
@@ -1325,12 +1421,6 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	}
 } 
 
-- (void) runTaskStartedRingbufferASynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
-
 - (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
@@ -1339,20 +1429,20 @@ unsigned long rblt_data[kMaxNumberWords] ;
 			[self disarmSamplingLogic];
 			int i;
 			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr[kNumSIS3350Channels] ;
-				[[self adapter] readLongBlock:&stop_next_sample_addr[i]
-									atAddress:[self baseAddress] + actualSampleAddressOffsets[i]
+				unsigned long stop_next_sample_addr;
+				[[self adapter] readLongBlock:&stop_next_sample_addr
+									atAddress:baseAddress + nextSampleAddressOffsets[i]
 									numToRead:1
-								   withAddMod:[self addressModifier]
+								   withAddMod:addressModifier
 								usingAddSpace:0x01];
 				
-				if (stop_next_sample_addr[i] > (2*kMaxAdcBufferLength))  {
+				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
 					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
 					return;
 				}
-				//if (stop_next_sample_addr[i] != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleLength:10000];
-				//}
+				if (stop_next_sample_addr != 0) {
+					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
+				}
 			}
 			[self armSamplingLogic];
 		}
@@ -1365,12 +1455,6 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	
 }
 
-- (void) runTaskStartedDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
-
 - (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
@@ -1379,19 +1463,19 @@ unsigned long rblt_data[kMaxNumberWords] ;
 			[self disarmSamplingLogic];
 			int i;
 			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr[kNumSIS3350Channels] ;
-				[[self adapter] readLongBlock:&stop_next_sample_addr[i]
-									atAddress:[self baseAddress] + actualSampleAddressOffsets[i]
+				unsigned long stop_next_sample_addr;
+				[[self adapter] readLongBlock:&stop_next_sample_addr
+									atAddress:baseAddress + nextSampleAddressOffsets[i]
 									numToRead:1
-								   withAddMod:[self addressModifier]
+								   withAddMod:addressModifier
 								usingAddSpace:0x01];
 				
-				if (stop_next_sample_addr[i] > (2*kMaxAdcBufferLength))  {
+				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
 					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
 					return;
 				}
-				if (stop_next_sample_addr[i] != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleLength:stop_next_sample_addr[i]];
+				if (stop_next_sample_addr != 0) {
+					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
 				}
 			}
 		}
@@ -1403,33 +1487,27 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	}
 }
 
-- (void) runTaskStartedDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
 
 - (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
 		unsigned long status = [self readAcqRegister];
 		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
-			[self disarmSamplingLogic];
 			int i;
 			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr[kNumSIS3350Channels] ;
-				[[self adapter] readLongBlock:&stop_next_sample_addr[i]
-									atAddress:[self baseAddress] + actualSampleAddressOffsets[i]
+				unsigned long stop_next_sample_addr;
+				[[self adapter] readLongBlock:&stop_next_sample_addr
+									atAddress:baseAddress + nextSampleAddressOffsets[i]
 									numToRead:1
-								   withAddMod:[self addressModifier]
+								   withAddMod:addressModifier
 								usingAddSpace:0x01];
 				
-				if (stop_next_sample_addr[i] > (2*kMaxAdcBufferLength))  {
+				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
 					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
 					return;
 				}
-				if (stop_next_sample_addr[i] != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleLength:stop_next_sample_addr[i]];
+				if (stop_next_sample_addr != 0) {
+					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
 				}
 			}
 			[self armSamplingLogic];
@@ -1440,11 +1518,6 @@ unsigned long rblt_data[kMaxNumberWords] ;
 		[self clearTimeStamps];
 		[self armSamplingLogic];
 	}
-}
-- (void) runTaskStartedDirectMemoryStartMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
 }
 
 - (void) takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1454,19 +1527,19 @@ unsigned long rblt_data[kMaxNumberWords] ;
 		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
 			int i;
 			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr[kNumSIS3350Channels] ;
-				[[self adapter] readLongBlock:&stop_next_sample_addr[i]
-									atAddress:[self baseAddress] + actualSampleAddressOffsets[i]
+				unsigned long stop_next_sample_addr;
+				[[self adapter] readLongBlock:&stop_next_sample_addr
+									atAddress:baseAddress + nextSampleAddressOffsets[i]
 									numToRead:1
-								   withAddMod:[self addressModifier]
+								   withAddMod:addressModifier
 								usingAddSpace:0x01];
 				
-				if (stop_next_sample_addr[i] > (2*kMaxAdcBufferLength))  {
+				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
 					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
 					return;
 				}
-				if (stop_next_sample_addr[i] != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleLength:stop_next_sample_addr[i]];
+				if (stop_next_sample_addr != 0) {
+					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
 				}
 			}
 			[self armSamplingLogic];
@@ -1479,37 +1552,32 @@ unsigned long rblt_data[kMaxNumberWords] ;
 	}
 }
 
-- (void) runTaskStartedDirectMemoryStopMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[self reset];
-	[self initBoard];
-}
 
 - (void) takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!firstTime){
 		unsigned long status = [self readAcqRegister];
 		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
-			[self disarmSamplingLogic];
 			int i;
 			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr[kNumSIS3350Channels] ;
-				[[self adapter] readLongBlock:&stop_next_sample_addr[i]
-									atAddress:[self baseAddress] + actualSampleAddressOffsets[i]
+				unsigned long stop_next_sample_addr;
+				[[self adapter] readLongBlock:&stop_next_sample_addr
+									atAddress:baseAddress + nextSampleAddressOffsets[i]
 									numToRead:1
-								   withAddMod:[self addressModifier]
+								   withAddMod:addressModifier
 								usingAddSpace:0x01];
 				
-				if (stop_next_sample_addr[i] > (2*kMaxAdcBufferLength))  {
+				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
 					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
 					return;
 				}
-				unsigned int nof_events = [self readEventCounter];
-				unsigned int calculated_stop_next_sample_address = nof_events   * (memoryWrapLength + 8) ;
-				if (stop_next_sample_addr[i] != calculated_stop_next_sample_address) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleLength:stop_next_sample_addr[i]];
+				unsigned long nof_events = [self readEventCounter];
+				unsigned long calculated_stop_next_sample_address = nof_events   * (memoryWrapLength + 8);
+				if (stop_next_sample_addr == calculated_stop_next_sample_address) {
+					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:YES];
 				}
 			}
+			[self armSamplingLogic];
 		}
 	}
 	else {
@@ -1521,45 +1589,116 @@ unsigned long rblt_data[kMaxNumberWords] ;
 
 
 - (void) readAndShip:(ORDataPacket*)aDataPacket
-			 channel:(unsigned int) aChannel 
-			 sampleStartAddress:(unsigned int) aBufferSampleStartAddress 
-				   sampleLength:(unsigned int) aBufferSampleLength
+			 channel:(int) aChannel 
+  sampleStartAddress:(unsigned long) aBufferSampleStartAddress 
+	sampleEndAddress:(unsigned long) aBufferSampleEndLength
+			 reOrder:(BOOL)reOrder
 {
 	
-	unsigned int max_page_sample_length       = kMaxPageSampleLength ; // 0x800000 ;	  // 8 MSample , 16 MByte		VME: 0x0 - 0x0100 0000
-	unsigned int page_sample_length_mask      = max_page_sample_length - 1 ;
-	unsigned int next_event_sample_start_addr =  (aBufferSampleStartAddress &  0x07fffffc); // max 128 MSample  256MByte
-	unsigned int rest_event_sample_length     =  (aBufferSampleLength & 0xfffffffc);
-	
-	if (rest_event_sample_length  >= kMaxSampleLength) {
-		rest_event_sample_length =  kMaxSampleLength;
-	}    // 0x8000000 max 128 MSample  
-		
-	unsigned int sub_event_sample_addr      =  (next_event_sample_start_addr & page_sample_length_mask) ;
-	unsigned int sub_max_page_sample_length =  max_page_sample_length - sub_event_sample_addr ;
-	
-	unsigned int sub_event_sample_length ;
-	if (rest_event_sample_length >= sub_max_page_sample_length) sub_event_sample_length = sub_max_page_sample_length;
-	else														sub_event_sample_length = rest_event_sample_length; //sub_event_sample_addr
-
-	unsigned int sub_page_addr_offset       =  (next_event_sample_start_addr >> 23) & 0xf ;
-	unsigned int dma_request_nof_lwords     =  sub_event_sample_length/2;	// Lwords
-	unsigned int dma_adc_addr_offset_bytes  =  sub_event_sample_addr*2;		// Bytes
-	
-	[self writeAdcMemoryPage:sub_page_addr_offset];   // set page
-		
-	unsigned int req_nof_lwords = dma_request_nof_lwords ; //   
-	NSMutableData* theData = [NSMutableData dataWithLength:req_nof_lwords*sizeof(long) + 4 + 4]; //data + ORCA header
+	unsigned long numLongWords = (aBufferSampleEndLength - aBufferSampleStartAddress)/2;
+	NSMutableData* theData = [NSMutableData dataWithLength:numLongWords*4 + 4 + 4]; //data + ORCA header
 	unsigned long* dataPtr = (unsigned long*)[theData bytes];
-	dataPtr[0] = dataId | req_nof_lwords + 2;
+	dataPtr[0] = dataId | numLongWords + 2;
 	dataPtr[1] = location | aChannel;
 		
 	[theController readLongBlock:&dataPtr[2]
-						atAddress: baseAddress + adcOffsets[aChannel] + dma_adc_addr_offset_bytes
-						numToRead:req_nof_lwords
+						atAddress: baseAddress + adcOffsets[aChannel]
+						numToRead:numLongWords
 					   withAddMod:0x09
 					usingAddSpace:0x01];
-	[aDataPacket addData:theData];
-			
+	if(!reOrder){
+		[aDataPacket addData:theData];
+		++waveFormCount[aChannel];
+	}
+	else {
+		NSData* reOrderedData = [self reOrderOneEvent:theData];
+		if(reOrderedData){
+			[aDataPacket addData:reOrderedData];
+			++waveFormCount[aChannel];
+		}
+	}
 }
+
+
+- (NSData*) reOrderOneEvent:(NSData*)theOriginalData
+{
+	unsigned long i;
+	unsigned long  wrap_length	= [self memoryWrapLength];
+	unsigned long* inDataPtr    = (unsigned long*)[theOriginalData bytes];
+	unsigned long  dataLength   = [theOriginalData length];
+	
+	NSMutableData* theRearrangedData = [NSMutableData dataWithLength:dataLength];
+	unsigned long* outDataPtr		 = (unsigned long*)[theRearrangedData bytes];
+	
+	unsigned long lword_length     = 0;
+	unsigned long lword_stop_index = 0;
+	unsigned long lword_wrap_index = 0;
+	
+	unsigned long wrapped	   = 0;
+	unsigned long stopDelayCounter=0;
+	
+	unsigned long event_sample_length = wrap_length;
+	
+	if (dataLength != 0) {
+		outDataPtr[0] = inDataPtr[0]; //copy ORCA header
+		outDataPtr[1] = inDataPtr[1]; //copy ORCA header
+		
+		unsigned long index = 2;
+		
+		outDataPtr[index] = inDataPtr[index];	// copy Timestamp	
+		outDataPtr[index+1] = inDataPtr[index+1];	// copy Timestamp	    
+		
+		wrapped			 =   ((inDataPtr[4]  & 0x08000000) >> 27); 
+		stopDelayCounter =   ((inDataPtr[4]  & 0x03000000) >> 24); 
+		
+		unsigned long stopAddress =   ((inDataPtr[index+2]  & 0x7) << 24)  
+									+ ((inDataPtr[index+3]  & 0xfff0000 ) >> 4) 
+									+  (inDataPtr[index+3]  & 0xfff);
+		
+		
+		// write event length 
+		outDataPtr[index+3] = (((event_sample_length) & 0xfff000) << 4)			// bit 23:12
+							 + ((event_sample_length) & 0xfff);					// bit 11:0 
+
+		outDataPtr[index+2] = (((event_sample_length) & 0x7000000) >> 24)		// bit 23:12
+							  + (inDataPtr[index+2]  & 0x0F000000);				// Wrap arround flag and stopDelayCounter
+		
+		
+		lword_length = event_sample_length/2;
+		// stop delay correction
+		if ((stopAddress/2) < stopDelayCounter) {
+			lword_stop_index = lword_length + (stopAddress/2) - stopDelayCounter;
+		}
+		else {
+			lword_stop_index = (stopAddress/2) - stopDelayCounter;
+		}
+		
+		
+		// rearange
+		if (wrapped) { // all samples are vaild
+			for (i=0;i<lword_length;i++){
+				lword_wrap_index =   lword_stop_index + i;
+				if  (lword_wrap_index >= lword_length) {
+					lword_wrap_index = lword_wrap_index - lword_length; 
+				} 
+				outDataPtr[index+4+i] =  inDataPtr[index+4+lword_wrap_index]; 
+			}
+		}
+		else { // only samples from "index" to "stopAddress" are valid
+			for (i=0;i<lword_length-lword_stop_index;i++){
+				lword_wrap_index =   lword_stop_index + i;
+				if  (lword_wrap_index >= lword_length) {lword_wrap_index = lword_wrap_index - lword_length; } 
+				outDataPtr[index+4+i] =  0; 
+			}
+			for (i=lword_length-lword_stop_index;i<lword_length;i++){
+				lword_wrap_index =   lword_stop_index + i;
+				if  (lword_wrap_index >= lword_length) {lword_wrap_index = lword_wrap_index - lword_length; } 
+				outDataPtr[index+4+i] =  inDataPtr[index+4+lword_wrap_index]; 
+			}
+		}
+	}
+	
+	return theRearrangedData;
+}
+
 @end

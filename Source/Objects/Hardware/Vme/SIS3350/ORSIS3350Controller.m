@@ -38,15 +38,23 @@
 
 - (void) dealloc
 {
+	[blankView release];
 	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
-    NSString* key = [NSString stringWithFormat: @"orca.SIS3350%d.selectedtab",[model slot]];
+	settingSize     = NSMakeSize(750,400);
+    rateSize		= NSMakeSize(480,380);
+    
+    blankView = [[NSView alloc] init];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+	
+	NSString* key = [NSString stringWithFormat: @"orca.SIS3350%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
+	
 	triggerModePU[0] = triggerModePU0;
 	triggerModePU[1] = triggerModePU1;
 	triggerModePU[2] = triggerModePU2;
@@ -121,7 +129,17 @@
                      selector : @selector(thresholdChanged:)
                          name : ORSIS3350ModelThresholdChanged
                        object : model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(gainChanged:)
+                         name : ORSIS3350ModelGainChanged
+                       object : model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(dacValueChanged:)
+                         name : ORSIS3350ModelDacValueChanged
+                       object : model];
+	
 	[notifyCenter addObserver : self
                      selector : @selector(thresholdOffChanged:)
                          name : ORSIS3350ModelThresholdOffChanged
@@ -259,6 +277,8 @@
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
 	[self triggerModeChanged:nil];
+	[self gainChanged:nil];
+	[self dacValueChanged:nil];
 	[self thresholdChanged:nil];
 	[self thresholdOffChanged:nil];
     [self rateGroupChanged:nil];
@@ -374,6 +394,7 @@
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
+	[self settingsLockChanged:nil];
 }
 
 - (void) operationModeChanged:(NSNotification*)aNote
@@ -402,6 +423,30 @@
 		[triggerModePU[i]  selectItemAtIndex:[model triggerMode:i]];
 	}
 	[self settingsLockChanged:nil];
+}
+
+- (void) gainChanged:(NSNotification*)aNote
+{
+	if(![aNote userInfo]){
+		short i;
+		for(i=0;i<kNumSIS3350Channels;i++)[[gainMatrix cellWithTag:i] setIntValue:[model gain:i]];
+	}
+	else {
+		int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+		[[gainMatrix cellWithTag:i] setIntValue:[model gain:i]];
+	}
+}
+
+- (void) dacValueChanged:(NSNotification*)aNote
+{
+	if(![aNote userInfo]){
+		short i;
+		for(i=0;i<kNumSIS3350Channels;i++)[[dacValueMatrix cellWithTag:i] setIntValue:[model dacValue:i]];
+	}
+	else {
+		int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+		[[dacValueMatrix cellWithTag:i] setIntValue:[model dacValue:i]];
+	}
 }
 
 - (void) thresholdChanged:(NSNotification*)aNote
@@ -498,13 +543,19 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3350SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3350SettingsLock];
     
-    [settingLockButton		setState: locked];
-    [addressText			setEnabled:!locked && !runInProgress];
-    [initButton				setEnabled:!lockedOrRunningMaintenance];
-	[thresholdMatrix		setEnabled:!lockedOrRunningMaintenance];
-	[trigPulseLenMatrix		setEnabled:!lockedOrRunningMaintenance];
-	[endAddressThresholdField setEnabled:!lockedOrRunningMaintenance];
+    [settingLockButton			setState: locked];
+    [addressText				setEnabled:!locked && !runInProgress];
+	[operationModePU			setEnabled:!lockedOrRunningMaintenance];
+	[clockSourcePU				setEnabled:!lockedOrRunningMaintenance];
+    [initButton					setEnabled:!lockedOrRunningMaintenance];
+	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[trigPulseLenMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
 	
+	BOOL usingFreqSynesizer = ([model clockSource] == 0);
+	[freqNPU	setEnabled:!lockedOrRunningMaintenance && usingFreqSynesizer];
+	[freqMField setEnabled:!lockedOrRunningMaintenance && usingFreqSynesizer];
+
 	int i;
 	for(i=0;i<kNumSIS3350Channels;i++){
 		[triggerModePU[i]	setEnabled:!lockedOrRunningMaintenance];
@@ -589,6 +640,22 @@
 			break;
 	}
 	
+	switch([model operationMode]){
+		case kOperationRingBufferAsync:  
+		case kOperationRingBufferSync:
+		case kOperationDirectMemoryStop:
+		case kOperationDirectMemoryStart:
+			[thresholdOnLabel  setStringValue:@"       Threshold"];
+			[thresholdOffLabel setStringValue:@"                 N/A"];
+		break;
+			
+		case kOperationDirectMemoryGateAsync:
+		case kOperationDirectMemoryGateSync:
+			[thresholdOnLabel  setStringValue:@" ON  Threshold"];
+			[thresholdOffLabel setStringValue:@"OFF Threshold"];
+			break;
+	}
+		
 	if (asynchronous_mode_flag == 0) {
 		[triggerMaskMatrix setEnabled:!lockedOrRunningMaintenance];
 		[invertLemoCB setEnabled:!lockedOrRunningMaintenance];
@@ -702,7 +769,6 @@
 }
 
 #pragma mark •••Actions
-
 
 - (IBAction) memoryWrapLengthAction:(id)sender
 {
@@ -832,46 +898,24 @@
 	}
 }
 
-- (IBAction) checkEvent:(id)sender;
-{
-	@try {
-		[model checkEventStatus];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Read for Report of SIS3350 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3350 Report FAILED", @"OK", nil, nil,
-                        localException);
-	}
-}
-
-- (IBAction) armSampling:(id)sender;
-{
-	@try {
-		[model armSamplingLogic];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Arm of SIS3350 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3350 Arm FAILED", @"OK", nil, nil,
-                        localException);
-	}
-}
-
-- (IBAction) disarmSampling:(id)sender;
-{
-	@try {
-		[model disarmSamplingLogic];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Disarm of SIS3350 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3350 Disarm FAILED", @"OK", nil, nil,
-                        localException);
-	}
-}
-
 - (IBAction) triggerModeAction:(id)sender
 {
 	[model setTriggerMode:[sender tag] withValue:[sender indexOfSelectedItem]];
 }
+
+- (IBAction) gainAction:(id)sender
+{
+    if([sender intValue] != [model gain:[[sender selectedCell] tag]]){
+		[model setGain:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+- (IBAction) dacValueAction:(id)sender
+{
+    if([sender intValue] != [model dacValue:[[sender selectedCell] tag]]){
+		[model setDacValue:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
 
 - (IBAction) thresholdAction:(id)sender
 {
@@ -941,6 +985,17 @@
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {	
+    if([tabView indexOfTabViewItem:tabViewItem] == 0){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:settingSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:rateSize];
+		[[self window] setContentView:tabView];
+    }
+
     NSString* key = [NSString stringWithFormat: @"orca.ORSIS3350%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
