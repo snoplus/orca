@@ -49,8 +49,6 @@
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
 	
-	IBOutlet ORPlotter1D*   plotter;
-
 	//Channel Parameters
 	IBOutlet NSPopUpButton*	triggerModePU0;
 	IBOutlet NSPopUpButton*	triggerModePU1;

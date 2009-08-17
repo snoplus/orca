@@ -1343,9 +1343,9 @@ unsigned long rblt_data[kMaxNumberWords];
 	configStruct->card_info[index].crate					= [self crateNumber];
 	configStruct->card_info[index].add_mod					= addressModifier;
 	configStruct->card_info[index].base_add					= baseAddress;
-    //configStruct->card_info[index].deviceSpecificData[0]	= bankSwitchMode;
-    //configStruct->card_info[index].deviceSpecificData[1]	= [self numberOfSamples];
-	configStruct->card_info[index].deviceSpecificData[2]	= moduleID;
+    configStruct->card_info[index].deviceSpecificData[0]	= operationMode;
+    configStruct->card_info[index].deviceSpecificData[1]	= 0;
+	configStruct->card_info[index].deviceSpecificData[2]	= 0;
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

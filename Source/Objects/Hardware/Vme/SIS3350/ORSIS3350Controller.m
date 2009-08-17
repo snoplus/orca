@@ -308,13 +308,7 @@
 	[self memoryWrapLengthChanged:nil];
 }
 
-- (void) updatePlot
-{
-	[plotter setNeedsDisplay:YES];
-}
-
 #pragma mark •••Interface Management
-
 - (void) memoryWrapLengthChanged:(NSNotification*)aNote
 {
 	[memoryWrapLengthField setIntValue: [model memoryWrapLength]];
@@ -1029,26 +1023,19 @@
 
 - (int) 	numberOfDataSetsInPlot:(id)aPlotter
 {
-	if(aPlotter== plotter)return 8;
-	else return 1;
+	return 1;
 }
 
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-	if(aPlotter== plotter)return 0; ///temp
-	else return [[[model waveFormRateGroup]timeRate]count];
+	return [[[model waveFormRateGroup]timeRate]count];
 }
 
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
-	if(aPlotter== plotter){
-		return 0; /////////temp
-	}
-	else if(set == 0){
-		int count = [[[model waveFormRateGroup]timeRate] count];
-		return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
+	int count = [[[model waveFormRateGroup]timeRate] count];
+	return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
 		
-	}
 	return 0;
 }
 
