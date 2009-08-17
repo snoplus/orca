@@ -43,7 +43,6 @@
 	BOOL			isRunning;
 	BOOL			ledOn;
 	unsigned short	moduleID;
-	BOOL			firstTime;
 	unsigned long   dataId;
 	NSMutableArray*	triggerModes;
 	NSMutableArray* gains;
@@ -75,7 +74,7 @@
 
 	unsigned long	location;
 	id				theController;
-
+	int				runningOperationMode;
 }
 
 - (id) init;

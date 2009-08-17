@@ -79,10 +79,10 @@ NSString* ORSIS3350ModelIDChanged				= @"ORSIS3350ModelIDChanged";
 #define kTimeStampClearRegister				0x041C	 /*write only*/
 
 #define kMemoryWrapLengthRegAll				0x01000004
+#define kSampleStartAddressAll				0x01000008
 #define kRingbufferLengthRegisterAll		0x01000020
 #define kRingbufferPreDelayRegisterAll		0x01000024
-#define kSampleStartAddressAll				0x01000008
-#define kEndAddressThresholdAllDAC			0x01000028	  
+#define kEndAddressThresholdAll				0x01000028	  
 
 #define kADC12DacControlStatus				0x02000050
 #define kADC34DacControlStatus				0x03000050
@@ -93,14 +93,10 @@ NSString* ORSIS3350ModelIDChanged				= @"ORSIS3350ModelIDChanged";
 
 #define kMaxNumEvents	powf(2.0,19)
 
-#define isAcqBusy(A)				((A >> 17) & 0x1)
-#define isSamplingLogicArmed(A)		((A >> 16) & 0x1)
-#define endAddressThresholdFlag(A)	((A >> 19) & 0x1)
-
 #define kAcqStatusEndAddressFlag	       		0x00080000
 #define kAcqStatusBusyFlag	        			0x00020000
 #define kAcqStatusArmedFlag	        			0x00010000
-#define kMaxAdcBufferLength						0x400000
+#define kMaxAdcBufferLength						0x10000
 
 static unsigned long thresholdRegOffsets[4]={
 	0x02000034,
@@ -123,7 +119,7 @@ static unsigned long triggerPulseRegOffsets[4]={
 	0x03000038
 };
 
-static unsigned long nextSampleAddressOffsets[4]={
+static unsigned long actualSampleAddressOffsets[4]={
 	0x02000010,
 	0x02000014,
 	0x03000010,
@@ -151,14 +147,8 @@ static unsigned long adcGainOffsets[4]={
 unsigned long rblt_data[kMaxNumberWords];
 
 @interface ORSIS3350Model (private)
-
-- (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket			userInfo:(id)userInfo;
-- (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-- (void) takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo;
-
+- (void) takeDataType1:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder;
+- (void) takeDataType2:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder;
 - (void) readAndShip:(ORDataPacket*)aDataPacket
 			 channel: (int) aChannel 
   sampleStartAddress:(unsigned long) aBufferSampleStartAddress 
@@ -727,20 +717,20 @@ unsigned long rblt_data[kMaxNumberWords];
 	[self writeControlStatusRegister];
 	[self writeAcquisitionRegister];
 	[self writeFreqSynthRegister];
-	[self writeValue:memoryTriggerDelay    offset:kDirectMemTriggerDelayReg];
-	[self writeValue:memoryStartModeLength offset:kDirectMemStartModeLengthReg];
-	[self writeValue:gateSyncLimitLength   offset:kGateSyncLimitLengthReg];
-	[self writeValue:gateSyncExtendLength  offset:kGateSyncExtendLengthReg];
-	[self writeValue:maxNumEvents          offset:kMaxNumEventsReg];
+	[self writeValue:memoryTriggerDelay		offset:kDirectMemTriggerDelayReg];
+	[self writeValue:memoryStartModeLength	offset:kDirectMemStartModeLengthReg];
+	[self writeValue:gateSyncLimitLength	offset:kGateSyncLimitLengthReg];
+	[self writeValue:gateSyncExtendLength	offset:kGateSyncExtendLengthReg];
+	[self writeValue:maxNumEvents			offset:kMaxNumEventsReg];
 	[self writeRingBufferParams];
-	[self writeValue:endAddressThreshold	offset:kEndAddressThresholdAllDAC];
 	[self writeValue:memoryWrapLength		offset:kMemoryWrapLengthRegAll];
+	[self writeValue:endAddressThreshold	offset:kEndAddressThresholdAll];
 	
 	[self writeTriggerSetupRegisters];
 	[self writeGains];
 	[self writeDacOffsets];
 	[self writeAdcMemoryPage:0];
-
+	runningOperationMode = operationMode;
 }
 
 
@@ -777,7 +767,6 @@ unsigned long rblt_data[kMaxNumberWords];
 	//put the inverse in the top bits to turn off everything else
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
 	aMask &= ~0xcc98cc98; //just leave the reserved bits zero
-	NSLog(@"%@ Acq Reg: 0x%08x\n",[self fullID],aMask);
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:baseAddress + kAcquisitionControlReg
                         numToWrite:1
@@ -1122,6 +1111,7 @@ unsigned long rblt_data[kMaxNumberWords];
     [p setName:@"End Threshold Address"];
     [p setFormat:@"##0" upperLimit:0xffffff lowerLimit:0 stepSize:8 units:@""];
     [p setSetMethod:@selector(setEndAddressThreshold:) getMethod:@selector(endAddressThreshold)];
+	[p setCanBeRamped:YES];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -1160,13 +1150,29 @@ unsigned long rblt_data[kMaxNumberWords];
     [p setSetMethod:@selector(setMemoryTriggerDelay:) getMethod:@selector(memoryTriggerDelay)];
     [a addObject:p];
 	
-    //[objDictionary setObject:[NSNumber numberWithLong:maxNumEvents]				forKey:@"maxNumEvents"];
-    //[objDictionary setObject:[NSNumber numberWithLong:multiEvent]				forKey:@"multiEvent"];
-    //[objDictionary setObject:[NSNumber numberWithLong:memoryStartModeLength]	forKey:@"memoryStartModeLength"];
-   // [objDictionary setObject:[NSNumber numberWithLong:memoryTriggerDelay]		forKey:@"memoryTriggerDelay"];
-   // [objDictionary setObject:[NSNumber numberWithLong:invertLemo]				forKey:@"invertLemo"];
-   //[objDictionary setObject:[NSNumber numberWithLong:triggerMask]				forKey:@"triggerMask"];
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Trigger Mask"];
+    [p setFormat:@"##0" upperLimit:0x7 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTriggerMask:) getMethod:@selector(triggerMask)];
+    [a addObject:p];
 	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Max Events"];
+    [p setFormat:@"##0" upperLimit:0x3fff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setMaxNumEvents:) getMethod:@selector(maxNumEvents)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Multi Event"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setMultiEvent:) getMethod:@selector(multiEvent)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Invert Lemo"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setInvertLemo:) getMethod:@selector(invertLemo)];
+    [a addObject:p];
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trigger Mode"];
@@ -1256,7 +1262,10 @@ unsigned long rblt_data[kMaxNumberWords];
 	else if([param isEqualToString:@"Memory Gate Length"])		return [cardDictionary objectForKey:@"gateSyncLimitLength"];
 	else if([param isEqualToString:@"Memory Start Length"])		return [cardDictionary objectForKey:@"memoryStartModeLength"];
 	else if([param isEqualToString:@"Memory Trigger Delay"])	return [cardDictionary objectForKey:@"memoryTriggerDelay"];
-		
+	else if([param isEqualToString:@"Trigger Mask"])			return [cardDictionary objectForKey:@"triggerMask"];
+	else if([param isEqualToString:@"Invert Lemo"])				return [cardDictionary objectForKey:@"invertLemo"];
+	else if([param isEqualToString:@"Max Events"])				return [cardDictionary objectForKey:@"maxEvents"];
+	else if([param isEqualToString:@"Multi Event"])				return [cardDictionary objectForKey:@"multiEvent"];
 	
     else return nil;
 }
@@ -1285,26 +1294,27 @@ unsigned long rblt_data[kMaxNumberWords];
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
     theController   = [self adapter];
 	ledOn = YES;
-	firstTime = NO;
 	
 	[self reset];
 	[self initBoard];
 	
-	if(!moduleID)[self readModuleID:NO];
-
+	[self clearTimeStamps];
+	[self armSamplingLogic];
+	
 	isRunning = YES;
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {	
-		switch(operationMode){
-			case kOperationRingBufferAsync:			[self takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo];	break;
-			case kOperationRingBufferSync:			[self takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo];	break;
-			case kOperationDirectMemoryGateAsync:	[self takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo];	break;
-			case kOperationDirectMemoryGateSync:	[self takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo];	break;
-			case kOperationDirectMemoryStop:		[self takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo];	break;
-			case kOperationDirectMemoryStart:		[self takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket		userInfo:(id)userInfo];	break;
+		switch(runningOperationMode){
+			case kOperationRingBufferSync:			[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryGateSync:	[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryStart:		[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryStop:		[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:YES];	break;
+			
+			case kOperationRingBufferAsync:			[self takeDataType2:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryGateAsync:	[self takeDataType2:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
 		}
 	}
 	@catch(NSException* localException) {
@@ -1535,202 +1545,55 @@ unsigned long rblt_data[kMaxNumberWords];
 @end
 
 @implementation ORSIS3350Model (private)
-- (void) takeDataRingbufferSynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeDataType1:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder
 {
-	if(!firstTime){
-		unsigned long status = [self readAcqRegister];
-		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
-			// Read Stop Sample (Address) Counters
-			int i;
-			for(i=0;i<kNumSIS3350Channels;i++){
+	unsigned long status = [self readAcqRegister];
+	if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
+		int i;
+		for(i=0;i<kNumSIS3350Channels;i++){
 			
-				unsigned long stop_next_sample_addr = 0;
-				[[self adapter] readLongBlock:&stop_next_sample_addr
-									atAddress:baseAddress + nextSampleAddressOffsets[i]
-									numToRead:1
-								   withAddMod:addressModifier
-								usingAddSpace:0x01];
+			unsigned long stop_next_sample_addr = 0;
+			[[self adapter] readLongBlock:&stop_next_sample_addr
+								atAddress:baseAddress + actualSampleAddressOffsets[i]
+								numToRead:1
+							   withAddMod:addressModifier
+							usingAddSpace:0x01];
 			
-				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
-					return;
-				}
-				if (stop_next_sample_addr != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
-				}
+			if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
+				stop_next_sample_addr = 2*kMaxAdcBufferLength;
 			}
-			[self armSamplingLogic];
+			if (stop_next_sample_addr != 0) {
+				[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:reorder];
+			}
 		}
-	}
-	else {
-		firstTime = NO;
 		[self armSamplingLogic];
 	}
 } 
 
-- (void) takeDataRingbufferASynchMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeDataType2:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder
 {
-	if(!firstTime){
-		unsigned long status = [self readAcqRegister];
-		if((status & kAcqStatusEndAddressFlag) == kAcqStatusEndAddressFlag){
-			[self disarmSamplingLogic];
-			int i;
-			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr;
-				[[self adapter] readLongBlock:&stop_next_sample_addr
-									atAddress:baseAddress + nextSampleAddressOffsets[i]
-									numToRead:1
-								   withAddMod:addressModifier
-								usingAddSpace:0x01];
-				
-				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
-					return;
-				}
-				if (stop_next_sample_addr != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
-				}
+	unsigned long status = [self readAcqRegister];
+	if((status & kAcqStatusEndAddressFlag) == kAcqStatusEndAddressFlag){
+		[self disarmSamplingLogic];
+		int i;
+		for(i=0;i<kNumSIS3350Channels;i++){
+			unsigned long stop_next_sample_addr;
+			[[self adapter] readLongBlock:&stop_next_sample_addr
+								atAddress:baseAddress + actualSampleAddressOffsets[i]
+								numToRead:1
+							   withAddMod:addressModifier
+							usingAddSpace:0x01];
+			
+			if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
+				stop_next_sample_addr = 2*kMaxAdcBufferLength;
 			}
-			[self armSamplingLogic];
+			if (stop_next_sample_addr != 0) {
+				[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:reorder];
+			}
 		}
-	}
-	else {
-		firstTime = NO;
-		[self clearTimeStamps];
 		[self armSamplingLogic];
 	}
 }
-
-- (void) takeDataDirectMemoryGateASyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	if(!firstTime){
-		unsigned long status = [self readAcqRegister];
-		if((status & kAcqStatusEndAddressFlag) == kAcqStatusEndAddressFlag){
-			[self disarmSamplingLogic];
-			int i;
-			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr;
-				[[self adapter] readLongBlock:&stop_next_sample_addr
-									atAddress:baseAddress + nextSampleAddressOffsets[i]
-									numToRead:1
-								   withAddMod:addressModifier
-								usingAddSpace:0x01];
-				
-				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
-					return;
-				}
-				if (stop_next_sample_addr != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
-				}
-			}
-		}
-	}
-	else {
-		firstTime = NO;
-		[self clearTimeStamps];
-		[self armSamplingLogic];
-	}
-}
-
-- (void) takeDataDirectMemoryGateSyncMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	if(!firstTime){
-		unsigned long status = [self readAcqRegister];
-		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
-			int i;
-			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr;
-				[[self adapter] readLongBlock:&stop_next_sample_addr
-									atAddress:baseAddress + nextSampleAddressOffsets[i]
-									numToRead:1
-								   withAddMod:addressModifier
-								usingAddSpace:0x01];
-				
-				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
-					return;
-				}
-				if (stop_next_sample_addr != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
-				}
-			}
-			[self armSamplingLogic];
-		}
-	}
-	else {
-		firstTime = NO;
-		[self clearTimeStamps];
-		[self armSamplingLogic];
-	}
-}
-
-- (void) takeDataDirectMemoryStartMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	if(!firstTime){
-		unsigned long status = [self readAcqRegister];
-		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
-			int i;
-			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr;
-				[[self adapter] readLongBlock:&stop_next_sample_addr
-									atAddress:baseAddress + nextSampleAddressOffsets[i]
-									numToRead:1
-								   withAddMod:addressModifier
-								usingAddSpace:0x01];
-				
-				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
-					return;
-				}
-				if (stop_next_sample_addr != 0) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:NO];
-				}
-			}
-			[self armSamplingLogic];
-		}
-	}
-	else {
-		firstTime = NO;
-		[self clearTimeStamps];
-		[self armSamplingLogic];
-	}
-}
-
-- (void) takeDataDirectMemoryStopMode:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	if(!firstTime){
-		unsigned long status = [self readAcqRegister];
-		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
-			int i;
-			for(i=0;i<kNumSIS3350Channels;i++){
-				unsigned long stop_next_sample_addr;
-				[[self adapter] readLongBlock:&stop_next_sample_addr
-									atAddress:baseAddress + nextSampleAddressOffsets[i]
-									numToRead:1
-								   withAddMod:addressModifier
-								usingAddSpace:0x01];
-				
-				if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-					NSLogError(@"SIS3350 Exception",@"Data Read_out",@"Sample size too large",nil);
-					return;
-				}
-				unsigned long nof_events = [self readEventCounter];
-				unsigned long calculated_stop_next_sample_address = nof_events   * (memoryWrapLength + 8);
-				if (stop_next_sample_addr == calculated_stop_next_sample_address) {
-					[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:YES];
-				}
-			}
-			[self armSamplingLogic];
-		}
-	}
-	else {
-		firstTime = NO;
-		[self clearTimeStamps];
-		[self armSamplingLogic];
-	}
-}
-
 
 - (void) readAndShip:(ORDataPacket*)aDataPacket
 			 channel:(int) aChannel 

@@ -550,7 +550,6 @@
     [initButton					setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[trigPulseLenMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
 	
 	BOOL usingFreqSynesizer = ([model clockSource] == 0);
 	[freqNPU	setEnabled:!lockedOrRunningMaintenance && usingFreqSynesizer];
@@ -576,6 +575,7 @@
 			[thresholdOffMatrix			setEnabled:NO];
 			[ringBufferLenField			setEnabled:!lockedOrRunningMaintenance];
 			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
+			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
 			asynchronous_mode_flag = YES ;
 			break;
 			
@@ -588,6 +588,7 @@
 			[thresholdOffMatrix			setEnabled:NO];
 			[ringBufferLenField			setEnabled:!lockedOrRunningMaintenance];
 			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
+			[endAddressThresholdField	setEnabled:NO];
 			asynchronous_mode_flag = NO ;
 			break;
 			
@@ -600,6 +601,7 @@
 			[ringBufferLenField			setEnabled:!lockedOrRunningMaintenance];
 			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
 			[thresholdOffMatrix			setEnabled:!lockedOrRunningMaintenance];
+			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
 			asynchronous_mode_flag = YES ;
 			break;
 			
@@ -612,6 +614,7 @@
 			[thresholdOffMatrix			setEnabled:!lockedOrRunningMaintenance];
 			[ringBufferLenField			setEnabled:NO];
 			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
+			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
 			asynchronous_mode_flag = NO;
 			break;
 			
@@ -624,6 +627,7 @@
 			[ringBufferLenField			setEnabled:NO];
 			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
 			[thresholdOffMatrix			setEnabled:NO];
+			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
 			asynchronous_mode_flag = NO;
 			break;
 			
@@ -636,6 +640,7 @@
 			[ringBufferLenField			setEnabled:NO];
 			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
 			[thresholdOffMatrix			setEnabled:NO];
+			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
 			asynchronous_mode_flag = NO;
 			break;
 	}
