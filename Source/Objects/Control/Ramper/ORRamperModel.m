@@ -52,7 +52,7 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 {
 	[rampItems makeObjectsPerformSelector:@selector(loadProxyObjects)];
 	if([rampItems count] == 1){
-		[[rampItems objectAtIndex:0] setVisible:YES];
+//		[[rampItems objectAtIndex:0] setVisible:YES];
 	}
 	[super wakeUp];
 }
