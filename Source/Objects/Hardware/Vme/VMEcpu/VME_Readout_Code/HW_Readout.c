@@ -1276,12 +1276,8 @@ int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 								}
 							}
 						}
-					}
-					//cleaup this loop
-					if(channelBaseReadoutHandle){
 						close_device(channelBaseReadoutHandle);
-					}
-					else LogBusError("No SIS3350 VME Handle 2: %s 0x%08x",strerror(errno),baseAddress+channelOffsets[i]);
+					} else LogBusError("No SIS3350 VME Handle 2: %s 0x%08x",strerror(errno),baseAddress+channelOffsets[i]);
 				}
 					
 				for(i=0;i<4;i++){
@@ -1306,14 +1302,8 @@ int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 								LogBusError("SIS3350 VME Exception 3: %s 0x%08x",strerror(errno),baseAddress+adcOffsets[i]);
 								dataIndex = startIndex; //dump the record
 							}
-						}
-					
-						//cleaup this loop
-						if(adcBaseHandle) {
-							close_device(adcBaseHandle);
 							release_dma_device();
-						}
-						else LogBusError("No SIS3350 VME Handle 5: %s 0x%08x",strerror(errno),baseAddress+adcOffsets[i]);
+						} else LogBusError("No SIS3350 VME Handle 5: %s 0x%08x",strerror(errno),baseAddress+adcOffsets[i]);
 					}
 				} //end of readout for loop
 				
@@ -1323,13 +1313,8 @@ int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 				}
 			}
 		} //End Check Acq Control Reg
-	}
-	
-	//cleanup main device
-	if(baseAddressHandle) {
 		close_device(baseAddressHandle);
-	}
-	else LogBusError("No SIS3350 VME Handle: %s 0x%08x",strerror(errno),baseAddress);
+	} else LogBusError("No SIS3350 VME Handle: %s 0x%08x",strerror(errno),baseAddress);
 	
     return config->card_info[index].next_Card_Index;
 }
