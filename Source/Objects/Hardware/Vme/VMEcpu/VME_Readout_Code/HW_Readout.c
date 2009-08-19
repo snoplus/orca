@@ -213,8 +213,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
     /* non-0 means an error*/
-    SBC_VmeWriteBlockStruct* returnDataPtr = 
-        (SBC_VmeWriteBlockStruct*)aPacket->payload;
+    SBC_VmeWriteBlockStruct* returnDataPtr = (SBC_VmeWriteBlockStruct*)aPacket->payload;
 
     returnDataPtr->address         = oldAddress;
     returnDataPtr->addressModifier = addressModifier;
@@ -224,7 +223,8 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 
     if(result == (numItems*unitSize)){
         returnDataPtr->errorCode = 0;
-    } else {
+    } 
+	else {
         aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_VmeWriteBlockStruct);
         returnDataPtr->errorCode = errno;        
     }
@@ -385,7 +385,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     if(index<config->total_cards && index>=0) {
         switch(config->card_info[index].hw_type_id){
-            case kDataGen:       index = Readout_DataGen(config,index,lamData);       break;
+            case kDataGen:       index = Readout_DataGen(config,index,lamData);      break;
             case kShaper:       index = Readout_Shaper(config,index,lamData);       break;
             case kGretina:      index = Readout_Gretina(config,index,lamData);      break;
             case kTrigger32:    index = Readout_TR32_Data(config,index,lamData);    break;
@@ -395,7 +395,8 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
             case kMtc:			index = Readout_MTC(config,index,lamData);			break;
             case kFec:			index = Readout_Fec(config,index,lamData);			break;
             case kSIS3300:		index = Readout_SIS3300(config,index,lamData);		break;
-            case kCaen419:      index = Readout_CAEN419(config,index,lamData);       break;
+            case kCaen419:      index = Readout_CAEN419(config,index,lamData);      break;
+            case kSIS3350:      index = Readout_SIS3350(config,index,lamData);      break;
             default:            index = -1;                                         break;
         }
         return index;
@@ -1221,4 +1222,189 @@ int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
     
     return config->card_info[index].next_Card_Index;
 }            
+
+/*************************************************************/
+/*             Reads out SIS3350 cards.                       */
+/*************************************************************/
+int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+	//static uint32_t actualSampleAddressOffsets[4] = {0x02000010, 0x02000014, 0x03000010, 0x03000014};	
+	static uint32_t adcOffsets[4]		= {0x04000000, 0x05000000, 0x06000000, 0x07000000};
+	static uint32_t channelOffsets[4]	= {0x02000000, 0x02000000, 0x03000000, 0x03000000};	
+	static uint32_t endOfEventOffset[4] = {0x10, 0x14, 0x10, 0x14};	
+	
+    uint32_t baseAddress    = config->card_info[index].base_add;
+    uint32_t theMod			= config->card_info[index].add_mod;
+	uint32_t dataId         = config->card_info[index].hw_mask[0];
+	uint32_t slot           = config->card_info[index].slot;
+	uint32_t crate          = config->card_info[index].crate;
+    uint32_t operationMode	= config->card_info[index].deviceSpecificData[0];
+	uint32_t wrapLength	= config->card_info[index].deviceSpecificData[1];
+	uint32_t locationMask   = ((crate & 0x0000000f)<<21) | ((slot & 0x0000001f)<<16);
+	
+	TUVMEDevice* baseAddressHandle = get_new_device(baseAddress, theMod, 4, 0x2000000);
+	if ( baseAddressHandle != NULL ) {
+		uint32_t status = 0;
+		if(read_device(baseAddressHandle,(char*)&status,4,0x10) == 4) {	//Check Acq Control Reg
+			char thereWasAnEvent = 0;
+			if(operationMode == 0 || operationMode == 2){
+				if((status & 0x00080000) == 0x00080000)thereWasAnEvent = 1;
+			}
+			else {
+				if((status & 0x00010000) != 0x00010000)thereWasAnEvent = 1;
+			}
+			if(thereWasAnEvent){					//check that the arm bit falls to zero
+				if(operationMode == 0 || operationMode == 2){
+					//if op mode is kOperationRingBufferAsync or kOperationDirectMemoryGateAsync -- must disarm sampling
+					uint32_t disarmIt = 1; //rearm by writing anything to the sample arm register
+					if(write_device(baseAddressHandle,(char*)&disarmIt,4,0x0414) != 4){ //sample disarm register
+						LogBusError("SIS3350 VME Exception 1: %s 0x%08x",strerror(errno),baseAddress);
+					}
+				}
+				uint16_t i;
+				uint32_t stop_next_sample_addr[4] = {0,0,0,0};
+				for(i=0;i<4;i++){
+					//we have to be a little tricky here... apparently this device's memory map is too large so we have 
+					//to get new devices from the driver at difference base addresses.
+					TUVMEDevice* channelBaseReadoutHandle = get_new_device(baseAddress+channelOffsets[i] , theMod, 4, 0x2000000);
+					if ( channelBaseReadoutHandle != NULL ) {
+						//read out the endofSample Reg to see if a channel has data
+						if(read_device(channelBaseReadoutHandle,(char*)&stop_next_sample_addr[i],4,endOfEventOffset[i]) == 4) {
+							if (stop_next_sample_addr[i] != 0) {
+								if (stop_next_sample_addr[i] > 65536){
+									stop_next_sample_addr[i] = 65536;
+								}
+							}
+						}
+					}
+					//cleaup this loop
+					if(channelBaseReadoutHandle){
+						close_device(channelBaseReadoutHandle);
+					}
+					else LogBusError("No SIS3350 VME Handle 2: %s 0x%08x",strerror(errno),baseAddress+channelOffsets[i]);
+				}
+					
+				for(i=0;i<4;i++){
+					if(stop_next_sample_addr[i] != 0){
+						//we have to be a little tricky here... apparently this device's memory map is too large so we have 
+						//to get new devices from the driver at difference base addresses.
+						TUVMEDevice* adcBaseHandle = get_dma_device(baseAddress+adcOffsets[i], theMod, 4, true);
+						if ( adcBaseHandle != NULL ) {
+							unsigned long numLongWords = stop_next_sample_addr[i]/2;
+							uint32_t startIndex = dataIndex;
+							data[dataIndex++] = dataId | (numLongWords + 2);
+							data[dataIndex++] = locationMask | i;
+							
+							if(read_device(adcBaseHandle,(char*)(&data[dataIndex]),numLongWords*4, 0) == (numLongWords*4)){
+								dataIndex += numLongWords;	
+								if(operationMode == 4){
+									//the kOperationDirectMemoryStop mode requires the data to be reordered
+									reOrderOneSIS3350Event(&data[startIndex],dataIndex-startIndex+1,wrapLength);
+								}
+							}
+							else {
+								LogBusError("SIS3350 VME Exception 3: %s 0x%08x",strerror(errno),baseAddress+adcOffsets[i]);
+								dataIndex = startIndex; //dump the record
+							}
+						}
+					
+						//cleaup this loop
+						if(adcBaseHandle) {
+							close_device(adcBaseHandle);
+							release_dma_device();
+						}
+						else LogBusError("No SIS3350 VME Handle 5: %s 0x%08x",strerror(errno),baseAddress+adcOffsets[i]);
+					}
+				} //end of readout for loop
+				
+				uint32_t armIt = 1; //rearm by writing anything to the sample arm register
+				if(write_device(baseAddressHandle,(char*)&armIt,4,0x0410) != 4){ //sample arm register
+					LogBusError("SIS3350 VME Exception 6: %s 0x%08x",strerror(errno),baseAddress);
+				}
+			}
+		} //End Check Acq Control Reg
+	}
+	
+	//cleanup main device
+	if(baseAddressHandle) {
+		close_device(baseAddressHandle);
+	}
+	else LogBusError("No SIS3350 VME Handle: %s 0x%08x",strerror(errno),baseAddress);
+	
+    return config->card_info[index].next_Card_Index;
+}
+
+void reOrderOneSIS3350Event(int32_t* inDataPtr, uint32_t dataLength, uint32_t wrapLength)
+{
+	unsigned long i;
+	int32_t* outDataPtr = (int32_t*)malloc(dataLength*sizeof(uint32_t));
+	unsigned long lword_length     = 0;
+	unsigned long lword_stop_index = 0;
+	unsigned long lword_wrap_index = 0;
+	
+	unsigned long wrapped	   = 0;
+	unsigned long stopDelayCounter=0;
+	
+	unsigned long event_sample_length = wrapLength;
+	
+	if (dataLength != 0) {
+		outDataPtr[0] = inDataPtr[0]; //copy ORCA header
+		outDataPtr[1] = inDataPtr[1]; //copy ORCA header
+		
+		unsigned long index = 2;
+		
+		outDataPtr[index]   = inDataPtr[index];		// copy Timestamp	
+		outDataPtr[index+1] = inDataPtr[index+1];	// copy Timestamp	    
+		
+		wrapped			 =   ((inDataPtr[4]  & 0x08000000) >> 27); 
+		stopDelayCounter =   ((inDataPtr[4]  & 0x03000000) >> 24); 
+		
+		unsigned long stopAddress =   ((inDataPtr[index+2]  & 0x7) << 24)  
+									+ ((inDataPtr[index+3]  & 0xfff0000 ) >> 4) 
+									+  (inDataPtr[index+3]  & 0xfff);
+		
+		
+		// write event length 
+		outDataPtr[index+3] = (((event_sample_length) & 0xfff000) << 4)			// bit 23:12
+							+ ((event_sample_length) & 0xfff);					// bit 11:0 
+		
+		outDataPtr[index+2] = (((event_sample_length) & 0x7000000) >> 24)		// bit 23:12
+							+ (inDataPtr[index+2]  & 0x0F000000);				// Wrap arround flag and stopDelayCounter
+		
+		
+		lword_length = event_sample_length/2;
+		// stop delay correction
+		if ((stopAddress/2) < stopDelayCounter) {
+			lword_stop_index = lword_length + (stopAddress/2) - stopDelayCounter;
+		}
+		else {
+			lword_stop_index = (stopAddress/2) - stopDelayCounter;
+		}
+		
+		// rearange
+		if (wrapped) { // all samples are vaild
+			for (i=0;i<lword_length;i++){
+				lword_wrap_index =   lword_stop_index + i;
+				if  (lword_wrap_index >= lword_length) {
+					lword_wrap_index = lword_wrap_index - lword_length; 
+				} 
+				outDataPtr[index+4+i] =  inDataPtr[index+4+lword_wrap_index]; 
+			}
+		}
+		else { // only samples from "index" to "stopAddress" are valid
+			for (i=0;i<lword_length-lword_stop_index;i++){
+				lword_wrap_index =   lword_stop_index + i;
+				if  (lword_wrap_index >= lword_length) {lword_wrap_index = lword_wrap_index - lword_length; } 
+				outDataPtr[index+4+i] =  0; 
+			}
+			for (i=lword_length-lword_stop_index;i<lword_length;i++){
+				lword_wrap_index =   lword_stop_index + i;
+				if  (lword_wrap_index >= lword_length) {lword_wrap_index = lword_wrap_index - lword_length; } 
+				outDataPtr[index+4+i] =  inDataPtr[index+4+lword_wrap_index]; 
+			}
+		}
+	}
+	memcpy(inDataPtr, outDataPtr, dataLength*sizeof(uint32_t));
+	free(outDataPtr);
+}
 

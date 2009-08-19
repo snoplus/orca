@@ -42,6 +42,8 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
 int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Fec(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index);
+void reOrderOneSIS3350Event(int32_t* inDataPtr, uint32_t dataLength, uint32_t wrapLength);
 
 #endif

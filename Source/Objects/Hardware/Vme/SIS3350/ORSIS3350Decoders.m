@@ -98,7 +98,7 @@
 				}
 			}
 		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:0];
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
 	}
 
     return length; //must return number of longs

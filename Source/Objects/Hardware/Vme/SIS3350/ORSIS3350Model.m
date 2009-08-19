@@ -1111,7 +1111,6 @@ unsigned long rblt_data[kMaxNumberWords];
     [p setName:@"End Threshold Address"];
     [p setFormat:@"##0" upperLimit:0xffffff lowerLimit:0 stepSize:8 units:@""];
     [p setSetMethod:@selector(setEndAddressThreshold:) getMethod:@selector(endAddressThreshold)];
-	[p setCanBeRamped:YES];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -1301,12 +1300,13 @@ unsigned long rblt_data[kMaxNumberWords];
 	[self clearTimeStamps];
 	[self armSamplingLogic];
 	
-	isRunning = YES;
+	isRunning		= NO;
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {	
+		isRunning		= YES;
 		switch(runningOperationMode){
 			case kOperationRingBufferSync:			[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
 			case kOperationDirectMemoryGateSync:	[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
@@ -1344,8 +1344,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	configStruct->card_info[index].add_mod					= addressModifier;
 	configStruct->card_info[index].base_add					= baseAddress;
     configStruct->card_info[index].deviceSpecificData[0]	= operationMode;
-    configStruct->card_info[index].deviceSpecificData[1]	= 0;
-	configStruct->card_info[index].deviceSpecificData[2]	= 0;
+    configStruct->card_info[index].deviceSpecificData[1]	= [self memoryWrapLength];
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -1559,11 +1558,21 @@ unsigned long rblt_data[kMaxNumberWords];
 							   withAddMod:addressModifier
 							usingAddSpace:0x01];
 			
-			if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-				stop_next_sample_addr = 2*kMaxAdcBufferLength;
+			if (stop_next_sample_addr > 65536)  {
+				stop_next_sample_addr = 65536;
 			}
 			if (stop_next_sample_addr != 0) {
-				[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:reorder];
+				int n = 1;
+				if(multiEvent)n = [self readEventCounter];
+				if(n>0){
+					int event;
+					unsigned long start = 0;
+					unsigned long eventSize = stop_next_sample_addr/n;
+					for(event=0;event<n;event++){
+						[self readAndShip:aDataPacket channel:i sampleStartAddress:start sampleEndAddress:start+eventSize reOrder:reorder];
+						start += eventSize;
+					}
+				}
 			}
 		}
 		[self armSamplingLogic];
@@ -1584,8 +1593,8 @@ unsigned long rblt_data[kMaxNumberWords];
 							   withAddMod:addressModifier
 							usingAddSpace:0x01];
 			
-			if (stop_next_sample_addr > (2*kMaxAdcBufferLength))  {
-				stop_next_sample_addr = 2*kMaxAdcBufferLength;
+			if (stop_next_sample_addr > 65536)  {
+				stop_next_sample_addr = 65536;
 			}
 			if (stop_next_sample_addr != 0) {
 				[self readAndShip:aDataPacket channel:i sampleStartAddress:0x0 sampleEndAddress:stop_next_sample_addr reOrder:reorder];
