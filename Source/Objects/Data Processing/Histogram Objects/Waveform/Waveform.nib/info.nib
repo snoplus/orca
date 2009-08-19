@@ -11,10 +11,10 @@
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>275</integer>
-		<integer>677</integer>
+		<integer>504</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>9J61</string>
+	<string>9L31a</string>
 	<key>targetFramework</key>
 	<string>IBCocoaFramework</string>
 </dict>
