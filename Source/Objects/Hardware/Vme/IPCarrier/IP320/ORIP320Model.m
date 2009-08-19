@@ -466,7 +466,7 @@ static struct {
 			[self loadConstants:aChannel];
 			[ORTimer delay:KDelayTime];
 			
-			errorLocation = @"Converion Start";
+			errorLocation = @"Conversion Start";
 			[self loadConversionStart];
 			errorLocation = @"Adc Read";
 			value = [self readDataBlock];
@@ -617,7 +617,7 @@ static struct {
 				unsigned short CountCALHI=0;
 				int i=0;
 				for(i=0;i<ReadNumber;i++){
-					errorLocation = @"CountCALHI Converion Start";
+					errorLocation = @"CountCALHI Conversion Start";
 					[self loadConversionStart];
 					errorLocation = @"CountCALHI Adc Read";
 					CountCALHI+=[self readDataBlock];
@@ -631,7 +631,7 @@ static struct {
 				
 				unsigned short CountCALLO=0;
 				for(i=0;i<ReadNumber;i++){
-					errorLocation = @"CountCALLO Converion Start";
+					errorLocation = @"CountCALLO Conversion Start";
 					[self loadConversionStart];
 					errorLocation = @"CountCALLO Adc Read";
 					CountCALLO+=[self readDataBlock];

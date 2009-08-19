@@ -527,7 +527,7 @@
         [model readAllAdcChannels];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nRead of All Channels Failed", @"OK", nil, nil,
                         localException);
     }
 }
