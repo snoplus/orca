@@ -78,8 +78,8 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(voltageChanged:)
-                         name : ORMITPulserModelVoltageChanged
+                     selector : @selector(resistanceChanged:)
+                         name : ORMITPulserModelResistanceChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -101,7 +101,7 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self clockSpeedChanged:nil];
-	[self voltageChanged:nil];
+	[self resistanceChanged:nil];
 	[self dutyCycleChanged:nil];
 	[self frequencyChanged:nil];
 }
@@ -116,9 +116,9 @@
 	[dutyCycleField setIntValue: [model dutyCycle]];
 }
 
-- (void) voltageChanged:(NSNotification*)aNote
+- (void) resistanceChanged:(NSNotification*)aNote
 {
-	[voltageField setIntValue: [model voltage]];
+	[resistanceField setIntValue: [model resistance]];
 }
 
 - (void) clockSpeedChanged:(NSNotification*)aNote
@@ -145,10 +145,10 @@
     [openPortButton setEnabled:	!locked];
 	[frequencyField setEnabled:!lockedOrRunningMaintenance];
 	[dutyCycleField setEnabled:!lockedOrRunningMaintenance];
-	[voltageField setEnabled:!lockedOrRunningMaintenance];
+	[resistanceField setEnabled:!lockedOrRunningMaintenance];
 	[frequencyStepper setEnabled:!lockedOrRunningMaintenance];
 	[dutyCycleStepper setEnabled:!lockedOrRunningMaintenance];
-	[voltageStepper setEnabled:!lockedOrRunningMaintenance];
+	[resistanceStepper setEnabled:!lockedOrRunningMaintenance];
 	[clockSpeedPU setEnabled:!lockedOrRunningMaintenance];
 	[loadHwButton setEnabled:!lockedOrRunningMaintenance];
 	[onButton setEnabled:!lockedOrRunningMaintenance];
@@ -214,9 +214,9 @@
 	[model setDutyCycle:[sender intValue]];	
 }
 
-- (void) voltageAction:(id)sender
+- (void) resistanceAction:(id)sender
 {
-	[model setVoltage:[sender intValue]];	
+	[model setResistance:[sender intValue]];	
 }
 
 - (void) clockSpeedAction:(id)sender

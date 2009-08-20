@@ -28,7 +28,7 @@
 #pragma mark ***External Strings
 NSString* ORMITPulserModelFrequencyChanged	= @"ORMITPulserModelFrequencyChanged";
 NSString* ORMITPulserModelDutyCycleChanged	= @"ORMITPulserModelDutyCycleChanged";
-NSString* ORMITPulserModelVoltageChanged	= @"ORMITPulserModelVoltageChanged";
+NSString* ORMITPulserModelResistanceChanged	= @"ORMITPulserModelResistanceChanged";
 NSString* ORMITPulserModelClockSpeedChanged = @"ORMITPulserModelClockSpeedChanged";
 NSString* ORMITPulserModelSerialPortChanged = @"ORMITPulserModelSerialPortChanged";
 NSString* ORMITPulserModelPortNameChanged   = @"ORMITPulserModelPortNameChanged";
@@ -77,7 +77,11 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFrequency:frequency];
     frequency = aFrequency;
-	if (frequency > [self actualClockSpeed]) frequency = [self actualClockSpeed];     //  You can only be as fast as your clock
+	int nBitsFrequency = 3;
+	int maxFrequency = [self actualClockSpeed] / 2;
+	int minFrequency = ([self actualClockSpeed] / pow(16,nBitsFrequency) / 2) + 1;
+	if (frequency > maxFrequency) frequency = maxFrequency;     //  You can only be as fast as your clock
+	if (frequency < minFrequency) frequency = minFrequency;     //  You only have n bits to program (go to lower clock speed)
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelFrequencyChanged object:self];
 }
 
@@ -91,22 +95,22 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setDutyCycle:dutyCycle];
     dutyCycle = aDutyCycle;
 	if (dutyCycle <= 0)  dutyCycle = 0;
-	if (dutyCycle >= 100)  dutyCycle = 100;	 
+	if (dutyCycle >= 50)  dutyCycle = 50;	 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelDutyCycleChanged object:self];
 }
 
-- (int) voltage
+- (int) resistance
 {
-    return voltage;
+    return resistance;
 }
 
-- (void) setVoltage:(int)aVoltage
+- (void) setResistance:(int)aResistance
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setVoltage:voltage];
+    [[[self undoManager] prepareWithInvocationTarget:self] setResistance:resistance];
     
-    voltage = aVoltage;
+    resistance = aResistance;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelVoltageChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelResistanceChanged object:self];
 }
 
 - (int) clockSpeed
@@ -211,7 +215,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
 		
     [objDictionary setObject:[NSNumber numberWithInt:clockSpeed]	forKey:@"clockSpeed"];
-    [objDictionary setObject:[NSNumber numberWithInt:voltage]		forKey:@"voltage"];
+    [objDictionary setObject:[NSNumber numberWithInt:resistance]	forKey:@"resistance"];
     [objDictionary setObject:[NSNumber numberWithInt:dutyCycle]		forKey:@"dutyCycle"];
     [objDictionary setObject:[NSNumber numberWithInt:frequency]		forKey:@"frequency"];
 	
@@ -223,12 +227,13 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void) loadHardware
 {
 	//option 1 -- send one by one
-	[self sendCommand: [self voltageCommand]];
-	[self sendCommand: [self dutyCycleCommand]];
+	[self sendCommand: [self clockCommand]];
+	[self sendCommand: [self resistanceCommand]];
 	[self sendCommand: [self frequencyCommand]];
+	[self sendCommand: [self dutyCycleCommand]];
 	
 	//option 2 -- append all once
-	//NSString* bigCommand = [[NSString alloc] initWithFormat:@"%@%@%@",[self voltageCommand],[self dutyCycleCommand],[self frequencyCommand]];
+	//NSString* bigCommand = [[NSString alloc] initWithFormat:@"%@%@%@",[self resistanceCommand],[self dutyCycleCommand],[self frequencyCommand]];
 	//[self sendCommand: bigCommand];
 	//[bigCommand release];
 }
@@ -236,31 +241,40 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void) setPower:(BOOL)state
 {
 	//For the future...
-	//NSString* powerCommand;
-	//if(state == YES)	powerCommand = @"X0"; //format the on command
-	//else				powerCommand = @"X1"; //format the off command
-	//[self sendCommand: powerCommand];
+	NSString* powerCommand;
+	if(state == YES)  {
+		powerCommand = @"P000\rD000\r"; //format the off command
+		[self sendCommand: powerCommand];
+	}
 }
 
-- (NSString*) voltageCommand
+- (NSString*) clockCommand
 {
-	int voltageBase = 10.;
-	int voltageTicks = voltageBase/(voltage/1000.);    
-	return [@"I" stringByAppendingFormat:@"%x\n",voltageTicks];;
+	return [@"H" stringByAppendingFormat:@"%01x\r",clockSpeed];;
+}
+
+- (NSString*) resistanceCommand
+{
+	float resistanceBase = 50.;
+	int resistanceTicks = 0;
+	if (resistance > resistanceBase) resistanceTicks = (resistance - resistanceBase)/3.9215;    
+	return [@"I" stringByAppendingFormat:@"%02x\r",resistanceTicks];;
 }
 
 - (NSString*) dutyCycleCommand
 {
 	int dutyTicks = 0;
-	if ((dutyCycle > 0) && (dutyCycle < 100)) dutyTicks = (5.00 * dutyCycle);
-	return [@"D" stringByAppendingFormat:@"%x\n",dutyTicks];
+	int frequencyTicks = 0;
+	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
+	if ((dutyCycle > 0) && (dutyCycle < 50)) dutyTicks = frequencyTicks * (1. - 2.* dutyCycle / 100.);
+	return [@"D" stringByAppendingFormat:@"%03x\r",dutyTicks];
 }
 
 - (NSString*) frequencyCommand
 {
 	int frequencyTicks = 0;
 	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
-	return  [@"P" stringByAppendingFormat:@"%x\n",frequencyTicks];
+	return  [@"P" stringByAppendingFormat:@"%03x\r",frequencyTicks];
 }
 
 #pragma mark ***Archival
@@ -272,7 +286,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     [self setClockSpeed:[decoder decodeIntForKey:@"clockSpeed"]];
     [self setFrequency:	[decoder decodeIntForKey:@"frequency"]];
     [self setDutyCycle:	[decoder decodeIntForKey:@"dutyCycle"]];
-    [self setVoltage:	[decoder decodeIntForKey:@"voltage"]];
+    [self setResistance:	[decoder decodeIntForKey:@"resistance"]];
     [[self undoManager] enableUndoRegistration];    
 	
     return self;
@@ -284,7 +298,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     [encoder encodeInt:clockSpeed	forKey:@"clockSpeed"];
     [encoder encodeInt:frequency	forKey:@"frequency"];
     [encoder encodeInt:dutyCycle	forKey:@"dutyCycle"];
-    [encoder encodeInt:voltage		forKey:@"voltage"];
+    [encoder encodeInt:resistance	forKey:@"resistance"];
 }
 @end
 
@@ -297,7 +311,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	for(i=0;i<[aCommand length];i++){
 		NSString* partToSend = [NSString stringWithFormat:@"%@",[aCommand substringWithRange:NSMakeRange(i,1)]]; 
 		[serialPort writeString:partToSend];
-		usleep(1000); //sleep 1 mSec
+		usleep(50000); //sleep 50 mSec
 	}
 }
 @end

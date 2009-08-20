@@ -29,7 +29,7 @@
         ORSerialPort*    serialPort;
 	
 		int				clockSpeed;
-		int				voltage;
+		int				resistance;
 		int				dutyCycle;
 		int				frequency;
 }
@@ -42,8 +42,8 @@
 - (void) setFrequency:(int)aFrequency;
 - (int) dutyCycle;
 - (void) setDutyCycle:(int)aDutyCycle;
-- (int) voltage;
-- (void) setVoltage:(int)aVoltage;
+- (int) resistance;
+- (void) setResistance:(int)aResistance;
 - (int) clockSpeed;
 - (void) setClockSpeed:(int)aClockSpeed;
 - (ORSerialPort*) serialPort;
@@ -58,7 +58,8 @@
 
 #pragma mark ***Commands
 - (void) loadHardware;
-- (NSString*) voltageCommand;
+- (NSString*) clockCommand;
+- (NSString*) resistanceCommand;
 - (NSString*) dutyCycleCommand;
 - (NSString*) frequencyCommand;
 
@@ -69,7 +70,7 @@
 
 extern NSString* ORMITPulserModelFrequencyChanged;
 extern NSString* ORMITPulserModelDutyCycleChanged;
-extern NSString* ORMITPulserModelVoltageChanged;
+extern NSString* ORMITPulserModelResistanceChanged;
 extern NSString* ORMITPulserModelClockSpeedChanged;
 extern NSString* ORMITPulserModelSerialPortChanged;
 extern NSString* ORMITPulserLock;

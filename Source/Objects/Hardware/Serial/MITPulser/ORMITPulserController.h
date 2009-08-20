@@ -26,8 +26,8 @@
 	IBOutlet NSStepper*		frequencyStepper;
 	IBOutlet NSTextField*	dutyCycleField;
 	IBOutlet NSStepper*		dutyCycleStepper;
-	IBOutlet NSTextField*	voltageField;
-	IBOutlet NSStepper*		voltageStepper;
+	IBOutlet NSTextField*	resistanceField;
+	IBOutlet NSStepper*		resistanceStepper;
 	IBOutlet NSPopUpButton* clockSpeedPU;
     IBOutlet NSButton*      loadHwButton;
     IBOutlet NSButton*      onButton;
@@ -51,7 +51,7 @@
 #pragma mark ***Interface Management
 - (void) frequencyChanged:(NSNotification*)aNote;
 - (void) dutyCycleChanged:(NSNotification*)aNote;
-- (void) voltageChanged:(NSNotification*)aNote;
+- (void) resistanceChanged:(NSNotification*)aNote;
 - (void) clockSpeedChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNotification;
@@ -63,7 +63,7 @@
 - (IBAction) loadHWAction:(id)sender;
 - (IBAction) frequencyAction:(id)sender;
 - (IBAction) dutyCycleAction:(id)sender;
-- (IBAction) voltageAction:(id)sender;
+- (IBAction) resistanceAction:(id)sender;
 - (IBAction) clockSpeedAction:(id)sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
