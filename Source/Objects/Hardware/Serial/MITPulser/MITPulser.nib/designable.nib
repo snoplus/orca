@@ -86,7 +86,7 @@
 										<string key="NSClassName">NSImage</string>
 										<string key="NSResourceName">NSMenuCheckmark</string>
 									</object>
-									<object class="NSCustomResource" key="NSMixedImage" id="885924019">
+									<object class="NSCustomResource" key="NSMixedImage" id="1067034225">
 										<string key="NSClassName">NSImage</string>
 										<string key="NSResourceName">NSMenuMixedState</string>
 									</object>
@@ -107,7 +107,7 @@
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
 											<reference key="NSOnImage" ref="1054219443"/>
-											<reference key="NSMixedImage" ref="885924019"/>
+											<reference key="NSMixedImage" ref="1067034225"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="1048149929"/>
 										</object>
@@ -118,7 +118,7 @@
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
 											<reference key="NSOnImage" ref="1054219443"/>
-											<reference key="NSMixedImage" ref="885924019"/>
+											<reference key="NSMixedImage" ref="1067034225"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="1048149929"/>
 										</object>
@@ -395,7 +395,7 @@
 													<int key="NSMnemonicLoc">2147483647</int>
 													<int key="NSState">1</int>
 													<reference key="NSOnImage" ref="1054219443"/>
-													<reference key="NSMixedImage" ref="885924019"/>
+													<reference key="NSMixedImage" ref="1067034225"/>
 													<string key="NSAction">_popUpItemAction:</string>
 													<reference key="NSTarget" ref="295265230"/>
 												</object>
@@ -414,7 +414,7 @@
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
 															<reference key="NSOnImage" ref="1054219443"/>
-															<reference key="NSMixedImage" ref="885924019"/>
+															<reference key="NSMixedImage" ref="1067034225"/>
 															<string key="NSAction">_popUpItemAction:</string>
 															<reference key="NSTarget" ref="295265230"/>
 														</object>
@@ -425,7 +425,7 @@
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
 															<reference key="NSOnImage" ref="1054219443"/>
-															<reference key="NSMixedImage" ref="885924019"/>
+															<reference key="NSMixedImage" ref="1067034225"/>
 															<string key="NSAction">_popUpItemAction:</string>
 															<reference key="NSTarget" ref="295265230"/>
 														</object>
@@ -776,14 +776,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">loadHWAction:</string>
-						<reference key="source" ref="737315545"/>
-						<reference key="destination" ref="675657980"/>
-					</object>
-					<int key="connectionID">1325</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">frequencyAction:</string>
 						<reference key="source" ref="737315545"/>
 						<reference key="destination" ref="652738740"/>
@@ -872,11 +864,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">turnPowerOn:</string>
+						<string key="label">loadHWAction:</string>
+						<reference key="source" ref="737315545"/>
+						<reference key="destination" ref="675657980"/>
+					</object>
+					<int key="connectionID">1349</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">loadHWAction:</string>
 						<reference key="source" ref="737315545"/>
 						<reference key="destination" ref="132049280"/>
 					</object>
-					<int key="connectionID">1348</int>
+					<int key="connectionID">1350</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1542,7 +1542,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1348</int>
+			<int key="maxID">1350</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1988,7 +1988,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="540523519">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="468945255">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/OrcaObject/OrcaObjectController.h</string>
 					</object>
@@ -2194,7 +2194,7 @@
 							<string>ORTimedTextField</string>
 						</object>
 					</object>
-					<reference key="sourceIdentifier" ref="540523519"/>
+					<reference key="sourceIdentifier" ref="468945255"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">OrcaObjectController</string>
