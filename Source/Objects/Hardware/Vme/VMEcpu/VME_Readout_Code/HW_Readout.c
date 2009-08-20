@@ -419,6 +419,9 @@ int32_t Readout_DataGen(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 		uint32_t chan = random()%8;
 		uint32_t aValue = (100*chan) + ((random()%500 + random()%500 + random()%500)/3);
 		if(card==0 && chan ==0)aValue = 100;
+		
+		ensureDataCanHold(5); 
+		
 		data[dataIndex++] = dataId1D | 2;
 		data[dataIndex++] = (card<<16) | (chan << 12) | (aValue & 0x0fff);
 		
@@ -430,6 +433,9 @@ int32_t Readout_DataGen(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 	}
 	
 	if(random()%20000 > 19998 ){
+		
+		ensureDataCanHold(2 * (2048+2));
+		
 		data[dataIndex++] = dataIdWaveform | (2048+2);
 		data[dataIndex++] = 0x00001000; //card 0, chan 1
 		float radians = 0;
@@ -543,7 +549,7 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 	uint32_t moduleID		   = config->card_info[index].deviceSpecificData[2];
 	int32_t result;
 
-    TUVMEDevice* vmeReadOutHandle = get_new_device(baseAddress, theMod, 4, 0);
+    TUVMEDevice* vmeReadOutHandle = get_new_device(baseAddress, theMod, 4, 0x2000000);
 	if ( vmeReadOutHandle == NULL ) {
 		LogBusError("No vmeAM9Handle: %s 0x%08x",strerror(errno),baseAddress);
 		return config->card_info[index].next_Card_Index;
@@ -603,6 +609,8 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 			for(group=0;group<4;group++){
 				uint32_t channelMask = triggerEventDir & (0xC0000000 >> (group*2));
 				if(channelMask==0)continue;
+				
+				ensureDataCanHold(numberOfSamples + 4);  
 				
 				//only read the channels that have trigger info
 				uint32_t totalNumLongs = numberOfSamples + 4;
@@ -732,6 +740,8 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
         uint32_t onlineMask        = config->card_info[index].deviceSpecificData[0];
         uint32_t firstAdcRegOffset = config->card_info[index].deviceSpecificData[2];
 
+		ensureDataCanHold(2 * 8); //max this card can produce
+		
         int16_t channel;
         for (channel=0; channel<8; ++channel) {
             if(onlineMask & theConversionMask & (1L<<channel)){
@@ -766,7 +776,7 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
     uint32_t theMod             = config->card_info[index].add_mod;
     
     TUVMEDevice* caenDMADevice = 0;
-    TUVMEDevice* memMapHandle = get_new_device(baseAddress, theMod, 4, 0);
+    TUVMEDevice* memMapHandle = get_new_device(baseAddress, theMod, 4, 0x2000000);
     if ( memMapHandle == NULL ) return config->card_info[index].next_Card_Index; 
 
     uint32_t numEventsToReadout = 0;
@@ -803,6 +813,9 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
             } 
             
             //load ORCA header info
+			
+			ensureDataCanHold(2+numEventsToReadout*eventSize);
+			
             data[dataIndex++] = dataId | (2+numEventsToReadout*eventSize);
             data[dataIndex++] = location; //location = crate and card number
           
@@ -906,7 +919,9 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
         } else {
             vmeReadOutHandle = vmeAM9Handle;
         }
-       
+		
+		ensureDataCanHold(kMaxDataBufferSize/2); //not sure how much this card can produce... just ensure half the data buffer is free
+     
         uint32_t numLongs = 3;
         int32_t savedIndex = dataIndex;
         data[dataIndex++] = dataId | 0; //we'll fill in the length later
@@ -1081,7 +1096,9 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDa
                                 
         if(!isNotValidCaenData(dataValue)) {
         
-            //OK some data is apparently in the buffer and is valid
+			ensureDataCanHold(kMaxDataBufferSize/2); //not sure how much this card can produce... just ensure half the data buffer is free
+			
+			//OK some data is apparently in the buffer and is valid
             uint32_t dataIndexStart = dataIndex; //save the start index in case we have to flush the data because of errors
             dataIndex += 2;                         //reserve two words for the ORCA header, we'll fill it in if we get valid data
 
@@ -1175,7 +1192,9 @@ int32_t Readout_CAEN419(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
     uint32_t enabledMask		= config->card_info[index].deviceSpecificData[0];
 	uint32_t firstStatusRegOffset = config->card_info[index].deviceSpecificData[1];
  	uint32_t firstAdcRegOffset  = config->card_info[index].deviceSpecificData[2];
-   
+
+	ensureDataCanHold(4 * 2); //max this card can produce
+
     lock_device(vmeAM39Handle);
 	int chan;
 	for(chan=0;chan<4;chan++){
@@ -1241,7 +1260,7 @@ int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
     uint32_t operationMode	= config->card_info[index].deviceSpecificData[0];
 	uint32_t wrapLength	= config->card_info[index].deviceSpecificData[1];
 	uint32_t locationMask   = ((crate & 0x0000000f)<<21) | ((slot & 0x0000001f)<<16);
-	
+
 	TUVMEDevice* baseAddressHandle = get_new_device(baseAddress, theMod, 4, 0x2000000);
 	if ( baseAddressHandle != NULL ) {
 		uint32_t status = 0;
@@ -1288,6 +1307,9 @@ int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 						if ( adcBaseHandle != NULL ) {
 							unsigned long numLongWords = stop_next_sample_addr[i]/2;
 							uint32_t startIndex = dataIndex;
+							
+							ensureDataCanHold(numLongWords + 2); //check for required array space  
+							
 							data[dataIndex++] = dataId | (numLongWords + 2);
 							data[dataIndex++] = locationMask | i;
 							

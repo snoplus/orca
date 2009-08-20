@@ -33,6 +33,8 @@ void processBuffer(SBC_Packet* aPacket,uint8_t reply);
 void processSBCCommand(SBC_Packet* aPacket,uint8_t reply);
 void processCmdBlock(SBC_Packet* aPacket);
 void processTimeDelay(SBC_Packet* aPacket,uint8_t reply);
+void commitData();
+void ensureDataCanHold(int numLongsRequired);
 
 void doRunCommand(SBC_Packet* aPacket);
 void startJob(void(*jobFunction)(SBC_Packet*),SBC_Packet* aPacket);

@@ -701,18 +701,31 @@ void* readoutThread (void* p)
 		index = readHW(&crate_config,index,0); //nil for the lam data
 		cycles++;
 		
+		commitData();
+		
 		if(index>=crate_config.total_cards || index<0){
-			if(dataIndex>0){
-				if(needToSwap)SwapLongBlock(data, dataIndex);
-				CB_writeDataBlock(data,dataIndex);
-				dataIndex = 0;
-			}
 			index = 0;
 		}
 
    }
 
     pthread_exit((void *) 0);
+}
+
+void commitData()
+{
+	if(dataIndex>0){
+		if(needToSwap)SwapLongBlock(data, dataIndex);
+		CB_writeDataBlock(data,dataIndex);
+		dataIndex = 0;
+	}
+}
+
+void ensureDataCanHold(int numLongsRequired)
+{
+	if(dataIndex + numLongsRequired >= kMaxDataBufferSize){
+		commitData();
+	}
 }
 
 void* irqAckThread (void* p)
