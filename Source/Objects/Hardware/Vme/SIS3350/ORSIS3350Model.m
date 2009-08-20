@@ -168,7 +168,7 @@ unsigned long rblt_data[kMaxNumberWords];
     [[self undoManager] disableUndoRegistration];
     [self setAddressModifier:0x09];
     [self setBaseAddress:0x10000000];
-
+	[self setDefaults];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -205,6 +205,28 @@ unsigned long rblt_data[kMaxNumberWords];
 }
 
 #pragma mark ***Accessors
+- (void) setDefaults
+{
+	int i;
+	for(i=0;i<4;i++){
+		[self setThreshold:i	withValue:0];
+		[self setThresholdOff:i withValue:0];
+		[self setGain:i			withValue:18];
+		[self setDacValue:i		withValue:3000];
+		[self setTrigPulseLen:i withValue:10];
+		[self setPeakingTime:i	withValue:8];
+		[self setSumG:i			withValue:15];
+		[self setTriggerMode:i	withValue:1];
+	}
+	[self setOperationMode:0];
+	[self setTriggerMask:0x1];
+	[self setClockSource:0];
+	[self setFreqN:0];
+	[self setFreqM:20];
+	[self setRingBufferLen:2048];
+	[self setRingBufferPreDelay:512];
+	[self setMemoryWrapLength:2048];
+}
 
 - (long) memoryWrapLength
 {
@@ -1445,7 +1467,7 @@ unsigned long rblt_data[kMaxNumberWords];
     [self setEndAddressThreshold:	[decoder decodeIntForKey:@"endAddressThreshold"]];
     [self setRingBufferPreDelay:	[decoder decodeIntForKey:@"ringBufferPreDelay"]];
     [self setRingBufferLen:			[decoder decodeIntForKey:@"ringBufferLen"]];
-    [self setGateSyncExtendLength:[decoder decodeIntForKey:@"gateSyncExtendLength"]];
+    [self setGateSyncExtendLength:	[decoder decodeIntForKey:@"gateSyncExtendLength"]];
     [self setGateSyncLimitLength:	[decoder decodeIntForKey:@"gateSyncLimitLength"]];
     [self setMaxNumEvents:			[decoder decodeInt32ForKey:@"maxNumEvents"]];
     [self setFreqN:					[decoder decodeIntForKey:@"freqN"]];
@@ -1499,14 +1521,15 @@ unsigned long rblt_data[kMaxNumberWords];
     [encoder encodeInt:triggerMask				forKey:@"triggerMask"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
     [encoder encodeInt:operationMode			forKey:@"operationMode"];
-    [encoder encodeObject:gains					forKey:@"gains"];
-    [encoder encodeObject:dacValues				forKey:@"dacValues"];
-    [encoder encodeObject:thresholds			forKey:@"thresholds"];
-    [encoder encodeObject:thresholdOffs			forKey:@"thresholdOffs"];
-    [encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
-    [encoder encodeObject:sumGs					forKey:@"sumGs"];
-    [encoder encodeObject:trigPulseLens			forKey:@"trigPulseLens"];
-    [encoder encodeObject:triggerModes			forKey:@"triggerMode"];
+	
+    if(gains)			[encoder encodeObject:gains			forKey:@"gains"];
+	if(dacValues)		[encoder encodeObject:dacValues		forKey:@"dacValues"];
+	if(thresholds)		[encoder encodeObject:thresholds	forKey:@"thresholds"];
+	if(thresholdOffs)	[encoder encodeObject:thresholdOffs	forKey:@"thresholdOffs"];
+	if(peakingTimes)	[encoder encodeObject:peakingTimes	forKey:@"peakingTimes"];
+	if(sumGs)			[encoder encodeObject:sumGs			forKey:@"sumGs"];
+	if(trigPulseLens)	[encoder encodeObject:trigPulseLens	forKey:@"trigPulseLens"];
+	if(triggerModes)	[encoder encodeObject:triggerModes	forKey:@"triggerMode"];
 	
 	[encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
 }
@@ -1514,14 +1537,14 @@ unsigned long rblt_data[kMaxNumberWords];
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [objDictionary setObject:thresholds											forKey:@"thresholds"];	
-    [objDictionary setObject:thresholdOffs										forKey:@"thresholdOffs"];	
-    [objDictionary setObject:gains												forKey:@"gains"];	
-    [objDictionary setObject:dacValues											forKey:@"dacValues"];	
-    [objDictionary setObject:trigPulseLens										forKey:@"trigPulseLens"];	
-    [objDictionary setObject:peakingTimes										forKey:@"peakingTimes"];	
-    [objDictionary setObject:sumGs												forKey:@"sumGs"];	
-    [objDictionary setObject:triggerModes										forKey:@"triggerModes"];
+    if(thresholds)		[objDictionary setObject:thresholds						forKey:@"thresholds"];	
+    if(thresholdOffs)	[objDictionary setObject:thresholdOffs					forKey:@"thresholdOffs"];	
+    if(gains)			[objDictionary setObject:gains							forKey:@"gains"];	
+    if(dacValues)		[objDictionary setObject:dacValues						forKey:@"dacValues"];	
+    if(trigPulseLens)	[objDictionary setObject:trigPulseLens					forKey:@"trigPulseLens"];	
+    if(peakingTimes)	[objDictionary setObject:peakingTimes					forKey:@"peakingTimes"];	
+    if(sumGs)			[objDictionary setObject:sumGs							forKey:@"sumGs"];	
+    if(triggerModes)	[objDictionary setObject:triggerModes						forKey:@"triggerModes"];
     [objDictionary setObject:[NSNumber numberWithLong:memoryWrapLength]			forKey:@"memoryWrapLength"];	
     [objDictionary setObject:[NSNumber numberWithLong:endAddressThreshold]		forKey:@"endAddressThreshold"];
     [objDictionary setObject:[NSNumber numberWithLong:ringBufferPreDelay]		forKey:@"ringBufferPreDelay"];

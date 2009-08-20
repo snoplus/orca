@@ -94,8 +94,8 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (void) setDefaults;
 - (unsigned short) moduleID;
-//CSR bits
 - (BOOL) bankFullTo3;
 - (void) setBankFullTo3:(BOOL)aBankFullTo3;
 - (BOOL) bankFullTo2;

@@ -171,11 +171,13 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [[self undoManager] disableUndoRegistration];
     [self initParams];
     [self setAddressModifier:0x09];
+    [self setBaseAddress:0x01000000];
     [self setThresholds:[NSMutableArray arrayWithCapacity:kNumSIS3300Channels]];
 	int i;
     for(i=0;i<kNumSIS3300Channels;i++){
         [thresholds addObject:[NSNumber numberWithInt:0]];
     }
+	[self setDefaults];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -208,12 +210,27 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 }
 
 #pragma mark ***Accessors
+- (void) setDefaults
+{
+	int i;
+	for(i=0;i<8;i++){
+		[self setThreshold:i withValue:0x1300];
+		[self setEnabledBit:i withValue:YES];
+	}
+	[self setEnableInternalRouting:YES];
+	[self setPageWrap:YES];
+	[self setPageSize:1];
+	[self setStopDelay:15000];
+	[self setStartDelay:15000];
+	[self setStopDelayEnabled:YES];
+	[self setStartDelayEnabled:YES];
+}
+
 - (unsigned short) moduleID;
 {
 	return moduleID;
 }
 
-//csr reg
 - (BOOL) bankFullTo3
 {
     return bankFullTo3;

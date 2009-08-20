@@ -81,6 +81,7 @@
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
+- (void) setDefaults;
 
 #pragma mark ***Accessors
 - (long) memoryWrapLength;
