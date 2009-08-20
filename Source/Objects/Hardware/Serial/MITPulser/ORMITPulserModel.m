@@ -242,7 +242,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
 	//For the future...
 	NSString* powerCommand;
-	if(state == YES)  {
+	if(state == NO)  {
 		powerCommand = @"P000\rD000\r"; //format the off command
 		[self sendCommand: powerCommand];
 	}
