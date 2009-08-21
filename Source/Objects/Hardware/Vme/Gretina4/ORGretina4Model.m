@@ -59,6 +59,7 @@ NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged		= @"ORGretina4ModelM
 NSString* ORGretina4CardInited					= @"ORGretina4CardInited";
 NSString* ORGretina4SettingsLock				= @"ORGretina4SettingsLock";
 NSString* ORGretina4RegisterLock				= @"ORGretina4RegisterLock";
+NSString* ORGretina4ModelSetEnableStatusChanged				= @"ORGretina4ModelSetEnableStatusChanged";
 
 @interface ORGretina4Model (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -82,7 +83,7 @@ NSString* ORGretina4RegisterLock				= @"ORGretina4RegisterLock";
 
 
 @implementation ORGretina4Model
-#pragma mark ¥¥¥Static Declarations
+#pragma mark â€¢â€¢â€¢Static Declarations
 //offsets from the base address
 typedef struct {
 	unsigned long offset;
@@ -102,7 +103,11 @@ static Gretina4RegisterInformation register_information[kNumberOfGretina4Registe
 {0x14,  @"External trigger sliding length", YES, YES, NO, YES},
 {0x18,  @"Collection time", YES, YES, NO, YES},                
 {0x1C,  @"Integration time", YES, YES, NO, YES},               
-{0x20,  @"Hardware Status", YES, YES, NO, NO},                 
+{0x20,  @"Hardware Status", YES, YES, NO, NO},  
+{0x24,	@"Data Package user defined data", YES,	YES, NO, NO}, //new for version 102b
+{0x28,	@"Collection time low resolution", YES, YES, NO, NO}, //new for version 102b
+{0x2C,	@"Integration time low resolution", YES, YES, NO, NO}, //new for version 102b
+{0x30,	@"External FIFO monitor", YES, NO, NO, NO}, //new for version 102b
 {0x40,  @"Control/Status", YES, YES, YES, YES},                
 {0x80,  @"LED Threshold", YES, YES, YES, YES},                 
 {0xC0,  @"CFD Parameters", YES, YES, YES, YES},                
@@ -111,17 +116,42 @@ static Gretina4RegisterInformation register_information[kNumberOfGretina4Registe
 {0x400, @"DAC", YES, YES, NO, NO},                             
 {0x480, @"Slave Front bus status", YES, YES, NO, NO},          
 {0x484, @"Channel Zero time stamp LSB", YES, YES, NO, NO},     
-{0x488, @"Channel Zero time stamp MSB",  YES, YES, NO, NO},    
-{0x48C, @"Slave Front Bus Send Box 18 - 1", YES, YES, NO, NO}, 
-{0x4D4, @"Slave Front bus register 0 - 10", YES, YES, NO, NO}, 
+{0x488, @"Channel Zero time stamp MSB",  YES, YES, NO, NO}, 
+{0x48C,	@"Central contact time stamp LSB", YES, YES, NO, NO}, //new for version 102b
+{0x490,	@"Central contact time stamp MSB", YES, YES, NO, NO}, //new for version 102b
+{0x494, @"Slave Sync counter", YES, YES, NO, NO}, //new for version 102b
+{0x498, @"Slave Imperative sync counter", YES, YES, NO, NO}, //new for version 102b
+{0x49C, @"Slave Latch status counter", YES, YES, NO, NO}, //new for version 102b
+{0x4A0, @"Slave Header memory validate counter", YES, YES, NO, NO}, //new for version 102b
+{0x4A4,	@"Slave Header memory read slow data counter", YES, YES, NO, NO}, //new for version 102b
+{0x4A8, @"Slave Front end reset and calibration inject counters", YES, YES, NO, NO}, //new for version 102b
+{0x4AC, @"Slave Front Bus Send Box 10 - 1", YES, YES, NO, NO}, //modifed address for version 102b Q: why hasChannels == NO?
+{0x4D4, @"Slave Front bus register 0 - 10", YES, YES, NO, NO}, //Q: why hasChannels == NO?
 {0x500, @"Master Logic Status", YES, YES, NO, NO},             
 {0x504, @"SlowData CCLED timers", YES, YES, NO, NO},           
 {0x508, @"DeltaT155_DeltaT255 (3)", YES, YES, NO, NO},         
 {0x514, @"SnapShot ", YES, YES, NO, NO},                       
 {0x518, @"XTAL ID ", YES, YES, NO, NO},                        
 {0x51C, @"Length of Time to get Hit Pattern", YES, YES, NO, NO},
-{0x520, @"Front Side Bus Register", YES, YES, NO, NO},         
-{0x524, @"FrontBus Registers 0-10", YES, YES, NO, NO},         
+{0x520, @"Front Side Bus Register", YES, YES, NO, NO},  //This is a debug register
+{0x524, @"Test digitizer Tx TTCL", YES, YES, NO, NO}, //new for version 102b
+{0x528, @"Test digitizer Rx TTCL", YES, YES, NO, NO}, //new for version 102b
+{0x52C, @"Slave Front Bus send box 10-1", YES, YES, NO, NO}, //new for version 102b
+{0x554, @"FrontBus Registers 0-10", YES, YES, NO, NO}, //modifed address for version 102b     
+{0x580, @"Master logic sync counter", YES, YES, NO, NO}, //new for version 102b
+{0x584, @"Master logic imperative sync counter", YES, YES, NO, NO}, //new for version 102b
+{0x588, @"Master logic latch status counter", YES, YES, NO, NO}, //new for version 102b
+{0x58C, @"Master logic header memory validate counter", YES, YES, NO, NO}, //new for version 102b
+{0x590,	@"Master logic header memory read slow data counter", YES, YES, NO, NO}, //new for version 102b
+{0x594, @"Master logic front end reset and calibration inject counters", YES, YES, NO, NO}, //new for version 102b
+{0x598, @"Master front bus sync counter", YES, YES, NO, NO}, //new for version 102b
+{0x59C, @"Master front bus imperative sync counter", YES, YES, NO, NO}, //new for version 102b
+{0x5A0, @"Master front bus latch status counter", YES, YES, NO, NO}, //new for version 102b
+{0x5A4, @"Master front bus header memory validate counter", YES, YES, NO, NO}, //new for version 102b
+{0x5A8,	@"Master front bus header memory read slow data counter", YES, YES, NO, NO}, //new for version 102b
+{0x5AC, @"Master front bus front end reset and calibration inject counters", YES, YES, NO, NO}, //new for version 102b
+{0x5B0, @"Serdes data package error", YES, YES, NO, NO}, //new for version 102b
+{0x5B4, @"CC_LED enable", YES, YES, NO, NO}, //new for version 102b
 {0x780, @"Debug data buffer address", YES, YES, NO, NO},       
 {0x784, @"Debug data buffer data", YES, YES, NO, NO},          
 {0x788, @"LED flag window", YES, YES, NO, NO},                 
@@ -137,7 +167,9 @@ static Gretina4RegisterInformation register_information[kNumberOfGretina4Registe
 {0x84C, @"Adc config", YES, YES, NO, NO},                      
 {0x860, @"self trigger enable", YES, YES, NO, NO},             
 {0x864, @"self trigger period", YES, YES, NO, NO},             
-{0x868, @"self trigger count", YES, YES, NO, NO}               
+{0x868, @"self trigger count", YES, YES, NO, NO}, 
+{0x870, @"FIFOInterfaceSMReg", YES, YES, NO, NO}, 
+{0x874, @"Test signals register", YES, YES, NO, NO}
 };
                                       
 static Gretina4RegisterInformation fpga_register_information[kNumberOfFPGARegisters] = {
@@ -177,7 +209,7 @@ static struct {
 {@"Noise Window",		@"ns",	0x10,	0x07F,	0x0040,	640./(float)0x40},
 {@"Ext Trigger Length", @"us",	0x14,	0x7FF,	0x0190,	4.0/(float)0x190},
 {@"Collection Time",	@"us",	0x18,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
-{@"Integration Time",	@"us",	0x1C,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
+{@"Integration Time",	@"us",	0x1C,	0x03FF,	0x01C2,	4.5/(float)0x1C2},
 };
 
 
@@ -534,7 +566,7 @@ static struct {
     [waveFormRateGroup setIntegrationTime:newIntegrationTime];
 }
 
-#pragma mark ¥¥¥Rates
+#pragma mark â€¢â€¢â€¢Rates
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
@@ -545,7 +577,7 @@ static struct {
 	}
 	else return 0;
 }
-#pragma mark ¥¥¥specific accessors
+#pragma mark â€¢â€¢â€¢specific accessors
 - (void) setExternalWindow:(int)aValue { [self cardInfo:kExternalWindowIndex  setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setPileUpWindow:(int)aValue   { [self cardInfo:kPileUpWindowIndex    setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setNoiseWindow:(int)aValue    { [self cardInfo:kNoiseWindowIndex		setObject:[NSNumber numberWithInt:aValue]]; }
@@ -553,12 +585,24 @@ static struct {
 - (void) setCollectionTime:(int)aValue { [self cardInfo:kCollectionTimeIndex  setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setIntegrationTime:(int)aValue { [self cardInfo:kIntegrationTimeIndex setObject:[NSNumber numberWithInt:aValue]]; }
 
-- (int) externalWindow   { return [[self cardInfo:kExternalWindowIndex] intValue]; }
-- (int) pileUpWindow	 { return [[self cardInfo:kPileUpWindowIndex] intValue]; }
-- (int) noiseWindow		 { return [[self cardInfo:kNoiseWindowIndex] intValue]; }
-- (int) extTrigLength    { return [[self cardInfo:kExtTrigLengthIndex] intValue]; }
-- (int) collectionTime   { return [[self cardInfo:kCollectionTimeIndex] intValue]; }
-- (int) integrationTime  { return [[self cardInfo:kIntegrationTimeIndex] intValue]; }
+- (int) externalWindowAsInt		{ return [[self cardInfo:kExternalWindowIndex] intValue]; }
+- (int) pileUpWindowAsInt		{ return [[self cardInfo:kPileUpWindowIndex] intValue]; }
+- (int) noiseWindowAsInt		{ return [[self cardInfo:kNoiseWindowIndex] intValue]; }
+- (int) extTrigLengthAsInt		{ return [[self cardInfo:kExtTrigLengthIndex] intValue]; }
+- (int) collectionTimeAsInt		{ return [[self cardInfo:kCollectionTimeIndex] intValue]; }
+- (int) integrationTimeAsInt	{ return [[self cardInfo:kIntegrationTimeIndex] intValue]; }
+
+//jing's code 
+- (void) setEnableStatusOfChannelsWhileInit:(bool) aValue {
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnableStatusOfChannelsWhileInit:doSetEnableStatusOfChannelsWhileInit];
+	doSetEnableStatusOfChannelsWhileInit = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelSetEnableStatusChanged object:self];
+}
+
+- (bool) doSetEnableStatusOfChannelsWhileInit {
+	return doSetEnableStatusOfChannelsWhileInit;
+}
+
 
 - (void) setEnabled:(short)chan withValue:(short)aValue		
 { 
@@ -694,7 +738,7 @@ static struct {
 
 - (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }						//convert to ns
 - (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }					//convert to kev
-- (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }					//convert to Âµs
+- (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }					//convert to Â¬Âµs
 - (float) traceLengthConverted:(short)chan	{ return (dataLength[chan]-2*kGretina4HeaderLengthLongs)*10.0; }//convert to ns, making sure to remove header length
 
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue
@@ -709,7 +753,7 @@ static struct {
 
 - (void) setDataDelayConverted:(short)chan withValue:(float)aValue;
 {
-	[self setDataDelay:chan withValue:aValue*0x01C2/4.5];		//Âµs -> raw
+	[self setDataDelay:chan withValue:aValue*0x01C2/4.5];		//Â¬Âµs -> raw
 } 
 
 - (void) setTraceLengthConverted:(short)chan withValue:(float)aValue
@@ -717,7 +761,7 @@ static struct {
 	[self setDataLength:chan withValue:(aValue/10.0 + 2*kGretina4HeaderLengthLongs)];		//ns -> raw
 }  
 
-#pragma mark ¥¥¥Hardware Access
+#pragma mark â€¢â€¢â€¢Hardware Access
 - (unsigned long) baseAddress
 {
 	return (([self slot]+1)&0x1f)<<20;
@@ -736,22 +780,32 @@ static struct {
 
 - (void) resetDCM
 {
-    unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-    
-    /* To reset the DCM, assert bit 9 of this register. */
-    theValue |= 0x200;
-    
-    [[self adapter] writeLongBlock:&theValue
+    //Start Slave clock
+	//turn off SerDes driver
+	unsigned long theValue = 0x11;
+	[[self adapter] writeLongBlock:&theValue
 						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
                         withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-    /* OK, that should do it. */
+	
+	//reset DCM clock while keeping SerDes driver off
+	// To reset the DCM, assert bit 9 of this register. 
+	theValue = 0x211;
+	[[self adapter] writeLongBlock:&theValue
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	sleep(1); //wait for 1 second:
+	
+	theValue = 0x11;
+	[[self adapter] writeLongBlock:&theValue
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
 }
 
 - (void) resetBoard
@@ -764,12 +818,13 @@ static struct {
     }
 	
     /* Then reset the DCM clock. (This will also reset the serdes.) */
-    [self resetDCM];
+    //[self resetDCM];  change by Jing: DCM is reset in initSerDes;
     
     /* Finally, initialize the serdes. */
     [self initSerDes];
 }
 
+/*
 - (void) initSerDes
 {
     unsigned long theValue = 0;
@@ -781,7 +836,7 @@ static struct {
 	
     if ((theValue & 0x7) == 0x7) return;
     theValue = 0x22;
-    /* First we set to loop back mode so the SD can lock. */
+    // First we set to loop back mode so the SD can lock. 
     [[self adapter] writeLongBlock:&theValue
 						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
@@ -790,7 +845,7 @@ static struct {
 	
     NSDate* startDate = [NSDate date];
     while(1) {
-        /* Wait for the SD and DCM to lock */
+        // Wait for the SD and DCM to lock 
         [[self adapter] readLongBlock:&theValue
                             atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
                             numToRead:1
@@ -810,28 +865,158 @@ static struct {
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];    
 }
+*/
+
+//new code version 1 (Jing Qian)
+- (void) setClockSource: (unsigned long) clocksource
+{
+	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
+	unsigned long theValue = clocksource;
+    [[self adapter] writeLongBlock:&theValue
+						 atAddress:[self baseAddress] + fpga_register_information[kVMEGPControl].offset
+                        numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+- (void) resetMainFPGA
+{
+	unsigned long theValue = 0x10;
+	[[self adapter] writeLongBlock:&theValue
+						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
+                        numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	sleep(1);
+	
+	/*
+	NSDate* startDate = [NSDate date];
+    while(1) {
+        // Wait for the SD and DCM to lock 
+        [[self adapter] readLongBlock:&theValue
+                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
+                            numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		
+        if ((theValue & 0x7) == 0x7) break;
+		if([[NSDate date] timeIntervalSinceDate:startDate] > 1) {
+			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
+			return;
+		}
+    }
+	*/
+	
+	theValue = 0x00;
+	[[self adapter] writeLongBlock:&theValue
+						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
+                        numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+- (void) initSerDes
+{
+	//first set clock source
+	//I can't find the variable for clock source, so I set it 0 temporarily
+	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
+	[self setClockSource:0x01];
+	
+	//main FPGA reset cycle
+	[self resetMainFPGA];
+	
+	//wait for 10 seconds
+	sleep(10);
+	
+	/*
+	unsigned long theValue = 0;
+	NSDate* startDate = [NSDate date];
+    while(1) {
+        // Wait for the SD and DCM to lock 
+        [[self adapter] readLongBlock:&theValue
+                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
+                            numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		
+        if ((theValue & 0x7) == 0x7) break;
+		if([[NSDate date] timeIntervalSinceDate:startDate] > 10) {
+			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
+			return;
+		}
+    }
+	*/
+	 
+	//reset DCM
+	[self resetDCM];
+	
+}
 
 - (void) initBoard
 {
-    [self initSerDes];
+	//find out the Main FPGA version
+	unsigned long mainVersion = 0x00;
+	[[self adapter] readLongBlock:&mainVersion
+						atAddress:[self baseAddress] + register_information[kBoardID].offset
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	mainVersion = (mainVersion & 0xFFFF0000) >> 16;
+	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
+	
+	if (mainVersion != 0x108)
+	{
+		NSLog(@"Main FPGA version does not match: it should be 0x108, but now it is 0x%x \n", mainVersion);
+		return;
+	}
+	
+	//find out the VME FPGA version
+	unsigned long vmeVersion = 0x00;
+	[[self adapter] readLongBlock:&vmeVersion
+						 atAddress:[self baseAddress] + fpga_register_information[kVMEFPGAVersionStatus].offset
+                        numToRead:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	NSLog(@"VME FPGA serial number: 0x%x \n", (vmeVersion & 0x0000FFFF));
+	NSLog(@"BOARD Revision number: 0x%x \n", ((vmeVersion & 0x00FF0000) >> 16));
+	NSLog(@"VHDL Version number: 0x%x \n", ((vmeVersion & 0xFF000000) >> 24));
+	
+	
+    //[self initSerDes];
     //write the card level params
-    int i;
-    for(i=0;i<kNumGretina4CardParams;i++){
-        unsigned long theValue = [[cardInfo objectAtIndex:i] longValue];
-        [[self adapter] writeLongBlock:&theValue
-                             atAddress:[self baseAddress] + cardConstants[i].regOffset
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-    //write the channel level params
-    for(i=0;i<kNumGretina4Channels;i++){
-        [self writeControlReg:i enabled:YES];
-        [self writeLEDThreshold:i];
-        [self writeCFDParameters:i];
-        [self writeRawDataSlidingLength:i];
-        [self writeRawDataWindowLength:i];
-    }
+	
+	
+	int i;
+	for(i=0;i<kNumGretina4CardParams;i++){
+		unsigned long theValue = [[cardInfo objectAtIndex:i] longValue];
+		[[self adapter] writeLongBlock:&theValue
+							atAddress:[self baseAddress] + cardConstants[i].regOffset
+							numToWrite:1
+							withAddMod:[self addressModifier]
+							usingAddSpace:0x01];
+	}
+	
+	//write the channel level params
+	if ([self doSetEnableStatusOfChannelsWhileInit]) {
+		for(i=0;i<kNumGretina4Channels;i++) {
+			[self writeControlReg:i enabled:[self enabled:i]];
+			[self writeLEDThreshold:i];
+			[self writeCFDParameters:i];
+			[self writeRawDataSlidingLength:i];
+			[self writeRawDataWindowLength:i];
+		}
+	}
+	else {
+		for(i=0;i<kNumGretina4Channels;i++) {
+			[self writeLEDThreshold:i];
+			[self writeCFDParameters:i];
+			[self writeRawDataSlidingLength:i];
+			[self writeRawDataWindowLength:i];
+		}
+	}
+		
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4CardInited object:self];
 }
 
@@ -1242,7 +1427,7 @@ static struct {
 }
 
 
-#pragma mark ¥¥¥Data Taker
+#pragma mark â€¢â€¢â€¢Data Taker
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -1273,7 +1458,7 @@ static struct {
 }
 
 
-#pragma mark ¥¥¥HW Wizard
+#pragma mark â€¢â€¢â€¢HW Wizard
 -(BOOL) hasParmetersToRamp
 {
 	return YES;
@@ -1291,42 +1476,42 @@ static struct {
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"External Window"];
     [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:cardConstants[kExternalWindowIndex].units];
-    [p setSetMethod:@selector(setExternalWindow:) getMethod:@selector(externalWindow)];
+    [p setSetMethod:@selector(setExternalWindow:) getMethod:@selector(externalWindowAsInt)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Pileup Window"];
     [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:cardConstants[kPileUpWindowIndex].units];
-    [p setSetMethod:@selector(setPileUpWindow:) getMethod:@selector(pileUpWindow)];
+    [p setSetMethod:@selector(setPileUpWindow:) getMethod:@selector(pileUpWindowAsInt)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Noise Window"];
     [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:cardConstants[kNoiseWindowIndex].units];
-    [p setSetMethod:@selector(setNoiseWindow:) getMethod:@selector(noiseWindow)];
+    [p setSetMethod:@selector(setNoiseWindow:) getMethod:@selector(noiseWindowAsInt)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Ext Trig Length"];
     [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:cardConstants[kExtTrigLengthIndex].units];
-    [p setSetMethod:@selector(setExtTrigLength:) getMethod:@selector(extTrigLength)];
+    [p setSetMethod:@selector(setExtTrigLength:) getMethod:@selector(extTrigLengthAsInt)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Collection Time"];
     [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:cardConstants[kCollectionTimeIndex].units];
-    [p setSetMethod:@selector(setCollectionTime:) getMethod:@selector(collectionTime)];
+    [p setSetMethod:@selector(setCollectionTime:) getMethod:@selector(collectionTimeAsInt)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Integration Time"];
     [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:cardConstants[kIntegrationTimeIndex].units];
-    [p setSetMethod:@selector(setIntegrationTime:) getMethod:@selector(integrationTime)];
+    [p setSetMethod:@selector(setIntegrationTime:) getMethod:@selector(integrationTimeAsInt)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
     
@@ -1646,7 +1831,7 @@ static struct {
 	return index+1;
 }
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];

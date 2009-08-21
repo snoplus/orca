@@ -72,41 +72,73 @@ enum {
     kCollectionTime,			//[6] Collection time
     kIntegrationTime,			//[7] Integration time
     kHardwareStatus,			//[8] Hardware Status
-    kControlStatus,				//[9] Control Status
-    kLEDThreshold,				//[10] LED Threshold
-    kCFDParameters,				//[11] CFD Parameters
-    kRawDataSlidingLength,		//[12] Raw data sliding length
-    kRawDataWindowLength,		//[13] Raw data window length
-    kDAC,						//[14] DAC
-	kSlaveFrontBusStatus,		//[15] Slave Front bus status
-    kChanZeroTimeStampLSB,		//[16] Channel Zero time stamp LSB
-    kChanZeroTimeStampMSB,		//[17] Channel Zero time stamp MSB
-    kSlaveFrontBusSendBox18_1,  //[18] Slave Front Bus Send Box 18 - 1
-    kSlaveFrontBusRegister0_10, //[19] Slave Front bus register 0 - 10
-    kMasterLogicStatus,			//[20] Master Logic Status
-    kSlowDataCCLEDTimers,		//[21] SlowData CCLED timers
-    kDeltaT155_DeltaT255,		//[22] DeltaT155_DeltaT255 (3)
-    kSnapShot,					//[23] SnapShot 
-    kXtalID,					//[24] XTAL ID 
-    kHitPatternTimeOut,			//[25] Length of Time to get Hit Pattern 
-    kFrontSideBusRegister,		//[26] Front Side Bus Register
-    kFrontBusRegisters0_10,		//[27] FrontBus Registers 0-10
-	kDebugDataBufferAddress,	//[28] Debug data buffer address
-	kDebugDataBufferData,		//[29] Debug data buffer data
-	kLEDFlagWindow,				//[30] LED flag window
-	kAuxIORead,					//[31] Aux io read
-	kAuxIOWrite,				//[32] Aux io write
-	kAuxIOConfig,				//[33] Aux io config
-	kFBRead,					//[34] FB_Read
-	kFBWrite,					//[35] FB_Write
-	kFBConfig,					//[36] FB_Config
-	kSDRead,					//[37] SD_Read
-	kSDWrite,					//[38] SD_Write
-	kSDConfig,					//[39] SD_Config; This has a number of important set/reset bits
-	kADCConfig,					//[40] Adc config
-	kSelfTriggerEnable,			//[41] self trigger enable
-	kSelfTriggerPeriod,			//[42] self trigger period
-	kSelfTriggerCount,			//[43] self trigger count
+	kDataPackUserDefinedData,	//[9] Data Package User Defined Data
+	kColTimeLowResolution,		//[10] Collection Time Low Resolution
+	KINTTimeLowResolution,		//[11] Integration Time Low resolution
+	kExtFIFOMonitor,			//[12] External FIFO monitor
+    kControlStatus,				//[13] Control Status
+    kLEDThreshold,				//[14] LED Threshold
+    kCFDParameters,				//[15] CFD Parameters
+    kRawDataSlidingLength,		//[16] Raw data sliding length
+    kRawDataWindowLength,		//[17] Raw data window length
+    kDAC,						//[18] DAC
+	kSlaveFrontBusStatus,		//[19] Slave Front bus status
+    kChanZeroTimeStampLSB,		//[20] Channel Zero time stamp LSB
+    kChanZeroTimeStampMSB,		//[21] Channel Zero time stamp MSB
+	kCentContactTimeStampLSB,	//[22] Central Contact Time Stamp LSB
+	kCentContactTimeStampMSB,	//[23] Central Contact Time Stamp MSB
+	kSlaveSyncCounter,			//[24] Slave Front Bus Logic Sync Counter
+	kSlaveImpSyncCounter,		//[25] Slave Front Bus Logic Imperative Sync Counter
+	kSlaveLatchStatusCounter,	//[26] Slave Front Bus Logic Latch Status Counter
+	kSlaveHMemValCounter,		//[27] Slave Front Bus Logic Header Memory Validate Counter 
+	kSlaveHMemSlowDataCounter,	//[28] Slave Front Bus Logic Header Memeory Read Slow Data Counter
+	kSlaveFEReset,				//[29] Slave Front Bus Logic Front End Reset and Calibration inject Counter
+    kSlaveFrontBusSendBox18_1,  //[30] Slave Front Bus Send Box 18 - 1
+    kSlaveFrontBusRegister0_10, //[31] Slave Front bus register 0 - 10
+    kMasterLogicStatus,			//[32] Master Logic Status
+    kSlowDataCCLEDTimers,		//[33] SlowData CCLED timers
+    kDeltaT155_DeltaT255,		//[34] DeltaT155_DeltaT255 (3)
+    kSnapShot,					//[35] SnapShot 
+    kXtalID,					//[36] XTAL ID 
+    kHitPatternTimeOut,			//[37] Length of Time to get Hit Pattern 
+    kFrontSideBusRegister,		//[38] Front Side Bus Register
+	kTestDigitizerTxTTCL,		//[39] Test Digitizer Tx TTCL
+	kTestDigitizerRxTTCL,		//[40] Test Digitizer Rx TTCL
+	//why we have slave front bus send box again?
+	kSlaveFrontBusSendBox10_1,  //[41] Slave Front Bus Send Box 10 - 1
+    kFrontBusRegisters0_10,		//[42] FrontBus Registers 0-10
+	kLogicSyncCounter,			//[43] Master Logic Sync Counter
+	kLogicImpSyncCounter,		//[44] Master Logic Imperative Sync Counter
+	kLogicLatchStatusCounter,	//[45] Master Logic Latch Status Counter
+	kLogicHMemValCounter,		//[46] Master Logic Header Memory Validate Counter 
+	kLogicHMemSlowDataCounter,	//[47] Master Logic Header Memeory Read Slow Data Counter
+	kLogicFEReset,				//[48] Master Logic Front End Reset and Calibration inject Counter
+	kFBSyncCounter,				//[49] Master Front Bus Sync Counter
+	kFBImpSyncCounter,			//[50] Master Front Bus Imperative Sync Counter
+	kFBLatchStatusCounter,		//[51] Master Front Bus Latch Status Counter
+	kFBHMemValCounter,			//[52] Master Front Bus Header Memory Validate Counter 
+	kFBHMemSlowDataCounter,		//[53] Master Front Bus Header Memeory Read Slow Data Counter
+	kFBFEReset,					//[54] Master Front Bus Front End Reset and Calibration inject Counter
+	kSerdesError,				//[55] Serdes Data Package Error
+	kCCLEDenable,				//[56] CC_LED Enable
+	kDebugDataBufferAddress,	//[57] Debug data buffer address
+	kDebugDataBufferData,		//[58] Debug data buffer data
+	kLEDFlagWindow,				//[59] LED flag window
+	kAuxIORead,					//[60] Aux io read
+	kAuxIOWrite,				//[61] Aux io write
+	kAuxIOConfig,				//[62] Aux io config
+	kFBRead,					//[63] FB_Read
+	kFBWrite,					//[64] FB_Write
+	kFBConfig,					//[65] FB_Config
+	kSDRead,					//[66] SD_Read
+	kSDWrite,					//[67] SD_Write
+	kSDConfig,					//[68] SD_Config; This has a number of important set/reset bits
+	kADCConfig,					//[69] Adc config
+	kSelfTriggerEnable,			//[70] self trigger enable
+	kSelfTriggerPeriod,			//[71] self trigger period
+	kSelfTriggerCount,			//[72] self trigger count
+	kFIFOInterfaceSMReg,		//[73] FIFOInterfaceSMReg
+	kTestSignalReg,				//[74] Test Signals Register
 	kNumberOfGretina4Registers	//must be last
 };
 
@@ -181,6 +213,9 @@ enum Gretina4FIFOStates {
 	int noiseFloorOffset;
     float noiseFloorIntegrationTime;
 	
+	//jing's code:
+	BOOL doSetEnableStatusOfChannelsWhileInit;
+	
     NSString* mainFPGADownLoadState;
 	BOOL isFlashWriteEnabled;
     NSString* fpgaFilePath;
@@ -249,12 +284,16 @@ enum Gretina4FIFOStates {
 - (void) setCollectionTime:(int)aValue;
 - (void) setIntegrationTime:(int)aValue;
 
-- (int) externalWindow;
-- (int) pileUpWindow;
-- (int) noiseWindow;
-- (int) extTrigLength;
-- (int) collectionTime;
-- (int) integrationTime; 
+//@property BOOL enableAllChannelsWhileInit; //jing's code
+- (void) setEnableStatusOfChannelsWhileInit:(bool) aValue;
+- (bool) doSetEnableStatusOfChannelsWhileInit;
+
+- (int) externalWindowAsInt;
+- (int) pileUpWindowAsInt;
+- (int) noiseWindowAsInt;
+- (int) extTrigLengthAsInt;
+- (int) collectionTimeAsInt;
+- (int) integrationTimeAsInt; 
 
 - (void) setPolarity:(short)chan withValue:(int)aValue;
 - (void) setTriggerMode:(short)chan withValue:(int)aValue; 
@@ -304,6 +343,8 @@ enum Gretina4FIFOStates {
 - (short) readBoardID;
 - (void) resetBoard;
 - (void) resetDCM;
+- (void) setClockSource:(unsigned long) clocksource;
+- (void) resetMainFPGA;
 - (void) initBoard;
 - (void) initSerDes;
 - (unsigned long) readControlReg:(int)channel;
@@ -318,6 +359,7 @@ enum Gretina4FIFOStates {
 - (void) findNoiseFloors;
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
+
 
 #pragma mark ¥¥¥FPGA download
 - (void) startDownLoadingMainFPGA;
@@ -384,3 +426,4 @@ extern NSString* ORGretina4RateGroupChangedNotification;
 extern NSString* ORGretina4NoiseFloorChanged;
 extern NSString* ORGretina4ModelFIFOCheckChanged;
 extern NSString* ORGretina4CardInited;
+extern NSString* ORGretina4ModelSetEnableStatusChanged;

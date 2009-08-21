@@ -58,6 +58,7 @@
     settingSize     = NSMakeSize(790,500);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,187);
+	firmwareTabSize = NSMakeSize(340,187);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -201,7 +202,7 @@
                      selector : @selector(enabledChanged:)
                          name : ORGretina4ModelEnabledChanged
                        object : model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(cfdEnabledChanged:)
                          name : ORGretina4ModelCFDEnabledChanged
@@ -302,6 +303,11 @@
                          name : ORGretina4ModelRegisterIndexChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(setEnableStatusOfAllChannelsWhileInitChanged:)
+                         name : ORGretina4ModelSetEnableStatusChanged
+						object: model];
+	
     [self registerRates];
 }
 
@@ -365,6 +371,7 @@
 
 	[self registerIndexChanged:nil];
 	[self registerWriteValueChanged:nil];
+	[self setEnableStatusOfAllChannelsWhileInitChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -408,6 +415,7 @@
 		[[enabled2Matrix cellWithTag:i] setState:[model enabled:i]];
 	}
 }
+
 
 - (void) cfdEnabledChanged:(NSNotification*)aNote
 {
@@ -612,6 +620,10 @@
     [writeRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 }
 
+- (void) setEnableStatusOfAllChannelsWhileInitChanged:(NSNotification*)aNote
+{
+	[setEnableStatusOfChannelsWhileInitButton setState:[model doSetEnableStatusOfChannelsWhileInit]];
+}
 
 - (void) setFifoStateLabel
 {
@@ -906,13 +918,14 @@
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4Registers) {
 		aValue = [model readRegister:index];
+		NSLog(@"Gretina4(%d,%d) %@: %u (0x%0x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
 	} 
 	else {
 		index -= kNumberOfGretina4Registers;
 		aValue = [model readFPGARegister:index];	
+		NSLog(@"Gretina4(%d,%d) %@: %u (0x%0x)\n",[model crateNumber],[model slot], [model fpgaRegisterNameAt:index],aValue,aValue);
 	}
-	NSLog(@"Gretina4(%d,%d) %@: %u (0x%0x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
-	//[registerWriteValueField setIntValue:aValue];
+	
 }
 
 - (IBAction) writeRegisterAction:(id)sender
@@ -951,6 +964,11 @@
         NSRunAlertPanel([localException name], @"%@\nFailed Gretina4 Reset", @"OK", nil, nil,
                         localException);
     }
+}
+
+- (IBAction) setEnableStatusOfAllChannelsWhileInitAction:(id)sender //jing's code
+{
+	[model setEnableStatusOfChannelsWhileInit:[sender state]];
 }
 
 - (IBAction) initBoard:(id)sender
@@ -1062,6 +1080,13 @@
         else if(fifoStatus == kEmpty)		NSLog(@"FIFO = Empty\n");
         else if(fifoStatus == kAlmostEmpty)	NSLog(@"FIFO = Almost Empty\n");
         else if(fifoStatus == kHalfFull)	NSLog(@"FIFO = Half Full\n");
+		
+		NSLog(@"External Window (us): %d \n", [model externalWindowAsInt]/100);
+		NSLog(@"Pileup Window (us): %d \n", [model pileUpWindowAsInt]/100);
+		NSLog(@"Noise Window (ns): %d \n", [model noiseWindowAsInt]*10);
+		NSLog(@"Ext Trig Length (us): %d \n", [model extTrigLengthAsInt]/100);
+		NSLog(@"Collection (us): %d \n", [model collectionTimeAsInt]/100);
+		NSLog(@"Integration Time (us):  %d \n", [model integrationTimeAsInt]/100);
         
     }
 	@catch(NSException* localException) {
@@ -1070,6 +1095,7 @@
                         localException);
     }
 }
+
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
@@ -1087,7 +1113,12 @@
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:registerTabSize];
 		[[self window] setContentView:tabView];
-    } 
+    }	
+	else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:firmwareTabSize];
+		[[self window] setContentView:tabView];
+    }  
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORGretina4%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];

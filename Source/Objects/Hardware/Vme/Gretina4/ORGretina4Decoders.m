@@ -52,7 +52,7 @@
 	ORGretina4Model* theCard	= [aNote object];
 	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
 	NSString* cardKey			= [self getCardKey: [theCard slot]];
-	[self setObject:[NSNumber numberWithInt:[theCard integrationTime]] forNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil];
+	[self setObject:[NSNumber numberWithInt:[theCard integrationTimeAsInt]] forNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil];
 }
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
@@ -83,9 +83,10 @@
 	NSString* cardKey	 = [self getCardKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
 
-	
-	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
-	if(integrationTime) energy /= integrationTime;
+	//Jing comment out these two line
+	//int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
+	//if(integrationTime) energy /= integrationTime; 
+	energy/=50;
 	
     [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	

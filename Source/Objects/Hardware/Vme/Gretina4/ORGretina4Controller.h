@@ -80,6 +80,8 @@
     IBOutlet NSButton*      noiseFloorButton;
     IBOutlet NSTextField*   fifoState;
 	
+	IBOutlet NSButton*      setEnableStatusOfChannelsWhileInitButton; //jing's code
+	
 	//FPGA download
 	IBOutlet NSTextField*			fpgaFilePathField;
 	IBOutlet NSButton*				loadMainFPGAButton;
@@ -120,6 +122,7 @@
     NSSize settingSize;
     NSSize rateSize;
     NSSize registerTabSize;
+	NSSize firmwareTabSize;
 
 }
 
@@ -165,6 +168,7 @@
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
 - (void) registerLockChanged:(NSNotification*)aNote;
 - (void) registerWriteValueChanged:(NSNotification*)aNote;
+- (void) setEnableStatusOfAllChannelsWhileInitChanged:(NSNotification*)aNote; 
 
 - (void) setRegisterDisplay:(unsigned int)index;
 
@@ -205,6 +209,8 @@
 - (IBAction) writeRegisterAction:(id)sender;
 - (IBAction) registerLockAction:(id) sender;
 - (IBAction) registerWriteValueAction:(id)sender;
+
+- (IBAction) setEnableStatusOfAllChannelsWhileInitAction:(id)sender; //jing's code
 
 #pragma mark ¥¥¥Data Source
 - (double)  getBarValue:(int)tag;
