@@ -32,6 +32,7 @@
 @interface SBC_LinkController (private)
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 
@@ -689,7 +690,7 @@
                           contextInfo:NULL];
 }
 
-- (void) loadModeAction:(id)sender
+- (IBAction) loadModeAction:(id)sender
 {
 	[[model sbcLink] setLoadMode:[[sender selectedCell] tag]];	
 }
@@ -709,6 +710,22 @@
                       @selector(_killCrateDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+}
+
+- (IBAction)  shutdownAction:(id)sender;     
+{
+    [rootPassWordField setStringValue:@""];
+    [NSApp beginSheet: passWordPanel
+	   modalForWindow: [self window]
+		modalDelegate: self
+	   didEndSelector: @selector(_validatePasswordPanelDidEnd:returnCode:contextInfo:)
+		  contextInfo: nil];
+}
+
+- (IBAction) closePassWordPanel:(id)sender
+{
+    [passWordPanel orderOut:self];
+    [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
 }
 
 - (IBAction) verboseAction:(id)sender
@@ -923,12 +940,12 @@
 	[resetCrateBusButton setEnabled:crateBusButtonEnabled];
 }
 
-- (void) rangeTextFieldAction:(id)sender
+- (IBAction) rangeTextFieldAction:(id)sender
 {
 	[[model sbcLink] setRange:[sender intValue]];	
 }
 
-- (void) doRangeAction:(id)sender
+- (IBAction) doRangeAction:(id)sender
 {
 	[[model sbcLink] setDoRange:[sender intValue]];	
 }
@@ -1042,6 +1059,13 @@
 {
 	if(returnCode == NSAlertAlternateReturn){		
 		[[model sbcLink] killCrate];
+	}
+}
+
+- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSOKButton){
+		[[model sbcLink] shutDown:[rootPassWordField stringValue]];   
 	}
 }
 

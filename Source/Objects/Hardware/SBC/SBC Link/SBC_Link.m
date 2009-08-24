@@ -836,6 +836,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	[aSequence launch];
 }
 
+
 - (void) taskFinished:(NSTask*)aTask
 {
 	if(aTask == pingTask){
@@ -926,6 +927,21 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	[aSequence setTextToDelegate:YES];
 	
 	[aSequence launch];
+}
+
+- (void) shutDown:(NSString*)rootPwd
+{
+	[self setGoScriptFailed:NO];
+	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+
+	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+			 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,@"shutdown",@"-h",@"now",nil]];	
+	[aSequence setVerbose:verbose];
+	[aSequence setTextToDelegate:YES];
+	
+	[aSequence launch];
+	
 }
 
 - (void) tellClientToStartRun
@@ -1094,7 +1110,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			char* dp = (char*)(rp+1);
 			memcpy(buffer,dp,num);
 		}
-		else [self throwError:rp->errorCode];
+		else [self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -1133,7 +1149,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			short* dp = (short*)(rp+1);
 			memcpy(buffer,dp,num*sizeof(short));
 		}
-		else [self throwError:rp->errorCode];
+		else [self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -1173,7 +1189,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			rp++;
 			memcpy(buffer,rp,num*sizeof(long));
 		}
-		else [self throwError:rp->errorCode];
+		else [self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -1211,7 +1227,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		[self read:socketfd buffer:&aPacket];		//read the response
 		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(rp->errorCode)[self throwError:rp->errorCode];
+		if(rp->errorCode)[self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -1249,7 +1265,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		[self read:socketfd buffer:&aPacket];		//read the response
 		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(rp->errorCode)[self throwError:rp->errorCode];
+		if(rp->errorCode)[self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -1286,7 +1302,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		[self read:socketfd buffer:&aPacket];		//read the response
 		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
-		if(rp->errorCode)[self throwError:rp->errorCode];
+		if(rp->errorCode)[self throwError:rp->errorCode address:aVmeAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch (NSException* localException) {
@@ -1719,7 +1735,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 }
 
 
-- (void) throwError:(int)anError
+- (void) throwError:(int)anError address:(unsigned long)anAddress
 {
 	NSString* baseString = [NSString stringWithFormat:@"Vme Address Exception. "];
 	NSString* details;
@@ -1731,7 +1747,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	else if(anError == EBUSY)	details = @"Device Busy";
 	else if(anError == ENOMEM)	details = @"Out of Memory";
 	else details = [NSString stringWithFormat:@"%d",anError];
-	[NSException raise: @"SBC/VME access Error" format:[NSString stringWithFormat:@"%@:%@",baseString,details]];
+	[NSException raise: @"SBC/VME access Error" format:[NSString stringWithFormat:@"%@:%@\nAddress: 0x%08x",baseString,details,anAddress]];
 }
 
 - (void) fillInScript:(NSString*)theScript

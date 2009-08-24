@@ -13,6 +13,36 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>analyze</key>
+				<string>id</string>
+				<key>publishToPDF</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ORFlippedView</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+				<key>viewForPDF</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>ORValueBar</string>
 			<key>LANGUAGE</key>
@@ -110,7 +140,7 @@
 				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>ORPlotter</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -242,6 +272,8 @@
 				<string>id</string>
 				<key>clearHistory</key>
 				<string>id</string>
+				<key>closePassWordPanel</key>
+				<string>id</string>
 				<key>connectionAction</key>
 				<string>id</string>
 				<key>doRangeAction</key>
@@ -281,6 +313,8 @@
 				<key>readWriteTypeMatrixAction</key>
 				<string>id</string>
 				<key>resetCrateBusAction</key>
+				<string>id</string>
+				<key>shutdownAction</key>
 				<string>id</string>
 				<key>toggleCrateAction</key>
 				<string>id</string>
@@ -365,6 +399,8 @@
 				<string>NSTextField</string>
 				<key>passWordField</key>
 				<string>NSSecureTextField</string>
+				<key>passWordPanel</key>
+				<string>NSPanel</string>
 				<key>payloadSizeField</key>
 				<string>NSTextField</string>
 				<key>payloadSizeSlider</key>
@@ -389,6 +425,8 @@
 				<string>NSMatrix</string>
 				<key>resetCrateBusButton</key>
 				<string>NSButton</string>
+				<key>rootPassWordField</key>
+				<string>NSTextField</string>
 				<key>runInfoField</key>
 				<string>NSTextField</string>
 				<key>setFilePathButton</key>
@@ -519,7 +557,7 @@
 				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>ORPlotter</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

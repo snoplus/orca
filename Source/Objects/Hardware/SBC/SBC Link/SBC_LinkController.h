@@ -41,6 +41,8 @@
 	IBOutlet NSButton*      killCrateButton;
 	IBOutlet NSMatrix*		loadModeMatrix;
 	IBOutlet NSTextField*   filePathField;
+    IBOutlet NSPanel*		passWordPanel;
+    IBOutlet NSTextField*   rootPassWordField;
 
 	//Monitoring
 	IBOutlet NSTextField*   runInfoField;
@@ -141,7 +143,6 @@
 - (NSString*) errorString:(int)errNum;
 - (NSString*) literalToString:(int)aLiteral;
 
-
 #pragma mark ¥¥¥Actions
 - (IBAction) clearHistory:(id) sender;
 - (IBAction) lockAction:(id)sender;
@@ -152,6 +153,8 @@
 - (IBAction) forceReloadAction:(id)sender;
 - (IBAction) toggleCrateAction:(id)sender;
 - (IBAction) killCrateAction:(id)sender;
+- (IBAction) shutdownAction:(id)sender;    
+- (IBAction) closePassWordPanel:(id)sender;
 
 - (IBAction) initAfterConnectAction:(id)sender;
 - (IBAction) ipNumberAction:(id)sender;
@@ -183,8 +186,6 @@
 - (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
 - (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue;
-
-
 @end
 
 @interface OrcaObject (SBC_Link)
