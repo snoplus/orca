@@ -59,7 +59,7 @@
 			memcpy(buffer,rp,num*sizeof(long));
             NSLog(@"n=%d: %08x\n", num, buffer[0]);
 		}
-		else [self throwError:rp->errorCode];
+		else [self throwError:rp->errorCode address:aPbusAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch(NSException* localException) {
@@ -94,7 +94,7 @@
 		[self read:socketfd buffer:&aPacket];		//read the response
 		
 		SBC_IPEv4ReadBlockStruct* rp = (SBC_IPEv4ReadBlockStruct*)aPacket.payload;
-		if(rp->errorCode)[self throwError:rp->errorCode];
+		if(rp->errorCode)[self throwError:rp->errorCode address:aPbusAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch(NSException* localException) {
