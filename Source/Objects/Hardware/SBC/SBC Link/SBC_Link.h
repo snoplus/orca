@@ -228,7 +228,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) startCrate;
 - (void) stopCrate;
 - (void) startCrateCode;
-- (void) shutdown:(NSString*)rootPwd;
+- (void) shutDown:(NSString*)rootPwd;
 - (void) connect;
 - (void) disconnect;
 - (NSString*) crateProcessState;
