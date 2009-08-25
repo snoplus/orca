@@ -291,6 +291,12 @@
 		840E004C0944B29000049827 /* ProcessPulser.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840EFFFF0944B28F00049827 /* ProcessPulser.tif */; };
 		840E004D0944B29000049827 /* ORProcessThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 840E00010944B28F00049827 /* ORProcessThread.h */; };
 		840E004E0944B29000049827 /* ORProcessThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 840E00020944B28F00049827 /* ORProcessThread.m */; };
+		840E72EA103DA7BC0070AD70 /* AmrelHV.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840E72E3103DA7BC0070AD70 /* AmrelHV.nib */; };
+		840E72ED103DA7BC0070AD70 /* ORAmrelHVController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840E72E6103DA7BC0070AD70 /* ORAmrelHVController.h */; };
+		840E72EE103DA7BC0070AD70 /* ORAmrelHVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840E72E7103DA7BC0070AD70 /* ORAmrelHVController.m */; };
+		840E72EF103DA7BC0070AD70 /* ORAmrelHVModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840E72E8103DA7BC0070AD70 /* ORAmrelHVModel.h */; };
+		840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840E72E9103DA7BC0070AD70 /* ORAmrelHVModel.m */; };
+		840E72F3103DB4980070AD70 /* AmrelHV.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840E72F2103DB4980070AD70 /* AmrelHV.tif */; };
 		840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F539C97C03A7C80D015F64B1 /* IOKit.framework */; };
 		84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84178D4E0923C4B100C15D2B /* ORSocketClient.h */; };
 		84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 84178D4F0923C4B100C15D2B /* ORSocketClient.m */; };
@@ -2406,6 +2412,12 @@
 		840DFF1103C37EAA00DCF929 /* ORFanInModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORFanInModel.m; sourceTree = "<group>"; };
 		840E00010944B28F00049827 /* ORProcessThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessThread.h; path = Source/Objects/ProcessLogic/ProcessThread/ORProcessThread.h; sourceTree = SOURCE_ROOT; };
 		840E00020944B28F00049827 /* ORProcessThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessThread.m; path = Source/Objects/ProcessLogic/ProcessThread/ORProcessThread.m; sourceTree = SOURCE_ROOT; };
+		840E72E3103DA7BC0070AD70 /* AmrelHV.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AmrelHV.nib; path = Source/Objects/Hardware/HV/AmrelHV/AmrelHV.nib; sourceTree = SOURCE_ROOT; };
+		840E72E6103DA7BC0070AD70 /* ORAmrelHVController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAmrelHVController.h; path = Source/Objects/Hardware/HV/AmrelHV/ORAmrelHVController.h; sourceTree = SOURCE_ROOT; };
+		840E72E7103DA7BC0070AD70 /* ORAmrelHVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmrelHVController.m; path = Source/Objects/Hardware/HV/AmrelHV/ORAmrelHVController.m; sourceTree = SOURCE_ROOT; };
+		840E72E8103DA7BC0070AD70 /* ORAmrelHVModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAmrelHVModel.h; path = Source/Objects/Hardware/HV/AmrelHV/ORAmrelHVModel.h; sourceTree = SOURCE_ROOT; };
+		840E72E9103DA7BC0070AD70 /* ORAmrelHVModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmrelHVModel.m; path = Source/Objects/Hardware/HV/AmrelHV/ORAmrelHVModel.m; sourceTree = SOURCE_ROOT; };
+		840E72F2103DB4980070AD70 /* AmrelHV.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AmrelHV.tif; path = Source/Objects/Hardware/HV/AmrelHV/AmrelHV.tif; sourceTree = SOURCE_ROOT; };
 		840EFFA50944B28F00049827 /* edu.washington.npl.orca.Process.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Process.plist; path = Source/Objects/ProcessLogic/ProcessContainer/edu.washington.npl.orca.Process.plist; sourceTree = SOURCE_ROOT; };
 		840EFFA60944B28F00049827 /* ORProcessController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessController.h; path = Source/Objects/ProcessLogic/ProcessContainer/ORProcessController.h; sourceTree = SOURCE_ROOT; };
 		840EFFA70944B28F00049827 /* ORProcessController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessController.m; path = Source/Objects/ProcessLogic/ProcessContainer/ORProcessController.m; sourceTree = SOURCE_ROOT; };
@@ -4894,6 +4906,20 @@
 			);
 			name = ProcessThread;
 			path = Source/Objects/ProcessLogic/ProcessThread;
+			sourceTree = SOURCE_ROOT;
+		};
+		840E72E2103DA7BC0070AD70 /* AmrelHV */ = {
+			isa = PBXGroup;
+			children = (
+				840E72E3103DA7BC0070AD70 /* AmrelHV.nib */,
+				840E72F2103DB4980070AD70 /* AmrelHV.tif */,
+				840E72E6103DA7BC0070AD70 /* ORAmrelHVController.h */,
+				840E72E7103DA7BC0070AD70 /* ORAmrelHVController.m */,
+				840E72E8103DA7BC0070AD70 /* ORAmrelHVModel.h */,
+				840E72E9103DA7BC0070AD70 /* ORAmrelHVModel.m */,
+			);
+			name = AmrelHV;
+			path = Source/Objects/Hardware/HV/AmrelHV;
 			sourceTree = SOURCE_ROOT;
 		};
 		840EFFA30944B28F00049827 /* ProcessLogic */ = {
@@ -7451,6 +7477,7 @@
 				84B28E4B0F4C835500E2B056 /* UnivVoltHVCrate */,
 				84B28DF50F4C718300E2B056 /* HVControl */,
 				84B28E050F4C718400E2B056 /* HV4032 */,
+				840E72E2103DA7BC0070AD70 /* AmrelHV */,
 			);
 			name = HV;
 			path = Source/Objects/Hardware/HV;
@@ -9994,6 +10021,8 @@
 				84FA6390102B041800B426A6 /* ORSIS3350Model.h in Headers */,
 				84A2405B1032ED28002AFA0B /* ORMITPulserController.h in Headers */,
 				84A2405D1032ED28002AFA0B /* ORMITPulserModel.h in Headers */,
+				840E72ED103DA7BC0070AD70 /* ORAmrelHVController.h in Headers */,
+				840E72EF103DA7BC0070AD70 /* ORAmrelHVModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10635,6 +10664,8 @@
 				84FA6393102B041800B426A6 /* SIS3350Card.gif in Resources */,
 				84A240591032ED28002AFA0B /* MITPulser.nib in Resources */,
 				84A240DA1032F8B9002AFA0B /* MITPulser.tif in Resources */,
+				840E72EA103DA7BC0070AD70 /* AmrelHV.nib in Resources */,
+				840E72F3103DB4980070AD70 /* AmrelHV.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11362,6 +11393,8 @@
 				84FA6619102B6E2300B426A6 /* ORSIS3350Model.m in Sources */,
 				84A2405C1032ED28002AFA0B /* ORMITPulserController.m in Sources */,
 				84A2405E1032ED28002AFA0B /* ORMITPulserModel.m in Sources */,
+				840E72EE103DA7BC0070AD70 /* ORAmrelHVController.m in Sources */,
+				840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
