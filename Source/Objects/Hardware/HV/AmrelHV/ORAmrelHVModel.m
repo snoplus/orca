@@ -259,7 +259,6 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 	[[self undoManager] disableUndoRegistration];
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
-		[self setActVoltage:i withValue:voltage[i]]; //temp
 		[self getOutput:i];
 		[self getActualVoltage:i];
 		[self getActualCurrent:i];
