@@ -21,12 +21,6 @@
 
 #import "ORVHQ224LController.h"
 #import "ORVHQ224LModel.h"
-#import "ORRate.h"
-#import "ORRateGroup.h"
-#import "ORValueBar.h"
-#import "ORAxis.h"
-#import "ORPlotter1D.h"
-#import "ORTimeRate.h"
 
 @interface ORVHQ224LController (private)
 - (void) panicToZero:(unsigned short)aChannel;
@@ -273,23 +267,20 @@
 
 - (void) actVoltageChanged:(NSNotification*)aNote
 {
-	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-	NSTextField* theTextField = (chan==0?actVoltageAField:actVoltageBField);
-	[theTextField setFloatValue:[model actVoltage:chan]];
+	[actVoltageAField setFloatValue:[model actVoltage:0]];
+	[actVoltageBField setFloatValue:[model actVoltage:1]];
 }
 
 - (void) actCurrentChanged:(NSNotification*)aNote
 {
-	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-	NSTextField* theTextField = (chan==0?actCurrentAField:actCurrentBField);
-	[theTextField setFloatValue:[model actCurrent:chan]];
+	[actCurrentAField setFloatValue:[model actCurrent:0]];
+	[actCurrentBField setFloatValue:[model actCurrent:1]];
 }
 
 - (void) maxCurrentChanged:(NSNotification*)aNote
 {
-	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-	NSTextField* theTextField = (chan==0?maxCurrentAField:maxCurrentBField);
-	[theTextField setFloatValue:[model maxCurrent:chan]];
+	[maxCurrentAField setFloatValue:[model maxCurrent:0]];
+	[maxCurrentBField setFloatValue:[model maxCurrent:1]];
 }
 
 - (void) rampRateChanged:(NSNotification*)aNote
