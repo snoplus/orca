@@ -337,25 +337,24 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel value:(float)aValue
 {
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %f",aChannel,aValue]];
+	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %f\r\n",aChannel,aValue]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel boolValue:(BOOL)aValue
 {
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %d",aChannel,aValue]];
+	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %d\r\n",aChannel,aValue]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel
 {
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d",aChannel]];
+	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d\r\n",aChannel]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand
 {	
-	if(![aCommand hasSuffix:@"\r"])aCommand = [aCommand stringByAppendingString:@"\r"];
 	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	
 	[cmdQueue addObject:[aCommand dataUsingEncoding:NSASCIIStringEncoding]];
@@ -450,7 +449,7 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 }
 
 #pragma mark •••HW Commands
-- (void) getID							{ [self sendCmd:@"*IDN?"];       }
+- (void) getID							{ [self sendCmd:@"*IDN?\r\n"]; }
 - (void) getActualVoltage:(int)aChannel	{ [self sendCmd:kGetActualVoltageCmd channel:aChannel]; }
 - (void) getActualCurrent:(int)aChannel	{ [self sendCmd:kGetActualCurrentCmd channel:aChannel]; }
 - (void) getOutput:(int)aChannel		{ [self sendCmd:kGetOutputCmd channel:aChannel]; }
