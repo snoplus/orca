@@ -337,19 +337,20 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel value:(float)aValue
 {
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %f\r\n",aChannel,aValue]];
+
+	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %f\r\n",aChannel+1,aValue]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel boolValue:(BOOL)aValue
 {
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %d\r\n",aChannel,aValue]];
+	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %d\r\n",aChannel+1,aValue]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel
 {
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d\r\n",aChannel]];
+	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d\r\n",aChannel+1]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
@@ -471,6 +472,10 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 
 - (void) dataReceived:(NSNotification*)note
 {
+	//query response = OK\n\rRESPONSE\n\rOK\n\r
+	//non-query response = OK\n\r
+	//error response = OK\n\rERROR\n\rOK\n\r
+	
 	BOOL done = NO;
 	if(!lastRequest)return;
 	
@@ -478,43 +483,58 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
         [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
 		
-		NSString* theLastCommand = [[[NSString alloc] initWithData:lastRequest 
-														  encoding:NSASCIIStringEncoding] autorelease];
-		theLastCommand = [theLastCommand uppercaseString];
+		NSString* theLastCommand = [[[[NSString alloc] initWithData:lastRequest 
+														  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
-		NSString* theResponse = [[[NSString alloc] initWithData:inComingData 
-														  encoding:NSASCIIStringEncoding] autorelease];
+		NSString* theResponse = [[[[NSString alloc] initWithData:inComingData 
+														  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
-		theLastCommand	= [theLastCommand uppercaseString];
-		theResponse		= [theResponse uppercaseString];
-				
-		if([theLastCommand rangeOfString:@"?"].location != NSNotFound){
-			if([theLastCommand hasPrefix:@"*IDN?"]){
+		BOOL isQuery = ([theLastCommand rangeOfString:@"?"].location != NSNotFound);
+		
+		NSArray* parts = [theResponse componentsSeparatedByString:@"\n\r"];
+		if(isQuery && [parts count] == 4){ //4 because the last \n\r results in a zero length part
+			
+			theResponse = [parts objectAtIndex:1];
+			
+			if([theResponse isEqualToString:@"ERROR"]){
+				//count the error....
+			}
+			
+			else if([theLastCommand hasPrefix:@"*IDN?"]){
 				NSLog(@"%@\n",theResponse);
 				done = YES;
 			}
 			
 			else if([theLastCommand hasPrefix:kGetActualVoltageCmd]){
-				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualVoltageCmd length]] intValue];
+				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualVoltageCmd length]] intValue] - 1;
 				float theVoltage = [theResponse floatValue];
 				[self setActVoltage:theChannel withValue:theVoltage];
 				done = YES;
 			}
 			
 			else if([theLastCommand hasPrefix:kGetActualCurrentCmd]){
-				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualCurrentCmd length]] intValue];
+				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualCurrentCmd length]] intValue] - 1;
 				float theCurrent = [theResponse floatValue];
 				[self setActCurrent:theChannel withValue:theCurrent];
 				done = YES;
 			}
 			
 			else if([theLastCommand hasPrefix:kGetOutputCmd]){
-				int theChannel = [[theLastCommand substringFromIndex:[kGetOutputCmd length]] intValue];
+				int theChannel = [[theLastCommand substringFromIndex:[kGetOutputCmd length]] intValue] - 1;
 				BOOL theState  = [theResponse boolValue];
 				[self setOutput:theChannel withValue:theState];
 				done = YES;
 			}		
 		}	
+		else if(!isQuery && [parts count] == 2){ //2 because the last \n\r results in a zero length part
+			done = YES;
+		}
+		else if(!isQuery && [parts count] == 4){ //4 because the last \n\r results in a zero length part
+			if([theResponse isEqualToString:@"ERROR"]){
+				//count the error....
+			}
+			done = YES;
+		}
 		
 		if(done){
 			[inComingData release];
