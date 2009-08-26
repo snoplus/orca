@@ -29,7 +29,7 @@
 	NSString*			portName;
 	BOOL				portWasOpen;
 	ORSerialPort*		serialPort;
-	NSData*				lastRequest;
+	NSString*			lastRequest;
 	NSMutableArray*		cmdQueue;
 	NSMutableData*		inComingData;
 	NSMutableString*    buffer;
@@ -73,8 +73,8 @@
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
-- (NSData*) lastRequest;
-- (void) setLastRequest:(NSData*)aRequest;
+- (NSString*) lastRequest;
+- (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 

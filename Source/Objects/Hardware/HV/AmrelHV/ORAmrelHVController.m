@@ -307,10 +307,10 @@
 	NSImageView* theImageView = ((i==0) ? hvStateAImage:hvStateBImage);
 	if(![model outputState:i])[theImageView setImage:nil];
 	else {
-		if([model actVoltage:i]==0) {
+		if([model actVoltage:i]<1) {
 			[theImageView setImage:nil];
 		}
-		else if([model actVoltage:i]>0 && [model actVoltage:i]<99){
+		else if([model actVoltage:i]>1 && [model actVoltage:i]<99){
 			[theImageView setImage:[NSImage imageNamed:@"lowVoltage"]];
 		}
 		else {

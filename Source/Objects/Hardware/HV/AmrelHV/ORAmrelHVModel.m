@@ -126,8 +126,15 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 		outputState[aChan] = aOutputState;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelOutputStateChanged object:self userInfo:userInfo];
 	}
-	if(outputState[aChan] && pollTime == 0){
+	if((outputState[0] || outputState[1]) && pollTime == 0){
+		[[self undoManager] disableUndoRegistration];
 		[self setPollTime:1];
+		[[self undoManager] enableUndoRegistration];
+	}
+	else if(!outputState[0] && !outputState[1]){
+		[[self undoManager] disableUndoRegistration];
+		[self setPollTime:0];
+		[[self undoManager] enableUndoRegistration];
 	}
 }
 
@@ -358,16 +365,16 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 {	
 	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	
-	[cmdQueue addObject:[aCommand dataUsingEncoding:NSASCIIStringEncoding]];
+	[cmdQueue addObject:aCommand];
 	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
-- (NSData*) lastRequest
+- (NSString*) lastRequest
 {
 	return lastRequest;
 }
 
-- (void) setLastRequest:(NSData*)aRequest
+- (void) setLastRequest:(NSString*)aRequest
 {
 	[aRequest retain];
 	[lastRequest release];
@@ -483,15 +490,14 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
         [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
 		
-		NSString* theLastCommand = [[[[NSString alloc] initWithData:lastRequest 
-														  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
+		NSString* theLastCommand = [lastRequest uppercaseString];
 		
 		NSString* theResponse = [[[[NSString alloc] initWithData:inComingData 
 														  encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
 		BOOL isQuery = ([theLastCommand rangeOfString:@"?"].location != NSNotFound);
 		
-		NSArray* parts = [theResponse componentsSeparatedByString:@"\n\r"];
+		NSArray* parts = [theResponse componentsSeparatedByString:@"\r\n"];
 		if(isQuery && [parts count] == 4){ //4 because the last \n\r results in a zero length part
 			
 			theResponse = [parts objectAtIndex:1];
@@ -592,10 +598,10 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 - (void) processOneCommandFromQueue
 {
 	if([cmdQueue count] == 0) return;
-	NSData* cmdData = [[[cmdQueue objectAtIndex:0] retain] autorelease];
+	NSString* cmdString = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
-	[self setLastRequest:cmdData];
-	[serialPort writeDataInBackground:cmdData];
+	[self setLastRequest:cmdString];
+	[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
 	
 }
