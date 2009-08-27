@@ -21,6 +21,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORHeartBeat.h"
+#import "ORAutoTester.h"
 #import "ORCommandCenter.h"
 #import "ORGateKeeper.h"
 #import "ORHWWizardController.h"
@@ -187,6 +188,11 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 - (IBAction) showCommandCenter:(id)sender
 {
     [[[ORCommandCenterController sharedCommandCenterController] window] orderFront:nil];
+}
+
+- (IBAction) showAutoTester:(id)sender
+{
+    [[[ORAutoTester sharedAutoTester] window] orderFront:nil];
 }
 
 - (IBAction) showORCARootServiceController:(id)sender

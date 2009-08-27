@@ -69,6 +69,7 @@
 - (IBAction) showORCARootServiceController:(id)sender;
 - (IBAction) showTemplates:(id)sender;
 - (IBAction) openRecentDocument:(id)sender;
+- (IBAction) showAutoTester:(id)sender;
 
 #pragma mark ¥¥¥Accessors
 - (id) document;
