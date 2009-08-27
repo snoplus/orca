@@ -16,6 +16,15 @@
 	</array>
 	<key>Items</key>
 	<dict>
+		<key>AutoTester</key>
+		<dict>
+			<key>Action</key>
+			<string>showAutoTester:</string>
+			<key>Label</key>
+			<string>AutoTester</string>
+			<key>ToolTip</key>
+			<string>Open AutoTester</string>
+		</dict>
 		<key>statusWindow</key>
 		<dict>
 			<key>Action</key>

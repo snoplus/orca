@@ -26,6 +26,7 @@
 #import "ORRateGroup.h"
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
+#import "ORVmeTests.h"
 
 NSString* ORSIS3350ModelMemoryWrapLengthChanged			= @"ORSIS3350ModelMemoryWrapLengthChanged";
 NSString* ORSIS3350ModelEndAddressThresholdChanged		= @"ORSIS3350ModelEndAddressThresholdChanged";
@@ -1564,6 +1565,16 @@ unsigned long rblt_data[kMaxNumberWords];
 	
 	return objDictionary;
 }
+
+#pragma mark •••AutoTesting
+- (NSArray*) autoTests 
+{
+	NSMutableArray* myTests = [NSMutableArray array];
+	[myTests addObject:[ORVmeReadWriteTest test:0x02000028 length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC1/2 address threshold"]];
+	[myTests addObject:[ORVmeReadWriteTest test:0x03000028 length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC3/4 address threshold"]];
+	return myTests;
+}
+
 @end
 
 @implementation ORSIS3350Model (private)

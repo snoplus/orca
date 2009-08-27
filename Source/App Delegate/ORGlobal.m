@@ -226,6 +226,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 	[[[NSApp delegate] document] setStatusText:[self runModeString]];
 }
 
+- (BOOL) testInProgress
+{
+    return testInProgress;
+}
+
+- (void) setTestInProgress:(BOOL)state
+{
+    testInProgress = state;
+	[[[NSApp delegate] document] setStatusText:testInProgress?@"Testing":@""];
+}
+
 - (unsigned long)runType {
     
     return runType;

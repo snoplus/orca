@@ -1700,6 +1700,8 @@
 				<string>id</string>
 				<key>showAlarms</key>
 				<string>id</string>
+				<key>showAutoTester</key>
+				<string>id</string>
 				<key>showCatalog</key>
 				<string>id</string>
 				<key>showCommandCenter</key>

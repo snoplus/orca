@@ -54,6 +54,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 //--------------------------------------------------------
 
 @interface ORGlobal : NSObject  {
+    BOOL	 testInProgress;
     BOOL	 runInProgress;
     short    tasksRunning;
     short    tasksWaiting;
@@ -79,6 +80,8 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 - (BOOL) runInProgress;
 - (BOOL) runStopped;
 - (BOOL) runRunning;
+- (BOOL) testInProgress;
+- (void) setTestInProgress:(BOOL)state;
 - (void) setRunInProgress:(BOOL)state;
 - (unsigned long)runType;
 - (void) setRunType:(unsigned long)aRunType;

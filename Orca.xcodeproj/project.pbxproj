@@ -1797,6 +1797,15 @@
 		84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */; };
 		84D79B860FFD347400DC81D2 /* leftBug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D79B850FFD347400DC81D2 /* leftBug.tif */; };
 		84D852E60BE171AF00290BDC /* ORCARootServiceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */; };
+		84D8CB4810447492005585C5 /* AutoTester.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D8CB4510447492005585C5 /* AutoTester.nib */; };
+		84D8CB4910447492005585C5 /* ORAutoTester.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D8CB4610447492005585C5 /* ORAutoTester.h */; };
+		84D8CB4A10447492005585C5 /* ORAutoTester.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D8CB4710447492005585C5 /* ORAutoTester.m */; };
+		84D8CB4E10447A57005585C5 /* AutoTester.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D8CB4D10447A57005585C5 /* AutoTester.gif */; };
+		84D8CB5610447C68005585C5 /* AutoTesting.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D8CB5510447C68005585C5 /* AutoTesting.h */; };
+		84D8CC8B1045A85B005585C5 /* ORVmeTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D8CC891045A85B005585C5 /* ORVmeTests.h */; };
+		84D8CC8C1045A85B005585C5 /* ORVmeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D8CC8A1045A85B005585C5 /* ORVmeTests.m */; };
+		84D8CF841046FE32005585C5 /* ORAmrelHVDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D8CF821046FE32005585C5 /* ORAmrelHVDecoders.m */; };
+		84D8CF851046FE32005585C5 /* ORAmrelHVDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D8CF831046FE32005585C5 /* ORAmrelHVDecoders.h */; };
 		84D967770CA03E50000C0C76 /* ORScriptController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D967710CA03E50000C0C76 /* ORScriptController.h */; };
 		84D967780CA03E50000C0C76 /* ORScriptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D967720CA03E50000C0C76 /* ORScriptController.m */; };
 		84D967790CA03E50000C0C76 /* ORScriptModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D967730CA03E50000C0C76 /* ORScriptModel.h */; };
@@ -3853,6 +3862,15 @@
 		84D7913A0FFA4CD000DC81D2 /* ORKeithley6487Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKeithley6487Model.m; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Model.m; sourceTree = SOURCE_ROOT; };
 		84D79B850FFD347400DC81D2 /* leftBug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = leftBug.tif; path = "Source/Widgets/Bar Graph/leftBug.tif"; sourceTree = SOURCE_ROOT; };
 		84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceDefs.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceDefs.h"; sourceTree = SOURCE_ROOT; };
+		84D8CB4510447492005585C5 /* AutoTester.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AutoTester.nib; path = "Source/Main Dialogs/AutoTester/AutoTester.nib"; sourceTree = SOURCE_ROOT; };
+		84D8CB4610447492005585C5 /* ORAutoTester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAutoTester.h; path = "Source/Main Dialogs/AutoTester/ORAutoTester.h"; sourceTree = SOURCE_ROOT; };
+		84D8CB4710447492005585C5 /* ORAutoTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAutoTester.m; path = "Source/Main Dialogs/AutoTester/ORAutoTester.m"; sourceTree = SOURCE_ROOT; };
+		84D8CB4D10447A57005585C5 /* AutoTester.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = AutoTester.gif; path = "Source/Main Document/AutoTester.gif"; sourceTree = SOURCE_ROOT; };
+		84D8CB5510447C68005585C5 /* AutoTesting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AutoTesting.h; path = "Source/Main Dialogs/AutoTester/AutoTesting.h"; sourceTree = SOURCE_ROOT; };
+		84D8CC891045A85B005585C5 /* ORVmeTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeTests.h; sourceTree = "<group>"; };
+		84D8CC8A1045A85B005585C5 /* ORVmeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVmeTests.m; sourceTree = "<group>"; };
+		84D8CF821046FE32005585C5 /* ORAmrelHVDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmrelHVDecoders.m; path = Source/Objects/Hardware/HV/AmrelHV/ORAmrelHVDecoders.m; sourceTree = SOURCE_ROOT; };
+		84D8CF831046FE32005585C5 /* ORAmrelHVDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAmrelHVDecoders.h; path = Source/Objects/Hardware/HV/AmrelHV/ORAmrelHVDecoders.h; sourceTree = SOURCE_ROOT; };
 		84D967710CA03E50000C0C76 /* ORScriptController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptController.h; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.h; sourceTree = SOURCE_ROOT; };
 		84D967720CA03E50000C0C76 /* ORScriptController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptController.m; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.m; sourceTree = SOURCE_ROOT; };
 		84D967730CA03E50000C0C76 /* ORScriptModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptModel.h; sourceTree = SOURCE_ROOT; };
@@ -4917,6 +4935,8 @@
 				840E72E7103DA7BC0070AD70 /* ORAmrelHVController.m */,
 				840E72E8103DA7BC0070AD70 /* ORAmrelHVModel.h */,
 				840E72E9103DA7BC0070AD70 /* ORAmrelHVModel.m */,
+				84D8CF821046FE32005585C5 /* ORAmrelHVDecoders.m */,
+				84D8CF831046FE32005585C5 /* ORAmrelHVDecoders.h */,
 			);
 			name = AmrelHV;
 			path = Source/Objects/Hardware/HV/AmrelHV;
@@ -8329,6 +8349,18 @@
 			path = Source/Objects/Hardware/Serial/Keithley6487;
 			sourceTree = SOURCE_ROOT;
 		};
+		84D8CB4410447492005585C5 /* AutoTester */ = {
+			isa = PBXGroup;
+			children = (
+				84D8CB5510447C68005585C5 /* AutoTesting.h */,
+				84D8CB4510447492005585C5 /* AutoTester.nib */,
+				84D8CB4610447492005585C5 /* ORAutoTester.h */,
+				84D8CB4710447492005585C5 /* ORAutoTester.m */,
+			);
+			name = AutoTester;
+			path = "Source/Main Dialogs/AutoTester";
+			sourceTree = SOURCE_ROOT;
+		};
 		84D967700CA03E50000C0C76 /* Script */ = {
 			isa = PBXGroup;
 			children = (
@@ -8948,6 +8980,7 @@
 		F51E695A03AE4775015F64B1 /* Main Dialogs */ = {
 			isa = PBXGroup;
 			children = (
+				84D8CB4410447492005585C5 /* AutoTester */,
 				843CDEBA03BE2B2D00C39F5F /* Preferences */,
 				844E494105752906005F11A0 /* TaskMaster */,
 				84BAA886055AD39B0005F507 /* CommandCenter */,
@@ -9020,6 +9053,7 @@
 				840B7DAF094DFBCB00B1B135 /* ProcessCenter.tif */,
 				84701AD30E0344CF00195E3E /* ORCARootService.tif */,
 				846A5EB20FF126B2001CBD54 /* WebServer.gif */,
+				84D8CB4D10447A57005585C5 /* AutoTester.gif */,
 				F51E697203AE4775015F64B1 /* Document.nib */,
 				8408A2260FD85B3A00B0206D /* Templates */,
 			);
@@ -9153,6 +9187,8 @@
 				84B89ED10EF1995800E0C395 /* ORVmeReadWriteCommand.m */,
 				9C880ED70F2B5B2500394AEC /* ORVmeCrate.h */,
 				9C880ED80F2B5B2500394AEC /* ORVmeCrate.m */,
+				84D8CC891045A85B005585C5 /* ORVmeTests.h */,
+				84D8CC8A1045A85B005585C5 /* ORVmeTests.m */,
 			);
 			path = "Vme Base Classes";
 			sourceTree = "<group>";
@@ -10023,6 +10059,10 @@
 				84A2405D1032ED28002AFA0B /* ORMITPulserModel.h in Headers */,
 				840E72ED103DA7BC0070AD70 /* ORAmrelHVController.h in Headers */,
 				840E72EF103DA7BC0070AD70 /* ORAmrelHVModel.h in Headers */,
+				84D8CB4910447492005585C5 /* ORAutoTester.h in Headers */,
+				84D8CB5610447C68005585C5 /* AutoTesting.h in Headers */,
+				84D8CC8B1045A85B005585C5 /* ORVmeTests.h in Headers */,
+				84D8CF851046FE32005585C5 /* ORAmrelHVDecoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10666,6 +10706,8 @@
 				84A240DA1032F8B9002AFA0B /* MITPulser.tif in Resources */,
 				840E72EA103DA7BC0070AD70 /* AmrelHV.nib in Resources */,
 				840E72F3103DB4980070AD70 /* AmrelHV.tif in Resources */,
+				84D8CB4810447492005585C5 /* AutoTester.nib in Resources */,
+				84D8CB4E10447A57005585C5 /* AutoTester.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11395,6 +11437,9 @@
 				84A2405E1032ED28002AFA0B /* ORMITPulserModel.m in Sources */,
 				840E72EE103DA7BC0070AD70 /* ORAmrelHVController.m in Sources */,
 				840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */,
+				84D8CB4A10447492005585C5 /* ORAutoTester.m in Sources */,
+				84D8CC8C1045A85B005585C5 /* ORVmeTests.m in Sources */,
+				84D8CF841046FE32005585C5 /* ORAmrelHVDecoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

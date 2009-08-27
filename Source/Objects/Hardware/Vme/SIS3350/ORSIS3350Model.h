@@ -24,6 +24,7 @@
 #import "ORDataTaker.h";
 #import "ORHWWizard.h";
 #import "SBC_Config.h"
+#import "AutoTesting.h"
 
 @class ORRateGroup;
 @class ORAlarm;
@@ -37,7 +38,7 @@
 #define kOperationDirectMemoryStop			4
 #define kOperationDirectMemoryStart			5
 
-@interface ORSIS3350Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface ORSIS3350Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
 	BOOL			isRunning;
