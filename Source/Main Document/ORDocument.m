@@ -103,7 +103,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 
 - (BOOL) documentCanBeChanged
 {
-    return ![gSecurity isLocked:ORDocumentLock] && ![gOrcaGlobals runInProgress];
+    return ![gSecurity isLocked:ORDocumentLock] && ![gOrcaGlobals runInProgress] && ![gOrcaGlobals testInProgress];
 }
 
 - (void)setGroup:(ORGroup *)aGroup
