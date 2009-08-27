@@ -18,10 +18,13 @@
 //-------------------------------------------------------------
 
 #import "OrcaObjectController.h"
+#import "ORTimedTextField.h"
 
 @interface ORAmrelHVController : OrcaObjectController 
 {
 	IBOutlet NSButton*		lockButton;
+	IBOutlet NSButton*		rampEnabledACB;
+	IBOutlet NSButton*		rampEnabledBCB;
 	IBOutlet NSButton*		loadValuesAButton;
 	IBOutlet NSButton*		loadValuesBButton;
 	IBOutlet NSPopUpButton* numberOfChannelsPU;
@@ -45,7 +48,12 @@
 	IBOutlet NSTextField*	maxCurrentBField;
 	IBOutlet NSTextField*	rampRateAField;
 	IBOutlet NSTextField*	rampRateBField;
-	
+	IBOutlet NSTextField*	rampStateAField;
+	IBOutlet NSTextField*	rampStateBField;
+	IBOutlet NSTextField*	setVoltageLabelA;
+	IBOutlet NSTextField*	setVoltageLabelB;
+	IBOutlet ORTimedTextField*	timeoutField;
+
 	IBOutlet NSButton*      initAButton;
 	IBOutlet NSButton*      initBButton;
 	IBOutlet NSButton*      panicAButton;
@@ -65,6 +73,9 @@
 }
 
 #pragma mark ***Interface Management
+- (void) timedOut:(NSNotification*)aNote;
+- (void) rampStateChanged:(NSNotification*)aNote;
+- (void) rampEnabledChanged:(NSNotification*)aNote;
 - (void) rampRateChanged:(NSNotification*)aNote;
 - (void) outputStateChanged:(NSNotification*)aNote;
 - (void) numberOfChannelsChanged:(NSNotification*)aNote;
@@ -81,14 +92,16 @@
 - (void) updateChannelButtons:(int)i;
 
 #pragma mark •••Actions
+- (IBAction) stopRampAction:(id)sender;
+- (IBAction) rampEnabledAction:(id)sender;
 - (IBAction) numberOfChannelsAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) setVoltageAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
-- (IBAction) panic:(id)sender;
-- (IBAction) systemPanic:(id)sender;
+- (IBAction) panicAction:(id)sender;
+- (IBAction) systemPanicAction:(id)sender;
 - (IBAction) loadAllValues:(id)sender;
 - (IBAction) polarityAction:(id)sender;
 - (IBAction) hwPowerAction:(id)sender;

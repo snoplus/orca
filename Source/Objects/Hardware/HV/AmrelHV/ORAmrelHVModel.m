@@ -25,8 +25,11 @@
 #import "ORSerialPortAdditions.h"
 #import "ORSerialPortList.h"
 #import "ORDataPacket.h"
+#import "ORDataTypeAssigner.h"
 
-NSString* ORAmrelHVModelOutputStateChanged = @"ORAmrelHVModelOutputStateChanged";
+NSString* ORAmrelHVModelRampStateChanged	= @"ORAmrelHVModelRampStateChanged";
+NSString* ORAmrelHVModelRampEnabledChanged	= @"ORAmrelHVModelRampEnabledChanged";
+NSString* ORAmrelHVModelOutputStateChanged	= @"ORAmrelHVModelOutputStateChanged";
 NSString* ORAmrelHVModelNumberOfChannelsChanged = @"ORAmrelHVModelNumberOfChannelsChanged";
 NSString* ORAmrelHVSetVoltageChanged		= @"ORAmrelHVSetVoltageChanged";
 NSString* ORAmrelHVActVoltageChanged		= @"ORAmrelHVActVoltageChanged";
@@ -40,10 +43,16 @@ NSString* ORAmrelHVModelSerialPortChanged	= @"ORAmrelHVModelSerialPortChanged";
 NSString* ORAmrelHVModelPortNameChanged		= @"ORAmrelHVModelPortNameChanged";
 NSString* ORAmrelHVModelPortStateChanged	= @"ORAmrelHVModelPortStateChanged";
 NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
+NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 
 @interface ORAmrelHVModel (private)
 - (void) timeout;
 - (void) processOneCommandFromQueue;
+- (void) doVoltage:(unsigned short)aChan;
+- (void) startRamp:(unsigned short)aChan;
+- (void) runRampStep:(unsigned short)aChan;
+- (void) setRampState:(unsigned short)aChan withValue:(int)aRampState;
+- (void) setActVoltage:(unsigned short) aChan withValue:(float) aVoltage;
 @end
 
 #define kGetActualVoltageCmd	@"MEAS:VOLT?"
@@ -74,6 +83,9 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
     if([serialPort isOpen]){
         [serialPort close];
     }
+	[lastRampStep[0] release];
+	[lastRampStep[1] release];
+
     [serialPort release];
     [super dealloc];
 }
@@ -94,15 +106,43 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 }
 
 #pragma mark ***Accessors
+- (BOOL) channelIsValid:(unsigned short)aChan
+{
+	return (aChan<[self numberOfChannels]);
+}
+
+- (int) rampState:(unsigned short)aChan
+{
+  	if([self channelIsValid:aChan]) return rampState[aChan];
+	else        return kAmrelHVNotRamping;
+}
+
+- (BOOL) rampEnabled:(unsigned short)aChan
+{
+ 	if([self channelIsValid:aChan]) return rampEnabled[aChan];
+	else return 0;
+}
+
+- (void) setRampEnabled:(unsigned short)aChan withValue:(BOOL)aRampEnabled
+{
+	if([self channelIsValid:aChan]){
+		[[[self undoManager] prepareWithInvocationTarget:self] setRampEnabled:aChan withValue:rampEnabled[aChan]];
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+		rampEnabled[aChan] = aRampEnabled;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelRampEnabledChanged object:self userInfo:userInfo];
+	}
+}
+
 - (int) rampRate:(unsigned short)aChan
 {
-	if(aChan<2) return rampRate[aChan];
-	else        return 0;
+	if([self channelIsValid:aChan]) return rampRate[aChan];
+	else        return 1;
 }
 
 - (void) setRampRate:(unsigned short)aChan withValue:(int)aRate;
 {
-	if(aChan<2){
+	if([self channelIsValid:aChan]){
+		if(aRate<1) aRate = 1;
 		[[[self undoManager] prepareWithInvocationTarget:self] setRampRate:aChan withValue:rampRate[aChan]];
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
 		rampRate[aChan] = aRate;
@@ -112,15 +152,15 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 
 - (BOOL) outputState:(unsigned short) aChan
 {
-	if(aChan<2) return outputState[aChan];
+	if([self channelIsValid:aChan]) return outputState[aChan];
 	else        return 0;
 }
 
 - (void) setOutputState:(unsigned short)aChan withValue:(BOOL)aOutputState
 {
-	if(aChan<2){
+	if([self channelIsValid:aChan]){
 		if(aOutputState != outputState[aChan]) {
-			statusChanged = YES;
+			statusChanged[aChan] = YES;
 		}
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
 		outputState[aChan] = aOutputState;
@@ -202,19 +242,6 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
     return actVoltage[aChan];
 }
 
-- (void) setActVoltage:(unsigned short) aChan withValue:(float) aVoltage
-{
-	if(aChan>=kNumAmrelHVChannels)return;
-	if(actVoltage[aChan] != aVoltage){
-		if(fabs(actVoltage[aChan]-aVoltage)>1){
-			statusChanged = YES;
-		}
-		actVoltage[aChan] = aVoltage;
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVActVoltageChanged object:self userInfo: userInfo];
-	}
-}
-
 - (float) actCurrent:(unsigned short) aChan
 {
 	if(aChan>=kNumAmrelHVChannels)return 0;
@@ -225,7 +252,9 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 {
 	if(aChan>=kNumAmrelHVChannels)return;
 	if(actCurrent[aChan] != aCurrent){
-		statusChanged = YES;
+		if(fabs(actCurrent[aChan]-aCurrent)>.001){
+			statusChanged[aChan] = YES;
+		}		
 		actCurrent[aChan] = aCurrent;
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVActCurrentChanged object:self userInfo: userInfo];
@@ -269,8 +298,8 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 		[self getOutput:i];
 		[self getActualVoltage:i];
 		[self getActualCurrent:i];
+		if(statusChanged[i])[self shipVoltageRecords];
 	}
-	if(statusChanged)[self shipVoltageRecords];
 	
     [[self undoManager] enableUndoRegistration];
 }
@@ -283,30 +312,44 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 		time(&theTime);
 		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		
-		unsigned long data[11];
-		data[0] = dataId | 11;
-		data[1] = [self uniqueIdNumber]&0xfff;
-		data[2] = mktime(theTimeGMTAsStruct);
-		
-		union {
-			float asFloat;
-			unsigned long asLong;
-		}theData;
-		int index = 3;
 		int i;
-		for(i=0;i<2;i++){
+		for(i=0;i<[self numberOfChannels];i++){
+			unsigned long data[5];
+			data[0] = dataId | 5;
+			data[1] = ((i & 0x1)<<28) | (([self outputState:i] & 0x1)<<16) | [self uniqueIdNumber]&0xfff;
+			data[2] = mktime(theTimeGMTAsStruct);
 			
+			union {
+				float asFloat;
+				unsigned long asLong;
+			}theData;
 			theData.asFloat = actVoltage[i];
-			data[index++] = theData.asLong;
-			
+			data[3] = theData.asLong;
+				
 			theData.asFloat = actCurrent[i];
-			data[index++] = theData.asLong;
+			data[4] = theData.asLong;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:data length:sizeof(long)*5]];
+			statusChanged[i] = NO;
 		}
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*11]];
 	}	
-	statusChanged = NO;
+}
+
+- (void) panicToZero:(unsigned short)aChan
+{
+	if(aChan == 0xFFFF || [self channelIsValid:aChan]){
+		[self stopRamp:0];
+		[self stopRamp:1];
+		[self sendCmd:kSetVoltageCmd channel:0 value:0];
+		[self sendCmd:kSetVoltageCmd channel:1 value:0];
+		[self setOutput:0 withValue:NO];
+		[self setOutput:1 withValue:NO];
+	}
+	else {
+		[self stopRamp:aChan];
+		[self sendCmd:kSetVoltageCmd channel:aChan value:aChan];
+		[self setOutput:aChan withValue:NO];
+	}
 }
 
 #pragma mark ***Archival
@@ -318,8 +361,9 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
     [self setNumberOfChannels:[decoder decodeIntForKey:@"numberOfChannels"]];
 	int i;
 	for(i=0;i<kNumAmrelHVChannels;i++){
-		[self setVoltage:i withValue:	[decoder decodeFloatForKey:[NSString stringWithFormat:@"voltage%d",i]]];
-		[self setRampRate:i withValue:	[decoder decodeIntForKey:[NSString stringWithFormat:@"rampRate%d",i]]];
+		[self setVoltage:i withValue:	 [decoder decodeFloatForKey:[NSString stringWithFormat:@"voltage%d",i]]];
+		[self setRampRate:i withValue:	 [decoder decodeIntForKey:	[NSString stringWithFormat:@"rampRate%d",i]]];
+		[self setRampEnabled:i withValue:[decoder decodeBoolForKey:	[NSString stringWithFormat:@"rampEnabled%d",i]]];
 	}
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
@@ -335,8 +379,9 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 	[encoder encodeInt:numberOfChannels forKey:@"numberOfChannels"];
 	int i;
 	for(i=0;i<kNumAmrelHVChannels;i++){
-		[encoder encodeFloat:voltage[i] forKey:[NSString stringWithFormat:@"voltage%d",i]];
-		[encoder encodeInt:voltage[i] forKey:[NSString stringWithFormat:@"rampRate%d",i]];
+		[encoder encodeFloat:voltage[i]		forKey:[NSString stringWithFormat:@"voltage%d",i]];
+		[encoder encodeInt:rampRate[i]		forKey:[NSString stringWithFormat:@"rampRate%d",i]];
+		[encoder encodeBool:rampEnabled[i]	forKey:[NSString stringWithFormat:@"rampEnabled%d",i]];
 	}
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
@@ -344,19 +389,21 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel value:(float)aValue
 {
-
+	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %f\r\n",aChannel+1,aValue]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel boolValue:(BOOL)aValue
 {
+	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %d\r\n",aChannel+1,aValue]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel
 {
+	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d\r\n",aChannel+1]];
 	if(!lastRequest)[self processOneCommandFromQueue];	
 }
@@ -458,24 +505,25 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 
 #pragma mark •••HW Commands
 - (void) getID							{ [self sendCmd:@"*IDN?\r\n"]; }
-- (void) getActualVoltage:(int)aChannel	{ [self sendCmd:kGetActualVoltageCmd channel:aChannel]; }
-- (void) getActualCurrent:(int)aChannel	{ [self sendCmd:kGetActualCurrentCmd channel:aChannel]; }
-- (void) getOutput:(int)aChannel		{ [self sendCmd:kGetOutputCmd channel:aChannel]; }
+- (void) getActualVoltage:(unsigned short)aChan	{ [self sendCmd:kGetActualVoltageCmd channel:aChan]; }
+- (void) getActualCurrent:(unsigned short)aChan	{ [self sendCmd:kGetActualCurrentCmd channel:aChan]; }
+- (void) getOutput:(unsigned short)aChan		{ [self sendCmd:kGetOutputCmd channel:aChan]; }
 
-- (void) setOutput:(int)aChannel withValue:(BOOL)aState
+- (void) setOutput:(unsigned short)aChannel withValue:(BOOL)aState
 {
 	[self sendCmd:kSetOutputCmd channel:aChannel value:aState]; 
 }
 
-- (void) loadHardware:(int)aChannel
+- (void) loadHardware:(unsigned short)aChan
 {
-	if(aChannel>=0 && aChannel<2){
-		[self sendCmd:kSetOutputCmd     channel:aChannel boolValue:outputState[aChannel]];
-		[self sendCmd:kSetPolarityCmd   channel:aChannel boolValue:polarity[aChannel]];
-		[self sendCmd:kSetVoltageCmd    channel:aChannel value:voltage[aChannel]];
-		[self sendCmd:kSetMaxCurrentCmd channel:aChannel boolValue:maxCurrent[aChannel]];
+	if([self channelIsValid:aChan]){
+		[self sendCmd:kSetOutputCmd     channel:aChan boolValue:outputState[aChan]];
+		[self sendCmd:kSetPolarityCmd   channel:aChan boolValue:polarity[aChan]];
+		[self sendCmd:kSetMaxCurrentCmd channel:aChan boolValue:maxCurrent[aChan]];
+		[self doVoltage:aChan];
 	}
 }
+
 
 - (void) dataReceived:(NSNotification*)note
 {
@@ -515,6 +563,7 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualVoltageCmd length]] intValue] - 1;
 				float theVoltage = [theResponse floatValue];
 				[self setActVoltage:theChannel withValue:theVoltage];
+				[self runRampStep:theChannel];
 				done = YES;
 			}
 			
@@ -562,12 +611,22 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
     dataId = DataId;
 }
 
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherSupply
+{
+    [self setDataId:[anotherSupply dataId]];
+}
+
 #pragma mark •••Header Stuff
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"VHQ224LModel"];
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"AmrelHVModel"];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -577,19 +636,90 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 								 @"ORAmrelHVDecoderForHVStatus",                 @"decoder",
 								 [NSNumber numberWithLong:dataId],               @"dataId",
 								 [NSNumber numberWithBool:NO],                   @"variable",
-								 [NSNumber numberWithLong:11],					 @"length",
+								 [NSNumber numberWithLong:5],					 @"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"HVStatus"];
     return dataDictionary;
 }
+
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+	
+	NSArray* theActVoltages = [NSArray arrayWithObjects:[NSNumber numberWithFloat:actVoltage[0]],[NSNumber numberWithFloat:actVoltage[1]],nil];
+    [objDictionary setObject:theActVoltages forKey:@"Voltages"];
+	
+	NSArray* theActCurrents = [NSArray arrayWithObjects:[NSNumber numberWithFloat:actCurrent[0]],[NSNumber numberWithFloat:actCurrent[1]],nil];
+    [objDictionary setObject:theActCurrents forKey:@"Currents"];
+	
+	return objDictionary;
+}
+
+- (void) stopRamp:(unsigned short)aChan
+{
+	[self setRampState:aChan withValue: kAmrelHVNotRamping];
+}
+
 @end
 
 @implementation ORAmrelHVModel (private)
+
+- (void) doVoltage:(unsigned short)aChan
+{
+	if([self rampEnabled:aChan]){
+		if(rampState[aChan]==kAmrelHVNotRamping){
+			[self startRamp:aChan];
+		}
+	}
+	else {
+		[self sendCmd:kSetVoltageCmd channel:aChan value:voltage[aChan]];
+	}
+}
+
+- (void) startRamp:(unsigned short)aChan
+{
+	[self setRampState:aChan withValue: kAmrelHVRampStarting];
+	[lastRampStep[aChan] release];
+	lastRampStep[aChan] = nil;
+}
+
+- (void) runRampStep:(unsigned short)aChan
+{	
+	//only called after getting the actvoltage... try to drive it to the target
+	if(rampEnabled[aChan] && (rampState[aChan]!=kAmrelHVNotRamping)){
+		if(lastRampStep[aChan]){
+			float			deltaVoltage = voltage[aChan] - actVoltage[aChan];
+			NSTimeInterval	deltaTime	 = [[NSDate date] timeIntervalSinceDate:lastRampStep[aChan]];
+			if(fabs(deltaVoltage)<1){
+				[self stopRamp:aChan];
+				[self sendCmd:kSetVoltageCmd channel:aChan value:voltage[aChan]];
+			}
+			else {
+				float newVoltage;
+				if(deltaVoltage<0){
+					[self setRampState:aChan withValue: kAmrelHVRampingDn];
+					newVoltage = actVoltage[aChan] - rampRate[aChan]*deltaTime;
+					if(newVoltage<voltage[aChan])newVoltage = voltage[aChan];
+				}
+				else {
+					[self setRampState:aChan withValue: kAmrelHVRampingUp];
+					newVoltage = actVoltage[aChan] + rampRate[aChan]*deltaTime;
+					if(newVoltage>voltage[aChan])newVoltage = voltage[aChan];
+				}
+				[self sendCmd:kSetVoltageCmd channel:aChan value:newVoltage];
+			}
+		}
+		[lastRampStep[aChan] release];
+		lastRampStep[aChan] = [[NSDate date] retain];
+	}
+}
 
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"ZUP",@"command timeout",nil);
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelTimeout object:self];
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
@@ -603,7 +733,26 @@ NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 	[self setLastRequest:cmdString];
 	[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
-	
+}
+
+- (void) setRampState:(unsigned short)aChan withValue:(int)aRampState
+{
+    rampState[aChan] = aRampState;
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelRampStateChanged object:self userInfo:userInfo];
+}
+
+- (void) setActVoltage:(unsigned short) aChan withValue:(float) aVoltage
+{
+	if(aChan>=kNumAmrelHVChannels)return;
+	if(actVoltage[aChan] != aVoltage){
+		if(fabs(actVoltage[aChan]-aVoltage)>1){
+			statusChanged[aChan] = YES;
+		}
+		actVoltage[aChan] = aVoltage;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVActVoltageChanged object:self userInfo: userInfo];
+	}
 }
 
 @end

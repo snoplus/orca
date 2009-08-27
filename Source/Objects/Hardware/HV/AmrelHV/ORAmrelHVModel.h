@@ -22,6 +22,11 @@
 
 #define kNumAmrelHVChannels 2
 
+#define kAmrelHVNotRamping		0
+#define kAmrelHVRampStarting	1
+#define kAmrelHVRampingUp		2
+#define kAmrelHVRampingDn		3
+
 @class ORSerialPort;
 
 @interface ORAmrelHVModel : OrcaObject
@@ -42,11 +47,18 @@
 	float				maxCurrent[2];
 	BOOL				polarity[2];
 	BOOL				rampRate[2];
-	BOOL				statusChanged; 
+	BOOL				statusChanged[2]; 
     int					numberOfChannels;
+    BOOL				rampEnabled[2];
+    int					rampState[2];
+	NSDate*				lastRampStep[2];
 }
 
 #pragma mark ***Accessors
+- (BOOL) channelIsValid:(unsigned short)aChan;
+- (int)  rampState:(unsigned short)aChan;
+- (BOOL) rampEnabled:(unsigned short)aChan;
+- (void) setRampEnabled:(unsigned short)aChan withValue:(BOOL)aRampEnabled;
 - (BOOL) outputState:(unsigned short)aChan;
 - (void) setOutputState:(unsigned short)aChan withValue:(BOOL)aOutputState;
 - (int) rampRate:(unsigned short)aChan;
@@ -56,7 +68,6 @@
 - (float) voltage:(unsigned short) aChan;
 - (void)  setVoltage:(unsigned short) aChan withValue:(float) aVoltage;
 - (float) actVoltage:(unsigned short) aChan;
-- (void)  setActVoltage:(unsigned short) aChan withValue:(float) aVoltage;
 - (float) actCurrent:(unsigned short) aChan;
 - (void)  setActCurrent:(unsigned short) aChan withValue:(float) aCurrent;
 - (BOOL) polarity:(unsigned short) aChan;
@@ -66,6 +77,8 @@
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherSupply;
 
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
@@ -81,19 +94,22 @@
 #pragma mark •••Header Stuff
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••HW Commands
 - (void) getID;
-- (void) getActualVoltage:(int)aChannel;
-- (void) getActualCurrent:(int)aChannel;
-- (void) getOutput:(int)aChannel;
-- (void) setOutput:(int)aChannel withValue:(BOOL)aState;
+- (void) getActualVoltage:(unsigned short)aChannel;
+- (void) getActualCurrent:(unsigned short)aChannel;
+- (void) getOutput:(unsigned short)aChannel;
+- (void) setOutput:(unsigned short)aChannel withValue:(BOOL)aState;
 - (void) dataReceived:(NSNotification*)note;
-- (void) loadHardware:(int)aChannel;
+- (void) loadHardware:(unsigned short)aChannel;
 - (void) pollHardware;
 - (void) getAllValues;
 
 - (void) shipVoltageRecords;
+- (void) stopRamp:(unsigned short)aChan;
+- (void) panicToZero:(unsigned short)aChan;
 
 #pragma mark ***Utilities
 - (void) sendCmd:(NSString*)aCommand;
@@ -106,6 +122,8 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORAmrelHVModelRampStateChanged;
+extern NSString* ORAmrelHVModelRampEnabledChanged;
 extern NSString* ORAmrelHVModelOutputStateChanged;
 extern NSString* ORAmrelHVModelNumberOfChannelsChanged;
 extern NSString* ORAmrelHVSetVoltageChanged;
@@ -120,4 +138,5 @@ extern NSString* ORAmrelHVModelPortStateChanged;
 extern NSString* ORAmrelHVModelPortNameChanged;
 extern NSString* ORAmrelHVModelPolarityChanged;
 extern NSString* ORAmrelHVModelRampRateChanged;
+extern NSString* ORAmrelHVModelTimeout;
 
