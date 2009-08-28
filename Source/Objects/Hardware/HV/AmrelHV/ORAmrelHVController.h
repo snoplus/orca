@@ -53,6 +53,8 @@
 	IBOutlet NSTextField*	setVoltageLabelA;
 	IBOutlet NSTextField*	setVoltageLabelB;
 	IBOutlet ORTimedTextField*	timeoutField;
+	IBOutlet NSProgressIndicator*	rampingAProgress;
+	IBOutlet NSProgressIndicator*	rampingBProgress;
 
 	IBOutlet NSButton*      initAButton;
 	IBOutlet NSButton*      initBButton;

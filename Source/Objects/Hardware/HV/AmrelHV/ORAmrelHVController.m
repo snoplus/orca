@@ -357,9 +357,11 @@
 			OKForPowerEnable &= ([model actVoltage:i]<1);
 		}
 		NSImageView* theImageView = ((i==0) ? hvStateAImage:hvStateBImage);
+		NSProgressIndicator* theRampProgress = ((i==0) ? rampingAProgress:rampingBProgress);
 		if(![model outputState:i])[theImageView setImage:nil];
 		else {
 			if([model rampState:i] == kAmrelHVNotRamping){
+				[theRampProgress stopAnimation:self];
 				if([model actVoltage:i]<1) {
 					[theImageView setImage:nil];
 				}
@@ -372,9 +374,11 @@
 			}
 			else if([model rampState:i] == kAmrelHVRampingUp){
 				[theImageView setImage:[NSImage imageNamed:@"upRamp"]];
+				[theRampProgress startAnimation:self];
 			}
 			else if([model rampState:i] == kAmrelHVRampingDn){
 				[theImageView setImage:[NSImage imageNamed:@"downRamp"]];
+				[theRampProgress startAnimation:self];
 			}
 		}
 		NSButton* powerButton = (i==0?hvPowerAButton:hvPowerBButton);
