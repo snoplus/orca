@@ -380,18 +380,18 @@
 												<int key="NSPeriodicInterval">25</int>
 											</object>
 										</object>
-										<object class="NSButton" id="62570559">
+										<object class="NSButton" id="832176068">
 											<reference key="NSNextResponder" ref="724551252"/>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{5, 24}, {88, 28}}</string>
 											<reference key="NSSuperview" ref="724551252"/>
 											<bool key="NSEnabled">YES</bool>
-											<object class="NSButtonCell" key="NSCell" id="300114062">
+											<object class="NSButtonCell" key="NSCell" id="79119603">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">134348800</int>
 												<string key="NSContents">Sync...</string>
 												<reference key="NSSupport" ref="26"/>
-												<reference key="NSControlView" ref="62570559"/>
+												<reference key="NSControlView" ref="832176068"/>
 												<int key="NSButtonFlags">-2038284033</int>
 												<int key="NSButtonFlags2">129</int>
 												<string key="NSAlternateContents"/>
@@ -896,7 +896,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="2.550000e+02" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="360193740">
+																<object class="NSNumberFormatter" key="NSFormatter" id="186932102">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -962,7 +962,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="1.000000e+02" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="782124450">
+																<object class="NSNumberFormatter" key="NSFormatter" id="825983888">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -1236,7 +1236,7 @@
 																<int key="NSPeriodicInterval">25</int>
 															</object>
 														</object>
-														<object class="NSProgressIndicator" id="1012645856">
+														<object class="NSProgressIndicator" id="356844052">
 															<reference key="NSNextResponder" ref="790855452"/>
 															<int key="NSvFlags">1292</int>
 															<object class="NSPSMatrix" key="NSDrawMatrix"/>
@@ -1700,7 +1700,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="2.550000e+02" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="648321130">
+																<object class="NSNumberFormatter" key="NSFormatter" id="1019957996">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -1762,7 +1762,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="5.000000e+01" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="317095525">
+																<object class="NSNumberFormatter" key="NSFormatter" id="352520724">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -2053,7 +2053,7 @@
 																<reference key="NSTextColor" ref="867931387"/>
 															</object>
 														</object>
-														<object class="NSProgressIndicator" id="634783364">
+														<object class="NSProgressIndicator" id="384126058">
 															<reference key="NSNextResponder" ref="151604997"/>
 															<int key="NSvFlags">1292</int>
 															<object class="NSPSMatrix" key="NSDrawMatrix"/>
@@ -2667,7 +2667,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">syncButton</string>
 						<reference key="source" ref="939799915"/>
-						<reference key="destination" ref="62570559"/>
+						<reference key="destination" ref="832176068"/>
 					</object>
 					<int key="connectionID">1729</int>
 				</object>
@@ -2675,7 +2675,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">syncAction:</string>
 						<reference key="source" ref="939799915"/>
-						<reference key="destination" ref="62570559"/>
+						<reference key="destination" ref="832176068"/>
 					</object>
 					<int key="connectionID">1730</int>
 				</object>
@@ -2683,17 +2683,17 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">rampingAProgress</string>
 						<reference key="source" ref="939799915"/>
-						<reference key="destination" ref="1012645856"/>
+						<reference key="destination" ref="356844052"/>
 					</object>
-					<int key="connectionID">1733</int>
+					<int key="connectionID">1735</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">rampingBProgress</string>
 						<reference key="source" ref="939799915"/>
-						<reference key="destination" ref="634783364"/>
+						<reference key="destination" ref="384126058"/>
 					</object>
-					<int key="connectionID">1734</int>
+					<int key="connectionID">1736</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2881,7 +2881,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="623896276"/>
 							<reference ref="937774341"/>
-							<reference ref="62570559"/>
+							<reference ref="832176068"/>
 						</object>
 						<reference key="parent" ref="562839223"/>
 					</object>
@@ -3047,7 +3047,7 @@
 							<reference ref="487540048"/>
 							<reference ref="902628736"/>
 							<reference ref="512388731"/>
-							<reference ref="1012645856"/>
+							<reference ref="356844052"/>
 						</object>
 						<reference key="parent" ref="970190715"/>
 					</object>
@@ -3230,7 +3230,7 @@
 						<reference key="object" ref="1060394358"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="360193740"/>
+							<reference ref="186932102"/>
 						</object>
 						<reference key="parent" ref="902628736"/>
 					</object>
@@ -3277,7 +3277,7 @@
 						<reference key="object" ref="933241858"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="782124450"/>
+							<reference ref="825983888"/>
 						</object>
 						<reference key="parent" ref="512388731"/>
 					</object>
@@ -3422,7 +3422,7 @@
 							<reference ref="633969369"/>
 							<reference ref="808438457"/>
 							<reference ref="635319878"/>
-							<reference ref="634783364"/>
+							<reference ref="384126058"/>
 						</object>
 						<reference key="parent" ref="970190715"/>
 					</object>
@@ -3590,7 +3590,7 @@
 						<reference key="object" ref="585670480"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="317095525"/>
+							<reference ref="352520724"/>
 						</object>
 						<reference key="parent" ref="744989069"/>
 					</object>
@@ -3614,7 +3614,7 @@
 						<reference key="object" ref="687527398"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="648321130"/>
+							<reference ref="1019957996"/>
 						</object>
 						<reference key="parent" ref="128140604"/>
 					</object>
@@ -3886,46 +3886,46 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1723</int>
-						<reference key="object" ref="360193740"/>
+						<reference key="object" ref="186932102"/>
 						<reference key="parent" ref="1060394358"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1724</int>
-						<reference key="object" ref="648321130"/>
+						<reference key="object" ref="1019957996"/>
 						<reference key="parent" ref="687527398"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1725</int>
-						<reference key="object" ref="782124450"/>
+						<reference key="object" ref="825983888"/>
 						<reference key="parent" ref="933241858"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1726</int>
-						<reference key="object" ref="317095525"/>
+						<reference key="object" ref="352520724"/>
 						<reference key="parent" ref="585670480"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1727</int>
-						<reference key="object" ref="62570559"/>
+						<reference key="object" ref="832176068"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="300114062"/>
+							<reference ref="79119603"/>
 						</object>
 						<reference key="parent" ref="688440198"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1728</int>
-						<reference key="object" ref="300114062"/>
-						<reference key="parent" ref="62570559"/>
+						<reference key="object" ref="79119603"/>
+						<reference key="parent" ref="832176068"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1731</int>
-						<reference key="object" ref="1012645856"/>
+						<reference key="object" ref="356844052"/>
 						<reference key="parent" ref="566615904"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1732</int>
-						<reference key="object" ref="634783364"/>
+						<reference key="object" ref="384126058"/>
 						<reference key="parent" ref="1019106963"/>
 					</object>
 				</object>
@@ -4414,7 +4414,7 @@
 						<string key="NS.key.0">ToolTip</string>
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
-							<reference key="object" ref="62570559"/>
+							<reference key="object" ref="832176068"/>
 							<string key="toolTip">Make the Target Voltage Equal to the last Actual Voltage</string>
 						</object>
 					</object>
@@ -4455,7 +4455,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1734</int>
+			<int key="maxID">1736</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
