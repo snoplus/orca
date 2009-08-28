@@ -142,7 +142,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 - (void) setRampRate:(unsigned short)aChan withValue:(float)aRate;
 {
 	if([self channelIsValid:aChan]){
-		if(aRate<.01) aRate = .01;
+		if(aRate<.1) aRate = .1;
 		[[[self undoManager] prepareWithInvocationTarget:self] setRampRate:aChan withValue:rampRate[aChan]];
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
 		rampRate[aChan] = aRate;
@@ -364,7 +364,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 		[self setVoltage:i withValue:	 [decoder decodeFloatForKey:[NSString stringWithFormat:@"voltage%d",i]]];
 		[self setRampEnabled:i withValue:[decoder decodeBoolForKey:	[NSString stringWithFormat:@"rampEnabled%d",i]]];
 		[self setRampRate:i withValue:	 [decoder decodeFloatForKey:[NSString stringWithFormat:@"rampingRate%d",i]]];
-		if(rampRate[i]<.01)[self setRampRate:i withValue:.01];
+		if(rampRate[i]==0)[self setRampRate:i withValue:1.0];
 	}
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
@@ -507,10 +507,8 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 - (void) syncDialog
 {
 	int i;
-	for(i=0;i<[self numberOfChannels];i++){
-		doSync[i] = YES;
-		[self getActualVoltage:i];
-	}
+	for(i=0;i<[self numberOfChannels];i++)doSync[i] = YES;
+	[self getAllValues];
 }
 
 #pragma mark •••HW Commands

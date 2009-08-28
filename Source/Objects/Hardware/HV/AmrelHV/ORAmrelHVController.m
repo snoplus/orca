@@ -415,7 +415,7 @@
 
 - (IBAction) rateRateAction:(id)sender
 {
-	[model setRampRate:[sender tag] withValue:[sender intValue]];	
+	[model setRampRate:[sender tag] withValue:[sender floatValue]];	
 }
 
 - (IBAction) numberOfChannelsAction:(id)sender
