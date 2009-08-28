@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1603"/>
+			<integer value="2"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -39,7 +39,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{99, -309}, {500, 636}}</string>
 				<int key="NSWTFlags">1886912512</int>
-				<string key="NSWindowTitle">VHQ224L</string>
+				<string key="NSWindowTitle">AmRel HV</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
@@ -118,7 +118,7 @@
 						<object class="NSTextField" id="701103228">
 							<reference key="NSNextResponder" ref="562839223"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{82, 37}, {148, 14}}</string>
+							<string key="NSFrame">{{82, 37}, {171, 14}}</string>
 							<reference key="NSSuperview" ref="562839223"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="469283173">
