@@ -46,12 +46,13 @@
 	float				actCurrent[2];
 	float				maxCurrent[2];
 	BOOL				polarity[2];
-	BOOL				rampRate[2];
+	float				rampRate[2];
 	BOOL				statusChanged[2]; 
     int					numberOfChannels;
     BOOL				rampEnabled[2];
     int					rampState[2];
 	NSDate*				lastRampStep[2];
+	BOOL				doSync[2];
 }
 
 #pragma mark ***Accessors
@@ -61,8 +62,8 @@
 - (void) setRampEnabled:(unsigned short)aChan withValue:(BOOL)aRampEnabled;
 - (BOOL) outputState:(unsigned short)aChan;
 - (void) setOutputState:(unsigned short)aChan withValue:(BOOL)aOutputState;
-- (int) rampRate:(unsigned short)aChan;
-- (void) setRampRate:(unsigned short)aChan withValue:(int)aRate;
+- (float) rampRate:(unsigned short)aChan;
+- (void) setRampRate:(unsigned short)aChan withValue:(float)aRate;
 - (int) numberOfChannels;
 - (void) setNumberOfChannels:(int)aNumberOfChannels;
 - (float) voltage:(unsigned short) aChan;
@@ -90,6 +91,7 @@
 - (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
+- (void) syncDialog;
 
 #pragma mark •••Header Stuff
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

@@ -133,16 +133,16 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 	}
 }
 
-- (int) rampRate:(unsigned short)aChan
+- (float) rampRate:(unsigned short)aChan
 {
 	if([self channelIsValid:aChan]) return rampRate[aChan];
 	else        return 1;
 }
 
-- (void) setRampRate:(unsigned short)aChan withValue:(int)aRate;
+- (void) setRampRate:(unsigned short)aChan withValue:(float)aRate;
 {
 	if([self channelIsValid:aChan]){
-		if(aRate<1) aRate = 1;
+		if(aRate<.01) aRate = .01;
 		[[[self undoManager] prepareWithInvocationTarget:self] setRampRate:aChan withValue:rampRate[aChan]];
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
 		rampRate[aChan] = aRate;
@@ -362,8 +362,9 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 	int i;
 	for(i=0;i<kNumAmrelHVChannels;i++){
 		[self setVoltage:i withValue:	 [decoder decodeFloatForKey:[NSString stringWithFormat:@"voltage%d",i]]];
-		[self setRampRate:i withValue:	 [decoder decodeIntForKey:	[NSString stringWithFormat:@"rampRate%d",i]]];
 		[self setRampEnabled:i withValue:[decoder decodeBoolForKey:	[NSString stringWithFormat:@"rampEnabled%d",i]]];
+		[self setRampRate:i withValue:	 [decoder decodeFloatForKey:[NSString stringWithFormat:@"rampingRate%d",i]]];
+		if(rampRate[i]<.01)[self setRampRate:i withValue:.01];
 	}
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
@@ -380,7 +381,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 	int i;
 	for(i=0;i<kNumAmrelHVChannels;i++){
 		[encoder encodeFloat:voltage[i]		forKey:[NSString stringWithFormat:@"voltage%d",i]];
-		[encoder encodeInt:rampRate[i]		forKey:[NSString stringWithFormat:@"rampRate%d",i]];
+		[encoder encodeFloat:rampRate[i]	forKey:[NSString stringWithFormat:@"rampingRate%d",i]];
 		[encoder encodeBool:rampEnabled[i]	forKey:[NSString stringWithFormat:@"rampEnabled%d",i]];
 	}
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
@@ -503,6 +504,15 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
     
 }
 
+- (void) syncDialog
+{
+	int i;
+	for(i=0;i<[self numberOfChannels];i++){
+		doSync[i] = YES;
+		[self getActualVoltage:i];
+	}
+}
+
 #pragma mark •••HW Commands
 - (void) getID							{ [self sendCmd:@"*IDN?\r\n"]; }
 - (void) getActualVoltage:(unsigned short)aChan	{ [self sendCmd:kGetActualVoltageCmd channel:aChan]; }
@@ -563,6 +573,12 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualVoltageCmd length]] intValue] - 1;
 				float theVoltage = [theResponse floatValue];
 				[self setActVoltage:theChannel withValue:theVoltage];
+				if(doSync[theChannel]){
+					[[self undoManager] disableUndoRegistration];
+					[self setVoltage:theChannel withValue:theVoltage];
+					doSync[theChannel] = NO;
+					[[self undoManager] enableUndoRegistration];
+				}
 				[self runRampStep:theChannel];
 				done = YES;
 			}
@@ -717,6 +733,9 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 
 - (void) timeout
 {
+	doSync[0] = NO;
+	doSync[1] = NO;
+
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"ZUP",@"command timeout",nil);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelTimeout object:self];

@@ -67,6 +67,7 @@
 	IBOutlet NSImageView*	hvStateAImage;
 	IBOutlet NSImageView*	hvStateBImage;
 	IBOutlet NSButton*      moduleIDButton;
+	IBOutlet NSButton*      syncButton;
 	
 	NSSize					oneChannelSize;
 	NSSize					twoChannelSize;
@@ -108,6 +109,7 @@
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) rateRateAction:(id)sender;
 - (IBAction) moduleIDAction:(id)sender;
+- (IBAction) syncAction:(id)sender;
 
 @end
 

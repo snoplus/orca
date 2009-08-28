@@ -332,6 +332,7 @@
 	}
 	
 	[moduleIDButton		setEnabled: !locked && portOpen];
+	[syncButton 	    setEnabled: !locked && portOpen];
 }
 
 - (void) updateChannels
@@ -484,6 +485,12 @@
 - (IBAction) moduleIDAction:(id)sender
 {
 	[model getID];
+}
+
+- (IBAction) syncAction:(id)sender
+{
+	[model syncDialog];
+
 }
 
 @end
