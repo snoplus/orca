@@ -8,7 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1605"/>
+			<integer value="1489"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -380,18 +380,18 @@
 												<int key="NSPeriodicInterval">25</int>
 											</object>
 										</object>
-										<object class="NSButton" id="608248466">
+										<object class="NSButton" id="647183178">
 											<reference key="NSNextResponder" ref="724551252"/>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{5, 24}, {88, 28}}</string>
 											<reference key="NSSuperview" ref="724551252"/>
 											<bool key="NSEnabled">YES</bool>
-											<object class="NSButtonCell" key="NSCell" id="512205989">
+											<object class="NSButtonCell" key="NSCell" id="931255207">
 												<int key="NSCellFlags">67239424</int>
 												<int key="NSCellFlags2">134348800</int>
 												<string key="NSContents">Sync Dialog</string>
 												<reference key="NSSupport" ref="26"/>
-												<reference key="NSControlView" ref="608248466"/>
+												<reference key="NSControlView" ref="647183178"/>
 												<int key="NSButtonFlags">-2038284033</int>
 												<int key="NSButtonFlags2">129</int>
 												<string key="NSAlternateContents"/>
@@ -896,7 +896,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="2.550000e+02" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="844717351">
+																<object class="NSNumberFormatter" key="NSFormatter" id="714537683">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -962,7 +962,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="1.000000e+02" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="547456591">
+																<object class="NSNumberFormatter" key="NSFormatter" id="848823426">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -975,11 +975,11 @@
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="9"/>
 																			<integer value="1040"/>
-																			<string>#.0</string>
+																			<string>#0.0</string>
 																		</object>
 																	</object>
-																	<string key="NS.positiveformat">#.0</string>
-																	<string key="NS.negativeformat">#.0</string>
+																	<string key="NS.positiveformat">#0.0</string>
+																	<string key="NS.negativeformat">#0.0</string>
 																	<nil key="NS.positiveattrs"/>
 																	<nil key="NS.negativeattrs"/>
 																	<object class="NSAttributedString" key="NS.zero">
@@ -1691,7 +1691,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="2.550000e+02" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="253807249">
+																<object class="NSNumberFormatter" key="NSFormatter" id="374090470">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -1704,11 +1704,11 @@
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="9"/>
 																			<integer value="1040"/>
-																			<string>#.0</string>
+																			<string>#0.0</string>
 																		</object>
 																	</object>
-																	<string key="NS.positiveformat">#.0</string>
-																	<string key="NS.negativeformat">#.0</string>
+																	<string key="NS.positiveformat">#0.0</string>
+																	<string key="NS.negativeformat">#0.0</string>
 																	<nil key="NS.positiveattrs"/>
 																	<nil key="NS.negativeattrs"/>
 																	<object class="NSAttributedString" key="NS.zero">
@@ -1753,7 +1753,7 @@
 																<int key="NSCellFlags2">71435264</int>
 																<real value="5.000000e+01" key="NSContents"/>
 																<reference key="NSSupport" ref="26"/>
-																<object class="NSNumberFormatter" key="NSFormatter" id="312583211">
+																<object class="NSNumberFormatter" key="NSFormatter" id="99291432">
 																	<object class="NSMutableDictionary" key="NS.attributes">
 																		<bool key="EncodedWithXMLCoder">YES</bool>
 																		<object class="NSMutableArray" key="dict.sortedKeys">
@@ -1766,11 +1766,11 @@
 																			<bool key="EncodedWithXMLCoder">YES</bool>
 																			<reference ref="9"/>
 																			<integer value="1040"/>
-																			<string>#.0</string>
+																			<string>#0.0</string>
 																		</object>
 																	</object>
-																	<string key="NS.positiveformat">#.0</string>
-																	<string key="NS.negativeformat">#.0</string>
+																	<string key="NS.positiveformat">#0.0</string>
+																	<string key="NS.negativeformat">#0.0</string>
 																	<nil key="NS.positiveattrs"/>
 																	<nil key="NS.negativeattrs"/>
 																	<object class="NSAttributedString" key="NS.zero">
@@ -2649,7 +2649,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">syncButton</string>
 						<reference key="source" ref="939799915"/>
-						<reference key="destination" ref="608248466"/>
+						<reference key="destination" ref="647183178"/>
 					</object>
 					<int key="connectionID">1729</int>
 				</object>
@@ -2657,7 +2657,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">syncAction:</string>
 						<reference key="source" ref="939799915"/>
-						<reference key="destination" ref="608248466"/>
+						<reference key="destination" ref="647183178"/>
 					</object>
 					<int key="connectionID">1730</int>
 				</object>
@@ -2847,7 +2847,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="623896276"/>
 							<reference ref="937774341"/>
-							<reference ref="608248466"/>
+							<reference ref="647183178"/>
 						</object>
 						<reference key="parent" ref="562839223"/>
 					</object>
@@ -3195,7 +3195,7 @@
 						<reference key="object" ref="1060394358"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="844717351"/>
+							<reference ref="714537683"/>
 						</object>
 						<reference key="parent" ref="902628736"/>
 					</object>
@@ -3242,7 +3242,7 @@
 						<reference key="object" ref="933241858"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="547456591"/>
+							<reference ref="848823426"/>
 						</object>
 						<reference key="parent" ref="512388731"/>
 					</object>
@@ -3554,7 +3554,7 @@
 						<reference key="object" ref="585670480"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="312583211"/>
+							<reference ref="99291432"/>
 						</object>
 						<reference key="parent" ref="744989069"/>
 					</object>
@@ -3578,7 +3578,7 @@
 						<reference key="object" ref="687527398"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="253807249"/>
+							<reference ref="374090470"/>
 						</object>
 						<reference key="parent" ref="128140604"/>
 					</object>
@@ -3850,37 +3850,37 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1723</int>
-						<reference key="object" ref="844717351"/>
+						<reference key="object" ref="714537683"/>
 						<reference key="parent" ref="1060394358"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1724</int>
-						<reference key="object" ref="253807249"/>
+						<reference key="object" ref="374090470"/>
 						<reference key="parent" ref="687527398"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1725</int>
-						<reference key="object" ref="547456591"/>
+						<reference key="object" ref="848823426"/>
 						<reference key="parent" ref="933241858"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1726</int>
-						<reference key="object" ref="312583211"/>
+						<reference key="object" ref="99291432"/>
 						<reference key="parent" ref="585670480"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1727</int>
-						<reference key="object" ref="608248466"/>
+						<reference key="object" ref="647183178"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="512205989"/>
+							<reference ref="931255207"/>
 						</object>
 						<reference key="parent" ref="688440198"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1728</int>
-						<reference key="object" ref="512205989"/>
-						<reference key="parent" ref="608248466"/>
+						<reference key="object" ref="931255207"/>
+						<reference key="parent" ref="647183178"/>
 					</object>
 				</object>
 			</object>
@@ -4366,7 +4366,7 @@
 						<string key="NS.key.0">ToolTip</string>
 						<object class="IBToolTipAttribute" key="NS.object.0">
 							<string key="name">ToolTip</string>
-							<reference key="object" ref="608248466"/>
+							<reference key="object" ref="647183178"/>
 							<string key="toolTip">Make the Target Voltage Equal to the last Actual Voltage</string>
 						</object>
 					</object>
