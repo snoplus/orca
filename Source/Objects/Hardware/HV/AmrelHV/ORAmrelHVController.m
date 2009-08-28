@@ -24,6 +24,10 @@
 
 @interface ORAmrelHVController (private)
 - (void) populatePortListPopup;
+- (void) panicToZero:(unsigned short)aChannel;
+- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) syncDialog;
+- (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
 
 @implementation ORAmrelHVController
@@ -452,7 +456,7 @@
 
 - (IBAction) panicAction:(id)sender
 {
-	[model panicToZero:[sender tag]];
+	[self panicToZero:[sender tag]];
 }
 
 - (IBAction) systemPanicAction:(id)sender
@@ -489,7 +493,7 @@
 
 - (IBAction) syncAction:(id)sender
 {
-	[model syncDialog];
+	[self syncDialog];
 
 }
 
@@ -508,6 +512,62 @@
         [portListPopup addItemWithTitle:[aPort name]];
 	}    
 }
+
+- (void) panicToZero:(unsigned short)aChannel
+{
+	[self endEditing];
+	NSDecimalNumber* contextInfo;
+	contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
+    NSBeginAlertSheet([NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":aChannel==0?@"Channel 0":@"Channel 1"],
+					  @"YES/Do it NOW",
+					  @"Canel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(_panicRampSheetDidEnd:returnCode:contextInfo:),
+					  nil,
+					  contextInfo,
+					  @"Really Panic Selected High Voltage OFF?");
+}
+
+- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	NSDecimalNumber* theChannelNumber = (NSDecimalNumber*)info;
+	int channel = [theChannelNumber intValue] ;
+	if(returnCode == NSAlertDefaultReturn){
+		@try {
+			if(channel == 0xFFFF || channel == 0)[model panicToZero:0];
+			if(channel == 0xFFFF || channel == 1)[model panicToZero:1];
+		}
+		@catch(NSException* e){
+			NSLog(@"vhW224L Panic failed because of exception\n");
+		}
+	}
+	[theChannelNumber release];
+}
+
+- (void) syncDialog
+{
+	[self endEditing];
+    NSBeginAlertSheet([NSString stringWithFormat:@"Sync Dialog to Hardware"],
+					  @"YES/Do it",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(_syncSheetDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really make Target Voltage == Actual Voltage?");
+}
+
+- (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	if(returnCode == NSAlertDefaultReturn){
+		[model syncDialog];
+	}
+}
+
 @end
 
 
