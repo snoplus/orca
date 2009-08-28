@@ -591,7 +591,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 			else if([theLastCommand hasPrefix:kGetOutputCmd]){
 				int theChannel = [[theLastCommand substringFromIndex:[kGetOutputCmd length]] intValue] - 1;
 				BOOL theState  = [theResponse boolValue];
-				[self setOutput:theChannel withValue:theState];
+				[self setOutputState:theChannel withValue:theState];
 				done = YES;
 			}		
 		}	
@@ -705,7 +705,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 		if(lastRampStep[aChan]){
 			float			deltaVoltage = voltage[aChan] - actVoltage[aChan];
 			NSTimeInterval	deltaTime	 = [[NSDate date] timeIntervalSinceDate:lastRampStep[aChan]];
-			if(fabs(deltaVoltage)<1){
+			if(fabs(deltaVoltage)<.1){
 				[self stopRamp:aChan];
 				[self sendCmd:kSetVoltageCmd channel:aChan value:voltage[aChan]];
 			}

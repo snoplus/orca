@@ -558,7 +558,7 @@
 					  @selector(_syncSheetDidEnd:returnCode:contextInfo:),
 					  nil,
 					  nil,
-					  @"Really make Target Voltage == Actual Voltage?");
+					  @"This will make Target Voltage == Actual Voltage\nAnd sync the rest of the values also.");
 }
 
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
