@@ -374,12 +374,12 @@
 			}
 			else if([model rampState:i] == kAmrelHVRampingUp){
 				[theImageView setImage:[NSImage imageNamed:@"upRamp"]];
-				[theRampProgress setDoubleValue:100 * (1.0-fabs(([model voltage:i]-[model actVoltage:i])/[model voltage:i]))];
+				[theRampProgress setDoubleValue:[model rampProgress:i]];
 				[theRampProgress startAnimation:self];
 			}
 			else if([model rampState:i] == kAmrelHVRampingDn){
 				[theImageView setImage:[NSImage imageNamed:@"downRamp"]];
-				[theRampProgress setDoubleValue:100 * (1.0-fabs(([model voltage:i]-[model actVoltage:i])/[model voltage:i]))];
+				[theRampProgress setDoubleValue:[model rampProgress:i]];
 				[theRampProgress startAnimation:self];
 			}
 		}

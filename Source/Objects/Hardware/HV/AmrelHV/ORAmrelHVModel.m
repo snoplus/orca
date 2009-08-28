@@ -675,6 +675,14 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 	[self setRampState:aChan withValue: kAmrelHVNotRamping];
 }
 
+- (float) rampProgress:(unsigned short)aChan
+{
+	if(startDelta[aChan]){
+		return 100.0 - 100.0*(fabs(targetVoltage[aChan]-actVoltage[aChan])/fabs(startDelta[aChan]));
+	}
+	else return 0;
+}
+
 @end
 
 @implementation ORAmrelHVModel (private)
@@ -693,6 +701,9 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 
 - (void) startRamp:(unsigned short)aChan
 {
+	targetVoltage[aChan] = -1; //this will be set when we step
+	startVoltage[aChan]  = -1; //this will be set when we step
+	startDelta[aChan]    =  0; //this will be set when we step
 	[self setRampState:aChan withValue: kAmrelHVRampStarting];
 	[lastRampStep[aChan] release];
 	lastRampStep[aChan] = nil;
@@ -700,6 +711,13 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 
 - (void) runRampStep:(unsigned short)aChan
 {	
+	if(voltage[aChan] != targetVoltage[aChan]){
+		//the final target is changed. this will change how we calculate the percent done
+		targetVoltage[aChan] = voltage[aChan];
+		startVoltage[aChan] = actVoltage[aChan];
+		startDelta[aChan] = targetVoltage[aChan] - startVoltage[aChan];
+	}
+	
 	//only called after getting the actvoltage... try to drive it to the target
 	if(rampEnabled[aChan] && (rampState[aChan]!=kAmrelHVNotRamping)){
 		if(lastRampStep[aChan]){
@@ -724,10 +742,12 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 				[self sendCmd:kSetVoltageCmd channel:aChan value:newVoltage];
 			}
 		}
+
 		[lastRampStep[aChan] release];
 		lastRampStep[aChan] = [[NSDate date] retain];
 	}
 }
+
 
 - (void) timeout
 {

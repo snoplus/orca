@@ -53,6 +53,11 @@
     int					rampState[2];
 	NSDate*				lastRampStep[2];
 	BOOL				doSync[2];
+	
+	//used for calculating percent of ramp done only.
+	float				targetVoltage[2];
+	float				startVoltage[2];
+	float				startDelta[2];
 }
 
 #pragma mark ***Accessors
@@ -92,6 +97,7 @@
 - (void) openPort:(BOOL)state;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (void) syncDialog;
+- (float) rampProgress:(unsigned short)aChannel;
 
 #pragma mark •••Header Stuff
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
