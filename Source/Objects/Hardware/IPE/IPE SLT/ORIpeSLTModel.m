@@ -286,11 +286,14 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
                      selector : @selector(serviceChanged:)
                          name : @"ORFireWireInterfaceServiceAliveChanged"
                        object : [self fireWireInterface]];
-    
+
+    #if 0
+    //Calls initBoard, which will be called from runTaskStarted again. So we dont need this notification.
     [notifyCenter addObserver : self
                      selector : @selector(runIsAboutToStart:)
                          name : ORRunAboutToStartNotification
                        object : nil];
+    #endif
 	
     [notifyCenter addObserver : self
                      selector : @selector(runIsStopped:)
@@ -352,9 +355,12 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 
 - (void) runIsAboutToStart:(NSNotification*)aNote
 {
-    //TODO: ORRunModel sends out ORRunAboutToStartNotification (in -(void)runStarted:...) -tb- 2008-03-28
-    //TODO: SLT should not init the board without check whether we can run, e.g. check if calibration run is active -tb- 2008-03-28
-    //TODO: why is it not in runTaskStarted: ... ??????? -tb- 
+    //Note: ORRunModel sends out ORRunAboutToStartNotification (in -(void)runStarted:...) -tb- 2008-03-28
+    //Note: SLT should not init the board without check whether we can run, e.g. check if calibration run is active -tb- 2008-03-28
+    //Note: why is it not in runTaskStarted: ... ??????? -tb- 
+    
+    //I removed the calling notification, initBoard is called from runTaskStarted. -tb- 2009-08-28
+    // (Maybe I could reuse it for FLT function loadTime?) -tb-
     
 	if([readOutGroup count] == 0){//TODO: [readOutGroup count]: what is this?????????????? -tb- 2008-03-28
 		[self initBoard];

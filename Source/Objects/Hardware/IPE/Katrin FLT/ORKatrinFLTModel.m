@@ -1635,7 +1635,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 
 - (void) loadTime
 {
-    NSLog(@"This is method: %@ ::  %@ (self: %p)  STARTING\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
+    //debug output -tb- NSLog(@"This is method: %@ ::  %@ (self: %p)  STARTING\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
 	//attempt to the load time as close as possible to a seconds boundary
 	NSDate* then = [NSDate date];
 	while(1){
@@ -1651,7 +1651,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 			break;
 		}
 	}
-    NSLog(@"This is method: %@ ::  %@ (self: %p)  STOPPING\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
+    //debug output -tb- NSLog(@"This is method: %@ ::  %@ (self: %p)  STOPPING\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
 }
 
 //testpattern stuff
@@ -3943,11 +3943,7 @@ clean_up_mark:
     //see 5 lines above: initBoard calles loadTime, writeMode:fltRunMode, loadThresholdsAndGains, writeHitRateMask ... -tb-
     //is this necessary before calling restartRun or reset ? why writeTriggerControl is missing in initBoard? ... -tb-
     if([[userInfo objectForKey:@"doinit"]intValue]){ // this produced a delay of 1 sec per FLT, so only for cold start necessary ... -tb- 2009-03
-	    [self loadTime];					//set the time on the flts to mac time
-         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
-         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
-         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
-         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
+	    [self loadTime];					//set the time on the flts to mac time (if doinit==1 [SLT initBoard] was called, reloading time is necessary ... -tb-)
 	}
 	[self writeMode:fltRunMode];
 	[self writeHitRateMask];			//set the hit rate masks
@@ -3962,6 +3958,8 @@ clean_up_mark:
     /*!@todo TODO: at Run Start the postTriggTime gets resetted somewhere to the default, should be checked somewhen -tb-
      * <br>... could be software (SLT?) or hardware; Denis already tried to find it in hardware, I tried to find it in software ...
      * <br> ... quite sure that it is in SLT ... -tb-2008-03-14
+     *
+     * (Could be fixed by removing init after runIsAboutToStart
      */
     //debug output -tb- NSLog(@"1\n");[self readPostTriggerTime];//TODO: debugging - remove it -tb-
 	

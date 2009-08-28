@@ -362,7 +362,7 @@
     //place here the startup for the histogram mode: stop (if running), clear, start (in takeData?) -tb-
     #if 1
     {
-        NSLog(@"Loop over FLTs ---------\n");  //YES!!!!! -tb-
+        //debug output -tb- NSLog(@"Loop over FLTs ---------\n");  //YES!!!!! -tb-
 		NSArray* cards = [[self crate] orcaObjects];
 		NSEnumerator* e = [cards objectEnumerator];
 		id card;
@@ -376,7 +376,7 @@
 				//try to access a card. if it throws then we have to load the FPGAs
 				//[card readControlStatus];
 				//break;	//only need to try one
-                NSLog(@"  Loop 3: found a ORKatrinFLTModel in slot %i\n",[card slot]);
+                //debug output -tb- NSLog(@"  Loop 3: found a ORKatrinFLTModel in slot %i\n",[card slot]);
                 if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
                     fltsInHistoDaqMode=TRUE;
                     if(!firstHistoModeFLT) firstHistoModeFLT=flt;
