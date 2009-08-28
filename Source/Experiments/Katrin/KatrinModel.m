@@ -29,6 +29,7 @@
 
 NSString* KatrinModelSlowControlIsConnectedChanged = @"KatrinModelSlowControlIsConnectedChanged";
 NSString* KatrinModelSlowControlNameChanged		= @"KatrinModelSlowControlNameChanged";
+NSString* ORKatrinModelUseCrateViewChanged		= @"ORKatrinModelUseCrateViewChanged";
 
 static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
@@ -183,6 +184,19 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	return @"KatrinDetailsLock";
 }
 
+- (void) setUseCrateView:(BOOL)aUseCrateView
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setUseCrateView:useCrateView];
+	useCrateView = aUseCrateView;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelUseCrateViewChanged object:self userInfo:nil];
+	
+}
+
+- (BOOL) useCrateView
+{
+	return useCrateView;
+}
+
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -190,6 +204,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     [[self undoManager] disableUndoRegistration];
     
     [self setSlowControlName:[decoder decodeObjectForKey:@"slowControlName"]];
+    [self setUseCrateView:[decoder decodeBoolForKey:@"useCrateView"]];
 	[[self undoManager] enableUndoRegistration];
 
     return self;
@@ -199,6 +214,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:slowControlName forKey:@"slowControlName"];
+    [encoder encodeBool:useCrateView forKey:@"useCrateView"];
 }
 
 

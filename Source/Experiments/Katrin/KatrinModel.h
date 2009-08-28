@@ -26,12 +26,15 @@
 {
 	NSString* slowControlName;
 	int	      slowControlIsConnected;
+	BOOL	  useCrateView;
 }
 #pragma mark ¥¥¥Accessors
 - (NSString*) slowControlName;
 - (void) setSlowControlName:(NSString*)aName;
 - (BOOL) slowControlIsConnected;
 - (void) setSlowControlIsConnected:(BOOL)aState;
+- (void) setUseCrateView:(BOOL)aUseCrateView;
+- (BOOL) useCrateView;
 
 #pragma mark ¥¥¥Slow Control Connection Monitoring
 - (void) slowControlConnectionChanged:(NSNotification*)aNote;
@@ -43,9 +46,9 @@
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
-
 @end
 
 extern NSString* KatrinModelSlowControlIsConnectedChanged;
 extern NSString* KatrinModelSlowControlNameChanged;
+extern NSString* ORKatrinModelUseCrateViewChanged;
 

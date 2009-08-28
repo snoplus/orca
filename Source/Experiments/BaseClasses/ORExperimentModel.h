@@ -59,6 +59,7 @@
 - (void) setCardCheck: (int) cardCheck;
 - (void) setCardCheckFailed;
 - (void) setHardwareCheckFailed;
+- (int) numberOfSegmentGroups;
 - (ORSegmentGroup*) segmentGroup:(int)aSet;
 - (BOOL) somethingSelected;
 - (void) setSomethingSelected:(BOOL)aFlag;

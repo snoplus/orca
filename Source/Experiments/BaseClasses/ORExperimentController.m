@@ -611,8 +611,6 @@
 	[primaryAdcClassNamePopup selectItemWithTitle: [[segmentGroups objectAtIndex:0] adcClassName]];
 }
 
-
-
 - (void) mapFileRead:(NSNotification*)aNote
 {
     if(aNote == nil || [aNote object] == model){

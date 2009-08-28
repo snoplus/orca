@@ -101,6 +101,8 @@
 				<string>id</string>
 				<key>secondaryAdcClassNameAction</key>
 				<string>id</string>
+				<key>showCrateViewAction</key>
+				<string>id</string>
 				<key>slowControlNameAction</key>
 				<string>id</string>
 			</dict>
@@ -130,6 +132,8 @@
 				<string>NSTableView</string>
 				<key>secondaryValuesView</key>
 				<string>NSTableView</string>
+				<key>showCrateViewMatrix</key>
+				<string>NSMatrix</string>
 				<key>slowControlIsConnectedField</key>
 				<string>NSTextField</string>
 				<key>slowControlIsConnectedField1</key>

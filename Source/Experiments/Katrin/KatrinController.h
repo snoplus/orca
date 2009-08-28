@@ -19,6 +19,7 @@
 //-------------------------------------------------------------
 
 #import "ORExperimentController.h"
+#import "KatrinDetectorView.h"
 
 @class ORColorScale;
 @class ORSegmentGroup;
@@ -42,6 +43,7 @@
 
 	//items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
+    IBOutlet NSMatrix*		showCrateViewMatrix;
 
 	ORSegmentGroup* secondaryGroup;
 	NSView *blankView;
@@ -64,6 +66,8 @@
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
 
+- (IBAction) showCrateViewAction:(id)sender;
+
 #pragma mark ¥¥¥Detector Interface Management
 - (void) slowControlNameChanged:(NSNotification*)aNote;
 - (void) slowControlIsConnectedChanged:(NSNotification*)aNote;
@@ -75,6 +79,7 @@
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
+- (void) showCrateViewChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Table Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 
@@ -85,6 +90,8 @@
             forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 - (void) tableView:(NSTableView*)tv didClickTableColumn:(NSTableColumn *)tableColumn;
 //- (void) updateTableHeaderToMatchCurrentSort;
- 
 
+@end
+@interface ORDetectorView (Katrin)
+- (void) setUseCrateView:(BOOL)aState;
 @end

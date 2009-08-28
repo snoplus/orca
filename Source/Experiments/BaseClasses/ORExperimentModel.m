@@ -138,6 +138,11 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	[segmentGroups makeObjectsPerformSelector:@selector(clearSegmentErrors)];
 }
 
+- (int) numberOfSegmentGroups
+{
+	return [segmentGroups count];
+}
+
 - (ORSegmentGroup*) segmentGroup:(int)aSet
 {
 	if(aSet>=0 && aSet < [segmentGroups count]){

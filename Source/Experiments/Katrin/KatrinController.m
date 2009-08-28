@@ -27,7 +27,6 @@
 #import "ORAxis.h"
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
-#import "ORDetectorView.h"
 
 @interface KatrinController (private)
 - (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -130,7 +129,13 @@
                      selector : @selector(slowControlNameChanged:)
                          name : KatrinModelSlowControlNameChanged
 						object: model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(showCrateViewChanged:)
+                         name : ORKatrinModelUseCrateViewChanged
+						object: model];
+	
+	
 }
 
 - (void) updateWindow
@@ -149,6 +154,14 @@
 	
 	[self slowControlIsConnectedChanged:nil];
 	[self slowControlNameChanged:nil];
+	[self showCrateViewChanged:nil];
+}
+
+- (void) showCrateViewChanged:(NSNotification*)aNote
+{
+	[showCrateViewMatrix selectCellWithTag:[model useCrateView]];
+	[detectorView setUseCrateView:[model useCrateView]];
+	[detectorView makeAllSegments];	
 }
 
 #pragma mark ¥¥¥HW Map Actions
@@ -216,6 +229,11 @@
 
 #pragma mark ¥¥¥Interface Management
 
+- (IBAction) showCrateViewAction:(id)sender
+{
+	[model setUseCrateView:[[sender selectedCell]tag]];
+}
+
 - (void) slowControlNameChanged:(NSNotification*)aNote
 {
 	[slowControlNameField setStringValue: [model slowControlName]];
@@ -242,6 +260,9 @@
 {
 	[super specialUpdate:aNote];
 	[secondaryValuesView reloadData];
+	if([model useCrateView]){
+		[detectorView makeAllSegments];
+	}
 }
 
 - (void) setDetectorTitle
