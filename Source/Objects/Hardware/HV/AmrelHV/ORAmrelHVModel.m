@@ -337,7 +337,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 
 - (void) panicToZero:(unsigned short)aChan
 {
-	if(aChan == 0xFFFF || [self channelIsValid:aChan]){
+	if(aChan == 0xFFFF ){
 		[self stopRamp:0];
 		[self stopRamp:1];
 		[self sendCmd:kSetVoltageCmd channel:0 value:0];
@@ -345,7 +345,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 		[self setOutput:0 withValue:NO];
 		[self setOutput:1 withValue:NO];
 	}
-	else {
+	else if([self channelIsValid:aChan]){
 		[self stopRamp:aChan];
 		[self sendCmd:kSetVoltageCmd channel:aChan value:aChan];
 		[self setOutput:aChan withValue:NO];
@@ -560,6 +560,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 			
 			if([theResponse isEqualToString:@"ERROR"]){
 				//count the error....
+				done = YES;
 			}
 			
 			else if([theLastCommand hasPrefix:@"*IDN?"]){
