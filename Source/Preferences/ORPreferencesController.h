@@ -18,12 +18,12 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
-@interface ORPreferencesController : NSWindowController {
-#else
-@interface ORPreferencesController : NSWindowController <NSTextViewDelegate> {
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@interface ORPreferencesController : NSWindowController <NSTextViewDelegate> 
+#else																						// pre-10.6 fallback
+@interface ORPreferencesController : NSWindowController <NSTextViewDelegate> 
 #endif
+{	
     IBOutlet NSColorWell* 	backgroundColorWell;
     IBOutlet NSColorWell* 	lineColorWell;
     IBOutlet NSMatrix*		openingDocPrefMatrix;

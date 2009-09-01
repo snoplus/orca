@@ -47,12 +47,12 @@
 /* -----------------------------------------------------------------------------
 	Classes:
    -------------------------------------------------------------------------- */
-
-#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
-@interface UKPrefsPanel : NSObject
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface UKPrefsPanel : NSObject <NSToolbarDelegate>
+#else																						// pre-10.6 fallback
+@interface UKPrefsPanel : NSObject
 #endif
+
 {
 	IBOutlet NSTabView*		tabView;			// The tabless tab-view that we're a switcher for.
 	NSMutableDictionary*	itemsList;			// Auto-generated from tab view's items.

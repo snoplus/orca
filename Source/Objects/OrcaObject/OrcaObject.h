@@ -33,11 +33,12 @@ extern NSString* ORObjArrayPtrPBType;
 @class ORGroup;
 @class ORConnection;
 
-#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
-@interface OrcaObject:NSObject <NSCoding,NSCopying> {
-#else
-@interface OrcaObject:NSObject <NSCoding,NSCopying,NSMenuDelegate> {
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@interface OrcaObject:NSObject <NSCoding,NSCopying,NSMenuDelegate> 
+#else																						// pre-10.6 fallback
+@interface OrcaObject:NSObject <NSCoding,NSCopying> 
 #endif
+{
 	@protected
         id			guardian;
         NSImage* 	image;

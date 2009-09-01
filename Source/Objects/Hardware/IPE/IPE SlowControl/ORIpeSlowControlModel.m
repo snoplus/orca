@@ -1199,10 +1199,10 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         NSLog(@"CONNECTION FAILED! Error - >%@< >%i< >%@<\n",
 			  [error localizedDescription], 
 			  [error code],
-#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
-			  [[error userInfo] objectForKey:NSErrorFailingURLStringKey]
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 			  [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]
+#else
+			  [[error userInfo] objectForKey:NSErrorFailingURLStringKey]
 #endif
 			  );
         //TODO: write a message into the tree -tb-
