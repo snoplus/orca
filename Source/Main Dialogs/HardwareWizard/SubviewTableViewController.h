@@ -58,8 +58,8 @@ and will forward all data source and delegate methods to the original owner.
 
 *****************************************************************************/
 
-#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
-@interface SubviewTableViewController : NSObject <NSTableViewDataSource>
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
+@interface SubviewTableViewController : NSObject
 #else
 @interface SubviewTableViewController : NSObject <NSTableViewDataSource,NSTableViewDelegate>
 #endif

@@ -48,7 +48,7 @@
 	Classes:
    -------------------------------------------------------------------------- */
 
-#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
 @interface UKPrefsPanel : NSObject
 #else
 @interface UKPrefsPanel : NSObject <NSToolbarDelegate>

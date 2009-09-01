@@ -36,31 +36,18 @@
 
 - (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName
 {
-	self = [super init];
+	self = [super initWithName:aName];
 	type = kReadWrite;
 	theOffset	= anOffset;
 	length		= aLength;
 	validMask	= aValidMask;
 	wordSize = aWordSize;
-	name = [aName copy];
 	return self;
 }
 
 - (void) dealloc
 {
-	[name release];
-	[failureLog release];
 	[super dealloc];
-}
-
-- (NSArray*) failureLog
-{
-	return failureLog;
-}
-
-- (NSString*)name
-{
-	return name;
 }
 
 - (void) runTest:(id)anObj
@@ -111,19 +98,16 @@
 		[self addFailureLog:[NSString stringWithFormat:@"Exception: 0x%08x\n",[anObj baseAddress] + theOffset]];
 	}
 }
-													
-- (void) addFailureLog:(NSString*)aEntry
-{
-	if(!failureLog)failureLog = [[NSMutableArray array] retain];
-	[failureLog addObject:aEntry];
-}
-														
 @end
 
 @implementation ORVmeReadOnlyTest
-- (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName
++ (id) test:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName
 {
-	self = [super initWith:anOffset length:aLength wordSize:aWordSize validMask:aValidMask name:aName];
+	return [[[ORVmeReadOnlyTest alloc] initWith:anOffset length:aLength wordSize:aWordSize name:aName] autorelease];
+}
+- (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName
+{
+	self = [super initWith:anOffset length:aLength wordSize:aWordSize validMask:0xFFFFFFFF name:aName];
 	type = kReadOnly;
 	return self;
 }

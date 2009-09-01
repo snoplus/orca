@@ -112,7 +112,7 @@
 	}
     else if(!incomingData){
 		//if there was no data after the notification, something is wrong-- just terminate the task.
-        [(NSTask*)[aNotification object] terminate];
+        [[aNotification object] terminate];
     }
 }
 @end

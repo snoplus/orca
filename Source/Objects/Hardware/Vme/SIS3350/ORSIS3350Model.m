@@ -1570,8 +1570,14 @@ unsigned long rblt_data[kMaxNumberWords];
 - (NSArray*) autoTests 
 {
 	NSMutableArray* myTests = [NSMutableArray array];
-	[myTests addObject:[ORVmeReadWriteTest test:0x02000028 length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC1/2 address threshold"]];
-	[myTests addObject:[ORVmeReadWriteTest test:0x03000028 length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC3/4 address threshold"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kControlStatus length:1 wordSize:4 name:@"Control Status"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kModuleIDReg length:1 wordSize:4 name:@"Module ID"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kAcquisitionControlReg length:1 wordSize:4 name:@"Acquisition Control"]];
+	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[0] length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC1/2 address threshold"]];
+	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[1] length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC3/4 address threshold"]];
+
+	
+	
 	return myTests;
 }
 

@@ -71,7 +71,7 @@
 
 
 
-#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
+#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MIN_ALLOWED
 @interface ORToolbarFactory : NSObject
 #else
 @interface ORToolbarFactory : NSObject <NSToolbarDelegate>

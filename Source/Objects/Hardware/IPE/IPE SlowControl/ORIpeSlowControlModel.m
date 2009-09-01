@@ -1199,7 +1199,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         NSLog(@"CONNECTION FAILED! Error - >%@< >%i< >%@<\n",
 			  [error localizedDescription], 
 			  [error code],
-#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
 			  [[error userInfo] objectForKey:NSErrorFailingURLStringKey]
 #else
 			  [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]

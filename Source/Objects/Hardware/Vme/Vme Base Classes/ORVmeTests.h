@@ -17,27 +17,24 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORAutoTestUnit.h"
 
-@interface ORVmeReadWriteTest : NSObject {
+@interface ORVmeReadWriteTest : ORAutoTestUnit {
 	int type;
 	unsigned long theOffset;
 	unsigned long length;
 	unsigned long validMask;
 	short wordSize;
-	NSString* name;
-	NSMutableArray* failureLog;
 }
 + (id) test:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName;
 - (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName;
 - (void) runTest:(id)anObj;
-- (NSString*)name;
-
-- (NSArray*) failureLog;
-- (void) addFailureLog:(NSString*)aEntry;
 @end
 
 @interface ORVmeReadOnlyTest : ORVmeReadWriteTest {
 }
++ (id) test:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName;
+- (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName;
 @end
 
 @interface ORVmeWriteOnlyTest : ORVmeReadWriteTest {

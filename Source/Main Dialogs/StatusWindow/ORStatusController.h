@@ -22,7 +22,11 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataSet;
 
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
+@interface ORStatusController : NSWindowController
+#else
 @interface ORStatusController : NSWindowController <NSOutlineViewDataSource>
+#endif
 {
 	IBOutlet NSTabView*     tabView;
     IBOutlet NSTextView*    statusView;  //our view

@@ -33,7 +33,7 @@ extern NSString* ORObjArrayPtrPBType;
 @class ORGroup;
 @class ORConnection;
 
-#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED
 @interface OrcaObject:NSObject <NSCoding,NSCopying> {
 #else
 @interface OrcaObject:NSObject <NSCoding,NSCopying,NSMenuDelegate> {

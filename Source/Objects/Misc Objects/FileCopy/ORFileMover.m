@@ -45,7 +45,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         [nc removeObserver:delegate name:nil object:self];
     }
     [nc removeObserver:self name:nil object:nil];
-
+	
     if([task isRunning]){
         [task terminate];
     }
@@ -253,9 +253,9 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     [task setEnvironment: environment];
     
     if([self transferType] == eUseCURL){
-	
+		
         [task setLaunchPath:@"/usr/bin/curl"];
-	
+		
         NSMutableArray* params = [NSMutableArray array];
         [params addObject:@"-T"];
         [params addObject:[NSString stringWithFormat:@"%@",fullPath]];
@@ -267,7 +267,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         if(verbose)[params addObject:@"-v"];
         
         [task setArguments:params];
-	
+		
     }
     else {
         //make temp file for the script NOTE: expect must be installed!
@@ -281,34 +281,34 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
             [self setScriptFilePath:scriptPath];            
             switch ([self transferType]) {
                 case eUseSCP:
-					{
-						NSString* bp = [[NSBundle mainBundle ]resourcePath];
-						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
-						[theScript replace:@"<isDir>" with:isDir?@"-r":@""];
-						[theScript replace:@"<verbose>" with:isDir?@"-v":@""];
-						[theScript replace:@"<sourcePath>" with:fullPath];
-						[theScript replace:@"<userName>" with:remoteUserName];
-						[theScript replace:@"<host>" with:remoteHost];
-						[theScript replace:@"<destinationPath>" with:remotePath];
-						[theScript replace:@"<password>" with:remotePassWord];
-						[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-					}
+				{
+					NSString* bp = [[NSBundle mainBundle ]resourcePath];
+					NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"]];
+					[theScript replace:@"<isDir>" with:isDir?@"-r":@""];
+					[theScript replace:@"<verbose>" with:isDir?@"-v":@""];
+					[theScript replace:@"<sourcePath>" with:fullPath];
+					[theScript replace:@"<userName>" with:remoteUserName];
+					[theScript replace:@"<host>" with:remoteHost];
+					[theScript replace:@"<destinationPath>" with:remotePath];
+					[theScript replace:@"<password>" with:remotePassWord];
+					[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+				}
                     break;
                     
                 case eUseSFTP:
                 case eUseFTP:
-					{
-						NSString* bp = [[NSBundle mainBundle ]resourcePath];
-						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
-						
-						[theScript replace:@"<ftp>" with:[self transferType] == eUseSFTP?@"sftp":@"ftp"];
-						[theScript replace:@"<user>" with:remoteUserName];
-						[theScript replace:@"<host>" with:remoteHost];
-						[theScript replace:@"<password>" with:remotePassWord];
-						[theScript replace:@"<sourcePath>" with:fullPath];
-						[theScript replace:@"<destinationPath>" with:remotePath];
-						[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-                    }
+				{
+					NSString* bp = [[NSBundle mainBundle ]resourcePath];
+					NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectScript"]];
+					
+					[theScript replace:@"<ftp>" with:[self transferType] == eUseSFTP?@"sftp":@"ftp"];
+					[theScript replace:@"<user>" with:remoteUserName];
+					[theScript replace:@"<host>" with:remoteHost];
+					[theScript replace:@"<password>" with:remotePassWord];
+					[theScript replace:@"<sourcePath>" with:fullPath];
+					[theScript replace:@"<destinationPath>" with:remotePath];
+					[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+				}
                     break;
                     
                 case eUseCURL:
@@ -320,7 +320,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
             BOOL fileOK = [fileManager fileExistsAtPath: fullPath];
             if ( fileOK ) {
                 NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
-				[fileManager setAttributes:dict ofItemAtPath:fullPath error:nil];
+                [fileManager changeFileAttributes:dict atPath:scriptPath];
                 [task setLaunchPath:scriptPath];
 				NSLog(@"Trying to send <%@> to %@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");
             }
@@ -346,7 +346,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 {
     if([aNote object] == task){
         BOOL transferOK = NO;
-        [[NSFileManager defaultManager] removeItemAtPath:scriptFilePath error:nil];
+        [[NSFileManager defaultManager] removeFileAtPath:scriptFilePath handler:nil];
 		int exitCode = [task terminationStatus];
         if( exitCode == 0) {
             //probable success.. but let's make sure
@@ -361,7 +361,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 							NSLogColor([NSColor redColor],@"Partial transfer only!\n");
 						}
 					}
-                break;
+					break;
 					
                 case eUseFTP:
 					range = [allOutput rangeOfString:@"%"];
@@ -374,7 +374,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					}
                     //range = [allOutput rangeOfString:@"Transfer complete"];
                     //if(range.location  != NSNotFound)transferOK = YES;
-                break;
+					break;
 					
                 case eUseSFTP:
                     range = [allOutput rangeOfString:@"Host is down"];
@@ -395,9 +395,9 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 							NSLogColor([NSColor redColor],@"Partial transfer only!\n");	
 						}
 					}
-                  //  range = [allOutput rangeOfString:@"Failure"];
-                   // if(range.location  == NSNotFound)transferOK = YES;
-                break;
+					//  range = [allOutput rangeOfString:@"Failure"];
+					// if(range.location  == NSNotFound)transferOK = YES;
+					break;
 					
                 case eUseCURL:
                     if([task terminationStatus] == 0)transferOK = YES;
@@ -405,16 +405,16 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                         transferOK = NO;
                         NSLog(@"task return status: %d\n",[task terminationStatus]);
                     }
-                break;
+					break;
             }
         }
         
-            
+		
         if(transferOK){
             NSLog(@"%@ copied to %@@%@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteUserName,remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");	
             if ([delegate respondsToSelector:@selector(shouldRemoveFile:)]){
                 if([delegate shouldRemoveFile:fullPath]){
-                    [[NSFileManager defaultManager] removeItemAtPath:fullPath error:nil];
+                    [[NSFileManager defaultManager] removeFileAtPath:fullPath handler:nil];
                     NSLog(@"%@ deleted from local host\n",[fullPath stringByAbbreviatingWithTildeInPath]);
                 }
                 else [self moveToSentFolder];
@@ -432,7 +432,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 		NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         [nc postNotificationName:NSTaskDidTerminateNotification object:self];
         [nc postNotificationName:ORFileMoverIsDoneNotification object:self];
-	
+		
 	}
 }
 
@@ -442,7 +442,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     if (incomingData && [incomingData length]) {
         // Note:  if incomingData is nil, the filehandle is closed.
         NSString *incomingText = [[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding];
-
+		
         [allOutput appendString:incomingText];
         
 		NSArray* lines = [incomingText lines];
@@ -458,9 +458,9 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					[self setPercentDone:[percentString intValue]];
 				}	
 			}
-
+			
 		}
-
+		
         [[aNotification object] readInBackgroundAndNotify];  // go back for more.
         [incomingText release];
     }
@@ -478,8 +478,8 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     NSString* dirPath = [fullPath stringByDeletingLastPathComponent];
     dirPath = [dirPath stringByAppendingPathComponent:@"sentFiles"];
     NSString* destination = [dirPath stringByAppendingPathComponent:[fullPath lastPathComponent]];
-	[fileManager createDirectoryAtPath:dirPath withIntermediateDirectories:NO attributes:nil error:nil];
-    [fileManager moveItemAtPath:fullPath toPath:destination  error:nil];
+    [fileManager createDirectoryAtPath:dirPath attributes:nil];
+    [fileManager movePath:fullPath toPath:destination  handler:nil];
 }
 
 
@@ -487,7 +487,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 {
     dirPath = [dirPath stringByAppendingPathComponent:@"sentFiles"];
     NSFileManager* fileManager = [NSFileManager defaultManager];
-    [fileManager removeItemAtPath:dirPath error:nil];
+    [fileManager removeFileAtPath:dirPath handler:nil];
     NSLog(@"removed folder: %@\n",dirPath);
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
