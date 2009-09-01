@@ -109,6 +109,8 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setResistance:resistance];
     
     resistance = aResistance;
+	if (resistance < 50) resistance = 50.;
+	if (resistance > 1050.) resistance = 1050.;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelResistanceChanged object:self];
 }
@@ -129,9 +131,8 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
 	switch ([self clockSpeed]){
 		case 0: 
-		default:  return 1e+03;
-		case 1:   return 1e+06;
-		case 2:   return 1e+09;
+		default:  return 1e+06;
+		case 1:   return 1e+03;
 	}
 }
 
