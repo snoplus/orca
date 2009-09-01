@@ -25,7 +25,7 @@
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 	imageRep = [existingImage bestRepresentationForRect:NSMakeRect(0,0,[self size].width,[self size].height) context:nil hints:nil];
 #else
-	imageRep = [existingImage bestRepresentationForDevice: nil]
+	imageRep = [existingImage bestRepresentationForDevice: nil];
 #endif
 	
     existingSize.width = [imageRep pixelsWide];
@@ -44,10 +44,10 @@
     [rotateTF concat];
 
     NSRect r1 = NSMakeRect(0, 0, newSize.height, newSize.width);
-#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
-	imageRep = [existingImage bestRepresentationForDevice: nil]
-#else
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 	imageRep = [existingImage bestRepresentationForRect:NSMakeRect(0,0,[self size].width,[self size].height) context:nil hints:nil];
+#else
+	imageRep = [existingImage bestRepresentationForDevice: nil];
 #endif
     [imageRep drawInRect: r1];
 
