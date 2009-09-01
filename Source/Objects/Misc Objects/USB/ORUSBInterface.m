@@ -296,7 +296,7 @@ readon:
 	IOReturn kr = (*interface)->WritePipeTO(interface, pipe, bytes, length,5000,5000);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
-		if(kr = kIOUSBPipeStalled){
+		if(kr == kIOUSBPipeStalled){
 			kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
 			if(kr){
 				[usbLock unlock];
@@ -366,7 +366,7 @@ readon:
 	IOReturn kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead, 1000, 1000);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
-		if(kr = kIOUSBPipeStalled){
+		if(kr == kIOUSBPipeStalled){
 			kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
 			if(kr){
 				[usbLock unlock];
@@ -404,7 +404,7 @@ readon:
 	IOReturn kr = (*interface)->ReadPipe(interface, pipe, bytes, &actualRead);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
-		if(kr = kIOUSBPipeStalled){
+		if(kr == kIOUSBPipeStalled){
 			kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
 			if(kr){
 				[usbLock unlock];
@@ -438,7 +438,7 @@ readon:
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, bytes, length);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
-		if(kr = kIOUSBPipeStalled){
+		if(kr == kIOUSBPipeStalled){
 			kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
 			if(kr){
 				[usbLock unlock];
@@ -471,8 +471,8 @@ readon:
 	IOReturn kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead, 10, 10);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
-		if(kr = kIOUSBPipeStalled){
-			kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
+		if(kr == kIOUSBPipeStalled){
+			(*interface)->ClearPipeStallBothEnds(interface, pipe);
 		}
 		actualRead = 0;
 	}

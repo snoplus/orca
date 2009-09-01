@@ -53,7 +53,6 @@
 - (void)    removeSelectedObjects;
 - (void)    drawContents:(NSRect)aRect;
 - (void)	drawIcons:(NSRect)aRect;
-- (NSArray*) copySelectedObjects;
 - (NSArray*) selectedObjects;
 - (NSArray*)allSelectedObjects;
 - (void)    clearSelections:(BOOL)shiftKeyDown;

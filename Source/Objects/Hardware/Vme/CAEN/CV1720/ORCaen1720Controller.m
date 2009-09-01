@@ -305,7 +305,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	}
 	else {
 		int val = [model bufferState];
-		if(val = [model bufferState]) {
+		if(val) {
 			[bufferStateField setTextColor:[NSColor redColor]];
 			[bufferStateField setStringValue:@"Full"];
 		}

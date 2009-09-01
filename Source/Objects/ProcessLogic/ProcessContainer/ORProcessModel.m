@@ -243,7 +243,7 @@ NSString* ORProcessModelShortNameChangedNotification   = @"ORProcessModelShortNa
         NSSize textSize = [n size];
         float x = theIconSize.width/2 - textSize.width/2;
         [n drawInRect:NSMakeRect(x,5,textSize.width,textSize.height)];
-
+		[n release];
     }
 
 

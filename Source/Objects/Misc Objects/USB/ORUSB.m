@@ -55,9 +55,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (void) dealloc
 {
-	id intf;
 	NSEnumerator* e = [interfaces objectEnumerator];
-	while(intf = [e nextObject]){
+	while([e nextObject]){
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceRemoved object:self userInfo:nil];
 	}
 	
@@ -268,7 +267,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
    	
 	// Now set up two more notifications, one to be called when a device is first matched by I/O Kit, and the other to be
 	// called when the device is terminated.
-	kr = IOServiceAddMatchingNotification(  _notifyPort,
+	IOServiceAddMatchingNotification(  _notifyPort,
 										  kIOFirstMatchNotification,
 										  matchingDict,
 										  _deviceAdded,
@@ -503,7 +502,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     IOReturn                            kr;
     IOUSBConfigurationDescriptorPtr     confDesc;
 	
-    kr = (*dev)->GetNumberOfConfigurations(dev, &numConf);
+    (*dev)->GetNumberOfConfigurations(dev, &numConf);
     if (!numConf)
         return kIOReturnError;
 	
@@ -541,7 +540,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		IOUSBInterfaceInterface197** intf = NULL;
 		IOCFPlugInInterface** plugInInterface = NULL;
 		SInt32  score;
-		kr = IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
+		IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
 		kr = IOObjectRelease(usbInterface);                             // done with the usbInterface object now that I have the plugin
 		if ((kIOReturnSuccess != kr) || !plugInInterface) {
 			[NSException raise: @"USB Exception" format:@"unable to create a plugin (%08x)\n", kr];

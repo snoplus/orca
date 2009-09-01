@@ -38,7 +38,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SwitchImages);
 		if(!switchImages) switchImages = [[NSMutableDictionary dictionary] retain];		//check the top level dictionary
 		NSMutableDictionary* stateGroup = [switchImages objectForKey:theStateKey];		//check the top level entry
 		if(!stateGroup) {																//couldn't find anything for this color
-			stateGroup = [[NSMutableDictionary dictionary] retain];						//make an dictionary
+			stateGroup = [NSMutableDictionary dictionary];						//make an dictionary
 			[switchImages setObject:stateGroup forKey:theStateKey];								//enter it
 		}
 		[stateGroup setObject:anImage forKey:[NSNumber numberWithInt:(int)anAngle]];

@@ -30,11 +30,12 @@
     [super dealloc];
 }
 
--(void) enqueue:(id)pushedObj
+-(BOOL) enqueue:(id)pushedObj
 {
     [queueLock lock];
-    [super enqueue:pushedObj];
+    BOOL result = [super enqueue:pushedObj];
     [queueLock unlock];
+	return result;
 }
 
 -(void) enqueueArray:(NSArray*)arrayOfObjects

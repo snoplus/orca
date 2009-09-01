@@ -635,8 +635,7 @@ static const int currentVersion = 1;           // Current version
 
 - (void) checkDiskStatus
 {
-	NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
-	NSDictionary* diskInfo = [[NSFileManager defaultManager] attributesOfItemAtPath:fullFileName error:nil];
+	NSDictionary* diskInfo = [[NSFileManager defaultManager] attributesOfFileSystemForPath:[self tempDir] error:nil];
 	long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
 	if(freeSpace < kMinDiskSpace * 1024 * 1024){
 		if(!diskFullAlarm){

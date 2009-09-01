@@ -417,7 +417,7 @@ enum {
 /* checkRngLow - make sure new scale limits are within range */
 -(BOOL) checkRngLow:(double *)low withHigh:(double *)high
 {
-    double	t,dv,v1,v2,cen,newPin;
+    double	dv,v1,v2,cen,newPin;
     BOOL	fixedPin;
     
     if(fabs(*low-*high) <.01){
@@ -451,7 +451,7 @@ enum {
             dv = [self minimumRange];
             /* expand scale, keeping the same center */
             cen = (v1 + v2) / 2;
-            t = sqrt(dv);
+            //t = sqrt(dv);
             v1 = cen / dv;
             v2 = cen * dv;
         }

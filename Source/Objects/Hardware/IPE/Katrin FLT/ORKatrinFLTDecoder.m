@@ -462,7 +462,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
     int i;
 	//int j;
 	//int mult;
-	int width;
+	//int width;
 	int energy;
 
     unsigned long* ptr = (unsigned long*)someData;
@@ -512,7 +512,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 	// Plot: (ePtr->threshold, ePtr->hitrate)
 	//
 	energy = ePtr->threshold; 
-	width = energy - lastEnergy[chan];
+	//width = energy - lastEnergy[chan];
 	
 	//NSLog(@"Hitrate: (%d .. %d) - %d\n", lastEnergy[chan], energy, width);
 	 

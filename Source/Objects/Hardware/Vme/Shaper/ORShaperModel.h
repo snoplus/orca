@@ -109,8 +109,6 @@ enum {
 	
 	//place to cache some stuff for alittle more speed.
 	unsigned long 	slotMask;
-	unsigned short 	modifier;
-	unsigned long 	base;
     
 	short savedThresholds[kNumShaperChannels];
 }

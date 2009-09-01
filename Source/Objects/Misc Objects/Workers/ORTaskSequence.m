@@ -99,7 +99,7 @@
 {
 	NSData* incomingData   = [[aNotification userInfo] valueForKey:NSFileHandleNotificationDataItem];
     if (incomingData && [incomingData length]) {
-		NSString *incomingText = [[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding];
+		NSString *incomingText = [[[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding] autorelease];
 		incomingText = [incomingText removeNLandCRs];
 		if(verbose)NSLog(@"%@\n",incomingText);
 		if(textToDelegate && incomingText){
@@ -107,7 +107,6 @@
 				[delegate taskData:incomingText];
 			}
 		}
-		//[incomingText autorelease];
 		[[aNotification object] readInBackgroundAndNotify];  // go back for more.
 	}
     else if(!incomingData){

@@ -66,7 +66,6 @@
 		BOOL			_nextRunWillQuickStart;
 		BOOL			_ignoreRunTimeout;
 		unsigned long	_currentRun;
-		BOOL			_betweenSubRuns;
         int				runningState;
         ORDataTypeAssigner* dataTypeAssigner;
 		unsigned long lastRunNumberShipped;

@@ -52,8 +52,6 @@
 		unsigned short alarmsEnabledMask;
 		
         //place to cache some stuff for alittle more speed.
-        unsigned long 	unChangingDataPart;
-        unsigned short cachedStation;
 		int pollingState;
 		int scanLimit;
 		BOOL scanEnabled;

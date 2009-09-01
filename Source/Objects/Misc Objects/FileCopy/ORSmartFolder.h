@@ -54,16 +54,13 @@
 	BOOL	     verbose;
 	NSString*    directoryName;
 	ORFileMover* theWorkingFileMover;
-	ORFolderController* controller;
+	//ORFolderController* controller;
 	NSWindow*   window;
 	BOOL	    sheetDisplayed;
-	BOOL	    lockEnabledState;
 	BOOL		useFolderStructure;
 	NSString*	defaultLastPathComponent;
 	
         //------------------internal use only
-        NSString*	statusFileName;
-        BOOL		ignoreModee;
         ORQueue*	fileQueue;
         BOOL        queueIsRunning;
         int         workingOnFile;

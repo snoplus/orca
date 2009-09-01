@@ -136,13 +136,11 @@ int rem;
 
 - (BOOL) getData:(long*)data forKey:(const char*)key
 {
-	unsigned int hashval;
 	hashTable* curhash;
 	
 	*data = 0;
-	hashval = 0;
 	
-	hashval = [self hash:key];
+	unsigned int hashval = [self hash:key];
 	
 	
 	if (hashTab[hashval] == NULL) return NO;
@@ -181,12 +179,9 @@ int rem;
 
 -(hashTable*) findHash:(const char*) aKey
 {
-   unsigned int hashval;
    hashTable *curhash;
    
-   hashval = 0;
-
-   hashval = [self hash:aKey];
+   unsigned int hashval = [self hash:aKey];
 
    if (hashTab[hashval] == NULL) return NULL;
  
@@ -216,12 +211,9 @@ int rem;
 
 - (BOOL) removeKey:(const char*) key
 {
-	unsigned int hashval;
 	hashTable*   curhash;
-	
-	hashval = 0;
-	
-	hashval = [self hash:key];
+		
+	unsigned int hashval = [self hash:key];
 	
 	
 	if (hashTab[hashval] == NULL) {

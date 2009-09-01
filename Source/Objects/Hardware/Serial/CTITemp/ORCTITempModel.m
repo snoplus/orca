@@ -137,8 +137,8 @@ NSString* ORCTITempLock = @"ORCTITempLock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[18];
-		data[0] = dataId | 18;
+		unsigned long data[4];
+		data[0] = dataId | 4;
 		data[1] = ([self uniqueIdNumber]&0x0000fffff);
 		
 		union {
@@ -151,10 +151,9 @@ NSString* ORCTITempLock = @"ORCTITempLock";
 		data[index] = theData.asLong;
 		index++;
 		data[index] = timeMeasured;
-		index++;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*18]];
+															object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
 	}
 }
 
@@ -389,7 +388,7 @@ NSString* ORCTITempLock = @"ORCTITempLock";
         @"ORCTITempDecoderForTemperature",@"decoder",
         [NSNumber numberWithLong:dataId],   @"dataId",
         [NSNumber numberWithBool:NO],       @"variable",
-        [NSNumber numberWithLong:18],       @"length",
+        [NSNumber numberWithLong:4],       @"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"Temperatures"];
     

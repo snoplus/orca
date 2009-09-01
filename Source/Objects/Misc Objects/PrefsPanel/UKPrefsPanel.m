@@ -305,7 +305,7 @@
 {
 	int					itemCount = [tabView numberOfTabViewItems],
 						x;
-	NSTabViewItem*		theItem = [tabView tabViewItemAtIndex:0];
+	NSTabViewItem*		theItem;
 	//NSMutableArray*	defaultItems = [NSMutableArray arrayWithObjects: [theItem identifier], NSToolbarSeparatorItemIdentifier, nil];
 	NSMutableArray*	defaultItems = [NSMutableArray array];
 	
@@ -335,7 +335,7 @@
 				NSToolbarSpaceItemIdentifier, NSToolbarFlexibleSpaceItemIdentifier,
 				NSToolbarCustomizeToolbarItemIdentifier, nil] ];
 	
-	return allowedItems;
+	return [allowedItems autorelease];
 }
 
 

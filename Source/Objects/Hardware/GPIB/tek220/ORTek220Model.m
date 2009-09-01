@@ -316,19 +316,18 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 {
     NSString*	impedanceValue;
     NSString*	couplingValue;
-	long		returnLength = 0;
 	
 	if ( [self checkChnlNum:aChnl] ){
 		
 		// Get the channel coupling option.
-		returnLength = [self writeReadGPIBDevice:[NSString stringWithFormat:@"CH%d:COUPLING?", aChnl + 1]
+		long returnLength = [self writeReadGPIBDevice:[NSString stringWithFormat:@"CH%d:COUPLING?", aChnl + 1]
                                              data:mReturnData
                                         maxLength:kMaxGPIBReturn];
         if ( returnLength > 0 ){
 			couplingValue = [NSString stringWithCString:mReturnData encoding:NSASCIIStringEncoding];
 			
 			// Now get the impedance.
-			returnLength = [self writeReadGPIBDevice:[NSString stringWithFormat:@"CH%d:IMPEDANCE?", aChnl + 1]
+			[self writeReadGPIBDevice:[NSString stringWithFormat:@"CH%d:IMPEDANCE?", aChnl + 1]
                                                  data:mReturnData
                                             maxLength:kMaxGPIBReturn];
 			
@@ -1370,7 +1369,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
     short						iStart = -1;
     short						i;
     bool						f_Found = false;
-    char*						dateString;
+    //char*						dateString;
 	char*						datePiece;
 	
 	// Initialize time to zero in case we fail.
@@ -1425,7 +1424,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 	if ( !datePiece ) return;
     unixTime.tm_sec = atoi( datePiece );
     
-    dateString = asctime( &unixTime );
+   // dateString = asctime( &unixTime );
     
 	// Get base time in seconds
     baseTime = timegm( &unixTime ); // Have to use timegm because mktime forces the time to

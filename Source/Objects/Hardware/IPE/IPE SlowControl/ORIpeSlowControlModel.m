@@ -928,7 +928,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         //[self handleError:err];
         NSLog(@"ERROR: err != 0\n");
     }
-    return xmlDoc;
+    return [xmlDoc autorelease]; //mah 9/1/09. added autorelease.
 }
 
 
@@ -963,7 +963,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         //[self handleError:err];
         NSLog(@"ERROR: err != 0\n");
     }
-    return xmlDoc;
+    return [xmlDoc autorelease];//mah 9/1/09. added autorelease.
 }
 
 
@@ -987,7 +987,9 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
        //TODO:
        //TODO:
        //TODO: release children of root, clear siblings of sensor list
-       [rootAdeiTree setChildren:  [[NSMutableArray alloc] init]];//TODO: will dealloc be called ??? I need to disconnect the sibling pointers somehow!!! -tb-
+		//[rootAdeiTree setChildren:  [[NSMutableArray alloc] init]];//TODO: will dealloc be called ??? I need to disconnect the sibling pointers somehow!!! -tb-
+		[rootAdeiTree setChildren:  [NSMutableArray array]];//MAH 9/1/09. commented out the above and added this to prevent memory leak. 
+	
        [rootAdeiTree setXmlNode: nil];//TODO: need to release xmlNode? better do it immediately after parsing -tb-
        //TODO:
        //TODO:
@@ -2049,7 +2051,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
 
 + (ORSensorItem*) sensorWithAdeiType:(int)aValue named:(NSString*)aName
 {
-    ORSensorItem* item = (ORSensorItem*)[[ORSensorItem alloc] init];
+    ORSensorItem* item = [[ORSensorItem alloc] init];
     [item setAdeiType: aValue];
     [item setName: aName];
     //[item setObject: anObject];
@@ -2063,7 +2065,8 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     [item setChannelMapNum:-1];
     [item setClassType:@"-"];//TODO: unneeded
 
-    return item;//TODO: who is responsible for releasing the sensor children? -tb- 2008-12-02
+    //return item;//TODO: who is responsible for releasing the sensor children? -tb- 2008-12-02
+    return [item autorelease];//MAH 09/01/09. comment out above and added this to prevent memory leak.
 }
 
 
@@ -2366,7 +2369,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     // DebugTB( NSLog(@"NSData CSV file description:\n%@\n",[csvData description]); )
     
     NSString *csvText;
-    csvText = [[NSString alloc] initWithData: csvData encoding: NSUTF8StringEncoding];
+    csvText = [[[NSString alloc] initWithData: csvData encoding: NSUTF8StringEncoding] autorelease]; //mah 09/01/09. added autorelease
     // other values for encoding: NSASCIIStringEncoding, NSNonLossyASCIIStringEncoding, NSISOLatin1StringEncoding, NSNEXTSTEPStringEncoding
     /* this is not able to read the degree sign (°) correctly:
     csvText = [[NSString alloc] initWithData: csvData encoding: NSASCIIStringEncoding];
@@ -2600,7 +2603,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
         [pstr appendString: [sensorPath valueForKey: kServiceString] ];
         [pstr appendString: @" , Option: " ];
         [pstr appendString: [sensorPath valueForKey: kSetupOptionString] ];
-        return pstr;
+        return [pstr autorelease]; //mah 09/01/09 added autorelease
     }else{
         return @"";
     }

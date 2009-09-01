@@ -18,7 +18,7 @@
 {
     NSRecursiveLock*         queueLock;
 }
--(void) enqueue:(id)pushedObj;
+-(BOOL) enqueue:(id)pushedObj;
 -(BOOL) tryEnqueue:(id)pushedObj;
 -(void) enqueueArray:(NSArray*)arrayOfObjects;
 -(BOOL) tryEnqueueArray:(NSArray*)arrayOfObjects;

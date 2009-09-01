@@ -151,7 +151,7 @@ NSString* ORLabelLock							 = @"ORLabelLock";
 		
 			
 		[n drawInRect:NSMakeRect(0,0,theSize.width,theSize.height)];
-
+		[n release];
 		[i unlockFocus];
 		[self setImage:i];
 		[i release];
@@ -179,6 +179,7 @@ NSString* ORLabelLock							 = @"ORLabelLock";
 									[NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
 		NSSize theSize = [n size];
 		[n drawInRect:NSMakeRect(0,0,theSize.width,theSize.height)];
+		[n release];
 		[highlightedImage unlockFocus];
 	}
 

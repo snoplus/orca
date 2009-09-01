@@ -129,8 +129,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(TextFinder);
     lastFindWasSuccessful = NO;
     if (text) {
         NSString *textContents = [text string];
-        unsigned textLength;
-        if (textContents && (textLength = [textContents length])) {
+        if (textContents && [textContents length]) {
             NSRange range;
             unsigned options = 0;
 			if (direction == Backward) options |= NSBackwardsSearch;

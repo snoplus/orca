@@ -25,7 +25,6 @@
 	IBOutlet NSButton* 		replayButton;
 	IBOutlet NSTableView*   fileListView;
     IBOutlet NSOutlineView*	headerView;
-	IBOutlet NSDrawer*		headerTextDrawer;
 	IBOutlet NSButton* 		viewHeaderButton;
 	IBOutlet NSTextField* 	viewHeaderFile;
 	IBOutlet NSProgressIndicator* 	progressIndicator;

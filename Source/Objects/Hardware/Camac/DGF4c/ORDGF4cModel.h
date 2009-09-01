@@ -73,10 +73,7 @@ union {
 		//read in at start of run
 		unsigned short linearDataBufferStart;
 		unsigned short linearDataBufferSize;
-		unsigned short mcaDataBufferStart;
-		unsigned short mcaDataBufferSize;
 		short maxEvents;
-		unsigned short headerLength;
 		
 		//place to cache some stuff for alittle more speed.
 		unsigned long 	unChangingDataPart;

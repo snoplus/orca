@@ -1680,8 +1680,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 + (id) hwWizObject:(id<ORHWWizard>)obj
 {
-    self = [[ORHWWizObj alloc] initWithTarget:obj];
-    return self;
+    return [[[ORHWWizObj alloc] initWithTarget:obj] autorelease];
 }
 
 - (id) initWithTarget:(id<ORHWWizard>)obj

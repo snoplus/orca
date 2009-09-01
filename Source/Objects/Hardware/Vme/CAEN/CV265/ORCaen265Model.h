@@ -49,7 +49,6 @@ enum {
 {
     @private
 		BOOL isRunning;
-		short adcIndex;
         unsigned short enabledMask;
 		BOOL suppressZeros;
 		

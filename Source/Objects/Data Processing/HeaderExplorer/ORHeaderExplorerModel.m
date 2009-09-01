@@ -429,7 +429,7 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 						int n = [array count];
 						int i;
 						for(i=0;i<n;i++){
-							ORHeaderItem* lowestItem = headerItem = [array objectAtIndex:i];
+							ORHeaderItem* lowestItem = [array objectAtIndex:i];
 							if([lowestItem object]){
 								NSLog(@"%@%@%@ %@\n",
 									  runNumber, 

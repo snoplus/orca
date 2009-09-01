@@ -20,6 +20,9 @@ set timeout -1
 spawn ssh -l $userName $ipaddr $scriptname $arg1 $arg2 $arg3 $arg4
 match_max 100000
 expect "*?assword:*"
+#expect "* (yes/no)?" {send "yes\r"; expect "*assword:"} "*assword:" 
+
+send -- "$password\r"
 send -- "$password\r"
 send -- "\r"
 expect eof

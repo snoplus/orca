@@ -38,7 +38,6 @@
         NSMutableString*       buffer;
 		BOOL			shipTemperatures;
 		ORTimeRate*		timeRates[8];
-		float testValue;
 }
 
 #pragma mark ***Initialization

@@ -32,7 +32,7 @@
 {
     self = [super initWithWindowNibName:@"UnivVoltHVCrate"];
 	if ( self ) {
-		[model setIpAddress: [[NSString alloc] initWithFormat: @"192.168.1.10"]];
+		[model setIpAddress: @"192.168.1.10"];
 	}
     return self;	
 }
@@ -41,13 +41,12 @@
 {
 	[super awakeFromNib];
 	
-	NSString* testString = [[NSString alloc] initWithString: @"See if anything appears in text view.\n"];
+	NSString* testString = @"See if anything appears in text view.\n";
 	NSLog( @"UnivVoltHVCrateController - IPAddress: %@\n", [model ipAddress] );
 	[ipAddressTextField setStringValue: [model ipAddress]];
 //	[mReturnStringFromSocket setString: testString];
 //	[mReturnStringFromSocket appendString: testString1];
-	NSString* returnStringFromSocket = [[NSString alloc] initWithFormat: @"%@", testString];
-	[outputArea setString: returnStringFromSocket];	
+	[outputArea setString: testString];	
 }
 
 

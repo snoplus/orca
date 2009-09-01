@@ -470,9 +470,9 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 {
     char* buffer = (char*)[dataChunk bytes];
     char* endPtr = buffer + [dataChunk length];
-    
+    NSAutoreleasePool* outerPool=nil;
     while (buffer<endPtr) {
-		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
+		outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 		unsigned long* lptr = (unsigned long*)buffer;
         unsigned long recordHeader = *lptr;
 		if(swapAll)	recordHeader = CFSwapInt32(recordHeader);			
@@ -556,7 +556,9 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 			break;
 		}
 		[outerPool release];
+		outerPool = nil;
 	}
+	[outerPool release]; //in case we broke out early
 }
 
 - (void) startProcessing
@@ -615,8 +617,9 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     char* buffer = (char*)[dataChunk bytes];
     char* endPtr = buffer + [dataChunk length];
     
+	NSAutoreleasePool* outerPool=nil;
     while (buffer<endPtr) {
-		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
+		outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 		unsigned long* lptr = (unsigned long*)buffer;
 		
         unsigned long recordHeader = CFSwapInt32(*lptr); //have to swap the first word -- but just locally
@@ -700,7 +703,9 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 			break;
 		}
 		[outerPool release];
+		outerPool = nil;
 	}
+	[outerPool release];
 }
 
 @end

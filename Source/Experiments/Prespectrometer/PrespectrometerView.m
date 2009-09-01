@@ -45,8 +45,7 @@
 			
 
 			theRect = NSInsetRect(theRect,segSize/2.5,segSize/2.5);
-			aPath = [[NSBezierPath bezierPathWithOvalInRect:theRect] retain];
-			[errorPaths addObject:aPath];
+			[errorPaths addObject:[NSBezierPath bezierPathWithOvalInRect:theRect]];
 			
 		}
 	}

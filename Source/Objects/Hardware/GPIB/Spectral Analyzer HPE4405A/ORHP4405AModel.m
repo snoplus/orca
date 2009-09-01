@@ -322,12 +322,11 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 - (void) oscGetChnlAcquire: (short) aChnl
 {
 	NSString*   acquireOn;
-    long		returnLength;		// Length of string returned by oscilloscope.
     
 	// Make sure that channel is valid
 	if ( [ self checkChnlNum: aChnl ] )
 	{
-		returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d?", aChnl + 1 ]
+		[ self writeReadGPIBDevice: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d?", aChnl + 1 ]
                                              data: mReturnData maxLength: kMaxGPIBReturn ];
         
 		acquireOn = [ NSString stringWithCString: mReturnData encoding:NSASCIIStringEncoding];

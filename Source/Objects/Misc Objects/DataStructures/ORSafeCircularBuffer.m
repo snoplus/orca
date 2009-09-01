@@ -75,6 +75,7 @@
 	[bufferLock lock];
 	BOOL full = NO;
 	if(freeSpace > 0){
+		//theData is released when pulled from the CB
 		NSData* theData = [[NSData dataWithBytes:someBytes length:numBytes] retain];
 		*(dataPtr+writeMark) = (unsigned long)theData;
 		writeMark = (writeMark+1)%bufferSize;	//move the write mark ahead 

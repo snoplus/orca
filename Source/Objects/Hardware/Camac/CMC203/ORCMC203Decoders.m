@@ -63,9 +63,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	unsigned char card   = (*ptr>>16) & 0x1f;
  	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
-	ptr++; //point to ls count
-	ptr++; //point ms count
-	ptr++; //point to data
+	//ptr++; //point to ls count
+	//ptr++; //point ms count
+	//ptr++; //point to data
 	[aDataSet loadWaveform:someData 
 					offset:2*sizeof(long)	//bytes!
 				  unitSize:sizeof(long)		//unit size in bytes!

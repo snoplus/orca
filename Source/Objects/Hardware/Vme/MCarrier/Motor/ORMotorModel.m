@@ -875,7 +875,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
         if(fileContents){
             //get rid of \r's
             NSString* processedContent = [[fileContents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
-            processedContent = [[fileContents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+            processedContent = [[processedContent componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
             NSArray* lines = [processedContent componentsSeparatedByString:@"\n"];
             long numSweeps = [[lines objectAtIndex:0] intValue];
             NSMutableArray* somePositions = [NSMutableArray array];

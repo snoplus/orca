@@ -37,7 +37,6 @@
         NSMutableString*       buffer;
 		BOOL			shipCurrent;
 		ORTimeRate*		timeRate;
-		float testValue;
 }
 
 #pragma mark ***Initialization

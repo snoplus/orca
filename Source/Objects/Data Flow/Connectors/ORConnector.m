@@ -511,8 +511,8 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     }	
 	if([self guardian]){
 		[NSGraphicsContext restoreGraphicsState];
-		[theShadow release]; 
 	}
+	[theShadow release]; 
 }
 
 - (void) strokeLine:(NSBezierPath*) path

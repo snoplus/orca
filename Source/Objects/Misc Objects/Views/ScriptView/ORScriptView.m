@@ -59,6 +59,7 @@
     [scrollView setHasHorizontalRuler:NO];
     [scrollView setHasVerticalRuler:YES];
     [scrollView setRulersVisible:YES];
+	[lineNumberView release];
 	
 	autoSyntaxColoring = YES;
 	maintainIndentation = YES;

@@ -50,7 +50,6 @@ typedef struct  {
 		unsigned char				controlPipes[8];
 		unsigned char				interruptInPipes[8];
 		unsigned char				interruptOutPipes[8];
-		unsigned short				maxPacketSize;
 		NSString*					deviceName;
 		UInt32						locationID;
 		UInt16						vendor;

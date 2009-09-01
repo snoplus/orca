@@ -394,7 +394,7 @@ NSString* UVkWrite = @"W";
 								 dictParamObj: dictParamObj
 								      command: command
 									  loadAll: NO];
-				[command retain];
+				//[command retain]; //mah 09/01/09 ... don't retain ... causes memory leak queueCommand should be responsible for retaining/
 //				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
 				[[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self stationNumber] channel: aCurrentChnl command: command];
 				writeCmdCtr++;
@@ -682,7 +682,7 @@ NSString* UVkWrite = @"W";
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSString* status = [tmpChnl objectForKey: HVkStatus];
-	[status autorelease];
+	//[status autorelease]; //mah. commented out. double release.... bad
 	return( status );
 }
 
@@ -1012,7 +1012,7 @@ NSString* UVkWrite = @"W";
 						float value = [valueStr floatValue];
 						valueObj = [NSNumber numberWithFloat: value];
 					}
-					else if ( type = UVkINT )
+					else if ( type == UVkINT )
 					{
 						int value = [valueStr intValue];
 						valueObj = [NSNumber numberWithInt: value];

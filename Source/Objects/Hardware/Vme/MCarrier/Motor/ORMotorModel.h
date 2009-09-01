@@ -67,7 +67,6 @@ enum {
         BOOL motorRunning;
         BOOL homeDetected;
         long motorPosition;
-        NSTimeInterval lastPollTime;
         ORAlarm*    breakPointAlarm;
         id motorWorker;
 

@@ -38,14 +38,11 @@
         BOOL            timedRun;
         BOOL            repeatRun;
         BOOL            quickStart;
-        BOOL            isRunning;
 
         int         runningState;
         NSString*   remoteHost;
         unsigned long remotePort;
         NetSocket*  socket;
-        BOOL        connected;
-        int         connectAction;
         BOOL        connectAtStart;
         BOOL        autoReconnect;
         BOOL        isConnected;

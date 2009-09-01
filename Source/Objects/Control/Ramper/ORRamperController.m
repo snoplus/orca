@@ -92,14 +92,14 @@
 {
 	NSEnumerator* e = [rampItemControllers objectEnumerator];
 	ORRampItemController* itemController;
-	NSSize itemSize;
+	//NSSize itemSize;
 	while(itemController = [e nextObject]){
 		if([itemController model] == anItem){
 			[itemController retain];
 			[rampItemControllers removeObject:itemController];
 			NSView* aView = [itemController view];
 			[rampItemContentView setSizing:ZMakeFlowLayoutSizing( [aView frame].size, 5, 0, YES )];
-			itemSize = [aView frame].size;
+			//itemSize = [aView frame].size;
 			[aView removeFromSuperview];
 			[itemController release];
 			break;

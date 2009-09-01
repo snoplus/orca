@@ -112,7 +112,7 @@ NSString* CBeValue		= @"Value";
 
 - (NSDictionary *) HVEntry
 {
-	NSDictionary* dictObj = [[mStorageArray objectAtIndex: mHeadIndex] autorelease];
+	NSDictionary* dictObj = [mStorageArray objectAtIndex: mHeadIndex];
 //	NSNumber* numObj = [dictObj objectForKey: [mKeys objectAtIndex: 1]];
 //	NSDate* dateObj = [dictObj	objectForKey: [mKeys objectAtIndex: 0]];
 //	float tmpFloat = [numObj floatValue];

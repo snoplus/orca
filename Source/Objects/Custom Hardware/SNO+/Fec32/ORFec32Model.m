@@ -842,7 +842,6 @@ const short kVoltageADCMaximumAttempts = 10;
 		else								writeValue = boardSelectVal;
 		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// load data value
 		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
-		writeValue = 0UL;
 	}
 	[self executeCommandList:aList];
 }

@@ -372,20 +372,6 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 }
 
 
-- (NSArray*)copySelectedObjects
-{
-    NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
-    OrcaObject* anObject;
-    NSMutableArray* theSelectedObjects = [[[NSMutableArray alloc] init] autorelease];
-    while (anObject = [e nextObject]) {
-        if([anObject highlighted]){
-            [theSelectedObjects addObject:[[anObject copy] autorelease]];
-        }
-    }
-    return theSelectedObjects;
-}
-
-
 - (void) clearSelections:(BOOL)shiftKeyDown
 {
     NSEnumerator* e  = [orcaObjects objectEnumerator];
@@ -401,7 +387,6 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 - (void) checkSelectionRect:(NSRect)aRect inView:(NSView*)aView;
 {
 
-	BOOL selectionChanged = NO;
     int n = [orcaObjects count];
     int i;
     for(i=0;i<n;i++){
@@ -422,7 +407,6 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
             }
         }
 		if(oldHighlighted != [anObject highlighted]){
-			selectionChanged = YES;
             [aView setNeedsDisplayInRect:[anObject frame]];
 		}
     }

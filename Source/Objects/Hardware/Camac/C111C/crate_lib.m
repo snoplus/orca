@@ -135,8 +135,7 @@ SOCKET csock_connect(char *ipAddress, int port)
 		tout = CRATE_CONNECT_TIMEOUT;
 #endif
 		now = time(NULL);
-		int r;
-		while (r=connect(sck, (struct sockaddr *) &target_address, sizeof(target_address)) == -1) {
+		while (connect(sck, (struct sockaddr *) &target_address, sizeof(target_address)) == -1) {
 			if(csock_canwrite(sck))break;
 			if ((time(NULL) - now) > tout) {
 		        return 0;
@@ -689,7 +688,7 @@ void* IRQ_Handler(void *arg)
 						}
 						crate_info[crate_id].irq_callback((short)crate_id, irq_type, irq_data, crate_info[crate_id].userInfo);
 					}
-					res = csock_send(crate_info[crate_id].sock_irq, resp, 2);
+					csock_send(crate_info[crate_id].sock_irq, resp, 2);
 				}
 				else break;
 			}
@@ -1360,7 +1359,7 @@ short LACK(short crate_id)
 ////////////////////////////////////////////
 short BLKBUFFS(short crate_id, short value)
 {
-	short retcode = CRATE_ERROR;
+	//short retcode = CRATE_ERROR;
 
 	if ((crate_id > MAX_CRATE) || (crate_id < 0))
 		return CRATE_ID_ERROR;
@@ -1369,7 +1368,7 @@ short BLKBUFFS(short crate_id, short value)
 		return CRATE_CONNECT_ERROR;
 
 	sprintf(CRATE_TxBuffer,"BLKBUFFS %d\r", value);
-	retcode = csock_sendrecvline(crate_info[crate_id].sock_ascii, CRATE_TxBuffer, CRATE_RxBuffer, 255);
+	csock_sendrecvline(crate_info[crate_id].sock_ascii, CRATE_TxBuffer, CRATE_RxBuffer, 255);
 	
 	return atoi(CRATE_RxBuffer);
 }

@@ -48,10 +48,8 @@
 		NSMutableArray*		inputValues;
 		NSMutableArray*		outputValues;
 		
-		BOOL				stopThread;
 		BOOL				running;
 		BOOL				parsedOK;
-		BOOL				normalExit;
 		unsigned			yaccInputPosition;
 		NSData*				expressionAsData;
 		BOOL				exitNow;

@@ -625,15 +625,12 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
             [enableCopyButton setEnabled:NO];
             [enableDeleteButton setEnabled:NO];
             [chooseDirButton setEnabled:NO];
-            //lockEnabledState = [lockButton isEnabled];
-            //if(lockEnabledState)[lockButton setEnabled:NO];
-        }
+         }
     }
     else {
         if(sheetDisplayed){
             sheetDisplayed = NO;
             [self updateButtons];
-            //if(lockEnabledState)[lockButton setEnabled:YES];
         }
     }
     

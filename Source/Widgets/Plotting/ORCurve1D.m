@@ -394,8 +394,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 - (void) drawXYPlot:(ORPlotter1D*)aPlot
 {
     float   x, y, xl, yl;
-    int   minX, maxX ;
-    float  minY, maxY;
+    int   minX;
 	id mDataSource = [aPlot dataSource];
 	ORAxis*    mXScale = [aPlot xScale];
 	ORAxis*    mYScale = [aPlot yScale];
@@ -411,15 +410,11 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 		
     /* get scale limits */
     minX = MAX(0,roundToLong([mXScale minValue]));
-    maxX = MIN(roundToLong([mXScale maxValue]),roundToLong([mDataSource plotterMinX:aPlot]));
+    //maxX = MIN(roundToLong([mXScale maxValue]),roundToLong([mDataSource plotterMinX:aPlot]));
 	
-    minY = [mYScale minValue];
-    maxY = [mYScale maxValue];
-        
-    /* initialize x and y values */
-    yl = -1;
-    xl = -1;
-	
+    //minY = [mYScale minValue];
+   // maxY = [mYScale maxValue];
+        	
     
     NSBezierPath* theDataPath = [NSBezierPath bezierPath];
     
@@ -462,8 +457,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 - (void) drawXYTimePlot:(ORPlotter1D*)aPlot
 {
     float   x, y, xl, yl;
-    int   minX, maxX ;
-    float  minY, maxY;
+    int   minX;
 	id mDataSource = [aPlot dataSource];
 	ORAxis*    mXScale = [aPlot xScale];
 	ORAxis*    mYScale = [aPlot yScale];
@@ -474,15 +468,11 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 		
     /* get scale limits */
     minX = MAX(0,roundToLong([mXScale minValue]));
-    maxX = MIN(roundToLong([mXScale maxValue]),roundToLong([mDataSource plotterMinX:aPlot]));
+   // maxX = MIN(roundToLong([mXScale maxValue]),roundToLong([mDataSource plotterMinX:aPlot]));
 	
-    minY = [mYScale minValue];
-    maxY = [mYScale maxValue];
-        
-    /* initialize x and y values */
-    yl = -1;
-    xl = -1;
-	
+   // minY = [mYScale minValue];
+   // maxY = [mYScale maxValue];
+        	
     NSTimeInterval startTime = [mDataSource plotterStartTime:aPlot];
 	[(ORTimeLine*)mXScale setStartTime: startTime];
     NSBezierPath* theDataPath = [NSBezierPath bezierPath];

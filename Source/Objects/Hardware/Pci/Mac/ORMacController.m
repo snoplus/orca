@@ -297,10 +297,10 @@
             if([[outputView textStorage] length] > 10*1024){
                 [[outputView textStorage] deleteCharactersInRange:NSMakeRange(0,10*1024/3)];
                 NSRange endOfLineRange = [[outputView string] rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]];
-                int extra = 0;
+               // int extra = 0;
                 if(endOfLineRange.location != NSNotFound){
                     [[outputView textStorage] deleteCharactersInRange:NSMakeRange(0,endOfLineRange.location)];
-                    extra = endOfLineRange.location;
+                    //extra = endOfLineRange.location;
                 }
             }
         }

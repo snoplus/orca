@@ -55,11 +55,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 	NSString* theComments = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.CommandCenter.scriptComments"];
     [self setScriptComments:theComments];
 	
-	NSMutableArray* theArgs = [[[[NSUserDefaults standardUserDefaults] objectForKey: @"orca.CommandCenter.args"] mutableCopy] autorelease];
-	if(!theArgs){
-		theArgs = [NSMutableArray arrayWithObjects:[NSDecimalNumber zero],[NSDecimalNumber zero],[NSDecimalNumber zero],
-		[NSDecimalNumber zero],[NSDecimalNumber zero],nil];
-	}
+	//NSMutableArray* theArgs = [[[[NSUserDefaults standardUserDefaults] objectForKey: @"orca.CommandCenter.args"] mutableCopy] autorelease];
+	//if(!theArgs){
+	//	theArgs = [NSMutableArray arrayWithObjects:[NSDecimalNumber zero],[NSDecimalNumber zero],[NSDecimalNumber zero],
+	//	[NSDecimalNumber zero],[NSDecimalNumber zero],nil];
+	//}
 
     
     [self setSocketPort:port];

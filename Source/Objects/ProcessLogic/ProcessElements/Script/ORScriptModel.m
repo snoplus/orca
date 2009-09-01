@@ -102,17 +102,12 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-    
-    NSFont* theFont;
-    NSAttributedString* n;
-    
-    theFont = [NSFont messageFontOfSize:10];
-    
+        
     if([self uniqueIdNumber]){
-        theFont = [NSFont messageFontOfSize:8];
-        n = [[NSAttributedString alloc] 
-            initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
-                attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
+        NSFont* theFont = [NSFont messageFontOfSize:8];
+        NSAttributedString*n = [[NSAttributedString alloc] 
+								initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+								attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
         
         NSSize textSize = [n size];
         float x = 20;
@@ -153,13 +148,10 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
         int oldSetState   = setState;
         
         int newSetState   = [[self objectConnectedTo:ORScriptInputConnection] eval];
-        
-        BOOL setStateTransition = NO;
-        
+                
         setState = newSetState;
 			
         if(oldSetState != newSetState){
-			setStateTransition = YES;
 			if(!scriptRunner){
 				scriptRunner = [[ORScriptRunner alloc] init];
 			}

@@ -64,7 +64,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Lo
 	
 	NSString* eventCounter    = [NSString stringWithFormat:@"EventCount = %d\n",*ptr++];
 	NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %d\n",*ptr++];
-	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %d\n",*ptr++];		
+	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %d\n",*ptr];		
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
 	                    eventCounter,timeStampHi,timeStampLo];               

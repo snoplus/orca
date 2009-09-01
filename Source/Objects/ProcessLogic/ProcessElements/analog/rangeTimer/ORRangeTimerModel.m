@@ -439,7 +439,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 		[mailer setSubject:@"Orca Message"];
 		[mailer setBody:theContent];
 		[mailer send:self];
-		
+		[theContent autorelease];
 	}
 
 	[pool release];

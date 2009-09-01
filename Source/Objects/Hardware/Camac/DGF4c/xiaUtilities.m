@@ -35,12 +35,12 @@
 
 double Tau_Fit(unsigned int* Trace, long kmin, long kmax, double dt){
 
-	double mutop,mubot,valtop,valbot,eps,dmu,mumid,valmid;
+	double mutop,mubot,valbot,eps,dmu,mumid,valmid;
 	 long count;
 
 	eps=1e-3;
 	mutop=10e6; /* begin the search at tau=100ns (=1/10e6) */
-	valtop=Phi_Value(Trace,exp(-mutop*dt),kmin,kmax);
+	//valtop=Phi_Value(Trace,exp(-mutop*dt),kmin,kmax);
 	mubot=mutop;
 	count=0;
 	do{				// geometric progression search
@@ -51,7 +51,7 @@ double Tau_Fit(unsigned int* Trace, long kmin, long kmax, double dt){
 	} while(valbot>0);	/* tau exceeded 100ms */
 
 	mutop=mubot*2.0;
-	valtop=Phi_Value(Trace,exp(-mutop*dt),kmin,kmax);
+	//valtop=Phi_Value(Trace,exp(-mutop*dt),kmin,kmax);
 	count=0;
 	do{			// binary search
 		mumid=(mutop+mubot)/2.0;

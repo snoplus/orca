@@ -491,7 +491,6 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		NSInvocation* callBack = [NSInvocation invocationWithMethodSignature:[finishTarget methodSignatureForSelector:finishSelector]];
 		[callBack setSelector:finishSelector];
 		
-		//selector =  script:didFinish:returnValue:
 		BOOL normalFinish = aResult!=nil;
 		[callBack setArgument:&normalFinish atIndex:2];
 		[callBack setArgument:&aResult atIndex:3];

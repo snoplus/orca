@@ -37,8 +37,6 @@
 	ORCircularBufferReader* circularBufferReader;
 	ORReadOutList* readOutGroup;
 	
-	BOOL			queScheduledForUpdate;
-	BOOL			updatesEnabled;
     NSTimeInterval	updateInterval;
 	NSDate*			lastQueUpdate;
 	

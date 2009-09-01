@@ -50,7 +50,7 @@
 + (void) publishPlot:(id)aPlot 
 {
 	if([aPlot respondsToSelector:@selector(plotAsPDFData)]){
-		ORPlotPublisher* publisher = [[ORPlotPublisher alloc] initWithPlot:aPlot];
+		ORPlotPublisher* publisher = [[[ORPlotPublisher alloc] initWithPlot:aPlot] autorelease];
 		[publisher beginSheet];
 	}
 }
@@ -97,6 +97,7 @@
 
 - (void) beginSheet
 {
+	[self retain];
 	oldAttributes = [[plotter attributes] mutableCopy];
 	oldXLabel = [[[plotter xScale] label] copy];
 	oldYLabel = [[[plotter yScale] label] copy];

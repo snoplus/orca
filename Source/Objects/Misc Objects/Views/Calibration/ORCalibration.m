@@ -123,6 +123,7 @@
 		NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:calAsData];
 		[archiver encodeObject:cal forKey:@"aCalibration"];
 		[archiver finishEncoding];		
+		[archiver release];
 		
 		[calDic setObject:calAsData forKey:[nameField stringValue]];
 		[defaults setObject:calDic forKey:@"ORCACalibrations"];

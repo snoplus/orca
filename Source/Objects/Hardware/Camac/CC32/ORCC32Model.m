@@ -586,8 +586,9 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 {
 }
 
-- (void) reset
+- (int) reset
 {
+	return 1;
 }
 
 - (void) saveReadOutList:(NSFileHandle*)aFile

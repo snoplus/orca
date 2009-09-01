@@ -34,7 +34,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PmtImages);
 		if(!pmtImages) pmtImages = [[NSMutableDictionary dictionary] retain];	//check the top level dictionary
 		NSMutableDictionary* colorGroup = [pmtImages objectForKey:aColor];		//check the top level entry
 		if(!colorGroup) {														//couldn't find anything for this color
-			colorGroup = [[NSMutableDictionary dictionary] retain];				//make an dictionary
+			colorGroup = [NSMutableDictionary dictionary];				//make an dictionary
 			[pmtImages setObject:colorGroup forKey:aColor];						//enter it
 		}
 		[colorGroup setObject:anImage forKey:[NSNumber numberWithInt:(int)anAngle]];
@@ -74,14 +74,14 @@ static NSImage *pmtImage, *colorMaskImage, *topImage;
 
 - (void) setColor:(NSColor*)aColor
 {
-	NSImage *anImage = [colorMaskImage copy];        
+	NSImage *anImage = [[colorMaskImage copy] autorelease];        
 	NSRect imageBounds = NSMakeRect(0, 0, [anImage size].width, [anImage size].height); 
 	[anImage lockFocus];
 	[aColor set];
 	NSRectFillUsingOperation(imageBounds, NSCompositeSourceAtop);
 	[anImage unlockFocus];
-
-	anImage = [anImage copy];        
+	
+	anImage = [[anImage copy] autorelease];        
 	[anImage lockFocus];
 	[pmtImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
 	[anImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver fraction:1];
@@ -92,6 +92,7 @@ static NSImage *pmtImage, *colorMaskImage, *topImage;
 	[self lockFocus];
 	[newImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver fraction:1];
 	[self unlockFocus];
+	
 }
 
 @end

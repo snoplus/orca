@@ -36,8 +36,6 @@
 	BOOL				 stopThread;
 	BOOL				 running;
 	BOOL				 parsedOK;
-	BOOL				 normalExit;
-	id					 returnValue;
 	NSData*				 expressionAsData;
 	NSString*			 scriptName;
 	
@@ -47,7 +45,6 @@
 	BOOL				exitNow;
 	BOOL				scriptExists;
 	unsigned long		lastLine;
-	unsigned long		lastLevel;
 	unsigned long       lastFunctionLevel;
 	BOOL				step;
 	BOOL				scriptShouldPause;

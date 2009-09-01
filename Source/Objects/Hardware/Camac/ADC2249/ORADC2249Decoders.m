@@ -99,19 +99,17 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-	unsigned long *timeStampPtr = 0;
 	unsigned long length = ExtractLength(*ptr);
     if(!IsShortForm(*ptr)){
         ptr++; //point to the data
-		timeStampPtr = ptr+1;
     }
     
     NSString* title= @"ADC2249 ADC Record\n\n";
     
-    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n", (*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n", (*ptr&0x001f0000)>>16];
-    NSString* chan  = [NSString stringWithFormat:@"Chan     = %d\n", (*ptr&0x0000f000)>>12];
-    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%x\n",*ptr&0x00000fff];
+    NSString* crate = [NSString stringWithFormat:@"Crate    = %d\n", (ptr[0]&0x01e00000)>>21];
+    NSString* card  = [NSString stringWithFormat:@"Station  = %d\n", (ptr[0]&0x001f0000)>>16];
+    NSString* chan  = [NSString stringWithFormat:@"Chan     = %d\n", (ptr[0]&0x0000f000)>>12];
+    NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%x\n",ptr[0]&0x00000fff];
 	NSCalendarDate* theTime = nil;
 	
 	if(length ==4){
@@ -119,9 +117,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 			NSTimeInterval asTimeInterval;
 			unsigned long asLongs[2];
 		}theTimeRef;
-		theTimeRef.asLongs[1] = *timeStampPtr;
-		timeStampPtr++;
-		theTimeRef.asLongs[0] = *timeStampPtr;
+		theTimeRef.asLongs[1] = ptr[1];
+		theTimeRef.asLongs[0] = ptr[2];
 		
 		theTime   = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:theTimeRef.asTimeInterval];
 		NSString* inSec = [NSString stringWithFormat:@"\n(%.3f secs)\n",theTimeRef.asTimeInterval];

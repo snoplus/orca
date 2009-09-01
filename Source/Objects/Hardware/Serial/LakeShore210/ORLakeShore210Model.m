@@ -229,15 +229,6 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];
 	[self readTemps];
-	
-//---for testing---	
-//	int i;
-//	testValue = testValue+2;
-//	for(i=0;i<8;i++){
-//		[self setTemp:i value:200 + i*10 + testValue];
-//	}
-//	if(shipTemperatures) [self shipTemps];
-//-------------	
 
 	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
 }

@@ -1077,7 +1077,7 @@ enum {
 
 	[usbInterface writeBytes:buf length:intbuf[0]*2 + 4];
 	
-	lDataLen=2000;
+	//lDataLen=2000;
 	
 	int ret = [usbInterface readBytes:buf length:sizeof(buf)];
 

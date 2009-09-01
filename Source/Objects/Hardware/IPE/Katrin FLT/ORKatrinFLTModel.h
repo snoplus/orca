@@ -214,6 +214,7 @@
     BOOL vetoFeatureIsAvailable;
     BOOL histoFeatureIsAvailable;
     BOOL filterGapFeatureIsAvailable;
+
 }
 
 #pragma mark ¥¥¥Initialization
@@ -506,9 +507,7 @@
 - (void) readVetoDataFrom:(int)fromIndex to:(int)toIndex;
 #pragma mark ¥¥¥Low-level Register Access
 //- (unsigned long) getRegisterAdress:(NSString*)aRegisterName withChan:(int)aChan;
-    int readWriteRegisterChannel;    //!< The channel/group currently selected in the low-level tab -tb-
-    NSString *readWriteRegisterName; //!< The register name currently selected in the low-level tab -tb-
--(int) readWriteRegisterChan;
+ -(int) readWriteRegisterChan;
 -(void) setReadWriteRegisterChan:(int)aChan;
 -(NSString *) readWriteRegisterName;
 -(void) setReadWriteRegisterName:(NSString *)aName;

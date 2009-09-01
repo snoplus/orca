@@ -56,7 +56,7 @@
 {
 	if( pthread_main_np() ) return [self postNotificationName:name object:object userInfo:userInfo];
 	
-	// The info dictionary is released in _postNotificationName.
+	//******The info dictionary is released in _postNotificationName.
 	NSMutableDictionary *info = [[NSMutableDictionary allocWithZone:nil] initWithCapacity:3];
 	if( name ) [info setObject:name forKey:@"name"];
 	if( object ) [info setObject:object forKey:@"object"];

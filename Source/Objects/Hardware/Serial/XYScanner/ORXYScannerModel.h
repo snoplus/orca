@@ -44,7 +44,6 @@ enum {
         ORSerialPort*   serialPort;
         NSPoint         xyPosition;
         NSPoint         oldXyPosition;
-        int             pollCount;
         NSMutableString*       buffer;
         NSPoint         cmdPosition;
         BOOL            absMotion;

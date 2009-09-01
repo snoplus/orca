@@ -557,10 +557,11 @@
 	
 	if(inPieChartView == motorPie1){
 	
-		if(motorPosition > 100)motorPosition = 100;
-		if(motorPosition < 0)motorPosition = 0;
-
 		motorPosition = 100.*([model xyPosition].x)/[model fullScale].x;
+		
+		if(motorPosition > 100)motorPosition = 100;
+		else if(motorPosition < 0)motorPosition = 0;
+
 		if(inSliceIndex==1){
 			return motorPosition;
 		}

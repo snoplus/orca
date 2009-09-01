@@ -453,7 +453,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 			couplingValue = [ NSString stringWithCString: mReturnData encoding:NSASCIIStringEncoding ];
 			
 			// Now get the impedance.
-			returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"CH%d:IMPEDANCE?", aChnl + 1 ]
+			[ self writeReadGPIBDevice: [ NSString stringWithFormat: @"CH%d:IMPEDANCE?", aChnl + 1 ]
                                                  data: mReturnData
                                             maxLength: kMaxGPIBReturn ];
 			
@@ -1912,7 +1912,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     short						iStart = -1;
     short						i;
     bool						f_Found = false;
-    char*						dateString;
+    //char*						dateString;
 	char*						datePiece;
 	
 	// Initialize time to zero in case we fail.
@@ -1969,7 +1969,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	if ( !datePiece ) return;
     unixTime.tm_sec = atoi( datePiece );
     
-    dateString = asctime( &unixTime );
+    //dateString = asctime( &unixTime );
     
 	// Get base time in seconds
     baseTime = timegm( &unixTime ); // Have to use timegm because mktime forces the time to

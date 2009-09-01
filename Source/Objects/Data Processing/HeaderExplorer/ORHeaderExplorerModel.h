@@ -42,7 +42,6 @@
         ORDataPacket*   fileAsDataPacket;
 
         BOOL			reading;
-        unsigned long   total;
         unsigned long   numberLeft;
         unsigned long   currentFileIndex;
 		

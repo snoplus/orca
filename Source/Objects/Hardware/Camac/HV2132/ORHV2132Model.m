@@ -638,7 +638,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 			break;
 		}
 		//check LAM2
-		statusWord = [[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:&dataWord];
+		[[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:&dataWord];
 		if(dataWord & 0x2) {
 			while(1){
 				statusWord = [[self adapter] camacShortNAF:[self stationNumber] a:1 f:2 data:&data[wordCount]];

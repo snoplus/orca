@@ -249,7 +249,7 @@ filterData ex(nodeType *p,id delegate)
 		tempData.val.lValue = 0;
 		
 	}
-    switch(p->type) {
+    else switch(p->type) {
 		case typeCon:       
 			tempData.type = kFilterLongType;
 			tempData.val.lValue = p->con.value;

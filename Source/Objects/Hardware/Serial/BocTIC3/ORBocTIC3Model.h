@@ -36,11 +36,9 @@
 		float		    pressure[3];
 		unsigned long	timeMeasured[3];
 		int				pollTime;
-		BOOL			degreesInKelvin;
         NSMutableString*       buffer;
 		BOOL			shipPressures;
 		ORTimeRate*		timeRates[3];
-		float			testValue;
 		int pressureScale;
 		float pressureScaleValue;
 }

@@ -134,6 +134,7 @@
 			[subControllers addObject:subPlotController];
 			if(i == 0) [chip1View addSubview:[subPlotController getView]];
 			else       [chip2View addSubview:[subPlotController getView]];
+			[subPlotController release];
 		}
 		viewsSetup= YES;
 	}
