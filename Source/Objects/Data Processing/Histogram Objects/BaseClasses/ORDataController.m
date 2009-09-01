@@ -367,7 +367,9 @@
 {
 	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 	NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:plotterGroupView printInfo:printInfo];
-	[printOp setShowPanels:YES];
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
+    [printOp setShowPanels:YES];
+#endif
 	[printOp runOperation];
 }
 

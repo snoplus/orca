@@ -347,16 +347,16 @@ struct {
 }
 
 #pragma mark ¥¥¥Accessors
-- (unsigned short) range
+- (unsigned short) rangeToDo
 {
-    return range;
+    return rangeToDo;
 }
 
-- (void) setRange:(unsigned short)aRange
+- (void) setRangeToDo:(unsigned short)aRange
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRange:range];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRangeToDo:rangeToDo];
     
-    range = aRange;
+    rangeToDo = aRange;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPciBit3ModelRangeChanged object:self];
 }
@@ -851,10 +851,10 @@ struct {
 		if( data & LOCAL_STATUS_NOPOWER ) {		// power off
 			[[NSNotificationCenter defaultCenter] postNotificationName:@"VmePowerFailedNotification" object:self];
 			powerWasOff = YES;
-			[NSException raise: OExceptionNoVmeCratePower format:[NSString stringWithFormat:@"%@ unable to access Vme Crate. Check Power and Cables.",deviceName]];
+			[NSException raise: OExceptionNoVmeCratePower format:@"%@ unable to access Vme Crate. Check Power and Cables.",deviceName];
 		}
 		else if( data & LOCAL_STATUS_RXPRI ) {		// unable to clear errors
-			[NSException raise: OExceptionVmeUnableToClear format:[NSString stringWithFormat:@"%@ unable to access Vme Crate. Check Power and Cables.",deviceName]];
+			[NSException raise: OExceptionVmeUnableToClear format:@"%@ unable to access Vme Crate. Check Power and Cables.",deviceName];
 		}
 		else if( data & ( LOCAL_STATUS_LRC | LOCAL_STATUS_IFTO
 						 | LOCAL_STATUS_VMEBERR | LOCAL_STATUS_IFPE ) ) {	// unable to access
@@ -875,7 +875,7 @@ struct {
 				details = @"Fiber Interface Error";
 				NSLogError(@" ",@"Bit3 Status",details,nil);
 			}
-			[NSException raise: OExceptionVmeAccessError format:[NSString stringWithFormat:@"%@:%@",baseString,details]];
+			[NSException raise: OExceptionVmeAccessError format:@"%@:%@",baseString,details];
 		}
 	}
 }    
@@ -898,7 +898,7 @@ struct {
     // check remote power on
     [self readCSRRegister:PCIVME_CSR_LOCAL_STATUS_OFFSET withDataPtr:&data];
     if( data & LOCAL_STATUS_NOPOWER ) {
-        [NSException raise: OExceptionNoVmeCratePower format:[NSString stringWithFormat:@"%@ unable to access Vme Crate. Check Power and Cables.",deviceName]];
+        [NSException raise: OExceptionNoVmeCratePower format:@"%@ unable to access Vme Crate. Check Power and Cables.",deviceName];
     }
     
     // clear any hardware errors caused by power up
@@ -1584,7 +1584,7 @@ physicalBufferAddress: physicalAddress
 	// check for errors	
 	if( ![self checkDmaErrors] ) {
 		NSString* baseString = [NSString stringWithFormat:@"%@ Vme DMA Exception. ",deviceName];
-		[NSException raise: CExceptionVmeLongBlockReadErr format:[NSString stringWithFormat:@"%@",baseString]];
+		[NSException raise: CExceptionVmeLongBlockReadErr format:@"%@",baseString];
 	}
 }
 
@@ -1661,7 +1661,7 @@ physicalBufferAddress: physicalAddress
 	// check for errors	
 	if( ![self checkDmaErrors] ) {
 		NSString* baseString = [NSString stringWithFormat:@"%@ Vme DMA Exception. ",deviceName];
-		[NSException raise: CExceptionVmeLongBlockWriteErr format:[NSString stringWithFormat:@"%@",baseString]];
+		[NSException raise: CExceptionVmeLongBlockWriteErr format:@"%@",baseString];
 	}
 }
 
@@ -2082,7 +2082,7 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setRange:[decoder decodeIntForKey:@"ORPciBit3ModelRange"]];
+    [self setRangeToDo:[decoder decodeIntForKey:@"ORPciBit3ModelRange"]];
     [self setDoRange:[decoder decodeBoolForKey:@"ORPciBit3ModelDoRange"]];
     [self setDualPortAddress:[decoder decodeInt32ForKey:ORPciBit3DualPortAddress]];
     [self setDualPortRamSize:[decoder decodeInt32ForKey:ORPciBit3DualPortRamSize]];
@@ -2114,7 +2114,7 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:range forKey:@"ORPciBit3ModelRange"];
+    [encoder encodeInt:rangeToDo forKey:@"ORPciBit3ModelRange"];
     [encoder encodeBool:doRange forKey:@"ORPciBit3ModelDoRange"];
     [encoder encodeInt32:dualPortAddress forKey:ORPciBit3DualPortAddress];
     [encoder encodeInt32:dualPortRamSize forKey:ORPciBit3DualPortRamSize];

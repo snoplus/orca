@@ -507,8 +507,8 @@
 			
 			//loops
 		case FOR:			return [self forLoop:p];
-		case BREAK:			[NSException raise:@"break" format:nil]; return nil;
-		case CONTINUE:		[NSException raise:@"continue" format:nil]; return nil;
+		case BREAK:			[NSException raise:@"break" format:@""]; return nil;
+		case CONTINUE:		[NSException raise:@"continue" format:@""]; return nil;
 		case EXIT:			return [self doExit:p];
 		case RETURN:		return [self doReturn:p];
 		case WHILE:			return [self whileLoop:p];
@@ -1237,7 +1237,7 @@
 	
     if (!p) return @"";
 	
-	NSMutableString* line = @"?";
+	NSMutableString* line = [NSMutableString stringWithString:@"?"];
 	
     switch([(Node*)p type]) {
         case typeCon:				line = [NSMutableString stringWithFormat:@"c(%@)",		[p nodeData]];	break;

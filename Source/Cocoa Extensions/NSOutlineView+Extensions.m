@@ -19,12 +19,13 @@
 
 - (NSArray*)allSelectedItems {
     NSMutableArray *items = [NSMutableArray array];
-    NSEnumerator *selectedRows = [self selectedRowEnumerator];
-    NSNumber *selRow = nil;
-    while( (selRow = [selectedRows nextObject]) ) {
-        if ([self itemAtRow:[selRow intValue]]) 
-            [items addObject: [self itemAtRow:[selRow intValue]]];
-    }
+	NSIndexSet* selectedSet = [self selectedRowIndexes];
+	unsigned current_index = [selectedSet firstIndex];
+	while (current_index != NSNotFound){
+        if ([self itemAtRow:current_index]) [items addObject: [self itemAtRow:current_index]];
+		current_index = [selectedSet indexGreaterThanIndex: current_index];
+	}
+
     return items;
 }
 
@@ -33,7 +34,10 @@
     if (extend==NO) [self deselectAll:nil];
     for (i=0;i<[items count];i++) {
         int row = [self rowForItem:[items objectAtIndex:i]];
-        if(row>=0) [self selectRow: row byExtendingSelection:YES];
+		if(row>=0) {
+			NSIndexSet* aSet = [NSIndexSet indexSetWithIndex:row];
+			[self selectRowIndexes:aSet byExtendingSelection:YES];
+		}
     }
 }
 - (id) parentOfSelectedRow

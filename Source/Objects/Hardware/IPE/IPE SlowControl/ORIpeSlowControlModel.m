@@ -1196,7 +1196,15 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         [receivedXMLData release];
 
         // inform the user
-        NSLog(@"CONNECTION FAILED! Error - >%@< >%i< >%@<\n",[error localizedDescription], [error code], [[error userInfo] objectForKey:NSErrorFailingURLStringKey]);
+        NSLog(@"CONNECTION FAILED! Error - >%@< >%i< >%@<\n",
+			  [error localizedDescription], 
+			  [error code],
+#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
+			  [[error userInfo] objectForKey:NSErrorFailingURLStringKey]
+#else
+			  [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]
+#endif
+			  );
         //TODO: write a message into the tree -tb-
         //TODO: write a message into the tree -tb-
         //TODO: need to improve the message !!!! maybe a alarm popup? -tb-

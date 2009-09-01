@@ -88,10 +88,10 @@
     //write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
 	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
     char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
-	NSString* thePath = [NSString stringWithCString:tmpName];
+	NSString* thePath = [NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding];
     [self writeToFile:thePath atomically:YES];
     NSData* data = [NSData dataWithContentsOfFile:thePath];
-	[[NSFileManager defaultManager] removeFileAtPath:[NSString stringWithCString:tmpName] handler:nil];
+	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] error:nil];
     free(tmpName);
 	return data;
 }
@@ -136,10 +136,10 @@
 	//write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
 	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
 	char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
-	NSString* thePath = [NSString stringWithCString:tmpName];
+	NSString* thePath = [NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding];
 	[plist writeToFile:thePath atomically:YES];
 	NSDictionary* theResponse = [NSDictionary dictionaryWithContentsOfFile:thePath];
-	[[NSFileManager defaultManager] removeFileAtPath:[NSString stringWithCString:tmpName] handler:nil];
+	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] error:nil];
 	free(tmpName);
 	return theResponse;
 }

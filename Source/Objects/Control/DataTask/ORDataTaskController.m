@@ -27,6 +27,7 @@
 #import "ORValueBar.h"
 #import "ORPlotter.h"
 #import "ORAxis.h"
+#import "ORGroupView.h"
 
 #define ORDataTakerItem @"ORDataTaker Drag Item"
 #define kManualRefresh 1E10
@@ -440,12 +441,12 @@ else {\
 {
 
 	if([gSecurity isLocked:ORDataTaskListLock]){
-        [[[info draggingSource] dataSource] dragDone];
+        [(ORGroupView*)([[info draggingSource] dataSource]) dragDone];
         return NO;
     }
     
 	BOOL result = NO;
-	NSArray *possibleItems = [[[info draggingSource] dataSource] draggedNodes];
+	NSArray *possibleItems = [(ORGroupView*)([[info draggingSource] dataSource]) draggedNodes];
 	
 	GET_CHILDREN; //macro: given an item, sets children array and guardian. 
 	
@@ -489,7 +490,7 @@ else {\
 			result = YES;
 		}
 	}
-	[[[info draggingSource] dataSource] dragDone];
+	[(ORGroupView*)([[info draggingSource] dataSource]) dragDone];
 	return result;
 }
 

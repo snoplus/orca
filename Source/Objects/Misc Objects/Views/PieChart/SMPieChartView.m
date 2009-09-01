@@ -736,10 +736,9 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
 
 - (void)reloadAttributesForSliceIndex:(unsigned int)inSliceIndex
 {
-    NSDictionary	*sliceData, *replacingData;
+    NSDictionary	*sliceData;
 
     // Determine if the attribute being replaced was a bar or not (so we can keep the bar count correct).
-    replacingData = [ myPrivateData->sliceAttributes objectAtIndex:inSliceIndex ];
 
     if ( myPrivateData->flags.dataSourceDecidesAttributes )
     {
@@ -833,7 +832,6 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
             frame.origin.y -= ( pieRect.size.height + labelRect.size.height ) - bounds.size.height;
             frame.size.height = pieRect.size.height + labelRect.size.height;
             [ self setFrame:frame ];
-            bounds = [ self bounds ];
         }
         labelRect.origin.y = pieRect.size.height + 1.0;
     }

@@ -283,7 +283,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                 case eUseSCP:
 					{
 						NSString* bp = [[NSBundle mainBundle ]resourcePath];
-						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"]];
+						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
 						[theScript replace:@"<isDir>" with:isDir?@"-r":@""];
 						[theScript replace:@"<verbose>" with:isDir?@"-v":@""];
 						[theScript replace:@"<sourcePath>" with:fullPath];
@@ -299,7 +299,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                 case eUseFTP:
 					{
 						NSString* bp = [[NSBundle mainBundle ]resourcePath];
-						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectScript"]];
+						NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
 						
 						[theScript replace:@"<ftp>" with:[self transferType] == eUseSFTP?@"sftp":@"ftp"];
 						[theScript replace:@"<user>" with:remoteUserName];
@@ -320,7 +320,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
             BOOL fileOK = [fileManager fileExistsAtPath: fullPath];
             if ( fileOK ) {
                 NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
-                [fileManager changeFileAttributes:dict atPath:scriptPath];
+				[fileManager setAttributes:dict ofItemAtPath:fullPath error:nil];
                 [task setLaunchPath:scriptPath];
 				NSLog(@"Trying to send <%@> to %@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");
             }
@@ -346,7 +346,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 {
     if([aNote object] == task){
         BOOL transferOK = NO;
-        [[NSFileManager defaultManager] removeFileAtPath:scriptFilePath handler:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:scriptFilePath error:nil];
 		int exitCode = [task terminationStatus];
         if( exitCode == 0) {
             //probable success.. but let's make sure
@@ -414,7 +414,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
             NSLog(@"%@ copied to %@@%@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteUserName,remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");	
             if ([delegate respondsToSelector:@selector(shouldRemoveFile:)]){
                 if([delegate shouldRemoveFile:fullPath]){
-                    [[NSFileManager defaultManager] removeFileAtPath:fullPath handler:nil];
+                    [[NSFileManager defaultManager] removeItemAtPath:fullPath error:nil];
                     NSLog(@"%@ deleted from local host\n",[fullPath stringByAbbreviatingWithTildeInPath]);
                 }
                 else [self moveToSentFolder];
@@ -478,8 +478,8 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     NSString* dirPath = [fullPath stringByDeletingLastPathComponent];
     dirPath = [dirPath stringByAppendingPathComponent:@"sentFiles"];
     NSString* destination = [dirPath stringByAppendingPathComponent:[fullPath lastPathComponent]];
-    [fileManager createDirectoryAtPath:dirPath attributes:nil];
-    [fileManager movePath:fullPath toPath:destination  handler:nil];
+	[fileManager createDirectoryAtPath:dirPath withIntermediateDirectories:NO attributes:nil error:nil];
+    [fileManager moveItemAtPath:fullPath toPath:destination  error:nil];
 }
 
 
@@ -487,7 +487,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 {
     dirPath = [dirPath stringByAppendingPathComponent:@"sentFiles"];
     NSFileManager* fileManager = [NSFileManager defaultManager];
-    [fileManager removeFileAtPath:dirPath handler:nil];
+    [fileManager removeItemAtPath:dirPath error:nil];
     NSLog(@"removed folder: %@\n",dirPath);
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];

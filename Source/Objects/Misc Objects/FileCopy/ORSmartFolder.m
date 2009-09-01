@@ -297,7 +297,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 {
     
     NSFileManager* fileManager = [NSFileManager defaultManager];
-    NSArray* files = [fileManager directoryContentsAtPath:[[self directoryName]stringByExpandingTildeInPath]];
+    NSArray* files = [fileManager contentsOfDirectoryAtPath:[[self directoryName]stringByExpandingTildeInPath] error:nil];
     NSEnumerator* e = [files objectEnumerator];
     NSString* aFile;
     while(aFile = [e nextObject]){
@@ -466,11 +466,11 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     
     NSString* tmpDir = [[folderName stringByExpandingTildeInPath] stringByAppendingPathComponent:subFolder];
     if(![fm fileExistsAtPath:tmpDir]){
-        if(![fm createDirectoryAtPath:tmpDir attributes:nil]){
+		if(![fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil]){
             NSString* aFolder = [[folderName stringByExpandingTildeInPath] stringByDeletingLastPathComponent];
             NSString* subFolder1 = [[folderName stringByExpandingTildeInPath] lastPathComponent];
             [self ensureSubFolder:subFolder1 inFolder:aFolder];
-            [fm createDirectoryAtPath:tmpDir attributes:nil];
+			[fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil];
         }
     }
     return tmpDir;
@@ -482,11 +482,12 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     
     NSString* tmpDir = [folderName stringByExpandingTildeInPath];
     if(![fm fileExistsAtPath:tmpDir]){
-        if(![fm createDirectoryAtPath:tmpDir attributes:nil]){
+		if(![fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil]){
+
             NSString* aFolder = [[folderName stringByExpandingTildeInPath] stringByDeletingLastPathComponent];
             [self ensureExists:aFolder];
-            [fm createDirectoryAtPath:tmpDir attributes:nil];
-        }
+			[fm createDirectoryAtPath:tmpDir withIntermediateDirectories:NO attributes:nil error:nil];        
+		}
     }
     return tmpDir;
 }

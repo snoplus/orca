@@ -161,7 +161,8 @@ void forLoop(nodeType* p, id delegate)
 {
 	BOOL breakLoop		= NO;
 	BOOL continueLoop	= NO;
-	for(ex(p->opr.op[0],delegate).val.lValue ; ex(p->opr.op[1],delegate).val.lValue ; ex(p->opr.op[2],delegate).val.lValue){
+	
+	for(ex(p->opr.op[0],delegate) ; ex(p->opr.op[1],delegate).val.lValue ; ex(p->opr.op[2],delegate)){
 		if([delegate exitNow])break;
 		else {
 			@try {
@@ -263,7 +264,7 @@ filterData ex(nodeType *p,id delegate)
 				case DO:		doLoop(p,delegate); return tempData;
 				case WHILE:     whileLoop(p,delegate); return tempData;
 				case FOR:		forLoop(p,delegate); return tempData;
-				case CONTINUE:	[NSException raise:@"continue" format:nil]; return tempData;
+				case CONTINUE:	[NSException raise:@"continue" format:@""]; return tempData;
 				case IF:        if (ex(p->opr.op[0],delegate).val.lValue != 0) ex(p->opr.op[1],delegate);
 				else if (p->opr.nops > 2) ex(p->opr.op[2],delegate);
 					return tempData;
@@ -271,7 +272,7 @@ filterData ex(nodeType *p,id delegate)
 				case UNLESS:    if (ex(p->opr.op[0],delegate).val.lValue) ex(p->opr.op[1],delegate);
 					return tempData;
 					
-				case BREAK:		[NSException raise:@"break" format:nil]; return tempData;
+				case BREAK:		[NSException raise:@"break" format:@""]; return tempData;
 				case SWITCH:	doSwitch(p,delegate); return tempData;
 				case CASE:		doCase(p,delegate); return tempData;
 				case DEFAULT:	doDefault(p,delegate); return tempData;

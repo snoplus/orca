@@ -363,7 +363,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (void) readMap
 {
     
-    NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath]];
+    NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
 	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
     NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
@@ -407,7 +407,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
     
     NSFileManager* theFileManager = [NSFileManager defaultManager];
     if([theFileManager fileExistsAtPath:newFileName]){
-        [theFileManager removeFileAtPath:newFileName handler:nil];
+        [theFileManager removeItemAtPath:newFileName error:nil];
     }
     [theFileManager createFileAtPath:newFileName contents:theContents attributes:nil];
 }
@@ -424,7 +424,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
-	NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath]];
+	NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	if(contents){
 		[mapDictionary setObject:contents forKey:@"Geometry"];
 	}

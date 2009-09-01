@@ -36,7 +36,7 @@ long 	convertTimeCharToLong( char* aTime )
 	struct tm	timeStruct;
     char		tmpStorage[ 16 ];
     
-    timeStr = [ NSString stringWithCString: aTime ];
+    timeStr = [ NSString stringWithCString: aTime  encoding:NSASCIIStringEncoding];
 	
 	[[timeStr substringWithRange:NSMakeRange( 0, 4 )] getCString:tmpStorage maxLength:4 encoding:NSASCIIStringEncoding];
 	timeStruct.tm_year = atoi( tmpStorage ) - 1900;

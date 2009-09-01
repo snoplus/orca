@@ -921,7 +921,7 @@ enum {
 {
 	if(!usbInterface){
         [[NSNotificationCenter defaultCenter] postNotificationName:@"CamacPowerFailedNotification" object:self];
-		[NSException raise: @"CamacPowerFailedNotification" format:[NSString stringWithFormat:@"Unable to access CAMAC Crate. Check Power and USB Cables."]];
+		[NSException raise: @"CamacPowerFailedNotification" format:@"Unable to access CAMAC Crate. Check Power and USB Cables."];
     }
     else {
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"CamacPowerRestoredNotification" object:self];

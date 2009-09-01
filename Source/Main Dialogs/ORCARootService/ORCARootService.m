@@ -403,8 +403,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 		unsigned long length = ExtractLength(*ptr);
 		unsigned long theID   = ExtractDataId(*ptr);
 		if([dataBuffer length]/4 >= length && theID == dataId){
-			ptr++;
-			NSString* plist = [NSString stringWithCString:(const char *)ptr length:(length-1)*4];
+			ptr++;			
+			NSString* plist = [[[NSString alloc] initWithBytes:(const char *)ptr length:(length-1)*4 encoding:NSASCIIStringEncoding] autorelease];
 			NSDictionary* theResponse = [NSDictionary dictionaryWithPList:plist];
 						
 			unsigned long oldLength = [dataBuffer length];

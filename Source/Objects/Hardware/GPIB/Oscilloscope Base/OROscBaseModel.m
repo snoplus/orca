@@ -893,7 +893,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 		// [ self oscSetOscSpecificSettings ];
 		
 		// Restart the acquisition either in a true run, or normal triggering.	
-		[ self oscRunOsc: [ NSString stringWithCString: theMsg ]];
+		[ self oscRunOsc: [ NSString stringWithCString: theMsg encoding:NSASCIIStringEncoding]];
     }
     
     
@@ -1099,7 +1099,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
     else
     {
         errorMsg = [ NSString stringWithFormat: @"Bad oscilloscope channel number: %d", aChnl ];
-        [ NSException raise: OExceptionOscError format: errorMsg ];
+        [ NSException raise: OExceptionOscError format: @"%@",errorMsg ];
     }
 	
 	

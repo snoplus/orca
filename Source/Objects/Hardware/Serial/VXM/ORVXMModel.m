@@ -827,7 +827,7 @@ NSString* ORVXMLock = @"ORVXMLock";
         if(patternType == kXYUseFile){
             NSString* fullPath = [cmdFile stringByExpandingTildeInPath];
             if([[NSFileManager defaultManager] fileExistsAtPath:fullPath]){
-                NSString* contents = [NSString stringWithContentsOfFile:fullPath];
+                NSString* contents = [NSString stringWithContentsOfFile:fullPath encoding:NSASCIIStringEncoding error:nil];
                 contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
                 contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
                 [self setCmdList:[[[contents componentsSeparatedByString:@"\n"] mutableCopy] autorelease]];

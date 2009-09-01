@@ -199,8 +199,8 @@
 
 - (void) rangeChanged:(NSNotification*)aNote
 {
-	[rangeTextField setIntValue: [model range]];
-	[rangeStepper setIntValue:	 [model range]];
+	[rangeTextField setIntValue: [model rangeToDo]];
+	[rangeStepper setIntValue:	 [model rangeToDo]];
 }
 
 - (void) doRangeChanged:(NSNotification*)aNote
@@ -362,7 +362,7 @@
 
 - (void) rangeTextFieldAction:(id)sender
 {
-	[model setRange:[sender intValue]];	
+	[model setDoRange:[sender intValue]];	
 }
 
 - (void) doRangeAction:(id)sender
@@ -689,12 +689,12 @@
     
     [self endEditing];
     unsigned long 	startAddress 	= [model rwAddress];
-	unsigned long	endAddress		= [model doRange]?startAddress + [model range]*[addressStepper increment] : startAddress;
+	unsigned long	endAddress		= [model doRange]?startAddress + [model rangeToDo]*[addressStepper increment] : startAddress;
     unsigned short 	addressModifier = [model rwAddressModifierValue];
     unsigned short 	addressSpace	= [model rwIOSpaceValue];
 	
 	unsigned long address = startAddress;
-	if([model doRange] && [model range]==0){
+	if([model doRange] && [model rangeToDo]==0){
 		NSLog(@"Range == 0: nothing to do\n");
 		return;
 	}
@@ -748,13 +748,13 @@
     
     [self endEditing];
     int 			startAddress 	= [model rwAddress];
-	int				endAddress		= [model doRange]?startAddress + [model range]*[addressStepper increment] : startAddress;
+	int				endAddress		= [model doRange]?startAddress + [model valueRange]*[addressStepper increment] : startAddress;
     unsigned short 	addressModifier = [model rwAddressModifierValue];
     unsigned short 	addressSpace	= [model rwIOSpaceValue];
     unsigned long  	ldata			= [model writeValue];
     
 	int address = startAddress;
-	if([model doRange] && [model range]==0){
+	if([model doRange] && [model rangeToDo]==0){
 		NSLog(@"Range == 0: nothing to do\n");
 		return;
 	}

@@ -466,7 +466,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 			// iterate over all the log files
 			while (filePath = [dirEnum nextObject]){
 				if([filePath hasPrefix:@"Orca"]){
-					NSString* contents = [NSString stringWithContentsOfFile:[[kCrashLogDir stringByExpandingTildeInPath] stringByAppendingPathComponent:filePath]];
+					NSString* contents = [NSString stringWithContentsOfFile:[[kCrashLogDir stringByExpandingTildeInPath] stringByAppendingPathComponent:filePath]encoding:NSASCIIStringEncoding error:nil];
 					if(contents){
 						NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:contents];
 						//the address may be a list... if so it must be a comma separated list... try to make it so...
@@ -503,11 +503,11 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 		if([filePath hasPrefix:@"Orca"]){
 			NSString* fullPath = [[kCrashLogDir stringByExpandingTildeInPath] stringByAppendingPathComponent:filePath];
 			if([fm fileExistsAtPath:lastCrashLogPath]){
-				[fm removeFileAtPath:lastCrashLogPath handler:nil];
+				[fm removeItemAtPath:lastCrashLogPath error:nil];
 			}
-			[fm copyPath:fullPath toPath:lastCrashLogPath handler:nil];
+			[fm copyItemAtPath:fullPath toPath:lastCrashLogPath error:nil];
 			NSLog(@"Old crash report copied to: %@\n",lastCrashLogPath);
-			[fm removeFileAtPath:fullPath handler:nil];
+			[fm removeItemAtPath:fullPath error:nil];
 		}
 	}	
 }

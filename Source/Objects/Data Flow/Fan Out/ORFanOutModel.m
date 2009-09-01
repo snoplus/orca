@@ -166,8 +166,8 @@ static NSString *kFanOutConnectorKey[10]  = {
     [self drawConnections:aRect withTransparency:aTransparency];
 	if([self guardian]){
 		[NSGraphicsContext restoreGraphicsState];
-		[theShadow release]; 
 	}
+	[theShadow release]; 
 }
 
 - (void) makeMainController

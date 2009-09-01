@@ -90,6 +90,8 @@
             forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 - (void) tableView:(NSTableView*)tv didClickTableColumn:(NSTableColumn *)tableColumn;
 //- (void) updateTableHeaderToMatchCurrentSort;
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
+
 
 @end
 @interface ORDetectorView (Katrin)

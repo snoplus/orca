@@ -20,9 +20,15 @@
 {
     NSImage *existingImage = image;
     NSSize existingSize;
-    existingSize.width = [[existingImage bestRepresentationForDevice: nil] pixelsWide];
-    existingSize.height = [[existingImage bestRepresentationForDevice: nil] pixelsHigh];
+	NSImageRep* imageRep;
 
+#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
+	imageRep = [existingImage bestRepresentationForDevice: nil]
+#else
+	imageRep = [existingImage bestRepresentationForRect:NSMakeRect(0,0,[self size].width,[self size].height) context:nil hints:nil];
+#endif
+    existingSize.width = [imageRep pixelsWide];
+    existingSize.height = [imageRep pixelsHigh];
     NSSize newSize = NSMakeSize(existingSize.height, existingSize.width);
     NSImage *rotatedImage = [[NSImage alloc] initWithSize:newSize];
 
@@ -37,7 +43,12 @@
     [rotateTF concat];
 
     NSRect r1 = NSMakeRect(0, 0, newSize.height, newSize.width);
-    [[existingImage bestRepresentationForDevice: nil] drawInRect: r1];
+#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
+	imageRep = [existingImage bestRepresentationForDevice: nil]
+#else
+	imageRep = [existingImage bestRepresentationForRect:NSMakeRect(0,0,[self size].width,[self size].height) context:nil hints:nil];
+#endif
+    [imageRep drawInRect: r1];
 
     [rotatedImage unlockFocus];
 

@@ -611,7 +611,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 - (void) saveReadOutListTo:(NSString*)fileName
 {
     NSFileManager* fileManager = [NSFileManager defaultManager];
-    if([fileManager fileExistsAtPath:fileName])[fileManager removeFileAtPath:fileName handler:nil];
+    if([fileManager fileExistsAtPath:fileName])[fileManager removeItemAtPath:fileName error:nil];
     [fileManager createFileAtPath:fileName contents:nil attributes:nil];
     NSFileHandle* theFile = [NSFileHandle fileHandleForWritingAtPath:fileName];
     [readOutList saveUsingFile:theFile];

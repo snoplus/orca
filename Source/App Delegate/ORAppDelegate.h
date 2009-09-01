@@ -45,6 +45,7 @@
 - (void) deleteCrashLogs;
 - (void) closeSplashWindow;
 - (ORHelpCenter*) helpCenter;
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

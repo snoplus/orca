@@ -128,7 +128,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 - (void) checkStatusErrors
 {
 	if (![sbcLink isConnected]) {
-		[NSException raise: OExceptionVmeAccessError format:[NSString stringWithString:@"SBC not connected."]];
+		[NSException raise: OExceptionVmeAccessError format:@"%@",[NSString stringWithString:@"SBC not connected."]];
 	}
 }
 

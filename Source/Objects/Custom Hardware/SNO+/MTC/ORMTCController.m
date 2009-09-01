@@ -428,8 +428,8 @@
 
 - (void) repeatCountChanged:(NSNotification*)aNote
 {
-	[repeatCountField setIntValue: [model repeatCount]];
-	[repeatCountStepper setIntValue:   [model repeatCount]];
+	[repeatCountField setIntValue:	 [model repeatOpCount]];
+	[repeatCountStepper setIntValue: [model repeatOpCount]];
 }
 
 - (void) writeValueChanged:(NSNotification*)aNote
@@ -537,7 +537,7 @@
 
 - (IBAction) basicRepeatCountAction:(id)sender
 {
-	[model setRepeatCount:[sender intValue]];	
+	[model setRepeatOpCount:[sender intValue]];	
 }
 
 - (IBAction) basicWriteValueAction:(id)sender

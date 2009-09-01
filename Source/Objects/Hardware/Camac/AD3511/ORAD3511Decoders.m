@@ -76,8 +76,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	BOOL dataOffset;
 	if(timingIncluded)	{
 		dataOffset = 4;
-		*ptr++;	//skip over the timing word #1
-		*ptr++; //skip over the timing word #2
+		ptr++;	//skip over the timing word #1
+		ptr++; //skip over the timing word #2
 	}
 	else dataOffset = 2;
 	

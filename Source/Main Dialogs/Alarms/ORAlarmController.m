@@ -184,13 +184,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
         //alarms, so we have to collect the selected ones, then acknowledge them
         //from that array.
         NSMutableArray* theSelectedAlarms = [NSMutableArray array];
-        NSEnumerator* e = [tableView selectedRowEnumerator];
-        NSNumber* selectedAlarmIndex;
-        while(selectedAlarmIndex = [e nextObject]){
-            [theSelectedAlarms addObject:[[self alarmCollection]objectAtIndex:[selectedAlarmIndex intValue]]];
-        }
+        NSIndexSet* selectedSet = [tableView selectedRowIndexes];
+		unsigned current_index = [selectedSet firstIndex];
+		while (current_index != NSNotFound){
+            [theSelectedAlarms addObject:[[self alarmCollection]objectAtIndex:current_index]];
+			current_index = [selectedSet indexGreaterThanIndex: current_index];
+		}
+		
         
-        e = [theSelectedAlarms objectEnumerator];
+        NSEnumerator* e = [theSelectedAlarms objectEnumerator];
         ORAlarm* anAlarm;
         while(anAlarm = [e nextObject]){
             [anAlarm acknowledge];

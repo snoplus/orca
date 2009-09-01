@@ -25,7 +25,11 @@
 @class ORCommandCenter;
 @class ORScriptView;
 
+#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
 @interface ORCommandCenterController : NSWindowController 
+#else
+@interface ORCommandCenterController : NSWindowController <NSTextFieldDelegate>
+#endif
 {
     IBOutlet NSTextField* portField;
     IBOutlet NSTableView* clientListView;

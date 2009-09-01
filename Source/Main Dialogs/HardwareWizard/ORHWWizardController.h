@@ -185,6 +185,7 @@
 - (void) countChannels;
 - (void) askForFileAndExecute;
 - (BOOL) needToRestore;
+- (int) numberOfRowsInTableView:(NSTableView *) tableView;
 
 @end
 
@@ -193,14 +194,16 @@ extern NSString* ORHWWizardLock;
 
 @interface ORHWWizObj : NSObject
 {
-    unsigned long mask;
+    unsigned long wizMask;
     id<ORHWWizard> target;
 }
 + (id) hwWizObject:(id<ORHWWizard>)obj;
 - (id) initWithTarget:(id<ORHWWizard>)obj;
 - (id) target;
-- (unsigned long) mask;
-- (void) setMask:(unsigned long)aMask;
+- (unsigned long) wizMask;
+- (void) setWizMask:(unsigned long)aMask;
 - (int) numberOfChannels;
+
+
 @end
 

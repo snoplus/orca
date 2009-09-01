@@ -476,7 +476,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	//make a dataPacket for transfering, use a copy of our packet but make it small
 	NSMutableArray* tempData = [[fileAsDataPacket dataArray] retain];
 	[fileAsDataPacket setDataArray:nil];
-	ORDataPacket* tempPacket = [fileAsDataPacket copy];
+	ORDataPacket* tempPacket = [[fileAsDataPacket copy] autorelease];
 	[tempPacket setNeedToSwap:[fileAsDataPacket needToSwap]];
 	[fileAsDataPacket setDataArray: tempData];
 	[tempData release];

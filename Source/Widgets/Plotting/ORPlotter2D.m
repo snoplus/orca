@@ -281,7 +281,7 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     double maxValue = -9E99;
     int x,y;
     int set;
-    unsigned short numberBinsPerSide;
+    unsigned short numberBinsPerSide = 256; //default
     for(set=0;set<numSets;++set){
         unsigned short dataXMin,dataXMax,dataYMin,dataYMax;
         unsigned long* data = [mDataSource plotter:self dataSet:set numberBinsPerSide:&numberBinsPerSide];

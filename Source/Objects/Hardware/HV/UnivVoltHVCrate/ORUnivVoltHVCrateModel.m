@@ -719,7 +719,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 {	
 	@try
 	{
-		NSString* command = [NSString stringWithFormat: ORHVkCrateEnet];	
+		NSString* command = [NSString stringWithFormat: @"%@",ORHVkCrateEnet];	
 		[self sendCrateCommand: command];
 			
 		// Write the command.

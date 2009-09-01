@@ -272,7 +272,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 {
 	//add in the document parameters
 	NSMutableDictionary* docDict = [NSMutableDictionary dictionary];
-    [docDict setObject:[self fileName] forKey:@"documentName"];
+    [docDict setObject:[[self fileURL]relativePath] forKey:@"documentName"];
     [docDict setObject:[[[NSBundle mainBundle] infoDictionary]       objectForKey:@"CFBundleVersion"] forKey:@"OrcaVersion"];
     [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
@@ -392,7 +392,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) saveFinished
 {
-	NSLog(@"Saved Configuration: %@\n",[self fileName]);
+	NSLog(@"Saved Configuration: %@\n",[[self fileURL] relativePath]);
 	@try {
 		[afterSaveTarget performSelector:afterSaveSelector];
 	}
@@ -517,19 +517,21 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) saveDefaultFileName
 {
-    [[NSUserDefaults standardUserDefaults] setObject:[self fileName] forKey:ORLastDocumentName];
+	NSString* theLastFile = [[self fileURL]relativePath];
+    [[NSUserDefaults standardUserDefaults] setObject:theLastFile forKey:ORLastDocumentName];
 }
 
 - (void) copyDocumentTo:(NSString*)aPath append:(NSString*)aString
 {
     [self saveDocument:self];
     NSFileManager* fm = [NSFileManager defaultManager];
-    NSString* path = [aPath stringByAppendingPathComponent:[[self fileName] lastPathComponent]];
-    NSString* ext = [[self fileName]pathExtension];
+    NSString* path = [aPath stringByAppendingPathComponent:[[self fileURL] lastPathComponent]];
+    NSString* ext = [[self fileURL]pathExtension];
     path = [path stringByDeletingPathExtension];
+	NSString* startName = [[self fileURL] relativePath];
     NSString* finalName = [[path stringByAppendingFormat:@"_%@",aString]stringByAppendingPathExtension:ext];
-    if([fm copyPath:[self fileName] toPath:finalName handler:nil]){
-        NSLog(@"Saving: %@\n",finalName);
+    if([fm copyItemAtPath:startName toPath:finalName error:nil]){
+        NSLog(@"Saving: %@\n",startName);
     }
     else {
         NSLogColor([NSColor redColor],@"Error: Configuration file NOT saved with the data\n");
@@ -616,12 +618,12 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) makeControllerPDF:(NSString*)aClassName forObject:(id)aModel
 {
-    id controller = [[NSClassFromString(aClassName) alloc] init];
+    id controller = [[[NSClassFromString(aClassName) alloc] init]autorelease];
     if([controller isKindOfClass:[OrcaObjectController class]]){
         [[controller window] setFrameOrigin:NSMakePoint(8000,8000)];
         [controller setModel:aModel];
 		[[[controller window] contentView] setNeedsDisplay:YES];
-		[self performSelector:@selector(makePDFFromController:) withObject:[controller autorelease] afterDelay:0];
+		[self performSelector:@selector(makePDFFromController:) withObject:controller afterDelay:0];
 	}
 }
 

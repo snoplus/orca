@@ -31,7 +31,11 @@
 #define TD_SYNTAX_COLORING_MODE_ATTR		@"UKTextDocumentSyntaxColoringMode"
 
 // Syntax-colored text file viewer:
+#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
 @interface ORScriptView : NSTextView
+#else
+@interface ORScriptView : NSTextView <NSTextViewDelegate,NSTextStorageDelegate>
+#endif
 {
 	IBOutlet NSProgressIndicator*	progress;				// Progress indicator while coloring syntax.
 	IBOutlet NSTextField*			status;					// Status display for things like syntax coloring or background syntax checks.

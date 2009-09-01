@@ -205,7 +205,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 - (id) parseFile:(NSString*)aPath
 {
-	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath]];
+	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	return [self parse:contents];
 }
 

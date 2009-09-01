@@ -154,7 +154,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 
 -(id)init
 {
-    kern_return_t	kernResult; // on PowerPC this is an int (4 bytes)
     /*
      *	error number layout as follows (see mach/error.h):
      *
@@ -172,7 +171,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 		[super init];
 		portList = [[NSMutableArray array] retain];
 	}
-		kernResult = [self findSerialPorts:&serialPortIterator];
+		[self findSerialPorts:&serialPortIterator];
 		do { 
 			serialPort = [self getNextSerialPort:serialPortIterator];
 			if (serialPort != NULL) {

@@ -293,7 +293,7 @@ static short register_offset[] = { 0x01,0x03,0x04,0x09 };
     [self readFifo:FIFO_DATA_REGISTER atPtr:&fifo_data];
     
     if( j != fifo_data) {
-        [NSException raise: OExceptionFifoTestError format: [NSString stringWithFormat:@"Read (%d) / Write (%d) Mismatch",fifo_data,j]];
+        [NSException raise: OExceptionFifoTestError format: @"Read (%d) / Write (%d) Mismatch",fifo_data,j];
         
     }
     

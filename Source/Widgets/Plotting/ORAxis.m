@@ -1615,7 +1615,6 @@ enum {
 		}
 	}
     else {
-		ticStartX = axisPosition;
 		if(isOpposite){
 			ticStartX	  = axisPosition+2;
 			shortTicEndX  = kShortTickLength+1;
@@ -1877,7 +1876,6 @@ enum {
 		}
 	}
     else {
-		ticStartX = axisPosition;
 		if(isOpposite){
 			ticStartX	  = axisPosition+2;
 			shortTicEndX  = kShortTickLength+1;

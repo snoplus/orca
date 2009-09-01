@@ -47,7 +47,7 @@
 	
 	NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
 
-	NSMutableString* svnVersion = @"";
+	NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
 	NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
 	NSFileManager* fm = [NSFileManager defaultManager];
 	if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];

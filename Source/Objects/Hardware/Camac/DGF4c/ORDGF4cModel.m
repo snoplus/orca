@@ -883,7 +883,7 @@ enum {
 		unsigned short data;
 		
 		//load the configuration data
-		NSString* rootName = [NSString stringWithCString:kBaseFirmwareFileName];
+		NSString* rootName = [NSString stringWithCString:kBaseFirmwareFileName encoding:NSASCIIStringEncoding];
 		NSString* filePath  = [NSString stringWithFormat:@"%@/%@.bin",firmWarePath, rootName];
 		
 		[self loadSystemFPGA:filePath];
@@ -1796,7 +1796,7 @@ enum {
 		[self loadParamsWithReadBack:YES]; //load all params to HW
 	}
 	else {
-		[NSException raise:@"Trace Length Too long" format:[NSString stringWithFormat:@"DGF4c station %d",[self stationNumber]]];
+		[NSException raise:@"Trace Length Too long" format:@"DGF4c station %d",[self stationNumber]];
 	}
 }
 
@@ -2186,7 +2186,7 @@ enum {
 - (void) createNewVarList:(NSString*)aFilePath
 {
     //read in the var list
-    NSString* contents = [NSString stringWithContentsOfFile:aFilePath];
+    NSString* contents = [NSString stringWithContentsOfFile:aFilePath encoding:NSASCIIStringEncoding error:nil];
     
     //fix up the line ends to be just '\n'
     contents = [[contents componentsSeparatedByString:@"\r"]   componentsJoinedByString:@"\n"];

@@ -179,7 +179,7 @@
 		
         if ( returnLen > 0 ){
             data[returnLen] = '\0';
-            [mResult insertText: [NSString stringWithCString: data]];
+            [mResult insertText: [NSString stringWithCString: data encoding:NSASCIIStringEncoding]];
         }
 	}
 	@catch(NSException* localException) {
@@ -204,7 +204,7 @@
 									   maxLength: sizeof( data ) - 1];
 		
         if ( returnLen > 0 )
-            [mResult insertText: [NSString stringWithCString: data]];
+            [mResult insertText: [NSString stringWithCString: data encoding:NSASCIIStringEncoding]];
 		
 	}
 	@catch(NSException* localException) {

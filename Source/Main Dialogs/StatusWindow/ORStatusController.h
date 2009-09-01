@@ -22,7 +22,7 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataSet;
 
-@interface ORStatusController : NSWindowController
+@interface ORStatusController : NSWindowController <NSOutlineViewDataSource>
 {
 	IBOutlet NSTabView*     tabView;
     IBOutlet NSTextView*    statusView;  //our view

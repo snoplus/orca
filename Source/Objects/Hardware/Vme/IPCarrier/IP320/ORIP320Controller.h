@@ -99,5 +99,8 @@
 - (IBAction) selectFileAction:(id)sender;
 - (IBAction) plotGroupAction:(id)sender;
 
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
+
 @end
 

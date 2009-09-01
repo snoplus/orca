@@ -19,7 +19,11 @@
 //-------------------------------------------------------------
 
 
+#if MAC_OS_X_VERSION_10_5 >= MAC_OS_X_VERSION_MAX_ALLOWED
 @interface ORPreferencesController : NSWindowController {
+#else
+@interface ORPreferencesController : NSWindowController <NSTextViewDelegate> {
+#endif
     IBOutlet NSColorWell* 	backgroundColorWell;
     IBOutlet NSColorWell* 	lineColorWell;
     IBOutlet NSMatrix*		openingDocPrefMatrix;

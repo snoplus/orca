@@ -376,13 +376,13 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 {
     NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
     OrcaObject* anObject;
-    NSMutableArray* theSelectedObjects = [[NSMutableArray alloc] init];
+    NSMutableArray* theSelectedObjects = [[[NSMutableArray alloc] init] autorelease];
     while (anObject = [e nextObject]) {
         if([anObject highlighted]){
-            [theSelectedObjects addObject:[anObject copy]];
+            [theSelectedObjects addObject:[[anObject copy] autorelease]];
         }
     }
-    return [theSelectedObjects autorelease];
+    return theSelectedObjects;
 }
 
 

@@ -345,7 +345,8 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 - (void) loadScriptFromFile:(NSString*)aFilePath
 {
 	[self setLastFile:aFilePath];
-	NSString* theContents = [NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]];
+	NSString* theContents = [[[NSString alloc] initWithContentsOfFile:[lastFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil] autorelease];
+	//NSString* theContents = [NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]];
 	//if the name and description are prepended then strip off and restore
 	//the name is always first if it exists
 	if([theContents hasPrefix:@"//#Name:"]){
@@ -381,7 +382,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 				NSArray* theParts = [theLine componentsSeparatedByString:@" "];
 				if([theParts count] == 2){
 					NSDictionary* d = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-															[NSString stringWithFormat:[theParts objectAtIndex:0]],@"name",
+															[NSString stringWithFormat:@"%@",[theParts objectAtIndex:0]],@"name",
 															[NSDecimalNumber decimalNumberWithString:[theParts objectAtIndex:1]],@"iValue",
 															 nil];
 					[inputValues addObject:d];
@@ -404,7 +405,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 {
 	NSFileManager* fm = [NSFileManager defaultManager];
 	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
-		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
+		[fm removeItemAtPath:[aFilePath stringByExpandingTildeInPath] error:nil];
 	}
 	NSMutableString* theScript = [script mutableCopy];
 	//prepend the globals

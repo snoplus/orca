@@ -609,8 +609,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
 	if(res==CRATE_OK){
 		if(verbose){
-			if(response)NSLog(@"C111C Response: %s\n",response);
-			else NSLog(@"C111C Response: <nil>\n");
+			NSLog(@"C111C Response: %s\n",response);
 		}
 	}
 	else {

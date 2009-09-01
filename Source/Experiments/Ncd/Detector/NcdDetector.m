@@ -494,7 +494,7 @@ static NSString *ORDetectorMapFile	= @"ORDetectorMapFile";
 
 - (void) replaceMuxThresholdsUsingFile:(NSString*)path
 {
-    NSString* contents = [NSString stringWithContentsOfFile:[path stringByExpandingTildeInPath]];
+    NSString* contents = [NSString stringWithContentsOfFile:[path stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
     if(contents){
         NSArray* theLines = [contents lines];
         int numLines = [theLines count];
@@ -554,7 +554,7 @@ static NSString *ORDetectorMapFile	= @"ORDetectorMapFile";
     else {
         mapFilePath = mapFileName;
     }
-    NSString* contents = [NSString stringWithContentsOfFile:mapFilePath];
+    NSString* contents = [NSString stringWithContentsOfFile:mapFilePath encoding:NSASCIIStringEncoding error:nil];
     NSArray*  lines = [contents componentsSeparatedByString:@"\n"];
     NSEnumerator* e = [lines objectEnumerator];
     NSString* aLine;
@@ -607,7 +607,7 @@ static NSString *ORDetectorMapFile	= @"ORDetectorMapFile";
     
     NSFileManager* theFileManager = [NSFileManager defaultManager];
     if([theFileManager fileExistsAtPath:newFileName]){
-        [theFileManager removeFileAtPath:newFileName handler:nil];
+        [theFileManager removeItemAtPath:newFileName error:nil];
     }
     [theFileManager createFileAtPath:newFileName contents:theContents attributes:nil];
 }

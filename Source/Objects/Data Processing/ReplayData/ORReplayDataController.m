@@ -454,7 +454,7 @@
     NSFileManager* fm = [NSFileManager defaultManager];
     [fm createFileAtPath:@"OrcaJunkTemp" contents:data attributes:nil];
     [self processFileList:[NSArray arrayWithContentsOfFile:@"OrcaJunkTemp"]];
-    [fm removeFileAtPath:@"OrcaJunkTemp" handler:nil];
+    [fm removeItemAtPath:@"OrcaJunkTemp" error:nil];
     return YES;
 }
 

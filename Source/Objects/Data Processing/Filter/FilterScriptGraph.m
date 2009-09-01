@@ -43,7 +43,7 @@ id exNode(nodeType *p, int aLevel, BOOL lastChild)
 {
 
     if (!p) return @"";
-	NSMutableString* line = @"?";
+	NSMutableString* line = [NSMutableString stringWithString:@"?"];
 	
     switch(p->type) {
         case typeCon: line = [NSMutableString stringWithFormat:@"c(%ld)", p->con.value]; break;

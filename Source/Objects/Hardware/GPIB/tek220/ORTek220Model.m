@@ -130,13 +130,14 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 		while( ( !haveDate ) && ( !haveTime ) ){
 			if ( isdigit( mReturnData[i] ) && !haveDate ){
 				haveDate = true;
-                dateStr = [NSString stringWithCString:&mReturnData[i] length:10]; 
+				dateStr = [[[NSString alloc] initWithBytes:&mReturnData[i] length:10 encoding:NSASCIIStringEncoding] autorelease];
 				i += 10;
 			}
 			
 			if ( isdigit( mReturnData[i] ) && ( haveDate ) ){
 				haveTime = true;
-				timeStr = [NSString stringWithCString:&mReturnData[i] length:8];
+				timeStr = [[[NSString alloc] initWithBytes:&mReturnData[i] length:8 encoding:NSASCIIStringEncoding] autorelease];
+
 			}
 		}
 		
@@ -175,8 +176,12 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 	convertTimeLongToChar( aDateTime, sDateTime );
     
 	// Have to separate the date and time plus modify format for oscilloscope.
-	dateString = [NSMutableString stringWithCString:sDateTime length:10];
-	timeString = [NSMutableString stringWithCString:&sDateTime[11] length:8];
+
+	dateString = [[[NSString alloc] initWithBytes:sDateTime length:10 encoding:NSASCIIStringEncoding] autorelease];
+	timeString = [[[NSString alloc] initWithBytes:&sDateTime[11] length:8 encoding:NSASCIIStringEncoding] autorelease];
+
+	//dateString = [NSMutableString stringWithCString:sDateTime length:10];
+	//timeString = [NSMutableString stringWithCString:&sDateTime[11] length:8];
 	
 	[dateString replaceCharactersInRange:NSMakeRange( 4, 1 ) withString:@"-"];
     [dateString replaceCharactersInRange:NSMakeRange( 7, 1 ) withString:@"-"];
@@ -320,14 +325,14 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
                                              data:mReturnData
                                         maxLength:kMaxGPIBReturn];
         if ( returnLength > 0 ){
-			couplingValue = [NSString stringWithCString:mReturnData];
+			couplingValue = [NSString stringWithCString:mReturnData encoding:NSASCIIStringEncoding];
 			
 			// Now get the impedance.
 			returnLength = [self writeReadGPIBDevice:[NSString stringWithFormat:@"CH%d:IMPEDANCE?", aChnl + 1]
                                                  data:mReturnData
                                             maxLength:kMaxGPIBReturn];
 			
-			impedanceValue = [NSString stringWithCString:mReturnData];
+			impedanceValue = [NSString stringWithCString:mReturnData encoding:NSASCIIStringEncoding];
 			
 			// Based on coupling and impedance set the coupling option value appropriately.
             if( [couplingValue rangeOfString:@"AC"
@@ -491,7 +496,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 	
 	// Convert coupling value to index
 	if ( returnLength > 0 ){
-        couplingValue = [NSString stringWithCString:mReturnData];
+        couplingValue = [NSString stringWithCString:mReturnData encoding:NSASCIIStringEncoding];
         
         if ( [couplingValue rangeOfString:@"AC"
 								  options:NSBackwardsSearch].location != NSNotFound  ){
@@ -579,7 +584,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 	
 	// Convert trigger mode to index
 	if ( returnLength > 0 ){
-        triggerMode = [NSString stringWithCString:mReturnData];
+        triggerMode = [NSString stringWithCString:mReturnData encoding:NSASCIIStringEncoding];
         
         if ( [triggerMode rangeOfString:@"AUTO" 
 								 options:NSBackwardsSearch].location != NSNotFound  ){
@@ -641,7 +646,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
                                     maxLength:kMaxGPIBReturn];
 	
 	if ( returnLength > 0 ){
-        slope = [NSString stringWithCString:mReturnData];
+        slope = [NSString stringWithCString:mReturnData encoding:NSASCIIStringEncoding];
         
         if ( [slope rangeOfString:@"FALL"
 						   options:NSBackwardsSearch].location != NSNotFound  ){
@@ -676,7 +681,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 	
 	// Convert response from oscilloscope to index.
 	if ( returnLength > 0 ){
-        triggerSource = [NSString stringWithCString:mReturnData];
+        triggerSource = [NSString stringWithCString:mReturnData encoding:NSASCIIStringEncoding];
         
         if ( [triggerSource rangeOfString:@"AUX"
                                    options:NSBackwardsSearch].location != NSNotFound  ){
@@ -869,7 +874,7 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
 		// Bad connection so don't execute instruction
         else {
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
-            [NSException raise:OExceptionGPIBConnectionError format:errorMsg];
+            [NSException raise:OExceptionGPIBConnectionError format:@"%@",errorMsg];
         }
         
     }

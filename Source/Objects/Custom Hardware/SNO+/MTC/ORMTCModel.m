@@ -414,17 +414,17 @@ kPEDCrateMask
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelRepeatDelayChanged object:self];
 }
 
-- (short) repeatCount
+- (short) repeatOpCount
 {
-    return repeatCount;
+    return repeatOpCount;
 }
 
-- (void) setRepeatCount:(short)aRepeatCount
+- (void) setRepeatOpCount:(short)aRepeatCount
 {
 	if(aRepeatCount<=0)aRepeatCount = 1;
-    [[[self undoManager] prepareWithInvocationTarget:self] setRepeatCount:repeatCount];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRepeatOpCount:repeatOpCount];
     
-    repeatCount = aRepeatCount;
+    repeatOpCount = aRepeatCount;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelRepeatCountChanged object:self];
 }
@@ -695,7 +695,7 @@ kPEDCrateMask
     [self setAutoIncrement:	[decoder decodeBoolForKey:		@"ORMTCModelAutoIncrement"]];
     [self setUseMemory:		[decoder decodeIntForKey:		@"ORMTCModelUseMemory"]];
     [self setRepeatDelay:	[decoder decodeIntForKey:		@"ORMTCModelRepeatDelay"]];
-    [self setRepeatCount:	[decoder decodeIntForKey:		@"ORMTCModelRepeatCount"]];
+    [self setRepeatOpCount:	[decoder decodeIntForKey:		@"ORMTCModelRepeatCount"]];
     [self setWriteValue:	[decoder decodeInt32ForKey:		@"ORMTCModelWriteValue"]];
     [self setMemoryOffset:	[decoder decodeInt32ForKey:		@"ORMTCModelMemoryOffset"]];
     [self setSelectedRegister:[decoder decodeIntForKey:		@"ORMTCModelSelectedRegister"]];
@@ -725,7 +725,7 @@ kPEDCrateMask
 	[encoder encodeBool:autoIncrement	forKey:@"ORMTCModelAutoIncrement"];
 	[encoder encodeInt:useMemory		forKey:@"ORMTCModelUseMemory"];
 	[encoder encodeInt:repeatDelay		forKey:@"ORMTCModelRepeatDelay"];
-	[encoder encodeInt:repeatCount		forKey:@"ORMTCModelRepeatCount"];
+	[encoder encodeInt:repeatOpCount	forKey:@"ORMTCModelRepeatCount"];
 	[encoder encodeInt32:writeValue		forKey:@"ORMTCModelWriteValue"];
 	[encoder encodeInt32:memoryOffset	forKey:@"ORMTCModelMemoryOffset"];
 	[encoder encodeInt:selectedRegister forKey:@"ORMTCModelSelectedRegister"];
@@ -1249,7 +1249,8 @@ kPEDCrateMask
 	static unsigned long theSecondsToAdd = 0;
 	
  	if( theSecondsToAdd == 0 ) {
-		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
+		NSTimeZone *timeZone = [NSTimeZone timeZoneWithName:@"GMT"];
+		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:timeZone]];
  	}
 	
     return theSecondsToAdd + (unsigned long)[self get10MHzSeconds];
@@ -1741,7 +1742,7 @@ kPEDCrateMask
 	NSData* theData = [NSData dataWithContentsOfFile:[self xilinxFilePath]];
 	if(![theData length]){
 		NSLog(@"Couldn't open the MTC Xilinx file %@!\n",[self xilinxFilePath]);
-		[NSException raise:@"Couldn't open Xilinx File" format:	[self xilinxFilePath]];	
+		[NSException raise:@"Couldn't open Xilinx File" format:	@"%@",[self xilinxFilePath]];	
 	}
 	
 	if([self adapterIsSBC]){
@@ -1852,7 +1853,7 @@ kPEDCrateMask
 				NSLog(@"Wrote 0x%08x to %@\n",writeValue,reg[selectedRegister].regName);
 			}
 		}
-		if(++workingCount<repeatCount){
+		if(++workingCount<repeatOpCount){
 			[self performSelector:@selector(doBasicOp) withObject:nil afterDelay:repeatDelay/1000.];
 		}
 		else {

@@ -116,10 +116,10 @@
 - (BOOL) useXYPlot; //default is no
 - (float) plotterMaxX:(id)aPlotter;
 - (float) plotterMinX:(id)aPlotter;
-- (BOOL)  plotter:(id) aPlotter dataSet:(int)set index:(int)i x:(float*)x y:(float*)y;
+- (BOOL)  plotter:(id) aPlotter dataSet:(int)set index:(unsigned long)i x:(float*)x y:(float*)y;
 - (BOOL) useXYTimePlot;
 - (NSTimeInterval) plotterStartTime:(id)aPlotter;
-- (void)  plotter:(id) aPlotter dataSet:(int)set index:(int)i time:(unsigned long*)x y:(float*)y;
+- (void)  plotter:(id) aPlotter dataSet:(int)set index:(unsigned long)i time:(unsigned long*)x y:(float*)y;
 @end
 
 @interface NSObject (ORPlotter1D)

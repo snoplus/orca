@@ -690,7 +690,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 			}
 			else {
 				NSString *errorMsg = @"Must establish connection prior to issuing command\n";
-				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+				[ NSException raise: OExceptionGPIBConnectionError format: @"%@",errorMsg ];
 				
 			}
 			break;
@@ -714,7 +714,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 			}
 			else {
 				NSString *errorMsg = @"Must establish connection prior to issuing command\n";
-				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+				[ NSException raise: OExceptionGPIBConnectionError format:@"%@", errorMsg ];
 				
 			}
 			break;
@@ -727,7 +727,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 			}
 			else {
 				NSString *errorMsg = @"Must establish IP connection prior to issuing command.\n";
-				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+				[ NSException raise: OExceptionGPIBConnectionError format: @"%@",errorMsg ];
 				
 			} 			
 			break;

@@ -358,7 +358,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         if (dwrr->error != 0) {
             [mErrorMsg setString:  @"***Error: read"];
             [self gpibError: mErrorMsg number:dwrr->error]; 
-            [NSException raise: OExceptionGpibError format: mErrorMsg];
+            [NSException raise: OExceptionGpibError format: @"%@",mErrorMsg];
         }
         
         // Successful read.
@@ -434,7 +434,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         if (dwrr &&  dwrr->error != 0 ) {
             [mErrorMsg setString:  @"***Error: write"];
             [self gpibError: mErrorMsg number: dwrr->error]; 
-            [NSException raise: OExceptionGpibError format: mErrorMsg];
+            [NSException raise: OExceptionGpibError format: @"%@",mErrorMsg];
         }  
         [theHWLock unlock];   //-----end critical section
     }

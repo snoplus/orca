@@ -43,7 +43,7 @@
 		int						selectedRegister;
 		unsigned long			memoryOffset;
 		unsigned long			writeValue;
-		short					repeatCount;
+		short					repeatOpCount;
 		unsigned short			repeatDelay;
 		int						useMemory;
 		unsigned long			workingOffset;
@@ -98,8 +98,8 @@
 - (void) setUseMemory:(int)aUseMemory;
 - (unsigned short) repeatDelay;
 - (void) setRepeatDelay:(unsigned short)aRepeatDelay;
-- (short) repeatCount;
-- (void) setRepeatCount:(short)aRepeatCount;
+- (short) repeatOpCount;
+- (void) setRepeatOpCount:(short)aRepeatCount;
 - (unsigned long) writeValue;
 - (void) setWriteValue:(unsigned long)aWriteValue;
 - (unsigned long) memoryOffset;

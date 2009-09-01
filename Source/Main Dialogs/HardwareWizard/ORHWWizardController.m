@@ -1033,7 +1033,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             while(wizObject = [objectEnum nextObject]){
                 if([wizObject respondsToSelector:@selector(numberOfChannels)]){
                     int chan;
-                    unsigned long mask = [wizObject mask];
+                    unsigned long mask = [wizObject wizMask];
                     BOOL atLeastOneChan = NO;
                     for(chan=0;chan<[wizObject numberOfChannels];chan++){
                         if(mask & (1<<chan)){
@@ -1255,18 +1255,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                         }
                         
                         /* finally, combine this mask with the current mask for this FEC */
-                        unsigned long theFinalMask = [wizObject mask];
+                        unsigned long theFinalMask = [wizObject wizMask];
                         switch (selectionLogic) {
                             case kSearchLogic_And:
                                 /* combine the channel masks with a logical AND and save in array */
                                 theFinalMask &= mask;
-                                [wizObject setMask:theFinalMask];	// reset bits of unselected channels
+                                [wizObject setWizMask:theFinalMask];	// reset bits of unselected channels
 								break;
 								
                             case kSearchLogic_Or:
                                 /* combine the channel masks with a logical OR and save in array */
                                 theFinalMask |= mask;	// set bits of selected channels
-                                [wizObject setMask:theFinalMask];	// reset bits of unselected channels
+                                [wizObject setWizMask:theFinalMask];	// reset bits of unselected channels
                                 
 								break;
                         }
@@ -1289,7 +1289,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             id wizObject;
             while(wizObject = [objectEnum nextObject]){
                 if([wizObject respondsToSelector:@selector(target)]){
-                    [wizObject setMask:0xffffffff];
+                    [wizObject setWizMask:0xffffffff];
                 }
             }
         }
@@ -1504,7 +1504,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				
 				if(numberOfSettableArguments <=1){
 					//no channels to deal with, just do the action
-					unsigned long chanMask = [wizObject mask];
+					unsigned long chanMask = [wizObject wizMask];
 					if(chanMask & 0xffffffff){									
 						
 						[self doAction:actionSelection 
@@ -1516,7 +1516,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				}
 				else {
 					if([paramObj useFixedChannel]){
-						if([wizObject mask] & (1<<[paramObj fixedChannel])){									
+						if([wizObject wizMask] & (1<<[paramObj fixedChannel])){									
 							[self doAction:actionSelection 
 									target: target
 								 parameter:paramObj 
@@ -1528,7 +1528,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 						//loop over the channels, doing the action for each channel in the mask.
 						int chan;
 						int numChan = [wizObject numberOfChannels];
-						unsigned long chanMask = [wizObject mask];
+						unsigned long chanMask = [wizObject wizMask];
 						for(chan=0;chan<numChan;chan++){
 							if(chanMask & (1<<chan)){									
 								[self doAction:actionSelection 
@@ -1695,14 +1695,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 {
     return target;
 }
-- (unsigned long ) mask
+- (unsigned long) wizMask
 {
-    return mask;
+    return wizMask;
 }
 
-- (void) setMask:(unsigned long )aMask
+- (void) setWizMask:(unsigned long )aMask
 {
-    mask = aMask;
+    wizMask = aMask;
 }
 
 - (int) numberOfChannels 

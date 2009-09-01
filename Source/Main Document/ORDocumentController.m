@@ -319,7 +319,9 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 {
     NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
     NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:[[self window]contentView] printInfo:printInfo];
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
     [printOp setShowPanels:YES];
+#endif
     [printOp runOperation];
 }
 

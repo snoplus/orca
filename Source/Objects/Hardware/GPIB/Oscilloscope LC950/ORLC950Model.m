@@ -194,7 +194,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	// Translate the date/time
 	if ( returnLength > 0 )
 	{
-		NSString* dateStr = [ NSString stringWithCString: &mReturnData[ 0 ] ];
+		NSString* dateStr = [ NSString stringWithCString: &mReturnData[ 0 ] encoding:NSASCIIStringEncoding];
 		NSArray* dateComponents = [ dateStr componentsSeparatedByString: @"," ];
 		
 		sprintf( timeBuffer, "%s/%s/%s %s:%s:%s", 
@@ -367,7 +367,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 		returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"C%d:TRACE?", aChnl + 1 ]
                                              data: mReturnData maxLength: kMaxGPIBReturn ];
         
-		acquireOn = [ NSString stringWithCString: mReturnData ];
+		acquireOn = [ NSString stringWithCString: mReturnData  encoding:NSASCIIStringEncoding];
 		if ( [ acquireOn rangeOfString: @"ON" 
 							   options: NSBackwardsSearch ].location != NSNotFound )
         {
@@ -423,10 +423,9 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 {
 	//    NSString*	impedanceValue;
     NSString*	couplingValue;
-	long		returnLength = 0;
+	long		returnLength;
 	
-	if ( [ self checkChnlNum: aChnl ] )
-	{
+	if ( [ self checkChnlNum: aChnl ] ){
 		
 		// Get the channel coupling option.
 		returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"C%d:COUPLING?", aChnl + 1 ]
@@ -435,7 +434,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 		// Set the correct coupling constant.
         if ( returnLength > 0 )
 		{
-			couplingValue = [ NSString stringWithCString: mReturnData ];
+			couplingValue = [ NSString stringWithCString: mReturnData  encoding:NSASCIIStringEncoding];
 			
 			if ( [ couplingValue rangeOfString: @"A1M" ].location != NSNotFound )
 				[ self setChnlCoupling: aChnl coupling: kChnlCouplingACIndex ];
@@ -500,7 +499,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscGetChnlPos: (short) aChnl
 {
-    long	returnLength = 0;
+    long	returnLength;
     
 	if ( [ self checkChnlNum: aChnl ] )
 	{
@@ -655,7 +654,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	// Have to parse the return
     if ( returnLength > 0 )
 	{
-		waveformParams = [ NSString stringWithCString: &mReturnData[ 0 ] ];
+		waveformParams = [ NSString stringWithCString: &mReturnData[ 0 ]  encoding:NSASCIIStringEncoding];
 		NSArray* waveformValues = [ waveformParams componentsSeparatedByString: @"," ];
 		
 		recordLengthStr = [ waveformValues objectAtIndex: 3 ];		
@@ -717,7 +716,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	// Convert coupling value to index
 	if ( returnLength > 0 )
 	{
-        couplingValue = [ NSString stringWithCString: mReturnData ];
+        couplingValue = [ NSString stringWithCString: mReturnData  encoding:NSASCIIStringEncoding];
         
         if ( [ couplingValue rangeOfString: @"AC"
                                    options: NSBackwardsSearch ].location != NSNotFound  )
@@ -846,7 +845,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	// Convert trigger mode to index
 	if ( returnLength > 0 )
 	{
-        triggerMode = [ NSString stringWithCString: mReturnData ];
+        triggerMode = [ NSString stringWithCString: mReturnData  encoding:NSASCIIStringEncoding];
         
         if ( [ triggerMode rangeOfString: @"AUTO" 
 								 options: NSBackwardsSearch ].location != NSNotFound  )
@@ -963,7 +962,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	
 	if ( returnLength > 0 )
 	{
-        slope = [ NSString stringWithCString: mReturnData ];
+        slope = [ NSString stringWithCString: mReturnData encoding:NSASCIIStringEncoding ];
         
         if ( [ slope rangeOfString: @"NEG"
 						   options: NSBackwardsSearch ].location != NSNotFound  )
@@ -1018,7 +1017,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	// Convert response from oscilloscope to index.
 	if ( returnLength > 0 )
 	{
-        triggerSource = [ NSString stringWithCString: mReturnData ];
+        triggerSource = [ NSString stringWithCString: mReturnData  encoding:NSASCIIStringEncoding];
         
         if ( [ triggerSource rangeOfString: @"SR,EX"
                                    options: NSBackwardsSearch ].location != NSNotFound  )
@@ -1253,7 +1252,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
         else
         {
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
-            [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+            [ NSException raise: OExceptionGPIBConnectionError format: @"%@",errorMsg ];
         }
         
 	}

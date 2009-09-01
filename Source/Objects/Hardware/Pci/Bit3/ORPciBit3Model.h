@@ -190,7 +190,7 @@ enum {
 		unsigned timeOutErrors;
 		unsigned remoteBusErrors;
 		BOOL doRange;
-		unsigned short range;
+		unsigned short rangeToDo;
 		BOOL powerWasOff;
 }
 
@@ -203,8 +203,8 @@ enum {
 - (void) runEnded:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
-- (unsigned short) range;
-- (void) setRange:(unsigned short)aRange;
+- (unsigned short) rangeToDo;
+- (void) setRangeToDo:(unsigned short)aRange;
 - (BOOL) doRange;
 - (void) setDoRange:(BOOL)aDoRange;
 - (NSString *) deviceName;

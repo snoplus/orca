@@ -591,7 +591,9 @@
 					break;
 					//NS_VOIDRETURN;
 				}
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
 				[progress animate:nil];
+#endif
 			}
 			
 			vEndOffs = [vScanner scanLocation];
@@ -646,7 +648,9 @@
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
 			
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
 			[progress animate:nil];
+#endif
 		}
 	}
 	@catch(NSException* localException) {
@@ -681,7 +685,9 @@
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
 			
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
 			[progress animate:nil];
+#endif
 		}
 	}
 	@catch(NSException* localException) {
@@ -732,7 +738,9 @@
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, [ident length] )];
 			
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
 			[progress animate:nil];
+#endif
 		}
 		
 	}

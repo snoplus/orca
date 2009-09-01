@@ -1747,7 +1747,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	else if(anError == EBUSY)	details = @"Device Busy";
 	else if(anError == ENOMEM)	details = @"Out of Memory";
 	else details = [NSString stringWithFormat:@"%d",anError];
-	[NSException raise: @"SBC/VME access Error" format:[NSString stringWithFormat:@"%@:%@\nAddress: 0x%08x",baseString,details,anAddress]];
+	[NSException raise: @"SBC/VME access Error" format:@"%@:%@\nAddress: 0x%08x",baseString,details,anAddress];
 }
 
 - (void) fillInScript:(NSString*)theScript
@@ -1755,7 +1755,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	//edit the script and push it into the SBCReadout folder for copying to the SBC
 	//first, find it in the ORCA mainBundle
 	NSString* aScriptPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:theScript];
-	NSMutableString* contents = [NSMutableString stringWithContentsOfFile:aScriptPath];
+	NSMutableString* contents = [NSMutableString stringWithContentsOfFile:aScriptPath encoding:NSASCIIStringEncoding error:nil];
 	[contents replaceOccurrencesOfString:@"<serverName>" withString:@"OrcaReadout" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [contents length])];
 	[contents replaceOccurrencesOfString:@"<port>" withString:[NSString stringWithFormat:@"%d",portNumber] options:NSCaseInsensitiveSearch range:NSMakeRange(0, [contents length])];
 	
@@ -1767,7 +1767,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	
 	NSString* newScriptPath = [[coreCodePath stringByAppendingPathComponent:theScript] stringByExpandingTildeInPath];
 	
-	if([fm fileExistsAtPath: newScriptPath]) [fm removeFileAtPath:newScriptPath handler:nil];
+	if([fm fileExistsAtPath: newScriptPath]) [fm removeItemAtPath:newScriptPath error:nil];
 	NSDictionary *attrib = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
 	[fm createFileAtPath:newScriptPath contents:[contents dataUsingEncoding:NSASCIIStringEncoding] attributes:attrib]; 
 }

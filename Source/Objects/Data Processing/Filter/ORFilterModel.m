@@ -682,7 +682,7 @@ int filterGraph(nodeType*);
 - (void) loadScriptFromFile:(NSString*)aFilePath
 {
 	[self setLastFile:aFilePath];
-	[self setScript:[NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]]];
+	[self setScript:[NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil]];
 }
 
 - (void) saveFile
@@ -694,7 +694,7 @@ int filterGraph(nodeType*);
 {
 	NSFileManager* fm = [NSFileManager defaultManager];
 	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
-		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
+		[fm removeItemAtPath:[aFilePath stringByExpandingTildeInPath] error:nil];
 	}
 	NSData* theData = [script dataUsingEncoding:NSUTF8StringEncoding];
 	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
@@ -734,7 +734,7 @@ int filterGraph(nodeType*);
 
 - (void) parseFile:(NSString*)aPath
 {
-	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath]];
+	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
 	[self parse:contents];
 }
 

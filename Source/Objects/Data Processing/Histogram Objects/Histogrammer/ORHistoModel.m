@@ -411,8 +411,8 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
             NSMutableDictionary* attributes = [NSMutableDictionary dictionary];
             [attributes setObject:[NSNumber numberWithUnsignedLong:'IGTX'] forKey:NSFileHFSTypeCode];
             [attributes setObject:[NSNumber numberWithUnsignedLong:'IGR0'] forKey:NSFileHFSCreatorCode];
-            [fileManager changeFileAttributes:attributes atPath:fullFileName];
-        }
+			[fileManager setAttributes:attributes ofItemAtPath:fullFileName error:nil];
+       }
     }
     
 	processedFinalCall = YES;

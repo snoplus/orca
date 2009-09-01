@@ -68,7 +68,7 @@
         buffer = malloc(AMSER_MAXBUFSIZE);
     
     len = read(fileDescriptor, buffer, AMSER_MAXBUFSIZE);
-    return [NSString stringWithCString:buffer length:len];
+	return [[[NSString alloc] initWithBytes:buffer length:len encoding:NSASCIIStringEncoding] autorelease];
 }
 
 -(int)writeString:(NSString *)string

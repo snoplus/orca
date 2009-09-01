@@ -974,7 +974,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 
 - (void) loadPatternFile
 {
-	NSString* contents = [NSString stringWithContentsOfFile:patternFilePath];
+	NSString* contents = [NSString stringWithContentsOfFile:patternFilePath encoding:NSASCIIStringEncoding error:nil];
 	if(contents){
 		NSLog(@"loading Pattern file: <%@>\n",patternFilePath);
 		NSScanner* scanner = [NSScanner scannerWithString:contents];

@@ -201,7 +201,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
         NSString* resourcePath = [[mainBundle resourcePath] stringByAppendingString:@"/Alarm Help Files/"];
         NSString* fullPath = [resourcePath stringByAppendingString:fileName];
         if([[NSFileManager defaultManager] fileExistsAtPath:fullPath]){
-            [self setHelpString:[NSString stringWithContentsOfFile:fullPath]];
+            [self setHelpString:[NSString stringWithContentsOfFile:fullPath encoding:NSASCIIStringEncoding error:nil]];
         }
     }
 }

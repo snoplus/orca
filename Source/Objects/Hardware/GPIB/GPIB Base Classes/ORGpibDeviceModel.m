@@ -321,7 +321,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
         else
         {
             NSString *errorMsg = @"Must establish GPIB connection prior to reading from device.\n";
-            [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+            [ NSException raise: OExceptionGPIBConnectionError format: @"%@",errorMsg ];
         }
 	}
 	@catch(NSException* localException) {
@@ -349,7 +349,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
         else
         {
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
-            [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+            [ NSException raise: OExceptionGPIBConnectionError format: @"%@",errorMsg ];
         }
 	}
 	@catch(NSException* localException) {
@@ -391,7 +391,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
         else
         {
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
-            [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+            [ NSException raise: OExceptionGPIBConnectionError format:@"%@", errorMsg ];
         }
 	}
 	@catch(NSException* localException) {

@@ -181,7 +181,7 @@
 	else if(anError == EBUSY)	details = @"Device Busy";
 	else if(anError == ENOMEM)	details = @"Out of Memory";
 	else details = [NSString stringWithFormat:@"%d",anError];
-	[NSException raise: @"SBC/VME access Error" format:[NSString stringWithFormat:@"%@:%@",baseString,details]];
+	[NSException raise: @"SBC/VME access Error" format:@"%@:%@",baseString,details];
 }
 - (long) longValue
 {

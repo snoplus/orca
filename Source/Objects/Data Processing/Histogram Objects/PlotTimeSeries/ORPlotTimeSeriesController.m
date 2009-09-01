@@ -117,7 +117,7 @@
 	return y;
 }
 
-- (void)  plotter:(id) aPlotter dataSet:(int)set index:(int)i time:(unsigned long*)x y:(float*)y
+- (void)  plotter:(id) aPlotter dataSet:(int)set index:(unsigned long)i time:(unsigned long*)x y:(float*)y
 {
 	[[model timeSeries] index:i time:x value:y];
 }

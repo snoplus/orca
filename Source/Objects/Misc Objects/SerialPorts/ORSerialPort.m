@@ -109,7 +109,7 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 
 - (NSString*) bsdPath
 {
-	return [NSString stringWithCString:bsdPath];
+	return [NSString stringWithCString:bsdPath encoding:NSASCIIStringEncoding];
 }
 
 - (NSString*) name

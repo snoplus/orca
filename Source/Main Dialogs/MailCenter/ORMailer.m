@@ -54,7 +54,7 @@
 - (void)dealloc 
 {
 	NSFileManager* fm = [NSFileManager defaultManager];
-	if([fm fileExistsAtPath:tempFilePath])[fm removeFileAtPath:tempFilePath handler:nil];
+	if([fm fileExistsAtPath:tempFilePath])[fm removeItemAtPath:tempFilePath error:nil];
 
 	[tempFilePath release];
 	[to release];
@@ -246,7 +246,7 @@
 		NSMutableString* recipents   = [@"make new to recipient at end of to recipients with properties {address:\"</address/>\"}" mutableCopy];
 		NSMutableString* ccrecipents = [@"make new to recipient at end of cc recipients with properties {address:\"</cc/>\"}" mutableCopy];
 		NSString* mailScriptPath = [[NSBundle mainBundle] pathForResource: @"MailScript" ofType: @"txt"];
-		NSMutableString* script = [NSMutableString stringWithContentsOfFile:mailScriptPath];
+		NSMutableString* script = [NSMutableString stringWithContentsOfFile:mailScriptPath encoding:NSASCIIStringEncoding error:nil];
 		[script replaceOccurrencesOfString:@"</subject/>" withString:subject options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		[script replaceOccurrencesOfString:@"</body/>" withString:[body string] options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		[recipents replaceOccurrencesOfString:@"</address/>" withString:to options:NSLiteralSearch range:NSMakeRange(0,[recipents length])];
@@ -262,7 +262,7 @@
 		
 		NSString* mailFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Mail"];
 		char* tmpName = tempnam([mailFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"aMailScriptXXX");
-		tempFilePath = [[NSString stringWithCString:tmpName] retain];
+		tempFilePath = [[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] retain];
 		free(tmpName);
 		
 		

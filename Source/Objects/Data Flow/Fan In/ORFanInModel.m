@@ -163,11 +163,11 @@ static NSString *kFanInConnectorKey[10]  = {
 	
 	if([self guardian]){
 		[NSGraphicsContext restoreGraphicsState];
-		[theShadow release]; 
 	}
     
     [self drawConnections:aRect withTransparency:aTransparency];
-    
+	[theShadow release]; 
+  
 }
 
 - (void) makeMainController

@@ -95,5 +95,5 @@
 #pragma mark ¥¥¥Data Source
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float)  	plotter:(id) aPlotter  dataSet:(int)set dataValue:(int) x;
-
 @end
+

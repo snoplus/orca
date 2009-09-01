@@ -434,7 +434,7 @@ id constantNode(char* aNumberString)
 	Node* p = [[Node alloc] init]; 
 	[p setType:typeCon];
 	[p setLine:num_lines+1];
-	[p setNodeData:[NSDecimalNumber decimalNumberWithString:[NSString stringWithCString:aNumberString]]];
+	[p setNodeData:[NSDecimalNumber decimalNumberWithString:[NSString stringWithCString:aNumberString encoding:NSASCIIStringEncoding]]];
     return [p autorelease];
 }
 
@@ -453,7 +453,7 @@ id identifierNode(char* aString)
 	Node* p = [[Node alloc] init];
 	[p setType:typeId];
 	[p setLine:num_lines+1];
-	[p setNodeData:[NSString stringWithCString:aString]];
+	[p setNodeData:[NSString stringWithCString:aString encoding:NSASCIIStringEncoding]];
     return [p autorelease];
 }
 
@@ -462,7 +462,7 @@ id selectorNode(char* aString)
 	Node* p = [[Node alloc] init];
 	[p setType:typeSelVar];
 	[p setLine:num_lines+1];
-	[p setNodeData:[NSString stringWithCString:aString]];
+	[p setNodeData:[NSString stringWithCString:aString encoding:NSASCIIStringEncoding]];
     return [p autorelease];
 }
 

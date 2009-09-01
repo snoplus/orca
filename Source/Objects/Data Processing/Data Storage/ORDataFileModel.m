@@ -519,7 +519,7 @@ static const int currentVersion = 1;           // Current version
         NSString* tmpFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
         NSLog(@"Closing dataFile: %@\n",[tmpFileName stringByAbbreviatingWithTildeInPath]);
         NSString* fullFileName = [[[dataFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:[self fileName]];
-		BOOL copiedOK = [[NSFileManager defaultManager] movePath:tmpFileName toPath:fullFileName handler:nil];
+		BOOL copiedOK = [[NSFileManager defaultManager] moveItemAtPath:tmpFileName toPath:fullFileName error:nil];
         if(copiedOK){
             NSLog(@"Moving dataFile to : %@\n",[fullFileName stringByAbbreviatingWithTildeInPath]);
         }
@@ -529,7 +529,7 @@ static const int currentVersion = 1;           // Current version
             do {
                 NSString* subRunFileName = [NSString stringWithFormat:@"%@_%d",fullFileName,subRun];
                 if(![fm fileExistsAtPath:subRunFileName]){
-                    copiedOK = [[NSFileManager defaultManager] movePath:tmpFileName toPath:subRunFileName handler:nil];
+                    copiedOK = [[NSFileManager defaultManager] moveItemAtPath:tmpFileName toPath:subRunFileName error:nil];
                     if(copiedOK){
                         NSLog(@"Moving subRun dataFile to : %@\n",[subRunFileName stringByAbbreviatingWithTildeInPath]);
                     }
@@ -623,7 +623,7 @@ static const int currentVersion = 1;           // Current version
     NSNumber* fsize;
     NSFileManager* fm = [NSFileManager defaultManager];
     NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
-    NSDictionary *fattrs = [fm fileAttributesAtPath:fullFileName traverseLink:YES];
+    NSDictionary *fattrs = [fm attributesOfItemAtPath:fullFileName error:nil];
     if (fsize = [fattrs objectForKey:NSFileSize]){
         [self setDataFileSize:[fsize intValue]];
     }
@@ -636,7 +636,7 @@ static const int currentVersion = 1;           // Current version
 - (void) checkDiskStatus
 {
 	NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
-	NSDictionary* diskInfo = [[NSFileManager defaultManager] fileSystemAttributesAtPath:fullFileName];
+	NSDictionary* diskInfo = [[NSFileManager defaultManager] attributesOfItemAtPath:fullFileName error:nil];
 	long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
 	if(freeSpace < kMinDiskSpace * 1024 * 1024){
 		if(!diskFullAlarm){

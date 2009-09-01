@@ -925,7 +925,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     [NSBezierPath fillRect:bounds];
     [[NSColor darkGrayColor] set];
     [NSBezierPath strokeRect:bounds];
-    float ht = bounds.size.height - 1;
+    float ht;// = bounds.size.height - 1;
     float width = bounds.size.width - 1;
 		
     //draw the Grid
@@ -1195,13 +1195,13 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	return [[NSDate date] timeIntervalSince1970];
 }
 
-- (BOOL)  plotter:(id) aPlotter dataSet:(int)set index:(int)i x:(float*)x y:(float*)y
+- (BOOL)  plotter:(id) aPlotter dataSet:(int)set index:(unsigned long)i x:(float*)x y:(float*)y
 {
 	*x = 0;
 	*y = 0;
 	return NO;
 }
-- (void)  plotter:(id) aPlotter dataSet:(int)set index:(int)i time:(unsigned long*)x y:(float*)y
+- (void)  plotter:(id) aPlotter dataSet:(int)set index:(unsigned long)i time:(unsigned long*)x y:(float*)y
 {
 	*x = 0;
 	*y = 0;

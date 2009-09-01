@@ -496,7 +496,7 @@
         else {
 			NSString* theFile = [fileName[extendedLinearity] stringByExpandingTildeInPath];
 			NSLog(@"Linearity task will use file: <%@>\n",theFile);
-            NSString* fileContents = [NSString stringWithContentsOfFile:theFile];
+            NSString* fileContents = [NSString stringWithContentsOfFile:theFile encoding:NSASCIIStringEncoding error:nil];
             if(fileContents){
                 [self setFileLines:[fileContents lines]];
                 if(![self setPulserFromFileLine:currentFileStep]){

@@ -37,7 +37,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ApplicationSupport);
 	while(part = [e nextObject]){
 		path = [path stringByAppendingPathComponent:part];
 		if(![fm fileExistsAtPath:path]){
-			[fm createDirectoryAtPath:path attributes:nil];
+			[fm createDirectoryAtPath:path withIntermediateDirectories:NO attributes:nil error:nil];        
 		}
 	}
 	return path;
@@ -52,7 +52,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ApplicationSupport);
 	
 	basePath = [basePath stringByAppendingPathComponent:@"ORCA"];
 	if(![fm fileExistsAtPath:basePath]){
-		[fm createDirectoryAtPath:basePath attributes:nil];
+		[fm createDirectoryAtPath:basePath withIntermediateDirectories:NO attributes:nil error:nil];        
 	}
 	
     return basePath;

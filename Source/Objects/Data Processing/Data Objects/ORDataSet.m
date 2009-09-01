@@ -326,8 +326,8 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 - (void) setObject: (id) anObject forKey: (id) aKey;
 {
  	[dataSetLock lock];
-    BOOL newObj = NO;
-    if(![realDictionary objectForKey:aKey])newObj = YES;
+ //   BOOL newObj = NO;
+//    if(![realDictionary objectForKey:aKey])newObj = YES;
     
     [realDictionary setObject: anObject  forKey: aKey];
     [sortedArray release];

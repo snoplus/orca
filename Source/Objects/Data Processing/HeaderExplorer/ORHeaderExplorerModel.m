@@ -418,7 +418,11 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 				ORHeaderItem* keyItem = [[headerItem items] objectAtIndex:keyNumber];
 				if([[keyItem name] hasPrefix:@"Key"]){
 					if([keyItem object]){
-						NSLog(@"%@%s%@ %@\n",runNumber, useSubRun?@".":@"",useSubRun?subRunNumber:@"",[keyItem object]);
+						NSLog(@"%@%@%@ %@\n",
+							  runNumber, 
+							  useSubRun?@".":@"",
+							  useSubRun?[NSString stringWithFormat:@"%@",subRunNumber]:@"",
+							  [keyItem object]);
 					}
 					else {
 						NSArray* array = [keyItem items];
@@ -427,7 +431,11 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 						for(i=0;i<n;i++){
 							ORHeaderItem* lowestItem = headerItem = [array objectAtIndex:i];
 							if([lowestItem object]){
-								NSLog(@"%@%s%@ %@\n",runNumber, useSubRun?@".":@"",useSubRun?subRunNumber:@"",[lowestItem object]);
+								NSLog(@"%@%@%@ %@\n",
+									  runNumber, 
+									  useSubRun?@".":@"",
+									  useSubRun?[NSString stringWithFormat:@"%@",subRunNumber]:@"",
+									  [lowestItem object]);
 							}
 						}						
 					}

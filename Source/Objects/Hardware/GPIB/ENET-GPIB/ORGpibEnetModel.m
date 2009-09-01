@@ -234,7 +234,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ mErrorMsg setString: @"***Error: ibpad" ];
             [ self GpibError: mErrorMsg ];
             
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }
         [theHWLock unlock];   //-----end critical section
     }
@@ -262,7 +262,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ mErrorMsg setString:  @"***Error: ibonl" ];
             [ self GpibError: mErrorMsg ];
             
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }
         [theHWLock unlock];   //-----end critical section
     }
@@ -313,7 +313,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         {
             [ mErrorMsg setString: @"***Error: ibonl (deactivate)" ];
             [ self GpibError: mErrorMsg ];
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }    
         [ theHWLock unlock ];   //-----end critical section
     }
@@ -336,7 +336,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         if ( (int)[gpibEnetInstance ibsta] & (unsigned short)[gpibEnetInstance err] ){
             [ mErrorMsg setString: [NSString stringWithFormat:@"***Error: ibeot (%d)",state] ];
             [ self GpibError: mErrorMsg ];
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         } 
         [ theHWLock unlock ];   //-----end critical section
     }
@@ -361,7 +361,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         if ( [gpibEnetInstance ibsta] & [gpibEnetInstance err] ) {
             [ mErrorMsg setString: @"***Error: ibclr" ];
             [ self GpibError: mErrorMsg ];
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }
         [ theHWLock unlock ];   //-----end critical section
     }
@@ -403,7 +403,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         if ( [gpibEnetInstance ibsta] &  [gpibEnetInstance err] ) {
             [ mErrorMsg setString:  @"***Error: ibdev" ];
             [ self GpibError: mErrorMsg ]; 
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }
         
         // Check that a device is actually present.
@@ -441,7 +441,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibrd" ];
             [ self GpibError: mErrorMsg ]; 
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }
         
         // Successful read.
@@ -507,7 +507,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibwrt" ];
             [ self GpibError: mErrorMsg ]; 
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format:@"%@", mErrorMsg ];
         }  
         [ theHWLock unlock ];   //-----end critical section
     }
@@ -552,7 +552,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibwait" ];
             [ self GpibError: mErrorMsg ]; 
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }
         [theHWLock unlock];   //-----end critical section
     }
@@ -587,13 +587,13 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         [theHWLock lock];   //-----begin critical section
         if ( aPrimaryAddress < 0 || aPrimaryAddress > kMaxGpibAddresses ){
             [ mErrorMsg setString: [ NSString stringWithFormat: @"***Error: Bad GPIB Address %d\n", aPrimaryAddress ]];
-            [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+            [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
         }
         else if ( aState ){
             if ( mDeviceUnit[ aPrimaryAddress ] == kNotInitialized ){
                 [ mErrorMsg setString: [ NSString stringWithFormat: 
 										@"***Error: Device at address %d not found.\n", aPrimaryAddress ]];
-                [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+                [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
             }
             
             // Now test if device is actually present.
@@ -609,7 +609,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
                 if ( !listen ) {
                     [ mErrorMsg setString: [ NSString stringWithFormat:
 											@"***Error: No device present at address %d\n", aPrimaryAddress ]];
-                    [ NSException raise: OExceptionGpibError format: mErrorMsg ];
+                    [ NSException raise: OExceptionGpibError format: @"%@",mErrorMsg ];
                 }
             }
         }

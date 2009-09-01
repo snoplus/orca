@@ -308,7 +308,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     if(!remoteControl || remoteInterface){
         NSString* fullFileName = [[[self dirName]stringByExpandingTildeInPath] stringByAppendingPathComponent:@"RunNumber"];
-        NSString* s = [NSString stringWithContentsOfFile:fullFileName];
+        NSString* s = [NSString stringWithContentsOfFile:fullFileName encoding:NSASCIIStringEncoding error:nil];
         runNumber = [s intValue];
     }
     
@@ -1607,7 +1607,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
             [names addObject:[NSString stringWithFormat:@"Bit %d",i]];
         }
         
-        NSString* contents = [NSString stringWithContentsOfFile:definitionsFilePath];
+        NSString* contents = [NSString stringWithContentsOfFile:definitionsFilePath encoding:NSASCIIStringEncoding error:nil];
         NSArray* items;
 		contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
 		contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];

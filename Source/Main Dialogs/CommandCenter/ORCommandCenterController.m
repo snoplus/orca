@@ -234,7 +234,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
     if(returnCode){
         NSString* path = [[sheet filenames] objectAtIndex:0];
         [self setLastPath:[path stringByDeletingLastPathComponent]];
-        [self sendCommand:[NSString stringWithContentsOfFile:path]];
+        [self sendCommand:[NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:nil]];
     }
 }
 

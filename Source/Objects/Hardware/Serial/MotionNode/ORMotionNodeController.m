@@ -194,7 +194,7 @@
 
 - (void) lastRecordShippedChanged:(NSNotification*)aNote
 {
-	[lastRecordShippedField setObjectValue: [model lastRecordShipped]?[model lastRecordShipped]:@"--"];
+	[lastRecordShippedField setObjectValue: [model lastRecordShipped]?(id)[model lastRecordShipped]:@"--"];
 }
 
 - (void) outOfBandChanged:(NSNotification*)aNote

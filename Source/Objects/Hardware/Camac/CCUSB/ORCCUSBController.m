@@ -919,7 +919,7 @@
 {
     if(returnCode){
         [model setLastStackFilePath:[[sheet filenames] objectAtIndex:0]];
-		NSString* theContents = [NSString stringWithContentsOfFile:[model lastStackFilePath]];
+		NSString* theContents = [NSString stringWithContentsOfFile:[model lastStackFilePath] encoding:NSASCIIStringEncoding error:nil];
 		[model setCustomStack:[[[theContents componentsSeparatedByString:@"\n"] mutableCopy] autorelease]];
     }
 }

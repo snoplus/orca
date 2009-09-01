@@ -330,7 +330,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 		returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d?", aChnl + 1 ]
                                              data: mReturnData maxLength: kMaxGPIBReturn ];
         
-		acquireOn = [ NSString stringWithCString: mReturnData ];
+		acquireOn = [ NSString stringWithCString: mReturnData encoding:NSASCIIStringEncoding];
 		if ( [ acquireOn rangeOfString: @"ON" 
 							   options: NSBackwardsSearch ].location != NSNotFound )
         {
@@ -404,7 +404,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 	// Have to parse the return
     if ( returnLength > 0 )
 	{
-		waveformParams = [ NSString stringWithCString: &mReturnData[ 0 ] ];
+		waveformParams = [ NSString stringWithCString: &mReturnData[0]  encoding:NSASCIIStringEncoding];
 		NSArray* waveformValues = [ waveformParams componentsSeparatedByString: @"," ];
 		
 		recordLengthStr = [ waveformValues objectAtIndex: 3 ];		
@@ -561,7 +561,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
         else
         {
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
-            [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+            [ NSException raise: OExceptionGPIBConnectionError format: @"%@",errorMsg ];
         }
         
     }

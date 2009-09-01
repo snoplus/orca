@@ -726,10 +726,11 @@
 #pragma mark •••File I/O
 - (NSFileHandle*) createFileFromHeader: (NSString*)path
 {
-    [fileHeader writeToFile:path atomically:YES];
+    BOOL result = [fileHeader writeToFile:path atomically:YES];
+	if(!result)NSLog(@"could not create header\n");
+	
     NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:path];
     [fp seekToEndOfFile];
-    
     return fp;
 }
 
@@ -738,8 +739,8 @@
     //write header to temp file because we want the form you get from a disk file...the string to property list isn't right.
 	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
     char* name = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"OrcaHeaderXXX");
-    [self createFileFromHeader:[NSString stringWithCString:name]];
-    NSData* dataBlock = [NSData dataWithContentsOfFile:[NSString stringWithCString:name]];
+    [self createFileFromHeader:[NSString stringWithCString:name encoding:NSASCIIStringEncoding]];
+    NSData* dataBlock = [NSData dataWithContentsOfFile:[NSString stringWithCString:name encoding:NSASCIIStringEncoding]];
 	unsigned long headerLength        = [dataBlock length];											//in bytes
 	unsigned long lengthWhenPadded    = sizeof(long)*(round(.5 + headerLength/(float)sizeof(long)));					//in bytes
 	unsigned long padSize             = lengthWhenPadded - headerLength;							//in bytes
@@ -757,7 +758,7 @@
 		[data appendBytes:&padByte length:1];
 	}
 	
-    [[NSFileManager defaultManager] removeFileAtPath:[NSString stringWithCString:name] handler:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithCString:name encoding:NSASCIIStringEncoding] error:nil];
     
     free(name);
     return data;
@@ -954,7 +955,6 @@ static NSString *ORDataPacketFileHeader        = @"ORDataPacketFileHeader";
 		ptr++;
 		if(needToSwap)*ptr = CFSwapInt32(*ptr);
 		unsigned long headerLengthInBytes = *ptr;
-		ptr++;
 		NSData* headerData = [fp readDataOfLength:headerLengthInBytes];
 		NSString* headerString = [[[NSString alloc] initWithBytes:[headerData bytes] length:headerLengthInBytes encoding:NSASCIIStringEncoding]autorelease];
 		[self setFileHeader:[headerString propertyList]]; 

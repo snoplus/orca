@@ -871,7 +871,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 {
     id aWorker = nil;
     if(useFileForPattern){
-        NSString* fileContents = [NSString stringWithContentsOfFile:[patternFileName stringByExpandingTildeInPath]];
+        NSString* fileContents = [NSString stringWithContentsOfFile:[patternFileName stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
         if(fileContents){
             //get rid of \r's
             NSString* processedContent = [[fileContents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];

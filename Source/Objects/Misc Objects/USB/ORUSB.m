@@ -313,7 +313,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			// Create a buffer to hold the data.
 			usbCallbackData = [[ORUSBInterface alloc] init];
 			
-			deviceNameAsString = [NSString stringWithCString:deviceName];
+			deviceNameAsString = [NSString stringWithCString:deviceName encoding:NSASCIIStringEncoding];
 			
 			// Now, get the locationID of this device. In order to do this, we need to create an IOUSBDeviceInterface182 
 			// for our device. This will create the necessary connections between our userland application and the 

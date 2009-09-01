@@ -596,7 +596,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
         reply[0]='\0';
         long n = [self writeReadGPIBDevice:@"*IDN?" data:reply maxLength:1024];
         if(n>0)reply[n-1]='\0';
-        NSMutableString* rs =  [NSMutableString stringWithCString:reply];
+        NSMutableString* rs =  [NSMutableString stringWithCString:reply encoding:NSASCIIStringEncoding];
 		if(rs)[rs replaceOccurrencesOfString:@"\n" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [rs length])];
 		return rs;
     }
@@ -766,7 +766,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     char reply[1024];
     long n = [self writeReadGPIBDevice:@"Data:CAT?" data:reply maxLength:1024];
     if(n>0)reply[n-1]='\0';
-    NSString* replyString = [[[NSString stringWithCString:reply] componentsSeparatedByString:@"\""] componentsJoinedByString:@""];
+    NSString* replyString = [[[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] componentsSeparatedByString:@"\""] componentsJoinedByString:@""];
     replyString = [replyString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     return [replyString componentsSeparatedByString:@","];
 }
@@ -968,7 +968,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     [self setWaveform: [NSMutableData dataWithCapacity:kMaxNumWaveformPoints*sizeof(float)]];
     
-    int count = [self numPoints];
+    //int count = [self numPoints];
 	
 	int inverter = negativePulse?1:-1;
 	
@@ -1098,7 +1098,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             
         case kWaveformFromFile: {
             
-            NSString*       contents = [NSString stringWithContentsOfFile:[fileName stringByExpandingTildeInPath]];
+            NSString*       contents = [NSString stringWithContentsOfFile:[fileName stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
             NSScanner*      scanner  = [NSScanner scannerWithString:contents];
             NSCharacterSet* set 	 = [NSCharacterSet characterSetWithCharactersInString:@" ,\t\r\n"];
 			[self insert:kPadSize/2 value:0];
@@ -1119,7 +1119,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             
     }
     
-    count = [self numPoints];
+    //count = [self numPoints];
     
 }
 
