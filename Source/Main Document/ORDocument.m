@@ -272,7 +272,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 {
 	//add in the document parameters
 	NSMutableDictionary* docDict = [NSMutableDictionary dictionary];
-    [docDict setObject:[[self fileURL]relativePath] forKey:@"documentName"];
+    [docDict setObject:[[self fileURL]path] forKey:@"documentName"];
     [docDict setObject:[[[NSBundle mainBundle] infoDictionary]       objectForKey:@"CFBundleVersion"] forKey:@"OrcaVersion"];
     [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
@@ -392,7 +392,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) saveFinished
 {
-	NSLog(@"Saved Configuration: %@\n",[[self fileURL] relativePath]);
+	NSLog(@"Saved Configuration: %@\n",[[self fileURL] path]);
 	@try {
 		[afterSaveTarget performSelector:afterSaveSelector];
 	}
@@ -517,7 +517,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) saveDefaultFileName
 {
-	NSString* theLastFile = [[self fileURL]relativePath];
+	NSString* theLastFile = [[self fileURL]path];
     [[NSUserDefaults standardUserDefaults] setObject:theLastFile forKey:ORLastDocumentName];
 }
 
@@ -525,10 +525,10 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 {
     [self saveDocument:self];
     NSFileManager* fm = [NSFileManager defaultManager];
-    NSString* path = [aPath stringByAppendingPathComponent:[[self fileURL] lastPathComponent]];
-    NSString* ext = [[self fileURL]pathExtension];
+    NSString* path = [aPath stringByAppendingPathComponent:[[[self fileURL] path ]lastPathComponent]];
+    NSString* ext = [[[self fileURL] path]pathExtension];
     path = [path stringByDeletingPathExtension];
-	NSString* startName = [[self fileURL] relativePath];
+	NSString* startName = [[self fileURL] path];
     NSString* finalName = [[path stringByAppendingFormat:@"_%@",aString]stringByAppendingPathExtension:ext];
     if([fm copyItemAtPath:startName toPath:finalName error:nil]){
         NSLog(@"Saving: %@\n",startName);
