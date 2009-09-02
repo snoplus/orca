@@ -3673,7 +3673,7 @@ clean_up_mark:
             //TODO : could omit the unavailable channels ... -tb-
             //[histogramData addObject:[NSMutableData dataWithLength:1024]]; <- this did not work -tb-
             //NSMutableData *md = [NSMutableData dataWithLength:1024*sizeof(unsigned int)]; <- this too
-            NSMutableData *md =[[NSMutableData allocWithZone:nil]  initWithLength:1024*sizeof(unsigned int)];
+            NSMutableData *md =[NSMutableData dataWithLength:1024*sizeof(unsigned int)]; //MAH 09/02/09 fixed memory leak
             // -> sizeof long and unsigned int is the same (4), here I rely on it! would be more elegant to use long
             // -> as longs are used to ship data to the Orca data stream -tb-
             //[md retain];  ... insertObject should do this -tb-

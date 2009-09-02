@@ -29,8 +29,6 @@
         IBOutlet NSMatrix*		onlineMaskMatrix;
         IBOutlet NSMatrix*		discriminatorFieldMatrix;
         IBOutlet NSMatrix*		discriminatorStepperMatrix;
-        IBOutlet NSButton*		readDiscriminatorButton;
-        IBOutlet NSButton*		writeDiscriminatorButton;
         IBOutlet NSButton*		clearModuleButton;
         
         IBOutlet NSButton*		settingLockButton;

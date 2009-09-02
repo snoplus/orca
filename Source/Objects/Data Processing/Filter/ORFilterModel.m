@@ -1014,7 +1014,7 @@ int filterGraph(nodeType*);
 		} 
 	}
 	
-	descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
+	//descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
 	
 	NSEnumerator* e = [inputValues objectEnumerator];
 	NSDictionary* anInputValueDictionary;

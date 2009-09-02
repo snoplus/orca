@@ -34,7 +34,7 @@
 		CFRunLoopRef				mIsochRunLoop; 
 		
 		IONotificationPortRef		mNotificationPort;
-		CFMutableDictionaryRef		mNotifications;
+		//CFMutableDictionaryRef		mNotifications;
 		io_object_t					mNotification;
 		BOOL						isOpen;
 		BOOL						serviceAlive;

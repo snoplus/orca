@@ -816,22 +816,19 @@ const float kGateAlpha2 = .1;
                 delta = startChan-mouseChan;
                 int new1 = gate1 - delta;
                 int new2 = gate2 - delta;
-                int w = abs(new1-new2-1);
+                //int w = abs(new1-new2-1);
                 if(new1<0){
                     new1 = 0;
-                    new2 = new1 + w;
                 }
                 else if(new2<0){
                     new2 = 0;
-                    new1 = new2 + w;
                 }
-                else {
-                    startChan = mouseChan;
-                    gate1 = new1;
-                    gate2 = new2;
-                    [self setGateMinChannel:MIN(gate1,gate2)];
-                    [self setGateMaxChannel:MAX(gate1,gate2)];
-                }
+				startChan = mouseChan;
+				gate1 = new1;
+				gate2 = new2;
+				[self setGateMinChannel:MIN(gate1,gate2)];
+				[self setGateMaxChannel:MAX(gate1,gate2)];
+                
             break;
         }
 

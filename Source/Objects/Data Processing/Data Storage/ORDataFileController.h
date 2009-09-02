@@ -51,7 +51,6 @@
 	IBOutlet NSButton*      lockButton;
 	IBOutlet NSTabView*     tabView;
 	
-	IBOutlet NSTextField* 	sizeLimitReachedField;
 	IBOutlet NSMatrix*		sizeLimitActionMatrix;
 }
 

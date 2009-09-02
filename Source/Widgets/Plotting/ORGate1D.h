@@ -52,7 +52,6 @@ enum {
         float           peakx;
         double			startChan;
         BOOL			dragInProgress;
-        BOOL			gateValid;
         int				dragType;
         NSString*       displayedGateName;
         BOOL            displayGate;

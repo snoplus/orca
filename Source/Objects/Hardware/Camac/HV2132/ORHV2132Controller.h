@@ -40,7 +40,6 @@
         IBOutlet NSButton*		disableL1L2Button;
         IBOutlet NSButton*		clearBufferButton;
 		
-		IBOutlet NSButton* dirSelectionButton;
 		IBOutlet NSTextField* hvStateDirField;
 
 };

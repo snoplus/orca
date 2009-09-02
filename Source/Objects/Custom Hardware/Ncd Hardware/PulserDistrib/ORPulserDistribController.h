@@ -29,8 +29,6 @@
 		IBOutlet NSMatrix* patternMatrix2;
 		IBOutlet NSMatrix* patternMatrix3;
 
-		IBOutlet NSMatrix* allColButton;
-		IBOutlet NSMatrix* noneColButton;
 		IBOutlet NSButton* disableForPulserCB;
 }
 

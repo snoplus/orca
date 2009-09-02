@@ -40,8 +40,6 @@
 	IBOutlet NSTextField* readHexField;
 	IBOutlet NSMatrix* 	  readBitMatrix;
 
-	IBOutlet NSButton*	readButton;
-	IBOutlet NSButton*	writeButton;
 }
 
 #pragma mark ¥¥¥Notifications

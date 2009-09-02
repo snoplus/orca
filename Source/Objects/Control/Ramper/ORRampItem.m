@@ -637,7 +637,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 {
 	int n = [wayPoints count];
 	int i;
-	ORWayPoint* aWayPoint = [wayPoints objectAtIndex:n-1];
+	ORWayPoint* aWayPoint;
 	float scaleFactor = [self maxValueForParameter]/[self oldMaxValue];
 	
 	for(i=0;i<n;i++){

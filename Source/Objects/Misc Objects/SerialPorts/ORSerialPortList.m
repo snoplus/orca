@@ -136,7 +136,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
         if (modemNameAsCFString && bsdPathAsCFString) {
 			result = [self oldPortByPath:(NSString*) bsdPathAsCFString];
 			if (result == nil)
-				result = [[ORSerialPort alloc] init:(NSString*) bsdPathAsCFString withName:(NSString*) modemNameAsCFString];
+				result = [[[ORSerialPort alloc] init:(NSString*) bsdPathAsCFString withName:(NSString*) modemNameAsCFString] autorelease];
 		}
 
         if (modemNameAsCFString)CFRelease(modemNameAsCFString);

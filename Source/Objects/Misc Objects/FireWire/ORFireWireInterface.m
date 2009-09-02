@@ -171,7 +171,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 		CFRunLoopAddSource( CFRunLoopGetCurrent(), source, kCFRunLoopDefaultMode );
 		
 		// the run loop has the source, so we release it.
-		CFRelease( source ) ;
+		//CFRelease( source ) ;
 		
 		IOServiceAddInterestNotification( mNotificationPort, [self service], kIOGeneralInterest, &deviceInterestCallback, self, &mNotification ) ;
 	}

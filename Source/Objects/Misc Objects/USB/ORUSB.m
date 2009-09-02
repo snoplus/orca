@@ -263,7 +263,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	
 	// Retain additional references because we use this same dictionary with two calls to
 	// IOServiceAddMatchingNotification, each of which consumes one reference.
-	matchingDict = (CFMutableDictionaryRef) CFRetain(matchingDict);
+	//matchingDict = (CFMutableDictionaryRef) CFRetain(matchingDict);
    	
 	// Now set up two more notifications, one to be called when a device is first matched by I/O Kit, and the other to be
 	// called when the device is terminated.

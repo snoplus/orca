@@ -671,8 +671,6 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 {    
 	reading = NO;
 	stop = NO;
-    [nextObject runTaskStopped:fileAsDataPacket userInfo:nil];
-    [nextObject closeOutRun:fileAsDataPacket userInfo:nil];
 
 	[fileAsDataPacket clearData];
     [fileAsDataPacket release];
@@ -687,7 +685,6 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 
 - (void) fileFinished
 {
-    [nextObject runTaskBoundary:fileAsDataPacket userInfo:nil];
 	numberLeft--;
 	[[NSNotificationCenter defaultCenter]
 				postNotificationName:ORHeaderExplorerOneFileDone

@@ -178,7 +178,7 @@ static NSString* kCrateKey[16] = {
 	int count = 0;
 	va_start(myArgs,firstKey);
 	
-	NSString* s = firstKey;
+	NSString* s;
 	while(s = va_arg(myArgs, NSString *)) count++;
 
 

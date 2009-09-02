@@ -27,7 +27,6 @@
 @interface ORScaleTask : NSObject {
 @private
     ORGroupView* 	view;
-    NSRect          theSelectionRect;
     NSPoint         startLoc,currentLoc;
 	int				scaleFactor;
 }

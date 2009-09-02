@@ -33,7 +33,6 @@
     @private
 		BOOL			stop;
         NSMutableArray*	filesToProcess;
-        id              nextObject;
 
         ORHeaderItem*   header;
         NSString*       lastListPath;

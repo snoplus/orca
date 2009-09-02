@@ -85,11 +85,8 @@
 
 
         IBOutlet NSPopUpButton*	pollRatePopup;
-        IBOutlet NSButton*		pollNowButton;
         IBOutlet NSProgressIndicator*	pollRunningIndicator;
-		
-		IBOutlet NSView*		totalView;
-		
+				
 		NSImage* xImage;
 		NSImage* yImage;
 

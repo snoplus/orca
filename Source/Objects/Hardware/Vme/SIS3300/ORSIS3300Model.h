@@ -80,9 +80,6 @@
 	//cach to speed takedata
 	unsigned long location;
 	id theController;
-	unsigned long fifoAddress;
-	unsigned long fifoStateAddress;
-	BOOL firstTime;
 	int currentBank;
 	unsigned long dataWord[4][16*1024];					
 	long count;

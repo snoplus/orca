@@ -31,7 +31,6 @@
 		IBOutlet NSButton* incButton;
 		IBOutlet NSButton* decButton;
 		IBOutlet NSButton* homeButton;
-		IBOutlet NSButton* readHomeButton;
 		IBOutlet NSButton* setStepCountButton;
 		IBOutlet NSMatrix* multiplierMatrix;
 		IBOutlet NSButton* goButton;

@@ -22,7 +22,6 @@
 
 @interface ORHeaderExplorerController : OrcaObjectController  {
     @private
-		IBOutlet NSButton* 		addSearchKeyButton;
 		IBOutlet NSButton* 		removeSearchKeyButton;
 		IBOutlet NSButton* 		printButton;
 		IBOutlet NSButton* 		selectButton;

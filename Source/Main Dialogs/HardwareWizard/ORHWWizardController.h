@@ -50,7 +50,6 @@
     IBOutlet NSButton*      markAnDoitButton;
 
     IBOutlet NSPopUpButton* objectPU;
-    IBOutlet NSButton*      doItButton;
     IBOutlet NSButton*      goToMarkButton;
     IBOutlet NSButton*      clearMarksButton;
     IBOutlet NSPopUpButton* marksPU;

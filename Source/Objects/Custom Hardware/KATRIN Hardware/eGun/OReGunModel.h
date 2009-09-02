@@ -31,9 +31,7 @@
         NSPoint         cmdPosition;
         NSPoint         goalPosition;
         NSPoint         degaussPosition;
-        int             pollCount;
         BOOL            absMotion;
-        BOOL            goingHome;
         unsigned        currentTrackIndex;
         unsigned        validTrackCount;
         NSPoint         track[kNumTrackPoints];

@@ -48,9 +48,6 @@
         IBOutlet NSButton*		pollWhenRunningButton;
         IBOutlet NSPopUpButton*	pollRatePopup;
         IBOutlet NSProgressIndicator*	pollRunningIndicator;
-        IBOutlet NSButton*		pollNowButton;
-
-        IBOutlet NSButton*		logButton;
 
         IBOutlet NSButton*		showHideTestButton;
 };

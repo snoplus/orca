@@ -41,8 +41,6 @@
         IBOutlet NSButton*		displayRawCB;
 		IBOutlet NSTextField*	logFileTextField;
 		IBOutlet NSButton*		logToFileButton;
-		IBOutlet NSButton*		selectLogFileButton;
-		IBOutlet NSButton*		calibrateButton;
 		IBOutlet NSPopUpButton*	jumperSettingsPU;
 		IBOutlet NSSplitView*	splitView;
 		IBOutlet NSOutlineView* outlineView;

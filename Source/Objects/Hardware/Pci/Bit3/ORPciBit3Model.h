@@ -172,9 +172,6 @@ enum {
         
         unsigned int 	dualPortAddress;
         unsigned int 	dualPortRamSize;
-        unsigned short 	remoteIOAddressModifier;
-        unsigned short 	remoteRamAddressModifier;
-        unsigned short 	dualPortAddressModifier;
         
         ORAlarm*	noHardwareAlarm;
         ORAlarm*    noDriverAlarm;

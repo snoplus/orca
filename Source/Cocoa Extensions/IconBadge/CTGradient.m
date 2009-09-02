@@ -35,7 +35,7 @@
 @implementation CTGradient
 
 /////////////////////////////////////Initialization Type Stuff
-void linearEvaluation (void *info, const float *in, float *out);
+void linearEvaluation (void *info, const CGFloat *in, CGFloat *out);
 static const CGFunctionCallbacks _CTLinearGradientFunction = { 0, &linearEvaluation, NULL };	//Version, evaluator function, cleanup function
 
 - (id)init
@@ -53,8 +53,8 @@ static const CGFunctionCallbacks _CTLinearGradientFunction = { 0, &linearEvaluat
   {
   elementList = nil;
 	
-  static const float input_value_range   [2] = { 0, 1 };						//range  for the evaluator input
-  static const float output_value_ranges [8] = { 0, 1, 0, 1, 0, 1, 0, 1 };		//ranges for the evaluator output (4 returned values)
+  static const CGFloat input_value_range   [2] = { 0, 1 };						//range  for the evaluator input
+  static const CGFloat output_value_ranges [8] = { 0, 1, 0, 1, 0, 1, 0, 1 };		//ranges for the evaluator output (4 returned values)
   
   gradientFunction = CGFunctionCreate(&elementList,					//the two transition colors
 									  1, input_value_range,			//number of inputs (just fraction of progression)
@@ -66,7 +66,7 @@ static const CGFunctionCallbacks _CTLinearGradientFunction = { 0, &linearEvaluat
   {
   CGFunctionRelease(gradientFunction);
   
-  CTGradientElement *elementToRemove = elementList;
+  CTGradientElement *elementToRemove;
   while(elementList != nil)
 	{
 	elementToRemove = elementList;
@@ -392,9 +392,9 @@ static const CGFunctionCallbacks _CTLinearGradientFunction = { 0, &linearEvaluat
   return nil;
   }
 
-- (NSColor *)colorAtPosition:(float)position
+- (NSColor *)colorAtPosition:(CGFloat)position
   {
-  float components[4];
+  CGFloat components[4];
   
   linearEvaluation(&elementList, &position, components);
   
@@ -549,8 +549,8 @@ static const CGFunctionCallbacks _CTLinearGradientFunction = { 0, &linearEvaluat
 #pragma mark Core Graphics
 - (CGFunctionRef)buildCGFunction
   {
-  static const float input_value_range   [2] = { 0, 1 };						//range  for the evaluator input
-  static const float output_value_ranges [8] = { 0, 1, 0, 1, 0, 1, 0, 1 };		//ranges for the evaluator output (4 returned values)
+  static const CGFloat input_value_range   [2] = { 0, 1 };						//range  for the evaluator input
+  static const CGFloat output_value_ranges [8] = { 0, 1, 0, 1, 0, 1, 0, 1 };		//ranges for the evaluator output (4 returned values)
   
   return CGFunctionCreate(&elementList,					//the two transition colors
 						  1, input_value_range  ,		//number of inputs (just fraction of progression)
@@ -565,7 +565,7 @@ static const CGFunctionCallbacks _CTLinearGradientFunction = { 0, &linearEvaluat
 
 //////////////////////////////////////LinearEvaluation Function/////////////////////////////////////
 
-void linearEvaluation (void *info, const float *in, float *out)
+void linearEvaluation (void *info, const CGFloat *in, CGFloat *out)
   {
   float position = *in;
   
