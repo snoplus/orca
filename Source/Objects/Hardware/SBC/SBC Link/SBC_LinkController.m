@@ -1035,12 +1035,12 @@
     return YES;
 }
 
-- (unsigned ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+- (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
 	return  [[model sbcLink] connectionHistoryCount];
 }
 
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(unsigned)index
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
 {
 	return [[model sbcLink] connectionHistoryItem:index];
 }

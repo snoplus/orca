@@ -259,12 +259,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 	}
 }
 
-- (unsigned ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+- (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
 	return  [[self orcaRootService] connectionHistoryCount];
 }
 
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(unsigned)index
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
 {
 	return [[self orcaRootService] connectionHistoryItem:index];
 }
