@@ -417,7 +417,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	readingHistogram = YES;
 	//!!!!!Assumes that the device has been disabled
 	unsigned short maxAdc = powf(2.0, (float)adcBits);								//max number of values			
-	if(!histogramData && maxAdc) histogramData = [[NSMutableData dataWithLength:(kCMC203ReservedHistoHeaderWords + maxAdc)*sizeof(long)] retain];
+	if(!histogramData) histogramData = [[NSMutableData dataWithLength:(kCMC203ReservedHistoHeaderWords + maxAdc)*sizeof(long)] retain];
 	[histogramData resetBytesInRange:NSMakeRange(0,[histogramData length])];
 
 	

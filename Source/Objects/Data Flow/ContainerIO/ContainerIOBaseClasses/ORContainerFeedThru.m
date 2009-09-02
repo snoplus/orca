@@ -23,7 +23,7 @@
 #import "ORContainerFeedThru.h"
 #import "ORDataPacket.h"
 #import "ORContainerModel.h"
-#import "ORMessagePipe.h";
+#import "ORMessagePipe.h"
 
 #pragma mark ¥¥¥String Definitions
 NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChangedNotification";

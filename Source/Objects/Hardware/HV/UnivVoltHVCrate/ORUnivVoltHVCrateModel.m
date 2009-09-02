@@ -919,7 +919,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 //		NSLog( @"Return Code: %@, number: %d\n", returnCodeAsString, *aReturnCode);
 		
 		// Convert modified char array to string.
-		returnStringFromSocket = [[[NSString alloc] initWithFormat: @"%s\n\0", returnBufferString] autorelease];
+		returnStringFromSocket = [[[NSString alloc] initWithFormat: @"%s\n", returnBufferString] autorelease];
 //		NSLog( @"Full return string:\n %@\n", returnStringFromSocket );
    }
 	

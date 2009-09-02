@@ -2503,7 +2503,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
         histoLastSecStrobeUSec = t.tv_usec;  
         int lastSecStrobe = [self readTime];
         DebugHistoTB(  NSLog(@"lastSecStrobe is %i\n",lastSecStrobe);  )
-        int sec = lastSecStrobe;
+        int sec;
         do{
             histoLastSecStrobeSec = t.tv_sec;  
             histoLastSecStrobeUSec = t.tv_usec;  

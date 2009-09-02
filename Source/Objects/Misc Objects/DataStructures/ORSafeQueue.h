@@ -12,7 +12,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORQueue.h";
+#import "ORQueue.h"
 
 @interface ORSafeQueue : ORQueue
 {

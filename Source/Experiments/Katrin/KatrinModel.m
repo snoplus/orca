@@ -140,7 +140,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	[group release];
 }
 
-- (NSArray*) initMapEntries:(int)index
+- (NSMutableArray*) initMapEntries:(int)index
 {
 	if(index==1)return [super initMapEntries:0]; //default set
 	else {

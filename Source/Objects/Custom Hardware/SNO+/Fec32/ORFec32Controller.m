@@ -25,7 +25,7 @@
 #import "ORFecPmtsView.h"
 #import "ORPmtImage.h"
 #import "ORSwitchImage.h"
-#import "ORFecDaughterCardModel.h";
+#import "ORFecDaughterCardModel.h"
 #import "Sno_Monitor_Adcs.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"

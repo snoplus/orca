@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORVmeIOCard.h";
+#import "ORVmeIOCard.h"
 
 @class ORPISlashTChip;
 

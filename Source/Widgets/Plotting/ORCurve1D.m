@@ -20,7 +20,7 @@
 
 
 #import "ORCurve1D.h"
-#import "ORGate1D.h";
+#import "ORGate1D.h"
 #import "ORPlotter1D.h"
 #import "ORTimeLine.h"
 #import "ORCalibration.h"
@@ -285,17 +285,17 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 		if(!differentiate){
 			if(useUnsignedValues){
 				switch (unitSize){
-					case 1: theValue = (unsigned char)cPtr[ix]; break;
-					case 2: theValue = (unsigned short)sPtr[ix]; break;
-					case 4: theValue = (unsigned long)lPtr[ix]; break;
+					case 1: if(cPtr)theValue = (unsigned char)cPtr[ix]; break;
+					case 2: if(sPtr)theValue = (unsigned short)sPtr[ix]; break;
+					case 4: if(lPtr)theValue = (unsigned long)lPtr[ix]; break;
 					default: theValue = (unsigned)[mDataSource plotter:aPlot dataSet:dataSetID dataValue:ix]; break;
 				}
 			}
 			else {
 				switch (unitSize){
-					case 1: theValue = cPtr[ix]; break;
-					case 2: theValue = sPtr[ix]; break;
-					case 4: theValue = lPtr[ix]; break;
+					case 1: if(cPtr)theValue = cPtr[ix]; break;
+					case 2: if(sPtr)theValue = sPtr[ix]; break;
+					case 4: if(lPtr)theValue = lPtr[ix]; break;
 					default: theValue = [mDataSource plotter:aPlot dataSet:dataSetID dataValue:ix]; break;
 				}
 			}
@@ -305,9 +305,9 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 				//if not first time just adjust the average using the new location	
 				if(useUnsignedValues){
 					switch (unitSize){
-						case 1: forwardSum  += ((unsigned char)cPtr[ix+n] - (unsigned char)cPtr[ix-1]); backwardSum += ((unsigned char)cPtr[ix-1] - (unsigned char)cPtr[ix-n-1]); break;
-						case 2: forwardSum  += ((unsigned short)sPtr[ix+n] - (unsigned short)sPtr[ix-1]); backwardSum += ((unsigned short)sPtr[ix-1] - (unsigned short)sPtr[ix-n-1]); break;
-						case 4: forwardSum  += ((unsigned long)lPtr[ix+n] - (unsigned long)lPtr[ix-1]); backwardSum += ((unsigned long)lPtr[ix-1] - (unsigned long)lPtr[ix-n-1]); break;
+						case 1: if(cPtr){forwardSum  += ((unsigned char)cPtr[ix+n] - (unsigned char)cPtr[ix-1]); backwardSum += ((unsigned char)cPtr[ix-1] - (unsigned char)cPtr[ix-n-1]);} break;
+						case 2: if(sPtr){forwardSum  += ((unsigned short)sPtr[ix+n] - (unsigned short)sPtr[ix-1]); backwardSum += ((unsigned short)sPtr[ix-1] - (unsigned short)sPtr[ix-n-1]); }break;
+						case 4: if(lPtr){forwardSum  += ((unsigned long)lPtr[ix+n] - (unsigned long)lPtr[ix-1]); backwardSum += ((unsigned long)lPtr[ix-1] - (unsigned long)lPtr[ix-n-1]); }break;
 						default:
 							forwardSum  +=  ((unsigned)[mDataSource plotter:self dataSet:dataSetID dataValue:ix+n]/dn - (unsigned)[mDataSource plotter:self dataSet:dataSetID dataValue:ix-1]/dn);
 							backwardSum +=  ((unsigned)[mDataSource plotter:self dataSet:dataSetID dataValue:ix-1]/dn - (unsigned)[mDataSource plotter:self dataSet:dataSetID dataValue:ix-n-1]/dn);
@@ -316,9 +316,9 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 				}
 				else {
 					switch (unitSize){
-						case 1: forwardSum  += (cPtr[ix+n] - cPtr[ix-1]); backwardSum += (cPtr[ix-1] - cPtr[ix-n-1]); break;
-						case 2: forwardSum  += (sPtr[ix+n] - sPtr[ix-1]); backwardSum += (sPtr[ix-1] - sPtr[ix-n-1]); break;
-						case 4: forwardSum  += (lPtr[ix+n] - lPtr[ix-1]); backwardSum += (lPtr[ix-1] - lPtr[ix-n-1]); break;
+						case 1: if(cPtr){forwardSum  += (cPtr[ix+n] - cPtr[ix-1]); backwardSum += (cPtr[ix-1] - cPtr[ix-n-1]); }break;
+						case 2: if(sPtr){forwardSum  += (sPtr[ix+n] - sPtr[ix-1]); backwardSum += (sPtr[ix-1] - sPtr[ix-n-1]); }break;
+						case 4: if(lPtr){forwardSum  += (lPtr[ix+n] - lPtr[ix-1]); backwardSum += (lPtr[ix-1] - lPtr[ix-n-1]); }break;
 						default:
 							forwardSum  +=  ([mDataSource plotter:self dataSet:dataSetID dataValue:ix+n]/dn - [mDataSource plotter:self dataSet:dataSetID dataValue:ix-1]/dn);
 							backwardSum +=  ([mDataSource plotter:self dataSet:dataSetID dataValue:ix-1]/dn - [mDataSource plotter:self dataSet:dataSetID dataValue:ix-n-1]/dn);
@@ -333,9 +333,9 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 				if(useUnsignedValues){
 					for(i = 0;i<n;i++) {
 						switch (unitSize){
-							case 1: forwardSum  += (unsigned char)cPtr[ix+i]; backwardSum += (unsigned char)cPtr[ix-i-1]; break;
-							case 2: forwardSum  += (unsigned short)sPtr[ix+i]; backwardSum += (unsigned short)sPtr[ix-i-1];  break;
-							case 4: forwardSum  += (unsigned long)lPtr[ix+i]; backwardSum += (unsigned long)lPtr[ix-i-1];  break;
+							case 1: if(cPtr){forwardSum  += (unsigned char)cPtr[ix+i]; backwardSum += (unsigned char)cPtr[ix-i-1]; }break;
+							case 2: if(sPtr){forwardSum  += (unsigned short)sPtr[ix+i]; backwardSum += (unsigned short)sPtr[ix-i-1];}  break;
+							case 4: if(lPtr){forwardSum  += (unsigned long)lPtr[ix+i]; backwardSum += (unsigned long)lPtr[ix-i-1]; } break;
 							default: 
 								forwardSum  += (unsigned)[mDataSource plotter:self dataSet:dataSetID dataValue:ix+i];
 								backwardSum += (unsigned)[mDataSource plotter:self dataSet:dataSetID dataValue:ix-i];
@@ -346,9 +346,9 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 				else {
 					for(i = 0;i<n;i++) {
 						switch (unitSize){
-							case 1: forwardSum  += cPtr[ix+i]; backwardSum += cPtr[ix-i-1]; break;
-							case 2: forwardSum  += sPtr[ix+i]; backwardSum += sPtr[ix-i-1];  break;
-							case 4: forwardSum  += lPtr[ix+i]; backwardSum += lPtr[ix-i-1];  break;
+							case 1: if(cPtr){forwardSum  += cPtr[ix+i]; backwardSum += cPtr[ix-i-1];} break;
+							case 2: if(sPtr){forwardSum  += sPtr[ix+i]; backwardSum += sPtr[ix-i-1];}  break;
+							case 4: if(lPtr){forwardSum  += lPtr[ix+i]; backwardSum += lPtr[ix-i-1];}  break;
 							default: 
 								forwardSum  += [mDataSource plotter:self dataSet:dataSetID dataValue:ix+i];
 								backwardSum += [mDataSource plotter:self dataSet:dataSetID dataValue:ix-i];

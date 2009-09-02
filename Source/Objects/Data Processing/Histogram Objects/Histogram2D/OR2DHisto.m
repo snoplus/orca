@@ -225,19 +225,21 @@
         [self setNumberBinsPerSide:(unsigned short)pow((double)num,.5)];
     }
 	[dataSetLock lock];
-    int i;
-    for(i=0;i<num;i++){
-        histogram[i] += ptr[i];
-        if(histogram[i]){
-            unsigned short y = i/numberBinsPerSide;
-            unsigned short x = i%numberBinsPerSide;
-            
-            if(x<minX)minX = x;
-            if(x>maxX)maxX = x;
-            if(y<minY)minY = y;
-            if(y>maxY)maxY = y;
-        }
-    }
+	if(histogram){
+		int i;
+		for(i=0;i<num;i++){
+			histogram[i] += ptr[i];
+			if(histogram[i]){
+				unsigned short y = i/numberBinsPerSide;
+				unsigned short x = i%numberBinsPerSide;
+				
+				if(x<minX)minX = x;
+				if(x>maxX)maxX = x;
+				if(y<minY)minY = y;
+				if(y>maxY)maxY = y;
+			}
+		}
+	}
 	[dataSetLock unlock];
     [self incrementTotalCounts];
 }
@@ -247,21 +249,23 @@
     if(!histogram || (numberBinsPerSide*numberBinsPerSide) != num){
         [self setNumberBinsPerSide:(unsigned short)pow((double)num,.5)];
     }
-	[dataSetLock lock];
-    int i;
-    for(i=0;i<num;i++){
-        histogram[i] = ptr[i];
-        if(histogram[i]){
-            unsigned short y = i/numberBinsPerSide;
-            unsigned short x = i%numberBinsPerSide;
-            
-            if(x<minX)minX = x;
-            if(x>maxX)maxX = x;
-            if(y<minY)minY = y;
-            if(y>maxY)maxY = y;
-        }
-    }
-	[dataSetLock unlock];
+	if(histogram){
+		[dataSetLock lock];
+		int i;
+		for(i=0;i<num;i++){
+			histogram[i] = ptr[i];
+			if(histogram[i]){
+				unsigned short y = i/numberBinsPerSide;
+				unsigned short x = i%numberBinsPerSide;
+				
+				if(x<minX)minX = x;
+				if(x>maxX)maxX = x;
+				if(y<minY)minY = y;
+				if(y>maxY)maxY = y;
+			}
+		}
+		[dataSetLock unlock];
+	}
     [self incrementTotalCounts];
 }
 
@@ -276,7 +280,9 @@
     if(aYValue >= numberBinsPerSide) aYValue = numberBinsPerSide-1;
     //aXValue = aXValue % numberBinsPerSide;   // Error Check Our x Value
     //aYValue = aYValue % numberBinsPerSide;   // Error Check Our y Value
-    ++histogram[aXValue+aYValue*numberBinsPerSide];
+	if(histogram){
+		++histogram[aXValue+aYValue*numberBinsPerSide];
+	}
     [self incrementTotalCounts];
     if(aXValue<minX)minX = aXValue;
     if(aXValue>maxX)maxX = aXValue;
@@ -295,7 +301,9 @@
     if(aYValue >= numberBinsPerSide) aYValue = numberBinsPerSide-1;
     //aXValue = aXValue % numberBinsPerSide;   // Error Check Our x Value
     //aYValue = aYValue % numberBinsPerSide;   // Error Check Our y Value
-    histogram[aXValue+aYValue*numberBinsPerSide] = aZValue;
+    if(histogram){
+		histogram[aXValue+aYValue*numberBinsPerSide] = aZValue;
+	}
     [self incrementTotalCounts];
     if(aXValue<minX)minX = aXValue;
     if(aXValue>maxX)maxX = aXValue;

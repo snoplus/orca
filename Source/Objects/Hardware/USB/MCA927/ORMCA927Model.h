@@ -20,7 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "ORUSB.h"
-#import "ORDataTaker.h";
+#import "ORDataTaker.h"
 
 @class ORUSBInterface;
 @class ORAlarm;

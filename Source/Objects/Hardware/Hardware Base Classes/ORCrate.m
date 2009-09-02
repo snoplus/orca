@@ -328,7 +328,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
     
 	[[self undoManager] disableUndoRegistration];
     
-	[self setAdapter:[decoder decodeObjectForKey:[self adapterArchiveKey]]];
+	//[self setAdapter:[decoder decodeObjectForKey:[self adapterArchiveKey]]];
     [self setShowLabels:[decoder decodeBoolForKey:@"showLabels"]];
 	[[self undoManager] enableUndoRegistration];
 	
@@ -340,7 +340,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeObject:adapter forKey:[self adapterArchiveKey]];
+	//[encoder encodeObject:adapter forKey:[self adapterArchiveKey]];
 	[encoder encodeBool:showLabels forKey:@"showLabels"];
 }
 

@@ -20,7 +20,7 @@
 //-------------------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "OrcaObjectController.h";
+#import "OrcaObjectController.h"
 #import "ORGretina4Model.h"
 @class ORValueBar;
 @class ORPlotter1D;

@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
-#import "OrcaObjectController.h";
+#import "OrcaObjectController.h"
 
 @class ORValueBar;
 @class ORPlotter1D;

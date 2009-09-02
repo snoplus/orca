@@ -20,9 +20,9 @@
 //-------------------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORVmeIOCard.h";
-#import "ORDataTaker.h";
-#import "ORHWWizard.h";
+#import "ORVmeIOCard.h"
+#import "ORDataTaker.h"
+#import "ORHWWizard.h"
 #import "SBC_Config.h"
 #import "AutoTesting.h"
 

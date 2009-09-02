@@ -264,13 +264,15 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
         [self setNumberBins:4096];
     }
 	[dataSetLock lock];
-    if(aValue>=numberBins){
-        ++overFlow;
-        ++histogram[numberBins-1];
-    }
-    else {
-        ++histogram[aValue];
-    }
+	if(histogram){
+		if(aValue>=numberBins){
+			++overFlow;
+			++histogram[numberBins-1];
+		}
+		else {
+			++histogram[aValue];
+		}
+	}
 	[dataSetLock unlock];
 	[self incrementTotalCounts];
 
@@ -283,13 +285,15 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
         [self setNumberBins:4096];
     }
 	[dataSetLock lock];
-    if(aValue>=numberBins){
-        overFlow += aWeight;
-        histogram[numberBins-1] += aWeight;
-    }
-    else {
-        histogram[aValue] += aWeight;
-    }
+	if(histogram){
+		if(aValue>=numberBins){
+			overFlow += aWeight;
+			histogram[numberBins-1] += aWeight;
+		}
+		else {
+			histogram[aValue] += aWeight;
+		}
+	}
 	[dataSetLock unlock];
 	[self incrementTotalCounts];
 
@@ -305,7 +309,9 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
     
 	unsigned long* lPtr = (unsigned long*)[someData bytes];
 	int i;
-	for(i=0;i<[someData length]/4;i++)histogram[i] = *lPtr++;
+	if(histogram){
+		for(i=0;i<[someData length]/4;i++)histogram[i] = *lPtr++;
+	}
 	[dataSetLock unlock];
 	[self incrementTotalCounts];	
 }
@@ -317,9 +323,11 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
     }
 	[dataSetLock lock];
     int i;
-    for(i=0;i<numBins;i++){
-        histogram[i] += ptr[i];
-    }
+	if(histogram){
+		for(i=0;i<numBins;i++){
+			histogram[i] += ptr[i];
+		}
+	}
 	[dataSetLock unlock];
     [self incrementTotalCounts];
 }
@@ -335,15 +343,17 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
         [self setNumberBins:maxBins];
     }
 	[dataSetLock lock];
-    int i,index;
-    for( (index=firstBin,i=0); i<numBins; (index+=stepSize,i++) ){
-        if(index>=numberBins){
-            overFlow += ptr[i];
-            histogram[numberBins-1] += ptr[i];
-        }else{
-            histogram[index] += ptr[i];
-        }
-    }
+	if(histogram){
+		int i,index;
+		for( (index=firstBin,i=0); i<numBins; (index+=stepSize,i++) ){
+			if(index>=numberBins){
+				overFlow += ptr[i];
+				histogram[numberBins-1] += ptr[i];
+			}else{
+				histogram[index] += ptr[i];
+			}
+		}
+	}
 	[dataSetLock unlock];
     [self setTotalCounts: totalCounts+counts];
 }

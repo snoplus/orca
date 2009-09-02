@@ -23,7 +23,7 @@
 #import "ORDataTaker.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
-#import "ORRunScriptModel.h";
+#import "ORRunScriptModel.h"
 
 #pragma mark ¥¥¥Definitions
 

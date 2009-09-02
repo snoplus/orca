@@ -33,7 +33,7 @@
 //-------------------------------------------------------------
 #pragma mark ¥¥¥Imported Files
 
-#import "OROscBaseController.h";
+#import "OROscBaseController.h"
 #import <Cocoa/Cocoa.h>
 
 @interface ORHP4405AController : OROscBaseController {    

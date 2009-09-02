@@ -679,7 +679,7 @@
 			if( ![vScanner scanString:startCh intoString:nil] )break;
 			
 			// Look for associated line break:
-			if( ![vScanner skipUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString: @"\n\r"]] );
+			[vScanner skipUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString: @"\n\r"]];
 			
 			vEndOffs = [vScanner scanLocation];
 			

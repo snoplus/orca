@@ -32,7 +32,7 @@
 //-------------------------------------------------------------
 #pragma mark ¥¥¥Imported Files
 
-#import "OROscBaseController.h";
+#import "OROscBaseController.h"
 
 @interface ORTek754DController : OROscBaseController {    
 }

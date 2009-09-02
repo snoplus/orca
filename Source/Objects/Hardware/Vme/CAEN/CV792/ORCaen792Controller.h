@@ -23,7 +23,7 @@
 //-------------------------------------------------------------
 #pragma mark ¥¥¥Imported Files
 
-#import "ORCaenCardController.h";
+#import "ORCaenCardController.h"
 
 // Definition of class.
 @interface ORCaen792Controller : ORCaenCardController {
