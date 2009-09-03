@@ -36,7 +36,7 @@ return self; \
 return self; \
 } \
 \
-- (unsigned)retainCount \
+- (NSUInteger)retainCount \
 { \
 return 0xffffffff; \
 } \
@@ -87,7 +87,7 @@ return self; \
 return self; \
 } \
 \
-- (unsigned)retainCount \
+- (NSUInteger)retainCount \
 { \
 return 0xffffffff; \
 } \

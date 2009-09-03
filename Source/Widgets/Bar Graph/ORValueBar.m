@@ -102,7 +102,7 @@
 	[barColor release];
 	barColor = aColor;
 	
-	float red,green,blue,alpha;
+	CGFloat red,green,blue,alpha;
 	[barColor getRed:&red green:&green blue:&blue alpha:&alpha];
 	
 	red *= .5;

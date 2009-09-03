@@ -107,7 +107,7 @@
 													[[channelForm cellWithTag:1] objectValue],
 													[[valueForm   cellWithTag:0] objectValue],
 													[[valueForm   cellWithTag:1] objectValue],nil];
-	id cal		= [[ORCalibration alloc] initCalibrationArray:calArray];
+	ORCalibration* cal		= [[ORCalibration alloc] initCalibrationArray:calArray];
 	[cal setUnits:[unitsField stringValue]];
 	[cal setCalibrationName:[nameField stringValue]];
 	[cal setType:![customButton intValue]];

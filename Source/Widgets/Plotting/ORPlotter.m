@@ -165,7 +165,7 @@ NSString* ORPlotterDataColor		= @"ORPlotterDataColor";
 
 	if([self useGradient]){
 		if(!gradient){
-			float red,green,blue,alpha;
+			CGFloat red,green,blue,alpha;
 			NSColor* color = [self backgroundColor];
 			color = [color colorUsingColorSpaceName:NSDeviceRGBColorSpace];
 			[color getRed:&red green:&green blue:&blue alpha:&alpha];

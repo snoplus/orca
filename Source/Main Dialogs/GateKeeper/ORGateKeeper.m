@@ -332,7 +332,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(GateKeeper);
 #pragma mark ***Actions
 - (IBAction) addGateAction:(id)sender
 {
-    [gateGroup newDataGate];
+	
+    [[self gateGroup] newDataGate];
     int lastIndex = [gateListView numberOfRows]-1;
     [gateListView selectRowIndexes:[NSIndexSet indexSetWithIndex:lastIndex] byExtendingSelection:NO];
     
