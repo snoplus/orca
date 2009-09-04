@@ -24,7 +24,9 @@
 #import "SynthesizeSingleton.h"
 #import "ORVmeTests.h"
 
-NSString*  AutoTesterLock = @"AutoTesterLock";
+NSString*  AutoTesterLock						= @"AutoTesterLock";
+NSString*  ORAutoTesterRepeatNotification		= @"ORAutoTesterRepeatNotification";
+NSString*  ORAutoTesterRepeatCountNotification	= @"ORAutoTesterRepeatCountNotification";
 
 @interface ORAutoTester (private)
 - (void) runTestThread:(NSArray*)objectsToTest;
@@ -37,22 +39,56 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AutoTester);
 - (id)init
 {
     self = [super initWithWindowNibName:@"AutoTester"];
+	resultLock = [[NSLock alloc] init];
     return self;
+}
+
+- (void) dealloc
+{
+	//we are a singleton, so we should never get here. But this prevents some warnings in
+	//the 10.6 static analysis builds
+	[testResults release];
+	[resultLock release];
+	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
     [self registerNotificationObservers];
 	[totalListView reloadData];
-	[runTestsButton setEnabled: NO];
- 	[stopTestsButton setEnabled:NO];
 	[totalListView setAction:@selector(tableClick:)];
+	[self repeatChanged:nil];
+	[self repeatCountChanged:nil];
 	[self securityStateChanged:nil];
+	[self runStatusChanged:nil];
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
     return [[NSApp delegate]  undoManager];
+}
+
+- (BOOL) repeat
+{
+	return repeat;
+}
+
+- (void) setRepeat:	(BOOL)aValue
+{
+    repeat = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAutoTesterRepeatNotification object:self];
+}
+
+- (int) repeatCount
+{
+	if(repeatCount == 0)repeatCount = 1;
+	return repeatCount;
+}
+
+- (void) setRepeatCount:(int)aValue
+{
+    repeatCount = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAutoTesterRepeatCountNotification object:self];
 }
 
 #pragma mark •••Notifications
@@ -85,13 +121,34 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AutoTester);
                          name : ORGlobalSecurityStateChanged
                         object: nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatChanged:)
+                         name : ORAutoTesterRepeatNotification
+                        object: nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatCountChanged:)
+                         name : ORAutoTesterRepeatCountNotification
+                        object: nil];
+	
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
+- (void) repeatChanged:(NSNotification*)aNote
+{
+	[repeatCB setIntValue:[self repeat]];
+	[repeatCountField setEnabled:repeat?YES:NO];
+}
+
+- (void) repeatCountChanged:(NSNotification*)aNote
+{
+	[repeatCountField setIntValue:[self repeatCount]];
+}
+
 - (void) runStatusChanged:(NSNotification*)aNote
 {
-	[runTestsButton setEnabled:![gOrcaGlobals runInProgress]];
+	[runTestsButton setEnabled:![gOrcaGlobals runInProgress] && [[totalListView allSelectedItems] count]!=0];
 }
 
 - (void) objectsChanged:(NSNotification*)aNote
@@ -119,6 +176,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AutoTester);
 - (IBAction) runTest:(id)sender
 {
 	if(!testsRunning){
+		if(![[self window] makeFirstResponder:[self window]]){
+			[[self window] endEditingFor:nil];		
+		}
+		[testResults removeAllObjects];
+		id objectsToTest = [totalListView allSelectedItems];
+		for(id obj in objectsToTest){
+			[self setTestResult:@"Waiting" forObject:obj];
+		}
 		[NSThread detachNewThreadSelector:@selector(runTestThread:) toTarget:self withObject:[totalListView allSelectedItems]];
 	}
 }
@@ -135,10 +200,26 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AutoTester);
 	stopTesting  = YES;
 }
 
+- (BOOL) stopTests
+{
+	return stopTesting;
+}
+
 - (IBAction) lockAction:(id)sender
 {
     [gSecurity tryToSetLock:AutoTesterLock to:[sender intValue] forWindow:[self window]];
 }
+
+- (IBAction) repeatAction:(id)sender
+{
+	[self setRepeat:[sender intValue]];
+}
+
+- (IBAction) repeatCountAction:(id)sender
+{
+	[self setRepeatCount:[sender intValue]];
+}
+
 
 #pragma mark •••Delegate Methods
 - (BOOL)outlineView:(NSOutlineView *)ov shouldSelectItem:(id)item
@@ -180,7 +261,42 @@ else children = nil;\
 		if([item conformsToProtocol:@protocol(AutoTesting)])return @"YES";
 		else return @"NO";
 	}
+	else if([[tableColumn identifier] isEqualToString:@"results"]){
+		if([item conformsToProtocol:@protocol(AutoTesting)])return [self testResultForObject:item];
+		else return @" ";
+	}
 	else return [item valueForKey:[tableColumn identifier]];
+}
+
+- (void) setTestResult:(id)aResult forObject:(id)anObj
+{
+	[resultLock lock];
+	@try {
+		if(!testResults)testResults = [[NSMutableDictionary alloc] init];
+		[testResults setObject:aResult forKey:[anObj fullID]];
+	}
+	@catch(NSException* e){
+	}
+	@finally {
+		[resultLock unlock];
+	}
+	[totalListView reloadData];
+}
+
+- (id) testResultForObject:(id)anObj
+{
+	id theResult;
+	@try {
+		[resultLock lock];
+		theResult = [testResults objectForKey:[anObj fullID]];
+	}
+	@catch(NSException* e)
+	{
+	}
+	@finally {
+		[resultLock unlock];
+	}
+	return theResult;
 }
 @end
 
@@ -188,36 +304,48 @@ else children = nil;\
 - (void) runTestThread:(NSArray*)objectsToTest
 {
 	NSAutoreleasePool* outerPool = [[NSAutoreleasePool alloc] init];
-	
+		
 	[[objectsToTest retain] autorelease];
 	
 	stopTesting  = NO;
 	[self performSelectorOnMainThread:@selector(testIsRunning) withObject:nil waitUntilDone:YES];
-	
-	NSEnumerator* objectEnummy = [objectsToTest objectEnumerator];
-	id obj;
-	while(obj = [objectEnummy nextObject]){
-		NSAutoreleasePool* innerPool = [[NSAutoreleasePool alloc] init];
-		//loop over all objects
-		NSArray* theTests = [obj autoTests];
-		NSEnumerator* testEnummy = [theTests objectEnumerator];
-		id aTest;
-		int failCount=0;
-		while(aTest = [testEnummy nextObject]){
-			if(stopTesting)break;
-			[aTest runTest:obj];
-			NSArray* failureLog = [aTest failureLog];
-			if(failureLog){
-				NSLog(@"%@:  %@ %@\n",[obj fullID], [aTest name],failureLog);
-				failCount++;
+	int i;
+	int numberTimesToRepeat;
+	if(repeat)numberTimesToRepeat = repeatCount;
+	else numberTimesToRepeat = 1;
+	int failCount=0;
+	for(id obj in objectsToTest){
+		[self setTestResult:@"Running" forObject:obj];
+		for(i=0;i<numberTimesToRepeat;i++){
+			NSAutoreleasePool* innerPool = [[NSAutoreleasePool alloc] init];
+			NSArray* theTests = [obj autoTests];
+			for(id aTest in theTests){
+				if(stopTesting)break;
+				[aTest runTest:obj];
+				NSArray* failureLog = [aTest failureLog];
+				if(failureLog){
+					NSLog(@"%@:  %@ %@\n",[obj fullID], [aTest name],failureLog);
+					failCount++;
+				}
 			}
+			[innerPool release];
+			if(stopTesting)break;
 		}
-		if(failCount==0)NSLog(@"%@: PASSED ALL\n",[obj fullID]);
-
-		[innerPool release];
-		if(stopTesting) break;
-	}
 	
+		if(stopTesting){
+			[self setTestResult:@"Stopped" forObject:obj];
+			NSLog(@"Testing stopped manually\n");
+		}
+		else if(failCount==0){
+			NSLog(@"%@: PASSED ALL\n",[obj fullID]);
+			[self setTestResult:@"PASSED" forObject:obj];
+		}
+		else {
+			[self setTestResult:@"FAILED" forObject:obj];
+		}
+		if(stopTesting) break;
+		
+	}
 	[self performSelectorOnMainThread:@selector(testIsStopped) withObject:nil waitUntilDone:NO];
 	[outerPool release];
 }
@@ -228,6 +356,8 @@ else children = nil;\
 	[gOrcaGlobals setTestInProgress:YES];
 	[runTestsButton setEnabled:NO];
 	[stopTestsButton setEnabled:YES];
+	[repeatCB setEnabled:NO];
+	[repeatCountField setEnabled:NO];
 }
 
 - (void) testIsStopped
@@ -236,7 +366,8 @@ else children = nil;\
 	[stopTestsButton setEnabled:NO];
 	[gOrcaGlobals removeRunVeto:@"AutoTestinger"];
 	[gOrcaGlobals setTestInProgress:NO];
-	
+	[repeatCB setEnabled:YES];
+	[repeatCountField setEnabled:repeat?YES:NO];
 }
 @end
 

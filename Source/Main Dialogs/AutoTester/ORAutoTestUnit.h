@@ -20,6 +20,7 @@
 
 
 @interface ORAutoTestUnit : NSObject {
+	
 	NSString* name;
 	NSMutableArray* failureLog;
 }
@@ -30,5 +31,6 @@
 
 - (NSArray*) failureLog;
 - (void) addFailureLog:(NSString*)aEntry;
+- (void) runTest:(id)anObj;
 
 @end

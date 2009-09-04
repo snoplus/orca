@@ -33,6 +33,10 @@
 {
 	return [[[ORVmeReadWriteTest alloc] initWith:anOffset length:aLength wordSize:aWordSize validMask:aValidMask name:aName] autorelease];
 }
++ (id) test:(unsigned long) anOffset wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName
+{
+	return [[[ORVmeReadWriteTest alloc] initWith:anOffset length:1 wordSize:aWordSize validMask:aValidMask name:aName] autorelease];
+}
 
 - (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName
 {
@@ -52,49 +56,100 @@
 
 - (void) runTest:(id)anObj
 {
-	unsigned long patterns[4]={
+#define kNumPatterns 4
+	unsigned long patterns[kNumPatterns]={
 		0x55555555,
 		0xAAAAAAAA,
 		0x00000000,
-		0xFFFFFFFF
+		0xFFFFFFFF,
 	};
+	int errorCount = 0;
 	@try {
 		int i;
 		unsigned long  theAddress  = [anObj baseAddress] + theOffset;
 		unsigned short theModifier = [anObj addressModifier];
 		id theController = [anObj adapter];
 		
-		for(i=0;i<4;i++){
-			unsigned long theWriteValue = patterns[i] & validMask;
-			unsigned long theReadValue = 0;
+		NSMutableData* readData  = [NSMutableData dataWithLength:length*wordSize];
+		NSMutableData* writeData = [NSMutableData dataWithLength:length*wordSize];
+		for(i=0;i<kNumPatterns;i++){
+			//load up the write values -- we use the same write value for all write addresses
+			int index;
+			for(index=0;index<length;index++){
+				if(wordSize == sizeof(long)){
+					unsigned long* longPtr = (unsigned long*)[writeData bytes];
+					longPtr[index] = patterns[i] & validMask;
+				}
+				else if(wordSize == sizeof(short)){
+					unsigned short* shortPtr = (unsigned short*)[writeData bytes];
+					shortPtr[index] = patterns[i] & validMask;
+				}
+				else {
+					unsigned char* charPtr = (unsigned char*)[writeData bytes];
+					charPtr[index] = patterns[i] & validMask;
+				}
+			}
+			
+			if([[ORAutoTester sharedAutoTester] stopTests])break;
 			if(wordSize == sizeof(long)){
-				if(type == kReadWrite || type == kWriteOnly) [theController writeLongBlock:&theWriteValue atAddress:theAddress numToWrite:1 withAddMod:theModifier usingAddSpace:0x01];
-				if(type == kReadWrite || type == kReadOnly)  [theController readLongBlock: &theReadValue  atAddress:theAddress numToRead:1  withAddMod:theModifier usingAddSpace:0x01];
+				unsigned long* longWritePtr = (unsigned long*)[writeData bytes];
+				unsigned long* longReadPtr  = (unsigned long*)[readData bytes];
+				if(type == kReadWrite || type == kWriteOnly) [theController writeLongBlock:longWritePtr atAddress:theAddress numToWrite:length withAddMod:theModifier usingAddSpace:0x01];
+				if(type == kReadWrite || type == kReadOnly)  [theController readLongBlock:longReadPtr   atAddress:theAddress numToRead:length  withAddMod:theModifier usingAddSpace:0x01];
 			}
 			else if(wordSize == sizeof(short)){
-				unsigned short shortWriteValue = (unsigned short)theWriteValue;
-				unsigned short shortReadValue = 0;
-				if(type == kReadWrite || type == kWriteOnly)[theController writeWordBlock:&shortWriteValue atAddress:theAddress numToWrite:1 withAddMod:theModifier usingAddSpace:0x01];
-				if(type == kReadWrite || type == kReadOnly)[theController readWordBlock: &shortReadValue  atAddress:theAddress numToRead:1  withAddMod:theModifier usingAddSpace:0x01];
-				theReadValue = shortReadValue;
+				unsigned short* shortWritePtr = (unsigned short*)[writeData bytes];
+				unsigned short* shortReadPtr  = (unsigned short*)[readData bytes];
+				if(type == kReadWrite || type == kWriteOnly)[theController writeWordBlock:shortWritePtr atAddress:theAddress numToWrite:length withAddMod:theModifier usingAddSpace:0x01];
+				if(type == kReadWrite || type == kReadOnly) [theController readWordBlock:shortReadPtr   atAddress:theAddress numToRead:length  withAddMod:theModifier usingAddSpace:0x01];
 			}
 			else if(wordSize == sizeof(char)){
-				unsigned char charWriteValue = (unsigned char)theWriteValue;
-				unsigned char charReadValue = 0;
-				if(type == kReadWrite || type == kWriteOnly)[theController writeByteBlock:&charWriteValue atAddress:theAddress numToWrite:1 withAddMod:theModifier usingAddSpace:0x01];
-				if(type == kReadWrite || type == kReadOnly)[theController readByteBlock: &charReadValue  atAddress:theAddress numToRead:1  withAddMod:theModifier usingAddSpace:0x01];
-				theReadValue = charReadValue;
-			}			
-			if(type == kReadWrite) {				
-				theReadValue &=  validMask;
-			
-				if(theWriteValue != theReadValue) {
-					[self addFailureLog:[NSString stringWithFormat:@"R/W Error: 0x%08x: 0x%0x != 0x%0x\n",[anObj baseAddress] + theOffset,theWriteValue,theReadValue]];
+				unsigned char* charWritePtr = (unsigned char*)[writeData bytes];
+				unsigned char* charReadPtr  = (unsigned char*)[readData bytes];
+				if(type == kReadWrite || type == kWriteOnly)[theController writeByteBlock:charWritePtr atAddress:theAddress numToWrite:length withAddMod:theModifier usingAddSpace:0x01];
+				if(type == kReadWrite || type == kReadOnly) [theController readByteBlock:charReadPtr   atAddress:theAddress numToRead:length  withAddMod:theModifier usingAddSpace:0x01];
+			}
+		
+			if(type == kReadWrite) {
+				int i;
+				for(i=0;i<length;i++){
+					unsigned long theReadValue  = 0;
+					unsigned long theWriteValue = 0;
+					if(wordSize == sizeof(long)){
+						unsigned long* longReadPtr = (unsigned long*)[readData bytes];
+						unsigned long* longWritePtr = (unsigned long*)[writeData bytes];
+						theReadValue = longReadPtr[i];
+						theWriteValue = longWritePtr[i];
+					}
+					else if(wordSize == sizeof(short)){
+						unsigned short* shortReadPtr  = (unsigned short*)[readData bytes];
+						unsigned short* shortWritePtr = (unsigned short*)[writeData bytes];
+						theReadValue = shortReadPtr[i];
+						theWriteValue = shortWritePtr[i];
+					}
+					else {
+						unsigned char* charReadPtr = (unsigned char*)[readData bytes];
+						unsigned char* charWritePtr = (unsigned char*)[writeData bytes];
+						theReadValue = charReadPtr[i];
+						theWriteValue = charWritePtr[i];
+					}
+					if((theWriteValue&validMask) != (theReadValue&validMask)) {
+						errorCount++;
+						if(errorCount<4){
+							[self addFailureLog:[NSString stringWithFormat:@"R/W Error: 0x%08x: 0x%0x != 0x%0x (Mask = 0x%08x)",[anObj baseAddress] + theOffset,theWriteValue&validMask,theReadValue&validMask,validMask]];
+						}
+					}
 				}
 			}
 		}
+		
+		if(errorCount>4){
+			[self addFailureLog:[NSString stringWithFormat:@"Errors Reports skipped. Total Errors: %d",errorCount]];
+		}
+		
 	}
 	@catch(NSException* e){
+		errorCount++;
 		[self addFailureLog:[NSString stringWithFormat:@"Exception: 0x%08x\n",[anObj baseAddress] + theOffset]];
 	}
 }
@@ -104,6 +159,11 @@
 + (id) test:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName
 {
 	return [[[ORVmeReadOnlyTest alloc] initWith:anOffset length:aLength wordSize:aWordSize name:aName] autorelease];
+}
+
++ (id) test:(unsigned long) anOffset wordSize:(short)aWordSize name:(NSString*)aName
+{
+	return [[[ORVmeReadOnlyTest alloc] initWith:anOffset length:1 wordSize:aWordSize name:aName] autorelease];
 }
 - (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName
 {
@@ -115,9 +175,13 @@
 @end
 
 @implementation ORVmeWriteOnlyTest
-- (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName
++ (id) test:(unsigned long) anOffset  wordSize:(short)aWordSize name:(NSString*)aName
 {
-	self = [super initWith:anOffset length:aLength wordSize:aWordSize validMask:aValidMask name:aName];
+	return [[[ORVmeWriteOnlyTest alloc] initWith:anOffset length:1 wordSize:aWordSize name:aName] autorelease];
+}
+- (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize  name:(NSString*)aName
+{
+	self = [super initWith:anOffset length:aLength wordSize:aWordSize validMask:0xFFFFFFFF name:aName];
 	type = kWriteOnly;
 	return self;
 }

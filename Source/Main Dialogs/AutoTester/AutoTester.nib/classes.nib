@@ -41,6 +41,10 @@
 			<dict>
 				<key>lockAction</key>
 				<string>id</string>
+				<key>repeatAction</key>
+				<string>id</string>
+				<key>repeatCountAction</key>
+				<string>id</string>
 				<key>runTest</key>
 				<string>id</string>
 				<key>stopTests</key>
@@ -56,6 +60,10 @@
 			<dict>
 				<key>lockButton</key>
 				<string>NSButton</string>
+				<key>repeatCB</key>
+				<string>NSButton</string>
+				<key>repeatCountField</key>
+				<string>NSTextField</string>
 				<key>runTestsButton</key>
 				<string>NSButton</string>
 				<key>stopTestsButton</key>

@@ -24,13 +24,14 @@
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 #import "SBC_Config.h"
+#import "AutoTesting.h"
 
 @class ORRateGroup;
 @class ORAlarm;
 
 #define kNumSIS3300Channels			8 
 
-@interface ORSIS3300Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface ORSIS3300Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
     int				pageSize;
@@ -243,6 +244,9 @@
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+
+#pragma mark •••AutoTesting
+- (NSArray*) autoTests; 
 @end
 
 //CSR

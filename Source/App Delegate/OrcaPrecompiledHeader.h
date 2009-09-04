@@ -41,6 +41,7 @@
 #import "ORDefaults.h"
 #import "ORTimer.h"
 #import "ORConnector.h"
+#import "ORAutoTester.h"
 
 #import <unistd.h>
 #import <sys/stat.h>

@@ -23,8 +23,15 @@
 	IBOutlet NSButton*	    runTestsButton;
 	IBOutlet NSButton*	    stopTestsButton;
     IBOutlet NSButton*      lockButton;
+    IBOutlet NSButton*      repeatCB;
+    IBOutlet NSTextField*   repeatCountField;
 	BOOL testsRunning;
 	BOOL stopTesting;
+	int repeatCount;
+	BOOL repeat;
+	NSMutableDictionary*	testResults;
+	NSLock*		resultLock;
+	
 }
 
 + (ORAutoTester*) sharedAutoTester;
@@ -32,6 +39,8 @@
 - (id)init;
 - (void) awakeFromNib;
 - (NSUndoManager*) windowWillReturnUndoManager:(NSWindow*)window;
+- (void) setTestResult:(id)aResult forObject:(id)anObj;
+- (id) testResultForObject:(id)anObj;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -39,12 +48,21 @@
 - (void) runStatusChanged:(NSNotification*)aNote;
 - (void) securityStateChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
+- (BOOL) stopTests;
+- (BOOL) repeat;
+- (void) setRepeat:	(BOOL)aValue;
+- (int) repeatCount;
+- (void) setRepeatCount:(int)aValue;
+- (void) repeatChanged:(NSNotification*)aNote;
+- (void) repeatCountChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) runTest:(id)sender;
 - (IBAction) tableClick:(id)sender;
 - (IBAction) stopTests:(id)sender;
 - (IBAction) lockAction:(id)sender;
+- (IBAction) repeatCountAction:(id)sender;
+- (IBAction) repeatAction:(id)sender;
 
 #pragma mark •••Delegate Methods
 - (BOOL)outlineView:(NSOutlineView *)ov shouldSelectItem:(id)item;
@@ -57,4 +75,6 @@
 
 @end
 extern NSString*  AutoTesterLock;
+extern NSString*  ORAutoTesterRepeatNotification;
+extern NSString*  ORAutoTesterRepeatCountNotification;
 

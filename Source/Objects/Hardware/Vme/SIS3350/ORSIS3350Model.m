@@ -196,8 +196,7 @@ unsigned long rblt_data[kMaxNumberWords];
 
 - (NSString*) helpURL
 {
-	//return @"VME/SIS330x.html";
-	return nil;
+	return @"VME/SIS3350.html";
 }
 
 - (NSRange)	memoryFootprint
@@ -1570,17 +1569,40 @@ unsigned long rblt_data[kMaxNumberWords];
 - (NSArray*) autoTests 
 {
 	NSMutableArray* myTests = [NSMutableArray array];
-	[myTests addObject:[ORVmeReadOnlyTest test:kControlStatus length:1 wordSize:4 name:@"Control Status"]];
-	[myTests addObject:[ORVmeReadOnlyTest test:kModuleIDReg length:1 wordSize:4 name:@"Module ID"]];
-	[myTests addObject:[ORVmeReadOnlyTest test:kAcquisitionControlReg length:1 wordSize:4 name:@"Acquisition Control"]];
-	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[0] length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC1/2 address threshold"]];
-	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[1] length:1 wordSize:4 validMask:0x00FFFFFC name:@"ADC3/4 address threshold"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kControlStatus wordSize:4 name:@"Control Status"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kModuleIDReg wordSize:4 name:@"Module ID"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kDirectMemTriggerDelayReg wordSize:4 validMask:0x07fffffe name:@"Dir Memory Trig Delay"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kFrequencySynthReg wordSize:4 validMask:0x000007ff name:@"Freq Synth"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kMaxNumEventsReg wordSize:4 validMask:0x000fffff name:@"Max Events"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kEventCounterReg wordSize:4 name:@"Event Counter"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kGateSyncLimitLengthReg wordSize:4 validMask:0x03fffff8 name:@"Gate Sync Limit Len"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kGateSyncExtendLengthReg wordSize:4 validMask:0x000000f8 name:@"Gate Sync Len Extend"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kAdcMemoryPageRegister wordSize:4 validMask:0x0000000f name:@"Page Reg"]];
 
-	
-	
+	[myTests addObject:[ORVmeReadOnlyTest test:kTemperatureRegister wordSize:4 name:@"temperature"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kAcquisitionControlReg wordSize:4 name:@"Acquisition Control"]];
+	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[0] wordSize:4 validMask:0x00FFFFFC name:@"ADC1/2 address threshold"]];
+	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[1] wordSize:4 validMask:0x00FFFFFC name:@"ADC3/4 address threshold"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kTimeStampClearRegister wordSize:4 name:@"Clear TimeStamp"]];
+	int i;
+	for(i=0;i<4;i++){
+		[myTests addObject:[ORVmeReadWriteTest test:thresholdRegOffsets[i] wordSize:4 validMask:0xfff name:@"Thresholds"]];
+		[myTests addObject:[ORVmeReadWriteTest test:adcGainOffsets[i] wordSize:4 validMask:0x0000007f name:@"AdcGain"]];
+		[myTests addObject:[ORVmeReadWriteTest test:triggerPulseRegOffsets[i] wordSize:4 validMask:0x0fff1f1f name:@"Trigger Setup"]];
+		[myTests addObject:[ORVmeReadOnlyTest test:actualSampleAddressOffsets[i] wordSize:4 name:@"Adc sample"]];
+		[myTests addObject:[ORVmeReadOnlyTest test:adcOffsets[i] length:64*1024 wordSize:4 name:@"Adc Memory"]]; //limit to 64K
+	}
 	return myTests;
 }
 
+
+
+#define kTimeStampClearRegister				0x041C	 /*write only*/
+
+#define kMemoryWrapLengthRegAll				0x01000004
+#define kSampleStartAddressAll				0x01000008
+#define kRingbufferLengthRegisterAll		0x01000020
+#define kRingbufferPreDelayRegisterAll		0x01000024
 @end
 
 @implementation ORSIS3350Model (private)

@@ -33,6 +33,11 @@
 	return name;
 }
 
+- (void) runTest:(id)anObj
+{
+	
+}
+
 - (void) addFailureLog:(NSString*)aEntry
 {
 	if(!failureLog)failureLog = [[NSMutableArray array] retain];

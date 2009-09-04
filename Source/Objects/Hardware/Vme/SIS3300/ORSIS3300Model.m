@@ -26,6 +26,7 @@
 #import "ORRateGroup.h"
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
+#import "ORVmeTests.h"
 
 NSString* ORSIS3300ModelCSRRegChanged			= @"ORSIS3300ModelCSRRegChanged";
 NSString* ORSIS3300ModelAcqRegChanged			= @"ORSIS3300ModelAcqRegChanged";
@@ -129,6 +130,7 @@ static unsigned long thresholdRegOffsets[4]={
 	0x00300004,
 	0x00380004
 };
+
 
 static unsigned long bankMemory[4][2]={
 {0x00400000,0x00600000},
@@ -1646,4 +1648,30 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     return objDictionary;
 }
 
+- (NSArray*) autoTests 
+{
+	NSMutableArray* myTests = [NSMutableArray array];
+	[myTests addObject:[ORVmeReadOnlyTest test:kControlStatus wordSize:4 name:@"Control Status"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kModuleIDReg wordSize:4 name:@"Module ID"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kAcquisitionControlReg wordSize:4 name:@"Acquistion Reg"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kStartDelay wordSize:4 validMask:0x000000ff name:@"Start Delay"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kStopDelay wordSize:4 validMask:0x000000ff name:@"Stop Delay"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kGeneralReset wordSize:4 name:@"Reset"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kStartSampling wordSize:4 name:@"Start Sampling"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kStopSampling wordSize:4 name:@"Stop Sampling"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kStartAutoBankSwitch wordSize:4 name:@"Stop Auto Bank Switch"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kStopAutoBankSwitch wordSize:4 name:@"Start Auto Bank Switch"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank1FullFlag wordSize:4 name:@"Clear Bank1 Full"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank2FullFlag wordSize:4 name:@"Clear Bank2 Full"]];
+	
+	int i;
+	for(i=0;i<4;i++){
+		[myTests addObject:[ORVmeReadWriteTest test:thresholdRegOffsets[i] wordSize:4 validMask:0xffffffff name:@"Threshold"]];
+		int j;
+		for(j=0;j<2;j++){
+			[myTests addObject:[ORVmeReadOnlyTest test:bankMemory[i][j] length:64*1024 wordSize:4 name:@"Adc Memory"]];
+		}
+	}
+	return myTests;
+}
 @end

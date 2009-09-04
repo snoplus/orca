@@ -27,6 +27,7 @@
 	short wordSize;
 }
 + (id) test:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName;
++ (id) test:(unsigned long) anOffset  wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName;
 - (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize validMask:(unsigned long)aValidMask name:(NSString*)aName;
 - (void) runTest:(id)anObj;
 @end
@@ -34,9 +35,12 @@
 @interface ORVmeReadOnlyTest : ORVmeReadWriteTest {
 }
 + (id) test:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName;
++ (id) test:(unsigned long) anOffset wordSize:(short)aWordSize name:(NSString*)aName;
 - (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName;
 @end
 
 @interface ORVmeWriteOnlyTest : ORVmeReadWriteTest {
 }
++ (id) test:(unsigned long) anOffset  wordSize:(short)aWordSize name:(NSString*)aName;
+- (id) initWith:(unsigned long) anOffset length:(unsigned long)aLength wordSize:(short)aWordSize name:(NSString*)aName;
 @end
