@@ -256,10 +256,7 @@ const float kGateAlpha2 = .1;
 
 - (void) analyzePlot:(ORPlotter1D*)aPlot
 {
-    
-    float		val, sumVal, sumValX;
-    float		minVal, maxVal;
-    
+        
     if([self gateValid] /*&& analyze*/){
         
         id mDataSource = [aPlot dataSource];
@@ -270,12 +267,14 @@ const float kGateAlpha2 = .1;
         [self setGateMinChannel:MIN(gate1,gate2)];
         [self setGateMaxChannel:MAX(gate1,gate2)];
         
-        sumVal = sumValX  = 0.0;
-        minVal = 3.402e+38;
-		maxVal = -3.402e+38;
-        
+        double sumY = 0.0;
+		double sumYSquared  = 0.0;
+		double sumValX = 0;
+		int maxX = 0;
+		float minY = 3.402e+38;
+		float maxY = -3.402e+38;
         int	x;
-        int maxValX = 0;
+		float y;
 		int xStart = [self gateMinChannel];
 		int xEnd = [self gateMaxChannel];
 		
@@ -286,9 +285,18 @@ const float kGateAlpha2 = .1;
 			int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSet];
 			for (index=0; index<numPoints; ++index) {
 				float x;
-				if([mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val]){
+				if([mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&y]){
 					if(x>=xStart && x<=xEnd){
-						sumVal += val;
+						sumY += y;
+						sumYSquared += y*y;
+						sumValX += y * x;
+					
+						if (y < minY) minY = y;
+						if (y > maxY) {
+							maxY = y;
+							maxX = x;
+						}
+						
 					}
 				}
 			}
@@ -296,68 +304,38 @@ const float kGateAlpha2 = .1;
 		else {
 			x=xStart;
 			do {
-				val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
-				sumVal += val;
+				y = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
+				sumY += y;
+				sumYSquared += y*y;
+				sumValX += y * x;
+		
+				if (y < minY) minY = y;
+				if (y > maxY) {
+					maxY = y;
+					maxX = x;
+				}
+				
 				++x;
 			} while(x<=xEnd);
 		}
 		
-		double aveVal = 0;
-		if(totalNum>0) {
-			aveVal = sumVal/(double)totalNum;
-			
-			float sum_x_minus_xBar_squared = 0;
-			if([mDataSource useXYPlot]){
-				int index;
-				int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSet];
-				int n=0;
-				for (index=0; index<numPoints; ++index) {
-					float x;
-					if([mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val]){
-						if(x>=xStart && x<=xEnd){
-							n++;
-							sumValX += val * x;
-							if (val < minVal) minVal = val;
-							if (val > maxVal) {
-								maxVal = val;
-								maxValX = x;
-							}
-						}
-					}
-				}
-				if(n)[self setAverage: sumVal / (float)n];
-				else [self setAverage: 0];
-			}
-			else {
-				x = xStart;
-				do {
-					val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
-					sum_x_minus_xBar_squared += (val - aveVal) * (val-aveVal);
-					
-					sumValX += val * x;
-					if (val < minVal) minVal = val;
-					if (val > maxVal) {
-						maxVal = val;
-						maxValX = x;
-					}
-					++x;
-				} while(x<=xEnd);
-				[self setAverage: sumVal / (double) totalNum];
-			}
-			[self setPeakx:maxValX];
-			[self setPeaky:maxVal];
-			
-			if (sumVal) {
-				[self setCentroid:sumValX / sumVal];
-				[self setSigma:sqrt((sum_x_minus_xBar_squared) / (double)totalNum)];
-			} 
-			else {
-				[self setCentroid:0];
-				[self setSigma:0];
-			}
-			
-			[self setTotalSum:sumVal];
+		if(totalNum){
+			double theXAverage = sumY / (double)totalNum;
+			[self setAverage: theXAverage];
+			[self setSigma:sqrt((sumYSquared/(double)totalNum) - (theXAverage*theXAverage))];
 		}
+		else {
+			[self setAverage: 0];
+			[self setSigma:0];
+		}
+		[self setPeakx:maxX];
+		[self setPeaky:maxY];
+		
+		if (sumY) [self setCentroid:sumValX / sumY];
+		else [self setCentroid:0];
+		
+		[self setTotalSum:sumY];
+
 	}
 }
 
