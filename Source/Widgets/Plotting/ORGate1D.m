@@ -268,7 +268,8 @@ const float kGateAlpha2 = .1;
         [self setGateMaxChannel:MAX(gate1,gate2)];
         
         double sumY = 0.0;
-		double sumYSquared  = 0.0;
+        double sumXY = 0.0;
+        double sumX2Y = 0.0;
 		double sumValX = 0;
 		int maxX = 0;
 		float minY = 3.402e+38;
@@ -288,7 +289,8 @@ const float kGateAlpha2 = .1;
 				if([mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&y]){
 					if(x>=xStart && x<=xEnd){
 						sumY += y;
-						sumYSquared += y*y;
+						sumXY+=x*y;
+						sumX2Y+=x*x*y;
 						sumValX += y * x;
 					
 						if (y < minY) minY = y;
@@ -306,7 +308,8 @@ const float kGateAlpha2 = .1;
 			do {
 				y = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
 				sumY += y;
-				sumYSquared += y*y;
+				sumXY+=x*y;
+				sumX2Y+=x*x*y;
 				sumValX += y * x;
 		
 				if (y < minY) minY = y;
@@ -320,9 +323,9 @@ const float kGateAlpha2 = .1;
 		}
 		
 		if(totalNum){
-			double theXAverage = sumY / (double)totalNum;
+			double theXAverage = sumXY / (double)sumY;
 			[self setAverage: theXAverage];
-			[self setSigma:sqrt((sumYSquared/(double)totalNum) - (theXAverage*theXAverage))];
+			[self setSigma:sqrt((sumX2Y/(double)sumY) - (theXAverage*theXAverage))];
 		}
 		else {
 			[self setAverage: 0];
