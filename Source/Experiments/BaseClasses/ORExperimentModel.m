@@ -459,8 +459,8 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [self setDisplayType:[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
     [self setCaptureDate:[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
 	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
-	[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
-	[[segmentGroups objectAtIndex:1] setMapEntries:[self initMapEntries:1]];
+	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
+	if([segmentGroups count] == 2)[[segmentGroups objectAtIndex:1] setMapEntries:[self initMapEntries:1]];
     [[self undoManager] enableUndoRegistration];
     
     [self setHardwareCheck:2]; //unknown
