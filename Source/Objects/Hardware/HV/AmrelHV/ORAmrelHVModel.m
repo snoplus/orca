@@ -540,9 +540,10 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 	//error response = OK\n\rERROR\n\rOK\n\r
 	
 	BOOL done = NO;
-	if(!lastRequest)return;
-	
-    if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+	if(!lastRequest){
+		done = YES;
+	}
+    else if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
         [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
 		
@@ -594,7 +595,10 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 				BOOL theState  = [theResponse boolValue];
 				[self setOutputState:theChannel withValue:theState];
 				done = YES;
-			}		
+			}
+			else {
+				done = YES;
+			}
 		}	
 		else if(!isQuery && [parts count] == 2){ //2 because the last \n\r results in a zero length part
 			done = YES;
@@ -605,14 +609,13 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 			}
 			done = YES;
 		}
-		
-		if(done){
-			[inComingData release];
-			inComingData = nil;
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-			[self setLastRequest:nil];			 //clear the last request
-			[self processOneCommandFromQueue];	 //do the next command in the queue
-		}
+	}
+	if(done){
+		[inComingData release];
+		inComingData = nil;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		[self setLastRequest:nil];			 //clear the last request
+		[self processOneCommandFromQueue];	 //do the next command in the queue
 	}
 }
 
