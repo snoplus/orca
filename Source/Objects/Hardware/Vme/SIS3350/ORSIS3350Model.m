@@ -1584,6 +1584,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[0] wordSize:4 validMask:0x00FFFFFC name:@"ADC1/2 address threshold"]];
 	[myTests addObject:[ORVmeReadWriteTest test:addressThresholdRegOffsets[1] wordSize:4 validMask:0x00FFFFFC name:@"ADC3/4 address threshold"]];
 	[myTests addObject:[ORVmeWriteOnlyTest test:kTimeStampClearRegister wordSize:4 name:@"Clear TimeStamp"]];
+
 	int i;
 	for(i=0;i<4;i++){
 		[myTests addObject:[ORVmeReadWriteTest test:thresholdRegOffsets[i] wordSize:4 validMask:0xfff name:@"Thresholds"]];
