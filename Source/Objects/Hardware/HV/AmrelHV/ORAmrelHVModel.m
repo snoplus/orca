@@ -286,7 +286,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollTime == 0 )return;
-	[self getAllValues];
+	if([cmdQueue count] == 0)[self getAllValues];
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 }
 
