@@ -209,14 +209,14 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 
 - (void) setPollTime:(int)aPollTime
 {
-	if(pollTime == 0){
-		[self resetDataValid];
-	}
     [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
     pollTime = aPollTime;
 	[self pollHardware];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVPollTimeChanged object:self];
-
+	if(pollTime == 0){
+		[self performSelector:@selector(resetDataValid) withObject:nil afterDelay:.1];
+	}
+	
 }
 
 - (BOOL) polarity:(unsigned short) aChan
@@ -745,10 +745,13 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 - (void) setDataValid:(unsigned short)aChan bit:(BOOL)aMask
 {
 	if([self channelIsValid:aChan]){
-		if((dataValidMask[aChan] & aMask) != aMask){
-			dataValidMask[aChan] |= aMask;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelDataIsValidChanged object:self];
+		if(pollTime!=0){
+			if((dataValidMask[aChan] & aMask) != aMask){
+				dataValidMask[aChan] |= aMask;
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelDataIsValidChanged object:self];
+			}
 		}
+		else [self performSelector:@selector(resetDataValid) withObject:nil afterDelay:.1];
 	}
 }
 
