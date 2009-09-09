@@ -90,6 +90,7 @@
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) polarityChanged:(NSNotification*)aNote;
+- (void) dataIsValidChanged:(NSNotification*)aNote;
 - (void) adjustWindowSize;
 - (void) updateButtons;
 - (void) updateChannelButtons:(int)i;

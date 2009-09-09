@@ -27,6 +27,12 @@
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
 
+
+#define kActualVoltageValidMask 0x4
+#define kActualCurrentValidMask 0x2
+#define kOutputValidMask		0x1
+#define kDataValidMask kActualVoltageValidMask | kActualCurrentValidMask | kOutputValidMask
+
 NSString* ORAmrelHVModelRampStateChanged	= @"ORAmrelHVModelRampStateChanged";
 NSString* ORAmrelHVModelRampEnabledChanged	= @"ORAmrelHVModelRampEnabledChanged";
 NSString* ORAmrelHVModelOutputStateChanged	= @"ORAmrelHVModelOutputStateChanged";
@@ -44,6 +50,7 @@ NSString* ORAmrelHVModelPortNameChanged		= @"ORAmrelHVModelPortNameChanged";
 NSString* ORAmrelHVModelPortStateChanged	= @"ORAmrelHVModelPortStateChanged";
 NSString* ORAmrelHVPolarityChanged			= @"ORAmrelHVPolarityChanged";
 NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
+NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged";
 
 @interface ORAmrelHVModel (private)
 - (void) timeout;
@@ -53,6 +60,8 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 - (void) runRampStep:(unsigned short)aChan;
 - (void) setRampState:(unsigned short)aChan withValue:(int)aRampState;
 - (void) setActVoltage:(unsigned short) aChan withValue:(float) aVoltage;
+- (void) setDataValid:(unsigned short)aChan bit:(BOOL)aValue;
+- (void) resetDataValid:(unsigned short)aChan;
 @end
 
 #define kGetActualVoltageCmd	@"MEAS:VOLT?"
@@ -204,6 +213,10 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
     pollTime = aPollTime;
 	[self pollHardware];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVPollTimeChanged object:self];
+	if(pollTime == 0){
+		int i;
+		for(i=0;i<2;i++)[self resetDataValid:i];
+	}
 }
 
 - (BOOL) polarity:(unsigned short) aChan
@@ -511,6 +524,16 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 	[self getAllValues];
 }
 
+- (BOOL) allDataIsValid:(unsigned short)aChan
+{
+	if([self channelIsValid:aChan]){
+		return (dataValidMask[aChan] & kDataValidMask) == kDataValidMask;
+	}
+	else return NO;
+}
+
+
+
 #pragma mark •••HW Commands
 - (void) getID							{ [self sendCmd:@"*IDN?\r\n"]; }
 - (void) getActualVoltage:(unsigned short)aChan	{ [self sendCmd:kGetActualVoltageCmd channel:aChan]; }
@@ -520,6 +543,21 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 - (void) setOutput:(unsigned short)aChannel withValue:(BOOL)aState
 {
 	[self sendCmd:kSetOutputCmd channel:aChannel value:aState]; 
+}
+
+- (void) togglePower:(unsigned short)aChannel
+{
+	if([self channelIsValid:aChannel]){
+		if([self allDataIsValid:aChannel]){
+			[self setVoltage:aChannel withValue:0];
+			if(outputState[aChannel]){
+				[self setOutput:aChannel withValue:NO];
+			}
+			else {
+				[self setOutput:aChannel withValue:YES];
+			}
+		}
+	}
 }
 
 - (void) loadHardware:(unsigned short)aChan
@@ -573,6 +611,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualVoltageCmd length]] intValue] - 1;
 				float theVoltage = [theResponse floatValue];
 				[self setActVoltage:theChannel withValue:theVoltage];
+				[self setDataValid:theChannel bit: kActualVoltageValidMask];
 				if(doSync[theChannel]){
 					[[self undoManager] disableUndoRegistration];
 					[self setVoltage:theChannel withValue:theVoltage];
@@ -587,6 +626,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 				int theChannel	 = [[theLastCommand substringFromIndex:[kGetActualCurrentCmd length]] intValue] - 1;
 				float theCurrent = [theResponse floatValue];
 				[self setActCurrent:theChannel withValue:theCurrent];
+				[self setDataValid:theChannel bit: kActualCurrentValidMask];
 				done = YES;
 			}
 			
@@ -594,6 +634,7 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 				int theChannel = [[theLastCommand substringFromIndex:[kGetOutputCmd length]] intValue] - 1;
 				BOOL theState  = [theResponse boolValue];
 				[self setOutputState:theChannel withValue:theState];
+				[self setDataValid:theChannel bit: kOutputValidMask];
 				done = YES;
 			}
 			else {
@@ -690,6 +731,24 @@ NSString* ORAmrelHVModelTimeout				= @"ORAmrelHVModelTimeout";
 @end
 
 @implementation ORAmrelHVModel (private)
+
+- (void) resetDataValid:(unsigned short)aChan
+{
+	if([self channelIsValid:aChan]){
+		dataValidMask[aChan] = 0;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelDataIsValidChanged object:self];
+	}
+}
+
+- (void) setDataValid:(unsigned short)aChan bit:(BOOL)aMask
+{
+	if([self channelIsValid:aChan]){
+		if(dataValidMask[aChan] & aMask != aMask){
+			dataValidMask[aChan] |= aMask;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelDataIsValidChanged object:self];
+		}
+	}
+}
 
 - (void) doVoltage:(unsigned short)aChan
 {

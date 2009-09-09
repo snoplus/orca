@@ -31,6 +31,7 @@
 
 @interface ORAmrelHVModel : OrcaObject
 {
+	BOOL				dataValidMask[2];
 	NSString*			portName;
 	BOOL				portWasOpen;
 	ORSerialPort*		serialPort;
@@ -61,6 +62,8 @@
 }
 
 #pragma mark ***Accessors
+- (BOOL) allDataIsValid:(unsigned short)aChan;
+
 - (BOOL) channelIsValid:(unsigned short)aChan;
 - (int)  rampState:(unsigned short)aChan;
 - (BOOL) rampEnabled:(unsigned short)aChan;
@@ -105,6 +108,7 @@
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••HW Commands
+- (void) togglePower:(unsigned short)aChannel;
 - (void) getID;
 - (void) getActualVoltage:(unsigned short)aChannel;
 - (void) getActualCurrent:(unsigned short)aChannel;
@@ -139,6 +143,7 @@ extern NSString* ORAmrelHVActVoltageChanged;
 extern NSString* ORAmrelHVPollTimeChanged;
 extern NSString* ORAmrelHVActCurrentChanged;
 extern NSString* ORAmrelHVMaxCurrentChanged;
+extern NSString* ORAmrelHVModelDataIsValidChanged;
 
 extern NSString* ORAmrelHVLock;
 extern NSString* ORAmrelHVModelSerialPortChanged;

@@ -122,10 +122,17 @@
                      selector : @selector(rampStateChanged:)
                          name : ORAmrelHVModelRampStateChanged
 						object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(timedOut:)
                          name : ORAmrelHVModelTimeout
 						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(dataIsValidChanged:)
+                         name : ORAmrelHVModelDataIsValidChanged
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -144,12 +151,18 @@
 	[self rampRateChanged:nil];
 	[self rampEnabledChanged:nil];
 	[self rampStateChanged:nil];
+	[self dataIsValidChanged:nil];
 	[self updateButtons];
 }
 
 - (void) timedOut:(NSNotification*)aNote
 {
 	[timeoutField setStringValue:@"Time Out"];
+}
+
+- (void) dataIsValidChanged:(NSNotification*)aNote
+{
+	[self updateButtons];
 }
 
 - (void) rampStateChanged:(NSNotification*)aNote
@@ -184,6 +197,7 @@
 - (void) numberOfChannelsChanged:(NSNotification*)aNote
 {
 	[numberOfChannelsPU selectItemAtIndex: [model numberOfChannels]-1];
+	[self updateButtons];
 	[self adjustWindowSize];
 }
 
@@ -304,12 +318,14 @@
     //BOOL runInProgress  = [gOrcaGlobals runInProgress];
     BOOL locked			= [gSecurity isLocked:ORAmrelHVLock];
     BOOL portOpen		= [[model serialPort] isOpen];
-
+	
     [lockButton setState: locked];
 	
+	[pollTimePopup		setEnabled: !locked && portOpen];
+	[pollNowButton		setEnabled: !locked && portOpen];
+	
 	if([model channelIsValid:0]){
-		[pollTimePopup		setEnabled: !locked && portOpen];
-		[pollNowButton		setEnabled: !locked && portOpen];
+		BOOL dataIsValid = [model allDataIsValid:0];
 		[polarityAPU		setEnabled: !locked && portOpen];
 		[setVoltageAField	setEnabled: !locked && portOpen];
 		[maxCurrentAField	setEnabled: !locked && portOpen];
@@ -317,12 +333,19 @@
 		[rampRateAField		setEnabled: !locked && portOpen && [model rampEnabled:0]];
 		if([model rampEnabled:0])[setVoltageLabelA setStringValue:@"Ramp To:"];
 		else					 [setVoltageLabelA setStringValue:@"Set To:"];
-		if([model outputState:0]) [hvPowerAButton setTitle:@"Turn Off"];
-		else					  [hvPowerAButton setTitle:@"Turn On"];
+		[hvPowerAButton setEnabled:dataIsValid];
+		if(dataIsValid){
+			if([model outputState:0]) [hvPowerAButton setTitle:@"Turn Off"];
+			else					  [hvPowerAButton setTitle:@"Turn On"];
+		}
+		else {
+			[hvPowerAButton setTitle:@"--"];
+		}
 		[self updateChannelButtons:0];
 	}
 	
 	if([model channelIsValid:1]){
+		BOOL dataIsValid = [model allDataIsValid:1];
 		[polarityBPU		setEnabled: !locked && portOpen];
 		[setVoltageBField	setEnabled: !locked && portOpen];
 		[maxCurrentBField	setEnabled: !locked && portOpen];
@@ -330,8 +353,15 @@
 		[rampRateBField		setEnabled: !locked && portOpen && [model rampEnabled:1]];
 		if([model rampEnabled:1])[setVoltageLabelB setStringValue:@"Ramp To:"];
 		else					 [setVoltageLabelB setStringValue:@"Set To:"];
-		if([model outputState:1]) [hvPowerBButton setTitle:@"Turn Off"];
-		else					  [hvPowerBButton setTitle:@"Turn On"];
+		
+		[hvPowerBButton setEnabled:dataIsValid];
+		if(dataIsValid){
+			if([model outputState:1]) [hvPowerBButton setTitle:@"Turn Off"];
+			else					  [hvPowerBButton setTitle:@"Turn On"];
+		}
+		else {
+			[hvPowerBButton setTitle:@"--"];
+		}
 		[self updateChannelButtons:1];
 	}
 	
@@ -350,6 +380,7 @@
 	BOOL locked				= [gSecurity isLocked:ORAmrelHVLock];
 	BOOL portOpen			= [[model serialPort] isOpen];
 	BOOL OKForPowerEnable	= !locked && portOpen;
+	BOOL dataIsValid		= [model allDataIsValid:i];
 	
 	if([model channelIsValid:i]){
 		if([model outputState:i]){
@@ -384,7 +415,7 @@
 			}
 		}
 		NSButton* powerButton = (i==0?hvPowerAButton:hvPowerBButton);
-		[powerButton setEnabled: OKForPowerEnable];
+		[powerButton setEnabled: OKForPowerEnable && dataIsValid];
 		
 		if(i==0){
 			[stopAButton		setEnabled: !locked && portOpen && [model rampState:0]!=kAmrelHVNotRamping];
@@ -452,7 +483,7 @@
 - (IBAction) loadAllValues:(id)sender
 {
 	[self endEditing];
-	[model loadHardware:[sender tag]];
+	[model loadHarhvpodware:[sender tag]];
 }
 
 - (IBAction) stopRampAction:(id)sender
@@ -483,8 +514,7 @@
 - (IBAction) hwPowerAction:(id)sender
 {
 	[self endEditing];
-    [model setOutputState:[sender tag] withValue:![model outputState:[sender tag]]];
-	[model loadHardware:[sender tag]];
+	[model togglePower:[sender tag]];
 }
 
 - (IBAction) pollNowAction:(id)sender
@@ -500,7 +530,6 @@
 - (IBAction) syncAction:(id)sender
 {
 	[self syncDialog];
-
 }
 
 @end
