@@ -160,10 +160,10 @@
 
 - (void) dataIsValidChanged:(NSNotification*)aNote
 {
+	[self updateButtons];
 	[self actVoltageChanged:aNote];
 	[self actCurrentChanged:aNote];
 	[self outputStateChanged:aNote];
-	[self updateButtons];
 }
 
 - (void) rampStateChanged:(NSNotification*)aNote
