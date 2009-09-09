@@ -745,7 +745,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 - (void) setDataValid:(unsigned short)aChan bit:(BOOL)aMask
 {
 	if([self channelIsValid:aChan]){
-		if(dataValidMask[aChan] & aMask != aMask){
+		if((dataValidMask[aChan] & aMask) != aMask){
 			dataValidMask[aChan] |= aMask;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelDataIsValidChanged object:self];
 		}
