@@ -31,7 +31,7 @@
 
 @interface ORAmrelHVModel : OrcaObject
 {
-	BOOL				dataValidMask[2];
+	unsigned long		dataValidMask[2];
 	NSString*			portName;
 	BOOL				portWasOpen;
 	ORSerialPort*		serialPort;

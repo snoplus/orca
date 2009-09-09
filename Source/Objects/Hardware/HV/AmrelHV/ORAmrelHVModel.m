@@ -31,7 +31,7 @@
 #define kActualVoltageValidMask 0x4
 #define kActualCurrentValidMask 0x2
 #define kOutputValidMask		0x1
-#define kDataValidMask kActualVoltageValidMask | kActualCurrentValidMask | kOutputValidMask
+#define kDataValidMask (kActualVoltageValidMask | kActualCurrentValidMask | kOutputValidMask)
 
 NSString* ORAmrelHVModelRampStateChanged	= @"ORAmrelHVModelRampStateChanged";
 NSString* ORAmrelHVModelRampEnabledChanged	= @"ORAmrelHVModelRampEnabledChanged";
@@ -61,7 +61,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 - (void) setRampState:(unsigned short)aChan withValue:(int)aRampState;
 - (void) setActVoltage:(unsigned short) aChan withValue:(float) aVoltage;
 - (void) setDataValid:(unsigned short)aChan bit:(BOOL)aValue;
-- (void) resetDataValid:(unsigned short)aChan;
+- (void) resetDataValid;
 @end
 
 #define kGetActualVoltageCmd	@"MEAS:VOLT?"
@@ -177,14 +177,14 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	}
 	if((outputState[0] || outputState[1]) && pollTime == 0){
 		[[self undoManager] disableUndoRegistration];
-		[self setPollTime:1];
+		[self setPollTime:5];
 		[[self undoManager] enableUndoRegistration];
 	}
-	else if(!outputState[0] && !outputState[1]){
-		[[self undoManager] disableUndoRegistration];
-		[self setPollTime:0];
-		[[self undoManager] enableUndoRegistration];
-	}
+	//else if(!outputState[0] && !outputState[1]){
+	//	[[self undoManager] disableUndoRegistration];
+	//	[self setPollTime:0];
+	//	[[self undoManager] enableUndoRegistration];
+	//}
 }
 
 - (int) numberOfChannels
@@ -209,14 +209,14 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 
 - (void) setPollTime:(int)aPollTime
 {
+	if(pollTime == 0){
+		[self resetDataValid];
+	}
     [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
     pollTime = aPollTime;
 	[self pollHardware];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVPollTimeChanged object:self];
-	if(pollTime == 0){
-		int i;
-		for(i=0;i<2;i++)[self resetDataValid:i];
-	}
+
 }
 
 - (BOOL) polarity:(unsigned short) aChan
@@ -381,6 +381,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	}
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
+    [self setPollTime:		[decoder decodeIntForKey: @"pollTime"]];
     [[self undoManager] enableUndoRegistration];    
     [self registerNotificationObservers];
 		
@@ -399,6 +400,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	}
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
+    [encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel value:(float)aValue
@@ -732,12 +734,12 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 
 @implementation ORAmrelHVModel (private)
 
-- (void) resetDataValid:(unsigned short)aChan
+- (void) resetDataValid
 {
-	if([self channelIsValid:aChan]){
-		dataValidMask[aChan] = 0;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelDataIsValidChanged object:self];
-	}
+	dataValidMask[0] = 0;
+	dataValidMask[1] = 0;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelDataIsValidChanged object:self];
+	
 }
 
 - (void) setDataValid:(unsigned short)aChan bit:(BOOL)aMask

@@ -142,8 +142,6 @@
 	[self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self setVoltageChanged:nil];
-	[self actVoltageChanged:nil];
-	[self actCurrentChanged:nil];
 	[self pollTimeChanged:nil];
 	[self numberOfChannelsChanged:nil];
 	[self outputStateChanged:nil];
@@ -162,6 +160,8 @@
 
 - (void) dataIsValidChanged:(NSNotification*)aNote
 {
+	[self actVoltageChanged:nil];
+	[self actCurrentChanged:aNote];
 	[self updateButtons];
 }
 
@@ -184,12 +184,24 @@
 
 - (void) outputStateChanged:(NSNotification*)aNote
 {
-	if([model outputState:0])	[hvPowerAField setStringValue:@"On"];
-	else						[hvPowerAField setStringValue:@"Off"];
-	
-	if([model outputState:1])	[hvPowerBField setStringValue:@"On"];
-	else						[hvPowerBField setStringValue:@"Off"];
-	
+	if([model allDataIsValid:0]){
+		[hvPowerAField setTextColor:[NSColor blackColor]];
+		if([model outputState:0])	[hvPowerAField setStringValue:@"On"];
+		else						[hvPowerAField setStringValue:@"Off"];
+	}
+	else {
+		[hvPowerAField setTextColor:[NSColor redColor]];
+		[hvPowerAField setStringValue:@"??"];
+	}
+	if([model allDataIsValid:1]){
+		[hvPowerBField setTextColor:[NSColor blackColor]];
+		if([model outputState:1])	[hvPowerBField setStringValue:@"On"];
+		else						[hvPowerBField setStringValue:@"Off"];
+	}
+	else {
+		[hvPowerBField setTextColor:[NSColor redColor]];
+		[hvPowerBField setStringValue:@"??"];
+	}
 	[self performSelector:@selector(updateChannels) withObject:nil afterDelay:0];
 	[self performSelector:@selector(updateButtons) withObject:nil afterDelay:0];
 }
@@ -265,8 +277,11 @@
 
 - (void) actVoltageChanged:(NSNotification*)aNote
 {
+	[actVoltageAField setTextColor:[model allDataIsValid:0]?[NSColor blackColor]:[NSColor redColor]];
 	[actVoltageAField setFloatValue:[model actVoltage:0]];
+	[actVoltageBField setTextColor:[model allDataIsValid:1]?[NSColor blackColor]:[NSColor redColor]];
 	[actVoltageBField setFloatValue:[model actVoltage:1]];
+
 	[self updateChannelButtons:0];
 	[self updateChannelButtons:1];
 }
@@ -279,6 +294,8 @@
 
 - (void) actCurrentChanged:(NSNotification*)aNote
 {
+	[actCurrentAField setTextColor:[model allDataIsValid:0]?[NSColor blackColor]:[NSColor redColor]];
+	[actCurrentBField setTextColor:[model allDataIsValid:1]?[NSColor blackColor]:[NSColor redColor]];
 	[actCurrentAField setFloatValue:[model actCurrent:0]];
 	[actCurrentBField setFloatValue:[model actCurrent:1]];
 }
@@ -483,7 +500,7 @@
 - (IBAction) loadAllValues:(id)sender
 {
 	[self endEditing];
-	[model loadHarhvpodware:[sender tag]];
+	[model loadHardware:[sender tag]];
 }
 
 - (IBAction) stopRampAction:(id)sender
