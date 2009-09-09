@@ -438,16 +438,16 @@
 		if(i==0){
 			[stopAButton		setEnabled: !locked && portOpen && [model rampState:0]!=kAmrelHVNotRamping];
 			[rampEnabledACB		setEnabled: !locked && portOpen && [model rampState:1]==kAmrelHVNotRamping];
-			[panicAButton		setEnabled: !locked && portOpen && ([model actVoltage:0]>0)];
+			[panicAButton		setEnabled: !locked && portOpen && dataIsValid && ([model actVoltage:0]>0)];
 		}
 		else if(i==1){
 			[stopBButton		setEnabled: !locked && portOpen && [model rampState:1]!=kAmrelHVNotRamping];
 			[rampEnabledBCB		setEnabled: !locked && portOpen && [model rampState:1]==kAmrelHVNotRamping];
-			[panicBButton		setEnabled: !locked && portOpen && ([model actVoltage:1]>0)];
+			[panicBButton		setEnabled: !locked && portOpen && dataIsValid && ([model actVoltage:1]>0)];
 		}
 	}
 
-	[systemPanicBButton setEnabled: !locked && portOpen && ([model actVoltage:0]>0) || [model actVoltage:1]>0];
+	[systemPanicBButton setEnabled: !locked && portOpen && ([model actVoltage:0]>0) || [model actVoltage:1]>0 && dataIsValid];
 		
 }
 
