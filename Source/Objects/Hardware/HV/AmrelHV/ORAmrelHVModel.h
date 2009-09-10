@@ -54,7 +54,6 @@
     int					rampState[2];
 	NSDate*				lastRampStep[2];
 	BOOL				doSync[2];
-	int					savedPollTime;
 	
 	//used for calculating percent of ramp done only.
 	float				targetVoltage[2];

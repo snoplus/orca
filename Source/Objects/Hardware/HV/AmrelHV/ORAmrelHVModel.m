@@ -302,7 +302,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	if(pollTime == 0 )return;
 	if([cmdQueue count] == 0){
 		[self getAllValues];
-		int nextPollTime = pollTime;
+		float nextPollTime = pollTime;
 		if(   rampState[0] != kAmrelHVNotRamping 
 		   || rampState[1] != kAmrelHVNotRamping) nextPollTime = .2;
 		
