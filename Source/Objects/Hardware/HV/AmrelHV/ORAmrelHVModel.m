@@ -72,7 +72,6 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 #define kGetOutputCmd			@"OUTP:STAT?"
 #define kSetPolarityCmd			@"OUTP:REL:POL"
 #define kGetPolarityCmd			@"OUTP:REL:POL?"
-#define kCheckRamp				@"+++CheckRamp"
 
 @implementation ORAmrelHVModel
 
@@ -304,14 +303,14 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 		[self getAllValues];
 		float nextPollTime = pollTime;
 		if(   rampState[0] != kAmrelHVNotRamping 
-		   || rampState[1] != kAmrelHVNotRamping) nextPollTime = .2;
+		   || rampState[1] != kAmrelHVNotRamping) nextPollTime = 1;
 		
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:nextPollTime];
 
 	}
 	else {
 		//the queue is not empty... we'll try again in a short time.
-		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:.2]; 
+		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:1]; 
 	}
 }
 
@@ -631,7 +630,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 					doSync[theChannel] = NO;
 					[[self undoManager] enableUndoRegistration];
 				}
-				[self sendCmd:kCheckRamp];
+				[self runRampStep:theChannel];
 				done = YES;
 			}
 			
@@ -846,15 +845,11 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	if([cmdQueue count] == 0) return;
 	NSString* cmdString = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
-	if([cmdString hasPrefix:kCheckRamp]){
-		int theChannel = [[cmdString substringFromIndex:[kCheckRamp length]] intValue]-1;
-		[self runRampStep:theChannel];
-	}
-	else{
-		[self setLastRequest:cmdString];
-		[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
-	}
+
+	[self setLastRequest:cmdString];
+	[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
+	
 }
 
 - (void) setRampState:(unsigned short)aChan withValue:(int)aRampState
