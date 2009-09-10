@@ -28,18 +28,18 @@
 
 NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
-@"Software",
-@"Right",
-@"Left",
-@"Mirror",
-@"External",
+	@"Software",
+	@"Right",
+	@"Left",
+	@"Mirror",
+	@"External",
 },
 {
-@"Software",
-@"N/A",
-@"N/A",
-@"Multiplicity",
-@"External",
+	@"Software",
+	@"N/A",
+	@"N/A",
+	@"Multiplicity",
+	@"External",
 }
 };
 
@@ -79,13 +79,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[pageStatusMatrix setMode:NSRadioModeMatrix];
 	[pageStatusMatrix setTarget:self];
 	[pageStatusMatrix setAction:@selector(dumpPageStatus:)];
-	
-	
-	
-    NSString* key = [NSString stringWithFormat: @"orca.ORIpeV4SLT%d.selectedtab",[model stationNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
-    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
-    [tabView selectTabViewItemAtIndex: index];
 	
 }
 
@@ -203,6 +196,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
+	[super tabView:aTabView didSelectTabViewItem:tabViewItem];
+	
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case  0: [self resizeWindowToSize:controlSize];			break;
 		case  1: [self resizeWindowToSize:statusSize];			break;
@@ -212,9 +207,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		default: [self resizeWindowToSize:cpuTestsSize];	    break;
     }
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORIpeV4SLT%d.selectedtab",[model stationNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
 

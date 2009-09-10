@@ -13,6 +13,36 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>analyze</key>
+				<string>id</string>
+				<key>publishToPDF</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ORFlippedView</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+				<key>viewForPDF</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>ORValueBar</string>
 			<key>LANGUAGE</key>
@@ -26,6 +56,14 @@
 				<key>mXScale</key>
 				<string>id</string>
 			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
 		</dict>
@@ -102,7 +140,7 @@
 				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>ORPlotter</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -384,9 +422,21 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>alignBottom</key>
+				<string>id</string>
+				<key>alignHorizontalCenters</key>
+				<string>id</string>
 				<key>alignLeft</key>
 				<string>id</string>
+				<key>alignRight</key>
+				<string>id</string>
+				<key>alignTop</key>
+				<string>id</string>
+				<key>alignVerticalCenters</key>
+				<string>id</string>
 				<key>arrangeInCircle</key>
+				<string>id</string>
+				<key>bringToFront</key>
 				<string>id</string>
 				<key>concludeDragOperation</key>
 				<string>id</string>
@@ -398,7 +448,11 @@
 				<string>id</string>
 				<key>draggingExited</key>
 				<string>id</string>
+				<key>getInfo</key>
+				<string>id</string>
 				<key>paste</key>
+				<string>id</string>
+				<key>sendToBack</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -407,6 +461,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>group</key>
+				<string>id</string>
 				<key>mouseTask</key>
 				<string>id</string>
 			</dict>
@@ -422,9 +478,15 @@
 				<string>id</string>
 				<key>cbTest</key>
 				<string>id</string>
+				<key>clearHistory</key>
+				<string>id</string>
+				<key>closePassWordPanel</key>
+				<string>id</string>
 				<key>connectionAction</key>
 				<string>id</string>
 				<key>doRangeAction</key>
+				<string>id</string>
+				<key>errorTimeOutAction</key>
 				<string>id</string>
 				<key>filePathAction</key>
 				<string>id</string>
@@ -459,6 +521,8 @@
 				<key>readWriteTypeMatrixAction</key>
 				<string>id</string>
 				<key>resetCrateBusAction</key>
+				<string>id</string>
+				<key>shutdownAction</key>
 				<string>id</string>
 				<key>toggleCrateAction</key>
 				<string>id</string>
@@ -497,6 +561,8 @@
 				<string>NSButton</string>
 				<key>cbTestProgress</key>
 				<string>NSProgressIndicator</string>
+				<key>clearHistoryButton</key>
+				<string>NSButton</string>
 				<key>connect1Button</key>
 				<string>NSButton</string>
 				<key>connectButton</key>
@@ -507,6 +573,8 @@
 				<string>NSTextField</string>
 				<key>doRangeButton</key>
 				<string>NSButton</string>
+				<key>errorTimeOutPU</key>
+				<string>NSPopUpButton</string>
 				<key>filePathField</key>
 				<string>NSTextField</string>
 				<key>forceReloadButton</key>
@@ -521,7 +589,11 @@
 				<string>NSMatrix</string>
 				<key>initAfterConnectButton</key>
 				<string>NSButton</string>
+				<key>ipNumberComboBox</key>
+				<string>NSComboBox</string>
 				<key>ipNumberField</key>
+				<string>NSTextField</string>
+				<key>irqNumberField</key>
 				<string>NSTextField</string>
 				<key>killCrateButton</key>
 				<string>NSButton</string>
@@ -537,6 +609,8 @@
 				<string>NSTextField</string>
 				<key>passWordField</key>
 				<string>NSSecureTextField</string>
+				<key>passWordPanel</key>
+				<string>NSPanel</string>
 				<key>payloadSizeField</key>
 				<string>NSTextField</string>
 				<key>payloadSizeSlider</key>
@@ -561,6 +635,8 @@
 				<string>NSMatrix</string>
 				<key>resetCrateBusButton</key>
 				<string>NSButton</string>
+				<key>rootPassWordField</key>
+				<string>NSTextField</string>
 				<key>runInfoField</key>
 				<string>NSTextField</string>
 				<key>setFilePathButton</key>
@@ -590,6 +666,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
@@ -644,6 +722,8 @@
 				<string>id</string>
 				<key>differentiateAction</key>
 				<string>id</string>
+				<key>refresh</key>
+				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>
 				<key>resetScales</key>
@@ -671,7 +751,7 @@
 				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>ORPlotter</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
