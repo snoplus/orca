@@ -585,7 +585,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	if([self channelIsValid:aChan]){
 		[self sendCmd:kSetOutputCmd     channel:aChan boolValue:outputState[aChan]];
 		[self sendCmd:kSetPolarityCmd   channel:aChan boolValue:polarity[aChan]];
-		[self sendCmd:kSetMaxCurrentCmd channel:aChan boolValue:maxCurrent[aChan]];
+		[self sendCmd:kSetMaxCurrentCmd channel:aChan value:maxCurrent[aChan]];
 		[self doVoltage:aChan];
 	}
 }
