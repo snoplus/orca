@@ -286,7 +286,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 {
 	if(aChan>=kNumAmrelHVChannels)return;
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
-    [[[self undoManager] prepareWithInvocationTarget:self] setVoltage:aChan withValue:voltage[aChan]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxCurrent:aChan withValue:maxCurrent[aChan]];
 	maxCurrent[aChan] = aCurrent;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVMaxCurrentChanged object:self  userInfo:userInfo];
 }
