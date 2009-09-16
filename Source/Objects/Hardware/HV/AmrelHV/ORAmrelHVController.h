@@ -36,6 +36,8 @@
 	IBOutlet NSTextField*	hvPowerBField;
     IBOutlet NSButton*      hvPowerAButton;
     IBOutlet NSButton*      hvPowerBButton;
+    IBOutlet NSButton*      clrCurrentTripAButton;
+    IBOutlet NSButton*      clrCurrentTripBButton;
 	IBOutlet NSPopUpButton* polarityAPU;
 	IBOutlet NSPopUpButton* polarityBPU;
 	IBOutlet NSTextField*	setVoltageAField;
@@ -91,6 +93,7 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) polarityChanged:(NSNotification*)aNote;
 - (void) dataIsValidChanged:(NSNotification*)aNote;
+- (void) maxCurrentChanged:(NSNotification*)aNote;
 - (void) adjustWindowSize;
 - (void) updateButtons;
 - (void) updateChannelButtons:(int)i;
@@ -113,6 +116,8 @@
 - (IBAction) rateRateAction:(id)sender;
 - (IBAction) moduleIDAction:(id)sender;
 - (IBAction) syncAction:(id)sender;
+- (IBAction) clearCurrentTripAction:(id)sender;
+- (IBAction) maxCurrentAction:(id)sender;
 
 @end
 

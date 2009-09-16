@@ -133,6 +133,10 @@
                          name : ORAmrelHVModelDataIsValidChanged
 						object: model];
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(maxCurrentChanged:)
+                         name : ORAmrelHVMaxCurrentChanged
+						object: model];	
 }
 
 - (void) updateWindow
@@ -150,6 +154,7 @@
 	[self rampEnabledChanged:nil];
 	[self rampStateChanged:nil];
 	[self dataIsValidChanged:nil];
+	[self maxCurrentChanged:nil];
 	[self updateButtons];
 }
 
@@ -301,6 +306,12 @@
 	[actCurrentBField setFloatValue:[model actCurrent:1]];
 }
 
+- (void) maxCurrentChanged:(NSNotification*)aNote
+{
+	[maxCurrentAField setFloatValue:[model maxCurrent:0]];
+	[maxCurrentBField setFloatValue:[model maxCurrent:1]];
+}
+
 - (void)adjustWindowSize
 {
     switch([model numberOfChannels]){
@@ -349,6 +360,7 @@
 		[maxCurrentAField	setEnabled: !locked && portOpen];
 		[loadValuesAButton	setEnabled: !locked && portOpen];
 		[rampRateAField		setEnabled: !locked && portOpen && [model rampEnabled:0]];
+		[clrCurrentTripAButton setEnabled: !locked && portOpen];
 		if([model rampEnabled:0])[setVoltageLabelA setStringValue:@"Ramp To:"];
 		else					 [setVoltageLabelA setStringValue:@"Set To:"];
 		[hvPowerAButton setEnabled:dataIsValid];
@@ -369,6 +381,7 @@
 		[maxCurrentBField	setEnabled: !locked && portOpen];
 		[loadValuesBButton	setEnabled: !locked && portOpen];
 		[rampRateBField		setEnabled: !locked && portOpen && [model rampEnabled:1]];
+		[clrCurrentTripBButton setEnabled: !locked && portOpen];
 		if([model rampEnabled:1])[setVoltageLabelB setStringValue:@"Ramp To:"];
 		else					 [setVoltageLabelB setStringValue:@"Set To:"];
 		
@@ -548,6 +561,17 @@
 - (IBAction) syncAction:(id)sender
 {
 	[self syncDialog];
+}
+
+- (IBAction) maxCurrentAction:(id)sender
+{
+	[self endEditing];
+	[model setMaxCurrent:[sender tag] withValue:[sender floatValue]];
+}
+
+- (IBAction) clearCurrentTripAction:(id)sender
+{
+	[model clearCurrentTrip:[sender tag]];
 }
 
 @end

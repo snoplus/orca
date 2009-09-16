@@ -68,6 +68,8 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 #define kGetActualCurrentCmd	@"MEAS:CURR?"
 #define kSetVoltageCmd			@"VOLT:LEV"
 #define kSetMaxCurrentCmd		@"CURR:TRIG"
+#define kSetCurrentTripCmd		@"CURR:PROT:STAT"
+#define kCurrentTripClrCmd		@"CURR:PROT:CLE"
 #define kSetOutputCmd			@"OUTP:STAT"
 #define kGetOutputCmd			@"OUTP:STAT?"
 #define kSetPolarityCmd			@"OUTP:REL:POL"
@@ -386,6 +388,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	int i;
 	for(i=0;i<kNumAmrelHVChannels;i++){
 		[self setVoltage:i withValue:	 [decoder decodeFloatForKey:[NSString stringWithFormat:@"voltage%d",i]]];
+		[self setMaxCurrent:i withValue: [decoder decodeFloatForKey:[NSString stringWithFormat:@"maxCurrent%d",i]]];
 		[self setRampEnabled:i withValue:[decoder decodeBoolForKey:	[NSString stringWithFormat:@"rampEnabled%d",i]]];
 		[self setRampRate:i withValue:	 [decoder decodeFloatForKey:[NSString stringWithFormat:@"rampingRate%d",i]]];
 		if(rampRate[i]==0)[self setRampRate:i withValue:1.0];
@@ -407,6 +410,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	for(i=0;i<kNumAmrelHVChannels;i++){
 		[encoder encodeFloat:voltage[i]		forKey:[NSString stringWithFormat:@"voltage%d",i]];
 		[encoder encodeFloat:rampRate[i]	forKey:[NSString stringWithFormat:@"rampingRate%d",i]];
+		[encoder encodeFloat:maxCurrent[i]	forKey:[NSString stringWithFormat:@"maxCurrent%d",i]];
 		[encoder encodeBool:rampEnabled[i]	forKey:[NSString stringWithFormat:@"rampEnabled%d",i]];
 	}
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
@@ -548,10 +552,11 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 
 
 #pragma mark •••HW Commands
-- (void) getID							{ [self sendCmd:@"*IDN?\r\n"]; }
-- (void) getActualVoltage:(unsigned short)aChan	{ [self sendCmd:kGetActualVoltageCmd channel:aChan]; }
-- (void) getActualCurrent:(unsigned short)aChan	{ [self sendCmd:kGetActualCurrentCmd channel:aChan]; }
-- (void) getOutput:(unsigned short)aChan		{ [self sendCmd:kGetOutputCmd channel:aChan]; }
+- (void) getID										{ [self sendCmd:@"*IDN?\r\n"]; }
+- (void) getActualVoltage:(unsigned short)aChan		{ [self sendCmd:kGetActualVoltageCmd channel:aChan]; }
+- (void) getActualCurrent:(unsigned short)aChan		{ [self sendCmd:kGetActualCurrentCmd channel:aChan]; }
+- (void) getOutput:(unsigned short)aChan			{ [self sendCmd:kGetOutputCmd channel:aChan]; }
+- (void) clearCurrentTrip:(unsigned short)aChan		{ [self sendCmd:kCurrentTripClrCmd channel:aChan]; }
 
 - (void) setOutput:(unsigned short)aChannel withValue:(BOOL)aState
 {
@@ -572,6 +577,8 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 		}
 	}
 }
+
+
 
 - (void) loadHardware:(unsigned short)aChan
 {

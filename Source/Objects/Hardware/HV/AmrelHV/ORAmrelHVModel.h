@@ -83,6 +83,8 @@
 - (void)  setPolarity:(unsigned short) aChan withValue:(BOOL) aState;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
+- (float) maxCurrent:(unsigned short) aChan;
+- (void) setMaxCurrent:(unsigned short) aChan withValue:(float) aCurrent;
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
@@ -109,6 +111,7 @@
 
 #pragma mark •••HW Commands
 - (void) togglePower:(unsigned short)aChannel;
+- (void) clearCurrentTrip:(unsigned short)aChannel;
 - (void) getID;
 - (void) getActualVoltage:(unsigned short)aChannel;
 - (void) getActualCurrent:(unsigned short)aChannel;
@@ -118,6 +121,7 @@
 - (void) loadHardware:(unsigned short)aChannel;
 - (void) pollHardware;
 - (void) getAllValues;
+- (void) clearCurrentTrip:(unsigned short)aChannel;
 
 - (void) shipVoltageRecords;
 - (void) stopRamp:(unsigned short)aChan;
