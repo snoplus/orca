@@ -230,6 +230,7 @@
 	if([model currentTripped:chan]){
 		[theTextField setTextColor:[NSColor redColor]];
 		[theTextField setStringValue:@"Current Trip"];
+		NSLogColor([NSColor redColor], @"%@: Current Tripped on channel %d\n",[model fullID],chan );
 	}
 	else {
 		[theTextField setTextColor:[NSColor blackColor]];
@@ -281,6 +282,20 @@
 {
 	[maxCurrentAField setFloatValue:[model maxCurrent:0]];
 	[maxCurrentBField setFloatValue:[model maxCurrent:1]];
+	
+	int i;
+	for(i=0;i<2;i++){
+		NSTextField* theField = (i==0?currentTripAField2:currentTripBField2);
+		
+		if([model maxCurrent:i] == 0){
+			[theField setTextColor:[NSColor redColor]];
+			[theField setStringValue:@"Disabled: I==0"];
+		}
+		else {
+			[theField setTextColor:[NSColor blackColor]];
+			[theField setStringValue:@"Enabled"];
+		}
+	}
 }
 
 - (void) rampRateChanged:(NSNotification*)aNote

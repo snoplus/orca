@@ -36,6 +36,8 @@
 	IBOutlet NSTextField*	maxCurrentBField;
 	IBOutlet NSTextField*	setRampRateAField;
 	IBOutlet NSTextField*	setRampRateBField;
+	IBOutlet NSTextField*	currentTripAField2;
+	IBOutlet NSTextField*	currentTripBField2;
 	IBOutlet NSTextField*	polarityAField;
 	IBOutlet NSTextField*	polarityBField;
 	IBOutlet NSImageView*	hvStateAImage;
