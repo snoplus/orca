@@ -182,6 +182,7 @@
 - (IBAction) payloadSizeAction:(id)sender;
 
 #pragma mark ¥¥¥DataSource
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 - (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
