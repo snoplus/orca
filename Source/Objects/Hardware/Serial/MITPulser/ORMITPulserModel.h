@@ -31,15 +31,15 @@
 		int				clockSpeed;
 		int				resistance;
 		int				dutyCycle;
-		int				frequency;
+		float			frequency;
 }
 
 #pragma mark ***Initialization
 - (void) dealloc;
 
 #pragma mark ***Accessors
-- (int) frequency;
-- (void) setFrequency:(int)aFrequency;
+- (float) frequency;
+- (void) setFrequency:(float)aFrequency;
 - (int) dutyCycle;
 - (void) setDutyCycle:(int)aDutyCycle;
 - (int) resistance;

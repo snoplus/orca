@@ -108,7 +108,7 @@
 
 - (void) frequencyChanged:(NSNotification*)aNote
 {
-	[frequencyField setIntValue: [model frequency]];
+	[frequencyField setFloatValue: [model frequency]];
 }
 
 - (void) dutyCycleChanged:(NSNotification*)aNote
@@ -206,7 +206,7 @@
 
 - (void) frequencyAction:(id)sender
 {
-	[model setFrequency:[sender intValue]];	
+	[model setFrequency:[sender floatValue]];	
 }
 
 - (void) dutyCycleAction:(id)sender

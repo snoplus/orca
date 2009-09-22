@@ -68,20 +68,25 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 
 #pragma mark ***Accessors
 
-- (int) frequency
+- (float) frequency
 {
     return frequency;
 }
 
-- (void) setFrequency:(int)aFrequency
+- (void) setFrequency:(float)aFrequency
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFrequency:frequency];
     frequency = aFrequency;
-	int nBitsFrequency = 3;
-	int maxFrequency = [self actualClockSpeed] / 2;
-	int minFrequency = ([self actualClockSpeed] / pow(16,nBitsFrequency) / 2) + 1;
+	float nBitsFrequency = 3;
+	float maxFrequency = [self actualClockSpeed] / 2;
+	float minFrequency = ([self actualClockSpeed] / pow(16,nBitsFrequency) / 2);
 	if (frequency > maxFrequency) frequency = maxFrequency;     //  You can only be as fast as your clock
 	if (frequency < minFrequency) frequency = minFrequency;     //  You only have n bits to program (go to lower clock speed)
+
+	int frequencyTicks = 0;
+	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
+	frequency = ((1./frequencyTicks)*([self actualClockSpeed])/2.);  // Take care of rounding issues
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelFrequencyChanged object:self];
 }
 
@@ -218,7 +223,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     [objDictionary setObject:[NSNumber numberWithInt:clockSpeed]	forKey:@"clockSpeed"];
     [objDictionary setObject:[NSNumber numberWithInt:resistance]	forKey:@"resistance"];
     [objDictionary setObject:[NSNumber numberWithInt:dutyCycle]		forKey:@"dutyCycle"];
-    [objDictionary setObject:[NSNumber numberWithInt:frequency]		forKey:@"frequency"];
+    [objDictionary setObject:[NSNumber numberWithFloat:frequency]	forKey:@"frequency"];
 	
 	[dictionary setObject:objDictionary forKey:[self identifier]];
 	return objDictionary;
@@ -285,7 +290,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     
     [[self undoManager] disableUndoRegistration];
     [self setClockSpeed:[decoder decodeIntForKey:@"clockSpeed"]];
-    [self setFrequency:	[decoder decodeIntForKey:@"frequency"]];
+    [self setFrequency:	[decoder decodeFloatForKey:@"frequency"]];
     [self setDutyCycle:	[decoder decodeIntForKey:@"dutyCycle"]];
     [self setResistance:	[decoder decodeIntForKey:@"resistance"]];
     [[self undoManager] enableUndoRegistration];    
@@ -297,7 +302,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:clockSpeed	forKey:@"clockSpeed"];
-    [encoder encodeInt:frequency	forKey:@"frequency"];
+    [encoder encodeFloat:frequency	forKey:@"frequency"];
     [encoder encodeInt:dutyCycle	forKey:@"dutyCycle"];
     [encoder encodeInt:resistance	forKey:@"resistance"];
 }
