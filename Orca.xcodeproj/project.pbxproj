@@ -944,6 +944,7 @@
 		84539EA4080ADAF500615B6D /* ORListenerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84539EA0080ADAF500615B6D /* ORListenerModel.m */; };
 		84539EA5080ADAF500615B6D /* ORListenerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84539EA1080ADAF500615B6D /* ORListenerController.m */; };
 		8453ADE5096B271700297FF1 /* DataSet.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E1520B0551D95200503E02 /* DataSet.nib */; };
+		845498C410628DF400F8DE1C /* scpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 845498C310628DF400F8DE1C /* scpExpectScript */; };
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
@@ -1418,6 +1419,16 @@
 		84A9566F077B796F00CAD99D /* ORCurve2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A9566D077B796F00CAD99D /* ORCurve2D.h */; };
 		84A95670077B796F00CAD99D /* ORCurve2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A9566E077B796F00CAD99D /* ORCurve2D.m */; };
 		84A9571F077B887100CAD99D /* Example2D.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9571E077B887100CAD99D /* Example2D.gif */; };
+		84AB0F3D1056DA4E0069D5E2 /* ModBus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AB0F341056DA4E0069D5E2 /* ModBus.nib */; };
+		84AB0F401056DA4E0069D5E2 /* ORModBusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB0F371056DA4E0069D5E2 /* ORModBusController.h */; };
+		84AB0F411056DA4E0069D5E2 /* ORModBusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB0F381056DA4E0069D5E2 /* ORModBusController.m */; };
+		84AB0F441056DA4E0069D5E2 /* ORModBusModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB0F3B1056DA4E0069D5E2 /* ORModBusModel.h */; };
+		84AB0F451056DA4E0069D5E2 /* ORModBusModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB0F3C1056DA4E0069D5E2 /* ORModBusModel.m */; };
+		84AB10081057D5290069D5E2 /* ModBus.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AB10071057D5290069D5E2 /* ModBus.tif */; };
+		84AB101C1057D6990069D5E2 /* iTransGasSensor.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AB10181057D6990069D5E2 /* iTransGasSensor.nib */; };
+		84AB101D1057D6990069D5E2 /* iTransGasSensor.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AB10191057D6990069D5E2 /* iTransGasSensor.tif */; };
+		84AB101E1057D6990069D5E2 /* ORiTransGasSensorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB101A1057D6990069D5E2 /* ORiTransGasSensorModel.h */; };
+		84AB101F1057D6990069D5E2 /* ORiTransGasSensorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB101B1057D6990069D5E2 /* ORiTransGasSensorModel.m */; };
 		84AB8BB60D2314A500EC39F2 /* ORCmdHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BB40D2314A500EC39F2 /* ORCmdHistory.h */; };
 		84AB8BB70D2314A500EC39F2 /* ORCmdHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BB50D2314A500EC39F2 /* ORCmdHistory.m */; };
 		84AB8BC10D2314CD00EC39F2 /* crate_lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BB90D2314CD00EC39F2 /* crate_lib.m */; };
@@ -1634,7 +1645,6 @@
 		84B63CE909783832005B20A5 /* PushButtonOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE209783832005B20A5 /* PushButtonOff.tif */; };
 		84B63CEA09783832005B20A5 /* PushButtonOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE309783832005B20A5 /* PushButtonOn.tif */; };
 		84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84B74ACF0FEAAB460033E658 /* ftpExpectScript */; };
-		84B74B3C0FEAB19E0033E658 /* scpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84B74B3B0FEAB19E0033E658 /* scpExpectScript */; };
 		84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B74CE10FEBE9B90033E658 /* Caen965.gif */; };
 		84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B74CE20FEBE9B90033E658 /* Caen965.nib */; };
 		84B74CE90FEBE9B90033E658 /* ORCaen965Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B74CE30FEBE9B90033E658 /* ORCaen965Controller.h */; };
@@ -1834,6 +1844,8 @@
 		84D98348079716E90074A035 /* TimedWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D98346079716E90074A035 /* TimedWorker.m */; };
 		84DB0B700D6279F500BB9855 /* FilterSyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */; };
 		84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */; };
+		84DBA1331058122C00884B1C /* ORiTransGasSensorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DBA1311058122C00884B1C /* ORiTransGasSensorController.m */; };
+		84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DBA1321058122C00884B1C /* ORiTransGasSensorController.h */; };
 		84DDEBA207BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */; };
 		84DDEBA307BD3E080060D0B4 /* MultiPlot.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */; };
 		84DDEBA507BD3E080060D0B4 /* ORMultiPlot.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DDEB9E07BD3E080060D0B4 /* ORMultiPlot.h */; };
@@ -2911,6 +2923,7 @@
 		84539E9F080ADAF500615B6D /* ORListenerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORListenerModel.h; path = "Source/Objects/Data Processing/Listener/ORListenerModel.h"; sourceTree = SOURCE_ROOT; };
 		84539EA0080ADAF500615B6D /* ORListenerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORListenerModel.m; path = "Source/Objects/Data Processing/Listener/ORListenerModel.m"; sourceTree = SOURCE_ROOT; };
 		84539EA1080ADAF500615B6D /* ORListenerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORListenerController.m; path = "Source/Objects/Data Processing/Listener/ORListenerController.m"; sourceTree = SOURCE_ROOT; };
+		845498C310628DF400F8DE1C /* scpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = scpExpectScript; path = "Source/Objects/Misc Objects/FileCopy/scpExpectScript"; sourceTree = SOURCE_ROOT; };
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
@@ -3406,6 +3419,16 @@
 		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		84AA7A540545B1B2005F64B1 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		84AB0F341056DA4E0069D5E2 /* ModBus.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ModBus.nib; sourceTree = "<group>"; };
+		84AB0F371056DA4E0069D5E2 /* ORModBusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORModBusController.h; sourceTree = "<group>"; };
+		84AB0F381056DA4E0069D5E2 /* ORModBusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORModBusController.m; sourceTree = "<group>"; };
+		84AB0F3B1056DA4E0069D5E2 /* ORModBusModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORModBusModel.h; sourceTree = "<group>"; };
+		84AB0F3C1056DA4E0069D5E2 /* ORModBusModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORModBusModel.m; sourceTree = "<group>"; };
+		84AB10071057D5290069D5E2 /* ModBus.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = ModBus.tif; sourceTree = "<group>"; };
+		84AB10181057D6990069D5E2 /* iTransGasSensor.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = iTransGasSensor.nib; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/iTransGasSensor.nib; sourceTree = SOURCE_ROOT; };
+		84AB10191057D6990069D5E2 /* iTransGasSensor.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = iTransGasSensor.tif; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/iTransGasSensor.tif; sourceTree = SOURCE_ROOT; };
+		84AB101A1057D6990069D5E2 /* ORiTransGasSensorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiTransGasSensorModel.h; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorModel.h; sourceTree = SOURCE_ROOT; };
+		84AB101B1057D6990069D5E2 /* ORiTransGasSensorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiTransGasSensorModel.m; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorModel.m; sourceTree = SOURCE_ROOT; };
 		84AB8BB40D2314A500EC39F2 /* ORCmdHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCmdHistory.h; path = "Source/Objects/Misc Objects/CmdHistory/ORCmdHistory.h"; sourceTree = SOURCE_ROOT; };
 		84AB8BB50D2314A500EC39F2 /* ORCmdHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCmdHistory.m; path = "Source/Objects/Misc Objects/CmdHistory/ORCmdHistory.m"; sourceTree = SOURCE_ROOT; };
 		84AB8BB90D2314CD00EC39F2 /* crate_lib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = crate_lib.m; path = Source/Objects/Hardware/Camac/C111C/crate_lib.m; sourceTree = SOURCE_ROOT; };
@@ -3639,7 +3662,6 @@
 		84B649B70407013B005F64B1 /* NcdMuxHWModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NcdMuxHWModel.h; sourceTree = "<group>"; };
 		84B649B80407013B005F64B1 /* NcdMuxHWModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NcdMuxHWModel.m; sourceTree = "<group>"; };
 		84B74ACF0FEAAB460033E658 /* ftpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ftpExpectScript; sourceTree = "<group>"; };
-		84B74B3B0FEAB19E0033E658 /* scpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = scpExpectScript; path = "Source/Objects/Misc Objects/FileCopy/scpExpectScript"; sourceTree = SOURCE_ROOT; };
 		84B74CE10FEBE9B90033E658 /* Caen965.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Caen965.gif; sourceTree = "<group>"; };
 		84B74CE20FEBE9B90033E658 /* Caen965.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen965.nib; path = Source/Objects/Hardware/Vme/CAEN/CV965/Caen965.nib; sourceTree = SOURCE_ROOT; };
 		84B74CE30FEBE9B90033E658 /* ORCaen965Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen965Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Controller.h; sourceTree = SOURCE_ROOT; };
@@ -3901,6 +3923,8 @@
 		84D98346079716E90074A035 /* TimedWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimedWorker.m; sourceTree = "<group>"; };
 		84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = FilterSyntaxDefinition.plist; path = "Source/Objects/Data Processing/Filter/FilterSyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
 		84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = FilterScriptGuide.rtf; path = "Source/Objects/Data Processing/Filter/FilterScriptGuide.rtf"; sourceTree = SOURCE_ROOT; };
+		84DBA1311058122C00884B1C /* ORiTransGasSensorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiTransGasSensorController.m; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorController.m; sourceTree = SOURCE_ROOT; };
+		84DBA1321058122C00884B1C /* ORiTransGasSensorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiTransGasSensorController.h; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorController.h; sourceTree = SOURCE_ROOT; };
 		84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = edu.washington.npl.orca.MultiPlot.plist; sourceTree = "<group>"; };
 		84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MultiPlot.nib; sourceTree = "<group>"; };
 		84DDEB9E07BD3E080060D0B4 /* ORMultiPlot.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMultiPlot.h; sourceTree = "<group>"; };
@@ -5938,6 +5962,7 @@
 				84B28D830F4C66BE00E2B056 /* VXM */,
 				84D258590FA7340B00626276 /* MotionNode */,
 				84A240521032ED28002AFA0B /* MITPulser */,
+				84AB0F331056DA4E0069D5E2 /* ModBus */,
 			);
 			name = Serial;
 			path = Source/Objects/Hardware/Serial;
@@ -7183,6 +7208,35 @@
 			);
 			name = SBC_LAM;
 			path = Source/Objects/Hardware/SBC/SBC_LAM;
+			sourceTree = SOURCE_ROOT;
+		};
+		84AB0F331056DA4E0069D5E2 /* ModBus */ = {
+			isa = PBXGroup;
+			children = (
+				84AB0F371056DA4E0069D5E2 /* ORModBusController.h */,
+				84AB0F381056DA4E0069D5E2 /* ORModBusController.m */,
+				84AB0F3B1056DA4E0069D5E2 /* ORModBusModel.h */,
+				84AB0F3C1056DA4E0069D5E2 /* ORModBusModel.m */,
+				84AB10071057D5290069D5E2 /* ModBus.tif */,
+				84AB0F341056DA4E0069D5E2 /* ModBus.nib */,
+				84AB10171057D6990069D5E2 /* GasSensor */,
+			);
+			name = ModBus;
+			path = Source/Objects/Hardware/Serial/iTransGasMon;
+			sourceTree = SOURCE_ROOT;
+		};
+		84AB10171057D6990069D5E2 /* GasSensor */ = {
+			isa = PBXGroup;
+			children = (
+				84AB10181057D6990069D5E2 /* iTransGasSensor.nib */,
+				84AB10191057D6990069D5E2 /* iTransGasSensor.tif */,
+				84AB101A1057D6990069D5E2 /* ORiTransGasSensorModel.h */,
+				84AB101B1057D6990069D5E2 /* ORiTransGasSensorModel.m */,
+				84DBA1311058122C00884B1C /* ORiTransGasSensorController.m */,
+				84DBA1321058122C00884B1C /* ORiTransGasSensorController.h */,
+			);
+			name = GasSensor;
+			path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor;
 			sourceTree = SOURCE_ROOT;
 		};
 		84AB8BB30D2314A500EC39F2 /* CmdHistory */ = {
@@ -8448,7 +8502,7 @@
 				84DF917304D6D53C005F64B1 /* ORFileMover.m */,
 				848463A90625D65F00128299 /* ORSmartFolder.h */,
 				848463A60625D65F00128299 /* ORSmartFolder.m */,
-				84B74B3B0FEAB19E0033E658 /* scpExpectScript */,
+				845498C310628DF400F8DE1C /* scpExpectScript */,
 				84B74ACF0FEAAB460033E658 /* ftpExpectScript */,
 				848463B70625D76A00128299 /* SmartFolder.nib */,
 			);
@@ -10070,6 +10124,10 @@
 				84D8CC8B1045A85B005585C5 /* ORVmeTests.h in Headers */,
 				84D8CF851046FE32005585C5 /* ORAmrelHVDecoders.h in Headers */,
 				84167116104C04D400E47227 /* ORAutoTestUnit.h in Headers */,
+				84AB0F401056DA4E0069D5E2 /* ORModBusController.h in Headers */,
+				84AB0F441056DA4E0069D5E2 /* ORModBusModel.h in Headers */,
+				84AB101E1057D6990069D5E2 /* ORiTransGasSensorModel.h in Headers */,
+				84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10693,7 +10751,6 @@
 				8408B23D0FDD579800B0206D /* IPE.png in Resources */,
 				8408B2830FDD5A9D00B0206D /* IPEV4.png in Resources */,
 				84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */,
-				84B74B3C0FEAB19E0033E658 /* scpExpectScript in Resources */,
 				84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */,
 				84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */,
 				846A5EB30FF126B2001CBD54 /* WebServer.gif in Resources */,
@@ -10715,6 +10772,11 @@
 				840E72F3103DB4980070AD70 /* AmrelHV.tif in Resources */,
 				84D8CB4810447492005585C5 /* AutoTester.nib in Resources */,
 				84D8CB4E10447A57005585C5 /* AutoTester.gif in Resources */,
+				84AB0F3D1056DA4E0069D5E2 /* ModBus.nib in Resources */,
+				84AB10081057D5290069D5E2 /* ModBus.tif in Resources */,
+				84AB101C1057D6990069D5E2 /* iTransGasSensor.nib in Resources */,
+				84AB101D1057D6990069D5E2 /* iTransGasSensor.tif in Resources */,
+				845498C410628DF400F8DE1C /* scpExpectScript in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11448,6 +11510,10 @@
 				84D8CC8C1045A85B005585C5 /* ORVmeTests.m in Sources */,
 				84D8CF841046FE32005585C5 /* ORAmrelHVDecoders.m in Sources */,
 				84167117104C04D400E47227 /* ORAutoTestUnit.m in Sources */,
+				84AB0F411056DA4E0069D5E2 /* ORModBusController.m in Sources */,
+				84AB0F451056DA4E0069D5E2 /* ORModBusModel.m in Sources */,
+				84AB101F1057D6990069D5E2 /* ORiTransGasSensorModel.m in Sources */,
+				84DBA1331058122C00884B1C /* ORiTransGasSensorController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
