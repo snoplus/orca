@@ -197,8 +197,8 @@
 		unsigned short statusWord = [model statusBits];
 
 		//-------------------------------------
-		BOOL currentLoopOpen    = statusWord & 0x8000;
-		BOOL currentLoopShorted = statusWord & 0x4000;
+		int currentLoopOpen    = statusWord & 0x8000;
+		int currentLoopShorted = statusWord & 0x4000;
 				
 		if(currentLoopOpen || currentLoopShorted){
 			if(currentLoopOpen)	[currentLoopField setStringValue:@"OPEN"];
@@ -206,34 +206,33 @@
 		}
 		else [currentLoopField setStringValue:@""];
 	
-		
 		//-------------------------------------
-		BOOL powerFault			= statusWord & 0x2000;
-		BOOL fiveVoltFault		= statusWord & 0x1000;
+		int powerFault			= statusWord & 0x2000;
+		int fiveVoltFault		= statusWord & 0x1000;
 		if(powerFault || fiveVoltFault){
-			if(powerFault)[powerField setStringValue:@"FAILED"];
+			if(powerFault)[powerField setStringValue:@"Power"];
 			else [powerField setStringValue:@"5 Volt"];
 		}
 		else [powerField setStringValue:@""];
 
 		//-------------------------------------
-		BOOL highAlarm	= statusWord & 0x0002;
-		BOOL lowAlarm	= statusWord & 0x0001;
+		int highAlarm	= statusWord & 0x0002;
+		int lowAlarm	= statusWord & 0x0001;
 		failedSensor	= statusWord & 0x0004;
 		alarmed			= highAlarm || lowAlarm;
 		missingSensor	= statusWord & 0x0800;
 		[self gasReadingChanged:nil];
 
 		//-------------------------------------
-		BOOL calibrationFault	= statusWord & 0x0010;
+		int calibrationFault	= statusWord & 0x0010;
 		[calibrationField setStringValue:calibrationFault?@"Calibration":@""];
 		
 		//-------------------------------------
-		BOOL zeroFault			= statusWord & 0x0020;
+		int zeroFault			= statusWord & 0x0020;
 		[zeroFaultField setStringValue:zeroFault?@"ZeroFault":@""];
 		
 		//-------------------------------------
-		BOOL overRange			= statusWord & 0x0008;
+		int overRange			= statusWord & 0x0008;
 		[overRangeField setStringValue:overRange?@"OverRange":@""];
 		
 	}
