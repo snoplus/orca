@@ -47,6 +47,8 @@
 
 #pragma mark ¥¥¥Serial Ports
 - (void) scanForSerialPorts;
+- (void) sendOnPort:(int)index anArray:(NSArray*)someData;
+- (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 
 #pragma mark ¥¥¥IP
 - (NSString*) ipAddress:(int)desiredNetwork;

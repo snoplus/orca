@@ -23,7 +23,7 @@
 #import "ORMacModel.h"
 #import "ORVmeAdapter.h"
 #import "ORSerialPortList.h"
-#import "ORSerialPort.h"
+#import "ORSerialPortAdditions.h"
 
 #import "ORFireWireInterface.h"
 #import "ORCrate.h"
@@ -203,6 +203,23 @@ void registryChanged(
     return [serialPorts objectAtIndex:index];
 }
 
+- (void) sendOnPort:(int)index anArray:(NSArray*)someData
+{
+	ORSerialPort* aPort = [self serialPort:index];
+	if(aPort){
+		NSMutableData* theData = [NSMutableData data];
+		int i;
+		for(i=0;i<[someData count];i++){
+			unsigned char aByte = [[someData objectAtIndex:i] unsignedCharValue];
+			[theData appendBytes:&aByte length:1];
+		}
+		[aPort writeDataInBackground:theData];
+	}
+}
+
+- (void) serialPortWriteProgress:(NSDictionary *)dataDictionary
+{
+}
 
 #pragma mark ¥¥¥Serial Ports
 - (void) scanForSerialPorts
