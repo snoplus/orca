@@ -36,7 +36,7 @@ UCFLAGS =  -g -Wall  -gstabs+ -I/home/katrin/src/v4/feshell/src -I/home/katrin/s
 #LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
  
 #-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
-LFLAGS  =  -fexceptions -lpbusaccesspci -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
+LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
  
 
 LIBs    = 
