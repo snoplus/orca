@@ -1,8 +1,28 @@
 TARGET  = OrcaReadout
-SOURCES = SBC_Readout.c CircularBuffer.c HW_Readout.c 
+
+# Set to 'true' to compile HW_Readout.cpp as C++.
+# fdhwlib requires C++. -tb- 2009-09-25
+COMPILE_CPLUSPLUS = true
+ifeq ($(COMPILE_CPLUSPLUS),true)
+  SOURCES = SBC_Readout.c CircularBuffer.c 
+  SOURCESCPP = HW_Readout.cpp 
+else
+  SOURCES = SBC_Readout.c CircularBuffer.c HW_Readout.c
+  #SOURCESCPP = HW_Readout.cpp 
+endif
+
+
+##SOURCES = SBC_Readout.c CircularBuffer.c HW_Readout.c
+##SOURCESCPP = HW_Readout.cpp 
+#SOURCES = SBC_Readout.c CircularBuffer.c 
+#SOURCESCPP = HW_Readout.cpp 
+
+CC = gcc
+CCPP = g++
 
 
 OBJECTS = $(SOURCES:.c=.o)
+OBJECTSCPP = $(SOURCESCPP:.cpp=.oo)
 
 # RECOMMENDED SETUP:
 # It is assuemed that the fdhwlib is compiled in the folder: ~/src/v4
@@ -24,7 +44,7 @@ OBJECTS = $(SOURCES:.c=.o)
 #----add in flags for your driver libraries and include files
 #UCFLAGS =  -g -Wall -gstabs+ -D_LINUX -fexceptions 
 # ===> use this -tb- !!!!   UCFLAGS =  -g -Wall  -gstabs+
-UCFLAGS =  -g -Wall  -gstabs+ -I/home/katrin/src/v4/feshell/src -I/home/katrin/src/v4/pbusaccess
+UCFLAGS =  -g -Wall  -gstabs+ -I/home/katrin/src/v4/fdhwlib/src -I/home/katrin/src/v4/pbusaccess
 #LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \
 #                                /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation \
 #                                /System/Library/Frameworks/IOKit.framework/IOKit 
@@ -36,18 +56,22 @@ UCFLAGS =  -g -Wall  -gstabs+ -I/home/katrin/src/v4/feshell/src -I/home/katrin/s
 #LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
  
 #-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
-LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
+LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lhw4 -lakutil -lpthread -lstdc++ 
  
 
 LIBs    = 
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) $(OBJECTSCPP)
 	@echo linking $*
-	$(CC)  -o $(TARGET) $(OBJECTS) $(LIBs) $(LFLAGS)  
+	$(CCPP)  -o $(TARGET) $(OBJECTS) $(OBJECTSCPP) $(LIBs) $(LFLAGS)  
 
 %.o: %.c
-	@echo compiling $*
+	@echo compiling $* using %.o: %.c
 	$(CC) -c $(UCFLAGS) $<
 
+%.oo: %.cpp
+	@echo compiling $* using %.oo: %.cpp
+	$(CCPP) -c $(UCFLAGS) $< -o $*.oo
+
 clean :
-	rm $(TARGET) *.o
+	rm $(TARGET) *.o *.oo

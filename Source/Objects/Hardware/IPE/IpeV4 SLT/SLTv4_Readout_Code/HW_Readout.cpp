@@ -1,5 +1,5 @@
 //
-//  HW_Readout.m
+//  HW_Readout.cpp
 //  Orca
 //
 //  Created by Mark Howe on Mon Mar 10, 2008
@@ -24,15 +24,31 @@
 #include <sys/types.h>
 #include <time.h>
 #include <errno.h>
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "SBC_Cmds.h"
 #include "SBC_Config.h"
-#include "HW_Readout.h"
 #include "SBC_Readout.h"
 #include "CircularBuffer.h"
 #include "SLTv4_HW_Definitions.h"
+#ifdef __cplusplus
+}
+#endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "pbusinterface.h"
-//#include "hw4/baseregister.h"
+#ifdef __cplusplus
+}
+#endif
+
+#include "hw4/baseregister.h"
+
+#include "HW_Readout.h"
 
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
@@ -87,6 +103,15 @@ void FindHardware(void)
 {
 	//open device driver(s), get device driver handles
         pbusInit("FE.ini");
+        // testing the C++ link to fdhwlib -tb-
+        if(0){
+            printf("Try to create a BaseRegister object -tb-\n");
+            fflush(stdout);
+            hw4::BaseRegister *reg;
+            reg = new hw4::BaseRegister("dummy",3,7,1,1);
+            fprintf(stdout,"  ->register name is %s, addr 0x%08x\n", reg->getName(),reg->getAddr());
+            fflush(stdout);
+        }
 }
 
 void ReleaseHardware(void)

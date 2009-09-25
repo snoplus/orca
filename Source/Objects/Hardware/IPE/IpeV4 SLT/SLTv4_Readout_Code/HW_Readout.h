@@ -20,7 +20,11 @@
 #ifndef _H_HWREADOUT_
 #define _H_HWREADOUT_
 
-#include "SBC_Cmds.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//#include "SBC_Cmds.h"
 
 void processHWCommand(SBC_Packet* aPacket);
 void startHWRun (SBC_crate_config* config);
@@ -33,5 +37,9 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
 
 int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
