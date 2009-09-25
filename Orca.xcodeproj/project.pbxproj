@@ -75,6 +75,7 @@
 		2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */; };
 		2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */; };
 		2D2C84090F4EC6650005D69F /* ORIpeSlowControlDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */; };
+		2D6672DC106D30EA001C4A11 /* HW_Readout.cpp in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D6672C4106D2F48001C4A11 /* HW_Readout.cpp */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
@@ -2118,6 +2119,7 @@
 			dstPath = SLTv4_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				2D6672DC106D30EA001C4A11 /* HW_Readout.cpp in SLTv4_Copy */,
 				8422513F0D8845500048D331 /* HW_Readout.c in SLTv4_Copy */,
 				842251400D8845500048D331 /* HW_Readout.h in SLTv4_Copy */,
 				842251410D8845500048D331 /* Makefile in SLTv4_Copy */,
@@ -2268,6 +2270,7 @@
 		2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDecoder.h; path = "IPE SlowControl/ORIpeSlowControlDecoder.h"; sourceTree = "<group>"; };
 		2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlDecoder.m; path = "IPE SlowControl/ORIpeSlowControlDecoder.m"; sourceTree = "<group>"; };
 		2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDefs.h; path = "IPE SlowControl/ORIpeSlowControlDefs.h"; sourceTree = "<group>"; };
+		2D6672C4106D2F48001C4A11 /* HW_Readout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HW_Readout.cpp; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
@@ -5504,6 +5507,7 @@
 		8422512D0D8845390048D331 /* SLTv4_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				2D6672C4106D2F48001C4A11 /* HW_Readout.cpp */,
 				8422512E0D8845390048D331 /* HW_Readout.c */,
 				8422512F0D8845390048D331 /* HW_Readout.h */,
 				842251300D8845390048D331 /* Makefile */,
