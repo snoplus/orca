@@ -873,8 +873,10 @@
 	[self endEditing];
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
-		[model writeReg:index value:[model writeValue]];
-		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+		//[model writeReg:index value:[model writeValue]];
+		[model writeReg:index value:[regWriteValueTextField intValue]];
+		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[regWriteValueTextField intValue],[model getRegisterName:index]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing SLT reg: %@\n",[model getRegisterName:index]);
