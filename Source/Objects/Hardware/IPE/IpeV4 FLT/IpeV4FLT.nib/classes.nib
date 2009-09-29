@@ -241,6 +241,12 @@
 				<string>NSMatrix</string>
 				<key>readoutPagesField</key>
 				<string>NSTextField</string>
+				<key>regReadButton</key>
+				<string>NSButton</string>
+				<key>regWriteButton</key>
+				<string>NSButton</string>
+				<key>regWriteValueStepper</key>
+				<string>NSStepper</string>
 				<key>regWriteValueTextField</key>
 				<string>NSTextField</string>
 				<key>registerPopUp</key>
