@@ -823,10 +823,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int)  readVersion
 {	
 	unsigned long data = 0;
-    if([[[self crate] adapter] IpeCrateVersion]==3){
-        data = [self readControlStatus];
-	    return (data >> kIpeFlt_Cntl_Version_Shift) & kIpeFlt_Cntl_Version_Mask;
-    }
+	data = [self readControlStatus];
+	return (data >> kIpeFlt_Cntl_Version_Shift) & kIpeFlt_Cntl_Version_Mask;
+    
     data = [self readReg: kFLTV4CFPGAVersionReg];
     //data = [self readReg:kFLTV4FPGA8Version];
 	return data;
@@ -929,15 +928,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (unsigned long) readControlStatus
 {
-    unsigned long value=0;
-    if([[[self crate] adapter] IpeCrateVersion]==3){
-	    value =   [self readReg: kFLTControlReg ];
-    	[self setLedOff: ((value & kIpeFlt_Cntl_LedOff_Mask) >> kIpeFlt_Cntl_LedOff_Shift)];
-    }else{
-	    //unsigned long value =   [self readReg: kFLTV4ControlReg ];
-	    value =   [self readReg: kFLTV4ControlReg ];
-    }
-	return value;
+	return [self readReg: kFLTV4ControlReg ];
 }
 
 - (void) writeControlStatus
@@ -1053,8 +1044,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel
 {
-    if([[[self crate] adapter] IpeCrateVersion]==3)
-	    return ([self slot] << 24) | (ipeV3Reg[aReg].space << kIpeFlt_AddressSpace) | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress) | ipeV3Reg[aReg].address;
 	return ([self stationNumber] << 17) | (aChannel << 12)   | regV4[aReg].addressOffset; //TODO: the channel ... -tb-   | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress)
 }
 
@@ -1062,14 +1051,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
  */ //-tb-
 - (unsigned long) regAddress:(int)aReg
 {
-	id slt = [[self crate] adapter];
-    int version = [slt IpeCrateVersion];
-    if(version==3)
-	    return ([self slot] << 24) | (ipeV3Reg[aReg].space << kIpeFlt_AddressSpace)  | ipeV3Reg[aReg].address;
-    if(version==4)
-	    //return ([self slot] << 19) |  ipeV4Reg[aReg].address; //TODO: NEED <<17 !!! -tb-
-	    return ([self stationNumber] << 17) |  regV4[aReg].addressOffset; //TODO: NEED <<17 !!! -tb-
-    return 0;
+
+	return ([self stationNumber] << 17) |  regV4[aReg].addressOffset; //TODO: NEED <<17 !!! -tb-
 }
 
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
@@ -1081,12 +1064,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (unsigned long) readReg:(int)aReg
 {
 	//	ORIpeV4SLTModel slt = [[self crate] adapter];
-	id slt = [[self crate] adapter];
-    int version = [slt IpeCrateVersion];
-    NSLog(@"V4FLT:readReg started: crate %p, slt is %p, version is %i\n",[self crate],slt,version);
-    if(version==3)
-		return [self read:[self regAddress:aReg]];
-    if(version==4 || version==0){
+
         NSLog(@"V4-FLT:readReg: detected V4 version\n");
         #if 0
         //test: loop over crate group -tb-
@@ -1125,8 +1103,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	    //return [self read:[self regAddress:aReg]];
         
         //return [self read:[self regAddress: kFLTV4CFPGAVersion]]; // this read goes via SLT! -tb-
-    }
-    return 0;
+    
 }
 
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel
@@ -2090,16 +2067,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		
 		NSLog(@"FLT %d\n",[self stationNumber]);
 		
-		[slt setSwInhibit]; 
-		[slt releaseAllPages]; 
-		[slt releaseSwInhibit]; 
+		//[slt setSwInhibit]; 
+		//slt releaseAllPages]; 
+		//[slt releaseSwInhibit]; 
 		
 		int numPulses = 10;
 		for(i=0;i<numPulses;i++){
-			[slt pulseOnce];
+			//[slt pulseOnce];
 			[ORTimer delay:.1];
 		}
-		[slt readPageStatus];
+		//[slt readPageStatus];
 		unsigned long lowStatus = [slt pageStatusLow];
 		unsigned long highStatus = [slt pageStatusHigh];
 		if(lowStatus | highStatus){

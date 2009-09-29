@@ -836,6 +836,7 @@
 
 - (IBAction) selectRegisterAction:(id) aSender
 {
+	/*
  NSLog(@"This is: FLTv4: selectRegisterAction\n");
     // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
@@ -843,16 +844,19 @@
 	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
 		[self settingsLockChanged:nil];
     }
+	 */
 }
 
 - (IBAction) writeValueAction:(id) aSender
 {
+	/*
 	[self endEditing];
     // Make sure that value has changed.
     if ([aSender intValue] != [model writeValue]){
 		[[model undoManager] setActionName:@"Set Write Value"]; // Set undo name.
 		[model setWriteValue:[aSender intValue]]; // Set new value
     }
+	 */
 }
 
 - (IBAction) readRegAction: (id) sender

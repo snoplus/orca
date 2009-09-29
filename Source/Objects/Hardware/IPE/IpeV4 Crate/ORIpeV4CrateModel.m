@@ -80,7 +80,14 @@
 - (void) makeConnectors
 {
 	//no connectors
-	
+}
+
+- (void) connected
+{
+}
+
+- (void) disconnected
+{
 }
 
 - (void) makeMainController
