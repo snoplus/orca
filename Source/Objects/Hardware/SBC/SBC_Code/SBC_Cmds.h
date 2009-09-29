@@ -128,7 +128,7 @@ SBC_VmeWriteBlockStruct;
 typedef 
     struct {
         uint32_t address;        /*first address*/
-        uint32_t errorCode;    /*filled on return*/
+        int32_t errorCode;    /*filled on return*/
         uint32_t numItems;        /*number Items of data to follow*/
         /*followed by the requested data, number of items from above*/
     }
@@ -137,7 +137,7 @@ SBC_IPEv4WriteBlockStruct;
 typedef 
     struct {
         uint32_t address;        /*first address*/
-        uint32_t errorCode;     /*filled on return*/
+        int32_t errorCode;     /*filled on return*/
         uint32_t numItems;        /*number of items to read*/
     }
 SBC_IPEv4ReadBlockStruct;

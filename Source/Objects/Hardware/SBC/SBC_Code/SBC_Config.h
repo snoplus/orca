@@ -23,7 +23,7 @@
 
 typedef struct {
     uint32_t header;
-    uint32_t total_cards;                   // total sum of all cards
+    int32_t total_cards;                   // total sum of all cards
     struct {								// structure required for card
         uint32_t hw_type_id;                // unique hardware identifier code
         uint32_t hw_mask[10];				// hardware identifier mask to OR into data word
