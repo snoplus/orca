@@ -26,11 +26,14 @@
 
 @interface ORIpeV4SLTController : SBC_LinkController {
 	@private
-		IBOutlet NSTextField*	projectField;
-		IBOutlet NSTextField*	docField;
-		IBOutlet NSTextField*	implementationField;
+	
+		IBOutlet NSTextField* projectField;
+		IBOutlet NSTextField* docField;
+		IBOutlet NSTextField* implementationField;
 	
 		//control reg
+		IBOutlet NSMatrix*		triggerEnableMatrix;
+	
 		IBOutlet NSButton*		initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
@@ -42,7 +45,6 @@
 		IBOutlet NSPopUpButton* watchDogPU;
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
 		IBOutlet NSPopUpButton* startSrcPU;
-		IBOutlet NSMatrix*		triggerSrcMatrix;
 		IBOutlet NSMatrix*		controlCheckBoxMatrix;
 		IBOutlet NSMatrix*		inhibitCheckBoxMatrix;
 		IBOutlet NSMatrix*		inhibitMaskMatrix;
@@ -113,13 +115,14 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) statusRegChanged:(NSNotification*)aNote;
+- (void) controlRegChanged:(NSNotification*)aNote;
 - (void) hwVersionChanged:(NSNotification*) aNote;
 
 - (void) readAllChanged:(NSNotification*)aNote;
 - (void) patternFilePathChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
 - (void) nextPageDelayChanged:(NSNotification*)aNote;
-- (void) versionChanged:(NSNotification*)aNote;
 - (void) nHitThresholdChanged:(NSNotification*)aNote;
 - (void) nHitChanged:(NSNotification*)aNote;
 - (void) pageSizeChanged:(NSNotification*)aNote;
@@ -132,7 +135,6 @@
 
 - (void) endAllEditing:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;
-- (void) statusRegChanged:(NSNotification*)aNote;
 - (void) selectedRegIndexChanged:(NSNotification*) aNote;
 - (void) writeValueChanged:(NSNotification*) aNote;
 

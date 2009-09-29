@@ -108,12 +108,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 					 selector : @selector(writeValueChanged:)
 						 name : ORIpeV4SLTWriteValueChanged
 					   object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(statusRegChanged:)
-                         name : ORIpeV4SLTStatusRegChanged
-                       object : model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(pulserAmpChanged:)
                          name : ORIpeV4SLTPulserAmpChanged
@@ -148,12 +143,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                      selector : @selector(nHitThresholdChanged:)
                          name : ORIpeV4SLTModelNHitThresholdChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(versionChanged:)
-                         name : ORIpeV4SLTModelFpgaVersionChanged
-						object: model];
-	
+
     [notifyCenter addObserver : self
                      selector : @selector(interruptMaskChanged:)
                          name : ORIpeV4SLTModelInterruptMaskChanged
@@ -189,9 +179,34 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : ORIpeV4SLTModelReadAllChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(controlRegChanged:)
+                         name : ORIpeV4SLTModelControlRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusRegChanged:)
+                         name : ORIpeV4SLTModelStatusRegChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) statusRegChanged:(NSNotification*)aNote
+{
+	unsigned long statusReg = [model statusReg];
+
+	
+	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusWDog)?@"ERR":@"OK"];
+	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"ERR":@"OK"]; 
+	[[statusMatrix cellWithTag:2] setStringValue: IsBitSet(statusReg,kStatusPpsErr)?@"ERR":@"OK"]; 
+	[[statusMatrix cellWithTag:3] setStringValue: [NSString stringWithFormat:@"0x%02x",ExtractValue(statusReg,kStatusClkErr,4)]]; 
+	[[statusMatrix cellWithTag:4] setStringValue: IsBitSet(statusReg,kStatusGpsErr)?@"ERR":@"OK"]; 
+	[[statusMatrix cellWithTag:5] setStringValue: IsBitSet(statusReg,kStatusVttErr)?@"ERR":@"OK"]; 
+	[[statusMatrix cellWithTag:6] setStringValue: IsBitSet(statusReg,kStatusFanErr)?@"ERR":@"OK"]; 
+
+}
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
@@ -205,8 +220,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		case  4: [self resizeWindowToSize:cpuManagementSize];	break;
 		default: [self resizeWindowToSize:cpuTestsSize];	    break;
     }
-	
-    
 }
 
 - (void) readAllChanged:(NSNotification*)aNote
@@ -252,24 +265,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-- (void) versionChanged:(NSNotification*)aNote
-{
-	[versionField setFloatValue: [model fpgaVersion]];
-	int i;
-	if(![model usingNHitTriggerVersion]){
-		for(i=0;i<kFltNumberTriggerSources;i++){
-			[[triggerSrcMatrix cellWithTag:i] setTitle:fltV4TriggerSourceNames[0][i]];
-		}
-	}
-	else {
-		for(i=0;i<kFltNumberTriggerSources;i++){
-			[[triggerSrcMatrix cellWithTag:i] setTitle:fltV4TriggerSourceNames[1][i]];
-		}
-	}
-	
-	[self settingsLockChanged:nil];
-}
-
 - (void) nHitThresholdChanged:(NSNotification*)aNote
 {
 	[nHitThresholdField setIntValue: [model nHitThreshold]];
@@ -294,7 +289,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [super updateWindow];
 	[self hwVersionChanged:nil];
 	[self controlRegChanged:nil];
-	[self statusRegChanged:nil];
     [self writeValueChanged:nil];
     [self pulserAmpChanged:nil];
     [self pulserDelayChanged:nil];
@@ -307,11 +301,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self interruptMaskChanged:nil];
 	[self nextPageDelayChanged:nil];
 	[self pageStatusChanged:nil];
-	[self versionChanged:nil];
     [self pollRateChanged:nil];
     [self pollRunningChanged:nil];
 	[self patternFilePathChanged:nil];
 	[self readAllChanged:nil];
+	[self statusRegChanged:nil];
 }
 
 
@@ -347,7 +341,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[readBoardButton setEnabled:!lockedOrRunningMaintenance];
     [controlCheckBoxMatrix setEnabled:!lockedOrRunningMaintenance];
     [inhibitCheckBoxMatrix setEnabled:!lockedOrRunningMaintenance];
-	[triggerSrcMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[triggerEnableMatrix setEnabled:!lockedOrRunningMaintenance]; 
 	[watchDogPU setEnabled:!lockedOrRunningMaintenance]; 
 	[secStrobeSrcPU setEnabled:!lockedOrRunningMaintenance]; 
 	[startSrcPU setEnabled:!lockedOrRunningMaintenance]; 
@@ -458,7 +452,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) controlRegChanged:(NSNotification*)aNote
 {
 	
-	[[controlCheckBoxMatrix cellWithTag:0] setIntValue:[model ledInhibit]];
+/*	[[controlCheckBoxMatrix cellWithTag:0] setIntValue:[model ledInhibit]];
 	[[controlCheckBoxMatrix cellWithTag:1] setIntValue:[model ledVeto]];
 	[[controlCheckBoxMatrix cellWithTag:2] setIntValue:[model enableDeadTimeCounter]];
 	
@@ -471,39 +465,15 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[watchDogPU selectItemAtIndex:[watchDogPU indexOfItemWithTag:[model watchDogStart]]];
 	[secStrobeSrcPU selectItemAtIndex:[secStrobeSrcPU indexOfItemWithTag:[model secStrobeSource]]];
 	[startSrcPU selectItemAtIndex:[startSrcPU indexOfItemWithTag:[model testPulseSource]]];
-	
+
 	int i;
 	for(i=0;i<kFltNumberTriggerSources;i++){
 		unsigned long aTriggerMask = [model triggerSource];
-		if(aTriggerMask & (1L<<i)) [[triggerSrcMatrix cellWithTag:i] setIntValue:1];
+		if(aTriggerMask & (1L<<i)) [[triggerSourceMatrix cellWithTag:i] setIntValue:1];
 		else [[triggerSrcMatrix cellWithTag:i] setIntValue:0];
 	}
-	
+	*/
 }
-
-- (void) statusRegChanged:(NSNotification*)aNote
-{
-	NSColor* redColor  = [NSColor colorWithDeviceRed:.65 green:0 blue:0 alpha:1];
-	NSColor* greenColor = [NSColor colorWithDeviceRed:0 green:.65 blue:0 alpha:1];
-	
-	[[statusMatrix cellWithTag:0] setTitle:[model veto]?@"Set": @"Clear"];
-	[[statusMatrix cellWithTag:0] setTextColor:[model veto]?redColor:greenColor];
-	
-	[[statusMatrix cellWithTag:1] setTitle:[model extInhibit]?@"Set": @"Clear"];
-	[[statusMatrix cellWithTag:1] setTextColor:[model extInhibit]?redColor:greenColor];
-	
-	[[statusMatrix cellWithTag:2] setTitle:[model nopgInhibit]?@"Set": @"Clear"];
-	[[statusMatrix cellWithTag:2] setTextColor:[model nopgInhibit]?redColor:greenColor];
-	
-	[[statusMatrix cellWithTag:3] setTitle:[model swInhibit]?@"Set": @"Clear"];
-	[[statusMatrix cellWithTag:3] setTextColor:[model swInhibit]?redColor:greenColor];
-	
-	[[statusMatrix cellWithTag:4] setTitle:[model inhibit]?@"Set": @"Clear"];
-	[[statusMatrix cellWithTag:4] setTextColor:[model inhibit]?redColor:greenColor];
-}
-
-
-
 
 - (void) populatePullDown
 {
@@ -619,7 +589,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) readStatus:(id)sender
 {
-	//[model readStatusReg];
+	[model readStatusReg];
 	//[model readPageStatus];
 }
 
@@ -627,7 +597,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	@try {
 		[model printStatusReg];
-		//[model printControlReg];
+		[model printControlReg];
 		//[model printInterruptMask];
 	}
 	@catch(NSException* localException) {
@@ -814,6 +784,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) triggerSourceAction:(id)sender
 {
+	/*
 	unsigned long aTriggerMask = 0;
 	int i;
 	for(i=0;i<kFltNumberTriggerSources;i++){
@@ -821,6 +792,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		else aTriggerMask &= ~(1L<<i);
 	}
 	[model setTriggerSource:aTriggerMask];
+	 */
 }
 
 - (IBAction) releaseAllPagesAction:(id)sender

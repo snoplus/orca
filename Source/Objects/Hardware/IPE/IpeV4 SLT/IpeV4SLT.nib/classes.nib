@@ -375,7 +375,7 @@
 				<string>NSMatrix</string>
 				<key>totalView</key>
 				<string>NSView</string>
-				<key>triggerSrcMatrix</key>
+				<key>triggerEnableMatrix</key>
 				<string>NSMatrix</string>
 				<key>usePBusSimButton</key>
 				<string>NSButton</string>

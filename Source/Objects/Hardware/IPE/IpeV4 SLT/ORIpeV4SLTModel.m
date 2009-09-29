@@ -31,88 +31,6 @@
 #import "PCM_Link.h"
 #import "SLTv4_HW_Definitions.h"
 
-//control reg bit masks
-#define kCtrlLedOffmask	(0x00000001 << 17) //RW
-#define kCtrlIntEnMask	(0x00000001 << 16) //RW
-#define kCtrlTstSltMask	(0x00000001 << 15) //RW
-#define kCtrlRunMask	(0x00000001 << 14) //RW
-#define kCtrlShapeMask	(0x00000001 << 13) //RW
-#define kCtrlTpEn		(0x00000003 << 11) //RW
-#define kCtrlPPS		(0x00000001 << 10) //RW
-#define kCtrlInhEn		(0x0000000F <<  6) //RW
-#define kCtrlTrEn		(0x0000003F <<  0) //RW
-
-//status reg bit masks
-#define kStatusIrq			(0x00000001 << 31) //R
-#define kStatusFltStat		(0x00000001 << 30) //R
-#define kStatusGps2			(0x00000001 << 29) //R
-#define kStatusGps1			(0x00000001 << 28) //R
-#define kStatusInhibitSrc	(0x0000000f << 24) //R
-#define kStatusInh			(0x00000001 << 23) //R
-#define kStatusSemaphores	(0x00000007 << 16) //R - cleared on W
-#define kStatusFltTmo		(0x00000001 << 15) //R - cleared on W
-#define kStatusPgFull		(0x00000001 << 14) //R - cleared on W
-#define kStatusPgRdy		(0x00000001 << 13) //R - cleared on W
-#define kStatusEvRdy		(0x00000001 << 12) //R - cleared on W
-#define kStatusSwRq			(0x00000001 << 11) //R - cleared on W
-#define kStatusFanErr		(0x00000001 << 10) //R - cleared on W
-#define kStatusFanErr		(0x00000001 << 10) //R - cleared on W
-#define kStatusVttErr		(0x00000001 <<  9) //R - cleared on W
-#define kStatusGpsErr		(0x00000001 <<  8) //R - cleared on W
-#define kStatusClkErr		(0x0000000F <<  4) //R - cleared on W
-#define kStatusPpsErr		(0x00000001 <<  3) //R - cleared on W
-#define kStatusPixErr		(0x00000001 <<  2) //R - cleared on W
-#define kStatusWDog			(0x00000001 <<  1) //R - cleared on W
-#define kStatusFltRq		(0x00000001 <<  0) //R - cleared on W
-
-//Cmd reg bit masks
-#define kCmdDisCnt			(0x00000001 << 10) //W - self cleared
-#define kCmdEnCnt			(0x00000001 <<  9) //W - self cleared
-#define kCmdClrCnt			(0x00000001 <<  8) //W - self cleared
-#define kCmdSwRq			(0x00000001 <<  7) //W - self cleared
-#define kCmdFltRes			(0x00000001 <<  6) //W - self cleared
-#define kCmdSltRes			(0x00000001 <<  5) //W - self cleared
-#define kCmdFwCfg			(0x00000001 <<  4) //W - self cleared
-#define kCmdTpStart			(0x00000001 <<  3) //W - self cleared
-#define kCmdSwTr			(0x00000001 <<  2) //W - self cleared
-#define kCmdClrInh			(0x00000001 <<  1) //W - self cleared
-#define kCmdSetInh			(0x00000001 <<  0) //W - self cleared
-
-//Interrupt Request and Mask reg bit masks
-//Interrupt Request Read only - cleared on Read
-//Interrupt Mask Read/Write only
-#define kIrptFtlTmo		(0x00000001 << 15) 
-#define kIrptPgFull		(0x00000001 << 14) 
-#define kIrptPgRdy		(0x00000001 << 13) 
-#define kIrptEvRdy		(0x00000001 << 12) 
-#define kIrptSwRq		(0x00000001 << 11) 
-#define kIrptFanErr		(0x00000001 << 10) 
-#define kIrptVttErr		(0x00000001 <<  9) 
-#define kIrptGPSErr		(0x00000001 <<  8) 
-#define kIrptClkErr		(0x0000000F <<  4) 
-#define kIrptPpsErr		(0x00000001 <<  3) 
-#define kIrptPixErr		(0x00000001 <<  2) 
-#define kIrptWdog		(0x00000001 <<  1) 
-#define kIrptFltRq		(0x00000001 <<  0) 
-
-//Revision Masks
-#define kRevisionProject (0x0000000F << 28) //R
-#define kDocRevision	 (0x00000FFF << 16) //R
-#define kImplemention	 (0x0000FFFF <<  0) //R
-
-//Page Manager Masks
-#define kPageMngReset			(0x00000001 << 22) //W - self cleared
-#define kPageMngNumFreePages	(0x0000007F << 15) //R
-#define kPageMngPgFull			(0x00000001 << 14) //W
-#define kPageNextPage			(0x0000003F <<  8) //W
-#define kPageReady				(0x00000001 <<  7) //W
-#define kPageOldestBuffer		(0x0000003F <<  1) //W
-#define kPageRelease			(0x00000001 <<  0) //W - self cleared
-
-//Trigger Timing
-#define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
-#define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
-
 //IPE V4 register definitions
 enum IpeV4Enum {
 	kSLTV4ControlReg,
@@ -207,6 +125,15 @@ static IpeRegisterNamesStruct regV4[kSLTV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* ORIpeV4SLTModelStatusRegChanged = @"ORIpeV4SLTModelStatusRegChanged";
+NSString* ORIpeV4SLTModelControlRegChanged = @"ORIpeV4SLTModelControlRegChanged";
+NSString* ORIpeV4SLTModelFanErrorChanged		= @"ORIpeV4SLTModelFanErrorChanged";
+NSString* ORIpeV4SLTModelVttErrorChanged		= @"ORIpeV4SLTModelVttErrorChanged";
+NSString* ORIpeV4SLTModelGpsErrorChanged		= @"ORIpeV4SLTModelGpsErrorChanged";
+NSString* ORIpeV4SLTModelClockErrorChanged		= @"ORIpeV4SLTModelClockErrorChanged";
+NSString* ORIpeV4SLTModelPpsErrorChanged		= @"ORIpeV4SLTModelPpsErrorChanged";
+NSString* ORIpeV4SLTModelPixelBusErrorChanged	= @"ORIpeV4SLTModelPixelBusErrorChanged";
+NSString* ORIpeV4SLTModelWatchDogErrorChanged	= @"ORIpeV4SLTModelWatchDogErrorChanged";
 NSString* ORIpeV4SLTModelHwVersionChanged		= @"ORIpeV4SLTModelHwVersionChanged";
 
 NSString* ORIpeV4SLTModelPatternFilePathChanged		= @"ORIpeV4SLTModelPatternFilePathChanged";
@@ -322,9 +249,34 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (unsigned long) statusReg
+{
+    return statusReg;
+}
+
+- (void) setStatusReg:(unsigned long)aStatusReg
+{
+    statusReg = aStatusReg;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelStatusRegChanged object:self];
+}
+
+- (unsigned long) controlReg
+{
+    return controlReg;
+}
+
+- (void) setControlReg:(unsigned long)aControlReg
+{
+    controlReg = aControlReg;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelControlRegChanged object:self];
+}
+
 - (unsigned long) projectVersion  { return (hwVersion & kRevisionProject)>>28;}
 - (unsigned long) documentVersion { return (hwVersion & kDocRevision)>>16;}
 - (unsigned long) implementation  { return hwVersion & kImplemention;}
+
 
 - (void) setHwVersion:(unsigned long) aVersion
 {
@@ -752,9 +704,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	if(aState != ledInhibit) {
 		[[[self undoManager] prepareWithInvocationTarget:self] setLedInhibit:ledInhibit];
-		
 		ledInhibit = aState;
-		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
 	}
 }
@@ -933,7 +883,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) checkPresence
 {
 	@try {
-	//	[self readStatusReg];
+		[self readStatusReg];
 		[self setPresent:YES];
 	}
 	@catch(NSException* localException) {
@@ -1057,7 +1007,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) readAllStatus
 {
 	//[self readPageStatus];
-	//[self readStatusReg];
+	[self readStatusReg];
 }
 /*
 - (void) readPageStatus
@@ -1067,32 +1017,27 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 					actual: [self readReg:kSLTActualPage]
 					  next:   [self readReg:kSLTNextPage]];
 }
+*/
 
 - (unsigned long) readStatusReg
 {
-	unsigned long data = 0;
-	
-	data = [self readReg:kSLTStatusReg];
-	
-	[self setVeto:				(data >> SLT_VETO)			& 0x1];
-	[self setExtInhibit:		(data >> SLT_EXTINHIBIT)	& 0x1];	
-	[self setNopgInhibit:		(data >> SLT_NOPGINHIBIT)	& 0x1];
-	[self setSwInhibit:			(data >> SLT_SWINHIBIT)		& 0x1];
-	[self setInhibit:			(data >> SLT_INHIBIT)		& 0x1];
-	
+	unsigned long data = [self readReg:kSLTV4StatusReg];
+	[self setStatusReg:data];
 	return data;
 }
-*/
+
 - (void) printStatusReg
 {
-	//[self readStatusReg];
+	unsigned long data = [self readStatusReg];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"----Status Register SLT (%d) ----\n",[self stationNumber]);
-	NSLogFont(aFont,@"Veto             : %d\n",veto);
-	NSLogFont(aFont,@"ExtInhibit       : %d\n",extInhibit);
-	NSLogFont(aFont,@"NopgInhibit      : %d\n",nopgInhibit);
-	NSLogFont(aFont,@"SwInhibit        : %d\n",swInhibit);
-	NSLogFont(aFont,@"Inhibit          : %d\n",inhibit);
+	NSLogFont(aFont,@"----Status Register %@ ----\n",[self fullID]);
+	NSLogFont(aFont,@"WatchDogError : %@\n",IsBitSet(data,kStatusWDog)?@"YES":@"NO");
+	NSLogFont(aFont,@"PixelBusError : %@\n",IsBitSet(data,kStatusPixErr)?@"YES":@"NO");
+	NSLogFont(aFont,@"PPSError      : %@\n",IsBitSet(data,kStatusPpsErr)?@"YES":@"NO");
+	NSLogFont(aFont,@"Clock         : 0x%02x\n",ExtractValue(data,kStatusClkErr,4));
+	NSLogFont(aFont,@"VttError      : %@\n",IsBitSet(data,kStatusVttErr)?@"YES":@"NO");
+	NSLogFont(aFont,@"GPSError      : %@\n",IsBitSet(data,kStatusGpsErr)?@"YES":@"NO");
+	NSLogFont(aFont,@"FanError      : %@\n",IsBitSet(data,kStatusFanErr)?@"YES":@"NO");
 }
 /*
 - (void) writeStatusReg
@@ -1113,76 +1058,39 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[self writeReg:kSLTT1 value:aValue];
 }
 
+*/
 
 - (unsigned long) readControlReg
 {
-	unsigned long data;
-	
-	data = [self readReg:kSLTControlReg];
-	
-	[self setLedInhibit:			(data >> SLT_UPPERLED)      & SLT_UPPERLED_MASK];
-	[self setLedVeto:				(data >> SLT_LOWERLED)      & SLT_LOWERLED_MASK];
-	[self setTriggerSource:			(data >> SLT_TRIGGER_LOW)   & SLT_TRIGGER_MASK];
-	[self setInhibitSource:			(data >> SLT_INHIBIT_LOW)   & SLT_INHIBIT_MASK];
-	[self setTestPulseSource:		(data >> SLT_TESTPULS_LOW)  & SLT_TESTPULS_MASK];
-	[self setSecStrobeSource:		(data >> SLT_SECSTROBE_LOW) & SLT_SECSTROBE_MASK];
-	[self setWatchDogStart:		    (data >> SLT_WATCHDOGSTART_LOW) & SLT_WATCHDOGSTART_MASK];
-	[self setEnableDeadTimeCounter: (data >> SLT_DEADTIMECOUNTERS)  & SLT_DEADTIMECOUNTERS_MASK];
-	
-	if(fpgaVersion >= 3.5){
-		data = [self readReg:kSLTThresh_Rd];
-		[self setNHit:			(data >> SLT_NHIT)			 & SLT_NHIT_MASK];
-		[self setNHitThreshold:	(data >> SLT_NHIT_THRESHOLD) & SLT_NHIT_THRESHOLD_MASK];
-	}
-	
+	unsigned long data = [self readReg:kSLTV4ControlReg];
+	[self setControlReg: data];	
 	return data;
 }
 
 - (void) printControlReg
 {
-	unsigned long data = [self readReg:kSLTControlReg];
+	unsigned long data = [self readControlReg];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"----Control Register SLT (%d) ----\n",[self stationNumber]);
-	NSLogFont(aFont,@"LedInhibit       : %d\n",(data >> SLT_UPPERLED)      & SLT_UPPERLED_MASK);
-	NSLogFont(aFont,@"LedVeto          : %d\n",(data >> SLT_LOWERLED)      & SLT_LOWERLED_MASK);
-	NSLogFont(aFont,@"TriggerSource    : 0x%x\n",(data >> SLT_TRIGGER_LOW)   & SLT_TRIGGER_MASK);
-	NSLogFont(aFont,@"InhibitSource    : 0x%x\n",(data >> SLT_INHIBIT_LOW)   & SLT_INHIBIT_MASK);
-	NSLogFont(aFont,@"TestPulseSource  : 0x%x\n",(data >> SLT_TESTPULS_LOW)  & SLT_TESTPULS_MASK);
-	NSLogFont(aFont,@"SecStrobeSource  : 0x%x\n",(data >> SLT_SECSTROBE_LOW) & SLT_SECSTROBE_MASK);
-	NSLogFont(aFont,@"WatchDogStart    : 0x%x\n",(data >> SLT_WATCHDOGSTART_LOW) & SLT_WATCHDOGSTART_MASK);
-	NSLogFont(aFont,@"EnableDeadTimeCnt: %d\n",(data >> SLT_DEADTIMECOUNTERS)  & SLT_DEADTIMECOUNTERS_MASK);
-	if(fpgaVersion >= 3.5){
-		data = [self readReg:kSLTThresh_Rd];
-		NSLogFont(aFont,@"Multiplicity Receive\n");
-		NSLogFont(aFont,@"NHit             : %d\n",(data >> SLT_NHIT)			 & SLT_NHIT_MASK);
-		NSLogFont(aFont,@"NHitThreshold    : %d\n",(data >> SLT_NHIT_THRESHOLD)	 & SLT_NHIT_THRESHOLD_MASK);
-	}
+	NSLogFont(aFont,@"----Control Register %@ ----\n",[self fullID]);
+	NSLogFont(aFont,@"Trigger Enable : 0x%02x\n",data & kCtrlTrgEn);
+	NSLogFont(aFont,@"Inibit Enable  : 0x%02x\n",(data & kCtrlInhEn) >> 6);
+	NSLogFont(aFont,@"PPS            : %@\n",IsBitSet(data,kCtrlPPS)?@"GPS":@"Internal");
+	NSLogFont(aFont,@"TP Enable      : 0x%02x\n", ExtractValue(data,kCtrlTpEn,11));
+	NSLogFont(aFont,@"TP Shape       : %d\n", IsBitSet(data,kCtrlShapeMask));
+	NSLogFont(aFont,@"Run Mode       : %@\n", IsBitSet(data,kCtrlRunMask)?@"Normal":@"Test");
+	NSLogFont(aFont,@"Test SLT       : %@\n", IsBitSet(data,kCtrlTstSltMask)?@"Enabled":@"Disabled");
+	NSLogFont(aFont,@"IntA Enable    : %@\n", IsBitSet(data,kCtrlIntEnMask)?@"Enabled":@"Disabled");
 }
+
 
 - (void) writeControlReg
 {
 	unsigned long data = 0;
-	data |= (ledInhibit   & SLT_UPPERLED_MASK)   << SLT_UPPERLED;
-	data |= (ledVeto   & SLT_LOWERLED_MASK)   << SLT_LOWERLED;
-	data |= (triggerSource   & SLT_TRIGGER_MASK)   << SLT_TRIGGER_LOW;
-	data |= (inhibitSource   & SLT_INHIBIT_MASK)   << SLT_INHIBIT_LOW;
-	data |= (testPulseSource  & SLT_TESTPULS_MASK)  << SLT_TESTPULS_LOW;
-	data |= (secStrobeSource & SLT_SECSTROBE_MASK) << SLT_SECSTROBE_LOW;
-	data |= (watchDogStart   & SLT_WATCHDOGSTART_MASK)   << SLT_WATCHDOGSTART_LOW;
-	data |= (enableDeadTimeCounter  & SLT_DEADTIMECOUNTERS_MASK)  << SLT_DEADTIMECOUNTERS;
-	[self writeReg:kSLTControlReg value:data];
-	
-	if(fpgaVersion >= 3.5){
-		data = 0x8000 | 
-		(nHit   & SLT_NHIT_MASK)   << SLT_NHIT | 
-		(nHitThreshold & SLT_NHIT_THRESHOLD_MASK)   << SLT_NHIT_THRESHOLD;
-		[self writeReg:kSLTThresh_Wr value:data];
-		[self writeReg:kSLTThresh_Wr value:0];
-		data = [self readReg:kSLTThresh_Rd];
-		NSLog(@"M threshold = %4d  N threshold = %4d\n",(data>>8)&0x3f, data&0xff);				
-	}
+	//data |= (ledInhibit   & SLT_UPPERLED_MASK)   << SLT_UPPERLED;
+	[self writeReg:kSLTV4StatusReg value:data];
 }
 
+/*
 - (void) writeInterruptMask
 {
 	[self writeReg:kSLTIRMask value:interruptMask];
@@ -1260,7 +1168,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	int savedInhibitSource = inhibitSource;
 	triggerSource = 0x1; //sw trigger only
 	inhibitSource = 0x3; 
-	//[self writeControlReg];
+	[self writeControlReg];
 //	[self releaseAllPages];
 	//unsigned long long p1 = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 	//[self writeReg:kSLTSwRelInhibit value:0];
@@ -1289,9 +1197,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	//[self writeControlReg];
 	//[self writeInterruptMask];
 	//[self writeNextPageDelay];
-	//[self readControlReg];	
-	//[self printStatusReg];
-	//[self printControlReg];
+	[self printStatusReg];
+	[self printControlReg];
 }
 
 - (void) reset
@@ -1555,7 +1462,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
-	//[self readStatusReg];
+	[self readStatusReg];
 	actualPageIndex = 0;
 	eventCounter    = 0;
 	first = YES;

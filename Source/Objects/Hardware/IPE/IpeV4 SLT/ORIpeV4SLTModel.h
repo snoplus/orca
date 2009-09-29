@@ -32,6 +32,9 @@
 @class PCM_Link;
 @class SBC_Link;
 
+#define IsBitSet(A,B) (((A) & (B)) == (B))
+#define ExtractValue(A,B,C) (((A) & (B)) >> (C))
+
 #define SLT_TRIGGER_SW    0x01  // Software
 #define SLT_TRIGGER_I_N   0x07  // Internal + Neighbors
 #define SLT_TRIGGER_LEFT  0x04  // left neighbor
@@ -65,20 +68,101 @@
 #define SLT_WATCHDOGSTART_EXT   0x00   // External  - not available -
 #define SLT_WATCHDOGSTART_SW    0x01   // Software
 
-// Declaration of reg constants for module.
-enum {
-    kOutputBuffer,			// 0000
-    kFirmWareRevision,		// 1000
-    kGeoAddress,			// 1002
-    kMCST_CBLTAddress,		// 1004
-};
+//control reg bit masks
+#define kCtrlLedOffmask	(0x00000001 << 17) //RW
+#define kCtrlIntEnMask	(0x00000001 << 16) //RW
+#define kCtrlTstSltMask	(0x00000001 << 15) //RW
+#define kCtrlRunMask	(0x00000001 << 14) //RW
+#define kCtrlShapeMask	(0x00000001 << 13) //RW
+#define kCtrlTpEn		(0x00000003 << 11) //RW
+#define kCtrlPPS		(0x00000001 << 10) //RW
+#define kCtrlInhEn		(0x0000000F <<  6) //RW
+#define kCtrlTrgEn		(0x0000003F <<  0) //RW
+
+//status reg bit masks
+#define kStatusIrq			(0x00000001 << 31) //R
+#define kStatusFltStat		(0x00000001 << 30) //R
+#define kStatusGps2			(0x00000001 << 29) //R
+#define kStatusGps1			(0x00000001 << 28) //R
+#define kStatusInhibitSrc	(0x0000000f << 24) //R
+#define kStatusInh			(0x00000001 << 23) //R
+#define kStatusSemaphores	(0x00000007 << 16) //R - cleared on W
+#define kStatusFltTimeOut	(0x00000001 << 15) //R - cleared on W
+#define kStatusPgFull		(0x00000001 << 14) //R - cleared on W
+#define kStatusPgRdy		(0x00000001 << 13) //R - cleared on W
+#define kStatusEvRdy		(0x00000001 << 12) //R - cleared on W
+#define kStatusSwRq			(0x00000001 << 11) //R - cleared on W
+#define kStatusFanErr		(0x00000001 << 10) //R - cleared on W
+#define kStatusVttErr		(0x00000001 <<  9) //R - cleared on W
+#define kStatusGpsErr		(0x00000001 <<  8) //R - cleared on W
+#define kStatusClkErr		(0x0000000F <<  4) //R - cleared on W
+#define kStatusPpsErr		(0x00000001 <<  3) //R - cleared on W
+#define kStatusPixErr		(0x00000001 <<  2) //R - cleared on W
+#define kStatusWDog			(0x00000001 <<  1) //R - cleared on W
+#define kStatusFltRq		(0x00000001 <<  0) //R - cleared on W
+
+//Cmd reg bit masks
+#define kCmdDisCnt			(0x00000001 << 10) //W - self cleared
+#define kCmdEnCnt			(0x00000001 <<  9) //W - self cleared
+#define kCmdClrCnt			(0x00000001 <<  8) //W - self cleared
+#define kCmdSwRq			(0x00000001 <<  7) //W - self cleared
+#define kCmdFltRes			(0x00000001 <<  6) //W - self cleared
+#define kCmdSltRes			(0x00000001 <<  5) //W - self cleared
+#define kCmdFwCfg			(0x00000001 <<  4) //W - self cleared
+#define kCmdTpStart			(0x00000001 <<  3) //W - self cleared
+#define kCmdSwTr			(0x00000001 <<  2) //W - self cleared
+#define kCmdClrInh			(0x00000001 <<  1) //W - self cleared
+#define kCmdSetInh			(0x00000001 <<  0) //W - self cleared
+
+//Interrupt Request and Mask reg bit masks
+//Interrupt Request Read only - cleared on Read
+//Interrupt Mask Read/Write only
+#define kIrptFtlTmo		(0x00000001 << 15) 
+#define kIrptPgFull		(0x00000001 << 14) 
+#define kIrptPgRdy		(0x00000001 << 13) 
+#define kIrptEvRdy		(0x00000001 << 12) 
+#define kIrptSwRq		(0x00000001 << 11) 
+#define kIrptFanErr		(0x00000001 << 10) 
+#define kIrptVttErr		(0x00000001 <<  9) 
+#define kIrptGPSErr		(0x00000001 <<  8) 
+#define kIrptClkErr		(0x0000000F <<  4) 
+#define kIrptPpsErr		(0x00000001 <<  3) 
+#define kIrptPixErr		(0x00000001 <<  2) 
+#define kIrptWdog		(0x00000001 <<  1) 
+#define kIrptFltRq		(0x00000001 <<  0) 
+
+//Revision Masks
+#define kRevisionProject (0x0000000F << 28) //R
+#define kDocRevision	 (0x00000FFF << 16) //R
+#define kImplemention	 (0x0000FFFF <<  0) //R
+
+//Page Manager Masks
+#define kPageMngReset			(0x00000001 << 22) //W - self cleared
+#define kPageMngNumFreePages	(0x0000007F << 15) //R
+#define kPageMngPgFull			(0x00000001 << 14) //W
+#define kPageNextPage			(0x0000003F <<  8) //W
+#define kPageReady				(0x00000001 <<  7) //W
+#define kPageOldestBuffer		(0x0000003F <<  1) //W
+#define kPageRelease			(0x00000001 <<  0) //W - self cleared
+
+//Trigger Timing
+#define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
+#define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
 @interface ORIpeV4SLTModel : ORIpeCard <ORDataTaker,SBC_Linking>
 {
 	@private
 		unsigned long hwVersion;
 	
-		//control reg 
+		//status reg 
+		BOOL watchDogError;
+		BOOL pixelBusError;
+		BOOL ppsError;
+		BOOL clockError;
+		BOOL gpsError;
+		BOOL vttError;
+		BOOL fanError;
+	
 		BOOL veto;
 		BOOL extInhibit;
 		BOOL nopgInhibit;
@@ -146,6 +230,8 @@ enum {
 
 		PCM_Link*		pcmLink;
         
+		unsigned long controlReg;
+		unsigned long statusReg;
 }
 
 #pragma mark •••Initialization
@@ -162,6 +248,11 @@ enum {
 - (void) runIsStopped:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
+- (unsigned long) statusReg;
+- (void) setStatusReg:(unsigned long)aStatusReg;
+- (unsigned long) controlReg;
+- (void) setControlReg:(unsigned long)aControlReg;
+
 - (SBC_Link*)sbcLink;
 - (unsigned long) projectVersion;
 - (unsigned long) documentVersion;
@@ -257,10 +348,10 @@ enum {
 //exceptions either directly or indirectly
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
-//- (unsigned long) readControlReg;
-//- (void)		  writeControlReg;
-//- (void)		  printControlReg;
-//- (unsigned long) readStatusReg;
+- (unsigned long) readControlReg;
+- (void)		  writeControlReg;
+- (void)		  printControlReg;
+- (unsigned long) readStatusReg;
 - (void)		  printStatusReg;
 //- (void)		  writeNextPageDelay;
 //- (void)		  writeStatusReg;
@@ -353,6 +444,8 @@ enum {
 
 @end
 
+extern NSString* ORIpeV4SLTModelStatusRegChanged;
+extern NSString* ORIpeV4SLTModelControlRegChanged;
 extern NSString* ORIpeV4SLTModelHwVersionChanged;
 
 extern NSString* ORIpeV4SLTModelPatternFilePathChanged;

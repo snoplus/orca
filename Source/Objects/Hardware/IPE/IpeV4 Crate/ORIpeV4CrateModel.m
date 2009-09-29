@@ -18,18 +18,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark •••Imported Files
-//#import "ORIpeDefs.h"
 #import "ORIpeV4CrateModel.h"
-#import "ORIpeCard.h"
+#import "ORIpeV4SLTModel.h"
 
 NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 
 @implementation ORIpeV4CrateModel
 
 #pragma mark •••initialization
-
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -87,6 +84,7 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 - (void) connected
 {
 	[self setIsConnected:YES];
+	[[self adapter] readHwVersion];
 }
 
 - (void) disconnected
@@ -121,7 +119,7 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+    [super registerNotificationObservers];
     [notifyCenter addObserver : self
                      selector : @selector(viewChanged:)
                          name : ORIpeCardSlotChangedNotification
