@@ -29,7 +29,7 @@
 @class ORDataPacket;
 @class TimedWorker;
 @class ORIpeFLTModel;
-@class Pbus_Link;
+@class PCM_Link;
 @class SBC_Link;
 
 #define SLT_TRIGGER_SW    0x01  // Software
@@ -75,8 +75,9 @@ enum {
 
 @interface ORIpeV4SLTModel : ORIpeCard <ORDataTaker,SBC_Linking>
 {
-//	@private
-	@protected
+	@private
+		unsigned long hwVersion;
+	
 		//control reg 
 		BOOL veto;
 		BOOL extInhibit;
@@ -143,10 +144,8 @@ enum {
 		unsigned long   lastSimSec;
 		unsigned long   pageSize; //< Length of the ADC data (0..100us)
 
-		Pbus_Link*		pbusLink;
+		PCM_Link*		pcmLink;
         
-        //V3/V4 handling -tb-
-        int IpeCrateVersion; // up to now we have version 3 and 4 -tb- 2008-09-10
 }
 
 #pragma mark •••Initialization
@@ -164,6 +163,11 @@ enum {
 
 #pragma mark •••Accessors
 - (SBC_Link*)sbcLink;
+- (unsigned long) projectVersion;
+- (unsigned long) documentVersion;
+- (unsigned long) implementation;
+- (void) setHwVersion:(unsigned long) aVersion;
+
 - (NSString*) patternFilePath;
 - (void) setPatternFilePath:(NSString*)aPatternFilePath;
 
@@ -191,7 +195,7 @@ enum {
 - (void) setPulserAmp:(float)aPulserAmp;
 - (short) getNumberRegisters;			
 - (NSString*) getRegisterName: (short) anIndex;
-- (unsigned long) getAddressOffset: (short) anIndex;
+//- (unsigned long) getAddressOffset: (short) anIndex;
 - (short) getAccessType: (short) anIndex;
 
 - (unsigned short) 	selectedRegIndex;
@@ -200,7 +204,7 @@ enum {
 - (void)		setWriteValue: (unsigned long) anIndex;
 - (BOOL)	readAll;
 - (void)    setReadAll:(BOOL)aState;
-- (void) loadPatternFile;
+//- (void) loadPatternFile;
 
 - (BOOL) displayTrigger; //< Staus of dispaly of trigger information
 - (void) setDisplayTrigger:(BOOL) aState; 
@@ -238,12 +242,9 @@ enum {
 - (void) setInhibitSource:(int)aInhibitSource;
 - (int) triggerSource;
 - (void) setTriggerSource:(int)aTriggerSource;
-- (void) releaseSwInhibit;
-- (void) setSwInhibit;
+//- (void) releaseSwInhibit;
+//- (void) setSwInhibit;
 - (BOOL) usingNHitTriggerVersion;
-// V3/V4 handling -tb-
-- (int) IpeCrateVersion;
-- (int) setIpeCrateVersion:(int) aValue;
 
 #pragma mark ***Polling
 - (TimedWorker *) poller;
@@ -256,32 +257,32 @@ enum {
 //exceptions either directly or indirectly
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
-- (unsigned long) readControlReg;
-- (void)		  writeControlReg;
-- (void)		  printControlReg;
-- (unsigned long) readStatusReg;
+//- (unsigned long) readControlReg;
+//- (void)		  writeControlReg;
+//- (void)		  printControlReg;
+//- (unsigned long) readStatusReg;
 - (void)		  printStatusReg;
-- (void)		  writeNextPageDelay;
-- (void)		  writeStatusReg;
-- (void)		  writeInterruptMask;
-- (void)		  readInterruptMask;
-- (void)		  printInterruptMask;
-- (void)		  readPageStatus;
-- (void)		  releaseAllPages;
-- (void)		  dumpTriggerRAM:(int)aPageIndex;
+//- (void)		  writeNextPageDelay;
+//- (void)		  writeStatusReg;
+//- (void)		  writeInterruptMask;
+//- (void)		  readInterruptMask;
+//- (void)		  printInterruptMask;
+//- (void)		  readPageStatus;
+//- (void)		  releaseAllPages;
+//- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
 - (void)		  writeReg:(unsigned short)index value:(unsigned long)aValue;
 - (unsigned long) readReg:(unsigned short) index;
-- (float)		  readVersion;
-- (unsigned long long) readDeadTime;
-- (unsigned long long) readVetoTime;
+- (float)		  readHwVersion;
+//- (unsigned long long) readDeadTime;
+//- (unsigned long long) readVetoTime;
 - (void)		reset;
 - (void)		hw_config;
 - (void)		hw_reset;
-- (void)		loadPulseAmp;
-- (void)		pulseOnce;
-- (void)		loadPulserValues;
-- (void)		swTrigger;
+//- (void)		loadPulseAmp;
+//- (void)		pulseOnce;
+//- (void)		loadPulserValues;
+//- (void)		swTrigger;
 - (void)		initBoard;
 - (void)		autoCalibrate;
 
@@ -313,11 +314,8 @@ enum {
 - (NSString*) codeResourcePath;
 
 #pragma mark •••SBC I/O layer
-- (unsigned long) read:(unsigned long) address;
 
 - (void) read:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len;
-
-- (void) write:(unsigned long) address value:(unsigned long) aValue;
 
 - (void) writeBitsAtAddress:(unsigned long)address 
 					   value:(unsigned long)dataWord 
@@ -355,6 +353,8 @@ enum {
 
 @end
 
+extern NSString* ORIpeV4SLTModelHwVersionChanged;
+
 extern NSString* ORIpeV4SLTModelPatternFilePathChanged;
 extern NSString* ORIpeV4SLTModelInterruptMaskChanged;
 extern NSString* ORIpeV4SLTModelFpgaVersionChanged;
@@ -377,4 +377,3 @@ extern NSString* ORIpeV4SLTModelReadAllChanged;
 
 extern NSString* ORSLTV4cpuLock;	
 
-extern NSString* ORIpeV4SLTIpeCrateVersionChanged;

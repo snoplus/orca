@@ -125,7 +125,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ZFlowLayout</string>
+				<string>ORFlippedView</string>
 				<key>curve</key>
 				<string>id</string>
 				<key>mColorScale</key>
@@ -289,10 +289,14 @@
 				<string>NSButton</string>
 				<key>displayTriggerButton</key>
 				<string>NSButton</string>
+				<key>docField</key>
+				<string>NSTextField</string>
 				<key>forceTrigger1Button</key>
 				<string>NSButton</string>
 				<key>forceTriggerButton</key>
 				<string>NSButton</string>
+				<key>implementationField</key>
+				<string>NSTextField</string>
 				<key>inhibitCheckBoxMatrix</key>
 				<string>NSMatrix</string>
 				<key>inhibitMaskMatrix</key>
@@ -333,6 +337,8 @@
 				<string>NSPopUpButton</string>
 				<key>pollRunningIndicator</key>
 				<string>NSProgressIndicator</string>
+				<key>projectField</key>
+				<string>NSTextField</string>
 				<key>pulserAmpField</key>
 				<string>NSTextField</string>
 				<key>pulserDelayField</key>
@@ -680,14 +686,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>ORColorScale</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -742,7 +740,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ZFlowLayout</string>
+				<string>ORFlippedView</string>
 				<key>mDataSource</key>
 				<string>id</string>
 				<key>mXScale</key>

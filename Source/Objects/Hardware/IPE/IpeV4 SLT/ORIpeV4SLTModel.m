@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "../IPE Base Classes/ORIpeDefs.h"
 #import "ORCrate.h"
 #import "ORIpeV4SLTModel.h"
@@ -29,172 +28,133 @@
 #import "unistd.h"
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
-#import "Pbus_Link.h"
+#import "PCM_Link.h"
 #import "SLTv4_HW_Definitions.h"
 
-enum {
-	kSLTControlReg,
-	kSLTStatusReg,
-	kSLTIRStatus,
-	kSLTIRMask,
-	kSLTIRVector,
-	kSLTThresh_Wr,
-	kSLTThresh_Rd,
-	kSLTSwNextPage,
-	kSLTSwSltTrigger,
-	kSLTSwSetInhibit,
-	kSLTSwRelInhibit,
-	kSLTSwTestpulsTrigger,
-	kSLTSwReadADC,
-	kSLTSwSecondStrobe,
-	kSLTConfSltFPGAs,
-	kSLTConfFltFPGAs,
-	kSLTActResetFlt,
-	kSLTRelResetFlt,
-	kSLTActResetSlt,
-	kSLTRelResetSlt,
-	kPageStatusLow,
-	kPageStatusHigh,
-	kSLTActualPage,
-	kSLTNextPage,
-	kSLTSetPageFree,
-	kSLTSetPageNoUse,
-	kSLTTimingMemory,
-	kSLTTestpulsAmpl,
-	kSLTTestpulsStartSec,
-	kSLTTestpulsStartSubSec,
-	kSLTSetSecCounter,
-	kSLTSecCounter,
-	kSLTSubSecCounter,
-	kSLTT1,
-	kSLTIRInput,
-	kSLTVersion,
-	kSLTVetoTimeLow,
-	kSLTVetoTimeHigh,
-	kSLTDeadTimeLow,
-	kSLTDeadTimeHigh,
-	kSLTResetDeadTime,
-	kSLTSensorMask,
-	kSLTSensorStatus,
-	kSLTPageTimeStamp,
-	kSLTLastTriggerTimeStamp,
-	kSLTTestpulsTiming,
-	kSLTSensorData,
-	kSLTSensorConfig,
-	kSLTSensorUpperThresh,
-	kSLTSensorLowerThresh,
-	kSLTWatchDogMask,
-	kSLTWatchDogStatus,
-	kSLTNumRegs //must be last
-};
+//control reg bit masks
+#define kCtrlLedOffmask	(0x00000001 << 17) //RW
+#define kCtrlIntEnMask	(0x00000001 << 16) //RW
+#define kCtrlTstSltMask	(0x00000001 << 15) //RW
+#define kCtrlRunMask	(0x00000001 << 14) //RW
+#define kCtrlShapeMask	(0x00000001 << 13) //RW
+#define kCtrlTpEn		(0x00000003 << 11) //RW
+#define kCtrlPPS		(0x00000001 << 10) //RW
+#define kCtrlInhEn		(0x0000000F <<  6) //RW
+#define kCtrlTrEn		(0x0000003F <<  0) //RW
 
-static IpeRegisterNamesStruct reg[kSLTNumRegs] = {
-{@"Control",			0x0f00,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Status",				0x0f02,		-1,				kIpeRegReadable},
-{@"IRStatus",			0x0f04,		-1,				kIpeRegReadable},
-{@"IRMask",				0x0f05,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"IRVector",			0x0f06,		-1,				kIpeRegReadable},
-{@"Thresh_Wr",			0x0f0d,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Thresh_Rd",			0x0f0e,		-1,				kIpeRegReadable},
-{@"SwNextPage",			0x0f10,		-1,				kIpeRegWriteable},
-{@"SwSltTrigger",		0x0f12,		-1,				kIpeRegWriteable},
-{@"SwSetInhibit",		0x0f13,		-1,				kIpeRegWriteable},
-{@"SwRelInhibit",		0x0f14,		-1,				kIpeRegWriteable},
-{@"SwTestpulsTrigger",	0x0f20,		-1,				kIpeRegWriteable},
-{@"SwReadADC",			0x0f40,		-1,				kIpeRegWriteable},
-{@"SwSecondStrobe",		0x0f50,		-1,				kIpeRegWriteable},
-{@"ConfSltFPGAs",		0x0f51,		-1,				kIpeRegWriteable},
-{@"ConfFltFPGAs",		0x0f61,		-1,				kIpeRegWriteable},
-{@"ActResetFlt",		0x0f80,		-1,				kIpeRegWriteable},
-{@"RelResetFlt",		0x0f81,		-1,				kIpeRegWriteable},
-{@"ActResetSlt",		0x0f90,		-1,				kIpeRegWriteable},
-{@"RelResetSlt",		0x0f91,		-1,				kIpeRegWriteable},
-{@"PageStatusLow",		0x0100,		-1,				kIpeRegReadable},
-{@"PageStatusHigh",		0x0101,		-1,				kIpeRegReadable},
-{@"ActualPage",			0x0102,		-1,				kIpeRegReadable},
-{@"NextPage",			0x0103,		-1,				kIpeRegReadable},
-{@"SetPageFree",		0x0105,		-1,				kIpeRegWriteable},
-{@"SetPageNoUse",		0x0106,		-1,				kIpeRegWriteable},
-{@"TimingMemory",		0x0200,		0xff,			kIpeRegReadable | kIpeRegWriteable},
-{@"TestpulsAmpl",		0x0300,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"TestpulsStartSec",	0x0301,		-1,				kIpeRegReadable},
-{@"TestpulsStartSubSec",0x0302,		-1,				kIpeRegReadable},
-{@"SetSecCounter",		0x0500,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"SecCounter",			0x0501,		-1,				kIpeRegReadable},
-{@"SubSecCounter",		0x0502,		-1,				kIpeRegReadable},
-{@"T1",					0x0503,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"IRInput",			0x0f07,		-1,				kIpeRegReadable},
-{@"SltVersion",			0x0f08,		-1,				kIpeRegReadable},
-{@"VetoTimeLow",		0x0f0a,		-1,				kIpeRegReadable},
-{@"VetoTimeHigh",		0x0f09,		-1,				kIpeRegReadable},
-{@"DeadTimeLow",		0x0f0c,		-1,				kIpeRegReadable},
-{@"DeadTimeHigh",		0x0f0b,		-1,				kIpeRegReadable},
-{@"ResetDeadTime",		0x0f11,		-1,				kIpeRegReadable},
-{@"SensorMask",			0x0f20,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"SensorStatus",		0x0f21,		-1,				kIpeRegReadable},
-{@"PageTimeStamp",		0x0000,		-1,				kIpeRegReadable},
-{@"LastTriggerTimeStamp",0x0080,	-1,				kIpeRegReadable},
-{@"TestpulsTiming",		0x0200,		256,			kIpeRegReadable | kIpeRegWriteable},
-{@"SensorData",			0x0400,		8,				kIpeRegReadable},
-{@"SensorConfig",		0x0408,		8,				kIpeRegReadable},
-{@"SensorUpperThresh",	0x0410,		8,				kIpeRegReadable},
-{@"SensorLowerThresh",	0x0418,		8,				kIpeRegReadable},
-{@"WatchDogMask",		0x0420,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"WatchDogStatus",		0x0421,		-1,				kIpeRegReadable},
-};
+//status reg bit masks
+#define kStatusIrq			(0x00000001 << 31) //R
+#define kStatusFltStat		(0x00000001 << 30) //R
+#define kStatusGps2			(0x00000001 << 29) //R
+#define kStatusGps1			(0x00000001 << 28) //R
+#define kStatusInhibitSrc	(0x0000000f << 24) //R
+#define kStatusInh			(0x00000001 << 23) //R
+#define kStatusSemaphores	(0x00000007 << 16) //R - cleared on W
+#define kStatusFltTmo		(0x00000001 << 15) //R - cleared on W
+#define kStatusPgFull		(0x00000001 << 14) //R - cleared on W
+#define kStatusPgRdy		(0x00000001 << 13) //R - cleared on W
+#define kStatusEvRdy		(0x00000001 << 12) //R - cleared on W
+#define kStatusSwRq			(0x00000001 << 11) //R - cleared on W
+#define kStatusFanErr		(0x00000001 << 10) //R - cleared on W
+#define kStatusFanErr		(0x00000001 << 10) //R - cleared on W
+#define kStatusVttErr		(0x00000001 <<  9) //R - cleared on W
+#define kStatusGpsErr		(0x00000001 <<  8) //R - cleared on W
+#define kStatusClkErr		(0x0000000F <<  4) //R - cleared on W
+#define kStatusPpsErr		(0x00000001 <<  3) //R - cleared on W
+#define kStatusPixErr		(0x00000001 <<  2) //R - cleared on W
+#define kStatusWDog			(0x00000001 <<  1) //R - cleared on W
+#define kStatusFltRq		(0x00000001 <<  0) //R - cleared on W
 
-#define SLTID 21
-#define SLT_REG_ADDRESS(A) ((SLTID << 24) + ((0x1) << 18) + reg[(A)].addressOffset)
+//Cmd reg bit masks
+#define kCmdDisCnt			(0x00000001 << 10) //W - self cleared
+#define kCmdEnCnt			(0x00000001 <<  9) //W - self cleared
+#define kCmdClrCnt			(0x00000001 <<  8) //W - self cleared
+#define kCmdSwRq			(0x00000001 <<  7) //W - self cleared
+#define kCmdFltRes			(0x00000001 <<  6) //W - self cleared
+#define kCmdSltRes			(0x00000001 <<  5) //W - self cleared
+#define kCmdFwCfg			(0x00000001 <<  4) //W - self cleared
+#define kCmdTpStart			(0x00000001 <<  3) //W - self cleared
+#define kCmdSwTr			(0x00000001 <<  2) //W - self cleared
+#define kCmdClrInh			(0x00000001 <<  1) //W - self cleared
+#define kCmdSetInh			(0x00000001 <<  0) //W - self cleared
 
-//status reg bit positions
-#define SLT_CRATEID				22
-#define SLT_SLOTID				27
-#define SLT_VETO				20
-#define SLT_EXTINHIBIT			19
+//Interrupt Request and Mask reg bit masks
+//Interrupt Request Read only - cleared on Read
+//Interrupt Mask Read/Write only
+#define kIrptFtlTmo		(0x00000001 << 15) 
+#define kIrptPgFull		(0x00000001 << 14) 
+#define kIrptPgRdy		(0x00000001 << 13) 
+#define kIrptEvRdy		(0x00000001 << 12) 
+#define kIrptSwRq		(0x00000001 << 11) 
+#define kIrptFanErr		(0x00000001 << 10) 
+#define kIrptVttErr		(0x00000001 <<  9) 
+#define kIrptGPSErr		(0x00000001 <<  8) 
+#define kIrptClkErr		(0x0000000F <<  4) 
+#define kIrptPpsErr		(0x00000001 <<  3) 
+#define kIrptPixErr		(0x00000001 <<  2) 
+#define kIrptWdog		(0x00000001 <<  1) 
+#define kIrptFltRq		(0x00000001 <<  0) 
 
-#define SLT_NOPGINHIBIT			18
-#define SLT_SWINHIBIT			17
-#define SLT_INHIBIT				16
+//Revision Masks
+#define kRevisionProject (0x0000000F << 28) //R
+#define kDocRevision	 (0x00000FFF << 16) //R
+#define kImplemention	 (0x0000FFFF <<  0) //R
 
-//control reg defs
-#define SLT_TRIGGER_LOW       0
-#define SLT_TRIGGER_MASK   0x1f
+//Page Manager Masks
+#define kPageMngReset			(0x00000001 << 22) //W - self cleared
+#define kPageMngNumFreePages	(0x0000007F << 15) //R
+#define kPageMngPgFull			(0x00000001 << 14) //W
+#define kPageNextPage			(0x0000003F <<  8) //W
+#define kPageReady				(0x00000001 <<  7) //W
+#define kPageOldestBuffer		(0x0000003F <<  1) //W
+#define kPageRelease			(0x00000001 <<  0) //W - self cleared
 
-#define SLT_INHIBIT_LOW       5
-#define SLT_INHIBIT_MASK   0x07
+//Trigger Timing
+#define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
+#define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
-#define SLT_TESTPULS_LOW      8
-#define SLT_TESTPULS_MASK  0x03
-
-#define SLT_SECSTROBE_LOW    10
-#define SLT_SECSTROBE_MASK 0x01
-
-#define SLT_WATCHDOGSTART_LOW      11
-#define SLT_WATCHDOGSTART_MASK   0x03
-
-#define SLT_DEADTIMECOUNTERS      13
-#define SLT_DEADTIMECOUNTERS_MASK   0x01
-
-#define SLT_LOWERLED      14
-#define SLT_LOWERLED_MASK   0x01
-
-#define SLT_UPPERLED      15
-#define SLT_UPPERLED_MASK   0x01
-
-#define SLT_NHIT					0
-#define SLT_NHIT_MASK			 0xff
-
-#define SLT_NHIT_THRESHOLD			8
-#define SLT_NHIT_THRESHOLD_MASK  0x7f
-
-
-//IPE V4 electronic definitions
-
-enum IpeV4Enum{
+//IPE V4 register definitions
+enum IpeV4Enum {
 	kSLTV4ControlReg,
 	kSLTV4StatusReg,
 	kSLTV4CommandReg,
-	kSLTV4HWRevision,
+	kSLTV4InterruptReguestReg,
+	kSLTV4InterruptMaskReg,
+	kSLTV4RequestSemaphoreReg,
+	kSLTV4HWRevisionReg,
+	kSLTV4PixelBusErrorReg,
+	kSLTV4PixelBusEnableReg,
+	kSLTV4PixelBusTestReg,
+	kSLTV4AuxBusTestReg,
+	kSLTV4DebugStatusReg,
+	kSLTV4DeadCounterLSBReg,
+	kSLTV4DeadCounterMSBReg,
+	kSLTV4VetoCounterLSBReg,
+	kSLTV4VetoCounterMSBReg,
+	kSLTV4RunCounterLSBReg,
+	kSLTV4RunCounterMSBReg,
+	kSLTV4SecondSetReg,
+	kSLTV4SecondCounterReg,
+	kSLTV4SubSecondCounterReg,
+	kSLTV4PageManagerReg,
+	kSLTV4TriggerTimingReg,
+	kSLTV4PageSelectReg,
+	kSLTV4NumberPagesReg,
+	kSLTV4PageNumbersReg,
+	kSLTV4EventStatusReg,
+	kSLTV4ReadoutCSRReg,
+	kSLTV4BufferSelectReg,
+	kSLTV4ReadoutDefinitionReg,
+	kSLTV4TPTimingReg,
+	kSLTV4TPShapeReg,
+	kSLTV4i2cCommandReg,
+	kSLTV4epcsCommandReg,
+	kSLTV4BoardIDLSBReg,
+	kSLTV4BoardIDMSBReg,
+	kSLTV4PROMsControlReg,
+	kSLTV4PROMsBufferReg,
+	kSLTV4TriggerDataReg,
+	kSLTV4ADCDataReg,
 	kSLTV4SecondSet,
 	kSLTV4SecondCounter,
 	kSLTV4SubSecondCounter,
@@ -202,19 +162,56 @@ enum IpeV4Enum{
 };
 
 static IpeRegisterNamesStruct regV4[kSLTV4NumRegs] = {
-//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
-{@"Control",			0xa80000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Status",				0xa80004>>2,		-1,				kIpeRegReadable},
-{@"Command",			0xa80008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"HWRevision",			0xa80020>>2,		-1,				kIpeRegReadable},
-{@"SecondSet",          0xb00000>>2,		-1,				kIpeRegWriteable},
-{@"SecondCounter",      0xb00004>>2,		-1,				kIpeRegReadable},
-{@"SubSecondCounter",   0xb00008>>2,		-1,				kIpeRegReadable},
+{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Status",				0xa80004,		1,			kIpeRegReadable },
+{@"Command",			0xa80008,		1,			kIpeRegWriteable },
+{@"Interrupt Reguest",	0xA8000C,		1,			kIpeRegReadable },
+{@"Interrupt Mask",		0xA80010,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Request Semaphore",	0xA80014,		3,			kIpeRegReadable },
+{@"HWRevision",			0xa80020,		1,			kIpeRegReadable },
+{@"Pixel Bus Error",	0xA80024,		1,			kIpeRegReadable },			
+{@"Pixel Bus Enable",	0xA80028,		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Dead Counter (LSB)",	0xA80080, 		1,			kIpeRegReadable },	
+{@"Dead Counter (MSB)",	0xA80084,		1,			kIpeRegReadable },	
+{@"Veto Counter (LSB)",	0xA80088, 		1,			kIpeRegReadable },	
+{@"Veto Counter (MSB)",	0xA8008C, 		1,			kIpeRegReadable },	
+{@"Run Counter (LSB)",	0xA80090,		1,			kIpeRegReadable },	
+{@"Run Counter (MSB)",	0xA80094, 		1,			kIpeRegReadable },	
+{@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable }, 
+{@"Second Counter",		0xB00004, 		1,			kIpeRegReadable },
+{@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable }, 
+{@"Page Manager",		0xB80000,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Trigger Timing",		0xB80004,  		1, 			kIpeRegReadable | kIpeRegWriteable },
+{@"Page Select",		0xB80008, 		1,			kIpeRegReadable },
+{@"Number of Pages",	0xB8000C, 		1,			kIpeRegReadable },
+{@"Page Numbers",		0xB81000,		64, 		kIpeRegReadable | kIpeRegWriteable },
+{@"Event Status",		0xB82000,		64,			kIpeRegReadable },
+{@"Readout CSR",		0xC00000,		1,			kIpeRegWriteable },
+{@"Buffer Select",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Readout Definition",	0xC10000,	  2048,			kIpeRegReadable | kIpeRegWriteable },			
+{@"TP Timing",			0xC80000,	   128,			kIpeRegReadable | kIpeRegWriteable },	
+{@"TP Shape",			0xC81000,	   512,			kIpeRegReadable | kIpeRegWriteable },	
+{@"I2C Command",		0xD00000,		1,			kIpeRegReadable },
+{@"EPC Command",		0xD00004,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Board ID (LSB)",		0xD00008,		1,			kIpeRegReadable },
+{@"Board ID (MSB)",		0xD0000C,		1,			kIpeRegReadable },
+{@"PROMs Control",		0xD00010,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"PROMs Buffer",		0xD00100,		256,		kIpeRegReadable | kIpeRegWriteable },
+{@"Trigger Data",		0xD80000,	  14000,		kIpeRegReadable | kIpeRegWriteable },
+{@"ADC Data",			0xE00000,	 0x8000,		kIpeRegReadable | kIpeRegWriteable },
+//{@"Data Block RW",		0xF00000 Data Block RW
+//{@"Data Block Length",	0xF00004 Data Block Length 
+//{@"Data Block Address",	0xF00008 Data Block Address
 };
 
 
-
 #pragma mark ***External Strings
+
+NSString* ORIpeV4SLTModelHwVersionChanged		= @"ORIpeV4SLTModelHwVersionChanged";
+
 NSString* ORIpeV4SLTModelPatternFilePathChanged		= @"ORIpeV4SLTModelPatternFilePathChanged";
 NSString* ORIpeV4SLTModelInterruptMaskChanged		= @"ORIpeV4SLTModelInterruptMaskChanged";
 NSString* ORIpeV4SLTModelFpgaVersionChanged			= @"ORIpeV4SLTModelFpgaVersionChanged";
@@ -237,10 +234,12 @@ NSString* ORIpeV4SLTModelDisplayTriggerChanged		= @"ORIpeV4SLTModelDisplayTriger
 NSString* ORIpeV4SLTModelDisplayEventLoopChanged	= @"ORIpeV4SLTModelDisplayEventLoopChanged";
 NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
-NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChanged";
+@interface ORIpeV4SLTModel (private)
+- (unsigned long) read:(unsigned long) address;
+- (void) write:(unsigned long) address value:(unsigned long) aValue;
+@end
 
 @implementation ORIpeV4SLTModel
-
 
 - (id) init
 {
@@ -249,8 +248,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	[self setReadOutGroup:readList];
     [self makePoller:0];
 	[readList release];
-    IpeCrateVersion=4;//the default -tb-
-	pbusLink = [[Pbus_Link alloc] initWithDelegate:self]; //mah -- Jun 06,2009 link wasn't made in this path of creation
+	pcmLink = [[PCM_Link alloc] initWithDelegate:self];
     return self;
 }
 
@@ -267,7 +265,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 - (void) wakeUp
 {
     if([self aWake])return;
-	[pbusLink wakeUp];
+	[pcmLink wakeUp];
     [super wakeUp];
     if(![gOrcaGlobals runInProgress]){
         [poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -277,38 +275,25 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 - (void) sleep
 {
     [super sleep];
-	[pbusLink sleep];
+	[pcmLink sleep];
     [poller stop];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
-		if(!pbusLink){
-			pbusLink = [[Pbus_Link alloc] initWithDelegate:self];
+		if(!pcmLink){
+			pcmLink = [[PCM_Link alloc] initWithDelegate:self];
 		}
-		[pbusLink connect];
+		[pcmLink connect];
 	}
 	@catch(NSException* localException) {
 	}
 }
 
-
-- (void) setUpImage
-{
-    [self setImage:[NSImage imageNamed:@"IpeV4SLTCard"]];
-}
-
-
-- (void) makeMainController
-{
-    [self linkToController:@"ORIpeV4SLTController"];
-}
-
-- (Class) guardianClass 
-{
-	return NSClassFromString(@"ORIpeV4CrateModel");
-}
+- (void) setUpImage			{ [self setImage:[NSImage imageNamed:@"IpeV4SLTCard"]]; }
+- (void) makeMainController	{ [self linkToController:@"ORIpeV4SLTController"];		}
+- (Class) guardianClass		{ return NSClassFromString(@"ORIpeV4CrateModel");		}
 
 - (void) setGuardian:(id)aGuardian //-tb-
 {
@@ -316,15 +301,12 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 		if([aGuardian adapter] == nil){
 			[aGuardian setAdapter:self];			
 		}
-		//[self findInterface];
 	}
 	else {
-		//[self setFireWireInterface:nil];
 		[[self guardian] setAdapter:nil];
 	}
 	[super setGuardian:aGuardian];
 }
-
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -342,6 +324,18 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
                        object : nil];
 }
 
+#pragma mark •••Accessors
+- (unsigned long) projectVersion  { return (hwVersion & kRevisionProject)>>28;}
+- (unsigned long) documentVersion { return (hwVersion & kDocRevision)>>16;}
+- (unsigned long) implementation  { return hwVersion & kImplemention;}
+
+- (void) setHwVersion:(unsigned long) aVersion
+{
+	hwVersion = aVersion;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelHwVersionChanged object:self];	
+}
+
+/*
 - (void) releaseSwInhibit
 {
 	[self writeReg:kSLTSwRelInhibit value:0];
@@ -359,21 +353,10 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 		[self writeReg:kSLTSetPageFree value:i];
 	}
 }
-
-- (id) controllerCard
-{
-	return self;
-}
-
-- (SBC_Link*)sbcLink
-{
-	return pbusLink;
-}
-
-- (TimedWorker *) poller
-{
-    return poller; 
-}
+*/
+- (id) controllerCard		{ return self;	  }
+- (SBC_Link*)sbcLink		{ return pcmLink; } 
+- (TimedWorker *) poller	{ return poller;  }
 
 - (void) setPoller: (TimedWorker *) aPoller
 {
@@ -415,14 +398,14 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 {	
 	// Stop all activities by software inhibit
 	if([readOutGroup count] == 0){
-		[self setSwInhibit];
+		//[self setSwInhibit];
 	}
 	
 	// TODO: Save dead time counters ?!
 	// Is it sensible to send a new package here?
 	// ak 18.7.07
 	
-	NSLog(@"Deadtime: %lld\n", [self readDeadTime]);
+	//NSLog(@"Deadtime: %lld\n", [self readDeadTime]);
 }
 
 - (void) checkAndLoadFPGAs
@@ -446,7 +429,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	
 	@try {
 		if(doLoad){
-			[self writeControlReg];
+			//[self writeControlReg];
 			[self hw_reset];
 			NSLog(@"SLT loaded FLT FPGAs\n");
 		}
@@ -526,7 +509,6 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 
 - (void) setPageStatusLow:(unsigned long)loPart high:(unsigned long)hiPart actual:(unsigned long)p0 next:(unsigned long)p1
 {
-    
     pageStatusLow	= loPart;
     pageStatusHigh	= hiPart;
     actualPage		= p0;
@@ -655,28 +637,23 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 
 - (short) getNumberRegisters			
 { 
-    if(IpeCrateVersion==4) return kSLTV4NumRegs; 
-    else //IpeCrateVersion==3
-		return kSLTNumRegs; 
+    return kSLTV4NumRegs; 
 }
 
 - (NSString*) getRegisterName: (short) anIndex
 {
-    if(IpeCrateVersion==4) return regV4[anIndex].regName;
-    else // V3
-		return reg[anIndex].regName;
+    return regV4[anIndex].regName;
 }
 
-- (unsigned long) getAddressOffset: (short) anIndex
+- (unsigned long) getAddress: (short) anIndex
 {
-    if(IpeCrateVersion==4)  return( regV4[anIndex].addressOffset );
-    return( reg[anIndex].addressOffset );
+    return( regV4[anIndex].addressOffset>>2);
+
 }
 
 - (short) getAccessType: (short) anIndex
 {
-    if(IpeCrateVersion==4)  return regV4[anIndex].accessType;
-	return reg[anIndex].accessType;
+	return regV4[anIndex].accessType;
 }
 
 - (unsigned short) selectedRegIndex
@@ -955,31 +932,18 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	
 }  
 
-- (int) IpeCrateVersion
-{
-    return IpeCrateVersion;
-}
-
-- (int) setIpeCrateVersion:(int) aValue
-{
-    IpeCrateVersion = aValue;
-    //NSLog(@"setIpeCrateVersion: %i\n",aValue);
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTIpeCrateVersionChanged object:self];
-    return IpeCrateVersion;
-}
-
 #pragma mark ***HW Access
 - (void) checkPresence
 {
 	@try {
-		[self readStatusReg];
+	//	[self readStatusReg];
 		[self setPresent:YES];
 	}
 	@catch(NSException* localException) {
 		[self setPresent:NO];
 	}
 }
-
+/*
 - (void) loadPatternFile
 {
 	NSString* contents = [NSString stringWithContentsOfFile:patternFilePath encoding:NSASCIIStringEncoding error:nil];
@@ -1080,31 +1044,25 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 {
 	[self writeReg:kSLTSwTestpulsTrigger value:0];
 }
+*/
 
 - (void) writeReg:(unsigned short)index value:(unsigned long)aValue
 {
-    if(IpeCrateVersion==4){
-	    [self write: regV4[index].addressOffset value:aValue];
-    }else{
-    	[self write: SLT_REG_ADDRESS(index) value:aValue];
-    }
+	[self write: [self getAddress:index] value:aValue];
 }
 
 - (unsigned long) readReg:(unsigned short) index
 {
-    if(IpeCrateVersion==4){
-        return [self read: regV4[index].addressOffset];
-    }else{
-        return [self read: SLT_REG_ADDRESS(index)];
-    }
+	return [self read: [self getAddress:index]];
+
 }
 
 - (void) readAllStatus
 {
-	[self readPageStatus];
-	[self readStatusReg];
+	//[self readPageStatus];
+	//[self readStatusReg];
 }
-
+/*
 - (void) readPageStatus
 {
 	[self setPageStatusLow:   [self readReg:kPageStatusLow] 
@@ -1127,10 +1085,10 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	
 	return data;
 }
-
+*/
 - (void) printStatusReg
 {
-	[self readStatusReg];
+	//[self readStatusReg];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"----Status Register SLT (%d) ----\n",[self stationNumber]);
 	NSLogFont(aFont,@"Veto             : %d\n",veto);
@@ -1139,7 +1097,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	NSLogFont(aFont,@"SwInhibit        : %d\n",swInhibit);
 	NSLogFont(aFont,@"Inhibit          : %d\n",inhibit);
 }
-
+/*
 - (void) writeStatusReg
 {
 	unsigned long data = 0;
@@ -1258,30 +1216,20 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 		if(data & (1<<8))NSLogFont(aFont,@"\tNext Page , Previous\n");
 	}
 }
+*/
 
-- (float) readVersion
+- (float) readHwVersion
 {
-	if(IpeCrateVersion==3){
-        [self setFpgaVersion: [self readReg:kSLTVersion]/10.];
-        NSLog(@"IPE-DAQ interface version %@ (build %s %s, fpga version %f)\n", ORIPE_VERSION, __DATE__, __TIME__, fpgaVersion);	
-    }
-    
-    //pbusPCI interface test -tb- 2008-09-04 BEGIN	
-    if(IpeCrateVersion==4){
-        NSLog(@"V4: IPE-V4-SLT ; crate is %p\n",  [self crate]);	
-        unsigned long value = 23;
-        unsigned long address;
-        //address = 0xfd000000 + 0xa80020; NO! omit offset  -tb-
-        address =  0xa80020;
-        [self write: address value: value];	// a test for PbusSim -tb-				  
-        value = [self read: address];					  
-        NSLog(@"V4: IPE-V4-SLT HW revision 0x%08x = %i (from register address 0x%x)\n", value,value,address);	
-        [self setFpgaVersion: (((double)value)/10.)];
-    }
-    //pbusPCI interface test -tb- 2008-09-04 END						  
-	return fpgaVersion;
+	unsigned long value;
+	@try {
+		[self setHwVersion:[self readReg: kSLTV4HWRevisionReg]];	
+	}
+	@catch (NSException* e){
+	}
+	return value;
 }
 
+/*
 - (unsigned long long) readDeadTime
 {
 	unsigned long low  = [self readReg:kSLTDeadTimeLow];
@@ -1295,19 +1243,19 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	unsigned long high = [self readReg:kSLTVetoTimeHigh];
 	return ((unsigned long long)high << 32) | low;
 }
-
+*/
 - (void) initBoard
 {
 	
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
-	[self writeReg:kSLTActResetFlt value:0];
-	[self writeReg:kSLTActResetSlt value:0];
+	//[self writeReg:kSLTActResetFlt value:0];
+	//[self writeReg:kSLTActResetSlt value:0];
 	usleep(10);
-	[self writeReg:kSLTRelResetFlt value:0];
-	[self writeReg:kSLTRelResetSlt value:0];
-	[self writeReg:kSLTSwSltTrigger value:0];
-	[self writeReg:kSLTSwSetInhibit value:0];
+	//[self writeReg:kSLTRelResetFlt value:0];
+	//[self writeReg:kSLTRelResetSlt value:0];
+	//[self writeReg:kSLTSwSltTrigger value:0];
+	//[self writeReg:kSLTSwSetInhibit value:0];
 	
 	usleep(100);
 	
@@ -1315,14 +1263,14 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	int savedInhibitSource = inhibitSource;
 	triggerSource = 0x1; //sw trigger only
 	inhibitSource = 0x3; 
-	[self writeControlReg];
-	[self releaseAllPages];
-	unsigned long long p1 = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
-	[self writeReg:kSLTSwRelInhibit value:0];
+	//[self writeControlReg];
+//	[self releaseAllPages];
+	//unsigned long long p1 = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
+	//[self writeReg:kSLTSwRelInhibit value:0];
 	int i = 0;
 	unsigned long lTmp;
     do {
-		lTmp = [self readReg:kSLTStatusReg];
+	//	lTmp = [self readReg:kSLTStatusReg];
 		//NSLog(@"waiting for inhibit %x i=%d\n", lTmp, i);
 		usleep(10);
 		i++;
@@ -1332,18 +1280,19 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 		NSLog(@"Release inhibit failed\n");
 		[NSException raise:@"SLT error" format:@"Release inhibit failed"];
 	}
-	
+/*	
 	unsigned long long p2  = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 	if(p1 == p2) NSLog (@"No software trigger\n");
 	[self writeReg:kSLTSwSetInhibit value:0];
+ */
 	triggerSource = savedTriggerSource;
 	inhibitSource = savedInhibitSource;
 	//-----------------------------------------------
 	
-	[self writeControlReg];
-	[self writeInterruptMask];
-	[self writeNextPageDelay];
-	[self readControlReg];	
+	//[self writeControlReg];
+	//[self writeInterruptMask];
+	//[self writeNextPageDelay];
+	//[self readControlReg];	
 	//[self printStatusReg];
 	//[self printControlReg];
 }
@@ -1357,29 +1306,27 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 - (void) hw_config
 {
 	NSLog(@"SLT: HW Configure\n");
-	[self writeReg:kSLTConfFltFPGAs value:0];
+	//[self writeReg:kSLTConfFltFPGAs value:0];
 	[ORTimer delay:1.5];
-	[self writeReg:kSLTConfSltFPGAs value:0];
+	//[self writeReg:kSLTConfSltFPGAs value:0];
 	[ORTimer delay:1.5];
-	[self readReg:kSLTStatusReg];
-	
+	//[self readReg:kSLTStatusReg];
 	[guardian checkCards];
-	
 }
 
 - (void) hw_reset
 {
 	NSLog(@"SLT: HW Reset\n");
-	[self writeReg:kSLTSwRelInhibit value:0];
-	[self writeReg:kSLTActResetFlt value:0];
-	[self writeReg:kSLTActResetSlt value:0];
+	//[self writeReg:kSLTSwRelInhibit value:0];
+	//[self writeReg:kSLTActResetFlt value:0];
+	//[self writeReg:kSLTActResetSlt value:0];
 	usleep(10);
-	[self writeReg:kSLTRelResetFlt value:0];
-	[self writeReg:kSLTRelResetSlt value:0];
-	[self writeReg:kSLTSwSltTrigger value:0];
-	[self writeReg:kSLTSwSetInhibit value:0];				
+	//[self writeReg:kSLTRelResetFlt value:0];
+	//[self writeReg:kSLTRelResetSlt value:0];
+	//[self writeReg:kSLTSwSltTrigger value:0];
+	//[self writeReg:kSLTSwSetInhibit value:0];				
 }
-
+/*
 - (void) loadPulseAmp
 {
 	unsigned short theConvertedAmp = pulserAmp * 4095./4.;
@@ -1417,25 +1364,23 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	[self loadPulseAmp];
 	[self loadPulseDelay];
 }
-
+*/
 - (void) setCrateNumber:(unsigned int)aNumber
 {
 	[guardian setCrateNumber:aNumber];
 }
 
-
 #pragma mark ***Archival
-
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
-	pbusLink = [[decoder decodeObjectForKey:@"Pbus_Link"] retain];
-	if(!pbusLink){
-		pbusLink = [[Pbus_Link alloc] initWithDelegate:self];
+	pcmLink = [[decoder decodeObjectForKey:@"PCM_Link"] retain];
+	if(!pcmLink){
+		pcmLink = [[PCM_Link alloc] initWithDelegate:self];
 	}
-	else [pbusLink setDelegate:self];
+	else [pcmLink setDelegate:self];
 	
 	//status reg
 	[self setPatternFilePath:		[decoder decodeObjectForKey:@"ORIpeV4SLTModelPatternFilePath"]];
@@ -1470,11 +1415,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
     [self setPageSize:				[decoder decodeIntForKey:@"ORIpeV4SLTPageSize"]]; // ak, 9.12.07
     [self setDisplayTrigger:		[decoder decodeBoolForKey:@"ORIpeV4SLTDisplayTrigger"]];
     [self setDisplayEventLoop:		[decoder decodeBoolForKey:@"ORIpeV4SLTDisplayEventLoop"]];
-    
-    //V3/V4 handling
-    [self setIpeCrateVersion:		[decoder decodeIntForKey:@"ORIpeCrateVersion"]];
-    if(IpeCrateVersion==0) IpeCrateVersion=4; //not saved, set the default -tb-
-	
+    	
     if (!poller)[self makePoller:0];
 	
 	//needed because the readoutgroup was added when the object was already in the config and so might not be in the configuration
@@ -1483,7 +1424,6 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 		[self setReadOutGroup:readList];
 		[readList release];
 	}
-	
 	
 	[[self undoManager] enableUndoRegistration];
 	
@@ -1494,7 +1434,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 {
 	[super encodeWithCoder:encoder];
 	
-	[encoder encodeObject:pbusLink		forKey:@"Pbus_Link"];
+	[encoder encodeObject:pcmLink		forKey:@"PCM_Link"];
 	
 	//status reg
 	[encoder encodeObject:patternFilePath forKey:@"ORIpeV4SLTModelPatternFilePath"];
@@ -1530,10 +1470,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
     [encoder encodeInt:pageSize         forKey:@"ORIpeV4SLTPageSize"]; // ak, 9.12.07
     [encoder encodeBool:displayTrigger   forKey:@"ORIpeV4SLTDisplayTrigger"];
     [encoder encodeBool:displayEventLoop forKey:@"ORIpeV4SLTDisplayEventLoop"];
-	
-    //V3/V4 handling
-    [encoder encodeInt:IpeCrateVersion  forKey:@"ORIpeCrateVersion"];
-	
+		
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -1607,7 +1544,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	pollingWasRunning = [poller isRunning];
 	if(pollingWasRunning) [poller stop];
 	
-	[self setSwInhibit];
+	//[self setSwInhibit];
 	
     if([[userInfo objectForKey:@"doinit"]intValue]){
 		[self initBoard];					
@@ -1621,7 +1558,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
-	[self readStatusReg];
+	//[self readStatusReg];
 	actualPageIndex = 0;
 	eventCounter    = 0;
 	first = YES;
@@ -1632,7 +1569,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
-	[pbusLink runTaskStarted:aDataPacket userInfo:userInfo];
+	[pcmLink runTaskStarted:aDataPacket userInfo:userInfo];
 	
 }
 
@@ -1640,22 +1577,22 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 {
 	if(!first){
 		//event readout controlled by the SLT cpu now. ORCA reads out 
-		//the resulting data from a generic circular buffer in the pbusLink code.
-		[pbusLink takeData:aDataPacket userInfo:userInfo];
+		//the resulting data from a generic circular buffer in the pcmLink code.
+		[pcmLink takeData:aDataPacket userInfo:userInfo];
 	}
 	else {
-		[self releaseAllPages];
-		[self releaseSwInhibit];
-		[self writeReg:kSLTResetDeadTime value:0];
+		//[self releaseAllPages];
+		//[self releaseSwInhibit];
+		//[self writeReg:kSLTResetDeadTime value:0];
 		first = NO;
 	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[self setSwInhibit];
+	//[self setSwInhibit];
 	
-	[pbusLink runTaskStopped:aDataPacket userInfo:userInfo];
+	[pcmLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	if(pollingWasRunning) {
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -1729,7 +1666,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
     [self setReadOutGroup:[[[ORReadOutList alloc] initWithIdentifier:@"cPCI"]autorelease]];
     [readOutGroup loadUsingFile:aFile];
 }
-
+/*
 - (void) dumpTriggerRAM:(int)aPageIndex
 {
 	
@@ -1796,7 +1733,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	
 	
 }
-
+*/
 - (void) autoCalibrate
 {
 	NSArray* allFLTs = [[self crate] orcaObjects];
@@ -1824,7 +1761,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 
 - (NSString*) sbcLocalCodePath
 {
-	return @"Source/Objects/Hardware/IPE/IpeV4SLT/SLTv4_Readout_Code";
+	return @"Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code";
 }
 
 - (NSString*) codeResourcePath
@@ -1836,35 +1773,24 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 #pragma mark •••SBC I/O layer
 - (unsigned long) read:(unsigned long) address
 {
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long theData;
-	[pbusLink readLongBlockPbus:&theData
+	[pcmLink readLongBlockPbus:&theData
 					  atAddress:address
 					  numToRead: 1];
 	return theData;
 }
 
-- (void) read:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len;
+- (void) read:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len
 { 
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
-	[pbusLink readLongBlockPbus:theData
-					  atAddress:address
-					  numToRead:len];
-}
-
-
-- (void) write:(unsigned long) address value:(unsigned long) aValue
-{
-	if(![pbusLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	[pbusLink writeLongBlockPbus:&aValue
-					   atAddress:address
-					  numToWrite:1];
+	[pcmLink readLongBlockPbus:theData
+					 atAddress:address
+					 numToRead:len];
 }
 
 - (void) writeBitsAtAddress:(unsigned long)address 
@@ -1872,7 +1798,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 					   mask:(unsigned long)aMask 
 					shifted:(int)shiftAmount
 {
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	
@@ -1884,7 +1810,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 - (void) setBitsHighAtAddress:(unsigned long)address 
 						 mask:(unsigned long)aMask
 {
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long buffer = [self  read:address];
@@ -1899,7 +1825,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 			   numberSlots:(unsigned long)  nSlots 
 			 slotIncrement:(unsigned long)  incrSlots
 {
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	
@@ -1916,7 +1842,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 			length:(unsigned long)  length 
 		 increment:(unsigned long)  incr
 {
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	
@@ -1931,7 +1857,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 			 length:(unsigned long)  length 
 		  increment:(unsigned long)  incr
 {
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	
@@ -1946,7 +1872,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 			 length:(unsigned long)  length 
 		  increment:(unsigned long)  incr
 {
-	if(![pbusLink isConnected]){
+	if(![pcmLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	int i;
@@ -1965,7 +1891,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 	
 	[self load_HW_Config_Structure:&configStruct index:index];
 	
-	[pbusLink load_HW_Config:&configStruct];
+	[pcmLink load_HW_Config:&configStruct];
 }
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
@@ -2003,11 +1929,32 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 			}
 		}
 	}
-	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
-	
 	return index+1;
 }
-
-
 @end
+
+@implementation ORIpeV4SLTModel (private)
+- (unsigned long) read:(unsigned long) address
+{
+	if(![pcmLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	unsigned long theData;
+	[pcmLink readLongBlockPbus:&theData
+					  atAddress:address
+					  numToRead: 1];
+	return theData;
+}
+
+- (void) write:(unsigned long) address value:(unsigned long) aValue
+{
+	if(![pcmLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	[pcmLink writeLongBlockPbus:&aValue
+					  atAddress:address
+					 numToWrite:1];
+}
+@end
+

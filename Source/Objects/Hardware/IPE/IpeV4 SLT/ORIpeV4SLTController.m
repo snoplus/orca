@@ -89,7 +89,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     
     [super registerNotificationObservers];
 	
-    [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
+                     selector : @selector(hwVersionChanged:)
+                         name : ORIpeV4SLTModelHwVersionChanged
+                       object : model];
+	
+	[notifyCenter addObserver : self
                      selector : @selector(controlRegChanged:)
                          name : ORIpeV4SLTControlRegChanged
                        object : model];
@@ -183,12 +188,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                      selector : @selector(readAllChanged:)
                          name : ORIpeV4SLTModelReadAllChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(crateVersionChanged:)
-                         name : ORIpeV4SLTIpeCrateVersionChanged
-						object: model];
-	
 	
 }
 
@@ -293,6 +292,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) updateWindow
 {
     [super updateWindow];
+	[self hwVersionChanged:nil];
 	[self controlRegChanged:nil];
 	[self statusRegChanged:nil];
     [self writeValueChanged:nil];
@@ -312,8 +312,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [self pollRunningChanged:nil];
 	[self patternFilePathChanged:nil];
 	[self readAllChanged:nil];
-	[self crateVersionChanged:nil];
-    
 }
 
 
@@ -394,6 +392,13 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 }
 
+- (void) hwVersionChanged:(NSNotification*) aNote
+{
+	[projectField	setIntValue:[model projectVersion]];
+	[docField		setIntValue:[model projectVersion]];
+	[implementationField setIntValue:[model implementation]];
+}
+
 - (void) writeValueChanged:(NSNotification*) aNote
 {
 	[self updateStepper:regWriteValueStepper setting:[model writeValue]];
@@ -448,11 +453,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[actualPageField setIntValue:[model actualPage]+1];
 	[nextPageField setIntValue:  [model nextPage]+1];
 	
-}
-
-- (void) crateVersionChanged:(NSNotification*)aNote
-{
-    [crateVersionPopup  selectItemWithTag: [model IpeCrateVersion]];
 }
 
 - (void) controlRegChanged:(NSNotification*)aNote
@@ -532,9 +532,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) dumpPageStatus:(id)sender
 {
 	if([[NSApp currentEvent] clickCount] >=2){
-		int pageIndex = [sender selectedRow]*32 + [sender selectedColumn];
+		//int pageIndex = [sender selectedRow]*32 + [sender selectedColumn];
 		@try {
-			[model dumpTriggerRAM:pageIndex];
+			//[model dumpTriggerRAM:pageIndex];
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Exception doing SLT dump trigger RAM page\n");
@@ -619,16 +619,16 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) readStatus:(id)sender
 {
-	[model readStatusReg];
-	[model readPageStatus];
+	//[model readStatusReg];
+	//[model readPageStatus];
 }
 
 - (IBAction) reportAllAction:(id)sender
 {
 	@try {
 		[model printStatusReg];
-		[model printControlReg];
-		[model printInterruptMask];
+		//[model printControlReg];
+		//[model printInterruptMask];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT status\n");
@@ -709,7 +709,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) versionAction: (id) sender
 {
 	@try {
-		NSLog(@"SLT Hardware Model Version: %.1f\n",[model readVersion]);
+		[model readHwVersion];
+		NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
+
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT HW Model Version\n");
@@ -721,7 +723,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) deadTimeAction: (id) sender
 {
 	@try {
-		NSLog(@"SLT Dead Time: %lld\n",[model readDeadTime]);
+		//NSLog(@"SLT Dead Time: %lld\n",[model readDeadTime]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT Dead Time\n");
@@ -733,7 +735,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) vetoTimeAction: (id) sender
 {
 	@try {
-		NSLog(@"SLT Veto Time: %lld\n",[model readVetoTime]);
+		//NSLog(@"SLT Veto Time: %lld\n",[model readVetoTime]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT Veto Time\n");
@@ -787,7 +789,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) loadPulserAction: (id) sender
 {
 	@try {
-		[model loadPulserValues];
+		//[model loadPulserValues];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception loading SLT pulser values\n");
@@ -800,7 +802,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) pulseOnceAction: (id) sender
 {
 	@try {
-		[model pulseOnce];
+		//[model pulseOnce];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT pulse\n");
@@ -824,7 +826,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) releaseAllPagesAction:(id)sender
 {
 	@try {
-		[model releaseAllPages];
+		//[model releaseAllPages];
 		[model readAllStatus];
 	}
 	@catch(NSException* localException) {
@@ -837,8 +839,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) setSWInhibitAction:(id)sender
 {
 	@try {
-		[model setSwInhibit];
-		[model readStatusReg];
+		//[model setSwInhibit];
+		//[model readStatusReg];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT Set SW Inhibit pages\n");
@@ -850,8 +852,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) releaseSWInhibitAction:(id)sender
 {
 	@try {
-		[model releaseSwInhibit];
-		[model readStatusReg];
+		//[model releaseSwInhibit];
+		//[model readStatusReg];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT Release SW Inhibit pages\n");
@@ -863,7 +865,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) forceTrigger:(id)sender
 {
 	@try {
-		[model pulseOnce];
+		//[model pulseOnce];
 		[model readAllStatus];
 	}
 	@catch(NSException* localException) {
@@ -900,7 +902,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) loadPatternFile:(id)sender
 {
-	[model loadPatternFile];
+	//[model loadPatternFile];
 }
 
 - (IBAction) readAllAction:(id)sender
@@ -919,14 +921,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                       nil,
                       nil,@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards.");
 }
-
-
-
-- (IBAction) crateVersionAction:(id)sender
-{
-    [model setIpeCrateVersion: [crateVersionPopup selectedTag]];
-}
-
 
 
 @end

@@ -126,27 +126,17 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_IPEv4WriteBlockStruct)/sizeof(int32_t));
 
     uint32_t startAddress   = p->address;
-    int32_t numItems        = p->numItems;
+    uint32_t numItems       = p->numItems;
     
     p++;								/*point to the data*/
 	int32_t* lptr = (int32_t*)p;		/*cast to the data type*/ 
 	if(needToSwap) SwapLongBlock(lptr,numItems);
     
 	//**** use device driver call to write data to HW
-    int32_t result = 0;
 	int32_t perr = 0;
-    if (numItems == 1){
-	  perr = pbusWrite(startAddress, *lptr);
-    } else {
-      perr = pbusWriteBlock(startAddress, (unsigned long *) lptr, numItems);
-    }
-
-    // Result needs to be the number of bytes read or an error code
-    if (perr == 0) result = numItems * sizeof(uint32_t);
-	else result = -perr;
-	
-    //printf("Addr = %08x  NumItems = %d, data=%08lx (res=%d)\n", startAddress, numItems, lPtr[0], result);   
-    
+    if (numItems == 1)	perr = pbusWrite(startAddress, *lptr);
+	else				perr = pbusWriteBlock(startAddress, (unsigned long *) lptr, numItems);
+	    
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
     /* non-0 means an error*/
@@ -155,12 +145,12 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     returnDataPtr->numItems        = 0;
 
 	//assuming that the device driver returns the number of bytes read
-	if(result == (numItems * sizeof(int32_t))){
+	if(perr == 0){
         returnDataPtr->errorCode = 0;
     }
     else {
         aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_IPEv4WriteBlockStruct);
-        returnDataPtr->errorCode = result;        
+        returnDataPtr->errorCode = perr;        
     }
 
     lptr = (int32_t*)returnDataPtr;
@@ -178,6 +168,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     
     uint32_t startAddress   = p->address;
     int32_t numItems        = p->numItems;
+	printf("starting read: %08x %d\n",startAddress,numItems);
 
     if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSize) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
@@ -195,39 +186,26 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     char* returnPayload = (char*)(returnDataPtr+1);
     unsigned long *lPtr = (unsigned long *) returnPayload;
 	
-    // use device driver to read HW
-    int32_t result = 0;
-	int32_t perr = 0;
-    if (numItems == 1){
-	  perr = pbusRead(startAddress, lPtr);
-    } else {
-      perr = pbusReadBlock(startAddress, lPtr, numItems);
-    }
-  
- 
-    // Result needs to be the number of bytes read or an error code
-    if (perr == 0) result = numItems * sizeof(uint32_t);
-	else result = -perr;
-	
-    //printf("Addr = %08x  NumItems = %d, data=%08lx (res=%d)\n", startAddress, numItems, lPtr[0], result);   
-
- 
+	int32_t perr   = 0;
+    if (numItems == 1)  perr = pbusRead(startAddress, lPtr);
+    else				perr = pbusReadBlock(startAddress, lPtr, numItems);
+	printf("perr: %d\n",perr);
+ 	
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = numItems;
-    if(result == (numItems*sizeof(uint32_t))){
+    if(perr == 0){
         returnDataPtr->errorCode = 0;
-	if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
+		if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
     }
     else {
-        sprintf(aPacket->message,"error: %d %d : %s\n",(int32_t)result,(int32_t)errno,strerror(errno));
+        sprintf(aPacket->message,"error: %d %d : %s\n",perr,(int32_t)errno,strerror(errno));
         aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_IPEv4ReadBlockStruct);
         returnDataPtr->numItems  = 0;
-        returnDataPtr->errorCode = result;        
+        returnDataPtr->errorCode = perr;        
     }
 
     if(needToSwap) SwapLongBlock(returnDataPtr,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
     if(reply)writeBuffer(aPacket);
-	
 }
 
 /*************************************************************/

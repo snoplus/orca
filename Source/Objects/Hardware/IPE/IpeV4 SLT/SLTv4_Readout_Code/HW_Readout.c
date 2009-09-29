@@ -31,7 +31,7 @@
 #include "CircularBuffer.h"
 #include "SLTv4_HW_Definitions.h"
 
-#include "pbusinterface.h"
+#include <pbusinterface.h>
 //#include "hw4/baseregister.h"
 
 void SwapLongBlock(void* p, int32_t n);
@@ -41,15 +41,6 @@ int32_t writeBuffer(SBC_Packet* aPacket);
 extern char needToSwap;
 extern int32_t  dataIndex;
 extern int32_t* data;
-
-//replace with whatever device driver handle(s) you have
-//TUVMEDevice* vmeAM29Handle = NULL;
-//TUVMEDevice* controlHandle = NULL;
-//TUVMEDevice* vmeAM39Handle = NULL;
-//TUVMEDevice* vmeAM9Handle = NULL;
-
-
-
 
 void processHWCommand(SBC_Packet* aPacket)
 {
@@ -86,13 +77,13 @@ void stopHWRun (SBC_crate_config* config)
 void FindHardware(void)
 {
 	//open device driver(s), get device driver handles
-        pbusInit("FE.ini");
+       // pbusInit("FE.ini");
 }
 
 void ReleaseHardware(void)
 {
 	//release / close device driver(s)
-        pbusFree();
+      //  pbusFree();
 }
 
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
@@ -142,12 +133,12 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     if(needToSwap)SwapLongBlock(lptr,numItems);
 
 	//send back to ORCA
-    if(reply)writeBuffer(aPacket);    
-	
+    if(reply)writeBuffer(aPacket);
 }
 
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 {
+#ifdef commentOut
     SBC_IPEv4ReadBlockStruct* p = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     if(needToSwap) SwapLongBlock(p,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
     
@@ -202,7 +193,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 
     if(needToSwap) SwapLongBlock(returnDataPtr,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
     if(reply)writeBuffer(aPacket);
-	
+#endif
 }
 
 /*************************************************************/
