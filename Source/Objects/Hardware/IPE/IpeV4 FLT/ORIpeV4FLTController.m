@@ -76,6 +76,7 @@
 	[totalRate setBackgroundColor:[NSColor whiteColor]];
 	[totalRate setBarColor:[NSColor greenColor]];
 	
+	[self populatePullDown];
 	
     [self updateWindow];
 }
@@ -258,6 +259,21 @@
 {
 	[interruptMaskField setIntValue: [model interruptMask]];
 }
+
+- (void) populatePullDown
+{
+    short	i;
+	
+	// Clear all the popup items.
+    [registerPopUp removeAllItems];
+    
+	// Populate the register popup
+    for (i = 0; i < [model getNumberRegisters]; i++) {
+        [registerPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
+    }
+}
+
+
 
 - (void) updateWindow
 {
@@ -816,6 +832,55 @@
     if(returnCode == NSAlertAlternateReturn){
 		[model autoCalibrate];
     }    
+}
+
+- (IBAction) selectRegisterAction:(id) aSender
+{
+ NSLog(@"This is: FLTv4: selectRegisterAction\n");
+    // Make sure that value has changed.
+    if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
+	    [[model undoManager] setActionName:@"Select Register"]; // Set undo name
+	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
+		[self settingsLockChanged:nil];
+    }
+}
+
+- (IBAction) writeValueAction:(id) aSender
+{
+	[self endEditing];
+    // Make sure that value has changed.
+    if ([aSender intValue] != [model writeValue]){
+		[[model undoManager] setActionName:@"Set Write Value"]; // Set undo name.
+		[model setWriteValue:[aSender intValue]]; // Set new value
+    }
+}
+
+- (IBAction) readRegAction: (id) sender
+{
+	int index = [registerPopUp indexOfSelectedItem];
+	@try {
+		unsigned long value = [model readReg:index];
+		NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);
+        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+- (IBAction) writeRegAction: (id) sender
+{
+	[self endEditing];
+	int index = [registerPopUp indexOfSelectedItem];
+	@try {
+		[model writeReg:index value:[model writeValue]];
+		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception writing SLT reg: %@\n",[model getRegisterName:index]);
+        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
 }
 
 #pragma mark •••Plot DataSource

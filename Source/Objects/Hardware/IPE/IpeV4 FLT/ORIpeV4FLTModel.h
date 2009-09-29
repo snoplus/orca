@@ -192,6 +192,10 @@
 - (unsigned short) readoutPages; // ak, 2.7.07
 - (void) setReadoutPages:(unsigned short)aReadoutPage; // ak, 2.7.07
 
+- (short) getNumberRegisters;			
+- (NSString*) getRegisterName: (short) anIndex;
+- (unsigned long) getAddressOffset: (short) anIndex;
+- (short) getAccessType: (short) anIndex;
 
 #pragma mark •••HW Access
 //all can raise exceptions

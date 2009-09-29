@@ -107,6 +107,8 @@ struct ipeV4Reg ipeV3Reg[kNumFLTChannels] = {
 {0x0L, 0x2L}	//kFLTAdcMemory
 };
 
+#if 0
+/* never used ? -tb-
 enum IpeV4FLTEnum {
 	kFLTV4ControlReg,
 	kFLTV4PixelStatus1Reg,
@@ -153,6 +155,9 @@ struct ipeV4Reg ipeV4Reg[kFLTV4NumRegs] = {
 {0x0cL, 0x0L},	//kFLTV4CFPGAVersion, 0x0c or 0x3
 {0x10L, 0x0L}	//kFLTV4FPGA8Version, 0x10 or 0x4
 };
+*/
+#endif
+
 
 static int trigChanConvFLT[4][6]={
 { 0,  2,  4,  6,  8, 10},	//FPGA-1
@@ -170,6 +175,44 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 @"Speed",
 @"Event",
 };
+
+// data for low-level page (IPE V4 electronic definitions)
+enum IpeFLTV4Enum{
+	kFLTV4StatusReg,
+	kFLTV4ControlReg,
+	kFLTV4CommandReg,
+	kFLTV4CFPGAVersionReg,
+	kFLTV4FPGA8VersionReg,
+	kFLTV4BoardIDLSBReg,
+	kFLTV4BoardIDMSBReg,
+	kFLTV4HrMeasEnableReg,
+	kFLTV4PixelSettings1Reg,
+	kFLTV4PixelSettings2Reg,
+	kFLTV4SecondCounterReg,
+	kFLTV4HrControlReg,
+	kFLTV4ThresholdReg,
+	kFLTV4NumRegs //must be last
+};
+
+static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
+//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
+{@"Status",				0x000000>>2,		-1,				kIpeRegReadable},
+{@"Control",			0x000004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"Command",			0x000008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"CFPGAVersion",		0x00000c>>2,		-1,				kIpeRegReadable},
+{@"FPGA8Version",		0x000010>>2,		-1,				kIpeRegReadable},
+{@"BoardIDLSB",         0x000014>>2,		-1,				kIpeRegReadable},
+{@"BoardIDMSB",         0x000018>>2,		-1,				kIpeRegReadable},
+{@"HrMeasEnable",       0x000024>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"PixelSettings1",     0x000030>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"PixelSettings2",     0x000034>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"SecondCounter",      0x000044>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+};
+
+
+
 
 @interface ORIpeV4FLTModel (private)
 - (NSAttributedString*) test:(int)testName result:(NSString*)string color:(NSColor*)aColor;
@@ -667,6 +710,29 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelReadoutPagesChanged object:self];
 }
 
+- (short) getNumberRegisters			
+{ 
+    //if(IpeCrateVersion==4) 
+    return kFLTV4NumRegs; 
+}
+
+- (NSString*) getRegisterName: (short) anIndex
+{
+    //if(IpeCrateVersion==4) 
+    return regV4[anIndex].regName;
+}
+
+- (unsigned long) getAddressOffset: (short) anIndex
+{
+    return( regV4[anIndex].addressOffset );
+}
+
+- (short) getAccessType: (short) anIndex
+{
+	return regV4[anIndex].accessType;
+}
+
+
 #pragma mark •••Calibration
 - (void) autoCalibrate
 {
@@ -755,7 +821,7 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
         data = [self readControlStatus];
 	    return (data >> kIpeFlt_Cntl_Version_Shift) & kIpeFlt_Cntl_Version_Mask;
     }
-    data = [self readReg:kFLTV4CFPGAVersion];
+    data = [self readReg: kFLTV4CFPGAVersionReg];
     //data = [self readReg:kFLTV4FPGA8Version];
 	return data;
 }
@@ -863,7 +929,7 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
     	[self setLedOff: ((value & kIpeFlt_Cntl_LedOff_Mask) >> kIpeFlt_Cntl_LedOff_Shift)];
     }else{
 	    //unsigned long value =   [self readReg: kFLTV4ControlReg ];
-	    value =   [self read: kFLTV4ControlReg ];
+	    value =   [self readReg: kFLTV4ControlReg ];
     }
 	return value;
 }
@@ -983,7 +1049,7 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 {
     if([[[self crate] adapter] IpeCrateVersion]==3)
 	    return ([self slot] << 24) | (ipeV3Reg[aReg].space << kIpeFlt_AddressSpace) | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress) | ipeV3Reg[aReg].address;
-	return ([self slot] << 17)   | ipeV4Reg[aReg].address; //TODO: the channel ... -tb-   | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress)
+	return ([self stationNumber] << 17) | (aChannel << 12)   | regV4[aReg].addressOffset; //TODO: the channel ... -tb-   | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress)
 }
 
 /** Detection of IPE electronic V3 or V4 is done automatically.
@@ -996,12 +1062,13 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 	    return ([self slot] << 24) | (ipeV3Reg[aReg].space << kIpeFlt_AddressSpace)  | ipeV3Reg[aReg].address;
     if(version==4)
 	    //return ([self slot] << 19) |  ipeV4Reg[aReg].address; //TODO: NEED <<17 !!! -tb-
-	    return ([self stationNumber] << 19) |  ipeV4Reg[aReg].address; //TODO: NEED <<17 !!! -tb-
+	    return ([self stationNumber] << 17) |  regV4[aReg].addressOffset; //TODO: NEED <<17 !!! -tb-
     return 0;
 }
 
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
 {
+    //TODO: obsolete (v3) -tb-
 	return ([self slot] << 24) | (0x2 << kIpeFlt_AddressSpace) | (aChannel << kIpeFlt_ChannelAddress)	| (aPage << kIpeFlt_PageNumber);
 }
 
@@ -1015,7 +1082,9 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 		return [self read:[self regAddress:aReg]];
     if(version==4 || version==0){
         NSLog(@"V4-FLT:readReg: detected V4 version\n");
+        #if 0
         //test: loop over crate group -tb-
+        /*
         id obj,crate;
         crate=[self crate];
         if(crate){
@@ -1042,7 +1111,9 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 				
             }
         }
-        return [self read:[self regAddress:aReg]];
+        */
+        #endif
+        return [self read: [self regAddress:aReg]];
 	    //return [self read:0x480010];
 	    //return [self read:0x120003];
 	    //return [self read:[self regAddress:aReg]];
@@ -1071,16 +1142,21 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 
 - (void) writeThreshold:(int)i value:(unsigned short)aValue
 {
-	[self writeReg:kFLTThresholdReg channel:i value:aValue];
+    //TODO: obsolete (v3) -tb-
+	//[self writeReg: kFLTThresholdReg channel:i value:aValue];
+	[self writeReg: kFLTV4ThresholdReg channel:i value:aValue];
 }
 
 - (unsigned short) readThreshold:(int)i
 {
-	return [self readReg:kFLTThresholdReg channel:i];
+    //TODO: obsolete (v3) -tb-
+	return [self readReg:kFLTV4ThresholdReg channel:i];
+	//return [self readReg:kFLTThresholdReg channel:i];
 }
 
 - (void) writeGain:(int)i value:(unsigned short)aValue
 {
+    //TODO: obsolete (v3) -tb-
 	// invert the gain scale, ak 20.7.07
 	[self writeReg:kFLTGainReg channel:i value:(255-aValue)]; 
 }
@@ -1099,11 +1175,13 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 
 - (void) rewindTestPattern
 {
+    //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTTestPulsMemReg value: kIpeFlt_TP_Control | kIpeFlt_TestPattern_Reset];
 }
 
 - (void) writeNextPattern:(unsigned long)aValue
 {
+    //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTTestPulsMemReg value:aValue];
 }
 
@@ -1154,17 +1232,20 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 		}
 	}
 	
+    //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTPixelStatus3Reg value:hitRateEnabledMask];
 }
 
 - (unsigned short) readGain:(int)i
 {
     // invert the gain scale, ak 20.7.07
+    //TODO: obsolete (v3) -tb-
 	return 255-[self readReg:kFLTGainReg channel:i];
 }
 
 - (void) disableAllTriggers
 {
+    //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTPixelStatus1Reg value:0x3ffffff];
 }
 
@@ -1178,6 +1259,7 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 		}
 	}
 	
+    //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTPixelStatus1Reg value:pixelStatus1Mask];
 	[self writeReg:kFLTPixelStatus2Reg value:0x0];
 }
@@ -1187,8 +1269,10 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 {
 	unsigned long aValue = 0x555; //all triggers off
 	int fpga;
+    //TODO: obsolete (v3) -tb-
 	for(fpga=0;fpga<4;fpga++){
 		
+    //TODO: obsolete (v3) -tb-
 		[self writeReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]  value:aValue];
 		unsigned long checkValue = [self readReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]];
 		
@@ -1203,6 +1287,7 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 
 - (unsigned short) readTriggerControl:(int) fpga
 {	
+    //TODO: obsolete (v3) -tb-
 	return [self readReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]];
 }
 
@@ -1221,6 +1306,7 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 		int chan;
 		for(chan=0;chan<kNumFLTChannels;chan++){
 			
+    //TODO: obsolete (v3) -tb-
 			aValue = [self readReg:kFLTHitRateMemReg channel:chan];
 			measurementAge = (aValue >> 12) & 0x1f;
 			overflow = (aValue >> 10) & 0x1;
@@ -1267,11 +1353,13 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 
 - (BOOL) isInRunMode
 {
+    //TODO: obsolete (v3) -tb-
 	return [self readMode] == kIpeFlt_Run_Mode;
 }
 
 - (BOOL) isInTestMode
 {
+    //TODO: obsolete (v3) -tb-
 	return [self readMode] == kIpeFlt_Test_Mode;
 }
 

@@ -77,6 +77,10 @@
 		NSSize					rateSize;
 		NSSize					testSize;
 		NSView*					blankView;
+        
+        //low level
+		IBOutlet NSPopUpButton*	registerPopUp;
+		IBOutlet NSTextField* 	regWriteValueTextField;
 		
 };
 #pragma mark •••Initialization
@@ -93,6 +97,7 @@
 - (void) thresholdOffsetChanged:(NSNotification*)aNote;
 - (void) ledOffChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
+- (void) populatePullDown;
 - (void) updateWindow;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -145,6 +150,10 @@
 - (IBAction) writeThresholdsGains:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (IBAction) selectRegisterAction:(id) aSender;
+- (IBAction) writeValueAction:(id) aSender;
+- (IBAction) readRegAction: (id) sender;
+- (IBAction) writeRegAction: (id) sender;
 
 #pragma mark •••Plot DataSource
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;

@@ -55,7 +55,8 @@
 		IBOutlet NSTextField*	actualPageField;
 		IBOutlet NSTextField*	nextPageField;
 		IBOutlet NSButton*		releaseAllPagesButton;
-
+        
+        //low level
 		IBOutlet NSPopUpButton*	registerPopUp;
 		IBOutlet NSStepper* 	regWriteValueStepper;
 		IBOutlet NSTextField* 	regWriteValueTextField;

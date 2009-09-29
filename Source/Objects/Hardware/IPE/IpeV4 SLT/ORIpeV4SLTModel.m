@@ -195,6 +195,9 @@ enum IpeV4Enum{
 	kSLTV4StatusReg,
 	kSLTV4CommandReg,
 	kSLTV4HWRevision,
+	kSLTV4SecondSet,
+	kSLTV4SecondCounter,
+	kSLTV4SubSecondCounter,
 	kSLTV4NumRegs //must be last
 };
 
@@ -204,6 +207,9 @@ static IpeRegisterNamesStruct regV4[kSLTV4NumRegs] = {
 {@"Status",				0xa80004>>2,		-1,				kIpeRegReadable},
 {@"Command",			0xa80008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"HWRevision",			0xa80020>>2,		-1,				kIpeRegReadable},
+{@"SecondSet",          0xb00000>>2,		-1,				kIpeRegWriteable},
+{@"SecondCounter",      0xb00004>>2,		-1,				kIpeRegReadable},
+{@"SubSecondCounter",   0xb00008>>2,		-1,				kIpeRegReadable},
 };
 
 
@@ -663,11 +669,13 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 
 - (unsigned long) getAddressOffset: (short) anIndex
 {
+    if(IpeCrateVersion==4)  return( regV4[anIndex].addressOffset );
     return( reg[anIndex].addressOffset );
 }
 
 - (short) getAccessType: (short) anIndex
 {
+    if(IpeCrateVersion==4)  return regV4[anIndex].accessType;
 	return reg[anIndex].accessType;
 }
 
@@ -955,7 +963,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 - (int) setIpeCrateVersion:(int) aValue
 {
     IpeCrateVersion = aValue;
-    NSLog(@"setIpeCrateVersion: %i\n",aValue);
+    //NSLog(@"setIpeCrateVersion: %i\n",aValue);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTIpeCrateVersionChanged object:self];
     return IpeCrateVersion;
 }
@@ -1004,7 +1012,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 		
 		@try {
 			//collect all valid cards
-			ORIpeFLTModel* cards[20];
+			ORIpeFLTModel* cards[20];//TODO: ORIpeV4SLTModel -tb-
 			int i;
 			for(i=0;i<20;i++)cards[i]=nil;
 			
@@ -1012,7 +1020,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
 			NSEnumerator* e = [allFLTs objectEnumerator];
 			id aCard;
 			while(aCard = [e nextObject]){
-				if([aCard isKindOfClass:NSClassFromString(@"ORIpeFireWireCard")])continue;
+				if([aCard isKindOfClass:NSClassFromString(@"ORIpeFireWireCard")])continue;//TODO: is this still true for v4? -tb-
 				int index = [aCard stationNumber] - 1;
 				if(index<20){
 					cards[index] = aCard;

@@ -117,6 +117,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
@@ -164,6 +166,8 @@
 				<string>id</string>
 				<key>modeAction</key>
 				<string>id</string>
+				<key>readRegAction</key>
+				<string>id</string>
 				<key>readThresholdsGains</key>
 				<string>id</string>
 				<key>readoutPagesAction</key>
@@ -171,6 +175,8 @@
 				<key>reportButtonAction</key>
 				<string>id</string>
 				<key>resetAction</key>
+				<string>id</string>
+				<key>selectRegisterAction</key>
 				<string>id</string>
 				<key>settingLockAction</key>
 				<string>id</string>
@@ -190,7 +196,11 @@
 				<string>id</string>
 				<key>versionAction</key>
 				<string>id</string>
+				<key>writeRegAction</key>
+				<string>id</string>
 				<key>writeThresholdsGains</key>
+				<string>id</string>
+				<key>writeValueAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -231,6 +241,10 @@
 				<string>NSMatrix</string>
 				<key>readoutPagesField</key>
 				<string>NSTextField</string>
+				<key>regWriteValueTextField</key>
+				<string>NSTextField</string>
+				<key>registerPopUp</key>
+				<string>NSPopUpButton</string>
 				<key>reportButton</key>
 				<string>NSButton</string>
 				<key>resetButton</key>
@@ -307,6 +321,8 @@
 				<key>copy</key>
 				<string>id</string>
 				<key>differentiateAction</key>
+				<string>id</string>
+				<key>refresh</key>
 				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>
