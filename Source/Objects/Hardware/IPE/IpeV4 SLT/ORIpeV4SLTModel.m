@@ -155,9 +155,6 @@ enum IpeV4Enum {
 	kSLTV4PROMsBufferReg,
 	kSLTV4TriggerDataReg,
 	kSLTV4ADCDataReg,
-	kSLTV4SecondSet,
-	kSLTV4SecondCounter,
-	kSLTV4SubSecondCounter,
 	kSLTV4NumRegs //must be last
 };
 
