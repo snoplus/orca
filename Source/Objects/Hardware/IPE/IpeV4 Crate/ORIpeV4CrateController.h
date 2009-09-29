@@ -25,13 +25,15 @@
 
 @interface ORIpeV4CrateController : ORCrateController
 {
+	IBOutlet NSTextField* connectedField;
+	BOOL connected;
 }
 - (id) init;
 - (void) awakeFromNib;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-//- (void) serviceChanged:(NSNotification*)aNotification;
+- (void) connectionChanged:(NSNotification*)aNotification;
 
 
 @end

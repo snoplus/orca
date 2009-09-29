@@ -24,6 +24,8 @@
 #import "ORIpeV4CrateModel.h"
 #import "ORIpeCard.h"
 
+NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
+
 @implementation ORIpeV4CrateModel
 
 #pragma mark •••initialization
@@ -84,10 +86,12 @@
 
 - (void) connected
 {
+	[self setIsConnected:YES];
 }
 
 - (void) disconnected
 {
+	[self setIsConnected:NO];
 }
 
 - (void) makeMainController
@@ -97,6 +101,16 @@
 
 
 #pragma mark •••Accessors
+- (void) setIsConnected:(BOOL)aState
+{
+	isConnected = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4CrateConnectedChanged object:self];
+}
+
+- (BOOL)isConnected
+{
+	return isConnected;
+}
 
 - (NSString*) adapterArchiveKey
 {

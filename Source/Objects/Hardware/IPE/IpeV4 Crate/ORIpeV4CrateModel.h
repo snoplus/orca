@@ -24,6 +24,7 @@
 #import "ORCrate.h"
 
 @interface ORIpeV4CrateModel : ORCrate   {
+	BOOL isConnected;
 }
 
 #pragma mark •••initialization
@@ -31,6 +32,9 @@
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (void) setIsConnected:(BOOL)aState;
+- (BOOL)isConnected;
+
 - (NSString*) adapterArchiveKey;
 - (void) checkCards;
 
@@ -44,3 +48,5 @@
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
 @end
+
+extern NSString* ORIpeV4CrateConnectedChanged;

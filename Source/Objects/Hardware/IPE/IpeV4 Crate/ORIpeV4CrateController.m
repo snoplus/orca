@@ -22,10 +22,7 @@
 
 #pragma mark •••Imported Files
 #import "ORIpeV4CrateController.h"
-#import "ORIpeFireWireCard.h"
 #import "ORIpeV4CrateModel.h"
-
-#import "ORFireWireInterface.h"
 
 @implementation ORIpeV4CrateController
 
@@ -52,19 +49,8 @@
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
 	
     [notifyCenter addObserver : self
-                     selector : @selector(serviceChanged:)
-                         name : ORFireWireInterfaceServiceAliveChanged
-                       object : nil];
-    
-
-    [notifyCenter addObserver : self
-                     selector : @selector(serviceChanged:)
-                         name : ORFireWireInterfaceIsOpenChanged
-                       object : nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(serviceChanged:)
-                         name : ORIpeInterfaceChanged
+                     selector : @selector(connectionChanged:)
+                         name : ORIpeV4CrateConnectedChanged
                        object : nil];
 
 
@@ -74,19 +60,13 @@
 - (void) updateWindow
 {
 	[super updateWindow];
-	//[self serviceChanged:nil];
+	[self connectionChanged:nil];
 }
 
-/*- (void) serviceChanged:(NSNotification*)aNotification
+- (void) connectionChanged:(NSNotification*)aNotification
 {
-	if([[model adapter] serviceIsOpen] && [[model adapter] serviceIsAlive]){
-		[powerField setStringValue:@""];
-	}
-	else {
-		[powerField setStringValue:@"No FW"];
-	}
-	
+	[connectedField setStringValue:[model isConnected]?@"Connected":@"Not Connected"];
 }
-*/
+
 
 @end
