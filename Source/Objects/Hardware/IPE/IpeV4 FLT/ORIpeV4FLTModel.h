@@ -117,6 +117,11 @@
 	/** Reference to the Slt board for hardware access */
 	ORIpeFireWireCard* fireWireCard; 
 	//-----------------------------------------
+    
+	// Register information
+    unsigned short  selectedRegIndex;
+    unsigned long   writeValue;
+
 }
 
 #pragma mark •••Initialization
@@ -196,6 +201,12 @@
 - (NSString*) getRegisterName: (short) anIndex;
 - (unsigned long) getAddressOffset: (short) anIndex;
 - (short) getAccessType: (short) anIndex;
+
+- (unsigned short) selectedRegIndex;
+- (void) setSelectedRegIndex:(unsigned short) anIndex;
+- (unsigned long) writeValue;
+- (void) setWriteValue:(unsigned long) aValue;
+
 
 #pragma mark •••HW Access
 //all can raise exceptions
@@ -331,3 +342,8 @@ extern NSString* ORIpeV4FLTModelCoinTimeChanged;
 
 extern NSString* ORIpeV4FLTModelReadoutPagesChanged;
 extern NSString* ORIpeSLTModelName;
+
+extern NSString* ORIpeV4FLTSelectedRegIndexChanged;
+extern NSString* ORIpeV4FLTWriteValueChanged;
+
+
