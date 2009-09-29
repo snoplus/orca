@@ -76,11 +76,15 @@
 		NSSize					settingSize;
 		NSSize					rateSize;
 		NSSize					testSize;
+		NSSize					lowlevelSize;
 		NSView*					blankView;
         
         //low level
 		IBOutlet NSPopUpButton*	registerPopUp;
+		IBOutlet NSStepper* 	regWriteValueStepper;
 		IBOutlet NSTextField* 	regWriteValueTextField;
+		IBOutlet NSButton*		regWriteButton;
+		IBOutlet NSButton*		regReadButton;
 		
 };
 #pragma mark •••Initialization
@@ -100,6 +104,7 @@
 - (void) populatePullDown;
 - (void) updateWindow;
 - (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) enableRegControls;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) modeChanged:(NSNotification*)aNote;
 - (void) gainChanged:(NSNotification*)aNote;
@@ -120,6 +125,8 @@
 - (void) testParamChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) readoutPagesChanged:(NSNotification*)aNote;
+- (void) selectedRegIndexChanged:(NSNotification*) aNote;
+- (void) writeValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
 - (IBAction) coinTimeAction:(id)sender;
