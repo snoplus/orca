@@ -188,10 +188,6 @@
 			<dict>
 				<key>calibrateAction</key>
 				<string>id</string>
-				<key>controlCheckBoxAction</key>
-				<string>id</string>
-				<key>controlRegAction</key>
-				<string>id</string>
 				<key>crateVersionAction</key>
 				<string>id</string>
 				<key>deadTimeAction</key>
@@ -204,9 +200,9 @@
 				<string>id</string>
 				<key>dumpPageStatus</key>
 				<string>id</string>
-				<key>forceTrigger</key>
+				<key>hwVersionAction</key>
 				<string>id</string>
-				<key>inhibitCheckBoxAction</key>
+				<key>inhibitEnableAction</key>
 				<string>id</string>
 				<key>initBoardAction</key>
 				<string>id</string>
@@ -216,9 +212,9 @@
 				<string>id</string>
 				<key>loadPulserAction</key>
 				<string>id</string>
-				<key>nHitAction</key>
+				<key>loadSecondsAction</key>
 				<string>id</string>
-				<key>nHitThresholdAction</key>
+				<key>miscCntrlBitsAction</key>
 				<string>id</string>
 				<key>nextPageDelayAction</key>
 				<string>id</string>
@@ -228,41 +224,47 @@
 				<string>id</string>
 				<key>pollRateAction</key>
 				<string>id</string>
-				<key>pulseOnceAction</key>
-				<string>id</string>
 				<key>pulserAmpAction</key>
 				<string>id</string>
 				<key>pulserDelayAction</key>
-				<string>id</string>
-				<key>readAllAction</key>
 				<string>id</string>
 				<key>readRegAction</key>
 				<string>id</string>
 				<key>readStatus</key>
 				<string>id</string>
-				<key>releaseAllPagesAction</key>
-				<string>id</string>
-				<key>releaseSWInhibitAction</key>
-				<string>id</string>
 				<key>reportAllAction</key>
 				<string>id</string>
 				<key>resetHWAction</key>
 				<string>id</string>
-				<key>selectRegisterAction</key>
+				<key>resetPageManagerAction</key>
 				<string>id</string>
-				<key>setSWInhibitAction</key>
+				<key>runTimeAction</key>
+				<string>id</string>
+				<key>secondsAction</key>
+				<string>id</string>
+				<key>secondsSetAction</key>
+				<string>id</string>
+				<key>selectRegisterAction</key>
 				<string>id</string>
 				<key>settingLockAction</key>
 				<string>id</string>
-				<key>triggerSourceAction</key>
+				<key>subSecondsAction</key>
+				<string>id</string>
+				<key>testPatternEnableAction</key>
+				<string>id</string>
+				<key>triggerEnableAction</key>
 				<string>id</string>
 				<key>usePBusSimAction</key>
 				<string>id</string>
-				<key>versionAction</key>
-				<string>id</string>
 				<key>vetoTimeAction</key>
 				<string>id</string>
+				<key>writeClrInhibit</key>
+				<string>id</string>
 				<key>writeRegAction</key>
+				<string>id</string>
+				<key>writeSWTrigAction</key>
+				<string>id</string>
+				<key>writeSetInhibitAction</key>
 				<string>id</string>
 				<key>writeValueAction</key>
 				<string>id</string>
@@ -273,12 +275,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>actualPageField</key>
-				<string>NSTextField</string>
 				<key>calibrateButton</key>
 				<string>NSButton</string>
-				<key>controlCheckBoxMatrix</key>
-				<string>NSMatrix</string>
 				<key>crateVersionPopup</key>
 				<string>NSPopUpButton</string>
 				<key>deadTimeButton</key>
@@ -289,17 +287,15 @@
 				<string>NSButton</string>
 				<key>displayTriggerButton</key>
 				<string>NSButton</string>
-				<key>docField</key>
-				<string>NSTextField</string>
 				<key>forceTrigger1Button</key>
 				<string>NSButton</string>
 				<key>forceTriggerButton</key>
 				<string>NSButton</string>
-				<key>implementationField</key>
+				<key>hwVersionButton</key>
+				<string>NSButton</string>
+				<key>hwVersionField</key>
 				<string>NSTextField</string>
-				<key>inhibitCheckBoxMatrix</key>
-				<string>NSMatrix</string>
-				<key>inhibitMaskMatrix</key>
+				<key>inhibitEnableMatrix</key>
 				<string>NSMatrix</string>
 				<key>initBoard1Button</key>
 				<string>NSButton</string>
@@ -309,19 +305,17 @@
 				<string>NSMatrix</string>
 				<key>loadPatternFileButton</key>
 				<string>NSButton</string>
-				<key>nHitField</key>
-				<string>NSTextField</string>
-				<key>nHitStepper</key>
-				<string>NSStepper</string>
-				<key>nHitThresholdField</key>
-				<string>NSTextField</string>
-				<key>nHitThresholdStepper</key>
-				<string>NSStepper</string>
+				<key>loadSecondsButton</key>
+				<string>NSButton</string>
+				<key>miscCntrlBitsMatrix</key>
+				<string>NSMatrix</string>
 				<key>nextPageDelayField</key>
 				<string>NSTextField</string>
 				<key>nextPageDelaySlider</key>
 				<string>NSSlider</string>
 				<key>nextPageField</key>
+				<string>NSTextField</string>
+				<key>oldestPageField</key>
 				<string>NSTextField</string>
 				<key>pageSizeField</key>
 				<string>NSTextField</string>
@@ -337,14 +331,10 @@
 				<string>NSPopUpButton</string>
 				<key>pollRunningIndicator</key>
 				<string>NSProgressIndicator</string>
-				<key>projectField</key>
-				<string>NSTextField</string>
 				<key>pulserAmpField</key>
 				<string>NSTextField</string>
 				<key>pulserDelayField</key>
 				<string>NSTextField</string>
-				<key>readAllMatrix</key>
-				<string>NSMatrix</string>
 				<key>readBoardButton</key>
 				<string>NSButton</string>
 				<key>regReadButton</key>
@@ -357,14 +347,24 @@
 				<string>NSTextField</string>
 				<key>registerPopUp</key>
 				<string>NSPopUpButton</string>
-				<key>relSWInhibitButton</key>
+				<key>relSWInhibit1Button</key>
 				<string>NSButton</string>
-				<key>releaseAllPagesButton</key>
+				<key>relSWInhibitButton</key>
 				<string>NSButton</string>
 				<key>resetHWButton</key>
 				<string>NSButton</string>
+				<key>resetPageManagerButton</key>
+				<string>NSButton</string>
+				<key>runTimeButton</key>
+				<string>NSButton</string>
 				<key>secStrobeSrcPU</key>
 				<string>NSPopUpButton</string>
+				<key>secondsCounterButton</key>
+				<string>NSButton</string>
+				<key>secondsSetField</key>
+				<string>NSTextField</string>
+				<key>setSWInhibit1Button</key>
+				<string>NSButton</string>
 				<key>setSWInhibitButton</key>
 				<string>NSButton</string>
 				<key>settingLockButton</key>
@@ -373,20 +373,18 @@
 				<string>NSPopUpButton</string>
 				<key>statusMatrix</key>
 				<string>NSMatrix</string>
+				<key>subsecondsCounterButton</key>
+				<string>NSButton</string>
+				<key>testPatternEnableMatrix</key>
+				<string>NSMatrix</string>
 				<key>totalView</key>
 				<string>NSView</string>
 				<key>triggerEnableMatrix</key>
 				<string>NSMatrix</string>
 				<key>usePBusSimButton</key>
 				<string>NSButton</string>
-				<key>versionButton</key>
-				<string>NSButton</string>
-				<key>versionField</key>
-				<string>NSTextField</string>
 				<key>vetoTimeButton</key>
 				<string>NSButton</string>
-				<key>watchDogPU</key>
-				<string>NSPopUpButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>SBC_LinkController</string>

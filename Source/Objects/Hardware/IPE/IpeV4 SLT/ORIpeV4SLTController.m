@@ -63,9 +63,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(555,440);
+	controlSize			= NSMakeSize(555,670);
     statusSize			= NSMakeSize(555,610);
-    patternSize			= NSMakeSize(555,320);
     lowLevelSize		= NSMakeSize(555,340);
     cpuManagementSize	= NSMakeSize(555,450);
     cpuTestsSize		= NSMakeSize(555,305);
@@ -94,9 +93,14 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : ORIpeV4SLTModelHwVersionChanged
                        object : model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(statusRegChanged:)
+                         name : ORIpeV4SLTModelStatusRegChanged
+						object: model];
+	
 	[notifyCenter addObserver : self
                      selector : @selector(controlRegChanged:)
-                         name : ORIpeV4SLTControlRegChanged
+                         name : ORIpeV4SLTModelControlRegChanged
                        object : model];
 	
     [notifyCenter addObserver : self
@@ -118,12 +122,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                      selector : @selector(pulserDelayChanged:)
                          name : ORIpeV4SLTPulserDelayChanged
                        object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(nHitChanged:)
-                         name : ORIpeV4SLTModelNHitChanged
-						object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(pageSizeChanged:)
                          name : ORIpeV4SLTModelPageSizeChanged
@@ -140,11 +139,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(nHitThresholdChanged:)
-                         name : ORIpeV4SLTModelNHitThresholdChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(interruptMaskChanged:)
                          name : ORIpeV4SLTModelInterruptMaskChanged
 						object: model];
@@ -152,11 +146,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [notifyCenter addObserver : self
                      selector : @selector(nextPageDelayChanged:)
                          name : ORIpeV4SLTModelNextPageDelayChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(pageStatusChanged:)
-                         name : ORIpeV4SLTModelPageStatusChanged
 						object: model];
 	
     [notifyCenter addObserver : self
@@ -175,29 +164,48 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(readAllChanged:)
-                         name : ORIpeV4SLTModelReadAllChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(controlRegChanged:)
-                         name : ORIpeV4SLTModelControlRegChanged
+                     selector : @selector(secondsSetChanged:)
+                         name : ORIpeV4SLTModelSecondsSetChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(statusRegChanged:)
-                         name : ORIpeV4SLTModelStatusRegChanged
+                     selector : @selector(pageManagerRegChanged:)
+                         name : ORIpeV4SLTModelPageManagerRegChanged
 						object: model];
 
 }
 
 #pragma mark •••Interface Management
 
+- (void) pageManagerRegChanged:(NSNotification*)aNote
+{
+	unsigned long pageManagerReg = [model pageManagerReg];
+	
+	if(!xImage)xImage = [[NSImage imageNamed:@"exMark"] retain];
+	if(!yImage)yImage = [[NSImage imageNamed:@"checkMark"] retain];
+	
+	unsigned long oldest = (pageManagerReg & kPageMngOldestPage) >> kPageMngOldestPageShift;
+	unsigned long newest = (pageManagerReg & kPageMngNextPage) >> kPageMngNextPageShift;
+	int i;
+	for(i=0;i<64;i++){
+		NSCell* aCell = [[pageStatusMatrix cells] objectAtIndex:i];
+		if(i>=oldest && i<newest)[aCell setImage:yImage];
+		else [aCell setImage:xImage];
+	}
+	[pageStatusMatrix setNeedsDisplay:YES];
+	
+	[oldestPageField setIntValue:oldest];
+	[nextPageField setIntValue:  newest];
+}
+
+- (void) secondsSetChanged:(NSNotification*)aNote
+{
+	[secondsSetField setIntValue: [model secondsSet]];
+}
+
 - (void) statusRegChanged:(NSNotification*)aNote
 {
 	unsigned long statusReg = [model statusReg];
-
-	
 	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusWDog)?@"ERR":@"OK"];
 	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:2] setStringValue: IsBitSet(statusReg,kStatusPpsErr)?@"ERR":@"OK"]; 
@@ -215,16 +223,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case  0: [self resizeWindowToSize:controlSize];			break;
 		case  1: [self resizeWindowToSize:statusSize];			break;
-		case  2: [self resizeWindowToSize:patternSize];			break;
-		case  3: [self resizeWindowToSize:lowLevelSize];	    break;
-		case  4: [self resizeWindowToSize:cpuManagementSize];	break;
+		case  2: [self resizeWindowToSize:lowLevelSize];	    break;
+		case  3: [self resizeWindowToSize:cpuManagementSize];	break;
 		default: [self resizeWindowToSize:cpuTestsSize];	    break;
     }
-}
-
-- (void) readAllChanged:(NSNotification*)aNote
-{
-	[readAllMatrix selectCellWithTag:[model readAll]];
 }
 
 - (void) patternFilePathChanged:(NSNotification*)aNote
@@ -265,18 +267,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-- (void) nHitThresholdChanged:(NSNotification*)aNote
-{
-	[nHitThresholdField setIntValue: [model nHitThreshold]];
-	[nHitThresholdStepper setIntValue: [model nHitThreshold]];
-}
-
-- (void) nHitChanged:(NSNotification*)aNote
-{
-	[nHitField setIntValue: [model nHit]];
-	[nHitStepper setIntValue: [model nHit]];
-}
-
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
 	[pageSizeField setIntValue: [model pageSize]];
@@ -293,19 +283,16 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [self pulserAmpChanged:nil];
     [self pulserDelayChanged:nil];
     [self selectedRegIndexChanged:nil];
-	[self nHitChanged:nil];
 	[self pageSizeChanged:nil];	
 	[self displayEventLoopChanged:nil];	
 	[self displayTriggerChanged:nil];	
-	[self nHitThresholdChanged:nil];
 	[self interruptMaskChanged:nil];
 	[self nextPageDelayChanged:nil];
-	[self pageStatusChanged:nil];
     [self pollRateChanged:nil];
     [self pollRunningChanged:nil];
 	[self patternFilePathChanged:nil];
-	[self readAllChanged:nil];
 	[self statusRegChanged:nil];
+	[self secondsSetChanged:nil];
 }
 
 
@@ -324,41 +311,39 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     BOOL locked = [gSecurity isLocked:ORIpeV4SLTSettingsLock];
 	BOOL isRunning = [gOrcaGlobals runInProgress];
 	
-	BOOL nHitSupported = [model usingNHitTriggerVersion];
 	
-	
+	[triggerEnableMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [inhibitEnableMatrix setEnabled:!lockedOrRunningMaintenance];
+	[hwVersionButton setEnabled:!isRunning];
+	[deadTimeButton setEnabled:!isRunning];
+	[vetoTimeButton setEnabled:!isRunning];
+	[runTimeButton setEnabled:!isRunning];
+	[secondsCounterButton setEnabled:!isRunning];
+	[subsecondsCounterButton setEnabled:!isRunning];
+	[loadSecondsButton setEnabled:!isRunning];
+
 	[calibrateButton setEnabled:!lockedOrRunningMaintenance];
-	[readAllMatrix setEnabled:!lockedOrRunningMaintenance];
 	[loadPatternFileButton setEnabled:!lockedOrRunningMaintenance];
 	[definePatternFileButton setEnabled:!lockedOrRunningMaintenance];
 	[setSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
 	[relSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[releaseAllPagesButton setEnabled:!lockedOrRunningMaintenance];
+	[resetPageManagerButton setEnabled:!lockedOrRunningMaintenance];
 	[forceTriggerButton setEnabled:!lockedOrRunningMaintenance];
-	[forceTrigger1Button setEnabled:!lockedOrRunningMaintenance];
 	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
 	[initBoard1Button setEnabled:!lockedOrRunningMaintenance];
 	[readBoardButton setEnabled:!lockedOrRunningMaintenance];
-    [controlCheckBoxMatrix setEnabled:!lockedOrRunningMaintenance];
-    [inhibitCheckBoxMatrix setEnabled:!lockedOrRunningMaintenance];
-	[triggerEnableMatrix setEnabled:!lockedOrRunningMaintenance]; 
-	[watchDogPU setEnabled:!lockedOrRunningMaintenance]; 
 	[secStrobeSrcPU setEnabled:!lockedOrRunningMaintenance]; 
 	[startSrcPU setEnabled:!lockedOrRunningMaintenance]; 
 	
-	[versionButton setEnabled:!isRunning];
-	[deadTimeButton setEnabled:!isRunning];
-	[vetoTimeButton setEnabled:!isRunning];
+	[setSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
+	[relSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
+	[forceTrigger1Button setEnabled:!lockedOrRunningMaintenance];
+
 	[resetHWButton setEnabled:!isRunning];
 	[usePBusSimButton setEnabled:!isRunning];
 	
 	[pulserAmpField setEnabled:!locked];
-	
-	[nHitThresholdField setEnabled:nHitSupported && !lockedOrRunningMaintenance];
-	[nHitThresholdStepper setEnabled:nHitSupported && !lockedOrRunningMaintenance];
-	[nHitField setEnabled:nHitSupported && !lockedOrRunningMaintenance];
-	[nHitStepper setEnabled:nHitSupported && !lockedOrRunningMaintenance];
-	
+		
 	[pageSizeField setEnabled:!lockedOrRunningMaintenance];
 	[pageSizeStepper setEnabled:!lockedOrRunningMaintenance];
 	
@@ -388,9 +373,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) hwVersionChanged:(NSNotification*) aNote
 {
-	[projectField	setIntValue:[model projectVersion]];
-	[docField		setIntValue:[model projectVersion]];
-	[implementationField setIntValue:[model implementation]];
+	NSString* s = [NSString stringWithFormat:@"%d.%d.%d",[model projectVersion],[model documentVersion],[model implementation]];
+	[hwVersionField setStringValue:s];
 }
 
 - (void) writeValueChanged:(NSNotification*) aNote
@@ -423,56 +407,26 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self enableRegControls];
 }
 
-- (void) pageStatusChanged:(NSNotification*)aNote
-{
-	if(!xImage)xImage = [[NSImage imageNamed:@"exMark"] retain];
-	if(!yImage)yImage = [[NSImage imageNamed:@"checkMark"] retain];
-	unsigned long lowWord = [model pageStatusLow];
-	unsigned long highWord = [model pageStatusHigh];
-	unsigned long theWord;
-	int i;
-	for(i=0;i<64;i++){
-		NSCell* aCell = [[pageStatusMatrix cells] objectAtIndex:i];
-		if(i<32) theWord = lowWord;
-		else     theWord = highWord;
-		if(theWord & (1<<(i%32))) {
-			[aCell setImage:yImage];
-		}
-		else {
-			[aCell setImage:xImage];
-		}
-	}
-	[pageStatusMatrix setNeedsDisplay:YES];
-	
-	[actualPageField setIntValue:[model actualPage]+1];
-	[nextPageField setIntValue:  [model nextPage]+1];
-	
-}
 
 - (void) controlRegChanged:(NSNotification*)aNote
 {
-	
-/*	[[controlCheckBoxMatrix cellWithTag:0] setIntValue:[model ledInhibit]];
-	[[controlCheckBoxMatrix cellWithTag:1] setIntValue:[model ledVeto]];
-	[[controlCheckBoxMatrix cellWithTag:2] setIntValue:[model enableDeadTimeCounter]];
-	
-	int value = [model inhibitSource];
-	[[inhibitCheckBoxMatrix cellWithTag:0] setIntValue:value&0x1];
-	[[inhibitCheckBoxMatrix cellWithTag:1] setIntValue:(value>>1)&0x1];
-	[[inhibitCheckBoxMatrix cellWithTag:2] setIntValue:(value>>2)&0x1];
-	
-	
-	[watchDogPU selectItemAtIndex:[watchDogPU indexOfItemWithTag:[model watchDogStart]]];
-	[secStrobeSrcPU selectItemAtIndex:[secStrobeSrcPU indexOfItemWithTag:[model secStrobeSource]]];
-	[startSrcPU selectItemAtIndex:[startSrcPU indexOfItemWithTag:[model testPulseSource]]];
-
+	unsigned long value = [model controlReg];
+	unsigned long aMask = (value & kCtrlTrgEnMask)>>kCtrlTrgEnShift;
 	int i;
-	for(i=0;i<kFltNumberTriggerSources;i++){
-		unsigned long aTriggerMask = [model triggerSource];
-		if(aTriggerMask & (1L<<i)) [[triggerSourceMatrix cellWithTag:i] setIntValue:1];
-		else [[triggerSrcMatrix cellWithTag:i] setIntValue:0];
-	}
-	*/
+	for(i=0;i<6;i++)[[triggerEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
+	
+	aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
+	for(i=0;i<4;i++)[[inhibitEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
+	
+	aMask = (value & kCtrlTpEnMask)>>kCtrlTpEnEnShift;
+	[testPatternEnableMatrix selectCellWithTag:aMask];
+	
+	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlPPSMask];
+	[[miscCntrlBitsMatrix cellWithTag:1] setIntValue:value & kCtrlShapeMask];
+	[[miscCntrlBitsMatrix cellWithTag:2] setIntValue:value & kCtrlRunMask];
+	[[miscCntrlBitsMatrix cellWithTag:3] setIntValue:value & kCtrlTstSltMask];
+	[[miscCntrlBitsMatrix cellWithTag:4] setIntValue:value & kCtrlIntEnMask];
+	[[miscCntrlBitsMatrix cellWithTag:5] setIntValue:value & kCtrlLedOffmask];	
 }
 
 - (void) populatePullDown
@@ -499,6 +453,77 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+//----------working actions ----------
+- (IBAction) loadSecondsAction:(id)sender
+{
+	@try {
+		[model loadSecondsReg];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception load SLT Seconds\n");
+		NSRunAlertPanel([localException name], @"%@\nSLT%d Set Seconds failed", @"OK", nil, nil,
+						localException,[model stationNumber]);
+	}
+	
+}
+
+- (IBAction) secondsSetAction:(id)sender
+{
+	[model setSecondsSet:[sender intValue]];	
+}
+
+- (IBAction) triggerEnableAction:(id)sender
+{
+	unsigned long aMask = 0;
+	int i;
+	for(i=0;i<6;i++){
+		if([[triggerEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
+		else aMask &= ~(1L<<i);
+	}
+	unsigned long theRegValue = [model controlReg] & ~kCtrlTrgEnMask; 
+	theRegValue |= (aMask<< kCtrlTrgEnShift);
+	[model setControlReg:theRegValue];
+}
+
+- (IBAction) inhibitEnableAction:(id)sender;
+{
+	unsigned long aMask = 0;
+	int i;
+	for(i=0;i<4;i++){
+		if([[inhibitEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
+		else aMask &= ~(1L<<i);
+	}
+	unsigned long theRegValue = [model controlReg] & ~kCtrlInhEnMask; 
+	theRegValue |= (aMask<<kCtrlInhEnShift);
+	[model setControlReg:theRegValue];
+}
+
+- (IBAction) testPatternEnableAction:(id)sender;
+{
+	unsigned long aMask       = [[testPatternEnableMatrix selectedCell] tag];
+	unsigned long theRegValue = [model controlReg] & ~kCtrlTpEnMask; 
+	theRegValue |= (aMask<<kCtrlTpEnEnShift);
+	[model setControlReg:theRegValue];
+}
+
+- (IBAction) miscCntrlBitsAction:(id)sender;
+{
+	unsigned long theRegValue = [model controlReg] & ~(kCtrlPPSMask | kCtrlShapeMask | kCtrlRunMask | kCtrlTstSltMask | kCtrlIntEnMask | kCtrlLedOffmask); 
+	if([[miscCntrlBitsMatrix cellWithTag:0] intValue])	theRegValue |= kCtrlPPSMask;
+	if([[miscCntrlBitsMatrix cellWithTag:1] intValue])	theRegValue |= kCtrlShapeMask;
+	if([[miscCntrlBitsMatrix cellWithTag:2] intValue])	theRegValue |= kCtrlRunMask;
+	if([[miscCntrlBitsMatrix cellWithTag:3] intValue])	theRegValue |= kCtrlTstSltMask;
+	if([[miscCntrlBitsMatrix cellWithTag:4] intValue])	theRegValue |= kCtrlIntEnMask;
+	if([[miscCntrlBitsMatrix cellWithTag:5] intValue])	theRegValue |= kCtrlLedOffmask;
+
+	[model setControlReg:theRegValue];
+}
+
+//----------------------------------
+
+
+
 - (IBAction) dumpPageStatus:(id)sender
 {
 	if([[NSApp currentEvent] clickCount] >=2){
@@ -540,17 +565,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[model setNextPageDelay:100-[sender intValue]];	
 }
 
-
-- (IBAction) nHitThresholdAction:(id)sender
-{
-	[model setNHitThreshold:[sender intValue]];	
-}
-
-- (IBAction) nHitAction:(id)sender
-{
-	[model setNHit:[sender intValue]];	
-}
-
 - (IBAction) pageSizeAction:(id)sender
 {
 	[model setPageSize:[sender intValue]];	
@@ -590,14 +604,25 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) readStatus:(id)sender
 {
 	[model readStatusReg];
-	//[model readPageStatus];
+	[model readPageManagerReg];
 }
 
 - (IBAction) reportAllAction:(id)sender
 {
+	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	@try {
 		[model printStatusReg];
 		[model printControlReg];
+		[model printPageManagerReg];
+		NSLogFont(aFont,@"--------------------------------------\n");
+		NSLogFont(aFont,@"Dead Time  : %lld\n",[model readDeadTime]);
+		NSLogFont(aFont,@"Veto Time  : %lld\n",[model readVetoTime]);
+		NSLogFont(aFont,@"Run Time   : %lld\n",[model readRunTime]);
+		NSLogFont(aFont,@"Seconds    : %d\n",  [model readSecondsCounter]);
+		unsigned long value = [model readSubSecondsCounter];
+		unsigned long v1 = value & 0x3FF;
+		unsigned long v2 = (value >>10) & 0x3FF;
+		NSLogFont(aFont,@"sub Seconds: %d, %d\n",v1,v2);
 		//[model printInterruptMask];
 	}
 	@catch(NSException* localException) {
@@ -607,24 +632,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORIpeV4SLTSettingsLock to:[sender intValue] forWindow:[self window]];
-}
-
-
-- (IBAction) controlRegAction:(id)sender
-{
- NSLog(@"This is: SLTv4: controlRegAction\n");
-	int tag		= [sender tag];
-	int value	= [sender indexOfSelectedItem];
-	switch(tag){
-		case 0:	[model setWatchDogStart:value]; break;
-		case 1:	[model setSecStrobeSource:value]; break;
-		case 2:	[model setTestPulseSource:value]; break;
-		case 4:	[model setTriggerSource:value]; break;
-	}
 }
 
 - (IBAction) selectRegisterAction:(id) aSender
@@ -676,11 +686,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-- (IBAction) versionAction: (id) sender
+- (IBAction) hwVersionAction: (id) sender
 {
 	@try {
 		[model readHwVersion];
-		NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
+		NSLog(@"%d Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
 
 	}
 	@catch(NSException* localException) {
@@ -693,7 +703,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) deadTimeAction: (id) sender
 {
 	@try {
-		//NSLog(@"SLT Dead Time: %lld\n",[model readDeadTime]);
+		NSLog(@"%@ Dead Time: %lld\n",[model fullID],[model readDeadTime]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT Dead Time\n");
@@ -705,7 +715,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) vetoTimeAction: (id) sender
 {
 	@try {
-		//NSLog(@"SLT Veto Time: %lld\n",[model readVetoTime]);
+		NSLog(@"%@ Veto Time: %lld\n",[model fullID],[model readVetoTime]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT Veto Time\n");
@@ -713,6 +723,46 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                         localException,[model stationNumber]);
 	}
 }
+
+- (IBAction) runTimeAction: (id) sender
+{
+	@try {
+		NSLog(@"%@ Run Time: %lld\n",[model fullID],[model readRunTime]);
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception reading SLT Run Time\n");
+        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+- (IBAction) secondsAction: (id) sender
+{
+	@try {
+		NSLog(@"%@ Seconds: %d\n",[model fullID],[model readSecondsCounter]);
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception reading SLT Seconds Counter\n");
+        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
+- (IBAction) subSecondsAction: (id) sender
+{
+	@try {
+		unsigned long value = [model readSubSecondsCounter];
+		unsigned long v1 = value & 0x3FF;
+		unsigned long v2 = (value >>10) & 0x3FF;
+		NSLog(@"%@ Sub Seconds: %d, %d\n",[model fullID],v1,v2);
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception reading SLT SubSeconds Counter\n");
+        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+
 
 - (IBAction) resetHWAction: (id) pSender
 {
@@ -724,26 +774,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
         NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
-}
-
-- (IBAction) controlCheckBoxAction:(id) sender
-{
-	switch([[sender selectedCell]tag]){
-		case 0: [model setLedInhibit:[[sender selectedCell]state]]; break;
-		case 1: [model setLedVeto:[[sender selectedCell]state]]; break;
-		case 2: [model setEnableDeadTimeCounter:[[sender selectedCell]state]]; break;
-		default: break;
-	}
-}
-
-- (IBAction) inhibitCheckBoxAction:(id) sender
-{
-	int tag = [[sender selectedCell]tag];
-	int value = [model inhibitSource];
-	
-	if([[sender selectedCell]state])value |= (1<<tag);
-	else	 value &= ~(1<<tag);
-	[model setInhibitSource:value];
 }
 
 - (IBAction) pulserAmpAction: (id) sender
@@ -766,40 +796,14 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
         NSRunAlertPanel([localException name], @"%@\nSLT%d load pulser failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
-	
 }
 
-- (IBAction) pulseOnceAction: (id) sender
+- (IBAction) resetPageManagerAction:(id)sender
 {
 	@try {
-		//[model pulseOnce];
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception doing SLT pulse\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d pulse failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	}
-}
+		[model writePageManagerReset];
+		NSLog(@"SLT: Manual Reset Page Manager\n");
 
-
-- (IBAction) triggerSourceAction:(id)sender
-{
-	/*
-	unsigned long aTriggerMask = 0;
-	int i;
-	for(i=0;i<kFltNumberTriggerSources;i++){
-		if([[triggerSrcMatrix cellWithTag:i] intValue]) aTriggerMask |= (1L<<i);
-		else aTriggerMask &= ~(1L<<i);
-	}
-	[model setTriggerSource:aTriggerMask];
-	 */
-}
-
-- (IBAction) releaseAllPagesAction:(id)sender
-{
-	@try {
-		//[model releaseAllPages];
-		[model readAllStatus];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT release pages\n");
@@ -808,11 +812,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-- (IBAction) setSWInhibitAction:(id)sender
+- (IBAction) writeSetInhibitAction:(id)sender
 {
-	@try {
-		//[model setSwInhibit];
-		//[model readStatusReg];
+	@try { 
+		[model writeSetInhibit]; 
+		NSLog(@"SLT: Manual Set Inhibit\n");
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT Set SW Inhibit pages\n");
@@ -821,11 +825,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-- (IBAction) releaseSWInhibitAction:(id)sender
+- (IBAction) writeClrInhibit:(id)sender
 {
-	@try {
-		//[model releaseSwInhibit];
-		//[model readStatusReg];
+	@try { 
+		[model writeClrInhibit]; 
+		NSLog(@"SLT: Manual Clr Inhibit\n");
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT Release SW Inhibit pages\n");
@@ -834,11 +838,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-- (IBAction) forceTrigger:(id)sender
+- (IBAction) writeSWTrigAction:(id)sender
 {
-	@try {
-		//[model pulseOnce];
-		[model readAllStatus];
+	@try { 
+		[model writeSwTrigger]; 
+		NSLog(@"SLT: Manual SW Trigger\n");
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT Software trigger\n");
@@ -875,11 +879,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) loadPatternFile:(id)sender
 {
 	//[model loadPatternFile];
-}
-
-- (IBAction) readAllAction:(id)sender
-{
-	[model setReadAll:[[sender selectedCell] tag]];
 }
 
 - (IBAction) calibrateAction:(id)sender

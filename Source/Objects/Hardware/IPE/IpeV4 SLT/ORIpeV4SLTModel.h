@@ -35,49 +35,21 @@
 #define IsBitSet(A,B) (((A) & (B)) == (B))
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
 
-#define SLT_TRIGGER_SW    0x01  // Software
-#define SLT_TRIGGER_I_N   0x07  // Internal + Neighbors
-#define SLT_TRIGGER_LEFT  0x04  // left neighbor
-#define SLT_TRIGGER_RIGHT 0x02  // right neighbor
-#define SLT_TRIGGER_INT   0x08  // Internal only
-#define SLT_TRIGGER_EXT   0x10  // External
-
-#define SLT_INHIBIT_SW    0x01  // Software
-#define SLT_INHIBIT_INT   0x02  // Internal
-#define SLT_INHIBIT_EXT   0x04  // External
-#define SLT_INHIBIT_ALL   0x07  // Internal + External
-#define SLT_INHIBIT_NO    0x01  // None of both (only Software)
-
-// not required any more !
-#define SLT_NXPG_INT      0x00   // Internal
-#define SLT_NXPG_EXT      0x01   // External
-#define SLT_NXPG_SW       0x01   // Software
-
-#define SLT_TESTPULS_NO   0x00   // None
-#define SLT_TESTPULS_EXT  0x02   // External
-#define SLT_TESTPULS_SW   0x01   // Software
-
-#define SLT_SECSTROBE_INT 0x00   // Internal SecStrobe Signal
-#define SLT_SECSTROBE_EXT 0x01   // Extern
-#define SLT_SECSTROBE_SW  0x00   // Software - not available -
-#define SLT_SECSTROBE_CAR 0x00   // Carry of Subsecond Counter
-                                 //   - not available -
-
-// called also watchdog in the slt hardware documentation
-#define SLT_WATCHDOGSTART_INT   0x02   // Start with internal second strobe
-#define SLT_WATCHDOGSTART_EXT   0x00   // External  - not available -
-#define SLT_WATCHDOGSTART_SW    0x01   // Software
-
 //control reg bit masks
+#define kCtrlTrgEnShift		0
+#define kCtrlInhEnShift		6
+#define kCtrlPPSShift		10
+#define kCtrlTpEnEnShift	11
+
 #define kCtrlLedOffmask	(0x00000001 << 17) //RW
 #define kCtrlIntEnMask	(0x00000001 << 16) //RW
 #define kCtrlTstSltMask	(0x00000001 << 15) //RW
 #define kCtrlRunMask	(0x00000001 << 14) //RW
 #define kCtrlShapeMask	(0x00000001 << 13) //RW
-#define kCtrlTpEn		(0x00000003 << 11) //RW
-#define kCtrlPPS		(0x00000001 << 10) //RW
-#define kCtrlInhEn		(0x0000000F <<  6) //RW
-#define kCtrlTrgEn		(0x0000003F <<  0) //RW
+#define kCtrlTpEnMask	(0x00000003 << kCtrlTpEnEnShift)	//RW
+#define kCtrlPPSMask	(0x00000001 << kCtrlPPSShift)		//RW
+#define kCtrlInhEnMask	(0x0000000F <<  kCtrlInhEnShift)	//RW
+#define kCtrlTrgEnMask	(0x0000003F <<  kCtrlTrgEnShift)	//RW
 
 //status reg bit masks
 #define kStatusIrq			(0x00000001 << 31) //R
@@ -137,13 +109,21 @@
 #define kImplemention	 (0x0000FFFF <<  0) //R
 
 //Page Manager Masks
-#define kPageMngReset			(0x00000001 << 22) //W - self cleared
-#define kPageMngNumFreePages	(0x0000007F << 15) //R
-#define kPageMngPgFull			(0x00000001 << 14) //W
-#define kPageNextPage			(0x0000003F <<  8) //W
-#define kPageReady				(0x00000001 <<  7) //W
-#define kPageOldestBuffer		(0x0000003F <<  1) //W
-#define kPageRelease			(0x00000001 <<  0) //W - self cleared
+#define kPageMngResetShift			22
+#define kPageMngNumFreePagesShift	15
+#define kPageMngPgFullShift			14
+#define kPageMngNextPageShift		8
+#define kPageMngReadyShift			7
+#define kPageMngOldestPageShift	1
+#define kPageMngReleaseShift		0
+
+#define kPageMngReset			(0x00000001 << kPageMngResetShift)			//W - self cleared
+#define kPageMngNumFreePages	(0x0000007F << kPageMngNumFreePagesShift)	//R
+#define kPageMngPgFull			(0x00000001 << kPageMngPgFullShift)			//W
+#define kPageMngNextPage		(0x0000003F << kPageMngNextPageShift)		//W
+#define kPageMngReady			(0x00000001 << kPageMngReadyShift)			//W
+#define kPageMngOldestPage		(0x0000003F << kPageMngOldestPageShift)	//W
+#define kPageMngRelease			(0x00000001 << kPageMngReleaseShift)		//W - self cleared
 
 //Trigger Timing
 #define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
@@ -152,65 +132,18 @@
 @interface ORIpeV4SLTModel : ORIpeCard <ORDataTaker,SBC_Linking>
 {
 	@private
-		unsigned long hwVersion;
-	
-		//status reg 
-		BOOL watchDogError;
-		BOOL pixelBusError;
-		BOOL ppsError;
-		BOOL clockError;
-		BOOL gpsError;
-		BOOL vttError;
-		BOOL fanError;
-	
-		BOOL veto;
-		BOOL extInhibit;
-		BOOL nopgInhibit;
-		BOOL swInhibit;
-		BOOL inhibit;
-
-		//status reg
-		BOOL ledInhibit;
-		BOOL ledVeto;
-		int triggerSource;
-		int inhibitSource;
-		int testPulseSource;
-		int secStrobeSource;
-		int watchDogStart;
-		int enableDeadTimeCounter;
+		unsigned long	hwVersion;
 		NSString*		patternFilePath;
-
-		//page status
-		unsigned long pageStatusLow;
-		unsigned long pageStatusHigh;
-		unsigned long actualPage;
-		unsigned long nextPage;
-
-		//interrupts
-		unsigned long interruptMask;
-
-		//time management
-		unsigned long nextPageDelay;
-
-		//pulser generation
-		float pulserAmp;
-		float pulserDelay;
-
-		// Register information
+		unsigned long	interruptMask;
+		unsigned long	nextPageDelay;
+		float			pulserAmp;
+		float			pulserDelay;
 		unsigned short  selectedRegIndex;
 		unsigned long   writeValue;
-
-		//multiplicity trigger
-		unsigned short nHit;
-		unsigned short nHitThreshold;
-		BOOL		   readAll;
-		
 		unsigned long	eventDataId;
 		unsigned long	multiplicityId;
 		unsigned long   eventCounter;
-		
-		float fpgaVersion;
-		int actualPageIndex;
+		int				actualPageIndex;
         TimedWorker*    poller;
 		BOOL			pollingWasRunning;
 		ORReadOutList*	readOutGroup;
@@ -232,6 +165,8 @@
         
 		unsigned long controlReg;
 		unsigned long statusReg;
+		unsigned long secondsSet;
+		unsigned long pageManagerReg;
 }
 
 #pragma mark •••Initialization
@@ -243,11 +178,14 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) checkAndLoadFPGAs;
 - (void) runIsAboutToStart:(NSNotification*)aNote;
 - (void) runIsStopped:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
+- (unsigned long) pageManagerReg;
+- (void) setPageManagerReg:(unsigned long)aPageManagerReg;
+- (unsigned long) secondsSet;
+- (void) setSecondsSet:(unsigned long)aSecondsSet;
 - (unsigned long) statusReg;
 - (void) setStatusReg:(unsigned long)aStatusReg;
 - (unsigned long) controlReg;
@@ -262,24 +200,10 @@
 - (NSString*) patternFilePath;
 - (void) setPatternFilePath:(NSString*)aPatternFilePath;
 
-- (unsigned long) pageStatusLow;
-- (void) setPageStatusLow:(unsigned long)loPart 
-					 high:(unsigned long)hiPart 
-				   actual:(unsigned long)p0 
-					 next:(unsigned long)p1;
-- (unsigned long) pageStatusHigh;
-- (unsigned long) actualPage;
-- (unsigned long) nextPage;
 - (unsigned long) nextPageDelay;
 - (void) setNextPageDelay:(unsigned long)aDelay;
 - (unsigned long) interruptMask;
 - (void) setInterruptMask:(unsigned long)aInterruptMask;
-- (float) fpgaVersion;
-- (void) setFpgaVersion:(float)aFpgaVersion;
-- (unsigned short) nHitThreshold;
-- (void) setNHitThreshold:(unsigned short)aNHitThreshold;
-- (unsigned short) nHit;
-- (void) setNHit:(unsigned short)aNHit;
 - (float) pulserDelay;
 - (void) setPulserDelay:(float)aPulserDelay;
 - (float) pulserAmp;
@@ -293,8 +217,6 @@
 - (void)		setSelectedRegIndex: (unsigned short) anIndex;
 - (unsigned long) 	writeValue;
 - (void)		setWriteValue: (unsigned long) anIndex;
-- (BOOL)	readAll;
-- (void)    setReadAll:(BOOL)aState;
 //- (void) loadPatternFile;
 
 - (BOOL) displayTrigger; //< Staus of dispaly of trigger information
@@ -304,39 +226,6 @@
 - (unsigned long) pageSize; //< Length of the ADC data (0..100us)
 - (void) setPageSize: (unsigned long) pageSize;   
  
-//status reg assess
-- (BOOL) inhibit;
-- (void) setInhibit:(BOOL)aInhibit;
-- (BOOL) swInhibit;
-- (void) setSwInhibit:(BOOL)aSwInhibit;
-- (BOOL) nopgInhibit;
-- (void) setNopgInhibit:(BOOL)aNopgInhibit;
-- (BOOL) extInhibit;
-- (void) setExtInhibit:(BOOL)aExtInhibit;
-- (BOOL) veto;
-- (void) setVeto:(BOOL)aVeto;
-
-//control reg access
-- (BOOL) ledInhibit;
-- (void) setLedInhibit:(BOOL)aState;
-- (BOOL) ledVeto;
-- (void) setLedVeto:(BOOL)aState;
-- (BOOL) enableDeadTimeCounter;
-- (void) setEnableDeadTimeCounter:(BOOL)aState;
-- (int) watchDogStart;
-- (void) setWatchDogStart:(int)aWatchDogStart;
-- (int) secStrobeSource;
-- (void) setSecStrobeSource:(int)aSecStrobeSource;
-- (int) testPulseSource;
-- (void) setTestPulseSource:(int)aTestPulseSource;
-- (int) inhibitSource;
-- (void) setInhibitSource:(int)aInhibitSource;
-- (int) triggerSource;
-- (void) setTriggerSource:(int)aTriggerSource;
-//- (void) releaseSwInhibit;
-//- (void) setSwInhibit;
-- (BOOL) usingNHitTriggerVersion;
-
 #pragma mark ***Polling
 - (TimedWorker *) poller;
 - (void) setPoller: (TimedWorker *) aPoller;
@@ -352,26 +241,44 @@
 - (void)		  writeControlReg;
 - (void)		  printControlReg;
 - (unsigned long) readStatusReg;
+- (unsigned long) readPageManagerReg;
 - (void)		  printStatusReg;
+- (void)		  printPageManagerReg;
+- (void)		  loadSecondsReg;
+- (void)		writeSetInhibit;
+- (void)		writeClrInhibit;
+- (void)		writeSwTrigger;
+- (void)		writeTpStart;
+- (void)		writeFwCfg;
+- (void)		writeSltRes;
+- (void)		writeFltRes;
+- (void)		writeSwRq;
+- (void)		writeClrCnt;
+- (void)		writeEnCnt;
+- (void)		writeDisCnt;
+- (void)		writeReleasePage;		
+- (void)		writePageManagerReset;
+
 //- (void)		  writeNextPageDelay;
 //- (void)		  writeStatusReg;
 //- (void)		  writeInterruptMask;
 //- (void)		  readInterruptMask;
 //- (void)		  printInterruptMask;
-//- (void)		  readPageStatus;
 //- (void)		  releaseAllPages;
 //- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
 - (void)		  writeReg:(unsigned short)index value:(unsigned long)aValue;
 - (unsigned long) readReg:(unsigned short) index;
-- (float)		  readHwVersion;
-//- (unsigned long long) readDeadTime;
-//- (unsigned long long) readVetoTime;
+- (unsigned long) readHwVersion;
+- (unsigned long long) readDeadTime;
+- (unsigned long long) readVetoTime;
+- (unsigned long long) readRunTime;
+- (unsigned long) readSecondsCounter;
+- (unsigned long) readSubSecondsCounter;
 - (void)		reset;
 - (void)		hw_config;
 - (void)		hw_reset;
 //- (void)		loadPulseAmp;
-//- (void)		pulseOnce;
 //- (void)		loadPulserValues;
 //- (void)		swTrigger;
 - (void)		initBoard;
@@ -444,15 +351,14 @@
 
 @end
 
+extern NSString* ORIpeV4SLTModelPageManagerRegChanged;
+extern NSString* ORIpeV4SLTModelSecondsSetChanged;
 extern NSString* ORIpeV4SLTModelStatusRegChanged;
 extern NSString* ORIpeV4SLTModelControlRegChanged;
 extern NSString* ORIpeV4SLTModelHwVersionChanged;
 
 extern NSString* ORIpeV4SLTModelPatternFilePathChanged;
 extern NSString* ORIpeV4SLTModelInterruptMaskChanged;
-extern NSString* ORIpeV4SLTModelFpgaVersionChanged;
-extern NSString* ORIpeV4SLTModelNHitThresholdChanged;
-extern NSString* ORIpeV4SLTModelNHitChanged;
 extern NSString* ORIpeV4SLTModelPageSizeChanged;
 extern NSString* ORIpeV4SLTModelDisplayEventLoopChanged;
 extern NSString* ORIpeV4SLTModelDisplayTriggerChanged;
@@ -464,7 +370,6 @@ extern NSString* ORIpeV4SLTSettingsLock;
 extern NSString* ORIpeV4SLTStatusRegChanged;
 extern NSString* ORIpeV4SLTControlRegChanged;
 extern NSString* ORIpeV4SLTModelNextPageDelayChanged;
-extern NSString* ORIpeV4SLTModelPageStatusChanged;
 extern NSString* ORIpeV4SLTModelPollRateChanged;
 extern NSString* ORIpeV4SLTModelReadAllChanged;
 

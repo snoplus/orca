@@ -2076,7 +2076,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			//[slt pulseOnce];
 			[ORTimer delay:.1];
 		}
-		//[slt readPageStatus];
+		[slt readPageManagerReg];
+		/*
 		unsigned long lowStatus = [slt pageStatusLow];
 		unsigned long highStatus = [slt pageStatusHigh];
 		if(lowStatus | highStatus){
@@ -2095,7 +2096,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			}
 		}
 		else NSLog(@"No Data\n");
-		
+		*/
 		[self runningTest:testNumber status:@"See StatusLog"];
 		
 		fltRunMode = savedMode;

@@ -27,29 +27,29 @@
 @interface ORIpeV4SLTController : SBC_LinkController {
 	@private
 	
-		IBOutlet NSTextField* projectField;
-		IBOutlet NSTextField* docField;
-		IBOutlet NSTextField* implementationField;
+		IBOutlet NSTextField* hwVersionField;
+		IBOutlet NSTextField* secondsSetField;
+		IBOutlet NSButton*	  hwVersionButton;
 	
 		//control reg
 		IBOutlet NSMatrix*		triggerEnableMatrix;
+		IBOutlet NSMatrix*		inhibitEnableMatrix;
+		IBOutlet NSMatrix*		testPatternEnableMatrix;
+		IBOutlet NSMatrix*		miscCntrlBitsMatrix;
+		IBOutlet NSButton*		deadTimeButton;
+		IBOutlet NSButton*		vetoTimeButton;
+		IBOutlet NSButton*		runTimeButton;
+		IBOutlet NSButton*		secondsCounterButton;
+		IBOutlet NSButton*		subsecondsCounterButton;
+		IBOutlet NSButton*		loadSecondsButton;
 	
 		IBOutlet NSButton*		initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
 		IBOutlet NSMatrix*		interruptMaskMatrix;
-		IBOutlet NSTextField*	nHitThresholdField;
-		IBOutlet NSStepper*		nHitThresholdStepper;
-		IBOutlet NSTextField*	nHitField;
-		IBOutlet NSStepper*		nHitStepper;
-		IBOutlet NSPopUpButton* watchDogPU;
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
 		IBOutlet NSPopUpButton* startSrcPU;
-		IBOutlet NSMatrix*		controlCheckBoxMatrix;
-		IBOutlet NSMatrix*		inhibitCheckBoxMatrix;
-		IBOutlet NSMatrix*		inhibitMaskMatrix;
 		IBOutlet NSMatrix*		pageStatusMatrix;
-		IBOutlet NSMatrix*		readAllMatrix;
 		IBOutlet NSButton*		calibrateButton;
 		IBOutlet NSTextField*   pageSizeField;
 		IBOutlet NSStepper*     pageSizeStepper;
@@ -58,9 +58,9 @@
 		
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
-		IBOutlet NSTextField*	actualPageField;
+		IBOutlet NSTextField*	oldestPageField;
 		IBOutlet NSTextField*	nextPageField;
-		IBOutlet NSButton*		releaseAllPagesButton;
+		IBOutlet NSButton*		resetPageManagerButton;
         
         //low level
 		IBOutlet NSPopUpButton*	registerPopUp;
@@ -71,14 +71,12 @@
 		IBOutlet NSButton*		setSWInhibitButton;
 		IBOutlet NSButton*		relSWInhibitButton;
 		IBOutlet NSButton*		forceTriggerButton;
+		IBOutlet NSButton*		setSWInhibit1Button;
+		IBOutlet NSButton*		relSWInhibit1Button;
 		IBOutlet NSButton*		forceTrigger1Button;
 		IBOutlet NSButton*		usePBusSimButton;
 
-		IBOutlet NSButton*		versionButton;
-		IBOutlet NSButton*		deadTimeButton;
-		IBOutlet NSButton*		vetoTimeButton;
 		IBOutlet NSButton*		resetHWButton;
-		IBOutlet NSTextField*	versionField;
 		IBOutlet NSButton*		definePatternFileButton;
 		IBOutlet NSTextField*	patternFilePathField;
 		IBOutlet NSButton*		loadPatternFileButton;
@@ -99,7 +97,6 @@
 
 		NSSize					controlSize;
 		NSSize					statusSize;
-		NSSize					patternSize;
 		NSSize					lowLevelSize;
 		NSSize					cpuManagementSize;
 		NSSize					cpuTestsSize;
@@ -115,16 +112,15 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) pageManagerRegChanged:(NSNotification*)aNote;
+- (void) secondsSetChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;
 - (void) hwVersionChanged:(NSNotification*) aNote;
 
-- (void) readAllChanged:(NSNotification*)aNote;
 - (void) patternFilePathChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
 - (void) nextPageDelayChanged:(NSNotification*)aNote;
-- (void) nHitThresholdChanged:(NSNotification*)aNote;
-- (void) nHitChanged:(NSNotification*)aNote;
 - (void) pageSizeChanged:(NSNotification*)aNote;
 - (void) displayEventLoopChanged:(NSNotification*)aNote;
 - (void) displayTriggerChanged:(NSNotification*)aNote;
@@ -140,49 +136,50 @@
 
 - (void) pulserAmpChanged:(NSNotification*) aNote;
 - (void) pulserDelayChanged:(NSNotification*) aNote;
-- (void) pageStatusChanged:(NSNotification*)aNote;
 
 - (void) enableRegControls;
 
 #pragma mark •••Actions
+- (IBAction) secondsSetAction:(id)sender;
+- (IBAction) triggerEnableAction:(id)sender;
+- (IBAction) inhibitEnableAction:(id)sender;
+- (IBAction) testPatternEnableAction:(id)sender;
+- (IBAction) miscCntrlBitsAction:(id)sender;
+- (IBAction) hwVersionAction: (id) sender;
+- (IBAction) deadTimeAction: (id) sender;
+- (IBAction) vetoTimeAction: (id) sender;
+- (IBAction) runTimeAction: (id) sender;
+- (IBAction) secondsAction: (id) sender;
+- (IBAction) subSecondsAction: (id) sender;
+- (IBAction) loadSecondsAction:(id)sender;
+- (IBAction) writeSetInhibitAction:(id)sender;
+- (IBAction) writeClrInhibit:(id)sender;
+- (IBAction) writeSWTrigAction:(id)sender;
+- (IBAction) resetPageManagerAction:(id)sender;
+
 - (IBAction) dumpPageStatus:(id)sender;
 - (IBAction) usePBusSimAction:(id)sender;
-- (IBAction) readAllAction:(id)sender;
-- (IBAction) setSWInhibitAction:(id)sender;
-- (IBAction) releaseSWInhibitAction:(id)sender;
-- (IBAction) releaseAllPagesAction:(id)sender;
 - (IBAction) pollRateAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readStatus:(id)sender;
-- (IBAction) triggerSourceAction:(id)sender;
 - (IBAction) nextPageDelayAction:(id)sender;
 - (IBAction) interruptMaskAction:(id)sender;
-- (IBAction) nHitThresholdAction:(id)sender;
-- (IBAction) nHitAction:(id)sender;
 - (IBAction) pageSizeAction:(id)sender;
 - (IBAction) displayTriggerAction:(id)sender;
 - (IBAction) displayEventLoopAction:(id)sender;
-- (IBAction) controlCheckBoxAction:(id) sender;
-- (IBAction) inhibitCheckBoxAction:(id) sender;
 - (IBAction) settingLockAction:(id) sender;
-- (IBAction) controlRegAction:(id)sender;
 - (IBAction) selectRegisterAction:(id) sender;
 - (IBAction) writeValueAction:(id) sender;
 - (IBAction) readRegAction: (id) sender;
 - (IBAction) writeRegAction: (id) sender;
-- (IBAction) versionAction: (id) sender;
-- (IBAction) deadTimeAction: (id) sender;
-- (IBAction) vetoTimeAction: (id) sender;
 - (IBAction) resetHWAction: (id) sender;
 - (IBAction) pulserAmpAction: (id) sender;
 - (IBAction) pulserDelayAction: (id) sender;
-- (IBAction) pulseOnceAction: (id) sender;
 - (IBAction) loadPulserAction: (id) sender;
 - (IBAction) initBoardAction:(id)sender;
 - (IBAction) reportAllAction:(id)sender;
 - (IBAction) definePatternFileAction:(id)sender;
 - (IBAction) loadPatternFile:(id)sender;
-- (IBAction) forceTrigger:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
 
 @end

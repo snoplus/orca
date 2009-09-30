@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "../IPE Base Classes/ORIpeDefs.h"
+#import "ORIpeDefs.h"
 #import "ORCrate.h"
 #import "ORIpeV4SLTModel.h"
 #import "ORIpeFLTModel.h"
@@ -33,50 +33,50 @@
 
 //IPE V4 register definitions
 enum IpeV4Enum {
-	kSLTV4ControlReg,
-	kSLTV4StatusReg,
-	kSLTV4CommandReg,
-	kSLTV4InterruptReguestReg,
-	kSLTV4InterruptMaskReg,
-	kSLTV4RequestSemaphoreReg,
-	kSLTV4HWRevisionReg,
-	kSLTV4PixelBusErrorReg,
-	kSLTV4PixelBusEnableReg,
-	kSLTV4PixelBusTestReg,
-	kSLTV4AuxBusTestReg,
-	kSLTV4DebugStatusReg,
-	kSLTV4DeadCounterLSBReg,
-	kSLTV4DeadCounterMSBReg,
-	kSLTV4VetoCounterLSBReg,
-	kSLTV4VetoCounterMSBReg,
-	kSLTV4RunCounterLSBReg,
-	kSLTV4RunCounterMSBReg,
-	kSLTV4SecondSetReg,
-	kSLTV4SecondCounterReg,
-	kSLTV4SubSecondCounterReg,
-	kSLTV4PageManagerReg,
-	kSLTV4TriggerTimingReg,
-	kSLTV4PageSelectReg,
-	kSLTV4NumberPagesReg,
-	kSLTV4PageNumbersReg,
-	kSLTV4EventStatusReg,
-	kSLTV4ReadoutCSRReg,
-	kSLTV4BufferSelectReg,
-	kSLTV4ReadoutDefinitionReg,
-	kSLTV4TPTimingReg,
-	kSLTV4TPShapeReg,
-	kSLTV4i2cCommandReg,
-	kSLTV4epcsCommandReg,
-	kSLTV4BoardIDLSBReg,
-	kSLTV4BoardIDMSBReg,
-	kSLTV4PROMsControlReg,
-	kSLTV4PROMsBufferReg,
-	kSLTV4TriggerDataReg,
-	kSLTV4ADCDataReg,
-	kSLTV4NumRegs //must be last
+	kSltV4ControlReg,
+	kSltV4StatusReg,
+	kSltV4CommandReg,
+	kSltV4InterruptReguestReg,
+	kSltV4InterruptMaskReg,
+	kSltV4RequestSemaphoreReg,
+	kSltV4HWRevisionReg,
+	kSltV4PixelBusErrorReg,
+	kSltV4PixelBusEnableReg,
+	kSltV4PixelBusTestReg,
+	kSltV4AuxBusTestReg,
+	kSltV4DebugStatusReg,
+	kSltV4DeadTimeCounterLoReg,
+	kSltV4DeadTimeCounterHiReg,
+	kSltV4VetoCounterLoReg,
+	kSltV4VetoCounterHiReg,
+	kSltV4RunCounterLoReg,
+	kSltV4RunCounterHiReg,
+	kSltV4SecondSetReg,
+	kSltV4SecondCounterReg,
+	kSltV4SubSecondCounterReg,
+	kSltV4PageManagerReg,
+	kSltV4TriggerTimingReg,
+	kSltV4PageSelectReg,
+	kSltV4NumberPagesReg,
+	kSltV4PageNumbersReg,
+	kSltV4EventStatusReg,
+	kSltV4ReadoutCSRReg,
+	kSltV4BufferSelectReg,
+	kSltV4ReadoutDefinitionReg,
+	kSltV4TPTimingReg,
+	kSltV4TPShapeReg,
+	kSltV4i2cCommandReg,
+	kSltV4epcsCommandReg,
+	kSltV4BoardIDLoReg,
+	kSltV4BoardIDHiReg,
+	kSltV4PROMsControlReg,
+	kSltV4PROHiufferReg,
+	kSltV4TriggerDataReg,
+	kSltV4ADCDataReg,
+	kSltV4NumRegs //must be last
 };
 
-static IpeRegisterNamesStruct regV4[kSLTV4NumRegs] = {
+static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
@@ -93,8 +93,8 @@ static IpeRegisterNamesStruct regV4[kSLTV4NumRegs] = {
 {@"Dead Counter (MSB)",	0xA80084,		1,			kIpeRegReadable },	
 {@"Veto Counter (LSB)",	0xA80088, 		1,			kIpeRegReadable },	
 {@"Veto Counter (MSB)",	0xA8008C, 		1,			kIpeRegReadable },	
-{@"Run Counter (LSB)",	0xA80090,		1,			kIpeRegReadable },	
-{@"Run Counter (MSB)",	0xA80094, 		1,			kIpeRegReadable },	
+{@"Run Counter  (LSB)",	0xA80090,		1,			kIpeRegReadable },	
+{@"Run Counter  (MSB)",	0xA80094, 		1,			kIpeRegReadable },	
 {@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable }, 
 {@"Second Counter",		0xB00004, 		1,			kIpeRegReadable },
 {@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable }, 
@@ -125,22 +125,20 @@ static IpeRegisterNamesStruct regV4[kSLTV4NumRegs] = {
 
 #pragma mark ***External Strings
 
-NSString* ORIpeV4SLTModelStatusRegChanged = @"ORIpeV4SLTModelStatusRegChanged";
-NSString* ORIpeV4SLTModelControlRegChanged = @"ORIpeV4SLTModelControlRegChanged";
+NSString* ORIpeV4SLTModelPageManagerRegChanged  = @"ORIpeV4SLTModelPageManagerRegChanged";
+NSString* ORIpeV4SLTModelSecondsSetChanged		= @"ORIpeV4SLTModelSecondsSetChanged";
+NSString* ORIpeV4SLTModelStatusRegChanged		= @"ORIpeV4SLTModelStatusRegChanged";
+NSString* ORIpeV4SLTModelControlRegChanged		= @"ORIpeV4SLTModelControlRegChanged";
 NSString* ORIpeV4SLTModelFanErrorChanged		= @"ORIpeV4SLTModelFanErrorChanged";
 NSString* ORIpeV4SLTModelVttErrorChanged		= @"ORIpeV4SLTModelVttErrorChanged";
 NSString* ORIpeV4SLTModelGpsErrorChanged		= @"ORIpeV4SLTModelGpsErrorChanged";
 NSString* ORIpeV4SLTModelClockErrorChanged		= @"ORIpeV4SLTModelClockErrorChanged";
 NSString* ORIpeV4SLTModelPpsErrorChanged		= @"ORIpeV4SLTModelPpsErrorChanged";
 NSString* ORIpeV4SLTModelPixelBusErrorChanged	= @"ORIpeV4SLTModelPixelBusErrorChanged";
-NSString* ORIpeV4SLTModelWatchDogErrorChanged	= @"ORIpeV4SLTModelWatchDogErrorChanged";
 NSString* ORIpeV4SLTModelHwVersionChanged		= @"ORIpeV4SLTModelHwVersionChanged";
 
 NSString* ORIpeV4SLTModelPatternFilePathChanged		= @"ORIpeV4SLTModelPatternFilePathChanged";
 NSString* ORIpeV4SLTModelInterruptMaskChanged		= @"ORIpeV4SLTModelInterruptMaskChanged";
-NSString* ORIpeV4SLTModelFpgaVersionChanged			= @"ORIpeV4SLTModelFpgaVersionChanged";
-NSString* ORIpeV4SLTModelNHitThresholdChanged		= @"ORIpeV4SLTModelNHitThresholdChanged";
-NSString* ORIpeV4SLTModelNHitChanged				= @"ORIpeV4SLTModelNHitChanged";
 NSString* ORIpeV4SLTPulserDelayChanged				= @"ORIpeV4SLTPulserDelayChanged";
 NSString* ORIpeV4SLTPulserAmpChanged				= @"ORIpeV4SLTPulserAmpChanged";
 NSString* ORIpeV4SLTSettingsLock					= @"ORIpeV4SLTSettingsLock";
@@ -149,9 +147,7 @@ NSString* ORIpeV4SLTControlRegChanged				= @"ORIpeV4SLTControlRegChanged";
 NSString* ORIpeV4SLTSelectedRegIndexChanged			= @"ORIpeV4SLTSelectedRegIndexChanged";
 NSString* ORIpeV4SLTWriteValueChanged				= @"ORIpeV4SLTWriteValueChanged";
 NSString* ORIpeV4SLTModelNextPageDelayChanged		= @"ORIpeV4SLTModelNextPageDelayChanged";
-NSString* ORIpeV4SLTModelPageStatusChanged			= @"ORIpeV4SLTModelPageStatusChanged";
 NSString* ORIpeV4SLTModelPollRateChanged			= @"ORIpeV4SLTModelPollRateChanged";
-NSString* ORIpeV4SLTModelReadAllChanged				= @"ORIpeV4SLTModelReadAllChanged";
 
 NSString* ORIpeV4SLTModelPageSizeChanged			= @"ORIpeV4SLTModelPageSizeChanged";
 NSString* ORIpeV4SLTModelDisplayTriggerChanged		= @"ORIpeV4SLTModelDisplayTrigerChanged";
@@ -249,6 +245,28 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+- (unsigned long) pageManagerReg
+{
+    return pageManagerReg;
+}
+
+- (void) setPageManagerReg:(unsigned long)aPageManagerReg
+{
+    pageManagerReg = aPageManagerReg;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelPageManagerRegChanged object:self];
+}
+
+- (unsigned long) secondsSet
+{
+    return secondsSet;
+}
+
+- (void) setSecondsSet:(unsigned long)aSecondsSet
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSecondsSet:secondsSet];
+    secondsSet = aSecondsSet;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelSecondsSetChanged object:self];
+}
 
 - (unsigned long) statusReg
 {
@@ -269,6 +287,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) setControlReg:(unsigned long)aControlReg
 {
+    [[[self undoManager] prepareWithInvocationTarget:self] setControlReg:controlReg];
     controlReg = aControlReg;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelControlRegChanged object:self];
 }
@@ -277,32 +296,26 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (unsigned long) documentVersion { return (hwVersion & kDocRevision)>>16;}
 - (unsigned long) implementation  { return hwVersion & kImplemention;}
 
-
 - (void) setHwVersion:(unsigned long) aVersion
 {
 	hwVersion = aVersion;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelHwVersionChanged object:self];	
 }
 
-/*
-- (void) releaseSwInhibit
-{
-	[self writeReg:kSLTSwRelInhibit value:0];
-}
+- (void) writeSetInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdSetInh]; }
+- (void) writeClrInhibit	{ [self writeReg:kSltV4CommandReg value:kCmdClrInh]; }
+- (void) writeSwTrigger			{ [self writeReg:kSltV4CommandReg value:kCmdSwTr];   }
+- (void) writeTpStart			{ [self writeReg:kSltV4CommandReg value:kCmdTpStart];   }
+- (void) writeFwCfg				{ [self writeReg:kSltV4CommandReg value:kCmdFwCfg];   }
+- (void) writeSltRes			{ [self writeReg:kSltV4CommandReg value:kCmdSltRes];   }
+- (void) writeFltRes			{ [self writeReg:kSltV4CommandReg value:kCmdFltRes];   }
+- (void) writeSwRq				{ [self writeReg:kSltV4CommandReg value:kCmdSwRq];   }
+- (void) writeClrCnt			{ [self writeReg:kSltV4CommandReg value:kCmdClrCnt];   }
+- (void) writeEnCnt				{ [self writeReg:kSltV4CommandReg value:kCmdEnCnt];   }
+- (void) writeDisCnt			{ [self writeReg:kSltV4CommandReg value:kCmdDisCnt];   }
+- (void) writeReleasePage		{ [self writeReg:kSltV4PageManagerReg value:kPageMngRelease];   }
+- (void) writePageManagerReset	{ [self writeReg:kSltV4PageManagerReg value:kPageMngReset];   }
 
-- (void) setSwInhibit
-{
-	[self writeReg:kSLTSwSetInhibit value:0];
-}
-
-- (void) releaseAllPages
-{
-	int i;
-	for(i=0;i<64;i++){
-		[self writeReg:kSLTSetPageFree value:i];
-	}
-}
-*/
 - (id) controllerCard		{ return self;	  }
 - (SBC_Link*)sbcLink		{ return pcmLink; } 
 - (TimedWorker *) poller	{ return poller;  }
@@ -347,7 +360,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {	
 	// Stop all activities by software inhibit
 	if([readOutGroup count] == 0){
-		//[self setSwInhibit];
+		[self writeSetInhibit];
 	}
 	
 	// TODO: Save dead time counters ?!
@@ -357,36 +370,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	//NSLog(@"Deadtime: %lld\n", [self readDeadTime]);
 }
 
-- (void) checkAndLoadFPGAs
-{
-	BOOL doLoad = NO;
-	@try {
-		NSArray* cards = [[self crate] orcaObjects];
-		NSEnumerator* e = [cards objectEnumerator];
-		id card;
-		while (card = [e nextObject]){
-			if([card isKindOfClass:NSClassFromString(@"ORIpeFLTModel")]){
-				//try to access a card. if it throws then we have to load the FPGAs
-				[card readControlStatus];
-				break;	//only need to try one
-			}
-		}
-	}
-	@catch(NSException* localException) {
-		doLoad = YES;
-	}
-	
-	@try {
-		if(doLoad){
-			//[self writeControlReg];
-			[self hw_reset];
-			NSLog(@"SLT loaded FLT FPGAs\n");
-		}
-	}
-	@catch(NSException* localException) {
-		NSLogColor([NSColor redColor],@"SLT failed FLT FPGA load attempt\n");
-	}
-}
 
 #pragma mark •••Accessors
 
@@ -423,50 +406,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 }
 
-- (BOOL) readAll
-{
-	return readAll;
-}
-
-- (void) setReadAll:(BOOL)aState
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setReadAll:readAll];
-    
-    readAll = aState;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelReadAllChanged object:self];
-}
-
-
-- (unsigned long) pageStatusLow
-{
-	return pageStatusLow;
-}
-
-- (unsigned long) pageStatusHigh
-{
-	return pageStatusHigh;
-}
-- (unsigned long) actualPage
-{
-	return actualPage;
-}
-- (unsigned long) nextPage
-{
-	return nextPage;
-}
-
-- (void) setPageStatusLow:(unsigned long)loPart high:(unsigned long)hiPart actual:(unsigned long)p0 next:(unsigned long)p1
-{
-    pageStatusLow	= loPart;
-    pageStatusHigh	= hiPart;
-    actualPage		= p0;
-    nextPage		= p1;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelPageStatusChanged object:self];
-}
-
-
 - (unsigned long) interruptMask
 {
     return interruptMask;
@@ -496,58 +435,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	//method exists to give common interface across all objects for display in lists
 	return [NSMutableArray arrayWithObject:readOutGroup];
-}
-
-- (BOOL) usingNHitTriggerVersion
-{
-	if(fpgaVersion >= 3.5)return YES;
-	else return NO;
-}
-
-- (float) fpgaVersion
-{
-    return fpgaVersion;
-}
-
-- (void) setFpgaVersion:(float)aFpgaVersion
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFpgaVersion:fpgaVersion];
-    
-    fpgaVersion = aFpgaVersion;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelFpgaVersionChanged object:self];
-}
-
-- (unsigned short) nHitThreshold
-{
-    return nHitThreshold;
-}
-
-- (void) setNHitThreshold:(unsigned short)aNHitThreshold
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNHitThreshold:nHitThreshold];
-	
-	if(aNHitThreshold>127)aNHitThreshold=127;
-    
-    nHitThreshold = aNHitThreshold;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelNHitThresholdChanged object:self];
-}
-
-- (unsigned short) nHit
-{
-    return nHit;
-}
-
-- (void) setNHit:(unsigned short)aNHit
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNHit:nHit];
-    
-	if(aNHit>255)aNHit=255;
-	
-    nHit = aNHit;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelNHitChanged object:self];
 }
 
 
@@ -586,7 +473,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (short) getNumberRegisters			
 { 
-    return kSLTV4NumRegs; 
+    return kSltV4NumRegs; 
 }
 
 - (NSString*) getRegisterName: (short) anIndex
@@ -635,199 +522,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORIpeV4SLTWriteValueChanged
 	 object:self];
-}
-
-//status reg values
-
-- (BOOL) inhibit
-{
-    return inhibit;
-}
-
-- (void) setInhibit:(BOOL)aInhibit
-{
-	inhibit = aInhibit;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTStatusRegChanged object:self];
-}
-
-- (BOOL) swInhibit
-{
-    return swInhibit;
-}
-
-- (void) setSwInhibit:(BOOL)aSwInhibit
-{
-	swInhibit = aSwInhibit;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTStatusRegChanged object:self];
-}
-
-- (BOOL) nopgInhibit
-{
-    return nopgInhibit;
-}
-
-- (void) setNopgInhibit:(BOOL)aNopgInhibit
-{
-	nopgInhibit = aNopgInhibit;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTStatusRegChanged object:self];
-}
-
-- (BOOL) extInhibit
-{
-    return extInhibit;
-}
-
-- (void) setExtInhibit:(BOOL)aExtInhibit
-{
-	extInhibit = aExtInhibit;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTStatusRegChanged object:self];
-}
-
-- (BOOL) veto
-{
-    return veto;
-}
-
-- (void) setVeto:(BOOL)aVeto
-{
-	veto = aVeto;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTStatusRegChanged object:self];
-}
-
-
-//control reg access
-- (BOOL) ledInhibit
-{
-	return ledInhibit;
-}
-- (void) setLedInhibit:(BOOL)aState
-{
-	if(aState != ledInhibit) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setLedInhibit:ledInhibit];
-		ledInhibit = aState;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
-}
-
-- (BOOL) ledVeto
-{
-	return ledVeto;
-}
-- (void) setLedVeto:(BOOL)aState
-{
-	if(aState != ledVeto) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setLedVeto:ledVeto];
-		
-		ledVeto = aState;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
-}
-
-- (BOOL) enableDeadTimeCounter
-{
-    return enableDeadTimeCounter;
-}
-
-- (void) setEnableDeadTimeCounter:(BOOL)aState
-{
-	if(aState != enableDeadTimeCounter) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setEnableDeadTimeCounter:enableDeadTimeCounter];
-		
-		enableDeadTimeCounter = aState;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
-}
-
-
-- (int) watchDogStart
-{
-    return watchDogStart;
-}
-
-- (void) setWatchDogStart:(int)aWatchDogStart
-{
-	if(aWatchDogStart ==  0)aWatchDogStart  = 1;
-	if(aWatchDogStart!= 1 && aWatchDogStart!= 2) aWatchDogStart  = 1;
-	if(aWatchDogStart != watchDogStart) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setWatchDogStart:watchDogStart];
-		
-		watchDogStart = aWatchDogStart;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
-}
-
-- (int) secStrobeSource
-{
-    return secStrobeSource;
-}
-
-- (void) setSecStrobeSource:(int)aSecStrobeSource
-{
-	if(aSecStrobeSource!= 0 && aSecStrobeSource!= 1) return;
-	
-	if(aSecStrobeSource != secStrobeSource) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setSecStrobeSource:secStrobeSource];
-		
-		secStrobeSource = aSecStrobeSource;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
-}
-
-- (int) testPulseSource
-{
-    return testPulseSource;
-}
-
-- (void) setTestPulseSource:(int)aTestPulseSource
-{
-	if(aTestPulseSource ==  0)aTestPulseSource  = 1;
-	if(aTestPulseSource!= 1 && aTestPulseSource!= 2) return;
-	
-	if(aTestPulseSource != testPulseSource) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setTestPulseSource:testPulseSource];
-		
-		testPulseSource = aTestPulseSource;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
-}
-
-- (int) inhibitSource
-{
-    return inhibitSource;
-}
-
-- (void) setInhibitSource:(int)aInhibitSource
-{
-	aInhibitSource &= 0x7; //only care about the lowest 3 bits
-	
-	if(aInhibitSource != inhibitSource) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setInhibitSource:inhibitSource];
-		
-		inhibitSource = aInhibitSource;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
-}
-
-- (int) triggerSource
-{	
-    return triggerSource;
-}
-
-- (void) setTriggerSource:(int)aTriggerSource
-{
-	if(aTriggerSource != triggerSource) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setTriggerSource:triggerSource];
-		
-		triggerSource = aTriggerSource;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTControlRegChanged object:self];
-	}
 }
 
 
@@ -942,8 +636,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 			}
 			
 			
-			[self writeReg:kSLTTestpulsAmpl value:amplitude];
-			[self writeBlock:SLT_REG_ADDRESS(kSLTTimingMemory) 
+			[self writeReg:kSltTestpulsAmpl value:amplitude];
+			[self writeBlock:SLT_REG_ADDRESS(kSltTimingMemory) 
 				  dataBuffer:time
 					  length:len
 				   increment:1];
@@ -989,7 +683,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) swTrigger
 {
-	[self writeReg:kSLTSwTestpulsTrigger value:0];
+	[self writeReg:kSltSwTestpulsTrigger value:0];
 }
 */
 
@@ -1006,22 +700,14 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) readAllStatus
 {
-	//[self readPageStatus];
+	[self readControlReg];
 	[self readStatusReg];
+	[self readPageManagerReg];
 }
-/*
-- (void) readPageStatus
-{
-	[self setPageStatusLow:   [self readReg:kPageStatusLow] 
-					  high:   [self readReg:kPageStatusHigh]
-					actual: [self readReg:kSLTActualPage]
-					  next:   [self readReg:kSLTNextPage]];
-}
-*/
 
 - (unsigned long) readStatusReg
 {
-	unsigned long data = [self readReg:kSLTV4StatusReg];
+	unsigned long data = [self readReg:kSltV4StatusReg];
 	[self setStatusReg:data];
 	return data;
 }
@@ -1039,6 +725,26 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	NSLogFont(aFont,@"GPSError      : %@\n",IsBitSet(data,kStatusGpsErr)?@"YES":@"NO");
 	NSLogFont(aFont,@"FanError      : %@\n",IsBitSet(data,kStatusFanErr)?@"YES":@"NO");
 }
+
+- (unsigned long) readPageManagerReg
+{
+	unsigned long data = [self readReg:kSltV4PageManagerReg];
+	[self setPageManagerReg:data];
+	return data;
+}
+
+- (void) printPageManagerReg
+{
+	unsigned long data = [self readPageManagerReg];
+	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	NSLogFont(aFont,@"----Page Manager Register %@ ----\n",[self fullID]);
+	NSLogFont(aFont,@"Page Ready  : %@\n",	IsBitSet(data,kPageMngReady)?@"YES":@"NO");
+	NSLogFont(aFont,@"Oldest Page : 0x%02x\n",(data & kPageMngOldestPage)>>kPageMngOldestPageShift);
+	NSLogFont(aFont,@"Next Page   : 0x%02x\n",(data & kPageMngNextPageShift)>>kPageMngNextPageShift);
+	NSLogFont(aFont,@"Page Full   : %@\n",	IsBitSet(data,kPageMngPgFull)?@"YES":@"NO");
+	NSLogFont(aFont,@"Free Pages  : 0x%02x\n",(data & kPageMngNumFreePagesShift)>>kPageMngNumFreePagesShift);
+}
+
 /*
 - (void) writeStatusReg
 {
@@ -1048,23 +754,21 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	data |= nopgInhibit		 << SLT_NOPGINHIBIT;
 	data |= swInhibit		 << SLT_SWINHIBIT;
 	data |= inhibit			 << SLT_INHIBIT;
-	[self writeReg:kSLTStatusReg value:data];
+	[self writeReg:kSltStatusReg value:data];
 }
 
 - (void) writeNextPageDelay
 {
 	//nextPageDelay stored as number from 0 - 100
 	unsigned long aValue = nextPageDelay * 1999./100.; //convert to value 0 - 1999 x 50us  // ak, 5.10.07
-	[self writeReg:kSLTT1 value:aValue];
+	[self writeReg:kSltT1 value:aValue];
 }
 
 */
 
 - (unsigned long) readControlReg
 {
-	unsigned long data = [self readReg:kSLTV4ControlReg];
-	[self setControlReg: data];	
-	return data;
+	return [self readReg:kSltV4ControlReg];
 }
 
 - (void) printControlReg
@@ -1072,10 +776,10 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	unsigned long data = [self readControlReg];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"----Control Register %@ ----\n",[self fullID]);
-	NSLogFont(aFont,@"Trigger Enable : 0x%02x\n",data & kCtrlTrgEn);
-	NSLogFont(aFont,@"Inibit Enable  : 0x%02x\n",(data & kCtrlInhEn) >> 6);
-	NSLogFont(aFont,@"PPS            : %@\n",IsBitSet(data,kCtrlPPS)?@"GPS":@"Internal");
-	NSLogFont(aFont,@"TP Enable      : 0x%02x\n", ExtractValue(data,kCtrlTpEn,11));
+	NSLogFont(aFont,@"Trigger Enable : 0x%02x\n",data & kCtrlTrgEnMask);
+	NSLogFont(aFont,@"Inibit Enable  : 0x%02x\n",(data & kCtrlInhEnMask) >> 6);
+	NSLogFont(aFont,@"PPS            : %@\n",IsBitSet(data,kCtrlPPSMask)?@"GPS":@"Internal");
+	NSLogFont(aFont,@"TP Enable      : 0x%02x\n", ExtractValue(data,kCtrlTpEnMask,11));
 	NSLogFont(aFont,@"TP Shape       : %d\n", IsBitSet(data,kCtrlShapeMask));
 	NSLogFont(aFont,@"Run Mode       : %@\n", IsBitSet(data,kCtrlRunMask)?@"Normal":@"Test");
 	NSLogFont(aFont,@"Test SLT       : %@\n", IsBitSet(data,kCtrlTstSltMask)?@"Enabled":@"Disabled");
@@ -1085,25 +789,28 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) writeControlReg
 {
-	unsigned long data = 0;
-	//data |= (ledInhibit   & SLT_UPPERLED_MASK)   << SLT_UPPERLED;
-	[self writeReg:kSLTV4StatusReg value:data];
+	[self writeReg:kSltV4ControlReg value:controlReg];
+}
+
+- (void) loadSecondsReg
+{
+	[self writeReg:kSltV4SecondSetReg value:secondsSet];
 }
 
 /*
 - (void) writeInterruptMask
 {
-	[self writeReg:kSLTIRMask value:interruptMask];
+	[self writeReg:kSltIRMask value:interruptMask];
 }
 
 - (void) readInterruptMask
 {
-	[self setInterruptMask:[self readReg:kSLTIRMask]];
+	[self setInterruptMask:[self readReg:kSltIRMask]];
 }
 
 - (void) printInterruptMask
 {
-	unsigned long data = [self readReg:kSLTIRMask];
+	unsigned long data = [self readReg:kSltIRMask];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"----Interrupt Mask SLT (%d) ----\n",[self stationNumber]);
 	if(!data)NSLogFont(aFont,@"Interrupt Mask is Clear (No interrupts enabled)\n");
@@ -1123,75 +830,92 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 */
 
-- (float) readHwVersion
+- (unsigned long) readHwVersion
 {
 	unsigned long value;
 	@try {
-		[self setHwVersion:[self readReg: kSLTV4HWRevisionReg]];	
+		[self setHwVersion:[self readReg: kSltV4HWRevisionReg]];	
 	}
 	@catch (NSException* e){
 	}
 	return value;
 }
 
-/*
+
 - (unsigned long long) readDeadTime
 {
-	unsigned long low  = [self readReg:kSLTDeadTimeLow];
-	unsigned long high = [self readReg:kSLTDeadTimeHigh];
+	unsigned long low  = [self readReg:kSltV4DeadTimeCounterLoReg];
+	unsigned long high = [self readReg:kSltV4DeadTimeCounterHiReg];
 	return ((unsigned long long)high << 32) | low;
 }
 
 - (unsigned long long) readVetoTime
 {
-	unsigned long low  = [self readReg:kSLTVetoTimeLow];
-	unsigned long high = [self readReg:kSLTVetoTimeHigh];
+	unsigned long low  = [self readReg:kSltV4VetoCounterLoReg];
+	unsigned long high = [self readReg:kSltV4VetoCounterHiReg];
 	return ((unsigned long long)high << 32) | low;
 }
-*/
+
+- (unsigned long long) readRunTime
+{
+	unsigned long low  = [self readReg:kSltV4RunCounterLoReg];
+	unsigned long high = [self readReg:kSltV4RunCounterHiReg];
+	return ((unsigned long long)high << 32) | low;
+}
+
+- (unsigned long) readSecondsCounter
+{
+	return [self readReg:kSltV4SecondCounterReg];
+}
+
+- (unsigned long) readSubSecondsCounter
+{
+	return [self readReg:kSltV4SubSecondCounterReg];
+}
+
 - (void) initBoard
 {
 	
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
-	//[self writeReg:kSLTActResetFlt value:0];
-	//[self writeReg:kSLTActResetSlt value:0];
-	usleep(10);
-	//[self writeReg:kSLTRelResetFlt value:0];
-	//[self writeReg:kSLTRelResetSlt value:0];
-	//[self writeReg:kSLTSwSltTrigger value:0];
-	//[self writeReg:kSLTSwSetInhibit value:0];
+	//[self writeReg:kSltActResetFlt value:0];
+	//[self writeReg:kSltActResetSlt value:0];
+	//usleep(10);
+	//[self writeReg:kSltRelResetFlt value:0];
+	//[self writeReg:kSltRelResetSlt value:0];
+	//[self writeReg:kSltSwSltTrigger value:0];
+	//[self writeReg:kSltSwSetInhibit value:0];
 	
-	usleep(100);
+	//usleep(100);
 	
-	int savedTriggerSource = triggerSource;
-	int savedInhibitSource = inhibitSource;
-	triggerSource = 0x1; //sw trigger only
-	inhibitSource = 0x3; 
+//	int savedTriggerSource = triggerSource;
+//	int savedInhibitSource = inhibitSource;
+//	triggerSource = 0x1; //sw trigger only
+//	inhibitSource = 0x3; 
 	[self writeControlReg];
 //	[self releaseAllPages];
 	//unsigned long long p1 = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
-	//[self writeReg:kSLTSwRelInhibit value:0];
-	int i = 0;
-	unsigned long lTmp;
-    do {
-	//	lTmp = [self readReg:kSLTStatusReg];
+	//[self writeReg:kSltSwRelInhibit value:0];
+	//int i = 0;
+	//unsigned long lTmp;
+    //do {
+	//	lTmp = [self readReg:kSltStatusReg];
 		//NSLog(@"waiting for inhibit %x i=%d\n", lTmp, i);
-		usleep(10);
-		i++;
-    } while(((lTmp & 0x10000) != 0) && (i<10000));
+		//usleep(10);
+		//i++;
+   // } while(((lTmp & 0x10000) != 0) && (i<10000));
 	
-    if (i>= 10000){
-		NSLog(@"Release inhibit failed\n");
-		[NSException raise:@"SLT error" format:@"Release inhibit failed"];
-	}
+   // if (i>= 10000){
+		//NSLog(@"Release inhibit failed\n");
+		//[NSException raise:@"SLT error" format:@"Release inhibit failed"];
+	//}
 /*	
 	unsigned long long p2  = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 	if(p1 == p2) NSLog (@"No software trigger\n");
-	[self writeReg:kSLTSwSetInhibit value:0];
+	[self writeReg:kSltSwSetInhibit value:0];
  */
-	triggerSource = savedTriggerSource;
-	inhibitSource = savedInhibitSource;
+//	triggerSource = savedTriggerSource;
+	//inhibitSource = savedInhibitSource;
 	//-----------------------------------------------
 	
 	//[self writeControlReg];
@@ -1199,6 +923,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	//[self writeNextPageDelay];
 	[self printStatusReg];
 	[self printControlReg];
+	[self printPageManagerReg];
 }
 
 - (void) reset
@@ -1210,31 +935,29 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) hw_config
 {
 	NSLog(@"SLT: HW Configure\n");
-	//[self writeReg:kSLTConfFltFPGAs value:0];
 	[ORTimer delay:1.5];
-	//[self writeReg:kSLTConfSltFPGAs value:0];
 	[ORTimer delay:1.5];
-	//[self readReg:kSLTStatusReg];
+	//[self readReg:kSltStatusReg];
 	[guardian checkCards];
 }
 
 - (void) hw_reset
 {
 	NSLog(@"SLT: HW Reset\n");
-	//[self writeReg:kSLTSwRelInhibit value:0];
-	//[self writeReg:kSLTActResetFlt value:0];
-	//[self writeReg:kSLTActResetSlt value:0];
+	//[self writeReg:kSltSwRelInhibit value:0];
+	//[self writeReg:kSltActResetFlt value:0];
+	//[self writeReg:kSltActResetSlt value:0];
 	usleep(10);
-	//[self writeReg:kSLTRelResetFlt value:0];
-	//[self writeReg:kSLTRelResetSlt value:0];
-	//[self writeReg:kSLTSwSltTrigger value:0];
-	//[self writeReg:kSLTSwSetInhibit value:0];				
+	//[self writeReg:kSltRelResetFlt value:0];
+	//[self writeReg:kSltRelResetSlt value:0];
+	//[self writeReg:kSltSwSltTrigger value:0];
+	//[self writeReg:kSltSwSetInhibit value:0];				
 }
 /*
 - (void) loadPulseAmp
 {
 	unsigned short theConvertedAmp = pulserAmp * 4095./4.;
-	[self writeReg:kSLTTestpulsAmpl value:theConvertedAmp];
+	[self writeReg:kSltTestpulsAmpl value:theConvertedAmp];
 	NSLog(@"Wrote %.2fV to SLT pulser Amplitude\n",pulserAmp);
 }
 
@@ -1244,24 +967,12 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	//writing 0x00 to hw gives longest delay. 
 	//conversion equation:  hwValue = -10.0*delay + 32768.
 	unsigned short theConvertedDelay = pulserDelay * -10.0 + 32768.;
-	[self write:SLT_REG_ADDRESS(kSLTTestpulsTiming)+0 value:theConvertedDelay];
-	[self write:SLT_REG_ADDRESS(kSLTTestpulsTiming)+1 value:theConvertedDelay];
+	[self write:SLT_REG_ADDRESS(kSltTestpulsTiming)+0 value:theConvertedDelay];
+	[self write:SLT_REG_ADDRESS(kSltTestpulsTiming)+1 value:theConvertedDelay];
 	int i; //load the rest of the pulser memory with 0's
-	for (i=2;i<256;i++) [self write:SLT_REG_ADDRESS(kSLTTestpulsTiming)+i value:theConvertedDelay];
+	for (i=2;i<256;i++) [self write:SLT_REG_ADDRESS(kSltTestpulsTiming)+i value:theConvertedDelay];
 }
 
-
-- (void) pulseOnce
-{
-	//int savedTriggerSource = [self triggerSource];
-	//[self setTriggerSource:0x01]; //set for sw trigger
-	//[self writeControlReg];
-	
-	[self writeReg:kSLTSwSltTrigger value:0];	// send SW trigger
-	
-	//[self setTriggerSource:savedTriggerSource];
-	//[self writeControlReg];
-}
 
 - (void) loadPulserValues
 {
@@ -1269,6 +980,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[self loadPulseDelay];
 }
 */
+
 - (void) setCrateNumber:(unsigned int)aNumber
 {
 	[guardian setCrateNumber:aNumber];
@@ -1281,36 +993,19 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[[self undoManager] disableUndoRegistration];
 	
 	pcmLink = [[decoder decodeObjectForKey:@"PCM_Link"] retain];
-	if(!pcmLink){
-		pcmLink = [[PCM_Link alloc] initWithDelegate:self];
-	}
+	if(!pcmLink)pcmLink = [[PCM_Link alloc] initWithDelegate:self];
 	else [pcmLink setDelegate:self];
-	
+
+	[self setControlReg:				[decoder decodeInt32ForKey:@"controlReg"]];
+	[self setSecondsSet:[decoder decodeInt32ForKey:@"secondsSet"]];
+
 	//status reg
 	[self setPatternFilePath:		[decoder decodeObjectForKey:@"ORIpeV4SLTModelPatternFilePath"]];
 	[self setInterruptMask:			[decoder decodeInt32ForKey:@"ORIpeV4SLTModelInterruptMask"]];
 	[self setPulserDelay:			[decoder decodeFloatForKey:@"ORIpeV4SLTModelPulserDelay"]];
 	[self setPulserAmp:				[decoder decodeFloatForKey:@"ORIpeV4SLTModelPulserAmp"]];
-	[self setInhibit:				[decoder decodeBoolForKey:@"ORIpeV4SLTStatusInhibit"]];
-	[self setSwInhibit:				[decoder decodeBoolForKey:@"ORIpeV4SLTStatusSwInhibit"]];
-	[self setNopgInhibit:			[decoder decodeBoolForKey:@"ORIpeV4SLTStatusNopgInhibit"]];
-	[self setExtInhibit:			[decoder decodeBoolForKey:@"ORIpeV4SLTStatusExtInhibit"]];
-	[self setVeto:					[decoder decodeBoolForKey:@"ORIpeV4SLTStatusVeto"]];
-	
-	//control reg
-	[self setTriggerSource:			[decoder decodeIntForKey:@"triggerSource"]];
-	[self setInhibitSource:			[decoder decodeIntForKey:@"inhibitSource"]];
-	[self setTestPulseSource:		[decoder decodeIntForKey:@"testPulseSource"]];
-	[self setSecStrobeSource:		[decoder decodeIntForKey:@"secStrobeSource"]];
-	[self setWatchDogStart:			[decoder decodeIntForKey:@"watchDogStart"]];
-	[self setEnableDeadTimeCounter:	[decoder decodeIntForKey:@"enableDeadTimeCounter"]];
-	[self setLedInhibit:			[decoder decodeBoolForKey:@"ledInhibit"]];
-	[self setLedVeto:				[decoder decodeBoolForKey:@"ledVeto"]];
-	
+		
 	//special
-	[self setNHitThreshold:			[decoder decodeIntForKey:@"ORIpeV4SLTModelNHitThreshold"]];
-	[self setNHit:					[decoder decodeIntForKey:@"ORIpeV4SLTModelNHit"]];
-	[self setReadAll:				[decoder decodeBoolForKey:@"readAll"]];
     [self setNextPageDelay:			[decoder decodeIntForKey:@"nextPageDelay"]]; // ak, 5.10.07
 	
 	[self setReadOutGroup:			[decoder decodeObjectForKey:@"ReadoutGroup"]];
@@ -1338,34 +1033,17 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt32:secondsSet forKey:@"secondsSet"];
 	[encoder encodeObject:pcmLink		forKey:@"PCM_Link"];
+	[encoder encodeInt32:controlReg	forKey:@"controlReg"];
 	
 	//status reg
 	[encoder encodeObject:patternFilePath forKey:@"ORIpeV4SLTModelPatternFilePath"];
 	[encoder encodeInt32:interruptMask	 forKey:@"ORIpeV4SLTModelInterruptMask"];
 	[encoder encodeFloat:pulserDelay	 forKey:@"ORIpeV4SLTModelPulserDelay"];
 	[encoder encodeFloat:pulserAmp		 forKey:@"ORIpeV4SLTModelPulserAmp"];
-	[encoder encodeBool:inhibit			 forKey:@"ORIpeV4SLTStatusInhibit"];
-	[encoder encodeBool:swInhibit		 forKey:@"ORIpeV4SLTStatusSwInhibit"];
-	[encoder encodeBool:nopgInhibit		 forKey:@"ORIpeV4SLTStatusNopgInhibit"];
-	[encoder encodeBool:extInhibit		 forKey:@"ORIpeV4SLTStatusExtInhibit"];
-	[encoder encodeBool:veto			 forKey:@"ORIpeV4SLTStatusVeto"];
-	
-	//control reg
-	[encoder encodeInt:triggerSource	forKey:@"triggerSource"];
-	[encoder encodeInt:inhibitSource	forKey:@"inhibitSource"];
-	[encoder encodeInt:testPulseSource	forKey:@"testPulseSource"];
-	[encoder encodeInt:secStrobeSource	forKey:@"secStrobeSource"];
-	[encoder encodeInt:watchDogStart	forKey:@"watchDogStart"];
-	[encoder encodeInt:enableDeadTimeCounter	forKey:@"enableDeadTimeCounter"];
-	[encoder encodeBool:ledInhibit		forKey:@"ledInhibit"];
-	[encoder encodeBool:ledVeto			forKey:@"ledVeto"];
-	
-	
+		
 	//special
-	[encoder encodeInt:nHitThreshold	 forKey:@"ORIpeV4SLTModelNHitThreshold"];
-	[encoder encodeInt:nHit				 forKey:@"ORIpeV4SLTModelNHit"];
-	[encoder encodeBool:readAll			 forKey:@"readAll"];
     [encoder encodeInt:nextPageDelay     forKey:@"nextPageDelay"]; // ak, 5.10.07
 	
 	[encoder encodeObject:readOutGroup  forKey:@"ReadoutGroup"];
@@ -1422,11 +1100,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [objDictionary setObject:[NSNumber numberWithInt:triggerSource]	forKey:@"triggerSource"];
-    [objDictionary setObject:[NSNumber numberWithInt:inhibitSource]	forKey:@"inhibitSource"];	
-    [objDictionary setObject:[NSNumber numberWithInt:nHit]			forKey:@"nHit"];	
-    [objDictionary setObject:[NSNumber numberWithInt:nHitThreshold]	forKey:@"nHitThreshold"];	
-    [objDictionary setObject:[NSNumber numberWithBool:readAll]		forKey:@"readAll"];	
 	return objDictionary;
 }
 
@@ -1448,7 +1121,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	pollingWasRunning = [poller isRunning];
 	if(pollingWasRunning) [poller stop];
 	
-	//[self setSwInhibit];
+	[self writeSetInhibit];
 	
     if([[userInfo objectForKey:@"doinit"]intValue]){
 		[self initBoard];					
@@ -1486,15 +1159,15 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	}
 	else {
 		//[self releaseAllPages];
-		//[self releaseSwInhibit];
-		//[self writeReg:kSLTResetDeadTime value:0];
+		[self writeClrInhibit];
+		//[self writeReg:kSltResetDeadTime value:0];
 		first = NO;
 	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//[self setSwInhibit];
+	[self writeSetInhibit];
 	
 	[pcmLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
@@ -1575,11 +1248,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	
 	//read page start address
-	unsigned long lTimeL     = [self read: SLT_REG_ADDRESS(kSLTLastTriggerTimeStamp) + aPageIndex];
+	unsigned long lTimeL     = [self read: SLT_REG_ADDRESS(kSltLastTriggerTimeStamp) + aPageIndex];
 	int iPageStart = (((lTimeL >> 10) & 0x7fe)  + 20) % 2000;
 	
-	unsigned long timeStampH = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*aPageIndex];
-	unsigned long timeStampL = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*aPageIndex+1];
+	unsigned long timeStampH = [self read: SLT_REG_ADDRESS(kSltPageTimeStamp) + 2*aPageIndex];
+	unsigned long timeStampL = [self read: SLT_REG_ADDRESS(kSltPageTimeStamp) + 2*aPageIndex+1];
 	
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
 	NSLogFont(aFont,@"Reading event from page %d, start=%d:  %ds %dx100us\n", 
