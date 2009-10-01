@@ -233,8 +233,8 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void) loadHardware
 {
 	//option 1 -- send one by one
-	[self sendCommand: [self clockCommand]];
 	[self sendCommand: [self resistanceCommand]];
+	[self sendCommand: [self clockCommand]];
 	[self sendCommand: [self frequencyCommand]];
 	[self sendCommand: [self dutyCycleCommand]];
 	
