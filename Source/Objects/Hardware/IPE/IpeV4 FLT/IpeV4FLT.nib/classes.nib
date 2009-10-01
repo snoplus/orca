@@ -176,6 +176,8 @@
 				<string>id</string>
 				<key>resetAction</key>
 				<string>id</string>
+				<key>selectChannelAction</key>
+				<string>id</string>
 				<key>selectRegisterAction</key>
 				<string>id</string>
 				<key>settingLockAction</key>
@@ -211,6 +213,8 @@
 			<dict>
 				<key>calibrateButton</key>
 				<string>NSButton</string>
+				<key>channelPopUp</key>
+				<string>NSPopUpButton</string>
 				<key>coinTimeField</key>
 				<string>NSTextField</string>
 				<key>gainTextFields</key>

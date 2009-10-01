@@ -60,6 +60,10 @@ NSString* ORIpeV4FLTModelReadoutPagesChanged		 = @"ORIpeV4FLTModelReadoutPagesCh
 NSString* ORIpeV4FLTModelIntegrationTimeChanged	 = @"ORIpeV4FLTModelIntegrationTimeChanged";
 NSString* ORIpeV4FLTModelCoinTimeChanged			 = @"ORIpeV4FLTModelCoinTimeChanged";
 
+NSString* ORIpeV4FLTSelectedRegIndexChanged			= @"ORIpeV4FLTSelectedRegIndexChanged";
+NSString* ORIpeV4FLTWriteValueChanged				= @"ORIpeV4FLTWriteValueChanged";
+
+
 enum {
 	kFLTControlReg,
 	kFLTPixelStatus1Reg,
@@ -738,6 +742,30 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return regV4[anIndex].accessType;
 }
 
+- (unsigned short) selectedRegIndex
+{
+    return selectedRegIndex;
+}
+
+- (void) setSelectedRegIndex:(unsigned short) anIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegIndex:selectedRegIndex];
+    selectedRegIndex = anIndex;
+    [[NSNotificationCenter defaultCenter]	 postNotificationName:ORIpeV4FLTSelectedRegIndexChanged	 object:self];
+}
+
+- (unsigned long) writeValue
+{
+    return writeValue;
+}
+
+- (void) setWriteValue:(unsigned long) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
+    writeValue = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTWriteValueChanged object:self];
+}
+
 
 #pragma mark •••Calibration
 - (void) autoCalibrate
@@ -820,14 +848,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 } 
 
-- (int)  readVersion
+- (int)  readVersion  //TODO: maybe we need a unsigned long int -tb-
 {	
 	unsigned long data = 0;
-	data = [self readControlStatus];
-	return (data >> kIpeFlt_Cntl_Version_Shift) & kIpeFlt_Cntl_Version_Mask;
-    
     data = [self readReg: kFLTV4CFPGAVersionReg];
-    //data = [self readReg:kFLTV4FPGA8Version];
+    //data = [self readReg:kFLTV4FPGA8Version]; //TODO: and the kFLTV4FPGA8Version register ? -tb-
 	return data;
 }
 
@@ -926,13 +951,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeReg:kFLTDisOnCntrlReg value:0];
 }
 
-- (unsigned long) readControlStatus
+- (unsigned long) readControlStatus //TODO: better rename to readStatus -tb-
 {
-	return [self readReg: kFLTV4ControlReg ];
+	return [self readReg: kFLTV4StatusReg ];
+	//return [self readReg: kFLTV4ControlReg ];
 }
 
 - (void) writeControlStatus
 {
+	NSLog(@"FLTv4: writeControlStatus not implemented \n");//TODO: needs implementation -tb-
+if(0){//TODO:  replace by V4 code -tb-
 	unsigned long aValue =	(interruptMask  & kIpeFlt_Cntl_InterruptMask_Mask) << kIpeFlt_Cntl_InterruptMask_Shift  |
 	(ledOff			& kIpeFlt_Cntl_LedOff_Mask)		   << kIpeFlt_Cntl_LedOff_Shift			| 
 	(hitRateLength  & kIpeFlt_Cntl_HitRateLength_Mask) << kIpeFlt_Cntl_HitRateLength_Shift  |
@@ -940,10 +968,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
 	[self writeReg: kFLTControlReg value:aValue];
 }
+}
 
 - (void) writePeriphStatus
 {
+//TODO:  replace by V4 code -tb-
+	NSLog(@"FLTv4: writePeriphStatus not implemented \n");//TODO: needs implementation -tb-
 	int fpga;
+    if(0)
 	for(fpga=0;fpga<4;fpga++){
 		unsigned long aValue = (!fltRunMode &kIpeFlt_Periph_Mode_Mask) << kIpeFlt_Periph_Mode_Shift |
 		(coinTime & kIpeFlt_Periph_CoinTme_Mask) << kIpeFlt_Periph_CoinTme_Shift |    
@@ -957,6 +989,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) printPixelRegs
 {
+	NSLog(@"FLTv4: printPixelRegs not implemented \n");//TODO: needs implementation -tb-
+//TODO:  replace by V4 code -tb-
+return;
 	unsigned long aValue;
 	int j;
 	
@@ -994,6 +1029,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) printStatusReg
 {
+//TODO:  replace by V4 code -tb-
+	NSLog(@"FLTv4: printStatusReg STILL UNDER DEVELOPMENT \n");//TODO: needs implementation -tb-
+
 	unsigned long status = [self readControlStatus];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"FLT %d status Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTControlReg],status);
@@ -1017,6 +1055,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) printPeriphStatusReg
 {
+//TODO:  replace by V4 code -tb-
+	NSLog(@"FLTv4: printPeriphStatusReg not implemented \n");//TODO: needs implementation -tb-
+return;
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	unsigned long status = [self readReg: kFLTPeriphStatusReg];
 	NSLogFont(aFont,@"FLT %d PeriphStatus Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTPeriphStatusReg],status);
@@ -1031,6 +1072,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) printStatistics
 {
+//TODO:  replace by V4 code -tb-
+	NSLog(@"FLTv4: printStatistics not implemented \n");//TODO: needs implementation -tb-
+return;
     int j;
 	double mean;
 	double var;
@@ -1047,8 +1091,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return ([self stationNumber] << 17) | (aChannel << 12)   | regV4[aReg].addressOffset; //TODO: the channel ... -tb-   | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress)
 }
 
-/** Detection of IPE electronic V3 or V4 is done automatically.
- */ //-tb-
 - (unsigned long) regAddress:(int)aReg
 {
 
@@ -1057,53 +1099,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
 {
+//TODO:  replace by V4 code -tb-
+return 0;
     //TODO: obsolete (v3) -tb-
 	return ([self slot] << 24) | (0x2 << kIpeFlt_AddressSpace) | (aChannel << kIpeFlt_ChannelAddress)	| (aPage << kIpeFlt_PageNumber);
 }
 
 - (unsigned long) readReg:(int)aReg
 {
-	//	ORIpeV4SLTModel slt = [[self crate] adapter];
-
-        NSLog(@"V4-FLT:readReg: detected V4 version\n");
-        #if 0
-        //test: loop over crate group -tb-
-        /*
-        id obj,crate;
-        crate=[self crate];
-        if(crate){
-            int i,n=[crate count];
-            NSString *className;
-            NSLog(@"V4-FLT:loop over %i crate objects\n",n);
-            for(i=0;i<n;i++){
-                obj=[crate objectAtIndex:i];
-                NSLog(@"   object %i: %p\n",i,obj);
-                className=@"OrcaObject";
-                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
-                className=@"ORIpeCard";
-                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
-                className=@"ORIpeV4FLTModel";
-                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
-                className=@"ORIpeV4SLTModel";
-                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
-	            if([obj guardian]){
-                    NSLog(@"   object %i has a guardian %p\n",i,[obj guardian]);
-                }
-	            if([obj crate]){
-                    NSLog(@"   object %i has crate %p\n",i,[obj crate]);
-                }
-				
-            }
-        }
-        */
-        #endif
         return [self read: [self regAddress:aReg]];
-	    //return [self read:0x480010];
-	    //return [self read:0x120003];
-	    //return [self read:[self regAddress:aReg]];
-        
-        //return [self read:[self regAddress: kFLTV4CFPGAVersion]]; // this read goes via SLT! -tb-
-    
 }
 
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel
@@ -1125,16 +1129,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) writeThreshold:(int)i value:(unsigned short)aValue
 {
-    //TODO: obsolete (v3) -tb-
-	//[self writeReg: kFLTThresholdReg channel:i value:aValue];
 	[self writeReg: kFLTV4ThresholdReg channel:i value:aValue];
 }
 
 - (unsigned short) readThreshold:(int)i
 {
-    //TODO: obsolete (v3) -tb-
 	return [self readReg:kFLTV4ThresholdReg channel:i];
-	//return [self readReg:kFLTThresholdReg channel:i];
 }
 
 - (void) writeGain:(int)i value:(unsigned short)aValue
@@ -1371,6 +1371,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self setTestEnabledArray:	[decoder decodeObjectForKey:@"testsEnabledArray"]];
 	[self setTestStatusArray:	[decoder decodeObjectForKey:@"testsStatusArray"]];
     [self setReadoutPages:		[decoder decodeIntForKey:@"ORIpeV4FLTModelReadoutPages"]];	// ak, 2.7.07
+    [self setWriteValue:		[decoder decodeIntForKey:@"ORIpeV4FLTModelwriteValue"]];
+    [self setSelectedRegIndex:  [decoder decodeIntForKey:@"ORIpeV4FLTModelselectedRegIndex"]];
 	
 	//make sure these objects exist and are populated with nil objects.
 	int i;	
@@ -1431,6 +1433,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [encoder encodeObject:testEnabledArray	forKey:@"testEnabledArray"];
     [encoder encodeObject:testStatusArray	forKey:@"testStatusArray"];
     [encoder encodeInt:readoutPages  		forKey:@"ORIpeV4FLTModelReadoutPages"];	
+
+    [encoder encodeInt:writeValue           forKey:@"ORIpeV4FLTModelwriteValue"];	
+    [encoder encodeInt:selectedRegIndex  	forKey:@"ORIpeV4FLTModelselectedRegIndex"];	
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -2067,7 +2072,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		
 		NSLog(@"FLT %d\n",[self stationNumber]);
 		
-		//[slt setSwInhibit]; 
+		//[slt setSwInhibit]; //TODO: in eventTest -tb-
 		//slt releaseAllPages]; 
 		//[slt releaseSwInhibit]; 
 		

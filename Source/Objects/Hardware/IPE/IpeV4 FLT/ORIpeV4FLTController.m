@@ -54,6 +54,7 @@
     settingSize			= NSMakeSize(546,670);
     rateSize			= NSMakeSize(430,650);
     testSize			= NSMakeSize(400,400);
+    lowlevelSize		= NSMakeSize(400,350);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -230,6 +231,16 @@
                          name : ORIpeV4FLTModelIntegrationTimeChanged
 						object: model];
 	
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(selectedRegIndexChanged:)
+						 name : ORIpeV4FLTSelectedRegIndexChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(writeValueChanged:)
+						 name : ORIpeV4FLTWriteValueChanged
+					   object : model];
 }
 
 #pragma mark •••Interface Management
@@ -271,6 +282,19 @@
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
     }
+    
+    
+	// Clear all the popup items.
+    [channelPopUp removeAllItems];
+    
+	// Populate the register popup
+    for (i = 0; i < 24; i++) {
+        [channelPopUp insertItemWithTitle: [NSString stringWithFormat: @"%i",i+1 ] atIndex:i];
+        [[channelPopUp itemAtIndex:i] setTag: i];
+    }
+    [channelPopUp insertItemWithTitle: @"All" atIndex:i];
+    [[channelPopUp itemAtIndex:i] setTag: i];
+    
 }
 
 
@@ -351,7 +375,27 @@
 		[testButton setEnabled: !runInProgress];	
 		[testButton setTitle: @"Test"];
 	}
+    
+	[self enableRegControls];
 }
+
+
+- (void) enableRegControls
+{
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORIpeV4FLTSettingsLock];
+	short index = [model selectedRegIndex];
+	BOOL readAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegReadable)>0;
+	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegWriteable)>0;
+	
+	[regWriteButton setEnabled:writeAllowed];
+	[regReadButton setEnabled:readAllowed];
+	
+	[regWriteValueStepper setEnabled:writeAllowed];
+	[regWriteValueTextField setEnabled:writeAllowed];
+    
+    //TODO: extend the accesstype to "channel" and "block64" -tb-
+}
+
 
 - (void) testParamChanged:(NSNotification*)aNotification
 {
@@ -560,12 +604,38 @@
 }
 
 
+- (void) selectedRegIndexChanged:(NSNotification*) aNote
+{
+	//	NSLog(@"This is v4FLT selectedRegIndexChanged\n" );
+    //[registerPopUp selectItemAtIndex: [model selectedRegIndex]];
+	[self updatePopUpButton:registerPopUp	 setting:[model selectedRegIndex]];
+	
+	[self enableRegControls];
+}
+
+- (void) selectedChanIndexChanged:(NSNotification*) aNote
+{
+ NSLog(@"This is v4FLT selectedChanIndexChanged\n" );
+    //[registerPopUp selectItemAtIndex: [model selectedRegIndex]];
+	[self updatePopUpButton:channelPopUp	 setting:[model selectedRegIndex]];
+	
+	[self enableRegControls];
+}
+
+- (void) writeValueChanged:(NSNotification*) aNote
+{
+    [regWriteValueTextField setIntValue: [model writeValue]];
+}
+
+
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case  0: [self resizeWindowToSize:settingSize];     break;
 		case  1: [self resizeWindowToSize:rateSize];	    break;
+		case  2: [self resizeWindowToSize:testSize];        break;
+		case  3: [self resizeWindowToSize:lowlevelSize];	break;
 		default: [self resizeWindowToSize:testSize];	    break;
     }
     [[self window] setContentView:totalView];
@@ -836,27 +906,34 @@
 
 - (IBAction) selectRegisterAction:(id) aSender
 {
-	/*
- NSLog(@"This is: FLTv4: selectRegisterAction\n");
     // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
 	    [[model undoManager] setActionName:@"Select Register"]; // Set undo name
 	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
 		[self settingsLockChanged:nil];
     }
-	 */
+}
+
+- (IBAction) selectChannelAction:(id) aSender
+{
+ //NSLog(@"This is: FLTv4: selectChannelAction\n");
+    // Make sure that value has changed.
+    if(0) //TODO: under development -tb-
+    if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
+	    [[model undoManager] setActionName:@"Select Register"]; // Set undo name
+	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
+		[self settingsLockChanged:nil];
+    }
 }
 
 - (IBAction) writeValueAction:(id) aSender
 {
-	/*
 	[self endEditing];
     // Make sure that value has changed.
     if ([aSender intValue] != [model writeValue]){
 		[[model undoManager] setActionName:@"Set Write Value"]; // Set undo name.
 		[model setWriteValue:[aSender intValue]]; // Set new value
     }
-	 */
 }
 
 - (IBAction) readRegAction: (id) sender
@@ -864,10 +941,10 @@
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
 		unsigned long value = [model readReg:index];
-		NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
+		NSLog(@"FLTv4 reg: %@ has value: 0x%x\n",[model getRegisterName:index],value);
 	}
 	@catch(NSException* localException) {
-		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);
+		NSLog(@"Exception reading FLT reg: %@\n",[model getRegisterName:index]);
         NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
@@ -880,7 +957,7 @@
 		//[model writeReg:index value:[model writeValue]];
 		[model writeReg:index value:[regWriteValueTextField intValue]];
 		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
-		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[regWriteValueTextField intValue],[model getRegisterName:index]);
+		NSLog(@"wrote 0x%x to FLTv4 reg: %@ \n",[regWriteValueTextField intValue],[model getRegisterName:index]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing SLT reg: %@\n",[model getRegisterName:index]);

@@ -81,6 +81,7 @@
         
         //low level
 		IBOutlet NSPopUpButton*	registerPopUp;
+		IBOutlet NSPopUpButton*	channelPopUp;
 		IBOutlet NSStepper* 	regWriteValueStepper;
 		IBOutlet NSTextField* 	regWriteValueTextField;
 		IBOutlet NSButton*		regWriteButton;
@@ -126,6 +127,7 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) readoutPagesChanged:(NSNotification*)aNote;
 - (void) selectedRegIndexChanged:(NSNotification*) aNote;
+- (void) selectedChanIndexChanged:(NSNotification*) aNote;
 - (void) writeValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
@@ -158,6 +160,7 @@
 - (IBAction) calibrateAction:(id)sender;
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (IBAction) selectRegisterAction:(id) aSender;
+- (IBAction) selectChannelAction:(id) aSender;
 - (IBAction) writeValueAction:(id) aSender;
 - (IBAction) readRegAction: (id) sender;
 - (IBAction) writeRegAction: (id) sender;
