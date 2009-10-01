@@ -28,6 +28,7 @@
 	@private
 	
 		IBOutlet NSTextField* hwVersionField;
+		IBOutlet NSMatrix*	  countersMatrix;
 		IBOutlet NSTextField* secondsSetField;
 		IBOutlet NSButton*	  hwVersionButton;
 	
@@ -36,21 +37,14 @@
 		IBOutlet NSMatrix*		inhibitEnableMatrix;
 		IBOutlet NSMatrix*		testPatternEnableMatrix;
 		IBOutlet NSMatrix*		miscCntrlBitsMatrix;
-		IBOutlet NSButton*		deadTimeButton;
-		IBOutlet NSButton*		vetoTimeButton;
-		IBOutlet NSButton*		runTimeButton;
-		IBOutlet NSButton*		secondsCounterButton;
-		IBOutlet NSButton*		subsecondsCounterButton;
-		IBOutlet NSButton*		loadSecondsButton;
+		IBOutlet NSMatrix*		enableDisableCountersMatrix;
 	
 		IBOutlet NSButton*		initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
 		IBOutlet NSMatrix*		interruptMaskMatrix;
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
-		IBOutlet NSPopUpButton* startSrcPU;
 		IBOutlet NSMatrix*		pageStatusMatrix;
-		IBOutlet NSButton*		calibrateButton;
 		IBOutlet NSTextField*   pageSizeField;
 		IBOutlet NSStepper*     pageSizeStepper;
 		IBOutlet NSButton*      displayTriggerButton;
@@ -74,7 +68,6 @@
 		IBOutlet NSButton*		setSWInhibit1Button;
 		IBOutlet NSButton*		relSWInhibit1Button;
 		IBOutlet NSButton*		forceTrigger1Button;
-		IBOutlet NSButton*		usePBusSimButton;
 
 		IBOutlet NSButton*		resetHWButton;
 		IBOutlet NSButton*		definePatternFileButton;
@@ -112,6 +105,11 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) countersEnabledChanged:(NSNotification*)aNote;
+- (void) clockTimeChanged:(NSNotification*)aNote;
+- (void) runTimeChanged:(NSNotification*)aNote;
+- (void) vetoTimeChanged:(NSNotification*)aNote;
+- (void) deadTimeChanged:(NSNotification*)aNote;
 - (void) pageManagerRegChanged:(NSNotification*)aNote;
 - (void) secondsSetChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
@@ -140,23 +138,17 @@
 - (void) enableRegControls;
 
 #pragma mark •••Actions
+- (IBAction) enableDisableCounterAction:(id)sender;
 - (IBAction) secondsSetAction:(id)sender;
 - (IBAction) triggerEnableAction:(id)sender;
 - (IBAction) inhibitEnableAction:(id)sender;
 - (IBAction) testPatternEnableAction:(id)sender;
 - (IBAction) miscCntrlBitsAction:(id)sender;
 - (IBAction) hwVersionAction: (id) sender;
-- (IBAction) deadTimeAction: (id) sender;
-- (IBAction) vetoTimeAction: (id) sender;
-- (IBAction) runTimeAction: (id) sender;
-- (IBAction) secondsAction: (id) sender;
-- (IBAction) subSecondsAction: (id) sender;
-- (IBAction) loadSecondsAction:(id)sender;
 - (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 
 - (IBAction) dumpPageStatus:(id)sender;
-- (IBAction) usePBusSimAction:(id)sender;
 - (IBAction) pollRateAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readStatus:(id)sender;

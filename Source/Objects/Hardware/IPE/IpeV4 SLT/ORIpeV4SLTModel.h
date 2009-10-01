@@ -156,8 +156,6 @@
 		unsigned long   lastDisplayCounter;
 		double          lastDisplayRate;
 		
-		
-    	BOOL usingPBusSimulation;
 		unsigned long   lastSimSec;
 		unsigned long   pageSize; //< Length of the ADC data (0..100us)
 
@@ -167,6 +165,11 @@
 		unsigned long statusReg;
 		unsigned long secondsSet;
 		unsigned long pageManagerReg;
+		unsigned long deadTime;
+		unsigned long vetoTime;
+		unsigned long runTime;
+		unsigned long clockTime;
+		BOOL countersEnabled;
 }
 
 #pragma mark •••Initialization
@@ -182,6 +185,16 @@
 - (void) runIsStopped:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
+- (BOOL) countersEnabled;
+- (void) setCountersEnabled:(BOOL)aContersEnabled;
+- (float) clockTime;
+- (void) setClockTime:(float)aClockTime;
+- (unsigned long) runTime;
+- (void) setRunTime:(unsigned long)aRunTime;
+- (unsigned long) vetoTime;
+- (void) setVetoTime:(unsigned long)aVetoTime;
+- (unsigned long) deadTime;
+- (void) setDeadTime:(unsigned long)aDeadTime;
 - (unsigned long) pageManagerReg;
 - (void) setPageManagerReg:(unsigned long)aPageManagerReg;
 - (unsigned long) secondsSet;
@@ -261,9 +274,12 @@
 
 //- (void)		  writeNextPageDelay;
 //- (void)		  writeStatusReg;
-//- (void)		  writeInterruptMask;
-//- (void)		  readInterruptMask;
-//- (void)		  printInterruptMask;
+- (void)		  writeInterruptMask;
+- (void)		  readInterruptMask;
+- (void)		  readInterruptRequest;
+- (void)		  printInterruptRequests;
+- (void)		  printInterruptMask;
+- (void)		  printInterrupt:(int)regIndex;
 //- (void)		  releaseAllPages;
 //- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
@@ -275,6 +291,8 @@
 - (unsigned long long) readRunTime;
 - (unsigned long) readSecondsCounter;
 - (unsigned long) readSubSecondsCounter;
+- (unsigned long) getSeconds;
+
 - (void)		reset;
 - (void)		hw_config;
 - (void)		hw_reset;
@@ -351,6 +369,11 @@
 
 @end
 
+extern NSString* ORIpeV4SLTModelCountersEnabledChanged;
+extern NSString* ORIpeV4SLTModelClockTimeChanged;
+extern NSString* ORIpeV4SLTModelRunTimeChanged;
+extern NSString* ORIpeV4SLTModelVetoTimeChanged;
+extern NSString* ORIpeV4SLTModelDeadTimeChanged;
 extern NSString* ORIpeV4SLTModelPageManagerRegChanged;
 extern NSString* ORIpeV4SLTModelSecondsSetChanged;
 extern NSString* ORIpeV4SLTModelStatusRegChanged;

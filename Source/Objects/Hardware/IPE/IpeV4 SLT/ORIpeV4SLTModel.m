@@ -125,6 +125,11 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* ORIpeV4SLTModelCountersEnabledChanged = @"ORIpeV4SLTModelCorntersEnabledChanged";
+NSString* ORIpeV4SLTModelClockTimeChanged = @"ORIpeV4SLTModelClockTimeChanged";
+NSString* ORIpeV4SLTModelRunTimeChanged = @"ORIpeV4SLTModelRunTimeChanged";
+NSString* ORIpeV4SLTModelVetoTimeChanged = @"ORIpeV4SLTModelVetoTimeChanged";
+NSString* ORIpeV4SLTModelDeadTimeChanged = @"ORIpeV4SLTModelDeadTimeChanged";
 NSString* ORIpeV4SLTModelPageManagerRegChanged  = @"ORIpeV4SLTModelPageManagerRegChanged";
 NSString* ORIpeV4SLTModelSecondsSetChanged		= @"ORIpeV4SLTModelSecondsSetChanged";
 NSString* ORIpeV4SLTModelStatusRegChanged		= @"ORIpeV4SLTModelStatusRegChanged";
@@ -245,6 +250,68 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) countersEnabled
+{
+    return countersEnabled;
+}
+
+- (void) setCountersEnabled:(BOOL)aCountersEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCountersEnabled:countersEnabled];
+    
+    countersEnabled = aCountersEnabled;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelCountersEnabledChanged object:self];
+}
+
+- (float) clockTime
+{
+    return clockTime;
+}
+
+- (void) setClockTime:(float)aClockTime
+{
+    clockTime = aClockTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelClockTimeChanged object:self];
+}
+
+- (unsigned long) runTime
+{
+    return runTime;
+}
+
+- (void) setRunTime:(unsigned long)aRunTime
+{
+    runTime = aRunTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelRunTimeChanged object:self];
+}
+
+- (unsigned long) vetoTime
+{
+    return vetoTime;
+}
+
+- (void) setVetoTime:(unsigned long)aVetoTime
+{
+    vetoTime = aVetoTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelVetoTimeChanged object:self];
+}
+
+- (unsigned long) deadTime
+{
+    return deadTime;
+}
+
+- (void) setDeadTime:(unsigned long)aDeadTime
+{
+    deadTime = aDeadTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelDeadTimeChanged object:self];
+}
 - (unsigned long) pageManagerReg
 {
     return pageManagerReg;
@@ -414,9 +481,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) setInterruptMask:(unsigned long)aInterruptMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setInterruptMask:interruptMask];
-    
     interruptMask = aInterruptMask;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelInterruptMaskChanged object:self];
 }
 
@@ -484,7 +549,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (unsigned long) getAddress: (short) anIndex
 {
     return( regV4[anIndex].addressOffset>>2);
-
 }
 
 - (short) getAccessType: (short) anIndex
@@ -701,6 +765,10 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[self readControlReg];
 	[self readStatusReg];
 	[self readPageManagerReg];
+	[self readDeadTime];
+	[self readVetoTime];
+	[self readRunTime];
+	[self getSeconds];
 }
 
 - (unsigned long) readStatusReg
@@ -795,38 +863,58 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[self writeReg:kSltV4SecondSetReg value:secondsSet];
 }
 
-/*
 - (void) writeInterruptMask
 {
-	[self writeReg:kSltIRMask value:interruptMask];
+	[self writeReg:kSltV4InterruptMaskReg value:interruptMask];
 }
 
 - (void) readInterruptMask
 {
-	[self setInterruptMask:[self readReg:kSltIRMask]];
+	[self setInterruptMask:[self readReg:kSltV4InterruptMaskReg]];
+}
+
+- (void) readInterruptRequest
+{
+	[self setInterruptMask:[self readReg:kSltV4InterruptReguestReg]];
+}
+
+- (void) printInterruptRequests
+{
+	[self printInterrupt:kSltV4InterruptReguestReg];
 }
 
 - (void) printInterruptMask
 {
-	unsigned long data = [self readReg:kSltIRMask];
+	[self printInterrupt:kSltV4InterruptMaskReg];
+}
+
+- (void) printInterrupt:(int)regIndex
+{
+	unsigned long data = [self readReg:regIndex];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"----Interrupt Mask SLT (%d) ----\n",[self stationNumber]);
-	if(!data)NSLogFont(aFont,@"Interrupt Mask is Clear (No interrupts enabled)\n");
+	if(!data)NSLogFont(aFont,@"Interrupt Mask is Clear (No interrupts %@)\n",regIndex==kSltV4InterruptReguestReg?@"Requested":@"Enabled");
 	else {
-		NSLogFont(aFont,@"The following interrupts are enabled:\n");
-		
-		if(data & (1<<0))NSLogFont(aFont,@"\tNext Page\n");
-		if(data & (1<<1))NSLogFont(aFont,@"\tAll Pages Full\n");
-		if(data & (1<<2))NSLogFont(aFont,@"\tFLT Config Failure\n");
-		if(data & (1<<3))NSLogFont(aFont,@"\tFLT Cmd sent after Config Failure\n");
-		if(data & (1<<4))NSLogFont(aFont,@"\tWatchDog Error\n");
-		if(data & (1<<5))NSLogFont(aFont,@"\tSecond Strobe Error\n");
-		if(data & (1<<6))NSLogFont(aFont,@"\tParity Error\n");
-		if(data & (1<<7))NSLogFont(aFont,@"\tNext Page When Full\n");
-		if(data & (1<<8))NSLogFont(aFont,@"\tNext Page , Previous\n");
+		NSLogFont(aFont,@"The following interrupts are %@:\n",regIndex==kSltV4InterruptReguestReg?@"Requested":@"Enabled");
+		NSString* s = @"";
+		if(data & (1<<0))s = [s stringByAppendingString: @" FLT Rq |"];
+		if(data & (1<<1))s = [s stringByAppendingString: @" WDog |"];
+		if(data & (1<<2))s = [s stringByAppendingString: @" Pixel Err |"];
+		if(data & (1<<3))s = [s stringByAppendingString: @" PPS Err |"];
+		if(data & (1<<4))s = [s stringByAppendingString: @" Clk 0 Err |"];
+		if(data & (1<<5))s = [s stringByAppendingString: @" Clk 1 Err |"];
+		if(data & (1<<6))s = [s stringByAppendingString: @" Clk 2 Err |"];
+		if(data & (1<<7))s = [s stringByAppendingString: @" Clk 3 Err |"];
+		if(data & (1<<8))s = [s stringByAppendingString: @" GPS Err |"];
+		if(data & (1<<9))s = [s stringByAppendingString: @" VTT Err |"];
+		if(data & (1<<10))s = [s stringByAppendingString:@" Fan Err |"];
+		if(data & (1<<11))s = [s stringByAppendingString:@" SW Rq Err |"];
+		if(data & (1<<12))s = [s stringByAppendingString:@" Event Ready |"];
+		if(data & (1<<13))s = [s stringByAppendingString:@" Page Ready |"];
+		if(data & (1<<14))s = [s stringByAppendingString:@" Page Full |"];
+		if(data & (1<<15))s = [s stringByAppendingString:@" Flt Timeout |"];
+		NSLogFont(aFont,@"%@",[s substringToIndex:[s length]-1]);
 	}
 }
-*/
 
 - (unsigned long) readHwVersion
 {
@@ -839,26 +927,28 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	return value;
 }
 
-
 - (unsigned long long) readDeadTime
 {
 	unsigned long low  = [self readReg:kSltV4DeadTimeCounterLoReg];
 	unsigned long high = [self readReg:kSltV4DeadTimeCounterHiReg];
-	return ((unsigned long long)high << 32) | low;
+	[self setDeadTime:((unsigned long long)high << 32) | low];
+	return deadTime;
 }
 
 - (unsigned long long) readVetoTime
 {
 	unsigned long low  = [self readReg:kSltV4VetoCounterLoReg];
 	unsigned long high = [self readReg:kSltV4VetoCounterHiReg];
-	return ((unsigned long long)high << 32) | low;
+	[self setVetoTime:((unsigned long long)high << 32) | low];
+	return vetoTime;
 }
 
 - (unsigned long long) readRunTime
 {
 	unsigned long low  = [self readReg:kSltV4RunCounterLoReg];
 	unsigned long high = [self readReg:kSltV4RunCounterHiReg];
-	return ((unsigned long long)high << 32) | low;
+	[self setRunTime:((unsigned long long)high << 32) | low];
+	return runTime;
 }
 
 - (unsigned long) readSecondsCounter
@@ -871,9 +961,19 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	return [self readReg:kSltV4SubSecondCounterReg];
 }
 
+- (unsigned long) getSeconds
+{
+	[self readSubSecondsCounter]; //must read the sub seconds to load the seconds register
+	[self setClockTime: [self readSecondsCounter]];
+	return clockTime;
+}
+
 - (void) initBoard
 {
-	
+	if(countersEnabled)[self writeEnCnt];
+	[self loadSecondsReg];
+	[self writeControlReg];
+	[self writeInterruptMask];
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
 	//[self writeReg:kSltActResetFlt value:0];
@@ -890,7 +990,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 //	int savedInhibitSource = inhibitSource;
 //	triggerSource = 0x1; //sw trigger only
 //	inhibitSource = 0x3; 
-	[self writeControlReg];
 //	[self releaseAllPages];
 	//unsigned long long p1 = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 	//[self writeReg:kSltSwRelInhibit value:0];
@@ -994,8 +1093,9 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	if(!pcmLink)pcmLink = [[PCM_Link alloc] initWithDelegate:self];
 	else [pcmLink setDelegate:self];
 
-	[self setControlReg:				[decoder decodeInt32ForKey:@"controlReg"]];
-	[self setSecondsSet:[decoder decodeInt32ForKey:@"secondsSet"]];
+	[self setControlReg:		[decoder decodeInt32ForKey:@"controlReg"]];
+	[self setSecondsSet:		[decoder decodeInt32ForKey:@"secondsSet"]];
+	[self setCountersEnabled:	[decoder decodeBoolForKey:@"countersEnabled"]];
 
 	//status reg
 	[self setPatternFilePath:		[decoder decodeObjectForKey:@"ORIpeV4SLTModelPatternFilePath"]];
@@ -1031,6 +1131,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:countersEnabled forKey:@"countersEnabled"];
 	[encoder encodeInt32:secondsSet forKey:@"secondsSet"];
 	[encoder encodeObject:pcmLink		forKey:@"PCM_Link"];
 	[encoder encodeInt32:controlReg	forKey:@"controlReg"];

@@ -196,8 +196,6 @@
 				<string>id</string>
 				<key>crateVersionAction</key>
 				<string>id</string>
-				<key>deadTimeAction</key>
-				<string>id</string>
 				<key>definePatternFileAction</key>
 				<string>id</string>
 				<key>disableCountersAction</key>
@@ -210,6 +208,8 @@
 				<string>id</string>
 				<key>enableCountersAction</key>
 				<string>id</string>
+				<key>enableDisableCounterAction</key>
+				<string>id</string>
 				<key>hwVersionAction</key>
 				<string>id</string>
 				<key>inhibitEnableAction</key>
@@ -221,8 +221,6 @@
 				<key>loadPatternFile</key>
 				<string>id</string>
 				<key>loadPulserAction</key>
-				<string>id</string>
-				<key>loadSecondsAction</key>
 				<string>id</string>
 				<key>miscCntrlBitsAction</key>
 				<string>id</string>
@@ -252,27 +250,17 @@
 				<string>id</string>
 				<key>resetSLTAction</key>
 				<string>id</string>
-				<key>runTimeAction</key>
-				<string>id</string>
-				<key>secondsAction</key>
-				<string>id</string>
 				<key>secondsSetAction</key>
 				<string>id</string>
 				<key>selectRegisterAction</key>
 				<string>id</string>
 				<key>settingLockAction</key>
 				<string>id</string>
-				<key>subSecondsAction</key>
-				<string>id</string>
 				<key>testPatternEnableAction</key>
 				<string>id</string>
 				<key>tpStartAction</key>
 				<string>id</string>
 				<key>triggerEnableAction</key>
-				<string>id</string>
-				<key>usePBusSimAction</key>
-				<string>id</string>
-				<key>vetoTimeAction</key>
 				<string>id</string>
 				<key>writeClrInhibit</key>
 				<string>id</string>
@@ -293,18 +281,18 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>calibrateButton</key>
-				<string>NSButton</string>
+				<key>countersMatrix</key>
+				<string>NSMatrix</string>
 				<key>crateVersionPopup</key>
 				<string>NSPopUpButton</string>
-				<key>deadTimeButton</key>
-				<string>NSButton</string>
 				<key>definePatternFileButton</key>
 				<string>NSButton</string>
 				<key>displayEventLoopButton</key>
 				<string>NSButton</string>
 				<key>displayTriggerButton</key>
 				<string>NSButton</string>
+				<key>enableDisableCountersMatrix</key>
+				<string>NSMatrix</string>
 				<key>forceTrigger1Button</key>
 				<string>NSButton</string>
 				<key>forceTriggerButton</key>
@@ -322,8 +310,6 @@
 				<key>interruptMaskMatrix</key>
 				<string>NSMatrix</string>
 				<key>loadPatternFileButton</key>
-				<string>NSButton</string>
-				<key>loadSecondsButton</key>
 				<string>NSButton</string>
 				<key>miscCntrlBitsMatrix</key>
 				<string>NSMatrix</string>
@@ -373,12 +359,8 @@
 				<string>NSButton</string>
 				<key>resetPageManagerButton</key>
 				<string>NSButton</string>
-				<key>runTimeButton</key>
-				<string>NSButton</string>
 				<key>secStrobeSrcPU</key>
 				<string>NSPopUpButton</string>
-				<key>secondsCounterButton</key>
-				<string>NSButton</string>
 				<key>secondsSetField</key>
 				<string>NSTextField</string>
 				<key>setSWInhibit1Button</key>
@@ -387,22 +369,14 @@
 				<string>NSButton</string>
 				<key>settingLockButton</key>
 				<string>NSButton</string>
-				<key>startSrcPU</key>
-				<string>NSPopUpButton</string>
 				<key>statusMatrix</key>
 				<string>NSMatrix</string>
-				<key>subsecondsCounterButton</key>
-				<string>NSButton</string>
 				<key>testPatternEnableMatrix</key>
 				<string>NSMatrix</string>
 				<key>totalView</key>
 				<string>NSView</string>
 				<key>triggerEnableMatrix</key>
 				<string>NSMatrix</string>
-				<key>usePBusSimButton</key>
-				<string>NSButton</string>
-				<key>vetoTimeButton</key>
-				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>SBC_LinkController</string>

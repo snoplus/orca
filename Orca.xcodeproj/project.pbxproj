@@ -359,6 +359,7 @@
 		84200CA206764C120048DFB4 /* ORSubPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84200CA006764C120048DFB4 /* ORSubPlotController.h */; };
 		84200CA306764C120048DFB4 /* ORSubPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84200CA106764C120048DFB4 /* ORSubPlotController.m */; };
 		842042070F0C082D00720846 /* Continue.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842042060F0C082D00720846 /* Continue.tif */; };
+		84211E371074E5CD00CCB0C0 /* IpeV4SLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */; };
 		84216070094F7F9E002E68B7 /* ORAdcModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8421606E094F7F9E002E68B7 /* ORAdcModel.h */; };
 		84216071094F7F9E002E68B7 /* ORAdcModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8421606F094F7F9E002E68B7 /* ORAdcModel.m */; };
 		8421607B094F861E002E68B7 /* adc.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8421607A094F861E002E68B7 /* adc.tif */; };
@@ -366,7 +367,6 @@
 		8421608A094F8910002E68B7 /* ORAdcController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84216087094F8910002E68B7 /* ORAdcController.m */; };
 		8421608B094F8910002E68B7 /* Adc.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84216088094F8910002E68B7 /* Adc.nib */; };
 		84216094094F8B90002E68B7 /* ORAdcProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 84216093094F8B90002E68B7 /* ORAdcProcessing.h */; };
-		842251320D8845390048D331 /* IpeV4SLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842251240D8845390048D331 /* IpeV4SLT.nib */; };
 		842251330D8845390048D331 /* IpeV4SLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842251250D8845390048D331 /* IpeV4SLTCard.gif */; };
 		842251340D8845390048D331 /* ORIpeV4SLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842251260D8845390048D331 /* ORIpeV4SLTController.h */; };
 		842251350D8845390048D331 /* ORIpeV4SLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842251270D8845390048D331 /* ORIpeV4SLTController.m */; };
@@ -2575,6 +2575,7 @@
 		84200CA006764C120048DFB4 /* ORSubPlotController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSubPlotController.h; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.h"; sourceTree = SOURCE_ROOT; };
 		84200CA106764C120048DFB4 /* ORSubPlotController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSubPlotController.m; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.m"; sourceTree = SOURCE_ROOT; };
 		842042060F0C082D00720846 /* Continue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Continue.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Continue.tif"; sourceTree = SOURCE_ROOT; };
+		84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4SLT.nib; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/IpeV4SLT.nib"; sourceTree = SOURCE_ROOT; };
 		8421606E094F7F9E002E68B7 /* ORAdcModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAdcModel.h; sourceTree = "<group>"; };
 		8421606F094F7F9E002E68B7 /* ORAdcModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAdcModel.m; sourceTree = "<group>"; };
 		8421607A094F861E002E68B7 /* adc.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adc.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adc.tif; sourceTree = SOURCE_ROOT; };
@@ -2590,7 +2591,6 @@
 		842162F7043E6317005F64B1 /* ORSelectionTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORSelectionTask.m; sourceTree = "<group>"; };
 		842162FA043E6317005F64B1 /* NetSocket.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NetSocket.h; sourceTree = "<group>"; };
 		842162FB043E6317005F64B1 /* NetSocket.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NetSocket.m; sourceTree = "<group>"; };
-		842251240D8845390048D331 /* IpeV4SLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4SLT.nib; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/IpeV4SLT.nib"; sourceTree = SOURCE_ROOT; };
 		842251250D8845390048D331 /* IpeV4SLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = IpeV4SLTCard.gif; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/IpeV4SLTCard.gif"; sourceTree = SOURCE_ROOT; };
 		842251260D8845390048D331 /* ORIpeV4SLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4SLTController.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTController.h"; sourceTree = SOURCE_ROOT; };
 		842251270D8845390048D331 /* ORIpeV4SLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4SLTController.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTController.m"; sourceTree = SOURCE_ROOT; };
@@ -5487,9 +5487,9 @@
 		842251230D8845390048D331 /* IpeV4 SLT */ = {
 			isa = PBXGroup;
 			children = (
+				84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */,
 				848BF50D107255F8005779A2 /* PCM_Link.m */,
 				848BF50E107255F8005779A2 /* PCM_Link.h */,
-				842251240D8845390048D331 /* IpeV4SLT.nib */,
 				842251250D8845390048D331 /* IpeV4SLTCard.gif */,
 				842251260D8845390048D331 /* ORIpeV4SLTController.h */,
 				842251270D8845390048D331 /* ORIpeV4SLTController.m */,
@@ -10598,7 +10598,6 @@
 				84FDF54F0D7F084E003AE119 /* IpeV4Crate.nib in Resources */,
 				84FDF5500D7F084E003AE119 /* IpeV4Crate.tif in Resources */,
 				84FDF5510D7F084E003AE119 /* IpeV4CrateBig.tif in Resources */,
-				842251320D8845390048D331 /* IpeV4SLT.nib in Resources */,
 				842251330D8845390048D331 /* IpeV4SLTCard.gif in Resources */,
 				84FB4E220D92F7560055813E /* BugReporter.nib in Resources */,
 				9CDEF4790D941B3300FEE85A /* Analysis2D.nib in Resources */,
@@ -10781,6 +10780,7 @@
 				84AB101C1057D6990069D5E2 /* iTransGasSensor.nib in Resources */,
 				84AB101D1057D6990069D5E2 /* iTransGasSensor.tif in Resources */,
 				845498C410628DF400F8DE1C /* scpExpectScript in Resources */,
+				84211E371074E5CD00CCB0C0 /* IpeV4SLT.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
