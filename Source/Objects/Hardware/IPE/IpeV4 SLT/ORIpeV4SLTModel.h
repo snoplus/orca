@@ -78,8 +78,8 @@
 #define kCmdEnCnt			(0x00000001 <<  9) //W - self cleared
 #define kCmdClrCnt			(0x00000001 <<  8) //W - self cleared
 #define kCmdSwRq			(0x00000001 <<  7) //W - self cleared
-#define kCmdFltRes			(0x00000001 <<  6) //W - self cleared
-#define kCmdSltRes			(0x00000001 <<  5) //W - self cleared
+#define kCmdFltReset		(0x00000001 <<  6) //W - self cleared
+#define kCmdSltReset		(0x00000001 <<  5) //W - self cleared
 #define kCmdFwCfg			(0x00000001 <<  4) //W - self cleared
 #define kCmdTpStart			(0x00000001 <<  3) //W - self cleared
 #define kCmdSwTr			(0x00000001 <<  2) //W - self cleared
@@ -250,8 +250,8 @@
 - (void)		writeSwTrigger;
 - (void)		writeTpStart;
 - (void)		writeFwCfg;
-- (void)		writeSltRes;
-- (void)		writeFltRes;
+- (void)		writeSltReset;
+- (void)		writeFltReset;
 - (void)		writeSwRq;
 - (void)		writeClrCnt;
 - (void)		writeEnCnt;

@@ -43,6 +43,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 };
 
+@interface ORIpeV4SLTController (private)
+-(void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) do:(SEL)aSelector name:(NSString*)aName;
+@end
+
 @implementation ORIpeV4SLTController
 
 #pragma mark •••Initialization
@@ -763,18 +769,19 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-
-- (IBAction) resetHWAction: (id) pSender
-{
-	@try {
-		[model hw_config];
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception reading SLT HW Reset\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	}
-}
+- (IBAction) enableCountersAction:(id)sender	{ [self do:@selector(writeEnCnt) name:@"Enable Counters"]; }
+- (IBAction) disableCountersAction:(id)sender	{ [self do:@selector(writeDisCnt) name:@"Disable Counters"]; }
+- (IBAction) clearCountersAction:(id)sender		{ [self do:@selector(writeClrCnt) name:@"Clear Counters"]; }
+- (IBAction) activateSWRequestAction:(id)sender	{ [self do:@selector(writeSwRq) name:@"Active SW Request Interrupt"]; }
+- (IBAction) configureFPGAsAction:(id)sender	{ [self do:@selector(writeFwCfg) name:@"Config FPGAs"]; }
+- (IBAction) tpStartAction:(id)sender			{ [self do:@selector(writeTpStart) name:@" Test Pattern Start"]; }
+- (IBAction) resetFLTAction:(id)sender			{ [self do:@selector(writeFltRest) name:@" FLT Reset"]; }
+- (IBAction) resetSLTAction:(id)sender			{ [self do:@selector(writeSltRest) name:@" SLT Reset"]; }
+- (IBAction) writeSWTrigAction:(id)sender		{ [self do:@selector(writeSwTrigger) name:@"SW Trigger"]; }
+- (IBAction) writeClrInhibitAction:(id)sender	{ [self do:@selector(writeClrInhibit) name:@"Clr Inhibit"]; }
+- (IBAction) writeSetInhibitAction:(id)sender	{ [self do:@selector(writeSetInhibit) name:@"Set Inhibit"]; }
+- (IBAction) resetPageManagerAction:(id)sender	{ [self do:@selector(writePageManagerReset) name:@"Reset Page Manager"]; }
+- (IBAction) releaseAllPagesAction:(id)sender	{ [self do:@selector(writeReleasePage) name:@"Release Pages"]; }
 
 - (IBAction) pulserAmpAction: (id) sender
 {
@@ -798,58 +805,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 }
 
-- (IBAction) resetPageManagerAction:(id)sender
-{
-	@try {
-		[model writePageManagerReset];
-		NSLog(@"SLT: Manual Reset Page Manager\n");
 
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception doing SLT release pages\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d release pages failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	}
-}
-
-- (IBAction) writeSetInhibitAction:(id)sender
-{
-	@try { 
-		[model writeSetInhibit]; 
-		NSLog(@"SLT: Manual Set Inhibit\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception doing SLT Set SW Inhibit pages\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d set SW inhibiit failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	}
-}
-
-- (IBAction) writeClrInhibit:(id)sender
-{
-	@try { 
-		[model writeClrInhibit]; 
-		NSLog(@"SLT: Manual Clr Inhibit\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception doing SLT Release SW Inhibit pages\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d release SW inhibiit failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	}
-}
-
-- (IBAction) writeSWTrigAction:(id)sender
-{
-	@try { 
-		[model writeSwTrigger]; 
-		NSLog(@"SLT: Manual SW Trigger\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception doing SLT Software trigger\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d software trigger failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	}
-}
 
 
 - (IBAction) definePatternFileAction:(id)sender
@@ -914,6 +870,19 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		@catch(NSException* localException) {
 		}
     }    
+}
+
+- (void) do:(SEL)aSelector name:(NSString*)aName
+{
+	@try { 
+		[model performSelector:aSelector]; 
+		NSLog(@"SLT: Manual %@\n",aName);
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception doing SLT %@\n",aName);
+        NSRunAlertPanel([localException name], @"%@\nSLT%d %@ failed", @"OK", nil, nil,
+                        localException,[model stationNumber],aName);
+	}
 }
 
 @end

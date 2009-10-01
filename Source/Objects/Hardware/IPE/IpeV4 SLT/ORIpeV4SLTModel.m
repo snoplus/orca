@@ -303,12 +303,12 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 - (void) writeSetInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdSetInh]; }
-- (void) writeClrInhibit	{ [self writeReg:kSltV4CommandReg value:kCmdClrInh]; }
+- (void) writeClrInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdClrInh]; }
 - (void) writeSwTrigger			{ [self writeReg:kSltV4CommandReg value:kCmdSwTr];   }
 - (void) writeTpStart			{ [self writeReg:kSltV4CommandReg value:kCmdTpStart];   }
 - (void) writeFwCfg				{ [self writeReg:kSltV4CommandReg value:kCmdFwCfg];   }
-- (void) writeSltRes			{ [self writeReg:kSltV4CommandReg value:kCmdSltRes];   }
-- (void) writeFltRes			{ [self writeReg:kSltV4CommandReg value:kCmdFltRes];   }
+- (void) writeSltReset			{ [self writeReg:kSltV4CommandReg value:kCmdSltReset];   }
+- (void) writeFltReset			{ [self writeReg:kSltV4CommandReg value:kCmdFltReset];   }
 - (void) writeSwRq				{ [self writeReg:kSltV4CommandReg value:kCmdSwRq];   }
 - (void) writeClrCnt			{ [self writeReg:kSltV4CommandReg value:kCmdClrCnt];   }
 - (void) writeEnCnt				{ [self writeReg:kSltV4CommandReg value:kCmdEnCnt];   }
@@ -533,9 +533,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) setDisplayTrigger:(BOOL) aState
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setDisplayTrigger:displayTrigger];
-	
 	displayTrigger = aState;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelDisplayTriggerChanged object:self];
 	
 }

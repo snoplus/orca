@@ -152,8 +152,6 @@
 - (IBAction) secondsAction: (id) sender;
 - (IBAction) subSecondsAction: (id) sender;
 - (IBAction) loadSecondsAction:(id)sender;
-- (IBAction) writeSetInhibitAction:(id)sender;
-- (IBAction) writeClrInhibit:(id)sender;
 - (IBAction) writeSWTrigAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 
@@ -172,7 +170,6 @@
 - (IBAction) writeValueAction:(id) sender;
 - (IBAction) readRegAction: (id) sender;
 - (IBAction) writeRegAction: (id) sender;
-- (IBAction) resetHWAction: (id) sender;
 - (IBAction) pulserAmpAction: (id) sender;
 - (IBAction) pulserDelayAction: (id) sender;
 - (IBAction) loadPulserAction: (id) sender;
@@ -181,5 +178,20 @@
 - (IBAction) definePatternFileAction:(id)sender;
 - (IBAction) loadPatternFile:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
+
+
+- (IBAction) enableCountersAction:(id)sender;
+- (IBAction) disableCountersAction:(id)sender;
+- (IBAction) clearCountersAction:(id)sender;
+- (IBAction) activateSWRequestAction:(id)sender;
+- (IBAction) configureFPGAsAction:(id)sender;
+- (IBAction) tpStartAction:(id)sender;
+- (IBAction) resetFLTAction:(id)sender;
+- (IBAction) resetSLTAction:(id)sender;
+- (IBAction) writeSWTrigAction:(id)sender;
+- (IBAction) writeClrInhibitAction:(id)sender;
+- (IBAction) writeSetInhibitAction:(id)sender;
+- (IBAction) resetPageManagerAction:(id)sender;
+- (IBAction) resetPageManagerAction:(id)sender;
 
 @end
