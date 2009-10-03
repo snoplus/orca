@@ -29,7 +29,7 @@
 @class ORDataPacket;
 @class TimedWorker;
 @class ORIpeFLTModel;
-@class PCM_Link;
+@class PMC_Link;
 @class SBC_Link;
 
 #define IsBitSet(A,B) (((A) & (B)) == (B))
@@ -159,7 +159,7 @@
 		unsigned long   lastSimSec;
 		unsigned long   pageSize; //< Length of the ADC data (0..100us)
 
-		PCM_Link*		pcmLink;
+		PMC_Link*		pmcLink;
         
 		unsigned long controlReg;
 		unsigned long statusReg;
@@ -271,6 +271,8 @@
 - (void)		writeDisCnt;
 - (void)		writeReleasePage;		
 - (void)		writePageManagerReset;
+- (unsigned long long) readBoardID;
+- (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 
 //- (void)		  writeNextPageDelay;
 //- (void)		  writeStatusReg;
@@ -341,28 +343,7 @@
 - (void) setBitsHighAtAddress:(unsigned long)address 
 						 mask:(unsigned long)aMask;
 						 
-- (void) readRegisterBlock:(unsigned long)  anAddress
-				dataBuffer:(unsigned long*) aDataBuffer
-					length:(unsigned long)  length 
-				 increment:(unsigned long)  incr
-			   numberSlots:(unsigned long)  nSlots 
-			 slotIncrement:(unsigned long)  incrSlots;
-			 
-- (void) readBlock:(unsigned long)  anAddress 
-		dataBuffer:(unsigned long*) aDataBuffer
-			length:(unsigned long)  length 
-		 increment:(unsigned long)  incr;
-		 
-- (void) writeBlock:(unsigned long)  anAddress 
-		 dataBuffer:(unsigned long*) aDataBuffer
-			 length:(unsigned long)  length 
-		  increment:(unsigned long)  incr;
 		  
-- (void) clearBlock:(unsigned long)  anAddress 
-		 pattern:(unsigned long) aPattern
-			 length:(unsigned long)  length 
-		  increment:(unsigned long)  incr;
-
 #pragma mark •••SBC Data Structure Setup
 - (void) load_HW_Config;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;

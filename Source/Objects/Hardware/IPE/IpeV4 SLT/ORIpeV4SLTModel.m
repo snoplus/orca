@@ -28,7 +28,7 @@
 #import "unistd.h"
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
-#import "PCM_Link.h"
+#import "PMC_Link.h"
 #import "SLTv4_HW_Definitions.h"
 
 //IPE V4 register definitions
@@ -173,7 +173,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[self setReadOutGroup:readList];
     [self makePoller:0];
 	[readList release];
-	pcmLink = [[PCM_Link alloc] initWithDelegate:self];
+	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
     return self;
 }
 
@@ -190,7 +190,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) wakeUp
 {
     if([self aWake])return;
-	[pcmLink wakeUp];
+	[pmcLink wakeUp];
     [super wakeUp];
     if(![gOrcaGlobals runInProgress]){
         [poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -200,17 +200,17 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) sleep
 {
     [super sleep];
-	[pcmLink sleep];
+	[pmcLink sleep];
     [poller stop];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
-		if(!pcmLink){
-			pcmLink = [[PCM_Link alloc] initWithDelegate:self];
+		if(!pmcLink){
+			pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 		}
-		[pcmLink connect];
+		[pmcLink connect];
 	}
 	@catch(NSException* localException) {
 	}
@@ -312,6 +312,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelDeadTimeChanged object:self];
 }
+
 - (unsigned long) pageManagerReg
 {
     return pageManagerReg;
@@ -384,7 +385,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) writePageManagerReset	{ [self writeReg:kSltV4PageManagerReg value:kPageMngReset];   }
 
 - (id) controllerCard		{ return self;	  }
-- (SBC_Link*)sbcLink		{ return pcmLink; } 
+- (SBC_Link*)sbcLink		{ return pmcLink; } 
 - (TimedWorker *) poller	{ return poller;  }
 
 - (void) setPoller: (TimedWorker *) aPoller
@@ -792,6 +793,28 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	NSLogFont(aFont,@"FanError      : %@\n",IsBitSet(data,kStatusFanErr)?@"YES":@"NO");
 }
 
+- (void) readEventStatus:(unsigned long*)eventStatusBuffer
+{
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	[pmcLink readLongBlockPbus:eventStatusBuffer
+					 atAddress:regV4[kSltV4EventStatusReg].addressOffset
+					 numToRead: 3];
+	
+}
+
+- (unsigned long long) readBoardID
+{
+	unsigned long low = [self readReg:kSltV4BoardIDLoReg];
+	unsigned long hi  = [self readReg:kSltV4BoardIDHiReg];
+	BOOL crc =(hi & 0x80000000)==0x80000000;
+	if(crc){
+		return (unsigned long long)(hi & 0xffff)<<32 | low;
+	}
+	else return 0;
+}
+
 - (unsigned long) readPageManagerReg
 {
 	unsigned long data = [self readReg:kSltV4PageManagerReg];
@@ -990,7 +1013,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 //	int savedInhibitSource = inhibitSource;
 //	triggerSource = 0x1; //sw trigger only
 //	inhibitSource = 0x3; 
-//	[self releaseAllPages];
+//	[self writePageManagerReset];
 	//unsigned long long p1 = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 	//[self writeReg:kSltSwRelInhibit value:0];
 	//int i = 0;
@@ -1089,9 +1112,9 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
-	pcmLink = [[decoder decodeObjectForKey:@"PCM_Link"] retain];
-	if(!pcmLink)pcmLink = [[PCM_Link alloc] initWithDelegate:self];
-	else [pcmLink setDelegate:self];
+	pmcLink = [[decoder decodeObjectForKey:@"PMC_Link"] retain];
+	if(!pmcLink)pmcLink = [[PMC_Link alloc] initWithDelegate:self];
+	else [pmcLink setDelegate:self];
 
 	[self setControlReg:		[decoder decodeInt32ForKey:@"controlReg"]];
 	[self setSecondsSet:		[decoder decodeInt32ForKey:@"secondsSet"]];
@@ -1133,7 +1156,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 	[encoder encodeBool:countersEnabled forKey:@"countersEnabled"];
 	[encoder encodeInt32:secondsSet forKey:@"secondsSet"];
-	[encoder encodeObject:pcmLink		forKey:@"PCM_Link"];
+	[encoder encodeObject:pmcLink		forKey:@"PMC_Link"];
 	[encoder encodeInt32:controlReg	forKey:@"controlReg"];
 	
 	//status reg
@@ -1245,7 +1268,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
-	[pcmLink runTaskStarted:aDataPacket userInfo:userInfo];
+	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
 	
 }
 
@@ -1253,13 +1276,13 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	if(!first){
 		//event readout controlled by the SLT cpu now. ORCA reads out 
-		//the resulting data from a generic circular buffer in the pcmLink code.
-		[pcmLink takeData:aDataPacket userInfo:userInfo];
+		//the resulting data from a generic circular buffer in the pmc code.
+		[pmcLink takeData:aDataPacket userInfo:userInfo];
 	}
 	else {
-		//[self releaseAllPages];
+		[self writePageManagerReset];
+		[self writeClrCnt];
 		[self writeClrInhibit];
-		//[self writeReg:kSltResetDeadTime value:0];
 		first = NO;
 	}
 }
@@ -1268,7 +1291,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	[self writeSetInhibit];
 	
-	[pcmLink runTaskStopped:aDataPacket userInfo:userInfo];
+	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	if(pollingWasRunning) {
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -1449,11 +1472,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 #pragma mark •••SBC I/O layer
 - (unsigned long) read:(unsigned long) address
 {
-	if(![pcmLink isConnected]){
+	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long theData;
-	[pcmLink readLongBlockPbus:&theData
+	[pmcLink readLongBlockPbus:&theData
 					  atAddress:address
 					  numToRead: 1];
 	return theData;
@@ -1461,10 +1484,10 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) read:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len
 { 
-	if(![pcmLink isConnected]){
+	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
-	[pcmLink readLongBlockPbus:theData
+	[pmcLink readLongBlockPbus:theData
 					 atAddress:address
 					 numToRead:len];
 }
@@ -1474,7 +1497,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 					   mask:(unsigned long)aMask 
 					shifted:(int)shiftAmount
 {
-	if(![pcmLink isConnected]){
+	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	
@@ -1486,7 +1509,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) setBitsHighAtAddress:(unsigned long)address 
 						 mask:(unsigned long)aMask
 {
-	if(![pcmLink isConnected]){
+	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long buffer = [self  read:address];
@@ -1494,80 +1517,14 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[self write:address value:buffer];
 }
 
-- (void) readRegisterBlock:(unsigned long)  anAddress 
-				dataBuffer:(unsigned long*) aDataBuffer
-					length:(unsigned long)  length 
-				 increment:(unsigned long)  incr
-			   numberSlots:(unsigned long)  nSlots 
-			 slotIncrement:(unsigned long)  incrSlots
-{
-	if(![pcmLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	
-	int i,j;
-	for(i=0;i<nSlots;i++) {
-		for(j=0;j<length;j++) {
-			aDataBuffer[i*length + j] = [self read:(anAddress + i*incrSlots + j*incr)]; // Slots start with id 1 !!!
-		}
-	}
-}
-
-- (void) readBlock:(unsigned long)  anAddress 
-		dataBuffer:(unsigned long*) aDataBuffer
-			length:(unsigned long)  length 
-		 increment:(unsigned long)  incr
-{
-	if(![pcmLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	
-	int i;
-	for(i=0;i<length;i++) {
-		aDataBuffer[i] = [self read:anAddress + i*incr];
-	}
-}
-
-- (void) writeBlock:(unsigned long)  anAddress 
-		 dataBuffer:(unsigned long*) aDataBuffer
-			 length:(unsigned long)  length 
-		  increment:(unsigned long)  incr
-{
-	if(![pcmLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	
-	int i;
-	for(i=0;i<length;i++) {
-		[self write:anAddress + i*incr value:aDataBuffer[i]];
-	}	
-}
-
-- (void) clearBlock:(unsigned long)  anAddress 
-			pattern:(unsigned long) aPattern
-			 length:(unsigned long)  length 
-		  increment:(unsigned long)  incr
-{
-	if(![pcmLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	int i;
-	for(i=0;i<length;i++) {
-		[self write:anAddress + i*incr value:aPattern];
-	}
-}
-
 #pragma mark •••SBC Data Structure Setup
 - (void) load_HW_Config
 {
 	int index = 0;
 	SBC_crate_config configStruct;
-	
 	configStruct.total_cards = 0;
-	
 	[self load_HW_Config_Structure:&configStruct index:index];
-	
-	[pcmLink load_HW_Config:&configStruct];
+	[pmcLink load_HW_Config:&configStruct];
 }
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
@@ -1613,11 +1570,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 @implementation ORIpeV4SLTModel (private)
 - (unsigned long) read:(unsigned long) address
 {
-	if(![pcmLink isConnected]){
+	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long theData;
-	[pcmLink readLongBlockPbus:&theData
+	[pmcLink readLongBlockPbus:&theData
 					  atAddress:address
 					  numToRead: 1];
 	return theData;
@@ -1625,10 +1582,10 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) write:(unsigned long) address value:(unsigned long) aValue
 {
-	if(![pcmLink isConnected]){
+	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
-	[pcmLink writeLongBlockPbus:&aValue
+	[pmcLink writeLongBlockPbus:&aValue
 					  atAddress:address
 					 numToWrite:1];
 }

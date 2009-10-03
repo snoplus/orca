@@ -1489,10 +1489,6 @@ return 0;
 	
     [self clearExceptionCount];
 	
-	//check that we can actually run
-    if(![[[self crate] adapter] serviceIsAlive]){
-		[NSException raise:@"No FireWire Service" format:@"Check Crate Power and FireWire Cable."];
-    }
 	
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
@@ -1544,6 +1540,14 @@ return 0;
 //***************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
+	if(firstTime){
+		//nothing to do here..the actual readout will be done on the PMC-side. Just post warnings. Once.
+		NSLogColor([NSColor redColor],@"Configuration Error: %@ Needs to be a child of an v4SLT in the readout list\n",[self fullID]);
+		NSLogError(@"",@"Configuration Error",[NSString stringWithFormat:@"Card%d",[self stationNumber]],@"Must be v4SLT child in readout list",nil);
+		firstTime = NO;
+	}
+
+#if 0
     @try {	
 		
 		//retrieve the parameters
@@ -1614,6 +1618,7 @@ return 0;
 		[localException raise];
 		
 	}
+#endif
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

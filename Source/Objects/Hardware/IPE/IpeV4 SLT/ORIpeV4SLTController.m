@@ -646,6 +646,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	@try {
+		NSLogFont(aFont, @"Board ID: %lld\n",[model readBoardID]);
 		[model printStatusReg];
 		[model printControlReg];
 		[model printPageManagerReg];

@@ -1146,8 +1146,8 @@
 		8486F4660CC6D02E00800B1E /* ORIpeDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */; };
 		848883CC10179CBA0043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */ = {isa = PBXBuildFile; fileRef = 848B03060D6505C6007FDEBD /* OrcaFilterScript.icns */; };
-		848BF50F107255F8005779A2 /* PCM_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = 848BF50D107255F8005779A2 /* PCM_Link.m */; };
-		848BF510107255F8005779A2 /* PCM_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = 848BF50E107255F8005779A2 /* PCM_Link.h */; };
+		848BF50F107255F8005779A2 /* PMC_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = 848BF50D107255F8005779A2 /* PMC_Link.m */; };
+		848BF510107255F8005779A2 /* PMC_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = 848BF50E107255F8005779A2 /* PMC_Link.h */; };
 		848CD35C08FB511B0046CD9D /* NSSplitView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */; };
 		848CD35D08FB511B0046CD9D /* NSSplitView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */; };
 		848D842A0DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 848D84240DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist */; };
@@ -3137,8 +3137,8 @@
 		8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIpeDefs.h; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeDefs.h"; sourceTree = SOURCE_ROOT; };
 		84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Universal/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = SOURCE_ROOT; };
 		848B03070D6505C6007FDEBD /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/OrcaFilterScript.icns; sourceTree = "<group>"; };
-		848BF50D107255F8005779A2 /* PCM_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PCM_Link.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/PCM_Link.m"; sourceTree = SOURCE_ROOT; };
-		848BF50E107255F8005779A2 /* PCM_Link.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PCM_Link.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/PCM_Link.h"; sourceTree = SOURCE_ROOT; };
+		848BF50D107255F8005779A2 /* PMC_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PMC_Link.m; sourceTree = "<group>"; };
+		848BF50E107255F8005779A2 /* PMC_Link.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMC_Link.h; sourceTree = "<group>"; };
 		848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSSplitView+Extensions.h"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSSplitView+Extensions.m"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		848D84240DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.TimeMultiPlot.plist; path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot/edu.washington.npl.orca.TimeMultiPlot.plist"; sourceTree = SOURCE_ROOT; };
@@ -5488,8 +5488,8 @@
 			isa = PBXGroup;
 			children = (
 				84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */,
-				848BF50D107255F8005779A2 /* PCM_Link.m */,
-				848BF50E107255F8005779A2 /* PCM_Link.h */,
+				848BF50D107255F8005779A2 /* PMC_Link.m */,
+				848BF50E107255F8005779A2 /* PMC_Link.h */,
 				842251250D8845390048D331 /* IpeV4SLTCard.gif */,
 				842251260D8845390048D331 /* ORIpeV4SLTController.h */,
 				842251270D8845390048D331 /* ORIpeV4SLTController.m */,
@@ -10131,7 +10131,7 @@
 				84AB0F441056DA4E0069D5E2 /* ORModBusModel.h in Headers */,
 				84AB101E1057D6990069D5E2 /* ORiTransGasSensorModel.h in Headers */,
 				84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */,
-				848BF510107255F8005779A2 /* PCM_Link.h in Headers */,
+				848BF510107255F8005779A2 /* PMC_Link.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11517,7 +11517,7 @@
 				84AB0F451056DA4E0069D5E2 /* ORModBusModel.m in Sources */,
 				84AB101F1057D6990069D5E2 /* ORiTransGasSensorModel.m in Sources */,
 				84DBA1331058122C00884B1C /* ORiTransGasSensorController.m in Sources */,
-				848BF50F107255F8005779A2 /* PCM_Link.m in Sources */,
+				848BF50F107255F8005779A2 /* PMC_Link.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
