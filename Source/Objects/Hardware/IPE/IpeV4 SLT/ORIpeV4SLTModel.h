@@ -274,15 +274,12 @@
 - (unsigned long long) readBoardID;
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 
-//- (void)		  writeNextPageDelay;
-//- (void)		  writeStatusReg;
 - (void)		  writeInterruptMask;
 - (void)		  readInterruptMask;
 - (void)		  readInterruptRequest;
 - (void)		  printInterruptRequests;
 - (void)		  printInterruptMask;
 - (void)		  printInterrupt:(int)regIndex;
-//- (void)		  releaseAllPages;
 //- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
 - (void)		  writeReg:(unsigned short)index value:(unsigned long)aValue;
@@ -330,20 +327,7 @@
 - (NSString*) sbcLockName;
 - (NSString*) sbcLocalCodePath;
 - (NSString*) codeResourcePath;
-
-#pragma mark •••SBC I/O layer
-
-- (void) read:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len;
-
-- (void) writeBitsAtAddress:(unsigned long)address 
-					   value:(unsigned long)dataWord 
-					   mask:(unsigned long)aMask 
-					shifted:(int)shiftAmount;
-					
-- (void) setBitsHighAtAddress:(unsigned long)address 
-						 mask:(unsigned long)aMask;
 						 
-		  
 #pragma mark •••SBC Data Structure Setup
 - (void) load_HW_Config;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;

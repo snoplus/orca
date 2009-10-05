@@ -25,12 +25,12 @@
 }
 
 #pragma mark •••Accessors
-- (void) readLongBlockPbus:(unsigned long *) buffer
-			 atAddress:(unsigned int) aPbusAddress
+- (void) readLongBlockPmc:(unsigned long *) buffer
+			 atAddress:(unsigned int) aPmcAddress
 			 numToRead:(unsigned int) numberLongs;
 
-- (void) writeLongBlockPbus:(unsigned long*) buffer
-			 atAddress:(unsigned int) aPbusAddress
+- (void) writeLongBlockPmc:(unsigned long*) buffer
+			 atAddress:(unsigned int) aPmcAddress
 			 numToWrite:(unsigned int)  numberLongs;
 @end
 

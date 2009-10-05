@@ -798,7 +798,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
-	[pmcLink readLongBlockPbus:eventStatusBuffer
+	[pmcLink readLongBlockPmc:eventStatusBuffer
 					 atAddress:regV4[kSltV4EventStatusReg].addressOffset
 					 numToRead: 3];
 	
@@ -834,26 +834,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	NSLogFont(aFont,@"Free Pages  : 0x%02x\n",(data & kPageMngNumFreePagesShift)>>kPageMngNumFreePagesShift);
 }
 
-/*
-- (void) writeStatusReg
-{
-	unsigned long data = 0;
-	data |= veto			 << SLT_VETO;
-	data |= extInhibit		 << SLT_EXTINHIBIT;
-	data |= nopgInhibit		 << SLT_NOPGINHIBIT;
-	data |= swInhibit		 << SLT_SWINHIBIT;
-	data |= inhibit			 << SLT_INHIBIT;
-	[self writeReg:kSltStatusReg value:data];
-}
-
-- (void) writeNextPageDelay
-{
-	//nextPageDelay stored as number from 0 - 100
-	unsigned long aValue = nextPageDelay * 1999./100.; //convert to value 0 - 1999 x 50us  // ak, 5.10.07
-	[self writeReg:kSltT1 value:aValue];
-}
-
-*/
 
 - (unsigned long) readControlReg
 {
@@ -1038,9 +1018,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	//inhibitSource = savedInhibitSource;
 	//-----------------------------------------------
 	
-	//[self writeControlReg];
-	//[self writeInterruptMask];
-	//[self writeNextPageDelay];
 	[self printStatusReg];
 	[self printControlReg];
 	[self printPageManagerReg];
@@ -1469,54 +1446,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 
-#pragma mark •••SBC I/O layer
-- (unsigned long) read:(unsigned long) address
-{
-	if(![pmcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	unsigned long theData;
-	[pmcLink readLongBlockPbus:&theData
-					  atAddress:address
-					  numToRead: 1];
-	return theData;
-}
-
-- (void) read:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len
-{ 
-	if(![pmcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	[pmcLink readLongBlockPbus:theData
-					 atAddress:address
-					 numToRead:len];
-}
-
-- (void) writeBitsAtAddress:(unsigned long)address 
-					  value:(unsigned long)dataWord 
-					   mask:(unsigned long)aMask 
-					shifted:(int)shiftAmount
-{
-	if(![pmcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	
-	unsigned long buffer = [self  read:address];
-	buffer =(buffer & ~(aMask<<shiftAmount) ) | (dataWord << shiftAmount);
-	[self write:address value:buffer];
-}
-
-- (void) setBitsHighAtAddress:(unsigned long)address 
-						 mask:(unsigned long)aMask
-{
-	if(![pmcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	unsigned long buffer = [self  read:address];
-	buffer = (buffer | aMask );
-	[self write:address value:buffer];
-}
-
 #pragma mark •••SBC Data Structure Setup
 - (void) load_HW_Config
 {
@@ -1574,7 +1503,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long theData;
-	[pmcLink readLongBlockPbus:&theData
+	[pmcLink readLongBlockPmc:&theData
 					  atAddress:address
 					  numToRead: 1];
 	return theData;
@@ -1585,7 +1514,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
-	[pmcLink writeLongBlockPbus:&aValue
+	[pmcLink writeLongBlockPmc:&aValue
 					  atAddress:address
 					 numToWrite:1];
 }

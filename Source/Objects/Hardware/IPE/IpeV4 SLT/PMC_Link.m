@@ -26,8 +26,8 @@
 
 #pragma mark •••Accessors
 
-- (void) readLongBlockPbus:(unsigned long *) buffer
-				 atAddress:(unsigned int) aPbusAddress
+- (void) readLongBlockPmc:(unsigned long *) buffer
+				 atAddress:(unsigned int) aPmcAddress
 				 numToRead:(unsigned int) numberLongs
 {
 	@try {
@@ -38,7 +38,7 @@
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_IPEv4ReadBlockStruct);
 		
 		SBC_IPEv4ReadBlockStruct* readBlockPtr = (SBC_IPEv4ReadBlockStruct*)aPacket.payload;
-		readBlockPtr->address			= aPbusAddress;
+		readBlockPtr->address			= aPmcAddress;
 		readBlockPtr->numItems			= numberLongs;
 				
 		//Do NOT call the combo send:receive method here... we have the locks already in place
@@ -53,7 +53,7 @@
 			rp++;
 			memcpy(buffer,rp,num*sizeof(long));
 		}
-		else [self throwError:rp->errorCode address:aPbusAddress];
+		else [self throwError:rp->errorCode address:aPmcAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch(NSException* localException) {
@@ -64,8 +64,8 @@
 
 
 
-- (void) writeLongBlockPbus:(unsigned long *) buffer
-				  atAddress:(unsigned int) aPbusAddress
+- (void) writeLongBlockPmc:(unsigned long *) buffer
+				  atAddress:(unsigned int) aPmcAddress
 				 numToWrite:(unsigned int) numberLongs
 {
 	
@@ -78,7 +78,7 @@
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberLongs*sizeof(long);
 		
 		SBC_IPEv4WriteBlockStruct* writeBlockPtr = (SBC_IPEv4WriteBlockStruct*)aPacket.payload;
-		writeBlockPtr->address			= aPbusAddress;
+		writeBlockPtr->address			= aPmcAddress;
 		writeBlockPtr->numItems			= numberLongs;
 		writeBlockPtr++;				//point to the payload
 		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
@@ -88,7 +88,7 @@
 		[self read:socketfd buffer:&aPacket];	//read the response
 		
 		SBC_IPEv4ReadBlockStruct* rp = (SBC_IPEv4ReadBlockStruct*)aPacket.payload;
-		if(rp->errorCode)[self throwError:rp->errorCode address:aPbusAddress];
+		if(rp->errorCode)[self throwError:rp->errorCode address:aPmcAddress];
 		[socketLock unlock]; //end critical section
 	}
 	@catch(NSException* localException) {
