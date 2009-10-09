@@ -35,11 +35,6 @@
   #define    DebugMethCallsTB(x) 
 #endif
 
-
-
-
-
-
 #pragma mark ***Imported Files
 
 #import "ORIpeSlowControlModel.h"
@@ -49,33 +44,32 @@
 #import "ORHWWizParam.h" //TODO: necessary? -tb-
 #import "ORHWWizSelection.h"
 
- 
 #pragma mark •••Notification Strings
 NSString* ORIpeSlowControlLock                                   = @"ORIpeSlowControlLock";
 //slow control -tb-
-NSString* ORIpeSlowControlMonitoringFieldChangedNotification     = @"ORIpeSlowControlMonitoringFieldChangedNotification";
-NSString* ORIpeSlowControlAdeiServiceUrlChangedNotification      = @"ORIpeSlowControlAdeiServiceUrlChangedNotification";
-NSString* ORIpeSlowControlAdeiSetupOptionsChangedNotification      = @"ORIpeSlowControlAdeiSetupOptionsChangedNotification";
-NSString* ORIpeSlowControlSelectedSensorNumChangedNotification     = @"ORIpeSlowControlSelectedSensorNumChangedNotification";
-NSString* ORIpeSlowControlAdeiBaseUrlChangedNotification   = @"ORIpeSlowControlAdeiBaseUrlChangedNotification";
-NSString* ORIpeSlowControlAdeiTreeChangedNotification      = @"ORIpeSlowControlAdeiTreeChangedNotification";
-NSString* ORIpeSlowControlRequestingAdeiTreeStartedNotification      = @"ORIpeSlowControlRequestingAdeiTreeStartedNotification";
-NSString* ORIpeSlowControlRequestingAdeiTreeStoppedNotification      = @"ORIpeSlowControlRequestingAdeiTreeStoppedNotification";
-NSString* ORIpeSlowControlSensorListChangedNotification    = @"ORIpeSlowControlSensorListChangedNotification";
+NSString* ORIpeSlowControlMonitoringFieldChanged    = @"ORIpeSlowControlMonitoringFieldChanged";
+NSString* ORIpeSlowControlAdeiServiceUrlChanged     = @"ORIpeSlowControlAdeiServiceUrlChanged";
+NSString* ORIpeSlowControlAdeiSetupOptionsChanged   = @"ORIpeSlowControlAdeiSetupOptionsChanged";
+NSString* ORIpeSlowControlSelectedSensorNumChanged  = @"ORIpeSlowControlSelectedSensorNumChanged";
+NSString* ORIpeSlowControlAdeiBaseUrlChanged		= @"ORIpeSlowControlAdeiBaseUrlChanged";
+NSString* ORIpeSlowControlAdeiTreeChanged			= @"ORIpeSlowControlAdeiTreeChanged";
+NSString* ORIpeSlowControlRequestingAdeiTreeStartedNotification = @"ORIpeSlowControlRequestingAdeiTreeStartedNotification";
+NSString* ORIpeSlowControlRequestingAdeiTreeStoppedNotification = @"ORIpeSlowControlRequestingAdeiTreeStoppedNotification";
+NSString* ORIpeSlowControlSensorListChanged			= @"ORIpeSlowControlSensorListChanged";
 
-NSString* ORIpeSlowControlDataChangedNotification          = @"ORIpeSlowControlDataChangedNotification";
-NSString* ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification          = @"ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification";
+NSString* ORIpeSlowControlDataChanged				= @"ORIpeSlowControlDataChanged";
+NSString* ORIpeSlowControlAdeiBaseUrlForSensorChanged = @"ORIpeSlowControlAdeiBaseUrlForSensorChanged";
 
-NSString* ORIpeSlowControlminValueChangedNotification         = @"ORIpeSlowControlminValueChangedNotification";
-NSString* ORIpeSlowControlmaxValueChangedNotification         = @"ORIpeSlowControlmaxValueChangedNotification";
-NSString* ORIpeSlowControllowAlarmRangeChangedNotification    = @"ORIpeSlowControllowAlarmRangeChangedNotification";
-NSString* ORIpeSlowControlhighAlarmRangeChangedNotification   = @"ORIpeSlowControlhighAlarmRangeChangedNotification";
-NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification   = @"ORIpeSlowControlSetIsRecordingDataChangedNotification";
+NSString* ORIpeSlowControlminValueChanged			= @"ORIpeSlowControlminValueChanged";
+NSString* ORIpeSlowControlmaxValueChanged			= @"ORIpeSlowControlmaxValueChanged";
+NSString* ORIpeSlowControllowAlarmRangeChanged		= @"ORIpeSlowControllowAlarmRangeChanged";
+NSString* ORIpeSlowControlhighAlarmRangeChanged		= @"ORIpeSlowControlhighAlarmRangeChanged";
+NSString* ORIpeSlowControlSetIsRecordingDataChanged = @"ORIpeSlowControlSetIsRecordingDataChanged";
+NSString* ORIpeSlowControlPollTimeChanged			= @"ORIpeSlowControlPollTimeChanged";
 
+NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
-//! Used in - (NSString*) identifier (Adc or Bit Processing Protocol) and - (NSString*) processingTitle (ID Helpers; see OrcaObject)
 #define IPE_SLOW_CONTROL_SHORT_NAME @"IPE-ADEI"
-//TODO: use a better name (it should be very short, Process objects are small) -tb-
 
 /** This is called once when "processing" is started. Intended for initialisation (?).
   */
@@ -132,8 +126,6 @@ double tbGetDiffToTimeOfDay(int lastSec, int lastUSec, int *getCurrentSec, int *
         
         return currentDoubleSec;
 }
-
-
 
 /** Gets a date in a NSString (returned by a ADEI csv request) and converts it to a struct timeval using mktime
   * 
@@ -233,24 +225,16 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     //[self setSensorList:[NSMutableArray array]];
     [self initSensorList];
     [self initAdeiSetupOptionsList];
-
-    //TODO: in the test application this was in awakeFromNib; maybe I will need it in initWithCoder ... -tb- TODO: the same for setAdeiServiceUrl (see above)
-    //rootAdeiTree = [ORSensorItem sensorWithAdeiType: kAdeiTypeRoot named: @"root"];
-    rootAdeiTree = [ORSensorItem sensorWithAdeiType: kAdeiTypeService named: @"ADEIRoot"];
+	[self setRootAdeiTree: [ORSensorItem sensorWithAdeiType: kAdeiTypeService named: @"ADEIRoot"]];
 
 	return self;
 }
 
-
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    //[NSObject cancelPreviousPerformRequestsWithTarget:self];  needed?? -tb-
 	[currentSensor release];//slow control TODO: obsolete -tb-
 	[super dealloc];
 }
-
-
 
 - (void) setUpImage
 {
@@ -262,35 +246,45 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 	[self linkToController:@"ORIpeSlowControlController"];
 }
 
-
-
-#pragma mark •••Notifications
-- (void) registerNotificationObservers
+- (BOOL) solitaryObject
 {
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    notifyCenter=notifyCenter;//TODO: nonsense, just to suppress compiler warnings -tb-
-    
-    //TODO: currently deactivated (old Listener code) -tb- 2008-05-19
-    #if 0
-    [notifyCenter addObserver : self
-                     selector : @selector(connectionChanged:)
-                         name : ORConnectionChanged
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(documentLoaded:)
-                         name : ORDocumentLoadedNotification
-                       object : nil];
-    #endif
-    
-    
+    return YES;
 }
 
-
-
-
+-(void)makeConnectors
+{
+	//we  have three permanent connectors. The rest we manage for the pci objects.
+    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(0, 0) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:aConnector forKey:ORADEIInConnection];
+    [aConnector setOffColor:[NSColor magentaColor]];
+    [aConnector setOffColor:[NSColor brownColor]];
+	[aConnector setConnectorType: 'ADEI'];
+	[aConnector addRestrictedConnectionType: 'ADEO']; //can only connect to DB Inputs
+    [aConnector release];
+}
 
 #pragma mark ***Accessors
+- (void) setRootAdeiTree:(ORSensorItem*)aSensorItem
+{
+	[aSensorItem retain];
+	[rootAdeiTree release];
+	rootAdeiTree = aSensorItem;
+}
+
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
+    pollTime = aPollTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlPollTimeChanged object:self];
+	
+	if(pollTime)[self performSelector:@selector(pollSlowControls) withObject:nil afterDelay:2];
+	else		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollSlowControls) object:nil];
+}
 
 /*! Assign the data IDs which are needed to identify the type of encoded data sets.
  They are needed in:
@@ -377,7 +371,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 -(void) setSelectedSensorNum:(int) aValue
 {
     selectedSensorNum=aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSelectedSensorNumChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSelectedSensorNumChanged object:self];
 }
 
 - (ORSensorItem*) rootAdeiTree
@@ -400,7 +394,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     if(aUrl==nil){
         [adeiBaseUrl release];
         adeiBaseUrl = nil;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlChangedNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlChanged object:self];
         return;
     }
     
@@ -412,7 +406,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     [goodUrl retain];
     [adeiBaseUrl release];
     adeiBaseUrl = goodUrl; //TODO: do I need to convert the mutable string 'goodUrl' to ordinary string? -tb-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlChanged object:self];
     [self setAdeiServiceUrl: [NSString stringWithFormat:@"%@%@",adeiBaseUrl,@"services/"]];
 }
 
@@ -430,7 +424,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     if(aUrl==nil){
         [adeiServiceUrl release];
         adeiServiceUrl = nil;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServiceUrlChangedNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServiceUrlChanged object:self];
         return;
     }
     
@@ -445,7 +439,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     [goodUrl retain];
     [adeiServiceUrl release];
     adeiServiceUrl = goodUrl;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServiceUrlChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServiceUrlChanged object:self];
 }
 
 /** Add 'service/' to the base URL.
@@ -529,7 +523,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         
 
     //[sensorTableView setNeedsDisplay: YES];  instead send a notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChanged object:self];
         // TODO: do I need this notification? it is always called by 
         // - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 
@@ -575,7 +569,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     //[sensorListItem release];//TODO: ?????
     
     //[sensorTableView setNeedsDisplay];  instead send a notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChanged object:self];
     
 }
 
@@ -621,7 +615,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     if(aName==nil) return;
     if(index==-1) index=[adeiSetupOptionsList count];
     [adeiSetupOptionsList insertObject: aName atIndex: index];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChanged object:self];
 }
 
 // one item must always remain in the list! if one tries to remove the last item, it will be cleared (?)
@@ -633,14 +627,14 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     }else{
         [adeiSetupOptionsList removeObjectAtIndex: index];
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChanged object:self];
 }
 
 - (void) replaceAdeiSetupOptionAtIndex:(int) index withString:(NSString *)aName
 {
     if(aName==nil) return;
     [adeiSetupOptionsList replaceObjectAtIndex: index withObject: aName ];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChanged object:self];
 }
 
 - (NSString *) adeiSetupOptionAtIndex:(int) index
@@ -654,28 +648,28 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 {
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor) [sensor setMinValue: aValue];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlminValueChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlminValueChanged object:self];
 }
 
 - (void) setMaxValue:(double)aValue forChan:(int)channel
 {
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor) [sensor setMaxValue: aValue];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlmaxValueChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlmaxValueChanged object:self];
 }
 
 - (void) setLowAlarmRange:(double)aValue forChan:(int)channel
 {
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor) [sensor setLowAlarmRange: aValue];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControllowAlarmRangeChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControllowAlarmRangeChanged object:self];
 }
 
 - (void) setHighAlarmRange:(double)aValue forChan:(int)channel
 {
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor) [sensor setHighAlarmRange: aValue];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlhighAlarmRangeChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlhighAlarmRangeChanged object:self];
 }
 
 - (double) doubleDataForChan:(int)channel;
@@ -688,7 +682,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 {
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor) [sensor setDoubleData: aValue];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlDataChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlDataChanged object:self];
 //TODO:
 //TODO:
 //TODO:
@@ -707,7 +701,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 {
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor) [sensor setIsRecordingData: aValue];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetIsRecordingDataChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetIsRecordingDataChanged object:self];
 }
 
 
@@ -717,7 +711,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor){
         [sensor setAdeiBaseUrl: aUrl];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlForSensorChanged object:self];
     }
 }
 
@@ -727,7 +721,8 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     if(sensor && [sensor isDefinedSensorListItem]){
         NSMutableDictionary * dict =[sensor sensorPath];
         return [dict  valueForKey: kAdeiUrlString];
-    }else{
+    }
+	else{
         return @"";
     }
 }
@@ -737,7 +732,8 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor && [sensor isDefinedSensorListItem]){
         return [[sensor sensorPath]  valueForKey: kServiceString];
-    }else{
+    }
+	else {
         return @"";
     }
 }
@@ -747,7 +743,8 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     if(sensor && [sensor isDefinedSensorListItem]){
         return [sensor adeiPath];
-    }else{
+    }
+	else {
         return @"";
     }
 }
@@ -756,8 +753,6 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 
 #pragma mark ***Slow Control
 //OBSOLETE -tb-
-
-
 /** This can be tested by
   * sending out
   * [ORIpeSlowControlModel setSensorWithName:@"T007" toIntValue: 24]
@@ -768,7 +763,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     NSLog(@"ORIpeSlowControlModel: setSensorWithName: %@ toIntValue:%i\n",aName,aValue);
     [self setCurrentSensor:aName];
     [self setCurrentSensorIntValue:aValue];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlMonitoringFieldChangedNotification object: self ];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlMonitoringFieldChanged object: self ];
 }
 
 
@@ -780,7 +775,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 - (void) setSensor:(char*)aName toIntValue:(int)aValue  //TODO: remove it - (char*) not possible ? -tb-
 {
     NSLog(@"ORIpeSlowControlModel: setSensor: %s toIntValue:%i\n",aName,aValue);
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlMonitoringFieldChangedNotification object: self ];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlMonitoringFieldChanged object: self ];
 }
 
 
@@ -793,7 +788,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 {
     NSLog(@"ORIpeSlowControlModel: setSensorToIntValue:%i\n",aValue);
     [self setCurrentSensorIntValue:aValue];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlMonitoringFieldChangedNotification object: self ];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlMonitoringFieldChanged object: self ];
 
 }
 
@@ -835,7 +830,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     [sensorTableView setNeedsDisplay];
     #endif
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChanged object:self];
     
 }
 
@@ -1036,10 +1031,9 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     //now start requesting the XML info for the nodes in queueForLoadingAdeiTree
     [self serveQueueForLoadingAdeiTree];
     
-// refresh display
-//[sensorOutlineView reloadItem:root reloadChildren:YES]; instead send a notification
-[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
-        
+	// refresh display
+	//[sensorOutlineView reloadItem:root reloadChildren:YES]; instead send a notification
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChanged object:self];
 }
 
 - (void) serveQueueForLoadingAdeiTree
@@ -1050,14 +1044,15 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         sensorNode = [queueForLoadingAdeiTree objectAtIndex:0];
         [queueForLoadingAdeiTree removeObjectAtIndex:0];
         [self loadAdeiTreeChildrenForNode: sensorNode];//after loading this method (serveQueueForLoadingAdeiTree) will be called again -tb-
-    }else{
+    }
+	else{
         //all nodes have requested their children
         //TODO: redraw tree -tb-
         NSLog(@"Calling %@ :: %@ for self=%p: ADEI tree loading finished!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
         //say the controler to stop the progress indicator
         [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlRequestingAdeiTreeStoppedNotification object:self];
         // refresh display
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChanged object:self];
     }
 }
 
@@ -1082,21 +1077,21 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     ORSensorItem* item=sensorNode;
     
     int aAdeiType;
-    {//step up until tree root is reached
-        while(item){
-            aAdeiType = [item adeiType];
-            if(aAdeiType == kAdeiTypeItem){
-                NSLog(@"WARNING: kAdeiTypeItem in loadAdeiTreeChildrenForNode: - something is wrong!\n");
-            }
-            if(aAdeiType == kAdeiTypeGroup)    groupItem = item;
-            if(aAdeiType == kAdeiTypeDatabase) databaseItem = item;
-            if(aAdeiType == kAdeiTypeServer)   serverItem = item;
-            if(aAdeiType == kAdeiTypeSetupOption)setupOptionItem = item;
-            if(aAdeiType == kAdeiTypeService)  serviceItem = item;
-            
-            item = [item parent];//go up in the tree ...
-        }
-    }
+    //step up until tree root is reached
+	while(item){
+		aAdeiType = [item adeiType];
+		if(aAdeiType == kAdeiTypeItem){
+			NSLog(@"WARNING: kAdeiTypeItem in loadAdeiTreeChildrenForNode: - something is wrong!\n");
+		}
+		if(aAdeiType == kAdeiTypeGroup)    groupItem = item;
+		if(aAdeiType == kAdeiTypeDatabase) databaseItem = item;
+		if(aAdeiType == kAdeiTypeServer)   serverItem = item;
+		if(aAdeiType == kAdeiTypeSetupOption)setupOptionItem = item;
+		if(aAdeiType == kAdeiTypeService)  serviceItem = item;
+		
+		item = [item parent];//go up in the tree ...
+	}
+    
     
     switch([sensorNode adeiType]){
         case kAdeiTypeSetupOption:
@@ -1323,7 +1318,8 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
     if(adeiServiceUrl){
         NSLog(@"Using ADEI service URL: %@\n",adeiServiceUrl);
-    }else{
+    }
+	else{
         NSLog(@"ERROR: No ADEI service URL defined!\n");
         return;
     }
@@ -1397,7 +1393,8 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
                 int j,m=[serverItem countChildren];
                 for(j=0;j<m;j++){
                     ORSensorItem *databaseItem = [serverItem childAtIndex:j];
-                    NSString *groupRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@%@",adeiServiceUrl,@"groups", [serverItem value], [databaseItem value], adeiSetupOptionString];
+                    //NSString *groupRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@%@",adeiServiceUrl,@"groups", [serverItem value], [databaseItem value], adeiSetupOptionString];
+                    NSString *groupRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@%@",adeiServiceUrl,@"cgroups", [serverItem value], [databaseItem value], adeiSetupOptionString];
                     //NSLog(@" \n");
                     //NSLog(@"    >>>>>>>>>>>>>>>group>>>>>>>>>>\n");
                     //NSLog(@"    Request databases of server: %@\n",groupRequestString);
@@ -1421,7 +1418,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
             }
             // refresh display
             //[sensorOutlineView reloadItem:root reloadChildren:YES]; instead send a notification
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChanged object:self];
             
         }else{
             NSLog(@"ERROR: Service not available: %@\n",serverRequestString);
@@ -1434,7 +1431,6 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 
 - (void) rebuildConnectionsBetweenAdeiTreeAndSensorList
 {
-
 //TODO: !!!!
 //TODO: !!!!
 //TODO: !!!!
@@ -1447,13 +1443,6 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 //TODO: !!!!
 }
 
-
-
-
-
-
-
-
 #pragma mark •••Archival
 
 - (id) initWithCoder:(NSCoder*)decoder
@@ -1464,12 +1453,9 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 	[[self undoManager] disableUndoRegistration];
     
     [self initBasics];//TODO: not everything from init is necessary -tb-
-
-    if([decoder containsValueForKey:@"ORIpeSlowControlAdeiBaseUrl"])
-	    [self setAdeiBaseUrl:[decoder decodeObjectForKey:@"ORIpeSlowControlAdeiBaseUrl"]];
-    
-    if([decoder containsValueForKey:@"ORIpeSlowControlAdeiSetupOptionsList"])
-	    [self setAdeiSetupOptionsList:[decoder decodeObjectForKey:@"ORIpeSlowControlAdeiSetupOptionsList"]];
+	[self setPollTime:[decoder decodeIntForKey:@"pollTime"]];
+	[self setAdeiBaseUrl:[decoder decodeObjectForKey:@"ORIpeSlowControlAdeiBaseUrl"]];
+    [self setAdeiSetupOptionsList:[decoder decodeObjectForKey:@"ORIpeSlowControlAdeiSetupOptionsList"]];
     
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[self setRemoteHost:[decoder decodeObjectForKey:@"ORIpeSlowControlRemoteHost"]];
@@ -1499,13 +1485,10 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
             if(![dict valueForKey: kSetupOptionString]) [dict setValue: @"" forKey: kSetupOptionString];//TODO: this can be removed in the future - for downward compatibility -tb-
              
         }
-        
-        
     }
-    
-    
     if(!currentSensor) currentSensor=@"-";
     
+	
 	[[self undoManager] enableUndoRegistration];
     
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1513,7 +1496,6 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     readingLock = [[NSLock alloc] init];
     processLock = [[NSConditionLock alloc] init];
 #endif//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	[self registerNotificationObservers];
     
 	return self;
 }
@@ -1526,6 +1508,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     //encode main properties
 	[encoder encodeObject:adeiBaseUrl forKey:@"ORIpeSlowControlAdeiBaseUrl"];
 	[encoder encodeObject:adeiSetupOptionsList forKey:@"ORIpeSlowControlAdeiSetupOptionsList"];
+	[encoder encodeInt:pollTime forKey:@"pollTime"];
     
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[encoder encodeObject:remoteHost forKey:@"ORIpeSlowControlRemoteHost"];
@@ -1574,12 +1557,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         //[sensor loadSensorValueWithSensorPath];
     }
     #endif
-    
 }
-
-
-
-
 
 - (NSDictionary*) dataRecordDescription
 {
@@ -1597,15 +1575,6 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     [dataDictionary setObject:aDictionary forKey:@"ChannelData"];
     return dataDictionary;
 }
-
-
-//TODO: is this ncessary? -tb-
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
-{
-    //
-    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
-}
-
 
 
 
@@ -1656,16 +1625,12 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     
 	return objDictionary;
     #endif
-    
 }
 
-/*
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP320"];
 }
-*/
-
 
 #pragma mark •••Adc or Bit Processing Protocol
 /** This is called once per "processing" cycle and is called at the begin of the process cycle.
@@ -1733,25 +1698,14 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
     NSLog(@"    ARG: channel is %i  value is %i\n",  channel , value);
 }
- //not usually used, but needed for easy compatibility with the bit protocol
 
 - (NSString*) processingTitle
 {
-    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
-    int ind=[self uniqueIdNumber];
-    //ind++;
-    //return [NSString stringWithFormat:@"%@",[self identifier]];//copy from ORIP320Model.m -tb-
-    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,ind];//see comment above -tb-
-    //return [NSString stringWithFormat: @"%@%i",@"IPESlowControl",ind];//TODO: use a better name (it should be very short, Process objects are small) -tb-
-    //return @"IPE-ADEI";//TODO: add a number, if there are more than one IpeSlowControl object ? -tb-
+    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
 }
 
-
 - (double) convertedValue:(int)channel
-{
-    //DebugMethCallsTB(  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);  )
-    //DebugMethCallsTB(  NSLog(@"    ARG: channel is %i\n",  channel );  )
-    
+{    
     double retval;
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
     retval = [sensor doubleData];
@@ -1830,119 +1784,64 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
 {
     NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
 }
+#pragma mark •••polling
 
-
-
-#pragma mark •••  Data Taker Protocol
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) pollSlowControls
 {
-
-    unsigned int chan;
-    //TEST
-    //chan = 17+[self uniqueIdNumber];
-    
-    //TEST+DEBUG: heartbeat output -tb-
-    //now class variable: static int heartbeatSec=0, heartbeatUSec=0; // for testing
-    //now class variable: static int heartbeatLastSec=0, heartbeatLastUSec=0; // for testing
-    double diffSec;
-    diffSec = tbGetDiffToTimeOfDay(heartbeatLastSec,heartbeatLastUSec,&heartbeatSec,&heartbeatUSec);
-    if(diffSec>=1.0){//write out heartbeat message for debugging
-        DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT! Identifier: %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),[self identifier]);  )
-        
-        for(chan=0; chan<maxSensorListLength; chan++){
-            ORSensorItem *sensor=[self sensorAtIndex: chan];
-            if(![sensor isRecordingData]) continue;
-            if(![sensor isDefinedSensorListItem]) continue;
-            
-            //write out a test data record
-            ipeSlowControlChannelDataStruct channelData;
-            double doubleData=[sensor doubleData];
-            double intPlaces;
-            double decimalPlaces;
-            if(doubleData<0.0) intPlaces = ceil(doubleData);
-            else intPlaces = floor(doubleData);
-            decimalPlaces= (doubleData - intPlaces) * 1000000.0; //or use fmod(doubleData,1.0) * 1000000.0;
-            //set the data
-            channelData.dataRound         = (long int)intPlaces;
-            channelData.dataDecimalPlaces = (long int)decimalPlaces;
-            channelData.timestampSec      = [sensor dataTimestampSec];
-            channelData.timestampSubSec   = [sensor dataTimestampSubSec];
-            channelData.flags             = 0x01020304;
-            channelData.doubleData        = doubleData;
-            //TEST: channelData.timestampSec      = heartbeatSec;
-            //TEST: channelData.timestampSubSec   = heartbeatUSec;
-            
-            //prepare for shipping
-            unsigned long totalLength = 2 + (sizeof(ipeSlowControlChannelDataStruct)/sizeof(long));
-            unsigned long	locationWord;
-            locationWord			  = (([self uniqueIdNumber]&0x0f)<<21); //  | ([self stationNumber]& 0x0000001f)<<16;// the object ID; see f.i. in KatrinFLT
-            locationWord |= (chan & 0xff)<<8; //  the channel 
-            
-            
-            NSMutableData* channelDataMData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
-            unsigned long header = channelDataId | totalLength;	//total event size + the two ORCA header words (in longs!).
-            
-            [channelDataMData appendBytes:&header length:4];		    //ORCA header word
-            [channelDataMData appendBytes:&locationWord length:4];	//which Adei obj. ID, which channel info
-            [channelDataMData appendBytes:&channelData length:sizeof(ipeSlowControlChannelDataStruct)];
-            
-            [aDataPacket addData:channelDataMData];	//ship the channel data record
-        }//end of chan loop
-        
-        //
-        heartbeatLastSec = heartbeatSec ;
-        heartbeatLastUSec = heartbeatUSec ;
-        DebugTB(   NSLog(@"This is the SlowControl heartbeat: difftime %f sec, current sec %i\n",diffSec,heartbeatSec);  )
-    }
-}
-
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
-    heartbeatSec=0; heartbeatUSec=0; // for testing
-    heartbeatLastSec=0; heartbeatLastUSec=0; // for testing
-    
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollSlowControls) object:nil];
+    unsigned int chan;    	
+	for(chan=0; chan<maxSensorListLength; chan++){
+		ORSensorItem *sensor=[self sensorAtIndex: chan];
+		if(![sensor isRecordingData]) continue;
+		if(![sensor isDefinedSensorListItem]) continue;
+		
+		//write out a test data record
+		ipeSlowControlChannelDataStruct channelData;
+		double doubleData=[sensor doubleData];
+		double intPlaces;
+		double decimalPlaces;
+		if(doubleData<0.0) intPlaces = ceil(doubleData);
+		else intPlaces = floor(doubleData);
+		decimalPlaces= (doubleData - intPlaces) * 1000000.0; //or use fmod(doubleData,1.0) * 1000000.0;
+		//set the data
+		channelData.dataRound         = (long int)intPlaces;
+		channelData.dataDecimalPlaces = (long int)decimalPlaces;
+		channelData.timestampSec      = [sensor dataTimestampSec];
+		channelData.timestampSubSec   = [sensor dataTimestampSubSec];
+		channelData.flags             = 0x01020304;
+		channelData.doubleData        = doubleData;
+		//TEST: channelData.timestampSec      = heartbeatSec;
+		//TEST: channelData.timestampSubSec   = heartbeatUSec;
+		
+		//prepare for shipping
+		unsigned long totalLength = 2 + (sizeof(ipeSlowControlChannelDataStruct)/sizeof(long));
+		unsigned long	locationWord;
+		locationWord			  = (([self uniqueIdNumber]&0x0f)<<21); //  | ([self stationNumber]& 0x0000001f)<<16;// the object ID; see f.i. in KatrinFLT
+		locationWord |= (chan & 0xff)<<8; //  the channel 
+		
+		
+		NSMutableData* channelDataMData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
+		unsigned long header = channelDataId | totalLength;	//total event size + the two ORCA header words (in longs!).
+		
+		[channelDataMData appendBytes:&header length:4];		    //ORCA header word
+		[channelDataMData appendBytes:&locationWord length:4];	//which Adei obj. ID, which channel info
+		[channelDataMData appendBytes:&channelData length:sizeof(ipeSlowControlChannelDataStruct)];
+		if([[ORGlobal sharedGlobal] runInProgress]){
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:channelDataMData];
+		}
+	}
 	
-    //----------------------------------------------------------------------------------------
-    // Add our description to the data description
-    //[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey: NSStringFromClass([self class])];    
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey: @"IpeSlowControl"];    
-    //----------------------------------------------------------------------------------------	
-	
-    
+	if(pollTime)[self performSelector:@selector(pollSlowControls) withObject:nil afterDelay:pollTime];
+
+	heartbeatLastSec = heartbeatSec ;
+	heartbeatLastUSec = heartbeatUSec ;
 }
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
-
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"----------------------------------------\n");
-	NSLogFont(aFont,@"IPE Slow Control - Run Summary: IPE-ADEI %d\n",[self uniqueIdNumber]);
-	NSLogFont(aFont,@"Record time    : %d\n", 0);
-	NSLogFont(aFont,@"Events         : %d\n", 0);
-	NSLogFont(aFont,@"ReadTimeouts   : %d\n", 0);
-	NSLogFont(aFont,@"Under Development.\n");
-}
-
-- (void) reset
-{
-    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
-}
-
-
 
 #pragma mark •••ID Helpers (see OrcaObject)
-//- (NSString*) objectName;  // take from super class
-//- (NSString*) isDataTaker;  // take from super class
-//- (NSString*) supportsHardwareWizard;  //TODO: not yet implemented -tb-
 - (NSString*) identifier
 {
-    int ind=[self uniqueIdNumber];
-    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,ind];
+    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
 }
-
-
 
 #pragma mark •••  Protocol ORHWWizard
 /** Here all attributes are defined which are accessible via the hardware wizard.
@@ -1991,13 +1890,7 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
     return maxSensorListLength; // 
 }
 
-
 @end
-
-
-
-
-
 
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -2058,7 +1951,8 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     if(aValue<kAdeiTypeLast){//sensor tree item
         [item setChildren:[NSMutableArray array]];
         [item setTree: [ORSensorItem stringForAdeiType: [item adeiType]]];
-    }else{//channel/sensor list item
+    }
+	else{//channel/sensor list item
         //[item setSensorPath:[NSMutableDictionary dictionary]];  moved to initSensorListItem
         [item initSensorListItem];
     }
@@ -2278,27 +2172,14 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     date = aString;
 }
 
-- (double) minValue
-{   return minValue;    }
-- (void) setMinValue:(double)aValue
-{   minValue= aValue;    }
-
-- (double) maxValue;
-{   return maxValue;    }
-- (void) setMaxValue:(double)aValue
-{   maxValue= aValue;    }
-
-- (double) lowAlarmRange;
-{   return lowAlarmRange;    }
-- (void) setLowAlarmRange:(double)aValue
-{   lowAlarmRange= aValue;    }
-
-- (double) highAlarmRange;
-{   return highAlarmRange;    }
-- (void) setHighAlarmRange:(double)aValue
-{   highAlarmRange= aValue;    }
-
-
+- (double) minValue						  { return minValue;  }
+- (void) setMinValue:(double)aValue		  { minValue= aValue; }
+- (double) maxValue;					  { return maxValue;  }
+- (void) setMaxValue:(double)aValue		  { maxValue= aValue; }
+- (double) lowAlarmRange;				  { return lowAlarmRange; }
+- (void) setLowAlarmRange:(double)aValue  { lowAlarmRange= aValue; }
+- (double) highAlarmRange;				  { return highAlarmRange; }
+- (void) setHighAlarmRange:(double)aValue { highAlarmRange= aValue; }
 
 #pragma  mark •••Actions using the ADEI interface
 - (int) adeiType
@@ -2340,8 +2221,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     }
     
     //example: csvurl = [NSURL URLWithString: @"http://ipepdvadei.ka.fzk.de/adei/services/getdata.php?format=csv&db_server=toskanadb&db_name=prespektrometer_rep&db_group=1&window=1227618000-1227620000&db_mask=5,6,7,81,82,83"];
-    NSString *requestString = 
-        [NSString stringWithFormat: @"%@getdata.php?format=csv&db_server=%@&db_name=%@&db_group=%@&window=-1&db_mask=%@%@",
+    NSString *requestString = [NSString stringWithFormat: @"%@getdata.php?format=csv&db_server=%@&db_name=%@&db_group=%@&window=-1&db_mask=%@%@",
             [sensorPath valueForKey: kServiceString],
             [sensorPath valueForKey: kServerString],
             [sensorPath valueForKey: kDatabaseString],
@@ -2362,14 +2242,14 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
         //[self handleError:err];
         NSLog(@"ERROR: err != 0 in call of dataWithContentsOfURL:options:error: &err\n");
         return retVal;
-    }else{
+    }
+	else{
         // DebugTB( NSLog(@"SUCCESS reading CSV file\n"); )
     }
     // DebugTB( NSLog(@"NSData CSV file object has length %i\n",[csvData length]); )
     // DebugTB( NSLog(@"NSData CSV file description:\n%@\n",[csvData description]); )
     
-    NSString *csvText;
-    csvText = [[[NSString alloc] initWithData: csvData encoding: NSUTF8StringEncoding] autorelease]; //mah 09/01/09. added autorelease
+    NSString* csvText = [[[NSString alloc] initWithData: csvData encoding: NSUTF8StringEncoding] autorelease]; //mah 09/01/09. added autorelease
     // other values for encoding: NSASCIIStringEncoding, NSNonLossyASCIIStringEncoding, NSISOLatin1StringEncoding, NSNEXTSTEPStringEncoding
     /* this is not able to read the degree sign (°) correctly:
     csvText = [[NSString alloc] initWithData: csvData encoding: NSASCIIStringEncoding];
@@ -2418,8 +2298,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
 //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
 //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0
 //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&window=0
-    NSString *requestString = 
-        [NSString stringWithFormat: @"%@#db_server=%@&db_name=%@&db_group=%@&db_mask=%@&window=0%@",
+    NSString *requestString = [NSString stringWithFormat: @"%@#db_server=%@&db_name=%@&db_group=%@&db_mask=%@&window=0%@",
             [sensorPath valueForKey: kAdeiUrlString],
             [sensorPath valueForKey: kServerString],
             [sensorPath valueForKey: kDatabaseString],
@@ -2535,9 +2414,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
 //! Sets the ADEI base and service url.
 - (void) setAdeiBaseUrl: (NSString*) aUrl
 {
-    if(aUrl==nil){
-        return;
-    }
+    if(aUrl==nil) aUrl = @"";
     BOOL hasHttp, hasSlash;
     hasHttp = [aUrl hasPrefix:   @"http://"];
     hasSlash = [aUrl hasSuffix:   @"/"];
@@ -2656,8 +2533,6 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     xmlNode= aNode;
 }
 
-
-
 - (NSMutableArray *) children
 {
     return children; 
@@ -2699,7 +2574,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
 //#define DebugTB2(x) x
 - (int) createChildrenFromXmlDoc:(NSXMLDocument*)aDoc withType:(int)aType
 {
-
+	NSLog(@"%@\n",aDoc);
     DebugTB2(  NSLog(@"Calling %@ %@ for %p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);   )
 
     int count = 0;

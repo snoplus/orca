@@ -53,6 +53,10 @@
 				<string>id</string>
 				<key>openRightDrawer</key>
 				<string>id</string>
+				<key>pollNowAction</key>
+				<string>id</string>
+				<key>pollTimeAction</key>
+				<string>id</string>
 				<key>removeAdeiSetupOptionAction</key>
 				<string>id</string>
 				<key>requestSensorTreeButtonAction</key>
@@ -124,6 +128,8 @@
 				<string>NSTextField</string>
 				<key>monitoringIntValueField</key>
 				<string>NSTextField</string>
+				<key>pollTimePopup</key>
+				<string>NSPopUpButton</string>
 				<key>remoteHostField</key>
 				<string>NSTextField</string>
 				<key>remotePortField</key>

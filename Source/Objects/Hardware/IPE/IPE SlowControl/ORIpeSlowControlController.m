@@ -93,22 +93,22 @@
                        
 	[notifyCenter addObserver : self
                       selector: @selector(adeiBaseUrlChanged:)
-                          name: ORIpeSlowControlAdeiBaseUrlChangedNotification
+                          name: ORIpeSlowControlAdeiBaseUrlChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(adeiServiceUrlChanged:)
-                          name: ORIpeSlowControlAdeiServiceUrlChangedNotification
+                          name: ORIpeSlowControlAdeiServiceUrlChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(adeiSetupOptionsChanged:)
-                          name: ORIpeSlowControlAdeiSetupOptionsChangedNotification
+                          name: ORIpeSlowControlAdeiSetupOptionsChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(adeiTreeChanged:)
-                          name: ORIpeSlowControlAdeiTreeChangedNotification
+                          name: ORIpeSlowControlAdeiTreeChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
@@ -123,86 +123,90 @@
                        
 	[notifyCenter addObserver : self
                       selector: @selector(sensorListChanged:)
-                          name: ORIpeSlowControlSensorListChangedNotification
+                          name: ORIpeSlowControlSensorListChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(minValueChanged:)
-                          name: ORIpeSlowControlminValueChangedNotification
+                          name: ORIpeSlowControlminValueChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(dataChanged:)
-                          name: ORIpeSlowControlDataChangedNotification
+                          name: ORIpeSlowControlDataChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(adeiBaseUrlForSensorChanged:)
-                          name: ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification  
+                          name: ORIpeSlowControlAdeiBaseUrlForSensorChanged  
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(maxValueChanged:)
-                          name: ORIpeSlowControlmaxValueChangedNotification
+                          name: ORIpeSlowControlmaxValueChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(lowAlarmRangeChanged:)
-                          name: ORIpeSlowControllowAlarmRangeChangedNotification
+                          name: ORIpeSlowControllowAlarmRangeChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(highAlarmRangeChanged:)
-                          name: ORIpeSlowControlhighAlarmRangeChangedNotification
+                          name: ORIpeSlowControlhighAlarmRangeChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(selectedSensorNumChanged:)
-                          name: ORIpeSlowControlSelectedSensorNumChangedNotification
+                          name: ORIpeSlowControlSelectedSensorNumChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
                       selector: @selector(isRecordingDataChanged:)
-                          name: ORIpeSlowControlSetIsRecordingDataChangedNotification
+                          name: ORIpeSlowControlSetIsRecordingDataChanged
                        object : model];
                        
-    
+	[notifyCenter addObserver : self
+                     selector : @selector(pollTimeChanged:)
+                         name : ORIpeSlowControlPollTimeChanged
+                       object : nil];
+	
 
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[notifyCenter addObserver : self
                       selector: @selector(remotePortChanged:)
-                          name: ORIpeSlowControlRemotePortChangedNotification
+                          name: ORIpeSlowControlRemotePortChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(remoteHostChanged:)
-                          name: ORIpeSlowControlRemoteHostChangedNotification
+                          name: ORIpeSlowControlRemoteHostChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(isConnectedChanged:)
-                          name: ORIpeSlowControlIsConnectedChangedNotification
+                          name: ORIpeSlowControlIsConnectedChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(byteCountChanged:)
-                          name: ORIpeSlowControlByteCountChangedNotification
+                          name: ORIpeSlowControlByteCountChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(connectAtStartChanged:)
-                          name: ORIpeSlowControlConnectAtStartChangedNotification
+                          name: ORIpeSlowControlConnectAtStartChanged
                        object : [self model]];
     
 	[notifyCenter addObserver : self
                       selector: @selector(autoReconnectChanged:)
-                          name: ORIpeSlowControlAutoReconnectChangedNotification
+                          name: ORIpeSlowControlAutoReconnectChanged
                        object : [self model]];
                        
     // slow control -tb- //OBSOLETE
   	[notifyCenter addObserver : self
                       selector: @selector(monitoringFieldChanged:)
-                          name: ORIpeSlowControlMonitoringFieldChangedNotification
+                          name: ORIpeSlowControlMonitoringFieldChanged
                        object : [self model]];
 #endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   
@@ -212,6 +216,7 @@
 {
     [super updateWindow];
     [self setWindowTitle];
+	[self pollTimeChanged:nil];
 #if 0  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[self remotePortChanged:nil];
 	[self remoteHostChanged:nil];
@@ -251,8 +256,13 @@
 	[[self window] setTitle: [NSString stringWithFormat:@"IPE-ADEI Slow Control - %d",[model uniqueIdNumber]]];
 }
 
-
 //general settings tab
+
+- (void) pollTimeChanged:(NSNotification*)aNotification
+{
+	[pollTimePopup selectItemWithTag:[model pollTime]];
+}
+
 - (void) adeiBaseUrlChanged:(NSNotification*)aNote
 {
 	[adeiBaseUrlField setStringValue: [model adeiBaseUrl]];
@@ -462,12 +472,16 @@
 }
 
 
-
-
-
-
 //general settings tab
+- (IBAction) pollTimeAction:(id)sender
+{
+	[model setPollTime:[[sender selectedItem] tag]];
+}
 
+- (IBAction) pollNowAction:(id)sender
+{
+	[model pollSlowControls];
+}
 
 - (IBAction) adeiBaseUrlFieldAction:(id)sender
 {

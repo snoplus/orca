@@ -19,7 +19,6 @@
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
-#import "ORDataTaker.h"
 #import "ORDataChainObject.h"
 
 #pragma mark ***Forward Declarations
@@ -60,53 +59,44 @@
   * The tree in fact is only necessary for defining the sensors in the "channel map".
   *
   *
-  *<br><br><br>
-  * Comments (Till):
-  * <br>
-  * Subclassing from ORDataChainObject is necessary for automatic registering as data taker and writer-to-header. 
-  * Otherwhise there is no difference compared to subclassing from OrcaObject. (ORDataChainObject is a direct subclass of OrcaObject.)
-  * ((See fillInHeaderInfo in ORDocument.m))
   */
 
-@interface ORIpeSlowControlModel : ORDataChainObject <ORAdcProcessing,ORDataTaker>
+@interface ORIpeSlowControlModel : OrcaObject <ORAdcProcessing>
 {
     //Slow Control
-    int channelDataId;
+    int				 channelDataId;
     
-    
-  	NSString* currentSensor;//TODO: rename to currentSensorName  obsolete -tb-
-    int currentSensorIntValue;//obsolete -tb-
+  	NSString*		 currentSensor;//TODO: rename to currentSensorName  obsolete -tb-
+    int				 currentSensorIntValue;//obsolete -tb-
     
     //new -tb-
-    int selectedSensorNum;//number of selected sensor (for editing) in the interface
-    NSString *adeiBaseUrl;
-    NSString *adeiServiceUrl;
-    NSURL *myurl;
-    NSURL *csvurl;
-    NSXMLDocument *myxmldoc;
-    NSData *csvData;
-    ORSensorItem *rootAdeiTree;// root of outline view tree (ORSensorItem) = ADEI tree   -tb-
-    ORSensorItem *rootRequestTree;// root of request tree (ORSensorItem) = tree according to sensorList, describes
+    int				 selectedSensorNum;//number of selected sensor (for editing) in the interface
+    NSString*		 adeiBaseUrl;
+    NSString*		 adeiServiceUrl;
+    NSURL*			 myurl;
+    NSURL*			 csvurl;
+    NSXMLDocument*	 myxmldoc;
+    NSData*			 csvData;
+    ORSensorItem*	 rootAdeiTree;// root of outline view tree (ORSensorItem) = ADEI tree   -tb-
+    ORSensorItem*	 rootRequestTree;// root of request tree (ORSensorItem) = tree according to sensorList, describes
                                   // hierarchy of sensor list items, used for fast reading
     
-    int maxSensorListLength;
-    NSMutableArray* sensorList; // list of tableview items (ORSensorItem) - TODO: write methods! (e.g. never insert items manually, the order MUST stay fixed) -tb-
-
-    NSMutableArray* adeiSetupOptionsList; // list of adei setup options (to be able to use the test sensors)
+    int				 maxSensorListLength;
+    NSMutableArray*  sensorList; // list of tableview items (ORSensorItem) - TODO: write methods! (e.g. never insert items manually, the order MUST stay fixed) -tb-
+    NSMutableArray*  adeiSetupOptionsList; // list of adei setup options (to be able to use the test sensors)
 
     //stuff for convenient ADEI tree download (NSURLConnection + NSURLRequest -> NSXMLDocument)
-    double xmlRequestTimeout;
-    BOOL            readOnce;
-    double dataRequestTimeout;
-    NSMutableArray  *queueForLoadingAdeiTree;
-    ORSensorItem    *currentlyLoadingSensorNode;//temp internal variable used for XML request
-    NSURLConnection *theXMLConnection;
-    NSMutableData   *receivedXMLData;
-    
+    double			 xmlRequestTimeout;
+    BOOL             readOnce;
+    double			 dataRequestTimeout;
+    NSMutableArray*	 queueForLoadingAdeiTree;
+    ORSensorItem*	 currentlyLoadingSensorNode;//temp internal variable used for XML request
+    NSURLConnection* theXMLConnection;
+    NSMutableData*	 receivedXMLData;
+    int				 pollTime;
     //testing/debugging
     int heartbeatSec, heartbeatUSec;
     int heartbeatLastSec, heartbeatLastUSec;
-
 }
 
 #pragma mark ***Initialization
@@ -116,15 +106,14 @@
 - (void) setUpImage;
 - (void) makeMainController;
 
-#pragma mark •••Notifications
-- (void) registerNotificationObservers;
-
-
 #pragma mark ***Accessors
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
 - (int) channelDataId;
 - (void) setChannelDataId:(int) aValue;
+- (int) pollTime;
+- (void) setPollTime:(int)aPollTime;
+- (void) setRootAdeiTree:(ORSensorItem*)aSensorItem;
 
 #pragma mark ***Slow Control Accessors
 //obsolete -tb-
@@ -199,9 +188,8 @@
 - (void) requestSensorTreeADEI;
 - (void) rebuildConnectionsBetweenAdeiTreeAndSensorList;
 
-
-
-
+//polling
+- (void) pollSlowControls;
 
 #pragma mark •••Archival
 
@@ -209,10 +197,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 - (NSDictionary*) dataRecordDescription;
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
-
-
 
 #pragma mark •••Adc or Bit Processing Protocol
 - (void) startProcessCycle;
@@ -229,58 +214,37 @@
 - (void)processIsStarting; //not in Bit Processing Protocol, but seems to be necessary -tb-
 - (void)processIsStopping; //not in Bit Processing Protocol, but seems to be necessary -tb-
 
-#pragma mark •••  Data Taker Protocol
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) reset;
-
-
 #pragma mark •••ID Helpers (see OrcaObject)
-//- (NSString*) objectName;  // take from super class
-//- (NSString*) isDataTaker;  // take from super class
-//- (NSString*) supportsHardwareWizard;  //TODO: not yet implemented -tb-
 - (NSString*) identifier;
 
-
- 
 #pragma mark •••  Protocol ORHWWizard
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (int) numberOfChannels;
-
-
-
 @end //of @interface ORIpeSlowControlModel
-
-
-
-
-
-
 
 #pragma mark •••Notification Strings
 extern NSString* ORIpeSlowControlLock;
-extern NSString* ORIpeSlowControlSelectedSensorNumChangedNotification;
-extern NSString* ORIpeSlowControlAdeiServiceUrlChangedNotification;
-extern NSString* ORIpeSlowControlAdeiSetupOptionsChangedNotification;
-extern NSString* ORIpeSlowControlAdeiBaseUrlChangedNotification;
-extern NSString* ORIpeSlowControlAdeiTreeChangedNotification;
+extern NSString* ORIpeSlowControlSelectedSensorNumChanged;
+extern NSString* ORIpeSlowControlAdeiServiceUrlChanged;
+extern NSString* ORIpeSlowControlAdeiSetupOptionsChanged;
+extern NSString* ORIpeSlowControlAdeiBaseUrlChanged;
+extern NSString* ORIpeSlowControlAdeiTreeChanged;
 extern NSString* ORIpeSlowControlRequestingAdeiTreeStartedNotification;
 extern NSString* ORIpeSlowControlRequestingAdeiTreeStoppedNotification;
-extern NSString* ORIpeSlowControlSensorListChangedNotification;
+extern NSString* ORIpeSlowControlSensorListChanged;
 //slow control -tb-
-extern NSString* ORIpeSlowControlMonitoringFieldChangedNotification; //obsolete -tb-
+extern NSString* ORIpeSlowControlMonitoringFieldChanged; //obsolete -tb-
 
-extern NSString* ORIpeSlowControlDataChangedNotification;
-extern NSString* ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification;
+extern NSString* ORIpeSlowControlDataChanged;
+extern NSString* ORIpeSlowControlAdeiBaseUrlForSensorChanged;
 
-extern NSString* ORIpeSlowControlminValueChangedNotification;
-extern NSString* ORIpeSlowControlmaxValueChangedNotification;
-extern NSString* ORIpeSlowControllowAlarmRangeChangedNotification;
-extern NSString* ORIpeSlowControlhighAlarmRangeChangedNotification;
-extern NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification;
-
+extern NSString* ORIpeSlowControlminValueChanged;
+extern NSString* ORIpeSlowControlmaxValueChanged;
+extern NSString* ORIpeSlowControllowAlarmRangeChanged;
+extern NSString* ORIpeSlowControlhighAlarmRangeChanged;
+extern NSString* ORIpeSlowControlSetIsRecordingDataChanged;
+extern NSString* ORIpeSlowControlPollTimeChanged;
 
 #pragma mark •••Class ORSensorItem
 
@@ -315,13 +279,12 @@ enum  {kAdeiUnknown=0 , kAdeiTypeRoot, kAdeiTypeService, kAdeiTypeSetupOption, k
   *
   */
 @interface ORSensorItem : NSObject {
-//@interface ORSensorItem : OrcaObject {
     NSString* name; //a outline view column identifier
     NSString* tree; //a outline view column identifier
     NSString* value; //a outline view column identifier
     NSString* type;  //a outline view column identifier
     NSString* data;  //a outline view column identifier
-    NSString* date;  //a outline view column identifier
+    NSString* date;  //a outline view column identi
     double doubleData; // double version of  NSString* data
     long dataTimestampSec;// the timestamp of the data (seconds)
     long dataTimestampSubSec;// the timestamp of the data (subseconds, could be usec or nanosec! -tb-)

@@ -37,44 +37,42 @@
 	IBOutlet NSTextField*   monitoringIntValueField;
     
     //slow control - new -tb-
-    IBOutlet NSOutlineView *sensorTreeOutlineView;
+    IBOutlet NSOutlineView* sensorTreeOutlineView;
     
     // Main Dialog
-    IBOutlet NSTableView  *sensorTableView; // the channel/sensor list view
+    IBOutlet NSTableView*  sensorTableView; // the channel/sensor list view
     //tab view
-    IBOutlet NSTabView   *ipeSlowControlTabView;
+    IBOutlet NSTabView* ipeSlowControlTabView;
     //general settings tab
-    IBOutlet NSTextField *adeiBaseUrlField;
-    IBOutlet NSComboBox  *adeiSetupOptionsComboBox;
-    //IBOutlet NSComboBox  *adeiSetupOptionsComboBox;
-    IBOutlet NSTextField *adeiServiceUrlField;
-    IBOutlet NSTableView *adeiSetupOptionsTableView; // the setup options list view
-	IBOutlet NSButton    *addAdeiSetupOptionButton;
-	IBOutlet NSButton    *removeAdeiSetupOptionButton;// button text changed to "Delete"
-    IBOutlet NSScrollView *textView; //super class of a text view is NSText -tb-
-                                     //[textView documentView] is a NSTextView -tb-
+    IBOutlet NSTextField*   adeiBaseUrlField;
+    IBOutlet NSComboBox*    adeiSetupOptionsComboBox;
+	IBOutlet NSPopUpButton* pollTimePopup;
+	
+    //IBOutlet NSComboBox*	adeiSetupOptionsComboBox;
+    IBOutlet NSTextField*	adeiServiceUrlField;
+    IBOutlet NSTableView*	adeiSetupOptionsTableView; // the setup options list view
+	IBOutlet NSButton*		addAdeiSetupOptionButton;
+	IBOutlet NSButton*		removeAdeiSetupOptionButton;// button text changed to "Delete"
+    IBOutlet NSScrollView*	textView; //super class of a text view is NSText -tb-
+	
     //sensor settings tab
-    IBOutlet NSTextField *sensorNumField;
-    IBOutlet NSTextField *sensorAdeiBaseUrlField;
-    IBOutlet NSTextField *sensorAdeiServiceUrlField;
-    IBOutlet NSTextField *sensorPathField;
-    IBOutlet NSTextField *minValueField;
-    IBOutlet NSTextField *maxValueField;
-    IBOutlet NSTextField *lowAlarmRangeField;
-    IBOutlet NSTextField *highAlarmRangeField;
-	IBOutlet NSButton    *isRecordingDataButton;
-                                     
+    IBOutlet NSTextField*	sensorNumField;
+    IBOutlet NSTextField*	sensorAdeiBaseUrlField;
+    IBOutlet NSTextField*	sensorAdeiServiceUrlField;
+    IBOutlet NSTextField*	sensorPathField;
+    IBOutlet NSTextField*	minValueField;
+    IBOutlet NSTextField*	maxValueField;
+    IBOutlet NSTextField*	lowAlarmRangeField;
+    IBOutlet NSTextField*	highAlarmRangeField;
+	IBOutlet NSButton*		isRecordingDataButton;
                                      
     // Drawers
-    IBOutlet NSDrawer *leftDrawer;
-	IBOutlet NSButton *requestAdeiSensorTreeButton;
-	IBOutlet NSProgressIndicator *requestAdeiSensorTreeProgressIndicator;
-	IBOutlet NSButton *clearAdeiSensorTreeButton;
-    IBOutlet NSDrawer *rightDrawer;
-    //IBOutlet id  *adeiWebInterfaceWebView;
-    IBOutlet WebView  *adeiWebInterfaceWebView;
-
-    
+    IBOutlet NSDrawer*	leftDrawer;
+	IBOutlet NSButton*	requestAdeiSensorTreeButton;
+	IBOutlet NSProgressIndicator*	requestAdeiSensorTreeProgressIndicator;
+	IBOutlet NSButton*	clearAdeiSensorTreeButton;
+    IBOutlet NSDrawer*	rightDrawer;
+    IBOutlet WebView*	adeiWebInterfaceWebView;
 }
 
 #pragma mark ***Initialization
@@ -118,6 +116,7 @@
 - (void) lowAlarmRangeChanged:(NSNotification*)aNote;
 - (void) highAlarmRangeChanged:(NSNotification*)aNote;
 - (void) isRecordingDataChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
 
 // slow control -tb-
 - (void) monitoringFieldChanged:(NSNotification*)aNotification;
@@ -157,11 +156,10 @@
 - (IBAction)sensorListContextMenuEditAction:(id)sender;
 - (IBAction)sensorListContextMenuRemoveAction:(id)sender;
 - (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender;//web view
-
-
 - (IBAction)loadAdeiHomeInWebInterfaceWebViewAction:(id)sender;//web view
 
-
+- (IBAction) pollNowAction:(id)sender;
+- (IBAction) pollTimeAction:(id)sender;
 
 #pragma mark •••Data Source Methods (OutlineView)
 - (id) outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;
