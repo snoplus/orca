@@ -1206,7 +1206,7 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timedShipScalers) object:nil];
     [self shipScalerRecords];
-    
+    [self initBoard];
 	isRunning = NO;
 }
 
