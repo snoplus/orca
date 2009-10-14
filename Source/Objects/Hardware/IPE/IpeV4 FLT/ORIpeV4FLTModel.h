@@ -115,12 +115,13 @@
 	unsigned long	memoryAddress;
 	unsigned long	locationWord;
 	/** Reference to the Slt board for hardware access */
-	ORIpeFireWireCard* fireWireCard; 
+	ORIpeFireWireCard* fireWireCard; //TODO: I would like to rename it to sltCard (and class ORIpeCard?) -tb-
 	//-----------------------------------------
     
-	// Register information
+	// Register information (low level tab)
     unsigned short  selectedRegIndex;
     unsigned long   writeValue;
+    unsigned long   selectedChannelValue;
 
 }
 
@@ -206,6 +207,8 @@
 - (void) setSelectedRegIndex:(unsigned short) anIndex;
 - (unsigned long) writeValue;
 - (void) setWriteValue:(unsigned long) aValue;
+- (unsigned short) selectedChannelValue;
+- (void) setSelectedChannelValue:(unsigned short) aValue;
 
 
 #pragma mark •••HW Access
@@ -345,5 +348,5 @@ extern NSString* ORIpeSLTModelName;
 
 extern NSString* ORIpeV4FLTSelectedRegIndexChanged;
 extern NSString* ORIpeV4FLTWriteValueChanged;
-
+extern NSString* ORIpeV4FLTSelectedChannelValueChanged;
 

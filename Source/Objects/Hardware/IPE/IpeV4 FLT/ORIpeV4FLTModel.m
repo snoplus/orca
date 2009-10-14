@@ -62,6 +62,7 @@ NSString* ORIpeV4FLTModelCoinTimeChanged			 = @"ORIpeV4FLTModelCoinTimeChanged";
 
 NSString* ORIpeV4FLTSelectedRegIndexChanged			= @"ORIpeV4FLTSelectedRegIndexChanged";
 NSString* ORIpeV4FLTWriteValueChanged				= @"ORIpeV4FLTWriteValueChanged";
+NSString* ORIpeV4FLTSelectedChannelValueChanged		= @"ORIpeV4FLTSelectedChannelValueChanged";
 
 
 enum {
@@ -218,7 +219,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {@"AccessTest",         0x000040>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"SecondCounter",      0x000044>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 };
 
 
@@ -740,6 +741,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getAccessType: (short) anIndex
 {
 	return regV4[anIndex].accessType;
+}
+
+- (unsigned short) selectedChannelValue
+{
+    return selectedChannelValue;
+}
+
+- (void) setSelectedChannelValue:(unsigned short) aValue
+{
+    [[self undoManager] setActionName:@"Select Channel Number"]; // Set undo name
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannelValue:selectedChannelValue];
+    selectedChannelValue = aValue;
+    [[NSNotificationCenter defaultCenter]	 postNotificationName:ORIpeV4FLTSelectedChannelValueChanged	 object:self];
+NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 }
 
 - (unsigned short) selectedRegIndex
@@ -1373,6 +1388,7 @@ return 0;
     [self setReadoutPages:		[decoder decodeIntForKey:@"ORIpeV4FLTModelReadoutPages"]];	// ak, 2.7.07
     [self setWriteValue:		[decoder decodeIntForKey:@"ORIpeV4FLTModelwriteValue"]];
     [self setSelectedRegIndex:  [decoder decodeIntForKey:@"ORIpeV4FLTModelselectedRegIndex"]];
+    [self setSelectedChannelValue:  [decoder decodeIntForKey:@"ORIpeV4FLTModelSelectedChannelValue"]];
 	
 	//make sure these objects exist and are populated with nil objects.
 	int i;	
@@ -1436,6 +1452,7 @@ return 0;
 
     [encoder encodeInt:writeValue           forKey:@"ORIpeV4FLTModelwriteValue"];	
     [encoder encodeInt:selectedRegIndex  	forKey:@"ORIpeV4FLTModelselectedRegIndex"];	
+    [encoder encodeInt:selectedChannelValue	forKey:@"ORIpeV4FLTModelSelectedChannelValue"];	
 }
 
 - (NSDictionary*) dataRecordDescription

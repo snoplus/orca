@@ -127,8 +127,8 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) readoutPagesChanged:(NSNotification*)aNote;
 - (void) selectedRegIndexChanged:(NSNotification*) aNote;
-- (void) selectedChanIndexChanged:(NSNotification*) aNote;
 - (void) writeValueChanged:(NSNotification*) aNote;
+- (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
 - (IBAction) coinTimeAction:(id)sender;

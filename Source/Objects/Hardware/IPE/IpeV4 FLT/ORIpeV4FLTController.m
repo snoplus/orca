@@ -241,6 +241,12 @@
 					 selector : @selector(writeValueChanged:)
 						 name : ORIpeV4FLTWriteValueChanged
 					   object : model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(selectedChannelValueChanged:)
+						 name : ORIpeV4FLTSelectedChannelValueChanged
+					   object : model];
+	
 }
 
 #pragma mark •••Interface Management
@@ -293,7 +299,7 @@
         [[channelPopUp itemAtIndex:i] setTag: i];
     }
     [channelPopUp insertItemWithTitle: @"All" atIndex:i];
-    [[channelPopUp itemAtIndex:i] setTag: i];
+    [[channelPopUp itemAtIndex:i] setTag: 0x1f];// chan 31 = broadcast to all channels
     
 }
 
@@ -324,6 +330,9 @@
 	[self thresholdOffsetChanged:nil];
 	[self integrationTimeChanged:nil];
 	[self coinTimeChanged:nil];
+	[self selectedRegIndexChanged:nil];
+	[self writeValueChanged:nil];
+	[self selectedChannelValueChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -386,6 +395,8 @@
 	short index = [model selectedRegIndex];
 	BOOL readAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegReadable)>0;
 	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegWriteable)>0;
+	BOOL needsChannel = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegNeedsChannel)>0;
+
 	
 	[regWriteButton setEnabled:writeAllowed];
 	[regReadButton setEnabled:readAllowed];
@@ -394,6 +405,7 @@
 	[regWriteValueTextField setEnabled:writeAllowed];
     
     //TODO: extend the accesstype to "channel" and "block64" -tb-
+    [channelPopUp setEnabled: needsChannel];
 }
 
 
@@ -613,19 +625,21 @@
 	[self enableRegControls];
 }
 
-- (void) selectedChanIndexChanged:(NSNotification*) aNote
-{
- NSLog(@"This is v4FLT selectedChanIndexChanged\n" );
-    //[registerPopUp selectItemAtIndex: [model selectedRegIndex]];
-	[self updatePopUpButton:channelPopUp	 setting:[model selectedRegIndex]];
-	
-	[self enableRegControls];
-}
-
 - (void) writeValueChanged:(NSNotification*) aNote
 {
     [regWriteValueTextField setIntValue: [model writeValue]];
 }
+
+- (void) selectedChannelValueChanged:(NSNotification*) aNote
+{
+ NSLog(@"This is v4FLT selectedChannelValueChanged\n" );
+    //[registerPopUp selectItemAtIndex: [model selectedRegIndex]];
+    [channelPopUp selectItemWithTag: [model selectedChannelValue]];
+	//[self updatePopUpButton:channelPopUp	 setting:[model selectedRegIndex]];
+	
+	[self enableRegControls];
+}
+
 
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -918,11 +932,11 @@
 {
  //NSLog(@"This is: FLTv4: selectChannelAction\n");
     // Make sure that value has changed.
-    if(0) //TODO: under development -tb-
-    if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
-	    [[model undoManager] setActionName:@"Select Register"]; // Set undo name
-	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
-		[self settingsLockChanged:nil];
+    if(1) //TODO: under development -tb-
+    if ([[aSender selectedItem] tag] != [model selectedChannelValue]){
+	    //[[model undoManager] setActionName:@"Select Channel Number"]; // Set undo name do it at model side -tb-
+	    [model setSelectedChannelValue:[[aSender selectedItem] tag]]; // set new value
+		//[self settingsLockChanged:nil]; //TODO: is it needed here ? -tb-
     }
 }
 
@@ -938,10 +952,18 @@
 
 - (IBAction) readRegAction: (id) sender
 {
-	int index = [registerPopUp indexOfSelectedItem];
+	//int index = [registerPopUp indexOfSelectedItem];
+	int index = [model selectedRegIndex]; 
 	@try {
-		unsigned long value = [model readReg:index];
-		NSLog(@"FLTv4 reg: %@ has value: 0x%x\n",[model getRegisterName:index],value);
+		unsigned long value;
+        if(([model getAccessType:index] & kIpeRegNeedsChannel)){
+            int chan = [model selectedChannelValue];
+		    value = [model readReg:index channel: chan ];
+		    NSLog(@"FLTv4 reg: %@ for channel %i has value: 0x%x (%i)\n",[model getRegisterName:index], chan, value, value);
+        }else{
+		    value = [model readReg:index ];
+		    NSLog(@"FLTv4 reg: %@ has value: 0x%x (%i)\n",[model getRegisterName:index],value, value);
+        }
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT reg: %@\n",[model getRegisterName:index]);
@@ -954,14 +976,24 @@
 	[self endEditing];
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
-		//[model writeReg:index value:[model writeValue]];
-		[model writeReg:index value:[regWriteValueTextField intValue]];
-		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
-		NSLog(@"wrote 0x%x to FLTv4 reg: %@ \n",[regWriteValueTextField intValue],[model getRegisterName:index]);
+		unsigned long val = [model writeValue];
+        if(([model getAccessType:index] & kIpeRegNeedsChannel)){
+            int chan = [model selectedChannelValue];
+    		//[model writeReg:index value:[model writeValue]];
+    		//[model writeReg:index value:[regWriteValueTextField intValue]];//TODO: allow hex values, e.g. 0x23 -tb-
+    		[model writeReg:index  channel: chan value: val];//TODO: allow hex values, e.g. 0x23 -tb-
+    		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+    		NSLog(@"wrote 0x%x (%i) to FLTv4 reg: %@ channel %i\n", val, val, [model getRegisterName:index], chan);
+        }else{
+    		//[model writeReg:index value:[model writeValue]];
+    		[model writeReg:index value: val];//TODO: allow hex values, e.g. 0x23 -tb-
+    		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+    		NSLog(@"wrote 0x%x (%i) to FLTv4 reg: %@ \n",val,val,[model getRegisterName:index]);
+        }
 	}
 	@catch(NSException* localException) {
-		NSLog(@"Exception writing SLT reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+		NSLog(@"Exception writing FLTv4 reg: %@\n",[model getRegisterName:index]);
+        NSRunAlertPanel([localException name], @"%@\nFLTv4%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
