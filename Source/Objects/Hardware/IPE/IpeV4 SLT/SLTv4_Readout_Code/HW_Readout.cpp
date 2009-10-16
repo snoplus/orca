@@ -273,6 +273,18 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     }
     else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
 */
+
+    //"counter" for debugging
+    
+
+    uint32_t dataId            = config->card_info[index].hw_mask[0];
+    uint32_t stationNumber     = config->card_info[index].slot;
+    uint32_t crate             = config->card_info[index].crate;
+    data[dataIndex++] = dataId | 5;
+    data[dataIndex++] =  ((stationNumber & 0x0000001f) << 16) | (crate & 0x0f) <<21;
+    data[dataIndex++] = 6;
+    data[dataIndex++] = 8;
+    data[dataIndex++] = 15;
     return config->card_info[index].next_Card_Index;
 }            
 
