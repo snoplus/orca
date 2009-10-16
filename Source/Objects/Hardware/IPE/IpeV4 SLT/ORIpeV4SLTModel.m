@@ -1208,9 +1208,10 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [self clearExceptionCount];
 	
 	//check that we can actually run
-    if(![[[self crate] adapter] serviceIsAlive]){
-		[NSException raise:@"No FireWire Service" format:@"Check Crate Power and FireWire Cable."];
-    }
+//TODO: this was a firewire check - is there a check of "Connected to Crate/PrPMC? -tb-
+//    if(![[[self crate] adapter] serviceIsAlive]){
+//		[NSException raise:@"No FireWire Service" format:@"Check Crate Power and FireWire Cable."];
+//    }
 	
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
@@ -1458,6 +1459,9 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
+#define DebugMethCallsTB(x) x
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id	= kSLTv4;	//should be unique
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
