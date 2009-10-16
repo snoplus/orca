@@ -47,7 +47,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Lo
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
-
+	[aDataSet loadGenericData:@" " sender:self withKeys:@"v4SLT",@"Test Record",nil];
     return length; //nothing to display at this time.. just return the length
 }
 
