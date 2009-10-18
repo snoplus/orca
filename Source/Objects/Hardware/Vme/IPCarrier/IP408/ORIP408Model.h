@@ -75,7 +75,7 @@
 #pragma mark ¥¥¥Bit Processing Protocol
 - (void) startProcessCycle;
 - (void) endProcessCycle;
-- (int) processValue:(int)channel;
+- (BOOL) processValue:(int)channel;
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 

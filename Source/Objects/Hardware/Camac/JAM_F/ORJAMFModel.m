@@ -532,9 +532,9 @@ struct {
     //nothing to do
 }
 
-- (int) processValue:(int)channel
+- (BOOL) processValue:(int)channel
 {
-	return 0;
+	return [self convertedValue:channel]!=0;
 }
 
 - (void) setProcessOutput:(int)channel value:(int)value

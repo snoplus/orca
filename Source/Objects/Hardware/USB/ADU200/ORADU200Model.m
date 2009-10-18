@@ -590,7 +590,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 	}
 }
 
-- (int) processValue:(int)channel
+- (BOOL) processValue:(int)channel
 {
 	return (processInputValue & (1L<<channel)) > 0;
 }

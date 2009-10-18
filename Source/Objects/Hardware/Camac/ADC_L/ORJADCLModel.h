@@ -105,7 +105,7 @@
 - (void)processIsStopping;
 - (void) startProcessCycle;
 - (void) endProcessCycle;
-- (int) processValue:(int)channel;
+- (BOOL) processValue:(int)channel;
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;

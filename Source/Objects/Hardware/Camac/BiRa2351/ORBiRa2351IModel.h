@@ -60,7 +60,7 @@
 - (void)processIsStopping;
 - (void) startProcessCycle;
 - (void) endProcessCycle;
-- (int) processValue:(int)channel;
+- (BOOL) processValue:(int)channel;
 - (NSString*) processingTitle;
 
 @end

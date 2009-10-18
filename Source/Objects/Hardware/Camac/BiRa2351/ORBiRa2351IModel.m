@@ -193,7 +193,7 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
 {
 }
 
-- (int) processValue:(int)channel;
+- (BOOL) processValue:(int)channel;
 {
 	return (processInputValue & (1L<<channel)) > 0;
 }

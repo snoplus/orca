@@ -371,7 +371,7 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
 	[self setOutputWithMask:processOutputMask value:processOutputValue];
 }
 
-- (int) processValue:(int)channel
+- (BOOL) processValue:(int)channel
 {
 	return (processInputValue & (1L<<channel)) > 0;
 }

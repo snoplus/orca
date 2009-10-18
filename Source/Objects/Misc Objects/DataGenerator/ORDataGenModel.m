@@ -206,9 +206,9 @@
 {
 }
 
-- (int) processValue:(int)channel
+- (BOOL) processValue:(int)channel
 {
-	return 0;
+	return adcValue!=0;
 }
 
 - (void) setProcessOutput:(int)channel value:(int)value
