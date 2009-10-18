@@ -74,7 +74,6 @@
 		2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */; };
 		2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */; };
 		2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */; };
-		2D2C84090F4EC6650005D69F /* ORIpeSlowControlDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */; };
 		2D6672DC106D30EA001C4A11 /* HW_Readout.cpp in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D6672C4106D2F48001C4A11 /* HW_Readout.cpp */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
@@ -359,6 +358,8 @@
 		84200CA206764C120048DFB4 /* ORSubPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84200CA006764C120048DFB4 /* ORSubPlotController.h */; };
 		84200CA306764C120048DFB4 /* ORSubPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84200CA106764C120048DFB4 /* ORSubPlotController.m */; };
 		842042070F0C082D00720846 /* Continue.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842042060F0C082D00720846 /* Continue.tif */; };
+		8421064C1085A28E00C3AA81 /* ORAdeiLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 8421064A1085A28E00C3AA81 /* ORAdeiLoader.m */; };
+		8421064D1085A28E00C3AA81 /* ORAdeiLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8421064B1085A28E00C3AA81 /* ORAdeiLoader.h */; };
 		84211E371074E5CD00CCB0C0 /* IpeV4SLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */; };
 		84216070094F7F9E002E68B7 /* ORAdcModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8421606E094F7F9E002E68B7 /* ORAdcModel.h */; };
 		84216071094F7F9E002E68B7 /* ORAdcModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8421606F094F7F9E002E68B7 /* ORAdcModel.m */; };
@@ -2269,7 +2270,6 @@
 		2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlModel.m; path = "IPE SlowControl/ORIpeSlowControlModel.m"; sourceTree = "<group>"; };
 		2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDecoder.h; path = "IPE SlowControl/ORIpeSlowControlDecoder.h"; sourceTree = "<group>"; };
 		2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlDecoder.m; path = "IPE SlowControl/ORIpeSlowControlDecoder.m"; sourceTree = "<group>"; };
-		2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDefs.h; path = "IPE SlowControl/ORIpeSlowControlDefs.h"; sourceTree = "<group>"; };
 		2D6672C4106D2F48001C4A11 /* HW_Readout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HW_Readout.cpp; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
@@ -2575,6 +2575,8 @@
 		84200CA006764C120048DFB4 /* ORSubPlotController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSubPlotController.h; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.h"; sourceTree = SOURCE_ROOT; };
 		84200CA106764C120048DFB4 /* ORSubPlotController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSubPlotController.m; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.m"; sourceTree = SOURCE_ROOT; };
 		842042060F0C082D00720846 /* Continue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Continue.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Continue.tif"; sourceTree = SOURCE_ROOT; };
+		8421064A1085A28E00C3AA81 /* ORAdeiLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAdeiLoader.m; path = "Source/Objects/Hardware/IPE/IPE SlowControl/ORAdeiLoader.m"; sourceTree = SOURCE_ROOT; };
+		8421064B1085A28E00C3AA81 /* ORAdeiLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAdeiLoader.h; path = "Source/Objects/Hardware/IPE/IPE SlowControl/ORAdeiLoader.h"; sourceTree = SOURCE_ROOT; };
 		84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4SLT.nib; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/IpeV4SLT.nib"; sourceTree = SOURCE_ROOT; };
 		8421606E094F7F9E002E68B7 /* ORAdcModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAdcModel.h; sourceTree = "<group>"; };
 		8421606F094F7F9E002E68B7 /* ORAdcModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAdcModel.m; sourceTree = "<group>"; };
@@ -4507,15 +4509,16 @@
 		2D1AB8070F1B9EBC00E6B850 /* IPE SlowControl */ = {
 			isa = PBXGroup;
 			children = (
-				2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */,
-				2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */,
-				2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */,
-				2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */,
-				2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */,
-				2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */,
-				2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */,
 				2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */,
 				2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */,
+				2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */,
+				2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */,
+				2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */,
+				2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */,
+				8421064A1085A28E00C3AA81 /* ORAdeiLoader.m */,
+				8421064B1085A28E00C3AA81 /* ORAdeiLoader.h */,
+				2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */,
+				2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */,
 			);
 			name = "IPE SlowControl";
 			sourceTree = "<group>";
@@ -8651,9 +8654,8 @@
 				84F46F0F0CA44255007EFADA /* ORIpeFireWireCard.h */,
 				84F46F100CA44255007EFADA /* ORIpeFireWireCard.m */,
 			);
-			name = "IPE Base Classes";
-			path = "Source/Objects/Hardware/IPE/IPE Base Classes";
-			sourceTree = SOURCE_ROOT;
+			path = "IPE Base Classes";
+			sourceTree = "<group>";
 		};
 		84F46F110CA44255007EFADA /* IPE Crate */ = {
 			isa = PBXGroup;
@@ -10074,7 +10076,6 @@
 				84B28E600F4C835500E2B056 /* ORUnivVoltHVCrateExceptions.h in Headers */,
 				84B28E610F4C835500E2B056 /* ORUnivVoltHVCrateModel.h in Headers */,
 				2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */,
-				2D2C84090F4EC6650005D69F /* ORIpeSlowControlDefs.h in Headers */,
 				84EBBEE70F52D9A700F57BDD /* ORCaen419Controller.h in Headers */,
 				84EBBEE90F52D9A700F57BDD /* ORCaen419Model.h in Headers */,
 				84EBC2140F530E4A00F57BDD /* ORCaen419Decoders.h in Headers */,
@@ -10132,6 +10133,7 @@
 				84AB101E1057D6990069D5E2 /* ORiTransGasSensorModel.h in Headers */,
 				84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */,
 				848BF510107255F8005779A2 /* PMC_Link.h in Headers */,
+				8421064D1085A28E00C3AA81 /* ORAdeiLoader.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11518,6 +11520,7 @@
 				84AB101F1057D6990069D5E2 /* ORiTransGasSensorModel.m in Sources */,
 				84DBA1331058122C00884B1C /* ORiTransGasSensorController.m in Sources */,
 				848BF50F107255F8005779A2 /* PMC_Link.m in Sources */,
+				8421064C1085A28E00C3AA81 /* ORAdeiLoader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
