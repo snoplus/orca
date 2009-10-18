@@ -649,7 +649,6 @@ else {\
    else  return [super validateMenuItem:menuItem];
 }
 
-
 - (IBAction)delete:(id)sender
 {
     [self removeItemAction:nil];
