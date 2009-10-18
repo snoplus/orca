@@ -77,11 +77,25 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
 	ePtr = (katrinEventDataStruct*) ptr;			//recast to event structure
 
     //NSLog(@"Channel %08x - %8d %8d\n", ePtr->channelMap, ePtr->sec, ePtr->subSec);
-			
+	//channel by channel histograms
 	[aDataSet histogram:ePtr->energy 
 					  numBins:32768 
 					  sender:self  
 					  withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
+	
+	//accumulated card level histograms
+	[aDataSet histogram:ePtr->energy 
+				numBins:32768 
+				 sender:self  
+			   withKeys: @"FLT",@"Total Card Energy",crateKey,stationKey,nil];
+	
+	//accumulated crate level histograms
+	[aDataSet histogram:ePtr->energy 
+				numBins:32768 
+				 sender:self  
+			   withKeys: @"FLT",@"Total Crate Energy",crateKey,nil];
+	
+	
 
     return length; //must return number of longs processed.
 }
