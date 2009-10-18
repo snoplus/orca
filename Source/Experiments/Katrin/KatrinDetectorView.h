@@ -19,8 +19,8 @@
 {	
     IBOutlet ORColorScale* focalPlaneColorScale;
     IBOutlet ORColorScale* vetoColorScale;
-	BOOL useCrateView;
+	BOOL viewType;
 }
-- (void) setUseCrateView:(BOOL)aState;
-- (void) makeAllSegments;
+- (void) setViewType:(int)aViewType;
+
 @end

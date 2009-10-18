@@ -28,8 +28,8 @@
 #import "ORCommandCenter.h"
 
 NSString* KatrinModelSlowControlIsConnectedChanged = @"KatrinModelSlowControlIsConnectedChanged";
-NSString* KatrinModelSlowControlNameChanged		= @"KatrinModelSlowControlNameChanged";
-NSString* ORKatrinModelUseCrateViewChanged		= @"ORKatrinModelUseCrateViewChanged";
+NSString* KatrinModelSlowControlNameChanged			= @"KatrinModelSlowControlNameChanged";
+NSString* ORKatrinModelViewTypeChanged				= @"ORKatrinModelViewTypeChanged";
 
 static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
@@ -64,8 +64,8 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - 35,2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:KatrinDbConnector];
     [aConnector setOffColor:[NSColor brownColor]];
-	[aConnector setConnectorType: 'DB O'];
-	[aConnector addRestrictedConnectionType: 'DB I']; //can only connect to DB Inputs
+	[aConnector setConnectorType: 'ADEO'];
+	[aConnector addRestrictedConnectionType: 'ADEI']; //can only connect to DB Inputs
     [aConnector release];
 }
 
@@ -184,17 +184,16 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	return @"KatrinDetailsLock";
 }
 
-- (void) setUseCrateView:(BOOL)aUseCrateView
+- (void) setViewType:(int)aViewType
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] setUseCrateView:useCrateView];
-	useCrateView = aUseCrateView;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelUseCrateViewChanged object:self userInfo:nil];
-	
+	[[[self undoManager] prepareWithInvocationTarget:self] setViewType:aViewType];
+	viewType = aViewType;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinModelViewTypeChanged object:self userInfo:nil];
 }
 
-- (BOOL) useCrateView
+- (int) viewType
 {
-	return useCrateView;
+	return viewType;
 }
 
 - (id)initWithCoder:(NSCoder*)decoder
@@ -204,7 +203,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     [[self undoManager] disableUndoRegistration];
     
     [self setSlowControlName:[decoder decodeObjectForKey:@"slowControlName"]];
-    [self setUseCrateView:[decoder decodeBoolForKey:@"useCrateView"]];
+    [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 	[[self undoManager] enableUndoRegistration];
 
     return self;
@@ -214,7 +213,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:slowControlName forKey:@"slowControlName"];
-    [encoder encodeBool:useCrateView forKey:@"useCrateView"];
+    [encoder encodeInt:viewType forKey:@"viewType"];
 }
 
 

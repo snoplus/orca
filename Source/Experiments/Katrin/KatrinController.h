@@ -25,7 +25,7 @@
 @class ORSegmentGroup;
 
 @interface KatrinController : ORExperimentController {
-
+ 
     IBOutlet ORColorScale*	secondaryColorScale;
 	IBOutlet NSTextField*	slowControlNameField;
 	IBOutlet NSTextField*	slowControlIsConnectedField;
@@ -43,7 +43,7 @@
 
 	//items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
-    IBOutlet NSMatrix*		showCrateViewMatrix;
+    IBOutlet NSPopUpButton*	viewTypePU;
 
 	ORSegmentGroup* secondaryGroup;
 	NSView *blankView;
@@ -66,7 +66,7 @@
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
 
-- (IBAction) showCrateViewAction:(id)sender;
+- (IBAction) viewTypeAction:(id)sender;
 
 #pragma mark ¥¥¥Detector Interface Management
 - (void) slowControlNameChanged:(NSNotification*)aNote;
@@ -79,7 +79,7 @@
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
-- (void) showCrateViewChanged:(NSNotification*)aNote;
+- (void) viewTypeChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Table Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 
@@ -95,5 +95,5 @@
 
 @end
 @interface ORDetectorView (Katrin)
-- (void) setUseCrateView:(BOOL)aState;
+- (void) setViewType:(int)aState;
 @end

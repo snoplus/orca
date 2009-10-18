@@ -131,8 +131,8 @@
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(showCrateViewChanged:)
-                         name : ORKatrinModelUseCrateViewChanged
+                     selector : @selector(viewTypeChanged:)
+                         name : ORKatrinModelViewTypeChanged
 						object: model];
 	
 	
@@ -154,13 +154,13 @@
 	
 	[self slowControlIsConnectedChanged:nil];
 	[self slowControlNameChanged:nil];
-	[self showCrateViewChanged:nil];
+	[self viewTypeChanged:nil];
 }
 
-- (void) showCrateViewChanged:(NSNotification*)aNote
+- (void) viewTypeChanged:(NSNotification*)aNote
 {
-	[showCrateViewMatrix selectCellWithTag:[model useCrateView]];
-	[detectorView setUseCrateView:[model useCrateView]];
+	[viewTypePU selectItemAtIndex:[model viewType]];
+	[detectorView setViewType:[model viewType]];
 	[detectorView makeAllSegments];	
 }
 
@@ -229,9 +229,9 @@
 
 #pragma mark ¥¥¥Interface Management
 
-- (IBAction) showCrateViewAction:(id)sender
+- (IBAction) viewTypeAction:(id)sender
 {
-	[model setUseCrateView:[[sender selectedCell]tag]];
+	[model setViewType:[sender indexOfSelectedItem]];
 }
 
 - (void) slowControlNameChanged:(NSNotification*)aNote
@@ -260,9 +260,9 @@
 {
 	[super specialUpdate:aNote];
 	[secondaryValuesView reloadData];
-	if([model useCrateView]){
+	//if([model viewType] == kUseCrateView){
 		[detectorView makeAllSegments];
-	}
+	//}
 }
 
 - (void) setDetectorTitle

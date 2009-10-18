@@ -105,6 +105,8 @@
 				<string>id</string>
 				<key>slowControlNameAction</key>
 				<string>id</string>
+				<key>viewTypeAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>KatrinController</string>
@@ -140,6 +142,8 @@
 				<string>NSTextField</string>
 				<key>slowControlNameField</key>
 				<string>NSTextField</string>
+				<key>viewTypePU</key>
+				<string>NSPopUpButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>ORExperimentController</string>
@@ -321,6 +325,10 @@
 				<string>NSMatrix</string>
 				<key>displayTypeMatrix1</key>
 				<string>NSMatrix</string>
+				<key>displayTypePU</key>
+				<string>NSPopUpButton</string>
+				<key>displayTypePU1</key>
+				<string>NSPopUpButton</string>
 				<key>elapsedTimeField</key>
 				<string>NSTextField</string>
 				<key>hardwareCheckView</key>

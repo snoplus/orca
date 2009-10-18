@@ -22,19 +22,23 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
 
+#define kUsePixelView 0
+#define kUseCrateView 1
+#define kUsePreampView 2
+
 @interface KatrinModel :  ORExperimentModel
 {
 	NSString* slowControlName;
 	int	      slowControlIsConnected;
-	BOOL	  useCrateView;
+	int		  viewType;
 }
 #pragma mark ¥¥¥Accessors
 - (NSString*) slowControlName;
 - (void) setSlowControlName:(NSString*)aName;
 - (BOOL) slowControlIsConnected;
 - (void) setSlowControlIsConnected:(BOOL)aState;
-- (void) setUseCrateView:(BOOL)aUseCrateView;
-- (BOOL) useCrateView;
+- (void) setViewType:(int)aViewType;
+- (int) viewType;
 
 #pragma mark ¥¥¥Slow Control Connection Monitoring
 - (void) slowControlConnectionChanged:(NSNotification*)aNote;
@@ -50,5 +54,5 @@
 
 extern NSString* KatrinModelSlowControlIsConnectedChanged;
 extern NSString* KatrinModelSlowControlNameChanged;
-extern NSString* ORKatrinModelUseCrateViewChanged;
+extern NSString* ORKatrinModelViewTypeChanged;
 
