@@ -30,7 +30,7 @@
 	IBOutlet NSButton*		showNamesCB;
 
 	//detector View tab view
-	IBOutlet NSMatrix*		displayTypeMatrix;
+	IBOutlet NSPopUpButton*	displayTypePU;
 	IBOutlet NSTextView*	selectionStringTextView;
     IBOutlet ORDetectorView* detectorView;
     IBOutlet ORColorScale*	primaryColorScale;
@@ -57,7 +57,7 @@
     IBOutlet NSProgressIndicator* 	runBar;
 
 	//items in the  details tab view
-	IBOutlet NSMatrix*		displayTypeMatrix1;
+	IBOutlet NSPopUpButton*	displayTypePU1;
     IBOutlet ORPlotter1D*	valueHistogramsPlot;
 	IBOutlet NSTextField*	histogramTitle;
     IBOutlet NSTableView*	primaryValuesView;

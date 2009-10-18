@@ -57,6 +57,9 @@
    
     [[ratePlot xScale] setNeedsDisplay:YES];
     [[ratePlot yScale] setNeedsDisplay:YES];
+	[[ratePlot yScale] setInteger:NO];
+	[[ratePlot yScale] setRngLimitsLow:0 withHigh:5000000 withMinRng:1];
+
     [[primaryColorScale colorAxis] setNeedsDisplay:YES];
     [selectionStringTextView setFont:[NSFont fontWithName:@"Monaco" size:9]];
 
@@ -432,7 +435,7 @@
 - (IBAction) displayTypeAction:(id)sender
 {
 	[self endEditing];
-	int type = [[sender selectedCell] tag];
+	int type = [[sender selectedCell]tag];
 	[model setDisplayType:type];	
 	[self setValueHistogramTitle];
 	[self scaleValueHistogram];
@@ -586,8 +589,8 @@
 
 - (void) displayTypeChanged:(NSNotification*)aNote
 {
-	[displayTypeMatrix selectCellWithTag: [model displayType]];
-	[displayTypeMatrix1 selectCellWithTag: [model displayType]];
+	[displayTypePU selectItemWithTag: [model displayType]];
+	[displayTypePU1 selectItemWithTag: [model displayType]];
 	[model compileHistograms];
 	[detectorView setNeedsDisplay:YES];
 	[valueHistogramsPlot setNeedsDisplay:YES];
