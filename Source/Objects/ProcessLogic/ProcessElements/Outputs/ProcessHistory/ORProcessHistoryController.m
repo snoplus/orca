@@ -47,7 +47,8 @@
 	[[plotter yScale] setRngLimitsLow:-1000 withHigh:1000 withMinRng:5];
 	[[plotter yScale] setRngDefaultsLow:0 withHigh:20];
 
-	[[plotter xScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
+	[[plotter xScale] setRngLimitsLow:0 withHigh:50000 withMinRng:10];
+	[[plotter xScale] setRngDefaultsLow:0 withHigh:50000];
 
 }
 
