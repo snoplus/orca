@@ -16,71 +16,48 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
 #pragma mark ***Imported Files
-#import <WebKit/WebKit.h> // needed for WebView
+#import <WebKit/WebKit.h>
 #import "ORIpeSlowControlController.h"
 #import "ORIpeSlowControlModel.h"
-
-
-// this is for testing and debugging the  code -tb- 2008-12-08
-//#define __ORCA_DEVELOPMENT__CONFIGURATION__
-#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
-
-    #define USE_TILLS_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
-    #ifdef USE_TILLS_DEBUG_MACRO
-      #define    DebugTB(x) x
-    #else
-      #define    DebugTB(x) 
-    #endif
-
-    #if 0
-      // if 1 all methods will print out a message -> for testing IB connections -tb-
-      #define    DebugMethCallsTB(x) x
-    #else
-      #define    DebugMethCallsTB(x) 
-    #endif
-    
-#else
-  #define    DebugTB(x) 
-  #define    DebugMethCallsTB(x) 
-#endif
-
+#import "ORTimedTextField.h"
+#import "ORPlotter1D.h"
 
 @implementation ORIpeSlowControlController
 
-
-//TODO:
-//TODO:
-//TODO:
-//TODO: I kept the elements of the Listener.nib, they are hidden in the lower part of the window -tb- 2008-05-19
-//TODO: (to see them, enlarge the window in the IpeSlowControl.nib file in Interface builder -tb-
-//TODO:
-//TODO:
-//TODO:
-
-
 #pragma mark ***Initialization
-
 - (id) init
 {
 	self = [super initWithWindowNibName:@"IpeSlowControl"];
 	return self;
 }
 
-- (void) dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super dealloc];
-}
-
 - (void) awakeFromNib
 {
-    [super awakeFromNib];
+	[super awakeFromNib];
+	[ipNumberComboBox setUsesDataSource:YES];
+	[ipNumberComboBox setDataSource:self];
+	[lastRequestField setTimeOut:1];
+    [itemTreeOutlineView setVerticalMotionCanBeginDrag:YES];
+    [itemTableView registerForDraggedTypes:[NSArray arrayWithObjects:@"ORItemType", nil]];
+	[ipNumberComboBox reloadData];
+	[viewItemInWebButton setEnabled:NO];
+	[setPointField setEnabled:NO];
+	[setPointButton setEnabled:NO];
+	[webViewButton setTitle:@"See Web View"];
+	[treeViewButton setTitle:@"See ADEI Tree"];
+	[treeDetailsView setAlignment:NSLeftTextAlignment];
+	[itemDetailsView setAlignment:NSLeftTextAlignment];
+	
+	[[timingPlotter yScale] setRngLimitsLow:0 withHigh:1e10 withMinRng:5];
+    [[timingPlotter yScale] setRngLow:0 withHigh:200];
+    [[timingPlotter yScale] setLog:NO];
+    [[timingPlotter xScale] setRngLimitsLow:0 withHigh:kResponseTimeHistogramSize withMinRng:100];
+    [[timingPlotter xScale] setRngLow:0 withHigh:kResponseTimeHistogramSize];
+    [[timingPlotter xScale] setLog:NO];
 }
 
 #pragma mark ***Notifications
-
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -90,126 +67,92 @@
                      selector : @selector(lockChanged:)
                          name : ORIpeSlowControlLock
                        object : nil];
-                       
+                                              
 	[notifyCenter addObserver : self
-                      selector: @selector(adeiBaseUrlChanged:)
-                          name: ORIpeSlowControlAdeiBaseUrlChanged
+                      selector: @selector(treeChanged:)
+                          name: ORIpeSlowItemTreeChanged
                        object : model];
                        
 	[notifyCenter addObserver : self
-                      selector: @selector(adeiServiceUrlChanged:)
-                          name: ORIpeSlowControlAdeiServiceUrlChanged
+                      selector: @selector(itemListChanged:)
+                          name: ORIpeSlowControlItemListChanged
                        object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(adeiSetupOptionsChanged:)
-                          name: ORIpeSlowControlAdeiSetupOptionsChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(adeiTreeChanged:)
-                          name: ORIpeSlowControlAdeiTreeChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(requestingAdeiTreeStarted:)
-                          name: ORIpeSlowControlRequestingAdeiTreeStartedNotification
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(requestingAdeiTreeStopped:)
-                          name: ORIpeSlowControlRequestingAdeiTreeStoppedNotification
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(sensorListChanged:)
-                          name: ORIpeSlowControlSensorListChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(minValueChanged:)
-                          name: ORIpeSlowControlminValueChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(dataChanged:)
-                          name: ORIpeSlowControlDataChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(adeiBaseUrlForSensorChanged:)
-                          name: ORIpeSlowControlAdeiBaseUrlForSensorChanged  
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(maxValueChanged:)
-                          name: ORIpeSlowControlmaxValueChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(lowAlarmRangeChanged:)
-                          name: ORIpeSlowControllowAlarmRangeChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(highAlarmRangeChanged:)
-                          name: ORIpeSlowControlhighAlarmRangeChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(selectedSensorNumChanged:)
-                          name: ORIpeSlowControlSelectedSensorNumChanged
-                       object : model];
-                       
-	[notifyCenter addObserver : self
-                      selector: @selector(isRecordingDataChanged:)
-                          name: ORIpeSlowControlSetIsRecordingDataChanged
-                       object : model];
-                       
+                                                                                            
 	[notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
                          name : ORIpeSlowControlPollTimeChanged
                        object : nil];
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(lastRequestChanged:)
+                         name : ORIpeSlowControlLastRequestChanged
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(ipNumberChanged:)
+                         name : ORIpeSlowControlIPNumberChanged
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(tableViewSelectionDidChange:)
+                         name : NSTableViewSelectionDidChangeNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(drawDidClose:)
+                         name : NSDrawerDidCloseNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(drawDidOpen:)
+                         name : NSDrawerDidOpenNotification
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(viewItemNameChanged:)
+                         name : ORIpeSlowControlModelViewItemNameChanged
+						object: model];
 
-#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[notifyCenter addObserver : self
-                      selector: @selector(remotePortChanged:)
-                          name: ORIpeSlowControlRemotePortChanged
-                       object : model];
-    
-	[notifyCenter addObserver : self
-                      selector: @selector(remoteHostChanged:)
-                          name: ORIpeSlowControlRemoteHostChanged
-                       object : model];
-    
-	[notifyCenter addObserver : self
-                      selector: @selector(isConnectedChanged:)
-                          name: ORIpeSlowControlIsConnectedChanged
-                       object : model];
-    
-	[notifyCenter addObserver : self
-                      selector: @selector(byteCountChanged:)
-                          name: ORIpeSlowControlByteCountChanged
-                       object : model];
-    
-	[notifyCenter addObserver : self
-                      selector: @selector(connectAtStartChanged:)
-                          name: ORIpeSlowControlConnectAtStartChanged
-                       object : [self model]];
-    
-	[notifyCenter addObserver : self
-                      selector: @selector(autoReconnectChanged:)
-                          name: ORIpeSlowControlAutoReconnectChanged
-                       object : [self model]];
-                       
-    // slow control -tb- //OBSOLETE
-  	[notifyCenter addObserver : self
-                      selector: @selector(monitoringFieldChanged:)
-                          name: ORIpeSlowControlMonitoringFieldChanged
-                       object : [self model]];
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  
+                     selector : @selector(outlineViewSelectionDidChange:)
+                         name : NSOutlineViewSelectionDidChangeNotification
+                       object : itemTreeOutlineView];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(itemTypeChanged:)
+                         name : ORIpeSlowControlModelItemTypeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(setPointChanged:)
+                         name : ORIpeSlowControlModelSetPointChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fastGenSetupChanged:)
+                         name : ORIpeSlowControlModelFastGenSetupChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(histoPlotChanged:)
+                         name : ORIpeSlowControlModelHistogramChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pendingRequestsChanged:)
+                         name : ORIpeSlowControlPendingRequestsChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(timeOutCountChanged:)
+                         name : ORIpeSlowControlModelTimeOutCountChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(totalRequestCountChanged:)
+                         name : ORIpeSlowControlModelTotalRequestCountChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -217,253 +160,254 @@
     [super updateWindow];
     [self setWindowTitle];
 	[self pollTimeChanged:nil];
-#if 0  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	[self remotePortChanged:nil];
-	[self remoteHostChanged:nil];
-	[self isConnectedChanged:nil];
-	[self byteCountChanged:nil];
-	[self connectAtStartChanged:nil];
-	[self autoReconnectChanged:nil];
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-	[self monitoringFieldChanged:nil]; //obsolete -tb-
-    
-	[self adeiBaseUrlChanged:nil];
-	[self adeiServiceUrlChanged:nil];
-	[self adeiSetupOptionsChanged:nil];
+	[self lastRequestChanged:nil];
+	[self ipNumberChanged:nil];
+	[self histoPlotChanged:nil];
 	
-	[self selectedSensorNumChanged:nil];
-	[self updateSensorSettings];
-
-    [sensorTableView reloadData];
-    [sensorTableView setNeedsDisplay: YES];
-    [sensorTreeOutlineView setNeedsDisplay: YES];
+    [itemTableView reloadData];
+    [itemTableView setNeedsDisplay: YES];
+    [itemTreeOutlineView setNeedsDisplay: YES];
     
+	[self viewItemNameChanged:nil];
+	[self itemTypeChanged:nil];
+	[self setPointChanged:nil];
+	[self fastGenSetupChanged:nil];
+	[self pendingRequestsChanged:nil];
+	[self timeOutCountChanged:nil];
+	[self totalRequestCountChanged:nil];
 }
 
-- (void) updateSensorSettings
+- (void) totalRequestCountChanged:(NSNotification*)aNote
 {
-	[self minValueChanged:nil];
-	[self maxValueChanged:nil];
-	[self lowAlarmRangeChanged:nil];
-	[self highAlarmRangeChanged:nil];
-	[self isRecordingDataChanged:nil];
+	[totalRequestCountField setIntValue: [model totalRequestCount]];
 }
+
+- (void) timeOutCountChanged:(NSNotification*)aNote
+{
+	[timeOutCountField setIntValue: [model timeOutCount]];
+}
+
+- (void) pendingRequestsChanged:(NSNotification*)aNote
+{
+	[pendingRequestsTable reloadData];
+}
+
+- (void) fastGenSetupChanged:(NSNotification*)aNote
+{
+	[fastGenSetupButton setIntValue: [model fastGenSetup]];
+}
+
+- (void) setPointChanged:(NSNotification*)aNote
+{
+	[setPointField setDoubleValue: [model setPoint]];
+}
+
+- (void) itemTypeChanged:(NSNotification*)aNote
+{
+	[itemTypeMatrix selectCellWithTag: [model itemType]];
+}
+
+- (void) viewItemNameChanged:(NSNotification*)aNote
+{
+	[viewItemNameMatrix selectCellWithTag: [model viewItemName]];
+	[itemTableView reloadData];
+}
+
 
 - (void) setWindowTitle
 {
-	//[[self window] setTitle: [model processingTitle]];// we can be more verbose
 	[[self window] setTitle: [NSString stringWithFormat:@"IPE-ADEI Slow Control - %d",[model uniqueIdNumber]]];
 }
 
-//general settings tab
+
+- (void) drawDidOpen:(NSNotification*)aNote
+{
+	if([aNote object] == webDrawer)		  [webViewButton setTitle:@"Hide Web View"];
+	else if([aNote object] == treeDrawer) [treeViewButton setTitle:@"Hide ADEI Tree"];
+}
+
+- (void) drawDidClose:(NSNotification*)aNote
+{
+	if([aNote object] == webDrawer)		  [webViewButton setTitle:@"See Web View"];
+	else if([aNote object] == treeDrawer) [treeViewButton setTitle:@"See ADEI Tree"];
+}
+
+- (void) ipNumberChanged:(NSNotification*)aNotification
+{
+	[ipNumberComboBox setStringValue:[model IPNumber]];
+}
+
+- (void) histoPlotChanged:(NSNotification*)aNotification
+{
+	[timingPlotter setNeedsDisplay:YES];
+}
+
+
+- (void) lastRequestChanged:(NSNotification*)aNotification
+{
+	[lastRequestField setStringValue:[model lastRequest]];
+}
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
 }
 
-- (void) adeiBaseUrlChanged:(NSNotification*)aNote
+- (void) treeChanged:(NSNotification*)aNote
 {
-	[adeiBaseUrlField setStringValue: [model adeiBaseUrl]];
-    //[adeiServiceUrlField setStringValue: [model adeiServiceUrl]];
+    [itemTreeOutlineView reloadData];
 }
 
-- (void) adeiServiceUrlChanged:(NSNotification*)aNote
+- (void) itemListChanged:(NSNotification*)aNote
 {
-	[adeiServiceUrlField setStringValue: [model adeiServiceUrl]];
+    [itemTableView reloadData];
+	[self tableViewSelectionDidChange:nil];
 }
 
-- (void) adeiSetupOptionsChanged:(NSNotification*)aNote
+- (void) tableViewSelectionDidChange:(NSNotification *)aNote
 {
-    [adeiSetupOptionsTableView reloadData]; //necessary when adding lines!!! (setNeedsDisplay: YES is not enough) -tb-
-    //[adeiSetupOptionsTableView noteNumberOfRowsChanged];// need reloadData or noteNumberOfRowsChanged!
-	[adeiSetupOptionsTableView setNeedsDisplay: YES];
+	if(([aNote object] == itemTableView) || (aNote==nil)){
+		NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
+		if([selectedSet count] == 1){
+			unsigned index = [selectedSet firstIndex];
+			if([model itemExists:index]){
+				[viewItemInWebButton setEnabled:YES];
+				[itemDetailsView setString: [model itemDetails:index]]; 
+				if([model isControlItem:index]){
+					[setPointField setEnabled:YES];
+					[setPointButton setEnabled:YES];
+				}
+				else {
+					[setPointField setEnabled:NO];
+					[setPointButton setEnabled:NO];
+				}
+			}
+			else {
+				[itemDetailsView setString: @"<Empty Item Slot>"]; 
+				[viewItemInWebButton setEnabled:NO];
+				[setPointField setEnabled:NO];
+				[setPointButton setEnabled:NO];
+			}
+		}
+		else {
+			[viewItemInWebButton setEnabled:NO];
+			[setPointField setEnabled:NO];
+			[setPointButton setEnabled:NO];
+			[itemDetailsView setString: @"<Nothing Selected>"]; 
+		}
+	}
 }
 
-- (void) adeiTreeChanged:(NSNotification*)aNote
+- (void) outlineViewSelectionDidChange:(NSNotification *)notification
 {
-    [sensorTreeOutlineView reloadItem:[model rootAdeiTree] reloadChildren:YES];
+    if([notification object] == itemTreeOutlineView){
+		id item = [itemTreeOutlineView selectedItem];
+		if(item){
+			if([item objectForKey:@"Children"]){
+				NSString* s = [NSString stringWithFormat:@"%@ = %@\n",@"URL",[item objectForKey:@"URL"]];
+				s = [s stringByAppendingFormat:@"%@ = %@\n",@"Path",[item objectForKey:@"Path"]];
+				[treeDetailsView setString: s]; 
+			}
+			else {
+				NSString* s = [[itemTreeOutlineView selectedItem] description];
+				s = [s stringByReplacingOccurrencesOfString:@"{" withString:@""];
+				s = [s stringByReplacingOccurrencesOfString:@"}" withString:@""];
+				[treeDetailsView setString: s]; 
+			}
+		}
+		else [treeDetailsView setString: @"<Nothing Selected>"]; 
+    }
 }
 
-- (void) requestingAdeiTreeStarted:(NSNotification*)aNote
+- (void) lockChanged:(NSNotification*)aNote
 {
-    NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-	[requestAdeiSensorTreeButton setEnabled: NO];
-	[clearAdeiSensorTreeButton setEnabled: NO];
-	[requestAdeiSensorTreeProgressIndicator startAnimation: self];
-}
-
-- (void) requestingAdeiTreeStopped:(NSNotification*)aNote
-{
-    NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-	[requestAdeiSensorTreeButton setEnabled: YES];
-	//TODO: not yet implemented [clearAdeiSensorTreeButton setEnabled: YES];
-	[requestAdeiSensorTreeProgressIndicator stopAnimation: self];
-}
-
-- (void) sensorListChanged:(NSNotification*)aNote
-{
-    [sensorTableView setNeedsDisplay: YES];
-}
-
-//sensor setting notifications
-- (void) selectedSensorNumChanged:(NSNotification*)aNote
-{
-    int sensorNum = [model selectedSensorNum];
-    
-    NSLog(@"Calling %@ :: %@ for self=%p  sensorNum is %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self,sensorNum);
-
-    //TODO: if -1 or sensor undefined - clear out everything  -tb-
-    [sensorNumField setIntValue: sensorNum];
-    [sensorAdeiBaseUrlField setStringValue: [model adeiBaseUrlForChan: sensorNum] ];
-    [sensorAdeiServiceUrlField setStringValue: [model adeiServiceUrlForChan: sensorNum] ];
-    [sensorPathField setStringValue: [model adeiPathForChan: sensorNum] ];
-    [self updateSensorSettings];//would be enough to update the 'Edit Sensor' area
-}
-
-- (void) dataChanged:(NSNotification*)aNote
-{
-    NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    //TODO:
-}
-
-- (void) adeiBaseUrlForSensorChanged:(NSNotification*)aNote
-{
-    NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    int sensorNum = [model selectedSensorNum];
-    [sensorAdeiBaseUrlField setStringValue: [model adeiBaseUrlForChan: sensorNum] ];
-    [sensorAdeiServiceUrlField setStringValue: [model adeiServiceUrlForChan: sensorNum] ];
-    [sensorPathField setStringValue: [model adeiPathForChan: sensorNum] ];
-    [sensorTableView setNeedsDisplay: YES];
-}
-
-- (void) minValueChanged:(NSNotification*)aNote
-{
-    //int sensorNum = [sensorNumField intValue];
-    int sensorNum = [model selectedSensorNum];
-    [minValueField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] minValue]  ];
-    [sensorTableView setNeedsDisplay: YES];
-}
-
-- (void) maxValueChanged:(NSNotification*)aNote
-{
-    //int sensorNum = [sensorNumField intValue];
-    int sensorNum = [model selectedSensorNum];
-    [maxValueField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] maxValue]  ];
-    [sensorTableView setNeedsDisplay: YES];
-}
-
-- (void) lowAlarmRangeChanged:(NSNotification*)aNote
-{
-    //int sensorNum = [sensorNumField intValue];
-    int sensorNum = [model selectedSensorNum];
-    [lowAlarmRangeField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] lowAlarmRange]  ];
-    [sensorTableView setNeedsDisplay: YES];
-}
-
-- (void) highAlarmRangeChanged:(NSNotification*)aNote
-{
-    //int sensorNum = [sensorNumField intValue];
-    int sensorNum = [model selectedSensorNum];
-    [highAlarmRangeField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] highAlarmRange]  ];
-    [sensorTableView setNeedsDisplay: YES];
-}
-
-- (void) isRecordingDataChanged:(NSNotification*)aNote
-{
-    //int index = [sensorNumField intValue];
-    int sensorNum = [model selectedSensorNum];
-    //[isRecordingDataButton setIntValue: [[[model sensorList] objectAtIndex:sensorNum ] isRecordingData]  ];
-    //[isRecordingDataButton setState: [[[model sensorList] objectAtIndex:sensorNum ] isRecordingData]  ];
-    [isRecordingDataButton setState: [model  isRecordingDataForChan: sensorNum] ];
-    [sensorTableView setNeedsDisplay: YES];
-
-	//IBOutlet NSButtonCell    *recordingDataButtonCell;
-    //[sensorTableView setNeedsDisplay];
-    //[sensorTableView display];
-    //[recordingDataButtonCell display];
-    //NSRect	cellFrame = [sensorTableView frameOfCellAtColumn: [sensorTableView columnWithIdentifier:@"Record" ] row:index];
-	//[sensorTableView setNeedsDisplayInRect:cellFrame];
-    //NSRect	cellFrame = [sensorTableView frameOfCellAtColumn:column row:row];
-	//[sensorTableView setNeedsDisplayInRect:cellFrame];
-}
-
-
-
-
-#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//TODO: remove it -tb-
-- (void) connectAtStartChanged:(NSNotification*)aNote
-{
-	[connectAtStartButton setState:[model connectAtStart]];
-}
-
-- (void) autoReconnectChanged:(NSNotification*)aNote
-{
-	[autoReconnectButton setState:[model autoReconnect]];
-}
-
-
-- (void) remotePortChanged:(NSNotification*)aNote
-{
-	[remotePortField setIntValue:[model remotePort]];
-}
-
-- (void) remoteHostChanged:(NSNotification*)aNote
-{
-	[remoteHostField setStringValue:[model remoteHost]];
-}
-
-- (void) isConnectedChanged:(NSNotification*)aNote
-{
-	[connectionStatusField setStringValue:[model isConnected]?@"Connected":@"---"];
-	[connectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
-}
-
-- (void) byteCountChanged:(NSNotification*)aNote
-{
-	[byteRecievedField setIntValue:[model byteCount]];
-}
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-- (void) lockChanged:(NSNotification*)aNotification
-{
-#if 0  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     BOOL locked = [gSecurity isLocked:ORIpeSlowControlLock];
     [lockButton setState: locked];
-    
-    [remotePortField setEnabled:!locked];
-    [remoteHostField setEnabled:!locked];
-    [connectAtStartButton setEnabled:!locked];
-    [autoReconnectButton setEnabled:!locked];
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    [itemTableView setEnabled:!locked];
+	[ipNumberComboBox setEnabled:!locked];
+	[setPointField setEnabled:!locked];
+	[setPointButton setEnabled:!locked];
 }
-
-//OBSOLETE
-// slow control -tb-
-
-- (void) monitoringFieldChanged:(NSNotification*)aNotification
-{
-    static int aValue=0;
-    aValue++;
-    //NSLog(@"ORIpeSlowControlControler: monitoringFieldChanged\n",aValue);
-
-
-    //[monitoringField setStringValue: [model currentSensor] ];
-    //[monitoringIntValueField setIntValue: [model currentSensorIntValue] ];
-}
-
 
 #pragma mark ***Actions
+- (void) fastGenSetupAction:(id)sender
+{
+	[model setFastGenSetup:[sender intValue]];	
+}
+
+- (void) setPointAction:(id)sender
+{
+	 [model setSetPoint:[sender doubleValue]];	
+}
+
+- (IBAction) writeSetPointAction:(id) sender
+{
+	[self endEditing];
+	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
+	if([selectedSet count] == 1){
+		unsigned index = [selectedSet firstIndex];
+		[model writeSetPoint:index value:[model setPoint]];
+	}
+}
+
+- (IBAction) itemTypeAction:(id)sender
+{
+	[model setItemType:[[sender selectedCell]tag]];	
+}
+
+- (void) viewItemNameAction:(id)sender
+{
+	[model setViewItemName:[[sender selectedCell]tag]];	
+}
+
+- (IBAction) viewItemInWebAction:(id)sender
+{	
+	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
+	if([selectedSet count] == 1){
+		unsigned index = [selectedSet firstIndex];
+		NSString* requestString = [model createWebRequestForItem:index];
+		[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString ]]];
+		[webDrawer open: nil];
+	}
+}
+
+- (IBAction) loadItemTree:(id)sender
+{
+	[model loadItemTree];
+}
+
+- (IBAction) delete:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction) cut:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction) removeItemAction:(id)sender
+{
+	[model removeSet:[itemTableView selectedRowIndexes]];
+    [itemTableView deselectAll:nil];
+	[itemTableView reloadData];
+}
+
+- (IBAction) ipNumberAction:(id)sender
+{
+	[model setIPNumber:[sender stringValue]];
+}
+
+- (IBAction) clearHistory:(id) sender
+{
+	[model clearHistory];
+}
 
 - (void) checkGlobalSecurity
 {
-#if 0  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:ORIpeSlowControlLock to:secure];
     [lockButton setEnabled:secure];
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 }
 
 - (IBAction) lockAction:(id)sender
@@ -471,8 +415,6 @@
     [gSecurity tryToSetLock:ORIpeSlowControlLock to:[sender intValue] forWindow:[self window]];
 }
 
-
-//general settings tab
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[[sender selectedItem] tag]];
@@ -483,597 +425,294 @@
 	[model pollSlowControls];
 }
 
-- (IBAction) adeiBaseUrlFieldAction:(id)sender
-{
-    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    //NSLog(@"String:%@ \n", [adeiBaseUrlField stringValue]);
-    [model setAdeiBaseUrl: [adeiBaseUrlField stringValue]];
-    //this is done in 'setAdeiBaseUrl:':[model setAdeiServiceUrl: [NSString stringWithFormat:@"%@%@",[model adeiServiceUrl],@"services/"]];
-}
-
-    
-- (IBAction) addAdeiSetupOptionAction:(id)sender
-{
-    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    int index=[adeiSetupOptionsTableView selectedRow];// if -1 inserts at end
-    [model  insertAdeiSetupOption:@"&setup=NEWOPTION" atIndex: index];
-
-}
-
-- (IBAction) removeAdeiSetupOptionAction:(id)sender
-{
-    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    int index=[adeiSetupOptionsTableView selectedRow];// if -1 nothing happens
-    [model  removeAdeiSetupOptionAtIndex: index];
-}
-
-
-
-- (IBAction) requestSensorTreeButtonAction:(id)sender
-{
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    //close the view
-    //[sensorTreeOutlineView collapseItem: [model rootAdeiTree] ];
-    [sensorTreeOutlineView collapseItem: [model rootAdeiTree] collapseChildren: YES];
-    //TODO: and maybe a redraw ??? -tb-
-    //[model requestSensorTreeADEI];// the old code without error and timeout handling (but much more streightforward) -tb-
-    [model startRequestingADEISensorTreeWithErrorHandling];
-}
-
-- (IBAction) sensorlistButtonAction:(id)sender
-{
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    
-    [model loadAllSensorValuesWithSensorPath];
-    #if 0
-    // just a test for the tableView / sensor list view
-    NSEnumerator *enumerator = [[model sensorList] objectEnumerator];
-    id object;
-    while ((object = [enumerator nextObject])) {
-        ORSensorItem *sensor=object;//TODO: could check the class -tb-
-        if([sensor isEmptySensorListItem]) continue;
-        if([sensor name]) NSLog(@"  (name) %@ (channelMapNum) %i\n",[sensor name],[sensor channelMapNum]);
-        else NSLog(@"  has no name\n");
-        //NSLog(@"  (stringValue) %@\n",[attNode stringValue]);
-        //d+=1.0;        [sensor setData: [NSString stringWithFormat: @"%5.3f",d*100.0+d*0.1]];
-        [sensor loadSensorValueWithSensorPath];
-    }
-    #endif
-    [sensorTableView setNeedsDisplay];
-    
-    
-    
-    #if 0
-    // THIS WAS A OLD TEST ... -tb-
-    NSLog(@"insert item %p at index 5\n",root);
-    NSLog(@"sensor list is %p \n", [self sensorList]);
-    [[self sensorList] insertObject:root atIndex: 5];
-    NSLog(@"length is %i\n",[[self sensorList] count]);
-    NSLog(@"item 5  is %p\n",[[self sensorList] objectAtIndex:5]);
-    //[sensorTableView display];  // setNeedsDisplay recommended
-    //[sensorTableView displayIfNeeded];// setNeedsDisplay recommended
-    [sensorTableView setNeedsDisplay];
-    #endif
-    
-    
-}
-
-- (IBAction) dumpSensorlistButtonAction:(id)sender
+- (IBAction) dumpSensorAction:(id)sender
 {
     [model dumpSensorlist];
 }
 
-
-//sensor settings actions
-- (IBAction) adeiBaseUrlForSensorAction:(id)sender
-{
-    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
-    [model setAdeiBaseUrl:  [sensorAdeiBaseUrlField stringValue] forChan: [model selectedSensorNum]];
-}
-
-- (IBAction) minValueChangedAction:(id)sender
-{
-    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
-    [model setMinValue:[minValueField doubleValue] forChan: [model selectedSensorNum]];
-}
-
-- (IBAction) maxValueChangedAction:(id)sender
-{
-    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
-    [model setMaxValue:[maxValueField doubleValue] forChan: [model selectedSensorNum]];
-}
-
-- (IBAction) lowAlarmRangeChangedAction:(id)sender
-{
-    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
-    [model setLowAlarmRange:[lowAlarmRangeField doubleValue] forChan: [model selectedSensorNum]];
-}
-
-- (IBAction) highAlarmRangeChangedAction:(id)sender
-{
-    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
-    [model setHighAlarmRange:[highAlarmRangeField doubleValue] forChan: [model selectedSensorNum]];
-}
-
-- (IBAction) isRecordingDataChangedAction:(id)sender;
-{
-    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
-    [model setIsRecordingData: [isRecordingDataButton intValue] forChan: [model selectedSensorNum]];
-}
-
-
 #pragma mark •••Drawer Actions
-
-
 /* We do not use [NSDrawer open:] to open the drawer, because that method will
-autoselect an edge, and we want this drawer to open only on the left edge. */
-
-- (void)openLeftDrawer:(id)sender {[leftDrawer openOnEdge:NSMinXEdge];}
-
-- (void)closeLeftDrawer:(id)sender {[leftDrawer close];}
-
-- (void)toggleLeftDrawer:(id)sender {
-    //NSLog(@"This is method: %@ of  %@ (self %p) \n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),self);
-    NSDrawerState state = [leftDrawer state];
+autoselect an edge, and we want this drawer to open only on specific edges. */
+- (IBAction) toggleTreeDrawer:(id)sender {
+    NSDrawerState state = [treeDrawer state];
     if (NSDrawerOpeningState == state || NSDrawerOpenState == state) {
-        [leftDrawer close];
-    } else {
-        [leftDrawer openOnEdge:NSMinXEdge];
+        [treeDrawer close];
+    } 
+	else {
+        [treeDrawer openOnEdge:NSMinYEdge];
     }
 }
 
-- (void)openRightDrawer:(id)sender {[rightDrawer openOnEdge:NSMaxXEdge];}
-
-- (void)closeRightDrawer:(id)sender {[rightDrawer close];}
-
-- (void)toggleRightDrawer:(id)sender {
-    DebugMethCallsTB(  NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-                       NSLog(@"    sender %p, rightDrawer %p\n",sender,  rightDrawer);   )
-    NSDrawerState state = [rightDrawer state];
-    if (NSDrawerOpeningState == state || NSDrawerOpenState == state) {
-        [rightDrawer close];
-    } else {
-        [rightDrawer openOnEdge:NSMaxXEdge];
-    }
+- (IBAction) toggleWebDrawer:(id)sender {
+    NSDrawerState state = [webDrawer state];
+    if (NSDrawerOpeningState == state || NSDrawerOpenState == state){
+		[webDrawer close];
+	}
+	else {
+		[webDrawer openOnEdge:NSMaxXEdge];
+	}
 }
-
-
-
-
-#pragma mark •••Sensor List Context Menu Actions
-//list view context menu
-- (IBAction)sensorListContextMenuAction:(id)sender
-{
-    DebugMethCallsTB(  
-        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
-    )
-}
-
-- (IBAction)sensorListContextMenuLoadValueAction:(id)sender
-{
-    DebugMethCallsTB(  
-        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
-    )
-    
-    int row = [sensorTableView selectedRow];
-    NSLog(@"Selected row of tableView is %i\n", row);
-    [[[model sensorList] objectAtIndex:row] loadSensorValueWithSensorPath];
-    [sensorTableView setNeedsDisplay: TRUE];
-
-}
-
-- (IBAction)sensorListContextMenuEditAction:(id)sender
-{
-    DebugMethCallsTB(  
-        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
-    )
-    int row = [sensorTableView selectedRow];
-    NSLog(@"Selected row of tableView is %i\n", row);
-    [model setSelectedSensorNum: row];
-    [ipeSlowControlTabView selectTabViewItemWithIdentifier: @"SensorSettings"];
-    //[sensorNumField setIntValue:row];
-    //[self updateWindow];//moved to selectedSensorNumChanged -tb-
-    
-    #if 0
-	[self minValueChanged:nil];
-	[self maxValueChanged:nil];
-	[self lowAlarmRangeChanged:nil];
-	[self highAlarmRangeChanged:nil];
-    #endif
-}
-
-- (IBAction)sensorListContextMenuRemoveAction:(id)sender
-{
-    DebugMethCallsTB(  
-        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-        //NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
-    )
-    //NSMenuItem *menuitem = sender; // no, I need the selectedItem of the ListView
-    int row = [sensorTableView selectedRow];
-    NSLog(@"Selected row of tableView is %i\n", row);
-    [model removeSensorListItemWithIndex: row];
-    [model setSelectedSensorNum: row-1];
-    //[sensorTableView setNeedsDisplay: TRUE]; TODO: model will all this via notification -tb-
-    [sensorTreeOutlineView reloadItem:[model rootAdeiTree] reloadChildren:YES]; //TODO: improvement: reload only the affected item -tb-
-
-}
-
-
-//try with module=graph ... NEW: minimal=graph
-#define ADEI_OPTION_STRING @"&module=graph"
-//#define ADEI_OPTION_STRING @"&minimal=graph"
-//#define ADEI_OPTION_STRING @""
-//TODO: Since 2009-02 it doesnt load any more (the Web Interface has been changed!), maybe I need to use more control of loading: 
-//TODO: see "WebFrameLoadDelegate Protocol Reference" -tb-
-- (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender
-{
-    DebugMethCallsTB(  
-            NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-            NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
-    )
-    
-    int row = [sensorTableView selectedRow];
-    //NSString *requestString =  [[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath];
-    //NSString *requestString =  [NSString stringWithFormat:@"%@%@",[[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath], @"&module=graph"] ;
-    NSString *requestString =  [NSString stringWithFormat:@"%@%@",[[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath], ADEI_OPTION_STRING] ;
-//http:
-//fuzzy.fzk.de/adei/#db_server=toskanadb&db_name=prespektrometer_rep&db_group=3&control_group=0&db_mask=72&window=0&module=graph
-    DebugTB( NSLog(@"Request string is %@\n", requestString); )
-
-    [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString ]]];
-    [self openRightDrawer: nil];
-
-    // example: http://fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
-    // other examples:
-    //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
-    //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0
-    //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&window=0
-}
-
-//web view
-- (IBAction)loadAdeiHomeInWebInterfaceWebViewAction:(id)sender
-{
-    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
-    //[[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
-    //[[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://fuzzy.fzk.de/adei/"]]];
-    NSString *requestString =  [NSString stringWithFormat:@"%@%@%@" ,[model  adeiBaseUrl], @"#",ADEI_OPTION_STRING];
-    DebugTB( NSLog(@"Request string is %@\n", requestString); )
-    @try{
-        [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString]]];
-    }
-    @catch(NSException *exception){
-        DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@: COULD NOT LOAD URL!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
-        NSLog(@"ERROR: %@ ; EXCEPTION-NAME:  %@, %i\n",
-             [NSString stringWithFormat:@" >%@< ", [exception reason]] ,
-             [NSString stringWithFormat:@" >%@< ", [exception name]] ,
-             [NSNumber numberWithInt:errOSAGeneralError]  );
-    }
-}
-
-
 
 #pragma mark •••Data Source Methods  (OutlineView)
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (int) outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item 
 {
-    DebugMethCallsTB(  NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));  )
-    if(outlineView==sensorTreeOutlineView){
-        if(item){
-            //NSLog(@"This is method: %@  - item %p\n",NSStringFromSelector(_cmd),item);
-            //return [[item children] objectAtIndex: index]; 
-            return [item childAtIndex: index]; 
-        }else{
-            //NSLog(@"This is method: %@  - NIL (root item)- item %p\n",NSStringFromSelector(_cmd),root);
-            return [model rootAdeiTree];
-        }
-    }
-    return nil;
+	if (item == nil)return [[model itemTreeRoot] count];
+	else {
+		if ([item isKindOfClass:[NSArray class]]) {
+			return [item count];
+		}
+		else if ([item isKindOfClass:[NSDictionary class]]) {
+			return [[item objectForKey:@"Children"] count];
+		}
+		else return 0;
+	}
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+- (BOOL) outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item 
 {
-    //NSLog(@"This is method: %@ with item %p\n",NSStringFromSelector(_cmd),item);
-    if(outlineView==sensorTreeOutlineView){
-        //NSLog(@"   Has name %@ children %i (%i)\n",[item name],[[item children] count],[ item  count] );
-        if(item==nil) return NO;
-        else return ([[item children] count] >0);
-    }
+	if ([item isKindOfClass:[NSArray class]]) {
+		return [item count]>0;
+	}
+	else if ([item isKindOfClass:[NSDictionary class]]) {
+		return [[item objectForKey:@"Children"] count]>0;
+	}
     return NO;
 }
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (id) outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item 
 {
-    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    //  //NSLog(@"This is method: %@ , outlineView %p ==sensorTreeOutlineView %p  ?\n",NSStringFromSelector(_cmd),outlineView,sensorTreeOutlineView);
-    if(outlineView==sensorTreeOutlineView){
-        //NSLog(@"This is method: %@ - item %p\n",NSStringFromSelector(_cmd),item);
-        if(item==nil){
-            return 1; //root = service
-        }else{
-            return ([[item children] count]);
-        }
+	if (item == nil)item = [model itemTreeRoot];
+    
+    if ([item isKindOfClass:[NSArray class]]) {
+        return [item objectAtIndex:index];
     }
-    //NSLog(@"This is method: %@ - UNDEFINED outlineView - returns 1\n",NSStringFromSelector(_cmd));
-    return 1;// strangely the first time the outlets are not set (i.e. sensorTreeOutlineView == 0x0) on 10.4, but I NEED to
-             // return 1; take care if this object becomes data source for other outline views ... -tb-
+    else if ([item isKindOfClass:[NSDictionary class]]) {
+        return [[item objectForKey:@"Children"] objectAtIndex:index];
+    }
+	return nil;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+- (id) outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item 
 {
-    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    if(outlineView==sensorTreeOutlineView){
-        //NSLog(@"This is method: %@ - item %p\n",NSStringFromSelector(_cmd),item);
-        if(item==nil){
-            return @"nil-item";
-        }else{
-            #if 0 //for debugging
-            NSLog(@"This is method: %@ - M1 ---\n",NSStringFromSelector(_cmd) );
-            NSLog(@"This is method: %@ , item is %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([item class]));
-            if([item isKindOfClass: [ORSensorItem class]]) 
-                NSLog(@"This is method: %@ - item is of class ORSensorItem \n",NSStringFromSelector(_cmd));
-            if([item isKindOfClass: [NSObject class]]) 
-                NSLog(@"This is method: %@ - item is of class NSObject \n",NSStringFromSelector(_cmd));
-            NSLog(@"This is method: %@ - item name %@\n",NSStringFromSelector(_cmd),[item name]);
-            return [item name];
-            #endif
-            if([[tableColumn identifier] isEqualToString:@"Tree"]){
-                return [item tree];
-            }
-            if([[tableColumn identifier] isEqualToString:@"Value"]){
-                return [item value];
-            }
-            if([[tableColumn identifier] isEqualToString:@"Name"]){
-                return [item name];
-            }
-            if([[tableColumn identifier] isEqualToString:@"Type"]){
-                return [ORSensorItem stringForAdeiType: [item adeiType]];
-            }
-            if([[tableColumn identifier] isEqualToString:@"ChanMap"]){
-                if([item adeiType]==kAdeiTypeItem){
-                    if([item channelMapNum]>=0){
-                        return [NSNumber numberWithInt:[item channelMapNum]];
-                    }else return @"-";
-                }else{
-                    return @"";
-                }
-            }
-            return [item name]; //fallback
+	id root = [model itemTreeRoot];
+	id parentObject = [outlineView parentForItem:item] ? [outlineView parentForItem:item] : root;
+	
+	if ([[tableColumn identifier] isEqual:@"Name"]) {
+        if ([item isKindOfClass:[NSDictionary class]]) {
+			if([item objectForKey:@"Children"])return [item objectForKey:@"Name"];
+			else return [item objectForKey:@"name"]; //lower case!
+        } 
+        else if ([item isKindOfClass:[NSArray class]]) {
+			return [parentObject objectForKey:@"Name"];
         }
-    }
-    return @"undefined";
+		else return @"";
+    } 
+    return nil;
 }
 
-- (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+- (BOOL) outlineView:(NSOutlineView *)ov writeItems:(NSArray*)writeItems toPasteboard:(NSPasteboard*)pboard
 {
-    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    if(outlineView==sensorTreeOutlineView){
-        //NSLog(@"This is method: %@ - item %p\n",NSStringFromSelector(_cmd),item);
-        if(item==nil){
-            return ;
-        }else{
-            if([[tableColumn identifier] isEqualToString:@"ChanMap"]){
-                //NSLog(@"This is method: %@ - item %p\n",NSStringFromSelector(_cmd),item);
-                if([item adeiType] == kAdeiTypeItem){
-                    //NSLog(@" item is Sensor - EDITING\n");
-                    if([object isKindOfClass: [NSString class]]){
-                        //NSLog(@"  object is %@ (%@) \n",@"NSString",object);
-                        int chanmap ; //the new channel number
-                        if([object isEqualToString:@"f"]){ //in this case: choose next free chAN map number; TODO: do the same even if the item is just selected and "f" pressed or at doubleclick -tb-
-                            chanmap = [model nextFreeChanMap ]; //the new channel number
-                            if(chanmap==-1){
-                                NSLog(@" WARNING: no free channel left!\n");
-                                return;
-                            }
-                        }else
-                            chanmap = [object intValue ]; //the new channel number
-                        //NSLog(@" object converted to int: %i \n",chanmap);
-                        //NSLog(@" old chanmap: %i \n",[item channelMapNum]);
-                        //all alphanumeric strings are taken as 0, so handle a 'true' @"0"
-                        if(chanmap==0 && !([object isEqualToString:@"0"]||[object isEqualToString:@"f"])){ //it was something else ... not a number
-                            chanmap=-1;
-                            [model removeSensorListItem:item];
-                        }
-                        if(chanmap>= 0 && chanmap < [model maxSensorListLength]){
-                            //TODO: create toplevel method (check free map values) etc. -tb-
-                            [model replaceSensorListItemAtIndex:chanmap withSensorTreeItem: item];
-                        }else{
-                            NSLog(@" ERROR: Channel %i is out of range!\n",chanmap);
-                        }
-                    }else NSLog(@"  object is of unknown class\n");
-                }else{
-                    NSLog(@" ERROR: item is not a Sensor - cannot assign a channel map number.\n");
-                }
-            }
-            return;
-        }
-    }
+    draggedNodes = [[NSMutableArray array] retain]; 
+	if(ov == itemTreeOutlineView){
+		NSArray *types   = [NSArray arrayWithObjects: @"ORItemType", nil];
+		[pboard declareTypes:types owner:self];
+		for(id obj in writeItems){
+			[draggedNodes addObject:[[obj mutableCopy] autorelease]];
+		}
+		//the actual data doesn't matter since We're not really putting anything on the pasteboard. We are
+		//just using it to control the process.
+		[pboard setData:[NSData data] forType:@"ORItemType"];		
+		[pboard declareTypes:[NSArray arrayWithObjects:@"ORItemType", nil] owner:self];
+		return YES;
+	}
+	else return NO;
 }
 
 
+- (BOOL) validateMenuItem:(NSMenuItem*)menuItem
+{
+    if ([menuItem action] == @selector(cut:)) {
+        return [itemTableView selectedRow] >= 0 ;
+    }
+    else if ([menuItem action] == @selector(delete:)) {
+        return [itemTableView selectedRow] >= 0 ;
+    }
+	return [super validateMenuItem:menuItem];
+}
+	
+#pragma mark •••Data Source Methods (ComboBox)
+- (NSInteger) numberOfItemsInComboBox:(NSComboBox *)aComboBox 
+{
+    return [model connectionHistoryCount];
+}
+
+- (id) comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index 
+{
+    return [model connectionHistoryItem:index];
+}
 
 #pragma mark •••Data Source Methods (TableView)
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
+- (int) numberOfRowsInTableView:(NSTableView *)tableView
 {
-    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    if(tableView==sensorTableView){
-        //NSLog(@"This is method: %@ ret 2\n",NSStringFromSelector(_cmd)); return 2;
-        return [[model sensorList] count];
+    if(tableView==itemTableView){
+        return [model pollingLookUpCount];
     }
-    
-    // for adeiSetupOptionsTableView I call cusom methods
-    if(tableView==adeiSetupOptionsTableView){
-        return [self numberOfRowsInAdeiSetupOptionsTableView: tableView];
-    }
-    return 0;
+	else if(tableView == pendingRequestsTable){
+		return [model pendingRequestsCount];
+	}
+	return 0;
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
 {
-    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    if(tableView==sensorTableView){
-        if(![model sensorList]) return @"err";
-        ORSensorItem *currItem=[[model sensorList] objectAtIndex: row];
-        //first column is always the index
-        if([[tableColumn identifier] isEqualToString:@"ChanMap"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            return [NSString stringWithFormat:@"%i",row];
-        }
-        //then check for 'empty' items
-        //if([currItem adeiType] == kSensorListEmptyItem){//is 'empty' item
-        if([currItem isEmptySensorListItem]){//is 'empty' item
-            return @"-";
-        }
-        //now check the other rows
-        if([[tableColumn identifier] isEqualToString:@"Name"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem)
-                return [NSString stringWithFormat:@"%@",[currItem name]];
-            else
-                return [NSString stringWithFormat:@"-",row];
-        }
-        if([[tableColumn identifier] isEqualToString:@"Value"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem){
-                if([currItem sibling])
-                    return [NSString stringWithFormat:@"Value %@",[[currItem sibling] value]];
-                return [NSString stringWithFormat:@"Value %@",[currItem value]];
-            }else{
-                return [NSString stringWithFormat:@"Value -",row];
-            }
-        }
-        if([[tableColumn identifier] isEqualToString:@"Path"]){
-            if(currItem){
-                return [currItem adeiPath];
-                #if 0
-                NSMutableDictionary *sensorPath=[currItem sensorPath];
-                if(sensorPath){
-                    NSMutableString *pstr = [[NSMutableString alloc] init];
-                    [pstr appendString: [sensorPath valueForKey: kServerString] ];
-                    [pstr appendString: @"." ];
-                    [pstr appendString: [sensorPath valueForKey: kDatabaseString] ];
-                    [pstr appendString: @"." ];
-                    [pstr appendString: [sensorPath valueForKey: kGroupIDString] ];
-                    [pstr appendString: @"." ];
-                    [pstr appendString: [sensorPath valueForKey: kSensorIDString] ];
-                    [pstr appendString: @" - " ];
-                    [pstr appendString: [sensorPath valueForKey: kServiceString] ];
-                    return pstr;
-                }
-                #endif
-                #if 0  //this was for testing
-                if([currItem sibling]){
-                    NSMutableString *pstr = [[NSMutableString alloc] init];
-                    ORSensorItem *item=[currItem sibling];
-                    while(item){
-                        [pstr insertString: [item value] atIndex:0 ];
-                        item = [item guardian];
-                        if(item)[pstr insertString: @"." atIndex:0 ];
-                    }
-                    return pstr;
-                }
-                #endif
-            }
-        }
-        if([[tableColumn identifier] isEqualToString:@"Data"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem && [currItem data]){
-                return [currItem data];
-                //return [NSString stringWithFormat:@"%@",[currItem data]];
-            }else
-                return @"-";
-        }
-        if([[tableColumn identifier] isEqualToString:@"Date"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem && [currItem date]){
-                return [currItem date];
-            }else
-                return @"-";
-        }
-        if([[tableColumn identifier] isEqualToString:@"Record"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem){
-                return [NSNumber numberWithBool: [currItem isRecordingData] ];
-            }else
-                return FALSE;
-        }
-        if([[tableColumn identifier] isEqualToString:@"MinVal"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem){
-                return  [NSNumber numberWithDouble: [currItem minValue] ];
-            }else
-                return @"-";
-        }
-        if([[tableColumn identifier] isEqualToString:@"MaxVal"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem){
-                return  [NSNumber numberWithDouble: [currItem maxValue] ];
-            }else
-                return @"-";
-        }
-        if([[tableColumn identifier] isEqualToString:@"AlarmLow"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem){
-                return  [NSNumber numberWithDouble: [currItem lowAlarmRange] ];
-            }else
-                return @"-";
-        }
-        if([[tableColumn identifier] isEqualToString:@"AlarmHigh"]){
-            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-            if(currItem){
-                return  [NSNumber numberWithDouble: [currItem highAlarmRange] ];
-            }else
-                return @"-";
-        }
-        //if([[tableColumn identifier] isEqualToString:@"Type"]){
-        //    NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
-        //    return [NSString stringWithFormat:@"Type %i",row];
-        //}
-        return [NSString stringWithFormat:@"empty %i",row];
-    }
-    
-    // for adeiSetupOptionsTableView I call cusom methods
-    if(tableView==adeiSetupOptionsTableView){
-        return [self adeiSetupOptionsTableView: tableView objectValueForTableColumn: tableColumn row: row];
-    }
+    if(tableView==itemTableView){
+		if(row<[model pollingLookUpCount]){
+			//things are slightly complicated because some of the items are in the topLevelDictionary and some are in the item's dictionary
+			NSString*		itemKey				= [model requestCacheItemKey:row];
+			NSDictionary*	topLevelDictionary	= [model topLevelPollingDictionary:itemKey];
+			NSDictionary*	itemDictionary		= [topLevelDictionary objectForKey:itemKey];
+			BOOL isControl						= [[itemDictionary objectForKey:@"Control"] boolValue];
+			NSString* theIdentifier				= [tableColumn identifier];
+			if([theIdentifier isEqual:@"Path"]){
+				if([model viewItemName]) {
+					if(isControl) return [itemDictionary objectForKey:@"name"];
+					else		  return [itemDictionary objectForKey:@"Name"];
+				}
+				else					 return  [itemDictionary objectForKey:@"Path"];
+			}
+			else if([theIdentifier isEqual:@"Value"]){
+				if(isControl) return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"value"] doubleValue]];
+				else          return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"Value"] doubleValue]];
+			}
+			else if([theIdentifier isEqual:@"Name"]){
+				if(isControl) return [itemDictionary objectForKey:@"name"];
+				else		  return [itemDictionary objectForKey:@"Name"];
+			}
+			else {
+				id aDisplayValue = [topLevelDictionary objectForKey:theIdentifier];
+				if(aDisplayValue)return aDisplayValue;
+				else {
+					aDisplayValue = [itemDictionary objectForKey:theIdentifier];
+					if(aDisplayValue)return aDisplayValue;
+					else return @"--";
+				}
+			}
+			
+		}
+	}
+	else if(tableView == pendingRequestsTable){
+		return [model pendingRequest:[tableColumn identifier] forIndex:row];
+	}
     return @"-";
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (void) tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
 {
-    if(tableView==sensorTableView){
-        //this table view is not editable up to now -tb-
-        return;
+    if(tableView==itemTableView){
+		if(row<[model pollingLookUpCount]){
+			//only items that can be changed are in the topLevelDictionary
+			NSString* itemKey = [model requestCacheItemKey:row];
+			NSMutableDictionary*	topLevelDictionary	= [model topLevelPollingDictionary:itemKey];
+			[topLevelDictionary setObject:object forKey:[tableColumn identifier]];
+		}
+		[self tableViewSelectionDidChange:nil];
     }
-    
-    // for adeiSetupOptionsTableView I call cusom methods
-    if(tableView==adeiSetupOptionsTableView){
-        [self adeiSetupOptionsTableView: tableView setObjectValue: object forTableColumn: tableColumn row: row];
+}
+
+- (NSDragOperation) tableView: (NSTableView *) view
+				 validateDrop: (id <NSDraggingInfo>) info
+				  proposedRow: (int) row
+		proposedDropOperation: (NSTableViewDropOperation) operation
+{	
+	if (nil == [info draggingSource]){
+		[(ORIpeSlowControlController*)([[info draggingSource] dataSource]) dragDone];
+		return NSDragOperationNone;
+	}
+	else if (itemTableView == [info draggingSource]){
+		[(ORIpeSlowControlController*)([[info draggingSource] dataSource]) dragDone];
+		return NSDragOperationNone;
+	}
+	else {
+		[view setDropRow: row dropOperation: NSTableViewDropAbove];
+		return NSDragOperationCopy;
+	}
+}
+
+- (BOOL) tableView: (NSTableView *) view
+		acceptDrop: (id <NSDraggingInfo>) info
+			   row: (int) row
+	 dropOperation: (NSTableViewDropOperation) operation
+{
+	if (nil == [info draggingSource]){
+        [(ORIpeSlowControlController*)([[info draggingSource] dataSource]) dragDone];
+		return NO;
+	}
+	else if (itemTableView == [info draggingSource]){
+        [(ORIpeSlowControlController*)([[info draggingSource] dataSource]) dragDone];
+		return NO;
+	}
+	else {
+		[model addItems:draggedNodes];
+        [(ORIpeSlowControlController*)([[info draggingSource] dataSource]) dragDone];
+		return YES;
+	}
+	return NO;
+}
+
+- (NSColor*) tableView:(id)aTableView backgroundColorForRow:(unsigned)row
+{
+    if(aTableView==itemTableView){
+		if(row<[model pollingLookUpCount]){
+			if([model isControlItem:row]) return [NSColor colorWithCalibratedRed:1.0 green:.5 blue:.5 alpha:.3];
+			else return nil;
+		}
     }
+	return nil;
 }
 
-//cloned Data Source Methods (TableView) for adeiSetupOptionsTableView
-- (int)numberOfRowsInAdeiSetupOptionsTableView:(NSTableView *)tableView
+- (void) dragDone
 {
-    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    return [[model adeiSetupOptionsList] count];
+    [draggedNodes release];
+    draggedNodes = nil;
 }
 
-- (id)adeiSetupOptionsTableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (NSArray*)draggedNodes
+{ 
+    return draggedNodes; 
+}
+
+#pragma mark •••Histogram DataSource
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    //NSLog(@"row; %i\n",row);
-    if([model adeiSetupOptionsList]) return [model adeiSetupOptionAtIndex: row];
-    return @"empty";
+    return kResponseTimeHistogramSize;
 }
-- (void)adeiSetupOptionsTableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
+
+- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
 {
-    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
-    //NSLog(@"Value is %@\n",object);
-    [model  replaceAdeiSetupOptionAtIndex: row withString: object];
+	return [model dataTimeHist:x];
 }
 
+@end
 
+@implementation ORIpeTableView
+//sub class of NSTableView so we can draw the control items with a different color.
+- (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect;
+{
+	NSColor *color = [[self dataSource] tableView:self backgroundColorForRow:row];
+	if (color && [self isRowSelected:row] == NO) {
+		[NSGraphicsContext saveGraphicsState];
+		NSRectClip(clipRect);
+		NSRect rowRect = [self rectOfRow:row];
+		// draw over the alternating row color
+		[[NSColor whiteColor] setFill];
+		NSRectFill(NSIntersectionRect(rowRect, clipRect));
+		// draw with rounded end caps
+		CGFloat radius = NSHeight(rowRect) / 2.0;
+		NSBezierPath *p = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(rowRect, 1.0, 0.0) xRadius:radius yRadius:radius];		[color setFill];
+		[p fill];
+		[NSGraphicsContext restoreGraphicsState];
+	}
+	[super drawRow:row clipRect:clipRect];
+}
 @end
 

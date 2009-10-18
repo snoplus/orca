@@ -16,172 +16,105 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
+@class ORPlotter1D;
 @class WebView;
 
 @interface ORIpeSlowControlController : OrcaObjectController
 {
-    //all obsolete -tb-
-	IBOutlet NSTextField*   remotePortField;
-	IBOutlet NSTextField*   remoteHostField;
-	IBOutlet NSTextField*   connectionStatusField;
-	IBOutlet NSTextField*   byteRecievedField;
-	IBOutlet NSButton*      connectButton;
-    IBOutlet NSButton*      lockButton;
-	IBOutlet NSButton*      connectAtStartButton;
-	IBOutlet NSButton*      autoReconnectButton;
-    
-    
-    //slow control - obsolete -tb-
-	IBOutlet NSTextField*   monitoringField;
-	IBOutlet NSTextField*   monitoringIntValueField;
-    
-    //slow control - new -tb-
-    IBOutlet NSOutlineView* sensorTreeOutlineView;
-    
-    // Main Dialog
-    IBOutlet NSTableView*  sensorTableView; // the channel/sensor list view
-    //tab view
-    IBOutlet NSTabView* ipeSlowControlTabView;
-    //general settings tab
-    IBOutlet NSTextField*   adeiBaseUrlField;
-    IBOutlet NSComboBox*    adeiSetupOptionsComboBox;
-	IBOutlet NSPopUpButton* pollTimePopup;
+	IBOutlet ORPlotter1D*		timingPlotter;   
+	IBOutlet NSTextField*		totalRequestCountField;
+	IBOutlet NSTextField*		timeOutCountField;
+	IBOutlet NSButton*			lockButton;   
+	IBOutlet NSButton*			fastGenSetupButton;
+	IBOutlet NSMatrix*			itemTypeMatrix;
+	IBOutlet NSMatrix*			viewItemNameMatrix;
+	IBOutlet ORTimedTextField*	lastRequestField;
+    IBOutlet NSOutlineView*		itemTreeOutlineView;
+    IBOutlet NSTextView*		treeDetailsView;
+    IBOutlet NSTextView*		itemDetailsView;
+    IBOutlet NSTableView*		itemTableView; 
+    IBOutlet NSTableView*		pendingRequestsTable; 
+	IBOutlet NSComboBox*		ipNumberComboBox;
+	IBOutlet NSButton*			viewItemInWebButton;
+	IBOutlet NSPopUpButton*		pollTimePopup;	
+	IBOutlet NSTextField*		setPointField;
+	IBOutlet NSButton*			setPointButton;
+
+	//Drawers
+    IBOutlet NSDrawer*	treeDrawer;
+    IBOutlet NSDrawer*	webDrawer;
+    IBOutlet WebView*	webView;
+	IBOutlet NSButton*  webViewButton;
+	IBOutlet NSButton*  treeViewButton;
 	
-    //IBOutlet NSComboBox*	adeiSetupOptionsComboBox;
-    IBOutlet NSTextField*	adeiServiceUrlField;
-    IBOutlet NSTableView*	adeiSetupOptionsTableView; // the setup options list view
-	IBOutlet NSButton*		addAdeiSetupOptionButton;
-	IBOutlet NSButton*		removeAdeiSetupOptionButton;// button text changed to "Delete"
-    IBOutlet NSScrollView*	textView; //super class of a text view is NSText -tb-
-	
-    //sensor settings tab
-    IBOutlet NSTextField*	sensorNumField;
-    IBOutlet NSTextField*	sensorAdeiBaseUrlField;
-    IBOutlet NSTextField*	sensorAdeiServiceUrlField;
-    IBOutlet NSTextField*	sensorPathField;
-    IBOutlet NSTextField*	minValueField;
-    IBOutlet NSTextField*	maxValueField;
-    IBOutlet NSTextField*	lowAlarmRangeField;
-    IBOutlet NSTextField*	highAlarmRangeField;
-	IBOutlet NSButton*		isRecordingDataButton;
-                                     
-    // Drawers
-    IBOutlet NSDrawer*	leftDrawer;
-	IBOutlet NSButton*	requestAdeiSensorTreeButton;
-	IBOutlet NSProgressIndicator*	requestAdeiSensorTreeProgressIndicator;
-	IBOutlet NSButton*	clearAdeiSensorTreeButton;
-    IBOutlet NSDrawer*	rightDrawer;
-    IBOutlet WebView*	adeiWebInterfaceWebView;
+	//local caches
+    NSMutableArray*     draggedNodes;
 }
 
 #pragma mark ***Initialization
 - (id) init;
-- (void) dealloc;
-- (void) awakeFromNib;
 
-#pragma mark ***Notifications
+#pragma mark ***Interface Management
+- (void) totalRequestCountChanged:(NSNotification*)aNote;
+- (void) timeOutCountChanged:(NSNotification*)aNote;
+- (void) pendingRequestsChanged:(NSNotification*)aNote;
+- (void) fastGenSetupChanged:(NSNotification*)aNote;
+- (void) setPointChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
+- (void) itemTypeChanged:(NSNotification*)aNote;
 - (void) updateWindow;
-- (void) updateSensorSettings;
 - (void) setWindowTitle;
-#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-- (void) remotePortChanged:(NSNotification*)note;
-- (void) remoteHostChanged:(NSNotification*)note;
-- (void) isConnectedChanged:(NSNotification*)note;
-- (void) byteCountChanged:(NSNotification*)note;
-- (void) connectAtStartChanged:(NSNotification*)note;
-- (void) autoReconnectChanged:(NSNotification*)note;
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-- (void) lockChanged:(NSNotification*)aNotification;
-
-//slow control
-
-//general settings tab
-- (void) adeiBaseUrlChanged:(NSNotification*)aNote;
-- (void) adeiServiceUrlChanged:(NSNotification*)aNote;
-- (void) adeiSetupOptionsChanged:(NSNotification*)aNote;
-- (void) adeiTreeChanged:(NSNotification*)aNote;
-- (void) requestingAdeiTreeStarted:(NSNotification*)aNote;
-- (void) requestingAdeiTreeStopped:(NSNotification*)aNote;
-
-- (void) sensorListChanged:(NSNotification*)aNote;
-
-//sensor setting notifications
-- (void) selectedSensorNumChanged:(NSNotification*)aNote;
-- (void) dataChanged:(NSNotification*)aNote;
-- (void) adeiBaseUrlForSensorChanged:(NSNotification*)aNote;
-- (void) minValueChanged:(NSNotification*)aNote;
-- (void) maxValueChanged:(NSNotification*)aNote;
-- (void) lowAlarmRangeChanged:(NSNotification*)aNote;
-- (void) highAlarmRangeChanged:(NSNotification*)aNote;
-- (void) isRecordingDataChanged:(NSNotification*)aNote;
+- (void) lockChanged:(NSNotification*)aNote;
+- (void) ipNumberChanged:(NSNotification*)aNote;
+- (void) viewItemNameChanged:(NSNotification*)aNote;
+- (void) treeChanged:(NSNotification*)aNote;
+- (void) itemListChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
-
-// slow control -tb-
-- (void) monitoringFieldChanged:(NSNotification*)aNotification;
-
-#pragma mark ***Accessors
+- (void) lastRequestChanged:(NSNotification*)aNote;
+- (void) tableViewSelectionDidChange:(NSNotification *)aNote;
+- (void) histoPlotChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) fastGenSetupAction:(id)sender;
+- (IBAction) writeSetPointAction:(id) sender;
+- (IBAction) setPointAction:(id) sender;
+- (IBAction) itemTypeAction:(id)sender;
+- (IBAction) viewItemNameAction:(id)sender;
+- (IBAction) viewItemInWebAction:(id)sender;
+- (IBAction) removeItemAction:(id)sender;
+- (IBAction) delete:(id)sender;
+- (IBAction) cut:(id)sender;
+- (IBAction) ipNumberAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
-
-//new -tb-
-//- (IBAction) loadButtonAction:(id)sender;  OBSOLETE -tb-
-//- (IBAction) loadCSVFileButtonAction:(id)sender; OBSOLETE -tb-
-- (IBAction) adeiBaseUrlFieldAction:(id)sender;
-- (IBAction) addAdeiSetupOptionAction:(id)sender;
-- (IBAction) removeAdeiSetupOptionAction:(id)sender;
-- (IBAction) requestSensorTreeButtonAction:(id)sender;
-- (IBAction) sensorlistButtonAction:(id)sender;
-- (IBAction) dumpSensorlistButtonAction:(id)sender;
-//sensor settings actions
-- (IBAction) adeiBaseUrlForSensorAction:(id)sender;
-- (IBAction) minValueChangedAction:(id)sender;
-- (IBAction) maxValueChangedAction:(id)sender;
-- (IBAction) lowAlarmRangeChangedAction:(id)sender;
-- (IBAction) highAlarmRangeChangedAction:(id)sender;
-- (IBAction) isRecordingDataChangedAction:(id)sender;
-//drawer actions
-- (IBAction)openLeftDrawer:(id)sender;
-- (IBAction)closeLeftDrawer:(id)sender;
-- (IBAction)toggleLeftDrawer:(id)sender;
-- (IBAction)openRightDrawer:(id)sender;
-- (IBAction)closeRightDrawer:(id)sender;
-- (IBAction)toggleRightDrawer:(id)sender;
-
-//list view context menu
-- (IBAction)sensorListContextMenuAction:(id)sender;
-- (IBAction)sensorListContextMenuLoadValueAction:(id)sender;
-- (IBAction)sensorListContextMenuEditAction:(id)sender;
-- (IBAction)sensorListContextMenuRemoveAction:(id)sender;
-- (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender;//web view
-- (IBAction)loadAdeiHomeInWebInterfaceWebViewAction:(id)sender;//web view
-
+- (IBAction) loadItemTree:(id)sender;
+- (IBAction) dumpSensorAction:(id)sender;
+- (IBAction) toggleTreeDrawer:(id)sender;
+- (IBAction) toggleWebDrawer:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+- (IBAction) clearHistory:(id) sender;
+- (IBAction) setPointAction:(id) sender;
 
 #pragma mark •••Data Source Methods (OutlineView)
-- (id) outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;
-- (BOOL) outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (int) outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
+- (BOOL) outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item; 
+- (id) outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item; 
 - (id) outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
-- (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
 
+#pragma mark •••Data Source Methods (ComboBox)
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox;
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index;
 
 #pragma mark •••Data Source Methods (TableView)
 - (int)numberOfRowsInTableView:(NSTableView *)tableView;
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row;
-//cloned Data Source Methods (TableView) for adeiSetupOptionsTableView
-- (int)numberOfRowsInAdeiSetupOptionsTableView:(NSTableView *)tableView;
-- (id)adeiSetupOptionsTableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
-- (void)adeiSetupOptionsTableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 
-
-/* Optional - Editing Support
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row;
-*/
-
+- (void) dragDone;
 @end
+
+@interface ORIpeTableView : NSTableView
+- (void) drawRow:(NSInteger)row clipRect:(NSRect)clipRect;
+@end
+
 

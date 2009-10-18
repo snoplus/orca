@@ -39,7 +39,7 @@
  * CLASSES
  *********************************************************************/
 
-/** This class provides a list of channels (or sensors). These channels can be used in the Orca processing framework
+/** This class provides a list of items (or sensors or controls). These channels can be used in the Orca processing framework
   * as input channels. The channel values are read from the ADEI system (by sending http requests to the ADEI system).
   *
   * The channels are free configurable. They can be configured by requesting all available sensor descriptions from the ADEI system
@@ -60,43 +60,32 @@
   *
   *
   */
+#define kResponseTimeHistogramSize 5000
 
 @interface ORIpeSlowControlModel : OrcaObject <ORAdcProcessing>
 {
-    //Slow Control
     int				 channelDataId;
-    
-  	NSString*		 currentSensor;//TODO: rename to currentSensorName  obsolete -tb-
-    int				 currentSensorIntValue;//obsolete -tb-
-    
-    //new -tb-
-    int				 selectedSensorNum;//number of selected sensor (for editing) in the interface
-    NSString*		 adeiBaseUrl;
-    NSString*		 adeiServiceUrl;
-    NSURL*			 myurl;
-    NSURL*			 csvurl;
-    NSXMLDocument*	 myxmldoc;
-    NSData*			 csvData;
-    ORSensorItem*	 rootAdeiTree;// root of outline view tree (ORSensorItem) = ADEI tree   -tb-
-    ORSensorItem*	 rootRequestTree;// root of request tree (ORSensorItem) = tree according to sensorList, describes
-                                  // hierarchy of sensor list items, used for fast reading
-    
-    int				 maxSensorListLength;
-    NSMutableArray*  sensorList; // list of tableview items (ORSensorItem) - TODO: write methods! (e.g. never insert items manually, the order MUST stay fixed) -tb-
-    NSMutableArray*  adeiSetupOptionsList; // list of adei setup options (to be able to use the test sensors)
-
-    //stuff for convenient ADEI tree download (NSURLConnection + NSURLRequest -> NSXMLDocument)
-    double			 xmlRequestTimeout;
-    BOOL             readOnce;
-    double			 dataRequestTimeout;
-    NSMutableArray*	 queueForLoadingAdeiTree;
-    ORSensorItem*	 currentlyLoadingSensorNode;//temp internal variable used for XML request
-    NSURLConnection* theXMLConnection;
-    NSMutableData*	 receivedXMLData;
+ 	NSString*		 IPNumber;
+	NSMutableArray*	 connectionHistory;
+	unsigned 		 ipNumberIndex;	
     int				 pollTime;
-    //testing/debugging
-    int heartbeatSec, heartbeatUSec;
-    int heartbeatLastSec, heartbeatLastUSec;
+	
+	NSMutableArray* itemTreeRoot;
+	NSString*		lastRequest;
+    BOOL			viewItemName;
+    int				itemType;
+    double			setPoint;
+    BOOL			fastGenSetup;
+	BOOL			checkingForTimeouts;
+	
+	NSMutableDictionary* requestCache;	//items to poll. Also contains extra info for the processing system
+	NSMutableArray*		 pollingLookUp;	//a look up table for itemKey by index
+	NSMutableDictionary* channelLookup; //a look up table for itemKey by channel
+	
+	NSMutableDictionary* pendingRequests;	//itemKeys in this are requests that have not come back
+	long histogram[kResponseTimeHistogramSize];
+    int timeOutCount;
+    int totalRequestCount;
 }
 
 #pragma mark ***Initialization
@@ -105,94 +94,63 @@
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
+- (void) clearHistory;
 
-#pragma mark ***Accessors
+#pragma mark •••Data Records
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
 - (int) channelDataId;
 - (void) setChannelDataId:(int) aValue;
+
+#pragma mark ***Accessors
+- (int) totalRequestCount;
+- (void) setTotalRequestCount:(int)aTotalRequestCount;
+- (int) timeOutCount;
+- (void) setTimeOutCount:(int)aTimeOutCount;
+- (BOOL) fastGenSetup;
+- (void) setFastGenSetup:(BOOL)aFastGenSetup;
+- (double) setPoint;
+- (void) setSetPoint:(double)aSetPoint;
+- (int) itemType;
+- (void) setItemType:(int)aItemType;
+- (BOOL) viewItemName;
+- (void) setViewItemName:(BOOL)aViewItemName;
+- (unsigned) connectionHistoryCount;
+- (id) connectionHistoryItem:(unsigned)index;
+- (NSString*) IPNumber;
+- (void) setIPNumber:(NSString*)aIPNumber;
+- (NSString*) ipNumberToURL;
+- (NSArray*) itemTreeRoot;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
-- (void) setRootAdeiTree:(ORSensorItem*)aSensorItem;
+- (NSString*) lastRequest;
+- (void) setLastRequest:(NSString*)aString;
+- (void) loadItemTree;
+- (void) addItems:(NSArray*)aSensorPathArray;
+- (NSString*) itemKey:aUrl:aPath;
+- (void) removeSet:(NSIndexSet*)aSetToRemove;
+- (unsigned) pendingRequestsCount;
+- (id) pendingRequest:(id)aKey forIndex:(int)anIndex;
 
-#pragma mark ***Slow Control Accessors
-//obsolete -tb-
-- (NSString*) currentSensor;//obsolete -tb-
-- (void) setCurrentSensor:(NSString*)aString;//obsolete -tb-
-- (int) currentSensorIntValue;//obsolete -tb-
-- (void) setCurrentSensorIntValue:(int)aValue;//obsolete -tb-
+- (void)          dumpSensorlist;
+- (void)	      pollSlowControls;
+- (NSString*)     createWebRequestForItem:(int)aChannel;
+- (NSString*)	  itemDetails:(int)index;
 
-//new -tb-
--(int) selectedSensorNum;
--(void) setSelectedSensorNum:(int) aValue;
-- (ORSensorItem*) rootAdeiTree;
-- (NSString*) adeiBaseUrl; 
-- (void) setAdeiBaseUrl: (NSString*) aUrl;
-- (NSString*) adeiServiceUrl; 
-- (void) setAdeiServiceUrl: (NSString*) aUrl;
-- (void) setAdeiServiceUrlFromAdeiBaseUrl;
-- (NSMutableArray *) sensorList;
-- (void) setSensorList: (NSMutableArray *) anItems;
-- (int) maxSensorListLength;
-- (void) initSensorList;
-- (ORSensorItem*) sensorAtIndex:(int)index;
-- (void) replaceSensorListItemAtIndex:(int)index withSensorTreeItem:(ORSensorItem*)sensorItem;
-- (void) removeSensorListItemWithIndex:(int)index;
-- (void) removeSensorListItem:(ORSensorItem*)sensorItem;
-- (int) nextFreeChanMap;
-// adei setup option list handling
-- (NSMutableArray *) adeiSetupOptionsList;
-- (void) setAdeiSetupOptionsList: (NSMutableArray *) anItems;
-- (void) initAdeiSetupOptionsList;
-- (void) insertAdeiSetupOption:(NSString *)aName atIndex:(int) index;
-- (void) removeAdeiSetupOptionAtIndex:(int) index;
-- (void) replaceAdeiSetupOptionAtIndex:(int) index withString:(NSString *)aName;
-- (NSString *) adeiSetupOptionAtIndex:(int) index;
-// more methods ...
-- (void) setMinValue:(double)aValue forChan:(int)channel;
-- (void) setMaxValue:(double)aValue forChan:(int)channel;
-- (void) setLowAlarmRange:(double)aValue forChan:(int)channel;
-- (void) setHighAlarmRange:(double)aValue forChan:(int)channel;
+#pragma mark ***Polling Cache
+- (unsigned)  pollingLookUpCount;
+- (NSString*) requestCacheItemKey:(int)anIndex;
+- (NSMutableDictionary*) topLevelPollingDictionary:(id)anItemKey;
+- (int)	 nextUnusedChannelNumber;
+- (BOOL) itemExists:(int)anIndex;
+- (BOOL) isControlItem:(int)anIndex;
+- (void) makeChannelLookup;
 
-- (double) doubleDataForChan:(int)channel;
-- (void) setDoubleData: (double) aValue forChan:(int)channel;
-- (BOOL) isRecordingDataForChan:(int)channel;
-- (void) setIsRecordingData:(BOOL)aValue forChan:(int)channel;
-
-- (void) setAdeiBaseUrl: (NSString*) aUrl forChan:(int)channel;
-- (NSString*) adeiBaseUrlForChan:(int)channel; 
-- (NSString*) adeiServiceUrlForChan:(int)channel; 
-- (NSString*) adeiPathForChan:(int)channel; 
-
-#pragma mark ***Slow Control
-//all obsolete -tb-
-- (void) setSensorWithName:(NSString*)aName toIntValue:(int)aValue; //obsolete -tb-
-- (void) setSensor:(char*)aName toIntValue:(int)aValue;//obsolete -tb-
-- (void) setSensorToIntValue:(int)aValue;//obsolete -tb-
-
-//for testing
-- (void) loadAllSensorValuesWithSensorPath;
-- (void) dumpSensorlist;
-//new -tb-
-- (NSXMLDocument*) createXMLDocumentWithErrorHandlingFromURL:(NSString *)urlname;
-- (NSXMLDocument*) createXMLDocumentFromURL:(NSString *)urlname;
-- (void) startRequestingADEISensorTreeWithErrorHandling;
-- (void) serveQueueForLoadingAdeiTree;
-- (void) loadAdeiTreeChildrenForNode:(ORSensorItem*) sensorNode;
-#pragma mark ***Delegate Methods for NSURLConnection
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
-- (void)connection:(NSURLConnection *)connection  didFailWithError:(NSError *)error;
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection;
-
-- (void) requestSensorTreeADEI;
-- (void) rebuildConnectionsBetweenAdeiTreeAndSensorList;
-
-//polling
-- (void) pollSlowControls;
+#pragma mark •••Statistics
+- (void) histogram:(int)milliSecs;
+- (long) dataTimeHist:(int)index;
 
 #pragma mark •••Archival
-
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
@@ -200,227 +158,69 @@
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••Adc or Bit Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
 - (void) startProcessCycle;
 - (void) endProcessCycle;
 - (BOOL) processValue:(int)channel;
-- (void) setProcessOutput:(int)channel value:(int)value;
- //not usually used, but needed for easy compatibility with the bit protocol
 - (NSString*) processingTitle;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
 - (double) minValueForChan:(int)channel;
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 
-- (void)processIsStarting; //not in Bit Processing Protocol, but seems to be necessary -tb-
-- (void)processIsStopping; //not in Bit Processing Protocol, but seems to be necessary -tb-
-
-#pragma mark •••ID Helpers (see OrcaObject)
+#pragma mark •••Helpers
 - (NSString*) identifier;
+- (NSMutableDictionary*) makeTopLevelDictionary;
 
-#pragma mark •••  Protocol ORHWWizard
-- (NSArray*) wizardParameters;
-- (NSArray*) wizardSelections;
-- (int) numberOfChannels;
-@end //of @interface ORIpeSlowControlModel
+#pragma mark •••Main Scripting Methods
+//Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
+- (void) setUrl:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
+- (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath;
+- (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath;
+- (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
+- (void) writeSetPoint:(int)anIndex value:(double)aValue;
+- (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;
+
+@end
 
 #pragma mark •••Notification Strings
+extern NSString* ORIpeSlowControlModelTotalRequestCountChanged;
+extern NSString* ORIpeSlowControlModelTimeOutCountChanged;
+extern NSString* ORIpeSlowControlModelFastGenSetupChanged;
+extern NSString* ORIpeSlowControlModelSetPointChanged;
+extern NSString* ORIpeSlowControlModelItemTypeChanged;
+extern NSString* ORIpeSlowControlModelViewItemNameChanged;
 extern NSString* ORIpeSlowControlLock;
-extern NSString* ORIpeSlowControlSelectedSensorNumChanged;
-extern NSString* ORIpeSlowControlAdeiServiceUrlChanged;
-extern NSString* ORIpeSlowControlAdeiSetupOptionsChanged;
-extern NSString* ORIpeSlowControlAdeiBaseUrlChanged;
-extern NSString* ORIpeSlowControlAdeiTreeChanged;
-extern NSString* ORIpeSlowControlRequestingAdeiTreeStartedNotification;
-extern NSString* ORIpeSlowControlRequestingAdeiTreeStoppedNotification;
-extern NSString* ORIpeSlowControlSensorListChanged;
-//slow control -tb-
-extern NSString* ORIpeSlowControlMonitoringFieldChanged; //obsolete -tb-
-
-extern NSString* ORIpeSlowControlDataChanged;
-extern NSString* ORIpeSlowControlAdeiBaseUrlForSensorChanged;
-
-extern NSString* ORIpeSlowControlminValueChanged;
-extern NSString* ORIpeSlowControlmaxValueChanged;
-extern NSString* ORIpeSlowControllowAlarmRangeChanged;
-extern NSString* ORIpeSlowControlhighAlarmRangeChanged;
-extern NSString* ORIpeSlowControlSetIsRecordingDataChanged;
+extern NSString* ORIpeSlowControlItemListChanged;
 extern NSString* ORIpeSlowControlPollTimeChanged;
+extern NSString* ORIpeSlowControlLastRequestChanged;
+extern NSString* SBC_LinkIPNumberChanged;
+extern NSString* ORIpeSlowControlIPNumberChanged;
+extern NSString* ORIpeSlowItemTreeChanged;
+extern NSString* ORIpeSlowControlModelHistogramChanged;
+extern NSString* ORIpeSlowControlPendingRequestsChanged;
 
-#pragma mark •••Class ORSensorItem
+// this is for testing and debugging the  code -tb- 2008-12-08
+//#define __ORCA_DEVELOPMENT__CONFIGURATION__
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
 
-/*********************************************************************-tb-
- * from here: class ORSensorItem
- *
- * TODO: could make own source files -tb-
- *********************************************************************/
+#define USE_TILLS_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
+#ifdef USE_TILLS_DEBUG_MACRO
+#define    DebugTB(x) x
+#else
+#define    DebugTB(x) 
+#endif
 
-extern NSString * kSensorIDString;//ADEI ItemMask
-extern NSString * kGroupIDString;//ADEI LogGroup
-extern NSString * kDatabaseString;
-extern NSString * kServerString;
-extern NSString * kSetupOptionString;
-extern NSString * kServiceString;
-extern NSString * kAdeiUrlString;
+#if 0
+// if 1 all methods will print out a message -> for testing IB connections -tb-
+#define    DebugMethCallsTB(x) x
+#else
+#define    DebugMethCallsTB(x) 
+#endif
 
-extern NSString * kMinValueString;
-extern NSString * kMaxValueString;
-extern NSString * kLowAlarmRangeString;
-extern NSString * kHighAlarmRangeString;
-extern NSString * kIsRecordingDataString;
-
-
-
-enum  {kAdeiUnknown=0 , kAdeiTypeRoot, kAdeiTypeService, kAdeiTypeSetupOption, kAdeiTypeServer, kAdeiTypeDatabase, kAdeiTypeGroup, kAdeiTypeItem, //TODO: rename to kAdeiTypeItemMask -tb-
-       kAdeiTypeLast, //MUST stand between tree items and list items
-       kSensorListItem, kSensorListEmptyItem};
-
-/** This class is used as nodes for the internal ADEI tree (starting at rootRequestTree) and as items for the OutlineView;
-  * second as list items for the TableView (stored in sensorList).
-  *
-  */
-@interface ORSensorItem : NSObject {
-    NSString* name; //a outline view column identifier
-    NSString* tree; //a outline view column identifier
-    NSString* value; //a outline view column identifier
-    NSString* type;  //a outline view column identifier
-    NSString* data;  //a outline view column identifier
-    NSString* date;  //a outline view column identi
-    double doubleData; // double version of  NSString* data
-    long dataTimestampSec;// the timestamp of the data (seconds)
-    long dataTimestampSubSec;// the timestamp of the data (subseconds, could be usec or nanosec! -tb-)
-    double setpoint; // the setpoint for a sensor (SOLLWERT)
-    BOOL isRecordingData; // TRUE if the sensor shall record its data into the Orca data file
-    double minValue;
-    double setMinValue;
-    double maxValue;
-    double setMaxValue;
-    double lowAlarmRange;
-    double setLowAlarmRange;
-    double highAlarmRange;
-    double setHighAlarmRange;
-    int adeiType;
-    int channelMapNum; //this is used in two ways: sensorListItem: the index of the item; treeItem: the number of the according sensorlistItem (if defined) otherwise -1
-    NSString* classType;
-    NSMutableArray* children;// the children of this item in the ADEI tree // rename to 'children' (from 'items') -tb-
-    id object;
-	ORSensorItem* parent; //the parent of this item in the ADEI tree
-	ORSensorItem* sibling; //for a sensor list item this points to the according element in ADEI tree and vice versa TODO: twin would be better name -tb-
-    NSXMLDocument *xmlDoc;
-    NSXMLNode     *xmlNode;
-    NSMutableDictionary* sensorPath; //for sensor list items this represents the path to the corresponding item in the ADEI tree/hierarchy
-}
-
-#pragma mark •••Initialization
-+ (ORSensorItem*) sensorWithAdeiType:(int)aValue named:(NSString*)aName;
-+ (ORSensorItem*) emptySensorListItemWithChanNum:(int)aNum;
-+ (NSString*) stringForAdeiType:(int)aValue;
-
-- (id) init;
-- (id) initSensorListItem;
-- (void) dealloc;
-
-//general attributes
-- (NSString *) name;
-- (void) setName: (NSString *) aName;
-
-- (NSString *) tree;
-- (void) setTree: (NSString *) aName;
-
-- (NSString *) value;
-- (void) setValue: (NSString *) aName;
-
-- (NSString *) type;
-- (void) setType: (NSString *) aName;
-
-- (NSString *) data;
-- (void) setData: (NSString *) aString;
-- (double) doubleData;
-- (void) setDoubleData: (double) aValue;
-- (long)  dataTimestampSec;
-- (void) setDataTimestampSec: (long) aValue;
-- (long)  dataTimestampSubSec;
-- (void) setDataTimestampSubSec: (long) aValue;
-- (void) setDataTimestampSec:(long) aSecValue   subSec:(long) aSubSecValue;
-- (double) setpoint;
-- (void) setSetpoint: (double) aValue;
-
-- (BOOL) isRecordingData;
-- (void) setIsRecordingData:(BOOL)aValue;
-
-- (NSString *) date; 
-- (void) setDate: (NSString *) aString;
-
-- (double) minValue;
-- (void) setMinValue:(double)aValue;
-- (double) maxValue;
-- (void) setMaxValue:(double)aValue;
-- (double) lowAlarmRange;
-- (void) setLowAlarmRange:(double)aValue;
-- (double) highAlarmRange;
-- (void) setHighAlarmRange:(double)aValue;
-
-#pragma  mark •••Actions using the ADEI interface
-- (int) adeiType;
-- (void) setAdeiType:(int) aValue;
-- (BOOL) isAdeiTreeItem;
-- (BOOL) isSensorListItem; //true, if this object is in the sensor list
-- (BOOL) isEmptySensorListItem;// objects in the sensor list are isEmptySensorListItem XOR isDefinedSensorListItem
-- (BOOL) isDefinedSensorListItem;
-
-- (double) loadSensorValueWithSensorPath;
-- (NSString*) createWebinterfaceRequestStringWithSensorPath;
-
-
-//link between channel map list items and sensor tree items
-- (void) setSibling:(ORSensorItem*)anObject;
-- (ORSensorItem*) sibling;
-- (void) connectSiblings:(ORSensorItem*)anObject; // sets the siblings in both directions
-- (void) disconnectSiblings; // disconnects (sets to nil) the siblings in both directions
-- (void) createAdeiPathFromSibling:(ORSensorItem*)aSibling; //if aSibling == nil, use the own sibling
-
-//channel map (sensor list) items
-- (void) clearSensorListItem;
-- (int) channelMapNum;
-- (void) setChannelMapNum:(int) aValue;
-
-- (void) setAdeiBaseUrl: (NSString*) aUrl;
-- (NSString*) adeiBaseUrl;
-- (NSString*) adeiServiceUrl;
-
-- (NSMutableDictionary *) sensorPath;
-- (void) setSensorPath: (NSMutableDictionary *) aDict;
-- (void) clearSensorPath;
-- (void) dumpSensorPath;
-- (NSString*) adeiPath; 
-
-//unused? unneeded?
-- (NSString *) classType;
-- (void) setClassType: (NSString *) aType;
-- (id) object;
-- (void) setObject: (id) anObject;
-
-//sensor tree methods
-- (void) setParent:(ORSensorItem*)anObject;
-- (ORSensorItem*) parent;
-
-- (NSXMLDocument*) xmlDoc;
-- (void) setXmlDoc:(NSXMLDocument*)aDoc;
-- (NSXMLNode*) xmlNode;
-- (void) setXmlNode:(NSXMLNode*)aNode;
-
-
-- (NSMutableArray *) children;//rename to children (was items) -tb-
-- (void) setChildren: (NSMutableArray *) anItems;
-- (void) addChild:(id)anObject;
-- (unsigned) countChildren;
-- (BOOL) isLeafNode;
-- (id) childAtIndex:(int)index;
-
-- (int) createChildrenFromXmlDoc:(NSXMLDocument*)aDoc withType:(int)aType;
-
-#pragma mark •••Archival
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
-
-
-@end //of @interface ORSensorItem
+#else
+#define    DebugTB(x) 
+#define    DebugMethCallsTB(x) 
+#endif
 
