@@ -336,6 +336,20 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	else return nil;
 }
 
+- (NSDictionary*) requestCacheItem:(int)anIndex
+{
+	//Note: index is NOT channel, it is the index of the item in the details panel
+	//use the lookup table to return the polingCache's topLevelDictionary
+	//to have fast access by index to the requestCache, there is a lookupTable Array of the 
+	//form: itemKey0,itemKey1,itemKey2....
+	if(anIndex<[pollingLookUp count]){
+		NSString* itemKey = [pollingLookUp objectAtIndex:anIndex];
+		NSDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
+		return [topLevelDictionary objectForKey:itemKey];
+	}
+	else return nil;
+}
+
 - (unsigned) pollingLookUpCount
 {
 	return [pollingLookUp count];

@@ -140,6 +140,8 @@
 #pragma mark ***Polling Cache
 - (unsigned)  pollingLookUpCount;
 - (NSString*) requestCacheItemKey:(int)anIndex;
+- (NSDictionary*) requestCacheItem:(int)anIndex;
+
 - (NSMutableDictionary*) topLevelPollingDictionary:(id)anItemKey;
 - (int)	 nextUnusedChannelNumber;
 - (BOOL) itemExists:(int)anIndex;

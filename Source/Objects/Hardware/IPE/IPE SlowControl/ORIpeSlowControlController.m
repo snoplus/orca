@@ -22,6 +22,7 @@
 #import "ORIpeSlowControlModel.h"
 #import "ORTimedTextField.h"
 #import "ORPlotter1D.h"
+#import "ORAdeiLoader.h"
 
 @implementation ORIpeSlowControlController
 
@@ -38,8 +39,6 @@
 	[ipNumberComboBox setUsesDataSource:YES];
 	[ipNumberComboBox setDataSource:self];
 	[lastRequestField setTimeOut:1];
-    [itemTreeOutlineView setVerticalMotionCanBeginDrag:YES];
-    [itemTableView registerForDraggedTypes:[NSArray arrayWithObjects:@"ORItemType", nil]];
 	[ipNumberComboBox reloadData];
 	[viewItemInWebButton setEnabled:NO];
 	[setPointField setEnabled:NO];
@@ -55,6 +54,12 @@
     [[timingPlotter xScale] setRngLimitsLow:0 withHigh:kResponseTimeHistogramSize withMinRng:100];
     [[timingPlotter xScale] setRngLow:0 withHigh:kResponseTimeHistogramSize];
     [[timingPlotter xScale] setLog:NO];
+	
+    [itemTreeOutlineView setVerticalMotionCanBeginDrag:YES];
+    [itemTableView registerForDraggedTypes:[NSArray arrayWithObjects:@"ORItemType",NSStringPboardType, nil]];
+	[itemTreeOutlineView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
+	[itemTableView setDraggingSourceOperationMask:NSDragOperationEvery forLocal:NO];
+    [itemTableView setVerticalMotionCanBeginDrag:YES];
 }
 
 #pragma mark ***Notifications
@@ -524,18 +529,23 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 			int componentCount = [[[obj objectForKey:@"Path"] componentsSeparatedByString:@"/"] count];
 			if(componentCount==4){
 				[draggedNodes addObject:[[obj mutableCopy] autorelease]];
+				NSString* aUrl = [obj objectForKey:@"URL"];
+				NSString* aPath = [obj objectForKey:@"Path"];
+				s = [s stringByAppendingFormat:@"url  = %@\n",aUrl];
+				s = [s stringByAppendingFormat:@"path = %@\n",aPath];
+				s = [s stringByAppendingFormat:@"webRequest = %@\n",[ORAdeiLoader webRequestStringUrl:aUrl itemPath:aPath]];
 			}
 		}
-		[pboard declareTypes:[NSArray arrayWithObjects:@"ORItemType",NSStringPboardType, nil] owner:self];
+		[pboard declareTypes:[NSArray arrayWithObjects:@"ORItemType", NSStringPboardType,nil] owner:self];
 		[pboard setData:[NSData data] forType:@"ORItemType"];	//put in a NSData placeholder.... we'll provide the actual data thru other means	
+
 		if([s length]){
-			[pboard setString:s  forType:NSStringPboardType];
+			[pboard setString:s forType:NSStringPboardType];
 		}
 		return YES;
 	}
 	else return NO;
 }
-
 
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem
 {
@@ -616,7 +626,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 
 - (void) tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
 {
-    if(tableView==itemTableView){
+	if(tableView==itemTableView){
 		if(row<[model pollingLookUpCount]){
 			//only items that can be changed are in the topLevelDictionary
 			NSString* itemKey = [model requestCacheItemKey:row];
@@ -676,6 +686,33 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 		}
     }
 	return nil;
+}
+
+- (BOOL) tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard
+{
+	unsigned current_index = [rowIndexes firstIndex];
+	NSString* s = @"";
+    while (current_index != NSNotFound) {
+		NSDictionary* itemDictionary = [model requestCacheItem:current_index];
+		if(itemDictionary){
+			int componentCount = [[[itemDictionary objectForKey:@"Path"] componentsSeparatedByString:@"/"] count];
+			if(componentCount==4){
+				NSString* aUrl = [itemDictionary objectForKey:@"URL"];
+				NSString* aPath = [itemDictionary objectForKey:@"Path"];
+				s = [s stringByAppendingFormat:@"url  = %@\n",aUrl];
+				s = [s stringByAppendingFormat:@"path = %@\n",aPath];
+				s = [s stringByAppendingFormat:@"webRequest = %@\n",[ORAdeiLoader webRequestStringUrl:aUrl itemPath:aPath]];
+			}
+		}
+		current_index = [rowIndexes indexGreaterThanIndex: current_index];
+    }
+	
+	if([s length]){
+		[pboard declareTypes:[NSArray arrayWithObjects:NSStringPboardType,nil] owner:self];	
+		[pboard setString:s forType:NSStringPboardType];
+		return YES;
+	}
+	else return NO;
 }
 
 - (void) dragDone
