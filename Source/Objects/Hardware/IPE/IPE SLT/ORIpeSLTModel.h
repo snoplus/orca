@@ -147,6 +147,7 @@ enum {
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
+- (void) findInterface;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

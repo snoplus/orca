@@ -268,6 +268,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 		if([aGuardian adapter] == nil){
 			[aGuardian setAdapter:self];			
 		}
+		[self findInterface];
 	}
 	else {
 		[self setFireWireInterface:nil];
@@ -678,6 +679,15 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORIpeSLTWriteValueChanged
 	 object:self];
+}
+
+- (void) findInterface
+{
+	@try {
+		[self setFireWireInterface:[[self crate] getFireWireInterface:0x108]];
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 //status reg values
