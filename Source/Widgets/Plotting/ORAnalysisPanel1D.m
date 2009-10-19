@@ -72,7 +72,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[fitFunction release];
-    //[analysisView removeFromSuperview];
+    [analysisView removeFromSuperview];
     [super dealloc];
 }
 
@@ -86,7 +86,9 @@
 {
     gate = aGate;
     
-    [self registerNotificationObservers];
+    if(gate)[self registerNotificationObservers];
+	else     [[NSNotificationCenter defaultCenter] removeObserver:self];
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCARootServiceBroadcastConnection object: self];
     [self updateWindow];
 }
