@@ -127,16 +127,9 @@ NSString* ORIpeV4CrateConnectedChanged = @"ORIpeV4CrateConnectedChanged";
     
 }
 
-- (void) findInterface
-{
-	[[self adapter] findInterface];
-}
-
 - (void) adapterChanged:(NSNotification*)aNote
 {
-	if([aNote object] == self){
-		[[self adapter] findInterface]; //TODO: this needs to be implemented -tb- 2008-09-19
-	}
+	//nothing to do...
 }
 
 

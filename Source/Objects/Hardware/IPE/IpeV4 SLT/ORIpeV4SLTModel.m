@@ -1208,10 +1208,9 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [self clearExceptionCount];
 	
 	//check that we can actually run
-//TODO: this was a firewire check - is there a check of "Connected to Crate/PrPMC? -tb-
-//    if(![[[self crate] adapter] serviceIsAlive]){
-//		[NSException raise:@"No FireWire Service" format:@"Check Crate Power and FireWire Cable."];
-//    }
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Check the SLT connection"];
+	}
 	
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
