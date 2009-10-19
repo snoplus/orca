@@ -371,6 +371,9 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
     NSString* aLine;
     BOOL oldFormat = [[[lines objectAtIndex:0] componentsSeparatedByString:@","] count] == 5;
 	int index = -1;
+	for(ORDetectorSegment* aSegment in segments){
+		[aSegment setHwPresent:NO];
+	}
     while(aLine = [e nextObject]){
         aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@","]];

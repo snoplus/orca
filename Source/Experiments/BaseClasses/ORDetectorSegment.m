@@ -232,7 +232,10 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 {
 	return hwPresent;
 }
-
+- (void) setHwPresent:(BOOL)state
+{
+	hwPresent = state;
+}
 
 - (NSUndoManager*) undoManager
 {

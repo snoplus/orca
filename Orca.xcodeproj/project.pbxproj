@@ -108,6 +108,7 @@
 		84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */ = {isa = PBXBuildFile; fileRef = 84028032073BF49D00972B07 /* ORLAMhosting.h */; };
 		840590EB0CCE5E9C0000DBF3 /* ORLevelMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */; };
 		840590EC0CCE5E9C0000DBF3 /* ORLevelMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */; };
+		8405A459108C99A8001F43F1 /* ORDetectorSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 8405A458108C99A8001F43F1 /* ORDetectorSegment.m */; };
 		84071B690D185E7F00FD6EFD /* ORDataChainObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 84071B670D185E7F00FD6EFD /* ORDataChainObject.h */; };
 		84071B6A0D185E7F00FD6EFD /* ORDataChainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 84071B680D185E7F00FD6EFD /* ORDataChainObject.m */; };
 		84073A4F05E3F3D3003E62AA /* ORValidatePassword.h in Headers */ = {isa = PBXBuildFile; fileRef = 84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */; };
@@ -1286,7 +1287,6 @@
 		849B25F20B2F34FA0007484F /* PrespectrometerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B25EA0B2F34F90007484F /* PrespectrometerModel.h */; };
 		849B25F30B2F34FA0007484F /* PrespectrometerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849B25EB0B2F34F90007484F /* PrespectrometerModel.m */; };
 		849B26D90B2F48490007484F /* ORDetectorSegment.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B26D70B2F48490007484F /* ORDetectorSegment.h */; };
-		849B26DA0B2F48490007484F /* ORDetectorSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 849B26D80B2F48490007484F /* ORDetectorSegment.m */; };
 		849B472E0D98298B00AD79A0 /* AutoScale.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849B472D0D98298B00AD79A0 /* AutoScale.tif */; };
 		849B47300D982AC000AD79A0 /* Calibrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849B472F0D982AC000AD79A0 /* Calibrate.gif */; };
 		849C68010A2CC20B00511E30 /* CCUSB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FD0A2CC20B00511E30 /* CCUSB.nib */; };
@@ -2309,6 +2309,7 @@
 		8403F4A60508F1BE005F64B1 /* ORGenericView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGenericView.m; path = Source/Misc/ORGenericView.m; sourceTree = SOURCE_ROOT; };
 		840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLevelMonitor.h; path = "Source/Widgets/Bar Graph/ORLevelMonitor.h"; sourceTree = SOURCE_ROOT; };
 		840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLevelMonitor.m; path = "Source/Widgets/Bar Graph/ORLevelMonitor.m"; sourceTree = SOURCE_ROOT; };
+		8405A458108C99A8001F43F1 /* ORDetectorSegment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDetectorSegment.m; path = Source/Experiments/BaseClasses/ORDetectorSegment.m; sourceTree = SOURCE_ROOT; };
 		84071B670D185E7F00FD6EFD /* ORDataChainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORDataChainObject.h; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.h"; sourceTree = SOURCE_ROOT; };
 		84071B680D185E7F00FD6EFD /* ORDataChainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDataChainObject.m; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.m"; sourceTree = SOURCE_ROOT; };
 		84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORValidatePassword.h; sourceTree = "<group>"; };
@@ -3285,7 +3286,6 @@
 		849B25EA0B2F34F90007484F /* PrespectrometerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrespectrometerModel.h; path = Source/Experiments/Prespectrometer/PrespectrometerModel.h; sourceTree = SOURCE_ROOT; };
 		849B25EB0B2F34F90007484F /* PrespectrometerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = PrespectrometerModel.m; path = Source/Experiments/Prespectrometer/PrespectrometerModel.m; sourceTree = SOURCE_ROOT; };
 		849B26D70B2F48490007484F /* ORDetectorSegment.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDetectorSegment.h; path = Source/Experiments/BaseClasses/ORDetectorSegment.h; sourceTree = SOURCE_ROOT; };
-		849B26D80B2F48490007484F /* ORDetectorSegment.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDetectorSegment.m; path = Source/Experiments/BaseClasses/ORDetectorSegment.m; sourceTree = SOURCE_ROOT; };
 		849B472D0D98298B00AD79A0 /* AutoScale.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AutoScale.tif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/AutoScale.tif"; sourceTree = SOURCE_ROOT; };
 		849B472F0D982AC000AD79A0 /* Calibrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Calibrate.gif; sourceTree = "<group>"; };
 		849C67FD0A2CC20B00511E30 /* CCUSB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CCUSB.nib; sourceTree = "<group>"; };
@@ -4786,6 +4786,7 @@
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
 			isa = PBXGroup;
 			children = (
+				84516B900523845D005F64B1 /* HardwareWizard */,
 				840B4BAC03D875E1005F64B1 /* ORAlarmCollection.h */,
 				840B4BAD03D875E1005F64B1 /* ORAlarmCollection.m */,
 				840B4BB203D87657005F64B1 /* ORAlarm.h */,
@@ -6950,7 +6951,7 @@
 			isa = PBXGroup;
 			children = (
 				849B26D70B2F48490007484F /* ORDetectorSegment.h */,
-				849B26D80B2F48490007484F /* ORDetectorSegment.m */,
+				8405A458108C99A8001F43F1 /* ORDetectorSegment.m */,
 				84F69CF50B331BB9000BE0CA /* ORSegmentGroup.h */,
 				84F69CF60B331BB9000BE0CA /* ORSegmentGroup.m */,
 				84A5A2290B35D8B0002EC2AA /* ORDetectorView.m */,
@@ -9050,7 +9051,6 @@
 				843CDEBA03BE2B2D00C39F5F /* Preferences */,
 				844E494105752906005F11A0 /* TaskMaster */,
 				84BAA886055AD39B0005F507 /* CommandCenter */,
-				84516B900523845D005F64B1 /* HardwareWizard */,
 				847BF70E07A5776000F91E05 /* GateKeeper */,
 				840B4BAB03D8754D005F64B1 /* Alarms */,
 				84799A3808DF5C6400D848FB /* SplashScreen */,
@@ -11228,7 +11228,6 @@
 				849B25EF0B2F34FA0007484F /* PrespectrometerController.m in Sources */,
 				849B25F10B2F34FA0007484F /* PrespectrometerView.m in Sources */,
 				849B25F30B2F34FA0007484F /* PrespectrometerModel.m in Sources */,
-				849B26DA0B2F48490007484F /* ORDetectorSegment.m in Sources */,
 				84F69CF80B331BBA000BE0CA /* ORSegmentGroup.m in Sources */,
 				84A5A22A0B35D8B0002EC2AA /* ORDetectorView.m in Sources */,
 				84760CC30B370E0A00512F67 /* ORExperimentModel.m in Sources */,
@@ -11521,6 +11520,7 @@
 				84DBA1331058122C00884B1C /* ORiTransGasSensorController.m in Sources */,
 				848BF50F107255F8005779A2 /* PMC_Link.m in Sources */,
 				8421064C1085A28E00C3AA81 /* ORAdeiLoader.m in Sources */,
+				8405A459108C99A8001F43F1 /* ORDetectorSegment.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

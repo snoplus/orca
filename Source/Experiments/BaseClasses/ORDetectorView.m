@@ -167,7 +167,7 @@
 				}
 				else [[NSColor whiteColor] set];
 			}
-			else [[NSColor blackColor] set];
+			else [[NSColor clearColor] set];
 			[segmentPath fill];
 			
 			//display error spot if needed

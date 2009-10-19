@@ -54,6 +54,7 @@
 - (void) setErrorShape:(NSBezierPath*)aPath;
 - (BOOL) online;
 - (BOOL) hwPresent;
+- (void) setHwPresent:(BOOL)state;
 - (BOOL) isValid;
 - (void) setIsValid:(BOOL)newIsValid;
 - (NSMutableDictionary *) params;
