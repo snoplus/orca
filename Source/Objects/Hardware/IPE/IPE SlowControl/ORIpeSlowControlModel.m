@@ -864,6 +864,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 		NSMutableArray* newArray = [NSMutableArray array];
 		NSMutableDictionary* aDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 											nodeName,@"Name",
+											aPath,@"Path",
 											[self ipNumberToURL],@"URL",
 											newArray,@"Children",
 											nil];

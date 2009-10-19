@@ -312,6 +312,7 @@
 				NSString* s = [[itemTreeOutlineView selectedItem] description];
 				s = [s stringByReplacingOccurrencesOfString:@"{" withString:@""];
 				s = [s stringByReplacingOccurrencesOfString:@"}" withString:@""];
+				s = [s stringByReplacingOccurrencesOfString:@";" withString:@""];
 				[treeDetailsView setString: s]; 
 			}
 		}
@@ -433,7 +434,8 @@
 #pragma mark •••Drawer Actions
 /* We do not use [NSDrawer open:] to open the drawer, because that method will
 autoselect an edge, and we want this drawer to open only on specific edges. */
-- (IBAction) toggleTreeDrawer:(id)sender {
+- (IBAction) toggleTreeDrawer:(id)sender 
+{
     NSDrawerState state = [treeDrawer state];
     if (NSDrawerOpeningState == state || NSDrawerOpenState == state) {
         [treeDrawer close];
@@ -443,7 +445,8 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
     }
 }
 
-- (IBAction) toggleWebDrawer:(id)sender {
+- (IBAction) toggleWebDrawer:(id)sender 
+{
     NSDrawerState state = [webDrawer state];
     if (NSDrawerOpeningState == state || NSDrawerOpenState == state){
 		[webDrawer close];
@@ -514,15 +517,20 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 {
     draggedNodes = [[NSMutableArray array] retain]; 
 	if(ov == itemTreeOutlineView){
-		NSArray *types   = [NSArray arrayWithObjects: @"ORItemType", nil];
+		NSArray *types   = [NSArray arrayWithObjects: @"ORItemType", NSStringPboardType, nil];
 		[pboard declareTypes:types owner:self];
+		NSString* s = @"";
 		for(id obj in writeItems){
-			[draggedNodes addObject:[[obj mutableCopy] autorelease]];
+			int componentCount = [[[obj objectForKey:@"Path"] componentsSeparatedByString:@"/"] count];
+			if(componentCount==4){
+				[draggedNodes addObject:[[obj mutableCopy] autorelease]];
+			}
 		}
-		//the actual data doesn't matter since We're not really putting anything on the pasteboard. We are
-		//just using it to control the process.
-		[pboard setData:[NSData data] forType:@"ORItemType"];		
-		[pboard declareTypes:[NSArray arrayWithObjects:@"ORItemType", nil] owner:self];
+		[pboard declareTypes:[NSArray arrayWithObjects:@"ORItemType",NSStringPboardType, nil] owner:self];
+		[pboard setData:[NSData data] forType:@"ORItemType"];	//put in a NSData placeholder.... we'll provide the actual data thru other means	
+		if([s length]){
+			[pboard setString:s  forType:NSStringPboardType];
+		}
 		return YES;
 	}
 	else return NO;

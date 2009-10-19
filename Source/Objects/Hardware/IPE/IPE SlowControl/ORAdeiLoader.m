@@ -366,7 +366,7 @@ didStartElement:(NSString*) elementName
 	NSArray* components = [path componentsSeparatedByString:@"/"];
 	if([components count] == 4) {
 		requestString = [NSMutableString stringWithFormat:
-				 @"%@/#db_server=%@&db_name=%@&db_group=%@&db_mask=%@&window=0&module=graph",
+				 @"%@/?minimal=graph#&module=graph&db_server=%@&db_name=%@&db_group=%@&db_mask=%@&window=0",
 				 url,
 				 [components objectAtIndex:0],
 				 [components objectAtIndex:1],
