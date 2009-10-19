@@ -1036,7 +1036,7 @@ int filterGraph(nodeType*);
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 2;
 	
-    unsigned short index  = (ptr[1]&0xff00000)>>24;
+    unsigned short index  = (ptr[1]&0xff000000)>>24;
     unsigned long  value = ptr[1]&0x00ffffff;
 	
     [aDataSet histogram:value numBins:4096  sender:self  withKeys:@"Filter",
@@ -1050,7 +1050,7 @@ int filterGraph(nodeType*);
     NSString* title= @"Filter Record (1D)\n\n";
     
     NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ptr[1]&0x00ffffff];    
-    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff00000)>>24];    
+    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff000000)>>24];    
 	
     return [NSString stringWithFormat:@"%@%@%@",title,value,index];               
 }
