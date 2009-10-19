@@ -25,8 +25,9 @@
 #import "ORAdeiLoader.h"
 
 #pragma mark •••Notification Strings
+NSString* ORIpeSlowControlModelShipRecordsChanged	= @"ORIpeSlowControlModelShipRecordsChanged";
 NSString* ORIpeSlowControlModelTotalRequestCountChanged = @"ORIpeSlowControlModelTotalRequestCountChanged";
-NSString* ORIpeSlowControlModelTimeOutCountChanged = @"ORIpeSlowControlModelTimeOutCountChanged";
+NSString* ORIpeSlowControlModelTimeOutCountChanged	= @"ORIpeSlowControlModelTimeOutCountChanged";
 NSString* ORIpeSlowControlModelFastGenSetupChanged	= @"ORIpeSlowControlModelFastGenSetupChanged";
 NSString* ORIpeSlowControlModelSetPointChanged		= @"ORIpeSlowControlModelSetPointChanged";
 NSString* ORIpeSlowControlModelItemTypeChanged		= @"ORIpeSlowControlModelItemTypeChanged";
@@ -53,6 +54,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (void) clearPendingRequest:(NSString*)anItemKey;
 - (void) setPendingRequest:(NSString*)anIemKey;
 - (void) checkForTimeOuts;
+- (void) shipTheRecords;
 @end
 
 @implementation ORIpeSlowControlModel
@@ -126,6 +128,18 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
 
 #pragma mark ***Accessors
+
+- (BOOL) shipRecords
+{
+    return shipRecords;
+}
+
+- (void) setShipRecords:(BOOL)aShipRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
+    shipRecords = aShipRecords;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlModelShipRecordsChanged object:self];
+}
 
 - (int) totalRequestCount
 {
@@ -522,6 +536,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
  	[self initConnectionHistory];
    
     [self initBasics];
+	[self setShipRecords:		[decoder decodeBoolForKey:	  @"shipRecords"]];
 	[self setFastGenSetup:		[decoder decodeBoolForKey:	  @"fastGen"]];
 	[self setSetPoint:			[decoder decodeDoubleForKey:  @"setPoint"]];
 	[self setItemType:			[decoder decodeIntForKey:	  @"itemType"]];
@@ -542,6 +557,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];    
+	[encoder encodeBool:shipRecords			forKey:@"shipRecords"];
 	[encoder encodeBool:fastGenSetup		forKey:@"fastGen"];
 	[encoder encodeDouble:setPoint			forKey:@"setPoint"];
 	[encoder encodeInt:itemType				forKey:@"itemType"];
@@ -737,7 +753,10 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 		[self setTotalRequestCount:totalRequestCount+1];
 
 	}		
+	
 	if(pollTime)[self performSelector:@selector(pollSlowControls) withObject:nil afterDelay:pollTime];
+	
+	if(shipRecords) [self shipTheRecords];
 }
 
 #pragma mark •••ID Helpers (see OrcaObject)
@@ -983,6 +1002,42 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	}
 	[self performSelector:@selector(checkForTimeOuts) withObject:nil afterDelay:10]; //delay should be parameter
 
+}
+
+- (void) shipTheRecords
+{
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}dataUnion;
+	
+	if([pollingLookUp count]){
+		if([[ORGlobal sharedGlobal] runInProgress]){
+			NSMutableData* theData = [NSMutableData dataWithCapacity:256]; //not a hard limit, just a hint to the data obj
+			for(id anItemKey in pollingLookUp){
+				NSDictionary* topLevelDictionary	= [requestCache objectForKey:anItemKey];
+				NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:anItemKey];
+				float theValue;
+				if([itemDictionary objectForKey:@"Control"]) theValue =  [[itemDictionary objectForKey:@"value"] floatValue];
+				else										 theValue =  [[itemDictionary objectForKey:@"Value"] floatValue];
+				int channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+				unsigned long data[7];
+				data[0] = channelDataId | 8;
+				data[1] = ([self uniqueIdNumber]&0xf) << 21;
+				data[1] = (channelNumber&0xff);
+							
+				dataUnion.asFloat = theValue;
+				data[2] = dataUnion.asLong;
+				data[3] = 0; //spare
+				data[4] = 0; //spare
+				data[5] = 0; //spare
+				data[6] = 0; //spare
+				
+				[theData appendBytes:data length:7*sizeof(unsigned long)];
+			}
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:theData];
+		}
+	}
 }
 
 @end

@@ -22,6 +22,7 @@
 @interface ORIpeSlowControlController : OrcaObjectController
 {
 	IBOutlet ORPlotter1D*		timingPlotter;   
+	IBOutlet NSButton*			shipRecordsCB;
 	IBOutlet NSTextField*		totalRequestCountField;
 	IBOutlet NSTextField*		timeOutCountField;
 	IBOutlet NSButton*			lockButton;   
@@ -55,6 +56,7 @@
 - (id) init;
 
 #pragma mark ***Interface Management
+- (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) totalRequestCountChanged:(NSNotification*)aNote;
 - (void) timeOutCountChanged:(NSNotification*)aNote;
 - (void) pendingRequestsChanged:(NSNotification*)aNote;
@@ -75,6 +77,7 @@
 - (void) histoPlotChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) fastGenSetupAction:(id)sender;
 - (IBAction) writeSetPointAction:(id) sender;
 - (IBAction) setPointAction:(id) sender;

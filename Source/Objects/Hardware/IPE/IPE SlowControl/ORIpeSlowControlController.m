@@ -158,6 +158,11 @@
                          name : ORIpeSlowControlModelTotalRequestCountChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipRecordsChanged:)
+                         name : ORIpeSlowControlModelShipRecordsChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -180,6 +185,12 @@
 	[self pendingRequestsChanged:nil];
 	[self timeOutCountChanged:nil];
 	[self totalRequestCountChanged:nil];
+	[self shipRecordsChanged:nil];
+}
+
+- (void) shipRecordsChanged:(NSNotification*)aNote
+{
+	[shipRecordsCB setIntValue: [model shipRecords]];
 }
 
 - (void) totalRequestCountChanged:(NSNotification*)aNote
@@ -336,6 +347,11 @@
 }
 
 #pragma mark ***Actions
+
+- (void) shipRecordsAction:(id)sender
+{
+	[model setShipRecords:[sender intValue]];	
+}
 - (void) fastGenSetupAction:(id)sender
 {
 	[model setFastGenSetup:[sender intValue]];	
