@@ -16,28 +16,11 @@
 //
 //-------------------------------------------------------------
 
-
-
 #import "ORBaseDecoder.h"
 
-@interface ORIpeSlowControlDecoder : ORBaseDecoder {
 
+@interface ORIpeSlowControlDecoderForChannelData : ORBaseDecoder {
 }
-
-- (NSString*) getIpeSlowControlObjectKey:(unsigned short)aValue;
-//- (NSString*) getChannelKey:(unsigned short)aChan; //already defined in ORBaseDecoder -tb-
-
-@end
-
-
-
-
-/** Decoder for the hitrate stream.   (copy of "event data stream" -tb-)
-  * This objects are generated in Flt measure mode.
-  */
-@interface ORIpeSlowControlDecoderForChannelData : ORIpeSlowControlDecoder {
-}
-// Documentation in m-file
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
