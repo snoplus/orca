@@ -134,14 +134,12 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 {
     if([aNotification object] == self){
         if([self objectConnectedTo:ORListenerConnector]){
-            theNextObject =  [self objectConnectedTo: ORListenerConnector];
             if(docLoaded){
                 [self connectSocket:YES];
             }
         }
         else {
             [self connectSocket:NO];
-            //theNextObject = nil;
         }
     }
 }
@@ -343,17 +341,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     }
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
-{
-    if(inNetSocket == socket){
-        id theData = [socket readData];
-        if(theData){
-            [transferQueue enqueue:theData];
-            [self incByteCount:inAmount];
-        }
-    }
-}
-
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
@@ -364,6 +351,16 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     }
 }
 
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+{
+    if(inNetSocket == socket){
+        id theData = [socket readData];
+        if(theData){
+            [transferQueue enqueue:theData];
+            [self incByteCount:inAmount];
+        }
+    }
+}
 
 #pragma mark ***Archival
 
@@ -468,6 +465,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 
 - (void) processRecords:(NSMutableData*)dataChunk
 {
+	
     char* buffer = (char*)[dataChunk bytes];
     char* endPtr = buffer + [dataChunk length];
     NSAutoreleasePool* outerPool=nil;
@@ -480,6 +478,10 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 		unsigned long dataId = ExtractDataId(recordHeader);
 		
 		if(dataId == 0x00000000){
+			if(firstTime){
+				firstTime = NO;
+				[self performSelectorOnMainThread:@selector(sendRunTaskStarted:) withObject:dataPacket waitUntilDone:YES];
+			}
 			//new style headers always have a id of zero.
 			unsigned long length = ExtractLength(recordHeader)*4; //bytes
 			if(buffer + length <= endPtr){
@@ -532,12 +534,14 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 					}
 					[dataPacket addData:[NSMutableData dataWithBytes:buffer length:length]];
 					
+					id theNextObject =  [self objectConnectedTo: ORListenerConnector];
 					[theNextObject processData:dataPacket userInfo:nil];
 					if(endOfRun){
 						[self performSelectorOnMainThread:@selector(sendRunTaskStopped:) withObject:dataPacket waitUntilDone:YES];
 						[dataPacket clearData];
 						[self performSelectorOnMainThread:@selector(sendCloseOutRun:)    withObject:dataPacket waitUntilDone:YES];
 						[self performSelectorOnMainThread:@selector(clearByteCount)      withObject:nil        waitUntilDone:YES];
+						firstTime = YES;
 					}
 					[dataPacket clearData];
 					buffer += length;
@@ -564,7 +568,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 - (void) startProcessing
 {
     if(!threadRunning && [socket isConnected]){
-        theNextObject =  [self objectConnectedTo: ORListenerConnector];
         [self setByteCount:0];
         if(!transferQueue){
             [self setTransferQueue:[[[ORSafeQueue alloc] init] autorelease]];
@@ -573,7 +576,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
         //set up the process thread control lock
         if( timeToStopProcessThread ) [ timeToStopProcessThread release ];
         timeToStopProcessThread  = [[ NSConditionLock alloc ] initWithCondition: NO ];
-        
+        firstTime = YES;
         [NSThread detachNewThreadSelector:@selector(processDataFromQueue) toTarget:self withObject:nil];
     }        
 }
@@ -612,101 +615,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     [self connectSocket:YES];
 }
 
-- (void) swapAndProcessRecords:(NSMutableData*)dataChunk
-{
-    char* buffer = (char*)[dataChunk bytes];
-    char* endPtr = buffer + [dataChunk length];
-    
-	NSAutoreleasePool* outerPool=nil;
-    while (buffer<endPtr) {
-		outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
-		unsigned long* lptr = (unsigned long*)buffer;
-		
-        unsigned long recordHeader = CFSwapInt32(*lptr); //have to swap the first word -- but just locally
-		
-		unsigned long dataId = ExtractDataId(recordHeader);
-		
-		if(dataId == 0x00000000){
-			//header is special -- we have to process it here and we don't pass it on.
-			//new style headers always have a id of zero.
-			unsigned long length = ExtractLength(recordHeader)*4; //bytes
-			if(buffer + length <= endPtr){
-				buffer+=4;	 //point to header length
-				unsigned long headerLength = *((unsigned long*)buffer); //bytes
-				headerLength = CFSwapInt32(headerLength);
-				//we have the whole header, extract it for use
-				buffer+=4;	 //point to header itself
-				
-				NSString* theHeader = [[NSString alloc] initWithBytes:buffer length:headerLength encoding:NSASCIIStringEncoding];
-				[dataPacket setFileHeader:[theHeader propertyList]]; 
-				[theHeader release];
-                [dataPacket generateObjectLookup];
-				buffer += length-4-4;
-				runDataID = [[dataPacket headerObject:@"dataDescription",@"ORRunModel",@"Run",@"dataId",nil] longValue];
-				
-			}
-		}
-		else {
-			BOOL endOfRun = NO;
-		    while (buffer<endPtr) {
-				NSAutoreleasePool* innerPool = [[NSAutoreleasePool allocWithZone:nil] init];
-				
-				//OK, regular record
-				lptr = (unsigned long*)buffer;
-				recordHeader = *lptr;
-				recordHeader = CFSwapInt32(recordHeader);
-				dataId = ExtractDataId(recordHeader);
-				unsigned long length = ExtractLength(recordHeader)*4; //bytes
-
-				if(buffer + length <= endPtr){
-					
-					[dataPacket byteSwapData:lptr forKey:[NSNumber numberWithLong:dataId]];
-
-					if(dataId == runDataID){
-						lptr++;
-						unsigned long firstWord = *lptr;
-						if(!(firstWord & 0x8)){
-							if(firstWord & 0x1){
-								NSLog(@"Listener: Run Start on Host: %@\n",remoteHost);
-							}
-							else {
-								//it's an end of run record --  we have some end of run cleanup to handle
-								NSLog(@"Listener: Run Ended on Host: %@\n",remoteHost);
-								//OK end of run received
-								endOfRun = YES;
-							}
-						}
-					}
-					[dataPacket addData:[NSMutableData dataWithBytes:buffer length:length]];
-					
-					[theNextObject processData:dataPacket userInfo:nil];
-					if(endOfRun){
-						[self performSelectorOnMainThread:@selector(sendRunTaskStopped:) withObject:dataPacket waitUntilDone:YES];
-						[dataPacket clearData];
-						[self performSelectorOnMainThread:@selector(sendCloseOutRun:)    withObject:dataPacket waitUntilDone:YES];
-						[self performSelectorOnMainThread:@selector(clearByteCount)      withObject:nil        waitUntilDone:YES];
-					}
-					[dataPacket clearData];
-					buffer += length;
-				}
-				else {
-					[innerPool release];
-					break;
-				}
-				[innerPool release];
-			}
-			
-			//remove processed data
-			unsigned long newLength = endPtr - buffer;
-			[dataToProcess replaceBytesInRange:NSMakeRange(0,(unsigned long)(endPtr-buffer)) withBytes:buffer];
-			[dataToProcess setLength:newLength];
-			break;
-		}
-		[outerPool release];
-		outerPool = nil;
-	}
-	[outerPool release];
-}
 
 @end
 
@@ -714,16 +622,19 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 //these exist so the process thread can do some work in the main thread
 - (void) sendRunTaskStarted:(ORDataPacket*)aDataPacket
 {
+	id theNextObject =  [self objectConnectedTo: ORListenerConnector];
 	[theNextObject runTaskStarted:aDataPacket userInfo:nil];
 }
 
 - (void) sendRunTaskStopped:(ORDataPacket*)aDataPacket
 {
+	id theNextObject =  [self objectConnectedTo: ORListenerConnector];
 	[theNextObject runTaskStopped:aDataPacket userInfo:nil];
 }
 
 - (void) sendCloseOutRun:(ORDataPacket*)aDataPacket
 {
+	id theNextObject =  [self objectConnectedTo: ORListenerConnector];
 	[theNextObject closeOutRun:aDataPacket userInfo:nil];
 }
 

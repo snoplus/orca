@@ -42,11 +42,11 @@
 	unsigned long queueCount;
 	ORSafeQueue* transferQueue;
     NSMutableData* dataToProcess;
-    id theNextObject;
     BOOL docLoaded;
 	BOOL autoReconnect;
 	BOOL connectAtStart;
 	BOOL swapAll;
+	BOOL firstTime;
 }
 
 #pragma mark ***Initialization
