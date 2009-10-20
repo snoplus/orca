@@ -55,6 +55,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (void) setPendingRequest:(NSString*)anIemKey;
 - (void) checkForTimeOuts;
 - (void) shipTheRecords;
+- (NSTimeInterval) timeFromADEIDate:(NSString*)aDate;
 @end
 
 @implementation ORIpeSlowControlModel
@@ -1021,15 +1022,19 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 				if([itemDictionary objectForKey:@"Control"]) theValue =  [[itemDictionary objectForKey:@"value"] floatValue];
 				else										 theValue =  [[itemDictionary objectForKey:@"Value"] floatValue];
 				int channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+
+				NSTimeInterval theTimeStamp =  [self timeFromADEIDate:[itemDictionary objectForKey:@"Date"]];
+				unsigned long seconds	 = (unsigned long)theTimeStamp;	  //seconds since 1970
+				unsigned long subseconds = (theTimeStamp - seconds)*1000; //milliseconds
+				
 				unsigned long data[7];
-				data[0] = channelDataId | 8;
-				data[1] = ([self uniqueIdNumber]&0xf) << 21;
-				data[1] = (channelNumber&0xff);
+				data[0] = channelDataId | 7;
+				data[1] = (([self uniqueIdNumber]&0xf) << 21) | (channelNumber&0xff);
 							
 				dataUnion.asFloat = theValue;
 				data[2] = dataUnion.asLong;
-				data[3] = 0; //spare
-				data[4] = 0; //spare
+				data[3] = seconds; 
+				data[4] = subseconds;
 				data[5] = 0; //spare
 				data[6] = 0; //spare
 				
@@ -1038,6 +1043,12 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:theData];
 		}
 	}
+}
+
+- (NSTimeInterval) timeFromADEIDate:(NSString*)aDate
+{
+	NSCalendarDate *theDate = [NSCalendarDate dateWithString:aDate calendarFormat:@"%d-%b-%y %H:%M:%S.%F"];
+	return [theDate timeIntervalSince1970];
 }
 
 @end

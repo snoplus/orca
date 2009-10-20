@@ -52,9 +52,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         ^ ^^^---------------------------adei object id
              ^ ^^^^---------------------spare
 			        ^^^^ ^^^^ ----------channel
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx dataRound
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx dataDecimalPlaces
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSec
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx value encoded as float
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSec (From 1970)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSubSec
 </pre>
     Orca identifies the type of binary data record by the header bytes.
@@ -72,7 +71,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSubSec
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
-
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
     return length; //must return number of longs processed.
@@ -80,7 +78,21 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSubSec
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-	return @"";
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theData;
+	
+    NSString* title= @"Slow Controls\n\n";
+    NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
+	theString = [theString stringByAppendingFormat:@"ADEI-%d\n",(ptr[1]>>21) & 0xf];
+	theString = [theString stringByAppendingFormat:@"Polling Channel: %d\n",ptr[1] & 0xff];
+	theData.asLong = ptr[2];
+	theString = [theString stringByAppendingFormat:@"Value: %.4E\n",theData.asFloat];
+	NSTimeInterval seconds = ptr[3] + ptr[4]/1000.;
+	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSince1970:seconds];
+	theString = [theString stringByAppendingFormat:@"Date: %@\n",theDate];
+	return theString;
 }
 @end
 
