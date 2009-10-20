@@ -754,6 +754,7 @@
 		8434F87605B4637700E03AAE /* ORSafeQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434F87405B4637600E03AAE /* ORSafeQueue.m */; };
 		8435625708FDB287002864C7 /* ContainerInput.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8435624208FDB287002864C7 /* ContainerInput.nib */; };
 		8435625808FDB287002864C7 /* ContainerInput.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8435624308FDB287002864C7 /* ContainerInput.tif */; };
+		84356258108E24A3005E2B34 /* Needle.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84356257108E24A3005E2B34 /* Needle.rtf */; };
 		8435625A08FDB287002864C7 /* ORContainerInputController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435624508FDB287002864C7 /* ORContainerInputController.h */; };
 		8435625B08FDB287002864C7 /* ORContainerInputController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435624608FDB287002864C7 /* ORContainerInputController.m */; };
 		8435625C08FDB287002864C7 /* ORContainerInputModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435624708FDB287002864C7 /* ORContainerInputModel.h */; };
@@ -2713,6 +2714,7 @@
 		8435625408FDB287002864C7 /* ORContainerFeedThru.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORContainerFeedThru.m; path = "Source/Objects/Data Flow/ContainerIO/ContainerIOBaseClasses/ORContainerFeedThru.m"; sourceTree = SOURCE_ROOT; };
 		8435625508FDB287002864C7 /* ORContainerFeedThruController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORContainerFeedThruController.h; path = "Source/Objects/Data Flow/ContainerIO/ContainerIOBaseClasses/ORContainerFeedThruController.h"; sourceTree = SOURCE_ROOT; };
 		8435625608FDB287002864C7 /* ORContainerFeedThruController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORContainerFeedThruController.m; path = "Source/Objects/Data Flow/ContainerIO/ContainerIOBaseClasses/ORContainerFeedThruController.m"; sourceTree = SOURCE_ROOT; };
+		84356257108E24A3005E2B34 /* Needle.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Needle.rtf; path = Source/Objects/Hardware/GPIB/HPPulser/Needle.rtf; sourceTree = SOURCE_ROOT; };
 		8435652F08FEFFB8002864C7 /* ORMessagePipe.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMessagePipe.h; path = "Source/Objects/Data Flow/Connectors/ORMessagePipe.h"; sourceTree = SOURCE_ROOT; };
 		8435653008FEFFB8002864C7 /* ORMessagePipe.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMessagePipe.m; path = "Source/Objects/Data Flow/Connectors/ORMessagePipe.m"; sourceTree = SOURCE_ROOT; };
 		84368AD10471AACA005F64B1 /* HPPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser.nib; path = Source/Objects/Hardware/GPIB/HPPulser/HPPulser.nib; sourceTree = SOURCE_ROOT; };
@@ -6476,6 +6478,7 @@
 				842A65BA0700E210007536B6 /* ORHPPulserDecoders.m */,
 				848627B208E4BC4800301049 /* HPPulserIcon.tif */,
 				84368AD10471AACA005F64B1 /* HPPulser.nib */,
+				84356257108E24A3005E2B34 /* Needle.rtf */,
 			);
 			name = HPPulser;
 			path = Source/Objects/Hardware/GPIB/HPPulser;
@@ -10783,6 +10786,7 @@
 				84AB101D1057D6990069D5E2 /* iTransGasSensor.tif in Resources */,
 				845498C410628DF400F8DE1C /* scpExpectScript in Resources */,
 				84211E371074E5CD00CCB0C0 /* IpeV4SLT.nib in Resources */,
+				84356258108E24A3005E2B34 /* Needle.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
