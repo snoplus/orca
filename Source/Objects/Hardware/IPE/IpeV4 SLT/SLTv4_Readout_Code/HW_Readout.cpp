@@ -280,6 +280,7 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
         static int lastSec=0;
         static int lastUSec=0;
         static long int counter=0;
+        static long int secCounter=0;
         
         struct timeval t;//    struct timezone tz; is obsolete ... -tb-
         //timing
@@ -290,7 +291,8 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 		((double)(currentUSec - lastUSec)) * 0.000001;
         
         if(diffTime >1.0){
-            printf("PrPMC: 1 sec is over, ship data ...\n");
+            secCounter++;
+            printf("PrPMC sec %i: 1 sec is over, ship data ...\n",secCounter);
             fflush(stdout);
             //remember for next call
             lastSec      = currentSec; 
