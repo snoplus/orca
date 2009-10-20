@@ -94,6 +94,10 @@
 {
 	NSString* requestString = [ORAdeiLoader sensorItemRequestStringUrl:host itemPath:aPath];
 	if(requestString){
+		if([setupOptions count]){
+			//for now we only support one option
+			requestString = [requestString stringByAppendingFormat:@"&setup=%@",[setupOptions objectAtIndex:0]];
+		}
 		dataFormat = kcsvFormat;
 		path = [aPath copy];
 		recursive  = NO;
