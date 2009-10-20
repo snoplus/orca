@@ -1737,7 +1737,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 - (void) throwError:(int)anError address:(unsigned long)anAddress
 {
-	NSString* baseString = [NSString stringWithFormat:@"Vme Address Exception. "];
+	NSString* baseString = [NSString stringWithFormat:@"Address Exception. "];
 	NSString* details;
 	if(anError == EPERM)		details = @"Operation not permitted";
 	else if(anError == ENODEV)	details = @"No such device";
@@ -1747,7 +1747,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	else if(anError == EBUSY)	details = @"Device Busy";
 	else if(anError == ENOMEM)	details = @"Out of Memory";
 	else details = [NSString stringWithFormat:@"%d",anError];
-	[NSException raise: @"SBC/VME access Error" format:@"%@:%@\nAddress: 0x%08x",baseString,details,anAddress];
+	[NSException raise: @"SBC access Error" format:@"%@:%@\nAddress: 0x%08x",baseString,details,anAddress];
 }
 
 - (void) fillInScript:(NSString*)theScript
