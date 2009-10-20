@@ -102,15 +102,15 @@ void stopHWRun (SBC_crate_config* config)
 void FindHardware(void)
 {
 	//open device driver(s), get device driver handles
-        pbusInit("FE.ini");
+		const char* name = "FE.ini";
+        pbusInit((char*)name);
         // testing the C++ link to fdhwlib -tb-
         if(0){
             printf("Try to create a BaseRegister object -tb-\n");
             fflush(stdout);
             hw4::BaseRegister *reg;
             reg = new hw4::BaseRegister("dummy",3,7,1,1);
-            fprintf(stdout,"  ->register name is %s, addr 0x%08x\n", reg->getName(),reg->getAddr());
-            fflush(stdout);
+            printf("  ->register name is %s, addr 0x%08lx\n", reg->getName(),reg->getAddr());
         }
 }
 
@@ -279,7 +279,7 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
         static int currentUSec=0;
         static int lastSec=0;
         static int lastUSec=0;
-        static long int counter=0;
+        //static long int counter=0;
         static long int secCounter=0;
         
         struct timeval t;//    struct timezone tz; is obsolete ... -tb-
@@ -292,7 +292,7 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
         
         if(diffTime >1.0){
             secCounter++;
-            printf("PrPMC sec %i: 1 sec is over, ship data ...\n",secCounter);
+            printf("PrPMC sec %ld: 1 sec is over, ship data ...\n",secCounter);
             fflush(stdout);
             //remember for next call
             lastSec      = currentSec; 
