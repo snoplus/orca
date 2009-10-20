@@ -86,6 +86,7 @@
 	long histogram[kResponseTimeHistogramSize];
     int timeOutCount;
     int totalRequestCount;
+    BOOL shipRecords;
 }
 
 #pragma mark ***Initialization
@@ -103,6 +104,8 @@
 - (void) setChannelDataId:(int) aValue;
 
 #pragma mark ***Accessors
+- (BOOL) shipRecords;
+- (void) setShipRecords:(BOOL)aShipRecords;
 - (int) totalRequestCount;
 - (void) setTotalRequestCount:(int)aTotalRequestCount;
 - (int) timeOutCount;
@@ -187,6 +190,7 @@
 @end
 
 #pragma mark •••Notification Strings
+extern NSString* ORIpeSlowControlModelShipRecordsChanged;
 extern NSString* ORIpeSlowControlModelTotalRequestCountChanged;
 extern NSString* ORIpeSlowControlModelTimeOutCountChanged;
 extern NSString* ORIpeSlowControlModelFastGenSetupChanged;
