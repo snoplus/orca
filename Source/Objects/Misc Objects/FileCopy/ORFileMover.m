@@ -258,7 +258,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 		
         NSMutableArray* params = [NSMutableArray array];
         [params addObject:@"-T"];
-        [params addObject:[NSString stringWithFormat:@"%@",fullPath]];
+        [params addObject:[NSString stringWithFormat:@"%@",[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]]];
         [params addObject:@"-u"];
         [params addObject:[NSString stringWithFormat:@"%@:%@",remoteUserName,remotePassWord]];
         [params addObject:[NSString stringWithFormat:@"sftp://%@/%@",remoteHost,remotePath]];
@@ -286,7 +286,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
 					[theScript replace:@"<isDir>" with:isDir?@"-r":@""];
 					[theScript replace:@"<verbose>" with:isDir?@"-v":@""];
-					[theScript replace:@"<sourcePath>" with:fullPath];
+					[theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
 					[theScript replace:@"<userName>" with:remoteUserName];
 					[theScript replace:@"<host>" with:remoteHost];
 					[theScript replace:@"<destinationPath>" with:remotePath];
@@ -305,7 +305,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					[theScript replace:@"<user>" with:remoteUserName];
 					[theScript replace:@"<host>" with:remoteHost];
 					[theScript replace:@"<password>" with:remotePassWord];
-					[theScript replace:@"<sourcePath>" with:fullPath];
+					[theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
 					[theScript replace:@"<destinationPath>" with:remotePath];
 					[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 				}
