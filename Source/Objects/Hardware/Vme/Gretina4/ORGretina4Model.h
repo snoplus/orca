@@ -24,6 +24,7 @@
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 #import "SBC_Config.h"
+#import "AutoTesting.h"
 
 @class ORRateGroup;
 @class ORAlarm;
@@ -165,7 +166,7 @@ enum Gretina4FIFOStates {
 	kHalfFull
 };
 
-@interface ORGretina4Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface ORGretina4Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
 	unsigned long   dataId;
@@ -394,6 +395,9 @@ enum Gretina4FIFOStates {
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
+
+#pragma mark ¥¥¥AutoTesting
+- (NSArray*) autoTests;
 @end
 
 extern NSString* ORGretina4ModelRegisterIndexChanged;

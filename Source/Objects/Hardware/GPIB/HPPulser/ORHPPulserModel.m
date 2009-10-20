@@ -78,6 +78,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 { @"Triple LogAmp",     @"TRPLOG",    YES },
 { @"LogAmp Adj",        @"AMPADJ",    YES },
 { @"Gaussian",          @"GSSIAN",    NO },
+{ @"Pin Diode",          @"PINDD",    NO },
+{ @"Needle",          @"NEEDLE",    NO },
 { @"From File",         @"",          NO },
 };
 
@@ -555,6 +557,27 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     }
 }
 
+- (void) loadWaveformFile:(NSString*) theWavefile
+{
+    		
+	NSString* bp = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:theWavefile];     
+	NSString*       contents = [NSString stringWithContentsOfFile:bp encoding:NSASCIIStringEncoding error:nil];
+	NSScanner*      scanner  = [NSScanner scannerWithString:contents];
+	NSCharacterSet* set 	 = [NSCharacterSet characterSetWithCharactersInString:@" ,\t\r\n"];
+	[self insert:kPadSize/2 value:0];
+	while(![scanner isAtEnd]) {
+		NSString*  destination = [NSString string];
+		[scanner scanUpToCharactersFromSet:[set invertedSet] intoString:nil];
+		if([scanner scanUpToCharactersFromSet:set intoString:&destination]){
+			if([destination length]){
+				[self insert:1 value:[destination floatValue]];
+			}
+		}
+	}
+	[self insert:kPadSize/2 value:0];
+	[self normalizeWaveform];
+			
+}	
 
 - (void) normalizeWaveform
 {
@@ -1095,7 +1118,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             [self insert:1000 value:0];
             [self insertPinDiode:4000 amplitude:theMax];
             break;
-            
+			
+		case kNeedle:
+			[self loadWaveformFile:@"Needle"];
+			break;
+			
         case kWaveformFromFile: {
             
             NSString*       contents = [NSString stringWithContentsOfFile:[fileName stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
@@ -1118,7 +1145,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 			break;
             
     }
-    
+	    
     //count = [self numPoints];
     
 }

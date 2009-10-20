@@ -42,7 +42,7 @@ typedef struct HPPulserCustomWaveformStruct {
 	NSMutableData*  waveform;
 	float           voltage;
 	float           burstRate;
-	//float           totalWidth;
+	//float           totalWidth;	
 	float           frequency;
 	float           voltageOffset;
 	int             burstCycles;
@@ -81,6 +81,7 @@ typedef struct HPPulserCustomWaveformStruct {
 		kLogCalibWaveAdjust,
 		kGaussian,
 		kPinDiode,
+		kNeedle,
 		kWaveformFromFile,
 		kNumWaveforms   //must be last
     } userWaveformConsts;
@@ -208,6 +209,7 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void) insertNegativeFullSineWave:(unsigned short)numPoints amplitude:(float) theAmplitude phase:(float) thePhase;
 - (void) insertGaussian:(unsigned short)numPoints amplitude:(float) theAmplitude;
 - (void) insertPinDiode:(unsigned short)numPoints amplitude:(float) theAmplitude;
+- (void) loadWaveformFile:(NSString*) theWavefile;
 - (void) normalizeWaveform;
 - (unsigned short) numPoints;
 - (void) trigger;

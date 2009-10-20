@@ -28,6 +28,7 @@
 #import "ORRateGroup.h"
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
+#import "ORVmeTests.h"
 
 NSString* ORGretina4ModelRegisterIndexChanged = @"ORGretina4ModelRegisterIndexChanged";
 NSString* ORGretina4ModelRegisterWriteValueChanged		= @"ORGretina4ModelRegisterWriteValueChanged";
@@ -1942,8 +1943,16 @@ static struct {
 	}
 	[dictionary setObject:ar forKey:aKey];
 }
-@end
 
+- (NSArray*) autoTests 
+{
+	NSMutableArray* myTests = [NSMutableArray array];
+	[myTests addObject:[ORVmeReadOnlyTest test:kBoardID wordSize:4 name:@"Board ID"]];
+	[myTests addObject:[ORVmeReadWriteTest test:kControlStatus wordSize:4 validMask:0x000000ff name:@"Control/Status"]];
+	return myTests;
+}
+
+@end
 @implementation ORGretina4Model (private)
 
 - (void) updateDownLoadProgress
