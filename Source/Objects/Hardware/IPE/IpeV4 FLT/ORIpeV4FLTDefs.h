@@ -31,7 +31,7 @@
 #define kIpeFlt_Cntl_ErrFlag_Shift			21   
 #define kIpeFlt_Cntl_ErrFlag_Mask			0x1 
 
-#define kIpeFlt_Cntl_Mode_Shift				22
+#define kIpeFlt_Cntl_Mode_Shift				16
 #define kIpeFlt_Cntl_Mode_Mask				0x1
 
 #define kIpeFlt_Cntl_Version_Shift			23
@@ -59,8 +59,10 @@
 #define kIpeFlt_Periph_Integration_Shift	20
 #define kIpeFlt_Periph_Integration_Mask		0xf
 
-#define kIpeFlt_Run_Mode		0
-#define kIpeFlt_Test_Mode		1
+#define kIpeFlt_StandBy_Mode		0
+#define kIpeFlt_Run_Mode			1
+#define kIpeFlt_Histo_Mode			2
+#define kIpeFlt_Test_Mode			3
 
 #define kIpeFlt_Intack				0x40000000
 #define kIpeFlt_READ				0x80000000

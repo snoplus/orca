@@ -155,7 +155,7 @@
 	
 	// energy is in 2's complement, taking abs value if necessary
 	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
-	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %d\n",energy];
+	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %d\n",energy/50]; //mah 10/21 added the /50 to be consistent with histogramed value
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,energyStr];               
 }
 

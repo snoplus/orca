@@ -33,144 +33,48 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 
-NSString* ORIpeV4FLTModelThresholdOffsetChanged	= @"ORIpeV4FLTModelThresholdOffsetChanged";
-NSString* ORIpeV4FLTModelLedOffChanged			= @"ORIpeV4FLTModelLedOffChanged";
+NSString* ORIpeV4FLTModelPostTriggerTimeChanged		= @"ORIpeV4FLTModelPostTriggerTimeChanged";
+NSString* ORIpeV4FLTModelFifoBehaviourChanged		= @"ORIpeV4FLTModelFifoBehaviourChanged";
+NSString* ORIpeV4FLTModelAnalogOffsetChanged		= @"ORIpeV4FLTModelAnalogOffsetChanged";
+NSString* ORIpeV4FLTModelLedOffChanged				= @"ORIpeV4FLTModelLedOffChanged";
 NSString* ORIpeV4FLTModelInterruptMaskChanged		= @"ORIpeV4FLTModelInterruptMaskChanged";
-NSString* ORIpeV4FLTModelTModeChanged				 = @"ORIpeV4FLTModelTModeChanged";
-NSString* ORIpeV4FLTModelTestParamChanged			 = @"ORIpeV4FLTModelTestParamChanged";
-NSString* ORIpeV4FLTModelHitRateLengthChanged		 = @"ORIpeV4FLTModelHitRateLengthChanged";
-NSString* ORIpeV4FLTModelTriggersEnabledChanged	 = @"ORIpeV4FLTModelTriggersEnabledChanged";
-NSString* ORIpeV4FLTModelGainsChanged				 = @"ORIpeV4FLTModelGainsChanged";
-NSString* ORIpeV4FLTModelThresholdsChanged		 = @"ORIpeV4FLTModelThresholdsChanged";
-NSString* ORIpeV4FLTModelModeChanged				 = @"ORIpeV4FLTModelModeChanged";
-NSString* ORIpeV4FLTSettingsLock					 = @"ORIpeV4FLTSettingsLock";
-NSString* ORIpeV4FLTChan							 = @"ORIpeV4FLTChan";
-NSString* ORIpeV4FLTModelTestPatternsChanged		 = @"ORIpeV4FLTModelTestPatternsChanged";
-NSString* ORIpeV4FLTModelGainChanged				 = @"ORIpeV4FLTModelGainChanged";
-NSString* ORIpeV4FLTModelThresholdChanged			 = @"ORIpeV4FLTModelThresholdChanged";
-NSString* ORIpeV4FLTModelTriggerEnabledChanged	 = @"ORIpeV4FLTModelTriggerEnabledChanged";
-NSString* ORIpeV4FLTModelHitRateEnabledChanged	 = @"ORIpeV4FLTModelHitRateEnabledChanged";
-NSString* ORIpeV4FLTModelHitRatesArrayChanged		 = @"ORIpeV4FLTModelHitRatesArrayChanged";
-NSString* ORIpeV4FLTModelHitRateChanged			 = @"ORIpeV4FLTModelHitRateChanged";
-NSString* ORIpeV4FLTModelTestsRunningChanged		 = @"ORIpeV4FLTModelTestsRunningChanged";
-NSString* ORIpeV4FLTModelTestEnabledArrayChanged	 = @"ORIpeV4FLTModelTestEnabledChanged";
-NSString* ORIpeV4FLTModelTestStatusArrayChanged	 = @"ORIpeV4FLTModelTestStatusChanged";
-NSString* ORIpeV4FLTModelEventMaskChanged			 = @"ORIpeV4FLTModelEventMaskChanged";
-NSString* ORIpeV4FLTModelReadoutPagesChanged		 = @"ORIpeV4FLTModelReadoutPagesChanged"; // ak, 2.7.07
-NSString* ORIpeV4FLTModelIntegrationTimeChanged	 = @"ORIpeV4FLTModelIntegrationTimeChanged";
-NSString* ORIpeV4FLTModelCoinTimeChanged			 = @"ORIpeV4FLTModelCoinTimeChanged";
+NSString* ORIpeV4FLTModelTModeChanged				= @"ORIpeV4FLTModelTModeChanged";
+NSString* ORIpeV4FLTModelTestParamChanged			= @"ORIpeV4FLTModelTestParamChanged";
+NSString* ORIpeV4FLTModelHitRateLengthChanged		= @"ORIpeV4FLTModelHitRateLengthChanged";
+NSString* ORIpeV4FLTModelTriggersEnabledChanged		= @"ORIpeV4FLTModelTriggersEnabledChanged";
+NSString* ORIpeV4FLTModelGainsChanged				= @"ORIpeV4FLTModelGainsChanged";
+NSString* ORIpeV4FLTModelThresholdsChanged			= @"ORIpeV4FLTModelThresholdsChanged";
+NSString* ORIpeV4FLTModelModeChanged				= @"ORIpeV4FLTModelModeChanged";
+NSString* ORIpeV4FLTSettingsLock					= @"ORIpeV4FLTSettingsLock";
+NSString* ORIpeV4FLTChan							= @"ORIpeV4FLTChan";
+NSString* ORIpeV4FLTModelTestPatternsChanged		= @"ORIpeV4FLTModelTestPatternsChanged";
+NSString* ORIpeV4FLTModelGainChanged				= @"ORIpeV4FLTModelGainChanged";
+NSString* ORIpeV4FLTModelThresholdChanged			= @"ORIpeV4FLTModelThresholdChanged";
+NSString* ORIpeV4FLTModelTriggerEnabledMaskChanged	= @"ORIpeV4FLTModelTriggerEnabledMaskChanged";
+NSString* ORIpeV4FLTModelHitRateEnabledMaskChanged	= @"ORIpeV4FLTModelHitRateEnabledMaskChanged";
+NSString* ORIpeV4FLTModelHitRateChanged				= @"ORIpeV4FLTModelHitRateChanged";
+NSString* ORIpeV4FLTModelTestsRunningChanged		= @"ORIpeV4FLTModelTestsRunningChanged";
+NSString* ORIpeV4FLTModelTestEnabledArrayChanged	= @"ORIpeV4FLTModelTestEnabledChanged";
+NSString* ORIpeV4FLTModelTestStatusArrayChanged		= @"ORIpeV4FLTModelTestStatusChanged";
+NSString* ORIpeV4FLTModelEventMaskChanged			= @"ORIpeV4FLTModelEventMaskChanged";
+NSString* ORIpeV4FLTModelReadoutPagesChanged		= @"ORIpeV4FLTModelReadoutPagesChanged"; // ak, 2.7.07
+NSString* ORIpeV4FLTModelIntegrationTimeChanged		= @"ORIpeV4FLTModelIntegrationTimeChanged";
+NSString* ORIpeV4FLTModelCoinTimeChanged			= @"ORIpeV4FLTModelCoinTimeChanged";
 
 NSString* ORIpeV4FLTSelectedRegIndexChanged			= @"ORIpeV4FLTSelectedRegIndexChanged";
 NSString* ORIpeV4FLTWriteValueChanged				= @"ORIpeV4FLTWriteValueChanged";
 NSString* ORIpeV4FLTSelectedChannelValueChanged		= @"ORIpeV4FLTSelectedChannelValueChanged";
 
 
-enum {
-	kFLTControlReg,
-	kFLTPixelStatus1Reg,
-	kFLTPixelStatus2Reg,
-	kFLTPixelStatus3Reg,
-	kFLTDisOnCntrlReg,
-	kFLTMarginsLReg,
-	kFLTMarginsHReg,
-	kFLTCheckSumDReg,
-	kFLTTestPulsMemReg,
-	kFLTHitRateMemReg,
-	kFLTGainReg,
-	kFLTPeriphStatusReg,
-	kFLTStaticSetReg,
-	kFLTThresholdReg,
-	kFLTSumXReg,
-	kFLTSumX2Reg,
-	kFLTChannelOnOffReg,
-	kFLTAdcMemory,
-	kFLTNumRegs //must be last
-};
 
-struct ipeV4Reg {// not elegant, maybe move definition of struct to header file -tb-
-	unsigned long address;
-	unsigned long space;
-};
-struct ipeV4Reg ipeV3Reg[kNumFLTChannels] = {
-{0x0L, 0x0L},	//kFLTControlReg
-{0x1L, 0x0L},	//kFLTPixelStatus1Reg
-{0x2L, 0x0L},	//kFLTPixelStatus2Reg
-{0x3L, 0x0L},	//kFLTPixelStatus3Reg
-{0x4L, 0x0L},	//kFLTDisOnCntrlReg
-{0x5L, 0x0L},	//kFLTMarginsLReg
-{0x6L, 0x0L},	//kFLTMarginsHReg
-{0x7L, 0x0L},	//kFLTCheckSumDReg
-{0x8L, 0x0L},	//kFLTTestPulsMemReg
-{0x8L, 0x1L},	//kFLTHitRateMemReg
-{0x9L, 0x1L},	//kFLTGainReg
-{0x0L, 0x1L},	//kFLTPeriphStatusReg
-{0x1L, 0x1L},	//kFLTStaticSetReg
-{0x2L, 0x1L},	//kFLTThresholdReg
-{0x3L, 0x1L},	//kFLTSumXReg
-{0x5L, 0x1L},	//kFLTSumX2Reg
-{0x6L, 0x1L},	//kFLTChannelOnOffReg
-{0x0L, 0x2L}	//kFLTAdcMemory
-};
-
-#if 0
-/* never used ? -tb-
-enum IpeV4FLTEnum {
-	kFLTV4ControlReg,
-	kFLTV4PixelStatus1Reg,
-	kFLTV4PixelStatus2Reg,
-	kFLTV4PixelStatus3Reg,
-	kFLTV4DisOnCntrlReg,
-	kFLTV4MarginsLReg,
-	kFLTV4MarginsHReg,
-	kFLTV4CheckSumDReg,
-	kFLTV4TestPulsMemReg,
-	kFLTV4HitRateMemReg,
-	kFLTV4GainReg,
-	kFLTV4PeriphStatusReg,
-	kFLTV4StaticSetReg,
-	kFLTV4ThresholdReg,
-	kFLTV4SumXReg,
-	kFLTV4SumX2Reg,
-	kFLTV4ChannelOnOffReg,
-	kFLTV4AdcMemory,
-	kFLTV4CFPGAVersion,
-	kFLTV4FPGA8Version,
-	kFLTV4NumRegs //must be last
-};
-
-struct ipeV4Reg ipeV4Reg[kFLTV4NumRegs] = {
-{0x0L, 0x0L},	//kFLTV4ControlReg
-{0x1L, 0x0L},	//kFLTV4PixelStatus1Reg
-{0x2L, 0x0L},	//kFLTV4PixelStatus2Reg
-{0x3L, 0x0L},	//kFLTV4PixelStatus3Reg
-{0x4L, 0x0L},	//kFLTV4DisOnCntrlReg
-{0x5L, 0x0L},	//kFLTV4MarginsLReg
-{0x6L, 0x0L},	//kFLTV4MarginsHReg
-{0x7L, 0x0L},	//kFLTV4CheckSumDReg
-{0x8L, 0x0L},	//kFLTV4TestPulsMemReg
-{0x8L, 0x1L},	//kFLTV4HitRateMemReg
-{0x9L, 0x1L},	//kFLTV4GainReg
-{0x0L, 0x1L},	//kFLTV4PeriphStatusReg
-{0x1L, 0x1L},	//kFLTV4StaticSetReg
-{0x2L, 0x1L},	//kFLTV4ThresholdReg
-{0x3L, 0x1L},	//kFLTV4SumXReg
-{0x5L, 0x1L},	//kFLTV4SumX2Reg
-{0x6L, 0x1L},	//kFLTV4ChannelOnOffReg
-{0x0L, 0x2L},	//kFLTV4AdcMemory
-{0x0cL, 0x0L},	//kFLTV4CFPGAVersion, 0x0c or 0x3
-{0x10L, 0x0L}	//kFLTV4FPGA8Version, 0x10 or 0x4
-};
-*/
-#endif
-
-
+#if (0)
 static int trigChanConvFLT[4][6]={
 { 0,  2,  4,  6,  8, 10},	//FPGA-1
 {12, 14, 16, 18, 20, 22},	//FPGA-2
 { 1,  3,  5,  7,  9, 11},	//FPGA-3
 {13, 15, 17, 19, 21, 23},	//FPGA-4
 };
-
+#endif
 
 
 static NSString* fltTestName[kNumIpeV4FLTTests]= {
@@ -186,10 +90,11 @@ enum IpeFLTV4Enum{
 	kFLTV4StatusReg,
 	kFLTV4ControlReg,
 	kFLTV4CommandReg,
-	kFLTV4CFPGAVersionReg,
-	kFLTV4FPGA8VersionReg,
-	kFLTV4BoardIDLSBReg,
-	kFLTV4BoardIDMSBReg,
+	kFLTV4VersionReg,
+	kFLTV4pVersionReg,
+	kFLTV4BoardIDLsbReg,
+	kFLTV4BoardIDMsbReg,
+	kFLTV4InterruptMaskReg,
 	kFLTV4HrMeasEnableReg,
 	kFLTV4PixelSettings1Reg,
 	kFLTV4PixelSettings2Reg,
@@ -199,6 +104,13 @@ enum IpeFLTV4Enum{
 	kFLTV4SecondCounterReg,
 	kFLTV4HrControlReg,
 	kFLTV4ThresholdReg,
+	kFLTV4pStatusA,
+	kFLTV4pStatusB,
+	kFLTV4pStatusC,
+	kFLTV4PostTrigger,
+	kFLTV4AnalogOffset,
+	kFLTV4GainReg,
+	kFLTV4HitRateReg,
 	kFLTV4NumRegs //must be last
 };
 
@@ -211,6 +123,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {@"FPGA8Version",		0x000010>>2,		-1,				kIpeRegReadable},
 {@"BoardIDLSB",         0x000014>>2,		-1,				kIpeRegReadable},
 {@"BoardIDMSB",         0x000018>>2,		-1,				kIpeRegReadable},
+{@"InterruptMask",      0x00001C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"HrMeasEnable",       0x000024>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"PixelSettings1",     0x000030>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"PixelSettings2",     0x000034>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
@@ -220,10 +133,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {@"SecondCounter",      0x000044>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+{@"pStatusB",           0x00A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"pStatusC",           0x02A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+
 };
-
-
-
 
 @interface ORIpeV4FLTModel (private)
 - (NSAttributedString*) test:(int)testName result:(NSString*)string color:(NSColor*)aColor;
@@ -245,7 +163,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [testEnabledArray release];
     [testStatusArray release];
 	[testSuit release];
-    [triggersEnabled release];
 	[thresholds release];
 	[gains release];
 	[totalRate release];
@@ -256,7 +173,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [self setImage:[NSImage imageNamed:@"IpeV4FLTCard"]];
 }
-
 
 - (void) makeMainController
 {
@@ -269,6 +185,32 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 #pragma mark •••Accessors
+
+- (unsigned long) postTriggerTime
+{
+    return postTriggerTime;
+}
+
+- (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
+    postTriggerTime = aPostTriggerTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelPostTriggerTimeChanged object:self];
+}
+
+- (int) fifoBehaviour
+{
+    return fifoBehaviour;
+}
+
+- (void) setFifoBehaviour:(int)aFifoBehaviour
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoBehaviour:fifoBehaviour];
+    fifoBehaviour = aFifoBehaviour;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelFifoBehaviourChanged object:self];
+}
+
+
 - (BOOL) partOfEvent:(short)chan
 {
 	return (eventMask & (1L<<chan)) != 0;
@@ -286,18 +228,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 
-- (int) thresholdOffset
+- (int) analogOffset
 {
-    return thresholdOffset;
+    return analogOffset;
 }
 
-- (void) setThresholdOffset:(int)aThresholdOffset
+- (void) setAnalogOffset:(int)aAnalogOffset
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setThresholdOffset:thresholdOffset];
+    [[[self undoManager] prepareWithInvocationTarget:self] setAnalogOffset:analogOffset];
     
-    thresholdOffset = aThresholdOffset;
+    analogOffset = aAnalogOffset;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelThresholdOffsetChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelAnalogOffsetChanged object:self];
 }
 
 - (BOOL) ledOff
@@ -355,9 +297,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setInterruptMask:(unsigned long)aInterruptMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setInterruptMask:interruptMask];
-    
     interruptMask = aInterruptMask;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelInterruptMaskChanged object:self];
 }
 
@@ -441,28 +381,23 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setHitRateLength:(unsigned short)aHitRateLength
 {
-	if(aHitRateLength<1)aHitRateLength = 1;
-	else if(aHitRateLength>32)aHitRateLength = 32;
+	if(aHitRateLength>6)aHitRateLength = 6; //0->1sec, 1->2, 2->4 .... 6->32sec
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateLength:hitRateLength];
-    
     hitRateLength = aHitRateLength;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateLengthChanged object:self];
 }
 
-- (NSMutableArray*) triggersEnabled
+- (unsigned long) triggerEnabledMask
 {
-    return triggersEnabled;
+    return triggerEnabledMask;
 }
 
-- (void) setTriggersEnabled:(NSMutableArray*)aTriggersEnabled
+- (void) setTriggerEnabledMask:(unsigned long)aMask
 {
-    [aTriggersEnabled retain];
-    [triggersEnabled release];
-    triggersEnabled = aTriggersEnabled;
+    triggerEnabledMask = aMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelTriggersEnabledChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelTriggerEnabledMaskChanged object:self];
 }
 
 - (unsigned long) dataId { return dataId; }
@@ -489,18 +424,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self setWaveFormId:[anotherCard waveFormId]];
 }
 
-- (NSMutableArray*) hitRatesEnabled
+- (unsigned long) hitRateEnabledMask
 {
-    return hitRatesEnabled;
+    return hitRateEnabledMask;
 }
 
-- (void) setHitRatesEnabled:(NSMutableArray*)anArray
+- (void) setHitRateEnabledMask:(unsigned long)aMask
 {
-	[anArray retain];
-	[hitRatesEnabled release];
-    hitRatesEnabled = anArray;
+    hitRateEnabledMask = aMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRatesArrayChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateEnabledMaskChanged object:self];
 }
 
 - (NSMutableArray*) gains
@@ -593,7 +526,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 -(BOOL) triggerEnabled:(unsigned short) aChan
 {
-    return [[triggersEnabled objectAtIndex:aChan] boolValue];
+	if(aChan<22)return (triggerEnabledMask >> aChan) & 0x1;
+	else return NO;
 }
 
 //ORAdcInfoProviding protocol 
@@ -605,36 +539,27 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 -(void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerEnabled:aChan withValue:[self triggerEnabled:aChan]];
-    [triggersEnabled replaceObjectAtIndex:aChan withObject:[NSNumber numberWithBool:aState]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerEnabledMask:triggerEnabledMask];
+	if(aState) triggerEnabledMask |= (1<<aChan);
+	else triggerEnabledMask &= ~(1<<aChan);
 	
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORIpeV4FLTChan];
-	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORIpeV4FLTModelTriggerEnabledChanged
-	 object:self
-	 userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter]postNotificationName:ORIpeV4FLTModelTriggerEnabledMaskChanged object:self];
 }
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan
 {
-    return [[hitRatesEnabled objectAtIndex:aChan] boolValue];
+ 	if(aChan<22)return (hitRateEnabledMask >> aChan) & 0x1;
+	else return NO;
 }
 
 
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHitRateEnabled:aChan withValue:[self hitRateEnabled:aChan]];
-    [hitRatesEnabled replaceObjectAtIndex:aChan withObject:[NSNumber numberWithBool:aState]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setHitRateEnabledMask:hitRateEnabledMask];
+	if(aState) hitRateEnabledMask |= (1<<aChan);
+	else hitRateEnabledMask &= ~(1<<aChan);
 	
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORIpeV4FLTChan];
-	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORIpeV4FLTModelHitRateEnabledChanged
-	 object:self
-	 userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateEnabledMaskChanged object:self];
 }
 
 
@@ -785,12 +710,12 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 #pragma mark •••Calibration
 - (void) autoCalibrate
 {
-	[self autoCalibrate:thresholdOffset];
+	[self autoCalibrate:analogOffset];
 }
 
 - (void) autoCalibrate:(int)theEndingOffset
 {
-	
+#if (0)	///comment out for now mah..
     // There is no need to load any kind of hitrate measurement of 
 	// control parameters if the thresholds shold be set in a fixed 
 	// distance to the mean ADC value
@@ -806,28 +731,16 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 	[self initBoard];
     usleep(100);
 	
-    // Set threshold to ADC + offset
-	double pedestal;
-	double var;
-	
 	// Get the integration time
 	// ADC * T_int = Threshold
 	unsigned long status = [self readReg: kFLTPeriphStatusReg];	
 	int t_Int = (status>>20) & 0xf; // default: 10
-	
-	unsigned long hitRateEnabledMask = 0x0;
+
+	// Set threshold to ADC + offset
 	int chan;
-	for(chan = 0;chan<kNumFLTChannels;chan++){
-		if([[hitRatesEnabled objectAtIndex:chan] intValue]){
-			hitRateEnabledMask |= (0x1L<<chan);
-		}
-	}
-	
 	for(chan=0;chan<kNumFLTChannels;chan++){
-		// Get the ADC pedestal
-		[self getStatistics:chan mean:&pedestal var:&var]; 
-		
-		// Set
+		double pedestal, var;
+		[self getStatistics:chan mean:&pedestal var:&var]; // Get the ADC pedestal
 		if(hitRateEnabledMask & (1L<<chan)){
 			int val = pedestal*t_Int + theEndingOffset; 
 			[self setThreshold:chan withValue:val];
@@ -837,7 +750,7 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 	
     // Adjust gains
 	// Not implemented now, ak 7.10.07
-	
+#endif
 }
 
 - (void) loadAutoCalbrateTestPattern
@@ -852,41 +765,59 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 }
 
 #pragma mark •••HW Access
-- (void) checkPresence
+- (unsigned long) readBoardIDLow
 {
-	@try {
-		[self readCardId];
-		[self setPresent:YES];
-	}
-	@catch(NSException* localException) {
-		[self setPresent:NO];
-	}
-} 
-
-- (int)  readVersion  //TODO: maybe we need a unsigned long int -tb-
-{	
-	unsigned long data = 0;
-    data = [self readReg: kFLTV4CFPGAVersionReg];
-    //data = [self readReg:kFLTV4FPGA8Version]; //TODO: and the kFLTV4FPGA8Version register ? -tb-
-	return data;
+	unsigned long value = [self readReg:kFLTV4BoardIDLsbReg];
+	return value;
 }
+
+- (unsigned long) readBoardIDHigh
+{
+	unsigned long value = [self readReg:kFLTV4BoardIDMsbReg];
+	return value;
+}
+
+- (int) readSlot
+{
+	return ([self readReg:kFLTV4BoardIDMsbReg]>>24) & 0x1F;
+}
+
+- (unsigned long)  readVersion
+{	
+	return [self readReg: kFLTV4VersionReg];
+}
+
+- (unsigned long)  readpVersion
+{	
+	return [self readReg: kFLTV4pVersionReg];
+}
+
+- (unsigned long)  readSeconds
+{	
+	return [self readReg: kFLTV4SecondCounterReg];
+}
+
+- (void)  writeSeconds:(unsigned long)aValue
+{	
+	return [self writeReg: kFLTV4SecondCounterReg value:aValue];
+}
+
+
 
 - (int)  readCardId
 {
- 	unsigned long data = [self readControlStatus];
-	int realSlot =  1+(data >> kIpeFlt_Cntl_CardID_Shift) & kIpeFlt_Cntl_CardID_Mask;
-	if(realSlot != [self stationNumber]){
-		NSLogError(@"IPE Crate %d configuration has FLT %d in the wrong slot! (Should be slot %d)\n",[self crateNumber], [self stationNumber], realSlot); 
-	}
-	return realSlot;
+// 	unsigned long data = [self readControlStatus];
+//	int realSlot =  1+(data >> kIpeFlt_Cntl_CardID_Shift) & kIpeFlt_Cntl_CardID_Mask;
+//	if(realSlot != [self stationNumber]){
+//		NSLogError(@"IPE Crate %d configuration has FLT %d in the wrong slot! (Should be slot %d)\n",[self crateNumber], [self stationNumber], realSlot); 
+//	}
+//	return realSlot;
+	return [self stationNumber]; //TODO....
 }
 
-
-- (int)  readMode
+- (int) readMode
 {
-	unsigned long data = [self readControlStatus];
-	[self setFltRunMode: (data >> kIpeFlt_Cntl_Mode_Shift) & kIpeFlt_Cntl_Mode_Mask];
-	return fltRunMode;
+	return ([self readControl]>>16) & 0xf;
 }
 
 - (void) loadThresholdsAndGains
@@ -900,6 +831,7 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 
 - (void) enableStatistics
 {
+#if (0)
     unsigned long aValue;
 	bool enabled = true;
 	unsigned long adc_guess = 150;			// This are parameter that work with the standard Auger-type boards
@@ -915,11 +847,13 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 	// Save parameter for calculation of mean and variance
 	statisticOffset = adc_guess;
 	statisticN = n;
+#endif
 }
 
 
 - (void) getStatistics:(int)aChannel mean:(double *)aMean  var:(double *)aVar 
 {
+#if (0)
     unsigned long data;
 	signed long sum;
     unsigned long sumSq;
@@ -950,45 +884,48 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 		*aMean = -1; 
 		*aVar = -1;
 	}
-	
+#endif
 }
 
 
 - (void) initBoard
 {
-	[self writeControlStatus];
+	[self writeControl];
 	[self writePeriphStatus];
+	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
+	[self writeReg: kFLTV4HrControlReg value:hitRateLength];
+	[self writeReg: kFLTV4PostTrigger  value:postTriggerTime];
 	[self loadThresholdsAndGains];
 	[self writeTriggerControl];			//set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
 	[self enableStatistics];			//enable hardware ADC statistics, ak 7.1.07
-	
-	[self writeReg:kFLTDisOnCntrlReg value:0];
+
+	//[self writeReg:kFLTDisOnCntrlReg value:0];
 }
 
-- (unsigned long) readControlStatus //TODO: better rename to readStatus -tb-
+- (unsigned long) readStatus
 {
 	return [self readReg: kFLTV4StatusReg ];
-	//return [self readReg: kFLTV4ControlReg ];
 }
 
-- (void) writeControlStatus
+- (unsigned long) readControl
 {
-	NSLog(@"FLTv4: writeControlStatus not implemented \n");//TODO: needs implementation -tb-
-if(0){//TODO:  replace by V4 code -tb-
-	unsigned long aValue =	(interruptMask  & kIpeFlt_Cntl_InterruptMask_Mask) << kIpeFlt_Cntl_InterruptMask_Shift  |
-	(ledOff			& kIpeFlt_Cntl_LedOff_Mask)		   << kIpeFlt_Cntl_LedOff_Shift			| 
-	(hitRateLength  & kIpeFlt_Cntl_HitRateLength_Mask) << kIpeFlt_Cntl_HitRateLength_Shift  |
-	(fltRunMode		& kIpeFlt_Cntl_Mode_Mask)		   << kIpeFlt_Cntl_Mode_Shift;
-	
-	[self writeReg: kFLTControlReg value:aValue];
+	return [self readReg: kFLTV4ControlReg];
 }
+
+- (void) writeControl
+{
+	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
+							((fifoBehaviour & 0x1)<<24) |
+							((ledOff & 0x1)<<1);
+	[self writeReg: kFLTV4ControlReg value:aValue];
 }
 
 - (void) writePeriphStatus
 {
 //TODO:  replace by V4 code -tb-
 	NSLog(@"FLTv4: writePeriphStatus not implemented \n");//TODO: needs implementation -tb-
+#if(0)
 	int fpga;
     if(0)
 	for(fpga=0;fpga<4;fpga++){
@@ -1000,90 +937,103 @@ if(0){//TODO:  replace by V4 code -tb-
 		
 		[self writeReg: kFLTPeriphStatusReg channel:trigChanConvFLT[fpga][0] value:aValue];
 	}
+#endif
 }
 
-- (void) printPixelRegs
+- (void) printPStatusRegs
 {
-	NSLog(@"FLTv4: printPixelRegs not implemented \n");//TODO: needs implementation -tb-
-//TODO:  replace by V4 code -tb-
-return;
-	unsigned long aValue;
-	int j;
-	
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	for(j=0;j<3;j++){
-		int regIndex;
-		if(j==0)		regIndex = kFLTPixelStatus1Reg;
-		else if(j==1)	regIndex = kFLTPixelStatus2Reg;
-		else			regIndex = kFLTPixelStatus3Reg;
-		
-		aValue = [self readReg:regIndex];
-		NSLogFont(aFont,@"FLT %d Pixel%d Reg (address:0x%08x): 0x%08x\n",[self stationNumber], j+1,[self regAddress:regIndex],aValue);
-		NSMutableString* s = [NSMutableString stringWithString:@"Bits 21 - 0: "];
-		int i=0;
-		for(i=21;i>=0;i--){
-			if(aValue & (1L<<i))[s appendString:@"1 "];
-			else [s appendString:@"0 "];
-		}
-		NSLogFont(aFont,@"%@\n",s);
+	unsigned long pAData = [self readReg:kFLTV4pStatusA];
+	unsigned long pBData = [self readReg:kFLTV4pStatusB];
+	unsigned long pCData = [self readReg:kFLTV4pStatusC];
+	NSLogFont(aFont,@"----------------------------------------\n");
+	NSLogFont(aFont,@"PStatus      A          B         C\n");
+	NSLogFont(aFont,@"----------------------------------------\n");
+	NSLogFont(aFont,@"Filter:  %@   %@   %@\n", (pAData>>2)&0x1 ? @" InValid": @"   OK   ",
+												(pBData>>2)&0x1 ? @" InValid": @"   OK   ",
+												(pCData>>2)&0x1 ? @" InValid": @"   OK   ");
+	
+	NSLogFont(aFont,@"PLL1  :  %@   %@   %@\n", (pAData>>8)&0x1 ? @"Unlocked": @"  Locked",
+												(pBData>>8)&0x1 ? @"Unlocked": @"  Locked",
+												(pCData>>8)&0x1 ? @"Unlocked": @"  Locked");
+	
+	NSLogFont(aFont,@"PLL2  :  %@   %@   %@\n", (pAData>>9)&0x1 ? @"Unlocked": @"  Locked",
+												(pBData>>9)&0x1 ? @"Unlocked": @"  Locked",
+												(pCData>>9)&0x1 ? @"Unlocked": @"  Locked");
+	
+	NSLogFont(aFont,@"QDR-II:  %@   %@   %@\n", (pAData>>10)&0x1 ? @"Unlocked": @"  Locked",
+												(pBData>>10)&0x1 ? @"Unlocked": @"  Locked",
+												(pCData>>10)&0x1 ? @"Unlocked": @"  Locked");
+	
+	NSLogFont(aFont,@"QDR-Er:  %@   %@   %@\n", (pAData>>11)&0x1 ? @"   Error": @"  Clear ",
+												(pBData>>11)&0x1 ? @"   Error": @"  Clear ",
+												(pCData>>11)&0x1 ? @"   Error": @"  Clear ");
+	
+	NSLogFont(aFont,@"----------------------------------------\n");
+}
+
+- (NSString*) boardTypeName:(int)aType
+{
+	switch(aType){
+		case 0:  return @"FZK HEAT";	break;
+		case 1:  return @"FZK KATRIN";	break;
+		case 2:  return @"FZK USCT";	break;
+		case 3:  return @"ITALY HEAT";	break;
+		default: return @"UNKNOWN";		break;
 	}
-	int fpga;
-	for(fpga=0;fpga<4;fpga++){
-		aValue = [self read:[self regAddress:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]]];
-		NSLogFont(aFont,@"FLT %d ChanOnOff Reg (address:0x%08x, fpga%d): 0x%08x\n",[self stationNumber],[self regAddress:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]],fpga+1,aValue);
-		NSMutableString* s = [NSMutableString stringWithString:@"Bits 11 - 0: "];
-		int i=0;
-		for(i=11;i>=0;i--){
-			if(aValue & (1L<<i))[s appendString:@"1 "];
-			else [s appendString:@"0 "];
-		}
-		NSLogFont(aFont,@"%@\n",s);
+}
+- (NSString*) fifoStatusString:(int)aType
+{
+	switch(aType){
+		case 0x1:  return @"Empty";			break;
+		case 0x3:  return @"Almost Empty";	break;
+		case 0x7:  return @"Almost Full";	break;
+		case 0xf:  return @"Full";			break;
+		default:   return @"UNKNOWN";		break;
 	}
 }
 
+- (void) printVersions
+{
+	unsigned long data;
+	data = [self readVersion];
+	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	NSLogFont(aFont,@"CFPGA Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
+	data = [self readpVersion];
+	NSLogFont(aFont,@"FPGA8 Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
+}
 
 - (void) printStatusReg
 {
-//TODO:  replace by V4 code -tb-
-	NSLog(@"FLTv4: printStatusReg STILL UNDER DEVELOPMENT \n");//TODO: needs implementation -tb-
-
-	unsigned long status = [self readControlStatus];
+	unsigned long status = [self readStatus];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"FLT %d status Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTControlReg],status);
-	NSLogFont(aFont,@"SlotID         : %d\n",1+(status>>kIpeFlt_Cntl_CardID_Shift) & kIpeFlt_Cntl_CardID_Mask);
-	NSLogFont(aFont,@"Version        : %d\n",(status>>kIpeFlt_Cntl_Version_Shift) & kIpeFlt_Cntl_Version_Mask);
-	NSLogFont(aFont,@"Run Mode       : %d\n",((status>>kIpeFlt_Cntl_Mode_Shift) & kIpeFlt_Cntl_Mode_Mask));
-	NSLogFont(aFont,@"Led Enabled    : %@\n",((status>>kIpeFlt_Cntl_LedOff_Shift) & kIpeFlt_Cntl_LedOff_Mask)?@"YES":@"NO");
-	NSLogFont(aFont,@"Interrupt Mask : %d\n",((status>>kIpeFlt_Cntl_InterruptMask_Shift) & kIpeFlt_Cntl_InterruptMask_Mask));
-	short maskValue = ((status>>kIpeFlt_Cntl_InterruptSources_Shift) & kIpeFlt_Cntl_InterruptSources_Mask);
-	NSLogFont(aFont,@"Interrupt Src  : %d\n",maskValue);
-	
-	NSLogFont(aFont,@"     CountErr1 : %d\n",maskValue & 0x1);
-	NSLogFont(aFont,@"     CountErr2 : %d\n",maskValue>>1 & 0x1);
-	NSLogFont(aFont,@"     CountErr3 : %d\n",maskValue>>3 & 0x1);
-	NSLogFont(aFont,@"     CountErr4 : %d\n",maskValue>>4 & 0x1);
-	NSLogFont(aFont,@"     ORT       : %d\n",maskValue>>5 & 0x1);
-	NSLogFont(aFont,@"     HR_Error  : %d\n",maskValue>>6 & 0x1);
-	NSLogFont(aFont,@"     GainError : %d\n",maskValue>>7 & 0x1);
-	NSLogFont(aFont,@"     MakeIntrpt: %d\n",maskValue>>8 & 0x1);
+	NSLogFont(aFont,@"FLT %d status Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTV4StatusReg],status);
+	NSLogFont(aFont,@"Power           : %@\n",	((status>>0) & 0x1) ? @"FAILED":@"OK");
+	NSLogFont(aFont,@"PLL1            : %@\n",	((status>>1) & 0x1) ? @"UNLOCKED":@"OK");
+	NSLogFont(aFont,@"PLL2            : %@\n",	((status>>2) & 0x1) ? @"UNLOCKED":@"OK");
+	NSLogFont(aFont,@"10MHz Phase     : %@\n",	((status>>3) & 0x1) ? @"UNLOCKED":@"OK");
+	NSLogFont(aFont,@"Firmware Type   : %@\n",	[self boardTypeName:((status>>4) & 0x3)]);
+	NSLogFont(aFont,@"Hardware Type   : %@\n",	[self boardTypeName:((status>>6) & 0x3)]);
+	NSLogFont(aFont,@"Busy            : %@\n",	((status>>8) & 0x1) ? @"BUSY":@"IDLE");
+	NSLogFont(aFont,@"Interrupt Srcs  : 0x%x\n",	(status>>16) &0xff);
+	NSLogFont(aFont,@"FIFO Status     : %@\n",	[self fifoStatusString:((status>>24) & 0xf)]);
+	NSLogFont(aFont,@"Histo Toggle Bit: %d\n",	((status>>28) & 0x1));
+	NSLogFont(aFont,@"Histo Toggle Clr: %d\n",	((status>>29) & 0x1));
+	NSLogFont(aFont,@"IRQ             : %d\n",	((status>>31) & 0x1));
 }
 
-- (void) printPeriphStatusReg
+- (void) printValueTable
 {
-//TODO:  replace by V4 code -tb-
-	NSLog(@"FLTv4: printPeriphStatusReg not implemented \n");//TODO: needs implementation -tb-
-return;
+	int i;
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	unsigned long status = [self readReg: kFLTPeriphStatusReg];
-	NSLogFont(aFont,@"FLT %d PeriphStatus Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTPeriphStatusReg],status);
-	NSLogFont(aFont,@"Version         : %d\n",(status>>28) & 0xf);
-	NSLogFont(aFont,@"Bits in BoxCar  : %d\n",(status>>24) & 0xf);
-	NSLogFont(aFont,@"Integration Time: %d\n",(status>>20) & 0xf);
-	NSLogFont(aFont,@"LED state       : %d\n",((status>>15) & 0x1));
-	NSLogFont(aFont,@"Run/Test Mode   : %d\n",((status>>14) & 0x1));
-	NSLogFont(aFont,@"Coincidence time: %d\n",((status>>0) & 0xff));
+	NSLogFont(aFont,   @"chan | HitRate  | Gain | Threshold\n");
+	NSLogFont(aFont,   @"----------------------------------\n");
+	unsigned long aHitRateMask = [self readHitRateMask] ;
+	for(i=0;i<kNumFLTChannels;i++){
+		NSLogFont(aFont,@"%4d | %@ | %4d | %4d \n",i,(aHitRateMask>>i)&0x1 ? @" Enabled":@"Disabled",[self readGain:i],[self readThreshold:i]);
+	}
+	NSLogFont(aFont,   @"---------------------------------\n");
 }
-
 
 - (void) printStatistics
 {
@@ -1140,23 +1090,26 @@ return 0;
 	[self write:[self regAddress:aReg channel:aChannel] value:aValue];
 }
 
-
-
 - (void) writeThreshold:(int)i value:(unsigned short)aValue
 {
+	aValue &= 0x1ffff;
 	[self writeReg: kFLTV4ThresholdReg channel:i value:aValue];
 }
 
 - (unsigned short) readThreshold:(int)i
 {
-	return [self readReg:kFLTV4ThresholdReg channel:i];
+	return [self readReg:kFLTV4ThresholdReg channel:i] & 0x1ffff;
 }
 
 - (void) writeGain:(int)i value:(unsigned short)aValue
 {
-    //TODO: obsolete (v3) -tb-
-	// invert the gain scale, ak 20.7.07
-	[self writeReg:kFLTGainReg channel:i value:(255-aValue)]; 
+	aValue &= 0xfff;
+	[self writeReg:kFLTV4GainReg channel:i value:aValue]; 
+}
+
+- (unsigned short) readGain:(int)i
+{
+	return [self readReg:kFLTV4GainReg channel:i] & 0xfff;
 }
 
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len
@@ -1173,14 +1126,19 @@ return 0;
 
 - (void) rewindTestPattern
 {
+#if (0)
     //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTTestPulsMemReg value: kIpeFlt_TP_Control | kIpeFlt_TestPattern_Reset];
+
+#endif
 }
 
 - (void) writeNextPattern:(unsigned long)aValue
 {
+#if (0)
     //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTTestPulsMemReg value:aValue];
+#endif
 }
 
 - (void) clear:(int)aChan page:(int)aPage value:(unsigned short)aValue
@@ -1222,49 +1180,40 @@ return 0;
 
 - (void) writeHitRateMask
 {
-	unsigned long hitRateEnabledMask = 0x0;
-	int chan;
-	for(chan = 0;chan<kNumFLTChannels;chan++){
-		if([[hitRatesEnabled objectAtIndex:chan] intValue]){
-			hitRateEnabledMask |= (0x1L<<chan);
-		}
-	}
-	
-    //TODO: obsolete (v3) -tb-
-	[self writeReg:kFLTPixelStatus3Reg value:hitRateEnabledMask];
+	[self writeReg:kFLTV4HrMeasEnableReg value:hitRateEnabledMask];
 }
 
-- (unsigned short) readGain:(int)i
+- (unsigned long) readHitRateMask
 {
-    // invert the gain scale, ak 20.7.07
-    //TODO: obsolete (v3) -tb-
-	return 255-[self readReg:kFLTGainReg channel:i];
+	return [self readReg:kFLTV4HrMeasEnableReg] & 0x3fffff;
+}
+
+- (void) writeInterruptMask
+{
+	[self writeReg:kFLTV4InterruptMaskReg value:interruptMask];
 }
 
 - (void) disableAllTriggers
 {
+#if (0)
     //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTPixelStatus1Reg value:0x3ffffff];
+#endif
 }
 
 - (void) writeTriggerControl
 {
-	unsigned long pixelStatus1Mask = 0x0;
-	int chan;
-	for(chan = 0;chan<kNumFLTChannels;chan++){
-		if(![[triggersEnabled objectAtIndex:chan] intValue]){ // ak 5.10.07
-			pixelStatus1Mask |= (0x1L<<chan);
-		}
-	}
-	
+#if (0)
     //TODO: obsolete (v3) -tb-
-	[self writeReg:kFLTPixelStatus1Reg value:pixelStatus1Mask];
+	[self writeReg:kFLTPixelStatus1Reg value:triggerEnabledMask];
 	[self writeReg:kFLTPixelStatus2Reg value:0x0];
+#endif
 }
 
 
 - (void) disableTrigger
 {
+#if (0)
 	unsigned long aValue = 0x555; //all triggers off
 	int fpga;
     //TODO: obsolete (v3) -tb-
@@ -1279,50 +1228,42 @@ return 0;
 		
 		if(aValue != checkValue)NSLog(@"FLT %d FPGA %d Trigger control write/read mismatch <0x%08x:0x%08x>\n",[self stationNumber],fpga,aValue,checkValue);
 	}
-	
+#endif
 }
 
 
 - (unsigned short) readTriggerControl:(int) fpga
 {	
+#if (0)
     //TODO: obsolete (v3) -tb-
 	return [self readReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]];
+#endif
+	return 0;
 }
 
 - (void) readHitRates
 {
-	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	
 	@try {
 		unsigned long aValue;
 		BOOL overflow;
-		float measurementAge;
 		
 		BOOL oneChanged = NO;
 		float newTotal = 0;
 		int chan;
 		for(chan=0;chan<kNumFLTChannels;chan++){
-			
-    //TODO: obsolete (v3) -tb-
-			aValue = [self readReg:kFLTHitRateMemReg channel:chan];
-			measurementAge = (aValue >> 12) & 0x1f;
-			overflow = (aValue >> 10) & 0x1;
-			aValue = aValue & 0x3FF;
+
+			aValue = [self readReg:kFLTV4HitRateReg channel:chan];
+			overflow = (aValue >> 17) & 0x1;
+			aValue = aValue & 0xffff;
 			
 			if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
-				// The hitrate counter has to be scaled by the counting time 
-				// ak, 15.6.07
-				if (hitRateLength!=0){  
-				    hitRate[chan] = aValue/ (float) hitRateLength; 
-				}
-				else {
-					hitRate[chan] = 0;
-				}
-				if(hitRateOverFlow[chan]){
-					hitRate[chan] = 0;
-				}
+
+				if (hitRateLength!=0)	hitRate[chan] = aValue/ (float) hitRateLength; 
+				else					hitRate[chan] = 0;
 				
+				if(hitRateOverFlow[chan])hitRate[chan] = 0;
 				hitRateOverFlow[chan] = overflow;
 				
 				oneChanged = YES;
@@ -1349,15 +1290,23 @@ return 0;
 	return ORIpeV4FLTModelHitRateChanged;
 }
 
+- (BOOL) isInStandByMode
+{
+	return [self readMode] == kIpeFlt_StandBy_Mode;
+}
+
 - (BOOL) isInRunMode
 {
-    //TODO: obsolete (v3) -tb-
 	return [self readMode] == kIpeFlt_Run_Mode;
+}
+
+- (BOOL) isInHistoMode
+{
+	return [self readMode] == kIpeFlt_Histo_Mode;
 }
 
 - (BOOL) isInTestMode
 {
-    //TODO: obsolete (v3) -tb-
 	return [self readMode] == kIpeFlt_Test_Mode;
 }
 
@@ -1368,40 +1317,31 @@ return 0;
 	
     [[self undoManager] disableUndoRegistration];
 	
-    [self setThresholdOffset:	[decoder decodeIntForKey:@"ORIpeV4FLTModelThresholdOffset"]];
-    [self setInterruptMask:		[decoder decodeInt32ForKey:@"ORIpeV4FLTModelInterruptMask"]];
+    [self setPostTriggerTime:	[decoder decodeInt32ForKey:@"postTriggerTime"]];
+    [self setFifoBehaviour:		[decoder decodeIntForKey:@"fifoBehaviour"]];
+    [self setAnalogOffset:		[decoder decodeIntForKey:@"analogOffset"]];
+    [self setInterruptMask:		[decoder decodeInt32ForKey:@"interruptMask"]];
     [self setCoinTime:			[decoder decodeInt32ForKey:@"coinTime"]];
     [self setIntegrationTime:	[decoder decodeInt32ForKey:@"integrationTime"]];
+    [self setHitRateEnabledMask:[decoder decodeInt32ForKey:@"hitRateEnabledMask"]];
+    [self setTriggerEnabledMask:[decoder decodeInt32ForKey:@"triggerEnabledMask"]];
     [self setPage:				[decoder decodeIntForKey:@"ORIpeV4FLTModelPage"]];
     [self setIterations:		[decoder decodeIntForKey:@"ORIpeV4FLTModelIterations"]];
     [self setEndChan:			[decoder decodeIntForKey:@"ORIpeV4FLTModelEndChan"]];
     [self setStartChan:			[decoder decodeIntForKey:@"ORIpeV4FLTModelStartChan"]];
     [self setHitRateLength:		[decoder decodeIntForKey:@"ORIpeV4FLTModelHitRateLength"]];
-    [self setTriggersEnabled:	[decoder decodeObjectForKey:@"ORIpeV4FLTModelTriggersEnabled"]];
     [self setGains:				[decoder decodeObjectForKey:@"gains"]];
     [self setThresholds:		[decoder decodeObjectForKey:@"thresholds"]];
     [self setFltRunMode:		[decoder decodeIntForKey:@"mode"]];
-    [self setHitRatesEnabled:	[decoder decodeObjectForKey:@"hitRatesEnabled"]];
     [self setTotalRate:			[decoder decodeObjectForKey:@"totalRate"]];
 	[self setTestEnabledArray:	[decoder decodeObjectForKey:@"testsEnabledArray"]];
 	[self setTestStatusArray:	[decoder decodeObjectForKey:@"testsStatusArray"]];
-    [self setReadoutPages:		[decoder decodeIntForKey:@"ORIpeV4FLTModelReadoutPages"]];	// ak, 2.7.07
-    [self setWriteValue:		[decoder decodeIntForKey:@"ORIpeV4FLTModelwriteValue"]];
-    [self setSelectedRegIndex:  [decoder decodeIntForKey:@"ORIpeV4FLTModelselectedRegIndex"]];
-    [self setSelectedChannelValue:  [decoder decodeIntForKey:@"ORIpeV4FLTModelSelectedChannelValue"]];
-	
-	//make sure these objects exist and are populated with nil objects.
-	int i;	
-	if(!triggersEnabled){
-		[self setTriggersEnabled: [NSMutableArray array]];
-		for(i=0;i<kNumFLTChannels;i++) [triggersEnabled addObject:[NSNumber numberWithBool:YES]];
-	}
-	
-	if(!hitRatesEnabled){
-		[self setHitRatesEnabled: [NSMutableArray array]];
-		for(i=0;i<kNumFLTChannels;i++) [hitRatesEnabled addObject:[NSNumber numberWithBool:YES]];
-	}
-	
+    [self setReadoutPages:		[decoder decodeIntForKey:@"readoutPages"]];
+    [self setWriteValue:		[decoder decodeIntForKey:@"writeValue"]];
+    [self setSelectedRegIndex:  [decoder decodeIntForKey:@"selectedRegIndex"]];
+    [self setSelectedChannelValue:  [decoder decodeIntForKey:@"selectedChannelValue"]];
+
+	int i;
 	if(!thresholds){
 		[self setThresholds: [NSMutableArray array]];
 		for(i=0;i<kNumFLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
@@ -1431,28 +1371,29 @@ return 0;
 {
     [super encodeWithCoder:encoder];
 	
-    [encoder encodeInt:thresholdOffset		forKey:@"ORIpeV4FLTModelThresholdOffset"];
-    [encoder encodeInt32:interruptMask		forKey:@"ORIpeV4FLTModelInterruptMask"];
+    [encoder encodeInt32:postTriggerTime	forKey:@"postTriggerTime"];
+    [encoder encodeInt:fifoBehaviour		forKey:@"fifoBehaviour"];
+    [encoder encodeInt:analogOffset			forKey:@"analogOffset"];
+    [encoder encodeInt32:interruptMask		forKey:@"interruptMask"];
     [encoder encodeInt32:coinTime			forKey:@"coinTime"];
     [encoder encodeInt32:integrationTime	forKey:@"integrationTime"];
+    [encoder encodeInt32:hitRateEnabledMask	forKey:@"hitRateEnabledMask"];
+    [encoder encodeInt32:triggerEnabledMask	forKey:@"triggerEnabledMask"];
     [encoder encodeInt:page					forKey:@"ORIpeV4FLTModelPage"];
     [encoder encodeInt:iterations			forKey:@"ORIpeV4FLTModelIterations"];
     [encoder encodeInt:endChan				forKey:@"ORIpeV4FLTModelEndChan"];
     [encoder encodeInt:startChan			forKey:@"ORIpeV4FLTModelStartChan"];
     [encoder encodeInt:hitRateLength		forKey:@"ORIpeV4FLTModelHitRateLength"];
-    [encoder encodeObject:triggersEnabled	forKey:@"ORIpeV4FLTModelTriggersEnabled"];
     [encoder encodeObject:gains				forKey:@"gains"];
     [encoder encodeObject:thresholds		forKey:@"thresholds"];
-    [encoder encodeObject:hitRatesEnabled	forKey:@"hitRatesEnabled"];
     [encoder encodeInt:fltRunMode			forKey:@"mode"];
     [encoder encodeObject:totalRate			forKey:@"totalRate"];
     [encoder encodeObject:testEnabledArray	forKey:@"testEnabledArray"];
     [encoder encodeObject:testStatusArray	forKey:@"testStatusArray"];
-    [encoder encodeInt:readoutPages  		forKey:@"ORIpeV4FLTModelReadoutPages"];	
-
-    [encoder encodeInt:writeValue           forKey:@"ORIpeV4FLTModelwriteValue"];	
-    [encoder encodeInt:selectedRegIndex  	forKey:@"ORIpeV4FLTModelselectedRegIndex"];	
-    [encoder encodeInt:selectedChannelValue	forKey:@"ORIpeV4FLTModelSelectedChannelValue"];	
+    [encoder encodeInt:readoutPages  		forKey:@"readoutPages"];	
+    [encoder encodeInt:writeValue           forKey:@"writeValue"];	
+    [encoder encodeInt:selectedRegIndex  	forKey:@"selectedRegIndex"];	
+    [encoder encodeInt:selectedChannelValue	forKey:@"selectedChannelValue"];	
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -1488,8 +1429,8 @@ return 0;
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds			forKey:@"thresholds"];
     [objDictionary setObject:gains				forKey:@"gains"];
-    [objDictionary setObject:hitRatesEnabled	forKey:@"hitRatesEnabled"];
-    [objDictionary setObject:triggersEnabled	forKey:@"triggersEnabled"];
+    [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask] forKey:@"hitRateEnabledMask"];
+    [objDictionary setObject:[NSNumber numberWithLong:triggerEnabledMask] forKey:@"triggerEnabledMask"];
 	
 	return objDictionary;
 }
@@ -1542,10 +1483,9 @@ return 0;
 	//cache some addresses for speed in the dataTaking loop.
 	unsigned long theSlotPart = [self slot]<<24;
 	statusAddress			  = theSlotPart;
-	memoryAddress			  = theSlotPart | (ipeV3Reg[kFLTAdcMemory].space << kIpeFlt_AddressSpace); //TODO: V4 handling ... -tb-
+	//memoryAddress			  = theSlotPart | (ipeV4Reg[kFLTAdcMemory].space << kIpeFlt_AddressSpace); //TODO: V4 handling ... -tb-
 	fireWireCard			  = [[self crate] adapter];
 	locationWord			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-  	usingPBusSimulation		  = [fireWireCard pBusSim];
 	pageSize                  = [slt pageSize];  //us
 }
 
@@ -1641,7 +1581,7 @@ return 0;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[self setLedOff:YES];
-	[self writeControlStatus];
+	[self writeControl];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	int chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
@@ -1867,9 +1807,9 @@ return 0;
 	@try {
 		BOOL passed = YES;
 		int i;
-		for(i=0;i<2;i++){
+		for(i=0;i<4;i++){
 			fltRunMode = i;
-			[self writeControlStatus];
+			[self writeControl];
 			if([self readMode] != i){
 				[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
 				passed = NO;
@@ -1877,7 +1817,7 @@ return 0;
 			}
 			if(passed){
 				fltRunMode = savedMode;
-				[self writeControlStatus];
+				[self writeControl];
 				if([self readMode] != savedMode){
 					[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
 					passed = NO;
@@ -1973,7 +1913,7 @@ return 0;
 			}
 		}
 		if(passed){		
-			unsigned long gainPattern[4] = {0xff,0x0,0xaa,0x55};
+			unsigned long gainPattern[4] = {0xfff,0x0,0xaaa,0x555};
 			
 			//now gains
 			for(testIndex = 0;testIndex<4;testIndex++){
@@ -1983,20 +1923,33 @@ return 0;
 				}
 				
 				for(chan=0;chan<kNumFLTChannels;chan++){
-					if([self readGain:chan] != thePattern){
+					unsigned short theValue = [self readGain:chan];
+					if(theValue != thePattern){
 						[self test:testNumber result:@"FAILED" color:[NSColor passedColor]];
-						NSLog(@"Error: Gain (pattern: 0x%0x) FLT %d chan %d does not work\n",thePattern,[self stationNumber],chan);
+						NSLog(@"Error: Gain (pattern: 0x%0x!=0x%0x) FLT %d chan %d does not work\n",thePattern,theValue,[self stationNumber],chan);
 						passed = NO;
 						break;
 					}
 				}
 			}
 		}
-		if(passed) {
-			[self test:testNumber result:@"Passed" color:[NSColor passedColor]];
+		if(passed){	
+			unsigned long offsetPattern[4] = {0xfff,0x0,0xaaa,0x555};
+			for(testIndex = 0;testIndex<4;testIndex++){
+				unsigned short thePattern = offsetPattern[testIndex];
+				[self writeReg:kFLTV4AnalogOffset value:thePattern];
+				unsigned short theValue = [self readReg:kFLTV4AnalogOffset];
+				if(theValue != thePattern){
+					NSLog(@"Error: Offset (pattern: 0x%0x!=0x%0x) FLT %d does not work\n",thePattern,theValue,[self stationNumber]);
+					passed = NO;
+					break;
+				}
+			}
 		}
 		
-		[self loadThresholdsAndGains];
+		if(passed) [self test:testNumber result:@"Passed" color:[NSColor passedColor]];
+		
+		[self loadThresholdsAndGains]; //put the old values back
 		
 		[self leaveTestMode];
 		
@@ -2053,6 +2006,7 @@ return 0;
 
 - (void) eventTest
 {
+#if (0)
 	int testNumber = 4;
 	if(!testsRunning){
 		[self runningTest:testNumber status:@"stopped"];
@@ -2072,18 +2026,18 @@ return 0;
 		int i;
 		for(i=0;i<10;i++){
 			ledOff	  = i%2;
-			[self writeControlStatus];
+			[self writeControl];
 			[ORTimer delay:.1];
 		}
 		
 		ledOff	  = YES;
-		[self writeControlStatus];
+		[self writeControl];
 		
 		//go to test mode
 		fltRunMode = kIpeFlt_Run_Mode;
 		ledOff = YES;
 		
-		[self writeControlStatus];
+		[self writeControl];
 		
 		if([self readMode] != kIpeFlt_Run_Mode){
 			NSLogColor([NSColor redColor],@"Could not put FLT %d into run mode\n",[self stationNumber]);
@@ -2128,7 +2082,7 @@ return 0;
 		
 		fltRunMode = savedMode;
 		ledOff   = savedLed;
-		[self writeControlStatus];
+		[self writeControl];
 	}
 	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
@@ -2136,7 +2090,7 @@ return 0;
 	}		
 	
 	[testSuit runForObject:self]; //do next test
-	
+#endif
 }
 
 - (int) compareData:(unsigned short*) data
@@ -2181,7 +2135,7 @@ return 0;
 	//put into test mode
 	savedMode = fltRunMode;
 	fltRunMode = kIpeFlt_Test_Mode;
-	[self writeControlStatus];
+	[self writeControl];
 	if([self readMode] != kIpeFlt_Test_Mode){
 		NSLogColor([NSColor redColor],@"Could not put FLT %d into test mode\n",[self stationNumber]);
 		[NSException raise:@"Ram Test Failed" format:@"Could not put FLT %d into test mode\n",[self stationNumber]];
@@ -2191,6 +2145,6 @@ return 0;
 - (void) leaveTestMode
 {
 	fltRunMode = savedMode;
-	[self writeControlStatus];
+	[self writeControl];
 }
 @end

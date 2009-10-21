@@ -125,24 +125,14 @@
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(triggerEnabledChanged:)
-						 name : ORIpeV4FLTModelTriggerEnabledChanged
+						 name : ORIpeV4FLTModelTriggerEnabledMaskChanged
 					   object : model];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(hitRateEnabledChanged:)
-						 name : ORIpeV4FLTModelHitRateEnabledChanged
+						 name : ORIpeV4FLTModelHitRateEnabledMaskChanged
 					   object : model];
-	
-	[notifyCenter addObserver : self
-					 selector : @selector(triggersEnabledArrayChanged:)
-						 name : ORIpeV4FLTModelTriggersEnabledChanged
-					   object : model];
-	
-	[notifyCenter addObserver : self
-					 selector : @selector(hitRatesEnabledArrayChanged:)
-						 name : ORIpeV4FLTModelHitRatesArrayChanged
-					   object : model];
-	
+		
 	
     [notifyCenter addObserver : self
 					 selector : @selector(gainArrayChanged:)
@@ -217,8 +207,8 @@
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(thresholdOffsetChanged:)
-                         name : ORIpeV4FLTModelThresholdOffsetChanged
+                     selector : @selector(analogOffsetChanged:)
+                         name : ORIpeV4FLTModelAnalogOffsetChanged
 						object: model];
 	
     [notifyCenter addObserver : self
@@ -246,10 +236,30 @@
 					 selector : @selector(selectedChannelValueChanged:)
 						 name : ORIpeV4FLTSelectedChannelValueChanged
 					   object : model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fifoBehaviourChanged:)
+                         name : ORIpeV4FLTModelFifoBehaviourChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(postTriggerTimeChanged:)
+                         name : ORIpeV4FLTModelPostTriggerTimeChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) postTriggerTimeChanged:(NSNotification*)aNote
+{
+	[postTriggerTimeField setIntValue: [model postTriggerTime]];
+}
+
+- (void) fifoBehaviourChanged:(NSNotification*)aNote
+{
+	[fifoBehaviourMatrix selectCellWithTag: [model fifoBehaviour]];
+}
 
 - (void) integrationTimeChanged:(NSNotification*)aNote
 {
@@ -262,9 +272,9 @@
 }
 
 
-- (void) thresholdOffsetChanged:(NSNotification*)aNote
+- (void) analogOffsetChanged:(NSNotification*)aNote
 {
-	[thresholdOffsetField setIntValue: [model thresholdOffset]];
+	[analogOffsetField setIntValue: [model analogOffset]];
 }
 
 - (void) ledOffChanged:(NSNotification*)aNote
@@ -327,12 +337,14 @@
 	[self readoutPagesChanged:nil];	
 	[self interruptMaskChanged:nil];
 	[self ledOffChanged:nil];
-	[self thresholdOffsetChanged:nil];
+	[self analogOffsetChanged:nil];
 	[self integrationTimeChanged:nil];
 	[self coinTimeChanged:nil];
 	[self selectedRegIndexChanged:nil];
 	[self writeValueChanged:nil];
 	[self selectedChannelValueChanged:nil];
+	[self fifoBehaviourChanged:nil];
+	[self postTriggerTimeChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -662,9 +674,19 @@
 
 #pragma mark •••Actions
 
-- (IBAction) thresholdOffsetAction:(id)sender
+- (void) postTriggerTimeAction:(id)sender
 {
-	[model setThresholdOffset:[sender intValue]];	
+	[model setPostTriggerTime:[sender intValue]];	
+}
+
+- (void) fifoBehaviourAction:(id)sender
+{
+	[model setFifoBehaviour:[[sender selectedCell]tag]];	
+}
+
+- (IBAction) analogOffsetAction:(id)sender
+{
+	[model setAnalogOffset:[sender intValue]];	
 }
 
 - (IBAction) interruptMaskAction:(id)sender
@@ -764,11 +786,12 @@
 {
 	[self endEditing];
 	@try {
+		[model printVersions];
 		[model printStatusReg];
-		[model printPeriphStatusReg];
-		[model printPixelRegs];
-		[self readThresholdsGains:sender];
-		[model printStatistics];
+		[model printPStatusRegs];
+		//[model printPixelRegs];
+		[model printValueTable];
+		//[model printStatistics];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT (%d) status\n",[model stationNumber]);
@@ -960,7 +983,8 @@
             int chan = [model selectedChannelValue];
 		    value = [model readReg:index channel: chan ];
 		    NSLog(@"FLTv4 reg: %@ for channel %i has value: 0x%x (%i)\n",[model getRegisterName:index], chan, value, value);
-        }else{
+        }
+		else {
 		    value = [model readReg:index ];
 		    NSLog(@"FLTv4 reg: %@ has value: 0x%x (%i)\n",[model getRegisterName:index],value, value);
         }
@@ -971,6 +995,7 @@
                         localException,[model stationNumber]);
 	}
 }
+
 - (IBAction) writeRegAction: (id) sender
 {
 	[self endEditing];
@@ -979,21 +1004,27 @@
 		unsigned long val = [model writeValue];
         if(([model getAccessType:index] & kIpeRegNeedsChannel)){
             int chan = [model selectedChannelValue];
-    		//[model writeReg:index value:[model writeValue]];
-    		//[model writeReg:index value:[regWriteValueTextField intValue]];//TODO: allow hex values, e.g. 0x23 -tb-
-    		[model writeReg:index  channel: chan value: val];//TODO: allow hex values, e.g. 0x23 -tb-
-    		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
+     		[model writeReg:index  channel: chan value: val];//TODO: allow hex values, e.g. 0x23 -tb-
     		NSLog(@"wrote 0x%x (%i) to FLTv4 reg: %@ channel %i\n", val, val, [model getRegisterName:index], chan);
-        }else{
-    		//[model writeReg:index value:[model writeValue]];
+        }
+		else{
     		[model writeReg:index value: val];//TODO: allow hex values, e.g. 0x23 -tb-
-    		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
     		NSLog(@"wrote 0x%x (%i) to FLTv4 reg: %@ \n",val,val,[model getRegisterName:index]);
         }
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLTv4 reg: %@\n",[model getRegisterName:index]);
         NSRunAlertPanel([localException name], @"%@\nFLTv4%d Access failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+	}
+}
+- (IBAction) testButtonAction: (id) sender //temp routine to hook up to any on a temp basis
+{
+	@try {
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception running FLT test code\n");
+        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }

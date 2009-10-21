@@ -29,7 +29,9 @@
 @interface ORIpeV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
-		IBOutlet NSTextField*	thresholdOffsetField;
+		IBOutlet NSTextField*   postTriggerTimeField;
+		IBOutlet NSMatrix*		fifoBehaviourMatrix;
+		IBOutlet NSTextField*	analogOffsetField;
 		IBOutlet NSTextField*	ledOffField;
 		IBOutlet NSTextField*	interruptMaskField;
 		IBOutlet NSPopUpButton*	modeButton;
@@ -97,9 +99,11 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) postTriggerTimeChanged:(NSNotification*)aNote;
+- (void) fifoBehaviourChanged:(NSNotification*)aNote;
 - (void) integrationTimeChanged:(NSNotification*)aNote;
 - (void) coinTimeChanged:(NSNotification*)aNote;
-- (void) thresholdOffsetChanged:(NSNotification*)aNote;
+- (void) analogOffsetChanged:(NSNotification*)aNote;
 - (void) ledOffChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
@@ -131,9 +135,11 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) postTriggerTimeAction:(id)sender;
+- (IBAction) fifoBehaviourAction:(id)sender;
 - (IBAction) coinTimeAction:(id)sender;
 - (IBAction) integrationTimeAction:(id)sender;
-- (IBAction) thresholdOffsetAction:(id)sender;
+- (IBAction) analogOffsetAction:(id)sender;
 - (IBAction) interruptMaskAction:(id)sender;
 - (IBAction) initBoardButtonAction:(id)sender;
 - (IBAction) reportButtonAction:(id)sender;
@@ -164,6 +170,7 @@
 - (IBAction) writeValueAction:(id) aSender;
 - (IBAction) readRegAction: (id) sender;
 - (IBAction) writeRegAction: (id) sender;
+- (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 
 #pragma mark •••Plot DataSource
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;

@@ -67,13 +67,13 @@
 @interface ORIpeV4FLTModel : ORIpeCard <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     // Hardware configuration
-    int				fltRunMode;		//!< Run modes: 0 = run, 1=test
+    int				fltRunMode;		//!< Run modes: 0=standby, 1=standard, 2=histogram, 3=test
     NSMutableArray* thresholds;     //!< Array to keep the threshold of all 22 channel
     NSMutableArray* gains;			//!< Aarry to keep the gains
+    unsigned long triggerEnabledMask;	//!< mask to keep the activated channel for the trigger
+	unsigned long hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement
     unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
-    NSMutableArray* triggersEnabled;	//!< Array to keep the activated channel for the trigger
-	NSMutableArray* hitRatesEnabled;	//!< Array to store the activated trigger rate measurement
     unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
 	float			hitRate[kNumFLTChannels];	//!< Actual value of the trigger rate measurement
 	BOOL			hitRateOverFlow[kNumFLTChannels];	//!< Overflow of hardware trigger rate register
@@ -83,7 +83,7 @@
 	BOOL			firstTime;		//!< Event loop: Flag to identify the first readout loop for initialization purpose
 	
 	ORTimeRate*		totalRate;
-    int				thresholdOffset;
+    int				analogOffset;
 	unsigned long   statisticOffset; //!< Offset guess used with by the hardware statistical evaluation
 	unsigned long   statisticN;		//! Number of samples used for statistical evaluation
 	unsigned long   eventMask;		//!Bits set for last channels hit.
@@ -122,7 +122,8 @@
     unsigned short  selectedRegIndex;
     unsigned long   writeValue;
     unsigned long   selectedChannelValue;
-
+    int fifoBehaviour;
+    unsigned long postTriggerTime;
 }
 
 #pragma mark •••Initialization
@@ -132,8 +133,12 @@
 - (void) makeMainController;
 
 #pragma mark •••Accessors
-- (int) thresholdOffset;
-- (void) setThresholdOffset:(int)aThresholdOffset;
+- (unsigned long) postTriggerTime;
+- (void) setPostTriggerTime:(unsigned long)aPostTriggerTime;
+- (int) fifoBehaviour;
+- (void) setFifoBehaviour:(int)aFifoBehaviour;
+- (int) analogOffset;
+- (void) setAnalogOffset:(int)aAnalogOffset;
 - (BOOL) ledOff;
 - (void) setLedOff:(BOOL)aledOff;
 
@@ -165,10 +170,10 @@
 
 - (NSMutableArray*) gains;
 - (NSMutableArray*) thresholds;
-- (NSMutableArray*) triggersEnabled;
+- (unsigned long) triggerEnabledMask;
+- (void) setTriggerEnabledMask:(unsigned long)aMask;
 - (void) setGains:(NSMutableArray*)aGains;
 - (void) setThresholds:(NSMutableArray*)aThresholds;
-- (void) setTriggersEnabled:(NSMutableArray*)aThresholds;
 - (void) disableAllTriggers;
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan;
@@ -220,9 +225,19 @@
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel;
 - (void) writeReg:(int)aReg value:(unsigned long)aValue;
 - (void) writeReg:(int)aReg channel:(int)aChannel value:(unsigned long)aValue;
+- (BOOL) isInStandByMode;
+- (BOOL) isInRunMode;
+- (BOOL) isInHistoMode;
+- (BOOL) isInTestMode;
+- (unsigned long)  readSeconds;
+- (void)  writeSeconds:(unsigned long)aValue;
 
-- (void)	checkPresence;
-- (int)		readVersion;
+- (unsigned long) readVersion;
+- (unsigned long) readpVersion;
+- (unsigned long) readBoardIDLow;
+- (unsigned long) readBoardIDHigh;
+- (int)			  readSlot;
+
 - (int)		readCardId;
 - (int)		readMode;
 
@@ -231,18 +246,23 @@
 - (BOOL) isInRunMode;
 - (BOOL) isInTestMode;
 - (void) writeHitRateMask;
-- (NSMutableArray*) hitRatesEnabled;
-- (void) setHitRatesEnabled:(NSMutableArray*)anArray;
+- (void) writeInterruptMask;
+- (unsigned long) hitRateEnabledMask;
+- (void) setHitRateEnabledMask:(unsigned long)aMask;
 - (void) readHitRates;
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len;
 - (void) rewindTestPattern;
 - (void) writeNextPattern:(unsigned long)aValue;
-- (unsigned long) readControlStatus;
-- (void) writeControlStatus;
+- (unsigned long) readStatus;
+- (unsigned long) readControl;
+- (unsigned long) readHitRateMask;
+- (void) writeControl;
 - (void) writePeriphStatus;
 - (void) printStatusReg;
-- (void) printPeriphStatusReg;
-- (void) printPixelRegs;
+- (void) printPStatusRegs;
+- (void) printVersions;
+- (void) printValueTable;
+
 /** Print result of hardware statistics for all channels */
 - (void) printStatistics; // ak, 7.10.07
 - (void) writeThreshold:(int)i value:(unsigned short)aValue;
@@ -253,6 +273,8 @@
 - (BOOL) partOfEvent:(short)chan;
 - (unsigned long) eventMask;
 - (void) eventMask:(unsigned long)aMask;
+- (NSString*) boardTypeName:(int)aType;
+- (NSString*) fifoStatusString:(int)aType;
 
 /** Disable the trigger algorithm in all channels. In debug mode the ADC Traces are
   * still recorded while the recording is not stopped by any steps in the signal. 
@@ -319,7 +341,9 @@
 					 n:(int) n;
 @end
 
-extern NSString* ORIpeV4FLTModelThresholdOffsetChanged;
+extern NSString* ORIpeV4FLTModelPostTriggerTimeChanged;
+extern NSString* ORIpeV4FLTModelFifoBehaviourChanged;
+extern NSString* ORIpeV4FLTModelAnalogOffsetChanged;
 extern NSString* ORIpeV4FLTModelLedOffChanged;
 extern NSString* ORIpeV4FLTModelInterruptMaskChanged;
 extern NSString* ORIpeV4FLTModelTestParamChanged;
@@ -328,10 +352,8 @@ extern NSString* ORIpeV4FLTModelTestEnabledArrayChanged;
 extern NSString* ORIpeV4FLTModelTestStatusArrayChanged;
 extern NSString* ORIpeV4FLTModelHitRateChanged;
 extern NSString* ORIpeV4FLTModelHitRateLengthChanged;
-extern NSString* ORIpeV4FLTModelHitRatesArrayChanged;
-extern NSString* ORIpeV4FLTModelHitRateEnabledChanged;
-extern NSString* ORIpeV4FLTModelTriggerEnabledChanged;
-extern NSString* ORIpeV4FLTModelTriggersEnabledChanged;
+extern NSString* ORIpeV4FLTModelHitRateEnabledMaskChanged;
+extern NSString* ORIpeV4FLTModelTriggerEnabledMaskChanged;
 extern NSString* ORIpeV4FLTModelGainChanged;
 extern NSString* ORIpeV4FLTModelThresholdChanged;
 extern NSString* ORIpeV4FLTChan;

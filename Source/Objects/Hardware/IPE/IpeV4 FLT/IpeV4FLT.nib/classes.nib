@@ -13,6 +13,36 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>analyze</key>
+				<string>id</string>
+				<key>publishToPDF</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ORFlippedView</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+				<key>viewForPDF</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>ORValueBar</string>
 			<key>LANGUAGE</key>
@@ -26,6 +56,14 @@
 				<key>mXScale</key>
 				<string>id</string>
 			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
 		</dict>
@@ -140,6 +178,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>analogOffsetAction</key>
+				<string>id</string>
 				<key>calibrateAction</key>
 				<string>id</string>
 				<key>coinTimeAction</key>
@@ -147,6 +187,8 @@
 				<key>enableAllTriggersAction</key>
 				<string>id</string>
 				<key>enableNoTriggersAction</key>
+				<string>id</string>
+				<key>fifoBehaviourAction</key>
 				<string>id</string>
 				<key>gainAction</key>
 				<string>id</string>
@@ -165,6 +207,8 @@
 				<key>interruptMaskAction</key>
 				<string>id</string>
 				<key>modeAction</key>
+				<string>id</string>
+				<key>postTriggerTimeTextFieldAction</key>
 				<string>id</string>
 				<key>readRegAction</key>
 				<string>id</string>
@@ -186,13 +230,13 @@
 				<string>id</string>
 				<key>testAction</key>
 				<string>id</string>
+				<key>testButtonAction</key>
+				<string>id</string>
 				<key>testEnabledAction</key>
 				<string>id</string>
 				<key>testParamAction</key>
 				<string>id</string>
 				<key>thresholdAction</key>
-				<string>id</string>
-				<key>thresholdOffsetAction</key>
 				<string>id</string>
 				<key>triggerEnableAction</key>
 				<string>id</string>
@@ -211,12 +255,16 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>analogOffsetField</key>
+				<string>NSTextField</string>
 				<key>calibrateButton</key>
 				<string>NSButton</string>
 				<key>channelPopUp</key>
 				<string>NSPopUpButton</string>
 				<key>coinTimeField</key>
 				<string>NSTextField</string>
+				<key>fifoBehaviourMatrix</key>
+				<string>NSMatrix</string>
 				<key>gainTextFields</key>
 				<string>NSMatrix</string>
 				<key>hitRateAllButton</key>
@@ -237,6 +285,8 @@
 				<string>NSTextField</string>
 				<key>modeButton</key>
 				<string>NSPopUpButton</string>
+				<key>postTriggerTimeTextField</key>
+				<string>NSTextField</string>
 				<key>rate0</key>
 				<string>ORValueBar</string>
 				<key>rateLogCB</key>
@@ -273,8 +323,6 @@
 				<string>NSMatrix</string>
 				<key>testStatusMatrix</key>
 				<string>NSMatrix</string>
-				<key>thresholdOffsetField</key>
-				<string>NSTextField</string>
 				<key>thresholdTextFields</key>
 				<string>NSMatrix</string>
 				<key>timeRateLogCB</key>
@@ -361,7 +409,7 @@
 				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>ORPlotter</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
