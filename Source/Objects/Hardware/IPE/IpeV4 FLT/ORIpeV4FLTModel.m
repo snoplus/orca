@@ -111,6 +111,10 @@ enum IpeFLTV4Enum{
 	kFLTV4AnalogOffset,
 	kFLTV4GainReg,
 	kFLTV4HitRateReg,
+	kFLTV4EventFifo1Reg,
+	kFLTV4EventFifo2Reg,
+	kFLTV4EventFifo3Reg,
+	kFLTV4EventFifo4Reg,
 	kFLTV4NumRegs //must be last
 };
 
@@ -140,7 +144,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-
+{@"Event FIFO1",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+{@"Event FIFO2",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+{@"Event FIFO3",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+{@"Event FIFO4",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 };
 
 @interface ORIpeV4FLTModel (private)
@@ -539,7 +546,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 -(void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerEnabledMask:triggerEnabledMask];
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerEnabled:aChan withValue:(triggerEnabledMask>>aChan)&0x1];
 	if(aState) triggerEnabledMask |= (1<<aChan);
 	else triggerEnabledMask &= ~(1<<aChan);
 	
@@ -555,7 +562,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHitRateEnabledMask:hitRateEnabledMask];
+    [[[self undoManager] prepareWithInvocationTarget:self] setHitRateEnabled:aChan withValue:(hitRateEnabledMask>>aChan)&0x1];
 	if(aState) hitRateEnabledMask |= (1<<aChan);
 	else hitRateEnabledMask &= ~(1<<aChan);
 	
@@ -578,18 +585,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) enableAllHitRates:(BOOL)aState
 {
-	int chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
-		[self setHitRateEnabled:chan withValue:aState];
-	}
+	[self setHitRateEnabledMask:aState?0x3fffff:0x0];
 }
 
 - (void) enableAllTriggers:(BOOL)aState
 {
-	int chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
-		[self setTriggerEnabled:chan withValue:aState];
-	}
+	[self setTriggerEnabledMask:aState?0x3fffff:0x0];
 }
 
 
@@ -919,6 +920,11 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 							((fifoBehaviour & 0x1)<<24) |
 							((ledOff & 0x1)<<1);
 	[self writeReg: kFLTV4ControlReg value:aValue];
+}
+
+- (void) printEventFIFOs
+{
+	unsigned long aValue = [self readReg: kFLTV4ControlReg];
 }
 
 - (void) writePeriphStatus

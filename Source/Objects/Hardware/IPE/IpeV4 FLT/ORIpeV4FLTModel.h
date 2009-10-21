@@ -262,6 +262,7 @@
 - (void) printPStatusRegs;
 - (void) printVersions;
 - (void) printValueTable;
+- (void) printEventFIFOs;
 
 /** Print result of hardware statistics for all channels */
 - (void) printStatistics; // ak, 7.10.07

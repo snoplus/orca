@@ -208,7 +208,7 @@
 				<string>id</string>
 				<key>modeAction</key>
 				<string>id</string>
-				<key>postTriggerTimeTextFieldAction</key>
+				<key>postTriggerTimeAction</key>
 				<string>id</string>
 				<key>readRegAction</key>
 				<string>id</string>
@@ -285,7 +285,7 @@
 				<string>NSTextField</string>
 				<key>modeButton</key>
 				<string>NSPopUpButton</string>
-				<key>postTriggerTimeTextField</key>
+				<key>postTriggerTimeField</key>
 				<string>NSTextField</string>
 				<key>rate0</key>
 				<string>ORValueBar</string>

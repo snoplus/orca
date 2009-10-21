@@ -525,14 +525,18 @@
 
 - (void) triggerEnabledChanged:(NSNotification*)aNotification
 {
-	int chan = [[[aNotification userInfo] objectForKey:ORIpeV4FLTChan] intValue];
-	[[triggerEnabledCBs cellWithTag:chan] setState: [model triggerEnabled:chan]];
+	int i;
+	for(i=0;i<kNumFLTChannels;i++){
+		[[triggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
+	}
 }
 
 - (void) hitRateEnabledChanged:(NSNotification*)aNotification
 {
-	int chan = [[[aNotification userInfo] objectForKey:ORIpeV4FLTChan] intValue];
-	[[hitRateEnabledCBs cellWithTag:chan] setState: [model hitRateEnabled:chan]];
+	int i;
+	for(i=0;i<kNumFLTChannels;i++){
+		[[hitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
+	}
 }
 
 - (void) thresholdChanged:(NSNotification*)aNotification
@@ -1021,6 +1025,7 @@
 - (IBAction) testButtonAction: (id) sender //temp routine to hook up to any on a temp basis
 {
 	@try {
+		[model printEventFIFOs];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception running FLT test code\n");
