@@ -523,8 +523,9 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 	
 	if ([[tableColumn identifier] isEqual:@"Name"]) {
         if ([item isKindOfClass:[NSDictionary class]]) {
-			if([item objectForKey:@"Children"])return [item objectForKey:@"Name"];
-			else return [item objectForKey:@"name"]; //lower case!
+			id theName = [item objectForKey:@"Name"];
+			if(!theName) theName = [item objectForKey:@"name"];
+			return theName;
         } 
         else if ([item isKindOfClass:[NSArray class]]) {
 			return [parentObject objectForKey:@"Name"];
@@ -609,8 +610,9 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 			NSString* theIdentifier				= [tableColumn identifier];
 			if([theIdentifier isEqual:@"Path"]){
 				if([model viewItemName]) {
-					if(isControl) return [itemDictionary objectForKey:@"name"];
-					else		  return [itemDictionary objectForKey:@"Name"];
+					id theName = [itemDictionary objectForKey:@"Name"];
+					if(!theName) theName = [itemDictionary objectForKey:@"name"];
+					return theName;
 				}
 				else					 return  [itemDictionary objectForKey:@"Path"];
 			}
@@ -619,8 +621,9 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 				else          return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"Value"] doubleValue]];
 			}
 			else if([theIdentifier isEqual:@"Name"]){
-				if(isControl) return [itemDictionary objectForKey:@"name"];
-				else		  return [itemDictionary objectForKey:@"Name"];
+				id theName = [itemDictionary objectForKey:@"Name"];
+				if(!theName) theName = [itemDictionary objectForKey:@"name"];
+				return theName;
 			}
 			else {
 				id aDisplayValue = [topLevelDictionary objectForKey:theIdentifier];
@@ -759,7 +762,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 //sub class of NSTableView so we can draw the control items with a different color.
 - (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect;
 {
-	NSColor *color = [[self dataSource] tableView:self backgroundColorForRow:row];
+	NSColor *color = [((ORIpeSlowControlController*)[self dataSource]) tableView:self backgroundColorForRow:row];
 	if (color && [self isRowSelected:row] == NO) {
 		[NSGraphicsContext saveGraphicsState];
 		NSRectClip(clipRect);

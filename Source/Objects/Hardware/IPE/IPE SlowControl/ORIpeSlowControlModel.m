@@ -56,6 +56,8 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (void) checkForTimeOuts;
 - (void) shipTheRecords;
 - (NSTimeInterval) timeFromADEIDate:(NSString*)aDate;
+- (void) addItemKeyToPollingLookup:(NSString*) anItemKey;
+- (void) removeItemKeyFromPollingLookup:(NSString*) anItemKey;
 @end
 
 @implementation ORIpeSlowControlModel
@@ -448,13 +450,27 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 			[topLevelDictionary setObject:[NSNumber numberWithInt:aChannelNumber]	forKey:@"ChannelNumber"]; //channel number for access by the processing system
 			
 			[requestCache setObject:topLevelDictionary forKey:itemKey];
-			[pollingLookUp addObject:itemKey];
-			[self makeChannelLookup];
+			[self addItemKeyToPollingLookup:itemKey];
 		}
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
-	
 }
+
+- (void) removeSet:(NSIndexSet*)aSetToRemove
+{
+	NSMutableArray* itemsToRemove = [NSMutableArray array];
+	unsigned current_index = [aSetToRemove firstIndex];
+    while (current_index != NSNotFound) {
+		if(current_index<[pollingLookUp count]){
+			NSString* itemKey = [self requestCacheItemKey:current_index];
+			[itemsToRemove addObject:itemKey];
+		}
+		current_index = [aSetToRemove indexGreaterThanIndex: current_index];
+    }
+	for(id aKey in itemsToRemove){
+		[self removeItemKeyFromPollingLookup:aKey];
+	}
+}
+
 
 - (NSMutableDictionary*) makeTopLevelDictionary
 {
@@ -466,21 +482,6 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	return topLevelDictionary;
 }
 
-- (void) removeSet:(NSIndexSet*)aSetToRemove
-{
-	NSMutableArray* itemsToRemove = [NSMutableArray array];
-	unsigned current_index = [aSetToRemove firstIndex];
-    while (current_index != NSNotFound) {
-		if(current_index<[pollingLookUp count]){
-			NSString* itemKey = [self requestCacheItemKey:current_index];
-			//removeFrom the cache
-			[requestCache removeObjectForKey:itemKey];
-			[itemsToRemove addObject:itemKey];
-		}
-		current_index = [aSetToRemove indexGreaterThanIndex: current_index];
-    }
-	[pollingLookUp removeObjectsInArray:itemsToRemove];
-}
 
 #pragma mark •••Item Tree Management
 - (void) setItemTreeRoot:(NSMutableArray*)anArray
@@ -1049,6 +1050,21 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
 	NSCalendarDate *theDate = [NSCalendarDate dateWithString:aDate calendarFormat:@"%d-%b-%y %H:%M:%S.%F"];
 	return [theDate timeIntervalSince1970];
+}
+- (void) addItemKeyToPollingLookup:(NSString *)anItemKey
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] removeItemKeyFromPollingLookup:anItemKey];
+	[pollingLookUp addObject:anItemKey];
+	[self makeChannelLookup];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
+}
+
+- (void) removeItemKeyFromPollingLookup:(NSString *)anItemKey
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] addItemKeyToPollingLookup:anItemKey];
+	[pollingLookUp removeObject:anItemKey];
+	[self makeChannelLookup];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
 }
 
 @end
