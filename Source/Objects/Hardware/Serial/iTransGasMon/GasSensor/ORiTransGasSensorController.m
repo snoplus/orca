@@ -220,7 +220,7 @@
 		int lowAlarm	= statusWord & 0x0001;
 		failedSensor	= statusWord & 0x0004;
 		alarmed			= highAlarm || lowAlarm;
-		missingSensor	= statusWord & 0x0800;
+		missingSensor	= (statusWord & 0x0800)!=0;
 		[self gasReadingChanged:nil];
 
 		//-------------------------------------
