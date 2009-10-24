@@ -167,6 +167,45 @@
 		}
 	}
 	else if(viewType == kUsePreampView){	
+		NSMutableArray* segmentPaths = [NSMutableArray arrayWithCapacity:kNumFocalPlaneSegments];
+		NSMutableArray* errorPaths   = [NSMutableArray arrayWithCapacity:kNumFocalPlaneSegments];
+		
+		//do the four inner channels
+		int i;
+		
+		for(i=0;i<4;i++){
+			NSAffineTransform *transform = [NSAffineTransform transform];
+			[transform translateXBy: xc yBy: yc];
+			[transform rotateByDegrees:i*360/4. + 2*360/24.];
+			NSRect segRect = NSMakeRect(5,-3,15,6);
+			NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
+			segRect = NSOffsetRect(segRect, 20, 0);
+			[segPath transformUsingAffineTransform: transform];
+			[segmentPaths addObject:segPath];
+			[errorPaths addObject:segPath];
+		}
+		int j;
+		for(j=0;j<6;j++){
+			float angle = 0;
+			float deltaAngle = 360/12.;
+			for(i=0;i<24;i++){
+				NSAffineTransform *transform = [NSAffineTransform transform];
+				[transform translateXBy: xc yBy: yc];
+				[transform rotateByDegrees:angle];
+				NSRect segRect = NSMakeRect(20+j*18,-3,18,6);
+				NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
+				segRect = NSOffsetRect(segRect, 18, 0);
+				[segPath transformUsingAffineTransform: transform];
+				[segmentPaths addObject:segPath];
+				[errorPaths addObject:segPath];
+				angle += deltaAngle;
+				if(i==11)angle = deltaAngle/2.;
+			}
+		}
+		
+
+		[segmentPathSet addObject:segmentPaths];
+		[errorPathSet addObject:errorPaths];
 		[self makeVetoSegments];
 	}	
 	else if(viewType == kUsePixelView) {
