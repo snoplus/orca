@@ -838,6 +838,14 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	//insert a header before the start of sub-run record
 	[[self dataPacket] makeFileHeader];
 	[[self dataPacket] generateObjectLookup];
+	//tell objects to add any additional data descriptions into the data description header.
+    NSArray* objectList = [NSArray arrayWithArray:[[self document]collectObjectsRespondingTo:@selector(appendDataDescription:userInfo:)]];
+    NSEnumerator* e = [objectList objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj appendDataDescription:[self dataPacket] userInfo:nil];
+    }
+	
 	NSMutableData* dataToBeInserted = [NSMutableData dataWithData:[[self dataPacket] headerAsData]];
 	
 	unsigned long data[4];
