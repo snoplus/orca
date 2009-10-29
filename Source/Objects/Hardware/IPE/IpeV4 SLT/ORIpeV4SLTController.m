@@ -672,7 +672,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) selectRegisterAction:(id) aSender
 {
- NSLog(@"This is: SLTv4: selectRegisterAction\n");
     // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
 	    [[model undoManager] setActionName:@"Select Register"]; // Set undo name
