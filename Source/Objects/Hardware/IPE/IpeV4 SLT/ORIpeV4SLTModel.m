@@ -750,12 +750,12 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 */
 
-- (void) writeReg:(unsigned short)index value:(unsigned long)aValue
+- (void) writeReg:(int)index value:(unsigned long)aValue
 {
 	[self write: [self getAddress:index] value:aValue];
 }
 
-- (unsigned long) readReg:(unsigned short) index
+- (unsigned long) readReg:(int) index
 {
 	return [self read: [self getAddress:index]];
 

@@ -282,8 +282,8 @@
 - (void)		  printInterrupt:(int)regIndex;
 //- (void)		  dumpTriggerRAM:(int)aPageIndex;
 
-- (void)		  writeReg:(unsigned short)index value:(unsigned long)aValue;
-- (unsigned long) readReg:(unsigned short) index;
+- (void)		  writeReg:(int)index value:(unsigned long)aValue;
+- (unsigned long) readReg:(int) index;
 - (unsigned long) readHwVersion;
 - (unsigned long long) readDeadTime;
 - (unsigned long long) readVetoTime;
