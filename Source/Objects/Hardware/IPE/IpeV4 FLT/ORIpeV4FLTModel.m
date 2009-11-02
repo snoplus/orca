@@ -138,16 +138,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 {@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-{@"pStatusB",           0x00A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"pStatusC",           0x02A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"pStatusB",           0x012000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+{@"pStatusC",           0x052000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 {@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-{@"Event FIFO1",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-{@"Event FIFO2",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-{@"Event FIFO3",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-{@"Event FIFO4",		0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+{@"Event FIFO1",		0x001800>>2,		-1,				kIpeRegReadable },
+{@"Event FIFO2",		0x001804>>2,		-1,				kIpeRegReadable },
+{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+{@"Event FIFO4",		0x00180c>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 };
 
 @interface ORIpeV4FLTModel (private)
