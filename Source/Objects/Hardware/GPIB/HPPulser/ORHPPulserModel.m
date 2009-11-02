@@ -80,6 +80,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 { @"Gaussian",          @"GSSIAN",    NO },
 { @"Pin Diode",          @"PINDD",    NO },
 { @"Needle",          @"NEEDLE",    NO },
+{ @"GermaniumHighE",    @"GEHIGHE",    NO },
+{ @"GermaniumLowE",     @"GELOWE",    NO },
 { @"From File",         @"",          NO },
 };
 
@@ -1121,6 +1123,14 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 			
 		case kNeedle:
 			[self loadWaveformFile:@"Needle"];
+			break;
+			
+		case kGermaniumHighE:
+			[self loadWaveformFile:@"GermaniumHighE"];
+			break;
+			
+		case kGermaniumLowE:
+			[self loadWaveformFile:@"GermaniumLowE"];
 			break;
 			
         case kWaveformFromFile: {
