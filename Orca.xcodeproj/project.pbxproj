@@ -77,6 +77,8 @@
 		2D556352109F4CBE00A65E6C /* Needle in Resources */ = {isa = PBXBuildFile; fileRef = 2D556351109F4CBE00A65E6C /* Needle */; };
 		2D6672DC106D30EA001C4A11 /* HW_Readout.cpp in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D6672C4106D2F48001C4A11 /* HW_Readout.cpp */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
+		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
+		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
 		546D9DB10874BDD60072A274 /* OR2228AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 546D9DA90874BDD60072A274 /* OR2228AController.h */; };
@@ -2274,6 +2276,8 @@
 		2D556351109F4CBE00A65E6C /* Needle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Needle; sourceTree = "<group>"; };
 		2D6672C4106D2F48001C4A11 /* HW_Readout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HW_Readout.cpp; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
+		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -6471,6 +6475,8 @@
 			isa = PBXGroup;
 			children = (
 				2D556351109F4CBE00A65E6C /* Needle */,
+				4325BA37109F6378009E15B9 /* GermaniumHighE */,
+				4325BA39109F6381009E15B9 /* GermaniumLowE */,
 				84CDDA4004716AA9005F64B1 /* ORHPPulserModel.m */,
 				84CDDA3F04716AA9005F64B1 /* ORHPPulserModel.h */,
 				84CDDA4E047171B1005F64B1 /* ORHPPulserController.h */,
@@ -10787,6 +10793,8 @@
 				845498C410628DF400F8DE1C /* scpExpectScript in Resources */,
 				84211E371074E5CD00CCB0C0 /* IpeV4SLT.nib in Resources */,
 				2D556352109F4CBE00A65E6C /* Needle in Resources */,
+				4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */,
+				4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
