@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark •••Imported Files
 #import "ORIpeV4FLTController.h"
 #import "ORIpeV4FLTModel.h"
@@ -90,7 +89,6 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
-    
     
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
@@ -830,7 +828,7 @@
 - (IBAction) versionAction: (id) sender
 {
 	@try {
-		NSLog(@"FLT %d Revision: %d\n",[model stationNumber],[model readVersion]);
+		[model printVersions];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Version\n");
@@ -1039,6 +1037,7 @@
 {
 	return [[model  totalRate]count];
 }
+
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
 	int count = [[model totalRate]count];

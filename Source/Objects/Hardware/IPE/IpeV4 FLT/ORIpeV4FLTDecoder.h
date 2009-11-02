@@ -35,3 +35,9 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
+@interface ORIpeV4FLTDecoderForEnergy : ORIpeCardDecoder {
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end

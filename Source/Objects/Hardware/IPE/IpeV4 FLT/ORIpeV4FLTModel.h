@@ -21,7 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORIpeCard.h"
-#import "ORIpeFireWireCard.h"
+#import "ORIpeV4SLTModel.h"
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
 #import "ORIpeV4FLTDefs.h"
@@ -70,8 +70,8 @@
     int				fltRunMode;		//!< Run modes: 0=standby, 1=standard, 2=histogram, 3=test
     NSMutableArray* thresholds;     //!< Array to keep the threshold of all 22 channel
     NSMutableArray* gains;			//!< Aarry to keep the gains
-    unsigned long triggerEnabledMask;	//!< mask to keep the activated channel for the trigger
-	unsigned long hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement
+    unsigned long	triggerEnabledMask;	//!< mask to keep the activated channel for the trigger
+	unsigned long	hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement
     unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
     unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
@@ -115,7 +115,7 @@
 	unsigned long	memoryAddress;
 	unsigned long	locationWord;
 	/** Reference to the Slt board for hardware access */
-	ORIpeFireWireCard* fireWireCard; //TODO: I would like to rename it to sltCard (and class ORIpeCard?) -tb-
+	ORIpeV4SLTModel* sltCard; 
 	//-----------------------------------------
     
 	// Register information (low level tab)
@@ -214,7 +214,6 @@
 - (void) setWriteValue:(unsigned long) aValue;
 - (unsigned short) selectedChannelValue;
 - (void) setSelectedChannelValue:(unsigned short) aValue;
-
 
 #pragma mark •••HW Access
 //all can raise exceptions

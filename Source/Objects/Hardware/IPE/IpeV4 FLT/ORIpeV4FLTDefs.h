@@ -73,6 +73,9 @@
 #define kIpeFlt_PatternMask			0xffffffff // 22bit + Multiplicity
 #define kIpeFlt_TestPattern_Reset	0x00000010
 
+#define kIpeFlt_Reset_All			0x18010
+
+
 #define SELECT_ALL_CHANNELS ( 0x1F <<16) // ak, 7.10.07
 
 typedef struct {
