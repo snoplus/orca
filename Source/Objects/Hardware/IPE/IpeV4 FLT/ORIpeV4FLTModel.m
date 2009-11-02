@@ -22,13 +22,11 @@
 //#import "ORIpeSLTModel.h"
 #import "ORIpeV4SLTModel.h"
 #import "ORIpeCrateModel.h"
-#import "ORIpeFireWireCard.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORDataTypeAssigner.h"
 #import "ORTimeRate.h"
 #import "ORFireWireInterface.h"
-#import "ORIpeFireWireCard.h"
 #import "ORTest.h"
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
@@ -69,20 +67,20 @@ NSString* ORIpeV4FLTSelectedChannelValueChanged		= @"ORIpeV4FLTSelectedChannelVa
 
 #if (0)
 static int trigChanConvFLT[4][6]={
-{ 0,  2,  4,  6,  8, 10},	//FPGA-1
-{12, 14, 16, 18, 20, 22},	//FPGA-2
-{ 1,  3,  5,  7,  9, 11},	//FPGA-3
-{13, 15, 17, 19, 21, 23},	//FPGA-4
+	{ 0,  2,  4,  6,  8, 10},	//FPGA-1
+	{12, 14, 16, 18, 20, 22},	//FPGA-2
+	{ 1,  3,  5,  7,  9, 11},	//FPGA-3
+	{13, 15, 17, 19, 21, 23},	//FPGA-4
 };
 #endif
 
 
 static NSString* fltTestName[kNumIpeV4FLTTests]= {
-@"Run Mode",
-@"Ram",
-@"Threshold/Gain",
-@"Speed",
-@"Event",
+	@"Run Mode",
+	@"Ram",
+	@"Threshold/Gain",
+	@"Speed",
+	@"Event",
 };
 
 // data for low-level page (IPE V4 electronic definitions)
@@ -96,6 +94,7 @@ enum IpeFLTV4Enum{
 	kFLTV4BoardIDMsbReg,
 	kFLTV4InterruptMaskReg,
 	kFLTV4HrMeasEnableReg,
+	kFLTV4EventFifoStatusReg,
 	kFLTV4PixelSettings1Reg,
 	kFLTV4PixelSettings2Reg,
 	kFLTV4RunControlReg,
@@ -119,35 +118,36 @@ enum IpeFLTV4Enum{
 };
 
 static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
-//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
-{@"Status",				0x000000>>2,		-1,				kIpeRegReadable},
-{@"Control",			0x000004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Command",			0x000008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"CFPGAVersion",		0x00000c>>2,		-1,				kIpeRegReadable},
-{@"FPGA8Version",		0x000010>>2,		-1,				kIpeRegReadable},
-{@"BoardIDLSB",         0x000014>>2,		-1,				kIpeRegReadable},
-{@"BoardIDMSB",         0x000018>>2,		-1,				kIpeRegReadable},
-{@"InterruptMask",      0x00001C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"HrMeasEnable",       0x000024>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"PixelSettings1",     0x000030>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"PixelSettings2",     0x000034>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"RunControl",         0x000038>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"HistgrSettings",     0x00003c>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"AccessTest",         0x000040>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"SecondCounter",      0x000044>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-{@"pStatusB",           0x012000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"pStatusC",           0x052000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-{@"Event FIFO1",		0x001800>>2,		-1,				kIpeRegReadable },
-{@"Event FIFO2",		0x001804>>2,		-1,				kIpeRegReadable },
-{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
-{@"Event FIFO4",		0x00180c>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+	//2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
+	{@"Status",				0x000000>>2,		-1,				kIpeRegReadable},
+	{@"Control",			0x000004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"Command",			0x000008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"CFPGAVersion",		0x00000c>>2,		-1,				kIpeRegReadable},
+	{@"FPGA8Version",		0x000010>>2,		-1,				kIpeRegReadable},
+	{@"BoardIDLSB",         0x000014>>2,		-1,				kIpeRegReadable},
+	{@"BoardIDMSB",         0x000018>>2,		-1,				kIpeRegReadable},
+	{@"InterruptMask",      0x00001C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HrMeasEnable",       0x000024>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"EventFifoStatus",    0x00002C>>2,		-1,				kIpeRegReadable},
+	{@"PixelSettings1",     0x000030>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"PixelSettings2",     0x000034>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"RunControl",         0x000038>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HistgrSettings",     0x00003c>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"AccessTest",         0x000040>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"SecondCounter",      0x000044>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"pStatusB",           0x00A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"pStatusC",           0x02A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+	{@"Event FIFO1",		0x001800>>2,		-1,				kIpeRegReadable},
+	{@"Event FIFO2",		0x001804>>2,		-1,				kIpeRegReadable},
+	{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable},
+	{@"Event FIFO4",		0x00180C>>2,		-1,				kIpeRegReadable},
 };
 
 @interface ORIpeV4FLTModel (private)
@@ -680,7 +680,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannelValue:selectedChannelValue];
     selectedChannelValue = aValue;
     [[NSNotificationCenter defaultCenter]	 postNotificationName:ORIpeV4FLTSelectedChannelValueChanged	 object:self];
-NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
+	NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 }
 
 - (unsigned short) selectedRegIndex
@@ -736,7 +736,7 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 	// ADC * T_int = Threshold
 	unsigned long status = [self readReg: kFLTPeriphStatusReg];	
 	int t_Int = (status>>20) & 0xf; // default: 10
-
+	
 	// Set threshold to ADC + offset
 	int chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
@@ -807,12 +807,12 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 
 - (int)  readCardId
 {
-// 	unsigned long data = [self readControlStatus];
-//	int realSlot =  1+(data >> kIpeFlt_Cntl_CardID_Shift) & kIpeFlt_Cntl_CardID_Mask;
-//	if(realSlot != [self stationNumber]){
-//		NSLogError(@"IPE Crate %d configuration has FLT %d in the wrong slot! (Should be slot %d)\n",[self crateNumber], [self stationNumber], realSlot); 
-//	}
-//	return realSlot;
+	// 	unsigned long data = [self readControlStatus];
+	//	int realSlot =  1+(data >> kIpeFlt_Cntl_CardID_Shift) & kIpeFlt_Cntl_CardID_Mask;
+	//	if(realSlot != [self stationNumber]){
+	//		NSLogError(@"IPE Crate %d configuration has FLT %d in the wrong slot! (Should be slot %d)\n",[self crateNumber], [self stationNumber], realSlot); 
+	//	}
+	//	return realSlot;
 	return [self stationNumber]; //TODO....
 }
 
@@ -900,7 +900,7 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 	[self writeTriggerControl];			//set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
 	[self enableStatistics];			//enable hardware ADC statistics, ak 7.1.07
-
+	
 	//[self writeReg:kFLTDisOnCntrlReg value:0];
 }
 
@@ -917,32 +917,57 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 - (void) writeControl
 {
 	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
-							((fifoBehaviour & 0x1)<<24) |
-							((ledOff & 0x1)<<1);
+	((fifoBehaviour & 0x1)<<24) |
+	((ledOff & 0x1)<<1);
 	[self writeReg: kFLTV4ControlReg value:aValue];
 }
 
 - (void) printEventFIFOs
 {
-	unsigned long aValue = [self readReg: kFLTV4ControlReg];
+	unsigned long status = [self readReg: kFLTV4StatusReg];
+	NSLog(@"fifoStatus: 0x%0x\n",(status>>24)&0xf);
+	
+	unsigned long aValue = [self readReg: kFLTV4EventFifoStatusReg];
+	NSLog(@"aValue: 0x%0x\n", aValue);
+	NSLog(@"Read: %d\n", (aValue>>16)&0x3ff);
+	NSLog(@"Write: %d\n", (aValue>>0)&0x3ff);
+	
+	unsigned long eventFifo1 = [self readReg: kFLTV4EventFifo1Reg];
+	unsigned long channelMap = (eventFifo1>>10)&0x3ffff;
+	NSLog(@"Channel Map: 0x%0x\n",channelMap);
+	
+	unsigned long eventFifo2 = [self readReg: kFLTV4EventFifo2Reg];
+	unsigned long sec =  ((eventFifo1&0x3ff)<<5) | ((eventFifo2>>27)&0x1f);
+	NSLog(@"sec: %d %d\n",((eventFifo2>>27)&0x1f),eventFifo1&0x3ff);
+	NSLog(@"Time: %d\n",sec);
+	
+	int i;
+	for(i=0;i<kNumFLTChannels;i++){
+		if(channelMap & (1<<i)){
+			unsigned long eventFifo3 = [self readReg: kFLTV4EventFifo3Reg channel:i];
+			unsigned long energy     = [self readReg: kFLTV4EventFifo4Reg channel:i];
+			NSLog(@"channel: %d page: %d energy: %d\n\n",i, eventFifo3 & 0x3f, energy);
+		}
+	}
+	NSLog(@"-------\n");
 }
 
 - (void) writePeriphStatus
 {
-//TODO:  replace by V4 code -tb-
+	//TODO:  replace by V4 code -tb-
 	NSLog(@"FLTv4: writePeriphStatus not implemented \n");//TODO: needs implementation -tb-
 #if(0)
 	int fpga;
     if(0)
-	for(fpga=0;fpga<4;fpga++){
-		unsigned long aValue = (!fltRunMode &kIpeFlt_Periph_Mode_Mask) << kIpeFlt_Periph_Mode_Shift |
-		(coinTime & kIpeFlt_Periph_CoinTme_Mask) << kIpeFlt_Periph_CoinTme_Shift |    
-		(0 & kIpeFlt_Periph_LedOff_Mask) <<kIpeFlt_Periph_LedOff_Shift |
-		(1 & kIpeFlt_Periph_ThresDelta_Mask) <<kIpeFlt_Periph_ThresDelta_Shift |
-		(integrationTime & kIpeFlt_Periph_Integration_Mask) <<kIpeFlt_Periph_Integration_Shift;  // ak 5.10.07
-		
-		[self writeReg: kFLTPeriphStatusReg channel:trigChanConvFLT[fpga][0] value:aValue];
-	}
+		for(fpga=0;fpga<4;fpga++){
+			unsigned long aValue = (!fltRunMode &kIpeFlt_Periph_Mode_Mask) << kIpeFlt_Periph_Mode_Shift |
+			(coinTime & kIpeFlt_Periph_CoinTme_Mask) << kIpeFlt_Periph_CoinTme_Shift |    
+			(0 & kIpeFlt_Periph_LedOff_Mask) <<kIpeFlt_Periph_LedOff_Shift |
+			(1 & kIpeFlt_Periph_ThresDelta_Mask) <<kIpeFlt_Periph_ThresDelta_Shift |
+			(integrationTime & kIpeFlt_Periph_Integration_Mask) <<kIpeFlt_Periph_Integration_Shift;  // ak 5.10.07
+			
+			[self writeReg: kFLTPeriphStatusReg channel:trigChanConvFLT[fpga][0] value:aValue];
+		}
 #endif
 }
 
@@ -956,24 +981,24 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 	NSLogFont(aFont,@"PStatus      A          B         C\n");
 	NSLogFont(aFont,@"----------------------------------------\n");
 	NSLogFont(aFont,@"Filter:  %@   %@   %@\n", (pAData>>2)&0x1 ? @" InValid": @"   OK   ",
-												(pBData>>2)&0x1 ? @" InValid": @"   OK   ",
-												(pCData>>2)&0x1 ? @" InValid": @"   OK   ");
+			  (pBData>>2)&0x1 ? @" InValid": @"   OK   ",
+			  (pCData>>2)&0x1 ? @" InValid": @"   OK   ");
 	
 	NSLogFont(aFont,@"PLL1  :  %@   %@   %@\n", (pAData>>8)&0x1 ? @"Unlocked": @"  Locked",
-												(pBData>>8)&0x1 ? @"Unlocked": @"  Locked",
-												(pCData>>8)&0x1 ? @"Unlocked": @"  Locked");
+			  (pBData>>8)&0x1 ? @"Unlocked": @"  Locked",
+			  (pCData>>8)&0x1 ? @"Unlocked": @"  Locked");
 	
 	NSLogFont(aFont,@"PLL2  :  %@   %@   %@\n", (pAData>>9)&0x1 ? @"Unlocked": @"  Locked",
-												(pBData>>9)&0x1 ? @"Unlocked": @"  Locked",
-												(pCData>>9)&0x1 ? @"Unlocked": @"  Locked");
+			  (pBData>>9)&0x1 ? @"Unlocked": @"  Locked",
+			  (pCData>>9)&0x1 ? @"Unlocked": @"  Locked");
 	
 	NSLogFont(aFont,@"QDR-II:  %@   %@   %@\n", (pAData>>10)&0x1 ? @"Unlocked": @"  Locked",
-												(pBData>>10)&0x1 ? @"Unlocked": @"  Locked",
-												(pCData>>10)&0x1 ? @"Unlocked": @"  Locked");
+			  (pBData>>10)&0x1 ? @"Unlocked": @"  Locked",
+			  (pCData>>10)&0x1 ? @"Unlocked": @"  Locked");
 	
 	NSLogFont(aFont,@"QDR-Er:  %@   %@   %@\n", (pAData>>11)&0x1 ? @"   Error": @"  Clear ",
-												(pBData>>11)&0x1 ? @"   Error": @"  Clear ",
-												(pCData>>11)&0x1 ? @"   Error": @"  Clear ");
+			  (pBData>>11)&0x1 ? @"   Error": @"  Clear ",
+			  (pCData>>11)&0x1 ? @"   Error": @"  Clear ");
 	
 	NSLogFont(aFont,@"----------------------------------------\n");
 }
@@ -991,10 +1016,10 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 - (NSString*) fifoStatusString:(int)aType
 {
 	switch(aType){
-		case 0x1:  return @"Empty";			break;
-		case 0x3:  return @"Almost Empty";	break;
-		case 0x7:  return @"Almost Full";	break;
-		case 0xf:  return @"Full";			break;
+		case 0x3:  return @"Empty";			break;
+		case 0x2:  return @"Almost Empty";	break;
+		case 0x4:  return @"Almost Full";	break;
+		case 0xc:  return @"Full";			break;
 		default:   return @"UNKNOWN";		break;
 	}
 }
@@ -1043,9 +1068,9 @@ NSLog(@"setSelectedChannelValue is %i\n",selectedChannelValue);
 
 - (void) printStatistics
 {
-//TODO:  replace by V4 code -tb-
+	//TODO:  replace by V4 code -tb-
 	NSLog(@"FLTv4: printStatistics not implemented \n");//TODO: needs implementation -tb-
-return;
+	return;
     int j;
 	double mean;
 	double var;
@@ -1064,21 +1089,21 @@ return;
 
 - (unsigned long) regAddress:(int)aReg
 {
-
+	
 	return ([self stationNumber] << 17) |  regV4[aReg].addressOffset; //TODO: NEED <<17 !!! -tb-
 }
 
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
 {
-//TODO:  replace by V4 code -tb-
-return 0;
+	//TODO:  replace by V4 code -tb-
+	return 0;
     //TODO: obsolete (v3) -tb-
 	return ([self slot] << 24) | (0x2 << kIpeFlt_AddressSpace) | (aChannel << kIpeFlt_ChannelAddress)	| (aPage << kIpeFlt_PageNumber);
 }
 
 - (unsigned long) readReg:(int)aReg
 {
-        return [self read: [self regAddress:aReg]];
+	return [self read: [self regAddress:aReg]];
 }
 
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel
@@ -1135,7 +1160,7 @@ return 0;
 #if (0)
     //TODO: obsolete (v3) -tb-
 	[self writeReg:kFLTTestPulsMemReg value: kIpeFlt_TP_Control | kIpeFlt_TestPattern_Reset];
-
+	
 #endif
 }
 
@@ -1225,7 +1250,7 @@ return 0;
     //TODO: obsolete (v3) -tb-
 	for(fpga=0;fpga<4;fpga++){
 		
-    //TODO: obsolete (v3) -tb-
+		//TODO: obsolete (v3) -tb-
 		[self writeReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]  value:aValue];
 		unsigned long checkValue = [self readReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]];
 		
@@ -1259,13 +1284,13 @@ return 0;
 		float newTotal = 0;
 		int chan;
 		for(chan=0;chan<kNumFLTChannels;chan++){
-
+			
 			aValue = [self readReg:kFLTV4HitRateReg channel:chan];
 			overflow = (aValue >> 17) & 0x1;
 			aValue = aValue & 0xffff;
 			
 			if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
-
+				
 				if (hitRateLength!=0)	hitRate[chan] = aValue/ (float) hitRateLength; 
 				else					hitRate[chan] = 0;
 				
@@ -1346,7 +1371,7 @@ return 0;
     [self setWriteValue:		[decoder decodeIntForKey:@"writeValue"]];
     [self setSelectedRegIndex:  [decoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannelValue:  [decoder decodeIntForKey:@"selectedChannelValue"]];
-
+	
 	int i;
 	if(!thresholds){
 		[self setThresholds: [NSMutableArray array]];
@@ -1407,13 +1432,13 @@ return 0;
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORIpeV4FLTDecoderForWaveForm",		@"decoder",
-								 [NSNumber numberWithLong:waveFormId],   @"dataId",
-								 [NSNumber numberWithBool:YES],			@"variable",
-								 [NSNumber numberWithLong:-1],			@"length",
+								 @"ORIpeV4FLTDecoderForEnergy",		@"decoder",
+								 [NSNumber numberWithLong:dataId],   @"dataId",
+								 [NSNumber numberWithBool:NO],			@"variable",
+								 [NSNumber numberWithLong:7],			@"length",
 								 nil];
 	
-    [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTWaveForm"];
+    [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTEnergy"];
 	
     return dataDictionary;
 }
@@ -1443,12 +1468,11 @@ return 0;
 
 - (void) reset
 {
+	[self writeReg:kFLTV4CommandReg value:kIpeFlt_Reset_All];
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	id slt = [[self crate] adapter];
-	
+{	
 	firstTime = YES;
 	
     [self clearExceptionCount];
@@ -1477,7 +1501,7 @@ return 0;
 	
 	if(ratesEnabled){
 		[self performSelector:@selector(readHitRates) 
-				   withObject:nil 
+				   withObject:nil
 				   afterDelay:[self hitRateLength]];		//start reading out the rates
 	}
 	
@@ -1490,9 +1514,9 @@ return 0;
 	unsigned long theSlotPart = [self slot]<<24;
 	statusAddress			  = theSlotPart;
 	//memoryAddress			  = theSlotPart | (ipeV4Reg[kFLTAdcMemory].space << kIpeFlt_AddressSpace); //TODO: V4 handling ... -tb-
-	fireWireCard			  = [[self crate] adapter];
+	sltCard					  = [[self crate] adapter];
 	locationWord			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-	pageSize                  = [slt pageSize];  //us
+	pageSize                  = [sltCard pageSize];  //us
 }
 
 
@@ -1504,12 +1528,35 @@ return 0;
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
 	if(firstTime){
-		//nothing to do here..the actual readout will be done on the PMC-side. Just post warnings. Once.
-		NSLogColor([NSColor redColor],@"Configuration Error: %@ Needs to be a child of an v4SLT in the readout list\n",[self fullID]);
-		NSLogError(@"",@"Configuration Error",[NSString stringWithFormat:@"Card%d",[self stationNumber]],@"Must be v4SLT child in readout list",nil);
 		firstTime = NO;
 	}
-
+	else {
+		unsigned long status = [self readReg: kFLTV4StatusReg];
+		if(status != 0x03){
+			unsigned long eventFifo1 = [self readReg: kFLTV4EventFifo1Reg];
+			unsigned long channelMap = (eventFifo1>>10)&0x3ffff;
+			int i;
+			for(i=0;i<kNumFLTChannels;i++){
+				if(channelMap & (1<<i)){
+					unsigned long eventFifo3 = [self readReg: kFLTV4EventFifo3Reg channel:i];
+					unsigned long energy     = [self readReg: kFLTV4EventFifo4Reg channel:i];
+					
+					unsigned long data[7];
+					
+					data[0] = dataId | 7;	
+					data[1] = locationWord | i<<8;
+					data[2] = 0; //sec
+					data[3] = 0; //subsec
+					data[4] = channelMap;
+					data[5] = 0; //eventID
+					data[6] = energy;
+					[aDataPacket addLongsToFrameBuffer:data length:7];
+					
+				}
+			}
+		}
+		
+	}
 #if 0
     @try {	
 		
@@ -1555,7 +1602,7 @@ return 0;
 					// Use block read mode.
 					// With every 32bit (long word) two 12bit ADC values are transmitted
 					// documentation says 1000 data words followed by 24 words not used
-					[fireWireCard read:addr data:wPtr size:fltSize*sizeof(long)];	
+					[slt read:addr data:wPtr size:fltSize*sizeof(long)];	
 					
 					// Remove the flags
 					// TODO: Add a control to enable or disable flags in the data
@@ -2065,25 +2112,25 @@ return 0;
 		}
 		[slt readPageManagerReg];
 		/*
-		unsigned long lowStatus = [slt pageStatusLow];
-		unsigned long highStatus = [slt pageStatusHigh];
-		if(lowStatus | highStatus){
-			NSLog(@"---Event Data---\n");
-			int sum = 0;
-			for(i=0;i<32;i++){
-				if(lowStatus & (0x1<<i))sum++;
-				if(highStatus & (0x1<<i))sum++;
-			}
-			if(sum == numPulses){
-				NSLogColor([NSColor passedColor],@"Passed: %d sw triggers == %d pages used\n",numPulses,sum);
-			}
-			else {
-				NSLogColor([NSColor failedColor],@"Passed: %d sw triggers == %d pages used\n",numPulses,sum);
-				[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-			}
-		}
-		else NSLog(@"No Data\n");
-		*/
+		 unsigned long lowStatus = [slt pageStatusLow];
+		 unsigned long highStatus = [slt pageStatusHigh];
+		 if(lowStatus | highStatus){
+		 NSLog(@"---Event Data---\n");
+		 int sum = 0;
+		 for(i=0;i<32;i++){
+		 if(lowStatus & (0x1<<i))sum++;
+		 if(highStatus & (0x1<<i))sum++;
+		 }
+		 if(sum == numPulses){
+		 NSLogColor([NSColor passedColor],@"Passed: %d sw triggers == %d pages used\n",numPulses,sum);
+		 }
+		 else {
+		 NSLogColor([NSColor failedColor],@"Passed: %d sw triggers == %d pages used\n",numPulses,sum);
+		 [self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
+		 }
+		 }
+		 else NSLog(@"No Data\n");
+		 */
 		[self runningTest:testNumber status:@"See StatusLog"];
 		
 		fltRunMode = savedMode;
