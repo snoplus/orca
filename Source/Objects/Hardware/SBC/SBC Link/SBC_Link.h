@@ -228,7 +228,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) startCrate;
 - (void) stopCrate;
 - (void) startCrateCode;
-- (void) shutDown:(NSString*)rootPwd;
+- (void) shutDown:(NSString*)rootPwd reboot:(BOOL)reboot;
 - (void) connect;
 - (void) disconnect;
 - (NSString*) crateProcessState;
@@ -319,7 +319,6 @@ typedef enum eSBC_ThrottleConsts{
 - (int) numHistoChannels;
 - (BOOL) productionSpeedValueValid;
 - (float) productionSpeed;
-- (void) shutDown:(NSString*)rootPwd;
 
 #pragma mark ¥¥¥DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;

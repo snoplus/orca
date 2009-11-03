@@ -929,14 +929,19 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	[aSequence launch];
 }
 
-- (void) shutDown:(NSString*)rootPwd
+- (void) shutDown:(NSString*)rootPwd reboot:(BOOL)reboot
 {
 	[self setGoScriptFailed:NO];
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-
-	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-			 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,@"shutdown",@"-h",@"now",nil]];	
+	if(reboot){
+		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,@"shutdown",@"-r",@"now",nil]];
+	}
+	else {
+		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,@"shutdown",@"-h",@"now",nil]];
+	}
 	[aSequence setVerbose:verbose];
 	[aSequence setTextToDelegate:YES];
 	
