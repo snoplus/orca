@@ -27,12 +27,10 @@
 #import "ORIpeV4FLTDefs.h"
 #import "ORAdcInfoProviding.h"
 
-@class ORFireWireInterface;
 
 #pragma mark •••Forward Definitions
 @class ORDataPacket;
 @class ORTimeRate;
-@class ORFireWireInterface;
 @class ORTestSuit;
 
 #define kNumIpeV4FLTTests 5
@@ -87,18 +85,12 @@
 	unsigned long   statisticOffset; //!< Offset guess used with by the hardware statistical evaluation
 	unsigned long   statisticN;		//! Number of samples used for statistical evaluation
 	unsigned long   eventMask;		//!Bits set for last channels hit.
-	unsigned long   coinTime;
-	unsigned long   integrationTime;
 	
 	//testing
 	NSMutableArray* testStatusArray;
 	NSMutableArray* testEnabledArray;
 	BOOL testsRunning;
 	ORTestSuit* testSuit;
-    int startChan;
-    int endChan;
-    int iterations;
-    int page;
 	int savedMode;
 	int savedLed;
 	BOOL usingPBusSimulation;
@@ -124,6 +116,13 @@
     unsigned long   selectedChannelValue;
     int fifoBehaviour;
     unsigned long postTriggerTime;
+    unsigned long histRecTime;
+    unsigned long histMeasTime;
+    unsigned long histNofMeas;
+    int gapLength;
+    int filterLength;
+    BOOL storeDataInRam;
+    BOOL runBoxCarFilter;
 }
 
 #pragma mark •••Initialization
@@ -131,8 +130,23 @@
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
+- (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (BOOL) runBoxCarFilter;
+- (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter;
+- (BOOL) storeDataInRam;
+- (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
+- (int) filterLength;
+- (void) setFilterLength:(int)aFilterLength;
+- (int) gapLength;
+- (void) setGapLength:(int)aGapLength;
+- (unsigned long) histNofMeas;
+- (void) setHistNofMeas:(unsigned long)aHistNofMeas;
+- (unsigned long) histMeasTime;
+- (void) setHistMeasTime:(unsigned long)aHistMeasTime;
+- (unsigned long) histRecTime;
+- (void) setHistRecTime:(unsigned long)aHistRecTime;
 - (unsigned long) postTriggerTime;
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime;
 - (int) fifoBehaviour;
@@ -142,22 +156,8 @@
 - (BOOL) ledOff;
 - (void) setLedOff:(BOOL)aledOff;
 
-- (unsigned long) coinTime;
-- (void) setCoinTime:(unsigned long)aValue;
-- (unsigned long) integrationTime;
-- (void) setIntegrationTime:(unsigned long)aValue;
-
-
 - (unsigned long) interruptMask;
 - (void) setInterruptMask:(unsigned long)aInterruptMask;
-- (int) page;
-- (void) setPage:(int)aPage;
-- (int) iterations;
-- (void) setIterations:(int)aIterations;
-- (int) endChan;
-- (void) setEndChan:(int)aEndChan;
-- (int) startChan;
-- (void) setStartChan:(int)aStartChan;
 - (unsigned short) hitRateLength;
 - (void) setHitRateLength:(unsigned short)aHitRateLength;
 - (unsigned long) dataId;
@@ -203,7 +203,6 @@
 - (unsigned short) readoutPages; // ak, 2.7.07
 - (void) setReadoutPages:(unsigned short)aReadoutPage; // ak, 2.7.07
 
-- (short) getNumberRegisters;			
 - (NSString*) getRegisterName: (short) anIndex;
 - (unsigned long) getAddressOffset: (short) anIndex;
 - (short) getAccessType: (short) anIndex;
@@ -214,6 +213,7 @@
 - (void) setWriteValue:(unsigned long) aValue;
 - (unsigned short) selectedChannelValue;
 - (void) setSelectedChannelValue:(unsigned short) aValue;
+- (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
 
 #pragma mark •••HW Access
 //all can raise exceptions
@@ -230,6 +230,7 @@
 - (BOOL) isInTestMode;
 - (unsigned long)  readSeconds;
 - (void)  writeSeconds:(unsigned long)aValue;
+- (void) setTimeToMacClock;
 
 - (unsigned long) readVersion;
 - (unsigned long) readpVersion;
@@ -237,7 +238,6 @@
 - (unsigned long) readBoardIDHigh;
 - (int)			  readSlot;
 
-- (int)		readCardId;
 - (int)		readMode;
 
 - (void) loadThresholdsAndGains;
@@ -256,12 +256,12 @@
 - (unsigned long) readControl;
 - (unsigned long) readHitRateMask;
 - (void) writeControl;
-- (void) writePeriphStatus;
 - (void) printStatusReg;
 - (void) printPStatusRegs;
 - (void) printVersions;
 - (void) printValueTable;
 - (void) printEventFIFOs;
+- (void) writeHistogramControl;
 
 /** Print result of hardware statistics for all channels */
 - (void) printStatistics; // ak, 7.10.07
@@ -276,12 +276,6 @@
 - (NSString*) boardTypeName:(int)aType;
 - (NSString*) fifoStatusString:(int)aType;
 
-/** Disable the trigger algorithm in all channels. In debug mode the ADC Traces are
-  * still recorded while the recording is not stopped by any steps in the signal. 
-  *
-  * @todo Join writeTriggerControl and disableTrigger using a argument list */
-- (void) disableTrigger; // ak, 2.7.07
-
 /** Enable the statistic evaluation of sum and sum square of the 
   * ADC signals in all channels.  */
 - (void) enableStatistics; // ak, 7.10.07
@@ -289,15 +283,9 @@
 /** Get statistics of a single channel */
 - (void) getStatistics:(int)aChannel mean:(double *)aMean  var:(double *)aVar; // ak, 7.10.07
 
-- (unsigned short) readTriggerControl:(int)fpga;
 - (unsigned long) readMemoryChan:(int)chan page:(int)aPage;
 - (void) readMemoryChan:(int)aChan page:(int)aPage pageBuffer:(unsigned short*)aPageBuffer;
 - (void) clear:(int)aChan page:(int)aPage value:(unsigned short)aValue;
-
-#pragma mark •••Calibration
-- (void) autoCalibrate;
-- (void) autoCalibrate:(int)theEndingOffset;
-- (void) loadAutoCalbrateTestPattern;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
@@ -316,7 +304,6 @@
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
-
 @end
 
 @interface ORIpeV4FLTModel (tests)
@@ -341,12 +328,18 @@
 					 n:(int) n;
 @end
 
+extern NSString* ORIpeV4FLTModelRunBoxCarFilterChanged;
+extern NSString* ORIpeV4FLTModelStoreDataInRamChanged;
+extern NSString* ORIpeV4FLTModelFilterLengthChanged;
+extern NSString* ORIpeV4FLTModelGapLengthChanged;
+extern NSString* ORIpeV4FLTModelHistNofMeasChanged;
+extern NSString* ORIpeV4FLTModelHistMeasTimeChanged;
+extern NSString* ORIpeV4FLTModelHistRecTimeChanged;
 extern NSString* ORIpeV4FLTModelPostTriggerTimeChanged;
 extern NSString* ORIpeV4FLTModelFifoBehaviourChanged;
 extern NSString* ORIpeV4FLTModelAnalogOffsetChanged;
 extern NSString* ORIpeV4FLTModelLedOffChanged;
 extern NSString* ORIpeV4FLTModelInterruptMaskChanged;
-extern NSString* ORIpeV4FLTModelTestParamChanged;
 extern NSString* ORIpeV4FLTModelTestsRunningChanged;
 extern NSString* ORIpeV4FLTModelTestEnabledArrayChanged;
 extern NSString* ORIpeV4FLTModelTestStatusArrayChanged;
@@ -362,8 +355,6 @@ extern NSString* ORIpeV4FLTModelThresholdsChanged;
 extern NSString* ORIpeV4FLTModelModeChanged;
 extern NSString* ORIpeV4FLTSettingsLock;
 extern NSString* ORIpeV4FLTModelEventMaskChanged;
-extern NSString* ORIpeV4FLTModelIntegrationTimeChanged;
-extern NSString* ORIpeV4FLTModelCoinTimeChanged;
 
 extern NSString* ORIpeV4FLTModelReadoutPagesChanged;
 extern NSString* ORIpeSLTModelName;

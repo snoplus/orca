@@ -48,11 +48,11 @@
 
 - (void) awakeFromNib
 {
-    [super awakeFromNib];
+	[super awakeFromNib];
 	
-    settingSize			= NSMakeSize(546,670);
-    rateSize			= NSMakeSize(430,650);
-    testSize			= NSMakeSize(400,400);
+    settingSize			= NSMakeSize(670,680);
+    rateSize			= NSMakeSize(490,650);
+    testSize			= NSMakeSize(400,350);
     lowlevelSize		= NSMakeSize(400,350);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
@@ -77,8 +77,8 @@
 	[totalRate setBarColor:[NSColor greenColor]];
 	
 	[self populatePullDown];
-	
-    [self updateWindow];
+	[self updateWindow];
+
 }
 
 #pragma mark •••Accessors
@@ -182,12 +182,6 @@
                          name : ORIpeV4FLTModelTestsRunningChanged
                        object : model];
 	
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(testParamChanged:)
-                         name : ORIpeV4FLTModelTestParamChanged
-                       object : model];
-	
     [notifyCenter addObserver : self
 					 selector : @selector(readoutPagesChanged:)
 						 name : ORIpeV4FLTModelReadoutPagesChanged
@@ -208,18 +202,7 @@
                      selector : @selector(analogOffsetChanged:)
                          name : ORIpeV4FLTModelAnalogOffsetChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(coinTimeChanged:)
-                         name : ORIpeV4FLTModelCoinTimeChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(integrationTimeChanged:)
-                         name : ORIpeV4FLTModelIntegrationTimeChanged
-						object: model];
-	
-	
+		
     [notifyCenter addObserver : self
 					 selector : @selector(selectedRegIndexChanged:)
 						 name : ORIpeV4FLTSelectedRegIndexChanged
@@ -245,9 +228,79 @@
                          name : ORIpeV4FLTModelPostTriggerTimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(histRecTimeChanged:)
+                         name : ORIpeV4FLTModelHistRecTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(histMeasTimeChanged:)
+                         name : ORIpeV4FLTModelHistMeasTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(histNofMeasChanged:)
+                         name : ORIpeV4FLTModelHistNofMeasChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(gapLengthChanged:)
+                         name : ORIpeV4FLTModelGapLengthChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(filterLengthChanged:)
+                         name : ORIpeV4FLTModelFilterLengthChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(storeDataInRamChanged:)
+                         name : ORIpeV4FLTModelStoreDataInRamChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runBoxCarFilterChanged:)
+                         name : ORIpeV4FLTModelRunBoxCarFilterChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) runBoxCarFilterChanged:(NSNotification*)aNote
+{
+	[runBoxCarFilterCB setIntValue: [model runBoxCarFilter]];
+}
+
+- (void) storeDataInRamChanged:(NSNotification*)aNote
+{
+	[storeDataInRamCB setIntValue: [model storeDataInRam]];
+}
+
+- (void) filterLengthChanged:(NSNotification*)aNote
+{
+	[filterLengthField setIntValue: [model filterLength]];
+}
+
+- (void) gapLengthChanged:(NSNotification*)aNote
+{
+	[gapLengthField setIntValue: [model gapLength]];
+}
+
+- (void) histNofMeasChanged:(NSNotification*)aNote
+{
+	[histNofMeasField setIntValue: [model histNofMeas]];
+}
+
+- (void) histMeasTimeChanged:(NSNotification*)aNote
+{
+	[histMeasTimeField setIntValue: [model histMeasTime]];
+}
+
+- (void) histRecTimeChanged:(NSNotification*)aNote
+{
+	[histRecTimeField setIntValue: [model histRecTime]];
+}
 
 - (void) postTriggerTimeChanged:(NSNotification*)aNote
 {
@@ -258,17 +311,6 @@
 {
 	[fifoBehaviourMatrix selectCellWithTag: [model fifoBehaviour]];
 }
-
-- (void) integrationTimeChanged:(NSNotification*)aNote
-{
-	[integrationTimeField setIntValue: [model integrationTime]];
-}
-
-- (void) coinTimeChanged:(NSNotification*)aNote
-{
-	[coinTimeField setIntValue: [model coinTime]];
-}
-
 
 - (void) analogOffsetChanged:(NSNotification*)aNote
 {
@@ -308,16 +350,12 @@
     }
     [channelPopUp insertItemWithTitle: @"All" atIndex:i];
     [[channelPopUp itemAtIndex:i] setTag: 0x1f];// chan 31 = broadcast to all channels
-    
 }
-
-
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self slotChanged:nil];
-    [self settingsLockChanged:nil];
 	[self modeChanged:nil];
 	[self gainArrayChanged:nil];
 	[self thresholdArrayChanged:nil];
@@ -330,19 +368,24 @@
 	[self scaleAction:nil];
     [self testEnabledArrayChanged:nil];
 	[self testStatusArrayChanged:nil];
-	[self testParamChanged:nil];
     [self miscAttributesChanged:nil];
 	[self readoutPagesChanged:nil];	
 	[self interruptMaskChanged:nil];
 	[self ledOffChanged:nil];
 	[self analogOffsetChanged:nil];
-	[self integrationTimeChanged:nil];
-	[self coinTimeChanged:nil];
 	[self selectedRegIndexChanged:nil];
 	[self writeValueChanged:nil];
 	[self selectedChannelValueChanged:nil];
 	[self fifoBehaviourChanged:nil];
 	[self postTriggerTimeChanged:nil];
+	[self histRecTimeChanged:nil];
+	[self histMeasTimeChanged:nil];
+	[self histNofMeasChanged:nil];
+    [self settingsLockChanged:nil];
+	[self gapLengthChanged:nil];
+	[self filterLengthChanged:nil];
+	[self storeDataInRamChanged:nil];
+	[self runBoxCarFilterChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -354,7 +397,6 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORIpeV4FLTSettingsLock];
 	BOOL isRunning = [gOrcaGlobals runInProgress];
@@ -365,8 +407,6 @@
 	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
-	[integrationTimeField setEnabled:!lockedOrRunningMaintenance];
-	[coinTimeField setEnabled:!lockedOrRunningMaintenance];
 	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
 	[reportButton setEnabled:!lockedOrRunningMaintenance];
 	[modeButton setEnabled:!lockedOrRunningMaintenance];
@@ -394,8 +434,12 @@
 		[testButton setEnabled: !runInProgress];	
 		[testButton setTitle: @"Test"];
 	}
-    
-	[self enableRegControls];
+	
+	int runMode = [model fltRunMode];
+	[histNofMeasField setEnabled: !locked & (runMode == kIpeFlt_Histo_Mode)];
+	[histRecTimeField setEnabled: !locked & (runMode == kIpeFlt_Histo_Mode)];
+
+ 	[self enableRegControls];
 }
 
 
@@ -417,15 +461,6 @@
     //TODO: extend the accesstype to "channel" and "block64" -tb-
     [channelPopUp setEnabled: needsChannel];
 }
-
-
-- (void) testParamChanged:(NSNotification*)aNotification
-{
-	[[testParamsMatrix cellWithTag:0] setIntValue:[model startChan]];
-	[[testParamsMatrix cellWithTag:1] setIntValue:[model endChan]];
-	[[testParamsMatrix cellWithTag:2] setIntValue:[model page]];	
-}
-
 
 - (void) testEnabledArrayChanged:(NSNotification*)aNotification
 {
@@ -588,7 +623,6 @@
 - (void) modeChanged:(NSNotification*)aNote
 {
 	[modeButton selectItemAtIndex:[model fltRunMode]];
-	[self settingsLockChanged:nil];	
 }
 
 - (void) hitRateLengthChanged:(NSNotification*)aNote
@@ -676,35 +710,95 @@
 
 #pragma mark •••Actions
 
-- (void) postTriggerTimeAction:(id)sender
+- (void) runBoxCarFilterAction:(id)sender
 {
-	[model setPostTriggerTime:[sender intValue]];	
+	[model setRunBoxCarFilter:[sender intValue]];	
 }
 
-- (void) fifoBehaviourAction:(id)sender
+- (void) storeDataInRamAction:(id)sender
 {
-	[model setFifoBehaviour:[[sender selectedCell]tag]];	
+	[model setStoreDataInRam:[sender intValue]];	
+}
+
+- (void) filterLengthAction:(id)sender
+{
+	[model setFilterLength:[sender intValue]];	
+}
+
+- (void) gapLengthAction:(id)sender
+{
+	[model setGapLength:[sender intValue]];	
+}
+
+- (void) histNofMeasAction:(id)sender
+{
+	[model setHistNofMeas:[sender intValue]];	
+}
+
+- (void) histRecTimeAction:(id)sender
+{
+	[model setHistRecTime:[sender intValue]];	
+}
+
+- (IBAction) setTimeToMacClock:(id)sender
+{
+	@try {
+		[model setTimeToMacClock];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception setting FLT clock\n");
+		NSRunAlertPanel([localException name], @"%@\nSetClock of FLT%d failed", @"OK", nil, nil,
+						localException,[model stationNumber]);
+	}
+}
+
+
+- (IBAction) postTriggerTimeAction:(id)sender
+{
+	@try {
+		[model setPostTriggerTime:[sender intValue]];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception reading FLT post trigger time\n");
+		NSRunAlertPanel([localException name], @"%@\nSet post trigger time of FLT%d failed", @"OK", nil, nil,
+						localException,[model stationNumber]);
+	}
+}
+
+- (IBAction) fifoBehaviourAction:(id)sender
+{
+	@try {
+		[model setFifoBehaviour:[[sender selectedCell]tag]];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception setting FLT behavior\n");
+		NSRunAlertPanel([localException name], @"%@\nSetting Behaviour of FLT%d failed", @"OK", nil, nil,
+						localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) analogOffsetAction:(id)sender
 {
-	[model setAnalogOffset:[sender intValue]];	
+	@try {
+		[model setAnalogOffset:[sender intValue]];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception setting FLT analog offset\n");
+		NSRunAlertPanel([localException name], @"%@\nSet analog offset FLT%d failed", @"OK", nil, nil,
+						localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) interruptMaskAction:(id)sender
 {
-	[model setInterruptMask:[sender intValue]];	
-}
-
-
-- (IBAction) coinTimeAction:(id)sender
-{
-	[model setCoinTime:[sender intValue]];
-}
-
-- (IBAction) integrationTimeAction:(id)sender
-{
-	[model setIntegrationTime:[sender intValue]];
+	@try {
+		[model setInterruptMask:[sender intValue]];	
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception setting FLT interrupt mask\n");
+		NSRunAlertPanel([localException name], @"%@\nSet of interrupt mask of FLT%d failed", @"OK", nil, nil,
+						localException,[model stationNumber]);
+	}
 }
 
 - (IBAction) testEnabledAction:(id)sender
@@ -890,18 +984,6 @@
 	[model enableAllTriggers:NO];
 }
 
-
-- (IBAction) testParamAction: (id) sender
-{
-	[self endEditing];
-	switch([[sender selectedCell] tag]){
-		case 0: 	[model setStartChan:[sender intValue]]; break;
-		case 1: 	[model setEndChan:[sender intValue]]; break;
-		case 2: 	[model setPage:[sender intValue]]; break;
-		default: break;
-	}
-}
-
 - (IBAction) statusAction:(id)sender
 {
 	@try {
@@ -922,53 +1004,25 @@
 	}
 }
 
-
-- (IBAction) calibrateAction:(id)sender
-{
-    NSBeginAlertSheet(@"Threshold Calibration",
-                      @"Cancel",
-                      @"Yes/Do Calibrate",
-                      nil,[self window],
-                      self,
-                      @selector(calibrationSheetDidEnd:returnCode:contextInfo:),
-                      nil,
-                      nil,@"Really run threshold calibration? This will change ALL thresholds on this card.");
-}
-
-
-- (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if(returnCode == NSAlertAlternateReturn){
-		[model autoCalibrate];
-    }    
-}
-
 - (IBAction) selectRegisterAction:(id) aSender
 {
-    // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
 	    [[model undoManager] setActionName:@"Select Register"]; // Set undo name
 	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
-		[self settingsLockChanged:nil];
     }
 }
 
 - (IBAction) selectChannelAction:(id) aSender
 {
- //NSLog(@"This is: FLTv4: selectChannelAction\n");
-    // Make sure that value has changed.
-    if(1) //TODO: under development -tb-
     if ([[aSender selectedItem] tag] != [model selectedChannelValue]){
-	    //[[model undoManager] setActionName:@"Select Channel Number"]; // Set undo name do it at model side -tb-
+	    [[model undoManager] setActionName:@"Select Channel Number"]; // Set undo name do it at model side -tb-
 	    [model setSelectedChannelValue:[[aSender selectedItem] tag]]; // set new value
-		//[self settingsLockChanged:nil]; //TODO: is it needed here ? -tb-
     }
 }
 
 - (IBAction) writeValueAction:(id) aSender
 {
 	[self endEditing];
-    // Make sure that value has changed.
     if ([aSender intValue] != [model writeValue]){
 		[[model undoManager] setActionName:@"Set Write Value"]; // Set undo name.
 		[model setWriteValue:[aSender intValue]]; // Set new value
@@ -977,7 +1031,6 @@
 
 - (IBAction) readRegAction: (id) sender
 {
-	//int index = [registerPopUp indexOfSelectedItem];
 	int index = [model selectedRegIndex]; 
 	@try {
 		unsigned long value;
@@ -1020,6 +1073,7 @@
                         localException,[model stationNumber]);
 	}
 }
+
 - (IBAction) testButtonAction: (id) sender //temp routine to hook up to any on a temp basis
 {
 	@try {

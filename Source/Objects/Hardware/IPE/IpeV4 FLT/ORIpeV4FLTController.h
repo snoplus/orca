@@ -29,6 +29,13 @@
 @interface ORIpeV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+		IBOutlet NSButton*		runBoxCarFilterCB;
+		IBOutlet NSButton*		storeDataInRamCB;
+		IBOutlet NSTextField*	filterLengthField;
+		IBOutlet NSTextField*	gapLengthField;
+		IBOutlet NSTextField*	histNofMeasField;
+		IBOutlet NSTextField*	histMeasTimeField;
+		IBOutlet NSTextField*	histRecTimeField;
 		IBOutlet NSTextField*   postTriggerTimeField;
 		IBOutlet NSMatrix*		fifoBehaviourMatrix;
 		IBOutlet NSTextField*	analogOffsetField;
@@ -49,7 +56,6 @@
 		IBOutlet NSButton*		hitRateNoneButton;
 		IBOutlet NSButton*		triggersAllButton;
 		IBOutlet NSButton*		triggersNoneButton;
-		IBOutlet NSButton*      calibrateButton;
 		
 		IBOutlet NSTextField*	readoutPagesField; // ak, 2.7.07
 
@@ -65,14 +71,11 @@
 		IBOutlet NSTextField*	totalHitRateField;
 		IBOutlet NSTabView*		tabView;	
 		IBOutlet NSView*		totalView;
-		IBOutlet NSTextField*   integrationTimeField;
-		IBOutlet NSTextField*   coinTimeField;
 		
 		//test page
 		IBOutlet NSButton*		testButton;
 		IBOutlet NSMatrix*		testEnabledMatrix;
 		IBOutlet NSMatrix*		testStatusMatrix;
-		IBOutlet NSMatrix*		testParamsMatrix;
 		
 		NSNumberFormatter*		rateFormatter;
 		NSSize					settingSize;
@@ -99,10 +102,15 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) runBoxCarFilterChanged:(NSNotification*)aNote;
+- (void) storeDataInRamChanged:(NSNotification*)aNote;
+- (void) filterLengthChanged:(NSNotification*)aNote;
+- (void) gapLengthChanged:(NSNotification*)aNote;
+- (void) histNofMeasChanged:(NSNotification*)aNote;
+- (void) histMeasTimeChanged:(NSNotification*)aNote;
+- (void) histRecTimeChanged:(NSNotification*)aNote;
 - (void) postTriggerTimeChanged:(NSNotification*)aNote;
 - (void) fifoBehaviourChanged:(NSNotification*)aNote;
-- (void) integrationTimeChanged:(NSNotification*)aNote;
-- (void) coinTimeChanged:(NSNotification*)aNote;
 - (void) analogOffsetChanged:(NSNotification*)aNote;
 - (void) ledOffChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
@@ -127,7 +135,6 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) testStatusArrayChanged:(NSNotification*)aNote;
 - (void) testEnabledArrayChanged:(NSNotification*)aNote;
-- (void) testParamChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) readoutPagesChanged:(NSNotification*)aNote;
 - (void) selectedRegIndexChanged:(NSNotification*) aNote;
@@ -135,10 +142,15 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) runBoxCarFilterAction:(id)sender;
+- (IBAction) storeDataInRamAction:(id)sender;
+- (IBAction) filterLengthAction:(id)sender;
+- (IBAction) gapLengthAction:(id)sender;
+- (IBAction) histNofMeasAction:(id)sender;
+- (IBAction) histRecTimeAction:(id)sender;
+- (IBAction) setTimeToMacClock:(id)sender;
 - (IBAction) postTriggerTimeAction:(id)sender;
 - (IBAction) fifoBehaviourAction:(id)sender;
-- (IBAction) coinTimeAction:(id)sender;
-- (IBAction) integrationTimeAction:(id)sender;
 - (IBAction) analogOffsetAction:(id)sender;
 - (IBAction) interruptMaskAction:(id)sender;
 - (IBAction) initBoardButtonAction:(id)sender;
@@ -156,15 +168,12 @@
 - (IBAction) hitRateAllAction: (id) sender;
 - (IBAction) hitRateNoneAction: (id) sender;
 - (IBAction) testEnabledAction:(id)sender;
-- (IBAction) testParamAction:(id)sender;
 - (IBAction) statusAction:(id)sender;
 - (IBAction) readoutPagesAction: (id) sender; // ak 2.7.07
 - (IBAction) enableAllTriggersAction: (id) sender;
 - (IBAction) enableNoTriggersAction: (id) sender;
 - (IBAction) readThresholdsGains:(id)sender;
 - (IBAction) writeThresholdsGains:(id)sender;
-- (IBAction) calibrateAction:(id)sender;
-- (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (IBAction) selectRegisterAction:(id) aSender;
 - (IBAction) selectChannelAction:(id) aSender;
 - (IBAction) writeValueAction:(id) aSender;

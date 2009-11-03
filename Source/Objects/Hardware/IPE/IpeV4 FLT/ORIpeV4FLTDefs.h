@@ -75,6 +75,8 @@
 
 #define kIpeFlt_Reset_All			0x18010
 
+#define kSetStandBy		1
+#define kReleaseStandBy 0
 
 #define SELECT_ALL_CHANNELS ( 0x1F <<16) // ak, 7.10.07
 
