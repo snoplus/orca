@@ -1138,7 +1138,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 	else {
 		unsigned long status = [self readReg: kFLTV4StatusReg];
-		if(status != 0x03){
+		int fifoStatus = (status>>24) & 0xf;
+		if(fifoStatus != 0x03){
 			//unsigned long eventFifoStatus = [self readReg: kFLTV4EventFifo1Reg];
 			//int readOffset = ((eventFifoStatus>>16) & 0x3ff)*2;
 			
@@ -1373,32 +1374,36 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) printEventFIFOs
 {
 	unsigned long status = [self readReg: kFLTV4StatusReg];
-	
-	NSLog(@"fifoStatus: 0x%0x\n",(status>>24)&0xf);
-	
-	unsigned long aValue = [self readReg: kFLTV4EventFifoStatusReg];
-	NSLog(@"aValue: 0x%0x\n", aValue);
-	NSLog(@"Read: %d\n", (aValue>>16)&0x3ff);
-	NSLog(@"Write: %d\n", (aValue>>0)&0x3ff);
-	
-	unsigned long eventFifo1 = [self readReg: kFLTV4EventFifo1Reg];
-	unsigned long channelMap = (eventFifo1>>10)&0x3ffff;
-	NSLog(@"Channel Map: 0x%0x\n",channelMap);
-	
-	unsigned long eventFifo2 = [self readReg: kFLTV4EventFifo2Reg];
-	unsigned long sec =  ((eventFifo1&0x3ff)<<5) | ((eventFifo2>>27)&0x1f);
-	NSLog(@"sec: %d %d\n",((eventFifo2>>27)&0x1f),eventFifo1&0x3ff);
-	NSLog(@"Time: %d\n",sec);
-	
-	int i;
-	for(i=0;i<kNumFLTChannels;i++){
-		if(channelMap & (1<<i)){
-			unsigned long eventFifo3 = [self readReg: kFLTV4EventFifo3Reg channel:i];
-			unsigned long energy     = [self readReg: kFLTV4EventFifo4Reg channel:i];
-			NSLog(@"channel: %d page: %d energy: %d\n\n",i, eventFifo3 & 0x3f, energy);
+	int fifoStatus = (status>>24) & 0xf;
+	if(fifoStatus != 0x03){
+		
+		NSLog(@"fifoStatus: 0x%0x\n",(status>>24)&0xf);
+		
+		unsigned long aValue = [self readReg: kFLTV4EventFifoStatusReg];
+		NSLog(@"aValue: 0x%0x\n", aValue);
+		NSLog(@"Read: %d\n", (aValue>>16)&0x3ff);
+		NSLog(@"Write: %d\n", (aValue>>0)&0x3ff);
+		
+		unsigned long eventFifo1 = [self readReg: kFLTV4EventFifo1Reg];
+		unsigned long channelMap = (eventFifo1>>10)&0x3ffff;
+		NSLog(@"Channel Map: 0x%0x\n",channelMap);
+		
+		unsigned long eventFifo2 = [self readReg: kFLTV4EventFifo2Reg];
+		unsigned long sec =  ((eventFifo1&0x3ff)<<5) | ((eventFifo2>>27)&0x1f);
+		NSLog(@"sec: %d %d\n",((eventFifo2>>27)&0x1f),eventFifo1&0x3ff);
+		NSLog(@"Time: %d\n",sec);
+		
+		int i;
+		for(i=0;i<kNumFLTChannels;i++){
+			if(channelMap & (1<<i)){
+				unsigned long eventFifo3 = [self readReg: kFLTV4EventFifo3Reg channel:i];
+				unsigned long energy     = [self readReg: kFLTV4EventFifo4Reg channel:i];
+				NSLog(@"channel: %d page: %d energy: %d\n\n",i, eventFifo3 & 0x3f, energy);
+			}
 		}
+		NSLog(@"-------\n");
 	}
-	NSLog(@"-------\n");
+	else NSLog(@"FIFO empty\n");
 }
 
 - (void) printPStatusRegs
