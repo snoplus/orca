@@ -43,6 +43,7 @@
 	IBOutlet NSTextField*   filePathField;
     IBOutlet NSPanel*		passWordPanel;
     IBOutlet NSTextField*   rootPassWordField;
+	IBOutlet NSButton*		rebootCB;
 
 	//Monitoring
 	IBOutlet NSTextField*   runInfoField;

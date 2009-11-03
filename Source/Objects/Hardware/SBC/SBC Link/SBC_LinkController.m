@@ -1065,7 +1065,7 @@
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSOKButton){
-		[[model sbcLink] shutDown:[rootPassWordField stringValue]];   
+		[[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[rebootCB intValue]];  
 	}
 }
 
