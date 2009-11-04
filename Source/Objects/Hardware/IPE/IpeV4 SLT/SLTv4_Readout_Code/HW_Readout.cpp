@@ -47,8 +47,14 @@ extern "C" {
 #endif
 
 #include "hw4/baseregister.h"
+#include "katrinhw4/subrackkatrin.h"
+#include "katrinhw4/sltkatrin.h"
+#include "katrinhw4/fltkatrin.h"
 
 #include "HW_Readout.h"
+
+static hw4::SubrackKatrin *srack=0;
+#define USE_PBUS 0
 
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
@@ -103,7 +109,13 @@ void FindHardware(void)
 {
 	//open device driver(s), get device driver handles
 		const char* name = "FE.ini";
+        #if USE_PBUS
         pbusInit((char*)name);
+        #else
+        srack = new hw4::SubrackKatrin((char*)name,0);
+        srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
+
+        #endif
         // testing the C++ link to fdhwlib -tb-
         if(0){
             printf("Try to create a BaseRegister object -tb-\n");
@@ -117,7 +129,11 @@ void FindHardware(void)
 void ReleaseHardware(void)
 {
 	//release / close device driver(s)
-        pbusFree();
+    #if USE_PBUS
+    pbusFree();
+    #else
+    delete srack;
+    #endif
 }
 
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
@@ -168,7 +184,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     
     uint32_t startAddress   = p->address;
     int32_t numItems        = p->numItems;
-	printf("starting read: %08x %d\n",startAddress,numItems);
+	//TODO: -tb- debug printf("starting read: %08x %d\n",startAddress,numItems);
 
     if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSize) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
@@ -189,7 +205,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 	int32_t perr   = 0;
     if (numItems == 1)  perr = pbusRead(startAddress, lPtr);
     else				perr = pbusReadBlock(startAddress, lPtr, numItems);
-	printf("perr: %d\n",perr);
+	//TODO: -tb- printf("perr: %d\n",perr);
  	
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = numItems;
@@ -198,7 +214,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 		if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
     }
     else {
-        sprintf(aPacket->message,"error: %d %d : %s\n",perr,(int32_t)errno,strerror(errno));
+        //TODO: -tb- sprintf(aPacket->message,"error: %d %d : %s\n",perr,(int32_t)errno,strerror(errno));
         aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_IPEv4ReadBlockStruct);
         returnDataPtr->numItems  = 0;
         returnDataPtr->errorCode = perr;        
@@ -301,6 +317,86 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
             // skip shipping data record
             return config->card_info[index].next_Card_Index;
         }
+    //==============================================================================
+    //TEST READOUT LOOP --------- BEGIN    
+        #if 1
+        int col; // col is number of FLT (0..23)
+        unsigned long int fstatus,f1,f2,f3,f4,chmap,energy,pagenr,writeptr,readptr,
+                          diff,evsec,evsubsec;
+        uint32_t status;
+        int fifoempty,status_ef;
+        
+        for(col=0; col<20;col++){
+            fflush(stdout);
+            if(srack->theFlt[col]->isPresent()){
+  //fprintf(stdout,"Flt %i ->status has address %p  \n",col,srack->theFlt[col]->status );
+            //hw4::FltKatrinStatus* st=srack->theFlt[col]->status;
+                status = srack->theFlt[col]->status->read();
+                status_ef = (status & 0x1000000) >> 24;
+                //printf("  FLT %i status 0x%0x:  fifoEmpty:%i  \n",col,status, status_ef);
+                //printf("Fifo FLT %i: ",col);
+                {
+                    fstatus = srack->theFlt[col]->eventFIFOStatus->read();
+                    writeptr = fstatus & 0x3ff;
+                    readptr = (fstatus >>16) & 0x3ff;
+                    diff = (writeptr-readptr+1024) % 512;
+                    printf(" fstatus: (0x%0lx)   writeptr %lu (0x%lx) readptr %lu ... diff %i\n",
+                           fstatus,            writeptr,writeptr,  readptr, diff );
+                           fflush(stdout);
+                }
+                if(diff>1){
+                    while(diff>1)
+                    {
+                        f1 = srack->theFlt[col]->eventFIFO1->read();
+                        chmap = f1 >> 8;
+                        //printf("   channelmap: (0x%0lx) \n",chmap);
+                        //fflush(stdout);
+                        f2 = srack->theFlt[col]->eventFIFO2->read();
+                        //check channel map
+                        int eventchan;
+                        for(eventchan=0;eventchan<24;eventchan++){
+                            if(chmap & (0x1 << eventchan)){
+                                printf("  -->EVENT FLT %2i, chan %2i: ",col,eventchan);
+                                f3 = srack->theFlt[col]->eventFIFO3->read(eventchan);
+                                f4 = srack->theFlt[col]->eventFIFO4->read(eventchan);
+                                pagenr = f3;
+                                energy = f4 ;
+                                evsec = ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+                                evsubsec = (f2 >> 2) & 0x1ffffff; // 25 bit
+                                printf("  sec %10lu subsec %9lu   ", evsec,evsubsec );
+                                printf("  energy %lu page# %lu  ", energy,pagenr );
+                                printf(" ... \n" );
+                                fflush(stdout);fflush(stderr);
+                                //for(row=0; row<24;row++){
+                                //    int hitrate = srack->theFlt[col]->hitrate->read(row);
+                                //    if(row<5) printf(" %i(0x%x),",hitrate,hitrate);
+                                //}
+                                //printf(" ...\n");
+                        
+                                //debug fstatus = srack->theFlt[col]->eventFIFOStatus->read();
+                                //debug writeptr = fstatus & 0x3ff;
+                                //debug readptr = (fstatus >>16) & 0x3ff;
+                                //debug printf(" fstatus: (0x%0lx)   writeptr %lu (0x%lx) readptr %lu ...\n",
+                                //debug    fstatus,            writeptr,writeptr,  readptr );
+                            }
+                            fstatus = srack->theFlt[col]->eventFIFOStatus->read();
+                            writeptr = fstatus & 0x3ff;
+                            readptr = (fstatus >>16) & 0x3ff;
+                            diff = (writeptr-readptr+1024) % 512;
+                        }
+                    }
+                }
+                else{
+                    printf("Fifo is EMPTY ...\n");
+                    fflush(stdout);
+                }
+            }
+        }
+        printf(" ...\n");
+        #endif
+    
+    //TEST READOUT LOOP --------- END
+    //==============================================================================
     
 
     uint32_t dataId            = config->card_info[index].hw_mask[0];
@@ -320,6 +416,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     uint32_t baseAddress            = config->card_info[index].base_add;
     uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
 	*/
+    printf("this is  Readout_Fltv4\n");
     return config->card_info[index].next_Card_Index;
 }
 

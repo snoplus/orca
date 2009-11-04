@@ -57,7 +57,7 @@ UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src -I ~/src/v4/pbusaccess
 #LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
  
 #-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
-LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lhw4 -lakutil -lpthread -lstdc++ 
+LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
  
 
 LIBs    = 
