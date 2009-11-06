@@ -1767,7 +1767,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	//then, copy it into either the ORCA source tree or the App Bundle resource
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString* coreCodePath;
-	if(loadMode) coreCodePath = [filePath stringByAppendingPathComponent:@"Source/Objects/Hardware/SBC/SBC_Code"];
+	if(loadMode==0) coreCodePath = [filePath stringByAppendingPathComponent:@"Source/Objects/Hardware/SBC/SBC_Code"];
 	else		 coreCodePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"SBC_Code"];
 	
 	NSString* newScriptPath = [[coreCodePath stringByAppendingPathComponent:theScript] stringByExpandingTildeInPath];
