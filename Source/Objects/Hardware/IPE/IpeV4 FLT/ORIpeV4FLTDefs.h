@@ -44,6 +44,8 @@
 #define kIpeFlt_Cntl_InterruptSources_Shift	0
 #define kIpeFlt_Cntl_InterruptSources_Mask	0xff
 
+#define kIpeFlt_Cmd_LoadGains	            0x10
+
 #define kIpeFlt_Periph_CoinTme_Shift		0
 #define kIpeFlt_Periph_CoinTme_Mask			0x1ff
 

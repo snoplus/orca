@@ -134,16 +134,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"HistNumMeas",         0x000054>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-	{@"pStatusB",           0x00A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"pStatusC",           0x02A000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"pStatusB",           0x012000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"pStatusC",           0x052000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 	{@"Event FIFO1",		0x001800>>2,		-1,				kIpeRegReadable},
 	{@"Event FIFO2",		0x001804>>2,		-1,				kIpeRegReadable},
-	{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable},
-	{@"Event FIFO4",		0x00180C>>2,		-1,				kIpeRegReadable},
+	{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+	{@"Event FIFO4",		0x00180C>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 };
 
 @interface ORIpeV4FLTModel (private)
@@ -573,6 +573,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self writeThreshold:i value:[self threshold:i]];
 		[self writeGain:i value:[self gain:i]]; 
 	}
+    [self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
+    usleep(180);//TODO: better check the busy flag -tb-
+    //TODO: this should be done by the SLT in cause of the 180 usec delay -tb-
 }
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
@@ -675,7 +678,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		((runBoxCarFilter & 0x1)<<2)	|
 		((startSampling & 0x1)<<1)
 		| 0x1;
-	
+
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
 

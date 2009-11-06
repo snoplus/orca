@@ -1259,14 +1259,14 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	else {
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
-		//TODO: -tb- [self writeClrInhibit];
+		[self writeClrInhibit];
 		first = NO;
 	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//[self writeSetInhibit];
+	[self writeSetInhibit];
 	
 	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
