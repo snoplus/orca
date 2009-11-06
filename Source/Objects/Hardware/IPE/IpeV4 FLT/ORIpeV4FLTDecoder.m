@@ -73,20 +73,21 @@
 	++ptr;	//point to the energy
 		
 	//channel by channel histograms
-	[aDataSet histogram:*ptr 
-				numBins:32768 
+	unsigned long energy = *ptr/16;
+	[aDataSet histogram:energy 
+				numBins:65535 
 				 sender:self  
 			   withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
 	
 	//accumulated card level histograms
-	[aDataSet histogram:*ptr 
-				numBins:32768 
+	[aDataSet histogram:energy 
+				numBins:65535 
 				 sender:self  
 			   withKeys: @"FLT",@"Total Card Energy",crateKey,stationKey,nil];
 	
 	//accumulated crate level histograms
-	[aDataSet histogram:*ptr 
-				numBins:32768 
+	[aDataSet histogram:energy
+				numBins:65535 
 				 sender:self  
 			   withKeys: @"FLT",@"Total Crate Energy",crateKey,nil];
 	

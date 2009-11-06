@@ -670,10 +670,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-		((filterLength<<8) & 0xf)		| 
-		((gapLength<<4) & 0xf)			| 
-		((runBoxCarFilter<<2) & 0x1)	|
-		((startSampling<<1) & 0x1);
+		((filterLength & 0xf)<<8)		| 
+		((gapLength & 0xf)<<4)			| 
+		((runBoxCarFilter & 0x1)<<2)	|
+		((startSampling & 0x1)<<1)
+		| 0x1;
 	
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
@@ -846,8 +847,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//0,1 test pattern
 	//1,0 always 0
 	//1,1 always 1
-	[self writeReg:kFLTV4PixelSettings1Reg value:0x0];
-	[self writeReg:kFLTV4PixelSettings2Reg value:~triggerEnabledMask];
+	[self writeReg:kFLTV4PixelSettings1Reg value:triggerEnabledMask];
+	[self writeReg:kFLTV4PixelSettings2Reg value:0];
 }
 
 - (void) readHitRates
@@ -1140,28 +1141,37 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		unsigned long status = [self readReg: kFLTV4StatusReg];
 		int fifoStatus = (status>>24) & 0xf;
 		if(fifoStatus != 0x03){
-			//unsigned long eventFifoStatus = [self readReg: kFLTV4EventFifo1Reg];
-			//int readOffset = ((eventFifoStatus>>16) & 0x3ff)*2;
-			
-			unsigned long eventFifo1 = [self readReg: kFLTV4EventFifo1Reg];
-			unsigned long channelMap = (eventFifo1>>10)&0x3ffff;
-			int i;
-			for(i=0;i<kNumFLTChannels;i++){
-				if(channelMap & (1<<i)){
-					unsigned long eventFifo3 = [self readReg: kFLTV4EventFifo3Reg channel:i];
-					unsigned long energy     = [self readReg: kFLTV4EventFifo4Reg channel:i];
-					
-					unsigned long data[7];
-					
-					data[0] = dataId | 7;	
-					data[1] = locationWord | i<<8;
-					data[2] = 0; //sec
-					data[3] = 0; //subsec
-					data[4] = channelMap;
-					data[5] = 0; //eventID
-					data[6] = energy;
-					[aDataPacket addLongsToFrameBuffer:data length:7];
-					
+			unsigned long fstatus = [self readReg: kFLTV4EventFifoStatusReg];
+			unsigned long writeptr = fstatus & 0x3ff;
+			unsigned long readptr = (fstatus >>16) & 0x3ff;
+			unsigned long diff = (writeptr-readptr+1024) % 512;
+			if(diff>1){
+				unsigned long f1 = [self readReg: kFLTV4EventFifo1Reg];
+				unsigned long f2 = [self readReg: kFLTV4EventFifo2Reg];
+				unsigned long channelMap = (f1>>10)&0x3ffff;
+				if(channelMap!=0){
+					unsigned long evsec = ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+					unsigned long evsubsec = (f2 >> 2) & 0x1ffffff; // 25 bit
+					//NSLog(@"0x%0x %d - %d - %d  %d.%d\n",channelMap,writeptr,readptr,diff,evsec,evsubsec);
+					int i;
+					for(i=0;i<kNumFLTChannels;i++){
+						if(channelMap & (1<<i)){
+							unsigned long f3		 = [self readReg: kFLTV4EventFifo3Reg channel:i];
+							unsigned long energy     = ([self readReg: kFLTV4EventFifo4Reg channel:i] & 0xfffff);
+							
+							unsigned long data[7];
+							
+							data[0] = dataId | 7;	
+							data[1] = locationWord | i<<8;
+							data[2] = evsec; //sec
+							data[3] = evsubsec; //subsec
+							data[4] = channelMap;
+							data[5] = f3; //eventID -- not sure this is right. mah
+							data[6] = energy;
+							[aDataPacket addLongsToFrameBuffer:data length:7];
+							
+						}
+					}
 				}
 			}
 		}
@@ -1259,21 +1269,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kFLTv4;	//should be unique
-	configStruct->card_info[index].hw_mask[0] 	= dataId;
-	configStruct->card_info[index].hw_mask[1] 	= waveFormId;
-	configStruct->card_info[index].slot			= [self stationNumber];
+	configStruct->card_info[index].hw_type_id	= kFLTv4;					//unique identifier for readout hw
+	configStruct->card_info[index].hw_mask[0] 	= dataId;					//record id for energies
+	configStruct->card_info[index].hw_mask[1] 	= waveFormId;				//record id for the waveforms
+	configStruct->card_info[index].slot			= [self stationNumber]-1;	//the PMC readout uses col 0 thru n
 	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
 	
-	//use the following as needed to define base addresses and special data for use by the cpu to 
-	//do the readout
-	//configStruct->card_info[index].base_add		= [self baseAddress];
-	//configStruct->card_info[index].deviceSpecificData[0] = onlineMask;
-	//configStruct->card_info[index].deviceSpecificData[1] = register_offsets[kConversionStatusRegister];
-	//configStruct->card_info[index].deviceSpecificData[2] = register_offsets[kADC1OutputRegister];
-	
-	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 	
 	return index+1;
@@ -1625,6 +1627,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			}
 			if(passed){
 				fltRunMode = savedMode;
+				[self writeControl];
 				if([self readMode] != savedMode){
 					[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
 					passed = NO;
@@ -1746,14 +1749,41 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
+	ORTimer* aTimer = [[ORTimer alloc] init];
+	[aTimer start];
 		
 	@try {
-		[self test:testNumber result:@"TBD" color:[NSColor passedColor]];
+		BOOL passed = YES;
+		int numLoops = 250;
+		int numPatterns = 4;
+		int j;
+		for(j=0;j<numLoops;j++){
+			unsigned long aPattern[4] = {0xfffffff,0x00000000,0xaaaaaaaa,0x55555555};
+			int i;
+			for(i=0;i<numPatterns;i++){
+				[self writeReg:kFLTV4AccessTestReg value:aPattern[i]];
+				unsigned long aValue = [self readReg:kFLTV4AccessTestReg];
+				if(aValue!=aPattern[i]){
+					NSLog(@"Error: Comm Check (pattern: 0x%0x!=0x%0x) FLT %d does not work\n",aPattern,aValue,[self stationNumber]);
+					passed = NO;				
+				}
+			}
+			if(!passed)break;
+		}
+		[aTimer stop];
+		if(passed){
+			int totalOps = numLoops*numPatterns*2;
+			double secs = [aTimer seconds];
+			[self test:testNumber result:[NSString stringWithFormat:@"%.2f/s",totalOps/secs] color:[NSColor passedColor]];
+			NSLog(@"Speed Test For FLT %d : %d accesses in %.3f sec\n",[self stationNumber], totalOps,secs);
+		}
 	}
 	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-		
-	}		
+	}	
+	@finally {
+		[aTimer release];
+	}
 	
 	[testSuit runForObject:self]; //do next test
 }

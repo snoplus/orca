@@ -397,9 +397,13 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+	[self updateButtons];
+}
+
+- (void) updateButtons
+{
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORIpeV4FLTSettingsLock];
-	BOOL isRunning = [gOrcaGlobals runInProgress];
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL locked = [gSecurity isLocked:ORIpeV4FLTSettingsLock];
 	BOOL testsAreRunning = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
@@ -416,9 +420,9 @@
     [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
 	
-	[versionButton setEnabled:!isRunning];
-	[testButton setEnabled:!isRunning];
-	[statusButton setEnabled:!isRunning];
+	[versionButton setEnabled:!runInProgress];
+	[testButton setEnabled:!runInProgress];
+	[statusButton setEnabled:!runInProgress];
 	
     [hitRateLengthPU setEnabled:!lockedOrRunningMaintenance];
     [hitRateAllButton setEnabled:!lockedOrRunningMaintenance];
@@ -437,7 +441,7 @@
 	
 	int runMode = [model fltRunMode];
 	[histNofMeasField setEnabled: !locked & (runMode == kIpeFlt_Histo_Mode)];
-	[histRecTimeField setEnabled: !locked & (runMode == kIpeFlt_Histo_Mode)];
+	[histMeasTimeField setEnabled: !locked & (runMode == kIpeFlt_Histo_Mode)];
 
  	[self enableRegControls];
 }
@@ -623,6 +627,7 @@
 - (void) modeChanged:(NSNotification*)aNote
 {
 	[modeButton selectItemAtIndex:[model fltRunMode]];
+	[self updateButtons];
 }
 
 - (void) hitRateLengthChanged:(NSNotification*)aNote

@@ -1458,9 +1458,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-#define DebugMethCallsTB(x) x
-    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
-
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id	= kSLTv4;	//should be unique
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
@@ -1469,20 +1466,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
 	
-	//use the following as needed to define base addresses and special data for use by the cpu to 
-	//do the readout
-	//configStruct->card_info[index].base_add		= [self baseAddress];
-	//configStruct->card_info[index].deviceSpecificData[0] = onlineMask;
-	//configStruct->card_info[index].deviceSpecificData[1] = register_offsets[kConversionStatusRegister];
-	//configStruct->card_info[index].deviceSpecificData[2] = register_offsets[kADC1OutputRegister];
-	
 	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by SLT
     int nextIndex = index+1;
     
 	configStruct->card_info[index].next_Trigger_Index[0] = -1;
-	NSEnumerator* e = [dataTakers objectEnumerator];
-	id obj;
-	while(obj = [e nextObject]){
+	for(id obj in dataTakers){
 		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
 			if(configStruct->card_info[index].next_Trigger_Index[0] == -1){
 				configStruct->card_info[index].next_Trigger_Index[0] = nextIndex;

@@ -100,6 +100,7 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) updateButtons;
 
 #pragma mark •••Interface Management
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote;

@@ -248,48 +248,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 /*************************************************************/
 int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
-	/* -----  example from the old shaper readout ---------
-	//data that is to be shipped is just put into the data[] array, incrementing the dataIndex each time
-	//note: don't initialize or reset the dataIndex, if you need the possiblity of discarding a record, then
-	//save the dataIndex at the start of the creation of a record and reset to that point if the record is to
-	//be discarded.
-	//the data record format is the same as the normal ORCA-side format
-	
-    uint32_t baseAddress            = config->card_info[index].base_add;
-    uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
-    
-    char theConversionMask;
-    int32_t result    = read_device(vmeAM29Handle,&theConversionMask,1,baseAddress+conversionRegOffset); //byte access, the conversion mask
-    if(result == 1 && theConversionMask != 0){
-
-        uint32_t dataId            = config->card_info[index].hw_mask[0];
-        uint32_t slot              = config->card_info[index].slot;
-        uint32_t crate             = config->card_info[index].crate;
-        uint32_t locationMask      = ((crate & 0x01e)<<21) | ((slot & 0x0000001f)<<16);
-        uint32_t onlineMask        = config->card_info[index].deviceSpecificData[0];
-        uint32_t firstAdcRegOffset = config->card_info[index].deviceSpecificData[2];
-
-        int16_t channel;
-        for (channel=0; channel<8; ++channel) {
-            if(onlineMask & theConversionMask & (1L<<channel)){
-                uint16_t aValue;
-                result    = read_device(vmeAM29Handle,(char*)&aValue,2,baseAddress+firstAdcRegOffset+2*channel); //short access, the adc Value
-                if(result == 2){
-                    if(((dataId) & 0x80000000)){ //short form
-                        data[dataIndex++] = dataId | locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
-                    }
-                    else { //long form
-                        data[dataIndex++] = dataId | 2;
-                        data[dataIndex++] = locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
-                    }
-                }
-                else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
-            }
-        }
-    }
-    else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
-*/
-
+#if 0
     //"counter" for debugging
         static int currentSec=0;
         static int currentUSec=0;
@@ -317,88 +276,16 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
             // skip shipping data record
             return config->card_info[index].next_Card_Index;
         }
-    //==============================================================================
-    //TEST READOUT LOOP --------- BEGIN    
-        #if 1
-        int col; // col is number of FLT (0..23)
-        unsigned long int fstatus,f1,f2,f3,f4,chmap,energy,pagenr,writeptr,readptr,
-                          diff,evsec,evsubsec;
-        uint32_t status;
-        int fifoempty,status_ef;
-        
-        for(col=0; col<20;col++){
-            fflush(stdout);
-            if(srack->theFlt[col]->isPresent()){
-  //fprintf(stdout,"Flt %i ->status has address %p  \n",col,srack->theFlt[col]->status );
-            //hw4::FltKatrinStatus* st=srack->theFlt[col]->status;
-                status = srack->theFlt[col]->status->read();
-                status_ef = (status & 0x1000000) >> 24;
-                //printf("  FLT %i status 0x%0x:  fifoEmpty:%i  \n",col,status, status_ef);
-                //printf("Fifo FLT %i: ",col);
-                {
-                    fstatus = srack->theFlt[col]->eventFIFOStatus->read();
-                    writeptr = fstatus & 0x3ff;
-                    readptr = (fstatus >>16) & 0x3ff;
-                    diff = (writeptr-readptr+1024) % 512;
-                    printf(" fstatus: (0x%0lx)   writeptr %lu (0x%lx) readptr %lu ... diff %i\n",
-                           fstatus,            writeptr,writeptr,  readptr, diff );
-                           fflush(stdout);
-                }
-                if(diff>1){
-                    while(diff>1)
-                    {
-                        f1 = srack->theFlt[col]->eventFIFO1->read();
-                        chmap = f1 >> 8;
-                        //printf("   channelmap: (0x%0lx) \n",chmap);
-                        //fflush(stdout);
-                        f2 = srack->theFlt[col]->eventFIFO2->read();
-                        //check channel map
-                        int eventchan;
-                        for(eventchan=0;eventchan<24;eventchan++){
-                            if(chmap & (0x1 << eventchan)){
-                                printf("  -->EVENT FLT %2i, chan %2i: ",col,eventchan);
-                                f3 = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                                f4 = srack->theFlt[col]->eventFIFO4->read(eventchan);
-                                pagenr = f3;
-                                energy = f4 ;
-                                evsec = ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-                                evsubsec = (f2 >> 2) & 0x1ffffff; // 25 bit
-                                printf("  sec %10lu subsec %9lu   ", evsec,evsubsec );
-                                printf("  energy %lu page# %lu  ", energy,pagenr );
-                                printf(" ... \n" );
-                                fflush(stdout);fflush(stderr);
-                                //for(row=0; row<24;row++){
-                                //    int hitrate = srack->theFlt[col]->hitrate->read(row);
-                                //    if(row<5) printf(" %i(0x%x),",hitrate,hitrate);
-                                //}
-                                //printf(" ...\n");
-                        
-                                //debug fstatus = srack->theFlt[col]->eventFIFOStatus->read();
-                                //debug writeptr = fstatus & 0x3ff;
-                                //debug readptr = (fstatus >>16) & 0x3ff;
-                                //debug printf(" fstatus: (0x%0lx)   writeptr %lu (0x%lx) readptr %lu ...\n",
-                                //debug    fstatus,            writeptr,writeptr,  readptr );
-                            }
-                            fstatus = srack->theFlt[col]->eventFIFOStatus->read();
-                            writeptr = fstatus & 0x3ff;
-                            readptr = (fstatus >>16) & 0x3ff;
-                            diff = (writeptr-readptr+1024) % 512;
-                        }
-                    }
-                }
-                else{
-                    printf("Fifo is EMPTY ...\n");
-                    fflush(stdout);
-                }
-            }
-        }
-        printf(" ...\n");
-        #endif
+#endif
+		short leaf_index;
+		//read out the children flts that are in the readout list
+		leaf_index = config->card_info[index].next_Trigger_Index[0];
+		while(leaf_index >= 0) {
+			leaf_index = readHW(config,leaf_index,lamData);
+		}
     
-    //TEST READOUT LOOP --------- END
-    //==============================================================================
-    
-
+	
+#if 0
     uint32_t dataId            = config->card_info[index].hw_mask[0];
     uint32_t stationNumber     = config->card_info[index].slot;
     uint32_t crate             = config->card_info[index].crate;
@@ -407,16 +294,71 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     data[dataIndex++] = 6;
     data[dataIndex++] = 8;
     data[dataIndex++] = 15;
+#endif
+	
     return config->card_info[index].next_Card_Index;
 }            
 
+#define kFifoEmpty 0x01
+
 int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
-	/*
-    uint32_t baseAddress            = config->card_info[index].base_add;
-    uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
-	*/
-    printf("this is  Readout_Fltv4\n");
+    uint32_t dataId     = config->card_info[index].hw_mask[0];
+    uint32_t col		= config->card_info[index].slot;
+    uint32_t crate		= config->card_info[index].crate;
+	uint32_t location   = ((crate & 0x01e)<<21) | ((col & 0x0000001f)<<16);
+
+	if(srack->theFlt[col]->isPresent()){
+		
+		uint32_t status		 = srack->theFlt[col]->status->read();
+		uint32_t  fifoStatus = (status >> 24) & 0xf;
+		
+		if(fifoStatus != kFifoEmpty){
+			//should be something in the fifo, but check the read/write pointers anyway.
+			uint32_t fstatus = srack->theFlt[col]->eventFIFOStatus->read();
+			uint32_t writeptr = fstatus & 0x3ff;
+			uint32_t readptr = (fstatus >>16) & 0x3ff;
+			
+			uint32_t diff = (writeptr-readptr+1024) % 512;
+			if(diff>1){
+				uint32_t f1 = srack->theFlt[col]->eventFIFO1->read();
+				uint32_t chmap = f1 >> 8;
+				uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
+				int eventchan;
+				for(eventchan=0;eventchan<24;eventchan++){
+					if(chmap & (0x1 << eventchan)){
+						//printf("  -->EVENT FLT %2i, chan %2i: ",col,eventchan);
+						uint32_t f3			= srack->theFlt[col]->eventFIFO3->read(eventchan);
+						uint32_t f4			= srack->theFlt[col]->eventFIFO4->read(eventchan);
+						uint32_t pagenr		= f3 & 0x3f;
+						uint32_t energy		= f4 ;
+						uint32_t evsec		= ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+						uint32_t evsubsec	= (f2 >> 2) & 0x1ffffff; // 25 bit
+						//printf("  sec %10lu subsec %9lu   ", evsec,evsubsec );
+						//printf("  energy %lu page# %lu  ", energy,pagenr );
+						//printf(" ... \n" );
+						//fflush(stdout);
+						//fflush(stderr);
+						
+						//package the data record
+						data[dataIndex++] = dataId | 7;	
+						data[dataIndex++] = location | eventchan<<8;
+						data[dataIndex++] = evsec;		//sec
+						data[dataIndex++] = evsubsec;	//subsec
+						data[dataIndex++] = chmap;
+						data[dataIndex++] = f3;			//was listed as the event ID... put in the pagenr for now 
+						data[dataIndex++] = energy;
+						
+						//for(row=0; row<24;row++){
+						//    int hitrate = srack->theFlt[col]->hitrate->read(row);
+						//    if(row<5) printf(" %i(0x%x),",hitrate,hitrate);
+						//}
+					}
+				}
+			}
+		}
+	}
+	
     return config->card_info[index].next_Card_Index;
 }
 
