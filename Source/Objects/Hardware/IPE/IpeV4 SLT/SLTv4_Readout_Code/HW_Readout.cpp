@@ -303,10 +303,19 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 
 int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
+    static uint32_t waveformBuffer32[64*1024];
+    static uint32_t shipWaveformBuffer32[64*1024];
+    static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
+    static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
+    
     uint32_t dataId     = config->card_info[index].hw_mask[0];
+    uint32_t waveformId = config->card_info[index].hw_mask[1];
+	uint32_t postTriggerTime = config->card_info[index].hw_mask[2];
     uint32_t col		= config->card_info[index].slot;
     uint32_t crate		= config->card_info[index].crate;
 	uint32_t location   = ((crate & 0x01e)<<21) | ((col & 0x0000001f)<<16);
+    
+    int i,waveformLength,waveformLength32;
 
 	if(srack->theFlt[col]->isPresent()){
 		
@@ -327,7 +336,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 				int eventchan;
 				for(eventchan=0;eventchan<24;eventchan++){
 					if(chmap & (0x1 << eventchan)){
-						//printf("  -->EVENT FLT %2i, chan %2i: ",col,eventchan);
+						fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
 						uint32_t f3			= srack->theFlt[col]->eventFIFO3->read(eventchan);
 						uint32_t f4			= srack->theFlt[col]->eventFIFO4->read(eventchan);
 						uint32_t pagenr		= f3 & 0x3f;
@@ -340,7 +349,8 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 						//fflush(stdout);
 						//fflush(stderr);
 						
-						//package the data record
+                        #if 1
+						//package the energy data record
 						data[dataIndex++] = dataId | 7;	
 						data[dataIndex++] = location | eventchan<<8;
 						data[dataIndex++] = evsec;		//sec
@@ -348,7 +358,56 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 						data[dataIndex++] = chmap;
 						data[dataIndex++] = f3;			//was listed as the event ID... put in the pagenr for now 
 						data[dataIndex++] = energy;
+                        #endif
 						
+						//package the waveform data record (we need a flag as we can switch off recording waveforms)
+                        waveformLength = 2048; waveformLength32=waveformLength/2; //the waveform length is variable	
+						data[dataIndex++] = waveformId | (waveformLength32 + 2);
+						data[dataIndex++] = location | eventchan<<8;
+						//data[dataIndex++] = evsec;		//sec
+						//data[dataIndex++] = evsubsec;	//subsec
+						//data[dataIndex++] = chmap;
+						//data[dataIndex++] = f3;			//was listed as the event ID... put in the pagenr for now 
+						//data[dataIndex++] = energy;
+
+                        //read waveform
+                        {
+                            uint32_t  adcval, adcval1, adcval2 ;
+                            int adccount, triggerPos, copyindex;
+                            triggerPos = -1;
+                            srack->theSlt->pageSelect->write(0x100 | pagenr);
+                            //printf("ADC FLT %2i chanmask %2i: \n",col,eventchan);
+                            for(adccount=0; adccount<1024;adccount++){
+                                adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
+                                waveformBuffer32[adccount] = adcval;
+                                #if 1 //TODO: WORKAROUND - align according to the trigger flag - in future we will use the timestamp, when Denis has fixed it -tb-
+                                adcval1 = adcval & 0xffff;
+                                adcval2 = (adcval >> 16) & 0xffff;
+                                if(adcval1 & 0x8000) triggerPos = adccount*2;
+                                if(adcval2 & 0x8000) triggerPos = adccount*2+1;
+                                #endif
+                            }
+                            copyindex = triggerPos + postTriggerTime;
+                            for(i=0;i<waveformLength;i++){
+                                copyindex++;
+                                copyindex = copyindex % 2048;
+                                shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
+                            }
+                        }
+                        
+                        
+
+                        //simulation mode
+                        if(0){
+                            for(i=0;i<waveformLength;i++){
+                                shipWaveformBuffer16[i]= (i>100)*i;
+                            }
+                        }
+                        //ship waveform
+                        for(i=0;i<waveformLength32;i++){
+                            data[dataIndex++] = shipWaveformBuffer32[i];
+                        }
+                        
 						//for(row=0; row<24;row++){
 						//    int hitrate = srack->theFlt[col]->hitrate->read(row);
 						//    if(row<5) printf(" %i(0x%x),",hitrate,hitrate);

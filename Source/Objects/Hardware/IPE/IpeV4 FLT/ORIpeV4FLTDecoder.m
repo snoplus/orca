@@ -32,7 +32,7 @@
  <pre>
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
- ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+                  ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
@@ -126,7 +126,8 @@
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
 			energy,eventDate,eventTime,seconds,subSec,eventID,nPages,chMap];               
 	*/ ///todo......
-	
+    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];
+    	
 	return @"to be done";
 }
 @end

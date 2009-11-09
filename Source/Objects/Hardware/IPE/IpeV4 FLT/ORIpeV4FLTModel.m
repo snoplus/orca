@@ -1047,10 +1047,21 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 								 nil];
 	
     [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTEnergy"];
+    
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORIpeV4FLTDecoderForWaveForm",		@"decoder",
+				   [NSNumber numberWithLong:waveFormId],   @"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
 	
+    [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTWaveForm"];
+		
     return dataDictionary;
 }
 
+
+//what is the event dictionary? -tb-
 - (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
 {
 	NSDictionary* aDictionary;
@@ -1062,6 +1073,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[anEventDictionary setObject:aDictionary forKey:@"IpeV4FLT"];
 }
 
+/** This will go to the XML header of the data file.
+ */ //-tb- 2009-11
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
@@ -1275,6 +1288,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].hw_type_id	= kFLTv4;					//unique identifier for readout hw
 	configStruct->card_info[index].hw_mask[0] 	= dataId;					//record id for energies
 	configStruct->card_info[index].hw_mask[1] 	= waveFormId;				//record id for the waveforms
+	configStruct->card_info[index].hw_mask[2] 	= postTriggerTime;			//needed to align the waveforms
 	configStruct->card_info[index].slot			= [self stationNumber]-1;	//the PMC readout uses col 0 thru n
 	configStruct->card_info[index].crate		= [self crateNumber];
 	
