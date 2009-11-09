@@ -133,6 +133,7 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (void) setToDefaults;
 - (BOOL) runBoxCarFilter;
 - (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter;
 - (BOOL) storeDataInRam;

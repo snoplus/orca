@@ -517,6 +517,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return regV4[anIndex].accessType;
 }
 
+- (void) setToDefaults
+{
+	int i;
+	for(i=0;i<kNumFLTChannels;i++){
+		[self setThreshold:i withValue:17000];
+		[self setGain:i withValue:0];
+	}
+	[self setRunBoxCarFilter:YES];
+	[self setGapLength:0];
+	[self setFilterLength:6];
+	[self setFifoBehaviour:kFifoStopOnFull];
+	[self setPostTriggerTime:2];
+}
+
 #pragma mark •••HW Access
 - (unsigned long) readBoardIDLow
 {

@@ -80,6 +80,9 @@
 #define kSetStandBy		1
 #define kReleaseStandBy 0
 
+#define kFifoEnableOverFlow 0
+#define kFifoStopOnFull     1
+
 #define SELECT_ALL_CHANNELS ( 0x1F <<16) // ak, 7.10.07
 
 typedef struct {

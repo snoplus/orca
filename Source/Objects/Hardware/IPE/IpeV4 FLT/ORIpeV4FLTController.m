@@ -817,7 +817,17 @@
 	[model setTestEnabledArray:anArray];
 }
 
-
+- (IBAction) setDefaultsAction: (id) sender
+{
+	@try {
+		[model setToDefaults];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Exception setting FLT default Values\n");
+		NSRunAlertPanel([localException name], @"%@\nSet Defaults for FLT%d failed", @"OK", nil, nil,
+						localException,[model stationNumber]);
+	}
+}
 
 - (IBAction) readThresholdsGains:(id)sender
 {

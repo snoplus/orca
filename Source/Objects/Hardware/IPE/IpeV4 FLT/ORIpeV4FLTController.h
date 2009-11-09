@@ -56,6 +56,7 @@
 		IBOutlet NSButton*		hitRateNoneButton;
 		IBOutlet NSButton*		triggersAllButton;
 		IBOutlet NSButton*		triggersNoneButton;
+		IBOutlet NSButton*		defaultsButton;
 		
 		IBOutlet NSTextField*	readoutPagesField; // ak, 2.7.07
 
@@ -180,6 +181,7 @@
 - (IBAction) writeValueAction:(id) aSender;
 - (IBAction) readRegAction: (id) sender;
 - (IBAction) writeRegAction: (id) sender;
+- (IBAction) setDefaultsAction: (id) sender;
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 
 #pragma mark •••Plot DataSource
