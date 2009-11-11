@@ -919,7 +919,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	@catch(NSException* localException) {
 	}
 	
-	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
+	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(1<<[self hitRateLength])];
 }
 
 - (NSString*) rateNotification
@@ -1148,7 +1148,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	if(ratesEnabled){
 		[self performSelector:@selector(readHitRates) 
 				   withObject:nil
-				   afterDelay:[self hitRateLength]];		//start reading out the rates
+				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
 	}
 	
 	
