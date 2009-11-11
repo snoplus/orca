@@ -879,16 +879,26 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		BOOL oneChanged = NO;
 		float newTotal = 0;
 		int chan;
+        int hitRateLengthSec = 1<<hitRateLength;
 		for(chan=0;chan<kNumFLTChannels;chan++){
 			
 			aValue = [self readReg:kFLTV4HitRateReg channel:chan];
-			overflow = (aValue >> 17) & 0x1;
+			overflow = (aValue >> 31) & 0x1;
 			aValue = aValue & 0xffff;
 			
 			if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
 				
-				if (hitRateLength!=0)	hitRate[chan] = aValue/ (float) hitRateLength; 
-				else					hitRate[chan] = 0;
+                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
+                //TODO: ask Denis -tb-
+                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
+                //TODO: ask Denis -tb-
+                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
+                //TODO: ask Denis -tb-
+                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
+                //TODO: ask Denis -tb-
+				//if (hitRateLengthSec!=0)	hitRate[chan] = aValue/ (float) hitRateLengthSec; 
+				if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
+				else					    hitRate[chan] = 0;
 				
 				if(hitRateOverFlow[chan])hitRate[chan] = 0;
 				hitRateOverFlow[chan] = overflow;
@@ -1108,6 +1118,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
+
 	firstTime = YES;
 	
     [self clearExceptionCount];

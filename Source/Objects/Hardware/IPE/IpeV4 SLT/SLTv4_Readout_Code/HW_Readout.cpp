@@ -249,7 +249,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 #if 0
-    //"counter" for debugging
+    //"counter" for debugging and simulation mode
         static int currentSec=0;
         static int currentUSec=0;
         static int lastSec=0;
@@ -275,6 +275,22 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
         }else{
             // skip shipping data record
             return config->card_info[index].next_Card_Index;
+        }
+        //read hitrates
+        {
+            int col,row;
+            for(col=0; col<20;col++){
+                if(srack->theFlt[col]->isPresent()){
+                    fprintf(stdout,"FLT %i:",col);
+                    for(row=0; row<24;row++){
+                        int hitrate = srack->theFlt[col]->hitrate->read(row);
+                        if(row<5) fprintf(stdout," %i(0x%x),",hitrate,hitrate);
+                    }
+                    fprintf(stdout,"\n");
+                    fflush(stdout);
+
+                }
+            }
         }
 #endif
 		short leaf_index;
@@ -310,10 +326,11 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     
     uint32_t dataId     = config->card_info[index].hw_mask[0];
     uint32_t waveformId = config->card_info[index].hw_mask[1];
-	uint32_t postTriggerTime = config->card_info[index].hw_mask[2];
     uint32_t col		= config->card_info[index].slot;
     uint32_t crate		= config->card_info[index].crate;
 	uint32_t location   = ((crate & 0x01e)<<21) | ((col & 0x0000001f)<<16);
+    
+	uint32_t postTriggerTime = config->card_info[index].deviceSpecificData[0];
     
     int i,waveformLength,waveformLength32;
 
