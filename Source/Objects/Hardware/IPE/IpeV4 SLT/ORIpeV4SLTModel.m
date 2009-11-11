@@ -1228,9 +1228,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	
-    NSEnumerator* e = [dataTakers objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
+	for(id obj in dataTakers){
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
@@ -1264,15 +1262,31 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	}
 }
 
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    for(id obj in dataTakers){
+        [obj runIsStopping:aDataPacket userInfo:userInfo];
+    }
+	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
+}
+
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[self writeSetInhibit];
+	
+    for(id obj in dataTakers){
+		[obj runTaskStopped:aDataPacket userInfo:userInfo];
+    }	
 	
 	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	if(pollingWasRunning) {
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
 	}
+	
+	[dataTakers release];
+	dataTakers = nil;
+
 }
 
 - (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj
@@ -1482,7 +1496,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 			}
 		}
 	}
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	configStruct->card_info[index].next_Card_Index 	= nextIndex;	
 	return index+1;
 }
 @end

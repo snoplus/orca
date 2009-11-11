@@ -29,6 +29,8 @@
 @interface ORIpeV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+		IBOutlet NSButton*		readWaveformsCB;
+		IBOutlet NSButton*		readEnergyCB;
 		IBOutlet NSButton*		runBoxCarFilterCB;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSTextField*	filterLengthField;
@@ -39,7 +41,6 @@
 		IBOutlet NSTextField*   postTriggerTimeField;
 		IBOutlet NSMatrix*		fifoBehaviourMatrix;
 		IBOutlet NSTextField*	analogOffsetField;
-		IBOutlet NSTextField*	ledOffField;
 		IBOutlet NSTextField*	interruptMaskField;
 		IBOutlet NSPopUpButton*	modeButton;
 		IBOutlet NSButton*		versionButton;
@@ -57,9 +58,7 @@
 		IBOutlet NSButton*		triggersAllButton;
 		IBOutlet NSButton*		triggersNoneButton;
 		IBOutlet NSButton*		defaultsButton;
-		
-		IBOutlet NSTextField*	readoutPagesField; // ak, 2.7.07
-
+	
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
 		
@@ -104,6 +103,8 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) readWaveformsChanged:(NSNotification*)aNote;
+- (void) readEnergyChanged:(NSNotification*)aNote;
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote;
 - (void) storeDataInRamChanged:(NSNotification*)aNote;
 - (void) filterLengthChanged:(NSNotification*)aNote;
@@ -114,7 +115,6 @@
 - (void) postTriggerTimeChanged:(NSNotification*)aNote;
 - (void) fifoBehaviourChanged:(NSNotification*)aNote;
 - (void) analogOffsetChanged:(NSNotification*)aNote;
-- (void) ledOffChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
 - (void) updateWindow;
@@ -138,18 +138,19 @@
 - (void) testStatusArrayChanged:(NSNotification*)aNote;
 - (void) testEnabledArrayChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
-- (void) readoutPagesChanged:(NSNotification*)aNote;
 - (void) selectedRegIndexChanged:(NSNotification*) aNote;
 - (void) writeValueChanged:(NSNotification*) aNote;
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) readWaveformsAction:(id)sender;
+- (IBAction) readEnergyAction:(id)sender;
 - (IBAction) runBoxCarFilterAction:(id)sender;
 - (IBAction) storeDataInRamAction:(id)sender;
 - (IBAction) filterLengthAction:(id)sender;
 - (IBAction) gapLengthAction:(id)sender;
 - (IBAction) histNofMeasAction:(id)sender;
-- (IBAction) histRecTimeAction:(id)sender;
+- (IBAction) histMeasTimeAction:(id)sender;
 - (IBAction) setTimeToMacClock:(id)sender;
 - (IBAction) postTriggerTimeAction:(id)sender;
 - (IBAction) fifoBehaviourAction:(id)sender;
@@ -171,7 +172,6 @@
 - (IBAction) hitRateNoneAction: (id) sender;
 - (IBAction) testEnabledAction:(id)sender;
 - (IBAction) statusAction:(id)sender;
-- (IBAction) readoutPagesAction: (id) sender; // ak 2.7.07
 - (IBAction) enableAllTriggersAction: (id) sender;
 - (IBAction) enableNoTriggersAction: (id) sender;
 - (IBAction) readThresholdsGains:(id)sender;

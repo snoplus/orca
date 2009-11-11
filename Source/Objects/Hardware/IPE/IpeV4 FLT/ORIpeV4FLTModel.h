@@ -72,11 +72,11 @@
 	unsigned long	hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement
     unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
-    unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
+	unsigned long	hitRateId;
+	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
 	float			hitRate[kNumFLTChannels];	//!< Actual value of the trigger rate measurement
 	BOOL			hitRateOverFlow[kNumFLTChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
-	unsigned short  readoutPages;	//!< Number of pages to read in debug mode
 
 	BOOL			firstTime;		//!< Event loop: Flag to identify the first readout loop for initialization purpose
 	
@@ -123,6 +123,8 @@
     int filterLength;
     BOOL storeDataInRam;
     BOOL runBoxCarFilter;
+    BOOL readEnergy;
+    BOOL readWaveforms;
 }
 
 #pragma mark •••Initialization
@@ -133,6 +135,10 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (BOOL) readWaveforms;
+- (void) setReadWaveforms:(BOOL)aReadWaveforms;
+- (BOOL) readEnergy;
+- (void) setReadEnergy:(BOOL)aReadEnergy;
 - (void) setToDefaults;
 - (BOOL) runBoxCarFilter;
 - (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter;
@@ -199,10 +205,6 @@
 
 - (ORTimeRate*) totalRate;
 - (void) setTotalRate:(ORTimeRate*)newTimeRate;
-
-
-- (unsigned short) readoutPages; // ak, 2.7.07
-- (void) setReadoutPages:(unsigned short)aReadoutPage; // ak, 2.7.07
 
 - (NSString*) getRegisterName: (short) anIndex;
 - (unsigned long) getAddressOffset: (short) anIndex;
@@ -329,6 +331,8 @@
 					 n:(int) n;
 @end
 
+extern NSString* ORIpeV4FLTModelReadWaveformsChanged;
+extern NSString* ORIpeV4FLTModelReadEnergyChanged;
 extern NSString* ORIpeV4FLTModelRunBoxCarFilterChanged;
 extern NSString* ORIpeV4FLTModelStoreDataInRamChanged;
 extern NSString* ORIpeV4FLTModelFilterLengthChanged;
@@ -357,7 +361,6 @@ extern NSString* ORIpeV4FLTModelModeChanged;
 extern NSString* ORIpeV4FLTSettingsLock;
 extern NSString* ORIpeV4FLTModelEventMaskChanged;
 
-extern NSString* ORIpeV4FLTModelReadoutPagesChanged;
 extern NSString* ORIpeSLTModelName;
 
 extern NSString* ORIpeV4FLTSelectedRegIndexChanged;

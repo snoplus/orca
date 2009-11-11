@@ -41,3 +41,9 @@
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
+
+@interface ORIpeV4FLTDecoderForHitRate : ORIpeCardDecoder {
+}
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end

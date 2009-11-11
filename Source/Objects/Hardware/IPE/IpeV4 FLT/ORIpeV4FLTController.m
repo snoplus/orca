@@ -183,19 +183,8 @@
                        object : model];
 	
     [notifyCenter addObserver : self
-					 selector : @selector(readoutPagesChanged:)
-						 name : ORIpeV4FLTModelReadoutPagesChanged
-					   object : model];
-	
-	
-    [notifyCenter addObserver : self
                      selector : @selector(interruptMaskChanged:)
                          name : ORIpeV4FLTModelInterruptMaskChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(ledOffChanged:)
-                         name : ORIpeV4FLTModelLedOffChanged
 						object: model];
 	
     [notifyCenter addObserver : self
@@ -263,9 +252,29 @@
                          name : ORIpeV4FLTModelRunBoxCarFilterChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(readEnergyChanged:)
+                         name : ORIpeV4FLTModelReadEnergyChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(readWaveformsChanged:)
+                         name : ORIpeV4FLTModelReadWaveformsChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) readWaveformsChanged:(NSNotification*)aNote
+{
+	[readWaveformsCB setIntValue: [model readWaveforms]];
+}
+
+- (void) readEnergyChanged:(NSNotification*)aNote
+{
+	[readEnergyCB setIntValue: [model readEnergy]];
+}
 
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote
 {
@@ -317,11 +326,6 @@
 	[analogOffsetField setIntValue: [model analogOffset]];
 }
 
-- (void) ledOffChanged:(NSNotification*)aNote
-{
-	[ledOffField setStringValue: ![model ledOff]?@"Led On":@""];
-}
-
 - (void) interruptMaskChanged:(NSNotification*)aNote
 {
 	[interruptMaskField setIntValue: [model interruptMask]];
@@ -369,9 +373,7 @@
     [self testEnabledArrayChanged:nil];
 	[self testStatusArrayChanged:nil];
     [self miscAttributesChanged:nil];
-	[self readoutPagesChanged:nil];	
 	[self interruptMaskChanged:nil];
-	[self ledOffChanged:nil];
 	[self analogOffsetChanged:nil];
 	[self selectedRegIndexChanged:nil];
 	[self writeValueChanged:nil];
@@ -386,6 +388,8 @@
 	[self filterLengthChanged:nil];
 	[self storeDataInRamChanged:nil];
 	[self runBoxCarFilterChanged:nil];
+	[self readEnergyChanged:nil];
+	[self readWaveformsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -427,9 +431,7 @@
     [hitRateLengthPU setEnabled:!lockedOrRunningMaintenance];
     [hitRateAllButton setEnabled:!lockedOrRunningMaintenance];
     [hitRateNoneButton setEnabled:!lockedOrRunningMaintenance];
-	
-	[readoutPagesField setEnabled:!lockedOrRunningMaintenance]; // ak, 2.7.07
-	
+		
 	if(testsAreRunning){
 		[testButton setEnabled: YES];
 		[testButton setTitle: @"Stop"];
@@ -663,12 +665,6 @@
 	}
 }
 
-- (void) readoutPagesChanged:(NSNotification*)aNote
-{
-	[readoutPagesField setIntValue:[model readoutPages]];
-}
-
-
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {
 	//	NSLog(@"This is v4FLT selectedRegIndexChanged\n" );
@@ -715,34 +711,44 @@
 
 #pragma mark •••Actions
 
-- (void) runBoxCarFilterAction:(id)sender
+- (IBAction) readWaveformsAction:(id)sender
+{
+	[model setReadWaveforms:[sender intValue]];	
+}
+
+- (IBAction) readEnergyAction:(id)sender
+{
+	[model setReadEnergy:[sender intValue]];	
+}
+
+- (IBAction) runBoxCarFilterAction:(id)sender
 {
 	[model setRunBoxCarFilter:[sender intValue]];	
 }
 
-- (void) storeDataInRamAction:(id)sender
+- (IBAction) storeDataInRamAction:(id)sender
 {
 	[model setStoreDataInRam:[sender intValue]];	
 }
 
-- (void) filterLengthAction:(id)sender
+- (IBAction) filterLengthAction:(id)sender
 {
 	[model setFilterLength:[sender intValue]];	
 }
 
-- (void) gapLengthAction:(id)sender
+- (IBAction) gapLengthAction:(id)sender
 {
 	[model setGapLength:[sender intValue]];	
 }
 
-- (void) histNofMeasAction:(id)sender
+- (IBAction) histNofMeasAction:(id)sender
 {
 	[model setHistNofMeas:[sender intValue]];	
 }
 
-- (void) histRecTimeAction:(id)sender
+- (IBAction) histMeasTimeAction:(id)sender
 {
-	[model setHistRecTime:[sender intValue]];	
+	[model setHistMeasTime:[sender intValue]];	
 }
 
 - (IBAction) setTimeToMacClock:(id)sender
@@ -1008,14 +1014,6 @@
 		NSLog(@"Exception during FLT read status\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	}
-}
-
-- (IBAction) readoutPagesAction: (id) sender
-{
-	if([sender intValue] != [model readoutPages]){
-		[[self undoManager] setActionName: @"Set Readout Pages"]; 
-		[model setReadoutPages:[sender intValue]];
 	}
 }
 

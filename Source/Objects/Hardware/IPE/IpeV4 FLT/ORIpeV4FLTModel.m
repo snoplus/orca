@@ -29,6 +29,8 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 
+NSString* ORIpeV4FLTModelReadWaveformsChanged		= @"ORIpeV4FLTModelReadWaveformsChanged";
+NSString* ORIpeV4FLTModelReadEnergyChanged			= @"ORIpeV4FLTModelReadEnergyChanged";
 NSString* ORIpeV4FLTModelRunBoxCarFilterChanged		= @"ORIpeV4FLTModelRunBoxCarFilterChanged";
 NSString* ORIpeV4FLTModelStoreDataInRamChanged		= @"ORIpeV4FLTModelStoreDataInRamChanged";
 NSString* ORIpeV4FLTModelFilterLengthChanged		= @"ORIpeV4FLTModelFilterLengthChanged";
@@ -59,7 +61,6 @@ NSString* ORIpeV4FLTModelTestsRunningChanged		= @"ORIpeV4FLTModelTestsRunningCha
 NSString* ORIpeV4FLTModelTestEnabledArrayChanged	= @"ORIpeV4FLTModelTestEnabledChanged";
 NSString* ORIpeV4FLTModelTestStatusArrayChanged		= @"ORIpeV4FLTModelTestStatusChanged";
 NSString* ORIpeV4FLTModelEventMaskChanged			= @"ORIpeV4FLTModelEventMaskChanged";
-NSString* ORIpeV4FLTModelReadoutPagesChanged		= @"ORIpeV4FLTModelReadoutPagesChanged"; // ak, 2.7.07
 
 NSString* ORIpeV4FLTSelectedRegIndexChanged			= @"ORIpeV4FLTSelectedRegIndexChanged";
 NSString* ORIpeV4FLTWriteValueChanged				= @"ORIpeV4FLTWriteValueChanged";
@@ -197,6 +198,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark •••Accessors
+
+- (BOOL) readWaveforms { return readWaveforms; }
+- (void) setReadWaveforms:(BOOL)aReadWaveforms
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setReadWaveforms:readWaveforms];
+    readWaveforms = aReadWaveforms;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelReadWaveformsChanged object:self];
+}
+
+- (BOOL) readEnergy { return readEnergy; }
+- (void) setReadEnergy:(BOOL)aReadEnergy
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setReadEnergy:readEnergy];
+    readEnergy = aReadEnergy;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelReadEnergyChanged object:self];
+}
 
 - (BOOL) runBoxCarFilter { return runBoxCarFilter; }
 - (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter
@@ -490,18 +507,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTWriteValueChanged object:self];
 }
 
-- (unsigned short) readoutPages { return readoutPages; }
-- (void) setReadoutPages:(unsigned short)aReadoutPage
-{
-    // At maximum there are 64 pages
-	if(aReadoutPage<1)aReadoutPage = 1;
-	else if(aReadoutPage>64)aReadoutPage = 64;
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setReadoutPages:readoutPages];
-    readoutPages = aReadoutPage;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelReadoutPagesChanged object:self];
-}
-
 - (NSString*) getRegisterName: (short) anIndex
 {
     return regV4[anIndex].regName;
@@ -587,10 +592,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self writeThreshold:i value:[self threshold:i]];
 		[self writeGain:i value:[self gain:i]]; 
 	}
-    [self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
-    usleep(180);//TODO: better check the busy flag -tb-
-    //TODO: this should be done by the SLT in cause of the 180 usec delay -tb-
-}
+ }
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
 {
@@ -665,6 +667,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeReg: kFLTV4HrControlReg value:hitRateLength];
 	[self writeReg: kFLTV4PostTrigger  value:postTriggerTime];
 	[self loadThresholdsAndGains];
+	[self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
 	[self writeTriggerControl];			//set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
 	[self enableStatistics];			//enable hardware ADC statistics, ak 7.1.07
@@ -880,34 +883,54 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		float newTotal = 0;
 		int chan;
         int hitRateLengthSec = 1<<hitRateLength;
+		
+		struct timeval t;
+		struct timezone tz;
+		gettimeofday(&t,&tz);
+		
+		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+		int dataIndex = 0;
+		unsigned long data[5 + kNumFLTChannels];
+		
 		for(chan=0;chan<kNumFLTChannels;chan++){
-			
-			aValue = [self readReg:kFLTV4HitRateReg channel:chan];
-			overflow = (aValue >> 31) & 0x1;
-			aValue = aValue & 0xffff;
-			
-			if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
-				
-                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
-                //TODO: ask Denis -tb-
-                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
-                //TODO: ask Denis -tb-
-                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
-                //TODO: ask Denis -tb-
-                //TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
-                //TODO: ask Denis -tb-
-				//if (hitRateLengthSec!=0)	hitRate[chan] = aValue/ (float) hitRateLengthSec; 
-				if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
-				else					    hitRate[chan] = 0;
-				
-				if(hitRateOverFlow[chan])hitRate[chan] = 0;
-				hitRateOverFlow[chan] = overflow;
-				
-				oneChanged = YES;
+			if(hitRateEnabledMask & (1<<chan)){
+				aValue = [self readReg:kFLTV4HitRateReg channel:chan];
+				if(aValue){
+					overflow = (aValue >> 31) & 0x1;
+					aValue = aValue & 0xffff;
+					
+					if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
+						
+						//TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
+						//TODO: ask Denis -tb-
+						//if (hitRateLengthSec!=0)	hitRate[chan] = aValue/ (float) hitRateLengthSec; 
+						if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
+						else					    hitRate[chan] = 0;
+						
+						if(hitRateOverFlow[chan])hitRate[chan] = 0;
+						hitRateOverFlow[chan] = overflow;
+						
+						oneChanged = YES;
+					}
+					if(!hitRateOverFlow[chan]){
+						newTotal += hitRate[chan];
+					}
+					
+					data[dataIndex + 5] = (chan<<20) | ((overflow&0x1)<<16) | aValue;
+					dataIndex++;
+				}
 			}
-			if(!hitRateOverFlow[chan]){
-				newTotal += hitRate[chan];
-			}
+		}
+		
+		if(dataIndex>0){
+			data[0] = hitRateId | (dataIndex + 5); 
+			data[1] = location;
+			data[2] = t.tv_sec;	
+			data[3] = hitRateLengthSec;	
+			data[4] = newTotal;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5)]];
+
 		}
 		
 		[self setHitRateTotal:newTotal];
@@ -954,6 +977,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setReadEnergy:		[decoder decodeBoolForKey:@"readEnergy"]];
+    [self setReadWaveforms:		[decoder decodeBoolForKey:@"readWaveforms"]];
     [self setRunBoxCarFilter:	[decoder decodeBoolForKey:@"runBoxCarFilter"]];
     [self setStoreDataInRam:	[decoder decodeBoolForKey:@"storeDataInRam"]];
     [self setFilterLength:		[decoder decodeIntForKey:@"filterLength"]];
@@ -973,7 +998,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self setTotalRate:			[decoder decodeObjectForKey:@"totalRate"]];
 	[self setTestEnabledArray:	[decoder decodeObjectForKey:@"testsEnabledArray"]];
 	[self setTestStatusArray:	[decoder decodeObjectForKey:@"testsStatusArray"]];
-    [self setReadoutPages:		[decoder decodeIntForKey:@"readoutPages"]];
     [self setWriteValue:		[decoder decodeIntForKey:@"writeValue"]];
     [self setSelectedRegIndex:  [decoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannelValue:  [decoder decodeIntForKey:@"selectedChannelValue"]];
@@ -1008,6 +1032,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeBool:readWaveforms		forKey:@"readWaveforms"];
+    [encoder encodeBool:readEnergy			forKey:@"readEnergy"];
     [encoder encodeBool:runBoxCarFilter		forKey:@"runBoxCarFilter"];
     [encoder encodeBool:storeDataInRam		forKey:@"storeDataInRam"];
     [encoder encodeInt:filterLength			forKey:@"filterLength"];
@@ -1028,7 +1054,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [encoder encodeObject:totalRate			forKey:@"totalRate"];
     [encoder encodeObject:testEnabledArray	forKey:@"testEnabledArray"];
     [encoder encodeObject:testStatusArray	forKey:@"testStatusArray"];
-    [encoder encodeInt:readoutPages  		forKey:@"readoutPages"];	
     [encoder encodeInt:writeValue           forKey:@"writeValue"];	
     [encoder encodeInt:selectedRegIndex  	forKey:@"selectedRegIndex"];	
     [encoder encodeInt:selectedChannelValue	forKey:@"selectedChannelValue"];	
@@ -1036,9 +1061,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark Data Taking
 - (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (void) setDataId: (unsigned long) aDataId
 {
-    dataId = DataId;
+    dataId = aDataId;
 }
 
 - (unsigned long) waveFormId { return waveFormId; }
@@ -1047,15 +1072,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     waveFormId = aWaveFormId;
 }
 
+- (unsigned long) hitRateId { return hitRateId; }
+- (void) setHitRateId: (unsigned long) aDataId
+{
+    hitRateId = aDataId;
+}
 - (void) setDataIds:(id)assigner
 {
     dataId      = [assigner assignDataIds:kLongForm];
+    hitRateId   = [assigner assignDataIds:kLongForm];
     waveFormId  = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
+    [self setHitRateId:[anotherCard hitRateId]];
     [self setWaveFormId:[anotherCard waveFormId]];
 }
 
@@ -1080,7 +1112,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   nil];
 	
     [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTWaveForm"];
-		
+
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORIpeV4FLTDecoderForHitRate",			@"decoder",
+				   [NSNumber numberWithLong:hitRateId],		@"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTHitRate"];
+	
     return dataDictionary;
 }
 
@@ -1101,7 +1142,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
  */ //-tb- 2009-11
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    
+    //TO DO....other things need to be added here.....
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds			forKey:@"thresholds"];
     [objDictionary setObject:gains				forKey:@"gains"];
@@ -1118,7 +1159,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
-
 	firstTime = YES;
 	
     [self clearExceptionCount];
@@ -1151,17 +1191,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
 	}
 	
-	
-	// TODO: For the auger FPGA set readoutPage always to 1
-	// ak, 5.10.2007
-	readoutPages = 1;
-	
+		
 	//cache some addresses for speed in the dataTaking loop.
 	unsigned long theSlotPart = [self slot]<<24;
 	statusAddress			  = theSlotPart;
 	//memoryAddress			  = theSlotPart | (ipeV4Reg[kFLTAdcMemory].space << kIpeFlt_AddressSpace); //TODO: V4 handling ... -tb-
 	sltCard					  = [[self crate] adapter];
-	locationWord			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+	locationWord			  = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 	pageSize                  = [sltCard pageSize];  //us
 	[self writeRunControl:YES];
 }
@@ -1189,7 +1225,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			if(diff>1){
 				unsigned long f1 = [self readReg: kFLTV4EventFifo1Reg];
 				unsigned long f2 = [self readReg: kFLTV4EventFifo2Reg];
-				unsigned long channelMap = (f1>>10)&0x3ffff;
+				unsigned long channelMap = (f1>>8)&0x3ffff;
 				if(channelMap!=0){
 					unsigned long evsec = ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
 					unsigned long evsubsec = (f2 >> 2) & 0x1ffffff; // 25 bit
@@ -1218,78 +1254,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		}
 		
 	}
-#if 0
-    @try {	
-		
-		//retrieve the parameters
-		int fltPageStart = [[userInfo objectForKey:@"page"] intValue];
-		int lStart		 = [[userInfo objectForKey:@"lStart"] intValue];
-		unsigned long pixelList = [[userInfo objectForKey:@"pixelList"] intValue]; // ak, 5.10.2007
-		unsigned long fltSize = pageSize * 5; // Size in long words
-		
-		//int eventCounter = [[userInfo objectForKey:@"eventCounter"] intValue];
-		[self eventMask:pixelList];	
-		
-		//NSLog(@"Pixellist = %08x\n", pixelList);	
-		
-		int aChan;
-		for(aChan=0;aChan<kNumFLTChannels;aChan++){	
-		    if (( (pixelList >> aChan) & 0x1 == 0x1)) {	
-			    //NSLog(@"Reading channel (%d,%d)\n", [self slot], aChan);
-				
-				locationWord &= 0xffff0000;
-				locationWord |= (aChan&0xff)<<8;
-				
-				unsigned long totalLength = (2 + readoutPages * fltSize);	// longs
-				//unsigned long totalLength = (2 + 500);	// longs
-				NSMutableData* theWaveFormData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
-				unsigned long header = waveFormId | totalLength;
-				
-				[theWaveFormData appendBytes:&header length:4];				           //ORCA header word∂
-				[theWaveFormData appendBytes:&locationWord length:4];		           //which crate, which card info
-				
-				[theWaveFormData setLength:totalLength*sizeof(long)]; //we're going to dump directly into the NSData object so
-				//we have to set the total size first. (Note: different than 'Capacity')
-				
-				
-				short* waveFormPtr = ((short*)[theWaveFormData bytes]) + (4*sizeof(short)); //point to start of waveform
-				unsigned long* wPtr = (unsigned long*)waveFormPtr;
-				
-				int i;
-				int j;
-				long addr =  memoryAddress | (aChan << kIpeFlt_ChannelAddress) | (fltPageStart<<10) | lStart; // ak, 5.10.07
-				for (j=0;j<readoutPages;j++){
-					
-					// Use block read mode.
-					// With every 32bit (long word) two 12bit ADC values are transmitted
-					// documentation says 1000 data words followed by 24 words not used
-					[slt read:addr data:wPtr size:fltSize*sizeof(long)];	
-					
-					// Remove the flags
-					// TODO: Add a control to enable or disable flags in the data
-					//       Better: Improve the display, define a variable number of
-					//               flags that can be defined and stored with the Orca settings.
-					for (i=0;i<2*fltSize;i++)
-						waveFormPtr[i] = waveFormPtr[i] & 0x0fff;					
-					
-					wPtr += fltSize;				
-					addr = (addr + 1024) % 0x10000;
-				}
-				
-				[aDataPacket addData:theWaveFormData]; //ship the waveform
-				
-			}
-		} // end of loop over all channel
-		
-	}
-	@catch(NSException* localException) {
-		
-		NSLogError(@"",@"Ipe FLT Card Error",[NSString stringWithFormat:@"Card%d",[self stationNumber]],@"Data Readout",nil);
-		[self incExceptionCount];
-		[localException raise];
-		
-	}
-#endif
+
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1313,10 +1278,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].hw_type_id	= kFLTv4;					//unique identifier for readout hw
 	configStruct->card_info[index].hw_mask[0] 	= dataId;					//record id for energies
 	configStruct->card_info[index].hw_mask[1] 	= waveFormId;				//record id for the waveforms
-	configStruct->card_info[index].slot			= [self stationNumber]-1;	//the PMC readout uses col 0 thru n
+	configStruct->card_info[index].slot			= [self stationNumber];		//the PMC readout uses col 0 thru n
 	configStruct->card_info[index].crate		= [self crateNumber];
 
 	configStruct->card_info[index].deviceSpecificData[0] = postTriggerTime;	//needed to align the waveforms
+	unsigned long eventTypeMask = 0;
+	
+	if(readEnergy)eventTypeMask |= kReadEnergy;
+	if(readWaveforms)eventTypeMask |= kReadWaveForms;
+	
+	configStruct->card_info[index].deviceSpecificData[1] = eventTypeMask;	
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

@@ -23,4 +23,8 @@
 #define kSLTv4    1
 #define kFLTv4    2
 
+
+#define kReadEnergy		0x1 << 0
+#define kReadWaveForms	0x1 << 1
+
 #endif

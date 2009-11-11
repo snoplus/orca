@@ -194,8 +194,86 @@ followed by waveform data (n x 1024 16-bit words)
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan]; 
 }
 
+@end
+
+@implementation ORIpeV4FLTDecoderForHitRate
+
+//-------------------------------------------------------------
+/** Data format for hit rate mode:
+ *
+ <pre>
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^-----------------------data id
+                  ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^--------------------------------spare
+         ^ ^^^---------------------------crate
+              ^ ^^^^---------------------card
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitRate length
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx total hitRate
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+      ^^^^ ^^^^-------------------------- channel (0..22)
+			       ^--------------------- overflow  
+				     ^^^^ ^^^^ ^^^^ ^^^^- hitrate
+ ...more 
+ </pre>
+ *
+ */
+//-------------------------------------------------------------
 
 
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
+	++ptr;										 
+	//crate and card from second word
+	unsigned char crate		= (*ptr>>21) & 0xf;
+	unsigned char card		= (*ptr>>16) & 0x1f;
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* stationKey	= [self getStationKey: card];	
+	++ptr;	//point to the sec
+	unsigned long seconds= *ptr;
+	++ptr;	//point to hit rate length
+	++ptr;	//point to total hitrate
+	unsigned long hitRateTotal = *ptr;
+	++ptr;	//point to total hitrate
+	int i;
+	int n = length - 5;
+	for(i=0;i<n;i++){
+		NSString* channelKey	= [self getChannelKey: (*ptr>>20) & 0xff];	
+		unsigned long hitRate = *ptr & 0xffff;
+		[aDataSet histogram:hitRate
+					numBins:65536 
+					 sender:self  
+				   withKeys: @"FLT",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
+		++ptr;
+	}
+	
+	[aDataSet loadTimeSeries: hitRateTotal
+                      atTime:seconds
+					  sender:self  
+					withKeys: @"FLT",@"HitrateTimeSeries",crateKey,stationKey,nil];
+	
+	
+	
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"Katrin FLT Hit Rate Record\n\n";
+	++ptr;		//skip the first word (dataID and length)
+    
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
+	
+    return [NSString stringWithFormat:@"%@%@%@",title,crate,card];
+	
+	return @"to be done";
+}
 @end
 
 

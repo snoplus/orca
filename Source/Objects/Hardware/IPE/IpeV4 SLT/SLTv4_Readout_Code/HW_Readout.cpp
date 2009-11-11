@@ -70,16 +70,13 @@ extern int32_t* data;
 //TUVMEDevice* vmeAM39Handle = NULL;
 //TUVMEDevice* vmeAM9Handle = NULL;
 
-
-
-
 void processHWCommand(SBC_Packet* aPacket)
 {
     /*look at the first word to get the destination*/
-    int32_t destination = aPacket->cmdHeader.destination;
-
-    switch(destination){
-//        default:              processUnknownCommand(aPacket); break;
+    int32_t aCmdID = aPacket->cmdHeader.cmdID;
+	
+    switch(aCmdID){
+			//        default:              processUnknownCommand(aPacket); break;
     }
 }
 
@@ -108,39 +105,40 @@ void stopHWRun (SBC_crate_config* config)
 void FindHardware(void)
 {
 	//open device driver(s), get device driver handles
-		const char* name = "FE.ini";
-        #if USE_PBUS
-        pbusInit((char*)name);
-        #else
-        srack = new hw4::SubrackKatrin((char*)name,0);
-        srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
-
-        #endif
-        // testing the C++ link to fdhwlib -tb-
-        if(0){
-            printf("Try to create a BaseRegister object -tb-\n");
-            fflush(stdout);
-            hw4::BaseRegister *reg;
-            reg = new hw4::BaseRegister("dummy",3,7,1,1);
-            printf("  ->register name is %s, addr 0x%08lx\n", reg->getName(),reg->getAddr());
-        }
+	const char* name = "FE.ini";
+#if USE_PBUS
+	pbusInit((char*)name);
+#else
+	srack = new hw4::SubrackKatrin((char*)name,0);
+	srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
+	
+#endif
+	// testing the C++ link to fdhwlib -tb-
+	if(0){
+		printf("Try to create a BaseRegister object -tb-\n");
+		fflush(stdout);
+		hw4::BaseRegister *reg;
+		reg = new hw4::BaseRegister("dummy",3,7,1,1);
+		printf("  ->register name is %s, addr 0x%08lx\n", reg->getName(),reg->getAddr());
+		fflush(stdout);
+	}
 }
 
 void ReleaseHardware(void)
 {
 	//release / close device driver(s)
-    #if USE_PBUS
+#if USE_PBUS
     pbusFree();
-    #else
+#else
     delete srack;
-    #endif
+#endif
 }
 
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 {
     SBC_IPEv4WriteBlockStruct* p = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_IPEv4WriteBlockStruct)/sizeof(int32_t));
-
+	
     uint32_t startAddress   = p->address;
     uint32_t numItems       = p->numItems;
     
@@ -152,14 +150,14 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 	int32_t perr = 0;
     if (numItems == 1)	perr = pbusWrite(startAddress, *lptr);
 	else				perr = pbusWriteBlock(startAddress, (unsigned long *) lptr, numItems);
-	    
+	
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
     /* non-0 means an error*/
     SBC_IPEv4WriteBlockStruct* returnDataPtr = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = 0;
-
+	
 	//assuming that the device driver returns the number of bytes read
 	if(perr == 0){
         returnDataPtr->errorCode = 0;
@@ -168,10 +166,10 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
         aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_IPEv4WriteBlockStruct);
         returnDataPtr->errorCode = perr;        
     }
-
+	
     lptr = (int32_t*)returnDataPtr;
     if(needToSwap)SwapLongBlock(lptr,numItems);
-
+	
 	//send back to ORCA
     if(reply)writeBuffer(aPacket);    
 	
@@ -185,19 +183,19 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     uint32_t startAddress   = p->address;
     int32_t numItems        = p->numItems;
 	//TODO: -tb- debug printf("starting read: %08x %d\n",startAddress,numItems);
-
+	
     if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSize) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
         p->errorCode = -1;
         if(reply)writeBuffer(aPacket);
         return;
     }
- 
+	
     /*OK, got address and # to read, set up the response and go get the data*/
     aPacket->cmdHeader.destination = kSBC_Process;
     aPacket->cmdHeader.cmdID       = kSBC_ReadBlock;
     aPacket->cmdHeader.numberBytesinPayload    = sizeof(SBC_IPEv4ReadBlockStruct) + numItems*sizeof(uint32_t);
-
+	
     SBC_IPEv4ReadBlockStruct* returnDataPtr = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     char* returnPayload = (char*)(returnDataPtr+1);
     unsigned long *lPtr = (unsigned long *) returnPayload;
@@ -219,7 +217,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
         returnDataPtr->numItems  = 0;
         returnDataPtr->errorCode = perr;        
     }
-
+	
     if(needToSwap) SwapLongBlock(returnDataPtr,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
     if(reply)writeBuffer(aPacket);
 }
@@ -249,56 +247,40 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 #if 0
-    //"counter" for debugging and simulation mode
-        static int currentSec=0;
-        static int currentUSec=0;
-        static int lastSec=0;
-        static int lastUSec=0;
-        //static long int counter=0;
-        static long int secCounter=0;
-        
-        struct timeval t;//    struct timezone tz; is obsolete ... -tb-
-        //timing
-        gettimeofday(&t,NULL);
-        currentSec = t.tv_sec;  
-        currentUSec = t.tv_usec;  
-        double diffTime = (double)(currentSec  - lastSec) +
-		((double)(currentUSec - lastUSec)) * 0.000001;
-        
-        if(diffTime >1.0){
-            secCounter++;
-            printf("PrPMC sec %ld: 1 sec is over, ship data ...\n",secCounter);
-            fflush(stdout);
-            //remember for next call
-            lastSec      = currentSec; 
-            lastUSec     = currentUSec; 
-        }else{
-            // skip shipping data record
-            return config->card_info[index].next_Card_Index;
-        }
-        //read hitrates
-        {
-            int col,row;
-            for(col=0; col<20;col++){
-                if(srack->theFlt[col]->isPresent()){
-                    fprintf(stdout,"FLT %i:",col);
-                    for(row=0; row<24;row++){
-                        int hitrate = srack->theFlt[col]->hitrate->read(row);
-                        if(row<5) fprintf(stdout," %i(0x%x),",hitrate,hitrate);
-                    }
-                    fprintf(stdout,"\n");
-                    fflush(stdout);
-
-                }
-            }
-        }
+    //"counter" for debugging
+	static int currentSec=0;
+	static int currentUSec=0;
+	static int lastSec=0;
+	static int lastUSec=0;
+	//static long int counter=0;
+	static long int secCounter=0;
+	
+	struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+	//timing
+	gettimeofday(&t,NULL);
+	currentSec = t.tv_sec;  
+	currentUSec = t.tv_usec;  
+	double diffTime = (double)(currentSec  - lastSec) +
+	((double)(currentUSec - lastUSec)) * 0.000001;
+	
+	if(diffTime >1.0){
+		secCounter++;
+		printf("PrPMC sec %ld: 1 sec is overa ...\n",secCounter);
+		fflush(stdout);
+		//remember for next call
+		lastSec      = currentSec; 
+		lastUSec     = currentUSec; 
+	}else{
+		// skip shipping data record
+		return config->card_info[index].next_Card_Index;
+	}
 #endif
-		short leaf_index;
-		//read out the children flts that are in the readout list
-		leaf_index = config->card_info[index].next_Trigger_Index[0];
-		while(leaf_index >= 0) {
-			leaf_index = readHW(config,leaf_index,lamData);
-		}
+	short leaf_index;
+	//read out the children flts that are in the readout list
+	leaf_index = config->card_info[index].next_Trigger_Index[0];
+	while(leaf_index >= 0) {
+		leaf_index = readHW(config,leaf_index,lamData);
+	}
     
 	
 #if 0
@@ -319,118 +301,89 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 
 int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
-    static uint32_t waveformBuffer32[64*1024];
-    static uint32_t shipWaveformBuffer32[64*1024];
-    static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
-    static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
     
     uint32_t dataId     = config->card_info[index].hw_mask[0];
     uint32_t waveformId = config->card_info[index].hw_mask[1];
-    uint32_t col		= config->card_info[index].slot;
+    uint32_t col		= config->card_info[index].slot - 1; //the mac slots go from 1 to n
     uint32_t crate		= config->card_info[index].crate;
-	uint32_t location   = ((crate & 0x01e)<<21) | ((col & 0x0000001f)<<16);
-    
-	uint32_t postTriggerTime = config->card_info[index].deviceSpecificData[0];
-    
-    int i,waveformLength,waveformLength32;
-
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
+	
+	//not used for now..
+	//uint32_t postTriggerTime = config->card_info[index].deviceSpecificData[0];
+	uint32_t eventType = config->card_info[index].deviceSpecificData[1];
+	
+	
 	if(srack->theFlt[col]->isPresent()){
 		
 		uint32_t status		 = srack->theFlt[col]->status->read();
 		uint32_t  fifoStatus = (status >> 24) & 0xf;
 		
 		if(fifoStatus != kFifoEmpty){
-			//should be something in the fifo, but check the read/write pointers anyway.
-			uint32_t fstatus = srack->theFlt[col]->eventFIFOStatus->read();
-			uint32_t writeptr = fstatus & 0x3ff;
-			uint32_t readptr = (fstatus >>16) & 0x3ff;
-			
-			uint32_t diff = (writeptr-readptr+1024) % 512;
-			if(diff>1){
-				uint32_t f1 = srack->theFlt[col]->eventFIFO1->read();
-				uint32_t chmap = f1 >> 8;
-				uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
-				int eventchan;
-				for(eventchan=0;eventchan<24;eventchan++){
-					if(chmap & (0x1 << eventchan)){
-						fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
-						uint32_t f3			= srack->theFlt[col]->eventFIFO3->read(eventchan);
-						uint32_t f4			= srack->theFlt[col]->eventFIFO4->read(eventchan);
-						uint32_t pagenr		= f3 & 0x3f;
-						uint32_t energy		= f4 ;
-						uint32_t evsec		= ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-						uint32_t evsubsec	= (f2 >> 2) & 0x1ffffff; // 25 bit
-						//printf("  sec %10lu subsec %9lu   ", evsec,evsubsec );
-						//printf("  energy %lu page# %lu  ", energy,pagenr );
-						//printf(" ... \n" );
-						//fflush(stdout);
-						//fflush(stderr);
-						
-                        #if 1
-						//package the energy data record
-						data[dataIndex++] = dataId | 7;	
-						data[dataIndex++] = location | eventchan<<8;
-						data[dataIndex++] = evsec;		//sec
-						data[dataIndex++] = evsubsec;	//subsec
-						data[dataIndex++] = chmap;
-						data[dataIndex++] = f3;			//was listed as the event ID... put in the pagenr for now 
-						data[dataIndex++] = energy;
-                        #endif
-						
-						//package the waveform data record (we need a flag as we can switch off recording waveforms)
-                        waveformLength = 2048; waveformLength32=waveformLength/2; //the waveform length is variable	
-						data[dataIndex++] = waveformId | (waveformLength32 + 2);
-						data[dataIndex++] = location | eventchan<<8;
-						//data[dataIndex++] = evsec;		//sec
-						//data[dataIndex++] = evsubsec;	//subsec
-						//data[dataIndex++] = chmap;
-						//data[dataIndex++] = f3;			//was listed as the event ID... put in the pagenr for now 
-						//data[dataIndex++] = energy;
-
-                        //read waveform
-                        {
-                            uint32_t  adcval, adcval1, adcval2 ;
-                            int adccount, triggerPos, copyindex;
-                            triggerPos = -1;
-                            srack->theSlt->pageSelect->write(0x100 | pagenr);
-                            //printf("ADC FLT %2i chanmask %2i: \n",col,eventchan);
-                            for(adccount=0; adccount<1024;adccount++){
-                                adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
-                                waveformBuffer32[adccount] = adcval;
-                                #if 1 //TODO: WORKAROUND - align according to the trigger flag - in future we will use the timestamp, when Denis has fixed it -tb-
-                                adcval1 = adcval & 0xffff;
-                                adcval2 = (adcval >> 16) & 0xffff;
-                                if(adcval1 & 0x8000) triggerPos = adccount*2;
-                                if(adcval2 & 0x8000) triggerPos = adccount*2+1;
-                                #endif
-                            }
-                            copyindex = triggerPos + postTriggerTime;
-                            for(i=0;i<waveformLength;i++){
-                                copyindex++;
-                                copyindex = copyindex % 2048;
-                                shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
-                            }
-                        }
-                        
-                        
-
-                        //simulation mode
-                        if(0){
-                            for(i=0;i<waveformLength;i++){
-                                shipWaveformBuffer16[i]= (i>100)*i;
-                            }
-                        }
-                        //ship waveform
-                        for(i=0;i<waveformLength32;i++){
-                            data[dataIndex++] = shipWaveformBuffer32[i];
-                        }
-                        
-						//for(row=0; row<24;row++){
-						//    int hitrate = srack->theFlt[col]->hitrate->read(row);
-						//    if(row<5) printf(" %i(0x%x),",hitrate,hitrate);
-						//}
+			//should be something in the fifo, check the read/write pointers and read and package up to 10 events.
+			//TO DO...the number of events could (should) be made variable and checking of the total data size should be done...
+			uint32_t eventN;
+			for(eventN=0;eventN<10;eventN++){
+				uint32_t fstatus = srack->theFlt[col]->eventFIFOStatus->read();
+				uint32_t writeptr = fstatus & 0x3ff;
+				uint32_t readptr = (fstatus >>16) & 0x3ff;
+				
+				uint32_t diff = (writeptr-readptr+1024) % 512;
+				if(diff>1){
+					uint32_t f1 = srack->theFlt[col]->eventFIFO1->read();
+					uint32_t chmap = f1 >> 8;
+					uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
+					int eventchan;
+					for(eventchan=0;eventchan<24;eventchan++){
+						if(chmap & (0x1 << eventchan)){
+							//fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
+							uint32_t f3			= srack->theFlt[col]->eventFIFO3->read(eventchan);
+							uint32_t f4			= srack->theFlt[col]->eventFIFO4->read(eventchan);
+							uint32_t pagenr		= f3 & 0x3f;
+							uint32_t energy		= f4 ;
+							uint32_t evsec		= ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+							uint32_t evsubsec	= (f2 >> 2) & 0x1ffffff; // 25 bit
+							//printf("  sec %10lu subsec %9lu   ", evsec,evsubsec );
+							//printf("  energy %lu page# %lu  ", energy,pagenr );
+							//printf(" ... \n" );
+							//fflush(stdout);
+							//fflush(stderr);
+							
+							if(eventType & kReadEnergy){
+								//package the energy data record
+								data[dataIndex++] = dataId | 7;	
+								data[dataIndex++] = location | eventchan<<8;
+								data[dataIndex++] = evsec;		//sec
+								data[dataIndex++] = evsubsec;	//subsec
+								data[dataIndex++] = chmap;
+								data[dataIndex++] = f3;			//was listed as the event ID... put in the pagenr for now 
+								data[dataIndex++] = energy;
+							}
+							
+							if(eventType & kReadWaveForms){
+								ReadWaveform(waveformId,location, col,eventchan, pagenr);
+							}
+#if (0)
+							//read hitrates
+							{
+								int col,row;
+								for(col=0; col<20;col++){
+									if(srack->theFlt[col]->isPresent()){
+										//fprintf(stdout,"FLT %i:",col);
+										for(row=0; row<24;row++){
+											int hitrate = srack->theFlt[col]->hitrate->read(row);
+											//if(row<5) fprintf(stdout," %i(0x%x),",hitrate,hitrate);
+										}
+										//fprintf(stdout,"\n");
+										//fflush(stdout);
+										
+									}
+								}
+							}
+#endif
+						}
 					}
 				}
+				else break;
 			}
 		}
 	}
@@ -438,4 +391,48 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     return config->card_info[index].next_Card_Index;
 }
 
-
+void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t eventchan, uint32_t pagenr)
+{
+    static uint32_t waveformBuffer32[64*1024];
+    static uint32_t shipWaveformBuffer32[64*1024];
+    static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
+    static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
+	uint32_t i;
+    uint32_t waveformLength,waveformLength32;
+	uint32_t  adcval, adcval1, adcval2 ;
+	uint32_t adccount, copyindex;
+	uint32_t triggerPos = 0;
+	srack->theSlt->pageSelect->write(0x100 | pagenr);
+	//printf("ADC FLT %2i chanmask %2i: \n",col,eventchan);
+	for(adccount=0; adccount<1024;adccount++){
+		adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
+		waveformBuffer32[adccount] = adcval;
+#if 1 //TODO: WORKAROUND - align according to the trigger flag - in future we will use the timestamp, when Denis has fixed it -tb-
+		adcval1 = adcval & 0xffff;
+		adcval2 = (adcval >> 16) & 0xffff;
+		if(adcval1 & 0x8000) triggerPos = adccount*2;
+		if(adcval2 & 0x8000) triggerPos = adccount*2+1;
+#endif
+	}
+	copyindex = (triggerPos + 1024) % 2048; // + postTriggerTime;
+	for(i=0;i<waveformLength;i++){
+		shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
+		copyindex++;
+		copyindex = copyindex % 2048;
+	}
+	
+	//simulation mode
+	if(0){
+		for(i=0;i<waveformLength;i++){
+			shipWaveformBuffer16[i]= (i>100)*i;
+		}
+	}
+	//ship waveform
+	waveformLength = 2048; 
+	waveformLength32=waveformLength/2; //the waveform length is variable	
+	data[dataIndex++] = waveformId | (waveformLength32 + 2);
+	data[dataIndex++] = location | eventchan<<8;
+	for(i=0;i<waveformLength32;i++){
+		data[dataIndex++] = shipWaveformBuffer32[i];
+	}
+}				  
