@@ -369,7 +369,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	hwVersion = aVersion;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelHwVersionChanged object:self];	
 }
-
+- (void) writePageSelect:(unsigned long)aPageNum		{ [self writeReg:kSltV4PageSelectReg value:aPageNum]; }
 - (void) writeSetInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdSetInh]; }
 - (void) writeClrInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdClrInh]; }
 - (void) writeSwTrigger			{ [self writeReg:kSltV4CommandReg value:kCmdSwTr];   }

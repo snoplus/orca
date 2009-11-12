@@ -125,6 +125,7 @@
     BOOL runBoxCarFilter;
     BOOL readEnergy;
     BOOL readWaveforms;
+    int runMode;
 }
 
 #pragma mark •••Initialization
@@ -135,10 +136,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
-- (BOOL) readWaveforms;
-- (void) setReadWaveforms:(BOOL)aReadWaveforms;
-- (BOOL) readEnergy;
-- (void) setReadEnergy:(BOOL)aReadEnergy;
+- (int) runMode;
+- (void) setRunMode:(int)aRunMode;
 - (void) setToDefaults;
 - (BOOL) runBoxCarFilter;
 - (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter;
@@ -227,10 +226,7 @@
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel;
 - (void) writeReg:(int)aReg value:(unsigned long)aValue;
 - (void) writeReg:(int)aReg channel:(int)aChannel value:(unsigned long)aValue;
-- (BOOL) isInStandByMode;
-- (BOOL) isInRunMode;
-- (BOOL) isInHistoMode;
-- (BOOL) isInTestMode;
+
 - (unsigned long)  readSeconds;
 - (void)  writeSeconds:(unsigned long)aValue;
 - (void) setTimeToMacClock;
@@ -245,8 +241,6 @@
 
 - (void) loadThresholdsAndGains;
 - (void) initBoard;
-- (BOOL) isInRunMode;
-- (BOOL) isInTestMode;
 - (void) writeHitRateMask;
 - (void) writeInterruptMask;
 - (unsigned long) hitRateEnabledMask;
@@ -331,8 +325,7 @@
 					 n:(int) n;
 @end
 
-extern NSString* ORIpeV4FLTModelReadWaveformsChanged;
-extern NSString* ORIpeV4FLTModelReadEnergyChanged;
+extern NSString* ORIpeV4FLTModelRunModeChanged;
 extern NSString* ORIpeV4FLTModelRunBoxCarFilterChanged;
 extern NSString* ORIpeV4FLTModelStoreDataInRamChanged;
 extern NSString* ORIpeV4FLTModelFilterLengthChanged;

@@ -29,8 +29,6 @@
 @interface ORIpeV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
-		IBOutlet NSButton*		readWaveformsCB;
-		IBOutlet NSButton*		readEnergyCB;
 		IBOutlet NSButton*		runBoxCarFilterCB;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSTextField*	filterLengthField;
@@ -103,8 +101,6 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
-- (void) readWaveformsChanged:(NSNotification*)aNote;
-- (void) readEnergyChanged:(NSNotification*)aNote;
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote;
 - (void) storeDataInRamChanged:(NSNotification*)aNote;
 - (void) filterLengthChanged:(NSNotification*)aNote;
@@ -143,8 +139,6 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
-- (IBAction) readWaveformsAction:(id)sender;
-- (IBAction) readEnergyAction:(id)sender;
 - (IBAction) runBoxCarFilterAction:(id)sender;
 - (IBAction) storeDataInRamAction:(id)sender;
 - (IBAction) filterLengthAction:(id)sender;

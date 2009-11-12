@@ -397,24 +397,24 @@ void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t
     static uint32_t shipWaveformBuffer32[64*1024];
     static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
     static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-	uint32_t i;
-    uint32_t waveformLength,waveformLength32;
-	uint32_t  adcval, adcval1, adcval2 ;
-	uint32_t adccount, copyindex;
 	uint32_t triggerPos = 0;
+	
 	srack->theSlt->pageSelect->write(0x100 | pagenr);
-	//printf("ADC FLT %2i chanmask %2i: \n",col,eventchan);
+	
+	uint32_t adccount;
 	for(adccount=0; adccount<1024;adccount++){
-		adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
+		uint32_t adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
 		waveformBuffer32[adccount] = adcval;
 #if 1 //TODO: WORKAROUND - align according to the trigger flag - in future we will use the timestamp, when Denis has fixed it -tb-
-		adcval1 = adcval & 0xffff;
-		adcval2 = (adcval >> 16) & 0xffff;
+		uint32_t adcval1 = adcval & 0xffff;
+		uint32_t adcval2 = (adcval >> 16) & 0xffff;
 		if(adcval1 & 0x8000) triggerPos = adccount*2;
 		if(adcval2 & 0x8000) triggerPos = adccount*2+1;
 #endif
 	}
-	copyindex = (triggerPos + 1024) % 2048; // + postTriggerTime;
+	uint32_t copyindex = (triggerPos + 1024) % 2048; // + postTriggerTime;
+	uint32_t waveformLength = 2048; 
+	uint32_t i;
 	for(i=0;i<waveformLength;i++){
 		shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
 		copyindex++;
@@ -428,8 +428,7 @@ void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t
 		}
 	}
 	//ship waveform
-	waveformLength = 2048; 
-	waveformLength32=waveformLength/2; //the waveform length is variable	
+	uint32_t waveformLength32=waveformLength/2; //the waveform length is variable	
 	data[dataIndex++] = waveformId | (waveformLength32 + 2);
 	data[dataIndex++] = location | eventchan<<8;
 	for(i=0;i<waveformLength32;i++){

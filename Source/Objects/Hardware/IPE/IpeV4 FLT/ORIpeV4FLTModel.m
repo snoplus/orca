@@ -29,8 +29,7 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 
-NSString* ORIpeV4FLTModelReadWaveformsChanged		= @"ORIpeV4FLTModelReadWaveformsChanged";
-NSString* ORIpeV4FLTModelReadEnergyChanged			= @"ORIpeV4FLTModelReadEnergyChanged";
+NSString* ORIpeV4FLTModelRunModeChanged				= @"ORIpeV4FLTModelRunModeChanged";
 NSString* ORIpeV4FLTModelRunBoxCarFilterChanged		= @"ORIpeV4FLTModelRunBoxCarFilterChanged";
 NSString* ORIpeV4FLTModelStoreDataInRamChanged		= @"ORIpeV4FLTModelStoreDataInRamChanged";
 NSString* ORIpeV4FLTModelFilterLengthChanged		= @"ORIpeV4FLTModelFilterLengthChanged";
@@ -199,20 +198,41 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
-- (BOOL) readWaveforms { return readWaveforms; }
-- (void) setReadWaveforms:(BOOL)aReadWaveforms
+- (int) runMode { return runMode; }
+- (void) setRunMode:(int)aRunMode
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setReadWaveforms:readWaveforms];
-    readWaveforms = aReadWaveforms;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelReadWaveformsChanged object:self];
-}
-
-- (BOOL) readEnergy { return readEnergy; }
-- (void) setReadEnergy:(BOOL)aReadEnergy
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setReadEnergy:readEnergy];
-    readEnergy = aReadEnergy;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelReadEnergyChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
+    runMode = aRunMode;
+	switch (runMode) {
+			
+		case kIpeFlt_EnergyMode:
+			[self setFltRunMode:kIpeFlt_Run_Mode];
+			readEnergy    = YES;
+			readWaveforms = NO;
+		break;
+			
+		case kIpeFlt_TraceMode:
+			[self setFltRunMode:kIpeFlt_Run_Mode];
+			readEnergy    = NO;
+			readWaveforms = YES;
+		break;
+			
+		case kIpeFlt_EnergyTrace:
+			[self setFltRunMode:kIpeFlt_Run_Mode];
+			readEnergy    = YES;
+			readWaveforms = YES;
+			break;
+			
+		case kIpeFlt_Histogram_Mode:
+			[self setFltRunMode:kIpeFlt_Histo_Mode];
+			readEnergy    = NO;
+			readWaveforms = NO;
+		break;
+			
+		default:
+		break;
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelRunModeChanged object:self];
 }
 
 - (BOOL) runBoxCarFilter { return runBoxCarFilter; }
@@ -440,7 +460,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateEnabledMaskChanged object:self];
 }
-
 
 - (int) fltRunMode { return fltRunMode; }
 - (void) setFltRunMode:(int)aMode
@@ -876,8 +895,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	
 	@try {
-		unsigned long aValue;
-		BOOL overflow;
 		
 		BOOL oneChanged = NO;
 		float newTotal = 0;
@@ -894,9 +911,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		
 		for(chan=0;chan<kNumFLTChannels;chan++){
 			if(hitRateEnabledMask & (1<<chan)){
-				aValue = [self readReg:kFLTV4HitRateReg channel:chan];
+				unsigned long aValue = [self readReg:kFLTV4HitRateReg channel:chan];
 				if(aValue){
-					overflow = (aValue >> 31) & 0x1;
+					BOOL overflow = (aValue >> 31) & 0x1;
 					aValue = aValue & 0xffff;
 					
 					if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
@@ -950,26 +967,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return ORIpeV4FLTModelHitRateChanged;
 }
 
-- (BOOL) isInStandByMode
-{
-	return [self readMode] == kIpeFlt_StandBy_Mode;
-}
-
-- (BOOL) isInRunMode
-{
-	return [self readMode] == kIpeFlt_Run_Mode;
-}
-
-- (BOOL) isInHistoMode
-{
-	return [self readMode] == kIpeFlt_Histo_Mode;
-}
-
-- (BOOL) isInTestMode
-{
-	return [self readMode] == kIpeFlt_Test_Mode;
-}
-
 #pragma mark •••archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -977,8 +974,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     [[self undoManager] disableUndoRegistration];
 	
-    [self setReadEnergy:		[decoder decodeBoolForKey:@"readEnergy"]];
-    [self setReadWaveforms:		[decoder decodeBoolForKey:@"readWaveforms"]];
+	[self setRunMode:			[decoder decodeIntForKey:@"runMode"]];
     [self setRunBoxCarFilter:	[decoder decodeBoolForKey:@"runBoxCarFilter"]];
     [self setStoreDataInRam:	[decoder decodeBoolForKey:@"storeDataInRam"]];
     [self setFilterLength:		[decoder decodeIntForKey:@"filterLength"]];
@@ -1032,8 +1028,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [super encodeWithCoder:encoder];
 	
-    [encoder encodeBool:readWaveforms		forKey:@"readWaveforms"];
-    [encoder encodeBool:readEnergy			forKey:@"readEnergy"];
+    [encoder encodeInt:runMode				forKey:@"runMode"];
     [encoder encodeBool:runBoxCarFilter		forKey:@"runBoxCarFilter"];
     [encoder encodeBool:storeDataInRam		forKey:@"storeDataInRam"];
     [encoder encodeInt:filterLength			forKey:@"filterLength"];
@@ -1212,49 +1207,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {	
 	if(firstTime){
 		firstTime = NO;
-		[self writeControl];
+		NSLogColor([NSColor redColor],@"Readout List Error: FLT %d must be a child of an SLT in the readout list\n",[self stationNumber]);
 	}
-	else {
-		unsigned long status = [self readReg: kFLTV4StatusReg];
-		int fifoStatus = (status>>24) & 0xf;
-		if(fifoStatus != 0x03){
-			unsigned long fstatus = [self readReg: kFLTV4EventFifoStatusReg];
-			unsigned long writeptr = fstatus & 0x3ff;
-			unsigned long readptr = (fstatus >>16) & 0x3ff;
-			unsigned long diff = (writeptr-readptr+1024) % 512;
-			if(diff>1){
-				unsigned long f1 = [self readReg: kFLTV4EventFifo1Reg];
-				unsigned long f2 = [self readReg: kFLTV4EventFifo2Reg];
-				unsigned long channelMap = (f1>>8)&0x3ffff;
-				if(channelMap!=0){
-					unsigned long evsec = ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-					unsigned long evsubsec = (f2 >> 2) & 0x1ffffff; // 25 bit
-					//NSLog(@"0x%0x %d - %d - %d  %d.%d\n",channelMap,writeptr,readptr,diff,evsec,evsubsec);
-					int i;
-					for(i=0;i<kNumFLTChannels;i++){
-						if(channelMap & (1<<i)){
-							unsigned long f3		 = [self readReg: kFLTV4EventFifo3Reg channel:i];
-							unsigned long energy     = ([self readReg: kFLTV4EventFifo4Reg channel:i] & 0xfffff);
-							
-							unsigned long data[7];
-							
-							data[0] = dataId | 7;	
-							data[1] = locationWord | i<<8;
-							data[2] = evsec; //sec
-							data[3] = evsubsec; //subsec
-							data[4] = channelMap;
-							data[5] = f3; //eventID -- not sure this is right. mah
-							data[6] = energy;
-							[aDataPacket addLongsToFrameBuffer:data length:7];
-							
-						}
-					}
-				}
-			}
-		}
-		
-	}
-
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

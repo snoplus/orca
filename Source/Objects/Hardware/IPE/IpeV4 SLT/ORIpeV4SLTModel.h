@@ -274,6 +274,7 @@
 - (unsigned long long) readBoardID;
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 
+- (void)		  writePageSelect:(unsigned long)aPageNum;
 - (void)		  writeInterruptMask;
 - (void)		  readInterruptMask;
 - (void)		  readInterruptRequest;

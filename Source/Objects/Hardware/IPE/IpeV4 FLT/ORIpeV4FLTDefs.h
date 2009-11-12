@@ -61,10 +61,17 @@
 #define kIpeFlt_Periph_Integration_Shift	20
 #define kIpeFlt_Periph_Integration_Mask		0xf
 
+//flt run modes (sent to hw)
 #define kIpeFlt_StandBy_Mode		0
 #define kIpeFlt_Run_Mode			1
 #define kIpeFlt_Histo_Mode			2
 #define kIpeFlt_Test_Mode			3
+
+//run modes set by user in popup
+#define kIpeFlt_EnergyMode		0
+#define kIpeFlt_TraceMode		1
+#define kIpeFlt_EnergyTrace		2
+#define kIpeFlt_Histogram_Mode	3
 
 #define kIpeFlt_Intack				0x40000000
 #define kIpeFlt_READ				0x80000000

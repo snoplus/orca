@@ -251,30 +251,9 @@
                      selector : @selector(runBoxCarFilterChanged:)
                          name : ORIpeV4FLTModelRunBoxCarFilterChanged
 						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(readEnergyChanged:)
-                         name : ORIpeV4FLTModelReadEnergyChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(readWaveformsChanged:)
-                         name : ORIpeV4FLTModelReadWaveformsChanged
-						object: model];
-
 }
 
 #pragma mark •••Interface Management
-
-- (void) readWaveformsChanged:(NSNotification*)aNote
-{
-	[readWaveformsCB setIntValue: [model readWaveforms]];
-}
-
-- (void) readEnergyChanged:(NSNotification*)aNote
-{
-	[readEnergyCB setIntValue: [model readEnergy]];
-}
 
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote
 {
@@ -388,8 +367,6 @@
 	[self filterLengthChanged:nil];
 	[self storeDataInRamChanged:nil];
 	[self runBoxCarFilterChanged:nil];
-	[self readEnergyChanged:nil];
-	[self readWaveformsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -441,13 +418,12 @@
 		[testButton setTitle: @"Test"];
 	}
 	
-	int runMode = [model fltRunMode];
-	[histNofMeasField setEnabled: !locked & (runMode == kIpeFlt_Histo_Mode)];
-	[histMeasTimeField setEnabled: !locked & (runMode == kIpeFlt_Histo_Mode)];
+	int fltRunMode = [model fltRunMode];
+	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFlt_Histo_Mode)];
+	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFlt_Histo_Mode)];
 
  	[self enableRegControls];
 }
-
 
 - (void) enableRegControls
 {
@@ -628,7 +604,7 @@
 
 - (void) modeChanged:(NSNotification*)aNote
 {
-	[modeButton selectItemAtIndex:[model fltRunMode]];
+	[modeButton selectItemAtIndex:[model runMode]];
 	[self updateButtons];
 }
 
@@ -710,17 +686,6 @@
 }
 
 #pragma mark •••Actions
-
-- (IBAction) readWaveformsAction:(id)sender
-{
-	[model setReadWaveforms:[sender intValue]];	
-}
-
-- (IBAction) readEnergyAction:(id)sender
-{
-	[model setReadEnergy:[sender intValue]];	
-}
-
 - (IBAction) runBoxCarFilterAction:(id)sender
 {
 	[model setRunBoxCarFilter:[sender intValue]];	
@@ -937,7 +902,7 @@
 
 - (IBAction) modeAction: (id) sender
 {
-	[model setFltRunMode:[modeButton indexOfSelectedItem]];
+	[model setRunMode:[modeButton indexOfSelectedItem]];
 }
 
 - (IBAction) versionAction: (id) sender
