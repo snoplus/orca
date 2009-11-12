@@ -143,17 +143,17 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-	{@"pStatusB",           0x012000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"pStatusC",           0x052000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"pStatusB",           0x012000>>2,		-1,				kIpeRegReadable},
+	{@"pStatusC",           0x022000>>2,		-1,				kIpeRegReadable},
+	{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable},
+	{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 	{@"Event FIFO1",		0x001800>>2,		-1,				kIpeRegReadable},
 	{@"Event FIFO2",		0x001804>>2,		-1,				kIpeRegReadable},
 	{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 	{@"Event FIFO4",		0x00180C>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 	{@"HistPageN",			0x00200C>>2,		-1,				kIpeRegReadable},
-	{@"HistLastFirst",		0x002040>>2,		-1,				kIpeRegReadable},
+	{@"HistLastFirst",		0x002044>>2,		-1,				kIpeRegReadable},
 };
 
 @interface ORIpeV4FLTModel (private)
@@ -1438,17 +1438,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	NSLog(@"HM: %d\n",  (hControl>>28) & 0x1);
 	NSLog(@"CM: %d\n",  (hControl>>29) & 0x1);
 	NSLog(@"page Changes: 0x%08x\n",  f3 & 0x3F);
-	NSLog(@"A: 0x%08x\n", (pStatusA>>12) & 0xFF);
-	NSLog(@"B: 0x%08x\n", (pStatusB>>12) & 0xFF);
-	NSLog(@"C: 0x%08x\n", (pStatusC>>12) & 0xFF);
+	NSLog(@"A: 0x%08x fid:%d\n", (pStatusA>>12) & 0xFF, pStatusA>>28);
+	NSLog(@"B: 0x%08x fid:%d\n", (pStatusB>>12) & 0xFF, pStatusB>>28);
+	NSLog(@"C: 0x%08x fid:%d\n", (pStatusC>>12) & 0xFF, pStatusC>>28);
 	NSLog(@"Meas Time: 0x%08x\n", [self readReg:kFLTV4HistMeasTimeReg]);
 	NSLog(@"Rec Time : 0x%08x\n", [self readReg:kFLTV4HistRecTimeReg]);
 	NSLog(@"Page Number : 0x%08x\n", [self readReg:kFLTV4HistPageNReg]);
 	
-	unsigned long fistLast = [self readReg:kFLTV4HistLastFirstReg];
-	NSLog(@"First Entry : 0x%08x\n", fistLast & 0xffff);
-	NSLog(@"Last Entry  : 0x%08x\n", (fistLast >>16) & 0xffff);
-
+	int i;
+	for(i=0;i<22;i++){
+		unsigned long firstLast = [self readReg:kFLTV4HistLastFirstReg channel:i];
+		unsigned long first = firstLast & 0xffff;
+		unsigned long last = (firstLast >>16) & 0xffff;
+		NSLog(@"%d: 0x%08x 0x%08x\n",i,first, last);
+	}
 }
 
 - (void) printEventFIFOs

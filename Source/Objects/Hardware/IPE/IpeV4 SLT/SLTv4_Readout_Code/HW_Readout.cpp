@@ -364,7 +364,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 					else break;
 				}
 			}
-			else if(runMode == kIpeFlt_Histo_Mode) {
+			else if(runMode == kIpeFlt_Histo_Mode) {				
 			}
 		}
 	}
