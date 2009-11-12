@@ -29,6 +29,12 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 
+NSString* ORIpeV4FLTModelHistLastEntryChanged = @"ORIpeV4FLTModelHistLastEntryChanged";
+NSString* ORIpeV4FLTModelHistFirstEntryChanged = @"ORIpeV4FLTModelHistFirstEntryChanged";
+NSString* ORIpeV4FLTModelHistClrModeChanged			= @"ORIpeV4FLTModelHistClrModeChanged";
+NSString* ORIpeV4FLTModelHistModeChanged			= @"ORIpeV4FLTModelHistModeChanged";
+NSString* ORIpeV4FLTModelHistEBinChanged			= @"ORIpeV4FLTModelHistEBinChanged";
+NSString* ORIpeV4FLTModelHistEMinChanged			= @"ORIpeV4FLTModelHistEMinChanged";
 NSString* ORIpeV4FLTModelRunModeChanged				= @"ORIpeV4FLTModelRunModeChanged";
 NSString* ORIpeV4FLTModelRunBoxCarFilterChanged		= @"ORIpeV4FLTModelRunBoxCarFilterChanged";
 NSString* ORIpeV4FLTModelStoreDataInRamChanged		= @"ORIpeV4FLTModelStoreDataInRamChanged";
@@ -95,11 +101,11 @@ enum IpeFLTV4Enum{
 	kFLTV4HistMeasTimeReg,
 	kFLTV4HistRecTimeReg,
 	kFLTV4HistNumMeasReg,
+	kFLTV4PostTrigger,
 	kFLTV4ThresholdReg,
 	kFLTV4pStatusA,
 	kFLTV4pStatusB,
 	kFLTV4pStatusC,
-	kFLTV4PostTrigger,
 	kFLTV4AnalogOffset,
 	kFLTV4GainReg,
 	kFLTV4HitRateReg,
@@ -107,6 +113,8 @@ enum IpeFLTV4Enum{
 	kFLTV4EventFifo2Reg,
 	kFLTV4EventFifo3Reg,
 	kFLTV4EventFifo4Reg,
+	kFLTV4HistPageNReg,
+	kFLTV4HistLastFirstReg,
 	kFLTV4NumRegs //must be last
 };
 
@@ -131,12 +139,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"HrControl",          0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"HistMeasTime",       0x00004C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"HistRecTime",        0x000050>>2,		-1,				kIpeRegReadable},
-	{@"HistNumMeas",         0x000054>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HistNumMeas",         0x000054>>2,		-1,				kIpeRegReadable},
+	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"pStatusB",           0x012000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"pStatusC",           0x052000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
@@ -144,6 +152,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"Event FIFO2",		0x001804>>2,		-1,				kIpeRegReadable},
 	{@"Event FIFO3",		0x001808>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
 	{@"Event FIFO4",		0x00180C>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
+	{@"HistPageN",			0x00200C>>2,		-1,				kIpeRegReadable},
+	{@"HistLastFirst",		0x002040>>2,		-1,				kIpeRegReadable},
 };
 
 @interface ORIpeV4FLTModel (private)
@@ -193,7 +203,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return (eventMask & (1L<<chan)) != 0;
 }
 
-- (ORTimeRate*) totalRate { return totalRate; }
+- (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark •••Accessors
@@ -203,17 +213,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
     runMode = aRunMode;
+	
+	readEnergy    = NO;
+	readWaveforms = NO;
+	
 	switch (runMode) {
-			
 		case kIpeFlt_EnergyMode:
 			[self setFltRunMode:kIpeFlt_Run_Mode];
 			readEnergy    = YES;
-			readWaveforms = NO;
 		break;
 			
 		case kIpeFlt_TraceMode:
 			[self setFltRunMode:kIpeFlt_Run_Mode];
-			readEnergy    = NO;
 			readWaveforms = YES;
 		break;
 			
@@ -225,14 +236,82 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			
 		case kIpeFlt_Histogram_Mode:
 			[self setFltRunMode:kIpeFlt_Histo_Mode];
-			readEnergy    = NO;
-			readWaveforms = NO;
+			readWaveforms = YES; //temp....
 		break;
 			
 		default:
 		break;
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelRunModeChanged object:self];
+}
+
+- (unsigned long) histLastEntry { return histLastEntry; }
+- (void) setHistLastEntry:(unsigned long)aHistLastEntry
+{
+    histLastEntry = aHistLastEntry;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistLastEntryChanged object:self];
+}
+
+- (unsigned long) histFirstEntry { return histFirstEntry; }
+- (void) setHistFirstEntry:(unsigned long)aHistFirstEntry
+{
+    histFirstEntry = aHistFirstEntry;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistFirstEntryChanged object:self];
+}
+
+- (int) histClrMode { return histClrMode; }
+- (void) setHistClrMode:(int)aHistClrMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistClrMode:histClrMode];
+    histClrMode = aHistClrMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistClrModeChanged object:self];
+}
+
+- (int) histMode { return histMode; }
+- (void) setHistMode:(int)aHistMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistMode:histMode];
+    histMode = aHistMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistModeChanged object:self];
+}
+
+- (unsigned long) histEBin { return histEBin; }
+- (void) setHistEBin:(unsigned long)aHistEBin
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistEBin:histEBin];
+    histEBin = aHistEBin;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistEBinChanged object:self];
+}
+
+- (unsigned long) histEMin { return histEMin;} 
+- (void) setHistEMin:(unsigned long)aHistEMin
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setHistEMin:histEMin];
+	histEMin = aHistEMin;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistEMinChanged object:self];
+}
+
+- (unsigned long) histNofMeas { return histNofMeas; }
+- (void) setHistNofMeas:(unsigned long)aHistNofMeas
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistNofMeas:histNofMeas];
+    histNofMeas = aHistNofMeas;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistNofMeasChanged object:self];
+}
+
+- (unsigned long) histMeasTime { return histMeasTime; }
+- (void) setHistMeasTime:(unsigned long)aHistMeasTime
+{
+    histMeasTime = aHistMeasTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistMeasTimeChanged object:self];
+}
+
+- (unsigned long) histRecTime { return histRecTime; }
+- (void) setHistRecTime:(unsigned long)aHistRecTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistRecTime:histRecTime];
+    histRecTime = aHistRecTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistRecTimeChanged object:self];
 }
 
 - (BOOL) runBoxCarFilter { return runBoxCarFilter; }
@@ -265,29 +344,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setGapLength:gapLength];
     gapLength = [self restrictIntValue:aGapLength min:0 max:7];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelGapLengthChanged object:self];
-}
-
-- (unsigned long) histNofMeas { return histNofMeas; }
-- (void) setHistNofMeas:(unsigned long)aHistNofMeas
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setHistNofMeas:histNofMeas];
-    histNofMeas = aHistNofMeas;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistNofMeasChanged object:self];
-}
-
-- (unsigned long) histMeasTime { return histMeasTime; }
-- (void) setHistMeasTime:(unsigned long)aHistMeasTime
-{
-    histMeasTime = aHistMeasTime;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistMeasTimeChanged object:self];
-}
-
-- (unsigned long) histRecTime { return histRecTime; }
-- (void) setHistRecTime:(unsigned long)aHistRecTime
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setHistRecTime:histRecTime];
-    histRecTime = aHistRecTime;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistRecTimeChanged object:self];
 }
 
 - (unsigned long) postTriggerTime { return postTriggerTime; }
@@ -611,6 +667,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self writeThreshold:i value:[self threshold:i]];
 		[self writeGain:i value:[self gain:i]]; 
 	}
+	
+	[self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
  }
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
@@ -686,7 +744,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeReg: kFLTV4HrControlReg value:hitRateLength];
 	[self writeReg: kFLTV4PostTrigger  value:postTriggerTime];
 	[self loadThresholdsAndGains];
-	[self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
 	[self writeTriggerControl];			//set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
 	[self enableStatistics];			//enable hardware ADC statistics, ak 7.1.07
@@ -729,7 +786,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeHistogramControl
 {
 	[self writeReg:kFLTV4HistMeasTimeReg value:histMeasTime];
-	[self writeReg:kFLTV4HistNumMeasReg value:histNofMeas];
+	unsigned long aValue = ((histClrMode & 0x1)<<29) | ((histMode & 0x1)<<28) | ((histEBin & 0xf)<<20) | histEMin;
+	[self writeReg:kFLTV4HistgrSettingsReg value:aValue];
 }
 
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel
@@ -974,6 +1032,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setHistClrMode:		[decoder decodeIntForKey:@"histClrMode"]];
+    [self setHistMode:			[decoder decodeIntForKey:@"histMode"]];
+    [self setHistEBin:			[decoder decodeInt32ForKey:@"histEBin"]];
+    [self setHistEMin:			[decoder decodeInt32ForKey:@"histEMin"]];
 	[self setRunMode:			[decoder decodeIntForKey:@"runMode"]];
     [self setRunBoxCarFilter:	[decoder decodeBoolForKey:@"runBoxCarFilter"]];
     [self setStoreDataInRam:	[decoder decodeBoolForKey:@"storeDataInRam"]];
@@ -1028,6 +1090,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:histClrMode			forKey:@"histClrMode"];
+    [encoder encodeInt:histMode				forKey:@"histMode"];
+    [encoder encodeInt32:histEBin			forKey:@"histEBin"];
+    [encoder encodeInt32:histEMin			forKey:@"histEMin"];
     [encoder encodeInt:runMode				forKey:@"runMode"];
     [encoder encodeBool:runBoxCarFilter		forKey:@"runBoxCarFilter"];
     [encoder encodeBool:storeDataInRam		forKey:@"storeDataInRam"];
@@ -1072,11 +1138,19 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     hitRateId = aDataId;
 }
+
+- (unsigned long) histogramId { return histogramId; }
+- (void) setHistogramId: (unsigned long) aDataId
+{
+    histogramId = aDataId;
+}
+
 - (void) setDataIds:(id)assigner
 {
     dataId      = [assigner assignDataIds:kLongForm];
     hitRateId   = [assigner assignDataIds:kLongForm];
     waveFormId  = [assigner assignDataIds:kLongForm];
+    histogramId  = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
@@ -1084,6 +1158,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self setDataId:[anotherCard dataId]];
     [self setHitRateId:[anotherCard hitRateId]];
     [self setWaveFormId:[anotherCard waveFormId]];
+    [self setHistogramId:[anotherCard histogramId]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -1091,8 +1166,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORIpeV4FLTDecoderForEnergy",		@"decoder",
-								 [NSNumber numberWithLong:dataId],   @"dataId",
+								 @"ORIpeV4FLTDecoderForEnergy",			@"decoder",
+								 [NSNumber numberWithLong:dataId],		@"dataId",
 								 [NSNumber numberWithBool:NO],			@"variable",
 								 [NSNumber numberWithLong:7],			@"length",
 								 nil];
@@ -1100,8 +1175,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTEnergy"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORIpeV4FLTDecoderForWaveForm",		@"decoder",
-				   [NSNumber numberWithLong:waveFormId],   @"dataId",
+				   @"ORIpeV4FLTDecoderForWaveForm",			@"decoder",
+				   [NSNumber numberWithLong:waveFormId],	@"dataId",
 				   [NSNumber numberWithBool:YES],			@"variable",
 				   [NSNumber numberWithLong:-1],			@"length",
 				   nil];
@@ -1116,6 +1191,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   nil];
 	
     [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTHitRate"];
+
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORIpeV4FLTDecoderForHistogram",		@"decoder",
+				   [NSNumber numberWithLong:histogramId],	@"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTHistogram"];
 	
     return dataDictionary;
 }
@@ -1232,16 +1316,17 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].hw_type_id	= kFLTv4;					//unique identifier for readout hw
 	configStruct->card_info[index].hw_mask[0] 	= dataId;					//record id for energies
 	configStruct->card_info[index].hw_mask[1] 	= waveFormId;				//record id for the waveforms
+	configStruct->card_info[index].hw_mask[2] 	= histogramId;				//record id for the histograms
 	configStruct->card_info[index].slot			= [self stationNumber];		//the PMC readout uses col 0 thru n
 	configStruct->card_info[index].crate		= [self crateNumber];
 
 	configStruct->card_info[index].deviceSpecificData[0] = postTriggerTime;	//needed to align the waveforms
+
 	unsigned long eventTypeMask = 0;
-	
-	if(readEnergy)eventTypeMask |= kReadEnergy;
-	if(readWaveforms)eventTypeMask |= kReadWaveForms;
-	
+	if(readEnergy)    eventTypeMask |= kReadEnergy;
+	if(readWaveforms) eventTypeMask |= kReadWaveForms;
 	configStruct->card_info[index].deviceSpecificData[1] = eventTypeMask;	
+	configStruct->card_info[index].deviceSpecificData[2] = fltRunMode;	
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -1341,6 +1426,31 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 #pragma mark •••Reporting
+- (void) testReadHisto
+{
+	unsigned long hControl = [self readReg:kFLTV4HistgrSettingsReg];
+	unsigned long pStatusA = [self readReg:kFLTV4pStatusA];
+	unsigned long pStatusB = [self readReg:kFLTV4pStatusB];
+	unsigned long pStatusC = [self readReg:kFLTV4pStatusC];
+	unsigned long f3	   = [self readReg:kFLTV4HistNumMeasReg];
+	NSLog(@"EMin: 0x%08x\n",  hControl & 0x7FFFF);
+	NSLog(@"EBin: 0x%08x\n",  (hControl>>20) & 0xF);
+	NSLog(@"HM: %d\n",  (hControl>>28) & 0x1);
+	NSLog(@"CM: %d\n",  (hControl>>29) & 0x1);
+	NSLog(@"page Changes: 0x%08x\n",  f3 & 0x3F);
+	NSLog(@"A: 0x%08x\n", (pStatusA>>12) & 0xFF);
+	NSLog(@"B: 0x%08x\n", (pStatusB>>12) & 0xFF);
+	NSLog(@"C: 0x%08x\n", (pStatusC>>12) & 0xFF);
+	NSLog(@"Meas Time: 0x%08x\n", [self readReg:kFLTV4HistMeasTimeReg]);
+	NSLog(@"Rec Time : 0x%08x\n", [self readReg:kFLTV4HistRecTimeReg]);
+	NSLog(@"Page Number : 0x%08x\n", [self readReg:kFLTV4HistPageNReg]);
+	
+	unsigned long fistLast = [self readReg:kFLTV4HistLastFirstReg];
+	NSLog(@"First Entry : 0x%08x\n", fistLast & 0xffff);
+	NSLog(@"Last Entry  : 0x%08x\n", (fistLast >>16) & 0xffff);
+
+}
+
 - (void) printEventFIFOs
 {
 	unsigned long status = [self readReg: kFLTV4StatusReg];

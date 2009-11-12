@@ -73,6 +73,7 @@
     unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
 	unsigned long	hitRateId;
+	unsigned long	histogramId;
 	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
 	float			hitRate[kNumFLTChannels];	//!< Actual value of the trigger rate measurement
 	BOOL			hitRateOverFlow[kNumFLTChannels];	//!< Overflow of hardware trigger rate register
@@ -126,6 +127,12 @@
     BOOL readEnergy;
     BOOL readWaveforms;
     int runMode;
+    unsigned long histEMin;
+    unsigned long histEBin;
+    int histMode;
+    int histClrMode;
+    unsigned long histFirstEntry;
+    unsigned long histLastEntry;
 }
 
 #pragma mark •••Initialization
@@ -147,12 +154,6 @@
 - (void) setFilterLength:(int)aFilterLength;
 - (int) gapLength;
 - (void) setGapLength:(int)aGapLength;
-- (unsigned long) histNofMeas;
-- (void) setHistNofMeas:(unsigned long)aHistNofMeas;
-- (unsigned long) histMeasTime;
-- (void) setHistMeasTime:(unsigned long)aHistMeasTime;
-- (unsigned long) histRecTime;
-- (void) setHistRecTime:(unsigned long)aHistRecTime;
 - (unsigned long) postTriggerTime;
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime;
 - (int) fifoBehaviour;
@@ -161,15 +162,38 @@
 - (void) setAnalogOffset:(int)aAnalogOffset;
 - (BOOL) ledOff;
 - (void) setLedOff:(BOOL)aledOff;
-
 - (unsigned long) interruptMask;
 - (void) setInterruptMask:(unsigned long)aInterruptMask;
 - (unsigned short) hitRateLength;
 - (void) setHitRateLength:(unsigned short)aHitRateLength;
+
+- (unsigned long) histNofMeas;
+- (void) setHistNofMeas:(unsigned long)aHistNofMeas;
+- (unsigned long) histMeasTime;
+- (void) setHistMeasTime:(unsigned long)aHistMeasTime;
+- (unsigned long) histRecTime;
+- (void) setHistRecTime:(unsigned long)aHistRecTime;
+- (unsigned long) histLastEntry;
+- (void) setHistLastEntry:(unsigned long)aHistLastEntry;
+- (unsigned long) histFirstEntry;
+- (void) setHistFirstEntry:(unsigned long)aHistFirstEntry;
+- (int) histClrMode;
+- (void) setHistClrMode:(int)aHistClrMode;
+- (int) histMode;
+- (void) setHistMode:(int)aHistMode;
+- (unsigned long) histEBin;
+- (void) setHistEBin:(unsigned long)aHistEBin;
+- (unsigned long) histEMin;
+- (void) setHistEMin:(unsigned long)aHistEMin;
+
 - (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
+- (void) setDataId: (unsigned long)aDataId;
 - (unsigned long) waveFormId;
 - (void) setWaveFormId: (unsigned long) aWaveFormId;
+- (unsigned long) hitRateId;
+- (void) setHitRateId: (unsigned long)aHitRateId;
+- (unsigned long) histogramId;
+- (void) setHistogramId: (unsigned long)aHistogramId;
 
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
@@ -301,6 +325,10 @@
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
+
+
+- (void) testReadHisto;
+
 @end
 
 @interface ORIpeV4FLTModel (tests)
@@ -325,6 +353,12 @@
 					 n:(int) n;
 @end
 
+extern NSString* ORIpeV4FLTModelHistLastEntryChanged;
+extern NSString* ORIpeV4FLTModelHistFirstEntryChanged;
+extern NSString* ORIpeV4FLTModelHistClrModeChanged;
+extern NSString* ORIpeV4FLTModelHistModeChanged;
+extern NSString* ORIpeV4FLTModelHistEBinChanged;
+extern NSString* ORIpeV4FLTModelHistEMinChanged;
 extern NSString* ORIpeV4FLTModelRunModeChanged;
 extern NSString* ORIpeV4FLTModelRunBoxCarFilterChanged;
 extern NSString* ORIpeV4FLTModelStoreDataInRamChanged;

@@ -276,4 +276,65 @@ followed by waveform data (n x 1024 16-bit words)
 }
 @end
 
+@implementation ORIpeV4FLTDecoderForHistogram
 
+//-------------------------------------------------------------
+/** Data format for waveform
+ *
+ <pre>  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^-----------------------data id
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^--------------------------------spare
+ ^ ^^^---------------------------crate
+ ^ ^^^^---------------------card
+ ^^^^ ^^^^-----------channel
+ followed by waveform data (n x 1024 16-bit words)
+ </pre>
+ *
+ */
+//-------------------------------------------------------------
+
+
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+	
+    unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
+	
+	++ptr;											//crate, card,channel from second word
+	unsigned char crate		= (*ptr>>21) & 0xf;
+	unsigned char card		= (*ptr>>16) & 0x1f;
+	unsigned char chan		= (*ptr>>8) & 0xff;
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* stationKey	= [self getStationKey: card];	
+	NSString* channelKey	= [self getChannelKey: chan];
+	
+	// Set up the waveform
+	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
+	
+	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 2*sizeof(long)					// Offset in bytes (2 header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+					  mask:	0x0FFF							// when displayed all values will be masked with this value
+					sender: self 
+				  withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
+	
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+	
+    NSString* title= @"Ipe FLT Waveform Record\n\n";
+	++ptr;		//skip the first word (dataID and length)
+    
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+	
+    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan]; 
+}
+@end

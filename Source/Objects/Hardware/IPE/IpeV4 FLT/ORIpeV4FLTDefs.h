@@ -44,7 +44,7 @@
 #define kIpeFlt_Cntl_InterruptSources_Shift	0
 #define kIpeFlt_Cntl_InterruptSources_Mask	0xff
 
-#define kIpeFlt_Cmd_LoadGains	            0x10
+#define kIpeFlt_Cmd_LoadGains	            0x100
 
 #define kIpeFlt_Periph_CoinTme_Shift		0
 #define kIpeFlt_Periph_CoinTme_Mask			0x1ff
@@ -60,12 +60,6 @@
 
 #define kIpeFlt_Periph_Integration_Shift	20
 #define kIpeFlt_Periph_Integration_Mask		0xf
-
-//flt run modes (sent to hw)
-#define kIpeFlt_StandBy_Mode		0
-#define kIpeFlt_Run_Mode			1
-#define kIpeFlt_Histo_Mode			2
-#define kIpeFlt_Test_Mode			3
 
 //run modes set by user in popup
 #define kIpeFlt_EnergyMode		0

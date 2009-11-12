@@ -29,6 +29,12 @@
 @interface ORIpeV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+		IBOutlet NSTextField*	histLastEntryField;
+		IBOutlet NSTextField*	histFirstEntryField;
+		IBOutlet NSPopUpButton* histClrModePU;
+		IBOutlet NSPopUpButton* histModePU;
+		IBOutlet NSPopUpButton* histEBinPU;
+		IBOutlet NSTextField*	histEMinTextField;
 		IBOutlet NSButton*		runBoxCarFilterCB;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSTextField*	filterLengthField;
@@ -101,6 +107,12 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) histLastEntryChanged:(NSNotification*)aNote;
+- (void) histFirstEntryChanged:(NSNotification*)aNote;
+- (void) histClrModeChanged:(NSNotification*)aNote;
+- (void) histModeChanged:(NSNotification*)aNote;
+- (void) histEBinChanged:(NSNotification*)aNote;
+- (void) histEMinChanged:(NSNotification*)aNote;
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote;
 - (void) storeDataInRamChanged:(NSNotification*)aNote;
 - (void) filterLengthChanged:(NSNotification*)aNote;
@@ -139,6 +151,10 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) histClrModeAction:(id)sender;
+- (IBAction) histModeAction:(id)sender;
+- (IBAction) histEBinAction:(id)sender;
+- (IBAction) histEMinAction:(id)sender;
 - (IBAction) runBoxCarFilterAction:(id)sender;
 - (IBAction) storeDataInRamAction:(id)sender;
 - (IBAction) filterLengthAction:(id)sender;

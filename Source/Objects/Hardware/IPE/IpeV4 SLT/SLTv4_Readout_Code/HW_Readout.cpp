@@ -311,79 +311,60 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 	//not used for now..
 	//uint32_t postTriggerTime = config->card_info[index].deviceSpecificData[0];
 	uint32_t eventType = config->card_info[index].deviceSpecificData[1];
-	
+	uint32_t runMode   = config->card_info[index].deviceSpecificData[2];
 	
 	if(srack->theFlt[col]->isPresent()){
-		
-		uint32_t status		 = srack->theFlt[col]->status->read();
-		uint32_t  fifoStatus = (status >> 24) & 0xf;
-		
-		if(fifoStatus != kFifoEmpty){
-			//should be something in the fifo, check the read/write pointers and read and package up to 10 events.
-			//TO DO...the number of events could (should) be made variable and checking of the total data size should be done...
-			uint32_t eventN;
-			for(eventN=0;eventN<10;eventN++){
-				uint32_t fstatus = srack->theFlt[col]->eventFIFOStatus->read();
-				uint32_t writeptr = fstatus & 0x3ff;
-				uint32_t readptr = (fstatus >>16) & 0x3ff;
-				
-				uint32_t diff = (writeptr-readptr+1024) % 512;
-				if(diff>1){
-					uint32_t f1 = srack->theFlt[col]->eventFIFO1->read();
-					uint32_t chmap = f1 >> 8;
-					uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
-					int eventchan;
-					for(eventchan=0;eventchan<24;eventchan++){
-						if(chmap & (0x1 << eventchan)){
-							//fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
-							uint32_t f3			= srack->theFlt[col]->eventFIFO3->read(eventchan);
-							uint32_t f4			= srack->theFlt[col]->eventFIFO4->read(eventchan);
-							uint32_t pagenr		= f3 & 0x3f;
-							uint32_t energy		= f4 ;
-							uint32_t evsec		= ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
-							uint32_t evsubsec	= (f2 >> 2) & 0x1ffffff; // 25 bit
-							//printf("  sec %10lu subsec %9lu   ", evsec,evsubsec );
-							//printf("  energy %lu page# %lu  ", energy,pagenr );
-							//printf(" ... \n" );
-							//fflush(stdout);
-							//fflush(stderr);
-							
-							if(eventType & kReadEnergy){
-								//package the energy data record
-								data[dataIndex++] = dataId | 7;	
-								data[dataIndex++] = location | eventchan<<8;
-								data[dataIndex++] = evsec;		//sec
-								data[dataIndex++] = evsubsec;	//subsec
-								data[dataIndex++] = chmap;
-								data[dataIndex++] = f3;			//was listed as the event ID... put in the pagenr for now 
-								data[dataIndex++] = energy;
-							}
-							
-							if(eventType & kReadWaveForms){
-								ReadWaveform(waveformId,location, col,eventchan, pagenr);
-							}
-#if (0)
-							//read hitrates
-							{
-								int col,row;
-								for(col=0; col<20;col++){
-									if(srack->theFlt[col]->isPresent()){
-										//fprintf(stdout,"FLT %i:",col);
-										for(row=0; row<24;row++){
-											int hitrate = srack->theFlt[col]->hitrate->read(row);
-											//if(row<5) fprintf(stdout," %i(0x%x),",hitrate,hitrate);
-										}
-										//fprintf(stdout,"\n");
-										//fflush(stdout);
-										
-									}
+		if(runMode == kIpeFlt_Run_Mode){
+			uint32_t status		 = srack->theFlt[col]->status->read();
+			uint32_t  fifoStatus = (status >> 24) & 0xf;
+			
+			if(fifoStatus != kFifoEmpty){
+				//TO DO... the number of events to read could (should) be made variable 
+				//         and checking of the total data size should be done...
+				uint32_t eventN;
+				for(eventN=0;eventN<10;eventN++){
+					
+					//should be something in the fifo, check the read/write pointers and read and package up to 10 events.
+					uint32_t fstatus = srack->theFlt[col]->eventFIFOStatus->read();
+					uint32_t writeptr = fstatus & 0x3ff;
+					uint32_t readptr = (fstatus >>16) & 0x3ff;
+					uint32_t diff = (writeptr-readptr+1024) % 512;
+					
+					if(diff>1){
+						uint32_t f1 = srack->theFlt[col]->eventFIFO1->read();
+						uint32_t chmap = f1 >> 8;
+						uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
+						int eventchan;
+						for(eventchan=0;eventchan<24;eventchan++){
+							if(chmap & (0x1 << eventchan)){
+								//fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
+								uint32_t f3			= srack->theFlt[col]->eventFIFO3->read(eventchan);
+								uint32_t f4			= srack->theFlt[col]->eventFIFO4->read(eventchan);
+								uint32_t pagenr		= f3 & 0x3f;
+								uint32_t energy		= f4 ;
+								uint32_t evsec		= ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+								uint32_t evsubsec	= (f2 >> 2) & 0x1ffffff; // 25 bit
+								
+								if(eventType & kReadEnergy){
+									data[dataIndex++] = dataId | 7;	
+									data[dataIndex++] = location | eventchan<<8;
+									data[dataIndex++] = evsec;		//sec
+									data[dataIndex++] = evsubsec;	//subsec
+									data[dataIndex++] = chmap;
+									data[dataIndex++] = pagenr;		//was listed as the event ID... put in the pagenr for now 
+									data[dataIndex++] = energy;
+								}
+								
+								if(eventType & kReadWaveForms){
+									ReadWaveform(waveformId,location, col,eventchan, pagenr);
 								}
 							}
-#endif
 						}
 					}
+					else break;
 				}
-				else break;
+			}
+			else if(runMode == kIpeFlt_Histo_Mode) {
 			}
 		}
 	}
@@ -434,4 +415,24 @@ void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t
 	for(i=0;i<waveformLength32;i++){
 		data[dataIndex++] = shipWaveformBuffer32[i];
 	}
-}				  
+}	
+
+#if (0)
+//maybe read hit rates in the pmc at some point..... here's how....
+//read hitrates
+{
+	int col,row;
+	for(col=0; col<20;col++){
+		if(srack->theFlt[col]->isPresent()){
+			//fprintf(stdout,"FLT %i:",col);
+			for(row=0; row<24;row++){
+				int hitrate = srack->theFlt[col]->hitrate->read(row);
+				//if(row<5) fprintf(stdout," %i(0x%x),",hitrate,hitrate);
+			}
+			//fprintf(stdout,"\n");
+			//fflush(stdout);
+			
+		}
+	}
+}
+#endif

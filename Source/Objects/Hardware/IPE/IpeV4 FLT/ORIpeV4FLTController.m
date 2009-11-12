@@ -22,6 +22,7 @@
 #import "ORIpeV4FLTController.h"
 #import "ORIpeV4FLTModel.h"
 #import "ORIpeV4FLTDefs.h"
+#import "SLTv4_HW_Definitions.h"
 #import "ORFireWireInterface.h"
 #import "ORPlotter1D.h"
 #import "ORValueBar.h"
@@ -251,9 +252,69 @@
                      selector : @selector(runBoxCarFilterChanged:)
                          name : ORIpeV4FLTModelRunBoxCarFilterChanged
 						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(histEMinChanged:)
+                         name : ORIpeV4FLTModelHistEMinChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(histEBinChanged:)
+                         name : ORIpeV4FLTModelHistEBinChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(histModeChanged:)
+                         name : ORIpeV4FLTModelHistModeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(histClrModeChanged:)
+                         name : ORIpeV4FLTModelHistClrModeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(histFirstEntryChanged:)
+                         name : ORIpeV4FLTModelHistFirstEntryChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(histLastEntryChanged:)
+                         name : ORIpeV4FLTModelHistLastEntryChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) histLastEntryChanged:(NSNotification*)aNote
+{
+	[histLastEntryField setIntValue: [model histLastEntry]];
+}
+
+- (void) histFirstEntryChanged:(NSNotification*)aNote
+{
+	[histFirstEntryField setIntValue: [model histFirstEntry]];
+}
+
+- (void) histClrModeChanged:(NSNotification*)aNote
+{
+	[histClrModePU selectItemAtIndex: [model histClrMode]];
+}
+
+- (void) histModeChanged:(NSNotification*)aNote
+{
+	[histModePU selectItemAtIndex: [model histMode]];
+}
+
+- (void) histEBinChanged:(NSNotification*)aNote
+{
+	[histEBinPU selectItemAtIndex: [model histEBin]];
+}
+
+- (void) histEMinChanged:(NSNotification*)aNote
+{
+	[histEMinTextField setIntValue: [model histEMin]];
+}
 
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote
 {
@@ -367,6 +428,12 @@
 	[self filterLengthChanged:nil];
 	[self storeDataInRamChanged:nil];
 	[self runBoxCarFilterChanged:nil];
+	[self histEMinChanged:nil];
+	[self histEBinChanged:nil];
+	[self histModeChanged:nil];
+	[self histClrModeChanged:nil];
+	[self histFirstEntryChanged:nil];
+	[self histLastEntryChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -665,8 +732,6 @@
 	[self enableRegControls];
 }
 
-
-
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     [[self window] setContentView:blankView];
@@ -686,6 +751,27 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) histClrModeAction:(id)sender
+{
+	[model setHistClrMode:[sender intValue]];	
+}
+
+- (IBAction) histModeAction:(id)sender
+{
+	[model setHistMode:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) histEBinAction:(id)sender
+{
+	[model setHistEBin:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) histEMinAction:(id)sender
+{
+	[model setHistEMin:[sender intValue]];	
+}
+
 - (IBAction) runBoxCarFilterAction:(id)sender
 {
 	[model setRunBoxCarFilter:[sender intValue]];	
@@ -1055,7 +1141,7 @@
 - (IBAction) testButtonAction: (id) sender //temp routine to hook up to any on a temp basis
 {
 	@try {
-		[model printEventFIFOs];
+		[model testReadHisto];
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception running FLT test code\n");

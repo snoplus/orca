@@ -27,4 +27,10 @@
 #define kReadEnergy		0x1 << 0
 #define kReadWaveForms	0x1 << 1
 
+//flt run modes (sent to hw)
+#define kIpeFlt_StandBy_Mode		0
+#define kIpeFlt_Run_Mode			1
+#define kIpeFlt_Histo_Mode			2
+#define kIpeFlt_Test_Mode			3
+
 #endif
