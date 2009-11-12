@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="595"/>
+			<integer value="1187"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -123,7 +123,6 @@
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
-																				<int key="NSState">1</int>
 																				<object class="NSCustomResource" key="NSOnImage" id="71588138">
 																					<string key="NSClassName">NSImage</string>
 																					<string key="NSResourceName">NSMenuCheckmark</string>
@@ -166,7 +165,7 @@
 																					</object>
 																					<object class="NSMenuItem" id="1061152396">
 																						<reference key="NSMenu" ref="901156163"/>
-																						<string key="NSTitle">Histrogram</string>
+																						<string key="NSTitle">Histogram</string>
 																						<string key="NSKeyEquiv"/>
 																						<int key="NSKeyEquivModMask">1048576</int>
 																						<int key="NSMnemonicLoc">2147483647</int>
@@ -12645,7 +12644,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{419, 907}, {141, 71}}</string>
+					<string>{{273, 953}, {141, 71}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
