@@ -28,6 +28,7 @@
 #import "ORValueBar.h"
 #import "ORAxis.h"
 #import "ORTimeRate.h"
+#import "ORTimeRate.h"
 
 @implementation ORIpeV4FLTController
 
@@ -486,8 +487,8 @@
 	}
 	
 	int fltRunMode = [model fltRunMode];
-	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
-	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
+	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
+	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
 
  	[self enableRegControls];
 }

@@ -36,17 +36,17 @@
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
- ^ ^^^---------------------------crate
- ^ ^^^^---------------------card
- ^^^^ ^^^^ ----------channel
+         ^ ^^^---------------------------crate
+              ^ ^^^^---------------------card
+					 ^^^^ ^^^^ ----------channel
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ^^^^ ^^^^------------------------------ channel (0..22)
- ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+             ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
- ^^ ^^^^ ^^^^ eventID (0..1024)
+		^ ^^^^ ^^^^-------------------- number of page in hardware buffer
+                            ^^ ^^^^ ^^^^ eventID (0..1024)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  </pre>
  *
@@ -136,23 +136,31 @@
 
 //-------------------------------------------------------------
 /** Data format for waveform
-  *
-<pre>  
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^^^ ^^^^ ^^-----------------------data id
-                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
-
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^^--------------------------------spare
-        ^ ^^^---------------------------crate
-             ^ ^^^^---------------------card
-			        ^^^^ ^^^^-----------channel
-followed by waveform data (n x 1024 16-bit words)
-</pre>
-  *
-  */
-//-------------------------------------------------------------
-
+ *
+ <pre>  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^-----------------------data id
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^--------------------------------spare
+ ^ ^^^---------------------------crate
+ ^ ^^^^---------------------card
+ ^^^^ ^^^^-----------channel
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+ ^^^^ ^^^^------------------------------ channel (0..22)
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+ ^ ------------------------------------- flag to indicate that the ADC have been swapped
+ ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
+ ^^ ^^^^ ^^^^ eventID (0..1024)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart/reset
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart/reset
+ followed by waveform data (n x 1024 16-bit words)
+*/ 
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
@@ -172,7 +180,7 @@ followed by waveform data (n x 1024 16-bit words)
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
 
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
-					offset: 2*sizeof(long)					// Offset in bytes (2 header words)
+					offset: 9*sizeof(long)					// Offset in bytes (9 header words)
 				    unitSize: sizeof(short)					// unit size in bytes
 					mask:	0x0FFF							// when displayed all values will be masked with this value
 					sender: self 

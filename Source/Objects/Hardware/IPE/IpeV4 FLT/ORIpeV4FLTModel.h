@@ -124,7 +124,6 @@
     int filterLength;
     BOOL storeDataInRam;
     BOOL runBoxCarFilter;
-    BOOL readEnergy;
     BOOL readWaveforms;
     int runMode;
     unsigned long histEMin;

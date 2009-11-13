@@ -63,9 +63,8 @@
 
 //run modes set by user in popup
 #define kIpeFlt_EnergyMode		0
-#define kIpeFlt_TraceMode		1
-#define kIpeFlt_EnergyTrace		2
-#define kIpeFlt_Histogram_Mode	3
+#define kIpeFlt_EnergyTrace		1
+#define kIpeFlt_Histogram_Mode	2
 
 #define kIpeFlt_Intack				0x40000000
 #define kIpeFlt_READ				0x80000000
