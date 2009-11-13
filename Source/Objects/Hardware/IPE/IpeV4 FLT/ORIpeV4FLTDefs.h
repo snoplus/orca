@@ -91,4 +91,13 @@ typedef struct {
 	unsigned long hitrate;
 } ipeFltHitRateDataStruct;
 
-
+typedef struct { // -tb- 2008-02-27
+	long readoutSec;
+	long recordingTimeSec;  //! this holds the refresh time -tb-
+	long firstBin;
+	long lastBin;
+	long histogramLength; //don't use unsigned! - it may become negative, at least temporaryly -tb-
+    long maxHistogramLength;
+    long binSize;
+    long offsetEMin;
+} ipcFltV4HistogramDataStruct;
