@@ -38,30 +38,30 @@
 #define kIpeV4FLTBufferSizeShorts 1024/2
 
 /** Access to the first level trigger board of the IPE-DAQ electronics.
-  * The board contains ADCs for 22 channels and digital logic (FPGA) for 
-  * for implementation experiment specific trigger logic. 
-  * 
-  * @section hwaccess Access to hardware  
-  * There can be only a single adapter connected to the firewire bus. 
-  * In the Ipe implementation this is the Slt board. The Flt has to refer
-  * this interface. example: [[self crate] aapter] is the slt object.
-  *
-  * Every time a run is started the stored configuratiation is written to the
-  * hardware before recording the data.
-  *
-  * The interface to the graphical configuration dialog is implemented in ORIpeV4FLTController.
-  *
-  * The Flt will produce three types of data objects depending on the run mode:
-  *   - events containing timestamp and energy
-  *   - events with an additional adc data trace of up to 6.5ms length
-  *   - threshold and hitrate pairs from the threshold scan.   
-  * 
-  * @section readout Readout
-  * The class implements two types of readout loops: Event by event and a periodic mode.
-  * The eventswise readout is used in run and debug mode. For every event the time stamp
-  * and a hardware id are stored. 
-  *
-  */ 
+ * The board contains ADCs for 22 channels and digital logic (FPGA) for 
+ * for implementation experiment specific trigger logic. 
+ * 
+ * @section hwaccess Access to hardware  
+ * There can be only a single adapter connected to the firewire bus. 
+ * In the Ipe implementation this is the Slt board. The Flt has to refer
+ * this interface. example: [[self crate] aapter] is the slt object.
+ *
+ * Every time a run is started the stored configuratiation is written to the
+ * hardware before recording the data.
+ *
+ * The interface to the graphical configuration dialog is implemented in ORIpeV4FLTController.
+ *
+ * The Flt will produce three types of data objects depending on the run mode:
+ *   - events containing timestamp and energy
+ *   - events with an additional adc data trace of up to 6.5ms length
+ *   - threshold and hitrate pairs from the threshold scan.   
+ * 
+ * @section readout Readout
+ * The class implements two types of readout loops: Event by event and a periodic mode.
+ * The eventswise readout is used in run and debug mode. For every event the time stamp
+ * and a hardware id are stored. 
+ *
+ */ 
 @interface ORIpeV4FLTModel : ORIpeCard <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     // Hardware configuration
@@ -78,7 +78,7 @@
 	float			hitRate[kNumFLTChannels];	//!< Actual value of the trigger rate measurement
 	BOOL			hitRateOverFlow[kNumFLTChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
-
+	
 	BOOL			firstTime;		//!< Event loop: Flag to identify the first readout loop for initialization purpose
 	
 	ORTimeRate*		totalRate;
@@ -98,7 +98,7 @@
     BOOL ledOff;
     unsigned long interruptMask;
 	unsigned long pageSize; //< Size of the readout pages - defined in slt dialog
-
+	
 	//-----------------------------------------
 	//place to cache some values so they don't have to be calculated every time thru the run loop.
 	//not so important in this object because of length of time it takes to readout waveforms,
@@ -297,7 +297,7 @@
 - (NSString*) fifoStatusString:(int)aType;
 
 /** Enable the statistic evaluation of sum and sum square of the 
-  * ADC signals in all channels.  */
+ * ADC signals in all channels.  */
 - (void) enableStatistics; // ak, 7.10.07
 
 /** Get statistics of a single channel */
@@ -347,9 +347,9 @@
 - (void) speedTest;
 - (void) eventTest;
 - (int) compareData:(unsigned short*) data
-                     pattern:(unsigned short*) pattern
-					 shift:(int) shift
-					 n:(int) n;
+			pattern:(unsigned short*) pattern
+			  shift:(int) shift
+				  n:(int) n;
 @end
 
 extern NSString* ORIpeV4FLTModelHistLastEntryChanged;

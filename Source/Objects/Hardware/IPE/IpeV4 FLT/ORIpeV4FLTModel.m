@@ -206,7 +206,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
@@ -218,21 +218,21 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
 	switch (runMode) {
 		case kIpeFlt_EnergyMode:
-			[self setFltRunMode:kIpeFlt_Run_Mode];
-		break;
+			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
+			break;
 			
 		case kIpeFlt_EnergyTrace:
-			[self setFltRunMode:kIpeFlt_Run_Mode];
+			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			readWaveforms = YES;
 			break;
 			
 		case kIpeFlt_Histogram_Mode:
-			[self setFltRunMode:kIpeFlt_Histo_Mode];
+			[self setFltRunMode:kIpeFltV4Katrin_Histo_Mode];
 			readWaveforms = YES; //temp....
-		break;
+			break;
 			
 		default:
-		break;
+			break;
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelRunModeChanged object:self];
 }
@@ -603,7 +603,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self setPostTriggerTime:2];
 }
 
-#pragma mark ¥¥¥HW Access
+#pragma mark â€¢â€¢â€¢HW Access
 - (unsigned long) readBoardIDLow
 {
 	unsigned long value = [self readReg:kFLTV4BoardIDLsbReg];
@@ -661,7 +661,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 	
 	[self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
- }
+}
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
 {
@@ -740,7 +740,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeHitRateMask];			//set hitRage control mask
 	[self enableStatistics];			//enable hardware ADC statistics, ak 7.1.07
 	
-	if(fltRunMode == kIpeFlt_Histo_Mode){
+	if(fltRunMode == kIpeFltV4Katrin_Histo_Mode){
 		[self writeHistogramControl];
 	}
 }
@@ -758,12 +758,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-		((filterLength & 0xf)<<8)		| 
-		((gapLength & 0xf)<<4)			| 
-		((runBoxCarFilter & 0x1)<<2)	|
-		((startSampling & 0x1)<<1)
-		| 0x1;
-
+	((filterLength & 0xf)<<8)		| 
+	((gapLength & 0xf)<<4)			| 
+	((runBoxCarFilter & 0x1)<<2)	|
+	((startSampling & 0x1)<<1)
+	| 0x1;
+	
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
 
@@ -997,7 +997,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			data[4] = newTotal;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5)]];
-
+			
 		}
 		
 		[self setHitRateTotal:newTotal];
@@ -1017,7 +1017,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return ORIpeV4FLTModelHitRateChanged;
 }
 
-#pragma mark ¥¥¥archival
+#pragma mark â€¢â€¢â€¢archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -1174,7 +1174,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   nil];
 	
     [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTWaveForm"];
-
+	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   @"ORIpeV4FLTDecoderForHitRate",			@"decoder",
 				   [NSNumber numberWithLong:hitRateId],		@"dataId",
@@ -1183,7 +1183,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   nil];
 	
     [dataDictionary setObject:aDictionary forKey:@"IpeV4FLTHitRate"];
-
+	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   @"ORIpeV4FLTDecoderForHistogram",		@"decoder",
 				   [NSNumber numberWithLong:histogramId],	@"dataId",
@@ -1262,7 +1262,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
 	}
 	
-		
+	
 	//cache some addresses for speed in the dataTaking loop.
 	unsigned long theSlotPart = [self slot]<<24;
 	statusAddress			  = theSlotPart;
@@ -1271,7 +1271,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	locationWord			  = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 	pageSize                  = [sltCard pageSize];  //us
 	[self writeRunControl:YES];
-	[self writeSeconds:0];
 }
 
 
@@ -1302,7 +1301,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateChanged object:self];
 }
 
-#pragma mark ¥¥¥SBC readout control structure... Till, fill out as needed
+#pragma mark â€¢â€¢â€¢SBC readout control structure... Till, fill out as needed
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
@@ -1312,21 +1311,21 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].hw_mask[2] 	= histogramId;				//record id for the histograms
 	configStruct->card_info[index].slot			= [self stationNumber];		//the PMC readout uses col 0 thru n
 	configStruct->card_info[index].crate		= [self crateNumber];
-
+	
 	configStruct->card_info[index].deviceSpecificData[0] = postTriggerTime;	//needed to align the waveforms
-
+	
 	unsigned long eventTypeMask = 0;
 	if(readWaveforms) eventTypeMask |= kReadWaveForms;
 	configStruct->card_info[index].deviceSpecificData[1] = eventTypeMask;	
 	configStruct->card_info[index].deviceSpecificData[2] = fltRunMode;	
-
+	
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 	
 	return index+1;
 }
 
-#pragma mark ¥¥¥HW Wizard
+#pragma mark â€¢â€¢â€¢HW Wizard
 -(BOOL) hasParmetersToRamp
 {
 	return YES;
@@ -1404,7 +1403,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     else return nil;
 }
 
-#pragma mark ¥¥¥AdcInfo Providing
+#pragma mark â€¢â€¢â€¢AdcInfo Providing
 - (void) postAdcInfoProvidingValueChanged
 {
 	//this notification is be picked up by high-level objects like the 
@@ -1417,7 +1416,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return [self triggerEnabled:bit];
 }
 
-#pragma mark ¥¥¥Reporting
+#pragma mark â€¢â€¢â€¢Reporting
 - (void) testReadHisto
 {
 	unsigned long hControl = [self readReg:kFLTV4HistgrSettingsReg];
@@ -1595,7 +1594,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 @end
 
 @implementation ORIpeV4FLTModel (tests)
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 - (BOOL) testsRunning { return testsRunning; }
 - (void) setTestsRunning:(BOOL)aTestsRunning
 {
@@ -1677,7 +1676,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 
-#pragma mark ¥¥¥Tests
+#pragma mark â€¢â€¢â€¢Tests
 - (void) modeTest
 {
 	int testNumber = 0;
@@ -1824,7 +1823,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 	ORTimer* aTimer = [[ORTimer alloc] init];
 	[aTimer start];
-		
+	
 	@try {
 		BOOL passed = YES;
 		int numLoops = 250;
@@ -1920,9 +1919,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
 	//put into test mode
 	savedMode = fltRunMode;
-	fltRunMode = kIpeFlt_Test_Mode;
+	fltRunMode = kIpeFltV4Katrin_Test_Mode;
 	[self writeControl];
-	if([self readMode] != kIpeFlt_Test_Mode){
+	if([self readMode] != kIpeFltV4Katrin_Test_Mode){
 		NSLogColor([NSColor redColor],@"Could not put FLT %d into test mode\n",[self stationNumber]);
 		[NSException raise:@"Ram Test Failed" format:@"Could not put FLT %d into test mode\n",[self stationNumber]];
 	}

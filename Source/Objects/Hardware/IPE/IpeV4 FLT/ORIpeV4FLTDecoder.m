@@ -32,21 +32,21 @@
  <pre>
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
-                  ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
-         ^ ^^^---------------------------crate
-              ^ ^^^^---------------------card
-					 ^^^^ ^^^^ ----------channel
+ ^ ^^^---------------------------crate
+ ^ ^^^^---------------------card
+ ^^^^ ^^^^ ----------channel
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ^^^^ ^^^^------------------------------ channel (0..22)
-             ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
-		^ ^^^^ ^^^^-------------------- number of page in hardware buffer
-                            ^^ ^^^^ ^^^^ eventID (0..1024)
+ ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
+ ^^ ^^^^ ^^^^ eventID (0..1024)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  </pre>
  *
@@ -71,7 +71,7 @@
 	++ptr;	//point to the channel map
 	++ptr;	//point to the eventID
 	++ptr;	//point to the energy
-		
+	
 	//channel by channel histograms
 	unsigned long energy = *ptr/16;
 	[aDataSet histogram:energy 
@@ -107,27 +107,27 @@
 	
 	
 	/*
-	++ptr;		//point to event struct
-	katrinEventDataStruct* ePtr = (katrinEventDataStruct*)ptr;			//recast to event structure
-	
-	NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",ePtr->energy];
-	
-	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
-	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
-	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
-	
-	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
-	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n", ePtr->subSec];
-	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %d\n", ePtr->eventID & 0xffff];
-    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n", ePtr->eventID >> 16];
-	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
-	
-	
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
-			energy,eventDate,eventTime,seconds,subSec,eventID,nPages,chMap];               
-	*/ ///todo......
+	 ++ptr;		//point to event struct
+	 katrinEventDataStruct* ePtr = (katrinEventDataStruct*)ptr;			//recast to event structure
+	 
+	 NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",ePtr->energy];
+	 
+	 NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
+	 NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
+	 NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
+	 
+	 NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
+	 NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n", ePtr->subSec];
+	 NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %d\n", ePtr->eventID & 0xffff];
+	 NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n", ePtr->eventID >> 16];
+	 NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
+	 
+	 
+	 return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
+	 energy,eventDate,eventTime,seconds,subSec,eventID,nPages,chMap];               
+	 */ ///todo......
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];
-    	
+	
 	return @"to be done";
 }
 @end
@@ -147,27 +147,19 @@
  ^ ^^^---------------------------crate
  ^ ^^^^---------------------card
  ^^^^ ^^^^-----------channel
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ^^^^ ^^^^------------------------------ channel (0..22)
- ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ^ ------------------------------------- flag to indicate that the ADC have been swapped
- ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
- ^^ ^^^^ ^^^^ eventID (0..1024)
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart/reset
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart/reset
  followed by waveform data (n x 1024 16-bit words)
-*/ 
+ </pre>
+ *
+ */
+//-------------------------------------------------------------
+
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
-
+	
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
-
+	
 	++ptr;											//crate, card,channel from second word
 	unsigned char crate		= (*ptr>>21) & 0xf;
 	unsigned char card		= (*ptr>>16) & 0x1f;
@@ -175,30 +167,30 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];
-			
+	
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
-
+	
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
-					offset: 9*sizeof(long)					// Offset in bytes (9 header words)
-				    unitSize: sizeof(short)					// unit size in bytes
-					mask:	0x0FFF							// when displayed all values will be masked with this value
+					offset: 2*sizeof(long)					// Offset in bytes (2 header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+					  mask:	0x0FFF							// when displayed all values will be masked with this value
 					sender: self 
-					withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
-										
+				  withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
+	
     return length; //must return number of longs processed.
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-
+	
     NSString* title= @"Ipe FLT Waveform Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
     NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
     NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
     NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
-
+	
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan]; 
 }
 
@@ -212,19 +204,19 @@
  <pre>
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
-                  ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
-         ^ ^^^---------------------------crate
-              ^ ^^^^---------------------card
+ ^ ^^^---------------------------crate
+ ^ ^^^^---------------------card
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitRate length
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx total hitRate
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
-      ^^^^ ^^^^-------------------------- channel (0..22)
-			       ^--------------------- overflow  
-				     ^^^^ ^^^^ ^^^^ ^^^^- hitrate
+ ^^^^ ^^^^-------------------------- channel (0..22)
+ ^--------------------- overflow  
+ ^^^^ ^^^^ ^^^^ ^^^^- hitrate
  ...more 
  </pre>
  *
