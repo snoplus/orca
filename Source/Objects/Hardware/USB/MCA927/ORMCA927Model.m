@@ -132,6 +132,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) dealloc
 {
+    [lastFile release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
  	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[fpgaFilePath release];
@@ -229,6 +230,18 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) lastFile
+{
+    return lastFile;
+}
+
+- (void) setLastFile:(NSString*)aLastFile
+{
+    [lastFile autorelease];
+    lastFile = [aLastFile copy];    
+}
+
 - (BOOL) startedFromMainRunControl:(int)index
 {
 	if(index>=0 && index<2) return startedFromMainRunControl[index];
@@ -819,6 +832,40 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	else return NO;
 }
 
+- (void) writeSpectrum:(int)index toFile:(NSString*)aFilePath
+{
+/*
+ $SPEC_ID:
+ No sample description was entered.
+ $SPEC_REM:
+ DET# 1
+ DETDESC# MCB 25
+ AP# Maestro Version 6.03
+ $DATE_MEA:
+ 05/29/2008 16:10:40
+ $MEAS_TIM:
+ 2642 2643
+ $DATA:
+ 0 8191
+ ...data....
+ */
+	int n = [self numChannels:index];
+	aFilePath = [aFilePath stringByExpandingTildeInPath];
+	[self setLastFile:aFilePath];
+	
+	NSMutableString* s = [NSMutableString string];
+	[s appendFormat:@"$SPEC_ID:\nNo Comment for now\n"];
+	[s appendFormat:@"$SPEC_REM:\nDET# 1\nDETDESC# MCB 25\nAP# ORCA\n"];
+	[s appendFormat:@"$DATE_MEA:\n%@\n",[NSDate date]];
+	[s appendFormat:@"$MEAS_TIM:\n%d %d\n",0,0];
+	[s appendFormat:@"$Data:\n%d %d\n",index,n];
+	int i;
+	for(i=0;i<n;i++){
+		[s appendFormat:@"%d\n",spectrum[index][i]];
+	}
+	
+	[s writeToFile:aFilePath atomically:NO encoding:NSASCIIStringEncoding error:nil];
+}
 
 - (unsigned long) spectrum:(int)index valueAtChannel:(int)x
 {
@@ -1029,6 +1076,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setLastFile:		  [decoder decodeObjectForKey:@"lastFile"]];
 	[self setSelectedChannel: [decoder decodeIntForKey:   @"selectedChannel"]];
 	[self setUseCustomFile:	  [decoder decodeBoolForKey:  @"useCustomFile"]];
     [self setFpgaFilePath:	  [decoder decodeObjectForKey:@"fpgaFilePath"]];
@@ -1058,6 +1106,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeObject:lastFile		forKey:@"lastFile"];
 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
     [encoder encodeBool:useCustomFile	forKey:@"useCustomFile"];
     [encoder encodeObject:fpgaFilePath	forKey:@"fpgaFilePath"];

@@ -102,9 +102,12 @@ typedef struct MCA927Registers {
 	BOOL		  startedFromMainRunControl[2];
 	BOOL		  mainRunIsStopping;
 	ORDataSet*    dataSet;
+	NSString*	  lastFile;
 }
 
 #pragma mark ***Accessors
+- (NSString*) lastFile;
+- (void) setLastFile:(NSString*)aLastFile;
 - (BOOL) startedFromMainRunControl:(int)index;
 - (BOOL) autoClear:(int)index;
 - (void) setAutoClear:(int)index withValue:(BOOL)aValue;
@@ -120,6 +123,7 @@ typedef struct MCA927Registers {
 - (void) setZdtMode:(int)index withValue:(unsigned long)aValue;
 - (BOOL) runningStatus:(int)index;
 - (void) setRunningStatus:(int)index withValue:(BOOL)aValue;
+- (void) writeSpectrum:(int)index toFile:(NSString*)aFilePath;
 
 - (unsigned long) convGain:(int)index;
 - (void) setConvGain:(int)index withValue:(unsigned long)aValue;

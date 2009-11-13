@@ -132,6 +132,7 @@
 - (IBAction) upperDiscriminatorAction:(id)sender;
 - (IBAction) zdtModeAction:(id)sender;
 - (IBAction) zdtSpeedAction:(id)sender;
+- (IBAction) writeSpectrumAction:(id)sender;
 
 - (IBAction) syncAction:(id)sender;
 - (IBAction) reportAction:(id)sender;

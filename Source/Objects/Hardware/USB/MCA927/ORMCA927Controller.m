@@ -35,6 +35,11 @@
 				  returnCode:(int)returnCode 
 				 contextInfo:(id)userInfo;
 
+- (void) saveFileDidEnd:(NSSavePanel *)sheet 
+			 returnCode:(int)returnCode 
+			contextInfo:(void  *)contextInfo;
+
+
 - (void) populateInterfacePopup:(ORUSB*)usb;
 
 @end
@@ -186,7 +191,6 @@
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
-	
 }
 
 - (void) awakeFromNib
@@ -541,6 +545,33 @@
                       nil,@"Is this really what you want?");
 }
 
+- (IBAction) writeSpectrumAction:(id)sender;
+{
+	NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save As"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[model lastFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = @"Untitled";
+    }
+	
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+	
+}
 
 - (IBAction) readSpectrumAction:(id)sender
 {
@@ -822,7 +853,6 @@
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
 {
 	return [model spectrum:set valueAtChannel:x];
-
 }
 
 @end
@@ -834,6 +864,14 @@
 {
     if(returnCode){
 		[model setFpgaFilePath:[sheet filename]];
+    }
+}
+
+- (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo
+{
+    if(returnCode){
+		int i = [model selectedChannel];
+		[model writeSpectrum:i toFile:[sheet filename]];
     }
 }
 
