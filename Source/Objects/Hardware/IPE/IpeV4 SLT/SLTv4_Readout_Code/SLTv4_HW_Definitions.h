@@ -24,13 +24,12 @@
 #define kFLTv4    2
 
 
-#define kReadEnergy		0x1 << 0
-#define kReadWaveForms	0x1 << 1
+#define kReadWaveForms	0x1 << 0
 
 //flt run modes (sent to hw)
-#define kIpeFltV4Katrin_StandBy_Mode		0
-#define kIpeFltV4Katrin_Run_Mode			1
-#define kIpeFltV4Katrin_Histo_Mode			2
-#define kIpeFltV4Katrin_Test_Mode			3
+#define kIpeFlt_StandBy_Mode		0
+#define kIpeFlt_Run_Mode			1
+#define kIpeFlt_Histo_Mode			2
+#define kIpeFlt_Test_Mode			3
 
 #endif
