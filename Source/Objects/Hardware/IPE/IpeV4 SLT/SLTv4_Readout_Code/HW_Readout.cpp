@@ -297,8 +297,8 @@ int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     return config->card_info[index].next_Card_Index;
 }            
 
-#define kFifoEmpty		0x01
-#define kWaveFormLength 2048
+#define kFifoEmpty 0x01
+
 int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     
@@ -314,7 +314,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 	uint32_t runMode   = config->card_info[index].deviceSpecificData[2];
 	
 	if(srack->theFlt[col]->isPresent()){
-		if(runMode == kIpeFlt_Run_Mode){
+		if(runMode == kIpeFltV4Katrin_Run_Mode){
 			uint32_t status		 = srack->theFlt[col]->status->read();
 			uint32_t  fifoStatus = (status >> 24) & 0xf;
 			
@@ -345,24 +345,16 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 								uint32_t evsec		= ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
 								uint32_t evsubsec	= (f2 >> 2) & 0x1ffffff; // 25 bit
 								
-								if(eventType & kReadWaveForms){
-									data[dataIndex++] = dataId | 7;
-								}
-								else {
-									data[dataIndex++] = waveformId | (kWaveFormLength/2 + 9) ;
-								}
-								
+								data[dataIndex++] = dataId | 7;	
 								data[dataIndex++] = location | eventchan<<8;
 								data[dataIndex++] = evsec;		//sec
 								data[dataIndex++] = evsubsec;	//subsec
 								data[dataIndex++] = chmap;
 								data[dataIndex++] = pagenr;		//was listed as the event ID... put in the pagenr for now 
 								data[dataIndex++] = energy;
-
+								
 								if(eventType & kReadWaveForms){
-									data[dataIndex++] = 0; //spare to make record match the v3 record 
-									data[dataIndex++] = 0; //spare to make record match the v3 record
-									ReadWaveform(col,eventchan, pagenr);
+									ReadWaveform(waveformId,location, col,eventchan, pagenr);
 								}
 							}
 						}
@@ -370,7 +362,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 					else break;
 				}
 			}
-			else if(runMode == kIpeFlt_Histo_Mode) {				
+			else if(runMode == kIpeFltV4Katrin_Histo_Mode) {				
 			}
 		}
 	}
@@ -378,7 +370,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     return config->card_info[index].next_Card_Index;
 }
 
-void ReadWaveform(uint32_t col, uint32_t eventchan, uint32_t pagenr)
+void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t eventchan, uint32_t pagenr)
 {
     static uint32_t waveformBuffer32[64*1024];
     static uint32_t shipWaveformBuffer32[64*1024];
@@ -400,8 +392,9 @@ void ReadWaveform(uint32_t col, uint32_t eventchan, uint32_t pagenr)
 #endif
 	}
 	uint32_t copyindex = (triggerPos + 1024) % 2048; // + postTriggerTime;
+	uint32_t waveformLength = 2048; 
 	uint32_t i;
-	for(i=0;i<kWaveFormLength;i++){
+	for(i=0;i<waveformLength;i++){
 		shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
 		copyindex++;
 		copyindex = copyindex % 2048;
@@ -409,12 +402,14 @@ void ReadWaveform(uint32_t col, uint32_t eventchan, uint32_t pagenr)
 	
 	//simulation mode
 	if(0){
-		for(i=0;i<kWaveFormLength;i++){
+		for(i=0;i<waveformLength;i++){
 			shipWaveformBuffer16[i]= (i>100)*i;
 		}
 	}
 	//ship waveform
 	uint32_t waveformLength32=waveformLength/2; //the waveform length is variable	
+	data[dataIndex++] = waveformId | (waveformLength32 + 2);
+	data[dataIndex++] = location | eventchan<<8;
 	for(i=0;i<waveformLength32;i++){
 		data[dataIndex++] = shipWaveformBuffer32[i];
 	}
