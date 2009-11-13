@@ -1271,6 +1271,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	locationWord			  = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 	pageSize                  = [sltCard pageSize];  //us
 	[self writeRunControl:YES];
+	[self writeSeconds:0];
 }
 
 
