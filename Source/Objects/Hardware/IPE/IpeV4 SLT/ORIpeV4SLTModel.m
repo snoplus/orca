@@ -18,10 +18,10 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORIpeDefs.h"
+//#import "ORIpeDefs.h"
 #import "ORCrate.h"
 #import "ORIpeV4SLTModel.h"
-#import "ORIpeFLTModel.h"
+//#import "ORIpeFLTModel.h"
 #import "ORIpeCrateModel.h"
 #import "ORIpeV4SLTDefs.h"
 #import "ORReadOutList.h"
@@ -732,7 +732,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 			
 			
 			for(i=0;i<20;i++){
-				[cards[i] setFltRunMode: kIpeFlt_Run_Mode];
+				[cards[i] setFltRunMode: kIpeFltV4Katrin_Run_Mode];
 			}
 			
 			

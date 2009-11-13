@@ -143,8 +143,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	{@"PostTrigger",		0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"pStatusA",           0x002000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-	{@"pStatusB",           0x012000>>2,		-1,				kIpeRegReadable},
-	{@"pStatusC",           0x022000>>2,		-1,				kIpeRegReadable},
+	{@"pStatusB",           0x006000>>2,		-1,				kIpeRegReadable},
+	{@"pStatusC",           0x026000>>2,		-1,				kIpeRegReadable},
 	{@"Analog Offset",		0x001000>>2,		-1,				kIpeRegReadable},
 	{@"Gain",				0x001004>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"Hit Rate",			0x001100>>2,		-1,				kIpeRegReadable | kIpeRegNeedsChannel},
@@ -219,23 +219,23 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
 	switch (runMode) {
 		case kIpeFlt_EnergyMode:
-			[self setFltRunMode:kIpeFlt_Run_Mode];
+			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			readEnergy    = YES;
 		break;
 			
 		case kIpeFlt_TraceMode:
-			[self setFltRunMode:kIpeFlt_Run_Mode];
+			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			readWaveforms = YES;
 		break;
 			
 		case kIpeFlt_EnergyTrace:
-			[self setFltRunMode:kIpeFlt_Run_Mode];
+			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			readEnergy    = YES;
 			readWaveforms = YES;
 			break;
 			
 		case kIpeFlt_Histogram_Mode:
-			[self setFltRunMode:kIpeFlt_Histo_Mode];
+			[self setFltRunMode:kIpeFltV4Katrin_Histo_Mode];
 			readWaveforms = YES; //temp....
 		break;
 			
@@ -748,7 +748,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeHitRateMask];			//set hitRage control mask
 	[self enableStatistics];			//enable hardware ADC statistics, ak 7.1.07
 	
-	if(fltRunMode == kIpeFlt_Histo_Mode){
+	if(fltRunMode == kIpeFltV4Katrin_Histo_Mode){
 		[self writeHistogramControl];
 	}
 }
@@ -1928,9 +1928,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
 	//put into test mode
 	savedMode = fltRunMode;
-	fltRunMode = kIpeFlt_Test_Mode;
+	fltRunMode = kIpeFltV4Katrin_Test_Mode;
 	[self writeControl];
-	if([self readMode] != kIpeFlt_Test_Mode){
+	if([self readMode] != kIpeFltV4Katrin_Test_Mode){
 		NSLogColor([NSColor redColor],@"Could not put FLT %d into test mode\n",[self stationNumber]);
 		[NSException raise:@"Ram Test Failed" format:@"Could not put FLT %d into test mode\n",[self stationNumber]];
 	}

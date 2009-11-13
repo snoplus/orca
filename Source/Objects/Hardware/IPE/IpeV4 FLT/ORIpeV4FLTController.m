@@ -486,8 +486,8 @@
 	}
 	
 	int fltRunMode = [model fltRunMode];
-	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFlt_Histo_Mode)];
-	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFlt_Histo_Mode)];
+	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
+	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
 
  	[self enableRegControls];
 }
@@ -724,8 +724,6 @@
 
 - (void) selectedChannelValueChanged:(NSNotification*) aNote
 {
- NSLog(@"This is v4FLT selectedChannelValueChanged\n" );
-    //[registerPopUp selectItemAtIndex: [model selectedRegIndex]];
     [channelPopUp selectItemWithTag: [model selectedChannelValue]];
 	//[self updatePopUpButton:channelPopUp	 setting:[model selectedRegIndex]];
 	

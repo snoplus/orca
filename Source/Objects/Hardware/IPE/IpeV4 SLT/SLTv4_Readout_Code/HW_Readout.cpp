@@ -314,7 +314,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 	uint32_t runMode   = config->card_info[index].deviceSpecificData[2];
 	
 	if(srack->theFlt[col]->isPresent()){
-		if(runMode == kIpeFlt_Run_Mode){
+		if(runMode == kIpeFltV4Katrin_Run_Mode){
 			uint32_t status		 = srack->theFlt[col]->status->read();
 			uint32_t  fifoStatus = (status >> 24) & 0xf;
 			
@@ -364,7 +364,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 					else break;
 				}
 			}
-			else if(runMode == kIpeFlt_Histo_Mode) {				
+			else if(runMode == kIpeFltV4Katrin_Histo_Mode) {				
 			}
 		}
 	}
