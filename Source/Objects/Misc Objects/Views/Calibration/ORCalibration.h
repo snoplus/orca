@@ -62,8 +62,8 @@
 @interface ORCalibration : NSObject 
 {
 	NSArray*		calibrationArray;
-	float			slope;
-	float			intercept;
+	double			slope;
+	double			intercept;
 	NSString*		units;
 	BOOL			calibrationValid;
 	BOOL			ignoreCalibration;
@@ -73,8 +73,8 @@
 
 - (id) initCalibrationArray:(NSArray*)calArray;
 - (NSArray*)calibrationArray;
-- (float) slope;
-- (float) intercept;
+- (double) slope;
+- (double) intercept;
 - (void) calibrate;
 - (BOOL) ignoreCalibration;
 - (void) setIgnoreCalibration:(BOOL)aState;
@@ -85,7 +85,7 @@
 - (NSString*) calibrationName;
 - (void) setType:(int)aType;
 - (int) type;
-- (float) convertedValueForChannel:(float)aChannel;
+- (double) convertedValueForChannel:(int)aChannel;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

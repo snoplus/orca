@@ -267,13 +267,14 @@
 
 - (void) calibrate
 {
-	float c0 = [[calibrationArray objectAtIndex:0] floatValue];
-	float c1 = [[calibrationArray objectAtIndex:1] floatValue];
-	float v0 = [[calibrationArray objectAtIndex:2] floatValue];
-	float v1 = [[calibrationArray objectAtIndex:3] floatValue];
+	double c0 = [[calibrationArray objectAtIndex:0] doubleValue];
+	double c1 = [[calibrationArray objectAtIndex:1] doubleValue];
+	double v0 = [[calibrationArray objectAtIndex:2] doubleValue];
+	double v1 = [[calibrationArray objectAtIndex:3] doubleValue];
 	if(c0 != c1){
 		slope = (v1-v0)/(c1-c0);
-		intercept = (v0*c1 - v1*c0)/(c1-c0);
+		//intercept = (v1*c0 - v0*c1)/(c1-c0);
+		intercept = v0-slope*c0;
 		calibrationValid = YES;
 	}
 	else {
@@ -282,12 +283,12 @@
 }
 
 
-- (float) slope
+- (double) slope
 {
 	return slope;
 }
 
-- (float) intercept
+- (double) intercept
 {
 	return intercept;
 }
@@ -342,9 +343,9 @@
 	return !ignoreCalibration && calibrationValid;
 }
 
-- (float) convertedValueForChannel:(float)aChannel
+- (double) convertedValueForChannel:(int)aChannel
 {
-	return aChannel*slope + intercept;
+	return (double)aChannel*slope + intercept;
 }
 
 #pragma mark •••Archival
