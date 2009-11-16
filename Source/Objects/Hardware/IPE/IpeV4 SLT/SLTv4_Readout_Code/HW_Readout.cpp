@@ -304,6 +304,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
     
     uint32_t dataId     = config->card_info[index].hw_mask[0];
     uint32_t waveformId = config->card_info[index].hw_mask[1];
+    uint32_t histogramId = config->card_info[index].hw_mask[2];
     uint32_t col		= config->card_info[index].slot - 1; //the mac slots go from 1 to n
     uint32_t crate		= config->card_info[index].crate;
 	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
@@ -312,6 +313,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 	//uint32_t postTriggerTime = config->card_info[index].deviceSpecificData[0];
 	uint32_t eventType = config->card_info[index].deviceSpecificData[1];
 	uint32_t runMode   = config->card_info[index].deviceSpecificData[2];
+	uint32_t runFlags  = config->card_info[index].deviceSpecificData[3];
 	
 	if(srack->theFlt[col]->isPresent()){
 		if(runMode == kIpeFltV4Katrin_Run_Mode){
@@ -362,34 +364,40 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 					else break;
 				}
 			}
-			else if(runMode == kIpeFltV4Katrin_Histo_Mode) {				
-				uint32_t pagenr,oldpagenr;
+        }
+		else if(runMode == kIpeFltV4Katrin_Histo_Mode) {	
+				//uint32_t pagenr,oldpagenr ;
+				uint32_t pageAB,oldpageAB;
+                uint32_t pStatus[3];
 				//fprintf(stdout,"FLT %i:runFlags %x\n",col+1, runFlags );fflush(stdout);    
 				//fprintf(stdout,"FLT %i:runFlags %x  pn 0x%x\n",col+1, runFlags,srack->theFlt[col]->histNofMeas->read() );fflush(stdout); 
 				//sleep(1);   
 				if(runFlags & 0x10000){// firstTime	
-					pagenr=srack->theFlt[col]->histNofMeas->read() & 0x3f;
-					config->card_info[index].deviceSpecificData[3]=pagenr;
+                    //srack->theFlt[col]->periphStatus->readBlock((long unsigned int*)pStatus);//TODO: fdhwlib will change to uint32_t in the future -tb-
+                    //pageAB = (pStatus[0] & 0x10) >> 4;
+                    pageAB = (srack->theFlt[col]->periphStatus->read(0) & 0x10) >> 4;
+					config->card_info[index].deviceSpecificData[3]=pageAB;
 					fprintf(stdout,"FLT %i: first cycle\n",col+1);fflush(stdout);
 					//sleep(1);
 				}
 				else{//check timing
-					pagenr=srack->theFlt[col]->histNofMeas->read() & 0x3f;
-					oldpagenr = config->card_info[index].deviceSpecificData[3]; //
+					//pagenr=srack->theFlt[col]->histNofMeas->read() & 0x3f;
+                    //srack->theFlt[col]->periphStatus->readBlock((long unsigned int*)pStatus);//TODO: fdhwlib will change to uint32_t in the future -tb-
+                    //pageAB = (pStatus[0] & 0x10) >> 4;
+					oldpageAB = config->card_info[index].deviceSpecificData[3]; //
+                    pageAB = (srack->theFlt[col]->periphStatus->read(0) & 0x10) >> 4;
 					//fprintf(stdout,"FLT %i: oldpage  %i currpagenr %i\n",col+1, oldpagenr, pagenr  );fflush(stdout);  
 					//              sleep(1);
 					
-					if(oldpagenr != pagenr){
-						fprintf(stdout,"FLT %i:toggle now from %i to page %i\n",col+1, oldpagenr, pagenr  );fflush(stdout);    
-						config->card_info[index].deviceSpecificData[3] = pagenr; 
+					if(oldpageAB != pageAB){
+						fprintf(stdout,"FLT %i:toggle now from %i to page %i\n",col+1, oldpageAB, pageAB  );fflush(stdout);    
+						config->card_info[index].deviceSpecificData[3] = pageAB; 
 						//read data
-						srack->theSlt->pageSelect->write(0x100 | pagenr);
 						int chan=0;
 						uint32_t adcval, lastFirst, last,first,llast,lfirst;
 						static uint32_t histogramBuffer32[1024];
 						static uint32_t shipHistogramBuffer32[2*1024];
-						for(chan=0;chan<24;chan++)
-						{//read out histogram
+						for(chan=0;chan<24;chan++)						{//read out histogram
 							uint32_t adccount;
 							lastFirst = srack->theFlt[col]->histLastFirst->read(chan);
 							last = (lastFirst >>16) & 0xffff;
@@ -404,17 +412,13 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 								//lfirst= first/2; llast=last/2;
 								lfirst= 0; llast=1023;//TODO: there is something wrong with last/first bin information -tb-
 								int cnt=0;
+						srack->theSlt->pageSelect->write(0x100 | 0);//TODO: do it once? -tb-
 								for(adccount=0; adccount<1024;adccount++){
-									//if(adccount>=lfirst  && adccount<=llast){
-                                    adcval = srack->theFlt[col]->ramData->read(chan,adccount);
-                                    histogramBuffer32[adccount] = adcval;
-                                    uint32_t adcval1 = adcval & 0xffff;
-                                    uint32_t adcval2 = (adcval >> 16) & 0xffff;
-                                    shipHistogramBuffer32[cnt]=adcval1;cnt++;
-                                    shipHistogramBuffer32[cnt]=adcval2;cnt++;
-                                    //fprintf(stdout,"%i %i ",adcval1,adcval2);fflush(stdout);
-									//}
-									//else histogramBuffer32[adccount] = 0;
+                                    shipHistogramBuffer32[adccount] =  srack->theFlt[col]->ramData->read(chan,adccount);
+								}
+						srack->theSlt->pageSelect->write(0x100 | 1);//TODO: do it once? -tb-
+								for(adccount=0; adccount<1024;adccount++){
+                                    shipHistogramBuffer32[adccount+1024] =  srack->theFlt[col]->ramData->read(chan,adccount);
 								}
 								//fprintf(stdout,"\n");
 							}
@@ -453,7 +457,6 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 						}
 					} 
 				}
-			}
 		}
 	}
 	
