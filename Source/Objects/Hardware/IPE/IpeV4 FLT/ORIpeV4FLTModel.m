@@ -1320,6 +1320,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].deviceSpecificData[1] = eventTypeMask;	
 	configStruct->card_info[index].deviceSpecificData[2] = fltRunMode;	
 	
+	unsigned long runFlagsMask = 0;
+	runFlagsMask |= 0x10000;//bit 16 = "first time" flag
+    
+	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
+NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 	
@@ -1430,9 +1435,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	NSLog(@"HM: %d\n",  (hControl>>28) & 0x1);
 	NSLog(@"CM: %d\n",  (hControl>>29) & 0x1);
 	NSLog(@"page Changes: 0x%08x\n",  f3 & 0x3F);
-	NSLog(@"A: 0x%08x fid:%d\n", (pStatusA>>12) & 0xFF, pStatusA>>28);
-	NSLog(@"B: 0x%08x fid:%d\n", (pStatusB>>12) & 0xFF, pStatusB>>28);
-	NSLog(@"C: 0x%08x fid:%d\n", (pStatusC>>12) & 0xFF, pStatusC>>28);
+	NSLog(@"A: 0x%08x fid:%d hPg:%i\n", (pStatusA>>12) & 0xFF, pStatusA>>28, (pStatusA&0x10)>>4);
+	NSLog(@"B: 0x%08x fid:%d hPg:%i\n", (pStatusB>>12) & 0xFF, pStatusB>>28, (pStatusB&0x10)>>4);
+	NSLog(@"C: 0x%08x fid:%d hPg:%i\n", (pStatusC>>12) & 0xFF, pStatusC>>28, (pStatusC&0x10)>>4);
 	NSLog(@"Meas Time: 0x%08x\n", [self readReg:kFLTV4HistMeasTimeReg]);
 	NSLog(@"Rec Time : 0x%08x\n", [self readReg:kFLTV4HistRecTimeReg]);
 	NSLog(@"Page Number : 0x%08x\n", [self readReg:kFLTV4HistPageNReg]);
