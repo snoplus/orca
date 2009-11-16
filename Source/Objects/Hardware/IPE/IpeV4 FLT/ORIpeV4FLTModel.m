@@ -1252,7 +1252,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     //if([[userInfo objectForKey:@"doinit"]intValue]){
 	[self setLedOff:NO];
-	[self initBoard];					
+	[self reset];
+	[self initBoard];
 	//}
 	
 	
