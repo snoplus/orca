@@ -1289,6 +1289,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 }
 
+- (BOOL) doneTakingData
+{
+	return [pmcLink doneTakingData];
+}
+
 - (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj
 { 
 	//temp----
