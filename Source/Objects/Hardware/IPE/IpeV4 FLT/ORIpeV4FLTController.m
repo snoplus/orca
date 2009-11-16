@@ -753,7 +753,7 @@
 
 - (IBAction) histClrModeAction:(id)sender
 {
-	[model setHistClrMode:[sender intValue]];	
+	[model setHistClrMode:[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) histModeAction:(id)sender
