@@ -347,7 +347,14 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 								uint32_t evsec		= ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
 								uint32_t evsubsec	= (f2 >> 2) & 0x1ffffff; // 25 bit
 								
-								data[dataIndex++] = dataId | 7;	
+								uint32_t waveformLength = 2048; 
+								if(eventType & kReadWaveForms){
+									data[dataIndex++] = waveformId | 9 + waveformLength/2;	
+								}
+								else {
+									data[dataIndex++] = dataId | 7;	
+								}
+								
 								data[dataIndex++] = location | eventchan<<8;
 								data[dataIndex++] = evsec;		//sec
 								data[dataIndex++] = evsubsec;	//subsec
@@ -356,7 +363,46 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 								data[dataIndex++] = energy;
 								
 								if(eventType & kReadWaveForms){
-									ReadWaveform(waveformId,location, col,eventchan, pagenr);
+									static uint32_t waveformBuffer32[64*1024];
+									static uint32_t shipWaveformBuffer32[64*1024];
+									static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
+									static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
+									uint32_t triggerPos = 0;
+									
+									srack->theSlt->pageSelect->write(0x100 | pagenr);
+									
+									uint32_t adccount;
+									for(adccount=0; adccount<1024;adccount++){
+										uint32_t adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
+										waveformBuffer32[adccount] = adcval;
+#if 1 //TODO: WORKAROUND - align according to the trigger flag - in future we will use the timestamp, when Denis has fixed it -tb-
+										uint32_t adcval1 = adcval & 0xffff;
+										uint32_t adcval2 = (adcval >> 16) & 0xffff;
+										if(adcval1 & 0x8000) triggerPos = adccount*2;
+										if(adcval2 & 0x8000) triggerPos = adccount*2+1;
+#endif
+									}
+									uint32_t copyindex = (triggerPos + 1024) % 2048; // + postTriggerTime;
+									uint32_t i;
+									for(i=0;i<waveformLength;i++){
+										shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
+										copyindex++;
+										copyindex = copyindex % 2048;
+									}
+									
+									//simulation mode
+									if(0){
+										for(i=0;i<waveformLength;i++){
+											shipWaveformBuffer16[i]= (i>100)*i;
+										}
+									}
+									//ship waveform
+									uint32_t waveformLength32=waveformLength/2; //the waveform length is variable	
+									data[dataIndex++] = 0;	//spare to remain byte compatible with the v3 record
+									data[dataIndex++] = 0;	//spare to remain byte compatible with the v3 record
+									for(i=0;i<waveformLength32;i++){
+										data[dataIndex++] = shipWaveformBuffer32[i];
+									}
 								}
 							}
 						}
@@ -465,48 +511,7 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 
 void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t eventchan, uint32_t pagenr)
 {
-    static uint32_t waveformBuffer32[64*1024];
-    static uint32_t shipWaveformBuffer32[64*1024];
-    static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
-    static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
-	uint32_t triggerPos = 0;
-	
-	srack->theSlt->pageSelect->write(0x100 | pagenr);
-	
-	uint32_t adccount;
-	for(adccount=0; adccount<1024;adccount++){
-		uint32_t adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
-		waveformBuffer32[adccount] = adcval;
-#if 1 //TODO: WORKAROUND - align according to the trigger flag - in future we will use the timestamp, when Denis has fixed it -tb-
-		uint32_t adcval1 = adcval & 0xffff;
-		uint32_t adcval2 = (adcval >> 16) & 0xffff;
-		if(adcval1 & 0x8000) triggerPos = adccount*2;
-		if(adcval2 & 0x8000) triggerPos = adccount*2+1;
-#endif
-	}
-	uint32_t copyindex = (triggerPos + 1024) % 2048; // + postTriggerTime;
-	uint32_t waveformLength = 2048; 
-	uint32_t i;
-	for(i=0;i<waveformLength;i++){
-		shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
-		copyindex++;
-		copyindex = copyindex % 2048;
-	}
-	
-	//simulation mode
-	if(0){
-		for(i=0;i<waveformLength;i++){
-			shipWaveformBuffer16[i]= (i>100)*i;
-		}
-	}
-	//ship waveform
-	uint32_t waveformLength32=waveformLength/2; //the waveform length is variable	
-	data[dataIndex++] = waveformId | (waveformLength32 + 2);
-	data[dataIndex++] = location | eventchan<<8;
-	for(i=0;i<waveformLength32;i++){
-		data[dataIndex++] = shipWaveformBuffer32[i];
-	}
-}	
+ }	
 
 #if (0)
 //maybe read hit rates in the pmc at some point..... here's how....
