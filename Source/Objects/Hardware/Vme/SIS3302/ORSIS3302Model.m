@@ -1088,7 +1088,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 		unsigned long startOffset = triggerEventDir & 0x1ffff;
 		NSLog(@"address counter0:0x%0x wrapped: %d\n",startOffset,wrapped);
 		[self readAddressCounts];
-		unsigned long nLongsToRead = [self numberOfSamples] - startOffset;
+		//unsigned long nLongsToRead = [self numberOfSamples] - startOffset;
 		int i;
 		for(i=0;i<8;i++){
 			if([self enabled:i]){
@@ -1583,10 +1583,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	int i;
 	for(i=0;i<8;i++){
 		[myTests addObject:[ORVmeReadWriteTest test:thresholdRegOffsets[i] wordSize:4 validMask:0xffff name:@"Threshold"]];
-		int j;
-		for(j=0;j<2;j++){
-			[myTests addObject:[ORVmeReadOnlyTest test:adcMemory[i][j] length:64*1024 wordSize:4 name:@"Adc Memory"]];
-		}
+		//[myTests addObject:[ORVmeReadOnlyTest test:adcMemory[i] length:64*1024 wordSize:4 name:@"Adc Memory"]];
 	}
 	return myTests;
 }
