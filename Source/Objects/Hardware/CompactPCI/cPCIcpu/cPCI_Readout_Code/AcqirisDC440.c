@@ -285,6 +285,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_Get1WaveForm:
 			{	
 				Acquiris_ReadDataRequest* p = (Acquiris_ReadDataRequest*)aPacket->payload;
+				printf("get1waveform for %d\n",p->boardID);
 				if(Acquire (p->boardID)){
 					Acquiris_ReadDataRequest* p = (Acquiris_ReadDataRequest*)aPacket->payload;
 					if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_ReadDataRequest)/sizeof(int32_t));
@@ -310,15 +311,17 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 char Acquire(ViSession dev)
 {
 	ViBoolean done		= 0;
-	int32_t timeoutCounter = 100000;
-	
-	AcqrsD1_acquire(dev);					// Start the acquisition
-	
+	int32_t timeoutCounter = 50000;
+	int32_t status = AcqrsD1_acquire(dev);					// Start the acquisition
+	printf("Acquire on %d: status: %d\n",dev, status);
+
 	while (!done && --timeoutCounter){
-		AcqrsD1_acqDone(dev, &done);		// Poll for the end of the acquisition
+		status = AcqrsD1_acqDone(dev, &done);		// Poll for the end of the acquisition
+		printf("AcqrsD1_acqDone %d: status: %d done: %d\n",dev, status, done);
 	}
 	if (timeoutCounter<=0){
-			AcqrsD1_stopAcquisition(dev);	// Acquisition do not complete successfully
+		printf("Timeout on %ld\n",dev);
+		AcqrsD1_stopAcquisition(dev);	// Acquisition do not complete successfully
 	}
 	return done;
 }
@@ -354,6 +357,7 @@ int32_t FindAcqirisDC440s(void)
 		digitizer[i].busNumber		= busNumber;
 		digitizer[i].serialNumber	= serialNumber;
 		digitizer[i].instrumentID	= InstrumentID[i];
+		printf("%d: %d %d %d\n",i, busNumber,serialNumber,InstrumentID[i]);
 	}
 	return status;	
 }
@@ -459,6 +463,7 @@ void Readout_DC440(int32_t boardID,int32_t numberSamples,int32_t enableMask,int3
 {
 	// ### Readout the data ###
 	int32_t nbrSegments=1;
+	printf("%d - %d - %d - %d - %d - %d - %d \n", boardID, numberSamples, enableMask, dataID, location, restart, useCB);
 
 	if(useCB){
 		ViBoolean done = 0;

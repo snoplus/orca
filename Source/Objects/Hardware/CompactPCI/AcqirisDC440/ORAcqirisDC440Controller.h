@@ -52,6 +52,7 @@
     IBOutlet ORValueBar*	rate0;
     IBOutlet NSButton*		settingLockButton;
     IBOutlet NSButton*		probeButton;
+	IBOutlet NSTextField*	boardIdField;
 }
 
 #pragma mark ¥¥¥Initialization

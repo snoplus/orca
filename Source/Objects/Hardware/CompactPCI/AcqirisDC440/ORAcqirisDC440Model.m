@@ -44,6 +44,7 @@ NSString* ORAcqirisDC440DataChanged					 = @"ORAcqirisDC440DataChanged";
 NSString* ORAcqirisDC440RateGroupChangedNotification = @"ORAcqirisDC440RateGroupChangedNotification";
 NSString* ORAcqirisDC440SamplingWaveforms			 = @"ORAcqirisDC440SamplingWaveforms";
 NSString* ORAcqirisDC440SettingsLock				 = @"ORAcqirisDC440SettingsLock";
+NSString* ORAcqirisDC440BoardIDChanged				 = @"ORAcqirisDC440BoardIDChanged";
 
 static NSString* trigggerSlopeNames[6] = {
 @"Positive",
@@ -214,7 +215,6 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 - (void) setTriggerCoupling:(int)aTriggerCoupling
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerCoupling:triggerCoupling];
-    
     triggerCoupling = aTriggerCoupling;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440TriggerCouplingChanged object:self];
@@ -344,7 +344,14 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 - (void) assignBoardID
 {
 	[self probe:NO];
-	NSLog(@"Acqiris DC440 %d assigned boardID %d\n",[self baseAddress], boardID);
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440BoardIDChanged object:self];
+
+	NSLog(@"Acqiris DC440 %d %d assigned boardID %d\n",[self stationNumber],[self baseAddress], boardID);
+}
+
+- (int) boardID
+{
+	return boardID;
 }
 
 - (unsigned long) probe:(BOOL) verbose
@@ -360,8 +367,12 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 		for(i=0;i<n;i++){
 			NSString* name = [args objectAtIndex:(i*3)+2];
 			unsigned long serialNumber = [[args objectAtIndex:(i*3)+1] intValue];
-			if(serialNumber == [self baseAddress])boardID = [[args objectAtIndex:(i*3)] intValue];
-			if(verbose)NSLog(@"(%@)  %d: %d \n",name,i,serialNumber);
+			if(serialNumber == [self baseAddress]){
+				boardID = [[args objectAtIndex:(i*3)] intValue];
+				if(verbose){
+					NSLog(@"(%@)  %d: %d %d \n",name,i,boardID, serialNumber);
+				}
+			}
 		}
 	}
 	return response.status;

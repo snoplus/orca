@@ -1801,6 +1801,14 @@
 		84D2586D0FA7340B00626276 /* ORMotionNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258620FA7340B00626276 /* ORMotionNodeController.m */; };
 		84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D258630FA7340B00626276 /* ORMotionNodeModel.h */; };
 		84D2586F0FA7340B00626276 /* ORMotionNodeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258640FA7340B00626276 /* ORMotionNodeModel.m */; };
+		84D34B0410B1D6C90013473E /* ORSIS3302Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D34AFC10B1D6C90013473E /* ORSIS3302Controller.h */; };
+		84D34B0510B1D6C90013473E /* ORSIS3302Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D34AFD10B1D6C90013473E /* ORSIS3302Controller.m */; };
+		84D34B0610B1D6C90013473E /* ORSIS3302Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D34AFE10B1D6C90013473E /* ORSIS3302Decoders.h */; };
+		84D34B0710B1D6C90013473E /* ORSIS3302Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D34AFF10B1D6C90013473E /* ORSIS3302Decoders.m */; };
+		84D34B0810B1D6C90013473E /* ORSIS3302Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D34B0010B1D6C90013473E /* ORSIS3302Model.h */; };
+		84D34B0910B1D6C90013473E /* ORSIS3302Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D34B0110B1D6C90013473E /* ORSIS3302Model.m */; };
+		84D34B0A10B1D6C90013473E /* SIS3302.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0210B1D6C90013473E /* SIS3302.nib */; };
+		84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0310B1D6C90013473E /* SIS3302Card.gif */; };
 		84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */; };
 		84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */; };
 		84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D435B60798851B003D089F /* NoCamacDriverHelp.plist */; };
@@ -3885,6 +3893,14 @@
 		84D258620FA7340B00626276 /* ORMotionNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotionNodeController.m; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeController.m; sourceTree = SOURCE_ROOT; };
 		84D258630FA7340B00626276 /* ORMotionNodeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMotionNodeModel.h; sourceTree = "<group>"; };
 		84D258640FA7340B00626276 /* ORMotionNodeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMotionNodeModel.m; sourceTree = "<group>"; };
+		84D34AFC10B1D6C90013473E /* ORSIS3302Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3302Controller.h; sourceTree = "<group>"; };
+		84D34AFD10B1D6C90013473E /* ORSIS3302Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3302Controller.m; sourceTree = "<group>"; };
+		84D34AFE10B1D6C90013473E /* ORSIS3302Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3302Decoders.h; sourceTree = "<group>"; };
+		84D34AFF10B1D6C90013473E /* ORSIS3302Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3302Decoders.m; sourceTree = "<group>"; };
+		84D34B0010B1D6C90013473E /* ORSIS3302Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3302Model.h; sourceTree = "<group>"; };
+		84D34B0110B1D6C90013473E /* ORSIS3302Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3302Model.m; sourceTree = "<group>"; };
+		84D34B0210B1D6C90013473E /* SIS3302.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3302.nib; sourceTree = "<group>"; };
+		84D34B0310B1D6C90013473E /* SIS3302Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3302Card.gif; sourceTree = "<group>"; };
 		84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Decoders.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.h; sourceTree = SOURCE_ROOT; };
 		84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Decoders.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D435B60798851B003D089F /* NoCamacDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacDriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoCamacDriverHelp.plist"; sourceTree = SOURCE_ROOT; };
@@ -8404,6 +8420,22 @@
 			path = Source/Objects/Hardware/Serial/MotionNode;
 			sourceTree = SOURCE_ROOT;
 		};
+		84D34AFB10B1D6C90013473E /* SIS3302 */ = {
+			isa = PBXGroup;
+			children = (
+				84D34AFC10B1D6C90013473E /* ORSIS3302Controller.h */,
+				84D34AFD10B1D6C90013473E /* ORSIS3302Controller.m */,
+				84D34AFE10B1D6C90013473E /* ORSIS3302Decoders.h */,
+				84D34AFF10B1D6C90013473E /* ORSIS3302Decoders.m */,
+				84D34B0010B1D6C90013473E /* ORSIS3302Model.h */,
+				84D34B0110B1D6C90013473E /* ORSIS3302Model.m */,
+				84D34B0210B1D6C90013473E /* SIS3302.nib */,
+				84D34B0310B1D6C90013473E /* SIS3302Card.gif */,
+			);
+			name = SIS3302;
+			path = Source/Objects/Hardware/Vme/SIS3302;
+			sourceTree = SOURCE_ROOT;
+		};
 		84D791320FFA4CD000DC81D2 /* Keithley6487 */ = {
 			isa = PBXGroup;
 			children = (
@@ -9212,6 +9244,7 @@
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 				844445FE0E815C0D00A1440D /* XYCom200 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
+				84D34AFB10B1D6C90013473E /* SIS3302 */,
 				84FA6383102B041800B426A6 /* SIS3350 */,
 				84AFC23D1029F35E009F4139 /* VHQ224L */,
 			);
@@ -10139,6 +10172,9 @@
 				84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */,
 				848BF510107255F8005779A2 /* PMC_Link.h in Headers */,
 				8421064D1085A28E00C3AA81 /* ORAdeiLoader.h in Headers */,
+				84D34B0410B1D6C90013473E /* ORSIS3302Controller.h in Headers */,
+				84D34B0610B1D6C90013473E /* ORSIS3302Decoders.h in Headers */,
+				84D34B0810B1D6C90013473E /* ORSIS3302Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10791,6 +10827,8 @@
 				2D556352109F4CBE00A65E6C /* Needle in Resources */,
 				4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */,
 				4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */,
+				84D34B0A10B1D6C90013473E /* SIS3302.nib in Resources */,
+				84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11529,6 +11567,9 @@
 				848BF50F107255F8005779A2 /* PMC_Link.m in Sources */,
 				8421064C1085A28E00C3AA81 /* ORAdeiLoader.m in Sources */,
 				8405A459108C99A8001F43F1 /* ORDetectorSegment.m in Sources */,
+				84D34B0510B1D6C90013473E /* ORSIS3302Controller.m in Sources */,
+				84D34B0710B1D6C90013473E /* ORSIS3302Decoders.m in Sources */,
+				84D34B0910B1D6C90013473E /* ORSIS3302Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

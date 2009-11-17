@@ -166,10 +166,15 @@
 					 selector : @selector(settingsLockChanged:)
 						 name : ORAcqirisDC440SettingsLock
 						object: nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(samplingWaveformsChanged:)
 						 name : ORAcqirisDC440SamplingWaveforms
+						object: nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(boardIDChanged:)
+						 name : ORAcqirisDC440BoardIDChanged
 						object: nil];
 
 
@@ -214,6 +219,7 @@
 	[self enableMaskChanged:nil];
     [self settingsLockChanged:nil];
     [self samplingWaveformsChanged:nil];
+	[self boardIDChanged:nil];
 	
 }
 
@@ -234,6 +240,11 @@
     BOOL locked = [gSecurity isLocked:ORAcqirisDC440SettingsLock];
     [settingLockButton setState: locked];
 	[self updateButtons];
+}
+
+- (void) boardIDChanged:(NSNotification*)aNote
+{
+	[boardIdField setIntValue: [model boardID]];
 }
 
 - (void) enableMaskChanged:(NSNotification*)aNote

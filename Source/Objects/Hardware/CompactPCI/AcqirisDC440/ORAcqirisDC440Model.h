@@ -95,6 +95,7 @@
 - (void) setNumberSamples:(unsigned long)aNumberSamples;
 - (unsigned long) probe:(BOOL) verbose;
 - (void) assignBoardID;
+- (int) boardID;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (BOOL) samplingWaveforms;
@@ -177,4 +178,5 @@ extern NSString* ORAcqirisDC440NumberSamplesChanged;
 extern NSString* ORAcqirisDC440DataChanged;
 extern NSString* ORAcqirisDC440SettingsLock;
 extern NSString* ORAcqirisDC440SamplingWaveforms;
+extern NSString* ORAcqirisDC440BoardIDChanged;
 
