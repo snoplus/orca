@@ -28,8 +28,8 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-NSString* ORSIS3302ModelSampleStartIndexChanged = @"ORSIS3302SampleStartIndexChanged";
-NSString* ORSIS3302ModelSampleLengthChanged		= @"ORSIS3302SampleLengthChanged";
+NSString* ORSIS3302SampleStartIndexChanged		= @"ORSIS3302SampleStartIndexChanged";
+NSString* ORSIS3302SampleLengthChanged			= @"ORSIS3302SampleLengthChanged";
 NSString* ORSIS3302DacOffsetChanged				= @"ORSIS3302DacOffsetChanged";
 NSString* ORSIS3302LemoInModeChanged			= @"ORSIS3302LemoInModeChanged";
 NSString* ORSIS3302LemoOutModeChanged			= @"ORSIS3302LemoOutModeChanged";
