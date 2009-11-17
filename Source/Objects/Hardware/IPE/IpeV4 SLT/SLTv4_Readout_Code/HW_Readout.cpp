@@ -322,7 +322,6 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 			
 			if(fifoStatus != kFifoEmpty){
 				//TO DO... the number of events to read could (should) be made variable 
-				//         and checking of the total data size should be done...
 				uint32_t eventN;
 				for(eventN=0;eventN<10;eventN++){
 					
@@ -349,12 +348,15 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 								
 								uint32_t waveformLength = 2048; 
 								if(eventType & kReadWaveForms){
+									ensureDataCanHold(9 + waveformLength/2); 
 									data[dataIndex++] = waveformId | 9 + waveformLength/2;	
 								}
 								else {
+									ensureDataCanHold(7); 
 									data[dataIndex++] = dataId | 7;	
 								}
 								
+
 								data[dataIndex++] = location | eventchan<<8;
 								data[dataIndex++] = evsec;		//sec
 								data[dataIndex++] = evsubsec;	//subsec
@@ -508,10 +510,6 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 	
     return config->card_info[index].next_Card_Index;
 }
-
-void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t eventchan, uint32_t pagenr)
-{
- }	
 
 #if (0)
 //maybe read hit rates in the pmc at some point..... here's how....

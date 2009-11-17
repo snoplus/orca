@@ -37,7 +37,6 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
 
 int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-	void ReadWaveform(uint32_t waveformId, uint32_t location, uint32_t col, uint32_t eventchan, uint32_t pagenr);
 
 #ifdef __cplusplus
 }
