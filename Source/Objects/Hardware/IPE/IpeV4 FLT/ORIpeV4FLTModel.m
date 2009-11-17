@@ -462,7 +462,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain
 {
-	if(aGain>255)aGain = 255;
+	if(aGain>0xfff) aGain = 0xfff;
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setGain:aChan withValue:[self gain:aChan]];
 	[gains replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aGain]];
@@ -1357,7 +1357,7 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gain"];
-    [p setFormat:@"##0" upperLimit:255 lowerLimit:0 stepSize:1 units:@"raw"];
+    [p setFormat:@"##0" upperLimit:0xfff lowerLimit:0 stepSize:1 units:@"raw"];
     [p setSetMethod:@selector(setGain:withValue:) getMethod:@selector(gain:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
