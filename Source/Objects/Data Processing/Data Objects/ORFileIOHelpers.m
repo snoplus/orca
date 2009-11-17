@@ -27,7 +27,7 @@ NSMutableString* getNextString(NSFileHandle* fp)
     NSMutableString* aString = [NSMutableString stringWithCapacity:64];
     char c;
     @try {
-		while((c = *((char*)[[fp readDataOfLength:1] bytes])) != '\0'){
+		while((c = *((char*)[[fp readDataOfLength:1] bytes])) != '\n'){
 			if(c!='\n')[aString appendFormat:@"%c",c];
 		}
     }
