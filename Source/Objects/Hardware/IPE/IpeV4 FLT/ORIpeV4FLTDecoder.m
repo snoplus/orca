@@ -208,7 +208,7 @@
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
 
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
-					offset: 9*sizeof(long)					// Offset in bytes (2 header words)
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				    unitSize: sizeof(short)					// unit size in bytes
 					mask:	0x0FFF							// when displayed all values will be masked with this value
 					sender: self 
