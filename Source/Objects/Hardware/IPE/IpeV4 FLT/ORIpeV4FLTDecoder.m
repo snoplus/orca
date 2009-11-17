@@ -137,43 +137,78 @@
 
 //-------------------------------------------------------------
 /** Data format for waveform
-  *
-<pre>  
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^^^ ^^^^ ^^-----------------------data id
-                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
-
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^^--------------------------------spare
-        ^ ^^^---------------------------crate
-             ^ ^^^^---------------------card
-			        ^^^^ ^^^^-----------channel
-followed by waveform data (n x 1024 16-bit words)
-</pre>
-  *
-  */
+ *
+ <pre>  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^-----------------------data id
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^--------------------------------spare
+ ^ ^^^---------------------------crate
+ ^ ^^^^---------------------card
+ ^^^^ ^^^^-----------channel
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+ ^^^^ ^^^^------------------------------ channel (0..22)
+ ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+ ^ ------------------------------------- flag to indicate that the ADC have been swapped
+ ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
+ ^^ ^^^^ ^^^^ eventID (0..1024)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart/reset
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart/reset
+ followed by waveform data (n x 1024 16-bit words)
+ <pre>  
+ */ 
 //-------------------------------------------------------------
 
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
 
-    unsigned long* ptr = (unsigned long*)someData;
+	unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
-
-	++ptr;											//crate, card,channel from second word
+	++ptr;										 
+	//crate and card from second word
 	unsigned char crate		= (*ptr>>21) & 0xf;
 	unsigned char card		= (*ptr>>16) & 0x1f;
 	unsigned char chan		= (*ptr>>8) & 0xff;
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
-	NSString* channelKey	= [self getChannelKey: chan];
-			
+	NSString* channelKey	= [self getChannelKey: chan];	
+	++ptr;	//point to the sec
+	++ptr;	//point to the sub sec
+	++ptr;	//point to the channel map
+	++ptr;	//point to the eventID
+	++ptr;	//point to the energy
+	
+	//channel by channel histograms
+	unsigned long energy = *ptr/16;
+	[aDataSet histogram:energy 
+				numBins:65535 
+				 sender:self  
+			   withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
+	
+	//accumulated card level histograms
+	[aDataSet histogram:energy 
+				numBins:65535 
+				 sender:self  
+			   withKeys: @"FLT",@"Total Card Energy",crateKey,stationKey,nil];
+	
+	//accumulated crate level histograms
+	[aDataSet histogram:energy
+				numBins:65535 
+				 sender:self  
+			   withKeys: @"FLT",@"Total Crate Energy",crateKey,nil];
+
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
 
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
-					offset: 2*sizeof(long)					// Offset in bytes (2 header words)
+					offset: 9*sizeof(long)					// Offset in bytes (2 header words)
 				    unitSize: sizeof(short)					// unit size in bytes
 					mask:	0x0FFF							// when displayed all values will be masked with this value
 					sender: self 
