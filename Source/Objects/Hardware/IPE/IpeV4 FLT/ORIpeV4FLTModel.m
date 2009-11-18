@@ -1044,7 +1044,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self setHitRateLength:		[decoder decodeIntForKey:@"ORIpeV4FLTModelHitRateLength"]];
     [self setGains:				[decoder decodeObjectForKey:@"gains"]];
     [self setThresholds:		[decoder decodeObjectForKey:@"thresholds"]];
-    [self setFltRunMode:		[decoder decodeIntForKey:@"mode"]];
     [self setTotalRate:			[decoder decodeObjectForKey:@"totalRate"]];
 	[self setTestEnabledArray:	[decoder decodeObjectForKey:@"testsEnabledArray"]];
 	[self setTestStatusArray:	[decoder decodeObjectForKey:@"testsStatusArray"]];
@@ -1103,7 +1102,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [encoder encodeInt:hitRateLength		forKey:@"ORIpeV4FLTModelHitRateLength"];
     [encoder encodeObject:gains				forKey:@"gains"];
     [encoder encodeObject:thresholds		forKey:@"thresholds"];
-    [encoder encodeInt:fltRunMode			forKey:@"mode"];
     [encoder encodeObject:totalRate			forKey:@"totalRate"];
     [encoder encodeObject:testEnabledArray	forKey:@"testEnabledArray"];
     [encoder encodeObject:testStatusArray	forKey:@"testStatusArray"];
@@ -1217,6 +1215,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds			forKey:@"thresholds"];
     [objDictionary setObject:gains				forKey:@"gains"];
+    [objDictionary setObject:[NSNumber numberWithInt:runMode] forKey:@"runMode"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask] forKey:@"hitRateEnabledMask"];
     [objDictionary setObject:[NSNumber numberWithLong:triggerEnabledMask] forKey:@"triggerEnabledMask"];
 	
@@ -1347,7 +1346,13 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 {
     NSMutableArray* a = [NSMutableArray array];
     ORHWWizParam* p;
-    
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Run Mode"];
+    [p setFormat:@"##0" upperLimit:2 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setRunMode:) getMethod:@selector(runMode)];
+    [a addObject:p];
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
     [p setFormat:@"##0" upperLimit:32000 lowerLimit:0 stepSize:1 units:@"raw"];
@@ -1372,7 +1377,7 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
     [p setName:@"HitRate Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setHitRateEnabled:withValue:) getMethod:@selector(hitRateEnabled:)];
-    [a addObject:p];
+    [a addObject:p];	
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
@@ -1406,6 +1411,9 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 	}
     else if([param isEqualToString:@"HitRateEnabled"]){
 		return [[cardDictionary objectForKey:@"hitRatesEnabled"] objectAtIndex:aChannel];
+	}
+    else if([param isEqualToString:@"RunMode"]) {
+		return [cardDictionary objectForKey:@"runMode"];
 	}
     else return nil;
 }
