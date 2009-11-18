@@ -37,8 +37,8 @@
 		IBOutlet NSTextField*	histEMinTextField;
 		IBOutlet NSButton*		runBoxCarFilterCB;
 		IBOutlet NSButton*		storeDataInRamCB;
-		IBOutlet NSTextField*	filterLengthField;
-		IBOutlet NSTextField*	gapLengthField;
+		IBOutlet NSPopUpButton*	filterLengthPU;
+		IBOutlet NSPopUpButton*	gapLengthPU;
 		IBOutlet NSTextField*	histNofMeasField;
 		IBOutlet NSTextField*	histMeasTimeField;
 		IBOutlet NSTextField*	histRecTimeField;

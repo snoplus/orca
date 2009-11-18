@@ -329,12 +329,12 @@
 
 - (void) filterLengthChanged:(NSNotification*)aNote
 {
-	[filterLengthField setIntValue: [model filterLength]];
+	[filterLengthPU selectItemAtIndex:[model filterLength]-2];
 }
 
 - (void) gapLengthChanged:(NSNotification*)aNote
 {
-	[gapLengthField setIntValue: [model gapLength]];
+	[gapLengthPU selectItemAtIndex: [model gapLength]];
 }
 
 - (void) histNofMeasChanged:(NSNotification*)aNote
@@ -783,12 +783,12 @@
 
 - (IBAction) filterLengthAction:(id)sender
 {
-	[model setFilterLength:[sender intValue]];	
+	[model setFilterLength:[sender indexOfSelectedItem]+2];	 //tranlate back to range of 2 to 8
 }
 
 - (IBAction) gapLengthAction:(id)sender
 {
-	[model setGapLength:[sender intValue]];	
+	[model setGapLength:[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) histNofMeasAction:(id)sender

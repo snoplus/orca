@@ -326,7 +326,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setFilterLength:(int)aFilterLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterLength:filterLength];
-    filterLength = [self restrictIntValue:aFilterLength min:2 max:15];
+    filterLength = [self restrictIntValue:aFilterLength min:2 max:8];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelFilterLengthChanged object:self];
 }
 
