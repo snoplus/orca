@@ -52,8 +52,8 @@
 {
 	[super awakeFromNib];
 	
-    settingSize			= NSMakeSize(670,680);
-    rateSize			= NSMakeSize(490,650);
+    settingSize			= NSMakeSize(670,720);
+    rateSize			= NSMakeSize(490,690);
     testSize			= NSMakeSize(400,350);
     lowlevelSize		= NSMakeSize(400,350);
 	

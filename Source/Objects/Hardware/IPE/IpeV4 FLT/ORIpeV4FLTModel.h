@@ -38,7 +38,7 @@
 #define kIpeV4FLTBufferSizeShorts 1024/2
 
 /** Access to the first level trigger board of the IPE-DAQ electronics.
- * The board contains ADCs for 22 channels and digital logic (FPGA) for 
+ * The board contains ADCs for 24 channels and digital logic (FPGA) for 
  * for implementation experiment specific trigger logic. 
  * 
  * @section hwaccess Access to hardware  
@@ -66,7 +66,7 @@
 {
     // Hardware configuration
     int				fltRunMode;		//!< Run modes: 0=standby, 1=standard, 2=histogram, 3=test
-    NSMutableArray* thresholds;     //!< Array to keep the threshold of all 22 channel
+    NSMutableArray* thresholds;     //!< Array to keep the threshold of all 24 channel
     NSMutableArray* gains;			//!< Aarry to keep the gains
     unsigned long	triggerEnabledMask;	//!< mask to keep the activated channel for the trigger
 	unsigned long	hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement

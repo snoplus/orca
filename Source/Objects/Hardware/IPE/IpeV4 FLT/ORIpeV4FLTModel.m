@@ -482,7 +482,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 -(BOOL) triggerEnabled:(unsigned short) aChan
 {
-	if(aChan<22)return (triggerEnabledMask >> aChan) & 0x1;
+	if(aChan<kNumFLTChannels)return (triggerEnabledMask >> aChan) & 0x1;
 	else return NO;
 }
 
@@ -497,7 +497,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan
 {
- 	if(aChan<22)return (hitRateEnabledMask >> aChan) & 0x1;
+ 	if(aChan<kNumFLTChannels)return (hitRateEnabledMask >> aChan) & 0x1;
 	else return NO;
 }
 
@@ -1057,10 +1057,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self setThresholds: [NSMutableArray array]];
 		for(i=0;i<kNumFLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
 	}
+	if([thresholds count]<kNumFLTChannels){
+		for(i=[thresholds count];i<kNumFLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
+	}
 	
 	if(!gains){
 		[self setGains: [NSMutableArray array]];
 		for(i=0;i<kNumFLTChannels;i++) [gains addObject:[NSNumber numberWithInt:100]];
+	}
+	if([gains count]<kNumFLTChannels){
+		for(i=[gains count];i<kNumFLTChannels;i++) [gains addObject:[NSNumber numberWithInt:50]];
 	}
 	
 	if(!testStatusArray){
@@ -1490,7 +1496,7 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 	NSLog(@"Page Number : 0x%08x\n", [self readReg:kFLTV4HistPageNReg]);
 	
 	int i;
-	for(i=0;i<22;i++){
+	for(i=0;i<kNumFLTChannels;i++){
 		unsigned long firstLast = [self readReg:kFLTV4HistLastFirstReg channel:i];
 		unsigned long first = firstLast & 0xffff;
 		unsigned long last = (firstLast >>16) & 0xffff;
