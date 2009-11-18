@@ -342,7 +342,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = aPostTriggerTime;
+    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:0 max:2047];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelPostTriggerTimeChanged object:self];
 }
 
@@ -350,7 +350,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setFifoBehaviour:(int)aFifoBehaviour
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFifoBehaviour:fifoBehaviour];
-    fifoBehaviour = aFifoBehaviour;
+    fifoBehaviour = [self restrictIntValue:aFifoBehaviour min:0 max:1];;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelFifoBehaviourChanged object:self];
 }
 
@@ -364,8 +364,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) analogOffset{ return analogOffset; }
 - (void) setAnalogOffset:(int)aAnalogOffset
 {
+	
     [[[self undoManager] prepareWithInvocationTarget:self] setAnalogOffset:analogOffset];
-    analogOffset = aAnalogOffset;
+    analogOffset = [self restrictIntValue:aAnalogOffset min:0 max:4095];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelAnalogOffsetChanged object:self];
 }
 
@@ -1207,18 +1208,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[anEventDictionary setObject:aDictionary forKey:@"IpeV4FLT"];
 }
 
-/** This will go to the XML header of the data file.
- */ //-tb- 2009-11
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //TO DO....other things need to be added here.....
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [objDictionary setObject:thresholds			forKey:@"thresholds"];
-    [objDictionary setObject:gains				forKey:@"gains"];
-    [objDictionary setObject:[NSNumber numberWithInt:runMode] forKey:@"runMode"];
-    [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask] forKey:@"hitRateEnabledMask"];
-    [objDictionary setObject:[NSNumber numberWithLong:triggerEnabledMask] forKey:@"triggerEnabledMask"];
-	
+    [objDictionary setObject:thresholds										forKey:@"thresholds"];
+    [objDictionary setObject:gains											forKey:@"gains"];
+    [objDictionary setObject:[NSNumber numberWithInt:runMode]				forKey:@"runMode"];
+    [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask]	forKey:@"hitRateEnabledMask"];
+    [objDictionary setObject:[NSNumber numberWithLong:triggerEnabledMask]	forKey:@"triggerEnabledMask"];
+    [objDictionary setObject:[NSNumber numberWithLong:postTriggerTime]		forKey:@"postTriggerTime"];
+    [objDictionary setObject:[NSNumber numberWithLong:postTriggerTime]		forKey:@"postTriggerTime"];
+    [objDictionary setObject:[NSNumber numberWithLong:fifoBehaviour]		forKey:@"fifoBehaviour"];
+    [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
+    [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
+    [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
+    [objDictionary setObject:[NSNumber numberWithLong:filterLength]			forKey:@"filterLength"];
 	return objDictionary;
 }
 
@@ -1377,7 +1382,44 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
     [p setName:@"HitRate Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setHitRateEnabled:withValue:) getMethod:@selector(hitRateEnabled:)];
-    [a addObject:p];	
+    [a addObject:p];
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Post Trigger Delay"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:2047 units:@"x50ns"];
+    [p setSetMethod:@selector(setPostTriggerTime:) getMethod:@selector(postTriggerTime)];
+    [a addObject:p];
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Fifo Behavior"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setFifoBehaviour:) getMethod:@selector(fifoBehaviour)];
+    [a addObject:p];
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Analog Offset"];
+    [p setFormat:@"##0" upperLimit:4095 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setAnalogOffset:) getMethod:@selector(analogOffset)];
+    [a addObject:p];			
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Hit Rate Length"];
+    [p setFormat:@"##0" upperLimit:4095 lowerLimit:255 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHitRateLength:) getMethod:@selector(hitRateLength)];
+    [a addObject:p];			
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Gap Length"];
+    [p setFormat:@"##0" upperLimit:0 lowerLimit:7 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setGapLength:) getMethod:@selector(gapLength)];
+    [a addObject:p];			
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"FilterLength"];
+    [p setFormat:@"##0" upperLimit:2 lowerLimit:7 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setFilterLength:) getMethod:@selector(filterLength)];
+    [a addObject:p];			
+	
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
@@ -1400,21 +1442,17 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
-    if([param isEqualToString:@"Threshold"]){
-        return  [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
-    }
-    else if([param isEqualToString:@"Gain"]){
-		return [[cardDictionary objectForKey:@"gains"] objectAtIndex:aChannel];
-	}
-    else if([param isEqualToString:@"TriggerEnabled"]){
-		return [[cardDictionary objectForKey:@"triggersEnabled"] objectAtIndex:aChannel];
-	}
-    else if([param isEqualToString:@"HitRateEnabled"]){
-		return [[cardDictionary objectForKey:@"hitRatesEnabled"] objectAtIndex:aChannel];
-	}
-    else if([param isEqualToString:@"RunMode"]) {
-		return [cardDictionary objectForKey:@"runMode"];
-	}
+    if([param isEqualToString:@"Threshold"])				return  [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Gain"])				return [[cardDictionary objectForKey:@"gains"] objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Trigger Enabled"])		return [[cardDictionary objectForKey:@"triggersEnabled"] objectAtIndex:aChannel];
+    else if([param isEqualToString:@"HitRate Enabled"])		return [[cardDictionary objectForKey:@"hitRatesEnabled"] objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Post Trigger Time"])	return [cardDictionary objectForKey:@"postTriggerTime"];
+    else if([param isEqualToString:@"Run Mode"])			return [cardDictionary objectForKey:@"runMode"];
+    else if([param isEqualToString:@"Fifo Behaviour"])		return [cardDictionary objectForKey:@"fifoBehaviour"];
+    else if([param isEqualToString:@"Analog Offset"])		return [cardDictionary objectForKey:@"analogOffset"];
+    else if([param isEqualToString:@"Hit Rate Length"])		return [cardDictionary objectForKey:@"hitRateLength"];
+    else if([param isEqualToString:@"Gap Length"])			return [cardDictionary objectForKey:@"gapLength"];
+    else if([param isEqualToString:@"Filter Length"])		return [cardDictionary objectForKey:@"filterLength"];
     else return nil;
 }
 
