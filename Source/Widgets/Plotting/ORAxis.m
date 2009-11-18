@@ -70,6 +70,7 @@ NSString* kDefFont = @"Helvetica";
 #define kBigNumber						1e100	// large number for divide by zero result
 
 static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
+static char	powers[]	= {-15,-12,-9,-6,-3,0,3,6,9};		        // powers for exponents
 
 //notifications
 NSString* ORAxisRangeChangedNotification    = @"ORAxis Range Changed";
@@ -1783,9 +1784,10 @@ enum {
     tstep  = step/ticks;
     ival  *= sep;
     char suffix = symbols[(power-kFirstSymbolExponent)/3];
- 
+	int suffixExponent = powers[(power-kFirstSymbolExponent)/3];
+	float convertMultipler = pow(10.,suffixExponent);
+	
 	char dec = 0;			// flag to print decimal point
-    
     switch ((power-kFirstSymbolExponent)%3) {
         case 0:
 		break;
@@ -1801,7 +1803,7 @@ enum {
             else {
                 ival *= 100;
                 sep  *= 100;
-            }
+           }
 		break;
     }
 	
@@ -1941,12 +1943,12 @@ enum {
 					else			axisNumberString = [NSString stringWithFormat:@"%d%c",ival,suffix];
 				}
 				else {
-					float ticValue = [theCalibration convertedValueForChannel:ival];
+					float ticValue = [theCalibration convertedValueForChannel:ival*convertMultipler];
 					if (dec) {
 						if (ival<0) axisNumberString = [NSString stringWithFormat:@"-%.1f.%.3f%c",(-ticValue)/10,((int)-ticValue)%10,suffix];
 						else		axisNumberString = [NSString stringWithFormat:@"%.1f.%.3f%c",ticValue/10,(int)ticValue%10,suffix];
 					}	
-					else			axisNumberString = [NSString stringWithFormat:@"%.3f%c",ticValue,suffix];
+					else			axisNumberString = [NSString stringWithFormat:@"%.3f",ticValue];
 				}
 			}
 			NSSize axisNumberSize = [axisNumberString sizeWithAttributes:labelAttributes];
