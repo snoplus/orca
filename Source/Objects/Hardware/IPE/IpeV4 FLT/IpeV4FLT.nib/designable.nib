@@ -3259,12 +3259,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																			<string key="NSKeyEquivalent"/>
 																			<int key="NSPeriodicDelay">400</int>
 																			<int key="NSPeriodicInterval">75</int>
-																			<object class="NSMenuItem" key="NSMenuItem" id="326398437">
+																			<object class="NSMenuItem" key="NSMenuItem" id="585890280">
 																				<reference key="NSMenu" ref="549480879"/>
-																				<string key="NSTitle">50 ns</string>
+																				<string key="NSTitle">0 ns</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
+																				<int key="NSState">1</int>
 																				<reference key="NSOnImage" ref="71588138"/>
 																				<reference key="NSMixedImage" ref="414806212"/>
 																				<string key="NSAction">_popUpItemAction:</string>
@@ -3275,9 +3276,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																				<string key="NSTitle">OtherViews</string>
 																				<object class="NSMutableArray" key="NSMenuItems">
 																					<bool key="EncodedWithXMLCoder">YES</bool>
-																					<object class="NSMenuItem" id="585890280">
+																					<reference ref="585890280"/>
+																					<object class="NSMenuItem" id="326398437">
 																						<reference key="NSMenu" ref="549480879"/>
-																						<string key="NSTitle">0 ns</string>
+																						<string key="NSTitle">50 ns</string>
 																						<string key="NSKeyEquiv"/>
 																						<int key="NSKeyEquivModMask">1048576</int>
 																						<int key="NSMnemonicLoc">2147483647</int>
@@ -3286,7 +3288,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																						<string key="NSAction">_popUpItemAction:</string>
 																						<reference key="NSTarget" ref="1065498610"/>
 																					</object>
-																					<reference ref="326398437"/>
 																					<object class="NSMenuItem" id="424526637">
 																						<reference key="NSMenu" ref="549480879"/>
 																						<string key="NSTitle">100 ns</string>
@@ -3380,12 +3381,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																			<string key="NSKeyEquivalent"/>
 																			<int key="NSPeriodicDelay">400</int>
 																			<int key="NSPeriodicInterval">75</int>
-																			<object class="NSMenuItem" key="NSMenuItem" id="831950996">
+																			<object class="NSMenuItem" key="NSMenuItem" id="116263835">
 																				<reference key="NSMenu" ref="71632649"/>
-																				<string key="NSTitle">200 ns</string>
+																				<string key="NSTitle">12.8 µs</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
+																				<int key="NSState">1</int>
 																				<reference key="NSOnImage" ref="71588138"/>
 																				<reference key="NSMixedImage" ref="414806212"/>
 																				<string key="NSAction">_popUpItemAction:</string>
@@ -3396,7 +3398,17 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																				<string key="NSTitle">OtherViews</string>
 																				<object class="NSMutableArray" key="NSMenuItems">
 																					<bool key="EncodedWithXMLCoder">YES</bool>
-																					<reference ref="831950996"/>
+																					<object class="NSMenuItem" id="831950996">
+																						<reference key="NSMenu" ref="71632649"/>
+																						<string key="NSTitle">200 ns</string>
+																						<string key="NSKeyEquiv"/>
+																						<int key="NSKeyEquivModMask">1048576</int>
+																						<int key="NSMnemonicLoc">2147483647</int>
+																						<reference key="NSOnImage" ref="71588138"/>
+																						<reference key="NSMixedImage" ref="414806212"/>
+																						<string key="NSAction">_popUpItemAction:</string>
+																						<reference key="NSTarget" ref="795027289"/>
+																					</object>
 																					<object class="NSMenuItem" id="644176557">
 																						<reference key="NSMenu" ref="71632649"/>
 																						<string key="NSTitle">400 ns</string>
@@ -3421,7 +3433,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																					</object>
 																					<object class="NSMenuItem" id="160246202">
 																						<reference key="NSMenu" ref="71632649"/>
-																						<string key="NSTitle">1.6 ms</string>
+																						<string key="NSTitle">1.6 µs</string>
 																						<string key="NSKeyEquiv"/>
 																						<int key="NSKeyEquivModMask">1048576</int>
 																						<int key="NSMnemonicLoc">2147483647</int>
@@ -3432,7 +3444,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																					</object>
 																					<object class="NSMenuItem" id="388596760">
 																						<reference key="NSMenu" ref="71632649"/>
-																						<string key="NSTitle">3.2 ms</string>
+																						<string key="NSTitle">3.2 µs</string>
 																						<string key="NSKeyEquiv"/>
 																						<int key="NSKeyEquivModMask">1048576</int>
 																						<int key="NSMnemonicLoc">2147483647</int>
@@ -3443,7 +3455,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																					</object>
 																					<object class="NSMenuItem" id="646951849">
 																						<reference key="NSMenu" ref="71632649"/>
-																						<string key="NSTitle">6.4 ms</string>
+																						<string key="NSTitle">6.4 µs</string>
 																						<string key="NSKeyEquiv"/>
 																						<int key="NSKeyEquivModMask">1048576</int>
 																						<int key="NSMnemonicLoc">2147483647</int>
@@ -3452,20 +3464,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																						<string key="NSAction">_popUpItemAction:</string>
 																						<reference key="NSTarget" ref="795027289"/>
 																					</object>
-																					<object class="NSMenuItem" id="116263835">
-																						<reference key="NSMenu" ref="71632649"/>
-																						<string key="NSTitle">12.8 ms</string>
-																						<string key="NSKeyEquiv"/>
-																						<int key="NSKeyEquivModMask">1048576</int>
-																						<int key="NSMnemonicLoc">2147483647</int>
-																						<reference key="NSOnImage" ref="71588138"/>
-																						<reference key="NSMixedImage" ref="414806212"/>
-																						<string key="NSAction">_popUpItemAction:</string>
-																						<reference key="NSTarget" ref="795027289"/>
-																					</object>
+																					<reference ref="116263835"/>
 																				</object>
 																				<reference key="NSMenuFont" ref="852293060"/>
 																			</object>
+																			<int key="NSSelectedIndex">6</int>
 																			<int key="NSPreferredEdge">1</int>
 																			<bool key="NSUsesItemFromMenu">YES</bool>
 																			<bool key="NSAltersState">YES</bool>
