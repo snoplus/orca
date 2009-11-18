@@ -272,9 +272,8 @@
 //--------------------------------------------------------------------------------
 - (void) baseAddressChanged:(NSNotification*) aNotification
 {
-	//  Set value of both text and stepper
-	[self updateStepper:addressStepper setting:[model baseAddress]];
-	[addressTextField setIntValue:[model baseAddress]];
+	[addressStepper setDoubleValue:[model baseAddress]];
+	[addressTextField setDoubleValue:[model baseAddress]];
 }
 
 //--------------------------------------------------------------------------------
@@ -356,11 +355,8 @@
 //--------------------------------------------------------------------------------
 - (IBAction) baseAddressAction:(id) aSender
 {
-    // Make sure that value has changed.
-    if ([aSender intValue] != [model baseAddress]){
-		[[[model document] undoManager] setActionName:@"Set Base Address"]; // Set undo name.
-		[model setBaseAddress:[aSender intValue]]; // set new value.
-    }
+	[[[model document] undoManager] setActionName:@"Set Base Address"]; // Set undo name.
+	[model setBaseAddress:[aSender doubleValue]]; // set new value.
 } 
 
 //--------------------------------------------------------------------------------

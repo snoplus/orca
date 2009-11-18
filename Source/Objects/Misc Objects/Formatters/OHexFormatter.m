@@ -32,7 +32,7 @@
 {
     char s[255];
 	[string getCString:s maxLength:255 encoding:NSASCIIStringEncoding];	// NO return if conversion not possible due to encoding errors or too small of a buffer. The buffer should include room for maxBufferCount bytes plus the NULL termination character, which this method adds. (So pass in one less than the size of the buffer.)
-    *obj = [NSNumber numberWithLong:strtoul(s,0,16)];
+    *obj = [NSNumber numberWithUnsignedLong:strtoul(s,0,16)];
     return YES;
 }
 
