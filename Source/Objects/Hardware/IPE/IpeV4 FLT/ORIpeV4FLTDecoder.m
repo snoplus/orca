@@ -74,7 +74,7 @@
 	++ptr;	//point to the energy
 		
 	//channel by channel histograms
-	unsigned long energy = *ptr/16;
+	unsigned long energy = *ptr; ///16; removed the /16 for Brandon... may leave it out
 	[aDataSet histogram:energy 
 				numBins:65535 
 				 sender:self  
@@ -186,7 +186,7 @@
 	++ptr;	//point to the energy
 	
 	//channel by channel histograms
-	unsigned long energy = *ptr/16;
+	unsigned long energy = *ptr; ///16; removed the /16 for Brandon... may leave it out
 	[aDataSet histogram:energy 
 				numBins:65535 
 				 sender:self  
