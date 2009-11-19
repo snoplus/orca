@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3001"/>
+			<integer value="875"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2463,13 +2463,13 @@ Z2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</bytes>
 																	<object class="NSTextField" id="674034234">
 																		<reference key="NSNextResponder" ref="148309558"/>
 																		<int key="NSvFlags">256</int>
-																		<string key="NSFrame">{{134, 510}, {66, 14}}</string>
+																		<string key="NSFrame">{{134, 507}, {66, 17}}</string>
 																		<reference key="NSSuperview" ref="148309558"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="104459749">
 																			<int key="NSCellFlags">67239424</int>
 																			<int key="NSCellFlags2">138412032</int>
-																			<string key="NSContents">(0-32000)</string>
+																			<string key="NSContents"/>
 																			<object class="NSFont" key="NSSupport" id="22">
 																				<string key="NSName">LucidaGrande</string>
 																				<double key="NSSize">9</double>
@@ -2483,13 +2483,13 @@ Z2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</bytes>
 																	<object class="NSTextField" id="756725269">
 																		<reference key="NSNextResponder" ref="148309558"/>
 																		<int key="NSvFlags">256</int>
-																		<string key="NSFrame">{{31, 510}, {59, 14}}</string>
+																		<string key="NSFrame">{{31, 507}, {59, 17}}</string>
 																		<reference key="NSSuperview" ref="148309558"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="294687350">
 																			<int key="NSCellFlags">67239424</int>
 																			<int key="NSCellFlags2">138412032</int>
-																			<string key="NSContents">(0-4095)</string>
+																			<string key="NSContents"/>
 																			<reference key="NSSupport" ref="22"/>
 																			<reference key="NSControlView" ref="756725269"/>
 																			<reference key="NSBackgroundColor" ref="279876502"/>

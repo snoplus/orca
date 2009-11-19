@@ -446,7 +446,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 -(void) setThreshold:(unsigned short) aChan withValue:(unsigned short) aThreshold
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
-	if(aThreshold>32000)aThreshold = 32000;
+	if(aThreshold>0xfffff)aThreshold = 0xfffff;
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aThreshold]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -824,7 +824,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) writeThreshold:(int)i value:(unsigned short)aValue
 {
-	aValue &= 0x1ffff;
+	aValue &= 0xfffff;
 	[self writeReg: kFLTV4ThresholdReg channel:i value:aValue];
 }
 
@@ -1366,7 +1366,7 @@ NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:32000 lowerLimit:0 stepSize:1 units:@"raw"];
+    [p setFormat:@"##0" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@"raw"];
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
