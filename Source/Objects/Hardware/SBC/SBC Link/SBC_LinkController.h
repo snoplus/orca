@@ -43,7 +43,11 @@
 	IBOutlet NSTextField*   filePathField;
     IBOutlet NSPanel*		passWordPanel;
     IBOutlet NSTextField*   rootPassWordField;
+	IBOutlet NSTextField*   driverPassWordField;
 	IBOutlet NSButton*		rebootCB;
+	IBOutlet NSButton*		downloadDriverButton;
+    IBOutlet NSPanel*		driverInstallPanel;
+	IBOutlet NSTextField*   driverScriptInfoField;
 
 	//Monitoring
 	IBOutlet NSTextField*   runInfoField;
@@ -143,6 +147,7 @@
 
 - (NSString*) errorString:(int)errNum;
 - (NSString*) literalToString:(int)aLiteral;
+- (void) setDriverInfo;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) clearHistory:(id) sender;
@@ -181,6 +186,8 @@
 - (IBAction) cbTest:(id)sender;
 - (IBAction) numTestPointsAction:(id)sender;
 - (IBAction) payloadSizeAction:(id)sender;
+- (IBAction) downloadDriverAction:(id)sender;
+- (IBAction) closeDriverInstallPanel:(id)sender;
 
 #pragma mark ¥¥¥DataSource
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;

@@ -1443,6 +1443,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 
 #pragma mark •••SBC_Linking protocol
+- (NSString*) driverScriptName {return nil;} //no driver
+- (NSString*) driverScriptInfo {return @"";}
 
 - (NSString*) cpuName
 {

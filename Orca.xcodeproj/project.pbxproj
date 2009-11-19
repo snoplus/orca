@@ -1809,6 +1809,15 @@
 		84D34B0910B1D6C90013473E /* ORSIS3302Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D34B0110B1D6C90013473E /* ORSIS3302Model.m */; };
 		84D34B0A10B1D6C90013473E /* SIS3302.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0210B1D6C90013473E /* SIS3302.nib */; };
 		84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0310B1D6C90013473E /* SIS3302Card.gif */; };
+		84D351AA10B577AD0013473E /* organizeScript in Resources */ = {isa = PBXBuildFile; fileRef = 84D351A910B577AD0013473E /* organizeScript */; };
+		84D351AB10B578470013473E /* loginScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC390C99FA0700B46CD4 /* loginScript */; };
+		84D351AC10B5784B0013473E /* organizeScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 84D351A910B577AD0013473E /* organizeScript */; };
+		84D351AD10B5784E0013473E /* makeScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC380C99FA0700B46CD4 /* makeScript */; };
+		84D351AE10B578520013473E /* killScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC370C99FA0700B46CD4 /* killScript */; };
+		84D351AF10B578550013473E /* goScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3A0C99FA0700B46CD4 /* goScript */; };
+		84D351C310B5822F0013473E /* UniverseDriverInstall in Resources */ = {isa = PBXBuildFile; fileRef = 84D351C210B5822F0013473E /* UniverseDriverInstall */; };
+		84D3545A10B5974E0013473E /* UniverseDriverInstall in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 84D351C210B5822F0013473E /* UniverseDriverInstall */; };
+		84D356E010B5C41B0013473E /* DriverInstall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D356DF10B5C41B0013473E /* DriverInstall.gif */; };
 		84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */; };
 		84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */; };
 		84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D435B60798851B003D089F /* NoCamacDriverHelp.plist */; };
@@ -2179,6 +2188,12 @@
 			dstPath = SBC_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				84D3545A10B5974E0013473E /* UniverseDriverInstall in SBC_Code Copy */,
+				84D351AB10B578470013473E /* loginScript in SBC_Code Copy */,
+				84D351AC10B5784B0013473E /* organizeScript in SBC_Code Copy */,
+				84D351AD10B5784E0013473E /* makeScript in SBC_Code Copy */,
+				84D351AE10B578520013473E /* killScript in SBC_Code Copy */,
+				84D351AF10B578550013473E /* goScript in SBC_Code Copy */,
 				8493D2AA0C99FC2C00B46CD4 /* SBC_Cmds.h in SBC_Code Copy */,
 				2A08E4C40CFB74DF0090BF77 /* CircularBuffer.h in SBC_Code Copy */,
 				2A08E4C30CFB74CF0090BF77 /* CircularBuffer.c in SBC_Code Copy */,
@@ -3901,6 +3916,9 @@
 		84D34B0110B1D6C90013473E /* ORSIS3302Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3302Model.m; sourceTree = "<group>"; };
 		84D34B0210B1D6C90013473E /* SIS3302.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3302.nib; sourceTree = "<group>"; };
 		84D34B0310B1D6C90013473E /* SIS3302Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3302Card.gif; sourceTree = "<group>"; };
+		84D351A910B577AD0013473E /* organizeScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = organizeScript; sourceTree = "<group>"; };
+		84D351C210B5822F0013473E /* UniverseDriverInstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UniverseDriverInstall; sourceTree = "<group>"; };
+		84D356DF10B5C41B0013473E /* DriverInstall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = DriverInstall.gif; path = "Source/Objects/Hardware/SBC/SBC Link/DriverInstall.gif"; sourceTree = SOURCE_ROOT; };
 		84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Decoders.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.h; sourceTree = SOURCE_ROOT; };
 		84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Decoders.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D435B60798851B003D089F /* NoCamacDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacDriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoCamacDriverHelp.plist"; sourceTree = SOURCE_ROOT; };
@@ -6705,11 +6723,8 @@
 				8493CC350C99FA0700B46CD4 /* SBC_LinkController.m */,
 				84B89E9F0EF1977800E0C395 /* ORCommandList.h */,
 				84B89EA00EF1977800E0C395 /* ORCommandList.m */,
+				84D356DF10B5C41B0013473E /* DriverInstall.gif */,
 				8493CC360C99FA0700B46CD4 /* SBC_Link.nib */,
-				8493CC370C99FA0700B46CD4 /* killScript */,
-				8493CC380C99FA0700B46CD4 /* makeScript */,
-				8493CC390C99FA0700B46CD4 /* loginScript */,
-				8493CC3A0C99FA0700B46CD4 /* goScript */,
 			);
 			name = "SBC Link";
 			path = "Source/Objects/Hardware/SBC/SBC Link";
@@ -6718,6 +6733,11 @@
 		8493CC3B0C99FA0700B46CD4 /* SBC_Code */ = {
 			isa = PBXGroup;
 			children = (
+				8493CC390C99FA0700B46CD4 /* loginScript */,
+				84D351A910B577AD0013473E /* organizeScript */,
+				8493CC380C99FA0700B46CD4 /* makeScript */,
+				8493CC370C99FA0700B46CD4 /* killScript */,
+				8493CC3A0C99FA0700B46CD4 /* goScript */,
 				8493CC3C0C99FA0700B46CD4 /* CircularBuffer.c */,
 				8493CC3D0C99FA0700B46CD4 /* CircularBuffer.h */,
 				8493CC3E0C99FA0700B46CD4 /* SBC_Cmds.h */,
@@ -6772,6 +6792,7 @@
 			isa = PBXGroup;
 			children = (
 				8493CC7E0C99FA4B00B46CD4 /* Makefile */,
+				84D351C210B5822F0013473E /* UniverseDriverInstall */,
 				84CEDD1E0CDA7DB7002CFD3A /* VME_HW_Definitions.h */,
 				8493CC7F0C99FA4B00B46CD4 /* HW_Readout.c */,
 				8493CC800C99FA4B00B46CD4 /* HW_Readout.h */,
@@ -10829,6 +10850,9 @@
 				4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */,
 				84D34B0A10B1D6C90013473E /* SIS3302.nib in Resources */,
 				84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */,
+				84D351AA10B577AD0013473E /* organizeScript in Resources */,
+				84D351C310B5822F0013473E /* UniverseDriverInstall in Resources */,
+				84D356E010B5C41B0013473E /* DriverInstall.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

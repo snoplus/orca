@@ -121,6 +121,9 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 
 
 #pragma mark ¥¥¥SBC_Linking protocol
+- (NSString*) driverScriptName {return nil;} //no driver
+- (NSString*) driverScriptInfo {return @"";}
+
 - (NSString*) cpuName
 {
 	return [NSString stringWithFormat:@"cPCI CPU (Crate %d)",[self crateNumber]];

@@ -67,6 +67,7 @@
 - (void) updateButtons;
 
 #pragma mark ***Interface Management
+- (void) boardIDChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) enableMaskChanged:(NSNotification*)aNote;
 - (void) sampleRateChanged:(NSNotification*)aNote;

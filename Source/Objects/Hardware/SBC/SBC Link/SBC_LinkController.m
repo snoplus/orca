@@ -33,6 +33,7 @@
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 
@@ -75,12 +76,28 @@
 	[payloadSizeSlider setMinValue:0];
 	[payloadSizeSlider setMaxValue:300];
 	[ipNumberComboBox reloadData];
+	[self setDriverInfo];
+
 }
 
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[model cpuName]];	
+	[self setDriverInfo];
+}
+
+- (void) setDriverInfo
+{
+	if([model driverScriptName]!=nil){
+		[downloadDriverButton setEnabled:YES];
+		[driverScriptInfoField setStringValue:[NSString stringWithFormat:@"Install Script: %@\n\nScript Info: %@",[model driverScriptName],[model driverScriptInfo]]];
+	}
+	else {
+		[downloadDriverButton setEnabled:NO];
+		[driverScriptInfoField setStringValue:@"N/A.... Driver is built-in or not needed"];
+	}
+	
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
@@ -712,6 +729,16 @@
                       nil,@"Is this really what you want?");
 }
 
+- (IBAction) downloadDriverAction:(id)sender
+{
+		[driverPassWordField setStringValue:@""];
+		[NSApp beginSheet: driverInstallPanel
+		   modalForWindow: [self window]
+			modalDelegate: self
+		   didEndSelector: @selector(_driverInstallPanelDidEnd:returnCode:contextInfo:)
+			  contextInfo: nil];
+}
+
 - (IBAction)  shutdownAction:(id)sender;     
 {
     [rootPassWordField setStringValue:@""];
@@ -726,6 +753,12 @@
 {
     [passWordPanel orderOut:self];
     [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+}
+
+- (IBAction) closeDriverInstallPanel:(id)sender
+{
+    [driverInstallPanel orderOut:self];
+    [NSApp endSheet:driverInstallPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
 }
 
 - (IBAction) verboseAction:(id)sender
@@ -1068,6 +1101,15 @@
 		[[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[rebootCB intValue]];  
 	}
 }
+
+- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSOKButton){
+		[[model sbcLink] installDriver:[driverPassWordField stringValue]];  
+	}
+}
+
+
 
 @end
 

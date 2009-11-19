@@ -61,6 +61,7 @@ typedef enum eSBC_ThrottleConsts{
 	
 	ORFileMover*	coreSBCFileMover;
 	ORFileMover*	specificHWFileMover;
+	ORFileMover*	driverScriptFileMover;
 	NSMutableData*	theDataBuffer;
 	unsigned short  missedHeartBeat;
 	unsigned long   oldCycleCount;
@@ -232,6 +233,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) connect;
 - (void) disconnect;
 - (NSString*) crateProcessState;
+- (void) installDriver:(NSString*)rootPwd; 
 
 - (void) tellClientToStartRun;
 - (void) tellClientToStopRun;

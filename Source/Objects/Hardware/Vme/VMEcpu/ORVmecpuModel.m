@@ -133,6 +133,15 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 }
 
 #pragma mark ¥¥¥SBC_Linking protocol
+- (NSString*) driverScriptName 
+{
+	return @"UniverseDriverInstall";
+}
+
+- (NSString*) driverScriptInfo 
+{
+	return @"Install for the latest version of the Universe II driver";
+}
 
 - (NSString*) cpuName
 {

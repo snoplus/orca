@@ -23,4 +23,6 @@
 - (NSString*) sbcLocalCodePath;
 - (NSString*) codeResourcePath;
 - (NSString*) cpuName;
+- (NSString*) driverScriptName;
+- (NSString*) driverScriptInfo;
 @end

@@ -60,6 +60,7 @@
 
 
 #pragma mark ¥¥¥SBC_Linking Protocol
+- (NSString*) driverScriptName;
 - (NSString*) cpuName;
 - (NSString*) sbcLockName;
 - (NSString*) sbcLocalCodePath;

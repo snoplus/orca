@@ -237,6 +237,67 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	return [delegate sbcLockName];
 }
 
+- (void) installDriver:(NSString*)rootPwd 
+{ 
+	if([delegate respondsToSelector:@selector(driverScriptName)]){
+		ORTaskSequence* aSequence;	
+		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+		
+		NSString* hwSpecificCodePath;
+		if(loadMode)hwSpecificCodePath = [filePath stringByAppendingPathComponent:[delegate sbcLocalCodePath]];
+		else hwSpecificCodePath = [resourcePath stringByAppendingPathComponent:[delegate codeResourcePath]];
+		hwSpecificCodePath = [hwSpecificCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
+		driverScriptFileMover = [[ORFileMover alloc] init];
+		[driverScriptFileMover setDelegate:aSequence];
+		
+		[driverScriptFileMover setMoveParams:[hwSpecificCodePath stringByExpandingTildeInPath]
+										to:@"" 
+								remoteHost:IPNumber 
+								  userName:userName 
+								  passWord:passWord];
+		[driverScriptFileMover setVerbose:YES];
+		[driverScriptFileMover doNotMoveFilesToSentFolder];
+		[driverScriptFileMover setTransferType:eUseSCP];
+		[aSequence addTaskObj:driverScriptFileMover];
+		
+		NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",userName,[delegate driverScriptName]];
+		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,scriptRunPath,nil]];
+		
+		[aSequence launch];
+	/*
+		ORTaskSequence* aSequence;	
+		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		NSString* scriptPath = 
+		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,scriptPath,@"upgrade",nil]];
+		
+		[aSequence setVerbose:YES];
+		[aSequence setTextToDelegate:YES];
+
+		[aSequence launch];
+*/
+	}
+}
+
+- (NSString*) driverScriptName 
+{
+	if([delegate respondsToSelector:@selector(driverScriptName)]){
+		return [delegate driverScriptName];
+	}
+	else return @"";
+}
+
+- (NSString*) driverScriptInfo 
+{
+	if([delegate respondsToSelector:@selector(driverScriptInfo)]){
+		return [delegate driverScriptInfo];
+	}
+	else return @"";
+}
+
 - (int) loadMode
 {
     return loadMode;
@@ -703,6 +764,11 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		[specificHWFileMover release];
 		specificHWFileMover  = nil;
 	}
+	else if([aNote object] == driverScriptFileMover){
+		NSLog(@"Transfered Driver Update Script: %@ to %@\n",[driverScriptFileMover fileName],[driverScriptFileMover remoteHost]);
+		[driverScriptFileMover release];
+		driverScriptFileMover  = nil;
+	}
 }
 
 - (void) tasksCompleted:(id)sender
@@ -762,9 +828,9 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		NSLog(@"Core code for crate reload starting\n");
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		[aSequence setVerbose:verbose];
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
 				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"/bin/rm",@"-rf",@"ORCA",nil]];
-		[aSequence setVerbose:verbose];
 		[aSequence setTextToDelegate:YES];
 		
 		[self fillInScript:@"makeScript"];

@@ -49,6 +49,7 @@
 
 - (void) addTask:(NSString*)aTaskPath  arguments:(NSArray*)theParams
 {
+	//if(verbose)NSLog(@"adding Task %@ %@\n",aTaskPath,theParams);
 	NSTask* theTask = [[NSTask alloc] init];
 	[theTask setLaunchPath:aTaskPath];
 	[theTask setArguments: theParams];
@@ -80,7 +81,7 @@
 
 - (void) taskCompleted: (NSNotification*)aNote
 {
-	[self performSelector:@selector(movetoNextTask:) withObject:aNote afterDelay:1];
+	[self performSelector:@selector(movetoNextTask:) withObject:aNote afterDelay:0];
 }
 
 - (void) movetoNextTask:(NSNotification*)aNote
@@ -145,6 +146,7 @@
 				   name : NSTaskDidTerminateNotification
 				 object : theTask];
 		
+		//if(verbose)NSLog(@"launching: %@\n",theTask);
 		[theTask launch];
 	}
 	else {
