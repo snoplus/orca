@@ -56,53 +56,6 @@ void processHWCommand(SBC_Packet* aPacket)
 	}
 }
 
-void startHWRun (SBC_crate_config* config)
-{	
-	int32_t index = 0;
-	while(1){
-		switch(config->card_info[index].hw_type_id){
-			case kAcqirisDC440: index = Start_AqirisDC440(index, config); break; /*Acqiris DC440 Digitizer*/
-			default:     index =  -1; break;
-		}
-		if(index>=config->total_cards || index<0)break;
-	}
-}
-
-void stopHWRun (SBC_crate_config* config)
-{
-
-	int32_t index = 0;
-	while(1){
-		switch(config->card_info[index].hw_type_id){
-			case kAcqirisDC440: index = Stop_AqirisDC440(index, config); break; /*Acqiris DC440 Digitizer*/
-			default:     index =  -1; break;
-		}
-		if(index>=config->total_cards || index<0)break;
-	}
-}
-
-int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data)
-{
-	if(index<config->total_cards && index>=0) {
-		switch(config->card_info[index].hw_type_id){
-			case kAcqirisDC440:														//Acqiris DC440 Digitizer
-				Readout_DC440( config->card_info[index].base_add,					//the address
-							   config->card_info[index].deviceSpecificData[0],		//the number of Samples
-							   config->card_info[index].deviceSpecificData[1],		//enable Mask
-							   config->card_info[index].hw_mask[0],					//the dataID
-							   ((config->card_info[index].crate & 0x0f) << 21) |
-							   ((config->card_info[index].slot  & 0x1f) << 16),		//the location (crate,card)
-								1,													//restart == YES
-								1);													//use Circular Buffer == YES
-				return config->card_info[index].next_Card_Index;
-			break;
-															
-			default: return -1; break;
-		}
-	}
-	return -1;
-}
-
 void FindHardware(void)
 {
 	ClearAcqirisInitFlag();

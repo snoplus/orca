@@ -23,27 +23,9 @@
 #include "SBC_Cmds.h"
 
 void processHWCommand(SBC_Packet* aPacket);
-void startHWRun (SBC_crate_config* config);
-void stopHWRun (SBC_crate_config* config);
-int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data);
 void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply);
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
-
-int32_t Readout_DataGen(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_CAEN419(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_IP320(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_Fec(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_SIS3350(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index);
-void reOrderOneSIS3350Event(int32_t* inDataPtr, uint32_t dataLength, uint32_t wrapLength);
 
 #endif

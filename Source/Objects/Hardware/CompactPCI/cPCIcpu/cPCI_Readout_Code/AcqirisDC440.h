@@ -24,14 +24,19 @@
 #include "AcqirisDC440Cmds.h"
 #include "SBC_Config.h"
 #include "SBC_Cmds.h"
+#include "AcqirisD1Import.h"
 
 void ClearAcqirisInitFlag(void);
 int32_t FindAcqirisDC440s(void);
 void ReleaseAcqirisDC440s(void);
 void processAcquirisDC440Command(SBC_Packet* aPacket);
+void StartUp(ViSession dev);
+void Stop(ViSession dev);
+char Arm(ViSession dev);
+char Acquire(ViSession dev);
+ViInt32 StopAcquisition (ViSession dev,int32_t aStopOption);
 
 int32_t configVerical(uint32_t identifier,int32_t channel, double fullScale, double offset, int32_t coupling, int32_t bandwidth);
 
 int32_t Start_AqirisDC440(int32_t index,SBC_crate_config* crate_config );
 int32_t Stop_AqirisDC440(int32_t index,SBC_crate_config* crate_config );
-void Readout_DC440(int32_t boardID,int32_t numberSamples,int32_t enableMask,int32_t dataID,int32_t location,char restart,char useCB);

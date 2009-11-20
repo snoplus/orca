@@ -21,10 +21,7 @@
 //    Generic hardware configuration structure used by both Mac and eCPU code.
 #define MAX_CARDS            20
 
-typedef struct {
-    uint32_t header;
-    int32_t total_cards;                   // total sum of all cards
-    struct {								// structure required for card
+typedef struct {								// structure required for card
         uint32_t hw_type_id;                // unique hardware identifier code
         uint32_t hw_mask[10];				// hardware identifier mask to OR into data word
         uint32_t slot;						// slot identifier
@@ -35,7 +32,13 @@ typedef struct {
         uint32_t next_Card_Index;			// next card_info index to be read after this one.        
         uint32_t num_Trigger_Indexes;		// number of triggers for this card
         uint32_t next_Trigger_Index[3];		//card_info index for device specific trigger
-    } card_info[MAX_CARDS];
+} SBC_card_info;
+
+typedef struct {
+    uint32_t header;
+    int32_t total_cards;                   // total sum of all cards
+    SBC_card_info
+card_info[MAX_CARDS];
 } SBC_crate_config;
 
 #define kSBC_CrateConfigSizeLongs sizeof(SBC_crate_config)/sizeof(uint32_t)

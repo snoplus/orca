@@ -35,6 +35,7 @@
 #include <sys/time.h>
 #include "SBC_Readout.h"
 #include "HW_Readout.h"
+#include "readout_code.h"
 #include "SBC_Job.h"
 
 #define BACKLOG 1     // how many pending connections queue will hold
@@ -624,6 +625,7 @@ char startRun (void)
     
     if(run_info.statusBits | kSBC_ConfigLoadedMask){
 
+        initializeHWRun(&crate_config);
         startHWRun(&crate_config);
 
         if( pthread_create(&readoutThreadId,&readoutThreadAttr, readoutThread, 0) == 0){
@@ -646,6 +648,7 @@ void stopRun()
     stopHWRun(&crate_config);
     // block until return
     pthread_join(readoutThreadId, NULL);
+    cleanupHWRun(&crate_config);
     memset(&crate_config,0,sizeof(SBC_crate_config));
     //CB_cleanup();
 }
@@ -938,3 +941,56 @@ void processCmdBlock(SBC_Packet* aPacket)
 	//echo the block back as a response
 	writeBuffer(aPacket);
 }
+
+void initializeHWRun(SBC_crate_config* config)
+{
+    int32_t index = 0;
+    while(index<config->total_cards){
+        if (load_card(&config->card_info[index], index) != 1) {
+            // Error
+        }
+        index++;
+    }
+}
+void startHWRun (SBC_crate_config* config)
+{    
+    int32_t index = 0;
+    while(index<config->total_cards){
+        if (start_card(index) != 1) {
+            // Error
+        }
+        index++;
+    }
+}
+
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+    if(index<config->total_cards && index>=0) {
+        return readout_card(index, lamData);
+    }
+    return -1;
+}
+
+
+void stopHWRun (SBC_crate_config* config)
+{
+    int32_t index = 0;
+    while(index<config->total_cards){
+        if (stop_card(index) != 1) {
+            // Error
+        }
+        index++;
+    }
+}
+
+void cleanupHWRun (SBC_crate_config* config)
+{
+    int32_t index = 0;
+    while(index<config->total_cards){
+        if (remove_card(index) != 1) {
+            // Error
+        }
+        index++;
+    }
+}
+

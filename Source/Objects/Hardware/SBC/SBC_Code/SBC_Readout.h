@@ -41,6 +41,13 @@ void startJob(void(*jobFunction)(SBC_Packet*),SBC_Packet* aPacket);
 void jobStatus(SBC_Packet* aPacket);
 void killJob(SBC_Packet* aPacket);
 
+// Hardware functions
+void initializeHWRun (SBC_crate_config* config);
+void stopHWRun (SBC_crate_config* config);
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data);
+void startHWRun (SBC_crate_config* config);
+void cleanupHWRun (SBC_crate_config* config);
+
 void sendResponse(SBC_Packet* aPacket);
 int32_t readBuffer(SBC_Packet* aPacket);
 int32_t writeBuffer(SBC_Packet* aPacket);

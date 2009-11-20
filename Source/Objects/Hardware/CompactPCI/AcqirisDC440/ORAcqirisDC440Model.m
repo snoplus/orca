@@ -406,7 +406,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 {
 	NSString* args = [NSString stringWithFormat:@"%lu,%ld,1",boardID,numberSamples];
 	long status =  [self doSetXXXCommand:kAcqiris_SetConfigMemory cmdArgs:args];
-	if(status)NSLog(@"config Memory status: %ld\n",[self decodeError:status]);
+	if(status)NSLog(@"config Memory status: %@\n",[self decodeError:status]);
 	return status;
 }
 
@@ -415,7 +415,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	
 	NSString* args = [NSString stringWithFormat:@"%lu,%d,%G,%G,%d,0",boardID,chan,DC440_fullscale[fullScale],verticalOffset,coupling];
 	long status = [self doSetXXXCommand:kAcqiris_SetConfigVertical cmdArgs:args];
-	if(status)NSLog(@"config Vertical status (%d): %ld\n",chan,[self decodeError:status]);
+	if(status)NSLog(@"config Vertical status (%d): %@\n",chan,[self decodeError:status]);
 	return status;
 }
 
@@ -423,7 +423,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 {
 	NSString* args = [NSString stringWithFormat:@"%lu,%G,%G",boardID,sampleInterval/1000000.0,delayTime/1000000.0];
 	long status = [self doSetXXXCommand:kAcqiris_SetConfigHorizontal cmdArgs:args];
-	if(status)NSLog(@"config Horizontal status: %ld\n",[self decodeError:status]);
+	if(status)NSLog(@"config Horizontal status: %@\n",[self decodeError:status]);
 	return status;
 }
 
@@ -437,7 +437,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	}
 	NSString* args = [NSString stringWithFormat:@"%lu,0,%ld,0,0,0,0",boardID,sourcePattern];
 	long status = [self doSetXXXCommand:kAcqiris_SetConfigTrigClass cmdArgs:args];
-	if(status)NSLog(@"config Trig Class status: %ld\n",[self decodeError:status]);
+	if(status)NSLog(@"config Trig Class status: %@\n",[self decodeError:status]);
 	return status;
 }
 
@@ -449,7 +449,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	
 	NSString* args = [NSString stringWithFormat:@"%lu,%ld,%ld,%ld,%G,%G",boardID,trig,triggerCoupling,triggerSlope,[self triggerLevel:0],[self triggerLevel:1]];
 	long status = [self doSetXXXCommand:kAcqiris_SetConfigTrigSource cmdArgs:args];
-	if(status)NSLog(@"config Trig Source status: %ld\n",[self decodeError:status]);
+	if(status)NSLog(@"config Trig Source status: %@\n",[self decodeError:status]);
 	return status;
 }
 
@@ -826,6 +826,8 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	configStruct->card_info[index].base_add		= boardID;
 	configStruct->card_info[index].deviceSpecificData[0] = numberSamples;
 	configStruct->card_info[index].deviceSpecificData[1] = enableMask;
+	configStruct->card_info[index].deviceSpecificData[2] = 1; // Tells the card to auto restart
+	configStruct->card_info[index].deviceSpecificData[3] = 1; // Use the circular buffer
 	configStruct->card_info[index].num_Trigger_Indexes = 0;		//N/A
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 	return index+1;

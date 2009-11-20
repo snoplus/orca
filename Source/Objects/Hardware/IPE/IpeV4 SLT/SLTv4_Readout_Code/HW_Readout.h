@@ -21,22 +21,19 @@
 #define _H_HWREADOUT_
 
 #ifdef __cplusplus
+class hw4::SubrackKatrin;
+hw4::SubrackKatrin *srack=0;
 extern "C" {
 #endif
 
 //#include "SBC_Cmds.h"
 	
 void processHWCommand(SBC_Packet* aPacket);
-void startHWRun (SBC_crate_config* config);
-void stopHWRun (SBC_crate_config* config);
-int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data);
 void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply);
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
 
-int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 
 #ifdef __cplusplus
 }
