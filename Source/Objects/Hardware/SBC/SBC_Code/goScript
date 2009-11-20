@@ -1,8 +1,8 @@
 #!/bin/bash
 
 STATUS_FILE=${HOME}/ORCA/stat.txt
-PID=`ps ux | awk '/OrcaReadout/ && !/awk/ {print $2}'`
-if [ "$PID" ]
+
+if [ "$(pidof -s OrcaReadout)" ]
 then
 	#Orca loop running
 	#output is logged if it includes "goscript:"
