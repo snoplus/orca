@@ -44,10 +44,13 @@
     IBOutlet NSPanel*		passWordPanel;
     IBOutlet NSTextField*   rootPassWordField;
 	IBOutlet NSTextField*   driverPassWordField;
-	IBOutlet NSButton*		rebootCB;
+	IBOutlet NSMatrix*		rebootMatrix;
 	IBOutlet NSButton*		downloadDriverButton;
     IBOutlet NSPanel*		driverInstallPanel;
 	IBOutlet NSTextField*   driverScriptInfoField;
+	IBOutlet NSTextField*   shutdown1Field;
+	IBOutlet NSTextField*   shutdown2Field;
+	IBOutlet NSButton*		shutdownButton;
 
 	//Monitoring
 	IBOutlet NSTextField*   runInfoField;
@@ -161,6 +164,7 @@
 - (IBAction) killCrateAction:(id)sender;
 - (IBAction) shutdownAction:(id)sender;    
 - (IBAction) closePassWordPanel:(id)sender;
+- (IBAction) rebootHaltSelectionAction:(id)sender;
 
 - (IBAction) initAfterConnectAction:(id)sender;
 - (IBAction) ipNumberAction:(id)sender;

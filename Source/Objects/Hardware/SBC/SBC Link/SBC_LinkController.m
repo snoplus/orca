@@ -749,6 +749,20 @@
 		  contextInfo: nil];
 }
 
+- (IBAction) rebootHaltSelectionAction:(id)sender
+{
+	if([[sender selectedCell]tag] == 0){
+		[shutdown1Field setStringValue:@"SBC Shutdown"];
+		[shutdown2Field setStringValue:@"Shutdown requires that you type in the SBC root password. "];
+		[shutdownButton	setTitle:@"Shutdown"];
+	}
+	else {
+		[shutdown1Field setStringValue:@"SBC Reboot"];
+		[shutdown2Field setStringValue:@"Reboot requires that you type in the SBC root password. "];
+		[shutdownButton	setTitle:@"Reboot"];
+	}
+}
+
 - (IBAction) closePassWordPanel:(id)sender
 {
     [passWordPanel orderOut:self];
@@ -1098,7 +1112,7 @@
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSOKButton){
-		[[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[rebootCB intValue]];  
+		[[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[[rebootMatrix selectedCell]tag]];  
 	}
 }
 

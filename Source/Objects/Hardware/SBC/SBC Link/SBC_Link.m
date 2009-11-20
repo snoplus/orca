@@ -833,9 +833,9 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"/bin/rm",@"-rf",@"ORCA",nil]];
 		[aSequence setTextToDelegate:YES];
 		
-		[self fillInScript:@"makeScript"];
-		[self fillInScript:@"goScript"];
-		[self fillInScript:@"organizeScript"];
+		[self fillInScript:@"makeScript.in"];
+		[self fillInScript:@"goScript.in"];
+		[self fillInScript:@"organizeScript.in"];
 		
 		coreSBCFileMover = [[ORFileMover alloc] init];
 		[coreSBCFileMover setDelegate:aSequence];
