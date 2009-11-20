@@ -1871,9 +1871,7 @@
 		84D34B0910B1D6C90013473E /* ORSIS3302Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D34B0110B1D6C90013473E /* ORSIS3302Model.m */; };
 		84D34B0A10B1D6C90013473E /* SIS3302.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0210B1D6C90013473E /* SIS3302.nib */; };
 		84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0310B1D6C90013473E /* SIS3302Card.gif */; };
-		84D351AA10B577AD0013473E /* organizeScript in Resources */ = {isa = PBXBuildFile; fileRef = 84D351A910B577AD0013473E /* organizeScript */; };
 		84D351AB10B578470013473E /* loginScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC390C99FA0700B46CD4 /* loginScript */; };
-		84D351AC10B5784B0013473E /* organizeScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 84D351A910B577AD0013473E /* organizeScript */; };
 		84D351AD10B5784E0013473E /* makeScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC380C99FA0700B46CD4 /* makeScript */; };
 		84D351AE10B578520013473E /* killScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC370C99FA0700B46CD4 /* killScript */; };
 		84D351AF10B578550013473E /* goScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3A0C99FA0700B46CD4 /* goScript */; };
@@ -2295,7 +2293,6 @@
 				43ADFE5510B6DB240044617C /* Makefile in SBC_Code Copy */,
 				84D3545A10B5974E0013473E /* UniverseDriverInstall in SBC_Code Copy */,
 				84D351AB10B578470013473E /* loginScript in SBC_Code Copy */,
-				84D351AC10B5784B0013473E /* organizeScript in SBC_Code Copy */,
 				84D351AD10B5784E0013473E /* makeScript in SBC_Code Copy */,
 				84D351AE10B578520013473E /* killScript in SBC_Code Copy */,
 				84D351AF10B578550013473E /* goScript in SBC_Code Copy */,
@@ -4063,7 +4060,6 @@
 		84D34B0110B1D6C90013473E /* ORSIS3302Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3302Model.m; sourceTree = "<group>"; };
 		84D34B0210B1D6C90013473E /* SIS3302.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3302.nib; sourceTree = "<group>"; };
 		84D34B0310B1D6C90013473E /* SIS3302Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3302Card.gif; sourceTree = "<group>"; };
-		84D351A910B577AD0013473E /* organizeScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = organizeScript; sourceTree = "<group>"; };
 		84D351C210B5822F0013473E /* UniverseDriverInstall */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UniverseDriverInstall; sourceTree = "<group>"; };
 		84D356DF10B5C41B0013473E /* DriverInstall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = DriverInstall.gif; path = "Source/Objects/Hardware/SBC/SBC Link/DriverInstall.gif"; sourceTree = SOURCE_ROOT; };
 		84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Decoders.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.h; sourceTree = SOURCE_ROOT; };
@@ -6892,7 +6888,6 @@
 				43ADFE3E10B6DAF90044617C /* ORVCard.cc */,
 				43ADFE4310B6DB060044617C /* Makefile */,
 				8493CC390C99FA0700B46CD4 /* loginScript */,
-				84D351A910B577AD0013473E /* organizeScript */,
 				8493CC380C99FA0700B46CD4 /* makeScript */,
 				8493CC370C99FA0700B46CD4 /* killScript */,
 				8493CC3A0C99FA0700B46CD4 /* goScript */,
@@ -11058,7 +11053,6 @@
 				4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */,
 				84D34B0A10B1D6C90013473E /* SIS3302.nib in Resources */,
 				84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */,
-				84D351AA10B577AD0013473E /* organizeScript in Resources */,
 				84D351C310B5822F0013473E /* UniverseDriverInstall in Resources */,
 				84D356E010B5C41B0013473E /* DriverInstall.gif in Resources */,
 			);

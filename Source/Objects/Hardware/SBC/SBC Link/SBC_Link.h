@@ -59,8 +59,7 @@ typedef enum eSBC_ThrottleConsts{
     NSString*		filePath;
     int				portNumber;
 	
-	ORFileMover*	coreSBCFileMover;
-	ORFileMover*	specificHWFileMover;
+	ORFileMover*	SBCFileMover;
 	ORFileMover*	driverScriptFileMover;
 	NSMutableData*	theDataBuffer;
 	unsigned short  missedHeartBeat;
@@ -134,6 +133,7 @@ typedef enum eSBC_ThrottleConsts{
 	int				errorTimeOut;
 	NSMutableArray* connectionHistory;
 	unsigned 		ipNumberIndex;
+	NSString*		mainStagingFolder;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;

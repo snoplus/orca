@@ -112,6 +112,11 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
     [passWord release];
     [IPNumber release];
 	[lastQueUpdate release];
+
+	NSString* folder = [mainStagingFolder stringByExpandingTildeInPath];
+	[[NSFileManager defaultManager] removeItemAtPath:folder error:nil];
+	[mainStagingFolder release];
+	
 	[super dealloc];
 }
 
@@ -754,16 +759,16 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 - (void) fileMoverIsDone:(NSNotification*)aNote
 {
-	if([aNote object] == coreSBCFileMover){
-		NSLog(@"Transfered Core SBC Code: %@ to %@\n",[coreSBCFileMover fileName],[coreSBCFileMover remoteHost]);
-		[coreSBCFileMover release];
-		coreSBCFileMover  = nil;
+	if([aNote object] == SBCFileMover){
+		NSLog(@"Transfered Core SBC Code: %@ to %@\n",[SBCFileMover fileName],[SBCFileMover remoteHost]);
+		[SBCFileMover release];
+		SBCFileMover  = nil;
+		NSString* folder = [mainStagingFolder stringByExpandingTildeInPath];
+		[[NSFileManager defaultManager] removeItemAtPath:folder error:nil];
+		[mainStagingFolder release];
+		mainStagingFolder= nil;
 	}
-	else if([aNote object] == specificHWFileMover){
-		NSLog(@"Transfered HW Specific Code: %@ to %@\n",[specificHWFileMover fileName],[specificHWFileMover remoteHost]);
-		[specificHWFileMover release];
-		specificHWFileMover  = nil;
-	}
+	
 	else if([aNote object] == driverScriptFileMover){
 		NSLog(@"Transfered Driver Update Script: %@ to %@\n",[driverScriptFileMover fileName],[driverScriptFileMover remoteHost]);
 		[driverScriptFileMover release];
@@ -826,50 +831,68 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			NSLog(@"Could not stop crate ... Probably already stopped\n");
 		}
 		NSLog(@"Core code for crate reload starting\n");
+		
+		//get the core and hw specific paths
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+		
+		NSString* coreCodePath;
+		if(loadMode) coreCodePath = [filePath stringByAppendingPathComponent:@"Source/Objects/Hardware/SBC/SBC_Code"];
+		else		 coreCodePath = [resourcePath stringByAppendingPathComponent:@"SBC_Code"];
+		
+		NSString* hwSpecificCodePath;
+		if(loadMode)hwSpecificCodePath = [filePath stringByAppendingPathComponent:[delegate sbcLocalCodePath]];
+		else hwSpecificCodePath = [resourcePath stringByAppendingPathComponent:[delegate codeResourcePath]];
+		
+		//make a staging area
+		NSString* stagingFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Staging"];
+		char* tmpName = tempnam([stagingFolder cStringUsingEncoding:NSASCIIStringEncoding] , [[hwSpecificCodePath lastPathComponent] cStringUsingEncoding:NSASCIIStringEncoding]);
+		mainStagingFolder = [[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] retain];
+		free(tmpName);
+		NSFileManager* fm = [NSFileManager defaultManager];
+		[fm createDirectoryAtPath:mainStagingFolder withIntermediateDirectories:YES attributes:nil error:nil];
+		
+		//copy all files to the staging area
+		NSString* srcFolder    = [hwSpecificCodePath stringByExpandingTildeInPath];
+		NSArray* filesToStage = [fm contentsOfDirectoryAtPath:srcFolder error:nil];
+		for(id aFile in filesToStage){
+			if(![aFile isEqual:@".svn"]){
+				NSString* srcFile = [srcFolder stringByAppendingPathComponent:aFile];
+				NSString* desFile = [mainStagingFolder stringByAppendingPathComponent:aFile];
+				[fm copyItemAtPath:srcFile toPath:desFile error:nil];
+			}
+		}
+		
+		srcFolder    = [coreCodePath stringByExpandingTildeInPath];
+		filesToStage = [fm contentsOfDirectoryAtPath:srcFolder error:nil];
+		for(id aFile in filesToStage){
+			if(![aFile isEqual:@".svn"]){
+				NSString* srcFile = [srcFolder stringByAppendingPathComponent:aFile];
+				NSString* desFile = [mainStagingFolder stringByAppendingPathComponent:aFile];
+				[fm copyItemAtPath:srcFile toPath:desFile error:nil];
+			}
+		}
+		//edit the scripts
+		[self fillInScript:@"makeScript"];
+		[self fillInScript:@"goScript"];
+				 
+		//ship the files from the staging area
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		[aSequence setVerbose:verbose];
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
 				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"/bin/rm",@"-rf",@"ORCA",nil]];
 		[aSequence setTextToDelegate:YES];
 		
-		[self fillInScript:@"makeScript.in"];
-		[self fillInScript:@"goScript.in"];
-		[self fillInScript:@"organizeScript.in"];
-		
-		coreSBCFileMover = [[ORFileMover alloc] init];
-		[coreSBCFileMover setDelegate:aSequence];
-		NSString* coreCodePath;
-		if(loadMode) coreCodePath = [filePath stringByAppendingPathComponent:@"Source/Objects/Hardware/SBC/SBC_Code"];
-		else		 coreCodePath = [resourcePath stringByAppendingPathComponent:@"SBC_Code"];
-		
-		[coreSBCFileMover setMoveParams:[coreCodePath stringByExpandingTildeInPath]
+		SBCFileMover = [[ORFileMover alloc] init];
+		[SBCFileMover setDelegate:aSequence];
+		[SBCFileMover setMoveParams:[mainStagingFolder stringByExpandingTildeInPath]
 									 to:@"ORCA" 
 							 remoteHost:IPNumber 
 							   userName:userName 
 							   passWord:passWord];
-		[coreSBCFileMover setVerbose:NO];
-		[coreSBCFileMover doNotMoveFilesToSentFolder];
-		[coreSBCFileMover setTransferType:eUseSCP];
-		[aSequence addTaskObj:coreSBCFileMover];
-		
-		
-		specificHWFileMover = [[ORFileMover alloc] init];
-		[specificHWFileMover setDelegate:aSequence];
-		
-		NSString* hwSpecificCodePath;
-		if(loadMode)hwSpecificCodePath = [filePath stringByAppendingPathComponent:[delegate sbcLocalCodePath]];
-		else hwSpecificCodePath = [resourcePath stringByAppendingPathComponent:[delegate codeResourcePath]];
-		
-		[specificHWFileMover setMoveParams:[hwSpecificCodePath stringByExpandingTildeInPath]
-										to:@"ORCA/HW_Readout" 
-								remoteHost:IPNumber 
-								  userName:userName 
-								  passWord:passWord];
-		[specificHWFileMover setVerbose:NO];
-		[specificHWFileMover doNotMoveFilesToSentFolder];
-		[specificHWFileMover setTransferType:eUseSCP];
-		[aSequence addTaskObj:specificHWFileMover];
+		[SBCFileMover setVerbose:NO];
+		[SBCFileMover doNotMoveFilesToSentFolder];
+		[SBCFileMover setTransferType:eUseSCP];
+		[aSequence addTaskObj:SBCFileMover];
 		
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
 				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/makeScript",nil]];
@@ -888,9 +911,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	}
 	@catch (NSException* localException) {
 	}
-	
-	[self fillInScript:@"killScript"];
-	
+		
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
@@ -1823,21 +1844,13 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 - (void) fillInScript:(NSString*)theScript
 {
-	//edit the script and push it into the SBCReadout folder for copying to the SBC
-	//first, find it in the ORCA mainBundle
-	NSString* aScriptPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:theScript];
-	NSMutableString* contents = [NSMutableString stringWithContentsOfFile:aScriptPath encoding:NSASCIIStringEncoding error:nil];
+	//first, find it in the staging area
+	NSString* newScriptPath = [[mainStagingFolder stringByAppendingPathComponent:theScript] stringByExpandingTildeInPath];
+	NSMutableString* contents = [NSMutableString stringWithContentsOfFile:newScriptPath encoding:NSASCIIStringEncoding error:nil];
 	[contents replaceOccurrencesOfString:@"<serverName>" withString:@"OrcaReadout" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [contents length])];
 	[contents replaceOccurrencesOfString:@"<port>" withString:[NSString stringWithFormat:@"%d",portNumber] options:NSCaseInsensitiveSearch range:NSMakeRange(0, [contents length])];
-	
-	//then, copy it into either the ORCA source tree or the App Bundle resource
+
 	NSFileManager* fm = [NSFileManager defaultManager];
-	NSString* coreCodePath;
-	if(loadMode==0) coreCodePath = [filePath stringByAppendingPathComponent:@"Source/Objects/Hardware/SBC/SBC_Code"];
-	else		 coreCodePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"SBC_Code"];
-	
-	NSString* newScriptPath = [[coreCodePath stringByAppendingPathComponent:theScript] stringByExpandingTildeInPath];
-	
 	if([fm fileExistsAtPath: newScriptPath]) [fm removeItemAtPath:newScriptPath error:nil];
 	NSDictionary *attrib = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
 	[fm createFileAtPath:newScriptPath contents:[contents dataUsingEncoding:NSASCIIStringEncoding] attributes:attrib]; 
