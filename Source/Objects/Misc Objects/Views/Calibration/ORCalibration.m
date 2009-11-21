@@ -52,11 +52,10 @@
 - (void) loadUI:(ORCalibration*) aCalibration
 {
 	if(aCalibration){
-		NSArray* calArray = [aCalibration calibrationArray];
-		[[channelForm cellWithTag:0] setObjectValue:[calArray objectAtIndex:0]]; 
-		[[channelForm cellWithTag:1] setObjectValue:[calArray objectAtIndex:1]]; 
-		[[valueForm cellWithTag:0] setObjectValue:[calArray objectAtIndex:2]]; 
-		[[valueForm cellWithTag:1] setObjectValue:[calArray objectAtIndex:3]]; 
+		
+		calibrationArray = [aCalibration calibrationArray];
+		[calibrationTableView reloadData];
+		
 		[unitsField setStringValue:[aCalibration units]];
 		[nameField setStringValue:[aCalibration calibrationName]];
 		[ignoreButton setIntValue:[aCalibration ignoreCalibration]];
@@ -71,10 +70,7 @@
 		else [selectionPU selectItemWithTitle:@"---"];
 	}
 	else {
-		[[channelForm cellWithTag:0] setFloatValue:0]; 
-		[[channelForm cellWithTag:1] setFloatValue:1000]; 
-		[[valueForm cellWithTag:0] setFloatValue:0]; 
-		[[valueForm cellWithTag:1] setFloatValue:1000]; 
+
 		[unitsField setStringValue:@"keV"];
 		[ignoreButton setIntValue:NO];
 		[nameField setStringValue:@""];
@@ -103,11 +99,15 @@
 	if(![[self window] makeFirstResponder:[self window]]){
 		[[self window] endEditingFor:nil];		
 	}
-	NSArray* calArray = [NSArray arrayWithObjects:  [[channelForm cellWithTag:0] objectValue],
-													[[channelForm cellWithTag:1] objectValue],
-													[[valueForm   cellWithTag:0] objectValue],
-													[[valueForm   cellWithTag:1] objectValue],nil];
-	ORCalibration* cal		= [[ORCalibration alloc] initCalibrationArray:calArray];
+	for(id pt in calibrationArray){
+		
+	}
+	
+//	NSArray* calArray = [NSArray arrayWithObjects:  [[channelForm cellWithTag:0] objectValue],
+//													[[channelForm cellWithTag:1] objectValue],
+//													[[valueForm   cellWithTag:0] objectValue],
+//													[[valueForm   cellWithTag:1] objectValue],nil];
+	ORCalibration* cal		= [[ORCalibration alloc] initCalibrationArray:calibrationArray];
 	[cal setUnits:[unitsField stringValue]];
 	[cal setCalibrationName:[nameField stringValue]];
 	[cal setType:![customButton intValue]];
@@ -153,8 +153,9 @@
 
 - (void) enableControls
 {
-	[channelForm  setEnabled: [customButton intValue]  == 1];
-	[valueForm    setEnabled: [customButton intValue]  == 1];
+	[calibrationTableView  setEnabled: [customButton intValue]  == 1];
+	[addPtButton	 setEnabled: [customButton intValue]  == 1];
+	[removePtButton  setEnabled: [customButton intValue]  == 1];
 	[unitsField   setEnabled: [customButton intValue]  == 1];
 	[nameField    setEnabled: [customButton intValue]  == 1 && [storeButton intValue] == 1];
 	[storeButton  setEnabled: [customButton intValue]  == 1];
@@ -228,6 +229,26 @@
 	[self calibrate];
 }
 
+- (IBAction) addPtAction:(id)sender
+{
+	if(!calibrationArray)calibrationArray = [[NSMutableArray alloc] init];
+	[calibrationArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0],@"Channel",[NSNumber numberWithFloat:0],@"Energy",nil]];
+	[calibrationTableView reloadData];
+}
+
+- (IBAction) removePtAction:(id)sender
+{
+	NSInteger selectedRow = [calibrationTableView selectedRow];
+	if(selectedRow == -1){
+		[calibrationArray removeLastObject];
+		[calibrationTableView reloadData];
+	}
+	else if(selectedRow<[calibrationArray count]){
+		[calibrationArray removeObjectAtIndex:selectedRow];
+		[calibrationTableView reloadData];
+	}
+}
+
 - (IBAction) done:(id)sender
 {	
 	[self calibrate];
@@ -242,10 +263,32 @@
     [NSApp endSheet:[self window] returnCode:NSCancelButton];
 }
 
+#pragma mark •••Table Data Source
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	if( aTableView == calibrationTableView)return [calibrationArray count];
+	else return 0;
+}
+
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+	if(aTableView == calibrationTableView ){
+		return [[calibrationArray objectAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
+	}
+	else return nil;
+}
+
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	if(aTableView == calibrationTableView){
+		[[calibrationArray objectAtIndex:rowIndex] setObject: anObject forKey:[aTableColumn identifier]];
+	}
+}
+
 @end
 
 @implementation ORCalibration
-- (id) initCalibrationArray:(NSArray*)calArray
+- (id) initCalibrationArray:(NSMutableArray*)calArray
 {
 	self = [super init];
 	calibrationArray = [calArray retain];
@@ -260,25 +303,33 @@
 	[super dealloc];
 }
 
-- (NSArray*)calibrationArray
+- (NSMutableArray*)calibrationArray
 {
 	return calibrationArray;
 }
 
 - (void) calibrate
 {
-	double c0 = [[calibrationArray objectAtIndex:0] doubleValue];
-	double c1 = [[calibrationArray objectAtIndex:1] doubleValue];
-	double v0 = [[calibrationArray objectAtIndex:2] doubleValue];
-	double v1 = [[calibrationArray objectAtIndex:3] doubleValue];
-	if(c0 != c1){
-		slope = (v1-v0)/(c1-c0);
-		//intercept = (v1*c0 - v0*c1)/(c1-c0);
-		intercept = v0-slope*c0;
-		calibrationValid = YES;
-	}
-	else {
-		calibrationValid = NO;
+	double SUMx = 0;
+	double SUMy = 0;
+	double SUMxy= 0;
+	double SUMxx= 0;
+	calibrationValid = NO;
+	int n = [calibrationArray count];
+	if(n!=0){
+		for(id pt in calibrationArray){
+			double x = [[pt objectForKey:@"Channel"] doubleValue];
+			double y = [[pt objectForKey:@"Energy"] doubleValue];
+			SUMx = SUMx + x;
+			SUMy = SUMy + y;
+			SUMxy = SUMxy + x*y;
+			SUMxx = SUMxx + x*x;
+		}
+		if((SUMx*SUMx - n*SUMxx) != 0){
+			slope = ( SUMx*SUMy - n*SUMxy ) / (SUMx*SUMx - n*SUMxx);
+			intercept = ( SUMy - slope*SUMx ) / n;
+			calibrationValid = YES;
+		}
 	}
 }
 
@@ -353,6 +404,12 @@
 {
     self		= [super init];
     calibrationArray =			[[decoder decodeObjectForKey:	@"calibrationArray"] retain];
+	
+	if(![[calibrationArray objectAtIndex:0] isKindOfClass:NSClassFromString(@"NSMutableDictionary")]){
+		[calibrationArray release];
+		calibrationArray = nil;
+	}
+	
 	[self setUnits:				[decoder decodeObjectForKey:@"units"]];
 	[self setIgnoreCalibration:	[decoder decodeBoolForKey:@"ignoreCalibration"]];
 	[self setCalibrationName:	[decoder decodeObjectForKey:@"calibrationName"]];

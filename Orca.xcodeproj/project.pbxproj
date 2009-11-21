@@ -8578,7 +8578,6 @@
 				8443514A0B56D75F0033B918 /* TextFinder */,
 				84A1ACA80FF3A4EE00D7F946 /* PlotPublisher */,
 				9CDEF5C40D9456A800FEE85A /* Calibration */,
-				847997A008DB69FC00D848FB /* PieChart */,
 				848D8CCC0DE35AB500D44B81 /* ValueBarGroup */,
 			);
 			name = Views;
@@ -9192,6 +9191,7 @@
 				9CDEF5C50D9456A800FEE85A /* Calibration.nib */,
 				9CDEF5C60D9456A800FEE85A /* ORCalibration.h */,
 				9CDEF5C70D9456A800FEE85A /* ORCalibration.m */,
+				847997A008DB69FC00D848FB /* PieChart */,
 			);
 			name = Calibration;
 			path = "Source/Objects/Misc Objects/Views/Calibration";

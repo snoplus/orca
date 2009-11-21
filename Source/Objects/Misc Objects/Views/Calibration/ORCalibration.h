@@ -29,13 +29,14 @@
 	IBOutlet NSPopUpButton*	selectionPU;
 	IBOutlet NSButton*		ignoreButton;
 	IBOutlet NSButton*		calibrateButton;
-	IBOutlet NSForm*		channelForm;
-	IBOutlet NSForm*		valueForm;
+	IBOutlet NSTableView*   calibrationTableView;
 	IBOutlet NSTextField*	unitsField;
 	IBOutlet NSTextField*	nameField;
 	IBOutlet NSButton*		cancelButton;
 	IBOutlet NSButton*		applyButton;
-	
+	IBOutlet NSButton*		addPtButton;
+	IBOutlet NSButton*		removePtButton;
+	NSMutableArray*			calibrationArray;
 	id						objectToCalibrate;
 	NSDictionary*			contextInfo;
 }
@@ -57,11 +58,13 @@
 - (IBAction) apply:(id)sender;
 - (IBAction) done:(id)sender;
 - (IBAction) cancel:(id)sender;
+- (IBAction) addPtAction:(id)sender;
+- (IBAction) removePtAction:(id)sender;
 @end
 
 @interface ORCalibration : NSObject 
 {
-	NSArray*		calibrationArray;
+	NSMutableArray*		calibrationArray;
 	double			slope;
 	double			intercept;
 	NSString*		units;
@@ -71,8 +74,8 @@
 	NSString*		calibrationName;
 }
 
-- (id) initCalibrationArray:(NSArray*)calArray;
-- (NSArray*)calibrationArray;
+- (id) initCalibrationArray:(NSMutableArray*)calArray;
+- (NSMutableArray*)calibrationArray;
 - (double) slope;
 - (double) intercept;
 - (void) calibrate;
