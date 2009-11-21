@@ -433,7 +433,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelThresholdsChanged object:self];
 }
 
--(unsigned short) threshold:(unsigned short) aChan
+-(unsigned long) threshold:(unsigned short) aChan
 {
     return [[thresholds objectAtIndex:aChan] shortValue];
 }
@@ -443,7 +443,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     return [[gains objectAtIndex:aChan] shortValue];
 }
 
--(void) setThreshold:(unsigned short) aChan withValue:(unsigned short) aThreshold
+-(void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
 	if(aThreshold>0xfffff)aThreshold = 0xfffff;

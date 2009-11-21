@@ -179,7 +179,6 @@
 			[transform rotateByDegrees:i*360/4. + 2*360/24.];
 			NSRect segRect = NSMakeRect(5,-3,15,6);
 			NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
-			segRect = NSOffsetRect(segRect, 20, 0);
 			[segPath transformUsingAffineTransform: transform];
 			[segmentPaths addObject:segPath];
 			[errorPaths addObject:segPath];
@@ -194,7 +193,6 @@
 				[transform rotateByDegrees:angle];
 				NSRect segRect = NSMakeRect(20+j*18,-3,18,6);
 				NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
-				segRect = NSOffsetRect(segRect, 18, 0);
 				[segPath transformUsingAffineTransform: transform];
 				[segmentPaths addObject:segPath];
 				[errorPaths addObject:segPath];

@@ -28,12 +28,6 @@
 @end
 
 @implementation ORValidatePassword
-+ (id) defaultValidate
-{
-	//self is released when done. 
-    ORValidatePassword* validatePassword = [[[ORValidatePassword alloc] init] retain];
-    return validatePassword;
-}
 
 + (id) validateForWindow:(NSWindow *)aDocWindow modalDelegate:(id)aModalDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo
 {

@@ -379,7 +379,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
 	//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0
 	//fuzzy.fzk.de/adei/#minimal=graph&db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&window=0
-	NSString* requestString;
+	NSString* requestString = nil;
 	if(anIndex<[pollingLookUp count]){
 		NSString* itemKey	= [pollingLookUp objectAtIndex:anIndex];
 		NSDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];

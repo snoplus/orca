@@ -249,14 +249,14 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 		
-		NSString* hwSpecificCodePath;
-		if(loadMode)hwSpecificCodePath = [filePath stringByAppendingPathComponent:[delegate sbcLocalCodePath]];
-		else hwSpecificCodePath = [resourcePath stringByAppendingPathComponent:[delegate codeResourcePath]];
-		hwSpecificCodePath = [hwSpecificCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
+		NSString* driverCodePath;
+		if(loadMode)driverCodePath = [filePath stringByAppendingPathComponent:[delegate sbcLocalCodePath]];
+		else driverCodePath = [resourcePath stringByAppendingPathComponent:[delegate codeResourcePath]];
+		driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
 		driverScriptFileMover = [[ORFileMover alloc] init];
 		[driverScriptFileMover setDelegate:aSequence];
 		
-		[driverScriptFileMover setMoveParams:[hwSpecificCodePath stringByExpandingTildeInPath]
+		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
 										to:@"" 
 								remoteHost:IPNumber 
 								  userName:userName 
@@ -852,10 +852,12 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		[fm createDirectoryAtPath:mainStagingFolder withIntermediateDirectories:YES attributes:nil error:nil];
 		
 		//copy all files to the staging area
-		NSString* srcFolder    = [hwSpecificCodePath stringByExpandingTildeInPath];
-		NSArray* filesToStage = [fm contentsOfDirectoryAtPath:srcFolder error:nil];
+		NSString* srcFolder        = [hwSpecificCodePath stringByExpandingTildeInPath];
+		NSArray* filesToStage      = [fm contentsOfDirectoryAtPath:srcFolder error:nil];
+		NSString* driverScriptFile = [delegate driverScriptName];
+		
 		for(id aFile in filesToStage){
-			if(![aFile isEqual:@".svn"]){
+			if(![aFile isEqual:@".svn"] && ![aFile isEqual:driverScriptFile]){
 				NSString* srcFile = [srcFolder stringByAppendingPathComponent:aFile];
 				NSString* desFile = [mainStagingFolder stringByAppendingPathComponent:aFile];
 				[fm copyItemAtPath:srcFile toPath:desFile error:nil];

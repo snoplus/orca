@@ -1153,6 +1153,12 @@
 		847CCA68058E8C75003522C8 /* ORQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA62058E8C75003522C8 /* ORQueue.h */; };
 		847CCA69058E8C75003522C8 /* ORQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA63058E8C75003522C8 /* ORQueue.m */; };
 		847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA65058E8C75003522C8 /* ORLinkedList.m */; };
+		847D76FA10B795DE00893F3A /* goScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76F710B795DE00893F3A /* goScript */; };
+		847D76FB10B795DE00893F3A /* killScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
+		847D76FC10B795DE00893F3A /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 847D76F910B795DE00893F3A /* Makefile */; };
+		847D76FE10B7963D00893F3A /* makeScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76FD10B7963D00893F3A /* makeScript */; };
+		847D771110B7977700893F3A /* goScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76F710B795DE00893F3A /* goScript */; };
+		847D771210B7977700893F3A /* killScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
 		847E6C100CFF4BF400E963C6 /* ORObjectProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 847E6C0E0CFF4BF400E963C6 /* ORObjectProxy.h */; };
 		847E6C110CFF4BF400E963C6 /* ORObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C0F0CFF4BF400E963C6 /* ORObjectProxy.m */; };
 		847E6C1A0CFF4C3200E963C6 /* eGun.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847E6C130CFF4C3200E963C6 /* eGun.nib */; };
@@ -1261,10 +1267,7 @@
 		8493CC450C99FA0700B46CD4 /* SBC_LinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493CC340C99FA0700B46CD4 /* SBC_LinkController.h */; };
 		8493CC460C99FA0700B46CD4 /* SBC_LinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493CC350C99FA0700B46CD4 /* SBC_LinkController.m */; };
 		8493CC470C99FA0700B46CD4 /* SBC_Link.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8493CC360C99FA0700B46CD4 /* SBC_Link.nib */; };
-		8493CC480C99FA0700B46CD4 /* killScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493CC370C99FA0700B46CD4 /* killScript */; };
-		8493CC490C99FA0700B46CD4 /* makeScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493CC380C99FA0700B46CD4 /* makeScript */; };
 		8493CC4A0C99FA0700B46CD4 /* loginScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493CC390C99FA0700B46CD4 /* loginScript */; };
-		8493CC4B0C99FA0700B46CD4 /* goScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493CC3A0C99FA0700B46CD4 /* goScript */; };
 		8493CC4D0C99FA0700B46CD4 /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493CC3D0C99FA0700B46CD4 /* CircularBuffer.h */; };
 		8493CC4E0C99FA0700B46CD4 /* SBC_Cmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493CC3E0C99FA0700B46CD4 /* SBC_Cmds.h */; };
 		8493CC4F0C99FA0700B46CD4 /* SBC_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493CC3F0C99FA0700B46CD4 /* SBC_Config.h */; };
@@ -1872,9 +1875,6 @@
 		84D34B0A10B1D6C90013473E /* SIS3302.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0210B1D6C90013473E /* SIS3302.nib */; };
 		84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D34B0310B1D6C90013473E /* SIS3302Card.gif */; };
 		84D351AB10B578470013473E /* loginScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC390C99FA0700B46CD4 /* loginScript */; };
-		84D351AD10B5784E0013473E /* makeScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC380C99FA0700B46CD4 /* makeScript */; };
-		84D351AE10B578520013473E /* killScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC370C99FA0700B46CD4 /* killScript */; };
-		84D351AF10B578550013473E /* goScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3A0C99FA0700B46CD4 /* goScript */; };
 		84D351C310B5822F0013473E /* UniverseDriverInstall in Resources */ = {isa = PBXBuildFile; fileRef = 84D351C210B5822F0013473E /* UniverseDriverInstall */; };
 		84D3545A10B5974E0013473E /* UniverseDriverInstall in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 84D351C210B5822F0013473E /* UniverseDriverInstall */; };
 		84D356E010B5C41B0013473E /* DriverInstall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D356DF10B5C41B0013473E /* DriverInstall.gif */; };
@@ -2286,16 +2286,15 @@
 			dstPath = SBC_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				847D771110B7977700893F3A /* goScript in SBC_Code Copy */,
+				847D771210B7977700893F3A /* killScript in SBC_Code Copy */,
+				84D351AB10B578470013473E /* loginScript in SBC_Code Copy */,
+				84D3545A10B5974E0013473E /* UniverseDriverInstall in SBC_Code Copy */,
+				43ADFE5510B6DB240044617C /* Makefile in SBC_Code Copy */,
 				43ADFE5110B6DB240044617C /* readout_code.h in SBC_Code Copy */,
 				43ADFE5210B6DB240044617C /* ORVCard.hh in SBC_Code Copy */,
 				43ADFE5310B6DB240044617C /* readout_code.cc in SBC_Code Copy */,
 				43ADFE5410B6DB240044617C /* ORVCard.cc in SBC_Code Copy */,
-				43ADFE5510B6DB240044617C /* Makefile in SBC_Code Copy */,
-				84D3545A10B5974E0013473E /* UniverseDriverInstall in SBC_Code Copy */,
-				84D351AB10B578470013473E /* loginScript in SBC_Code Copy */,
-				84D351AD10B5784E0013473E /* makeScript in SBC_Code Copy */,
-				84D351AE10B578520013473E /* killScript in SBC_Code Copy */,
-				84D351AF10B578550013473E /* goScript in SBC_Code Copy */,
 				8493D2AA0C99FC2C00B46CD4 /* SBC_Cmds.h in SBC_Code Copy */,
 				2A08E4C40CFB74DF0090BF77 /* CircularBuffer.h in SBC_Code Copy */,
 				2A08E4C30CFB74CF0090BF77 /* CircularBuffer.c in SBC_Code Copy */,
@@ -3249,6 +3248,10 @@
 		847CCA62058E8C75003522C8 /* ORQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.h"; sourceTree = SOURCE_ROOT; };
 		847CCA63058E8C75003522C8 /* ORQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORQueue.m; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.m"; sourceTree = SOURCE_ROOT; };
 		847CCA65058E8C75003522C8 /* ORLinkedList.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLinkedList.m; path = "Source/Objects/Misc Objects/DataStructures/ORLinkedList.m"; sourceTree = SOURCE_ROOT; };
+		847D76F710B795DE00893F3A /* goScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = goScript; path = Source/Objects/Hardware/SBC/SBC_Code/goScript; sourceTree = SOURCE_ROOT; };
+		847D76F810B795DE00893F3A /* killScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = killScript; path = Source/Objects/Hardware/SBC/SBC_Code/killScript; sourceTree = SOURCE_ROOT; };
+		847D76F910B795DE00893F3A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Source/Objects/Hardware/SBC/SBC_Code/Makefile; sourceTree = SOURCE_ROOT; };
+		847D76FD10B7963D00893F3A /* makeScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = makeScript; path = Source/Objects/Hardware/SBC/SBC_Code/makeScript; sourceTree = SOURCE_ROOT; };
 		847E6C0E0CFF4BF400E963C6 /* ORObjectProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORObjectProxy.h; path = "Source/Objects/Misc Objects/ObjectProxy/ORObjectProxy.h"; sourceTree = SOURCE_ROOT; };
 		847E6C0F0CFF4BF400E963C6 /* ORObjectProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORObjectProxy.m; path = "Source/Objects/Misc Objects/ObjectProxy/ORObjectProxy.m"; sourceTree = SOURCE_ROOT; };
 		847E6C130CFF4C3200E963C6 /* eGun.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = eGun.nib; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/eGun.nib"; sourceTree = SOURCE_ROOT; };
@@ -3364,10 +3367,7 @@
 		8493CC340C99FA0700B46CD4 /* SBC_LinkController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SBC_LinkController.h; path = "Source/Objects/Hardware/SBC/SBC Link/SBC_LinkController.h"; sourceTree = SOURCE_ROOT; };
 		8493CC350C99FA0700B46CD4 /* SBC_LinkController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SBC_LinkController.m; path = "Source/Objects/Hardware/SBC/SBC Link/SBC_LinkController.m"; sourceTree = SOURCE_ROOT; };
 		8493CC360C99FA0700B46CD4 /* SBC_Link.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SBC_Link.nib; path = "Source/Objects/Hardware/SBC/SBC Link/SBC_Link.nib"; sourceTree = SOURCE_ROOT; };
-		8493CC370C99FA0700B46CD4 /* killScript */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; name = killScript; path = "Source/Objects/Hardware/SBC/SBC Link/killScript"; sourceTree = SOURCE_ROOT; };
-		8493CC380C99FA0700B46CD4 /* makeScript */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; name = makeScript; path = "Source/Objects/Hardware/SBC/SBC Link/makeScript"; sourceTree = SOURCE_ROOT; };
-		8493CC390C99FA0700B46CD4 /* loginScript */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = loginScript; path = "Source/Objects/Hardware/SBC/SBC Link/loginScript"; sourceTree = SOURCE_ROOT; };
-		8493CC3A0C99FA0700B46CD4 /* goScript */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; name = goScript; path = "Source/Objects/Hardware/SBC/SBC Link/goScript"; sourceTree = SOURCE_ROOT; };
+		8493CC390C99FA0700B46CD4 /* loginScript */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = loginScript; sourceTree = "<group>"; };
 		8493CC3C0C99FA0700B46CD4 /* CircularBuffer.c */ = {isa = PBXFileReference; fileEncoding = 30; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = CircularBuffer.c; path = Source/Objects/Hardware/SBC/SBC_Code/CircularBuffer.c; sourceTree = SOURCE_ROOT; };
 		8493CC3D0C99FA0700B46CD4 /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CircularBuffer.h; path = Source/Objects/Hardware/SBC/SBC_Code/CircularBuffer.h; sourceTree = SOURCE_ROOT; };
 		8493CC3E0C99FA0700B46CD4 /* SBC_Cmds.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SBC_Cmds.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Cmds.h; sourceTree = SOURCE_ROOT; };
@@ -6873,6 +6873,7 @@
 				84B89E9F0EF1977800E0C395 /* ORCommandList.h */,
 				84B89EA00EF1977800E0C395 /* ORCommandList.m */,
 				84D356DF10B5C41B0013473E /* DriverInstall.gif */,
+				8493CC390C99FA0700B46CD4 /* loginScript */,
 				8493CC360C99FA0700B46CD4 /* SBC_Link.nib */,
 			);
 			name = "SBC Link";
@@ -6882,15 +6883,15 @@
 		8493CC3B0C99FA0700B46CD4 /* SBC_Code */ = {
 			isa = PBXGroup;
 			children = (
+				847D76F710B795DE00893F3A /* goScript */,
+				847D76F810B795DE00893F3A /* killScript */,
+				847D76FD10B7963D00893F3A /* makeScript */,
+				847D76F910B795DE00893F3A /* Makefile */,
 				43ADFE3B10B6DAF90044617C /* readout_code.h */,
 				43ADFE3C10B6DAF90044617C /* ORVCard.hh */,
 				43ADFE3D10B6DAF90044617C /* readout_code.cc */,
 				43ADFE3E10B6DAF90044617C /* ORVCard.cc */,
 				43ADFE4310B6DB060044617C /* Makefile */,
-				8493CC390C99FA0700B46CD4 /* loginScript */,
-				8493CC380C99FA0700B46CD4 /* makeScript */,
-				8493CC370C99FA0700B46CD4 /* killScript */,
-				8493CC3A0C99FA0700B46CD4 /* goScript */,
 				8493CC3C0C99FA0700B46CD4 /* CircularBuffer.c */,
 				8493CC3D0C99FA0700B46CD4 /* CircularBuffer.h */,
 				8493CC3E0C99FA0700B46CD4 /* SBC_Cmds.h */,
@@ -6899,9 +6900,8 @@
 				8493CC400C99FA0700B46CD4 /* SBC_Readout.c */,
 				8493CC410C99FA0700B46CD4 /* SBC_Readout.h */,
 			);
-			name = SBC_Code;
-			path = Source/Objects/Hardware/SBC/SBC_Code;
-			sourceTree = SOURCE_ROOT;
+			path = SBC_Code;
+			sourceTree = "<group>";
 		};
 		8493CC650C99FA3100B46CD4 /* cPCICPU */ = {
 			isa = PBXGroup;
@@ -10808,10 +10808,7 @@
 				84EA6C9F0C73D11200083319 /* nTPC.nib in Resources */,
 				84EA6CA00C73D11200083319 /* nTPC.tif in Resources */,
 				8493CC470C99FA0700B46CD4 /* SBC_Link.nib in Resources */,
-				8493CC480C99FA0700B46CD4 /* killScript in Resources */,
-				8493CC490C99FA0700B46CD4 /* makeScript in Resources */,
 				8493CC4A0C99FA0700B46CD4 /* loginScript in Resources */,
-				8493CC4B0C99FA0700B46CD4 /* goScript in Resources */,
 				8493CC720C99FA3100B46CD4 /* cPCIcpu.gif in Resources */,
 				8493CC830C99FA4B00B46CD4 /* Vmecpu.gif in Resources */,
 				84D9677B0CA03E50000C0C76 /* Script.nib in Resources */,
@@ -11055,6 +11052,9 @@
 				84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */,
 				84D351C310B5822F0013473E /* UniverseDriverInstall in Resources */,
 				84D356E010B5C41B0013473E /* DriverInstall.gif in Resources */,
+				847D76FA10B795DE00893F3A /* goScript in Resources */,
+				847D76FB10B795DE00893F3A /* killScript in Resources */,
+				847D76FE10B7963D00893F3A /* makeScript in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11796,6 +11796,7 @@
 				84D34B0510B1D6C90013473E /* ORSIS3302Controller.m in Sources */,
 				84D34B0710B1D6C90013473E /* ORSIS3302Decoders.m in Sources */,
 				84D34B0910B1D6C90013473E /* ORSIS3302Model.m in Sources */,
+				847D76FC10B795DE00893F3A /* Makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

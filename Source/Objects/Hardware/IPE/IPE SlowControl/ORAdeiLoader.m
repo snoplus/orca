@@ -136,7 +136,7 @@
 	
 	//@"http://ipepdvadei.ka.fzk.de/test/services/control.php?db_server=test_zeus&db_name=cfp_test&control_group=3&control_mask=3
 
-	NSMutableString* requestString;
+	NSMutableString* requestString = nil;
 	switch (count) {
 		case 0:	//path was nil. get all servers
 			requestString = [NSMutableString stringWithFormat:@"%@/services/list.php?target=servers",host];
@@ -295,7 +295,7 @@
 		NSArray* keys	= [[lines objectAtIndex:0] componentsSeparatedByString:@","];
 		NSArray* values = [[lines objectAtIndex:1] componentsSeparatedByString:@","];
 		NSArray* itemNumbers = [[path lastPathComponent] componentsSeparatedByString:@","];
-		NSString* pathRoot = [[path stringByDeletingLastPathComponent] mutableCopy];
+		NSString* pathRoot = [[[path stringByDeletingLastPathComponent] mutableCopy] autorelease];
 		if(([keys count] == [values count]) && ([itemNumbers count] == ([values count]-1))) {
 			if(!resultArray)resultArray = [[NSMutableArray array] retain];
 			int i;

@@ -625,7 +625,7 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORIpeV4FLTChan] intValue];
-	[[thresholdTextFields cellWithTag:chan] setIntValue: [model threshold:chan]];
+	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORIpeV4FLTModel*)model threshold:chan]];
 }
 
 
@@ -648,7 +648,7 @@
 {
 	short chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
-		[[thresholdTextFields cellWithTag:chan] setIntValue: [model threshold:chan]];
+		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORIpeV4FLTModel*)model threshold:chan]];
 	}
 }
 
@@ -929,7 +929,7 @@
 
 - (IBAction) thresholdAction:(id)sender
 {
-	if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
+	if([sender intValue] != [(ORIpeV4FLTModel*)model threshold:[[sender selectedCell] tag]]){
 		[[self undoManager] setActionName: @"Set Threshold"];
 		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}

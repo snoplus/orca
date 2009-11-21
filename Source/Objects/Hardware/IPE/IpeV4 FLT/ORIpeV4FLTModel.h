@@ -208,10 +208,10 @@
 - (BOOL) hitRateEnabled:(unsigned short) aChan;
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
-- (unsigned short)threshold:(unsigned short) aChan;
+- (unsigned long)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
 - (BOOL) triggerEnabled:(unsigned short) aChan;
-- (void) setThreshold:(unsigned short) aChan withValue:(unsigned short) aThreshold;
+- (void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold;
 - (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
 - (void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
