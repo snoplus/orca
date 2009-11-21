@@ -99,14 +99,7 @@
 	if(![[self window] makeFirstResponder:[self window]]){
 		[[self window] endEditingFor:nil];		
 	}
-	for(id pt in calibrationArray){
-		
-	}
-	
-//	NSArray* calArray = [NSArray arrayWithObjects:  [[channelForm cellWithTag:0] objectValue],
-//													[[channelForm cellWithTag:1] objectValue],
-//													[[valueForm   cellWithTag:0] objectValue],
-//													[[valueForm   cellWithTag:1] objectValue],nil];
+
 	ORCalibration* cal		= [[ORCalibration alloc] initCalibrationArray:calibrationArray];
 	[cal setUnits:[unitsField stringValue]];
 	[cal setCalibrationName:[nameField stringValue]];
