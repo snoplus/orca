@@ -1155,7 +1155,6 @@
 		847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA65058E8C75003522C8 /* ORLinkedList.m */; };
 		847D76FA10B795DE00893F3A /* goScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76F710B795DE00893F3A /* goScript */; };
 		847D76FB10B795DE00893F3A /* killScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
-		847D76FC10B795DE00893F3A /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 847D76F910B795DE00893F3A /* Makefile */; };
 		847D76FE10B7963D00893F3A /* makeScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76FD10B7963D00893F3A /* makeScript */; };
 		847D771110B7977700893F3A /* goScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76F710B795DE00893F3A /* goScript */; };
 		847D771210B7977700893F3A /* killScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
@@ -11796,7 +11795,6 @@
 				84D34B0510B1D6C90013473E /* ORSIS3302Controller.m in Sources */,
 				84D34B0710B1D6C90013473E /* ORSIS3302Decoders.m in Sources */,
 				84D34B0910B1D6C90013473E /* ORSIS3302Model.m in Sources */,
-				847D76FC10B795DE00893F3A /* Makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
