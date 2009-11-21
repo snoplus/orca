@@ -397,10 +397,25 @@
 {
     self		= [super init];
     calibrationArray =			[[decoder decodeObjectForKey:	@"calibrationArray"] retain];
-	
+	//check if we need to be backward compatible with the old form which used just an array
 	if(![[calibrationArray objectAtIndex:0] isKindOfClass:NSClassFromString(@"NSMutableDictionary")]){
-		[calibrationArray release];
-		calibrationArray = nil;
+		int i;
+		int n = [calibrationArray count];
+		NSMutableArray* newArray = [NSMutableArray array];
+		if(n%2 == 0){
+			for(i=0;i<n;i+=2){
+				id chan = [calibrationArray objectAtIndex:i];
+				id energy = [calibrationArray objectAtIndex:i+1];
+				[newArray addObject:[NSMutableDictionary dictionaryWithObject:chan forKey:@"Channel"]];
+				[newArray addObject:[NSMutableDictionary dictionaryWithObject:energy forKey:@"Energy"]];
+			}
+			[calibrationArray release];
+			calibrationArray = [newArray retain];
+		}
+		else {
+			[calibrationArray release];
+			calibrationArray = nil;
+		}
 	}
 	
 	[self setUnits:				[decoder decodeObjectForKey:@"units"]];
