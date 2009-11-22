@@ -31,7 +31,6 @@
 #include "SBC_Readout.h"
 #include "CircularBuffer.h"
 #include "VME_HW_Definitions.h"
-#include "VME_Trigger32.h"
 #include "SNO.h"
 #include "universe_api.h"
 

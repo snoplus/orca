@@ -115,7 +115,7 @@ bool ORSIS3350Readout::Readout(SBC_LAM_Data* lamData)
 void ORSIS3350Readout::ReOrderOneSIS3350Event(int32_t* inDataPtr, uint32_t dataLength, uint32_t wrapLength)
 {
     unsigned long i;
-    int32_t* outDataPtr = (int32_t*)malloc(dataLength*sizeof(uint32_t));
+    int32_t* outDataPtr = new int32_t[dataLength];
     unsigned long lword_length     = 0;
     unsigned long lword_stop_index = 0;
     unsigned long lword_wrap_index = 0;
@@ -183,6 +183,6 @@ void ORSIS3350Readout::ReOrderOneSIS3350Event(int32_t* inDataPtr, uint32_t dataL
         }
     }
     memcpy(inDataPtr, outDataPtr, dataLength*sizeof(uint32_t));
-    free(outDataPtr);
+    delete outDataPtr;
 
 }
