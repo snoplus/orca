@@ -40,7 +40,7 @@ static NSString* kIPSlotKey[4] = {
 	else return [NSString stringWithFormat:@"IP %2d",aSlot];		
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr	 = (unsigned long*)someData;
     unsigned long length = ExtractLength(*ptr);
@@ -113,7 +113,7 @@ static NSString* kIPSlotKey[4] = {
 	else return [NSString stringWithFormat:@"IP %2d",aSlot];		
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr	 = (unsigned long*)someData;
     unsigned long length = ExtractLength(*ptr);

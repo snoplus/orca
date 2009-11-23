@@ -77,6 +77,7 @@
     NSMutableArray *selectionControllers;
 
     NSMutableDictionary *objects;
+    NSMutableDictionary *fileHeader;
 
     int objectTag;
     NSMutableArray* controlArray;
@@ -89,9 +90,6 @@
     ORHWUndoManager* hwUndoManager;
     BOOL    useMark;
     BOOL    objectsAvailiable;
-	BOOL    delayDataPacketRelease;
-    //temp objects for restoring param values
-    ORDataPacket* dataPacket;
 }
 
 + (BOOL) exists;
@@ -119,8 +117,7 @@
 - (void)setChanCount:(short)aChanCount;
 - (BOOL) useMark;
 - (void) setUseMark: (BOOL) flag;
-- (ORDataPacket *)dataPacket;
-- (void)setDataPacket:(ORDataPacket *)aDataPacket;
+- (void) setFileHeader:(NSMutableDictionary*)aHeader;
 
 - (void) registerNotificationObservers;
 - (void) statusTextChanged:(NSNotification*)aNotification;

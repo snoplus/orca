@@ -116,6 +116,7 @@
 {
 	[model setAutoProcess:[sender intValue]];	
 }
+
 - (IBAction) selectButtonAction:(id)sender
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -162,6 +163,18 @@
 	if([[self window] firstResponder] == headerView){
 		[self copyHeader:[headerView selectedItem] toPasteBoard:[NSPasteboard generalPasteboard]];
 	}
+}
+
+- (IBAction) incRunSelection:(id)sender
+{
+	int i = [model selectedRunIndex];
+	[model setSelectedRunIndex:i+1];
+}
+
+- (IBAction) decRunSelection:(id)sender
+{
+	int i = [model selectedRunIndex];
+	[model setSelectedRunIndex:i-1];
 }
 
 - (void) copyHeader:(ORHeaderItem*)item toPasteBoard:(NSPasteboard*)pboard
@@ -344,10 +357,6 @@
                          name : ORHeaderExplorerProcessingFile
                         object: model];
 
-	[notifyCenter addObserver : self
-                     selector : @selector(oneFileDone:)
-                         name : ORHeaderExplorerOneFileDone
-                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(selectionDateChanged:)
@@ -363,7 +372,6 @@
                      selector : @selector(runSelectionChanged:)
                          name : ORHeaderExplorerRunSelectionChanged
                         object: model];
-
 						
 	[notifyCenter addObserver : self
                      selector : @selector(tableViewSelectionDidChange:)
@@ -386,6 +394,15 @@
                          name : NSControlTextDidChangeNotification
 						object: nil];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(progressChanged:)
+                         name : ORHeaderExplorerProgressChanged
+                        object: nil];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(fileSelectionChanged:)
+                         name : ORHeaderExplorerFileSelectionChanged
+                        object: nil];		
 }
 
 - (void) updateWindow
@@ -393,12 +410,15 @@
     [self fileListChanged:nil];
     [self selectionDateChanged:nil];
     [self runSelectionChanged:nil];
+    [self fileSelectionChanged:nil];
+	
     [self headerChanged:nil];
 	
 	[progressField setStringValue:@""];
 	[self autoProcessChanged:nil];
 	[self useFilterChanged:nil];
 	[self searchKeysChanged:nil];
+	[self progressChanged:nil];
 	[self tableViewSelectionDidChange:nil];
 }
 
@@ -454,22 +474,21 @@
 	if(theFileName)[progressField setStringValue:[NSString stringWithFormat:@"Reading:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
 	else [progressField setStringValue:@""];
 
-	unsigned long total = [model total];
-    if(total>0)[progressIndicatorBottom setDoubleValue:100. - (100.*[model numberLeft]/(double)total)];
+	//unsigned long total = [model total];
+    //if(total>0)[progressIndicatorBottom setDoubleValue:100. - (100.*[model numberLeft]/(double)total)];
 }
 
-- (void) oneFileDone:(NSNotification *)aNote
+- (void) progressChanged:(NSNotification *)aNotification
 {
-	[runTimeView setNeedsDisplay:YES];
-	unsigned long total = [model total];
-    if(total>0)[progressIndicatorBottom setDoubleValue:100. - (100.*[model numberLeft]/(double)total)];
+    [progressIndicatorBottom setDoubleValue:[model percentComplete]];
 }
 
 
 #pragma mark •••Interface Management
 - (void) selectionDateChanged:(NSNotification*)note
 {
-	if(!sliderDrag)[selectionDateSlider setIntValue:[selectionDateSlider maxValue] - [model selectionDate]];
+	//if(!sliderDrag)
+		[selectionDateSlider setIntValue:[selectionDateSlider maxValue] - [model selectionDate]];
 	
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
@@ -478,9 +497,15 @@
 		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
 		[selectionDateField setObjectValue:d];
 	}
+	[runTimeView setNeedsDisplay:YES];
 }
 
-- (void) runSelectionChanged:(NSNotification*)note
+- (void) fileSelectionChanged:(NSNotification*)aNote
+{
+	[fileListView selectRowIndexes:[NSIndexSet indexSetWithIndex: [model selectedFileIndex]] byExtendingSelection:NO] ;
+}
+
+- (void) runSelectionChanged:(NSNotification*)aNote
 {
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
@@ -514,16 +539,13 @@
 			}
 			else [runSummaryTextView setString:problem];
 						
-			[fileListView selectRowIndexes:[NSIndexSet indexSetWithIndex: [model selectedRunIndex]] byExtendingSelection:NO] ;
 		}
 		else {
 			[runSummaryTextView setString:@"no valid selection"];
-			//[fileListView deselectAll:self];
 		}
 	}
 	else {
 		[runSummaryTextView setString:@"no valid selection"];
-		//[fileListView deselectAll:self];
 	}
 	[runTimeView setNeedsDisplay:YES];
 }
@@ -533,7 +555,7 @@
 	int n = [fileListView numberOfSelectedRows];
 	if(n == 1){
 		int i = [fileListView selectedRow];
-		[model findSelectedRunByIndex:i];
+		[model selectFirstRunForFileIndex:i];
 	}
 	[fileListView reloadData];
 }
@@ -704,17 +726,21 @@
 		int n = [fileListView numberOfSelectedRows];
 		if(n == 1){
 			int i = [fileListView selectedRow];
-			[model findSelectedRunByIndex:i];
+			[model setSelectedFileIndex:i];
+			[model selectFirstRunForFileIndex:i];
 			unsigned long absStart = [model minRunStartTime];
 			unsigned long absEnd   = [model maxRunEndTime];
 			
 			unsigned long start = [[model run:i objectForKey:@"RunStart"] unsignedLongValue];
 			unsigned long end   = [[model run:i objectForKey:@"RunEnd"] unsignedLongValue];
 			unsigned long mid = start + (end-start)/2.;
-			[model setSelectionDate:[selectionDateSlider maxValue]*(mid - absStart)/(absEnd-absStart)];
+			if(absEnd-absStart !=0){
+				[model setSelectionDate:1000*(mid - absStart)/(absEnd-absStart)];
+			}
 		}
 		else {
-			[model findSelectedRunByIndex:-1];
+			[model setSelectedFileIndex:-1];
+			[model selectFirstRunForFileIndex:-1];
 			[headerView reloadData];
 		}
 	}
@@ -752,7 +778,10 @@
 
 - (void) setSelectionDate:(long)aValue { [model setSelectionDate:aValue]; }
 - (void) findSelectedRunByDate { [model findSelectedRunByDate]; }
-
+- (NSSlider*) selectionDateSlider
+{
+	return selectionDateSlider;
+}
 @end
 
 @implementation ORHeaderExplorerController (private)
@@ -839,8 +868,6 @@
         else NSLog(@"<%@> replay list is empty\n",listPath);
     }
 }
-
-
 @end
 
 @implementation ORRunTimeView
@@ -923,8 +950,10 @@
 	if([anEvent clickCount] >= 2){
 		[dataSource doubleClick:self];
 	}
-	[self setNeedsDisplay:YES];
 }
-
+- (BOOL) acceptsFirstResponder
+{
+    return YES;
+}
 @end
 

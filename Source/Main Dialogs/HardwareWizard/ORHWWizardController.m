@@ -24,8 +24,8 @@
 #import "ORHWWizard.h"
 #import "ORHWWizSelection.h"
 #import "ORHWUndoManager.h"
-#import "ORDataPacket.h"
 #import "SynthesizeSingleton.h"
+#import "ORDecoder.h"
 
 NSString* ORHWWizCountsChangedNotification  = @"ORHWWizCountsChangedNotification";
 NSString* ORHWWizardLock					= @"ORHWWizardLock";
@@ -75,6 +75,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [selectionControllers release];
     [controlArray release];
     [objects release];
+	[fileHeader release];
     [hwUndoManager release];
     
     [super dealloc];
@@ -166,6 +167,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     return selectionViewController; 
 }
 
+- (void) setFileHeader:(NSMutableDictionary*)aHeader
+{
+	[aHeader retain];
+	[fileHeader release];
+	fileHeader = aHeader;
+}
 
 - (void)setSelectionViewController:(SubviewTableViewController *)aSelectionViewController
 {
@@ -288,16 +295,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [aHwUndoManager retain];
     [hwUndoManager release];
     hwUndoManager = aHwUndoManager;
-}
-
-- (ORDataPacket *)dataPacket {
-    return dataPacket; 
-}
-
-- (void)setDataPacket:(ORDataPacket *)aDataPacket {
-    [aDataPacket retain];
-    [dataPacket release];
-    dataPacket = aDataPacket;
 }
 
 - (NSUndoManager *)undoManager
@@ -1317,9 +1314,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     
     [undoButton setEnabled:[hwUndoManager canUndo]];
     [redoButton setEnabled:[hwUndoManager canRedo]];
-    
-    if(!delayDataPacketRelease)[self setDataPacket:nil];
-    
+	
 }
 
 - (void) doAction:(eAction)actionSelection target:(id)target parameter:(ORHWWizParam*)paramObj channel:(int)chan value:(NSNumber*)aValue 
@@ -1410,7 +1405,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                 
             case kAction_Restore:
 				@try {
-					NSNumber* theValue = [target extractParam:[paramObj name] from:[dataPacket fileHeader]  forChannel:[theChan intValue]];
+					NSNumber* theValue = [target extractParam:[paramObj name] from:fileHeader  forChannel:[theChan intValue]];
 					if(theValue!=nil){
 						[invocationForSetter setArgument:valueArg  to:theValue];
 					}
@@ -1587,11 +1582,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 - (void)_restoreAllFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[sheet filenames] objectAtIndex:0]];
-        [self setDataPacket:[[[ORDataPacket alloc] init]autorelease]];
-        if(![dataPacket readHeader:theFile]){
-            [self setDataPacket:nil];
-        }
+        NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[sheet filenames] objectAtIndex:0]];\
+		[self setFileHeader:[ORDecoder readHeader:theFile]];
 		[self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
     }
 }
@@ -1611,7 +1603,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	
     [[self undoManager] enableUndoRegistration];
 	
-    delayDataPacketRelease = YES; //we'll do it ourselves instead of the usual place
 	//loop thru all availiable objects and do a 'Restore All'
 	n = [objectPU numberOfItems];
 	for(i=0;i<n;i++){
@@ -1630,8 +1621,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	objectTag = -1; //force an update
 	[objectPU selectItemAtIndex:oldObjectIndex];
 	[self selectObject:objectPU];
-	[self setDataPacket:nil];	
-    delayDataPacketRelease = NO; 
 	
     [[self undoManager] enableUndoRegistration];
 	
@@ -1666,10 +1655,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 {
     if(returnCode){
         NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[sheet filenames] objectAtIndex:0]];
-        [self setDataPacket:[[[ORDataPacket alloc] init]autorelease]];
-        if(![dataPacket readHeader:theFile]){
-            [self setDataPacket:nil];
-        }
+		[self setFileHeader:[ORDecoder readHeader:theFile]];
         [self executeControlStruct];   
     }
 }

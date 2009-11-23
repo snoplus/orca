@@ -25,6 +25,7 @@
 #import "ORDataTaker.h"
 #import "ORDataPacket.h"
 #import "ORHeaderItem.h"
+#import "ORHeaderCollector.h"
 
 #pragma mark •••Notification Strings
 NSString* ORHeaderExplorerUseFilterChanged		= @"ORHeaderExplorerUseFilterChanged";
@@ -38,14 +39,16 @@ NSString* ORHeaderExplorerOneFileDone			= @"ORHeaderExplorerOneFileDone";
 
 NSString* ORHeaderExplorerSelectionDate			= @"ORHeaderExplorerSelectionDate";
 NSString* ORHeaderExplorerRunSelectionChanged	= @"ORHeaderExplorerRunSelectionChanged";
+NSString* ORHeaderExplorerFileSelectionChanged	= @"ORHeaderExplorerFileSelectionChanged";
 NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChanged";
+NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
+
 
 #pragma mark •••Definitions
 
 @interface ORHeaderExplorerModel (private)
 - (void) processFinished;
-- (void) fileFinished;
 @end
 
 @implementation ORHeaderExplorerModel
@@ -73,6 +76,9 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
     [fileAsDataPacket release];
 	[fileToProcess release];
 	[runArray release];
+	
+	[queue cancelAllOperations];
+	[queue release];
 
     [super dealloc];
 }
@@ -195,6 +201,17 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerAutoProcessChanged object:self];
 }
 
+- (int) selectedFileIndex
+{
+	return selectedFileIndex;
+}
+- (void) setSelectedFileIndex:(int)anIndex
+{
+	if(anIndex>=(int)[filesToProcess count])	selectedFileIndex = [filesToProcess count]-1;
+	else								selectedFileIndex = anIndex;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerFileSelectionChanged object:self];
+}
+
 - (int) selectedRunIndex
 {
 	return selectedRunIndex;
@@ -202,10 +219,11 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 
 - (void) setSelectedRunIndex:(int)anIndex
 {
+	if(anIndex<0)anIndex = [runArray count]-1;
+	else if(anIndex>=[runArray count])anIndex = 0;
 	selectedRunIndex = anIndex;
-	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORHeaderExplorerRunSelectionChanged
-				object: self];
+	[self loadHeader];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerRunSelectionChanged object: self];
 }
 
 
@@ -230,11 +248,6 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 	return [filesToProcess count];
 }
 
-- (unsigned long)   numberLeft
-{
-	return numberLeft;
-}
-
 - (NSDictionary*) runDictionaryForIndex:(int)index
 {
 	if(index>=0 && index<[runArray count]){
@@ -242,7 +255,6 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 	}
 	else return nil;
 }
-
 
 - (ORDataPacket*) fileAsDataPacket
 {
@@ -330,8 +342,16 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 
 - (BOOL)isProcessing
 {
-    return reading;
+    return [[queue operations] count]!=0;
 }
+
+- (void) checkStatus
+{
+	if(![self isProcessing]){
+		[self processFinished];
+	}
+}
+
 
 - (NSString *) lastListPath
 {
@@ -354,40 +374,65 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
     lastFilePath = [aSetLastListPath copy];
 }
 
-- (void) findSelectedRunByIndex:(int)anIndex
+- (void) selectFirstRunForFileIndex:(int)anIndex
 {
-	[self setSelectedRunIndex: anIndex];
-	[self loadHeader];
+	if(anIndex<0){
+		[self setSelectedRunIndex: -1];
+	}
+	else {
+		unsigned long minTime = 0xFFFFFFFF;
+		NSString* selectedRunFilePath = nil;
+		if(anIndex<[filesToProcess count]) selectedRunFilePath = [filesToProcess objectAtIndex:anIndex];
+		int foundIndex = 0;
+		for(id runDictionary in runArray){
+			NSString* runFilePath = [runDictionary objectForKey:@"FilePath"];
+			if([selectedRunFilePath isEqual:runFilePath]){
+				unsigned long startTime = [[runDictionary objectForKey:@"RunStart"] unsignedLongValue];
+				if(startTime < minTime){
+					minTime = startTime;
+					foundIndex = [runArray indexOfObject:runDictionary];
+				}
+			}
+		}
+		[self setSelectedRunIndex: foundIndex];
+	}
 }
 
 - (void) findSelectedRunByDate
 {
-	int index;
 	BOOL valid = NO;
-	int n = [runArray count];
 	unsigned long actualDate	= minRunStartTime + ((maxRunEndTime - minRunStartTime) * (selectionDate/1000.));
+
+	int n = [runArray count];
+	int index;
 	for(index=0;index<n;index++){
 		NSDictionary* runDictionary = [runArray objectAtIndex:index];
 		unsigned long start = [[runDictionary objectForKey:@"RunStart"] unsignedLongValue];
 		unsigned long end   = [[runDictionary objectForKey:@"RunEnd"] unsignedLongValue];
 		if(actualDate >= start && actualDate < end){
+			NSString* fileName  = [runDictionary objectForKey:@"FilePath"];
+			[self setSelectedFileIndex:[self indexOfFile:fileName]];
 			[self setSelectedRunIndex: index];
-			[self loadHeader];
 			valid = YES;
 			break;
 		}
 	}
+	
 	if(!valid){
 		if(actualDate>=maxRunEndTime){
 			[self setSelectedRunIndex: [runArray count]-1];
-			[self loadHeader];
 		}
 		else {
-			[self setSelectedRunIndex: -1];
 			[self setHeader:nil];
 		}
 	}
 }
+
+- (int) indexOfFile:(NSString*)aFilePath
+{
+	return [filesToProcess indexOfObject:aFilePath];
+}
+
 - (void) assembleDataForPlotting
 {
 	if(useFilter){
@@ -477,12 +522,8 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
     
     
     //remove dups
-    NSEnumerator* newListEnummy = [newFilesToProcess objectEnumerator];
-    id newFileName;
-    while(newFileName = [newListEnummy nextObject]){
-        NSEnumerator* oldListEnummy = [filesToProcess objectEnumerator];
-        id oldFileName;
-        while(oldFileName = [oldListEnummy nextObject]){
+    for(id newFileName in newFilesToProcess){
+        for(id oldFileName in filesToProcess){
             if([oldFileName isEqualToString:newFileName]){
                 [filesToProcess removeObject:oldFileName];
                 break;
@@ -527,6 +568,7 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 
 - (void) stopProcessing
 {
+	[queue cancelAllOperations];
 	reading = NO;
 	stop = YES;
     NSLog(@"Header Explorer stopped manually\n");
@@ -535,105 +577,90 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 #pragma mark •••File Actions
 - (void) readHeaders
 {
-	
 	[runArray release];
 	runArray = [[NSMutableArray array] retain];
 	
-	reading = YES;
-	stop = NO;
-	numberLeft = [filesToProcess count];
-
-    if(fileAsDataPacket)[fileAsDataPacket release];
-    fileAsDataPacket = [[ORDataPacket alloc] init];
-
 	[self setHeader:nil];
 	minRunStartTime  = 0xffffffff;
 	maxRunEndTime	 = 0;
     currentFileIndex = 0;
 	
 	if ([filesToProcess count]){
+		
 		[[NSNotificationCenter defaultCenter]
 				postNotificationName:ORHeaderExplorerProcessing
                               object: self];
-		[self performSelector:@selector(readNextFile) withObject:nil afterDelay:.1];
+		amountDoneSoFar = 0;
+		for(id aPath in filesToProcess){
+			if([[NSFileManager defaultManager] fileExistsAtPath:aPath]){
+				NSDictionary *fattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:aPath error:nil];
+				totalToBeProcessed += [[fattrs objectForKey:NSFileSize] longLongValue];
+			}
+		}
+		
+		if(!queue){
+			queue = [[NSOperationQueue alloc] init];
+		}
+		
+		[queue setMaxConcurrentOperationCount:1];
+		for(id aPath in filesToProcess){
+			if([[NSFileManager defaultManager] fileExistsAtPath:aPath]){
+				ORHeaderCollector* headerCollector = [[ORHeaderCollector alloc] initWithPath:aPath delegate:self];
+				[queue addOperation:headerCollector];
+				[headerCollector release];
+				reading = YES;
+				stop = NO;
+			}
+		}
+		
+
 	}
 }
 
-- (void) readNextFile
+- (void)logHeader:(NSDictionary*)aHeader
+		 runStart:(unsigned long)aRunStart 
+		   runEnd:(unsigned long)aRunEnd 
+		runNumber:(unsigned long)aRunNumber 
+		useSubRun:(unsigned long)aUseSubRun
+	 subRunNumber:(unsigned long)aSubRunNumber
+		 fileSize:(unsigned long)aFileSize
+		 fileName:(unsigned long)aFilePath
 {
-	[[self undoManager] disableUndoRegistration];
-	if(!stop && currentFileIndex < [filesToProcess count]){
-		id aFile = [filesToProcess objectAtIndex:currentFileIndex];
+	if(aRunStart!=0 && aRunEnd!=0){
+	
+		if(aRunStart < minRunStartTime) minRunStartTime = aRunStart;
+		if(aRunEnd > maxRunEndTime)     maxRunEndTime   = aRunEnd;
 		
-		[self setFileToProcess:aFile];
-
-		NSFileHandle* fp = [NSFileHandle fileHandleForReadingAtPath:aFile];
-
-		[fileAsDataPacket clearData];
-		BOOL fileOK = NO;
-		NSString* problemReason;
-		if(fp){
-		
-			unsigned long runStart  = 0;
-			unsigned long runEnd    = 0;
-			unsigned long runNumber = 0;
-			BOOL		  useSubRun	= NO;
-			unsigned long subRunNumber = 0;
-		
-			if([fileAsDataPacket readHeaderReturnRunLength:fp runStart:&runStart 
-													runEnd:&runEnd runNumber:&runNumber 
-												 useSubRun:&useSubRun
-											  subRunNumber:&subRunNumber]){
-				if(runStart!=0 && runEnd!=0){
+		NSMutableDictionary* runDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+				[NSNumber numberWithUnsignedLong:aRunStart],			@"RunStart",
+				[NSNumber numberWithUnsignedLong:aRunEnd],				@"RunEnd",
+				[NSNumber numberWithUnsignedLong:aRunEnd-aRunStart],	@"RunLength",
+				[NSNumber numberWithUnsignedLong:aRunNumber],			@"RunNumber",
+				[NSNumber numberWithBool:aUseSubRun],					@"UseSubRun",
+				[NSNumber numberWithUnsignedLong:aSubRunNumber],		@"SubRunNumber",
+				[NSNumber numberWithUnsignedLong:aFileSize],			@"FileSize",
+				aHeader,												@"FileHeader",
+				aFilePath,												@"FilePath",
+				nil];
 				
-					if(runStart < minRunStartTime) minRunStartTime = runStart;
-					if(runEnd > maxRunEndTime)     maxRunEndTime   = runEnd;
-					[fp seekToEndOfFile];
-					
-					fileOK = YES;
-					NSMutableDictionary* runDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-							[NSNumber numberWithUnsignedLong:runStart],				  @"RunStart",
-							[NSNumber numberWithUnsignedLong:runEnd],				  @"RunEnd",
-							[NSNumber numberWithUnsignedLong:runEnd-runStart],		  @"RunLength",
-							[NSNumber numberWithUnsignedLong:runNumber],			  @"RunNumber",
-							[NSNumber numberWithBool:useSubRun],					  @"UseSubRun",
-							[NSNumber numberWithUnsignedLong:subRunNumber],			  @"SubRunNumber",
-							[NSNumber numberWithUnsignedLong:[fp offsetInFile]],	  @"FileSize",
-							[fileAsDataPacket fileHeader],							  @"FileHeader",
-							nil];
-							
-					[runArray addObject:runDictionary];
-					[self fileFinished];
-				}
-				else {
-					problemReason = [NSString stringWithFormat:@"Problem reading <%@> for exploring.\n",[aFile stringByAbbreviatingWithTildeInPath]];
-					NSLogColor([NSColor redColor],@"%s",problemReason);
-				}
-			}
-			else {
-				problemReason = [NSString stringWithFormat:@" <%@> doesn't appear to be a legal ORCA data file.\n",[aFile stringByAbbreviatingWithTildeInPath]];
-				NSLogColor([NSColor redColor],@"%@",problemReason);
-			}
-		}
-		else {
-			problemReason = [NSString stringWithFormat:@" Could not open: <%@>\n",[aFile stringByAbbreviatingWithTildeInPath]];
-			NSLogColor([NSColor redColor],@"%s",problemReason);
-		}
-		if(!fileOK){
-			NSMutableDictionary* runDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-					problemReason,						 @"Failed",
-					@"No Header",						 @"FileHeader",
-					nil];
-					[runArray addObject:runDictionary];
-		}
-		currentFileIndex++;
-		[self performSelector:@selector(readNextFile) withObject:nil afterDelay:0];
+		[runArray addObject:runDictionary];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerOneFileDone object: self];
 	}
-	else {
-		[self processFinished];
-	}
-	[[self undoManager] enableUndoRegistration];
 }
+
+- (void) updateProgress:(NSNumber*)amountDone
+{
+	amountDoneSoFar += [amountDone doubleValue];
+	percentComplete = 100. * amountDoneSoFar/totalToBeProcessed;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerProgressChanged object: self];		
+}
+
+- (double) percentComplete
+{
+	return percentComplete;
+}
+
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -682,17 +709,6 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 
 	[self loadHeader];
 }
-
-- (void) fileFinished
-{
-	numberLeft--;
-	[[NSNotificationCenter defaultCenter]
-				postNotificationName:ORHeaderExplorerOneFileDone
-                              object: self];
-
-}
-
-
 
 @end
 

@@ -41,7 +41,6 @@
         ORDataPacket*   fileAsDataPacket;
 
         BOOL			reading;
-        unsigned long   numberLeft;
         unsigned long   currentFileIndex;
 		
 		NSMutableArray* runArray;
@@ -49,13 +48,19 @@
 		unsigned long	maxRunEndTime;
 		int				selectionDate;
 		int				selectedRunIndex;
+		int				selectedFileIndex;
 
 		BOOL			autoProcess;
 		NSMutableArray*	searchKeys;
 		BOOL			useFilter;
+		NSOperationQueue* queue;
+		double		   totalToBeProcessed;	
+		double		   amountDoneSoFar;
+		double			percentComplete;
 }
 
 #pragma mark •••Accessors
+- (double) percentComplete;
 - (BOOL) useFilter;
 - (void) setUseFilter:(BOOL)aUseFilter;
 - (NSMutableArray*) searchKeys;
@@ -67,12 +72,13 @@
 - (BOOL) autoProcess;
 - (void) setAutoProcess:(BOOL)aAutoProcess;
 - (int) selectedRunIndex;
+- (int) selectedFileIndex;
+- (void) setSelectedFileIndex:(int)anIndex;
 - (void) setSelectedRunIndex:(int)anIndex;
 - (int)  selectionDate;
 - (void) setSelectionDate:(int)aValue;
 - (NSDictionary*) runDictionaryForIndex:(int)index;
 - (unsigned long)   total;
-- (unsigned long)   numberLeft;
 - (NSString*)   fileToProcess;
 - (void)        setFileToProcess:(NSString*)newFileToProcess;
 - (NSArray*) filesToProcess;
@@ -97,11 +103,18 @@
 - (void) removeFiles:(NSMutableArray*)anArray;
 - (void) readHeaders;
 - (void) findSelectedRunByDate;
-- (void) findSelectedRunByIndex:(int)anIndex;
+- (void) selectFirstRunForFileIndex:(int)anIndex;
 - (void) assembleDataForPlotting;
 - (void) assembleDataForPlotting:(int)keyNumber;
-
-- (void) readNextFile;
+- (void)logHeader:(NSDictionary*)aHeader
+		 runStart:(unsigned long)aRunStart 
+		   runEnd:(unsigned long)aRunEnd 
+		runNumber:(unsigned long)aRunNumber 
+		useSubRun:(unsigned long)aUseSubRun
+	 subRunNumber:(unsigned long)aSubRunNumber
+		 fileSize:(unsigned long)aFileSize
+		 fileName:(unsigned long)aFilePath;
+- (int) indexOfFile:(NSString*)aFilePath;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -125,4 +138,6 @@ extern NSString* ORHeaderExplorerOneFileDone;
 extern NSString* ORHeaderExplorerHeaderChanged;
 
 extern NSString* ORHeaderExplorerSearchKeysChanged;
+extern NSString* ORHeaderExplorerProgressChanged;
+extern NSString* ORHeaderExplorerFileSelectionChanged;
 

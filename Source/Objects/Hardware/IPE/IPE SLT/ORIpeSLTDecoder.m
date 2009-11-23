@@ -43,7 +43,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Lo
 **/
 //-------------------------------------------------------------
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
@@ -94,7 +94,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 //-------------------------------------------------------------
 
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 
     unsigned long* ptr = (unsigned long*)someData;

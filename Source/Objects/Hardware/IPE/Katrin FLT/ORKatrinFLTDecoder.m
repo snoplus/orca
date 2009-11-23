@@ -54,7 +54,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
 //-------------------------------------------------------------
 
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 	katrinEventDataStruct* ePtr;
 
@@ -184,7 +184,7 @@ followed by waveform data (n x 1024 16-bit words)
 //-------------------------------------------------------------
 
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 
     unsigned long* ptr = (unsigned long*)someData;
@@ -359,7 +359,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitrate
 //-------------------------------------------------------------
 
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 	katrinHitRateDataStruct* ePtr;
 
@@ -471,7 +471,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 //-------------------------------------------------------------
 
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     int i;
 	//int j;
@@ -605,7 +605,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 //-------------------------------------------------------------
 
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     //debug output -tb-
     //NSLog(@"  ORKatrinFLTDecoderForHistogram::decodeData:\n");

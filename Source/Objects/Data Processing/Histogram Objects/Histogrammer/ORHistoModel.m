@@ -28,6 +28,7 @@
 #import "ORDataSet.h"
 #import "OR1DHisto.h"
 #import "OR2DHisto.h"
+#import "ORDecoder.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORHistoModelShipFinalHistogramsChanged = @"ORHistoModelShipFinalHistogramsChanged";
@@ -304,7 +305,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
                               object: self ];
 }
 
-- (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder
 {
 	[mLock lock];
     if(!dataSet){
@@ -312,14 +313,19 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     }
     
 	//process the data
-    [someData decodeIntoDataSet:dataSet];
+    for(id someData in dataArray){
+        [aDecoder decode:someData intoDataSet:dataSet];
+    }
 	[mLock unlock];
 	
 	//pass it on
 	id theNextObject = [self objectConnectedTo:ORHistoPassThruConnection];
-	[theNextObject processData:someData userInfo:userInfo];
+	[theNextObject processData:dataArray decoder:aDecoder];
 }
 
+- (void) setRunMode:(int)aRunMode;
+{
+}
 
 - (NSArray*) collectObjectsOfClass:(Class)aClass
 {
@@ -341,13 +347,12 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 #pragma mark ¥¥¥Run Management
 
-
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [dataSet appendDataDescription:aDataPacket userInfo:userInfo];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(id)userInfo
 {
 
 	processedFinalCall = NO;
@@ -357,23 +362,28 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	  
 	long runNumber = -1;
 	if(userInfo){
-		//normally we'd get the runnumber from the dataPacket, but that doesn't work for replay objects
-		runNumber = [[userInfo objectForKey:@"RunNumber"] longValue];
+		runNumber = [[userInfo objectForKey:kRunNumber] intValue];
 	}
 	else {
-		NSArray* dataChainObjects = [[aDataPacket fileHeader] objectForNestedKey:@"ObjectInfo,DataChain"];
+		id header = [userInfo objectForKey:kHeader];
+		NSArray* dataChainObjects = [header objectForNestedKey:@"ObjectInfo,DataChain"];
 		NSDictionary* runControlEntry = [[dataChainObjects objectAtIndex:0] objectForKey:@"Run Control"];
 		runNumber = [[runControlEntry objectForKey:@"RunNumber"] longValue];
 	}	  
 	[dataSet setRunNumber:runNumber];
     [dataSet clear];
 
-    [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStarted:aDataPacket userInfo:userInfo];
+    [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStarted:userInfo];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) subRunTaskStarted:(id)userInfo
 {
-	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
+	//we don't care
+}
+
+- (void) runTaskStopped:(id)userInfo
+{
+	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:userInfo];
     [dataSet runTaskStopped];
 }
 
@@ -384,22 +394,28 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	}
 }
 
-- (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskBoundary
 {
     [dataSet runTaskBoundary];
 }
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) closeOutRun:(id)userInfo
 {
 
 	[[NSNotificationCenter defaultCenter]
 				postNotificationName:ORHistoModelChangedNotification
                               object: self ];
     
-    
-    if([self writeFile] && ([[ORGlobal sharedGlobal] runMode] == kNormalRun)){
-        
-        [self setFileName:[NSString stringWithFormat:@"HistogramsRun%d",[aDataPacket runNumber]]];
+    BOOL runMode = [[userInfo objectForKey:kRunMode] boolValue];
+    if([self writeFile] && (runMode == kNormalRun)){
+        int runNumber = [[userInfo objectForKey:kRunNumber] intValue];
+        int subRunNumber = [[userInfo objectForKey:kSubRunNumber] intValue];
+		NSString* runNumberString = [NSString stringWithFormat:@"HistogramsRun%d",runNumber];
+		if(subRunNumber!=0){
+			runNumberString = [runNumberString stringByAppendingFormat:@".d",subRunNumber];
+		}
+
+        [self setFileName:runNumberString];
         NSString* fullFileName = [[directoryName stringByExpandingTildeInPath] stringByAppendingPathComponent:fileName];
         FILE* aFile = fopen([fullFileName cStringUsingEncoding:NSASCIIStringEncoding],"w"); 
         if(aFile){
@@ -416,7 +432,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     }
     
 	processedFinalCall = YES;
-    [[self objectConnectedTo:ORHistoPassThruConnection] closeOutRun:aDataPacket userInfo:userInfo];
+    [[self objectConnectedTo:ORHistoPassThruConnection] closeOutRun:userInfo];
 
 }
 

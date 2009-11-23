@@ -28,7 +28,7 @@
 @interface ORIP320DecoderForAdc : ORVmeCardDecoder {
 }
 - (NSString*) getSlotKey:(unsigned short)aSlot;
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
@@ -36,6 +36,6 @@
 @interface ORIP320DecoderForValue : ORVmeCardDecoder {
 }
 - (NSString*) getSlotKey:(unsigned short)aSlot;
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

@@ -59,12 +59,13 @@
 - (void) started:(NSNotification *)aNote;
 - (void) stopped:(NSNotification *)aNote;
 - (void) processingFile:(NSNotification *)aNote;
-- (void) oneFileDone:(NSNotification *)aNote;
 - (void) headerChanged:(NSNotification*)aNote;
 - (void) setSelectionDate:(long)aValue;
 - (void) findSelectedRunByDate;
 - (void) setRunBoundaryTimes;
 - (void) tableViewSelectionDidChange:(NSNotification *)aNote;
+- (void) progressChanged:(NSNotification *)aNote;
+- (void) fileSelectionChanged:(NSNotification*)aNote;
 
 #pragma  mark •••Actions
 - (IBAction) useFilterAction:(id)sender;
@@ -81,7 +82,8 @@
 - (IBAction)addSearchKeys:(id)sender;
 - (IBAction)deleteSearchKeys:(id)sender;
 - (IBAction) plotFilteredData:(id)sender;
-
+- (IBAction) incRunSelection:(id)sender;
+- (IBAction) decRunSelection:(id)sender;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
@@ -91,6 +93,7 @@
 - (long) numberRuns;
 - (id) run:(int)index objectForKey:(id)aKey;
 - (void) copyHeader:(ORHeaderItem*)anItem toPasteBoard:(NSPasteboard*)pboard;
+- (NSSlider*) selectionDateSlider;
 
 @end
 

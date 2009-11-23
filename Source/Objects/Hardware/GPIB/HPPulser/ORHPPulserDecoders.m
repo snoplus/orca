@@ -25,7 +25,7 @@
 #import "ORDataTypeAssigner.h"
 
 @implementation ORHPPulserDecoderForPulserSettings
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long value = *((unsigned long*)someData);
     //for now, just return the length

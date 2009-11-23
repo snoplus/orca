@@ -55,11 +55,11 @@
 	[self setObject:[NSNumber numberWithInt:[theCard integrationTimeAsInt]] forNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil];
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 
 	if(![self cacheSetUp]){
-		[self cacheCardLevelObject:kIntegrationTimeKey fromHeader:[aDataPacket fileHeader]];
+		[self cacheCardLevelObject:kIntegrationTimeKey fromHeader:[aDecoder fileHeader]];
 	}
 	
     unsigned long* ptr = (unsigned long*)someData;

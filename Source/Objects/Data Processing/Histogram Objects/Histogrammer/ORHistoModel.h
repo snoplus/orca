@@ -21,14 +21,17 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataChainObject.h"
+#import "ORDataProcessing.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
 @class ORDataSet;
 @class OR1DHisto;
 @class OR2DHisto;
+@class ORDecoder;
+@class ORDataPacket;
 
-@interface ORHistoModel :  ORDataChainObject 
+@interface ORHistoModel :  ORDataChainObject <ORDataProcessing>
 {
     @private
         ORDataSet*   dataSet;
@@ -68,11 +71,11 @@
 - (ORDataSet*) dataSetWithName:(NSString*)aName;
 
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(id)userInfo;
+- (void) runTaskStopped:(id)userInfo;
+- (void) closeOutRun:(id)userInfo;
+- (void) runTaskBoundary;
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 
 - (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
@@ -85,7 +88,7 @@
 - (BOOL) leafNode;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
+- (void) setRunMode:(int)aRunMode;
 @end
 
 
