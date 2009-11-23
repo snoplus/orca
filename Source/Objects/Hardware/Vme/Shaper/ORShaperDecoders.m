@@ -40,7 +40,7 @@
     [super dealloc];
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long length;
     unsigned long* ptr = (unsigned long*)someData;
@@ -103,7 +103,7 @@
 @end
 
 @implementation ORShaperDecoderForScalers
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr   = (unsigned long*)someData;
     unsigned long length;
@@ -165,7 +165,7 @@
 //ARGGGGGG -- because of a cut/paste error some data around jan '07 gat taken with a bugus decoder name
 //temp insert this decoder so the data can be replayed.
 @implementation ORShaperDecoderFORAxisrs
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr   = (unsigned long*)someData;
     unsigned long length;

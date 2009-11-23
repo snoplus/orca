@@ -20,10 +20,12 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORRunModel.h"
+#import "ORDataProcessing.h"
 #import "ORDataTaker.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
 #import "ORRunScriptModel.h"
+#import "ORDecoder.h"
 
 #pragma mark ¥¥¥Definitions
 
@@ -94,6 +96,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     heartBeatTimer = nil;
 	
     [dataPacket release];
+	[runInfo release];
     [dirName release];
     [startTime release];
     [definitionsFilePath release];
@@ -836,17 +839,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	time_t ut_time = mktime(theTimeGMTAsStruct);
 	
 	//insert a header before the start of sub-run record
-	[[self dataPacket] makeFileHeader];
-	[[self dataPacket] generateObjectLookup];
-	//tell objects to add any additional data descriptions into the data description header.
-    NSArray* objectList = [NSArray arrayWithArray:[[self document]collectObjectsRespondingTo:@selector(appendDataDescription:userInfo:)]];
-    NSEnumerator* e = [objectList objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-        [obj appendDataDescription:[self dataPacket] userInfo:nil];
-    }
+	[[self dataPacket] updateHeader];
 	
-	NSMutableData* dataToBeInserted = [NSMutableData dataWithData:[[self dataPacket] headerAsData]];
+	NSData* headerAsData = [ORDecoder convertHeaderToData:[[self dataPacket] fileHeader]];
+	NSMutableData* dataToBeInserted = [NSMutableData dataWithData:headerAsData];
 	
 	unsigned long data[4];
 	data[0] = dataId | 4;
@@ -856,11 +852,17 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	
 	[dataToBeInserted appendData:[NSMutableData dataWithBytes:data length:4*sizeof(long)]];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-														object:dataToBeInserted];
+	[dataPacket addData:dataToBeInserted];
+	
+	[runInfo setObject:[[self dataPacket]fileHeader]		  forKey:kHeader];
+	[runInfo setObject:[NSNumber numberWithLong:runNumber]	  forKey:kRunNumber];
+	[runInfo setObject:[NSNumber numberWithLong:subRunNumber] forKey:kSubRunNumber];
+	
+	id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
+	[nextObject subRunTaskStarted:runInfo];
 
 	NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
-	
+
 }
 
 - (void) startRun:(BOOL)doInit
@@ -948,13 +950,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         NSLogColor([NSColor redColor],@"Run Not Started because of exception: %@\n",[localException name]);
         
     }
-    
-    
 }
 
 - (void) setOfflineRun:(BOOL)offline
 {
 	[[ORGlobal sharedGlobal] setRunMode:offline]; //0 = NormalRun, 1= offlineRun
+    id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
+	[nextObject setRunMode:offline];
 }
 
 - (BOOL) offlineRun
@@ -1070,7 +1072,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     @try {
         
 		[nextObject setInvolvedInCurrentRun:NO];
-        [nextObject runTaskStopped:dataPacket userInfo:nil];
+        [nextObject runTaskStopped:runInfo];
 
 		[NSThread setThreadPriority:1];
 		
@@ -1114,7 +1116,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[dataPacket addLongsToFrameBuffer:data length:4];
 	
 	//closeout run will wait until the processing thread is done.
-	[nextObject closeOutRun:dataPacket userInfo:nil];
+	[nextObject closeOutRun:runInfo];
 	
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
 		NSLog(@"Run %d stopped.\n",_currentRun);
@@ -1134,8 +1136,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		_forceRestart = NO;
 		[self restartRun];
 	}
- 	[NSThread setThreadPriority:.9];
-	
 }
 
 - (void) sendHeartBeat:(NSTimer*)aTimer
@@ -1203,6 +1203,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [objDictionary setObject:[NSNumber numberWithLong:runType]          forKey:@"runType"];
     [objDictionary setObject:[NSNumber numberWithBool:quickStart]       forKey:@"quickStart"];
     [objDictionary setObject:[NSNumber numberWithLong:[self runNumber]] forKey:@"RunNumber"];
+    [objDictionary setObject:[NSNumber numberWithLong:[self subRunNumber]] forKey:@"SubRunNumber"];
     [dictionary setObject:objDictionary forKey:@"Run Control"];
     
     
@@ -1229,6 +1230,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) runStarted:(BOOL)doInit
 {
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    
+    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
+    
+    [dataTypeAssigner assignDataIds];
 	
     [heartBeatTimer invalidate];
     [heartBeatTimer release];
@@ -1241,7 +1248,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[self dataPacket] setRunNumber:[self runNumber]];
     
     [[self dataPacket] makeFileHeader];
-    
+   
     if([self remoteControl]){
         [[self dataPacket] setFilePrefix:@"R_Run"];
     }
@@ -1254,64 +1261,30 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     NSArray* objs = [[self document]  collectObjectsRespondingTo:@selector(preRunChecks)];
     [objs makeObjectsPerformSelector:@selector(preRunChecks) withObject:nil];
     
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    
-    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
-    
-    [dataTypeAssigner assignDataIds];
-    
-    
-    
-    //get the time(UT!)
-    time_t	theTime;
-    time(&theTime);
-    struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    time_t ut_time = mktime(theTimeGMTAsStruct);
-    
-    unsigned long data[4];
-    
-    data[0] = dataId | 4;
-    data[1] =  1;
-    _wasQuickStart = !doInit;
-    
-    if(_wasQuickStart){
-        data[1] |= 0x2;			//set the reset bit
-        _nextRunWillQuickStart = NO;
-    }
-    if(remoteControl){
-        data[1] |= 0x4;			//set the remotebit
-    }
-
-    data[2] = [self runNumber];
-    data[3] = ut_time;
-    
-    //and into the data stream.
-    //don't put into the framebuffer because we want this record to go out first.
-    [dataPacket addData:[NSData dataWithBytes:data length:4*sizeof(long)]];
-    
-    lastRunNumberShipped	= data[2];
-	
+	[runInfo release];
     //pack up some info about the run.
-    NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-							  [NSNumber numberWithLong:runNumber],@"RunNumber",
-							  [NSNumber numberWithLong:runType],  @"RunType",
+    runInfo = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+							  [dataPacket fileHeader], kHeader,
+							  dataPacket,kDataPacket,
+							  [NSNumber numberWithLong:runNumber],kRunNumber,
+							  [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
+							  [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
 							  [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
-							  nil];
+							  nil] retain];
     
     //let others know the run is about to start
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStartNotification
                                                         object: self
-                                                      userInfo: userInfo];
+                                                      userInfo: runInfo];
     
     //tell them to start up
-    [nextObject runTaskStarted:dataPacket userInfo:userInfo];
+    [nextObject runTaskStarted:runInfo];
     [nextObject setInvolvedInCurrentRun:YES];
 	
     //tell them it has been started.
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartedNotification
                                                         object: self
-                                                      userInfo: userInfo];
+                                                      userInfo: runInfo];
     
 	NSLog(@"---------------------------------------\n");
     
@@ -1326,7 +1299,37 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     forceFullInit = NO;
     
     heartBeatTimer = [[NSTimer scheduledTimerWithTimeInterval:kHeartBeatTime target:self selector:@selector(sendHeartBeat:)userInfo:nil repeats:YES] retain];
+
+	//get the time(UT!)
+    time_t	theTime;
+    time(&theTime);
+    struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+    time_t ut_time = mktime(theTimeGMTAsStruct);
+ 
+	NSData* headerAsData = [ORDecoder convertHeaderToData:[[self dataPacket] fileHeader]];
+ 	[dataPacket addData:[NSMutableData dataWithData:headerAsData]];
+ 
+    unsigned long data[4];
     
+    data[0] = dataId | 4;
+    data[1] =  1;
+    _wasQuickStart = !doInit;
+    
+    if(_wasQuickStart){
+        data[1] |= 0x2;			//set the reset bit
+        _nextRunWillQuickStart = NO;
+    }
+    if(remoteControl){
+        data[1] |= 0x4;			//set the remotebit
+    }
+	
+    data[2] = [self runNumber];
+    data[3] = ut_time;
+
+	[dataPacket addData:[NSMutableData dataWithBytes:data length:4*sizeof(long)]];
+    
+    lastRunNumberShipped	= data[2];
+	
     [self sendHeartBeat:nil];
 	[NSThread setThreadPriority:.7];
 	
@@ -1367,7 +1370,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [pool release];
     }
     
-	[client runIsStopping:dataPacket userInfo:nil];
+	[client runIsStopping:runInfo];
 	
 	@try {
 		BOOL allDone = NO;
@@ -1402,7 +1405,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                      selector: @selector(vmePowerFailed:)
                          name: @"VmePowerFailedNotification"
                        object: nil];
-    
     
     [notifyCenter addObserver: self
                      selector: @selector(gotForceRunStopNotification:)
@@ -1735,7 +1737,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 
 
 @implementation ORRunDecoderForRun
-- (unsigned long)decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long)decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 	unsigned long* p = (unsigned long*)someData;
 	unsigned long length =  ExtractLength(p[0]); //must return number of longs processed.

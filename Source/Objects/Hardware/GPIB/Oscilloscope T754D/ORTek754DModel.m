@@ -2002,9 +2002,9 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 @end
 
 @implementation ORTek754DDecoderForScopeGTID
-- (unsigned long) decodeData: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet
+- (unsigned long) decodeData: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet
 {
-    return [self decodeGtId:aSomeData fromDataPacket:aDataPacket intoDataSet:aDataSet];
+    return [self decodeGtId:aSomeData fromDecoder:aDecoder intoDataSet:aDataSet];
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
@@ -2015,9 +2015,9 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 @end
 
 @implementation ORTek754DDecoderForScopeTime
-- (unsigned long) decodeData: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet
+- (unsigned long) decodeData: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet
 {
-    return [self decodeClock:aSomeData fromDataPacket:aDataPacket intoDataSet:aDataSet];
+    return [self decodeClock:aSomeData fromDecoder:aDecoder intoDataSet:aDataSet];
 } 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {

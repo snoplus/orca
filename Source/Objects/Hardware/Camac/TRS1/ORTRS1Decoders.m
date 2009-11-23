@@ -39,7 +39,7 @@
     [super dealloc];
 }
 
-- (unsigned long) decodeData:(void*)aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr   = (unsigned long*)aSomeData;
 	unsigned long length = ExtractLength(*ptr);
