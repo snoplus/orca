@@ -106,11 +106,11 @@ H			[a-fA-F0-9]
                 return VARIABLE;
              }
 
-[ \t]+        ;       /* ignore whitespace */
+[ \t\r]+        ;       /* ignore whitespace */
 
 \n				{++numFilterLines;}
 
-.               FilterScripterror("Unknown character");
+.               ;
 %%
 int yywrap(void) {
     return 1;
