@@ -22,7 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORFanOutModel.h"
 #import "ORDataPacket.h"
-
+#import "ORDecoder.h"
 
 #pragma mark ¥¥¥String Definitions
 NSString* ORFanOutChangedNotification 	 = @"Fan In Number Changed";
@@ -375,19 +375,23 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
     
 }
 
+
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
 {
-    if(![self respondsToSelector:aSelector]){
+	
+	if( [[self class] instancesRespondToSelector:aSelector] ) {
+		//Get the instance method signature from the Context's class.
+		return [[self class] instanceMethodSignatureForSelector:aSelector];
+	}
+	else {
+		//Get the instance method signature from the Strategy.
 		short i;
 		for(i=0;i<[self numberOfOutputs];i++){
             id obj = [self objectConnectedTo:kFanOutConnectorKey[i]];
 			if(obj)return [obj methodSignatureForSelector:aSelector];
 		}
-		return [super methodSignatureForSelector:aSelector];
 	}
-    else {
-        return [super methodSignatureForSelector:aSelector];
-    }
+	return nil;
 }
 
 - (void) forwardInvocation:(NSInvocation *)invocation
@@ -405,46 +409,40 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
 //be getting hit the hardest with data processing. Let the slow methods handle everything except the next 
 //three messages.
 //
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(id)userInfo
 {
 	[cachedProcessors release];
 	cachedProcessors = [[NSMutableArray array] retain];
 	int i;
 	for(i=0;i<[self numberOfOutputs];i++){
         id obj = [self objectConnectedTo:kFanOutConnectorKey[i]];
-		if(obj && [obj respondsToSelector:@selector(processData:userInfo:)]){
+		if(obj && [obj respondsToSelector:@selector(processData:decoder:)]){
 			[cachedProcessors addObject:obj];
 		}
-		[obj runTaskStarted:aDataPacket userInfo:userInfo];
+		[obj runTaskStarted:userInfo];
 	}
 	cachedProcessorsCount = [cachedProcessors count];
 }
 
 
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder
 {
-	int i;
-    for(i=0;i<cachedProcessorsCount;i++){
-        [[cachedProcessors objectAtIndex:i] processData:aDataPacket userInfo:userInfo];
+    for(id obj in cachedProcessors){
+        [obj processData:dataArray decoder:aDecoder];
     }
 }
 
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket  userInfo:(id)userInfo
+- (void) runTaskStopped:(id)userInfo
 {
-    NSEnumerator* e = [cachedProcessors objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-        [obj runTaskStopped:aDataPacket userInfo:userInfo];
+	for(id obj in cachedProcessors){
+        [obj runTaskStopped:userInfo];
     }
 }
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) closeOutRun:(id)userInfo
 {
-    NSEnumerator* e = [cachedProcessors objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-        [obj closeOutRun:aDataPacket userInfo:userInfo];
+	for(id obj in cachedProcessors){
+        [obj closeOutRun:userInfo];
     }
 }
 

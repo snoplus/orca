@@ -28,7 +28,7 @@
 @class ORReadOutList;
 @class ORDataSet;
 @class ORTimer;
-@class ORGateGroup;
+@class ORDecoder;
 
 #define kTimeHistoSize 4000
 
@@ -40,9 +40,9 @@
     NSArray*        dataTakers;     //cache of data takers.
     unsigned long   queueCount;
     
-    ORDataPacket*   transferDataPacket;
     ORSafeQueue*    transferQueue;
-    
+    ORDecoder*      theDecoder;
+	
     ORAlarm*	    queueFullAlarm;
     NSString*       lastFile;
     ORSafeQueue*	recordsPending;
@@ -66,8 +66,6 @@
 	BOOL processThreadRunning;
 	
     NSLock*			 timerLock;
-    BOOL            doGateProcessing;
-    ORGateGroup*    cachedGateGroup; 
 	//hints
 	unsigned long queAddCount;
 	unsigned long lastqueAddCount;
@@ -93,18 +91,19 @@
 - (void) setEnableTimer:(int)aState;
 - (unsigned long)cycleRate;
 - (void) setCycleRate:(unsigned long)aRate;
+- (void) setRunMode:(int)runMode;
 
 #pragma mark ¥¥¥Run Management
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(id)userInfo;
+- (void) runIsStopping:(id)userInfo;
 - (BOOL) doneTakingData;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(id)userInfo;
 - (void) putDataInQueue:(ORDataPacket*)aDataPacket force:(BOOL)forceAdd;
 - (void) queueRecordForShipping:(NSNotification*)aNote;
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) closeOutRun:(id)userInfo;
 - (void) doCycleRate;
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 
 #pragma mark ¥¥¥Save/Restore
 - (void) saveReadOutListTo:(NSString*)fileName;
@@ -124,11 +123,10 @@ extern NSString* ORDataTaskCycleRateChangedNotification;
 extern NSString* ORDataTaskModelTimerEnableChanged;
 
 @interface NSObject (ORDataTaskModel)
-
 - (int) stationNumber;
 - (int) slot;
 - (int) crateNumber;
-
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 @end
 
 

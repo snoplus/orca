@@ -23,7 +23,6 @@
 @class ORPlotter1D;
 @class ORCurve1D;
 @class ORAnalysisPanel1D;
-@class ORGateKey;
 @class ORPlotter1D;
 
 enum {
@@ -41,7 +40,6 @@ enum {
         NSMutableDictionary*	attributes;
         NSDictionary*			fitLableAttributes;
         ORAnalysisPanel1D*		analysis;
-        ORGateKey*      cachedGate;
         int             gate1,gate2;
         BOOL			analyze;
         double			average;
@@ -76,12 +74,7 @@ enum {
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
-- (void) gateNameChanged:(NSNotification*)aNote;
-- (void) lowValueChanged:(NSNotification*)aNote;
-- (void) highValueChanged:(NSNotification*)aNote;
 
-- (NSString *) displayedGateName;
-- (void) setDisplayedGateName: (NSString *) aDisplayedGateName;
 - (BOOL) displayGate;
 - (void) setDisplayGate: (BOOL) flag;
 - (ORAnalysisPanel1D *)analysis;

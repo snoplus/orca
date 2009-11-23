@@ -29,7 +29,6 @@
 @class ORDocumentController;
 @class OrcaObjectController;
 @class OrcaObject;
-@class ORGateGroup;
 
 //@class NKDPostgreSQLConnection;
 
@@ -42,7 +41,6 @@
         //NKDPostgreSQLConnection* dbConnection;
         NSMutableArray* orcaControllers;
         int				scaleFactor;
-        ORGateGroup*	gateGroup;
 		SEL				afterSaveSelector;
 		id				afterSaveTarget;
 }
@@ -71,8 +69,6 @@
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
 - (id)       findObjectWithFullID:(NSString*)aFullID;
 - (NSMutableDictionary*) fillInHeaderInfo:(NSMutableDictionary*)dictionary;
-- (ORGateGroup *) gateGroup;
-- (void) setGateGroup: (ORGateGroup *) aGateGroup;
 - (void) assignUniqueIDNumber:(id)anObject;
 - (void) resetAlreadyVisitedInChainSearch;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;

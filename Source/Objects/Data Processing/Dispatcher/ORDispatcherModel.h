@@ -21,28 +21,31 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataChainObject.h"
+#import "ORDataProcessing.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class NetSocket;
-@class ORDataPacket;
 @class ORDispatcherClient;
+@class ORDecoder;
 
 #define kORDispatcherPort 44666
 
 
-@interface ORDispatcherModel :  ORDataChainObject 
+@interface ORDispatcherModel :  ORDataChainObject <ORDataProcessing>  
 {
     @private
 	int             socketPort;
 	NetSocket*      serverSocket;
 	NSMutableArray*	clients;
-	NSData*         dataHeader;
+	NSMutableDictionary*         currentHeader;
     BOOL        checkAllowed;
     BOOL        checkRefused;
 	BOOL		_ignoreMode;
 	BOOL		scheduledForUpdate;
     NSArray* allowedList;
     NSArray* refusedList;
+	BOOL     runInProgress;
+	int		runMode;
 }
 
 - (void)serve;
@@ -73,20 +76,16 @@
 - (void) postUpdate;
 
 #pragma mark ¥¥¥Data Handling
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
+- (void) runTaskStarted:(id)userInfo;
+- (void) runTaskStopped:(id)userInfo;
+- (void) closeOutRun:(id)userInfo;
 - (void) clientDisconnected:(id)aClient;
 
 #pragma mark ¥¥¥Delegate Methods
 - (void) netsocket:(NetSocket*)inNetSocket connectionAccepted:(NetSocket*)inNewNetSocket;
 - (void) clientChanged:(id)aClient;
-
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
-- (void) runModeChanged:(NSNotification*)aNotification;
-
+- (void) setRunMode:(int)aMode;
 
 @end
 

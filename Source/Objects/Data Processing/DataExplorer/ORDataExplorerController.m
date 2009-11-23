@@ -568,7 +568,6 @@
 {
     if(![model dataSet])[model createDataSet];
     NSMutableDictionary* dataDictionary = [model dataRecordAtIndex:row];
-    ORDataPacket* d = [model fileAsDataPacket];
     unsigned long offset = [[dataDictionary objectForKey:@"StartingOffset"] longValue];
     id aKey = [dataDictionary objectForKey:@"Key"];
 	BOOL alreadyDecodedOnce = [[dataDictionary objectForKey:@"DecodedOnce"] boolValue];
@@ -579,7 +578,7 @@
     }
     if(!scanInProgress){
         NSString* header = [NSString stringWithFormat:@"Record %d / %d\n",row,[[model dataRecords]count]-1];
-        header = [header stringByAppendingFormat:@"%@",[d dataRecordDescription:offset forKey:aKey]];
+        header = [header stringByAppendingFormat:@"%@",[model dataRecordDescription:offset forKey:aKey]];
         [detailsView setString:header];
     }
 

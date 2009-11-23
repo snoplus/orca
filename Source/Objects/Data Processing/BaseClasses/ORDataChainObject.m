@@ -19,7 +19,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORDataChainObject.h"
-#import "ORDataPacket.h"
 
 NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInCurrentRun";
 
@@ -46,8 +45,13 @@ NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInC
 		[anArray addObject:dictionary];
 	}
 }
-
-- (void) endOfRunCleanup:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(id)userInfo
+{
+}
+- (void) endOfRunCleanup:(id)userInfo
+{
+}
+- (void) setRunMode:(int)aMode
 {
 }
 @end

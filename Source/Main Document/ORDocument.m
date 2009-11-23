@@ -31,7 +31,6 @@
 #import "ORTaskMaster.h"
 #import "ORHWWizardController.h"
 #import "ORCommandCenter.h"
-#import "ORGateGroup.h"
 
 @implementation ORDocument
 
@@ -89,7 +88,6 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	}
     [group sleep];
     [group release];
-    [self setGateGroup: nil];
 	
     [[self undoManager] removeAllActions];
 	RestoreApplicationDockTileImage();
@@ -186,18 +184,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 
 
 
-- (ORGateGroup *) gateGroup;
-{
-    if(!gateGroup)[self setGateGroup:[ORGateGroup gateGroup]];
-    return gateGroup; 
-}
 
-- (void) setGateGroup: (ORGateGroup *) aGateGroup;
-{
-    [aGateGroup retain];
-    [gateGroup release];
-    gateGroup = aGateGroup;
-}
 
 - (void) assignUniqueIDNumber:(id)objToGetID
 {
@@ -276,13 +263,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     [docDict setObject:[[[NSBundle mainBundle] infoDictionary]       objectForKey:@"CFBundleVersion"] forKey:@"OrcaVersion"];
     [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
-	
-	//add in any gategroups
-    if([gateGroup count])[gateGroup addParametersToDictionary:dictionary];
-	
-	//have our group add parameters
-	//[group addParametersToDictionary:dictionary];
-	
+		
 	//setup and add Objects to object info list
 	NSMutableDictionary* objectInfoDictionary = [NSMutableDictionary dictionary];
 	NSMutableArray* allObjects		= (NSMutableArray*)[self collectObjectsOfClass:NSClassFromString(@"OrcaObject")];
@@ -343,7 +324,6 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 
 #pragma mark ¥¥¥Archival
 static NSString* ORGroupKey             = @"ORGroup";
-static NSString* ORGateGroupKey         = @"ORGateGroupKey";
 static NSString* OROrcaControllers	    = @"OROrcaControllers";
 static NSString* ORTaskMasterVisibleKey = @"ORTaskMasterVisibleKey";
 static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
@@ -370,7 +350,6 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[archiver encodeInt:scaleFactor forKey:ORDocumentScaleFactor];						
         
-        [archiver encodeObject: gateGroup forKey: ORGateGroupKey];
 		
 		[[ORAlarmCollection sharedAlarmCollection] encodeEMailList:archiver];
 		[[ORStatusController sharedStatusController] encode:archiver];
@@ -422,7 +401,6 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[self setGroup:[unarchiver decodeObjectForKey:ORGroupKey]];	    
 		[[ORGlobal sharedGlobal] loadParams:unarchiver];
-		[self setGateGroup:[unarchiver decodeObjectForKey: ORGateGroupKey]];
 		
 		[[ORAlarmCollection sharedAlarmCollection] decodeEMailList:unarchiver];
 		[[ORStatusController sharedStatusController] decode:unarchiver];

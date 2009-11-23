@@ -21,22 +21,22 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataChainObject.h"
+#import "ORDataProcessing.h"
 
 #pragma mark ¥¥¥Forward Declarations
-@class ORDataPacket;
 @class ORQueue;
 @class ORSmartFolder;
 @class ORAlarm;
+@class ORDecoder;
 
 #define kStopOnLimit	0
 #define kRestartOnLimit 1
 #define kMinDiskSpace   500 //MBytes
 
-@interface ORDataFileModel :  ORDataChainObject
+@interface ORDataFileModel :  ORDataChainObject <ORDataProcessing>
 {
     @private
         NSFileHandle*	filePointer;
-        NSTimer*		fileSizeTimer;
         unsigned long	dataFileSize;
         NSString*		fileName;
         NSString*		statusFileName;
@@ -63,6 +63,8 @@
 		int				sizeLimitReachedAction;
 		ORAlarm*		diskFullAlarm;
 		int				checkCount;
+		int				runMode;
+		NSTimeInterval lastFileCheckTime;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -93,9 +95,7 @@
 - (void)setTitles;
 - (unsigned long)dataFileSize;
 - (void) setDataFileSize:(unsigned long)aSize;
-- (NSTimer*) fileSizeTimer;
-- (void) setFileSizeTimer:(NSTimer*)aTimer;
-- (void) getDataFileSize:(NSTimer*)aTimer;
+- (void) getDataFileSize;
 - (void) checkDiskStatus;
 
 - (BOOL)saveConfiguration;
@@ -105,13 +105,13 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) runAboutToStart:(NSNotification*)aNotification;
-- (void) runModeChanged:(NSNotification*)aNotification;
+- (void) setRunMode:(int)aMode;
 - (void) statusLogFlushed:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Data Handling
-- (void) processData:(ORDataPacket*)someData  userInfo:(NSDictionary*)userInfo;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
+- (void) runTaskStarted:(id)userInfo;
+- (void) runTaskStopped:(id)userInfo;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;

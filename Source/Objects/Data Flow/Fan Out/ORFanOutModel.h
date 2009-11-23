@@ -22,6 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 
 @class ORDataPacket;
+@class ORDecoder;
 
 @interface ORFanOutModel :  OrcaObject 
 {
@@ -47,11 +48,10 @@
 - (void) 		setLineType: (int)aType;
 
 //used with caching to speed up the data processing.
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-
+- (void) runTaskStarted:(id)userInfo;
+- (void) runTaskStopped:(id)userInfo;
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
+- (void) closeOutRun:(id)userInfo;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

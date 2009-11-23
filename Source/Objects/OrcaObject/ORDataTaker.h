@@ -23,6 +23,8 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
+@class ORDecoder;
+
 #define kSBCisDataTaker @"kSBCisDataTaker"
 
 @protocol ORDataTaker
@@ -39,10 +41,9 @@
 - (int) maxNumChannels;
 @end
 
-
+/*
 @interface NSObject (ORDataTaker)
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (BOOL) dataAvailable;
 - (BOOL) isRunning;
@@ -51,4 +52,4 @@
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket;
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
-@end
+@end*/

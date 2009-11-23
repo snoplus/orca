@@ -21,6 +21,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORFanInModel.h"
+#import "ORDecoder.h"
 
 #pragma mark ¥¥¥String Definitions
 NSString* ORFanInChangedNotification 	 = @"Fan In Number Changed";
@@ -377,52 +378,54 @@ static NSString *ORFanInNumber 		= @"Number of Fan In Inputs";
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
 {
-    if(![self respondsToSelector:aSelector]){
-        ORConnector* aConnector = [[self connectors] objectForKey:ORFanInOutputConnection];
-        return [[[aConnector connector]guardian] methodSignatureForSelector:aSelector];
-    }
-    else {
-        return [super methodSignatureForSelector:aSelector];
-    }
+	
+	if( [[self class] instancesRespondToSelector:aSelector] ) {
+		return [[self class] instanceMethodSignatureForSelector:aSelector];
+	}
+	else {
+		id obj = [self objectConnectedTo:ORFanInOutputConnection];
+		if(obj)return [obj methodSignatureForSelector:aSelector];
+	}
+	return nil;
 }
 
 - (void) forwardInvocation:(NSInvocation *)invocation
 {
-    id obj = [self objectConnectedTo:ORFanInOutputConnection];
-    if(obj)[invocation invokeWithTarget:obj];
+	id obj = [self objectConnectedTo:ORFanInOutputConnection];
+	if(obj)[invocation invokeWithTarget:obj];
 }
+
 
 //----------------------------------------------------------------------------------------------------
 //methodSignatureForSelector and forwardInvocation are quite slow, so here we cach the objects that will
 //be getting hit the hardest with data processing. Let the slow methods handle everything except the next 
 //three messages.
 //
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(id)userInfo
 {
 	[cachedProcessor release];
     id obj = [self objectConnectedTo:ORFanInOutputConnection];
-	if(obj && [obj respondsToSelector:@selector(processData:userInfo:)]){
+	if(obj && [obj respondsToSelector:@selector(runTaskStarted:)]){
 	    cachedProcessor = [obj retain];
 	}
-	[obj runTaskStarted:aDataPacket userInfo:userInfo];
+	[obj runTaskStarted:userInfo];
 	
 }
 
 
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder
 {
-    [cachedProcessor processData:aDataPacket userInfo:userInfo];
+    [cachedProcessor processData:dataArray decoder:aDecoder];
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket  userInfo:(id)userInfo
+- (void) runTaskStopped:(id)userInfo
 {
-    [cachedProcessor runTaskStopped:aDataPacket userInfo:userInfo];
+    [cachedProcessor runTaskStopped:userInfo];
 }
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) closeOutRun:(id)userInfo
 {
-    [cachedProcessor closeOutRun:aDataPacket userInfo:userInfo];
+    [cachedProcessor closeOutRun:userInfo];
 }
-
 @end

@@ -21,10 +21,10 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataFileModel.h"
-#import "ORDataPacket.h"
-#import "ORStatusController.h"
 #import "ORSmartFolder.h"
 #import "ORAlarm.h"
+#import "ORDecoder.h"
+#import "ORStatusController.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORDataFileModelUseDatedFileNamesChanged	= @"ORDataFileModelUseDatedFileNamesChanged";
@@ -45,7 +45,7 @@ NSString* ORDataFileLock					= @"ORDataFileLock";
 static NSString *ORDataFileConnection 		= @"Data File Input Connector";
 
 @interface ORDataFileModel (private)
-- (NSString*) formRunName:(ORDataPacket*)aDataPacket;
+- (NSString*) formRunName:(id)userInfo;
 @end
 
 @implementation ORDataFileModel
@@ -83,8 +83,6 @@ static const int currentVersion = 1;           // Current version
 	[diskFullAlarm clearAlarm];
     [diskFullAlarm release];
     [filePointer release];
-    [fileSizeTimer invalidate];
-    [fileSizeTimer release];
     [fileName release];
     [statusFileName release];
     [dataFolder release];
@@ -149,12 +147,6 @@ static const int currentVersion = 1;           // Current version
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [notifyCenter addObserver : self
-                     selector : @selector(runModeChanged:)
-                         name : ORRunModeChangedNotification
-                       object : nil];
-    
-    
-    [notifyCenter addObserver : self
                      selector : @selector(statusLogFlushed:)
                          name : ORStatusFlushedNotification
                        object : nil];
@@ -178,8 +170,9 @@ static const int currentVersion = 1;           // Current version
 }
 
 
-- (void) runModeChanged:(NSNotification*)aNotification
+- (void) setRunMode:(int)aMode
 {
+	runMode = aMode;
     [self setUpImage];
 }
 
@@ -363,20 +356,6 @@ static const int currentVersion = 1;           // Current version
     filePointer = aFilePointer;
 }
 
-- (NSTimer*) fileSizeTimer
-{
-    return fileSizeTimer;
-}
-
-- (void) setFileSizeTimer:(NSTimer*)aTimer
-{
-    [fileSizeTimer invalidate];
-    [aTimer retain];
-    [fileSizeTimer release];
-    fileSizeTimer = aTimer;
-}
-
-
 - (NSString*) tempDir
 {
     return [dataFolder ensureSubFolder:@"openFiles" inFolder:[dataFolder finalDirectoryName]];
@@ -402,16 +381,16 @@ static const int currentVersion = 1;           // Current version
 	 object: self];
 }
 
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
-    if(filePointer && [[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        //[aDataPacket writeData:filePointer];
-        //write the data itself
-        int i;
-        NSArray* dataArray = [aDataPacket dataArray];
-        int n = [dataArray count];
-        for(i=0;i<n;i++){
-            [dataBuffer appendData:[dataArray objectAtIndex:i]];
+    if(filePointer && runMode == kNormalRun){
+		NSTimeInterval thisTime = [NSDate timeIntervalSinceReferenceDate];
+		if(fabs(lastFileCheckTime - thisTime) > 3){
+			lastFileCheckTime = thisTime;
+			[self performSelectorOnMainThread:@selector(getDataFileSize) withObject:nil waitUntilDone:NO];
+		}
+        for(id dataItem in dataArray){
+            [dataBuffer appendData:dataItem];
         }
         if(([dataBuffer length] > 15*1024) || ([NSDate timeIntervalSinceReferenceDate]-lastTime > 15)){
             [filePointer writeData:dataBuffer];
@@ -441,9 +420,8 @@ static const int currentVersion = 1;           // Current version
 }
 
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(id)userInfo
 {
-	
 	if(diskFullAlarm){
 		[diskFullAlarm clearAlarm];
 		[diskFullAlarm release];
@@ -460,18 +438,17 @@ static const int currentVersion = 1;           // Current version
         processedRunStart = YES;
         processedCloseRun = NO;
     }
-    
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+    runMode = [[userInfo objectForKey:kRunMode] intValue];
+    if(runMode == kNormalRun){
         //open file and write headers
-		if(filePrefix)[aDataPacket setFilePrefix:filePrefix];
-		
-        [self setFileName:[self formRunName:aDataPacket]];
+
+        [self setFileName:[self formRunName:userInfo]];
 		
         if(fileName){
 			NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
 			NSLog(@"Opening dataFile: %@\n",[fullFileName stringByAbbreviatingWithTildeInPath]);
-			
-			[[aDataPacket headerAsData] writeToFile:fullFileName atomically:YES];
+			NSFileManager* fm = [NSFileManager defaultManager];
+			[fm createFileAtPath:fullFileName contents:nil attributes:nil];
 			NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:fullFileName];
 			[fp seekToEndOfFile];
             [self setFilePointer:fp];
@@ -482,33 +459,35 @@ static const int currentVersion = 1;           // Current version
 		 object: self];
         
         
-        [self getDataFileSize:nil];
-        [self setFileSizeTimer:[NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(getDataFileSize:) userInfo:nil repeats:YES]];
+        [self getDataFileSize];
         
     }
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) subRunTaskStarted:(id)userInfo
 {
+	//we don't care
+}
+
+- (void) runTaskStopped:(id)userInfo
+{
+	//we don't care
 }
 
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) closeOutRun:(id)userInfo
 {	
-    
     if(processedCloseRun)return;
     else {
         processedCloseRun = YES;
         processedRunStart = NO;
     }
-    
-    if(filePointer && [[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [self getDataFileSize:nil];
-        [self setFileSizeTimer:nil];
+	
+    if(filePointer && (runMode == kNormalRun)){
+        [self getDataFileSize];
         
         //write out the last of the data if any
         [filePointer writeData:dataBuffer];
-        [aDataPacket writeData:filePointer];
         
         [filePointer release];
         filePointer = nil;
@@ -551,10 +530,9 @@ static const int currentVersion = 1;           // Current version
     }
     
     int statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
-    
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+    if(runMode == kNormalRun){
 	    //start a copy of the Status File
-	    statusFileName = [[NSString stringWithFormat:@"%@.log",[self formRunName:aDataPacket]] retain];
+	    statusFileName = [[NSString stringWithFormat:@"%@.log",[self formRunName:userInfo]] retain];
         
         [statusFolder ensureExists:[statusFolder finalDirectoryName]];
         NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
@@ -599,6 +577,9 @@ static const int currentVersion = 1;           // Current version
 	
 }
 
+- (void) runTaskBoundary
+{
+}
 
 - (unsigned long)dataFileSize
 {
@@ -618,7 +599,7 @@ static const int currentVersion = 1;           // Current version
 		object: self];
 }
 
-- (void) getDataFileSize:(NSTimer*)timer
+- (void) getDataFileSize
 {
     NSNumber* fsize;
     NSFileManager* fm = [NSFileManager defaultManager];
@@ -765,16 +746,21 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 
 @implementation ORDataFileModel (private)
 
-- (NSString*) formRunName:(ORDataPacket*)aDataPacket
+- (NSString*) formRunName:(id)userInfo
 {
 	NSString* s;
-	if([aDataPacket filePrefix]!=nil){
-		if([[aDataPacket filePrefix] rangeOfString:@"Run"].location != NSNotFound){
-			s = [NSString stringWithFormat:@"%@%d",[aDataPacket filePrefix],[aDataPacket runNumber]];
+	int runNumber		 = [[userInfo objectForKey:kRunNumber]intValue];
+	int subRunNumber	 = [[userInfo objectForKey:kSubRunNumber] intValue];
+	NSString* fileSuffix = [userInfo objectForKey:kFileSuffix];
+	if(!fileSuffix)fileSuffix = @"";
+	if(filePrefix!=nil){
+		if([filePrefix rangeOfString:@"Run"].location != NSNotFound){
+			s = [NSString stringWithFormat:@"%@%@%d",filePrefix,fileSuffix,runNumber];
 		}
-		else s = [NSString stringWithFormat:@"%@%@Run%d",[aDataPacket filePrefix],[[aDataPacket filePrefix] length]?@"_":@"",[aDataPacket runNumber]];
+		else s = [NSString stringWithFormat:@"%@%@Run%@%d",filePrefix,[filePrefix length]?@"_":@"",fileSuffix,runNumber];
 	}
-	else s = [NSString stringWithFormat:@"Run%d",[aDataPacket runNumber]];
+	else s = [NSString stringWithFormat:@"Run%@%d",fileSuffix,runNumber];
+	if(subRunNumber!=0)s = [s stringByAppendingFormat:@".%d",subRunNumber];
 	if(useDatedFileNames){
 		NSCalendarDate* theDate = [NSCalendarDate date];
 		s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];

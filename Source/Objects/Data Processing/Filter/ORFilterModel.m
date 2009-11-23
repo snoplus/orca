@@ -21,13 +21,13 @@
 
 #pragma mark •••Imported Files
 #import "ORFilterModel.h"
-#import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORFilterSymbolTable.h"
 #import "FilterScript.h"
 #import "ORDataTypeAssigner.h"
 #import "ORQueue.h"
 #import "ORFilterPluginBaseClass.h"
+#import "ORDecoder.h"
 
 NSString* ORFilterModelUsePluginChanged = @"ORFilterModelUsePluginChanged";
 NSString* ORFilterModelPluginValidChanged = @"ORFilterModelPluginValidChanged";
@@ -78,7 +78,7 @@ int filterGraph(nodeType*);
 //========================================================================
 
 @interface ORFilterModel (private)
-- (void) loadDataIDsIntoSymbolTable:(ORDataPacket*)aDataPacket;
+- (void) loadDataIDsIntoSymbolTable:(NSMutableDictionary*)aHeader;
 @end
 
 @implementation ORFilterModel
@@ -100,8 +100,7 @@ int filterGraph(nodeType*);
 	[pluginInstance release];
 	[self freeNodes];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduledUpdate) object:nil];
-	
-	[transferDataPacket release];
+	[currentDecoder release];
 	[expressionAsData release];
 	[inputValues release];
 	[outputValues release];
@@ -309,17 +308,18 @@ int filterGraph(nodeType*);
 }
 
 #pragma mark •••Data Handling
-- (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
-	
-	if(someData != currentDataPacket){
-		[someData generateObjectLookup];	 //MUST be done before data header will work.
+	if(aDecoder != currentDecoder){
+		[currentDecoder release];
+		currentDecoder = [aDecoder retain];
 		if(usePlugin && firstTime){
 			[symbolTable release];
 			symbolTable = [[ORFilterSymbolTable alloc] init];
 		}
 		if(firstTime){
-			[self loadDataIDsIntoSymbolTable:someData];
+			[self loadDataIDsIntoSymbolTable:[aDecoder fileHeader]];
+			[aDecoder generateObjectLookup];
 			if(usePlugin){
 				[pluginInstance setSymbolTable:symbolTable];
 				[pluginInstance start];
@@ -329,27 +329,14 @@ int filterGraph(nodeType*);
 			}
 			firstTime = NO;
 		}
-		currentDataPacket = someData;
-		if(transferDataPacket){
-			[transferDataPacket release];
-			transferDataPacket = nil;
-		}
-		transferDataPacket  = [someData copy];
-		[transferDataPacket generateObjectLookup];	//MUST be done before data header will work.
-		[transferDataPacket clearData];	
 	}
 	
 	//pass it on
-	[thePassThruObject processData:someData userInfo:userInfo];
-	
+	[thePassThruObject processData:dataArray decoder:aDecoder];
 	
 	//each block of data is an array of NSData objects, each potentially containing many records..
-	NSArray* theDataArray = [someData dataArray];
-	int n = [theDataArray count];
-	int i;
-	for(i=0;i<n;i++){
+	for(id data in dataArray){
 		//each record must be filtered by the filter code. 
-		NSData* data = [theDataArray objectAtIndex:i];
 		long totalLen = [data length]/sizeof(long);
 		if(totalLen>0){
 			unsigned long* ptr = (unsigned long*)[data bytes];
@@ -530,42 +517,23 @@ int filterGraph(nodeType*);
 		}
 	}
 }
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(id)userInfo
 {		
 	[self clearTimeHistogram];
 	
 	firstTime = YES;
-	currentDataPacket = nil;
-	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORFilterModel"];  
+	currentDecoder = nil;
 	
 	[self verifyFilterIsReady]; //throws on error
-	
-	NSMutableDictionary* theHeader = [aDataPacket fileHeader];
-	NSMutableDictionary* runControlSection = [theHeader objectForKey:@"Run Control"];
-	if(runControlSection)[aDataPacket setRunNumber:[[runControlSection objectForKey:@"RunNumber"] longValue]];
-	else {
-		NSMutableDictionary* objectSection = [theHeader objectForKey:@"ObjectInfo"];	
-		NSMutableArray* dataChainArray = [objectSection objectForKey:@"DataChain"];
-		id item;
-		NSEnumerator* e = [dataChainArray objectEnumerator];
-		while(item = [e nextObject]){
-			id runNum = [item objectForKey:@"RunNumber"];
-			if(runNum){
-				[aDataPacket setRunNumber:[runNum longValue]];
-				break;
-			}
-		}
-	}
-	
-	NSString* currentPrefix = [aDataPacket filePrefix];
-	if(currentPrefix)[aDataPacket setFilePrefix:[currentPrefix stringByAppendingString:@"Filtered"]];
-	else [aDataPacket setFilePrefix:@"FilteredRun"];
 	
 	thePassThruObject = [self objectConnectedTo:ORFilterOutConnector];
 	theFilteredObject = [self objectConnectedTo:ORFilterFilteredConnector];
 	
-	[thePassThruObject runTaskStarted:aDataPacket userInfo:userInfo];
-	[theFilteredObject runTaskStarted:aDataPacket userInfo:userInfo];
+	[thePassThruObject runTaskStarted:userInfo];
+	
+	[userInfo setObject:@"Filtered" forKey:kFileSuffix];
+	
+	[theFilteredObject runTaskStarted:userInfo];
 	
 	runTimer = [[ORTimer alloc] init];
 	[runTimer start];
@@ -576,26 +544,28 @@ int filterGraph(nodeType*);
 	
 }
 
+- (void) subRunTaskStarted:(id)userInfo
+{
+	//we don't care
+}
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+
+- (void) runTaskStopped:(id)userInfo
 {
 	
-	[thePassThruObject runTaskStopped:aDataPacket userInfo:userInfo];
-	[theFilteredObject runTaskStopped:aDataPacket userInfo:userInfo];
+	[thePassThruObject runTaskStopped:userInfo];
+	[theFilteredObject runTaskStopped:userInfo];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
 	
 }
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) closeOutRun:(id)userInfo
 {
-	[thePassThruObject closeOutRun:aDataPacket userInfo:userInfo];
-	[theFilteredObject closeOutRun:aDataPacket userInfo:userInfo];
-	
-	[transferDataPacket release];
-	transferDataPacket = nil;
-	
+	[thePassThruObject closeOutRun:userInfo];
+	[theFilteredObject closeOutRun:userInfo];
+		
 	if(usePlugin){
 		[pluginInstance finish];
 	}
@@ -616,7 +586,19 @@ int filterGraph(nodeType*);
 	[runTimer release];
 	runTimer = nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
+	[currentDecoder release];
+	currentDecoder = nil;
 	
+}
+
+- (void) setRunMode:(int)aMode
+{
+	[[self objectConnectedTo:ORFilterOutConnector] setRunMode:aMode];
+	[[self objectConnectedTo:ORFilterFilteredConnector] setRunMode:aMode];
+}
+
+- (void) runTaskBoundary
+{
 }
 
 - (NSString*) script
@@ -820,18 +802,16 @@ int filterGraph(nodeType*);
 
 - (void) shipRecord:(unsigned long*)p length:(long)length
 {
-	if(ExtractDataId(p[0]) != 0){
-		[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:length];
-		[transferDataPacket addFrameBuffer:YES];
+	//if(ExtractDataId(p[0]) != 0){
 		//pass it on
-		[theFilteredObject processData:transferDataPacket userInfo:nil];
-		[transferDataPacket clearData];
-	}
+		NSArray* dataArray = [NSArray arrayWithObject:[NSData dataWithBytes:p length:length*sizeof(long)]];
+		[theFilteredObject processData:dataArray decoder:currentDecoder];
+	//}
 }
 
 - (void) pushOntoStack:(int)i record:(unsigned long*)p
 {
-	if(!stacks[i])stacks[i] = [[ORQueue alloc] init]; 
+	if(!stacks[i])stacks[i] = [[ORQueue alloc] init];
 	
 	NSData* data = [NSData dataWithBytes:p length:ExtractLength(*p)*sizeof(long)];
 	[stacks[i] enqueue:data];
@@ -854,12 +834,8 @@ int filterGraph(nodeType*);
 {
 	if(![stacks[i] isEmpty]) {
 		while(![stacks[i] isEmpty]){
-			[transferDataPacket addData:[stacks[i] dequeueFromBottom]];
+			[theFilteredObject processData:[stacks[i] dequeueFromBottom] decoder:currentDecoder];
 		}
-		[transferDataPacket addFrameBuffer:YES];
-		//pass it on
-		[theFilteredObject processData:transferDataPacket userInfo:nil];
-		[transferDataPacket clearData];
 		
 		[self dumpStack:i];
 	}
@@ -881,11 +857,9 @@ int filterGraph(nodeType*);
 	unsigned long p[2];
 	p[0] = dataId1D | 2;
 	p[1] = (i & 0xff) << 24 | (aValue & 0x00ffffff);
-	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:2];
-	[transferDataPacket addFrameBuffer:YES];
 	//pass it on
-	[theFilteredObject processData:transferDataPacket userInfo:nil];
-	[transferDataPacket clearData];
+	NSArray* someData = [NSArray arrayWithObject:[NSData dataWithBytes:p length:2*sizeof(long)]];
+	[theFilteredObject processData:someData decoder:currentDecoder];
 }
 
 - (void) histo2D:(int)i x:(unsigned long)x y:(unsigned long)y
@@ -894,11 +868,10 @@ int filterGraph(nodeType*);
 	p[0] = dataId2D | 3;
 	p[1] = (i & 0xff) << 24 | (x & 0xffff);
 	p[2] = (y & 0xffff);
-	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:3];
-	[transferDataPacket addFrameBuffer:YES];
+
 	//pass it on
-	[theFilteredObject processData:transferDataPacket userInfo:nil];
-	[transferDataPacket clearData];
+	NSArray* someData = [NSArray arrayWithObject:[NSData dataWithBytes:p length:3*sizeof(long)]];
+	[theFilteredObject processData:someData decoder:currentDecoder];
 }
 
 - (void) stripChart:(int)i time:(unsigned long)aTimeIndex value:(unsigned long)aValue
@@ -907,11 +880,10 @@ int filterGraph(nodeType*);
 	p[0] = dataIdStrip | 3;
 	p[1] = (i & 0xffff) << 16 | (aValue & 0xffff); 
 	p[2] = aTimeIndex;
-	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:3];
-	[transferDataPacket addFrameBuffer:YES];
+
 	//pass it on
-	[theFilteredObject processData:transferDataPacket userInfo:nil];
-	[transferDataPacket clearData];
+	NSArray* someData = [NSArray arrayWithObject:[NSData dataWithBytes:p length:3*sizeof(long)]];
+	[theFilteredObject processData:someData decoder:currentDecoder];
 }
 
 
@@ -960,9 +932,9 @@ int filterGraph(nodeType*);
 @end
 
 @implementation ORFilterModel (private)
-- (void) loadDataIDsIntoSymbolTable:(ORDataPacket*)aDataPacket
+- (void) loadDataIDsIntoSymbolTable:(NSMutableDictionary*)aHeader
 {	
-	NSMutableDictionary* descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
+	NSMutableDictionary* descriptionDict = [aHeader objectForKey:@"dataDescription"];
 	NSString* objKey;
 	NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
 	
@@ -994,7 +966,6 @@ int filterGraph(nodeType*);
 			maxLongID++;
 			[self setDataIdStrip:maxLongID<<18];
 			[descriptionDict setObject:[self dataRecordDescription] forKey:@"ORFilterModel"];
-			[aDataPacket generateObjectLookup];
 			
 		}
 	}
@@ -1013,9 +984,7 @@ int filterGraph(nodeType*);
 			[symbolTable setData:theDataType forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
 		} 
 	}
-	
-	//descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
-	
+		
 	NSEnumerator* e = [inputValues objectEnumerator];
 	NSDictionary* anInputValueDictionary;
 	filterData tempData;
@@ -1031,7 +1000,7 @@ int filterGraph(nodeType*);
 
 @implementation ORFilterDecoderFor1D
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 2;
@@ -1059,7 +1028,7 @@ int filterGraph(nodeType*);
 @end
 
 @implementation ORFilterDecoderFor2D
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 3;
@@ -1085,7 +1054,7 @@ int filterGraph(nodeType*);
 @end
 
 @implementation ORFilterDecoderForStrip
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 3;

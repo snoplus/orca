@@ -40,7 +40,6 @@
 {
 	
     NSMutableArray* classList = [[[[NSApp delegate] document] collectObjectsRespondingTo:@selector(setDataIds:)] mutableCopy];
-    [classList insertObject:[[[NSApp delegate] document] gateGroup] atIndex:0];
     
     while([classList count]){
         int i;

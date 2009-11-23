@@ -24,9 +24,6 @@
 #import "ORAxis.h"
 #import "ORCurve1D.h"
 #import "ORAnalysisPanel1D.h"
-#import "ORGate.h"
-#import "ORGateKey.h"
-#import "ORGateGroup.h"
 #import "ORCalibration.h"
 #import "ORCARootServiceDefs.h"
 #import "NSDictionary+Extensions.h"
@@ -54,10 +51,6 @@ NSString* ORGateFitChanged							= @"ORGateFitChanged";
 
 const float kGateAlpha = .2;
 const float kGateAlpha2 = .1;
-
-@interface ORGate1D (private)
-- (void) registerForGateChanges;
-@end
 
 @implementation ORGate1D
 + (void) initialize
@@ -127,46 +120,8 @@ const float kGateAlpha2 = .1;
 	[analysis adjustSize];
 }
 
-- (void) gateNameChanged:(NSNotification*)aNote
-{
-    if([[[aNote userInfo] objectForKey:@"oldGateName"] isEqualToString: displayedGateName]){
-        [self setDisplayedGateName:[[aNote object] gateName]];
-    }
-}
 
-- (void) lowValueChanged:(NSNotification*)aNote
-{
-    if(displayGate){
-        ORGateKey* aGateKey = [aNote object];
-        if([[[aGateKey gate] gateName] isEqualToString:displayedGateName]){
-            gate1 = MIN([aGateKey lowAcceptValue],[aGateKey highAcceptValue]);
-            [self setGateMinChannel:gate1];
-            
-            [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORForcePlotUpdateNotification
-							  object:self
-							userInfo: [NSDictionary dictionaryWithObject: self
-																  forKey:@"OrcaObject Notification Sender"]];
 
-        }
-   }
-}
-
-- (void) highValueChanged:(NSNotification*)aNote
-{
-    if(displayGate){
-        ORGateKey* aGateKey = [aNote object];
-        if([[[aGateKey gate]gateName] isEqualToString:displayedGateName]){
-            gate2 = MAX([aGateKey lowAcceptValue],[aGateKey highAcceptValue]);
-            [self setGateMaxChannel:gate2];
-            [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORForcePlotUpdateNotification
-							  object:self
-							userInfo: [NSDictionary dictionaryWithObject: self
-																  forKey:@"OrcaObject Notification Sender"]];
-        }
-   }
-}
 
 
 
@@ -220,7 +175,6 @@ const float kGateAlpha2 = .1;
 							userInfo: [NSDictionary dictionaryWithObject: self
 																  forKey:@"OrcaObject Notification Sender"]];
 
-    [self registerForGateChanges];
 
 }
 
@@ -248,7 +202,6 @@ const float kGateAlpha2 = .1;
                                                           forKey:@"OrcaObject Notification Sender"]];
 
 
-    [self registerForGateChanges];
 
 }
 
@@ -692,13 +645,6 @@ const float kGateAlpha2 = .1;
 
 -(void)	mouseDown:(NSEvent*)theEvent  plotter:(ORPlotter1D*)aPlotter
 {
-    if(displayGate){
-        ORGateGroup* gateGroup = [[[NSApp delegate] document] gateGroup];
-        cachedGate = [[gateGroup gateWithName:displayedGateName] gateKey];
-        //remove our notifications to prevent conflicts while moving the mouse
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ORGateLowValueChangedNotification" object:nil];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ORGateHighValueChangedNotification" object:nil];
-    }
 
     NSPoint p = [aPlotter convertPoint:[theEvent locationInWindow] fromView:nil];
     if([aPlotter mouse:p inRect:[aPlotter bounds]]){
@@ -754,13 +700,8 @@ const float kGateAlpha2 = .1;
 {
     [self doDrag:theEvent plotter:aPlotter];
     
-    if(displayGate){
-        //restore our registration for gate changes.
-        
-        [self registerForGateChanges];
-    }
+
     dragInProgress = NO;
-    cachedGate = nil;
 }
 
 - (void) doDrag:(NSEvent*)theEvent  plotter:(ORPlotter1D*)aPlotter
@@ -813,10 +754,6 @@ const float kGateAlpha2 = .1;
             break;
         }
 
-        if(displayGate && cachedGate){
-            [cachedGate setLowAcceptValue:MIN(gate1,gate2)];
-            [cachedGate setHighAcceptValue:MAX(gate1,gate2)];
-        }
         
         [aPlotter setNeedsDisplay:YES];
         
@@ -1030,36 +967,3 @@ static NSString *ORGateDisplayGate           = @"ORGateDisplayGate";
 }
 
 @end
-
-@implementation ORGate1D (private)
-- (void) registerForGateChanges
-{
-    if(!displayGate){
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ORGateLowValueChangedNotification" object:nil];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ORGateHighValueChangedNotification" object:nil];
-    }
-    else {
-        [[NSNotificationCenter defaultCenter]  addObserver: self
-                     selector: @selector(lowValueChanged:)
-                         name: @"ORGateLowValueChangedNotification"
-                       object: nil];
-    
-        [[NSNotificationCenter defaultCenter]  addObserver: self
-                     selector: @selector(highValueChanged:)
-                         name: @"ORGateHighValueChangedNotification"
-                       object: nil];
-
-        
-        ORGateGroup* gateGroup = [[[NSApp delegate] document] gateGroup];
-        ORGateKey* aGateKey = [[gateGroup gateWithName:[self displayedGateName]]gateKey];
-        
-        NSNotification* aNote;
-         aNote = [NSNotification notificationWithName:@"ORGateLowValueChangedNotification" object:aGateKey];
-        [self lowValueChanged:aNote];
-        
-        aNote = [NSNotification notificationWithName:@"ORGateHighValueChangedNotification" object:aGateKey];
-        [self highValueChanged:aNote];
-    }
-}
-@end
-

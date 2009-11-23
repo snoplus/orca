@@ -22,19 +22,21 @@
 #pragma mark •••Imported Files
 #import "ORDataChainObject.h"
 #import "ORBaseDecoder.h"
+#import "ORDataProcessing.h"
 
 #define kNumScriptArgs 5
 #define kNumDisplayValues 5
 #define kNumFilterStacks 256
 
 #pragma mark •••Forward Declarations
-@class ORDataPacket;
 @class ORQueue;
 @class ORTimer;
+@class ORDecoder;
 
 #define kFilterTimeHistoSize 4000
 
-@interface ORFilterModel :  ORDataChainObject 
+@interface ORFilterModel :  ORDataChainObject <ORDataProcessing>
+
 {
     @private
 	
@@ -54,8 +56,7 @@
 		NSData*				expressionAsData;
 		BOOL				exitNow;
 		BOOL				firstTime;
-		ORDataPacket*       transferDataPacket;
-		ORDataPacket*       currentDataPacket;
+		ORDecoder*			currentDecoder;
 		ORQueue*			stacks[kNumFilterStacks];
 		unsigned long		processingTimeHist[kFilterTimeHistoSize];
 		NSLock*				timerLock;
@@ -114,10 +115,11 @@
 - (NSDictionary*) dataRecordDescription;
 
 - (void) verifyFilterIsReady;
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(id)userInfo;
+- (void) runTaskStopped:(id)userInfo;
+- (void) closeOutRun:(id)userInfo;
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
+- (void) setRunMode:(int)aMode;
 
 #pragma mark ***Script Methods
 - (void) parseScript;
@@ -178,19 +180,19 @@ extern NSString* ORFilterUpdateTiming;
 
 @interface ORFilterDecoderFor1D : ORBaseDecoder
 {}
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 @end
 
 @interface ORFilterDecoderFor2D : ORBaseDecoder
 {}
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 @end
 
 @interface ORFilterDecoderForStrip : ORBaseDecoder
 {}
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 @end
 

@@ -28,7 +28,6 @@
 #import "ORHWWizardController.h"
 #import "ORPreferencesController.h"
 #import "ORCommandCenterController.h"
-#import "ORGateKeeper.h"
 #import "ORDataTaker.h"
 #import "ORReadOutList.h"
 #import "ORTemplates.h"
@@ -276,13 +275,6 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 - (IBAction) openHelp:(NSToolbarItem*)item 
 {
 	[[[NSApp delegate] helpCenter] showHelpCenter:nil];
-}
-
-- (IBAction) openGateKeeper:(NSToolbarItem*)item 
-{
-    ORGateKeeper* aGateKeeper = [ORGateKeeper sharedGateKeeper];
-    [aGateKeeper setGateGroup:[[self document] gateGroup]];
-    [aGateKeeper showWindow:self];
 }
 
 - (IBAction) openPreferences:(NSToolbarItem*)item 

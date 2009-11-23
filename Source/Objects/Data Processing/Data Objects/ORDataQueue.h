@@ -1,5 +1,5 @@
 //
-//  ORDataPacket.h
+//  ORDataQueu.h
 //  Orca
 //
 //  Created by Mark Howe on Thu Mar 06 2003.
@@ -17,26 +17,17 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
 #pragma mark •••Imported Files
-
-#pragma mark •••Forward Declarations
-@class ORDataSet;
+#import "ORDataQueueing.h"
 
 #define kMaxReservedPoolSize 2045
 #define kFastLoopupCacheSize 16384
 
-@interface ORDataPacket : NSObject {
+@interface ORDataQueue : NSObject <ORDataQueueing>{
     @private
-		unsigned long        runNumber;				//current run number for this data
-		unsigned long        subRunNumber;           //current subrun number for this data
-		NSString*            filePrefix;             //name for file prefix (i.e. Run, R_Run, etc..)
 		NSMutableArray*  	 dataArray;             //data records
 		NSMutableArray*  	 cacheArray;			//data records that are to be cached for later inclusion into data
 		BOOL				 dataInCache;
-		NSMutableDictionary* fileHeader;
-		ORDecoder*			 currentDecoder;
 		NSMutableData*		 frameBuffer;			//accumulator for data
 		unsigned long		 frameIndex;
 		NSRecursiveLock*     theDataLock;
@@ -45,57 +36,42 @@
         unsigned long        lastFrameBufferSize;
 		BOOL				 dataAvailable;
 
-		int             version;
         BOOL            addedData;
 		long			frameCounter;
 		long			oldFrameCounter;
+		BOOL			needToSwap;
 }
 
-#pragma mark •••Accessors
-- (int)  version;
-- (void)  setVersion:(int)aVersion;
-- (void) setRunNumber:(unsigned long)aRunNumber;
-- (unsigned long)runNumber;
-- (void) setSubRunNumber:(unsigned long)aSubRunNumber;
-- (unsigned long)subRunNumber;
-- (NSMutableDictionary *) fileHeader;
-- (void) setFileHeader: (NSMutableDictionary *) aFileHeader;
-- (void) makeFileHeader;
-- (void) updateHeader;
-- (BOOL) addedData;
-- (void) setAddedData:(BOOL)flag;
-- (unsigned long) frameIndex;
-- (NSMutableArray*)  dataArray;
-- (void) setDataArray:(NSMutableArray*)someData;
-- (NSMutableArray*) cacheArray;
-- (void) setCacheArray:(NSMutableArray*)newCacheArray;
-- (NSString*)filePrefix;
-- (void)setFilePrefix:(NSString*)aFilePrefix;
-- (NSMutableData*)  frameBuffer;
-- (void) setFrameBuffer:(NSMutableData*)someData;
+- (id) init;
+- (void) dealloc;
 
+#pragma mark •••Accessors
 - (void) startFrameTimer;
 - (void) stopFrameTimer;
 - (void) forceFrameLoad;
-- (void) addCachedData;
-- (void) addDataToCach:(NSData*)someData;
-- (void) addArrayToCache:(NSArray*)aDataArray;
+- (NSMutableArray*)  dataArray;
+- (void) setDataArray:(NSMutableArray*)someData;
+- (NSMutableData*)  frameBuffer;
+- (void) setFrameBuffer:(NSMutableData*)someData;
+- (NSMutableArray*) cacheArray;
+- (void) setCacheArray:(NSMutableArray*)newCacheArray;
 
+#pragma mark •••Data Addition
+- (unsigned long) frameIndex;
+- (void) replaceReservedDataInFrameBufferAtIndex:(unsigned long)index withLongs:(unsigned long*)data length:(unsigned long)length;
+- (unsigned long) addLongsToFrameBuffer:(unsigned long*)someData length:(unsigned long)length;
+- (unsigned long*) getBlockForAddingLongs:(unsigned long)length;
+- (unsigned long)reserveSpaceInFrameBuffer:(unsigned long)length;
+- (void) removeReservedLongsFromFrameBuffer:(NSRange)aRange;
 - (void) addFrameBuffer:(BOOL)forceAdd;
 - (void) addData:(NSData*)someData;
 - (void) addDataFromArray:(NSArray*)aDataArray;
-
-- (unsigned long*) getBlockForAddingLongs:(unsigned long)length;
-- (unsigned long) addLongsToFrameBuffer:(unsigned long*)someData length:(unsigned long)length;
-- (void) replaceReservedDataInFrameBufferAtIndex:(unsigned long)index withLongs:(unsigned long*)data length:(unsigned long)length;
-- (unsigned long)reserveSpaceInFrameBuffer:(unsigned long)length;
-- (void) removeReservedLongsFromFrameBuffer:(NSRange)aRange;
-- (void) clearData;
+- (void) addCachedData;
 - (unsigned long) dataCount;
-
-- (void) addEventDescriptionItem:(NSDictionary*) eventDictionary;
-- (void) addDataDescriptionItem:(NSDictionary*) dataDictionary forKey:(NSString*)aKey;
-- (void) addReadoutDescription:(id) readoutDescription;
-
+- (void) addDataToCach:(NSData*)someData;
+- (void) addArrayToCache:(NSArray*)aDataArray;
+- (void) clearData;
+- (BOOL) addedData;
+- (void) setAddedData:(BOOL)flag;
 @end
 

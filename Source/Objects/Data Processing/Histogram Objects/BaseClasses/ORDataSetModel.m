@@ -22,7 +22,6 @@
 #import "ORDataSetModel.h"
 #import "ORDataController.h"
 #import "ORScale.h"
-#import "ORGate.h"
 
 NSString* ORDataSetModelPausedChanged		= @"ORDataSetModelPausedChanged";
 NSString* ORDataSetModelRefreshModeChanged	= @"ORDataSetModelRefreshModeChanged";

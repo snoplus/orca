@@ -21,10 +21,9 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataExplorerModel.h"
-#import "ORDataPacket.h"
 #import "ORHeaderItem.h"
 #import "ORDataSet.h"
-#import "ThreadWorker.h"
+#import "ORRecordIndexer.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORDataExplorerModelHistoErrorFlagChanged = @"ORDataExplorerModelHistoErrorFlagChanged";
@@ -41,7 +40,6 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 {
     [fileToExplore release];
     [header release];
-    [fileAsDataPacket release];
     [dataRecords release];
     [dataSet release];
     
@@ -118,10 +116,6 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 {
     return [dataRecords objectAtIndex:index];
 }
-- (ORDataPacket*) fileAsDataPacket
-{
-    return fileAsDataPacket;
-}
 
 - (NSString*) fileToExplore
 {
@@ -142,31 +136,18 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     
 }
 
-- (ORHeaderItem *)header
+- (ORHeaderItem*)header
 {
     return header; 
 }
 
-- (void)setHeader:(ORHeaderItem *)aHeader
+- (void) setHeader:(ORHeaderItem*)aHeader
 {
     [aHeader retain];
     [header release];
     header = aHeader;
 }
 
-- (void) dataPacket:(id)aDataPacket setTotalLength:(unsigned)aLength
-{
-    if(aDataPacket == fileAsDataPacket){
-        totalLength = aLength;
-    }
-}
-
-- (void) dataPacket:(id)aDataPacket setLengthDecoded:(unsigned)aLength
-{
-    if(aDataPacket == fileAsDataPacket){
-        lengthDecoded = aLength;
-    }    
-}
 
 - (id)   name
 {
@@ -205,10 +186,22 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     }
     else [dataSet removeObject:item];
 }
+
 - (void) createDataSet
 {
     [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease]];
 }
+
+- (void) setTotalLength:(unsigned)aLength
+{
+	totalLength = aLength;
+}
+
+- (void) setLengthDecoded:(unsigned)aLength
+{
+	lengthDecoded = aLength;
+}
+
 
 - (unsigned) totalLength
 {
@@ -241,89 +234,58 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 
 - (BOOL) parseInProgress
 {
-    return parseThread != nil;
+    return [[queue operations] count]!=0;
 }
+
 - (void) stopParse
 {
-    [fileAsDataPacket setStopDecodeIntoArray:YES];
 }
 
 - (void) parseFile
 {
 	[self setHistoErrorFlag:NO];
-	
-    if(parseThread)return;
-    
+	    
     totalLength   = 0;
     lengthDecoded = 0;
     [self setDataRecords:nil];
     [self setHeader:nil];
     [self setDataSet:nil];
     
-    if(fileAsDataPacket)[fileAsDataPacket release];
-    fileAsDataPacket = [[ORDataPacket alloc] init];
-    
-    
-    parseThread = [[ThreadWorker workOn:self withSelector:@selector(parse:thread:)
-                             withObject:nil
-                         didEndSelector:@selector(parseThreadExited:)] retain];
-    
-    [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORDataExplorerParseStartedNotification
-                              object: self];
-    
-    if(!parseThread){
-        [self parseThreadExited:nil];
-    }
+	if(!queue){
+		queue = [[NSOperationQueue alloc] init];
+	}
+	
+	[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+	if(recordIndexer)[recordIndexer release];
+	recordIndexer = [[ORRecordIndexer alloc] initWithPath:fileToExplore delegate:self];
+	[queue addOperation:recordIndexer];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseStartedNotification object: self];
+
 }
 
--(id) parse:(id)userInfo thread:(id)tw
+- (void) parseEnded
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
-    NSFileHandle* fp = [NSFileHandle fileHandleForReadingAtPath:fileToExplore];
-    if(fp){
-        
-        if([fileAsDataPacket legalDataFile:fp]){
-			if([fileAsDataPacket readData:fp]){
-				[fileAsDataPacket generateObjectLookup];       //MUST be done before data header will work.
-				
-				[self setHeader:[ORHeaderItem headerFromObject:[fileAsDataPacket fileHeader] named:@"Root"]];
-				
-				[self setDataRecords:[fileAsDataPacket decodeDataIntoArrayForDelegate:self]]; 
-			}
-			else {
-				NSLogColor([NSColor redColor],@"Problem reading <%@> for exploring.\n",[fileToExplore stringByAbbreviatingWithTildeInPath]);
-			}
-		}
-		else {
-			NSLogColor([NSColor redColor],@" <%@> doesn't appear to be a legal ORCA data file.\n",[fileToExplore stringByAbbreviatingWithTildeInPath]);
-		}
-    }
-    else {
-        NSLogColor([NSColor redColor],@"Could NOT Open <%@> for exploring.\n",[fileToExplore stringByAbbreviatingWithTildeInPath]);
-    }
-    [pool release];
-    return @"done";
+	[self performSelector:@selector(delayedSendParseEnded) withObject:nil afterDelay:.1];
 }
 
--(void)parseThreadExited:(id)userInfo
+- (void) delayedSendParseEnded
 {
-    [parseThread release];
-    parseThread = nil;
-    [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORDataExplorerParseEndedNotification
-                              object: self];
-    
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseEndedNotification object: self];
 }
 
 - (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset forKey:(id)aKey
 {
-    [fileAsDataPacket byteSwapOneRecordAtOffset:anOffset forKey:aKey];
+    [recordIndexer byteSwapOneRecordAtOffset:anOffset forKey:aKey];
 }
 
 - (void) decodeOneRecordAtOffset:(unsigned long)anOffset forKey:(id)aKey
 {
-    [fileAsDataPacket decodeOneRecordAtOffset:anOffset intoDataSet:dataSet forKey:aKey];
+    [recordIndexer decodeOneRecordAtOffset:anOffset intoDataSet:dataSet forKey:aKey];
+}
+
+- (NSString*) dataRecordDescription:(unsigned long)anOffset forKey:(NSNumber*)aKey
+{
+	return [recordIndexer dataRecordDescription:anOffset forKey:aKey];
 }
 
 #pragma mark ¥¥¥Archival

@@ -54,36 +54,28 @@ static NSString* kCardKey[8] = {
     else return [NSString stringWithFormat:@"Card %d",aCard];			
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
-    unsigned long length = 2;
-    ptr++;
-
-    unsigned short crate = 0;
-    unsigned short card  = (*ptr&0x000f0000)>>16;
-    unsigned short chan  = (*ptr&0x0000f000)>>12;
-    unsigned long  value = *ptr&0x00000fff;
-
+	unsigned short card  = ShiftAndExtract(ptr[1],16,0xf);
+	unsigned short chan  = ShiftAndExtract(ptr[1],12,0xf);
+	unsigned short value = ShiftAndExtract(ptr[1],0,0xfff);
+	
     [aDataSet histogram:value numBins:4096  sender:self  withKeys:@"DataGen",
 		kCardKey[card],
 		kChanKey[chan],
         nil];
-        
-    if(gatesInstalled){
-        [super prepareData:aDataSet crate:crate card:card channel:chan value:value];
-    }
     
-    return length; //must return number of longs processed.
+    return ExtractLength(ptr[0]); //must return number of longs processed.
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"Data Gen Record\n\n";
     
-    NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ptr[1]&0x00000fff];    
-    NSString* card  = [NSString stringWithFormat: @"Card  = %d\n",(ptr[1]&0x000f0000)>>16];    
-    NSString* chan  = [NSString stringWithFormat: @"Chan  = %d\n",(ptr[1]&0x0000f000)>>12];    
+    NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ShiftAndExtract(ptr[1],0,0xfff)];    
+    NSString* card  = [NSString stringWithFormat: @"Card  = %d\n",ShiftAndExtract(ptr[1],16,0xf)];    
+    NSString* chan  = [NSString stringWithFormat: @"Chan  = %d\n",ShiftAndExtract(ptr[1],12,0xf)];    
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,value,card,chan];               
 }
@@ -105,19 +97,19 @@ static NSString* kCardKey[8] = {
     else return [NSString stringWithFormat:@"Card %d",aCard];			
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 3;
 
-    [aDataSet histogram2DX:ptr[1]&0x00000fff y:ptr[2]&0x00000fff size:256  sender:self  withKeys:@"DataGen2D",
-		kCardKey[(ptr[1]&0x000f0000)>>16],
-		kChanKey[(ptr[1]&0x0000f000)>>12],
-        nil];
-
-    [aDataSet loadData2DX:ptr[1]&0x00000fff y:ptr[2]&0x00000fff z:1 size:256  sender:self  withKeys:@"DataGen2D_Set",
-		kCardKey[(ptr[1]&0x000f0000)>>16],
-		kChanKey[(ptr[1]&0x0000f000)>>12],
+	[aDataSet histogram2DX:ShiftAndExtract(ptr[1],0,0xfff) y:ShiftAndExtract(ptr[2],0,0xfff) size:256  sender:self  withKeys:@"DataGen2D",
+	 kCardKey[ShiftAndExtract(ptr[1],16,0xf)],
+	 kChanKey[ShiftAndExtract(ptr[1],12,0xf)],
+	 nil];
+	
+    [aDataSet loadData2DX:ShiftAndExtract(ptr[1],0,0xfff) y:ShiftAndExtract(ptr[2],0,0xfff) z:1 size:256  sender:self  withKeys:@"DataGen2D_Set",
+		kCardKey[ShiftAndExtract(ptr[1],16,0xf)],
+		kChanKey[ShiftAndExtract(ptr[1],12,0xf)],
         nil];
 
 
@@ -127,8 +119,8 @@ static NSString* kCardKey[8] = {
 	}
 	if([now timeIntervalSinceDate:lastTime] > 1){
 		[aDataSet clearDataUpdate:NO withKeys:@"DataGen2D_Set",
-			kCardKey[(ptr[1]&0x000f0000)>>16],
-			kChanKey[(ptr[1]&0x0000f000)>>12],
+			kCardKey[ShiftAndExtract(ptr[1],16,0xf)],
+			kChanKey[ShiftAndExtract(ptr[1],11,0xf)],
 			nil];
 		[lastTime release];
 		lastTime = [now retain];
@@ -140,11 +132,11 @@ static NSString* kCardKey[8] = {
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"Data Gen Record (2D)\n\n";
-    
-    NSString* valueX  = [NSString stringWithFormat:@"ValueX = %d\n",ptr[1]&0x00000fff];    
-    NSString* valueY  = [NSString stringWithFormat:@"ValueY = %d\n",ptr[2]&0x00000fff];    
-    NSString* card  = [NSString stringWithFormat: @"Card  = %d\n",(ptr[1]&0x000f0000)>>16];    
-    NSString* chan  = [NSString stringWithFormat: @"Chan  = %d\n",(ptr[1]&0x0000f000)>>12];    
+ 
+	NSString* valueX  = [NSString stringWithFormat:@"ValueX = %d\n",ShiftAndExtract(ptr[1],0,0xfff)];    
+    NSString* valueY  = [NSString stringWithFormat:@"ValueY = %d\n",ShiftAndExtract(ptr[2],0,0xfff)];    
+    NSString* card    = [NSString stringWithFormat: @"Card  = %d\n",ShiftAndExtract(ptr[1],16,0xf)];    
+    NSString* chan    = [NSString stringWithFormat: @"Chan  = %d\n",ShiftAndExtract(ptr[1],12,0xf)];    
 
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,valueX,valueY,card,chan];               
 }
@@ -167,14 +159,14 @@ static NSString* kCardKey[8] = {
     else return [NSString stringWithFormat:@"Card %d",aCard];			
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = ExtractLength(*ptr);
 	NSData* data = [NSData dataWithBytes:&ptr[2] length:(length-2)*sizeof(long)];
     [aDataSet loadWaveform:data offset:0 unitSize:sizeof(long) sender:self withKeys:@"DataGenWaveform",
-		kCardKey[(ptr[1]&0x000f0000)>>16],
-		kChanKey[(ptr[1]&0x0000f000)>>12],
+		kCardKey[ShiftAndExtract(ptr[1],16,0xf)],
+		kChanKey[ShiftAndExtract(ptr[1],12,0xf)],
         nil];
 
 
@@ -185,8 +177,8 @@ static NSString* kCardKey[8] = {
 {
     NSString* title= @"Data Gen Record (Waveform)\n\n";
     
-    NSString* card  = [NSString stringWithFormat: @"Card  = %d\n",(ptr[1]&0x000f0000)>>16];    
-    NSString* chan  = [NSString stringWithFormat: @"Chan  = %d\n",(ptr[1]&0x0000f000)>>12];    
+    NSString* card  = [NSString stringWithFormat: @"Card  = %d\n",ShiftAndExtract(ptr[1],16,0xf)];    
+    NSString* chan  = [NSString stringWithFormat: @"Chan  = %d\n",ShiftAndExtract(ptr[1],12,0xf)];    
 
     return [NSString stringWithFormat:@"%@%@%@",title,card,chan];               
 }

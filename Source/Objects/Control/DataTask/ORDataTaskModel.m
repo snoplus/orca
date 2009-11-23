@@ -25,7 +25,8 @@
 #import "ORDataSet.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
-#import "ORGateGroup.h"
+#import "ORDecoder.h"
+#import "ORDataProcessing.h"
 
 #pragma mark ¥¥¥Local Strings
 NSString* ORDataTaskModelRefreshRateChanged = @"ORDataTaskModelRefreshRateChanged";
@@ -67,12 +68,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [timerLock release];
-    
-	if(transferDataPacket){
-		[transferDataPacket release];
-		transferDataPacket = nil;
-	}
-	
+    	
     if(transferQueue){
         [transferQueue release];
         transferQueue = nil;
@@ -82,6 +78,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [queueFullAlarm release];
     [readOutList release];
     [dataTakers release];
+	[theDecoder release];
+
     [super dealloc];
 }
 
@@ -278,8 +276,9 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 
 
 #pragma mark ¥¥¥Run Management
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(id)userInfo
 {
+	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
 	if(processThreadRunning){
 		NSLogColor([NSColor redColor],@"Processing Thread still running from last run\n");
 	}
@@ -307,13 +306,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	}
 	
     cachedNumberDataTakers = [dataTakers count];
-    doGateProcessing = [[[self document] gateGroup] count] > 0;
-    if(doGateProcessing){
-        NSLog(@"Gates will be processed.\n");
-        cachedGateGroup = [[self document] gateGroup];
-        [aDataPacket addDataDescriptionItem:[cachedGateGroup dataRecordDescription] forKey:@"ORGateGroup"];    
-    }
-    else cachedGateGroup = nil;
+
     
 	cachedDataTakers = (id*)malloc(cachedNumberDataTakers * sizeof(id));
 	
@@ -346,17 +339,9 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 		[aDataPacket addReadoutDescription:[self readoutInfo:readOutList array:[NSMutableArray array]]];
 	}
 	
-	
-    [aDataPacket generateObjectLookup];	 //MUST be done before data header will work.
-	
-	if(transferDataPacket){
-		[transferDataPacket release];
-		transferDataPacket = nil;
-	}
-    transferDataPacket  = [aDataPacket copy];
-    [transferDataPacket generateObjectLookup];	//MUST be done before data header will work.
-    [transferDataPacket clearData];	
-	
+	[theDecoder release];
+	theDecoder = [[ORDecoder alloc] initWithHeader:[aDataPacket fileHeader]];
+		
 	if(transferQueue){
         [transferQueue release];
         transferQueue = nil;
@@ -365,7 +350,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     
     //cache the next object
     nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
-    [nextObject runTaskStarted:aDataPacket userInfo:userInfo];
+    [nextObject runTaskStarted:userInfo];
 	[nextObject setInvolvedInCurrentRun:YES];
 	
 	timeToStopProcessThread = NO;
@@ -376,6 +361,18 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	cycleRate  = 0;
     [self performSelector:@selector(doCycleRate) withObject:nil afterDelay:1];
 	[aDataPacket startFrameTimer];
+}
+
+- (void) subRunTaskStarted:(id)userInfo
+{
+    nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
+    [nextObject subRunTaskStarted:userInfo];
+}
+
+- (void) setRunMode:(int)runMode
+{
+    nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
+	[nextObject setRunMode:runMode];
 }
 
 //-------------------------------------------------------------------------
@@ -425,12 +422,6 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [aDataPacket addCachedData];
     [self putDataInQueue:aDataPacket force:NO];   
     
-    if(doGateProcessing){
-		if([aDataPacket addedData]){
-			[cachedGateGroup addProcessFlag:aDataPacket];
-			[aDataPacket setAddedData:NO];
-		}
-    }
     [self putDataInQueue:aDataPacket force:YES];   
 	
 	if(enableTimer){
@@ -445,12 +436,15 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	++cycleCount;
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(id)userInfo
 {
+	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
     int i;
     for(i=0;i<cachedNumberDataTakers;i++){
-        [cachedDataTakers[i] runIsStopping:aDataPacket userInfo:userInfo];
-    }
+		if([cachedDataTakers[i] respondsToSelector:@selector(runIsStopping:userInfo:)]){
+			[cachedDataTakers[i] runIsStopping:aDataPacket userInfo:userInfo];
+		}
+	}
 }
 
 - (BOOL) doneTakingData
@@ -464,8 +458,9 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	return allDone;
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(id)userInfo
 {
+	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
     int i;
     for(i=0;i<cachedNumberDataTakers;i++){
         [cachedDataTakers[i] runTaskStopped:aDataPacket userInfo:userInfo];
@@ -476,7 +471,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
 	
-	[nextObject runTaskStopped:aDataPacket userInfo:userInfo];
+	[nextObject runTaskStopped:userInfo];
 	//wait for the processing queu to clear.
 	float totalTime = 0;
     while([transferQueue count]){
@@ -488,16 +483,15 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 		}
 	}	
 	
-	[nextObject endOfRunCleanup:aDataPacket userInfo:userInfo];
+	[nextObject endOfRunCleanup:userInfo];
 
     [self setQueueCount:[transferQueue count]];
 	[self setCycleRate:0];
-    cachedGateGroup = nil;    
 }
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) closeOutRun:(id)userInfo
 {
-	
+	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
 
@@ -539,7 +533,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	
 	NSLog(@"Close out run\n");
     //tell everyone it's over and done.
-    [nextObject closeOutRun:aDataPacket userInfo:userInfo];
+    [nextObject closeOutRun:userInfo];
 	[nextObject setInvolvedInCurrentRun:NO];
 	
 	
@@ -568,10 +562,10 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 }
 
 
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder
 {
     id obj =  [self objectConnectedTo: ORDataTaskDataOut];
-    [obj processData:aDataPacket userInfo:userInfo];
+    [obj processData:dataArray decoder:aDecoder];
 }
 
 #pragma mark ¥¥¥Archival
@@ -692,16 +686,8 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 			@try { 
 				NSArray* theDataArray = [transferQueue dequeueArray];
 				if(theDataArray){
-					unsigned long theFirstLong = *((unsigned long*)[[theDataArray objectAtIndex:0] bytes]);
-					if(theFirstLong !=0){
-						[transferDataPacket addDataFromArray:theDataArray];
-						[theNextObject processData:transferDataPacket userInfo:nil];
-					}
-					else {
-						NSLogError(@"Main Queue Exception",@"Data Read_out",@"First Word of Record == 0",nil);
-					}
+					[theNextObject processData:theDataArray decoder:theDecoder];
 				}
-				[transferDataPacket clearData];
 			}
 			@catch(NSException* localException) {
 				NSLogError(@"Main Queue Exception",@"Data Read_out",nil);

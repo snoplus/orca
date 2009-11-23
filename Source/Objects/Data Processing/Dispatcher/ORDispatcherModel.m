@@ -22,8 +22,8 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDispatcherModel.h"
 #import "NetSocket.h"
-#import "ORDataPacket.h"
 #import "ORDispatcherClient.h"
+#import "ORDecoder.h"
 
 static NSString* ORDispatcherConnector 			= @"Dispatcher Connector";
 
@@ -54,12 +54,12 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 
 -(void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[clients release];
     [allowedList release];
     [refusedList release];
 	[serverSocket release];
-    [super dealloc];
+  	[currentHeader release];
+	[super dealloc];
 }
 
 - (void) setUpImage
@@ -74,7 +74,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	[i lockFocus];
 	[aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
     
-    if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !_ignoreMode){
+    if((runMode == kOfflineRun) && !_ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
         [aNoticeImage compositeToPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) operation:NSCompositeSourceOver];
     }
@@ -121,19 +121,9 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 }
 
 #pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers
+- (void) setRunMode:(int)aMode
 {
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(runModeChanged:)
-                         name : ORRunModeChangedNotification
-                       object : nil];
-    
-}
-
-- (void) runModeChanged:(NSNotification*)aNotification
-{
+	runMode = aMode;
     [self setUpImage];
 }
 
@@ -280,7 +270,6 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 
 - (void)netsocket:(NetSocket*)inNetSocket connectionAccepted:(NetSocket*)inNewNetSocket
 {
-    
     ORDispatcherClient* client = [[[ORDispatcherClient alloc] initWithNetSocket:inNewNetSocket] autorelease];
     
     if(![self isAlreadyConnected:client]){
@@ -290,9 +279,12 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
             
             [client setTimeConnected:[NSDate date]];
             
-            if([[ORGlobal sharedGlobal] runInProgress]){
-				if(dataHeader){
-					[[client socket] writeData:dataHeader];
+            if(runInProgress){
+				if(currentHeader){
+					NSData* headerAsData = [ORDecoder convertHeaderToData:currentHeader];
+					if(headerAsData){
+						[[client socket] writeData:headerAsData];
+					}
 				}
             }
             
@@ -394,36 +386,46 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 }
 
 #pragma mark ¥¥¥Data Handling
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-		NSArray* dataArray = [aDataPacket dataArray];
-		int i;
-		int n = [dataArray count];
 		NSMutableData* theData = [[NSMutableData alloc] initWithCapacity:500000];
-		for(i=0;i<n;i++)[theData appendData: [dataArray objectAtIndex:i]];
+		for(id d in dataArray)[theData appendData: d];
 		if([theData length]>0)[clients makeObjectsPerformSelector:@selector(writeData:) withObject:theData];
         [theData release];
 	}    
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{		
-	dataHeader = [[aDataPacket headerAsData] retain];
-	[clients makeObjectsPerformSelector:@selector(writeData:) withObject:dataHeader];
+- (void) runTaskStarted:(id)userInfo
+{	
+	runInProgress = YES;
+	[currentHeader release];
+	currentHeader = [userInfo objectForKey:kHeader];
+	//[clients makeObjectsPerformSelector:@selector(writeData:) withObject:dataHeader];
 	[clients makeObjectsPerformSelector:@selector(clearCounts)];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) subRunTaskStarted:(id)userInfo
 {
+	//store the new current header
+	[currentHeader release];
+	currentHeader = [[userInfo objectForKey:kHeader] retain];
 }
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(id)userInfo
 {
-	[dataHeader release];
-	dataHeader = nil;
+	runInProgress = NO;
 }
 
+- (void) closeOutRun:(id)userInfo
+{
+	[currentHeader release];
+	currentHeader = nil;
+}
+
+- (void) runTaskBoundary
+{
+}
 
 #pragma mark ¥¥¥Archival
 static NSString *ORDispatcherPortNumber		 	= @"ORDispatcherPortNumber";
@@ -446,7 +448,6 @@ static NSString *ORDispatcherRefusedList	 	= @"ORDispatcherRefusedList";
     [self setClients:[NSMutableArray array]];
     
     _ignoreMode = NO;
-	[self registerNotificationObservers];
     
     return self;
 }
@@ -472,6 +473,5 @@ static NSString *ORDispatcherRefusedList	 	= @"ORDispatcherRefusedList";
     [dictionary setObject:objDictionary forKey:@"Listener"];
     return objDictionary;
 }
-
 
 @end

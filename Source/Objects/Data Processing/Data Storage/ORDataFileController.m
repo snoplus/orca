@@ -410,7 +410,8 @@ enum {
 	unsigned long theSize = [model dataFileSize];
 	if(theSize<1000)[sizeTextField setStringValue: [NSString stringWithFormat:@"%d Bytes",[model dataFileSize]]];
 	else if(theSize<100000)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f KB",[model dataFileSize]/1000.]];
-	else [sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f MB",[model dataFileSize]/1000000.]];
+	else if(theSize<1000000000)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f MB",[model dataFileSize]/1000000.]];
+	else [sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f GB",[model dataFileSize]/1000000000.]];
 }
 
 - (void) saveConfigurationChanged:(NSNotification*)note

@@ -1,5 +1,5 @@
 //
-//  ORDataPacket.m
+//  ORDataQueue.m
 //  Orca
 //
 //  Created by Mark Howe on Thu Mar 06 2003.
@@ -20,7 +20,7 @@
 
 
 #pragma mark •••Imported Files
-#import "ORDataPacket.h"
+#import "ORDataQueue.h"
 #import "ORFileIOHelpers.h"
 #import "ORDataSet.h"
 #import "ORDataTaker.h"
@@ -31,15 +31,13 @@
 #define kMinSize 4096*2
 #define kMinCapacity 4096
 
-@implementation ORDataPacket
+@implementation ORDataQueue
 - (id)init
 {
     self = [super init];
 	
     theDataLock         = [[NSRecursiveLock alloc] init];
-    
-    version = kDataVersion;
-    lastFrameBufferSize = kMinSize;
+	lastFrameBufferSize = kMinSize;
     return self;
 }
 
@@ -48,102 +46,11 @@
     [theDataLock release];
     [dataArray release];
 	[cacheArray release];
-    [filePrefix release];
-    [fileHeader release];
     [frameBuffer release];
     [super dealloc];
 }
 
-- (id) copyWithZone:(NSZone*)zone
-{
-    return [[NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]] retain];
-}
-
-
 #pragma mark •••Accessors
-- (void) setRunNumber:(unsigned long)aRunNumber
-{
-    runNumber = aRunNumber;
-}
-
-- (unsigned long)runNumber
-{
-    return runNumber;
-}
-
-- (void) setSubRunNumber:(unsigned long)aSubRunNumber
-{
-    subRunNumber = aSubRunNumber;
-}
-
-- (unsigned long)subRunNumber
-{
-    return subRunNumber;
-}
-
-- (NSMutableDictionary *) fileHeader
-{
-    return fileHeader; 
-}
-
-- (void) setFileHeader: (NSMutableDictionary *) aFileHeader
-{
-    [aFileHeader retain];
-    [fileHeader release];
-    fileHeader = aFileHeader;
-	if(fileHeader){
-		[currentDecoder release];
-		currentDecoder = [[ORDecoder alloc] initWithHeader:fileHeader];
-	}
-	else {
-		[currentDecoder release];
-		currentDecoder = nil;
-	}
-}
-
-- (void) makeFileHeader
-{
-    [self setFileHeader:[[[NSApp delegate] document] fillInHeaderInfo:[NSMutableDictionary dictionary]]];
-    NSMutableDictionary* docDict = [fileHeader objectForKey:@"Document Info"];
-    if(!docDict){
-        docDict = [NSMutableDictionary dictionary];
-        [fileHeader setObject:docDict forKey:@"Document Info"];
-    }
-    [docDict setObject:[NSNumber numberWithInt:kDataVersion] forKey:@"dataVersion"];
-	//tell objects to add any additional data descriptions into the data description header.
-    NSArray* objectList = [NSArray arrayWithArray:[[[NSApp delegate] document]collectObjectsRespondingTo:@selector(appendDataDescription:userInfo:)]];
-    NSEnumerator* e = [objectList objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-        [obj appendDataDescription:self userInfo:nil];
-    }
-}
-
-- (void) updateHeader
-{
-	[[[NSApp delegate] document] fillInHeaderInfo:[self fileHeader]];
-}
-
-- (void) addDataDescriptionItem:(NSDictionary*) dataDictionary forKey:(NSString*)aKey
-{
-    id dataDescriptionDictionary = [fileHeader objectForKey:@"dataDescription"];
-    if(!dataDescriptionDictionary){
-        dataDescriptionDictionary = [NSMutableDictionary dictionary];
-        [fileHeader setObject:dataDescriptionDictionary forKey:@"dataDescription"];
-    }
-    [dataDescriptionDictionary setObject:dataDictionary forKey:aKey];
-}
-
-- (void) addReadoutDescription:(id) readoutDescription
-{
-	[fileHeader setObject:readoutDescription forKey:@"ReadoutDescription"];
-}
-
-
-- (void) addEventDescriptionItem:(NSDictionary*) eventDictionary
-{
-	[fileHeader setObject:eventDictionary forKey:@"eventDescription"];
-}
 
 - (void) startFrameTimer
 {
@@ -215,19 +122,6 @@
     cacheArray=[newCacheArray retain];
 	[theDataLock unlock];   //-----end critical section
 }
-
-
-- (NSString*)filePrefix
-{
-    return filePrefix;
-}
-
-- (void)setFilePrefix:(NSString*)aFilePrefix
-{
-    [filePrefix autorelease];
-    filePrefix = [aFilePrefix copy];
-}
-
 
 //------------------------------------------------------------------------------
 //data addition methods
@@ -424,16 +318,6 @@
 - (void) setAddedData:(BOOL)flag
 {
     addedData = flag;
-}
-
-- (void)  setVersion:(int)aVersion
-{
-    version=aVersion;
-}
-
-- (int)  version
-{
-    return version;
 }
 
 @end
