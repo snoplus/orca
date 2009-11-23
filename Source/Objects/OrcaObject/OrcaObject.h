@@ -203,7 +203,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) makeConnectors;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)aDataPacket forChannel:(int)aChannel;
 - (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
-- (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskBoundary;
 @end
 
 

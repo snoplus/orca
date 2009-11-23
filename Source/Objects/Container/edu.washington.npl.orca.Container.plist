@@ -79,15 +79,6 @@
 			<key>ToolTip</key>
 			<string>Open Task Master</string>
 		</dict>
-		<key>GateKeeper</key>
-		<dict>
-			<key>Action</key>
-			<string>openGateKeeper:</string>
-			<key>Label</key>
-			<string>GateKeeper</string>
-			<key>ToolTip</key>
-			<string>Open GateKeeper</string>
-		</dict>
 		<key>ProcessCenter</key>
 		<dict>
 			<key>Action</key>

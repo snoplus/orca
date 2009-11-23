@@ -42,7 +42,7 @@
 #import "ORTimer.h"
 #import "ORConnector.h"
 #import "ORAutoTester.h"
-
+#import "ORDecoder.h"
 #import <unistd.h>
 #import <sys/stat.h>
 #import <sys/time.h>

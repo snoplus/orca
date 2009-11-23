@@ -927,7 +927,7 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 }
 
 
-- (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskBoundary
 {
 }
 

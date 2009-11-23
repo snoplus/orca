@@ -77,7 +77,9 @@
 	[payloadSizeSlider setMaxValue:300];
 	[ipNumberComboBox reloadData];
 	[self setDriverInfo];
-
+	if([[model driverScriptName] length] == 0){
+		[downloadDriverButton setEnabled:NO];
+	}
 }
 
 - (void) setModel:(id)aModel
