@@ -1869,9 +1869,9 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 @end
 
 @implementation ORLC950DecoderForScopeGTID
-- (unsigned long) decodeData: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet
+- (unsigned long) decodeData: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet
 {
-    return [self decodeGtId:aSomeData fromDataPacket:aDataPacket intoDataSet:aDataSet];
+    return [self decodeGtId:aSomeData fromDecoder:aDecoder intoDataSet:aDataSet];
 } 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
@@ -1880,9 +1880,9 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 @end
 
 @implementation ORLC950DecoderForScopeTime
-- (unsigned long) decodeData: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet
+- (unsigned long) decodeData: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet
 {
-    return [self decodeClock:aSomeData fromDataPacket:aDataPacket intoDataSet:aDataSet];
+    return [self decodeClock:aSomeData fromDecoder:aDecoder intoDataSet:aDataSet];
 } 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {

@@ -110,7 +110,6 @@
 {
     if(![model isReplaying]){
         [model replayFiles];
-        [selectButton setEnabled:NO];
     }
     else {
         [model stopReplay];
@@ -184,47 +183,30 @@
                      selector : @selector(stopped:)
                          name : ORReplayStoppedNotification
                         object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(reading:)
-                         name : ORReplayReadingNotification
-                        object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(reading:)
-                         name : ORReplayReadingNotification
-                        object: model];
-	
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(parsing:)
-                         name : ORReplayParseStartedNotification
-                        object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(fileChanged:)
                          name : ORRelayFileChangedNotification
                         object: model];
 	
 	[notifyCenter addObserver : self
-                     selector : @selector(processing:)
-                         name : ORReplayProcessingStartedNotification
-                        object: model];
-
-	[notifyCenter addObserver : self
                      selector : @selector(tableViewSelectionDidChange:)
                          name : NSTableViewSelectionDidChangeNotification
                         object: nil];
-
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(progressChanged:)
+                         name : ORReplayProgressChangedNotification
+                        object: nil];	
 }
 
 - (void) updateWindow
 {
     [self fileListChanged:nil];
     [self fileChanged:nil];
+    [self progressChanged:nil];
 	[workingOnField setStringValue:@""];
 }
-
 
 - (void)started:(NSNotification *)aNotification
 {
@@ -234,16 +216,11 @@
 	[replayButton setTitle:@"Stop"];
 	[progressIndicator startAnimation:self];
 	[progressField setStringValue:@"In Progress"];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProgress) object:nil];
 }
 
-- (void) updateProgress
+- (void) progressChanged:(NSNotification *)aNotification
 {
-    double total = [model totalLength];
-    double current = [model lengthDecoded];
-    
-    if(total>0)[progressIndicatorBottom setDoubleValue:100. - (100.*current/(double)total)];
-    [self performSelector:@selector(updateProgress) withObject:nil afterDelay:0.1];
+    [progressIndicatorBottom setDoubleValue:[model percentComplete]];
 }
 
 - (void)stopped:(NSNotification *)aNotification
@@ -255,49 +232,8 @@
 	[progressIndicator stopAnimation:self];
 	[progressField setStringValue:@""];
 	[workingOnField setStringValue:@""];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProgress) object:nil];
 	[progressIndicatorBottom setDoubleValue:0.0];
 	[progressIndicatorBottom stopAnimation:self];
-}
-
-- (void) updateProgressBottom 
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProgressBottom) object:nil];
-	[progressIndicatorBottom setDoubleValue:0];
-	[self performSelector:@selector(updateProgressBottom) withObject:nil afterDelay:.2];
-}
-
-- (void) reading:(NSNotification *)aNotification
-{
-	[progressField setStringValue:@"Reading"];
-	NSString* theFileName = [model fileToReplay];
-	if(theFileName)[workingOnField setStringValue:[NSString stringWithFormat:@"Reading:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
-	else [workingOnField setStringValue:@""];
-	[progressIndicatorBottom setIndeterminate:YES];
-	[progressIndicatorBottom startAnimation:self];
-}
-
-- (void) parsing:(NSNotification *)aNotification
-{
-	[progressField setStringValue:@"Parsing"];
-	NSString* theFileName = [model fileToReplay];
-	if(theFileName)[workingOnField setStringValue:[NSString stringWithFormat:@"Parsing:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
-	else [workingOnField setStringValue:@""];
-	[progressIndicatorBottom setIndeterminate:NO];
-	[progressIndicatorBottom setDoubleValue:0];
-	[self performSelector:@selector(updateProgress) withObject:nil afterDelay:0.0];
-}
-
-- (void) processing:(NSNotification *)aNotification
-{
-	[progressField setStringValue:@"Processing"];
-	NSString* theFileName = [model fileToReplay];
-	if(theFileName)[workingOnField setStringValue:[NSString stringWithFormat:@"Processing:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
-	else [workingOnField setStringValue:@""];
-	[progressIndicatorBottom setIndeterminate:NO];
-	[progressIndicatorBottom setDoubleValue:0];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProgressBottom) object:nil];
-	[self performSelector:@selector(updateProgress) withObject:nil afterDelay:0.1];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification

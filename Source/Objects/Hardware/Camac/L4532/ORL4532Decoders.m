@@ -49,7 +49,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 
 @implementation ORL4532DecoderForTrigger
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr   = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
@@ -124,7 +124,7 @@ static NSString* kTriggerKey[32] = {
 
 @implementation ORL4532DecoderForChannelTrigger
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr   = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);

@@ -28,6 +28,6 @@
 @interface ORMksPdr2000DecoderForPressure : ORBaseDecoder {
 }
 - (NSString*) getGaugeKey:(unsigned short)aUnit;
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

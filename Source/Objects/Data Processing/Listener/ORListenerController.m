@@ -83,19 +83,12 @@
 	[notifyCenter addObserver : self
                       selector: @selector(autoReconnectChanged:)
                           name: ORListenerAutoReconnectChanged
-                       object : [self model]];
-
-	[notifyCenter addObserver : self
-                      selector: @selector(swapAllChanged:)
-                          name: ORListenerSwapAllChanged
-                       object : [self model]];
-	
+                       object : [self model]];	
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
-	[self swapAllChanged:nil];
 	[self remotePortChanged:nil];
 	[self remoteHostChanged:nil];
 	[self isConnectedChanged:nil];
@@ -104,12 +97,6 @@
 	[self autoReconnectChanged:nil];
 	
 }
-
-- (void) swapAllChanged:(NSNotification*)aNote
-{
-	[swapAllButton setState:[model swapAll]];
-}
-
 
 - (void) connectAtStartChanged:(NSNotification*)aNote
 {
@@ -151,7 +138,6 @@
     [remotePortField setEnabled:!locked];
     [remoteHostField setEnabled:!locked];
     [connectAtStartButton setEnabled:!locked];
-    [swapAllButton setEnabled:!locked];
     [autoReconnectButton setEnabled:!locked];
 }
 
@@ -195,11 +181,6 @@
 - (IBAction) connectAtStartAction:(id)sender
 {
 	[[self model] setConnectAtStart:[sender state]];
-}
-
-- (IBAction) swapAllButtonAction:(id)sender
-{
-	[[self model] setSwapAll:[sender state]];
 }
 
 - (IBAction) autoReconnectAction:(id)sender

@@ -34,27 +34,24 @@
 }
 
 #pragma mark ¥¥¥Accessors
+- (void) loadHeader;
 
 #pragma  mark ¥¥¥Actions
 - (IBAction) selectButtonAction:(id)sender;
 - (IBAction) replayButtonAction:(id)sender;
-- (IBAction)delete:(id)sender;
-- (IBAction)cut:(id)sender;
+- (IBAction) delete:(id)sender;
+- (IBAction) cut:(id)sender;
 - (IBAction) removeItemAction:(id)sender;
 - (IBAction) saveListAction:(id)sender;
 - (IBAction) loadListAction:(id)sender;
-- (void) loadHeader;
 
 #pragma mark ¥¥¥Interface Management
-- (void) updateProgress;
+- (void) progressChanged:(NSNotification *)aNotification;
 - (void) registerNotificationObservers;
 - (void) fileListChanged:(NSNotification*)note;
 - (void) started:(NSNotification *)aNotification;
 - (void) stopped:(NSNotification *)aNotification;
 - (void) fileChanged:(NSNotification *)aNotification;
-- (void) reading:(NSNotification *)aNotification;
-- (void) parsing:(NSNotification *)aNotification;
-- (void) processing:(NSNotification *)aNotification;
 
 #pragma mark ¥¥¥Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;

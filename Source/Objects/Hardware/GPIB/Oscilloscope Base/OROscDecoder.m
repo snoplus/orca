@@ -27,7 +27,7 @@
 
 @implementation OROscDecoder
 
-- (unsigned long) decodeData: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet
+- (unsigned long) decodeData: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet
 {
     unsigned long* dataPtr;
     long offset;
@@ -58,7 +58,7 @@
     return length ; 
 }
 
-- (unsigned long) decodeGtId: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet
+- (unsigned long) decodeGtId: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet
 {
     unsigned long* ptr = (unsigned long*)aSomeData;
     if(IsShortForm(*ptr)){
@@ -69,7 +69,7 @@
     }
 }
 
-- (unsigned long) decodeClock: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet
+- (unsigned long) decodeClock: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet
 {
     return 3;
 }

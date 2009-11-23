@@ -39,10 +39,10 @@
 - (void) connectionChanged;
 
 #pragma mark ¥¥¥Optimization
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStarted:(id)userInfo;
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(id)userInfo;
+- (void) closeOutRun:(id)userInfo;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

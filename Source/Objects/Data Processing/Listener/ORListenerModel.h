@@ -22,8 +22,8 @@
 
 #pragma mark ***Forward Declarations
 @class NetSocket;
-@class ORDataPacket;
 @class ORSafeQueue;
+@class ORDecoder;
 
 @interface ORListenerModel : ORDataChainObject
 {
@@ -32,21 +32,24 @@
 	BOOL isConnected;
 	unsigned long byteCount;
 	NetSocket* socket;
-	ORDataPacket* dataPacket;
     NSConditionLock* timeToStopProcessThread;
     NSLock* readingLock;
-    unsigned long runDataID;
 
     BOOL threadRunning;
-    NSConditionLock* processLock;
 	unsigned long queueCount;
 	ORSafeQueue* transferQueue;
     NSMutableData* dataToProcess;
     BOOL docLoaded;
 	BOOL autoReconnect;
 	BOOL connectAtStart;
-	BOOL swapAll;
 	BOOL firstTime;
+	BOOL needToSwap;
+	unsigned long runDataID;
+	ORDecoder* currentDecoder;
+	NSMutableDictionary* runInfo;
+	NSMutableArray* dataArray;
+	BOOL runEnded;
+	BOOL scheduledForUpdate;
 }
 
 #pragma mark ***Initialization
@@ -67,8 +70,6 @@
 - (void) setTransferQueue:(ORSafeQueue*)aTransferQueue;
 - (unsigned long) queueCount;
 - (void) setQueueCount:(unsigned long)aQueueCount;
-- (ORDataPacket*) dataPacket;
-- (void) setDataPacket:(ORDataPacket*)aDataPacket;
 - (NetSocket*) socket;
 - (void) setSocket:(NetSocket*)aSocket;
 
@@ -82,8 +83,6 @@
 - (void) setByteCount:(unsigned long)aNewByteCount;
 - (void) incByteCount:(unsigned long)anAmount;
 - (void) clearByteCount;
-- (void) setSwapAll:(BOOL)state;
-- (BOOL) swapAll;
 - (void) connectSocket:(BOOL)state;
 
 #pragma mark ***Delegate Methods
@@ -93,7 +92,6 @@
 
 @end
 
-extern NSString* ORListenerSwapAllChanged;
 extern NSString* ORListenerRemotePortChanged;
 extern NSString* ORListenerRemoteHostChanged;
 extern NSString* ORListenerIsConnectedChanged;

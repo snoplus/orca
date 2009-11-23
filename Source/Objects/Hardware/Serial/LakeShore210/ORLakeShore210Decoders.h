@@ -28,6 +28,6 @@
 @interface ORLakeShore210DecoderForTemperature : ORBaseDecoder {
 }
 - (NSString*) getUnitKey:(unsigned short)aUnit;
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

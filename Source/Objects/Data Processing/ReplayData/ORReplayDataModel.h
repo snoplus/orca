@@ -21,53 +21,49 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORFileMover.h"
+#import "ORDataProcessing.h"
 
 #pragma mark ¥¥¥Forward Declarations
-@class ORDataPacket;
-@class ThreadWorker;
 @class ORHeaderItem;
 @class ORDataSet;
 
 @interface ORReplayDataModel :  OrcaObject
 {
     @private
+		NSOperationQueue* queue;
 		BOOL			stop;
         NSMutableArray*	filesToReplay;
-        id              nextObject;
+        id<ORDataProcessing> nextObject;
 
         ORHeaderItem*   header;
         NSString*       lastListPath;
         NSString*       lastFilePath;
 		NSString*       fileToReplay;
-        ORDataPacket*   fileAsDataPacket;
         NSArray*        dataRecords;
 
-        ThreadWorker*   parseThread;
-        unsigned long   totalLength;
-        unsigned long   lengthDecoded;
+        double			percentComplete;
 		BOOL			sentRunStart;
 
 }
 
 #pragma mark ¥¥¥Accessors
-- (unsigned long)   totalLength;
-- (unsigned long)   lengthDecoded;
-- (NSArray *)   dataRecords;
-- (void)        setDataRecords: (NSArray *) aDataRecords;
-- (id)          dataRecordAtIndex:(int)index;
+- (double)		percentComplete;
 - (NSString*)   fileToReplay;
 - (void)        setFileToReplay:(NSString*)newFileToReplay;
-- (NSArray*) filesToReplay;
-- (void) addFilesToReplay:(NSMutableArray*)newFilesToReplay;
+- (NSArray*)	filesToReplay;
+- (void)		addFilesToReplay:(NSMutableArray*)newFilesToReplay;
 - (ORHeaderItem *)header;
-- (void)setHeader:(ORHeaderItem *)aHeader;
-- (BOOL)isReplaying;
-- (NSString *) lastListPath;
-- (void) setLastListPath: (NSString *) aSetLastListPath;
-- (NSString *) lastFilePath;
-- (void) setLastFilePath: (NSString *) aSetLastListPath;
+- (void)		setHeader:(ORHeaderItem *)aHeader;
+- (BOOL)		isReplaying;
+- (NSString *)	lastListPath;
+- (void)		setLastListPath: (NSString *) aSetLastListPath;
+- (NSString *)	lastFilePath;
+- (void)		setLastFilePath: (NSString *) aSetLastListPath;
 
 #pragma mark ¥¥¥Data Handling
+- (void) checkStatus;
+- (void) updateProgress:(NSNumber*)amountDone;
+- (BOOL) cancelAndStop;
 - (void) stopReplay;
 - (void) readHeaderForFileIndex:(int)index;
 - (void) removeFilesWithIndexes:(NSIndexSet*)indexSet;
@@ -75,35 +71,17 @@
 - (void) removeAll;
 - (void) removeFiles:(NSMutableArray*)anArray;
 - (void) replayFiles;
-
-#pragma mark ¥¥¥Data Handling
-- (void) dataPacket:(id)aDataPacket setTotalLength:(unsigned)aLength;
-- (void) dataPacket:(id)aDataPacket setLengthDecoded:(unsigned)aLength;
-- (void) parseFile;
-- (BOOL) parseInProgress;
-
-#pragma mark ¥¥¥Thread
-- (id) parse:(id)userInfo thread:(id)tw;
-- (void) processData;
-- (void) parseThreadExited:(id)userInfo;
-- (void) stopParse;
-- (id) parse:(id)userInfo thread:(id)tw;
-- (void)parseThreadExited:(id)userInfo;
-- (void) postReadStarted;
-- (void) postParseStarted;
-
+- (void) sendDataArray:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
+- (void) sendRunStart:(id)userInfo;
+- (void) sendRunEnd:(id)userInfo;
+- (void) sendCloseOutRun:(id)userInfo;
+- (void) sendRunSubRunStart:(id)userInfo;
 @end
 
 #pragma mark ¥¥¥External String Definitions
 extern NSString* ORReplayFileListChangedNotification;
-extern NSString* ORReplayFileAtEndNotification;
 extern NSString* ORReplayRunningNotification;
 extern NSString* ORReplayStoppedNotification;
-extern NSString* ORReplayFileInProgressNotification;
 
-extern NSString* ORRelayParseStartedNotification;
-extern NSString* ORRelayParseEndedNotification;
 extern NSString* ORRelayFileChangedNotification;
-extern NSString* ORReplayReadingNotification;
-extern NSString* ORReplayParseStartedNotification;
-extern NSString* ORReplayProcessingStartedNotification;
+extern NSString* ORReplayProgressChangedNotification;

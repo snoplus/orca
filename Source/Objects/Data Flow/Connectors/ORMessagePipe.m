@@ -64,15 +64,15 @@
 }
 
 #pragma mark ¥¥¥Optimization
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) runTaskStarted:(id)userInfo
 {
 	id obj = [[destination connector] objectLink];
-	if(obj && [obj respondsToSelector:@selector(processData:userInfo:)]){
-		[obj runTaskStarted:aDataPacket userInfo:userInfo];
+	if(obj && [obj respondsToSelector:@selector(runTaskStarted:)]){
+		[obj runTaskStarted:userInfo];
 	}
 }
 
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 {
 	id obj = [[destination connector] objectLink];
 	if(obj && [obj respondsToSelector:@selector(processData:userInfo:)]){
@@ -80,19 +80,19 @@
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) runTaskStopped:(id)userInfo
 {
 	id obj = [[destination connector] objectLink];
-	if(obj && [obj respondsToSelector:@selector(processData:userInfo:)]){
-		[obj runTaskStopped:aDataPacket userInfo:userInfo];
+	if(obj && [obj respondsToSelector:@selector(processData:)]){
+		[obj runTaskStopped:userInfo];
 	}
 }
 
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
+- (void) closeOutRun:(id)userInfo
 {
 	id obj = [[destination connector] objectLink];
-	if(obj && [obj respondsToSelector:@selector(processData:userInfo:)]){
-		[obj closeOutRun:aDataPacket userInfo:userInfo];
+	if(obj && [obj respondsToSelector:@selector(processData:)]){
+		[obj closeOutRun:userInfo];
 	}
 }
 

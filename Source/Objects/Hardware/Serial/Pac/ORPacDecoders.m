@@ -41,7 +41,7 @@
 
 @implementation ORPacDecoderForAdc
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 	unsigned long *dataPtr = (unsigned long*)someData;
 	int ident = dataPtr[1] & 0xfff;

@@ -48,7 +48,7 @@
 
 @implementation ORMCA927SpectraDecoder
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr	 = (unsigned long*)someData;
     unsigned long length = ExtractLength(*ptr);

@@ -27,9 +27,9 @@
 @interface OROscDecoder : ORBaseDecoder 
 {
 }
-- (unsigned long) decodeData: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet;
-- (unsigned long) decodeGtId: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet;
-- (unsigned long) decodeClock: (void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet: (ORDataSet*) aDataSet;
+- (unsigned long) decodeData: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet;
+- (unsigned long) decodeGtId: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet;
+- (unsigned long) decodeClock: (void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet: (ORDataSet*) aDataSet;
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 - (NSString*) dataGtIdDescription:(unsigned long*)ptr;

@@ -445,7 +445,7 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
 
 
 @implementation ORPulserDistribDecoderForPDS
--(unsigned long)decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+-(unsigned long)decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     return 4; //must return number of longs processed.
 }
