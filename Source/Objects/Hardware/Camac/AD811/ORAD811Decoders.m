@@ -38,7 +38,7 @@
     [super dealloc];
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long length;
     unsigned long* ptr = (unsigned long*)someData;
@@ -60,9 +60,6 @@
 	
     [aDataSet histogram:value numBins:2048 sender:self  withKeys:@"AD811", crateKey,cardKey,channelKey,nil];
 
-    if(gatesInstalled){
-        [super prepareData:aDataSet crate:crate card:card channel:channel value:value];
-    }
     
     return length; //must return number of bytes processed.
 }

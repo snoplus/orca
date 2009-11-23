@@ -26,7 +26,7 @@
 
 @implementation NcdDecoderForPulserSettings
 
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long value = *((unsigned long*)someData);
     return ExtractLength(value);
@@ -59,7 +59,7 @@
 
 @implementation NcdDecoderForLogAmpTask
 
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long value = *((unsigned long*)someData);
     return ExtractLength(value);
@@ -77,7 +77,7 @@
 
 @implementation NcdDecoderForLinearityTask
 
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long value = *((unsigned long*)someData);
     return ExtractLength(value);
@@ -98,7 +98,7 @@
 
 @implementation NcdDecoderForThresholdTask
 
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long value = *((unsigned long*)someData);
     return ExtractLength(value);
@@ -116,7 +116,7 @@
 
 @implementation NcdDecoderForCableCheckTask
 
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long value = *((unsigned long*)someData);
     return ExtractLength(value);
@@ -134,7 +134,7 @@
 
 @implementation NcdDecoderForStepPDSTask
 
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long value = *((unsigned long*)someData);
     return ExtractLength(value);
@@ -152,7 +152,7 @@
 
 @implementation NcdDecoderForPulseChannelsTask
 
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     return ExtractLength(*((unsigned long*)someData));
 }

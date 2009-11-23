@@ -61,7 +61,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     [super dealloc];
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr   = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
@@ -87,9 +87,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 		unsigned long  value = *ptr;
 		[aDataSet histogram:value numBins:8192 sender:self  withKeys:@"AD3511", crateKey,cardKey,@"ADC",nil];
 
-		if(gatesInstalled){
-			[super prepareData:aDataSet crate:crate card:card channel:0 value:value];
-		}
+
 	}
     return length; //must return number of longs processed.
 }

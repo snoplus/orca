@@ -117,11 +117,15 @@
 				<string>id</string>
 				<key>cut</key>
 				<string>id</string>
+				<key>decRunSelection</key>
+				<string>id</string>
 				<key>delete</key>
 				<string>id</string>
 				<key>deleteSearchKeys</key>
 				<string>id</string>
 				<key>doubleClick</key>
+				<string>id</string>
+				<key>incRunSelection</key>
 				<string>id</string>
 				<key>loadListAction</key>
 				<string>id</string>

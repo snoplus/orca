@@ -34,7 +34,7 @@ static NSString* kMuxBoxKey[8] = {
 };
 
 @implementation NcdMuxDecoderForMux
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
    unsigned long* ptr = (unsigned long*)someData;
     unsigned long length;
@@ -88,7 +88,7 @@ static NSString* kMuxBoxKey[8] = {
 
 @implementation NcdMuxDecoderForMuxEventReg
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length;

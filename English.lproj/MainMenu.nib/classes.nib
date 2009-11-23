@@ -468,6 +468,106 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clearHistory</key>
+				<string>id</string>
+				<key>cut</key>
+				<string>id</string>
+				<key>delete</key>
+				<string>id</string>
+				<key>dumpSensorAction</key>
+				<string>id</string>
+				<key>fastGenSetupAction</key>
+				<string>id</string>
+				<key>ipNumberAction</key>
+				<string>id</string>
+				<key>itemTypeAction</key>
+				<string>id</string>
+				<key>loadItemTree</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>pollNowAction</key>
+				<string>id</string>
+				<key>pollTimeAction</key>
+				<string>id</string>
+				<key>removeItemAction</key>
+				<string>id</string>
+				<key>setPointAction</key>
+				<string>id</string>
+				<key>shipRecordsAction</key>
+				<string>id</string>
+				<key>toggleTreeDrawer</key>
+				<string>id</string>
+				<key>toggleWebDrawer</key>
+				<string>id</string>
+				<key>viewItemInWebAction</key>
+				<string>id</string>
+				<key>viewItemNameAction</key>
+				<string>id</string>
+				<key>writeSetPointAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORIpeSlowControlController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>fastGenSetupButton</key>
+				<string>NSButton</string>
+				<key>ipNumberComboBox</key>
+				<string>NSComboBox</string>
+				<key>itemDetailsView</key>
+				<string>NSTextView</string>
+				<key>itemTableView</key>
+				<string>NSTableView</string>
+				<key>itemTreeOutlineView</key>
+				<string>NSOutlineView</string>
+				<key>itemTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>lastRequestField</key>
+				<string>ORTimedTextField</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>pendingRequestsTable</key>
+				<string>NSTableView</string>
+				<key>pollTimePopup</key>
+				<string>NSPopUpButton</string>
+				<key>setPointButton</key>
+				<string>NSButton</string>
+				<key>setPointField</key>
+				<string>NSTextField</string>
+				<key>shipRecordsCB</key>
+				<string>NSButton</string>
+				<key>timeOutCountField</key>
+				<string>NSTextField</string>
+				<key>timingPlotter</key>
+				<string>ORPlotter1D</string>
+				<key>totalRequestCountField</key>
+				<string>NSTextField</string>
+				<key>treeDetailsView</key>
+				<string>NSTextView</string>
+				<key>treeDrawer</key>
+				<string>NSDrawer</string>
+				<key>treeViewButton</key>
+				<string>NSButton</string>
+				<key>viewItemInWebButton</key>
+				<string>NSButton</string>
+				<key>viewItemNameMatrix</key>
+				<string>NSMatrix</string>
+				<key>webDrawer</key>
+				<string>NSDrawer</string>
+				<key>webView</key>
+				<string>WebView</string>
+				<key>webViewButton</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>commentFieldAction</key>
 				<string>id</string>
 			</dict>
@@ -1364,11 +1464,15 @@
 				<string>id</string>
 				<key>cut</key>
 				<string>id</string>
+				<key>decRunSelection</key>
+				<string>id</string>
 				<key>delete</key>
 				<string>id</string>
 				<key>deleteSearchKeys</key>
 				<string>id</string>
 				<key>doubleClick</key>
+				<string>id</string>
+				<key>incRunSelection</key>
 				<string>id</string>
 				<key>loadListAction</key>
 				<string>id</string>
