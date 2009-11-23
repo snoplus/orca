@@ -69,7 +69,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-reference date (high part of double)
 */
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long length;
     unsigned long* ptr = (unsigned long*)someData;
@@ -89,10 +89,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     unsigned long  value = *ptr&0x00000fff;
 	
     [aDataSet histogram:value numBins:2048 sender:self  withKeys:@"ADC2249", crateKey,cardKey,channelKey,nil];
-
-    if(gatesInstalled){
-        [super prepareData:aDataSet crate:crate card:card channel:channel value:value];
-    }
     
     return length; //must return number of bytes processed.
 }

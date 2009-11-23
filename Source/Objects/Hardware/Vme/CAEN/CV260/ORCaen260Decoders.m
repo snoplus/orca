@@ -43,7 +43,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 15
 
 @implementation ORCaen260DecoderForScaler
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
 	ptr++; //point to the location word

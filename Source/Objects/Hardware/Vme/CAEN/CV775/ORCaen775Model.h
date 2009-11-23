@@ -72,14 +72,19 @@ enum {
 
 // Size of output buffer
 #define kTDCOutputBufferSize 0x0FFC + 0x0004
+#define kModel775  0
+#define kModel775N 1
 
 // Class definition
 @interface ORCaen775Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
+    int modelType;
 }
 
 
 #pragma mark ¥¥¥Accessors
+- (int) modelType;
+- (void) setModelType:(int)aModelType;
 
 #pragma mark ¥¥¥Register - General routines
 - (short) 			getNumberRegisters;
@@ -99,7 +104,12 @@ enum {
 - (BOOL)  			swReset: (short) anIndex;
 - (BOOL)  			hwReset: (short) anIndex;
 
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
+
+extern NSString* ORCaen775ModelModelTypeChanged;
 
 //the decoder concrete decoder class
 @interface ORCaen775DecoderForCAEN : ORCaenDataDecoder

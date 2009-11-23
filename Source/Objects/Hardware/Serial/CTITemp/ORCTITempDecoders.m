@@ -46,7 +46,7 @@ static NSString* kCTITempUnit[8] = {
     else return [NSString stringWithFormat:@"Unit %d",aUnit];			
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 	unsigned long *dataPtr = (unsigned long*)someData;
 	union {

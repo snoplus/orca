@@ -26,7 +26,7 @@
 
 @implementation ORDGF4cDecoderForWaveform
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr   = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
@@ -70,7 +70,7 @@
 
 @implementation ORDGF4cDecoderForEvent
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long*	recordPtr = (unsigned long*)someData;
 	
@@ -275,7 +275,7 @@
 
 @implementation ORDGF4cDecoderForLiveTime
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 
     unsigned long*	recordPtr = (unsigned long*)someData;

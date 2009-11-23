@@ -45,22 +45,41 @@
 - (void) registerNotificationObservers
 {
     [ super registerNotificationObservers ];
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter addObserver : self
+                     selector : @selector(modelTypeChanged:)
+                         name : ORCaen775ModelModelTypeChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
-//--------------------------------------------------------------------------------
-/*!\method  updateWindow
- * \brief	Sets all GUI values to current model values.
- * \note	
- */
-//--------------------------------------------------------------------------------
+- (void) modelTypeChanged:(NSNotification*)aNote
+{
+	[modelTypePU selectItemAtIndex: [model modelType]];
+	if([model modelType] == kModel775){
+		[thresholdB setEnabled:YES];
+		[stepperB setEnabled:YES];
+	}
+	else {
+		[thresholdB setEnabled:NO];
+		[stepperB setEnabled:NO];
+	}
+}
+
 - (void) updateWindow
 {
    [ super updateWindow ];
+	[self modelTypeChanged:nil];
 }
+
 #pragma mark ***Interface Management - Module specific
 - (NSString*) thresholdLockName {return @"ORCaen775ThresholdLock";}
 - (NSString*) basicLockName     {return @"ORCaen775BasicLock";}
 
 #pragma mark ¥¥¥Actions
+- (void) modelTypePUAction:(id)sender
+{
+	[model setModelType:[sender indexOfSelectedItem]];	
+}
 @end

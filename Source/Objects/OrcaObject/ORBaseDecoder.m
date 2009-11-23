@@ -21,7 +21,6 @@
 
 #import "ORBaseDecoder.h"
 #import "ORDataSet.h"
-#import "ORGateElement.h"
 #import "ORGlobal.h"
 #import <stdarg.h>
 
@@ -68,7 +67,6 @@ static NSString* kCrateKey[16] = {
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    [gates release];
 	[cachedObjectsLock lock];
 	[cachedObjects release];
 	[cachedObjectsLock unlock];
@@ -112,30 +110,6 @@ static NSString* kCrateKey[16] = {
 	else return [NSString stringWithFormat:@"Crate %2d",aCrate];		
 }
 
-- (void) addGate: (ORGateElement *) aGate
-{
-    if(!gates)gates = [[NSMutableArray alloc] init];
-    gatesInstalled = YES;
-    [gates addObject:aGate];
-}
-
-- (BOOL) prepareData:(ORDataSet*)aDataSet 
-                  crate:(unsigned short)aCrate 
-                   card:(unsigned short)aCard 
-                channel:(unsigned short)aChannel
-                  value:(unsigned long)aValue
-{
-
-    int i;
-    int count = [gates count];
-    for(i=0;i<count;i++){
-        if([[gates objectAtIndex:i] prepareData:aDataSet crate:aCrate card:aCard channel:aChannel value:aValue]){
-            return YES;
-        }
-    }   
-    return NO; 
-}
-
 - (void) swapData:(void*)someData
 {
 	unsigned long* ptr = (unsigned long*)someData;
@@ -147,7 +121,7 @@ static NSString* kCrateKey[16] = {
 	}
 }
 
-- (id) objectForNestedKey:(id)firstKey,...
+- (id) objectForNestedKey:(NSString*)firstKey,...
 {
 	[cachedObjectsLock lock];
 	va_list args;
@@ -168,7 +142,7 @@ static NSString* kCrateKey[16] = {
 	return [aHeader objectForKey:aKey];
 }
 
-- (void) setObject:(id)obj forNestedKey:(id)firstKey,...
+- (void) setObject:(id)obj forNestedKey:(NSString*)firstKey,...
 {
 	[cachedObjectsLock lock];
 		if(!cachedObjects)cachedObjects = [[NSMutableDictionary dictionary] retain];

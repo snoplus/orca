@@ -86,7 +86,6 @@
 - (void) fitTypeChanged;
 - (void) fftOptionChanged;
 - (void) fftWindowChanged;
-- (void) displayedGateChanged:(NSNotification*)aNotification;
 - (void) displayGateChanged:(NSNotification*)aNotification;
 - (void) curveNumberChanged:(NSNotification*)aNotification;
 - (void) gateNumberChanged:(NSNotification*)aNotification;
@@ -100,7 +99,6 @@
 - (void) peakyChanged:(NSNotification*)aNotification;
 
 - (IBAction) displayGateAction:(id)sender;
-- (IBAction) selectGateAction:(id)sender;
 - (IBAction) fitAction:(id)sender;
 - (IBAction) deleteFitAction:(id)sender;
 - (IBAction) fitTypeAction:(id)sender;

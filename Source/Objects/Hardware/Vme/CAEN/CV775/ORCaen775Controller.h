@@ -30,6 +30,7 @@
 
 // Definition of class
 @interface ORCaen775Controller : ORCaenCardController {
+	IBOutlet NSPopUpButton* modelTypePU;
 }
 
 #pragma mark ***Initialization
@@ -37,11 +38,14 @@
  	
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
+- (void) modelTypeChanged:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
+- (void) modelTypeChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 
-// The outlets
-	
+#pragma mark ¥¥¥Actions
+- (void) modelTypePUAction:(id)sender;
+
 
 @end

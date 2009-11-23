@@ -20,13 +20,11 @@
 
 #import "ORDataTypeAssigner.h"
 
+#define ShiftAndExtract(aValue,aShift,aMask) (((aValue)>>(aShift)) & (aMask))
+
 @class ORDataSet;
-@class ORGateElement;
 
 @interface ORBaseDecoder : NSObject {
-    @protected 
-        BOOL gatesInstalled;				//at least one gate installed.
-        NSMutableArray* gates;
 	@private
 		NSMutableDictionary* cachedObjects;	//decoder can cache info here
 		NSLock* cachedObjectsLock;
@@ -36,21 +34,13 @@
 - (NSString*) getCardKey:(unsigned short)aChan;
 - (NSString*) getCrateKey:(unsigned short)aCrate;
 
-- (void) addGate: (ORGateElement *) aGate;
-
-- (BOOL) prepareData:(ORDataSet*)aDataSet 
-                  crate:(unsigned short)aCrate 
-                   card:(unsigned short)aCard 
-                channel:(unsigned short)aChannel
-                  value:(unsigned long)aValue;
-
 - (void) swapData:(void*)someData;
 
 - (void) registerNotifications;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
-- (id)   objectForNestedKey:(id)firstKey,...;				//nil terminated list of keys
-- (void) setObject:(id)obj forNestedKey:(id)firstKey,...; //nil terminated list of keys
+- (id)   objectForNestedKey:(NSString*)firstKey,...;				//nil terminated list of keys
+- (void) setObject:(id)obj forNestedKey:(NSString*)firstKey,...; //nil terminated list of keys
 - (BOOL) cacheSetUp;
 - (void) setUpCacheUsingHeader:(NSDictionary*)aHeader;
 - (void) cacheCardLevelObject:(id)aKey fromHeader:(NSDictionary*)aHeader;

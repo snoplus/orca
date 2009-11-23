@@ -298,18 +298,21 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     if(inNetSocket == socket){
 		NSLog( @"ORCARoot Service: Connection established\n" );		
 		[self setName:[socket remoteHost]];
-
-		ORDataPacket* aDataPacket = [[ORDataPacket alloc] init];
-		[aDataPacket makeFileHeader];
+		
+		
 		ORDataTypeAssigner* assigner = [[ORDataTypeAssigner alloc] init];
 		dataId = [assigner reservedDataId:[self className]];
 		[assigner release];
    
+		ORDataPacket* aDataPacket = [[ORDataPacket alloc] init];
+		[aDataPacket makeFileHeader];
 		[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORCARootService"];
-
-		NSData* dataHeader = [aDataPacket headerAsData];
-		[socket writeData:dataHeader];
+		
+		
+		NSData* dataHeader = [ORDecoder  convertHeaderToData:[aDataPacket fileHeader]];
+		if(dataHeader)[socket writeData:dataHeader];
 		[aDataPacket release];
+		
         [self setIsConnected:[socket isConnected]];
 	}
 }

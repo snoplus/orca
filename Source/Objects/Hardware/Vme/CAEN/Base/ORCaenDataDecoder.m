@@ -207,7 +207,7 @@
     }
 }
 
-- (unsigned long) decodeData:(void*) aSomeData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*) aDataSet
+- (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet
 {
     short i;
     long* ptr = (long*) aSomeData;

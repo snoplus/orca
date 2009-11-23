@@ -65,7 +65,6 @@
 - (IBAction) showCatalog:(id)sender;
 - (IBAction) showPreferences:(id)sender;
 - (IBAction) showMemoryWatcher:(id)sender;
-- (IBAction) showGateKeeper:(id)sender;
 - (IBAction) showWindowList:(id)sender;
 - (IBAction) showORCARootServiceController:(id)sender;
 - (IBAction) showTemplates:(id)sender;

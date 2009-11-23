@@ -19,15 +19,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-@class ORDataPacket;
-
 @interface ORDataChainObject : OrcaObject {
 	BOOL involvedInCurrentRun;
 }
 - (BOOL) involvedInCurrentRun;
 - (void) setInvolvedInCurrentRun:(BOOL)state;
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray;
-- (void) endOfRunCleanup:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) endOfRunCleanup:(id)userInfo;
+- (void) setRunMode:(int)aMode;
+- (void) runIsStopping:(id)userInfo;
 
 @end
 

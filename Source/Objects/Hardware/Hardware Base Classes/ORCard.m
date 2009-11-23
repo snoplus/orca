@@ -22,6 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORCard.h"
 #import "ORAdcInfoProviding.h"
+#import "ORDataPacket.h"
 
 
 @implementation ORCard
@@ -213,4 +214,8 @@
 	return cardDictionary;
 }
 
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	//subclasses can override
+}
 @end

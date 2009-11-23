@@ -21,8 +21,6 @@
 
 #import "ORAnalysisPanel2D.h"
 #import "ORGate2D.h"
-#import "ORGateGroup.h"
-#import "ORGate.h"
 #import "ORCurve2D.h"
 
 @implementation ORAnalysisPanel2D

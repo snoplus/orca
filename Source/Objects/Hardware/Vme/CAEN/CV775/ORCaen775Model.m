@@ -22,9 +22,7 @@
 #define k775DefaultBaseAddress 		0xa00000
 #define k775DefaultAddressModifier 	0x39
 
-//NSString* OR775SelectedRegIndexChanged 	= @"775 Selected Register Index Changed";
-//NSString* OR775SelectedChannelChanged 	= @"775 Selected Channel Changed";
-//NSString* OR775WriteValueChanged 		= @"775 Write Value Changed";
+NSString* ORCaen775ModelModelTypeChanged = @"ORCaen775ModelModelTypeChanged";
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
@@ -89,6 +87,22 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	[[self undoManager] enableUndoRegistration];
     
     return self;
+}
+
+#pragma mark ***Accessors
+
+- (int) modelType
+{
+    return modelType;
+}
+
+- (void) setModelType:(int)aModelType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setModelType:modelType];
+    
+    modelType = aModelType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen775ModelModelTypeChanged object:self];
 }
 
 //--------------------------------------------------------------------------------
@@ -198,16 +212,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 //--------------------------------------------------------------------------------
 - (short) getThresholdIndex
 {
-    //<<<<<<< ORCaen775Model.m
     return( kThresholds );
-    /*=======
-	[[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
-	writeValue = aValue;
-	[[NSNotificationCenter defaultCenter]
-				postNotificationName:OR775WriteValueChanged
-                              object:self];
-    >>>>>>> 1.2
-    */
 }
 
 //--------------------------------------------------------------------------------
@@ -362,7 +367,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 
 #pragma mark ¥¥¥Archival
-//--------------------------------------------------------------------------------
 /*!\method  initWithCoder  
 * \brief	Initialize object using archived settings.
 * \param	aDecoder			- Object used for getting archived internal parameters.
@@ -381,6 +385,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 //--------------------------------------------------------------------------------
+
 /*!\method  encodeWithCoder  
 * \brief	Save the internal settings to the archive.  OscBase saves most
 *			of the settings.

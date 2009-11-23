@@ -23,7 +23,6 @@
 #import "ORHeartBeat.h"
 #import "ORAutoTester.h"
 #import "ORCommandCenter.h"
-#import "ORGateKeeper.h"
 #import "ORHWWizardController.h"
 #import "ORStatusController.h"
 #import "ORAlarmController.h"
@@ -236,11 +235,6 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 - (IBAction) showPreferences:(id)sender
 {
     [[[ORPreferencesController sharedPreferencesController] window] orderFront:nil];
-}
-
-- (IBAction) showGateKeeper:(id)sender
-{
-    [[[ORGateKeeper sharedGateKeeper] window] orderFront:nil];
 }
 
 - (IBAction) newDocument:(id)sender

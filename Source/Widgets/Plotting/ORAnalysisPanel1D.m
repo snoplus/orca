@@ -21,17 +21,14 @@
 
 #import "ORAnalysisPanel1D.h"
 #import "ORGate1D.h"
-#import "ORGateGroup.h"
-#import "ORGate.h"
 #import "ORCARootServiceDefs.h"
 #import "ORCurve1D.h"
 #import "ORPlotter1D.h"
 
-#define kAnalysisPanelExpandedHeight  307
+#define kAnalysisPanelExpandedHeight  255
 #define kAnalysisPanelCollapsedHeight 100
 
 @interface ORAnalysisPanel1D (private)
-- (void) populateSelectGatePopup;
 - (void) populateFitServicePopup;
 - (void) populateFFTServicePopup;
 - (void) populateFFTWindowPopup;
@@ -60,7 +57,6 @@
     [analysisView setAutoresizingMask:NSViewNotSizable];
 	[analysisView setBoxType:NSBoxCustom];
 	[analysisView setBorderType:NSBezelBorder];
-    [self populateSelectGatePopup];
 	[self populateFitServicePopup];
 	[self populateFFTServicePopup];
 	[self populateFFTWindowPopup];
@@ -152,18 +148,6 @@
                      selector : @selector(displayGateChanged:)
                          name : ORGateDisplayGateChangedNotification
                        object : gate];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(displayedGateChanged:)
-                         name : ORGateDisplayedGateChangedNotification
-                       object : gate];
-    
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(gateArrayChanged:)
-                         name : @"ORGateArrayChangedNotification"
-                       object : [[[NSApp delegate] document] gateGroup]];
-    
 
     [notifyCenter addObserver : self
                      selector : @selector(peakxChanged:)
@@ -205,7 +189,6 @@
     [self peakxChanged:nil];
     [self peakyChanged:nil];
     [self displayGateChanged:nil];
-    [self displayedGateChanged:nil];
     [self fitOrderChanged];
     [self fitFunctionChanged];
     [self fitTypeChanged];
@@ -355,21 +338,6 @@
 }
 
 
-- (void) gateArrayChanged:(NSNotification*)aNotification
-{
-    if([aNotification object] == [[[NSApp delegate] document] gateGroup]){
-        NSDictionary* userInfo = [aNotification userInfo];
-        if(userInfo){
-            if([[userInfo objectForKey:@"deletedGateName"] isEqualToString:[gatePopup titleOfSelectedItem]]){
-                [gate setDisplayGate:NO];
-            }
-        }
-        [self populateSelectGatePopup];
-        [gatePopup selectItemWithTitle:[gate displayedGateName]];
-    }
-}
-
-
 - (void) curveNumberChanged:(NSNotification*)aNotification
 {
     [curveField setIntValue:[gate curveNumber]];
@@ -465,13 +433,6 @@
         [gatePeakYField setIntValue: (int)[gate peaky]];
     }
 }
-- (void) displayedGateChanged:(NSNotification*)aNotification
-{
-    if(!aNotification || [aNotification object] == gate){
-        [self populateSelectGatePopup];
-        [gatePopup selectItemWithTitle:[gate displayedGateName]];
-    }
-}
 
 - (void) displayGateChanged:(NSNotification*)aNotification
 {
@@ -486,10 +447,6 @@
     [gate setDisplayGate:[sender intValue]];
 }
 
-- (IBAction) selectGateAction:(id)sender
-{
-    [gate setDisplayedGateName:[sender titleOfSelectedItem]];
-}
 
 - (IBAction) fitAction:(id)sender
 {
@@ -577,16 +534,6 @@
     }
 }
 
-
-- (void) populateSelectGatePopup
-{
-    [gatePopup removeAllItems];
-    ORGateGroup* gateGroup = [[[NSApp delegate] document] gateGroup];
-    int i;
-    for(i=0;i<[gateGroup count];i++){
-        [gatePopup insertItemWithTitle:[[gateGroup objectAtIndex:i] gateName] atIndex:i];
-    }
-}
 @end
 	
 

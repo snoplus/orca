@@ -30,7 +30,6 @@
 #import "ORHWWizardController.h"
 #import "ORPreferencesController.h"
 #import "ORCommandCenterController.h"
-#import "ORGateKeeper.h"
 #import "ORHelpCenter.h"
 
 @implementation ORContainerController
@@ -190,12 +189,6 @@
     [[ORCatalogController sharedCatalogController] showWindow:self];
 }
 
-- (IBAction) openGateKeeper:(NSToolbarItem*)item 
-{
-    ORGateKeeper* aGateKeeper = [ORGateKeeper sharedGateKeeper];
-    [aGateKeeper setGateGroup:[[self document] gateGroup]];
-    [aGateKeeper showWindow:self];
-}
 
 - (IBAction) openPreferences:(NSToolbarItem*)item 
 {
