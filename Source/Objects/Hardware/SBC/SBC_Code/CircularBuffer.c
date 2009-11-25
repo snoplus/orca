@@ -78,6 +78,17 @@ void CB_cleanup(void)
     pthread_mutex_destroy(&cb.cbMutex);
 }
 
+void CB_flush(void)
+{
+    pthread_mutex_lock (&cb.cbMutex);                        //begin critical section
+    cb.lostByteCount += cb.amountInBuffer;
+    cb.writeIndex = 0;
+    cb.readIndex  = 0;
+    cb.amountInBuffer = 0;
+    pthread_mutex_unlock (&cb.cbMutex);                       //end critical section
+}
+
+
 int32_t CB_freeSpace(void)
 {
 	int32_t freeSpace = 0;

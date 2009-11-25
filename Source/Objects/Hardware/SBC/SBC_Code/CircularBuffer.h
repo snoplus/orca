@@ -31,3 +31,4 @@ int32_t CB_nextBlockSize(void);
 int32_t CB_readNextDataBlock(int32_t* buffer,int32_t maxSize);
 void CB_getBufferInfo(BufferInfo* buffInfo);
 int32_t CB_freeSpace(void);
+void CB_flush(void);
