@@ -30,3 +30,4 @@ void CB_writeDataBlock(int32_t* data, int32_t length);
 int32_t CB_nextBlockSize(void);
 int32_t CB_readNextDataBlock(int32_t* buffer,int32_t maxSize);
 void CB_getBufferInfo(BufferInfo* buffInfo);
+int32_t CB_freeSpace(void);

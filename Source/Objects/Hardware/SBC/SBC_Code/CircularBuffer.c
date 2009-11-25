@@ -78,6 +78,15 @@ void CB_cleanup(void)
     pthread_mutex_destroy(&cb.cbMutex);
 }
 
+int32_t CB_freeSpace(void)
+{
+	int32_t freeSpace = 0;
+    pthread_mutex_lock (&cb.cbMutex);                        //begin critical section
+	freeSpace = cb.bufferLength - cb.amountInBuffer;
+    pthread_mutex_unlock (&cb.cbMutex);                       //end critical section
+	return freeSpace;
+}
+
 void CB_writeDataBlock(int32_t* data, int32_t length)
 {
     if(length<=0)return;

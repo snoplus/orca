@@ -1,6 +1,7 @@
 #include "ORFLTv4Readout.hh"
 #include "SLTv4_HW_Definitions.h"
 #include "katrinhw4/subrackkatrin.h"
+
 extern hw4::SubrackKatrin* srack; 
 bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
@@ -118,7 +119,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         else if(runMode == kIpeFltV4Katrin_Histo_Mode) {    
                 //uint32_t pagenr,oldpagenr ;
                 uint32_t pageAB,oldpageAB;
-                uint32_t pStatus[3];
+                //uint32_t pStatus[3];
                 //fprintf(stdout,"FLT %i:runFlags %x\n",col+1, runFlags );fflush(stdout);    
                 //fprintf(stdout,"FLT %i:runFlags %x  pn 0x%x\n",col+1, runFlags,srack->theFlt[col]->histNofMeas->read() );fflush(stdout); 
                 //sleep(1);   
@@ -144,10 +145,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         GetDeviceSpecificData()[3] = pageAB; 
                         //read data
                         int chan=0;
-                        uint32_t adcval, lastFirst, last,first,llast,lfirst;
-                        static uint32_t histogramBuffer32[1024];
+                        uint32_t lastFirst, last,first,llast,lfirst;
+                        //static uint32_t histogramBuffer32[1024]; //comment out to clear compiler warning. mah 11/25/09121122//
                         static uint32_t shipHistogramBuffer32[2*1024];
-                        for(chan=0;chan<24;chan++)                        {//read out histogram
+                        for(chan=0;chan<24;chan++) {//read out histogram
                             uint32_t adccount;
                             lastFirst = srack->theFlt[col]->histLastFirst->read(chan);
                             last = (lastFirst >>16) & 0xffff;
@@ -161,12 +162,12 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 //read out histogram
                                 //lfirst= first/2; llast=last/2;
                                 lfirst= 0; llast=1023;//TODO: there is something wrong with last/first bin information -tb-
-                                int cnt=0;
-                        srack->theSlt->pageSelect->write(0x100 | 0);//TODO: do it once? -tb-
+                                //int cnt=0;
+								srack->theSlt->pageSelect->write(0x100 | 0);//TODO: do it once? -tb-
                                 for(adccount=0; adccount<1024;adccount++){
                                     shipHistogramBuffer32[adccount] =  srack->theFlt[col]->ramData->read(chan,adccount);
                                 }
-                        srack->theSlt->pageSelect->write(0x100 | 1);//TODO: do it once? -tb-
+								srack->theSlt->pageSelect->write(0x100 | 1);//TODO: do it once? -tb-
                                 for(adccount=0; adccount<1024;adccount++){
                                     shipHistogramBuffer32[adccount+1024] =  srack->theFlt[col]->ramData->read(chan,adccount);
                                 }
