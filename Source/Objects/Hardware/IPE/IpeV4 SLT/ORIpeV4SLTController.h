@@ -44,7 +44,6 @@
 		IBOutlet NSButton*		readBoardButton;
 		IBOutlet NSMatrix*		interruptMaskMatrix;
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
-		IBOutlet NSMatrix*		pageStatusMatrix;
 		IBOutlet NSTextField*   pageSizeField;
 		IBOutlet NSStepper*     pageSizeStepper;
 		IBOutlet NSButton*      displayTriggerButton;
@@ -52,8 +51,6 @@
 		
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
-		IBOutlet NSTextField*	oldestPageField;
-		IBOutlet NSTextField*	nextPageField;
 		IBOutlet NSButton*		resetPageManagerButton;
         
         //low level
@@ -110,7 +107,6 @@
 - (void) runTimeChanged:(NSNotification*)aNote;
 - (void) vetoTimeChanged:(NSNotification*)aNote;
 - (void) deadTimeChanged:(NSNotification*)aNote;
-- (void) pageManagerRegChanged:(NSNotification*)aNote;
 - (void) secondsSetChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;

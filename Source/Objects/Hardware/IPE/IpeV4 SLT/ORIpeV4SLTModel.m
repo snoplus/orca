@@ -104,7 +104,7 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 {@"Number of Pages",	0xB8000C, 		1,			kIpeRegReadable },
 {@"Page Numbers",		0xB81000,		64, 		kIpeRegReadable | kIpeRegWriteable },
 {@"Event Status",		0xB82000,		64,			kIpeRegReadable },
-{@"Readout CSR",		0xC00000,		1,			kIpeRegWriteable },
+{@"Readout CSR",		0xC00000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Buffer Select",		0xC00004,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Readout Definition",	0xC10000,	  2048,			kIpeRegReadable | kIpeRegWriteable },			
 {@"TP Timing",			0xC80000,	   128,			kIpeRegReadable | kIpeRegWriteable },	
@@ -130,7 +130,6 @@ NSString* ORIpeV4SLTModelClockTimeChanged = @"ORIpeV4SLTModelClockTimeChanged";
 NSString* ORIpeV4SLTModelRunTimeChanged = @"ORIpeV4SLTModelRunTimeChanged";
 NSString* ORIpeV4SLTModelVetoTimeChanged = @"ORIpeV4SLTModelVetoTimeChanged";
 NSString* ORIpeV4SLTModelDeadTimeChanged = @"ORIpeV4SLTModelDeadTimeChanged";
-NSString* ORIpeV4SLTModelPageManagerRegChanged  = @"ORIpeV4SLTModelPageManagerRegChanged";
 NSString* ORIpeV4SLTModelSecondsSetChanged		= @"ORIpeV4SLTModelSecondsSetChanged";
 NSString* ORIpeV4SLTModelStatusRegChanged		= @"ORIpeV4SLTModelStatusRegChanged";
 NSString* ORIpeV4SLTModelControlRegChanged		= @"ORIpeV4SLTModelControlRegChanged";
@@ -313,16 +312,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelDeadTimeChanged object:self];
 }
 
-- (unsigned long) pageManagerReg
-{
-    return pageManagerReg;
-}
-
-- (void) setPageManagerReg:(unsigned long)aPageManagerReg
-{
-    pageManagerReg = aPageManagerReg;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelPageManagerRegChanged object:self];
-}
 
 - (unsigned long) secondsSet
 {
@@ -763,15 +752,21 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) readAllStatus
 {
-	[self readControlReg];
+	//[self readControlReg];
+	[self readPageSelectReg];
 	[self readStatusReg];
-	[self readPageManagerReg];
+	//[self readReadOutControlReg];
 	[self readDeadTime];
 	[self readVetoTime];
 	[self readRunTime];
 	[self getSeconds];
 }
 
+- (unsigned long) readPageSelectReg
+{
+	unsigned long data = [self readReg:kSltV4PageSelectReg];
+	return data;
+}
 - (unsigned long) readStatusReg
 {
 	unsigned long data = [self readReg:kSltV4StatusReg];
@@ -814,26 +809,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	}
 	else return 0;
 }
-
-- (unsigned long) readPageManagerReg
-{
-	unsigned long data = [self readReg:kSltV4PageManagerReg];
-	[self setPageManagerReg:data];
-	return data;
-}
-
-- (void) printPageManagerReg
-{
-	unsigned long data = [self readPageManagerReg];
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"----Page Manager Register %@ ----\n",[self fullID]);
-	NSLogFont(aFont,@"Page Ready  : %@\n",	IsBitSet(data,kPageMngReady)?@"YES":@"NO");
-	NSLogFont(aFont,@"Oldest Page : 0x%02x\n",(data & kPageMngOldestPage)>>kPageMngOldestPageShift);
-	NSLogFont(aFont,@"Next Page   : 0x%02x\n",(data & kPageMngNextPageShift)>>kPageMngNextPageShift);
-	NSLogFont(aFont,@"Page Full   : %@\n",	IsBitSet(data,kPageMngPgFull)?@"YES":@"NO");
-	NSLogFont(aFont,@"Free Pages  : 0x%02x\n",(data & kPageMngNumFreePagesShift)>>kPageMngNumFreePagesShift);
-}
-
 
 - (unsigned long) readControlReg
 {
@@ -1020,7 +995,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 	[self printStatusReg];
 	[self printControlReg];
-	[self printPageManagerReg];
 }
 
 - (void) reset

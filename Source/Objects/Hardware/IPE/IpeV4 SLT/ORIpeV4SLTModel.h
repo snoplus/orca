@@ -164,7 +164,6 @@
 		unsigned long controlReg;
 		unsigned long statusReg;
 		unsigned long secondsSet;
-		unsigned long pageManagerReg;
 		unsigned long deadTime;
 		unsigned long vetoTime;
 		unsigned long runTime;
@@ -195,8 +194,6 @@
 - (void) setVetoTime:(unsigned long)aVetoTime;
 - (unsigned long) deadTime;
 - (void) setDeadTime:(unsigned long)aDeadTime;
-- (unsigned long) pageManagerReg;
-- (void) setPageManagerReg:(unsigned long)aPageManagerReg;
 - (unsigned long) secondsSet;
 - (void) setSecondsSet:(unsigned long)aSecondsSet;
 - (unsigned long) statusReg;
@@ -251,12 +248,11 @@
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
 - (unsigned long) readControlReg;
+- (unsigned long) readPageSelectReg;
 - (void)		  writeControlReg;
 - (void)		  printControlReg;
 - (unsigned long) readStatusReg;
-- (unsigned long) readPageManagerReg;
 - (void)		  printStatusReg;
-- (void)		  printPageManagerReg;
 - (void)		  loadSecondsReg;
 - (void)		writeSetInhibit;
 - (void)		writeClrInhibit;
@@ -343,7 +339,6 @@ extern NSString* ORIpeV4SLTModelClockTimeChanged;
 extern NSString* ORIpeV4SLTModelRunTimeChanged;
 extern NSString* ORIpeV4SLTModelVetoTimeChanged;
 extern NSString* ORIpeV4SLTModelDeadTimeChanged;
-extern NSString* ORIpeV4SLTModelPageManagerRegChanged;
 extern NSString* ORIpeV4SLTModelSecondsSetChanged;
 extern NSString* ORIpeV4SLTModelStatusRegChanged;
 extern NSString* ORIpeV4SLTModelControlRegChanged;

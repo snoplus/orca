@@ -70,9 +70,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) awakeFromNib
 {
 	controlSize			= NSMakeSize(555,670);
-    statusSize			= NSMakeSize(555,610);
+    statusSize			= NSMakeSize(555,480);
     lowLevelSize		= NSMakeSize(555,400);
-    cpuManagementSize	= NSMakeSize(555,450);
+    cpuManagementSize	= NSMakeSize(475,450);
     cpuTestsSize		= NSMakeSize(555,305);
 	
 	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];	
@@ -81,10 +81,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [self updateWindow];
 	
 	[self populatePullDown];
-	[pageStatusMatrix setMode:NSRadioModeMatrix];
-	[pageStatusMatrix setTarget:self];
-	[pageStatusMatrix setAction:@selector(dumpPageStatus:)];
-	
 }
 
 #pragma mark •••Notifications
@@ -175,11 +171,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(pageManagerRegChanged:)
-                         name : ORIpeV4SLTModelPageManagerRegChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(deadTimeChanged:)
                          name : ORIpeV4SLTModelDeadTimeChanged
 						object: model];
@@ -231,27 +222,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) deadTimeChanged:(NSNotification*)aNote
 {
 	[[countersMatrix cellWithTag:0] setIntValue:[model deadTime]];
-}
-
-- (void) pageManagerRegChanged:(NSNotification*)aNote
-{
-	unsigned long pageManagerReg = [model pageManagerReg];
-	
-	if(!xImage)xImage = [[NSImage imageNamed:@"exMark"] retain];
-	if(!yImage)yImage = [[NSImage imageNamed:@"checkMark"] retain];
-	
-	unsigned long oldest = (pageManagerReg & kPageMngOldestPage) >> kPageMngOldestPageShift;
-	unsigned long newest = (pageManagerReg & kPageMngNextPage) >> kPageMngNextPageShift;
-	int i;
-	for(i=0;i<64;i++){
-		NSCell* aCell = [[pageStatusMatrix cells] objectAtIndex:i];
-		if(i>=oldest && i<newest)[aCell setImage:yImage];
-		else [aCell setImage:xImage];
-	}
-	[pageStatusMatrix setNeedsDisplay:YES];
-	
-	[oldestPageField setIntValue:oldest];
-	[nextPageField setIntValue:  newest];
 }
 
 - (void) secondsSetChanged:(NSNotification*)aNote
@@ -639,7 +609,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) readStatus:(id)sender
 {
 	[model readStatusReg];
-	[model readPageManagerReg];
 }
 
 - (IBAction) reportAllAction:(id)sender
@@ -649,7 +618,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		NSLogFont(aFont, @"Board ID: %lld\n",[model readBoardID]);
 		[model printStatusReg];
 		[model printControlReg];
-		[model printPageManagerReg];
 		NSLogFont(aFont,@"--------------------------------------\n");
 		NSLogFont(aFont,@"Dead Time  : %lld\n",[model readDeadTime]);
 		NSLogFont(aFont,@"Veto Time  : %lld\n",[model readVetoTime]);
