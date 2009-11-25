@@ -795,6 +795,14 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	[self setTotalRequestCount:totalRequestCount+1];
 }
 
+- (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
+{
+    ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:nil];
+    [aLoader writeControl:aPath value:aValue];
+    [self setTotalRequestCount:totalRequestCount+1];
+}
+
+
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath
 {
 	return [pendingRequests objectForKey:[self itemKey:aUrl:aPath]] != nil;
@@ -805,6 +813,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
 	//index is NOT channel
 	if(anIndex<[pollingLookUp count]){
+    NSLog(@"pollingLookUp:\n %@\n",pollingLookUp);
 		NSString* itemKey = [pollingLookUp objectAtIndex:anIndex];
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
 		id anItem = [topLevelDictionary objectForKey:itemKey];
