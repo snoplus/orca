@@ -158,7 +158,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     int32_t numItems        = p->numItems;
     //TODO: -tb- debug printf("starting read: %08x %d\n",startAddress,numItems);
     
-    if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSize) {
+    if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSizeBytes) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
         p->errorCode = -1;
         if(reply)writeBuffer(aPacket);

@@ -64,7 +64,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
         if(!isNotValidCaenData(dataValue)) {
         
             // FixME!!
-			ensureDataCanHold(kMaxDataBufferSize/2); 
+			ensureDataCanHold(kMaxDataBufferSizeLongs/2); 
             //not sure how much this card can produce... 
             //just ensure half the data buffer is free
 			

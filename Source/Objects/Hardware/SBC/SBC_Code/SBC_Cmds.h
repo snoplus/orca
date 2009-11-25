@@ -167,14 +167,14 @@ typedef
 SBC_LAM_Data;
 
 
-#define kSBC_MaxPayloadSize    1024*400
-#define kSBC_MaxMessageSize    256
+#define kSBC_MaxPayloadSizeBytes    1024*400
+#define kSBC_MaxMessageSizeBytes    256
 typedef 
     struct {
         uint32_t numBytes;                //filled in automatically
         SBC_CommandHeader cmdHeader;
-        char message[kSBC_MaxMessageSize];
-        char payload[kSBC_MaxPayloadSize];
+        char message[kSBC_MaxMessageSizeBytes];
+        char payload[kSBC_MaxPayloadSizeBytes];
     }
 SBC_Packet;
 

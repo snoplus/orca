@@ -46,11 +46,11 @@ bool ORCAEN1720Readout::Readout(SBC_LAM_Data* lamData)
         if(result == sizeof(eventSize) && eventSize>0){
             uint32_t startIndex = dataIndex;
             if ( (int32_t)(numEventsToReadout*(eventSize+1) + 2) > 
-                 (kMaxDataBufferSize-dataIndex) ) {
+                 (kMaxDataBufferSizeLongs-dataIndex) ) {
                 /* We can't read out. */ 
                 LogError("Temp buffer too small, requested (%d) > available (%d)",
                           numEventsToReadout*(eventSize+1)+2, 
-                          kMaxDataBufferSize-dataIndex);
+                          kMaxDataBufferSizeLongs-dataIndex);
                 return false; 
             } 
             
@@ -72,7 +72,7 @@ bool ORCAEN1720Readout::Readout(SBC_LAM_Data* lamData)
                 return true; 
             }
             dataIndex += result/4;
-            if ( dataIndex + fifoBuffSize/4 > kMaxDataBufferSize ) {
+            if ( dataIndex + fifoBuffSize/4 > kMaxDataBufferSizeLongs ) {
                 /* Error checking, for some reason we will 
                    read past our buffer.*/
                 /* Reset to not do that. */

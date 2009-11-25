@@ -1801,7 +1801,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setPayloadSize:payloadSize];
     
 	if(aValue<=5000)aValue = 5000;
-	else if(aValue>kSBC_MaxPayloadSize)aValue = kSBC_MaxPayloadSize;
+	else if(aValue>kSBC_MaxPayloadSizeBytes)aValue = kSBC_MaxPayloadSizeBytes;
 	
     payloadSize = aValue;
 	
@@ -2031,7 +2031,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
     int bytesWritten = 0;
 	int numBytesToSend = sizeof(long) +
 	sizeof(SBC_CommandHeader) + 
-	kSBC_MaxMessageSize + 
+	kSBC_MaxMessageSizeBytes + 
 	aPacket->cmdHeader.numberBytesinPayload;
 	aPacket->numBytes = numBytesToSend;
 	char* packetPtr = (char*)aPacket;		//recast the first 'real' word in the packet

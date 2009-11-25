@@ -142,7 +142,7 @@
 		delayStructPtr->milliSecondDelay			= milliSecondDelay;
 	}
 	
-	aPacket.numBytes = sizeof(unsigned long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket.cmdHeader.numberBytesinPayload;
+	aPacket.numBytes = sizeof(unsigned long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSizeBytes + aPacket.cmdHeader.numberBytesinPayload;
 	return aPacket;
 }
 

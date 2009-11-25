@@ -57,7 +57,7 @@ bool ORAcqirisDC440Readout::Readout(SBC_LAM_Data* /*lamData*/)
     readParams.firstSampleInSeg = 0;                    // First data point in segment.
     readParams.nbrSamplesInSeg  = numberSamples;        // Expected number of points
     readParams.segmentOffset    = numberSamples + 100;    // Offset between segments.
-    readParams.dataArraySize    = ( kSBC_MaxPayloadSize - 
+    readParams.dataArraySize    = ( kSBC_MaxPayloadSizeBytes - 
                                     sizeof(Acquiris_WaveformResponseStruct) - 
                                     sizeof(Acquiris_OrcaWaveformStruct)) / sizeof(int16_t) ;    // User supplied array size.
     readParams.segDescArraySize = nbrSegments*sizeof(AqSegmentDescriptor);  // Maximum number of segments.    

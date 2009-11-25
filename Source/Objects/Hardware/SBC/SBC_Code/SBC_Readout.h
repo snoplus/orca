@@ -27,7 +27,7 @@
 #include "SBC_Config.h"
 #include <sys/types.h>
 
-#define kMaxDataBufferSize 1024*400
+#define kMaxDataBufferSizeLongs kSBC_MaxPayloadSizeBytes/4
 
 void processBuffer(SBC_Packet* aPacket,uint8_t reply);
 void processSBCCommand(SBC_Packet* aPacket,uint8_t reply);

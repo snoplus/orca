@@ -193,9 +193,9 @@ void loadMtcXilinx(SBC_Packet* aPacket)
 	/* non-0 means an error*/
 	SNOMtc_XilinxLoadStruct* returnDataPtr = (SNOMtc_XilinxLoadStruct*)aPacket->payload;
 	uint32_t errLen = strlen(errorMessage);
-	if(errLen >= kSBC_MaxMessageSize-1){
-		errLen = kSBC_MaxMessageSize-1;
-		aPacket->message[kSBC_MaxMessageSize-1] = '\0';	
+	if(errLen >= kSBC_MaxMessageSizeBytes-1){
+		errLen = kSBC_MaxMessageSizeBytes-1;
+		aPacket->message[kSBC_MaxMessageSizeBytes-1] = '\0';	
 	}
 	strncpy(aPacket->message,errorMessage,errLen);
 	
@@ -336,9 +336,9 @@ void loadXL2Clocks(SBC_Packet* aPacket)
 	/* non-0 means an error*/
 	SNOXL2_ClockLoadStruct* returnDataPtr = (SNOXL2_ClockLoadStruct*)aPacket->payload;
 	uint32_t errLen = strlen(errorMessage);
-	if(errLen >= kSBC_MaxMessageSize-1){
-		errLen = kSBC_MaxMessageSize-1;
-		aPacket->message[kSBC_MaxMessageSize-1] = '\0';	
+	if(errLen >= kSBC_MaxMessageSizeBytes-1){
+		errLen = kSBC_MaxMessageSizeBytes-1;
+		aPacket->message[kSBC_MaxMessageSizeBytes-1] = '\0';	
 	}
 	strncpy(aPacket->message,errorMessage,errLen);
 	

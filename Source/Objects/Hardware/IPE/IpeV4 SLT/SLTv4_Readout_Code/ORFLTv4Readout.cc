@@ -38,9 +38,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         uint32_t f1 = srack->theFlt[col]->eventFIFO1->read();
                         uint32_t chmap = f1 >> 8;
                         uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
-                        int eventchan;
+                        uint32_t eventchan;
                         for(eventchan=0;eventchan<24;eventchan++){
-                            if(chmap & (0x1 << eventchan)){
+                            if(chmap & (0x1L << eventchan)){
                                 //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
                                 uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
                                 uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(eventchan);
@@ -52,7 +52,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 uint32_t waveformLength = 2048; 
                                 if(eventType & kReadWaveForms){
                                     ensureDataCanHold(9 + waveformLength/2); 
-                                    data[dataIndex++] = waveformId | 9 + waveformLength/2;    
+                                    data[dataIndex++] = waveformId | (9 + waveformLength/2);    
                                 }
                                 else {
                                     ensureDataCanHold(7); 

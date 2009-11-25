@@ -230,7 +230,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     bool deleteHandle = false;
     bool useDMADevice = false;
 
-    if (numItems*unitSize > kSBC_MaxPayloadSize) {
+    if (numItems*unitSize > kSBC_MaxPayloadSizeBytes) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
         p->errorCode = -1;
         if(reply)writeBuffer(aPacket);

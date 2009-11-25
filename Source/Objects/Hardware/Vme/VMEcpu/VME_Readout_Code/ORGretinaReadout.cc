@@ -34,7 +34,7 @@ bool ORGretinaReadout::Readout(SBC_LAM_Data* /*lamData*/)
      
     if ((fifoState & fifoEmptyMask) == 0 ) {
 		
-        ensureDataCanHold(kMaxDataBufferSize/2); //not sure how much this card can produce... just ensure half the data buffer is free
+        ensureDataCanHold(kMaxDataBufferSizeLongs/2); //not sure how much this card can produce... just ensure half the data buffer is free
      
         uint32_t numLongs = 3;
         int32_t savedIndex = dataIndex;

@@ -101,7 +101,7 @@ int32_t main(int32_t argc, char *argv[])
     struct sigaction sa;
     int32_t yes=1;
     timeToExit = 0;
-    maxPacketSize = kSBC_MaxPayloadSize;
+    maxPacketSize = kSBC_MaxPayloadSizeBytes;
 	
     if (argc != 2) {
         exit(1);
@@ -185,7 +185,7 @@ int32_t main(int32_t argc, char *argv[])
         pthread_mutex_unlock (&lamInfoMutex);//end critical section
         /*-------------------------------*/
 
-        data = (int32_t*)malloc(kMaxDataBufferSize*sizeof(int32_t));
+        data = (int32_t*)malloc(kMaxDataBufferSizeLongs*sizeof(int32_t));
 
         SBC_Packet aPacket;
         int32_t numRead = 0;
@@ -465,7 +465,7 @@ void sendCBRecord(void)
     do {
         int32_t nextBlockSize = CB_nextBlockSize();
         if(nextBlockSize == 0)break;
-		if(nextBlockSize > (kSBC_MaxPayloadSize/sizeof(int32_t))){
+		if(nextBlockSize > (kSBC_MaxPayloadSizeBytes/sizeof(int32_t))){
 			LogError("sendCBRecord Error: Block too Large!");   
 			break;
 		}
@@ -523,7 +523,7 @@ int32_t writeBuffer(SBC_Packet* aPacket)
 { 
     /* writeBuffer returns -1 if an error.  errno shoulc be set appropriately. */
     if(workingSocket < 0) return -1;
-    aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket->cmdHeader.numberBytesinPayload; 
+    aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSizeBytes + aPacket->cmdHeader.numberBytesinPayload; 
     int32_t numBytesToSend = aPacket->numBytes;
 
     if(needToSwap)SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(int32_t)+1);
@@ -553,7 +553,7 @@ int32_t writeIRQ(int n)
     if(n<0 || n>=kMaxNumberLams) return -1;
     
     SBC_Packet* aPacket = &lam_info[n].lam_Packet;
-    aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket->cmdHeader.numberBytesinPayload; 
+    aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSizeBytes + aPacket->cmdHeader.numberBytesinPayload; 
     int32_t numBytesToSend = aPacket->numBytes; 
     if(needToSwap)SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(int32_t)+1);
     char* p = (char*)aPacket;
@@ -726,7 +726,7 @@ void commitData()
 
 void ensureDataCanHold(int numLongsRequired)
 {
-	if(dataIndex + numLongsRequired >= kMaxDataBufferSize){
+	if(dataIndex + numLongsRequired >= kMaxDataBufferSizeLongs){
 		commitData();
 	}
 }
@@ -859,8 +859,8 @@ void setPacketOptions(SBC_Packet* aPacket)
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
     maxPacketSize = p->option[0];
 
-	if(maxPacketSize<=0)maxPacketSize = kSBC_MaxPayloadSize;
-	else if(maxPacketSize > kSBC_MaxPayloadSize)maxPacketSize = kSBC_MaxPayloadSize;
+	if(maxPacketSize<=0)maxPacketSize = kSBC_MaxPayloadSizeBytes;
+	else if(maxPacketSize > kSBC_MaxPayloadSizeBytes)maxPacketSize = kSBC_MaxPayloadSizeBytes;
 
 	p->option[0] = 1;	//response...
     sendResponse(aPacket);
