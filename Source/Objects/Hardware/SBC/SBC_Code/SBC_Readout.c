@@ -466,7 +466,9 @@ void sendCBRecord(void)
         int32_t nextBlockSize = CB_nextBlockSize();
         if(nextBlockSize == 0)break;
 		if(nextBlockSize > (kSBC_MaxPayloadSizeBytes/sizeof(int32_t))){
-			LogError("sendCBRecord Error: Block too Large!");   
+			//disaster! Flush the entire CB and notify the user.
+			LogError("CB Error: Block too large to ship (flushing)!");   
+			CB_flush();
 			break;
 		}
 		if((recordCount == 0) && (nextBlockSize > maxPacketSize/sizeof(int32_t))){
