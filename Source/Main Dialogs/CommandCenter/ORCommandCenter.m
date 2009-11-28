@@ -612,6 +612,70 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     }
 }
 
+- (id) executeSimpleCommand:(NSString*)aCommandString;
+{
+    NSCharacterSet* whiteset     = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    NSCharacterSet* delimiterset = [NSCharacterSet characterSetWithCharactersInString:@": "];
+    NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
+    NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
+	NSString* returnValue = @"?";
+	if([aCommandString length]){
+				
+		NSScanner* 	scanner  = [NSScanner scannerWithString:[aCommandString stringByTrimmingCharactersInSet:trimSet]];
+		NSMutableArray* cmdItems = [NSMutableArray array];
+		
+		//parse a string of the form [obj method:var1 name:var2 ....]
+		NSString* objName;
+		[scanner scanUpToCharactersFromSet:whiteset intoString:&objName];                       //get the objName
+		
+		while(![scanner isAtEnd]) {
+			NSString*  result = [NSString string];
+			[scanner scanUpToCharactersFromSet:inverteddelimiterset intoString:nil];            //skip leading delimiters
+			if([scanner scanUpToCharactersFromSet:delimiterset intoString:&result]){            //store up to next delimiter
+				if([result length]){
+					[cmdItems addObject:result];
+				}
+			}
+		}
+		
+		//turn the array into a selector
+		SEL theSelector = [NSInvocation makeSelectorFromArray:cmdItems];
+		id theObj = [destinationObjects objectForKey:objName];
+		if(!theObj){
+			//OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
+			theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
+		}	
+		
+		if([theObj respondsToSelector:theSelector]){
+			NSMethodSignature* theSignature = [theObj methodSignatureForSelector:theSelector];
+			NSInvocation* theInvocation = [NSInvocation invocationWithMethodSignature:theSignature];
+			[theInvocation setSelector:theSelector];
+			int n = [theSignature numberOfArguments]-2; //first two are hidden
+			int i;
+			int argI;
+			BOOL ok = YES;
+			for(i=1,argI=0 ; i<=n*2 ; i+=2,argI++){
+				NSString* aCmdItem = [cmdItems objectAtIndex:i];
+				if(![theInvocation setArgument:argI to:aCmdItem]){
+					ok = NO;
+					break;
+				}
+			}
+			if(ok){
+				[[self undoManager] disableUndoRegistration];
+				@try {
+					[theInvocation invokeWithTarget:theObj];
+					returnValue = [theInvocation returnValue];
+				}
+				@catch (NSException* e){
+				}
+				[[self undoManager] enableUndoRegistration];
+			}
+		}
+	}
+	return returnValue;					
+}
+
 #pragma mark •••Update Methods
 - (void) sendCurrentAlarms:(ORCommandClient*)client
 {

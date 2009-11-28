@@ -88,6 +88,7 @@
 - (void) handleCommand:(NSString*)aCommandString fromClient:(id)aClient;
 - (void) handleLocalCommand:(NSString*)aCommandString;
 - (void) addCommandToHistory:(NSString*)aCommandString;
+- (id) executeSimpleCommand:(NSString*)aCommandString;
 
 #pragma mark •••Delegate Methods
 - (void) netsocket:(NetSocket*)inNetSocket connectionAccepted:(NetSocket*)inNewNetSocket;
