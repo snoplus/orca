@@ -21,54 +21,56 @@
 
 #import "ORDotImage.h"
 
-static NSImage *shadowImage, *colorMaskImage, *refractionMaskImage;
+static NSImage *shadowImage			= nil;
+static NSImage *colorMaskImage		= nil;
+static NSImage *refractionMaskImage	= nil;
 
 @implementation ORDotImage
 + (void)initialize 
 {
     //defaults in case someone calls initWithColor instead of xxxWithColor methods
-    shadowImage         =    [NSImage imageNamed:@"dotshadow"];
-    colorMaskImage      =    [NSImage imageNamed:@"dotcolormask"];
-    refractionMaskImage =    [NSImage imageNamed:@"dottopmask"];
+    if(!shadowImage)shadowImage					=    [[NSImage imageNamed:@"dotshadow"] retain];
+    if(!colorMaskImage)colorMaskImage			=    [[NSImage imageNamed:@"dotcolormask"] retain];
+    if(!refractionMaskImage)refractionMaskImage =    [[NSImage imageNamed:@"dottopmask"] retain];
 }
 
 
 + (ORDotImage *)dotWithColor:(NSColor *)aColor 
 {
-    shadowImage         =    [NSImage imageNamed:@"dotshadow"];
-    colorMaskImage      =    [NSImage imageNamed:@"dotcolormask"];
-    refractionMaskImage =    [NSImage imageNamed:@"dottopmask"];
+    if(!shadowImage)shadowImage					 =    [[NSImage imageNamed:@"dotshadow"] retain];
+    if(!colorMaskImage)colorMaskImage			 =    [[NSImage imageNamed:@"dotcolormask"] retain];
+    if(!refractionMaskImage)refractionMaskImage  =    [[NSImage imageNamed:@"dottopmask"] retain];
     return [[[self alloc] initWithColor:aColor] autorelease];
 }
 
 + (ORDotImage *)bigDotWithColor:(NSColor *)aColor 
 {
-    shadowImage         =    [NSImage imageNamed:@"bigdotshadow"];
-    colorMaskImage      =    [NSImage imageNamed:@"bigdotcolormask"];
-    refractionMaskImage =    [NSImage imageNamed:@"bigdottopmask"];
+    if(!shadowImage)shadowImage					 =    [[NSImage imageNamed:@"bigdotshadow"] retain];
+    if(!colorMaskImage)colorMaskImage			 =    [[NSImage imageNamed:@"bigdotcolormask"] retain];
+    if(!refractionMaskImage)refractionMaskImage  =    [[NSImage imageNamed:@"bigdottopmask"] retain];
     return [[[self alloc] initWithColor:aColor] autorelease];
 }
 
 + (ORDotImage *)vRectWithColor:(NSColor *)aColor 
 {
-    shadowImage         =    [NSImage imageNamed:@"vrectshadow"];
-    colorMaskImage      =    [NSImage imageNamed:@"vrectcolormask"];
-    refractionMaskImage =    [NSImage imageNamed:@"vrecttopmask"];
+    if(!shadowImage)shadowImage					 =    [[NSImage imageNamed:@"vrectshadow"] retain];
+    if(!colorMaskImage)colorMaskImage			 =    [[NSImage imageNamed:@"vrectcolormask"] retain];
+    if(!refractionMaskImage)refractionMaskImage  =    [[NSImage imageNamed:@"vrecttopmask"] retain];
     return [[[self alloc] initWithColor:aColor] autorelease];
 }
 + (ORDotImage *)hRectWithColor:(NSColor *)aColor 
 {
-    shadowImage         =    [NSImage imageNamed:@"hrectshadow"];
-    colorMaskImage      =    [NSImage imageNamed:@"hrectcolormask"];
-    refractionMaskImage =    [NSImage imageNamed:@"hrecttopmask"];
+    if(!shadowImage)shadowImage					 =    [[NSImage imageNamed:@"hrectshadow"] retain];
+    if(!colorMaskImage)colorMaskImage			 =    [[NSImage imageNamed:@"hrectcolormask"] retain];
+    if(!refractionMaskImage)refractionMaskImage  =    [[NSImage imageNamed:@"hrecttopmask"] retain];
     return [[[self alloc] initWithColor:aColor] autorelease];
 }
 
 + (ORDotImage *)smallDotWithColor:(NSColor *)aColor 
 {
-    shadowImage         =    [NSImage imageNamed:@"smalldotshadow"];
-    colorMaskImage      =    [NSImage imageNamed:@"smalldotcolormask"];
-    refractionMaskImage =    [NSImage imageNamed:@"smalldottopmask"];
+    if(!shadowImage)shadowImage					 =    [[NSImage imageNamed:@"smalldotshadow"] retain];
+    if(!colorMaskImage)colorMaskImage			 =    [[NSImage imageNamed:@"smalldotcolormask"] retain];
+    if(!refractionMaskImage)refractionMaskImage  =    [[NSImage imageNamed:@"smalldottopmask"] retain];
     return [[[self alloc] initWithColor:aColor] autorelease];
 }
 
