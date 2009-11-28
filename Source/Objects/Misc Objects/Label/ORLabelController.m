@@ -54,6 +54,11 @@
                      selector: @selector(textDidChange:)
                          name: NSTextDidChangeNotification
                        object: labelField];
+	
+	[notifyCenter addObserver: self
+                     selector: @selector(labelTypeChanged:)
+                         name: ORLabelModelLabelTypeChanged
+                       object: labelField];
 
 }
 
@@ -68,6 +73,7 @@
 	[super updateWindow];
     [self textSizeChanged:nil];
     [self labelLockChanged:nil];
+    [self labelTypeChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -83,9 +89,10 @@
     [labelLockButton setState: locked];
     [labelField setEditable: !locked];
     [textSizeField setEnabled: !locked];
+    [labelTypeMatrix setEnabled: !locked];
 }
 
-- (void)textDidChange:(NSNotification *)notification
+- (void) textDidChange:(NSNotification *)notification
 {
 	[model setLabelNoNotify:[labelField string]];
 }
@@ -95,11 +102,21 @@
 	[textSizeField setIntValue:[model textSize]];
 }
 
+- (void) labelTypeChanged:(NSNotification*)aNote
+{
+	[labelTypeMatrix selectCellWithTag:[model labelType]];
+}
+
 
 #pragma mark ¥¥¥Actions
 - (IBAction) textSizeAction:(id)sender
 {
 	[model setTextSize:[sender intValue]];
+}
+
+- (IBAction) labelTypeAction:(id)sender
+{
+	[model setLabelType:[[sender selectedCell] tag]];
 }
 
 - (IBAction)labelLockAction:(id)sender

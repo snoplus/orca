@@ -24,7 +24,7 @@
     IBOutlet NSTextView*  labelField;
     IBOutlet NSTextField* textSizeField;
     IBOutlet NSButton*    labelLockButton;
-
+	IBOutlet NSMatrix*	  labelTypeMatrix;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -35,6 +35,7 @@
 - (void) updateWindow;
 - (void) labelLockChanged:(NSNotification *)aNote;
 - (void) checkGlobalSecurity;
+- (void) labelTypeChanged:(NSNotification*)aNote;
 - (void) labelLockChanged:(NSNotification*)aNote;
 - (void) textSizeChanged:(NSNotification*)aNote;
 - (void) textDidChange:(NSNotification *)aNote;
@@ -42,5 +43,6 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) textSizeAction:(id)sender;
 - (IBAction) labelLockAction:(id)sender;
+- (IBAction) labelTypeAction:(id)sender;
 
 @end

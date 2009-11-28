@@ -21,14 +21,47 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORLabelModel.h"
+#import "TimedWorker.h"
+#import "ORCommandCenter.h"
 
 NSString* ORLabelModelTextSizeChanged			 = @"ORLabelModelTextSizeChanged";
 NSString* ORLabelModelLabelChangedNotification   = @"ORLabelModelLabelChangedNotification";
 NSString* ORLabelLock							 = @"ORLabelLock";
+NSString* ORLabelPollRateChanged				 = @"ORLabelPollRateChanged";
+NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 
 @implementation ORLabelModel
 
 #pragma mark ¥¥¥initialization
+- (id) init
+{
+    self = [super init];
+    return self;
+}
+
+-(void) dealloc
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [poller stop];
+    [poller release];
+	[displayValue release];
+    [super dealloc];
+}
+
+- (void) wakeUp
+{
+    if([self aWake])return;
+    [super wakeUp];
+	if(labelType == kDynamiclabel){
+		[poller runWithTarget:self selector:@selector(updateValue)];
+	}
+}
+
+- (void) sleep
+{
+    [super sleep];
+    [poller stop];
+}
 
 
 - (NSString*) label
@@ -112,7 +145,10 @@ NSString* ORLabelLock							 = @"ORLabelLock";
     
     [label autorelease];
     label = [aLabel copy];
-    [self setUpImage];
+	if(!scheduledForUpdate){
+		scheduledForUpdate = YES;
+		[self performSelector:@selector(setUpImage) withObject:nil afterDelay:1];
+	}
     [[NSNotificationCenter defaultCenter]
 		postNotificationName:ORLabelModelLabelChangedNotification
                               object:self];
@@ -135,13 +171,27 @@ NSString* ORLabelLock							 = @"ORLabelLock";
 
 - (void) setUpImage
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setupImage) object:nil];
+
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
     //so, we cache the image here so that each Label can have its own version for drawing into.
     //---------------------------------------------------------------------------------------------------
 	if(label){
+		NSString* s = @"";
+		if(labelType == kStaticLabel){
+			s = label;
+		}
+		else {
+			if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
+				s = [NSString stringWithFormat:@"%.2f",[displayValue floatValue]];
+			}
+			else {
+				s = [NSString stringWithFormat:@"%@",displayValue];
+			}
+		}
 		NSAttributedString* n = [[NSAttributedString alloc] 
-								initWithString:[label length]?label:@"Text Label"
+								initWithString:[s length]?s:@"Text Label"
 									attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Geneva"  size:textSize] forKey:NSFontAttributeName]];
 		
 		NSSize theSize = [n size];
@@ -162,27 +212,63 @@ NSString* ORLabelLock							 = @"ORLabelLock";
     [[NSNotificationCenter defaultCenter]
                 postNotificationName:OROrcaObjectImageChanged
                               object:self];
-
+	scheduledForUpdate = NO;
 }
 
 - (void) setImage:(NSImage*)anImage
 {
 	[super setImage:anImage];
-
 	if(anImage){
 		[highlightedImage release];
 		highlightedImage = [[NSImage alloc] initWithSize:[anImage size]];
 		[highlightedImage lockFocus];
+		
+		NSString* s = @"";
+		if(labelType == kStaticLabel){
+			s = label;
+		}
+		else {
+			if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
+				s = [NSString stringWithFormat:@"%.2f",[displayValue floatValue]];
+			}
+			else {
+				s = [NSString stringWithFormat:@"%@",displayValue];
+			}
+		}
 		NSAttributedString* n = [[NSAttributedString alloc] 
-								initWithString:[label length]?label:@"Text Label"
-									attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Geneva"  size:textSize],NSFontAttributeName,
-									[NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
+								 initWithString:[s length]?s:@"Text Label"
+								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Geneva"  size:textSize],NSFontAttributeName,
+											 [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
+		
 		NSSize theSize = [n size];
 		[n drawInRect:NSMakeRect(0,0,theSize.width,theSize.height)];
 		[n release];
 		[highlightedImage unlockFocus];
 	}
+}
 
+- (int) labelType
+{
+	return labelType;
+}
+
+- (void) setLabelType:(int)aType
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setLabelType:labelType];
+	labelType = aType;
+	[displayValue release];
+	displayValue = nil;
+	if(labelType == kDynamiclabel){
+		[self setPollingInterval:1];
+	}
+	else {
+		[self setLabel:[self label]];
+		[poller stop];
+		[poller release];
+		poller = nil;
+		[self setUpImage];
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabelModelLabelTypeChanged object:self];
 }
 
 
@@ -191,6 +277,54 @@ NSString* ORLabelLock							 = @"ORLabelLock";
     [self linkToController:@"ORLabelController"];
 }
 
+- (TimedWorker *) poller
+{
+    return poller; 
+}
+
+- (void) setPoller: (TimedWorker *) aPoller
+{
+    if(aPoller == nil){
+        [poller stop];
+    }
+    [aPoller retain];
+    [poller release];
+    poller = aPoller;
+}
+
+- (void) setPollingInterval:(float)anInterval
+{
+    if(!poller){
+        [self makePoller:(float)anInterval];
+    }
+    else [poller setTimeInterval:anInterval];
+    
+	[poller stop];
+	[self updateValue];
+    [poller runWithTarget:self selector:@selector(updateValue)];
+}
+
+
+- (void) makePoller:(float)anInterval
+{
+    [self setPoller:[TimedWorker TimeWorkerWithInterval:anInterval]];
+}
+
+- (void) updateValue
+{
+	id aValue = nil;
+	@try {
+		aValue = [[ORCommandCenter sharedCommandCenter] executeSimpleCommand:[self label]];
+	}
+	@catch (NSException* e){
+	}
+	if(![aValue isEqual:displayValue]){
+		[aValue retain];
+		[displayValue release];
+		displayValue = aValue;
+		[self setUpImage];
+	}
+}
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -199,9 +333,9 @@ NSString* ORLabelLock							 = @"ORLabelLock";
 	
     [[self undoManager] disableUndoRegistration];
 	
+	[self setLabelType:[decoder decodeIntForKey:@"labelType"]];
     [self setLabel:[decoder decodeObjectForKey:@"label"]];
     [self setTextSize:[decoder decodeIntForKey:@"textSize"]];
-	
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -212,6 +346,7 @@ NSString* ORLabelLock							 = @"ORLabelLock";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:label forKey:@"label"];
     [encoder encodeInt:textSize forKey:@"textSize"];
+	[encoder encodeInt:labelType forKey:@"labelType"];
 }
 
 @end

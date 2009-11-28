@@ -17,12 +17,19 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+@class TimedWorker;
 
+#define kStaticLabel  0
+#define kDynamiclabel 1
 
 @interface ORLabelModel : OrcaObject  
 {
 	NSString*   label;
+	NSString*   displayValue;
     int			textSize;
+	TimedWorker*    poller;
+	BOOL scheduledForUpdate;
+	int labelType;
 }
 
 #pragma mark ***Accessors
@@ -32,6 +39,8 @@
 - (void) setLabel:(NSString*)aLabel;
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey;
 - (void) setLabelNoNotify:(NSString*)aLabel;
+- (int) labelType;
+- (void) setLabelType:(int)aType;
 
 //supplied so that labels can be handled by the process machinery.
 - (NSString*) elementName;
@@ -41,12 +50,20 @@
 - (void) setComment:(NSString*)aComment;
 - (NSString*) description:(NSString*)prefix;
 
-#pragma mark ¥¥¥Archival
-- (id)initWithCoder:(NSCoder*)decoder;
-- (void)encodeWithCoder:(NSCoder*)encoder;
+#pragma mark ***Polling
+- (TimedWorker *) poller;
+- (void) setPoller: (TimedWorker *) aPoller;
+- (void) setPollingInterval:(float)anInterval;
+- (void) makePoller:(float)anInterval;
+- (void) updateValue;
 
+#pragma mark ¥¥¥Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
 extern NSString* ORLabelModelTextSizeChanged;
 extern NSString* ORLabelModelLabelChangedNotification;
 extern NSString* ORLabelLock;
+extern NSString* ORLabelPollRateChanged;
+extern NSString* ORLabelModelLabelTypeChanged;
