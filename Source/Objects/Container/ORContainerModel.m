@@ -23,6 +23,7 @@
 #import "ORContainerModel.h"
 
 NSString* ORContainerScaleChangedNotification = @"ORContainerScaleChangedNotification";
+NSString* ORContainerBackgroundImageChangedNotification = @"ORContainerBackgroundImageChangedNotification";
 
 
 @implementation ORContainerModel
@@ -39,8 +40,13 @@ NSString* ORContainerScaleChangedNotification = @"ORContainerScaleChangedNotific
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	NSImage* anImage = [[NSImage alloc] initWithContentsOfFile:[backgroundImagePath stringByExpandingTildeInPath]];
+	[anImage setSize:[aCachedImage size]];
+	[anImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceAtop];
+	[anImage release];
+	
     
-    if([[self orcaObjects] count]){
+    if(!anImage && [[self orcaObjects] count]){
 		NSImage* imageOfObjects = [self imageOfObjects:[self orcaObjects] withTransparency:1.0];
 		float xScale = .75*[aCachedImage size].width/[imageOfObjects size].width;
 		float yScale = .75*[aCachedImage size].height/[imageOfObjects size].height;
@@ -94,6 +100,25 @@ NSString* ORContainerScaleChangedNotification = @"ORContainerScaleChangedNotific
     }
 }
 
+- (NSString*)backgroundImagePath 
+{
+    return backgroundImagePath;
+}
+
+- (void)setBackgroundImagePath:(NSString*)aPath 
+{
+    
+	[[[self undoManager] prepareWithInvocationTarget:self] setBackgroundImagePath:backgroundImagePath];
+	[aPath retain];
+	[backgroundImagePath release];
+	backgroundImagePath = aPath;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORContainerBackgroundImageChangedNotification
+														object:self];
+	[self setUpImage];
+}
+
+
 
 //override this because we WANT to use the name of the connector that we are given
 - (void) assumeDisplayOf:(ORConnector*)aConnector withKey:(NSString*)aKey
@@ -143,7 +168,7 @@ NSString* ORContainerScaleChangedNotification = @"ORContainerScaleChangedNotific
     int value = [decoder decodeIntForKey:@"scaleFactor"];
     if(value == 0)value = 100;
     [self setScaleFactor:value];
-
+	[self setBackgroundImagePath:[decoder decodeObjectForKey:@"backgroundImagePath"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -153,10 +178,7 @@ NSString* ORContainerScaleChangedNotification = @"ORContainerScaleChangedNotific
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:scaleFactor forKey:@"scaleFactor"];						
-	
+    [encoder encodeObject:backgroundImagePath forKey:@"backgroundImagePath"];						
 }
-
-
-
 
 @end

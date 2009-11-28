@@ -43,6 +43,11 @@
 - (void) awakeFromNib
 {
     [groupView setGroup:model];
+	
+	NSImage* anImage = [[NSImage alloc] initWithContentsOfFile:[[model backgroundImagePath] stringByExpandingTildeInPath]];
+	[groupView setBackgroundImage:anImage];
+	[anImage release];
+	
     [super awakeFromNib];
 }
 
@@ -126,8 +131,20 @@
 						 name : ORConnectionChanged
 					   object : nil];
 	
+	[notifyCenter addObserver : self
+					 selector : @selector(backgroundImageChanged:)
+						 name : ORContainerBackgroundImageChangedNotification
+					   object : model];
+	
+	
 }
 
+-(void) backgroundImageChanged:(NSNotification*)note
+{
+	NSImage* anImage = [[NSImage alloc] initWithContentsOfFile:[[model backgroundImagePath] stringByExpandingTildeInPath]];
+	[groupView setBackgroundImage:anImage];
+	[anImage release];
+}
 
 - (void) documentLockChanged:(NSNotification*)aNotification
 {

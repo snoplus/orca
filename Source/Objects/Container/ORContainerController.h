@@ -40,8 +40,9 @@
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
-- (void) scaleFactorChanged:(NSNotification*)aNotification;
-- (void) remoteScaleFactorChanged:(NSNotification*)aNotification;
+- (void) scaleFactorChanged:(NSNotification*)aNote;
+- (void) remoteScaleFactorChanged:(NSNotification*)aNote;
+-(void) backgroundImageChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) openHelp:(NSToolbarItem*)item;

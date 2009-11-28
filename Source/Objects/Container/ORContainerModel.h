@@ -24,6 +24,7 @@
 @interface ORContainerModel : ORGroup 
 {
     int		    scaleFactor;
+	NSString*	backgroundImagePath;
 }
 - (void) setUpImage;
 - (void) makeMainController;
@@ -31,13 +32,14 @@
 - (void) assumeDisplayOf:(ORConnector*)aConnector withKey:(NSString*)aKey;
 - (int)scaleFactor;
 - (void)setScaleFactor:(int)aScaleFactor;
-
+- (NSString*)backgroundImagePath;
+- (void)setBackgroundImagePath:(NSString*)aPath;
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-
 @end
 
 extern NSString* ORContainerScaleChangedNotification;
+extern NSString* ORContainerBackgroundImageChangedNotification;
 
 @interface NSObject (ORContainerModel)
 - (void) positionConnector:(ORConnector*)aConnector;

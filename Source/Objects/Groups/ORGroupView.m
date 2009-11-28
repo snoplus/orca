@@ -28,6 +28,7 @@
 #import "ORHWWizard.h"
 
 @interface ORGroupView (ExperimentViewPrivateMethods)
+- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (BOOL) _canTakeValueFromPasteboard:(NSPasteboard *)pb;
 - (void) _startDrag:(NSEvent*)event;
 - (BOOL) _doDragOp:(NSString *)op atPoint:(NSPoint)aPoint;
@@ -135,7 +136,10 @@
 
 - (void)drawRect:(NSRect)rect
 {
-    [self drawContents:rect];
+	[backgroundImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+
+	//[backgroundImage drawInRect:[self bounds] fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1];
+	[self drawContents:rect];
     [mouseTask drawRect:rect];
 }
 
@@ -303,6 +307,7 @@
     BOOL shiftKeyDown = ([event modifierFlags] & NSShiftKeyMask)!=0;
     BOOL cmdKeyDown   = ([event modifierFlags] & NSCommandKeyMask)!=0;
     BOOL cntrlKeyDown = ([event modifierFlags] & NSControlKeyMask)!=0;
+    BOOL optionKeyDown = ([event modifierFlags] & NSAlternateKeyMask)!=0;
 	
     NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     
@@ -323,7 +328,8 @@
 			if(!cmdKeyDown){
 				if(cntrlKeyDown){
 					[obj1 doCntrlClick:obj1];
-					break;
+					somethingHit = YES;
+				break;
 				}
 				else {
 					somethingHit = YES;
@@ -358,6 +364,8 @@
 			else {
 				[obj1 setHighlighted:NO]; 
 				[obj1 doCmdClick:obj1];
+				somethingHit = YES;
+
 				break;
 			}
 			
@@ -366,9 +374,13 @@
 	
     //something else must be done..
     if(!somethingHit){
-		id theMouseTask;
-		if(cntrlKeyDown){
+		id theMouseTask=nil;
+		if(optionKeyDown ){
 			theMouseTask = [ORScaleTask getTaskForEvent:event inView:self];
+		}
+		else  if(cntrlKeyDown){
+			[self doControlClick:self];
+			
 		}
 		else {
 			[self clearSelections:shiftKeyDown];
@@ -389,6 +401,67 @@
         }
     }
     //[self setNeedsDisplay:YES];
+}
+- (void) doControlClick:(id)sender
+{
+	if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
+		
+		NSEvent* theCurrentEvent = [NSApp currentEvent];
+		NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+											 location:[theCurrentEvent locationInWindow]
+										modifierFlags:NSLeftMouseDownMask // 0x100
+											timestamp:(NSTimeInterval)0
+										 windowNumber:[theCurrentEvent windowNumber]
+											  context:[theCurrentEvent context]
+										  eventNumber:0
+										   clickCount:1
+											 pressure:1];
+		
+		NSMenu *menu = [[[NSMenu alloc] init] autorelease];
+		[[menu insertItemWithTitle:@"Set Background Image"
+							action:@selector(selectBackgroundImage:)
+					 keyEquivalent:@""
+						   atIndex:0] setTarget:self];
+		[[menu insertItemWithTitle:@"Clear Background Image"
+							action:@selector(clearBackgroundImage:)
+					 keyEquivalent:@""
+						   atIndex:0] setTarget:self];
+		[menu setDelegate:self];
+		[NSMenu popUpContextMenu:menu withEvent:event forView:nil];
+	}
+}
+
+- (IBAction) clearBackgroundImage:(id)sender
+{
+	if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
+		[group setBackgroundImagePath:nil];
+	}
+}
+
+- (IBAction) selectBackgroundImage:(id)sender
+{
+    NSString* startDir = NSHomeDirectory(); //default to home
+	if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
+		if([group backgroundImagePath]){
+			startDir = [[group backgroundImagePath]stringByDeletingLastPathComponent];
+			if([startDir length] == 0){
+				startDir = NSHomeDirectory();
+			}
+		}
+	}
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	[openPanel setCanChooseDirectories:NO];
+	[openPanel setCanChooseFiles:YES];
+	[openPanel setAllowsMultipleSelection:NO];
+	[openPanel setCanCreateDirectories:NO];
+	[openPanel setPrompt:@"Choose Image"];
+	[openPanel beginSheetForDirectory:startDir
+                                 file:nil
+                                types:[NSArray arrayWithObjects:@"pdf",@"tif",@"gif",@"png",@"jpeg",nil]
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
 }
 
 //-------------------------------------------------------------------------------
@@ -977,6 +1050,14 @@
 	}
 }
 
+- (void) setBackgroundImage:(NSImage *)newImage
+{ 
+    [newImage retain];
+    [backgroundImage release];
+    backgroundImage = newImage;
+	
+    [self setNeedsDisplay:YES];
+}
 @end
 
 @implementation ORGroupView (private)
@@ -1142,6 +1223,16 @@
 		
     }
     return result;
+}
+
+- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* path = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
+		if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
+			[group setBackgroundImagePath:path];
+		}
+	}
 }
 @end
 

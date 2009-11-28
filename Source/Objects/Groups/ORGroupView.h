@@ -18,9 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-@class ORGroup;
-
 @interface ORGroupView : NSView {
     id mouseTask;
     BOOL dragSessionInProgress;
@@ -30,6 +27,7 @@
     NSArray* draggedObjects;
     NSArray* savedObjects;
     NSMutableArray*  draggedNodes;
+	NSImage* backgroundImage;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -43,6 +41,7 @@
 - (id) dataSource;
 
 #pragma mark ¥¥¥Graphics
+- (void) setBackgroundImage:(NSImage *)newImage;
 - (void) drawContents:(NSRect)aRect;
 - (void) backgroundColorChanged:(NSNotification*)note;
 - (void) lineColorChanged:(NSNotification*)note;
@@ -66,6 +65,7 @@
 - (void) moveSelectedObjectsRight:(NSEvent*)event;
 - (void) moveSelectedObjects:(NSPoint)delta;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
+- (void) doControlClick:(id)sender;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender;
@@ -82,6 +82,8 @@
 - (IBAction) sendToBack:(id)sender;
 - (IBAction) bringToFront:(id)sender;
 - (IBAction) getInfo:(id)sender;
+- (IBAction) selectBackgroundImage:(id)sender;
+- (IBAction) clearBackgroundImage:(id)sender;
 
 #pragma mark ¥¥¥Drag and Drop
 - (NSPoint) suggestPasteLocationFor:(id)anObject;
@@ -101,6 +103,11 @@
 #pragma mark ¥¥¥Connection Management
 -(void)doConnectionFrom:(NSPoint)pt1 to:(NSPoint)pt2;
 
+@end
+
+@interface NSObject (ORGroupView)
+- (NSString*) backgroundImagePath;
+- (void) setBackgroundImagePath:(NSString*)aPath;
 @end
 
 @interface ORScrollView : NSScrollView
