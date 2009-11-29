@@ -41,8 +41,15 @@ NSString* ORContainerBackgroundImageChangedNotification = @"ORContainerBackgroun
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
 	NSImage* anImage = [[NSImage alloc] initWithContentsOfFile:[backgroundImagePath stringByExpandingTildeInPath]];
-	[anImage setSize:[aCachedImage size]];
-	[anImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceAtop];
+
+	float xScale = .8*[aCachedImage size].width/[anImage size].width;
+	float yScale = .8*[aCachedImage size].height/[anImage size].height;
+	float scale = MIN(.8,MIN(xScale,yScale));
+	float newWidth = [anImage size].width*scale;
+	float newHeight = [anImage size].height*scale;
+	
+	[anImage setSize:NSMakeSize(newWidth,newHeight)];
+	[anImage compositeToPoint:NSMakePoint([aCachedImage size].width/2. - [anImage size].width/2., [aCachedImage size].height/2. - [anImage size].height/2.) operation:NSCompositeSourceAtop];
 	[anImage release];
 	
     
