@@ -26,22 +26,27 @@
 {
 	NSString*   label;
 	NSString*   displayValue;
+	NSString*   displayFormat;
     int			textSize;
 	TimedWorker*    poller;
 	BOOL scheduledForUpdate;
 	int labelType;
+	int updateInterval;
 }
 
 #pragma mark ***Accessors
 - (int) textSize;
 - (void) setTextSize:(int)aTextSize;
+- (NSString*) displayFormat;
+- (void) setDisplayFormat:(NSString*)aLabel;
 - (NSString*) label;
 - (void) setLabel:(NSString*)aLabel;
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey;
 - (void) setLabelNoNotify:(NSString*)aLabel;
 - (int) labelType;
 - (void) setLabelType:(int)aType;
-
+- (int) updateInterval;
+- (void) setUpdateInterval:(int) anInterval;
 //supplied so that labels can be handled by the process machinery.
 - (NSString*) elementName;
 - (NSString*) fullHwName;
@@ -62,8 +67,11 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORLabelModelUpdateIntervalChanged;
 extern NSString* ORLabelModelTextSizeChanged;
 extern NSString* ORLabelModelLabelChangedNotification;
 extern NSString* ORLabelLock;
 extern NSString* ORLabelPollRateChanged;
 extern NSString* ORLabelModelLabelTypeChanged;
+extern NSString* ORLabelModelFormatChanged;
+

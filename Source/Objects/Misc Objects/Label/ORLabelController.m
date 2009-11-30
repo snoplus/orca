@@ -58,8 +58,17 @@
 	[notifyCenter addObserver: self
                      selector: @selector(labelTypeChanged:)
                          name: ORLabelModelLabelTypeChanged
-                       object: labelField];
-
+                       object: model];
+	
+	[notifyCenter addObserver: self
+                     selector: @selector(updateIntervalChanged:)
+                         name: ORLabelModelUpdateIntervalChanged
+                       object: model];
+	
+	[notifyCenter addObserver: self
+                     selector: @selector(displayFormatChanged:)
+                         name: ORLabelModelFormatChanged
+                       object: model];
 }
 
 - (void) awakeFromNib
@@ -74,6 +83,8 @@
     [self textSizeChanged:nil];
     [self labelLockChanged:nil];
     [self labelTypeChanged:nil];
+    [self updateIntervalChanged:nil];
+	[self displayFormatChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -83,6 +94,11 @@
     [labelLockButton setEnabled:secure];
 }
 
+- (void) updateIntervalChanged:(NSNotification*)aNotification
+{
+	[updateIntervalPU selectItemWithTag:[model updateInterval]];
+}
+
 - (void) labelLockChanged:(NSNotification*)aNotification
 {
     BOOL locked = [gSecurity isLocked:ORLabelLock];
@@ -90,6 +106,8 @@
     [labelField setEditable: !locked];
     [textSizeField setEnabled: !locked];
     [labelTypeMatrix setEnabled: !locked];
+    [updateIntervalPU setEnabled: !locked && [model labelType] == kDynamiclabel];
+    [displayFormatField setEnabled: !locked && [model labelType] == kDynamiclabel];
 }
 
 - (void) textDidChange:(NSNotification *)notification
@@ -105,10 +123,26 @@
 - (void) labelTypeChanged:(NSNotification*)aNote
 {
 	[labelTypeMatrix selectCellWithTag:[model labelType]];
+	[self labelLockChanged:nil];
+}
+
+- (void) displayFormatChanged:(NSNotification*)aNote
+{
+	[displayFormatField setStringValue:[model displayFormat]];
 }
 
 
 #pragma mark ¥¥¥Actions
+- (IBAction) displayFormatAction:(id)sender
+{
+	[model setDisplayFormat:[sender stringValue]];
+}
+
+- (IBAction) updateIntervalAction:(id)sender
+{
+	[model setUpdateInterval:[[sender selectedItem] tag]];
+}
+
 - (IBAction) textSizeAction:(id)sender
 {
 	[model setTextSize:[sender intValue]];

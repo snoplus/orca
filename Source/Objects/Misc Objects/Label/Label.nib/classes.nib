@@ -67,6 +67,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>displayFormatAction</key>
+				<string>id</string>
 				<key>labelAction</key>
 				<string>id</string>
 				<key>labelLockAction</key>
@@ -75,6 +77,8 @@
 				<string>id</string>
 				<key>textSizeAction</key>
 				<string>id</string>
+				<key>updateIntervalAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORLabelController</string>
@@ -82,6 +86,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>displayFormatField</key>
+				<string>NSTextField</string>
 				<key>labelField</key>
 				<string>NSTextView</string>
 				<key>labelLockButton</key>
@@ -90,6 +96,8 @@
 				<string>NSMatrix</string>
 				<key>textSizeField</key>
 				<string>NSTextField</string>
+				<key>updateIntervalPU</key>
+				<string>NSPopUpButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>

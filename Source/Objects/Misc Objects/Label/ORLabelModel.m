@@ -29,6 +29,9 @@ NSString* ORLabelModelLabelChangedNotification   = @"ORLabelModelLabelChangedNot
 NSString* ORLabelLock							 = @"ORLabelLock";
 NSString* ORLabelPollRateChanged				 = @"ORLabelPollRateChanged";
 NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
+NSString* ORLabelModelUpdateIntervalChanged		 = @"ORLabelModelUpdateIntervalChanged";
+NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
+
 
 @implementation ORLabelModel
 
@@ -114,8 +117,27 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
     return [ourKey compare:theirKey];
 }
 
+- (void) makeMainController
+{
+    [self linkToController:@"ORLabelController"];
+}
 
 #pragma mark ***Accessors
+- (int) updateInterval
+{
+	return updateInterval;
+}
+
+- (void) setUpdateInterval:(int) anInterval
+{
+	if(anInterval==0)anInterval = 1;
+    [[[self undoManager] prepareWithInvocationTarget:self] setUpdateInterval:updateInterval];
+	updateInterval = anInterval;
+	if(labelType == kDynamiclabel){
+		[self setPollingInterval:updateInterval];
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORLabelModelUpdateIntervalChanged object:self];
+}
 
 - (int) textSize
 {
@@ -169,6 +191,7 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
             [aGuardian isMemberOfClass:NSClassFromString(@"ORContainerModel")];
 }
 
+
 - (void) setUpImage
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setupImage) object:nil];
@@ -184,7 +207,10 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 		}
 		else {
 			if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
-				s = [NSString stringWithFormat:@"%.2f",[displayValue floatValue]];
+				NSString* f;
+				if([displayFormat length])f = displayFormat;
+				else f = @"%.2f";
+				s = [NSString stringWithFormat:f,[displayValue floatValue]];
 			}
 			else {
 				s = [NSString stringWithFormat:@"%@",displayValue];
@@ -229,7 +255,10 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 		}
 		else {
 			if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
-				s = [NSString stringWithFormat:@"%.2f",[displayValue floatValue]];
+				NSString* f;
+				if([displayFormat length])f = displayFormat;
+				else f = @"%.2f";
+				s = [NSString stringWithFormat:f,[displayValue floatValue]];
 			}
 			else {
 				s = [NSString stringWithFormat:@"%@",displayValue];
@@ -259,7 +288,7 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 	[displayValue release];
 	displayValue = nil;
 	if(labelType == kDynamiclabel){
-		[self setPollingInterval:1];
+		[self setPollingInterval:updateInterval];
 	}
 	else {
 		[self setLabel:[self label]];
@@ -271,10 +300,23 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabelModelLabelTypeChanged object:self];
 }
 
-
-- (void) makeMainController
+- (NSString*) displayFormat
 {
-    [self linkToController:@"ORLabelController"];
+	if(!displayFormat)return @"";
+	else return displayFormat;
+}
+
+
+- (void) setDisplayFormat:(NSString*)aFormat
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLabel:label];
+    aFormat = [aFormat stringByReplacingOccurrencesOfString:@"%@" withString:@"%.2f"];
+    [displayFormat autorelease];
+    displayFormat = [aFormat copy];
+	[self setUpImage];
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORLabelModelFormatChanged
+	 object:self];
 }
 
 - (TimedWorker *) poller
@@ -335,7 +377,9 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 	
 	[self setLabelType:[decoder decodeIntForKey:@"labelType"]];
     [self setLabel:[decoder decodeObjectForKey:@"label"]];
+    [self setDisplayFormat:[decoder decodeObjectForKey:@"displayFormat"]];
     [self setTextSize:[decoder decodeIntForKey:@"textSize"]];
+    [self setUpdateInterval:[decoder decodeIntForKey:@"updateInterval"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -345,8 +389,10 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:label forKey:@"label"];
+    [encoder encodeObject:displayFormat forKey:@"displayFormat"];
     [encoder encodeInt:textSize forKey:@"textSize"];
 	[encoder encodeInt:labelType forKey:@"labelType"];
+	[encoder encodeInt:updateInterval forKey:@"updateInterval"];
 }
 
 @end
