@@ -37,9 +37,12 @@
 	ORAdcLowLimitNub*  lowLimitNub;
 	ORAdcHighLimitNub* highLimitNub;
     float minChange;
+    NSString* displayFormat;
 }
 
 #pragma mark ***Accessors
+- (NSString*) displayFormat;
+- (void) setDisplayFormat:(NSString*)aDisplayFormat;
 - (float) minChange;
 - (void) setMinChange:(float)aMinChange;
 - (void) dealloc;
@@ -58,6 +61,7 @@
 
 @end
 
+extern NSString* ORAdcModelDisplayFormatChanged;
 extern NSString* ORAdcModelMinChangeChanged;
 
 @interface ORAdcLowLimitNub : ORProcessNub
