@@ -223,10 +223,10 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 	if(index>=0 && index<8){
 		adc[index] = aValue;
 		//get the time(UT!)
-		time_t	theTime;
-		time(&theTime);
-		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		timeMeasured[index] = mktime(theTimeGMTAsStruct);
+		time_t	ut_Time;
+		time(&ut_Time);
+		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		timeMeasured[index] = ut_Time;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChanged 
 															object:self 

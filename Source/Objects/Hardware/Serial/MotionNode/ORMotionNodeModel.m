@@ -692,9 +692,9 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(shipXYZTrace) object:nil];
 
 		//get the time(UT!)
-		time_t	theTime;
-		time(&theTime);
-		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t	ut_Time;
+		time(&ut_Time);
+		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		int shipLen = kSecToShip * kPtPerSec;
 		
 		int backIndex = (excursionIndex - kPerTrigger*kPtPerSec);
@@ -705,7 +705,7 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 			unsigned long data[3 + (kSecToShip * kPtPerSec)];
 			data[0] = dataId | (3 + shipLen);
 			data[1] = ((type&0x3)<<16) | ([self uniqueIdNumber]&0xfff); // xtrace
-			data[2] = mktime(theTimeGMTAsStruct);
+			data[2] = ut_Time;
 			int i;
 			float slope		= motionNodeCalibration[type].slope;
 			float intercept = motionNodeCalibration[type].intercept;

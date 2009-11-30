@@ -409,10 +409,10 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 {
 	int i;
 	//get the time(UT!)
-	time_t	theTime;
-	time(&theTime);
-	struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	lastReadTime = mktime(theTimeGMTAsStruct);
+	time_t	ut_Time;
+	time(&ut_Time);
+	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+	lastReadTime = ut_Time;
 	for(i=0;i<kNumCaen260Channels;i++){
 		if(enabledMask & (0x1<<i)){
 			unsigned long aValue = 0;

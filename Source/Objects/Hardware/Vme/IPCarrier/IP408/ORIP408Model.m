@@ -299,10 +299,10 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
 		
 		//get the time(UT!)
-		time_t	theTime;
-		time(&theTime);
-		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		time_t ut_time = mktime(theTimeGMTAsStruct);
+		time_t	ut_time;
+		time(&ut_time);
+		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		//time_t ut_time = mktime(theTimeGMTAsStruct);
 		data[2] = ut_time;	//seconds since 1970
 		data[3]	= writeMask;	
 		data[4]	= readMask;	

@@ -640,10 +640,10 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //get the time(UT!)
-    time_t	theTime;
-    time(&theTime);
-    struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    time_t ut_time = mktime(theTimeGMTAsStruct);
+    time_t	ut_time;
+    time(&ut_time);
+    //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+    //time_t ut_time = mktime(theTimeGMTAsStruct);
     NSTimeInterval refTime = [NSDate timeIntervalSinceReferenceDate];
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class])            forKey:@"Class Name"];

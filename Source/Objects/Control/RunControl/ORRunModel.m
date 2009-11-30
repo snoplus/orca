@@ -809,10 +809,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[self setElapsedBetweenSubRunTime:0];
 	//ship between sub run record
 	//get the time(UT!)
-	time_t	theTime;
-	time(&theTime);
-	struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	time_t ut_time = mktime(theTimeGMTAsStruct);
+	time_t	ut_time;
+	time(&ut_time);
+	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+	//time_t ut_time = mktime(theTimeGMTAsStruct);
 	
 	unsigned long data[4];
 	data[0] = dataId | 4;
@@ -833,10 +833,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[self setElapsedSubRunTime:0];
 	//ship new sub run record
 	//get the time(UT!)
-	time_t	theTime;
-	time(&theTime);
-	struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	time_t ut_time = mktime(theTimeGMTAsStruct);
+	time_t	ut_time;
+	time(&ut_time);
+	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+	//time_t ut_time = mktime(theTimeGMTAsStruct);
 	
 	//insert a header before the start of sub-run record
 	[[self dataPacket] updateHeader];

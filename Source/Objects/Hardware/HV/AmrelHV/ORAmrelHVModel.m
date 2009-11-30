@@ -334,16 +334,16 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 {
 	if([[ORGlobal sharedGlobal] runInProgress]){
 		//get the time(UT!)
-		time_t	theTime;
-		time(&theTime);
-		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t	ut_Time;
+		time(&ut_Time);
+		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		
 		int i;
 		for(i=0;i<[self numberOfChannels];i++){
 			unsigned long data[5];
 			data[0] = dataId | 5;
 			data[1] = ((i & 0x1)<<28) | (([self outputState:i] & 0x1)<<16) | [self uniqueIdNumber]&0xfff;
-			data[2] = mktime(theTimeGMTAsStruct);
+			data[2] = ut_Time;
 			
 			union {
 				float asFloat;

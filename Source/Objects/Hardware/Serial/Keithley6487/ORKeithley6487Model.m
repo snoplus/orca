@@ -230,10 +230,10 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 {
 	current = aValue;
 	//get the time(UT!)
-	time_t	theTime;
-	time(&theTime);
-	struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	timeMeasured = mktime(theTimeGMTAsStruct);
+	time_t	ut_Time;
+	time(&ut_Time);
+	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+	timeMeasured = ut_Time;
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKeithley6487CurrentChanged 
 														object:self 
