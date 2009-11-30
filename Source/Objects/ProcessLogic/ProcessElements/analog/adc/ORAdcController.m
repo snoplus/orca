@@ -42,17 +42,42 @@
                      selector : @selector(minChangeChanged:)
                          name : ORAdcModelMinChangeChanged
                        object : model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(displayFormatChanged:)
+                         name : ORAdcModelDisplayFormatChanged
+						object: model];
+
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
     [self minChangeChanged:nil];
- }
+	[self displayFormatChanged:nil];
+}
+
+- (void) setButtonStates
+{
+	[super setButtonStates];
+    BOOL locked = [gSecurity isLocked:ORHWAccessLock];
+	[displayFormatField setEnabled: !locked ];
+}
+
+
+- (void) displayFormatChanged:(NSNotification*)aNote
+{
+	[displayFormatField setStringValue: [model displayFormat]];
+}
 
 - (void) minChangeChanged:(NSNotification*)aNote
 {
 	[minChangeField setFloatValue:[model minChange]];
+}
+
+- (void) displayFormatAction:(id)sender
+{
+	[model setDisplayFormat:[sender stringValue]];	
 }
 
 - (IBAction) minChangeAction:(id)sender

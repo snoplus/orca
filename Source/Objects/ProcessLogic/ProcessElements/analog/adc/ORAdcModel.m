@@ -25,6 +25,7 @@
 #import "ORProcessThread.h"
 #import "ORAdcProcessing.h"
 
+NSString* ORAdcModelDisplayFormatChanged = @"ORAdcModelDisplayFormatChanged";
 NSString* ORAdcModelMinChangeChanged = @"ORAdcModelMinChangeChanged";
 NSString* ORAdcModelOKConnection     = @"ORAdcModelOKConnection";
 NSString* ORAdcModelLowConnection    = @"ORAdcModelLowConnection";
@@ -34,12 +35,30 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 - (void) dealloc
 {
+    [displayFormat release];
 	[lowLimitNub release];
 	[highLimitNub release];
 	[super dealloc];
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) displayFormat
+{
+    return displayFormat;
+}
+
+- (void) setDisplayFormat:(NSString*)aDisplayFormat
+{
+	if(!aDisplayFormat)aDisplayFormat = @"%.1f";
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setDisplayFormat:displayFormat];
+    
+    [displayFormat autorelease];
+    displayFormat = [aDisplayFormat copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelDisplayFormatChanged object:self];
+}
 
 - (float) minChange
 {
@@ -282,7 +301,15 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
     theFont = [NSFont messageFontOfSize:8];
     NSDictionary* attrib;
 
-    if(hwName)	label = [NSString stringWithFormat:@"%.1f",[self hwValue]];
+    if(hwName)	{
+		NSString* theFormat = @".1f";
+		if([displayFormat length] != 0){
+			theFormat = displayFormat;
+		}
+		if([theFormat rangeOfString:@"%@"].location !=NSNotFound)theFormat = @".1f";
+		else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)theFormat = @".0f";
+		label = [NSString stringWithFormat:theFormat,[self hwValue]];
+	}
 	else		label = @"--";
 	n = [[NSAttributedString alloc] 
 		initWithString:label 
@@ -333,6 +360,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setDisplayFormat:[decoder decodeObjectForKey:@"displayFormat"]];
     [self setMinChange:[decoder decodeFloatForKey:@"minChange"]];
     [[self undoManager] enableUndoRegistration];    
 
@@ -342,6 +370,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:displayFormat forKey:@"displayFormat"];
     [encoder encodeFloat:minChange forKey:@"minChange"];
 }
 

@@ -25,10 +25,18 @@
 
 @interface ORAdcController : ORProcessHwAccessorController {
 	IBOutlet NSTextField* minChangeField;
+	IBOutlet NSTextField* displayFormatField;
  }
 
 #pragma mark ¥¥¥Initialization
 - (id)init;
+
+#pragma mark ***Interface Management
 - (void) minChangeChanged:(NSNotification*)aNote;
+- (void) displayFormatChanged:(NSNotification*)aNote;
+
+#pragma mark ***Actions
+- (IBAction) displayFormatAction:(id)sender;
 - (IBAction) minChangeAction:(id)sender;
 @end
+
