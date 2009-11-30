@@ -160,6 +160,7 @@
 		//the icon needs to be updated, but we have to wait until the next event to 
 		//avoid a drawing conflict
 		[model performSelector:@selector(setUpImage) withObject:nil afterDelay:0];
+		[self updateWindow];
     }
 }
 
