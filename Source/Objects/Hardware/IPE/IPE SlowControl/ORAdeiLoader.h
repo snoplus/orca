@@ -22,7 +22,11 @@
 #define kcsvFormat 0
 #define kxmlFormat 1
 
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORAdeiLoader : NSObject <NSXMLParserDelegate> {
+#else																						// pre-10.6 fallback
+@interface ORAdeiLoader : NSObject {
+#endif
 	NSString*			host;
 	NSURLConnection*	theAdeiConnection;
 	NSMutableData*		receivedData;
