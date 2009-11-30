@@ -457,7 +457,7 @@
 	[openPanel setPrompt:@"Choose Image"];
 	[openPanel beginSheetForDirectory:startDir
                                  file:nil
-                                types:[NSArray arrayWithObjects:@"pdf",@"tif",@"gif",@"png",@"jpeg",nil]
+                                types:[NSArray arrayWithObjects:@"pdf",@"tif",@"tiff",@"gif",@"png",@"jpeg",@"jpg",nil]
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
