@@ -598,14 +598,14 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 {
 	if([[ORGlobal sharedGlobal] runInProgress]){
 		//get the time(UT!)
-		time_t	theTime;
-		time(&theTime);
-		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t	ut_Time;
+		time(&ut_Time);
+		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		
 		unsigned long data[11];
 		data[0] = dataId | 11;
 		data[1] = [self uniqueIdNumber]&0xfff;
-		data[2] = mktime(theTimeGMTAsStruct);
+		data[2] = ut_Time;
 		
 		union {
 			float asFloat;

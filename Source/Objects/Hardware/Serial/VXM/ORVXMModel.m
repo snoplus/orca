@@ -176,10 +176,10 @@ NSString* ORVXMLock = @"ORVXMLock";
     if([[ORGlobal sharedGlobal] runInProgress]){
         if([self optionSet:kXYShipPositionOption]){
             //get the time(UT!)
-            time_t	theTime;
-            time(&theTime);
-            struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-            time_t ut_time = mktime(theTimeGMTAsStruct);
+            time_t	ut_time;
+            time(&ut_time);
+            //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+            //time_t ut_time = mktime(theTimeGMTAsStruct);
             
             unsigned long data[5];
             data[0] = dataId | 5;

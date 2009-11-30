@@ -517,10 +517,10 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     if([gOrcaGlobals runInProgress]){
 		
 		//get the time(UT!)
-		time_t	theTime;
-		time(&theTime);
-		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		time_t ut_time = mktime(theTimeGMTAsStruct); //seconds since 1970
+		time_t	ut_time;
+		time(&ut_time);
+		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		//time_t ut_time = mktime(theTimeGMTAsStruct); //seconds since 1970
 		
 		unsigned long data[4];		
 		data[0] = dataId | 4; 
