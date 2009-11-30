@@ -1524,7 +1524,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		throttle = 0;
 		if(runInfo.amountInBuffer > 0){
 			lastAmountInBuffer = runInfo.amountInBuffer;
-			NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
+			NSLog(@"%@ %d %d reading out last %d bytes in CB\n",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
 		}
 	}
 	@catch (NSException* localException) {
