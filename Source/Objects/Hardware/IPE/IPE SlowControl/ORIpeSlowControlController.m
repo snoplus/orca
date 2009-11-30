@@ -395,6 +395,7 @@
 
 - (IBAction) loadItemTree:(id)sender
 {
+	[self endEditing];
 	[model loadItemTree];
 }
 
@@ -617,8 +618,17 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 				else					 return  [itemDictionary objectForKey:@"Path"];
 			}
 			else if([theIdentifier isEqual:@"Value"]){
-				if(isControl) return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"value"] doubleValue]];
-				else          return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"Value"] doubleValue]];
+                //TODO: how can I control the rounding of NSNumber in the outline view cell?
+                // problem: NSNumber is rounded to 3 floating point digits, but we need all (or at least 4) digits! -tb-
+                // for now I just pass the string; I changed the cell content from number to text cell -tb-
+				//  if(isControl) return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"value"] doubleValue]];
+				//  else          return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"Value"] doubleValue]];
+                id retVal;
+                if(isControl) retVal = [itemDictionary objectForKey:@"value"];
+				else          retVal = [itemDictionary objectForKey:@"Value"];
+                if(retVal) return retVal;//yes, at the beginning it may be undefined! -tb-
+                else return @"--";
+                //TODO: for controls the key "value" contains the Control item id, not the current value -> use another key! -tb-
 			}
 			else if([theIdentifier isEqual:@"Name"]){
 				id theName = [itemDictionary objectForKey:@"Name"];

@@ -89,6 +89,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSubSec
 	theString = [theString stringByAppendingFormat:@"Polling Channel: %d\n",ptr[1] & 0xff];
 	theData.asLong = ptr[2];
 	theString = [theString stringByAppendingFormat:@"Value: %.4E\n",theData.asFloat];
+	// -tb- theString = [theString stringByAppendingFormat:@"Value: %.4E\n",theData.asFloat];
 	NSTimeInterval seconds = ptr[3] + ptr[4]/1000.;
 	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSince1970:seconds];
 	theString = [theString stringByAppendingFormat:@"Date: %@\n",theDate];

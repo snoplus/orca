@@ -680,7 +680,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
 	NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 	if(itemKey){
-		NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+		//TODO: needed two times? -tb- NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
 		return [[topLevelDictionary objectForKey:@"HiLimit"] doubleValue];
 	}
@@ -691,7 +691,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {    
 	NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 	if(itemKey){
-		NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+		//TODO: needed two times? -tb- NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
 		return [[topLevelDictionary objectForKey:@"LoAlarm"] doubleValue];
 	}
@@ -702,7 +702,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
 	NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 	if(itemKey){
-		NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+		//TODO: needed two times? -tb- NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
 		return [[topLevelDictionary objectForKey:@"HiAlarm"] doubleValue];
 	}
@@ -713,7 +713,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
 	NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 	if(itemKey){
-		NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+		//TODO: needed two times? -tb- NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
 		return [[topLevelDictionary objectForKey:@"LoLimit"] doubleValue];
 	}
@@ -725,7 +725,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {	
 	NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 	if(itemKey){
-		NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
+		//TODO: needed two times? -tb- NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
 		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
 		*theLowLimit  =  [[topLevelDictionary objectForKey:@"LoAlarm"]doubleValue] ;
 		*theHighLimit  =  [[topLevelDictionary objectForKey:@"HiAlarm"]doubleValue] ;
@@ -769,14 +769,6 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
 #pragma mark •••Methods Useful For Scripting
 //-------------should use only these methods in scripts---------------------------------
-- (void) setUrl:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
-{
-	ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
-	[aLoader writeControl:aPath value:aValue];
-	[self setPendingRequest:[self itemKey:aUrl :aPath]];
-	[self setTotalRequestCount:totalRequestCount+1];
-}
-
 - (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath
 {
 	ORAdeiLoader* aLoader;
@@ -797,9 +789,54 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
 {
-    ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:nil];
+    ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
     [aLoader writeControl:aPath value:aValue];
+	[self setPendingRequest:[self itemKey:aUrl :aPath]];
     [self setTotalRequestCount:totalRequestCount+1];
+}
+
+
+- (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath
+{
+    int channelNumber=-1;
+    NSString* itemKey = [self itemKey:aUrl :aPath];
+	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
+	if([itemDictionary objectForKey:@"Control"]) NSLog(@"%@: no Sensor channel found, is a Control channel!\n",NSStringFromClass([self class]));//-tb- warning output  //is a Control, not a Sensor
+    else channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+    return channelNumber;
+}
+
+- (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath
+{
+    int channelNumber=-1;
+    NSString* itemKey = [self itemKey:aUrl :aPath];
+	NSDictionary* topLevelDictionary	= [requestCache objectForKey:itemKey];
+	NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:itemKey];
+	if([itemDictionary objectForKey:@"Control"]) channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+    else NSLog(@"%@: no Control channel found, is a non-Control channel!\n",NSStringFromClass([self class]));//-tb- warning output //is a Sensor, not a Control
+    return channelNumber;
+}
+
+
+- (void) postControlSetpointForChan:(int)aChan value:(double)aValue
+{
+    NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+    if(itemKey){
+		id topLevelDictionary = [requestCache objectForKey:itemKey];
+		id anItem = [topLevelDictionary objectForKey:itemKey];
+		if([anItem objectForKey:@"Control"]){
+			NSString* aUrl  = [anItem objectForKey:@"URL"];
+			NSString* aPath = [anItem objectForKey:@"Path"];
+			[self postControlSetpoint:aUrl path:aPath value:aValue ];
+		}else{
+            NSLog(@"%@: you tried to write to a non-Control channel!\n",NSStringFromClass([self class]));//-tb- warning output
+            return;
+        }
+    }else{
+        NSLog(@"%@: you tried to use a undefined channel!\n",NSStringFromClass([self class]));
+        return;
+    }
 }
 
 
@@ -813,16 +850,25 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
 	//index is NOT channel
 	if(anIndex<[pollingLookUp count]){
-    NSLog(@"pollingLookUp:\n %@\n",pollingLookUp);
+        #if 0
+        NSLog(@"pollingLookUp:\n %@\n",pollingLookUp);
+        NSLog(@"channelLookup:\n %@\n",channelLookup);
+        NSLog(@"requestCache:\n %@\n",requestCache);
+        NSLog(@"itemTreeRoot:\n %@\n",itemTreeRoot);
+        #endif
 		NSString* itemKey = [pollingLookUp objectAtIndex:anIndex];
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
 		id anItem = [topLevelDictionary objectForKey:itemKey];
 		if([anItem objectForKey:@"Control"]){
 			NSString* aUrl  = [anItem objectForKey:@"URL"];
 			NSString* aPath = [anItem objectForKey:@"Path"];
+            #if 1
+            [self postControlSetpoint:aUrl path:aPath value:aValue];
+            #else
 			ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:nil];
 			[aLoader writeControl:aPath value:aValue];
 			[self setTotalRequestCount:totalRequestCount+1];
+            #endif
 		}
 	}
 }
