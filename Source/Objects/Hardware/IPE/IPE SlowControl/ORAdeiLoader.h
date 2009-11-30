@@ -22,7 +22,7 @@
 #define kcsvFormat 0
 #define kxmlFormat 1
 
-@interface ORAdeiLoader : NSObject {
+@interface ORAdeiLoader : NSObject <NSXMLParserDelegate> {
 	NSString*			host;
 	NSURLConnection*	theAdeiConnection;
 	NSMutableData*		receivedData;

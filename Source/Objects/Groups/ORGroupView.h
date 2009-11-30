@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-@interface ORGroupView : NSView {
+@interface ORGroupView : NSView <NSMenuDelegate>{
     id mouseTask;
     BOOL dragSessionInProgress;
     BOOL goodObjectsInDrag;
