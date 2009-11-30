@@ -58,6 +58,10 @@
 - (void) lineColorChanged:(NSNotification*)aNotification;
 - (void) lineTypeChanged:(NSNotification*)aNotification;
 
+#pragma mark ¥¥¥Forwarding
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector;
+- (void) forwardInvocation:(NSInvocation *)invocation;
+- (void) messageDump;
 @end
 
 #pragma mark ¥¥¥External String Definitions

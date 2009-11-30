@@ -32,6 +32,9 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 NSString* ORLabelModelUpdateIntervalChanged		 = @"ORLabelModelUpdateIntervalChanged";
 NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
+@interface ORLabelModel (private)
+- (NSString*) stringToDisplay;
+@end
 
 @implementation ORLabelModel
 
@@ -201,21 +204,8 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     //so, we cache the image here so that each Label can have its own version for drawing into.
     //---------------------------------------------------------------------------------------------------
 	if(label){
-		NSString* s = @"";
-		if(labelType == kStaticLabel){
-			s = label;
-		}
-		else {
-			if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
-				NSString* f;
-				if([displayFormat length])f = displayFormat;
-				else f = @"%.2f";
-				s = [NSString stringWithFormat:f,[displayValue floatValue]];
-			}
-			else {
-				s = [NSString stringWithFormat:@"%@",displayValue];
-			}
-		}
+		NSString* s = [self stringToDisplay];
+
 		NSAttributedString* n = [[NSAttributedString alloc] 
 								initWithString:[s length]?s:@"Text Label"
 									attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Geneva"  size:textSize] forKey:NSFontAttributeName]];
@@ -248,22 +238,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		[highlightedImage release];
 		highlightedImage = [[NSImage alloc] initWithSize:[anImage size]];
 		[highlightedImage lockFocus];
-		
-		NSString* s = @"";
-		if(labelType == kStaticLabel){
-			s = label;
-		}
-		else {
-			if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
-				NSString* f;
-				if([displayFormat length])f = displayFormat;
-				else f = @"%.2f";
-				s = [NSString stringWithFormat:f,[displayValue floatValue]];
-			}
-			else {
-				s = [NSString stringWithFormat:@"%@",displayValue];
-			}
-		}
+		NSString* s = [self stringToDisplay];
 		NSAttributedString* n = [[NSAttributedString alloc] 
 								 initWithString:[s length]?s:@"Text Label"
 								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Geneva"  size:textSize],NSFontAttributeName,
@@ -275,6 +250,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		[highlightedImage unlockFocus];
 	}
 }
+
 
 - (int) labelType
 {
@@ -395,4 +371,31 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	[encoder encodeInt:updateInterval forKey:@"updateInterval"];
 }
 
+@end
+
+@implementation ORLabelModel (private)
+- (NSString*) stringToDisplay
+{
+	NSString* s = @"";
+	if(labelType == kStaticLabel){
+		s = label;
+	}
+	else {
+		if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
+			NSString* f;
+			if([displayFormat length])f = displayFormat;
+			else f = @"%.2f";
+			if([f rangeOfString:@"%d"].location != NSNotFound){
+				s = [NSString stringWithFormat:f,[displayValue intValue]];
+			}
+			else {
+				s = [NSString stringWithFormat:f,[displayValue floatValue]];
+			}
+		}
+		else {
+			s = [NSString stringWithFormat:@"%@",displayValue];
+		}
+	}
+	return s;
+}
 @end

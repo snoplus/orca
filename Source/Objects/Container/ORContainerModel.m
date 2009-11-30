@@ -47,7 +47,7 @@ NSString* ORContainerBackgroundImageChangedNotification = @"ORContainerBackgroun
 	float scale = MIN(.8,MIN(xScale,yScale));
 	float newWidth = [anImage size].width*scale;
 	float newHeight = [anImage size].height*scale;
-	
+	[anImage setScalesWhenResized:YES];
 	[anImage setSize:NSMakeSize(newWidth,newHeight)];
 	[anImage compositeToPoint:NSMakePoint([aCachedImage size].width/2. - [anImage size].width/2., [aCachedImage size].height/2. - [anImage size].height/2.) operation:NSCompositeSourceAtop];
 	[anImage release];

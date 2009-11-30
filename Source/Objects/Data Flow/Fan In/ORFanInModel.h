@@ -49,11 +49,17 @@
 - (void) lineColorChanged:(NSNotification*)aNotification;
 - (void) lineTypeChanged:(NSNotification*)aNotification;
 
+#pragma mark ¥¥¥Cached Messages
 //used with caching to speed up the data processing.
 - (void) runTaskStarted:(id)userInfo;
 - (void) runTaskStopped:(id)userInfo;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 - (void) closeOutRun:(id)userInfo;
+
+#pragma mark ¥¥¥Forwarding
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector;
+- (void) messageDump;
+- (void) forwardInvocation:(NSInvocation *)invocation;
 
 @end
 

@@ -376,7 +376,7 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
 }
 
 
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+- (NSMethodSignature*)methodSignatureForSelector:(SEL)aSelector
 {
 	
 	if( [[self class] instancesRespondToSelector:aSelector] ) {
@@ -384,14 +384,26 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
 		return [[self class] instanceMethodSignatureForSelector:aSelector];
 	}
 	else {
+		NSMethodSignature* methodSignature = nil;
 		//Get the instance method signature from the Strategy.
 		short i;
 		for(i=0;i<[self numberOfOutputs];i++){
             id obj = [self objectConnectedTo:kFanOutConnectorKey[i]];
-			if(obj)return [obj methodSignatureForSelector:aSelector];
+			if(obj){
+				methodSignature = [obj methodSignatureForSelector:aSelector];
+				if(methodSignature)return methodSignature;
+			}
+		}
+		if(!methodSignature){
+			//there was no method found... we will dump the message. One way this happens is if there is nothing connected to the fanout.
+			return [[self class] instanceMethodSignatureForSelector:@selector(messageDump)];
 		}
 	}
 	return nil;
+}
+
+- (void) messageDump
+{
 }
 
 - (void) forwardInvocation:(NSInvocation *)invocation

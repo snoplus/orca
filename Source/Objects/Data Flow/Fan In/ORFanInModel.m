@@ -383,10 +383,18 @@ static NSString *ORFanInNumber 		= @"Number of Fan In Inputs";
 		return [[self class] instanceMethodSignatureForSelector:aSelector];
 	}
 	else {
+		NSMethodSignature* methodSignature = nil;
 		id obj = [self objectConnectedTo:ORFanInOutputConnection];
-		if(obj)return [obj methodSignatureForSelector:aSelector];
+		if(obj)methodSignature =  [obj methodSignatureForSelector:aSelector];
+		if(methodSignature)return methodSignature;
+		//there was no method found... we will dump the message. One way this happens is if there is nothing connected to the fanout.
+		else return [[self class] instanceMethodSignatureForSelector:@selector(messageDump)];
 	}
 	return nil;
+}
+
+- (void) messageDump
+{
 }
 
 - (void) forwardInvocation:(NSInvocation *)invocation
