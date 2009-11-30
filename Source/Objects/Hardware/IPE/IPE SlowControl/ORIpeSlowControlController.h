@@ -19,7 +19,7 @@
 @class ORPlotter1D;
 @class WebView;
 
-@interface ORIpeSlowControlController : OrcaObjectController
+@interface ORIpeSlowControlController : OrcaObjectController <NSComboBoxDataSource>
 {
 	IBOutlet ORPlotter1D*		timingPlotter;   
 	IBOutlet NSButton*			shipRecordsCB;
