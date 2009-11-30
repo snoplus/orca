@@ -19,7 +19,12 @@
 @class ORPlotter1D;
 @class WebView;
 
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORIpeSlowControlController : OrcaObjectController <NSComboBoxDataSource>
+#else
+@interface ORIpeSlowControlController : OrcaObjectController
+#endif
+
 {
 	IBOutlet ORPlotter1D*		timingPlotter;   
 	IBOutlet NSButton*			shipRecordsCB;
