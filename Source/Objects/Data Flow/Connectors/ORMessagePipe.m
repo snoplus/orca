@@ -43,14 +43,22 @@
 #pragma mark ¥¥¥Message Passing
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
 {
-    if(![self respondsToSelector:aSelector]){
-		id obj = [[destination connector] objectLink];
-		if(obj)return [obj methodSignatureForSelector:aSelector];
-		else return [super methodSignatureForSelector:aSelector];
+ 	if( [[self class] instancesRespondToSelector:aSelector] ) {
+		return [[self class] instanceMethodSignatureForSelector:aSelector];
 	}
-    else {
-        return [super methodSignatureForSelector:aSelector];
-    }
+	else {
+		NSMethodSignature* methodSignature = nil;
+		id obj = [[destination connector] objectLink];
+		if(obj)methodSignature =  [obj methodSignatureForSelector:aSelector];
+		if(methodSignature)return methodSignature;
+		//there was no method found... we will dump the message. One way this happens is if there is nothing connected to the fanout.
+		else return [[self class] instanceMethodSignatureForSelector:@selector(messageDump)];
+	}
+	return nil;
+}
+
+- (void) messageDump
+{
 }
 
 - (void) forwardInvocation:(NSInvocation *)invocation
@@ -72,11 +80,11 @@
 	}
 }
 
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) processData:(NSArray*)anArray decoder:(ORDecoder*)aDecoder
 {
 	id obj = [[destination connector] objectLink];
-	if(obj && [obj respondsToSelector:@selector(processData:userInfo:)]){
-		[obj processData:aDataPacket userInfo:userInfo];
+	if(obj && [obj respondsToSelector:@selector(processData:decoder:)]){
+		[obj processData:anArray decoder:aDecoder];
 	}
 }
 

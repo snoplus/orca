@@ -22,7 +22,7 @@
 
 
 @class ORConnector;
-@class ORDataPacket;
+@class ORDecoder;
 
 @interface ORMessagePipe : NSObject {
 	ORConnector* destination;
@@ -37,10 +37,12 @@
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector;
 - (void) forwardInvocation:(NSInvocation *)invocation;
 - (void) connectionChanged;
+- (void) messageDump;
+
 
 #pragma mark ¥¥¥Optimization
 - (void) runTaskStarted:(id)userInfo;
-- (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 - (void) runTaskStopped:(id)userInfo;
 - (void) closeOutRun:(id)userInfo;
 

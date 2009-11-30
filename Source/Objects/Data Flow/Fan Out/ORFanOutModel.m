@@ -387,7 +387,8 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
 		NSMethodSignature* methodSignature = nil;
 		//Get the instance method signature from the Strategy.
 		short i;
-		for(i=0;i<[self numberOfOutputs];i++){
+		int n = [self numberOfOutputs];
+		for(i=0;i<n;i++){
             id obj = [self objectConnectedTo:kFanOutConnectorKey[i]];
 			if(obj){
 				methodSignature = [obj methodSignatureForSelector:aSelector];
