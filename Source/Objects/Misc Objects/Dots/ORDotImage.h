@@ -23,13 +23,17 @@
 
 
 @interface ORDotImage : NSImage 
-{}
+{
+	NSImage *shadowImage;
+	NSImage *colorMaskImage;
+	NSImage *refractionMaskImage;
+}
 
 + (ORDotImage *)dotWithColor:(NSColor *)aColor;
 + (ORDotImage *)vRectWithColor:(NSColor *)aColor;
 + (ORDotImage *)hRectWithColor:(NSColor *)aColor;
 + (ORDotImage *)bigDotWithColor:(NSColor *)aColor; 
 + (ORDotImage *)smallDotWithColor:(NSColor *)aColor;
-- initWithColor:(NSColor *)aColor;
+- (id) initWithColor:(NSColor *)aColor shadowImage:(NSImage*)aShadowImage colorMaskImage:(NSImage*)aColorMaskImage refractionMaskImage:(NSImage*)aRefractionMaskImage;
 
 @end
