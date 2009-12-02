@@ -59,6 +59,11 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
 	}
 }
 
+- (NSString*) helpURL
+{
+	return @"Subsystems/Containers_and_Dynamic_Labels.html";
+}
+
 - (NSMutableDictionary*) remoteConnectors
 {
 	return remoteConnectors;
