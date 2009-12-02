@@ -73,10 +73,10 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (void)	processOneCommandFromQueue;
 - (int)		checkSum:(NSString*)aString;
 - (void)	enqueCmdData:(NSData*)someData;
-- (void)	processReceivedString:(NSString*)aCommand;
+- (void)	processReceivedData:(NSData*)aCommand;
 - (BOOL)	extractBool:(NSString*)aCommand;
 - (int)		extractInt:(NSString*)aCommand;
-- (float)	extractFloat:(NSString*)aCommand;
+- (float)	extractFloat:(NSData*)aCommand;
 - (NSString*) extractString:(NSString*)aCommand;
 - (void) clearAlarms;
 @end
@@ -604,49 +604,41 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
 		[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
 		
-		char* p = (char*)[inComingData bytes];
-		int i;
-		int numCharsProcessed=0;
-		NSMutableData* cmd =  [NSMutableData dataWithCapacity:64];
-		NSLog(@"received: %@\n",inComingData);
-		for(i=0;i<[inComingData length];i++){
-/*
-			[cmd appendBytes:p length:1];
-			if(*p == '\r'){
-				NSString* s = [[[NSString alloc] initWithData:cmd encoding:NSASCIIStringEncoding] autorelease];
-				numCharsProcessed += [cmd length];
-				[cmd setLength:0];
-				if([s rangeOfString:@"=?"].location == NSNotFound){
-					NSLog(@"received: %@\n",s);
-					[self processReceivedString:s];
-				}
+		do {
+			char* p = (char*)[inComingData bytes];
+			int i;
+			NSLog(@"received: %@\n",inComingData);
+			int n = [inComingData length];
+			BOOL foundEnd = NO;
+			for(i=0;i<n;i++){
+				if(p[i] == 0x03 && n>=i+2){
+					[self processReceivedData:[NSData dataWithBytes:p length:i+2]];
+					[inComingData replaceBytesInRange:NSMakeRange(0,i+2) withBytes:nil length:0];
+					foundEnd = YES;
+					break;
+				} 
 			}
-			p++;
- */
-		}
-		if(numCharsProcessed){
-			[inComingData replaceBytesInRange:NSMakeRange(0,numCharsProcessed) withBytes:nil length:0];
-		}
+			if(!foundEnd) break;
+		} while([inComingData length]!=0);
 	}
 }
 
-- (void) decode:(int)paramNumber command:(NSString*)aCommand
+- (void) decode:(int)paramNumber command:(NSData*)aCommand
 {
 	switch (paramNumber) {
-		case kDeviceAddress: [self setDeviceAddress:	[self extractInt:aCommand]]; break;
-		case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]]; break;
-		case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]]; break;
-		case kOilDeficiency: [self setOilDeficiency:	[self extractBool:aCommand]]; break;
-		case kTempDriveUnit: [self setDriveUnitOverTemp:[self extractBool:aCommand]]; break;
-		case kTempTurbo:	 [self setTurboPumpOverTemp:[self extractBool:aCommand]]; break;
-		case kSpeedAttained: [self setSpeedAttained:	[self extractBool:aCommand]]; break;
-		case kAccelerating:  [self setTurboAccelerating:[self extractBool:aCommand]]; break;
+		//case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]]; break;
+		//case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]]; break;
+		//case kOilDeficiency: [self setOilDeficiency:	[self extractBool:aCommand]]; break;
+		//case kTempDriveUnit: [self setDriveUnitOverTemp:[self extractBool:aCommand]]; break;
+		//case kTempTurbo:	 [self setTurboPumpOverTemp:[self extractBool:aCommand]]; break;
+		//case kSpeedAttained: [self setSpeedAttained:	[self extractBool:aCommand]]; break;
+		//case kAccelerating:  [self setTurboAccelerating:[self extractBool:aCommand]]; break;
 
-		case kSetSpeed:		[self setSetRotorSpeed:		[self extractInt:aCommand]];   break;
-		case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
-		case kMotorCurrent: [self setMotorCurrent:		[self extractFloat:aCommand]]; break;
+		//case kSetSpeed:		[self setSetRotorSpeed:		[self extractInt:aCommand]];   break;
+		//case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
+		//case kMotorCurrent: [self setMotorCurrent:		[self extractFloat:aCommand]]; break;
 		case kPressure:		[self setPressure:			[self extractFloat:aCommand]]; break;			
-		case kUnitName:		NSLog(@"DCU Unit: %@\n",	[self extractString:aCommand]);break;	
+		//case kUnitName:		NSLog(@"DCU Unit: %@\n",	[self extractString:aCommand]);break;	
 		default:
 		break;
 	}
@@ -665,7 +657,18 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 
 - (BOOL)  extractBool: (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]!=0; }
 - (int)   extractInt:  (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]; }
-- (float) extractFloat:(NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] floatValue]; }
+
+- (float) extractFloat:(NSData*)aCommand	
+{ 
+	if([aCommand length]>=16){
+		NSString* s = [[NSString alloc] initWithData:[aCommand subdataWithRange:NSMakeRange(4,14)] encoding:NSASCIIStringEncoding];
+		float theValue = [s floatValue];
+		[s release];
+		return theValue; 
+	}
+	else return 0;
+}
+
 - (NSString*) extractString:(NSString*)aCommand	
 {
 	int numChars = [[aCommand substringWithRange:NSMakeRange(8,2)] intValue];
@@ -686,7 +689,6 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	if([cmdQueue count] == 0) return;
 	NSData* cmdData = [cmdQueue dequeue];
 	[self setLastRequest:cmdData];
-	NSLog(@"send: %@\n",cmdData);
 	[serialPort writeDataInBackground:cmdData];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
 }
@@ -727,23 +729,21 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	return s;
 }
 
-- (void) processReceivedString:(NSString*)aCommand
+- (void) processReceivedData:(NSData*)aCommand
 {
 	BOOL doNextCommand = NO;
-	//double check that the device address matches.
-	int anAddress = [[aCommand substringToIndex:3] intValue];
-	if(anAddress == deviceAddress){
-		int receivedParam = [[aCommand substringWithRange:NSMakeRange(5,3)] intValue];
-		[self decode:receivedParam command:aCommand];
+	unsigned char* p = (unsigned char*)[aCommand bytes];
+	int receivedWindow = (p[2]-'0')*100 + (p[3]-'0')*10 + (p[4]-'0');
+	[self decode:receivedWindow command:aCommand];
 		
-		if(lastRequest){
-			//if the param number matches the last cmd sent, then assume a match and remove the timeout
-//			int lastParam	  = [[lastRequest    substringWithRange:NSMakeRange(5,3)] intValue];
-//			if(receivedParam == lastParam){
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-				[self setLastRequest:nil];			 //clear the last request
-				doNextCommand = YES;
-//			}
+	if(lastRequest){
+		//if the param number matches the last cmd sent, then assume a match and remove the timeout
+		unsigned char* p = (unsigned char*)[lastRequest bytes];
+		int lastWindow = (p[2]-'0')*100 + (p[3]-'0')*10 + (p[4]-'0');
+		if(receivedWindow == lastWindow){
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+			[self setLastRequest:nil];			 //clear the last request
+			doNextCommand = YES;
 		}
 	}
 	
