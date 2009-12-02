@@ -17,19 +17,17 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-
 #pragma mark ***Imported Files
 #import "ORVmeIOCard.h"
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 #import "SBC_Config.h"
 #import "AutoTesting.h"
+#import "ORSISRegisterDefs.h"
 
 @class ORRateGroup;
 @class ORAlarm;
 
-#define kNumSIS3302Channels			8 
 
 @interface ORSIS3302Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
@@ -169,30 +167,20 @@
 - (void) readModuleID:(BOOL)verbose;
 - (void) writeControlStatusRegister;
 - (void) writeAcquistionRegister;
-- (void) writeEventConfigurationRegister;
 - (void) writeThresholds;
 - (void) readThresholds:(BOOL)verbose;
 - (void) setLed:(BOOL)state;
 - (void) enableUserOut:(BOOL)state;
-- (void) startSampling;
-- (void) stopSampling;
-- (void) startBankSwitching;
-- (void) stopBankSwitching;
-- (void) clearBankFullFlag:(int)whichFlag;
-- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
-- (void) writeTriggerClearValue:(unsigned long)aValue;
-- (void) setMaxNumberEvents:(unsigned long)aValue;
-- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank;
-- (unsigned long) readTriggerTime:(int)bank index:(int)index;
+//- (void) startSampling;
+//- (void) stopSampling;
+//- (void) startBankSwitching;
+//- (void) stopBankSwitching;
+//- (void) clearBankFullFlag:(int)whichFlag;
 
 - (void) disArm:(int)bank;
 - (void) arm:(int)bank;
 - (BOOL) bankIsFull:(int)bank;
 - (void) writeTriggerSetups;
-
-//some test functions
-- (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
-- (void) readAddressCounts;
 
 - (int) dataWord:(int)chan index:(int)index;
 

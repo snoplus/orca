@@ -57,65 +57,6 @@ NSString* ORSIS3302PeakingTimeChanged			= @"ORSIS3302PeakingTimeChanged";
 NSString* ORSIS3302InternalTriggerDelayChanged	= @"ORSIS3302InternalTriggerDelayChanged";
 NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChanged";
 
-//general register offsets
-#define kControlStatus				0x00		// [] Control/Status
-#define kModuleIDReg				0x04		// [] module ID
-#define kAcquisitionControlReg		0x10		// [] Acquistion Control 
-#define kADCDacControlStatus		0x50		// [] DAC Control/Status Reg
-#define kGeneralReset				0x20		// [] General Reset
-#define kStartSampling				0x30		// [] Start Sampling
-#define kStopSampling				0x34		// [] Stop Sampling
-#define kStartAutoBankSwitch		0x40		// [] Start Auto Bank Switching
-#define kStopAutoBankSwitch			0x44		// [] Start Auto Bank Switching
-#define kClearBank1FullFlag			0x48		// [] Clear Bank 1 Full Flag
-#define kClearBank2FullFlag			0x4C		// [] Clear Bank 2 Full Flag
-#define kEventConfigAll				0x00100000	// [] Event Config (ALL)
-#define kTriggerSetupReg			0x100028
-#define kTriggerSetupReg			0x100028
-#define kTriggerFlagClrCounterReg	0x10001C
-#define kMaxNumberEventsReg			0x10002C
-
-// Bits in the data acquisition control register:
-//defined state sets value, shift left 16 to clear
-#define ACQMask(state,A) ((state)?(A):(A<<16))
-#define kSISSampleBank1			0x0001L
-#define kSISSampleBank2			0x0002L
-#define kSISBankSwitch			0x0004L
-#define kSISMultiEvent			0x0020L
-#define kSISClockSrcBit1        0x1000L
-#define kSISClockSrcBit2        0x2000L
-#define kSISClockSrcBit3        0x4000L
-#define kSISClockSetShiftCount  12
-#define kSISBusyStatus			0x00010000
-#define kSISBank1ClockStatus	0x00000001
-#define kSISBank2ClockStatus	0x00000002
-#define kSISBank1BusyStatus		0x00100000
-#define kSISBank2BusyStatus		0x00400000
-
-//Control Status Register Bits
-//defined state sets value, shift left 16 to clear
-#define CSRMask(state,A) ((state)?(A):(A<<16))
-#define kSISLed							0x0001L
-#define kSISUserOutput					0x0002L
-#define kSISInvertTrigger				0x0010L
-#define kSISTriggerOnArmedAndStarted	0x0020L
-#define kSISInternalTriggerRouting		0x0040L
-#define kSISBankFullTo1					0x0100L
-#define kSISBankFullTo2					0x0200L
-#define kSISBankFullTo3					0x0400L
-#define kCSRReservedMask				0xF888L //reserved bits
-
-// Bits in event register.
-#define kSISPageSizeMask       0x00000007
-#define kSISWrapMask           0x00000008
-
-#define  kSISEventDirEndEventMask	0x1ffff
-#define  kSISEventDirWrapFlag		0x80000
-
-//Bits and fields in the threshold register.
-#define kSISTHRLt             0x8000
-#define kSISTHRChannelShift    16
-
 
 @interface ORSIS3302Model (private)
 - (void) writeDacOffsets;
@@ -125,91 +66,74 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 #pragma mark •••Static Declarations
 static unsigned long thresholdRegOffsets[8]={
-	0x02000034,
-	0x0200003C,
-	0x02800034,
-	0x0280003C,
-	0x03000034,
-	0x0300003C,
-	0x03800034,
-	0x0380003C
+	kSIS3302TriggerThresholdAdc1,
+	kSIS3302TriggerThresholdAdc2,
+	kSIS3302TriggerThresholdAdc3,
+	kSIS3302TriggerThresholdAdc4,
+	kSIS3302TriggerThresholdAdc5,
+	kSIS3302TriggerThresholdAdc6,
+	kSIS3302TriggerThresholdAdc7,
+	kSIS3302TriggerThresholdAdc8
 };
 
 static unsigned long triggerSetupRegOffsets[8]={
-	0x02000030,
-	0x02000038,
-	0x02800030,
-	0x02800038,
-	0x03000030,
-	0x03000038,
-	0x03800030,
-	0x03800038
+	kSIS3302TriggerSetupAdc1,
+	kSIS3302TriggerSetupAdc2,
+	kSIS3302TriggerSetupAdc3,
+	kSIS3302TriggerSetupAdc4,
+	kSIS3302TriggerSetupAdc5,
+	kSIS3302TriggerSetupAdc6,
+	kSIS3302TriggerSetupAdc7,
+	kSIS3302TriggerSetupAdc8
 };
 
 static unsigned long triggerExtSetupRegOffsets[8]={
-	0x02000030,
-	0x02000038,
-	0x02800030,
-	0x02800038,
-	0x03000030,
-	0x03000038,
-	0x03800030,
-	0x03800038
+	kSIS3302TriggerExtendedSetupAdc1,
+	kSIS3302TriggerExtendedSetupAdc2,
+	kSIS3302TriggerExtendedSetupAdc3,
+	kSIS3302TriggerExtendedSetupAdc4,
+	kSIS3302TriggerExtendedSetupAdc5,
+	kSIS3302TriggerExtendedSetupAdc6,
+	kSIS3302TriggerExtendedSetupAdc7,
+	kSIS3302TriggerExtendedSetupAdc8
 };
 
 
 static unsigned long endThresholdRegOffsets[4]={
-	0x02000004,
-	0x02800004,
-	0x03000004,
-	0x03800004
+	kSIS3302ENDAddressThresholdAdc12,
+	kSIS3302ENDAddressThresholdAdc34,
+	kSIS3302ENDAddressThresholdAdc56,
+	kSIS3302ENDAddressThresholdAdc78
 };
 
 static unsigned long preTriggerDelayRegOffsets[4]={
-	0x02000008,
-	0x02800008,
-	0x03000008,
-	0x03800008
+	kSIS3302PretriggerDelayTriggergateLengthAdc12,
+	kSIS3302PretriggerDelayTriggergateLengthAdc34,
+	kSIS3302PretriggerDelayTriggergateLengthAdc56,
+	kSIS3302PretriggerDelayTriggergateLengthAdc78
 };
 
+static unsigned long sampleAddress[8]={
+	kSIS3302ActualSampleAddressAdc1,
+	kSIS3302ActualSampleAddressAdc2,
+	kSIS3302ActualSampleAddressAdc3,
+	kSIS3302ActualSampleAddressAdc4,
+	kSIS3302ActualSampleAddressAdc5,
+	kSIS3302ActualSampleAddressAdc6,
+	kSIS3302ActualSampleAddressAdc7,
+	kSIS3302ActualSampleAddressAdc8
+};
 
 static unsigned long adcMemory[8]={
-	0x04000000,
-	0x04800000,
-	0x05000000,
-	0x05800000,
-	0x06000000,
-	0x06800000,
-	0x07000000,
-	0x07800000
+	kSIS3302Adc1Offset,
+	kSIS3302Adc2Offset,
+	kSIS3302Adc3Offset,
+	kSIS3302Adc4Offset,
+	kSIS3302Adc5Offset,
+	kSIS3302Adc6Offset,
+	kSIS3302Adc7Offset,
+	kSIS3302Adc8Offset
 };
-
-static unsigned long eventCountOffset[4][2]={ //group,bank
-{0x00200010,0x00200014},
-{0x00280010,0x00280014},
-{0x00300010,0x00300014},
-{0x00380010,0x00380014},
-};
-
-static unsigned long eventDirOffset[4][2]={ //group,bank
-{0x00201000,0x00202000},
-{0x00281000,0x00282000},
-{0x00301000,0x00302000},
-{0x00381000,0x00382000},
-};
-
-static unsigned long addressCounterOffset[4][2]={ //group,bank
-{0x00200008,0x0020000C},
-{0x00280008,0x0028000C},
-{0x00300008,0x0030000C},
-{0x00380008,0x0038000C},
-};
-
-#define kTriggerEvent1DirOffset 0x101000
-#define kTriggerEvent2DirOffset 0x102000
-
-#define kTriggerTime1Offset 0x1000
-#define kTriggerTime2Offset 0x2000
 
 #pragma mark ***Initialization
 - (id) init 
@@ -633,7 +557,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {	
 	unsigned long result = 0;
 	[[self adapter] readLongBlock:&result
-                         atAddress:[self baseAddress] + kModuleIDReg
+                         atAddress:[self baseAddress] + kSIS3302ModID
                         numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -659,7 +583,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	//put the inverse in the top bits to turn off everything else
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask ;
 	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kControlStatus
+                         atAddress:[self baseAddress] + kSIS3302ControlStatus
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -678,32 +602,17 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
 	
 	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
+                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
-
-- (void) writeEventConfigurationRegister
-{
-	//enable/disable autostop at end of page
-	//set pagesize
-	unsigned long aMask = 0x0;
-	aMask					  |= pageSize;
-	if(pageWrap)		aMask |= kSISWrapMask;
-	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kEventConfigAll
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
 
 - (void) setLed:(BOOL)state
 {
 	unsigned long aValue = CSRMask(state,kSISLed);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kControlStatus
+                         atAddress:[self baseAddress] + kSIS3302ControlStatus
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -713,32 +622,14 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 	unsigned long aValue = CSRMask(state,kSISUserOutput);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kControlStatus
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) writeTriggerClearValue:(unsigned long)aValue
-{
-
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kTriggerFlagClrCounterReg
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) setMaxNumberEvents:(unsigned long)aValue
-{
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kMaxNumberEventsReg
+                         atAddress:[self baseAddress] + kSIS3302ControlStatus
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
 
 
+/*
 - (void) startSampling
 {
 	unsigned long aValue = 0x0;
@@ -788,34 +679,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
-
-- (unsigned long) eventNumberGroup:(int)group bank:(int) bank
-{
-	//Note, here banks are 0,1,2,3 NOT 1,2,3,4
-	unsigned long eventNumber = 0x0;   
-	[[self adapter] readLongBlock:&eventNumber
-						atAddress:[self baseAddress] + eventCountOffset[group][bank]
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-	
-	return eventNumber;
-}
-
-- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank
-{
-	//Note, here banks are 0,1,2,3 NOT 1,2,3,4
-	unsigned long triggerWord = 0x0;   
-	[[self adapter] readLongBlock:&triggerWord
-						atAddress:[self baseAddress] + eventDirOffset[group][bank]
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-	
-	return triggerWord;
-}
+*/
 
 - (int) dataWord:(int)chan index:(int)index
 {
@@ -828,31 +692,11 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	else return 0;
 }
 
-- (void) readAddressCounts
-{
-	unsigned long aValue;   
-	unsigned long aValue1; 
-	int i;
-	for(i=0;i<4;i++){
-		[[self adapter] readLongBlock:&aValue
-							atAddress:[self baseAddress] + addressCounterOffset[i][0]
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		[[self adapter] readLongBlock:&aValue1
-							atAddress:[self baseAddress] + addressCounterOffset[i][1]
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		NSLog(@"Group %d Address Counters:  0x%04x   0x%04x\n",i,aValue,aValue1);
-	}
-}
-
 - (unsigned long) acqReg
 {
  	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kAcquisitionControlReg
+						atAddress:[self baseAddress] + kSIS3302AcquistionControl
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -863,7 +707,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
  	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kControlStatus
+						atAddress:[self baseAddress] + kSIS3302ControlStatus
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -874,7 +718,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
  	unsigned long aValue = ACQMask(FALSE,bank?kSISSampleBank2:kSISSampleBank1);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
+                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -884,7 +728,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
  	unsigned long aValue = ACQMask(TRUE , bank?kSISSampleBank2:kSISSampleBank1);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
+                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -894,7 +738,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 	unsigned long aValue=0;
 	[[self adapter] readLongBlock:&aValue
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
+                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
                         numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -906,7 +750,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 	unsigned long aValue=0;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kAcquisitionControlReg
+						atAddress:[self baseAddress] + kSIS3302AcquistionControl
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -987,36 +831,12 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	}
 }
 
-- (unsigned long) readTriggerTime:(int)bank index:(int)index
-{   		
-	unsigned long aValue;
-	[[self adapter] readLongBlock: &aValue
-						atAddress: [self baseAddress] + (bank?kTriggerTime2Offset:kTriggerTime1Offset) + index*sizeof(long)
-						numToRead: 1
-					   withAddMod: [self addressModifier]
-					usingAddSpace: 0x01];
-		
-	return aValue;
-}
-
-- (unsigned long) readTriggerEventBank:(int)bank index:(int)index
-{   		
-	unsigned long aValue;
-	[[self adapter] readLongBlock: &aValue
-						atAddress: [self baseAddress] + (bank?kTriggerEvent2DirOffset:kTriggerEvent1DirOffset) + index*sizeof(long)
-						numToRead: 1
-					   withAddMod: [self addressModifier]
-					usingAddSpace: 0x01];
-	
-	return aValue;
-}
-
 - (BOOL) isBusy
 {
 	
 	unsigned long aValue = 0;
 	[[self adapter] readLongBlock: &aValue
-						atAddress: [self baseAddress] + kAcquisitionControlReg
+						atAddress: [self baseAddress] + kSIS3302AcquistionControl
 						numToRead: 1
 					   withAddMod: [self addressModifier]
 					usingAddSpace: 0x01];
@@ -1028,11 +848,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {  
 	//[self reset];							//reset the card
 	[self writeAcquistionRegister];			//set up the Acquisition Register
-	//[self writeEventConfigurationRegister];	//set up the Event Config Register
 	[self writeThresholds];
 	//[self writeControlStatusRegister];		//set up Control/Status Register
 	[self writeTriggerSetups];
-	//[self writeTriggerClearValue:[self numberOfSamples]+100];
 	
 }
 
@@ -1063,44 +881,69 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (void) testEventRead
 {
-	[self reset];
-	[self initBoard];
-
-	[self clearBankFullFlag:0];
-	[self arm:0];
-	[self startSampling];
-	int totalTime = 0;
-	BOOL timeout = NO;
-	while(![self bankIsFull:0]){
-		[ORTimer delay:.1];
-		if(totalTime++ >= 10){
-			timeout = YES;
-			break;
-		}
-	}
-	if(!timeout){
-		int numEvents= [self eventNumberGroup:0 bank:0];
-		NSLog(@"Number Events: %d\n",numEvents);
-		unsigned long triggerEventDir;
-		triggerEventDir = [self readTriggerEventBank:0 index:0];
-
-		BOOL wrapped = ((triggerEventDir&0x80000) !=0);
-		unsigned long startOffset = triggerEventDir & 0x1ffff;
-		NSLog(@"address counter0:0x%0x wrapped: %d\n",startOffset,wrapped);
-		[self readAddressCounts];
-		//unsigned long nLongsToRead = [self numberOfSamples] - startOffset;
-		int i;
-		for(i=0;i<8;i++){
-			if([self enabled:i]){
-					[[self adapter] readLongBlock: dataWord[i]
-										atAddress: [self baseAddress] + adcMemory[i]
-										numToRead: [self numberOfSamples]
-									   withAddMod: [self addressModifier]
-									usingAddSpace: 0x01];
+	ORTimer* aTimer = [[ORTimer alloc] init];
+	@try {
+		// Readout Loop  */
+		unsigned long aValue = 0;
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:[self baseAddress] + kSIS3302KeyDisarmandArmBank1
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+		
+		// wait for address threshold flag
+		BOOL eventHappened = NO;
+		[aTimer start];
+		do {
+			unsigned long data_rd;
+			[[self adapter] readLongBlock:&data_rd
+								 atAddress:[self baseAddress] + kSIS3302AcquistionControl
+								numToRead:1
+								withAddMod:[self addressModifier]
+							 usingAddSpace:0x01];
+			if((data_rd & 0x80000) == 0x80000){
+				eventHappened = YES;
+				break;
+			}
+			if([aTimer seconds]>2)break;
+		} while (1);
+		
+		if(eventHappened){
+			unsigned long aValue = 0;
+			[[self adapter] writeLongBlock:&aValue
+								 atAddress:[self baseAddress] + kSIS3302KeyDisarm
+								numToWrite:1
+								withAddMod:[self addressModifier]
+							 usingAddSpace:0x01];
+			
+			unsigned long adc1_buffer[8][0x200000] ; // 8MByte 
+			int i;
+			for(i=0;i<kNumSIS3302Channels;i++){
+				unsigned long endSampleAddress = 0;
+				[[self adapter] readLongBlock:&endSampleAddress
+									 atAddress:[self baseAddress] + sampleAddress[i]
+									numToRead:1
+									withAddMod:[self addressModifier]
+								 usingAddSpace:0x01];
+				
+				if (endSampleAddress != 0) {
+					[[self adapter] readLongBlock:adc1_buffer[i]
+										 atAddress:[self baseAddress] + adcMemory[i]
+										numToRead:(endSampleAddress & 0x3ffffc)>>1
+										withAddMod:[self addressModifier]
+									 usingAddSpace:0x01];
+					
+				}
 			}
 		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleDone object:self];
+		else NSLog(@"NO Event\n");
 	}
+	@catch(NSException* e){
+	}
+	@finally {
+		[aTimer release];
+	}
+	
 }
 
 #pragma mark •••Data Taker
@@ -1257,9 +1100,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [self initBoard];
 		
 	currentBank = 0;
-	[self clearBankFullFlag:currentBank];
+	//[self clearBankFullFlag:currentBank];
 	[self arm:currentBank];
-	[self startSampling];
+	//[self startSampling];
 	[self setLed:YES];
 	isRunning = NO;
 	count=0;
@@ -1344,8 +1187,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[self stopSampling];
-	[self stopBankSwitching];
+	//[self stopSampling];
+	//[self stopBankSwitching];
     isRunning = NO;
     [waveFormRateGroup stop];
 	[self setLed:NO];
@@ -1373,7 +1216,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
  	unsigned long aValue = 0; //value doesn't matter 
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kGeneralReset
+                         atAddress:[self baseAddress] + kSIS3302KeyReset
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -1570,15 +1413,15 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (NSArray*) autoTests 
 {
 	NSMutableArray* myTests = [NSMutableArray array];
-	[myTests addObject:[ORVmeReadOnlyTest test:kControlStatus wordSize:4 name:@"Control Status"]];
-	[myTests addObject:[ORVmeReadOnlyTest test:kAcquisitionControlReg wordSize:4 name:@"Acquistion Reg"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kGeneralReset wordSize:4 name:@"Reset"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kStartSampling wordSize:4 name:@"Start Sampling"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kStopSampling wordSize:4 name:@"Stop Sampling"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kStartAutoBankSwitch wordSize:4 name:@"Stop Auto Bank Switch"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kStopAutoBankSwitch wordSize:4 name:@"Start Auto Bank Switch"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank1FullFlag wordSize:4 name:@"Clear Bank1 Full"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank2FullFlag wordSize:4 name:@"Clear Bank2 Full"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302ControlStatus wordSize:4 name:@"Control Status"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302AcquistionControl wordSize:4 name:@"Acquistion Reg"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kSIS3302KeyReset wordSize:4 name:@"Reset"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartSampling wordSize:4 name:@"Start Sampling"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopSampling wordSize:4 name:@"Stop Sampling"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartAutoBankSwitch wordSize:4 name:@"Stop Auto Bank Switch"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopAutoBankSwitch wordSize:4 name:@"Start Auto Bank Switch"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank1FullFlag wordSize:4 name:@"Clear Bank1 Full"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank2FullFlag wordSize:4 name:@"Clear Bank2 Full"]];
 	
 	int i;
 	for(i=0;i<8;i++){
@@ -1599,14 +1442,14 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 		unsigned long dac_select_no = i%2;
 		data =  [self dacOffset];
 		[[self adapter] writeLongBlock:&data
-							 atAddress:baseAddress + kADCDacControlStatus + 4 // DAC_DATA
+							 atAddress:baseAddress + kSIS3302DacControlStatus + 4 // DAC_DATA
 							numToWrite:1
 							withAddMod:addressModifier
 						 usingAddSpace:0x01];
 		
 		data =  1 + (dac_select_no << 4); // write to DAC Register
 		[[self adapter] writeLongBlock:&data
-							 atAddress:baseAddress + kADCDacControlStatus
+							 atAddress:baseAddress + kSIS3302DacControlStatus
 							numToWrite:1
 							withAddMod:addressModifier
 						 usingAddSpace:0x01];
@@ -1615,7 +1458,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 		timeout_cnt = 0;
 		do {
 			[[self adapter] readLongBlock:&data
-								atAddress:baseAddress + kADCDacControlStatus
+								atAddress:baseAddress + kSIS3302DacControlStatus
 								numToRead:1
 							   withAddMod:addressModifier
 							usingAddSpace:0x01];
@@ -1629,14 +1472,14 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 		
 		data =  2 + (dac_select_no << 4); // Load DACs 
 		[[self adapter] writeLongBlock:&data
-							 atAddress:baseAddress + kADCDacControlStatus
+							 atAddress:baseAddress + kSIS3302DacControlStatus
 							numToWrite:1
 							withAddMod:addressModifier
 						 usingAddSpace:0x01];
 		timeout_cnt = 0;
 		do {
 			[[self adapter] readLongBlock:&data
-								atAddress:baseAddress + kADCDacControlStatus
+								atAddress:baseAddress + kSIS3302DacControlStatus
 								numToRead:1
 							   withAddMod:addressModifier
 							usingAddSpace:0x01];

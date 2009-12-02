@@ -836,6 +836,16 @@
 		8435626908FDB287002864C7 /* ORContainerFeedThruController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435625608FDB287002864C7 /* ORContainerFeedThruController.m */; };
 		8435653108FEFFB8002864C7 /* ORMessagePipe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435652F08FEFFB8002864C7 /* ORMessagePipe.h */; };
 		8435653208FEFFB8002864C7 /* ORMessagePipe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435653008FEFFB8002864C7 /* ORMessagePipe.m */; };
+		8435AACC10C6D0EF00E03F7F /* NoOilHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8435AAC210C6D0EF00E03F7F /* NoOilHelp.plist */; };
+		8435AACD10C6D0EF00E03F7F /* ORVarianTPSController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435AAC310C6D0EF00E03F7F /* ORVarianTPSController.h */; };
+		8435AACE10C6D0EF00E03F7F /* ORVarianTPSController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435AAC410C6D0EF00E03F7F /* ORVarianTPSController.m */; };
+		8435AACF10C6D0EF00E03F7F /* ORVarianTPSDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435AAC510C6D0EF00E03F7F /* ORVarianTPSDecoders.h */; };
+		8435AAD010C6D0EF00E03F7F /* ORVarianTPSDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435AAC610C6D0EF00E03F7F /* ORVarianTPSDecoders.m */; };
+		8435AAD110C6D0EF00E03F7F /* ORVarianTPSModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435AAC710C6D0EF00E03F7F /* ORVarianTPSModel.h */; };
+		8435AAD210C6D0EF00E03F7F /* ORVarianTPSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435AAC810C6D0EF00E03F7F /* ORVarianTPSModel.m */; };
+		8435AAD410C6D0EF00E03F7F /* VarianTPS.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8435AACA10C6D0EF00E03F7F /* VarianTPS.nib */; };
+		8435AAD510C6D0EF00E03F7F /* VarianTPS.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8435AACB10C6D0EF00E03F7F /* VarianTPS.tif */; };
+		8435AD2610C6F0F400E03F7F /* Varian.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8435AD2510C6F0F400E03F7F /* Varian.gif */; };
 		8438002F0AB23EC20069C0BA /* ORRangeTimerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843800290AB23EC20069C0BA /* ORRangeTimerController.h */; };
 		843800300AB23EC20069C0BA /* ORRangeTimerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438002A0AB23EC20069C0BA /* ORRangeTimerController.m */; };
 		843800310AB23EC20069C0BA /* ORRangeTimerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8438002B0AB23EC20069C0BA /* ORRangeTimerModel.h */; };
@@ -1938,6 +1948,7 @@
 		84E5B23A0715C65500C7B798 /* NcdCableCheckTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */; };
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
+		84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */; };
 		84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */; };
 		84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */; };
 		84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E743420DAD5EEF0099CAEE /* ORMailer.h */; };
@@ -2871,6 +2882,16 @@
 		8435625608FDB287002864C7 /* ORContainerFeedThruController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORContainerFeedThruController.m; path = "Source/Objects/Data Flow/ContainerIO/ContainerIOBaseClasses/ORContainerFeedThruController.m"; sourceTree = SOURCE_ROOT; };
 		8435652F08FEFFB8002864C7 /* ORMessagePipe.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMessagePipe.h; path = "Source/Objects/Data Flow/Connectors/ORMessagePipe.h"; sourceTree = SOURCE_ROOT; };
 		8435653008FEFFB8002864C7 /* ORMessagePipe.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMessagePipe.m; path = "Source/Objects/Data Flow/Connectors/ORMessagePipe.m"; sourceTree = SOURCE_ROOT; };
+		8435AAC210C6D0EF00E03F7F /* NoOilHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoOilHelp.plist; path = Source/Objects/Hardware/Serial/VarianTPS/NoOilHelp.plist; sourceTree = SOURCE_ROOT; };
+		8435AAC310C6D0EF00E03F7F /* ORVarianTPSController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVarianTPSController.h; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSController.h; sourceTree = SOURCE_ROOT; };
+		8435AAC410C6D0EF00E03F7F /* ORVarianTPSController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVarianTPSController.m; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSController.m; sourceTree = SOURCE_ROOT; };
+		8435AAC510C6D0EF00E03F7F /* ORVarianTPSDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVarianTPSDecoders.h; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSDecoders.h; sourceTree = SOURCE_ROOT; };
+		8435AAC610C6D0EF00E03F7F /* ORVarianTPSDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVarianTPSDecoders.m; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSDecoders.m; sourceTree = SOURCE_ROOT; };
+		8435AAC710C6D0EF00E03F7F /* ORVarianTPSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVarianTPSModel.h; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSModel.h; sourceTree = SOURCE_ROOT; };
+		8435AAC810C6D0EF00E03F7F /* ORVarianTPSModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVarianTPSModel.m; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSModel.m; sourceTree = SOURCE_ROOT; };
+		8435AACA10C6D0EF00E03F7F /* VarianTPS.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VarianTPS.nib; path = Source/Objects/Hardware/Serial/VarianTPS/VarianTPS.nib; sourceTree = SOURCE_ROOT; };
+		8435AACB10C6D0EF00E03F7F /* VarianTPS.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VarianTPS.tif; path = Source/Objects/Hardware/Serial/VarianTPS/VarianTPS.tif; sourceTree = SOURCE_ROOT; };
+		8435AD2510C6F0F400E03F7F /* Varian.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Varian.gif; path = Source/Objects/Hardware/Serial/VarianTPS/Varian.gif; sourceTree = SOURCE_ROOT; };
 		84368AD10471AACA005F64B1 /* HPPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser.nib; path = Source/Objects/Hardware/GPIB/HPPulser/HPPulser.nib; sourceTree = SOURCE_ROOT; };
 		843800290AB23EC20069C0BA /* ORRangeTimerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRangeTimerController.h; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerController.h; sourceTree = SOURCE_ROOT; };
 		8438002A0AB23EC20069C0BA /* ORRangeTimerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRangeTimerController.m; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerController.m; sourceTree = SOURCE_ROOT; };
@@ -4142,6 +4163,7 @@
 		84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdCableCheckTask.h; sourceTree = "<group>"; };
 		84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdCableCheckTask.m; sourceTree = "<group>"; };
 		84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdCableCheckTask.nib; path = Source/Experiments/Ncd/CableCheckTask/NcdCableCheckTask.nib; sourceTree = SOURCE_ROOT; };
+		84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ObjectFactory.m; path = Source/Objects/OrcaObject/ObjectFactory.m; sourceTree = SOURCE_ROOT; };
 		84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ObjectFactory.h; path = Source/Objects/OrcaObject/ObjectFactory.h; sourceTree = SOURCE_ROOT; };
 		84E743420DAD5EEF0099CAEE /* ORMailer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMailer.h; path = "Source/Main Dialogs/MailCenter/ORMailer.h"; sourceTree = SOURCE_ROOT; };
@@ -5833,6 +5855,24 @@
 			path = "Source/Objects/Data Flow/ContainerIO/ContainerIOBaseClasses";
 			sourceTree = SOURCE_ROOT;
 		};
+		8435AAC110C6D0EF00E03F7F /* VarianTPS */ = {
+			isa = PBXGroup;
+			children = (
+				8435AAC210C6D0EF00E03F7F /* NoOilHelp.plist */,
+				8435AAC310C6D0EF00E03F7F /* ORVarianTPSController.h */,
+				8435AAC410C6D0EF00E03F7F /* ORVarianTPSController.m */,
+				8435AAC510C6D0EF00E03F7F /* ORVarianTPSDecoders.h */,
+				8435AAC610C6D0EF00E03F7F /* ORVarianTPSDecoders.m */,
+				8435AAC710C6D0EF00E03F7F /* ORVarianTPSModel.h */,
+				8435AAC810C6D0EF00E03F7F /* ORVarianTPSModel.m */,
+				8435AD2510C6F0F400E03F7F /* Varian.gif */,
+				8435AACA10C6D0EF00E03F7F /* VarianTPS.nib */,
+				8435AACB10C6D0EF00E03F7F /* VarianTPS.tif */,
+			);
+			name = VarianTPS;
+			path = Source/Objects/Hardware/Serial/VarianTPS;
+			sourceTree = SOURCE_ROOT;
+		};
 		843800280AB23EC20069C0BA /* rangeTimer */ = {
 			isa = PBXGroup;
 			children = (
@@ -6108,6 +6148,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				8435AAC110C6D0EF00E03F7F /* VarianTPS */,
 				84B28CEF0F4C5DBB00E2B056 /* Ami286 */,
 				84B28CD50F4C597900E2B056 /* BocTIC3 */,
 				84499CBD0F13E457004B855B /* CTITemp */,
@@ -8569,6 +8610,7 @@
 				84D34AFF10B1D6C90013473E /* ORSIS3302Decoders.m */,
 				84D34B0010B1D6C90013473E /* ORSIS3302Model.h */,
 				84D34B0110B1D6C90013473E /* ORSIS3302Model.m */,
+				84E6E5DA10BC570800187AF6 /* ORSISRegisterDefs.h */,
 				84D34B0210B1D6C90013473E /* SIS3302.nib */,
 				84D34B0310B1D6C90013473E /* SIS3302Card.gif */,
 			);
@@ -10330,6 +10372,10 @@
 				848A148310BAE404002A80D0 /* ORRecordIndexer.h in Headers */,
 				848A148710BAE40E002A80D0 /* ORDecoderOperation.h in Headers */,
 				848A149D10BAE43A002A80D0 /* ORDecoder.h in Headers */,
+				84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */,
+				8435AACD10C6D0EF00E03F7F /* ORVarianTPSController.h in Headers */,
+				8435AACF10C6D0EF00E03F7F /* ORVarianTPSDecoders.h in Headers */,
+				8435AAD110C6D0EF00E03F7F /* ORVarianTPSModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10985,6 +11031,10 @@
 				847D76FA10B795DE00893F3A /* goScript in Resources */,
 				847D76FB10B795DE00893F3A /* killScript in Resources */,
 				847D76FE10B7963D00893F3A /* makeScript in Resources */,
+				8435AACC10C6D0EF00E03F7F /* NoOilHelp.plist in Resources */,
+				8435AAD410C6D0EF00E03F7F /* VarianTPS.nib in Resources */,
+				8435AAD510C6D0EF00E03F7F /* VarianTPS.tif in Resources */,
+				8435AD2610C6F0F400E03F7F /* Varian.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11722,6 +11772,9 @@
 				848A148410BAE404002A80D0 /* ORRecordIndexer.m in Sources */,
 				848A148810BAE40E002A80D0 /* ORDecoderOperation.m in Sources */,
 				848A149E10BAE43A002A80D0 /* ORDecoder.m in Sources */,
+				8435AACE10C6D0EF00E03F7F /* ORVarianTPSController.m in Sources */,
+				8435AAD010C6D0EF00E03F7F /* ORVarianTPSDecoders.m in Sources */,
+				8435AAD210C6D0EF00E03F7F /* ORVarianTPSModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
