@@ -22,6 +22,7 @@
 @interface ORLabelController : OrcaObjectController
 {
     IBOutlet NSTextView*  labelField;
+	IBOutlet NSTextField* controllerStringField;
 	IBOutlet NSTextField* displayFormatField;
     IBOutlet NSTextField* textSizeField;
     IBOutlet NSButton*    labelLockButton;
@@ -33,6 +34,7 @@
 - (id) init;
 
 #pragma mark ¥¥¥Interface Management
+- (void) controllerStringChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) labelLockChanged:(NSNotification *)aNote;
@@ -43,8 +45,10 @@
 - (void) textDidChange:(NSNotification *)aNote;
 - (void) updateIntervalChanged:(NSNotification*)aNote;
 - (void) displayFormatChanged:(NSNotification*)aNote;
+- (void) labelChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) controllerStringAction:(id)sender;
 - (IBAction) textSizeAction:(id)sender;
 - (IBAction) labelLockAction:(id)sender;
 - (IBAction) labelTypeAction:(id)sender;

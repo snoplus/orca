@@ -24,6 +24,7 @@
 #import "TimedWorker.h"
 #import "ORCommandCenter.h"
 
+NSString* ORLabelModelControllerStringChanged	 = @"ORLabelModelControllerStringChanged";
 NSString* ORLabelModelTextSizeChanged			 = @"ORLabelModelTextSizeChanged";
 NSString* ORLabelModelLabelChangedNotification   = @"ORLabelModelLabelChangedNotification";
 NSString* ORLabelLock							 = @"ORLabelLock";
@@ -47,6 +48,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 -(void) dealloc
 {
+    [controllerString release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [poller stop];
     [poller release];
@@ -69,6 +71,10 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [poller stop];
 }
 
+- (NSString*) helpURL
+{
+	return @"Subsystems/Containers_and_Dynamic_Labels.html";
+}
 
 - (NSString*) label
 {
@@ -125,7 +131,33 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [self linkToController:@"ORLabelController"];
 }
 
+- (void) doCmdClick:(id)sender
+{
+	if(controllerString){
+		id obj = [[self document] findObjectWithFullID:controllerString];
+		if([obj respondsToSelector:@selector(makeMainController)]){
+			[obj makeMainController];
+		}
+	}
+}
+
 #pragma mark ***Accessors
+
+- (NSString*) controllerString
+{
+    return controllerString;
+}
+
+- (void) setControllerString:(NSString*)aControllerString
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setControllerString:controllerString];
+    
+    [controllerString autorelease];
+    controllerString = [aControllerString copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabelModelControllerStringChanged object:self];
+}
+
 - (int) updateInterval
 {
 	return updateInterval;
@@ -286,7 +318,6 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 - (void) setDisplayFormat:(NSString*)aFormat
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLabel:label];
-    aFormat = [aFormat stringByReplacingOccurrencesOfString:@"%@" withString:@"%.2f"];
     [displayFormat autorelease];
     displayFormat = [aFormat copy];
 	[self setUpImage];
@@ -351,11 +382,12 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	
     [[self undoManager] disableUndoRegistration];
 	
-	[self setLabelType:[decoder decodeIntForKey:@"labelType"]];
-    [self setLabel:[decoder decodeObjectForKey:@"label"]];
-    [self setDisplayFormat:[decoder decodeObjectForKey:@"displayFormat"]];
-    [self setTextSize:[decoder decodeIntForKey:@"textSize"]];
-    [self setUpdateInterval:[decoder decodeIntForKey:@"updateInterval"]];
+    [self setLabel:				[decoder decodeObjectForKey:@"label"]];
+	[self setLabelType:			[decoder decodeIntForKey:	@"labelType"]];
+    [self setDisplayFormat:		[decoder decodeObjectForKey:@"displayFormat"]];
+    [self setTextSize:			[decoder decodeIntForKey:	@"textSize"]];
+    [self setUpdateInterval:	[decoder decodeIntForKey:	@"updateInterval"]];
+    [self setControllerString:	[decoder decodeObjectForKey:@"controllerString"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -364,11 +396,12 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:label forKey:@"label"];
-    [encoder encodeObject:displayFormat forKey:@"displayFormat"];
-    [encoder encodeInt:textSize forKey:@"textSize"];
-	[encoder encodeInt:labelType forKey:@"labelType"];
-	[encoder encodeInt:updateInterval forKey:@"updateInterval"];
+    [encoder encodeObject:label				forKey:@"label"];
+    [encoder encodeObject:displayFormat		forKey:@"displayFormat"];
+    [encoder encodeInt:textSize				forKey:@"textSize"];
+	[encoder encodeInt:labelType			forKey:@"labelType"];
+    [encoder encodeObject:controllerString	forKey:@"controllerString"];
+	[encoder encodeInt:updateInterval		forKey:@"updateInterval"];
 }
 
 @end
@@ -377,15 +410,18 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 - (NSString*) stringToDisplay
 {
 	NSString* s = @"";
+	NSString* f;
 	if(labelType == kStaticLabel){
 		s = label;
 	}
 	else {
 		if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
-			NSString* f;
 			if([displayFormat length])f = displayFormat;
 			else f = @"%.2f";
-			if([f rangeOfString:@"%d"].location != NSNotFound){
+			if([f rangeOfString:@"%@"].location != NSNotFound){
+				s = [NSString stringWithFormat:f,displayValue];
+			}
+			else if([f rangeOfString:@"%d"].location != NSNotFound){
 				s = [NSString stringWithFormat:f,[displayValue intValue]];
 			}
 			else {
@@ -393,7 +429,9 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 			}
 		}
 		else {
-			s = [NSString stringWithFormat:@"%@",displayValue];
+			if([displayFormat length])f = displayFormat;
+			else f = @"%@";
+			s = [NSString stringWithFormat:f,displayValue];
 		}
 	}
 	return s;

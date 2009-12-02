@@ -35,6 +35,12 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) controllerStringChanged:(NSNotification*)aNote
+{
+	[controllerStringField setStringValue: [model controllerString]];
+}
+
 - (void) registerNotificationObservers
 {
     [super registerNotificationObservers];
@@ -69,6 +75,17 @@
                      selector: @selector(displayFormatChanged:)
                          name: ORLabelModelFormatChanged
                        object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(controllerStringChanged:)
+                         name : ORLabelModelControllerStringChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(labelChanged:)
+                         name : ORLabelModelLabelChangedNotification
+						object: model];
+	
 }
 
 - (void) awakeFromNib
@@ -81,10 +98,12 @@
 {
 	[super updateWindow];
     [self textSizeChanged:nil];
+    [self labelChanged:nil];
     [self labelLockChanged:nil];
     [self labelTypeChanged:nil];
     [self updateIntervalChanged:nil];
 	[self displayFormatChanged:nil];
+	[self controllerStringChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -106,11 +125,17 @@
     [labelField setEditable: !locked];
     [textSizeField setEnabled: !locked];
     [labelTypeMatrix setEnabled: !locked];
+    [controllerStringField setEnabled: !locked];
     [updateIntervalPU setEnabled: !locked && [model labelType] == kDynamiclabel];
     [displayFormatField setEnabled: !locked && [model labelType] == kDynamiclabel];
 }
 
-- (void) textDidChange:(NSNotification *)notification
+- (void) labelChanged:(NSNotification*)notification
+{
+	[labelField setString:[model label]];
+}
+
+- (void) textDidChange:(NSNotification*)notification
 {
 	[model setLabelNoNotify:[labelField string]];
 }
@@ -133,6 +158,11 @@
 
 
 #pragma mark ¥¥¥Actions
+- (IBAction) controllerStringAction:(id)sender
+{
+	[model setControllerString:[sender stringValue]];	
+}
+
 - (IBAction) displayFormatAction:(id)sender
 {
 	[model setDisplayFormat:[sender stringValue]];
