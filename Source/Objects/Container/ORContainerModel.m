@@ -86,6 +86,11 @@ NSString* ORContainerBackgroundImageChangedNotification = @"ORContainerBackgroun
 
 }
 
+- (NSString*) helpURL
+{
+	return @"Subsystems/Containers_and_Dynamic_Labels.html";
+}
+
 - (int)scaleFactor 
 {
     return scaleFactor;
