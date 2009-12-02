@@ -414,7 +414,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (void) getSetSpeed		{  }
 - (void) getActualSpeed		{  }
 - (void) getMotorCurrent	{  }
-- (void) getPressure		{  }
+- (void) getPressure		{ [self read:224];  }
 - (void) getMotorPower		{  }
 - (void) getStationPower	{  }
 - (void) getStandby			{  }
@@ -422,17 +422,17 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 
 - (void) updateAll
 {
-	[self getOilDeficiency];
-	[self getTurboTemp];
-	[self getDriveTemp];
-	[self getAccelerating];
-	[self getSpeedAttained];
-	[self getSetSpeed];
-	[self getActualSpeed];
-	[self getMotorCurrent];
+	//[self getOilDeficiency];
+	//[self getTurboTemp];
+	//[self getDriveTemp];
+	//[self getAccelerating];
+	//[self getSpeedAttained];
+	//[self getSetSpeed];
+	//[self getActualSpeed];
+	//[self getMotorCurrent];
 	[self getPressure];
-	[self getStationPower];
-	[self getMotorPower];
+	//[self getStationPower];
+	//[self getMotorPower];
 }
 
 - (void) sendTmpRotSet:(int)aValue
@@ -497,10 +497,34 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	data[9] = c[1];
 
 	NSMutableData* cmdData = [NSMutableData dataWithBytes:data length:10];
-	NSLog(@"data: %@\n",cmdData);
 
 	[self enqueCmdData:cmdData];
 }
+	
+- (void) read:(int)window 
+	{
+	int d1 = window/100;
+	int d2 = (window-d1*100)/10;
+	int d3 = window - d1*100 - d2*10;
+	unsigned char data[64];
+	data[0] = 0x02;	//<STX>
+	data[1] = 0x80; //addr -- always 0x80 for rs232
+	data[2] = '0'+ d1;
+	data[3] = '0'+ d2;
+	data[4] = '0'+ d3;
+	data[5] = 0x30; //read
+	data[6] = 0x03; //<ETX>
+	int crc = [self crc:data length:7];
+	char c[64];
+	sprintf(c,"%02X",crc);
+	data[7] = c[0];
+	data[8] = c[1];
+	
+	NSMutableData* cmdData = [NSMutableData dataWithBytes:data length:9];
+	
+	[self enqueCmdData:cmdData];
+}
+	
 
 //---------------------------
 //format of a command
@@ -584,7 +608,9 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 		int i;
 		int numCharsProcessed=0;
 		NSMutableData* cmd =  [NSMutableData dataWithCapacity:64];
+		NSLog(@"received: %@\n",inComingData);
 		for(i=0;i<[inComingData length];i++){
+/*
 			[cmd appendBytes:p length:1];
 			if(*p == '\r'){
 				NSString* s = [[[NSString alloc] initWithData:cmd encoding:NSASCIIStringEncoding] autorelease];
@@ -596,6 +622,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 				}
 			}
 			p++;
+ */
 		}
 		if(numCharsProcessed){
 			[inComingData replaceBytesInRange:NSMakeRange(0,numCharsProcessed) withBytes:nil length:0];

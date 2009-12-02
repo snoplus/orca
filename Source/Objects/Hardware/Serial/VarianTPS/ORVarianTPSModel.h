@@ -105,6 +105,7 @@
 
 #pragma mark •••Command Methods
 - (void) write:(int)window logicValue:(BOOL)aValue;
+- (void) read:(int)window;
 - (int) crc:(unsigned char*)aCmd length:(int)len;
 
 - (void) sendDataSet:(int)aParamNum bool:(BOOL)aState;
