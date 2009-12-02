@@ -371,13 +371,21 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 
 - (id) description
 {		
-	NSString* string = [NSString stringWithFormat:@"Segment  : %d\n",[self segmentNumber]];
-	string = [string stringByAppendingFormat:   @"Adc Class: %@\n",[(NSObject*)hardwareCard className]];
-	string = [string stringByAppendingFormat:   @"Slot     : %d\n",[self cardSlot]];
-	string = [string stringByAppendingFormat:   @"Channel  : %d\n",[self channel]];
-	string = [string stringByAppendingFormat:   @"Threshold: %d\n",[self threshold]];
-	string = [string stringByAppendingFormat:   @"Gain     : %d\n",[self gain]];
-	if([self name])string = [string stringByAppendingFormat:   @"Name     : %@\n",[self name]];
+	NSString* string = [NSString stringWithFormat:@"      Segment : %d\n",[self segmentNumber]];
+	NSString* theModel = [(NSObject*)hardwareCard className];
+	if([theModel hasPrefix:@"OR"]) theModel   = [theModel substringFromIndex:2];
+	if([theModel hasSuffix:@"Model"])theModel = [theModel substringToIndex:[theModel length]-[@"Model"length]];
+	string = [string stringByAppendingFormat:     @"    Adc Class : %@\n",theModel];
+	string = [string stringByAppendingFormat:     @"   Threshold  : %d\n",[self threshold]];
+	string = [string stringByAppendingFormat:     @"      Gain    : %d\n",[self gain]];
+	for(id aKey in params){
+		const char *theKeyAsCString = [[aKey substringFromIndex:1] cStringUsingEncoding:NSASCIIStringEncoding];
+		NSString* p = [NSString stringWithFormat:   @"%15s: %@\n",theKeyAsCString,[params objectForKey:aKey]];
+		string = [string stringByAppendingString:[p substringFromIndex:1]];
+	}
+	//string = [string stringByAppendingFormat:   @"Slot     : %d\n",[self cardSlot]];
+	//string = [string stringByAppendingFormat:   @"Channel  : %d\n",[self channel]];
+	//if([self name])string = [string stringByAppendingFormat:   @"Name     : %@\n",[self name]];
 	return string;
 }
 
