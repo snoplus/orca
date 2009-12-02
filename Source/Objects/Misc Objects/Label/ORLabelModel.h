@@ -32,9 +32,12 @@
 	BOOL scheduledForUpdate;
 	int labelType;
 	int updateInterval;
+    NSString* controllerString;
 }
 
 #pragma mark ***Accessors
+- (NSString*) controllerString;
+- (void) setControllerString:(NSString*)aControllerString;
 - (int) textSize;
 - (void) setTextSize:(int)aTextSize;
 - (NSString*) displayFormat;
@@ -67,6 +70,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORLabelModelControllerStringChanged;
 extern NSString* ORLabelModelUpdateIntervalChanged;
 extern NSString* ORLabelModelTextSizeChanged;
 extern NSString* ORLabelModelLabelChangedNotification;
