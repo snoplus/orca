@@ -25,8 +25,6 @@
 #import "ORAxis.h"
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
-#import "OHexFormatter.h"
-#import "StopLightView.h"
 #import "ORSerialPortController.h"
 
 @interface ORVarianTPSController (private)
@@ -58,7 +56,6 @@
     [[plotter xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 	[super awakeFromNib];	
-	//[model getPressure];
 }
 
 #pragma mark •••Notifications
@@ -83,31 +80,6 @@
                          name : ORVarianTPSLock
                         object: nil];
 
-     [notifyCenter addObserver : self
-                     selector : @selector(deviceAddressChanged:)
-                         name : ORVarianTPSModelDeviceAddressChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(turboAcceleratingChanged:)
-                         name : ORVarianTPSTurboAcceleratingChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(speedAttainedChanged:)
-                         name : ORVarianTPSTurboSpeedAttainedChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(turboOverTempChanged:)
-                         name : ORVarianTPSTurboOverTempChanged
-						object: model];
-			
-    [notifyCenter addObserver : self
-                     selector : @selector(setRotorSpeedChanged:)
-                         name : ORVarianTPSModelSetRotorSpeedChanged
-						object: model];
-
     [notifyCenter addObserver : self
                      selector : @selector(actualRotorSpeedChanged:)
                          name : ORVarianTPSModelActualRotorSpeedChanged
@@ -126,11 +98,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(pressureChanged:)
                          name : ORVarianTPSModelPressureChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(motorPowerChanged:)
-                         name : ORVarianTPSModelMotorPowerChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -159,11 +126,6 @@
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(tmpRotSetChanged:)
-                         name : ORVarianTPSModelTmpRotSetChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(remoteChanged:)
                          name : ORVarianTPSModelRemoteChanged
 						object: model];
@@ -172,37 +134,35 @@
                      selector : @selector(statusChanged:)
                          name : ORVarianTPSModelWindowStatusChanged
 						object: model];	
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(controllerTempChanged:)
+                         name : ORVarianTPSModelControllerTempChanged
+						object: model];	
+	
 }
 
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"DCU (%d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Varian TPS (%d)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
     [self lockChanged:nil];
-	[self deviceAddressChanged:nil];
-	[self setRotorSpeedChanged:nil];
 	[self actualRotorSpeedChanged:nil];
 	[self motorCurrentChanged:nil];
-	[self turboAcceleratingChanged:nil];
-	[self speedAttainedChanged:nil];
-	[self turboOverTempChanged:nil];
-	[self unitOverTempChanged:nil];
 	[self pressureChanged:nil];
-	[self motorPowerChanged:nil];
 	[self stationPowerChanged:nil];
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
 	[self pressureScaleChanged:nil];
 	[self pollTimeChanged:nil];
-	[self tmpRotSetChanged:nil];
 	[self remoteChanged:nil];
 	[self statusChanged:nil];
+	[self controllerTempChanged:nil];
 }
 
 - (void) statusChanged:(NSNotification*)aNote
@@ -210,15 +170,15 @@
 	[statusField setStringValue: [model statusString]];
 }
 
+- (void) controllerTempChanged:(NSNotification*)aNote
+{
+	[controllerTempField setIntValue: [model controllerTemp]];
+}
+
 - (void) remoteChanged:(NSNotification*)aNote
 {
 	[self updateButtons];
-	[remoteField setStringValue: [model remote]? @"YES":@"NO"];
-}
-
-- (void) tmpRotSetChanged:(NSNotification*)aNote
-{
-	[tmpRotSetField setIntValue: [model tmpRotSet]];
+	[remoteField setStringValue: [model remote]? @"NO":@"YES"];
 }
 
 - (void) pressureScaleChanged:(NSNotification*)aNote
@@ -278,60 +238,18 @@
 
 - (void) motorCurrentChanged:(NSNotification*)aNote		{ [motorCurrentField		setFloatValue:	[model motorCurrent]]; }
 - (void) actualRotorSpeedChanged:(NSNotification*)aNote	{ [actualRotorSpeedField	setIntValue:	[model actualRotorSpeed]]; }
-- (void) setRotorSpeedChanged:(NSNotification*)aNote	{ [setRotorSpeedField		setIntValue:	[model setRotorSpeed]]; }
-- (void) deviceAddressChanged:(NSNotification*)aNote	{ [deviceAddressField		setIntValue:	[model deviceAddress]]; }
 
 - (void) stationPowerChanged:(NSNotification*)aNote		
 { 
 	[stationPowerField	setStringValue:	[model stationPower]? @"ON":@"OFF"];
-	[self updateStopLight];
 	[self updateButtons];
 }
 
-- (void) speedAttainedChanged:(NSNotification*)aNote	
-{ 
-	[speedAttainedField setStringValue:	[model speedAttained] ? @"YES":@"NO"];
-	[self updateStopLight];
-}
-
-- (void) turboAcceleratingChanged:(NSNotification*)aNote
-{ 
-	[turboAcceleratingField	setStringValue:	[model turboAccelerating] ? @"YES":@"NO"];
-	[self updateStopLight];
-}
-
-- (void) updateStopLight
-{
-	if([model motorPower]){
-		if([model speedAttained])[lightBoardView setState:kGoLight];
-		else [lightBoardView setState:kCautionLight];
-	}
-	else [lightBoardView setState:kStoppedLight];
-}
 
 - (void) pressureChanged:(NSNotification*)aNote
 {
 	float pressure = [model pressure];
 	[pressureField setStringValue: pressure == 0?@"--":[NSString stringWithFormat:@"%7.1E mbar",[model pressure]]];
-}
-
-- (void) motorPowerChanged:(NSNotification*)aNote		
-{ 
-	[motorPowerField setStringValue: [model motorPower] ? @"ON":@"OFF"];
-	[self updateStopLight];
-	[self updateButtons];
-}
-
-- (void) turboOverTempChanged:(NSNotification*)aNote
-{	
-	[turboPumpOverTempField setStringValue: [model turboPumpOverTemp]?@"HOT":@"OK"];
-	[turboPumpOverTempField setTextColor:	[model turboPumpOverTemp]?[NSColor redColor]:[NSColor blackColor]];
-}
-
-- (void) unitOverTempChanged:(NSNotification*)aNote
-{
-	[driveUnitOverTempField setStringValue: [model driveUnitOverTemp]?@"HOT":@"OK"];
-	[driveUnitOverTempField setTextColor:	[model driveUnitOverTemp]?[NSColor redColor]:[NSColor blackColor]];
 }
 
 - (void) checkGlobalSecurity
@@ -355,19 +273,17 @@
 {
     BOOL locked = [gSecurity isLocked:ORVarianTPSLock];
 	BOOL portOpen = [[model serialPort] isOpen];
-	BOOL stationOn = [model stationPower] && [model motorPower];
-	BOOL inRemote  = [model remote];
+	BOOL stationOn = [model stationPower];
+	BOOL inRemote  = ![model remote];
     [lockButton setState: locked];
 	
 	[serialPortController updateButtons:locked];
 	
     [stationOnButton setEnabled:!locked && portOpen && !stationOn && inRemote];
     [stationOffButton setEnabled:!locked && portOpen && stationOn && inRemote];
-	[tmpRotSetField setEnabled:!locked && portOpen];
     [updateButton setEnabled:portOpen];
 
     [pollTimePopup setEnabled:!locked && portOpen];
-	//[initButton  setEnabled:!locked && portOpen && stationOn];
 }
 
 - (void) pollTimeChanged:(NSNotification*)aNotification
@@ -376,10 +292,6 @@
 }
 
 #pragma mark •••Actions
-- (IBAction) tmpRotSetAction:(id)sender
-{
-	[model setTmpRotSet:[sender intValue]];	
-}
 
 - (IBAction) pressureScaleAction:(id)sender
 {
@@ -403,10 +315,6 @@
                       nil,@"Is this really what you want?");
 }
 
-- (IBAction) deviceAddressAction:(id)sender
-{
-	[model setDeviceAddress:[sender intValue]];	
-}
 
 - (IBAction) lockAction:(id) sender
 {
@@ -422,13 +330,6 @@
 {
 	[model setPollTime:[[sender selectedItem] tag]];
 }
-
-- (IBAction) initAction:(id)sender
-{
-	[self endEditing];
-	[model initUnit];
-}
-
 
 #pragma mark •••Data Source
 

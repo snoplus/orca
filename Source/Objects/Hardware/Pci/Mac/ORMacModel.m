@@ -206,6 +206,7 @@ void registryChanged(
 - (void) sendOnPort:(int)index anArray:(NSArray*)someData
 {
 	ORSerialPort* aPort = [self serialPort:index];
+	[aPort setDelegate:self];
 	if(aPort){
 		NSMutableData* theData = [NSMutableData data];
 		int i;

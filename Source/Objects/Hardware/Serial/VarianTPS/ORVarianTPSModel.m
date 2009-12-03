@@ -28,42 +28,22 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
-NSString* ORVarianTPSModelRemoteChanged = @"ORVarianTPSModelRemoteChanged";
-NSString* ORVarianTPSModelTmpRotSetChanged		= @"ORVarianTPSModelTmpRotSetChanged";
+NSString* ORVarianTPSModelRemoteChanged			= @"ORVarianTPSModelRemoteChanged";
 NSString* ORVarianTPSModelPressureScaleChanged	= @"ORVarianTPSModelPressureScaleChanged";
 NSString* ORVarianTPSModelStationPowerChanged	= @"ORVarianTPSModelStationPowerChanged";
-NSString* ORVarianTPSModelMotorPowerChanged		= @"ORVarianTPSModelMotorPowerChanged";
 NSString* ORVarianTPSModelPressureChanged		= @"ORVarianTPSModelPressureChanged";
 NSString* ORVarianTPSModelMotorCurrentChanged	= @"ORVarianTPSModelMotorCurrentChanged";
 NSString* ORVarianTPSModelActualRotorSpeedChanged = @"ORVarianTPSModelActualRotorSpeedChanged";
-NSString* ORVarianTPSModelSetRotorSpeedChanged	= @"ORVarianTPSModelSetRotorSpeedChanged";
-NSString* ORVarianTPSTurboStateChanged			= @"ORVarianTPSTurboStateChanged";
-NSString* ORVarianTPSModelDeviceAddressChanged	= @"ORVarianTPSModelDeviceAddressChanged";
 NSString* ORVarianTPSModelPollTimeChanged		= @"ORVarianTPSModelPollTimeChanged";
 NSString* ORVarianTPSModelSerialPortChanged		= @"ORVarianTPSModelSerialPortChanged";
 NSString* ORVarianTPSModelPortNameChanged		= @"ORVarianTPSModelPortNameChanged";
 NSString* ORVarianTPSModelPortStateChanged		= @"ORVarianTPSModelPortStateChanged";
-NSString* ORVarianTPSTurboAcceleratingChanged	= @"ORVarianTPSTurboAcceleratingChanged";
-NSString* ORVarianTPSTurboSpeedAttainedChanged	= @"ORVarianTPSTurboSpeedAttainedChanged";
-NSString* ORVarianTPSTurboOverTempChanged		= @"ORVarianTPSTurboOverTempChanged";
-NSString* ORVarianTPSDriveOverTempChanged		= @"ORVarianTPSDriveOverTempChanged";
 NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusChanged";
+NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTempChanged";
 
 #pragma mark •••Status Parameters
-#define kTMPRotSet		707
-#define kDeviceAddress	797
-#define kTempDriveUnit	304
-#define kTempTurbo		305
-#define kSpeedAttained	306
-#define kAccelerating	307
-#define kSetSpeed		308
-#define kActualSpeed	309
-#define kMotorCurrent	310
-#define kUnitName		350
-#define kStandby		2
 #define kStationPower	10
-#define kMotorPower		23
 
 #define kAck			0x6
 #define kWinDisabled	0x35
@@ -79,21 +59,20 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 #define kRemoteOps		8
 #define kSoftStart		100
 #define kPressure		224
+#define kMotorCurrent   200
+#define kActualSpeed	226
+#define kControllerTemp	216
+#define kReadSpeedOp    167
 
 @interface ORVarianTPSModel (private)
-- (NSString*) formatExp:(float)aFloat;
 - (void)	timeout;
 - (void)	processOneCommandFromQueue;
-- (int)		checkSum:(NSString*)aString;
 - (void)	enqueCmdData:(NSData*)someData;
 - (void)	processReceivedData:(NSData*)aCommand;
 - (BOOL)	extractBool:(NSData*)aCommand;
 - (int)		extractInt:(NSData*)aCommand;
 - (float)	extractFloat:(NSData*)aCommand;
-- (NSString*) extractString:(NSString*)aCommand;
-- (void) clearAlarms;
-- (int) extractWindow:(NSData*)aCommand;
-
+- (int)		extractWindow:(NSData*)aCommand;
 @end
 
 @implementation ORVarianTPSModel
@@ -125,6 +104,16 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 }
 
 #pragma mark •••Accessors
+- (int) controllerTemp
+{
+	return controllerTemp;
+}
+- (void) setControllerTemp:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setControllerTemp:controllerTemp];
+    controllerTemp = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelControllerTempChanged object:self];
+}
 
 - (BOOL) remote
 {
@@ -136,20 +125,6 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
     [[[self undoManager] prepareWithInvocationTarget:self] setRemote:remote];
     remote = aRemote;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelRemoteChanged object:self];
-}
-
-- (int) tmpRotSet
-{
-    return tmpRotSet;
-}
-
-- (void) setTmpRotSet:(int)aTmpRotSet
-{
-	if(aTmpRotSet<20)aTmpRotSet = 20;
-	else if(aTmpRotSet>100)aTmpRotSet=100;
-    [[[self undoManager] prepareWithInvocationTarget:self] setTmpRotSet:tmpRotSet];
-    tmpRotSet = aTmpRotSet;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelTmpRotSetChanged object:self];
 }
 
 - (int) pollTime
@@ -218,16 +193,6 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelStationPowerChanged object:self];
 }
 
-- (BOOL) motorPower
-{
-    return motorPower;
-}
-
-- (void) setMotorPower:(BOOL)aMotorPower
-{
-    motorPower = aMotorPower;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelMotorPowerChanged object:self];
-}
 
 - (float) pressure
 {
@@ -265,80 +230,6 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelActualRotorSpeedChanged object:self];
 }
 
-- (int) setRotorSpeed
-{
-    return setRotorSpeed;
-}
-
-- (void) setSetRotorSpeed:(int)aSetRotorSpeed
-{
-    setRotorSpeed = aSetRotorSpeed;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelSetRotorSpeedChanged object:self];
-}
-
-- (BOOL) turboAccelerating
-{
-    return turboAccelerating;
-}
-
-- (void) setTurboAccelerating:(BOOL)aTurboAccelerating
-{
-    turboAccelerating = aTurboAccelerating;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSTurboAcceleratingChanged object:self];
-}
-
-- (BOOL) speedAttained
-{
-    return speedAttained;
-}
-
-- (void) setSpeedAttained:(BOOL)aSpeedAttained
-{
-    speedAttained = aSpeedAttained;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSTurboSpeedAttainedChanged object:self];
-}
-
-- (BOOL) turboPumpOverTemp
-{
-    return turboPumpOverTemp;
-}
-
-- (void) setTurboPumpOverTemp:(BOOL)aTurboPumpOverTemp
-{
-    turboPumpOverTemp = aTurboPumpOverTemp;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSTurboOverTempChanged object:self];
-}
-
-- (BOOL) driveUnitOverTemp
-{
-    return driveUnitOverTemp;
-}
-
-- (void) setDriveUnitOverTemp:(BOOL)aDriveUnitOverTemp
-{
-    driveUnitOverTemp = aDriveUnitOverTemp;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSDriveOverTempChanged object:self];
-}
-
-
-- (int) deviceAddress
-{
-    return deviceAddress;
-}
-
-- (void) setDeviceAddress:(int)aDeviceAddress
-{
-	//if(aDeviceAddress<1)aDeviceAddress = 1;
-	//else if(aDeviceAddress>255)aDeviceAddress= 255;
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setDeviceAddress:deviceAddress];
-	if([serialPort isOpen]){
-		//[self sendDataSet:kDeviceAddress integer:aDeviceAddress];
-	}
-    deviceAddress = aDeviceAddress;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelDeviceAddressChanged object:self];
-}
-
 - (NSData*) lastRequest
 {
 	return lastRequest;
@@ -363,9 +254,12 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
     }
     else {
 		[serialPort close];
-		[self clearAlarms];
 	}
     portWasOpen = [serialPort isOpen];
+	if([serialPort isOpen]){
+		[self sendRemoteMode];
+		[self sendReadSpeedMode];
+	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
     
 }
@@ -376,10 +270,8 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setRemote:[decoder decodeBoolForKey:@"remote"]];
-	[self setTmpRotSet:		[decoder decodeIntForKey:	@"tmpRotSet"]];
 	[self setPollTime:		[decoder decodeIntForKey:	@"pollTime"]];
 	[self setPressureScale:	[decoder decodeIntForKey:	@"pressureScale"]];
-	[self setDeviceAddress:	[decoder decodeIntForKey:	@"deviceAddress"]];
 	[[self undoManager] enableUndoRegistration];
 	cmdQueue = [[ORSafeQueue alloc] init];
 	
@@ -390,69 +282,27 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:remote forKey:@"remote"];
-    [encoder encodeInt:tmpRotSet		forKey:@"tmpRotSet"];
     [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
-    [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
     [encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
 #pragma mark •••HW Methods
-- (void) initUnit
-{
-	[self sendTmpRotSet:[self tmpRotSet]];
-}
 
 - (void) getPressure		{ [self read:kPressure];  }
 - (void) getRemote			{ [self read:kRemoteOps];  }
 - (void) getStationPower	{ [self read:kStartStop];  }
-
-- (void) getDeviceAddress	{ }
-- (void) getTMPRotSet		{  }
-- (void) getTurboTemp		{ }
-- (void) getDriveTemp		{  }
-- (void) getSpeedAttained	{  }
-- (void) getAccelerating	{  }
-- (void) getSetSpeed		{  }
-- (void) getActualSpeed		{  }
-- (void) getMotorCurrent	{  }
-- (void) getMotorPower		{  }
-- (void) getStandby			{  }
-- (void) getUnitName		{  }
+- (void) getMotorCurrent	{ [self read:kMotorCurrent];  }
+- (void) getActualSpeed		{ [self read:kActualSpeed]; }
+- (void) getControllerTemp	{ [self read:kControllerTemp];  }
 
 - (void) updateAll
 {
-	//[self getTurboTemp];
-	//[self getDriveTemp];
-	//[self getAccelerating];
-	//[self getSpeedAttained];
-	//[self getSetSpeed];
-	//[self getActualSpeed];
-	//[self getMotorCurrent];
+	[self getControllerTemp];
 	[self getRemote];
+	[self getActualSpeed];
 	[self getPressure];
 	[self getStationPower];
-	//[self getMotorPower];
-}
-
-- (void) sendTmpRotSet:(int)aValue
-{
-	[self sendDataSet:kTMPRotSet real:aValue];
-}
-
-- (void) sendMotorPower:(BOOL)aState
-{
-	[self sendRemoteMode];
-	[self sendDataSet:kMotorPower bool:aState];
-}
-
-- (void) sendStationPower:(BOOL)aState
-{
-	[self sendDataSet:kStationPower bool:aState];
-}
-
-- (void) sendStandby:(BOOL)aState
-{
-	[self sendDataSet:kStandby bool:aState];
+	[self getMotorCurrent];
 }
 
 - (void) sendRemoteMode
@@ -460,15 +310,21 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 	[self write:kRemoteOps logicValue:0];
 }
 
+- (void) sendReadSpeedMode
+{
+	[self write:kReadSpeedOp logicValue:0];
+}
+
 - (void) turnStationOn
 {
-	[self sendRemoteMode];
 	[self write:kStartStop logicValue:1];
+	[self updateAll];
 }
 
 - (void) turnStationOff
 {
 	[self write:kStartStop logicValue:0];
+	[self updateAll];
 }
 
 #pragma mark •••Commands
@@ -613,7 +469,6 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 		do {
 			char* p = (char*)[inComingData bytes];
 			int i;
-			NSLog(@"received: %@\n",inComingData);
 			int n = [inComingData length];
 			BOOL foundEnd = NO;
 			for(i=0;i<n;i++){
@@ -666,20 +521,13 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 			[self showWindowDisabled:aCommand];
 		break;
 			
-		case kRemoteOps:[self setRemote:			[self extractBool:aCommand]];  break;
-		case kPressure:	[self setPressure:			[self extractFloat:aCommand]]; break;			
-		case kStartStop:[self setStationPower:		[self extractBool:aCommand]]; break;			
-		//case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]]; break;
-		//case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]]; break;
-		//case kTempDriveUnit: [self setDriveUnitOverTemp:[self extractBool:aCommand]]; break;
-		//case kTempTurbo:	 [self setTurboPumpOverTemp:[self extractBool:aCommand]]; break;
-		//case kSpeedAttained: [self setSpeedAttained:	[self extractBool:aCommand]]; break;
-		//case kAccelerating:  [self setTurboAccelerating:[self extractBool:aCommand]]; break;
-
-		//case kSetSpeed:		[self setSetRotorSpeed:		[self extractInt:aCommand]];   break;
-		//case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
-		//case kMotorCurrent: [self setMotorCurrent:		[self extractFloat:aCommand]]; break;
-		//case kUnitName:		NSLog(@"DCU Unit: %@\n",	[self extractString:aCommand]);break;	
+		case kRemoteOps:	[self setRemote:			[self extractBool:aCommand]];  break;
+		case kPressure:		[self setPressure:			[self extractFloat:aCommand]]; break;			
+		case kStartStop:	[self setStationPower:		[self extractBool:aCommand]]; break;			
+		case kMotorCurrent: [self setMotorCurrent:		[self extractInt:aCommand]]; break;
+		case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
+		case kControllerTemp: [self setControllerTemp:	[self extractInt:aCommand]]; break;
+			
 		default:
 		break;
 	}
@@ -689,12 +537,18 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 @implementation ORVarianTPSModel (private)
 - (int)   extractInt:  (NSData*)aCommand	
 { 
-	return [[aCommand substringWithRange:NSMakeRange(6,6)] intValue]; 
+	NSString* s = [[NSString alloc] initWithData:[aCommand subdataWithRange:NSMakeRange(6,6)] encoding:NSASCIIStringEncoding];
+	int theValue = [s intValue];
+	[s release];
+	return theValue;
 }
 
 - (BOOL)  extractBool: (NSData*)aCommand	
 { 
-	return [[aCommand substringWithRange:NSMakeRange(6,1)] intValue]!=0; 
+	NSString* s = [[NSString alloc] initWithData:[aCommand subdataWithRange:NSMakeRange(6,1)] encoding:NSASCIIStringEncoding];
+	BOOL theValue = [s boolValue];
+	[s release];
+	return theValue; 
 }
 
 - (float) extractFloat:(NSData*)aCommand	
@@ -706,12 +560,6 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 		return theValue; 
 	}
 	else return 0;
-}
-
-- (NSString*) extractString:(NSString*)aCommand	
-{
-	int numChars = [[aCommand substringWithRange:NSMakeRange(8,2)] intValue];
-	return [aCommand substringWithRange:NSMakeRange(10,numChars)];
 }
 
 - (void) timeout
@@ -732,40 +580,12 @@ NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusCh
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
 }
 
-- (int) checkSum:(NSString*)aString
-{
-	int i;
-	int sum = 0;
-	for(i=0;i<[aString length];i++){
-		sum += (int)[aString characterAtIndex:i];
-	}
-	return sum%256;
-}
-
 - (void) enqueCmdData:(NSData*)someData
 {
 	if([serialPort isOpen]){
 		[cmdQueue enqueue:someData];
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
-}
-
-- (NSString*) formatExp:(float)aFloat
-{
-	NSString* s = [NSString stringWithFormat:@"%.1E",aFloat];
-	NSArray* parts = [s componentsSeparatedByString:@"E"];
-	float m = [[parts objectAtIndex:0] floatValue];
-	int e = [[parts objectAtIndex:1] intValue];
-	s= [NSString stringWithFormat:@"%.1fE%d",m,e];
-	s = [[s componentsSeparatedByString:@".0"] componentsJoinedByString:@""];
-	int len = [s length];
-	if(len<6){
-		int i;
-		for(i=0;i<6-len;i++){
-			s = [NSString stringWithFormat:@"0%@",s];
-		}
-	}
-	return s;
 }
 
 - (int) extractWindow:(NSData*)aCommand

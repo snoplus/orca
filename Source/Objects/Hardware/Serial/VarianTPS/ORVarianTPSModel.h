@@ -31,20 +31,13 @@
 		NSData*			lastRequest;
 		ORSafeQueue*	cmdQueue;
 		NSMutableData*	inComingData;
-		int				deviceAddress;
-		int				setRotorSpeed;
+		int				controllerTemp;
 		int				actualRotorSpeed;
 		int				pressureScale;
 		int				pollTime;
-		int				tmpRotSet;
 		float			motorCurrent;
 		float			pressure;
 		float			pressureScaleValue;
-		BOOL			driveUnitOverTemp;
-		BOOL			turboPumpOverTemp;
-		BOOL			speedAttained;
-		BOOL			turboAccelerating;
-		BOOL			motorPower;
 		BOOL			stationPower;
 		ORTimeRate*		timeRate;
 	
@@ -58,8 +51,8 @@
 #pragma mark •••Accessors
 - (BOOL) remote;
 - (void) setRemote:(BOOL)aRemote;
-- (int) tmpRotSet;
-- (void) setTmpRotSet:(int)aTmpRotSet;
+- (int) controllerTemp;
+- (void) setControllerTemp:(int)aValue;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (float) pressureScaleValue;
@@ -68,26 +61,12 @@
 - (ORTimeRate*)timeRate;
 - (BOOL) stationPower;
 - (void) setStationPower:(BOOL)aStationPower;
-- (BOOL) motorPower;
-- (void) setMotorPower:(BOOL)aMotorPower;
 - (float) pressure;
 - (void) setPressure:(float)aPressure;
 - (float) motorCurrent;
 - (void) setMotorCurrent:(float)aMotorCurrent;
 - (int) actualRotorSpeed;
 - (void) setActualRotorSpeed:(int)aActualRotorSpeed;
-- (int) setRotorSpeed;
-- (void) setSetRotorSpeed:(int)aSetRotorSpeed;
-- (BOOL) turboAccelerating;
-- (void) setTurboAccelerating:(BOOL)aTurboAccelerating;
-- (BOOL) speedAttained;
-- (void) setSpeedAttained:(BOOL)aSpeedAttained;
-- (BOOL) turboPumpOverTemp;
-- (void) setTurboPumpOverTemp:(BOOL)aTurboPumpOverTemp;
-- (BOOL) driveUnitOverTemp;
-- (void) setDriveUnitOverTemp:(BOOL)aDriveUnitOverTemp;
-- (int) deviceAddress;
-- (void) setDeviceAddress:(int)aDeviceAddress;
 - (NSData*) lastRequest;
 - (void) setLastRequest:(NSData*)aCmdString;
 - (void) openPort:(BOOL)state;
@@ -121,46 +100,27 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••HW Methods
-- (void) initUnit;
-- (void) getDeviceAddress;
-- (void) getTurboTemp;
-- (void) getDriveTemp;
-- (void) getSpeedAttained;
-- (void) getAccelerating;
-- (void) getSetSpeed;
+- (void) getControllerTemp;
 - (void) getActualSpeed	;
 - (void) getMotorCurrent;
 - (void) getPressure;	
-- (void) getUnitName;
-- (void) getStandby;
 - (void) updateAll;
-- (void) sendMotorPower:(BOOL)aState;
-- (void) sendStationPower:(BOOL)aState;
-- (void) sendStandby:(BOOL)aState;
-- (void) sendTmpRotSet:(int)aValue;
 - (void) sendRemoteMode;
 - (void) turnStationOn;
 - (void) turnStationOff;
+- (void) sendReadSpeedMode;
 
 @end
 
 extern NSString* ORVarianTPSModelRemoteChanged;
-extern NSString* ORVarianTPSModelTmpRotSetChanged;
 extern NSString* ORVarianTPSModelPressureScaleChanged;
 extern NSString* ORVarianTPSModelStationPowerChanged;
-extern NSString* ORVarianTPSModelMotorPowerChanged;
-extern NSString* ORVarianTPSTurboAcceleratingChanged;
-extern NSString* ORVarianTPSTurboSpeedAttainedChanged;
-extern NSString* ORVarianTPSTurboOverTempChanged;
-extern NSString* ORVarianTPSDriveOverTempChanged;
 extern NSString* ORVarianTPSModelPressureChanged;
 extern NSString* ORVarianTPSModelMotorCurrentChanged;
 extern NSString* ORVarianTPSModelMotorCurrentChanged;
 extern NSString* ORVarianTPSModelActualRotorSpeedChanged;
-extern NSString* ORVarianTPSModelSetRotorSpeedChanged;
-extern NSString* ORVarianTPSTurboStateChanged;
-extern NSString* ORVarianTPSModelDeviceAddressChanged;
 extern NSString* ORVarianTPSLock;
 extern NSString* ORVarianTPSModelPollTimeChanged;
 extern NSString* ORVarianTPSModelWindowStatusChanged;
+extern NSString* ORVarianTPSModelControllerTempChanged;
 

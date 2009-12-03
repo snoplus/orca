@@ -19,37 +19,27 @@
 
 #pragma mark •••Imported Files
 
-@class StopLightView;
 @class ORPlotter1D;
 @class ORSerialPortController;
 @class ORTimedTextField;
 
 @interface ORVarianTPSController : OrcaObjectController
 {
-	IBOutlet NSTextField*	motorPowerField;
 	IBOutlet NSTextField*	remoteField;
-	IBOutlet NSTextField*	tmpRotSetField;
 	IBOutlet NSTextField*	stationPowerField;
 	IBOutlet NSTextField*	pressureField;
 	IBOutlet NSTextField*	motorCurrentField;
 	IBOutlet NSTextField*	actualRotorSpeedField;
-	IBOutlet NSTextField*	setRotorSpeedField;
-	IBOutlet NSTextField*	turboAcceleratingField;
-	IBOutlet NSTextField*	speedAttainedField;
-	IBOutlet NSTextField*	turboPumpOverTempField;
-	IBOutlet NSTextField*	driveUnitOverTempField;
-	IBOutlet NSTextField*	deviceAddressField;
     IBOutlet NSButton*		lockButton;
     IBOutlet NSButton*		stationOnButton;
     IBOutlet NSButton*		stationOffButton;
     IBOutlet NSButton*		updateButton;
-    IBOutlet NSButton*		initButton;
-    IBOutlet StopLightView* lightBoardView;
     IBOutlet ORPlotter1D*		plotter;
 	IBOutlet NSPopUpButton*	pressureScalePU;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;
 	IBOutlet ORTimedTextField* statusField;
+	IBOutlet NSTextField* controllerTempField;
 }
 
 #pragma mark •••Initialization
@@ -63,28 +53,18 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) controllerTempChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
 - (void) remoteChanged:(NSNotification*)aNote;
-- (void) tmpRotSetChanged:(NSNotification*)aNote;
 - (void) stationPowerChanged:(NSNotification*)aNote;
-- (void) motorPowerChanged:(NSNotification*)aNote;
-- (void) turboAcceleratingChanged:(NSNotification*)aNote;
-- (void) speedAttainedChanged:(NSNotification*)aNote;
 - (void) pressureChanged:(NSNotification*)aNote;
 - (void) motorCurrentChanged:(NSNotification*)aNote;
 - (void) motorCurrentChanged:(NSNotification*)aNote;
 - (void) actualRotorSpeedChanged:(NSNotification*)aNote;
-- (void) setRotorSpeedChanged:(NSNotification*)aNote;
 - (void) pressureChanged:(NSNotification*)aNote;
-- (void) turboAcceleratingChanged:(NSNotification*)aNote;
 - (void) motorCurrentChanged:(NSNotification*)aNote;
 - (void) actualRotorSpeedChanged:(NSNotification*)aNote;
-- (void) setRotorSpeedChanged:(NSNotification*)aNote;
-- (void) deviceAddressChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) turboOverTempChanged:(NSNotification*)aNote;
-- (void) unitOverTempChanged:(NSNotification*)aNote;
-- (void) updateStopLight;
 - (void) pressureScaleChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
@@ -93,16 +73,13 @@
 - (BOOL) portLocked;
 
 #pragma mark •••Actions
-- (IBAction) tmpRotSetAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) pressureScaleAction:(id)sender;
 - (IBAction) turnOnAction:(id)sender;
 - (IBAction) turnOffAction:(id)sender;
-- (IBAction) deviceAddressAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) updateAllAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
-- (IBAction) initAction:(id)sender;
 
 @end
 
