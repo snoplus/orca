@@ -249,7 +249,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 		NSAttributedString* n = [[NSAttributedString alloc] 
 								initWithString:[s length]?s:@"Text Label"
-									attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Geneva"  size:textSize] forKey:NSFontAttributeName]];
+									attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:textSize] forKey:NSFontAttributeName]];
 		
 		NSSize theSize = [n size];
 
@@ -282,7 +282,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		NSString* s = [self stringToDisplay];
 		NSAttributedString* n = [[NSAttributedString alloc] 
 								 initWithString:[s length]?s:@"Text Label"
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Geneva"  size:textSize],NSFontAttributeName,
+								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
 											 [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
 		
 		NSSize theSize = [n size];

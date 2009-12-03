@@ -97,6 +97,8 @@
 {
 	[super awakeFromNib];
 	[labelField setString:[model label]];
+	[labelField setFont:[NSFont fontWithName:@"Monaco" size:12]];
+	[displayFormatField setFont:[NSFont fontWithName:@"Monaco" size:12]];
 }
 
 - (void) updateWindow
