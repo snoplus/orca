@@ -611,6 +611,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
         }
     }
 }
+- (NSCalendarDate*) currentTime
+{
+	NSCalendarDate* theDate = [NSCalendarDate date];
+	[theDate setCalendarFormat:@"%d/%m/%Y %H:%M:%S %z"];
+	return theDate;
+}
 
 - (id) executeSimpleCommand:(NSString*)aCommandString;
 {
@@ -642,10 +648,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 		SEL theSelector = [NSInvocation makeSelectorFromArray:cmdItems];
 		id theObj = [destinationObjects objectForKey:objName];
 		if(!theObj){
-			//OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
-			theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
-		}	
-		
+			if([objName isEqualToString:@"self"]){
+				theObj = self;
+			}
+			else {
+				//OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
+				theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
+			}	
+		}
 		if([theObj respondsToSelector:theSelector]){
 			NSMethodSignature* theSignature = [theObj methodSignatureForSelector:theSelector];
 			NSInvocation* theInvocation = [NSInvocation invocationWithMethodSignature:theSignature];
