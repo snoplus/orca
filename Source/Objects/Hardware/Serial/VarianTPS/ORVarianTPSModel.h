@@ -40,7 +40,6 @@
 		float			motorCurrent;
 		float			pressure;
 		float			pressureScaleValue;
-		BOOL			oilDeficiency;
 		BOOL			driveUnitOverTemp;
 		BOOL			turboPumpOverTemp;
 		BOOL			speedAttained;
@@ -48,14 +47,17 @@
 		BOOL			motorPower;
 		BOOL			stationPower;
 		ORTimeRate*		timeRate;
-		ORAlarm*		noOilAlarm;
+	
 		NSString*		statusString;
+		BOOL			remote;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (BOOL) remote;
+- (void) setRemote:(BOOL)aRemote;
 - (int) tmpRotSet;
 - (void) setTmpRotSet:(int)aTmpRotSet;
 - (int)  pollTime;
@@ -84,13 +86,12 @@
 - (void) setTurboPumpOverTemp:(BOOL)aTurboPumpOverTemp;
 - (BOOL) driveUnitOverTemp;
 - (void) setDriveUnitOverTemp:(BOOL)aDriveUnitOverTemp;
-- (BOOL) oilDeficiency;
-- (void) setOilDeficiency:(BOOL)aOilDeficiency;
 - (int) deviceAddress;
 - (void) setDeviceAddress:(int)aDeviceAddress;
 - (NSData*) lastRequest;
 - (void) setLastRequest:(NSData*)aCmdString;
 - (void) openPort:(BOOL)state;
+- (NSString*) statusString;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -122,7 +123,6 @@
 #pragma mark •••HW Methods
 - (void) initUnit;
 - (void) getDeviceAddress;
-- (void) getOilDeficiency;
 - (void) getTurboTemp;
 - (void) getDriveTemp;
 - (void) getSpeedAttained;
@@ -144,6 +144,7 @@
 
 @end
 
+extern NSString* ORVarianTPSModelRemoteChanged;
 extern NSString* ORVarianTPSModelTmpRotSetChanged;
 extern NSString* ORVarianTPSModelPressureScaleChanged;
 extern NSString* ORVarianTPSModelStationPowerChanged;
@@ -152,7 +153,6 @@ extern NSString* ORVarianTPSTurboAcceleratingChanged;
 extern NSString* ORVarianTPSTurboSpeedAttainedChanged;
 extern NSString* ORVarianTPSTurboOverTempChanged;
 extern NSString* ORVarianTPSDriveOverTempChanged;
-extern NSString* ORVarianTPSOilDeficiencyChanged;
 extern NSString* ORVarianTPSModelPressureChanged;
 extern NSString* ORVarianTPSModelMotorCurrentChanged;
 extern NSString* ORVarianTPSModelMotorCurrentChanged;
@@ -162,3 +162,5 @@ extern NSString* ORVarianTPSTurboStateChanged;
 extern NSString* ORVarianTPSModelDeviceAddressChanged;
 extern NSString* ORVarianTPSLock;
 extern NSString* ORVarianTPSModelPollTimeChanged;
+extern NSString* ORVarianTPSModelWindowStatusChanged;
+

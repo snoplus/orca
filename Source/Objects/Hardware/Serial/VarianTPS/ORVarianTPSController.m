@@ -102,12 +102,7 @@
                      selector : @selector(turboOverTempChanged:)
                          name : ORVarianTPSTurboOverTempChanged
 						object: model];
-		
-	[notifyCenter addObserver : self
-                     selector : @selector(oilDeficiencyChanged:)
-                         name : ORVarianTPSOilDeficiencyChanged
-						object: model];
-	
+			
     [notifyCenter addObserver : self
                      selector : @selector(setRotorSpeedChanged:)
                          name : ORVarianTPSModelSetRotorSpeedChanged
@@ -168,6 +163,16 @@
                          name : ORVarianTPSModelTmpRotSetChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(remoteChanged:)
+                         name : ORVarianTPSModelRemoteChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(statusChanged:)
+                         name : ORVarianTPSModelWindowStatusChanged
+						object: model];	
+
 }
 
 - (void) setModel:(id)aModel
@@ -188,7 +193,6 @@
 	[self speedAttainedChanged:nil];
 	[self turboOverTempChanged:nil];
 	[self unitOverTempChanged:nil];
-	[self oilDeficiencyChanged:nil];
 	[self pressureChanged:nil];
 	[self motorPowerChanged:nil];
 	[self stationPowerChanged:nil];
@@ -197,6 +201,19 @@
 	[self pressureScaleChanged:nil];
 	[self pollTimeChanged:nil];
 	[self tmpRotSetChanged:nil];
+	[self remoteChanged:nil];
+	[self statusChanged:nil];
+}
+
+- (void) statusChanged:(NSNotification*)aNote
+{
+	[statusField setStringValue: [model statusString]];
+}
+
+- (void) remoteChanged:(NSNotification*)aNote
+{
+	[self updateButtons];
+	[remoteField setStringValue: [model remote]? @"YES":@"NO"];
 }
 
 - (void) tmpRotSetChanged:(NSNotification*)aNote
@@ -317,12 +334,6 @@
 	[driveUnitOverTempField setTextColor:	[model driveUnitOverTemp]?[NSColor redColor]:[NSColor blackColor]];
 }
 
-- (void) oilDeficiencyChanged:(NSNotification*)aNote
-{
-	[oilDeficiencyField setStringValue: [model oilDeficiency]?@"LOW":@"OK"];
-	[oilDeficiencyField setTextColor:	[model oilDeficiency]?[NSColor redColor]:[NSColor blackColor]];
-}
-
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
@@ -345,12 +356,13 @@
     BOOL locked = [gSecurity isLocked:ORVarianTPSLock];
 	BOOL portOpen = [[model serialPort] isOpen];
 	BOOL stationOn = [model stationPower] && [model motorPower];
+	BOOL inRemote  = [model remote];
     [lockButton setState: locked];
 	
 	[serialPortController updateButtons:locked];
 	
-    //[stationOnButton setEnabled:!locked && portOpen && !stationOn];
-    //[stationOffButton setEnabled:!locked && portOpen && stationOn];
+    [stationOnButton setEnabled:!locked && portOpen && !stationOn && inRemote];
+    [stationOffButton setEnabled:!locked && portOpen && stationOn && inRemote];
 	[tmpRotSetField setEnabled:!locked && portOpen];
     [updateButton setEnabled:portOpen];
 

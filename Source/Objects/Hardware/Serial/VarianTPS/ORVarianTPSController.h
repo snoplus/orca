@@ -22,10 +22,12 @@
 @class StopLightView;
 @class ORPlotter1D;
 @class ORSerialPortController;
+@class ORTimedTextField;
 
 @interface ORVarianTPSController : OrcaObjectController
 {
 	IBOutlet NSTextField*	motorPowerField;
+	IBOutlet NSTextField*	remoteField;
 	IBOutlet NSTextField*	tmpRotSetField;
 	IBOutlet NSTextField*	stationPowerField;
 	IBOutlet NSTextField*	pressureField;
@@ -36,7 +38,6 @@
 	IBOutlet NSTextField*	speedAttainedField;
 	IBOutlet NSTextField*	turboPumpOverTempField;
 	IBOutlet NSTextField*	driveUnitOverTempField;
-	IBOutlet NSTextField*	oilDeficiencyField;
 	IBOutlet NSTextField*	deviceAddressField;
     IBOutlet NSButton*		lockButton;
     IBOutlet NSButton*		stationOnButton;
@@ -48,6 +49,7 @@
 	IBOutlet NSPopUpButton*	pressureScalePU;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;
+	IBOutlet ORTimedTextField* statusField;
 }
 
 #pragma mark •••Initialization
@@ -61,6 +63,8 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) statusChanged:(NSNotification*)aNote;
+- (void) remoteChanged:(NSNotification*)aNote;
 - (void) tmpRotSetChanged:(NSNotification*)aNote;
 - (void) stationPowerChanged:(NSNotification*)aNote;
 - (void) motorPowerChanged:(NSNotification*)aNote;
@@ -80,7 +84,6 @@
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) turboOverTempChanged:(NSNotification*)aNote;
 - (void) unitOverTempChanged:(NSNotification*)aNote;
-- (void) oilDeficiencyChanged:(NSNotification*)aNote;
 - (void) updateStopLight;
 - (void) pressureScaleChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;

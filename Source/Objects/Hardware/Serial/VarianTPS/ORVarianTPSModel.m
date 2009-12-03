@@ -28,6 +28,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORVarianTPSModelRemoteChanged = @"ORVarianTPSModelRemoteChanged";
 NSString* ORVarianTPSModelTmpRotSetChanged		= @"ORVarianTPSModelTmpRotSetChanged";
 NSString* ORVarianTPSModelPressureScaleChanged	= @"ORVarianTPSModelPressureScaleChanged";
 NSString* ORVarianTPSModelStationPowerChanged	= @"ORVarianTPSModelStationPowerChanged";
@@ -46,13 +47,12 @@ NSString* ORVarianTPSTurboAcceleratingChanged	= @"ORVarianTPSTurboAcceleratingCh
 NSString* ORVarianTPSTurboSpeedAttainedChanged	= @"ORVarianTPSTurboSpeedAttainedChanged";
 NSString* ORVarianTPSTurboOverTempChanged		= @"ORVarianTPSTurboOverTempChanged";
 NSString* ORVarianTPSDriveOverTempChanged		= @"ORVarianTPSDriveOverTempChanged";
-NSString* ORVarianTPSOilDeficiencyChanged		= @"ORVarianTPSOilDeficiencyChanged";
 NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
+NSString* ORVarianTPSModelWindowStatusChanged	= @"ORVarianTPSModelWindowStatusChanged";
 
 #pragma mark •••Status Parameters
 #define kTMPRotSet		707
 #define kDeviceAddress	797
-#define kOilDeficiency	301
 #define kTempDriveUnit	304
 #define kTempTurbo		305
 #define kSpeedAttained	306
@@ -87,8 +87,8 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (int)		checkSum:(NSString*)aString;
 - (void)	enqueCmdData:(NSData*)someData;
 - (void)	processReceivedData:(NSData*)aCommand;
-- (BOOL)	extractBool:(NSString*)aCommand;
-- (int)		extractInt:(NSString*)aCommand;
+- (BOOL)	extractBool:(NSData*)aCommand;
+- (int)		extractInt:(NSData*)aCommand;
 - (float)	extractFloat:(NSData*)aCommand;
 - (NSString*) extractString:(NSString*)aCommand;
 - (void) clearAlarms;
@@ -104,8 +104,6 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	[cmdQueue release];
 	[lastRequest release];
 	[inComingData release];
-    [noOilAlarm clearAlarm];
-    [noOilAlarm release];
 	[statusString release];
 	[super dealloc];
 }
@@ -114,9 +112,6 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 {
     [super sleep];
     	
-    [noOilAlarm clearAlarm];
-    [noOilAlarm release];
-    noOilAlarm = nil;
 }
 
 - (void) setUpImage
@@ -130,6 +125,19 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) remote
+{
+    return remote;
+}
+
+- (void) setRemote:(BOOL)aRemote
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRemote:remote];
+    remote = aRemote;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelRemoteChanged object:self];
+}
+
 - (int) tmpRotSet
 {
     return tmpRotSet;
@@ -312,33 +320,6 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSDriveOverTempChanged object:self];
 }
 
-- (BOOL) oilDeficiency
-{
-    return oilDeficiency;
-}
-
-- (void) setOilDeficiency:(BOOL)aOilDeficiency
-{    
-    oilDeficiency = aOilDeficiency;
-	if(oilDeficiency){
-		if(!noOilAlarm){
-			NSString* s = [NSString stringWithFormat:@"No Oil -- DCU %d",[self uniqueIdNumber]];
-			noOilAlarm = [[ORAlarm alloc] initWithName:s severity:kImportantAlarm];
-			[noOilAlarm setSticky:YES];
-			[noOilAlarm setHelpStringFromFile:@"NoOilHelp"];
-			[noOilAlarm setAcknowledged:NO];
-		}                      
-		[noOilAlarm postAlarm];
-	}
-	else {
-		if(noOilAlarm){
-			[noOilAlarm clearAlarm];
-			[noOilAlarm release];
-			noOilAlarm = nil;
-		}
-	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSOilDeficiencyChanged object:self];
-}
 
 - (int) deviceAddress
 {
@@ -394,6 +375,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setRemote:[decoder decodeBoolForKey:@"remote"]];
 	[self setTmpRotSet:		[decoder decodeIntForKey:	@"tmpRotSet"]];
 	[self setPollTime:		[decoder decodeIntForKey:	@"pollTime"]];
 	[self setPressureScale:	[decoder decodeIntForKey:	@"pressureScale"]];
@@ -407,6 +389,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:remote forKey:@"remote"];
     [encoder encodeInt:tmpRotSet		forKey:@"tmpRotSet"];
     [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
     [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
@@ -419,9 +402,12 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	[self sendTmpRotSet:[self tmpRotSet]];
 }
 
+- (void) getPressure		{ [self read:kPressure];  }
+- (void) getRemote			{ [self read:kRemoteOps];  }
+- (void) getStationPower	{ [self read:kStartStop];  }
+
 - (void) getDeviceAddress	{ }
 - (void) getTMPRotSet		{  }
-- (void) getOilDeficiency	{  }
 - (void) getTurboTemp		{ }
 - (void) getDriveTemp		{  }
 - (void) getSpeedAttained	{  }
@@ -429,15 +415,12 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (void) getSetSpeed		{  }
 - (void) getActualSpeed		{  }
 - (void) getMotorCurrent	{  }
-- (void) getPressure		{ [self read:224];  }
 - (void) getMotorPower		{  }
-- (void) getStationPower	{  }
 - (void) getStandby			{  }
 - (void) getUnitName		{  }
 
 - (void) updateAll
 {
-	//[self getOilDeficiency];
 	//[self getTurboTemp];
 	//[self getDriveTemp];
 	//[self getAccelerating];
@@ -445,8 +428,9 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	//[self getSetSpeed];
 	//[self getActualSpeed];
 	//[self getMotorCurrent];
+	[self getRemote];
 	[self getPressure];
-	//[self getStationPower];
+	[self getStationPower];
 	//[self getMotorPower];
 }
 
@@ -655,11 +639,20 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	}
 }
 
+- (NSString*) statusString
+{
+	if(!statusString)return @"";
+	else return statusString;
+}
+
 - (void) showWindowDisabled:(NSData*)aCommand
 {
 	int lastWindow = [self extractWindow:lastRequest];
 	[statusString release];
 	statusString = [[NSString stringWithFormat:@"%@ Disabled",[self windowName:lastWindow]] retain];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelWindowStatusChanged object:self];
+
+	
 	NSLog(@"%@\n",statusString);
 }
 
@@ -672,12 +665,12 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 		case kWinDisabled:
 			[self showWindowDisabled:aCommand];
 		break;
-		case kRemoteOps:
-			NSLog(@"got remote Ops\n");
-		break;
+			
+		case kRemoteOps:[self setRemote:			[self extractBool:aCommand]];  break;
+		case kPressure:	[self setPressure:			[self extractFloat:aCommand]]; break;			
+		case kStartStop:[self setStationPower:		[self extractBool:aCommand]]; break;			
 		//case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]]; break;
 		//case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]]; break;
-		//case kOilDeficiency: [self setOilDeficiency:	[self extractBool:aCommand]]; break;
 		//case kTempDriveUnit: [self setDriveUnitOverTemp:[self extractBool:aCommand]]; break;
 		//case kTempTurbo:	 [self setTurboPumpOverTemp:[self extractBool:aCommand]]; break;
 		//case kSpeedAttained: [self setSpeedAttained:	[self extractBool:aCommand]]; break;
@@ -686,7 +679,6 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 		//case kSetSpeed:		[self setSetRotorSpeed:		[self extractInt:aCommand]];   break;
 		//case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
 		//case kMotorCurrent: [self setMotorCurrent:		[self extractFloat:aCommand]]; break;
-		case kPressure:		[self setPressure:			[self extractFloat:aCommand]]; break;			
 		//case kUnitName:		NSLog(@"DCU Unit: %@\n",	[self extractString:aCommand]);break;	
 		default:
 		break;
@@ -695,17 +687,15 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 @end
 
 @implementation ORVarianTPSModel (private)
-- (void) clearAlarms
-{
-	if(noOilAlarm){
-		[noOilAlarm clearAlarm];
-		[noOilAlarm release];
-		noOilAlarm = nil;
-	}	
+- (int)   extractInt:  (NSData*)aCommand	
+{ 
+	return [[aCommand substringWithRange:NSMakeRange(6,6)] intValue]; 
 }
 
-- (BOOL)  extractBool: (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]!=0; }
-- (int)   extractInt:  (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]; }
+- (BOOL)  extractBool: (NSData*)aCommand	
+{ 
+	return [[aCommand substringWithRange:NSMakeRange(6,1)] intValue]!=0; 
+}
 
 - (float) extractFloat:(NSData*)aCommand	
 { 
