@@ -188,6 +188,27 @@ NSString* ORPlotterDataColor		= @"ORPlotterDataColor";
 	}
 	[[NSColor darkGrayColor] set];
 	[NSBezierPath strokeRect:bounds];
+	[self drawPositionLines];
+}
+
+- (void) drawPositionLinesAt:(NSPoint)aPoint
+{
+	if(aPoint.x && aPoint.y)drawPositionLines = YES;
+	else drawPositionLines = NO;
+	
+	positionLines = aPoint;
+	[self setNeedsDisplay:YES];
+}
+
+- (void) drawPositionLines
+{
+	if(drawPositionLines){
+		[[NSColor redColor] set];
+		float x = [mXScale getPixAbs:positionLines.x];
+		float y = [mYScale getPixAbs:positionLines.y];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(0,y) toPoint:NSMakePoint([self bounds].size.width,y)];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(x,0) toPoint:NSMakePoint(x,[self bounds].size.height)];
+	}
 }
 
 - (NSData*) plotAsPDFData

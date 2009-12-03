@@ -36,6 +36,8 @@
 		CTGradient*				gradient;
 		NSMutableDictionary*	attributes;
 		BOOL					doNotDraw;
+		BOOL					drawPositionLines;
+		NSPoint					positionLines;
 }
 
 #pragma mark •••Initialization
@@ -61,6 +63,8 @@
 -(NSColor*) colorForDataSet:(int) aDataSet;
 - (void) setDataColor:(NSColor*)aColor dataSet:(int) aDataSet;
 - (int) numberDataSets;
+- (void) drawPositionLinesAt:(NSPoint)aPoint;
+- (void) drawPositionLines;
 
 #pragma mark •••Drawing
 - (void) drawBackground;

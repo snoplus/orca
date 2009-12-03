@@ -1048,6 +1048,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 - (void)flagsChanged:(NSEvent *)theEvent
 {
     shiftKeyIsDown = ([theEvent modifierFlags] & NSShiftKeyMask)!=0;
+    commandKeyIsDown = ([theEvent modifierFlags] & NSCommandKeyMask)!=0;
     [[self window] resetCursorRects];
     
 }
@@ -1070,7 +1071,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 - (void) resetCursorRects
 {
     if([[self activeCurve] showActiveGate]){
-        if(!shiftKeyIsDown){
+        if(!shiftKeyIsDown && !commandKeyIsDown){
             NSRect aRect;
             float x1 = [mXScale getPixAbs:[[[self activeCurve] activeGate] gateMinChannel]];
             float x2 = [mXScale getPixAbs:[[[self activeCurve] activeGate] gateMaxChannel]];

@@ -116,9 +116,11 @@
         float x = [[info objectForKey:@"x"] floatValue];
         float y = [[info objectForKey:@"y"] floatValue];
         [positionField setStringValue:[NSString stringWithFormat:@"x: %.3f  y: %.0f",x,y]];
+		[plotter drawPositionLinesAt:NSMakePoint(x,y)];
     }
     else {
         [positionField setStringValue:@""];
+		[plotter drawPositionLinesAt:NSMakePoint(0,0)];
     }
 }
 

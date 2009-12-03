@@ -22,6 +22,7 @@
 	
     int				activeCurveIndex;
     BOOL			shiftKeyIsDown;
+	BOOL			commandKeyIsDown;
     BOOL			ignoreDoNotDrawFlag;
 	BOOL			setAllLinesBold;
 }

@@ -645,49 +645,52 @@ const float kGateAlpha2 = .1;
 
 -(void)	mouseDown:(NSEvent*)theEvent  plotter:(ORPlotter1D*)aPlotter
 {
+	NSEventType modifierKeys = [theEvent modifierFlags];
+	if((modifierKeys & NSCommandKeyMask) != NSCommandKeyMask){
 
-    NSPoint p = [aPlotter convertPoint:[theEvent locationInWindow] fromView:nil];
-    if([aPlotter mouse:p inRect:[aPlotter bounds]]){
-        ORAxis* xScale = [aPlotter xScale];
-        int mouseChan = floor([xScale convertPoint:p.x]+.5);
-        startChan = mouseChan;
-        
-        if(([theEvent modifierFlags] & NSAlternateKeyMask) || (gate1 == 0 && gate2 == 0)){
-            dragType = kInitialDrag;
-            gate1 = mouseChan;
-            gate2 = gate1;
-            [self setGateMinChannel:MIN(gate1,gate2)];
-            [self setGateMaxChannel:MAX(gate1,gate2)];
-        }
-        else if(!([theEvent modifierFlags] & NSCommandKeyMask)){
-            if(fabs([xScale getPixAbs:startChan]-[xScale getPixAbs:[self gateMinChannel]])<3){
-                dragType = kMinDrag;
-                gate1 = [self gateMaxChannel];
-                gate2 = [self gateMinChannel];
-            }
-            else if(fabs([xScale getPixAbs:startChan]-[xScale getPixAbs:[self gateMaxChannel]])<3){
-                dragType = kMaxDrag;
-                gate1 = [self gateMinChannel];
-                gate2 = [self gateMaxChannel];
-            }
-            else if([xScale getPixAbs:startChan]>[xScale getPixAbs:[self gateMinChannel]] && [xScale getPixAbs:startChan]<[xScale getPixAbs:[self gateMaxChannel]]){
-                dragType = kCenterDrag;
-            }
-            else dragType = kNoDrag;
-        }
-        else if(([theEvent modifierFlags] & NSCommandKeyMask) &&
-                ([xScale getPixAbs:startChan]>=[xScale getPixAbs:[self gateMinChannel]] && [xScale getPixAbs:startChan]<=[xScale getPixAbs:[self gateMaxChannel]])){
-            dragType = kCenterDrag;
-        }
-        else dragType = kNoDrag;
-        
-        if(dragType!=kNoDrag){
-			[[NSCursor closedHandCursor] push];
+		NSPoint p = [aPlotter convertPoint:[theEvent locationInWindow] fromView:nil];
+		if([aPlotter mouse:p inRect:[aPlotter bounds]]){
+			ORAxis* xScale = [aPlotter xScale];
+			int mouseChan = floor([xScale convertPoint:p.x]+.5);
+			startChan = mouseChan;
+			
+			if(([theEvent modifierFlags] & NSAlternateKeyMask) || (gate1 == 0 && gate2 == 0)){
+				dragType = kInitialDrag;
+				gate1 = mouseChan;
+				gate2 = gate1;
+				[self setGateMinChannel:MIN(gate1,gate2)];
+				[self setGateMaxChannel:MAX(gate1,gate2)];
+			}
+			else if(!([theEvent modifierFlags] & NSCommandKeyMask)){
+				if(fabs([xScale getPixAbs:startChan]-[xScale getPixAbs:[self gateMinChannel]])<3){
+					dragType = kMinDrag;
+					gate1 = [self gateMaxChannel];
+					gate2 = [self gateMinChannel];
+				}
+				else if(fabs([xScale getPixAbs:startChan]-[xScale getPixAbs:[self gateMaxChannel]])<3){
+					dragType = kMaxDrag;
+					gate1 = [self gateMinChannel];
+					gate2 = [self gateMaxChannel];
+				}
+				else if([xScale getPixAbs:startChan]>[xScale getPixAbs:[self gateMinChannel]] && [xScale getPixAbs:startChan]<[xScale getPixAbs:[self gateMaxChannel]]){
+					dragType = kCenterDrag;
+				}
+				else dragType = kNoDrag;
+			}
+			else if(([theEvent modifierFlags] & NSCommandKeyMask) &&
+					([xScale getPixAbs:startChan]>=[xScale getPixAbs:[self gateMinChannel]] && [xScale getPixAbs:startChan]<=[xScale getPixAbs:[self gateMaxChannel]])){
+				dragType = kCenterDrag;
+			}
+			else dragType = kNoDrag;
+			
+			if(dragType!=kNoDrag){
+				[[NSCursor closedHandCursor] push];
+			}
+			[self setGateValid:YES];        
+			dragInProgress = YES;
+			[aPlotter setNeedsDisplay:YES];
 		}
-        [self setGateValid:YES];        
-        dragInProgress = YES;
-        [aPlotter setNeedsDisplay:YES];
-    }
+	}
 }
 
 -(void)	mouseDragged:(NSEvent*)theEvent  plotter:(ORPlotter1D*)aPlotter
