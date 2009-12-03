@@ -49,6 +49,7 @@
 		BOOL			stationPower;
 		ORTimeRate*		timeRate;
 		ORAlarm*		noOilAlarm;
+		NSString*		statusString;
 }
 
 #pragma mark •••Initialization
@@ -107,6 +108,7 @@
 - (void) write:(int)window logicValue:(BOOL)aValue;
 - (void) read:(int)window;
 - (int) crc:(unsigned char*)aCmd length:(int)len;
+- (void) showWindowDisabled:(NSData*)aCommand;
 
 - (void) sendDataSet:(int)aParamNum bool:(BOOL)aState;
 - (void) sendDataSet:(int)aParamNum integer:(unsigned int)anInt; 
@@ -136,6 +138,7 @@
 - (void) sendStationPower:(BOOL)aState;
 - (void) sendStandby:(BOOL)aState;
 - (void) sendTmpRotSet:(int)aValue;
+- (void) sendRemoteMode;
 - (void) turnStationOn;
 - (void) turnStationOff;
 

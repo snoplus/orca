@@ -60,12 +60,25 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 #define kSetSpeed		308
 #define kActualSpeed	309
 #define kMotorCurrent	310
-#define kPressure		340
 #define kUnitName		350
 #define kStandby		2
 #define kStationPower	10
 #define kMotorPower		23
-#define kRemoteOps		28
+
+#define kAck			0x6
+#define kWinDisabled	0x35
+
+#define kStx			0x02
+#define kEtx			0x03
+#define kRdCmd			0x30
+#define kWrCmd			0x31
+#define kAddrs			0x80
+
+#define kStartStop		0
+#define kLowSpeedAct	1
+#define kRemoteOps		8
+#define kSoftStart		100
+#define kPressure		224
 
 @interface ORVarianTPSModel (private)
 - (NSString*) formatExp:(float)aFloat;
@@ -79,6 +92,8 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (float)	extractFloat:(NSData*)aCommand;
 - (NSString*) extractString:(NSString*)aCommand;
 - (void) clearAlarms;
+- (int) extractWindow:(NSData*)aCommand;
+
 @end
 
 @implementation ORVarianTPSModel
@@ -91,7 +106,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	[inComingData release];
     [noOilAlarm clearAlarm];
     [noOilAlarm release];
-	
+	[statusString release];
 	[super dealloc];
 }
 
@@ -442,6 +457,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 
 - (void) sendMotorPower:(BOOL)aState
 {
+	[self sendRemoteMode];
 	[self sendDataSet:kMotorPower bool:aState];
 }
 
@@ -455,14 +471,20 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	[self sendDataSet:kStandby bool:aState];
 }
 
+- (void) sendRemoteMode
+{
+	[self write:kRemoteOps logicValue:0];
+}
+
 - (void) turnStationOn
 {
-	[self write:0 logicValue:1];
+	[self sendRemoteMode];
+	[self write:kStartStop logicValue:1];
 }
 
 - (void) turnStationOff
 {
-	[self write:0  logicValue:0];
+	[self write:kStartStop logicValue:0];
 }
 
 #pragma mark •••Commands
@@ -482,14 +504,14 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	int d2 = (window-d1*100)/10;
 	int d3 = window - d1*100 - d2*10;
 	unsigned char data[64];
-	data[0] = 0x02;	//<STX>
-	data[1] = 0x80; //addr -- always 0x80 for rs232
+	data[0] = kStx;	
+	data[1] = kAddrs; //addr -- always 0x80 for rs232
 	data[2] = '0'+ d1;
 	data[3] = '0'+ d2;
 	data[4] = '0'+ d3;
-	data[5] = 0x31; //write
+	data[5] = kWrCmd; 
 	data[6] = '0'+ aValue;
-	data[7] = 0x03; //<ETX>
+	data[7] = kEtx;
 	int crc = [self crc:data length:8];
 	char c[64];
 	sprintf(c,"%02X",crc);
@@ -507,13 +529,13 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	int d2 = (window-d1*100)/10;
 	int d3 = window - d1*100 - d2*10;
 	unsigned char data[64];
-	data[0] = 0x02;	//<STX>
-	data[1] = 0x80; //addr -- always 0x80 for rs232
+	data[0] = kStx;	
+	data[1] = kAddrs; //addr -- always 0x80 for rs232
 	data[2] = '0'+ d1;
 	data[3] = '0'+ d2;
 	data[4] = '0'+ d3;
-	data[5] = 0x30; //read
-	data[6] = 0x03; //<ETX>
+	data[5] = kRdCmd; 
+	data[6] = kEtx;
 	int crc = [self crc:data length:7];
 	char c[64];
 	sprintf(c,"%02X",crc);
@@ -611,9 +633,9 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 			int n = [inComingData length];
 			BOOL foundEnd = NO;
 			for(i=0;i<n;i++){
-				if(p[i] == 0x03 && n>=i+2){
-					[self processReceivedData:[NSData dataWithBytes:p length:i+2]];
-					[inComingData replaceBytesInRange:NSMakeRange(0,i+2) withBytes:nil length:0];
+				if(p[i] == kEtx && n>=i+2){
+					[self processReceivedData:[NSData dataWithBytes:p length:i+3]];
+					[inComingData replaceBytesInRange:NSMakeRange(0,i+3) withBytes:nil length:0];
 					foundEnd = YES;
 					break;
 				} 
@@ -622,10 +644,37 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 		} while([inComingData length]!=0);
 	}
 }
+- (NSString*) windowName:(int)aValue
+{
+	switch(aValue){
+		case kStartStop:	return @"Start/Stop";	
+		case kLowSpeedAct:	return @"Low Speed Activation";
+		case kRemoteOps:	return @"Remote Ops";
+		case kSoftStart:	return @"Soft Start";
+		default: return @"Undefined";
+	}
+}
+
+- (void) showWindowDisabled:(NSData*)aCommand
+{
+	int lastWindow = [self extractWindow:lastRequest];
+	[statusString release];
+	statusString = [[NSString stringWithFormat:@"%@ Disabled",[self windowName:lastWindow]] retain];
+	NSLog(@"%@\n",statusString);
+}
 
 - (void) decode:(int)paramNumber command:(NSData*)aCommand
 {
 	switch (paramNumber) {
+		case kAck: 
+//			[self decode:paramNumber command:lastRequest];
+		break;
+		case kWinDisabled:
+			[self showWindowDisabled:aCommand];
+		break;
+		case kRemoteOps:
+			NSLog(@"got remote Ops\n");
+		break;
 		//case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]]; break;
 		//case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]]; break;
 		//case kOilDeficiency: [self setOilDeficiency:	[self extractBool:aCommand]]; break;
@@ -661,7 +710,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (float) extractFloat:(NSData*)aCommand	
 { 
 	if([aCommand length]>=16){
-		NSString* s = [[NSString alloc] initWithData:[aCommand subdataWithRange:NSMakeRange(4,14)] encoding:NSASCIIStringEncoding];
+		NSString* s = [[NSString alloc] initWithData:[aCommand subdataWithRange:NSMakeRange(6,10)] encoding:NSASCIIStringEncoding];
 		float theValue = [s floatValue];
 		[s release];
 		return theValue; 
@@ -678,7 +727,7 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"PAC",@"command timeout",nil);
+	NSLogError(@"VarianTPS",@"command timeout",nil);
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
@@ -729,18 +778,27 @@ NSString* ORVarianTPSLock						= @"ORVarianTPSLock";
 	return s;
 }
 
+- (int) extractWindow:(NSData*)aCommand
+{
+	unsigned char* p = (unsigned char*)[aCommand bytes];
+	int receivedWindow = 0;
+	if(p[3] == kEtx)receivedWindow = p[2];
+	else receivedWindow = (p[2]-'0')*100 + (p[3]-'0')*10 + (p[4]-'0');
+	return receivedWindow;
+}
+
 - (void) processReceivedData:(NSData*)aCommand
 {
 	BOOL doNextCommand = NO;
-	unsigned char* p = (unsigned char*)[aCommand bytes];
-	int receivedWindow = (p[2]-'0')*100 + (p[3]-'0')*10 + (p[4]-'0');
+	int receivedWindow = [self extractWindow:aCommand];
 	[self decode:receivedWindow command:aCommand];
 		
 	if(lastRequest){
+		
 		//if the param number matches the last cmd sent, then assume a match and remove the timeout
 		unsigned char* p = (unsigned char*)[lastRequest bytes];
-		int lastWindow = (p[2]-'0')*100 + (p[3]-'0')*10 + (p[4]-'0');
-		if(receivedWindow == lastWindow){
+		int lastWindow = [self extractWindow:lastRequest];
+		if(receivedWindow == lastWindow || p[2] == 0x06){
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 			[self setLastRequest:nil];			 //clear the last request
 			doNextCommand = YES;
