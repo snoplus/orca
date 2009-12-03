@@ -61,6 +61,11 @@
                          name: NSTextDidChangeNotification
                        object: labelField];
 	
+    [notifyCenter addObserver: self
+                     selector: @selector(textDidChange:)
+                         name: NSTextDidChangeNotification
+                       object: displayFormatField];
+	
 	[notifyCenter addObserver: self
                      selector: @selector(labelTypeChanged:)
                          name: ORLabelModelLabelTypeChanged
@@ -127,7 +132,7 @@
     [labelTypeMatrix setEnabled: !locked];
     [controllerStringField setEnabled: !locked];
     [updateIntervalPU setEnabled: !locked && [model labelType] == kDynamiclabel];
-    [displayFormatField setEnabled: !locked && [model labelType] == kDynamiclabel];
+    [displayFormatField setEditable: !locked && [model labelType] == kDynamiclabel];
 }
 
 - (void) labelChanged:(NSNotification*)notification
@@ -137,7 +142,12 @@
 
 - (void) textDidChange:(NSNotification*)notification
 {
-	[model setLabelNoNotify:[labelField string]];
+	if([notification object] == labelField){
+		[model setLabelNoNotify:[labelField string]];
+	}
+	else {
+		[model setFormatNoNotify:[displayFormatField string]];
+	}
 }
 
 - (void) textSizeChanged:(NSNotification*)aNote
@@ -153,11 +163,17 @@
 
 - (void) displayFormatChanged:(NSNotification*)aNote
 {
-	[displayFormatField setStringValue:[model displayFormat]];
+	[displayFormatField setString:[model displayFormat]];
 }
 
 
 #pragma mark ¥¥¥Actions
+
+- (IBAction) applyAction:(id)sender
+{
+	[self  endEditing];	
+}
+
 - (IBAction) controllerStringAction:(id)sender
 {
 	[model setControllerString:[sender stringValue]];	

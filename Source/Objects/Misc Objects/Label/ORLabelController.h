@@ -23,7 +23,7 @@
 {
     IBOutlet NSTextView*  labelField;
 	IBOutlet NSTextField* controllerStringField;
-	IBOutlet NSTextField* displayFormatField;
+	IBOutlet NSTextView* displayFormatField;
     IBOutlet NSTextField* textSizeField;
     IBOutlet NSButton*    labelLockButton;
 	IBOutlet NSMatrix*	  labelTypeMatrix;
@@ -48,6 +48,7 @@
 - (void) labelChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) applyAction:(id)sender;
 - (IBAction) controllerStringAction:(id)sender;
 - (IBAction) textSizeAction:(id)sender;
 - (IBAction) labelLockAction:(id)sender;

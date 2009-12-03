@@ -52,7 +52,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [poller stop];
     [poller release];
-	[displayValue release];
+	[displayValues release];
     [super dealloc];
 }
 
@@ -219,6 +219,15 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [self setUpImage];
 }
 
+- (void) setFormatNoNotify:(NSString*)aFormat
+{
+    if(!aFormat)aFormat = @"Text Box";
+    [displayFormat autorelease];
+    displayFormat = [aFormat copy];
+    [self setUpImage];
+}
+
+
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
     return  [aGuardian isMemberOfClass:NSClassFromString(@"ORGroup")]           || 
@@ -293,8 +302,8 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setLabelType:labelType];
 	labelType = aType;
-	[displayValue release];
-	displayValue = nil;
+	[displayValues release];
+	displayValues = nil;
 	if(labelType == kDynamiclabel){
 		[self setPollingInterval:updateInterval];
 	}
@@ -361,18 +370,39 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (void) updateValue
 {
-	id aValue = nil;
+	NSMutableArray* newValues = [NSMutableArray array];;
 	@try {
-		aValue = [[ORCommandCenter sharedCommandCenter] executeSimpleCommand:[self label]];
+		NSArray* cmds = [[self label] componentsSeparatedByString:@"\n"];
+		if([cmds count]>0){
+			for(id aCmd in cmds){
+				if([aCmd length]>0){
+					id aValue = [[ORCommandCenter sharedCommandCenter] executeSimpleCommand:aCmd];
+					if(aValue)	[newValues addObject:aValue];
+					else		[newValues addObject:@"?"];
+				}
+			}
+		}
 	}
 	@catch (NSException* e){
 	}
-	if(![aValue isEqual:displayValue]){
-		[aValue retain];
-		[displayValue release];
-		displayValue = aValue;
+	//check to see if any of the values are different. If not, there's not need to update
+	if(!displayValues){
+		displayValues = [newValues retain];
 		[self setUpImage];
 	}
+	else if([displayValues count] != [newValues count]){
+		[displayValues release];
+		displayValues = [newValues retain];
+		[self setUpImage];
+	}
+	else {
+		if(![newValues isEqualToArray:displayValues]){
+			[displayValues release];
+			displayValues = [newValues retain];
+			[self setUpImage];
+		}
+	}
+
 }
 
 #pragma mark ¥¥¥Archival
@@ -403,6 +433,37 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [encoder encodeObject:controllerString	forKey:@"controllerString"];
 	[encoder encodeInt:updateInterval		forKey:@"updateInterval"];
 }
+- (void) doCntrlClick:(id)sender
+{
+	NSEvent* theCurrentEvent = [NSApp currentEvent];
+    NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+                                         location:[theCurrentEvent locationInWindow]
+                                    modifierFlags:NSLeftMouseDownMask // 0x100
+                                        timestamp:(NSTimeInterval)0
+                                     windowNumber:[theCurrentEvent windowNumber]
+                                          context:[theCurrentEvent context]
+                                      eventNumber:0
+                                       clickCount:1
+                                         pressure:1];
+	
+    NSMenu *menu = [[NSMenu alloc] init];
+	[[menu insertItemWithTitle:@"Open Label Dialog"
+						action:@selector(doDoubleClick:)
+				 keyEquivalent:@""
+					   atIndex:0] setTarget:self];
+	if([controllerString length]){
+		[[menu insertItemWithTitle:[NSString stringWithFormat:@"Open %@",controllerString]
+							action:@selector(doCmdClick:)
+					 keyEquivalent:@""
+						   atIndex:0] setTarget:self];
+	}
+	[[menu insertItemWithTitle:@"Help"
+						action:@selector(openHelp:)
+				 keyEquivalent:@""
+					   atIndex:1] setTarget:self];
+	[menu setDelegate:self];
+    [NSMenu popUpContextMenu:menu withEvent:event forView:nil];
+}
 
 @end
 
@@ -415,24 +476,38 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		s = label;
 	}
 	else {
-		if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
-			if([displayFormat length])f = displayFormat;
-			else f = @"%.2f";
-			if([f rangeOfString:@"%@"].location != NSNotFound){
-				s = [NSString stringWithFormat:f,displayValue];
+		int i;
+		int n = [displayValues count];
+		NSArray* formats = [displayFormat componentsSeparatedByString:@"\n"];
+		NSString* newString = @"";
+		NSString* aFormat;
+		for(i=0;i<n;i++){
+			id displayValue = [displayValues objectAtIndex:i];
+			if(i<[formats count]){
+				aFormat = [formats objectAtIndex:i];
 			}
-			else if([f rangeOfString:@"%d"].location != NSNotFound){
-				s = [NSString stringWithFormat:f,[displayValue intValue]];
+			else aFormat = @"";
+			if([displayValue isKindOfClass:NSClassFromString(@"NSNumber")]){
+				if([aFormat length])f = aFormat;
+				else f = @"%.2f";
+				if([f rangeOfString:@"%@"].location != NSNotFound){
+					newString = [NSString stringWithFormat:f,displayValue];
+				}
+				else if([f rangeOfString:@"%d"].location != NSNotFound){
+					newString = [NSString stringWithFormat:f,[displayValue intValue]];
+				}
+				else {
+					newString = [NSString stringWithFormat:f,[displayValue floatValue]];
+				}
 			}
 			else {
-				s = [NSString stringWithFormat:f,[displayValue floatValue]];
+				if([aFormat length])f = aFormat;
+				else f = @"%@";
+				newString = [NSString stringWithFormat:f,displayValue];
 			}
+			s = [s stringByAppendingFormat:@"%@\n",newString];
 		}
-		else {
-			if([displayFormat length])f = displayFormat;
-			else f = @"%@";
-			s = [NSString stringWithFormat:f,displayValue];
-		}
+		if([s hasSuffix:@"\n"])s = [s substringToIndex:[s length]-1];
 	}
 	return s;
 }
