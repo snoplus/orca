@@ -186,10 +186,10 @@
 	[pressureScalePU selectItemAtIndex: [model pressureScale]];
 	[plotter setNeedsDisplay:YES];
 	if([model pressureScale]>0){
-		[[plotter yScale] setLabel:[NSString stringWithFormat:@"xE-%02d mbar",[model pressureScale]]];
+		[[plotter yScale] setLabel:[NSString stringWithFormat:@"Pressure x E-%02d",[model pressureScale]]];
 	}
 	else {
-		[[plotter yScale] setLabel:@"mbar"];
+		[[plotter yScale] setLabel:@"Pressure"];
 	}
 }
 - (void) scaleAction:(NSNotification*)aNotification
@@ -224,6 +224,7 @@
 			[[plotter yScale] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter yScale] setNeedsDisplay:YES];
+			[trendLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
 	
@@ -249,7 +250,7 @@
 - (void) pressureChanged:(NSNotification*)aNote
 {
 	float pressure = [model pressure];
-	[pressureField setStringValue: pressure == 0?@"--":[NSString stringWithFormat:@"%7.1E mbar",[model pressure]]];
+	[pressureField setStringValue: pressure == 0?@"--":[NSString stringWithFormat:@"%7.1E",[model pressure]]];
 }
 
 - (void) checkGlobalSecurity

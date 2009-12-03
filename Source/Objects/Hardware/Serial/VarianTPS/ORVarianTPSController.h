@@ -40,6 +40,7 @@
     IBOutlet ORSerialPortController* serialPortController;
 	IBOutlet ORTimedTextField* statusField;
 	IBOutlet NSTextField* controllerTempField;
+	IBOutlet NSButton* trendLogCB;
 }
 
 #pragma mark •••Initialization

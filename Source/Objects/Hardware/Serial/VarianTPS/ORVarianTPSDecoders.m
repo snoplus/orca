@@ -38,8 +38,13 @@
 {
 	unsigned long *p = (unsigned long*)someData;
 	int ident = ShiftAndExtract(p[1],0,0xff);
-	[aDataSet loadTimeSeries:(float)p[3]										
-					  atTime:p[2]
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theTemp;
+	theTemp.asLong = p[2];									//encoded as float, use union to convert
+	[aDataSet loadTimeSeries:theTemp.asFloat*10E7										
+					  atTime:p[3]
 					  sender:self 
 					withKeys:@"VarianTPS",
 	 [NSString stringWithFormat:@"Unit %d",ident],nil];
@@ -54,9 +59,14 @@
 	int ident = ShiftAndExtract(p[1],0,0xff);
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
 		
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)p[2]];
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theTemp;
+	theTemp.asLong = p[2];									//encoded as float, use union to convert
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)p[3]];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-	theString = [theString stringByAppendingFormat:@"%.2E %@\n",p[3],date];
+	theString = [theString stringByAppendingFormat:@"%.2E %@\n",theTemp.asFloat,date];
 	return theString;
 }
 @end
