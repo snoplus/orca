@@ -835,8 +835,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	//get the time(UT!)
 	time_t	ut_time;
 	time(&ut_time);
-	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	//time_t ut_time = mktime(theTimeGMTAsStruct);
 	
 	//insert a header before the start of sub-run record
 	[[self dataPacket] updateHeader];
@@ -1147,11 +1145,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     dataHeartBeat[2] = kHeartBeatTime;
     
     //get the time(UT!)
-    time_t	theTime;
-    time(&theTime);
-    struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    time_t ut_time = mktime(theTimeGMTAsStruct);
-    
+    time_t	ut_time;
+    time(&ut_time);    
     dataHeartBeat[3] = ut_time;
     
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
@@ -1190,10 +1185,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //get the time(UT!)
-    time_t	theTime;
-    time(&theTime);
-    struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    time_t ut_time = mktime(theTimeGMTAsStruct);
+    time_t	ut_time;
+    time(&ut_time);
     NSTimeInterval refTime = [NSDate timeIntervalSinceReferenceDate];
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class])            forKey:@"Class Name"];
@@ -1301,10 +1294,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     heartBeatTimer = [[NSTimer scheduledTimerWithTimeInterval:kHeartBeatTime target:self selector:@selector(sendHeartBeat:)userInfo:nil repeats:YES] retain];
 
 	//get the time(UT!)
-    time_t	theTime;
-    time(&theTime);
-    struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-    time_t ut_time = mktime(theTimeGMTAsStruct);
+    time_t	ut_time;
+    time(&ut_time);
  
 	NSData* headerAsData = [ORDecoder convertHeaderToData:[[self dataPacket] fileHeader]];
  	[dataPacket addData:[NSMutableData dataWithData:headerAsData]];
