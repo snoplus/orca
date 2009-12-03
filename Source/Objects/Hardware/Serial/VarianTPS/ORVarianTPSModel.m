@@ -204,6 +204,10 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
     pressure = aPressure;
 	if(timeRate == nil) timeRate = [[ORTimeRate alloc] init];
 	[timeRate addDataToTimeAverage:aPressure];
+	time_t	ut_Time;
+	time(&ut_Time);
+	timeMeasured = ut_Time;
+	[self shipPressure];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelPressureChanged object:self];
 }
 
@@ -448,12 +452,12 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORVarianTPSDecoderForAdc",				@"decoder",
+        @"ORVarianTPSDecoderForPressure",	@"decoder",
         [NSNumber numberWithLong:dataId],   @"dataId",
         [NSNumber numberWithBool:NO],       @"variable",
-        [NSNumber numberWithLong:8],        @"length",
+        [NSNumber numberWithLong:4],        @"length",
         nil];
-    [dataDictionary setObject:aDictionary forKey:@"Adcs"];
+    [dataDictionary setObject:aDictionary forKey:@"Pressure"];
     
     return dataDictionary;
 }
@@ -532,6 +536,28 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 		break;
 	}
 }
+
+- (void) shipPressure
+{
+    if([[ORGlobal sharedGlobal] runInProgress]){
+		
+		unsigned long data[4];
+		data[0] = dataId | 4;
+		data[1] = [self uniqueIdNumber]&0xfff;
+		
+		union {
+			float asFloat;
+			unsigned long asLong;
+		}theData;
+		theData.asFloat = pressure;
+		data[2] = theData.asLong;			
+		data[3] = timeMeasured;
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
+	}
+}
+
 @end
 
 @implementation ORVarianTPSModel (private)

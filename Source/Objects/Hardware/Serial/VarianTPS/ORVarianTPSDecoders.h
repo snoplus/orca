@@ -22,11 +22,10 @@
 
 #import "ORBaseDecoder.h"
 
-@class ORDataPacket;
 @class ORDataSet;
 
-@interface ORVarianTPSDecoderForAdc : ORBaseDecoder {
+@interface ORVarianTPSDecoderForPressure : ORBaseDecoder {
 }
-- (unsigned long) decodeData:(void*)someData fromDataVarianTPSket:(ORDataPacket*)aDataVarianTPSket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

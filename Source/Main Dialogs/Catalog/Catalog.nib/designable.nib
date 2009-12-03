@@ -5334,7 +5334,7 @@
 													<reference key="NSControlView" ref="964011099"/>
 													<int key="NSButtonFlags">-2042347265</int>
 													<int key="NSButtonFlags2">2</int>
-													<object class="NSCustomResource" key="NSNormalImage" id="720904570">
+													<object class="NSCustomResource" key="NSNormalImage">
 														<string key="NSClassName">NSImage</string>
 														<string key="NSResourceName">PDcu</string>
 													</object>
@@ -5363,7 +5363,7 @@
 											<object class="NSButton" id="19633072">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{586, 65}, {66, 62}}</string>
+												<string key="NSFrame">{{586, 51}, {92, 76}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="865777138">
@@ -5374,7 +5374,10 @@
 													<reference key="NSControlView" ref="19633072"/>
 													<int key="NSButtonFlags">-2042347265</int>
 													<int key="NSButtonFlags2">2</int>
-													<reference key="NSNormalImage" ref="720904570"/>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">VarianTPS</string>
+													</object>
 													<string key="NSAlternateContents"/>
 													<string key="NSKeyEquivalent"/>
 													<int key="NSPeriodicDelay">400</int>
@@ -5384,7 +5387,7 @@
 											<object class="NSTextField" id="662778017">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{577, 44}, {84, 17}}</string>
+												<string key="NSFrame">{{585, 33}, {84, 17}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="411134476">

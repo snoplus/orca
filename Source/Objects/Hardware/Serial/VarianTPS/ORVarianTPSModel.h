@@ -37,6 +37,8 @@
 		int				pollTime;
 		float			motorCurrent;
 		float			pressure;
+		unsigned long	timeMeasured;
+
 		float			pressureScaleValue;
 		BOOL			stationPower;
 		ORTimeRate*		timeRate;
@@ -79,6 +81,7 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherVarianTPS;
+- (void) shipPressure;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

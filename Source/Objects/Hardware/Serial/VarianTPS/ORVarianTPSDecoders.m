@@ -18,9 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORVarianTPSDecoders.h"
-#import "ORDataPacket.h"
 #import "ORDataSet.h"
 
 //------------------------------------------------------------------------------------------------
@@ -28,55 +26,37 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 // ^^^^ ^^^^ ^^^^ ^^------------------------data id
 //                  ^^ ^^^^ ^^^^ ^^^^ ^^^^--length in longs
-//
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//                          ^^^^ ^^^^ ^^^^--device id
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 0
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 0 taken in seconds since Jan 1, 1970
-// ..
-// ..
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 7
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 7 taken in seconds since Jan 1, 1970
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  
+//                               ^^^^ ^^^^--Unique ID
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure taken in seconds since Jan 1, 1970 UT time
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure encoded as Long
 //-----------------------------------------------------------------------------------------------
 
-@implementation ORVarianTPSDecoderForAdc
+@implementation ORVarianTPSDecoderForPressure
 
-- (unsigned long) decodeData:(void*)someData fromDataVarianTPSket:(ORDataPacket*)aDataVarianTPSket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long *dataPtr = (unsigned long*)someData;
-	int ident = dataPtr[1] & 0xfff;
-	int i;
-	int index = 2;
-	for(i=0;i<8;i++){
-		[aDataSet loadTimeSeries:(float)dataPtr[index]										
-						  atTime:dataPtr[index+1]
-						  sender:self 
-						withKeys:@"PAC",
-								[NSString stringWithFormat:@"Unit %d",ident],
-								[self getChannelKey:i],
-								nil];
-		index+=2;
-	}
+	unsigned long *p = (unsigned long*)someData;
+	int ident = ShiftAndExtract(p[1],0,0xff);
+	[aDataSet loadTimeSeries:(float)p[3]										
+					  atTime:p[2]
+					  sender:self 
+					withKeys:@"VarianTPS",
+	 [NSString stringWithFormat:@"Unit %d",ident],nil];
 	
-	return ExtractLength(dataPtr[0]);
+	return ExtractLength(p[0]);
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+- (NSString*) dataRecordDescription:(unsigned long*)p
 {
-    NSString* title= @"POC Controller\n\n";
+    NSString* title= @"VarianTPS Controller\n\n";
     NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
-	int ident = dataPtr[1] & 0xfff;
+	int ident = ShiftAndExtract(p[1],0,0xff);
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
-	int i;
-	int index = 2;
-	for(i=0;i<8;i++){
 		
-		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
-		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-		
-		theString = [theString stringByAppendingFormat:@"Channel %d: 0x%02x %@\n",i,dataPtr[index],date];
-		index+=2;
-	}
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)p[2]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	theString = [theString stringByAppendingFormat:@"%.2E %@\n",p[3],date];
 	return theString;
 }
 @end
