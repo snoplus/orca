@@ -43,7 +43,7 @@
 		unsigned long asLong;
 	}theTemp;
 	theTemp.asLong = p[2];									//encoded as float, use union to convert
-	[aDataSet loadTimeSeries:theTemp.asFloat*10E7										
+	[aDataSet loadTimeSeries:theTemp.asFloat*10.0E7										
 					  atTime:p[3]
 					  sender:self 
 					withKeys:@"VarianTPS",
@@ -64,9 +64,8 @@
 		unsigned long asLong;
 	}theTemp;
 	theTemp.asLong = p[2];									//encoded as float, use union to convert
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)p[3]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-	theString = [theString stringByAppendingFormat:@"%.2E %@\n",theTemp.asFloat,date];
+
+	theString = [theString stringByAppendingFormat:@"%.2E %s\n",theTemp.asFloat,ctime((const time_t *)(&p[3]))];
 	return theString;
 }
 @end
