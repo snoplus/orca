@@ -48,6 +48,7 @@
 - (void) labelChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) openAltDialogAction:(id)sender;
 - (IBAction) applyAction:(id)sender;
 - (IBAction) controllerStringAction:(id)sender;
 - (IBAction) textSizeAction:(id)sender;

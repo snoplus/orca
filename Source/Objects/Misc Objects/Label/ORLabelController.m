@@ -170,6 +170,10 @@
 
 
 #pragma mark ¥¥¥Actions
+- (IBAction) openAltDialogAction:(id)sender
+{
+	[model doCmdClick:self];
+}
 
 - (IBAction) applyAction:(id)sender
 {
