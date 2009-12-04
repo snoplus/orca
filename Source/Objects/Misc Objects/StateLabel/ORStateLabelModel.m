@@ -83,9 +83,10 @@ NSString* ORLabelModelBoolTypeChanged = @"ORLabelModelBoolTypeChanged";
 	switch(boolType){
 		case 0: return aValue?@"Open":@"Closed";
 		case 1: return aValue?@"Closed":@"Open";
-		case 2: return aValue?@"Yes":@"No";
-		case 3: return aValue?@"No":@"Yes";
+		case 2: return aValue?@"On":@"Off";
+		case 3: return aValue?@"Off":@"On";
 		case 4: return aValue?@"Yes":@"No";
+		case 5: return aValue?@"No":@"Yes";
 		default:return aValue?@"1":@"0";
 	}
 }
