@@ -538,7 +538,10 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 {
 	//subclasses can use as needed.
 }
-
+- (void) doCmdDoubleClick:(id)sender
+{
+	//subclasses can use as needed.
+}
 - (void) doCntrlClick:(id)sender
 {
 	NSEvent* theCurrentEvent = [NSApp currentEvent];

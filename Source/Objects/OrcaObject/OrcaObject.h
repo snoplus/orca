@@ -130,6 +130,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) openHelp:(id)sender;
 - (void) doDoubleClick:(id)sender;
 - (void) doCmdClick:(id)sender;
+- (void) doCmdDoubleClick:(id)sender;
 - (void) doCntrlClick:(id)sender;
 - (ORConnector*) requestsConnection: (NSPoint)aPoint;
 - (BOOL) rectIntersectsIcon:(NSRect)aRect;
