@@ -363,9 +363,9 @@
 			}
 			else {
 				[obj1 setHighlighted:NO]; 
-				[obj1 doCmdClick:obj1];
+				if([event clickCount]>=2) [obj1 doCmdDoubleClick:obj1];
+				else					  [obj1 doCmdClick:obj1];
 				somethingHit = YES;
-
 				break;
 			}
 			
