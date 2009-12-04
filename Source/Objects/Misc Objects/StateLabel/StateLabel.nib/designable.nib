@@ -587,13 +587,13 @@
 						<object class="NSTextField" id="462316929">
 							<reference key="NSNextResponder" ref="746333268"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{60, 34}, {106, 16}}</string>
+							<string key="NSFrame">{{60, 36}, {259, 14}}</string>
 							<reference key="NSSuperview" ref="746333268"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="298512056">
 								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">71303168</int>
-								<string key="NSContents">Cmd-Click Opens:</string>
+								<int key="NSCellFlags2">4194304</int>
+								<string key="NSContents">Alt Dialog (if defined dbl-click opens):</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="462316929"/>
 								<reference key="NSBackgroundColor" ref="300764549"/>
@@ -683,6 +683,7 @@
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
+									<int key="NSState">1</int>
 									<reference key="NSOnImage" ref="188368544"/>
 									<reference key="NSMixedImage" ref="368130683"/>
 									<string key="NSAction">_popUpItemAction:</string>
