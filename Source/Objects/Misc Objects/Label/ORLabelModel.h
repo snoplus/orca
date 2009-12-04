@@ -58,6 +58,8 @@
 - (NSString*) comment;
 - (void) setComment:(NSString*)aComment;
 - (NSString*) description:(NSString*)prefix;
+- (void) openAltDialog:(id)sender;
+- (void) openMainDialog:(id)sender;
 
 #pragma mark ***Polling
 - (TimedWorker *) poller;

@@ -133,14 +133,33 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [self linkToController:@"ORLabelController"];
 }
 
-- (void) doCmdClick:(id)sender
+- (void) doDoubleClick:(id)sender
 {
-	if(controllerString){
+	if([controllerString length]) [self openAltDialog:self];		
+    else				 [self openMainDialog:self];
+}
+
+- (void) doCmdDoubleClick:(id)sender
+{
+	if([controllerString length]) [self openMainDialog:self];		
+    else				 [self openAltDialog:self];
+}
+
+- (void) openMainDialog:(id)sender
+{
+	[self makeMainController];
+}
+
+- (void) openAltDialog:(id)sender
+{
+	if([controllerString length]!=0){
 		id obj = [[self document] findObjectWithFullID:controllerString];
 		if([obj respondsToSelector:@selector(makeMainController)]){
 			[obj makeMainController];
 		}
 	}
+	else [obj makeMainController];
+
 }
 
 #pragma mark ***Accessors
@@ -456,7 +475,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 					   atIndex:0] setTarget:self];
 	if([controllerString length]){
 		[[menu insertItemWithTitle:[NSString stringWithFormat:@"Open %@",controllerString]
-							action:@selector(doCmdClick:)
+							action:@selector(openAltDialog:)
 					 keyEquivalent:@""
 						   atIndex:0] setTarget:self];
 	}
