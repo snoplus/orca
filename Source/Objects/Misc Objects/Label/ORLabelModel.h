@@ -60,6 +60,7 @@
 - (NSString*) description:(NSString*)prefix;
 - (void) openAltDialog:(id)sender;
 - (void) openMainDialog:(id)sender;
+- (NSAttributedString*) stringToDisplay:(BOOL)highlight;
 
 #pragma mark ***Polling
 - (TimedWorker *) poller;

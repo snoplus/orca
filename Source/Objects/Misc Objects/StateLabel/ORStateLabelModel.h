@@ -22,6 +22,8 @@
 @interface ORStateLabelModel : ORLabelModel  
 {
 	int boolType;
+	NSColor* trueColor;
+	NSColor* falseColor;
 }
 
 #pragma mark •••Initialization
@@ -31,6 +33,11 @@
 #pragma mark •••Accessor
 - (int) boolType;
 - (void) setBoolType:(int)aType;
+- (NSColor*) trueColor;
+- (void) setTrueColor:(NSColor*)aColor;
+- (NSColor*) falseColor;
+- (void) setFalseColor:(NSColor*)aColor;
+- (NSString*) boolString:(BOOL)aValue;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -38,3 +45,5 @@
 @end
 
 extern NSString* ORLabelModelBoolTypeChanged;
+extern NSString* ORLabelModelTrueColorChanged;
+extern NSString* ORLabelModelFalseColorChanged;

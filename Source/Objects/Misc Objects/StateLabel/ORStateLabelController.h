@@ -22,6 +22,8 @@
 @interface ORStateLabelController : ORLabelController
 {
 	IBOutlet NSPopUpButton* boolTypePU;
+	IBOutlet NSColorWell* trueColorWell;
+	IBOutlet NSColorWell* falseColorWell;
 }
 
 - (id) init;
@@ -31,7 +33,11 @@
 - (void) updateWindow;
 - (void) labelLockChanged:(NSNotification*)aNotification;
 - (void) boolTypeChanged:(NSNotification*)aNotification;
+- (void) trueColorChanged:(NSNotification*)aNotification;
+- (void) falseColorChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Actions
 - (IBAction) boolTypeAction:(id)sender;
+- (IBAction) trueColorAction:(id)sender;
+- (IBAction) falsColorAction:(id)sender;
 @end

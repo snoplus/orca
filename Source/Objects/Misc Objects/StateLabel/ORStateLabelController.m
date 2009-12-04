@@ -46,6 +46,16 @@
                      selector : @selector(boolTypeChanged:)
                          name : ORLabelModelBoolTypeChanged
 						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(trueColorChanged:)
+                         name : ORLabelModelTrueColorChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(falseColorChanged:)
+                         name : ORLabelModelFalseColorChanged
+						object: model];
 	
 }
 
@@ -53,6 +63,8 @@
 {
 	[super updateWindow];
 	[self boolTypeChanged:nil];
+	[self trueColorChanged:nil];
+	[self falseColorChanged:nil];
 }
 
 - (void) boolTypeChanged:(NSNotification*)aNotification
@@ -67,10 +79,30 @@
 	[super labelLockChanged:aNotification];
 }
 
+- (void) trueColorChanged:(NSNotification*)aNotification
+{
+	[trueColorWell setColor:[model trueColor]];
+}
+
+- (void) falseColorChanged:(NSNotification*)aNotification
+{
+	[falseColorWell setColor:[model falseColor]];
+}
+
 #pragma mark •••Actions
 - (IBAction) boolTypeAction:(id)sender
 {
 	[model setBoolType:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) trueColorAction:(id)sender
+{
+	[model setTrueColor:[sender color]];
+}
+
+- (IBAction) falsColorAction:(id)sender
+{
+	[model setFalseColor:[sender color]];
 }
 
 

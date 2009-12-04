@@ -33,10 +33,6 @@ NSString* ORLabelModelLabelTypeChanged			 = @"ORLabelModelLabelTypeChanged";
 NSString* ORLabelModelUpdateIntervalChanged		 = @"ORLabelModelUpdateIntervalChanged";
 NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
-@interface ORLabelModel (private)
-- (NSString*) stringToDisplay;
-@end
-
 @implementation ORLabelModel
 
 #pragma mark ¥¥¥initialization
@@ -267,20 +263,13 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     //so, we cache the image here so that each Label can have its own version for drawing into.
     //---------------------------------------------------------------------------------------------------
 	if(label){
-		NSString* s = [self stringToDisplay];
-
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								initWithString:[s length]?s:@"Text Label"
-									attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:textSize] forKey:NSFontAttributeName]];
-		
+		NSAttributedString* n = [self stringToDisplay:NO];
 		NSSize theSize = [n size];
 
 		NSImage* i = [[NSImage alloc] initWithSize:theSize];
 		[i lockFocus];
 		
-			
 		[n drawInRect:NSMakeRect(0,0,theSize.width,theSize.height)];
-		[n release];
 		[i unlockFocus];
 		[self setImage:i];
 		[i release];
@@ -301,15 +290,9 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		[highlightedImage release];
 		highlightedImage = [[NSImage alloc] initWithSize:[anImage size]];
 		[highlightedImage lockFocus];
-		NSString* s = [self stringToDisplay];
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:[s length]?s:@"Text Label"
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
-											 [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
-		
+		NSAttributedString* n = [self stringToDisplay:YES];
 		NSSize theSize = [n size];
 		[n drawInRect:NSMakeRect(0,0,theSize.width,theSize.height)];
-		[n release];
 		[highlightedImage unlockFocus];
 	}
 }
@@ -487,10 +470,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [NSMenu popUpContextMenu:menu withEvent:event forView:nil];
 }
 
-@end
-
-@implementation ORLabelModel (private)
-- (NSString*) stringToDisplay
+- (NSAttributedString*) stringToDisplay:(BOOL)highlight
 {
 	NSString* s = @"";
 	NSString* f;
@@ -531,6 +511,19 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		}
 		if([s hasSuffix:@"\n"])s = [s substringToIndex:[s length]-1];
 	}
-	return s;
+	NSAttributedString* n;
+	if(highlight){
+		n = [[NSAttributedString alloc] 
+			 initWithString:[s length]?s:@"Text Label"
+			 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
+						 [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
+	}
+	else {
+		n= [[NSAttributedString alloc] 
+			initWithString:[s length]?s:@"Text Label"
+			attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:textSize] forKey:NSFontAttributeName]];
+	}
+	
+	return [n autorelease];
 }
 @end
