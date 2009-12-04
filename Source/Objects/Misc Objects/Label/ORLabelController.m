@@ -133,8 +133,8 @@
     [textSizeField setEnabled: !locked];
     [labelTypeMatrix setEnabled: !locked];
     [controllerStringField setEnabled: !locked];
-    [updateIntervalPU setEnabled: !locked && [model labelType] == kDynamiclabel];
-    [displayFormatField setEditable: !locked && [model labelType] == kDynamiclabel];
+    [updateIntervalPU setEnabled: !locked && [model labelType] == kDynamicLabel];
+    [displayFormatField setEditable: !locked && [model labelType] == kDynamicLabel];
 }
 
 - (void) labelChanged:(NSNotification*)notification
@@ -172,6 +172,7 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) openAltDialogAction:(id)sender
 {
+	[self  endEditing];	
 	[model doCmdClick:self];
 }
 

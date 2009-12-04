@@ -20,7 +20,7 @@
 @class TimedWorker;
 
 #define kStaticLabel  0
-#define kDynamiclabel 1
+#define kDynamicLabel 1
 
 @interface ORLabelModel : OrcaObject  
 {

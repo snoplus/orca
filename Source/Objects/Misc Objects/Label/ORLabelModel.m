@@ -60,7 +60,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 {
     if([self aWake])return;
     [super wakeUp];
-	if(labelType == kDynamiclabel){
+	if(labelType == kDynamicLabel){
 		[poller runWithTarget:self selector:@selector(updateValue)];
 	}
 }
@@ -78,7 +78,8 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (NSString*) label
 {
-	return label;
+	if(!label)return @"?";
+	else return label;
 }
 
 - (NSString*) elementName
@@ -92,7 +93,8 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 }
 - (NSString*) comment
 {
-	return label;
+	if(!label)return @"";
+	else return label;
 }
 
 - (void) setComment:(NSString*)aComment
@@ -145,7 +147,8 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (NSString*) controllerString
 {
-    return controllerString;
+	if(!controllerString)return @"";
+    else return controllerString;
 }
 
 - (void) setControllerString:(NSString*)aControllerString
@@ -168,7 +171,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	if(anInterval==0)anInterval = 1;
     [[[self undoManager] prepareWithInvocationTarget:self] setUpdateInterval:updateInterval];
 	updateInterval = anInterval;
-	if(labelType == kDynamiclabel){
+	if(labelType == kDynamicLabel){
 		[self setPollingInterval:updateInterval];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORLabelModelUpdateIntervalChanged object:self];
@@ -304,7 +307,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	labelType = aType;
 	[displayValues release];
 	displayValues = nil;
-	if(labelType == kDynamiclabel){
+	if(labelType == kDynamicLabel){
 		[self setPollingInterval:updateInterval];
 	}
 	else {
