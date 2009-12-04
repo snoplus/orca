@@ -136,7 +136,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 - (void) doDoubleClick:(id)sender
 {
 	if([controllerString length]) [self openAltDialog:self];		
-    else				 [self openMainDialog:self];
+    else						  [self openMainDialog:self];
 }
 
 - (void) doCmdDoubleClick:(id)sender
@@ -158,7 +158,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 			[obj makeMainController];
 		}
 	}
-	else [obj makeMainController];
+	else [self makeMainController];
 
 }
 
