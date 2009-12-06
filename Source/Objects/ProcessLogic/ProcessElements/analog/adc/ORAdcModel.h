@@ -41,6 +41,7 @@
 }
 
 #pragma mark ***Accessors
+- (NSImage*) altImage;
 - (NSString*) displayFormat;
 - (void) setDisplayFormat:(NSString*)aDisplayFormat;
 - (float) minChange;

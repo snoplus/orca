@@ -50,14 +50,14 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 - (void) setDisplayFormat:(NSString*)aDisplayFormat
 {
-	if(!aDisplayFormat)aDisplayFormat = @"%.1f";
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setDisplayFormat:displayFormat];
-    
-    [displayFormat autorelease];
-    displayFormat = [aDisplayFormat copy];    
+	if(![aDisplayFormat length])aDisplayFormat = @"%.1f";
+	[[[self undoManager] prepareWithInvocationTarget:self] setDisplayFormat:displayFormat];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelDisplayFormatChanged object:self];
+	[displayFormat autorelease];
+	displayFormat = [aDisplayFormat copy];    
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelDisplayFormatChanged object:self];
+	
 }
 
 - (float) minChange
@@ -128,9 +128,42 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 {
     [self linkToController:@"ORAdcController"];
 }
+- (BOOL) canBeInAltView
+{
+	return YES;
+}
+
+- (NSImage*) altImage
+{
+	NSImage* anImage = [[NSImage alloc] initWithSize:NSMakeSize(100,75)];
+	[anImage lockFocus];
+	[[NSColor whiteColor] set];
+	[NSBezierPath fillRect:NSMakeRect(0,25,100,75)];
+	NSPoint theCenter = NSMakePoint(50,25);
+	NSBezierPath* path = [NSBezierPath bezierPath];
+	[path appendBezierPathWithArcWithCenter:theCenter radius:49.
+		startAngle:0
+		endAngle:180
+		clockwise:NO];
+	[path closePath];
+	[[NSColor colorWithCalibratedWhite:.95 alpha:.9] set];
+	[path fill];
+	[[NSColor colorWithCalibratedWhite:.7 alpha:.9] set];
+	[path stroke];
+	[[NSColor blackColor] set];
+	[NSBezierPath strokeRect:NSMakeRect(0,25,100,50)];
+	[anImage unlockFocus];
+	return [anImage autorelease];
+}
+
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"adc"]];
+	if([self useAltView]){
+		[self setImage:[self altImage]];
+	}
+	else {
+		[self setImage:[NSImage imageNamed:@"adc"]];
+	}
     [self addOverLay];
 }
 
@@ -227,15 +260,50 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 }
 
 //--------------------------------
+- (NSString*) iconValue 
+{ 
+    if(hwName)	{
+		NSString* theFormat = @"%.1f";
+		if([displayFormat length] != 0)									theFormat = displayFormat;
+		if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
+		else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)	theFormat = @"%.0f";
+		return [NSString stringWithFormat:theFormat,[self hwValue]];
+	}
+	else return @"";
+}
+
+- (NSString*) iconLabel
+{
+    if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+    else		return @"";        
+}
 
 - (void) addOverLay
 {
 	
-#define kRadius 30.
-	
+	float kRadius;
+	float kConnectorOffset;
+	float kPad;
+	float kYStart;
     if(!guardian) return;
     
-    NSImage* aCachedImage = [self image];
+    NSImage* aCachedImage;
+	if(![self useAltView]){
+		kRadius = 30.;
+		kYStart = 27.;
+		kPad = 1;
+		kConnectorOffset = 10.;
+		aCachedImage = [self image];
+	}
+	else {
+		aCachedImage = [self altImage];
+		kRadius = 50.;
+		kYStart = 25.;
+		kPad = 0;
+		kConnectorOffset = 0.;
+	}
+	if(!aCachedImage)return;
+	
     NSSize theIconSize = [aCachedImage size];
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
@@ -245,14 +313,14 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
         [[NSColor redColor] set];
         float oldWidth = [NSBezierPath defaultLineWidth];
         [NSBezierPath setDefaultLineWidth:3.];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(0.,10.) toPoint:NSMakePoint(theIconSize.width-10.,theIconSize.height)];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(0.,theIconSize.height) toPoint:NSMakePoint(theIconSize.width-10.,10.)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(0.,kConnectorOffset) toPoint:NSMakePoint(theIconSize.width-kConnectorOffset,theIconSize.height)];
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(0.,theIconSize.height) toPoint:NSMakePoint(theIconSize.width-kConnectorOffset,kConnectorOffset)];
         [NSBezierPath setDefaultLineWidth:oldWidth];
 
     }
     if(hwObject){
         if(maxValue-minValue != 0){
-			NSPoint theCenter = NSMakePoint((theIconSize.width-10.)/2.+1.,27.);
+			NSPoint theCenter = NSMakePoint((theIconSize.width-kConnectorOffset)/2.+kPad,kYStart);
 			if(lowLimit>minValue){
 				NSBezierPath* path = [NSBezierPath bezierPath];
                 float lowLimitAngle = 180*(lowLimit-minValue)/(maxValue-minValue);
@@ -262,7 +330,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 								startAngle:lowLimitAngle endAngle:180];
 					[path lineToPoint:theCenter];
 					[path closePath];
-					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
+					[[NSColor colorWithCalibratedRed:.7 green:.4 blue:.4 alpha:.2] set];
 					[path fill];
 				}
             }
@@ -276,7 +344,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
                             startAngle:0 endAngle:highLimitAngle];
 					[path lineToPoint:theCenter];
 					[path closePath];
-					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
+					[[NSColor colorWithCalibratedRed:.7 green:0.4 blue:.4 alpha:.2] set];
 					[path fill];
 				}
             }
@@ -288,57 +356,43 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 			if(needleAngle>180)needleAngle=180;
 			
 			float nA = .0174553*needleAngle;
-			[[NSColor redColor] set];
 			[NSBezierPath setDefaultLineWidth:0];
-            [NSBezierPath strokeLineFromPoint:theCenter toPoint:NSMakePoint(theCenter.x + kRadius*cosf(nA),theCenter.y + kRadius*sinf(nA))];
+ 			[[NSColor blackColor] set];
+			[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(theCenter.x-2*kPad,theCenter.y-2*kPad,4,4)];
+ 			[[NSColor redColor] set];
+			[NSBezierPath strokeLineFromPoint:theCenter toPoint:NSMakePoint(theCenter.x + kRadius*cosf(nA),theCenter.y + kRadius*sinf(nA))];
         }
     }
-    
-    NSString* label;
-    NSFont* theFont;
-    NSAttributedString* n;
-    
-    theFont = [NSFont messageFontOfSize:8];
-    NSDictionary* attrib;
-
-    if(hwName)	{
-		NSString* theFormat = @".1f";
-		if([displayFormat length] != 0){
-			theFormat = displayFormat;
-		}
-		if([theFormat rangeOfString:@"%@"].location !=NSNotFound)theFormat = @".1f";
-		else if([theFormat rangeOfString:@"%d"].location !=NSNotFound)theFormat = @".0f";
-		label = [NSString stringWithFormat:theFormat,[self hwValue]];
-	}
-	else		label = @"--";
-	n = [[NSAttributedString alloc] 
-		initWithString:label 
-			attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
 	
-	NSSize textSize = [n size];
-	[n drawInRect:NSMakeRect((theIconSize.width-10)/2-textSize.width/2,15,textSize.width,textSize.height)];
-	[n release];
-
-
-    if(hwName){
-        label = [NSString stringWithFormat:@"%@,%d",hwName,bit];
-        attrib = [NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName];
-    }
-    else {
-        label = @"XXXXXXXX";
-        attrib = [NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor redColor],NSForegroundColorAttributeName,nil];
-        
-    }
-    n = [[NSAttributedString alloc] initWithString:label attributes:attrib];
-    
-    textSize = [n size];
-    float x = theIconSize.width/2 - textSize.width/2;
-    [n drawInRect:NSMakeRect(x,0,textSize.width,textSize.height)];
-    [n release];
-
+ 	NSString* iconValue = [self iconValue];
+	if([iconValue length]){
+        NSFont* theFont = [NSFont messageFontOfSize:10];
+		NSAttributedString* n = [[NSAttributedString alloc] 
+								 initWithString:iconValue
+								 attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
+		
+		NSSize textSize = [n size];
+		float x = theIconSize.width/2 - textSize.width/2- 4;
+		[[NSColor blackColor] set];
+		[n drawInRect:NSMakeRect(x,12,textSize.width,textSize.height)];
+	}
+	
+	NSString* iconLabel = [self iconLabel];
+	if([iconLabel length]){
+        NSFont* theFont = [NSFont messageFontOfSize:9];
+		NSAttributedString* n = [[NSAttributedString alloc] 
+								 initWithString:iconLabel
+								 attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
+		
+		NSSize textSize = [n size];
+		float x = theIconSize.width/2 - textSize.width/2;
+		[[NSColor blackColor] set];
+		[n drawInRect:NSMakeRect(x,0,textSize.width,textSize.height)];
+	}
+	
     if([self uniqueIdNumber]){
-        theFont = [NSFont messageFontOfSize:9];
-        n = [[NSAttributedString alloc] 
+        NSFont* theFont = [NSFont messageFontOfSize:9];
+        NSAttributedString* n = [[NSAttributedString alloc] 
             initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
                 attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
         
@@ -360,8 +414,8 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setDisplayFormat:[decoder decodeObjectForKey:@"displayFormat"]];
-    [self setMinChange:[decoder decodeFloatForKey:@"minChange"]];
+    [self setDisplayFormat:	[decoder decodeObjectForKey:@"displayFormat"]];
+    [self setMinChange:		[decoder decodeFloatForKey:@"minChange"]];
     [[self undoManager] enableUndoRegistration];    
 
     return self;
@@ -371,7 +425,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:displayFormat forKey:@"displayFormat"];
-    [encoder encodeFloat:minChange forKey:@"minChange"];
+    [encoder encodeFloat: minChange		forKey:@"minChange"];
 }
 
 @end

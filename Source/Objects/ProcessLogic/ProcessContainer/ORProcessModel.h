@@ -34,9 +34,12 @@
     float		sampleRate;
 	NSDate*		lastSampleTime;
 	BOOL		sampleGateOpen;
+	BOOL		useAltView;
 }
 
 #pragma mark ***Accessors
+- (BOOL) useAltView;
+- (void) setUseAltView:(BOOL)aState;
 - (void) startProcessCycle;
 - (BOOL) sampleGateOpen;
 - (void) endProcessCycle;
@@ -72,9 +75,13 @@
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-
 @end
 
+@interface OrcaObject (ProcessModel)
+- (void) setUseAltView:(BOOL)aState; 
+@end
+
+extern NSString* ORProcessModelUseAltViewChanged;
 extern NSString* ORProcessModelSampleRateChanged;
 extern NSString* ORProcessModelShortNameChangedNotification;
 extern NSString* ORProcessTestModeChangedNotification;

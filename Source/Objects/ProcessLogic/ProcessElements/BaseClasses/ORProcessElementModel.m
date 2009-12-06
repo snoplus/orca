@@ -38,7 +38,9 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 
 - (void) dealloc
 {
-    [processLock release];
+	[highlightedAltImage release];
+    [altImage release];
+	[processLock release];
     [super dealloc];
 }
 
@@ -52,7 +54,6 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 	return @"Process_Control/Process_Elements.html";
 }
 
-
 - (void) setUpNubs
 {
 }
@@ -60,6 +61,17 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 - (NSString*) shortName
 {
 	return @"";
+}
+
+- (BOOL) useAltView
+{
+	return useAltView;
+}
+
+- (void) setUseAltView:(BOOL)aState
+{
+	useAltView = aState;
+	[self setUpImage];
 }
 
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey
@@ -72,22 +84,227 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
     return [ourKey compare:theirKey];
 }
 
+#pragma mark ¥¥¥AltImage Methods
+- (NSImage*) altImage
+{
+	//sub-classes define an image if they are to appear on the Normal View
+	return nil;
+}
+- (BOOL) canBeInAltView
+{
+	return NO;
+}
+- (void) setImage:(NSImage*)anImage
+{
+	if(![self useAltView])[super setImage:anImage];
+	else {
+		[anImage retain];
+		[altImage release];
+		altImage = anImage;
+		
+		if(anImage){
+			NSSize aSize = [anImage size];
+			altFrame.size.width = aSize.width;
+			altFrame.size.height = aSize.height;
+			altBounds.size.width = aSize.width;
+			altBounds.size.height = aSize.height;
+			NSRect sourceRect = NSMakeRect(0,0,[anImage size].width,[anImage size].height);
+			[highlightedAltImage release];
+			highlightedAltImage = [[NSImage alloc] initWithSize:[anImage size]];
+			[highlightedAltImage lockFocus];
+			[anImage dissolveToPoint:NSZeroPoint fraction:1];
+			[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
+			NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
+			[highlightedAltImage unlockFocus];
+		}
+		else {
+			altFrame.size.width 	= 0;
+			altFrame.size.height 	= 0;
+			altBounds.size.width 	= 0;
+			altBounds.size.height 	= 0;
+			[highlightedAltImage release];
+			highlightedAltImage = nil;
+		}  
+	}
+}
+
+- (void) drawConnections:(NSRect)aRect withTransparency:(float)aTransparency
+{
+	if(![self useAltView])[super drawConnections:aRect withTransparency:aTransparency];
+}
+
+- (NSString*) iconLabel { return nil; }
+- (NSString*) iconValue { return nil; }
+
+- (void) drawIcon:(NSRect)aRect withTransparency:(float)aTransparency
+{
+	if(![self useAltView]){
+		[super drawIcon:aRect withTransparency:aTransparency];
+	}
+	else {
+		if(![self altImage])return;
+		//a workaround for a case where image hasn't been made yet.. don't worry--it will get made below if need be.
+		if(aRect.size.height == 0)aRect.size.height = 1;
+		if(aRect.size.width == 0)aRect.size.width = 1;
+		NSShadow* theShadow = nil;
+		
+		if(NSIntersectsRect(aRect,altFrame)){
+			
+			if([self guardian]){
+				[NSGraphicsContext saveGraphicsState]; 
+				
+				// Create the shadow below and to the right of the shape.
+				theShadow = [[NSShadow alloc] init]; 
+				[theShadow setShadowOffset:NSMakeSize(3.0, -3.0)]; 
+				[theShadow setShadowBlurRadius:3.0]; 
+				
+				// Use a partially transparent color for shapes that overlap.
+				[theShadow setShadowColor:[[NSColor blackColor]
+										   colorWithAlphaComponent:0.3]]; 
+				
+				[theShadow set];
+			}
+			// Draw.
+			if(!altImage){
+				[self setUpImage];
+			}
+			if(altImage){
+				NSImage* imageToDraw;
+				if([self highlighted])	imageToDraw = highlightedAltImage;
+				else					imageToDraw = altImage;
+				
+				NSRect sourceRect = NSMakeRect(0,0,[imageToDraw size].width,[imageToDraw size].height);
+				[imageToDraw drawAtPoint:altFrame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:aTransparency];
+			}
+			else {
+				//no icon so fake it with just a square
+				if([self highlighted])	[[NSColor redColor]set];
+				else					[[NSColor blueColor]set];
+				NSFrameRect(frame);
+				NSAttributedString* s = [[NSAttributedString alloc] initWithString:@"No Icon"];
+				[s drawAtPoint:altFrame.origin];
+				[s release];
+			}
+			
+			if([self guardian]){
+				[NSGraphicsContext restoreGraphicsState];
+			}        
+		}
+		[theShadow release]; 
+	}
+}
+
+- (void) drawImageAtOffset:(NSPoint)anOffset withTransparency:(float)aTransparency
+{
+	if(![self useAltView]){
+		[super drawImageAtOffset:anOffset withTransparency:aTransparency];
+	}
+	else {
+		BOOL saveState = [self highlighted];
+		NSRect oldFrame = altFrame;
+		NSRect aFrame = altFrame;
+		aFrame.origin.x += anOffset.x;
+		aFrame.origin.y += anOffset.y;
+		altFrame = aFrame;
+		[self setHighlighted:NO];
+		[self setSkipConnectionDraw:YES];
+		[self drawSelf:altFrame withTransparency:aTransparency];
+		[self setSkipConnectionDraw:NO];
+		[self setOffset:NSMakePoint(altFrame.origin.x,altFrame.origin.y)];
+		altFrame = oldFrame;
+		
+		[self setHighlighted:saveState];
+	}
+}
+
+- (NSImage*)image
+{
+	if(![self useAltView])	return [super image];
+    else					return [self altImage];
+}
+
+- (int)	x
+{
+	if(![self useAltView])	return [super x];
+	else					return altFrame.origin.x;
+}
+
+- (int) y
+{
+ 	if(![self useAltView])	return [super y];
+	else					return  altFrame.origin.y;
+}
+
+- (void) setFrame:(NSRect)aValue
+{
+    frame = aValue;
+    bounds.size = frame.size;
+}
+
+- (NSRect) frame
+{
+	if(![self useAltView] || ![self canBeInAltView])	return [super frame];
+	else					return altFrame;
+}
+
+- (void) setBounds:(NSRect)aValue
+{
+	if(![self useAltView] || ![self canBeInAltView])	[super setBounds:aValue];
+	else					altBounds = aValue;
+}
+
+- (NSRect) bounds
+{
+	if(![self useAltView] || ![self canBeInAltView])	return [super bounds];
+    else					return altBounds;
+}
+
+- (void) setOffset:(NSPoint)aPoint
+{
+	if(![self useAltView] || ![self canBeInAltView])	[super setOffset:aPoint];
+	else					altOffset = aPoint;
+}
+
+- (NSPoint)offset
+{
+    if(![self useAltView] || ![self canBeInAltView])	return [super offset];
+	else					return altOffset;
+}
+
+- (void) setGuardian:(id)aGuardian
+{
+	[super setGuardian:aGuardian];
+	if([aGuardian useAltView]){
+		altFrame.origin = frame.origin;
+	}
+}
+
+- (void) moveTo:(NSPoint)aPoint
+{	
+	if(![self useAltView]){
+		[super moveTo:aPoint];
+	}
+	else {
+		[[[self undoManager] prepareWithInvocationTarget:self] moveTo:altFrame.origin];
+		altFrame.origin = aPoint;
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:self forKey: ORMovedObject];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectMoved object:self userInfo: userInfo];
+	}
+}
+
+-(void) move:(NSPoint)aPoint
+{
+	if(![self useAltView])[super move:aPoint];
+    else [self moveTo:NSMakePoint(altFrame.origin.x+aPoint.x,altFrame.origin.y+aPoint.y)];
+}
+
 #pragma mark ¥¥¥Accessors
-
-- (NSString*) elementName
-{
-    return @"Processor";
-}
-
-- (NSString*) fullHwName
-{
-    return @"N/A";
-}
-
-- (id) stateValue
-{
-    return @"-";
-}
+- (NSString*) elementName{ return @"Processor"; }
+- (NSString*) fullHwName { return @"N/A"; }
+- (id) stateValue		 { return @"-"; }
 
 - (NSString*) description:(NSString*)prefix
 {
@@ -109,7 +326,6 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
     [[NSNotificationCenter defaultCenter]
 		postNotificationName:ORProcessCommentChangedNotification
                               object:self];
-    
 }
 
 - (void) setUniqueIdNumber :(unsigned long)aNumber
@@ -152,57 +368,18 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 	}
 }
 
-- (int) evaluatedState
-{
-    return evaluatedState;
-}
-
-
-- (Class) guardianClass 
-{
-    return NSClassFromString(@"ORProcessModel");
-}
-- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
-{
-    return [aGuardian isKindOfClass:[self guardianClass]];
-}
-
-- (BOOL) canImageChangeWithState
-{
-    return NO;
-}
+- (int)   evaluatedState  { return evaluatedState; }
+- (Class) guardianClass   { return NSClassFromString(@"ORProcessModel"); }
+- (BOOL)  acceptsGuardian: (OrcaObject*)aGuardian { return [aGuardian isKindOfClass:[self guardianClass]]; }
+- (BOOL)  canImageChangeWithState { return NO; }
 
 #pragma mark ¥¥¥Thread Related
-- (void) clearAlreadyEvaluatedFlag
-{
-    alreadyEvaluated = NO;
-}
-
-- (BOOL) alreadyEvaluated
-{
-	return alreadyEvaluated;
-}
-
-- (void) processIsStarting
-{
-	partOfRun = YES;
-}
-
-- (void) processIsStopping
-{
-	partOfRun = NO;
-}
-
-- (BOOL) partOfRun
-{
-	return partOfRun;
-}
-
-
-- (int) eval
-{
-    return 0;
-}
+- (void) clearAlreadyEvaluatedFlag	{ alreadyEvaluated = NO; }
+- (BOOL) alreadyEvaluated			{ return alreadyEvaluated; }
+- (void) processIsStarting			{ partOfRun = YES; }
+- (void) processIsStopping			{ partOfRun = NO; }
+- (BOOL) partOfRun					{ return partOfRun; }
+- (int) eval						{ return 0; }
 
 - (void) postStateChange
 {
@@ -215,27 +392,34 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 	[super drawSelf:aRect withTransparency:aTransparency];
 }
 
-
 #pragma mark ¥¥¥Archiving
-- (id)initWithCoder:(NSCoder*)decoder
+- (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    
     [self setComment:[decoder decodeObjectForKey:@"comment"]];
-    
+	useAltView =	 [decoder decodeBoolForKey:@"useAltView"];
+	altFrame  =		 [decoder decodeRectForKey:@"altFrame"];
+	altOffset =		 [decoder decodePointForKey:@"altOffset"];
+	altBounds =		 [decoder decodeRectForKey:@"altBounds"];
+
     [[self undoManager] enableUndoRegistration];
-    
+	
     processLock = [[NSLock alloc] init];
     [self setUpNubs];
+	
     return self;
 }
 
-- (void)encodeWithCoder:(NSCoder*)encoder
+- (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:comment forKey:@"comment"];
+    [encoder encodeBool:useAltView  forKey:@"useAltView"];
+    [encoder encodeObject:comment  forKey:@"comment"];
+    [encoder encodeRect:altFrame   forKey:@"altFrame"];
+    [encoder encodePoint:altOffset forKey:@"altOffset"];
+	[encoder encodeRect:altBounds  forKey:@"altBounds"];
 }
 
 @end

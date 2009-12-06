@@ -68,6 +68,7 @@
 - (void) displayFormatChanged:(NSNotification*)aNote
 {
 	[displayFormatField setStringValue: [model displayFormat]];
+	[model setUpImage];
 }
 
 - (void) minChangeChanged:(NSNotification*)aNote

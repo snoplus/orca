@@ -80,7 +80,9 @@ NSString* ORSpliterOutConnection  = @"ORSpliterOutConnection";
 }
 
 
-- (void) drawSelf:(NSRect)aRect withTransparency:(float)aTransparency{
+- (void) drawSelf:(NSRect)aRect withTransparency:(float)aTransparency
+{
+    if([self useAltView])return;
     
     NSBezierPath* path = [NSBezierPath bezierPath];
 	[path setLineWidth:.5];

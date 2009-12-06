@@ -316,6 +316,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
     NSSize theIconSize = [aCachedImage size];
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
+	[[NSColor blackColor] set];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
         
     NSString* label;

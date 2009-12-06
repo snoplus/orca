@@ -33,6 +33,7 @@
     IBOutlet NSTextField* statusTextField;
     IBOutlet NSTextView* detailsTextView;
     IBOutlet NSTextField* shortNameField;
+    IBOutlet NSButton* altViewButton;
 
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
@@ -54,8 +55,11 @@
 - (void) commentChanged:(NSNotification*)aNote;
 - (void) shortNameChanged:(NSNotification*)aNote;
 - (void) detailsChanged:(NSNotification*)aNote;
+- (void) useAltViewChanged:(NSNotification*)aNote;
+- (void) objectsChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) useAltViewAction:(id)sender;
 - (IBAction) sampleRateAction:(id)sender;
 - (IBAction) startProcess:(id)sender;
 - (IBAction) testModeAction:(id)sender;

@@ -17,6 +17,8 @@
 				<string>id</string>
 				<key>testModeAction</key>
 				<string>id</string>
+				<key>useAltViewAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORProcessController</string>
@@ -24,6 +26,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>altViewButton</key>
+				<string>NSButton</string>
 				<key>detailsTextView</key>
 				<string>NSTextView</string>
 				<key>sampleRateField</key>
@@ -96,6 +100,8 @@
 				<key>openCommandCenter</key>
 				<string>NSToolbarItem</string>
 				<key>openHWWizard</key>
+				<string>NSToolbarItem</string>
+				<key>openHelp</key>
 				<string>NSToolbarItem</string>
 				<key>openPreferences</key>
 				<string>NSToolbarItem</string>

@@ -26,7 +26,14 @@
         BOOL        alreadyEvaluated;
 		int			evaluatedState;
 
-    @private
+		NSImage* 	altImage;
+		NSImage* 	highlightedAltImage;
+		NSRect 		altFrame;
+		NSRect 		altBounds;
+		NSPoint 	altOffset;
+		BOOL		useAltView;
+    
+	@private
         int         state;
         NSLock*     processLock;
         NSString*   comment;
@@ -38,8 +45,12 @@
 - (void) dealloc;
 - (void) setUpNubs;
 - (void) awakeAfterDocumentLoaded;
+- (NSImage*) altImage;
+- (BOOL) canBeInAltView;
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) useAltView;
+- (void) setUseAltView:(BOOL)aState;
 - (NSString*) description:(NSString*)prefix;
 - (NSString*) elementName;
 - (NSString*)comment;
@@ -55,6 +66,8 @@
 - (BOOL) canImageChangeWithState;
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey;
 - (BOOL) partOfRun;
+- (NSString*) iconValue;
+- (NSString*) iconLabel;
 
 #pragma mark ¥¥¥Thread Related
 - (void) clearAlreadyEvaluatedFlag;
@@ -66,6 +79,7 @@
 
 #pragma mark ¥¥¥Archiving
 - (id)initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 

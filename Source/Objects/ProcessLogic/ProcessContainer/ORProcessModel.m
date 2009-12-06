@@ -24,11 +24,12 @@
 #import "ORProcessThread.h"
 
 
-NSString* ORProcessModelSampleRateChanged = @"ORProcessModelSampleRateChanged";
+NSString* ORProcessModelSampleRateChanged			= @"ORProcessModelSampleRateChanged";
 NSString* ORProcessTestModeChangedNotification      = @"ORProcessTestModeChangedNotification";
 NSString* ORProcessRunningChangedNotification       = @"ORProcessRunningChangedNotification";
 NSString* ORProcessModelCommentChangedNotification  = @"ORProcessModelCommentChangedNotification";
-NSString* ORProcessModelShortNameChangedNotification   = @"ORProcessModelShortNameChangedNotification";
+NSString* ORProcessModelShortNameChangedNotification= @"ORProcessModelShortNameChangedNotification";
+NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged";
 
 @implementation ORProcessModel
 
@@ -56,6 +57,24 @@ NSString* ORProcessModelShortNameChangedNotification   = @"ORProcessModelShortNa
 
 
 #pragma mark ***Accessors
+- (BOOL) useAltView
+{
+	return useAltView;
+}
+
+- (void) setUseAltView:(BOOL)aState
+{
+	BOOL deselectIcons = NO;
+	if(aState != useAltView)deselectIcons = YES;
+	useAltView = aState;
+	for(OrcaObject* obj in [self orcaObjects]){
+		if([obj respondsToSelector:@selector(setUseAltView:)]){
+			[obj setUseAltView:useAltView];
+			if(deselectIcons)[obj setHighlighted:NO];
+		}
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelUseAltViewChanged object:self];
+}
 
 - (float) sampleRate
 {
@@ -412,6 +431,7 @@ NSString* ORProcessModelShortNameChangedNotification   = @"ORProcessModelShortNa
     [self setComment:[decoder decodeObjectForKey:@"comment"]];
     [self setShortName:[decoder decodeObjectForKey:@"shortName"]];
     [self setProcessRunning:NO];
+    [self setUseAltView:[decoder decodeBoolForKey:@"useAltView"]];
 	
     [[self undoManager] enableUndoRegistration];
 	
@@ -425,6 +445,7 @@ NSString* ORProcessModelShortNameChangedNotification   = @"ORProcessModelShortNa
     [encoder encodeInt:inTestMode forKey:@"inTestMode"];
     [encoder encodeObject:comment forKey:@"comment"];
     [encoder encodeObject:shortName forKey:@"shortName"];
+    [encoder encodeBool:useAltView forKey:@"useAltView"];
 	
 }
 

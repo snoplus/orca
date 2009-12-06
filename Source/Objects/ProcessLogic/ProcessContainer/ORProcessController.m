@@ -103,18 +103,25 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                          name : ORProcessModelShortNameChangedNotification
                        object : model];
 	
-	
     [notifyCenter addObserver : self
                      selector : @selector(detailsChanged:)
                          name : NSTableViewSelectionDidChangeNotification
                        object : tableView];
-    
     
     [notifyCenter addObserver : self
                      selector : @selector(sampleRateChanged:)
                          name : ORProcessModelSampleRateChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(useAltViewChanged:)
+                         name : ORProcessModelUseAltViewChanged
+						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(objectsChanged:)
+                         name : ORGroupObjectsAdded
+						object: nil];	
 }
 
 - (void) updateWindow
@@ -125,6 +132,19 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [self detailsChanged:nil];
     [self processRunningChanged:nil];
 	[self sampleRateChanged:nil];
+	[self useAltViewChanged:nil];
+}
+
+- (void) useAltViewChanged:(NSNotification*)aNote
+{
+	[altViewButton setTitle:[model useAltView]?@"Edit Connections":@"Show Displays Only"];
+	[groupView setNeedsDisplay:YES];
+}
+
+- (void) objectsChanged:(NSNotification*)aNote
+{
+	//just set the same value to force a reset of the value to all objects
+	[model setUseAltView:[model useAltView]];
 }
 
 - (void) commentChanged:(NSNotification*)aNote
@@ -190,11 +210,16 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) useAltViewAction:(id)sender
+{
+	[model setUseAltView:![model useAltView]];
+}
 
 - (void) sampleRateAction:(id)sender
 {
 	[model setSampleRate:[sender floatValue]];	
 }
+
 - (IBAction) startProcess:(id)sender
 {
 	[[self window] endEditingFor:nil];		
@@ -237,7 +262,6 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 {
     return [[model orcaObjects] count];
 }
-
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
