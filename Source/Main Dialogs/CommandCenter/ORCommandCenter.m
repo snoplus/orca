@@ -614,7 +614,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 - (NSCalendarDate*) currentTime
 {
 	NSCalendarDate* theDate = [NSCalendarDate date];
-	[theDate setCalendarFormat:@"%d/%m/%Y %H:%M:%S %z"];
+	[theDate setCalendarFormat:@"%Y/%m/%d %H:%M:%S"];
 	return theDate;
 }
 
