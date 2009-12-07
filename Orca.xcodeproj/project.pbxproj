@@ -1007,6 +1007,8 @@
 		84519C6C0B5C0B0900B08915 /* GoToLine.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84519C690B5C0B0900B08915 /* GoToLine.nib */; };
 		84519C6D0B5C0B0900B08915 /* GoToLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 84519C6A0B5C0B0900B08915 /* GoToLine.h */; };
 		84519C6E0B5C0B0900B08915 /* GoToLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84519C6B0B5C0B0900B08915 /* GoToLine.m */; };
+		84522B9610CD723E0077DDFF /* adcMeter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84522B9510CD723E0077DDFF /* adcMeter.tif */; };
+		84522D4910CD90600077DDFF /* adcHorizontalBar.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84522D4810CD90600077DDFF /* adcHorizontalBar.tif */; };
 		84538DF40803462500615B6D /* OR1DHistoDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84538DF20803462500615B6D /* OR1DHistoDecoders.m */; };
 		84538DF50803462500615B6D /* OR1DHistoDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84538DF30803462500615B6D /* OR1DHistoDecoders.h */; };
 		84538DFE0803462F00615B6D /* OR2DHistoDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84538DFC0803462F00615B6D /* OR2DHistoDecoders.h */; };
@@ -3097,6 +3099,8 @@
 		84519C690B5C0B0900B08915 /* GoToLine.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = GoToLine.nib; path = "Source/Objects/Misc Objects/Views/TextFinder/GoToLine.nib"; sourceTree = SOURCE_ROOT; };
 		84519C6A0B5C0B0900B08915 /* GoToLine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GoToLine.h; path = "Source/Objects/Misc Objects/Views/TextFinder/GoToLine.h"; sourceTree = SOURCE_ROOT; };
 		84519C6B0B5C0B0900B08915 /* GoToLine.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = GoToLine.m; path = "Source/Objects/Misc Objects/Views/TextFinder/GoToLine.m"; sourceTree = SOURCE_ROOT; };
+		84522B9510CD723E0077DDFF /* adcMeter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = adcMeter.tif; sourceTree = "<group>"; };
+		84522D4810CD90600077DDFF /* adcHorizontalBar.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = adcHorizontalBar.tif; sourceTree = "<group>"; };
 		84538DF20803462500615B6D /* OR1DHistoDecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = OR1DHistoDecoders.m; path = "Source/Objects/Data Processing/Histogram Objects/Histogram1D/OR1DHistoDecoders.m"; sourceTree = SOURCE_ROOT; };
 		84538DF30803462500615B6D /* OR1DHistoDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR1DHistoDecoders.h; path = "Source/Objects/Data Processing/Histogram Objects/Histogram1D/OR1DHistoDecoders.h"; sourceTree = SOURCE_ROOT; };
 		84538DFC0803462F00615B6D /* OR2DHistoDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2DHistoDecoders.h; path = "Source/Objects/Data Processing/Histogram Objects/Histogram2D/OR2DHistoDecoders.h"; sourceTree = SOURCE_ROOT; };
@@ -5593,6 +5597,8 @@
 				8421606F094F7F9E002E68B7 /* ORAdcModel.m */,
 				84216086094F8910002E68B7 /* ORAdcController.h */,
 				84216087094F8910002E68B7 /* ORAdcController.m */,
+				84522B9510CD723E0077DDFF /* adcMeter.tif */,
+				84522D4810CD90600077DDFF /* adcHorizontalBar.tif */,
 				8421607A094F861E002E68B7 /* adc.tif */,
 				84216088094F8910002E68B7 /* Adc.nib */,
 			);
@@ -11066,6 +11072,8 @@
 				8435AD2610C6F0F400E03F7F /* Varian.gif in Resources */,
 				849516BA10C95382001C8112 /* StateLabel.nib in Resources */,
 				849516BB10C95382001C8112 /* StateLabel.tif in Resources */,
+				84522B9610CD723E0077DDFF /* adcMeter.tif in Resources */,
+				84522D4910CD90600077DDFF /* adcHorizontalBar.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

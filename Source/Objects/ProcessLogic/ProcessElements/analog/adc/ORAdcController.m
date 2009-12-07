@@ -48,6 +48,21 @@
                          name : ORAdcModelDisplayFormatChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(customLabelChanged:)
+                         name : ORAdcModelCustomLabelChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(labelTypeChanged:)
+                         name : ORAdcModelLabelTypeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(viewIconTypeChanged:)
+                         name : ORAdcModelViewIconTypeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -55,13 +70,35 @@
 	[super updateWindow];
     [self minChangeChanged:nil];
 	[self displayFormatChanged:nil];
+	[self customLabelChanged:nil];
+	[self labelTypeChanged:nil];
+	[self viewIconTypeChanged:nil];
+}
+
+- (void) viewIconTypeChanged:(NSNotification*)aNote
+{
+	[viewIconTypePU selectItemAtIndex: [model viewIconType]];
+}
+
+- (void) labelTypeChanged:(NSNotification*)aNote
+{
+	[labelTypeMatrix selectCellWithTag: [model labelType]];
+}
+
+- (void) customLabelChanged:(NSNotification*)aNote
+{
+	[customLabelField setStringValue: [model customLabel]];
 }
 
 - (void) setButtonStates
 {
 	[super setButtonStates];
     BOOL locked = [gSecurity isLocked:ORHWAccessLock];
+	[minChangeField setEnabled: !locked ];
 	[displayFormatField setEnabled: !locked ];
+	[viewIconTypePU setEnabled: !locked ];
+	[labelTypeMatrix setEnabled: !locked ];
+	[customLabelField setEnabled: !locked ];
 }
 
 
@@ -76,7 +113,23 @@
 	[minChangeField setFloatValue:[model minChange]];
 }
 
-- (void) displayFormatAction:(id)sender
+
+- (IBAction) viewIconTypeAction:(id)sender
+{
+	[model setViewIconType:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) labelTypeAction:(id)sender
+{
+	[model setLabelType:[[sender selectedCell]tag]];	
+}
+
+- (IBAction) customLabelAction:(id)sender
+{
+	[model setCustomLabel:[sender stringValue]];	
+}
+
+- (IBAction) displayFormatAction:(id)sender
 {
 	[model setDisplayFormat:[sender stringValue]];	
 }

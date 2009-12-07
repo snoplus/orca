@@ -17,25 +17,31 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
 #pragma mark ¥¥¥Imported Files
-
 #import "ORProcessHwAccessorController.h"
 
 @interface ORAdcController : ORProcessHwAccessorController {
-	IBOutlet NSTextField* minChangeField;
-	IBOutlet NSTextField* displayFormatField;
- }
+	IBOutlet NSTextField*	minChangeField;
+	IBOutlet NSPopUpButton* viewIconTypePU;
+	IBOutlet NSMatrix*		labelTypeMatrix;
+	IBOutlet NSTextField*	customLabelField;
+	IBOutlet NSTextField*	displayFormatField;
+}
 
 #pragma mark ¥¥¥Initialization
 - (id)init;
 
 #pragma mark ***Interface Management
+- (void) viewIconTypeChanged:(NSNotification*)aNote;
+- (void) labelTypeChanged:(NSNotification*)aNote;
+- (void) customLabelChanged:(NSNotification*)aNote;
 - (void) minChangeChanged:(NSNotification*)aNote;
 - (void) displayFormatChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) viewIconTypeAction:(id)sender;
+- (IBAction) labelTypeAction:(id)sender;
+- (IBAction) customLabelAction:(id)sender;
 - (IBAction) displayFormatAction:(id)sender;
 - (IBAction) minChangeAction:(id)sender;
 @end
