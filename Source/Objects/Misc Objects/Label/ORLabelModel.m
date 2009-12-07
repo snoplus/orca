@@ -456,7 +456,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	
     NSMenu *menu = [[NSMenu alloc] init];
 	[[menu insertItemWithTitle:@"Open Label Dialog"
-						action:@selector(doDoubleClick:)
+						action:@selector(openMainDialog:)
 				 keyEquivalent:@""
 					   atIndex:0] setTarget:self];
 	if([controllerString length]){
