@@ -62,6 +62,11 @@
 {
     [super setModel:aModel];
     [groupView setGroup:(ORGroup*)model];
+	
+	NSImage* anImage = [[NSImage alloc] initWithContentsOfFile:[[model backgroundImagePath] stringByExpandingTildeInPath]];
+	[groupView setBackgroundImage:anImage];
+	[anImage release];
+	
     NSString* theName = [self className];
     if([theName hasPrefix:@"OR"]){
         theName = [theName substringFromIndex:2];
