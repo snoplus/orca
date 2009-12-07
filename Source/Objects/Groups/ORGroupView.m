@@ -105,7 +105,7 @@
 
 #pragma mark ¥¥¥Accessors
 - (void) setGroup:(id)aModel
-{
+{	
     group = aModel;
 }
 
@@ -137,15 +137,12 @@
 - (void)drawRect:(NSRect)rect
 {
 	[backgroundImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-
-	//[backgroundImage drawInRect:[self bounds] fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1];
 	[self drawContents:rect];
     [mouseTask drawRect:rect];
 }
 
 - (void) drawContents:(NSRect)aRect
 {
-
     [group drawContents:aRect];	
 }
 
