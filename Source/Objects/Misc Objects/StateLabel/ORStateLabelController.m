@@ -100,7 +100,7 @@
 	[model setTrueColor:[sender color]];
 }
 
-- (IBAction) falsColorAction:(id)sender
+- (IBAction) falseColorAction:(id)sender
 {
 	[model setFalseColor:[sender color]];
 }

@@ -36,7 +36,11 @@ NSString* ORLabelModelFalseColorChanged = @"ORLabelModelFalseColorChanged";
 - (id) init
 {
     self = [super init];
+    [[self undoManager] disableUndoRegistration];
 	[self setLabelType:kDynamicLabel];
+	[self setTrueColor:	[NSColor blackColor]];
+	[self setFalseColor:[NSColor blackColor]];
+    [[self undoManager] enableUndoRegistration];
     return self;
 }
 
@@ -90,41 +94,81 @@ NSString* ORLabelModelFalseColorChanged = @"ORLabelModelFalseColorChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabelModelFalseColorChanged object:self];
 	[self setUpImage];
 }
+- (void) setLabel:(NSString*)aLabel
+{
+    if(!aLabel)aLabel = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setLabel:label];
+    
+    [label autorelease];
+    label = [aLabel copy];
+	if(!scheduledForUpdate){
+		scheduledForUpdate = YES;
+		[self performSelector:@selector(setUpImage) withObject:nil afterDelay:1];
+	}
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORLabelModelLabelChangedNotification
+	 object:self];
+}
+
 - (NSAttributedString*) stringToDisplay:(BOOL)highlight
 {
-	NSMutableAttributedString* attribString = [[NSMutableAttributedString alloc] initWithString:@""];
-	NSString* s = @"";
 	int i;
 	int n = [displayValues count];
 	NSArray* formats = [displayFormat componentsSeparatedByString:@"\n"];
 	NSString* aPrefix;
-	for(i=0;i<n;i++){
-		id displayValue = [displayValues objectAtIndex:i];
-		if(i<[formats count]) aPrefix = [formats objectAtIndex:i];
-		else				  aPrefix = @"";
-		
-		s = [s stringByAppendingFormat:@"%@%@%@",aPrefix,displayValue==nil?@"?":[self boolString:[displayValue boolValue]],i<n-1?@"\n":@""];		
-		NSMutableAttributedString* sPart;
-		NSColor* theColor;
-		if([displayValue boolValue])theColor = trueColor;
-		else theColor=falseColor;
+	NSMutableAttributedString* attribString;
+	NSString* s = @"";
+	if(n==0){
 		if(highlight){
-			sPart = [[[NSMutableAttributedString alloc] initWithString:[s length]?s:@"Text Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-								  [NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
-								  theColor,NSForegroundColorAttributeName,
-								  [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]] autorelease];
+			attribString = [[NSMutableAttributedString alloc] initWithString:@"State Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																											  [NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
+																											  [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
 		}
 		else {
-			sPart = [[[NSMutableAttributedString alloc] initWithString:[s length]?s:@"Text Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-								  theColor,NSForegroundColorAttributeName,
-								  [NSFont fontWithName:@"Monaco" size:textSize],NSFontAttributeName,nil]] autorelease];
+			attribString = [[NSMutableAttributedString alloc] initWithString:@"State Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																											  [NSFont fontWithName:@"Monaco" size:textSize],NSFontAttributeName,nil]];
 		}
-		if([aPrefix length]){
-			NSString* s = [sPart string];
-			NSRange prefixRange = [s rangeOfString:aPrefix];
-			[sPart removeAttribute:NSForegroundColorAttributeName range:prefixRange];
+	}
+	else {
+		attribString = [[NSMutableAttributedString alloc] initWithString:@""];
+		for(i=0;i<n;i++){
+			id displayValue = [displayValues objectAtIndex:i];
+			
+			//get the prefix
+			if(i<[formats count]) aPrefix = [formats objectAtIndex:i];
+			else				  aPrefix = @"";
+			
+			//get the value part
+			if([displayValue isEqual:@"?"]) s = [NSString stringWithFormat:@"%@%@%@",aPrefix,@"?",i<n-1?@"\n":@""];
+			else							s = [NSString stringWithFormat:@"%@%@%@",aPrefix,displayValue==nil?@"?":[self boolString:[displayValue boolValue]],i<n-1?@"\n":@""];		
+
+			//turn the result into an attributed string,with the right font, color, etc...
+			NSMutableAttributedString* sPart;
+			NSColor* theColor;
+			if([displayValue boolValue])theColor = trueColor;
+			else theColor=falseColor;
+			if(highlight){
+				sPart = [[[NSMutableAttributedString alloc] initWithString:[s length]?s:@"Text Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+									  [NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
+									  theColor,NSForegroundColorAttributeName,
+									  [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]] autorelease];
+			}
+			else {
+				sPart = [[[NSMutableAttributedString alloc] initWithString:[s length]?s:@"Text Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+									  theColor,NSForegroundColorAttributeName,
+									  [NSFont fontWithName:@"Monaco" size:textSize],NSFontAttributeName,nil]] autorelease];
+			}
+			
+			//make the prefix part black
+			if([aPrefix length]){
+				NSString* s = [sPart string];
+				NSRange prefixRange = [s rangeOfString:aPrefix];
+				[sPart removeAttribute:NSForegroundColorAttributeName range:prefixRange];
+			}
+			
+			//put all the results togther
+			if(sPart)[attribString appendAttributedString:sPart];
 		}
-		if(sPart)[attribString appendAttributedString:sPart];
 	}
 	
 	return [attribString autorelease];

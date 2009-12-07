@@ -39,5 +39,5 @@
 #pragma mark •••Actions
 - (IBAction) boolTypeAction:(id)sender;
 - (IBAction) trueColorAction:(id)sender;
-- (IBAction) falsColorAction:(id)sender;
+- (IBAction) falseColorAction:(id)sender;
 @end

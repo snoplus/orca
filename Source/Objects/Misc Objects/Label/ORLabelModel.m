@@ -215,7 +215,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (void) setLabel:(NSString*)aLabel
 {
-    if(!aLabel)aLabel = @"Text Box";
+    if(!aLabel)aLabel = @"Text Label";
     [[[self undoManager] prepareWithInvocationTarget:self] setLabel:label];
     
     [label autorelease];
@@ -264,6 +264,8 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     //---------------------------------------------------------------------------------------------------
 	if(label){
 		NSAttributedString* n = [self stringToDisplay:NO];
+		if([n length] == 0)n = [[[NSMutableAttributedString alloc] initWithString:@"State Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																												[NSFont fontWithName:@"Monaco" size:textSize],NSFontAttributeName,nil]] autorelease];
 		NSSize theSize = [n size];
 
 		NSImage* i = [[NSImage alloc] initWithSize:theSize];
@@ -387,6 +389,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 				}
 			}
 		}
+		else [newValues addObject:@"?"];
 	}
 	@catch (NSException* e){
 	}
@@ -513,14 +516,12 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	}
 	NSAttributedString* n;
 	if(highlight){
-		n = [[NSAttributedString alloc] 
-			 initWithString:[s length]?s:@"Text Label"
+		n = [[NSAttributedString alloc] initWithString:[s length]?s:@"Text Label"
 			 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont fontWithName:@"Monaco"  size:textSize],NSFontAttributeName,
 						 [NSColor colorWithCalibratedRed:.5 green:.5 blue:.5 alpha:.3],NSBackgroundColorAttributeName,nil]];
 	}
 	else {
-		n= [[NSAttributedString alloc] 
-			initWithString:[s length]?s:@"Text Label"
+		n= [[NSAttributedString alloc] initWithString:[s length]?s:@"Text Label"
 			attributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:textSize] forKey:NSFontAttributeName]];
 	}
 	
