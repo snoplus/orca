@@ -173,6 +173,31 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return reg[anIndex].hwReset;
 }
 
+- (unsigned short) threshold:(unsigned short) aChnl
+{
+    return thresholds[aChnl] & 0xff;
+}
+
+- (void) setThreshold:(unsigned short) aChnl threshold:(unsigned short) aValue
+{
+    if(aValue>255)aValue = 255;
+    // Set the undo manager action.  The label has already been set by the controller calling this method.
+    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl threshold:[self threshold:aChnl]];
+    
+    // Set the new value in the model.
+    thresholds[aChnl] = aValue;
+    
+    // Create a dictionary object that stores a pointer to this object and the channel that was changed.
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:caenChnl];
+    
+    // Send out notification that the value has changed.
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:caenChnlThresholdChanged
+	 object:self
+	 userInfo:userInfo];
+}
+
 
 #pragma mark ***DataTaker
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
