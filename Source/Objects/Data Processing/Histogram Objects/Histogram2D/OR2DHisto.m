@@ -314,6 +314,29 @@
 }
 
 
+- (void) sumX:(unsigned short)aXValue y:(unsigned short)aYValue z:(unsigned short)aZValue
+{
+    if(!histogram){
+        [self setNumberBinsPerSide:512]; //default
+    }
+	[dataSetLock lock];
+    if(aXValue >= numberBinsPerSide) aXValue = numberBinsPerSide-1;
+    if(aYValue >= numberBinsPerSide) aYValue = numberBinsPerSide-1;
+    //aXValue = aXValue % numberBinsPerSide;   // Error Check Our x Value
+    //aYValue = aYValue % numberBinsPerSide;   // Error Check Our y Value
+    if(histogram){
+		histogram[aXValue+aYValue*numberBinsPerSide] += aZValue;
+	}
+    [self incrementTotalCounts];
+    if(aXValue<minX)minX = aXValue;
+    if(aXValue>maxX)maxX = aXValue;
+    if(aYValue<minY)minY = aYValue;
+    if(aYValue>maxY)maxY = aYValue;
+	[dataSetLock unlock];
+    
+}
+
+
 #pragma  mark ¥¥¥Actions
 - (void) makeMainController
 {
