@@ -768,7 +768,14 @@ kPEDCrateMask
 - (void) setDbObject:(id) anObject forIndex:(int)anIndex
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDbObject:[mtcDataBase objectForNestedKey:[self getDBKeyByIndex:anIndex]] forIndex:anIndex];
-	[mtcDataBase setObject:anObject forNestedKey:[self getDBKeyByIndex:anIndex]];
+	if (anIndex < kDBComments && [anObject isKindOfClass:[NSString class]]) {
+		NSDecimalNumber* aValue = [NSDecimalNumber decimalNumberWithString:anObject];
+		[mtcDataBase setObject:aValue forNestedKey:[self getDBKeyByIndex:anIndex]];
+	}
+	else {
+		[mtcDataBase setObject:anObject forNestedKey:[self getDBKeyByIndex:anIndex]];
+	}
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMtcDataBaseChanged object:self];
 }
 
@@ -1007,7 +1014,7 @@ kPEDCrateMask
 - (void) setSingleGTWordMask:(unsigned long) gtWordMask
 {	
 	@try {
-		[self setBits:kMtcGmskReg mask:gtWordMask];
+		[self setBits:kMtcMaskReg mask:gtWordMask];
 		NSLog(@"Set GT Mask: 0x%08x\n",uLongDBValue(kGtMask));
 	}
 	@catch(NSException* localException) {

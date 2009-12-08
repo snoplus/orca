@@ -380,12 +380,12 @@
 		[[globalTriggerMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
 	maskValue = [model dbIntByIndex: kGtCrateMask];
-	for(i=0;i<25;i++){
+	for(i=0;i<22;i++){
 		[[globalTriggerCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 		[[globalTriggerCrateMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
 	maskValue = [model dbIntByIndex: kPEDCrateMask];
-	for(i=0;i<25;i++){
+	for(i=0;i<22;i++){
 		[[pedCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 		[[pedCrateMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
@@ -778,7 +778,7 @@
 {
 	unsigned long mask = 0;
 	int i;
-	for(i=0;i<24;i++){
+	for(i=0;i<26;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
@@ -791,7 +791,7 @@
 {
 	unsigned long mask = 0;
 	int i;
-	for(i=0;i<24;i++){
+	for(i=0;i<22;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
@@ -803,7 +803,7 @@
 {
 	unsigned long mask = 0;
 	int i;
-	for(i=0;i<24;i++){
+	for(i=0;i<3;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
@@ -815,7 +815,7 @@
 {
 	unsigned long mask = 0;
 	int i;
-	for(i=0;i<24;i++){
+	for(i=0;i<22;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
