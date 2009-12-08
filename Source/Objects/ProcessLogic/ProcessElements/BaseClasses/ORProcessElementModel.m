@@ -237,8 +237,13 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 
 - (void) setFrame:(NSRect)aValue
 {
-    frame = aValue;
-    bounds.size = frame.size;
+	if(![self useAltView]){
+		[super  setFrame:aValue];
+	}
+	else {
+		altFrame = aValue;
+		altBounds.size = altFrame.size;
+	}
 }
 
 - (NSRect) frame

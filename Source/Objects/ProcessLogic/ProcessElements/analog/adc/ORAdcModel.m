@@ -336,8 +336,6 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 - (void) addOverLay
 {
-	
-
     if(!guardian) return;
     
     NSImage* aCachedImage;
@@ -365,11 +363,11 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 			if([self useAltView])[self addAltMeterOverlay:aCachedImage];
 			else				 [self addMeterOverlay:aCachedImage];
 		}
-		else if(viewIconType == 1 && [self useAltView]){
+		else if(viewIconType == 1){
 			//if([self useAltView])[self addAltMeterOverlay:aCachedImage];
 			//else				 [self addMeterOverlay:aCachedImage];
 		}
-		else if(viewIconType == 2 && [self useAltView] ){
+		else if(viewIconType == 2 ){
 			if([self useAltView])[self addHorizontalBarOverlay:aCachedImage];
 			else				 [self addMeterOverlay:aCachedImage];
 		}
