@@ -42,6 +42,8 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (void) addMeterText:(NSImage*)anImage;
 - (void) addAltMeterText:(NSImage*)anImage;
 - (void) addAltHorizontalBarText:(NSImage*)anImage;
+- (void) addAltValueOverlay:(NSImage*)anImage;
+- (void) addAltValueText:(NSImage*)anImage;
 @end
 
 @implementation ORAdcModel
@@ -67,9 +69,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (void) setViewIconType:(int)aViewIconType
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setViewIconType:viewIconType];
-    
     viewIconType = aViewIconType;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelViewIconTypeChanged object:self];
 }
 
@@ -81,9 +81,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (void) setLabelType:(int)aLabelType
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLabelType:labelType];
-    
     labelType = aLabelType;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelLabelTypeChanged object:self];
 }
 
@@ -197,7 +195,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (NSImage*) altImage
 {
 	if(viewIconType == 0)return [NSImage imageNamed:@"adcMeter"];
-	else if(viewIconType == 1)return [NSImage imageNamed:@"adcMeter"];
+	else if(viewIconType == 1)return [NSImage imageNamed:@"adcHorizontalBar"]; //temp
 	else if(viewIconType == 2)return [NSImage imageNamed:@"adcHorizontalBar"];
 	else return [NSImage imageNamed:@"adcMeter"];
 }
@@ -364,8 +362,8 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 			else				 [self addMeterOverlay:aCachedImage];
 		}
 		else if(viewIconType == 1){
-			//if([self useAltView])[self addAltMeterOverlay:aCachedImage];
-			//else				 [self addMeterOverlay:aCachedImage];
+			if([self useAltView])[self addAltValueOverlay:aCachedImage];
+			else				 [self addMeterOverlay:aCachedImage];
 		}
 		else if(viewIconType == 2 ){
 			if([self useAltView])[self addHorizontalBarOverlay:aCachedImage];
@@ -595,6 +593,59 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		[n release];
 	}
 }
+
+- (void) addAltValueOverlay:(NSImage*)anImage
+{
+	[self addAltValueText:anImage];	
+}
+
+- (void) addAltValueText:(NSImage*)anImage
+{
+	float startx = 152;
+    NSSize theIconSize = [anImage size];	
+	NSString* iconValue = [self iconValue];
+	if([iconValue length]){
+		NSAttributedString* n = [[NSAttributedString alloc] 
+								 initWithString:iconValue
+								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+											 [NSFont messageFontOfSize:20],NSFontAttributeName,
+											 [NSColor whiteColor],NSForegroundColorAttributeName,nil]];
+		
+		NSSize textSize = [n size];
+		float x = startx + 30;
+		float y = 4;
+		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+	}
+	
+	NSString* iconLabel = [self iconLabel];
+	if([iconLabel length]){
+		NSAttributedString* n = [[NSAttributedString alloc] 
+								 initWithString:iconLabel
+								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+											 [NSFont messageFontOfSize:9],NSFontAttributeName,
+											 [NSColor blackColor],NSForegroundColorAttributeName,nil]];
+		
+		NSSize textSize = [n size];
+		float x = startx - textSize.width-4;
+		float y = 3;
+		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+	}
+	
+	if([self uniqueIdNumber]){
+		NSAttributedString* n = [[NSAttributedString alloc] 
+								 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+											 [NSFont messageFontOfSize:9],NSFontAttributeName,
+											 [NSColor whiteColor],NSForegroundColorAttributeName,nil]];
+		
+		NSSize textSize = [n size];
+		[n drawInRect:NSMakeRect(startx+7,theIconSize.height-textSize.height-4,textSize.width,textSize.height)];
+		[n release];
+	}
+}
+
+
+
 - (void) addHorizontalBarOverlay:(NSImage*)anImage
 {
 	if(!normalGradient){
