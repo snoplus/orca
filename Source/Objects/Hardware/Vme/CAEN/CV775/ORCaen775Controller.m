@@ -73,6 +73,10 @@
 	[self modelTypeChanged:nil];
 }
 
+- (NSSize) thresholdDialogSize
+{
+	return NSMakeSize(286,607);
+}
 #pragma mark ***Interface Management - Module specific
 - (NSString*) thresholdLockName {return @"ORCaen775ThresholdLock";}
 - (NSString*) basicLockName     {return @"ORCaen775BasicLock";}

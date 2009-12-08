@@ -175,6 +175,12 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	return kTDCOutputBufferSize;
 }
 
+- (int) numberOfChannels
+{
+	if([self modelType] == kModel775) return 32;
+	else							  return 16;
+}
+
 //--------------------------------------------------------------------------------
 /*!\method  getThresholdOffset
 * \brief	Get the offset relative to the module's base address for the threshold
