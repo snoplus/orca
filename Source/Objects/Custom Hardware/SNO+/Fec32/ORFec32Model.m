@@ -60,6 +60,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 
 @interface ORFec32Model (private)
 - (ORCommandList*) cmosShiftLoadAndClock:(unsigned short) registerAddress cmosRegItem:(unsigned short) cmosRegItem bitMaskStart:(short) bit_mask_start;
+- (void) cmosShiftLoadAndClockBit3:(unsigned short) registerAddress cmosRegItem:(unsigned short) cmosRegItem bitMaskStart:(short) bit_mask_start;
 - (void) loadCmosShiftRegData:(unsigned short)whichChannels triggersDisabled:(BOOL)aTriggersDisabled;
 - (void) loadCmosShiftRegisters:(BOOL) aTriggersDisabled;
 @end
@@ -1306,23 +1307,43 @@ const short kVoltageADCMaximumAttempts = 10;
 			
 			// serially shift in 35 bits of data, the top 10 bits are shifted in as zero
 			//STEP 1: first shift in the top 10 bits: the bottom 0-15 channels first
-			ORCommandList* aList = [ORCommandList commandList];
-			short i;
-			for (i = 0; i < 10; i++){
-				[aList addCommand: [self writeToFec32RegisterCmd:registerAddress value:FEC32_CMOS_SHIFT_SERSTROB]];
-				[aList addCommand: [self writeToFec32RegisterCmd:registerAddress value:FEC32_CMOS_SHIFT_SERSTROB | FEC32_CMOS_SHIFT_CLOCK]];
+			//todo: split into two implementations
+			if([[self xl2] adapterIsSBC]) {
+				ORCommandList* aList = [ORCommandList commandList];
+				short i;
+				for (i = 0; i < 10; i++){
+					[aList addCommand: [self writeToFec32RegisterCmd:registerAddress value:FEC32_CMOS_SHIFT_SERSTROB]];
+					[aList addCommand: [self writeToFec32RegisterCmd:registerAddress value:FEC32_CMOS_SHIFT_SERSTROB | FEC32_CMOS_SHIFT_CLOCK]];
+				}
+				
+				[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:TAC_TRIM1 bitMaskStart:TACTRIM_BITS]];		// STEP 2: tacTrim1
+				[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:TAC_TRIM0 bitMaskStart:TACTRIM_BITS]];		// STEP 3: tacTrim0
+				[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_MASK bitMaskStart:NS20_MASK_BITS]];		// STEP 4: ns20Mask
+				[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_WIDTH bitMaskStart:NS20_WIDTH_BITS]];	// STEP 5: ns20Width
+				[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_DELAY bitMaskStart:NS20_DELAY_BITS]];	// STEP 6: ns20Delay
+				[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS100_MASK bitMaskStart:NS_MASK_BITS]];		// STEP 7: ns100Mask
+				[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS100_DELAY bitMaskStart:NS100_DELAY_BITS]];	// STEP 8: ns100Delay
+				[aList addCommand: [self writeToFec32RegisterCmd:registerAddress value:0x3FFFF]];										// FINAL STEP: SERSTOR
+				[self executeCommandList:aList]; //send out the list (blocks until reply or timeout)
+			}
+			else {
+				short i;
+				for (i = 0; i < 10; i++){
+					[self writeToFec32Register:registerAddress value:FEC32_CMOS_SHIFT_SERSTROB];
+					[self writeToFec32Register:registerAddress value:FEC32_CMOS_SHIFT_SERSTROB | FEC32_CMOS_SHIFT_CLOCK];
+				}
+				
+				[self cmosShiftLoadAndClockBit3:registerAddress cmosRegItem:TAC_TRIM1 bitMaskStart:TACTRIM_BITS];		// STEP 2: tacTrim1
+				[self cmosShiftLoadAndClockBit3:registerAddress cmosRegItem:TAC_TRIM0 bitMaskStart:TACTRIM_BITS];		// STEP 3: tacTrim0
+				[self cmosShiftLoadAndClockBit3:registerAddress cmosRegItem:NS20_MASK bitMaskStart:NS20_MASK_BITS];		// STEP 4: ns20Mask
+				[self cmosShiftLoadAndClockBit3:registerAddress cmosRegItem:NS20_WIDTH bitMaskStart:NS20_WIDTH_BITS];	// STEP 5: ns20Width
+				[self cmosShiftLoadAndClockBit3:registerAddress cmosRegItem:NS20_DELAY bitMaskStart:NS20_DELAY_BITS];	// STEP 6: ns20Delay
+				[self cmosShiftLoadAndClockBit3:registerAddress cmosRegItem:NS100_MASK bitMaskStart:NS_MASK_BITS];		// STEP 7: ns100Mask
+				[self cmosShiftLoadAndClockBit3:registerAddress cmosRegItem:NS100_DELAY bitMaskStart:NS100_DELAY_BITS];	// STEP 8: ns100Delay
+				[self writeToFec32RegisterCmd:registerAddress value:0x3FFFF];										// FINAL STEP: SERSTOR
 			}
 			
-			[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:TAC_TRIM1 bitMaskStart:TACTRIM_BITS]];		// STEP 2: tacTrim1
-			[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:TAC_TRIM0 bitMaskStart:TACTRIM_BITS]];		// STEP 3: tacTrim0
-			[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_MASK bitMaskStart:NS20_MASK_BITS]];		// STEP 4: ns20Mask
-			[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_WIDTH bitMaskStart:NS20_WIDTH_BITS]];	// STEP 5: ns20Width
-			[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_DELAY bitMaskStart:NS20_DELAY_BITS]];	// STEP 6: ns20Delay
-			[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS100_MASK bitMaskStart:NS_MASK_BITS]];		// STEP 7: ns100Mask
-			[aList addCommands:[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS100_DELAY bitMaskStart:NS100_DELAY_BITS]];	// STEP 8: ns100Delay
-			[aList addCommand: [self writeToFec32RegisterCmd:registerAddress value:0x3FFFF]];										// FINAL STEP: SERSTOR
-			[self executeCommandList:aList]; //send out the list (blocks until reply or timeout)
-
+				
 #ifdef VERIFY_CMOS_SHIFT_REGISTER
 			//-----VERIFY that we have set the shift register properly for the 16 channels just loaded - PH 09/17/99
 			const short	kMaxCmosLoadAttempts = 2;	// maximum number of times to attempt loading the CMOS shift register before throwing an exception
@@ -1415,6 +1436,35 @@ const short kVoltageADCMaximumAttempts = 10;
 	}
 	return aList;
 }
+
+
+- (void) cmosShiftLoadAndClockBit3:(unsigned short) registerAddress cmosRegItem:(unsigned short) cmosRegItem bitMaskStart:(short) bit_mask_start
+{
+	
+	short bit_mask;
+	
+	// bit_mask_start : the number of bits to peel off from cmosRegItem
+	for(bit_mask = bit_mask_start; bit_mask >= 0; bit_mask--){
+		
+		unsigned long writeValue = 0UL;
+		short channel_index;
+		for(channel_index = 0; channel_index < 16; channel_index++){
+			if ( cmosShiftRegisterValue[channel_index].cmos_shift_item[cmosRegItem] & (1UL << bit_mask) ) {
+				writeValue |= (1UL << channel_index + 2);
+			}
+		}
+		
+		// place data on line
+		[self writeToFec32Register:registerAddress value:writeValue | FEC32_CMOS_SHIFT_SERSTROB];
+		// now clock in data without SERSTROB for bit_mask = 0 and cmosRegItem = NS100_DELAY
+		if( (cmosRegItem == NS100_DELAY) && (bit_mask == 0) ){
+			[self writeToFec32Register:registerAddress value:writeValue | FEC32_CMOS_SHIFT_CLOCK];
+		}
+		// now clock in data
+		[self writeToFec32Register:registerAddress value:writeValue | FEC32_CMOS_SHIFT_SERSTROB | FEC32_CMOS_SHIFT_CLOCK];
+	}
+}
+
 
 -(void) loadCmosShiftRegData:(unsigned short)whichChannels triggersDisabled:(BOOL)aTriggersDisabled
 {
