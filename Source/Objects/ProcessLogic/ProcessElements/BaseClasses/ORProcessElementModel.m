@@ -115,6 +115,7 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 			[anImage dissolveToPoint:NSZeroPoint fraction:1];
 			[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
 			NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
+			[NSBezierPath strokeRect:sourceRect];
 			[highlightedAltImage unlockFocus];
 		}
 		else {
