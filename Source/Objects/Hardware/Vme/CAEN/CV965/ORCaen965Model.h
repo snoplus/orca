@@ -24,6 +24,9 @@
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 
+#define kV965  0
+#define kV965A 1
+
 // Declaration of constants for module.
 enum {
     kOutputBuffer,		// 0000
@@ -66,14 +69,26 @@ enum {
 };
 
 // Size of output buffer
-#define k862OutputBufferSize 0x07FF
+#define k965OutputBufferSize 0x07FF
 
 // Class definition
 @interface ORCaen965Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
+	int				cardType;
+	unsigned short   onlineMask;
+	//cached values for speed.
+	unsigned long statusAddress;
+	unsigned long dataBufferAddress;
+	unsigned long location;
 }
 
 #pragma mark ***Accessors
+- (int) cardType;
+- (void) setCardType:(int)aCardType;
+- (unsigned short)   onlineMask;
+- (void)	    setOnlineMask:(unsigned short)anOnlineMask;
+- (BOOL)	    onlineMaskBit:(int)bit;
+- (void)	    setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
 
 #pragma mark ***Register - General routines
 - (short)			getNumberRegisters;
@@ -92,12 +107,8 @@ enum {
 - (BOOL)			dataReset: (short) anIndex;
 - (BOOL)			swReset: (short) anIndex;
 - (BOOL)			hwReset: (short) anIndex;
-
 @end
 
-//the decoder concrete decoder class
-@interface ORCaen965DecoderForCAEN : ORCaenDataDecoder
-{}
-- (NSString*) identifier;
-@end
+extern NSString* ORCaen965ModelCardTypeChanged;
+extern NSString* ORCaen965ModelOnlineMaskChanged;
 

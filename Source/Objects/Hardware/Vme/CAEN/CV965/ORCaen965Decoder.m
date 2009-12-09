@@ -26,53 +26,41 @@
 {
     short i;
     long* ptr = (long*) aSomeData;
-    long length;
-    NSString* crateKey;
-    NSString* cardKey;
-	length = *ptr & 0x3ffff;
-	++ptr; //point to the header word with the crate and channel info
-	crateKey = [self getCrateKey:(*ptr >> 21)&0x0000000f];
-	cardKey  = [self getCardKey: (*ptr >> 16)&0x0000001f];
-            
-    ++ptr; //point past the header
-    for( i = 0; i < length-2; i++ ){
-        if( [self isHeader: *ptr] ){
-            //ignore the header for now
+	long length = ExtractLength(ptr[0]);
+	NSString* crateKey = [self getCrateKey:ShiftAndExtract(ptr[1],21,0x0000000f)];
+	NSString* cardKey  = [self getCardKey: ShiftAndExtract(ptr[1],16,0x0000001f)];
+	int cardType       = ShiftAndExtract(ptr[1],0,0x1);
+    for( i = 2; i < length; i++ ){
+		int dataType = ShiftAndExtract(ptr[i],24,0x7);
+		if(dataType == 0x000){
+			int qdcValue = ShiftAndExtract(ptr[i],0,0xffff);
+			int chan;
+			if(cardType == 1)chan = ShiftAndExtract(ptr[i],18,0x7);
+			else			 chan = ShiftAndExtract(ptr[i],17,0xf);
+			NSString* channelKey  = [self getChannelKey: chan];
+			[aDataSet histogram:qdcValue numBins:0xffff sender:self withKeys:@"CAEN965 QDC",crateKey,cardKey,channelKey,nil];
         }
-        else if( [self isValidDatum: *ptr] ){
-            [aDataSet histogram:[self adcValue: *ptr] numBins:4096 sender:self 
-                withKeys:[self identifier],
-                crateKey,
-                cardKey,
-                [self getChannelKey:[self channel: *ptr]],
-                nil];
-        }
-        else if( [self isEndOfBlock: *ptr] ){
-            //ignore end of block for now
-        }
-        else if( [self isNotValidDatum: *ptr] ){
-            NSLogError(@"",[NSString stringWithFormat:@"%@ Data Record Error",[self identifier]],crateKey,cardKey,nil);
-        }
-		++ptr;
     }
     return length;
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    unsigned long length = (ptr[0] & 0x003ffff);
+	long length = ExtractLength(ptr[0]);
+    NSString* title= @"CAEN965 QDC Record\n\n";
 
-    NSString* title= [NSString stringWithFormat:@"%@ Record\n\n",[self identifier]];
-    
-    NSString* len =[NSString stringWithFormat:   @"Record Length = %d\n",length-2];
+    NSString* len	=[NSString stringWithFormat: @"# QDC = %d\n",length-2];
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(ptr[1] >> 21)&0x0000000f];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(ptr[1] >> 16)&0x0000001f];    
    
     NSString* restOfString = [NSString string];
     int i;
     for( i = 2; i < length; i++ ){
-         if( [self isValidDatum: ptr[i]] ){
-            restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",[self channel: ptr[i]],[self adcValue: ptr[i]]];
+		int dataType = ShiftAndExtract(ptr[i],24,0x7);
+		if(dataType == 0x000){
+			int qdcValue = ShiftAndExtract(ptr[i],0,0xffff);
+			int channel  = ShiftAndExtract(ptr[i],16,0xf);
+			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
         }
     }
 

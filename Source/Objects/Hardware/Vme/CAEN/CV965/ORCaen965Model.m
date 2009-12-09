@@ -20,10 +20,13 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORCaen965Model.h"
+#import "ORBaseDecoder.h"
+#import "ORHWWizParam.h"
+#import "ORHWWizSelection.h"
 
 // Address information for this unit.
-#define k862DefaultBaseAddress 		0xa00000
-#define k862DefaultAddressModifier 	0x39
+#define k965DefaultBaseAddress 		0xa0000
+#define k965DefaultAddressModifier 	0x39
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
@@ -65,6 +68,10 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Thresholds",			false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
 
+
+NSString* ORCaen965ModelCardTypeChanged = @"ORCaen965ModelCardTypeChanged";
+NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged";
+
 @implementation ORCaen965Model
 
 #pragma mark ***Initialization
@@ -73,12 +80,50 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setBaseAddress:k862DefaultBaseAddress];
-    [self setAddressModifier:k862DefaultAddressModifier];
+    [self setBaseAddress:k965DefaultBaseAddress];
+    [self setAddressModifier:k965DefaultAddressModifier];
+	[self setOnlineMask:0xff];
 	
     [[self undoManager] enableUndoRegistration];
    
     return self;
+}
+
+#pragma mark ***Accessors
+- (unsigned short)onlineMask {
+	
+    return onlineMask;
+}
+
+- (void)setOnlineMask:(unsigned short)anOnlineMask {
+    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
+    onlineMask = anOnlineMask;	    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965ModelOnlineMaskChanged object:self];
+}
+
+- (BOOL)onlineMaskBit:(int)bit
+{
+	return onlineMask&(1<<bit);
+}
+
+- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned short aMask = onlineMask;
+	if(aValue)aMask |= (1<<bit);
+	else      aMask &= ~(1<<bit);
+	[self setOnlineMask:aMask];
+}
+
+- (int) cardType
+{
+    return cardType;
+}
+
+- (void) setCardType:(int)aCardType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCardType:cardType];
+    cardType = aCardType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965ModelCardTypeChanged object:self];
 }
 
 - (void) setUpImage
@@ -114,7 +159,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 - (unsigned short) getDataBufferSize
 {
-    return k862OutputBufferSize;
+    return k965OutputBufferSize;
 }
 
 - (unsigned long) getThresholdOffset
@@ -198,8 +243,44 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	 userInfo:userInfo];
 }
 
+- (void) writeThreshold:(unsigned short) aChan
+{
+    unsigned short 	threshold = [self threshold:aChan];
+	if(onlineMask & (1<<aChan)) threshold |= 0x100;
+    [[self adapter] writeWordBlock:&threshold
+                         atAddress:[self baseAddress] + [self getThresholdOffset] + (aChan * kD16)
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
 
 #pragma mark ***DataTaker
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCaen965DecoderForQdc",							@"decoder",
+								 [NSNumber numberWithLong:dataId],					@"dataId",
+								 [NSNumber numberWithBool:NO],						@"variable",
+								 [NSNumber numberWithLong:IsShortForm(dataId)?1:2],	@"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"Caen965"];
+    
+    return dataDictionary;
+}
+
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
+{
+	NSDictionary* aDictionary;
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"Qdc",								@"name",
+				   [NSNumber numberWithLong:dataId],   @"dataId",
+				   [NSNumber numberWithLong:16],		@"maxChannels",
+				   nil];
+	
+	[anEventDictionary setObject:aDictionary forKey:@"Caen965"];
+}
+
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
@@ -209,31 +290,171 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
     [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
 
-    // Set options
+    //Cache some values
+	statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
+	dataBufferAddress   = [self baseAddress]+reg[kOutputBuffer].addressOffset;
+	location      =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16) | cardType; //doesn't change so do it here.
 
     // Set thresholds in unit
     [self writeThresholds];
     
 }
 
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    @try {
+		unsigned short statusValue = 0;
+		[controller readWordBlock:&statusValue
+						atAddress:statusAddress
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+		
+		if(statusValue & 0x0001){
+			
+			//OK, at least one data value is ready
+			unsigned short dataValue;
+			[controller readWordBlock:&dataValue
+							atAddress:dataBufferAddress
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+			
+			//if this is a header, must be valid data continue.
+			BOOL validData = NO; //assume !OK until shown otherwise
+			if(ShiftAndExtract(dataValue,27,0xf) == 0x010){
+				//get the number of memorized channels
+				int dataType			 = ShiftAndExtract(dataValue,24,0x7);
+				int numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
+				int i;
+				if((numMemorizedChannels>0) && (dataType == 0x010)){
+					unsigned long dataRecord[2];
+					dataRecord[0] = dataId | 2;
+					dataRecord[1] = location;
+					int index = 2;
+					for(i=0;i<numMemorizedChannels;i++){
+						[controller readWordBlock:&dataValue
+										atAddress:dataBufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						if(dataType == 0x000){
+							dataRecord[index] = dataValue;
+							index++;
+						}
+						else {
+							break;
+						}
+					}
+					if(validData){
+						//OK we read the data, get the end of block
+						[controller readWordBlock:&dataValue
+										atAddress:dataBufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						//make sure it really is an end of block
+						if(dataType == 0x100){
+							dataRecord[index] = dataValue;
+							index++;
+						}
+						//fill in the ORCA header and ship the data
+						dataRecord[0] = dataId | index;
+						[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
+						validData = YES;
+					}
+				}
+			}
+			if(!validData){
+				//flush the buffer, read until not valid datum
+				int i;
+				for(i=0;i<0x07FC;i++) {
+					unsigned short dataValue;
+					[controller readWordBlock:&dataValue
+									atAddress:dataBufferAddress
+									numToRead:1
+								   withAddMod:[self addressModifier]
+								usingAddSpace:0x01];
+					if(ShiftAndExtract(dataValue,24,0x7) == 0x110) break;
+				}
+			}
+		}
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"Caen965 Card Error",nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
+}
+
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    int i;
+    NSMutableArray* array = [NSMutableArray arrayWithCapacity:[self numberOfChannels]];
+    for(i=0;i<[self numberOfChannels];i++){
+        [array addObject:[NSNumber numberWithShort:thresholds[i]]];
+    }
+    [objDictionary setObject:array forKey:@"thresholds"];
+    [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@"onlineMask"];
+    
+    return objDictionary;
+}
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 965 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 965%@ QDC (Slot %d) ",[self cardType] == kV965A?@"A":@"",[self slot]];
+}
+
+- (NSArray*) wizardParameters
+{
+    NSMutableArray* a = [NSMutableArray array];
+    ORHWWizParam* p;
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Threshold"];
+    [p setFormat:@"##0" upperLimit:255 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setThreshold:threshold:) getMethod:@selector(threshold:)];
+	[p setCanBeRamped:YES];
+	[p setInitMethodSelector:@selector(writeThresholds)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Online"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setOnlineMaskBit:withValue:) getMethod:@selector(onlineMaskBit:)];
+    [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+	[p setUseValue:NO];
+	[p setName:@"Init"];
+	[p setSetMethodSelector:@selector(writeThresholds)];
+	[a addObject:p];
+    
+    return a;
+}
+
+- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
+{
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
+	if([param isEqualToString:@"Threshold"])return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Online"]) return [cardDictionary objectForKey:@"onlineMask"];
+    else return nil;
 }
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
     self = [super initWithCoder:aDecoder];
-
     [[self undoManager] disableUndoRegistration];
-
-    
+    [self setCardType:[aDecoder decodeIntForKey:@"cardType"]];
+	[self setOnlineMask:[aDecoder decodeIntForKey:@"onlineMask"]];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -241,14 +462,10 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+    [anEncoder encodeInt:cardType forKey:@"cardType"];
+    [anEncoder encodeInt:onlineMask forKey:@"onlineMask"];
 }
 
 @end
 
-@implementation ORCaen965DecoderForCAEN : ORCaenDataDecoder
-- (NSString*) identifier
-{
-    return @"CAEN 965 QDC";
-}
-@end
 
