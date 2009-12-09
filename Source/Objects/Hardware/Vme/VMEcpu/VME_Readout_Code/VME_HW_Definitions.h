@@ -33,5 +33,6 @@
 #define kDataGen   11 //a test data generator
 #define kSIS3350   12 
 #define kSIS3302   13 
+#define kCaen965   14
 
 #endif
