@@ -363,7 +363,7 @@ static Caen419Registers reg[kNumRegisters] = {
                         numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-}
+} 
 
 - (void) reset
 {

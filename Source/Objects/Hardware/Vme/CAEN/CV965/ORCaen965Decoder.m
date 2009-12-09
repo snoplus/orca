@@ -29,14 +29,12 @@
 	long length = ExtractLength(ptr[0]);
 	NSString* crateKey = [self getCrateKey:ShiftAndExtract(ptr[1],21,0x0000000f)];
 	NSString* cardKey  = [self getCardKey: ShiftAndExtract(ptr[1],16,0x0000001f)];
-	int cardType       = ShiftAndExtract(ptr[1],0,0x1);
     for( i = 2; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xffff);
 			int chan;
-			if(cardType == 1)chan = ShiftAndExtract(ptr[i],18,0x7);
-			else			 chan = ShiftAndExtract(ptr[i],17,0xf);
+			chan = ShiftAndExtract(ptr[i],17,0xf);
 			NSString* channelKey  = [self getChannelKey: chan];
 			[aDataSet histogram:qdcValue numBins:0xffff sender:self withKeys:@"CAEN965 QDC",crateKey,cardKey,channelKey,nil];
         }
