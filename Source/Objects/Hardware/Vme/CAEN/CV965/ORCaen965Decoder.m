@@ -20,7 +20,7 @@
 #import "ORCaen965Decoder.h"
 #import "ORDataSet.h"
 
-@implementation ORCaen965Decoder
+@implementation ORCaen965DecoderForQdc
 
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet
 {
@@ -32,7 +32,7 @@
 	int cardType       = ShiftAndExtract(ptr[1],0,0x1);
     for( i = 2; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
-		if(dataType == 0x000){
+		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xffff);
 			int chan;
 			if(cardType == 1)chan = ShiftAndExtract(ptr[i],18,0x7);
@@ -57,7 +57,7 @@
     int i;
     for( i = 2; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
-		if(dataType == 0x000){
+		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xffff);
 			int channel  = ShiftAndExtract(ptr[i],16,0xf);
 			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];

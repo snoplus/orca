@@ -82,7 +82,7 @@ NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged
 	
     [self setBaseAddress:k965DefaultBaseAddress];
     [self setAddressModifier:k965DefaultAddressModifier];
-	[self setOnlineMask:0xff];
+	[self setOnlineMask:0xffff];
 	
     [[self undoManager] enableUndoRegistration];
    
@@ -225,12 +225,11 @@ NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged
 
 - (void) setThreshold:(unsigned short) aChnl threshold:(unsigned short) aValue
 {
-    if(aValue>255)aValue = 255;
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl threshold:[self threshold:aChnl]];
     
     // Set the new value in the model.
-    thresholds[aChnl] = aValue;
+    thresholds[aChnl] = aValue & 0xff;
     
     // Create a dictionary object that stores a pointer to this object and the channel that was changed.
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -261,8 +260,8 @@ NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORCaen965DecoderForQdc",							@"decoder",
 								 [NSNumber numberWithLong:dataId],					@"dataId",
-								 [NSNumber numberWithBool:NO],						@"variable",
-								 [NSNumber numberWithLong:IsShortForm(dataId)?1:2],	@"length",
+								 [NSNumber numberWithBool:YES],						@"variable",
+								 [NSNumber numberWithLong:-1],	@"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Caen965"];
     
@@ -292,7 +291,7 @@ NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged
 
     //Cache some values
 	statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
-	dataBufferAddress   = [self baseAddress]+reg[kOutputBuffer].addressOffset;
+	dataBufferAddress   = [self baseAddress]+[self getBufferOffset];;
 	location      =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16) | cardType; //doesn't change so do it here.
 
     // Set thresholds in unit
@@ -313,27 +312,26 @@ NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged
 		if(statusValue & 0x0001){
 			
 			//OK, at least one data value is ready
-			unsigned short dataValue;
-			[controller readWordBlock:&dataValue
+			unsigned long dataValue;
+			[controller readLongBlock:&dataValue
 							atAddress:dataBufferAddress
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];
 			
-			//if this is a header, must be valid data continue.
-			BOOL validData = NO; //assume !OK until shown otherwise
-			if(ShiftAndExtract(dataValue,27,0xf) == 0x010){
+			//if this is a header, must be valid data.
+			BOOL validData = YES; //assume OK until shown otherwise
+			if(ShiftAndExtract(dataValue,24,0x7) == 0x2){
 				//get the number of memorized channels
-				int dataType			 = ShiftAndExtract(dataValue,24,0x7);
 				int numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
 				int i;
-				if((numMemorizedChannels>0) && (dataType == 0x010)){
-					unsigned long dataRecord[2];
-					dataRecord[0] = dataId | 2;
+				if((numMemorizedChannels>0)){
+					unsigned long dataRecord[0xffff];
+					//dataRecord[0] = dataId | 2;
 					dataRecord[1] = location;
 					int index = 2;
 					for(i=0;i<numMemorizedChannels;i++){
-						[controller readWordBlock:&dataValue
+						[controller readLongBlock:&dataValue
 										atAddress:dataBufferAddress
 										numToRead:1
 									   withAddMod:[self addressModifier]
@@ -344,25 +342,29 @@ NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged
 							index++;
 						}
 						else {
+							validData = NO;
 							break;
 						}
 					}
 					if(validData){
 						//OK we read the data, get the end of block
-						[controller readWordBlock:&dataValue
+						[controller readLongBlock:&dataValue
 										atAddress:dataBufferAddress
 										numToRead:1
 									   withAddMod:[self addressModifier]
 									usingAddSpace:0x01];
 						//make sure it really is an end of block
-						if(dataType == 0x100){
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						if(dataType == 0x4){
 							dataRecord[index] = dataValue;
 							index++;
+							//got a end of block fill in the ORCA header and ship the data
+							dataRecord[0] = dataId | index;
+							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
 						}
-						//fill in the ORCA header and ship the data
-						dataRecord[0] = dataId | index;
-						[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
-						validData = YES;
+						else {
+							validData = NO;
+						}
 					}
 				}
 			}
@@ -370,13 +372,15 @@ NSString* ORCaen965ModelOnlineMaskChanged    = @"ORCaen965ModelOnlineMaskChanged
 				//flush the buffer, read until not valid datum
 				int i;
 				for(i=0;i<0x07FC;i++) {
-					unsigned short dataValue;
-					[controller readWordBlock:&dataValue
+					unsigned long dataValue;
+					[controller readLongBlock:&dataValue
 									atAddress:dataBufferAddress
 									numToRead:1
 								   withAddMod:[self addressModifier]
 								usingAddSpace:0x01];
-					if(ShiftAndExtract(dataValue,24,0x7) == 0x110) break;
+					if(ShiftAndExtract(dataValue,24,0x7) == 0x6) {
+						break;
+					}
 				}
 			}
 		}

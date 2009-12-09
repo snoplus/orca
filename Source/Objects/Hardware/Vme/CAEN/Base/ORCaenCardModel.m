@@ -529,7 +529,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
                     usingAddSpace:0x01];
     
     // Store new value
-    [self setThreshold:pChan threshold:value];
+   // [self setThreshold:pChan threshold:value];
     
 }
 

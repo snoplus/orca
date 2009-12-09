@@ -19,7 +19,7 @@
 
 #import "ORVmeCardDecoder.h"
 
-@interface ORCaen965Decoder : ORVmeCardDecoder {
+@interface ORCaen965DecoderForQdc : ORVmeCardDecoder {
 }
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
