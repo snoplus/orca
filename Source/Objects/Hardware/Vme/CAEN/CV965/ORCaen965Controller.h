@@ -25,6 +25,8 @@
 
 // Definition of class.
 @interface ORCaen965Controller : ORCaenCardController {
+	IBOutlet NSPopUpButton* cardTypePU;
+    IBOutlet NSMatrix*		onlineMaskMatrix;
 }
 
 #pragma mark ***Initialization
@@ -32,12 +34,13 @@
  	
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-
-#pragma mark ***Interface Management
 - (void) updateWindow;
+- (void) cardTypeChanged:(NSNotification*)aNote;
+- (void) onlineMaskChanged:(NSNotification*)aNote;
 
+#pragma mark •••Actions
+- (IBAction) cardTypePUAction:(id)sender;
+- (IBAction) onlineAction:(id)sender;
 
-// The outlets
-	
 
 @end

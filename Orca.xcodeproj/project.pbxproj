@@ -1026,6 +1026,8 @@
 		84539EA5080ADAF500615B6D /* ORListenerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84539EA1080ADAF500615B6D /* ORListenerController.m */; };
 		8453ADE5096B271700297FF1 /* DataSet.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E1520B0551D95200503E02 /* DataSet.nib */; };
 		845498C410628DF400F8DE1C /* scpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 845498C310628DF400F8DE1C /* scpExpectScript */; };
+		8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 8455097810CEF7DD008A019C /* ORCaen965Decoder.h */; };
+		8455097B10CEF7DD008A019C /* ORCaen965Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8455097910CEF7DD008A019C /* ORCaen965Decoder.m */; };
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
@@ -2756,7 +2758,7 @@
 		8421064A1085A28E00C3AA81 /* ORAdeiLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAdeiLoader.m; path = "Source/Objects/Hardware/IPE/IPE SlowControl/ORAdeiLoader.m"; sourceTree = SOURCE_ROOT; };
 		8421064B1085A28E00C3AA81 /* ORAdeiLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAdeiLoader.h; path = "Source/Objects/Hardware/IPE/IPE SlowControl/ORAdeiLoader.h"; sourceTree = SOURCE_ROOT; };
 		84211E361074E5CD00CCB0C0 /* IpeV4SLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4SLT.nib; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/IpeV4SLT.nib"; sourceTree = SOURCE_ROOT; };
-		8421606E094F7F9E002E68B7 /* ORAdcModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAdcModel.h; sourceTree = "<group>"; };
+		8421606E094F7F9E002E68B7 /* ORAdcModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAdcModel.h; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/ORAdcModel.h; sourceTree = SOURCE_ROOT; };
 		8421606F094F7F9E002E68B7 /* ORAdcModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAdcModel.m; sourceTree = "<group>"; };
 		8421607A094F861E002E68B7 /* adc.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adc.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adc.tif; sourceTree = SOURCE_ROOT; };
 		84216086094F8910002E68B7 /* ORAdcController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAdcController.h; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/ORAdcController.h; sourceTree = SOURCE_ROOT; };
@@ -3117,6 +3119,8 @@
 		84539EA0080ADAF500615B6D /* ORListenerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORListenerModel.m; path = "Source/Objects/Data Processing/Listener/ORListenerModel.m"; sourceTree = SOURCE_ROOT; };
 		84539EA1080ADAF500615B6D /* ORListenerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORListenerController.m; path = "Source/Objects/Data Processing/Listener/ORListenerController.m"; sourceTree = SOURCE_ROOT; };
 		845498C310628DF400F8DE1C /* scpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = scpExpectScript; path = "Source/Objects/Misc Objects/FileCopy/scpExpectScript"; sourceTree = SOURCE_ROOT; };
+		8455097810CEF7DD008A019C /* ORCaen965Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen965Decoder.h; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Decoder.h; sourceTree = SOURCE_ROOT; };
+		8455097910CEF7DD008A019C /* ORCaen965Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen965Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Decoder.m; sourceTree = SOURCE_ROOT; };
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
@@ -8021,6 +8025,8 @@
 				84B74CE50FEBE9B90033E658 /* ORCaen965Model.h */,
 				84B74CE40FEBE9B90033E658 /* ORCaen965Controller.m */,
 				84B74CE30FEBE9B90033E658 /* ORCaen965Controller.h */,
+				8455097810CEF7DD008A019C /* ORCaen965Decoder.h */,
+				8455097910CEF7DD008A019C /* ORCaen965Decoder.m */,
 				84B74CE10FEBE9B90033E658 /* Caen965.gif */,
 				84B74CE20FEBE9B90033E658 /* Caen965.nib */,
 			);
@@ -10411,6 +10417,7 @@
 				8435AAD110C6D0EF00E03F7F /* ORVarianTPSModel.h in Headers */,
 				849516B610C95382001C8112 /* ORStateLabelController.h in Headers */,
 				849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */,
+				8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11816,6 +11823,7 @@
 				8435AAD210C6D0EF00E03F7F /* ORVarianTPSModel.m in Sources */,
 				849516B710C95382001C8112 /* ORStateLabelController.m in Sources */,
 				849516B910C95382001C8112 /* ORStateLabelModel.m in Sources */,
+				8455097B10CEF7DD008A019C /* ORCaen965Decoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

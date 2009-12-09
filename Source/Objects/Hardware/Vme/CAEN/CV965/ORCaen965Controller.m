@@ -33,18 +33,50 @@
     return self;
 }
 
-
-
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     [ super registerNotificationObservers ];
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(cardTypeChanged:)
+                         name : ORCaen965ModelCardTypeChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(onlineMaskChanged:)
+						 name : ORCaen965ModelOnlineMaskChanged
+					   object : model];
 }
 
 #pragma mark ***Interface Management
 - (void) updateWindow
 {
-   [ super updateWindow ];
+	[super updateWindow ];
+	[self cardTypeChanged:nil];
+    [self onlineMaskChanged:nil];
+}
+
+- (void) thresholdLockChanged:(NSNotification*)aNotification
+{
+	[super thresholdLockChanged:aNotification];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self thresholdLockName]];
+    [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
+	
+}
+- (void) cardTypeChanged:(NSNotification*)aNote
+{
+	[cardTypePU selectItemAtIndex: [model cardType]];
+}
+
+- (void) onlineMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned short theMask = [model onlineMask];
+	for(i=0;i<[model numberOfChannels];i++){
+		[[onlineMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+	}
 }
 
 #pragma mark ***Interface Management - Module specific
@@ -52,4 +84,15 @@
 - (NSString*) basicLockName     {return @"ORCaen965BasicLock";}
 
 #pragma mark •••Actions
+- (IBAction) cardTypePUAction:(id)sender
+{
+	[model setCardType:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) onlineAction:(id)sender
+{
+	if([sender intValue] != [model onlineMaskBit:[[sender selectedCell] tag]]){
+		[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
 @end
