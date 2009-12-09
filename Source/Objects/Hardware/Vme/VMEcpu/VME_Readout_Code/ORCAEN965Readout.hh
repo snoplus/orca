@@ -9,7 +9,8 @@ class ORCaen965Readout : public ORVVmeCard
     ORCaen965Readout(SBC_card_info* ci) : ORVVmeCard(ci) {} 
     virtual ~ORCaen965Readout() {} 
     virtual bool Readout(SBC_LAM_Data*);
-	void flushDataBuffer();
+  protected:
+	virtual void FlushDataBuffer();
 };
 
 #endif /* _ORCaen965Readout_hh_*/

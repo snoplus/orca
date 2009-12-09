@@ -124,7 +124,7 @@
     [self selectedRegIndexChanged:nil];
     [self selectedRegIndexChanged:nil];
     short 	i;
-    for (i = 0; i < [model numberOfChannels]; i++){
+    for (i = 0; i < kCV965NumberChannels; i++){
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:@"channel"];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965LowThresholdChanged object:model userInfo:userInfo];
@@ -203,7 +203,7 @@
 {
 	short i;
 	unsigned short theMask = [model onlineMask];
-	for(i=0;i<[model numberOfChannels];i++){
+	for(i=0;i<kCV965NumberChannels;i++){
 		[[onlineMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
 }
@@ -293,9 +293,7 @@
 
 - (IBAction) onlineAction:(id)sender
 {
-	if([sender intValue] != [model onlineMaskBit:[[sender selectedCell] tag]]){
-		[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
+	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) readThresholds:(id) sender
@@ -346,12 +344,12 @@
     }
     
 	// Populate the channel popup
-    for (i = 0; i < [model numberOfChannels]; i++) {
+    for (i = 0; i < kCV965NumberChannels; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i] 
 								  atIndex:i];
     }
 	
-    [channelPopUp insertItemWithTitle:@"All" atIndex:[model numberOfChannels]];
+    [channelPopUp insertItemWithTitle:@"All" atIndex:kCV965NumberChannels];
 	
     [self selectedRegIndexChanged:nil];
 	

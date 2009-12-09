@@ -19,9 +19,8 @@ bool ORCaen965Readout::Readout(SBC_LAM_Data* lamData)
 	
 	if((result == sizeof(theStatusReg)) && (theStatusReg & 0x0001)){
 		//OK, at least one data value is ready, first value read should be a header
-		int32_t dataValue;
+		uint32_t dataValue;
 		result = VMERead(GetBaseAddress()+dataBufferOffset, 0x39, sizeof(dataValue), dataValue);
-		uint8_t validData = YES; //assume OK until shown otherwise
 		if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x2)){
 			int32_t numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
 			int32_t i;
@@ -45,7 +44,7 @@ bool ORCaen965Readout::Readout(SBC_LAM_Data* lamData)
 					//some kind of bad error, report and flush the buffer
 					LogBusError("Rd Err: CAEN 965 0x%04x %s", GetBaseAddress(),strerror(errno)); 
 					dataIndex = savedDataIndex;
-					flushDataBuffer();
+					FlushDataBuffer();
 				}
 			}
 		}
@@ -54,18 +53,18 @@ bool ORCaen965Readout::Readout(SBC_LAM_Data* lamData)
     return true; 
 }
 
-void flushDataBuffer()
+void ORCaen965Readout::FlushDataBuffer()
 {
-	uint32_t dataBufferOffset     = GetDeviceSpecificData()[1];
+ 	uint32_t dataBufferOffset     = GetDeviceSpecificData()[1];
 	//flush the buffer, read until not valid datum
-	int i;
+	int32_t i;
 	for(i=0;i<0x07FC;i++) {
-		unsigned long dataValue;
-		[controller readLongBlock:&dataValue
-						atAddress:dataBufferAddress
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
+		uint32_t dataValue;
+		int32_t result = VMERead(GetBaseAddress()+dataBufferOffset, 0x39, sizeof(dataValue), dataValue);
+		if(result<0){
+			LogBusError("Flush Err: CAEN 965 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+			break;
+		}
 		if(ShiftAndExtract(dataValue,24,0x7) == 0x6) break;
 	}
 }

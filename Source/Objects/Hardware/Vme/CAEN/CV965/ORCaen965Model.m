@@ -198,6 +198,60 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 }
 
 #pragma mark ***Register - General routines
+- (void) read
+{
+    
+    unsigned short 	theValue   = 0;
+    short		start;
+    short		end;
+    short		i;
+    // Get register and channel from dialog box.
+    short theChannelIndex	= [self selectedChannel];
+    short theRegIndex 		= [self selectedRegIndex];
+    
+    @try {
+        
+       /* if (theRegIndex == [self getThresholdIndex]){
+            start = theChannelIndex;
+            end = theChannelIndex;
+            if(theChannelIndex >= [self numberOfChannels]) {
+                start = 0;
+                end = [self numberOfChannels] - 1;
+            }
+            
+            // Loop through the thresholds and read them.
+            for(i = start; i <= end; i++){
+                [self readThreshold:i];
+                NSLog(@"Threshold %2d = 0x%04lx\n", i, [self threshold:i]);
+            }
+        }
+        
+        // If user selected the output buffer then read it.
+        else*/if (theRegIndex == [self getOutputBufferIndex]){
+            ORDataPacket* tempDataPacket = [[ORDataPacket alloc]init];
+            [self takeData:tempDataPacket userInfo:nil];
+            if([[tempDataPacket dataArray]count]){
+                ORCaenDataDecoder *aDecoder = [[ORCaenDataDecoder alloc] init];
+                [aDecoder printData:@"CAEN" dataPacket:tempDataPacket];
+                [aDecoder release];
+            }
+        }
+        
+        // Handle all other registers.  Just read them.
+        else {
+            [self read:theRegIndex returnValue:&theValue];
+            NSLog(@"CAEN reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
+        }
+        
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Can't Read [%@] on the %@.\n",
+			  [self getRegisterName:theRegIndex], [self identifier]);
+		[localException raise];
+	}
+}
+
+
 - (void) write
 {
     // Get the value - Already validated by stepper.
@@ -261,6 +315,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	}
 }
 
+
+
 - (void) writeThresholds
 {
     short i;
@@ -281,7 +337,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 
 - (void) writeLowThreshold:(unsigned short) pChan
 {    
-	unsigned short lowThreshold = lowThresholds[pChan];
+	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
+	unsigned short lowThreshold = lowThresholds[pChan] | kill;
     [[self adapter] writeWordBlock:&lowThreshold
                          atAddress:[self baseAddress] + [self lowThresholdOffset:pChan]
                         numToWrite:1
@@ -292,7 +349,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 
 - (void) writeHighThreshold:(unsigned short) pChan
 {    
-	unsigned short highThreshold = highThresholds[pChan];
+	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
+	unsigned short highThreshold = highThresholds[pChan] | kill;
     [[self adapter] writeWordBlock:&highThreshold
                          atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
                         numToWrite:1
@@ -449,7 +507,10 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 }
 
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
-{    
+{  
+	
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
+
     // Clear unit
 	unsigned short aValue = kClearData;
 	[[self adapter] writeWordBlock:&aValue
@@ -476,7 +537,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     //Cache some values
 	statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
 	dataBufferAddress   = [self baseAddress]+[self getBufferOffset];;
-	location      =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+	location			=  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+    controller			= [self adapter]; //cache for speed
 
     // Set thresholds in unit
     [self writeThresholds];
