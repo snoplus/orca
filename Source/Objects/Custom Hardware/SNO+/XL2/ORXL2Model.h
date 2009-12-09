@@ -113,6 +113,7 @@
 - (unsigned long) readFromXL2Register:(unsigned long) aRegister;
 - (void) writeHardwareRegister:(unsigned long) anAddress value:(unsigned long) aValue;
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress;
+- (unsigned long) readHardwareMemory:(unsigned long) memAddress;
 - (void) reset;
 - (void) loadTheClocks;
 - (void) loadTheXilinx:(unsigned long) selectBits;

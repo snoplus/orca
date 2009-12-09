@@ -345,6 +345,19 @@ unsigned long xl2_register_offsets[] =
 	return [[self xl1] readHardwareRegister:regAddress];
 }
 
+- (unsigned long) readHardwareMemory:(unsigned long) memAddress
+{
+	unsigned long aValue=0;
+	[[[self xl1] adapter] readLongBlock:&aValue
+			    atAddress:memAddress
+			    numToRead:1
+			   withAddMod:0x09
+			usingAddSpace:0x01];
+	
+	return aValue;
+}
+
+
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern
 {
 	return [[self xl1] writeHardwareRegisterCmd:aRegister value:aBitPattern];		
