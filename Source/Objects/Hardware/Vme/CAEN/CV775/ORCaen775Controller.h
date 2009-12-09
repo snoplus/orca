@@ -39,9 +39,6 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) modelTypeChanged:(NSNotification*)aNote;
-
-#pragma mark ***Interface Management
-- (void) modelTypeChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Actions
