@@ -36,12 +36,12 @@ bool ORCAEN419Readout::Readout(SBC_LAM_Data* lamData)
 					}
 				} 
 				else if (result < 0) {
-                    LogBusError("Rd Err: Shaper 0x%04x %s",
+                    LogBusError("Rd Err: CAEN 419 0x%04x %s",
                         GetBaseAddress(),strerror(errno));                
                 }
 			} 
 			else if (result < 0) {
-                LogBusError("Rd Err: Shaper 0x%04x %s",
+                LogBusError("Rd Err: CAEN 419 0x%04x %s",
                     GetBaseAddress(),strerror(errno));   
             }
 		}
