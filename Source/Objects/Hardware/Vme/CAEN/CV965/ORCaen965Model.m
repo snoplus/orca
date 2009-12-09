@@ -517,7 +517,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 				int i;
 				if((numMemorizedChannels>0)){
 					unsigned long dataRecord[0xffff];
-					//dataRecord[0] = dataId | 2;
+					//we fill in dataRecord[0] below once we know the final size
 					dataRecord[1] = location;
 					int index = 2;
 					for(i=0;i<numMemorizedChannels;i++){
@@ -527,6 +527,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 									   withAddMod:[self addressModifier]
 									usingAddSpace:0x01];
 						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						int channel = ShiftAndExtract(dataValue,17,0xf);
 						if(dataType == 0x000){
 							dataRecord[index] = dataValue;
 							index++;
@@ -535,6 +536,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 							validData = NO;
 							break;
 						}
+						++adcCount[channel]; 
 					}
 					if(validData){
 						//OK we read the data, get the end of block
@@ -546,10 +548,10 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 						//make sure it really is an end of block
 						int dataType = ShiftAndExtract(dataValue,24,0x7);
 						if(dataType == 0x4){
-							dataRecord[index] = dataValue;
-							index++;
+							//dataRecord[index] = dataValue; //we don't ship the end of block for now
+							//index++;
 							//got a end of block fill in the ORCA header and ship the data
-							dataRecord[0] = dataId | index;
+							dataRecord[0] = dataId | index; //see.... filled it in here....
 							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
 						}
 						else {
@@ -587,6 +589,24 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	[adcRateGroup stop];
     controller = nil;
 	isRunning = NO;
+}
+
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id = kCaen965; //should be unique
+	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	configStruct->card_info[index].slot 	 = [self slot];
+	configStruct->card_info[index].crate 	 = [self crateNumber];
+	configStruct->card_info[index].add_mod 	 = [self addressModifier];
+	configStruct->card_info[index].base_add  = [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0] = reg[kStatusRegister1].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	
+	return index+1;
 }
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel

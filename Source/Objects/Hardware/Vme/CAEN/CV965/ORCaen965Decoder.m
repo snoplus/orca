@@ -33,10 +33,9 @@
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xffff);
-			int chan;
-			chan = ShiftAndExtract(ptr[i],17,0xf);
+			int chan     = ShiftAndExtract(ptr[i],17,0xf);
 			NSString* channelKey  = [self getChannelKey: chan];
-			[aDataSet histogram:qdcValue numBins:0xffff sender:self withKeys:@"CAEN965 QDC",crateKey,cardKey,channelKey,nil];
+			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN965 QDC",crateKey,cardKey,channelKey,nil];
         }
     }
     return length;
@@ -56,7 +55,7 @@
     for( i = 2; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
-			int qdcValue = ShiftAndExtract(ptr[i],0,0xffff);
+			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
 			int channel  = ShiftAndExtract(ptr[i],16,0xf);
 			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
         }

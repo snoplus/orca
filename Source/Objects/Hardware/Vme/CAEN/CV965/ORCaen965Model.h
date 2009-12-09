@@ -142,6 +142,7 @@ enum {
 - (void) read:(unsigned short) pReg returnValue:(void*) pValue;
 
 #pragma mark ***DataTaker
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
 - (unsigned long) dataId;

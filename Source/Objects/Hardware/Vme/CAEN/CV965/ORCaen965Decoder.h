@@ -19,6 +19,21 @@
 
 #import "ORVmeCardDecoder.h"
 
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^^ ^^^^ ^^----------------------- ID (from header)
+//-----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//--------^-^^^--------------------------- Crate number
+//-------------^-^^^^--------------------- Card number
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^---------------------------------- Geo
+//------^^^^------------------------------ data type 0x2=header, 0x0=valid data,  0x4=end of block, 0x6=invalid
+//----------------^^^--------------------- channel
+//-----------------------^---------------- under flow
+//------------------------^--------------- over flow
+//-------------------------^^^^ ^^^^ ^^^^- qdc value
+//.... may be followed by more qdc words
+
 @interface ORCaen965DecoderForQdc : ORVmeCardDecoder {
 }
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet;
