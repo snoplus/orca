@@ -11,45 +11,6 @@ bool ORCaen965Readout::Readout(SBC_LAM_Data* lamData)
 	uint32_t firstStatusRegOffset = GetDeviceSpecificData()[0];
  	uint32_t dataBufferOffset     = GetDeviceSpecificData()[1];
 
-	ensureDataCanHold(4 * 2); //max this card can produce
-
-	for(uint32_t chan=0;chan<4;chan++){
-		if(enabledMask & (1<<chan)){
-			uint16_t theStatusReg;
-            int32_t result = VMERead(GetBaseAddress()+firstStatusRegOffset+(chan*4),
-                                     0x39,
-                                     sizeof(theStatusReg),
-                                     theStatusReg);
-			if(result == sizeof(theStatusReg) && (theStatusReg&0x8000)){
-				uint16_t aValue;
-                result = VMERead(GetBaseAddress()+firstAdcRegOffset+(chan*4),
-                                 0x39,
-                                 sizeof(aValue),
-                                 aValue);
-				if(result == sizeof(aValue)){
-					if(((dataId) & 0x80000000)){ //short form
-						data[dataIndex++] = dataId | locationMask | 
-                            ((chan & 0x0000000f) << 12) | (aValue & 0x0fff);
-					} 
-					else { //long form
-						data[dataIndex++] = dataId | 2;
-						data[dataIndex++] = locationMask | 
-                            ((chan & 0x0000000f) << 12) | (aValue & 0x0fff);
-					}
-				} 
-				else if (result < 0) {
-                    LogBusError("Rd Err: CAEN 965 0x%04x %s",
-                        GetBaseAddress(),strerror(errno));                
-                }
-			} 
-			else if (result < 0) {
-                LogBusError("Rd Err: CAEN 965 0x%04x %s",
-                    GetBaseAddress(),strerror(errno));   
-            }
-		}
-	}
-	
-	//////
 	uint16_t theStatusReg;
 	int32_t result = VMERead(GetBaseAddress()+firstStatusRegOffset,
 							 0x39,
