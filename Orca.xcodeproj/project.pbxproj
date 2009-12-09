@@ -1028,6 +1028,9 @@
 		845498C410628DF400F8DE1C /* scpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 845498C310628DF400F8DE1C /* scpExpectScript */; };
 		8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 8455097810CEF7DD008A019C /* ORCaen965Decoder.h */; };
 		8455097B10CEF7DD008A019C /* ORCaen965Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8455097910CEF7DD008A019C /* ORCaen965Decoder.m */; };
+		84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
+		84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */; };
+		84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
@@ -2247,6 +2250,7 @@
 			files = (
 				43ADFEB910B6E2090044617C /* HW_Specific.icc in VME_Copy */,
 				43ADFEBA10B6E2090044617C /* HWMakefile.mk in VME_Copy */,
+				84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */,
 				43ADFEBB10B6E2090044617C /* ORCAEN419Readout.cc in VME_Copy */,
 				43ADFEBC10B6E2090044617C /* ORCAEN419Readout.hh in VME_Copy */,
 				43ADFEBD10B6E2090044617C /* ORCAEN1720Readout.cc in VME_Copy */,
@@ -2273,6 +2277,7 @@
 				43ADFED210B6E2090044617C /* ORSIS3350Readout.hh in VME_Copy */,
 				43ADFED310B6E2090044617C /* ORVMETrigger32Readout.cc in VME_Copy */,
 				43ADFED410B6E2090044617C /* ORVMETrigger32Readout.hh in VME_Copy */,
+				84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */,
 				43ADFED510B6E2090044617C /* ORVVmeCard.cc in VME_Copy */,
 				43ADFED610B6E2090044617C /* ORVVmeCard.hh in VME_Copy */,
 				43ADFED710B6E2090044617C /* UniverseDriverInstall in VME_Copy */,
@@ -3121,6 +3126,8 @@
 		845498C310628DF400F8DE1C /* scpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = scpExpectScript; path = "Source/Objects/Misc Objects/FileCopy/scpExpectScript"; sourceTree = SOURCE_ROOT; };
 		8455097810CEF7DD008A019C /* ORCaen965Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen965Decoder.h; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Decoder.h; sourceTree = SOURCE_ROOT; };
 		8455097910CEF7DD008A019C /* ORCaen965Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen965Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Decoder.m; sourceTree = SOURCE_ROOT; };
+		84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN965Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.cc; sourceTree = SOURCE_ROOT; };
+		84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN965Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.hh; sourceTree = SOURCE_ROOT; };
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
@@ -6947,6 +6954,8 @@
 			children = (
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
+				84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */,
+				84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */,
 				43ADFE5810B6DBCF0044617C /* ORCAEN419Readout.cc */,
 				43ADFE5910B6DBCF0044617C /* ORCAEN419Readout.hh */,
 				43ADFE5A10B6DBCF0044617C /* ORCAEN1720Readout.cc */,
@@ -8023,8 +8032,8 @@
 			children = (
 				84B74CE60FEBE9B90033E658 /* ORCaen965Model.m */,
 				84B74CE50FEBE9B90033E658 /* ORCaen965Model.h */,
-				84B74CE40FEBE9B90033E658 /* ORCaen965Controller.m */,
 				84B74CE30FEBE9B90033E658 /* ORCaen965Controller.h */,
+				84B74CE40FEBE9B90033E658 /* ORCaen965Controller.m */,
 				8455097810CEF7DD008A019C /* ORCaen965Decoder.h */,
 				8455097910CEF7DD008A019C /* ORCaen965Decoder.m */,
 				84B74CE10FEBE9B90033E658 /* Caen965.gif */,
@@ -10418,6 +10427,7 @@
 				849516B610C95382001C8112 /* ORStateLabelController.h in Headers */,
 				849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */,
 				8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */,
+				84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
