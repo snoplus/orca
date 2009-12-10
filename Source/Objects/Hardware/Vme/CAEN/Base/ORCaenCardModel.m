@@ -293,9 +293,11 @@ NSString* 	caenChnl				= @"CAEN Chnl";
         else if (theRegIndex == [self getOutputBufferIndex]){
             ORDataPacket* tempDataPacket = [[ORDataPacket alloc]init];
             [self takeData:tempDataPacket userInfo:nil];
-            if([[tempDataPacket dataArray]count]){
+			if([[tempDataPacket dataArray]count]){
+				NSData* theData = [[tempDataPacket dataArray] objectAtIndex:0];
+				unsigned long* someData = (unsigned long*)[theData bytes];
                 ORCaenDataDecoder *aDecoder = [[ORCaenDataDecoder alloc] init];
-                [aDecoder printData:@"CAEN" dataPacket:tempDataPacket];
+                [aDecoder printData:[self className] data:someData];
                 [aDecoder release];
             }
         }

@@ -96,23 +96,23 @@ enum {
 - (id) init;
 
 #pragma mark ***Accessors
-- (unsigned long) lowThreshold:(unsigned short) aChnl;
-- (void) setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
-- (unsigned long) highThreshold:(unsigned short) aChnl;
-- (void) setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
+- (unsigned long)	lowThreshold:(unsigned short) aChnl;
+- (void)			setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
+- (unsigned long)	highThreshold:(unsigned short) aChnl;
+- (void)			setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
 - (unsigned short)onlineMask;
-- (void)setOnlineMask:(unsigned short)anOnlineMask;
-- (BOOL)onlineMaskBit:(int)bit;
-- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
-- (void) setUpImage;
-- (void) makeMainController;
-- (NSRange)	memoryFootprint;
+- (void)			setOnlineMask:(unsigned short)anOnlineMask;
+- (BOOL)			onlineMaskBit:(int)bit;
+- (void)			setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
+- (void)			setUpImage;
+- (void)			makeMainController;
+- (NSRange)			memoryFootprint;
 - (unsigned short) 	selectedRegIndex;
-- (void)		setSelectedRegIndex: (unsigned short) anIndex;
+- (void)			setSelectedRegIndex: (unsigned short) anIndex;
 - (unsigned short) 	selectedChannel;
-- (void)		setSelectedChannel: (unsigned short) anIndex;
+- (void)			setSelectedChannel: (unsigned short) anIndex;
 - (unsigned long) 	writeValue;
-- (void)		setWriteValue: (unsigned long) anIndex;
+- (void)			setWriteValue: (unsigned long) anIndex;
 
 #pragma mark ***Register - General routines
 - (void) writeThresholds;
@@ -140,9 +140,11 @@ enum {
 - (void) initBoard;
 - (void) write;
 - (void) read:(unsigned short) pReg returnValue:(void*) pValue;
+- (void) clearData;
+- (void) resetEventCounter;
 
 #pragma mark ***DataTaker
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (int)  load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
 - (unsigned long) dataId;
@@ -162,17 +164,17 @@ enum {
 - (NSString*) identifier;
 
 #pragma mark ***HWWizard Support
-- (BOOL) hasParmetersToRamp;
-- (NSArray*) wizardSelections;
-- (NSArray*) wizardParameters;
+- (BOOL)      hasParmetersToRamp;
+- (NSArray*)  wizardSelections;
+- (NSArray*)  wizardParameters;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
-- (void) logThresholds;
+- (void)	  logThresholds;
 
 #pragma mark ***Archival
-- (id) initWithCoder:(NSCoder*) aDecoder;
+- (id)   initWithCoder:(NSCoder*) aDecoder;
 - (void) encodeWithCoder:(NSCoder*) anEncoder;
-
 @end
+
 extern NSString* ORCaen965BasicLock;
 extern NSString* ORCaen965ModelOnlineMaskChanged;
 extern NSString* ORCaen965LowThresholdChanged;

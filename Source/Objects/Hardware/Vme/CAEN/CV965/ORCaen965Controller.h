@@ -29,12 +29,13 @@
     IBOutlet NSMatrix*	onlineMaskMatrix;
     IBOutlet NSMatrix*	lowThresholdMatrix;
     IBOutlet NSMatrix*	highThresholdMatrix;
-    IBOutlet NSButton*	readThresholdsButton;
-    IBOutlet NSButton*	writeThresholdsButton;
     IBOutlet NSTextField* slotField;
     IBOutlet NSTextField* basicLockDocField;
     IBOutlet NSButton*	  basicLock1Button;
     IBOutlet NSButton*	  basicLock2Button;
+    IBOutlet NSButton*	 initButton;
+    IBOutlet NSButton*	 resetButton;
+    IBOutlet NSButton*	 reportButton;
 
  	IBOutlet NSTextField*	baseAddressField;
     IBOutlet NSStepper*		writeValueStepper;
@@ -79,8 +80,6 @@
 - (IBAction) lowThresholdAction:(id)sender;
 - (IBAction) highThresholdAction:(id)sender;
 - (IBAction) onlineAction:(id)sender;
-- (IBAction) readThresholds:(id)sender;
-- (IBAction) writeThresholds:(id)sender;
 - (IBAction) basicLockAction:(id)sender;
 - (IBAction) writeValueAction:(id)sender;
 
@@ -91,8 +90,9 @@
 - (IBAction) read:(id)sender;
 - (IBAction) write:(id)sender;
 - (IBAction) onlineAction:(id)sender;
-- (IBAction) readThresholds:(id)sender;
-- (IBAction) writeThresholds:(id)sender;
+- (IBAction) report:(id) sender;
+- (IBAction) resetBoard:(id)sender;
+- (IBAction) initBoard:(id)sender;
 - (IBAction) basicLockAction:(id)sender;
 
 - (void) populatePullDown;

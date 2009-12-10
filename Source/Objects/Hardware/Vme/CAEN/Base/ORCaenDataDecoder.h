@@ -25,8 +25,6 @@
 //-------------------------------------------------------------
 
 #import "ORVmeCardDecoder.h"
-
-@class ORDataPacket;
 //--------------------------------------------------------------------------------
 // Important constants.
 //--------------------------------------------------------------------------------
@@ -120,7 +118,7 @@
 - (unsigned long) 	decodeValueOutput: (unsigned long) pDataValue
                                ofType: (unsigned short) pType;
 
-- (void) printData: (NSString*) pName dataPacket: (ORDataPacket*) theData;
+- (void) printData: (NSString*) pName data:(void*) aSomeData;
 - (NSString*) identifier;
 
 @end

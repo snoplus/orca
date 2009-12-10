@@ -64,5 +64,31 @@
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,len,crate,card,restOfString];               
 }
 
+- (void) printData: (NSString*) pName data:(void*) theData
+{
+    short i;
+    long* ptr = (long*)theData;
+    
+	long length = ExtractLength(ptr[0]);
+	NSString* crateKey = [self getCrateKey:ShiftAndExtract(ptr[1],21,0xf)];
+	NSString* cardKey  = [self getCardKey: ShiftAndExtract(ptr[i],16,0x1f)];
+	
+    if( length == 0 ) NSLog( @"%@ Data Buffer is empty.\n", pName );
+    else {
+        NSLog(@"crate: %@ card: %@\n",crateKey,cardKey);        
+        for( i = 2; i < length; i++ ){
+            if( ShiftAndExtract(ptr[i],24,0x7) == 0x0){ //is valid data?
+                NSLog( @"--Data Block\n");
+                NSLog( @"Geo Address  : 0x%lx\n",	ShiftAndExtract(ptr[i],27,0x1f));
+                NSLog( @"Channel      : 0x%lx  (un:%ld ov:%ld)\n", 
+													ShiftAndExtract(ptr[i],17,0xf),
+													ShiftAndExtract(ptr[i],13,0x1),
+													ShiftAndExtract(ptr[i],12,0x1));
+                NSLog( @"Adc Value    : 0x%lx\n",	ShiftAndExtract(ptr[i],0,0xfff) );
+            }
+        }
+    }
+}
+
 @end
 

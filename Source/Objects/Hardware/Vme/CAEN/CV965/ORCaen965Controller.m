@@ -179,8 +179,9 @@
     [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
     [lowThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
     [highThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-    [readThresholdsButton setEnabled:!lockedOrRunningMaintenance];
-    [writeThresholdsButton setEnabled:!lockedOrRunningMaintenance];
+    [reportButton setEnabled:!lockedOrRunningMaintenance];
+    [initButton setEnabled:!lockedOrRunningMaintenance];
+    [resetButton setEnabled:!lockedOrRunningMaintenance];
 	
     [baseAddressField setEnabled:!locked && !runInProgress];
     [writeValueStepper setEnabled:!lockedOrRunningMaintenance];
@@ -245,6 +246,7 @@
 {
 	[model setWriteValue:[aSender intValue]];
 }
+
 - (IBAction) selectRegisterAction:(id) aSender
 {
 	[model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
@@ -264,6 +266,17 @@
 {
     if ([sender intValue] != [model highThreshold:[[sender selectedCell] tag]]){
         [model setHighThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; 
+    }
+}
+- (IBAction) resetBoard:(id)sender
+{
+	@try {
+		[self endEditing];		// Save in memory user changes before executing command.
+		[model clearData];
+    }
+	@catch(NSException* localException) {
+        NSRunAlertPanel([localException name], @"%@\nReset of %@ failed", @"OK", nil, nil,
+                        localException,@"Reset and Clear");
     }
 }
 
@@ -296,7 +309,7 @@
 	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) readThresholds:(id) sender
+- (IBAction) report:(id) sender
 {
 	@try {
 		[self endEditing];
@@ -304,13 +317,13 @@
 		[model logThresholds];
     }
 	@catch(NSException* localException) {
-        NSLog(@"Read of %@ thresholds FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Reading Thresholds", @"OK", nil, nil,
+        NSLog(@"Report of %@ FAILED.\n",[model identifier]);
+        NSRunAlertPanel([localException name], @"%@\nFailed Making Report", @"OK", nil, nil,
                         localException);
     }
 }
 
-- (IBAction) writeThresholds:(id) pSender
+- (IBAction) initBoard:(id) pSender
 {
 	@try {
 		[self endEditing];

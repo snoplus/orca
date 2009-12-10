@@ -211,28 +211,38 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     
     @try {
         
-       /* if (theRegIndex == [self getThresholdIndex]){
+        if (theRegIndex == kLowThresholds || theRegIndex == kHiThresholds){
             start = theChannelIndex;
             end = theChannelIndex;
             if(theChannelIndex >= [self numberOfChannels]) {
                 start = 0;
-                end = [self numberOfChannels] - 1;
+                end = kCV965NumberChannels - 1;
             }
             
             // Loop through the thresholds and read them.
-            for(i = start; i <= end; i++){
-                [self readThreshold:i];
-                NSLog(@"Threshold %2d = 0x%04lx\n", i, [self threshold:i]);
+			if(theRegIndex == kLowThresholds){
+				for(i = start; i <= end; i++){
+					[self readLowThreshold:i];
+					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+				}
+			}
+			else {
+				for(i = start; i <= end; i++){
+					[self readHighThreshold:i];
+					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
+				}
             }
         }
         
         // If user selected the output buffer then read it.
-        else*/if (theRegIndex == [self getOutputBufferIndex]){
+        else if (theRegIndex == [self getOutputBufferIndex]){
             ORDataPacket* tempDataPacket = [[ORDataPacket alloc]init];
             [self takeData:tempDataPacket userInfo:nil];
             if([[tempDataPacket dataArray]count]){
+				NSData* theData = [[tempDataPacket dataArray] objectAtIndex:0];
+				unsigned long* someData = (unsigned long*)[theData bytes];
                 ORCaenDataDecoder *aDecoder = [[ORCaenDataDecoder alloc] init];
-                [aDecoder printData:@"CAEN" dataPacket:tempDataPacket];
+                [aDecoder printData:@"CAEN 965" data:someData];
                 [aDecoder release];
             }
         }
@@ -458,6 +468,33 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	[self writeThresholds];
 }
 
+- (void) clearData
+{
+	unsigned short aValue = kClearData;
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + [self getAddressOffset:kBitSet2]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	aValue = kClearData;
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + [self getAddressOffset:kBitClear2]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+- (void) resetEventCounter
+{
+	unsigned short aValue = 0x0;
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + [self getAddressOffset:kEventCounterReset]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
 #pragma mark ***DataTaker
 
 - (void) setDataIds:(id)assigner
@@ -503,7 +540,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 }
 
 - (void) reset
-{
+{	
 }
 
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
@@ -512,28 +549,9 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
 
     // Clear unit
-	unsigned short aValue = kClearData;
-	[[self adapter] writeWordBlock:&aValue
-						 atAddress:[self baseAddress] + [self getAddressOffset:kBitSet2]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+	[self clearData];
+	[self resetEventCounter];
 	
-	aValue = kClearData;
-	[[self adapter] writeWordBlock:&aValue
-						 atAddress:[self baseAddress] + [self getAddressOffset:kBitClear2]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	aValue = 0x0;
-	[[self adapter] writeWordBlock:&aValue
-						 atAddress:[self baseAddress] + [self getAddressOffset:kEventCounterReset]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-
     //Cache some values
 	statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
 	dataBufferAddress   = [self baseAddress]+[self getBufferOffset];;
@@ -541,7 +559,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     controller			= [self adapter]; //cache for speed
 
     // Set thresholds in unit
-    [self writeThresholds];
+    [self initBoard];
 
 	isRunning = NO;
 	
@@ -737,10 +755,12 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 {
     return kCV965NumberChannels;
 }
+
 - (BOOL) hasParmetersToRamp
 {
 	return YES;
 }
+
 - (NSArray*) wizardSelections
 {
     NSMutableArray* a = [NSMutableArray array];
@@ -748,8 +768,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:NSStringFromClass([self class])]];
     [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:NSStringFromClass([self class])]];
     return a;
-    
 }
+
 - (NSArray*) wizardParameters
 {
     NSMutableArray* a = [NSMutableArray array];
@@ -781,7 +801,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	p = [[[ORHWWizParam alloc] init] autorelease];
 	[p setUseValue:NO];
 	[p setName:@"Init"];
-	[p setSetMethodSelector:@selector(writeThresholds)];
+	[p setSetMethodSelector:@selector(initBoard)];
 	[a addObject:p];
     
     return a;

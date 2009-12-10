@@ -16,7 +16,6 @@
 //-------------------------------------------------------------
 
 #import "ORCaenDataDecoder.h"
-#import "ORDataPacket.h"
 #import "ORDataSet.h"
 
 @implementation ORCaenDataDecoder
@@ -161,46 +160,45 @@
     return val;
 }
 
-- (void) printData: (NSString*) pName dataPacket: (ORDataPacket*) theDataPacket
+- (void) printData: (NSString*) pName data:(void*) theData
 {
     short i;
-    NSData* theData = [[theDataPacket dataArray] objectAtIndex:0];
-    unsigned long* ptr = (unsigned long*)[theData bytes];
+    long* ptr = (long*)theData;
     
 	long length = ExtractLength(*ptr);
 	++ptr; //point to the header word with the crate and channel info
 	NSString* crateKey = [self getCrateKey:(*ptr >> 21)&0x0000000f];
 	NSString* cardKey  = [self getCardKey: (*ptr >> 16)&0x0000001f];
 
-    if( length == 0 ) NSLog( @"%@ Data Buffer is empty.", pName );
+    if( length == 0 ) NSLog( @"%@ Data Buffer is empty.\n", pName );
     else {
         NSLog(@"crate: %@ card: %@\n",crateKey,cardKey);
         ++ptr; //point past the header
         
         for( i = 0; i < length; i++ ){
             if( [self isHeader: ptr[i]] ){
-                NSLog( @"--%@ Header", pName );
-                NSLog( @"Geo Address  : 0x%lx", [self decodeValueOutput: ptr[i] ofType: kCaen_GeoAddress] );
-                NSLog( @"Crate        : 0x%lx", [self decodeValueOutput: ptr[i] ofType: kCaen_Crate] );
-                NSLog( @"Num Chans    : 0x%lx", [self decodeValueOutput: ptr[i] ofType: kCaen_ChanCount] );
+                NSLog( @"--%@ Header\n", pName );
+                NSLog( @"Geo Address  : 0x%lx\n", [self decodeValueOutput: ptr[i] ofType: kCaen_GeoAddress] );
+                NSLog( @"Crate        : 0x%lx\n", [self decodeValueOutput: ptr[i] ofType: kCaen_Crate] );
+                NSLog( @"Num Chans    : 0x%lx\n", [self decodeValueOutput: ptr[i] ofType: kCaen_ChanCount] );
             }
             else if( [self isValidDatum: ptr[i]] ){
-                NSLog( @"--Data Block");
-                NSLog( @"Geo Address  : 0x%lx", [self decodeValueOutput: ptr[i] ofType: kCaen_GeoAddress] );
-                NSLog( @"Channel      : 0x%lx  (un:%ld ov:%ld)", [self channel: ptr[i]],
+                NSLog( @"--Data Block\n");
+                NSLog( @"Geo Address  : 0x%lx\n", [self decodeValueOutput: ptr[i] ofType: kCaen_GeoAddress] );
+                NSLog( @"Channel      : 0x%lx  (un:%ld ov:%ld)\n", [self channel: ptr[i]],
                        [self decodeValueOutput: ptr[i] 
                                         ofType: kCaen_UnderThreshold],
                        [self decodeValueOutput: ptr[i] 
                                         ofType: kCaen_Overflow] );
-                NSLog( @"Adc Value    : 0x%lx", [self adcValue: ptr[i]] );
+                NSLog( @"Adc Value    : 0x%lx\n", [self adcValue: ptr[i]] );
             }
             else if( [self isEndOfBlock: ptr[i]] ){
-                NSLog( @"Geo Address  : 0x%lx", [self decodeValueOutput: ptr[i] ofType: kCaen_GeoAddress] );
-                NSLog( @"Event Counter: 0x%lx", [self decodeValueOutput: ptr[i] ofType: kCaen_EventCounter] );
+                NSLog( @"Geo Address  : 0x%lx\n", [self decodeValueOutput: ptr[i] ofType: kCaen_GeoAddress] );
+                NSLog( @"Event Counter: 0x%lx\n", [self decodeValueOutput: ptr[i] ofType: kCaen_EventCounter] );
                 NSLog( @"--End of Block");
             }
             else if( [self isNotValidDatum: ptr[i]] ){
-                NSLog( @"xxx Invalid Data at [%d]", i );
+                NSLog( @"xxx Invalid Data at [%d]\n", i );
                 
             }
         }
