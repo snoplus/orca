@@ -4978,7 +4978,6 @@
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
 			isa = PBXGroup;
 			children = (
-				84516B900523845D005F64B1 /* HardwareWizard */,
 				840B4BAC03D875E1005F64B1 /* ORAlarmCollection.h */,
 				840B4BAD03D875E1005F64B1 /* ORAlarmCollection.m */,
 				840B4BB203D87657005F64B1 /* ORAlarm.h */,
@@ -6370,9 +6369,8 @@
 				8439D65D05BF31550077EFF2 /* ActionView.nib */,
 				8439D65E05BF31550077EFF2 /* SelectionView.nib */,
 			);
-			name = HardwareWizard;
-			path = "Source/Main Dialogs/HardwareWizard";
-			sourceTree = SOURCE_ROOT;
+			path = HardwareWizard;
+			sourceTree = "<group>";
 		};
 		84539C470807247A00615B6D /* RemoteRunControl */ = {
 			isa = PBXGroup;
@@ -9321,6 +9319,7 @@
 				843CDEBA03BE2B2D00C39F5F /* Preferences */,
 				844E494105752906005F11A0 /* TaskMaster */,
 				84BAA886055AD39B0005F507 /* CommandCenter */,
+				84516B900523845D005F64B1 /* HardwareWizard */,
 				840B4BAB03D8754D005F64B1 /* Alarms */,
 				84799A3808DF5C6400D848FB /* SplashScreen */,
 				F51E695B03AE4775015F64B1 /* About Box */,
