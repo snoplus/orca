@@ -10,7 +10,9 @@ class ORFLTv4Readout : public ORVCard
     virtual bool Readout(SBC_LAM_Data*);
 
     enum EORFLTv4Consts {
-        kFifoEmpty = 0x01
+        kFifoEmpty = 0x01,
+        kNumChan   = 24,
+        kFirstTimeFlag   = 0x10000
     };
 };
 

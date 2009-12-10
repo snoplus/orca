@@ -5,6 +5,11 @@
 extern hw4::SubrackKatrin* srack; 
 bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
+    //this data must be constant during a run
+    static uint32_t histoBinWidth = 0;
+    static uint32_t histoEnergyOffset = 0;
+    
+    //
     uint32_t dataId     = GetHardwareMask()[0];
     uint32_t waveformId = GetHardwareMask()[1];
     uint32_t histogramId = GetHardwareMask()[2];
@@ -17,6 +22,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t eventType = GetDeviceSpecificData()[1];
     uint32_t runMode   = GetDeviceSpecificData()[2];
     uint32_t runFlags  = GetDeviceSpecificData()[3];
+    uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     
     if(srack->theFlt[col]->isPresent()){
         if(runMode == kIpeFltV4Katrin_Run_Mode){
@@ -39,7 +45,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         uint32_t chmap = f1 >> 8;
                         uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
                         uint32_t eventchan;
-                        for(eventchan=0;eventchan<24;eventchan++){
+                        for(eventchan=0;eventchan<kNumChan;eventchan++){
                             if(chmap & (0x1L << eventchan)){
                                 //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
                                 uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
@@ -116,94 +122,114 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 }
             }
         }
+        // HISTOGRAM MODE ------------------------------
         else if(runMode == kIpeFltV4Katrin_Histo_Mode) {    
+                // buffer some data:
+                hw4::FltKatrin *currentFlt = srack->theFlt[col];
+                hw4::SltKatrin *currentSlt = srack->theSlt;
                 //uint32_t pagenr,oldpagenr ;
                 uint32_t pageAB,oldpageAB;
                 //uint32_t pStatus[3];
                 //fprintf(stdout,"FLT %i:runFlags %x\n",col+1, runFlags );fflush(stdout);    
                 //fprintf(stdout,"FLT %i:runFlags %x  pn 0x%x\n",col+1, runFlags,srack->theFlt[col]->histNofMeas->read() );fflush(stdout); 
                 //sleep(1);   
-                if(runFlags & 0x10000){// firstTime    
-                    //srack->theFlt[col]->periphStatus->readBlock((long unsigned int*)pStatus);//TODO: fdhwlib will change to uint32_t in the future -tb-
-                    //pageAB = (pStatus[0] & 0x10) >> 4;
-                    pageAB = (srack->theFlt[col]->periphStatus->read(0) & 0x10) >> 4;
+                if(runFlags & kFirstTimeFlag){// firstTime   
+                    //make some plausability checks
+                    uint32_t histogramSettings = currentFlt->histogramSettings->read();
+                    if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
+                       currentFlt->histogramSettings->histClearModeManual->getCache()){
+                        fprintf(stdout,"ORFLTv4Readout.cc: WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n");
+                        fflush(stdout);
+                    }
+                    //store some static data which is constant during run
+                    currentFlt->histogramSettings->read();//read to cache
+                    histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
+                    histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
+                    //clear histogram (probably not really necessary with "automatic clear" -tb-) 
+                    srack->theFlt[col]->command->resetPages->write(1);
+                    //init page AB flag
+                    pageAB = srack->theFlt[col]->status->histPageAB->read();
                     GetDeviceSpecificData()[3]=pageAB;
-                    fprintf(stdout,"FLT %i: first cycle\n",col+1);fflush(stdout);
-                    //sleep(1);
+                    //debug: fprintf(stdout,"FLT %i: first cycle\n",col+1);fflush(stdout);
+                    //debug: //sleep(1);
                 }
                 else{//check timing
                     //pagenr=srack->theFlt[col]->histNofMeas->read() & 0x3f;
                     //srack->theFlt[col]->periphStatus->readBlock((long unsigned int*)pStatus);//TODO: fdhwlib will change to uint32_t in the future -tb-
                     //pageAB = (pStatus[0] & 0x10) >> 4;
                     oldpageAB = GetDeviceSpecificData()[3]; //
-                    pageAB = (srack->theFlt[col]->periphStatus->read(0) & 0x10) >> 4;
+                    //pageAB = (srack->theFlt[col]->periphStatus->read(0) & 0x10) >> 4;
+                    //pageAB = srack->theFlt[col]->periphStatus->histPageAB->read(0);
+                    pageAB = srack->theFlt[col]->status->histPageAB->read();
                     //fprintf(stdout,"FLT %i: oldpage  %i currpagenr %i\n",col+1, oldpagenr, pagenr  );fflush(stdout);  
                     //              sleep(1);
                     
                     if(oldpageAB != pageAB){
-                        fprintf(stdout,"FLT %i:toggle now from %i to page %i\n",col+1, oldpageAB, pageAB  );fflush(stdout);    
+                        //debug: fprintf(stdout,"FLT %i:toggle now from %i to page %i\n",col+1, oldpageAB, pageAB  );fflush(stdout);    
                         GetDeviceSpecificData()[3] = pageAB; 
                         //read data
-                        int chan=0;
-                        uint32_t lastFirst, last,first,llast,lfirst;
+                        uint32_t chan=0;
+                        uint32_t readoutSec;
+                        unsigned long totalLength;
+                        uint32_t lastFirst=0, last,first,llast,lfirst;
                         //static uint32_t histogramBuffer32[1024]; //comment out to clear compiler warning. mah 11/25/09121122//
                         static uint32_t shipHistogramBuffer32[2*1024];
-                        for(chan=0;chan<24;chan++) {//read out histogram
-                            uint32_t adccount;
-                            lastFirst = srack->theFlt[col]->histLastFirst->read(chan);
-                            last = (lastFirst >>16) & 0xffff;
-                            first = lastFirst & 0xffff;
-                            fprintf(stdout,"FLT %i: ch %i:first %i, last %i \n",col+1,chan,first,last);fflush(stdout);
+                        // CHANNEL LOOP ----------------
+                        for(chan=0;chan<kNumChan;chan++) {//read out histogram
+                            if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
+                            currentFlt->histLastFirst->read(chan);//read to cache ...
+                            //last = (lastFirst >>16) & 0xffff;
+                            //first = lastFirst & 0xffff;
+                            last  = currentFlt->histLastFirst->histLastEntry->getCache(chan);
+                            first = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
+                            //debug: fprintf(stdout,"FLT %i: ch %i:first %i, last %i \n",col+1,chan,first,last);fflush(stdout);
+                            
+                            #if 1  //READ OUT HISTOGRAM -tb- -------------
                             if(last<first){
                                 //no events
-                                continue;
+                                continue;  //TODO: or write out empty histogram -tb-
                             }
-                            else{
-                                //read out histogram
-                                //lfirst= first/2; llast=last/2;
-                                lfirst= 0; llast=1023;//TODO: there is something wrong with last/first bin information -tb-
-                                //int cnt=0;
-								srack->theSlt->pageSelect->write(0x100 | 0);//TODO: do it once? -tb-
-                                for(adccount=0; adccount<1024;adccount++){
-                                    shipHistogramBuffer32[adccount] =  srack->theFlt[col]->ramData->read(chan,adccount);
-                                }
-								srack->theSlt->pageSelect->write(0x100 | 1);//TODO: do it once? -tb-
-                                for(adccount=0; adccount<1024;adccount++){
-                                    shipHistogramBuffer32[adccount+1024] =  srack->theFlt[col]->ramData->read(chan,adccount);
-                                }
-                                //fprintf(stdout,"\n");
+                            else{//read out histogram
+                                //read sec
+                                readoutSec=currentFlt->secondCounter->read();
+                                //read histogram block
+                                srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
+
+                                //prepare data record
+                                katrinHistogramDataStruct theEventData;
+                                theEventData.readoutSec = readoutSec;
+                                theEventData.recordingTimeSec =  0;//histoRunTime;   
+                                theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
+                                theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
+                                theEventData.histogramLength =2048;
+                                //theEventData.histogramLength = theEventData.lastBin - theEventData.firstBin +1;
+                                //if(theEventData.histogramLength < 0){// we had no counts ...
+                                //    theEventData.histogramLength = 0;
+                                //}
+                                theEventData.maxHistogramLength = 2048; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
+                                theEventData.binSize    = histoBinWidth;        
+                                theEventData.offsetEMin = histoEnergyOffset;
+
+                                
+                                //ship data record
+                                totalLength = 2 + (sizeof(katrinHistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
+                                ensureDataCanHold(totalLength); 
+                                data[dataIndex++] = histogramId | totalLength;    
+                                data[dataIndex++] = location | chan<<8;
+                                data[dataIndex++] = theEventData.readoutSec;
+                                data[dataIndex++] = theEventData.recordingTimeSec;
+                                data[dataIndex++] = theEventData.firstBin;
+                                data[dataIndex++] = theEventData.lastBin;
+                                data[dataIndex++] = theEventData.histogramLength;
+                                data[dataIndex++] = theEventData.maxHistogramLength;
+                                data[dataIndex++] = theEventData.binSize;
+                                data[dataIndex++] = theEventData.offsetEMin;
+                                int i;
+                                for(i=0; i<theEventData.histogramLength;i++)
+                                    data[dataIndex++] = shipHistogramBuffer32[i];
+                                
                             }
-                            
-                            //prepare data record
-                            katrinHistogramDataStruct theEventData;
-                            theEventData.readoutSec = 0;
-                            theEventData.recordingTimeSec =  0;//histoRunTime; 
-                            theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
-                            theEventData.lastBin   = 2048;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
-                            theEventData.histogramLength =2048;
-                            //theEventData.histogramLength = theEventData.lastBin - theEventData.firstBin +1;
-                            //if(theEventData.histogramLength < 0){// we had no counts ...
-                            //    theEventData.histogramLength = 0;
-                            //}
-                            theEventData.maxHistogramLength = 2048; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
-                            theEventData.binSize    = 1;//histoBinWidth;        
-                            theEventData.offsetEMin = 0;//histoMinEnergy;
-                            
-                            //ship data record
-                            unsigned long totalLength = 2 + (sizeof(katrinHistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
-                            data[dataIndex++] = histogramId | totalLength;    
-                            data[dataIndex++] = location | chan<<8;
-                            data[dataIndex++] = theEventData.readoutSec;
-                            data[dataIndex++] = theEventData.recordingTimeSec;
-                            data[dataIndex++] = theEventData.firstBin;
-                            data[dataIndex++] = theEventData.lastBin;
-                            data[dataIndex++] = theEventData.histogramLength;
-                            data[dataIndex++] = theEventData.maxHistogramLength;
-                            data[dataIndex++] = theEventData.binSize;
-                            data[dataIndex++] = theEventData.offsetEMin;
-                            int i;
-                            for(i=0; i<theEventData.histogramLength;i++)
-                                data[dataIndex++] = shipHistogramBuffer32[i];
+                            #endif
                             
                         }
                     } 

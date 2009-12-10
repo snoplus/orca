@@ -465,7 +465,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
             for(j=0;j<aValue;j++){
                 //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
                 [aDataSet histogram:aBin 
-                            numBins:1024 
+                            numBins:2048 
                              sender:self  
                            withKeys: @"FLT",
                  @"Histogram (all counts)", // use better name -tb-
@@ -554,7 +554,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
     #endif
     
     
-    #if 1
+    #if 0
     {
         // this is very similar to the first version (with speed up improvement 2008-08-05),
         // but probably it is usefull as it is in 'energy mode' units ... -tb-

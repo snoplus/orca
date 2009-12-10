@@ -520,12 +520,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) enableAllHitRates:(BOOL)aState
 {
-	[self setHitRateEnabledMask:aState?0x3fffff:0x0];
+	[self setHitRateEnabledMask:aState?0xffffff:0x0];
 }
 
 - (void) enableAllTriggers:(BOOL)aState
 {
-	[self setTriggerEnabledMask:aState?0x3fffff:0x0];
+	[self setTriggerEnabledMask:aState?0xffffff:0x0];
 }
 
 - (void) setHitRateTotal:(float)newTotalValue
@@ -917,7 +917,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (unsigned long) readHitRateMask
 {
-	return [self readReg:kFLTV4HrMeasEnableReg] & 0x3fffff;
+	return [self readReg:kFLTV4HrMeasEnableReg] & 0xffffff;
 }
 
 - (void) writeInterruptMask
@@ -927,17 +927,17 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) disableAllTriggers
 {
-	[self writeReg:kFLTV4PixelSettings1Reg value:0x0];
-	[self writeReg:kFLTV4PixelSettings2Reg value:0x3ffffff];
+	[self writeReg:kFLTV4PixelSettings1Reg value:0x0];       //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
+	[self writeReg:kFLTV4PixelSettings2Reg value:0x3ffffff]; //TODO:
 }
 
-- (void) writeTriggerControl
+- (void) writeTriggerControl  //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
 {
 	//0,0 Normal
 	//0,1 test pattern
 	//1,0 always 0
 	//1,1 always 1
-	[self writeReg:kFLTV4PixelSettings1Reg value:triggerEnabledMask];
+	[self writeReg:kFLTV4PixelSettings1Reg value:triggerEnabledMask]; //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
 	[self writeReg:kFLTV4PixelSettings2Reg value:0];
 }
 
@@ -1224,7 +1224,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask]	forKey:@"hitRateEnabledMask"];
     [objDictionary setObject:[NSNumber numberWithLong:triggerEnabledMask]	forKey:@"triggerEnabledMask"];
     [objDictionary setObject:[NSNumber numberWithLong:postTriggerTime]		forKey:@"postTriggerTime"];
-    [objDictionary setObject:[NSNumber numberWithLong:postTriggerTime]		forKey:@"postTriggerTime"];
     [objDictionary setObject:[NSNumber numberWithLong:fifoBehaviour]		forKey:@"fifoBehaviour"];
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
@@ -1331,13 +1330,19 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].deviceSpecificData[1] = eventTypeMask;	
 	configStruct->card_info[index].deviceSpecificData[2] = fltRunMode;	
 	
+    //"first time" flag (needed for histogram mode)
 	unsigned long runFlagsMask = 0;
 	runFlagsMask |= 0x10000;//bit 16 = "first time" flag
-    
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
-NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
+//NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
+
+    //for all daq modes
+	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;	
+
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
+
+
 	
 	return index+1;
 }

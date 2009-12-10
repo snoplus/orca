@@ -629,6 +629,8 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
                 if(retVal) return retVal;//yes, at the beginning it may be undefined! -tb-
                 else return @"--";
                 //TODO: for controls the key "value" contains the Control item id, not the current value -> use another key! -tb-
+                //
+                //PS: use ... - (double) convertedValue:(int)channel -tb-
 			}
 			else if([theIdentifier isEqual:@"Name"]){
 				id theName = [itemDictionary objectForKey:@"Name"];

@@ -37,8 +37,8 @@
 #define kIpeV4FLTBufferSizeLongs 1024
 #define kIpeV4FLTBufferSizeShorts 1024/2
 
-/** Access to the first level trigger board of the IPE-DAQ electronics.
- * The board contains ADCs for 24 channels and digital logic (FPGA) for 
+/** Access to the first level trigger board of the IPE-DAQ V4 electronics.
+ * The board contains ADCs for 24 channels and digital logic (FPGA) 
  * for implementation experiment specific trigger logic. 
  * 
  * @section hwaccess Access to hardware  
@@ -51,15 +51,17 @@
  *
  * The interface to the graphical configuration dialog is implemented in ORIpeV4FLTController.
  *
- * The Flt will produce three types of data objects depending on the run mode:
+ * The Flt will produce several types of data objects depending on the run mode:
  *   - events containing timestamp and energy
- *   - events with an additional adc data trace of up to 6.5ms length
- *   - threshold and hitrate pairs from the threshold scan.   
+ *   - events with an additional adc data trace of to 102.4 usec length (2048 samples)
  * 
  * @section readout Readout
- * The class implements two types of readout loops: Event by event and a periodic mode.
- * The eventswise readout is used in run and debug mode. For every event the time stamp
+ * The class implements two types of readout loops: Event by event (list mode in KATRIN
+ * collaboration terms) and a periodic mode.
+ * The event readout is used in energy and trace mode. For every event the time stamp
  * and a hardware id are stored. 
+ * The periodic mode is the histogram mode. A histogram is filled on the hardware according
+ * to the occured events and this histogram is read out frequently.
  *
  */ 
 @interface ORIpeV4FLTModel : ORIpeCard <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
@@ -115,17 +117,19 @@
     unsigned short  selectedRegIndex;
     unsigned long   writeValue;
     unsigned long   selectedChannelValue;
+    // fields for event readout
     int fifoBehaviour;
     unsigned long postTriggerTime;
-    unsigned long histRecTime;
-    unsigned long histMeasTime;
-    unsigned long histNofMeas;
     int gapLength;
     int filterLength;
     BOOL storeDataInRam;
     BOOL runBoxCarFilter;
     BOOL readWaveforms;
     int runMode;
+    // fields for histogram readout
+    unsigned long histRecTime;  //!<the histogram refresh time
+    unsigned long histMeasTime; //!<the per-cycle second counter
+    unsigned long histNofMeas;  //!<number of histo measurement cycles
     unsigned long histEMin;
     unsigned long histEBin;
     int histMode;

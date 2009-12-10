@@ -1422,7 +1422,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (NSString*) cpuName
 {
-	return [NSString stringWithFormat:@"SLT (Crate %d)",[self crateNumber]];
+	return [NSString stringWithFormat:@"IPE-DAQ-V4 SLT Card (Crate %d)",[self crateNumber]];
 }
 
 - (NSString*) sbcLockName
