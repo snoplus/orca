@@ -95,6 +95,14 @@
 		IBOutlet NSTextField* 	regWriteValueTextField;
 		IBOutlet NSButton*		regWriteButton;
 		IBOutlet NSButton*		regReadButton;
+	
+		IBOutlet NSButton*      noiseFloorButton;
+		//offset panel
+		IBOutlet NSPanel*				noiseFloorPanel;
+		IBOutlet NSTextField*			noiseFloorOffsetField;
+		IBOutlet NSTextField*			noiseFloorStateField;
+		IBOutlet NSButton*				startNoiseFloorButton;
+		IBOutlet NSProgressIndicator*	noiseFloorProgress;
 		
 };
 #pragma mark •••Initialization
@@ -107,6 +115,8 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) noiseFloorChanged:(NSNotification*)aNote;
+- (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
 - (void) histLastEntryChanged:(NSNotification*)aNote;
 - (void) histFirstEntryChanged:(NSNotification*)aNote;
 - (void) histClrModeChanged:(NSNotification*)aNote;
@@ -192,8 +202,14 @@
 - (IBAction) readRegAction: (id) sender;
 - (IBAction) writeRegAction: (id) sender;
 - (IBAction) setDefaultsAction: (id) sender;
+- (IBAction) openNoiseFloorPanel:(id)sender;
+- (IBAction) closeNoiseFloorPanel:(id)sender;
+- (IBAction) findNoiseFloors:(id)sender;
+- (IBAction) noiseFloorOffsetAction:(id)sender;
+
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 
+	
 #pragma mark •••Plot DataSource
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x ;

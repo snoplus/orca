@@ -283,10 +283,18 @@
                          name : ORIpeV4FLTModelHistLastEntryChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(noiseFloorChanged:)
+                         name : ORIpeV4FLTNoiseFloorChanged
+                       object : model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(noiseFloorOffsetChanged:)
+                         name : ORIpeV4FLTNoiseFloorOffsetChanged
+                       object : model];
 }
 
 #pragma mark •••Interface Management
-
 - (void) histLastEntryChanged:(NSNotification*)aNote
 {
 	[histLastEntryField setIntValue: [model histLastEntry]];
@@ -435,6 +443,8 @@
 	[self histClrModeChanged:nil];
 	[self histFirstEntryChanged:nil];
 	[self histLastEntryChanged:nil];
+	[self noiseFloorChanged:nil];
+	[self noiseFloorOffsetChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -511,6 +521,25 @@
     //TODO: extend the accesstype to "channel" and "block64" -tb-
     [channelPopUp setEnabled: needsChannel];
 }
+
+- (void) noiseFloorChanged:(NSNotification*)aNote
+{
+	if([model noiseFloorRunning]){
+		[noiseFloorProgress startAnimation:self];
+		[startNoiseFloorButton setTitle:@"Stop"];
+	}
+	else {
+		[noiseFloorProgress stopAnimation:self];
+		[startNoiseFloorButton setTitle:@"Start"];
+	}
+	[noiseFloorStateField setStringValue:[model noiseFloorStateString]];
+}
+
+- (void) noiseFloorOffsetChanged:(NSNotification*)aNote
+{
+	[noiseFloorOffsetField setIntValue:[model noiseFloorOffset]];
+}
+
 
 - (void) testEnabledArrayChanged:(NSNotification*)aNotification
 {
@@ -750,6 +779,38 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) openNoiseFloorPanel:(id)sender
+{
+	[self endEditing];
+    [NSApp beginSheet:noiseFloorPanel modalForWindow:[self window]
+		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+- (IBAction) closeNoiseFloorPanel:(id)sender
+{
+    [noiseFloorPanel orderOut:nil];
+    [NSApp endSheet:noiseFloorPanel];
+}
+
+- (IBAction) findNoiseFloors:(id)sender
+{
+	[noiseFloorPanel endEditingFor:nil];		
+    @try {
+        NSLog(@"IPE V4 FLT (slot %d) Finding Thresholds \n",[model slot]);
+		[model findNoiseFloors];
+    }
+	@catch(NSException* localException) {
+        NSLog(@"Threshold Finder for IPE V4 FLT Board FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Threshold finder", @"OK", nil, nil,
+                        localException);
+    }
+}
+- (IBAction) noiseFloorOffsetAction:(id)sender
+{
+    if([sender intValue] != [model noiseFloorOffset]){
+        [model setNoiseFloorOffset:[sender intValue]];
+    }
+}
 
 - (IBAction) histClrModeAction:(id)sender
 {
