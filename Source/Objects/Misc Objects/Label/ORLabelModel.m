@@ -264,7 +264,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     //---------------------------------------------------------------------------------------------------
 	if(label){
 		NSAttributedString* n = [self stringToDisplay:NO];
-		if([n length] == 0)n = [[[NSMutableAttributedString alloc] initWithString:@"State Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+		if([n length] == 0)n = [[[NSMutableAttributedString alloc] initWithString:@"Text Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 																												[NSFont fontWithName:@"Monaco" size:textSize],NSFontAttributeName,nil]] autorelease];
 		NSSize theSize = [n size];
 
@@ -277,7 +277,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		[i release];
     }
 	else {
-		[self setImage:[NSImage imageNamed:@"Label"]];
+		[self setImage:[NSImage imageNamed:@"Text Label"]];
 	}
     [[NSNotificationCenter defaultCenter]
                 postNotificationName:OROrcaObjectImageChanged

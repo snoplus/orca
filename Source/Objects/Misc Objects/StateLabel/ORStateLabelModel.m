@@ -48,6 +48,36 @@ NSString* ORLabelModelFalseColorChanged = @"ORLabelModelFalseColorChanged";
 {
     [self linkToController:@"ORStateLabelController"];
 }
+- (void) setUpImage
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setupImage) object:nil];
+	
+    //---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so that each Label can have its own version for drawing into.
+    //---------------------------------------------------------------------------------------------------
+	if(label){
+		NSAttributedString* n = [self stringToDisplay:NO];
+		if([n length] == 0)n = [[[NSMutableAttributedString alloc] initWithString:@"State Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+																											 [NSFont fontWithName:@"Monaco" size:textSize],NSFontAttributeName,nil]] autorelease];
+		NSSize theSize = [n size];
+		
+		NSImage* i = [[NSImage alloc] initWithSize:theSize];
+		[i lockFocus];
+		
+		[n drawInRect:NSMakeRect(0,0,theSize.width,theSize.height)];
+		[i unlockFocus];
+		[self setImage:i];
+		[i release];
+    }
+	else {
+		[self setImage:[NSImage imageNamed:@"Label"]];
+	}
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:OROrcaObjectImageChanged
+	 object:self];
+	scheduledForUpdate = NO;
+}
 
 #pragma mark ***Accessors
 - (int) boolType
