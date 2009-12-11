@@ -522,7 +522,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 								 [NSNumber numberWithBool:YES],						@"variable",
 								 [NSNumber numberWithLong:-1],	@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Caen965"];
+    [dataDictionary setObject:aDictionary forKey:@"Qdc"];
     
     return dataDictionary;
 }
