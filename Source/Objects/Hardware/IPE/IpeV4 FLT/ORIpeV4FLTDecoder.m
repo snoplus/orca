@@ -37,17 +37,17 @@
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
- ^ ^^^---------------------------crate
- ^ ^^^^---------------------card
- ^^^^ ^^^^ ----------channel
+		 ^ ^^^---------------------------crate
+			  ^ ^^^^---------------------card
+                               ^^^^ ^^^^ ----------channel
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ^^^^ ^^^^------------------------------ channel (0..22)
- ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+             ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
- ^^ ^^^^ ^^^^ eventID (0..1024)
+			  ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
+                            ^^ ^^^^ ^^^^ eventID (0..1024)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  </pre>
  *
@@ -58,23 +58,16 @@
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 {
     unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
-	++ptr;										 
-	//crate and card from second word
-	unsigned char crate		= (*ptr>>21) & 0xf;
-	unsigned char card		= (*ptr>>16) & 0x1f;
-	unsigned char chan		= (*ptr>>8) & 0xff;
+	unsigned long length	= ExtractLength(ptr[0]);								 
+	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
+	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
+	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
-	++ptr;	//point to the sec
-	++ptr;	//point to the sub sec
-	++ptr;	//point to the channel map
-	++ptr;	//point to the eventID
-	++ptr;	//point to the energy
 		
 	//channel by channel histograms
-	unsigned long energy = *ptr; ///16; removed the /16 for Brandon... may leave it out
+	unsigned long energy = ptr[6]; ///*16; removed the /16 for Brandon... may leave it out
 	[aDataSet histogram:energy 
 				numBins:65535 
 				 sender:self  
@@ -99,37 +92,27 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    NSString* title= @"Katrin FLT Energy Record\n\n";
-	++ptr;		//skip the first word (dataID and length)
-    
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8)  & 0xff];
+    NSString* title= @"Katrin FLT Energy Record\n\n";    
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",ShiftAndExtract(ptr[1],8,0xff)];
+		
 	
-	
-	/*
-	++ptr;		//point to event struct
-	katrinEventDataStruct* ePtr = (katrinEventDataStruct*)ptr;			//recast to event structure
-	
-	NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",ePtr->energy];
-	
-	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
+	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ptr[2]];
 	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
 	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
 	
-	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
-	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n", ePtr->subSec];
-	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %d\n", ePtr->eventID & 0xffff];
-    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n", ePtr->eventID >> 16];
-	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
+	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n",     ptr[2]];
+	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n",     ptr[3]];
+	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ptr[4]];	
+    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n",     ptr[5]];
 	
+	NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",     ptr[6]];
+
 	
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
-			energy,eventDate,eventTime,seconds,subSec,eventID,nPages,chMap];               
-	*/ ///todo......
-    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
+			energy,eventDate,eventTime,seconds,subSec,nPages,chMap];               
     	
-	return @"to be done";
 }
 @end
 
@@ -170,23 +153,16 @@
 {
 
 	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
-	++ptr;										 
-	//crate and card from second word
-	unsigned char crate		= (*ptr>>21) & 0xf;
-	unsigned char card		= (*ptr>>16) & 0x1f;
-	unsigned char chan		= (*ptr>>8) & 0xff;
+	unsigned long length	= ExtractLength(ptr[0]);
+	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
+	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
+	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
-	++ptr;	//point to the sec
-	++ptr;	//point to the sub sec
-	++ptr;	//point to the channel map
-	++ptr;	//point to the eventID
-	++ptr;	//point to the energy
-	
+
 	//channel by channel histograms
-	unsigned long energy = *ptr; ///16; removed the /16 for Brandon... may leave it out
+	unsigned long energy = ptr[6]; ///*16; removed the /16 for Brandon... may leave it out
 	[aDataSet histogram:energy 
 				numBins:65535 
 				 sender:self  
@@ -263,29 +239,26 @@
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
-	++ptr;										 
-	//crate and card from second word
-	unsigned char crate		= (*ptr>>21) & 0xf;
-	unsigned char card		= (*ptr>>16) & 0x1f;
+	unsigned long length	= ExtractLength(ptr[0]);
+	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
+	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
-	++ptr;	//point to the sec
-	unsigned long seconds= *ptr;
-	++ptr;	//point to hit rate length
-	++ptr;	//point to total hitrate
-	unsigned long hitRateTotal = *ptr;
-	++ptr;	//point to total hitrate
+	unsigned long seconds	= ptr[2];
+	unsigned long hitRateTotal = ptr[4];
 	int i;
 	int n = length - 5;
 	for(i=0;i<n;i++){
-		NSString* channelKey	= [self getChannelKey: (*ptr>>20) & 0xff];	
-		unsigned long hitRate = *ptr & 0xffff;
+		int chan = ShiftAndExtract(ptr[5+i],20,0xff);
+		NSString* channelKey	= [self getChannelKey:chan];
+		unsigned long hitRate = ShiftAndExtract(ptr[5+i],0,0xffff);
 		[aDataSet histogram:hitRate
 					numBins:65536 
 					 sender:self  
 				   withKeys: @"FLT",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
-		++ptr;
+
+	    [aDataSet loadData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLT",@"HitRate_2D",crateKey, nil];
+	    [aDataSet sumData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLT",@"HitRateSum_2D",crateKey, nil];
 	}
 	
 	[aDataSet loadTimeSeries: hitRateTotal
@@ -301,14 +274,9 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"Katrin FLT Hit Rate Record\n\n";
-	++ptr;		//skip the first word (dataID and length)
-    
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-	
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
     return [NSString stringWithFormat:@"%@%@%@",title,crate,card];
-	
-	return @"to be done";
 }
 @end
 

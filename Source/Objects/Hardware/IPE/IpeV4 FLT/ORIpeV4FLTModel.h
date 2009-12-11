@@ -136,6 +136,16 @@
     int histClrMode;
     unsigned long histFirstEntry;
     unsigned long histLastEntry;
+	
+	BOOL noiseFloorRunning;
+	int noiseFloorState;
+	long noiseFloorOffset;
+	long noiseFloorLow[kNumFLTChannels];
+	long noiseFloorHigh[kNumFLTChannels];
+	long noiseFloorTestValue[kNumFLTChannels];
+	BOOL oldEnabled[kNumFLTChannels];
+	long oldThreshold[kNumFLTChannels];
+	long newThreshold[kNumFLTChannels];
 }
 
 #pragma mark •••Initialization
@@ -169,6 +179,11 @@
 - (void) setInterruptMask:(unsigned long)aInterruptMask;
 - (unsigned short) hitRateLength;
 - (void) setHitRateLength:(unsigned short)aHitRateLength;
+- (BOOL) noiseFloorRunning;
+- (int) noiseFloorOffset;
+- (void) setNoiseFloorOffset:(int)aNoiseFloorOffset;
+- (void) findNoiseFloors;
+- (NSString*) noiseFloorStateString;
 
 - (unsigned long) histNofMeas;
 - (void) setHistNofMeas:(unsigned long)aHistNofMeas;
@@ -243,6 +258,7 @@
 - (unsigned short) selectedChannelValue;
 - (void) setSelectedChannelValue:(unsigned short) aValue;
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
+- (float) restrictFloatValue:(int)aValue min:(float)aMinValue max:(float)aMaxValue;
 
 #pragma mark •••HW Access
 //all can raise exceptions
@@ -390,6 +406,8 @@ extern NSString* ORIpeV4FLTModelThresholdsChanged;
 extern NSString* ORIpeV4FLTModelModeChanged;
 extern NSString* ORIpeV4FLTSettingsLock;
 extern NSString* ORIpeV4FLTModelEventMaskChanged;
+extern NSString* ORIpeV4FLTNoiseFloorChanged;
+extern NSString* ORIpeV4FLTNoiseFloorOffsetChanged;
 
 extern NSString* ORIpeSLTModelName;
 

@@ -70,6 +70,8 @@ NSString* ORIpeV4FLTModelEventMaskChanged			= @"ORIpeV4FLTModelEventMaskChanged"
 NSString* ORIpeV4FLTSelectedRegIndexChanged			= @"ORIpeV4FLTSelectedRegIndexChanged";
 NSString* ORIpeV4FLTWriteValueChanged				= @"ORIpeV4FLTWriteValueChanged";
 NSString* ORIpeV4FLTSelectedChannelValueChanged		= @"ORIpeV4FLTSelectedChannelValueChanged";
+NSString* ORIpeV4FLTNoiseFloorChanged				= @"ORIpeV4FLTNoiseFloorChanged";
+NSString* ORIpeV4FLTNoiseFloorOffsetChanged			= @"ORIpeV4FLTNoiseFloorOffsetChanged";
 
 static NSString* fltTestName[kNumIpeV4FLTTests]= {
 	@"Run Mode",
@@ -160,6 +162,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (NSAttributedString*) test:(int)testName result:(NSString*)string color:(NSColor*)aColor;
 - (void) enterTestMode;
 - (void) leaveTestMode;
+- (void) stepNoiseFloor;
 @end
 
 @implementation ORIpeV4FLTModel
@@ -208,6 +211,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
+
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
 {
@@ -235,6 +239,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			break;
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelRunModeChanged object:self];
+}
+
+- (BOOL) noiseFloorRunning { return noiseFloorRunning; }
+
+- (int) noiseFloorOffset { return noiseFloorOffset; }
+- (void) setNoiseFloorOffset:(int)aNoiseFloorOffset
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorOffset:noiseFloorOffset];
+    noiseFloorOffset = aNoiseFloorOffset;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTNoiseFloorOffsetChanged object:self];
 }
 
 - (unsigned long) histLastEntry { return histLastEntry; }
@@ -402,13 +416,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (unsigned long) triggerEnabledMask { return triggerEnabledMask; } 
 - (void) setTriggerEnabledMask:(unsigned long)aMask
 {
-    triggerEnabledMask = aMask;
+ 	[[[self undoManager] prepareWithInvocationTarget:self] setTriggerEnabledMask:triggerEnabledMask];
+	triggerEnabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelTriggerEnabledMaskChanged object:self];
 }
 
 - (unsigned long) hitRateEnabledMask { return hitRateEnabledMask; }
 - (void) setHitRateEnabledMask:(unsigned long)aMask
 {
+	[[[self undoManager] prepareWithInvocationTarget:self] setHitRateEnabledMask:hitRateEnabledMask];
     hitRateEnabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateEnabledMaskChanged object:self];
 }
@@ -446,7 +462,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 -(void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
-	if(aThreshold>0xfffff)aThreshold = 0xfffff;
+	aThreshold = [self restrictIntValue:aThreshold min:0 max:0xfffff];
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aThreshold]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -665,6 +681,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
+{
+	if(aValue<aMinValue)	  return aMinValue;
+	else if(aValue>aMaxValue) return aMaxValue;
+	else					  return aValue;
+}
+
+- (float) restrictFloatValue:(int)aValue min:(float)aMinValue max:(float)aMaxValue
 {
 	if(aValue<aMinValue)	  return aMinValue;
 	else if(aValue>aMaxValue) return aMaxValue;
@@ -951,11 +974,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		float newTotal = 0;
 		int chan;
         int hitRateLengthSec = 1<<hitRateLength;
-		
-		struct timeval t;
-		struct timezone tz;
-		gettimeofday(&t,&tz);
-		
+				
 		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 		int dataIndex = 0;
 		unsigned long data[5 + kNumFLTChannels];
@@ -963,7 +982,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		for(chan=0;chan<kNumFLTChannels;chan++){
 			if(hitRateEnabledMask & (1<<chan)){
 				unsigned long aValue = [self readReg:kFLTV4HitRateReg channel:chan];
-				if(aValue){
+				//if(aValue){
 					BOOL overflow = (aValue >> 31) & 0x1;
 					aValue = aValue & 0xffff;
 					
@@ -986,14 +1005,17 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 					
 					data[dataIndex + 5] = (chan<<20) | ((overflow&0x1)<<16) | aValue;
 					dataIndex++;
-				}
+				//}
 			}
 		}
 		
 		if(dataIndex>0){
+			time_t	ut_time;
+			time(&ut_time);
+
 			data[0] = hitRateId | (dataIndex + 5); 
 			data[1] = location;
-			data[2] = t.tv_sec;	
+			data[2] = ut_time;	
 			data[3] = hitRateLengthSec;	
 			data[4] = newTotal;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
@@ -1523,7 +1545,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		NSLog(@"Write: %d\n", (aValue>>0)&0x3ff);
 		
 		unsigned long eventFifo1 = [self readReg: kFLTV4EventFifo1Reg];
-		unsigned long channelMap = (eventFifo1>>10)&0x3ffff;
+		unsigned long channelMap = (eventFifo1>>10)&0xfffff;
 		NSLog(@"Channel Map: 0x%0x\n",channelMap);
 		
 		unsigned long eventFifo2 = [self readReg: kFLTV4EventFifo2Reg];
@@ -1654,7 +1676,29 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		NSLogFont(aFont,@"  %2d -- %10.2f +/-  %10.2f\n", j, mean, var);
 	}
 }
-
+- (void) findNoiseFloors
+{
+	if(noiseFloorRunning){
+		noiseFloorRunning = NO;
+	}
+	else {
+		noiseFloorState = 0;
+		noiseFloorRunning = YES;
+		[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTNoiseFloorChanged object:self];
+}
+- (NSString*) noiseFloorStateString
+{
+	if(!noiseFloorRunning) return @"Idle";
+	else switch(noiseFloorState){
+		case 0: return @"Initializing"; 
+		case 1: return @"Setting Thresholds";
+		case 2: return @"Integrating";
+		case 3: return @"Finishing";
+		default: return @"?";
+	}	
+}
 @end
 
 @implementation ORIpeV4FLTModel (tests)
@@ -1965,9 +2009,118 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
 	return n;
 }
+
 @end
 
 @implementation ORIpeV4FLTModel (private)
+
+- (void) stepNoiseFloor
+{
+	[[self undoManager] disableUndoRegistration];
+	int i;
+	BOOL atLeastOne;
+    @try {
+		switch(noiseFloorState){
+			case 0:
+				//disable all channels
+				for(i=0;i<kNumFLTChannels;i++){
+					oldEnabled[i]   = [self hitRateEnabled:i];
+					oldThreshold[i] = [self threshold:i];
+					[self setThreshold:i withValue:0x7fff];
+					newThreshold[i] = 0x7fff;
+				}
+				atLeastOne = NO;
+				for(i=0;i<kNumFLTChannels;i++){
+					if(oldEnabled[i]){
+						noiseFloorLow[i]			= 0;
+						noiseFloorHigh[i]		= 0x7FFF;
+						noiseFloorTestValue[i]	= 0x7FFF/2;              //Initial probe position
+						[self setThreshold:i withValue:noiseFloorHigh[i]];
+						atLeastOne = YES;
+					}
+				}
+				
+				[ORTimer delay:.2];
+				[self initBoard];
+				
+				if(atLeastOne)	noiseFloorState = 1;
+				else			noiseFloorState = 4; //nothing to do
+			break;
+				
+			case 1:
+				for(i=0;i<kNumFLTChannels;i++){
+					if([self hitRateEnabled:i]){
+						if(noiseFloorLow[i] <= noiseFloorHigh[i]) {
+							[self setThreshold:i withValue:noiseFloorTestValue[i]];
+							
+						}
+						else {
+							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset);
+							[self setThreshold:i withValue:0x7fff];
+							hitRateEnabledMask &= ~(1<<i);
+						}
+					}
+				}
+				[ORTimer delay:.2];
+				[self initBoard];
+				
+				if(hitRateEnabledMask)	noiseFloorState = 2;	//go check for data
+				else					noiseFloorState = 3;	//done
+			break;
+				
+			case 2:
+				//read the hitrates
+				[self readHitRates];
+				
+				for(i=0;i<kNumFLTChannels;i++){
+					if([self hitRateEnabled:i]){
+						if([self hitRate:i] > 10){
+							//there's a rate so we're too low with the threshold
+							[self setThreshold:i withValue:0x7fff];
+							noiseFloorLow[i] = noiseFloorTestValue[i] + 1;
+						}
+						else noiseFloorHigh[i] = noiseFloorTestValue[i] - 1;									//no data so continue lowering threshold
+						noiseFloorTestValue[i] = noiseFloorLow[i]+((noiseFloorHigh[i]-noiseFloorLow[i])/2);     //Next probe position.
+					}
+				}
+				
+				[ORTimer delay:.2];
+				[self initBoard];
+				
+				noiseFloorState = 1;
+				break;
+								
+			case 3: //finish up	
+				//load new results
+				for(i=0;i<kNumFLTChannels;i++){
+					[self setHitRateEnabled:i withValue:oldEnabled[i]];
+					[self setThreshold:i withValue:newThreshold[i]];
+				}
+				[self initBoard];
+				noiseFloorRunning = NO;
+			break;
+		}
+		if(noiseFloorRunning){
+			float timeToWait;
+			if(noiseFloorState==2)	timeToWait = pow(2.,hitRateLength)+.5;
+			else					timeToWait = 0.2;
+			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:timeToWait];
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTNoiseFloorChanged object:self];
+    }
+	@catch(NSException* localException) {
+        int i;
+        for(i=0;i<kNumFLTChannels;i++){
+            [self setHitRateEnabled:i withValue:oldEnabled[i]];
+            [self setThreshold:i withValue:oldThreshold[i]];
+			//[self reset];
+			[self initBoard];
+        }
+		NSLog(@"FLT4 LED threshold finder quit because of exception\n");
+    }
+	[[self undoManager] enableUndoRegistration];
+}
+
 
 - (NSAttributedString*) test:(int)testIndex result:(NSString*)result color:(NSColor*)aColor
 {
