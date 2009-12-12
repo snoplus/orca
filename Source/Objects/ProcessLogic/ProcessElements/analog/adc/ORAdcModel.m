@@ -192,6 +192,24 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	return YES;
 }
 
+- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
+{
+	NSRect f = [self frame];
+	if(viewIconType == 0 || ![self useAltView]) return NSPointInRect(aPoint,f);
+	else if(viewIconType == 1)	return NSPointInRect(aPoint,NSMakeRect(f.origin.x + 152,f.origin.y,f.size.width - 152,f.size.height));
+	else if(viewIconType == 2)	return NSPointInRect(aPoint,NSMakeRect(f.origin.x + 157,f.origin.y,f.size.width - 157,f.size.height));
+	else						return NSPointInRect(aPoint,f);
+}
+
+- (BOOL) intersectsRect:(NSRect) aRect
+{
+	NSRect f = [self frame];
+	if(viewIconType == 0 || ![self useAltView]) return NSIntersectsRect(aRect,f);
+	else if(viewIconType == 1)	return NSIntersectsRect(aRect,NSMakeRect(f.origin.x + 152,f.origin.y,f.size.width - 152,f.size.height));
+	else if(viewIconType == 2)	return NSIntersectsRect(aRect,NSMakeRect(f.origin.x + 157,f.origin.y,f.size.width - 157,f.size.height));
+	else						return NSIntersectsRect(aRect,f);
+}
+
 - (NSImage*) altImage
 {
 	if(viewIconType == 0)return [NSImage imageNamed:@"adcMeter"];
