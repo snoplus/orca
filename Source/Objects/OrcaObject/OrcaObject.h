@@ -127,6 +127,8 @@ extern NSString* ORObjArrayPtrPBType;
 - (NSString*)		fullID;
 
 #pragma mark ¥¥¥Mouse Events
+- (BOOL) intersectsRect:(NSRect) aRect;
+- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint;
 - (void) openHelp:(id)sender;
 - (void) doDoubleClick:(id)sender;
 - (void) doCmdClick:(id)sender;

@@ -393,7 +393,7 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
         OrcaObject* anObject = [orcaObjects objectAtIndex:i];
 
 		BOOL oldHighlighted = [anObject highlighted];
-        if(NSIntersectsRect(aRect,[anObject frame])){      //touched by the selection rect
+        if([anObject intersectsRect:aRect]){ //touched by the selection rect
             [aView setNeedsDisplayInRect:[anObject frame]];
             if(![anObject insideSelectionRect]){
                 [anObject setInsideSelectionRect:YES];

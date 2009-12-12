@@ -238,6 +238,11 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
     return insideSelectionRect;
 }
 
+- (BOOL) intersectsRect:(NSRect) aRect
+{
+	return NSIntersectsRect(aRect,[self frame]);
+}
+
 - (BOOL) skipConnectionDraw
 {
     return skipConnectionDraw;
@@ -524,6 +529,11 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 
 #pragma mark ¥¥¥Mouse Events
+- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
+{
+	return NSPointInRect(aPoint,[self frame]);
+}
+
 - (void) openHelp:(id)sender
 {
 	[[[NSApp delegate] helpCenter] showHelpCenterPage:[self helpURL]];

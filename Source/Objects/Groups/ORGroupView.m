@@ -321,7 +321,7 @@
 			}                
 			continue;
 		}
-		if( NSPointInRect(localPoint,[obj1 frame])){    //obj1 is hit?
+		if( [obj1 acceptsClickAtPoint:localPoint]){
 			if(!cmdKeyDown){
 				if(cntrlKeyDown){
 					[obj1 doCntrlClick:obj1];
