@@ -67,7 +67,11 @@
 - (double) hwValue;
 - (double) maxValue;
 - (void) viewSource;
+
 - (float) evalAndReturnAnalogValue;
+
+- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint;
+- (BOOL) intersectsRect:(NSRect) aRect;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
