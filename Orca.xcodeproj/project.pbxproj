@@ -1529,6 +1529,8 @@
 		84AC6A510A34F9A800A0018E /* NcdPulseChannelsTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */; };
 		84AC6A520A34F9A900A0018E /* NcdPulseChannelsTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */; };
 		84AC6A530A34F9A900A0018E /* NcdPulseChannelsTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */; };
+		84ACBA6410D44258003B9735 /* ORProcessView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84ACBA6210D44258003B9735 /* ORProcessView.m */; };
+		84ACBA6510D44258003B9735 /* ORProcessView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84ACBA6310D44258003B9735 /* ORProcessView.h */; };
 		84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AD4C2D0BA21B7A003C7ABE /* ORWindowListController.h */; };
 		84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */; };
 		84AD4CD70BA23300003C7ABE /* WindowList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */; };
@@ -3646,6 +3648,8 @@
 		84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NcdPulseChannelsTask.h; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.h; sourceTree = SOURCE_ROOT; };
 		84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NcdPulseChannelsTask.m; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.m; sourceTree = SOURCE_ROOT; };
 		84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdPulseChannelsTask.nib; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.nib; sourceTree = SOURCE_ROOT; };
+		84ACBA6210D44258003B9735 /* ORProcessView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORProcessView.m; path = Source/Objects/ProcessLogic/ProcessContainer/ORProcessView.m; sourceTree = SOURCE_ROOT; };
+		84ACBA6310D44258003B9735 /* ORProcessView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORProcessView.h; path = Source/Objects/ProcessLogic/ProcessContainer/ORProcessView.h; sourceTree = SOURCE_ROOT; };
 		84AD4C2D0BA21B7A003C7ABE /* ORWindowListController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORWindowListController.h; path = "Source/Main Dialogs/WindowList/ORWindowListController.h"; sourceTree = SOURCE_ROOT; };
 		84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORWindowListController.m; path = "Source/Main Dialogs/WindowList/ORWindowListController.m"; sourceTree = SOURCE_ROOT; };
 		84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowList.nib; path = "Source/Main Dialogs/WindowList/WindowList.nib"; sourceTree = SOURCE_ROOT; };
@@ -5186,6 +5190,8 @@
 				840EFFA70944B28F00049827 /* ORProcessController.m */,
 				840EFFA80944B28F00049827 /* ORProcessModel.h */,
 				840EFFA90944B28F00049827 /* ORProcessModel.m */,
+				84ACBA6210D44258003B9735 /* ORProcessView.m */,
+				84ACBA6310D44258003B9735 /* ORProcessView.h */,
 				840EFFAA0944B28F00049827 /* Process.nib */,
 				840EFFAB0944B28F00049827 /* Process.tif */,
 			);
@@ -10427,6 +10433,7 @@
 				849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */,
 				8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */,
 				84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */,
+				84ACBA6510D44258003B9735 /* ORProcessView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11833,6 +11840,7 @@
 				849516B710C95382001C8112 /* ORStateLabelController.m in Sources */,
 				849516B910C95382001C8112 /* ORStateLabelModel.m in Sources */,
 				8455097B10CEF7DD008A019C /* ORCaen965Decoder.m in Sources */,
+				84ACBA6410D44258003B9735 /* ORProcessView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
