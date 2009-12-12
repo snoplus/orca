@@ -247,6 +247,23 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 	}
 }
 
+- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
+{
+	if(![self canBeInAltView]) return NO;
+	else return [super acceptsClickAtPoint:aPoint];
+}
+- (BOOL) intersectsRect:(NSRect) aRect
+{
+	if(![self canBeInAltView]) return NO;
+	else return [super intersectsRect:aRect];
+}
+
+- (ORConnector*) requestsConnection: (NSPoint)aPoint
+{
+	if(![self useAltView] || ![self canBeInAltView])	return [super requestsConnection:aPoint];
+	else return nil;
+}
+
 - (NSRect) frame
 {
 	if(![self useAltView] || ![self canBeInAltView])	return [super frame];

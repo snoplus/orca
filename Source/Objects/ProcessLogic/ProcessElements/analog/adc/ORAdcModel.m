@@ -195,10 +195,13 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
 {
 	NSRect f = [self frame];
-	if(viewIconType == 0 || ![self useAltView]) return NSPointInRect(aPoint,f);
-	else if(viewIconType == 1)	return NSPointInRect(aPoint,NSMakeRect(f.origin.x + 152,f.origin.y,f.size.width - 152,f.size.height));
-	else if(viewIconType == 2)	return NSPointInRect(aPoint,NSMakeRect(f.origin.x + 157,f.origin.y,f.size.width - 157,f.size.height));
-	else						return NSPointInRect(aPoint,f);
+	if([super useAltView]) return [super acceptsClickAtPoint:aPoint];
+	else {
+		if(viewIconType == 0) return [super acceptsClickAtPoint:aPoint];
+		else if(viewIconType == 1)	return NSPointInRect(aPoint,NSMakeRect(f.origin.x + 152,f.origin.y,f.size.width - 152,f.size.height));
+		else if(viewIconType == 2)	return NSPointInRect(aPoint,NSMakeRect(f.origin.x + 157,f.origin.y,f.size.width - 157,f.size.height));
+		else						return NSPointInRect(aPoint,f);
+	}
 }
 
 - (BOOL) intersectsRect:(NSRect) aRect
