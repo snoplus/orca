@@ -257,7 +257,6 @@
 		840B72200948AE3A00B1B135 /* smallLock.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840B721E0948AE3900B1B135 /* smallLock.tif */; };
 		840B78F9094A47AF00B1B135 /* Inverter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840B78F6094A47AF00B1B135 /* Inverter.tif */; };
 		840B78FA094A47B000B1B135 /* ORInverterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B78F7094A47AF00B1B135 /* ORInverterModel.h */; };
-		840B78FB094A47B000B1B135 /* ORInverterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B78F8094A47AF00B1B135 /* ORInverterModel.m */; };
 		840B795A094A564E00B1B135 /* NandGate.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840B7957094A564E00B1B135 /* NandGate.tif */; };
 		840B795B094A564E00B1B135 /* ORNandGateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B7958094A564E00B1B135 /* ORNandGateModel.h */; };
 		840B795C094A564E00B1B135 /* ORNandGateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B7959094A564E00B1B135 /* ORNandGateModel.m */; };
@@ -2582,7 +2581,6 @@
 		840B721F0948AE3900B1B135 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/smallLock.tif; sourceTree = "<group>"; };
 		840B78F6094A47AF00B1B135 /* Inverter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Inverter.tif; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/Inverter.tif; sourceTree = SOURCE_ROOT; };
 		840B78F7094A47AF00B1B135 /* ORInverterModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORInverterModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/ORInverterModel.h; sourceTree = SOURCE_ROOT; };
-		840B78F8094A47AF00B1B135 /* ORInverterModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORInverterModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/ORInverterModel.m; sourceTree = SOURCE_ROOT; };
 		840B7957094A564E00B1B135 /* NandGate.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NandGate.tif; path = Source/Objects/ProcessLogic/ProcessElements/Logic/NandGate/NandGate.tif; sourceTree = SOURCE_ROOT; };
 		840B7958094A564E00B1B135 /* ORNandGateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORNandGateModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/NandGate/ORNandGateModel.h; sourceTree = SOURCE_ROOT; };
 		840B7959094A564E00B1B135 /* ORNandGateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORNandGateModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/NandGate/ORNandGateModel.m; sourceTree = SOURCE_ROOT; };
@@ -4997,7 +4995,6 @@
 			children = (
 				840B78F6094A47AF00B1B135 /* Inverter.tif */,
 				840B78F7094A47AF00B1B135 /* ORInverterModel.h */,
-				840B78F8094A47AF00B1B135 /* ORInverterModel.m */,
 			);
 			name = Inverter;
 			path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter;
@@ -11460,7 +11457,6 @@
 				84B48981094506C000DFC618 /* OROneShotController.m in Sources */,
 				84B48983094506C000DFC618 /* OROneShotModel.m in Sources */,
 				84B489BC0945142300DFC618 /* ORInvertedOutputNub.m in Sources */,
-				840B78FB094A47B000B1B135 /* ORInverterModel.m in Sources */,
 				840B795C094A564E00B1B135 /* ORNandGateModel.m in Sources */,
 				840B798E094A589200B1B135 /* ORNorGateModel.m in Sources */,
 				840B79A0094A5BD400B1B135 /* ORXorGateModel.m in Sources */,
