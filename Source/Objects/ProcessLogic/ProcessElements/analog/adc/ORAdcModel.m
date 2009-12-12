@@ -195,7 +195,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (NSImage*) altImage
 {
 	if(viewIconType == 0)return [NSImage imageNamed:@"adcMeter"];
-	else if(viewIconType == 1)return [NSImage imageNamed:@"adcHorizontalBar"]; //temp
+	else if(viewIconType == 1)return [NSImage imageNamed:@"adcHorizontalBar"];
 	else if(viewIconType == 2)return [NSImage imageNamed:@"adcHorizontalBar"];
 	else return [NSImage imageNamed:@"adcMeter"];
 }
@@ -340,7 +340,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	if(![self useAltView])	aCachedImage = [self image];
 	else					aCachedImage = [self altImage];		
 	
-	if(!aCachedImage)return;
+	if(!aCachedImage || [aCachedImage size].width<1 || [aCachedImage size].height<1)return;
 	
     NSSize theIconSize = [aCachedImage size];
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];

@@ -1990,6 +1990,7 @@
 		84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */; };
 		84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
+		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
 		84F03CDA059A145E00275624 /* ORGlobal.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F03CD8059A145E00275624 /* ORGlobal.h */; };
 		84F03CDB059A145E00275624 /* ORGlobal.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F03CD9059A145E00275624 /* ORGlobal.m */; };
 		84F03E6705A0995400275624 /* muxBoxSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84F03E6605A0995400275624 /* muxBoxSmall.gif */; };
@@ -4219,6 +4220,7 @@
 		84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoBit3DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoBit3DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthesizeSingleton.h; path = Source/Misc/SynthesizeSingleton.h; sourceTree = SOURCE_ROOT; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
+		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
 		84F03CD8059A145E00275624 /* ORGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGlobal.h; sourceTree = "<group>"; };
 		84F03CD9059A145E00275624 /* ORGlobal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGlobal.m; sourceTree = "<group>"; };
 		84F03E6605A0995400275624 /* muxBoxSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = muxBoxSmall.gif; path = Source/Experiments/Ncd/Detector/muxBoxSmall.gif; sourceTree = SOURCE_ROOT; };
@@ -5609,6 +5611,7 @@
 				84216087094F8910002E68B7 /* ORAdcController.m */,
 				84522B9510CD723E0077DDFF /* adcMeter.tif */,
 				84522D4810CD90600077DDFF /* adcHorizontalBar.tif */,
+				84EE7DC410D2BEC200BBCBE5 /* adcText.tif */,
 				8421607A094F861E002E68B7 /* adc.tif */,
 				84216088094F8910002E68B7 /* Adc.nib */,
 			);
@@ -11090,6 +11093,7 @@
 				849516BB10C95382001C8112 /* StateLabel.tif in Resources */,
 				84522B9610CD723E0077DDFF /* adcMeter.tif in Resources */,
 				84522D4910CD90600077DDFF /* adcHorizontalBar.tif in Resources */,
+				84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
