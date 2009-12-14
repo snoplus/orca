@@ -41,7 +41,7 @@ typedef struct { // -tb- 2008-02-27
     int32_t maxHistogramLength;
     int32_t binSize;
     int32_t offsetEMin;
-} katrinHistogramDataStruct;
+} katrinV4HistogramDataStruct;
 
 
 #endif

@@ -401,7 +401,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 	++ptr;		//point to event struct
 	
 	
-	katrinHistogramDataStruct* ePtr = (katrinHistogramDataStruct*) ptr;
+	katrinV4HistogramDataStruct* ePtr = (katrinV4HistogramDataStruct*) ptr;
     #if 0 //debug output -tb-
 	NSLog(@"Keys:%@ %@ %@ %@ %@ \n", @"FLT",@"HitrateTimeSerie",crateKey,stationKey,channelKey);
 	NSLog(@"  readoutSec = %d \n", ePtr->readoutSec);
@@ -415,7 +415,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 	NSLog(@"  offsetEMin = %d \n", ePtr->offsetEMin);
     #endif
 
-    ptr = ptr + (sizeof(katrinHistogramDataStruct)/sizeof(long));// points now to the histogram data -tb-
+    ptr = ptr + (sizeof(katrinV4HistogramDataStruct)/sizeof(long));// points now to the histogram data -tb-
     
     #if 0
     {
@@ -570,7 +570,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
     NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
 	++ptr;		//point to next structure
 
-	katrinHistogramDataStruct* ePtr = (katrinHistogramDataStruct*)ptr;			//recast to event structure
+	katrinV4HistogramDataStruct* ePtr = (katrinV4HistogramDataStruct*)ptr;			//recast to event structure
 
 	NSLog(@" readoutSec = %d \n", ePtr->readoutSec);
 	//NSLog(@" recordingTimeSec = %d \n", ePtr->recordingTimeSec);

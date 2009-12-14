@@ -29,8 +29,9 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 
-NSString* ORIpeV4FLTModelHistLastEntryChanged = @"ORIpeV4FLTModelHistLastEntryChanged";
-NSString* ORIpeV4FLTModelHistFirstEntryChanged = @"ORIpeV4FLTModelHistFirstEntryChanged";
+NSString* ORIpeV4FLTModelHistPageABChanged          = @"ORIpeV4FLTModelHistPageABChanged";
+NSString* ORIpeV4FLTModelHistLastEntryChanged       = @"ORIpeV4FLTModelHistLastEntryChanged";
+NSString* ORIpeV4FLTModelHistFirstEntryChanged      = @"ORIpeV4FLTModelHistFirstEntryChanged";
 NSString* ORIpeV4FLTModelHistClrModeChanged			= @"ORIpeV4FLTModelHistClrModeChanged";
 NSString* ORIpeV4FLTModelHistModeChanged			= @"ORIpeV4FLTModelHistModeChanged";
 NSString* ORIpeV4FLTModelHistEBinChanged			= @"ORIpeV4FLTModelHistEBinChanged";
@@ -210,6 +211,17 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark •••Accessors
+
+- (int) histPageAB
+{
+    return histPageAB;
+}
+
+- (void) setHistPageAB:(int)aHistPageAB
+{
+    histPageAB = aHistPageAB;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistPageABChanged object:self];
+}
 
 
 - (int) runMode { return runMode; }
@@ -1035,6 +1047,26 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(1<<[self hitRateLength])];
 }
 
+
+- (void) readHistogrammingStatus
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
+
+    int histoUpdateRate = 1; // sec
+    unsigned long recTime = [self readReg:kFLTV4HistRecTimeReg];
+    unsigned long histoID = [self readReg:kFLTV4HistNumMeasReg];
+    unsigned long pageAB  = ([self readReg:kFLTV4StatusReg] >>28) & 0x1;
+    
+    NSLog(@"HistoStatus: recTime: %i  histoID: %i, pageAB: %i \n",recTime,histoID, pageAB);
+    [self setHistRecTime: recTime];
+    [self setHistNofMeas: histoID];
+    [self setHistPageAB: pageAB];
+    
+	[self performSelector:@selector(readHistogrammingStatus) withObject:nil afterDelay:histoUpdateRate];
+}
+
+
+
 - (NSString*) rateNotification
 {
 	return ORIpeV4FLTModelHitRateChanged;
@@ -1294,6 +1326,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
 	}
 	
+	if(runMode == kIpeFlt_Histogram_Mode){
+		[self performSelector:@selector(readHistogrammingStatus) 
+				   withObject:nil
+				   afterDelay: 1];		//start reading out histogram timer and page toggle
+	}
+	
+	
 	
 	//cache some addresses for speed in the dataTaking loop.
 	unsigned long theSlotPart = [self slot]<<24;
@@ -1325,6 +1364,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeRunControl:NO];
 	[self setLedOff:YES];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
 	int chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		hitRate[chan] = 0;

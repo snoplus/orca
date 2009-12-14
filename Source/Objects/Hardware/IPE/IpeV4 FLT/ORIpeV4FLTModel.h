@@ -146,6 +146,7 @@
 	BOOL oldEnabled[kNumFLTChannels];
 	long oldThreshold[kNumFLTChannels];
 	long newThreshold[kNumFLTChannels];
+    int histPageAB;
 }
 
 #pragma mark •••Initialization
@@ -156,6 +157,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (int) histPageAB;
+- (void) setHistPageAB:(int)aHistPageAB;
 - (int) runMode;
 - (void) setRunMode:(int)aRunMode;
 - (void) setToDefaults;
@@ -289,6 +292,7 @@
 - (unsigned long) hitRateEnabledMask;
 - (void) setHitRateEnabledMask:(unsigned long)aMask;
 - (void) readHitRates;
+- (void) readHistogrammingStatus;
 - (void) writeTestPattern:(unsigned long*)mask length:(int)len;
 - (void) rewindTestPattern;
 - (void) writeNextPattern:(unsigned long)aValue;
@@ -372,6 +376,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORIpeV4FLTModelHistPageABChanged;
 extern NSString* ORIpeV4FLTModelHistLastEntryChanged;
 extern NSString* ORIpeV4FLTModelHistFirstEntryChanged;
 extern NSString* ORIpeV4FLTModelHistClrModeChanged;

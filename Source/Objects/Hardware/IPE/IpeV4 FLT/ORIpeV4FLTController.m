@@ -292,9 +292,20 @@
                      selector : @selector(noiseFloorOffsetChanged:)
                          name : ORIpeV4FLTNoiseFloorOffsetChanged
                        object : model];
+    [notifyCenter addObserver : self
+                     selector : @selector(histPageABChanged:)
+                         name : ORIpeV4FLTModelHistPageABChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) histPageABChanged:(NSNotification*)aNote
+{
+	[histPageABTextField setStringValue: [model histPageAB]?@"B":@"A"];
+	//[histPageABTextField setIntValue: [model histPageAB]];
+}
 - (void) histLastEntryChanged:(NSNotification*)aNote
 {
 	[histLastEntryField setIntValue: [model histLastEntry]];
@@ -445,6 +456,7 @@
 	[self histLastEntryChanged:nil];
 	[self noiseFloorChanged:nil];
 	[self noiseFloorOffsetChanged:nil];
+	[self histPageABChanged:nil];
 }
 
 - (void) checkGlobalSecurity

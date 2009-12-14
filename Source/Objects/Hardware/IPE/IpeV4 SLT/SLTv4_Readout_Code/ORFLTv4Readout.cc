@@ -212,7 +212,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
                                 
                                 //ship data record
-                                totalLength = 2 + (sizeof(katrinHistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
+                                totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
                                 ensureDataCanHold(totalLength); 
                                 data[dataIndex++] = histogramId | totalLength;    
                                 data[dataIndex++] = location | chan<<8;
