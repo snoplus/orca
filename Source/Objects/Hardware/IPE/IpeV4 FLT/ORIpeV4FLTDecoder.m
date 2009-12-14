@@ -252,10 +252,10 @@
 		int chan = ShiftAndExtract(ptr[5+i],20,0xff);
 		NSString* channelKey	= [self getChannelKey:chan];
 		unsigned long hitRate = ShiftAndExtract(ptr[5+i],0,0xffff);
-		[aDataSet histogram:hitRate
-					numBins:65536 
-					 sender:self  
-				   withKeys: @"FLT",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
+		if(hitRate)[aDataSet histogram:hitRate
+							   numBins:65536 
+								sender:self  
+							  withKeys: @"FLT",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
 
 	    [aDataSet loadData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLT",@"HitRate_2D",crateKey, nil];
 	    [aDataSet sumData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLT",@"HitRateSum_2D",crateKey, nil];
