@@ -127,25 +127,21 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         else if(runMode == kIpeFltV4Katrin_Histo_Mode) {    
                 // buffer some data:
                 hw4::FltKatrin *currentFlt = srack->theFlt[col];
-                hw4::SltKatrin *currentSlt = srack->theSlt;
-                //uint32_t pagenr,oldpagenr ;
+                //hw4::SltKatrin *currentSlt = srack->theSlt;
                 uint32_t pageAB,oldpageAB;
-                uint32_t histogramID;
-                uint32_t histogramInfo;
                 //uint32_t pStatus[3];
                 //fprintf(stdout,"FLT %i:runFlags %x\n",col+1, runFlags );fflush(stdout);    
                 //fprintf(stdout,"FLT %i:runFlags %x  pn 0x%x\n",col+1, runFlags,srack->theFlt[col]->histNofMeas->read() );fflush(stdout); 
                 //sleep(1);   
                 if(runFlags & kFirstTimeFlag){// firstTime   
                     //make some plausability checks
-                    uint32_t histogramSettings = currentFlt->histogramSettings->read();
+                    currentFlt->histogramSettings->read();//read to cache
                     if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
                        currentFlt->histogramSettings->histClearModeManual->getCache()){
                         fprintf(stdout,"ORFLTv4Readout.cc: WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n");
                         fflush(stdout);
                     }
                     //store some static data which is constant during run
-                    currentFlt->histogramSettings->read();//read to cache
                     histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
                     histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
                     histoRefreshTime    = currentFlt->histMeasTime->read();
@@ -175,10 +171,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         uint32_t chan=0;
                         uint32_t readoutSec;
                         unsigned long totalLength;
-                        uint32_t lastFirst=0, last,first;
+                        uint32_t last,first;
                         uint32_t histogramID;
-                        //static uint32_t histogramBuffer32[1024]; //comment out to clear compiler warning. mah 11/25/09121122//
-                        static uint32_t shipHistogramBuffer32[2*1024];
+                        static uint32_t shipHistogramBuffer32[2048];
                         histogramID     = currentFlt->histNofMeas->read();;
                         // CHANNEL LOOP ----------------
                         for(chan=0;chan<kNumChan;chan++) {//read out histogram
