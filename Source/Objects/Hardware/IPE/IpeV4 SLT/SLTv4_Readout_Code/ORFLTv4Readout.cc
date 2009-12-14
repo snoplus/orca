@@ -11,7 +11,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     static uint32_t histoRefreshTime = 0;
     
     //
-    uint32_t dataId     = GetHardwareMask()[0];
+    uint32_t dataId     = GetHardwareMask()[0];//this is energy record
     uint32_t waveformId = GetHardwareMask()[1];
     uint32_t histogramId = GetHardwareMask()[2];
     uint32_t col        = GetSlot() - 1; //the mac slots go from 1 to n
@@ -20,13 +20,113 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     
     //not used for now..
     //uint32_t postTriggerTime = config->card_info[index].deviceSpecificData[0];
-    uint32_t eventType = GetDeviceSpecificData()[1];
-    uint32_t runMode   = GetDeviceSpecificData()[2];
-    uint32_t runFlags  = GetDeviceSpecificData()[3];
+    uint32_t eventType  = GetDeviceSpecificData()[1];
+    uint32_t fltRunMode = GetDeviceSpecificData()[2];
+    uint32_t runFlags   = GetDeviceSpecificData()[3];
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
+    uint32_t daqRunMode = GetDeviceSpecificData()[5];
     
     if(srack->theFlt[col]->isPresent()){
-        if(runMode == kIpeFltV4Katrin_Run_Mode){
+        // --- ENERGY MODE ------------------------------
+        if(daqRunMode == kIpeFlt_EnergyMode){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode
+            uint32_t status         = srack->theFlt[col]->status->read();
+            uint32_t fifoStatus = (status >> 24) & 0xf;
+            
+            if(fifoStatus != kFifoEmpty){
+                //TO DO... the number of events to read could (should) be made variable 
+                uint32_t eventN;
+                for(eventN=0;eventN<10;eventN++){
+                    
+                    //should be something in the fifo, check the read/write pointers and read and package up to 10 events.
+                    uint32_t fstatus = srack->theFlt[col]->eventFIFOStatus->read();
+                    uint32_t writeptr = fstatus & 0x3ff;
+                    uint32_t readptr = (fstatus >>16) & 0x3ff;
+                    uint32_t diff = (writeptr-readptr+1024) % 512;
+                    
+                    if(diff>1){
+                        uint32_t f1 = srack->theFlt[col]->eventFIFO1->read();
+                        uint32_t chmap = f1 >> 8;
+                        uint32_t f2 = srack->theFlt[col]->eventFIFO2->read();
+                        uint32_t eventchan;
+                        for(eventchan=0;eventchan<kNumChan;eventchan++){
+                            if(chmap & (0x1L << eventchan)){
+                                //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: ",col,eventchan);fflush(stdout);
+                                uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
+                                uint32_t f4            = srack->theFlt[col]->eventFIFO4->read(eventchan);
+                                uint32_t pagenr        = f3 & 0x3f;
+                                uint32_t energy        = f4 ;
+                                uint32_t evsec        = ( (f1 & 0xff) <<5 )  |  (f2 >>27);  //13 bit
+                                uint32_t evsubsec    = (f2 >> 2) & 0x1ffffff; // 25 bit
+                                
+                                uint32_t waveformLength = 2048; 
+                                if(eventType & kReadWaveForms){
+                                    ensureDataCanHold(9 + waveformLength/2); 
+                                    data[dataIndex++] = waveformId | (9 + waveformLength/2);    
+                                }
+                                else {
+                                    ensureDataCanHold(7); 
+                                    data[dataIndex++] = dataId | 7;    
+                                }
+                                
+
+                                data[dataIndex++] = location | eventchan<<8;
+                                data[dataIndex++] = evsec;        //sec
+                                data[dataIndex++] = evsubsec;    //subsec
+                                data[dataIndex++] = chmap;
+                                data[dataIndex++] = pagenr;        //was listed as the event ID... put in the pagenr for now 
+                                data[dataIndex++] = energy;
+                                
+                                if(eventType & kReadWaveForms){
+                                    static uint32_t waveformBuffer32[64*1024];
+                                    static uint32_t shipWaveformBuffer32[64*1024];
+                                    static uint16_t *waveformBuffer16 = (uint16_t *)(waveformBuffer32);
+                                    static uint16_t *shipWaveformBuffer16 = (uint16_t *)(shipWaveformBuffer32);
+                                    uint32_t triggerPos = 0;
+                                    
+                                    srack->theSlt->pageSelect->write(0x100 | pagenr);
+                                    
+                                    uint32_t adccount;
+                                    for(adccount=0; adccount<1024;adccount++){
+                                        uint32_t adcval = srack->theFlt[col]->ramData->read(eventchan,adccount);
+                                        waveformBuffer32[adccount] = adcval;
+#if 1 //TODO: WORKAROUND - align according to the trigger flag - in future we will use the timestamp, when Denis has fixed it -tb-
+                                        uint32_t adcval1 = adcval & 0xffff;
+                                        uint32_t adcval2 = (adcval >> 16) & 0xffff;
+                                        if(adcval1 & 0x8000) triggerPos = adccount*2;
+                                        if(adcval2 & 0x8000) triggerPos = adccount*2+1;
+#endif
+                                    }
+                                    uint32_t copyindex = (triggerPos + 1024) % 2048; // + postTriggerTime;
+                                    uint32_t i;
+                                    for(i=0;i<waveformLength;i++){
+                                        shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
+                                        copyindex++;
+                                        copyindex = copyindex % 2048;
+                                    }
+                                    
+                                    //simulation mode
+                                    if(0){
+                                        for(i=0;i<waveformLength;i++){
+                                            shipWaveformBuffer16[i]= (i>100)*i;
+                                        }
+                                    }
+                                    //ship waveform
+                                    uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
+                                    data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
+                                    data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
+                                    for(i=0;i<waveformLength32;i++){
+                                        data[dataIndex++] = shipWaveformBuffer32[i];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else break;
+                }
+            }
+        }
+        // --- ENERGY+TRACE MODE ------------------------------
+        else if(daqRunMode == kIpeFlt_EnergyTrace){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode
             uint32_t status         = srack->theFlt[col]->status->read();
             uint32_t  fifoStatus = (status >> 24) & 0xf;
             
@@ -123,8 +223,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 }
             }
         }
-        // HISTOGRAM MODE ------------------------------
-        else if(runMode == kIpeFltV4Katrin_Histo_Mode) {    
+        // --- HISTOGRAM MODE ------------------------------
+        else if(fltRunMode == kIpeFltV4Katrin_Histo_Mode) {    //then fltRunMode == kIpeFltV4Katrin_Histo_Mode
                 // buffer some data:
                 hw4::FltKatrin *currentFlt = srack->theFlt[col];
                 //hw4::SltKatrin *currentSlt = srack->theSlt;
@@ -242,6 +342,11 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     } 
                 }
         }
+        // --- BAD MODE ------------------------------
+        else{
+            fprintf(stdout,"ORFLTv4Readout.cc: WARNING: received unknown DAQ mode!\n"); fflush(stdout);
+        }
+
     }
     return true;
     

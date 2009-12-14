@@ -29,6 +29,7 @@
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
 
+NSString* ORIpeV4FLTModelHistMaxEnergyChanged       = @"ORIpeV4FLTModelHistMaxEnergyChanged";
 NSString* ORIpeV4FLTModelHistPageABChanged          = @"ORIpeV4FLTModelHistPageABChanged";
 NSString* ORIpeV4FLTModelHistLastEntryChanged       = @"ORIpeV4FLTModelHistLastEntryChanged";
 NSString* ORIpeV4FLTModelHistFirstEntryChanged      = @"ORIpeV4FLTModelHistFirstEntryChanged";
@@ -212,11 +213,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
-- (int) histPageAB
+- (int) histMaxEnergy { return histMaxEnergy; }
+//!< A argument -1 will auto-recalculate the maximum energy which fits still into the histogram. -tb-
+- (void) setHistMaxEnergy:(int)aHistMaxEnergy
 {
-    return histPageAB;
+    if(aHistMaxEnergy<0) histMaxEnergy = histEMin + 2048*(1<<histEBin);
+    else histMaxEnergy = aHistMaxEnergy;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistMaxEnergyChanged object:self];
 }
 
+- (int) histPageAB{ return histPageAB; }
 - (void) setHistPageAB:(int)aHistPageAB
 {
     histPageAB = aHistPageAB;
@@ -244,7 +250,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			
 		case kIpeFlt_Histogram_Mode:
 			[self setFltRunMode:kIpeFltV4Katrin_Histo_Mode];
-			readWaveforms = YES; //temp....
 			break;
 			
 		default:
@@ -299,6 +304,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setHistEBin:histEBin];
     histEBin = aHistEBin;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistEBinChanged object:self];
+    
+    //recalc max energy
+    [self setHistMaxEnergy: -1];
 }
 
 - (unsigned long) histEMin { return histEMin;} 
@@ -307,6 +315,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[[[self undoManager] prepareWithInvocationTarget:self] setHistEMin:histEMin];
 	histEMin = aHistEMin;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistEMinChanged object:self];
+
+    //recalc max energy
+    [self setHistMaxEnergy: -1];
 }
 
 - (unsigned long) histNofMeas { return histNofMeas; }
@@ -1387,10 +1398,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
     //for all daq modes
 	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;	
+    //the daq mode (should replace the flt mode)
+    configStruct->card_info[index].deviceSpecificData[5] = runMode;//the daqRunMode
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
-
 
 	
 	return index+1;

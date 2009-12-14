@@ -29,7 +29,9 @@
 @interface ORIpeV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
-	IBOutlet   NSTextField* histPageABTextField;
+        IBOutlet NSTextField*   histMaxEnergyTextField;
+        IBOutlet NSTextField*   histPageABTextField;
+        IBOutlet NSTextField*   fltSlotNumTextField;
 		IBOutlet NSTextField*	histLastEntryField;
 		IBOutlet NSTextField*	histFirstEntryField;
 		IBOutlet NSPopUpButton* histClrModePU;
@@ -116,6 +118,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) histMaxEnergyChanged:(NSNotification*)aNote;
 - (void) histPageABChanged:(NSNotification*)aNote;
 - (void) noiseFloorChanged:(NSNotification*)aNote;
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;

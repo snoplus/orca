@@ -26,11 +26,17 @@
 
 #define kReadWaveForms	0x1 << 0
 
-//flt run modes (sent to hw)
+//flt run modes (sent to hw, FLTv4 control register) -> for fltRunMode -tb-
 #define kIpeFltV4Katrin_StandBy_Mode		0
 #define kIpeFltV4Katrin_Run_Mode			1
 #define kIpeFltV4Katrin_Histo_Mode			2
 #define kIpeFltV4Katrin_Test_Mode			3
+
+//daq run modes set by user in popup -> for daqRunMode -tb-
+#define kIpeFlt_EnergyMode		0
+#define kIpeFlt_EnergyTrace		1
+#define kIpeFlt_Histogram_Mode	2
+
 
 typedef struct { // -tb- 2008-02-27
 	int32_t readoutSec;

@@ -86,8 +86,8 @@
 	ORTimeRate*		totalRate;
     int				analogOffset;
 	unsigned long   statisticOffset; //!< Offset guess used with by the hardware statistical evaluation
-	unsigned long   statisticN;		//! Number of samples used for statistical evaluation
-	unsigned long   eventMask;		//!Bits set for last channels hit.
+	unsigned long   statisticN;		 //!< Number of samples used for statistical evaluation
+	unsigned long   eventMask;		 //!<Bits set for last channels hit.
 	
 	//testing
 	NSMutableArray* testStatusArray;
@@ -112,17 +112,20 @@
     BOOL storeDataInRam;
     BOOL runBoxCarFilter;
     BOOL readWaveforms;
-    int runMode;
+    int runMode;        //!< This is the daqRunMode (not the fltRunMode on the hardware).
+    
     // fields for histogram readout
     unsigned long histRecTime;  //!<the histogram refresh time
     unsigned long histMeasTime; //!<the per-cycle second counter
     unsigned long histNofMeas;  //!<number of histo measurement cycles (0..63)
     unsigned long histEMin;     //!< the energy offset of the histogram
     unsigned long histEBin;     //!<the bin size setting (histBinWidth = 2^histEBin)
+    int histMaxEnergy;
     int histMode;
     int histClrMode;
     unsigned long histFirstEntry;
     unsigned long histLastEntry;
+    int histPageAB;
 	
 	BOOL noiseFloorRunning;
 	int noiseFloorState;
@@ -133,7 +136,6 @@
 	BOOL oldEnabled[kNumFLTChannels];
 	long oldThreshold[kNumFLTChannels];
 	long newThreshold[kNumFLTChannels];
-    int histPageAB;
 }
 
 #pragma mark •••Initialization
@@ -144,6 +146,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (int) histMaxEnergy;
+- (void) setHistMaxEnergy:(int)aHistMaxEnergy;
 - (int) histPageAB;
 - (void) setHistPageAB:(int)aHistPageAB;
 - (int) runMode;
@@ -363,6 +367,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORIpeV4FLTModelHistMaxEnergyChanged;
 extern NSString* ORIpeV4FLTModelHistPageABChanged;
 extern NSString* ORIpeV4FLTModelHistLastEntryChanged;
 extern NSString* ORIpeV4FLTModelHistFirstEntryChanged;

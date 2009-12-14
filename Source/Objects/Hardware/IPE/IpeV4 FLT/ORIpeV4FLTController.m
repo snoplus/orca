@@ -297,9 +297,19 @@
                          name : ORIpeV4FLTModelHistPageABChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(histMaxEnergyChanged:)
+                         name : ORIpeV4FLTModelHistMaxEnergyChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) histMaxEnergyChanged:(NSNotification*)aNote
+{
+	[histMaxEnergyTextField setIntValue: [model histMaxEnergy]];
+}
 
 - (void) histPageABChanged:(NSNotification*)aNote
 {
@@ -457,6 +467,7 @@
 	[self noiseFloorChanged:nil];
 	[self noiseFloorOffsetChanged:nil];
 	[self histPageABChanged:nil];
+	[self histMaxEnergyChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -674,6 +685,7 @@
 {
 	// Set title of FLT configuration window, ak 15.6.07
 	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V4 FLT Card (Slot %d)",[model stationNumber]]];
+    [fltSlotNumTextField setStringValue: [NSString stringWithFormat:@"FLT %d",[model stationNumber]]];
 }
 
 - (void) gainArrayChanged:(NSNotification*)aNotification
