@@ -196,7 +196,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
 
                                 //prepare data record
-                                katrinHistogramDataStruct theEventData;
+                                katrinV4HistogramDataStruct theEventData;
                                 theEventData.readoutSec = readoutSec;
                                 theEventData.recordingTimeSec =  0;//histoRunTime;   
                                 theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
