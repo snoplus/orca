@@ -30,6 +30,7 @@
 #import "ORDataTypeAssigner.h"
 #import "PMC_Link.h"
 #import "SLTv4_HW_Definitions.h"
+#import "ORPMCReadWriteCommand.h"
 
 //IPE V4 register definitions
 enum IpeV4Enum {
@@ -750,6 +751,24 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 }
 
+- (id) writeHardwareRegisterCmd:(unsigned long) regAddress value:(unsigned long) aValue
+{
+	return [ORPMCReadWriteCommand writeLongBlock:&aValue
+									   atAddress:regAddress
+									  numToWrite:1];
+}
+
+- (id) readHardwareRegisterCmd:(unsigned long) regAddress
+{
+	return [ORPMCReadWriteCommand readLongBlockAtAddress:regAddress
+									  numToRead:1];
+}
+
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	[pmcLink executeCommandList:aList];
+}
+
 - (void) readAllStatus
 {
 	//[self readControlReg];
@@ -767,6 +786,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	unsigned long data = [self readReg:kSltV4PageSelectReg];
 	return data;
 }
+
 - (unsigned long) readStatusReg
 {
 	unsigned long data = [self readReg:kSltV4StatusReg];

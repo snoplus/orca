@@ -28,6 +28,7 @@
 #import "ORTest.h"
 #import "SBC_Config.h"
 #import "SLTv4_HW_Definitions.h"
+#import "ORCommandList.h"
 
 NSString* ORIpeV4FLTModelHistMaxEnergyChanged       = @"ORIpeV4FLTModelHistMaxEnergyChanged";
 NSString* ORIpeV4FLTModelHistPageABChanged          = @"ORIpeV4FLTModelHistPageABChanged";
@@ -1001,10 +1002,23 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 		int dataIndex = 0;
 		unsigned long data[5 + kNumFLTChannels];
+
+		NSLog(@"hitrate: %d\n",[self readReg:kFLTV4HitRateReg channel:10]& 0xffff);
 		
+		//combine all the hitrate read commands into one command packet
+		ORCommandList* aList = [ORCommandList commandList];
 		for(chan=0;chan<kNumFLTChannels;chan++){
 			if(hitRateEnabledMask & (1<<chan)){
-				unsigned long aValue = [self readReg:kFLTV4HitRateReg channel:chan];
+				[aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
+			}
+		}
+		
+		[self executeCommandList:aList];
+		
+		//pull out the result
+		for(chan=0;chan<kNumFLTChannels;chan++){
+			if(hitRateEnabledMask & (1<<chan)){
+				unsigned long aValue = [aList longValueForCmd:chan];
 				BOOL overflow = (aValue >> 31) & 0x1;
 				aValue = aValue & 0xffff;
 				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
@@ -1053,6 +1067,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(1<<[self hitRateLength])];
 }
 
+- (id) readRegCmd:(unsigned long) aRegister channel:(short) aChannel
+{
+	unsigned long theAddress = [self regAddress:aRegister channel:aChannel];
+	return [[[self crate] adapter] readHardwareRegisterCmd:theAddress];		
+}
+
+- (id) writeRegCmd:(unsigned long) aRegister channel:(short) aChannel
+{
+	unsigned long theAddress = [self regAddress:aRegister channel:aChannel];
+	return [[[self crate] adapter] writeHardwareRegisterCmd:theAddress value:aChannel];		
+}
+
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	[[[self crate] adapter] executeCommandList:aList];
+}
 
 - (void) readHistogrammingStatus
 {

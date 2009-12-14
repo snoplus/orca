@@ -281,6 +281,8 @@
 
 - (void)		  writeReg:(int)index value:(unsigned long)aValue;
 - (unsigned long) readReg:(int) index;
+- (id) writeHardwareRegisterCmd:(unsigned long)regAddress value:(unsigned long) aValue;
+- (id) readHardwareRegisterCmd:(unsigned long)regAddress;
 - (unsigned long) readHwVersion;
 - (unsigned long long) readDeadTime;
 - (unsigned long long) readVetoTime;
