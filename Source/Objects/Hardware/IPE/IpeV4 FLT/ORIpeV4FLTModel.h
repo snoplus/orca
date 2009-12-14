@@ -264,9 +264,12 @@
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel;
 - (void) writeReg:(int)aReg value:(unsigned long)aValue;
 - (void) writeReg:(int)aReg channel:(int)aChannel value:(unsigned long)aValue;
+
 - (void) executeCommandList:(ORCommandList*)aList;
 - (id) readRegCmd:(unsigned long) aRegister channel:(short) aChannel;
-- (id) writeRegCmd:(unsigned long) aRegister channel:(short) aChannel;
+- (id) writeRegCmd:(unsigned long) aRegister channel:(short) aChannel value:(unsigned long)aValue;
+- (id) readRegCmd:(unsigned long) aRegister;
+- (id) writeRegCmd:(unsigned long) aRegister value:(unsigned long)aValue;
 
 - (unsigned long)  readSeconds;
 - (void)  writeSeconds:(unsigned long)aValue;

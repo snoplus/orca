@@ -1065,22 +1065,36 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(1<<[self hitRateLength])];
 }
 
+//------------------
+//command Lists
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	[[[self crate] adapter] executeCommandList:aList];
+}
+
 - (id) readRegCmd:(unsigned long) aRegister channel:(short) aChannel
 {
 	unsigned long theAddress = [self regAddress:aRegister channel:aChannel];
 	return [[[self crate] adapter] readHardwareRegisterCmd:theAddress];		
 }
 
-- (id) writeRegCmd:(unsigned long) aRegister channel:(short) aChannel
+- (id) readRegCmd:(unsigned long) aRegister
 {
-	unsigned long theAddress = [self regAddress:aRegister channel:aChannel];
-	return [[[self crate] adapter] writeHardwareRegisterCmd:theAddress value:aChannel];		
+	return [[[self crate] adapter] readHardwareRegisterCmd:[self regAddress:aRegister]];		
 }
 
-- (void) executeCommandList:(ORCommandList*)aList
+- (id) writeRegCmd:(unsigned long) aRegister channel:(short) aChannel value:(unsigned long)aValue
 {
-	[[[self crate] adapter] executeCommandList:aList];
+	unsigned long theAddress = [self regAddress:aRegister channel:aChannel];
+	return [[[self crate] adapter] writeHardwareRegisterCmd:theAddress value:aValue];		
 }
+
+- (id) writeRegCmd:(unsigned long) aRegister value:(unsigned long)aValue
+{
+	return [[[self crate] adapter] writeHardwareRegisterCmd:[self regAddress:aRegister] value:aValue];		
+}
+//------------------
+
 
 - (void) readHistogrammingStatus
 {
