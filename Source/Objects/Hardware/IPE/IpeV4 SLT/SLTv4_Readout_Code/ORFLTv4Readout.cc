@@ -8,6 +8,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     //this data must be constant during a run
     static uint32_t histoBinWidth = 0;
     static uint32_t histoEnergyOffset = 0;
+    static uint32_t histoRefreshTime = 0;
     
     //
     uint32_t dataId     = GetHardwareMask()[0];
@@ -129,6 +130,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 hw4::SltKatrin *currentSlt = srack->theSlt;
                 //uint32_t pagenr,oldpagenr ;
                 uint32_t pageAB,oldpageAB;
+                uint32_t histogramID;
+                uint32_t histogramInfo;
                 //uint32_t pStatus[3];
                 //fprintf(stdout,"FLT %i:runFlags %x\n",col+1, runFlags );fflush(stdout);    
                 //fprintf(stdout,"FLT %i:runFlags %x  pn 0x%x\n",col+1, runFlags,srack->theFlt[col]->histNofMeas->read() );fflush(stdout); 
@@ -145,6 +148,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     currentFlt->histogramSettings->read();//read to cache
                     histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
                     histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
+                    histoRefreshTime    = currentFlt->histMeasTime->read();
                     //clear histogram (probably not really necessary with "automatic clear" -tb-) 
                     srack->theFlt[col]->command->resetPages->write(1);
                     //init page AB flag
@@ -171,9 +175,11 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         uint32_t chan=0;
                         uint32_t readoutSec;
                         unsigned long totalLength;
-                        uint32_t lastFirst=0, last,first,llast,lfirst;
+                        uint32_t lastFirst=0, last,first;
+                        uint32_t histogramID;
                         //static uint32_t histogramBuffer32[1024]; //comment out to clear compiler warning. mah 11/25/09121122//
                         static uint32_t shipHistogramBuffer32[2*1024];
+                        histogramID     = currentFlt->histNofMeas->read();;
                         // CHANNEL LOOP ----------------
                         for(chan=0;chan<kNumChan;chan++) {//read out histogram
                             if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
@@ -198,7 +204,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 //prepare data record
                                 katrinV4HistogramDataStruct theEventData;
                                 theEventData.readoutSec = readoutSec;
-                                theEventData.recordingTimeSec =  0;//histoRunTime;   
+                                theEventData.refreshTimeSec =  histoRefreshTime;//histoRunTime;   
                                 theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
                                 theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
                                 theEventData.histogramLength =2048;
@@ -209,21 +215,27 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 theEventData.maxHistogramLength = 2048; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
                                 theEventData.binSize    = histoBinWidth;        
                                 theEventData.offsetEMin = histoEnergyOffset;
-
+                                theEventData.histogramID    = histogramID;
+                                theEventData.histogramInfo  = pageAB & 0x1;//one bit
                                 
                                 //ship data record
                                 totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
                                 ensureDataCanHold(totalLength); 
                                 data[dataIndex++] = histogramId | totalLength;    
                                 data[dataIndex++] = location | chan<<8;
+                                int32_t checkDataIndexLength = dataIndex;
                                 data[dataIndex++] = theEventData.readoutSec;
-                                data[dataIndex++] = theEventData.recordingTimeSec;
+                                data[dataIndex++] = theEventData.refreshTimeSec;
                                 data[dataIndex++] = theEventData.firstBin;
                                 data[dataIndex++] = theEventData.lastBin;
                                 data[dataIndex++] = theEventData.histogramLength;
                                 data[dataIndex++] = theEventData.maxHistogramLength;
                                 data[dataIndex++] = theEventData.binSize;
                                 data[dataIndex++] = theEventData.offsetEMin;
+                                data[dataIndex++] = theEventData.histogramID;
+                                data[dataIndex++] = theEventData.histogramInfo;
+                                if( ((dataIndex-checkDataIndexLength)*sizeof(int32_t)) != sizeof(katrinV4HistogramDataStruct) ) fprintf(stdout,"ORFLTv4Readout: WARNING: bad record size!\n");
+                                fflush(stdout);   
                                 int i;
                                 for(i=0; i<theEventData.histogramLength;i++)
                                     data[dataIndex++] = shipHistogramBuffer32[i];

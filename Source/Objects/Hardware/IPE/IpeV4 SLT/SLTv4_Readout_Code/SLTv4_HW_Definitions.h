@@ -34,13 +34,15 @@
 
 typedef struct { // -tb- 2008-02-27
 	int32_t readoutSec;
-	int32_t recordingTimeSec;  //! this holds the refresh time -tb-
+	int32_t refreshTimeSec;  //! this holds the refresh time -tb-
 	int32_t firstBin;
 	int32_t lastBin;
 	int32_t histogramLength; //don't use unsigned! - it may become negative, at least temporaryly -tb-
     int32_t maxHistogramLength;
     int32_t binSize;
     int32_t offsetEMin;
+    uint32_t histogramID;
+    uint32_t histogramInfo;
 } katrinV4HistogramDataStruct;
 
 

@@ -1052,7 +1052,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     unsigned long histoID = [self readReg:kFLTV4HistNumMeasReg];
     unsigned long pageAB  = ([self readReg:kFLTV4StatusReg] >>28) & 0x1;
     
-    NSLog(@"HistoStatus: recTime: %i  histoID: %i, pageAB: %i \n",recTime,histoID, pageAB);
+    //DEBUG OUTPUT - NSLog(@"HistoStatus: recTime: %i  histoID: %i, pageAB: %i \n",recTime,histoID, pageAB);
     [self setHistRecTime: recTime];
     [self setHistNofMeas: histoID];
     [self setHistPageAB: pageAB];

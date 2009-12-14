@@ -373,6 +373,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramLength
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx maxHistogramLength
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx binSize
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramID
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare for future extensions)
+                                      ^-pageAB flag
 </pre>
 
   * For more infos: see
@@ -490,36 +493,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
     
     
     
-    //this slows down the system at very high rates - an improved version is below -tb-
-    #if 0
-    {
-        // this is very similar to the first version ('brute force'),
-        // but probably it is usefull as it is in 'energy mode' units ... -tb-
-        int i;
-        unsigned long aValue;
-        unsigned long aBin;
-        unsigned long energy;
-        for(i=0; i< ePtr->histogramLength;i++){
-            aValue=*(ptr+i);
-            aBin = i+ (ePtr->firstBin);
-            energy= ( ((aBin) << (ePtr->binSize))/2 )   + ePtr->offsetEMin;
-            //TODO: fill all bins from this one to the next energy -tb- 2008-05-30
-            //if(aValue) NSLog(@"  Bin %i = %d \n", aBin,aValue);
-            #if 1
-            int j;
-            for(j=0;j<aValue;j++){
-                //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
-                [aDataSet histogram:energy 
-                            numBins:65536 //-tb- 32768  
-                             sender:self  
-                           withKeys: @"FLT",
-                 @"Histogram - TEST+DEBUG - (energy mode units)", // use better name -tb-
-                 crateKey,stationKey,channelKey,nil];
-            }
-            #endif
-        }
-    }
-    #endif
+
     
     
     #if 0
@@ -572,27 +546,31 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 
 	katrinV4HistogramDataStruct* ePtr = (katrinV4HistogramDataStruct*)ptr;			//recast to event structure
 
+    #if 0
+    //debug output
 	NSLog(@" readoutSec = %d \n", ePtr->readoutSec);
 	//NSLog(@" recordingTimeSec = %d \n", ePtr->recordingTimeSec);
-	NSLog(@" refreshTimeSec = %d \n", ePtr->recordingTimeSec);
+	NSLog(@" refreshTimeSec = %d \n", ePtr->refreshTimeSec);
 	NSLog(@" firstBin = %d \n", ePtr->firstBin);
 	NSLog(@" lastBin = %d \n", ePtr->lastBin);
 	NSLog(@" histogramLength = %d \n", ePtr->histogramLength);
+    #endif
 	
 	NSString* readoutSec	= [NSString stringWithFormat:@"ReadoutSec = %d\n",ePtr->readoutSec];
 	//NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
-	NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->recordingTimeSec];
+	NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->refreshTimeSec];
 	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
 	NSString* lastBin	= [NSString stringWithFormat:@"lastBin = %d\n",ePtr->lastBin];
 	NSString* histogramLength	= [NSString stringWithFormat:@"histogramLength = %d\n",ePtr->histogramLength];
 	NSString* maxHistogramLength	= [NSString stringWithFormat:@"maxHistogramLength = %d\n",ePtr->maxHistogramLength];
 	NSString* binSize	= [NSString stringWithFormat:@"binSize = %d\n",ePtr->binSize];
 	NSString* offsetEMin	= [NSString stringWithFormat:@"offsetEMin = %d\n",ePtr->offsetEMin];
+	NSString* histIDInfo	= [NSString stringWithFormat:@"ID = %d.%c\n",ePtr->histogramID,(ePtr->histogramInfo&0x1)?'B':'A'];
 
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
 	                       readoutSec,refreshTimeSec,firstBin,lastBin,histogramLength,
-                           maxHistogramLength,binSize,offsetEMin]; 
+                           maxHistogramLength,binSize,offsetEMin,histIDInfo]; 
 }
 
 
