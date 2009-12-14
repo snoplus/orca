@@ -1002,8 +1002,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 		int dataIndex = 0;
 		unsigned long data[5 + kNumFLTChannels];
-
-		NSLog(@"hitrate: %d\n",[self readReg:kFLTV4HitRateReg channel:10]& 0xffff);
 		
 		//combine all the hitrate read commands into one command packet
 		ORCommandList* aList = [ORCommandList commandList];
