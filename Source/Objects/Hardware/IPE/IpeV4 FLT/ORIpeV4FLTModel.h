@@ -99,20 +99,7 @@
 	BOOL usingPBusSimulation;
     BOOL ledOff;
     unsigned long interruptMask;
-	unsigned long pageSize; //< Size of the readout pages - defined in slt dialog
-	
-	//-----------------------------------------
-	//place to cache some values so they don't have to be calculated every time thru the run loop.
-	//not so important in this object because of length of time it takes to readout waveforms,
-	//but we'll do it anyway.
-	//Caution, these variables are only valid when a run is in progress.
-	unsigned long	statusAddress;
-	unsigned long	memoryAddress;
-	unsigned long	locationWord;
-	/** Reference to the Slt board for hardware access */
-	ORIpeV4SLTModel* sltCard; 
-	//-----------------------------------------
-    
+	    
 	// Register information (low level tab)
     unsigned short  selectedRegIndex;
     unsigned long   writeValue;
