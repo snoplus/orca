@@ -83,11 +83,13 @@ void FindHardware(void)
 #if USE_PBUS
     pbusInit((char*)name);
 #else
+#endif
+    //TODO: check here blocking semaphores? -tb-
     srack = new hw4::SubrackKatrin((char*)name,0);
     srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
-    
-#endif
-    // testing the C++ link to fdhwlib -tb-
+    pbus = srack->theSlt->version; //all registers inherit from Pbus, we choose "version" as it shall exist for all FPGA configurations
+    if(!pbus) fprintf(stdout,"HW_Readout.cc (IPE DAQ V4): ERROR: could not connect to Pbus!\n");
+    // test/force the C++ link to fdhwlib -tb-
     if(0){
         printf("Try to create a BaseRegister object -tb-\n");
         fflush(stdout);
@@ -104,6 +106,7 @@ void ReleaseHardware(void)
 #if USE_PBUS
     pbusFree();
 #else
+    pbus = 0;
     delete srack;
 #endif
 }
@@ -122,8 +125,17 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     
     //**** use device driver call to write data to HW
     int32_t perr = 0;
+#if USE_PBUS
     if (numItems == 1)    perr = pbusWrite(startAddress, *lptr);
     else                perr = pbusWriteBlock(startAddress, (unsigned long *) lptr, numItems);
+#else
+    try{
+        if (numItems == 1)  pbus->write(startAddress, *lptr);
+        else                pbus->writeBlock(startAddress, (unsigned long *) lptr, numItems);
+    }catch(PbusError &e){
+        perr = 1;
+    }
+#endif
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
@@ -175,9 +187,18 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     unsigned long *lPtr = (unsigned long *) returnPayload;
     
     int32_t perr   = 0;
+#if USE_PBUS
     if (numItems == 1)  perr = pbusRead(startAddress, lPtr);
     else                perr = pbusReadBlock(startAddress, lPtr, numItems);
     //TODO: -tb- printf("perr: %d\n",perr);
+#else
+    try{
+        if (numItems == 1)  *lPtr = pbus->read(startAddress);
+        else                pbus->readBlock(startAddress, (unsigned long *) lPtr, numItems);
+    }catch(PbusError &e){
+        perr = 1;
+    }
+#endif
      
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = numItems;

@@ -129,9 +129,9 @@
     // fields for histogram readout
     unsigned long histRecTime;  //!<the histogram refresh time
     unsigned long histMeasTime; //!<the per-cycle second counter
-    unsigned long histNofMeas;  //!<number of histo measurement cycles
-    unsigned long histEMin;
-    unsigned long histEBin;
+    unsigned long histNofMeas;  //!<number of histo measurement cycles (0..63)
+    unsigned long histEMin;     //!< the energy offset of the histogram
+    unsigned long histEBin;     //!<the bin size setting (histBinWidth = 2^histEBin)
     int histMode;
     int histClrMode;
     unsigned long histFirstEntry;

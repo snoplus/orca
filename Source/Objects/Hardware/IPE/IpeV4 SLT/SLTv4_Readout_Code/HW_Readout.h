@@ -21,7 +21,9 @@
 #define _H_HWREADOUT_
 
 #ifdef __cplusplus
+class Pbus;
 class hw4::SubrackKatrin;
+Pbus *pbus=0;
 hw4::SubrackKatrin *srack=0;
 extern "C" {
 #endif

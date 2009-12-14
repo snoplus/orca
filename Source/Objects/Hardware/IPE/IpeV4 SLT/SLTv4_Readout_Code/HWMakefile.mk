@@ -21,10 +21,11 @@ UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src -I ~/src/v4/pbusaccess
 #-tb- Use this for Pbus  simulation mode (yes, -lPbusSim is needed two times!):
 #LFLAGS  =  -fexceptions -lpbusaccess -lPbusSim -lHw -lPbusSim  -lakutil -lpthread -lstdc++ 
 
+#-tb- Use this for V4 SLT+FLT PbusPCI lib (Linux only!):
+# This uses libpbusaccess (C wrapper for C++ fdhwlib), benefit: uses C; misfit: needs to link with non-fdhwlib library
+#LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
+
 #-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
-#LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
- 
-#-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
-LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
+LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
 LIBs    = 
 
