@@ -32,6 +32,7 @@
 @class ORDataPacket;
 @class ORTimeRate;
 @class ORTestSuit;
+@class ORCommandList;
 
 #define kNumIpeV4FLTTests 5
 #define kIpeV4FLTBufferSizeLongs 1024
@@ -263,6 +264,9 @@
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel;
 - (void) writeReg:(int)aReg value:(unsigned long)aValue;
 - (void) writeReg:(int)aReg channel:(int)aChannel value:(unsigned long)aValue;
+- (void) executeCommandList:(ORCommandList*)aList;
+- (id) readRegCmd:(unsigned long) aRegister channel:(short) aChannel;
+- (id) writeRegCmd:(unsigned long) aRegister channel:(short) aChannel;
 
 - (unsigned long)  readSeconds;
 - (void)  writeSeconds:(unsigned long)aValue;
