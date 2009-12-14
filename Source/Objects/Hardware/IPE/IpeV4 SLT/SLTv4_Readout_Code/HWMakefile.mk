@@ -12,7 +12,7 @@
 # -tb- 2009-09 
 # mail: till.bergmann@ipe.fzk.de
 
-UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src -I ~/src/v4/pbusaccess
+UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src
 #Note: -Wno-sign-compare supresses 'comparison int with unsigned int' compiler warning -tb-
 #LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \
 #                                /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation \
@@ -22,7 +22,8 @@ UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src -I ~/src/v4/pbusaccess
 #LFLAGS  =  -fexceptions -lpbusaccess -lPbusSim -lHw -lPbusSim  -lakutil -lpthread -lstdc++ 
 
 #-tb- Use this for V4 SLT+FLT PbusPCI lib (Linux only!):
-# This uses libpbusaccess (C wrapper for C++ fdhwlib), benefit: uses C; misfit: needs to link with non-fdhwlib library
+# This used libpbusaccess (C wrapper for C++ fdhwlib), benefit: uses C; misfit: needs to link with non-fdhwlib library
+#UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src -I ~/src/v4/pbusaccess
 #LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
 
 #-tb- Use this for V4 SLT PbusPCI lib (Linux only!):

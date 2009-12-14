@@ -25,6 +25,8 @@
 #include <time.h>
 #include <errno.h>
 
+#define USE_PBUS 0
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,6 +40,8 @@ extern "C" {
 }
 #endif
 
+
+#if USE_PBUS
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,6 +49,8 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+#endif
+
 
 #include "hw4/baseregister.h"
 #include "katrinhw4/subrackkatrin.h"
@@ -53,8 +59,6 @@ extern "C" {
 
 #include "HW_Readout.h"
 
-//srack = 0;
-#define USE_PBUS 0
 
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
