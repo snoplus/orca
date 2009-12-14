@@ -994,30 +994,25 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		for(chan=0;chan<kNumFLTChannels;chan++){
 			if(hitRateEnabledMask & (1<<chan)){
 				unsigned long aValue = [self readReg:kFLTV4HitRateReg channel:chan];
-				//if(aValue){
-					BOOL overflow = (aValue >> 31) & 0x1;
-					aValue = aValue & 0xffff;
+				BOOL overflow = (aValue >> 31) & 0x1;
+				aValue = aValue & 0xffff;
+				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
+					//TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
+					//TODO: ask Denis -tb-
+					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue/ (float) hitRateLengthSec; 
+					if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
+					else					    hitRate[chan] = 0;
 					
-					if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
-						
-						//TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
-						//TODO: ask Denis -tb-
-						//if (hitRateLengthSec!=0)	hitRate[chan] = aValue/ (float) hitRateLengthSec; 
-						if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
-						else					    hitRate[chan] = 0;
-						
-						if(hitRateOverFlow[chan])hitRate[chan] = 0;
-						hitRateOverFlow[chan] = overflow;
-						
-						oneChanged = YES;
-					}
-					if(!hitRateOverFlow[chan]){
-						newTotal += hitRate[chan];
-					}
+					if(hitRateOverFlow[chan])hitRate[chan] = 0;
+					hitRateOverFlow[chan] = overflow;
 					
-					data[dataIndex + 5] = (chan<<20) | ((overflow&0x1)<<16) | aValue;
-					dataIndex++;
-				//}
+					oneChanged = YES;
+				}
+				if(!hitRateOverFlow[chan]){
+					newTotal += hitRate[chan];
+				}
+				data[dataIndex + 5] = (chan<<20) | ((overflow&0x1)<<16) | aValue;
+				dataIndex++;
 			}
 		}
 		
@@ -1315,6 +1310,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     //if([[userInfo objectForKey:@"doinit"]intValue]){
 	[self setLedOff:NO];
+	[self writeRunControl:NO];
 	[self reset];
 	[self initBoard];
 	//}
@@ -1332,15 +1328,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   afterDelay: 1];		//start reading out histogram timer and page toggle
 	}
 	
-	
-	
-	//cache some addresses for speed in the dataTaking loop.
-	unsigned long theSlotPart = [self slot]<<24;
-	statusAddress			  = theSlotPart;
-	//memoryAddress			  = theSlotPart | (ipeV4Reg[kFLTAdcMemory].space << kIpeFlt_AddressSpace); //TODO: V4 handling ... -tb-
-	sltCard					  = [[self crate] adapter];
-	locationWord			  = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-	pageSize                  = [sltCard pageSize];  //us
 	[self writeRunControl:YES];
 	[self writeSeconds:0];
 }
@@ -2114,7 +2101,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				
 				for(i=0;i<kNumFLTChannels;i++){
 					if([self hitRateEnabled:i]){
-						if([self hitRate:i] > 10){
+						if([self hitRate:i] > 2){
 							//there's a rate so we're too low with the threshold
 							[self setThreshold:i withValue:0x7fff];
 							noiseFloorLow[i] = noiseFloorTestValue[i] + 1;
