@@ -1992,6 +1992,8 @@
 		84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
 		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
+		84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */; };
+		84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */; };
 		84F03CDA059A145E00275624 /* ORGlobal.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F03CD8059A145E00275624 /* ORGlobal.h */; };
 		84F03CDB059A145E00275624 /* ORGlobal.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F03CD9059A145E00275624 /* ORGlobal.m */; };
 		84F03E6705A0995400275624 /* muxBoxSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84F03E6605A0995400275624 /* muxBoxSmall.gif */; };
@@ -4223,6 +4225,8 @@
 		84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthesizeSingleton.h; path = Source/Misc/SynthesizeSingleton.h; sourceTree = SOURCE_ROOT; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
 		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
+		84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPMCReadWriteCommand.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.h"; sourceTree = SOURCE_ROOT; };
+		84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMCReadWriteCommand.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
 		84F03CD8059A145E00275624 /* ORGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGlobal.h; sourceTree = "<group>"; };
 		84F03CD9059A145E00275624 /* ORGlobal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGlobal.m; sourceTree = "<group>"; };
 		84F03E6605A0995400275624 /* muxBoxSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = muxBoxSmall.gif; path = Source/Experiments/Ncd/Detector/muxBoxSmall.gif; sourceTree = SOURCE_ROOT; };
@@ -5702,6 +5706,8 @@
 				8422512A0D8845390048D331 /* ORIpeV4SLTDefs.h */,
 				8422512B0D8845390048D331 /* ORIpeV4SLTModel.h */,
 				8422512C0D8845390048D331 /* ORIpeV4SLTModel.m */,
+				84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */,
+				84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */,
 				8422512D0D8845390048D331 /* SLTv4_Readout_Code */,
 			);
 			name = "IpeV4 SLT";
@@ -10434,6 +10440,7 @@
 				8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */,
 				84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */,
 				84ACBA6510D44258003B9735 /* ORProcessView.h in Headers */,
+				84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11841,6 +11848,7 @@
 				849516B910C95382001C8112 /* ORStateLabelModel.m in Sources */,
 				8455097B10CEF7DD008A019C /* ORCaen965Decoder.m in Sources */,
 				84ACBA6410D44258003B9735 /* ORProcessView.m in Sources */,
+				84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
