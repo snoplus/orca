@@ -85,12 +85,6 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
 
 - (void) drawDataInPlot:(ORPlotter2D*)aPlot
 {
-    float   x, y, xl, yl;
-    short   minX, maxX ;
-    float   xinc,xsum,yinc,ysum, xfrc,yfrc;
-    long    ix,iy,xRng,yRng;
-    float   minY, maxY;
-    short   xwidth,ywidth;
 	id mDataSource = [aPlot dataSource];
 	ORAxis*    mXScale = [aPlot xScale];
 	ORAxis*    mYScale = [aPlot yScale];
@@ -102,35 +96,23 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
     [mDataSource plotter:aPlot dataSet:dataSetID xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
     
     if(!data)return;
-    xwidth = [aPlot bounds].size.width - 1;
-    ywidth = [aPlot bounds].size.height - 1;
+    short xwidth = [aPlot bounds].size.width - 1;
+    short ywidth = [aPlot bounds].size.height - 1;
     
     [NSBezierPath setDefaultLineWidth:.2];
 	
     /* get scale limits */
-    minX = MAX(MAX(0,roundToLong([mXScale minValue])),dataXMin);
-    maxX = MIN(MIN(roundToLong([mXScale maxValue]),numBinsPerSide),dataXMax);
+    short minX = MAX(MAX(0,roundToLong([mXScale minValue])),dataXMin);
+    short maxX = MIN(MIN(roundToLong([mXScale maxValue]),numBinsPerSide),dataXMax);
 	
-    minY = MAX(MAX(0,roundToLong([mYScale minValue])),dataYMin);
-    maxY = MIN(MIN(roundToLong([mYScale maxValue]),numBinsPerSide),dataYMax);
-    
+    short minY = MAX(MAX(0,roundToLong([mYScale minValue])),dataYMin);
+    short maxY = MIN(MIN(roundToLong([mYScale maxValue]),numBinsPerSide),dataYMax);
     
     /* calculate the number of channels to display */
-    xRng = [mXScale valueRange];
-    xinc = xwidth / xRng;
-    xfrc = xwidth % xRng;
-    xsum = -(xRng + 1) / 2.;
-
-    yRng = [mYScale valueRange];
-    yinc = ywidth / yRng;
-    yfrc = ywidth % yRng;
-    ysum = -(yRng + 1) / 2.;
-
-    
-    /* initialize x and y values */
-    yl = y = [mYScale getPixAbs:minY]-yinc/2;
+    float xinc = xwidth / [mXScale valueRange];
+    float yinc = ywidth / [mYScale valueRange];
+	
     /* loop through all data in plot window */
-    maxValue = -9E99;
     short rectCount[256];
     memset(rectCount,0,256*sizeof(short));
     NSRect rectList[256][kMaxNumRects];
@@ -139,46 +121,27 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
 	BOOL aInt       = [[colorScale colorAxis] integer];
 	double aMinPad  = [[colorScale colorAxis] minPad];
 
-
+	int iy;
     for (iy=minY; iy<=maxY;++iy) {
         
-        y += yinc;
-        
-        /* increment the running sum and check for overflow to next pixel */
-        if ((ysum+=yfrc) >= 0) {
-            ++y;
-            ysum -= yRng;
-        }
-
-        xl = x = [mXScale getPixAbs:minX]-xinc/2.;
-
+        float y = [mYScale getPixAbs:(float)iy-.5];
+		int ix;
         for (ix=minX; ix<=maxX;++ix) {	
-            x += xinc;
-            
-            /* increment the running sum and check for overflow to next pixel */
-            if ((xsum+=xfrc) >= 0) {
-                ++x;
-                xsum -= xRng;
-            }
+			float x = [mXScale getPixAbs:(float)ix-.5];
             
             /* Get the data value for this point and increment to next point */
             unsigned long z = data[ix + iy*numBinsPerSide];
             if(z){
                 int colorIndex = [colorScale getFastColorIndexForValue:z log:aLog integer:aInt minPad:aMinPad];
-                rectList[colorIndex][rectCount[colorIndex]] = NSMakeRect(xl,yl,x-xl+1,y-yl+1);
+                rectList[colorIndex][rectCount[colorIndex]] = NSMakeRect(x-.5,y-.5,xinc+1,yinc+1);
                 ++rectCount[colorIndex];
-                //[[colorScale getColorForValue:z] set];
-                //[NSBezierPath fillRect:NSMakeRect(xl,yl,x-xl+1,y-yl+1)];
-                if(rectCount[colorIndex]>=kMaxNumRects){
+                 if(rectCount[colorIndex]>=kMaxNumRects){
                     [[colorScale getColorForIndex:colorIndex] set];
                     NSRectFillList(rectList[colorIndex],rectCount[colorIndex]);
                     rectCount[colorIndex] = 0;
                 }
             }
-            // save previous x and y values
-            xl = x;
-        }
-        yl = y;
+         }
     }	
     //flush rects
     long i;
