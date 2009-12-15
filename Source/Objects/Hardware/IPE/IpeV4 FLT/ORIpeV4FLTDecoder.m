@@ -39,15 +39,15 @@
  ^^^^ ^^^--------------------------------spare
 		 ^ ^^^---------------------------crate
 			  ^ ^^^^---------------------card
-                               ^^^^ ^^^^ ----------channel
+                     ^^^^ ^^^^ ----------channel
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ^^^^ ^^^^------------------------------ channel (0..22)
-             ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+           ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
-			  ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
-                            ^^ ^^^^ ^^^^ eventID (0..1024)
+                  ^^-------------------- time precision(2 bit)
+                     ^^^^ ^^------------ number of page in hardware buffer (0..63, 6 bit)
+                            ^^ ^^^^ ^^^^ eventID (0..511, 10 bit!)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  </pre>
  *
@@ -141,9 +141,14 @@
  ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
  ^^ ^^^^ ^^^^ eventID (0..1024)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart/reset
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart/reset
- followed by waveform data (n x 1024 16-bit words)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
+                 ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
+                                 ^-------append flag is in this record (append to previous record)
+                                  ^------append next waveform record
+                                    ^^^^-number which defines the content of the record (kind of version number)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx not yet defined ...
+ TBD
+ followed by waveform data (up to 2048 16-bit words)
  <pre>  
  */ 
 //-------------------------------------------------------------

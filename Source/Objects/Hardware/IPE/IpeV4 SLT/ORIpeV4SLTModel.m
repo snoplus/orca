@@ -858,7 +858,18 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) loadSecondsReg
 {
+    //TODO: add option to set system time? -tb-
 	[self writeReg:kSltV4SecondSetReg value:secondsSet];
+    //Wait until next second srobe!
+    uint32_t i,sltsec;
+    for(i=0;i<10000;i++){
+        usleep(100);
+        [self readReg:kSltV4SubSecondCounterReg];
+        sltsec=[self readReg:kSltV4SecondCounterReg];
+        if(sltsec==secondsSet) break;
+    }
+    if(i==10000) NSLog(@"ORIpeV4SLTModel::loadSecondsReg: ERROR: could not read back SLT time %i (is %i)!\n",secondsSet,sltsec);
+    NSLog(@"ORIpeV4SLTModel::loadSecondsReg:  setpoint SLT time %i (is %i) loops %i!\n",secondsSet,sltsec,i);
 }
 
 - (void) writeInterruptMask

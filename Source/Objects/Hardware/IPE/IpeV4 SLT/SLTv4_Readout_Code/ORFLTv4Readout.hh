@@ -11,8 +11,7 @@ class ORFLTv4Readout : public ORVCard
 
     enum EORFLTv4Consts {
         kFifoEmpty = 0x01,
-        kNumChan   = 24,
-        kFirstTimeFlag   = 0x10000
+        kNumChan   = 24
     };
 };
 

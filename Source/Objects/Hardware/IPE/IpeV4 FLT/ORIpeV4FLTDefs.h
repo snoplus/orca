@@ -77,7 +77,8 @@
 #define kIpeFlt_PatternMask			0xffffffff // 22bit + Multiplicity
 #define kIpeFlt_TestPattern_Reset	0x00000010
 
-#define kIpeFlt_Reset_All			0x18010
+//#define kIpeFlt_Reset_All			0x18010 I added the resetPage flag -tb-
+#define kIpeFlt_Reset_All			0x38010
 
 #define kSetStandBy		1
 #define kReleaseStandBy 0
@@ -93,6 +94,7 @@ typedef struct {
 	unsigned long hitrate;
 } ipeFltHitRateDataStruct;
 
+#if 0
 typedef struct { // -tb- 2008-02-27
 	long readoutSec;
 	long recordingTimeSec;  //! this holds the refresh time -tb-
@@ -103,3 +105,4 @@ typedef struct { // -tb- 2008-02-27
     long binSize;
     long offsetEMin;
 } ipcFltV4HistogramDataStruct;
+#endif
