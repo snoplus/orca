@@ -29,7 +29,7 @@ int32_t stop_card(int32_t index)
 {
   gCardIterator = gSetOfCards.find(index); 
   if (gCardIterator == gSetOfCards.end()) return 0;
-  gCardIterator->second->Start();
+  gCardIterator->second->Stop();
   return 1;
 }
 
