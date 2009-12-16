@@ -380,7 +380,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:0 max:2047];
+    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:2047];//min 6 is found 'experimental' -tb-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelPostTriggerTimeChanged object:self];
 }
 
@@ -475,7 +475,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 -(unsigned long) threshold:(unsigned short) aChan
 {
-    return [[thresholds objectAtIndex:aChan] shortValue];
+    return [[thresholds objectAtIndex:aChan] intValue];
 }
 
 -(unsigned short) gain:(unsigned short) aChan
@@ -698,7 +698,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	int i;
 	for(i=0;i<kNumFLTChannels;i++){
 		[self writeThreshold:i value:[self threshold:i]];
-		[self writeGain:i value:[self gain:i]]; 
+        {
+            //TODO: there is no way to disable the pixel trigger, so I set the threshold to maximum -tb-
+            //at low threshold there will be many (irnored) triggers which overflow the event fifo -tb-
+            //maybe Denis should add a register (similar to "enable hitrate") -tb-
+            if( !(triggerEnabledMask & (0x1<<i)) ) [self writeThreshold:i value:0xfffff];
+        }
+        [self writeGain:i value:[self gain:i]]; 
 	}
 	
 	[self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
@@ -869,15 +875,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self write:[self regAddress:aReg channel:aChannel] value:aValue];
 }
 
-- (void) writeThreshold:(int)i value:(unsigned short)aValue
+- (void) writeThreshold:(int)i value:(unsigned int)aValue
 {
 	aValue &= 0xfffff;
 	[self writeReg: kFLTV4ThresholdReg channel:i value:aValue];
 }
 
-- (unsigned short) readThreshold:(int)i
+- (unsigned int) readThreshold:(int)i
 {
-	return [self readReg:kFLTV4ThresholdReg channel:i] & 0x1ffff;
+	return [self readReg:kFLTV4ThresholdReg channel:i] & 0xfffff;
 }
 
 - (void) writeGain:(int)i value:(unsigned short)aValue
@@ -1434,7 +1440,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     //"first time" flag (needed for histogram mode)
 	unsigned long runFlagsMask = 0;
-	runFlagsMask |= 0x10000;//bit 16 = "first time" flag
+	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
+    if(runMode == kIpeFlt_EnergyMode | runMode == kIpeFlt_EnergyTrace)
+        runFlagsMask |= kSyncFltWithSltTimerFlag;//bit 17 = "sync flt with slt timer" flag
+    
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
 //NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
 

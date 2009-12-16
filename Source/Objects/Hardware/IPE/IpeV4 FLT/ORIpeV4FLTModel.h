@@ -307,8 +307,8 @@
 
 /** Print result of hardware statistics for all channels */
 - (void) printStatistics; // ak, 7.10.07
-- (void) writeThreshold:(int)i value:(unsigned short)aValue;
-- (unsigned short) readThreshold:(int)i;
+- (void) writeThreshold:(int)i value:(unsigned int)aValue;
+- (unsigned int) readThreshold:(int)i;
 - (void) writeGain:(int)i value:(unsigned short)aValue;
 - (unsigned short) readGain:(int)i;
 - (void) writeTriggerControl;
