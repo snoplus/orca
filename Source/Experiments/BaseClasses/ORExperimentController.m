@@ -51,9 +51,9 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
         
-	[[valueHistogramsPlot xScale] setRngLimitsLow:0 withHigh:50000 withMinRng:64];
-	[[primaryColorScale colorAxis] setRngLimitsLow:0 withHigh:50000 withMinRng:5];
- 	[[primaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:50000];
+	[[valueHistogramsPlot xScale] setRngLimitsLow:0 withHigh:128000 withMinRng:64];
+	[[primaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000 withMinRng:5];
+ 	[[primaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:32000];
    
     [[ratePlot xScale] setNeedsDisplay:YES];
     [[ratePlot yScale] setNeedsDisplay:YES];
@@ -731,8 +731,10 @@
 	else if(aPlotter == valueHistogramsPlot){
 		int displayType = [model displayType];
 		switch(displayType){
-				case kDisplayRates: return [[segmentGroups objectAtIndex:set] numSegments];
-				default:		    return 1000;
+			case kDisplayRates:		 return [[segmentGroups objectAtIndex:set] numSegments];
+			case kDisplayThresholds: return 32*1024;
+			case kDisplayGains:		 return 1024;
+			default:				 return 1000;
 		}
 	}
 	else return 0;

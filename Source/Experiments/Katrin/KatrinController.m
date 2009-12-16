@@ -85,8 +85,8 @@
 	
 	if([secondaryGroup colorAxisAttributes])[[secondaryColorScale colorAxis] setAttributes:[[[secondaryGroup colorAxisAttributes] mutableCopy] autorelease]];
 
-	[[secondaryColorScale colorAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:5];
-    [[secondaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:1000];
+	[[secondaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000 withMinRng:5];
+    [[secondaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:32000];
     [[secondaryColorScale colorAxis] setOppositePosition:YES];
 	[[secondaryColorScale colorAxis] setNeedsDisplay:YES];
 

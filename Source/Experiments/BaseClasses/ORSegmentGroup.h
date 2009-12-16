@@ -31,8 +31,8 @@
 	NSString*		adcClassName;
 	NSString*		mapFile;
 	ORTimeRate*		totalRate;
-	int				thresholdHistogram[1000];
-	int				gainHistogram[1000];
+	int				thresholdHistogram[32*1024];
+	int				gainHistogram[1020];
 	float			rate;
 	NSArray*		mapEntries;
 

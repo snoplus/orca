@@ -344,17 +344,17 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (void) histogram
 {
-	memset(thresholdHistogram,0,sizeof(int) * 1000);
-	memset(gainHistogram,0,sizeof(int) * 1000);
+	memset(thresholdHistogram,0,sizeof(int) * 32*1024);
+	memset(gainHistogram,0,sizeof(int) * 1024);
 	
 	int i;
 	int n = [segments count];
 	for(i=0;i<n;i++){
 		if([[segments objectAtIndex:i] hwPresent]){
 			int thresholdValue = (int)[self getThreshold:i];
-			if(thresholdValue>=0 && thresholdValue<1000)thresholdHistogram[thresholdValue]++;
+			if(thresholdValue>=0 && thresholdValue<32*1024)thresholdHistogram[thresholdValue]++;
 			int gainValue = (int)[self getGain:i];
-			if(gainValue>=0 && gainValue<1000)gainHistogram[gainValue]++;
+			if(gainValue>=0 && gainValue<1024)gainHistogram[gainValue]++;
 		}
 	}
 }
