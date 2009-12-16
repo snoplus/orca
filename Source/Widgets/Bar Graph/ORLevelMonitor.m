@@ -32,6 +32,8 @@
         [self setContentsColor:[NSColor colorWithCalibratedRed:.7 green:1 blue:.7 alpha:.8]];
  		lowLevelBugImage = [[NSImage imageNamed:@"leftBug"] retain];
 		hiLevelBugImage  = [[NSImage imageNamed:@"leftBug"] retain];
+ 		lowFillPointBugImage = [[NSImage imageNamed:@"rightBug"] retain];
+		hiFillPointBugImage  = [[NSImage imageNamed:@"rightBug"] retain];
 
 	}
     return self;
@@ -39,6 +41,8 @@
 
 - (void) dealloc
 {
+	[lowFillPointBugImage release];
+	[hiFillPointBugImage release];
 	[lowLevelBugImage release];
 	[hiLevelBugImage release];
 	[levelGradient release];
@@ -55,6 +59,12 @@
 }
 
 #pragma mark ¥¥¥Accessors
+- (void) setShowFillPoints:(BOOL)aState
+{
+	showFillPoints = aState;
+	[self setNeedsDisplay:YES];
+}
+
 - (void) setTankColor:(NSColor*)aColor
 {
 	[aColor retain];
@@ -116,9 +126,10 @@
 	NSRect b = [self bounds];
 	b.origin.x += kBugPad;
 	b.origin.y += kBugPad/2;
-	b.size.width -= kBugPad;
 	b.size.height -= kBugPad;
-
+	if(showFillPoints)	b.size.width -= 2*kBugPad;
+	else				b.size.width -= kBugPad;
+	
 	[tankGradient fillRect:NSMakeRect(kBugPad,kBugPad/2,b.size.width,b.size.height) angle:270.];
 
 	if([dataSource respondsToSelector:@selector(levelMonitorLevel:)]){
@@ -141,13 +152,31 @@
 					   operation:NSCompositeSourceOver];
 	[NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad,lowAlarmLevel) toPoint:NSMakePoint(b.size.width+kBugPad,lowAlarmLevel)];
 
-	if([dataSource respondsToSelector:@selector(levelMonitorLowAlarmLevel:)]){
+	if([dataSource respondsToSelector:@selector(levelMonitorHiAlarmLevel:)]){
 		hiAlarmLevel = b.origin.y + b.size.height * [dataSource levelMonitorHiAlarmLevel:self]/100.;
 	}
 	[hiLevelBugImage compositeToPoint:NSMakePoint(0, hiAlarmLevel-[lowLevelBugImage size].height/2.) 
 					   operation:NSCompositeSourceOver];
 	[NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad,hiAlarmLevel) toPoint:NSMakePoint(b.size.width+kBugPad,hiAlarmLevel)];
 
+	if(showFillPoints){
+		float lowFillPoint = 25;
+		float hiFillPoint = 75;
+		if([dataSource respondsToSelector:@selector(levelMonitorLowFillPoint:)]){
+			lowFillPoint = b.origin.y + b.size.height * [dataSource levelMonitorLowFillPoint:self]/100.;
+		}
+		[lowFillPointBugImage compositeToPoint:NSMakePoint(b.size.width+kBugPad, lowFillPoint-[lowFillPointBugImage size].height/2.) 
+								 operation:NSCompositeSourceOver];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad,lowFillPoint) toPoint:NSMakePoint(b.size.width+kBugPad,lowFillPoint)];
+		
+		if([dataSource respondsToSelector:@selector(levelMonitorHiFillPoint:)]){
+			hiFillPoint = b.origin.y + b.size.height * [dataSource levelMonitorHiFillPoint:self]/100.;
+		}
+		[hiFillPointBugImage compositeToPoint:NSMakePoint(b.size.width+kBugPad, hiFillPoint-[hiFillPointBugImage size].height/2.) 
+								operation:NSCompositeSourceOver];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(kBugPad,hiFillPoint) toPoint:NSMakePoint(b.size.width+kBugPad,hiFillPoint)];
+	}
+	
 	[NSBezierPath strokeRect:b];
 }
 
@@ -194,11 +223,14 @@
 	NSRect b = [self bounds];
 	b.origin.x += kBugPad;
 	b.origin.y += kBugPad/2;
-	b.size.width -= kBugPad;
 	b.size.height -= kBugPad;
+	if(showFillPoints) b.size.width -= 2*kBugPad;
+	else			   b.size.width -= kBugPad;
 
-	movingLowAlarm = NO;
-	movingHiAlarm  = NO;
+	movingLowAlarm		= NO;
+	movingHiAlarm		= NO;
+	movingLowFillPoint	= NO;
+	movingHiFillPoint	= NO;
 	
 	if([dataSource respondsToSelector:@selector(levelMonitorLowAlarmLevel:)]){
 		float orginalValue = [dataSource levelMonitorLowAlarmLevel:self];
@@ -209,10 +241,13 @@
 		if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
 			movingLowAlarm = YES;
 			[dataSource setLevelMonitor:self lowAlarm:orginalValue];
+			[[NSCursor closedHandCursor] set];
+			[self setNeedsDisplay:YES];
+			return;
 		}
 	}
-	
-	if(!movingLowAlarm && [dataSource respondsToSelector:@selector(levelMonitorHiAlarmLevel:)]){
+
+	if([dataSource respondsToSelector:@selector(levelMonitorHiAlarmLevel:)]){
 		float orginalValue = [dataSource levelMonitorHiAlarmLevel:self];
 		float hiAlarmLevel = b.origin.y + b.size.height * orginalValue/100.;
 		NSRect r3 = NSMakeRect(0,hiAlarmLevel-kBugPad/2,kBugPad,kBugPad);
@@ -220,14 +255,44 @@
 		if(NSPointInRect(localPoint,r3)|| NSPointInRect(localPoint,r4)){
 			movingHiAlarm = YES;
 			[dataSource setLevelMonitor:self hiAlarm:orginalValue];
+			[[NSCursor closedHandCursor] set];
+			[self setNeedsDisplay:YES];
+			return;
 		}
 	}
-	
 
-	if(movingLowAlarm || movingHiAlarm){
-		[[NSCursor closedHandCursor] set];
+	
+	if([dataSource respondsToSelector:@selector(levelMonitorLowFillPoint:)]){
+		float orginalValue = [dataSource levelMonitorLowFillPoint:self];
+		float lowFillPoint = b.origin.y + b.size.height * orginalValue/100.;
+		
+		NSRect r1 = NSMakeRect([self bounds].size.width-kBugPad,lowFillPoint-kBugPad/2,kBugPad,kBugPad);
+		NSRect r2 = NSMakeRect(b.origin.x,lowFillPoint-2,b.size.width,4);
+		if(NSPointInRect(localPoint,r1) || NSPointInRect(localPoint,r2)){
+			movingLowFillPoint = YES;
+			NSLog(@"grabbed low Fill\n");
+			[dataSource setLevelMonitor:self lowFillPoint:orginalValue];
+			[[NSCursor closedHandCursor] set];
+			[self setNeedsDisplay:YES];
+			return;
+		}
 	}
-	[self setNeedsDisplay:YES];
+
+	if([dataSource respondsToSelector:@selector(levelMonitorHiFillPoint:)]){
+		float orginalValue = [dataSource levelMonitorHiFillPoint:self];
+		float hiFillPoint = b.origin.y + b.size.height * orginalValue/100.;
+		NSRect r3 = NSMakeRect([self bounds].size.width-kBugPad,hiFillPoint-kBugPad/2,kBugPad,kBugPad);
+		NSRect r4 = NSMakeRect(b.origin.x,hiFillPoint-2,b.size.width,4);
+
+		if(NSPointInRect(localPoint,r3)|| NSPointInRect(localPoint,r4)){
+			movingHiFillPoint = YES;
+			NSLog(@"grabbed Hi Fill\n");
+			[dataSource setLevelMonitor:self hiFillPoint:orginalValue];
+			[[NSCursor closedHandCursor] set];
+			[self setNeedsDisplay:YES];
+			return;
+		}
+	}
 }
 
 - (void) mouseDragged:(NSEvent*)event
@@ -235,8 +300,9 @@
 	NSRect b = [self bounds];
 	b.origin.x += kBugPad;
 	b.origin.y += kBugPad/2;
-	b.size.width -= kBugPad;
 	b.size.height -= kBugPad;
+	if(showFillPoints) b.size.width -= 2*kBugPad;
+	else			   b.size.width -= kBugPad;
 
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 	float level = 100.*(localPoint.y - b.origin.y)/b.size.height;
@@ -250,6 +316,19 @@
 			[dataSource setLevelMonitor:self hiAlarm:level];
 		}
 	}
+	else if(movingLowFillPoint){
+		if([dataSource respondsToSelector:@selector(setLevelMonitor:lowFillPoint:)]){
+			[dataSource setLevelMonitor:self lowFillPoint:level];
+			NSLog(@"moving Lo Fill\n");
+		}
+	}
+	else if(movingHiFillPoint){
+		if([dataSource respondsToSelector:@selector(setLevelMonitor:hiFillPoint:)]){
+			[dataSource setLevelMonitor:self hiFillPoint:level];
+			NSLog(@"moving Hi Fill\n");
+		}
+	}
+	
 	[self setNeedsDisplay:YES];
 }
 
@@ -260,8 +339,10 @@
 	NSRect b = [self bounds];
 	b.origin.x += kBugPad;
 	b.origin.y += kBugPad/2;
-	b.size.width -= kBugPad;
 	b.size.height -= kBugPad;
+	if(showFillPoints) b.size.width -= 2*kBugPad;
+	else			   b.size.width -= kBugPad;
+	
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 	float level = 100.*(localPoint.y - b.origin.y)/b.size.height;
 
@@ -275,6 +356,18 @@
 			[dataSource setLevelMonitor:self hiAlarm:level];
 		}
 	}
+	
+	if(movingLowFillPoint){
+		if([dataSource respondsToSelector:@selector(setLevelMonitor:lowFillPoint:)]){
+			[dataSource setLevelMonitor:self lowFillPoint:level];
+		}
+	}
+	else if(movingHiFillPoint){
+		if([dataSource respondsToSelector:@selector(setLevelMonitor:hiFillPoint:)]){
+			[dataSource setLevelMonitor:self hiFillPoint:level];
+		}
+	}
+	
 	if([dataSource respondsToSelector:@selector(loadAlarmsToHardware)]){
 		[dataSource loadAlarmsToHardware];
 	}
@@ -282,6 +375,8 @@
 
 	movingLowAlarm = NO;
 	movingHiAlarm = NO;
+	movingLowFillPoint = NO;
+	movingHiFillPoint = NO;
 	[self setNeedsDisplay:YES];
     [[self window] resetCursorRects];
 }
@@ -296,8 +391,9 @@
 	NSRect b = [self bounds];
 	b.origin.x += kBugPad;
 	b.origin.y += kBugPad/2;
-	b.size.width -= kBugPad;
 	b.size.height -= kBugPad;
+	if(showFillPoints) b.size.width -= 2*kBugPad;
+	else			   b.size.width -= kBugPad;
 
 	if([dataSource respondsToSelector:@selector(levelMonitorLowAlarmLevel:)]){
 		float lowAlarmLevel = [dataSource levelMonitorLowAlarmLevel:self];
@@ -314,6 +410,22 @@
 		[self addCursorRect:r3 cursor:[NSCursor openHandCursor]];
 		[self addCursorRect:r4 cursor:[NSCursor openHandCursor]];
 	}
+	if([dataSource respondsToSelector:@selector(levelMonitorLowFillPoint:)]){
+		float lowFillPoint = [dataSource levelMonitorLowFillPoint:self];
+		NSRect r1 = NSMakeRect([self bounds].size.width-kBugPad,lowFillPoint-kBugPad/2,kBugPad,kBugPad);
+		NSRect r2 = NSMakeRect(kBugPad,lowFillPoint-3,b.size.width,6);
+		[self addCursorRect:r1 cursor:[NSCursor openHandCursor]];
+		[self addCursorRect:r2 cursor:[NSCursor openHandCursor]];
+	}
+	
+	if([dataSource respondsToSelector:@selector(levelMonitorHiFillPoint:)]){
+		float hiFillPoint = [dataSource levelMonitorHiFillPoint:self];
+		NSRect r3 = NSMakeRect([self bounds].size.width-kBugPad,hiFillPoint-kBugPad/2,kBugPad,kBugPad);
+		NSRect r4 = NSMakeRect(kBugPad,hiFillPoint-3,b.size.width,6);
+		[self addCursorRect:r3 cursor:[NSCursor openHandCursor]];
+		[self addCursorRect:r4 cursor:[NSCursor openHandCursor]];
+	}
+	
 }
 
 @end

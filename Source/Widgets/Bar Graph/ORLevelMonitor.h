@@ -23,12 +23,17 @@
 	IBOutlet id dataSource;
 	NSImage*	lowLevelBugImage;
 	NSImage*	hiLevelBugImage;
+	NSImage*	lowFillPointBugImage;
+	NSImage*	hiFillPointBugImage;
 	BOOL		movingLowAlarm;
 	BOOL		movingHiAlarm;
+	BOOL		movingLowFillPoint;
+	BOOL		movingHiFillPoint;
 	NSColor* 	tankColor;
 	NSColor* 	contentsColor;
 	CTGradient*	levelGradient;
 	CTGradient* tankGradient;
+	BOOL		showFillPoints;
 }
 
 - (id)initWithFrame:(NSRect)frame;
@@ -36,6 +41,7 @@
 - (void) awakeFromNib;
 
 #pragma mark ¥¥¥Accessors
+- (void) setShowFillPoints:(BOOL)aState;
 - (void) setTankColor:(NSColor*)aColor;
 - (NSColor*) tankColor;
 - (void) setContentsColor:(NSColor*)aColor;
@@ -63,4 +69,9 @@
 - (float) levelMonitorLowAlarmLevel:(id)aLevelMonitor;
 - (float) levelMonitorLevel:(id)aLevelMonitor;
 - (void) loadAlarmsToHardware;
+- (void) setLevelMonitor:(ORLevelMonitor*)aMonitor lowFillPoint:(float)aValue;
+- (void) setLevelMonitor:(ORLevelMonitor*)aMonitor hiFillPoint:(float)aValue;
+- (float) levelMonitorHiFillPoint:(id)aLevelMonitor;
+- (float) levelMonitorLowFillPoint:(id)aLevelMonitor;
+
 @end

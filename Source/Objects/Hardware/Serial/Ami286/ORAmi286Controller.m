@@ -55,7 +55,8 @@
     [[plotter0 yScale] setRngLow:0.0 withHigh:100.];
 	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100 withMinRng:10];
 	[plotter0 setUseGradient:YES];
-	
+	[monitor0 setShowFillPoints:YES];
+	[monitor1 setShowFillPoints:YES];
     [super awakeFromNib];
 }
 
@@ -129,6 +130,12 @@
                      selector : @selector(alarmLevelChanged:)
                          name : ORAmi286AlarmLevelChanged
 						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(fillPointChanged:)
+                         name : ORAmi286FillPointChanged
+						object: model];
+	
 	
     [notifyCenter addObserver : self
                      selector : @selector(eMailEnabledChanged:)
@@ -179,6 +186,7 @@
 	[self updateTimePlot:nil];
 	[self updateMonitor:nil];
 	[self alarmLevelChanged:nil];
+	[self fillPointChanged:nil];
 	[self enabledMaskChanged:nil];
     [self miscAttributesChanged:nil];
 	[self eMailEnabledChanged:nil];
@@ -348,12 +356,33 @@
 		for(i=0;i<4;i++){
 			[[hiAlarmMatrix cellWithTag:i] setFloatValue:[model hiAlarmLevel:i]];
 			[[lowAlarmMatrix cellWithTag:i] setFloatValue:[model lowAlarmLevel:i]];
+			[self updateTank:i];
 		}
 	}
 	else {
 		int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
 		[[hiAlarmMatrix cellWithTag:index] setFloatValue:[model hiAlarmLevel:index]];
 		[[lowAlarmMatrix cellWithTag:index] setFloatValue:[model lowAlarmLevel:index]];
+		[self updateTank:index];
+	}
+}
+
+
+- (void) fillPointChanged:(NSNotification*)aNote
+{
+	if(!aNote){
+		int i;
+		for(i=0;i<4;i++){
+			[[hiFillPointMatrix cellWithTag:i] setFloatValue:[model hiFillPoint:i]];
+			[[lowFillPointMatrix cellWithTag:i] setFloatValue:[model lowFillPoint:i]];
+			[self updateTank:i];
+		}
+	}
+	else {
+		int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+		[[hiFillPointMatrix cellWithTag:index] setFloatValue:[model hiFillPoint:index]];
+		[[lowFillPointMatrix cellWithTag:index] setFloatValue:[model lowFillPoint:index]];
+		[self updateTank:index];
 	}
 }
 
@@ -414,6 +443,16 @@
 		else {
 			[[lowAlarmMatrix cellWithTag:i] setEnabled:NO];
 			[[hiAlarmMatrix cellWithTag:i] setEnabled:NO];
+		}
+	}
+	for(i=0;i<2;i++){
+		if(aMask & (1<<i)){
+			[[lowFillPointMatrix cellWithTag:i] setEnabled:!locked];
+			[[hiFillPointMatrix cellWithTag:i] setEnabled:!locked];
+		}
+		else {
+			[[lowFillPointMatrix cellWithTag:i] setEnabled:NO];
+			[[hiFillPointMatrix cellWithTag:i] setEnabled:NO];
 		}
 	}
 }
@@ -514,19 +553,28 @@
 	}
 }
 
-
 - (IBAction) hiAlarmAction:(id)sender
 {
 	int index = [[hiAlarmMatrix selectedCell] tag];
 	[model setHiAlarmLevel:index value:[sender floatValue]];
-	[self updateTank:index];
 }
 
 - (IBAction) lowAlarmAction:(id)sender
 {
 	int index = [[lowAlarmMatrix selectedCell] tag];
 	[model setLowAlarmLevel:index value:[sender floatValue]];
-	[self updateTank:index];
+}
+
+- (IBAction) hiFillPointAction:(id)sender
+{
+	int index = [[hiFillPointMatrix selectedCell] tag];
+	[model setHiFillPoint:index value:[sender floatValue]];
+}
+
+- (IBAction) lowFillPointAction:(id)sender
+{
+	int index = [[lowFillPointMatrix selectedCell] tag];
+	[model setLowFillPoint:index value:[sender floatValue]];
 }
 
 - (void) enabledMaskAction:(id)sender
@@ -696,12 +744,39 @@
 	else return 0;
 }
 
+- (void) setLevelMonitor:(ORLevelMonitor*)aMonitor lowFillPoint:(float)aValue
+{
+	if(aMonitor == monitor0)	 [model setLowFillPoint:0 value:aValue];
+	else if(aMonitor == monitor1)[model setLowFillPoint:1 value:aValue];
+	[self scheduledUpdate]; //force update now
+}
+
+- (void) setLevelMonitor:(ORLevelMonitor*)aMonitor hiFillPoint:(float)aValue
+{
+	if(aMonitor == monitor0)	 [model setHiFillPoint:0 value:aValue];
+	else if(aMonitor == monitor1)[model setHiFillPoint:1 value:aValue];
+	[self scheduledUpdate]; //force update now
+}
+
+- (float) levelMonitorHiFillPoint:(id)aLevelMonitor
+{
+	if(aLevelMonitor == monitor0)      return [model hiFillPoint:0];
+	else if(aLevelMonitor == monitor1) return [model hiFillPoint:1];
+	else return 0;
+}
+
+- (float) levelMonitorLowFillPoint:(id)aLevelMonitor
+{
+	if(aLevelMonitor == monitor0)      return [model lowFillPoint:0];
+	else if(aLevelMonitor == monitor1) return [model lowFillPoint:1];
+	else return 0;
+}
+
+
 - (float) levelMonitorLevel:(id)aLevelMonitor
 {
 	if(aLevelMonitor == monitor0)      return [model level:0];
 	else if(aLevelMonitor == monitor1) return [model level:1];
-	else if(aLevelMonitor == monitor2) return [model level:2];
-	else if(aLevelMonitor == monitor3) return [model level:3];
 	else return 0;
 }
 @end

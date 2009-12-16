@@ -1994,6 +1994,7 @@
 		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
 		84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */; };
 		84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */; };
+		84EE877F10D94B3100BBCBE5 /* rightBug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE877E10D94B3100BBCBE5 /* rightBug.tif */; };
 		84F03CDA059A145E00275624 /* ORGlobal.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F03CD8059A145E00275624 /* ORGlobal.h */; };
 		84F03CDB059A145E00275624 /* ORGlobal.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F03CD9059A145E00275624 /* ORGlobal.m */; };
 		84F03E6705A0995400275624 /* muxBoxSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84F03E6605A0995400275624 /* muxBoxSmall.gif */; };
@@ -4227,6 +4228,7 @@
 		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
 		84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPMCReadWriteCommand.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.h"; sourceTree = SOURCE_ROOT; };
 		84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMCReadWriteCommand.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
+		84EE877E10D94B3100BBCBE5 /* rightBug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = rightBug.tif; path = "Source/Widgets/Bar Graph/rightBug.tif"; sourceTree = SOURCE_ROOT; };
 		84F03CD8059A145E00275624 /* ORGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGlobal.h; sourceTree = "<group>"; };
 		84F03CD9059A145E00275624 /* ORGlobal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGlobal.m; sourceTree = "<group>"; };
 		84F03E6605A0995400275624 /* muxBoxSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = muxBoxSmall.gif; path = Source/Experiments/Ncd/Detector/muxBoxSmall.gif; sourceTree = SOURCE_ROOT; };
@@ -7351,9 +7353,8 @@
 				849F4C6B0768DA920087E9A8 /* DataExplorer.gif */,
 				849F4C6C0768DA920087E9A8 /* DataExplorer.nib */,
 			);
-			name = DataExplorer;
-			path = "Source/Objects/Data Processing/DataExplorer";
-			sourceTree = SOURCE_ROOT;
+			path = DataExplorer;
+			sourceTree = "<group>";
 		};
 		84A16C4C0A7EB7CE005BC151 /* ADC_L */ = {
 			isa = PBXGroup;
@@ -8056,6 +8057,7 @@
 		84B7DF9C04E1C53D005F64B1 /* Bar Graph */ = {
 			isa = PBXGroup;
 			children = (
+				84EE877E10D94B3100BBCBE5 /* rightBug.tif */,
 				84D79B850FFD347400DC81D2 /* leftBug.tif */,
 				84B7DF9F04E1C53D005F64B1 /* ORValueBar.m */,
 				84B7DF9E04E1C53D005F64B1 /* ORValueBar.h */,
@@ -11105,6 +11107,7 @@
 				84522B9610CD723E0077DDFF /* adcMeter.tif in Resources */,
 				84522D4910CD90600077DDFF /* adcHorizontalBar.tif in Resources */,
 				84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */,
+				84EE877F10D94B3100BBCBE5 /* rightBug.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

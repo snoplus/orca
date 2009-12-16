@@ -24,12 +24,12 @@
 
 @interface ORAmi286Controller : OrcaObjectController
 {
-    IBOutlet ORLevelMonitor*	monitor0;
 	IBOutlet NSButton*			sendOnAlarmCB;
 	IBOutlet NSTextField*		expiredTimeField;
 	IBOutlet NSButton*			sendOnExpiredCB;
 	IBOutlet NSButton*			sendOnValveChangeCB;
 	IBOutlet NSMatrix*			enabledMaskMatrix;
+    IBOutlet ORLevelMonitor*	monitor0;
     IBOutlet ORLevelMonitor*	monitor1;
     IBOutlet ORLevelMonitor*	monitor2;
     IBOutlet ORLevelMonitor*	monitor3;
@@ -45,6 +45,8 @@
     IBOutlet NSMatrix*			level1Matrix;
     IBOutlet NSMatrix*			hiAlarmMatrix;
     IBOutlet NSMatrix*			lowAlarmMatrix;
+    IBOutlet NSMatrix*			hiFillPointMatrix;
+    IBOutlet NSMatrix*			lowFillPointMatrix;
     IBOutlet NSMatrix*			timeMatrix;
 	IBOutlet ORPlotter1D*		plotter0;
 	IBOutlet NSPopUpButton*		fillStatePU0;
@@ -94,6 +96,7 @@
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) eMailEnabledChanged:(NSNotification*)aNote;
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote;
+- (void) fillPointChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) sendOnAlarmAction:(id)sender;
@@ -114,6 +117,8 @@
 - (IBAction) addAddress:(id)sender;
 - (IBAction) removeAddress:(id)sender;
 - (IBAction) eMailEnabledAction:(id)sender;
+- (IBAction) hiFillPointAction:(id)sender;
+- (IBAction) lowFillPointAction:(id)sender;
 
 #pragma mark ***DataSource
 - (float) levelMonitorLevel:(id)aLevelMonitor;
@@ -121,6 +126,10 @@
 - (void)  setLevelMonitor:(ORLevelMonitor*)aMonitor hiAlarm:(float)aValue;
 - (float) levelMonitorHiAlarmLevel:(id)aLevelMonitor;
 - (float) levelMonitorLowAlarmLevel:(id)aLevelMonitor;
+- (void) setLevelMonitor:(ORLevelMonitor*)aMonitor lowFillPoint:(float)aValue;
+- (void) setLevelMonitor:(ORLevelMonitor*)aMonitor hiFillPoint:(float)aValue;
+- (float) levelMonitorHiFillPoint:(id)aLevelMonitor;
+- (float) levelMonitorLowFillPoint:(id)aLevelMonitor;
 
 @end
 

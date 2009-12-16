@@ -46,6 +46,7 @@ NSString* ORAmi286Update						= @"ORAmi286Update";
 NSString* ORAmi286EMailEnabledChanged			= @"ORAmi286EMailEnabledChanged";
 NSString* ORAmi286EMailAddressesChanged			= @"ORAmi286EMailAddressesChanged";
 NSString* ORAmi286LastChange					= @"ORAmi286LastChange";
+NSString* ORAmi286FillPointChanged				= @"ORAmi286FillPointChanged";
 
 NSString* ORAmi286Lock = @"ORAmi286Lock";
 
@@ -655,6 +656,47 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	else return 0;
 }
 
+- (void) setLowFillPoint:(int)index value:(float)aValue
+{
+	if(aValue<0)aValue = 0;
+	else if(aValue>100)aValue=100;
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowFillPoint:index value:lowFillPoint[index]];
+	
+	lowFillPoint[index] = aValue;
+	if(lowFillPoint[index] >= hiFillPoint[index])[self setHiFillPoint:index value:lowFillPoint[index]];
+	
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286FillPointChanged object:self userInfo:userInfo];
+	
+}
+
+- (float) lowFillPoint:(int)index
+{
+	if(index>=0 && index<=10)return lowFillPoint[index];
+	else return 0;
+}
+
+- (void) setHiFillPoint:(int)index value:(float)aValue
+{
+	if(aValue<0)aValue = 0;
+	else if(aValue>100)aValue=100;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setHiFillPoint:index value:hiFillPoint[index]];
+	
+	hiFillPoint[index] = aValue;
+	if(hiFillPoint[index] < lowFillPoint[index])[self setLowFillPoint:index value:hiFillPoint[index]];
+	
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286FillPointChanged object:self userInfo:userInfo];
+	
+}
+
+- (float) hiFillPoint:(int)index
+{
+	if(index>=0 && index<=10)return hiFillPoint[index];
+	else return 0;
+}
+
 - (NSString*) lastRequest
 {
 	return lastRequest;
@@ -770,6 +812,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		timeRates[i] = [[ORTimeRate alloc] init];
 		[self setLowAlarmLevel:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"LowAlarm%d",i]]];
 		[self setHiAlarmLevel:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"HiAlarm%d",i]]];
+		[self setLowFillPoint:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowFillPoint%d",i]]];
+		[self setHiFillPoint:i value:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiFillPoint%d",i]]];
 		[self setFillState:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"FillState%d",i]]];
 		[self setLastChange:i];
 	}
@@ -800,6 +844,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	for(i=0;i<4;i++){
 		[encoder encodeFloat:lowAlarmLevel[i] forKey:[NSString stringWithFormat:@"LowAlarm%d",i]];
 		[encoder encodeFloat:hiAlarmLevel[i] forKey:[NSString stringWithFormat:@"HiAlarm%d",i]];
+		[encoder encodeFloat:lowFillPoint[i] forKey:[NSString stringWithFormat:@"lowFillPoint%d",i]];
+		[encoder encodeFloat:hiFillPoint[i] forKey:[NSString stringWithFormat:@"hiFillPoint%d",i]];
 		[encoder encodeInt:fillState[i] forKey:[NSString stringWithFormat:@"FillState%d",i]];
 	}
 }
@@ -817,6 +863,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		}
 	}
 	[self loadAlarmsToHardware];
+	[self loadFillPointsToHardware];
 	[self readLevels];
 }
 
@@ -862,7 +909,17 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			[self setHighAlarm:i withValue:hiAlarmLevel[i]];
 		}
 	}
-	[self readLevels];
+}
+
+- (void) loadFillPointsToHardware
+{
+	int i;
+	for(i=0;i<4;i++){
+		if(enabledMask&(1<<i)){
+			[self setLowFillPoint:i withValue:lowFillPoint[i]];
+			[self setHighFillPoint:i withValue:hiFillPoint[i]];
+		}
+	}
 }
 
 - (void) setLowAlarm:(int)chan withValue:(float)aValue
@@ -884,6 +941,29 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:ALAR:HI %.1f",chan+1,aValue]];
 	[self addCmdToQueue:@"*OPC?"];
 }
+
+- (void) setLowFillPoint:(int)chan withValue:(float)aValue
+{
+	if(chan>1)return;
+	if(!unitsSet){
+		[self addCmdToQueue:@"PERC"]; //default to percent units
+		unitsSet = YES;
+	}
+	[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:ALAR:B %.1f",chan+1,aValue]];
+	[self addCmdToQueue:@"*OPC?"];
+}
+
+- (void) setHighFillPoint:(int)chan withValue:(float)aValue
+{
+	if(chan>1)return;
+	if(!unitsSet){
+		[self addCmdToQueue:@"PERC"]; //default to percent units
+		unitsSet = YES;
+	}
+	[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:ALAR:A %.1f",chan+1,aValue]];
+	[self addCmdToQueue:@"*OPC?"];
+}
+
 
 #pragma mark •••Data Records
 - (unsigned long) dataId { return dataId; }

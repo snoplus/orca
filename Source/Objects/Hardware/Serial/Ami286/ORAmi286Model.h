@@ -43,6 +43,8 @@
 		int				fillState[4];
 		float		    hiAlarmLevel[4];
 		float		    lowAlarmLevel[4];
+		float		    hiFillPoint[4];
+		float		    lowFillPoint[4];
 		unsigned long	timeMeasured[4];
 		int				alarmStatus[4];
 		NSCalendarDate*	lastChange[4];
@@ -114,12 +116,18 @@
 - (void) setLastChange:(int)index;
 - (NSDate*) lastChange:(int)index;
 
-- (void) setFillState:(int)index value:(int)aValue;
-- (int) fillState:(int)index;
-- (void) setLowAlarmLevel:(int)index value:(float)aValue;
+- (void)  setFillState:(int)index value:(int)aValue;
+- (int)   fillState:(int)index;
+- (void)  setLowAlarmLevel:(int)index value:(float)aValue;
 - (float) lowAlarmLevel:(int)index;
-- (void) setHiAlarmLevel:(int)index value:(float)aValue;
+- (void)  setHiAlarmLevel:(int)index value:(float)aValue;
 - (float) hiAlarmLevel:(int)index;
+
+- (void)  setLowFillPoint:(int)index value:(float)aValue;
+- (float) lowFillPoint:(int)index;
+- (void)  setHiFillPoint:(int)index value:(float)aValue;
+- (float) hiFillPoint:(int)index;
+
 - (NSString*) fillStatusName:(int)i;
 - (NSString*) fillStateName:(int)i;
 
@@ -140,7 +148,10 @@
 - (void) readLevels;
 - (void) setLowAlarm:(int)chan withValue:(float)aValue;
 - (void) setHighAlarm:(int)chan withValue:(float)aValue;
+- (void) setLowFillPoint:(int)chan withValue:(float)aValue;
+- (void) setHighFillPoint:(int)chan withValue:(float)aValue;
 - (void) loadAlarmsToHardware;
+- (void) loadFillPointsToHardware;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -163,3 +174,4 @@ extern NSString* ORAmi286ModelPortStateChanged;
 extern NSString* ORAmi286AlarmLevelChanged;
 extern NSString* ORAmi286Update;
 extern NSString* ORAmi286LastChange;
+extern NSString* ORAmi286FillPointChanged;
