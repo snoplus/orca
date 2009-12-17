@@ -77,6 +77,7 @@
 - (void) selectedRegChannelChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) baseAddressAction: (id)aSender;
 - (IBAction) lowThresholdAction:(id)sender;
 - (IBAction) highThresholdAction:(id)sender;
 - (IBAction) onlineAction:(id)sender;

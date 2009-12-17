@@ -242,6 +242,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) baseAddressAction: (id) aSender
+{
+	[model setBaseAddress:[aSender intValue]];
+}
+
 - (IBAction) writeValueAction:(id) aSender
 {
 	[model setWriteValue:[aSender intValue]];
