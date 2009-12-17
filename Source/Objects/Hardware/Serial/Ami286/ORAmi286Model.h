@@ -51,9 +51,9 @@
 		NSTimer*		expiredTimer[4];
 		unsigned char	enabledMask;
 		BOOL			unitsSet;
-		ORAlarm*		hiAlarm;
-		ORAlarm*		lowAlarm;
-		ORAlarm*		expiredAlarm;
+		ORAlarm*		hiAlarm[4];
+		ORAlarm*		lowAlarm[4];
+		ORAlarm*		expiredAlarm[4];
 		NSMutableArray* eMailList;
 		BOOL			emailEnabled;
 		BOOL			eMailThreadRunning;

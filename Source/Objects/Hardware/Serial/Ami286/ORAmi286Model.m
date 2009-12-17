@@ -96,18 +96,20 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		[timeRates[i] release];
 		[lastChange[i] release];
 		[self stopExpiredTimer:i];
+		[hiAlarm[i] clearAlarm];
+		[hiAlarm[i] release];
+		
+		[lowAlarm[i] clearAlarm];
+		[lowAlarm[i] release];	
+		[expiredAlarm[i] clearAlarm];
+		[expiredAlarm[i] release];
 	}
-	[hiAlarm clearAlarm];
-	[hiAlarm release];
 	
-	[lowAlarm clearAlarm];
-	[lowAlarm release];
+
+	[self clearReasons];
 	
-	[expiredAlarm clearAlarm];
-	[expiredAlarm release];
 	[eMailLock release];
 	[eMailList release];
-	[self clearReasons];
 	[super dealloc];
 }
 
@@ -493,11 +495,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 														  userInfo:userInfo];
 		
 		if(alarmStatus[index] & (1<<0)){
-			if(!hiAlarm){
-				hiAlarm = [[ORAlarm alloc] initWithName:@"Ami 286 Hi Level" severity:kRangeAlarm];
-				[hiAlarm setSticky:YES];
+			if(!hiAlarm[index]){
+				hiAlarm[index] = [[ORAlarm alloc] initWithName:@"Ami 286 Hi Level" severity:kRangeAlarm];
+				[hiAlarm[index] setSticky:YES];
 			}
-			[hiAlarm postAlarm];
+			[hiAlarm[index] postAlarm];
 			if(sendOnAlarm){
 				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Hi Alarm posted at %@\n",index,time]];
@@ -505,16 +507,16 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 		}
 		else {
-			[hiAlarm clearAlarm];
-			[hiAlarm release];
-			hiAlarm = nil;
+			[hiAlarm[index] clearAlarm];
+			[hiAlarm[index] release];
+			hiAlarm[index] = nil;
 		}
 		if(alarmStatus[index] & (1<<3)){
-			if(!lowAlarm){
-				lowAlarm = [[ORAlarm alloc] initWithName:@"Ami 286 Low Level" severity:kRangeAlarm];
-				[lowAlarm setSticky:YES];
+			if(!lowAlarm[index]){
+				lowAlarm[index] = [[ORAlarm alloc] initWithName:@"Ami 286 Low Level" severity:kRangeAlarm];
+				[lowAlarm[index] setSticky:YES];
 			}
-			[lowAlarm postAlarm];
+			[lowAlarm[index] postAlarm];
 			if(sendOnAlarm){
 				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Low Alarm posted at %@\n",index,time]];
@@ -522,16 +524,16 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 		}
 		else {
-			[lowAlarm clearAlarm];
-			[lowAlarm release];
-			lowAlarm = nil;
+			[lowAlarm[index] clearAlarm];
+			[lowAlarm[index] release];
+			lowAlarm[index] = nil;
 		}
 		if(alarmStatus[index] & (1<<6)){
-			if(!expiredAlarm){
-				expiredAlarm = [[ORAlarm alloc] initWithName:@"Ami 286 Expired" severity:kRangeAlarm];
-				[expiredAlarm setSticky:YES];
+			if(!expiredAlarm[index]){
+				expiredAlarm[index] = [[ORAlarm alloc] initWithName:@"Ami 286 Expired" severity:kRangeAlarm];
+				[expiredAlarm[index] setSticky:YES];
 			}
-			[expiredAlarm postAlarm];
+			[expiredAlarm[index] postAlarm];
 			if(sendOnAlarm){
 				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Expired Alarm posted at %@\n",index,time]];
@@ -539,9 +541,9 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 		}
 		else {
-			[expiredAlarm clearAlarm];
-			[expiredAlarm release];
-			expiredAlarm = nil;
+			[expiredAlarm[index] clearAlarm];
+			[expiredAlarm[index] release];
+			expiredAlarm[index] = nil;
 		}
 	}
 }
