@@ -854,18 +854,27 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) loadHardware
 {
 	int i;
-	for(i=0;i<4;i++){
+	for(i=0;i<2;i++){
 		if(enabledMask&(1<<i)){
-			if(i<2){
-				[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:Fill:State %d",i+1,fillState[i]]];
-				[self addCmdToQueue:@"*OPC?"];
-			}
+			[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:Fill:State %d",i+1,fillState[i]]];
+			[self addCmdToQueue:@"*OPC?"];
 		}
 	}
 	[self loadAlarmsToHardware];
 	[self loadFillPointsToHardware];
 	[self readLevels];
 }
+
+- (void) loadFillState
+{
+	int i;
+	for(i=0;i<2;i++){
+		if(i<2){
+			[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:Fill:State %d",i+1,fillState[i]]];
+		}
+	}
+}
+
 
 - (void) addCmdToQueue:(NSString*)aCmd
 {

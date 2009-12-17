@@ -114,6 +114,7 @@
 - (IBAction) lowAlarmAction:(id)sender;
 - (IBAction) fillStateAction:(id)sender;
 - (IBAction) loadHardwareAction:(id)sender;
+- (IBAction) loadFillStateAction:(id)sender;
 - (IBAction) addAddress:(id)sender;
 - (IBAction) removeAddress:(id)sender;
 - (IBAction) eMailEnabledAction:(id)sender;

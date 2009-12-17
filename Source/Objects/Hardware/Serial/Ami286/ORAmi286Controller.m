@@ -546,6 +546,16 @@
 	}
 }
 
+- (IBAction) loadFillStateAction:(id)sender
+{
+	@try {
+		[self endEditing];
+		[model loadFillState];
+	}
+	@catch(NSException* localException) {
+	}
+}
+
 - (IBAction) fillStateAction:(id)sender;
 {
 	if([model fillState:[sender tag]] != [sender indexOfSelectedItem]){

@@ -143,6 +143,7 @@
 
 #pragma mark •••Commands
 - (void) loadHardware;
+- (void) loadFillState;
 - (void) addCmdToQueue:(NSString*)aCmd;
 - (void) readLevels:(BOOL)ship;
 - (void) readLevels;
