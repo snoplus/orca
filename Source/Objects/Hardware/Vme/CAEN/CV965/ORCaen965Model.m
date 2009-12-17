@@ -26,7 +26,7 @@
 #import "ORRateGroup.h"
 
 // Address information for this unit.
-#define k965DefaultBaseAddress 		0xd0000
+#define k965DefaultBaseAddress 		0xd000
 #define k965DefaultAddressModifier 	0x39
 
 // Define all the registers available to this unit.
@@ -94,6 +94,11 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     [[self undoManager] enableUndoRegistration];
    
     return self;
+}
+
+- (NSString*) helpURL
+{
+	return @"VME/V965.html";
 }
 
 #pragma mark ***Accessors
