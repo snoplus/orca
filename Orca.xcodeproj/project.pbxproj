@@ -836,7 +836,6 @@
 		8435653108FEFFB8002864C7 /* ORMessagePipe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435652F08FEFFB8002864C7 /* ORMessagePipe.h */; };
 		8435653208FEFFB8002864C7 /* ORMessagePipe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435653008FEFFB8002864C7 /* ORMessagePipe.m */; };
 		8435AACC10C6D0EF00E03F7F /* NoOilHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8435AAC210C6D0EF00E03F7F /* NoOilHelp.plist */; };
-		8435AACD10C6D0EF00E03F7F /* ORVarianTPSController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435AAC310C6D0EF00E03F7F /* ORVarianTPSController.h */; };
 		8435AACE10C6D0EF00E03F7F /* ORVarianTPSController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435AAC410C6D0EF00E03F7F /* ORVarianTPSController.m */; };
 		8435AACF10C6D0EF00E03F7F /* ORVarianTPSDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8435AAC510C6D0EF00E03F7F /* ORVarianTPSDecoders.h */; };
 		8435AAD010C6D0EF00E03F7F /* ORVarianTPSDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8435AAC610C6D0EF00E03F7F /* ORVarianTPSDecoders.m */; };
@@ -2902,7 +2901,6 @@
 		8435652F08FEFFB8002864C7 /* ORMessagePipe.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMessagePipe.h; path = "Source/Objects/Data Flow/Connectors/ORMessagePipe.h"; sourceTree = SOURCE_ROOT; };
 		8435653008FEFFB8002864C7 /* ORMessagePipe.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMessagePipe.m; path = "Source/Objects/Data Flow/Connectors/ORMessagePipe.m"; sourceTree = SOURCE_ROOT; };
 		8435AAC210C6D0EF00E03F7F /* NoOilHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoOilHelp.plist; path = Source/Objects/Hardware/Serial/VarianTPS/NoOilHelp.plist; sourceTree = SOURCE_ROOT; };
-		8435AAC310C6D0EF00E03F7F /* ORVarianTPSController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVarianTPSController.h; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSController.h; sourceTree = SOURCE_ROOT; };
 		8435AAC410C6D0EF00E03F7F /* ORVarianTPSController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVarianTPSController.m; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSController.m; sourceTree = SOURCE_ROOT; };
 		8435AAC510C6D0EF00E03F7F /* ORVarianTPSDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVarianTPSDecoders.h; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSDecoders.h; sourceTree = SOURCE_ROOT; };
 		8435AAC610C6D0EF00E03F7F /* ORVarianTPSDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVarianTPSDecoders.m; path = Source/Objects/Hardware/Serial/VarianTPS/ORVarianTPSDecoders.m; sourceTree = SOURCE_ROOT; };
@@ -5902,7 +5900,6 @@
 			isa = PBXGroup;
 			children = (
 				8435AAC210C6D0EF00E03F7F /* NoOilHelp.plist */,
-				8435AAC310C6D0EF00E03F7F /* ORVarianTPSController.h */,
 				8435AAC410C6D0EF00E03F7F /* ORVarianTPSController.m */,
 				8435AAC510C6D0EF00E03F7F /* ORVarianTPSDecoders.h */,
 				8435AAC610C6D0EF00E03F7F /* ORVarianTPSDecoders.m */,
@@ -10434,7 +10431,6 @@
 				848A148710BAE40E002A80D0 /* ORDecoderOperation.h in Headers */,
 				848A149D10BAE43A002A80D0 /* ORDecoder.h in Headers */,
 				84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */,
-				8435AACD10C6D0EF00E03F7F /* ORVarianTPSController.h in Headers */,
 				8435AACF10C6D0EF00E03F7F /* ORVarianTPSDecoders.h in Headers */,
 				8435AAD110C6D0EF00E03F7F /* ORVarianTPSModel.h in Headers */,
 				849516B610C95382001C8112 /* ORStateLabelController.h in Headers */,
