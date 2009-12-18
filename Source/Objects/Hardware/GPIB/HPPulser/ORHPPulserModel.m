@@ -171,29 +171,6 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(downloadStarted:)
-                         name : ORHPPulserWaveformLoadStartedNotification
-                       object : self];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(downloadFinished:)
-                         name : ORHPPulserWaveformLoadFinishedNotification
-                       object : self];
-}
-
-- (void) downloadStarted:(NSNotification*)aNotification
-{
-	savedTriggerSource = triggerSource;
-	[self writeTriggerSource:kSoftwareTrigger];
-}
-
-- (void) downloadFinished:(NSNotification*)aNotification
-{
-	[self writeTriggerSource:savedTriggerSource];
-    [self logSystemResponse];
-	NSLog(@"Waveform Download Complete\n");
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -681,7 +658,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) writeBurstState:(BOOL)value
 {
     if(value) [self writeToGPIBDevice:@"BM:STAT ON"];
-    else [self writeToGPIBDevice:@"BM:STAT OFF"];
+    else	  [self writeToGPIBDevice:@"BM:STAT OFF"];
+    [self logSystemResponse];
 }
 
 - (void) writeBurstCycles:(int)value
@@ -703,12 +681,15 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     switch(value){
         case kInternalTrigger:
             [self writeToGPIBDevice:@"TRIG:SOUR IMM"];
-            break;
+			[self logSystemResponse];
+           break;
         case kExternalTrigger:
             [self writeToGPIBDevice:@"TRIG:SOUR EXT"];
+			[self logSystemResponse];
             break;
         case kSoftwareTrigger:
             [self writeToGPIBDevice:@"TRIG:SOUR BUS"];
+			[self logSystemResponse];
             break;
         default:
             NSLog(@"ORHPPulserModel:writeTriggerSource - The selection %s, is not valid.  1 = Internal, 2 = External, 3 = Bus\n",value);
@@ -744,6 +725,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (void) logSystemResponse
 {
+	return;   //stopped asking for response because of device time-outs and errors. MAH 12/18/09
     char reply[1024];
     long n = [self writeReadGPIBDevice:@"SYST:ERR?" data:reply maxLength:1024];
     if(n && [[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] rangeOfString:@"No error"].location == NSNotFound){
@@ -841,10 +823,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
         [self loadFromNonVolativeMemory];
     }
 	@catch(NSException* localException) {
-        //[localException raise]; //reraise the exception
 	}
 	
-	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:YES];
+	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
 	
 	[pool release];
 }
@@ -873,12 +854,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
         }
 	}
 	@catch(NSException* localException) {
-		//[localException raise]; //reraise the exception
 	}
 	
 	downloadIndex = [self numPoints];
 	
-	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:YES];
+	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
 	
 	[pool release];
 }
@@ -893,9 +873,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) waveFormWasSent
 {
 	loading = NO;
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName: ORHPPulserWaveformLoadFinishedNotification
-	 object: self];
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORHPPulserWaveformLoadFinishedNotification object: self];
+	[self writeTriggerSource:savedTriggerSource];
+	NSLog(@"Waveform Download Complete\n");
 }
 
 - (void) stopDownload
@@ -937,41 +917,22 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     if([self isConnected]){
         if(selectedWaveform == kLogCalibrationWaveform){
-            //[self writeTotalWidth:kCalibrationWidth];
-            //[self logSystemResponse];
             [self writeVoltage:kCalibrationVoltage];
-            [self logSystemResponse];
             [self writeBurstCycles:1];
-            [self logSystemResponse];            
             [self writeBurstRate:kCalibrationBurstRate];
-            [self logSystemResponse];
 			[self writeFrequency:[self frequency]];
-			[self logSystemResponse];
         }
         else {
-            //[self writeTotalWidth:[self totalWidth]];
-            //[self logSystemResponse];
             [self writeVoltage:[self voltage]];
-            [self logSystemResponse];
             [self writeVoltageOffset:[self voltageOffset]];
-            [self logSystemResponse];
-            //if (selectedWaveform <= kNumBuiltInTypes) {
 			[self writeFrequency:[self frequency]];
-			[self logSystemResponse];
-            //}
             [self writeBurstCycles:[self burstCycles]];
-            [self logSystemResponse];
             [self writeBurstRate:[self burstRate]];
-            [self logSystemResponse];
         }
         
-		
         [self writeBurstPhase:[self burstPhase]];
-        [self logSystemResponse];
         [self writeTriggerSource:[self triggerSource]];
-        [self logSystemResponse];
         [self writeBurstState:YES];
-        [self logSystemResponse];
         
     }
 }
@@ -1312,6 +1273,9 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 	downloadIndex = 0;
 	loading = YES;
 	[self buildWave];
+	
+	savedTriggerSource = triggerSource;
+	[self writeTriggerSource:kSoftwareTrigger];
 	
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName: ORHPPulserWaveformLoadStartedNotification

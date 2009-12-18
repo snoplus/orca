@@ -510,35 +510,25 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) downloadWaveform
 {
-	if(connectionProtocol == kHPPulserUseIP){
-		waitForAsyncDownloadDone = YES;
-	}
-	else waitForAsyncDownloadDone = NO;
+	if(connectionProtocol == kHPPulserUseIP) waitForAsyncDownloadDone = YES;
+	else									 waitForAsyncDownloadDone = NO;
 	[super downloadWaveform];
 }
 
 - (void) waveFormWasSent
 {
 	if(!waitForAsyncDownloadDone)[super waveFormWasSent];
+	[self writeToGPIBDevice:@"Output 1;*WAI"];
 	if(connectionProtocol == kHPPulserUseIP){
 		[self writeToGPIBDevice:@"*OPC?"];
 	}
-	
-}
-
-- (void) downloadFinished:(NSNotification*)aNotification
-{
-	[super downloadFinished:aNotification];
-	[self writeToGPIBDevice:@"Output 1;*WAI"];
 }
 
 - (void) asyncDownloadFinished
 {
 	waitForAsyncDownloadDone = NO;
 	loading = NO;
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName: ORHPPulserWaveformLoadFinishedNotification
-	 object: self];
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORHPPulserWaveformLoadFinishedNotification object: self];
 	waitForGetWaveformsLoadedDone = YES;
 	[self writeToGPIBDevice:@"Data:CAT?;*WAI;*OPC?"];
 }

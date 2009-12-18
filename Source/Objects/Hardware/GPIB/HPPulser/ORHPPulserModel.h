@@ -127,8 +127,6 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void)	makeMainController;
 - (void) registerNotificationObservers;
 - (void) runStatusChanged:(NSNotification*)aNotification;
-- (void) downloadStarted:(NSNotification*)aNotification;
-- (void) downloadFinished:(NSNotification*)aNotification;
 - (void) waveFormWasSent;
 - (void) updateLoadProgress;
 

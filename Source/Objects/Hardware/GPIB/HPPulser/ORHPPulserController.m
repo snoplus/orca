@@ -412,6 +412,10 @@
         
 	}
 	@catch(NSException* localException) {
+		[model stopDownload];
+		[progress stopAnimation:self];
+		[progress setIndeterminate:NO];
+		[progress setDoubleValue:0];
 		NSLog( [ localException reason ] );
 		NSRunAlertPanel( [ localException name ], 	// Name of panel
 						[ localException reason ],	// Reason for error
@@ -569,7 +573,6 @@
 - (void) lockChanged: (NSNotification*) aNotification
 {
 	[self setButtonStates];
-	
 }
 
 - (void) primaryAddressChanged:(NSNotification*)aNotification
@@ -642,6 +645,7 @@
 - (void) volatileChanged:(NSNotification*)aNotification
 {
 	[progress setIndeterminate:NO];
+	[progress setDoubleValue:0];
 	[downloadTypeField setStringValue:@""];
 }
 
@@ -715,19 +719,13 @@
 }
 
 - (void) waveformLoadFinished:(NSNotification*)aNotification
-{
-	[yScale setNeedsDisplay:YES];
-	[xScale setNeedsDisplay:YES];
-	[plotter setNeedsDisplay:YES];
-	[downloadButton setEnabled:![model loading] && ![model lockGUI]];
-	
-	[downloadTypeField setStringValue:@""];
-	
-	[progress stopAnimation:self];
-	[progress setIndeterminate:NO];
-	[progress setDoubleValue:0]; 
-	
+{	
 	[self setButtonStates];
+	
+	[progress setIndeterminate:NO];
+	[progress stopAnimation:self];
+	[progress setMaxValue:100];
+	[progress setDoubleValue:0];
 }
 
 
@@ -745,20 +743,21 @@
 - (void) setButtonStates
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model dialogLock]];
-    BOOL loading = [model loading];
-	BOOL runInProgress  = [gOrcaGlobals runInProgress];
-	
-    if(loading){
-        [downloadButton setTitle:@"Stop"];
-    }
-    else {
-        [downloadButton setTitle:@"Load"];
-    }
-	BOOL locked		= [gSecurity isLocked:[model dialogLock]];
-    BOOL triggerModeIsSoftware = [model triggerSource] == kSoftwareTrigger;
-	
+    BOOL loading					= [model loading];
+	BOOL runInProgress				= [gOrcaGlobals runInProgress];
+	BOOL locked						= [gSecurity isLocked:[model dialogLock]];
+    BOOL triggerModeIsSoftware		= [model triggerSource] == kSoftwareTrigger;
 	locked |= [model lockGUI];
 	
+    [downloadButton setTitle: loading ? @"Stop":@"Load"];
+	
+	[yScale setNeedsDisplay:YES];
+	[xScale setNeedsDisplay:YES];
+	[plotter setNeedsDisplay:YES];
+	[downloadButton setEnabled:![model loading] && ![model lockGUI]];
+	
+	[downloadTypeField setStringValue:@""];
+		
     [enableRandomButton setEnabled: !locked && triggerModeIsSoftware];	
     [minTimeField setEnabled: !locked && triggerModeIsSoftware];	
     [maxTimeField setEnabled: !locked && triggerModeIsSoftware];	
@@ -785,13 +784,12 @@
     [burstCyclesStepper setEnabled:!loading && !locked];
     [burstPhaseField setEnabled:!loading && !locked];
     [burstPhaseStepper setEnabled:!loading && !locked];
-	//    [totalWidthField setEnabled:!loading && !locked];
-	//    [totalWidthStepper setEnabled:!loading && !locked];
     [triggerModeMatrix setEnabled:!locked && !loading];
     [triggerButton setEnabled:!locked && !loading && triggerModeIsSoftware];
     [loadParamsButton setEnabled:!locked && !loading];
     [sendCommandButton setEnabled:!locked && !loading];
     [commandField setEnabled:!locked && !loading];
+		
     NSString* s = @"";
 	if([model lockGUI]){
 		s = @"Locked by other object";
