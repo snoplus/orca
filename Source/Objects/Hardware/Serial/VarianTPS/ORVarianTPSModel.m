@@ -603,7 +603,7 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 	NSData* cmdData = [cmdQueue dequeue];
 	[self setLastRequest:cmdData];
 	[serialPort writeDataInBackground:cmdData];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:.5];
 }
 
 - (void) enqueCmdData:(NSData*)someData
