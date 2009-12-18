@@ -75,16 +75,14 @@
 	
     if( length == 0 ) NSLog( @"%@ Data Buffer is empty.\n", pName );
     else {
-        NSLog(@"crate: %@ card: %@\n",crateKey,cardKey);        
+        NSLog(@"Data Buffer for %@ %@\n",crateKey,cardKey);        
         for( i = 2; i < length; i++ ){
             if( ShiftAndExtract(ptr[i],24,0x7) == 0x0){ //is valid data?
-                NSLog( @"--Data Block\n");
-                NSLog( @"Geo Address  : 0x%lx\n",	ShiftAndExtract(ptr[i],27,0x1f));
-                NSLog( @"Channel      : 0x%lx  (un:%ld ov:%ld)\n", 
+                NSLogFont([NSFont fontWithName:@"Monaco" size:12],  @"Chan: %2d  (un:%d ov:%d) qdc: 0x%x\n", 
 													ShiftAndExtract(ptr[i],17,0xf),
 													ShiftAndExtract(ptr[i],13,0x1),
-													ShiftAndExtract(ptr[i],12,0x1));
-                NSLog( @"Adc Value    : 0x%lx\n",	ShiftAndExtract(ptr[i],0,0xfff) );
+													ShiftAndExtract(ptr[i],12,0x1),
+													ShiftAndExtract(ptr[i],0,0xfff));
             }
         }
     }

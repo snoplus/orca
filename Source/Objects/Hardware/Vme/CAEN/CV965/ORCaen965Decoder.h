@@ -38,5 +38,6 @@
 }
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
+- (void) printData: (NSString*) pName data:(void*) theData;
 
 @end
