@@ -131,6 +131,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [waveform release];
+	[fileName release];
     [super dealloc];
 }
 
@@ -843,7 +844,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
         //[localException raise]; //reraise the exception
 	}
 	
-	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:YES];
 	
 	[pool release];
 }
@@ -877,7 +878,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	
 	downloadIndex = [self numPoints];
 	
-	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:YES];
 	
 	[pool release];
 }
