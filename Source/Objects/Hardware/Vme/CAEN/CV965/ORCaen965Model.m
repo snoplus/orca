@@ -20,7 +20,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORCaen965Model.h"
-#import "ORBaseDecoder.h"
+#import "ORCaen965Decoder.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORRateGroup.h"
@@ -242,14 +242,24 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
         // If user selected the output buffer then read it.
         else if (theRegIndex == [self getOutputBufferIndex]){
             ORDataPacket* tempDataPacket = [[ORDataPacket alloc]init];
+			
+			statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
+			dataBufferAddress   = [self baseAddress]+[self getBufferOffset];;
+			location			=  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+			controller			= [self adapter]; //cache for speed
+			
             [self takeData:tempDataPacket userInfo:nil];
+			[tempDataPacket addFrameBuffer:YES];
+			isRunning = NO;
+
             if([[tempDataPacket dataArray]count]){
 				NSData* theData = [[tempDataPacket dataArray] objectAtIndex:0];
 				unsigned long* someData = (unsigned long*)[theData bytes];
-                ORCaenDataDecoder *aDecoder = [[ORCaenDataDecoder alloc] init];
+                ORCaen965DecoderForQdc* aDecoder = [[ORCaen965DecoderForQdc alloc] init];
                 [aDecoder printData:@"CAEN 965" data:someData];
                 [aDecoder release];
             }
+			else NSLog(@"No Data in buffer\n");
         }
         
         // Handle all other registers.  Just read them.
@@ -274,19 +284,55 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     // Get register and channel from dialog box.
     short theChannelIndex	= [self selectedChannel];
     short theRegIndex 		= [self selectedRegIndex];
-    
+	short		start;
+    short		end;
+    short		i;
+	
     @try {
         
         NSLog(@"Register is:%d\n", theRegIndex);
         NSLog(@"Index is   :%d\n", theChannelIndex);
         NSLog(@"Value is   :0x%04x\n", theValue);
-        
-		[[self adapter] writeLongBlock:&theValue
-							 atAddress:[self baseAddress] + [self getAddressOffset:theRegIndex]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-        
+		if (theRegIndex == kLowThresholds || theRegIndex == kHiThresholds){
+            start = theChannelIndex;
+            end = theChannelIndex;
+            if(theChannelIndex >= [self numberOfChannels]) {
+                start = 0;
+                end = kCV965NumberChannels - 1;
+            }
+            
+            // Loop through the thresholds and read them.
+			if(theRegIndex == kLowThresholds){
+				for(i = start; i <= end; i++){
+					[self setLowThreshold:i withValue:theValue];
+					[self writeLowThreshold:i];
+					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+				}
+			}
+			else {
+				for(i = start; i <= end; i++){
+					[self setHighThreshold:i withValue:theValue];
+					[self writeHighThreshold:i];
+					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
+				}
+            }
+        }
+		
+		else if ([self getAccessSize:theRegIndex] == kD16){
+			unsigned short sValue = (unsigned short)theValue;
+			[[self adapter] writeWordBlock:&sValue
+								 atAddress:[self baseAddress] + [self getAddressOffset:theRegIndex]
+								numToWrite:1
+								withAddMod:[self addressModifier]
+							 usingAddSpace:0x01];
+        }
+		else {
+			[[self adapter] writeLongBlock:&theValue
+								 atAddress:[self baseAddress] + [self getAddressOffset:theRegIndex]
+								numToWrite:1
+								withAddMod:[self addressModifier]
+							 usingAddSpace:0x01];
+		}
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
@@ -399,12 +445,12 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 
 - (int) lowThresholdOffset:(unsigned short)aChan
 {
-	return reg[kLowThresholds].addressOffset + (aChan * 2);
+	return reg[kLowThresholds].addressOffset + (aChan * 4);
 }
 
 - (int) highThresholdOffset:(unsigned short)aChan
 {
-	return reg[kHiThresholds].addressOffset + (aChan * 2);
+	return reg[kHiThresholds].addressOffset + (aChan * 4);
 }
 
 - (short) getNumberRegisters
