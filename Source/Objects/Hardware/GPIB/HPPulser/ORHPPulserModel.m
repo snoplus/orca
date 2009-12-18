@@ -768,9 +768,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     BOOL result = NO;
     @try {
         NSArray* allInMemory = [self getLoadedWaveforms];
-        NSEnumerator* e = [allInMemory objectEnumerator];
-        NSString* aName;
-        while(aName = [e nextObject]){
+        for(NSString* aName in allInMemory){
             //Check if our selected waveform is already in memory
             if( [aName isEqualToString:waveformData[selectedWaveform].storageName]){
                 result = YES;
@@ -801,9 +799,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     @try {
         NSArray* allInMemory = [self getLoadedWaveforms];
-        NSEnumerator* e = [allInMemory objectEnumerator];
-        NSString* aName; 
-        while(aName = [e nextObject]){
+        for(NSString* aName in allInMemory){
             if( ![self inBuiltInList:aName] && [self inCustomList:aName]){
                 [self writeToGPIBDevice:[NSString stringWithFormat:@"*RST;*CLS;DATA:DEL %@",aName]];
             }
