@@ -34,6 +34,7 @@
 #define kLogAmpVoltage  	750
 #define kLogAmpPulseWidth  	7.8  //can't have it exactly 8 because of a bug in the HP pulser
 #define kLogAmpBurstRate  	3.0
+#define kBitResolution      0x3FFF
 
 
 #define PI  3.141592
@@ -490,8 +491,14 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     return loading;
 }
 
+- (void) setLoading:(BOOL)aLoad
+{
+	loading = aLoad;
+}
+
 - (void) insert:(unsigned short) numPoints value:(float) theValue;
 {
+	if ([self numPoints] >= [self maxNumberOfWaveformPoints]) return;
     short i;
     for(i=0;i<numPoints;i++){
         [waveform appendBytes:&theValue length:sizeof(float)];
@@ -577,6 +584,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	
 	for(i=0;i<n;i++){
 		w[i] *= scaleFactor*(negativePulse?-1:1);
+		if (fabs(w[i]) <= 1./kBitResolution) {
+			w[i] = 0;
+		}
 	}
 }
 
@@ -589,6 +599,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (id)  dialogLock
 {
 	return @"ORHPPulserLock";
+}
+
+- (unsigned int) maxNumberOfWaveformPoints
+{
+	return kMaxNumWaveformPoints;
 }
 
 #pragma mark •••Hardware Access
@@ -841,13 +856,21 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
         const float* ptr = (const float*)[waveform bytes];
         for(downloadIndex=0;downloadIndex<[self numPoints]-1;downloadIndex++){
             if(!loading)break;
-            [self writeToGPIBDevice:[NSString stringWithFormat:@"%6.5f,",ptr[downloadIndex]]];
+			if (ptr[downloadIndex]==0) {
+				[self writeToGPIBDevice:@"0.0001,"];
+			} else {
+				[self writeToGPIBDevice:[NSString stringWithFormat:@"%6.5f,",ptr[downloadIndex]]];
+			}
             if(!(downloadIndex%10)){
 				[self performSelectorOnMainThread:@selector(updateLoadProgress) withObject:nil waitUntilDone:NO];
             }
         }
         [self enableEOT:YES];
-        [self writeToGPIBDevice:[NSString stringWithFormat:@"%6.5f\n;*WAI",ptr[downloadIndex]]];
+		if (ptr[downloadIndex]==0) {
+			[self writeToGPIBDevice:@"0\n;*WAI"];
+		} else {
+			[self writeToGPIBDevice:[NSString stringWithFormat:@"%6.5f\n;*WAI",ptr[downloadIndex]]];
+		}
         if(loading){
             [self logSystemResponse];
             [self loadFromVolativeMemory];
@@ -949,7 +972,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (void) buildWave
 {
-    [self setWaveform: [NSMutableData dataWithCapacity:kMaxNumWaveformPoints*sizeof(float)]];
+    [self setWaveform: [NSMutableData dataWithCapacity:[self maxNumberOfWaveformPoints] *sizeof(float)]];
     
     //int count = [self numPoints];
 	
@@ -1096,7 +1119,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             NSString*       contents = [NSString stringWithContentsOfFile:[fileName stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
             NSScanner*      scanner  = [NSScanner scannerWithString:contents];
             NSCharacterSet* set 	 = [NSCharacterSet characterSetWithCharactersInString:@" ,\t\r\n"];
-			[self insert:kPadSize/2 value:0];
+			//[self insert:kPadSize/2 value:0];
             while(![scanner isAtEnd]) {
                 NSString*  destination = [NSString string];
                 [scanner scanUpToCharactersFromSet:[set invertedSet] intoString:nil];
@@ -1106,7 +1129,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
                     }
                 }
             }
-			[self insert:kPadSize/2 value:0];
+			//[self insert:kPadSize/2 value:0];
 			[self normalizeWaveform];
 			
         }

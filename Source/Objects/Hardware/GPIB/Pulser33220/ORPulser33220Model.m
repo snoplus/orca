@@ -24,6 +24,8 @@
 #import "ORUSBInterface.h"
 #import "NetSocket.h"
 
+#define kMaxNumberOfPoints33220 0xFFFF
+
 NSString* ORPulser33220ModelSerialNumberChanged = @"ORPulser33220ModelSerialNumberChanged";
 NSString* ORPulser33220ModelCanChangeConnectionProtocolChanged = @"ORPulser33220ModelCanChangeConnectionProtocolChanged";
 NSString* ORPulser33220ModelIpConnectedChanged	= @"ORPulser33220ModelIpConnectedChanged";
@@ -575,6 +577,11 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	if(!ipConnected){
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kHPPulserPort]];	
 	}
+}
+
+- (unsigned int) maxNumberOfWaveformPoints
+{
+	return kMaxNumberOfPoints33220;
 }
 
 #pragma mark ***Delegate Methods

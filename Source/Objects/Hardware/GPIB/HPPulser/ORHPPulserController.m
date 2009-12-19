@@ -379,7 +379,7 @@
         [openPanel setCanChooseDirectories:NO];
         [openPanel setCanChooseFiles:YES];
         [openPanel setAllowsMultipleSelection:NO];
-        [openPanel setPrompt:@"DownLoad"];
+        [openPanel setPrompt:@"Download"];
         [openPanel beginSheetForDirectory:NSHomeDirectory()
                                      file:nil
                                     types:nil

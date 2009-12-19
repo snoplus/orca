@@ -163,6 +163,7 @@ typedef struct HPPulserCustomWaveformStruct {
 - (int)  downloadIndex;
 - (void) stopDownload;
 - (BOOL) loading;
+- (void) setLoading:(BOOL)aLoad;
 - (BOOL) enableRandom;
 - (void) setEnableRandom:(BOOL)aNewEnableRandom;
 - (float) minTime;
@@ -174,6 +175,7 @@ typedef struct HPPulserCustomWaveformStruct {
 - (unsigned long)   pulserDataId;
 - (void)   setPulserDataId:(unsigned long)aValue;
 - (id)  dialogLock;
+- (unsigned int) maxNumberOfWaveformPoints;
 
 #pragma mark •••Hardware Access
 - (NSString*) readIDString;

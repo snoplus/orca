@@ -92,6 +92,7 @@
 - (void) writeBurstState:(BOOL)value;
 - (void) writeBurstCycles:(int)value;
 - (void) writeBurstPhase:(int)value;
+- (unsigned int) maxNumberOfWaveformPoints;
 
 #pragma mark ***Delegate Methods
 //- (void) netsocketConnected:(NetSocket*)inNetSocket;
