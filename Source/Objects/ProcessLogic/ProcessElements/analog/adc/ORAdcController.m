@@ -78,6 +78,7 @@
 - (void) viewIconTypeChanged:(NSNotification*)aNote
 {
 	[viewIconTypePU selectItemAtIndex: [model viewIconType]];
+	[model setUpImage];
 }
 
 - (void) labelTypeChanged:(NSNotification*)aNote

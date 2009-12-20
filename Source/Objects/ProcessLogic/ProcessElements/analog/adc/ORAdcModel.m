@@ -60,7 +60,6 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 }
 
 #pragma mark ***Accessors
-
 - (int) viewIconType
 {
     return viewIconType;
@@ -70,7 +69,9 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setViewIconType:viewIconType];
     viewIconType = aViewIconType;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelViewIconTypeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelViewIconTypeChanged object:self];	
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];	
+
 }
 
 - (int) labelType
@@ -116,7 +117,6 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	displayFormat = [aDisplayFormat copy];    
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelDisplayFormatChanged object:self];
-	
 }
 
 - (float) minChange
@@ -152,7 +152,6 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
     [ aConnector setConnectorType: 'LP2 ' ];
     [ aConnector addRestrictedConnectionType: 'LP1 ' ]; //can only connect to processor inputs
     [aConnector release];
-
 }
 
 - (void) setUpNubs
@@ -168,15 +167,12 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
     [highLimitNub setGuardian:self];
     aConnector = [[self connectors] objectForKey: ORAdcModelHighConnection];
     [aConnector setObjectLink:highLimitNub];
-
 }
-
 
 - (NSString*) elementName
 {
 	return @"ADC";
 }
-
 
 - (NSArray*) validObjects
 {
@@ -187,6 +183,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 {
     [self linkToController:@"ORAdcController"];
 }
+
 - (BOOL) canBeInAltView
 {
 	return YES;
@@ -219,7 +216,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (NSImage*) altImage
 {
 	if(viewIconType == 0)return [NSImage imageNamed:@"adcMeter"];
-	else if(viewIconType == 1)return [NSImage imageNamed:@"adcHorizontalBar"];
+	else if(viewIconType == 1)return [NSImage imageNamed:@"adcText"];
 	else if(viewIconType == 2)return [NSImage imageNamed:@"adcHorizontalBar"];
 	else return [NSImage imageNamed:@"adcMeter"];
 }
@@ -268,7 +265,6 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 {
 	return minValue;
 }
-
 
 - (void) processIsStarting
 {
@@ -381,17 +377,11 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
     }
     if(hwObject){
-		if(viewIconType == 0){
-			if([self useAltView])[self addAltMeterOverlay:aCachedImage];
-			else				 [self addMeterOverlay:aCachedImage];
-		}
-		else if(viewIconType == 1){
-			if([self useAltView])[self addAltValueOverlay:aCachedImage];
-			else				 [self addMeterOverlay:aCachedImage];
-		}
-		else if(viewIconType == 2 ){
-			if([self useAltView])[self addHorizontalBarOverlay:aCachedImage];
-			else				 [self addMeterOverlay:aCachedImage];
+		if(![self useAltView])[self addMeterOverlay:aCachedImage];
+		else {
+			if(viewIconType == 0)		[self addAltMeterOverlay:aCachedImage];
+			else if(viewIconType == 1)	[self addAltValueOverlay:aCachedImage];
+			else if(viewIconType == 2 )	[self addHorizontalBarOverlay:aCachedImage];
 		}
 	}
 
@@ -696,12 +686,11 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	float startx = 157;
 	if(maxValue-minValue != 0){
 	
-		float slope = -w/(minValue-maxValue);
-		float intercept = slope*minValue;
+		float slope = w/(maxValue-minValue);
+		float intercept = w-slope*maxValue;
 		float xValue = slope*hwValue + intercept;
 		if(xValue<0)xValue=0;
 		if(xValue>w)xValue=w;
-		[[NSColor redColor] set];
 		[normalGradient fillRect:NSMakeRect(startx,4,xValue,24) angle:270];
 		
 		if(lowLimit>minValue){
@@ -713,6 +702,10 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 			float hiAlarmx = slope*highLimit + intercept;
 			[alarmGradient fillRect:NSMakeRect(startx+hiAlarmx,4,w-hiAlarmx,24) angle:270];
 		}
+		
+		[[NSColor redColor] set];
+		float x1 = MIN(startx + xValue,startx+w-3);
+		[NSBezierPath fillRect:NSMakeRect(x1,4,3,24)];
 		
 	}
 	[self addAltHorizontalBarText:anImage];
