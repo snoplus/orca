@@ -36,14 +36,15 @@ NSString* ORAdcModelLowConnection    = @"ORAdcModelLowConnection";
 NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 @interface ORAdcModel (private)
-- (void) addMeterOverlay:(NSImage*)anImage;
-- (void) addAltMeterOverlay:(NSImage*)anImage;
-- (void) addHorizontalBarOverlay:(NSImage*)anImage;
-- (void) addMeterText:(NSImage*)anImage;
-- (void) addAltMeterText:(NSImage*)anImage;
-- (void) addAltHorizontalBarText:(NSImage*)anImage;
-- (void) addAltValueOverlay:(NSImage*)anImage;
-- (void) addAltValueText:(NSImage*)anImage;
+- (NSImage*) composeIcon;
+- (NSImage*) composeLowLevelIcon;
+- (NSImage*) composeHighLevelIcon;
+- (NSImage*) composeHighLevelIconAsMeter;
+- (NSImage*) composeHighLevelIconAsText;
+- (NSImage*) composeHighLevelIconAsBar;
+- (NSAttributedString*) iconValueWithSize:(int)theSize color:(NSColor*) textColor;
+- (NSAttributedString*) iconLabelWithSize:(int)theSize color:(NSColor*) textColor;
+- (NSAttributedString*) idLabelWithSize:(int)theSize color:(NSColor*) textColor;
 @end
 
 @implementation ORAdcModel
@@ -223,13 +224,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 - (void) setUpImage
 {
-	if([self useAltView]){
-		[self setImage:[self altImage]];
-	}
-	else {
-		[self setImage:[NSImage imageNamed:@"adc"]];
-	}
-    [self addOverLay];
+	[self setImage:[self composeIcon]];
 }
 
 - (BOOL) valueTooLow
@@ -352,45 +347,6 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	}
 }
 
-- (void) addOverLay
-{
-    if(!guardian) return;
-    
-    NSImage* aCachedImage;
-	if(![self useAltView])	aCachedImage = [self image];
-	else					aCachedImage = [self altImage];		
-	
-	if(!aCachedImage || [aCachedImage size].width<1 || [aCachedImage size].height<1)return;
-	
-    NSSize theIconSize = [aCachedImage size];
-    NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
-    [i lockFocus];
-    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-    
-    if(!hwObject && hwName && ![self useAltView]){
-        [[NSColor redColor] set];
-        float oldWidth = [NSBezierPath defaultLineWidth];
-        [NSBezierPath setDefaultLineWidth:3.];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(0.,10) toPoint:NSMakePoint(theIconSize.width-10,theIconSize.height)];
-        [NSBezierPath strokeLineFromPoint:NSMakePoint(0.,theIconSize.height) toPoint:NSMakePoint(theIconSize.width-10,10)];
-        [NSBezierPath setDefaultLineWidth:oldWidth];
-
-    }
-    if(hwObject){
-		if(![self useAltView])[self addMeterOverlay:aCachedImage];
-		else {
-			if(viewIconType == 0)		[self addAltMeterOverlay:aCachedImage];
-			else if(viewIconType == 1)	[self addAltValueOverlay:aCachedImage];
-			else if(viewIconType == 2 )	[self addHorizontalBarOverlay:aCachedImage];
-		}
-	}
-
-    [i unlockFocus];
-    
-    [self setImage:i];
-    [i release];
-    
-}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -420,10 +376,26 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 @end
 
 @implementation ORAdcModel (private)
-- (void) addMeterOverlay:(NSImage*)anImage
+
+- (NSImage*) composeIcon
 {
-	//assumes that the focus is locked on a view.
-    NSSize theIconSize = [anImage size];
+	if(![self useAltView])	return [self composeLowLevelIcon];
+	else					return [self composeHighLevelIcon];
+}
+
+- (NSImage*) composeLowLevelIcon
+{
+	NSImage* anImage = [NSImage imageNamed:@"adc"];
+	
+	NSSize theIconSize = [anImage size];
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+
+	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
+	NSAttributedString* iconValue = [self iconValueWithSize:9 color:[NSColor blackColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
+	
 	if(minValue-maxValue != 0){
 		NSPoint theCenter = NSMakePoint((theIconSize.width-10)/2.+1,27);
 		if(lowLimit>minValue){
@@ -467,57 +439,48 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		[[NSColor redColor] set];
 		[NSBezierPath strokeLineFromPoint:theCenter toPoint:NSMakePoint(theCenter.x + 30.*cosf(nA),theCenter.y + 30.*sinf(nA))];
 	}
-	[self addMeterText:anImage];
-}
-
-- (void) addMeterText:(NSImage*)anImage
-{
-    NSSize theIconSize = [anImage size];
-	NSColor* textColor=[NSColor blackColor];
-	NSString* iconValue = [self iconValue];
-	if([iconValue length]){		
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:iconValue
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:10],NSFontAttributeName,
-											 textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		float x = theIconSize.width/2 - textSize.width/2- 4;
-		float y = 12;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+	
+	if(iconValue){
+		NSSize textSize = [iconValue size];
+		float x = (theIconSize.width-kConnectorSize)/2 - textSize.width/2;
+		[iconValue drawInRect:NSMakeRect(x,13,textSize.width,textSize.height)];
 	}
 	
-	NSString* iconLabel = [self iconLabel];
-	if([iconLabel length]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:iconLabel
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:9],NSFontAttributeName,
-											 textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
+	if(iconLabel){
+		NSSize textSize = [iconLabel size];
 		float x = theIconSize.width/2 - textSize.width/2;
-		float y = 0;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+		[iconLabel drawInRect:NSMakeRect(x,0,textSize.width,textSize.height)];
 	}
 	
-	if([self uniqueIdNumber]){
-		NSFont* theFont = [NSFont messageFontOfSize:9];
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		[n drawInRect:NSMakeRect(5,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
-		[n release];
+	if(idLabel){
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(5,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
 	}
+
+	[finalImage unlockFocus];
+	return [finalImage autorelease];
 }
 
-- (void) addAltMeterOverlay:(NSImage*)anImage
+- (NSImage*) composeHighLevelIcon
 {
+	if(viewIconType == 0)		return [self composeHighLevelIconAsMeter];
+	else if(viewIconType == 1)	return [self composeHighLevelIconAsText];
+	else if(viewIconType == 2)	return [self composeHighLevelIconAsBar];
+	else						return nil;
+}
+
+- (NSImage*) composeHighLevelIconAsMeter
+{
+	NSImage* anImage = [NSImage imageNamed:@"adcMeter"];
+	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor whiteColor]];
+	NSAttributedString* iconValue = [self iconValueWithSize:12 color:[NSColor whiteColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor whiteColor]];
+	
+	NSSize theIconSize = [anImage size];
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
 	//assumes that the focus is locked on the view icon.
-    NSSize theIconSize = [anImage size];
 	if(minValue-maxValue != 0){
 		NSPoint theCenter = NSMakePoint((theIconSize.width)/2.,45.);
 		if(lowLimit>minValue){
@@ -561,112 +524,82 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		[[NSColor redColor] set];
 		[NSBezierPath strokeLineFromPoint:theCenter toPoint:NSMakePoint(theCenter.x + 60.*cosf(nA),theCenter.y + 60.*sinf(nA))];
 	}
-	[self addAltMeterText:anImage];
-}
-
-- (void) addAltMeterText:(NSImage*)anImage
-{
-	NSColor* textColor=[NSColor whiteColor];
-    NSSize theIconSize = [anImage size];	
-	NSString* iconValue = [self iconValue];
-	if([iconValue length]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:iconValue
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:14],NSFontAttributeName,
-											 textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
+	
+	if(iconValue){		
+		NSSize textSize = [iconValue size];
 		float x = theIconSize.width/2 - textSize.width/2- 4;
-		float y = 15;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+		[iconValue drawInRect:NSMakeRect(x,18,textSize.width,textSize.height)];
 	}
 	
-	NSString* iconLabel = [self iconLabel];
-	if([iconLabel length]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:iconLabel
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:9],NSFontAttributeName,
-											 textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
+	if(iconLabel){		
+		NSSize textSize = [iconLabel size];
 		float x = theIconSize.width/2 - textSize.width/2;
-		float y = 3;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+		[iconLabel drawInRect:NSMakeRect(x,3,textSize.width,textSize.height)];
 	}
 	
-	if([self uniqueIdNumber]){
-		NSFont* theFont = [NSFont messageFontOfSize:9];
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		[n drawInRect:NSMakeRect(5,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
-		[n release];
-	}
-}
-
-- (void) addAltValueOverlay:(NSImage*)anImage
-{
-	[self addAltValueText:anImage];	
-}
-
-- (void) addAltValueText:(NSImage*)anImage
-{
-	float startx = 152;
-    NSSize theIconSize = [anImage size];	
-	NSString* iconValue = [self iconValue];
-	if([iconValue length]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:iconValue
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:20],NSFontAttributeName,
-											 [NSColor whiteColor],NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		float x = startx + 30;
-		float y = 4;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+	if(idLabel){		
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(5,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
 	}
 	
-	NSString* iconLabel = [self iconLabel];
-	if([iconLabel length]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:iconLabel
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:9],NSFontAttributeName,
-											 [NSColor blackColor],NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		float x = startx - textSize.width-4;
-		float y = 3;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
-	}
-	
-	if([self uniqueIdNumber]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:9],NSFontAttributeName,
-											 [NSColor whiteColor],NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		[n drawInRect:NSMakeRect(startx+7,theIconSize.height-textSize.height-4,textSize.width,textSize.height)];
-		[n release];
-	}
+    [finalImage unlockFocus];
+	return [finalImage autorelease];
 }
 
 
-
-- (void) addHorizontalBarOverlay:(NSImage*)anImage
+- (NSImage*) composeHighLevelIconAsText
 {
+	NSImage* anImage = [NSImage imageNamed:@"adcText"];
+	NSAttributedString* idLabel   = [self idLabelWithSize:12 color:[NSColor whiteColor]];
+	NSAttributedString* iconValue = [self iconValueWithSize:22 color:[NSColor whiteColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
+	
+	NSSize theIconSize	= [anImage size];
+	float iconStart		= [iconLabel size].width + 5;
+	theIconSize.width += iconStart;
+	
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
+	
+	if(iconValue){		
+		NSSize textSize = [iconValue size];
+		float x = iconStart + 20;
+		[iconValue drawInRect:NSMakeRect(x,3,textSize.width,textSize.height)];
+	}
+	
+	if(iconLabel){		
+		NSSize textSize = [iconLabel size];
+		[iconLabel drawInRect:NSMakeRect(0,3,textSize.width,textSize.height)];
+	}
+	
+	if(idLabel){		
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(iconStart+6,theIconSize.height-textSize.height-3,textSize.width,textSize.height)];
+	}
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];
+}
+
+- (NSImage*) composeHighLevelIconAsBar
+{
+	NSImage* anImage = [NSImage imageNamed:@"adcHorizontalBar"];
+	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor whiteColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:12 color:[NSColor blackColor]];
+	
+	NSSize theIconSize	= [anImage size];
+	float iconStart		= [iconLabel size].width + 5;
+	theIconSize.width += iconStart;
+	
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
 	if(!normalGradient){
 		float red   = 0.0; 
 		float green = 1.0; 
 		float blue  = 0.0;
-	
+		
 		normalGradient = [[CTGradient 
 						   gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
 						   endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]] retain];
@@ -678,14 +611,14 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		float blue  = 0.0;
 		
 		alarmGradient = [[CTGradient 
-						   gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:.3]
-						   endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:.3]] retain];
+						  gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:.3]
+						  endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:.3]] retain];
 	}
 	
 	float w = 231;
-	float startx = 157;
+	float startx = iconStart+6;
 	if(maxValue-minValue != 0){
-	
+		
 		float slope = w/(maxValue-minValue);
 		float intercept = w-slope*maxValue;
 		float xValue = slope*hwValue + intercept;
@@ -708,52 +641,59 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		[NSBezierPath fillRect:NSMakeRect(x1,4,3,24)];
 		
 	}
-	[self addAltHorizontalBarText:anImage];
-
+	
+	if([iconLabel length]){		
+		NSSize textSize = [iconLabel size];
+		float x = 0;
+		float y = 3;
+		[iconLabel drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+	}
+	
+	if([idLabel length]){		
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(iconStart+6,theIconSize.height-textSize.height-3,textSize.width,textSize.height)];
+	}
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];
 }
-- (void) addAltHorizontalBarText:(NSImage*)anImage
+
+- (NSAttributedString*) iconValueWithSize:(int)theSize color:(NSColor*) textColor
 {
-	float startx = 152;
-	NSColor* textColor=[NSColor blackColor];
-    NSSize theIconSize = [anImage size];	
 	NSString* iconValue = [self iconValue];
-	if([iconValue length]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
+	if([iconValue length]){		
+		return [[[NSAttributedString alloc] 
 								 initWithString:iconValue
 								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:14],NSFontAttributeName,
-											 textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		float x = startx - textSize.width- 4;
-		float y = 15;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+											 [NSFont messageFontOfSize:theSize],NSFontAttributeName,
+											 textColor,NSForegroundColorAttributeName,nil]]autorelease];
 	}
-	
+	else return nil;
+}
+
+- (NSAttributedString*) iconLabelWithSize:(int)theSize color:(NSColor*) textColor
+{
 	NSString* iconLabel = [self iconLabel];
 	if([iconLabel length]){
-		NSAttributedString* n = [[NSAttributedString alloc] 
+		NSFont* theFont = [NSFont messageFontOfSize:theSize];
+		return [[[NSAttributedString alloc] 
 								 initWithString:iconLabel
 								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-											 [NSFont messageFontOfSize:9],NSFontAttributeName,
-											 textColor,NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		float x = startx - textSize.width-4;
-		float y = 3;
-		[n drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+											 theFont,NSFontAttributeName,
+											 textColor,NSForegroundColorAttributeName,nil]] autorelease];
 	}
-	
+	else return nil;
+}
+
+- (NSAttributedString*) idLabelWithSize:(int)theSize color:(NSColor*) textColor
+{
 	if([self uniqueIdNumber]){
-		NSFont* theFont = [NSFont messageFontOfSize:9];
-		NSAttributedString* n = [[NSAttributedString alloc] 
-								 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
-								 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor whiteColor],NSForegroundColorAttributeName,nil]];
-		
-		NSSize textSize = [n size];
-		[n drawInRect:NSMakeRect(startx+7,theIconSize.height-textSize.height-4,textSize.width,textSize.height)];
-		[n release];
+		NSFont* theFont = [NSFont messageFontOfSize:theSize];
+		return [[[NSAttributedString alloc] 
+							 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+							 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,textColor,NSForegroundColorAttributeName,nil]]autorelease];
 	}
+	else return nil;
 }
 
 @end
