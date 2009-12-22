@@ -85,15 +85,11 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 }
 
 #pragma mark ¥¥¥AltImage Methods
-- (NSImage*) altImage
-{
-	//sub-classes define an image if they are to appear on the Normal View
-	return nil;
-}
 - (BOOL) canBeInAltView
 {
 	return NO;
 }
+
 - (void) setImage:(NSImage*)anImage
 {
 	if(![self useAltView])[super setImage:anImage];
@@ -143,12 +139,11 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 		[super drawIcon:aRect withTransparency:aTransparency];
 	}
 	else {
-		if(![self altImage])return;
+		if(![self canBeInAltView])return;
 		//a workaround for a case where image hasn't been made yet.. don't worry--it will get made below if need be.
 		if(aRect.size.height == 0)aRect.size.height = 1;
 		if(aRect.size.width == 0)aRect.size.width = 1;
 		NSShadow* theShadow = nil;
-		
 		if(NSIntersectsRect(aRect,altFrame)){
 			
 			if([self guardian]){
@@ -193,6 +188,7 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 		}
 		[theShadow release]; 
 	}
+
 }
 
 - (void) drawImageAtOffset:(NSPoint)anOffset withTransparency:(float)aTransparency
@@ -216,6 +212,10 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 		
 		[self setHighlighted:saveState];
 	}
+}
+- (NSImage*) altImage
+{
+	return altImage;
 }
 
 - (NSImage*)image
@@ -245,18 +245,6 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 		altFrame = aValue;
 		altBounds.size = altFrame.size;
 	}
-}
-
-- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint
-{
-	if(![self useAltView]) return [super acceptsClickAtPoint:aPoint];
-	else return NO;
-}
-
-- (BOOL) intersectsRect:(NSRect) aRect
-{
-	if(![self useAltView]) return [super intersectsRect:aRect];
-	else return NO;
 }
 
 - (ORConnector*) requestsConnection: (NSPoint)aPoint
@@ -414,6 +402,43 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 - (void) drawSelf:(NSRect)aRect withTransparency:(float)aTransparency
 {
 	[super drawSelf:aRect withTransparency:aTransparency];
+}
+- (NSAttributedString*) iconValueWithSize:(int)theSize color:(NSColor*) textColor
+{
+	NSString* iconValue = [self iconValue];
+	if([iconValue length]){		
+		return [[[NSAttributedString alloc] 
+				 initWithString:iconValue
+				 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+							 [NSFont messageFontOfSize:theSize],NSFontAttributeName,
+							 textColor,NSForegroundColorAttributeName,nil]]autorelease];
+	}
+	else return nil;
+}
+
+- (NSAttributedString*) iconLabelWithSize:(int)theSize color:(NSColor*) textColor
+{
+	NSString* iconLabel = [self iconLabel];
+	if([iconLabel length]){
+		NSFont* theFont = [NSFont messageFontOfSize:theSize];
+		return [[[NSAttributedString alloc] 
+				 initWithString:iconLabel
+				 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+							 theFont,NSFontAttributeName,
+							 textColor,NSForegroundColorAttributeName,nil]] autorelease];
+	}
+	else return nil;
+}
+
+- (NSAttributedString*) idLabelWithSize:(int)theSize color:(NSColor*) textColor
+{
+	if([self uniqueIdNumber]){
+		NSFont* theFont = [NSFont messageFontOfSize:theSize];
+		return [[[NSAttributedString alloc] 
+				 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+				 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,textColor,NSForegroundColorAttributeName,nil]]autorelease];
+	}
+	else return nil;
 }
 
 #pragma mark ¥¥¥Archiving

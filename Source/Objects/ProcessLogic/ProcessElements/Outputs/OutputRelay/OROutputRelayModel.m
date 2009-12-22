@@ -18,19 +18,27 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "OROutputRelayModel.h"
+
+@interface OROutputRelayModel (private)
+- (NSImage*) composeIcon;
+- (NSImage*) composeLowLevelIcon;
+- (NSImage*) composeHighLevelIcon;
+- (NSImage*) composeHighLevelIconAsLed;
+@end
 
 @implementation OROutputRelayModel
 
 #pragma mark ¥¥¥Initialization
+- (BOOL) canBeInAltView
+{
+	return YES;
+}
 
 - (void) setUpImage
 {
-    if([self state]) [self setImage:[NSImage imageNamed:@"OutputRelayOn"]];
-    else             [self setImage:[NSImage imageNamed:@"OutputRelayOff"]];
-    [self addOverLay];
+	[self setImage:[self composeIcon]];
 }
 
 - (void) makeMainController
@@ -42,4 +50,105 @@
 {
 	return @"Output relay";
 }
+
+
+@end
+
+@implementation OROutputRelayModel (private)
+- (NSImage*) composeIcon
+{
+	if(![self useAltView])	return [self composeLowLevelIcon];
+	else					return [self composeHighLevelIcon];
+}
+
+- (NSImage*) composeLowLevelIcon
+{
+	NSImage* anImage;
+	if([self state]) anImage = [NSImage imageNamed:@"OutputRelayOn"];
+	else             anImage = [NSImage imageNamed:@"OutputRelayOff"];
+	
+	NSSize theIconSize = [anImage size];
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	
+	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
+	if(iconLabel){
+		NSSize textSize = [iconLabel size];
+		float x = theIconSize.width/2 - textSize.width/2;
+		[iconLabel drawInRect:NSMakeRect(x,0,textSize.width,textSize.height)];
+	}
+	
+	if(idLabel){
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(0,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
+	}
+	
+	[finalImage unlockFocus];
+	return [finalImage autorelease];
+
+}
+
+- (NSImage*) composeHighLevelIcon
+{
+	return [self composeHighLevelIconAsLed];
+}
+
+- (NSImage*) composeHighLevelIconAsLed
+{
+	NSImage* anImage;
+
+	if(viewIconType == 0){
+		if([self state]) anImage = [NSImage imageNamed:@"greenled"];
+		else             anImage = [NSImage imageNamed:@"redled"];
+	}
+	else if(viewIconType == 1){
+		if([self state]) anImage = [NSImage imageNamed:@"OnText"];
+		else             anImage = [NSImage imageNamed:@"OffText"];
+	}
+
+	NSAttributedString* idLabel   = [self idLabelWithSize:12 color:[NSColor blackColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:12 color:[NSColor blackColor]];
+	
+	NSSize theIconSize	= [anImage size];
+	float iconStart		= MAX([iconLabel size].width+3,[idLabel size].width+3);
+	
+	theIconSize.width += iconStart;
+	
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
+	
+	if(iconLabel){		
+		NSSize textSize = [iconLabel size];
+		[iconLabel drawInRect:NSMakeRect(iconStart-textSize.width-1,3,textSize.width,textSize.height)];
+	}
+	
+	if(idLabel){		
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(iconStart-[idLabel size].width-1,theIconSize.height-textSize.height,textSize.width,textSize.height)];
+	}
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];
+}
+
+- (NSString*) iconLabel
+{
+	if(![self useAltView]){
+		if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		else		return @""; 
+	}
+	else {
+		if(labelType == 1)return @"";
+		else if(labelType ==2)return [self customLabel];
+		else {
+			if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+			else		return @""; 
+		}
+	}
+}
+
+
 @end

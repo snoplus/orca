@@ -27,7 +27,6 @@
 }
 
 #pragma mark ¥¥¥Initialization
-- (void) setUpImage;
 - (void) makeMainController;
 
 @end

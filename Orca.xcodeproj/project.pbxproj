@@ -1017,6 +1017,10 @@
 		84539C540807247B00615B6D /* ORRemoteRunModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84539C4B0807247A00615B6D /* ORRemoteRunModel.m */; };
 		84539C580807247C00615B6D /* RemoteRunControl.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84539C4F0807247A00615B6D /* RemoteRunControl.nib */; };
 		84539C590807247C00615B6D /* RemoteRunFailedHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84539C500807247A00615B6D /* RemoteRunFailedHelp.plist */; };
+		84539D1A10E137AD0066A797 /* redled.png in Resources */ = {isa = PBXBuildFile; fileRef = 84539D1810E137AD0066A797 /* redled.png */; };
+		84539D1B10E137AD0066A797 /* greenled.png in Resources */ = {isa = PBXBuildFile; fileRef = 84539D1910E137AD0066A797 /* greenled.png */; };
+		84539E7F10E1693F0066A797 /* OnText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84539E7D10E1693F0066A797 /* OnText.tif */; };
+		84539E8010E1693F0066A797 /* OffText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84539E7E10E1693F0066A797 /* OffText.tif */; };
 		84539E90080AD92B00615B6D /* Listener.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84539E8F080AD92B00615B6D /* Listener.nib */; };
 		84539EA2080ADAF500615B6D /* ORListenerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84539E9E080ADAF500615B6D /* ORListenerController.h */; };
 		84539EA3080ADAF500615B6D /* ORListenerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84539E9F080ADAF500615B6D /* ORListenerModel.h */; };
@@ -3120,6 +3124,10 @@
 		84539C4B0807247A00615B6D /* ORRemoteRunModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORRemoteRunModel.m; sourceTree = "<group>"; };
 		84539C4F0807247A00615B6D /* RemoteRunControl.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = RemoteRunControl.nib; sourceTree = "<group>"; };
 		84539C500807247A00615B6D /* RemoteRunFailedHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = RemoteRunFailedHelp.plist; sourceTree = "<group>"; };
+		84539D1810E137AD0066A797 /* redled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = redled.png; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/redled.png; sourceTree = SOURCE_ROOT; };
+		84539D1910E137AD0066A797 /* greenled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = greenled.png; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/greenled.png; sourceTree = SOURCE_ROOT; };
+		84539E7D10E1693F0066A797 /* OnText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = OnText.tif; sourceTree = "<group>"; };
+		84539E7E10E1693F0066A797 /* OffText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = OffText.tif; sourceTree = "<group>"; };
 		84539E8F080AD92B00615B6D /* Listener.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Listener.nib; sourceTree = "<group>"; };
 		84539E9E080ADAF500615B6D /* ORListenerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORListenerController.h; path = "Source/Objects/Data Processing/Listener/ORListenerController.h"; sourceTree = SOURCE_ROOT; };
 		84539E9F080ADAF500615B6D /* ORListenerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORListenerModel.h; path = "Source/Objects/Data Processing/Listener/ORListenerModel.h"; sourceTree = SOURCE_ROOT; };
@@ -5242,6 +5250,10 @@
 				848648810975C1F6001C459D /* ORProcessInConnector.m */,
 				848648930975C415001C459D /* ORProcessOutConnector.m */,
 				848648940975C415001C459D /* ORProcessOutConnector.h */,
+				84539D1810E137AD0066A797 /* redled.png */,
+				84539D1910E137AD0066A797 /* greenled.png */,
+				84539E7D10E1693F0066A797 /* OnText.tif */,
+				84539E7E10E1693F0066A797 /* OffText.tif */,
 			);
 			name = BaseClasses;
 			path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses;
@@ -11104,6 +11116,10 @@
 				84522D4910CD90600077DDFF /* adcHorizontalBar.tif in Resources */,
 				84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */,
 				84EE877F10D94B3100BBCBE5 /* rightBug.tif in Resources */,
+				84539D1A10E137AD0066A797 /* redled.png in Resources */,
+				84539D1B10E137AD0066A797 /* greenled.png in Resources */,
+				84539E7F10E1693F0066A797 /* OnText.tif in Resources */,
+				84539E8010E1693F0066A797 /* OffText.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

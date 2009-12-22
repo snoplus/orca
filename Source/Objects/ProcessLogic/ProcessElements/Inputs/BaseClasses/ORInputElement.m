@@ -28,6 +28,13 @@
 NSString* ORInputElementInConnection     = @"ORInputElementInConnection";
 NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 
+@interface ORInputElement (private)
+- (NSImage*) composeIcon;
+- (NSImage*) composeLowLevelIcon;
+- (NSImage*) composeHighLevelIcon;
+- (NSImage*) composeHighLevelIconAsLed;
+@end
+
 @implementation ORInputElement
 - (NSString*) description:(NSString*)prefix
 {
@@ -79,7 +86,11 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 - (int) connectedObjState
 {
 	return connectedObjState;
+}
 
+- (void) setUpImage
+{
+	[self setImage:[self composeIcon]];
 }
 
 //--------------------------------
@@ -102,4 +113,96 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 	return evaluatedState;
 }
 //--------------------------------
+- (NSString*) iconLabel
+{
+	if(![self useAltView]){
+		if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		else		return @""; 
+	}
+	else {
+		if(labelType == 1)return @"";
+		else if(labelType ==2)return [self customLabel];
+		else {
+			if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+			else		return @""; 
+		}
+	}
+}
+
 @end
+
+@implementation ORInputElement (private)
+
+- (NSImage*) composeIcon
+{
+	if(![self useAltView])	return [self composeLowLevelIcon];
+	else					return [self composeHighLevelIcon];
+}
+
+- (NSImage*) composeLowLevelIcon
+{
+	return nil;
+}
+
+- (NSImage*) composeHighLevelIcon
+{
+	return [self composeHighLevelIconAsLed];
+}
+
+- (NSImage*) composeHighLevelIconAsLed
+{
+	NSImage* anImage;
+	
+	if(viewIconType == 0){
+		if([self state]) anImage = [NSImage imageNamed:@"greenled"];
+		else             anImage = [NSImage imageNamed:@"redled"];
+	}
+	else if(viewIconType == 1){
+		if([self state]) anImage = [NSImage imageNamed:@"OnText"];
+		else             anImage = [NSImage imageNamed:@"OffText"];
+	}
+	
+	NSAttributedString* idLabel   = [self idLabelWithSize:12 color:[NSColor blackColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:12 color:[NSColor blackColor]];
+	
+	NSSize theIconSize	= [anImage size];
+	float iconStart		= MAX([iconLabel size].width+3,[idLabel size].width+3);
+	
+	theIconSize.width += iconStart;
+	
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
+	
+	if(iconLabel){		
+		NSSize textSize = [iconLabel size];
+		[iconLabel drawInRect:NSMakeRect(iconStart-textSize.width-1,3,textSize.width,textSize.height)];
+	}
+	
+	if(idLabel){		
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(iconStart-[idLabel size].width-1,theIconSize.height-textSize.height,textSize.width,textSize.height)];
+	}
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];
+}
+
+- (NSString*) iconLabel
+{
+	if(![self useAltView]){
+		if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		else		return @""; 
+	}
+	else {
+		if(labelType == 1)return @"";
+		else if(labelType ==2)return [self customLabel];
+		else {
+			if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+			else		return @""; 
+		}
+	}
+}
+
+@end
+

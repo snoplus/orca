@@ -45,10 +45,10 @@
 - (void) dealloc;
 - (void) setUpNubs;
 - (void) awakeAfterDocumentLoaded;
-- (NSImage*) altImage;
 - (BOOL) canBeInAltView;
 
 #pragma mark ¥¥¥Accessors
+- (NSImage*) altImage;
 - (BOOL) useAltView;
 - (void) setUseAltView:(BOOL)aState;
 - (NSString*) description:(NSString*)prefix;
@@ -68,6 +68,9 @@
 - (BOOL) partOfRun;
 - (NSString*) iconValue;
 - (NSString*) iconLabel;
+- (NSAttributedString*) iconValueWithSize:(int)theSize color:(NSColor*) textColor;
+- (NSAttributedString*) iconLabelWithSize:(int)theSize color:(NSColor*) textColor;
+- (NSAttributedString*) idLabelWithSize:(int)theSize color:(NSColor*) textColor;
 
 #pragma mark ¥¥¥Thread Related
 - (void) clearAlreadyEvaluatedFlag;

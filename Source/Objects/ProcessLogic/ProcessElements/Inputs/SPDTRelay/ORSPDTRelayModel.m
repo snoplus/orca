@@ -36,13 +36,6 @@ NSString* ORSPDTRelayOutOffConnection  = @"ORSPDTRelayOutOffConnection";
     [super dealloc];
 }
 
-- (void) setUpImage
-{
-    if([self state]) [self setImage:[NSImage imageNamed:@"SPDTRelayOn"]];
-    else             [self setImage:[NSImage imageNamed:@"SPDTRelayOff"]];
-    [self addOverLay];
-}
-
 - (void) makeMainController
 {
     [self linkToController:@"ORSPDTRelayController"];
@@ -71,6 +64,38 @@ NSString* ORSPDTRelayOutOffConnection  = @"ORSPDTRelayOutOffConnection";
     [offNub setGuardian:self];
     ORConnector* aConnector = [[self connectors] objectForKey: ORSPDTRelayOutOffConnection];
     [aConnector setObjectLink:offNub];
+}
+- (BOOL) canBeInAltView
+{
+	return YES;
+}
+
+- (NSImage*) composeLowLevelIcon
+{
+	NSImage* anImage;
+	if([self state]) anImage = [NSImage imageNamed:@"SPDTRelayOn"];
+	else             anImage = [NSImage imageNamed:@"SPDTRelayOff"];
+
+	NSSize theIconSize = [anImage size];
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	
+	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
+	if(iconLabel){
+		NSSize textSize = [iconLabel size];
+		float x = theIconSize.width/2 - textSize.width/2;
+		[iconLabel drawInRect:NSMakeRect(x,0,textSize.width,textSize.height)];
+	}
+	
+	if(idLabel){
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(0,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
+	}
+	
+	[finalImage unlockFocus];
+	return [finalImage autorelease];
 }
 
 @end

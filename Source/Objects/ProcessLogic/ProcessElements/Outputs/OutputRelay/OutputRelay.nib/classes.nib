@@ -95,9 +95,17 @@
 			<dict>
 				<key>channelPUAction</key>
 				<string>id</string>
+				<key>customLabelAction</key>
+				<string>id</string>
+				<key>displayFormatAction</key>
+				<string>id</string>
 				<key>hwAccessLockAction</key>
 				<string>id</string>
 				<key>interfaceObjPUAction</key>
+				<string>id</string>
+				<key>labelTypeAction</key>
+				<string>id</string>
+				<key>viewIconTypeAction</key>
 				<string>id</string>
 				<key>viewSourceAction</key>
 				<string>id</string>
@@ -114,9 +122,17 @@
 				<string>NSTextField</string>
 				<key>currentSourceStateField</key>
 				<string>NSTextField</string>
+				<key>customLabelField</key>
+				<string>NSTextField</string>
+				<key>displayFormatField</key>
+				<string>NSTextField</string>
 				<key>hwAccessLockButton</key>
 				<string>NSButton</string>
 				<key>interfaceObjPU</key>
+				<string>NSPopUpButton</string>
+				<key>labelTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>viewIconTypePU</key>
 				<string>NSPopUpButton</string>
 				<key>viewSourceButton</key>
 				<string>NSButton</string>

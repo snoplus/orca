@@ -30,6 +30,11 @@
     IBOutlet NSTextField*   currentSourceStateField;
     IBOutlet NSButton*      hwAccessLockButton;
 	IBOutlet NSButton*		viewSourceButton;
+
+	IBOutlet NSPopUpButton* viewIconTypePU;
+	IBOutlet NSMatrix*		labelTypeMatrix;
+	IBOutlet NSTextField*	customLabelField;
+	IBOutlet NSTextField*	displayFormatField;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -37,6 +42,10 @@
 - (void) registerNotificationObservers;
 - (void) populateObjPU;
 - (void) populateBitsPU;
+- (void) viewIconTypeChanged:(NSNotification*)aNote;
+- (void) labelTypeChanged:(NSNotification*)aNote;
+- (void) customLabelChanged:(NSNotification*)aNote;
+- (void) displayFormatChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Interface Management
 - (void) checkGlobalSecurity;
@@ -54,4 +63,7 @@
 - (IBAction) interfaceObjPUAction:(id)sender;
 - (IBAction) channelPUAction:(id)sender;
 - (IBAction) viewSourceAction:(id)sender;
-@end
+- (IBAction) viewIconTypeAction:(id)sender;
+- (IBAction) labelTypeAction:(id)sender;
+- (IBAction) customLabelAction:(id)sender;
+- (IBAction) displayFormatAction:(id)sender;@end

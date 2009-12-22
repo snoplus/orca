@@ -620,9 +620,9 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
  
 	int newVersion = [decoder decodeIntForKey:@"newVersion"];
 	if(newVersion)	{
-		[self setFrame:[decoder decodeRectForKey:@"localFrame"]];
-		[self setOffset:[decoder decodePointForKey:@"offset"]];
-		[self setBounds:[decoder decodeRectForKey:@"bounds"]];
+		frame  = [decoder decodeRectForKey:@"localFrame"];
+		offset = [decoder decodePointForKey:@"offset"];
+		bounds = [decoder decodeRectForKey:@"bounds"];
 	}
 	else {
 		[self setFrame:[[decoder decodeObjectForKey:OROrcaObjectFrame] rectValue]];
@@ -644,9 +644,9 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 {
 	[encoder encodeInt:1 forKey:@"newVersion"];
 
-    [encoder encodeRect:[self frame] forKey:@"localFrame"];
-    [encoder encodePoint:[self offset] forKey:@"offset"];
-    [encoder encodeRect:[self bounds] forKey:@"bounds"];
+    [encoder encodeRect:frame forKey:@"localFrame"];
+    [encoder encodePoint:offset forKey:@"offset"];
+    [encoder encodeRect: bounds forKey:@"bounds"];
     [encoder encodeObject:connectors forKey:OROrcaObjectConnectors];
     [encoder encodeInt:[self tag] forKey:OROrcaObjectTag];
     [encoder encodeInt32:uniqueIdNumber forKey:OROrcaObjectUniqueIDNumber];

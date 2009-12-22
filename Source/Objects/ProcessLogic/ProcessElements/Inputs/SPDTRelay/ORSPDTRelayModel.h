@@ -32,11 +32,10 @@
 
 #pragma mark ¥¥¥Initialization
 - (void) dealloc;
-- (void) setUpImage;
 - (void) makeMainController;
 - (void) makeConnectors;
 - (void) setUpNubs;
-
+- (NSImage*) composeLowLevelIcon;
 @end
 
 @interface ORSPDTRelayOff :  ORProcessNub

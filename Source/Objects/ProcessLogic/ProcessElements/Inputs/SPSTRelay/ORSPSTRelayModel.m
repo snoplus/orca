@@ -26,12 +26,6 @@
 
 #pragma mark ¥¥¥Initialization
 
-- (void) setUpImage
-{
-    if([self state]) [self setImage:[NSImage imageNamed:@"SPSTRelayOn"]];
-    else               [self setImage:[NSImage imageNamed:@"SPSTRelayOff"]];
-    [self addOverLay];
-}
 
 - (void) makeMainController
 {
@@ -41,4 +35,39 @@
 {
 	return @"SPST Input relay";
 }
+- (BOOL) canBeInAltView
+{
+	return YES;
+}
+- (NSImage*) composeLowLevelIcon
+{
+	NSImage* anImage;
+	if([self state]) anImage = [NSImage imageNamed:@"SPSTRelayOn"];
+	else             anImage = [NSImage imageNamed:@"SPSTRelayOff"];
+    if([self state]) [self setImage:[NSImage imageNamed:@"SPSTRelayOn"]];
+    else               [self setImage:[NSImage imageNamed:@"SPSTRelayOff"]];
+	
+	NSSize theIconSize = [anImage size];
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	
+	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
+	if(iconLabel){
+		NSSize textSize = [iconLabel size];
+		float x = theIconSize.width/2 - textSize.width/2;
+		[iconLabel drawInRect:NSMakeRect(x,0,textSize.width,textSize.height)];
+	}
+	
+	if(idLabel){
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(0,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
+	}
+	
+	[finalImage unlockFocus];
+	return [finalImage autorelease];
+}
+
+
 @end

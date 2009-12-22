@@ -25,6 +25,10 @@
 NSString* ORProcessHWAccessorHwObjectChangedNotification    = @"ORProcessHWAccessorHwObjectChangedNotification";
 NSString* ORProcessHWAccessorBitChangedNotification         = @"ORProcessHWAccessorBitChangedNotification";
 NSString* ORProcessHWAccessorHwNameChangedNotification      = @"ORProcessHWAccessorHwNameChangedNotification";
+NSString* ORProcessHWAccessorViewIconTypeChanged			=  @"ORProcessHWAccessorViewIconTypeChanged";
+NSString* ORProcessHWAccessorLabelTypeChanged				= @"ORProcessHWAccessorLabelTypeChanged";
+NSString* ORProcessHWAccessorCustomLabelChanged				= @"ORProcessHWAccessorCustomLabelChanged";
+NSString* ORProcessHWAccessorDisplayFormatChanged			= @"ORProcessHWAccessorDisplayFormatChanged";
 NSString* ORHWAccessLock									= @"ORHWAccessLock";
 
 @implementation ORProcessHWAccessor 
@@ -39,6 +43,8 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [hwName release];
+    [customLabel release];
+    [displayFormat release];
     [super dealloc];
 }
 
@@ -159,6 +165,66 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     s = [super description:prefix];
     if(hwName) s = [s stringByAppendingFormat:@" [%@]",[self fullHwName]];
     return s;
+}
+
+
+- (int) viewIconType
+{
+    return viewIconType;
+}
+
+- (void) setViewIconType:(int)aViewIconType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setViewIconType:viewIconType];
+    viewIconType = aViewIconType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHWAccessorViewIconTypeChanged object:self];	
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];	
+	
+}
+
+- (int) labelType
+{
+    return labelType;
+}
+
+- (void) setLabelType:(int)aLabelType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLabelType:labelType];
+    labelType = aLabelType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHWAccessorLabelTypeChanged object:self];
+}
+
+- (NSString*) customLabel
+{
+	if(!customLabel)return @"";
+    return customLabel;
+}
+
+- (void) setCustomLabel:(NSString*)aCustomLabel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCustomLabel:customLabel];
+    
+    [customLabel autorelease];
+    customLabel = [aCustomLabel copy];    
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHWAccessorCustomLabelChanged object:self];
+}
+
+- (NSString*) displayFormat
+{
+	if(!displayFormat)return @"";
+    return displayFormat;
+}
+
+- (void) setDisplayFormat:(NSString*)aDisplayFormat
+{
+	if(![aDisplayFormat length])aDisplayFormat = @"%.1f";
+	[[[self undoManager] prepareWithInvocationTarget:self] setDisplayFormat:displayFormat];
+	
+	[displayFormat autorelease];
+	displayFormat = [aDisplayFormat copy];    
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHWAccessorDisplayFormatChanged object:self];
 }
 
 
@@ -338,7 +404,11 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     
     [self setHwName:[decoder decodeObjectForKey:@"hwName"]];
     [self setBit:[decoder decodeIntForKey:@"bit"]];
-    
+	[self setViewIconType:	[decoder decodeIntForKey:@"viewIconType"]];
+    [self setLabelType:		[decoder decodeIntForKey:@"labelType"]];
+    [self setCustomLabel:	[decoder decodeObjectForKey:@"customLabel"]];
+    [self setDisplayFormat:	[decoder decodeObjectForKey:@"displayFormat"]];
+	
     [[self undoManager] enableUndoRegistration];
     
     [self registerNotificationObservers];
@@ -351,6 +421,10 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:hwName forKey:@"hwName"];
     [encoder encodeInt:bit forKey:@"bit"];
+    [encoder encodeInt:viewIconType		forKey:@"viewIconType"];
+    [encoder encodeInt:labelType		forKey:@"labelType"];
+    [encoder encodeObject:customLabel	forKey:@"customLabel"];
+    [encoder encodeObject:displayFormat forKey:@"displayFormat"];
 }
 
 @end

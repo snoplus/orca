@@ -29,6 +29,11 @@
     int bit;
 	BOOL startOnce;
 	BOOL stopOnce;
+	
+    NSString* displayFormat;
+    NSString* customLabel;
+    int labelType;
+    int viewIconType;
 }
 
 - (id) init;
@@ -54,8 +59,20 @@
 - (void) useHWObjectWithName:(NSString*)aName;
 - (void) viewSource;
 
+- (int) viewIconType;
+- (void) setViewIconType:(int)aViewIconType;
+- (int) labelType;
+- (void) setLabelType:(int)aLabelType;
+- (NSString*) customLabel;
+- (void) setCustomLabel:(NSString*)aCustomLabel;
+- (NSString*) displayFormat;
+- (void) setDisplayFormat:(NSString*)aDisplayFormat;
 @end
 
+extern NSString* ORProcessHWAccessorViewIconTypeChanged;
+extern NSString* ORProcessHWAccessorLabelTypeChanged;
+extern NSString* ORProcessHWAccessorCustomLabelChanged;
+extern NSString* ORProcessHWAccessorDisplayFormatChanged;
 extern NSString* ORProcessHWAccessorHwObjectChangedNotification;
 extern NSString* ORProcessHWAccessorBitChangedNotification;
 extern NSString* ORProcessHWAccessorHwNameChangedNotification;

@@ -38,27 +38,15 @@
 	ORAdcLowLimitNub*  lowLimitNub;
 	ORAdcHighLimitNub* highLimitNub;
     float minChange;
-    NSString* displayFormat;
-    NSString* customLabel;
-    int labelType;
-    int viewIconType;
 	CTGradient* normalGradient;
 	CTGradient* alarmGradient;
 }
 
 #pragma mark ***Accessors
-- (int) viewIconType;
-- (void) setViewIconType:(int)aViewIconType;
-- (int) labelType;
-- (void) setLabelType:(int)aLabelType;
-- (NSString*) customLabel;
-- (void) setCustomLabel:(NSString*)aCustomLabel;
-- (NSImage*) altImage;
-- (NSString*) displayFormat;
-- (void) setDisplayFormat:(NSString*)aDisplayFormat;
+- (void) dealloc;
+
 - (float) minChange;
 - (void) setMinChange:(float)aMinChange;
-- (void) dealloc;
 
 - (BOOL) valueTooLow;
 - (BOOL) valueTooHigh;
@@ -70,18 +58,12 @@
 
 - (float) evalAndReturnAnalogValue;
 
-- (BOOL) acceptsClickAtPoint:(NSPoint)aPoint;
-- (BOOL) intersectsRect:(NSRect) aRect;
-
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
-extern NSString* ORAdcModelViewIconTypeChanged;
-extern NSString* ORAdcModelLabelTypeChanged;
-extern NSString* ORAdcModelCustomLabelChanged;
-extern NSString* ORAdcModelDisplayFormatChanged;
+
 extern NSString* ORAdcModelMinChangeChanged;
 
 @interface ORAdcLowLimitNub : ORProcessNub
