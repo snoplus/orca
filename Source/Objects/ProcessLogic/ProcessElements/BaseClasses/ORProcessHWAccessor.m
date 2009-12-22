@@ -192,6 +192,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setLabelType:labelType];
     labelType = aLabelType;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHWAccessorLabelTypeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];	
 }
 
 - (NSString*) customLabel
@@ -208,6 +209,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     customLabel = [aCustomLabel copy];    
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHWAccessorCustomLabelChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];	
 }
 
 - (NSString*) displayFormat
@@ -225,6 +227,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
 	displayFormat = [aDisplayFormat copy];    
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessHWAccessorDisplayFormatChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];	
 }
 
 

@@ -186,11 +186,13 @@
 - (void) labelTypeChanged:(NSNotification*)aNote
 {
 	[labelTypeMatrix selectCellWithTag: [model labelType]];
+	[model setUpImage];
 }
 
 - (void) customLabelChanged:(NSNotification*)aNote
 {
 	[customLabelField setStringValue: [model customLabel]];
+	[model setUpImage];
 }
 
 - (void) hwNameChanged:(NSNotification*) aNotification
