@@ -134,7 +134,7 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 		//also parse the full name to create a short version the name.
 		NSScanner* 		 scanner  	= [NSScanner scannerWithString:fullName];
 		NSCharacterSet*  numbers 	= [NSCharacterSet decimalDigitCharacterSet];
-		NSCharacterSet*  delimiters = [NSCharacterSet characterSetWithCharactersInString:@"\r\n\t ,"];
+		NSCharacterSet*  delimiters = [NSCharacterSet characterSetWithCharactersInString:@"\r\n\t,"];
 		NSString* 		 scanResult = [NSString string];
 		NSString* comma = @",";
 		NSMutableString* result = [NSMutableString string];
@@ -153,6 +153,11 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 			[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];	//skip any non-alphanumerics
 			[result appendString:scanResult];										
 		}
+		[result stringByReplacingOccurrencesOfString:@" " withString:@""];
+		[result replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+		[result replaceOccurrencesOfString:@"Card" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+		[result replaceOccurrencesOfString:@"Channel" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+
 		[shortName release];
 		shortName = [result copy];
 	}

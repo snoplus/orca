@@ -1261,6 +1261,13 @@
 		848E3BC909DB0B3E0003F7A2 /* ORMailCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */; };
 		848E3BCA09DB0B3E0003F7A2 /* ORMailCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */; };
 		848E3BCB09DB0B3E0003F7A2 /* MailCenter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */; };
+		849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849013BE10E27B13007591B5 /* ORPlotLinkController.h */; };
+		849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849013BF10E27B13007591B5 /* ORPlotLinkController.m */; };
+		849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849013C010E27B13007591B5 /* ORPlotLinkModel.h */; };
+		849013C710E27B13007591B5 /* ORPlotLinkModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849013C110E27B13007591B5 /* ORPlotLinkModel.m */; };
+		849013C810E27B13007591B5 /* PlotLink.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849013C210E27B13007591B5 /* PlotLink.nib */; };
+		849013C910E27B13007591B5 /* 2DPlotLink.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849013C310E27B13007591B5 /* 2DPlotLink.tif */; };
+		8490160810E31582007591B5 /* 1DPlotLink.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8490160710E31582007591B5 /* 1DPlotLink.tif */; };
 		8491917F0725B43500F454F1 /* ORToolbarFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491917D0725B43400F454F1 /* ORToolbarFactory.m */; };
 		849191800725B43500F454F1 /* ORToolbarFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491917E0725B43500F454F1 /* ORToolbarFactory.h */; };
 		849191C70725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */; };
@@ -3374,6 +3381,13 @@
 		848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMailCenter.h; path = "Source/Main Dialogs/MailCenter/ORMailCenter.h"; sourceTree = SOURCE_ROOT; };
 		848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMailCenter.m; path = "Source/Main Dialogs/MailCenter/ORMailCenter.m"; sourceTree = SOURCE_ROOT; };
 		848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MailCenter.nib; sourceTree = "<group>"; };
+		849013BE10E27B13007591B5 /* ORPlotLinkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPlotLinkController.h; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkController.h"; sourceTree = SOURCE_ROOT; };
+		849013BF10E27B13007591B5 /* ORPlotLinkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPlotLinkController.m; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkController.m"; sourceTree = SOURCE_ROOT; };
+		849013C010E27B13007591B5 /* ORPlotLinkModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPlotLinkModel.h; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkModel.h"; sourceTree = SOURCE_ROOT; };
+		849013C110E27B13007591B5 /* ORPlotLinkModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPlotLinkModel.m; path = "Source/Objects/Misc Objects/PlotLink/ORPlotLinkModel.m"; sourceTree = SOURCE_ROOT; };
+		849013C210E27B13007591B5 /* PlotLink.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PlotLink.nib; path = "Source/Objects/Misc Objects/PlotLink/PlotLink.nib"; sourceTree = SOURCE_ROOT; };
+		849013C310E27B13007591B5 /* 2DPlotLink.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = 2DPlotLink.tif; sourceTree = "<group>"; };
+		8490160710E31582007591B5 /* 1DPlotLink.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = 1DPlotLink.tif; path = "Source/Objects/Misc Objects/PlotLink/1DPlotLink.tif"; sourceTree = SOURCE_ROOT; };
 		8491917D0725B43400F454F1 /* ORToolbarFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORToolbarFactory.m; path = Source/Misc/ORToolbarFactory.m; sourceTree = SOURCE_ROOT; };
 		8491917E0725B43500F454F1 /* ORToolbarFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORToolbarFactory.h; path = Source/Misc/ORToolbarFactory.h; sourceTree = SOURCE_ROOT; };
 		849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Document.plist; path = "Source/Main Document/edu.washington.npl.orca.Document.plist"; sourceTree = SOURCE_ROOT; };
@@ -5661,6 +5675,7 @@
 				843A48510A0AC2F4003DF248 /* USB */,
 				2A178EB608DB3F66001D78BC /* FireWire */,
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
+				849013BD10E27B13007591B5 /* PlotLink */,
 				849516AF10C95382001C8112 /* StateLabel */,
 				840B8135094E4D8D00B1B135 /* Label */,
 				847597450B5EF26500123411 /* SQL */,
@@ -6834,6 +6849,21 @@
 			);
 			name = MailCenter;
 			path = "Source/Main Dialogs/MailCenter";
+			sourceTree = SOURCE_ROOT;
+		};
+		849013BD10E27B13007591B5 /* PlotLink */ = {
+			isa = PBXGroup;
+			children = (
+				849013BE10E27B13007591B5 /* ORPlotLinkController.h */,
+				849013BF10E27B13007591B5 /* ORPlotLinkController.m */,
+				849013C010E27B13007591B5 /* ORPlotLinkModel.h */,
+				849013C110E27B13007591B5 /* ORPlotLinkModel.m */,
+				849013C210E27B13007591B5 /* PlotLink.nib */,
+				8490160710E31582007591B5 /* 1DPlotLink.tif */,
+				849013C310E27B13007591B5 /* 2DPlotLink.tif */,
+			);
+			name = PlotLink;
+			path = "Source/Objects/Misc Objects/PlotLink";
 			sourceTree = SOURCE_ROOT;
 		};
 		8491F4730EC0CDEF0084BAD6 /* pmtImage */ = {
@@ -10451,6 +10481,8 @@
 				84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */,
 				84ACBA6510D44258003B9735 /* ORProcessView.h in Headers */,
 				84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */,
+				849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */,
+				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11120,6 +11152,9 @@
 				84539D1B10E137AD0066A797 /* greenled.png in Resources */,
 				84539E7F10E1693F0066A797 /* OnText.tif in Resources */,
 				84539E8010E1693F0066A797 /* OffText.tif in Resources */,
+				849013C810E27B13007591B5 /* PlotLink.nib in Resources */,
+				849013C910E27B13007591B5 /* 2DPlotLink.tif in Resources */,
+				8490160810E31582007591B5 /* 1DPlotLink.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11864,6 +11899,8 @@
 				8455097B10CEF7DD008A019C /* ORCaen965Decoder.m in Sources */,
 				84ACBA6410D44258003B9735 /* ORProcessView.m in Sources */,
 				84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */,
+				849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */,
+				849013C710E27B13007591B5 /* ORPlotLinkModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
