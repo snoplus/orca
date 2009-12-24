@@ -6836,7 +6836,7 @@ ZSBjb250cm9sbGVyLg</string>
 											<object class="NSButton" id="569730877">
 												<reference key="NSNextResponder" ref="626387338"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{264, 34}, {74, 60}}</string>
+												<string key="NSFrame">{{264, 34}, {74, 68}}</string>
 												<reference key="NSSuperview" ref="626387338"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="449015349">
@@ -6847,7 +6847,10 @@ ZSBjb250cm9sbGVyLg</string>
 													<reference key="NSControlView" ref="569730877"/>
 													<int key="NSButtonFlags">-2042347265</int>
 													<int key="NSButtonFlags2">2</int>
-													<reference key="NSNormalImage" ref="559660208"/>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">2DPlotLink</string>
+													</object>
 													<string key="NSAlternateContents"/>
 													<string key="NSKeyEquivalent"/>
 													<int key="NSPeriodicDelay">400</int>
@@ -17384,8 +17387,8 @@ ZSBjb250cm9sbGVyLg</string>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{42, 571}, {818, 285}}</string>
-					<string>{{42, 571}, {818, 285}}</string>
+					<string>{{13, 571}, {818, 285}}</string>
+					<string>{{13, 571}, {818, 285}}</string>
 					<reference ref="5"/>
 					<reference ref="5"/>
 					<string>{213, 107}</string>
@@ -19080,6 +19083,13 @@ ZSBjb250cm9sbGVyLg</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Misc Objects/ObjectProxy/ORObjectProxy.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Misc Objects/PlotLink/ORPlotLinkModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
