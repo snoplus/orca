@@ -573,7 +573,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
 	hitRateTotal = newTotalValue;
 	if(!totalRate){
-		[self setTotalRate:[[ORTimeRate alloc] init]];
+		[self setTotalRate:[[[ORTimeRate alloc] init] autorelease]];
 	}
 	[totalRate addDataToTimeAverage:hitRateTotal];
 }
