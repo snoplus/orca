@@ -533,6 +533,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	else triggerEnabledMask &= ~(1<<aChan);
 	
     [[NSNotificationCenter defaultCenter]postNotificationName:ORIpeV4FLTModelTriggerEnabledMaskChanged object:self];
+	[self postAdcInfoProvidingValueChanged];
 }
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan
