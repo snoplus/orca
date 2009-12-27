@@ -184,6 +184,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[readOutGroup release];
     [poller stop];
     [poller release];
+	[pmcLink rlease];
     [super dealloc];
 }
 
