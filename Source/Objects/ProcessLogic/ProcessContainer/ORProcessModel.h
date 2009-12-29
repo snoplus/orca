@@ -38,6 +38,7 @@
 }
 
 #pragma mark ***Accessors
+- (void) setProcessIDs;
 - (BOOL) useAltView;
 - (void) setUseAltView:(BOOL)aState;
 - (void) startProcessCycle;
@@ -71,6 +72,7 @@
 - (void) startStopRun;
 - (BOOL) changesAllowed;
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey;
+- (void)assignProcessID:(id)objToGetID;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -79,6 +81,7 @@
 
 @interface OrcaObject (ProcessModel)
 - (void) setUseAltView:(BOOL)aState; 
+- (void) askForProcessID:(id)fromObj;
 @end
 
 extern NSString* ORProcessModelUseAltViewChanged;

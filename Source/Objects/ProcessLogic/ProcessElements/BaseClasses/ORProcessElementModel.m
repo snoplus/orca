@@ -49,6 +49,13 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
     [self setUpNubs];
 }
 
+- (id) copyWithZone:(NSZone*)zone
+{
+	id obj = [super copyWithZone:zone];
+	[obj setProcessID:0];
+    return obj;
+}
+
 - (NSString*) helpURL
 {
 	return @"Process_Control/Process_Elements.html";
@@ -314,6 +321,12 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 }
 
 #pragma mark ¥¥¥Accessors
+- (unsigned long) processID { return processID;}
+- (void) setProcessID:(unsigned long)aValue
+{
+	processID = aValue;
+}
+
 - (NSString*) elementName{ return @"Processor"; }
 - (NSString*) fullHwName { return @"N/A"; }
 - (id) stateValue		 { return @"-"; }
@@ -435,7 +448,7 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 	if([self uniqueIdNumber]){
 		NSFont* theFont = [NSFont messageFontOfSize:theSize];
 		return [[[NSAttributedString alloc] 
-				 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
+				 initWithString:[NSString stringWithFormat:@"%d",[self processID]] 
 				 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,textColor,NSForegroundColorAttributeName,nil]]autorelease];
 	}
 	else return nil;
@@ -452,7 +465,11 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 	altFrame  =		 [decoder decodeRectForKey:@"altFrame"];
 	altOffset =		 [decoder decodePointForKey:@"altOffset"];
 	altBounds =		 [decoder decodeRectForKey:@"altBounds"];
-
+	processID =		 [decoder decodeInt32ForKey:@"processID"];
+	if(altFrame.origin.x == 0 && altFrame.origin.y == 0){
+		altFrame.origin.x = frame.origin.x+10;
+		altFrame.origin.y = frame.origin.y+10;
+	}
     [[self undoManager] enableUndoRegistration];
 	
     processLock = [[NSLock alloc] init];
@@ -469,6 +486,7 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
     [encoder encodeRect:altFrame   forKey:@"altFrame"];
     [encoder encodePoint:altOffset forKey:@"altOffset"];
 	[encoder encodeRect:altBounds  forKey:@"altBounds"];
+	[encoder encodeInt32:processID forKey:@"processID"];
 }
 
 @end

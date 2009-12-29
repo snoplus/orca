@@ -145,6 +145,8 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 {
 	//just set the same value to force a reset of the value to all objects
 	[model setUseAltView:[model useAltView]];
+	//we also have to assign a processID number -- different than the uniqueID number
+	[model setProcessIDs];
 }
 
 - (void) commentChanged:(NSNotification*)aNote

@@ -20,6 +20,7 @@
 
 
 #pragma mark ¥¥¥Imported Files
+#import "ORProcessElementModel.h"
 #import "ORProcessModel.h"
 #import "ORProcessThread.h"
 
@@ -57,6 +58,35 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 
 #pragma mark ***Accessors
+- (void) setProcessIDs
+{
+	for(OrcaObject* obj in [self orcaObjects]){
+		[self assignProcessID:obj];
+	}
+}
+
+- (void)assignProcessID:(id)objToGetID
+{
+	if(![objToGetID processID]){
+		unsigned long anId = 1;
+		do {
+			BOOL idAlreadyUsed = NO;
+			for(id anObj in [self orcaObjects]){
+				if(anObj == objToGetID)continue;
+				if([anObj processID] == anId){
+					anId++;
+					idAlreadyUsed = YES;
+					break;
+				}
+			}
+			if(!idAlreadyUsed){
+				[objToGetID setProcessID:anId];
+				break;
+			}
+		}while(1);
+	}
+}
+
 - (BOOL) useAltView
 {
 	return useAltView;
@@ -446,7 +476,6 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
     [encoder encodeObject:comment forKey:@"comment"];
     [encoder encodeObject:shortName forKey:@"shortName"];
     [encoder encodeBool:useAltView forKey:@"useAltView"];
-	
 }
 
 @end
