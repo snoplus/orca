@@ -108,6 +108,7 @@ E			[Ee][+-]?{D}+
 "logfile"		return LOGFILE;
 "nsdictionary"	return NSDICTIONARY;
 "nsarray"		return NSARRAY;
+"time"			return TIME;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

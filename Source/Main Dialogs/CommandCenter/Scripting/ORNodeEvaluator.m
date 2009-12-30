@@ -66,6 +66,7 @@
 - (id)		clearAlarm:(id)p;
 - (id)		extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray;
 - (id)		sleepFunc:(id)p;
+- (id)		timeFunc;
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
 @end
@@ -519,6 +520,7 @@
 			
 			//built-in funcs
 		case SLEEP:			return [self sleepFunc:p];
+		case TIME:			return [self timeFunc];
 		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
 		case NSARRAY:		return [NSMutableArray array];
 		case DISPLAY:		return [delegate display:NodeValue(1) forKey:NodeValue(0)];
@@ -1135,6 +1137,16 @@
 	}while(total<delay);
 	return nil;
 }
+
+- (id) timeFunc
+{
+	struct timeval time1; 
+	double theTime = 0; 
+	int ierr = gettimeofday(&time1, NULL) ; 
+	if (ierr == 0 )theTime = time1.tv_sec + time1.tv_usec/1.0E6;
+	return [NSDecimalNumber numberWithDouble:theTime];
+}
+
 
 - (id) postAlarm:(id)p
 {
