@@ -538,9 +538,10 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	else 	[mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:.1];
 
     [mYScale setRngLow:MIN(mmin,0) withHigh:mmax];
-	
-    [mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:20];
-    [mXScale setRngLow:0 withHigh:maxX];
+	if(![mXScale isKindOfClass:NSClassFromString(@"ORTimeAxis")] && ![mXScale isKindOfClass:NSClassFromString(@"ORTimeLine")] ){
+		[mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:20];
+		[mXScale setRngLow:0 withHigh:maxX];
+	}
 	
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];
