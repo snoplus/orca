@@ -12,7 +12,7 @@
 #define kIpeFlt_PageNumber 10		// Page Number          bits 14..10
 #define kIpeFlt_RegId 0				// Register Id          bits 14.. 0
 
-#define kNumFLTChannels 24
+#define kNumV4FLTChannels 24
 
 #define kIpeFlt_Page_Size 1000
 
