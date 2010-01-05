@@ -239,12 +239,12 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 srack->theSlt->pageSelect->write(0x100 | pagenr);
                                 
                                 uint32_t adccount;
+								//read raw trace
+								for(adccount=0; adccount<1024;adccount++){
+									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+								}
                                 if(wfRecordVersion == 0x1){
-                                    //read raw trace
-                                    for(adccount=0; adccount<1024;adccount++){
-                                        shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-                                    }
-                                    //search trigger flag (usually in the same or adcoffset+2 bin 2009-12-15)
+                                     //search trigger flag (usually in the same or adcoffset+2 bin 2009-12-15)
                                     searchTrig=adcoffset; //+2;
                                     searchTrig = searchTrig & 0x7ff;
                                     if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
@@ -257,17 +257,11 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                     searchTrig = (searchTrig+1) & 0x7ff;
                                     if(shipWaveformBuffer16[searchTrig] & 0x08000) triggerPos = searchTrig;
                                     //printf("FLT%i: FOund triggerPos %i , diff> %i<  (adcoffset was %i, searchtrig %i)\n",col+1,triggerPos,triggerPos-adcoffset, adcoffset,searchTrig);
-                            //printf("FLT%i: FOund triggerPos %i , diff> %i<  \n",col+1,triggerPos,triggerPos-adcoffset);fflush(stdout);
+									//printf("FLT%i: FOund triggerPos %i , diff> %i<  \n",col+1,triggerPos,triggerPos-adcoffset);fflush(stdout);
                                     //uint32_t copyindex = (adcoffset + postTriggerTime) % 2048;
-                                    uint32_t copyindex = (triggerPos + postTriggerTime) % 2048;
-                                    traceStart16 = copyindex;
+                                    traceStart16 = (triggerPos + postTriggerTime) % 2048;
                                 }
-                                else
-                                {
-                                    //read raw trace
-                                    for(adccount=0; adccount<1024;adccount++){
-                                        waveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
-                                    }
+                                else {
                                     //search trigger pos
                                     for(adccount=0; adccount<1024;adccount++){
                                         uint32_t adcval = waveformBuffer32[adccount];
@@ -285,15 +279,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                     if(appendFlagPos>=0) eventFlags |= 0x20;
                                     //uint32_t copyindex = (triggerPos + 1024) % 2048; //<- this aligns the trigger in the middle (from Mark)
                                     //uint32_t copyindex = (triggerPos + postTriggerTime) % 2048 ;// this was the workaround without time info -tb-
-                                    uint32_t copyindex = (adcoffset + postTriggerTime) % 2048 ;
-                                    traceStart16 = copyindex;
-                                    uint32_t i;
-                                    for(i=0;i<waveformLength;i++){
-                                        shipWaveformBuffer16[i] = waveformBuffer16[copyindex];
-                                        copyindex++;
-                                        copyindex = copyindex % 2048;
-                                    }
-                                }
+                                    traceStart16 = (adcoffset + postTriggerTime) % 2048 ;
+                                 }
                                 
                                 //ship data record
                                 ensureDataCanHold(9 + waveformLength/2); 
