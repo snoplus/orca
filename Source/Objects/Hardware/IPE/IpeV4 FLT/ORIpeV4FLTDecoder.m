@@ -18,8 +18,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORIpeV4FLTDecoder.h"
+#import "ORIpeV4FLTModel.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORIpeV4FLTDefs.h"
@@ -85,8 +85,6 @@
 				 sender:self  
 			   withKeys: @"FLT",@"Total Crate Energy",crateKey,nil];
 	
-	
-	
     return length; //must return number of longs processed.
 }
 
@@ -124,22 +122,22 @@
  <pre>  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
- ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
- ^ ^^^---------------------------crate
- ^ ^^^^---------------------card
- ^^^^ ^^^^-----------channel
+ ------- ^ ^^^---------------------------crate
+ -------------^ ^^^^---------------------card
+ --------------------^^^^ ^^^^-----------channel
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ^^^^ ^^^^------------------------------ channel (0..22)
- ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+ ------------^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ^ ------------------------------------- flag to indicate that the ADC have been swapped
- ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
- ^^ ^^^^ ^^^^ eventID (0..1024)
+ --------^ ^^^^ ^^^^-------------------- number of page in hardware buffer
+ ---------------------------^^ ^^^^ ^^^^ eventID (0..1024)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
                  ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
@@ -165,6 +163,7 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
+	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
 	//channel by channel histograms
 	unsigned long energy = ptr[6]; ///*16; removed the /16 for Brandon... may leave it out
@@ -187,10 +186,29 @@
 
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
-
+	
+	//-----------------------------------------------
+	//temp.. to lock the waveform to the highest value
+	int n = [waveFormdata length]/sizeof(short) - 20;
+	unsigned long maxValue = 0;
+	startIndex = 0;
+	unsigned long i;
+	unsigned short* p = (unsigned short*)[waveFormdata bytes];
+	for(i=20;i<n;i++){
+		unsigned short theValue = p[i] & 0xfff;
+		if(theValue>maxValue){
+			maxValue = theValue;
+			startIndex = i;
+		}	
+	}
+	startIndex = (startIndex+2000)%n;
+	//-----------------------------------------------
+	
+	
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				    unitSize: sizeof(short)					// unit size in bytes
+					startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					mask:	0x0FFF							// when displayed all values will be masked with this value
 					sender: self 
 					withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];

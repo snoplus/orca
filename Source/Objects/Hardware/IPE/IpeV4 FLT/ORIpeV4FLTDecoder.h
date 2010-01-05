@@ -17,17 +17,10 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
-
 #import "ORIpeCardDecoder.h"
 
-@class ORDataPacket;
 @class ORDataSet;
 
-/** Decoder for the extended event data stream. 
-  * These objects are generated in Flt trace mode.
-  */
 @interface ORIpeV4FLTDecoderForWaveForm : ORIpeCardDecoder {
 }
 // Documentation in m-file
