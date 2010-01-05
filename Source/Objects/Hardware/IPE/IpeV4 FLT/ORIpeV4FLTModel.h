@@ -33,6 +33,7 @@
 @class ORTimeRate;
 @class ORTestSuit;
 @class ORCommandList;
+@class ORRateGroup;
 
 #define kNumIpeV4FLTTests 5
 #define kIpeV4FLTBufferSizeLongs 1024
@@ -78,8 +79,8 @@
 	unsigned long	hitRateId;
 	unsigned long	histogramId;
 	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
-	float			hitRate[kNumFLTChannels];	//!< Actual value of the trigger rate measurement
-	BOOL			hitRateOverFlow[kNumFLTChannels];	//!< Overflow of hardware trigger rate register
+	float			hitRate[kNumV4FLTChannels];	//!< Actual value of the trigger rate measurement
+	BOOL			hitRateOverFlow[kNumV4FLTChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
 	
 	BOOL			firstTime;		//!< Event loop: Flag to identify the first readout loop for initialization purpose
@@ -131,12 +132,13 @@
 	BOOL noiseFloorRunning;
 	int noiseFloorState;
 	long noiseFloorOffset;
-	long noiseFloorLow[kNumFLTChannels];
-	long noiseFloorHigh[kNumFLTChannels];
-	long noiseFloorTestValue[kNumFLTChannels];
-	BOOL oldEnabled[kNumFLTChannels];
-	long oldThreshold[kNumFLTChannels];
-	long newThreshold[kNumFLTChannels];
+    int targetRate;
+	long noiseFloorLow[kNumV4FLTChannels];
+	long noiseFloorHigh[kNumV4FLTChannels];
+	long noiseFloorTestValue[kNumV4FLTChannels];
+	BOOL oldEnabled[kNumV4FLTChannels];
+	long oldThreshold[kNumV4FLTChannels];
+	long newThreshold[kNumV4FLTChannels];
 }
 
 #pragma mark •••Initialization
@@ -147,6 +149,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark •••Accessors
+- (int) targetRate;
+- (void) setTargetRate:(int)aTargetRate;
 - (int) histMaxEnergy;
 - (void) setHistMaxEnergy:(int)aHistMaxEnergy;
 - (int) histPageAB;
@@ -254,6 +258,7 @@
 - (void) setSelectedChannelValue:(unsigned short) aValue;
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
 - (float) restrictFloatValue:(int)aValue min:(float)aMinValue max:(float)aMaxValue;
+
 
 #pragma mark •••HW Access
 //all can raise exceptions
@@ -374,6 +379,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORIpeV4FLTModelTargetRateChanged;
 extern NSString* ORIpeV4FLTModelHistMaxEnergyChanged;
 extern NSString* ORIpeV4FLTModelHistPageABChanged;
 extern NSString* ORIpeV4FLTModelHistLastEntryChanged;
@@ -418,4 +424,3 @@ extern NSString* ORIpeSLTModelName;
 extern NSString* ORIpeV4FLTSelectedRegIndexChanged;
 extern NSString* ORIpeV4FLTWriteValueChanged;
 extern NSString* ORIpeV4FLTSelectedChannelValueChanged;
-

@@ -30,6 +30,7 @@
 #import "SLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+NSString* ORIpeV4FLTModelTargetRateChanged			= @"ORIpeV4FLTModelTargetRateChanged";
 NSString* ORIpeV4FLTModelHistMaxEnergyChanged       = @"ORIpeV4FLTModelHistMaxEnergyChanged";
 NSString* ORIpeV4FLTModelHistPageABChanged          = @"ORIpeV4FLTModelHistPageABChanged";
 NSString* ORIpeV4FLTModelHistLastEntryChanged       = @"ORIpeV4FLTModelHistLastEntryChanged";
@@ -213,6 +214,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark •••Accessors
+- (int) targetRate { return targetRate; }
+- (void) setTargetRate:(int)aTargetRate
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTargetRate:targetRate];
+    targetRate = [self restrictIntValue:aTargetRate min:1 max:100];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelTargetRateChanged object:self];
+}
 
 - (int) histMaxEnergy { return histMaxEnergy; }
 //!< A argument -1 will auto-recalculate the maximum energy which fits still into the histogram. -tb-
@@ -434,6 +442,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {	
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateLength:hitRateLength];
     hitRateLength = [self restrictIntValue:aHitRateLength min:0 max:6]; //0->1sec, 1->2, 2->4 .... 6->32sec
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateLengthChanged object:self];
 }
 
@@ -522,15 +531,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 -(BOOL) triggerEnabled:(unsigned short) aChan
 {
-	if(aChan<kNumFLTChannels)return (triggerEnabledMask >> aChan) & 0x1;
+	if(aChan<kNumV4FLTChannels)return (triggerEnabledMask >> aChan) & 0x1;
 	else return NO;
 }
 
 -(void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerEnabled:aChan withValue:(triggerEnabledMask>>aChan)&0x1];
-	if(aState) triggerEnabledMask |= (1<<aChan);
-	else triggerEnabledMask &= ~(1<<aChan);
+	if(aState) triggerEnabledMask |= (1L<<aChan);
+	else triggerEnabledMask &= ~(1L<<aChan);
 	
     [[NSNotificationCenter defaultCenter]postNotificationName:ORIpeV4FLTModelTriggerEnabledMaskChanged object:self];
 	[self postAdcInfoProvidingValueChanged];
@@ -538,15 +547,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan
 {
- 	if(aChan<kNumFLTChannels)return (hitRateEnabledMask >> aChan) & 0x1;
+ 	if(aChan<kNumV4FLTChannels)return (hitRateEnabledMask >> aChan) & 0x1;
 	else return NO;
 }
 
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateEnabled:aChan withValue:(hitRateEnabledMask>>aChan)&0x1];
-	if(aState) hitRateEnabledMask |= (1<<aChan);
-	else hitRateEnabledMask &= ~(1<<aChan);
+	if(aState) hitRateEnabledMask |= (1L<<aChan);
+	else hitRateEnabledMask &= ~(1L<<aChan);
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHitRateEnabledMaskChanged object:self];
 }
@@ -578,17 +587,25 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[totalRate addDataToTimeAverage:hitRateTotal];
 }
 
-- (float) hitRateTotal { return hitRateTotal; }
+- (float) hitRateTotal 
+{ 
+	return hitRateTotal; 
+}
+
 - (float) hitRate:(unsigned short)aChan
 {
-	if(aChan<kNumFLTChannels)return hitRate[aChan];
-	else return 0;
+	if(aChan<kNumV4FLTChannels){
+		return hitRate[aChan];
+	}
+	else return 0.0;
 }
+
+
 
 - (float) rate:(int)aChan { return [self hitRate:aChan]; }
 - (BOOL) hitRateOverFlow:(unsigned short)aChan
 {
-	if(aChan<kNumFLTChannels)return hitRateOverFlow[aChan];
+	if(aChan<kNumV4FLTChannels)return hitRateOverFlow[aChan];
 	else return NO;
 }
 
@@ -634,7 +651,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setToDefaults
 {
 	int i;
-	for(i=0;i<kNumFLTChannels;i++){
+	for(i=0;i<kNumV4FLTChannels;i++){
 		[self setThreshold:i withValue:17000];
 		[self setGain:i withValue:0];
 	}
@@ -696,19 +713,19 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) loadThresholdsAndGains
 {
+	//use the command list to load all the thresholds and gains with one PMC command packet
 	int i;
-	for(i=0;i<kNumFLTChannels;i++){
-		[self writeThreshold:i value:[self threshold:i]];
-        {
-            //TODO: there is no way to disable the pixel trigger, so I set the threshold to maximum -tb-
-            //at low threshold there will be many (irnored) triggers which overflow the event fifo -tb-
-            //maybe Denis should add a register (similar to "enable hitrate") -tb-
-            if( !(triggerEnabledMask & (0x1<<i)) ) [self writeThreshold:i value:0xfffff];
-        }
-        [self writeGain:i value:[self gain:i]]; 
+	ORCommandList* aList = [ORCommandList commandList];
+	for(i=0;i<kNumV4FLTChannels;i++){
+		unsigned long thres;
+		if( !(triggerEnabledMask & (0x1<<i)) )	thres = 0xfffff;
+		else									thres = [self threshold:i];
+		[aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value:thres & 0xFFFFF]];
+		[aList addCommand: [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF]];
 	}
+	[aList addCommand: [self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains]];
 	
-	[self writeReg: kFLTV4CommandReg  value: kIpeFlt_Cmd_LoadGains];
+	[self executeCommandList:aList];
 }
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
@@ -1008,21 +1025,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				
 		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 		int dataIndex = 0;
-		unsigned long data[5 + kNumFLTChannels];
+		unsigned long data[5 + kNumV4FLTChannels];
 		
 		//combine all the hitrate read commands into one command packet
 		ORCommandList* aList = [ORCommandList commandList];
-		for(chan=0;chan<kNumFLTChannels;chan++){
-			if(hitRateEnabledMask & (1<<chan)){
+		for(chan=0;chan<kNumV4FLTChannels;chan++){
+			if(hitRateEnabledMask & (1L<<chan)){
 				[aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
 			}
 		}
 		
 		[self executeCommandList:aList];
 		
+		//put the synchronized around this code to test if access to the hitrates is thread safe
 		//pull out the result
-		for(chan=0;chan<kNumFLTChannels;chan++){
-			if(hitRateEnabledMask & (1<<chan)){
+		for(chan=0;chan<kNumV4FLTChannels;chan++){
+			if(hitRateEnabledMask & (1L<<chan)){
 				unsigned long aValue = [aList longValueForCmd:chan];
 				BOOL overflow = (aValue >> 31) & 0x1;
 				aValue = aValue & 0xffff;
@@ -1041,7 +1059,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				if(!hitRateOverFlow[chan]){
 					newTotal += hitRate[chan];
 				}
-				data[dataIndex + 5] = (chan<<20) | ((overflow&0x1)<<16) | aValue;
+				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;
 				dataIndex++;
 			}
 		}
@@ -1134,6 +1152,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setTargetRate:[decoder decodeIntForKey:@"targetRate"]];
     [self setHistClrMode:		[decoder decodeIntForKey:@"histClrMode"]];
     [self setHistMode:			[decoder decodeIntForKey:@"histMode"]];
     [self setHistEBin:			[decoder decodeInt32ForKey:@"histEBin"]];
@@ -1164,18 +1183,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	int i;
 	if(!thresholds){
 		[self setThresholds: [NSMutableArray array]];
-		for(i=0;i<kNumFLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
+		for(i=0;i<kNumV4FLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
 	}
-	if([thresholds count]<kNumFLTChannels){
-		for(i=[thresholds count];i<kNumFLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
+	if([thresholds count]<kNumV4FLTChannels){
+		for(i=[thresholds count];i<kNumV4FLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
 	}
 	
 	if(!gains){
 		[self setGains: [NSMutableArray array]];
-		for(i=0;i<kNumFLTChannels;i++) [gains addObject:[NSNumber numberWithInt:100]];
+		for(i=0;i<kNumV4FLTChannels;i++) [gains addObject:[NSNumber numberWithInt:100]];
 	}
-	if([gains count]<kNumFLTChannels){
-		for(i=[gains count];i<kNumFLTChannels;i++) [gains addObject:[NSNumber numberWithInt:50]];
+	if([gains count]<kNumV4FLTChannels){
+		for(i=[gains count];i<kNumV4FLTChannels;i++) [gains addObject:[NSNumber numberWithInt:50]];
 	}
 	
 	if(!testStatusArray){
@@ -1197,6 +1216,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:targetRate			forKey:@"targetRate"];
     [encoder encodeInt:histClrMode			forKey:@"histClrMode"];
     [encoder encodeInt:histMode				forKey:@"histMode"];
     [encoder encodeInt32:histEBin			forKey:@"histEBin"];
@@ -1317,7 +1337,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   [NSNumber numberWithLong:dataId],				@"dataId",
-				   [NSNumber numberWithLong:kNumFLTChannels],		@"maxChannels",
+				   [NSNumber numberWithLong:kNumV4FLTChannels],		@"maxChannels",
 				   nil];
 	
 	[anEventDictionary setObject:aDictionary forKey:@"IpeV4FLT"];
@@ -1361,7 +1381,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//check which mode to use
 	BOOL ratesEnabled = NO;
 	int i;
-	for(i=0;i<kNumFLTChannels;i++){
+	for(i=0;i<kNumV4FLTChannels;i++){
 		if([self hitRateEnabled:i]){
 			ratesEnabled = YES;
 			break;
@@ -1381,7 +1401,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   withObject:nil
 				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
 	}
-	
+		
 	if(runMode == kIpeFlt_Histogram_Mode){
 		[self performSelector:@selector(readHistogrammingStatus) 
 				   withObject:nil
@@ -1390,6 +1410,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
 	[self writeRunControl:YES];
 	[self writeSeconds:0];
+
 }
 
 
@@ -1413,7 +1434,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
 	int chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
+	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		hitRate[chan] = 0;
 	}
 	[self setHitRateTotal:0];
@@ -1468,7 +1489,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (int) numberOfChannels
 {
-    return kNumFLTChannels;
+    return kNumV4FLTChannels;
 }
 
 - (NSArray*) wizardParameters
@@ -1614,7 +1635,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	NSLog(@"Page Number : 0x%08x\n", [self readReg:kFLTV4HistPageNReg]);
 	
 	int i;
-	for(i=0;i<kNumFLTChannels;i++){
+	for(i=0;i<kNumV4FLTChannels;i++){
 		unsigned long firstLast = [self readReg:kFLTV4HistLastFirstReg channel:i];
 		unsigned long first = firstLast & 0xffff;
 		unsigned long last = (firstLast >>16) & 0xffff;
@@ -1645,7 +1666,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		NSLog(@"Time: %d\n",sec);
 		
 		int i;
-		for(i=0;i<kNumFLTChannels;i++){
+		for(i=0;i<kNumV4FLTChannels;i++){
 			if(channelMap & (1<<i)){
 				unsigned long eventFifo3 = [self readReg: kFLTV4EventFifo3Reg channel:i];
 				unsigned long energy     = [self readReg: kFLTV4EventFifo4Reg channel:i];
@@ -1741,13 +1762,23 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) printValueTable
 {
-	int i;
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,   @"chan | HitRate  | Gain | Threshold\n");
 	NSLogFont(aFont,   @"----------------------------------\n");
-	unsigned long aHitRateMask = [self readHitRateMask] ;
-	for(i=0;i<kNumFLTChannels;i++){
-		NSLogFont(aFont,@"%4d | %@ | %4d | %4d \n",i,(aHitRateMask>>i)&0x1 ? @" Enabled":@"Disabled",[self readGain:i],[self readThreshold:i]);
+	unsigned long aHitRateMask = [self readHitRateMask];
+
+	//grab all the thresholds and gains using one command packet
+	int i;
+	ORCommandList* aList = [ORCommandList commandList];
+	for(i=0;i<kNumV4FLTChannels;i++){
+		[aList addCommand: [self readRegCmd:kFLTV4GainReg channel:i]];
+		[aList addCommand: [self readRegCmd:kFLTV4ThresholdReg channel:i]];
+	}
+	
+	[self executeCommandList:aList];
+	
+	for(i=0;i<kNumV4FLTChannels;i++){
+		NSLogFont(aFont,@"%4d | %@ | %4d | %4d \n",i,(aHitRateMask>>i)&0x1 ? @" Enabled":@"Disabled",[aList longValueForCmd:i*2],[aList longValueForCmd:1+i*2]);
 	}
 	NSLogFont(aFont,   @"---------------------------------\n");
 }
@@ -1762,7 +1793,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	double var;
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     NSLogFont(aFont,@"Statistics      :\n");
-	for (j=0;j<kNumFLTChannels;j++){
+	for (j=0;j<kNumV4FLTChannels;j++){
 		[self getStatistics:j mean:&mean var:&var];
 		NSLogFont(aFont,@"  %2d -- %10.2f +/-  %10.2f\n", j, mean, var);
 	}
@@ -1951,11 +1982,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		//thresholds first
 		for(testIndex = 0;testIndex<4;testIndex++){
 			unsigned short thePattern = aPattern[testIndex];
-			for(chan=0;chan<kNumFLTChannels;chan++){
+			for(chan=0;chan<kNumV4FLTChannels;chan++){
 				[self writeThreshold:chan value:thePattern];
 			}
 			
-			for(chan=0;chan<kNumFLTChannels;chan++){
+			for(chan=0;chan<kNumV4FLTChannels;chan++){
 				if([self readThreshold:chan] != thePattern){
 					[self test:testNumber result:@"FAILED" color:[NSColor passedColor]];
 					NSLog(@"Error: Threshold (pattern: 0x%0x) FLT %d chan %d does not work\n",thePattern,[self stationNumber],chan);
@@ -1970,11 +2001,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			//now gains
 			for(testIndex = 0;testIndex<4;testIndex++){
 				unsigned short thePattern = gainPattern[testIndex];
-				for(chan=0;chan<kNumFLTChannels;chan++){
+				for(chan=0;chan<kNumV4FLTChannels;chan++){
 					[self writeGain:chan value:thePattern];
 				}
 				
-				for(chan=0;chan<kNumFLTChannels;chan++){
+				for(chan=0;chan<kNumV4FLTChannels;chan++){
 					unsigned short theValue = [self readGain:chan];
 					if(theValue != thePattern){
 						[self test:testNumber result:@"FAILED" color:[NSColor passedColor]];
@@ -2114,14 +2145,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		switch(noiseFloorState){
 			case 0:
 				//disable all channels
-				for(i=0;i<kNumFLTChannels;i++){
+				for(i=0;i<kNumV4FLTChannels;i++){
 					oldEnabled[i]   = [self hitRateEnabled:i];
 					oldThreshold[i] = [self threshold:i];
 					[self setThreshold:i withValue:0x7fff];
 					newThreshold[i] = 0x7fff;
 				}
 				atLeastOne = NO;
-				for(i=0;i<kNumFLTChannels;i++){
+				for(i=0;i<kNumV4FLTChannels;i++){
 					if(oldEnabled[i]){
 						noiseFloorLow[i]			= 0;
 						noiseFloorHigh[i]		= 0x7FFF;
@@ -2131,7 +2162,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 					}
 				}
 				
-				[ORTimer delay:.2];
 				[self initBoard];
 				
 				if(atLeastOne)	noiseFloorState = 1;
@@ -2139,7 +2169,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			break;
 				
 			case 1:
-				for(i=0;i<kNumFLTChannels;i++){
+				for(i=0;i<kNumV4FLTChannels;i++){
 					if([self hitRateEnabled:i]){
 						if(noiseFloorLow[i] <= noiseFloorHigh[i]) {
 							[self setThreshold:i withValue:noiseFloorTestValue[i]];
@@ -2148,11 +2178,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 						else {
 							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset);
 							[self setThreshold:i withValue:0x7fff];
-							hitRateEnabledMask &= ~(1<<i);
+							hitRateEnabledMask &= ~(1L<<i);
 						}
 					}
 				}
-				[ORTimer delay:.2];
 				[self initBoard];
 				
 				if(hitRateEnabledMask)	noiseFloorState = 2;	//go check for data
@@ -2163,10 +2192,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				//read the hitrates
 				[self readHitRates];
 				
-				for(i=0;i<kNumFLTChannels;i++){
+				for(i=0;i<kNumV4FLTChannels;i++){
 					if([self hitRateEnabled:i]){
-						if([self hitRate:i] > 2){
-							//there's a rate so we're too low with the threshold
+						if([self hitRate:i] > targetRate){
+							//the rate is too high, bump the threshold up
 							[self setThreshold:i withValue:0x7fff];
 							noiseFloorLow[i] = noiseFloorTestValue[i] + 1;
 						}
@@ -2175,7 +2204,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 					}
 				}
 				
-				[ORTimer delay:.2];
 				[self initBoard];
 				
 				noiseFloorState = 1;
@@ -2183,7 +2211,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 								
 			case 3: //finish up	
 				//load new results
-				for(i=0;i<kNumFLTChannels;i++){
+				for(i=0;i<kNumV4FLTChannels;i++){
 					[self setHitRateEnabled:i withValue:oldEnabled[i]];
 					[self setThreshold:i withValue:newThreshold[i]];
 				}
@@ -2193,7 +2221,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		}
 		if(noiseFloorRunning){
 			float timeToWait;
-			if(noiseFloorState==2)	timeToWait = pow(2.,hitRateLength)+.5;
+			if(noiseFloorState==2)	timeToWait = pow(2.,hitRateLength)* 1.5;
 			else					timeToWait = 0.2;
 			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:timeToWait];
 		}
@@ -2201,7 +2229,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     }
 	@catch(NSException* localException) {
         int i;
-        for(i=0;i<kNumFLTChannels;i++){
+        for(i=0;i<kNumV4FLTChannels;i++){
             [self setHitRateEnabled:i withValue:oldEnabled[i]];
             [self setThreshold:i withValue:oldThreshold[i]];
 			//[self reset];

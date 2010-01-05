@@ -60,7 +60,7 @@
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
 	[totalHitRateField setFormatter:rateFormatter];
-	
+	[rateTextFields setFormatter:rateFormatter];
     blankView = [[NSView alloc] init];
     
     NSString* key = [NSString stringWithFormat: @"orca.ORIpeV4FLT%d.selectedtab",[model stationNumber]];
@@ -302,9 +302,18 @@
                          name : ORIpeV4FLTModelHistMaxEnergyChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(targetRateChanged:)
+                         name : ORIpeV4FLTModelTargetRateChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+- (void) targetRateChanged:(NSNotification*)aNote
+{
+	[targetRateField setIntValue: [model targetRate]];
+}
 
 - (void) histMaxEnergyChanged:(NSNotification*)aNote
 {
@@ -468,6 +477,7 @@
 	[self noiseFloorOffsetChanged:nil];
 	[self histPageABChanged:nil];
 	[self histMaxEnergyChanged:nil];
+	[self targetRateChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -661,7 +671,7 @@
 - (void) triggerEnabledChanged:(NSNotification*)aNotification
 {
 	int i;
-	for(i=0;i<kNumFLTChannels;i++){
+	for(i=0;i<kNumV4FLTChannels;i++){
 		[[triggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
 	}
 }
@@ -669,7 +679,7 @@
 - (void) hitRateEnabledChanged:(NSNotification*)aNotification
 {
 	int i;
-	for(i=0;i<kNumFLTChannels;i++){
+	for(i=0;i<kNumV4FLTChannels;i++){
 		[[hitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
 	}
 }
@@ -691,7 +701,7 @@
 - (void) gainArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
+	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
 		
 	}	
@@ -700,7 +710,7 @@
 - (void) thresholdArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
+	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORIpeV4FLTModel*)model threshold:chan]];
 	}
 }
@@ -708,7 +718,7 @@
 - (void) triggersEnabledArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
+	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
 		
 	}
@@ -717,7 +727,7 @@
 - (void) hitRatesEnabledArrayChanged:(NSNotification*)aNotification
 {
 	short chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
+	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[hitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
 		
 	}
@@ -737,7 +747,7 @@
 - (void) hitRateChanged:(NSNotification*)aNote
 {
 	int chan;
-	for(chan=0;chan<kNumFLTChannels;chan++){
+	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		id theCell = [rateTextFields cellWithTag:chan];
 		if([model hitRateOverFlow:chan]){
 			[theCell setFormatter: nil];
@@ -803,6 +813,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) targetRateAction:(id)sender
+{
+	[model setTargetRate:[sender intValue]];	
+}
 
 - (IBAction) openNoiseFloorPanel:(id)sender
 {
@@ -978,7 +993,7 @@
 		NSLogFont(aFont,   @"FLT (station %d)\n",[model stationNumber]); // ak, 5.10.07
 		NSLogFont(aFont,   @"chan | Gain | Threshold\n");
 		NSLogFont(aFont,   @"-----------------------\n");
-		for(i=0;i<kNumFLTChannels;i++){
+		for(i=0;i<kNumV4FLTChannels;i++){
 			NSLogFont(aFont,@"%4d | %4d | %4d \n",i,[model readGain:i],[model readThreshold:i]);
 			//NSLog(@"%d: %d\n",i,[model readGain:i]);
 		}
