@@ -482,7 +482,8 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	double aMinPad = [mYScale minPad];
 	double theValue = 0;
 
-	yl   = [mYScale getPixAbs:theValue];
+	if(!aLog)	yl = [mYScale getPixAbs:theValue];
+	else		yl = [mYScale getPixAbs:1];
 	xl	 = [mXScale getPixAbs:minX];
 
 	int i;
