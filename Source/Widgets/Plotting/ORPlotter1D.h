@@ -25,6 +25,7 @@
 	BOOL			commandKeyIsDown;
     BOOL			ignoreDoNotDrawFlag;
 	BOOL			setAllLinesBold;
+	BOOL			drawSymbols;
 }
 
 - (void) dealloc;
@@ -33,7 +34,8 @@
 
 - (void) forcedUpdate:(NSNotification*)aNote;
 - (void) windowResizing:(NSNotification*)aNote;
-
+- (BOOL) drawSymbols;
+- (void) setDrawSymbols:(BOOL)aFlag;
 - (void) drawRect:(NSRect) rect;
 - (void) setFrame:(NSRect)aFrame;
 - (int)activeCurveIndex;

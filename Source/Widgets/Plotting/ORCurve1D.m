@@ -428,29 +428,42 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 
 	int i;
 	float xValue,yValue;
-	for (i=0; i<numPoints;++i) {
-						
-		[mDataSource plotter:aPlot dataSet:dataSetID index:i x:&xValue y:&yValue];
-		y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
-		x = [mXScale getPixAbs:xValue];
-		
-		if(i>0){
-			[theDataPath moveToPoint:NSMakePoint(xl,yl)];
-			[theDataPath lineToPoint:NSMakePoint(x,y)];
+	if([aPlot drawSymbols]){
+		for (i=0; i<numPoints;++i) {
+			[mDataSource plotter:aPlot dataSet:dataSetID index:i x:&xValue y:&yValue];
+			y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
+			x = [mXScale getPixAbs:xValue];			
+			NSColor* curveColor = [aPlot colorForDataSet:dataSetID];
+			if([aPlot activeCurve] == self)[curveColor set];
+			else [[curveColor highlightWithLevel:.4]set];
+			[NSBezierPath fillRect:NSMakeRect(x-1,y-1,2,2)];
 		}
-		
-		// save previous x and y values
-		xl = x;
-		yl = y;
-		
 	}
-
-	NSColor* curveColor = [aPlot colorForDataSet:dataSetID];
+	else {
+		for (i=0; i<numPoints;++i) {
+							
+			[mDataSource plotter:aPlot dataSet:dataSetID index:i x:&xValue y:&yValue];
+			y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
+			x = [mXScale getPixAbs:xValue];
+			
+			if(i>0){
+				[theDataPath moveToPoint:NSMakePoint(xl,yl)];
+				[theDataPath lineToPoint:NSMakePoint(x,y)];
+			}
+			
+			// save previous x and y values
+			xl = x;
+			yl = y;
+			
+		}
 	
-	if([aPlot activeCurve] == self)[curveColor set];
-	else [[curveColor highlightWithLevel:.4]set];
-	[theDataPath setLineWidth:.5];
-	[theDataPath stroke];
+		NSColor* curveColor = [aPlot colorForDataSet:dataSetID];
+		
+		if([aPlot activeCurve] == self)[curveColor set];
+		else [[curveColor highlightWithLevel:.4]set];
+		[theDataPath setLineWidth:.5];
+		[theDataPath stroke];
+	}
 	
 }
 

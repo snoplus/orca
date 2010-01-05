@@ -121,6 +121,16 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	return [mDataSource useXYPlot];;
 }
 
+- (BOOL) drawSymbols
+{
+	return drawSymbols;
+}
+
+- (void) setDrawSymbols:(BOOL)aFlag
+{
+	drawSymbols = aFlag;
+}
+
 - (void) initCurves
 {
     [self setCurves:[NSMutableArray array]];
