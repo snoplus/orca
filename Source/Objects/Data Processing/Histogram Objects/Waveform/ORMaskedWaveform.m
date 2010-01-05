@@ -23,6 +23,10 @@
 @implementation ORMaskedWaveform
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) useDataObject:(id)aPlotter  dataSet:(int)set
+{
+	return NO;
+}
 
 - (unsigned long) mask
 {
@@ -41,4 +45,28 @@
 }
 
 @end
+
+@implementation ORMaskedIndexedWaveform
+
+#pragma mark ¥¥¥Accessors
+
+- (void) setStartIndex:(unsigned long)anIndex
+{
+	startIndex = anIndex;
+}
+
+- (unsigned long) startIndex
+{
+	return startIndex;
+}
+
+-(long) value:(unsigned short)aChan
+{
+	aChan = (aChan + startIndex)%[self numberBins];;
+	if(!mask)return [super value:aChan];
+	return [super value:aChan] & mask;
+}
+
+@end
+
 

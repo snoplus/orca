@@ -31,4 +31,14 @@
 - (unsigned long) mask;
 @end
 
+@interface ORMaskedIndexedWaveform : ORMaskedWaveform  {
+    unsigned long   startIndex;
+}
+
+#pragma mark ¥¥¥Accessors 
+- (void) setStartIndex:(unsigned long)anIndex;
+- (unsigned long) startIndex;
+@end
+
+
 
