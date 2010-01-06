@@ -75,6 +75,7 @@ const float kGateAlpha2 = .1;
         [self setDefaults];
         [self registerNotificationObservers];
 		RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
+		fitValuesValid = NO;
     }
     return self;
 }
@@ -94,8 +95,14 @@ const float kGateAlpha2 = .1;
     [fitLableAttributes release];
     [analysis release];
     [displayedGateName release];
+	
 	[fitString release];
 	[fit release];
+	[fitParams release];
+	[fitParamNames release];
+	[fitParamErrors release];
+	[chiSquare release];
+	
     [super dealloc];
 }
 
@@ -824,9 +831,82 @@ const float kGateAlpha2 = .1;
 	[mPlot doFFT:userInfo];
 }
 
+- (BOOL) fitValuesValid
+{
+	return fitValuesValid;
+}
+
+- (int) fitParamCount
+{
+	return [fitParamNames count];
+}
+
+- (NSString*) fitParamName:(int) i
+{
+	if(i<[fitParamNames count]) return [fitParamNames objectAtIndex:i];
+	else return @"";
+}
+
+- (float) fitParam:(int) i
+{
+	if(i<[fitParamNames count]) return [[fitParams objectAtIndex:i] floatValue];
+	else return 0.0;
+}
+
+- (float) fitParamError:(int) i
+{
+	if(i<[fitParamNames count]) return [[fitParamErrors objectAtIndex:i] floatValue];
+	else return 0.0;
+}
+
+- (float) chiSquare
+{
+	return [chiSquare floatValue];
+}
+
+- (void) doLinearFit:(int)fitOrder
+{	
+	[self doFitType:2 fitOrder:fitOrder fitFunction:@""];
+}
+
+- (void) doFitType:(int)fitType
+{	
+	int fitOrder;
+	if(fitType == 2)fitOrder = 1;
+	else			fitOrder = 0;
+	
+	[self doFitType:fitType fitOrder:0 fitFunction:@""];
+}
+
+- (void) doArbitraryFit:(NSString*)fitFunction
+{	
+	[self doFitType:4 fitOrder:0 fitFunction:fitFunction];
+}
+
+- (void) doFitType:(int)fitType fitOrder:(int)fitOrder fitFunction:(NSString*)fitFunction
+{	
+	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+	
+	[userInfo setObject:[NSNumber numberWithInt:fitType] forKey:ORCARootServiceFitFunctionKey];
+	[userInfo setObject:[NSNumber numberWithInt:fitOrder] forKey:ORCARootServiceFitOrderKey];
+	[userInfo setObject:fitFunction forKey:ORCARootServiceFitFunction];
+	
+	[self doFit:userInfo];
+}
 
 - (void) doFit:(id)userInfo
 {
+	[fitParams release];	
+	[fitParamNames release];
+	[fitParamErrors release];
+	[chiSquare release];
+	
+	fitParams = nil;	
+	fitParamNames = nil;
+	fitParamErrors = nil;
+	chiSquare = nil;
+	fitValuesValid = NO;
+	
 	NSArray* dataPoints;
 	if([[mPlot dataSource] useXYPlot])	dataPoints = [mCurve dataPointArray:mPlot range:NSMakeRange([self gateMinChannel],[self gateMaxChannel])];
 	else						dataPoints = [mCurve dataPointArray:mPlot range:NSMakeRange(0,[self gateMaxChannel])];
@@ -874,10 +954,13 @@ const float kGateAlpha2 = .1;
 	BOOL responseOK = ([aResponse objectForKey:@"Request Error"] == nil);
 	if(responseOK){
 		if([[aResponse objectForKey:@"Request Type"] isEqualToString: @"OROrcaRequestFitProcessor"]){
-			NSArray* fitParams		= [aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputParameters",nil];
-			NSArray* fitParamNames	= [aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputParametersNames",nil];
-			NSArray* fitParamErrors = [aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputErrorParameters",nil];
-			NSNumber* chiSquare		= [aResponse nestedObjectForKey:@"Request Outputs",@"FitChiSquare",nil];
+			
+			fitParams		= [[aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputParameters",nil] retain];
+			fitParamNames	= [[aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputParametersNames",nil] retain];
+			fitParamErrors  = [[aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputErrorParameters",nil] retain];
+			chiSquare		= [[aResponse nestedObjectForKey:@"Request Outputs",@"FitChiSquare",nil] retain];
+			fitValuesValid = YES;
+			
 			NSLog(@"----------------------------------------\n");
 			NSLog(@"Fit done on %@\n",[[[mPlot dataSource] window] title]);
 			NSLog(@"Data curve: %d roi: %d\n",[mCurve dataSetID],[mCurve activeGateIndex]);

@@ -57,7 +57,14 @@ enum {
 		int				fitMaxChannel;
 		int				fitMinChannel;
 		NSString*		fitString;
-        
+	
+		//cache of OrcaRoot Service values
+		BOOL     fitValuesValid;
+		NSArray* fitParams;
+		NSArray* fitParamNames;
+		NSArray* fitParamErrors;
+		NSNumber* chiSquare;
+	
 }
 + (id) gateForCurve:(ORCurve1D*)aCurve plot:(ORPlotter1D*)aPlot;
 - (id) initForCurve:(ORCurve1D*)aCurve plot:(ORPlotter1D*)aPlot;
@@ -125,6 +132,20 @@ enum {
 - (int) fitMaxChannel;
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
+
+
+- (void) doLinearFit:(int)fitOrder;
+- (void) doFitType:(int)fitType;
+- (void) doArbitraryFit:(NSString*)fitFunction;
+- (void) doFitType:(int)fitType fitOrder:(int)fitOrder fitFunction:(NSString*)fitFunction;
+- (BOOL) fitValuesValid;
+
+- (int) fitParamCount;
+- (NSString*) fitParamName:(int) index;
+- (float) fitParam:(int) index;
+- (float) fitParamError:(int) index;
+- (float) chiSquare;
+
 @end
 
 extern NSString* ORGate1DValid;
