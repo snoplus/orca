@@ -234,7 +234,7 @@ const float kGateAlpha2 = .1;
 		int maxX = 0;
 		float minY = 3.402e+38;
 		float maxY = -3.402e+38;
-        int	x;
+        float	x;
 		float y;
 		int xStart = [self gateMinChannel];
 		int xEnd = [self gateMaxChannel];
