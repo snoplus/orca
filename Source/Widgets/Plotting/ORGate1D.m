@@ -231,13 +231,13 @@ const float kGateAlpha2 = .1;
         double sumXY = 0.0;
         double sumX2Y = 0.0;
 		double sumValX = 0;
-		int maxX = 0;
+		float maxX = 0;
 		float minY = 3.402e+38;
 		float maxY = -3.402e+38;
-        float	x;
+        float x;
 		float y;
 		int xStart = [self gateMinChannel];
-		int xEnd = [self gateMaxChannel];
+		int xEnd   = [self gateMaxChannel];
 		
 		int totalNum = xEnd - xStart+1;
 		
