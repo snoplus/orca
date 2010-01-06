@@ -117,7 +117,7 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 	[lastRequest release];
 	[serialNumber release];
 	[localLock release];
-	
+		
 	if(longTermTrace){
 		int i;
 		for (i = 0; i < kNumMin; i++) free(longTermTrace[i]);

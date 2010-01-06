@@ -69,8 +69,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    [selectionViewController release];
+	[selectionViewController setDelegate: nil];
+	[selectionViewController release];
+	
+    [actionViewController setDelegate: nil];
     [actionViewController release];
+	
     [actionControllers release];
     [selectionControllers release];
     [controlArray release];

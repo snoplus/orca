@@ -89,6 +89,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     [clients release];
     [script release];
     [scriptComments release];
+    [serverSocket setDelegate:nil];
     [serverSocket release];
     [destinationObjects release];
 	[history release];

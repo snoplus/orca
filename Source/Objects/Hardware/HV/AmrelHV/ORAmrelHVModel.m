@@ -94,6 +94,8 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
     if([serialPort isOpen]){
         [serialPort close];
     }
+	[serialPort setDelegate:nil];
+
 	[lastRampStep[0] release];
 	[lastRampStep[1] release];
 

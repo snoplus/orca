@@ -201,9 +201,11 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 //---------------------------------------------------------------------------------------------------
 - (void) dealloc
 {
-	if ( mCmdCmdQueue != nil ) [mCmdCmdQueue dealloc];
-	if ( mRetQueue != nil ) [mRetQueue dealloc];
-	if ( mSocket != nil ) [mSocket dealloc];
+	[mCmdCmdQueue dealloc];
+	[mRetQueue dealloc];
+	
+	[mSocket setDelegate:nil];
+	[mSocket dealloc];
 	
     [super dealloc];
 }

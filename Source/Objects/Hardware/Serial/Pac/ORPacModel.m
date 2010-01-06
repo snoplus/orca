@@ -68,7 +68,8 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
     if([serialPort isOpen]){
         [serialPort close];
     }
-    [serialPort release];
+	[serialPort setDelegate:nil];
+	[serialPort release];
 
 	[super dealloc];
 }

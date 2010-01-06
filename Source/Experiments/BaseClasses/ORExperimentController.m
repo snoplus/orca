@@ -41,6 +41,11 @@
 
 
 @implementation ORExperimentController
+- (void) dealloc
+{
+	[detectorView setDelegate:nil];	
+	[super dealloc];
+}
 
 -(void) awakeFromNib
 {

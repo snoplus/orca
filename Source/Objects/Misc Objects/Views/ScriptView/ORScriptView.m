@@ -40,6 +40,7 @@
 - (void)	dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
+	[self setDelegate:nil];
 	[recolorTimer invalidate];
 	[recolorTimer release];
 	[super dealloc];

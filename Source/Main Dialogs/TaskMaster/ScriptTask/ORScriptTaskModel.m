@@ -33,6 +33,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 
 - (void) dealloc 
 {
+    [task setDelegate:nil];
     [task release];
     task = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];

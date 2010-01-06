@@ -116,6 +116,7 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     [rateGroup quit];
     [calibrationTask abort];
     
+	[calibrationTask setDelegate:nil];
     [calibrationTask release];
     [thresholdDacs release];
     [thresholdAdcs release];

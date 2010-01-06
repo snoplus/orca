@@ -65,6 +65,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 -(void)dealloc 
 {
+	[eval setDelegate:nil];
 	[eval release];
 	[functionTable release];
 	[expressionAsData release];

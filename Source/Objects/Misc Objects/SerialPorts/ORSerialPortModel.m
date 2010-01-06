@@ -45,6 +45,8 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
     if([serialPort isOpen]){
         [serialPort close];
     }
+	
+	[serialPort setDelegate:nil];	
     [serialPort release];
 
 	[super dealloc];

@@ -78,6 +78,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	[timeToStopProcessThread release];
     [readingLock release];
 	[remoteHost release];
+    [socket setDelegate:nil];
 	[socket release];
 	[transferQueue release];
 	[dataArray release];

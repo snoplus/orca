@@ -63,6 +63,7 @@ NSString* ORZupModelPortStateChanged		= @"ORZupModelPortStateChanged";
     if([serialPort isOpen]){
         [serialPort close];
     }
+	[serialPort setDelegate:nil];
     [serialPort release];
     [super dealloc];
 }

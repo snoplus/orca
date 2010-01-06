@@ -81,6 +81,7 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	[selectedStartScriptName release];
 	[selectedShutDownScriptName release];
     [socket close];
+    [socket setDelegate:nil];
     [socket release];
     
     [super dealloc];

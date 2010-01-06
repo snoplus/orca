@@ -73,8 +73,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[waitingObjects release];
-    [socket release];
 	[socket setDelegate:nil];
+    [socket release];
     [timeConnected release];
     [name release];
 	[hostName release];

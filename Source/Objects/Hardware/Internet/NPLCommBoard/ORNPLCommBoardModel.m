@@ -49,6 +49,7 @@ static NSString* NPLComConnectors[8] = {
 {
     [cmdString release];
 	[socket close];
+    [socket setDelegate:nil];
 	[socket release];
     [super dealloc];
 }

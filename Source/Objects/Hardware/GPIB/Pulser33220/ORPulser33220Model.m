@@ -119,6 +119,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	[allWaveFormsInMemory release];
 	[ipAddress release];
 	[socket close];
+    [socket setDelegate:nil];
 	[socket release];
     [super dealloc];
 }

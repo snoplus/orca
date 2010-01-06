@@ -43,6 +43,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 - (void) dealloc
 {
 	[readOutGroup release];
+	[sbcLink setDelegate:nil];
 	[sbcLink release];
 	[super dealloc];
 }

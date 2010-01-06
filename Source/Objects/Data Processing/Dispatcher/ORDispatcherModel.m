@@ -57,6 +57,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	[clients release];
     [allowedList release];
     [refusedList release];
+	[serverSocket setDelegate:nil];
 	[serverSocket release];
   	[currentHeader release];
 	[super dealloc];

@@ -42,6 +42,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 
 - (void) dealloc
 {
+	[cmdField setDelegate:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }

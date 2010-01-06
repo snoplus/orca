@@ -44,6 +44,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 - (void) dealloc
 {
 	[socket close];
+    [socket setDelegate:nil];
 	[socket release];
 	[meterData release];
 	

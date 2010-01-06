@@ -67,7 +67,8 @@ NSString* ORModBusLock						= @"ORModBusLock";
     }
 	[lastRequest release];
 	[cmdQueue release];
-    [serialPort release];
+	[serialPort setDelegate:nil];
+	[serialPort release];
 	[timeRates release];
 
 	

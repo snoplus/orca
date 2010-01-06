@@ -98,6 +98,8 @@ enum {
 
 -(void)dealloc
 {
+	[[NcdDetector sharedInstance] setDelegate:nil];
+
     [reducedEfficiencyDate release];
     [nominalSettingsFile release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -107,21 +109,27 @@ enum {
     [xAttributes release];
     [yAttributes release];
     
+    [ncdPulseChannelsTask setDelegate:self];
     [ncdPulseChannelsTask release];
     ncdPulseChannelsTask = nil;
     
+    [ncdPDSStepTask setDelegate:self];
     [ncdPDSStepTask release];
     ncdPDSStepTask = nil;
     
-    [ncdLogAmpTask release];
+	[ncdLogAmpTask setDelegate:self];
+	[ncdLogAmpTask release];
     ncdLogAmpTask = nil;
     
+	[ncdLinearityTask setDelegate:self];
     [ncdLinearityTask release];
     ncdLinearityTask = nil;
     
+	[ncdThresholdTask setDelegate:self];
     [ncdThresholdTask release];
     ncdThresholdTask = nil;
     
+	[ncdCableCheckTask setDelegate:self];
     [ncdCableCheckTask release];
     ncdCableCheckTask = nil;
     
@@ -215,6 +223,7 @@ enum {
     if(!ncdLogAmpTask){
         ncdLogAmpTask = [[NcdLogAmpTask alloc] init];
     }
+	
     [ncdLogAmpTask setDelegate:self];
     [ncdLogAmpTask wakeUp];
     

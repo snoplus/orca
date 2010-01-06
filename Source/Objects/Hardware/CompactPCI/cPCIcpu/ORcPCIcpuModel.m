@@ -40,6 +40,7 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 
 - (void) dealloc
 {
+	[sbcLink setDelegate:nil];
 	[sbcLink release];
 	[super dealloc];
 }

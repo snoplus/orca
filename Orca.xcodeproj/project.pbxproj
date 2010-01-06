@@ -11186,7 +11186,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ -x \"/usr/local/bin/svnversion\" ]; then\n    /usr/local/bin/svnversion > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\nelse\n    echo \"-\" > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\nfi\n";
+			shellScript = "if [ -x \"/usr/bin/svnversion\" ]; then\n    /usr/bin/svnversion . > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\nelse\n    echo \"-\" > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
