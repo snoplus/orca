@@ -117,8 +117,8 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 - (void) endEditing
 {
 	//commit all text editing... subclasses should call before doing their work.
-	if(![[self window] makeFirstResponder:[self window]]){
-		[[self window] endEditingFor:nil];		
+	if(![[self window] endEditing]){
+		[[self window] forceEndEditing];		
 	}
 }
 
