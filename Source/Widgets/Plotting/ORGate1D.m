@@ -864,9 +864,29 @@ const float kGateAlpha2 = .1;
 	return [chiSquare floatValue];
 }
 
-- (void) doLinearFit:(int)fitOrder
+- (void) doGaussianFit
+{	
+	[self doFitType:0 fitOrder:0 fitFunction:@""];
+}
+
+- (void) doExponentialFit
+{	
+	[self doFitType:1 fitOrder:0 fitFunction:@""];
+}
+
+- (void) doPolynomialFit:(int)fitOrder
 {	
 	[self doFitType:2 fitOrder:fitOrder fitFunction:@""];
+}
+
+- (void) doLandauFit
+{	
+	[self doFitType:3 fitOrder:0 fitFunction:@""];
+}
+
+- (void) doArbitraryFit:(NSString*)fitFunction
+{	
+	[self doFitType:4 fitOrder:0 fitFunction:fitFunction];
 }
 
 - (void) doFitType:(int)fitType
@@ -876,11 +896,6 @@ const float kGateAlpha2 = .1;
 	else			fitOrder = 0;
 	
 	[self doFitType:fitType fitOrder:0 fitFunction:@""];
-}
-
-- (void) doArbitraryFit:(NSString*)fitFunction
-{	
-	[self doFitType:4 fitOrder:0 fitFunction:fitFunction];
 }
 
 - (void) doFitType:(int)fitType fitOrder:(int)fitOrder fitFunction:(NSString*)fitFunction

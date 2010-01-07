@@ -133,10 +133,12 @@ enum {
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
 
-
-- (void) doLinearFit:(int)fitOrder;
-- (void) doFitType:(int)fitType;
+- (void) doGaussianFit;
+- (void) doExponentialFit;
+- (void) doPolynomialFit:(int)fitOrder;
+- (void) doLandauFit;
 - (void) doArbitraryFit:(NSString*)fitFunction;
+- (void) doFitType:(int)fitType;
 - (void) doFitType:(int)fitType fitOrder:(int)fitOrder fitFunction:(NSString*)fitFunction;
 - (BOOL) fitValuesValid;
 
