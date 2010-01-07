@@ -139,6 +139,8 @@
 	BOOL oldEnabled[kNumV4FLTChannels];
 	long oldThreshold[kNumV4FLTChannels];
 	long newThreshold[kNumV4FLTChannels];
+	
+	unsigned long eventCount[kNumV4FLTChannels];
 }
 
 #pragma mark •••Initialization
@@ -333,6 +335,10 @@
 - (unsigned long) readMemoryChan:(int)chan page:(int)aPage;
 - (void) readMemoryChan:(int)aChan page:(int)aPage pageBuffer:(unsigned short*)aPageBuffer;
 - (void) clear:(int)aChan page:(int)aPage value:(unsigned short)aValue;
+
+- (unsigned long) eventCount:(int)aChannel;
+- (void)		  clearEventCounts;
+- (BOOL) bumpRateFromDecodeStage:(short)channel;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;

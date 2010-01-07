@@ -33,7 +33,7 @@
     IBOutlet NSButton*		secondaryColorAxisLogCB;
     IBOutlet NSTextField*	secondaryRateField;
     IBOutlet NSTextField*	detectorTitle;
-   
+
 	//items in the  HW map tab view
 	IBOutlet NSPopUpButton* secondaryAdcClassNamePopup;
 	IBOutlet NSTextField*	secondaryMapFileTextField;

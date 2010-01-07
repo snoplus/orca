@@ -631,6 +631,12 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [self preRunChecks];
 }
 
+- (void) clearTotalCounts
+{
+	[segmentGroups makeObjectsPerformSelector:@selector(clearTotalCounts)];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAdcInfoProvidingValueChanged object:self];
+}
+
 @end
 
 @implementation ORExperimentModel (private)

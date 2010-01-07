@@ -33,6 +33,7 @@
 	ORTimeRate*		totalRate;
 	int				thresholdHistogram[32*1024];
 	int				gainHistogram[1020];
+	int				totalCountsHistogram[1020];
 	float			rate;
 	NSArray*		mapEntries;
 
@@ -60,6 +61,7 @@
 - (void) setGroupName:(NSString*)aName;
 - (int) thresholdHistogram:(int) index;
 - (int) gainHistogram:(int) index;
+- (int) totalCountsHistogram:(int) index;
 - (ORTimeRate*) totalRate;
 - (void) setTotalRate:(ORTimeRate*)newTotalRate;
 - (NSString*) mapFile;
@@ -75,6 +77,7 @@
 - (float) rate;
 - (float) getThreshold:(int) index;
 - (float) getRate:(int) index;
+- (float) getTotalCounts:(int) index;
 - (BOOL) getError:(int) index;
 - (void) showDialogForSegment:(int)aSegment;
 - (float) getGain:(int) index;
@@ -83,6 +86,7 @@
 - (void) clearSegmentErrors;
 - (NSSet*) hwCards;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (void) clearTotalCounts;
 
 #pragma mark •••Work Methods
 - (void) histogram;

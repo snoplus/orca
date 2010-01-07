@@ -85,8 +85,8 @@
 	
 	if([secondaryGroup colorAxisAttributes])[[secondaryColorScale colorAxis] setAttributes:[[[secondaryGroup colorAxisAttributes] mutableCopy] autorelease]];
 
-	[[secondaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000 withMinRng:5];
-    [[secondaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:32000];
+	[[secondaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000000 withMinRng:5];
+    [[secondaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:128000000];
     [[secondaryColorScale colorAxis] setOppositePosition:YES];
 	[[secondaryColorScale colorAxis] setNeedsDisplay:YES];
 
@@ -166,7 +166,7 @@
 
 #pragma mark ¥¥¥HW Map Actions
 
-- (void) slowControlNameAction:(id)sender
+- (IBAction) slowControlNameAction:(id)sender
 {
 	[model setSlowControlName:[sender stringValue]];	
 }
@@ -271,6 +271,7 @@
 		case kDisplayRates:			[detectorTitle setStringValue:@"Detector Rate"];	break;
 		case kDisplayThresholds:	[detectorTitle setStringValue:@"Thresholds"];		break;
 		case kDisplayGains:			[detectorTitle setStringValue:@"Gains"];			break;
+		case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];		break;
 		default: break;
 	}
 }

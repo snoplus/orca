@@ -56,9 +56,9 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
         
-	[[valueHistogramsPlot xScale] setRngLimitsLow:0 withHigh:128000 withMinRng:64];
-	[[primaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000 withMinRng:5];
- 	[[primaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:32000];
+	[[valueHistogramsPlot xScale] setRngLimitsLow:0 withHigh:128000000 withMinRng:64];
+	[[primaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000000 withMinRng:5];
+ 	[[primaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:128000000];
    
     [[ratePlot xScale] setNeedsDisplay:YES];
     [[ratePlot yScale] setNeedsDisplay:YES];
@@ -391,6 +391,10 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) clearAction:(id)sender
+{
+	[model clearTotalCounts];
+}
 
 - (IBAction) showNamesAction:(id)sender
 {
@@ -600,6 +604,7 @@
 	[detectorView setNeedsDisplay:YES];
 	[valueHistogramsPlot setNeedsDisplay:YES];
 	[self setDetectorTitle];
+	[self detectorLockChanged:nil];
 }
 
 - (void) primaryMapFileChanged:(NSNotification*)aNote
@@ -657,6 +662,7 @@
     BOOL locked = [gSecurity isLocked:[model experimentDetectorLock]];
     [detectorLockButton setState: locked];
     [captureStateButton setEnabled: !locked];
+    [clearButton setEnabled: [model displayType] == kDisplayTotalCounts];
 }
 
 
@@ -721,6 +727,7 @@
 		case kDisplayRates:		[[valueHistogramsPlot xScale] setRngLow:0 withHigh:64]; break;
 		case kDisplayThresholds:
 		case kDisplayGains:		
+		case kDisplayTotalCounts:		
 			[valueHistogramsPlot xAndYAutoScale];
 		break;
 		default: break;
@@ -736,10 +743,11 @@
 	else if(aPlotter == valueHistogramsPlot){
 		int displayType = [model displayType];
 		switch(displayType){
-			case kDisplayRates:		 return [[segmentGroups objectAtIndex:set] numSegments];
-			case kDisplayThresholds: return 32*1024;
-			case kDisplayGains:		 return 1024;
-			default:				 return 1000;
+			case kDisplayRates:			return [[segmentGroups objectAtIndex:set] numSegments];
+			case kDisplayTotalCounts:	return [[segmentGroups objectAtIndex:set] numSegments];
+			case kDisplayThresholds:	return 32*1024;
+			case kDisplayGains:			return 1024;
+			default:					return 1000;
 		}
 	}
 	else return 0;
@@ -772,6 +780,10 @@
 			[histogramTitle setStringValue:@"Channel Rates"];
 			[valueHistogramsPlot setXLabel:@"Channel" yLabel:@"Counts/Sec"];	
 		break;
+		case kDisplayTotalCounts:			
+			[histogramTitle setStringValue:@"Total Counts Distribution"];		
+			[valueHistogramsPlot setXLabel:@"Channel" yLabel:@"Total Counts"];	
+		break;
 		case kDisplayThresholds:	
 			[histogramTitle setStringValue:@"Threshold Distribution"];	
 			[valueHistogramsPlot setXLabel:@"Raw Threshold Value" yLabel:@"# Channels"];	
@@ -796,9 +808,10 @@
 		int displayType = [model displayType];
 		float aValue = 0;
 		switch(displayType){
-			case kDisplayThresholds: aValue = [[segmentGroups objectAtIndex:set] thresholdHistogram:x];	break;
-			case kDisplayGains:		 aValue = [[segmentGroups objectAtIndex:set] gainHistogram:x];		break;
-			case kDisplayRates:		 aValue = [[segmentGroups objectAtIndex:set] getRate:x];				break;
+			case kDisplayThresholds:	aValue = [[segmentGroups objectAtIndex:set] thresholdHistogram:x];	break;
+			case kDisplayGains:			aValue = [[segmentGroups objectAtIndex:set] gainHistogram:x];		break;
+			case kDisplayRates:			aValue = [[segmentGroups objectAtIndex:set] getRate:x];				break;
+			case kDisplayTotalCounts:	aValue = [[segmentGroups objectAtIndex:set] totalCountsHistogram:x];break;
 			default:	break;
 		}
 		return aValue;
@@ -875,7 +888,8 @@
 - (void) scaleValueHistogram
 {
 	switch([model displayType]){
-		case kDisplayRates:		[[valueHistogramsPlot xScale] setRngLow:0 withHigh:[model maxNumSegments]]; break;
+		case kDisplayRates:			[[valueHistogramsPlot xScale] setRngLow:0 withHigh:[model maxNumSegments]]; break;
+		case kDisplayTotalCounts:	[[valueHistogramsPlot xScale] setRngLow:0 withHigh:[model maxNumSegments]]; break;
 		case kDisplayThresholds:
 		case kDisplayGains:		
 			[valueHistogramsPlot xAndYAutoScale];

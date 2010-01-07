@@ -21,6 +21,7 @@
 #define kDisplayRates		1
 #define kDisplayThresholds	2
 #define kDisplayGains		3
+#define kDisplayTotalCounts	4
 
 @interface ORDetectorView : NSView
 {
@@ -49,7 +50,7 @@
 - (void) downArrow;
 - (void) leftArrow;
 - (void) rightArrow;
-- (NSColor*) getColorForSet:(int)setIndex value:(int)aValue;
+- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue;
 
 @end
 

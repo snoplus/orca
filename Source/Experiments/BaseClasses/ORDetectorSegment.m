@@ -130,11 +130,25 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 	else return 0;
 }
 
+- (float) totalCounts
+{
+	int channel = [[params objectForKey:mapKey(kChannel)] intValue];
+	if(channel>=0){
+		return (float)[hardwareCard eventCount:channel];
+	}
+	else return 0;
+}
+
+- (void) clearTotalCounts
+{
+	[hardwareCard clearEventCounts];
+}
 
 - (float) rate
 {
     return rate;
 }
+
 - (void) setRate:(float)newRate
 {
     rate=newRate;

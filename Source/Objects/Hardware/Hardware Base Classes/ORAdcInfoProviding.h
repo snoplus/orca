@@ -35,6 +35,8 @@
 - (void) initBoard;
 - (void) postAdcInfoProvidingValueChanged;
 - (BOOL) partOfEvent:(unsigned short) aChan;
+- (unsigned long) eventCount:(int)channel;
+- (void) clearEventCounts;
 @end
 
 extern NSString* ORAdcInfoProvidingValueChanged;

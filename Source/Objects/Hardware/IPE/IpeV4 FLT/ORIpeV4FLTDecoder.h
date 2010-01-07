@@ -22,6 +22,9 @@
 @class ORDataSet;
 
 @interface ORIpeV4FLTDecoderForWaveForm : ORIpeCardDecoder {
+	@private 
+		BOOL getRatesFromDecodeStage;
+		NSMutableDictionary* actualFlts;
 }
 // Documentation in m-file
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
@@ -29,6 +32,9 @@
 @end
 
 @interface ORIpeV4FLTDecoderForEnergy : ORIpeCardDecoder {
+	@private 
+		BOOL getRatesFromDecodeStage;
+		NSMutableDictionary* actualFlts;
 }
 // Documentation in m-file
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;

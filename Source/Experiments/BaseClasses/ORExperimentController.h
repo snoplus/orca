@@ -55,6 +55,7 @@
     IBOutlet NSTextField*   timeLimitField;
     IBOutlet NSMatrix*      runModeMatrix;
     IBOutlet NSProgressIndicator* 	runBar;
+	IBOutlet NSButton*		clearButton;
 
 	//items in the  details tab view
 	IBOutlet NSPopUpButton*	displayTypePU1;
@@ -103,6 +104,7 @@
 #pragma mark •••Details Actions
 - (IBAction) detailsLockAction:(id)sender;
 - (IBAction) initAction:(id)sender;
+- (IBAction) clearAction:(id)sender;
 
 #pragma mark •••Interface Management
 - (void) showNamesChanged:(NSNotification*)aNote;

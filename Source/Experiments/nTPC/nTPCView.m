@@ -79,7 +79,7 @@
 	[errorPathSet addObject:error1Paths];
 }
 
-- (NSColor*) getColorForSet:(int)setIndex value:(int)aValue
+- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue
 {
 	return [colorScale getColorForValue:aValue];
 }

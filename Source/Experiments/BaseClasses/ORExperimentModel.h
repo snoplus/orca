@@ -63,6 +63,7 @@
 - (ORSegmentGroup*) segmentGroup:(int)aSet;
 - (BOOL) somethingSelected;
 - (void) setSomethingSelected:(BOOL)aFlag;
+- (void) clearTotalCounts;
 
 #pragma mark •••Convience Methods
 - (void) clearAlarm:(NSString*)aName;

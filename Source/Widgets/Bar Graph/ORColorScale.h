@@ -44,9 +44,9 @@
 - (ORAxis*) colorAxis;
 - (NSMutableArray*) colors;
 - (void) setColors:(NSMutableArray*)newColors;
-- (NSColor*) getColorForValue:(unsigned short)aValue;
-- (unsigned short) getFastColorIndexForValue:(unsigned short)aValue log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad;
-- (unsigned short) getColorIndexForValue:(unsigned short)aValue;
+- (NSColor*) getColorForValue:(unsigned long)aValue;
+- (unsigned short) getFastColorIndexForValue:(unsigned long)aValue log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad;
+- (unsigned short) getColorIndexForValue:(unsigned long)aValue;
 - (NSColor*) getColorForIndex:(unsigned short)index;
 
 - (BOOL) useRainBow;

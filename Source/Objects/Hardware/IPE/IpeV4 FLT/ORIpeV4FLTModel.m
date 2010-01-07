@@ -1361,6 +1361,27 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return objDictionary;
 }
 
+- (BOOL) bumpRateFromDecodeStage:(short)channel
+{
+    if(channel>=0 && channel<kNumV4FLTChannels){
+		++eventCount[channel];
+	}
+    return YES;
+}
+
+- (unsigned long) eventCount:(int)aChannel
+{
+    return eventCount[aChannel];
+}
+
+- (void) clearEventCounts
+{
+    int i;
+    for(i=0;i<kNumV4FLTChannels;i++){
+		eventCount[i]=0;
+    }
+}
+
 - (void) reset
 {
 	[self writeReg:kFLTV4CommandReg value:kIpeFlt_Reset_All];
@@ -1371,7 +1392,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	firstTime = YES;
 	
     [self clearExceptionCount];
-	
+	[self clearEventCounts];
 	
     //----------------------------------------------------------------------------------------
     // Add our description to the data description

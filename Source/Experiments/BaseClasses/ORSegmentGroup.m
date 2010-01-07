@@ -67,6 +67,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	
 	memset(thresholdHistogram,0,1000);
 	memset(gainHistogram,0,1000);
+	memset(totalCountsHistogram,0,1000);
 
     [[self undoManager] enableUndoRegistration];
 	
@@ -192,6 +193,11 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	return gainHistogram[index];
 }
 
+- (int) totalCountsHistogram:(int) index;
+{
+	return totalCountsHistogram[index];
+}
+
 - (ORTimeRate*) totalRate
 {
     return totalRate;
@@ -294,9 +300,20 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 {
 	return [[segments objectAtIndex:index] segmentError];
 }
+
 - (float) getRate:(int) index
 {
 	return [[segments objectAtIndex:index] rate];
+}
+
+- (float) getTotalCounts:(int) index
+{
+	return [[segments objectAtIndex:index] totalCounts];
+}
+
+- (void) clearTotalCounts
+{
+	[segments makeObjectsPerformSelector:@selector(clearTotalCounts)];
 }
 
 - (void) clearSegmentErrors
@@ -346,6 +363,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 {
 	memset(thresholdHistogram,0,sizeof(int) * 32*1024);
 	memset(gainHistogram,0,sizeof(int) * 1024);
+	memset(totalCountsHistogram,0,sizeof(int) * 1024);
 	
 	int i;
 	int n = [segments count];
@@ -355,6 +373,8 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 			if(thresholdValue>=0 && thresholdValue<32*1024)thresholdHistogram[thresholdValue]++;
 			int gainValue = (int)[self getGain:i];
 			if(gainValue>=0 && gainValue<1024)gainHistogram[gainValue]++;
+			int totalClountsValue = (int)[self getTotalCounts:i];
+			totalCountsHistogram[i] += totalClountsValue;
 		}
 	}
 }

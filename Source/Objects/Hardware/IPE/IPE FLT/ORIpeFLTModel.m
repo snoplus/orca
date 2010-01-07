@@ -1532,7 +1532,14 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	}
     else return nil;
 }
-
+//for adcProvidingProtocol... but not used for now
+- (unsigned long) eventCount:(int)channel
+{
+	return 0;
+}
+- (void) clearEventCounts
+{
+}
 @end
 
 @implementation ORIpeFLTModel (tests)

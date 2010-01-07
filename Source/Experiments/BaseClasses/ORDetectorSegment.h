@@ -31,6 +31,7 @@
 	NSMutableDictionary*	params;
 	BOOL					isValid;
 	float					rate;
+	float					totalCounts;
 	BOOL					hwPresent;
 	BOOL					online;
 	BOOL					segmentError;
@@ -73,6 +74,8 @@
 - (short) threshold;
 - (void) setGain:(id)aValue;
 - (void) setThreshold:(id)aValue;
+- (float) totalCounts;
+- (void) clearTotalCounts;
 - (short) gain;
 - (float) rate;
 - (void) setRate:(float)newRate;
@@ -90,8 +93,7 @@
 #pragma mark ¥¥¥Achival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-
-
 @end
+
 
 extern NSString* KSegmentRateChangedNotification;

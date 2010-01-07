@@ -5738,6 +5738,15 @@ clean_up_mark:
 	//included to satisfy the protocal... change if needed
 	return NO;
 }
+
+//for adcProvidingProtocol... but not used for now
+- (unsigned long) eventCount:(int)channel
+{
+	return 0;
+}
+- (void) clearEventCounts
+{
+}
 @end
 
 @implementation ORKatrinFLTModel (tests)

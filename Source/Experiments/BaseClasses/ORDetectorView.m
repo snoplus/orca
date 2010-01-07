@@ -85,7 +85,7 @@
 - (void) downArrow{;}
 - (void) leftArrow{;}
 - (void) rightArrow{;}
-- (NSColor*) getColorForSet:(int)setIndex value:(int)aValue{return nil;}
+- (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue{return nil;}
 - (int) selectedSet  {return selectedSet;}
 - (int) selectedPath {return selectedPath;}
 
@@ -157,11 +157,12 @@
 				if([segmentGroup online:segmentIndex]){
 					float displayValue;
 					switch(displayType){
-						case kDisplayThresholds: displayValue = [segmentGroup getThreshold:segmentIndex];	break;
-						case kDisplayGains:		 displayValue = [segmentGroup getGain:segmentIndex];		break;
-						default:				 displayValue = [segmentGroup getRate:segmentIndex];		break;
+						case kDisplayThresholds:	displayValue = [segmentGroup getThreshold:segmentIndex];	break;
+						case kDisplayGains:			displayValue = [segmentGroup getGain:segmentIndex];			break;
+						case kDisplayTotalCounts:	displayValue = [segmentGroup getTotalCounts:segmentIndex];	break;
+						default:					displayValue = [segmentGroup getRate:segmentIndex];			break;
 					}
-					NSColor* displayColor = [self getColorForSet:setIndex value:(int)displayValue];
+					NSColor* displayColor = [self getColorForSet:setIndex value:(unsigned long)displayValue];
 					if(displayColor)[displayColor set];
 					else [[NSColor darkGrayColor] set];
 				}

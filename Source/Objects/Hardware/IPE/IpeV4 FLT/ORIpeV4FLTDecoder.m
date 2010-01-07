@@ -54,6 +54,18 @@
  */
 //-------------------------------------------------------------
 
+- (id) init
+{
+    self = [super init];
+    getRatesFromDecodeStage = YES;
+    return self;
+}
+
+- (void) dealloc
+{
+	[actualFlts release];
+    [super dealloc];
+}
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 {
@@ -84,7 +96,24 @@
 				numBins:65535 
 				 sender:self  
 			   withKeys: @"FLT",@"Total Crate Energy",crateKey,nil];
-	
+
+	//get the actual object
+	if(getRatesFromDecodeStage){
+		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
+		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
+		ORIpeV4FLTModel* obj = [actualFlts objectForKey:fltKey];
+		if(!obj){
+			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORIpeV4FLTModel")];
+			for(ORIpeV4FLTModel* aFlt in listOfFlts){
+				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
+					[actualFlts setObject:aFlt forKey:fltKey];
+					obj = aFlt;
+					break;
+				}
+			}
+		}
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan];
+	}
     return length; //must return number of longs processed.
 }
 
@@ -112,6 +141,7 @@
 			energy,eventDate,eventTime,seconds,subSec,nPages,chMap];               
     	
 }
+
 @end
 
 @implementation ORIpeV4FLTDecoderForWaveForm
@@ -150,6 +180,18 @@
  <pre>  
  */ 
 //-------------------------------------------------------------
+- (id) init
+{
+    self = [super init];
+    getRatesFromDecodeStage = YES;
+    return self;
+}
+
+- (void) dealloc
+{
+	[actualFlts release];
+    [super dealloc];
+}
 
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
@@ -204,7 +246,6 @@
 	startIndex = (startIndex+2000)%n;
 	//-----------------------------------------------
 	
-	
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				    unitSize: sizeof(short)					// unit size in bytes
@@ -212,6 +253,25 @@
 					mask:	0x0FFF							// when displayed all values will be masked with this value
 					sender: self 
 					withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
+	
+	//get the actual object
+	if(getRatesFromDecodeStage){
+		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
+		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
+		ORIpeV4FLTModel* obj = [actualFlts objectForKey:fltKey];
+		if(!obj){
+			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORIpeV4FLTModel")];
+			for(ORIpeV4FLTModel* aFlt in listOfFlts){
+				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
+					[actualFlts setObject:aFlt forKey:fltKey];
+					obj = aFlt;
+					break;
+				}
+			}
+		}
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan];
+	}
+	
 										
     return length; //must return number of longs processed.
 }
