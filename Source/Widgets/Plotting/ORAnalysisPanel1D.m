@@ -91,11 +91,11 @@
 
 - (void) registerNotificationObservers
 {
-    if(!gate){
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
+	if(!gate){
         return;
     }
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
@@ -180,13 +180,8 @@
 {
     [self curveNumberChanged:nil];
     [self gateNumberChanged:nil];
-    [self gateMinChanged:nil];
-    [self gateMaxChanged:nil];
     [self totalSumChanged:nil];
     [self averageChanged:nil]; 
-    [self centroidChanged:nil];
-    [self sigmaChanged:nil];
-    [self peakxChanged:nil];
     [self peakyChanged:nil];
     [self displayGateChanged:nil];
     [self fitOrderChanged];
@@ -197,6 +192,17 @@
     [self orcaRootServiceConnectionChanged:nil];
 	[self orcaRootServiceFitChanged:nil];
 	[self activeGateChanged:nil];
+
+	//-----------------------------------------------------------
+	//these can not be called here.... causes nasty crash bug 
+	//because of a deep - level call to a free data source
+	//after a window is closed.
+	//[self gateMinChanged:nil];
+	//[self gateMaxChanged:nil];
+	//[self centroidChanged:nil];
+	//[self sigmaChanged:nil];
+	//[self peakxChanged:nil];
+	//-----------------------------------------------------------
 }
 
 - (int) fitOrder
