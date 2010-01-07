@@ -114,7 +114,7 @@ const float kGateAlpha2 = .1;
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+    [notifyCenter removeObserver:self];
     [notifyCenter addObserver: self
                      selector: @selector(gateNameChanged:)
                          name: @"ORGateNameChangedNotification"
