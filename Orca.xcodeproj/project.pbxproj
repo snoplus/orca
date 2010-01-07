@@ -366,6 +366,8 @@
 		840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840E72E9103DA7BC0070AD70 /* ORAmrelHVModel.m */; };
 		840E72F3103DB4980070AD70 /* AmrelHV.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840E72F2103DB4980070AD70 /* AmrelHV.tif */; };
 		840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F539C97C03A7C80D015F64B1 /* IOKit.framework */; };
+		8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */; };
+		8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */; };
 		84167116104C04D400E47227 /* ORAutoTestUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 84167114104C04D400E47227 /* ORAutoTestUnit.h */; };
 		84167117104C04D400E47227 /* ORAutoTestUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 84167115104C04D400E47227 /* ORAutoTestUnit.m */; };
 		84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84178D4E0923C4B100C15D2B /* ORSocketClient.h */; };
@@ -2709,6 +2711,8 @@
 		840EFFFD0944B28F00049827 /* ORProcessPulserModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessPulserModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ORProcessPulserModel.m; sourceTree = SOURCE_ROOT; };
 		840EFFFE0944B28F00049827 /* ProcessPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ProcessPulser.nib; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ProcessPulser.nib; sourceTree = SOURCE_ROOT; };
 		840EFFFF0944B28F00049827 /* ProcessPulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProcessPulser.tif; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ProcessPulser.tif; sourceTree = SOURCE_ROOT; };
+		8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWindow+Extensions.h"; sourceTree = "<group>"; };
+		8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+Extensions.m"; path = "Source/Cocoa Extensions/NSWindow+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		84167114104C04D400E47227 /* ORAutoTestUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAutoTestUnit.h; sourceTree = "<group>"; };
 		84167115104C04D400E47227 /* ORAutoTestUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAutoTestUnit.m; sourceTree = "<group>"; };
 		84178D4E0923C4B100C15D2B /* ORSocketClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSocketClient.h; sourceTree = "<group>"; };
@@ -9359,6 +9363,8 @@
 				840B207B0B4D79400021220C /* NSScanner+Extensions.m */,
 				8491FE410EC1DD270084BAD6 /* NSImage+Extensions.m */,
 				8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */,
+				8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */,
+				8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */,
 				8400D90109B36E34000C1DA4 /* IconBadge */,
 				844514940674E10D00A19654 /* ZFlowLayout */,
 			);
@@ -10483,6 +10489,7 @@
 				84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */,
 				849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */,
 				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
+				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11901,6 +11908,7 @@
 				84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */,
 				849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */,
 				849013C710E27B13007591B5 /* ORPlotLinkModel.m in Sources */,
+				8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
