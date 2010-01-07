@@ -536,6 +536,17 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	}
 }
 
+- (NSString*) crateKey:(NSDictionary*)aDicionary
+{
+	NSArray* theKeys = [aDicionary allKeys];
+	for(NSString* aKey in theKeys){
+		if([aKey rangeOfString:@"CrateModel"].location != NSNotFound){
+			return aKey;
+		}
+	}
+	return @"";
+}
+
 //a highly hardcoded config checker. Assumes things like only one crate, ect.
 - (BOOL) preRunChecks
 {
@@ -553,9 +564,9 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     //init the checks to 'unknown'
     [self setHardwareCheck:2];
     [self setCardCheck:2];
-    
-    NSDictionary* newCrateDictionary = [newDictionary objectForKey:@"crate 0"];
-    NSDictionary* oldCrateDictionary = [oldDictionary objectForKey:@"crate 0"];
+    id crateKey = [self crateKey:oldDictionary];
+    NSDictionary* newCrateDictionary = [newDictionary objectForKey:crateKey];
+    NSDictionary* oldCrateDictionary = [oldDictionary objectForKey:crateKey];
     if(!newCrateDictionary  && oldCrateDictionary){
         [self setHardwareCheck:NO];
         [problemArray addObject:@"Crate has been removed\n"];
@@ -607,7 +618,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     
     if(cardCheck == 2)[self setCardCheck:YES];
     else if(cardCheck == 0){
-        NSLogColor([NSColor redColor],@"Failed Shaper Config Check\n");
+        NSLogColor([NSColor redColor],@"Failed Card Config Check\n");
         passed = NO;
     }
             

@@ -75,6 +75,7 @@
 - (void) compileHistograms;
 - (BOOL) preRunChecks;
 - (void) printProblemSummary;
+- (NSString*) crateKey:(NSDictionary*)aDicionary;
 
 #pragma mark •••Subclass Responsibility
 - (void) makeSegmentGroups;
