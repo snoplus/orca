@@ -29,7 +29,8 @@
 #import "ORSegmentGroup.h"
 #import "ORAlarmCollection.h"
 
-NSString* ORExperimentModelShowNamesChanged = @"ORExperimentModelShowNamesChanged";
+NSString* ORExperimentModelIgnoreHWChecksChanged		 = @"ORExperimentModelIgnoreHWChecksChanged";
+NSString* ORExperimentModelShowNamesChanged				 = @"ORExperimentModelShowNamesChanged";
 NSString* ExperimentModelDisplayTypeChanged				 = @"ExperimentModelDisplayTypeChanged";
 NSString* ExperimentModelSelectionStringChanged			 = @"ExperimentModelSelectionStringChanged";
 NSString* ExperimentHardwareCheckChangedNotification     = @"ExperimentHardwareCheckChangedNotification";
@@ -273,6 +274,18 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 
 #pragma mark •••Accessors
 
+- (BOOL) ignoreHWChecks
+{
+    return ignoreHWChecks;
+}
+
+- (void) setIgnoreHWChecks:(BOOL)aIgnoreHWChecks
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIgnoreHWChecks:ignoreHWChecks];
+    ignoreHWChecks = aIgnoreHWChecks;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORExperimentModelIgnoreHWChecksChanged object:self];
+}
+
 - (BOOL) showNames
 {
     return showNames;
@@ -455,9 +468,10 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setShowNames:[decoder decodeBoolForKey:@"ORExperimentModelShowNames"]];
-    [self setDisplayType:[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
-    [self setCaptureDate:[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
+    [self setIgnoreHWChecks:[decoder decodeBoolForKey:	@"ignoreHWChecks"]];
+    [self setShowNames:		[decoder decodeBoolForKey:	@"ORExperimentModelShowNames"]];
+    [self setDisplayType:	[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
+    [self setCaptureDate:	[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
 	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
 	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
 	if([segmentGroups count] == 2){
@@ -476,10 +490,11 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:showNames forKey:@"ORExperimentModelShowNames"];
-    [encoder encodeInt:displayType forKey:   @"ExperimentModelDisplayType"];
-    [encoder encodeObject:captureDate forKey:@"ExperimentCaptureDate"];
-    [encoder encodeObject:segmentGroups forKey:@"ExperimentSegmentGroups"];
+    [encoder encodeBool:ignoreHWChecks	forKey: @"ignoreHWChecks"];
+    [encoder encodeBool:showNames		forKey: @"ORExperimentModelShowNames"];
+    [encoder encodeInt:displayType		forKey: @"ExperimentModelDisplayType"];
+    [encoder encodeObject:captureDate	forKey: @"ExperimentCaptureDate"];
+    [encoder encodeObject:segmentGroups forKey: @"ExperimentSegmentGroups"];
 }
 
 - (NSMutableDictionary*) captureState
@@ -547,10 +562,17 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	return @"";
 }
 
-//a highly hardcoded config checker. Assumes things like only one crate, ect.
 - (BOOL) preRunChecks
 {
+	return [self preRunChecks:ignoreHWChecks];
+}
+
+//a highly hardcoded config checker. Assumes things like only one crate, ect.
+- (BOOL) preRunChecks:(BOOL) skipChecks
+{
 	[self clearSegmentErrors];
+	
+	if(skipChecks)return YES;
 	
     NSMutableDictionary* newDictionary  = [[self document] addParametersToDictionary: [NSMutableDictionary dictionary]];
     NSDictionary* oldDictionary         = [NSDictionary dictionaryWithContentsOfFile:[[self capturePListsFile] stringByExpandingTildeInPath]];
@@ -594,6 +616,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
         //grab some objects that we'll use more than once below
 		NSString* slotKey = @"slot";
 		if( ![newCardRecord objectForKey:slotKey]) slotKey = @"station";             
+		if( ![newCardRecord objectForKey:slotKey]) slotKey = @"Card";             
         NSNumber* newSlot           = [newCardRecord objectForKey:slotKey];
 
         while( oldCardKey = [eOld nextObject]){ 
@@ -639,7 +662,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 
 - (void) printProblemSummary
 {
-    [self preRunChecks];
+    [self preRunChecks:NO];
 }
 
 - (void) clearTotalCounts
@@ -656,7 +679,8 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     NSEnumerator* e = [oldRecord keyEnumerator];
     id aKey;
 	NSString* slotKey = @"slot";
-	if(![oldRecord objectForKey:slotKey])slotKey = @"station";
+	if(![oldRecord objectForKey:slotKey])	slotKey = @"station";
+	if(![oldRecord objectForKey:slotKey])	slotKey = @"Card";             
 	BOOL segmentErrorNoted = NO;
     while(aKey = [e nextObject]){
         if(![exclusionSet containsObject:aKey]){
@@ -664,22 +688,43 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 			id newValues =  [newRecord objectForKey:aKey];
             if(![oldValues isEqualTo:newValues]){
                 [self performSelector:checkSelector];
-                [problemArray addObject:[NSString stringWithFormat:@"%@ slot %@ changed.\n",
-                    [oldRecord objectForKey:@"Class Name"],
-                    [oldRecord objectForKey:slotKey], aKey]];
+				NSString* problemCardID = [NSString stringWithFormat:@"%@ %@ %@ changed.\n",
+									[oldRecord objectForKey:@"Class Name"],
+									slotKey,
+									[oldRecord objectForKey:slotKey], aKey];
+                if(![problemArray containsObject:problemCardID]){
+					[problemArray addObject:problemCardID];
+				}
                 
-                [problemArray addObject:[NSString stringWithFormat:@"%@ (at least one changed):\noldValues:%@\nnewValues:%@\n",aKey,oldValues,newValues]];
-				
+				if([newValues isKindOfClass:NSClassFromString(@"NSArray")]){
+					int i = 0;
+					for(id newVal in newValues){
+						@try {
+							id oldVal = [oldValues objectAtIndex:i];
+							if(![oldVal isEqualTo:newVal]){
+								[problemArray addObject:[NSString stringWithFormat:@"%@ %d: oldValue = %@ / newValue = %@\n",aKey,i,oldVal,newVal]];
+							}
+						}
+						@catch (NSException* e){
+						}
+						i++;
+					}
+				}
+				else {
+					[problemArray addObject:[NSString stringWithFormat:@"%@: oldValue = %@ / newValue = %@\n",aKey,oldValues,newValues]];
+				}
 				if(!segmentErrorNoted){
 					segmentErrorNoted = YES;
-					int numChannels = [newValues count];
-					int channel;
-					for(channel = 0;channel<numChannels;channel++){
-						id newValue = [newValues objectAtIndex:channel];
-						id oldValue = [oldValues objectAtIndex:channel];
-						if(![newValue  isEqualTo: oldValue ]){
-							int card = [[oldRecord objectForKey:slotKey] intValue];
-							[self setSegmentErrorClassName:[oldRecord objectForKey:@"Class Name"] card:card channel:channel];
+					if([newValues isKindOfClass:NSClassFromString(@"NSArray")]){
+						int numChannels = [newValues count];
+						int channel;
+						for(channel = 0;channel<numChannels;channel++){
+							id newValue = [newValues objectAtIndex:channel];
+							id oldValue = [oldValues objectAtIndex:channel];
+							if(![newValue  isEqualTo: oldValue ]){
+								int card = [[oldRecord objectForKey:slotKey] intValue];
+								[self setSegmentErrorClassName:[oldRecord objectForKey:@"Class Name"] card:card channel:channel];
+							}
 						}
 					}
 				}

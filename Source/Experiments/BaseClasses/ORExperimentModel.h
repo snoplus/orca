@@ -35,6 +35,7 @@
 	int				displayType;
 	BOOL			scheduledToHistogram;
     BOOL showNames;
+    BOOL ignoreHWChecks;
 }
 
 - (id) init;
@@ -42,6 +43,8 @@
 - (NSMutableArray*) initMapEntries:(int)index;
 
 #pragma mark •••Accessors
+- (BOOL) ignoreHWChecks;
+- (void) setIgnoreHWChecks:(BOOL)aIgnoreHWChecks;
 - (BOOL) showNames;
 - (void) setShowNames:(BOOL)aShowNames;
 - (int) displayType;
@@ -73,6 +76,7 @@
 
 #pragma mark •••Work Methods
 - (void) compileHistograms;
+- (BOOL) preRunChecks:(BOOL) skipChecks;
 - (BOOL) preRunChecks;
 - (void) printProblemSummary;
 - (NSString*) crateKey:(NSDictionary*)aDicionary;
@@ -106,6 +110,7 @@
 
 @end
 
+extern NSString* ORExperimentModelIgnoreHWChecksChanged;
 extern NSString* ORExperimentModelShowNamesChanged;
 extern NSString* ExperimentModelDisplayTypeChanged;
 extern NSString* ExperimentModelSelectionStringChanged;

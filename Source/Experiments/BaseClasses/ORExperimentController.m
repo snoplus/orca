@@ -266,6 +266,11 @@
                          name : ORExperimentModelShowNamesChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(ignoreHWChecksChanged:)
+                         name : ORExperimentModelIgnoreHWChecksChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -299,6 +304,7 @@
     [valueHistogramsPlot setNeedsDisplay:YES];
 	[primaryValuesView reloadData];
 	[self showNamesChanged:nil];
+	[self ignoreHWChecksChanged:nil];
 }
 
 - (void) findRunControl:(NSNotification*)aNote
@@ -391,6 +397,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) ignoreHWChecksAction:(id)sender
+{
+	[model setIgnoreHWChecks:[sender intValue]];	
+}
+
 - (IBAction) clearAction:(id)sender
 {
 	[model clearTotalCounts];
@@ -533,7 +545,6 @@
 {
 	[model initHardware];
 	[self  specialUpdate:nil];
-
 }
 
 - (IBAction) detailsLockAction:(id)sender
@@ -542,6 +553,11 @@
 }
 
 #pragma mark •••Interface Management
+
+- (void) ignoreHWChecksChanged:(NSNotification*)aNote
+{
+	[ignoreHWChecksCB setIntValue: [model ignoreHWChecks]];
+}
 
 - (void) showNamesChanged:(NSNotification*)aNote
 {

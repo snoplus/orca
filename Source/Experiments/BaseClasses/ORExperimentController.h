@@ -27,6 +27,7 @@
 
 @interface ORExperimentController : OrcaObjectController {
     IBOutlet NSTabView*		tabView;
+	IBOutlet NSButton*		ignoreHWChecksCB;
 	IBOutlet NSButton*		showNamesCB;
 
 	//detector View tab view
@@ -85,6 +86,7 @@
 - (void) setDetectorTitle;
 
 #pragma mark •••Actions
+- (IBAction) ignoreHWChecksAction:(id)sender;
 - (IBAction) showNamesAction:(id)sender;
 - (IBAction) displayTypeAction:(id)sender;
 - (IBAction) primaryAdcClassNameAction:(id)sender;
@@ -107,6 +109,7 @@
 - (IBAction) clearAction:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) ignoreHWChecksChanged:(NSNotification*)aNote;
 - (void) showNamesChanged:(NSNotification*)aNote;
 - (void) updateRunInfo:(NSNotification*)aNote;
 - (void) findRunControl:(NSNotification*)aNote;
