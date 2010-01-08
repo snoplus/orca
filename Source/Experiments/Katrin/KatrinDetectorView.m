@@ -17,13 +17,14 @@
 #import "KatrinConstants.h"
 #import "ORSegmentGroup.h"
 #import "ORDetectorSegment.h"
+
+
 @interface KatrinDetectorView (private)
 - (void) makeAllSegments;
 - (void) makeVetoSegments;
 @end
 
 @implementation KatrinDetectorView
-
 - (void) setViewType:(int)aViewType
 {
 	viewType = aViewType;
@@ -152,14 +153,14 @@
 			int n = [aGroup numSegments];
 			for(i=0;i<n;i++){
 				ORDetectorSegment* aSegment = [aGroup segment:i];
-				int cardSlot = [aSegment cardSlot];
+				int cardSlot = [aSegment cardSlot]-1;
 				int channel = [aSegment channel];
-				if(channel <0){
+				if(channel < 0){
 					cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
 				}
 				NSRect channelRect = NSMakeRect(cardSlot*dx,channel*dy,dx,dy);
 				[segmentPaths addObject:[NSBezierPath bezierPathWithRect:channelRect]];
-				[errorPaths addObject:[NSBezierPath bezierPathWithRect:channelRect]];
+				[errorPaths addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(channelRect, 4, 4)]];
 			}
 			
 			[segmentPathSet addObject:segmentPaths];
@@ -181,7 +182,9 @@
 			NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
 			[segPath transformUsingAffineTransform: transform];
 			[segmentPaths addObject:segPath];
-			[errorPaths addObject:segPath];
+			NSBezierPath* errorPath = [NSBezierPath bezierPathWithRect:NSInsetRect(segRect, 4, 2)];
+			[errorPath transformUsingAffineTransform: transform];
+			[errorPaths addObject:errorPath];
 		}
 		int j;
 		for(j=0;j<6;j++){
@@ -195,7 +198,9 @@
 				NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
 				[segPath transformUsingAffineTransform: transform];
 				[segmentPaths addObject:segPath];
-				[errorPaths addObject:segPath];
+				NSBezierPath* errorPath = [NSBezierPath bezierPathWithRect:NSInsetRect(segRect, 4, 2)];
+				[errorPath transformUsingAffineTransform: transform];
+				[errorPaths addObject:errorPath];
 				angle += deltaAngle;
 				if(i==11)angle = deltaAngle/2.;
 			}

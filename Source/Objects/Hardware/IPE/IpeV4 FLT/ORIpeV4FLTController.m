@@ -500,7 +500,6 @@
 	BOOL testsAreRunning = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
     
-	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
 	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
@@ -533,6 +532,8 @@
 	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
 	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
 
+	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
+	
  	[self enableRegControls];
 }
 
@@ -566,6 +567,7 @@
 		[startNoiseFloorButton setTitle:@"Start"];
 	}
 	[noiseFloorStateField setStringValue:[model noiseFloorStateString]];
+	[noiseFloorStateField2 setStringValue:[model noiseFloorStateString]];
 }
 
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote
@@ -825,6 +827,7 @@
     [NSApp beginSheet:noiseFloorPanel modalForWindow:[self window]
 		modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
+
 - (IBAction) closeNoiseFloorPanel:(id)sender
 {
     [noiseFloorPanel orderOut:nil];

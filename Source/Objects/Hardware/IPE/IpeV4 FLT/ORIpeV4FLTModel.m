@@ -1819,6 +1819,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		NSLogFont(aFont,@"  %2d -- %10.2f +/-  %10.2f\n", j, mean, var);
 	}
 }
+
 - (void) findNoiseFloors
 {
 	if(noiseFloorRunning){
@@ -1831,6 +1832,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTNoiseFloorChanged object:self];
 }
+
 - (NSString*) noiseFloorStateString
 {
 	if(!noiseFloorRunning) return @"Idle";

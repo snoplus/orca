@@ -108,6 +108,7 @@
 		IBOutlet NSTextField*			noiseFloorStateField;
 		IBOutlet NSButton*				startNoiseFloorButton;
 		IBOutlet NSProgressIndicator*	noiseFloorProgress;
+		IBOutlet NSTextField*			noiseFloorStateField2;
 		
 };
 #pragma mark •••Initialization
