@@ -189,9 +189,14 @@
 
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath;
 - (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath;
+
+- (void) postRequestForChan:(int)aChan;
 - (void) postControlSetpointForChan:(int)aChan value:(double)aValue;
+- (BOOL) requestIsPendingForChan:(int)aChan;
+- (double) valueForChan:(int)aChan;
 
 
+- (int) findChanOfIndex:(int)anIndex;
 - (void) writeSetPoint:(int)anIndex value:(double)aValue;
 
 @end
@@ -225,7 +230,7 @@ extern NSString* ORIpeSlowControlPendingRequestsChanged;
 #define    DebugTB(x) 
 #endif
 
-#if 0
+#if 1
 // if 1 all methods will print out a message -> for testing IB connections -tb-
 #define    DebugMethCallsTB(x) x
 #else

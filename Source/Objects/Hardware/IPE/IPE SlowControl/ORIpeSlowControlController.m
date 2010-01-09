@@ -453,6 +453,137 @@
     [model dumpSensorlist];
 }
 
+//adei/ipe list view context menu
+- (IBAction)adeiListContextMenuAction:(id)sender
+{
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
+}
+
+- (IBAction)adeiListContextMenuLoadValueAction:(id)sender
+{
+    int row = [itemTableView selectedRow] ; 
+    int numRow = [itemTableView numberOfSelectedRows] ; 
+    if(numRow != 1){//
+        NSLog(@"ORIpeSlowControlController: Nothing selected or bad selection!\n");
+        return;
+    }
+    int chan = [model findChanOfIndex: row];
+    [model postRequestForChan: chan];
+    
+
+    DebugMethCallsTB(  
+        //NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
+    
+    
+    #if 0
+    [itemTableView setNeedsDisplay: TRUE]; //??? -tb-
+    #endif
+
+}
+
+
+- (IBAction)adeiListContextMenuRemoveAction:(id)sender
+{
+    int row = [itemTableView selectedRow] ; 
+    int numRow = [itemTableView numberOfSelectedRows] ; 
+    if(numRow != 1){//
+        NSLog(@"ORIpeSlowControlController: Nothing selected or bad selection! %i\n",row);
+        return;
+    }
+
+    NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        //NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
+    
+    #if 0
+    //NSMenuItem *menuitem = sender; // no, I need the selectedItem of the ListView
+    int row = [sensorTableView selectedRow];
+    NSLog(@"Selected row of tableView is %i\n", row);
+    [model removeSensorListItemWithIndex: row];
+    [model setSelectedSensorNum: row-1];
+    //[sensorTableView setNeedsDisplay: TRUE]; TODO: model will all this via notification -tb-
+    [sensorTreeOutlineView reloadItem:[model rootAdeiTree] reloadChildren:YES]; //TODO: improvement: reload only the affected item -tb-
+    #endif
+
+}
+
+- (IBAction)adeiListContextMenuDisplayWebViewAction:(id)sender
+{
+    int row = [itemTableView selectedRow] ; 
+    int numRow = [itemTableView numberOfSelectedRows] ; 
+    if(numRow != 1){//
+        NSLog(@"ORIpeSlowControlController: Nothing selected or bad selection! %i\n",row);
+        return;
+    }
+    
+    NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
+}
+
+
+- (IBAction) editChannelNumberAction:(id)sender
+{
+    NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
+    int row = [itemTableView selectedRow] ; 
+    int numRow = [itemTableView numberOfSelectedRows] ; 
+    NSLog(@"numberOfSelectedRows: %i, selectedRow: %i\n",numRow,row);
+    if(numRow != 1){//
+        NSLog(@"ORIpeSlowControlController: Nothing selected or bad selection!\n");
+        return;
+    }
+    //populate pulldown
+    [newChannelNumberPopup removeAllItems];
+    //TODO: fill in free channels -tb-
+    [newChannelNumberPopup addItemWithTitle:@"Under development!"];
+    [newChannelNumberPopup addItemWithTitle:@"4"];
+#if 1
+    [newChannelNumberPopup addItemWithTitle:@"5"];
+    [newChannelNumberPopup addItemWithTitle:@"6"];
+    [newChannelNumberPopup addItemWithTitle:@"7"];
+    [newChannelNumberPopup addItemWithTitle:@"11"];
+    [newChannelNumberPopup addItemWithTitle:@"12"];
+    [newChannelNumberPopup addItemWithTitle:@"23"];
+    [newChannelNumberPopup addItemWithTitle:@"24"];
+    [newChannelNumberPopup addItemWithTitle:@"25"];
+    [newChannelNumberPopup addItemWithTitle:@"26"];
+#endif
+    
+	[[NSApplication sharedApplication] beginSheet:editChannelNumberView
+								   modalForWindow:[self window]
+									modalDelegate:self
+								   didEndSelector:NULL
+									  contextInfo:NULL];
+}
+
+- (IBAction) cancelEditChannelNumberAction:(id)sender
+{
+	[editChannelNumberView orderOut:self];
+	[[NSApplication sharedApplication]  endSheet:editChannelNumberView];
+}
+
+- (IBAction) newChannelNumberAction:(id)sender
+{
+    NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
+    NSLog(@"newChannelNumberAction: selected chan %i!  \n", [[[sender selectedItem] title] intValue]);
+	//[model ChannelNumber:[[[sender selectedItem] title] intValue]; //TODO: -tb-
+    [self cancelEditChannelNumberAction: nil];
+}
+
+
+
 #pragma mark •••Drawer Actions
 /* We do not use [NSDrawer open:] to open the drawer, because that method will
 autoselect an edge, and we want this drawer to open only on specific edges. */

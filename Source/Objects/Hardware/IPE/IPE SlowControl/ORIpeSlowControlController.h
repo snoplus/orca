@@ -45,7 +45,9 @@
 	IBOutlet NSPopUpButton*		pollTimePopup;	
 	IBOutlet NSTextField*		setPointField;
 	IBOutlet NSButton*			setPointButton;
-
+	IBOutlet id					editChannelNumberView;
+	IBOutlet NSPopUpButton*		newChannelNumberPopup;	
+    
 	//Drawers
     IBOutlet NSDrawer*	treeDrawer;
     IBOutlet NSDrawer*	webDrawer;
@@ -102,6 +104,16 @@
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) clearHistory:(id) sender;
 - (IBAction) setPointAction:(id) sender;
+//list view context menu
+- (IBAction)adeiListContextMenuAction:(id)sender;
+- (IBAction)adeiListContextMenuLoadValueAction:(id)sender;
+- (IBAction)adeiListContextMenuRemoveAction:(id)sender;
+- (IBAction)adeiListContextMenuDisplayWebViewAction:(id)sender;//web view
+//associated
+- (IBAction) editChannelNumberAction:(id)sender;
+- (IBAction) cancelEditChannelNumberAction:(id)sender;
+- (IBAction) newChannelNumberAction:(id)sender;
+
 
 #pragma mark •••Data Source Methods (OutlineView)
 - (int) outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
