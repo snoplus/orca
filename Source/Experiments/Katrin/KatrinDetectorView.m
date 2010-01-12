@@ -36,7 +36,7 @@
 		float x;
 		float y;
 		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/22.;
+		float dy = [self bounds].size.height/24.;
 		[[NSColor blackColor] set];
 		[NSBezierPath fillRect:[self bounds]];
 		[[NSColor whiteColor] set];
@@ -142,7 +142,7 @@
 
 	if(viewType == kUseCrateView){
 		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/22.;
+		float dy = [self bounds].size.height/24.;
 		int set;
 		int numSets = [delegate numberOfSegmentGroups];
 		for(set=0;set<numSets;set++){
