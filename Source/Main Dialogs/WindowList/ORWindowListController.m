@@ -61,10 +61,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(WindowListController);
 	[[listView subviews] makeObjectsPerformSelector:@selector(removeFromSuperviewWithoutNeedingDisplay)];
 	
 	NSArray* windowList = [[NSApp windows] sortedArrayUsingFunction:windowNameSort context:nil];
-	NSEnumerator* e = [windowList objectEnumerator];
-	id aWindow;
 	int i = 0;
-	while(aWindow = [e nextObject]){
+	for(id aWindow in windowList){
+		if([aWindow isKindOfClass:NSClassFromString(@"NSPanel")])continue;
+		if([aWindow isKindOfClass:NSClassFromString(@"NSDrawerWindow")])continue;
+		if([[aWindow title] isEqualToString:@"Window"])continue;
 		if([[aWindow title] length]>0 && ![[aWindow title] isEqualToString:@"Window List"]){
 			[self addButtonForWindow:aWindow index:i];
 			i++;
