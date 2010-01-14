@@ -794,7 +794,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (BOOL) viewSpectrum0
 {
-	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,Channel0"];
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,0"];
 	if(aDataSet){
 		[aDataSet doDoubleClick:self];
 		return YES;
@@ -804,7 +804,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (BOOL) viewSpectrum1
 {
-	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,Channel1"];
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,1"];
 	if(aDataSet){
 		[aDataSet doDoubleClick:self];
 		return YES;
@@ -814,7 +814,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (BOOL) viewZDT0
 {
-	ORDataSet* aDataSet = [dataSet dataSetWithName:@"ZDT,Channel0"];
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"ZDT,0"];
 	if(aDataSet){
 		[aDataSet doDoubleClick:self];
 		return YES;
@@ -824,7 +824,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (BOOL) viewZDT1
 {
-	ORDataSet* aDataSet = [dataSet dataSetWithName:@"ZDT,Channel1"];
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"ZDT,1"];
 	if(aDataSet){
 		[aDataSet doDoubleClick:self];
 		return YES;
