@@ -22,7 +22,6 @@
 #pragma mark •••Imported Files
 #import "ORAlarmCollection.h"
 #import "ORAlarmController.h"
-#import "CTBadge.h"
 #define __CARBONSOUND__ 
 #import <Carbon/Carbon.h>
 #import "SynthesizeSingleton.h"
@@ -41,7 +40,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     self = [super init];
     
     [self registerNotificationObservers];
-	myBadge = [[CTBadge alloc] init];
     return self;
 }
 
@@ -54,7 +52,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     [beepTimer release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [alarms release];
-	[myBadge release];
     [super dealloc];
 }
 
@@ -157,7 +154,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     [self beep:nil];
     [[aNotification object] setIsPosted:YES];
     [[[ORAlarmController sharedAlarmController] window]orderFront:self];
-	[myBadge badgeApplicationDockIconWithValue:[alarms count] insetX:0 y:0];
+	[self drawBadge:[alarms count]];
 }
 
 - (void) alarmWasCleared:(NSNotification*)aNotification
@@ -169,9 +166,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 		RestoreApplicationDockTileImage();
 		[[[ORAlarmController sharedAlarmController] window]orderOut:self];
     }
-	else {
-		[myBadge badgeApplicationDockIconWithValue:[alarms count] insetX:0 y:0];
-	}
+	[self drawBadge:[alarms count]];
+}
+
+- (void) drawBadge:(int)n
+{
+    NSDockTile *myTile = [NSApp dockTile];
+    if(n)[myTile setBadgeLabel:[NSString stringWithFormat:@"%d",n]];
+	else [myTile setBadgeLabel:nil];
 }
 
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification

@@ -23,13 +23,11 @@
 
 #pragma mark •••Forward Declarations
 @class ORAlarmController;
-@class CTBadge;
 @class ORAlarmEMailDestination;
 
 @interface ORAlarmCollection : NSObject {
 	NSMutableArray* alarms;
 	NSTimer*		beepTimer;
-	CTBadge*		myBadge;
     NSMutableArray* eMailList;
     BOOL			emailEnabled;
 }
@@ -48,6 +46,7 @@
 - (void) setBeepTimer:(NSTimer*)aTimer;
 - (NSEnumerator*) alarmEnumerator;
 - (ORAlarm*) objectAtIndex:(int)index;
+- (void) drawBadge:(int)n;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
