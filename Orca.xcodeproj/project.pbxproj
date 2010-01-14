@@ -159,14 +159,6 @@
 		8400D08D09AD40CE000C1DA4 /* ORcPCICard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */; };
 		8400D67A09AF96C5000C1DA4 /* ORTaskSequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */; };
 		8400D67B09AF96C6000C1DA4 /* ORTaskSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */; };
-		8400D90609B36E35000C1DA4 /* CTBadge.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D90209B36E34000C1DA4 /* CTBadge.h */; };
-		8400D90709B36E35000C1DA4 /* CTBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = 8400D90309B36E34000C1DA4 /* CTBadge.m */; };
-		8400D90809B36E35000C1DA4 /* CTGradient.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D90409B36E34000C1DA4 /* CTGradient.h */; };
-		8400D90909B36E35000C1DA4 /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8400D90509B36E34000C1DA4 /* CTGradient.m */; };
-		8400D91A09B370F6000C1DA4 /* 1.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8400D91609B370F6000C1DA4 /* 1.pdf */; };
-		8400D91B09B370F7000C1DA4 /* 3.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8400D91709B370F6000C1DA4 /* 3.pdf */; };
-		8400D91C09B370F8000C1DA4 /* 4.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8400D91809B370F6000C1DA4 /* 4.pdf */; };
-		8400D91D09B370F8000C1DA4 /* 5.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 8400D91909B370F6000C1DA4 /* 5.pdf */; };
 		8402797007397B8700972B07 /* Bit3.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8402796A07397B8700972B07 /* Bit3.nib */; };
 		8402797107397B8700972B07 /* Bit3Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8402796B07397B8700972B07 /* Bit3Card.gif */; };
 		8402797207397B8700972B07 /* ORBit3Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8402796C07397B8700972B07 /* ORBit3Controller.h */; };
@@ -1468,6 +1460,8 @@
 		84A30C560A1E44D400DAE618 /* HPPulser33220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A30C530A1E44D400DAE618 /* HPPulser33220.nib */; };
 		84A30C570A1E44D400DAE618 /* ORPulser33220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */; };
 		84A30C580A1E44D400DAE618 /* ORPulser33220Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */; };
+		84A4056410FFE57100C02D47 /* CTGradient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A4056210FFE57100C02D47 /* CTGradient.h */; };
+		84A4056510FFE57100C02D47 /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A4056310FFE57100C02D47 /* CTGradient.m */; };
 		84A4E8290C187A3E00CBC222 /* IP220.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A4E8230C187A3E00CBC222 /* IP220.gif */; };
 		84A4E82A0C187A3E00CBC222 /* IP220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A4E8240C187A3E00CBC222 /* IP220.nib */; };
 		84A4E82B0C187A3E00CBC222 /* ORIP220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A4E8250C187A3E00CBC222 /* ORIP220Controller.h */; };
@@ -2489,14 +2483,6 @@
 		8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICard.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICard.h"; sourceTree = SOURCE_ROOT; };
 		8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTaskSequence.h; sourceTree = "<group>"; };
 		8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTaskSequence.m; sourceTree = "<group>"; };
-		8400D90209B36E34000C1DA4 /* CTBadge.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CTBadge.h; path = "Source/Cocoa Extensions/IconBadge/CTBadge.h"; sourceTree = SOURCE_ROOT; };
-		8400D90309B36E34000C1DA4 /* CTBadge.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CTBadge.m; path = "Source/Cocoa Extensions/IconBadge/CTBadge.m"; sourceTree = SOURCE_ROOT; };
-		8400D90409B36E34000C1DA4 /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CTGradient.h; path = "Source/Cocoa Extensions/IconBadge/CTGradient.h"; sourceTree = SOURCE_ROOT; };
-		8400D90509B36E34000C1DA4 /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = CTGradient.m; path = "Source/Cocoa Extensions/IconBadge/CTGradient.m"; sourceTree = SOURCE_ROOT; };
-		8400D91609B370F6000C1DA4 /* 1.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = 1.pdf; path = "Source/Cocoa Extensions/IconBadge/badges/1.pdf"; sourceTree = SOURCE_ROOT; };
-		8400D91709B370F6000C1DA4 /* 3.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = 3.pdf; path = "Source/Cocoa Extensions/IconBadge/badges/3.pdf"; sourceTree = SOURCE_ROOT; };
-		8400D91809B370F6000C1DA4 /* 4.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = 4.pdf; path = "Source/Cocoa Extensions/IconBadge/badges/4.pdf"; sourceTree = SOURCE_ROOT; };
-		8400D91909B370F6000C1DA4 /* 5.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = 5.pdf; path = "Source/Cocoa Extensions/IconBadge/badges/5.pdf"; sourceTree = SOURCE_ROOT; };
 		8402796A07397B8700972B07 /* Bit3.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Bit3.nib; sourceTree = "<group>"; };
 		8402796B07397B8700972B07 /* Bit3Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Bit3Card.gif; sourceTree = "<group>"; };
 		8402796C07397B8700972B07 /* ORBit3Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORBit3Controller.h; sourceTree = "<group>"; };
@@ -3598,6 +3584,8 @@
 		84A30C530A1E44D400DAE618 /* HPPulser33220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser33220.nib; path = Source/Objects/Hardware/GPIB/Pulser33220/HPPulser33220.nib; sourceTree = SOURCE_ROOT; };
 		84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulser33220Controller.h; sourceTree = "<group>"; };
 		84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulser33220Controller.m; sourceTree = "<group>"; };
+		84A4056210FFE57100C02D47 /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTGradient.h; path = "Source/Cocoa Extensions/CTGradient/CTGradient.h"; sourceTree = SOURCE_ROOT; };
+		84A4056310FFE57100C02D47 /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CTGradient.m; path = "Source/Cocoa Extensions/CTGradient/CTGradient.m"; sourceTree = SOURCE_ROOT; };
 		84A4E8230C187A3E00CBC222 /* IP220.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = IP220.gif; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/IP220.gif; sourceTree = SOURCE_ROOT; };
 		84A4E8240C187A3E00CBC222 /* IP220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IP220.nib; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/IP220.nib; sourceTree = SOURCE_ROOT; };
 		84A4E8250C187A3E00CBC222 /* ORIP220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIP220Controller.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/ORIP220Controller.h; sourceTree = SOURCE_ROOT; };
@@ -4791,31 +4779,6 @@
 			);
 			name = Katrin;
 			path = Source/Experiments/Katrin;
-			sourceTree = SOURCE_ROOT;
-		};
-		8400D90109B36E34000C1DA4 /* IconBadge */ = {
-			isa = PBXGroup;
-			children = (
-				8400D90209B36E34000C1DA4 /* CTBadge.h */,
-				8400D90309B36E34000C1DA4 /* CTBadge.m */,
-				8400D90409B36E34000C1DA4 /* CTGradient.h */,
-				8400D90509B36E34000C1DA4 /* CTGradient.m */,
-				8400D91509B370F6000C1DA4 /* badges */,
-			);
-			name = IconBadge;
-			path = "Source/Cocoa Extensions/IconBadge";
-			sourceTree = SOURCE_ROOT;
-		};
-		8400D91509B370F6000C1DA4 /* badges */ = {
-			isa = PBXGroup;
-			children = (
-				8400D91609B370F6000C1DA4 /* 1.pdf */,
-				8400D91709B370F6000C1DA4 /* 3.pdf */,
-				8400D91809B370F6000C1DA4 /* 4.pdf */,
-				8400D91909B370F6000C1DA4 /* 5.pdf */,
-			);
-			name = badges;
-			path = "Source/Cocoa Extensions/IconBadge/badges";
 			sourceTree = SOURCE_ROOT;
 		};
 		8402796907397B8700972B07 /* Bit3 Adaptor */ = {
@@ -7438,6 +7401,16 @@
 			path = Source/Objects/Hardware/Serial/MITPulser;
 			sourceTree = SOURCE_ROOT;
 		};
+		84A4056110FFE57100C02D47 /* CTGradient */ = {
+			isa = PBXGroup;
+			children = (
+				84A4056210FFE57100C02D47 /* CTGradient.h */,
+				84A4056310FFE57100C02D47 /* CTGradient.m */,
+			);
+			name = CTGradient;
+			path = "Source/Cocoa Extensions/CTGradient";
+			sourceTree = SOURCE_ROOT;
+		};
 		84A4E8220C187A3E00CBC222 /* IP220 */ = {
 			isa = PBXGroup;
 			children = (
@@ -9365,7 +9338,7 @@
 				8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */,
 				8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */,
 				8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */,
-				8400D90109B36E34000C1DA4 /* IconBadge */,
+				84A4056110FFE57100C02D47 /* CTGradient */,
 				844514940674E10D00A19654 /* ZFlowLayout */,
 			);
 			path = "Cocoa Extensions";
@@ -10087,8 +10060,6 @@
 				8498069D09A6584200086E71 /* ORSocketThreadedClient.h in Headers */,
 				8400D08D09AD40CE000C1DA4 /* ORcPCICard.h in Headers */,
 				8400D67A09AF96C5000C1DA4 /* ORTaskSequence.h in Headers */,
-				8400D90609B36E35000C1DA4 /* CTBadge.h in Headers */,
-				8400D90809B36E35000C1DA4 /* CTGradient.h in Headers */,
 				848E3BC909DB0B3E0003F7A2 /* ORMailCenter.h in Headers */,
 				8448E4FC09E5C4AC001B88B5 /* NSView+Extensions.h in Headers */,
 				844D93020A0A79AA00E83C57 /* ORPulser33220Model.h in Headers */,
@@ -10490,6 +10461,7 @@
 				849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */,
 				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
 				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
+				84A4056410FFE57100C02D47 /* CTGradient.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10827,10 +10799,6 @@
 				84C1355D0997F5CD006F2901 /* cPCICrate.gif in Resources */,
 				84C1355E0997F5CD006F2901 /* cPCICrate.nib in Resources */,
 				84C1355F0997F5CD006F2901 /* cPCICrateSmall.gif in Resources */,
-				8400D91A09B370F6000C1DA4 /* 1.pdf in Resources */,
-				8400D91B09B370F7000C1DA4 /* 3.pdf in Resources */,
-				8400D91C09B370F8000C1DA4 /* 4.pdf in Resources */,
-				8400D91D09B370F8000C1DA4 /* 5.pdf in Resources */,
 				848E3BCB09DB0B3E0003F7A2 /* MailCenter.nib in Resources */,
 				844D8CC80A069CA200E83C57 /* MCarrier.gif in Resources */,
 				844D93050A0A79AA00E83C57 /* Pulser33220Icon.tif in Resources */,
@@ -11564,8 +11532,6 @@
 				84751A2E09A5057100253B57 /* ORSafeCircularBuffer.m in Sources */,
 				8498069E09A6584200086E71 /* ORSocketThreadedClient.m in Sources */,
 				8400D67B09AF96C6000C1DA4 /* ORTaskSequence.m in Sources */,
-				8400D90709B36E35000C1DA4 /* CTBadge.m in Sources */,
-				8400D90909B36E35000C1DA4 /* CTGradient.m in Sources */,
 				848E3BCA09DB0B3E0003F7A2 /* ORMailCenter.m in Sources */,
 				8448E4FD09E5C4AC001B88B5 /* NSView+Extensions.m in Sources */,
 				84E0968609F44E3200EFE044 /* ORTek754DModel.m in Sources */,
@@ -11909,6 +11875,7 @@
 				849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */,
 				849013C710E27B13007591B5 /* ORPlotLinkModel.m in Sources */,
 				8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */,
+				84A4056510FFE57100C02D47 /* CTGradient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
