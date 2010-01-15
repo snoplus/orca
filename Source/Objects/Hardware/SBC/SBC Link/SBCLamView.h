@@ -20,9 +20,8 @@
 
 #pragma mark •••Imported Files
 #import "ORCardContainerView.h"
-@class CTGradient;
 
 @interface SBCLamView : ORCardContainerView {
-	CTGradient* gradient;
+	NSGradient* gradient;
 }
 @end

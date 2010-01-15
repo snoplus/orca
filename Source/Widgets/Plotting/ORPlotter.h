@@ -20,7 +20,6 @@
 
 #import "ORAxis.h"
 
-@class CTGradient;
 @class ORFlippedView;
 
 @interface ORPlotter : NSView <NSCoding> {
@@ -33,7 +32,7 @@
 		IBOutlet NSView*		viewForPDF;
 	
 		BOOL					analyze;
-		CTGradient*				gradient;
+		NSGradient*				gradient;
 		NSMutableDictionary*	attributes;
 		BOOL					doNotDraw;
 		BOOL					drawPositionLines;

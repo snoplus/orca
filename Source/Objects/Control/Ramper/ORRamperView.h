@@ -20,14 +20,13 @@
 
 @class ORWayPoint;
 @class ORRamperController;
-@class CTGradient;
 
 @interface ORRamperView : NSView {
 	IBOutlet id xAxis;
 	IBOutlet id yAxis;
 	IBOutlet ORRamperController* dataSource;
 
-	CTGradient*			gradient;
+	NSGradient*			gradient;
 	ORWayPoint* selectedWayPoint;	//x in non-converted time, y in y-axis coords
 	NSImage* rightTargetBug;
 	float xLowConstraint;

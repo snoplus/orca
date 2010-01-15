@@ -17,7 +17,6 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-@class CTGradient;
 
 @interface ORLevelMonitor : NSView {
 	IBOutlet id dataSource;
@@ -31,8 +30,8 @@
 	BOOL		movingHiFillPoint;
 	NSColor* 	tankColor;
 	NSColor* 	contentsColor;
-	CTGradient*	levelGradient;
-	CTGradient* tankGradient;
+	NSGradient*	levelGradient;
+	NSGradient* tankGradient;
 	BOOL		showFillPoints;
 }
 

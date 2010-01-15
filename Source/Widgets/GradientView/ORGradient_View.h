@@ -21,10 +21,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class CTGradient;
 
 @interface ORGradient_View : NSView {
-	CTGradient*			gradient;
+	NSGradient*			gradient;
 	NSColor*			endColor;
 	NSColor*			startColor;
 	IBOutlet NSView*    viewToAdd;

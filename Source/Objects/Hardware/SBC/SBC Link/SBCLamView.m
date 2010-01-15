@@ -21,7 +21,6 @@
 
 #import "SBCLamView.h"
 #import "ORSBC_LAMModel.h"
-#import "CTGradient.h"
 
 @implementation SBCLamView
 
@@ -37,9 +36,9 @@
  	if(!gradient){
 		NSColor* color = [NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:1];
 		NSColor* endingColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
-		gradient = [[CTGradient gradientWithBeginningColor:color endingColor:endingColor] retain];
+		gradient = [[NSGradient alloc] initWithStartingColor:color endingColor:endingColor];
 	}
-	[gradient fillRect:[self bounds] angle:270.];
+	[gradient drawInRect:[self bounds] angle:270.];
 	
 	float y1 = [self bounds].origin.y;
     float y2 = y1+[self bounds].size.height;

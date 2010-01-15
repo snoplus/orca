@@ -22,7 +22,6 @@
 
 
 @class ORAxis;
-@class CTGradient;
 
 @interface ORValueBar : NSView {
 	
@@ -32,7 +31,7 @@
 	NSColor* 			backgroundColor;
 	NSColor* 			barColor;
 	int 				tag;
-	CTGradient*			gradient;
+	NSGradient*			gradient;
 }
 
 #pragma mark ¥¥¥Accessors

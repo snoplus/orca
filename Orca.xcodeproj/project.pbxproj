@@ -1460,8 +1460,6 @@
 		84A30C560A1E44D400DAE618 /* HPPulser33220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A30C530A1E44D400DAE618 /* HPPulser33220.nib */; };
 		84A30C570A1E44D400DAE618 /* ORPulser33220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */; };
 		84A30C580A1E44D400DAE618 /* ORPulser33220Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */; };
-		84A4056410FFE57100C02D47 /* CTGradient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A4056210FFE57100C02D47 /* CTGradient.h */; };
-		84A4056510FFE57100C02D47 /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A4056310FFE57100C02D47 /* CTGradient.m */; };
 		84A4E8290C187A3E00CBC222 /* IP220.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A4E8230C187A3E00CBC222 /* IP220.gif */; };
 		84A4E82A0C187A3E00CBC222 /* IP220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A4E8240C187A3E00CBC222 /* IP220.nib */; };
 		84A4E82B0C187A3E00CBC222 /* ORIP220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A4E8250C187A3E00CBC222 /* ORIP220Controller.h */; };
@@ -3584,8 +3582,6 @@
 		84A30C530A1E44D400DAE618 /* HPPulser33220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser33220.nib; path = Source/Objects/Hardware/GPIB/Pulser33220/HPPulser33220.nib; sourceTree = SOURCE_ROOT; };
 		84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulser33220Controller.h; sourceTree = "<group>"; };
 		84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulser33220Controller.m; sourceTree = "<group>"; };
-		84A4056210FFE57100C02D47 /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTGradient.h; path = "Source/Cocoa Extensions/CTGradient/CTGradient.h"; sourceTree = SOURCE_ROOT; };
-		84A4056310FFE57100C02D47 /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CTGradient.m; path = "Source/Cocoa Extensions/CTGradient/CTGradient.m"; sourceTree = SOURCE_ROOT; };
 		84A4E8230C187A3E00CBC222 /* IP220.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = IP220.gif; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/IP220.gif; sourceTree = SOURCE_ROOT; };
 		84A4E8240C187A3E00CBC222 /* IP220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IP220.nib; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/IP220.nib; sourceTree = SOURCE_ROOT; };
 		84A4E8250C187A3E00CBC222 /* ORIP220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIP220Controller.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/ORIP220Controller.h; sourceTree = SOURCE_ROOT; };
@@ -7401,16 +7397,6 @@
 			path = Source/Objects/Hardware/Serial/MITPulser;
 			sourceTree = SOURCE_ROOT;
 		};
-		84A4056110FFE57100C02D47 /* CTGradient */ = {
-			isa = PBXGroup;
-			children = (
-				84A4056210FFE57100C02D47 /* CTGradient.h */,
-				84A4056310FFE57100C02D47 /* CTGradient.m */,
-			);
-			name = CTGradient;
-			path = "Source/Cocoa Extensions/CTGradient";
-			sourceTree = SOURCE_ROOT;
-		};
 		84A4E8220C187A3E00CBC222 /* IP220 */ = {
 			isa = PBXGroup;
 			children = (
@@ -9338,7 +9324,6 @@
 				8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */,
 				8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */,
 				8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */,
-				84A4056110FFE57100C02D47 /* CTGradient */,
 				844514940674E10D00A19654 /* ZFlowLayout */,
 			);
 			path = "Cocoa Extensions";
@@ -10461,7 +10446,6 @@
 				849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */,
 				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
 				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
-				84A4056410FFE57100C02D47 /* CTGradient.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11875,7 +11859,6 @@
 				849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */,
 				849013C710E27B13007591B5 /* ORPlotLinkModel.m in Sources */,
 				8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */,
-				84A4056510FFE57100C02D47 /* CTGradient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

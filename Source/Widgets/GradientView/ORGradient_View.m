@@ -20,7 +20,6 @@
 //-------------------------------------------------------------
 
 #import "ORGradient_View.h"
-#import "CTGradient.h"
 
 @implementation ORGradient_View
 
@@ -78,7 +77,7 @@
 - (void) makeGradient
 {		
 	[gradient release];
-	gradient = [[CTGradient gradientWithBeginningColor:startColor endingColor:endColor] retain];
+	gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:endColor];
 
 	[self setNeedsDisplay: YES];	
 }
@@ -87,7 +86,7 @@
 - (void)drawRect:(NSRect)rect 
 {
     [super drawRect:rect];
-	[gradient fillRect:[self bounds] angle:-90.];
+	[gradient drawInRect:[self bounds] angle:-90.];
 }
 
 #pragma mark ¥¥¥Archival

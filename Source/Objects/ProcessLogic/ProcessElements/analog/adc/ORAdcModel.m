@@ -24,7 +24,6 @@
 #import "ORProcessModel.h"
 #import "ORProcessThread.h"
 #import "ORAdcProcessing.h"
-#import "CTGradient.h"
 
 NSString* ORAdcModelMinChangeChanged = @"ORAdcModelMinChangeChanged";
 NSString* ORAdcModelOKConnection     = @"ORAdcModelOKConnection";
@@ -499,9 +498,9 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		float green = 1.0; 
 		float blue  = 0.0;
 		
-		normalGradient = [[CTGradient 
-						   gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
-						   endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]] retain];
+		normalGradient = [[NSGradient alloc] 
+						   initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
+						   endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]];
 	}
 	
 	if(!alarmGradient){
@@ -509,9 +508,9 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		float green = 0.0; 
 		float blue  = 0.0;
 		
-		alarmGradient = [[CTGradient 
-						  gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:.3]
-						  endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:.3]] retain];
+		alarmGradient = [[NSGradient alloc]
+						  initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:.3]
+						  endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:.3]];
 	}
 	
 	float w = 231;
@@ -523,16 +522,16 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		float xValue = slope*hwValue + intercept;
 		if(xValue<0)xValue=0;
 		if(xValue>w)xValue=w;
-		[normalGradient fillRect:NSMakeRect(startx,4,xValue,24) angle:270];
+		[normalGradient drawInRect:NSMakeRect(startx,4,xValue,24) angle:270];
 		
 		if(lowLimit>minValue){
 			float lowAlarmx = slope*lowLimit + intercept;
-			[alarmGradient fillRect:NSMakeRect(startx,4,lowAlarmx,24) angle:270];
+			[alarmGradient drawInRect:NSMakeRect(startx,4,lowAlarmx,24) angle:270];
 		}
 		
 		if(highLimit<maxValue){
 			float hiAlarmx = slope*highLimit + intercept;
-			[alarmGradient fillRect:NSMakeRect(startx+hiAlarmx,4,w-hiAlarmx,24) angle:270];
+			[alarmGradient drawInRect:NSMakeRect(startx+hiAlarmx,4,w-hiAlarmx,24) angle:270];
 		}
 		
 		[[NSColor redColor] set];

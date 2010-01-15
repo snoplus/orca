@@ -24,7 +24,6 @@
 #import "ORHeaderExplorerModel.h"
 #import "ORHeaderItem.h"
 #import "ORDataSet.h"
-#import "CTGradient.h"
 #import "ORDataExplorerModel.h"
 
 @interface ORHeaderExplorerController (private)
@@ -884,21 +883,21 @@
 {
 	float red,green,blue;
 	red = 0; green = 1; blue = 0;
-	normalGradient = [[CTGradient 
-						gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
-						               endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]] retain];
+	normalGradient = [[NSGradient alloc]
+						initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
+						               endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]];
 
 
 	red = 1; green = 0; blue = 0;
-	selectedGradient = [[CTGradient 
-						gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
-						               endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]] retain];
+	selectedGradient = [[NSGradient alloc] 
+						initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
+						               endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]];
 
 
 	float gray = 1.0;
-	backgroundGradient = [[CTGradient 
-						gradientWithBeginningColor:[NSColor colorWithCalibratedRed:gray green:gray blue:gray alpha:1]
-						               endingColor:[NSColor colorWithCalibratedRed:.7*gray green:.7*gray blue:.7*gray alpha:1]] retain];
+	backgroundGradient = [[NSGradient alloc]
+						initWithStartingColor:[NSColor colorWithCalibratedRed:gray green:gray blue:gray alpha:1]
+						               endingColor:[NSColor colorWithCalibratedRed:.7*gray green:.7*gray blue:.7*gray alpha:1]];
 
 }
 
@@ -910,7 +909,7 @@
 - (void) drawRect:(NSRect)aRect
 {
 	[NSBezierPath setDefaultLineWidth:1];
-	[backgroundGradient fillRect:[self bounds] angle:0];
+	[backgroundGradient drawInRect:[self bounds] angle:0];
 	[[NSColor blackColor] set];
 	[NSBezierPath strokeRect:[self bounds]];
 		
@@ -929,8 +928,8 @@
 			float y1 = h*(start-absStart)/(float)(absEnd-absStart);
 			float y2 = h*(end-absStart)/(float)(absEnd-absStart);
 			NSRect aRect = NSMakeRect(0,y1,[self bounds].size.width,y2-y1);
-			if(i==selectedRunIndex)[selectedGradient fillRect:aRect angle:0];
-			else [normalGradient fillRect:aRect angle:0];
+			if(i==selectedRunIndex)[selectedGradient drawInRect:aRect angle:0];
+			else [normalGradient drawInRect:aRect angle:0];
 			[[NSColor blackColor] set];
 			[NSBezierPath strokeRect:aRect];
 		}

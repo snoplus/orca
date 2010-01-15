@@ -16,7 +16,6 @@
 #import "ORCurve2D.h"
 #import "ZFlowLayout.h"
 #import "ORColorScale.h"
-#import "CTGradient.h"
 #import "ORGate2D.h"
 #import "ORAnalysisPanel2D.h"
 

@@ -21,7 +21,6 @@
 
 #import "ORValueBar.h"
 #import "ORAxis.h"
-#import "CTGradient.h"
 
 #ifndef NSAppKitVersionNumber10_5
 #define NSAppKitVersionNumber10_5 949
@@ -113,7 +112,7 @@
 	NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
 	
 	[gradient release];
-	gradient = [[CTGradient gradientWithBeginningColor:barColor endingColor:endingColor] retain];
+	gradient = [[NSGradient alloc] initWithStartingColor:barColor endingColor:endingColor];
 
     [self setNeedsDisplay: YES];	
 }
@@ -155,7 +154,7 @@
 	[barColor set];
 	if(dataSource){
 		float x = [mXScale getPixAbs:[dataSource doubleValue]];
-		[gradient fillRect:NSMakeRect(1,1,x,b.size.height-2) angle:180.];
+		[gradient drawInRect:NSMakeRect(1,1,x,b.size.height-2) angle:180.];
 
 	}
 	else {

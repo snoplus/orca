@@ -20,7 +20,6 @@
 
 
 #import "ORLevelMonitor.h"
-#import "CTGradient.h"
 
 #define kBugPad 10
 
@@ -82,7 +81,7 @@
 
 
 	[tankGradient release];
-	tankGradient = [[CTGradient gradientWithBeginningColor:tankColor endingColor:endingColor] retain];
+	tankGradient = [[NSGradient alloc] initWithStartingColor:tankColor endingColor:endingColor];
 
 
     [self setNeedsDisplay: YES];
@@ -109,7 +108,7 @@
 	NSColor* endingColor = [NSColor colorWithDeviceRed:red green:green blue:blue alpha:alpha];
 	
 	[levelGradient release];
-	levelGradient = [[CTGradient gradientWithBeginningColor:contentsColor endingColor:endingColor] retain];
+	levelGradient = [[NSGradient alloc] initWithStartingColor:contentsColor endingColor:endingColor];
 
     [self setNeedsDisplay: YES];	
 }
@@ -130,12 +129,12 @@
 	if(showFillPoints)	b.size.width -= 2*kBugPad;
 	else				b.size.width -= kBugPad;
 	
-	[tankGradient fillRect:NSMakeRect(kBugPad,kBugPad/2,b.size.width,b.size.height) angle:270.];
+	[tankGradient drawInRect:NSMakeRect(kBugPad,kBugPad/2,b.size.width,b.size.height) angle:270.];
 
 	if([dataSource respondsToSelector:@selector(levelMonitorLevel:)]){
 		float level = [dataSource levelMonitorLevel:self]; //level will be a value from 0 - 100%
 		float y =  b.size.height * level/100.;
-		[levelGradient fillRect:NSMakeRect(b.origin.x,b.origin.y,b.size.width,y) angle:270.];
+		[levelGradient drawInRect:NSMakeRect(b.origin.x,b.origin.y,b.size.width,y) angle:270.];
 	}
 	else {
 		[NSBezierPath fillRect:NSMakeRect(b.origin.x+1,50,b.size.width-2,b.size.height/3-2)];

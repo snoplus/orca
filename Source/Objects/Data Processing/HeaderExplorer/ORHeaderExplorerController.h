@@ -97,14 +97,13 @@
 
 @end
 
-@class CTGradient;
 
 @interface ORRunTimeView : NSView
 {
 	IBOutlet id dataSource;
-	CTGradient* selectedGradient;
-	CTGradient* backgroundGradient;
-	CTGradient* normalGradient;
+	NSGradient* selectedGradient;
+	NSGradient* backgroundGradient;
+	NSGradient* normalGradient;
 	
 }
 

@@ -19,7 +19,6 @@
 //-------------------------------------------------------------
 
 #import "ORPlotter.h"
-#import "CTGradient.h"
 #import "ORFlippedView.h"
 #import "ORPlotPublisher.h"
 
@@ -178,9 +177,9 @@ NSString* ORPlotterDataColor		= @"ORPlotterDataColor";
 			NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
 			
 			[gradient release];
-			gradient = [[CTGradient gradientWithBeginningColor:color endingColor:endingColor] retain];
+			gradient = [[NSGradient alloc ] initWithStartingColor:color endingColor:endingColor];
 		}
-		[gradient fillRect:bounds angle:270.];
+		[gradient drawInRect:bounds angle:270.];
 	}
 	else {
 		[[self backgroundColor] set];

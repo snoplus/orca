@@ -25,7 +25,6 @@
 
 @class ORAdcLowLimitNub;
 @class ORAdcHighLimitNub;
-@class CTGradient;
 
 @interface ORAdcModel : ORProcessHWAccessor {
 	double hwValue;
@@ -38,8 +37,8 @@
 	ORAdcLowLimitNub*  lowLimitNub;
 	ORAdcHighLimitNub* highLimitNub;
     float minChange;
-	CTGradient* normalGradient;
-	CTGradient* alarmGradient;
+	NSGradient* normalGradient;
+	NSGradient* alarmGradient;
 }
 
 #pragma mark ***Accessors

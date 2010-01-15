@@ -24,7 +24,6 @@
 #import "ORRamperModel.h"
 #import "ORRampItem.h"
 #import "ORAxis.h"
-#import "CTGradient.h"
 
 #define kWayPointSize 8
 #define kTargetSelectionHeight 5
@@ -73,9 +72,13 @@
 	float bugPadHeight = [rightTargetBug size].height+2;
 	[[NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1] set];
 	rampArea.size.width -= bugPadWidth;
-
-	if(!gradient) gradient = [[CTGradient unifiedNormalGradient] retain];
-	[gradient fillRect:rampArea angle:90.];
+		
+ 	if(!gradient){
+		NSColor* startingColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
+		NSColor* endingColor = [NSColor colorWithCalibratedRed:.9 green:.9 blue:.9 alpha:1];
+		gradient = [[NSGradient alloc] initWithStartingColor:startingColor endingColor:endingColor];
+	}
+	[gradient drawInRect:rampArea angle:90.];
 	[NSBezierPath setDefaultLineWidth:1];
 	[[NSColor grayColor] set];
 	[NSBezierPath strokeRect:rampArea];
@@ -105,7 +108,7 @@
 			[NSBezierPath fillRect:rampArea];
 			[[NSColor colorWithCalibratedRed:.8 green:.8 blue:.8 alpha:1] set];
 			//[NSBezierPath fillRect:NSMakeRect(xLowConstraint,y1,xHighConstraint-xLowConstraint,y2-y1)];
-			[gradient fillRect:NSMakeRect(xLowConstraint,y1,xHighConstraint-xLowConstraint,y2-y1) angle:90.];
+			[gradient drawInRect:NSMakeRect(xLowConstraint,y1,xHighConstraint-xLowConstraint,y2-y1) angle:90.];
 
 			[[NSColor colorWithCalibratedRed:.7 green:0 blue:0 alpha:.3] set];
 			[NSBezierPath strokeRect:NSMakeRect(xLowConstraint,y1,xHighConstraint-xLowConstraint,y2-y1)];
