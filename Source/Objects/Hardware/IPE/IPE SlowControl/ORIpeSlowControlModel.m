@@ -320,7 +320,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
 - (void) dumpSensorlist
 {
-	NSLog(@"%@\n",requestCache);
+	NSLog(@"requestCache:\n%@\n",requestCache);
 }
 
 #pragma mark ***Polled Item via LookupTable index
@@ -339,6 +339,13 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 		return [itemDictionary objectForKey:@"Control"]!=nil;
 	}
 	else return NO;
+}
+
+- (BOOL) isControlItemWithItemKey:(NSString*)itemKey
+{
+		NSDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
+		NSDictionary* itemDictionary = [topLevelDictionary objectForKey:itemKey];
+		return [itemDictionary objectForKey:@"Control"]!=nil;
 }
 
 - (NSString*) requestCacheItemKey:(int)anIndex
@@ -404,7 +411,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
 	[channelLookup release];
 	channelLookup = [[NSMutableDictionary dictionary] retain];
-	for(id itemKey in pollingLookUp){
+	for(id itemKey in pollingLookUp){ //TODO: we need to see the channels used by scripts ... -tb-
 		NSDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
 		id channelNumber = [topLevelDictionary objectForKey:@"ChannelNumber"];
 		if(channelNumber){
@@ -412,6 +419,13 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 		}
 	}
 }
+
+- (BOOL) channelExists:(int)aChan
+{
+	NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+    return (itemKey!=nil);
+}
+
 
 - (int) nextUnusedChannelNumber
 {
@@ -431,6 +445,45 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	} while(1);
 	return proposedIndex;
 }
+- (int) channelNumberForItemKey:(NSString*) anItemKey;
+{
+        NSMutableDictionary* topLevelDictionary = [requestCache objectForKey: anItemKey];
+        int chan=-1;
+        id chanNumObj = [topLevelDictionary objectForKey:@"ChannelNumber"];
+        if(chanNumObj) chan = [chanNumObj intValue];
+		return chan;
+        //TODO:  or better search itemKey in channelLookup -> ensure that this is always up to date -tb-
+}
+
+//!We return the channel which was set; if the channel already exists, a negative number is returned
+- (int) setChannelNumber:(int) aChan forItemKey:(NSString*) anItemKey 
+{
+    NSMutableDictionary* topLevelDictionary = [requestCache objectForKey: anItemKey];
+    if(!topLevelDictionary) return -2;
+    int oldChan = [self channelNumberForItemKey: anItemKey];
+    if(oldChan == aChan) return aChan; //nothing to do
+    [[[self undoManager] prepareWithInvocationTarget:self] setChannelNumber:oldChan forItemKey:anItemKey];
+    [topLevelDictionary setObject:[NSNumber numberWithInt:aChan]	forKey:@"ChannelNumber"]; //channel number for access by the processing system
+    
+    //fill it into the channelLookup
+    if(channelLookup){
+        [channelLookup removeObjectForKey: [NSNumber numberWithInt: oldChan]];
+        [channelLookup setObject:anItemKey  forKey: [NSNumber numberWithInt: aChan]];
+    }
+    
+#if 0  // must be done somewhere else (addItemKeyToPollingLookup, removeItemKeyFromPollingLookup)-tb-
+    //pollingLookup
+    NSLog( @"setChannelNumber: pollingLookup: key %@, oldch  %i  new ch %i",anItemKey,oldChan,aChan);
+    if(oldChan<0 && aChan>=0){
+     [pollingLookUp addObject:anItemKey];//[self addItemKeyToPollingLookup:anItemKey];  //adding new item to polling lookup
+    }
+    if(oldChan>=0 && aChan<0) [pollingLookUp removeObject:anItemKey];// [self removeItemKeyFromPollingLookup:anItemKey];  //adding new item to polling lookup
+#endif
+    //NSLog( @"setChannelNumber: itemkey:%@, old chan %i, new chan %i\n",anItemKey,oldChan,aChan);
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
+    return aChan;
+}
 
 #pragma mark •••Polling Cache Management
 //addItems to the polling loop
@@ -448,7 +501,8 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 			NSMutableDictionary* topLevelDictionary = [self makeTopLevelDictionary];
 			[topLevelDictionary setObject:anItem forKey:itemKey];			
 			[topLevelDictionary setObject:[NSNumber numberWithInt:aChannelNumber]	forKey:@"ChannelNumber"]; //channel number for access by the processing system
-			
+			//or [self setChannelNumber:aChannelNumber  forItemKey:itemKey]; // with undo ...
+            
 			[requestCache setObject:topLevelDictionary forKey:itemKey];
 			[self addItemKeyToPollingLookup:itemKey];
 		}
@@ -479,6 +533,9 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	[topLevelDictionary setObject:[NSNumber numberWithInt:100]		forKey:@"HiAlarm"]; //used by processing
 	[topLevelDictionary setObject:[NSNumber numberWithInt:0]		forKey:@"LoLimit"]; //used by processing
 	[topLevelDictionary setObject:[NSNumber numberWithInt:100]		forKey:@"HiLimit"]; //used by processing
+	[topLevelDictionary setObject:[NSNumber numberWithInt:-1]		forKey:@"ChannelNumber"];   //used for initializing
+	[topLevelDictionary setObject:@"--"		forKey:@"DBValue"];     //used for initializing
+	[topLevelDictionary setObject:@"--"     forKey:@"DBTimestamp"]; //used for initializing
 	return topLevelDictionary;
 }
 
@@ -524,6 +581,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
 - (NSString*) itemKey:aUrl:aPath
 {
+    if(aUrl==nil || aPath==nil) return nil;
 	if([aPath hasPrefix:@"/"])return [NSString stringWithFormat:@"%@%@",aUrl,aPath];
 	else return [NSString stringWithFormat:@"%@/%@",aUrl,aPath];
 }
@@ -659,21 +717,19 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
     //nothing to do
 }
 
+/** Note: Adc  Processing supports 30 channels; shipping SC packs channel number into 16 bit (0x00-0xff or 0 ... 255).
+  * But there is no limit to the channel number (except it must be a int).
+  *
+  */ //-tb-
 - (BOOL) processValue:(int)channel
 {
 	return [self convertedValue:channel]!=0;
 }
 
+//!convertedValue: and valueForChan: are the same.
 - (double) convertedValue:(int)channel
 {    
-	NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:channel]];
-	if(itemKey){
-		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
-		NSDictionary* itemDictionary = [topLevelDictionary objectForKey:itemKey];
-		if([itemDictionary objectForKey:@"Control"]) return [[itemDictionary objectForKey:@"value"] doubleValue];
-		else										 return [[itemDictionary objectForKey:@"Value"] doubleValue];
-	}
-	return 0; // return something if channel number out of range
+    return [self valueForChan:channel];
 }
 
 - (double) maxValueForChan:(int)channel
@@ -893,15 +949,25 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (double) valueForChan:(int)aChan
 {
     NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+    return [self valueForItemKey: itemKey];
+}
+
+- (double) valueForItemKey:(NSString*)itemKey
+{
 	if(itemKey){
+        //scan the new items "DBValue", "DBTimestamp"-tb-
+        #if 1
+		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
+        return [[topLevelDictionary objectForKey:@"DBValue"] doubleValue];
+        #else
 		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
 		NSDictionary* itemDictionary = [topLevelDictionary objectForKey:itemKey];
 		if([itemDictionary objectForKey:@"Control"]) return [[itemDictionary objectForKey:@"value"] doubleValue];
 		else										 return [[itemDictionary objectForKey:@"Value"] doubleValue];
+        #endif
 	}
 	return 0; // return something if channel number out of range
 }
-
 
 
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath
@@ -940,13 +1006,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath
 {
 	NSString* itemKey = [self itemKey:aUrl:aPath];
-	if(itemKey){
-		NSDictionary* topLevelDictionary = [requestCache objectForKey: itemKey];
-		NSDictionary* itemDictionary = [topLevelDictionary objectForKey:itemKey];
-		if([itemDictionary objectForKey:@"Control"]) return [[itemDictionary objectForKey:@"value"] doubleValue];
-		else										 return [[itemDictionary objectForKey:@"Value"] doubleValue];
-	}
-	return 0; // return something if channel number out of range
+    return [self valueForItemKey: itemKey];
 }
 //-------------end of script methods---------------------------------
 
@@ -1067,16 +1127,50 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	// ...
 	// ...
 	//
+    //NSLog(@"polledItemResult: ... result is %@ \n",result);
 	for(id resultItem in result){
+        int chan=-1;
 		NSString* itemKey = [self itemKey:[resultItem objectForKey:@"URL"]:[resultItem objectForKey:@"Path"]];
+        if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
+        //should work without: if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
 		if(!topLevelDictionary){
 			//wasn't in the topLevel so we haven't seen this item before. Add it to the cache.
+            //REUSE "addItems:"
+            //NSArray* anItemArray = [NSArray arrayWithObject: [NSDictionary dictionaryWithObjectsAndKeys:
+            //    [resultItem objectForKey:@"URL"],@"URL", [resultItem objectForKey:@"Path"],@"Path",nil         ] ];
+            NSArray* anItemArray = [NSArray arrayWithObject: resultItem ];
+            [self addItems: anItemArray];
+            topLevelDictionary = [requestCache objectForKey:itemKey];
+            #if 0
 			topLevelDictionary = [self makeTopLevelDictionary];
 			[requestCache setObject:topLevelDictionary forKey:itemKey];
+            //TODO: insert it into the pollingLookUp and channelLookup (using the first free chan - if no chan numbers available? NSLog ...) -tb-
+            chan = [self nextUnusedChannelNumber];
+            [self setChannelNumber:chan forItemKey:itemKey];
+            //adding to polling and channel cache was missing ...
+            #endif
 		}
+        
+        //maybe the item is in the requestCache but not in pollingLookup
+        chan = [self channelNumberForItemKey:itemKey];
+        if(chan<0){
+            [self setChannelNumber:[self nextUnusedChannelNumber] forItemKey:itemKey];
+            [self addItemKeyToPollingLookup: itemKey];
+        }
+        
 		//we only replace the resultItem. leaving the other things in the dictionary (i.e. loAlarm, etc...) alone.
 		[topLevelDictionary setObject:resultItem forKey:itemKey];
+        if([self isControlItemWithItemKey:itemKey]){
+            [topLevelDictionary setObject:[resultItem objectForKey:@"value"] forKey:@"DBValue"];
+            [topLevelDictionary setObject:[resultItem objectForKey:@"timestamp"] forKey:@"DBTimestamp"];
+        }
+		else{
+            [topLevelDictionary setObject:[resultItem objectForKey:@"Value"] forKey:@"DBValue"];
+            [topLevelDictionary setObject:[resultItem objectForKey:@"Date"] forKey:@"DBTimestamp"];//TODO: use Unix time -tb- ?
+        }
+        
+        //housekeeping
 		[self clearPendingRequest:itemKey];
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
@@ -1139,11 +1233,16 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 				NSDictionary* topLevelDictionary	= [requestCache objectForKey:anItemKey];
 				NSDictionary* itemDictionary		= [topLevelDictionary objectForKey:anItemKey];
 				float theValue;
+                #if 0
 				if([itemDictionary objectForKey:@"Control"]) theValue =  [[itemDictionary objectForKey:@"value"] floatValue];
 				else										 theValue =  [[itemDictionary objectForKey:@"Value"] floatValue];
+                #else
+                theValue = [self valueForItemKey: anItemKey];
+                #endif
 				int channelNumber = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
-
-				NSTimeInterval theTimeStamp =  [self timeFromADEIDate:[itemDictionary objectForKey:@"Date"]];
+                if(channelNumber ==-1) channelNumber = 0xff;//removed channels have channelNumber -1
+                
+				NSTimeInterval theTimeStamp =  [self timeFromADEIDate:[itemDictionary objectForKey:@"Date"]];//TODO: controls have no "Date" -tb-
 				unsigned long seconds	 = (unsigned long)theTimeStamp;	  //seconds since 1970
 				unsigned long subseconds = (theTimeStamp - seconds)*1000; //milliseconds
 				
@@ -1163,27 +1262,38 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:theData];
 		}
 	}
-}
+} 
 
 - (NSTimeInterval) timeFromADEIDate:(NSString*)aDate
 {
 	NSCalendarDate *theDate = [NSCalendarDate dateWithString:aDate calendarFormat:@"%d-%b-%y %H:%M:%S.%F"];
 	return [theDate timeIntervalSince1970];
 }
+
+//TODO: is this only for undo? who sets channel number? it is called only from addItems: and polledItemResult: -tb-
 - (void) addItemKeyToPollingLookup:(NSString *)anItemKey
 {
     [[[self undoManager] prepareWithInvocationTarget:self] removeItemKeyFromPollingLookup:anItemKey];
 	[pollingLookUp addObject:anItemKey];
+    //TODO: restore the old channel ...
 	[self makeChannelLookup];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
 }
 
+//! Remove it from pollingLookup (and channelLookup) but keep it in requestCache ...
 - (void) removeItemKeyFromPollingLookup:(NSString *)anItemKey
 {
     [[[self undoManager] prepareWithInvocationTarget:self] addItemKeyToPollingLookup:anItemKey];
+    int aChan = [self channelNumberForItemKey: anItemKey];
+    [[[self undoManager] prepareWithInvocationTarget:self] setChannelNumber:aChan forItemKey:anItemKey];
+    //TODO: set ChannelNumber to -1 and do a undo for it ... -tb-
+        NSMutableDictionary* topLevelDictionary = [requestCache objectForKey: anItemKey];
+        [topLevelDictionary setObject:[NSNumber numberWithInt:-1]	forKey:@"ChannelNumber"]; //channel number for access by the processing system
+//TODO: [self setChannelNumber:-1 forItemKey:  anItemKey];     
 	[pollingLookUp removeObject:anItemKey];
 	[self makeChannelLookup];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
 }
+
 
 @end

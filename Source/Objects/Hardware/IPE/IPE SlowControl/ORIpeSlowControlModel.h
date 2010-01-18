@@ -79,8 +79,11 @@
 	BOOL			checkingForTimeouts;
 	
 	NSMutableDictionary* requestCache;	//items to poll. Also contains extra info for the processing system
-	NSMutableArray*		 pollingLookUp;	//a look up table for itemKey by index
+                                        // These holds also the deleted item (for undo) and the items created by a Orca script -tb-
+	NSMutableArray*		 pollingLookUp;	//a look up table for itemKey by index; 
+                                        //this represents the contents of the list view (subset of requestCache) -tb-
 	NSMutableDictionary* channelLookup; //a look up table for itemKey by channel
+                                        //this represents the contents of the list view (subset of requestCache) -tb-
 	
 	NSMutableDictionary* pendingRequests;	//itemKeys in this are requests that have not come back
 	long histogram[kResponseTimeHistogramSize];
@@ -148,8 +151,12 @@
 - (NSMutableDictionary*) topLevelPollingDictionary:(id)anItemKey;
 - (int)	 nextUnusedChannelNumber;
 - (BOOL) itemExists:(int)anIndex;
+- (BOOL) channelExists:(int)aChan;
 - (BOOL) isControlItem:(int)anIndex;
+- (BOOL) isControlItemWithItemKey:(NSString*)itemKey;
 - (void) makeChannelLookup;
+- (int) channelNumberForItemKey:(NSString*) anItemKey;  //works on requestCache
+- (int) setChannelNumber:(int) aChan forItemKey:(NSString*) anItemKey ;//works on requestCache and channelLookup
 
 #pragma mark •••Statistics
 - (void) histogram:(int)milliSecs;
@@ -180,13 +187,6 @@
 
 #pragma mark •••Main Scripting Methods
 //Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
-- (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath;
-- (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath;
-- (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
-- (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
-- (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;
-
-
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath;
 - (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath;
 
@@ -194,9 +194,18 @@
 - (void) postControlSetpointForChan:(int)aChan value:(double)aValue;
 - (BOOL) requestIsPendingForChan:(int)aChan;
 - (double) valueForChan:(int)aChan;
+- (double) valueForItemKey:(NSString*)itemKey;
 
 
+//following methods are not recommended (use "...ForChan:" instead of "...aUrl path:..." functions) -tb-
 - (int) findChanOfIndex:(int)anIndex;
+- (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath;
+- (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath;
+- (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
+- (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
+- (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;
+
+//dont use in scripts:
 - (void) writeSetPoint:(int)anIndex value:(double)aValue;
 
 @end

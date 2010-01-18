@@ -450,7 +450,7 @@
 
 - (IBAction) dumpSensorAction:(id)sender
 {
-    [model dumpSensorlist];
+    [model dumpSensorlist];// dumps the requestCache -tb-
 }
 
 //adei/ipe list view context menu
@@ -494,7 +494,10 @@
         NSLog(@"ORIpeSlowControlController: Nothing selected or bad selection! %i\n",row);
         return;
     }
-
+    
+    [self removeItemAction:nil]; //calls u.a. [model removeSet:[itemTableView selectedRowIndexes]];
+    return;
+    
     NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
     DebugMethCallsTB(  
         NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
@@ -515,6 +518,8 @@
 
 - (IBAction)adeiListContextMenuDisplayWebViewAction:(id)sender
 {
+    [self viewItemInWebAction: sender];
+#if 0
     int row = [itemTableView selectedRow] ; 
     int numRow = [itemTableView numberOfSelectedRows] ; 
     if(numRow != 1){//
@@ -527,35 +532,28 @@
         NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
         NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
     )
+#endif
 }
 
 
 - (IBAction) editChannelNumberAction:(id)sender
 {
-    NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
-    int row = [itemTableView selectedRow] ; 
+    //NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
+    //int row = [itemTableView selectedRow] ; 
     int numRow = [itemTableView numberOfSelectedRows] ; 
-    NSLog(@"numberOfSelectedRows: %i, selectedRow: %i\n",numRow,row);
+    //NSLog(@"numberOfSelectedRows: %i, selectedRow: %i\n",numRow,row);
     if(numRow != 1){//
         NSLog(@"ORIpeSlowControlController: Nothing selected or bad selection!\n");
         return;
     }
+    
     //populate pulldown
     [newChannelNumberPopup removeAllItems];
     //TODO: fill in free channels -tb-
-    [newChannelNumberPopup addItemWithTitle:@"Under development!"];
-    [newChannelNumberPopup addItemWithTitle:@"4"];
-#if 1
-    [newChannelNumberPopup addItemWithTitle:@"5"];
-    [newChannelNumberPopup addItemWithTitle:@"6"];
-    [newChannelNumberPopup addItemWithTitle:@"7"];
-    [newChannelNumberPopup addItemWithTitle:@"11"];
-    [newChannelNumberPopup addItemWithTitle:@"12"];
-    [newChannelNumberPopup addItemWithTitle:@"23"];
-    [newChannelNumberPopup addItemWithTitle:@"24"];
-    [newChannelNumberPopup addItemWithTitle:@"25"];
-    [newChannelNumberPopup addItemWithTitle:@"26"];
-#endif
+    int i;
+    for(i=0;i<32;i++){
+        if(![model channelExists: i]) [newChannelNumberPopup addItemWithTitle:[NSString stringWithFormat:@"%i",i]];
+    }
     
 	[[NSApplication sharedApplication] beginSheet:editChannelNumberView
 								   modalForWindow:[self window]
@@ -572,6 +570,7 @@
 
 - (IBAction) newChannelNumberAction:(id)sender
 {
+    #if 0
     NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
     DebugMethCallsTB(  
         NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
@@ -579,6 +578,11 @@
     )
     NSLog(@"newChannelNumberAction: selected chan %i!  \n", [[[sender selectedItem] title] intValue]);
 	//[model ChannelNumber:[[[sender selectedItem] title] intValue]; //TODO: -tb-
+    #endif
+    
+    int row = [itemTableView selectedRow] ; 
+
+    [model setChannelNumber: [[[sender selectedItem]title]intValue]      forItemKey: [model requestCacheItemKey:row]  ];
     [self cancelEditChannelNumberAction: nil];
 }
 
@@ -738,7 +742,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 			NSString*		itemKey				= [model requestCacheItemKey:row];
 			NSDictionary*	topLevelDictionary	= [model topLevelPollingDictionary:itemKey];
 			NSDictionary*	itemDictionary		= [topLevelDictionary objectForKey:itemKey];
-			BOOL isControl						= [[itemDictionary objectForKey:@"Control"] boolValue];
+			//BOOL isControl						= [[itemDictionary objectForKey:@"Control"] boolValue];
 			NSString* theIdentifier				= [tableColumn identifier];
 			if([theIdentifier isEqual:@"Path"]){
 				if([model viewItemName]) {
@@ -755,13 +759,20 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 				//  if(isControl) return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"value"] doubleValue]];
 				//  else          return [NSNumber numberWithDouble:[[itemDictionary objectForKey:@"Value"] doubleValue]];
                 id retVal;
+                //new
+                retVal = [topLevelDictionary objectForKey:@"DBValue"];
+                #if 0
                 if(isControl) retVal = [itemDictionary objectForKey:@"value"];
 				else          retVal = [itemDictionary objectForKey:@"Value"];
+                #endif
                 if(retVal) return retVal;//yes, at the beginning it may be undefined! -tb-
                 else return @"--";
                 //TODO: for controls the key "value" contains the Control item id, not the current value -> use another key! -tb-
                 //
                 //PS: use ... - (double) convertedValue:(int)channel -tb-
+			}
+			else if([theIdentifier isEqual:@"Timestamp"]){
+                return [topLevelDictionary objectForKey:@"DBTimestamp"];
 			}
 			else if([theIdentifier isEqual:@"Name"]){
 				id theName = [itemDictionary objectForKey:@"Name"];
