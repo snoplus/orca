@@ -895,7 +895,7 @@ const float kGateAlpha2 = .1;
 	if(fitType == 2)fitOrder = 1;
 	else			fitOrder = 0;
 	
-	[self doFitType:fitType fitOrder:0 fitFunction:@""];
+	[self doFitType:fitType fitOrder:fitOrder fitFunction:@""];
 }
 
 - (void) doFitType:(int)fitType fitOrder:(int)fitOrder fitFunction:(NSString*)fitFunction
