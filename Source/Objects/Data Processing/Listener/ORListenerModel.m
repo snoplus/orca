@@ -529,12 +529,10 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
         
         //....wait for processing to finish.....
         //wait for the processing thread to exit.
-        BOOL timeout = NO;
         NSTimeInterval t0 = [NSDate timeIntervalSinceReferenceDate];
         while(threadRunning){
             [NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
             if([NSDate timeIntervalSinceReferenceDate]-t0 > 10){
-                timeout = YES;
                 threadRunning = NO;
                 break;
             }
