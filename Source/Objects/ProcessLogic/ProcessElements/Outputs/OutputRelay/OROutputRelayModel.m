@@ -103,7 +103,7 @@
 		if([self state]) anImage = [NSImage imageNamed:@"greenled"];
 		else             anImage = [NSImage imageNamed:@"redled"];
 	}
-	else if(viewIconType == 1){
+	else {
 		if([self state]) anImage = [NSImage imageNamed:@"OnText"];
 		else             anImage = [NSImage imageNamed:@"OffText"];
 	}
