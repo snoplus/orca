@@ -1070,6 +1070,11 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	return aResponse;
 }
 
+- (NSString*) identifier
+{
+	return [NSString stringWithFormat:@"MCA927 %d",[self uniqueIdNumber]];
+}
+
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -1131,9 +1136,8 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-{
+{	
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-	
 	[self addCurrentState:objDictionary cArray:runOptions forKey:@"RunOptions"];
 	[self addCurrentState:objDictionary cArray:liveTime forKey:@"LiveTime"];
 	[self addCurrentState:objDictionary cArray:realTime forKey:@"Debug Mode"];
@@ -1150,7 +1154,6 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	
     return objDictionary;
 }
-
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }

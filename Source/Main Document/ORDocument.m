@@ -270,6 +270,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	NSMutableArray* crates			= [NSMutableArray array];
 	NSMutableArray* dataChain		= [NSMutableArray array];
 	NSMutableArray* gpib			= [NSMutableArray array];
+	NSMutableArray* usb				= [NSMutableArray array];
 	NSMutableDictionary* exp		= [NSMutableDictionary dictionary];
 	NSEnumerator* e					= [allObjects objectEnumerator];
 	id anObj;
@@ -289,6 +290,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 				[anObj addObjectInfoToArray:gpib];
 			}
 		}
+		else if([anObj isKindOfClass:NSClassFromString(@"ORUsbDeviceModel")]){
+			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
+				[anObj addObjectInfoToArray:usb];
+			}
+		}
 		else if([anObj isKindOfClass:NSClassFromString(@"ORExperimentModel")]){
 			if([anObj respondsToSelector:@selector(addParametersToDictionary:)]){
 				[anObj addParametersToDictionary:objectInfoDictionary];
@@ -305,6 +311,9 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	}
 	if([gpib count]){
 		[objectInfoDictionary setObject:gpib forKey:@"Gpib"];
+	}
+	if([usb count]){
+		[objectInfoDictionary setObject:usb forKey:@"USB"];
 	}
 	if([exp count]){
 		[objectInfoDictionary setObject:exp forKey:@"Experiments"];

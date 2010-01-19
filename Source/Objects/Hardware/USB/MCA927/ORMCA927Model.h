@@ -19,6 +19,8 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+
+#import "ORUsbDeviceModel.h"
 #import "ORUSB.h"
 #import "ORDataTaker.h"
 
@@ -72,7 +74,7 @@ typedef struct MCA927Registers {
 	unsigned long 	addressOffset;
 } MCA927Registers;
 
-@interface ORMCA927Model : OrcaObject <USBDevice,ORDataTaker> {
+@interface ORMCA927Model : ORUsbDeviceModel <USBDevice,ORDataTaker> {
 	unsigned long   dataId;
 	NSLock*			localLock;
 	ORUSBInterface* usbInterface;
