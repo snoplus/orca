@@ -360,6 +360,8 @@
 		840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F539C97C03A7C80D015F64B1 /* IOKit.framework */; };
 		8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */; };
 		8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */; };
+		8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8411A93011063ACC00CD9544 /* ORUsbDeviceModel.h */; };
+		8411A93311063ACC00CD9544 /* ORUsbDeviceModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8411A93111063ACC00CD9544 /* ORUsbDeviceModel.m */; };
 		84167116104C04D400E47227 /* ORAutoTestUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 84167114104C04D400E47227 /* ORAutoTestUnit.h */; };
 		84167117104C04D400E47227 /* ORAutoTestUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 84167115104C04D400E47227 /* ORAutoTestUnit.m */; };
 		84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84178D4E0923C4B100C15D2B /* ORSocketClient.h */; };
@@ -2697,6 +2699,8 @@
 		840EFFFF0944B28F00049827 /* ProcessPulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProcessPulser.tif; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ProcessPulser.tif; sourceTree = SOURCE_ROOT; };
 		8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWindow+Extensions.h"; sourceTree = "<group>"; };
 		8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+Extensions.m"; path = "Source/Cocoa Extensions/NSWindow+Extensions.m"; sourceTree = SOURCE_ROOT; };
+		8411A93011063ACC00CD9544 /* ORUsbDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUsbDeviceModel.h; path = "Source/Objects/Hardware/USB/USB Base Classes/ORUsbDeviceModel.h"; sourceTree = SOURCE_ROOT; };
+		8411A93111063ACC00CD9544 /* ORUsbDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUsbDeviceModel.m; path = "Source/Objects/Hardware/USB/USB Base Classes/ORUsbDeviceModel.m"; sourceTree = SOURCE_ROOT; };
 		84167114104C04D400E47227 /* ORAutoTestUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAutoTestUnit.h; sourceTree = "<group>"; };
 		84167115104C04D400E47227 /* ORAutoTestUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAutoTestUnit.m; sourceTree = "<group>"; };
 		84178D4E0923C4B100C15D2B /* ORSocketClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSocketClient.h; sourceTree = "<group>"; };
@@ -5429,6 +5433,16 @@
 			path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser;
 			sourceTree = SOURCE_ROOT;
 		};
+		8411A92F11063ACC00CD9544 /* USB Base Classes */ = {
+			isa = PBXGroup;
+			children = (
+				8411A93011063ACC00CD9544 /* ORUsbDeviceModel.h */,
+				8411A93111063ACC00CD9544 /* ORUsbDeviceModel.m */,
+			);
+			name = "USB Base Classes";
+			path = "Source/Objects/Hardware/USB/USB Base Classes";
+			sourceTree = SOURCE_ROOT;
+		};
 		8418DC4C0531EF7A005F64B1 /* PulserDistrib */ = {
 			isa = PBXGroup;
 			children = (
@@ -7302,6 +7316,7 @@
 		849E7C900B6956B200353D50 /* USB */ = {
 			isa = PBXGroup;
 			children = (
+				8411A92F11063ACC00CD9544 /* USB Base Classes */,
 				84CC16C50FAF157000CEE642 /* MCA927 */,
 				849E7C910B6956C800353D50 /* ADU200 */,
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
@@ -10446,6 +10461,7 @@
 				849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */,
 				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
 				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
+				8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11859,6 +11875,7 @@
 				849013C510E27B13007591B5 /* ORPlotLinkController.m in Sources */,
 				849013C710E27B13007591B5 /* ORPlotLinkModel.m in Sources */,
 				8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */,
+				8411A93311063ACC00CD9544 /* ORUsbDeviceModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
