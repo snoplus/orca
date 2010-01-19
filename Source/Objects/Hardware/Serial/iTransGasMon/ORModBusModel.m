@@ -440,7 +440,7 @@ NSString* ORModBusLock						= @"ORModBusLock";
 	//these sensors response by echoing the orginal data packet followed by the true response
 	//so we have to jump thru hoops to decode it all
 	unsigned char* bytes = (unsigned char*)[theData bytes];
-	BOOL done;
+	BOOL done = NO;
 	if(!response){
 		//this is the echo of the command, all we need is the function
 		//should probably check to see is the command is a error or not
