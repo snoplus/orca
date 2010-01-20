@@ -187,6 +187,7 @@
 	[self updateMonitor:nil];
 	[self alarmLevelChanged:nil];
 	[self fillPointChanged:nil];
+	[self fillStateChanged:nil];
 	[self enabledMaskChanged:nil];
     [self miscAttributesChanged:nil];
 	[self eMailEnabledChanged:nil];
@@ -290,9 +291,16 @@
 
 - (void) fillStateChanged:(NSNotification*)aNote
 {
-	int index = [[[aNote userInfo] objectForKey:@"Index"]intValue];
-	if(index == 0)     [fillStatePU0 selectItemAtIndex:[model fillState:index]];
-	else if(index == 1)[fillStatePU1 selectItemAtIndex:[model fillState:index]];
+	if(!aNote){
+		[fillStatePU0 selectItemAtIndex:[model fillState:0]];
+		[fillStatePU1 selectItemAtIndex:[model fillState:1]];
+	}
+	else {
+		int index = [[[aNote userInfo] objectForKey:@"Index"]intValue];
+		if(index == 0)     [fillStatePU0 selectItemAtIndex:[model fillState:index]];
+		else if(index == 1)[fillStatePU1 selectItemAtIndex:[model fillState:index]];
+
+	}
 }
 
 - (void) shipLevelsChanged:(NSNotification*)aNote
