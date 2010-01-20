@@ -202,8 +202,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[8];
-		data[0] = dataId | 8;
+		unsigned long data[10];
+		data[0] = dataId | 10;
 		data[1] = [self uniqueIdNumber]&0xfff;
 		
 		union {
@@ -221,7 +221,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*8]];
+															object:[NSData dataWithBytes:&data length:sizeof(long)*10]];
 	}
 }
 
