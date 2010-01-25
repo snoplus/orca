@@ -1006,7 +1006,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 								 @"ORAmi286DecoderForLevel",     @"decoder",
 								 [NSNumber numberWithLong:dataId],   @"dataId",
 								 [NSNumber numberWithBool:NO],       @"variable",
-								 [NSNumber numberWithLong:8],        @"length",
+								 [NSNumber numberWithLong:10],        @"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Levels"];
     
