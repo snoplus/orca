@@ -32,6 +32,7 @@
 	IBOutlet ORPlotter1D*		plotter0;
     IBOutlet NSButton*			addSensorButton;
 	IBOutlet ORFlippedView*		sensorsView;
+	IBOutlet NSButton*			shipValuesCB;
 	NSMutableArray*				sensorControllers;
 }
 
@@ -55,6 +56,7 @@
 - (void) sensorAdded:(NSNotification*)aNote;
 - (void) sensorRemoved:(NSNotification*)aNote;
 - (void) tileSensors;
+- (void) shipValuesChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) addSensorAction:(id)sender;
@@ -63,6 +65,7 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) readNowAction:(id)sender;
+- (IBAction) shipValuesAction:(id)sender;
 
 @end
 

@@ -119,6 +119,10 @@
 					 selector : @selector(sensorRemoved:)
 						 name : ORModBusModelSensorRemoved
 					   object : nil];
+	[notifyCenter addObserver : self
+					 selector : @selector(shipValuesChanged:)
+						 name : ORModBusModelShipValues
+					   object : nil];
 	
 }
 
@@ -136,6 +140,7 @@
     [self portNameChanged:nil];
 	[self pollTimeChanged:nil];
 	[self updateTimePlot:nil];
+	[self shipValuesChanged:nil];
     [self miscAttributesChanged:nil];
 }
 
@@ -230,6 +235,11 @@
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemWithTag:[model pollTime]];
+}
+
+- (void) shipValuesChanged:(NSNotification*)aNotification
+{
+	[shipValuesCB setIntValue:[model shipValues]];
 }
 
 - (void) portNameChanged:(NSNotification*)aNotification
@@ -354,7 +364,11 @@
 {
 	[self endEditing];
 	[model pollSensors];
+}
 
+- (IBAction) shipValuesAction:(id)sender
+{
+	[model setShipValues:[sender intValue]];	
 }
 
 #pragma mark •••Data Source

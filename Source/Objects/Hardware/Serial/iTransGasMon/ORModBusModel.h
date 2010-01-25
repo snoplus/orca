@@ -37,6 +37,7 @@
 		int				lastAddress;
 		NSMutableArray*		cmdQueue;
 		NSData* lastRequest;
+		BOOL shipValues;
 }
 
 #pragma mark •••Initialization
@@ -70,6 +71,8 @@
 
 - (void) readHoldingReg:(int)reg_num deviceAddress:(int) address;
 - (void) writeHoldingReg:(int)reg_num deviceAddress:(int) address withValue:(int)aValue;
+- (BOOL) shipValues;
+- (void) setShipValues:(BOOL)aShipState;
 
 #pragma mark •••Commands
 - (void) pollSensors;
@@ -87,4 +90,5 @@ extern NSString* ORModBusModelSensorsChanged;
 extern NSString* ORModBusModelSensorAdded;
 extern NSString* ORModBusModelSensorRemoved;
 extern NSString* ORModBusModelTimeout;
+extern NSString* ORModBusModelShipValues;
 

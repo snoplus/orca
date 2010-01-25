@@ -36,6 +36,7 @@ NSString* ORModBusModelSensorsChanged		= @"ORModBusModelSensorsChanged";
 NSString* ORModBusModelSensorAdded			= @"ORModBusModelSensorAdded";
 NSString* ORModBusModelSensorRemoved		= @"ORModBusModelSensorRemoved";
 NSString* ORModBusModelTimeout				= @"ORModBusModelTimeout";
+NSString* ORModBusModelShipValues			= @"ORModBusModelShipValues";
 
 NSString* ORModBusLock						= @"ORModBusLock";
 
@@ -157,6 +158,9 @@ NSString* ORModBusLock						= @"ORModBusLock";
 	ORiTransGasSensorModel* aSensor;
 	for(aSensor in sensors){
 		[aSensor readValues:self];
+		if(shipValues){
+			[aSensor shipDataRecords];
+		}
 	}
 }
 
@@ -304,6 +308,7 @@ NSString* ORModBusLock						= @"ORModBusLock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setPollTime:[decoder decodeIntForKey:@"ORModBusModelPollTime"]];
+	[self setShipValues:[decoder decodeBoolForKey:@"shipValues"]];
 	[self setPortWasOpen:[decoder decodeBoolForKey:@"ORModBusModelPortWasOpen"]];
     [self setPortName:[decoder decodeObjectForKey: @"portName"]];
  	[self setSensors:[decoder decodeObjectForKey:@"sensors"]];
@@ -320,6 +325,7 @@ NSString* ORModBusLock						= @"ORModBusLock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:pollTime forKey:@"ORModBusModelPollTime"];
+    [encoder encodeBool:shipValues forKey:@"shipValues"];
     [encoder encodeBool:portWasOpen forKey:@"ORModBusModelPortWasOpen"];
     [encoder encodeObject:portName forKey: @"portName"];
     [encoder encodeObject:sensors forKey: @"sensors"];
@@ -399,6 +405,17 @@ NSString* ORModBusLock						= @"ORModBusLock";
 	[self sendData:theData];
 }
 
+- (BOOL) shipValues
+{
+    return shipValues;
+}
+
+- (void) setShipValues:(BOOL)aShipState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipValues:shipValues];
+    shipValues = aShipState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORModBusModelShipValues object:self];
+}
 @end
 
 @implementation ORModBusModel (private)
@@ -484,5 +501,7 @@ NSString* ORModBusLock						= @"ORModBusLock";
 	[self pollSensors];
 	[self performSelector:@selector(doPoll) withObject:nil afterDelay:pollTime];
 }
+
+
 
 @end
