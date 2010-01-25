@@ -43,7 +43,10 @@
 	BOOL fullRead;
 	ORAlarm* gasAlarm;
     int channel;
+	unsigned long timeMeasured;
+	unsigned long	dataId;
 }
+
 + (id) sensor;
 - (id)init;
 - (void) dealloc;
@@ -86,6 +89,14 @@
 - (void) setFullRead:(BOOL)aState;
 - (int) offsetReg:(int)aReg;
 - (int) extractChanFrom:(int)aCommand;
+- (void) shipDataRecords;
+
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherAmi286;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
 
 #pragma mark •••Helpers
 - (NSString*) gasType:(int)aType fullName:(BOOL)full;

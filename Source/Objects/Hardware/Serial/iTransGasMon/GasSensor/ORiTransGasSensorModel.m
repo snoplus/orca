@@ -21,7 +21,8 @@
 #import "ORiTransGasSensorModel.h"
 #import "ORModBusModel.h"
 #import "ORAlarm.h"
-
+#import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
 
 NSString* ORiTransGasSensorModelChannelChanged		= @"ORiTransGasSensorModelChannelChanged";
 NSString* ORiTransGasSensorModelNameChanged			= @"ORiTransGasSensorModelNameChanged";
@@ -152,6 +153,10 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 
 - (void) setGasReading:(int)aValue
 {
+	time_t	ut_Time;
+	time(&ut_Time);
+	timeMeasured = ut_Time;
+	
     gasReading = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiTransGasSensorGasReadingChanged object:self];
 }
@@ -390,6 +395,44 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 	}
 }
 
+#pragma mark •••Data Records
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherAmi286
+{
+    [self setDataId:[anotherAmi286 dataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"iTransGasSensorModel"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORiTrasGasSensorDecoderForValue", @"decoder",
+								 [NSNumber numberWithLong:dataId],   @"dataId",
+								 [NSNumber numberWithBool:NO],       @"variable",
+								 [NSNumber numberWithLong:8],        @"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"GasValue"];
+    
+    return dataDictionary;
+}
+
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -409,6 +452,34 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
     [encoder encodeInt:channel		 forKey:@"channel"];
     [encoder encodeObject:sensorName forKey:@"sensorName"];
     [encoder encodeInt:baseAddress	 forKey:@"baseAddress"];
+}
+
+- (void) shipDataRecords
+{
+    if([[ORGlobal sharedGlobal] runInProgress]){
+		
+		union {
+			float asFloat;
+			unsigned long asLong;
+		}theData;
+		
+		unsigned long data[8];
+		data[0] = dataId | 8;
+		data[1] = (channel<<16) | [delegate uniqueIdNumber]&0xfff;
+		
+		data[2] = timeMeasured;
+		
+		theData.asFloat = [[self formattedGasReading] floatValue];
+		data[3] = theData.asLong;
+		
+		data[4] = statusBits;
+		data[5] = gasType;
+		data[6] = gasType;
+		data[7] = gasType;
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:&data length:sizeof(long)*8]];
+	}
 }
 
 @end
