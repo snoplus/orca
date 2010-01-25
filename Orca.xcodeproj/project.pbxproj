@@ -1946,6 +1946,8 @@
 		84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */; };
 		84DBA1331058122C00884B1C /* ORiTransGasSensorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DBA1311058122C00884B1C /* ORiTransGasSensorController.m */; };
 		84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DBA1321058122C00884B1C /* ORiTransGasSensorController.h */; };
+		84DCB61A110E116E0062A95C /* ORiTransGasSensorDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DCB618110E116E0062A95C /* ORiTransGasSensorDecoder.h */; };
+		84DCB61B110E116E0062A95C /* ORiTransGasSensorDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DCB619110E116E0062A95C /* ORiTransGasSensorDecoder.m */; };
 		84DDEBA207BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */; };
 		84DDEBA307BD3E080060D0B4 /* MultiPlot.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */; };
 		84DDEBA507BD3E080060D0B4 /* ORMultiPlot.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DDEB9E07BD3E080060D0B4 /* ORMultiPlot.h */; };
@@ -4152,6 +4154,8 @@
 		84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = FilterScriptGuide.rtf; path = "Source/Objects/Data Processing/Filter/FilterScriptGuide.rtf"; sourceTree = SOURCE_ROOT; };
 		84DBA1311058122C00884B1C /* ORiTransGasSensorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiTransGasSensorController.m; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorController.m; sourceTree = SOURCE_ROOT; };
 		84DBA1321058122C00884B1C /* ORiTransGasSensorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiTransGasSensorController.h; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorController.h; sourceTree = SOURCE_ROOT; };
+		84DCB618110E116E0062A95C /* ORiTransGasSensorDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiTransGasSensorDecoder.h; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorDecoder.h; sourceTree = SOURCE_ROOT; };
+		84DCB619110E116E0062A95C /* ORiTransGasSensorDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiTransGasSensorDecoder.m; path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor/ORiTransGasSensorDecoder.m; sourceTree = SOURCE_ROOT; };
 		84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = edu.washington.npl.orca.MultiPlot.plist; sourceTree = "<group>"; };
 		84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MultiPlot.nib; sourceTree = "<group>"; };
 		84DDEB9E07BD3E080060D0B4 /* ORMultiPlot.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMultiPlot.h; sourceTree = "<group>"; };
@@ -7518,6 +7522,8 @@
 				84AB101B1057D6990069D5E2 /* ORiTransGasSensorModel.m */,
 				84DBA1311058122C00884B1C /* ORiTransGasSensorController.m */,
 				84DBA1321058122C00884B1C /* ORiTransGasSensorController.h */,
+				84DCB618110E116E0062A95C /* ORiTransGasSensorDecoder.h */,
+				84DCB619110E116E0062A95C /* ORiTransGasSensorDecoder.m */,
 			);
 			name = GasSensor;
 			path = Source/Objects/Hardware/Serial/iTransGasMon/GasSensor;
@@ -10462,6 +10468,7 @@
 				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
 				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
 				8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */,
+				84DCB61A110E116E0062A95C /* ORiTransGasSensorDecoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11876,6 +11883,7 @@
 				849013C710E27B13007591B5 /* ORPlotLinkModel.m in Sources */,
 				8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */,
 				8411A93311063ACC00CD9544 /* ORUsbDeviceModel.m in Sources */,
+				84DCB61B110E116E0062A95C /* ORiTransGasSensorDecoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
