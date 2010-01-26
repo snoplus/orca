@@ -300,6 +300,10 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     if(index>=0 && [filesToReplay count]){
 		NSString* aFileName = [filesToReplay objectAtIndex:index];
 		ORFileReader* fileReader = [[ORFileReader alloc] initWithPath:aFileName delegate:self];
+		if(![[NSFileManager defaultManager] fileExistsAtPath:aFileName]){
+			[self setHeader:nil];
+			return;
+		}
 		if([fileReader currentHeader]){
 			[self setHeader:[ORHeaderItem headerFromObject:[fileReader currentHeader] named:@"Root"]];
 		}
