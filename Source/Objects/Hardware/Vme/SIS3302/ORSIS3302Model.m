@@ -132,7 +132,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	[self calculateSampleValues];
 }
 
-- (int) endAddressThreshold { return endAddressThreshold & 0xfffc; }
+- (int) endAddressThreshold { return endAddressThreshold; }
 - (void) setEndAddressThreshold:(int)aEndAddressThreshold
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:endAddressThreshold];
@@ -178,6 +178,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
     energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:510] & 0x3fe;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
+	[self calculateSampleValues];
 }
 
 - (int) energyGapTime { return energyGapTime; }
@@ -617,7 +618,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	
 	eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
 	eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
-	eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;   
+	eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 
     [self setEndAddressThreshold:eventLengthLongWords];
 }
@@ -1055,7 +1056,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 			for(i=0;i<kNumSIS3302Channels;i++){
 				unsigned long endSampleAddress = 0;
 				[[self adapter] readLongBlock:&endSampleAddress
-									atAddress:[self baseAddress] +  [self getSampleAddress:i]
+									atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:i]
 									numToRead:1
 									withAddMod:[self addressModifier]
 								 usingAddSpace:0x01];
@@ -1233,194 +1234,201 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	if(![self isEvent]) return;
 	
  	NSLog(@"****Event\n");
-	[self disarmSampleLogic];
+	//[self disarmSampleLogic];
 	
     // Try disarm current bank and arm the next one
     //[self disarmAndArmNextBank];
 	
-    //let's readout
-	//[self writePageRegister:0x0];
+	if(bankOneArmed)[self writePageRegister:0x0];
+	else			[self writePageRegister:0x4];
 	
     // We've selected a particular page to readout for each channel
 	int i = 0;
-    //for( i=0;i<kNumSIS3302Channels;i++) {
+    for( i=0;i<kNumSIS3302Channels;i++) {
         [self readOutChannel:i];
-   // }
-}
-
-- (unsigned long) readEndAddress //temp for testing
-{
-	unsigned long end_sample_address = 0;
-	[[self adapter] readLongBlock:&end_sample_address
-						atAddress:[self baseAddress] + kSIS3302ENDAddressThresholdAdc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	return end_sample_address;
+    }
 }
 
 - (void) readOutChannel:(int) channel
 {
-	
-	//check a bunch of addresses -- not sure which one is relevent
-	unsigned long EventConfig = 0;
-	[[self adapter] readLongBlock:&EventConfig
-						atAddress:[self baseAddress] +kSIS3302EventConfigAdc12
+	NSLog(@"************Channel %d\n",channel);
+	unsigned long endSampleAddress = 0;
+	[[self adapter] readLongBlock:&endSampleAddress
+						atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
 						numToRead:1
 					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	NSLog(@"EventConfig: 0x%08x\n",EventConfig);
+					usingAddSpace:0x01];
+	NSLog(@"end_sample_address: 0x%08x\n",endSampleAddress);
 	
-    unsigned long end_sample_address = 0;
-	[[self adapter] readLongBlock:&end_sample_address
-						atAddress:[self baseAddress] + kSIS3302ENDAddressThresholdAdc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	NSLog(@"end_sample_address: 0x%08x\n",end_sample_address);
+    endSampleAddress &= 0xffffff ; // mask bank2 address bit (bit 24)
 	
-	unsigned long pretrigger = 0;
-	[[self adapter] readLongBlock:&pretrigger
-						atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggergateLengthAdc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"pretrigger: 0x%08x\n",pretrigger);
-
-	unsigned long rawDataBufferConfig = 0;
-	[[self adapter] readLongBlock:&rawDataBufferConfig
-						atAddress:[self baseAddress] + kSIS3302RAWDataBufferConfigAdc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"rawDataBufferConfig: 0x%08x\n",rawDataBufferConfig);
-
-	unsigned long actualNextSampleAddress1 = 0;
-	[[self adapter] readLongBlock:&actualNextSampleAddress1
-						atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc1
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"actualNextSampleAddress1: 0x%08x\n",actualNextSampleAddress1);
-
-	unsigned long actualNextSampleAddress2 = 0;
-	[[self adapter] readLongBlock:&actualNextSampleAddress2
-						atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc2
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"actualNextSampleAddress2: 0x%08x\n",actualNextSampleAddress2);
-
-	unsigned long prevNextSampleAddress1 = 0;
-	[[self adapter] readLongBlock:&prevNextSampleAddress1
-						atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc1
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"prevNextSampleAddress1: 0x%08x\n",prevNextSampleAddress1);
-
-	unsigned long prevNextSampleAddress2 = 0;
-	[[self adapter] readLongBlock:&prevNextSampleAddress2
-						atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc2
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"prevNextSampleAddress2: 0x%08x\n",prevNextSampleAddress2);
-
-	unsigned long triggerSetup1 = 0;
-	[[self adapter] readLongBlock:&triggerSetup1
-						atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc1
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"triggerSetup1: 0x%08x\n",triggerSetup1);
-	
-	unsigned long triggerSetup2 = 0;
-	[[self adapter] readLongBlock:&triggerSetup2
-						atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc2
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"triggerSetup2: 0x%08x\n",triggerSetup2);
-
-	unsigned long energySetupGP = 0;
-	[[self adapter] readLongBlock:&energySetupGP
-						atAddress:[self baseAddress] + kSIS3302EnergySetupGaPAdc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"energySetupGP: 0x%08x\n",energySetupGP);
-
-	unsigned long EnergyGateLen = 0;
-	[[self adapter] readLongBlock:&EnergyGateLen
-						atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAdc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"EnergyGateLen: 0x%08x\n",EnergyGateLen);
-
-	unsigned long EnergySampleLen = 0;
-	[[self adapter] readLongBlock:&EnergySampleLen
-						atAddress:[self baseAddress] + kSIS3302EnergySampleLengthAdc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"EnergySampleLen: 0x%08x\n",EnergySampleLen);
-	
-	unsigned long EnergySampleStartIndex = 0;
-	[[self adapter] readLongBlock:&EnergySampleStartIndex
-						atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex1Adc12
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
-	
-				
-    // check if bank address flag is valid
-    if (((end_sample_address >> 24) & 0x1) != ((bankOneArmed) ? 0x1 : 0x0) ) {   
-    	// in this case -> poll right arm flag or implement a delay
-    }
-	
-    // check buffer address
-    end_sample_address &= 0xffffff ; // mask bank2 address bit (bit 24)
-	
-    if (end_sample_address > 0x3fffff) {   // more than 1 page memory buffer is used
+    if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
         // Warning?
     }
 	
     // readout	   	
-    if (end_sample_address != 0) {
-    	unsigned long addr = [self baseAddress] + [self getADCBufferRegisterOffset:channel];
-        unsigned long num_bytes_to_read = (end_sample_address & 0x3ffffc)>>1;
-		NSLog(@"should read %d bytes: %d\n",num_bytes_to_read);
-		int n;
-		unsigned long data=0;
-		for(n=0;n<num_bytes_to_read;n+=4){
-			unsigned long adc_Memory1 = 0;
-			[[self adapter] readLongBlock:&adc_Memory1
-								atAddress:[self baseAddress] + [self getADCBufferRegisterOffset:channel] + n
-								numToRead:1
-							   withAddMod: [self addressModifier]
-							usingAddSpace:0x01];
-			NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
-			//int32_t error = DMARead(addr, (uint32_t)0x08, 
-			//						(uint32_t)8, buffer,  
-			//						num_bytes_to_read);
+    if (endSampleAddress != 0) {
+		
+		//check a bunch of addresses -- not sure which one is relevent
+		unsigned long EventConfig = 0;
+		[[self adapter] readLongBlock:&EventConfig
+							atAddress:[self baseAddress] +kSIS3302EventConfigAdc12
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		NSLog(@"EventConfig: 0x%08x\n",EventConfig);
+		
+		
+		unsigned long pretrigger = 0;
+		[[self adapter] readLongBlock:&pretrigger
+							atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggergateLengthAdc12
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"pretrigger: 0x%08x\n",pretrigger);
+		
+		unsigned long rawDataBufferConfig = 0;
+		[[self adapter] readLongBlock:&rawDataBufferConfig
+							atAddress:[self baseAddress] + kSIS3302RAWDataBufferConfigAdc12
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"rawDataBufferConfig: 0x%08x\n",rawDataBufferConfig);
+		
+		unsigned long actualNextSampleAddress1 = 0;
+		[[self adapter] readLongBlock:&actualNextSampleAddress1
+							atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc1
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"actualNextSampleAddress1: 0x%08x\n",actualNextSampleAddress1);
+		
+		unsigned long actualNextSampleAddress2 = 0;
+		[[self adapter] readLongBlock:&actualNextSampleAddress2
+							atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc2
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"actualNextSampleAddress2: 0x%08x\n",actualNextSampleAddress2);
+		
+		unsigned long prevNextSampleAddress1 = 0;
+		[[self adapter] readLongBlock:&prevNextSampleAddress1
+							atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc1
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"prevNextSampleAddress1: 0x%08x\n",prevNextSampleAddress1);
+		
+		unsigned long prevNextSampleAddress2 = 0;
+		[[self adapter] readLongBlock:&prevNextSampleAddress2
+							atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc2
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"prevNextSampleAddress2: 0x%08x\n",prevNextSampleAddress2);
+		
+		unsigned long triggerSetup1 = 0;
+		[[self adapter] readLongBlock:&triggerSetup1
+							atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc1
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"triggerSetup1: 0x%08x\n",triggerSetup1);
+		
+		unsigned long triggerSetup2 = 0;
+		[[self adapter] readLongBlock:&triggerSetup2
+							atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc2
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"triggerSetup2: 0x%08x\n",triggerSetup2);
+		
+		unsigned long energySetupGP = 0;
+		[[self adapter] readLongBlock:&energySetupGP
+							atAddress:[self baseAddress] + kSIS3302EnergySetupGaPAdc12
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"energySetupGP: 0x%08x\n",energySetupGP);
+		
+		unsigned long EnergyGateLen = 0;
+		[[self adapter] readLongBlock:&EnergyGateLen
+							atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAdc12
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"EnergyGateLen: 0x%08x\n",EnergyGateLen);
+		
+		unsigned long EnergySampleLen = 0;
+		[[self adapter] readLongBlock:&EnergySampleLen
+							atAddress:[self baseAddress] + kSIS3302EnergySampleLengthAdc12
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"EnergySampleLen: 0x%08x\n",EnergySampleLen);
+		
+		unsigned long EnergySampleStartIndex = 0;
+		[[self adapter] readLongBlock:&EnergySampleStartIndex
+							atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex1Adc12
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		
+		NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
+		
+		
+		
+		// check if bank address flag is valid
+		if (((endSampleAddress >> 24) & 0x1) != ((bankOneArmed) ? 0x1 : 0x0) ) {   
+			// in this case -> poll right arm flag or implement a delay
 		}
-    }
-    // Now write to data buffer 
+		
+		endSampleAddress = endSampleAddress & 0xffffff;
+		
+		
+		unsigned int  uint_max_event_use , uint_max_event_saved ;
+		unsigned int gl_uint_CountOfNotProcessedTriggerCount;
+		// check buffer address
+		if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
+			uint_max_event_saved =  endSampleAddress / eventLengthLongWords ;
+			
+			endSampleAddress = 2 * (1 * eventLengthLongWords) ; // max 8Mbyte (inside one page) **only one event in this test code
+			uint_max_event_use =  endSampleAddress / eventLengthLongWords ;
+			gl_uint_CountOfNotProcessedTriggerCount = gl_uint_CountOfNotProcessedTriggerCount + (uint_max_event_saved - uint_max_event_use) ;
+		}
+		if (endSampleAddress != 0) {
+			
+			unsigned long numToRead = (endSampleAddress & 0x3ffffc)/2;
+			NSLog(@"channel %d should read %d longs\n",channel,numToRead);
+			int n;
+			//for(n=0;n<numToRead;n+=4){
+			for(n=0;n<40;n+=4){
+				unsigned long adc_Memory1 = 0;
+				
+				//****TO DO read block....
+				[[self adapter] readLongBlock:&adc_Memory1
+									atAddress:[self baseAddress] + [self getADCBufferRegisterOffset:channel] + n
+									numToRead:1
+								   withAddMod: [self addressModifier]
+								usingAddSpace:0x01];
+				NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
+				//int32_t error = DMARead(addr, (uint32_t)0x08, 
+				//						(uint32_t)8, buffer,  
+				//						num_bytes_to_read);
+			}
+		}
+	}
 }
 
 - (void) disarmSampleLogic

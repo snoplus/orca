@@ -96,8 +96,6 @@
 	unsigned long eventLengthLongWords;
 }
 
-- (unsigned long) readEndAddress; //temp for testing
-
 - (id) init;
 - (void) dealloc;
 - (void) setUpImage;
