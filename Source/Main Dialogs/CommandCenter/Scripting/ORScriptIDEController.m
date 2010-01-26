@@ -44,10 +44,23 @@
 {
 	[super awakeFromNib];
 	[statusField setTimeOut:1.5];
-	NSString*   path = [[NSBundle mainBundle] pathForResource: @"OrcaScriptGuide" ofType: @"rtf"];
-	[helpView readRTFDFromFile:path];
+	[self loadHelpFile];
 	//some scripts can't be chained together -- get rid of the button that are not used
 	[breakChainButton setTransparent:[model nextScriptConnector]==nil];
+}
+
+- (void) loadHelpFile
+{
+	NSString*   path = [[NSBundle mainBundle] pathForResource: @"OrcaScriptGuide" ofType: @"rtf"];
+	[helpView readRTFDFromFile:path];
+}
+
+- (void) loadClassMethods
+{
+	NSString* theClassName = [classNameField stringValue];
+	if([theClassName length]){
+		[helpView setString:listMethodWithOptions(NSClassFromString(theClassName),YES,[model showSuperClass])];
+	}
 }
 
 - (void) setModel:(id)aModel
@@ -383,10 +396,12 @@
 
 - (IBAction) listMethodsAction:(id) sender
 {
-	NSString* theClassName = [classNameField stringValue];
-	if([theClassName length]){
-		NSLog(@"\n%@\n",listMethodWithOptions(NSClassFromString(theClassName),YES,[model showSuperClass]));
-	}
+	[self loadClassMethods];
+}
+
+- (IBAction) loadHelpAction:(id) sender
+{
+	[self loadHelpFile];
 }
 
 - (IBAction) cancelLoadSaveAction:(id)sender

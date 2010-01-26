@@ -62,6 +62,8 @@
 - (id)   init;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) loadHelpFile;
+- (void) loadClassMethods;
 
 #pragma mark •••Interface Management
 - (void) globalsChanged:(NSNotification*)aNote;
@@ -87,6 +89,7 @@
 - (IBAction) debuggerAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) showSuperClassAction:(id)sender;
+- (IBAction) loadHelpAction:(id) sender;
 - (IBAction) listMethodsAction:(id) sender;
 - (IBAction) cancelLoadSaveAction:(id)sender;
 - (IBAction) loadSaveAction:(id)sender;
