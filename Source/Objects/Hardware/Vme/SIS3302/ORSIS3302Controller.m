@@ -575,7 +575,6 @@
 	[gtMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[checkEventButton	    setEnabled:!locked && !runInProgress];
-	[testMemoryButton	    setEnabled:!locked && !runInProgress];
 	
 	[csrMatrix				setEnabled:!locked && !runInProgress];
 	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
@@ -780,17 +779,6 @@
 }
 
 //hardware actions
-- (IBAction) testMemoryBankAction:(id)sender;
-{
-	@try {
-		[model testMemory];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Test of SIS 3300 Memory Bank failed\n");
-        NSRunAlertPanel([localException name], @"%@/nTest Memory Failed", @"OK", nil, nil,
-                        localException);
-	}
-}
 - (IBAction) probeBoardAction:(id)sender;
 {
 	@try {

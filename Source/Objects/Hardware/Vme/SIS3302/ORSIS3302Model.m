@@ -826,7 +826,6 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
-		
 	}
 }
 
@@ -1008,96 +1007,6 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	[self writeBufferConfiguration];
 	[self writeEventConfiguration];
 	[self writeEnergyFilterValues];
-}
-
-- (void) testMemory
-{
-	long i;
-	for(i=0;i<1024;i++){
-		unsigned long aValue = i;
-		[[self adapter] writeLongBlock: &aValue
-							atAddress: [self baseAddress] + 0x00400000+i*4
-							numToWrite: 1
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];
-	}
-	long errorCount =0;
-	for(i=0;i<1024;i++){
-		unsigned long aValue;
-		[[self adapter] readLongBlock: &aValue
-							atAddress: [self baseAddress] + 0x00400000+i*4
-							numToRead: 1
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];
-		if(aValue!=i)errorCount++;
-	}
-	if(errorCount)NSLog(@"Error R/W Bank memory: %d errors\n",errorCount);
-	else NSLog(@"Memory Bank Test Passed\n");
-}
-
-- (void) readOneEvent
-{
-	ORTimer* aTimer;
-	@try {
-		aTimer = [[ORTimer alloc] init];
-		// Readout Loop 
-		
-		[self disarmAndArmBank:0];
-
-		// wait for address threshold flag
-		BOOL eventHappened = NO;
-		[aTimer start];
-		do {
-			unsigned long data_rd;
-			[[self adapter] readLongBlock:&data_rd
-								 atAddress:[self baseAddress] + kSIS3302AcquistionControl
-								numToRead:1
-								withAddMod:[self addressModifier]
-							 usingAddSpace:0x01];
-			if((data_rd & 0x80000) == 0x80000){
-				eventHappened = YES;
-				break;
-			}
-			if([aTimer seconds]>2)break;
-		} while (1);
-		
-		if(eventHappened){
-			
-			[self disarmSampleLogic];
-			
-			NSLog(@"eventHappened\n");
-			
-			//unsigned long adc1_buffer[8][0x200000] ; // 8MByte 
-			int i;
-			for(i=0;i<kNumSIS3302Channels;i++){
-				unsigned long endSampleAddress = 0;
-				[[self adapter] readLongBlock:&endSampleAddress
-									atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:i]
-									numToRead:1
-									withAddMod:[self addressModifier]
-								 usingAddSpace:0x01];
-				NSLog(@"endSampleAddress %d: 0x%x\n",i, endSampleAddress);
-				
-				
-				/*
-				if (endSampleAddress != 0) {
-					[[self adapter] readLongBlock:adc1_buffer[i]
-										 atAddress:[self baseAddress] + adcMemory[i]
-										numToRead:(endSampleAddress & 0x3ffffc)>>1
-										withAddMod:[self addressModifier]
-									 usingAddSpace:0x01];
-					
-				}
-				 */
-			}
-		}
-		else NSLog(@"NO Event\n");
-	}
-	@catch(NSException* e){
-	}
-	@finally {
-		[aTimer release];
-	}
 }
 
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 

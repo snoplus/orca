@@ -72,7 +72,6 @@
     IBOutlet NSButton*      initButton;
     IBOutlet NSButton*      statusButton;
 	IBOutlet NSButton*		checkEventButton;
-	IBOutlet NSButton*		testMemoryButton;
 	
 	IBOutlet NSPopUpButton*	triggerDecimationPU;
 
@@ -179,7 +178,6 @@
 - (IBAction) internalTriggerDelayAction:(id)sender;
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;
-- (IBAction) testMemoryBankAction:(id)sender;
 - (IBAction) checkEvent:(id)sender;
 - (IBAction) report:(id)sender;
 - (IBAction) forceTrigger:(id)sender;

@@ -238,8 +238,6 @@
 - (int) dataWord:(int)chan index:(int)index;
 
 - (unsigned long) acqReg;
-- (void) testMemory;
-- (void) readOneEvent;
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel;
 - (unsigned long) getADCBufferRegisterOffset:(int) channel;
 - (void) readOutEvents;
