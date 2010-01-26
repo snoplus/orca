@@ -51,6 +51,10 @@
 
 - (void) main 
 {
+	if(![[NSFileManager defaultManager] fileExistsAtPath:filePath]){
+		NSLog(@"<%@> does not exist.\n",filePath);
+		return;
+	}
 	NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
 	if([currentDecoder legalDataFile:fh]){
 		dataToProcess = [[NSMutableData dataWithCapacity:kAmountToRead] retain];
