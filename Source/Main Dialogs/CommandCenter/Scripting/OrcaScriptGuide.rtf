@@ -163,11 +163,12 @@ Note the 'display' is a
 
 \b LogFiles\
 
-\b0 logfile (<filePath>);  
-\i //subsequent prints go to <filePath>
-\i0 \
-logfile  <filePath>; \
+\b0 logfile (<var,var,...>); //subsequent prints go to this file\
+logfile  <var,var,...>; \
 \
+example:  logfile "~/MyOutputLog",10 ; //output file is "MyOutputLog10" in your home dir.\
+Note: Output is appended to the end of existing files. If you wish \
+to start a new empty file with the same name, you must manually delete the old file.\
 \
 
 \b Special
