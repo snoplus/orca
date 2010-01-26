@@ -28,11 +28,23 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet NSPopUpButton* runModePU;
+	IBOutlet NSTextField*	endAddressThresholdField;
+	IBOutlet NSTextField*	energySampleStartIndex3Field;
+	IBOutlet NSTextField*	energyTauFactorField;
+	IBOutlet NSTextField*	energySampleStartIndex2Field;
+	IBOutlet NSTextField*	energySampleStartIndex1Field;
+	IBOutlet NSTextField*	energySampleLengthField;
+	IBOutlet NSTextField*	energyGapTimeField;
+	IBOutlet NSTextField*	energyPeakingTimeField;
+	IBOutlet NSTextField*	triggerGateLengthField;
+	IBOutlet NSTextField*	preTriggerDelayField;
 	IBOutlet NSTextField*	sampleStartIndexField;
 	IBOutlet NSTextField*	sampleLengthField;
-	IBOutlet NSTextField*	dacOffsetField;
 	IBOutlet NSPopUpButton* lemoInModePU;
+	IBOutlet NSTextField*	lemoInAssignmentsField;
 	IBOutlet NSPopUpButton* lemoOutModePU;
+	IBOutlet NSTextField*	lemoOutAssignmentsField;
 	IBOutlet NSMatrix*		acqRegEnableMaskMatrix;
 	
 	//base address
@@ -41,29 +53,28 @@
 	
 	//CSR
 	IBOutlet NSMatrix*		csrMatrix;
-	IBOutlet NSMatrix*		eventConfigMatrix;
 	
 
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
 	IBOutlet NSPopUpButton* clockSourcePU;
-	IBOutlet NSPopUpButton* pageSizePU;
-	IBOutlet ORPlotter1D*   plotter;
 
 	IBOutlet NSMatrix*		enabledMatrix;
 	IBOutlet NSMatrix*		gtMatrix;
+	IBOutlet NSMatrix*		dacOffsetMatrix;
 	IBOutlet NSMatrix*		thresholdMatrix;
 	IBOutlet NSMatrix*		gateLengthMatrix;
 	IBOutlet NSMatrix*		pulseLengthMatrix;
 	IBOutlet NSMatrix*		sumGMatrix;
 	IBOutlet NSMatrix*		peakingTimeMatrix;
 	IBOutlet NSMatrix*		internalTriggerDelayMatrix;
-	IBOutlet NSMatrix*		triggerDecimationMatrix;
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
     IBOutlet NSButton*      statusButton;
 	IBOutlet NSButton*		checkEventButton;
 	IBOutlet NSButton*		testMemoryButton;
+	
+	IBOutlet NSPopUpButton*	triggerDecimationPU;
 
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
@@ -89,6 +100,17 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) runModeChanged:(NSNotification*)aNote;
+- (void) endAddressThresholdChanged:(NSNotification*)aNote;
+- (void) energyTauFactorChanged:(NSNotification*)aNote;
+- (void) energySampleStartIndex3Changed:(NSNotification*)aNote;
+- (void) energySampleStartIndex2Changed:(NSNotification*)aNote;
+- (void) energySampleStartIndex1Changed:(NSNotification*)aNote;
+- (void) energySampleLengthChanged:(NSNotification*)aNote;
+- (void) energyGapTimeChanged:(NSNotification*)aNote;
+- (void) energyPeakingTimeChanged:(NSNotification*)aNote;
+- (void) triggerGateLengthChanged:(NSNotification*)aNote;
+- (void) preTriggerDelayChanged:(NSNotification*)aNote;
 - (void) sampleStartIndexChanged:(NSNotification*)aNote;
 - (void) sampleLengthChanged:(NSNotification*)aNote;
 - (void) dacOffsetChanged:(NSNotification*)aNote;
@@ -96,10 +118,8 @@
 - (void) lemoOutModeChanged:(NSNotification*)aNote;
 - (void) acqRegEnableMaskChanged:(NSNotification*)aNote;
 - (void) csrChanged:(NSNotification*)aNote;
-- (void) eventConfigChanged:(NSNotification*)aNote;
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
-- (void) pageSizeChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
@@ -123,6 +143,16 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) runModeAction:(id)sender;
+- (IBAction) energySampleStartIndex3Action:(id)sender;
+- (IBAction) energyTauFactorAction:(id)sender;
+- (IBAction) energySampleStartIndex2Action:(id)sender;
+- (IBAction) energySampleStartIndex1Action:(id)sender;
+- (IBAction) energySampleLengthAction:(id)sender;
+- (IBAction) energyGapTimeAction:(id)sender;
+- (IBAction) energyPeakingTimeAction:(id)sender;
+- (IBAction) triggerGateLengthAction:(id)sender;
+- (IBAction) preTriggerDelayAction:(id)sender;
 - (IBAction) sampleStartIndexAction:(id)sender;
 - (IBAction) sampleLengthAction:(id)sender;
 - (IBAction) dacOffsetAction:(id)sender;
@@ -130,8 +160,6 @@
 - (IBAction) lemoOutModeAction:(id)sender;
 - (IBAction) acqRegEnableMaskAction:(id)sender;
 - (IBAction) csrAction:(id)sender;
-- (IBAction) eventConfigAction:(id)sender;
-- (IBAction) pageSizeAction:(id)sender;
 
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
@@ -153,6 +181,8 @@
 - (IBAction) readThresholdsAction:(id)sender;
 - (IBAction) testMemoryBankAction:(id)sender;
 - (IBAction) checkEvent:(id)sender;
+- (IBAction) report:(id)sender;
+- (IBAction) forceTrigger:(id)sender;
 
 #pragma mark •••Data Source
 - (double)  getBarValue:(int)tag;

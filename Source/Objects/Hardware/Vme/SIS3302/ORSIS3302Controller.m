@@ -148,12 +148,7 @@
                      selector : @selector(thresholdChanged:)
                          name : ORSIS3302ThresholdChanged
                        object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(pageSizeChanged:)
-                         name : ORSIS3302PageSizeChanged
-						object: model];
-	
+		
     [self registerRates];
 
 	
@@ -170,11 +165,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(csrChanged:)
                          name : ORSIS3302CSRRegChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(updatePlot)
-                         name : ORSIS3302SampleDone
 						object: model];
 	
     [notifyCenter addObserver : self
@@ -237,6 +227,61 @@
                          name : ORSIS3302SampleStartIndexChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(preTriggerDelayChanged:)
+                         name : ORSIS3302ModelPreTriggerDelayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerGateLengthChanged:)
+                         name : ORSIS3302ModelTriggerGateLengthChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energyPeakingTimeChanged:)
+                         name : ORSIS3302ModelEnergyPeakingTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energyGapTimeChanged:)
+                         name : ORSIS3302ModelEnergyGapTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energySampleLengthChanged:)
+                         name : ORSIS3302ModelEnergySampleLengthChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energySampleStartIndex1Changed:)
+                         name : ORSIS3302ModelEnergySampleStartIndex1Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energySampleStartIndex2Changed:)
+                         name : ORSIS3302ModelEnergySampleStartIndex2Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energyTauFactorChanged:)
+                         name : ORSIS3302ModelEnergyTauFactorChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(energySampleStartIndex3Changed:)
+                         name : ORSIS3302ModelEnergySampleStartIndex3Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(endAddressThresholdChanged:)
+                         name : ORSIS3302ModelEndAddressThresholdChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runModeChanged:)
+                         name : ORSIS3302ModelRunModeChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -281,10 +326,8 @@
     [self totalRateChanged:nil];
     [self updateTimePlot:nil];
     [self waveFormRateChanged:nil];
-	[self pageSizeChanged:nil];
 	[self clockSourceChanged:nil];
 	
-	[self eventConfigChanged:nil];
 	[self csrChanged:nil];
 	[self acqRegEnableMaskChanged:nil];
 	[self lemoOutModeChanged:nil];
@@ -292,14 +335,77 @@
 	[self dacOffsetChanged:nil];
 	[self sampleLengthChanged:nil];
 	[self sampleStartIndexChanged:nil];
-}
-
-- (void) updatePlot
-{
-	[plotter setNeedsDisplay:YES];
+	[self preTriggerDelayChanged:nil];
+	[self triggerGateLengthChanged:nil];
+	[self energyPeakingTimeChanged:nil];
+	[self energyGapTimeChanged:nil];
+	[self energySampleLengthChanged:nil];
+	[self energySampleStartIndex1Changed:nil];
+	[self energySampleStartIndex2Changed:nil];
+	[self energyTauFactorChanged:nil];
+	[self energySampleStartIndex3Changed:nil];
+	[self endAddressThresholdChanged:nil];
+	[self runModeChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) runModeChanged:(NSNotification*)aNote
+{
+	[runModePU selectItemAtIndex: [model runMode]];
+	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
+	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
+}
+
+- (void) endAddressThresholdChanged:(NSNotification*)aNote
+{
+	[endAddressThresholdField setIntValue: [model endAddressThreshold]];
+}
+
+- (void) energySampleStartIndex3Changed:(NSNotification*)aNote
+{
+	[energySampleStartIndex3Field setIntValue: [model energySampleStartIndex3]];
+}
+
+- (void) energyTauFactorChanged:(NSNotification*)aNote
+{
+	[energyTauFactorField setIntValue: [model energyTauFactor]];
+}
+
+- (void) energySampleStartIndex2Changed:(NSNotification*)aNote
+{
+	[energySampleStartIndex2Field setIntValue: [model energySampleStartIndex2]];
+}
+
+- (void) energySampleStartIndex1Changed:(NSNotification*)aNote
+{
+	[energySampleStartIndex1Field setIntValue: [model energySampleStartIndex1]];
+}
+
+- (void) energySampleLengthChanged:(NSNotification*)aNote
+{
+	[energySampleLengthField setIntValue: [model energySampleLength]];
+}
+
+- (void) energyGapTimeChanged:(NSNotification*)aNote
+{
+	[energyGapTimeField setIntValue: [model energyGapTime]];
+}
+
+- (void) energyPeakingTimeChanged:(NSNotification*)aNote
+{
+	[energyPeakingTimeField setIntValue: [model energyPeakingTime]];
+}
+
+- (void) triggerGateLengthChanged:(NSNotification*)aNote
+{
+	[triggerGateLengthField setIntValue: [model triggerGateLength]];
+}
+
+- (void) preTriggerDelayChanged:(NSNotification*)aNote
+{
+	[preTriggerDelayField setIntValue: [model preTriggerDelay]];
+}
 
 - (void) sampleStartIndexChanged:(NSNotification*)aNote
 {
@@ -311,19 +417,16 @@
 	[sampleLengthField setIntValue: [model sampleLength]];
 }
 
-- (void) dacOffsetChanged:(NSNotification*)aNote
-{
-	[dacOffsetField setIntValue: [model dacOffset]];
-}
-
 - (void) lemoInModeChanged:(NSNotification*)aNote
 {
 	[lemoInModePU selectItemAtIndex: [model lemoInMode]];
+	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
 }
 
 - (void) lemoOutModeChanged:(NSNotification*)aNote
 {
 	[lemoOutModePU selectItemAtIndex: [model lemoOutMode]];
+	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
 }
 
 - (void) acqRegEnableMaskChanged:(NSNotification*)aNote
@@ -346,20 +449,9 @@
 	[[csrMatrix cellWithTag:6] setIntValue:[model bankFullTo3]];
 }
 
-- (void) eventConfigChanged:(NSNotification*)aNote
-{
-	[[eventConfigMatrix cellWithTag:0] setIntValue:[model pageWrap]];
-	[[eventConfigMatrix cellWithTag:1] setIntValue:[model gateChaining]];
-}
-
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
-}
-
-- (void) pageSizeChanged:(NSNotification*)aNote
-{
-	[pageSizePU selectItemWithTag: [model pageSize]];
 }
 
 - (void) enabledChanged:(NSNotification*)aNote
@@ -367,7 +459,6 @@
 	short i;
 	for(i=0;i<kNumSIS3302Channels;i++){
 		[[enabledMatrix cellWithTag:i] setState:[model enabled:i]];
-		[[enabled2Matrix cellWithTag:i] setState:[model enabled:i]];
 	}
 }
 
@@ -385,6 +476,15 @@
 	for(i=0;i<kNumSIS3302Channels;i++){
 		//float volts = (0.0003*[model threshold:i])-5.0;
 		[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+	}
+}
+
+- (void) dacOffsetChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels;i++){
+		//float volts = (0.0003*[model threshold:i])-5.0;
+		[[dacOffsetMatrix cellWithTag:i] setIntValue:[model dacOffset:i]];
 	}
 }
 
@@ -430,10 +530,7 @@
 
 - (void) triggerDecimationChanged:(NSNotification*)aNote
 {
-	short i;
-	for(i=0;i<kNumSIS3302Channels;i++){
-		[[triggerDecimationMatrix cellWithTag:i] setIntValue:[model triggerDecimation:i]];
-	}
+	[triggerDecimationPU selectItemAtIndex:[model triggerDecimation]];
 }
 
 - (void) waveFormRateChanged:(NSNotification*)aNote
@@ -467,7 +564,6 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3302SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3302SettingsLock];
@@ -482,9 +578,7 @@
 	[testMemoryButton	    setEnabled:!locked && !runInProgress];
 	
 	[csrMatrix				setEnabled:!locked && !runInProgress];
-	[eventConfigMatrix		setEnabled:!locked && !runInProgress];
 	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
-	[pageSizePU				setEnabled:!locked && !runInProgress];
 }
 
 - (void) setModel:(id)aModel
@@ -587,32 +681,78 @@
 
 #pragma mark •••Actions
 
-- (void) sampleStartIndexAction:(id)sender
+- (IBAction) runModeAction:(id)sender
+{
+	[model setRunMode:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) energySampleStartIndex3Action:(id)sender
+{
+	[model setEnergySampleStartIndex3:[sender intValue]];	
+}
+
+- (IBAction) energyTauFactorAction:(id)sender
+{
+	[model setEnergyTauFactor:[sender intValue]];	
+}
+
+- (IBAction) energySampleStartIndex2Action:(id)sender
+{
+	[model setEnergySampleStartIndex2:[sender intValue]];	
+}
+
+- (IBAction) energySampleStartIndex1Action:(id)sender
+{
+	[model setEnergySampleStartIndex1:[sender intValue]];	
+}
+
+- (IBAction) energySampleLengthAction:(id)sender
+{
+	[model setEnergySampleLength:[sender intValue]];	
+}
+
+- (IBAction) energyGapTimeAction:(id)sender
+{
+	[model setEnergyGapTime:[sender intValue]];	
+}
+
+- (IBAction) energyPeakingTimeAction:(id)sender
+{
+	[model setEnergyPeakingTime:[sender intValue]];	
+}
+
+- (IBAction) triggerGateLengthAction:(id)sender
+{
+	[model setTriggerGateLength:[sender intValue]];	
+}
+
+- (IBAction) preTriggerDelayAction:(id)sender
+{
+	[model setPreTriggerDelay:[sender intValue]];	
+}
+
+
+- (IBAction) sampleStartIndexAction:(id)sender
 {
 	[model setSampleStartIndex:[sender intValue]];	
 }
 
-- (void) sampleLengthAction:(id)sender
+- (IBAction) sampleLengthAction:(id)sender
 {
 	[model setSampleLength:[sender intValue]];	
 }
 
-- (void) dacOffsetAction:(id)sender
-{
-	[model setDacOffset:[sender intValue]];	
-}
-
-- (void) lemoInModeAction:(id)sender
+- (IBAction) lemoInModeAction:(id)sender
 {
 	[model setLemoInMode:[sender indexOfSelectedItem]];	
 }
 
-- (void) lemoOutModeAction:(id)sender
+- (IBAction) lemoOutModeAction:(id)sender
 {
 	[model setLemoOutMode:[sender indexOfSelectedItem]];	
 }
 
-- (void) acqRegEnableMaskAction:(id)sender
+- (IBAction) acqRegEnableMaskAction:(id)sender
 {
 	unsigned short aMask = 0;
 	int i;
@@ -639,17 +779,6 @@
 	}
 }
 
-- (IBAction) eventConfigAction:(id)sender
-{
-	//tags are defined in IB, they have to match here or there will be trouble
-	BOOL state = [[sender selectedCell] intValue];
-	switch ([[sender selectedCell] tag]) {
-		case 0: [model setPageWrap:state];			break; 
-		case 1: [model setGateChaining:state];		break; 
-		default: break;
-	}
-}
-
 //hardware actions
 - (IBAction) testMemoryBankAction:(id)sender;
 {
@@ -658,6 +787,8 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Test of SIS 3300 Memory Bank failed\n");
+        NSRunAlertPanel([localException name], @"%@/nTest Memory Failed", @"OK", nil, nil,
+                        localException);
 	}
 }
 - (IBAction) probeBoardAction:(id)sender;
@@ -667,18 +798,25 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS 3300 board ID failed\n");
+        NSRunAlertPanel([localException name], @"%@\nProbe Failed", @"OK", nil, nil,
+                        localException);
+	}
+}
+- (IBAction) forceTrigger:(id)sender;
+{
+	@try {
+		[model forceTrigger];
+	}
+	@catch (NSException* localException) {
+		NSLog(@"Trigger of SIS 3300 failed\n");
+        NSRunAlertPanel([localException name], @"%@\nForce Trigger Failed", @"OK", nil, nil,
+                        localException);
 	}
 }
 
 - (IBAction) clockSourceAction:(id)sender
 {
 	[model setClockSource:[sender indexOfSelectedItem]];	
-}
-
-
-- (IBAction) pageSizeAction:(id)sender
-{
-	[model setPageSize:[[sender selectedItem] tag]];	
 }
 
 - (IBAction) enabledAction:(id)sender
@@ -693,9 +831,15 @@
 
 - (IBAction) thresholdAction:(id)sender
 {
-	//int dacVal = ([sender floatValue]+5)/0.0003;
     if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
 		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) dacOffsetAction:(id)sender
+{
+    if([sender intValue] != [model dacOffset:[[sender selectedCell] tag]]){
+		[model setDacOffset:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 
@@ -736,8 +880,8 @@
 
 - (IBAction) triggerDecimationAction:(id)sender
 {
-    if([sender intValue] != [model triggerDecimation:[[sender selectedCell] tag]]){
-		[model setTriggerDecimation:[[sender selectedCell] tag] withValue:[sender intValue]];
+    if([sender intValue] != [model triggerDecimation]){
+		[model setTriggerDecimation:[sender indexOfSelectedItem]];
 	}
 }
 
@@ -824,8 +968,30 @@
 
 - (IBAction) checkEvent:(id)sender
 {
-	[self endEditing];
-	[model testEventRead];
+    @try {
+		[self endEditing];
+		[model initBoard];
+		[model readOutEvents];
+	}
+	@catch(NSException* localException) {
+        NSLog(@"SIS3302 Test Read FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3302 Test Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) report:(id)sender
+{
+    @try {
+		[self endEditing];
+		[model initBoard];
+		[model report];
+	}
+	@catch(NSException* localException) {
+        NSLog(@"SIS3302 Report FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3302 Report FAILED", @"OK", nil, nil,
+                        localException);
+    }
 }
 
 #pragma mark •••Data Source
@@ -842,27 +1008,19 @@
 
 - (int) 	numberOfDataSetsInPlot:(id)aPlotter
 {
-	if(aPlotter== plotter)return 8;
-	else return 1;
+	return 1;
 }
 
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-	if(aPlotter== plotter)return [model numberOfSamples];
-	else return [[[model waveFormRateGroup]timeRate]count];
+	return [[[model waveFormRateGroup]timeRate]count];
 }
 
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
-	if(aPlotter== plotter){
-		return [model dataWord:set index:x];
-	}
-	else if(set == 0){
-		int count = [[[model waveFormRateGroup]timeRate] count];
-		return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
-		
-	}
-	return 0;
+
+	int count = [[[model waveFormRateGroup]timeRate] count];
+	return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
 }
 
 - (unsigned long)  	secondsPerUnit:(id) aPlotter

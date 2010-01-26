@@ -28,6 +28,17 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
+NSString* ORSIS3302ModelRunModeChanged = @"ORSIS3302ModelRunModeChanged";
+NSString* ORSIS3302ModelEndAddressThresholdChanged = @"ORSIS3302ModelEndAddressThresholdChanged";
+NSString* ORSIS3302ModelEnergySampleStartIndex3Changed	= @"ORSIS3302ModelEnergySampleStartIndex3Changed";
+NSString* ORSIS3302ModelEnergyTauFactorChanged			= @"ORSIS3302ModelEnergyTauFactorChanged";
+NSString* ORSIS3302ModelEnergySampleStartIndex2Changed	= @"ORSIS3302ModelEnergySampleStartIndex2Changed";
+NSString* ORSIS3302ModelEnergySampleStartIndex1Changed	= @"ORSIS3302ModelEnergySampleStartIndex1Changed";
+NSString* ORSIS3302ModelEnergySampleLengthChanged		= @"ORSIS3302ModelEnergySampleLengthChanged";
+NSString* ORSIS3302ModelEnergyGapTimeChanged	 = @"ORSIS3302ModelEnergyGapTimeChanged";
+NSString* ORSIS3302ModelEnergyPeakingTimeChanged = @"ORSIS3302ModelEnergyPeakingTimeChanged";
+NSString* ORSIS3302ModelTriggerGateLengthChanged = @"ORSIS3302ModelTriggerGateLengthChanged";
+NSString* ORSIS3302ModelPreTriggerDelayChanged  = @"ORSIS3302ModelPreTriggerDelayChanged";
 NSString* ORSIS3302SampleStartIndexChanged		= @"ORSIS3302SampleStartIndexChanged";
 NSString* ORSIS3302SampleLengthChanged			= @"ORSIS3302SampleLengthChanged";
 NSString* ORSIS3302DacOffsetChanged				= @"ORSIS3302DacOffsetChanged";
@@ -37,7 +48,6 @@ NSString* ORSIS3302AcqRegEnableMaskChanged		= @"ORSIS3302AcqRegEnableMaskChanged
 NSString* ORSIS3302CSRRegChanged				= @"ORSIS3302CSRRegChanged";
 NSString* ORSIS3302AcqRegChanged				= @"ORSIS3302AcqRegChanged";
 NSString* ORSIS3302EventConfigChanged			= @"ORSIS3302EventConfigChanged";
-NSString* ORSIS3302PageSizeChanged				= @"ORSIS3302PageSizeChanged";
 
 NSString* ORSIS3302ClockSourceChanged			= @"ORSIS3302ClockSourceChanged";
 
@@ -60,91 +70,20 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 @interface ORSIS3302Model (private)
 - (void) writeDacOffsets;
+- (void) setUpArrays;
 @end
 
 @implementation ORSIS3302Model
-
-#pragma mark •••Static Declarations
-static unsigned long thresholdRegOffsets[8]={
-	kSIS3302TriggerThresholdAdc1,
-	kSIS3302TriggerThresholdAdc2,
-	kSIS3302TriggerThresholdAdc3,
-	kSIS3302TriggerThresholdAdc4,
-	kSIS3302TriggerThresholdAdc5,
-	kSIS3302TriggerThresholdAdc6,
-	kSIS3302TriggerThresholdAdc7,
-	kSIS3302TriggerThresholdAdc8
-};
-
-static unsigned long triggerSetupRegOffsets[8]={
-	kSIS3302TriggerSetupAdc1,
-	kSIS3302TriggerSetupAdc2,
-	kSIS3302TriggerSetupAdc3,
-	kSIS3302TriggerSetupAdc4,
-	kSIS3302TriggerSetupAdc5,
-	kSIS3302TriggerSetupAdc6,
-	kSIS3302TriggerSetupAdc7,
-	kSIS3302TriggerSetupAdc8
-};
-
-static unsigned long triggerExtSetupRegOffsets[8]={
-	kSIS3302TriggerExtendedSetupAdc1,
-	kSIS3302TriggerExtendedSetupAdc2,
-	kSIS3302TriggerExtendedSetupAdc3,
-	kSIS3302TriggerExtendedSetupAdc4,
-	kSIS3302TriggerExtendedSetupAdc5,
-	kSIS3302TriggerExtendedSetupAdc6,
-	kSIS3302TriggerExtendedSetupAdc7,
-	kSIS3302TriggerExtendedSetupAdc8
-};
-
-
-static unsigned long endThresholdRegOffsets[4]={
-	kSIS3302ENDAddressThresholdAdc12,
-	kSIS3302ENDAddressThresholdAdc34,
-	kSIS3302ENDAddressThresholdAdc56,
-	kSIS3302ENDAddressThresholdAdc78
-};
-
-static unsigned long preTriggerDelayRegOffsets[4]={
-	kSIS3302PretriggerDelayTriggergateLengthAdc12,
-	kSIS3302PretriggerDelayTriggergateLengthAdc34,
-	kSIS3302PretriggerDelayTriggergateLengthAdc56,
-	kSIS3302PretriggerDelayTriggergateLengthAdc78
-};
-
-static unsigned long sampleAddress[8]={
-	kSIS3302ActualSampleAddressAdc1,
-	kSIS3302ActualSampleAddressAdc2,
-	kSIS3302ActualSampleAddressAdc3,
-	kSIS3302ActualSampleAddressAdc4,
-	kSIS3302ActualSampleAddressAdc5,
-	kSIS3302ActualSampleAddressAdc6,
-	kSIS3302ActualSampleAddressAdc7,
-	kSIS3302ActualSampleAddressAdc8
-};
-
-static unsigned long adcMemory[8]={
-	kSIS3302Adc1Offset,
-	kSIS3302Adc2Offset,
-	kSIS3302Adc3Offset,
-	kSIS3302Adc4Offset,
-	kSIS3302Adc5Offset,
-	kSIS3302Adc6Offset,
-	kSIS3302Adc7Offset,
-	kSIS3302Adc8Offset
-};
 
 #pragma mark ***Initialization
 - (id) init 
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
-    [self initParams];
     [self setAddressModifier:0x09];
-    [self setBaseAddress:0x01000000];
+    [self setBaseAddress:0x08000000];
+    [self initParams];
 
-	[self setDefaults];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -156,7 +95,6 @@ static unsigned long adcMemory[8]={
 	[sumGs release];
 	[peakingTimes release];
 	[internalTriggerDelays release];
-	[triggerDecimations release];
 	
  	[thresholds release];
 	[waveFormRateGroup release];
@@ -185,29 +123,111 @@ static unsigned long adcMemory[8]={
 
 #pragma mark ***Accessors
 
+- (int) runMode { return runMode; }
+- (void) setRunMode:(int)aRunMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
+    runMode = aRunMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelRunModeChanged object:self];
+	[self calculateSampleValues];
+}
+
+- (int) endAddressThreshold { return endAddressThreshold & 0xfffc; }
+- (void) setEndAddressThreshold:(int)aEndAddressThreshold
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:endAddressThreshold];
+    endAddressThreshold = aEndAddressThreshold;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEndAddressThresholdChanged object:self];
+}
+
+- (int) energyTauFactor { return energyTauFactor; }
+- (void) setEnergyTauFactor:(int)aEnergyTauFactor
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyTauFactor:energyTauFactor];
+    energyTauFactor = aEnergyTauFactor;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyTauFactorChanged object:self];
+}
+
+- (int) energySampleStartIndex3 { return energySampleStartIndex3; }
+- (void) setEnergySampleStartIndex3:(int)aEnergySampleStartIndex3
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex3:energySampleStartIndex3];
+    energySampleStartIndex3 = aEnergySampleStartIndex3;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
+}
+
+- (int) energySampleStartIndex2 { return energySampleStartIndex2; }
+- (void) setEnergySampleStartIndex2:(int)aEnergySampleStartIndex2
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex2:energySampleStartIndex2];
+    energySampleStartIndex2 = aEnergySampleStartIndex2;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
+}
+
+- (int) energySampleStartIndex1 { return energySampleStartIndex1; }
+- (void) setEnergySampleStartIndex1:(int)aEnergySampleStartIndex1
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex1:energySampleStartIndex1];
+    energySampleStartIndex1 = aEnergySampleStartIndex1;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
+}
+
+- (int) energySampleLength { return energySampleLength; }
+- (void) setEnergySampleLength:(int)aEnergySampleLength
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
+    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:510] & 0x3fe;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
+}
+
+- (int) energyGapTime { return energyGapTime; }
+- (void) setEnergyGapTime:(int)aEnergyGapTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGapTime:energyGapTime];
+    energyGapTime = [self limitIntValue:aEnergyGapTime min:0 max:0xff];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyGapTimeChanged object:self];
+}
+
+- (int) energyPeakingTime { return energyPeakingTime; }
+- (void) setEnergyPeakingTime:(int)aEnergyPeakingTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyPeakingTime:energyPeakingTime];
+    energyPeakingTime = [self limitIntValue:aEnergyPeakingTime min:0 max:0xff];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyPeakingTimeChanged object:self];
+}
+
+- (int) triggerGateLength { return triggerGateLength; }
+- (void) setTriggerGateLength:(int)aTriggerGateLength
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:triggerGateLength];
+    triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:1023];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelTriggerGateLengthChanged object:self];
+}
+
+- (int) preTriggerDelay { return preTriggerDelay; }
+- (void) setPreTriggerDelay:(int)aPreTriggerDelay
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:preTriggerDelay];
+    preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:65535];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelPreTriggerDelayChanged object:self];
+}
+
 - (unsigned short) sampleStartIndex{ return sampleStartIndex; }
 - (void) setSampleStartIndex:(unsigned short)aSampleStartIndex
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleStartIndex:sampleStartIndex];
-    sampleStartIndex = aSampleStartIndex;
+    sampleStartIndex = aSampleStartIndex & 0xfffe;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleStartIndexChanged object:self];
 }
 
 - (unsigned short) sampleLength { return sampleLength; }
-
 - (void) setSampleLength:(unsigned short)aSampleLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:sampleLength];
-    sampleLength = aSampleLength;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleLengthChanged object:self];
-}
-
-- (unsigned short) dacOffset { return dacOffset; }
-- (void) setDacOffset:(unsigned short)aDacOffset
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setDacOffset:dacOffset];
-    dacOffset = aDacOffset;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302DacOffsetChanged object:self];
+    sampleLength = aSampleLength & 0xfffc;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleLengthChanged object:self];
+	[self calculateSampleValues];
 }
 
 - (short) lemoInMode { return lemoInMode; }
@@ -218,6 +238,32 @@ static unsigned long adcMemory[8]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302LemoInModeChanged object:self];
 }
 
+- (NSString*) lemoInAssignments
+{
+	if(runMode == 0){
+		if(lemoInMode == 0)      return @"3:Trigger\n2:TimeStamp Clr\n1:Veto";
+		else if(lemoInMode == 1) return @"3:Trigger\n2:TimeStamp Clr\n1:Gate";
+		else if(lemoInMode == 2) return @"3:Reserved\n2:Reserved\n1:Reserved";
+		else if(lemoInMode == 3) return @"3:Reserved\n2:Reserved\n1:Reserved";
+		else if(lemoInMode == 4) return @"3:N+1 Trig/Gate In\n2:Trigger\n1:N-1 Trig/Gate In";
+		else if(lemoInMode == 5) return @"3:N+1 Trig/Gate In\n2:TimeStamp Clr\n1:N-1 Trig/Gate In";
+		else if(lemoInMode == 6) return @"3:N+1 Trig/Gate In\n2:Veto\n1:N-1 Trig/Gate In";
+		else if(lemoInMode == 7) return @"3:N+1 Trig/Gate In\n2:Gate\n1:N-1 Trig/Gate In";
+		else return @"Undefined";
+	} 
+	else {
+		if(lemoInMode == 0)      return @"3:Reserved\n2:Ext MCA Start\n1:Ext Next Pulse";
+		else if(lemoInMode == 1) return @"3:Trigger\n2:Ext MCA Start\n1:Ext Next Pulse";
+		else if(lemoInMode == 2) return @"3:Veto\n2:Ext MCA Start\n1:Ext Next Pulse";
+		else if(lemoInMode == 3) return @"3:Gate\n2:Ext MCA Start\n1:Ext Next Pulse";
+		else if(lemoInMode == 4) return @"3:Reserved\n2:Reserved\n1:Reserved";
+		else if(lemoInMode == 5) return @"3:Reserved\n2:Reserved\n1:Reserved";
+		else if(lemoInMode == 6) return @"3:Reserved\n2:Reserved\n1:Reserved";
+		else if(lemoInMode == 7) return @"3:Reserved\n2:Reserved\n1:Reserved";
+		else return @"Undefined";
+	}
+}
+
 - (short) lemoOutMode { return lemoOutMode; }
 - (void) setLemoOutMode:(short)aLemoOutMode
 {
@@ -225,7 +271,23 @@ static unsigned long adcMemory[8]={
     lemoOutMode = aLemoOutMode;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302LemoOutModeChanged object:self];
 }
-
+- (NSString*) lemoOutAssignments
+{
+	if(runMode == 0){
+		if(lemoOutMode == 0)      return @"3:Sample logic armed\n2:Busy\n1:Trigger output";
+		else if(lemoOutMode == 1) return @"3:Sample logic armed\n2:Busy or Veto\n1:Trigger output";
+		else if(lemoOutMode == 2) return @"3:N+1 Trig/Gate Out\n2:Trigger output\n1:N-1 Trig/Gate Out";
+		else if(lemoOutMode == 3) return @"3:N+1 Trig/Gate Out\n2:Busy or Veto\n1:N-1 Trig/Gate Out";
+		else return @"Undefined";
+	} 
+	else {
+		if(lemoOutMode == 0)      return @"3:Sample logic armed\n2:Busy\n1:Trigger output";
+		else if(lemoOutMode == 1) return @"3:First Scan Signal\n2:LNE\n1:Scan Enable";
+		else if(lemoOutMode == 2) return @"3:Scan Enable\n2:LNE\n1:Trigger Output";
+		else if(lemoOutMode == 3) return @"3:Reserved\n2:Reserved\n1:Reserved";
+		else return @"Undefined";
+	}
+}
 - (short) acqRegEnableMask { return acqRegEnableMask; }
 - (void) setAcqRegEnableMask:(short)aAcqRegEnableMask
 {
@@ -240,10 +302,25 @@ static unsigned long adcMemory[8]={
 	for(i=0;i<8;i++){
 		[self setThreshold:i withValue:0x1300];
 		[self setEnabledBit:i withValue:YES];
+		[self setPeakingTime:i withValue:150];
+		[self setSumG:i withValue:50];
+		[self setGateLength:i withValue:256];
+		[self setInternalTriggerDelay:i withValue:128];
 	}
+	
+	[self setSampleLength:8*1024];
+	[self setSampleStartIndex:0];
+	[self setEnergyPeakingTime:150];
+	[self setEnergyGapTime:50];
+	[self setTriggerDecimation:0];
+	[self setPreTriggerDelay:128];
+	[self setTriggerGateLength:256];
+	[self setSampleLength:510];
+	[self setSampleStartIndex:0];
+	[self setGtMask:0xff];
+	[self setEnabledMask:0x0];
+	
 	[self setEnableInternalRouting:YES];
-	[self setPageWrap:YES];
-	[self setPageSize:1];
 }
 
 - (BOOL) bankFullTo3
@@ -332,17 +409,6 @@ static unsigned long adcMemory[8]={
 
 
 //Event configuration
-- (BOOL) pageWrap
-{
-    return pageWrap;
-}
-
-- (void) setPageWrap:(BOOL)aPageWrap
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPageWrap:pageWrap];
-    pageWrap = aPageWrap;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EventConfigChanged object:self];
-}
 
 - (BOOL) gateChaining
 {
@@ -354,36 +420,6 @@ static unsigned long adcMemory[8]={
     [[[self undoManager] prepareWithInvocationTarget:self] setGateChaining:gateChaining];
     gateChaining = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EventConfigChanged object:self];
-}
-
-- (int) pageSize
-{
-    return pageSize;
-}
-
-- (void) setPageSize:(int)aPageSize
-{
-	if(aPageSize<0)		aPageSize = 0;
-	else if(aPageSize>7)aPageSize = 7;
-    [[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
-    pageSize = aPageSize;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302PageSizeChanged object:self];
-}
-
-- (int) numberOfSamples
-{
-	static unsigned long sampleSize[8]={
-		0x20000,
-		0x4000,
-		0x1000,
-		0x800,
-		0x400,
-		0x200,
-		0x100,
-		0x80
-	};
-	
-	return sampleSize[pageSize];
 }
 
 - (ORRateGroup*) waveFormRateGroup
@@ -408,7 +444,8 @@ static unsigned long adcMemory[8]={
 
 - (void) initParams
 {
-	enabledMask = 0xFFFFFFFF;
+	[self setUpArrays];
+	[self setDefaults];
 }
 
 - (void) setRateIntegrationTime:(double)newIntegrationTime
@@ -430,7 +467,7 @@ static unsigned long adcMemory[8]={
 	else return 0;
 }
 
-- (long) enabledMask
+- (short) enabledMask
 {
 	return enabledMask;
 }
@@ -440,7 +477,7 @@ static unsigned long adcMemory[8]={
 	return enabledMask & (1<<chan); 
 }
 
-- (void) setEnabledMask:(long)aMask	
+- (void) setEnabledMask:(short)aMask	
 { 
 	[[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
 	enabledMask = aMask;
@@ -455,7 +492,7 @@ static unsigned long adcMemory[8]={
 	[self setEnabledMask:aMask];
 }
 
-- (long) gtMask
+- (short) gtMask
 {
 	return gtMask;
 }
@@ -494,6 +531,15 @@ static unsigned long adcMemory[8]={
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ThresholdChanged object:self];
+}
+
+- (unsigned short) dacOffset:(short)aChan { return [[dacOffsets objectAtIndex:aChan]intValue]; }
+- (void) setDacOffset:(short)aChan withValue:(int)aValue 
+{
+	aValue = [self limitIntValue:aValue min:0 max:0xffff];
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacOffset:aChan withValue:[self dacOffset:aChan]];
+    [dacOffsets replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302DacOffsetChanged object:self];
 }
 
 - (short) gateLength:(short)aChan { return [[gateLengths objectAtIndex:aChan] shortValue]; }
@@ -542,15 +588,39 @@ static unsigned long adcMemory[8]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalTriggerDelayChanged object:self];
 }
 
-- (short) triggerDecimation:(short)aChan { return [[triggerDecimations objectAtIndex:aChan] shortValue]; }
-- (void) setTriggerDecimation:(short)aChan withValue:(short)aValue 
+- (short) triggerDecimation { return triggerDecimation; }
+- (void) setTriggerDecimation:(short)aValue 
 { 
-	aValue = [self limitIntValue:aValue min:0 max:0x1f];
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerDecimation:aChan withValue:[self triggerDecimation:aChan]];
-    [triggerDecimations replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerDecimation:triggerDecimation];
+    triggerDecimation = [self limitIntValue:aValue min:0 max:0x3];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302TriggerDecimationChanged object:self];
 }
 
+- (void) calculateSampleValues
+{
+	if(runMode      == 1)	numEnergyValues = 510;					//Energy Trapezoidal 510 values + Max and Min
+	else if(runMode == 2)   numEnergyValues = 0;					//No Energy
+	else if(runMode == 3)   numEnergyValues = 3*energySampleLength;	//3 parts of Energy Trapezoidal (3x170 = 510 values) + Max/Min
+	else if(runMode == 4)	numEnergyValues = energySampleLength;   //valid only if only one start address is defined
+
+	if(numEnergyValues > 510){
+		NSLogColor([NSColor redColor],@"Number of energy values is to high (max = 510) ; actual = %d \n",numEnergyValues);
+		NSLogColor([NSColor redColor],@"Value forced to 510\n");
+		numEnergyValues = 510;
+	}
+
+	numRawDataLongWords = ([self sampleLength]>>1);
+	rawDataIndex  = 2 ;
+	
+	energyIndex    = 2 + numRawDataLongWords ;
+	energyMaxIndex = 2 + numEnergyValues + numRawDataLongWords ;
+	
+	eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
+	eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
+	eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;   
+
+    [self setEndAddressThreshold:eventLengthLongWords];
+}
 
 #pragma mark •••Hardware Access
 - (void) readModuleID:(BOOL)verbose
@@ -569,33 +639,15 @@ static unsigned long adcMemory[8]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302IDChanged object:self];
 }
 
-- (void) writeControlStatusRegister
-{		
-	//The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.
-	unsigned long aMask = 0x0;	
-	if(invertTrigger)			aMask |= kSISInvertTrigger;
-	if(activateTriggerOnArmed)	aMask |= kSISTriggerOnArmedAndStarted;
-	if(enableInternalRouting)	aMask |= kSISInternalTriggerRouting;
-	if(bankFullTo1)				aMask |= kSISBankFullTo1;
-	if(bankFullTo2)				aMask |= kSISBankFullTo2;
-	if(bankFullTo3)				aMask |= kSISBankFullTo3;
-	
-	//put the inverse in the top bits to turn off everything else
-	aMask = ((~aMask & 0x0000ffff)<<16) | aMask ;
-	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kSIS3302ControlStatus
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
 - (void) writeAcquistionRegister
 {
 	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.	
 	unsigned long aMask = 0x0;
-	aMask |= ((clockSource & 0x7) << kSISClockSetShiftCount); /*clock src bits*/
+	BOOL mcaMode = (runMode == 0);
+	aMask |= ((clockSource & 0x7)<< 12);
 	aMask |= acqRegEnableMask;
 	aMask |= (lemoOutMode & 0x3) << 4;
+	aMask |= (mcaMode&0x1)       << 3;
 	aMask |= (lemoInMode & 0x7)  << 0;
 	
 	//put the inverse in the top bits to turn off everything else
@@ -618,16 +670,25 @@ static unsigned long adcMemory[8]={
                      usingAddSpace:0x01];
 }
 
-- (void) enableUserOut:(BOOL)state
+- (void) forceTrigger
 {
-	unsigned long aValue = CSRMask(state,kSISUserOutput);
+	unsigned long aValue = 0;
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kSIS3302ControlStatus
+                         atAddress:[self baseAddress] + kSIS3302KeyTrigger
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
 
+- (void) clearTimeStamp
+{
+	unsigned long aValue = 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyTimestampClear
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
 
 /*
 - (void) startSampling
@@ -703,17 +764,6 @@ static unsigned long adcMemory[8]={
 	return aValue;
 }
 
-- (unsigned long) configReg
-{
- 	unsigned long aValue = 0;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kSIS3302ControlStatus
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	return aValue;
-}
-
 - (void) disArm:(int)bank
 {
  	unsigned long aValue = ACQMask(FALSE,bank?kSISSampleBank2:kSISSampleBank1);
@@ -758,7 +808,6 @@ static unsigned long adcMemory[8]={
 	return (aValue & mask) != 0;
 }
 
-
 - (void) writeThresholds
 {   
 	int i;
@@ -772,7 +821,7 @@ static unsigned long adcMemory[8]={
 		thresholdMask |= ([self threshold:i] & 0x1FFFF);
 		
 		[[self adapter] writeLongBlock:&thresholdMask
-							 atAddress:[self baseAddress] + thresholdRegOffsets[i]
+							 atAddress:[self baseAddress] + [self getThresholdRegOffsets:i]
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
@@ -780,33 +829,128 @@ static unsigned long adcMemory[8]={
 	}
 }
 
-- (void) writeTriggerSetups
+- (void) writeEventConfiguration
 {
-	int i;
-	unsigned long aValueMask;
-	for(i = 0; i < 8; i++) {
-		int sumGLower = [self sumG:i] & 0xff;
-		int peakingTimeLower = [self peakingTime:i] & 0xff;
-		aValueMask = ([self gateLength:i]<<24) | ([self pulseLength:i]<<16) | (sumGLower<<8) | peakingTimeLower;
-		
+	//temp value.........
+	long i;
+	for(i=0;i<4;i++){
+		unsigned long aValueMask = ((i+1)<<19) | 0x00001414;
 		[[self adapter] writeLongBlock:&aValueMask
-							 atAddress:[self baseAddress] + triggerSetupRegOffsets[i]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-
-		int sumGUpper = [self sumG:i]>>8;
-		int peakingTimeUpper = [self peakingTime:i]>>8;
-		int triggerDec = [self triggerDecimation:i] & 0x3;
-		int triggerDelay = [self internalTriggerDelay:i] & 0x1f;
-		aValueMask =  (triggerDelay<<24) | (triggerDec << 16) | (sumGUpper<<8) | peakingTimeUpper;
-		
-		[[self adapter] writeLongBlock:&aValueMask
-							 atAddress:[self baseAddress] + triggerExtSetupRegOffsets[i]
+							 atAddress:[self baseAddress] + [self getEventConfigAdcOffsets:i]
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
 	}
+	
+}
+
+- (void) writePreTriggerDelayAndTriggerGateDelay
+{
+	unsigned long aValue = (([self preTriggerDelay]&0x01ff000)<<16) | [self triggerGateLength];
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggergateLengthAllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+}
+
+- (void) writeEnergyGP
+{
+	unsigned long peakingTimeHi = ([self energyPeakingTime] >> 8) & 0x3;
+	unsigned long peakingTimeLo = [self energyPeakingTime] & 0xff; 
+	
+	unsigned long aValueMask = (([self triggerDecimation]  & 0x3)<<28) | 
+								(peakingTimeHi <<16)				   | 
+								(([self energyGapTime]     & 0xff)<<8) | 
+								peakingTimeLo;
+	
+	[[self adapter] writeLongBlock:&aValueMask
+						 atAddress:[self baseAddress] + kSIS3302EnergySetupGPAllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	[self resetSamplingLogic];
+	
+	unsigned long aValue = endAddressThreshold;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + 0x01000004
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	aValue = energySampleLength;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergySampleLengthAllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+
+	aValue = energySampleStartIndex1;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex1AllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	aValue = energySampleStartIndex2;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex2AllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	aValue = energySampleStartIndex3;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex3AllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+}
+	
+- (void) writeTriggerSetups
+{
+	int i;
+	for(i = 0; i < 8; i++) {
+		unsigned long aExtValueMask = (([self internalTriggerDelay:i] & 0x001fL) << 24) | 
+									  (([self triggerDecimation]      & 0x0003L) << 16) | 
+									  (([self sumG:i]                 & 0x0300L) <<  8) | 
+									   ([self peakingTime:i]          & 0x0300L);
+		
+		[[self adapter] writeLongBlock:&aExtValueMask
+							 atAddress:[self baseAddress] + [self getTriggerExtSetupRegOffsets:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+		
+		unsigned long aTriggerMask =(([self gateLength:i]  & 0x3fL) << 24) | 
+									(([self pulseLength:i] & 0xffL) << 16) | 
+									(([self sumG:i]        & 0xffL) <<  8) | 
+									 ([self peakingTime:i] & 0xffL);
+		
+		[[self adapter] writeLongBlock:&aTriggerMask
+							 atAddress:[self baseAddress] + [self getTriggerSetupRegOffsets:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
+}
+
+- (void) writeBufferConfiguration
+{
+	unsigned long rawDataSampleLen  = [self sampleLength] & 0xfffc;
+	unsigned long rawDataStartIndex = [self sampleStartIndex] & 0xfffe; 
+	
+	unsigned long aValueMask = (rawDataSampleLen<<16) | (rawDataStartIndex <<16);
+	
+	[[self adapter] writeLongBlock:&aValueMask
+						 atAddress:[self baseAddress] + kSIS3302RAWDataBufferConfigAllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
 }
 
 - (void) readThresholds:(BOOL)verbose
@@ -817,7 +961,7 @@ static unsigned long adcMemory[8]={
 	for(i =0; i < kNumSIS3302Channels; i++) {
 		unsigned long aValue;
 		[[self adapter] readLongBlock: &aValue
-							atAddress: [self baseAddress] + thresholdRegOffsets[i]
+							atAddress: [self baseAddress] + [self getThresholdRegOffsets:i]
 							numToRead: 1
 						   withAddMod: [self addressModifier]
 						usingAddSpace: 0x01];
@@ -831,27 +975,22 @@ static unsigned long adcMemory[8]={
 	}
 }
 
-- (BOOL) isBusy
+- (void) report
 {
-	
-	unsigned long aValue = 0;
-	[[self adapter] readLongBlock: &aValue
-						atAddress: [self baseAddress] + kSIS3302AcquistionControl
-						numToRead: 1
-					   withAddMod: [self addressModifier]
-					usingAddSpace: 0x01];
-
-	return (aValue & kSISBusyStatus) != 0;
+	[self readThresholds:YES];
 }
 
 - (void) initBoard
 {  
-	//[self reset];							//reset the card
+	[self reset];							//reset the card
 	[self writeAcquistionRegister];			//set up the Acquisition Register
 	[self writeThresholds];
-	//[self writeControlStatusRegister];		//set up Control/Status Register
+	[self writeEnergyGP];
 	[self writeTriggerSetups];
-	
+	[self writeBufferConfiguration];
+	[self writeEventConfiguration];
+	[self writePreTriggerDelayAndTriggerGateDelay];
+	[self writeEnergyGP];
 }
 
 - (void) testMemory
@@ -879,18 +1018,15 @@ static unsigned long adcMemory[8]={
 	else NSLog(@"Memory Bank Test Passed\n");
 }
 
-- (void) testEventRead
+- (void) readOneEvent
 {
-	ORTimer* aTimer = [[ORTimer alloc] init];
+	ORTimer* aTimer;
 	@try {
-		// Readout Loop  */
-		unsigned long aValue = 0;
-		[[self adapter] writeLongBlock:&aValue
-							 atAddress:[self baseAddress] + kSIS3302KeyDisarmandArmBank1
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+		aTimer = [[ORTimer alloc] init];
+		// Readout Loop 
 		
+		[self disarmAndArmBank:0];
+
 		// wait for address threshold flag
 		BOOL eventHappened = NO;
 		[aTimer start];
@@ -909,23 +1045,24 @@ static unsigned long adcMemory[8]={
 		} while (1);
 		
 		if(eventHappened){
-			unsigned long aValue = 0;
-			[[self adapter] writeLongBlock:&aValue
-								 atAddress:[self baseAddress] + kSIS3302KeyDisarm
-								numToWrite:1
-								withAddMod:[self addressModifier]
-							 usingAddSpace:0x01];
 			
-			unsigned long adc1_buffer[8][0x200000] ; // 8MByte 
+			[self disarmSampleLogic];
+			
+			NSLog(@"eventHappened\n");
+			
+			//unsigned long adc1_buffer[8][0x200000] ; // 8MByte 
 			int i;
 			for(i=0;i<kNumSIS3302Channels;i++){
 				unsigned long endSampleAddress = 0;
 				[[self adapter] readLongBlock:&endSampleAddress
-									 atAddress:[self baseAddress] + sampleAddress[i]
+									atAddress:[self baseAddress] +  [self getSampleAddress:i]
 									numToRead:1
 									withAddMod:[self addressModifier]
 								 usingAddSpace:0x01];
+				NSLog(@"endSampleAddress %d: 0x%x\n",i, endSampleAddress);
 				
+				
+				/*
 				if (endSampleAddress != 0) {
 					[[self adapter] readLongBlock:adc1_buffer[i]
 										 atAddress:[self baseAddress] + adcMemory[i]
@@ -934,6 +1071,7 @@ static unsigned long adcMemory[8]={
 									 usingAddSpace:0x01];
 					
 				}
+				 */
 			}
 		}
 		else NSLog(@"NO Event\n");
@@ -943,7 +1081,385 @@ static unsigned long adcMemory[8]={
 	@finally {
 		[aTimer release];
 	}
+}
+
+- (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
+{
+    switch (channel) {
+        case 0: return 0x02000018;
+        case 1: return 0x0200001c;
+        case 2: return 0x02800018;
+        case 3: return 0x0280001c;
+        case 4: return 0x03000018;
+        case 5: return 0x0300001c;
+        case 6: return 0x03800018;
+        case 7: return 0x0380001c;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getADCBufferRegisterOffset:(int) channel 
+{
+    switch (channel) {
+        case 0: return kSIS3302Adc1Offset;
+        case 1: return kSIS3302Adc2Offset;
+        case 2: return kSIS3302Adc3Offset;
+        case 3: return kSIS3302Adc4Offset;
+        case 4: return kSIS3302Adc5Offset;
+        case 5: return kSIS3302Adc6Offset;
+        case 6: return kSIS3302Adc7Offset;
+        case 7: return kSIS3302Adc8Offset;
+    }
+    return (unsigned long) -1;
+}
+
+#pragma mark •••Static Declarations
+- (unsigned long) getThresholdRegOffsets:(int) channel 
+{
+    switch (channel) {
+        case 0: return 	kSIS3302TriggerThresholdAdc1;
+		case 1: return 	kSIS3302TriggerThresholdAdc2;
+		case 2: return 	kSIS3302TriggerThresholdAdc3;
+		case 3: return 	kSIS3302TriggerThresholdAdc4;
+		case 4:	return 	kSIS3302TriggerThresholdAdc5;
+		case 5: return 	kSIS3302TriggerThresholdAdc6;
+		case 6: return 	kSIS3302TriggerThresholdAdc7;
+		case 7: return 	kSIS3302TriggerThresholdAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getTriggerSetupRegOffsets:(int) channel 
+{
+    switch (channel) {
+		case 0: return 	kSIS3302TriggerSetupAdc1;
+		case 1: return 	kSIS3302TriggerSetupAdc2;
+		case 2: return 	kSIS3302TriggerSetupAdc3;
+		case 3: return 	kSIS3302TriggerSetupAdc4;
+		case 4: return 	kSIS3302TriggerSetupAdc5;
+		case 5: return 	kSIS3302TriggerSetupAdc6;
+		case 6: return 	kSIS3302TriggerSetupAdc7;
+		case 7: return 	kSIS3302TriggerSetupAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getTriggerExtSetupRegOffsets:(int)channel
+{
+    switch (channel) {	
+		case 0: return 	kSIS3302TriggerExtendedSetupAdc1;
+		case 1: return 	kSIS3302TriggerExtendedSetupAdc2;
+		case 2: return 	kSIS3302TriggerExtendedSetupAdc3;
+		case 3: return 	kSIS3302TriggerExtendedSetupAdc4;
+		case 4: return 	kSIS3302TriggerExtendedSetupAdc5;
+		case 5: return 	kSIS3302TriggerExtendedSetupAdc6;
+		case 6: return 	kSIS3302TriggerExtendedSetupAdc7;
+		case 7: return 	kSIS3302TriggerExtendedSetupAdc8;
+	}
+    return (unsigned long) -1;	
+}
+
+
+- (unsigned long) getEndThresholdRegOffsets:(int)group
+{
+	switch (group) {	
+		case 0: return 	 kSIS3302ENDAddressThresholdAdc12;
+		case 1: return 	 kSIS3302ENDAddressThresholdAdc34;
+		case 2: return 	 kSIS3302ENDAddressThresholdAdc56;
+		case 3: return 	 kSIS3302ENDAddressThresholdAdc78;
+	}
+	return (unsigned long) -1;	 
+}
+ 
+- (unsigned long) getSampleAddress:(int)channel
+{
+    switch (channel) {
+		case 0: return 	kSIS3302ActualSampleAddressAdc1;
+		case 1: return 	kSIS3302ActualSampleAddressAdc2;
+		case 2: return 	kSIS3302ActualSampleAddressAdc3;
+		case 3: return 	kSIS3302ActualSampleAddressAdc4;
+		case 4: return 	kSIS3302ActualSampleAddressAdc5;
+		case 5: return 	kSIS3302ActualSampleAddressAdc6;
+		case 6: return 	kSIS3302ActualSampleAddressAdc7;
+		case 7: return 	kSIS3302ActualSampleAddressAdc8;
+ 	}
+	return (unsigned long) -1;	 
+}
+		 
+- (unsigned long) getEventConfigAdcOffsets:(int)group
+{
+	 switch (group) {
+		 case 0: return kSIS3302EventConfigAdc12;
+		 case 1: return kSIS3302EventConfigAdc34;
+		 case 2: return kSIS3302EventConfigAdc56;
+		 case 3: return kSIS3302EventConfigAdc78;
+	 }
+	return (unsigned long) -1;	 
+}
+		 
+- (unsigned long) getAdcMemory:(int)channel
+{
+    switch (channel) {			
+		case 0: return 	kSIS3302Adc1Offset;
+		case 1: return 	kSIS3302Adc2Offset;
+		case 2: return 	kSIS3302Adc3Offset;
+		case 3: return 	kSIS3302Adc4Offset;
+		case 4: return 	kSIS3302Adc5Offset;
+		case 5: return 	kSIS3302Adc6Offset;
+		case 6: return 	kSIS3302Adc7Offset;
+		case 7: return 	kSIS3302Adc8Offset;
+ 	}
+   return (unsigned long) -1;	 
+}
+
+- (BOOL) isEvent
+{
+	unsigned long data_rd = 0;
+	[[self adapter] readLongBlock:&data_rd
+						atAddress:[self baseAddress] + kSIS3302AcquistionControl
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+
+	if ((data_rd & 0x80000) != 0x80000)return NO;
+	else return YES;
+}
+
+- (void) readOutEvents 
+{
+	// Try disarm current bank and arm the next one
+	[self disarmAndArmBank:0];
 	
+	if(![self isEvent]) return;
+	
+ 	NSLog(@"****Event\n");
+	[self disarmSampleLogic];
+	
+    // Try disarm current bank and arm the next one
+    //[self disarmAndArmNextBank];
+	
+    //let's readout
+	//[self writePageRegister:0x0];
+	
+    // We've selected a particular page to readout for each channel
+	int i = 0;
+    //for( i=0;i<kNumSIS3302Channels;i++) {
+        [self readOutChannel:i];
+   // }
+}
+
+- (unsigned long) readEndAddress //temp for testing
+{
+	unsigned long end_sample_address = 0;
+	[[self adapter] readLongBlock:&end_sample_address
+						atAddress:[self baseAddress] + kSIS3302ENDAddressThresholdAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	return end_sample_address;
+}
+
+- (void) readOutChannel:(int) channel
+{
+	
+	//check a bunch of addresses -- not sure which one is relevent
+	unsigned long EventConfig = 0;
+	[[self adapter] readLongBlock:&EventConfig
+						atAddress:[self baseAddress] +kSIS3302EventConfigAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	NSLog(@"EventConfig: 0x%08x\n",EventConfig);
+	
+    unsigned long end_sample_address = 0;
+	[[self adapter] readLongBlock:&end_sample_address
+						atAddress:[self baseAddress] + kSIS3302ENDAddressThresholdAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	NSLog(@"end_sample_address: 0x%08x\n",end_sample_address);
+	
+	unsigned long pretrigger = 0;
+	[[self adapter] readLongBlock:&pretrigger
+						atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggergateLengthAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"pretrigger: 0x%08x\n",pretrigger);
+
+	unsigned long rawDataBufferConfig = 0;
+	[[self adapter] readLongBlock:&rawDataBufferConfig
+						atAddress:[self baseAddress] + kSIS3302RAWDataBufferConfigAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"rawDataBufferConfig: 0x%08x\n",rawDataBufferConfig);
+
+	unsigned long actualNextSampleAddress1 = 0;
+	[[self adapter] readLongBlock:&actualNextSampleAddress1
+						atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc1
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"actualNextSampleAddress1: 0x%08x\n",actualNextSampleAddress1);
+
+	unsigned long actualNextSampleAddress2 = 0;
+	[[self adapter] readLongBlock:&actualNextSampleAddress2
+						atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc2
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"actualNextSampleAddress2: 0x%08x\n",actualNextSampleAddress2);
+
+	unsigned long prevNextSampleAddress1 = 0;
+	[[self adapter] readLongBlock:&prevNextSampleAddress1
+						atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc1
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"prevNextSampleAddress1: 0x%08x\n",prevNextSampleAddress1);
+
+	unsigned long prevNextSampleAddress2 = 0;
+	[[self adapter] readLongBlock:&prevNextSampleAddress2
+						atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc2
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"prevNextSampleAddress2: 0x%08x\n",prevNextSampleAddress2);
+
+	unsigned long triggerSetup1 = 0;
+	[[self adapter] readLongBlock:&triggerSetup1
+						atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc1
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"triggerSetup1: 0x%08x\n",triggerSetup1);
+	
+	unsigned long triggerSetup2 = 0;
+	[[self adapter] readLongBlock:&triggerSetup2
+						atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc2
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"triggerSetup2: 0x%08x\n",triggerSetup2);
+
+	unsigned long energySetupGP = 0;
+	[[self adapter] readLongBlock:&energySetupGP
+						atAddress:[self baseAddress] + kSIS3302EnergySetupGaPAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"energySetupGP: 0x%08x\n",energySetupGP);
+
+	unsigned long EnergyGateLen = 0;
+	[[self adapter] readLongBlock:&EnergyGateLen
+						atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"EnergyGateLen: 0x%08x\n",EnergyGateLen);
+
+	unsigned long EnergySampleLen = 0;
+	[[self adapter] readLongBlock:&EnergySampleLen
+						atAddress:[self baseAddress] + kSIS3302EnergySampleLengthAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"EnergySampleLen: 0x%08x\n",EnergySampleLen);
+	
+	unsigned long EnergySampleStartIndex = 0;
+	[[self adapter] readLongBlock:&EnergySampleStartIndex
+						atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex1Adc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
+	
+				
+    // check if bank address flag is valid
+    if (((end_sample_address >> 24) & 0x1) != ((bankOneArmed) ? 0x1 : 0x0) ) {   
+    	// in this case -> poll right arm flag or implement a delay
+    }
+	
+    // check buffer address
+    end_sample_address &= 0xffffff ; // mask bank2 address bit (bit 24)
+	
+    if (end_sample_address > 0x3fffff) {   // more than 1 page memory buffer is used
+        // Warning?
+    }
+	
+    // readout	   	
+    if (end_sample_address != 0) {
+    	unsigned long addr = [self baseAddress] + [self getADCBufferRegisterOffset:channel];
+        unsigned long num_bytes_to_read = (end_sample_address & 0x3ffffc)>>1;
+		NSLog(@"should read %d bytes: %d\n",num_bytes_to_read);
+		int n;
+		unsigned long data=0;
+		for(n=0;n<num_bytes_to_read;n+=4){
+			unsigned long adc_Memory1 = 0;
+			[[self adapter] readLongBlock:&adc_Memory1
+								atAddress:[self baseAddress] + [self getADCBufferRegisterOffset:channel] + n
+								numToRead:1
+							   withAddMod: [self addressModifier]
+							usingAddSpace:0x01];
+			NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
+			//int32_t error = DMARead(addr, (uint32_t)0x08, 
+			//						(uint32_t)8, buffer,  
+			//						num_bytes_to_read);
+		}
+    }
+    // Now write to data buffer 
+}
+
+- (void) disarmSampleLogic
+{
+	unsigned long aValue = 0;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302KeyDisarm
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+- (void) disarmAndArmBank:(int) bank 
+{
+    if (bank==0) bankOneArmed = YES;
+    else		 bankOneArmed = NO;
+	
+    unsigned long addr = [self baseAddress] + ((bank == 0) ? kSIS3302KeyDisarmandArmBank1 : kSIS3302KeyDisarmandArmBank2);
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+						atAddress:addr
+						numToWrite:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+}
+
+- (void) disarmAndArmNextBank
+{ 
+	return (bankOneArmed) ? [self disarmAndArmBank:0] : [self disarmAndArmBank:1]; 
+}
+
+- (void) writePageRegister:(int) aPage 
+{	
+	unsigned long aValue = aPage & 0xf;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302AdcMemoryPageRegister
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];	
 }
 
 #pragma mark •••Data Taker
@@ -990,26 +1506,17 @@ static unsigned long adcMemory[8]={
 {
     NSMutableArray* a = [NSMutableArray array];
     ORHWWizParam* p;
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Page Size"];
-    [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPageSize:) getMethod:@selector(pageSize)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-		
+    		
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Source"];
     [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-	
-    [a addObject:[ORHWWizParam boolParamWithName:@"PageWrap" setter:@selector(setPageWrap:) getter:@selector(pageWrap)]];
-	
+		
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
@@ -1058,8 +1565,8 @@ static unsigned long adcMemory[8]={
 {
     NSMutableArray* a = [NSMutableArray array];
     [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORVmeCrateModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"ORSIS3302"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"ORSIS3302"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"ORSIS3302Model"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"ORSIS3302Model"]];
     return a;
 }
 
@@ -1072,11 +1579,9 @@ static unsigned long adcMemory[8]={
 	else if([param isEqualToString:@"SumG"])return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"PeakingTime"])return [[cardDictionary objectForKey:@"peakingTime"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"InternalTriggerDelay"])return [[cardDictionary objectForKey:@"internalTriggerDelay"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"TriggerDecimation"])return [[cardDictionary objectForKey:@"triggerDecimation"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"TriggerDecimation"])return [cardDictionary objectForKey:@"triggerDecimation"];
     else if([param isEqualToString:@"Enabled"]) return [cardDictionary objectForKey:@"enabledMask"];
-    else if([param isEqualToString:@"Page Size"]) return [cardDictionary objectForKey:@"pageSize"];
     else if([param isEqualToString:@"Clock Source"]) return [cardDictionary objectForKey:@"clockSource"];
-    else if([param isEqualToString:@"PageWrap"]) return [cardDictionary objectForKey:@"pageWrap"];
     else return nil;
 }
 
@@ -1115,69 +1620,25 @@ static unsigned long adcMemory[8]={
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		/*
 		isRunning = YES;
-		if([self bankIsFull:currentBank] && ![self bankIsBusy:currentBank]){
-			int bankToUse = currentBank;
-			
-			int numEvents = [self eventNumberGroup:0 bank:bankToUse];
-			int event,group;
-			for(event=0;event<numEvents;event++){
-				unsigned long triggerEventDir = [self readTriggerEventBank:bankToUse index:event];
-				unsigned long startOffset = triggerEventDir&0x1ffff & ([self numberOfSamples]-1);
-				unsigned long triggerTime = [self readTriggerTime:bankToUse index:event];
-				
-				for(group=0;group<4;group++){
-					unsigned long channelMask = triggerEventDir & (0xC0000000 >> (group*2));
-					if(channelMask==0)continue;
-					
-					if(triggerEventDir & (0x80000000 >> (group*2)))		++waveFormCount[(group*2)];
-					if(triggerEventDir & (0x80000000 >> (group*2)+1))	++waveFormCount[(group*2)+1];
-					
-					
-					//only read the channels that have trigger info
-					unsigned long numLongs = 0;
-					unsigned long totalNumLongs = [self numberOfSamples] + 4;
-					
-					NSMutableData* d = [NSMutableData dataWithLength:totalNumLongs*sizeof(long)];
-					unsigned long* dataBuffer = (unsigned long*)[d bytes];
-					dataBuffer[numLongs++] = dataId | totalNumLongs;
-					dataBuffer[numLongs++] = location;
-
-					dataBuffer[numLongs++] = triggerEventDir & (channelMask | 0x00FFFFFF);
-					dataBuffer[numLongs++] = ((event&0xFF)<<24) | (triggerTime & 0xFFFFFF);
-					
-
-					// The first read is from startOffset -> nPagesize.
-					unsigned long nLongsToRead = [self numberOfSamples] - startOffset;	
-					if(nLongsToRead>0){
-						[[self adapter] readLongBlock: &dataBuffer[numLongs]
-											atAddress: [self baseAddress] +adcMemory[group][bankToUse] + 4*startOffset
-											numToRead: nLongsToRead
-										   withAddMod: [self addressModifier]
-										usingAddSpace: 0x01];
-						numLongs +=  nLongsToRead;
-					}
-					
-					// The second read, if necessary, is from 0 ->nEventEnd-1.
-					if(startOffset>0) {
-						[[self adapter] readLongBlock: &dataBuffer[numLongs]
-											atAddress: [self baseAddress] + bankMemory[group][bankToUse]
-											numToRead: startOffset-1
-										   withAddMod: [self addressModifier]
-										usingAddSpace: 0x01];			
-					}
-			
-					[aDataPacket addData:d];
-				}
-			}
-			
-			[self clearBankFullFlag:currentBank];
-			[self arm:currentBank];
-			[self startSampling];
-			
+		
+/*		unsigned long data_rd;
+		[[self adapter] readLongBlock:&data_rd
+							atAddress:[self baseAddress] + kSIS3302AcquistionControl
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		if((data_rd & 0x80000) == 0x80000){	
 		}
-		 */
+ */
+		sleep(1);
+		unsigned long dataValue;
+		[[self adapter] readLongBlock:&dataValue
+							atAddress:[self baseAddress] + 0x02000020
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
+		NSLog(@"%d %d\n",(dataValue&0xffff0000)>>16,dataValue&0xFFFF);
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
@@ -1204,7 +1665,7 @@ static unsigned long adcMemory[8]={
 	configStruct->card_info[index].crate					= [self crateNumber];
 	configStruct->card_info[index].add_mod					= [self addressModifier];
 	configStruct->card_info[index].base_add					= [self baseAddress];
-    configStruct->card_info[index].deviceSpecificData[1]	= [self numberOfSamples];
+    //configStruct->card_info[index].deviceSpecificData[1]	= [self numberOfSamples];
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -1222,6 +1683,15 @@ static unsigned long adcMemory[8]={
                      usingAddSpace:0x01];
 }
 
+- (void) resetSamplingLogic
+{
+ 	unsigned long aValue = 0; //value doesn't matter 
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeySampleLogicReset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {
@@ -1254,22 +1724,32 @@ static unsigned long adcMemory[8]={
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    
     [[self undoManager] disableUndoRegistration];
 	
+    [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
+    [self setEndAddressThreshold:		[decoder decodeIntForKey:@"endAddressThreshold"]];
+    [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
+    [self setEnergyTauFactor:			[decoder decodeIntForKey:@"energyTauFactor"]];
+    [self setEnergySampleStartIndex2:	[decoder decodeIntForKey:@"energySampleStartIndex2"]];
+    [self setEnergySampleStartIndex1:	[decoder decodeIntForKey:@"energySampleStartIndex1"]];
+    [self setEnergySampleLength:		[decoder decodeIntForKey:@"energySampleLength"]];
+	[self setEnergyGapTime:			[decoder decodeIntForKey:@"energyGapTime"]];
+    [self setEnergyPeakingTime:		[decoder decodeIntForKey:@"energyPeakingTime"]];
+    [self setTriggerGateLength:		[decoder decodeIntForKey:@"triggerGateLength"]];
+    [self setPreTriggerDelay:		[decoder decodeIntForKey:@"preTriggerDelay"]];
     [self setSampleStartIndex:		[decoder decodeIntForKey:@"sampleStartIndex"]];
     [self setSampleLength:			[decoder decodeIntForKey:@"sampleLength"]];
-    [self setDacOffset:				[decoder decodeIntForKey:@"dacOffset"]];
     [self setLemoInMode:			[decoder decodeIntForKey:@"lemoInMode"]];
     [self setLemoOutMode:			[decoder decodeIntForKey:@"lemoOutMode"]];
     [self setAcqRegEnableMask:		[decoder decodeIntForKey:@"acqRegEnableMask"]];
 	thresholds  =					[[decoder decodeObjectForKey:@"thresholds"] retain];
+    dacOffsets  =				    [[decoder decodeObjectForKey:@"dacOffsets"] retain];
 	gateLengths =					[[decoder decodeObjectForKey:@"gateLengths"] retain];
 	pulseLengths =					[[decoder decodeObjectForKey:@"pulseLengths"] retain];
 	sumGs =							[[decoder decodeObjectForKey:@"sumGs"] retain];
 	peakingTimes =					[[decoder decodeObjectForKey:@"peakingTime"] retain];
 	internalTriggerDelays =			[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
-	triggerDecimations =			[[decoder decodeObjectForKey:@"triggerDecimations"] retain];
+	triggerDecimation =			    [decoder decodeIntForKey:   @"triggerDecimation"];
 
 	//csr
 	[self setBankFullTo3:			[decoder decodeBoolForKey:@"bankFullTo3"]];
@@ -1279,16 +1759,9 @@ static unsigned long adcMemory[8]={
     [self setActivateTriggerOnArmed:[decoder decodeBoolForKey:@"activateTriggerOnArmed"]];
     [self setInvertTrigger:			[decoder decodeBoolForKey:@"invertTrigger"]];
 	
-	//acq
-    ;
-	
-	//clocks
     [self setClockSource:			[decoder decodeIntForKey:@"clockSource"]];
-	
-    [self setPageWrap:				[decoder decodeBoolForKey:@"pageWrap"]];
-    [self setPageSize:				[decoder decodeIntForKey:@"pageSize"]];
     [self setEnabledMask:			[decoder decodeInt32ForKey:@"enabledMask"]];
-	[self setGtMask:				[decoder decodeIntForKey:@"GtMask"]];
+	[self setGtMask:				[decoder decodeIntForKey:@"gtMask"]];
 		
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 
@@ -1299,10 +1772,120 @@ static unsigned long adcMemory[8]={
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
 	
+	[self setUpArrays];
+
+	
+    [[self undoManager] enableUndoRegistration];
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+	
+	[encoder encodeInt:runMode					forKey:@"runMode"];
+	[encoder encodeInt:endAddressThreshold		forKey:@"endAddressThreshold"];
+	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
+	[encoder encodeInt:energyTauFactor			forKey:@"energyTauFactor"];
+	[encoder encodeInt:energySampleStartIndex2	forKey:@"energySampleStartIndex2"];
+	[encoder encodeInt:energySampleStartIndex1	forKey:@"energySampleStartIndex1"];
+	[encoder encodeInt:energySampleLength		forKey:@"energySampleLength"];
+	[encoder encodeInt:energyGapTime			forKey:@"energyGapTime"];
+	[encoder encodeInt:energyPeakingTime		forKey:@"energyPeakingTime"];
+	[encoder encodeInt:triggerGateLength		forKey:@"triggerGateLength"];
+	[encoder encodeInt:preTriggerDelay			forKey:@"preTriggerDelay"];
+	[encoder encodeInt:sampleStartIndex			forKey:@"sampleStartIndex"];
+	[encoder encodeInt:sampleLength				forKey:@"sampleLength"];
+	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
+	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
+	[encoder encodeInt:acqRegEnableMask			forKey:@"acqRegEnableMask"];
+	[encoder encodeObject:thresholds			forKey:@"thresholds"];
+	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
+	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
+	[encoder encodeObject:pulseLengths			forKey:@"pulseLengths"];
+	[encoder encodeObject:sumGs					forKey:@"sumGs"];
+	[encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
+	[encoder encodeObject:internalTriggerDelays	forKey:@"internalTriggerDelays"];
+	[encoder encodeInt:triggerDecimation		forKey:@"triggerDecimation"];
+
+	//csr
+    [encoder encodeBool:bankFullTo3				forKey:@"bankFullTo3"];
+    [encoder encodeBool:bankFullTo2				forKey:@"bankFullTo2"];
+    [encoder encodeBool:bankFullTo1				forKey:@"bankFullTo1"];
+    [encoder encodeBool:enableInternalRouting	forKey:@"enableInternalRouting"];
+    [encoder encodeBool:activateTriggerOnArmed	forKey:@"activateTriggerOnArmed"];
+    [encoder encodeBool:invertTrigger			forKey:@"invertTrigger"];
+
+    [encoder encodeInt:clockSource				forKey:@"clockSource"];
+	[encoder encodeInt32:enabledMask			forKey:@"enabledMask"];
+    [encoder encodeInt:gtMask					forKey:@"gtMask"];
+	
+    [encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
+	
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+	//csr
+	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo3]			  forKey:@"bankFullTo3"];
+	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo2]			  forKey:@"bankFullTo2"];
+	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo1]			  forKey:@"bankFullTo1"];
+	[objDictionary setObject: [NSNumber numberWithBool:enableInternalRouting] forKey:@"enableInternalRouting"];
+	[objDictionary setObject: [NSNumber numberWithBool:activateTriggerOnArmed] forKey:@"activateTriggerOnArmed"];
+	[objDictionary setObject: [NSNumber numberWithBool:invertTrigger]		   forKey:@"invertTrigger"];
+	
+
+ 	//clocks
+	[objDictionary setObject: [NSNumber numberWithInt:clockSource]			forKey:@"clockSource"];
+
+	[objDictionary setObject: [NSNumber numberWithLong:enabledMask]			forKey:@"enabledMask"];
+    [objDictionary setObject: thresholds									forKey:@"thresholds"];	
+    [objDictionary setObject: gateLengths									forKey:@"gateLengths"];	
+    [objDictionary setObject: pulseLengths									forKey:@"pulseLengths"];	
+    [objDictionary setObject: sumGs											forKey:@"sumGs"];	
+    [objDictionary setObject: peakingTimes									forKey:@"peakingTimes"];	
+    [objDictionary setObject: internalTriggerDelays							forKey:@"internalTriggerDelays"];	
+    [objDictionary setObject: [NSNumber numberWithInt:triggerDecimation]	forKey:@"triggerDecimation"];	
+    [objDictionary setObject: [NSNumber numberWithLong:gtMask]				forKey:@"gtMask"];	
+	
+    return objDictionary;
+}
+
+- (NSArray*) autoTests 
+{
+	NSMutableArray* myTests = [NSMutableArray array];
+	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302AcquistionControl wordSize:4 name:@"Acquistion Reg"]];
+	[myTests addObject:[ORVmeWriteOnlyTest test:kSIS3302KeyReset wordSize:4 name:@"Reset"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartSampling wordSize:4 name:@"Start Sampling"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopSampling wordSize:4 name:@"Stop Sampling"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartAutoBankSwitch wordSize:4 name:@"Stop Auto Bank Switch"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopAutoBankSwitch wordSize:4 name:@"Start Auto Bank Switch"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank1FullFlag wordSize:4 name:@"Clear Bank1 Full"]];
+	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank2FullFlag wordSize:4 name:@"Clear Bank2 Full"]];
+	
+	int i;
+	for(i=0;i<8;i++){
+		[myTests addObject:[ORVmeReadWriteTest test:[self getThresholdRegOffsets:i] wordSize:4 validMask:0xffff name:@"Threshold"]];
+		//[myTests addObject:[ORVmeReadOnlyTest test:adcMemory[i] length:64*1024 wordSize:4 name:@"Adc Memory"]];
+	}
+	return myTests;
+}
+@end
+
+@implementation ORSIS3302Model (private)
+- (void) setUpArrays
+{
 	int i;
 	if(!thresholds){
 		thresholds = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
 		for(i=0;i<kNumSIS3302Channels;i++)[thresholds addObject:[NSNumber numberWithInt:0]];
+	}
+	
+	if(!dacOffsets){
+		dacOffsets = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
+		for(i=0;i<kNumSIS3302Channels;i++)[dacOffsets addObject:[NSNumber numberWithInt:0]];
 	}
 	
 	if(!gateLengths){
@@ -1319,7 +1902,7 @@ static unsigned long adcMemory[8]={
 		sumGs = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
 		for(i=0;i<kNumSIS3302Channels;i++)[sumGs addObject:[NSNumber numberWithInt:0]];
 	}
-		
+	
 	if(!peakingTimes){
 		peakingTimes = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
 		for(i=0;i<kNumSIS3302Channels;i++)[peakingTimes addObject:[NSNumber numberWithInt:0]];
@@ -1329,110 +1912,8 @@ static unsigned long adcMemory[8]={
 		internalTriggerDelays = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
 		for(i=0;i<kNumSIS3302Channels;i++)[internalTriggerDelays addObject:[NSNumber numberWithInt:0]];
 	}
-	
-	if(!triggerDecimations){
-		triggerDecimations = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[triggerDecimations addObject:[NSNumber numberWithInt:0]];
-	}
-	
-    [[self undoManager] enableUndoRegistration];
-    
-    return self;
 }
 
-- (void)encodeWithCoder:(NSCoder*)encoder
-{
-    [super encodeWithCoder:encoder];
-	
-	[encoder encodeInt:sampleStartIndex			forKey:@"sampleStartIndex"];
-	[encoder encodeInt:sampleLength				forKey:@"sampleLength"];
-	[encoder encodeInt:dacOffset				forKey:@"dacOffset"];
-	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
-	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
-	[encoder encodeInt:acqRegEnableMask			forKey:@"acqRegEnableMask"];
-	[encoder encodeObject:thresholds			forKey:@"thresholds"];
-	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
-	[encoder encodeObject:pulseLengths			forKey:@"pulseLengths"];
-	[encoder encodeObject:sumGs					forKey:@"sumGs"];
-	[encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
-	[encoder encodeObject:internalTriggerDelays	forKey:@"internalTriggerDelays"];
-	[encoder encodeObject:triggerDecimations	forKey:@"triggerDecimations"];
-
-	//csr
-    [encoder encodeBool:bankFullTo3				forKey:@"bankFullTo3"];
-    [encoder encodeBool:bankFullTo2				forKey:@"bankFullTo2"];
-    [encoder encodeBool:bankFullTo1				forKey:@"bankFullTo1"];
-    [encoder encodeBool:enableInternalRouting	forKey:@"enableInternalRouting"];
-    [encoder encodeBool:activateTriggerOnArmed	forKey:@"activateTriggerOnArmed"];
-    [encoder encodeBool:invertTrigger			forKey:@"invertTrigger"];
-
-	
- 	//clocks
-    [encoder encodeInt:clockSource				forKey:@"clockSource"];
-	
-    [encoder encodeBool:pageWrap				forKey:@"pageWrap"];
-
-    [encoder encodeInt:pageSize					forKey:@"pageSize"];
-    [encoder encodeInt32:enabledMask			forKey:@"enabledMask"];
-    [encoder encodeInt:gtMask					forKey:@"gtMask"];
-	
-    [encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
-	
-}
-
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-{
-    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-	//csr
-	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo3]			  forKey:@"bankFullTo3"];
-	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo2]			  forKey:@"bankFullTo2"];
-	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo1]			  forKey:@"bankFullTo1"];
-	[objDictionary setObject: [NSNumber numberWithBool:enableInternalRouting] forKey:@"enableInternalRouting"];
-	[objDictionary setObject: [NSNumber numberWithBool:activateTriggerOnArmed] forKey:@"activateTriggerOnArmed"];
-	[objDictionary setObject: [NSNumber numberWithBool:invertTrigger]		forKey:@"invertTrigger"];
-	
-
- 	//clocks
-	[objDictionary setObject: [NSNumber numberWithInt:clockSource]			forKey:@"clockSource"];
-
-	[objDictionary setObject: [NSNumber numberWithInt:pageSize]				forKey:@"pageSize"];
-	[objDictionary setObject: [NSNumber numberWithBool:pageWrap]			forKey:@"pageWrap"];
-	[objDictionary setObject: [NSNumber numberWithLong:enabledMask]			forKey:@"enabledMask"];
-    [objDictionary setObject: thresholds									forKey:@"thresholds"];	
-    [objDictionary setObject: gateLengths									forKey:@"gateLengths"];	
-    [objDictionary setObject: pulseLengths									forKey:@"pulseLengths"];	
-    [objDictionary setObject: sumGs											forKey:@"sumGs"];	
-    [objDictionary setObject: peakingTimes									forKey:@"peakingTimes"];	
-    [objDictionary setObject: internalTriggerDelays							forKey:@"internalTriggerDelays"];	
-    [objDictionary setObject: triggerDecimations							forKey:@"triggerDecimations"];	
-    [objDictionary setObject: [NSNumber numberWithLong:gtMask]				forKey:@"gtMask"];	
-	
-    return objDictionary;
-}
-
-- (NSArray*) autoTests 
-{
-	NSMutableArray* myTests = [NSMutableArray array];
-	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302ControlStatus wordSize:4 name:@"Control Status"]];
-	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302AcquistionControl wordSize:4 name:@"Acquistion Reg"]];
-	[myTests addObject:[ORVmeWriteOnlyTest test:kSIS3302KeyReset wordSize:4 name:@"Reset"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartSampling wordSize:4 name:@"Start Sampling"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopSampling wordSize:4 name:@"Stop Sampling"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartAutoBankSwitch wordSize:4 name:@"Stop Auto Bank Switch"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopAutoBankSwitch wordSize:4 name:@"Start Auto Bank Switch"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank1FullFlag wordSize:4 name:@"Clear Bank1 Full"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank2FullFlag wordSize:4 name:@"Clear Bank2 Full"]];
-	
-	int i;
-	for(i=0;i<8;i++){
-		[myTests addObject:[ORVmeReadWriteTest test:thresholdRegOffsets[i] wordSize:4 validMask:0xffff name:@"Threshold"]];
-		//[myTests addObject:[ORVmeReadOnlyTest test:adcMemory[i] length:64*1024 wordSize:4 name:@"Adc Memory"]];
-	}
-	return myTests;
-}
-@end
-
-@implementation ORSIS3302Model (private)
 - (void) writeDacOffsets
 {
 	unsigned long data;
@@ -1440,7 +1921,7 @@ static unsigned long adcMemory[8]={
 	int i;
 	for(i=0;i<kNumSIS3302Channels;i++){
 		unsigned long dac_select_no = i%2;
-		data =  [self dacOffset];
+		data =  [self dacOffset:i];
 		[[self adapter] writeLongBlock:&data
 							 atAddress:baseAddress + kSIS3302DacControlStatus + 4 // DAC_DATA
 							numToWrite:1

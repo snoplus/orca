@@ -36,8 +36,8 @@
 #define kSIS3302KeyReset						0x400	  /* write only; D32 */
 
 #define kSIS3302Key0x404SampleLogicReset		0x404	  /* write only; D32 */
-
 #define kSIS3302KeySampleLogicReset				0x410	  /* write only; D32 */
+
 #define kSIS3302KeyDisarm                       0x414	  /* write only; D32 */
 #define kSIS3302KeyTrigger                      0x418	  /* write only; D32 */
 #define kSIS3302KeyTimestampClear               0x41C	  /* write only; D32 */
@@ -370,7 +370,6 @@
 #define kSISClockSrcBit1        0x1000L
 #define kSISClockSrcBit2        0x2000L
 #define kSISClockSrcBit3        0x4000L
-#define kSISClockSetShiftCount  12
 #define kSISBusyStatus			0x00010000
 #define kSISBank1ClockStatus	0x00000001
 #define kSISBank2ClockStatus	0x00000002

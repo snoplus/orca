@@ -28,15 +28,11 @@
 @class ORRateGroup;
 @class ORAlarm;
 
-
 @interface ORSIS3302Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
-    int				pageSize;
 	BOOL			isRunning;
- 	
- 	
-    BOOL			pageWrap;
+
     BOOL			gateChaining;
 	
 	//control status reg
@@ -52,15 +48,16 @@
 	
 	unsigned long   dataId;
 
-	long			enabledMask;
-	long			gtMask;
+	short			enabledMask;
+	short			gtMask;
+	short			triggerDecimation;
 	NSMutableArray* thresholds;
+    NSMutableArray* dacOffsets;
 	NSMutableArray* gateLengths;
 	NSMutableArray* pulseLengths;
 	NSMutableArray* sumGs;
 	NSMutableArray* peakingTimes;
 	NSMutableArray* internalTriggerDelays;
-	NSMutableArray* triggerDecimations;
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3302Channels];
@@ -74,10 +71,32 @@
     short acqRegEnableMask;
     short lemoOutMode;
     short lemoInMode;
-    unsigned short dacOffset;
     unsigned short sampleLength;
     unsigned short sampleStartIndex;
+	BOOL bankOneArmed;
+
+    int preTriggerDelay;
+    int triggerGateLength;
+    int energyPeakingTime;
+    int energyGapTime;
+    int energySampleLength;
+    int energySampleStartIndex1;
+    int energySampleStartIndex2;
+    int energySampleStartIndex3;
+    int energyTauFactor;
+    int endAddressThreshold;
+    int runMode;
+	
+	//calculated values
+	unsigned long numEnergyValues;
+	unsigned long numRawDataLongWords;
+	unsigned long rawDataIndex;
+	unsigned long energyIndex;
+	unsigned long energyMaxIndex;
+	unsigned long eventLengthLongWords;
 }
+
+- (unsigned long) readEndAddress; //temp for testing
 
 - (id) init;
 - (void) dealloc;
@@ -85,16 +104,46 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (int) runMode;
+- (void) setRunMode:(int)aRunMode;
+- (int) endAddressThreshold;
+- (void) setEndAddressThreshold:(int)aEndAddressThreshold;
+- (int) energyTauFactor;
+- (void) setEnergyTauFactor:(int)aEnergyTauFactor;
+- (int) energySampleStartIndex3;
+- (void) setEnergySampleStartIndex3:(int)aEnergySampleStartIndex3;
+- (int) energySampleStartIndex2;
+- (void) setEnergySampleStartIndex2:(int)aEnergySampleStartIndex2;
+- (int) energySampleStartIndex1;
+- (void) setEnergySampleStartIndex1:(int)aEnergySampleStartIndex1;
+- (int) energySampleLength;
+- (void) setEnergySampleLength:(int)aEnergySampleLength;
+- (int) energyGapTime;
+- (void) setEnergyGapTime:(int)aEnergyGapTime;
+- (int) energyPeakingTime;
+- (void) setEnergyPeakingTime:(int)aEnergyPeakingTime;
+- (int) triggerGateLength;
+- (void) setTriggerGateLength:(int)aTriggerGateLength;
+- (int) preTriggerDelay;
+- (void) setPreTriggerDelay:(int)aPreTriggerDelay;
+- (unsigned long) getThresholdRegOffsets:(int) channel;
+- (unsigned long) getTriggerSetupRegOffsets:(int) channel; 
+- (unsigned long) getTriggerExtSetupRegOffsets:(int)channel;
+- (unsigned long) getEndThresholdRegOffsets:(int)group;
+- (unsigned long) getSampleAddress:(int)channel;
+- (unsigned long) getAdcMemory:(int)channel;
+- (unsigned long) getEventConfigAdcOffsets:(int)group;
+
 - (unsigned short) sampleStartIndex;
 - (void) setSampleStartIndex:(unsigned short)aSampleStartIndex;
 - (unsigned short) sampleLength;
 - (void) setSampleLength:(unsigned short)aSampleLength;
-- (unsigned short) dacOffset;
-- (void) setDacOffset:(unsigned short)aDacOffset;
 - (short) lemoInMode;
 - (void) setLemoInMode:(short)aLemoInMode;
+- (NSString*) lemoInAssignments;
 - (short) lemoOutMode;
 - (void) setLemoOutMode:(short)aLemoOutMode;
+- (NSString*) lemoOutAssignments;
 - (short) acqRegEnableMask;
 - (void) setAcqRegEnableMask:(short)aAcqRegEnableMask;
 - (void) setDefaults;
@@ -116,20 +165,15 @@
 - (void) setClockSource:(int)aClockSource;
 
 //event configuration
-- (BOOL) pageWrap;
-- (void) setPageWrap:(BOOL)aPageWrap;
 - (BOOL) gateChaining;
 - (void) setGateChaining:(BOOL)aState;
 
-- (int) pageSize;
-- (void) setPageSize:(int)aPageSize;
-
-- (long) enabledMask;
+- (short) enabledMask;
 - (BOOL) enabled:(short)chan;
-- (void) setEnabledMask:(long)aMask;
+- (void) setEnabledMask:(short)aMask;
 - (void) setEnabledBit:(short)chan withValue:(BOOL)aValue;
 
-- (long) gtMask;
+- (short) gtMask;
 - (void) setGtMask:(long)aMask;
 - (BOOL) gt:(short)chan;
 - (void) setGtBit:(short)chan withValue:(BOOL)aValue;
@@ -137,11 +181,13 @@
 - (void) setPeakingTime:(short)chan withValue:(short)aValue;
 - (short) internalTriggerDelay:(short)chan;
 - (void) setInternalTriggerDelay:(short)chan withValue:(short)aValue;
-- (short) triggerDecimation:(short)aChan;
-- (void) setTriggerDecimation:(short)aChan withValue:(short)aValue;
+- (short) triggerDecimation;
+- (void) setTriggerDecimation:(short)aValue;
 
-- (void) setThreshold:(short)chan withValue:(int)aValue;
 - (int) threshold:(short)chan;
+- (void) setThreshold:(short)chan withValue:(int)aValue;
+- (unsigned short) dacOffset:(short)chan;
+- (void) setDacOffset:(short)aChan withValue:(int)aValue;
 - (void) setPulseLength:(short)aChan withValue:(short)aValue;
 - (short) pulseLength:(short)chan;
 - (void) setGateLength:(short)aChan withValue:(short)aValue;
@@ -159,24 +205,32 @@
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
-- (int) numberOfSamples;
+- (void) calculateSampleValues;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Hardware Access
+#pragma mark •••Hardware Access
 - (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax;
 - (void) initBoard;
 - (void) readModuleID:(BOOL)verbose;
-- (void) writeControlStatusRegister;
 - (void) writeAcquistionRegister;
+- (void) writeEventConfiguration;
 - (void) writeThresholds;
 - (void) readThresholds:(BOOL)verbose;
 - (void) setLed:(BOOL)state;
-- (void) enableUserOut:(BOOL)state;
+- (void) report;
+- (void) resetSamplingLogic;
+- (void) writePageRegister:(int) aPage;
+- (void) writePreTriggerDelayAndTriggerGateDelay;
+- (void) writeEnergyGP;
+- (void) writeBufferConfiguration;
+
 //- (void) startSampling;
 //- (void) stopSampling;
 //- (void) startBankSwitching;
 //- (void) stopBankSwitching;
 //- (void) clearBankFullFlag:(int)whichFlag;
 
+- (void) disarmSampleLogic;
+- (void) clearTimeStamp;
 - (void) disArm:(int)bank;
 - (void) arm:(int)bank;
 - (BOOL) bankIsFull:(int)bank;
@@ -185,12 +239,17 @@
 - (int) dataWord:(int)chan index:(int)index;
 
 - (unsigned long) acqReg;
-- (unsigned long) configReg;
 - (void) testMemory;
-- (void) testEventRead;
+- (void) readOneEvent;
+- (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel;
+- (unsigned long) getADCBufferRegisterOffset:(int) channel;
+- (void) readOutEvents;
+- (void) readOutChannel:(int) channel;
+- (void) disarmAndArmBank:(int) bank;
+- (void) disarmAndArmNextBank;
+- (void) forceTrigger;
 
-
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
+#pragma mark •••Data Taker
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
@@ -204,25 +263,37 @@
 - (void) clearWaveFormCounts;
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (BOOL) isEvent;
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Wizard
+#pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Archival
+#pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢AutoTesting
+#pragma mark •••AutoTesting
 - (NSArray*) autoTests; 
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelRunModeChanged;
+extern NSString* ORSIS3302ModelEndAddressThresholdChanged;
+extern NSString* ORSIS3302ModelEnergySampleStartIndex3Changed;
+extern NSString* ORSIS3302ModelEnergyTauFactorChanged;
+extern NSString* ORSIS3302ModelEnergySampleStartIndex2Changed;
+extern NSString* ORSIS3302ModelEnergySampleStartIndex1Changed;
+extern NSString* ORSIS3302ModelEnergySampleLengthChanged;
+extern NSString* ORSIS3302ModelEnergyGapTimeChanged;
+extern NSString* ORSIS3302ModelEnergyPeakingTimeChanged;
+extern NSString* ORSIS3302ModelTriggerGateLengthChanged;
+extern NSString* ORSIS3302ModelPreTriggerDelayChanged;
 extern NSString* ORSIS3302SampleStartIndexChanged;
 extern NSString* ORSIS3302SampleLengthChanged;
 extern NSString* ORSIS3302DacOffsetChanged;
@@ -235,7 +306,6 @@ extern NSString* ORSIS3302AcqRegChanged;
 extern NSString* ORSIS3302EventConfigChanged;
 
 extern NSString* ORSIS3302ClockSourceChanged;
-extern NSString* ORSIS3302PageSizeChanged;
 extern NSString* ORSIS3302EnabledChanged;
 extern NSString* ORSIS3302ThresholdChanged;
 extern NSString* ORSIS3302ThresholdArrayChanged;
