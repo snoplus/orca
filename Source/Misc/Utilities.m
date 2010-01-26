@@ -180,9 +180,14 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 		int n = [sig numberOfArguments];
 		int j;
 		NSString* finalName = @"";
-		for(j=0;j<n-2;j++){
-			const char* theType = decodeType([sig getArgumentTypeAtIndex:j+2]);
-			finalName = [finalName stringByAppendingFormat:@"%@:(%s) ",[parts objectAtIndex:j],theType];
+		if(n==2){
+			finalName = [finalName stringByAppendingFormat:@"%@",[parts objectAtIndex:0]];
+		}
+		else {
+			for(j=0;j<n-2;j++){
+				const char* theType = decodeType([sig getArgumentTypeAtIndex:j+2]);
+				finalName = [finalName stringByAppendingFormat:@"%@:(%s) ",[parts objectAtIndex:j],theType];
+			}
 		}
 		if([finalName length] > 1)[methodNames addObject:finalName];
 	}
