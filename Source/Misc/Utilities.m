@@ -174,7 +174,17 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 	int i;
 	NSMutableArray* methodNames = [NSMutableArray array];
 	for(i=0;i<methodCount;i++){
-		[methodNames addObject:NSStringFromSelector(method_getName(methods[i]))];
+		NSString* aName = NSStringFromSelector(method_getName(methods[i]));
+		NSArray* parts = [aName componentsSeparatedByString:@":"];
+		NSMethodSignature* sig = [aClass instanceMethodSignatureForSelector:method_getName(methods[i])];
+		int n = [sig numberOfArguments];
+		int j;
+		NSString* finalName = @"";
+		for(j=0;j<n-2;j++){
+			const char* theType = decodeType([sig getArgumentTypeAtIndex:j+2]);
+			finalName = [finalName stringByAppendingFormat:@"%@:(%s) ",[parts objectAtIndex:j],theType];
+		}
+		if([finalName length] > 1)[methodNames addObject:finalName];
 	}
 	free(methods);
 	[methodNames sortUsingSelector:@selector(caseInsensitiveCompare:)];
@@ -201,4 +211,28 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 NSString* hexToString(unsigned long aHexValue)
 {
 	return [NSString stringWithFormat:@"%x",aHexValue];
+}
+
+const char* decodeType(const char* aType)
+{
+	if(!strcmp(aType,"@"))return "id";
+	else if(!strcmp(aType,"c"))return "char";
+	else if(!strcmp(aType,"i"))return "int";
+	else if(!strcmp(aType,"s"))return "short";
+	else if(!strcmp(aType,"l"))return "long";
+	else if(!strcmp(aType,"q"))return "long long";
+	else if(!strcmp(aType,"C"))return "unsigned char";
+	else if(!strcmp(aType,"I"))return "unsigned int";
+	else if(!strcmp(aType,"S"))return "unsigned short";
+	else if(!strcmp(aType,"L"))return "unsigned long";
+	else if(!strcmp(aType,"Q"))return "unsigned long long";
+	else if(!strcmp(aType,"f"))return "float";
+	else if(!strcmp(aType,"d"))return "double";
+	else if(!strcmp(aType,"B"))return "bool";
+	else if(!strcmp(aType,"v"))return "void";
+	else if(!strcmp(aType,"*"))return "char *";
+	else if(!strcmp(aType,"#"))return "Class";
+	else if(!strcmp(aType,":"))return "SEL";
+	else return aType;
+	
 }

@@ -36,3 +36,4 @@ io_service_t rootService();
 NSString* listMethods(Class aClass);
 NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass);
 NSString* hexToString(unsigned long aHexValue);
+const char* decodeType(const char* aType);
