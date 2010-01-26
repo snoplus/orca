@@ -220,6 +220,7 @@
 - (void) writePreTriggerDelayAndTriggerGateDelay;
 - (void) writeEnergyGP;
 - (void) writeBufferConfiguration;
+- (void) writeEnergyFilterValues;
 
 //- (void) startSampling;
 //- (void) stopSampling;

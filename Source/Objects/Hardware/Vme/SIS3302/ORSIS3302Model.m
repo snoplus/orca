@@ -144,7 +144,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) setEnergyTauFactor:(int)aEnergyTauFactor
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyTauFactor:energyTauFactor];
-    energyTauFactor = aEnergyTauFactor;
+    energyTauFactor = [self limitIntValue:aEnergyTauFactor min:0 max:0x3f];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyTauFactorChanged object:self];
 }
 
@@ -819,7 +819,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		BOOL gtEnabled = [self gt:i];
 		if(!enabled)	thresholdMask |= (1<<26); //logic is inverted on the hw
 		if(gtEnabled)	thresholdMask |= (1<<25);
-		thresholdMask |= ([self threshold:i] & 0x1FFFF);
+		thresholdMask |= (0x10000 + [self threshold:i]);
 		
 		[[self adapter] writeLongBlock:&thresholdMask
 							 atAddress:[self baseAddress] + [self getThresholdRegOffsets:i]
@@ -832,7 +832,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 - (void) writeEventConfiguration
 {
-	//temp value.........
+	//temp hard coded value.........
 	long i;
 	for(i=0;i<4;i++){
 		unsigned long aValueMask = ((i+1)<<19) | 0x00001414;
@@ -873,10 +873,13 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 					 usingAddSpace:0x01];
 	
 	[self resetSamplingLogic];
-	
+}
+
+- (void) writeEnergyFilterValues
+{
 	unsigned long aValue = endAddressThreshold;
 	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + 0x01000004
+						 atAddress:[self baseAddress] + kSIS3302EndAddressThresholdAllAdc
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -905,6 +908,19 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	aValue = energySampleStartIndex3;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex3AllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+
+	aValue = energyTauFactor;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc1357
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc2468
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -984,14 +1000,14 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) initBoard
 {  
 	[self reset];							//reset the card
+	[self writePreTriggerDelayAndTriggerGateDelay];
+	[self writeEnergyGP];
 	[self writeAcquistionRegister];			//set up the Acquisition Register
 	[self writeThresholds];
-	[self writeEnergyGP];
 	[self writeTriggerSetups];
 	[self writeBufferConfiguration];
 	[self writeEventConfiguration];
-	[self writePreTriggerDelayAndTriggerGateDelay];
-	[self writeEnergyGP];
+	[self writeEnergyFilterValues];
 }
 
 - (void) testMemory
@@ -1234,7 +1250,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	if(![self isEvent]) return;
 	
  	NSLog(@"****Event\n");
-	//[self disarmSampleLogic];
+	[self disarmSampleLogic];
 	
     // Try disarm current bank and arm the next one
     //[self disarmAndArmNextBank];
@@ -1251,14 +1267,12 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 - (void) readOutChannel:(int) channel
 {
-	NSLog(@"************Channel %d\n",channel);
 	unsigned long endSampleAddress = 0;
 	[[self adapter] readLongBlock:&endSampleAddress
 						atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
 						numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	NSLog(@"end_sample_address: 0x%08x\n",endSampleAddress);
 	
     endSampleAddress &= 0xffffff ; // mask bank2 address bit (bit 24)
 	
@@ -1268,6 +1282,8 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	
     // readout	   	
     if (endSampleAddress != 0) {
+		NSLog(@"************Channel %d\n",channel);
+		NSLog(@"end_sample_address: 0x%08x\n",endSampleAddress);
 		
 		//check a bunch of addresses -- not sure which one is relevent
 		unsigned long EventConfig = 0;
@@ -1412,8 +1428,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 			unsigned long numToRead = (endSampleAddress & 0x3ffffc)/2;
 			NSLog(@"channel %d should read %d longs\n",channel,numToRead);
 			int n;
-			//for(n=0;n<numToRead;n+=4){
-			for(n=0;n<40;n+=4){
+			for(n=0;n<numToRead;n+=4){
 				unsigned long adc_Memory1 = 0;
 				
 				//****TO DO read block....
@@ -1423,6 +1438,8 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 								   withAddMod: [self addressModifier]
 								usingAddSpace:0x01];
 				NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
+				//NSLog(@"%d: %d\n",n,adc_Memory1&0xffff);
+				if(adc_Memory1 == 0xdeadbeef)break;
 				//int32_t error = DMARead(addr, (uint32_t)0x08, 
 				//						(uint32_t)8, buffer,  
 				//						num_bytes_to_read);
