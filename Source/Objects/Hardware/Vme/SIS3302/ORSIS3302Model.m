@@ -955,11 +955,8 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 }
 
 - (void) writeBufferConfiguration
-{
-	unsigned long rawDataSampleLen  = [self sampleLength] & 0xfffc;
-	unsigned long rawDataStartIndex = [self sampleStartIndex] & 0xfffe; 
-	
-	unsigned long aValueMask = (rawDataSampleLen<<16) | (rawDataStartIndex <<16);
+{	
+	unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
 	
 	[[self adapter] writeLongBlock:&aValueMask
 						 atAddress:[self baseAddress] + kSIS3302RAWDataBufferConfigAllAdc
@@ -999,8 +996,8 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) initBoard
 {  
 	[self reset];							//reset the card
-	[self writePreTriggerDelayAndTriggerGateDelay];
 	[self writeEnergyGP];
+	[self writePreTriggerDelayAndTriggerGateDelay];
 	[self writeAcquistionRegister];			//set up the Acquisition Register
 	[self writeThresholds];
 	[self writeTriggerSetups];
@@ -1332,29 +1329,32 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 			uint_max_event_use =  endSampleAddress / eventLengthLongWords ;
 			gl_uint_CountOfNotProcessedTriggerCount = gl_uint_CountOfNotProcessedTriggerCount + (uint_max_event_saved - uint_max_event_use) ;
 		}
-		if (endSampleAddress != 0) {
+		
+		unsigned long numToRead = (endSampleAddress & 0x3ffffc)/2;
+		NSLog(@"channel %d should read %d longs\n",channel,numToRead);
+		int n;
+		int c = 0;
+		for(n=0;n<numToRead;n+=4){
+			unsigned long adc_Memory1 = 0;
 			
-			unsigned long numToRead = (endSampleAddress & 0x3ffffc)/2;
-			NSLog(@"channel %d should read %d longs\n",channel,numToRead);
-			int n;
-			for(n=0;n<numToRead;n+=4){
-				unsigned long adc_Memory1 = 0;
-				
-				//****TO DO read block....
-				[[self adapter] readLongBlock:&adc_Memory1
-									atAddress:[self baseAddress] + [self getADCBufferRegisterOffset:channel] + n
-									numToRead:1
-								   withAddMod: [self addressModifier]
-								usingAddSpace:0x01];
-				NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
-				//NSLog(@"%d: %d\n",n,adc_Memory1&0xffff);
-				if(adc_Memory1 == 0xdeadbeef)break;
-				//int32_t error = DMARead(addr, (uint32_t)0x08, 
-				//						(uint32_t)8, buffer,  
-				//						num_bytes_to_read);
+			//****TO DO read block....
+			[[self adapter] readLongBlock:&adc_Memory1
+								atAddress:[self baseAddress] + [self getADCBufferRegisterOffset:channel] + n
+								numToRead:1
+							   withAddMod: [self addressModifier]
+							usingAddSpace:0x01];
+			NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
+			//NSLog(@"%d: %d\n",n,adc_Memory1&0xffff);
+			if(adc_Memory1 == 0xdeadbeef){
+				c++;
+				if(c>2)break;
 			}
+			//int32_t error = DMARead(addr, (uint32_t)0x08, 
+			//						(uint32_t)8, buffer,  
+			//						num_bytes_to_read);
 		}
 	}
+	
 }
 
 - (void) disarmSampleLogic
