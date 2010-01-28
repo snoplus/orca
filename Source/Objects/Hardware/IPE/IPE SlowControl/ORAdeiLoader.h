@@ -22,6 +22,9 @@
 #define kcsvFormat 0
 #define kxmlFormat 1
 
+#define kTimeoutInterval 10.0
+// #define kTimeoutInterval 15.0
+
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORAdeiLoader : NSObject <NSXMLParserDelegate> {
 #else																						// pre-10.6 fallback
@@ -39,6 +42,8 @@
 	BOOL				dataFormat;
 	BOOL				fastGenOption;
 	NSArray*			setupOptions;
+    
+	BOOL				showDebugOutput;
 }
 
 + (id)	 loaderWithAdeiHost:(NSString*)aHost adeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector setupOptions:(NSArray*)setupOptions;
@@ -53,6 +58,8 @@
 - (void) requestSensorItem:(NSString*)aPath;
 - (void) requestControlItem:(NSString*)aPath;
 - (void) writeControl:(NSString*)aPath value:(double)aValue;
+- (void) setShowDebugOutput:(BOOL) aOption;
+- (BOOL) showDebugOutput;
 
 #pragma mark •••Helpers
 + (NSString*) controlItemRequestStringUrl:(NSString*)aUrl itemPath:(NSString*)aPath;

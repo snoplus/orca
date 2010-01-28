@@ -43,6 +43,7 @@
 	didFinishSelector	= aSelector;
 	adeiType			= aType;
 	setupOptions		= [someArray retain];
+    showDebugOutput     = false;
 	[self retain];
 	return self;
 }
@@ -78,7 +79,8 @@
 			path = [aPath copy];
 			recursive  = NO;
 			NSURL* furl = [NSURL URLWithString: requestString];
-			NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:10.0];// make it configurable
+            if(showDebugOutput) NSLog(@"Sending out sensor request string: >>>%@<<<\n",requestString);//debugging
+			NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
 			theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 		}
 	}
@@ -102,7 +104,8 @@
 		path = [aPath copy];
 		recursive  = NO;
 		NSURL* furl = [NSURL URLWithString: requestString];
-		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:10.0];// make it configurable
+        if(showDebugOutput) NSLog(@"Sending out sensor request string: >>>%@<<<\n",requestString);//debugging
+		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
 		theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 	}
 }
@@ -115,7 +118,8 @@
 		path = [aPath copy];
 		recursive  = NO;
 		NSURL* furl = [NSURL URLWithString: requestString];
-		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:10.0];// make it configurable
+        if(showDebugOutput) NSLog(@"Sending out control request string: >>>%@<<<\n",requestString);//debugging
+		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
 		theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 	}
 }
@@ -172,10 +176,17 @@
 		dataFormat = kxmlFormat;
 		path = [aPath copy];
 		NSURL* furl = [NSURL URLWithString: requestString];
-		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:10.0];// make it configurable
+		NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
 		theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
 	}
 }
+
+- (void) setShowDebugOutput:(BOOL) aOption
+{    showDebugOutput = aOption; }
+
+- (BOOL) showDebugOutput
+{   return showDebugOutput; }
+
 
 #pragma mark ***Delegate Methods
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
@@ -190,6 +201,9 @@
 
 - (void)connection:(NSURLConnection *)connection  didFailWithError:(NSError *)error
 {	
+    if(showDebugOutput) 
+    NSLog(@"ADEI Loader::didFailWithError: Connection Failed :: descr. >>>%@<<<\n",[error localizedDescription]);//debugging timeouts
+
     if(connection==theAdeiConnection){
         // release the connection, and the data object
         [theAdeiConnection release];
@@ -202,6 +216,11 @@
 
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection
 {
+    if(showDebugOutput){//debug timeouts
+        NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+        NSLogFont(aFont,@"Received data/string after URL request: >>>%@<<<\n",[receivedData description]);
+    }
+    //handle the request
 	if(dataFormat == kxmlFormat){
 		[self parseXMLData:receivedData];
 		if(adeiType==kControlType){
@@ -322,7 +341,8 @@ didStartElement:(NSString*) elementName
 	if([elementName isEqual:@"Value"]){
 		if(!resultArray)resultArray = [[NSMutableArray array] retain];
 		NSMutableDictionary* dictWithAdditions = [NSMutableDictionary dictionaryWithDictionary:attributeDict];
-		if(adeiType)[dictWithAdditions setObject:[NSNumber numberWithInt:adeiType]	forKey:@"Control"];
+		if(adeiType)//TODO: check the value, not only existence (in the future there will be more adei types)-tb-
+            [dictWithAdditions setObject:[NSNumber numberWithInt:adeiType]	forKey:@"Control"];
 		[resultArray addObject:dictWithAdditions];
 	}
 }
