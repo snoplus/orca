@@ -233,9 +233,6 @@
 
 - (void) disarmSampleLogic;
 - (void) clearTimeStamp;
-- (void) disArm:(int)bank;
-- (void) arm:(int)bank;
-- (BOOL) bankIsFull:(int)bank;
 - (void) writeTriggerSetups;
 
 - (int) dataWord:(int)chan index:(int)index;

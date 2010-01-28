@@ -665,7 +665,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
 	
 	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
+                         atAddress:[self baseAddress] + kSIS3302AcquisitionControl
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -701,58 +701,6 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
                      usingAddSpace:0x01];
 }
 
-/*
-- (void) startSampling
-{
-	unsigned long aValue = 0x0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kStartSampling
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) stopSampling
-{
-	unsigned long aValue = 0x0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kStopSampling
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) startBankSwitching
-{
-	unsigned long aValue = 0x0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kStartAutoBankSwitch
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) stopBankSwitching
-{
-	unsigned long aValue = 0x0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kStopAutoBankSwitch
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) clearBankFullFlag:(int)whichFlag
-{
-	unsigned long aValue = 0x0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + (whichFlag?kClearBank2FullFlag:kClearBank1FullFlag)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-*/
-
 - (int) dataWord:(int)chan index:(int)index
 {
 	if([self enabled:chan]){	
@@ -768,55 +716,11 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {
  	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kSIS3302AcquistionControl
+						atAddress:[self baseAddress] + kSIS3302AcquisitionControl
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 	return aValue;
-}
-
-- (void) disArm:(int)bank
-{
- 	unsigned long aValue = ACQMask(FALSE,bank?kSISSampleBank2:kSISSampleBank1);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) arm:(int)bank
-{
- 	unsigned long aValue = ACQMask(TRUE , bank?kSISSampleBank2:kSISSampleBank1);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (BOOL) bankIsFull:(int)bank
-{
-	unsigned long aValue=0;
-	[[self adapter] readLongBlock:&aValue
-                         atAddress:[self baseAddress] + kSIS3302AcquistionControl
-                        numToRead:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	unsigned long mask = (bank?kSISBank2ClockStatus : kSISBank1ClockStatus);
-	return (aValue & mask) == 0;
-}
-
-- (BOOL) bankIsBusy:(int)bank
-{
-	unsigned long aValue=0;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kSIS3302AcquistionControl
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	unsigned long mask = (bank?kSISBank2BusyStatus : kSISBank1BusyStatus);
-	return (aValue & mask) != 0;
 }
 
 - (void) writeThresholds
@@ -829,7 +733,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		BOOL gtEnabled = [self gt:i];
 		if(!enabled)	thresholdMask |= (1<<26); //logic is inverted on the hw
 		if(gtEnabled)	thresholdMask |= (1<<25);
-		thresholdMask |= (0x10000 + [self threshold:i]);
+		thresholdMask |= (0x08010000 | [self threshold:i]);
 		
 		[[self adapter] writeLongBlock:&thresholdMask
 							 atAddress:[self baseAddress] + [self getThresholdRegOffsets:i]
@@ -858,7 +762,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {
 	unsigned long aValue = (([self preTriggerDelay]&0x01ff)<<16) | [self triggerGateLength];
 	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggergateLengthAllAdc
+						 atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggerGateLengthAllAdc
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -976,7 +880,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
 	
 	[[self adapter] writeLongBlock:&aValueMask
-						 atAddress:[self baseAddress] + kSIS3302RAWDataBufferConfigAllAdc
+						 atAddress:[self baseAddress] + kSIS3302RawDataBufferConfigAllAdc
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -1014,7 +918,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {  
 	[self reset];							//reset the card
 	[self writePreTriggerDelayAndTriggerGateDelay];
-	[self writeDacOffsets];
+	//[self writeDacOffsets];
 	[self writeThresholds];
 	[self writeTriggerSetups];
 	[self writeBufferConfiguration];
@@ -1104,10 +1008,10 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (unsigned long) getEndThresholdRegOffsets:(int)group
 {
 	switch (group) {	
-		case 0: return 	 kSIS3302ENDAddressThresholdAdc12;
-		case 1: return 	 kSIS3302ENDAddressThresholdAdc34;
-		case 2: return 	 kSIS3302ENDAddressThresholdAdc56;
-		case 3: return 	 kSIS3302ENDAddressThresholdAdc78;
+		case 0: return 	 kSIS3302EndAddressThresholdAdc12;
+		case 1: return 	 kSIS3302EndAddressThresholdAdc34;
+		case 2: return 	 kSIS3302EndAddressThresholdAdc56;
+		case 3: return 	 kSIS3302EndAddressThresholdAdc78;
 	}
 	return (unsigned long) -1;	 
 }
@@ -1157,7 +1061,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {
 	unsigned long data_rd = 0;
 	[[self adapter] readLongBlock:&data_rd
-						atAddress:[self baseAddress] + kSIS3302AcquistionControl
+						atAddress:[self baseAddress] + kSIS3302AcquisitionControl
 						numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -1221,7 +1125,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		
 		unsigned long pretrigger = 0;
 		[[self adapter] readLongBlock:&pretrigger
-							atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggergateLengthAdc12
+							atAddress:[self baseAddress] + kSIS3302PreTriggerDelayTriggerGateLengthAdc12
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];	
@@ -1230,7 +1134,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		
 		unsigned long rawDataBufferConfig = 0;
 		[[self adapter] readLongBlock:&rawDataBufferConfig
-							atAddress:[self baseAddress] + kSIS3302RAWDataBufferConfigAdc12
+							atAddress:[self baseAddress] + kSIS3302RawDataBufferConfigAdc12
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];	
@@ -1293,7 +1197,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		
 		unsigned long energySetupGP = 0;
 		[[self adapter] readLongBlock:&energySetupGP
-							atAddress:[self baseAddress] + kSIS3302EnergySetupGaPAdc12
+							atAddress:[self baseAddress] + kSIS3302EnergySetupGPAdc12
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];	
@@ -1390,7 +1294,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
     if (bank==0) bankOneArmed = YES;
     else		 bankOneArmed = NO;
 	
-    unsigned long addr = [self baseAddress] + ((bank == 0) ? kSIS3302KeyDisarmandArmBank1 : kSIS3302KeyDisarmandArmBank2);
+    unsigned long addr = [self baseAddress] + ((bank == 0) ? kSIS3302KeyDisarmAndArmBank1 : kSIS3302KeyDisarmAndArmBank2);
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
 						atAddress:addr
@@ -1558,7 +1462,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		
 	currentBank = 0;
 	//[self clearBankFullFlag:currentBank];
-	[self arm:currentBank];
+	//[self arm:currentBank];
 	//[self startSampling];
 	[self setLed:YES];
 	isRunning = NO;
@@ -1810,7 +1714,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (NSArray*) autoTests 
 {
 	NSMutableArray* myTests = [NSMutableArray array];
-	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302AcquistionControl wordSize:4 name:@"Acquistion Reg"]];
+	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302AcquisitionControl wordSize:4 name:@"Acquistion Reg"]];
 	[myTests addObject:[ORVmeWriteOnlyTest test:kSIS3302KeyReset wordSize:4 name:@"Reset"]];
 	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartSampling wordSize:4 name:@"Start Sampling"]];
 	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopSampling wordSize:4 name:@"Stop Sampling"]];
@@ -1870,61 +1774,78 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 - (void) writeDacOffsets
 {
-	unsigned long data;
-	unsigned long max_timeout, timeout_cnt;
+	
+	unsigned int max_timeout, timeout_cnt;
+	
 	int i;
-	for(i=0;i<kNumSIS3302Channels;i++){
-		unsigned long dac_select_no = i%2;
-		data =  [self dacOffset:i];
+	for (i=0;i<8;i++) {	
+		
+		unsigned long data =  [self dacOffset:i];
+		unsigned long addr = [self baseAddress] + kSIS3302DacData  ;
 		[[self adapter] writeLongBlock:&data
-							 atAddress:baseAddress + kSIS3302DacControlStatus + 4 // DAC_DATA
+							 atAddress:addr
+							numToWrite:1
+							withAddMod:addressModifier
+						 usingAddSpace:0x01];
+	
+		
+		data =  1 + (i << 4); // write to DAC Register
+		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
+		[[self adapter] writeLongBlock:&data
+							 atAddress:addr
 							numToWrite:1
 							withAddMod:addressModifier
 						 usingAddSpace:0x01];
 		
-		data =  1 + (dac_select_no << 4); // write to DAC Register
-		[[self adapter] writeLongBlock:&data
-							 atAddress:baseAddress + kSIS3302DacControlStatus
-							numToWrite:1
-							withAddMod:addressModifier
-						 usingAddSpace:0x01];
-		
-		max_timeout = 5000;
-		timeout_cnt = 0;
+		max_timeout = 5000 ;
+		timeout_cnt = 0 ;
+		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
 		do {
 			[[self adapter] readLongBlock:&data
-								atAddress:baseAddress + kSIS3302DacControlStatus
+								 atAddress:addr
 								numToRead:1
-							   withAddMod:addressModifier
-							usingAddSpace:0x01];
+								withAddMod:addressModifier
+							 usingAddSpace:0x01];
+			
 			timeout_cnt++;
-		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) );
+		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) )    ;
 		
 		if (timeout_cnt >=  max_timeout) {
 			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
 			continue;
 		}
 		
-		data =  2 + (dac_select_no << 4); // Load DACs 
 		[[self adapter] writeLongBlock:&data
-							 atAddress:baseAddress + kSIS3302DacControlStatus
+							atAddress:addr
+							numToWrite:1
+						   withAddMod:addressModifier
+						usingAddSpace:0x01];
+		
+		
+		data =  2 + (i << 4); // Load DACs 
+		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
+		[[self adapter] writeLongBlock:&data
+							 atAddress:addr
 							numToWrite:1
 							withAddMod:addressModifier
 						 usingAddSpace:0x01];
-		timeout_cnt = 0;
+
+		timeout_cnt = 0 ;
+		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
 		do {
 			[[self adapter] readLongBlock:&data
-								atAddress:baseAddress + kSIS3302DacControlStatus
+								atAddress:addr
 								numToRead:1
 							   withAddMod:addressModifier
 							usingAddSpace:0x01];
 			timeout_cnt++;
-		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) );
+		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) )    ;
 		
 		if (timeout_cnt >=  max_timeout) {
 			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
 			continue;
 		}
 	}
+	
 }
 @end
