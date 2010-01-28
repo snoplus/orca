@@ -222,14 +222,13 @@
 - (void) writePageRegister:(int) aPage;
 - (void) writePreTriggerDelayAndTriggerGateDelay;
 - (void) writeEnergyGP;
-- (void) writeBufferConfiguration;
+- (void) writeRawDataBufferConfiguration;
 - (void) writeEnergyFilterValues;
-
-//- (void) startSampling;
-//- (void) stopSampling;
-//- (void) startBankSwitching;
-//- (void) stopBankSwitching;
-//- (void) clearBankFullFlag:(int)whichFlag;
+- (void) writeEndAddressThreshold;
+- (void) writeEnergyGateLength;
+- (void) writeEnergyTauFactor;
+- (void) writeEnergySampleLength;
+- (void) writeEnergySampleStartIndexes;
 
 - (void) disarmSampleLogic;
 - (void) clearTimeStamp;

@@ -733,7 +733,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		BOOL gtEnabled = [self gt:i];
 		if(!enabled)	thresholdMask |= (1<<26); //logic is inverted on the hw
 		if(gtEnabled)	thresholdMask |= (1<<25);
-		thresholdMask |= (0x08010000 | [self threshold:i]);
+		thresholdMask |= (0x00010000 | [self threshold:i]);
 		
 		[[self adapter] writeLongBlock:&thresholdMask
 							 atAddress:[self baseAddress] + [self getThresholdRegOffsets:i]
@@ -788,7 +788,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	[self resetSamplingLogic];
 }
 
-- (void) writeEnergyFilterValues
+- (void) writeEndAddressThreshold
 {
 	unsigned long aValue = endAddressThreshold;
 	[[self adapter] writeLongBlock:&aValue
@@ -796,22 +796,47 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-	
-	aValue = energyGateLength;
+}
+
+- (void) writeEnergyGateLength
+{
+	unsigned long aValue = energyGateLength;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAllAdc
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
+}
+
+- (void) writeEnergyTauFactor
+{
+	unsigned long 	aValue = energyTauFactor;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc1357
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
 	
-	aValue = energySampleLength;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc2468
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+- (void) writeEnergySampleLength
+{
+	unsigned long aValue = energySampleLength;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302EnergySampleLengthAllAdc
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
+}
 
-	aValue = energySampleStartIndex1;
+- (void) writeEnergySampleStartIndexes
+{	
+	unsigned long aValue = energySampleStartIndex1;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex1AllAdc
 						numToWrite:1
@@ -828,19 +853,6 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	aValue = energySampleStartIndex3;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex3AllAdc
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-
-	aValue = energyTauFactor;
-	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc1357
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc2468
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -875,7 +887,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	}
 }
 
-- (void) writeBufferConfiguration
+- (void) writeRawDataBufferConfiguration
 {	
 	unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
 	
@@ -917,15 +929,20 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) initBoard
 {  
 	[self reset];							//reset the card
-	[self writePreTriggerDelayAndTriggerGateDelay];
-	//[self writeDacOffsets];
-	[self writeThresholds];
-	[self writeTriggerSetups];
-	[self writeBufferConfiguration];
-	[self writeEventConfiguration];
-	[self writeEnergyFilterValues];
 	[self writeAcquistionRegister];			//set up the Acquisition Register
+	[self writeEventConfiguration];
+	[self writeEndAddressThreshold];
+	[self writePreTriggerDelayAndTriggerGateDelay];
+	[self writeEnergyGateLength];
 	[self writeEnergyGP];
+	[self writeEnergyTauFactor];
+	[self writeRawDataBufferConfiguration];
+	[self writeEnergySampleLength];
+	[self writeEnergySampleStartIndexes];
+	[self writeTriggerSetups];
+	[self writeThresholds];
+	[self writeDacOffsets];
+	[self resetSamplingLogic];
 }
 
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
