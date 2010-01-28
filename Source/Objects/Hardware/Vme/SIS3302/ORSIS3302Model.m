@@ -844,7 +844,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	//temp hard coded value.........
 	long i;
 	for(i=0;i<4;i++){
-		unsigned long aValueMask = ((i+1)<<19) | 0x00001414;
+		unsigned long aValueMask = ((i+1)<<19) | 0x00000404;
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getEventConfigAdcOffsets:i]
 							numToWrite:1
@@ -1176,7 +1176,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	[self disarmSampleLogic];
 	
     // Try disarm current bank and arm the next one
-    [self disarmAndArmNextBank];
+    //[self disarmAndArmNextBank];
 	
 	if(bankOneArmed)[self writePageRegister:0x0];
 	else			[self writePageRegister:0x4];
