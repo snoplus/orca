@@ -726,6 +726,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[aList addCommand: [self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains]];
 	
 	[self executeCommandList:aList];
+    
+    //TODO: now we should wait 180 usec or check the busy flag before other write/read accesses -tb-
+    // (usually (but not guaranteed!) access via TCP/IP is slow enought to produce a 180 usec timeout)
 }
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
@@ -804,13 +807,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) initBoard
 {
 	[self writeControl];
-	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
 	[self writeReg: kFLTV4HrControlReg value:hitRateLength];
 	[self writeReg: kFLTV4PostTrigger  value:postTriggerTime];
 	[self loadThresholdsAndGains];
-	[self writeTriggerControl];			//set trigger mask
+	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
+	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
-	[self enableStatistics];			//enable hardware ADC statistics, ak 7.1.07
+	[self enableStatistics];			//TODO: OBSOLETE -tb- enable hardware ADC statistics, ak 7.1.07
 	
 	if(fltRunMode == kIpeFltV4Katrin_Histo_Mode){
 		[self writeHistogramControl];
@@ -827,14 +830,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return [self readReg: kFLTV4ControlReg];
 }
 
+
+//TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
 	((filterLength & 0xf)<<8)		| 
 	((gapLength & 0xf)<<4)			| 
 	((runBoxCarFilter & 0x1)<<2)	|
-	((startSampling & 0x1)<<1)
-	| 0x1;
+	((startSampling & 0x1)<<1)      |
+	0x1;
 	
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
@@ -868,6 +873,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
 {
 	//TODO:  replace by V4 code -tb-
+    //adc access now is very different from v3 -tb-
 	return 0;
     //TODO: obsolete (v3) -tb-
 	return ([self slot] << 24) | (0x2 << kIpeFlt_AddressSpace) | (aChannel << kIpeFlt_ChannelAddress)	| (aPage << kIpeFlt_PageNumber);
@@ -996,12 +1002,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeReg:kFLTV4InterruptMaskReg value:interruptMask];
 }
 
+
+//TODO: TBD after firmware update -tb- 2010-01-28
 - (void) disableAllTriggers
 {
 	[self writeReg:kFLTV4PixelSettings1Reg value:0x0];       //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
 	[self writeReg:kFLTV4PixelSettings2Reg value:0x3ffffff]; //TODO:
 }
 
+//TODO: TBD after firmware update -tb- 2010-01-28
 - (void) writeTriggerControl  //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
 {
 	//0,0 Normal
@@ -1009,6 +1018,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//1,0 always 0
 	//1,1 always 1
 	[self writeReg:kFLTV4PixelSettings1Reg value:triggerEnabledMask]; //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
+	//[self writeReg:kFLTV4PixelSettings1Reg value:0]; //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
 	[self writeReg:kFLTV4PixelSettings2Reg value:0];
 }
 
@@ -1382,7 +1392,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     }
 }
 
-- (void) reset
+//! Write 1 to all reset/clear flags of the FLTv4 command register.
+- (void) reset 
 {
 	[self writeReg:kFLTV4CommandReg value:kIpeFlt_Reset_All];
 }
@@ -1411,9 +1422,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     //if([[userInfo objectForKey:@"doinit"]intValue]){
 	[self setLedOff:NO];
-	[self writeRunControl:NO];
-	[self reset];
-	[self initBoard];
+	[self writeRunControl:NO];  // writes to run control register
+	[self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register.
+	[self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
 	//}
 	
 	
