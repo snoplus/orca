@@ -44,23 +44,25 @@
   *
   * The channels are free configurable. They can be configured by requesting all available sensor descriptions from the ADEI system
   * and assigning one of these sensors to one of the channels. The available sensors are grouped in a tree structured
-  * hierarchy and are displayed in a outline view. From there a sensor can easily be assigned to a channel.
+  * hierarchy and are displayed in a outline view. From there a sensor can easily be assigned to a channel (drag&drop).
   *
   * The slow control interface provides the ADEI web interface in a web view for monitoring a sensors values graphically.
+  *
+  * 2009-12: Now controls have been added. Controls are similar to Sensors with the extension that a setpoint can be sent to a control.
   *
   * <br>
   * Details: <br>
   *
-  * The class holds a list of channel/sensor items (stored in #sensorList) and a tree (the ADEI hierarchy) of sensor items (starting at #rootAdeiTree).
+  * The class holds a list of channel/sensor items (stored in #requestCache, #pollingLookUp and #channelLookup) and a tree (the ADEI hierarchy) of sensor items (starting at #itemTreeRoot).
   * For channels and sensors we use the same class structure ORSensorItem.
   * Sensors in the list may or may not have a sibling in the tree.
   * So we may or may not have the tree and independently of the tree are able to load the sensor values of
-  * the sensors listed in the #sensorList. So the sensorList can be saved in the .Orca file and used without tree.
+  * the sensors listed in the #requestCache. So the requestCache can be saved in the .Orca file and used without tree.
   * The tree in fact is only necessary for defining the sensors in the "channel map".
   *
-  *
+  * 
   */
-#define kResponseTimeHistogramSize 5000
+#define kResponseTimeHistogramSize 15000
 
 @interface ORIpeSlowControlModel : OrcaObject <ORAdcProcessing>
 {
@@ -203,6 +205,7 @@
 - (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath;
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
+- (BOOL) requestIsPending:(NSString*)itemKey;
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;
 
 //dont use in scripts:

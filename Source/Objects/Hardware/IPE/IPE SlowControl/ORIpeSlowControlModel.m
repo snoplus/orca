@@ -52,7 +52,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (void) itemTreeResults:(id)result path:(NSString*)aPath;
 - (void) polledItemResult:(id)result path:(NSString*)aPath;
 - (void) clearPendingRequest:(NSString*)anItemKey;
-- (void) setPendingRequest:(NSString*)anIemKey;
+- (void) setPendingRequest:(NSString*)anItemKey;
 - (void) checkForTimeOuts;
 - (void) shipTheRecords;
 - (NSTimeInterval) timeFromADEIDate:(NSString*)aDate;
@@ -560,6 +560,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	itemTreeRoot = nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowItemTreeChanged object:self];
 	ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:[self ipNumberToURL] adeiType:itemType delegate:self didFinishSelector:@selector(itemTreeResults:path:)];
+    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
 	[aLoader loadPath:@"/" recursive:YES];
 }
 
@@ -797,12 +798,17 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	}
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollSlowControls) object:nil];
 	for(id anItemKey in pollingLookUp){
+		if([self requestIsPending:anItemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending request: %@\n",anItemKey);
+            continue;
+        }
 		id topLevelDictionary = [requestCache objectForKey:anItemKey];
 		id anItem = [topLevelDictionary objectForKey:anItemKey];
 		int aType = [[anItem objectForKey:@"Control"] intValue];
 		ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:[anItem objectForKey:@"URL"] adeiType:aType delegate:self didFinishSelector:@selector(polledItemResult:path:) setupOptions:setupOptions];
+        [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
 		[aLoader requestItem:[anItem objectForKey:@"Path"]];
-		[self setPendingRequest:anItemKey];
+        [self setPendingRequest:anItemKey];
 		[self setTotalRequestCount:totalRequestCount+1];
 
 	}		
@@ -822,27 +828,48 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 //-------------should use only these methods in scripts---------------------------------
 - (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath
 {
+//NSLog( @"postSensorRequest: \n");//TODO: debug1
+    NSString* anItemKey = [self itemKey:aUrl :aPath];
+//NSLog( @"postSensorRequest: item: %@\n",anItemKey);//TODO: debug1
+		if([self requestIsPending:anItemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
+            //TODO: XXX return;
+        }
 	ORAdeiLoader* aLoader;
 	aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kSensorType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
+    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
 	[aLoader requestItem:aPath];
-	[self setPendingRequest:[self itemKey:aUrl :aPath]];
+	[self setPendingRequest:anItemKey];
 	[self setTotalRequestCount:totalRequestCount+1];
 }
 
 - (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath
 {
+//NSLog( @"postControlRequest: \n");//TODO: debug1
+    NSString* anItemKey = [self itemKey:aUrl :aPath];
+		if([self requestIsPending:anItemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
+            //TODO: XXX return;
+        }
 	ORAdeiLoader* aLoader;
 	aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
+    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
 	[aLoader requestItem:aPath];
-	[self setPendingRequest:[self itemKey:aUrl :aPath]];
+	[self setPendingRequest:anItemKey];
 	[self setTotalRequestCount:totalRequestCount+1];
 }
 
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
 {
+    NSString* anItemKey = [self itemKey:aUrl :aPath];
+		if([self requestIsPending:anItemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
+            //TODO: XXX return;
+        }
     ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
+    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
     [aLoader writeControl:aPath value:aValue];
-	[self setPendingRequest:[self itemKey:aUrl :aPath]];
+	[self setPendingRequest:anItemKey];
     [self setTotalRequestCount:totalRequestCount+1];
 }
 
@@ -886,6 +913,10 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 {
     NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
     if(itemKey){
+		if([self requestIsPending:itemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending item: %@\n",itemKey);
+            //TODO: XXX return;//TODO: allow it anyway? -tb-
+        }
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
 		id anItem = [topLevelDictionary objectForKey:itemKey];
         NSString* aUrl  = [anItem objectForKey:@"URL"];
@@ -897,8 +928,9 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
         // post request
         ORAdeiLoader* aLoader;
         aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:aType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
+        [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
         [aLoader requestItem:aPath];
-        [self setPendingRequest:[self itemKey:aUrl :aPath]];
+        [self setPendingRequest:itemKey];
         [self setTotalRequestCount:totalRequestCount+1];
         //
     }else{
@@ -975,6 +1007,11 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	return [pendingRequests objectForKey:[self itemKey:aUrl:aPath]] != nil;
 }
 
+- (BOOL) requestIsPending:(NSString*)itemKey
+{
+	return [pendingRequests objectForKey:itemKey] != nil;
+}
+
 //if the item is part of the itemArray
 - (void) writeSetPoint:(int)anIndex value:(double)aValue
 {
@@ -995,6 +1032,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
             #if 1
             [self postControlSetpoint:aUrl path:aPath value:aValue];
             #else
+            //TODO: remove from source file -tb-
 			ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:nil];
 			[aLoader writeControl:aPath value:aValue];
 			[self setTotalRequestCount:totalRequestCount+1];
@@ -1167,7 +1205,9 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
         }
 		else{
             [topLevelDictionary setObject:[resultItem objectForKey:@"Value"] forKey:@"DBValue"];
-            [topLevelDictionary setObject:[resultItem objectForKey:@"Date"] forKey:@"DBTimestamp"];//TODO: use Unix time -tb- ?
+            [topLevelDictionary setObject:[resultItem objectForKey:@"Date"] forKey:@"DBTimestamp"];//TODO: use Unix time -tb- ? !!!!!!!!!!!!!
+            //TODO: use Unix time -tb- ? !!!!!!!!!!!!!
+            //TODO: use Unix time -tb- ? !!!!!!!!!!!!!
         }
         
         //housekeeping
@@ -1200,8 +1240,10 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	}
 }
 
+
 - (void) checkForTimeOuts
 {
+    int timeoutTime = 15;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkForTimeOuts) object:nil];
 	NSTimeInterval theCurrentTime = [NSDate timeIntervalSinceReferenceDate];
 	if([pendingRequests count] == 0) return; 
@@ -1209,8 +1251,8 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	for(id anItemKey in theKeys){
 		//it's a dictionary with one key -- the itemKey that holds the time the request was posted
 		NSTimeInterval timePosted = [[pendingRequests objectForKey:anItemKey] doubleValue];
-		if(theCurrentTime - timePosted > 10){
-			NSLog(@"timeout on %@\n",anItemKey);
+		if(theCurrentTime - timePosted > timeoutTime){
+			NSLog(@"timeout on %@ (currentTime %f, timePosted %f)\n", anItemKey ,theCurrentTime ,timePosted);
 			[self setTimeOutCount:[self timeOutCount]+1];
 			[self clearPendingRequest:anItemKey];
 		}
