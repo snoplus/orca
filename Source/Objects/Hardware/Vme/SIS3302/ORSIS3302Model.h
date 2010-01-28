@@ -77,6 +77,7 @@
 
     int preTriggerDelay;
     int triggerGateLength;
+    int energyGateLength;
     int energyPeakingTime;
     int energyGapTime;
     int energySampleLength;
@@ -102,6 +103,8 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (int) energyGateLength;
+- (void) setEnergyGateLength:(int)aEnergyGateLength;
 - (int) runMode;
 - (void) setRunMode:(int)aRunMode;
 - (int) endAddressThreshold;
@@ -280,6 +283,7 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelEnergyGateLengthChanged;
 extern NSString* ORSIS3302ModelRunModeChanged;
 extern NSString* ORSIS3302ModelEndAddressThresholdChanged;
 extern NSString* ORSIS3302ModelEnergySampleStartIndex3Changed;

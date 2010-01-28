@@ -282,6 +282,11 @@
                          name : ORSIS3302ModelRunModeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(energyGateLengthChanged:)
+                         name : ORSIS3302ModelEnergyGateLengthChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -346,9 +351,15 @@
 	[self energySampleStartIndex3Changed:nil];
 	[self endAddressThresholdChanged:nil];
 	[self runModeChanged:nil];
+	[self energyGateLengthChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) energyGateLengthChanged:(NSNotification*)aNote
+{
+	[energyGateLengthField setIntValue: [model energyGateLength]];
+}
 
 - (void) runModeChanged:(NSNotification*)aNote
 {
@@ -679,6 +690,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) energyGateLengthAction:(id)sender
+{
+	[model setEnergyGateLength:[sender intValue]];	
+}
 
 - (IBAction) runModeAction:(id)sender
 {

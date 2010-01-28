@@ -28,8 +28,9 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-NSString* ORSIS3302ModelRunModeChanged = @"ORSIS3302ModelRunModeChanged";
-NSString* ORSIS3302ModelEndAddressThresholdChanged = @"ORSIS3302ModelEndAddressThresholdChanged";
+NSString* ORSIS3302ModelEnergyGateLengthChanged =		@"ORSIS3302ModelEnergyGateLengthChanged";
+NSString* ORSIS3302ModelRunModeChanged					= @"ORSIS3302ModelRunModeChanged";
+NSString* ORSIS3302ModelEndAddressThresholdChanged		= @"ORSIS3302ModelEndAddressThresholdChanged";
 NSString* ORSIS3302ModelEnergySampleStartIndex3Changed	= @"ORSIS3302ModelEnergySampleStartIndex3Changed";
 NSString* ORSIS3302ModelEnergyTauFactorChanged			= @"ORSIS3302ModelEnergyTauFactorChanged";
 NSString* ORSIS3302ModelEnergySampleStartIndex2Changed	= @"ORSIS3302ModelEnergySampleStartIndex2Changed";
@@ -122,6 +123,14 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 }
 
 #pragma mark ***Accessors
+
+- (int) energyGateLength { return energyGateLength; }
+- (void) setEnergyGateLength:(int)aEnergyGateLength
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGateLength:energyGateLength];
+    energyGateLength = aEnergyGateLength;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyGateLengthChanged object:self];
+}
 
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
@@ -241,7 +250,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 - (NSString*) lemoInAssignments
 {
-	if(runMode == 0){
+	if(runMode != 0){
 		if(lemoInMode == 0)      return @"3:Trigger\n2:TimeStamp Clr\n1:Veto";
 		else if(lemoInMode == 1) return @"3:Trigger\n2:TimeStamp Clr\n1:Gate";
 		else if(lemoInMode == 2) return @"3:Reserved\n2:Reserved\n1:Reserved";
@@ -274,7 +283,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 }
 - (NSString*) lemoOutAssignments
 {
-	if(runMode == 0){
+	if(runMode != 0){
 		if(lemoOutMode == 0)      return @"3:Sample logic armed\n2:Busy\n1:Trigger output";
 		else if(lemoOutMode == 1) return @"3:Sample logic armed\n2:Busy or Veto\n1:Trigger output";
 		else if(lemoOutMode == 2) return @"3:N+1 Trig/Gate Out\n2:Trigger output\n1:N-1 Trig/Gate Out";
@@ -599,6 +608,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 - (void) calculateSampleValues
 {
+	if(runMode      == 0)   return;
 	if(runMode      == 1)	numEnergyValues = 510;					//Energy Trapezoidal 510 values + Max and Min
 	else if(runMode == 2)   numEnergyValues = 0;					//No Energy
 	else if(runMode == 3)   numEnergyValues = 3*energySampleLength;	//3 parts of Energy Trapezoidal (3x170 = 510 values) + Max/Min
@@ -846,7 +856,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 - (void) writePreTriggerDelayAndTriggerGateDelay
 {
-	unsigned long aValue = (([self preTriggerDelay]&0x01ff000)<<16) | [self triggerGateLength];
+	unsigned long aValue = (([self preTriggerDelay]&0x01ff)<<16) | [self triggerGateLength];
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggergateLengthAllAdc
 						numToWrite:1
@@ -879,6 +889,13 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	unsigned long aValue = endAddressThreshold;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302EndAddressThresholdAllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	aValue = energyGateLength;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAllAdc
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -930,10 +947,10 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {
 	int i;
 	for(i = 0; i < 8; i++) {
-		unsigned long aExtValueMask = (([self internalTriggerDelay:i] & 0x001fL) << 24) | 
-									  (([self triggerDecimation]      & 0x0003L) << 16) | 
-									  (([self sumG:i]                 & 0x0300L) <<  8) | 
-									   ([self peakingTime:i]          & 0x0300L);
+		unsigned long aExtValueMask =  (([self internalTriggerDelay:i] & 0x001fL) << 24) | 
+									   (([self triggerDecimation]      & 0x0003L) << 16) | 
+									  ((([self sumG:i]>>8)             & 0x0003L) <<  8) | 
+									   (([self peakingTime:i]>>8)      & 0x0300L);
 		
 		[[self adapter] writeLongBlock:&aExtValueMask
 							 atAddress:[self baseAddress] + [self getTriggerExtSetupRegOffsets:i]
@@ -996,14 +1013,14 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) initBoard
 {  
 	[self reset];							//reset the card
-	[self writeEnergyGP];
 	[self writePreTriggerDelayAndTriggerGateDelay];
-	[self writeAcquistionRegister];			//set up the Acquisition Register
 	[self writeThresholds];
 	[self writeTriggerSetups];
 	[self writeBufferConfiguration];
 	[self writeEventConfiguration];
 	[self writeEnergyFilterValues];
+	[self writeAcquistionRegister];			//set up the Acquisition Register
+	[self writeEnergyGP];
 }
 
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
@@ -1159,7 +1176,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	[self disarmSampleLogic];
 	
     // Try disarm current bank and arm the next one
-    //[self disarmAndArmNextBank];
+    [self disarmAndArmNextBank];
 	
 	if(bankOneArmed)[self writePageRegister:0x0];
 	else			[self writePageRegister:0x4];
@@ -1660,6 +1677,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
+    [self setEnergyGateLength:			[decoder decodeIntForKey:@"energyGateLength"]];
     [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
     [self setEndAddressThreshold:		[decoder decodeIntForKey:@"endAddressThreshold"]];
     [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
@@ -1718,6 +1736,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:energyGateLength			forKey:@"energyGateLength"];
 	[encoder encodeInt:runMode					forKey:@"runMode"];
 	[encoder encodeInt:endAddressThreshold		forKey:@"endAddressThreshold"];
 	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];

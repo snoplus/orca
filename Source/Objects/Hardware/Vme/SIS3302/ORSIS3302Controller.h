@@ -28,6 +28,7 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet   NSTextField* energyGateLengthField;
 	IBOutlet NSPopUpButton* runModePU;
 	IBOutlet NSTextField*	endAddressThresholdField;
 	IBOutlet NSTextField*	energySampleStartIndex3Field;
@@ -99,6 +100,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) energyGateLengthChanged:(NSNotification*)aNote;
 - (void) runModeChanged:(NSNotification*)aNote;
 - (void) endAddressThresholdChanged:(NSNotification*)aNote;
 - (void) energyTauFactorChanged:(NSNotification*)aNote;
@@ -142,6 +144,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) energyGateLengthAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 - (IBAction) energySampleStartIndex3Action:(id)sender;
 - (IBAction) energyTauFactorAction:(id)sender;
