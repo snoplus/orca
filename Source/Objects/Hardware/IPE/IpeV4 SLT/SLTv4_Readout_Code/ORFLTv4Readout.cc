@@ -214,8 +214,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 uint32_t pagenr        = f3 & 0x3f;
                                 uint32_t energy        = f4 ;
                                 //fprintf(stdout,"  -->EVENT FLT %2i, chan %2i: page %i\n",col,eventchan,pagenr);fflush(stdout);
-                                uint32_t eventFlags;//0x1=raw trace, full length
-                                uint32_t wfRecordVersion;//length: 4 bit (0..15) 0x1=raw trace, full length
+                                uint32_t eventFlags=0;//append page, append next page
+                                uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
                                 uint32_t traceStart16;//start of trace in short array
                                 
                                 wfRecordVersion = 0x1 ;//0x1=raw trace, full length, no additional analysis (use if fifo is almost full)
@@ -259,6 +259,18 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                     //printf("FLT%i: FOund triggerPos %i , diff> %i<  (adcoffset was %i, searchtrig %i)\n",col+1,triggerPos,triggerPos-adcoffset, adcoffset,searchTrig);
 									//printf("FLT%i: FOund triggerPos %i , diff> %i<  \n",col+1,triggerPos,triggerPos-adcoffset);fflush(stdout);
                                     //uint32_t copyindex = (adcoffset + postTriggerTime) % 2048;
+#if 0  //TODO: testcode - I will remove it later -tb-
+             fprintf(stdout,"triggerPos is %x (%i)  (last search pos %i)\n",triggerPos,triggerPos,searchTrig);fflush(stdout);
+             fprintf(stdout,"srack->theFlt[col]->postTrigTime->read() %x \n",srack->theFlt[col]->postTrigTime->read());fflush(stdout);
+           if(srack->theFlt[col]->postTrigTime->read() == 0x12c){
+           for(adccount=0; adccount<2*1024;adccount++){
+                   uint16_t adcval = shipWaveformBuffer16[adccount] & 0xffff;
+                        if(adcval & 0xf000){
+                         fprintf(stdout,"adcval[%i] has flags %x \n",adccount,adcval);fflush(stdout);
+                        }
+           }
+           }
+#endif
                                     traceStart16 = (triggerPos + postTriggerTime) % 2048;
                                 }
                                 else {
@@ -290,10 +302,12 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = evsec;        //sec
                                 data[dataIndex++] = evsubsec;     //subsec
                                 data[dataIndex++] = chmap;
-                                data[dataIndex++] = readptr | (pagenr<<10) | (precision<<16);        //event ID:read ptr (10 bit); pagenr (6 bit)
+                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16);        //event ID:read ptr (10 bit); pagenr (6 bit)
                                 data[dataIndex++] = energy;
                                 data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
                                 data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
+                                
+                                //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
                                 
                                 //ship waveform
                                 uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
