@@ -164,10 +164,10 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ^^^^ ^^^^------------------------------ channel (0..22)
  ------------^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ^ ------------------------------------- flag to indicate that the ADC have been swapped
- --------^ ^^^^ ^^^^-------------------- number of page in hardware buffer
- ---------------------------^^ ^^^^ ^^^^ eventID (0..1024)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID:
+ -----------------^^---------------------precision
+ --------------------^^^^ ^^-------------number of page in hardware buffer
+ ---------------------------^^ ^^^^ ^^^^-readPtr (0..1024)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
                  ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
@@ -245,7 +245,8 @@
 	}
 	startIndex = (startIndex+2000)%n;
 	//-----------------------------------------------
-	
+//TODO: no offset -tb-
+//startIndex=0;
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				    unitSize: sizeof(short)					// unit size in bytes
@@ -279,14 +280,41 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 
+	unsigned long length	= ExtractLength(ptr[0]);
+	//unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
+	//unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
+	//unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
+    uint32_t sec            = ptr[2];
+    uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
+    uint32_t chmap          = ptr[4];
+    uint32_t eventID        = ptr[5];
+    uint32_t energy         = ptr[6];
+    uint32_t eventFlags     = ptr[7];
+    uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
+    
     NSString* title= @"Ipe FLT Waveform Record\n\n";
+
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+    NSString* crate     = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
+    NSString* card      = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
+    NSString* chan      = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+    NSString* secStr    = [NSString stringWithFormat:@"Sec        = %d\n", sec];
+    NSString* subsecStr = [NSString stringWithFormat:@"SubSec     = %d\n", subsec];
+    NSString* energyStr = [NSString stringWithFormat:@"Energy     = %d\n", energy];
+    NSString* chmapStr  = [NSString stringWithFormat:@"ChannelMap = 0x%x\n", chmap];
+    NSString* eventIDStr= [NSString stringWithFormat:@"ReadPtr,Pg#= %d,%d\n", ShiftAndExtract(eventID,0,0x3ff),ShiftAndExtract(eventID,10,0x3f)];
+    NSString* offsetStr = [NSString stringWithFormat:@"Offset16   = %d\n", traceStart16];
+    NSString* versionStr= [NSString stringWithFormat:@"RecVersion = %d\n", ShiftAndExtract(eventFlags,0,0xf)];
+    NSString* eventFlagsStr
+                        = [NSString stringWithFormat:@"Flag(a,ap) = %d,%d\n", ShiftAndExtract(eventFlags,4,0x1),ShiftAndExtract(eventFlags,5,0x1)];
+    NSString* lengthStr = [NSString stringWithFormat:@"Length     = %d\n", length];
+    
+    
+    NSString* evFlagsStr= [NSString stringWithFormat:@"EventFlags = 0x%x\n", eventFlags ];
 
-    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan]; 
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
+                secStr, subsecStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr]; 
 }
 
 @end
