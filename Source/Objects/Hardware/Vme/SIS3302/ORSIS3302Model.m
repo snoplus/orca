@@ -1014,6 +1014,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {  
 	[self reset];							//reset the card
 	[self writePreTriggerDelayAndTriggerGateDelay];
+	[self writeDacOffsets];
 	[self writeThresholds];
 	[self writeTriggerSetups];
 	[self writeBufferConfiguration];
