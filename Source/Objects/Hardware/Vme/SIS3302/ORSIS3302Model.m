@@ -1284,7 +1284,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 		NSLog(@"channel %d should read %d longs\n",channel,numToRead);
 		int n;
 		int c = 0;
-		/*
+		
 		for(n=0;n<numToRead;n+=4){
 			unsigned long adc_Memory1 = 0;
 			
@@ -1294,17 +1294,15 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 								numToRead:1
 							   withAddMod: [self addressModifier]
 							usingAddSpace:0x01];
-			//NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
-			//NSLog(@"%d: %d\n",n,adc_Memory1&0xffff);
+			NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
 			if(adc_Memory1 == 0xdeadbeef){
-				NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
 				c++;
 				if(c>2)break;
 			}
 			//int32_t error = DMARead(addr, (uint32_t)0x08, 
 			//						(uint32_t)8, buffer,  
 			//						num_bytes_to_read);
-		}*/
+		}
 	}
 	
 }
