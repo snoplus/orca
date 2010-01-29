@@ -41,7 +41,7 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 {
     uint32_t addr = GetBaseAddress() + GetAcquisitionControl(); 
     uint32_t data_rd = 0;
-    if (VMERead(addr,GetAddressModifier(),4,data_rd) != 0) { 
+    if (VMERead(addr,GetAddressModifier(),4,data_rd) != sizeof(data_rd)) { 
     	return false;
     }
     if ((data_rd & 0x80000) != 0x80000) return false; // No threshold yet
@@ -54,7 +54,7 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 
     addr = GetBaseAddress() + GetADCMemoryPageRegister() ;
     if (VMEWrite(addr,GetAddressModifier(),
-                 GetDataWidth(),data_wr ) != 0) {
+                 GetDataWidth(),data_wr ) != sizeof(data_wr)) {
         return false;
     }
 
@@ -67,13 +67,16 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 
 bool ORSIS3302Card::ReadOutChannel(size_t channel) 
 {
+	// Function to readout a particular channel.
+	// This will dump one channel into a data record, should
+	// this be changed?
     // read stop sample address
     uint32_t addr = GetBaseAddress() 
            + GetPreviousBankSampleRegisterOffset(channel) ; 
     uint32_t end_sample_address = 0;
-    uint8_t* buffer;
+
     if (VMERead(addr,GetAddressModifier(),
-                GetDataWidth(),end_sample_address) != 0) { 
+                GetDataWidth(),end_sample_address) != sizeof(end_sample_address)) { 
     	return false;
     }
 
@@ -95,15 +98,27 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
     	addr = GetBaseAddress() 
                + GetADCBufferRegisterOffset(channel);
         // Do DMA Read
-        uint32_t num_bytes_to_read = (end_sample_address & 0x3ffffc)>>1;
-    	int32_t error = DMARead(addr, (uint32_t)0x08, 
-                (uint32_t)8, buffer,  
+        uint32_t num_bytes_to_read = (end_sample_address & 0x3ffffc);
+		uint32_t num_longs_to_read = num_bytes_to_read >> 2;
+		ensureDataCanHold(num_longs_to_read + 2);
+		size_t savedIndex = dataIndex;
+		data[dataIndex++] = GetHardwareMask()[0] | (num_longs_to_read+2); 
+        data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
+							((GetSlot()  & 0x0000001f)<<16);
+		uint8_t* buffer = (uint8_t*) &data[dataIndex];
+    	int32_t error = DMARead(addr, 
+				(uint32_t)0x08, // Address Modifier, request MBLT 
+                (uint32_t)8, // Read 64-bits at a time
+				buffer,  
                 num_bytes_to_read);
-    	if (error != 0x0) { // vme error
+		
+    	if (error != num_bytes_to_read) { // vme error
+			// Reset the data
+			dataIndex = savedIndex;
             return false;
     	}
-    }
-    // Now write to data buffer 
+		dataIndex += num_longs_to_read;
+    } 
     return true;
 }
 
@@ -113,5 +128,5 @@ bool ORSIS3302Card::DisarmAndArmBank(size_t bank)
     if (bank==1) fBankOneArmed = true;
     else fBankOneArmed = false;
     return (VMEWrite(addr, GetAddressModifier(), 
-                     GetDataWidth(), (uint32_t) 0x0) != 0);
+                     GetDataWidth(), (uint32_t) 0x0) != sizeof(uint32_t));
 }
