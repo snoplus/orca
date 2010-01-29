@@ -185,7 +185,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 - (void) setEnergySampleLength:(int)aEnergySampleLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
-    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:510] & 0x3fe;
+    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:510];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
 	[self calculateSampleValues];
 }
