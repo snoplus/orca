@@ -46,7 +46,6 @@ NSString* ORSIS3302DacOffsetChanged				= @"ORSIS3302DacOffsetChanged";
 NSString* ORSIS3302LemoInModeChanged			= @"ORSIS3302LemoInModeChanged";
 NSString* ORSIS3302LemoOutModeChanged			= @"ORSIS3302LemoOutModeChanged";
 NSString* ORSIS3302AcqRegEnableMaskChanged		= @"ORSIS3302AcqRegEnableMaskChanged";
-NSString* ORSIS3302CSRRegChanged				= @"ORSIS3302CSRRegChanged";
 NSString* ORSIS3302AcqRegChanged				= @"ORSIS3302AcqRegChanged";
 NSString* ORSIS3302EventConfigChanged			= @"ORSIS3302EventConfigChanged";
 
@@ -332,80 +331,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	[self setGtMask:0xff];
 	[self setEnabledMask:0x0];
 	
-	[self setEnableInternalRouting:YES];
 }
-
-- (BOOL) bankFullTo3
-{
-    return bankFullTo3;
-}
-
-- (void) setBankFullTo3:(BOOL)aBankFullTo3
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setBankFullTo3:bankFullTo3];
-    bankFullTo3 = aBankFullTo3;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CSRRegChanged object:self];
-}
-
-- (BOOL) bankFullTo2
-{
-    return bankFullTo2;
-}
-
-- (void) setBankFullTo2:(BOOL)aBankFullTo2
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setBankFullTo2:bankFullTo2];
-    bankFullTo2 = aBankFullTo2;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CSRRegChanged object:self];
-}
-
-- (BOOL) bankFullTo1
-{
-    return bankFullTo1;
-}
-
-- (void) setBankFullTo1:(BOOL)aBankFullTo1
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setBankFullTo1:bankFullTo1];
-    bankFullTo1 = aBankFullTo1;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CSRRegChanged object:self];
-}
-- (BOOL) enableInternalRouting
-{
-    return enableInternalRouting;
-}
-
-- (void) setEnableInternalRouting:(BOOL)aEnableInternalRouting
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnableInternalRouting:enableInternalRouting];
-    enableInternalRouting = aEnableInternalRouting;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CSRRegChanged object:self];
-}
-
-- (BOOL) activateTriggerOnArmed
-{
-    return activateTriggerOnArmed;
-}
-
-- (void) setActivateTriggerOnArmed:(BOOL)aActivateTriggerOnArmed
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setActivateTriggerOnArmed:activateTriggerOnArmed];
-    activateTriggerOnArmed = aActivateTriggerOnArmed;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CSRRegChanged object:self];
-}
-
-- (BOOL) invertTrigger
-{
-    return invertTrigger;
-}
-
-- (void) setInvertTrigger:(BOOL)aInvertTrigger
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setInvertTrigger:invertTrigger];
-    invertTrigger = aInvertTrigger;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CSRRegChanged object:self];
-}
-
 
 - (int) clockSource
 {
@@ -637,7 +563,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	energyMaxIndex = 2 + numEnergyValues + numRawDataLongWords ;
 	
 	eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
-	eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
+	eventLengthLongWords = eventLengthLongWords + numRawDataLongWords/2  ;  
 	eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 
     [self setEndAddressThreshold:eventLengthLongWords];
@@ -935,6 +861,122 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 - (void) report
 {
 	[self readThresholds:YES];
+	
+	unsigned long EventConfig = 0;
+	[[self adapter] readLongBlock:&EventConfig
+						atAddress:[self baseAddress] +kSIS3302EventConfigAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	NSLog(@"EventConfig: 0x%08x\n",EventConfig);
+	
+	unsigned long pretrigger = 0;
+	[[self adapter] readLongBlock:&pretrigger
+						atAddress:[self baseAddress] + kSIS3302PreTriggerDelayTriggerGateLengthAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"pretrigger: 0x%08x\n",pretrigger);
+	
+	unsigned long rawDataBufferConfig = 0;
+	[[self adapter] readLongBlock:&rawDataBufferConfig
+						atAddress:[self baseAddress] + kSIS3302RawDataBufferConfigAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"rawDataBufferConfig: 0x%08x\n",rawDataBufferConfig);
+	
+	unsigned long actualNextSampleAddress1 = 0;
+	[[self adapter] readLongBlock:&actualNextSampleAddress1
+						atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc1
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"actualNextSampleAddress1: 0x%08x\n",actualNextSampleAddress1);
+	
+	unsigned long actualNextSampleAddress2 = 0;
+	[[self adapter] readLongBlock:&actualNextSampleAddress2
+						atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc2
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"actualNextSampleAddress2: 0x%08x\n",actualNextSampleAddress2);
+	
+	unsigned long prevNextSampleAddress1 = 0;
+	[[self adapter] readLongBlock:&prevNextSampleAddress1
+						atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc1
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"prevNextSampleAddress1: 0x%08x\n",prevNextSampleAddress1);
+	
+	unsigned long prevNextSampleAddress2 = 0;
+	[[self adapter] readLongBlock:&prevNextSampleAddress2
+						atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc2
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"prevNextSampleAddress2: 0x%08x\n",prevNextSampleAddress2);
+	
+	unsigned long triggerSetup1 = 0;
+	[[self adapter] readLongBlock:&triggerSetup1
+						atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc1
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"triggerSetup1: 0x%08x\n",triggerSetup1);
+	
+	unsigned long triggerSetup2 = 0;
+	[[self adapter] readLongBlock:&triggerSetup2
+						atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc2
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"triggerSetup2: 0x%08x\n",triggerSetup2);
+	
+	unsigned long energySetupGP = 0;
+	[[self adapter] readLongBlock:&energySetupGP
+						atAddress:[self baseAddress] + kSIS3302EnergySetupGPAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"energySetupGP: 0x%08x\n",energySetupGP);
+	
+	unsigned long EnergyGateLen = 0;
+	[[self adapter] readLongBlock:&EnergyGateLen
+						atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"EnergyGateLen: 0x%08x\n",EnergyGateLen);
+	
+	unsigned long EnergySampleLen = 0;
+	[[self adapter] readLongBlock:&EnergySampleLen
+						atAddress:[self baseAddress] + kSIS3302EnergySampleLengthAdc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"EnergySampleLen: 0x%08x\n",EnergySampleLen);
+	
+	unsigned long EnergySampleStartIndex = 0;
+	[[self adapter] readLongBlock:&EnergySampleStartIndex
+						atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex1Adc12
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];	
+	
+	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
 }
 
 - (void) initBoard
@@ -1102,8 +1144,16 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 {
 	// Try disarm current bank and arm the next one
 	[self disarmAndArmBank:0];
-	
-	if(![self isEvent]) return;
+	[ORTimer delay:.01];
+	float theTime=0;
+	do {
+		if([self isEvent]) break;
+		else {
+			[ORTimer delay:.01];
+			theTime+=.01;
+		}
+	}while(theTime<1);
+	if(theTime>=1)return;
 	
  	NSLog(@"****Event\n");
 	[self disarmSampleLogic];
@@ -1141,7 +1191,6 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 		NSLog(@"************Channel %d\n",channel);
 		NSLog(@"end_sample_address: 0x%08x\n",endSampleAddress);
 		
-		//check a bunch of addresses -- not sure which one is relevent
 		unsigned long EventConfig = 0;
 		[[self adapter] readLongBlock:&EventConfig
 							atAddress:[self baseAddress] +kSIS3302EventConfigAdc12
@@ -1366,12 +1415,12 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORSIS3302WaveformDecoder",            @"decoder",
-								 [NSNumber numberWithLong:dataId],       @"dataId",
-								 [NSNumber numberWithBool:YES],          @"variable",
-								 [NSNumber numberWithLong:-1],			 @"length",
+								 @"ORSIS3302Decoder",					@"decoder",
+								 [NSNumber numberWithLong:dataId],      @"dataId",
+								 [NSNumber numberWithBool:YES],         @"variable",
+								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Waveform"];
+    [dataDictionary setObject:aDictionary forKey:@"Energy"];
     
     return dataDictionary;
 }
@@ -1488,14 +1537,14 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     [self startRates];
 	[self reset];
     [self initBoard];
-		
+	firstTime = YES;
 	currentBank = 0;
-	//[self clearBankFullFlag:currentBank];
-	//[self arm:currentBank];
-	//[self startSampling];
 	[self setLed:YES];
 	isRunning = NO;
 	count=0;
+	
+	dataRecordlength = 4+2+4+sampleLength/2+energySampleLength; //Orca header + sisheader + samples + energy + sistrailer
+	dataRecord = malloc(dataRecordlength*sizeof(long));
 }
 
 //**************************************************************************************
@@ -1505,25 +1554,60 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		isRunning = YES;
-		
-/*		unsigned long data_rd;
-		[[self adapter] readLongBlock:&data_rd
-							atAddress:[self baseAddress] + kSIS3302AcquistionControl
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		if((data_rd & 0x80000) == 0x80000){	
+		if(firstTime){
+			isRunning = YES;
+			firstTime = NO;
+			[self disarmAndArmBank:0];
 		}
- */
-		sleep(1);
-		unsigned long dataValue;
-		[[self adapter] readLongBlock:&dataValue
-							atAddress:[self baseAddress] + 0x02000020
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		NSLog(@"%d %d\n",(dataValue&0xffff0000)>>16,dataValue&0xFFFF);
+		else {
+			if([self isEvent]) {
+				[self disarmSampleLogic];
+
+				if(bankOneArmed)[self writePageRegister:0x0];
+				else			[self writePageRegister:0x4];
+				int channel;
+				for( channel=0;channel<kNumSIS3302Channels;channel++) {
+					unsigned long endSampleAddress = 0;
+					[[self adapter] readLongBlock:&endSampleAddress
+										atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+				
+					endSampleAddress &= 0xffffff ; // mask bank2 address bit (bit 24)
+				
+					if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
+						// count up as Warnings?
+					}
+				
+					if (endSampleAddress != 0) {
+						unsigned long addrOffset = 0;
+						do {
+							int index = 0;
+							dataRecord[index++] =   dataId | dataRecordlength;
+							dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
+													(([self slot] & 0x0000001f)<<16)      |
+													((channel & 0x000000ff)<<8);
+							dataRecord[index++] = sampleLength/2;
+							dataRecord[index++] = energySampleLength;
+							unsigned long* p = &dataRecord[index];
+							[[self adapter] readLongBlock: p
+												atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + addrOffset
+												numToRead: dataRecordlength-4
+											   withAddMod: [self addressModifier]
+											usingAddSpace: 0x01];
+	
+							if(dataRecord[dataRecordlength-1] == 0xdeadbeef){
+								[aDataPacket addLongsToFrameBuffer:dataRecord length:dataRecordlength];
+							}
+							addrOffset += (dataRecordlength-4)*4;
+						}while (addrOffset < endSampleAddress);
+					}
+				}
+				[self disarmAndArmBank:0];
+			}
+		}
+		
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
@@ -1533,8 +1617,8 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//[self stopSampling];
-	//[self stopBankSwitching];
+	free(dataRecord);
+	[self disarmSampleLogic];
     isRunning = NO;
     [waveFormRateGroup stop];
 	[self setLed:NO];
@@ -1637,14 +1721,6 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	internalTriggerDelays =			[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
 	triggerDecimation =			    [decoder decodeIntForKey:   @"triggerDecimation"];
 	energyDecimation =			    [decoder decodeIntForKey:   @"energyDecimation"];
-
-	//csr
-	[self setBankFullTo3:			[decoder decodeBoolForKey:@"bankFullTo3"]];
-    [self setBankFullTo2:			[decoder decodeBoolForKey:@"bankFullTo2"]];
-    [self setBankFullTo1:			[decoder decodeBoolForKey:@"bankFullTo1"]];
-	[self setEnableInternalRouting:	[decoder decodeBoolForKey:@"enableInternalRouting"]];
-    [self setActivateTriggerOnArmed:[decoder decodeBoolForKey:@"activateTriggerOnArmed"]];
-    [self setInvertTrigger:			[decoder decodeBoolForKey:@"invertTrigger"]];
 	
     [self setClockSource:			[decoder decodeIntForKey:@"clockSource"]];
     [self setEnabledMask:			[decoder decodeInt32ForKey:@"enabledMask"]];
@@ -1698,14 +1774,6 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	[encoder encodeInt:triggerDecimation		forKey:@"triggerDecimation"];
 	[encoder encodeInt:energyDecimation			forKey:@"energyDecimation"];
 
-	//csr
-    [encoder encodeBool:bankFullTo3				forKey:@"bankFullTo3"];
-    [encoder encodeBool:bankFullTo2				forKey:@"bankFullTo2"];
-    [encoder encodeBool:bankFullTo1				forKey:@"bankFullTo1"];
-    [encoder encodeBool:enableInternalRouting	forKey:@"enableInternalRouting"];
-    [encoder encodeBool:activateTriggerOnArmed	forKey:@"activateTriggerOnArmed"];
-    [encoder encodeBool:invertTrigger			forKey:@"invertTrigger"];
-
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
 	[encoder encodeInt32:enabledMask			forKey:@"enabledMask"];
     [encoder encodeInt:gtMask					forKey:@"gtMask"];
@@ -1717,14 +1785,6 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-	//csr
-	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo3]			  forKey:@"bankFullTo3"];
-	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo2]			  forKey:@"bankFullTo2"];
-	[objDictionary setObject: [NSNumber numberWithBool:bankFullTo1]			  forKey:@"bankFullTo1"];
-	[objDictionary setObject: [NSNumber numberWithBool:enableInternalRouting] forKey:@"enableInternalRouting"];
-	[objDictionary setObject: [NSNumber numberWithBool:activateTriggerOnArmed] forKey:@"activateTriggerOnArmed"];
-	[objDictionary setObject: [NSNumber numberWithBool:invertTrigger]		   forKey:@"invertTrigger"];
-	
 
  	//clocks
 	[objDictionary setObject: [NSNumber numberWithInt:clockSource]			forKey:@"clockSource"];
@@ -1762,6 +1822,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	}
 	return myTests;
 }
+
 @end
 
 @implementation ORSIS3302Model (private)
