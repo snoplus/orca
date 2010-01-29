@@ -37,6 +37,17 @@ uint32_t ORSIS3302Card::GetADCBufferRegisterOffset(size_t channel)
     return (uint32_t)-1;
 }
 
+bool ORSIS3302Card::Start()
+{
+	DisarmAndArmBank(0);
+	return true;
+}
+
+bool ORSIS3302Card::Stop()
+{
+	return true;
+}
+
 bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/) 
 {
     uint32_t addr = GetBaseAddress() + GetAcquisitionControl(); 
@@ -112,7 +123,7 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 				buffer,  
                 num_bytes_to_read);
 		
-    	if (error != num_bytes_to_read) { // vme error
+    	if (error != (int32_t) num_bytes_to_read) { // vme error
 			// Reset the data
 			dataIndex = savedIndex;
             return false;
@@ -128,5 +139,5 @@ bool ORSIS3302Card::DisarmAndArmBank(size_t bank)
     if (bank==1) fBankOneArmed = true;
     else fBankOneArmed = false;
     return (VMEWrite(addr, GetAddressModifier(), 
-                     GetDataWidth(), (uint32_t) 0x0) != sizeof(uint32_t));
+                     GetDataWidth(), (uint32_t) 0x0) == sizeof(uint32_t));
 }

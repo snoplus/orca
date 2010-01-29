@@ -6,8 +6,9 @@ class ORSIS3302Card: public ORVVmeCard
        ORSIS3302Card(SBC_card_info* card_info);
        virtual ~ORSIS3302Card() {}
 
+	   virtual bool Start();
        virtual bool Readout(SBC_LAM_Data* /* lam_data*/);  
-
+	   virtual bool Stop();
        enum EORSIS3302Consts {
            kNumberOfChannels = 8 };
 
