@@ -57,60 +57,53 @@
 		unsigned long energy = ptr[length - 4]/4; 
 		[aDataSet histogram:energy numBins:65*1024 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
 		
-/*		long waveformLength = ptr[2];
+		long waveformLength = ptr[2];
+		long energyLength   = ptr[2];
+		
 		if(waveformLength){
-			unsigned short* sptr = (unsigned   
-			NSMutableData* tmpData = [NSMutableData dataWithLength:waveformLength*2*sizeof(short)];
-			short* sPtr = (short*)[tmpData bytes];
-			int i;
-			int wordCount = 0;
-			//data is actually 2's complement. detwiler 08/26/08
-			for(i=0;i<waveformLength;i++){
-				dPtr[wordCount++] =    (0x0000ffff & *ptr);
-				dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
-				ptr++;
-			}
-			[aDataSet loadWaveform:tmpData 
-							offset:0 //bytes!
-						  unitSize:2 //unit size in bytes!
-							sender:self  
-						  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
+			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2];
+			NSData* recordAsData = [NSData dataWithBytes:bPtr length:waveformLength*sizeof(long)];
+			[aDataSet loadWaveform:recordAsData 
+							offset: 0 //bytes!
+						  unitSize: 2 //unit size in bytes!
+							sender: self  
+						  withKeys: @"SIS3302", @"ADC Trace",crateKey,cardKey,channelKey,nil];
 		}
-		long energyLength = ptr[3];
+
 		if(energyLength){
-			[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
-							offset: 9*sizeof(long)					// Offset in bytes (past header words)
-						  unitSize: sizeof(short)					// unit size in bytes
-						startIndex:	startIndex					// first Point Index (past the header offset!!!)
-							  mask:	0x0FFF							// when displayed all values will be masked with this value
-							sender: self 
-						  withKeys: @"SIS3302", @"Waveform",crateKey,stationKey,channelKey,nil];	
+			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2 + waveformLength];
+			NSData* recordAsData = [NSData dataWithBytes:bPtr length:energyLength*sizeof(long)];
+			[aDataSet loadWaveform:recordAsData 
+							offset: 0
+						  unitSize: 2 //unit size in bytes!
+							sender: self 						 
+						  withKeys: @"SIS3302", @"Energy Waveform",crateKey,cardKey,channelKey,nil];	
 		}
 	
- */
+ 
 			
-			//get the actual object
-			if(getRatesFromDecodeStage){
-				NSString* aKey = [crateKey stringByAppendingString:cardKey];
-				if(!actualSIS3302Cards)actualSIS3302Cards = [[NSMutableDictionary alloc] init];
-				ORSIS3302Model* obj = [actualSIS3302Cards objectForKey:aKey];
-				if(!obj){
-					NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3302Model")];
-					NSEnumerator* e = [listOfCards objectEnumerator];
-					ORSIS3302Model* aCard;
-					while(aCard = [e nextObject]){
-						if([aCard slot] == card){
-							[actualSIS3302Cards setObject:aCard forKey:aKey];
-							obj = aCard;
-							break;
-						}
+		//get the actual object
+		if(getRatesFromDecodeStage){
+			NSString* aKey = [crateKey stringByAppendingString:cardKey];
+			if(!actualSIS3302Cards)actualSIS3302Cards = [[NSMutableDictionary alloc] init];
+			ORSIS3302Model* obj = [actualSIS3302Cards objectForKey:aKey];
+			if(!obj){
+				NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3302Model")];
+				NSEnumerator* e = [listOfCards objectEnumerator];
+				ORSIS3302Model* aCard;
+				while(aCard = [e nextObject]){
+					if([aCard slot] == card){
+						[actualSIS3302Cards setObject:aCard forKey:aKey];
+						obj = aCard;
+						break;
 					}
 				}
-				getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
 			}
-			
-			
+			getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
 		}
+		
+		
+	}
  
     return length; //must return number of longs
 }
