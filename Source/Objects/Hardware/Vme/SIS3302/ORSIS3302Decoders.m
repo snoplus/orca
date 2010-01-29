@@ -26,6 +26,25 @@
 
 
 @implementation ORSIS3302Decoder
+
+//------------------------------------------------------------------
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^^ ^^^^ ^^-----------------------data id
+//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^--------------------------------spare
+//        ^ ^^^---------------------------crate
+//             ^ ^^^^---------------------card
+//                    ^^^^ ^^^^-----------channel
+//								^^^^ ^^^--spare
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-length of waveform (longs)
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-length of energy   (longs)
+// ---- followed by the data record as read 
+//from hardware. see the manual.
+// ---- should end in 0xdeadbeef
+//------------------------------------------------------------------
+
 - (id) init
 
 {
@@ -58,8 +77,8 @@
 		unsigned long energy = ptr[length - 4]/4; 
 		[aDataSet histogram:energy numBins:65*1024 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
 		
-		long waveformLength = ptr[2];
-		long energyLength   = ptr[2];
+		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
+		long energyLength   = ptr[2]; //each energy value is a sum of two 
 		
 		if(waveformLength){
 			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2]; //ORCA header + SIS header

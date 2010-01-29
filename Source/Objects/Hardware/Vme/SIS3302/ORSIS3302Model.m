@@ -1543,7 +1543,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	isRunning = NO;
 	count=0;
 	
-	dataRecordlength = 4+2+4+sampleLength/2+energySampleLength; //Orca header + sisheader + samples + energy + sistrailer
+	dataRecordlength = 4+2+sampleLength/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
 	dataRecord = malloc(dataRecordlength*sizeof(long));
 }
 
