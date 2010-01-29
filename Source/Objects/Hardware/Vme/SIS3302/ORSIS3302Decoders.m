@@ -78,7 +78,7 @@
 		[aDataSet histogram:energy numBins:65*1024 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
 		
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
-		long energyLength   = ptr[2]; //each energy value is a sum of two 
+		long energyLength   = ptr[3]; //each energy value is a sum of two 
 		
 		if(waveformLength){
 			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2]; //ORCA header + SIS header
