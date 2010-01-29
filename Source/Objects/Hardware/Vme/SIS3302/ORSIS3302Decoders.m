@@ -54,6 +54,7 @@
 	
 	unsigned long lastWord = ptr[length-1];
 	if(lastWord == 0xdeadbeef){
+		//histogram the energy.... prescale by dividing by 4 so we can have a histogram of reseanable length.... have to do something better at some point
 		unsigned long energy = ptr[length - 4]/4; 
 		[aDataSet histogram:energy numBins:65*1024 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
 		
@@ -61,7 +62,7 @@
 		long energyLength   = ptr[2];
 		
 		if(waveformLength){
-			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2];
+			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2]; //ORCA header + SIS header
 			NSData* recordAsData = [NSData dataWithBytes:bPtr length:waveformLength*sizeof(long)];
 			[aDataSet loadWaveform:recordAsData 
 							offset: 0 //bytes!
@@ -71,17 +72,15 @@
 		}
 
 		if(energyLength){
-			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2 + waveformLength];
+			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2 + waveformLength];//ORCA header + SIS header + possible waveform
 			NSData* recordAsData = [NSData dataWithBytes:bPtr length:energyLength*sizeof(long)];
 			[aDataSet loadWaveform:recordAsData 
 							offset: 0
-						  unitSize: 2 //unit size in bytes!
+						  unitSize: 4 //unit size in bytes!
 							sender: self 						 
 						  withKeys: @"SIS3302", @"Energy Waveform",crateKey,cardKey,channelKey,nil];	
 		}
-	
- 
-			
+
 		//get the actual object
 		if(getRatesFromDecodeStage){
 			NSString* aKey = [crateKey stringByAppendingString:cardKey];
@@ -101,8 +100,6 @@
 			}
 			getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
 		}
-		
-		
 	}
  
     return length; //must return number of longs
@@ -110,6 +107,9 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
+	
+	//TODO ---- 
+	/*
 	ptr++;
     NSString* title= @"SIS3302 Waveform Record\n\n";
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
@@ -121,7 +121,9 @@
 	NSString* Event = [NSString stringWithFormat:@"Event  = 0x%08x\n",(*ptr>>24)&0xff];
 	NSString* Time = [NSString stringWithFormat:@"Time Since Last Trigger  = 0x%08x\n",*ptr&0xffffff];
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];       
+	 */
+	return @"Description not implemented yet";
 }
 
 @end
