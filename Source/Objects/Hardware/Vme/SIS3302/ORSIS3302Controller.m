@@ -248,11 +248,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(energySampleLengthChanged:)
-                         name : ORSIS3302ModelEnergySampleLengthChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(energySampleStartIndex1Changed:)
                          name : ORSIS3302ModelEnergySampleStartIndex1Changed
 						object: model];
@@ -344,7 +339,6 @@
 	[self triggerGateLengthChanged:nil];
 	[self energyPeakingTimeChanged:nil];
 	[self energyGapTimeChanged:nil];
-	[self energySampleLengthChanged:nil];
 	[self energySampleStartIndex1Changed:nil];
 	[self energySampleStartIndex2Changed:nil];
 	[self energyTauFactorChanged:nil];
@@ -391,11 +385,6 @@
 - (void) energySampleStartIndex1Changed:(NSNotification*)aNote
 {
 	[energySampleStartIndex1Field setIntValue: [model energySampleStartIndex1]];
-}
-
-- (void) energySampleLengthChanged:(NSNotification*)aNote
-{
-	[energySampleLengthField setIntValue: [model energySampleLength]];
 }
 
 - (void) energyGapTimeChanged:(NSNotification*)aNote
@@ -715,9 +704,20 @@
 	[model setEnergySampleStartIndex1:[sender intValue]];	
 }
 
-- (IBAction) energySampleLengthAction:(id)sender
+- (IBAction) energyShipWaveformAction:(id)sender
 {
-	[model setEnergySampleLength:[sender intValue]];	
+	if ([sender state] == 1) {
+		[model setEnergySampleLength:510];
+		[energySampleStartIndex3Field setEnabled:YES];
+		[energySampleStartIndex2Field setEnabled:YES];
+		[energySampleStartIndex1Field setEnabled:YES];
+	} else {
+		[model setEnergySampleLength:0];
+		[energySampleStartIndex3Field setEnabled:NO];
+		[energySampleStartIndex2Field setEnabled:NO];
+		[energySampleStartIndex1Field setEnabled:NO];
+	}
+
 }
 
 - (IBAction) energyGapTimeAction:(id)sender

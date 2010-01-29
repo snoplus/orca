@@ -31,11 +31,11 @@
 	IBOutlet   NSTextField* energyGateLengthField;
 	IBOutlet NSPopUpButton* runModePU;
 	IBOutlet NSTextField*	endAddressThresholdField;
-	IBOutlet NSTextField*	energySampleStartIndex3Field;
 	IBOutlet NSTextField*	energyTauFactorField;
+	IBOutlet NSTextField*	energySampleStartIndex3Field;
 	IBOutlet NSTextField*	energySampleStartIndex2Field;
 	IBOutlet NSTextField*	energySampleStartIndex1Field;
-	IBOutlet NSTextField*	energySampleLengthField;
+	IBOutlet NSButton*		energyShipWaveformButton;
 	IBOutlet NSTextField*	energyGapTimeField;
 	IBOutlet NSTextField*	energyPeakingTimeField;
 	IBOutlet NSTextField*	triggerGateLengthField;
@@ -105,7 +105,6 @@
 - (void) energySampleStartIndex3Changed:(NSNotification*)aNote;
 - (void) energySampleStartIndex2Changed:(NSNotification*)aNote;
 - (void) energySampleStartIndex1Changed:(NSNotification*)aNote;
-- (void) energySampleLengthChanged:(NSNotification*)aNote;
 - (void) energyGapTimeChanged:(NSNotification*)aNote;
 - (void) energyPeakingTimeChanged:(NSNotification*)aNote;
 - (void) triggerGateLengthChanged:(NSNotification*)aNote;
@@ -148,7 +147,7 @@
 - (IBAction) energyTauFactorAction:(id)sender;
 - (IBAction) energySampleStartIndex2Action:(id)sender;
 - (IBAction) energySampleStartIndex1Action:(id)sender;
-- (IBAction) energySampleLengthAction:(id)sender;
+- (IBAction) energyShipWaveformAction:(id)sender;
 - (IBAction) energyGapTimeAction:(id)sender;
 - (IBAction) energyPeakingTimeAction:(id)sender;
 - (IBAction) triggerGateLengthAction:(id)sender;
