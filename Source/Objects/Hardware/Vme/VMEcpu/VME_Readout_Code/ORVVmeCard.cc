@@ -34,6 +34,7 @@ int32_t ORVVmeCard::DMARead(uint32_t vme_address,
                             uint32_t number_of_bytes,
                             bool auto_increment)
 {
+    if(!fDevice) return 0;
     TUVMEDevice* dma_device = 
       TUVMEDeviceManager::GetDeviceManager()->GetDMADevice(vme_address,
                                                             address_modifier,

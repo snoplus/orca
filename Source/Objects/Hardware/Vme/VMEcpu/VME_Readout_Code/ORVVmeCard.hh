@@ -13,6 +13,9 @@ class ORVVmeCard : public ORVCard
        virtual ~ORVVmeCard(); 
 
     protected:
+	/* All the following functions return the bytes written/read,
+	   or -1 if an error has occurred. */
+	
        static int32_t DMARead(uint32_t vme_address,
                               uint32_t address_modifier,
                               uint32_t data_width,
