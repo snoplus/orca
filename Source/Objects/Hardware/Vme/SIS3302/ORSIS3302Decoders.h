@@ -25,11 +25,11 @@
 @class ORDataPacket;
 @class ORDataSet;
 
-@interface ORSIS3302WaveformDecoder : ORVmeCardDecoder {
+@interface ORSIS3302Decoder : ORVmeCardDecoder {
     @private 
         BOOL getRatesFromDecodeStage;
         NSMutableDictionary* actualSIS3302Cards;
 }
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

@@ -161,12 +161,7 @@
                      selector : @selector(eventConfigChanged:)
                          name : ORSIS3302EventConfigChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(csrChanged:)
-                         name : ORSIS3302CSRRegChanged
-						object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(gateLengthChanged:)
                          name : ORSIS3302GateLengthChanged
@@ -339,7 +334,6 @@
     [self waveFormRateChanged:nil];
 	[self clockSourceChanged:nil];
 	
-	[self csrChanged:nil];
 	[self acqRegEnableMaskChanged:nil];
 	[self lemoOutModeChanged:nil];
 	[self lemoInModeChanged:nil];
@@ -454,16 +448,6 @@
 		BOOL state = (aMask & (1<<i)) != 0;
 		[[acqRegEnableMaskMatrix cellWithTag:i] setIntValue:state];
 	}
-}
-
-- (void) csrChanged:(NSNotification*)aNote
-{
-	[[csrMatrix cellWithTag:1] setIntValue:[model invertTrigger]];
-	[[csrMatrix cellWithTag:2] setIntValue:[model activateTriggerOnArmed]];
-	[[csrMatrix cellWithTag:3] setIntValue:[model enableInternalRouting]];
-	[[csrMatrix cellWithTag:4] setIntValue:[model bankFullTo1]];
-	[[csrMatrix cellWithTag:5] setIntValue:[model bankFullTo2]];
-	[[csrMatrix cellWithTag:6] setIntValue:[model bankFullTo3]];
 }
 
 - (void) clockSourceChanged:(NSNotification*)aNote
@@ -598,7 +582,6 @@
 	[thresholdMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[checkEventButton	    setEnabled:!locked && !runInProgress];
 	
-	[csrMatrix				setEnabled:!locked && !runInProgress];
 	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
 }
 
@@ -788,21 +771,6 @@
 		}
 	}
 	[model setAcqRegEnableMask:aMask];	
-}
-
-- (IBAction) csrAction:(id)sender
-{
-	//tags are defined in IB, they have to match here or there will be trouble
-	BOOL state = [[sender selectedCell] intValue];
-	switch ([[sender selectedCell] tag]) {
-		case 1: [model setInvertTrigger:state];				break; 
-		case 2: [model setActivateTriggerOnArmed:state];	break; 
-		case 3: [model setEnableInternalRouting:state];		break; 
-		case 4: [model setBankFullTo1:state];				break; 
-		case 5: [model setBankFullTo2:state];				break; 
-		case 6: [model setBankFullTo3:state];				break; 
-		default: break;
-	}
 }
 
 //hardware actions

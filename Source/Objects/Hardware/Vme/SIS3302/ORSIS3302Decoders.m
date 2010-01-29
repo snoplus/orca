@@ -24,48 +24,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORSIS3302Model.h"
 
-/*
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
- -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- --------^-^^^--------------------------- Crate number
- -------------^-^^^^--------------------- Card number
- --------------------------------------^- 1==SIS33021, 0==SIS3000 
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-Trigger Event Word
- ^---------------------------------------1 if ADC0 in this event
- -^--------------------------------------1 if ADC1 in this event
- --^-------------------------------------1 if ADC2 in this event
- ---^------------------------------------1 if ADC3 in this event
- -----^----------------------------------1 if ADC4 in this event
- ------^---------------------------------1 if ADC5 in this event
- -------^--------------------------------1 if ADC6 in this event
- --------^-------------------------------1 if ADC7 in this event
- ------------^---------------------------1 if wrapped
- ---------------^^^^ ^^^^ ^^^^ ^^^^ ^^^^-Event Data End Address
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^^^^ ^^^^-------------------------------Event #
- ----------^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-Time from previous event always zero unless in multievent mode
- 
- waveform follows:
- Each word may have data for two ADC channels. The high order 16
- bits are for ADC0,2,4,6. The low order bits are for ADC1,3,5,7
- 
- if SIS3302:
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^----------------------------------------Status of User Bit
- --------------------^--------------------Status of Gate Chaining Bit
- ---^-------------------^-----------------Out of Range Bit
- -----^^^^ ^^^^ ^^^^------^^^^ ^^^^ ^^^^--12 bit Data
- if SIS3301:
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^---------------------------------------Status of User Bit
- --------------------^-------------------Status of Gate Chaining Bit
- -^-------------------^------------------Out of Range Bit
- --^^ ^^^^ ^^^^ ^^^^---^^ ^^^^ ^^^^ ^^^^-14-bit Data
- */
 
-@implementation ORSIS3302WaveformDecoder
+@implementation ORSIS3302Decoder
 - (id) init
 
 {
@@ -80,49 +40,54 @@
     [super dealloc];
 }
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
-	ptr++; //point to location info
-    int crate = (*ptr&0x01e00000)>>21;
-    int card  = (*ptr&0x001f0000)>>16;
-	int moduleID = (*ptr & 0x1);
-	ptr++; //event trigger word
-	unsigned long triggerWord= *ptr;
+	unsigned long length = ExtractLength(ptr[0]);
+	int crate	= ShiftAndExtract(ptr[1],21,0xf);
+	int card	= ShiftAndExtract(ptr[1],16,0x1f);
+	int channel = ShiftAndExtract(ptr[1],0,0xff);
 	
-	ptr++; //point to the event# and timestamp (timestamp always zero unless in multievent mode)
-	ptr++; //point to the data
-
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
+	NSString* channelKey	= [self getChannelKey: channel];
 	
-	long numDataWords = length-4;
-	//any of the channels may have triggered, so have to check each bit in the adc mask
-	int channel;
-	unsigned long aMask = moduleID?0x3fff:0xfff;
-	for(channel=0;channel<8;channel++){
-		if(triggerWord & (0x80000000 >> channel)){
-			NSMutableData* tmpData = [NSMutableData dataWithLength:numDataWords*sizeof(short)];
+	unsigned long lastWord = ptr[length-1];
+	if(lastWord == 0xdeadbeef){
+		unsigned long energy = ptr[length - 4]/4; 
+		[aDataSet histogram:energy numBins:65*1024 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
+		
+/*		long waveformLength = ptr[2];
+		if(waveformLength){
+			unsigned short* sptr = (unsigned   
+			NSMutableData* tmpData = [NSMutableData dataWithLength:waveformLength*2*sizeof(short)];
 			short* sPtr = (short*)[tmpData bytes];
-			NSString* channelKey = [self getChannelKey: channel];
 			int i;
-			if(channel%2){
-				for(i=0;i<(length-3);i++) {
-					sPtr[i] = ptr[i] & aMask;	
-				}
+			int wordCount = 0;
+			//data is actually 2's complement. detwiler 08/26/08
+			for(i=0;i<waveformLength;i++){
+				dPtr[wordCount++] =    (0x0000ffff & *ptr);
+				dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
+				ptr++;
 			}
-			else {
-				for(i=0;i<(length-3);i++) {
-					sPtr[i] = (ptr[i]>>16) & aMask;	
-				}
-			}
-			
-			[aDataSet loadWaveform:tmpData
+			[aDataSet loadWaveform:tmpData 
 							offset:0 //bytes!
 						  unitSize:2 //unit size in bytes!
 							sender:self  
-						  withKeys:@"SIS3302", @"Waveforms",crateKey,cardKey,channelKey,nil];
+						  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
+		}
+		long energyLength = ptr[3];
+		if(energyLength){
+			[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+							offset: 9*sizeof(long)					// Offset in bytes (past header words)
+						  unitSize: sizeof(short)					// unit size in bytes
+						startIndex:	startIndex					// first Point Index (past the header offset!!!)
+							  mask:	0x0FFF							// when displayed all values will be masked with this value
+							sender: self 
+						  withKeys: @"SIS3302", @"Waveform",crateKey,stationKey,channelKey,nil];	
+		}
+	
+ */
 			
 			//get the actual object
 			if(getRatesFromDecodeStage){
@@ -146,8 +111,6 @@
 			
 			
 		}
-	}
-
  
     return length; //must return number of longs
 }

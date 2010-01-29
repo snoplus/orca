@@ -32,17 +32,8 @@
 {
   @private
 	BOOL			isRunning;
-
     BOOL			gateChaining;
-	
-	//control status reg
-    BOOL invertTrigger;
-    BOOL activateTriggerOnArmed;
-    BOOL enableInternalRouting;
-    BOOL bankFullTo1;
-    BOOL bankFullTo2;
-    BOOL bankFullTo3;	
-	
+	 	
 	//clocks and delays (Acquistion control reg)
 	int	 clockSource;
 	
@@ -75,7 +66,8 @@
     unsigned short sampleLength;
     unsigned short sampleStartIndex;
 	BOOL bankOneArmed;
-
+	BOOL firstTime;
+	
     int preTriggerDelay;
     int triggerGateLength;
     int energyGateLength;
@@ -88,6 +80,9 @@
     int energyTauFactor;
     int endAddressThreshold;
     int runMode;
+	
+	unsigned long* dataRecord;
+	unsigned long  dataRecordlength;
 	
 	//calculated values
 	unsigned long numEnergyValues;
@@ -149,18 +144,6 @@
 - (short) acqRegEnableMask;
 - (void) setAcqRegEnableMask:(short)aAcqRegEnableMask;
 - (void) setDefaults;
-- (BOOL) bankFullTo3;
-- (void) setBankFullTo3:(BOOL)aBankFullTo3;
-- (BOOL) bankFullTo2;
-- (void) setBankFullTo2:(BOOL)aBankFullTo2;
-- (BOOL) bankFullTo1;
-- (void) setBankFullTo1:(BOOL)aBankFullTo1;
-- (BOOL) enableInternalRouting;
-- (void) setEnableInternalRouting:(BOOL)aEnableInternalRouting;
-- (BOOL) activateTriggerOnArmed;
-- (void) setActivateTriggerOnArmed:(BOOL)aActivateTriggerOnArmed;
-- (BOOL) invertTrigger;
-- (void) setInvertTrigger:(BOOL)aInvertTrigger;
 
 //clocks and delays (Acquistion control reg)
 - (int) clockSource;
@@ -226,7 +209,6 @@
 - (void) writePreTriggerDelayAndTriggerGateDelay;
 - (void) writeEnergyGP;
 - (void) writeRawDataBufferConfiguration;
-- (void) writeEnergyFilterValues;
 - (void) writeEndAddressThreshold;
 - (void) writeEnergyGateLength;
 - (void) writeEnergyTauFactor;
@@ -301,7 +283,6 @@ extern NSString* ORSIS3302LemoInModeChanged;
 extern NSString* ORSIS3302LemoOutModeChanged;
 extern NSString* ORSIS3302AcqRegEnableMaskChanged;
 
-extern NSString* ORSIS3302CSRRegChanged;
 extern NSString* ORSIS3302AcqRegChanged;
 extern NSString* ORSIS3302EventConfigChanged;
 

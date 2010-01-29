@@ -51,10 +51,7 @@
 	//base address
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
-	
-	//CSR
-	IBOutlet NSMatrix*		csrMatrix;
-	
+		
 
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
@@ -119,7 +116,6 @@
 - (void) lemoInModeChanged:(NSNotification*)aNote;
 - (void) lemoOutModeChanged:(NSNotification*)aNote;
 - (void) acqRegEnableMaskChanged:(NSNotification*)aNote;
-- (void) csrChanged:(NSNotification*)aNote;
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -163,7 +159,6 @@
 - (IBAction) lemoInModeAction:(id)sender;
 - (IBAction) lemoOutModeAction:(id)sender;
 - (IBAction) acqRegEnableMaskAction:(id)sender;
-- (IBAction) csrAction:(id)sender;
 
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
