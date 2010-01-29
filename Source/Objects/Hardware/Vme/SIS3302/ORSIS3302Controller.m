@@ -197,6 +197,11 @@
                          name : ORSIS3302TriggerDecimationChanged
 						object: model];	
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(energyDecimationChanged:)
+                         name : ORSIS3302EnergyDecimationChanged
+						object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(acqRegEnableMaskChanged:)
                          name : ORSIS3302AcqRegEnableMaskChanged
@@ -324,6 +329,7 @@
 	[self peakingTimeChanged:nil];
 	[self internalTriggerDelayChanged:nil];
 	[self triggerDecimationChanged:nil];
+	[self energyDecimationChanged:nil];
 	
     [self rateGroupChanged:nil];
     [self integrationChanged:nil];
@@ -542,6 +548,11 @@
 - (void) triggerDecimationChanged:(NSNotification*)aNote
 {
 	[triggerDecimationPU selectItemAtIndex:[model triggerDecimation]];
+}
+
+- (void) energyDecimationChanged:(NSNotification*)aNote
+{
+	[energyDecimationPU selectItemAtIndex:[model energyDecimation]];
 }
 
 - (void) waveFormRateChanged:(NSNotification*)aNote
@@ -884,8 +895,15 @@
 
 - (IBAction) triggerDecimationAction:(id)sender
 {
-    if([sender intValue] != [model triggerDecimation]){
+    if([sender indexOfSelectedItem] != [model triggerDecimation]){
 		[model setTriggerDecimation:[sender indexOfSelectedItem]];
+	}
+}
+
+- (IBAction) energyDecimationAction:(id)sender
+{
+    if([sender indexOfSelectedItem] != [model energyDecimation]){
+		[model setEnergyDecimation:[sender indexOfSelectedItem]];
 	}
 }
 

@@ -51,6 +51,7 @@
 	short			enabledMask;
 	short			gtMask;
 	short			triggerDecimation;
+	short			energyDecimation;
 	NSMutableArray* thresholds;
     NSMutableArray* dacOffsets;
 	NSMutableArray* gateLengths;
@@ -184,6 +185,8 @@
 - (void) setInternalTriggerDelay:(short)chan withValue:(short)aValue;
 - (short) triggerDecimation;
 - (void) setTriggerDecimation:(short)aValue;
+- (short) energyDecimation;
+- (void) setEnergyDecimation:(short)aValue;
 
 - (int) threshold:(short)chan;
 - (void) setThreshold:(short)chan withValue:(int)aValue;
@@ -318,5 +321,6 @@ extern NSString* ORSIS3302SumGChanged;
 extern NSString* ORSIS3302PeakingTimeChanged;
 extern NSString* ORSIS3302InternalTriggerDelayChanged;
 extern NSString* ORSIS3302TriggerDecimationChanged;
+extern NSString* ORSIS3302EnergyDecimationChanged;
 
 

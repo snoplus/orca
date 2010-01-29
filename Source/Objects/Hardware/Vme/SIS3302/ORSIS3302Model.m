@@ -67,6 +67,7 @@ NSString* ORSIS3302SumGChanged					= @"ORSIS3302SumGChanged";
 NSString* ORSIS3302PeakingTimeChanged			= @"ORSIS3302PeakingTimeChanged";
 NSString* ORSIS3302InternalTriggerDelayChanged	= @"ORSIS3302InternalTriggerDelayChanged";
 NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChanged";
+NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged";
 
 
 @interface ORSIS3302Model (private)
@@ -202,7 +203,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) setEnergyPeakingTime:(int)aEnergyPeakingTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyPeakingTime:energyPeakingTime];
-    energyPeakingTime = [self limitIntValue:aEnergyPeakingTime min:0 max:0xff];
+    energyPeakingTime = [self limitIntValue:aEnergyPeakingTime min:0 max:0x3ff];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyPeakingTimeChanged object:self];
 }
 
@@ -210,7 +211,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) setTriggerGateLength:(int)aTriggerGateLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:triggerGateLength];
-    triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:1023];
+    triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:65535];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelTriggerGateLengthChanged object:self];
 }
 
@@ -218,7 +219,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 - (void) setPreTriggerDelay:(int)aPreTriggerDelay
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:preTriggerDelay];
-    preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:65535];
+    preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:1023];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelPreTriggerDelayChanged object:self];
 }
@@ -323,6 +324,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	[self setEnergyPeakingTime:150];
 	[self setEnergyGapTime:50];
 	[self setTriggerDecimation:0];
+	[self setEnergyDecimation:0];
 	[self setPreTriggerDelay:128];
 	[self setTriggerGateLength:256];
 	[self setSampleLength:510];
@@ -598,6 +600,14 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalTriggerDelayChanged object:self];
 }
 
+- (short) energyDecimation { return energyDecimation; }
+- (void) setEnergyDecimation:(short)aValue 
+{ 
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyDecimation:energyDecimation];
+    energyDecimation = [self limitIntValue:aValue min:0 max:0x3];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EnergyDecimationChanged object:self];
+}
+
 - (short) triggerDecimation { return triggerDecimation; }
 - (void) setTriggerDecimation:(short)aValue 
 { 
@@ -748,6 +758,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	//temp hard coded value.........
 	long i;
 	for(i=0;i<4;i++){
+		// Only the ADCx internal enable bit.
 		unsigned long aValueMask = ((i+1)<<19) | 0x00000404;
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getEventConfigAdcOffsets:i]
@@ -774,7 +785,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	unsigned long peakingTimeHi = ([self energyPeakingTime] >> 8) & 0x3;
 	unsigned long peakingTimeLo = [self energyPeakingTime] & 0xff; 
 	
-	unsigned long aValueMask = (([self triggerDecimation]  & 0x3)<<28) | 
+	unsigned long aValueMask = (([self energyDecimation]  & 0x3)<<28) | 
 								(peakingTimeHi <<16)				   | 
 								(([self energyGapTime]     & 0xff)<<8) | 
 								peakingTimeLo;
@@ -790,7 +801,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 
 - (void) writeEndAddressThreshold
 {
-	unsigned long aValue = endAddressThreshold;
+	unsigned long aValue = 0x1c0;//endAddressThreshold;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302EndAddressThresholdAllAdc
 						numToWrite:1
@@ -863,10 +874,10 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 {
 	int i;
 	for(i = 0; i < 8; i++) {
-		unsigned long aExtValueMask =  (([self internalTriggerDelay:i] & 0x001fL) << 24) | 
-									   (([self triggerDecimation]      & 0x0003L) << 16) | 
-									  ((([self sumG:i]>>8)             & 0x0003L) <<  8) | 
-									   (([self peakingTime:i]>>8)      & 0x0300L);
+		unsigned long aExtValueMask = (([self internalTriggerDelay:i] & 0x00ffL) << 24) | 
+									  (([self triggerDecimation]      & 0x0003L) << 16) | 
+									  (([self sumG:i]                 & 0x0F00L)) | 
+									  (([self peakingTime:i]          & 0x0F00L) >> 8);
 		
 		[[self adapter] writeLongBlock:&aExtValueMask
 							 atAddress:[self baseAddress] + [self getTriggerExtSetupRegOffsets:i]
@@ -874,7 +885,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
 		
-		unsigned long aTriggerMask =(([self gateLength:i]  & 0x3fL) << 24) | 
+		unsigned long aTriggerMask =(([self gateLength:i]  & 0xffL) << 24) | 
 									(([self pulseLength:i] & 0xffL) << 16) | 
 									(([self sumG:i]        & 0xffL) <<  8) | 
 									 ([self peakingTime:i] & 0xffL);
@@ -1273,6 +1284,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		NSLog(@"channel %d should read %d longs\n",channel,numToRead);
 		int n;
 		int c = 0;
+		/*
 		for(n=0;n<numToRead;n+=4){
 			unsigned long adc_Memory1 = 0;
 			
@@ -1282,16 +1294,17 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 								numToRead:1
 							   withAddMod: [self addressModifier]
 							usingAddSpace:0x01];
-			NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
+			//NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
 			//NSLog(@"%d: %d\n",n,adc_Memory1&0xffff);
 			if(adc_Memory1 == 0xdeadbeef){
+				NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
 				c++;
 				if(c>2)break;
 			}
 			//int32_t error = DMARead(addr, (uint32_t)0x08, 
 			//						(uint32_t)8, buffer,  
 			//						num_bytes_to_read);
-		}
+		}*/
 	}
 	
 }
@@ -1453,6 +1466,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	else if([param isEqualToString:@"PeakingTime"])return [[cardDictionary objectForKey:@"peakingTime"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"InternalTriggerDelay"])return [[cardDictionary objectForKey:@"internalTriggerDelay"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"TriggerDecimation"])return [cardDictionary objectForKey:@"triggerDecimation"];
+	else if([param isEqualToString:@"EnergyDecimation"])return [cardDictionary objectForKey:@"energyDecimation"];
     else if([param isEqualToString:@"Enabled"]) return [cardDictionary objectForKey:@"enabledMask"];
     else if([param isEqualToString:@"Clock Source"]) return [cardDictionary objectForKey:@"clockSource"];
     else return nil;
@@ -1624,6 +1638,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	peakingTimes =					[[decoder decodeObjectForKey:@"peakingTime"] retain];
 	internalTriggerDelays =			[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
 	triggerDecimation =			    [decoder decodeIntForKey:   @"triggerDecimation"];
+	energyDecimation =			    [decoder decodeIntForKey:   @"energyDecimation"];
 
 	//csr
 	[self setBankFullTo3:			[decoder decodeBoolForKey:@"bankFullTo3"]];
@@ -1683,6 +1698,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	[encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
 	[encoder encodeObject:internalTriggerDelays	forKey:@"internalTriggerDelays"];
 	[encoder encodeInt:triggerDecimation		forKey:@"triggerDecimation"];
+	[encoder encodeInt:energyDecimation			forKey:@"energyDecimation"];
 
 	//csr
     [encoder encodeBool:bankFullTo3				forKey:@"bankFullTo3"];
@@ -1723,6 +1739,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
     [objDictionary setObject: peakingTimes									forKey:@"peakingTimes"];	
     [objDictionary setObject: internalTriggerDelays							forKey:@"internalTriggerDelays"];	
     [objDictionary setObject: [NSNumber numberWithInt:triggerDecimation]	forKey:@"triggerDecimation"];	
+    [objDictionary setObject: [NSNumber numberWithInt:energyDecimation]	forKey:@"energyDecimation"];	
     [objDictionary setObject: [NSNumber numberWithLong:gtMask]				forKey:@"gtMask"];	
 	
     return objDictionary;
@@ -1795,10 +1812,11 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 	unsigned int max_timeout, timeout_cnt;
 	
 	int i;
-	for (i=0;i<8;i++) {	
-		
+	for (i=0;i<kNumSIS3302Channels;i++) {
 		unsigned long data =  [self dacOffset:i];
 		unsigned long addr = [self baseAddress] + kSIS3302DacData  ;
+		
+		// Set the Data in the DAC Register
 		[[self adapter] writeLongBlock:&data
 							 atAddress:addr
 							numToWrite:1
@@ -1808,6 +1826,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		
 		data =  1 + (i << 4); // write to DAC Register
 		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
+		// Tell card to set the DAC shift Register
 		[[self adapter] writeLongBlock:&data
 							 atAddress:addr
 							numToWrite:1
@@ -1817,6 +1836,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		max_timeout = 5000 ;
 		timeout_cnt = 0 ;
 		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
+		// Wait until done.
 		do {
 			[[self adapter] readLongBlock:&data
 								 atAddress:addr
@@ -1829,7 +1849,7 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		
 		if (timeout_cnt >=  max_timeout) {
 			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
-			continue;
+			return;
 		}
 		
 		[[self adapter] writeLongBlock:&data
@@ -1860,9 +1880,8 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 		
 		if (timeout_cnt >=  max_timeout) {
 			NSLog(@"%@ Failed programing the DAC offset for channel %d\n",[self fullID],i); 
-			continue;
+			return;
 		}
 	}
-	
 }
 @end

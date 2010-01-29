@@ -75,6 +75,7 @@
 	IBOutlet NSButton*		checkEventButton;
 	
 	IBOutlet NSPopUpButton*	triggerDecimationPU;
+	IBOutlet NSPopUpButton*	energyDecimationPU;
 
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
@@ -138,6 +139,7 @@
 - (void) peakingTimeChanged:(NSNotification*)aNote;
 - (void) internalTriggerDelayChanged:(NSNotification*)aNote;
 - (void) triggerDecimationChanged:(NSNotification*)aNote;
+- (void) energyDecimationChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
@@ -170,6 +172,7 @@
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) probeBoardAction:(id)sender;
 - (IBAction) triggerDecimationAction:(id)sender;
+- (IBAction) energyDecimationAction:(id)sender;
 
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) gtAction:(id)sender;
