@@ -67,6 +67,7 @@
     unsigned short sampleStartIndex;
 	BOOL bankOneArmed;
 	BOOL firstTime;
+	BOOL shipEnergyWaveform;
 	
     int preTriggerDelay;
     int triggerGateLength;
@@ -157,6 +158,9 @@
 - (BOOL) enabled:(short)chan;
 - (void) setEnabledMask:(short)aMask;
 - (void) setEnabledBit:(short)chan withValue:(BOOL)aValue;
+- (BOOL) shipEnergyWaveform;
+- (void) setShipEnergyWaveform:(BOOL)aState;
+
 
 - (short) gtMask;
 - (void) setGtMask:(long)aMask;
@@ -193,6 +197,7 @@
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
 - (void) calculateSampleValues;
+- (void) calculateEnergyGateLength;
 
 #pragma mark •••Hardware Access
 - (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax;
@@ -303,5 +308,6 @@ extern NSString* ORSIS3302PeakingTimeChanged;
 extern NSString* ORSIS3302InternalTriggerDelayChanged;
 extern NSString* ORSIS3302TriggerDecimationChanged;
 extern NSString* ORSIS3302EnergyDecimationChanged;
+extern NSString* ORSIS3302SetShipWaveformChanged;
 
 

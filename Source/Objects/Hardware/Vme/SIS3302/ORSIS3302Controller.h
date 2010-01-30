@@ -107,6 +107,7 @@
 - (void) energySampleStartIndex1Changed:(NSNotification*)aNote;
 - (void) energyGapTimeChanged:(NSNotification*)aNote;
 - (void) energyPeakingTimeChanged:(NSNotification*)aNote;
+- (void) energySetShipWaveformChanged:(NSNotification*)aNote;
 - (void) triggerGateLengthChanged:(NSNotification*)aNote;
 - (void) preTriggerDelayChanged:(NSNotification*)aNote;
 - (void) sampleStartIndexChanged:(NSNotification*)aNote;
@@ -141,7 +142,6 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) energyGateLengthAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 - (IBAction) energySampleStartIndex3Action:(id)sender;
 - (IBAction) energyTauFactorAction:(id)sender;

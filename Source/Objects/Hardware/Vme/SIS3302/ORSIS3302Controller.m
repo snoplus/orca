@@ -281,6 +281,11 @@
                      selector : @selector(energyGateLengthChanged:)
                          name : ORSIS3302ModelEnergyGateLengthChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(energySetShipWaveformChanged:)
+                         name : ORSIS3302SetShipWaveformChanged
+						object: model];
 
 }
 
@@ -343,6 +348,7 @@
 	[self energySampleStartIndex2Changed:nil];
 	[self energyTauFactorChanged:nil];
 	[self energySampleStartIndex3Changed:nil];
+	[self energySetShipWaveformChanged:nil];
 	[self endAddressThresholdChanged:nil];
 	[self runModeChanged:nil];
 	[self energyGateLengthChanged:nil];
@@ -395,6 +401,22 @@
 - (void) energyPeakingTimeChanged:(NSNotification*)aNote
 {
 	[energyPeakingTimeField setIntValue: [model energyPeakingTime]];
+}
+
+- (void) energySetShipWaveformChanged:(NSNotification*)aNote
+{
+	if ([energyShipWaveformButton state] != [model shipEnergyWaveform]) {
+		[energyShipWaveformButton setState:[model shipEnergyWaveform]];
+	}
+	if ([model shipEnergyWaveform]) {
+		[energySampleStartIndex3Field setEnabled:YES];
+		[energySampleStartIndex2Field setEnabled:YES];
+		[energySampleStartIndex1Field setEnabled:YES];
+	} else {
+		[energySampleStartIndex3Field setEnabled:NO];
+		[energySampleStartIndex2Field setEnabled:NO];
+		[energySampleStartIndex1Field setEnabled:NO];
+	}
 }
 
 - (void) triggerGateLengthChanged:(NSNotification*)aNote
@@ -674,11 +696,6 @@
 
 #pragma mark •••Actions
 
-- (void) energyGateLengthAction:(id)sender
-{
-	[model setEnergyGateLength:[sender intValue]];	
-}
-
 - (IBAction) runModeAction:(id)sender
 {
 	[model setRunMode:[sender indexOfSelectedItem]];	
@@ -707,12 +724,12 @@
 - (IBAction) energyShipWaveformAction:(id)sender
 {
 	if ([sender state] == 1) {
-		[model setEnergySampleLength:510];
+		[model setShipEnergyWaveform:YES];
 		[energySampleStartIndex3Field setEnabled:YES];
 		[energySampleStartIndex2Field setEnabled:YES];
 		[energySampleStartIndex1Field setEnabled:YES];
 	} else {
-		[model setEnergySampleLength:0];
+		[model setShipEnergyWaveform:NO];
 		[energySampleStartIndex3Field setEnabled:NO];
 		[energySampleStartIndex2Field setEnabled:NO];
 		[energySampleStartIndex1Field setEnabled:NO];

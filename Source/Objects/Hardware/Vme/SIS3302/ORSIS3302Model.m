@@ -67,6 +67,7 @@ NSString* ORSIS3302PeakingTimeChanged			= @"ORSIS3302PeakingTimeChanged";
 NSString* ORSIS3302InternalTriggerDelayChanged	= @"ORSIS3302InternalTriggerDelayChanged";
 NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChanged";
 NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged";
+NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 
 
 @interface ORSIS3302Model (private)
@@ -164,6 +165,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     energySampleStartIndex3 = aEnergySampleStartIndex3;
 	[self calculateSampleValues];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (int) energySampleStartIndex2 { return energySampleStartIndex2; }
@@ -173,6 +175,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     energySampleStartIndex2 = aEnergySampleStartIndex2;
 	[self calculateSampleValues];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (int) energySampleStartIndex1 { return energySampleStartIndex1; }
@@ -182,15 +185,17 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     energySampleStartIndex1 = aEnergySampleStartIndex1;
 	[self calculateSampleValues];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (int) energySampleLength { return energySampleLength; }
 - (void) setEnergySampleLength:(int)aEnergySampleLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
-    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:510];
+    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:kSIS3302MaxEnergyWaveform];
 	[self calculateSampleValues];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (int) energyGapTime { return energyGapTime; }
@@ -199,6 +204,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGapTime:energyGapTime];
     energyGapTime = [self limitIntValue:aEnergyGapTime min:0 max:0xff];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyGapTimeChanged object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (int) energyPeakingTime { return energyPeakingTime; }
@@ -207,12 +213,14 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyPeakingTime:energyPeakingTime];
     energyPeakingTime = [self limitIntValue:aEnergyPeakingTime min:0 max:0x3ff];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyPeakingTimeChanged object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (int) triggerGateLength { return triggerGateLength; }
 - (void) setTriggerGateLength:(int)aTriggerGateLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:triggerGateLength];
+	if (aTriggerGateLength < sampleLength) aTriggerGateLength = sampleLength;
     triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:65535];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelTriggerGateLengthChanged object:self];
 }
@@ -224,6 +232,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:1023];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelPreTriggerDelayChanged object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (unsigned short) sampleStartIndex{ return sampleStartIndex; }
@@ -242,6 +251,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	[self calculateSampleValues];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleLengthChanged object:self];
 }
+
 
 - (short) lemoInMode { return lemoInMode; }
 - (void) setLemoInMode:(short)aLemoInMode
@@ -329,8 +339,9 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	[self setEnergyDecimation:0];
 	[self setPreTriggerDelay:128];
 	[self setTriggerGateLength:256];
-	[self setSampleLength:510];
+	[self setSampleLength:0];
 	[self setSampleStartIndex:0];
+	[self setShipEnergyWaveform:NO];
 	[self setGtMask:0xff];
 	[self setEnabledMask:0x0];
 	
@@ -431,6 +442,26 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	if(aValue)aMask |= (1<<chan);
 	else aMask &= ~(1<<chan);
 	[self setEnabledMask:aMask];
+}
+
+- (BOOL) shipEnergyWaveform { return shipEnergyWaveform;}
+- (void) setShipEnergyWaveform:(BOOL)aState
+{ 
+	[[[self undoManager] prepareWithInvocationTarget:self] setShipEnergyWaveform:shipEnergyWaveform];
+	shipEnergyWaveform = aState;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SetShipWaveformChanged object:self];
+	if (!shipEnergyWaveform) {
+		[self setEnergySampleLength:0];		
+	} else {
+		[self setEnergySampleLength:kSIS3302MaxEnergyWaveform];
+		// The following forces the start indices to calculate automatically.
+		// This could avoid some confusion about the special cases of 
+		// start indices 2 and 3 being 0.  This forces them to be
+		// at least span the max sample length.  (There's a check 
+		// in calculateSampleValues.)
+		[self setEnergySampleStartIndex2:1];
+	}
+
 }
 
 - (short) gtMask
@@ -539,6 +570,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyDecimation:energyDecimation];
     energyDecimation = [self limitIntValue:aValue min:0 max:0x3];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EnergyDecimationChanged object:self];
+	[self calculateEnergyGateLength];
 }
 
 - (short) triggerDecimation { return triggerDecimation; }
@@ -555,10 +587,16 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	if(runMode      == 0)   return;
 	else	numEnergyValues = energySampleLength;   
 
-	if(numEnergyValues > 510){
-		NSLogColor([NSColor redColor],@"Number of energy values is to high (max = 510) ; actual = %d \n",numEnergyValues);
-		NSLogColor([NSColor redColor],@"Value forced to 510\n");
-		numEnergyValues = 510;
+
+	if(numEnergyValues > kSIS3302MaxEnergyWaveform){
+		// This should never be happen in the current implementation since we 
+		// handle this value internally, but checking nonetheless in case 
+		// in the future we modify this.  
+		NSLogColor([NSColor redColor],@"Number of energy values is to high (max = %d) ; actual = %d \n",
+				   kSIS3302MaxEnergyWaveform, numEnergyValues);
+		NSLogColor([NSColor redColor],@"Value forced to %d\n", kSIS3302MaxEnergyWaveform);
+		numEnergyValues = kSIS3302MaxEnergyWaveform;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
 	}
 
 	numRawDataLongWords = ([self sampleLength]>>1);
@@ -585,8 +623,8 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 	} else if (energySampleStartIndex2 != 0 || energySampleStartIndex3 != 0) {
 		// Means we are requesting different pieces of the waveform.
 		// Make sure they are correct.
-		if (energySampleStartIndex2 < energySampleStartIndex1 + energySampleLength/3) {
-			aValue = energySampleLength/3 + energySampleStartIndex1;
+		if (energySampleStartIndex2 < energySampleStartIndex1 + energySampleLength/3 + 1) {
+			aValue = energySampleLength/3 + energySampleStartIndex1 + 1;
 			energySampleStartIndex2 = aValue;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
 			if (energySampleStartIndex3 == 0) {
@@ -598,11 +636,50 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 		if (energySampleStartIndex2 == 0 && energySampleStartIndex3 != 0) {
 			energySampleStartIndex3 = 0;
 		} else if (energySampleStartIndex2 != 0 && 
-				   energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3) {
-			aValue = energySampleLength/3 + energySampleStartIndex2;
+				   energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
+			aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
 			energySampleStartIndex3 = aValue;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
 		}
+	}
+	
+	// Finally check the trigger gate length to make sure it is big enough
+	if (triggerGateLength < sampleLength) {
+		[self setTriggerGateLength:sampleLength];
+	}
+}
+
+- (void) calculateEnergyGateLength
+{
+	// Make sure the gate is set appropriately.
+	// The Pre-trigger and and Trigger Gate are both in
+	// 100 MHz clock ticks, but everything else is in 
+	// Decimation clock ticks.  Convert this down to the correct
+	// decimation.
+	unsigned int delayInDecimationClockTicks = preTriggerDelay >> energyDecimation;
+	unsigned int temp = 0;
+	unsigned int temptwo = 0;
+	if (energySampleLength == 0) {
+		// Means that we are not shipping an energy waveform.
+		// Make sure the gate length is long enough
+		[self setEnergyGateLength:(delayInDecimationClockTicks +
+								   2*energyPeakingTime +
+								   energyGapTime + 20)]; // Add the 20 ticks for safety
+	} else {
+		// We are shipping an energy waveform, we require the waveform to be at least:
+		temp = delayInDecimationClockTicks + 
+			   energySampleStartIndex3 + 
+			   energySampleLength/3 + 20;
+		temptwo = delayInDecimationClockTicks +
+			      2*energyPeakingTime +
+				  energyGapTime + 20;
+		// Take the larger of the two.
+		if (temp > temptwo ) {
+			[self setEnergyGateLength:temp];
+		} else {
+			[self setEnergyGateLength:temptwo];			
+		}
+		
 	}
 }
 
@@ -1768,6 +1845,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     [self setClockSource:			[decoder decodeIntForKey:@"clockSource"]];
     [self setEnabledMask:			[decoder decodeInt32ForKey:@"enabledMask"]];
 	[self setGtMask:				[decoder decodeIntForKey:@"gtMask"]];
+	[self setShipEnergyWaveform:	[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
 		
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 
@@ -1820,6 +1898,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
 	[encoder encodeInt32:enabledMask			forKey:@"enabledMask"];
     [encoder encodeInt:gtMask					forKey:@"gtMask"];
+	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
 	
     [encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
 	

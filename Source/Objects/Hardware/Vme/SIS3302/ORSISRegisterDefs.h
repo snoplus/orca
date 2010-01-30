@@ -19,6 +19,7 @@
 
 #define kNumSIS3302Channels			8 
 #define kSISLed						0x0001L
+#define kSIS3302MaxEnergyWaveform	510
 
 #define CSRMask(state,A) ((state)?(A):(A<<16))
 
