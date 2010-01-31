@@ -1,4 +1,5 @@
 #include "ORVVmeCard.hh"
+#include <vector>
 
 class ORSIS3302Card: public ORVVmeCard
 {
@@ -10,7 +11,9 @@ class ORSIS3302Card: public ORVVmeCard
        virtual bool Readout(SBC_LAM_Data* /* lam_data*/);  
 	   virtual bool Stop();
        enum EORSIS3302Consts {
-           kNumberOfChannels = 8 };
+           kNumberOfChannels = 8,
+	       kHeaderSizeInLongs = 2,
+	       kTrailerSizeInLongs = 4};
 
 
    protected:
@@ -33,5 +36,7 @@ class ORSIS3302Card: public ORVVmeCard
        virtual size_t GetNumberOfChannels() { return kNumberOfChannels; }
 
        bool fBankOneArmed;
+	   std::vector<std::vector<uint32_t> > fSetOfTempVectors;
+	   std::vector<size_t> fSetOfTempVectorIters;
 
 };

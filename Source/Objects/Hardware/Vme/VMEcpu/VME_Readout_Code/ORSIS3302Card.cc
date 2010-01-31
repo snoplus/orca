@@ -1,7 +1,9 @@
 #include "ORSIS3302Card.hh"
 
 ORSIS3302Card::ORSIS3302Card(SBC_card_info* ci) :
-  ORVVmeCard(ci), fBankOneArmed(false)
+  ORVVmeCard(ci), fBankOneArmed(false), 
+  fSetOfTempVectors(kNumberOfChannels, std::vector<uint32_t>(0)),  
+  fSetOfTempVectorIters(kNumberOfChannels, 0)
 {
   // Start module here?
   
@@ -39,6 +41,7 @@ uint32_t ORSIS3302Card::GetADCBufferRegisterOffset(size_t channel)
 
 bool ORSIS3302Card::Start()
 {
+	fSetOfTempVectorIters.assign(fSetOfTempVectorIters.size(), 0);
 	DisarmAndArmBank(0);
 	return true;
 }
@@ -82,6 +85,9 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 	// This will dump one channel into a data record, should
 	// this be changed?
     // read stop sample address
+	std::vector<uint32_t>& fTempVector = fSetOfTempVectors[channel];
+	size_t& fTempVectorIter = fSetOfTempVectorIters[channel];
+	
     uint32_t addr = GetBaseAddress() 
            + GetPreviousBankSampleRegisterOffset(channel) ; 
     uint32_t end_sample_address = 0;
@@ -108,27 +114,54 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
     if (end_sample_address != 0) {
     	addr = GetBaseAddress() 
                + GetADCBufferRegisterOffset(channel);
-        // Do DMA Read
-        uint32_t num_bytes_to_read = (end_sample_address & 0x3ffffc);
+        uint32_t num_bytes_to_read = (end_sample_address & 0x3ffffc)*2;
 		uint32_t num_longs_to_read = num_bytes_to_read >> 2;
-		ensureDataCanHold(num_longs_to_read + 2);
-		size_t savedIndex = dataIndex;
-		data[dataIndex++] = GetHardwareMask()[0] | (num_longs_to_read+2); 
-        data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
-							((GetSlot()  & 0x0000001f)<<16);
-		uint8_t* buffer = (uint8_t*) &data[dataIndex];
+		if (num_longs_to_read + fTempVectorIter > fTempVector.size()) {
+			fTempVector.resize(num_longs_to_read + fTempVectorIter);
+		}
+		
+		// The following construction enables us to write onto 
+		uint8_t* buffer = (uint8_t*) &fTempVector[fTempVectorIter];
+		
+		// Do DMA Read
     	int32_t error = DMARead(addr, 
 				(uint32_t)0x08, // Address Modifier, request MBLT 
-                (uint32_t)8, // Read 64-bits at a time
+                (uint32_t)8, // Read 64-bits at a time (redundant request)
 				buffer,  
                 num_bytes_to_read);
-		
     	if (error != (int32_t) num_bytes_to_read) { // vme error
 			// Reset the data
-			dataIndex = savedIndex;
             return false;
     	}
-		dataIndex += num_longs_to_read;
+		
+		// Put the data into the data stream
+		size_t number_of_longs_in_raw_data = GetDeviceSpecificData()[0];
+		size_t number_of_longs_in_energy_wf_data = GetDeviceSpecificData()[1];
+		size_t size_of_record = kHeaderSizeInLongs + kTrailerSizeInLongs + 
+			number_of_longs_in_raw_data + number_of_longs_in_energy_wf_data;
+		
+		size_t total_data_in_vector = fTempVectorIter + num_bytes_to_read/4;
+		for (size_t temp_iter = 0; temp_iter < total_data_in_vector; temp_iter += size_of_record) {
+			if (temp_iter + size_of_record >= total_data_in_vector) { 
+				// OK this means we don't have a complete record here.
+				// We will catch the rest on the next read cycle.
+				size_t num_data_left = total_data_in_vector - temp_iter;
+				// Move it to the front of the vector
+				memmove(&fTempVector[0], &fTempVector[temp_iter], 
+						num_data_left*sizeof(fTempVector[0]));
+				// Set the iterator correctly
+				fTempVectorIter = num_data_left;
+				break;
+			}
+			ensureDataCanHold(size_of_record + 4);
+			data[dataIndex++] = GetHardwareMask()[0] | (size_of_record+4); 
+			data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
+			((GetSlot()  & 0x0000001f)<<16);
+			data[dataIndex++] = number_of_longs_in_raw_data;
+			data[dataIndex++] = number_of_longs_in_energy_wf_data;
+			memcpy(data + dataIndex, &fTempVector[temp_iter], size_of_record*sizeof(fTempVector[0]));
+			dataIndex += size_of_record;
+		}
     } 
     return true;
 }
