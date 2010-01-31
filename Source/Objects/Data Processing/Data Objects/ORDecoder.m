@@ -89,6 +89,9 @@
 	[fileHeader release];
 	fileHeader = [aHeader retain];
 	[self generateObjectLookup];
+	unsigned long headerLength = [[self headerAsData] length]; 
+	[fileHeader setObject:[NSNumber numberWithLong:headerLength] forKey:@"Header Length"];
+
 }
 
 - (NSMutableDictionary*) objectLookup
@@ -295,7 +298,7 @@
 	if(needToSwap)	headerLength = CFSwapInt32(headerLength);			
 	p++;	 //point to header itself
 	NSString* theHeader = [[NSString alloc] initWithBytes:p length:headerLength encoding:NSASCIIStringEncoding];
-	[self setFileHeader:[theHeader propertyList]]; 
+	[self setFileHeader:[theHeader propertyList]];
 	[theHeader release];
 }
 
