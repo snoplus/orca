@@ -135,8 +135,19 @@
                        object : nil];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(enabledChanged:)
-                         name : ORSIS3302EnabledChanged
+                     selector : @selector(triggerOutEnabledChanged:)
+                         name : ORSIS3302TriggerOutEnabledChanged
+                       object : model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(inputInvertedChanged:)
+                         name : ORSIS3302InputInvertedChanged
+                       object : model];
+	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(adc50KTriggerEnabledChanged:)
+                         name : ORSIS3302Adc50KTriggerEnabledChanged
                        object : model];
 	
     [notifyCenter addObserver : self
@@ -197,11 +208,6 @@
                          name : ORSIS3302EnergyDecimationChanged
 						object: model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(acqRegEnableMaskChanged:)
-                         name : ORSIS3302AcqRegEnableMaskChanged
-						object: model];
-
     [notifyCenter addObserver : self
                      selector : @selector(lemoOutModeChanged:)
                          name : ORSIS3302LemoOutModeChanged
@@ -287,6 +293,16 @@
                          name : ORSIS3302SetShipWaveformChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoInEnabledMaskChanged:)
+                         name : ORSIS3302ModelLemoInEnabledMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(internalExternalTriggersOredChanged:)
+                         name : ORSIS3302ModelInternalExternalTriggersOredChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -315,7 +331,9 @@
     [self baseAddressChanged:nil];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self enabledChanged:nil];
+	[self inputInvertedChanged:nil];
+	[self triggerOutEnabledChanged:nil];
+	[self adc50KTriggerEnabledChanged:nil];
 	[self gtChanged:nil];
 	[self thresholdChanged:nil];
 	[self gateLengthChanged:nil];
@@ -334,7 +352,6 @@
     [self waveFormRateChanged:nil];
 	[self clockSourceChanged:nil];
 	
-	[self acqRegEnableMaskChanged:nil];
 	[self lemoOutModeChanged:nil];
 	[self lemoInModeChanged:nil];
 	[self dacOffsetChanged:nil];
@@ -350,11 +367,26 @@
 	[self energySampleStartIndex3Changed:nil];
 	[self energySetShipWaveformChanged:nil];
 	[self endAddressThresholdChanged:nil];
-	[self runModeChanged:nil];
 	[self energyGateLengthChanged:nil];
+	[self lemoInEnabledMaskChanged:nil];
+	[self internalExternalTriggersOredChanged:nil];
+	[self runModeChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) internalExternalTriggersOredChanged:(NSNotification*)aNote
+{
+	[internalExternalTriggersOredCB setIntValue: [model internalExternalTriggersOred]];
+}
+
+- (void) lemoInEnabledMaskChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<3;i++){
+		[[lemoInEnabledMaskMatrix cellWithTag:i] setState:[model lemoInEnabled:i]];
+	}
+}
 
 - (void) energyGateLengthChanged:(NSNotification*)aNote
 {
@@ -366,6 +398,7 @@
 	[runModePU selectItemAtIndex: [model runMode]];
 	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
 	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
+	[runSummaryField setStringValue: [model runSummary]];
 }
 
 - (void) endAddressThresholdChanged:(NSNotification*)aNote
@@ -417,6 +450,9 @@
 		[energySampleStartIndex2Field setEnabled:NO];
 		[energySampleStartIndex1Field setEnabled:NO];
 	}
+	
+	[runSummaryField setStringValue: [model runSummary]];
+
 }
 
 - (void) triggerGateLengthChanged:(NSNotification*)aNote
@@ -437,6 +473,7 @@
 - (void) sampleLengthChanged:(NSNotification*)aNote
 {
 	[sampleLengthField setIntValue: [model sampleLength]];
+	[runSummaryField setStringValue: [model runSummary]];
 }
 
 - (void) lemoInModeChanged:(NSNotification*)aNote
@@ -451,26 +488,31 @@
 	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
 }
 
-- (void) acqRegEnableMaskChanged:(NSNotification*)aNote
-{
-	int i;
-	unsigned long aMask = [model acqRegEnableMask];
-	for(i = 0;i<16;i++){
-		BOOL state = (aMask & (1<<i)) != 0;
-		[[acqRegEnableMaskMatrix cellWithTag:i] setIntValue:state];
-	}
-}
-
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
 }
 
-- (void) enabledChanged:(NSNotification*)aNote
+- (void) inputInvertedChanged:(NSNotification*)aNote
 {
 	short i;
 	for(i=0;i<kNumSIS3302Channels;i++){
-		[[enabledMatrix cellWithTag:i] setState:[model enabled:i]];
+		[[inputInvertedMatrix cellWithTag:i] setState:[model inputInverted:i]];
+	}
+}
+
+- (void) triggerOutEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels;i++){
+		[[triggerOutEnabledMatrix cellWithTag:i] setState:[model triggerOutEnabled:i]];
+	}
+}
+- (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels;i++){
+		[[adc50KTriggerEnabledMatrix cellWithTag:i] setState:[model adc50KTriggerEnabled:i]];
 	}
 }
 
@@ -585,15 +627,15 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3302SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3302SettingsLock];
     
-    [settingLockButton		setState: locked];
-    [addressText			setEnabled:!locked && !runInProgress];
-    [initButton				setEnabled:!lockedOrRunningMaintenance];
-	[enabledMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[gtMatrix				setEnabled:!lockedOrRunningMaintenance];
-	[thresholdMatrix		setEnabled:!lockedOrRunningMaintenance];
-	[checkEventButton	    setEnabled:!locked && !runInProgress];
-	
-	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
+    [settingLockButton			setState: locked];
+    [addressText				setEnabled:!locked && !runInProgress];
+    [initButton					setEnabled:!lockedOrRunningMaintenance];
+	[triggerOutEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
+	[inputInvertedMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[adc50KTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
+	[gtMatrix					setEnabled:!lockedOrRunningMaintenance];
+	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[clockSourcePU				setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) setModel:(id)aModel
@@ -696,6 +738,16 @@
 
 #pragma mark •••Actions
 
+- (IBAction) internalExternalTriggersOredAction:(id)sender
+{
+	[model setInternalExternalTriggersOred:[sender intValue]];	
+}
+
+- (IBAction) lemoInEnabledMaskAction:(id)sender
+{
+	[model setLemoInEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 - (IBAction) runModeAction:(id)sender
 {
 	[model setRunMode:[sender indexOfSelectedItem]];	
@@ -734,7 +786,6 @@
 		[energySampleStartIndex2Field setEnabled:NO];
 		[energySampleStartIndex1Field setEnabled:NO];
 	}
-
 }
 
 - (IBAction) energyGapTimeAction:(id)sender
@@ -757,7 +808,6 @@
 	[model setPreTriggerDelay:[sender intValue]];	
 }
 
-
 - (IBAction) sampleStartIndexAction:(id)sender
 {
 	[model setSampleStartIndex:[sender intValue]];	
@@ -778,18 +828,6 @@
 	[model setLemoOutMode:[sender indexOfSelectedItem]];	
 }
 
-- (IBAction) acqRegEnableMaskAction:(id)sender
-{
-	unsigned short aMask = 0;
-	int i;
-	for(i=0;i<16;i++){
-		if([[sender cellWithTag:i] intValue]){
-			aMask |= (1<<i);
-		}
-	}
-	[model setAcqRegEnableMask:aMask];	
-}
-
 //hardware actions
 - (IBAction) probeBoardAction:(id)sender;
 {
@@ -802,26 +840,25 @@
                         localException);
 	}
 }
-- (IBAction) forceTrigger:(id)sender;
-{
-	@try {
-		[model forceTrigger];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Trigger of SIS 3300 failed\n");
-        NSRunAlertPanel([localException name], @"%@\nForce Trigger Failed", @"OK", nil, nil,
-                        localException);
-	}
-}
 
 - (IBAction) clockSourceAction:(id)sender
 {
 	[model setClockSource:[sender indexOfSelectedItem]];	
 }
 
-- (IBAction) enabledAction:(id)sender
+- (IBAction) triggerOutEnabledAction:(id)sender
 {
-	[model setEnabledBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setTriggerOutEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) inputInvertedAction:(id)sender
+{
+	[model setInputInverted:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) adc50KTriggerEnabledAction:(id)sender
+{
+	[model setAdc50KTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) gtAction:(id)sender
@@ -944,47 +981,6 @@
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
-}
-
-- (IBAction) writeThresholdsAction:(id)sender
-{
-    @try {
-        [self endEditing];
-		NSLog(@"Write Thresholds for SIS3302 %d\n",[model slot]);
-        [model writeThresholds];
-    }
-	@catch(NSException* localException) {
-        NSLog(@"SIS3302 Thresholds write FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3302 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) readThresholdsAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model readThresholds:YES];
-    }
-	@catch(NSException* localException) {
-        NSLog(@"SIS3302 Thresholds read FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3302 Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) checkEvent:(id)sender
-{
-    @try {
-		[self endEditing];
-		[model initBoard];
-		[model readOutEvents];
-	}
-	@catch(NSException* localException) {
-        NSLog(@"SIS3302 Test Read FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3302 Test Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
 }
 
 - (IBAction) report:(id)sender

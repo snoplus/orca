@@ -28,7 +28,9 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
-	IBOutlet   NSTextField* energyGateLengthField;
+	IBOutlet NSButton*		internalExternalTriggersOredCB;
+	IBOutlet NSMatrix*		lemoInEnabledMaskMatrix;
+	IBOutlet NSTextField*	energyGateLengthField;
 	IBOutlet NSPopUpButton* runModePU;
 	IBOutlet NSTextField*	endAddressThresholdField;
 	IBOutlet NSTextField*	energyTauFactorField;
@@ -46,18 +48,16 @@
 	IBOutlet NSTextField*	lemoInAssignmentsField;
 	IBOutlet NSPopUpButton* lemoOutModePU;
 	IBOutlet NSTextField*	lemoOutAssignmentsField;
-	IBOutlet NSMatrix*		acqRegEnableMaskMatrix;
+	IBOutlet NSTextField*	runSummaryField;
 	
 	//base address
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
-		
-
-	IBOutlet NSButton*		writeThresholdButton;
-	IBOutlet NSButton*		readThresholdButton;
 	IBOutlet NSPopUpButton* clockSourcePU;
 
-	IBOutlet NSMatrix*		enabledMatrix;
+	IBOutlet NSMatrix*		inputInvertedMatrix;
+	IBOutlet NSMatrix*		triggerOutEnabledMatrix;
+	IBOutlet NSMatrix*		adc50KTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		gtMatrix;
 	IBOutlet NSMatrix*		dacOffsetMatrix;
 	IBOutlet NSMatrix*		thresholdMatrix;
@@ -79,7 +79,6 @@
     IBOutlet NSStepper*     integrationStepper;
     IBOutlet NSTextField*   integrationText;
     IBOutlet NSTextField*   totalRateText;
-    IBOutlet NSMatrix*      enabled2Matrix;
 
     IBOutlet ORValueBar*    rate0;
     IBOutlet ORValueBar*    totalRate;
@@ -98,6 +97,8 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
+- (void) lemoInEnabledMaskChanged:(NSNotification*)aNote;
 - (void) energyGateLengthChanged:(NSNotification*)aNote;
 - (void) runModeChanged:(NSNotification*)aNote;
 - (void) endAddressThresholdChanged:(NSNotification*)aNote;
@@ -115,7 +116,6 @@
 - (void) dacOffsetChanged:(NSNotification*)aNote;
 - (void) lemoInModeChanged:(NSNotification*)aNote;
 - (void) lemoOutModeChanged:(NSNotification*)aNote;
-- (void) acqRegEnableMaskChanged:(NSNotification*)aNote;
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -126,7 +126,9 @@
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
-- (void) enabledChanged:(NSNotification*)aNote;
+- (void) triggerOutEnabledChanged:(NSNotification*)aNote;
+- (void) inputInvertedChanged:(NSNotification*)aNote;
+- (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) gtChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
 - (void) gateLengthChanged:(NSNotification*)aNote;
@@ -142,6 +144,8 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) internalExternalTriggersOredAction:(id)sender;
+- (IBAction) lemoInEnabledMaskAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 - (IBAction) energySampleStartIndex3Action:(id)sender;
 - (IBAction) energyTauFactorAction:(id)sender;
@@ -157,7 +161,6 @@
 - (IBAction) dacOffsetAction:(id)sender;
 - (IBAction) lemoInModeAction:(id)sender;
 - (IBAction) lemoOutModeAction:(id)sender;
-- (IBAction) acqRegEnableMaskAction:(id)sender;
 
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
@@ -168,7 +171,9 @@
 - (IBAction) triggerDecimationAction:(id)sender;
 - (IBAction) energyDecimationAction:(id)sender;
 
-- (IBAction) enabledAction:(id)sender;
+- (IBAction) adc50KTriggerEnabledAction:(id)sender;
+- (IBAction) inputInvertedAction:(id)sender;
+- (IBAction) triggerOutEnabledAction:(id)sender;
 - (IBAction) gtAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) gateLengthAction:(id)sender;
@@ -176,11 +181,7 @@
 - (IBAction) sumGAction:(id)sender;
 - (IBAction) peakingTimeAction:(id)sender;
 - (IBAction) internalTriggerDelayAction:(id)sender;
-- (IBAction) writeThresholdsAction:(id)sender;
-- (IBAction) readThresholdsAction:(id)sender;
-- (IBAction) checkEvent:(id)sender;
 - (IBAction) report:(id)sender;
-- (IBAction) forceTrigger:(id)sender;
 
 #pragma mark •••Data Source
 - (double)  getBarValue:(int)tag;

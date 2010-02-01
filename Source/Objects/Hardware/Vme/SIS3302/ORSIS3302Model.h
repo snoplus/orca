@@ -39,7 +39,11 @@
 	
 	unsigned long   dataId;
 
-	short			enabledMask;
+	short			internalTriggerEnabledMask;
+	short			externalTriggerEnabledMask;
+	short			inputInvertedMask;
+	short			triggerOutEnabledMask;
+	short			adc50KTriggerEnabledMask;
 	short			gtMask;
 	short			triggerDecimation;
 	short			energyDecimation;
@@ -60,7 +64,6 @@
 	int currentBank;
 	unsigned long dataWord[4][16*1024];					
 	long count;
-    short acqRegEnableMask;
     short lemoOutMode;
     short lemoInMode;
     unsigned short sampleLength;
@@ -81,6 +84,8 @@
     int energyTauFactor;
     int endAddressThreshold;
     int runMode;
+    unsigned short lemoInEnabledMask;
+    BOOL internalExternalTriggersOred;
 	
 	unsigned long* dataRecord;
 	unsigned long  dataRecordlength;
@@ -100,29 +105,37 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
-- (int) energyGateLength;
+- (BOOL) internalExternalTriggersOred;
+- (void) setInternalExternalTriggersOred:(BOOL)aInternalExternalTriggersOred;
+- (unsigned short) lemoInEnabledMask;
+- (void) setLemoInEnabledMask:(unsigned short)aLemoInEnableMask;
+- (BOOL) lemoInEnabled:(unsigned short)aBit;
+- (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
+- (BOOL) lemoInEnabled:(unsigned short)aBit;
+- (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
+- (int)  energyGateLength;
 - (void) setEnergyGateLength:(int)aEnergyGateLength;
-- (int) runMode;
+- (int)  runMode;
 - (void) setRunMode:(int)aRunMode;
-- (int) endAddressThreshold;
+- (int)  endAddressThreshold;
 - (void) setEndAddressThreshold:(int)aEndAddressThreshold;
-- (int) energyTauFactor;
+- (int)  energyTauFactor;
 - (void) setEnergyTauFactor:(int)aEnergyTauFactor;
-- (int) energySampleStartIndex3;
+- (int)  energySampleStartIndex3;
 - (void) setEnergySampleStartIndex3:(int)aEnergySampleStartIndex3;
-- (int) energySampleStartIndex2;
+- (int)  energySampleStartIndex2;
 - (void) setEnergySampleStartIndex2:(int)aEnergySampleStartIndex2;
-- (int) energySampleStartIndex1;
+- (int)  energySampleStartIndex1;
 - (void) setEnergySampleStartIndex1:(int)aEnergySampleStartIndex1;
-- (int) energySampleLength;
+- (int)  energySampleLength;
 - (void) setEnergySampleLength:(int)aEnergySampleLength;
-- (int) energyGapTime;
+- (int)  energyGapTime;
 - (void) setEnergyGapTime:(int)aEnergyGapTime;
-- (int) energyPeakingTime;
+- (int)  energyPeakingTime;
 - (void) setEnergyPeakingTime:(int)aEnergyPeakingTime;
-- (int) triggerGateLength;
+- (int)  triggerGateLength;
 - (void) setTriggerGateLength:(int)aTriggerGateLength;
-- (int) preTriggerDelay;
+- (int)  preTriggerDelay;
 - (void) setPreTriggerDelay:(int)aPreTriggerDelay;
 - (unsigned long) getThresholdRegOffsets:(int) channel;
 - (unsigned long) getTriggerSetupRegOffsets:(int) channel; 
@@ -130,7 +143,8 @@
 - (unsigned long) getEndThresholdRegOffsets:(int)group;
 - (unsigned long) getSampleAddress:(int)channel;
 - (unsigned long) getAdcMemory:(int)channel;
-- (unsigned long) getEventConfigAdcOffsets:(int)group;
+- (unsigned long) getEventConfigOffsets:(int)group;
+- (unsigned long) getExtendedEventConfigOffsets:(int)group;
 
 - (unsigned short) sampleStartIndex;
 - (void) setSampleStartIndex:(unsigned short)aSampleStartIndex;
@@ -142,8 +156,6 @@
 - (short) lemoOutMode;
 - (void) setLemoOutMode:(short)aLemoOutMode;
 - (NSString*) lemoOutAssignments;
-- (short) acqRegEnableMask;
-- (void) setAcqRegEnableMask:(short)aAcqRegEnableMask;
 - (void) setDefaults;
 
 //clocks and delays (Acquistion control reg)
@@ -154,13 +166,33 @@
 - (BOOL) gateChaining;
 - (void) setGateChaining:(BOOL)aState;
 
-- (short) enabledMask;
-- (BOOL) enabled:(short)chan;
-- (void) setEnabledMask:(short)aMask;
-- (void) setEnabledBit:(short)chan withValue:(BOOL)aValue;
+- (short) internalTriggerEnabledMask;
+- (void) setInternalTriggerEnabledMask:(short)aMask;
+- (BOOL) internalTriggerEnabled:(short)chan;
+- (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue;
+
+- (short) externalTriggerEnabledMask;
+- (void) setExternalTriggerEnabledMask:(short)aMask;
+- (BOOL) externalTriggerEnabledMask:(short)chan;
+- (void) setExternalTriggerEnabledMask:(short)chan withValue:(BOOL)aValue;
+
+- (short) inputInvertedMask;
+- (void) setInputInvertedMask:(short)aMask;
+- (BOOL) inputInverted:(short)chan;
+- (void) setInputInverted:(short)chan withValue:(BOOL)aValue;
+
+- (short) triggerOutEnabledMask;
+- (void) setTriggerOutEnabledMask:(short)aMask;
+- (BOOL) triggerOutEnabled:(short)chan;
+- (void) setTriggerOutEnabled:(short)chan withValue:(BOOL)aValue;
+
+- (short) adc50KTriggerEnabledMask;
+- (void) setAdc50KTriggerEnabledMask:(short)aMask;
+- (BOOL) adc50KTriggerEnabled:(short)chan;
+- (void) setAdc50KTriggerEnabled:(short)chan withValue:(BOOL)aValue;
+
 - (BOOL) shipEnergyWaveform;
 - (void) setShipEnergyWaveform:(BOOL)aState;
-
 
 - (short) gtMask;
 - (void) setGtMask:(long)aMask;
@@ -229,11 +261,10 @@
 - (unsigned long) acqReg;
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel;
 - (unsigned long) getADCBufferRegisterOffset:(int) channel;
-- (void) readOutEvents;
-- (void) readOutChannel:(int) channel;
 - (void) disarmAndArmBank:(int) bank;
 - (void) disarmAndArmNextBank;
 - (void) forceTrigger;
+- (NSString*) runSummary;
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
@@ -269,6 +300,8 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelInternalExternalTriggersOredChanged;
+extern NSString* ORSIS3302ModelLemoInEnabledMaskChanged;
 extern NSString* ORSIS3302ModelEnergyGateLengthChanged;
 extern NSString* ORSIS3302ModelRunModeChanged;
 extern NSString* ORSIS3302ModelEndAddressThresholdChanged;
@@ -292,7 +325,7 @@ extern NSString* ORSIS3302AcqRegChanged;
 extern NSString* ORSIS3302EventConfigChanged;
 
 extern NSString* ORSIS3302ClockSourceChanged;
-extern NSString* ORSIS3302EnabledChanged;
+extern NSString* ORSIS3302TriggerOutEnabledChanged;
 extern NSString* ORSIS3302ThresholdChanged;
 extern NSString* ORSIS3302ThresholdArrayChanged;
 extern NSString* ORSIS3302GtChanged;
@@ -309,5 +342,9 @@ extern NSString* ORSIS3302InternalTriggerDelayChanged;
 extern NSString* ORSIS3302TriggerDecimationChanged;
 extern NSString* ORSIS3302EnergyDecimationChanged;
 extern NSString* ORSIS3302SetShipWaveformChanged;
+extern NSString* ORSIS3302Adc50KTriggerEnabledChanged;
+extern NSString* ORSIS3302InputInvertedChanged;
 
+extern NSString* ORSIS3302InternalTriggerEnabledChanged;
+extern NSString* ORSIS3302ExternalTriggerEnabledChanged;
 

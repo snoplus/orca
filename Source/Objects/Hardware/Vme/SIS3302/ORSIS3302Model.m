@@ -28,7 +28,9 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-NSString* ORSIS3302ModelEnergyGateLengthChanged =		@"ORSIS3302ModelEnergyGateLengthChanged";
+NSString* ORSIS3302ModelInternalExternalTriggersOredChanged = @"ORSIS3302ModelInternalExternalTriggersOredChanged";
+NSString* ORSIS3302ModelLemoInEnabledMaskChanged		= @"ORSIS3302ModelLemoInEnabledMaskChanged";
+NSString* ORSIS3302ModelEnergyGateLengthChanged			= @"ORSIS3302ModelEnergyGateLengthChanged";
 NSString* ORSIS3302ModelRunModeChanged					= @"ORSIS3302ModelRunModeChanged";
 NSString* ORSIS3302ModelEndAddressThresholdChanged		= @"ORSIS3302ModelEndAddressThresholdChanged";
 NSString* ORSIS3302ModelEnergySampleStartIndex3Changed	= @"ORSIS3302ModelEnergySampleStartIndex3Changed";
@@ -45,16 +47,18 @@ NSString* ORSIS3302SampleLengthChanged			= @"ORSIS3302SampleLengthChanged";
 NSString* ORSIS3302DacOffsetChanged				= @"ORSIS3302DacOffsetChanged";
 NSString* ORSIS3302LemoInModeChanged			= @"ORSIS3302LemoInModeChanged";
 NSString* ORSIS3302LemoOutModeChanged			= @"ORSIS3302LemoOutModeChanged";
-NSString* ORSIS3302AcqRegEnableMaskChanged		= @"ORSIS3302AcqRegEnableMaskChanged";
 NSString* ORSIS3302AcqRegChanged				= @"ORSIS3302AcqRegChanged";
 NSString* ORSIS3302EventConfigChanged			= @"ORSIS3302EventConfigChanged";
+NSString* ORSIS3302InputInvertedChanged			= @"ORSIS3302InputInvertedChanged";
+NSString* ORSIS3302InternalTriggerEnabledChanged = @"ORSIS3302InternalTriggerEnabledChanged";
+NSString* ORSIS3302ExternalTriggerEnabledChanged = @"ORSIS3302ExternalTriggerEnabledChanged";
 
 NSString* ORSIS3302ClockSourceChanged			= @"ORSIS3302ClockSourceChanged";
 
 NSString* ORSIS3302RateGroupChangedNotification	= @"ORSIS3302RateGroupChangedNotification";
 NSString* ORSIS3302SettingsLock					= @"ORSIS3302SettingsLock";
 
-NSString* ORSIS3302EnabledChanged				= @"ORSIS3302EnabledChanged";
+NSString* ORSIS3302TriggerOutEnabledChanged		= @"ORSIS3302TriggerOutEnabledChanged";
 NSString* ORSIS3302ThresholdChanged				= @"ORSIS3302ThresholdChanged";
 NSString* ORSIS3302ThresholdArrayChanged		= @"ORSIS3302ThresholdArrayChanged";
 NSString* ORSIS3302GtChanged					= @"ORSIS3302GtChanged";
@@ -68,6 +72,7 @@ NSString* ORSIS3302InternalTriggerDelayChanged	= @"ORSIS3302InternalTriggerDelay
 NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChanged";
 NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged";
 NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
+NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabledChanged";
 
 
 @interface ORSIS3302Model (private)
@@ -124,6 +129,31 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) internalExternalTriggersOred { return internalExternalTriggersOred; }
+- (void) setInternalExternalTriggersOred:(BOOL)aInternalExternalTriggersOred
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setInternalExternalTriggersOred:internalExternalTriggersOred];
+    internalExternalTriggersOred = aInternalExternalTriggersOred;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelInternalExternalTriggersOredChanged object:self];
+}
+
+- (unsigned short) lemoInEnabledMask { return lemoInEnabledMask; }
+- (void) setLemoInEnabledMask:(unsigned short)aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoInEnabledMask:lemoInEnabledMask];
+    lemoInEnabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelLemoInEnabledMaskChanged object:self];
+}
+
+- (BOOL) lemoInEnabled:(unsigned short)aBit { return lemoInEnabledMask & (1<<aBit); }
+- (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState
+{
+	unsigned short aMask = [self lemoInEnabledMask];
+	if(aState)	aMask &= (1<<aBit);
+	else		aMask |= ~(1<<aBit);
+	[self setLemoInEnabledMask:aMask];
+}
 
 - (int) energyGateLength { return energyGateLength; }
 - (void) setEnergyGateLength:(int)aEnergyGateLength
@@ -311,20 +341,12 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 		else return @"Undefined";
 	}
 }
-- (short) acqRegEnableMask { return acqRegEnableMask; }
-- (void) setAcqRegEnableMask:(short)aAcqRegEnableMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setAcqRegEnableMask:acqRegEnableMask];
-    acqRegEnableMask = aAcqRegEnableMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302AcqRegEnableMaskChanged object:self];
-}
 
 - (void) setDefaults
 {
 	int i;
 	for(i=0;i<8;i++){
 		[self setThreshold:i withValue:0x1300];
-		[self setEnabledBit:i withValue:YES];
 		[self setPeakingTime:i withValue:150];
 		[self setSumG:i withValue:50];
 		[self setGateLength:i withValue:256];
@@ -343,7 +365,11 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	[self setSampleStartIndex:0];
 	[self setShipEnergyWaveform:NO];
 	[self setGtMask:0xff];
-	[self setEnabledMask:0x0];
+	[self setTriggerOutEnabledMask:0x0];
+	[self setInputInvertedMask:0x0];
+	[self setInternalTriggerEnabledMask:0x0];
+	[self setExternalTriggerEnabledMask:0x0];
+	[self setAdc50KTriggerEnabledMask:0xff];
 	
 }
 
@@ -419,29 +445,132 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	else return 0;
 }
 
-- (short) enabledMask
+
+- (short) internalTriggerEnabledMask
 {
-	return enabledMask;
+	return internalTriggerEnabledMask;
 }
 
-- (BOOL) enabled:(short)chan	
-{ 
-	return enabledMask & (1<<chan); 
+- (void) setInternalTriggerEnabledMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerEnabledMask:internalTriggerEnabledMask];
+	internalTriggerEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalTriggerEnabledChanged object:self];
 }
 
-- (void) setEnabledMask:(short)aMask	
-{ 
-	[[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
-	enabledMask = aMask;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EnabledChanged object:self];
+- (BOOL) internalTriggerEnabled:(short)chan
+{
+	return internalTriggerEnabledMask & (1<<chan); 
 }
 
-- (void) setEnabledBit:(short)chan withValue:(BOOL)aValue		
-{ 
-	unsigned char aMask = enabledMask;
+- (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = inputInvertedMask;
 	if(aValue)aMask |= (1<<chan);
 	else aMask &= ~(1<<chan);
-	[self setEnabledMask:aMask];
+	[self setInputInvertedMask:aMask];
+}
+
+- (short) externalTriggerEnabledMask
+{
+	return externalTriggerEnabledMask;
+}
+
+- (void) setExternalTriggerEnabledMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setExternalTriggerEnabledMask:externalTriggerEnabledMask];
+	externalTriggerEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ExternalTriggerEnabledChanged object:self];
+}
+
+- (BOOL) externalTriggerEnabledMask:(short)chan
+{
+	return externalTriggerEnabledMask & (1<<chan); 
+}
+
+- (void) setExternalTriggerEnabledMask:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = inputInvertedMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setExternalTriggerEnabledMask:aMask];
+}
+
+- (short) inputInvertedMask
+{
+	return inputInvertedMask;
+}
+
+- (void) setInputInvertedMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setInputInvertedMask:inputInvertedMask];
+	inputInvertedMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InputInvertedChanged object:self];
+}
+
+- (BOOL) inputInverted:(short)chan
+{
+	return inputInvertedMask & (1<<chan); 
+}
+
+- (void) setInputInverted:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = inputInvertedMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setInputInvertedMask:aMask];
+}
+
+
+- (short) triggerOutEnabledMask
+{
+	return triggerOutEnabledMask;
+}
+
+
+- (void) setTriggerOutEnabledMask:(short)aMask	
+{ 
+	[[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutEnabledMask:triggerOutEnabledMask];
+	triggerOutEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302TriggerOutEnabledChanged object:self];
+}
+
+- (BOOL) triggerOutEnabled:(short)chan	
+{ 
+	return triggerOutEnabledMask & (1<<chan); 
+}
+
+- (void) setTriggerOutEnabled:(short)chan withValue:(BOOL)aValue		
+{ 
+	unsigned char aMask = triggerOutEnabledMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setTriggerOutEnabledMask:aMask];
+}
+
+- (short) adc50KTriggerEnabledMask
+{
+	return adc50KTriggerEnabledMask;
+}
+
+- (void) setAdc50KTriggerEnabledMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setAdc50KTriggerEnabledMask:adc50KTriggerEnabledMask];
+	adc50KTriggerEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302Adc50KTriggerEnabledChanged object:self];
+}
+
+- (BOOL) adc50KTriggerEnabled:(short)chan
+{
+	return adc50KTriggerEnabledMask & (1<<chan); 
+}
+
+- (void) setAdc50KTriggerEnabled:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = adc50KTriggerEnabledMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setAdc50KTriggerEnabledMask:aMask];
 }
 
 - (BOOL) shipEnergyWaveform { return shipEnergyWaveform;}
@@ -584,7 +713,7 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 - (void) calculateSampleValues
 {
 	unsigned long aValue = 0;
-	if(runMode      == 0)   return;
+	if(runMode == 0)   return;
 	else	numEnergyValues = energySampleLength;   
 
 
@@ -706,7 +835,8 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	unsigned long aMask = 0x0;
 	BOOL mcaMode = (runMode == 0);
 	aMask |= ((clockSource & 0x7)<< 12);
-	aMask |= acqRegEnableMask;
+	aMask |= (lemoInEnabledMask & 0x7) << 8;
+	aMask |= internalExternalTriggersOred << 6;
 	aMask |= (lemoOutMode & 0x3) << 4;
 	aMask |= (mcaMode&0x1)       << 3;
 	aMask |= (lemoInMode & 0x7)  << 0;
@@ -753,7 +883,7 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 
 - (int) dataWord:(int)chan index:(int)index
 {
-	if([self enabled:chan]){	
+	if([self triggerOutEnabled:chan]){	
 		unsigned long dataMask = 0x3fff;
 		unsigned long theValue = dataWord[chan/2][index];
 		if((chan%2)==0)	return (theValue>>16) & dataMask; 
@@ -779,7 +909,7 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	unsigned long thresholdMask;
 	for(i = 0; i < 8; i++) {
 		thresholdMask = 0;
-		BOOL enabled   = [self enabled:i];
+		BOOL enabled   = [self triggerOutEnabled:i];
 		BOOL gtEnabled = [self gt:i];
 		if(!enabled)	thresholdMask |= (1<<26); //logic is inverted on the hw
 		if(gtEnabled)	thresholdMask |= (1<<25);
@@ -795,13 +925,28 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 
 - (void) writeEventConfiguration
 {
-	//temp hard coded value.........
-	long i;
+	int i;
 	for(i=0;i<4;i++){
-		// Only the ADCx internal enable bit.
-		unsigned long aValueMask = ((i+1)<<19) | 0x00000404;
+		unsigned long aValueMask = 0x0;
+		aValueMask |= ((internalTriggerEnabledMask & (1<<i*2))==1)       << 2;
+		aValueMask |= ((internalTriggerEnabledMask & (1<<((i*2)+1)))==1) << 10;
+		
+		aValueMask |= ((externalTriggerEnabledMask & (1<<i*2))==1)       << 3;
+		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))==1) << 11;
+		
 		[[self adapter] writeLongBlock:&aValueMask
-							 atAddress:[self baseAddress] + [self getEventConfigAdcOffsets:i]
+							 atAddress:[self baseAddress] + [self getEventConfigOffsets:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
+	//extended event config reg
+	for(i=0;i<4;i++){
+		unsigned long aValueMask = 0x0;
+		aValueMask |= ((adc50KTriggerEnabledMask & (1<<i*2))==1)<<0;
+		aValueMask |= ((adc50KTriggerEnabledMask & (1<<((i*2)+1)))==1)<<8;
+		[[self adapter] writeLongBlock:&aValueMask
+							 atAddress:[self baseAddress] + [self getExtendedEventConfigOffsets:i]
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
@@ -951,7 +1096,6 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-	
 }
 
 - (void) readThresholds:(BOOL)verbose
@@ -1119,14 +1263,14 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
 {
     switch (channel) {
-        case 0: return 0x02000018;
-        case 1: return 0x0200001c;
-        case 2: return 0x02800018;
-        case 3: return 0x0280001c;
-        case 4: return 0x03000018;
-        case 5: return 0x0300001c;
-        case 6: return 0x03800018;
-        case 7: return 0x0380001c;
+        case 0: return kSIS3302PreviousBankSampleAddressAdc1;
+        case 1: return kSIS3302PreviousBankSampleAddressAdc2;
+        case 2: return kSIS3302PreviousBankSampleAddressAdc3;
+        case 3: return kSIS3302PreviousBankSampleAddressAdc4;
+        case 4: return kSIS3302PreviousBankSampleAddressAdc5;
+        case 5: return kSIS3302PreviousBankSampleAddressAdc6;
+        case 6: return kSIS3302PreviousBankSampleAddressAdc7;
+        case 7: return kSIS3302PreviousBankSampleAddressAdc8;
     }
     return (unsigned long)-1;
 }
@@ -1219,7 +1363,7 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	return (unsigned long) -1;	 
 }
 		 
-- (unsigned long) getEventConfigAdcOffsets:(int)group
+- (unsigned long) getEventConfigOffsets:(int)group
 {
 	 switch (group) {
 		 case 0: return kSIS3302EventConfigAdc12;
@@ -1227,6 +1371,17 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 		 case 2: return kSIS3302EventConfigAdc56;
 		 case 3: return kSIS3302EventConfigAdc78;
 	 }
+	return (unsigned long) -1;	 
+}
+
+- (unsigned long) getExtendedEventConfigOffsets:(int)group
+{
+	switch (group) {
+		case 0: return kSIS3302EventExtendedConfigAdc12;
+		case 1: return kSIS3302EventExtendedConfigAdc34;
+		case 2: return kSIS3302EventExtendedConfigAdc56;
+		case 3: return kSIS3302EventExtendedConfigAdc78;
+	}
 	return (unsigned long) -1;	 
 }
 		 
@@ -1258,221 +1413,7 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	else return YES;
 }
 
-- (void) readOutEvents 
-{
-	// Try disarm current bank and arm the next one
-	[self disarmAndArmBank:0];
-	[ORTimer delay:.01];
-	float theTime=0;
-	do {
-		if([self isEvent]) break;
-		else {
-			[ORTimer delay:.01];
-			theTime+=.01;
-		}
-	}while(theTime<1);
-	if(theTime>=1)return;
-	
- 	NSLog(@"****Event\n");
-	[self disarmSampleLogic];
-	
-    // Try disarm current bank and arm the next one
-    //[self disarmAndArmNextBank];
-	
-	if(bankOneArmed)[self writePageRegister:0x0];
-	else			[self writePageRegister:0x4];
-	
-    // We've selected a particular page to readout for each channel
-	int i = 0;
-    for( i=0;i<kNumSIS3302Channels;i++) {
-        [self readOutChannel:i];
-    }
-}
 
-- (void) readOutChannel:(int) channel
-{
-	unsigned long endSampleAddress = 0;
-	[[self adapter] readLongBlock:&endSampleAddress
-						atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-    endSampleAddress &= 0xffffff ; // mask bank2 address bit (bit 24)
-	
-    if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
-        // Warning?
-    }
-	
-    // readout	   	
-    if (endSampleAddress != 0) {
-		NSLog(@"************Channel %d\n",channel);
-		NSLog(@"end_sample_address: 0x%08x\n",endSampleAddress);
-		
-		unsigned long EventConfig = 0;
-		[[self adapter] readLongBlock:&EventConfig
-							atAddress:[self baseAddress] +kSIS3302EventConfigAdc12
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		NSLog(@"EventConfig: 0x%08x\n",EventConfig);
-		
-		
-		unsigned long pretrigger = 0;
-		[[self adapter] readLongBlock:&pretrigger
-							atAddress:[self baseAddress] + kSIS3302PreTriggerDelayTriggerGateLengthAdc12
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"pretrigger: 0x%08x\n",pretrigger);
-		
-		unsigned long rawDataBufferConfig = 0;
-		[[self adapter] readLongBlock:&rawDataBufferConfig
-							atAddress:[self baseAddress] + kSIS3302RawDataBufferConfigAdc12
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"rawDataBufferConfig: 0x%08x\n",rawDataBufferConfig);
-		
-		unsigned long actualNextSampleAddress1 = 0;
-		[[self adapter] readLongBlock:&actualNextSampleAddress1
-							atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc1
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"actualNextSampleAddress1: 0x%08x\n",actualNextSampleAddress1);
-		
-		unsigned long actualNextSampleAddress2 = 0;
-		[[self adapter] readLongBlock:&actualNextSampleAddress2
-							atAddress:[self baseAddress] + kSIS3302ActualSampleAddressAdc2
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"actualNextSampleAddress2: 0x%08x\n",actualNextSampleAddress2);
-		
-		unsigned long prevNextSampleAddress1 = 0;
-		[[self adapter] readLongBlock:&prevNextSampleAddress1
-							atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc1
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"prevNextSampleAddress1: 0x%08x\n",prevNextSampleAddress1);
-		
-		unsigned long prevNextSampleAddress2 = 0;
-		[[self adapter] readLongBlock:&prevNextSampleAddress2
-							atAddress:[self baseAddress] + kSIS3302PreviousBankSampleAddressAdc2
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"prevNextSampleAddress2: 0x%08x\n",prevNextSampleAddress2);
-		
-		unsigned long triggerSetup1 = 0;
-		[[self adapter] readLongBlock:&triggerSetup1
-							atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc1
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"triggerSetup1: 0x%08x\n",triggerSetup1);
-		
-		unsigned long triggerSetup2 = 0;
-		[[self adapter] readLongBlock:&triggerSetup2
-							atAddress:[self baseAddress] + kSIS3302TriggerSetupAdc2
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"triggerSetup2: 0x%08x\n",triggerSetup2);
-		
-		unsigned long energySetupGP = 0;
-		[[self adapter] readLongBlock:&energySetupGP
-							atAddress:[self baseAddress] + kSIS3302EnergySetupGPAdc12
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"energySetupGP: 0x%08x\n",energySetupGP);
-		
-		unsigned long EnergyGateLen = 0;
-		[[self adapter] readLongBlock:&EnergyGateLen
-							atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAdc12
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"EnergyGateLen: 0x%08x\n",EnergyGateLen);
-		
-		unsigned long EnergySampleLen = 0;
-		[[self adapter] readLongBlock:&EnergySampleLen
-							atAddress:[self baseAddress] + kSIS3302EnergySampleLengthAdc12
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"EnergySampleLen: 0x%08x\n",EnergySampleLen);
-		
-		unsigned long EnergySampleStartIndex = 0;
-		[[self adapter] readLongBlock:&EnergySampleStartIndex
-							atAddress:[self baseAddress] + kSIS3302EnergySampleStartIndex1Adc12
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		
-		NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
-		
-		
-		
-		// check if bank address flag is valid
-		if (((endSampleAddress >> 24) & 0x1) != ((bankOneArmed) ? 0x1 : 0x0) ) {   
-			// in this case -> poll right arm flag or implement a delay
-		}
-		
-		endSampleAddress = endSampleAddress & 0xffffff;
-		
-		
-		unsigned int  uint_max_event_use , uint_max_event_saved ;
-		unsigned int gl_uint_CountOfNotProcessedTriggerCount;
-		// check buffer address
-		if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
-			uint_max_event_saved =  endSampleAddress / eventLengthLongWords ;
-			
-			endSampleAddress = 2 * (1 * eventLengthLongWords) ; // max 8Mbyte (inside one page) **only one event in this test code
-			uint_max_event_use =  endSampleAddress / eventLengthLongWords ;
-			gl_uint_CountOfNotProcessedTriggerCount = gl_uint_CountOfNotProcessedTriggerCount + (uint_max_event_saved - uint_max_event_use) ;
-		}
-		
-		unsigned long numToRead = (endSampleAddress & 0x3ffffc)/2;
-		NSLog(@"channel %d should read %d longs\n",channel,numToRead/4);
-		int n;
-		int c = 0;
-		
-		for(n=0;n<numToRead;n+=4){
-			unsigned long adc_Memory1 = 0;
-			
-			//****TO DO read block....
-			[[self adapter] readLongBlock:&adc_Memory1
-								atAddress:[self baseAddress] + [self getADCBufferRegisterOffset:channel] + n
-								numToRead:1
-							   withAddMod: [self addressModifier]
-							usingAddSpace:0x01];
-			NSLog(@"%d: 0x%08x\n",n,adc_Memory1);
-			if(adc_Memory1 == 0xdeadbeef){
-				c++;
-				if(c>2)break;
-			}
-			//int32_t error = DMARead(addr, (uint32_t)0x08, 
-			//						(uint32_t)8, buffer,  
-			//						num_bytes_to_read);
-		}
-	}
-	
-}
 
 - (void) disarmSampleLogic
 {
@@ -1512,6 +1453,21 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];	
 }
+
+- (NSString*) runSummary
+{
+	NSString* summary;
+	if(runMode == 0){
+		return @"MCA Spectrum";
+	}
+	else {
+		summary = @"Energy\n";
+		if(sampleLength>0)	   summary = [summary stringByAppendingFormat:@"Adc Trace    : %d values\n",sampleLength];
+		if(shipEnergyWaveform) summary = [summary stringByAppendingFormat:@"Energy Filter: 510 values\n"];
+		return summary;
+	}
+}
+
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
@@ -1815,8 +1771,10 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setEnergyGateLength:			[decoder decodeIntForKey:@"energyGateLength"]];
     [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
+    [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
+    [self setLemoInEnabledMask:			[decoder decodeIntForKey:@"lemoInEnabledMask"]];
+    [self setEnergyGateLength:			[decoder decodeIntForKey:@"energyGateLength"]];
     [self setEndAddressThreshold:		[decoder decodeIntForKey:@"endAddressThreshold"]];
     [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
     [self setEnergyTauFactor:			[decoder decodeIntForKey:@"energyTauFactor"]];
@@ -1831,7 +1789,6 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
     [self setSampleLength:			[decoder decodeIntForKey:@"sampleLength"]];
     [self setLemoInMode:			[decoder decodeIntForKey:@"lemoInMode"]];
     [self setLemoOutMode:			[decoder decodeIntForKey:@"lemoOutMode"]];
-    [self setAcqRegEnableMask:		[decoder decodeIntForKey:@"acqRegEnableMask"]];
 	thresholds  =					[[decoder decodeObjectForKey:@"thresholds"] retain];
     dacOffsets  =				    [[decoder decodeObjectForKey:@"dacOffsets"] retain];
 	gateLengths =					[[decoder decodeObjectForKey:@"gateLengths"] retain];
@@ -1843,7 +1800,11 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	energyDecimation =			    [decoder decodeIntForKey:   @"energyDecimation"];
 	
     [self setClockSource:			[decoder decodeIntForKey:@"clockSource"]];
-    [self setEnabledMask:			[decoder decodeInt32ForKey:@"enabledMask"]];
+    [self setTriggerOutEnabledMask:	[decoder decodeInt32ForKey:@"triggerOutEnabledMask"]];
+    [self setInputInvertedMask:		[decoder decodeInt32ForKey:@"inputInvertedMask"]];
+    [self setInternalTriggerEnabledMask:		[decoder decodeInt32ForKey:@"internalTriggerEnabledMask"]];
+    [self setExternalTriggerEnabledMask:		[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
+    [self setAdc50KTriggerEnabledMask:	[decoder decodeInt32ForKey:@"adc50KtriggerEnabledMask"]];
 	[self setGtMask:				[decoder decodeIntForKey:@"gtMask"]];
 	[self setShipEnergyWaveform:	[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
 		
@@ -1868,8 +1829,10 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 {
     [super encodeWithCoder:encoder];
 	
-	[encoder encodeInt:energyGateLength			forKey:@"energyGateLength"];
 	[encoder encodeInt:runMode					forKey:@"runMode"];
+	[encoder encodeBool:internalExternalTriggersOred forKey:@"internalExternalTriggersOred"];
+	[encoder encodeInt:lemoInEnabledMask		forKey:@"lemoInEnabledMask"];
+	[encoder encodeInt:energyGateLength			forKey:@"energyGateLength"];
 	[encoder encodeInt:endAddressThreshold		forKey:@"endAddressThreshold"];
 	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
 	[encoder encodeInt:energyTauFactor			forKey:@"energyTauFactor"];
@@ -1884,7 +1847,6 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	[encoder encodeInt:sampleLength				forKey:@"sampleLength"];
 	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
 	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
-	[encoder encodeInt:acqRegEnableMask			forKey:@"acqRegEnableMask"];
 	[encoder encodeObject:thresholds			forKey:@"thresholds"];
 	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
 	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
@@ -1896,7 +1858,12 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 	[encoder encodeInt:energyDecimation			forKey:@"energyDecimation"];
 
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
-	[encoder encodeInt32:enabledMask			forKey:@"enabledMask"];
+	[encoder encodeInt32:triggerOutEnabledMask	forKey:@"triggerOutEnabledMask"];
+	[encoder encodeInt32:inputInvertedMask		forKey:@"inputInvertedMask"];
+	[encoder encodeInt32:internalTriggerEnabledMask		forKey:@"internalTriggerEnabledMask"];
+	[encoder encodeInt32:externalTriggerEnabledMask		forKey:@"externalTriggerEnabledMask"];
+	[encoder encodeInt32:adc50KTriggerEnabledMask forKey:@"adc50KtriggerEnabledMask"];
+	
     [encoder encodeInt:gtMask					forKey:@"gtMask"];
 	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
 	
@@ -1911,7 +1878,11 @@ NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
  	//clocks
 	[objDictionary setObject: [NSNumber numberWithInt:clockSource]			forKey:@"clockSource"];
 
-	[objDictionary setObject: [NSNumber numberWithLong:enabledMask]			forKey:@"enabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:adc50KTriggerEnabledMask] forKey:@"adc50KtriggerEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:triggerOutEnabledMask] forKey:@"triggerOutEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:inputInvertedMask]	forKey:@"inputInvertedMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:internalTriggerEnabledMask]	forKey:@"internalTriggerEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:externalTriggerEnabledMask]	forKey:@"externalTriggerEnabledMask"];
     [objDictionary setObject: thresholds									forKey:@"thresholds"];	
     [objDictionary setObject: gateLengths									forKey:@"gateLengths"];	
     [objDictionary setObject: pulseLengths									forKey:@"pulseLengths"];	
