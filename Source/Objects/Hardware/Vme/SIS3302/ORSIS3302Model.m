@@ -52,6 +52,8 @@ NSString* ORSIS3302EventConfigChanged			= @"ORSIS3302EventConfigChanged";
 NSString* ORSIS3302InputInvertedChanged			= @"ORSIS3302InputInvertedChanged";
 NSString* ORSIS3302InternalTriggerEnabledChanged = @"ORSIS3302InternalTriggerEnabledChanged";
 NSString* ORSIS3302ExternalTriggerEnabledChanged = @"ORSIS3302ExternalTriggerEnabledChanged";
+NSString* ORSIS3302InternalGateEnabledChanged	= @"ORSIS3302InternalGateEnabledChanged";
+NSString* ORSIS3302ExternalGateEnabledChanged	= @"ORSIS3302ExternalGateEnabledChanged";
 
 NSString* ORSIS3302ClockSourceChanged			= @"ORSIS3302ClockSourceChanged";
 
@@ -367,9 +369,11 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self setGtMask:0xff];
 	[self setTriggerOutEnabledMask:0x0];
 	[self setInputInvertedMask:0x0];
-	[self setInternalTriggerEnabledMask:0x0];
+	[self setInternalTriggerEnabledMask:0xff];
 	[self setExternalTriggerEnabledMask:0x0];
-	[self setAdc50KTriggerEnabledMask:0xff];
+	[self setAdc50KTriggerEnabledMask:0x00];
+	[self setInternalGateEnabledMask:0x00];
+	[self setExternalGateEnabledMask:0x00];
 	
 }
 
@@ -387,19 +391,6 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 
 //Event configuration
-
-- (BOOL) gateChaining
-{
-    return gateChaining;
-}
-
-- (void) setGateChaining:(BOOL)aState
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setGateChaining:gateChaining];
-    gateChaining = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EventConfigChanged object:self];
-}
-
 - (ORRateGroup*) waveFormRateGroup
 {
     return waveFormRateGroup;
@@ -465,10 +456,10 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 - (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
 {
-	unsigned char aMask = inputInvertedMask;
+	unsigned char aMask = internalTriggerEnabledMask;
 	if(aValue)aMask |= (1<<chan);
 	else aMask &= ~(1<<chan);
-	[self setInputInvertedMask:aMask];
+	[self setInternalTriggerEnabledMask:aMask];
 }
 
 - (short) externalTriggerEnabledMask
@@ -483,17 +474,67 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ExternalTriggerEnabledChanged object:self];
 }
 
-- (BOOL) externalTriggerEnabledMask:(short)chan
+- (BOOL) externalTriggerEnabled:(short)chan
 {
 	return externalTriggerEnabledMask & (1<<chan); 
 }
 
-- (void) setExternalTriggerEnabledMask:(short)chan withValue:(BOOL)aValue
+- (void) setExternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
 {
-	unsigned char aMask = inputInvertedMask;
+	unsigned char aMask = externalTriggerEnabledMask;
 	if(aValue)aMask |= (1<<chan);
 	else aMask &= ~(1<<chan);
 	[self setExternalTriggerEnabledMask:aMask];
+}
+
+- (short) internalGateEnabledMask
+{
+	return internalGateEnabledMask;
+}
+
+- (void) setInternalGateEnabledMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setInternalGateEnabledMask:internalGateEnabledMask];
+	internalGateEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalGateEnabledChanged object:self];
+}
+
+- (BOOL) internalGateEnabled:(short)chan
+{
+	return internalGateEnabledMask & (1<<chan); 
+}
+
+- (void) setInternalGateEnabled:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = internalGateEnabledMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setInternalGateEnabledMask:aMask];
+}
+
+- (short) externalGateEnabledMask
+{
+	return externalGateEnabledMask;
+}
+
+- (void) setExternalGateEnabledMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setExternalGateEnabledMask:externalGateEnabledMask];
+	externalGateEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ExternalGateEnabledChanged object:self];
+}
+
+- (BOOL) externalGateEnabled:(short)chan
+{
+	return externalGateEnabledMask & (1<<chan); 
+}
+
+- (void) setExternalGateEnabled:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = externalGateEnabledMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setExternalGateEnabledMask:aMask];
 }
 
 - (short) inputInvertedMask
@@ -933,6 +974,13 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 		
 		aValueMask |= ((externalTriggerEnabledMask & (1<<i*2))==1)       << 3;
 		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))==1) << 11;
+	
+		aValueMask |= ((internalGateEnabledMask & (1<<i*2))==1)       << 4;
+		aValueMask |= ((internalGateEnabledMask & (1<<((i*2)+1)))==1) << 13;
+		
+		aValueMask |= ((externalGateEnabledMask & (1<<i*2))==1)       << 5;
+		aValueMask |= ((externalGateEnabledMask & (1<<((i*2)+1)))==1) << 13;
+		
 		
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getEventConfigOffsets:i]
@@ -1513,7 +1561,54 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 {
     NSMutableArray* a = [NSMutableArray array];
     ORHWWizParam* p;
-    		
+  	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Run Mode"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setRunMode:withValue:) getMethod:@selector(runMode:)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"GT"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setGtBit:withValue:) getMethod:@selector(gt:)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"ADC50K Trigger"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setAdc50KTriggerEnabled:withValue:) getMethod:@selector(adc50KTriggerEnabled:)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Input Inverted"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setInputInverted:withValue:) getMethod:@selector(inputInverted:)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Internal Trigger Enable"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setInternalTriggerEnabled:withValue:) getMethod:@selector(internalTriggerEnabled:)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"External Trigger Enable"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setExternalTriggerEnabled:withValue:) getMethod:@selector(externalTriggerEnabled:)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Internal Gate Enable"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setInternalGateEnabled:withValue:) getMethod:@selector(internalGateEnabled:)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"External Gate Enable"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setExternalGateEnabled:withValue:) getMethod:@selector(externalGateEnabled:)];
+    [a addObject:p];
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Source"];
     [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
@@ -1545,17 +1640,83 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setSumG:withValue:) getMethod:@selector(sumG:)];
     [a addObject:p];
-	
+		
 	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"P Bit"];
+    [p setName:@"Peaking Time"];
     [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
     [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Dac Offset"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setDacOffset:withValue:) getMethod:@selector(dacOffset:)];
+    [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Peaking Times"];
-    [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
+    [p setName:@"InternalTriggerDelay"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setInternalTriggerDelay:withValue:) getMethod:@selector(internalTriggerDelay:)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Energy Decimation"];
+    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setEnergyDecimation:) getMethod:@selector(energyDecimation)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Trigger Decimation"];
+    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTriggerDecimation:) getMethod:@selector(triggerDecimation)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Sample Length"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setSampleLength:) getMethod:@selector(sampleLength)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Pretrigger Delay"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setPreTriggerDelay:) getMethod:@selector(preTriggerDelay)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Trigger Gate Length"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTriggerGateLength:) getMethod:@selector(triggerGateLength)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Energy Gate Length"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setEnergyGateLength:) getMethod:@selector(energyGateLength)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Energy Gap Time"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setEnergyGapTime:) getMethod:@selector(energyGapTime)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Energy Peaking Time"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setEnergyPeakingTime:) getMethod:@selector(energyPeakingTime)];
+    [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Energy Sample Length"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setEnergySampleLength:) getMethod:@selector(energySampleLength)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Energy Tau Factor"];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setEnergyTauFactor:) getMethod:@selector(energyTauFactor)];
     [a addObject:p];
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -1580,18 +1741,39 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
-	if([param isEqualToString:@"Threshold"])return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"GateLength"])return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"PulseLength"])return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"SumG"])return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"PeakingTime"])return [[cardDictionary objectForKey:@"peakingTime"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"InternalTriggerDelay"])return [[cardDictionary objectForKey:@"internalTriggerDelay"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"TriggerDecimation"])return [cardDictionary objectForKey:@"triggerDecimation"];
-	else if([param isEqualToString:@"EnergyDecimation"])return [cardDictionary objectForKey:@"energyDecimation"];
-    else if([param isEqualToString:@"Enabled"]) return [cardDictionary objectForKey:@"enabledMask"];
-    else if([param isEqualToString:@"Clock Source"]) return [cardDictionary objectForKey:@"clockSource"];
-    else return nil;
+	if([param isEqualToString:@"Threshold"])				return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"GateLength"])			return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"PulseLength"])			return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"SumG"])				return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"PeakingTime"])			return [[cardDictionary objectForKey:@"peakingTimes"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"InternalTriggerDelay"])return [[cardDictionary objectForKey:@"internalTriggerDelays"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"Dac Offset"])			return [[cardDictionary objectForKey:@"dacOffsets"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"TriggerDecimation"])	return [cardDictionary objectForKey:@"triggerDecimation"];
+	else if([param isEqualToString:@"EnergyDecimation"])	return [cardDictionary objectForKey:@"energyDecimation"];
+    else if([param isEqualToString:@"Clock Source"])		return [cardDictionary objectForKey:@"clockSource"];
+    else if([param isEqualToString:@"Run Mode"])			return [cardDictionary objectForKey:@"runMode"];
+    else if([param isEqualToString:@"GT"])					return [cardDictionary objectForKey:@"gtMask"];
+    else if([param isEqualToString:@"ADC50K Trigger"])		return [cardDictionary objectForKey:@"adc50KtriggerEnabledMask"];
+    else if([param isEqualToString:@"Input Inverted"])		return [cardDictionary objectForKey:@"inputInvertedMask"];
+    else if([param isEqualToString:@"Internal Trigger Enabled"])	return [cardDictionary objectForKey:@"internalTriggerEnabledMask"];
+    else if([param isEqualToString:@"External Trigger Enabled"])	return [cardDictionary objectForKey:@"externalTriggerEnabledMask"];
+    else if([param isEqualToString:@"Internal Gate Enabled"])		return [cardDictionary objectForKey:@"internalGateEnabledMask"];
+    else if([param isEqualToString:@"External Gate Enabled"])		return [cardDictionary objectForKey:@"externalGateEnabledMask"];
+    else if([param isEqualToString:@"Trigger Decimation"])			return [cardDictionary objectForKey:@"triggerDecimation"];
+    else if([param isEqualToString:@"Energy Decimation"])			return [cardDictionary objectForKey:@"energyDecimation"];
+    else if([param isEqualToString:@"Energy Gate Length"])			return [cardDictionary objectForKey:@"energyGateLength"];
+    else if([param isEqualToString:@"Energy Tau Factor"])			return [cardDictionary objectForKey:@"energyTauFactor"];
+    else if([param isEqualToString:@"Energy Sample Length"])		return [cardDictionary objectForKey:@"energySampleLength"];
+    else if([param isEqualToString:@"Energy Gap Time"])				return [cardDictionary objectForKey:@"energyGapTime"];
+    else if([param isEqualToString:@"Energy Peaking Time"])			return [cardDictionary objectForKey:@"energyPeakingTime"];
+    else if([param isEqualToString:@"Trigger Gate Delay"])			return [cardDictionary objectForKey:@"triggerGateLength"];
+    else if([param isEqualToString:@"Pretrigger Delay"])			return [cardDictionary objectForKey:@"preTriggerDelay"];
+    else if([param isEqualToString:@"Sample Length"])				return [cardDictionary objectForKey:@"sampleLength"];
+
+    
+	else return nil;
 }
+
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -1775,45 +1957,42 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
     [self setLemoInEnabledMask:			[decoder decodeIntForKey:@"lemoInEnabledMask"]];
     [self setEnergyGateLength:			[decoder decodeIntForKey:@"energyGateLength"]];
-    [self setEndAddressThreshold:		[decoder decodeIntForKey:@"endAddressThreshold"]];
     [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
     [self setEnergyTauFactor:			[decoder decodeIntForKey:@"energyTauFactor"]];
     [self setEnergySampleStartIndex2:	[decoder decodeIntForKey:@"energySampleStartIndex2"]];
     [self setEnergySampleStartIndex1:	[decoder decodeIntForKey:@"energySampleStartIndex1"]];
     [self setEnergySampleLength:		[decoder decodeIntForKey:@"energySampleLength"]];
-	[self setEnergyGapTime:			[decoder decodeIntForKey:@"energyGapTime"]];
-    [self setEnergyPeakingTime:		[decoder decodeIntForKey:@"energyPeakingTime"]];
-    [self setTriggerGateLength:		[decoder decodeIntForKey:@"triggerGateLength"]];
-    [self setPreTriggerDelay:		[decoder decodeIntForKey:@"preTriggerDelay"]];
-    [self setSampleStartIndex:		[decoder decodeIntForKey:@"sampleStartIndex"]];
-    [self setSampleLength:			[decoder decodeIntForKey:@"sampleLength"]];
-    [self setLemoInMode:			[decoder decodeIntForKey:@"lemoInMode"]];
-    [self setLemoOutMode:			[decoder decodeIntForKey:@"lemoOutMode"]];
+	[self setEnergyGapTime:				[decoder decodeIntForKey:@"energyGapTime"]];
+    [self setEnergyPeakingTime:			[decoder decodeIntForKey:@"energyPeakingTime"]];
+    [self setTriggerGateLength:			[decoder decodeIntForKey:@"triggerGateLength"]];
+    [self setPreTriggerDelay:			[decoder decodeIntForKey:@"preTriggerDelay"]];
+    [self setSampleStartIndex:			[decoder decodeIntForKey:@"sampleStartIndex"]];
+    [self setSampleLength:				[decoder decodeIntForKey:@"sampleLength"]];
+    [self setLemoInMode:				[decoder decodeIntForKey:@"lemoInMode"]];
+    [self setLemoOutMode:				[decoder decodeIntForKey:@"lemoOutMode"]];
+	
+    [self setClockSource:				[decoder decodeIntForKey:@"clockSource"]];
+    [self setTriggerOutEnabledMask:		[decoder decodeInt32ForKey:@"triggerOutEnabledMask"]];
+    [self setInputInvertedMask:			[decoder decodeInt32ForKey:@"inputInvertedMask"]];
+    [self setInternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"internalTriggerEnabledMask"]];
+    [self setExternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
+    [self setInternalGateEnabledMask:	[decoder decodeInt32ForKey:@"internalGateEnabledMask"]];
+    [self setExternalGateEnabledMask:	[decoder decodeInt32ForKey:@"externalGateEnabledMask"]];
+    [self setAdc50KTriggerEnabledMask:	[decoder decodeInt32ForKey:@"adc50KtriggerEnabledMask"]];
+	[self setGtMask:					[decoder decodeIntForKey:@"gtMask"]];
+	[self setShipEnergyWaveform:		[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
+	[self setTriggerDecimation:			[decoder decodeIntForKey:   @"triggerDecimation"]];
+	[self setEnergyDecimation:			[decoder decodeIntForKey:   @"energyDecimation"]];
+    [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
+		
 	thresholds  =					[[decoder decodeObjectForKey:@"thresholds"] retain];
-    dacOffsets  =				    [[decoder decodeObjectForKey:@"dacOffsets"] retain];
+    dacOffsets  =					[[decoder decodeObjectForKey:@"dacOffsets"] retain];
 	gateLengths =					[[decoder decodeObjectForKey:@"gateLengths"] retain];
 	pulseLengths =					[[decoder decodeObjectForKey:@"pulseLengths"] retain];
 	sumGs =							[[decoder decodeObjectForKey:@"sumGs"] retain];
 	peakingTimes =					[[decoder decodeObjectForKey:@"peakingTimes"] retain];
 	internalTriggerDelays =			[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
-	triggerDecimation =			    [decoder decodeIntForKey:   @"triggerDecimation"];
-	energyDecimation =			    [decoder decodeIntForKey:   @"energyDecimation"];
-	
-    [self setClockSource:			[decoder decodeIntForKey:@"clockSource"]];
-    [self setTriggerOutEnabledMask:	[decoder decodeInt32ForKey:@"triggerOutEnabledMask"]];
-    [self setInputInvertedMask:		[decoder decodeInt32ForKey:@"inputInvertedMask"]];
-    [self setInternalTriggerEnabledMask:		[decoder decodeInt32ForKey:@"internalTriggerEnabledMask"]];
-    [self setExternalTriggerEnabledMask:		[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
-    [self setAdc50KTriggerEnabledMask:	[decoder decodeInt32ForKey:@"adc50KtriggerEnabledMask"]];
-	[self setGtMask:				[decoder decodeIntForKey:@"gtMask"]];
-	[self setShipEnergyWaveform:	[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
-		
-    [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 
-    if(!waveFormRateGroup){
-        [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
-        [waveFormRateGroup setIntegrationTime:5];
-    }
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
 	
@@ -1830,10 +2009,10 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     [super encodeWithCoder:encoder];
 	
 	[encoder encodeInt:runMode					forKey:@"runMode"];
-	[encoder encodeBool:internalExternalTriggersOred forKey:@"internalExternalTriggersOred"];
+    [encoder encodeInt:gtMask					forKey:@"gtMask"];
+    [encoder encodeInt:clockSource				forKey:@"clockSource"];
 	[encoder encodeInt:lemoInEnabledMask		forKey:@"lemoInEnabledMask"];
 	[encoder encodeInt:energyGateLength			forKey:@"energyGateLength"];
-	[encoder encodeInt:endAddressThreshold		forKey:@"endAddressThreshold"];
 	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
 	[encoder encodeInt:energyTauFactor			forKey:@"energyTauFactor"];
 	[encoder encodeInt:energySampleStartIndex2	forKey:@"energySampleStartIndex2"];
@@ -1847,6 +2026,20 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[encoder encodeInt:sampleLength				forKey:@"sampleLength"];
 	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
 	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
+	[encoder encodeInt:triggerDecimation		forKey:@"triggerDecimation"];
+	[encoder encodeInt:energyDecimation			forKey:@"energyDecimation"];
+	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
+
+	[encoder encodeBool:internalExternalTriggersOred	forKey:@"internalExternalTriggersOred"];
+	[encoder encodeInt32:triggerOutEnabledMask			forKey:@"triggerOutEnabledMask"];
+	[encoder encodeInt32:inputInvertedMask				forKey:@"inputInvertedMask"];
+	[encoder encodeInt32:internalTriggerEnabledMask		forKey:@"internalTriggerEnabledMask"];
+	[encoder encodeInt32:externalTriggerEnabledMask		forKey:@"externalTriggerEnabledMask"];
+	[encoder encodeInt32:internalGateEnabledMask		forKey:@"internalGateEnabledMask"];
+	[encoder encodeInt32:externalGateEnabledMask		forKey:@"externalGateEnabledMask"];
+	[encoder encodeInt32:adc50KTriggerEnabledMask		forKey:@"adc50KtriggerEnabledMask"];
+	
+    [encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
 	[encoder encodeObject:thresholds			forKey:@"thresholds"];
 	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
 	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
@@ -1854,20 +2047,6 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[encoder encodeObject:sumGs					forKey:@"sumGs"];
 	[encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
 	[encoder encodeObject:internalTriggerDelays	forKey:@"internalTriggerDelays"];
-	[encoder encodeInt:triggerDecimation		forKey:@"triggerDecimation"];
-	[encoder encodeInt:energyDecimation			forKey:@"energyDecimation"];
-
-    [encoder encodeInt:clockSource				forKey:@"clockSource"];
-	[encoder encodeInt32:triggerOutEnabledMask	forKey:@"triggerOutEnabledMask"];
-	[encoder encodeInt32:inputInvertedMask		forKey:@"inputInvertedMask"];
-	[encoder encodeInt32:internalTriggerEnabledMask		forKey:@"internalTriggerEnabledMask"];
-	[encoder encodeInt32:externalTriggerEnabledMask		forKey:@"externalTriggerEnabledMask"];
-	[encoder encodeInt32:adc50KTriggerEnabledMask forKey:@"adc50KtriggerEnabledMask"];
-	
-    [encoder encodeInt:gtMask					forKey:@"gtMask"];
-	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
-	
-    [encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
 	
 }
 
@@ -1875,23 +2054,45 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 
- 	//clocks
-	[objDictionary setObject: [NSNumber numberWithInt:clockSource]			forKey:@"clockSource"];
-
-	[objDictionary setObject: [NSNumber numberWithLong:adc50KTriggerEnabledMask] forKey:@"adc50KtriggerEnabledMask"];
-	[objDictionary setObject: [NSNumber numberWithLong:triggerOutEnabledMask] forKey:@"triggerOutEnabledMask"];
-	[objDictionary setObject: [NSNumber numberWithLong:inputInvertedMask]	forKey:@"inputInvertedMask"];
+    [objDictionary setObject: [NSNumber numberWithLong:gtMask]						forKey:@"gtMask"];	
+	[objDictionary setObject: [NSNumber numberWithInt:clockSource]					forKey:@"clockSource"];
+	[objDictionary setObject: [NSNumber numberWithLong:adc50KTriggerEnabledMask]	forKey:@"adc50KtriggerEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:triggerOutEnabledMask]		forKey:@"triggerOutEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:inputInvertedMask]			forKey:@"inputInvertedMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:internalTriggerEnabledMask]	forKey:@"internalTriggerEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:externalTriggerEnabledMask]	forKey:@"externalTriggerEnabledMask"];
-    [objDictionary setObject: thresholds									forKey:@"thresholds"];	
-    [objDictionary setObject: gateLengths									forKey:@"gateLengths"];	
-    [objDictionary setObject: pulseLengths									forKey:@"pulseLengths"];	
-    [objDictionary setObject: sumGs											forKey:@"sumGs"];	
-    [objDictionary setObject: peakingTimes									forKey:@"peakingTimes"];	
-    [objDictionary setObject: internalTriggerDelays							forKey:@"internalTriggerDelays"];	
-    [objDictionary setObject: [NSNumber numberWithInt:triggerDecimation]	forKey:@"triggerDecimation"];	
-    [objDictionary setObject: [NSNumber numberWithInt:energyDecimation]	forKey:@"energyDecimation"];	
-    [objDictionary setObject: [NSNumber numberWithLong:gtMask]				forKey:@"gtMask"];	
+	[objDictionary setObject: [NSNumber numberWithLong:internalGateEnabledMask]		forKey:@"internalGateEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:externalGateEnabledMask]		forKey:@"externalGateEnabledMask"];
+    [objDictionary setObject: internalTriggerDelays									forKey:@"internalTriggerDelays"];	
+    [objDictionary setObject: [NSNumber numberWithInt:triggerDecimation]			forKey:@"triggerDecimation"];	
+    [objDictionary setObject: [NSNumber numberWithInt:energyDecimation]				forKey:@"energyDecimation"];	
+	
+	[objDictionary setObject:[NSNumber numberWithInt:runMode]						forKey:@"runMode"];
+	[objDictionary setObject:[NSNumber numberWithInt:lemoInEnabledMask]				forKey:@"lemoInEnabledMask"];
+	[objDictionary setObject:[NSNumber numberWithInt:energyGateLength]				forKey:@"energyGateLength"];
+	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex3]		forKey:@"energySampleStartIndex3"];
+	[objDictionary setObject:[NSNumber numberWithInt:energyTauFactor]				forKey:@"energyTauFactor"];
+	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex2]		forKey:@"energySampleStartIndex2"];
+	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex1]		forKey:@"energySampleStartIndex1"];
+	[objDictionary setObject:[NSNumber numberWithInt:energySampleLength]			forKey:@"energySampleLength"];
+	[objDictionary setObject:[NSNumber numberWithInt:energyGapTime]					forKey:@"energyGapTime"];
+	[objDictionary setObject:[NSNumber numberWithInt:energyPeakingTime]				forKey:@"energyPeakingTime"];
+	[objDictionary setObject:[NSNumber numberWithInt:triggerGateLength]				forKey:@"triggerGateLength"];
+	[objDictionary setObject:[NSNumber numberWithInt:preTriggerDelay]				forKey:@"preTriggerDelay"];
+	[objDictionary setObject:[NSNumber numberWithInt:sampleStartIndex]				forKey:@"sampleStartIndex"];
+	[objDictionary setObject:[NSNumber numberWithInt:sampleLength]					forKey:@"sampleLength"];
+	[objDictionary setObject:[NSNumber numberWithInt:lemoInMode]					forKey:@"lemoInMode"];
+	[objDictionary setObject:[NSNumber numberWithInt:lemoOutMode]					forKey:@"lemoOutMode"];
+	[objDictionary setObject:[NSNumber numberWithBool:shipEnergyWaveform]			forKey:@"shipEnergyWaveform"];
+	[objDictionary setObject:[NSNumber numberWithBool:internalExternalTriggersOred]	forKey:@"internalExternalTriggersOred"];
+	
+	[objDictionary setObject: dacOffsets		forKey:@"dacOffsets"];
+    [objDictionary setObject: thresholds		forKey:@"thresholds"];	
+    [objDictionary setObject: gateLengths		forKey:@"gateLengths"];	
+    [objDictionary setObject: pulseLengths		forKey:@"pulseLengths"];	
+    [objDictionary setObject: sumGs				forKey:@"sumGs"];	
+    [objDictionary setObject: peakingTimes		forKey:@"peakingTimes"];	
+    [objDictionary setObject: waveFormRateGroup	forKey:@"waveFormRateGroup"];
 	
     return objDictionary;
 }
@@ -1901,17 +2102,11 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	NSMutableArray* myTests = [NSMutableArray array];
 	[myTests addObject:[ORVmeReadOnlyTest test:kSIS3302AcquisitionControl wordSize:4 name:@"Acquistion Reg"]];
 	[myTests addObject:[ORVmeWriteOnlyTest test:kSIS3302KeyReset wordSize:4 name:@"Reset"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartSampling wordSize:4 name:@"Start Sampling"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopSampling wordSize:4 name:@"Stop Sampling"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStartAutoBankSwitch wordSize:4 name:@"Stop Auto Bank Switch"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kStopAutoBankSwitch wordSize:4 name:@"Start Auto Bank Switch"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank1FullFlag wordSize:4 name:@"Clear Bank1 Full"]];
-	//[myTests addObject:[ORVmeWriteOnlyTest test:kClearBank2FullFlag wordSize:4 name:@"Clear Bank2 Full"]];
+	//TO DO.. add more tests
 	
 	int i;
 	for(i=0;i<8;i++){
-		[myTests addObject:[ORVmeReadWriteTest test:[self getThresholdRegOffsets:i] wordSize:4 validMask:0xffff name:@"Threshold"]];
-		//[myTests addObject:[ORVmeReadOnlyTest test:adcMemory[i] length:64*1024 wordSize:4 name:@"Adc Memory"]];
+		[myTests addObject:[ORVmeReadWriteTest test:[self getThresholdRegOffsets:i] wordSize:4 validMask:0x1ffff name:@"Threshold"]];
 	}
 	return myTests;
 }
@@ -1956,6 +2151,12 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 		internalTriggerDelays = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
 		for(i=0;i<kNumSIS3302Channels;i++)[internalTriggerDelays addObject:[NSNumber numberWithInt:0]];
 	}
+	
+	if(!waveFormRateGroup){
+        [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
+        [waveFormRateGroup setIntegrationTime:5];
+    }
+	
 }
 
 - (void) writeDacOffsets

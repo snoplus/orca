@@ -32,7 +32,6 @@
 {
   @private
 	BOOL			isRunning;
-    BOOL			gateChaining;
 	 	
 	//clocks and delays (Acquistion control reg)
 	int	 clockSource;
@@ -41,6 +40,8 @@
 
 	short			internalTriggerEnabledMask;
 	short			externalTriggerEnabledMask;
+	short			internalGateEnabledMask;
+	short			externalGateEnabledMask;
 	short			inputInvertedMask;
 	short			triggerOutEnabledMask;
 	short			adc50KTriggerEnabledMask;
@@ -158,13 +159,8 @@
 - (NSString*) lemoOutAssignments;
 - (void) setDefaults;
 
-//clocks and delays (Acquistion control reg)
 - (int) clockSource;
 - (void) setClockSource:(int)aClockSource;
-
-//event configuration
-- (BOOL) gateChaining;
-- (void) setGateChaining:(BOOL)aState;
 
 - (short) internalTriggerEnabledMask;
 - (void) setInternalTriggerEnabledMask:(short)aMask;
@@ -173,8 +169,18 @@
 
 - (short) externalTriggerEnabledMask;
 - (void) setExternalTriggerEnabledMask:(short)aMask;
-- (BOOL) externalTriggerEnabledMask:(short)chan;
-- (void) setExternalTriggerEnabledMask:(short)chan withValue:(BOOL)aValue;
+- (BOOL) externalTriggerEnabled:(short)chan;
+- (void) setExternalTriggerEnabled:(short)chan withValue:(BOOL)aValue;
+
+- (short) internalGateEnabledMask;
+- (void) setInternalGateEnabledMask:(short)aMask;
+- (BOOL) internalGateEnabled:(short)chan;
+- (void) setInternalGateEnabled:(short)chan withValue:(BOOL)aValue;
+
+- (short) externalGateEnabledMask;
+- (void) setExternalGateEnabledMask:(short)aMask;
+- (BOOL) externalGateEnabled:(short)chan;
+- (void) setExternalGateEnabled:(short)chan withValue:(BOOL)aValue;
 
 - (short) inputInvertedMask;
 - (void) setInputInvertedMask:(short)aMask;
@@ -347,4 +353,6 @@ extern NSString* ORSIS3302InputInvertedChanged;
 
 extern NSString* ORSIS3302InternalTriggerEnabledChanged;
 extern NSString* ORSIS3302ExternalTriggerEnabledChanged;
+extern NSString* ORSIS3302InternalGateEnabledChanged;
+extern NSString* ORSIS3302ExternalGateEnabledChanged;
 

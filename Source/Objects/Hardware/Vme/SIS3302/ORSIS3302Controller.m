@@ -47,7 +47,7 @@
 - (void) awakeFromNib
 {
 	
-    settingSize     = NSMakeSize(765,700);
+    settingSize     = NSMakeSize(850,700);
     rateSize		= NSMakeSize(790,300);
     
     blankView = [[NSView alloc] init];
@@ -302,7 +302,27 @@
                      selector : @selector(internalExternalTriggersOredChanged:)
                          name : ORSIS3302ModelInternalExternalTriggersOredChanged
 						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(internalTriggerEnabledChanged:)
+                         name : ORSIS3302InternalTriggerEnabledChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(externalTriggerEnabledChanged:)
+                         name : ORSIS3302ExternalTriggerEnabledChanged
+						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(internalGateEnabledChanged:)
+                         name : ORSIS3302InternalGateEnabledChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(externalGateEnabledChanged:)
+                         name : ORSIS3302ExternalGateEnabledChanged
+						object: model];
+	
 }
 
 - (void) registerRates
@@ -370,6 +390,13 @@
 	[self energyGateLengthChanged:nil];
 	[self lemoInEnabledMaskChanged:nil];
 	[self internalExternalTriggersOredChanged:nil];
+	
+	[self internalTriggerEnabledChanged:nil];
+	[self externalTriggerEnabledChanged:nil];
+	
+	[self internalGateEnabledChanged:nil];
+	[self externalGateEnabledChanged:nil];
+	
 	[self runModeChanged:nil];
 }
 
@@ -384,7 +411,39 @@
 {
 	short i;
 	for(i=0;i<3;i++){
-		[[lemoInEnabledMaskMatrix cellWithTag:i] setState:[model lemoInEnabled:i]];
+		[[lemoInEnabledMatrix cellWithTag:i] setState:[model lemoInEnabled:i]];
+	}
+}
+
+- (void) internalTriggerEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<8;i++){
+		[[internalTriggerEnabledMatrix cellWithTag:i] setState:[model internalTriggerEnabled:i]];
+	}
+}
+
+- (void) externalTriggerEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<8;i++){
+		[[externalTriggerEnabledMatrix cellWithTag:i] setState:[model externalTriggerEnabled:i]];
+	}
+}
+
+- (void) internalGateEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<8;i++){
+		[[internalGateEnabledMatrix cellWithTag:i] setState:[model internalGateEnabled:i]];
+	}
+}
+
+- (void) externalGateEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<8;i++){
+		[[externalGateEnabledMatrix cellWithTag:i] setState:[model externalGateEnabled:i]];
 	}
 }
 
@@ -399,6 +458,7 @@
 	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
 	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
 	[runSummaryField setStringValue: [model runSummary]];
+	[self settingsLockChanged:nil];
 }
 
 - (void) endAddressThresholdChanged:(NSNotification*)aNote
@@ -636,6 +696,7 @@
 	[gtMatrix					setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU				setEnabled:!lockedOrRunningMaintenance];
+	[adc50KTriggerEnabledMatrix setEnabled:!locked && ([model runMode] == 0)];
 }
 
 - (void) setModel:(id)aModel
@@ -737,6 +798,26 @@
 }
 
 #pragma mark •••Actions
+
+- (void) internalGateEnabledMaskAction:(id)sender
+{
+	[model setInternalGateEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (void) externalGateEnabledMaskAction:(id)sender
+{
+	[model setExternalGateEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (void) internalTriggerEnabledMaskAction:(id)sender
+{
+	[model setInternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (void) externalTriggerEnabledMaskAction:(id)sender
+{
+	[model setExternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
 
 - (IBAction) internalExternalTriggersOredAction:(id)sender
 {

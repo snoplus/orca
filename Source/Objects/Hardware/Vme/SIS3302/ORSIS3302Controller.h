@@ -29,7 +29,11 @@
 {
     IBOutlet NSTabView* 	tabView;
 	IBOutlet NSButton*		internalExternalTriggersOredCB;
-	IBOutlet NSMatrix*		lemoInEnabledMaskMatrix;
+	IBOutlet NSMatrix*		internalTriggerEnabledMatrix;
+	IBOutlet NSMatrix*		externalTriggerEnabledMatrix;
+	IBOutlet NSMatrix*		internalGateEnabledMatrix;
+	IBOutlet NSMatrix*		externalGateEnabledMatrix;
+	IBOutlet NSMatrix*		lemoInEnabledMatrix;
 	IBOutlet NSTextField*	energyGateLengthField;
 	IBOutlet NSPopUpButton* runModePU;
 	IBOutlet NSTextField*	endAddressThresholdField;
@@ -98,6 +102,10 @@
 
 #pragma mark •••Interface Management
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
+- (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
+- (void) externalTriggerEnabledChanged:(NSNotification*)aNote;
+- (void) internalGateEnabledChanged:(NSNotification*)aNote;
+- (void) externalGateEnabledChanged:(NSNotification*)aNote;
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote;
 - (void) energyGateLengthChanged:(NSNotification*)aNote;
 - (void) runModeChanged:(NSNotification*)aNote;
@@ -145,6 +153,11 @@
 
 #pragma mark •••Actions
 - (IBAction) internalExternalTriggersOredAction:(id)sender;
+- (IBAction) internalTriggerEnabledMaskAction:(id)sender;
+- (IBAction) externalTriggerEnabledMaskAction:(id)sender;
+- (IBAction) internalGateEnabledMaskAction:(id)sender;
+- (IBAction) externalGateEnabledMaskAction:(id)sender;
+- (IBAction) lemoInEnabledMaskAction:(id)sender;
 - (IBAction) lemoInEnabledMaskAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 - (IBAction) energySampleStartIndex3Action:(id)sender;
