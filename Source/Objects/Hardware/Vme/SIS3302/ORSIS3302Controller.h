@@ -28,6 +28,13 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	
+	IBOutlet NSTextField*	mcaNofScansPresetField;
+	IBOutlet NSButton*		mcaAutoClearCB;
+	IBOutlet NSTextField*	mcaPrescaleFactorField;
+	IBOutlet NSTextField*	mcaLNESetupField;
+	IBOutlet NSTextField*	mcaNofHistoPresetField;
+	
 	IBOutlet NSButton*		internalExternalTriggersOredCB;
 	IBOutlet NSMatrix*		internalTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		externalTriggerEnabledMatrix;
@@ -101,6 +108,11 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) mcaNofScansPresetChanged:(NSNotification*)aNote;
+- (void) mcaAutoClearChanged:(NSNotification*)aNote;
+- (void) mcaPrescaleFactorChanged:(NSNotification*)aNote;
+- (void) mcaLNESetupChanged:(NSNotification*)aNote;
+- (void) mcaNofHistoPresetChanged:(NSNotification*)aNote;
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) externalTriggerEnabledChanged:(NSNotification*)aNote;
@@ -152,6 +164,11 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) mcaNofScansPresetAction:(id)sender;
+- (IBAction) mcaAutoClearAction:(id)sender;
+- (IBAction) mcaPrescaleFactorAction:(id)sender;
+- (IBAction) mcaLNESetupAction:(id)sender;
+- (IBAction) mcaNofHistoPresetAction:(id)sender;
 - (IBAction) internalExternalTriggersOredAction:(id)sender;
 - (IBAction) internalTriggerEnabledMaskAction:(id)sender;
 - (IBAction) externalTriggerEnabledMaskAction:(id)sender;

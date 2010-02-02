@@ -28,6 +28,11 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
+NSString* ORSIS3302ModelMcaNofScansPresetChanged = @"ORSIS3302ModelMcaNofScansPresetChanged";
+NSString* ORSIS3302ModelMcaAutoClearChanged = @"ORSIS3302ModelMcaAutoClearChanged";
+NSString* ORSIS3302ModelMcaPrescaleFactorChanged = @"ORSIS3302ModelMcaPrescaleFactorChanged";
+NSString* ORSIS3302ModelMcaLNESetupChanged = @"ORSIS3302ModelMcaLNESetupChanged";
+NSString* ORSIS3302ModelMcaNofHistoPresetChanged = @"ORSIS3302ModelMcaNofHistoPresetChanged";
 NSString* ORSIS3302ModelInternalExternalTriggersOredChanged = @"ORSIS3302ModelInternalExternalTriggersOredChanged";
 NSString* ORSIS3302ModelLemoInEnabledMaskChanged		= @"ORSIS3302ModelLemoInEnabledMaskChanged";
 NSString* ORSIS3302ModelEnergyGateLengthChanged			= @"ORSIS3302ModelEnergyGateLengthChanged";
@@ -131,6 +136,46 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 }
 
 #pragma mark ***Accessors
+
+- (unsigned long) mcaNofScansPreset { return mcaNofScansPreset; }
+- (void) setMcaNofScansPreset:(unsigned long)aMcaNofScansPreset
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaNofScansPreset:mcaNofScansPreset];
+    mcaNofScansPreset = aMcaNofScansPreset;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaNofScansPresetChanged object:self];
+}
+
+- (BOOL) mcaAutoClear { return mcaAutoClear; }
+- (void) setMcaAutoClear:(BOOL)aMcaAutoClear
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaAutoClear:mcaAutoClear];
+    mcaAutoClear = aMcaAutoClear;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaAutoClearChanged object:self];
+}
+
+- (unsigned long) mcaPrescaleFactor { return mcaPrescaleFactor; }
+- (void) setMcaPrescaleFactor:(unsigned long)aMcaPrescaleFactor
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaPrescaleFactor:mcaPrescaleFactor];
+    mcaPrescaleFactor = aMcaPrescaleFactor;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaPrescaleFactorChanged object:self];
+}
+
+- (unsigned long) mcaLNESetup { return mcaLNESetup; }
+- (void) setMcaLNESetup:(unsigned long)aMcaLNESetup
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaLNESetup:mcaLNESetup];
+    mcaLNESetup = aMcaLNESetup;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaLNESetupChanged object:self];
+}
+
+- (unsigned long) mcaNofHistoPreset { return mcaNofHistoPreset; }
+- (void) setMcaNofHistoPreset:(unsigned long)aMcaNofHistoPreset
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaNofHistoPreset:mcaNofHistoPreset];
+    mcaNofHistoPreset = aMcaNofHistoPreset;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaNofHistoPresetChanged object:self];
+}
 
 - (BOOL) internalExternalTriggersOred { return internalExternalTriggersOred; }
 - (void) setInternalExternalTriggersOred:(BOOL)aInternalExternalTriggersOred
@@ -1957,7 +2002,12 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
+    [self setMcaNofScansPreset:		[decoder decodeInt32ForKey:@"mcaNofScansPreset"]];
+    [self setMcaAutoClear:			[decoder decodeBoolForKey:@"mcaAutoClear"]];
+    [self setMcaPrescaleFactor:		[decoder decodeInt32ForKey:@"mcaPrescaleFactor"]];
+    [self setMcaLNESetup:			[decoder decodeInt32ForKey:@"mcaLNESetup"]];
+    [self setMcaNofHistoPreset:		[decoder decodeInt32ForKey:@"mcaNofHistoPreset"]];
+    [self setRunMode:				[decoder decodeIntForKey:@"runMode"]];
     [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
     [self setLemoInEnabledMask:			[decoder decodeIntForKey:@"lemoInEnabledMask"]];
     [self setEnergyGateLength:			[decoder decodeIntForKey:@"energyGateLength"]];
@@ -2012,6 +2062,11 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeInt32:mcaNofScansPreset		forKey:@"mcaNofScansPreset"];
+	[encoder encodeBool:mcaAutoClear			forKey:@"mcaAutoClear"];
+	[encoder encodeInt32:mcaPrescaleFactor		forKey:@"mcaPrescaleFactor"];
+	[encoder encodeInt32:mcaLNESetup			forKey:@"mcaLNESetup"];
+	[encoder encodeInt32:mcaNofHistoPreset		forKey:@"mcaNofHistoPreset"];
 	[encoder encodeInt:runMode					forKey:@"runMode"];
     [encoder encodeInt:gtMask					forKey:@"gtMask"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];

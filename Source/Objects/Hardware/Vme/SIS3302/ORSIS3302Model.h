@@ -98,6 +98,11 @@
 	unsigned long energyIndex;
 	unsigned long energyMaxIndex;
 	unsigned long eventLengthLongWords;
+    unsigned long mcaNofHistoPreset;
+    unsigned long mcaLNESetup;
+    unsigned long mcaPrescaleFactor;
+    BOOL mcaAutoClear;
+    unsigned long mcaNofScansPreset;
 }
 
 - (id) init;
@@ -106,6 +111,16 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (unsigned long) mcaNofScansPreset;
+- (void) setMcaNofScansPreset:(unsigned long)aMcaNofScansPreset;
+- (BOOL) mcaAutoClear;
+- (void) setMcaAutoClear:(BOOL)aMcaAutoClear;
+- (unsigned long) mcaPrescaleFactor;
+- (void) setMcaPrescaleFactor:(unsigned long)aMcaPrescaleFactor;
+- (unsigned long) mcaLNESetup;
+- (void) setMcaLNESetup:(unsigned long)aMcaLNESetup;
+- (unsigned long) mcaNofHistoPreset;
+- (void) setMcaNofHistoPreset:(unsigned long)aMcaNofHistoPreset;
 - (BOOL) internalExternalTriggersOred;
 - (void) setInternalExternalTriggersOred:(BOOL)aInternalExternalTriggersOred;
 - (unsigned short) lemoInEnabledMask;
@@ -306,6 +321,11 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelMcaNofScansPresetChanged;
+extern NSString* ORSIS3302ModelMcaAutoClearChanged;
+extern NSString* ORSIS3302ModelMcaPrescaleFactorChanged;
+extern NSString* ORSIS3302ModelMcaLNESetupChanged;
+extern NSString* ORSIS3302ModelMcaNofHistoPresetChanged;
 extern NSString* ORSIS3302ModelInternalExternalTriggersOredChanged;
 extern NSString* ORSIS3302ModelLemoInEnabledMaskChanged;
 extern NSString* ORSIS3302ModelEnergyGateLengthChanged;

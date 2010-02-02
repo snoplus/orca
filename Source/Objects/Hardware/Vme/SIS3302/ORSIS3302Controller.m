@@ -322,6 +322,31 @@
 	
 	[self registerRates];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaNofHistoPresetChanged:)
+                         name : ORSIS3302ModelMcaNofHistoPresetChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaLNESetupChanged:)
+                         name : ORSIS3302ModelMcaLNESetupChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaPrescaleFactorChanged:)
+                         name : ORSIS3302ModelMcaPrescaleFactorChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaAutoClearChanged:)
+                         name : ORSIS3302ModelMcaAutoClearChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaNofScansPresetChanged:)
+                         name : ORSIS3302ModelMcaNofScansPresetChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -397,9 +422,39 @@
 	[self externalGateEnabledChanged:nil];
 	
 	[self runModeChanged:nil];
+	[self mcaNofHistoPresetChanged:nil];
+	[self mcaLNESetupChanged:nil];
+	[self mcaPrescaleFactorChanged:nil];
+	[self mcaAutoClearChanged:nil];
+	[self mcaNofScansPresetChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) mcaNofScansPresetChanged:(NSNotification*)aNote
+{
+	[mcaNofScansPresetField setIntValue: [model mcaNofScansPreset]];
+}
+
+- (void) mcaAutoClearChanged:(NSNotification*)aNote
+{
+	[mcaAutoClearCB setIntValue: [model mcaAutoClear]];
+}
+
+- (void) mcaPrescaleFactorChanged:(NSNotification*)aNote
+{
+	[mcaPrescaleFactorField setIntValue: [model mcaPrescaleFactor]];
+}
+
+- (void) mcaLNESetupChanged:(NSNotification*)aNote
+{
+	[mcaLNESetupField setIntValue: [model mcaLNESetup]];
+}
+
+- (void) mcaNofHistoPresetChanged:(NSNotification*)aNote
+{
+	[mcaNofHistoPresetField setIntValue: [model mcaNofHistoPreset]];
+}
 
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote
 {
@@ -596,7 +651,6 @@
 {
 	short i;
 	for(i=0;i<kNumSIS3302Channels;i++){
-		//float volts = (0.0003*[model threshold:i])-5.0;
 		[[dacOffsetMatrix cellWithTag:i] setIntValue:[model dacOffset:i]];
 	}
 }
@@ -798,22 +852,47 @@
 
 #pragma mark •••Actions
 
-- (void) internalGateEnabledMaskAction:(id)sender
+- (IBAction) mcaNofScansPresetAction:(id)sender
+{
+	[model setMcaNofScansPreset:[sender intValue]];	
+}
+
+- (IBAction) mcaAutoClearAction:(id)sender
+{
+	[model setMcaAutoClear:[sender intValue]];	
+}
+
+- (IBAction) mcaPrescaleFactorAction:(id)sender
+{
+	[model setMcaPrescaleFactor:[sender intValue]];	
+}
+
+- (IBAction) mcaLNESetupAction:(id)sender
+{
+	[model setMcaLNESetup:[sender intValue]];	
+}
+
+- (IBAction) mcaNofHistoPresetAction:(id)sender
+{
+	[model setMcaNofHistoPreset:[sender intValue]];	
+}
+
+- (IBAction) internalGateEnabledMaskAction:(id)sender
 {
 	[model setInternalGateEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (void) externalGateEnabledMaskAction:(id)sender
+- (IBAction) externalGateEnabledMaskAction:(id)sender
 {
 	[model setExternalGateEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (void) internalTriggerEnabledMaskAction:(id)sender
+- (IBAction) internalTriggerEnabledMaskAction:(id)sender
 {
 	[model setInternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (void) externalTriggerEnabledMaskAction:(id)sender
+- (IBAction) externalTriggerEnabledMaskAction:(id)sender
 {
 	[model setExternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
