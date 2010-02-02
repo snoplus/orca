@@ -347,6 +347,11 @@
                          name : ORSIS3302ModelMcaNofScansPresetChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaHistoSizeChanged:)
+                         name : ORSIS3302ModelMcaHistoSizeChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -427,9 +432,15 @@
 	[self mcaPrescaleFactorChanged:nil];
 	[self mcaAutoClearChanged:nil];
 	[self mcaNofScansPresetChanged:nil];
+	[self mcaHistoSizeChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) mcaHistoSizeChanged:(NSNotification*)aNote
+{
+	[mcaHistoSizePU selectItemAtIndex: [model mcaHistoSize]];
+}
 
 - (void) mcaNofScansPresetChanged:(NSNotification*)aNote
 {
@@ -448,7 +459,7 @@
 
 - (void) mcaLNESetupChanged:(NSNotification*)aNote
 {
-	[mcaLNESetupField setIntValue: [model mcaLNESetup]];
+	[mcaLNESourcePU selectItemAtIndex: [model mcaLNESetup]];
 }
 
 - (void) mcaNofHistoPresetChanged:(NSNotification*)aNote
@@ -852,6 +863,11 @@
 
 #pragma mark •••Actions
 
+- (IBAction) mcaHistoSizeAction:(id)sender
+{
+	[model setMcaHistoSize:[sender indexOfSelectedItem]];	
+}
+
 - (IBAction) mcaNofScansPresetAction:(id)sender
 {
 	[model setMcaNofScansPreset:[sender intValue]];	
@@ -869,7 +885,7 @@
 
 - (IBAction) mcaLNESetupAction:(id)sender
 {
-	[model setMcaLNESetup:[sender intValue]];	
+	[model setMcaLNESetup:[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) mcaNofHistoPresetAction:(id)sender

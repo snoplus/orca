@@ -99,10 +99,11 @@
 	unsigned long energyMaxIndex;
 	unsigned long eventLengthLongWords;
     unsigned long mcaNofHistoPreset;
-    unsigned long mcaLNESetup;
+    BOOL		mcaLNESetup;
     unsigned long mcaPrescaleFactor;
     BOOL mcaAutoClear;
     unsigned long mcaNofScansPreset;
+    int mcaHistoSize;
 }
 
 - (id) init;
@@ -111,14 +112,16 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (int) mcaHistoSize;
+- (void) setMcaHistoSize:(int)aMcaHistoSize;
 - (unsigned long) mcaNofScansPreset;
 - (void) setMcaNofScansPreset:(unsigned long)aMcaNofScansPreset;
 - (BOOL) mcaAutoClear;
 - (void) setMcaAutoClear:(BOOL)aMcaAutoClear;
 - (unsigned long) mcaPrescaleFactor;
 - (void) setMcaPrescaleFactor:(unsigned long)aMcaPrescaleFactor;
-- (unsigned long) mcaLNESetup;
-- (void) setMcaLNESetup:(unsigned long)aMcaLNESetup;
+- (BOOL) mcaLNESetup;
+- (void) setMcaLNESetup:(BOOL)aMcaLNESetup;
 - (unsigned long) mcaNofHistoPreset;
 - (void) setMcaNofHistoPreset:(unsigned long)aMcaNofHistoPreset;
 - (BOOL) internalExternalTriggersOred;
@@ -277,7 +280,17 @@
 - (void) clearTimeStamp;
 - (void) writeTriggerSetups;
 
-- (int) dataWord:(int)chan index:(int)index;
+- (void) writeMcaLNESetupAndPrescalFactor;
+- (void) writeMcaScanControl:(BOOL)startScanBank2;
+- (void) writeMcaNofHistoPreset;
+- (void) mcaLNEPulse;
+- (void) mcaArm;
+- (void) mcaScanEnable;
+- (void) mcaScanDisable;
+- (void) mcaMultiScanStartReset;
+- (void) mcaMultiScanArmScanArm;
+- (void) mcaMultiScanArmScanEnable;
+- (void) mcaMultiScanDisable;
 
 - (unsigned long) acqReg;
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel;
@@ -321,6 +334,7 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelMcaHistoSizeChanged;
 extern NSString* ORSIS3302ModelMcaNofScansPresetChanged;
 extern NSString* ORSIS3302ModelMcaAutoClearChanged;
 extern NSString* ORSIS3302ModelMcaPrescaleFactorChanged;

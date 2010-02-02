@@ -28,11 +28,13 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-NSString* ORSIS3302ModelMcaNofScansPresetChanged = @"ORSIS3302ModelMcaNofScansPresetChanged";
-NSString* ORSIS3302ModelMcaAutoClearChanged = @"ORSIS3302ModelMcaAutoClearChanged";
-NSString* ORSIS3302ModelMcaPrescaleFactorChanged = @"ORSIS3302ModelMcaPrescaleFactorChanged";
-NSString* ORSIS3302ModelMcaLNESetupChanged = @"ORSIS3302ModelMcaLNESetupChanged";
-NSString* ORSIS3302ModelMcaNofHistoPresetChanged = @"ORSIS3302ModelMcaNofHistoPresetChanged";
+NSString* ORSIS3302ModelMcaHistoSizeChanged				= @"ORSIS3302ModelMcaHistoSizeChanged";
+NSString* ORSIS3302ModelMcaNofScansPresetChanged		= @"ORSIS3302ModelMcaNofScansPresetChanged";
+NSString* ORSIS3302ModelMcaAutoClearChanged				= @"ORSIS3302ModelMcaAutoClearChanged";
+NSString* ORSIS3302ModelMcaPrescaleFactorChanged		= @"ORSIS3302ModelMcaPrescaleFactorChanged";
+NSString* ORSIS3302ModelMcaLNESetupChanged				= @"ORSIS3302ModelMcaLNESetupChanged";
+NSString* ORSIS3302ModelMcaNofHistoPresetChanged		= @"ORSIS3302ModelMcaNofHistoPresetChanged";
+
 NSString* ORSIS3302ModelInternalExternalTriggersOredChanged = @"ORSIS3302ModelInternalExternalTriggersOredChanged";
 NSString* ORSIS3302ModelLemoInEnabledMaskChanged		= @"ORSIS3302ModelLemoInEnabledMaskChanged";
 NSString* ORSIS3302ModelEnergyGateLengthChanged			= @"ORSIS3302ModelEnergyGateLengthChanged";
@@ -137,6 +139,15 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 #pragma mark ***Accessors
 
+- (int) mcaHistoSize { return mcaHistoSize; }
+
+- (void) setMcaHistoSize:(int)aMcaHistoSize
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaHistoSize:mcaHistoSize];
+    mcaHistoSize = aMcaHistoSize;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaHistoSizeChanged object:self];
+}
+
 - (unsigned long) mcaNofScansPreset { return mcaNofScansPreset; }
 - (void) setMcaNofScansPreset:(unsigned long)aMcaNofScansPreset
 {
@@ -161,8 +172,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaPrescaleFactorChanged object:self];
 }
 
-- (unsigned long) mcaLNESetup { return mcaLNESetup; }
-- (void) setMcaLNESetup:(unsigned long)aMcaLNESetup
+- (BOOL) mcaLNESetup { return mcaLNESetup; }
+- (void) setMcaLNESetup:(BOOL)aMcaLNESetup
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMcaLNESetup:mcaLNESetup];
     mcaLNESetup = aMcaLNESetup;
@@ -937,6 +948,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
+
 - (void) setLed:(BOOL)state
 {
 	unsigned long aValue = CSRMask(state,kSISLed);
@@ -965,17 +977,6 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-}
-
-- (int) dataWord:(int)chan index:(int)index
-{
-	if([self triggerOutEnabled:chan]){	
-		unsigned long dataMask = 0x3fff;
-		unsigned long theValue = dataWord[chan/2][index];
-		if((chan%2)==0)	return (theValue>>16) & dataMask; 
-		else			return theValue & dataMask; 
-	}
-	else return 0;
 }
 
 - (unsigned long) acqReg
@@ -1212,6 +1213,122 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 		}
 	}
 }
+
+- (void) writeMcaLNESetupAndPrescalFactor
+{
+	
+	unsigned long aValue = mcaLNESetup<<28 | (mcaPrescaleFactor & 0xfffffff);
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302McaScanSetupPrescaleFactor
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) writeMcaScanControl:(BOOL)startScanBank2
+{
+	
+	unsigned long aValue = startScanBank2<<4 | mcaAutoClear;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302McaScanControl
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+
+- (void) writeMcaNofHistoPreset
+{
+	[[self adapter] writeLongBlock:&mcaNofHistoPreset
+                         atAddress:[self baseAddress] + kSIS3302McaScanNumOfHistogramsPreset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaLNEPulse
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaScanLnePulse
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaArm
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaScanArm
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaScanEnable
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaScanStart
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaScanDisable
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaScanStop
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaMultiScanStartReset
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaMultiScanStartResetPulse
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaMultiScanArmScanArm
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaMultiScanArmScanArm
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaMultiScanArmScanEnable
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaMultiScanArmScanEnable
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) mcaMultiScanDisable
+{
+	unsigned long aValue= 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302KeyMcaMultiScanDisable
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+
+
+
 
 - (void) report
 {
@@ -2002,12 +2119,14 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setMcaNofScansPreset:		[decoder decodeInt32ForKey:@"mcaNofScansPreset"]];
-    [self setMcaAutoClear:			[decoder decodeBoolForKey:@"mcaAutoClear"]];
-    [self setMcaPrescaleFactor:		[decoder decodeInt32ForKey:@"mcaPrescaleFactor"]];
-    [self setMcaLNESetup:			[decoder decodeInt32ForKey:@"mcaLNESetup"]];
-    [self setMcaNofHistoPreset:		[decoder decodeInt32ForKey:@"mcaNofHistoPreset"]];
-    [self setRunMode:				[decoder decodeIntForKey:@"runMode"]];
+    [self setMcaHistoSize:				[decoder decodeIntForKey:@"mcaHistoSize"]];
+    [self setMcaNofScansPreset:			[decoder decodeInt32ForKey:@"mcaNofScansPreset"]];
+    [self setMcaAutoClear:				[decoder decodeBoolForKey:@"mcaAutoClear"]];
+    [self setMcaPrescaleFactor:			[decoder decodeInt32ForKey:@"mcaPrescaleFactor"]];
+    [self setMcaLNESetup:				[decoder decodeBoolForKey:@"mcaLNESetup"]];
+    [self setMcaNofHistoPreset:			[decoder decodeInt32ForKey:@"mcaNofHistoPreset"]];
+	
+    [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
     [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
     [self setLemoInEnabledMask:			[decoder decodeIntForKey:@"lemoInEnabledMask"]];
     [self setEnergyGateLength:			[decoder decodeIntForKey:@"energyGateLength"]];
@@ -2062,11 +2181,13 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:mcaHistoSize				forKey:@"mcaHistoSize"];
 	[encoder encodeInt32:mcaNofScansPreset		forKey:@"mcaNofScansPreset"];
 	[encoder encodeBool:mcaAutoClear			forKey:@"mcaAutoClear"];
 	[encoder encodeInt32:mcaPrescaleFactor		forKey:@"mcaPrescaleFactor"];
-	[encoder encodeInt32:mcaLNESetup			forKey:@"mcaLNESetup"];
+	[encoder encodeBool:mcaLNESetup				forKey:@"mcaLNESetup"];
 	[encoder encodeInt32:mcaNofHistoPreset		forKey:@"mcaNofHistoPreset"];
+	
 	[encoder encodeInt:runMode					forKey:@"runMode"];
     [encoder encodeInt:gtMask					forKey:@"gtMask"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];

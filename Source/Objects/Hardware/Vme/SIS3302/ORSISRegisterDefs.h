@@ -293,26 +293,19 @@
 #define kEventConfAdc1InternTriggerEnableBit	0x4	 
 #define kEventConfAdc1InputInvertBit			0x1	   
 
-
-
-#define kDecimationNumOfHistogramsPreset							0x00000000
-#define kDecimation2								0x10000000
-#define kDecimation4								0x20000000
-#define kDecimation8								0x30000000
-
+#define kDecimationNumOfHistogramsPreset		0x00000000
+#define kDecimation2							0x10000000
+#define kDecimation4							0x20000000
+#define kDecimation8							0x30000000
 
 /* gamma  MCA */
 /*******************************************************************************************************/
-
-
-
-
-#define kSIS3302McaScanNumOfHistogramsPreset	    			0x80	  /* read/write; D32 */
+#define kSIS3302McaScanNumOfHistogramsPreset	    		0x80	  /* read/write; D32 */
 #define kSIS3302McaScanHistogramCounter	    				0x84	  /* read only; D32  */
 #define kSIS3302McaScanSetupPrescaleFactor    				0x88	  /* read only; D32  */
 #define kSIS3302McaScanControl			    				0x8C	  /* read/write; D32  */
 
-#define kSIS3302McaMultiScanNumOfScansPreset	    			0x90	  /* read/write; D32 */
+#define kSIS3302McaMultiScanNumOfScansPreset	    		0x90	  /* read/write; D32 */
 #define kSIS3302McaMultiScanScanCounter	    				0x94	  /* read only; D32  */
 #define kSIS3302McaMultiScanLastScanHistogramCounter		0x98	  /* read only; D32  */
 
@@ -320,26 +313,21 @@
 #define kSIS3302KeyMcaScanLnePulse           				0x410	  /* write only; D32 */
 #define kSIS3302KeyMcaScanArm         						0x414	  /* write only; D32 */
 #define kSIS3302KeyMcaScanStart          					0x418	  /* write only; D32 */
-#define kSIS3302KeyMcaScanNumOfHistogramsPreset           					0x41C	  /* write only; D32 */
+#define kSIS3302KeyMcaScanStop								0x41C	  /* write only; D32 */
 
 #define kSIS3302KeyMcaMultiScanStartResetPulse				0x420	  /* write only; D32 */
 #define kSIS3302KeyMcaMultiScanArmScanArm        			0x424	  /* write only; D32 */
 #define kSIS3302KeyMcaMultiScanArmScanEnable				0x428	  /* write only; D32 */
-#define kSIS3302KeyMcaMultiScanNumOfHistogramsPreset           			0x42C	  /* write only; D32 */
-
+#define kSIS3302KeyMcaMultiScanDisable						0x42C	  /* write only; D32 */
 
 
 #define kSIS3302McaEnergy2HistogramParamAdc1357    			0x01000060	  /* write only; D32 */
 #define kSIS3302McaEnergy2HistogramParamAdc2468    			0x01000064	  /* write only; D32 */
 #define kSIS3302McaHistogramParamAllAdc    					0x01000068	  /* write only; D32 */
 
-#define kSIS3302McaEnergy2HistogramParamAdc1    				0x02000060	  /* read/write; D32 */
-#define kSIS3302McaEnergy2HistogramParamAdc2    				0x02000064	  /* read/write; D32 */
+#define kSIS3302McaEnergy2HistogramParamAdc1				0x02000060	  /* read/write; D32 */
+#define kSIS3302McaEnergy2HistogramParamAdc2    			0x02000064	  /* read/write; D32 */
 #define kSIS3302McaHistogramParamAdc12    					0x02000068	  /* read/write; D32 */
-
-
-
-
 
 #define kSIS3302MCATriggerStartCounterAdc1 					0x02000080	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc1 						0x02000084	  /* read only; D32 */
@@ -382,5 +370,5 @@
 #define kSIS3302McaEnergy2HighCounterAdc8 					0x03800098	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc8 					0x0380009C	  /* read only; D32 */
 
-#define kSIS3302AcqSetMcaMode					0x00000008  /* GAMMA, up V1205   */
-#define kSIS3302AcqClrMcaMode					0x00080000  /* GAMMA, up V1205   */
+#define kSIS3302AcqSetMcaMode								0x00000008  /* GAMMA, up V1205   */
+#define kSIS3302AcqClrMcaMode								0x00080000  /* GAMMA, up V1205   */

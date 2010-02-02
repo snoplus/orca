@@ -28,11 +28,12 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet NSPopUpButton* mcaHistoSizePU;
+	IBOutlet NSPopUpButton* mcaLNESourcePU;
 	
 	IBOutlet NSTextField*	mcaNofScansPresetField;
 	IBOutlet NSButton*		mcaAutoClearCB;
 	IBOutlet NSTextField*	mcaPrescaleFactorField;
-	IBOutlet NSTextField*	mcaLNESetupField;
 	IBOutlet NSTextField*	mcaNofHistoPresetField;
 	
 	IBOutlet NSButton*		internalExternalTriggersOredCB;
@@ -108,6 +109,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) mcaHistoSizeChanged:(NSNotification*)aNote;
 - (void) mcaNofScansPresetChanged:(NSNotification*)aNote;
 - (void) mcaAutoClearChanged:(NSNotification*)aNote;
 - (void) mcaPrescaleFactorChanged:(NSNotification*)aNote;
@@ -164,6 +166,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) mcaHistoSizeAction:(id)sender;
 - (IBAction) mcaNofScansPresetAction:(id)sender;
 - (IBAction) mcaAutoClearAction:(id)sender;
 - (IBAction) mcaPrescaleFactorAction:(id)sender;
