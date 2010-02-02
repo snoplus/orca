@@ -159,9 +159,6 @@
                      selector : @selector(thresholdChanged:)
                          name : ORSIS3302ThresholdChanged
                        object : model];
-		
-    [self registerRates];
-
 	
     [notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
@@ -323,6 +320,8 @@
                          name : ORSIS3302ExternalGateEnabledChanged
 						object: model];
 	
+	[self registerRates];
+
 }
 
 - (void) registerRates

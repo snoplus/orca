@@ -44,6 +44,7 @@
 //from hardware. see the manual.
 // ---- should end in 0xdeadbeef
 //------------------------------------------------------------------
+#define kPageLength (65*1024)
 
 - (id) init
 
@@ -70,12 +71,15 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
-	
+
 	unsigned long lastWord = ptr[length-1];
 	if(lastWord == 0xdeadbeef){
 		//histogram the energy.... prescale by dividing by 4 so we can have a histogram of reseanable length.... have to do something better at some point
-		unsigned long energy = ptr[length - 4]/4; 
-		[aDataSet histogram:energy numBins:65*1024 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
+		unsigned long energy = ptr[length - 4]; 
+		int page = energy/kPageLength;
+		int startPage = page*kPageLength;
+		int endPage = (page+1)*kPageLength;
+		[aDataSet histogram:energy - page*kPageLength numBins:kPageLength sender:self  withKeys:@"SIS3302", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,cardKey,channelKey,nil];
 		
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
 		long energyLength   = ptr[3]; //each energy value is a sum of two 

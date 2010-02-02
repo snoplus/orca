@@ -1790,7 +1790,6 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
     theController   = [self adapter];
     
-    [self startRates];
 	[self reset];
     [self initBoard];
 	firstTime = YES;
@@ -1799,8 +1798,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	isRunning = NO;
 	count=0;
 	
-	dataRecordlength = 4+2+sampleLength/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
-	dataRecord = malloc(dataRecordlength*sizeof(long));
+    [self startRates];
+	dataRecord = nil;
 }
 
 //**************************************************************************************
@@ -1811,6 +1810,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 {
     @try {
 		if(firstTime){
+			dataRecordlength = 4+2+sampleLength/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
+			dataRecord = malloc(dataRecordlength*sizeof(long));
 			isRunning = YES;
 			firstTime = NO;
 			[self disarmAndArmBank:0];
@@ -1873,7 +1874,10 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	free(dataRecord);
+	if(dataRecord){
+		free(dataRecord);
+		dataRecord = nil;
+	}
 	[self disarmSampleLogic];
     isRunning = NO;
     [waveFormRateGroup stop];
