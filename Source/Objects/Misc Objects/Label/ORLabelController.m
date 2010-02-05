@@ -173,7 +173,7 @@
 - (IBAction) openAltDialogAction:(id)sender
 {
 	[self  endEditing];	
-	[model doCmdClick:self];
+	[model openAltDialog:model];
 }
 
 - (IBAction) applyAction:(id)sender

@@ -277,7 +277,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 		[i release];
     }
 	else {
-		[self setImage:[NSImage imageNamed:@"Text Label"]];
+		[self setImage:[NSImage imageNamed:@"Label"]];
 	}
     [[NSNotificationCenter defaultCenter]
                 postNotificationName:OROrcaObjectImageChanged
