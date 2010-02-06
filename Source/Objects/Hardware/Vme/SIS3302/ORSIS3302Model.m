@@ -2272,7 +2272,6 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     [objDictionary setObject: pulseLengths		forKey:@"pulseLengths"];	
     [objDictionary setObject: sumGs				forKey:@"sumGs"];	
     [objDictionary setObject: peakingTimes		forKey:@"peakingTimes"];	
-    [objDictionary setObject: waveFormRateGroup	forKey:@"waveFormRateGroup"];
 	
     return objDictionary;
 }
