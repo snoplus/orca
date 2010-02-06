@@ -305,7 +305,7 @@
 - (NSFileHandle*) createFileFromHeader: (NSString*)path
 {
     BOOL result = [fileHeader writeToFile:path atomically:YES];
-	if(!result)NSLog(@"could not create header\n");
+	if(!result)NSLog(@"ORDecoder:: Could not create header. This is most likely caused by non-complient object(s) in the header.\n");
 	
     NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:path];
     [fp seekToEndOfFile];
