@@ -1013,19 +1013,19 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 - (void) writeEventConfiguration
 {
 	int i;
-	for(i=0;i<4;i++){
+	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
-		aValueMask |= ((internalTriggerEnabledMask & (1<<i*2))==1)       << 2;
-		aValueMask |= ((internalTriggerEnabledMask & (1<<((i*2)+1)))==1) << 10;
+		aValueMask |= ((internalTriggerEnabledMask & (1<<i*2))!=0)       << 2;
+		aValueMask |= ((internalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 10;
 		
-		aValueMask |= ((externalTriggerEnabledMask & (1<<i*2))==1)       << 3;
-		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))==1) << 11;
+		aValueMask |= ((externalTriggerEnabledMask & (1<<i*2))!=0)       << 3;
+		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 11;
 	
-		aValueMask |= ((internalGateEnabledMask & (1<<i*2))==1)       << 4;
-		aValueMask |= ((internalGateEnabledMask & (1<<((i*2)+1)))==1) << 13;
+		aValueMask |= ((internalGateEnabledMask & (1<<i*2))!=0)       << 4;
+		aValueMask |= ((internalGateEnabledMask & (1<<((i*2)+1)))!=0) << 13;
 		
-		aValueMask |= ((externalGateEnabledMask & (1<<i*2))==1)       << 5;
-		aValueMask |= ((externalGateEnabledMask & (1<<((i*2)+1)))==1) << 13;
+		aValueMask |= ((externalGateEnabledMask & (1<<i*2))!=0)       << 5;
+		aValueMask |= ((externalGateEnabledMask & (1<<((i*2)+1)))!=0) << 13;
 		
 		
 		[[self adapter] writeLongBlock:&aValueMask
@@ -1037,8 +1037,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	//extended event config reg
 	for(i=0;i<4;i++){
 		unsigned long aValueMask = 0x0;
-		aValueMask |= ((adc50KTriggerEnabledMask & (1<<i*2))==1)<<0;
-		aValueMask |= ((adc50KTriggerEnabledMask & (1<<((i*2)+1)))==1)<<8;
+		aValueMask |= ((adc50KTriggerEnabledMask & (1<<i*2))!=0)<<0;
+		aValueMask |= ((adc50KTriggerEnabledMask & (1<<((i*2)+1)))!=0)<<8;
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getExtendedEventConfigOffsets:i]
 							numToWrite:1
@@ -2006,7 +2006,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 							dataRecord[index++] =   dataId | dataRecordlength;
 							dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
 													(([self slot] & 0x0000001f)<<16)      |
-													((channel & 0x000000ff)<<8);
+													((channel & 0x000000ff));
 							dataRecord[index++] = sampleLength/2;
 							dataRecord[index++] = energySampleLength;
 							unsigned long* p = &dataRecord[index];
