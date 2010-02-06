@@ -157,7 +157,7 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 			data[dataIndex++] = GetHardwareMask()[0] | (size_of_record+4); 
 			data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
 								((GetSlot()  & 0x0000001f)<<16) | 
-								((channel & 0x000000ff));
+								((channel & 0x000000ff)<<8);
 			data[dataIndex++] = number_of_longs_in_raw_data;
 			data[dataIndex++] = number_of_longs_in_energy_wf_data;
 			memcpy(data + dataIndex, &fTempVector[temp_iter], size_of_record*sizeof(fTempVector[0]));

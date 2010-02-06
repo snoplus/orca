@@ -2006,7 +2006,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 							dataRecord[index++] =   dataId | dataRecordlength;
 							dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
 													(([self slot] & 0x0000001f)<<16)      |
-													((channel & 0x000000ff));
+													((channel & 0x000000ff)<<8);
 							dataRecord[index++] = sampleLength/2;
 							dataRecord[index++] = energySampleLength;
 							unsigned long* p = &dataRecord[index];

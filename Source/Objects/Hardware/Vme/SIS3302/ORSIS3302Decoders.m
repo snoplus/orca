@@ -66,7 +66,7 @@
 	unsigned long length = ExtractLength(ptr[0]);
 	int crate	= ShiftAndExtract(ptr[1],21,0xf);
 	int card	= ShiftAndExtract(ptr[1],16,0x1f);
-	int channel = ShiftAndExtract(ptr[1],0,0xff);
+	int channel = ShiftAndExtract(ptr[1],8,0xff);
 	
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
