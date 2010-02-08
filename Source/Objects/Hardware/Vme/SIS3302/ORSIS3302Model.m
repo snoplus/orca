@@ -980,6 +980,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (void) writeEventConfiguration
 {
+	//******the extern/internal gates seem to have an inverted logic, so the extern/internal gate matrixes in IB are swapped.
 	int i;
 	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
