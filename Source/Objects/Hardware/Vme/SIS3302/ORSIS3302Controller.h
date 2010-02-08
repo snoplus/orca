@@ -28,6 +28,9 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet NSPopUpButton* mcaModePU;
+	IBOutlet NSButton*		mcaScanBank2FlagCB;
+	IBOutlet NSButton*		mcaPileupEnabledCB;
 	IBOutlet NSPopUpButton* mcaHistoSizePU;
 	IBOutlet NSPopUpButton* mcaLNESourcePU;
 	
@@ -85,7 +88,17 @@
 	
 	IBOutlet NSPopUpButton*	triggerDecimationPU;
 	IBOutlet NSPopUpButton*	energyDecimationPU;
-
+	
+    IBOutlet NSTextField*	mcaBusyField;
+    IBOutlet NSTextField*	mcaMultiScanBusyField;
+	
+    IBOutlet NSTextField*   mcaScanHistogramCounterField;
+    IBOutlet NSTextField*   mcaMultiScanScanCounterField;
+	IBOutlet NSMatrix*		mcaTriggerStartCounterMatrix;
+	IBOutlet NSMatrix*		mcaPileupCounterMatrix;
+	IBOutlet NSMatrix*		mcaEnergy2LowCounterMatrix;
+	IBOutlet NSMatrix*		mcaEnergy2HighCounterMatrix;
+	
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
     IBOutlet NSStepper*     integrationStepper;
@@ -109,6 +122,10 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) mcaStatusChanged:(NSNotification*)aNote;
+- (void) mcaModeChanged:(NSNotification*)aNote;
+- (void) mcaScanBank2FlagChanged:(NSNotification*)aNote;
+- (void) mcaPileupEnabledChanged:(NSNotification*)aNote;
 - (void) mcaHistoSizeChanged:(NSNotification*)aNote;
 - (void) mcaNofScansPresetChanged:(NSNotification*)aNote;
 - (void) mcaAutoClearChanged:(NSNotification*)aNote;
@@ -166,6 +183,9 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) mcaModeAction:(id)sender;
+- (IBAction) mcaScanBank2FlagAction:(id)sender;
+- (IBAction) mcaPileupEnabledAction:(id)sender;
 - (IBAction) mcaHistoSizeAction:(id)sender;
 - (IBAction) mcaNofScansPresetAction:(id)sender;
 - (IBAction) mcaAutoClearAction:(id)sender;

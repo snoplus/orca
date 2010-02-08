@@ -352,6 +352,26 @@
                          name : ORSIS3302ModelMcaHistoSizeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaPileupEnabledChanged:)
+                         name : ORSIS3302ModelMcaPileupEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaScanBank2FlagChanged:)
+                         name : ORSIS3302ModelMcaScanBank2FlagChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaModeChanged:)
+                         name : ORSIS3302ModelMcaModeChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaStatusChanged:)
+                         name : ORSIS3302McaStatusChanged
+						object: model];
+	
 }
 
 - (void) registerRates
@@ -433,9 +453,44 @@
 	[self mcaAutoClearChanged:nil];
 	[self mcaNofScansPresetChanged:nil];
 	[self mcaHistoSizeChanged:nil];
+	[self mcaPileupEnabledChanged:nil];
+	[self mcaScanBank2FlagChanged:nil];
+	[self mcaModeChanged:nil];
+	[self mcaStatusChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) mcaStatusChanged:(NSNotification*)aNote
+{
+	//sorry about the hard-coded indexes --- values from a command list....
+	unsigned long acqRegValue = [model mcaStatusResult:0];
+	[mcaBusyField setStringValue:(acqRegValue & 0x100000)?@"Busy":@""];
+	[mcaMultiScanBusyField setStringValue:(acqRegValue & 0x200000)?@"Busy":@""];
+	[mcaScanHistogramCounterField setIntValue:[model mcaStatusResult:1]];
+	[mcaMultiScanScanCounterField setIntValue:[model mcaStatusResult:2]];
+	int i;
+	for(i=0;i<kNumSIS3302Channels;i++){
+		[[mcaTriggerStartCounterMatrix	cellWithTag:i] setIntValue:[model mcaStatusResult:3 + (4*i)]];
+		[[mcaPileupCounterMatrix		cellWithTag:i] setIntValue:[model mcaStatusResult:4 + (4*i)]];
+		[[mcaEnergy2LowCounterMatrix	cellWithTag:i] setIntValue:[model mcaStatusResult:5 + (4*i)]];
+		[[mcaEnergy2HighCounterMatrix	cellWithTag:i] setIntValue:[model mcaStatusResult:6 + (4*i)]];
+	}
+}
+
+- (void) mcaModeChanged:(NSNotification*)aNote
+{
+	[mcaModePU selectItemAtIndex: [model mcaMode]];
+}
+
+- (void) mcaScanBank2FlagChanged:(NSNotification*)aNote
+{
+	[mcaScanBank2FlagCB setIntValue: [model mcaScanBank2Flag]];
+}
+
+- (void) mcaPileupEnabledChanged:(NSNotification*)aNote
+{
+	[mcaPileupEnabledCB setIntValue: [model mcaPileupEnabled]];
+}
 
 - (void) mcaHistoSizeChanged:(NSNotification*)aNote
 {
@@ -760,7 +815,7 @@
 	[gtMatrix					setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU				setEnabled:!lockedOrRunningMaintenance];
-	[adc50KTriggerEnabledMatrix setEnabled:!locked && ([model runMode] == 0)];
+	[adc50KTriggerEnabledMatrix setEnabled:!locked && ([model runMode] == kMcaRunMode)];
 }
 
 - (void) setModel:(id)aModel
@@ -862,6 +917,21 @@
 }
 
 #pragma mark •••Actions
+
+- (void) mcaModeAction:(id)sender
+{
+	[model setMcaMode:[sender indexOfSelectedItem]];	
+}
+
+- (void) mcaScanBank2FlagAction:(id)sender
+{
+	[model setMcaScanBank2Flag:[sender intValue]];	
+}
+
+- (void) mcaPileupEnabledAction:(id)sender
+{
+	[model setMcaPileupEnabled:[sender intValue]];	
+}
 
 - (IBAction) mcaHistoSizeAction:(id)sender
 {

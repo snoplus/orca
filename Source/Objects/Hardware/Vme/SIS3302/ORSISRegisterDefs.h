@@ -17,7 +17,11 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#define kNumSIS3302Channels			8 
+#define kNumSIS3302Channels	8 
+
+#define kMcaRunMode			0
+#define kEnergyRunMode		1
+
 #define kSISLed						0x0001L
 #define kSIS3302MaxEnergyWaveform	510
 
@@ -36,7 +40,8 @@
 #define kSIS3302DacControlStatus                  0x50      /* read/write; D32 */
 #define kSIS3302DacData                           0x54      /* read/write; D32 */
 
-
+#define kSIS3302McaEnable1357					0x10
+#define kSIS3302McaEnable2468					0x20
 
 
 // Key Addresses  
@@ -329,43 +334,43 @@
 #define kSIS3302McaEnergy2HistogramParamAdc2    			0x02000064	  /* read/write; D32 */
 #define kSIS3302McaHistogramParamAdc12    					0x02000068	  /* read/write; D32 */
 
-#define kSIS3302MCATriggerStartCounterAdc1 					0x02000080	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc1 					0x02000080	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc1 						0x02000084	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc1 					0x02000088	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc1 					0x0200008C	  /* read only; D32 */
 
-#define kSIS3302MCATriggerStartCounterAdc2 					0x02000090	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc2 					0x02000090	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc2 						0x02000094	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc2 					0x02000098	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc2 					0x0200009C	  /* read only; D32 */
 
 
-#define kSIS3302MCATriggerStartCounterAdc3 					0x02800080	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc3 					0x02800080	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc3 						0x02800084	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc3 					0x02800088	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc3 					0x0280008C	  /* read only; D32 */
 
-#define kSIS3302MCATriggerStartCounterAdc4 					0x02800090	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc4 					0x02800090	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc4 						0x02800094	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc4 					0x02800098	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc4 					0x0280009C	  /* read only; D32 */
 
-#define kSIS3302MCATriggerStartCounterAdc5 					0x03000080	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc5 					0x03000080	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc5 						0x03000084	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc5 					0x03000088	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc5 					0x0300008C	  /* read only; D32 */
 
-#define kSIS3302MCATriggerStartCounterAdc6 					0x03000090	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc6 					0x03000090	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc6 						0x03000094	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc6 					0x03000098	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc6 					0x0300009C	  /* read only; D32 */
 
-#define kSIS3302MCATriggerStartCounterAdc7 					0x03800080	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc7 					0x03800080	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc7 						0x03800084	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc7 					0x03800088	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc7 					0x0380008C	  /* read only; D32 */
 
-#define kSIS3302MCATriggerStartCounterAdc8 					0x03800090	  /* read only; D32 */
+#define kSIS3302McaTriggerStartCounterAdc8 					0x03800090	  /* read only; D32 */
 #define kSIS3302McaPileupCounterAdc8 						0x03800094	  /* read only; D32 */
 #define kSIS3302McaEnergy2HighCounterAdc8 					0x03800098	  /* read only; D32 */
 #define kSIS3302McaEnergy2LowCounterAdc8 					0x0380009C	  /* read only; D32 */

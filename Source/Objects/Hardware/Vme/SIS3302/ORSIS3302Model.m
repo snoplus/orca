@@ -27,7 +27,12 @@
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
+#import "ORVmeReadWriteCommand.h"
+#import "ORCommandList.h"
 
+NSString* ORSIS3302ModelMcaModeChanged					= @"ORSIS3302ModelMcaModeChanged";
+NSString* ORSIS3302ModelMcaScanBank2FlagChanged			= @"ORSIS3302ModelMcaScanBank2FlagChanged";
+NSString* ORSIS3302ModelMcaPileupEnabledChanged			= @"ORSIS3302ModelMcaPileupEnabledChanged";
 NSString* ORSIS3302ModelMcaHistoSizeChanged				= @"ORSIS3302ModelMcaHistoSizeChanged";
 NSString* ORSIS3302ModelMcaNofScansPresetChanged		= @"ORSIS3302ModelMcaNofScansPresetChanged";
 NSString* ORSIS3302ModelMcaAutoClearChanged				= @"ORSIS3302ModelMcaAutoClearChanged";
@@ -82,11 +87,13 @@ NSString* ORSIS3302TriggerDecimationChanged		= @"ORSIS3302TriggerDecimationChang
 NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged";
 NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabledChanged";
+NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 
 @interface ORSIS3302Model (private)
 - (void) writeDacOffsets;
 - (void) setUpArrays;
+- (void) pollMcaStatus;
 @end
 
 @implementation ORSIS3302Model
@@ -106,6 +113,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 - (void) dealloc 
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	
 	[gateLengths release];
 	[pulseLengths release];
 	[sumGs release];
@@ -139,8 +148,31 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 #pragma mark ***Accessors
 
-- (int) mcaHistoSize { return mcaHistoSize; }
+- (int) mcaMode { return mcaMode; }
+- (void) setMcaMode:(int)aMcaMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaMode:mcaMode];
+    mcaMode = aMcaMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaModeChanged object:self];
+}
 
+- (BOOL) mcaScanBank2Flag { return mcaScanBank2Flag; }
+- (void) setMcaScanBank2Flag:(BOOL)aMcaScanBank2Flag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaScanBank2Flag:mcaScanBank2Flag];
+    mcaScanBank2Flag = aMcaScanBank2Flag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaScanBank2FlagChanged object:self];
+}
+
+- (BOOL) mcaPileupEnabled { return mcaPileupEnabled; }
+- (void) setMcaPileupEnabled:(BOOL)aMcaPileupEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaPileupEnabled:mcaPileupEnabled];
+    mcaPileupEnabled = aMcaPileupEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaPileupEnabledChanged object:self];
+}
+
+- (int) mcaHistoSize { return mcaHistoSize; }
 - (void) setMcaHistoSize:(int)aMcaHistoSize
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMcaHistoSize:mcaHistoSize];
@@ -208,8 +240,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 - (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState
 {
 	unsigned short aMask = [self lemoInEnabledMask];
-	if(aState)	aMask &= (1<<aBit);
-	else		aMask |= ~(1<<aBit);
+	if(aState)	aMask |= (1<<aBit);
+	else		aMask &= ~(1<<aBit);
 	[self setLemoInEnabledMask:aMask];
 }
 
@@ -351,7 +383,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 - (NSString*) lemoInAssignments
 {
-	if(runMode != 0){
+	if(runMode == kEnergyRunMode){
 		if(lemoInMode == 0)      return @"3:Trigger\n2:TimeStamp Clr\n1:Veto";
 		else if(lemoInMode == 1) return @"3:Trigger\n2:TimeStamp Clr\n1:Gate";
 		else if(lemoInMode == 2) return @"3:Reserved\n2:Reserved\n1:Reserved";
@@ -384,7 +416,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 }
 - (NSString*) lemoOutAssignments
 {
-	if(runMode != 0){
+	if(runMode == kEnergyRunMode){
 		if(lemoOutMode == 0)      return @"3:Sample logic armed\n2:Busy\n1:Trigger output";
 		else if(lemoOutMode == 1) return @"3:Sample logic armed\n2:Busy or Veto\n1:Trigger output";
 		else if(lemoOutMode == 2) return @"3:N+1 Trig/Gate Out\n2:Trigger output\n1:N-1 Trig/Gate Out";
@@ -428,7 +460,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self setInternalTriggerEnabledMask:0xff];
 	[self setExternalTriggerEnabledMask:0x0];
 	[self setAdc50KTriggerEnabledMask:0x00];
-	[self setInternalGateEnabledMask:0x00];
+	[self setInternalGateEnabledMask:0xff];
 	[self setExternalGateEnabledMask:0x00];
 	
 }
@@ -493,11 +525,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 }
 
 
-- (short) internalTriggerEnabledMask
-{
-	return internalTriggerEnabledMask;
-}
-
+- (short) internalTriggerEnabledMask { return internalTriggerEnabledMask; }
 - (void) setInternalTriggerEnabledMask:(short)aMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerEnabledMask:internalTriggerEnabledMask];
@@ -505,11 +533,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalTriggerEnabledChanged object:self];
 }
 
-- (BOOL) internalTriggerEnabled:(short)chan
-{
-	return internalTriggerEnabledMask & (1<<chan); 
-}
-
+- (BOOL) internalTriggerEnabled:(short)chan { return internalTriggerEnabledMask & (1<<chan); }
 - (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
 {
 	unsigned char aMask = internalTriggerEnabledMask;
@@ -518,11 +542,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self setInternalTriggerEnabledMask:aMask];
 }
 
-- (short) externalTriggerEnabledMask
-{
-	return externalTriggerEnabledMask;
-}
-
+- (short) externalTriggerEnabledMask { return externalTriggerEnabledMask; }
 - (void) setExternalTriggerEnabledMask:(short)aMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setExternalTriggerEnabledMask:externalTriggerEnabledMask];
@@ -530,11 +550,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ExternalTriggerEnabledChanged object:self];
 }
 
-- (BOOL) externalTriggerEnabled:(short)chan
-{
-	return externalTriggerEnabledMask & (1<<chan); 
-}
-
+- (BOOL) externalTriggerEnabled:(short)chan { return externalTriggerEnabledMask & (1<<chan); }
 - (void) setExternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
 {
 	unsigned char aMask = externalTriggerEnabledMask;
@@ -543,11 +559,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self setExternalTriggerEnabledMask:aMask];
 }
 
-- (short) internalGateEnabledMask
-{
-	return internalGateEnabledMask;
-}
-
+- (short) internalGateEnabledMask { return internalGateEnabledMask; }
 - (void) setInternalGateEnabledMask:(short)aMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setInternalGateEnabledMask:internalGateEnabledMask];
@@ -555,11 +567,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalGateEnabledChanged object:self];
 }
 
-- (BOOL) internalGateEnabled:(short)chan
-{
-	return internalGateEnabledMask & (1<<chan); 
-}
-
+- (BOOL) internalGateEnabled:(short)chan { return internalGateEnabledMask & (1<<chan); }
 - (void) setInternalGateEnabled:(short)chan withValue:(BOOL)aValue
 {
 	unsigned char aMask = internalGateEnabledMask;
@@ -568,11 +576,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self setInternalGateEnabledMask:aMask];
 }
 
-- (short) externalGateEnabledMask
-{
-	return externalGateEnabledMask;
-}
-
+- (short) externalGateEnabledMask { return externalGateEnabledMask; }
 - (void) setExternalGateEnabledMask:(short)aMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setExternalGateEnabledMask:externalGateEnabledMask];
@@ -580,11 +584,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ExternalGateEnabledChanged object:self];
 }
 
-- (BOOL) externalGateEnabled:(short)chan
-{
-	return externalGateEnabledMask & (1<<chan); 
-}
-
+- (BOOL) externalGateEnabled:(short)chan { return externalGateEnabledMask & (1<<chan); }
 - (void) setExternalGateEnabled:(short)chan withValue:(BOOL)aValue
 {
 	unsigned char aMask = externalGateEnabledMask;
@@ -593,11 +593,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self setExternalGateEnabledMask:aMask];
 }
 
-- (short) inputInvertedMask
-{
-	return inputInvertedMask;
-}
-
+- (short) inputInvertedMask { return inputInvertedMask; }
 - (void) setInputInvertedMask:(short)aMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setInputInvertedMask:inputInvertedMask];
@@ -605,11 +601,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InputInvertedChanged object:self];
 }
 
-- (BOOL) inputInverted:(short)chan
-{
-	return inputInvertedMask & (1<<chan); 
-}
-
+- (BOOL) inputInverted:(short)chan { return inputInvertedMask & (1<<chan); }
 - (void) setInputInverted:(short)chan withValue:(BOOL)aValue
 {
 	unsigned char aMask = inputInvertedMask;
@@ -619,12 +611,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 }
 
 
-- (short) triggerOutEnabledMask
-{
-	return triggerOutEnabledMask;
-}
-
-
+- (short) triggerOutEnabledMask { return triggerOutEnabledMask; }
 - (void) setTriggerOutEnabledMask:(short)aMask	
 { 
 	[[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutEnabledMask:triggerOutEnabledMask];
@@ -632,11 +619,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302TriggerOutEnabledChanged object:self];
 }
 
-- (BOOL) triggerOutEnabled:(short)chan	
-{ 
-	return triggerOutEnabledMask & (1<<chan); 
-}
-
+- (BOOL) triggerOutEnabled:(short)chan { return triggerOutEnabledMask & (1<<chan); }
 - (void) setTriggerOutEnabled:(short)chan withValue:(BOOL)aValue		
 { 
 	unsigned char aMask = triggerOutEnabledMask;
@@ -645,10 +628,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self setTriggerOutEnabledMask:aMask];
 }
 
-- (short) adc50KTriggerEnabledMask
-{
-	return adc50KTriggerEnabledMask;
-}
+- (short) adc50KTriggerEnabledMask { return adc50KTriggerEnabledMask; }
 
 - (void) setAdc50KTriggerEnabledMask:(short)aMask
 {
@@ -657,11 +637,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302Adc50KTriggerEnabledChanged object:self];
 }
 
-- (BOOL) adc50KTriggerEnabled:(short)chan
-{
-	return adc50KTriggerEnabledMask & (1<<chan); 
-}
-
+- (BOOL) adc50KTriggerEnabled:(short)chan { return adc50KTriggerEnabledMask & (1<<chan); }
 - (void) setAdc50KTriggerEnabled:(short)chan withValue:(BOOL)aValue
 {
 	unsigned char aMask = adc50KTriggerEnabledMask;
@@ -690,16 +666,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 }
 
-- (short) gtMask
-{
-	return gtMask;
-}
-
-- (BOOL) gt:(short)chan	
-{ 
-	return gtMask & (1<<chan); 
-}
-
+- (short) gtMask { return gtMask; }
+- (BOOL) gt:(short)chan	 { return gtMask & (1<<chan); }
 - (void) setGtMask:(long)aMask	
 { 
 	[[[self undoManager] prepareWithInvocationTarget:self] setGtMask:gtMask];
@@ -810,7 +778,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 - (void) calculateSampleValues
 {
 	unsigned long aValue = 0;
-	if(runMode == 0)   return;
+	if(runMode == kMcaRunMode)   return;
 	else	numEnergyValues = energySampleLength;   
 
 
@@ -930,12 +898,12 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 {
 	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.	
 	unsigned long aMask = 0x0;
-	BOOL mcaMode = (runMode == 0);
+	BOOL inMcaMode = (runMode == kMcaRunMode);
 	aMask |= ((clockSource & 0x7)<< 12);
 	aMask |= (lemoInEnabledMask & 0x7) << 8;
 	aMask |= internalExternalTriggersOred << 6;
 	aMask |= (lemoOutMode & 0x3) << 4;
-	aMask |= (mcaMode&0x1)       << 3;
+	aMask |= (inMcaMode&0x1)       << 3;
 	aMask |= (lemoInMode & 0x7)  << 0;
 	
 	//put the inverse in the top bits to turn off everything else
@@ -1015,18 +983,17 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	int i;
 	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
-		aValueMask |= ((internalTriggerEnabledMask & (1<<i*2))!=0)       << 2;
+		aValueMask |= ((internalTriggerEnabledMask & (1<<(i*2)))!=0)     << 2;
 		aValueMask |= ((internalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 10;
 		
-		aValueMask |= ((externalTriggerEnabledMask & (1<<i*2))!=0)       << 3;
+		aValueMask |= ((externalTriggerEnabledMask & (1<<(i*2)))!=0)     << 3;
 		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 11;
 	
-		aValueMask |= ((internalGateEnabledMask & (1<<i*2))!=0)       << 4;
-		aValueMask |= ((internalGateEnabledMask & (1<<((i*2)+1)))!=0) << 13;
+		aValueMask |= ((internalGateEnabledMask & (1<<(i*2)))!=0)       << 4;
+		aValueMask |= ((internalGateEnabledMask & (1<<((i*2)+1)))!=0)   << 12;
 		
-		aValueMask |= ((externalGateEnabledMask & (1<<i*2))!=0)       << 5;
-		aValueMask |= ((externalGateEnabledMask & (1<<((i*2)+1)))!=0) << 13;
-		
+		aValueMask |= ((externalGateEnabledMask & (1<<(i*2)))!=0)       << 5;
+		aValueMask |= ((externalGateEnabledMask & (1<<((i*2)+1)))!=0)   << 13;
 		
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getEventConfigOffsets:i]
@@ -1035,10 +1002,10 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 						 usingAddSpace:0x01];
 	}
 	//extended event config reg
-	for(i=0;i<4;i++){
+	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
-		aValueMask |= ((adc50KTriggerEnabledMask & (1<<i*2))!=0)<<0;
-		aValueMask |= ((adc50KTriggerEnabledMask & (1<<((i*2)+1)))!=0)<<8;
+		aValueMask |= ((adc50KTriggerEnabledMask & (1<<i*2))!=0)      << 0;
+		aValueMask |= ((adc50KTriggerEnabledMask & (1<<((i*2)+1)))!=0)<< 8;
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getExtendedEventConfigOffsets:i]
 							numToWrite:1
@@ -1209,7 +1176,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 			unsigned short thresh = (aValue&0xffff);
 			BOOL triggerDisabled  = (aValue>>26) & 0x1;
 			BOOL triggerModeGT    = (aValue>>25) & 0x1;
-			NSLog(@"%d: %8s %2s 0x%4x\n",i, triggerDisabled ? "Disabled": "Enabled",  triggerModeGT?"GT":"  " ,thresh);
+			NSLog(@"%d: %8s %2s 0x%4x\n",i, triggerDisabled ? "Trig Out Disabled": "Trig Out Enabled",  triggerModeGT?"GT":"  " ,thresh);
 		}
 	}
 }
@@ -1225,10 +1192,10 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) writeMcaScanControl:(BOOL)startScanBank2
+- (void) writeMcaScanControl
 {
 	
-	unsigned long aValue = startScanBank2<<4 | mcaAutoClear;
+	unsigned long aValue = mcaScanBank2Flag<<4 | mcaAutoClear;
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kSIS3302McaScanControl
                         numToWrite:1
@@ -1246,7 +1213,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaLNEPulse
+- (void) writeMcaLNEPulse
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1256,7 +1223,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaArm
+- (void) writeMcaArm
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1266,7 +1233,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaScanEnable
+- (void) writeMcaScanEnable
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1276,7 +1243,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaScanDisable
+- (void) writeMcaScanDisable
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1286,7 +1253,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaMultiScanStartReset
+- (void) writeMcaMultiScanStartReset
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1296,7 +1263,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaMultiScanArmScanArm
+- (void) writeMcaMultiScanArmScanArm
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1306,7 +1273,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaMultiScanArmScanEnable
+- (void) writeMcaMultiScanArmScanEnable
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1316,7 +1283,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
-- (void) mcaMultiScanDisable
+- (void) writeMcaMultiScanDisable
 {
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
@@ -1326,9 +1293,36 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
                      usingAddSpace:0x01];
 }
 
+- (void) writeMcaMultiScanNofScansPreset
+{
+	unsigned long aValue= mcaNofScansPreset;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3302McaMultiScanNumOfScansPreset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
 
 
-
+- (void) writeMcaArmMode
+{
+	unsigned long addrOffset = 0;
+	switch (mcaMode) {
+		case 0: addrOffset = kSIS3302KeyMcaScanStart;				break;
+		case 1: addrOffset = kSIS3302KeyMcaScanArm;					break;
+		case 2: addrOffset = kSIS3302KeyMcaMultiScanArmScanEnable;	break;
+		case 3: addrOffset = kSIS3302KeyMcaMultiScanArmScanArm;		break;
+	}
+	
+	if(addrOffset!=0){
+		unsigned long aValue= 0;
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:[self baseAddress] + addrOffset
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
+}	
 
 - (void) report
 {
@@ -1451,10 +1445,91 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
 }
 
+
+- (void) readMcaStatus
+{
+	static unsigned long mcaStatusAddress[kNumMcaStatusRequests] = {
+		//order is important here....
+		kSIS3302AcquisitionControl,
+		kSIS3302McaScanHistogramCounter,
+		kSIS3302McaMultiScanScanCounter,
+		
+		kSIS3302McaTriggerStartCounterAdc1,
+		kSIS3302McaPileupCounterAdc1,
+		kSIS3302McaEnergy2LowCounterAdc1,
+		kSIS3302McaEnergy2HighCounterAdc1,
+		
+		kSIS3302McaTriggerStartCounterAdc2,
+		kSIS3302McaPileupCounterAdc2,
+		kSIS3302McaEnergy2LowCounterAdc2,
+		kSIS3302McaEnergy2HighCounterAdc2,
+		
+		kSIS3302McaTriggerStartCounterAdc3,
+		kSIS3302McaPileupCounterAdc3,
+		kSIS3302McaEnergy2LowCounterAdc3,
+		kSIS3302McaEnergy2HighCounterAdc3,
+
+		kSIS3302McaTriggerStartCounterAdc4,
+		kSIS3302McaPileupCounterAdc4,
+		kSIS3302McaEnergy2LowCounterAdc4,
+		kSIS3302McaEnergy2HighCounterAdc4,
+		
+		kSIS3302McaTriggerStartCounterAdc5,
+		kSIS3302McaPileupCounterAdc5,
+		kSIS3302McaEnergy2LowCounterAdc5,
+		kSIS3302McaEnergy2HighCounterAdc5,
+		
+		kSIS3302McaTriggerStartCounterAdc6,
+		kSIS3302McaPileupCounterAdc6,
+		kSIS3302McaEnergy2LowCounterAdc6,
+		kSIS3302McaEnergy2HighCounterAdc6,
+		
+		kSIS3302McaTriggerStartCounterAdc7,
+		kSIS3302McaPileupCounterAdc7,
+		kSIS3302McaEnergy2LowCounterAdc7,
+		kSIS3302McaEnergy2HighCounterAdc7,
+		
+		kSIS3302McaTriggerStartCounterAdc8,
+		kSIS3302McaPileupCounterAdc8,
+		kSIS3302McaEnergy2LowCounterAdc8,
+		kSIS3302McaEnergy2HighCounterAdc8
+		//order is important here....
+	};
+	
+	ORCommandList* aList = [ORCommandList commandList];
+	int i;
+	for(i=0;i<kNumMcaStatusRequests;i++){
+		[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + mcaStatusAddress[i]
+															   numToRead: 1
+															  withAddMod: [self addressModifier]
+														   usingAddSpace: 0x01]];
+	}
+	[self executeCommandList:aList];
+	
+	//if we get here, the results can retrieved in the same order as sent
+	for(i=0;i<kNumMcaStatusRequests;i++){
+		mcaStatusResults[i] = [aList longValueForCmd:i];
+	}
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302McaStatusChanged object:self];
+} 
+
+- (unsigned long) mcaStatusResult:(int)index
+{
+	if(index>=0 && index<kNumMcaStatusRequests){
+		return mcaStatusResults[index];
+	}
+	else return 0;
+}
+
+- (void) executeCommandList:(ORCommandList*) aList
+{
+	[[self adapter] executeCommandList:aList];
+}
+	
 - (void) initBoard
 {  
 	[self reset];							//reset the card
-	[self writeAcquistionRegister];			//set up the Acquisition Register
 	[self writeEventConfiguration];
 	[self writeEndAddressThreshold];
 	[self writePreTriggerDelayAndTriggerGateDelay];
@@ -1468,6 +1543,17 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	[self writeThresholds];
 	[self writeDacOffsets];
 	[self resetSamplingLogic];
+	
+	if(runMode == kMcaRunMode){
+		[self writeHistogramParams];
+		[self writeMcaScanControl];
+		[self writeMcaNofHistoPreset];
+		[self writeMcaLNESetupAndPrescalFactor];
+		[self writeMcaNofHistoPreset];
+		[self writeMcaLNESetupAndPrescalFactor];
+		[self writeMcaMultiScanNofScansPreset];
+	}
+	[self writeAcquistionRegister];			//set up the Acquisition Register
 }
 
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
@@ -1667,7 +1753,7 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 - (NSString*) runSummary
 {
 	NSString* summary;
-	if(runMode == 0){
+	if(runMode == kMcaRunMode){
 		return @"MCA Spectrum";
 	}
 	else {
@@ -1678,6 +1764,15 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	}
 }
 
+- (void) writeHistogramParams
+{
+	unsigned long aValue =   kSIS3302McaEnable2468 | kSIS3302McaEnable1357 | (mcaPileupEnabled << 3) + mcaHistoSize;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302McaHistogramParamAllAdc
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];	
+}
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
@@ -1936,7 +2031,6 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	else return nil;
 }
 
-
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     if(![[self adapter] controllerCard]){
@@ -1962,6 +2056,11 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 	
     [self startRates];
 	dataRecord = nil;
+	
+	if(runMode == kMcaRunMode){
+		[self writeMcaArmMode];
+		[self pollMcaStatus];
+	}
 }
 
 //**************************************************************************************
@@ -1971,62 +2070,66 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		if(firstTime){
-			dataRecordlength = 4+2+sampleLength/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
-			dataRecord = malloc(dataRecordlength*sizeof(long));
-			isRunning = YES;
-			firstTime = NO;
-			[self disarmAndArmBank:0];
+		if(runMode == kMcaRunMode){
+			
 		}
 		else {
-			if([self isEvent]) {
-				[self disarmSampleLogic];
-
-				if(bankOneArmed)[self writePageRegister:0x0];
-				else			[self writePageRegister:0x4];
-				int channel;
-				for( channel=0;channel<kNumSIS3302Channels;channel++) {
-					unsigned long endSampleAddress = 0;
-					[[self adapter] readLongBlock:&endSampleAddress
-										atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
-										numToRead:1
-									   withAddMod:[self addressModifier]
-									usingAddSpace:0x01];
-				
-					endSampleAddress &= 0xffffff ; // mask bank2 address bit (bit 24)
-				
-					if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
-						// count up as Warnings?
-					}
-				
-					if (endSampleAddress != 0) {
-						unsigned long addrOffset = 0;
-						do {
-							int index = 0;
-							dataRecord[index++] =   dataId | dataRecordlength;
-							dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
-													(([self slot] & 0x0000001f)<<16)      |
-													((channel & 0x000000ff)<<8);
-							dataRecord[index++] = sampleLength/2;
-							dataRecord[index++] = energySampleLength;
-							unsigned long* p = &dataRecord[index];
-							[[self adapter] readLongBlock: p
-												atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + addrOffset
-												numToRead: dataRecordlength-4
-											   withAddMod: [self addressModifier]
-											usingAddSpace: 0x01];
-	
-							if(dataRecord[dataRecordlength-1] == 0xdeadbeef){
-								[aDataPacket addLongsToFrameBuffer:dataRecord length:dataRecordlength];
-							}
-							addrOffset += (dataRecordlength-4)*4;
-						}while (addrOffset < endSampleAddress);
-					}
-				}
+			if(firstTime){
+				dataRecordlength = 4+2+sampleLength/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
+				dataRecord = malloc(dataRecordlength*sizeof(long));
+				isRunning = YES;
+				firstTime = NO;
 				[self disarmAndArmBank:0];
 			}
-		}
+			else {
+				if([self isEvent]) {
+					[self disarmSampleLogic];
+
+					if(bankOneArmed)[self writePageRegister:0x0];
+					else			[self writePageRegister:0x4];
+					int channel;
+					for( channel=0;channel<kNumSIS3302Channels;channel++) {
+						unsigned long endSampleAddress = 0;
+						[[self adapter] readLongBlock:&endSampleAddress
+											atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
+											numToRead:1
+										   withAddMod:[self addressModifier]
+										usingAddSpace:0x01];
+					
+						endSampleAddress &= 0xffffff ; // mask bank2 address bit (bit 24)
+					
+						if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
+							// count up as Warnings?
+						}
+					
+						if (endSampleAddress != 0) {
+							unsigned long addrOffset = 0;
+							do {
+								int index = 0;
+								dataRecord[index++] =   dataId | dataRecordlength;
+								dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
+														(([self slot] & 0x0000001f)<<16)      |
+														((channel & 0x000000ff)<<8);
+								dataRecord[index++] = sampleLength/2;
+								dataRecord[index++] = energySampleLength;
+								unsigned long* p = &dataRecord[index];
+								[[self adapter] readLongBlock: p
+													atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + addrOffset
+													numToRead: dataRecordlength-4
+												   withAddMod: [self addressModifier]
+												usingAddSpace: 0x01];
 		
+								if(dataRecord[dataRecordlength-1] == 0xdeadbeef){
+									[aDataPacket addLongsToFrameBuffer:dataRecord length:dataRecordlength];
+								}
+								addrOffset += (dataRecordlength-4)*4;
+							}while (addrOffset < endSampleAddress);
+						}
+					}
+					[self disarmAndArmBank:0];
+				}
+			}
+		}
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
@@ -2036,6 +2139,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMcaStatus) object:nil];
+
 	if(dataRecord){
 		free(dataRecord);
 		dataRecord = nil;
@@ -2119,6 +2224,9 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
+    [self setMcaMode:					[decoder decodeIntForKey:@"mcaMode"]];
+    [self setMcaScanBank2Flag:			[decoder decodeBoolForKey:@"mcaScanBank2Flag"]];
+    [self setMcaPileupEnabled:			[decoder decodeBoolForKey:@"mcaPileupEnabled"]];
     [self setMcaHistoSize:				[decoder decodeIntForKey:@"mcaHistoSize"]];
     [self setMcaNofScansPreset:			[decoder decodeInt32ForKey:@"mcaNofScansPreset"]];
     [self setMcaAutoClear:				[decoder decodeBoolForKey:@"mcaAutoClear"]];
@@ -2181,6 +2289,9 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:mcaMode					forKey:@"mcaMode"];
+	[encoder encodeBool:mcaScanBank2Flag		forKey:@"mcaScanBank2Flag"];
+	[encoder encodeBool:mcaPileupEnabled		forKey:@"mcaPileupEnabled"];
 	[encoder encodeInt:mcaHistoSize				forKey:@"mcaHistoSize"];
 	[encoder encodeInt32:mcaNofScansPreset		forKey:@"mcaNofScansPreset"];
 	[encoder encodeBool:mcaAutoClear			forKey:@"mcaAutoClear"];
@@ -2416,4 +2527,14 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 		}
 	}
 }
+
+- (void) pollMcaStatus
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMcaStatus) object:nil];
+	if([gOrcaGlobals runInProgress]){
+		[self readMcaStatus];
+		[self performSelector:@selector(pollMcaStatus) withObject:self afterDelay:2];
+	}
+}
+
 @end

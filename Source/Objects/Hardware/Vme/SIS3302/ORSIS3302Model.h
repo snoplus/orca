@@ -25,8 +25,11 @@
 #import "AutoTesting.h"
 #import "ORSISRegisterDefs.h"
 
+#define kNumMcaStatusRequests 35 //don't change this unless you know what you are doing....
+
 @class ORRateGroup;
 @class ORAlarm;
+@class ORCommandList;
 
 @interface ORSIS3302Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
@@ -37,6 +40,7 @@
 	int	 clockSource;
 	
 	unsigned long   dataId;
+	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
 
 	short			internalTriggerEnabledMask;
 	short			externalTriggerEnabledMask;
@@ -99,11 +103,14 @@
 	unsigned long energyMaxIndex;
 	unsigned long eventLengthLongWords;
     unsigned long mcaNofHistoPreset;
-    BOOL		mcaLNESetup;
-    unsigned long mcaPrescaleFactor;
-    BOOL mcaAutoClear;
-    unsigned long mcaNofScansPreset;
-    int mcaHistoSize;
+    BOOL			mcaLNESetup;
+    unsigned long	mcaPrescaleFactor;
+    BOOL			mcaAutoClear;
+    unsigned long	mcaNofScansPreset;
+    int				mcaHistoSize;
+    BOOL			mcaPileupEnabled;
+    BOOL			mcaScanBank2Flag;
+    int mcaMode;
 }
 
 - (id) init;
@@ -112,6 +119,13 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (unsigned long) mcaStatusResult:(int)index;
+- (int) mcaMode;
+- (void) setMcaMode:(int)aMcaMode;
+- (BOOL) mcaScanBank2Flag;
+- (void) setMcaScanBank2Flag:(BOOL)aMcaScanBank2Flag;
+- (BOOL) mcaPileupEnabled;
+- (void) setMcaPileupEnabled:(BOOL)aMcaPileupEnabled;
 - (int) mcaHistoSize;
 - (void) setMcaHistoSize:(int)aMcaHistoSize;
 - (unsigned long) mcaNofScansPreset;
@@ -281,16 +295,20 @@
 - (void) writeTriggerSetups;
 
 - (void) writeMcaLNESetupAndPrescalFactor;
-- (void) writeMcaScanControl:(BOOL)startScanBank2;
+- (void) writeMcaScanControl;
 - (void) writeMcaNofHistoPreset;
-- (void) mcaLNEPulse;
-- (void) mcaArm;
-- (void) mcaScanEnable;
-- (void) mcaScanDisable;
-- (void) mcaMultiScanStartReset;
-- (void) mcaMultiScanArmScanArm;
-- (void) mcaMultiScanArmScanEnable;
-- (void) mcaMultiScanDisable;
+- (void) writeMcaLNEPulse;
+- (void) writeMcaArm;
+- (void) writeMcaScanEnable;
+- (void) writeMcaScanDisable;
+- (void) writeMcaMultiScanStartReset;
+- (void) writeMcaMultiScanArmScanArm;
+- (void) writeMcaMultiScanArmScanEnable;
+- (void) writeMcaMultiScanDisable;
+- (void) writeHistogramParams;
+- (void) writeMcaMultiScanNofScansPreset;
+- (void) writeMcaArmMode;
+- (void) executeCommandList:(ORCommandList*) aList;
 
 - (unsigned long) acqReg;
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel;
@@ -316,13 +334,11 @@
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) isEvent;
 
-
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
-
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -334,6 +350,9 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelMcaModeChanged;
+extern NSString* ORSIS3302ModelMcaScanBank2FlagChanged;
+extern NSString* ORSIS3302ModelMcaPileupEnabledChanged;
 extern NSString* ORSIS3302ModelMcaHistoSizeChanged;
 extern NSString* ORSIS3302ModelMcaNofScansPresetChanged;
 extern NSString* ORSIS3302ModelMcaAutoClearChanged;
@@ -389,4 +408,4 @@ extern NSString* ORSIS3302InternalTriggerEnabledChanged;
 extern NSString* ORSIS3302ExternalTriggerEnabledChanged;
 extern NSString* ORSIS3302InternalGateEnabledChanged;
 extern NSString* ORSIS3302ExternalGateEnabledChanged;
-
+extern NSString* ORSIS3302McaStatusChanged;
