@@ -434,34 +434,34 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (void) setDefaults
 {
+	[self setRunMode:kEnergyRunMode];
 	int i;
 	for(i=0;i<8;i++){
-		[self setThreshold:i withValue:0x1300];
-		[self setPeakingTime:i withValue:150];
-		[self setSumG:i withValue:50];
-		[self setGateLength:i withValue:256];
-		[self setInternalTriggerDelay:i withValue:128];
+		[self setThreshold:i withValue:0x64];
+		[self setPeakingTime:i withValue:250];
+		[self setSumG:i withValue:263];
+		[self setInternalTriggerDelay:i withValue:0];
+		[self setDacOffset:i withValue:30000];
 	}
 	
-	[self setSampleLength:8*1024];
+	[self setSampleLength:2048];
 	[self setSampleStartIndex:0];
-	[self setEnergyPeakingTime:150];
-	[self setEnergyGapTime:50];
-	[self setTriggerDecimation:0];
-	[self setEnergyDecimation:0];
-	[self setPreTriggerDelay:128];
-	[self setTriggerGateLength:256];
-	[self setSampleLength:0];
-	[self setSampleStartIndex:0];
+	[self setEnergyPeakingTime:100];
+	[self setEnergyGapTime:25];
+	[self setTriggerDecimation:3];
+	[self setEnergyDecimation:3];
+	[self setPreTriggerDelay:0];
+	[self setTriggerGateLength:50000];
 	[self setShipEnergyWaveform:NO];
 	[self setGtMask:0xff];
 	[self setTriggerOutEnabledMask:0x0];
 	[self setInputInvertedMask:0x0];
-	[self setInternalTriggerEnabledMask:0xff];
-	[self setExternalTriggerEnabledMask:0x0];
 	[self setAdc50KTriggerEnabledMask:0x00];
 	[self setInternalGateEnabledMask:0xff];
 	[self setExternalGateEnabledMask:0x00];
+	
+	[self setInternalTriggerEnabledMask:0xff];
+	[self setExternalTriggerEnabledMask:0x0];
 	
 }
 
@@ -982,6 +982,9 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
 	//******the extern/internal gates seem to have an inverted logic, so the extern/internal gate matrixes in IB are swapped.
 	int i;
+	unsigned long tempIntGateMask  = ~internalGateEnabledMask;
+	unsigned long tempExtGateMask  = ~externalGateEnabledMask;
+	
 	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
 		aValueMask |= ((internalTriggerEnabledMask & (1<<(i*2)))!=0)     << 2;
@@ -990,11 +993,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		aValueMask |= ((externalTriggerEnabledMask & (1<<(i*2)))!=0)     << 3;
 		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 11;
 	
-		aValueMask |= ((internalGateEnabledMask & (1<<(i*2)))!=0)       << 4;
-		aValueMask |= ((internalGateEnabledMask & (1<<((i*2)+1)))!=0)   << 12;
+		aValueMask |= ((tempIntGateMask & (1<<(i*2)))!=0)       << 4;
+		aValueMask |= ((tempIntGateMask & (1<<((i*2)+1)))!=0)   << 12;
 		
-		aValueMask |= ((externalGateEnabledMask & (1<<(i*2)))!=0)       << 5;
-		aValueMask |= ((externalGateEnabledMask & (1<<((i*2)+1)))!=0)   << 13;
+		aValueMask |= ((tempExtGateMask & (1<<(i*2)))!=0)       << 5;
+		aValueMask |= ((tempExtGateMask & (1<<((i*2)+1)))!=0)   << 13;
 		
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getEventConfigOffsets:i]
@@ -2275,6 +2278,10 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	peakingTimes =					[[decoder decodeObjectForKey:@"peakingTimes"] retain];
 	internalTriggerDelays =			[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
 
+	if(!waveFormRateGroup){
+		[self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
+	    [waveFormRateGroup setIntegrationTime:5];
+    }
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
 	

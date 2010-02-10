@@ -805,17 +805,64 @@
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3302SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3302SettingsLock];
-    
-    [settingLockButton			setState: locked];
+    BOOL mcaMode = ([model runMode] == kMcaRunMode);
+
+	[settingLockButton			setState: locked];
+
+    [runModePU					setEnabled:!locked && !runInProgress];
     [addressText				setEnabled:!locked && !runInProgress];
     [initButton					setEnabled:!lockedOrRunningMaintenance];
-	[triggerOutEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
-	[inputInvertedMatrix		setEnabled:!lockedOrRunningMaintenance];
-	[adc50KTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
-	[gtMatrix					setEnabled:!lockedOrRunningMaintenance];
-	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[clockSourcePU				setEnabled:!lockedOrRunningMaintenance];
-	[adc50KTriggerEnabledMatrix setEnabled:!locked && ([model runMode] == kMcaRunMode)];
+	[reportButton				setEnabled:!lockedOrRunningMaintenance];
+	[probeButton				setEnabled:!lockedOrRunningMaintenance];
+	
+    [internalExternalTriggersOredCB	setEnabled:!lockedOrRunningMaintenance];
+	[energyTauFactorField			setEnabled:!lockedOrRunningMaintenance];
+	[energySampleStartIndex3Field	setEnabled:!lockedOrRunningMaintenance];
+	[energySampleStartIndex2Field	setEnabled:!lockedOrRunningMaintenance];
+	[energySampleStartIndex1Field	setEnabled:!lockedOrRunningMaintenance];
+	[energyShipWaveformButton		setEnabled:!lockedOrRunningMaintenance];
+	[energyGapTimeField				setEnabled:!lockedOrRunningMaintenance];
+	[energyPeakingTimeField			setEnabled:!lockedOrRunningMaintenance];
+	[triggerGateLengthField			setEnabled:!lockedOrRunningMaintenance];
+	[preTriggerDelayField			setEnabled:!lockedOrRunningMaintenance];
+	[sampleStartIndexField			setEnabled:!lockedOrRunningMaintenance];
+	[sampleLengthField				setEnabled:!lockedOrRunningMaintenance];
+	[lemoInModePU					setEnabled:!lockedOrRunningMaintenance];
+	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
+
+	[clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
+	[triggerDecimationPU			setEnabled:!lockedOrRunningMaintenance];
+	[energyDecimationPU				setEnabled:!lockedOrRunningMaintenance];
+
+	[gtMatrix						setEnabled:!lockedOrRunningMaintenance];
+	[inputInvertedMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[thresholdMatrix				setEnabled:!lockedOrRunningMaintenance];
+	[internalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
+	[externalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
+	[internalGateEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[externalGateEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[internalTriggerDelayMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[dacOffsetMatrix				setEnabled:!lockedOrRunningMaintenance];
+	[gateLengthMatrix				setEnabled:!lockedOrRunningMaintenance];
+	[pulseLengthMatrix				setEnabled:!lockedOrRunningMaintenance];
+	[sumGMatrix						setEnabled:!lockedOrRunningMaintenance];
+	[peakingTimeMatrix				setEnabled:!lockedOrRunningMaintenance];
+	
+	[lemoInEnabledMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[triggerOutEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
+	
+	//mca specific
+	[adc50KTriggerEnabledMatrix setEnabled:!lockedOrRunningMaintenance && mcaMode];
+	[mcaModePU					setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaHistoSizePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaLNESourcePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaScanBank2FlagCB			setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaPileupEnabledCB			setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaAutoClearCB				setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaNofScansPresetField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaPrescaleFactorField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
+    [mcaNofHistoPresetField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
+	
 }
 
 - (void) setModel:(id)aModel

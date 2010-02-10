@@ -83,8 +83,8 @@
 	IBOutlet NSMatrix*		internalTriggerDelayMatrix;
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
-    IBOutlet NSButton*      statusButton;
-	IBOutlet NSButton*		checkEventButton;
+    IBOutlet NSButton*      reportButton;
+    IBOutlet NSButton*      probeButton;
 	
 	IBOutlet NSPopUpButton*	triggerDecimationPU;
 	IBOutlet NSPopUpButton*	energyDecimationPU;
