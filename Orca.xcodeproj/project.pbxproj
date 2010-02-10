@@ -1057,6 +1057,12 @@
 		8468E6F6069321DA00B57CE8 /* NcdPDSStepTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8468E6F3069321DA00B57CE8 /* NcdPDSStepTask.nib */; };
 		8468E6FA06932C3F00B57CE8 /* NcdLogAmpTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */; };
 		8468E6FB06932C4000B57CE8 /* NcdLogAmpTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */; };
+		84693F731121BB4C008B5DB2 /* ORRunNotesController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84693F6C1121BB4C008B5DB2 /* ORRunNotesController.h */; };
+		84693F741121BB4C008B5DB2 /* ORRunNotesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84693F6D1121BB4C008B5DB2 /* ORRunNotesController.m */; };
+		84693F751121BB4C008B5DB2 /* ORRunNotesModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84693F6E1121BB4C008B5DB2 /* ORRunNotesModel.h */; };
+		84693F761121BB4C008B5DB2 /* ORRunNotesModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84693F6F1121BB4C008B5DB2 /* ORRunNotesModel.m */; };
+		84693F771121BB4C008B5DB2 /* RunNotes.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84693F701121BB4C008B5DB2 /* RunNotes.nib */; };
+		84693F781121BB4C008B5DB2 /* RunNotes.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84693F711121BB4C008B5DB2 /* RunNotes.tif */; };
 		846A08F20B77BAAA00B811F4 /* NoADUDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */; };
 		846A5EB30FF126B2001CBD54 /* WebServer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 846A5EB20FF126B2001CBD54 /* WebServer.gif */; };
 		846B8F0F0E15972A00C41F9D /* ICS8065Box.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F080E15972A00C41F9D /* ICS8065Box.tif */; };
@@ -3169,6 +3175,12 @@
 		8468E6F3069321DA00B57CE8 /* NcdPDSStepTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = NcdPDSStepTask.nib; sourceTree = "<group>"; };
 		8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdLogAmpTask.h; sourceTree = "<group>"; };
 		8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdLogAmpTask.m; sourceTree = "<group>"; };
+		84693F6C1121BB4C008B5DB2 /* ORRunNotesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunNotesController.h; path = Source/Objects/Control/RunNotes/ORRunNotesController.h; sourceTree = SOURCE_ROOT; };
+		84693F6D1121BB4C008B5DB2 /* ORRunNotesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunNotesController.m; path = Source/Objects/Control/RunNotes/ORRunNotesController.m; sourceTree = SOURCE_ROOT; };
+		84693F6E1121BB4C008B5DB2 /* ORRunNotesModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunNotesModel.h; path = Source/Objects/Control/RunNotes/ORRunNotesModel.h; sourceTree = SOURCE_ROOT; };
+		84693F6F1121BB4C008B5DB2 /* ORRunNotesModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunNotesModel.m; path = Source/Objects/Control/RunNotes/ORRunNotesModel.m; sourceTree = SOURCE_ROOT; };
+		84693F701121BB4C008B5DB2 /* RunNotes.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RunNotes.nib; path = Source/Objects/Control/RunNotes/RunNotes.nib; sourceTree = SOURCE_ROOT; };
+		84693F711121BB4C008B5DB2 /* RunNotes.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunNotes.tif; path = Source/Objects/Control/RunNotes/RunNotes.tif; sourceTree = SOURCE_ROOT; };
 		846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoADUDriverHelp.plist; path = Source/Objects/Hardware/USB/ADU200/NoADUDriverHelp.plist; sourceTree = SOURCE_ROOT; };
 		846A5EB20FF126B2001CBD54 /* WebServer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = WebServer.gif; path = "Source/Main Document/WebServer.gif"; sourceTree = SOURCE_ROOT; };
 		846B8F080E15972A00C41F9D /* ICS8065Box.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ICS8065Box.tif; path = Source/Objects/Hardware/GPIB/ICS8065/ICS8065Box.tif; sourceTree = SOURCE_ROOT; };
@@ -5831,6 +5843,7 @@
 				84539C470807247A00615B6D /* RemoteRunControl */,
 				842F19A703B8EAF3005F64B1 /* RunControl */,
 				84B28DCE0F4C6FED00E2B056 /* Ramper */,
+				84693F6A1121BB4C008B5DB2 /* RunNotes */,
 			);
 			name = Control;
 			path = Source/Objects/Control;
@@ -6491,6 +6504,20 @@
 			);
 			name = LogAmpTask;
 			path = Source/Experiments/Ncd/LogAmpTask;
+			sourceTree = SOURCE_ROOT;
+		};
+		84693F6A1121BB4C008B5DB2 /* RunNotes */ = {
+			isa = PBXGroup;
+			children = (
+				84693F6C1121BB4C008B5DB2 /* ORRunNotesController.h */,
+				84693F6D1121BB4C008B5DB2 /* ORRunNotesController.m */,
+				84693F6E1121BB4C008B5DB2 /* ORRunNotesModel.h */,
+				84693F6F1121BB4C008B5DB2 /* ORRunNotesModel.m */,
+				84693F701121BB4C008B5DB2 /* RunNotes.nib */,
+				84693F711121BB4C008B5DB2 /* RunNotes.tif */,
+			);
+			name = RunNotes;
+			path = Source/Objects/Control/RunNotes;
 			sourceTree = SOURCE_ROOT;
 		};
 		846B8F070E15972A00C41F9D /* ICS8065 */ = {
@@ -10469,6 +10496,8 @@
 				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
 				8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */,
 				84DCB61A110E116E0062A95C /* ORiTransGasSensorDecoder.h in Headers */,
+				84693F731121BB4C008B5DB2 /* ORRunNotesController.h in Headers */,
+				84693F751121BB4C008B5DB2 /* ORRunNotesModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11137,6 +11166,8 @@
 				849013C810E27B13007591B5 /* PlotLink.nib in Resources */,
 				849013C910E27B13007591B5 /* 2DPlotLink.tif in Resources */,
 				8490160810E31582007591B5 /* 1DPlotLink.tif in Resources */,
+				84693F771121BB4C008B5DB2 /* RunNotes.nib in Resources */,
+				84693F781121BB4C008B5DB2 /* RunNotes.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11884,6 +11915,8 @@
 				8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */,
 				8411A93311063ACC00CD9544 /* ORUsbDeviceModel.m in Sources */,
 				84DCB61B110E116E0062A95C /* ORiTransGasSensorDecoder.m in Sources */,
+				84693F741121BB4C008B5DB2 /* ORRunNotesController.m in Sources */,
+				84693F761121BB4C008B5DB2 /* ORRunNotesModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
