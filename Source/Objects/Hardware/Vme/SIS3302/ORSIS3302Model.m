@@ -443,13 +443,13 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		[self setInternalTriggerDelay:i withValue:0];
 		[self setDacOffset:i withValue:30000];
 	}
+	[self setTriggerDecimation:0];
+	[self setEnergyDecimation:0];
 	
 	[self setSampleLength:2048];
 	[self setSampleStartIndex:0];
 	[self setEnergyPeakingTime:100];
 	[self setEnergyGapTime:25];
-	[self setTriggerDecimation:3];
-	[self setEnergyDecimation:3];
 	[self setPreTriggerDelay:0];
 	[self setTriggerGateLength:50000];
 	[self setShipEnergyWaveform:NO];
