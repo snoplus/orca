@@ -54,6 +54,8 @@
  */
 //-------------------------------------------------------------
 
+#define kPageLength (65*1024)
+
 - (id) init
 {
     self = [super init];
@@ -77,25 +79,27 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
-		
+
+	unsigned long energy = ptr[6];
+	
+	int page = energy/kPageLength;
+	int startPage = page*kPageLength;
+	int endPage = (page+1)*kPageLength;
+	
 	//channel by channel histograms
-	unsigned long energy = ptr[6]; ///*16; removed the /16 for Brandon... may leave it out
-	[aDataSet histogram:energy 
-				numBins:65535 
-				 sender:self  
-			   withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
+	[aDataSet histogram:energy - page*kPageLength 
+				numBins:kPageLength sender:self  
+			   withKeys:@"FLT", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,stationKey,channelKey,nil];
 	
 	//accumulated card level histograms
-	[aDataSet histogram:energy 
-				numBins:65535 
-				 sender:self  
-			   withKeys: @"FLT",@"Total Card Energy",crateKey,stationKey,nil];
+	[aDataSet histogram:energy - page*kPageLength 
+				numBins:kPageLength sender:self  
+			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Card Energy (%d - %d)",startPage,endPage], crateKey,stationKey,nil];
 	
 	//accumulated crate level histograms
-	[aDataSet histogram:energy
-				numBins:65535 
-				 sender:self  
-			   withKeys: @"FLT",@"Total Crate Energy",crateKey,nil];
+	[aDataSet histogram:energy - page*kPageLength 
+				numBins:kPageLength sender:self  
+			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
 
 	//get the actual object
 	if(getRatesFromDecodeStage){
@@ -208,24 +212,28 @@
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
 	//channel by channel histograms
-	unsigned long energy = ptr[6]; ///*16; removed the /16 for Brandon... may leave it out
-	[aDataSet histogram:energy 
-				numBins:65535 
-				 sender:self  
-			   withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
+	unsigned long energy = ptr[6];
+
+	int page = energy/kPageLength;
+	int startPage = page*kPageLength;
+	int endPage = (page+1)*kPageLength;
+	
+	//channel by channel histograms
+	[aDataSet histogram:energy - page*kPageLength 
+				numBins:kPageLength sender:self  
+			   withKeys:@"FLT", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,stationKey,channelKey,nil];
 	
 	//accumulated card level histograms
-	[aDataSet histogram:energy 
-				numBins:65535 
-				 sender:self  
-			   withKeys: @"FLT",@"Total Card Energy",crateKey,stationKey,nil];
+	[aDataSet histogram:energy - page*kPageLength 
+				numBins:kPageLength sender:self  
+			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Card Energy (%d - %d)",startPage,endPage], crateKey,stationKey,nil];
 	
 	//accumulated crate level histograms
-	[aDataSet histogram:energy
-				numBins:65535 
-				 sender:self  
-			   withKeys: @"FLT",@"Total Crate Energy",crateKey,nil];
-
+	[aDataSet histogram:energy - page*kPageLength 
+				numBins:kPageLength sender:self  
+			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
+	
+	
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
 	
