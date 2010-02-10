@@ -93,6 +93,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
                          name : ORAlarmCollectionEmailEnabledChanged
                        object : [self alarmCollection]];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(addressAdded:)
+                         name : ORAlarmCollectionAddressAdded
+                       object : [self alarmCollection]];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(addressRemoved:)
+                         name : ORAlarmCollectionAddressRemoved
+                       object : [self alarmCollection]];		
+	
 }
 
 
@@ -212,12 +222,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
     [[[NSApp delegate]document] saveDocumentAs:sender];
 }
 
+- (IBAction)delete:(id)sender
+{
+    [self removeAddress:nil];
+}
+
+- (IBAction) cut:(id)sender
+{
+    [self removeAddress:nil];
+}
+
 - (IBAction) addAddress:(id)sender
 {
 	[[self alarmCollection] addAddress];
-	[addressList reloadData];
-	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:[[self alarmCollection] eMailCount]-1];
-	[addressList selectRowIndexes:indexSet byExtendingSelection:NO];
 }
 
 - (IBAction) removeAddress:(id)sender
@@ -227,10 +244,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 	NSIndexSet* theSet = [addressList selectedRowIndexes];
 	unsigned current_index = [theSet firstIndex];
     if(current_index != NSNotFound){
-		[[self alarmCollection] removeAddress:current_index];
-		[addressList reloadData];
-		NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:[[self alarmCollection] eMailCount]-1];
-		[addressList selectRowIndexes:indexSet byExtendingSelection:NO];
+		[[self alarmCollection] removeAddressAtIndex:current_index];
 	}
 }
 
@@ -289,6 +303,26 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 	}
 }
 
+- (void) addressAdded:(NSNotification*)aNote
+{
+	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+	index = MIN(index,[[self alarmCollection] eMailCount]);
+	index = MAX(index,0);
+	[addressList reloadData];
+	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
+	[addressList selectRowIndexes:indexSet byExtendingSelection:NO];
+}
+
+- (void) addressRemoved:(NSNotification*)aNote
+{
+	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+	index = MIN(index,[[self alarmCollection] eMailCount]-1);
+	index = MAX(index,0);
+	[addressList reloadData];
+	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
+	[addressList selectRowIndexes:indexSet byExtendingSelection:NO];
+}
+
 - (void) addressChanged:(NSNotification*)aNotification
 {
 	int selectedIndex = [addressList selectedRow];
@@ -296,6 +330,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 		id addressObj = [[self alarmCollection] addressAtIndex:selectedIndex];
 		if([aNotification object] == addressObj){
 			[addressField setStringValue:[addressObj mailAddress]];
+			[addressList reloadData];
 		}
 	}
 }
@@ -308,6 +343,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 - (void) documentLoaded:(NSNotification*)aNotification
 {
 	[addressList reloadData];
+}
+
+- (BOOL) validateMenuItem:(NSMenuItem*)menuItem
+{
+    if ([menuItem action] == @selector(cut:)) {
+        return [addressList selectedRow] >= 0 ;
+    }
+    else if ([menuItem action] == @selector(delete:)) {
+        return [addressList selectedRow] >= 0;
+    }
+	[super validateMenuItem:menuItem];
+	return YES;
 }
 
 #pragma mark •••Data Source Methods

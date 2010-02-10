@@ -28,6 +28,8 @@
 #import "ORMailer.h"
 
 NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabledChanged";
+NSString* ORAlarmCollectionAddressAdded   = @"ORAlarmCollectionAddressAdded";
+NSString* ORAlarmCollectionAddressRemoved = @"ORAlarmCollectionAddressRemoved";
 
 @implementation ORAlarmCollection
 
@@ -284,15 +286,32 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 }
 
 - (void) addAddress
-{
-	if(!eMailList)[self setEMailList:[NSMutableArray array]];
-	[eMailList addObject:[[[ORAlarmEMailDestination alloc] init] autorelease]];
+{	
+	if(!eMailList) [self setEMailList:[NSMutableArray array]];
+	id newAddress = [[[ORAlarmEMailDestination alloc] init] autorelease];
+	[self addAddress:newAddress atIndex:[eMailList count]];
 }
 
-- (void) removeAddress:(int) anIndex
+- (void) addAddress:(id)anAddress atIndex:(int)anIndex
 {
-	[eMailList removeObjectAtIndex:anIndex];
+	if(!eMailList) eMailList= [[NSMutableArray array] retain];
+	if([eMailList count] == 0)anIndex = 0;
+	anIndex = MIN(anIndex,[eMailList count]);
+	[[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] removeAddressAtIndex:anIndex];
+	[eMailList insertObject:anAddress atIndex:anIndex];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionAddressAdded object:self userInfo:userInfo];
 }
+
+- (void) removeAddressAtIndex:(int) anIndex
+{
+	id anAddress = [eMailList objectAtIndex:anIndex];
+	[[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] addAddress:anAddress atIndex:anIndex];
+	[eMailList removeObjectAtIndex:anIndex];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionAddressRemoved object:self userInfo:userInfo];
+}
+
 
 - (ORAlarmEMailDestination*) addressAtIndex:(int)anIndex
 {

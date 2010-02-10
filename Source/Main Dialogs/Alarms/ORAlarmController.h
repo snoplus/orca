@@ -60,8 +60,11 @@
 - (void) severitySelectionChanged:(NSNotification*)aNotification;
 - (void) addressChanged:(NSNotification*)aNotification;
 - (void) documentLoaded:(NSNotification*)aNotification;
+- (void) addressAdded:(NSNotification*)aNote;
+- (void) addressRemoved:(NSNotification*)aNote;
 
 - (void) setUpHelpText;
+- (BOOL)validateMenuItem:(NSMenuItem*)menuItem;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;

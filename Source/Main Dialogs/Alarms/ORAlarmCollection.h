@@ -61,17 +61,19 @@
 - (void) removeAlarm:(ORAlarm*)anAlarm;
 - (void) removeAlarmWithName:(NSString*)aName;
 
-
 #pragma mark •••EMail Management
 - (int) eMailCount;
 - (void) decodeEMailList:(NSCoder*) aDecoder;
 - (void) encodeEMailList:(NSCoder*) anEncoder;
 - (void) addAddress;
-- (void) removeAddress:(int) anAddress;
+- (void) addAddress:(id)anAddress atIndex:(int)anIndex;
+- (void) removeAddressAtIndex:(int) anIndex;
 - (ORAlarmEMailDestination*) addressAtIndex:(int)anIndex;
 @end
 
 extern NSString* ORAlarmCollectionEmailEnabledChanged;
+extern NSString* ORAlarmCollectionAddressAdded;
+extern NSString* ORAlarmCollectionAddressRemoved;
 
 //--------------------------------------------------------------
 //--------------------------------------------------------------
