@@ -28,6 +28,7 @@
 - (void) endOfRunCleanup:(id)userInfo;
 - (void) setRunMode:(int)aMode;
 - (void) runIsStopping:(id)userInfo;
+- (BOOL) runModals;
 
 @end
 

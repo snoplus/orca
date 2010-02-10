@@ -45,13 +45,24 @@ NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInC
 		[anArray addObject:dictionary];
 	}
 }
+
 - (void) runIsStopping:(id)userInfo
 {
 }
+
 - (void) endOfRunCleanup:(id)userInfo
 {
 }
+
 - (void) setRunMode:(int)aMode
 {
 }
+
+- (BOOL) runModals
+{
+	//objects can override.
+	//return NO if run should not proceed.
+	return YES;
+}
+
 @end
