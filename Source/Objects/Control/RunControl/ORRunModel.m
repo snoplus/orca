@@ -740,7 +740,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         _forceRestart = YES;
         [self stopRun];
     }
-    else [self startRun:!quickStart];
+    else {
+		id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
+		if([nextObject runModals]){
+			[self startRun:!quickStart];
+		}
+		else {
+			if([self isRunning])[self stopRun];
+			else [self setRunningState:eRunStopped];
+		}
+	}
 }
 
 - (void) restartRun
@@ -1338,8 +1347,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[NSThread setThreadPriority:1];
 	//alloc a large block to force the memory system to clean house
 	char* p = malloc(1024*1024*50);
-	if(p)*p=1; //use it so the compile doesn't optimize it away.
-	free(p);
+	if(p){
+		*p=1; //use it so the compile doesn't optimize it away.
+		free(p);
+	}
 
 	dataTakingThreadRunning = YES;
     [self clearExceptionCount];
