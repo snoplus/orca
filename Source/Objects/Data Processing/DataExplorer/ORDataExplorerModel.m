@@ -255,11 +255,11 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 		queue = [[NSOperationQueue alloc] init];
 	}
 	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseStartedNotification object: self];
 	[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
 	if(recordIndexer)[recordIndexer release];
 	recordIndexer = [[ORRecordIndexer alloc] initWithPath:fileToExplore delegate:self];
 	[queue addOperation:recordIndexer];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseStartedNotification object: self];
 
 }
 
