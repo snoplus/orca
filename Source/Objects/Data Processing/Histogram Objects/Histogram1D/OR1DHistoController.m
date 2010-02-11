@@ -53,7 +53,6 @@
     [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
 	[self rebinChanged:nil];
 	[self rebinNumberChanged:nil];
-
 }
 
 - (void) registerNotificationObservers
@@ -78,14 +77,6 @@
                          name : OR1DHisotRebinNumberChanged
                        object : model];
 
-}
-
-- (void) dataSetChanged:(NSNotification*)aNotification
-{
-	[self rebinNumberChanged:nil];
-	[self rebinChanged:nil];
-	
-	[super dataSetChanged:aNotification];
 }
 
 - (void) rebinNumberChanged:(NSNotification*) aNote
