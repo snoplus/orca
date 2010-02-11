@@ -87,6 +87,7 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
 - (NSDictionary*) dataRecordDescription;
+- (void) cancelRequest:(NSNotification*)aNote;
 - (void) requestNotification:(NSNotification*)aNote;
 - (void) sendRequest:(NSMutableDictionary*)request fromObject:(id)anObject;
 - (unsigned) connectionHistoryCount;

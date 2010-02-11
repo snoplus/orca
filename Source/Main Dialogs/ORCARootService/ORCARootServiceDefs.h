@@ -21,6 +21,7 @@
 //-------------------------------------------------------------
 
 #define ORCARootServiceRequestNotification	@"ORCARootServiceRequestNotification"
+#define ORCARootServiceCancelRequest		@"ORCARootServiceCancelRequest"
 #define ORCARootServiceConnectedKey			@"ORCARootServiceConnectedKey"
 #define ORCARootServiceFitFunctionKey		@"ORCARootServiceFitFunctionKey"
 #define ORCARootServiceFitOrderKey			@"ORCARootServiceFitOrderKey"

@@ -63,7 +63,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     [[self undoManager] enableUndoRegistration];
     	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestNotification:) name:ORCARootServiceRequestNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cancelRequest:) name:ORCARootServiceCancelRequest object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(broadcastConnectionStatus) name:ORCARootServiceBroadcastConnection object:nil];
+
 	RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
 		
     return self;
@@ -424,6 +426,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	}
 }
 
+- (void) cancelRequest:(NSNotification*)aNote
+{
+	id requestingObj = [aNote object];
+	NSArray* allKeys = [waitingObjects allKeys];
+	for(id aKey in allKeys){
+		id anObj = [waitingObjects objectForKey:aKey];
+		if(anObj == requestingObj){
+			[waitingObjects removeObjectForKey:aKey]; 
+		}
+	}
+}
+
 - (void) requestNotification:(NSNotification*)aNote
 {
 	[self sendRequest:[[aNote userInfo] objectForKey:ServiceRequestKey] fromObject:[aNote object]];
@@ -447,12 +461,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	NSData* dataBlock = [request asData];
 	
 	//the request is now in dataBlock
-	unsigned long headerLength        = [dataBlock length];											//in bytes
-	unsigned long lengthWhenPadded    = sizeof(long)*(round(.5 + headerLength/(float)sizeof(long)));					//in bytes
-	unsigned long padSize             = lengthWhenPadded - headerLength;							//in bytes
-	unsigned long totalLength		  = 1 + (lengthWhenPadded/4);									//in longs
-	unsigned long theHeaderWord = dataId | (0x1ffff & totalLength);										//compose the header word
-	NSMutableData* dataToSend = [NSMutableData dataWithBytes:&theHeaderWord length:sizeof(long)];			//add the header word
+	unsigned long headerLength        = [dataBlock length];												  //in bytes
+	unsigned long lengthWhenPadded    = sizeof(long)*(round(.5 + headerLength/(float)sizeof(long)));	  //length in bytes to long boundary
+	unsigned long padSize             = lengthWhenPadded - headerLength;								  //in bytes
+	unsigned long totalLength		  = 1 + (lengthWhenPadded/sizeof(long));							  //in longs
+	unsigned long theHeaderWord		  = dataId | (0x3ffff & totalLength);								  //compose the header word
+	NSMutableData* dataToSend		  = [NSMutableData dataWithBytes:&theHeaderWord length:sizeof(long)]; //add the header word
 	
 	[dataToSend appendData:dataBlock];
 	
