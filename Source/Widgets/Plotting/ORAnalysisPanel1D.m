@@ -66,8 +66,8 @@
 
 - (void) dealloc
 {
+	[fitFunction release], fitFunction = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[fitFunction release];
     [analysisView removeFromSuperview];
     [super dealloc];
 }
