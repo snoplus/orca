@@ -91,17 +91,17 @@ const float kGateAlpha2 = .1;
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [attributes release];
-    [fitLableAttributes release];
-    [analysis release];
-    [displayedGateName release];
+    [attributes release], attributes=nil;
+    [fitLableAttributes release], fitLableAttributes=nil;;
+    [analysis release], analysis=nil;;
+    [displayedGateName release], displayedGateName=nil;;
 	
-	[fitString release];
-	[fit release];
-	[fitParams release];
-	[fitParamNames release];
-	[fitParamErrors release];
-	[chiSquare release];
+	[fitString release], fitString=nil;;
+	[fit release], fit=nil;;
+	[fitParams release], fitParams=nil;;
+	[fitParamNames release], fitParamNames=nil;;
+	[fitParamErrors release], fitParamErrors=nil;;
+	[chiSquare release], chiSquare=nil;;
 	
     [super dealloc];
 }
@@ -126,12 +126,6 @@ const float kGateAlpha2 = .1;
 {
 	[analysis adjustSize];
 }
-
-
-
-
-
-
 
 - (void) setDefaults
 {

@@ -29,9 +29,11 @@ NSString* ORPlotterDataColor		= @"ORPlotterDataColor";
 @implementation ORPlotter
 -(void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [gradient release];
+    [gradient release],gradient = nil;
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
     [super dealloc];
 }
 

@@ -50,7 +50,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 -(void)dealloc
 {
     [attributes release];
-    [gates release];
+    [gates release], gates = nil;
     [super dealloc];
 }
 

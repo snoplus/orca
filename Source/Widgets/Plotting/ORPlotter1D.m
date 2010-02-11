@@ -47,7 +47,8 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 -(void)dealloc
 {
-    [curves release];	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCARootServiceCancelRequest object:self];
+    [curves release], curves = nil;	
     [super dealloc];
 }
 
@@ -151,7 +152,10 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 - (id) activeCurve
 {
 	if([curves count]){
-		return [curves objectAtIndex:activeCurveIndex];
+		if(activeCurveIndex < [curves count]){
+			return [curves objectAtIndex:activeCurveIndex];
+		}
+		else return [curves objectAtIndex:0];
 	}
 	else return nil;
 }
