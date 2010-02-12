@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1339"/>
+			<integer value="4164"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -5812,6 +5812,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<string key="NSKeyEquiv"/>
 																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
+																		<int key="NSState">1</int>
 																		<reference key="NSOnImage" ref="229067266"/>
 																		<reference key="NSMixedImage" ref="287520686"/>
 																		<string key="NSAction">_popUpItemAction:</string>
@@ -6091,7 +6092,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<reference key="NSSuperview" ref="329719972"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSPopUpButtonCell" key="NSCell" id="877578172">
-																	<int key="NSCellFlags">-2076049856</int>
+																	<int key="NSCellFlags">71433792</int>
 																	<int key="NSCellFlags2">134350848</int>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="245494864"/>
@@ -6101,12 +6102,13 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<object class="NSMenuItem" key="NSMenuItem" id="166889501">
+																	<object class="NSMenuItem" key="NSMenuItem" id="858311740">
 																		<reference key="NSMenu" ref="543231291"/>
-																		<string key="NSTitle">Internal 10MHz</string>
+																		<string key="NSTitle">External Next Pulse</string>
 																		<string key="NSKeyEquiv"/>
 																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
+																		<int key="NSState">1</int>
 																		<reference key="NSOnImage" ref="229067266"/>
 																		<reference key="NSMixedImage" ref="287520686"/>
 																		<string key="NSAction">_popUpItemAction:</string>
@@ -6117,9 +6119,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<string key="NSTitle">OtherViews</string>
 																		<object class="NSMutableArray" key="NSMenuItems">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
-																			<object class="NSMenuItem" id="858311740">
+																			<reference ref="858311740"/>
+																			<object class="NSMenuItem" id="166889501">
 																				<reference key="NSMenu" ref="543231291"/>
-																				<string key="NSTitle">External Next Pulse</string>
+																				<string key="NSTitle">Internal 10MHz</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
@@ -6128,7 +6131,6 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																				<string key="NSAction">_popUpItemAction:</string>
 																				<reference key="NSTarget" ref="877578172"/>
 																			</object>
-																			<reference ref="166889501"/>
 																		</object>
 																	</object>
 																	<int key="NSSelectedIndex">1</int>
@@ -13290,6 +13292,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>4129.IBPluginDependency</string>
 					<string>4131.IBPluginDependency</string>
 					<string>4132.IBPluginDependency</string>
+					<string>4134.IBPluginDependency</string>
 					<string>4135.IBPluginDependency</string>
 					<string>4135.ImportedFromIB2</string>
 					<string>4136.IBPluginDependency</string>
@@ -13315,6 +13318,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>4161.IBPluginDependency</string>
 					<string>4161.ImportedFromIB2</string>
 					<string>4162.IBPluginDependency</string>
+					<string>4164.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -13647,9 +13651,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{416, 377}, {947, 700}}</string>
+					<string>{{285, 377}, {947, 700}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{416, 377}, {947, 700}}</string>
+					<string>{{285, 377}, {947, 700}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<string>{213, 107}</string>
@@ -14285,18 +14289,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -14308,6 +14300,20 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>

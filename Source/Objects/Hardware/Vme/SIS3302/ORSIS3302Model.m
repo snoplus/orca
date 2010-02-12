@@ -1219,7 +1219,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 - (void) writeMcaLNESetupAndPrescalFactor
 {
 	
-	unsigned long aValue = mcaLNESetup<<28 | (mcaPrescaleFactor & 0xfffffff);
+	unsigned long aValue = ((mcaLNESetup & 0x3)<<28) | (mcaPrescaleFactor & 0x0ffffff);
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kSIS3302McaScanSetupPrescaleFactor
                         numToWrite:1
