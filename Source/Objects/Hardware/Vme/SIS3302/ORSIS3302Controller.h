@@ -28,8 +28,11 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet NSButton*		mcaUseEnergyCalculationButton;
+	IBOutlet NSTextField*	mcaEnergyOffsetField;
+	IBOutlet NSTextField*	mcaEnergyMultiplierField;
+	IBOutlet NSTextField*	mcaEnergyDividerField;
 	IBOutlet NSPopUpButton* mcaModePU;
-	IBOutlet NSButton*		mcaScanBank2FlagCB;
 	IBOutlet NSButton*		mcaPileupEnabledCB;
 	IBOutlet NSPopUpButton* mcaHistoSizePU;
 	IBOutlet NSPopUpButton* mcaLNESourcePU;
@@ -90,7 +93,6 @@
 	IBOutlet NSPopUpButton*	energyDecimationPU;
 	
     IBOutlet NSTextField*	mcaBusyField;
-    IBOutlet NSTextField*	mcaMultiScanBusyField;
 	
     IBOutlet NSTextField*   mcaScanHistogramCounterField;
     IBOutlet NSTextField*   mcaMultiScanScanCounterField;
@@ -122,9 +124,13 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) mcaEnergyCalculationValues;
+- (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote;
+- (void) mcaEnergyOffsetChanged:(NSNotification*)aNote;
+- (void) mcaEnergyMultiplierChanged:(NSNotification*)aNote;
+- (void) mcaEnergyDividerChanged:(NSNotification*)aNote;
 - (void) mcaStatusChanged:(NSNotification*)aNote;
 - (void) mcaModeChanged:(NSNotification*)aNote;
-- (void) mcaScanBank2FlagChanged:(NSNotification*)aNote;
 - (void) mcaPileupEnabledChanged:(NSNotification*)aNote;
 - (void) mcaHistoSizeChanged:(NSNotification*)aNote;
 - (void) mcaNofScansPresetChanged:(NSNotification*)aNote;
@@ -183,8 +189,11 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) mcaUseEnergyCalculationAction:(id)sender;
+- (IBAction) mcaEnergyOffsetAction:(id)sender;
+- (IBAction) mcaEnergyMultiplierAction:(id)sender;
+- (IBAction) mcaEnergyDividerAction:(id)sender;
 - (IBAction) mcaModeAction:(id)sender;
-- (IBAction) mcaScanBank2FlagAction:(id)sender;
 - (IBAction) mcaPileupEnabledAction:(id)sender;
 - (IBAction) mcaHistoSizeAction:(id)sender;
 - (IBAction) mcaNofScansPresetAction:(id)sender;

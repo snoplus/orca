@@ -30,8 +30,11 @@
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
 
+NSString* ORSIS3302ModelMcaUseEnergyCalculationChanged  = @"ORSIS3302ModelMcaUseEnergyCalculationChanged";
+NSString* ORSIS3302ModelMcaEnergyOffsetChanged			= @"ORSIS3302ModelMcaEnergyOffsetChanged";
+NSString* ORSIS3302ModelMcaEnergyMultiplierChanged		= @"ORSIS3302ModelMcaEnergyMultiplierChanged";
+NSString* ORSIS3302ModelMcaEnergyDividerChanged			= @"ORSIS3302ModelMcaEnergyDividerChanged";
 NSString* ORSIS3302ModelMcaModeChanged					= @"ORSIS3302ModelMcaModeChanged";
-NSString* ORSIS3302ModelMcaScanBank2FlagChanged			= @"ORSIS3302ModelMcaScanBank2FlagChanged";
 NSString* ORSIS3302ModelMcaPileupEnabledChanged			= @"ORSIS3302ModelMcaPileupEnabledChanged";
 NSString* ORSIS3302ModelMcaHistoSizeChanged				= @"ORSIS3302ModelMcaHistoSizeChanged";
 NSString* ORSIS3302ModelMcaNofScansPresetChanged		= @"ORSIS3302ModelMcaNofScansPresetChanged";
@@ -138,15 +141,46 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (NSString*) helpURL
 {
-	return @"VME/SIS330x.html";
+	return @"VME/SIS3302.html";
 }
 
 - (NSRange)	memoryFootprint
 {
-	return NSMakeRange(baseAddress,0x00780000+0x80000);
+	return NSMakeRange(baseAddress, 0x00780000 + (8*0x1024*0x1024));
 }
 
 #pragma mark ***Accessors
+- (BOOL) mcaUseEnergyCalculation { return mcaUseEnergyCalculation; }
+- (void) setMcaUseEnergyCalculation:(BOOL)aMcaUseEnergyCalculation
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaUseEnergyCalculation:mcaUseEnergyCalculation];
+    mcaUseEnergyCalculation = aMcaUseEnergyCalculation;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaUseEnergyCalculationChanged object:self];
+}
+
+- (int) mcaEnergyOffset { return mcaEnergyOffset; }
+- (void) setMcaEnergyOffset:(int)aMcaEnergyOffset
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaEnergyOffset:mcaEnergyOffset];
+	mcaEnergyOffset = [self limitIntValue:aMcaEnergyOffset min:0 max:0xfffff];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaEnergyOffsetChanged object:self];
+}
+
+- (int) mcaEnergyMultiplier { return mcaEnergyMultiplier; }
+- (void) setMcaEnergyMultiplier:(int)aMcaEnergyMultiplier
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaEnergyMultiplier:mcaEnergyMultiplier];
+	mcaEnergyMultiplier = [self limitIntValue:aMcaEnergyMultiplier min:0 max:0xffff];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaEnergyMultiplierChanged object:self];
+}
+
+- (int) mcaEnergyDivider { return mcaEnergyDivider; }
+- (void) setMcaEnergyDivider:(int)aMcaEnergyDivider
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMcaEnergyDivider:mcaEnergyDivider];
+	mcaEnergyDivider = [self limitIntValue:aMcaEnergyDivider min:1 max:16];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaEnergyDividerChanged object:self];
+}
 
 - (int) mcaMode { return mcaMode; }
 - (void) setMcaMode:(int)aMcaMode
@@ -154,14 +188,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setMcaMode:mcaMode];
     mcaMode = aMcaMode;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaModeChanged object:self];
-}
-
-- (BOOL) mcaScanBank2Flag { return mcaScanBank2Flag; }
-- (void) setMcaScanBank2Flag:(BOOL)aMcaScanBank2Flag
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setMcaScanBank2Flag:mcaScanBank2Flag];
-    mcaScanBank2Flag = aMcaScanBank2Flag;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelMcaScanBank2FlagChanged object:self];
 }
 
 - (BOOL) mcaPileupEnabled { return mcaPileupEnabled; }
@@ -960,9 +986,10 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (void) writeThresholds
 {   
+	ORCommandList* aList = [ORCommandList commandList];
 	int i;
 	unsigned long thresholdMask;
-	for(i = 0; i < 8; i++) {
+	for(i = 0; i < kNumSIS3302Channels; i++) {
 		thresholdMask = 0;
 		BOOL enabled   = [self triggerOutEnabled:i];
 		BOOL gtEnabled = [self gt:i];
@@ -970,12 +997,14 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		if(gtEnabled)	thresholdMask |= (1<<25);
 		thresholdMask |= (0x00010000 | [self threshold:i]);
 		
-		[[self adapter] writeLongBlock:&thresholdMask
-							 atAddress:[self baseAddress] + [self getThresholdRegOffsets:i]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
+													   atAddress: [self baseAddress] + [self getThresholdRegOffsets:i]
+													   numToWrite: 1
+													  withAddMod: [self addressModifier]
+												   usingAddSpace: 0x01]];
+		
 	}
+	[self executeCommandList:aList];
 }
 
 - (void) writeEventConfiguration
@@ -985,6 +1014,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	unsigned long tempIntGateMask  = ~internalGateEnabledMask;
 	unsigned long tempExtGateMask  = ~externalGateEnabledMask;
 	
+	ORCommandList* aList = [ORCommandList commandList];
 	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
 		aValueMask |= ((internalTriggerEnabledMask & (1<<(i*2)))!=0)     << 2;
@@ -999,23 +1029,24 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		aValueMask |= ((tempExtGateMask & (1<<(i*2)))!=0)       << 5;
 		aValueMask |= ((tempExtGateMask & (1<<((i*2)+1)))!=0)   << 13;
 		
-		[[self adapter] writeLongBlock:&aValueMask
-							 atAddress:[self baseAddress] + [self getEventConfigOffsets:i]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
+													   atAddress: [self baseAddress] + [self getEventConfigOffsets:i]
+													  numToWrite: 1
+													  withAddMod: [self addressModifier]
+												   usingAddSpace: 0x01]];
 	}
 	//extended event config reg
 	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
 		aValueMask |= ((adc50KTriggerEnabledMask & (1<<i*2))!=0)      << 0;
 		aValueMask |= ((adc50KTriggerEnabledMask & (1<<((i*2)+1)))!=0)<< 8;
-		[[self adapter] writeLongBlock:&aValueMask
-							 atAddress:[self baseAddress] + [self getExtendedEventConfigOffsets:i]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
+													   atAddress: [self baseAddress] + [self getExtendedEventConfigOffsets:i]
+													  numToWrite: 1
+													  withAddMod: [self addressModifier]
+												   usingAddSpace: 0x01]];
 	}
+	[self executeCommandList:aList];
 	
 }
 
@@ -1199,7 +1230,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 - (void) writeMcaScanControl
 {
 	
-	unsigned long aValue = mcaScanBank2Flag<<4 | mcaAutoClear;
+	unsigned long aValue = (mcaScanBank2Flag<<4) | !mcaAutoClear;
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kSIS3302McaScanControl
                         numToWrite:1
@@ -1327,6 +1358,36 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 						 usingAddSpace:0x01];
 	}
 }	
+
+
+- (void) writeMcaCalculationFactors
+{   
+	unsigned long calculationParm;
+	if(!mcaUseEnergyCalculation){
+		calculationParm = ((long)mcaEnergyDivider<<28) | ((long)mcaEnergyMultiplier<<20) | ((long)mcaEnergyOffset);
+	}
+	else {
+		//defaults
+		switch(mcaHistoSize) {
+			case 0: calculationParm = 0x68000000; break;	// 16bit value -> 1K
+			case 1: calculationParm = 0x58000000; break;	// 16bit value -> 2K
+			case 2: calculationParm = 0x48000000; break;	// 16bit value -> 4K
+			case 3: calculationParm = 0x38000000; break;	// 16bit value -> 8K histo
+		} 
+	}
+	
+	[[self adapter] writeLongBlock:&calculationParm
+						 atAddress:[self baseAddress] + kSIS3302McaEnergy2HistogramParamAdc1357
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];	
+	
+	[[self adapter] writeLongBlock:&calculationParm
+						 atAddress:[self baseAddress] + kSIS3302McaEnergy2HistogramParamAdc2468
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];	
+}
 
 - (void) report
 {
@@ -1556,6 +1617,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		[self writeMcaNofHistoPreset];
 		[self writeMcaLNESetupAndPrescalFactor];
 		[self writeMcaMultiScanNofScansPreset];
+		[self writeMcaCalculationFactors];
 	}
 	[self writeAcquistionRegister];			//set up the Acquisition Register
 }
@@ -1778,7 +1840,14 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 					 usingAddSpace:0x01];	
 }
 
+
 #pragma mark •••Data Taker
+- (unsigned long) mcaId { return mcaId; }
+- (void) setMcaId: (unsigned long) anId
+{
+    mcaId = anId;
+}
+
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -1787,24 +1856,35 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 - (void) setDataIds:(id)assigner
 {
     dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
+    mcaId       = [assigner assignDataIds:kLongForm]; //short form preferred
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
+    [self setMcaId:[anotherCard mcaId]];
 }
 
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORSIS3302Decoder",					@"decoder",
-								 [NSNumber numberWithLong:dataId],      @"dataId",
-								 [NSNumber numberWithBool:YES],         @"variable",
-								 [NSNumber numberWithLong:-1],			@"length",
-								 nil];
+	NSDictionary* aDictionary;
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+						   @"ORSIS3302Decoder",				@"decoder",
+						   [NSNumber numberWithLong:dataId],@"dataId",
+						   [NSNumber numberWithBool:YES],   @"variable",
+						   [NSNumber numberWithLong:-1],	@"length",
+						   nil];
     [dataDictionary setObject:aDictionary forKey:@"Energy"];
-    
+	
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+						   @"ORSIS3302McaDecoder",			@"decoder",
+						   [NSNumber numberWithLong:mcaId], @"dataId",
+						   [NSNumber numberWithBool:YES],   @"variable",
+						   [NSNumber numberWithLong:-1],	@"length",
+						   nil];
+    [dataDictionary setObject:aDictionary forKey:@"MCA"];
+	
     return dataDictionary;
 }
 
@@ -2062,6 +2142,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	dataRecord = nil;
 	
 	if(runMode == kMcaRunMode){
+		mcaScanBank2Flag = NO;
 		[self writeMcaArmMode];
 		[self pollMcaStatus];
 	}
@@ -2075,7 +2156,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
     @try {
 		if(runMode == kMcaRunMode){
-			
+			//do nothing.. read out mca spectrum at end
 		}
 		else {
 			if(firstTime){
@@ -2141,8 +2222,60 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	}
 }
 
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	if(runMode == kMcaRunMode){
+		unsigned long mcaLength;
+		switch (mcaHistoSize) {
+			case 0:  mcaLength = 1024; break;
+			case 1:  mcaLength = 2048; break;
+			case 2:  mcaLength = 4096; break;
+			case 3:  mcaLength = 8192; break;
+			default: mcaLength = 2048; break;
+		}
+		unsigned long pageOffset = 0x0;
+		if(mcaScanBank2Flag) pageOffset = 8 * 0x1024 * 0x1024;
+		
+		int channel;
+		for(channel=0;channel<kNumSIS3302Channels;channel++){
+			if(gtMask & (1<<channel)){
+				NSMutableData* mcaData = [NSMutableData dataWithLength:(mcaLength + 2)*sizeof(long)];
+				unsigned long* mcaBytes = (unsigned long*)[mcaData bytes];
+				mcaBytes[0] = mcaId | (mcaLength+2);
+				mcaBytes[1] =	(([self crateNumber]&0x0000000f)<<21) | 
+								(([self slot] & 0x0000001f)<<16)      |
+								((channel & 0x000000ff)<<8);
+				
+				[[self adapter] readLongBlock: &mcaBytes[2]
+									atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + pageOffset
+									numToRead: mcaLength
+								   withAddMod: [self addressModifier]
+								usingAddSpace: 0x01];
+				[aDataPacket addData:mcaData];
+			}
+		}
+	}
+}
+
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	if(runMode == kMcaRunMode){	
+		unsigned long aValue = 0;
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:[self baseAddress] + kSIS3302KeyMcaMultiScanDisable
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];	
+
+		[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSIS3302KeyMcaScanStop
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];	
+		
+		[self readMcaStatus];
+	}
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMcaStatus) object:nil];
 
 	if(dataRecord){
@@ -2158,21 +2291,27 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id				= kSIS3302; //should be unique
-	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
-	configStruct->card_info[index].slot						= [self slot];
-	configStruct->card_info[index].crate					= [self crateNumber];
-	configStruct->card_info[index].add_mod					= [self addressModifier];
-	configStruct->card_info[index].base_add					= [self baseAddress];
-    configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength]/2;
-    configStruct->card_info[index].deviceSpecificData[1]	= [self energySampleLength];
-	
-	configStruct->card_info[index].num_Trigger_Indexes		= 0;
-	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
-	
-	return index+1;
+	if(runMode == kMcaRunMode){
+		//in MCA mode there is nothing for the SBC to do... so don't ship any card config data to it.
+		return index; 
+	}
+	else {
+		configStruct->total_cards++;
+		configStruct->card_info[index].hw_type_id				= kSIS3302; //should be unique
+		configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
+		configStruct->card_info[index].slot						= [self slot];
+		configStruct->card_info[index].crate					= [self crateNumber];
+		configStruct->card_info[index].add_mod					= [self addressModifier];
+		configStruct->card_info[index].base_add					= [self baseAddress];
+		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength]/2;
+		configStruct->card_info[index].deviceSpecificData[1]	= [self energySampleLength];
+		
+		configStruct->card_info[index].num_Trigger_Indexes		= 0;
+		
+		configStruct->card_info[index].next_Card_Index 	= index+1;	
+		
+		return index+1;
+	}
 }
 
 - (void) reset
@@ -2228,8 +2367,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
+    [self setMcaUseEnergyCalculation:	[decoder decodeBoolForKey:@"mcaUseEnergyCalculation"]];
+    [self setMcaEnergyOffset:			[decoder decodeIntForKey:@"mcaEnergyOffset"]];
+    [self setMcaEnergyMultiplier:		[decoder decodeIntForKey:@"mcaEnergyMultiplier"]];
+    [self setMcaEnergyDivider:			[decoder decodeIntForKey:@"mcaEnergyDivider"]];
     [self setMcaMode:					[decoder decodeIntForKey:@"mcaMode"]];
-    [self setMcaScanBank2Flag:			[decoder decodeBoolForKey:@"mcaScanBank2Flag"]];
     [self setMcaPileupEnabled:			[decoder decodeBoolForKey:@"mcaPileupEnabled"]];
     [self setMcaHistoSize:				[decoder decodeIntForKey:@"mcaHistoSize"]];
     [self setMcaNofScansPreset:			[decoder decodeInt32ForKey:@"mcaNofScansPreset"]];
@@ -2297,8 +2439,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];
+	[encoder encodeInt:mcaEnergyOffset			forKey:@"mcaEnergyOffset"];
+	[encoder encodeInt:mcaEnergyMultiplier		forKey:@"mcaEnergyMultiplier"];
+	[encoder encodeInt:mcaEnergyDivider			forKey:@"mcaEnergyDivider"];
 	[encoder encodeInt:mcaMode					forKey:@"mcaMode"];
-	[encoder encodeBool:mcaScanBank2Flag		forKey:@"mcaScanBank2Flag"];
 	[encoder encodeBool:mcaPileupEnabled		forKey:@"mcaPileupEnabled"];
 	[encoder encodeInt:mcaHistoSize				forKey:@"mcaHistoSize"];
 	[encoder encodeInt32:mcaNofScansPreset		forKey:@"mcaNofScansPreset"];

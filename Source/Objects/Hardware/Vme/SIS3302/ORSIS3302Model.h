@@ -40,6 +40,7 @@
 	int	 clockSource;
 	
 	unsigned long   dataId;
+	unsigned long   mcaId;
 	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
 
 	short			internalTriggerEnabledMask;
@@ -110,7 +111,11 @@
     int				mcaHistoSize;
     BOOL			mcaPileupEnabled;
     BOOL			mcaScanBank2Flag;
-    int mcaMode;
+    int				mcaMode;
+    int				mcaEnergyDivider;
+    int				mcaEnergyMultiplier;
+    int				mcaEnergyOffset;
+    BOOL			mcaUseEnergyCalculation;
 }
 
 - (id) init;
@@ -119,11 +124,17 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (BOOL) mcaUseEnergyCalculation;
+- (void) setMcaUseEnergyCalculation:(BOOL)aMcaUseEnergyCalculation;
+- (int) mcaEnergyOffset;
+- (void) setMcaEnergyOffset:(int)aMcaEnergyOffset;
+- (int) mcaEnergyMultiplier;
+- (void) setMcaEnergyMultiplier:(int)aMcaEnergyMultiplier;
+- (int) mcaEnergyDivider;
+- (void) setMcaEnergyDivider:(int)aMcaEnergyDivider;
 - (unsigned long) mcaStatusResult:(int)index;
 - (int) mcaMode;
 - (void) setMcaMode:(int)aMcaMode;
-- (BOOL) mcaScanBank2Flag;
-- (void) setMcaScanBank2Flag:(BOOL)aMcaScanBank2Flag;
 - (BOOL) mcaPileupEnabled;
 - (void) setMcaPileupEnabled:(BOOL)aMcaPileupEnabled;
 - (int) mcaHistoSize;
@@ -308,6 +319,8 @@
 - (void) writeHistogramParams;
 - (void) writeMcaMultiScanNofScansPreset;
 - (void) writeMcaArmMode;
+- (void) writeMcaCalculationFactors;
+
 - (void) executeCommandList:(ORCommandList*) aList;
 
 - (unsigned long) acqReg;
@@ -319,6 +332,8 @@
 - (NSString*) runSummary;
 
 #pragma mark •••Data Taker
+- (unsigned long) mcaId;
+- (void) setMcaId: (unsigned long) anId;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
@@ -350,8 +365,11 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelMcaUseEnergyCalculationChanged;
+extern NSString* ORSIS3302ModelMcaEnergyOffsetChanged;
+extern NSString* ORSIS3302ModelMcaEnergyMultiplierChanged;
+extern NSString* ORSIS3302ModelMcaEnergyDividerChanged;
 extern NSString* ORSIS3302ModelMcaModeChanged;
-extern NSString* ORSIS3302ModelMcaScanBank2FlagChanged;
 extern NSString* ORSIS3302ModelMcaPileupEnabledChanged;
 extern NSString* ORSIS3302ModelMcaHistoSizeChanged;
 extern NSString* ORSIS3302ModelMcaNofScansPresetChanged;

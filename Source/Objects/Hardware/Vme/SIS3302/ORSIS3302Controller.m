@@ -358,11 +358,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(mcaScanBank2FlagChanged:)
-                         name : ORSIS3302ModelMcaScanBank2FlagChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(mcaModeChanged:)
                          name : ORSIS3302ModelMcaModeChanged
 						object: model];
@@ -372,6 +367,26 @@
                          name : ORSIS3302McaStatusChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaEnergyDividerChanged:)
+                         name : ORSIS3302ModelMcaEnergyDividerChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaEnergyMultiplierChanged:)
+                         name : ORSIS3302ModelMcaEnergyMultiplierChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaEnergyOffsetChanged:)
+                         name : ORSIS3302ModelMcaEnergyOffsetChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mcaUseEnergyCalculationChanged:)
+                         name : ORSIS3302ModelMcaUseEnergyCalculationChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -454,37 +469,97 @@
 	[self mcaNofScansPresetChanged:nil];
 	[self mcaHistoSizeChanged:nil];
 	[self mcaPileupEnabledChanged:nil];
-	[self mcaScanBank2FlagChanged:nil];
 	[self mcaModeChanged:nil];
 	[self mcaStatusChanged:nil];
+	[self mcaEnergyDividerChanged:nil];
+	[self mcaEnergyMultiplierChanged:nil];
+	[self mcaEnergyOffsetChanged:nil];
+	[self mcaUseEnergyCalculationChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote
+{
+	[mcaUseEnergyCalculationButton setIntValue: [model mcaUseEnergyCalculation]];
+	[self mcaEnergyCalculationValues];
+}
+
+- (void) mcaEnergyCalculationValues
+{
+	BOOL useEnergyCalc = [model mcaUseEnergyCalculation];
+	if(useEnergyCalc){
+		if([model mcaHistoSize] == 0)      [mcaEnergyDividerField setIntValue: 0x6];
+		else if([model mcaHistoSize] == 1) [mcaEnergyDividerField setIntValue: 0x5];
+		else if([model mcaHistoSize] == 2) [mcaEnergyDividerField setIntValue: 0x4];
+		else if([model mcaHistoSize] == 3) [mcaEnergyDividerField setIntValue: 0x3];
+		[mcaEnergyMultiplierField setIntValue: 0x80];
+		[mcaEnergyOffsetField setIntValue: 0x0];
+	}
+	else {
+		[mcaEnergyDividerField setIntValue: [model mcaEnergyDivider]];
+		[mcaEnergyMultiplierField setIntValue: [model mcaEnergyMultiplier]];
+		[mcaEnergyOffsetField setIntValue: [model mcaEnergyOffset]];
+	}
+}
+
+
+- (void) mcaEnergyOffsetChanged:(NSNotification*)aNote
+{
+	[mcaEnergyOffsetField setIntValue: [model mcaEnergyOffset]];
+}
+
+- (void) mcaEnergyMultiplierChanged:(NSNotification*)aNote
+{
+	[mcaEnergyMultiplierField setIntValue: [model mcaEnergyMultiplier]];
+}
+
+- (void) mcaEnergyDividerChanged:(NSNotification*)aNote
+{
+	[mcaEnergyDividerField setIntValue: [model mcaEnergyDivider]];
+}
+
 - (void) mcaStatusChanged:(NSNotification*)aNote
 {
 	//sorry about the hard-coded indexes --- values from a command list....
 	unsigned long acqRegValue = [model mcaStatusResult:0];
-	[mcaBusyField setStringValue:(acqRegValue & 0x100000)?@"Busy":@""];
-	[mcaMultiScanBusyField setStringValue:(acqRegValue & 0x200000)?@"Busy":@""];
+	
+	BOOL mcaBusy = (acqRegValue & 0x100000) || (acqRegValue & 0x200000);
+	[mcaBusyField setStringValue:mcaBusy?@"MCA Busy":@""];
+	
 	[mcaScanHistogramCounterField setIntValue:[model mcaStatusResult:1]];
 	[mcaMultiScanScanCounterField setIntValue:[model mcaStatusResult:2]];
 	int i;
 	for(i=0;i<kNumSIS3302Channels;i++){
-		[[mcaTriggerStartCounterMatrix	cellWithTag:i] setIntValue:[model mcaStatusResult:3 + (4*i)]];
-		[[mcaPileupCounterMatrix		cellWithTag:i] setIntValue:[model mcaStatusResult:4 + (4*i)]];
-		[[mcaEnergy2LowCounterMatrix	cellWithTag:i] setIntValue:[model mcaStatusResult:5 + (4*i)]];
-		[[mcaEnergy2HighCounterMatrix	cellWithTag:i] setIntValue:[model mcaStatusResult:6 + (4*i)]];
+		unsigned long aValue;
+		aValue = [model mcaStatusResult:3 + (4*i)];
+		if(aValue>100000){
+			[[mcaTriggerStartCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+		}
+		else [[mcaTriggerStartCounterMatrix	cellWithTag:i] setIntValue:aValue];
+
+		aValue = [model mcaStatusResult:4 + (4*i)];
+		if(aValue>100000){
+			[[mcaPileupCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+		}
+		else [[mcaPileupCounterMatrix	cellWithTag:i] setIntValue:aValue];
+
+		aValue = [model mcaStatusResult:5 + (4*i)];
+		if(aValue>100000){
+			[[mcaEnergy2LowCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+		}
+		else [[mcaEnergy2LowCounterMatrix	cellWithTag:i] setIntValue:aValue];
+
+		aValue = [model mcaStatusResult:6 + (4*i)];
+		if(aValue>100000){
+			[[mcaEnergy2HighCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%dK",aValue/1000]];
+		}
+		else [[mcaEnergy2HighCounterMatrix	cellWithTag:i] setIntValue:aValue];
 	}
 }
 
 - (void) mcaModeChanged:(NSNotification*)aNote
 {
 	[mcaModePU selectItemAtIndex: [model mcaMode]];
-}
-
-- (void) mcaScanBank2FlagChanged:(NSNotification*)aNote
-{
-	[mcaScanBank2FlagCB setIntValue: [model mcaScanBank2Flag]];
 }
 
 - (void) mcaPileupEnabledChanged:(NSNotification*)aNote
@@ -495,6 +570,7 @@
 - (void) mcaHistoSizeChanged:(NSNotification*)aNote
 {
 	[mcaHistoSizePU selectItemAtIndex: [model mcaHistoSize]];
+	[self mcaEnergyCalculationValues];
 }
 
 - (void) mcaNofScansPresetChanged:(NSNotification*)aNote
@@ -856,12 +932,17 @@
 	[mcaModePU					setEnabled:!lockedOrRunningMaintenance && mcaMode];
     [mcaHistoSizePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
     [mcaLNESourcePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
-    [mcaScanBank2FlagCB			setEnabled:!lockedOrRunningMaintenance && mcaMode];
     [mcaPileupEnabledCB			setEnabled:!lockedOrRunningMaintenance && mcaMode];
     [mcaAutoClearCB				setEnabled:!lockedOrRunningMaintenance && mcaMode];
     [mcaNofScansPresetField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
     [mcaPrescaleFactorField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
     [mcaNofHistoPresetField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
+	
+	BOOL useEnergyCalc = [model mcaUseEnergyCalculation];
+	[mcaUseEnergyCalculationButton	setEnabled:!lockedOrRunningMaintenance && mcaMode];
+	[mcaEnergyOffsetField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
+    [mcaEnergyMultiplierField	setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
+    [mcaEnergyDividerField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
 	
 }
 
@@ -965,17 +1046,33 @@
 
 #pragma mark •••Actions
 
-- (void) mcaModeAction:(id)sender
+- (IBAction) mcaUseEnergyCalculationAction:(id)sender
+{
+	[model setMcaUseEnergyCalculation:[sender intValue]];
+	[self settingsLockChanged:nil];
+}
+
+- (IBAction) mcaEnergyOffsetAction:(id)sender
+{
+	[model setMcaEnergyOffset:[sender intValue]];	
+}
+
+- (IBAction) mcaEnergyMultiplierAction:(id)sender
+{
+	[model setMcaEnergyMultiplier:[sender intValue]];	
+}
+
+- (IBAction) mcaEnergyDividerAction:(id)sender
+{
+	[model setMcaEnergyDivider:[sender intValue]];	
+}
+
+- (IBAction) mcaModeAction:(id)sender
 {
 	[model setMcaMode:[sender indexOfSelectedItem]];	
 }
 
-- (void) mcaScanBank2FlagAction:(id)sender
-{
-	[model setMcaScanBank2Flag:[sender intValue]];	
-}
-
-- (void) mcaPileupEnabledAction:(id)sender
+- (IBAction) mcaPileupEnabledAction:(id)sender
 {
 	[model setMcaPileupEnabled:[sender intValue]];	
 }
