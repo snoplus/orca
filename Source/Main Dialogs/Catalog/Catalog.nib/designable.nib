@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="71"/>
+			<integer value="70"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2229,7 +2229,7 @@
 																<object class="ObjectFactory" id="381390604">
 																	<reference key="NSNextResponder" ref="1023099894"/>
 																	<int key="NSvFlags">256</int>
-																	<string key="NSFrame">{{337, 47}, {16, 127}}</string>
+																	<string key="NSFrame">{{277, 47}, {16, 127}}</string>
 																	<reference key="NSSuperview" ref="1023099894"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="831272101">
@@ -2253,7 +2253,7 @@
 																<object class="NSTextField" id="987932972">
 																	<reference key="NSNextResponder" ref="1023099894"/>
 																	<int key="NSvFlags">256</int>
-																	<string key="NSFrame">{{319, 25}, {53, 17}}</string>
+																	<string key="NSFrame">{{259, 25}, {53, 17}}</string>
 																	<reference key="NSSuperview" ref="1023099894"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="97728449">
@@ -2318,22 +2318,6 @@
 																		<string key="NSContents">Digitizers (VME64 Only)</string>
 																		<reference key="NSSupport" ref="26"/>
 																		<reference key="NSControlView" ref="900461154"/>
-																		<reference key="NSBackgroundColor" ref="421922390"/>
-																		<reference key="NSTextColor" ref="688154912"/>
-																	</object>
-																</object>
-																<object class="NSTextField" id="775137337">
-																	<reference key="NSNextResponder" ref="1023099894"/>
-																	<int key="NSvFlags">256</int>
-																	<string key="NSFrame">{{346, 97}, {96, 28}}</string>
-																	<reference key="NSSuperview" ref="1023099894"/>
-																	<bool key="NSEnabled">YES</bool>
-																	<object class="NSTextFieldCell" key="NSCell" id="131368073">
-																		<int key="NSCellFlags">67239424</int>
-																		<int key="NSCellFlags2">138412032</int>
-																		<string key="NSContents">&lt;--Under Construction</string>
-																		<reference key="NSSupport" ref="26"/>
-																		<reference key="NSControlView" ref="775137337"/>
 																		<reference key="NSBackgroundColor" ref="421922390"/>
 																		<reference key="NSTextColor" ref="688154912"/>
 																	</object>
@@ -9012,7 +8996,6 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="33872178"/>
 							<reference ref="381390604"/>
 							<reference ref="987932972"/>
-							<reference ref="775137337"/>
 						</object>
 						<reference key="parent" ref="773850525"/>
 					</object>
@@ -14071,20 +14054,6 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="parent" ref="381390604"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">26127</int>
-						<reference key="object" ref="775137337"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="131368073"/>
-						</object>
-						<reference key="parent" ref="1023099894"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">26128</int>
-						<reference key="object" ref="131368073"/>
-						<reference key="parent" ref="775137337"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">26129</int>
 						<reference key="object" ref="19633072"/>
 						<object class="NSMutableArray" key="children">
@@ -15016,9 +14985,6 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26124.ImportedFromIB2</string>
 					<string>26125.IBPluginDependency</string>
 					<string>26126.IBPluginDependency</string>
-					<string>26127.IBPluginDependency</string>
-					<string>26127.ImportedFromIB2</string>
-					<string>26128.IBPluginDependency</string>
 					<string>26129.CustomClassName</string>
 					<string>26129.IBAttributePlaceholdersKey</string>
 					<string>26129.IBPluginDependency</string>
@@ -17105,9 +17071,6 @@ ZSBjb250cm9sbGVyLg</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>ObjectFactory</string>
 					<object class="NSMutableDictionary">
 						<string key="NS.key.0">ToolTip</string>
@@ -18971,13 +18934,6 @@ ZSBjb250cm9sbGVyLg</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Control/RunControl/ORRunModel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Control/RunNotes/ORRunNotesModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
