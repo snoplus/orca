@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="4164"/>
+			<integer value="1339"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -5258,7 +5258,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<object class="NSTextFieldCell" key="NSCell" id="20762950">
 																	<int key="NSCellFlags">67239424</int>
 																	<int key="NSCellFlags2">138412032</int>
-																	<string key="NSContents">Start Counter</string>
+																	<string key="NSContents">Event Counter</string>
 																	<reference key="NSSupport" ref="298115673"/>
 																	<reference key="NSControlView" ref="893226564"/>
 																	<reference key="NSBackgroundColor" ref="252786761"/>

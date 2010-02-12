@@ -524,7 +524,7 @@
 	unsigned long acqRegValue = [model mcaStatusResult:0];
 	
 	BOOL mcaBusy = (acqRegValue & 0x100000) || (acqRegValue & 0x200000);
-	[mcaBusyField setStringValue:mcaBusy?@"MCA Busy":@""];
+	[mcaBusyField setStringValue:mcaBusy?@"MCA Busy":@"--"];
 	
 	[mcaScanHistogramCounterField setIntValue:[model mcaStatusResult:1]];
 	[mcaMultiScanScanCounterField setIntValue:[model mcaStatusResult:2]];
