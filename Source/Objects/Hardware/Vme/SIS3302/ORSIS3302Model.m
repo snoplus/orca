@@ -141,7 +141,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (NSString*) helpURL
 {
-	return @"VME/SIS3302.html";
+	return @"VME/SIS3302_(Gamma).html";
 }
 
 - (NSRange)	memoryFootprint
@@ -2383,7 +2383,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
     [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
     [self setLemoInEnabledMask:			[decoder decodeIntForKey:@"lemoInEnabledMask"]];
-    [self setEnergyGateLength:			[decoder decodeIntForKey:@"energyGateLength"]];
     [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
     [self setEnergyTauFactor:			[decoder decodeIntForKey:@"energyTauFactor"]];
     [self setEnergySampleStartIndex2:	[decoder decodeIntForKey:@"energySampleStartIndex2"]];
@@ -2456,7 +2455,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [encoder encodeInt:gtMask					forKey:@"gtMask"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
 	[encoder encodeInt:lemoInEnabledMask		forKey:@"lemoInEnabledMask"];
-	[encoder encodeInt:energyGateLength			forKey:@"energyGateLength"];
 	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
 	[encoder encodeInt:energyTauFactor			forKey:@"energyTauFactor"];
 	[encoder encodeInt:energySampleStartIndex2	forKey:@"energySampleStartIndex2"];
