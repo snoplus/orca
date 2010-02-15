@@ -37,6 +37,20 @@ NSString* ORPulserUSBNextConnection				= @"ORPulserUSBNextConnection";
 NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfaceChanged";
 
 @implementation ORPulser33220Model
+- (void) sleep
+{
+	[noUSBAlarm clearAlarm];
+	[noUSBAlarm release];
+	noUSBAlarm = nil;
+	[super sleep];
+}
+
+- (void) wakeUp 
+{
+    if([self aWake])return;
+	[self checkNoUsbAlarm];
+	[super wakeUp];
+}
 
 - (void) makeConnectors
 {
@@ -433,7 +447,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 		noUSBAlarm = nil;
 	}
 	else {
-		if(guardian){
+		if(guardian && [self aWake]){
 			if(!noUSBAlarm){
 				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for Pulser"] severity:kHardwareAlarm];
 				[noUSBAlarm setHelpString:@"\n\nThe USB interface is no longer available for this object. This could mean the cable is disconnected or the power is off"];
