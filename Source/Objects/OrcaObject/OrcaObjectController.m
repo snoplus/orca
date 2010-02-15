@@ -330,9 +330,10 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
     @try {
         nibName = [decoder decodeObjectForKey:OROrcaObjectControllerNibName];
         self = [super initWithWindowNibName:nibName];
-        [self setWindowFrameAutosaveName:nibName];
         [self setModel:[decoder decodeObjectForKey:OROrcaObjectControllerModel]];
-        [[self window] setFrameFromString:[decoder decodeObjectForKey:OROrcaObjectControllerFrame]];
+		NSString* s = [decoder decodeObjectForKey:OROrcaObjectControllerFrame];
+		[[self window] orderFront:self];
+        [[self window] setFrameFromString:s];
 	}
 	@catch(NSException* localException) {
         NSLog(@"Failed loading: %@\n",nibName);
@@ -346,7 +347,6 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
     [super encodeWithCoder:encoder];
     [encoder encodeObject:model forKey:OROrcaObjectControllerModel];
     [encoder encodeObject:[[self window] stringWithSavedFrame] forKey:OROrcaObjectControllerFrame];
-    
 }
 
 #pragma mark ¥¥¥Actions
