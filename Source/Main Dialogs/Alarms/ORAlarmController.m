@@ -353,7 +353,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
     else if ([menuItem action] == @selector(delete:)) {
         return [addressList selectedRow] >= 0;
     }
-	[super validateMenuItem:menuItem];
 	return YES;
 }
 
