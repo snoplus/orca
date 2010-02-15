@@ -445,16 +445,17 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[[self group] wakeUp];
 		
-		NSEnumerator* e = [orcaControllers objectEnumerator];
+
+	NSEnumerator* e = [orcaControllers objectEnumerator];
 		id controller;
 		while(controller = [e nextObject]){
 			@try {
-				[controller showWindow:controller];
+				[controller orderFront:controller];
 			}
 			@catch(NSException* localException) {
 			}
 		}
-		
+
 		
 		[[NSNotificationCenter defaultCenter]
 		 postNotificationName:ORDocumentLoadedNotification
