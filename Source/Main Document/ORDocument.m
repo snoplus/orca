@@ -77,7 +77,6 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 
 - (void) dealloc
 {
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [statusText release];
 	@try {
@@ -450,7 +449,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		id controller;
 		while(controller = [e nextObject]){
 			@try {
-				[controller orderFront:controller];
+				[[controller window] orderFront:controller];
 			}
 			@catch(NSException* localException) {
 			}
