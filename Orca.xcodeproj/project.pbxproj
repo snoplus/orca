@@ -1176,6 +1176,8 @@
 		847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C190CFF4C3200E963C6 /* OReGunModel.m */; };
 		847F8B35063DB29E00A8597A /* ORTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 847F8B33063DB29E00A8597A /* ORTimer.h */; };
 		847F8B36063DB29E00A8597A /* ORTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F8B34063DB29E00A8597A /* ORTimer.m */; };
+		848283C0112B14F100BA30ED /* OffSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BE112B14F100BA30ED /* OffSwitch.tif */; };
+		848283C1112B14F100BA30ED /* OnSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BF112B14F100BA30ED /* OnSwitch.tif */; };
 		848326E906DA614B00172F1C /* ORDualPortLAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E506DA614B00172F1C /* ORDualPortLAMController.h */; };
 		848326EA06DA614B00172F1C /* ORDualPortLAMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848326E606DA614B00172F1C /* ORDualPortLAMController.m */; };
 		848326EB06DA614B00172F1C /* ORDualPortLAMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E706DA614B00172F1C /* ORDualPortLAMModel.h */; };
@@ -3301,6 +3303,8 @@
 		847F59EA0450CB61005F64B1 /* TriggerCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = TriggerCard.gif; path = Source/Objects/Hardware/Vme/Trigger/TriggerCard.gif; sourceTree = SOURCE_ROOT; };
 		847F8B33063DB29E00A8597A /* ORTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTimer.h; sourceTree = "<group>"; };
 		847F8B34063DB29E00A8597A /* ORTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimer.m; sourceTree = "<group>"; };
+		848283BE112B14F100BA30ED /* OffSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OffSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OffSwitch.tif; sourceTree = SOURCE_ROOT; };
+		848283BF112B14F100BA30ED /* OnSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OnSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OnSwitch.tif; sourceTree = SOURCE_ROOT; };
 		848326E506DA614B00172F1C /* ORDualPortLAMController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMController.h; sourceTree = "<group>"; };
 		848326E606DA614B00172F1C /* ORDualPortLAMController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDualPortLAMController.m; sourceTree = "<group>"; };
 		848326E706DA614B00172F1C /* ORDualPortLAMModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMModel.h; sourceTree = "<group>"; };
@@ -8083,6 +8087,8 @@
 				84B63CE109783832005B20A5 /* PushButton.nib */,
 				84B63CE209783832005B20A5 /* PushButtonOff.tif */,
 				84B63CE309783832005B20A5 /* PushButtonOn.tif */,
+				848283BE112B14F100BA30ED /* OffSwitch.tif */,
+				848283BF112B14F100BA30ED /* OnSwitch.tif */,
 			);
 			name = PushButton;
 			path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton;
@@ -11168,6 +11174,8 @@
 				8490160810E31582007591B5 /* 1DPlotLink.tif in Resources */,
 				84693F771121BB4C008B5DB2 /* RunNotes.nib in Resources */,
 				84693F781121BB4C008B5DB2 /* RunNotes.tif in Resources */,
+				848283C0112B14F100BA30ED /* OffSwitch.tif in Resources */,
+				848283C1112B14F100BA30ED /* OnSwitch.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
