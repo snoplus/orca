@@ -70,6 +70,8 @@
 - (IBAction) showTemplates:(id)sender;
 - (IBAction) openRecentDocument:(id)sender;
 - (IBAction) showAutoTester:(id)sender;
+- (IBAction) saveWindowSet:(id)sender;
+- (IBAction) restoreWindowSet:(id)sender;
 
 #pragma mark ¥¥¥Accessors
 - (id) document;

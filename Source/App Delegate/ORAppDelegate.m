@@ -39,6 +39,8 @@
 #import "ORCARootService.h"
 #import "ORCARootServiceController.h"
 #import "ORMailer.h"
+#import "OrcaObjectController.h"
+
 #import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
 
@@ -262,7 +264,6 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     [[NSDocumentController sharedDocumentController] performClose:sender];
 }
 
-
 - (IBAction) terminate:(id)sender
 {
 	[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
@@ -273,6 +274,77 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [NSApp terminate:sender];
+}
+
+- (IBAction) saveWindowSet:(id)sender
+{
+	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"WindowSets"];
+	NSArray* theOpenControllers = [[self document] orcaControllers];
+	NSMutableArray* windowInfoArray = [NSMutableArray array];
+	NSDictionary* info;
+	for(id aController in theOpenControllers){
+		info = [NSDictionary dictionaryWithObjectsAndKeys:[[aController model] fullID],@"model",[[aController window] stringWithSavedFrame],@"frame",nil];
+		[windowInfoArray addObject:info];
+	}
+	
+	NSWindow* theWindow;
+	theWindow = [[[[self document] windowControllers] objectAtIndex:0]window];
+	info = [NSDictionary dictionaryWithObjectsAndKeys:@"MainWindow",@"model",[theWindow stringWithSavedFrame],@"frame",nil];
+	[windowInfoArray addObject:info];
+
+	theWindow = [[ORStatusController sharedStatusController] window];
+	info = [NSDictionary dictionaryWithObjectsAndKeys:@"StatusLog",@"model",[theWindow stringWithSavedFrame],@"frame",nil];
+	[windowInfoArray addObject:info];
+
+	theWindow = [[ORAlarmController sharedAlarmController] window];
+	info = [NSDictionary dictionaryWithObjectsAndKeys:@"Alarms",@"model",[theWindow stringWithSavedFrame],@"frame",[NSNumber numberWithBool:[theWindow isVisible]],@"visible", nil];
+	[windowInfoArray addObject:info];	
+	
+	NSString* windowSetFile = [tempFolder stringByAppendingPathComponent:@"windowPositions"];
+	NSFileManager* fm = [NSFileManager defaultManager]; 
+	if([fm fileExistsAtPath:windowSetFile])[fm removeItemAtPath:windowSetFile error:nil];
+	[windowInfoArray writeToFile:windowSetFile atomically:NO];
+}
+
+- (IBAction) restoreWindowSet:(id)sender
+{
+	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"WindowSets"];
+	NSString* windowSetFile = [tempFolder stringByAppendingPathComponent:@"windowPositions"];
+	NSArray* aWindowInfoArray = [NSArray arrayWithContentsOfFile:windowSetFile];
+	for(id aDictionary in aWindowInfoArray){
+		NSString* theID = [aDictionary objectForKey:@"model"];
+		NSString* theFrame = [aDictionary objectForKey:@"frame"];
+		//the special cases
+		if([theID isEqual:@"MainWindow"]){
+			NSWindow* theWindow = [[[[self document] windowControllers] objectAtIndex:0] window];
+			[theWindow setFrameFromString:theFrame];
+			[theWindow orderFront:self];
+		}
+		else if([theID isEqual:@"StatusLog"]){
+			NSWindow* theWindow = [[ORStatusController sharedStatusController] window];
+			[theWindow setFrameFromString:theFrame];
+			[theWindow orderFront:self];
+		}
+		else if([theID isEqual:@"Alarms"]){
+			NSWindow* theWindow = [[ORAlarmController sharedAlarmController] window];
+			[theWindow setFrameFromString:theFrame];
+			BOOL wasVisible = [[aDictionary objectForKey:@"visible"] boolValue];
+			if(wasVisible)[theWindow orderFront:self];
+		}
+		else {
+			//the object windows
+			id theModel = [[self document] findObjectWithFullID:theID];
+			if([theModel isKindOfClass:NSClassFromString(@"OrcaObject")]){
+				[theModel makeMainController];
+				NSArray* objControllers = [[self document] findControllersWithModel:theModel];
+				if([objControllers count]){
+					id theController = [objControllers objectAtIndex:0];
+					[[theController window] setFrameFromString:theFrame];
+					[[theController window] orderFront:self];
+				}
+			}
+		}
+	}
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -442,6 +514,15 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 		else if([[[self document] group] count]==0 && ![[self document] isDocumentEdited])return YES;
         else return documentIsOpen ? NO : YES;
     }
+	
+    if(theAction == @selector(restoreWindowSet:)){
+		NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"WindowSets"];
+		NSString* windowSetFile = [tempFolder stringByAppendingPathComponent:@"windowPositions"];
+		NSFileManager* fm = [NSFileManager defaultManager]; 
+		if([fm fileExistsAtPath:windowSetFile])return YES;
+		else return NO;
+    }
+	
 	
     return YES;
 }
