@@ -176,7 +176,6 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 - (void) elementStateChanged:(NSNotification*)aNote
 {
     if([[model orcaObjects] containsObject:[aNote object]]){
-        //if([[aNote object] canImageChangeWithState]){
 		NSRect objRect = [[aNote object] frame];
 		//add in all the bounds of the lines
 		NSEnumerator* e = [[[aNote object] connectors] objectEnumerator];
@@ -186,7 +185,6 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 		}
 		[groupView setNeedsDisplayInRect:objRect];
 		[tableView reloadData];
-		// }
     }
 }
 

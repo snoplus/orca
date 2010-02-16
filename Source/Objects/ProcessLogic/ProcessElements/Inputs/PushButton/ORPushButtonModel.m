@@ -22,6 +22,11 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORPushButtonModel.h"
 #import "ORProcessModel.h"
+@interface ORPushButtonModel (private)
+- (NSImage*) composeIcon;
+- (NSImage*) composeLowLevelIcon;
+- (NSImage*) composeHighLevelIcon;
+@end
 
 @implementation ORPushButtonModel
 
@@ -29,9 +34,7 @@
 
 - (void) setUpImage
 {
-    if([self state]) [self setImage:[NSImage imageNamed:@"PushButtonOn"]];
-    else             [self setImage:[NSImage imageNamed:@"PushButtonOff"]];
-    [self addOverLay];
+	[self setImage:[self composeIcon]];
 }
 
 - (void) makeMainController
@@ -44,13 +47,25 @@
 	return @"Push Button";
 }
 
-- (void) addOverLay
-{    
+- (void) doCmdDoubleClick:(id)sender
+{
+	[self doCmdClick:sender];
 }
 
 - (void) doCmdClick:(id)sender
 {
-	[self setState:![self state]];
+	BOOL currentState = [self state];
+	[self setState:!currentState];
+}
+
+- (BOOL) canBeInAltView
+{
+	return YES;
+}
+
+- (BOOL)  canImageChangeWithState 
+{ 
+	return YES; 
 }
 
 //--------------------------------
@@ -72,3 +87,40 @@
 
 @end
 
+@implementation ORPushButtonModel (private)
+
+- (NSImage*) composeIcon
+{
+	if(![self useAltView])	return [self composeLowLevelIcon];
+	else					return [self composeHighLevelIcon];
+}
+- (NSImage*) composeLowLevelIcon
+{
+	if([self state]) return [NSImage imageNamed:@"PushButtonOn"];
+	else             return [NSImage imageNamed:@"PushButtonOff"];
+}
+
+- (NSImage*) composeHighLevelIcon
+{
+	NSImage* anImage;
+	if([self state]) anImage = [NSImage imageNamed:@"OnSwitch"];
+	else             anImage = [NSImage imageNamed:@"OffSwitch"];
+	NSAttributedString* idLabel   = [self idLabelWithSize:12 color:[NSColor blackColor]];
+	
+	NSSize theIconSize = [anImage size];
+	float iconStart		= [idLabel size].width + 1;
+	theIconSize.width += iconStart;
+
+	NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+	[finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
+	
+	if(idLabel){		
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(iconStart-[idLabel size].width-1,theIconSize.height-textSize.height,textSize.width,textSize.height)];
+	}
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];
+}
+@end

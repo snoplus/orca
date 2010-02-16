@@ -453,7 +453,8 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	NSAttributedString* iconLabel = [self iconLabelWithSize:12 color:[NSColor blackColor]];
 	
 	NSSize theIconSize	= [anImage size];
-	float iconStart		= [iconLabel size].width + 5;
+	float iconStart		= MAX([iconLabel size].width,[idLabel size].width) + 1;
+
 	theIconSize.width += iconStart;
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
@@ -487,7 +488,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	NSAttributedString* iconLabel = [self iconLabelWithSize:12 color:[NSColor blackColor]];
 	
 	NSSize theIconSize	= [anImage size];
-	float iconStart		= [iconLabel size].width + 5;
+	float iconStart		= MAX([iconLabel size].width,[idLabel size].width) + 1;
 	theIconSize.width += iconStart;
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];

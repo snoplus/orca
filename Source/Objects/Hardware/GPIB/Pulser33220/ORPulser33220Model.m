@@ -48,8 +48,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 - (void) wakeUp 
 {
     if([self aWake])return;
-	[self checkNoUsbAlarm];
 	[super wakeUp];
+	[self checkNoUsbAlarm];
 }
 
 - (void) makeConnectors

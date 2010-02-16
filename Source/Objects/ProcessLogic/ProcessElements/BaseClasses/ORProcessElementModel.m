@@ -408,7 +408,8 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 
 - (void) postStateChange
 {
-	if([self canImageChangeWithState])[self performSelectorOnMainThread:@selector(setUpImage) withObject:nil waitUntilDone:NO];
+	//if([self canImageChangeWithState])[self performSelectorOnMainThread:@selector(setUpImage) withObject:nil waitUntilDone:YES];
+	if([self canImageChangeWithState])[self setUpImage];
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORProcessElementStateChangedNotification object:self userInfo:nil waitUntilDone:NO]; 
 }
 
