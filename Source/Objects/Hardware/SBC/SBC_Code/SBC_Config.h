@@ -19,7 +19,7 @@
 
 // ---------------------------------------------------------------------------- 
 //    Generic hardware configuration structure used by both Mac and eCPU code.
-#define MAX_CARDS            20
+#define MAX_CARDS            21
 
 typedef struct {								// structure required for card
         uint32_t hw_type_id;                // unique hardware identifier code
