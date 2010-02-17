@@ -659,7 +659,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self setGapLength:0];
 	[self setFilterLength:6];
 	[self setFifoBehaviour:kFifoStopOnFull];
-	[self setPostTriggerTime:2];
+	[self setPostTriggerTime:300]; // max. filter length should fit into the range -tb-
 }
 
 #pragma mark •••HW Access
@@ -837,9 +837,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	unsigned long aValue = 
 	((filterLength & 0xf)<<8)		| 
 	((gapLength & 0xf)<<4)			| 
-	((runBoxCarFilter & 0x1)<<2)	|
-	((startSampling & 0x1)<<1)      |
-	0x1;
+	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
+	((startSampling & 0x1)<<3)		|		// run trigger unit
+	((startSampling & 0x1)<<2)		|		// run filter unit
+	((startSampling & 0x1)<<1)      |		// start ADC sampling
+	 (startSampling & 0x1);					// store data in QDRII RAM
 	
 	[self writeReg:kFLTV4RunControlReg value:aValue];					
 }
@@ -1006,20 +1008,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 //TODO: TBD after firmware update -tb- 2010-01-28
 - (void) disableAllTriggers
 {
-	[self writeReg:kFLTV4PixelSettings1Reg value:0x0];       //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
-	[self writeReg:kFLTV4PixelSettings2Reg value:0x3ffffff]; //TODO:
+	[self writeReg:kFLTV4PixelSettings1Reg value:0x0];
+	[self writeReg:kFLTV4PixelSettings2Reg value:0xffffff];
 }
 
 //TODO: TBD after firmware update -tb- 2010-01-28
-- (void) writeTriggerControl  //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
+- (void) writeTriggerControl  //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN ; this is fixed now, remove workaround after all crates are updated -tb-
 {
+    //PixelSetting....
+	//2,1:
 	//0,0 Normal
 	//0,1 test pattern
 	//1,0 always 0
 	//1,1 always 1
-	[self writeReg:kFLTV4PixelSettings1Reg value:triggerEnabledMask]; //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
-	//[self writeReg:kFLTV4PixelSettings1Reg value:0]; //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN -tb-
-	[self writeReg:kFLTV4PixelSettings2Reg value:0];
+	[self writeReg:kFLTV4PixelSettings1Reg value:0]; //must be handled by readout, single pixels cannot be disabled for KATRIN - FIRMWARE FIXED -tb-
+	uint32_t mask = (~triggerEnabledMask) & 0xffffff;
+	[self writeReg:kFLTV4PixelSettings2Reg value: mask];
 }
 
 - (void) readHitRates
@@ -1422,7 +1426,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     //if([[userInfo objectForKey:@"doinit"]intValue]){
 	[self setLedOff:NO];
-	[self writeRunControl:NO];  // writes to run control register
+	[self writeRunControl:YES]; // writes to run control register (was NO, but this causes the first few noise events -tb-)
 	[self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register.
 	[self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
 	//}
@@ -1461,7 +1465,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[self writeRunControl:NO];
+	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	[self setLedOff:YES];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
