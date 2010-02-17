@@ -166,8 +166,7 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
- ^^^^ ^^^^------------------------------ channel (0..22)
- ------------^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+ ----------^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID:
  -----------------^^---------------------precision
  --------------------^^^^ ^^-------------number of page in hardware buffer
@@ -178,8 +177,8 @@
                                  ^-------append flag is in this record (append to previous record)
                                   ^------append next waveform record
                                     ^^^^-number which defines the content of the record (kind of version number)
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx not yet defined ...
- TBD
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx not yet defined ... named eventInfo (started to store there postTriggTime -tb-)
+ 
  followed by waveform data (up to 2048 16-bit words)
  <pre>  
  */ 
@@ -345,7 +344,7 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitRate length
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx total hitRate
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
-      ^^^^ ^^^^-------------------------- channel (0..22)
+      ^^^^ ^^^^-------------------------- channel (0..23)
 			       ^--------------------- overflow  
 				     ^^^^ ^^^^ ^^^^ ^^^^- hitrate
  ...more 
@@ -397,7 +396,28 @@
     NSString* title= @"Katrin FLT Hit Rate Record\n\n";
     NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
     NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
-    return [NSString stringWithFormat:@"%@%@%@",title,crate,card];
+	
+	unsigned long length		= ExtractLength(ptr[0]);
+    uint32_t ut_time			= ptr[2];
+    uint32_t hitRateLengthSec	= ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
+    uint32_t newTotal			= ptr[4];
+
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ut_time];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+	
+	NSMutableString *hrString = [NSMutableString stringWithFormat:@"UTTime     = %d\nHitrateLen = %d\nTotal HR   = %d\n",
+						  ut_time,hitRateLengthSec,newTotal];
+	int i;
+	for(i=0; i<length-5; i++){
+		uint32_t chan	= ShiftAndExtract(ptr[5+i],20,0xff);
+		uint32_t over	= ShiftAndExtract(ptr[5+i],16,0x1);
+		uint32_t hitrate= ShiftAndExtract(ptr[5+i], 0,0xffff);
+		if(over)
+			[hrString appendString: [NSString stringWithFormat:@"Chan %2d    = OVERFLOW\n", chan] ];
+		else
+			[hrString appendString: [NSString stringWithFormat:@"Chan %2d    = %d\n", chan,hitrate] ];
+	}
+    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,date,hrString];
 }
 @end
 
