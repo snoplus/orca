@@ -57,7 +57,7 @@
 
 - (void) dataSetChanged:(NSNotification*)aNotification
 {
-	[titleField setStringValue:[model fullNameWithRunNumber]];
+	//[titleField setStringValue:[model fullNameWithRunNumber]];
 	[super dataSetChanged:aNotification];
 }
 

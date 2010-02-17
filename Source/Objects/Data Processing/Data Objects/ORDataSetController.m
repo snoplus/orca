@@ -110,7 +110,8 @@
 - (void) dataSetRemoved:(NSNotification*)aNote
 {
     if([aNote object] == model){
-	[[self window] close];
+		[self setModel:nil];
+		[[self window] close];
     }
 }
 
