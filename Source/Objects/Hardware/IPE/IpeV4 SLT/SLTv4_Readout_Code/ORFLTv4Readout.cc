@@ -220,7 +220,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 
                                 wfRecordVersion = 0x1 ;//0x1=raw trace, full length, no additional analysis (use if fifo is almost full)
                                 
-                                #if 1
+                                #if 0
                                 //check timing
                                 readSltSecSubsec(sltsec,sltsubsec);
                                 timediff2slt = (sltsec-evsec)*(int32_t)20000000 + ((int32_t)sltsubsec-(int32_t)evsubsec);//in 50ns units
@@ -305,7 +305,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16);        //event ID:read ptr (10 bit); pagenr (6 bit)
                                 data[dataIndex++] = energy;
                                 data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
-                                data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
+                                //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
+                                data[dataIndex++] = postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
                                 
                                 //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
                                 
@@ -319,7 +320,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         }
                     }
                 }//if(!fifoEmptyFlag)...
-                else break;//fifo is empty, leave ...
+                else break;//fifo is empty, leave loop ...
             }//for(eventN=0; ...
         }
         // --- HISTOGRAM MODE ------------------------------
@@ -450,6 +451,17 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     return true;
     
 }
+
+#if 1 //Test to prepare single histogram readout -tb-
+//TODO: using this inhibits stopping a waveform run (?) -tb-
+bool ORFLTv4Readout::Stop()
+{
+	//-tb- a test:
+	//fprintf(stdout,"ORFLTv4Readout.cc: This is bool ORFLTv4Readout::Stop() for slot %i (ct is %i)!\n",GetSlot()); fflush(stdout);
+    // it seems to me that nobody cares when I return false; -tb-
+	return true;
+}
+#endif
 
 #if (0)
 //maybe read hit rates in the pmc at some point..... here's how....
