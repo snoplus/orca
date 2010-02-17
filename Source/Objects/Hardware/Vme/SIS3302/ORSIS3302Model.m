@@ -1594,7 +1594,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	
 - (void) initBoard
 {  
-	if(![gOrcaGlobals runInProgress])[self reset];							//reset the card
+	[self reset];							//reset the card
 	[self writeEventConfiguration];
 	[self writeEndAddressThreshold];
 	[self writePreTriggerDelayAndTriggerGateDelay];
@@ -1620,6 +1620,15 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		[self writeMcaCalculationFactors];
 	}
 	[self writeAcquistionRegister];			//set up the Acquisition Register
+	
+	if([gOrcaGlobals runInProgress]){
+		if(runMode == kMcaRunMode){
+			[self writeMcaArmMode];
+		}
+		else {
+			[self disarmAndArmBank:0];
+		}
+	}
 }
 
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
