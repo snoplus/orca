@@ -1594,7 +1594,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	
 - (void) initBoard
 {  
-	[self reset];							//reset the card
+	if(![gOrcaGlobals runInProgress])[self reset];							//reset the card
 	[self writeEventConfiguration];
 	[self writeEndAddressThreshold];
 	[self writePreTriggerDelayAndTriggerGateDelay];
