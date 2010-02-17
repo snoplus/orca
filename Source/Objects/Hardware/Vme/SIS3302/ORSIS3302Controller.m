@@ -893,18 +893,13 @@
 	
     [internalExternalTriggersOredCB	setEnabled:!lockedOrRunningMaintenance];
 	[energyTauFactorField			setEnabled:!lockedOrRunningMaintenance];
-	[energySampleStartIndex3Field	setEnabled:!lockedOrRunningMaintenance];
-	[energySampleStartIndex2Field	setEnabled:!lockedOrRunningMaintenance];
-	[energySampleStartIndex1Field	setEnabled:!lockedOrRunningMaintenance];
-	[energyShipWaveformButton		setEnabled:!lockedOrRunningMaintenance];
 	[energyGapTimeField				setEnabled:!lockedOrRunningMaintenance];
 	[energyPeakingTimeField			setEnabled:!lockedOrRunningMaintenance];
 	[triggerGateLengthField			setEnabled:!lockedOrRunningMaintenance];
 	[preTriggerDelayField			setEnabled:!lockedOrRunningMaintenance];
-	[sampleStartIndexField			setEnabled:!lockedOrRunningMaintenance];
-	[sampleLengthField				setEnabled:!lockedOrRunningMaintenance];
 	[lemoInModePU					setEnabled:!lockedOrRunningMaintenance];
 	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
+	[sampleStartIndexField			setEnabled:!lockedOrRunningMaintenance];
 
 	[clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
 	[triggerDecimationPU			setEnabled:!lockedOrRunningMaintenance];
@@ -943,6 +938,14 @@
 	[mcaEnergyOffsetField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
     [mcaEnergyMultiplierField	setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
     [mcaEnergyDividerField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
+
+	//can't be changed during a run or the sbc will be hosed.
+	[sampleLengthField				setEnabled:!locked && !runInProgress];
+	[energyShipWaveformButton		setEnabled:!locked && !runInProgress];
+	[energySampleStartIndex3Field	setEnabled:!locked && !runInProgress];
+	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
+	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
+	
 	
 }
 
