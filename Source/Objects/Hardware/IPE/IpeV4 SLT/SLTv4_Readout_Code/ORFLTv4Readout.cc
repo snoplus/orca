@@ -345,6 +345,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
                     histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
                     histoRefreshTime    = currentFlt->histMeasTime->read();
+					//set page manager to automatic mode
+					//srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
+					srack->theSlt->pageSelect->write((long unsigned int)0x0);
                     //clear histogram (probably not really necessary with "automatic clear" -tb-) 
                     srack->theFlt[col]->command->resetPages->write(1);
                     //init page AB flag
@@ -372,9 +375,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         uint32_t readoutSec;
                         unsigned long totalLength;
                         uint32_t last,first;
-                        uint32_t histogramID;
+                        uint32_t fpgaHistogramID;
                         static uint32_t shipHistogramBuffer32[2048];
-                        histogramID     = currentFlt->histNofMeas->read();;
+                        fpgaHistogramID     = currentFlt->histNofMeas->read();;
                         // CHANNEL LOOP ----------------
                         for(chan=0;chan<kNumChan;chan++) {//read out histogram
                             if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
@@ -386,23 +389,29 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                             //debug: fprintf(stdout,"FLT %i: ch %i:first %i, last %i \n",col+1,chan,first,last);fflush(stdout);
                             
                             #if 1  //READ OUT HISTOGRAM -tb- -------------
-                            if(last<first){
-                                //no events
-                                continue;  //TODO: or write out empty histogram -tb-
-                            }
-                            else{//read out histogram
-                                //read sec
-                                readoutSec=currentFlt->secondCounter->read();
-                                //read histogram block
-                                srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
-
+							{
+								//read sec
+								readoutSec=currentFlt->secondCounter->read();
                                 //prepare data record
                                 katrinV4HistogramDataStruct theEventData;
                                 theEventData.readoutSec = readoutSec;
                                 theEventData.refreshTimeSec =  histoRefreshTime;//histoRunTime;   
-                                theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
-                                theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
-                                theEventData.histogramLength =2048;
+								
+								//read out histogram
+								if(last<first){
+									//no events, write out empty histogram -tb-
+									theEventData.firstBin  = 2047;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
+									theEventData.lastBin   = 0;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
+									theEventData.histogramLength =0;
+								}
+								else{
+									//read histogram block
+									srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
+									theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
+									theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
+									theEventData.histogramLength =2048;
+								}
+							
                                 //theEventData.histogramLength = theEventData.lastBin - theEventData.firstBin +1;
                                 //if(theEventData.histogramLength < 0){// we had no counts ...
                                 //    theEventData.histogramLength = 0;
@@ -410,7 +419,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 theEventData.maxHistogramLength = 2048; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
                                 theEventData.binSize    = histoBinWidth;        
                                 theEventData.offsetEMin = histoEnergyOffset;
-                                theEventData.histogramID    = histogramID;
+                                theEventData.histogramID    = fpgaHistogramID;
                                 theEventData.histogramInfo  = pageAB & 0x1;//one bit
                                 
                                 //ship data record
@@ -427,14 +436,16 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = theEventData.maxHistogramLength;
                                 data[dataIndex++] = theEventData.binSize;
                                 data[dataIndex++] = theEventData.offsetEMin;
-                                data[dataIndex++] = theEventData.histogramID;
+                                data[dataIndex++] = theEventData.histogramID;// don't confuse with Orca data ID 'histogramID' -tb-
                                 data[dataIndex++] = theEventData.histogramInfo;
                                 if( ((dataIndex-checkDataIndexLength)*sizeof(int32_t)) != sizeof(katrinV4HistogramDataStruct) ) fprintf(stdout,"ORFLTv4Readout: WARNING: bad record size!\n");
                                 fflush(stdout);   
                                 int i;
-                                for(i=0; i<theEventData.histogramLength;i++)
-                                    data[dataIndex++] = shipHistogramBuffer32[i];
-                                
+								if(theEventData.histogramLength>0){
+									for(i=0; i<theEventData.histogramLength;i++)
+										data[dataIndex++] = shipHistogramBuffer32[i];
+								}
+								//debug: fprintf(stdout," Shipping histogram with ID %i\n",histogramID);     fflush(stdout);   
                             }
                             #endif
                             

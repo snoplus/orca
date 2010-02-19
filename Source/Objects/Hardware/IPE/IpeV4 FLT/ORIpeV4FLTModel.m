@@ -175,6 +175,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     self = [super init];
 	ledOff = YES;
+	histMeasTime = 5;
     return self;
 }
 
@@ -259,6 +260,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			
 		case kIpeFlt_Histogram_Mode:
 			[self setFltRunMode:kIpeFltV4Katrin_Histo_Mode];
+			//TODO: workaround - if set to kFifoStopOnFull the histogramming stops after some seconds - probably a FPGA bug? -tb-
+			if(fifoBehaviour == kFifoStopOnFull){
+				//NSLog(@"ORIpeV4FLTModel message: due to a FPGA side effect histogramming mode should run with kFifoEnableOverFlow setting! -tb-\n");//TODO: fix it -tb-
+				NSLog(@"ORIpeV4FLTModel message: switched FIFO behaviour to kFifoEnableOverFlow (required for histogramming mode)\n");//TODO: fix it -tb-
+				[self setFifoBehaviour: kFifoEnableOverFlow];
+			}
 			break;
 			
 		default:
@@ -340,6 +347,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (unsigned long) histMeasTime { return histMeasTime; }
 - (void) setHistMeasTime:(unsigned long)aHistMeasTime
 {
+	if(aHistMeasTime==0) aHistMeasTime=5;
     histMeasTime = aHistMeasTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistMeasTimeChanged object:self];
 }
@@ -658,8 +666,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self setRunBoxCarFilter:YES];
 	[self setGapLength:0];
 	[self setFilterLength:6];
-	[self setFifoBehaviour:kFifoStopOnFull];
+	[self setFifoBehaviour:kFifoEnableOverFlow];// kFifoEnableOverFlow or kFifoStopOnFull
 	[self setPostTriggerTime:300]; // max. filter length should fit into the range -tb-
+	
+	[self setHistMeasTime:	5];
 }
 
 #pragma mark •••HW Access
@@ -1021,7 +1031,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//0,1 test pattern
 	//1,0 always 0
 	//1,1 always 1
-	[self writeReg:kFLTV4PixelSettings1Reg value:0]; //must be handled by readout, single pixels cannot be disabled for KATRIN - FIRMWARE FIXED -tb-
+	[self writeReg:kFLTV4PixelSettings1Reg value:0]; //must be handled by readout, single pixels cannot be disabled for KATRIN - OK, FIRMWARE FIXED -tb-
 	uint32_t mask = (~triggerEnabledMask) & 0xffffff;
 	[self writeReg:kFLTV4PixelSettings2Reg value: mask];
 }
@@ -1036,6 +1046,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		float newTotal = 0;
 		int chan;
         int hitRateLengthSec = 1<<hitRateLength;
+		float freq = 1.0/((double)hitRateLengthSec);
 				
 		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 		int dataIndex = 0;
@@ -1059,10 +1070,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				BOOL overflow = (aValue >> 31) & 0x1;
 				aValue = aValue & 0xffff;
 				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
-					//TODO: there is a bug or the HR is devided by # of seconds on FPGA -tb-
-					//TODO: ask Denis -tb-
-					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue/ (float) hitRateLengthSec; 
-					if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
+					if (hitRateLengthSec!=0)	hitRate[chan] = aValue * freq;
+					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
 					else					    hitRate[chan] = 0;
 					
 					if(hitRateOverFlow[chan])hitRate[chan] = 0;
@@ -1073,7 +1082,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				if(!hitRateOverFlow[chan]){
 					newTotal += hitRate[chan];
 				}
-				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;
+				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb-
 				dataIndex++;
 			}
 		}
@@ -1439,6 +1448,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 		
 	if(runMode == kIpeFlt_Histogram_Mode){
+		//start polling histogramming mode status
 		[self performSelector:@selector(readHistogrammingStatus) 
 				   withObject:nil
 				   afterDelay: 1];		//start reading out histogram timer and page toggle

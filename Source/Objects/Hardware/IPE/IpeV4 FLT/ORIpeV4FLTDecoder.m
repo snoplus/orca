@@ -422,73 +422,6 @@
 @end
 
 
-#if 0
-
-@implementation ORIpeV4FLTDecoderForHistogram
-
-//-------------------------------------------------------------
-/** Data format for waveform
- *
- <pre>  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^^^^ ^^^^ ^^^^ ^^-----------------------data id
- ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
- 
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^^^^ ^^^--------------------------------spare
- ^ ^^^---------------------------crate
- ^ ^^^^---------------------card
- ^^^^ ^^^^-----------channel
- followed by waveform data (n x 1024 16-bit words)
- </pre>
- *
- */
-//-------------------------------------------------------------
-
-
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-	
-    unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
-	
-	++ptr;											//crate, card,channel from second word
-	unsigned char crate		= (*ptr>>21) & 0xf;
-	unsigned char card		= (*ptr>>16) & 0x1f;
-	unsigned char chan		= (*ptr>>8) & 0xff;
-	NSString* crateKey		= [self getCrateKey: crate];
-	NSString* stationKey	= [self getStationKey: card];	
-	NSString* channelKey	= [self getChannelKey: chan];
-	
-	// Set up the waveform
-	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
-	
-	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
-					offset: 2*sizeof(long)					// Offset in bytes (2 header words)
-				  unitSize: sizeof(short)					// unit size in bytes
-					  mask:	0x0FFF							// when displayed all values will be masked with this value
-					sender: self 
-				  withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
-	
-    return length; //must return number of longs processed.
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
-{
-	
-    NSString* title= @"Ipe FLT Waveform Record\n\n";
-	++ptr;		//skip the first word (dataID and length)
-    
-    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
-	
-    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan]; 
-}
-@end
-
-
-#else
 
 
 @implementation ORIpeV4FLTDecoderForHistogram
@@ -591,8 +524,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 
     #if 1
     // this counts one histogram as one event in data monitor -tb-
-    if(ePtr->histogramLength){
-        int numBins = 2048; //TODO: this has changed for V4 !!!! -tb-512;
+    //if(ePtr->histogramLength){
+    {// I want to see empty histograms
+        int numBins = 2048; //TODO: this has changed for V4 to 2048!!!! -tb-512;
+		if(ePtr->maxHistogramLength>numBins) numBins=ePtr->maxHistogramLength;
         unsigned long data[numBins];// v3: histogram length is 512 -tb-
         int i;
         for(i=0; i< numBins;i++) data[i]=0;
@@ -701,12 +636,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	//NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
 	NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->refreshTimeSec];
 	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
-	NSString* lastBin	= [NSString stringWithFormat:@"lastBin = %d\n",ePtr->lastBin];
-	NSString* histogramLength	= [NSString stringWithFormat:@"histogramLength = %d\n",ePtr->histogramLength];
+	NSString* lastBin	= [NSString stringWithFormat:@"lastBin  = %d\n",ePtr->lastBin];
+	NSString* histogramLength		= [NSString stringWithFormat:@"histogramLength    = %d\n",ePtr->histogramLength];
 	NSString* maxHistogramLength	= [NSString stringWithFormat:@"maxHistogramLength = %d\n",ePtr->maxHistogramLength];
-	NSString* binSize	= [NSString stringWithFormat:@"binSize = %d\n",ePtr->binSize];
+	NSString* binSize		= [NSString stringWithFormat:@"binSize    = %d\n",ePtr->binSize];
 	NSString* offsetEMin	= [NSString stringWithFormat:@"offsetEMin = %d\n",ePtr->offsetEMin];
-	NSString* histIDInfo	= [NSString stringWithFormat:@"ID = %d.%c\n",ePtr->histogramID,(ePtr->histogramInfo&0x1)?'B':'A'];
+	NSString* histIDInfo	= [NSString stringWithFormat:@"ID         = %d.%c\n",ePtr->histogramID,(ePtr->histogramInfo&0x1)?'B':'A'];
 
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
@@ -719,4 +654,3 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 @end
 
 
-#endif
