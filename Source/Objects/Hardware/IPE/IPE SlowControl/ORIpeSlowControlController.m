@@ -163,6 +163,11 @@
                          name : ORIpeSlowControlModelShipRecordsChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(showDebugOutputChanged:)
+                         name : ORIpeSlowControlModelShowDebugOutputChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -186,6 +191,12 @@
 	[self timeOutCountChanged:nil];
 	[self totalRequestCountChanged:nil];
 	[self shipRecordsChanged:nil];
+	[self showDebugOutputChanged:nil];
+}
+
+- (void) showDebugOutputChanged:(NSNotification*)aNote
+{
+	[showDebugOutputCB setState: [model showDebugOutput]];
 }
 
 - (void) shipRecordsChanged:(NSNotification*)aNote
@@ -347,6 +358,11 @@
 }
 
 #pragma mark ***Actions
+
+- (void) showDebugOutputAction:(id)sender
+{
+	[model setShowDebugOutput:[sender state]];	
+}
 
 - (void) shipRecordsAction:(id)sender
 {

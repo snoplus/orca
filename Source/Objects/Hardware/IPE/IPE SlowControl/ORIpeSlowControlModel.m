@@ -25,6 +25,7 @@
 #import "ORAdeiLoader.h"
 
 #pragma mark •••Notification Strings
+NSString* ORIpeSlowControlModelShowDebugOutputChanged = @"ORIpeSlowControlModelShowDebugOutputChanged";
 NSString* ORIpeSlowControlModelShipRecordsChanged	= @"ORIpeSlowControlModelShipRecordsChanged";
 NSString* ORIpeSlowControlModelTotalRequestCountChanged = @"ORIpeSlowControlModelTotalRequestCountChanged";
 NSString* ORIpeSlowControlModelTimeOutCountChanged	= @"ORIpeSlowControlModelTimeOutCountChanged";
@@ -131,6 +132,18 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
 
 #pragma mark ***Accessors
+
+- (BOOL) showDebugOutput
+{
+    return showDebugOutput;
+}
+
+- (void) setShowDebugOutput:(BOOL)aShowDebugOutput
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowDebugOutput:showDebugOutput];
+    showDebugOutput = aShowDebugOutput;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlModelShowDebugOutputChanged object:self];
+}
 
 - (BOOL) shipRecords
 {
@@ -560,7 +573,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	itemTreeRoot = nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowItemTreeChanged object:self];
 	ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:[self ipNumberToURL] adeiType:itemType delegate:self didFinishSelector:@selector(itemTreeResults:path:)];
-    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
+    [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
 	[aLoader loadPath:@"/" recursive:YES];
 }
 
@@ -597,6 +610,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
  	[self initConnectionHistory];
    
     [self initBasics];
+	[self setShowDebugOutput:	[decoder decodeBoolForKey:    @"showDebugOutput"]];
 	[self setShipRecords:		[decoder decodeBoolForKey:	  @"shipRecords"]];
 	[self setFastGenSetup:		[decoder decodeBoolForKey:	  @"fastGen"]];
 	[self setSetPoint:			[decoder decodeDoubleForKey:  @"setPoint"]];
@@ -618,6 +632,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];    
+	[encoder encodeBool:showDebugOutput		forKey:@"showDebugOutput"];
 	[encoder encodeBool:shipRecords			forKey:@"shipRecords"];
 	[encoder encodeBool:fastGenSetup		forKey:@"fastGen"];
 	[encoder encodeDouble:setPoint			forKey:@"setPoint"];
@@ -806,7 +821,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 		id anItem = [topLevelDictionary objectForKey:anItemKey];
 		int aType = [[anItem objectForKey:@"Control"] intValue];
 		ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:[anItem objectForKey:@"URL"] adeiType:aType delegate:self didFinishSelector:@selector(polledItemResult:path:) setupOptions:setupOptions];
-        [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
+        [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
 		[aLoader requestItem:[anItem objectForKey:@"Path"]];
         [self setPendingRequest:anItemKey];
 		[self setTotalRequestCount:totalRequestCount+1];
@@ -837,7 +852,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
         }
 	ORAdeiLoader* aLoader;
 	aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kSensorType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
-    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
+    [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
 	[aLoader requestItem:aPath];
 	[self setPendingRequest:anItemKey];
 	[self setTotalRequestCount:totalRequestCount+1];
@@ -853,7 +868,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
         }
 	ORAdeiLoader* aLoader;
 	aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
-    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
+    [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
 	[aLoader requestItem:aPath];
 	[self setPendingRequest:anItemKey];
 	[self setTotalRequestCount:totalRequestCount+1];
@@ -867,7 +882,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
             //TODO: XXX return;
         }
     ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
-    [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
+    [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
     [aLoader writeControl:aPath value:aValue];
 	[self setPendingRequest:anItemKey];
     [self setTotalRequestCount:totalRequestCount+1];
@@ -928,7 +943,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
         // post request
         ORAdeiLoader* aLoader;
         aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:aType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
-        [aLoader setShowDebugOutput: TRUE];//TODO: timeout debugging -tb-
+        [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
         [aLoader requestItem:aPath];
         [self setPendingRequest:itemKey];
         [self setTotalRequestCount:totalRequestCount+1];

@@ -19,14 +19,15 @@
 @class ORPlotter1D;
 @class WebView;
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORIpeSlowControlController : OrcaObjectController <NSComboBoxDataSource>
-#else
 @interface ORIpeSlowControlController : OrcaObjectController
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+	//having '@interface' in two #ifdef #else #endif branches confuses IB, he cannot recognize the outlets any more -tb-
+																<NSComboBoxDataSource>
 #endif
 
 {
 	IBOutlet ORPlotter1D*		timingPlotter;   
+	IBOutlet NSButton*			showDebugOutputCB;
 	IBOutlet NSButton*			shipRecordsCB;
 	IBOutlet NSTextField*		totalRequestCountField;
 	IBOutlet NSTextField*		timeOutCountField;
@@ -63,6 +64,7 @@
 - (id) init;
 
 #pragma mark ***Interface Management
+- (void) showDebugOutputChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) totalRequestCountChanged:(NSNotification*)aNote;
 - (void) timeOutCountChanged:(NSNotification*)aNote;
@@ -84,6 +86,7 @@
 - (void) histoPlotChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) showDebugOutputAction:(id)sender;
 - (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) fastGenSetupAction:(id)sender;
 - (IBAction) writeSetPointAction:(id) sender;

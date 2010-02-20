@@ -92,6 +92,7 @@
     int timeOutCount;
     int totalRequestCount;
     BOOL shipRecords;
+    BOOL showDebugOutput;
 }
 
 #pragma mark ***Initialization
@@ -109,6 +110,8 @@
 - (void) setChannelDataId:(int) aValue;
 
 #pragma mark ***Accessors
+- (BOOL) showDebugOutput;
+- (void) setShowDebugOutput:(BOOL)aShowDebugOutput;
 - (BOOL) shipRecords;
 - (void) setShipRecords:(BOOL)aShipRecords;
 - (int) totalRequestCount;
@@ -214,6 +217,7 @@
 @end
 
 #pragma mark •••Notification Strings
+extern NSString* ORIpeSlowControlModelShowDebugOutputChanged;
 extern NSString* ORIpeSlowControlModelShipRecordsChanged;
 extern NSString* ORIpeSlowControlModelTotalRequestCountChanged;
 extern NSString* ORIpeSlowControlModelTimeOutCountChanged;
