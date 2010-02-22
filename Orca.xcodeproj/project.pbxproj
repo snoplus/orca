@@ -1178,6 +1178,14 @@
 		847F8B36063DB29E00A8597A /* ORTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F8B34063DB29E00A8597A /* ORTimer.m */; };
 		848283C0112B14F100BA30ED /* OffSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BE112B14F100BA30ED /* OffSwitch.tif */; };
 		848283C1112B14F100BA30ED /* OnSwitch.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848283BF112B14F100BA30ED /* OnSwitch.tif */; };
+		848285B1112C5AD700BA30ED /* ORVHS4030Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 848285A5112C5AD600BA30ED /* ORVHS4030Controller.h */; };
+		848285B2112C5AD700BA30ED /* ORVHS4030Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 848285A6112C5AD600BA30ED /* ORVHS4030Controller.m */; };
+		848285B3112C5AD700BA30ED /* ORVHS4030Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 848285A7112C5AD600BA30ED /* ORVHS4030Decoders.h */; };
+		848285B4112C5AD700BA30ED /* ORVHS4030Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 848285A8112C5AD600BA30ED /* ORVHS4030Decoders.m */; };
+		848285B5112C5AD700BA30ED /* ORVHS4030Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 848285A9112C5AD600BA30ED /* ORVHS4030Model.h */; };
+		848285B6112C5AD700BA30ED /* ORVHS4030Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 848285AA112C5AD600BA30ED /* ORVHS4030Model.m */; };
+		848285B8112C5AD700BA30ED /* VHS4030.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848285AC112C5AD600BA30ED /* VHS4030.nib */; };
+		848285B9112C5AD700BA30ED /* VHS4030.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848285AD112C5AD600BA30ED /* VHS4030.tif */; };
 		848326E906DA614B00172F1C /* ORDualPortLAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E506DA614B00172F1C /* ORDualPortLAMController.h */; };
 		848326EA06DA614B00172F1C /* ORDualPortLAMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848326E606DA614B00172F1C /* ORDualPortLAMController.m */; };
 		848326EB06DA614B00172F1C /* ORDualPortLAMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E706DA614B00172F1C /* ORDualPortLAMModel.h */; };
@@ -3305,6 +3313,14 @@
 		847F8B34063DB29E00A8597A /* ORTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimer.m; sourceTree = "<group>"; };
 		848283BE112B14F100BA30ED /* OffSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OffSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OffSwitch.tif; sourceTree = SOURCE_ROOT; };
 		848283BF112B14F100BA30ED /* OnSwitch.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OnSwitch.tif; path = Source/Objects/ProcessLogic/ProcessElements/Inputs/PushButton/OnSwitch.tif; sourceTree = SOURCE_ROOT; };
+		848285A5112C5AD600BA30ED /* ORVHS4030Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHS4030Controller.h; path = Source/Objects/Hardware/Vme/VHS4030/ORVHS4030Controller.h; sourceTree = SOURCE_ROOT; };
+		848285A6112C5AD600BA30ED /* ORVHS4030Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVHS4030Controller.m; sourceTree = "<group>"; };
+		848285A7112C5AD600BA30ED /* ORVHS4030Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHS4030Decoders.h; path = Source/Objects/Hardware/Vme/VHS4030/ORVHS4030Decoders.h; sourceTree = SOURCE_ROOT; };
+		848285A8112C5AD600BA30ED /* ORVHS4030Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHS4030Decoders.m; path = Source/Objects/Hardware/Vme/VHS4030/ORVHS4030Decoders.m; sourceTree = SOURCE_ROOT; };
+		848285A9112C5AD600BA30ED /* ORVHS4030Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHS4030Model.h; path = Source/Objects/Hardware/Vme/VHS4030/ORVHS4030Model.h; sourceTree = SOURCE_ROOT; };
+		848285AA112C5AD600BA30ED /* ORVHS4030Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHS4030Model.m; path = Source/Objects/Hardware/Vme/VHS4030/ORVHS4030Model.m; sourceTree = SOURCE_ROOT; };
+		848285AC112C5AD600BA30ED /* VHS4030.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VHS4030.nib; path = Source/Objects/Hardware/Vme/VHS4030/VHS4030.nib; sourceTree = SOURCE_ROOT; };
+		848285AD112C5AD600BA30ED /* VHS4030.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VHS4030.tif; path = Source/Objects/Hardware/Vme/VHS4030/VHS4030.tif; sourceTree = SOURCE_ROOT; };
 		848326E506DA614B00172F1C /* ORDualPortLAMController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMController.h; sourceTree = "<group>"; };
 		848326E606DA614B00172F1C /* ORDualPortLAMController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDualPortLAMController.m; sourceTree = "<group>"; };
 		848326E706DA614B00172F1C /* ORDualPortLAMModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMModel.h; sourceTree = "<group>"; };
@@ -6747,6 +6763,22 @@
 			path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun";
 			sourceTree = SOURCE_ROOT;
 		};
+		848285A1112C5AD600BA30ED /* VHS4030 */ = {
+			isa = PBXGroup;
+			children = (
+				848285A5112C5AD600BA30ED /* ORVHS4030Controller.h */,
+				848285A6112C5AD600BA30ED /* ORVHS4030Controller.m */,
+				848285A7112C5AD600BA30ED /* ORVHS4030Decoders.h */,
+				848285A8112C5AD600BA30ED /* ORVHS4030Decoders.m */,
+				848285A9112C5AD600BA30ED /* ORVHS4030Model.h */,
+				848285AA112C5AD600BA30ED /* ORVHS4030Model.m */,
+				848285AC112C5AD600BA30ED /* VHS4030.nib */,
+				848285AD112C5AD600BA30ED /* VHS4030.tif */,
+			);
+			name = VHS4030;
+			path = Source/Objects/Hardware/Vme/VHS4030;
+			sourceTree = SOURCE_ROOT;
+		};
 		848326E406DA614B00172F1C /* DualPortLAM */ = {
 			isa = PBXGroup;
 			children = (
@@ -9547,6 +9579,7 @@
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
 				84D34AFB10B1D6C90013473E /* SIS3302 */,
 				84FA6383102B041800B426A6 /* SIS3350 */,
+				848285A1112C5AD600BA30ED /* VHS4030 */,
 				84AFC23D1029F35E009F4139 /* VHQ224L */,
 			);
 			path = Vme;
@@ -10504,6 +10537,9 @@
 				84DCB61A110E116E0062A95C /* ORiTransGasSensorDecoder.h in Headers */,
 				84693F731121BB4C008B5DB2 /* ORRunNotesController.h in Headers */,
 				84693F751121BB4C008B5DB2 /* ORRunNotesModel.h in Headers */,
+				848285B1112C5AD700BA30ED /* ORVHS4030Controller.h in Headers */,
+				848285B3112C5AD700BA30ED /* ORVHS4030Decoders.h in Headers */,
+				848285B5112C5AD700BA30ED /* ORVHS4030Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11176,6 +11212,8 @@
 				84693F781121BB4C008B5DB2 /* RunNotes.tif in Resources */,
 				848283C0112B14F100BA30ED /* OffSwitch.tif in Resources */,
 				848283C1112B14F100BA30ED /* OnSwitch.tif in Resources */,
+				848285B8112C5AD700BA30ED /* VHS4030.nib in Resources */,
+				848285B9112C5AD700BA30ED /* VHS4030.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11925,6 +11963,9 @@
 				84DCB61B110E116E0062A95C /* ORiTransGasSensorDecoder.m in Sources */,
 				84693F741121BB4C008B5DB2 /* ORRunNotesController.m in Sources */,
 				84693F761121BB4C008B5DB2 /* ORRunNotesModel.m in Sources */,
+				848285B2112C5AD700BA30ED /* ORVHS4030Controller.m in Sources */,
+				848285B4112C5AD700BA30ED /* ORVHS4030Decoders.m in Sources */,
+				848285B6112C5AD700BA30ED /* ORVHS4030Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
