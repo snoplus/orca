@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#define MAX_CARDS			20
+#define MAX_CARDS			21
  
 typedef struct {
     unsigned long total_cards;					// total sum of all cards
