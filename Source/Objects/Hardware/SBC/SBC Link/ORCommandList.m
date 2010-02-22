@@ -110,5 +110,20 @@
 	else return 0;
 }
 
+- (short) shortValueForCmd:(int)anIndex
+{
+	if(anIndex<[commands count]){
+		return [[commands objectAtIndex:anIndex] shortValue];
+	}
+	else return 0;
+}
+- (NSData*) dataForCmd:(int)anIndex
+{
+	if(anIndex<[commands count]){
+		return [commands objectAtIndex:anIndex];
+	}
+	else return 0;
+}
+
 @end
 

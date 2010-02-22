@@ -31,4 +31,6 @@
 - (SBC_Packet) SBCPacket;
 - (void) extractData:(SBC_Packet*) aPacket;
 - (long) longValueForCmd:(int)anIndex;
+- (short) shortValueForCmd:(int)anIndex;
+- (NSData*) dataForCmd:(int)anIndex;
 @end

@@ -57,6 +57,22 @@
 	
 }
 
++ (id) readShortBlockAtAddress:(unsigned int) vmeAddress
+					numToRead:(unsigned int) numberShorts
+				   withAddMod:(unsigned short) anAddressModifier
+				usingAddSpace:(unsigned short) anAddressSpace
+{
+	return [[[ORVmeReadWriteCommand alloc] initWithOp: kReadOp
+										   dataAdress: 0		
+										   vmeAddress: vmeAddress
+										  numberItems: numberShorts
+											 itemSize: sizeof(short)
+										   withAddMod: anAddressModifier
+										usingAddSpace: anAddressSpace] autorelease];
+	
+}
+
+
 - (id) initWithMilliSecondDelay:(unsigned long) aMilliSecondDelay
 {
 	self			= [super init];
@@ -183,9 +199,16 @@
 	else details = [NSString stringWithFormat:@"%d",anError];
 	[NSException raise: @"SBC/VME access Error" format:@"%@:%@",baseString,details];
 }
+
 - (long) longValue
 {
 	long* p = (long*)[data bytes];
+	return p[0];
+}
+
+- (short) shortValue
+{
+	short* p = (short*)[data bytes];
 	return p[0];
 }
 

@@ -48,6 +48,11 @@ for the use of this software.
 				   withAddMod:(unsigned short) anAddressModifier
 				usingAddSpace:(unsigned short) anAddressSpace;
 
++ (id) readShortBlockAtAddress:(unsigned int) vmeAddress
+					 numToRead:(unsigned int) numberShorts
+					withAddMod:(unsigned short) anAddressModifier
+				 usingAddSpace:(unsigned short) anAddressSpace;
+
 - (id) initWithMilliSecondDelay:(unsigned long) aMilliSecondDelay;
 	
 - (id) initWithOp: (int) aOpType
@@ -74,6 +79,7 @@ for the use of this software.
 - (void) extractData:(SBC_Packet*) aPacket;
 - (void) throwError:(int)anError;
 - (long) longValue;
+- (short) shortValue;
 
 @end
 
