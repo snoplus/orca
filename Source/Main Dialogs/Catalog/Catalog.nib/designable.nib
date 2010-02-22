@@ -2441,6 +2441,46 @@
 																		<int key="NSPeriodicInterval">75</int>
 																	</object>
 																</object>
+																<object class="NSTextField" id="1072143995">
+																	<reference key="NSNextResponder" ref="543308063"/>
+																	<int key="NSvFlags">256</int>
+																	<string key="NSFrame">{{456, 26}, {86, 17}}</string>
+																	<reference key="NSSuperview" ref="543308063"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSTextFieldCell" key="NSCell" id="574472502">
+																		<int key="NSCellFlags">67239424</int>
+																		<int key="NSCellFlags2">138412032</int>
+																		<string key="NSContents">VHS4030 HV</string>
+																		<reference key="NSSupport" ref="625969386"/>
+																		<reference key="NSControlView" ref="1072143995"/>
+																		<reference key="NSBackgroundColor" ref="421922390"/>
+																		<reference key="NSTextColor" ref="688154912"/>
+																	</object>
+																</object>
+																<object class="ObjectFactory" id="1072695849">
+																	<reference key="NSNextResponder" ref="543308063"/>
+																	<int key="NSvFlags">256</int>
+																	<string key="NSFrame">{{491, 47}, {16, 127}}</string>
+																	<reference key="NSSuperview" ref="543308063"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSButtonCell" key="NSCell" id="69914451">
+																		<int key="NSCellFlags">67239424</int>
+																		<int key="NSCellFlags2">134217728</int>
+																		<string key="NSContents"/>
+																		<reference key="NSSupport" ref="625969386"/>
+																		<reference key="NSControlView" ref="1072695849"/>
+																		<int key="NSButtonFlags">-2046017281</int>
+																		<int key="NSButtonFlags2">2</int>
+																		<object class="NSCustomResource" key="NSNormalImage">
+																			<string key="NSClassName">NSImage</string>
+																			<string key="NSResourceName">VHS4030</string>
+																		</object>
+																		<string key="NSAlternateContents"/>
+																		<string key="NSKeyEquivalent"/>
+																		<int key="NSPeriodicDelay">400</int>
+																		<int key="NSPeriodicInterval">75</int>
+																	</object>
+																</object>
 															</object>
 															<string key="NSFrame">{{10, 7}, {719, 206}}</string>
 														</object>
@@ -9267,6 +9307,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="923102256"/>
 							<reference ref="447292781"/>
 							<reference ref="960377520"/>
+							<reference ref="1072143995"/>
+							<reference ref="1072695849"/>
 						</object>
 						<reference key="parent" ref="761815348"/>
 					</object>
@@ -14151,6 +14193,34 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="object" ref="502758048"/>
 						<reference key="parent" ref="605760205"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26143</int>
+						<reference key="object" ref="1072143995"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="574472502"/>
+						</object>
+						<reference key="parent" ref="543308063"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26144</int>
+						<reference key="object" ref="1072695849"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="69914451"/>
+						</object>
+						<reference key="parent" ref="543308063"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26145</int>
+						<reference key="object" ref="69914451"/>
+						<reference key="parent" ref="1072695849"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26146</int>
+						<reference key="object" ref="574472502"/>
+						<reference key="parent" ref="1072143995"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -15014,6 +15084,13 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26140.ImportedFromIB2</string>
 					<string>26141.IBPluginDependency</string>
 					<string>26142.IBPluginDependency</string>
+					<string>26143.IBPluginDependency</string>
+					<string>26143.ImportedFromIB2</string>
+					<string>26144.IBAttributePlaceholdersKey</string>
+					<string>26144.IBPluginDependency</string>
+					<string>26144.ImportedFromIB2</string>
+					<string>26145.IBPluginDependency</string>
+					<string>26146.IBPluginDependency</string>
 					<string>267.IBPluginDependency</string>
 					<string>267.ImportedFromIB2</string>
 					<string>2709.IBPluginDependency</string>
@@ -17130,6 +17207,20 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="1072695849"/>
+							<string key="toolTip">ORVHS4030Model</string>
+						</object>
+					</object>
+					<string>com.yourcompany.OrcaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>ObjectFactory</string>
@@ -18820,7 +18911,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26142</int>
+			<int key="maxID">26146</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
