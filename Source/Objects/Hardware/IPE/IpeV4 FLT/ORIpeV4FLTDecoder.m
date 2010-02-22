@@ -54,7 +54,7 @@
  */
 //-------------------------------------------------------------
 
-#define kPageLength (65*1024)
+#define kPageLength (64*1024)
 
 - (id) init
 {
@@ -212,6 +212,8 @@
 
 	//channel by channel histograms
 	unsigned long energy = ptr[6];
+    uint32_t eventFlags     = ptr[7];
+    uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
 
 	int page = energy/kPageLength;
 	int startPage = page*kPageLength;
@@ -236,6 +238,7 @@
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
 	
+	#if 0
 	//-----------------------------------------------
 	//temp.. to lock the waveform to the highest value
 	int n = [waveFormdata length]/sizeof(short) - 20;
@@ -252,8 +255,9 @@
 	}
 	startIndex = (startIndex+2000)%n;
 	//-----------------------------------------------
+	#endif
 //TODO: no offset -tb-
-//startIndex=0;
+startIndex=traceStart16;
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				    unitSize: sizeof(short)					// unit size in bytes
