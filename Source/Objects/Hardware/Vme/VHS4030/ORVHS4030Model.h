@@ -71,7 +71,8 @@ enum {
 	kNumberOfVHS4030ChannelRegisters
 };
 
-#define kNumVHS4030Channels 4
+#define kNumVHS4030Channels		 4
+#define kVHS403DataRecordLength  (3 + (kNumVHS4030Channels*kNumVHS4030Channels))
 
 //kModuleStatus bits
 #define kIsCmdComplete				(0x1<<7)

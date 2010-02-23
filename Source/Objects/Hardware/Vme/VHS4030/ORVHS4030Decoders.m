@@ -32,14 +32,11 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                          ^^^^ ^^^^ ^^^^- device id
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time in seconds since Jan 1, 1970
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  StatusWord1 for channel 0
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  StatusWord2 for channel 0
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  StatusWord for channel 0
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  EventStatusWord for channel 0
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage chan 0 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current chan 0 encoded as a float
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  StatusWord1 for channel 1
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  StatusWord2 for channel 1
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage chan 1 encoded as a float
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current chan 1 encoded as a float
+//channel 1,2,3 follow.
 //-----------------------------------------------------------------------------------------------
 
 @implementation ORVHS4030DecoderForHVStatus
@@ -64,22 +61,18 @@
 		unsigned long asLong;
 	}theData;
 	
-	theString = [theString stringByAppendingFormat:@"--------------------------\n"];
-	theString = [theString stringByAppendingFormat:@"Channel 0\n"];
-	theString = [theString stringByAppendingFormat:@"Status Words 0x%02x  0x%02x\n",dataPtr[3],dataPtr[4]];
-	theData.asLong = dataPtr[5]; //act Voltage 0
-	theString = [theString stringByAppendingFormat:@"Act Voltage: %.1f\n",theData.asFloat];
-	theData.asLong = dataPtr[6]; //act Current 0
-	theString = [theString stringByAppendingFormat:@"Act Current: %.1f\n",theData.asFloat];
-	
-	theString = [theString stringByAppendingFormat:@"--------------------------\n"];
-	theString = [theString stringByAppendingFormat:@"Channel 1\n"];
-	theString = [theString stringByAppendingFormat:@"Status Words 0x%02x 0x%02x\n",dataPtr[7],dataPtr[8]];
-	theData.asLong = dataPtr[9]; //act Voltage 1
-	theString = [theString stringByAppendingFormat:@"Act Voltage: %.1f\n",theData.asFloat];
-	theData.asLong = dataPtr[10]; //act Current 1
-	theString = [theString stringByAppendingFormat:@"Act Current: %.1f\n",theData.asFloat];
-	
+	int i;
+	int index = 3;
+	for(i=0;i<4;i++){
+		theString = [theString stringByAppendingFormat:@"--------------------------\n"];
+		theString = [theString stringByAppendingFormat:@"Channel %d\n",i];
+		theString = [theString stringByAppendingFormat:@"Status Words 0x%02x  0x%02x\n",dataPtr[index],dataPtr[index+1]];
+		index +=2;
+		theData.asLong = dataPtr[index++]; //act Voltage 0
+		theString = [theString stringByAppendingFormat:@"Act Voltage: %.1f\n",theData.asFloat];
+		theData.asLong = dataPtr[index++]; //act Current 0
+		theString = [theString stringByAppendingFormat:@"Act Current: %.1f\n",theData.asFloat];
+	}
 	return theString;
 	
 }

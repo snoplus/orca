@@ -561,7 +561,7 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 	if(aChannel>=kNumVHS4030Channels)return;
 	if(aChannel == 0xFFFF){
 		int i;
-		for(i=0;i<4;i++){
+		for(i=0;i<kNumVHS4030Channels;i++){
 			[self writeChannel:i regIndex:kVoltageSet withFloatValue:0];	
 			[self writeEmergency:i];
 		}
@@ -831,7 +831,7 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 					usingAddSpace:0x01];	
 	
 	int i;
-	for(i=0;i<4;i++){
+	for(i=0;i<kNumVHS4030Channels;i++){
 		[self clearEmergency:i];
 	}
 }
@@ -1018,7 +1018,7 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 								 @"ORVHS4030DecoderForHVStatus",                 @"decoder",
 								 [NSNumber numberWithLong:dataId],               @"dataId",
 								 [NSNumber numberWithBool:NO],                   @"variable",
-								 [NSNumber numberWithLong:11],					 @"length",
+								 [NSNumber numberWithLong:kVHS403DataRecordLength],	@"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"HVStatus"];
     return dataDictionary;
@@ -1101,8 +1101,8 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 		time(&ut_Time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		
-		unsigned long data[11];
-		data[0] = dataId | 11;
+		unsigned long data[kVHS403DataRecordLength];
+		data[0] = dataId | kVHS403DataRecordLength;
 		data[1] = [self uniqueIdNumber]&0xfff;
 		data[2] = ut_Time;
 		
@@ -1112,7 +1112,7 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 		}theData;
 		int index = 3;
 		int i;
-		for(i=0;i<4;i++){
+		for(i=0;i<kNumVHS4030Channels;i++){
 			data[index++] = channelStatus[i];
 			data[index++] = channelEventStatus[i];
 
@@ -1124,7 +1124,7 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 		}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*11]];
+															object:[NSData dataWithBytes:&data length:sizeof(long)*kVHS403DataRecordLength]];
 	}	
 	statusChanged = NO;
 }
@@ -1162,12 +1162,14 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 		}
 		
 		if(statusChanged)[self shipVoltageRecords];
+		
 		[self setPollingError:NO];
 	}
 	@catch(NSException* e){
 		[self setPollingError:YES];
 		NSLogError(@"",@"VHS4030",@"Polling Error",nil);
 	}
+	
 	
     [[self undoManager] enableUndoRegistration];
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];

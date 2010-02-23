@@ -333,7 +333,7 @@
 	BOOL isEmergency = NO;
 	BOOL anyPowerOn = NO;
 	int i;
-	for(i=0;i<4;i++){
+	for(i=0;i<kNumVHS4030Channels;i++){
 		[[onOffMatrix cellAtRow:i column:0] setEnabled: !lockedOrRunningMaintenance && [model voltageMeasure:i]<20 && ![model isEmergency:i]];
 		[[loadStartButtonMatrix cellAtRow:i column:0] setEnabled: !lockedOrRunningMaintenance && [model hvPower:i] && ![model isEmergency:i]];
 		[[stopButtonMatrix cellAtRow:i column:0] setEnabled: [model isRamping:i]];
@@ -364,7 +364,7 @@
 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
 	if(!aNote){
 		int i; 
-		for(i=0;i<4;i++) {
+		for(i=0;i<kNumVHS4030Channels;i++) {
 			BOOL hvOn = [model hvPower:i];
 			[[hvStateMatrix cellAtRow:i column:0] setStringValue:hvOn ? @"*ON*":@"Off"];
 			[[hvStateMatrix cellAtRow:i column:0] setTextColor:hvOn ? [NSColor redColor]:[NSColor blueColor]];
@@ -405,7 +405,7 @@
 {
 	if(!aNote){
 		int i; 
-		for(i=0;i<4;i++) [[voltageSetMatrix cellAtRow:i column:0] setFloatValue:[model voltageSet:i]];	
+		for(i=0;i<kNumVHS4030Channels;i++) [[voltageSetMatrix cellAtRow:i column:0] setFloatValue:[model voltageSet:i]];	
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];	
@@ -417,7 +417,7 @@
 {
 	if(!aNote){
 		int i; 
-		for(i=0;i<4;i++) [[voltageMeasureMatrix cellAtRow:i column:0] setFloatValue:[model voltageMeasure:i]];	
+		for(i=0;i<kNumVHS4030Channels;i++) [[voltageMeasureMatrix cellAtRow:i column:0] setFloatValue:[model voltageMeasure:i]];	
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];	
@@ -430,7 +430,7 @@
 {
 	if(!aNote){
 		int i; 
-		for(i=0;i<4;i++) [[currentMeasureMatrix cellAtRow:i column:0] setFloatValue:[model currentMeasure:i]*1000.];	
+		for(i=0;i<kNumVHS4030Channels;i++) [[currentMeasureMatrix cellAtRow:i column:0] setFloatValue:[model currentMeasure:i]*1000.];	
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];	
@@ -442,7 +442,7 @@
 {	
 	if(!aNote){
 		int i; 
-		for(i=0;i<4;i++) [[currentSetMatrix cellAtRow:i column:0] setFloatValue:[model currentSet:i]*1000.];	
+		for(i=0;i<kNumVHS4030Channels;i++) [[currentSetMatrix cellAtRow:i column:0] setFloatValue:[model currentSet:i]*1000.];	
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];	
@@ -454,7 +454,7 @@
 {
 	if(!aNote){
 		int i; 
-		for(i=0;i<4;i++) [[voltageBoundsMatrix cellAtRow:i column:0] setFloatValue:[model voltageBounds:i]];	
+		for(i=0;i<kNumVHS4030Channels;i++) [[voltageBoundsMatrix cellAtRow:i column:0] setFloatValue:[model voltageBounds:i]];	
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];	
@@ -466,7 +466,7 @@
 {
 	if(!aNote){
 		int i; 
-		for(i=0;i<4;i++) [[currentBoundsMatrix cellAtRow:i column:0] setFloatValue:[model currentBounds:i]*1000.];	
+		for(i=0;i<kNumVHS4030Channels;i++) [[currentBoundsMatrix cellAtRow:i column:0] setFloatValue:[model currentBounds:i]*1000.];	
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];	
