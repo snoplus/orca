@@ -26,10 +26,10 @@
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
-#import "OHexFormatter.h"
 
 @interface ORPacController (private)
 - (void) populatePortListPopup;
+- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 
 @implementation ORPacController
@@ -49,6 +49,7 @@
 
 - (void) awakeFromNib
 {
+		
     [self populatePortListPopup];
 	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	[numberFormatter setFormat:@"0.00"];
@@ -57,6 +58,18 @@
 		NSCell* theCell = [adcMatrix cellAtRow:i column:0];
 		[theCell setFormatter:numberFormatter];
 	}
+	
+	[[plotter0 yScale] setRngLow:0.0 withHigh:6.];
+	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:6. withMinRng:1];
+    [[plotter1 yScale] setRngLow:0.0 withHigh:6.];
+	[[plotter1 yScale] setRngLimitsLow:0.0 withHigh:6. withMinRng:1];
+	[[plotter0 yScale] setInteger:NO];
+	[[plotter1 yScale] setInteger:NO];
+	
+    [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
+	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:50];
+    [[plotter1 xScale] setRngLow:0.0 withHigh:10000];
+	[[plotter1 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:50];
 	
 	[super awakeFromNib];
 }
@@ -67,6 +80,12 @@
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(pollingStateChanged:)
+                         name : ORPacModelPollingStateChanged
+						object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
@@ -127,6 +146,31 @@
                          name : ORPacModelRDacsChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(logToFileChanged:)
+                         name : ORPacModelLogToFileChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(logFileChanged:)
+                         name : ORPacModelLogFileChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(scaleAction:)
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTimePlot:)
+						 name : ORRateAverageChangedNotification
+					   object : nil];
+	
 }
 
 - (void) setModel:(id)aModel
@@ -149,6 +193,94 @@
 	[self rdacChannelChanged:nil];
 	[self setAllRDacsChanged:nil];
 	[self rdacsChanged:nil];
+    [self pollingStateChanged:nil];
+	[self logToFileChanged:nil];
+	[self logFileChanged:nil];
+    [self pollingStateChanged:nil];
+    [self miscAttributesChanged:nil];
+}
+
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
+		[model setMiscAttributes:[[plotter0 xScale]attributes] forKey:@"XAttributes0"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
+		[model setMiscAttributes:[[plotter0 yScale]attributes] forKey:@"YAttributes0"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter1 xScale]){
+		[model setMiscAttributes:[[plotter1 xScale]attributes] forKey:@"XAttributes1"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter1 yScale]){
+		[model setMiscAttributes:[[plotter1 yScale]attributes] forKey:@"YAttributes1"];
+	};
+}
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+	
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
+		if(attrib){
+			[[plotter0 xScale] setAttributes:attrib];
+			[plotter0 setNeedsDisplay:YES];
+			[[plotter0 xScale] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
+		if(attrib){
+			[[plotter0 yScale] setAttributes:attrib];
+			[plotter0 setNeedsDisplay:YES];
+			[[plotter0 yScale] setNeedsDisplay:YES];
+		}
+	}
+	
+	if(aNote == nil || [key isEqualToString:@"XAttributes1"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes1"];
+		if(attrib){
+			[[plotter1 xScale] setAttributes:attrib];
+			[plotter1 setNeedsDisplay:YES];
+			[[plotter1 xScale] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes1"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes1"];
+		if(attrib){
+			[[plotter1 yScale] setAttributes:attrib];
+			[plotter1 setNeedsDisplay:YES];
+			[[plotter1 yScale] setNeedsDisplay:YES];
+		}
+	}
+}
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+	if(!aNote || ([aNote object] == [model timeRate:0])){
+		[plotter0 setNeedsDisplay:YES];
+	}
+	else if(!aNote || ([aNote object] == [model timeRate:1])){
+		[plotter1 setNeedsDisplay:YES];
+	}
+}
+- (void) pollingStateChanged:(NSNotification*)aNotification
+{
+	[pollingButton selectItemAtIndex:[pollingButton indexOfItemWithTag:[model pollingState]]];
+}
+
+- (void) logFileChanged:(NSNotification*)aNote
+{
+	if([model logFile])[logFileTextField setStringValue: [model logFile]];
+	else [logFileTextField setStringValue: @"---"];
+}
+
+- (void) logToFileChanged:(NSNotification*)aNote
+{
+	[logToFileButton setIntValue: [model logToFile]];
 }
 
 - (void) rdacsChanged:(NSNotification*)aNote
@@ -201,8 +333,6 @@
 	}
 }
 
-
-
 - (void) loadAdcTimeValuesForIndex:(int)index
 {
 	[[adcMatrix cellWithTag:index] setFloatValue:[model convertedAdc:index]];
@@ -214,7 +344,6 @@
 		[[timeMatrix cellWithTag:index] setObjectValue:theDate];
 	}
 	else [[timeMatrix cellWithTag:index] setObjectValue:@"--"];
-	
 }
 
 - (void) checkGlobalSecurity
@@ -303,7 +432,8 @@
 }
 
 #pragma mark •••Actions
-- (void) setAllRDacsAction:(id)sender
+
+- (IBAction) setAllRDacsAction:(id)sender
 {
 	[model setSetAllRDacs:[sender intValue]];
 	[self lockChanged:nil];
@@ -399,6 +529,43 @@
 	}
 }
 
+- (IBAction) selectFileAction:(id)sender
+{
+	NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Log To File"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[model logFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = @"OrcaScript";
+    }
+	
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(selectLogFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+	
+}
+
+- (IBAction) logToFileAction:(id)sender
+{
+	[model setLogToFile:[sender intValue]];	
+}
+- (IBAction) setPollingAction:(id)sender
+{
+    [model setPollingState:(NSTimeInterval)[[sender selectedItem] tag]];
+}
+
 #pragma mark •••Table Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
@@ -416,7 +583,8 @@
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return 37;
+	if(aTableView == aTableView)return 37;
+	else return 8;
 }
 
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
@@ -434,11 +602,51 @@
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
-{
+{	
     int index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.Pac.selectedtab"];
 }
 
+#pragma mark •••Data Source
+- (int) numberOfDataSetsInPlot:(id)aPlotter
+{
+    return 4;
+}
+
+- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+	if(aPlotter == plotter0)		return [[model timeRate:set]   count];
+	else if(aPlotter == plotter1)	return [[model timeRate:set+4] count];
+	else return 0;
+}
+- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+{
+	if(aPlotter == plotter0){
+		int count = [[model timeRate:set] count];
+		return [[model timeRate:set] valueAtIndex:count-x-1];
+	}
+	else if(aPlotter == plotter1){
+		int count = [[model timeRate:set+4] count];
+		return [[model timeRate:set+4] valueAtIndex:count-x-1];
+	}
+	else return 0;
+}
+
+- (unsigned long)  	secondsPerUnit:(id) aPlotter
+{
+	return [[model timeRate:0] sampleTime]; //all should be the same, just return value for rate 0
+}
+
+
+#pragma  mark •••Delegate Responsiblities
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    return NO;
+}
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row
+{
+	return YES;
+}
 @end
 
 @implementation ORPacController (private)
@@ -454,5 +662,13 @@
         [portListPopup addItemWithTitle:[aPort name]];
 	}    
 }
+
+- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setLogFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
+    }
+}
+
 @end
 

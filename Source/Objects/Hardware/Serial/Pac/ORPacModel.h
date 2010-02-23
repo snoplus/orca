@@ -20,6 +20,7 @@
 #pragma mark •••Imported Files
 
 @class ORSerialPort;
+@class ORTimeRate;
 
 #define kPacShipAdcs	0xff
 
@@ -59,9 +60,10 @@
         unsigned long		dataId;
 		NSData*				lastRequest;
 		NSMutableArray*		cmdQueue;
+		NSMutableString*    buffer;
 		unsigned long		timeMeasured[8];
-        NSMutableString*    buffer;
 		unsigned short		adc[8];
+		ORTimeRate*			timeRates[8];
 		NSMutableData*		inComingData;
 		int					module;
 		int					preAmp;
@@ -70,6 +72,12 @@
 		int					dacValue;
 		BOOL				setAllRDacs;
 		int					rdac[148];
+		BOOL				pollRunning;
+		NSTimeInterval		pollingState;
+		BOOL				logToFile;
+		NSString*			logFile;
+		NSMutableArray*		logBuffer;
+		unsigned long		readCount;
 }
 
 #pragma mark •••Initialization
@@ -81,6 +89,9 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (ORTimeRate*)timeRate:(int)index;
+- (void) setPollingState:(NSTimeInterval)aState;
+- (NSTimeInterval) pollingState;
 - (int)  rdac:(int)index;
 - (void) setRdac:(int)index withValue:(int)aValue;
 - (BOOL) setAllRDacs;
@@ -108,6 +119,10 @@
 - (unsigned long) timeMeasured:(int)index;
 - (void) setAdc:(int)index value:(unsigned short)aValue;
 - (float) convertedAdc:(int)index;
+- (NSString*) logFile;
+- (void) setLogFile:(NSString*)aLogFile;
+- (BOOL) logToFile;
+- (void) setLogToFile:(BOOL)aLogToFile;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -118,8 +133,8 @@
 - (void) syncDataIdsWith:(id)anotherPac;
 - (void) writeDac;
 - (void) readDac;
-- (void) shipAdcValues;
 - (void) selectModule;
+- (void) writeLogBufferToFile;
 
 #pragma mark •••Commands
 - (void) enqueCmdData:(NSData*)someData;
@@ -136,6 +151,11 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
+
+@end
+
+@interface NSObject (ORHistModel)
+- (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
 extern NSString* ORPacModelSetAllRDacsChanged;
@@ -150,3 +170,7 @@ extern NSString* ORPacModelPortNameChanged;
 extern NSString* ORPacModelPortStateChanged;
 extern NSString* ORPacModelAdcChanged;
 extern NSString* ORPacModelRDacsChanged;
+extern NSString* ORPacModelMultiPlotsChanged;
+extern NSString* ORPacModelPollingStateChanged;
+extern NSString* ORPacModelLogToFileChanged;
+extern NSString* ORPacModelLogFileChanged;

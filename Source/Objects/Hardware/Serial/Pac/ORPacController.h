@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+@class ORPlotter1D;
 
 @interface ORPacController : OrcaObjectController
 {
@@ -46,7 +47,15 @@
     IBOutlet NSButton*      loadButton1;
     IBOutlet NSButton*      loadButton2;
     IBOutlet NSButton*      loadButton3;
-    IBOutlet NSButton*      loadButtonAll;
+    IBOutlet NSButton*      loadButtonAll;	
+
+	IBOutlet NSPopUpButton* pollingButton;
+	IBOutlet NSTextField*	logFileTextField;
+	IBOutlet NSButton*		logToFileButton;
+	
+	IBOutlet ORPlotter1D*   plotter0;
+	IBOutlet ORPlotter1D*   plotter1;
+	
 }
 
 #pragma mark •••Initialization
@@ -59,6 +68,10 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) scaleAction:(NSNotification*)aNotification;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNote;
+- (void) pollingStateChanged:(NSNotification*)aNote;
 - (void) rdacsChanged:(NSNotification*)aNote;
 - (void) setAllRDacsChanged:(NSNotification*)aNote;
 - (void) rdacChannelChanged:(NSNotification*)aNote;
@@ -70,7 +83,9 @@
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
+- (void) logToFileChanged:(NSNotification*)aNote;
 - (void) loadAdcTimeValuesForIndex:(int)index;
+- (void) logFileChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) setAllRDacsAction:(id)sender;
@@ -88,6 +103,13 @@
 - (IBAction) lcmEnabledAction:(id)sender;
 - (IBAction) selectModuleAction:(id)sender;
 - (IBAction) loadRdcaAction:(id)sender;
+
+- (IBAction) selectFileAction:(id)sender;
+- (IBAction) setPollingAction:(id)sender;
+- (IBAction) logToFileAction:(id)sender;
+
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
 
 @end
 

@@ -25,6 +25,7 @@
 #import "ORSerialPortList.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
+#import "ORDataSet.h"
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
@@ -34,18 +35,26 @@ NSString* ORPacModelLcmEnabledChanged	= @"ORPacModelLcmEnabledChanged";
 NSString* ORPacModelPreAmpChanged		= @"ORPacModelPreAmpChanged";
 NSString* ORPacModelModuleChanged		= @"ORPacModelModuleChanged";
 NSString* ORPacModelDacValueChanged		= @"ORPacModelDacValueChanged";
-NSString* ORPacModelShipAdcsChanged		= @"ORPacModelShipAdcsChanged";
-NSString* ORPacModelPollTimeChanged		= @"ORPacModelPollTimeChanged";
 NSString* ORPacModelSerialPortChanged	= @"ORPacModelSerialPortChanged";
 NSString* ORPacModelPortNameChanged		= @"ORPacModelPortNameChanged";
 NSString* ORPacModelPortStateChanged	= @"ORPacModelPortStateChanged";
 NSString* ORPacModelAdcChanged			= @"ORPacModelAdcChanged";
 NSString* ORPacLock						= @"ORPacLock";
 NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
+NSString* ORPacModelPollingStateChanged	= @"ORPacModelPollingStateChangedNotification";
+NSString* ORPacModelMultiPlotsChanged	= @"ORPacModelMultiPlotsChanged";
+NSString* ORPacModelLogToFileChanged	= @"ORPacModelLogToFileChanged";
+NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 
 @interface ORPacModel (private)
 - (void) timeout;
 - (void) processOneCommandFromQueue;
+- (void) _setUpPolling:(BOOL)verbose;
+- (void) _stopPolling;
+- (void) _startPolling;
+- (void) _pollAllChannels;
+- (void) shipAdcValues;
+- (void) loadLogBuffer;
 @end
 
 @implementation ORPacModel
@@ -70,8 +79,33 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
     }
 	[serialPort setDelegate:nil];
 	[serialPort release];
-
+	
+    [logFile release];
+	[self _stopPolling];
+	
+	int i;
+	for(i=0;i<8;i++){
+		[timeRates[i] release];
+	}
+	
 	[super dealloc];
+}
+
+- (void) wakeUp
+{
+    if(![self aWake]){
+        [self _setUpPolling:NO];
+		if(logToFile){
+			[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];		
+		}
+    }
+    [super wakeUp];
+}
+
+- (void) sleep
+{
+    [super sleep];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (void) setUpImage
@@ -94,26 +128,12 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
                        object : nil];
 }
 
-- (void) shipAdcValues
+#pragma mark •••Accessors
+- (ORTimeRate*)timeRate:(int)index
 {
-    if([[ORGlobal sharedGlobal] runInProgress]){
-		
-		unsigned long data[18];
-		data[0] = dataId | 18;
-		data[1] = ([self uniqueIdNumber]&0xfff);
-				
-		int index = 2;
-		int i;
-		for(i=0;i<8;i++){
-			data[index++] = adc[i];
-		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*18]];
-	}
+	return timeRates[index];
 }
 
-
-#pragma mark •••Accessors
 - (int)  rdac:(int)index
 {
 	if(index>=0 && index<148)return rdac[index];
@@ -219,7 +239,7 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 	else return 0.0;
 }
 
-- (void) setAdc:(int)index value:(unsigned short)aValue;
+- (void) setAdc:(int)index value:(unsigned short)aValue
 {
 	if(index>=0 && index<8){
 		adc[index] = aValue;
@@ -232,6 +252,10 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChanged 
 															object:self 
 														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"]];
+
+
+		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
+		[timeRates[index] addDataToTimeAverage:[self convertedAdc:index]];
 	}
 }
 
@@ -318,7 +342,63 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortStateChanged object:self];
+}
+
+- (NSString*) logFile
+{
+    return logFile;
+}
+
+- (void) setLogFile:(NSString*)aLogFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLogFile:logFile];
+	
+    [logFile autorelease];
+    logFile = [aLogFile copy];    
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelLogFileChanged object:self];
+}
+
+- (BOOL) logToFile
+{
+    return logToFile;
+}
+
+- (void) setLogToFile:(BOOL)aLogToFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLogToFile:logToFile];
     
+    logToFile = aLogToFile;
+	
+	if(logToFile)[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];
+	else {
+		[logBuffer removeAllObjects];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(writeLogBufferToFile) object:nil];
+	}
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelLogToFileChanged object:self];
+}
+
+- (void) writeLogBufferToFile
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(writeLogBufferToFile) object:nil];
+	if(logToFile && [logBuffer count] && [logFile length]){
+		if(![[NSFileManager defaultManager] fileExistsAtPath:[logFile stringByExpandingTildeInPath]]){
+			[[NSFileManager defaultManager] createFileAtPath:[logFile stringByExpandingTildeInPath] contents:nil attributes:nil];
+		}
+		
+		NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:[logFile stringByExpandingTildeInPath]];
+		[fh seekToEndOfFile];
+		
+		int i;
+		int n = [logBuffer count];
+		for(i=0;i<n;i++){
+			[fh writeData:[[logBuffer objectAtIndex:i] dataUsingEncoding:NSASCIIStringEncoding]];
+		}
+		[fh closeFile];
+		[logBuffer removeAllObjects];
+	}
+	[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];
 }
 
 #pragma mark •••Archival
@@ -334,7 +414,15 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 	[self setDacValue:		[decoder decodeIntForKey:	 @"dacValue"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
+	[self setPollingState:	[decoder decodeIntForKey:	 @"pollingState"]];
+	[self setLogFile:		[decoder decodeObjectForKey: @"logFile"]];
+    [self setLogToFile:		[decoder decodeBoolForKey:	 @"logToFile"]];
+	
+
 	int i; 
+	for(i=0;i<8;i++){
+		timeRates[i] = [[ORTimeRate alloc] init];
+	}
 	for(i=0;i<148;i++){
 		[self setRdac:i withValue: [decoder decodeIntForKey:[NSString stringWithFormat:@"rdac%d",i]]];
 	}
@@ -347,7 +435,7 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:setAllRDacs forKey:@"ORPacModelSetAllRDacs"];
+    [encoder encodeBool:setAllRDacs		forKey:@"ORPacModelSetAllRDacs"];
     [encoder encodeInt:rdacChannel		forKey:@"ORPacModelRdacChannel"];
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
     [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
@@ -355,11 +443,16 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
     [encoder encodeInt:dacValue			forKey: @"dacValue"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
+    [encoder encodeInt:pollingState		forKey:@"pollingState"];
+    [encoder encodeObject:logFile		forKey:@"logFile"];
+    [encoder encodeBool:logToFile		forKey:@"logToFile"];
+	
 	int i; 
 	for(i=0;i<148;i++){
 		[encoder encodeInt:rdac[i] forKey: [NSString stringWithFormat:@"rdac%d",i]];
 	}
 }
+
 
 #pragma mark ••• Commands
 - (void) enqueLcmEnable
@@ -466,9 +559,18 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 
 - (void) readAdcs
 {
+	int i;
+	
+	//----------------------------
+	//temp for testing
+	//for(i=0;i<8;i++){
+	//	[self setAdc:i value:65535./(float)i];
+	//}
+	//[self loadLogBuffer];
+	//----------------------------
+	
 	[self enqueLcmEnable];
 	[self enqueModuleSelect];
-	int i;
 	for(i=0;i<8;i++){
 		[self enqueReadADC:i];
 	}
@@ -635,10 +737,60 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 	return objDictionary;
 }
 
+- (void) setPollingState:(NSTimeInterval)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollingState:pollingState];
+    
+    pollingState = aState;
+    
+    [self performSelector:@selector(_startPolling) withObject:nil afterDelay:0.5];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPollingStateChanged object: self];
+}
+
+- (NSTimeInterval)	pollingState
+{
+    return pollingState;
+}
+
 @end
 
 @implementation ORPacModel (private)
-
+- (void) shipAdcValues
+{
+    if([[ORGlobal sharedGlobal] runInProgress]){
+		
+		unsigned long data[18];
+		data[0] = dataId | 18;
+		data[1] = ([self uniqueIdNumber]&0xfff);
+		
+		int index = 2;
+		int i;
+		for(i=0;i<8;i++){
+			data[index++] = adc[i];
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:&data length:sizeof(long)*18]];
+	}
+}
+- (void) loadLogBuffer
+{
+	NSString*   outputString = nil;
+	if(logToFile) {
+		outputString = [NSString stringWithFormat:@"%u ",timeMeasured[0]];
+		short chan;
+		for(chan=0;chan<8;chan++){
+			outputString = [outputString stringByAppendingFormat:@"%.2f ",[self convertedAdc:chan]];
+		}
+		outputString = [outputString stringByAppendingString:@"\n"];
+		//accumulate into a buffer, we'll write the file later
+		if(!logBuffer)logBuffer = [[NSMutableArray arrayWithCapacity:1024] retain];
+		if([outputString length]){
+			[logBuffer addObject:outputString];
+		}
+	}
+	readCount++;	
+}
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
@@ -655,6 +807,7 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 	unsigned char* cmd = (unsigned char*)[cmdData bytes];
 	if(cmd[0] == kPacShipAdcs){
 		[self shipAdcValues];
+		[self loadLogBuffer];
 	}
 	else {
 		[self setLastRequest:cmdData];
@@ -662,5 +815,48 @@ NSString* ORPacModelRDacsChanged		= @"ORPacModelRDacsChanged";
 		[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
 	}
 }
+
+- (void) _stopPolling
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+	pollRunning = NO;
+}
+
+- (void) _startPolling
+{
+	[self _setUpPolling:YES];
+}
+
+- (void) _setUpPolling:(BOOL)verbose
+{
+    if(pollingState!=0){  
+		readCount = 0;
+		pollRunning = YES;
+        if(verbose)NSLog(@"Polling PAC,%d  every %.0f seconds.\n",[self uniqueIdNumber],pollingState);
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+        [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
+        [self _pollAllChannels];
+    }
+    else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+        if(verbose)NSLog(@"Not Polling PAC,%d\n",[self uniqueIdNumber]);
+    }
+}
+
+- (void) _pollAllChannels
+{
+    @try { 
+        [self readAdcs]; 
+    }
+	@catch(NSException* localException) { 
+		//catch this here to prevent it from falling thru, but nothing to do.
+	}
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+	if(pollingState!=0){
+		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
+	}
+}
+
 
 @end
