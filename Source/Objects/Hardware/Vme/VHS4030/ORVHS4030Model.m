@@ -1067,18 +1067,38 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-/*	NSArray* status1 = [NSArray arrayWithObjects:[NSNumber numberWithInt:statusReg1Chan[0]],[NSNumber numberWithInt:statusReg1Chan[1]],nil];
-    [objDictionary setObject:status1 forKey:@"StatusReg1"];	
+	NSArray* status1 = [NSArray arrayWithObjects:
+						[NSNumber numberWithInt:channelStatus[0]],
+						[NSNumber numberWithInt:channelStatus[1]],
+						[NSNumber numberWithInt:channelStatus[2]],
+						[NSNumber numberWithInt:channelStatus[3]],
+						nil];
+    [objDictionary setObject:status1 forKey:@"ChannelStatus"];	
 
-	NSArray* status2 = [NSArray arrayWithObjects:[NSNumber numberWithInt:statusReg2Chan[0]],[NSNumber numberWithInt:statusReg2Chan[1]],nil];
-    [objDictionary setObject:status2 forKey:@"StatusReg2"];
+	NSArray* status2 = [NSArray arrayWithObjects:
+						[NSNumber numberWithInt:channelEventStatus[0]],
+						[NSNumber numberWithInt:channelEventStatus[1]],
+						[NSNumber numberWithInt:channelEventStatus[2]],
+						[NSNumber numberWithInt:channelEventStatus[3]],
+						nil];
+    [objDictionary setObject:status2 forKey:@"ChannelEventStatus"];
 	
-	NSArray* theVoltageMeasures = [NSArray arrayWithObjects:[NSNumber numberWithFloat:voltageMeasure[0]],[NSNumber numberWithFloat:voltageMeasure[1]],nil];
+	NSArray* theVoltageMeasures = [NSArray arrayWithObjects:
+								   [NSNumber numberWithFloat:voltageMeasure[0]],
+								   [NSNumber numberWithFloat:voltageMeasure[1]],
+								   [NSNumber numberWithFloat:voltageMeasure[2]],
+								   [NSNumber numberWithFloat:voltageMeasure[3]],
+								   nil];
     [objDictionary setObject:theVoltageMeasures forKey:@"Voltages"];
 	
-	NSArray* theCurrentMeasures = [NSArray arrayWithObjects:[NSNumber numberWithFloat:currentMeasure[0]],[NSNumber numberWithFloat:currentMeasure[1]],nil];
+	NSArray* theCurrentMeasures = [NSArray arrayWithObjects:
+								   [NSNumber numberWithFloat:currentMeasure[0]],
+								   [NSNumber numberWithFloat:currentMeasure[1]],
+								   [NSNumber numberWithFloat:currentMeasure[2]],
+								   [NSNumber numberWithFloat:currentMeasure[3]],
+								   nil];
     [objDictionary setObject:theCurrentMeasures forKey:@"Currents"];
-*/
+
 	return objDictionary;
 }
 
