@@ -388,7 +388,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 		if([aPlot activeCurve] == self)[curveColor set];
 		else [[curveColor highlightWithLevel:.4]set];
 	}
-	[theDataPath setLineWidth:.5];
+	[theDataPath setLineWidth:.75];
 	[theDataPath stroke];
 }
 
@@ -462,7 +462,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 		
 		if([aPlot activeCurve] == self)[curveColor set];
 		else [[curveColor highlightWithLevel:.4]set];
-		[theDataPath setLineWidth:.5];
+		[theDataPath setLineWidth:.75];
 		[theDataPath stroke];
 	}
 	
@@ -523,7 +523,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	
 	if([aPlot activeCurve] == self)[curveColor set];
 	else [[curveColor highlightWithLevel:.4]set];
-	[theDataPath setLineWidth:.5];
+	[theDataPath setLineWidth:.75];
 	[theDataPath stroke];
 
 }
