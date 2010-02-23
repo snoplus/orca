@@ -235,7 +235,8 @@
 - (void) setDisplayEventLoop:(BOOL) aState;
 - (unsigned long) pageSize; //< Length of the ADC data (0..100us)
 - (void) setPageSize: (unsigned long) pageSize;   
- 
+- (void) sendSimulationConfigScript;
+
 #pragma mark ***Polling
 - (TimedWorker *) poller;
 - (void) setPoller: (TimedWorker *) aPoller;

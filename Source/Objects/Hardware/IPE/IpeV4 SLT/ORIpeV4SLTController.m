@@ -714,6 +714,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) resetPageManagerAction:(id)sender	{ [self do:@selector(writePageManagerReset) name:@"Reset Page Manager"]; }
 - (IBAction) releaseAllPagesAction:(id)sender	{ [self do:@selector(writeReleasePage) name:@"Release Pages"]; }
 
+- (IBAction) sendSimulationConfigScript:(id)sender
+{
+	[model sendSimulationConfigScript];
+}
+
 - (IBAction) pulserAmpAction: (id) sender
 {
 	[model setPulserAmp:[sender floatValue]];

@@ -32,6 +32,10 @@
 #import "SLTv4_HW_Definitions.h"
 #import "ORPMCReadWriteCommand.h"
 
+#import "ORTaskSequence.h"
+#import "ORFileMover.h"
+
+
 //IPE V4 register definitions
 enum IpeV4Enum {
 	kSltV4ControlReg,
@@ -627,6 +631,46 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelPageSizeChanged object:self];
 	
 }  
+
+/*! Send a script to the PrPMC which will configure the PrPMC.
+ *
+ */
+- (void) sendSimulationConfigScript
+{
+	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
+
+	NSString *scriptName = @"tillsScript";
+		ORTaskSequence* aSequence;	
+		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+		
+		NSString* driverCodePath; //[pmcLink ]
+		if([pmcLink loadMode])driverCodePath = [[pmcLink filePath] stringByAppendingPathComponent:[self sbcLocalCodePath]];
+		else driverCodePath = [resourcePath stringByAppendingPathComponent:[self codeResourcePath]];
+		//driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
+		driverCodePath = [driverCodePath stringByAppendingPathComponent: scriptName];
+		ORFileMover* driverScriptFileMover = [[ORFileMover alloc] init];//TODO: keep it as object in the class variables -tb-
+		[driverScriptFileMover setDelegate:aSequence];
+NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);		
+		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
+										to:@"" 
+								remoteHost:[pmcLink IPNumber] 
+								  userName:[pmcLink userName] 
+								  passWord:[pmcLink passWord]];
+		[driverScriptFileMover setVerbose:YES];
+		[driverScriptFileMover doNotMoveFilesToSentFolder];
+		[driverScriptFileMover setTransferType:eUseSCP];
+		[aSequence addTaskObj:driverScriptFileMover];
+		
+		NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
+NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);		
+		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+				 arguments:[NSArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,@"arg1",@"arg2",nil]];
+		
+		[aSequence launch];
+
+}
 
 #pragma mark ***HW Access
 - (void) checkPresence
@@ -1227,7 +1271,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	pollingWasRunning = [poller isRunning];
 	if(pollingWasRunning) [poller stop];
 	
-	[self writeSetInhibit];
+	[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
 	
     if([[userInfo objectForKey:@"doinit"]intValue]){
 		[self initBoard];					
@@ -1264,8 +1308,9 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	else {
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
-		[self writeClrInhibit];
+		[self writeClrInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
 		first = NO;
+		
 	}
 }
 
@@ -1279,7 +1324,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[self writeSetInhibit];
+	[self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
 	
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];

@@ -182,4 +182,6 @@
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 
+- (IBAction) sendSimulationConfigScript:(id)sender;
+
 @end
