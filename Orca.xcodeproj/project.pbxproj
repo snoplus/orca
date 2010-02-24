@@ -66,6 +66,15 @@
 		2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */; };
 		2ACEE0E50612266000CAD497 /* ThresholdCalibrationTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */; };
 		2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AE87BDD0D6E486900A839FC /* libmysqlclient.a */; };
+		2D158EB511359F5800EA1552 /* KatrinV4FLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D158EAC11359F5800EA1552 /* KatrinV4FLT.nib */; };
+		2D158EB611359F5800EA1552 /* KatrinV4FLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D158EAD11359F5800EA1552 /* KatrinV4FLTCard.gif */; };
+		2D158EB711359F5800EA1552 /* ORKatrinV4FLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D158EAE11359F5800EA1552 /* ORKatrinV4FLTController.h */; };
+		2D158EB811359F5800EA1552 /* ORKatrinV4FLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D158EAF11359F5800EA1552 /* ORKatrinV4FLTController.m */; };
+		2D158EB911359F5800EA1552 /* ORKatrinV4FLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D158EB011359F5800EA1552 /* ORKatrinV4FLTDecoder.h */; };
+		2D158EBA11359F5800EA1552 /* ORKatrinV4FLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D158EB111359F5800EA1552 /* ORKatrinV4FLTDecoder.m */; };
+		2D158EBB11359F5800EA1552 /* ORKatrinV4FLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D158EB211359F5800EA1552 /* ORKatrinV4FLTDefs.h */; };
+		2D158EBC11359F5800EA1552 /* ORKatrinV4FLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D158EB311359F5800EA1552 /* ORKatrinV4FLTModel.h */; };
+		2D158EBD11359F5800EA1552 /* ORKatrinV4FLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D158EB411359F5800EA1552 /* ORKatrinV4FLTModel.m */; };
 		2D1AB81A0F1B9F2400E6B850 /* IpeSlowControl.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */; };
 		2D1AB81B0F1B9F2400E6B850 /* IpeSlowControl.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */; };
 		2D1AB81C0F1B9F2400E6B850 /* ORIpeSlowControlController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */; };
@@ -2427,6 +2436,15 @@
 		2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ThresholdCalibrationTask.h; sourceTree = "<group>"; };
 		2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationTask.m; sourceTree = "<group>"; };
 		2AE87BDD0D6E486900A839FC /* libmysqlclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmysqlclient.a; sourceTree = "<group>"; };
+		2D158EAC11359F5800EA1552 /* KatrinV4FLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = KatrinV4FLT.nib; sourceTree = "<group>"; };
+		2D158EAD11359F5800EA1552 /* KatrinV4FLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KatrinV4FLTCard.gif; sourceTree = "<group>"; };
+		2D158EAE11359F5800EA1552 /* ORKatrinV4FLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinV4FLTController.h; sourceTree = "<group>"; };
+		2D158EAF11359F5800EA1552 /* ORKatrinV4FLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKatrinV4FLTController.m; sourceTree = "<group>"; };
+		2D158EB011359F5800EA1552 /* ORKatrinV4FLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinV4FLTDecoder.h; sourceTree = "<group>"; };
+		2D158EB111359F5800EA1552 /* ORKatrinV4FLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKatrinV4FLTDecoder.m; sourceTree = "<group>"; };
+		2D158EB211359F5800EA1552 /* ORKatrinV4FLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinV4FLTDefs.h; sourceTree = "<group>"; };
+		2D158EB311359F5800EA1552 /* ORKatrinV4FLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinV4FLTModel.h; sourceTree = "<group>"; };
+		2D158EB411359F5800EA1552 /* ORKatrinV4FLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKatrinV4FLTModel.m; sourceTree = "<group>"; };
 		2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeSlowControl.nib; path = "IPE SlowControl/IpeSlowControl.nib"; sourceTree = "<group>"; };
 		2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeSlowControl.tif; path = "IPE SlowControl/IpeSlowControl.tif"; sourceTree = "<group>"; };
 		2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlController.h; path = "IPE SlowControl/ORIpeSlowControlController.h"; sourceTree = "<group>"; };
@@ -4765,6 +4783,22 @@
 				84F7FB550AE555C600A5AA4C /* mysql.h */,
 			);
 			path = libUniversal;
+			sourceTree = "<group>";
+		};
+		2D158EAB11359F5800EA1552 /* KatrinV4FLT */ = {
+			isa = PBXGroup;
+			children = (
+				2D158EAC11359F5800EA1552 /* KatrinV4FLT.nib */,
+				2D158EAD11359F5800EA1552 /* KatrinV4FLTCard.gif */,
+				2D158EAE11359F5800EA1552 /* ORKatrinV4FLTController.h */,
+				2D158EAF11359F5800EA1552 /* ORKatrinV4FLTController.m */,
+				2D158EB011359F5800EA1552 /* ORKatrinV4FLTDecoder.h */,
+				2D158EB111359F5800EA1552 /* ORKatrinV4FLTDecoder.m */,
+				2D158EB211359F5800EA1552 /* ORKatrinV4FLTDefs.h */,
+				2D158EB311359F5800EA1552 /* ORKatrinV4FLTModel.h */,
+				2D158EB411359F5800EA1552 /* ORKatrinV4FLTModel.m */,
+			);
+			path = KatrinV4FLT;
 			sourceTree = "<group>";
 		};
 		2D1AB8070F1B9EBC00E6B850 /* IPE SlowControl */ = {
@@ -9008,6 +9042,7 @@
 				84F46F240CA44255007EFADA /* IPE SLT */,
 				84F46F2D0CA44255007EFADA /* Katrin FLT */,
 				84FDF5220D7E1EAE003AE119 /* Katrin SLT */,
+				2D158EAB11359F5800EA1552 /* KatrinV4FLT */,
 			);
 			name = IPE;
 			path = Source/Objects/Hardware/IPE;
@@ -10540,6 +10575,10 @@
 				848285B1112C5AD700BA30ED /* ORVHS4030Controller.h in Headers */,
 				848285B3112C5AD700BA30ED /* ORVHS4030Decoders.h in Headers */,
 				848285B5112C5AD700BA30ED /* ORVHS4030Model.h in Headers */,
+				2D158EB711359F5800EA1552 /* ORKatrinV4FLTController.h in Headers */,
+				2D158EB911359F5800EA1552 /* ORKatrinV4FLTDecoder.h in Headers */,
+				2D158EBB11359F5800EA1552 /* ORKatrinV4FLTDefs.h in Headers */,
+				2D158EBC11359F5800EA1552 /* ORKatrinV4FLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11214,6 +11253,8 @@
 				848283C1112B14F100BA30ED /* OnSwitch.tif in Resources */,
 				848285B8112C5AD700BA30ED /* VHS4030.nib in Resources */,
 				848285B9112C5AD700BA30ED /* VHS4030.tif in Resources */,
+				2D158EB511359F5800EA1552 /* KatrinV4FLT.nib in Resources */,
+				2D158EB611359F5800EA1552 /* KatrinV4FLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11966,6 +12007,9 @@
 				848285B2112C5AD700BA30ED /* ORVHS4030Controller.m in Sources */,
 				848285B4112C5AD700BA30ED /* ORVHS4030Decoders.m in Sources */,
 				848285B6112C5AD700BA30ED /* ORVHS4030Model.m in Sources */,
+				2D158EB811359F5800EA1552 /* ORKatrinV4FLTController.m in Sources */,
+				2D158EBA11359F5800EA1552 /* ORKatrinV4FLTDecoder.m in Sources */,
+				2D158EBD11359F5800EA1552 /* ORKatrinV4FLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
