@@ -40,12 +40,27 @@
 	BOOL					debugging;
 	NSDictionary*			breakpoints;
 	BOOL					breakChain;
+    BOOL					autoStartWithDocument;
+    BOOL					autoStartWithRun;
+    BOOL					autoStopWithRun;
 }
 
 #pragma mark ***Initialization
+- (id) init;
 - (void) dealloc;
 
+#pragma mark ***Notifications
+- (void) registerNotificationObservers;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runEnded:(NSNotification*)aNote;
+
 #pragma mark ***Accessors
+- (BOOL) autoStopWithRun;
+- (void) setAutoStopWithRun:(BOOL)aAutoStopWithRun;
+- (BOOL) autoStartWithRun;
+- (void) setAutoStartWithRun:(BOOL)aAutoStartWithRun;
+- (BOOL) autoStartWithDocument;
+- (void) setAutoStartWithDocument:(BOOL)aAutoStartWithDocument;
 
 - (BOOL)	breakChain;
 - (void)	setBreakChain:(BOOL)aState;
@@ -112,6 +127,9 @@
 
 @end
 
+extern NSString* ORScriptIDEModelAutoStopWithRunChanged;
+extern NSString* ORScriptIDEModelAutoStartWithRunChanged;
+extern NSString* ORScriptIDEModelAutoStartWithDocumentChanged;
 extern NSString* ORScriptIDEModelCommentsChanged;
 extern NSString* ORScriptIDEModelLock;
 extern NSString* ORScriptIDEModelShowSuperClassChanged;

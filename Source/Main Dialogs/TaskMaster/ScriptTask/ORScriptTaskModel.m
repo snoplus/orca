@@ -123,6 +123,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 - (void) registerNotificationObservers
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self

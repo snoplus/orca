@@ -176,6 +176,21 @@
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(autoStartWithDocumentChanged:)
+                         name : ORScriptIDEModelAutoStartWithDocumentChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(autoStartWithRunChanged:)
+                         name : ORScriptIDEModelAutoStartWithRunChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(autoStopWithRunChanged:)
+                         name : ORScriptIDEModelAutoStopWithRunChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -191,6 +206,9 @@
 	[self breakpointsChanged:nil];
 	[self breakChainChanged:nil];
 	[self displayDictionaryChanged:nil];
+	[self autoStartWithDocumentChanged:nil];
+	[self autoStartWithRunChanged:nil];
+	[self autoStopWithRunChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -202,6 +220,21 @@
 }
 
 #pragma mark •••Interface Management
+
+- (void) autoStopWithRunChanged:(NSNotification*)aNote
+{
+	[autoStopWithRunCB setIntValue: [model autoStopWithRun]];
+}
+
+- (void) autoStartWithRunChanged:(NSNotification*)aNote
+{
+	[autoStartWithRunCB setIntValue: [model autoStartWithRun]];
+}
+
+- (void) autoStartWithDocumentChanged:(NSNotification*)aNote
+{
+	[autoStartWithDocumentCB setIntValue: [model autoStartWithDocument]];
+}
 - (void) displayDictionaryChanged:(NSNotification*)aNote
 {
 	[outputVariablesTableView reloadData];
@@ -368,6 +401,22 @@
 }
 
 #pragma mark •••Actions
+
+- (void) autoStopWithRunAction:(id)sender
+{
+	[model setAutoStopWithRun:[sender intValue]];	
+}
+
+- (void) autoStartWithRunAction:(id)sender
+{
+	[model setAutoStartWithRun:[sender intValue]];	
+}
+
+- (void) autoStartWithDocumentAction:(id)sender
+{
+	[model setAutoStartWithDocument:[sender intValue]];	
+}
+
 - (IBAction) clearAllBreakpoints:(id) sender
 {
 	[model setBreakpoints:nil];

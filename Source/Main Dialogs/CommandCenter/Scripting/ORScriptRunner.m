@@ -462,7 +462,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		[innerPool release];
 		if(stopThread || failed){
 			if(stopThread){
-				NSLogColor([NSColor redColor],@"Script manually stopped\n");
+				NSLogColor([NSColor redColor],@"Script stopped\n");
 			}
 			[self reportResult:[NSDecimalNumber numberWithInt:0]];
 

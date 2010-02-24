@@ -29,6 +29,9 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
+NSString* ORScriptIDEModelAutoStopWithRunChanged = @"ORScriptIDEModelAutoStopWithRunChanged";
+NSString* ORScriptIDEModelAutoStartWithRunChanged = @"ORScriptIDEModelAutoStartWithRunChanged";
+NSString* ORScriptIDEModelAutoStartWithDocumentChanged = @"ORScriptIDEModelAutoStartWithDocumentChanged";
 NSString* ORScriptIDEModelCommentsChanged		 = @"ORScriptIDEModelCommentsChanged";
 NSString* ORScriptIDEModelShowSuperClassChanged	 = @"ORScriptIDEModelShowSuperClassChanged";
 NSString* ORScriptIDEModelScriptChanged			 = @"ORScriptIDEModelScriptChanged";
@@ -42,13 +45,34 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 @implementation ORScriptIDEModel
 
 #pragma mark ***Initialization
+- (id) init
+{
+	self = [super init];
+	[self registerNotificationObservers];
+	return self;
+}
+
 - (void) dealloc 
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [comments release];
 	[scriptName release];
 	[inputValues release];
 	[scriptRunner release];
     [super dealloc];
+}
+
+- (void) wakeUp
+{
+    if([self aWake])return;
+	[self registerNotificationObservers];
+    [super wakeUp];
+}
+
+- (void) sleep
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+   [super sleep];
 }
 
 - (void) makeMainController
@@ -61,7 +85,84 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 	return @"Subsystems/Script_IDE.html";
 }
 
+- (void) registerNotificationObservers
+{
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(runStarted:)
+						 name : ORRunStartedNotification
+					   object : nil];
+
+	[notifyCenter addObserver : self
+					 selector : @selector(runEnded:)
+						 name : ORRunStoppedNotification
+					   object : nil];
+}
+- (void) awakeAfterDocumentLoaded
+{
+	if(autoStartWithDocument){
+		[self runScript];
+	}
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+	if(autoStartWithRun){
+		[self runScript];
+	}
+}
+
+- (void) runEnded:(NSNotification*)aNote
+{		
+	if(autoStopWithRun){
+		[self stopScript];
+	}
+}
+
 #pragma mark ***Accessors
+
+- (BOOL) autoStopWithRun
+{
+    return autoStopWithRun;
+}
+
+- (void) setAutoStopWithRun:(BOOL)aAutoStopWithRun
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoStopWithRun:autoStopWithRun];
+    
+    autoStopWithRun = aAutoStopWithRun;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelAutoStopWithRunChanged object:self];
+}
+
+- (BOOL) autoStartWithRun
+{
+    return autoStartWithRun;
+}
+
+- (void) setAutoStartWithRun:(BOOL)aAutoStartWithRun
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoStartWithRun:autoStartWithRun];
+    
+    autoStartWithRun = aAutoStartWithRun;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelAutoStartWithRunChanged object:self];
+}
+
+- (BOOL) autoStartWithDocument
+{
+    return autoStartWithDocument;
+}
+
+- (void) setAutoStartWithDocument:(BOOL)aAutoStartWithDocument
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoStartWithDocument:autoStartWithDocument];
+    
+    autoStartWithDocument = aAutoStartWithDocument;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelAutoStartWithDocumentChanged object:self];
+}
 
 - (BOOL) breakChain
 {
@@ -579,6 +680,9 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
+    [self setAutoStopWithRun:[decoder decodeBoolForKey:@"autoStopWithRun"]];
+    [self setAutoStartWithRun:[decoder decodeBoolForKey:@"autoStartWithRun"]];
+    [self setAutoStartWithDocument:[decoder decodeBoolForKey:@"autoStartWithDocument"]];
 	[self setBreakChain:[decoder decodeBoolForKey:@"breakChain"]];
 	[self setComments:[decoder decodeObjectForKey:@"comments"]];
     [self setShowSuperClass:[decoder decodeBoolForKey:@"showSuperClass"]];
@@ -588,13 +692,18 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 	[self setBreakpoints:[decoder decodeObjectForKey:@"breakpoints"]];
     inputValues = [[decoder decodeObjectForKey:@"inputValues"] retain];	
     [[self undoManager] enableUndoRegistration];
-		
+	
+	[self registerNotificationObservers];
+
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:autoStopWithRun forKey:@"autoStopWithRun"];
+    [encoder encodeBool:autoStartWithRun forKey:@"autoStartWithRun"];
+    [encoder encodeBool:autoStartWithDocument forKey:@"autoStartWithDocument"];
     [encoder encodeBool:breakChain forKey:@"breakChain"];
     [encoder encodeObject:comments forKey:@"comments"];
     [encoder encodeBool:showSuperClass forKey:@"showSuperClass"];

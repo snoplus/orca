@@ -26,6 +26,9 @@
 
 @interface ORScriptIDEController : OrcaObjectController {
 	IBOutlet NSButton*			breakChainButton;
+	IBOutlet NSButton*			autoStopWithRunCB;
+	IBOutlet NSButton*			autoStartWithRunCB;
+	IBOutlet NSButton*			autoStartWithDocumentCB;
 	IBOutlet ORTimedTextField*	statusField;
 	IBOutlet NSTextView*		commentsView;
 	IBOutlet NSButton*			showSuperClassButton;
@@ -66,6 +69,9 @@
 - (void) loadClassMethods;
 
 #pragma mark •••Interface Management
+- (void) autoStopWithRunChanged:(NSNotification*)aNote;
+- (void) autoStartWithRunChanged:(NSNotification*)aNote;
+- (void) autoStartWithDocumentChanged:(NSNotification*)aNote;
 - (void) globalsChanged:(NSNotification*)aNote;
 - (void) breakChainChanged:(NSNotification*)aNote;
 - (void) breakpointsChanged:(NSNotification*)aNote;
@@ -84,6 +90,9 @@
 - (void) displayDictionaryChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) autoStopWithRunAction:(id)sender;
+- (IBAction) autoStartWithRunAction:(id)sender;
+- (IBAction) autoStartWithDocumentAction:(id)sender;
 - (IBAction) clearAllBreakpoints:(id) sender;
 - (IBAction) breakChainAction:(id) sender;
 - (IBAction) debuggerAction:(id)sender;
