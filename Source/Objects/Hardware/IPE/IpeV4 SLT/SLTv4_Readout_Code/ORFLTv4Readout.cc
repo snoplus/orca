@@ -106,6 +106,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         if(daqRunMode == kIpeFlt_EnergyMode){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
             uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            uint32_t fifoFlags;// =   FF, AF, AE, EF
             
             //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
             uint32_t eventN;
@@ -125,7 +126,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
                     uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
                     uint32_t diff = (writeptr-readptr+1024) % 512;
-                    
+					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
+								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
+								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
+								(eventFIFOStatus->emptyFlag->getCache());
                     //depending on 'diff' the loop should start here -tb-
                     
                     if(diff>0){
@@ -156,7 +160,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = evsec;        //sec
                                 data[dataIndex++] = evsubsec;     //subsec
                                 data[dataIndex++] = chmap;
-                                data[dataIndex++] = readptr | (pagenr<<10) | (precision<<16);  //event ID:read ptr (10 bit); pagenr (6 bit)
+                                data[dataIndex++] = readptr | (pagenr<<10) | (precision<<16)  | (fifoFlags <<20);  //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit)
                                 data[dataIndex++] = energy;
                             }
                         }
@@ -271,7 +275,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
            }
            }
 #endif
-                                    traceStart16 = (triggerPos + postTriggerTime) % 2048;
+                                    traceStart16 = (triggerPos + postTriggerTime ) % 2048;
                                 }
                                 else {
                                     //search trigger pos

@@ -44,7 +44,8 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
            ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx event flags/infos
+           ^^^^------------------------- FIFO Flags: FF, AF, AE, EF
                   ^^-------------------- time precision(2 bit)
                      ^^^^ ^^------------ number of page in hardware buffer (0..63, 6 bit)
                             ^^ ^^^^ ^^^^ eventID (0..511, 10 bit!)
@@ -123,7 +124,7 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    NSString* title= @"Katrin FLT Energy Record\n\n";    
+    NSString* title= @"Katrin V4 FLT Energy Record\n\n";    
     NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
     NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
     NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",ShiftAndExtract(ptr[1],8,0xff)];
@@ -136,7 +137,7 @@
 	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n",     ptr[2]];
 	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n",     ptr[3]];
 	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ptr[4]];	
-    NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n",     ptr[5]];
+    NSString* nPages		= [NSString stringWithFormat:@"EventFlags = 0x%x\n",     ptr[5]];
 	
 	NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",     ptr[6]];
 
@@ -303,7 +304,7 @@ startIndex=traceStart16;
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     
-    NSString* title= @"Ipe FLT Waveform Record\n\n";
+    NSString* title= @"Katrin V4 FLT Waveform Record\n\n";
 
 	++ptr;		//skip the first word (dataID and length)
     
@@ -616,7 +617,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 
-    NSString* title= @"Katrin FLT Histogram Record\n\n";
+    NSString* title= @"Katrin V4 FLT Histogram Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
     NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
