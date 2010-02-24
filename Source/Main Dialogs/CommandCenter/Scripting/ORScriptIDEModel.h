@@ -48,6 +48,7 @@
 #pragma mark ***Initialization
 - (id) init;
 - (void) dealloc;
+- (void) decorateIcon:(NSImage*)anImage;
 
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;

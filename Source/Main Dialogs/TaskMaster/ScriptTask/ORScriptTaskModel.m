@@ -67,8 +67,6 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 
 - (void) setUpImage
 {
-    //[self setImage:[NSImage imageNamed:@"ScriptTask"]];
-
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
     //so, we cache the image here so we can draw into it.
@@ -79,13 +77,16 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	
+	[self decorateIcon:i];
+	
 	if([self breakChain] && [self objectConnectedTo: ORScriptTaskOutConnector]){
 		[[NSImage imageNamed:@"chainBroken"] compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
 	}	
     if([self running]){
         [[NSImage imageNamed:@"ScriptRunning"] compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
     }
-
+	
     [i unlockFocus];
     
     [self setImage:i];

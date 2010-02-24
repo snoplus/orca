@@ -85,6 +85,23 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 	return @"Subsystems/Script_IDE.html";
 }
 
+- (void) decorateIcon:(NSImage*)anImage
+{
+    if(autoStopWithRun || autoStartWithRun || autoStartWithDocument){
+		NSSize iconSize = [anImage size];
+		NSFont *font = [NSFont fontWithName:@"Helvetica" size:18.0];
+		NSDictionary* attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+										 font,NSFontAttributeName,
+										 [NSColor redColor],NSForegroundColorAttributeName,nil];
+		NSAttributedString* s = [[NSAttributedString alloc] initWithString:@"A" attributes:attrsDictionary];
+		NSSize labelSize = [s size];
+		float height = iconSize.height;
+		float width = iconSize.width;
+		[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-labelSize.height-5)];
+    }
+}
+
+
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -134,6 +151,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     autoStopWithRun = aAutoStopWithRun;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelAutoStopWithRunChanged object:self];
+	[self setUpImage];
 }
 
 - (BOOL) autoStartWithRun
@@ -148,6 +166,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     autoStartWithRun = aAutoStartWithRun;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelAutoStartWithRunChanged object:self];
+	[self setUpImage];
 }
 
 - (BOOL) autoStartWithDocument
@@ -162,6 +181,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     autoStartWithDocument = aAutoStartWithDocument;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelAutoStartWithDocumentChanged object:self];
+	[self setUpImage];
 }
 
 - (BOOL) breakChain
