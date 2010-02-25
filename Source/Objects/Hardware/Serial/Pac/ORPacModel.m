@@ -94,7 +94,7 @@ NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 - (void) wakeUp
 {
     if(![self aWake]){
-        [self _setUpPolling:NO];
+		[self _setUpPolling:NO];
 		if(logToFile){
 			[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];		
 		}
@@ -564,7 +564,7 @@ NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 	//----------------------------
 	//temp for testing
 	//for(i=0;i<8;i++){
-	//	[self setAdc:i value:65535./(float)i];
+	//	[self setAdc:[self adc:i]+1 value:65535./(float)i];
 	//}
 	//[self loadLogBuffer];
 	//----------------------------
@@ -834,7 +834,6 @@ NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 		pollRunning = YES;
         if(verbose)NSLog(@"Polling PAC,%d  every %.0f seconds.\n",[self uniqueIdNumber],pollingState);
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
-        [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
         [self _pollAllChannels];
     }
     else {
