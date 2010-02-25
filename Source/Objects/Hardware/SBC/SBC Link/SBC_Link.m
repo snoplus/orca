@@ -1020,6 +1020,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 - (void) shutDown:(NSString*)rootPwd reboot:(BOOL)reboot
 {
+	[self disconnect];
 	[self setGoScriptFailed:NO];
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
