@@ -1049,7 +1049,6 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		float freq = 1.0/((double)hitRateLengthSec);
 				
 		unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-		int dataIndex = 0;
 		unsigned long data[5 + kNumV4FLTChannels];
 		
 		//combine all the hitrate read commands into one command packet
@@ -1064,9 +1063,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		
 		//put the synchronized around this code to test if access to the hitrates is thread safe
 		//pull out the result
+		int dataIndex = 0;
 		for(chan=0;chan<kNumV4FLTChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
-				unsigned long aValue = [aList longValueForCmd:chan];
+				unsigned long aValue = [aList longValueForCmd:dataIndex];
 				BOOL overflow = (aValue >> 31) & 0x1;
 				aValue = aValue & 0xffff;
 				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
