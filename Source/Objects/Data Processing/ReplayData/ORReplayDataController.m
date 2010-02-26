@@ -257,7 +257,7 @@
             [viewHeaderFile setStringValue:[[[model filesToReplay] objectAtIndex:index] stringByAbbreviatingWithTildeInPath]];
         }
         else [viewHeaderFile setStringValue:@"---"];
-        [model readHeaderForFileIndex:index];
+		//[model readHeaderForFileIndex:index];
 		
         [headerView reloadData];
     }
