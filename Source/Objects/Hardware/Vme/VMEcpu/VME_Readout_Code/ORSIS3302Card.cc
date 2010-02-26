@@ -153,6 +153,11 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 				fTempVectorIter = num_data_left;
 				break;
 			}
+			
+			size_t time0;
+			size_t time1;
+			size_t energy;
+			
 			ensureDataCanHold(size_of_record + 4);
 			data[dataIndex++] = GetHardwareMask()[0] | (size_of_record+4); 
 			data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
@@ -160,8 +165,27 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 								((channel & 0x000000ff)<<8);
 			data[dataIndex++] = number_of_longs_in_raw_data;
 			data[dataIndex++] = number_of_longs_in_energy_wf_data;
+			size_t startOfDataIndex = dataIndex;
 			memcpy(data + dataIndex, &fTempVector[temp_iter], size_of_record*sizeof(fTempVector[0]));
+
+			//cache some stuff for below
+			time0 = data[startOfDataIndex];
+			time1 = data[startOfDataIndex+1];
+			energy = data[dataIndex-4];
+			
 			dataIndex += size_of_record;
+			
+			if(GetDeviceSpecificData()[2]){
+				//special case for Graham
+				ensureDataCanHold(5);
+				data[dataIndex++] = GetHardwareMask()[1] | 5; 
+				data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
+									((GetSlot()  & 0x0000001f)<<16) | 
+									((channel & 0x000000ff)<<8);
+				data[dataIndex++] = time0;
+				data[dataIndex++] = time1;
+				data[dataIndex++] = energy;
+			}
 		}
     } 
     return true;

@@ -30,6 +30,7 @@
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
 
+NSString* ORSIS3302ModelShipTimeRecordAlsoChanged		= @"ORSIS3302ModelShipTimeRecordAlsoChanged";
 NSString* ORSIS3302ModelMcaUseEnergyCalculationChanged  = @"ORSIS3302ModelMcaUseEnergyCalculationChanged";
 NSString* ORSIS3302ModelMcaEnergyOffsetChanged			= @"ORSIS3302ModelMcaEnergyOffsetChanged";
 NSString* ORSIS3302ModelMcaEnergyMultiplierChanged		= @"ORSIS3302ModelMcaEnergyMultiplierChanged";
@@ -150,6 +151,20 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) shipTimeRecordAlso
+{
+    return shipTimeRecordAlso;
+}
+
+- (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipTimeRecordAlso:shipTimeRecordAlso];
+    
+    shipTimeRecordAlso = aShipTimeRecordAlso;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelShipTimeRecordAlsoChanged object:self];
+}
 - (BOOL) mcaUseEnergyCalculation { return mcaUseEnergyCalculation; }
 - (void) setMcaUseEnergyCalculation:(BOOL)aMcaUseEnergyCalculation
 {
@@ -1857,6 +1872,12 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     mcaId = anId;
 }
 
+- (unsigned long) timeId { return timeId; }
+- (void) setTimeId: (unsigned long) anId
+{
+    timeId = anId;
+}
+
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -1864,14 +1885,16 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 }
 - (void) setDataIds:(id)assigner
 {
-    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
-    mcaId       = [assigner assignDataIds:kLongForm]; //short form preferred
+    dataId   = [assigner assignDataIds:kLongForm];
+    mcaId    = [assigner assignDataIds:kLongForm]; 
+    timeId   = [assigner assignDataIds:kLongForm]; 
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
     [self setMcaId:[anotherCard mcaId]];
+    [self setTimeId:[anotherCard mcaId]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -1894,6 +1917,15 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 						   nil];
     [dataDictionary setObject:aDictionary forKey:@"MCA"];
 	
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORSIS3302TimeDecoder",			@"decoder",
+				   [NSNumber numberWithLong:timeId], @"dataId",
+				   [NSNumber numberWithBool:NO],   @"variable",
+				   [NSNumber numberWithLong:5],	@"length",
+				   nil];
+    [dataDictionary setObject:aDictionary forKey:@"Time"];
+	
+	
     return dataDictionary;
 }
 
@@ -1915,6 +1947,12 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [p setName:@"Run Mode"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setRunMode:withValue:) getMethod:@selector(runMode:)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Extra Time Record"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setShipTimeRecordAlso:) getMethod:@selector(shipTimeRecordAlso)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -2091,20 +2129,21 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
-	if([param isEqualToString:@"Threshold"])				return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"GateLength"])			return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"PulseLength"])			return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"SumG"])				return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"PeakingTime"])			return [[cardDictionary objectForKey:@"peakingTimes"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"InternalTriggerDelay"])return [[cardDictionary objectForKey:@"internalTriggerDelays"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"Dac Offset"])			return [[cardDictionary objectForKey:@"dacOffsets"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"TriggerDecimation"])	return [cardDictionary objectForKey:@"triggerDecimation"];
-	else if([param isEqualToString:@"EnergyDecimation"])	return [cardDictionary objectForKey:@"energyDecimation"];
-    else if([param isEqualToString:@"Clock Source"])		return [cardDictionary objectForKey:@"clockSource"];
-    else if([param isEqualToString:@"Run Mode"])			return [cardDictionary objectForKey:@"runMode"];
-    else if([param isEqualToString:@"GT"])					return [cardDictionary objectForKey:@"gtMask"];
-    else if([param isEqualToString:@"ADC50K Trigger"])		return [cardDictionary objectForKey:@"adc50KtriggerEnabledMask"];
-    else if([param isEqualToString:@"Input Inverted"])		return [cardDictionary objectForKey:@"inputInvertedMask"];
+	if([param isEqualToString:@"Threshold"])						return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"GateLength"])					return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"PulseLength"])					return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"SumG"])						return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"PeakingTime"])					return [[cardDictionary objectForKey:@"peakingTimes"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"InternalTriggerDelay"])		return [[cardDictionary objectForKey:@"internalTriggerDelays"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"Dac Offset"])					return [[cardDictionary objectForKey:@"dacOffsets"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"TriggerDecimation"])			return [cardDictionary objectForKey:@"triggerDecimation"];
+	else if([param isEqualToString:@"EnergyDecimation"])			return [cardDictionary objectForKey:@"energyDecimation"];
+    else if([param isEqualToString:@"Clock Source"])				return [cardDictionary objectForKey:@"clockSource"];
+    else if([param isEqualToString:@"Run Mode"])					return [cardDictionary objectForKey:@"runMode"];
+    else if([param isEqualToString:@"Extra Time Record"])			return [cardDictionary objectForKey:@"shipTimeRecordAlso"];
+    else if([param isEqualToString:@"GT"])							return [cardDictionary objectForKey:@"gtMask"];
+    else if([param isEqualToString:@"ADC50K Trigger"])				return [cardDictionary objectForKey:@"adc50KtriggerEnabledMask"];
+    else if([param isEqualToString:@"Input Inverted"])				return [cardDictionary objectForKey:@"inputInvertedMask"];
     else if([param isEqualToString:@"Internal Trigger Enabled"])	return [cardDictionary objectForKey:@"internalTriggerEnabledMask"];
     else if([param isEqualToString:@"External Trigger Enabled"])	return [cardDictionary objectForKey:@"externalTriggerEnabledMask"];
     else if([param isEqualToString:@"Internal Gate Enabled"])		return [cardDictionary objectForKey:@"internalGateEnabledMask"];
@@ -2119,8 +2158,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     else if([param isEqualToString:@"Trigger Gate Delay"])			return [cardDictionary objectForKey:@"triggerGateLength"];
     else if([param isEqualToString:@"Pretrigger Delay"])			return [cardDictionary objectForKey:@"preTriggerDelay"];
     else if([param isEqualToString:@"Sample Length"])				return [cardDictionary objectForKey:@"sampleLength"];
-
-    
+	
 	else return nil;
 }
 
@@ -2199,6 +2237,10 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 						if (endSampleAddress != 0) {
 							unsigned long addrOffset = 0;
 							do {
+								BOOL goodRecord = NO;
+								long cachedEnergy;
+								long cachedTime0;
+								long cachedTime1;
 								int index = 0;
 								dataRecord[index++] =   dataId | dataRecordlength;
 								dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
@@ -2214,8 +2256,26 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 												usingAddSpace: 0x01];
 		
 								if(dataRecord[dataRecordlength-1] == 0xdeadbeef){
+									cachedTime0  = dataRecord[0];
+									cachedTime1  = dataRecord[1];
+									cachedEnergy = dataRecord[dataRecordlength-4];
+									[aDataPacket addLongsToFrameBuffer:dataRecord length:dataRecordlength];
+									goodRecord = YES;
+								}
+								
+								if(goodRecord && shipTimeRecordAlso){
+									int index = 0;
+									dataRecord[index++] =   timeId | 5;
+									dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
+															(([self slot] & 0x0000001f)<<16)      |
+															((channel & 0x000000ff)<<8);	
+									
+									dataRecord[index++] = cachedTime0;
+									dataRecord[index++] = cachedTime1;
+									dataRecord[index++] = cachedEnergy;
 									[aDataPacket addLongsToFrameBuffer:dataRecord length:dataRecordlength];
 								}
+								
 								addrOffset += (dataRecordlength-4)*4;
 							}while (addrOffset < endSampleAddress);
 						}
@@ -2308,12 +2368,14 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		configStruct->total_cards++;
 		configStruct->card_info[index].hw_type_id				= kSIS3302; //should be unique
 		configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
+		configStruct->card_info[index].hw_mask[1]				= timeId; //better be unique
 		configStruct->card_info[index].slot						= [self slot];
 		configStruct->card_info[index].crate					= [self crateNumber];
 		configStruct->card_info[index].add_mod					= [self addressModifier];
 		configStruct->card_info[index].base_add					= [self baseAddress];
 		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength]/2;
 		configStruct->card_info[index].deviceSpecificData[1]	= [self energySampleLength];
+		configStruct->card_info[index].deviceSpecificData[2]	= [self shipTimeRecordAlso];
 		
 		configStruct->card_info[index].num_Trigger_Indexes		= 0;
 		
@@ -2376,6 +2438,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
+    [self setShipTimeRecordAlso:		[decoder decodeBoolForKey:@"shipTimeRecordAlso"]];
     [self setMcaUseEnergyCalculation:	[decoder decodeBoolForKey:@"mcaUseEnergyCalculation"]];
     [self setMcaEnergyOffset:			[decoder decodeIntForKey:@"mcaEnergyOffset"]];
     [self setMcaEnergyMultiplier:		[decoder decodeIntForKey:@"mcaEnergyMultiplier"]];
@@ -2447,6 +2510,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:shipTimeRecordAlso		forKey:@"shipTimeRecordAlso"];
 	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];
 	[encoder encodeInt:mcaEnergyOffset			forKey:@"mcaEnergyOffset"];
 	[encoder encodeInt:mcaEnergyMultiplier		forKey:@"mcaEnergyMultiplier"];
@@ -2519,6 +2583,8 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [objDictionary setObject: [NSNumber numberWithInt:energyDecimation]				forKey:@"energyDecimation"];	
 	
 	[objDictionary setObject:[NSNumber numberWithInt:runMode]						forKey:@"runMode"];
+	[objDictionary setObject:[NSNumber numberWithInt:shipTimeRecordAlso]			forKey:@"shipTimeRecordAlso"];
+
 	[objDictionary setObject:[NSNumber numberWithInt:lemoInEnabledMask]				forKey:@"lemoInEnabledMask"];
 	[objDictionary setObject:[NSNumber numberWithInt:energyGateLength]				forKey:@"energyGateLength"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex3]		forKey:@"energySampleStartIndex3"];

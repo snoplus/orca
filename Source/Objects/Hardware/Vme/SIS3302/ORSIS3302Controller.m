@@ -387,6 +387,11 @@
                          name : ORSIS3302ModelMcaUseEnergyCalculationChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipTimeRecordAlsoChanged:)
+                         name : ORSIS3302ModelShipTimeRecordAlsoChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -475,9 +480,16 @@
 	[self mcaEnergyMultiplierChanged:nil];
 	[self mcaEnergyOffsetChanged:nil];
 	[self mcaUseEnergyCalculationChanged:nil];
+	[self shipTimeRecordAlsoChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote
+{
+	[shipTimeRecordAlsoCB setIntValue: [model shipTimeRecordAlso]];
+}
+
 - (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote
 {
 	[mcaUseEnergyCalculationButton setIntValue: [model mcaUseEnergyCalculation]];
@@ -1039,7 +1051,6 @@
 	}
 }
 
-
 - (void) updateTimePlot:(NSNotification*)aNote
 {
     if(!aNote || ([aNote object] == [[model waveFormRateGroup]timeRate])){
@@ -1048,6 +1059,10 @@
 }
 
 #pragma mark •••Actions
+- (void) shipTimeRecordAlsoAction:(id)sender
+{
+	[model setShipTimeRecordAlso:[sender intValue]];	
+}
 
 - (IBAction) mcaUseEnergyCalculationAction:(id)sender
 {

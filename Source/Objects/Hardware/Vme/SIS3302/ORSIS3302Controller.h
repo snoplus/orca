@@ -28,6 +28,7 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet NSButton*		shipTimeRecordAlsoCB;
 	IBOutlet NSButton*		mcaUseEnergyCalculationButton;
 	IBOutlet NSTextField*	mcaEnergyOffsetField;
 	IBOutlet NSTextField*	mcaEnergyMultiplierField;
@@ -124,6 +125,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote;
 - (void) mcaEnergyCalculationValues;
 - (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote;
 - (void) mcaEnergyOffsetChanged:(NSNotification*)aNote;
@@ -189,6 +191,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) shipTimeRecordAlsoAction:(id)sender;
 - (IBAction) mcaUseEnergyCalculationAction:(id)sender;
 - (IBAction) mcaEnergyOffsetAction:(id)sender;
 - (IBAction) mcaEnergyMultiplierAction:(id)sender;

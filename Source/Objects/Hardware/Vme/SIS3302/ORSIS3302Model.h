@@ -41,8 +41,9 @@
 	
 	unsigned long   dataId;
 	unsigned long   mcaId;
+	unsigned long   timeId;
+	
 	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
-
 	short			internalTriggerEnabledMask;
 	short			externalTriggerEnabledMask;
 	short			internalGateEnabledMask;
@@ -116,6 +117,7 @@
     int				mcaEnergyMultiplier;
     int				mcaEnergyOffset;
     BOOL			mcaUseEnergyCalculation;
+    BOOL			shipTimeRecordAlso;
 }
 
 - (id) init;
@@ -124,6 +126,8 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (BOOL) shipTimeRecordAlso;
+- (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso;
 - (BOOL) mcaUseEnergyCalculation;
 - (void) setMcaUseEnergyCalculation:(BOOL)aMcaUseEnergyCalculation;
 - (int) mcaEnergyOffset;
@@ -332,6 +336,8 @@
 - (NSString*) runSummary;
 
 #pragma mark •••Data Taker
+- (unsigned long) timeId;
+- (void) setTimeId: (unsigned long) anId;
 - (unsigned long) mcaId;
 - (void) setMcaId: (unsigned long) anId;
 - (unsigned long) dataId;
@@ -365,6 +371,7 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelShipTimeRecordAlsoChanged;
 extern NSString* ORSIS3302ModelMcaUseEnergyCalculationChanged;
 extern NSString* ORSIS3302ModelMcaEnergyOffsetChanged;
 extern NSString* ORSIS3302ModelMcaEnergyMultiplierChanged;
