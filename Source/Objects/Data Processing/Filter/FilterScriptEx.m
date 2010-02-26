@@ -196,8 +196,10 @@ void freeArray(nodeType* p, id delegate)
 	if([symbolTable getData:&theFilterData forKey:p->opr.op[0]->ident.key]){
 		if(theFilterData.type == kFilterPtrType){
 			if(theFilterData.val.pValue !=0){
-				free(theFilterData.val.pValue);
-				theFilterData.val.pValue = 0;
+				if(theFilterData.val.pValue){
+					free(theFilterData.val.pValue);
+					theFilterData.val.pValue = 0;
+				}
 				[symbolTable setData:theFilterData forKey:p->opr.op[0]->ident.key];
 			}
 			//else {

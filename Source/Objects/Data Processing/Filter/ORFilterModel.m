@@ -126,6 +126,7 @@ int filterGraph(nodeType*);
 		}
 		free(filterNodes);
 		filterNodes = nil;
+		filterNodeCount = 0;
 	}
 	if(startFilterNodes){
 		for(i=0;i<startFilterNodeCount;i++){
@@ -133,13 +134,18 @@ int filterGraph(nodeType*);
 		}
 		free(startFilterNodes);
 		startFilterNodes = nil;
+		startFilterNodeCount = 0;
 	}
 	if(finishFilterNodes){
 		for(i=0;i<finishFilterNodeCount;i++){
-			freeNode(finishFilterNodes[i]);
+			if(finishFilterNodes[i]){
+				freeNode(finishFilterNodes[i]);
+				finishFilterNodes[i]  = nil;
+			}
 		}
 		free(finishFilterNodes);
 		finishFilterNodes = nil;
+		finishFilterNodeCount = 0;
 	}
 	
 }
@@ -580,7 +586,7 @@ int filterGraph(nodeType*);
 	
 	int i;
 	for(i=0;i<kNumFilterStacks;i++){
-		[stacks[i] release];
+		[self dumpStack:i];
 	}
 	
 	[runTimer release];
@@ -832,9 +838,11 @@ int filterGraph(nodeType*);
 
 - (void) shipStack:(int)i
 {
-	if(![stacks[i] isEmpty]) {
+	
+	if(stacks[i] && ![stacks[i] isEmpty]) {
 		while(![stacks[i] isEmpty]){
-			[theFilteredObject processData:[stacks[i] dequeueFromBottom] decoder:currentDecoder];
+			NSArray* dataArray = [NSArray arrayWithObject:[stacks[i] dequeueFromBottom]];
+			[theFilteredObject processData:dataArray decoder:currentDecoder];
 		}
 		
 		[self dumpStack:i];
