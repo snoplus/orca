@@ -1894,7 +1894,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
     [self setDataId:[anotherCard dataId]];
     [self setMcaId:[anotherCard mcaId]];
-    [self setTimeId:[anotherCard mcaId]];
+    [self setTimeId:[anotherCard timeId]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -1902,7 +1902,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	NSDictionary* aDictionary;
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-						   @"ORSIS3302Decoder",				@"decoder",
+						   @"ORSIS3302DecoderForEnergy",				@"decoder",
 						   [NSNumber numberWithLong:dataId],@"dataId",
 						   [NSNumber numberWithBool:YES],   @"variable",
 						   [NSNumber numberWithLong:-1],	@"length",
@@ -1910,7 +1910,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [dataDictionary setObject:aDictionary forKey:@"Energy"];
 	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-						   @"ORSIS3302McaDecoder",			@"decoder",
+						   @"ORSIS3302DecoderForMca",			@"decoder",
 						   [NSNumber numberWithLong:mcaId], @"dataId",
 						   [NSNumber numberWithBool:YES],   @"variable",
 						   [NSNumber numberWithLong:-1],	@"length",
@@ -1918,7 +1918,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [dataDictionary setObject:aDictionary forKey:@"MCA"];
 	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORSIS3302TimeDecoder",			@"decoder",
+				   @"ORSIS3302DecoderForTime",			@"decoder",
 				   [NSNumber numberWithLong:timeId], @"dataId",
 				   [NSNumber numberWithBool:NO],   @"variable",
 				   [NSNumber numberWithLong:5],	@"length",

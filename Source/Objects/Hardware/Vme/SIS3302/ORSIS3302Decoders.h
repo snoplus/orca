@@ -25,6 +25,27 @@
 @class ORDataPacket;
 @class ORDataSet;
 
+@interface ORSIS3302DecoderForEnergy : ORVmeCardDecoder {
+@private 
+	BOOL getRatesFromDecodeStage;
+	NSMutableDictionary* actualSIS3302Cards;
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORSIS3302DecoderForTime
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end
+
+@interface ORSIS3302DecoderForMca : ORVmeCardDecoder {
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+//**********old...leave in for backward compatiblity
 @interface ORSIS3302Decoder : ORVmeCardDecoder {
     @private 
         BOOL getRatesFromDecodeStage;
