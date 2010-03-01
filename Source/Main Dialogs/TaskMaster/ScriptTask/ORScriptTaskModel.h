@@ -32,7 +32,6 @@
 
 #pragma mark ***Initialization
 - (void) dealloc;
-- (NSImage*) makeIcon;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
