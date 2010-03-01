@@ -19,10 +19,12 @@
 //-------------------------------------------------------------
 
 //#import "ORIpeDefs.h"
+#import "ORGlobal.h"
 #import "ORCrate.h"
 #import "ORIpeV4SLTModel.h"
 //#import "ORIpeFLTModel.h"
-#import "ORIpeCrateModel.h"
+//#import "ORIpeCrateModel.h"
+#import "ORIpeV4CrateModel.h"
 #import "ORIpeV4SLTDefs.h"
 #import "ORReadOutList.h"
 #import "unistd.h"
@@ -253,6 +255,18 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
                      selector : @selector(runIsStopped:)
                          name : ORRunStoppedNotification
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsBetweenSubRuns:)
+                         name : ORRunBetweenSubRunsNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsStartingSubRun:)
+                         name : ORRunStartSubRunNotification
+                       object : nil];
+
+
 }
 
 #pragma mark •••Accessors
@@ -432,6 +446,17 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	// ak 18.7.07
 	
 	//NSLog(@"Deadtime: %lld\n", [self readDeadTime]);
+}
+
+- (void) runIsBetweenSubRuns:(NSNotification*)aNote
+{
+	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+}
+
+
+- (void) runIsStartingSubRun:(NSNotification*)aNote
+{
+	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
 }
 
 
@@ -1174,7 +1199,9 @@ NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 	}
 	
 	[[self undoManager] enableUndoRegistration];
-	
+
+	[self registerNotificationObservers];
+		
 	return self;
 }
 

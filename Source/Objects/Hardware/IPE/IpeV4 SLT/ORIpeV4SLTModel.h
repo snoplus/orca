@@ -182,6 +182,8 @@
 - (void) registerNotificationObservers;
 - (void) runIsAboutToStart:(NSNotification*)aNote;
 - (void) runIsStopped:(NSNotification*)aNote;
+- (void) runIsBetweenSubRuns:(NSNotification*)aNote;
+- (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (BOOL) countersEnabled;
