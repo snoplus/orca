@@ -94,7 +94,7 @@ NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 - (void) wakeUp
 {
     if(![self aWake]){
-		[self _setUpPolling:NO];
+		//[self _setUpPolling:NO];
 		if(logToFile){
 			[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];		
 		}
@@ -105,7 +105,7 @@ NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 - (void) sleep
 {
     [super sleep];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+   // [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (void) setUpImage
