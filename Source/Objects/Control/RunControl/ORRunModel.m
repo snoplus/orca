@@ -831,6 +831,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 														object:[NSData dataWithBytes:data length:4*sizeof(long)]];
 
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRunBetweenSubRunsNotification
+                                                        object: self
+                                                      userInfo: nil];
+	
+	
 	NSLog(@"Run %@ preparing for a new sub-run\n",[self fullRunNumberString]);
 }
 
@@ -869,7 +874,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[nextObject subRunTaskStarted:runInfo];
 
 	NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
-
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartSubRunNotification
+                                                        object: self
+                                                      userInfo: nil];
+	
 }
 
 - (void) startRun:(BOOL)doInit

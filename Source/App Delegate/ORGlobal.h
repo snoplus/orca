@@ -121,6 +121,8 @@ extern NSString* ORRunAboutToStopNotification;
 extern NSString* ORRunFinalCallNotification;
 extern NSString* ORRunAboutToStartNotification;
 extern NSString* ORRunStartedNotification;
+extern NSString* ORRunBetweenSubRunsNotification;
+extern NSString* ORRunStartSubRunNotification;
 extern NSString* ORRequestRunStop;
 extern NSString* ORRequestRunRestart;
 extern NSString* ORRequestRunHalt;
