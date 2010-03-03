@@ -176,23 +176,22 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		NSArray* parts = [aString componentsSeparatedByString:@"\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Segment" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Quadrant" parts:parts]];
-		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"CardSlot" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Channel" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Threshold" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Gain" parts:parts]];
-		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"PreampSerial" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"CarouselSlot" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ModuleAddress" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ModuleChannel" parts:parts]];
-		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"OSBSlot" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"OSBChannel" parts:parts]];
-		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ORBCard" parts:parts]];
 		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ORBChannel" parts:parts]];
-		finalString = [finalString stringByAppendingString:@"---------------\n"];
 		return finalString;
 	}
 	else {
