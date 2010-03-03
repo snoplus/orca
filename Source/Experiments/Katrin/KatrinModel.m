@@ -168,6 +168,47 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 }
 
 
+- (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
+{
+	if(aSet == 0){
+		//the focal plane
+		NSString* finalString = @"";
+		NSArray* parts = [aString componentsSeparatedByString:@"\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Segment" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Quadrant" parts:parts]];
+		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"CardSlot" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Channel" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Threshold" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"Gain" parts:parts]];
+		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"PreampSerial" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"CarouselSlot" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ModuleAddress" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ModuleChannel" parts:parts]];
+		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"OSBSlot" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"OSBChannel" parts:parts]];
+		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ORBCard" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@"ORBChannel" parts:parts]];
+		finalString = [finalString stringByAppendingString:@"---------------\n"];
+		return finalString;
+	}
+	else {
+		//the veto
+		return aString;
+	}
+}
+
+- (NSString*) getPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts
+{
+	for(id aLine in parts){
+		if([aLine rangeOfString:aLabel].location != NSNotFound) return aLine;
+	}
+	return @"";
+}
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
 {

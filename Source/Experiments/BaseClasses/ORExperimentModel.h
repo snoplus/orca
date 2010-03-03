@@ -67,6 +67,8 @@
 - (BOOL) somethingSelected;
 - (void) setSomethingSelected:(BOOL)aFlag;
 - (void) clearTotalCounts;
+- (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet;
+- (NSString*) getPartStartingWith:(NSString*)aLable parts:(NSArray*)parts;
 
 #pragma mark •••Convience Methods
 - (void) clearAlarm:(NSString*)aName;

@@ -150,13 +150,26 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 		return [segmentGroups objectAtIndex:aSet];
 	}
 	else return nil;
+}		
+
+- (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
+{
+	//default is to just return the string. subclasses can reform if they want
+	return aString;
 }
+- (NSString*) getPartStartingWith:(NSString*)aLable parts:(NSArray*)parts
+{
+	//subclasses can reform if they want
+	return @"";
+}
+
 
 - (void) selectedSet:(int)aSet segment:(int)index
 {
 	if(aSet>=0 && aSet < [segmentGroups count]){
 		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
-		[self setSelectionString:[aGroup selectedSegementInfo:index]];	
+		NSString* s = [self reformatSelectionString:[aGroup selectedSegementInfo:index] forSet:aSet];
+		[self setSelectionString:s];	
 		[self setSomethingSelected:YES];
 	}
 	else {
