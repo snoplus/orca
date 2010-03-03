@@ -169,6 +169,7 @@
 		unsigned long runTime;
 		unsigned long clockTime;
 		BOOL countersEnabled;
+    NSString* sltScriptArguments;
 }
 
 #pragma mark •••Initialization
@@ -186,6 +187,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
+- (NSString*) sltScriptArguments;
+- (void) setSltScriptArguments:(NSString*)aSltScriptArguments;
 - (BOOL) countersEnabled;
 - (void) setCountersEnabled:(BOOL)aContersEnabled;
 - (float) clockTime;
@@ -237,7 +240,9 @@
 - (void) setDisplayEventLoop:(BOOL) aState;
 - (unsigned long) pageSize; //< Length of the ADC data (0..100us)
 - (void) setPageSize: (unsigned long) pageSize;   
-- (void) sendSimulationConfigScript;
+- (void) sendSimulationConfigScriptON;
+- (void) sendSimulationConfigScriptOFF;
+- (void) sendPMCCommandScript: (NSString*)aString;
 
 #pragma mark ***Polling
 - (TimedWorker *) poller;
@@ -339,6 +344,7 @@
 
 @end
 
+extern NSString* ORIpeV4SLTModelSltScriptArgumentsChanged;
 extern NSString* ORIpeV4SLTModelCountersEnabledChanged;
 extern NSString* ORIpeV4SLTModelClockTimeChanged;
 extern NSString* ORIpeV4SLTModelRunTimeChanged;

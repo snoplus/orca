@@ -132,6 +132,7 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* ORIpeV4SLTModelSltScriptArgumentsChanged = @"ORIpeV4SLTModelSltScriptArgumentsChanged";
 NSString* ORIpeV4SLTModelCountersEnabledChanged = @"ORIpeV4SLTModelCorntersEnabledChanged";
 NSString* ORIpeV4SLTModelClockTimeChanged = @"ORIpeV4SLTModelClockTimeChanged";
 NSString* ORIpeV4SLTModelRunTimeChanged = @"ORIpeV4SLTModelRunTimeChanged";
@@ -185,6 +186,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 -(void) dealloc
 {
+    [sltScriptArguments release];
     [patternFilePath release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[readOutGroup release];
@@ -270,6 +272,23 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (NSString*) sltScriptArguments
+{
+    return sltScriptArguments;
+}
+
+- (void) setSltScriptArguments:(NSString*)aSltScriptArguments
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSltScriptArguments:sltScriptArguments];
+    
+    [sltScriptArguments autorelease];
+    sltScriptArguments = [aSltScriptArguments copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelSltScriptArgumentsChanged object:self];
+	
+	NSLog(@"%@::%@  ire %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sltScriptArguments);//TODO: debug -tb-
+}
 
 - (BOOL) countersEnabled
 {
@@ -450,7 +469,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote
 {
-	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
 }
 
 
@@ -660,12 +679,15 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 /*! Send a script to the PrPMC which will configure the PrPMC.
  *
  */
-- (void) sendSimulationConfigScript
+- (void) sendSimulationConfigScriptON
 {
 	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
 	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
+	
+	[self sendPMCCommandScript: @"SimulationConfigScriptON"];
 
-	NSString *scriptName = @"tillsScript";
+	#if 0
+	NSString *scriptName = @"IpeV4SLTScript";
 		ORTaskSequence* aSequence;	
 		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
@@ -688,10 +710,82 @@ NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);
 		[driverScriptFileMover setTransferType:eUseSCP];
 		[aSequence addTaskObj:driverScriptFileMover];
 		
-		NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
+		//NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
+		NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
 NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);		
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,@"arg1",@"arg2",nil]];
+				 arguments:[NSArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,
+				 //@"arg1",@"arg2",nil]];
+				 //@"shellcommand",@"ls",@"&&",@"date",@"&&",@"ps",nil]];
+				 //@"shellcommand",@"ls",@"-laF",nil]];
+				 @"shellcommand",@"ls",@"-l",@"-a",@"-F",nil]];  //limited to 6 arguments (see loginScript)
+				 //TODO: use sltScriptArguments -tb-
+		
+		[aSequence launch];
+		#endif
+
+}
+
+/*! Send a script to the PrPMC which will configure the PrPMC.
+ */
+- (void) sendSimulationConfigScriptOFF
+{
+	//NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
+	
+	[self sendPMCCommandScript: @"SimulationConfigScriptOFF"];
+}
+
+/*! Send a script to the PrPMC which will configure the PrPMC.
+ *
+ */
+- (void) sendPMCCommandScript: (NSString*)aString;
+{
+	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
+
+
+	NSArray *scriptcommands = nil;//limited to 6 arguments (see loginScript)
+	if(aString) scriptcommands = [aString componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if([scriptcommands count] >6) NSLog(@"WARNING: too much arguments in sendPMCConfigScript:\n");
+	
+	NSString *scriptName = @"IpeV4SLTScript";
+		ORTaskSequence* aSequence;	
+		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+		
+		NSString* driverCodePath; //[pmcLink ]
+		if([pmcLink loadMode])driverCodePath = [[pmcLink filePath] stringByAppendingPathComponent:[self sbcLocalCodePath]];
+		else driverCodePath = [resourcePath stringByAppendingPathComponent:[self codeResourcePath]];
+		//driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
+		driverCodePath = [driverCodePath stringByAppendingPathComponent: scriptName];
+		ORFileMover* driverScriptFileMover = [[ORFileMover alloc] init];//TODO: keep it as object in the class variables -tb-
+		[driverScriptFileMover setDelegate:aSequence];
+NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);		
+		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
+										to:@"" 
+								remoteHost:[pmcLink IPNumber] 
+								  userName:[pmcLink userName] 
+								  passWord:[pmcLink passWord]];
+		[driverScriptFileMover setVerbose:YES];
+		[driverScriptFileMover doNotMoveFilesToSentFolder];
+		[driverScriptFileMover setTransferType:eUseSCP];
+		[aSequence addTaskObj:driverScriptFileMover];
+		
+		//NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
+		NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
+NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);	
+
+	    //prepare script commands/arguments
+		NSMutableArray *arguments = nil;
+		arguments = [NSMutableArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,nil];
+		[arguments addObjectsFromArray:	scriptcommands];
+NSLog(@"  arguments: %@ \n" , arguments);	
+	
+		//add task
+		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
+				 arguments: arguments];  //limited to 6 arguments (see loginScript)
+
 		
 		[aSequence launch];
 
@@ -1165,6 +1259,7 @@ NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setSltScriptArguments:[decoder decodeObjectForKey:@"sltScriptArguments"]];
 	pmcLink = [[decoder decodeObjectForKey:@"PMC_Link"] retain];
 	if(!pmcLink)pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 	else [pmcLink setDelegate:self];
@@ -1209,6 +1304,7 @@ NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeObject:sltScriptArguments forKey:@"sltScriptArguments"];
 	[encoder encodeBool:countersEnabled forKey:@"countersEnabled"];
 	[encoder encodeInt32:secondsSet forKey:@"secondsSet"];
 	[encoder encodeObject:pmcLink		forKey:@"PMC_Link"];

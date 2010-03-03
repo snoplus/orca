@@ -15,9 +15,11 @@ set arg1 [lrange $argv 4 4]
 set arg2 [lrange $argv 5 5] 
 set arg3 [lrange $argv 6 6] 
 set arg4 [lrange $argv 7 7] 
+set arg5 [lrange $argv 8 8] 
+set arg6 [lrange $argv 9 9] 
 set timeout -1   
 # now connect to remote UNIX box (ipaddr) with given script to execute
-spawn ssh -l $userName $ipaddr $scriptname $arg1 $arg2 $arg3 $arg4
+spawn ssh -l $userName $ipaddr $scriptname $arg1 $arg2 $arg3 $arg4 $arg5 $arg6
 match_max 100000
 expect "*?assword:*"
 #expect "* (yes/no)?" {send "yes\r"; expect "*assword:"} "*assword:" 

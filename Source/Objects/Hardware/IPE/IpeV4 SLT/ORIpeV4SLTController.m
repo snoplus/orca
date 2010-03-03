@@ -195,9 +195,19 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : ORIpeV4SLTModelCountersEnabledChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(sltScriptArgumentsChanged:)
+                         name : ORIpeV4SLTModelSltScriptArgumentsChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) sltScriptArgumentsChanged:(NSNotification*)aNote
+{
+	[sltScriptArgumentsTextField setStringValue: [model sltScriptArguments]];
+}
 
 - (void) countersEnabledChanged:(NSNotification*)aNote
 {
@@ -325,6 +335,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self runTimeChanged:nil];
 	[self clockTimeChanged:nil];
 	[self countersEnabledChanged:nil];
+	[self sltScriptArgumentsChanged:nil];
 }
 
 
@@ -472,6 +483,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) sltScriptArgumentsTextFieldAction:(id)sender
+{
+	[model setSltScriptArguments:[sender stringValue]];	
+}
 
 - (void) enableDisableCounterAction:(id)sender
 {
@@ -714,10 +730,17 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) resetPageManagerAction:(id)sender	{ [self do:@selector(writePageManagerReset) name:@"Reset Page Manager"]; }
 - (IBAction) releaseAllPagesAction:(id)sender	{ [self do:@selector(writeReleasePage) name:@"Release Pages"]; }
 
-- (IBAction) sendSimulationConfigScript:(id)sender
+- (IBAction) sendCommandScript:(id)sender
 {
-	[model sendSimulationConfigScript];
+	[self endEditing];
+	NSString *fullCommand = [NSString stringWithFormat: @"shellcommand %@",[model sltScriptArguments]];
+	[model sendPMCCommandScript: fullCommand];  
 }
+
+- (IBAction) sendSimulationConfigScriptON:(id)sender
+{	[model sendSimulationConfigScriptON];  }
+- (IBAction) sendSimulationConfigScriptOFF:(id)sender
+{	[model sendSimulationConfigScriptOFF];  }
 
 - (IBAction) pulserAmpAction: (id) sender
 {

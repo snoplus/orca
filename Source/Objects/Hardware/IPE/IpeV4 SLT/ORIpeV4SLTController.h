@@ -28,6 +28,7 @@
 	@private
 	
 		IBOutlet NSTextField* hwVersionField;
+		IBOutlet NSTextField* sltScriptArgumentsTextField;
 		IBOutlet NSMatrix*	  countersMatrix;
 		IBOutlet NSTextField* secondsSetField;
 		IBOutlet NSButton*	  hwVersionButton;
@@ -102,6 +103,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
 - (void) countersEnabledChanged:(NSNotification*)aNote;
 - (void) clockTimeChanged:(NSNotification*)aNote;
 - (void) runTimeChanged:(NSNotification*)aNote;
@@ -134,6 +136,7 @@
 - (void) enableRegControls;
 
 #pragma mark •••Actions
+- (IBAction) sltScriptArgumentsTextFieldAction:(id)sender;
 - (IBAction) enableDisableCounterAction:(id)sender;
 - (IBAction) secondsSetAction:(id)sender;
 - (IBAction) triggerEnableAction:(id)sender;
@@ -182,6 +185,8 @@
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 
-- (IBAction) sendSimulationConfigScript:(id)sender;
+- (IBAction) sendCommandScript:(id)sender;
+- (IBAction) sendSimulationConfigScriptON:(id)sender;
+- (IBAction) sendSimulationConfigScriptOFF:(id)sender;
 
 @end
