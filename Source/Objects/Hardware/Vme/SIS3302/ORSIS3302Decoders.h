@@ -55,7 +55,7 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
-@interface ORSIS3302TimeDecoder
+@interface ORSIS3302TimeDecoder: ORVmeCardDecoder
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 @end
