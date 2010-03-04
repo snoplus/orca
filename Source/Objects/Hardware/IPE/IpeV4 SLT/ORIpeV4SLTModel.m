@@ -275,11 +275,13 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (NSString*) sltScriptArguments
 {
+	if(!sltScriptArguments)return @"";
     return sltScriptArguments;
 }
 
 - (void) setSltScriptArguments:(NSString*)aSltScriptArguments
 {
+	if(!aSltScriptArguments)aSltScriptArguments = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setSltScriptArguments:sltScriptArguments];
     
     [sltScriptArguments autorelease];
