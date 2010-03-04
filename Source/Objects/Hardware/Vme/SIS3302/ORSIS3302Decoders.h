@@ -34,7 +34,7 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
-@interface ORSIS3302DecoderForTime
+@interface ORSIS3302DecoderForTime : ORVmeCardDecoder 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 @end
