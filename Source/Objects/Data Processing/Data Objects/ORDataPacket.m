@@ -110,6 +110,7 @@
         [fileHeader setObject:docDict forKey:@"Document Info"];
     }
     [docDict setObject:[NSNumber numberWithInt:kDataVersion] forKey:@"dataVersion"];
+    [docDict setObject:[[NSApp delegate] ethernetHardwareAddress] forKey:@"macAddress"];
 	//tell objects to add any additional data descriptions into the data description header.
     NSArray* objectList = [NSArray arrayWithArray:[[[NSApp delegate] document]collectObjectsRespondingTo:@selector(appendDataDescription:userInfo:)]];
     NSEnumerator* e = [objectList objectEnumerator];

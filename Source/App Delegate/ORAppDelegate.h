@@ -33,6 +33,7 @@
     MemoryWatcher*     memoryWatcher;
     ORSplashWindowController* theSplashController;
 	IBOutlet ORHelpCenter* helpCenter;
+	NSString* ethernetHardwareAddress;
 }
 + (BOOL)isMacOSX10_5;
 + (BOOL)isMacOSX10_4;
@@ -46,6 +47,7 @@
 - (void) closeSplashWindow;
 - (ORHelpCenter*) helpCenter;
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender;
+- (NSString*) ethernetHardwareAddress;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

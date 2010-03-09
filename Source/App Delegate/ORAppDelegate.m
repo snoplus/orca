@@ -110,6 +110,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	self = [super init];
 	theSplashController = [[ORSplashWindowController alloc] init];
 	[theSplashController showWindow:self];
+	
 	return self;
 }
 
@@ -118,6 +119,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [alarmCollection release];
     [memoryWatcher release];
+	[ethernetHardwareAddress release];
     [super dealloc];
 }    
 
@@ -155,6 +157,14 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	[someAlarms retain];
 	[alarmCollection release];
 	alarmCollection = someAlarms;
+}
+- (NSString*) ethernetHardwareAddress
+{
+	if(![ethernetHardwareAddress length]){
+		ethernetHardwareAddress = macAddress();
+		[ethernetHardwareAddress retain];
+	}
+	return ethernetHardwareAddress;
 }
 
 #pragma mark ¥¥¥Notifications
@@ -400,7 +410,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	unsigned major, minor, bugFix;
     [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
     NSLog(@"Running MacOS %u.%u.%u %@\n", major, minor, bugFix,minor>=5?@"":@"(Note: some ORCA features require 10.5. Please update)");
-    
+    NSLog(@"Mac Address: %@\n",[self ethernetHardwareAddress]);
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
         [self mailCrashLogs];
     }

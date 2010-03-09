@@ -37,3 +37,10 @@ NSString* listMethods(Class aClass);
 NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass);
 NSString* hexToString(unsigned long aHexValue);
 const char* decodeType(const char* aType);
+NSString* macAddress();
+
+#pragma mark ***private
+kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices);
+kern_return_t getMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8 bufferSize);
+
+
