@@ -338,16 +338,21 @@
 - (id) findObject:(id) p
 {
 	//needs to return NSDecimalNumber holding the obj pointer.
-	Class theClass = NSClassFromString(VARIABLENAME(0));
+	NSString* theClassName = VARIABLENAME(0);
+	Class theClass = NSClassFromString(theClassName);
 	if([theClass isEqualTo:[[[NSApp delegate] document] class]]){
 		return [[NSApp delegate] document];
+	}
+	else if([theClassName isEqualTo:@"self"]){
+		return self;
 	}
 	else {
 		NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
 		if([objects count] == 0)return _zero;
-		if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORVmeDaughterCard")])  return [self findVmeDaughterCard:p collection:objects];
-		else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCard")])  return [self findCard:p collection:objects];
-		else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCrate")])  return [self findCrate:p collection:objects];
+		id anObj = [objects objectAtIndex:0];
+		if([anObj isKindOfClass:NSClassFromString(@"ORVmeDaughterCard")])  return [self findVmeDaughterCard:p collection:objects];
+		else if([anObj isKindOfClass:NSClassFromString(@"ORCard")])  return [self findCard:p collection:objects];
+		else if([anObj isKindOfClass:NSClassFromString(@"ORCrate")])  return [self findCrate:p collection:objects];
 		else {
 			int numArgs = [[p nodeData] count];
 			if(numArgs == 1){
@@ -485,6 +490,34 @@
 	if(functionEvaluator)return [functionEvaluator functionEvaluator];
 	else return self;
 }
+
+- (int) second 
+{
+	return [[NSCalendarDate date] secondOfMinute];
+}
+
+- (int) minute 
+{
+	return [[NSCalendarDate date] minuteOfHour];
+}
+
+- (int) hour 
+{
+	return [[NSCalendarDate date] hourOfDay];
+}
+- (int) day 
+{
+	return [[NSCalendarDate date] dayOfMonth];
+}
+- (int) month 
+{
+	return [[NSCalendarDate date] monthOfYear];
+}
+- (int)year 
+{
+	return [[NSCalendarDate date] yearOfCommonEra];
+}
+
 @end
 
 @implementation ORNodeEvaluator (Interpret_private)
