@@ -1,3 +1,6 @@
+#this configures the make process:
+-include simulationmode.mk
+
 
 # RECOMMENDED SETUP:
 # It is assuemed that the fdhwlib is compiled in the folder: ~/src/v4
@@ -11,8 +14,23 @@
 #
 # -tb- 2009-09 
 # mail: till.bergmann@ipe.fzk.de
+#
+# UPDATE:
+# now there is a rpm repository, which may be installed with 'yast'
+# (then UCFLAGS = ... -I ~/src/v4/fdhwlib/src  isn't necessary any more)
+# -tb- 2009-09 
+# mail: till.bergmann@kit.edu
 
-UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src
+
+
+#-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
+ifeq ($(PMC_COMPILE_IN_SIMULATION_MODE),1)
+  defflags='-DPMC_COMPILE_IN_SIMULATION_MODE=1'
+else
+  defflags='-DPMC_COMPILE_IN_SIMULATION_MODE=0'
+endif
+
+UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)
 #Note: -Wno-sign-compare supresses 'comparison int with unsigned int' compiler warning -tb-
 #LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \
 #                                /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation \
@@ -27,6 +45,9 @@ UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src
 #LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
 
 #-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
-LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
-LIBs    = 
+#LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++ 
+#LIBs    = 
 
+
+LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+LIBs    = 

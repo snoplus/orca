@@ -1,6 +1,13 @@
 #include "ORFLTv4Readout.hh"
 #include "SLTv4_HW_Definitions.h"
-#include "katrinhw4/subrackkatrin.h"
+
+#if PMC_COMPILE_IN_SIMULATION_MODE
+    #warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 1
+#else
+    #warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 0
+	#include "katrinhw4/subrackkatrin.h"
+#endif
+
 
 extern hw4::SubrackKatrin* srack; 
 

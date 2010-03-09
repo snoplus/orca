@@ -289,7 +289,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelSltScriptArgumentsChanged object:self];
 	
-	NSLog(@"%@::%@  ire %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sltScriptArguments);//TODO: debug -tb-
+	NSLog(@"%@::%@  is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sltScriptArguments);//TODO: debug -tb-
 }
 
 - (BOOL) countersEnabled

@@ -40,6 +40,12 @@ extern "C" {
 }
 #endif
 
+#if PMC_COMPILE_IN_SIMULATION_MODE
+    #warning MESSAGE: HW_Readout: PMC_COMPILE_IN_SIMULATION_MODE is 1
+#else
+    #warning MESSAGE: HW_Readout: PMC_COMPILE_IN_SIMULATION_MODE is 0
+#endif
+
 
 #if USE_PBUS
 #ifdef __cplusplus
@@ -52,10 +58,15 @@ extern "C" {
 #endif
 
 
-#include "hw4/baseregister.h"
-#include "katrinhw4/subrackkatrin.h"
-#include "katrinhw4/sltkatrin.h"
-#include "katrinhw4/fltkatrin.h"
+#if PMC_COMPILE_IN_SIMULATION_MODE
+    //# warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 1
+#else
+    //# warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 0
+	#include "hw4/baseregister.h"
+	#include "katrinhw4/subrackkatrin.h"
+	#include "katrinhw4/sltkatrin.h"
+	#include "katrinhw4/fltkatrin.h"
+#endif
 
 #include "HW_Readout.h"
 
