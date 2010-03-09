@@ -76,6 +76,7 @@
 		2D158EBC11359F5800EA1552 /* ORKatrinV4FLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D158EB311359F5800EA1552 /* ORKatrinV4FLTModel.h */; };
 		2D158EBD11359F5800EA1552 /* ORKatrinV4FLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D158EB411359F5800EA1552 /* ORKatrinV4FLTModel.m */; };
 		2D159238113EE62C00EA1552 /* IpeV4SLTScript in Resources */ = {isa = PBXBuildFile; fileRef = 2D159237113EE62C00EA1552 /* IpeV4SLTScript */; };
+		2D1593E3114686AC00EA1552 /* IpeV4SLTScript in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D159237113EE62C00EA1552 /* IpeV4SLTScript */; };
 		2D1AB81A0F1B9F2400E6B850 /* IpeSlowControl.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */; };
 		2D1AB81B0F1B9F2400E6B850 /* IpeSlowControl.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */; };
 		2D1AB81C0F1B9F2400E6B850 /* ORIpeSlowControlController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */; };
@@ -2258,6 +2259,7 @@
 				43ADFEA910B6E1600044617C /* ORSLTv4Readout.cc in SLTv4_Copy */,
 				43ADFEAA10B6E1600044617C /* ORSLTv4Readout.hh in SLTv4_Copy */,
 				842251420D8845500048D331 /* SLTv4_HW_Definitions.h in SLTv4_Copy */,
+				2D1593E3114686AC00EA1552 /* IpeV4SLTScript in SLTv4_Copy */,
 			);
 			name = SLTv4_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
