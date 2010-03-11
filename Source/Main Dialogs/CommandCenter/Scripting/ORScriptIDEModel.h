@@ -125,6 +125,7 @@
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState;
 - (void) shipDataRecord:(id)someData tag:(unsigned long)anID;
 - (int) scriptType;
+- (unsigned long) currentTime;
 
 @end
 

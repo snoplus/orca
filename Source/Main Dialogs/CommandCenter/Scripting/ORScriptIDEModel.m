@@ -733,6 +733,11 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     [encoder encodeObject:lastFile forKey:@"lastFile"];
     [encoder encodeObject:breakpoints forKey:@"breakpoints"];
 }
+
+- (unsigned long) currentTime
+{
+	return [NSDate timeIntervalSinceReferenceDate];
+}
 @end
 
 
@@ -771,6 +776,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 
     return [NSString stringWithFormat:@"%@%@%@",title,state,date];               
 }
+
 @end
 
 
