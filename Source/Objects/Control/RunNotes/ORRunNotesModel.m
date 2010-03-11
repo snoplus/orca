@@ -197,6 +197,7 @@ NSString* ORRunNotesListLock				 = @"ORRunNotesListLock";
 
 - (NSString*) comments
 {
+	if(!comments)return @"";
 	return comments;
 }
 
