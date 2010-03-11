@@ -1107,10 +1107,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	}
 	
 	//get the time(UT!)
-	time_t	theTime;
-	time(&theTime);
-	struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	time_t ut_time = mktime(theTimeGMTAsStruct);
+	time_t	ut_time;
+    time(&ut_time);    
 	
 	unsigned long data[4];
 	data[0] = dataId | 4;
