@@ -21,8 +21,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="3001"/>
 			<integer value="3175"/>
-			<integer value="1187"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -6617,7 +6617,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 								<object class="NSButton" id="1072803663">
 									<reference key="NSNextResponder" ref="405881282"/>
 									<int key="NSvFlags">292</int>
-									<string key="NSFrame">{{18, 69}, {36, 41}}</string>
+									<string key="NSFrame">{{18, 8}, {36, 41}}</string>
 									<reference key="NSSuperview" ref="405881282"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="117528255">
@@ -8515,9 +8515,9 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							<reference ref="702784524"/>
 							<reference ref="624907523"/>
 							<reference ref="131968427"/>
-							<reference ref="1072803663"/>
 							<reference ref="749133473"/>
 							<reference ref="768625386"/>
+							<reference ref="1072803663"/>
 						</object>
 						<reference key="parent" ref="326989058"/>
 					</object>
@@ -13364,6 +13364,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<string>3253.IBPluginDependency</string>
 					<string>3253.ImportedFromIB2</string>
 					<string>3254.IBPluginDependency</string>
+					<string>3255.IBPluginDependency</string>
 					<string>565.IBPluginDependency</string>
 					<string>565.ImportedFromIB2</string>
 					<string>595.IBPluginDependency</string>
@@ -14102,9 +14103,9 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{409, 139}, {661, 717}}</string>
+					<string>{{108, 139}, {661, 717}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{409, 139}, {661, 717}}</string>
+					<string>{{108, 139}, {661, 717}}</string>
 					<integer value="1"/>
 					<string>{{28, 62}, {661, 717}}</string>
 					<boolean value="NO"/>
@@ -14577,6 +14578,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
@@ -14925,6 +14927,13 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/SBC/SBC Link/SBC_Link.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/Serial/Pac/ORPacModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
