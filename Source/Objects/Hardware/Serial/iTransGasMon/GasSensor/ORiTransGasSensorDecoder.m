@@ -39,7 +39,7 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  spare
 //-----------------------------------------------------------------------------------------------
 
-@implementation ORiTrasGasSensorDecoder
+@implementation ORiTrasGasSensorDecoderForValue
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {

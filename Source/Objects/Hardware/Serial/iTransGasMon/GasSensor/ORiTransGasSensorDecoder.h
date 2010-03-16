@@ -23,7 +23,7 @@
 @class ORDataPacket;
 @class ORDataSet;
 
-@interface ORiTrasGasSensorDecoder : ORBaseDecoder {
+@interface ORiTrasGasSensorDecoderForValue : ORBaseDecoder {
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
