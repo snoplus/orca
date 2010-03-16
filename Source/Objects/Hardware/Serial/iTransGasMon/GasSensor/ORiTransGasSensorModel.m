@@ -456,7 +456,7 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 
 - (void) shipDataRecords
 {
-    if([[ORGlobal sharedGlobal] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress] && (dataId != 0)){
 		
 		union {
 			float asFloat;
