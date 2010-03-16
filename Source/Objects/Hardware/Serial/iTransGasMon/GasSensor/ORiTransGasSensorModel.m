@@ -404,12 +404,12 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 
 - (void) setDataIds:(id)assigner
 {
-    dataId       = [assigner assignDataIds:kLongForm];
+    dataId = [assigner assignDataIds:kLongForm];
 }
 
-- (void) syncDataIdsWith:(id)anotherAmi286
+- (void) syncDataIdsWith:(id)anotherObject
 {
-    [self setDataId:[anotherAmi286 dataId]];
+    [self setDataId:[anotherObject dataId]];
 }
 
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
