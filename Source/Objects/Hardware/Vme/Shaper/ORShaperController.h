@@ -25,6 +25,7 @@
 @interface ORShaperController : OrcaObjectController {
 
     IBOutlet NSTabView*		tabView;
+	IBOutlet NSButton*		shipTimeStampCB;
     IBOutlet NSTextField*   slotField;
     IBOutlet NSStepper* 	addressStepper;
     IBOutlet NSTextField* 	addressText;
@@ -68,6 +69,7 @@
 - (void) registerRates;
 
 #pragma mark ¥¥¥Interface Management
+- (void) shipTimeStampChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNotification;
 - (void) slotChanged:(NSNotification*)aNotification;
 - (void) thresholdArrayChanged:(NSNotification*)aNotification;
@@ -100,6 +102,7 @@
 
 
 #pragma mark ¥¥¥Actions
+- (IBAction) shipTimeStampAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) thresholdTextAction:(id)sender;

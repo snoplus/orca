@@ -1,5 +1,7 @@
 #include "ORShaperReadout.hh"
 #include <errno.h>
+#import <sys/timeb.h>
+
 bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
 {
     uint32_t conversionRegOffset = GetDeviceSpecificData()[1];
@@ -12,12 +14,13 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
     if(result == (int32_t) sizeof(theConversionMask) && theConversionMask != 0){
 
         uint32_t dataId            = GetHardwareMask()[0];
+        uint32_t timeId            = GetHardwareMask()[1];
         uint32_t locationMask      = ((GetCrate() & 0x01e)<<21) | 
                                      ((GetSlot() & 0x0000001f)<<16);
         uint32_t onlineMask        = GetDeviceSpecificData()[0];
         uint32_t firstAdcRegOffset = GetDeviceSpecificData()[2];
-
-		ensureDataCanHold(2 * 8); //max this card can produce
+		uint8_t  shipTimeStamp     = GetDeviceSpecificData()[3];
+		ensureDataCanHold(2*8 + 4*8); //max this card can produce
 		
         for (int16_t channel=0; channel<8; ++channel) {
             if(onlineMask & theConversionMask & (1L<<channel)){
@@ -39,6 +42,20 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
                     LogBusError("Rd Err: Shaper 0x%04x %s",
                         GetBaseAddress(),strerror(errno));                
                 }
+				
+				if(shipTimeStamp){
+					
+					struct timeb mt;
+					if (ftime(&mt) == 0) {
+						unsigned long data[4];
+						data[dataIndex++] = timeId | 4;
+						data[dataIndex++] = ((GetCrate()&0x0000000f)<<21) | ((GetSlot()& 0x0000001f)<<16) | ((channel & 0x000000ff)<<8);
+						data[dataIndex++] = mt.time;
+						data[dataIndex++] = mt.millitm;
+					}						
+					
+				}
+				
             }
         }
     } else if (result < 0) {

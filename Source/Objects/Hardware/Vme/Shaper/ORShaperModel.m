@@ -29,6 +29,7 @@
 #import "ORHWWizSelection.h"
 #import "ORDataTypeAssigner.h"
 #include "VME_HW_Definitions.h"
+#import <sys/timeb.h>
 
 #pragma mark ¥¥¥Definitions
 #define kDefaultAddressModifier			0x29
@@ -101,28 +102,29 @@ static unsigned short kThreshWriteSelectionBits[8]={
 
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORShaperChan				    = @"Shaper Channel Value";
-NSString* ORShaperThresholdArrayChangedNotification = @"Shaper Thresholds Array Changed Notification";
-NSString* ORShaperThresholdAdcArrayChangedNotification = @"Shaper Threshold Adc Array Changed Notification";
-NSString* ORShaperGainArrayChangedNotification      = @"Shaper Gains Array Changed Notification";
-NSString* ORShaperThresholdChangedNotification      = @"Shaper Threshold Value Changed Notification";
-NSString* ORShaperThresholdAdcChangedNotification   = @"Shaper Threshold Adc Value Changed Notification";
-NSString* ORShaperGainChangedNotification	    = @"Shaper Gain Value Changed Notification";
-NSString* ORShaperContinousChangedNotification      = @"Shaper Continous Changed Notification";
-NSString* ORShaperScalersEnabledChangedNotification = @"Shaper Scalers Enabled Changed Notification";
-NSString* ORShaperMultiBoardEnabledChangedNotification = @"Shaper MultiBoard Changed Notification";
-NSString* ORShaperScalerMaskChangedNotification     = @"Shaper Scaler Mask Changed Notification";
-NSString* ORShaperOnlineMaskChangedNotification     = @"Shaper Online Mask Changed Notification";
+NSString* ORShaperModelShipTimeStampChanged				= @"ORShaperModelShipTimeStampChanged";
+NSString* ORShaperChan									= @"Shaper Channel Value";
+NSString* ORShaperThresholdArrayChangedNotification		= @"Shaper Thresholds Array Changed Notification";
+NSString* ORShaperThresholdAdcArrayChangedNotification	= @"Shaper Threshold Adc Array Changed Notification";
+NSString* ORShaperGainArrayChangedNotification			= @"Shaper Gains Array Changed Notification";
+NSString* ORShaperThresholdChangedNotification			= @"Shaper Threshold Value Changed Notification";
+NSString* ORShaperThresholdAdcChangedNotification		= @"Shaper Threshold Adc Value Changed Notification";
+NSString* ORShaperGainChangedNotification				= @"Shaper Gain Value Changed Notification";
+NSString* ORShaperContinousChangedNotification			= @"Shaper Continous Changed Notification";
+NSString* ORShaperScalersEnabledChangedNotification		= @"Shaper Scalers Enabled Changed Notification";
+NSString* ORShaperMultiBoardEnabledChangedNotification	= @"Shaper MultiBoard Changed Notification";
+NSString* ORShaperScalerMaskChangedNotification			= @"Shaper Scaler Mask Changed Notification";
+NSString* ORShaperOnlineMaskChangedNotification			= @"Shaper Online Mask Changed Notification";
 
-NSString* ORShaperScanStartChangedNotification 	= @"Shaper ScanStart Changed Notification";
-NSString* ORShaperScanDeltaChangedNotification 	= @"Shaper ScanDelta Changed Notification";
-NSString* ORShaperScanNumChangedNotification 	= @"Shaper ScanNum Changed Notification";
+NSString* ORShaperScanStartChangedNotification			= @"Shaper ScanStart Changed Notification";
+NSString* ORShaperScanDeltaChangedNotification			= @"Shaper ScanDelta Changed Notification";
+NSString* ORShaperScanNumChangedNotification			= @"Shaper ScanNum Changed Notification";
 
-NSString* ORShaperScalerGroupChangedNotification    = @"ORShaperScalerGroupChangedNotification";
-NSString* ORShaperRateGroupChangedNotification      = @"ORShaperRateGroupChangedNotification";
+NSString* ORShaperScalerGroupChangedNotification		= @"ORShaperScalerGroupChangedNotification";
+NSString* ORShaperRateGroupChangedNotification			= @"ORShaperRateGroupChangedNotification";
 
-NSString* ORShaperDisplayRawChangedNotification = @"ORShaperDisplayRawChangedNotification";
-NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
+NSString* ORShaperDisplayRawChangedNotification			= @"ORShaperDisplayRawChangedNotification";
+NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 
 @implementation ORShaperModel
 
@@ -220,6 +222,19 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) shipTimeStamp
+{
+    return shipTimeStamp;
+}
+
+- (void) setShipTimeStamp:(BOOL)aShipTimeStamp
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipTimeStamp:shipTimeStamp];
+    shipTimeStamp = aShipTimeStamp;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORShaperModelShipTimeStampChanged object:self];
+}
+
 - (NSMutableArray*) thresholds
 {
     return thresholds;
@@ -574,6 +589,12 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 - (void) setDataId: (unsigned long) DataId
 {
     dataId = DataId;
+}
+
+- (unsigned long) timeId { return timeId; }
+- (void) setTimeId: (unsigned long) aTimeId
+{
+    timeId = aTimeId;
 }
 
 
@@ -1080,7 +1101,16 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 								 [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Shaper"];
-    
+ 	
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORShaperDecoderForTime",						@"decoder",
+								 [NSNumber numberWithLong:timeId],              @"dataId",
+								 [NSNumber numberWithBool:NO],                  @"variable",
+								 [NSNumber numberWithLong:4],					@"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"Time"];
+	
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   @"ORShaperDecoderForScalers",			    @"decoder",
 				   [NSNumber numberWithLong:scalerDataId],     @"dataId",
@@ -1096,8 +1126,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   @"Adc",								@"name",
-				   [NSNumber numberWithLong:dataId],   @"dataId",
-				   [NSNumber numberWithLong:8],		@"maxChannels",
+				   [NSNumber numberWithLong:dataId],	@"dataId",
+				   [NSNumber numberWithLong:8],			@"maxChannels",
 				   nil];
 	
 	[anEventDictionary setObject:aDictionary forKey:@"Shaper"];
@@ -1187,6 +1217,21 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
                         [aDataPacket addLongsToFrameBuffer:data length:2];
                     }
 					
+					if(shipTimeStamp){
+						
+						struct timeb mt;
+						if (ftime(&mt) == 0) {
+							
+							unsigned long data[4];
+							data[0] = timeId | 4;
+							data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16) | ((channel & 0x000000ff)<<8);
+							data[2] = mt.time;
+							data[3] = mt.millitm;
+							[aDataPacket addLongsToFrameBuffer:data length:4];
+						}						
+						
+					}
+					
 					++adcCount[channel]; 
 				}
 			}
@@ -1268,7 +1313,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 {
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id = kShaper; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	configStruct->card_info[index].hw_mask[0] = dataId; //better be unique
+	configStruct->card_info[index].hw_mask[1] = timeId; //better be unique
 	configStruct->card_info[index].slot 	 = [self slot];
 	configStruct->card_info[index].crate 	 = [self crateNumber];
 	configStruct->card_info[index].add_mod 	 = [self addressModifier];
@@ -1276,6 +1322,7 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 	configStruct->card_info[index].deviceSpecificData[0] = onlineMask;
 	configStruct->card_info[index].deviceSpecificData[1] = register_offsets[kConversionStatusRegister];
 	configStruct->card_info[index].deviceSpecificData[2] = register_offsets[kADC1OutputRegister];
+	configStruct->card_info[index].deviceSpecificData[3] = shipTimeStamp;
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -1304,16 +1351,16 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 #pragma mark ¥¥¥Archival
 static NSString *ORShaperThresholds 		= @"Shaper Thresholds Array";
 static NSString *ORShaperThresholdAdcs 		= @"Shaper ThresholdAdcs Array";
-static NSString *ORShaperGains			= @"Shaper Gains Array";
-static NSString *ORShaperContinous		= @"Shaper Continous";
+static NSString *ORShaperGains				= @"Shaper Gains Array";
+static NSString *ORShaperContinous			= @"Shaper Continous";
 static NSString *ORShaperScalersEnabled 	= @"Shaper Scalers Enabled";
 static NSString *ORShaperMultiBoardEnabled 	= @"Shaper MultiBoard Enabled";
-static NSString *ORShaperScalerMask		= @"Shaper Scaler Enabled Mask";
-static NSString *ORShaperOnlineMask		= @"Shaper Online Mask";
+static NSString *ORShaperScalerMask			= @"Shaper Scaler Enabled Mask";
+static NSString *ORShaperOnlineMask			= @"Shaper Online Mask";
 
-static NSString *ORShaperScanStart		= @"ORShaper Scan Start";
-static NSString *ORShaperScanDelta		= @"ORShaper Scan Delta";
-static NSString *ORShaperScanNumber		= @"ORShaper Scan Number";
+static NSString *ORShaperScanStart			= @"ORShaper Scan Start";
+static NSString *ORShaperScanDelta			= @"ORShaper Scan Delta";
+static NSString *ORShaperScanNumber			= @"ORShaper Scan Number";
 static NSString *ORShaperAdcRateGroup		= @"ORShaper Rate Group";
 
 static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
@@ -1324,13 +1371,14 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 	
     [[self undoManager] disableUndoRegistration];
 	
-    [self setThresholds:[decoder decodeObjectForKey:ORShaperThresholds]];
-    [self setThresholdAdcs:[decoder decodeObjectForKey:ORShaperThresholdAdcs]];
-    [self setGains:[decoder decodeObjectForKey:ORShaperGains]];
-    [self setContinous:[decoder decodeBoolForKey:ORShaperContinous]];
-    [self setScalersEnabled:[decoder decodeBoolForKey:ORShaperScalersEnabled]];
-    [self setMultiBoardEnabled:[decoder decodeBoolForKey:ORShaperMultiBoardEnabled]];
-    [self setScalerMask:[decoder decodeIntForKey:ORShaperScalerMask]];
+    [self setShipTimeStamp:		[decoder decodeBoolForKey:@"shipTimeStamp"]];
+    [self setThresholds:		[decoder decodeObjectForKey:ORShaperThresholds]];
+    [self setThresholdAdcs:		[decoder decodeObjectForKey:ORShaperThresholdAdcs]];
+    [self setGains:				[decoder decodeObjectForKey:ORShaperGains]];
+    [self setContinous:			[decoder decodeBoolForKey:ORShaperContinous]];
+    [self setScalersEnabled:	[decoder decodeBoolForKey:ORShaperScalersEnabled]];
+    [self setMultiBoardEnabled:	[decoder decodeBoolForKey:ORShaperMultiBoardEnabled]];
+    [self setScalerMask:		[decoder decodeIntForKey:ORShaperScalerMask]];
     if([decoder containsValueForKey:ORShaperOnlineMask]){
 		[self setOnlineMask:[decoder decodeIntForKey:ORShaperOnlineMask]];
     }
@@ -1361,28 +1409,28 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 			[thresholdAdcs addObject:[NSNumber numberWithInt:0]];
 		}
     }
-    
 	
     [[self undoManager] enableUndoRegistration];
 	
     return self;
 }
 
-- (void)encodeWithCoder:(NSCoder*)encoder
+- (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:[self thresholds] forKey:ORShaperThresholds];
-    [encoder encodeObject:[self thresholdAdcs] forKey:ORShaperThresholdAdcs];
-    [encoder encodeObject:[self gains] forKey:ORShaperGains];
-    [encoder encodeBool:[self continous] forKey:ORShaperContinous];
-    [encoder encodeBool:[self scalersEnabled] forKey:ORShaperScalersEnabled];
+    [encoder encodeBool:shipTimeStamp			forKey:@"shipTimeStamp"];
+    [encoder encodeObject:[self thresholds]		forKey:ORShaperThresholds];
+    [encoder encodeObject:[self thresholdAdcs]	forKey:ORShaperThresholdAdcs];
+    [encoder encodeObject:[self gains]			forKey:ORShaperGains];
+    [encoder encodeBool:[self continous]		forKey:ORShaperContinous];
+    [encoder encodeBool:[self scalersEnabled]	forKey:ORShaperScalersEnabled];
     [encoder encodeBool:[self multiBoardEnabled] forKey:ORShaperMultiBoardEnabled];
-    [encoder encodeInt:[self scalerMask] forKey:ORShaperScalerMask];
-    [encoder encodeInt:[self onlineMask] forKey:ORShaperOnlineMask];
+    [encoder encodeInt:[self scalerMask]		forKey:ORShaperScalerMask];
+    [encoder encodeInt:[self onlineMask]		forKey:ORShaperOnlineMask];
 	
-    [encoder encodeInt32:[self scanStart] forKey:ORShaperScanStart];
-    [encoder encodeInt:[self scanDelta] forKey:ORShaperScanDelta];
-    [encoder encodeInt:[self scanNumber] forKey:ORShaperScanNumber];
+    [encoder encodeInt32:[self scanStart]		forKey:ORShaperScanStart];
+    [encoder encodeInt:[self scanDelta]			forKey:ORShaperScanDelta];
+    [encoder encodeInt:[self scanNumber]		forKey:ORShaperScanNumber];
 	
     [encoder encodeObject:[self adcRateGroup] forKey:ORShaperAdcRateGroup];
 	
@@ -1392,7 +1440,6 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds forKey:@"thresholds"];
     [objDictionary setObject:thresholdAdcs forKey:@"thresholdAdcs"];
@@ -1402,6 +1449,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     [objDictionary setObject:[NSNumber numberWithBool:continous] forKey:@"continous"];
     [objDictionary setObject:[NSNumber numberWithBool:scalersEnabled] forKey:@"scalersEnabled"];
     [objDictionary setObject:[NSNumber numberWithBool:multiBoardEnabled] forKey:@"multiBoardEnabled"];
+    [objDictionary setObject:[NSNumber numberWithBool:shipTimeStamp] forKey:@"shipTimeStamp"];
     
     @try {
         unsigned short aValue;
@@ -1513,6 +1561,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 {
 	return YES;
 }
+
 - (NSArray*) wizardParameters
 {
     NSMutableArray* a = [NSMutableArray array];
@@ -1563,6 +1612,13 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     [p setSetMethod:@selector(setOnlineMaskBit:withValue:) getMethod:@selector(onlineMaskBit:)];
     [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
     [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Ship Time"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setShipTimeStamp:) getMethod:@selector(shipTimeStamp)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
 	
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -1596,6 +1652,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     else if([param isEqualToString:@"Set Continuous"]) return [cardDictionary objectForKey:@"continous"];
     else if([param isEqualToString:@"Set MultiBoard"]) return [cardDictionary objectForKey:@"multiBoardEnabled"];
     else if([param isEqualToString:@"Enable Scalers"]) return [cardDictionary objectForKey:@"scalersEnabled"];
+    else if([param isEqualToString:@"Ship Time"]) return [cardDictionary objectForKey:@"shipTimeStamp"];
     else return nil;
 }
 
@@ -1604,10 +1661,12 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 {
     dataId       = [assigner assignDataIds:kShortForm]; //short form preferred
     scalerDataId = [assigner assignDataIds:kLongForm];
+    timeId		 = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherShaper
 {
+    [self setTimeId:[anotherShaper timeId]];
     [self setDataId:[anotherShaper dataId]];
     [self setScalerDataId:[anotherShaper scalerDataId]];
 }

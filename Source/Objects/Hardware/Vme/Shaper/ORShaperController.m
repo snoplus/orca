@@ -177,6 +177,11 @@
 	
 	
     [self registerRates];
+    [notifyCenter addObserver : self
+                     selector : @selector(shipTimeStampChanged:)
+                         name : ORShaperModelShipTimeStampChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -196,6 +201,11 @@
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) shipTimeStampChanged:(NSNotification*)aNote
+{
+	[shipTimeStampCB setIntValue: [model shipTimeStamp]];
+}
 - (void) updateWindow
 {
     [super updateWindow];
@@ -222,6 +232,7 @@
     [self settingsLockChanged:nil];
 	
     [self displayRawChanged:nil];
+	[self shipTimeStampChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -510,12 +521,17 @@
 
 #pragma mark ¥¥¥Actions
 
+- (void) shipTimeStampAction:(id)sender
+{
+	[model setShipTimeStamp:[sender intValue]];	
+}
+
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORShaperSettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
--(IBAction)baseAddressAction:(id)sender
+-(IBAction) baseAddressAction:(id)sender
 {
 	if([sender intValue] != [model baseAddress]){
 		[[self undoManager] setActionName: @"Set Base Address"];
@@ -523,7 +539,7 @@
 	}
 }
 
--(IBAction)continousAction:(id)sender
+-(IBAction) continousAction:(id)sender
 {
 	if([sender intValue] != [model continous]){
 		[[self undoManager] setActionName: @"Enable Continous"];
@@ -548,8 +564,6 @@
 	}
 }
 
-
-
 -(IBAction) thresholdAction:(id)sender
 {
 	if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
@@ -573,7 +587,6 @@
 		}
 	}
 }
-
 
 - (IBAction) gainAction:(id)sender
 {

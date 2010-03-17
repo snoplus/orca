@@ -162,6 +162,62 @@
 
 @end
 
+//------------------------------------------------------------------
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^^ ^^^^ ^^-----------------------data id
+//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^--------------------------------spare
+//        ^ ^^^---------------------------crate
+//             ^ ^^^^---------------------card
+//                    ^^^^ ^^^^-----------channel
+//								^^^^ ^^^--spare
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-seconds
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-millisconds
+//------------------------------------------------------------------
+
+@implementation ORShaperDecoderForTime
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr   = (unsigned long*)someData;
+    unsigned long length = ExtractLength(ptr[0]);
+    
+	int crate	= ShiftAndExtract(ptr[1],21,0xf);
+	int card	= ShiftAndExtract(ptr[1],16,0x1f);
+	int channel = ShiftAndExtract(ptr[1],8,0xff);
+	
+ 	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* cardKey		= [self getCardKey: card];
+	NSString* channelKey	= [self getChannelKey: channel];
+
+	NSString* infoString = [NSString stringWithFormat:@"%.19s.%hu",ptr[2],ptr[3]];
+
+    [aDataSet loadGenericData:infoString sender:self withKeys:@"Shaper", crateKey, cardKey, channelKey, @"Time Record",nil];
+	
+
+    return length;
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{ 	
+    NSString* title= @"Shaper Time Stamp\n\n";
+ 	int crate	= ShiftAndExtract(ptr[1],21,0xf);
+	int card	= ShiftAndExtract(ptr[1],16,0x1f);
+	int channel = ShiftAndExtract(ptr[1],8,0xff);
+	
+    NSString* crateString		= [NSString stringWithFormat:@"Crate = %d\n",crate];
+    NSString* cardString		= [NSString stringWithFormat:@"Card  = %d\n",card];    
+    NSString* channelString	= [NSString stringWithFormat:@"Total = %d\n",channel];
+	NSString* seconds	= [NSString stringWithFormat:@"Seconds = %d.%hu\n",ptr[2],ptr[3]];
+	
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crateString,cardString,channelString,seconds];               
+}
+
+@end
+
+
+
+
 //ARGGGGGG -- because of a cut/paste error some data around jan '07 gat taken with a bugus decoder name
 //temp insert this decoder so the data can be replayed.
 @implementation ORShaperDecoderFORAxisrs

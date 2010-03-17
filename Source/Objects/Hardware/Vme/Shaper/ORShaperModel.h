@@ -84,7 +84,8 @@ enum {
 	
     unsigned long dataId;
     unsigned long scalerDataId;
-    
+	unsigned long timeId;
+
 	NSMutableArray* thresholds;
 	NSMutableArray* thresholdAdcs;
 	NSMutableArray* gains;
@@ -111,9 +112,12 @@ enum {
 	unsigned long 	slotMask;
     
 	short savedThresholds[kNumShaperChannels];
+    BOOL shipTimeStamp;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) shipTimeStamp;
+- (void) setShipTimeStamp:(BOOL)aShipTimeStamp;
 - (NSMutableArray*) thresholds;
 - (void)	    setThresholds:(NSMutableArray*)someThresholds;
 - (NSMutableArray*) thresholdAdcs;
@@ -151,6 +155,8 @@ enum {
 - (ORRateGroup*)    scalerRateGroup;
 - (void)	    setScalerRateGroup:(ORRateGroup*)newScalerRateGroup;
 
+- (unsigned long) timeId;
+- (void) setTimeId: (unsigned long) TimeId;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (unsigned long) scalerDataId;
@@ -260,10 +266,15 @@ enum {
 - (NSArray*) wizardParameters;
 - (int) numberOfChannels;
 
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
 
+
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORShaperModelShipTimeStampChanged;
 extern NSString* ORShaperChan;
 extern NSString* ORShaperThresholdArrayChangedNotification;
 extern NSString* ORShaperThresholdAdcArrayChangedNotification;
