@@ -29,7 +29,6 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
 					
 					struct timeb mt;
 					if (ftime(&mt) == 0) {
-						unsigned long data[4];
 						data[dataIndex++] = timeId | 4;
 						data[dataIndex++] = locationMask | ((channel & 0x000000ff)<<8);
 						data[dataIndex++] = mt.time;
