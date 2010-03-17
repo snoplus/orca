@@ -190,9 +190,9 @@
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
 
-	NSString* infoString = [NSString stringWithFormat:@"%.19s.%hu",ptr[2],ptr[3]];
+	NSString* infoString = [NSString stringWithFormat:@"%hu.%hu",ptr[2],ptr[3]];
 
-    [aDataSet loadGenericData:infoString sender:self withKeys:@"Shaper", crateKey, cardKey, channelKey, @"Time Record",nil];
+    [aDataSet loadGenericData:infoString sender:self withKeys:@"Time",@"Shaper", crateKey, cardKey, channelKey, @"Time Record",nil];
 	
 
     return length;
@@ -207,10 +207,10 @@
 	
     NSString* crateString		= [NSString stringWithFormat:@"Crate = %d\n",crate];
     NSString* cardString		= [NSString stringWithFormat:@"Card  = %d\n",card];    
-    NSString* channelString	= [NSString stringWithFormat:@"Total = %d\n",channel];
-	NSString* seconds	= [NSString stringWithFormat:@"Seconds = %d.%hu\n",ptr[2],ptr[3]];
+    NSString* channelString	= [NSString stringWithFormat:	 @"Channel = %d\n",channel];
+	NSString* seconds	= [NSString stringWithFormat:		 @"Seconds = %hu.%hu\n",ptr[2],ptr[3]];
 	
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crateString,cardString,channelString,seconds];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crateString,cardString,channelString,seconds];               
 }
 
 @end

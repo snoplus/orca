@@ -24,6 +24,20 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
 		
         for (int16_t channel=0; channel<8; ++channel) {
             if(onlineMask & theConversionMask & (1L<<channel)){
+				
+				if(shipTimeStamp){
+					
+					struct timeb mt;
+					if (ftime(&mt) == 0) {
+						unsigned long data[4];
+						data[dataIndex++] = timeId | 4;
+						data[dataIndex++] = locationMask | ((channel & 0x000000ff)<<8);
+						data[dataIndex++] = mt.time;
+						data[dataIndex++] = mt.millitm;
+					}						
+					
+				}
+				
                 uint16_t aValue;
                 result = VMERead(GetBaseAddress() + firstAdcRegOffset + 2*channel,
                                  0x29, 
@@ -33,29 +47,17 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
                     if(((dataId) & 0x80000000)){ //short form
                         data[dataIndex++] = dataId | locationMask | 
                             ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
-                    } else { //long form
+                    } 
+					else { //long form
                         data[dataIndex++] = dataId | 2;
                         data[dataIndex++] = locationMask | 
                             ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                     }
-                } else if (result < 0) {
+                } 
+				else if (result < 0) {
                     LogBusError("Rd Err: Shaper 0x%04x %s",
                         GetBaseAddress(),strerror(errno));                
                 }
-				
-				if(shipTimeStamp){
-					
-					struct timeb mt;
-					if (ftime(&mt) == 0) {
-						unsigned long data[4];
-						data[dataIndex++] = timeId | 4;
-						data[dataIndex++] = ((GetCrate()&0x0000000f)<<21) | ((GetSlot()& 0x0000001f)<<16) | ((channel & 0x000000ff)<<8);
-						data[dataIndex++] = mt.time;
-						data[dataIndex++] = mt.millitm;
-					}						
-					
-				}
-				
             }
         }
     } else if (result < 0) {

@@ -1197,6 +1197,22 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 			for (channel=0; channel<kNumShaperChannels; ++channel) {
 				unsigned char chanMask = (1L<<channel) & onlineMask;
 				if(theConversionMask & chanMask){
+					
+					if(shipTimeStamp){
+						
+						struct timeb mt;
+						if (ftime(&mt) == 0) {
+							
+							unsigned long data[4];
+							data[0] = timeId | 4;
+							data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16) | ((channel & 0x000000ff)<<8);
+							data[2] = mt.time & 0xffffffff;
+							data[3] = mt.millitm;
+							[aDataPacket addLongsToFrameBuffer:data length:4];
+						}						
+						
+					}
+					
 					unsigned short aValue;
 					
 					[controller readWordBlock:&aValue
@@ -1216,22 +1232,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
                         data[1] =  slotMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                         [aDataPacket addLongsToFrameBuffer:data length:2];
                     }
-					
-					if(shipTimeStamp){
-						
-						struct timeb mt;
-						if (ftime(&mt) == 0) {
-							
-							unsigned long data[4];
-							data[0] = timeId | 4;
-							data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16) | ((channel & 0x000000ff)<<8);
-							data[2] = mt.time;
-							data[3] = mt.millitm;
-							[aDataPacket addLongsToFrameBuffer:data length:4];
-						}						
-						
-					}
-					
+										
 					++adcCount[channel]; 
 				}
 			}
