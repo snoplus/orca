@@ -27,16 +27,12 @@
 @interface HaloController : ORExperimentController {
  
     IBOutlet NSTextField*	detectorTitle;
-
-	//items in the  details tab view
     IBOutlet NSPopUpButton*	viewTypePU;
 
-	ORSegmentGroup* secondaryGroup;
 	NSView *blankView;
     NSSize detectorSize;
     NSSize detailsSize;
     NSSize focalPlaneSize;
-
 }
 
 #pragma mark ¥¥¥Initialization

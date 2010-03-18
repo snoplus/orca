@@ -134,8 +134,11 @@ NSString* ORHaloModelViewTypeChanged	= @"ORHaloModelViewTypeChanged";
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
 {
+	if([aString length] == 0)return @"Not Mapped";
+	
 	NSString* finalString = @"";
-	NSArray* parts = [aString componentsSeparatedByString:@"\n\n\n"];
+	NSArray* parts = [aString componentsSeparatedByString:@"\n"];
+	finalString = [finalString stringByAppendingString:@"\n-----------------------\n"];
 	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment" parts:parts]];
 	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
 	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];

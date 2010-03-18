@@ -54,9 +54,9 @@
 -(void) awakeFromNib
 {
 	
-	detectorSize		= NSMakeSize(675,589);
-	detailsSize			= NSMakeSize(655,589);
-	focalPlaneSize		= NSMakeSize(827,589);
+	detectorSize		= NSMakeSize(620,595);
+	detailsSize			= NSMakeSize(450,589);
+	focalPlaneSize		= NSMakeSize(350,589);
 	
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -84,7 +84,6 @@
 - (void) updateWindow
 {
     [super updateWindow];
-	
 	[self viewTypeChanged:nil];
 }
 

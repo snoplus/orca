@@ -36,7 +36,7 @@
 		float x;
 		float y;
 		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/24.;
+		float dy = [self bounds].size.height/8;
 		[[NSColor blackColor] set];
 		[NSBezierPath fillRect:[self bounds]];
 		[[NSColor whiteColor] set];
@@ -81,16 +81,14 @@
 @implementation HaloDetectorView (private)
 - (void) makeAllSegments
 {
-	float xc = [self bounds].size.width/2;
-	float yc = [self bounds].size.height/2;
+	//float xc = [self bounds].size.width/2;
+	//float yc = [self bounds].size.height/2;
 	
 	[super makeAllSegments];
 	
-	NSPoint centerPoint = NSMakePoint(xc,yc);
-
 	if(viewType == kUseCrateView){
 		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/24.;
+		float dy = [self bounds].size.height/8;
 		NSMutableArray* segmentPaths = [NSMutableArray arrayWithCapacity:kNumTubes];
 		NSMutableArray* errorPaths   = [NSMutableArray arrayWithCapacity:kNumTubes];
 		ORSegmentGroup* aGroup = [delegate segmentGroup:0];
@@ -103,7 +101,7 @@
 			if(channel < 0){
 				cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
 			}
-			NSRect channelRect = NSMakeRect(cardSlot*dx,channel*dy,dx,dy);
+			NSRect channelRect = NSMakeRect(cardSlot*dx,[self bounds].size.height - channel*dy,dx,dy);
 			[segmentPaths addObject:[NSBezierPath bezierPathWithRect:channelRect]];
 			[errorPaths addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(channelRect, 4, 4)]];
 		}
@@ -122,7 +120,6 @@
 		float height = [self bounds].size.height;
 		float width = [self bounds].size.height;
 		int evenColumnDelta = width  / 5;
-		int oddColumnDelta  = width  / 4;
 		int rowSpacing      = height / 7;
 #define cellSize 30
 		
@@ -132,12 +129,12 @@
 		for(bore=0;bore<32;bore++){
 			
 			int t;
-			float angle = 0;
+			float angle = 90;
 			for(t=0;t<4;t++){
 				float x = xc + 10 * cos(angle * 3.1415/180.);
 				float y = yc + 10 * sin(angle * 3.1415/180.);
-				angle += 90;
-				NSRect r = NSMakeRect(20+x-5,y-5,10,10);
+				angle -= 90;
+				NSRect r = NSMakeRect(10+x-5,y-5,10,10);
 				r = NSOffsetRect(r, 0, 0);
 				[segmentPaths addObject:[NSBezierPath bezierPathWithOvalInRect:r]];
 				[errorPaths   addObject:[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(r, -5, -5)]];
