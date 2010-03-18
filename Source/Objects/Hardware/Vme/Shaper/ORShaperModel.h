@@ -102,7 +102,7 @@ enum {
 	
 	ORRateGroup*	adcRateGroup;
 	unsigned long 	adcCount[kNumShaperChannels];
-	
+	unsigned long   eventCount[kNumShaperChannels];
 	ORRateGroup*	scalerRateGroup;
 	unsigned short 	scalerCount[kNumShaperChannels];
 		

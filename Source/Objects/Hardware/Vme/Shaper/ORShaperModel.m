@@ -1234,6 +1234,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
                     }
 										
 					++adcCount[channel]; 
+					++eventCount[channel];
 				}
 			}
 		}
@@ -1259,7 +1260,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 - (BOOL) bumpRateFromDecodeStage:(short)channel
 {
 	if(isRunning)return NO;
-    
+	++eventCount[channel];
     ++adcCount[channel];
     return YES;
 }
@@ -1719,13 +1720,17 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 	//included to satisfy the protocal... change if needed
 	return NO;
 }
-//for adcProvidingProtocol... but not used for now
-- (unsigned long) eventCount:(int)channel
+- (unsigned long) eventCount:(int)aChannel
 {
-	return 0;
+    return eventCount[aChannel];
 }
+
 - (void) clearEventCounts
 {
+    int i;
+    for(i=0;i<kNumShaperChannels;i++){
+		eventCount[i]=0;
+    }
 }
 
 @end
