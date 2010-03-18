@@ -516,6 +516,14 @@
 		842DAEBE0A82CA8400C942A2 /* ORBiRa2351IController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842DAEB80A82CA8400C942A2 /* ORBiRa2351IController.m */; };
 		842DAEBF0A82CA8400C942A2 /* ORBiRa2351IModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 842DAEB90A82CA8400C942A2 /* ORBiRa2351IModel.h */; };
 		842DAEC00A82CA8400C942A2 /* ORBiRa2351IModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 842DAEBA0A82CA8400C942A2 /* ORBiRa2351IModel.m */; };
+		843175CD1152766E005643AB /* Halo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 843175C41152766E005643AB /* Halo.gif */; };
+		843175CE1152766E005643AB /* Halo.nib in Resources */ = {isa = PBXBuildFile; fileRef = 843175C51152766E005643AB /* Halo.nib */; };
+		843175D01152766E005643AB /* HaloController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843175C71152766E005643AB /* HaloController.h */; };
+		843175D11152766E005643AB /* HaloController.m in Sources */ = {isa = PBXBuildFile; fileRef = 843175C81152766E005643AB /* HaloController.m */; };
+		843175D21152766E005643AB /* HaloDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 843175C91152766E005643AB /* HaloDetectorView.h */; };
+		843175D31152766E005643AB /* HaloDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 843175CA1152766E005643AB /* HaloDetectorView.m */; };
+		843175D41152766E005643AB /* HaloModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843175CB1152766E005643AB /* HaloModel.h */; };
+		843175D51152766E005643AB /* HaloModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843175CC1152766E005643AB /* HaloModel.m */; };
 		8431D2FF096F11E600995510 /* DGF4c.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8431D2FE096F11E600995510 /* DGF4c.nib */; };
 		8434149D08EDF240009B7659 /* NoFireWireServiceHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */; };
 		8434150D08EE0378009B7659 /* ORCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8434150B08EE0378009B7659 /* ORCrateController.h */; };
@@ -2915,6 +2923,14 @@
 		842F19B903B8F060005F64B1 /* ORRunModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRunModel.h; path = Source/Objects/Control/RunControl/ORRunModel.h; sourceTree = SOURCE_ROOT; };
 		842F2341047D3655005F64B1 /* ThreadWorker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ThreadWorker.m; path = "Source/Objects/Misc Objects/Workers/ThreadWorker.m"; sourceTree = SOURCE_ROOT; };
 		842F2343047D365F005F64B1 /* ThreadWorker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ThreadWorker.h; path = "Source/Objects/Misc Objects/Workers/ThreadWorker.h"; sourceTree = SOURCE_ROOT; };
+		843175C41152766E005643AB /* Halo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Halo.gif; sourceTree = "<group>"; };
+		843175C51152766E005643AB /* Halo.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Halo.nib; sourceTree = "<group>"; };
+		843175C71152766E005643AB /* HaloController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HaloController.h; sourceTree = "<group>"; };
+		843175C81152766E005643AB /* HaloController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HaloController.m; sourceTree = "<group>"; };
+		843175C91152766E005643AB /* HaloDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HaloDetectorView.h; sourceTree = "<group>"; };
+		843175CA1152766E005643AB /* HaloDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HaloDetectorView.m; sourceTree = "<group>"; };
+		843175CB1152766E005643AB /* HaloModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HaloModel.h; sourceTree = "<group>"; };
+		843175CC1152766E005643AB /* HaloModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HaloModel.m; sourceTree = "<group>"; };
 		8431D2FE096F11E600995510 /* DGF4c.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = DGF4c.nib; path = Source/Objects/Hardware/Camac/DGF4c/DGF4c.nib; sourceTree = SOURCE_ROOT; };
 		8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoFireWireServiceHelp.plist; path = "Source/Objects/Misc Objects/FireWire/NoFireWireServiceHelp.plist"; sourceTree = SOURCE_ROOT; };
 		8434150B08EE0378009B7659 /* ORCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCrateController.h; sourceTree = "<group>"; };
@@ -5926,6 +5942,21 @@
 			path = RunControl;
 			sourceTree = "<group>";
 		};
+		843175C31152766E005643AB /* Halo */ = {
+			isa = PBXGroup;
+			children = (
+				843175C41152766E005643AB /* Halo.gif */,
+				843175C51152766E005643AB /* Halo.nib */,
+				843175C71152766E005643AB /* HaloController.h */,
+				843175C81152766E005643AB /* HaloController.m */,
+				843175C91152766E005643AB /* HaloDetectorView.h */,
+				843175CA1152766E005643AB /* HaloDetectorView.m */,
+				843175CB1152766E005643AB /* HaloModel.h */,
+				843175CC1152766E005643AB /* HaloModel.m */,
+			);
+			path = Halo;
+			sourceTree = "<group>";
+		};
 		8435624008FDB287002864C7 /* ContainerIO */ = {
 			isa = PBXGroup;
 			children = (
@@ -8200,6 +8231,7 @@
 			isa = PBXGroup;
 			children = (
 				849B26D60B2F48490007484F /* BaseClasses */,
+				843175C31152766E005643AB /* Halo */,
 				54F5B6F9087206D9003AC228 /* Katrin */,
 				849B25E30B2F34F90007484F /* Prespectrometer */,
 				84B8B99404DB33F8005F64B1 /* Ncd */,
@@ -10584,6 +10616,9 @@
 				2D158EB911359F5800EA1552 /* ORKatrinV4FLTDecoder.h in Headers */,
 				2D158EBB11359F5800EA1552 /* ORKatrinV4FLTDefs.h in Headers */,
 				2D158EBC11359F5800EA1552 /* ORKatrinV4FLTModel.h in Headers */,
+				843175D01152766E005643AB /* HaloController.h in Headers */,
+				843175D21152766E005643AB /* HaloDetectorView.h in Headers */,
+				843175D41152766E005643AB /* HaloModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11261,6 +11296,8 @@
 				2D158EB511359F5800EA1552 /* KatrinV4FLT.nib in Resources */,
 				2D158EB611359F5800EA1552 /* KatrinV4FLTCard.gif in Resources */,
 				2D159238113EE62C00EA1552 /* IpeV4SLTScript in Resources */,
+				843175CD1152766E005643AB /* Halo.gif in Resources */,
+				843175CE1152766E005643AB /* Halo.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12016,6 +12053,9 @@
 				2D158EB811359F5800EA1552 /* ORKatrinV4FLTController.m in Sources */,
 				2D158EBA11359F5800EA1552 /* ORKatrinV4FLTDecoder.m in Sources */,
 				2D158EBD11359F5800EA1552 /* ORKatrinV4FLTModel.m in Sources */,
+				843175D11152766E005643AB /* HaloController.m in Sources */,
+				843175D31152766E005643AB /* HaloDetectorView.m in Sources */,
+				843175D51152766E005643AB /* HaloModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
