@@ -105,9 +105,7 @@
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[super specialUpdate:aNote];
-	//if([model viewType] == kUseCrateView){
-		[detectorView makeAllSegments];
-	//}
+	[detectorView makeAllSegments];
 }
 
 - (void) setDetectorTitle
