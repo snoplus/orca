@@ -202,6 +202,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 {
     return totalRate;
 }
+
 - (void) setTotalRate:(ORTimeRate*)newTotalRate
 {
     [totalRate autorelease];
@@ -439,6 +440,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (NSString*) selectedSegementInfo:(int)index
 {
 	if(index<0)return @"<nothing selected>";
+	else if(index>=[segments count]) return @"";
 	else {
 		NSString* string = [NSString stringWithFormat:@"%@\n",groupName];
 		return [string stringByAppendingFormat:@"%@",[segments objectAtIndex:index]];
