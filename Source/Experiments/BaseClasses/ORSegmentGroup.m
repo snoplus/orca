@@ -210,7 +210,8 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (BOOL) hwPresent:(int)aChannel
 {
-	return [[segments objectAtIndex:aChannel] hwPresent];
+	if(aChannel < [segments count]) return [[segments objectAtIndex:aChannel] hwPresent];
+	else return NO;
 }
 
 - (BOOL) online:(int)aChannel;
