@@ -150,35 +150,6 @@
 }
 @end
 
-@implementation ORSIS3302DecoderForTime
-//------------------------------------------------------------------
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^^ ^^^^ ^^-----------------------data id
-//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
-
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^--------------------------------spare
-//        ^ ^^^---------------------------crate
-//             ^ ^^^^---------------------card
-//                    ^^^^ ^^^^-----------channel
-//								^^^^ ^^^--spare
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-HW Data Record 1
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-HW Data Record 2
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-Energy Max Value
-//------------------------------------------------------------------
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-    unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(ptr[0]);	
-    return length; //must return number of longs
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
-{
-	return @"Description not implemented yet";
-}
-@end
-
 
 @implementation ORSIS3302DecoderForMca
 
@@ -364,34 +335,6 @@
 }
 @end
 
-@implementation ORSIS3302TimeDecoder
-//------------------------------------------------------------------
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^^ ^^^^ ^^-----------------------data id
-//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
-
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^--------------------------------spare
-//        ^ ^^^---------------------------crate
-//             ^ ^^^^---------------------card
-//                    ^^^^ ^^^^-----------channel
-//								^^^^ ^^^--spare
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-HW Data Record 1
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-HW Data Record 2
-//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-Energy Max Value
-//------------------------------------------------------------------
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
-{
-    unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(ptr[0]);	
-    return length; //must return number of longs
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
-{
-	return @"Description not implemented yet";
-}
-@end
 
 
 @implementation ORSIS3302McaDecoder

@@ -48,21 +48,17 @@
 	IBOutlet NSMatrix*		externalTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		internalGateEnabledMatrix;
 	IBOutlet NSMatrix*		externalGateEnabledMatrix;
+	IBOutlet NSMatrix*		triggerGateLengthMatrix;
+	IBOutlet NSMatrix*		preTriggerDelayMatrix;
+	IBOutlet NSMatrix*		sampleStartIndexMatrix;
 	IBOutlet NSMatrix*		lemoInEnabledMatrix;
-	IBOutlet NSTextField*	energyGateLengthField;
+	IBOutlet NSMatrix*		energyGateLengthMatrix;
 	IBOutlet NSPopUpButton* runModePU;
 	IBOutlet NSTextField*	endAddressThresholdField;
-	IBOutlet NSTextField*	energyTauFactorField;
 	IBOutlet NSTextField*	energySampleStartIndex3Field;
 	IBOutlet NSTextField*	energySampleStartIndex2Field;
 	IBOutlet NSTextField*	energySampleStartIndex1Field;
 	IBOutlet NSButton*		energyShipWaveformButton;
-	IBOutlet NSTextField*	energyGapTimeField;
-	IBOutlet NSTextField*	energyPeakingTimeField;
-	IBOutlet NSTextField*	triggerGateLengthField;
-	IBOutlet NSTextField*	preTriggerDelayField;
-	IBOutlet NSTextField*	sampleStartIndexField;
-	IBOutlet NSTextField*	sampleLengthField;
 	IBOutlet NSPopUpButton* lemoInModePU;
 	IBOutlet NSTextField*	lemoInAssignmentsField;
 	IBOutlet NSPopUpButton* lemoOutModePU;
@@ -85,13 +81,24 @@
 	IBOutlet NSMatrix*		sumGMatrix;
 	IBOutlet NSMatrix*		peakingTimeMatrix;
 	IBOutlet NSMatrix*		internalTriggerDelayMatrix;
-    IBOutlet NSButton*      settingLockButton;
+	IBOutlet NSMatrix*		sampleLengthMatrix;
+ 	IBOutlet NSMatrix*		energyTauFactorMatrix;
+	IBOutlet NSMatrix*		energyGapTimeMatrix;
+	IBOutlet NSMatrix*		energyPeakingTimeMatrix;
+
+	IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
     IBOutlet NSButton*      reportButton;
     IBOutlet NSButton*      probeButton;
 	
-	IBOutlet NSPopUpButton*	triggerDecimationPU;
-	IBOutlet NSPopUpButton*	energyDecimationPU;
+	IBOutlet NSPopUpButton*	triggerDecimation0;
+	IBOutlet NSPopUpButton*	triggerDecimation1;
+	IBOutlet NSPopUpButton*	triggerDecimation2;
+	IBOutlet NSPopUpButton*	triggerDecimation3;
+	IBOutlet NSPopUpButton*	energyDecimation0;
+	IBOutlet NSPopUpButton*	energyDecimation1;
+	IBOutlet NSPopUpButton*	energyDecimation2;
+	IBOutlet NSPopUpButton*	energyDecimation3;
 	
     IBOutlet NSTextField*	mcaBusyField;
 	

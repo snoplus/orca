@@ -98,6 +98,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 - (void) writeDacOffsets;
 - (void) setUpArrays;
 - (void) pollMcaStatus;
+- (NSMutableArray*) arrayOfLength:(int)len;
 @end
 
 @implementation ORSIS3302Model
@@ -286,14 +287,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[self setLemoInEnabledMask:aMask];
 }
 
-- (int) energyGateLength { return energyGateLength; }
-- (void) setEnergyGateLength:(int)aEnergyGateLength
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGateLength:energyGateLength];
-    energyGateLength = aEnergyGateLength;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyGateLengthChanged object:self];
-}
-
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
 {
@@ -309,14 +302,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:endAddressThreshold];
     endAddressThreshold = aEndAddressThreshold;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEndAddressThresholdChanged object:self];
-}
-
-- (int) energyTauFactor { return energyTauFactor; }
-- (void) setEnergyTauFactor:(int)aEnergyTauFactor
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyTauFactor:energyTauFactor];
-    energyTauFactor = [self limitIntValue:aEnergyTauFactor min:0 max:0x3f];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyTauFactorChanged object:self];
 }
 
 - (int) energySampleStartIndex3 { return energySampleStartIndex3; }
@@ -359,60 +344,106 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[self calculateEnergyGateLength];
 }
 
-- (int) energyGapTime { return energyGapTime; }
-- (void) setEnergyGapTime:(int)aEnergyGapTime
+- (int) energyTauFactor:(short)aChannel 
+{ 
+	if(aChannel>=8)return 0; 
+	return [[energyTauFactors objectAtIndex:aChannel] intValue];
+}
+- (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGapTime:energyGapTime];
-    energyGapTime = [self limitIntValue:aEnergyGapTime min:0 max:0xff];
+	if(aChannel>=8)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyTauFactor:aChannel withValue:[self energyTauFactor:aChannel]];
+    int energyTauFactor = [self limitIntValue:aValue min:0 max:0x3f];
+	[energyTauFactors replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:energyTauFactor]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyTauFactorChanged object:self];
+}
+- (int) energyGapTime:(short)aGroup 
+{ 
+	if(aGroup>=4)return 0; 
+	return [[energyGapTimes objectAtIndex:aGroup] intValue]; 
+}
+- (void) setEnergyGapTime:(short)aGroup withValue:(int)aValue
+{
+	if(aGroup>=4)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGapTime:aGroup withValue:[self energyGapTime:aGroup]];
+    aValue = [self limitIntValue:aValue min:0 max:0xff];
+	[energyGapTimes replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aValue]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyGapTimeChanged object:self];
 	[self calculateEnergyGateLength];
 }
 
-- (int) energyPeakingTime { return energyPeakingTime; }
-- (void) setEnergyPeakingTime:(int)aEnergyPeakingTime
+- (int) energyPeakingTime:(short)aGroup 
+{ 
+	if(aGroup>=4)return 0; 
+	return [[energyPeakingTimes objectAtIndex:aGroup] intValue]; 
+}
+- (void) setEnergyPeakingTime:(short)aGroup withValue:(int)aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyPeakingTime:energyPeakingTime];
-    energyPeakingTime = [self limitIntValue:aEnergyPeakingTime min:0 max:0x3ff];
+	if(aGroup>=4)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyPeakingTime:aGroup withValue:[self energyPeakingTime:aGroup]];
+    int energyPeakingTime = [self limitIntValue:aValue min:0 max:0x3ff];
+	[energyPeakingTimes replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:energyPeakingTime]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyPeakingTimeChanged object:self];
 	[self calculateEnergyGateLength];
 }
 
-- (int) triggerGateLength { return triggerGateLength; }
-- (void) setTriggerGateLength:(int)aTriggerGateLength
+- (int) energyGateLength:(short)aGroup 
+{ 
+	if(aGroup>=4)return 0; 
+	return [[energyGateLengths objectAtIndex:aGroup] intValue]; 
+}
+- (void) setEnergyGateLength:(short)aGroup withValue:(int)aEnergyGateLength
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:triggerGateLength];
-	if (aTriggerGateLength < sampleLength) aTriggerGateLength = sampleLength;
-    triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:65535];
+	if(aGroup>=4)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGateLength:aGroup withValue:[self energyGateLength:aGroup]];
+	[energyGateLengths replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aEnergyGateLength]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyGateLengthChanged object:self];
+}
+
+- (int) triggerGateLength:(short)aGroup 
+{
+	if(aGroup>=4)return 0; 
+	return [[triggerGateLengths objectAtIndex:aGroup] intValue]; 
+}
+- (void) setTriggerGateLength:(short)aGroup withValue:(int)aTriggerGateLength
+{
+	if(aGroup>=4)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:aGroup withValue:[self triggerGateLength:aGroup]];
+	if (aTriggerGateLength < [self sampleLength:aGroup]) aTriggerGateLength = [self sampleLength:aGroup];
+    int triggerGateLength = [self limitIntValue:aTriggerGateLength min:0 max:65535];
+	[triggerGateLengths replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:triggerGateLength]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelTriggerGateLengthChanged object:self];
 }
 
-- (int) preTriggerDelay { return preTriggerDelay; }
-- (void) setPreTriggerDelay:(int)aPreTriggerDelay
+- (int) preTriggerDelay:(short)aGroup 
+{ 
+	if(aGroup>=4)return 0; 
+	return [[preTriggerDelays objectAtIndex:aGroup]intValue]; 
+}
+- (void) setPreTriggerDelay:(short)aGroup withValue:(int)aPreTriggerDelay
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:preTriggerDelay];
-    preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:1023];
+	if(aGroup>=4)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
+    int preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:1023];
+	[preTriggerDelays replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:preTriggerDelay]];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelPreTriggerDelayChanged object:self];
 	[self calculateEnergyGateLength];
 }
 
-- (unsigned short) sampleStartIndex{ return sampleStartIndex; }
-- (void) setSampleStartIndex:(unsigned short)aSampleStartIndex
+- (int) sampleStartIndex:(int)aGroup 
+{ 
+	if(aGroup>=4)return 0; 
+	return [[sampleStartIndexes objectAtIndex:aGroup] intValue];
+}
+- (void) setSampleStartIndex:(int)aGroup withValue:(unsigned short)aSampleStartIndex
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setSampleStartIndex:sampleStartIndex];
-    sampleStartIndex = aSampleStartIndex & 0xfffe;
+	if(aGroup>=4)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setSampleStartIndex:aGroup withValue:[self sampleStartIndex:aGroup]];
+    int sampleStartIndex = aSampleStartIndex & 0xfffe;
+	[sampleStartIndexes replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:sampleStartIndex]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleStartIndexChanged object:self];
 }
-
-- (unsigned short) sampleLength { return sampleLength; }
-- (void) setSampleLength:(unsigned short)aSampleLength
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:sampleLength];
-    sampleLength = aSampleLength & 0xfffc;
-	[self calculateSampleValues];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleLengthChanged object:self];
-}
-
 
 - (short) lemoInMode { return lemoInMode; }
 - (void) setLemoInMode:(short)aLemoInMode
@@ -484,15 +515,17 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		[self setInternalTriggerDelay:i withValue:0];
 		[self setDacOffset:i withValue:30000];
 	}
-	[self setTriggerDecimation:0];
-	[self setEnergyDecimation:0];
+	for(i=0;i<4;i++){
+		[self setSampleLength:i withValue:2048];
+		[self setPreTriggerDelay:i withValue:0];
+		[self setTriggerGateLength:i withValue:50000];
+		[self setTriggerDecimation:i withValue:0];
+		[self setEnergyDecimation:i withValue:0];
+		[self setSampleStartIndex:i withValue:0];
+		[self setEnergyPeakingTime:i withValue:100];
+		[self setEnergyGapTime:i withValue:25];
+	}
 	
-	[self setSampleLength:2048];
-	[self setSampleStartIndex:0];
-	[self setEnergyPeakingTime:100];
-	[self setEnergyGapTime:25];
-	[self setPreTriggerDelay:0];
-	[self setTriggerGateLength:50000];
 	[self setShipEnergyWaveform:NO];
 	[self setGtMask:0xff];
 	[self setTriggerOutEnabledMask:0x0];
@@ -518,12 +551,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ClockSourceChanged object:self];
 }
 
-
-//Event configuration
 - (ORRateGroup*) waveFormRateGroup
 {
     return waveFormRateGroup;
 }
+
 - (void) setWaveFormRateGroup:(ORRateGroup*)newRateGroup
 {
     [newRateGroup retain];
@@ -740,6 +772,15 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ThresholdChanged object:self];
 }
 
+- (unsigned short) sampleLength:(short)aChan { return [[sampleLengths objectAtIndex:aChan]unsignedShortValue]; }
+- (void) setSampleLength:(short)aChan withValue:(int)aValue 
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:aChan withValue:[self sampleLength:aChan]];
+    [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue & 0xfffc]];
+	[self calculateSampleValues];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleLengthChanged object:self];
+}
+
 - (unsigned short) dacOffset:(short)aChan { return [[dacOffsets objectAtIndex:aChan]intValue]; }
 - (void) setDacOffset:(short)aChan withValue:(int)aValue 
 {
@@ -799,20 +840,32 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalTriggerDelayChanged object:self];
 }
 
-- (short) energyDecimation { return energyDecimation; }
-- (void) setEnergyDecimation:(short)aValue 
+- (short) energyDecimation:(short)aGroup 
 { 
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyDecimation:energyDecimation];
-    energyDecimation = [self limitIntValue:aValue min:0 max:0x3];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EnergyDecimationChanged object:self];
+	if(aGroup>=4)return 0; 
+	return [[energyDecimations objectAtIndex:aGroup] intValue]; 
+}
+- (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue 
+{ 
+ 	if(aGroup>=4)return; 
+	[[[self undoManager] prepareWithInvocationTarget:self] setEnergyDecimation:aGroup withValue:[self energyDecimation:aGroup]];
+    int energyDecimation = [self limitIntValue:aValue min:0 max:0x3];
+	[energyDecimations replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:energyDecimation]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302EnergyDecimationChanged object:self];
 	[self calculateEnergyGateLength];
 }
 
-- (short) triggerDecimation { return triggerDecimation; }
-- (void) setTriggerDecimation:(short)aValue 
+- (int) triggerDecimation:(short)aGroup 
 { 
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerDecimation:triggerDecimation];
-    triggerDecimation = [self limitIntValue:aValue min:0 max:0x3];
+	if(aGroup>=4)return 0; 
+	return [[triggerDecimations objectAtIndex:aGroup] intValue]; 
+}
+- (void) setTriggerDecimation:(short)aGroup withValue:(short)aValue 
+{ 
+	if(aGroup>=4)return; 
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerDecimation:aGroup withValue:[self triggerDecimation:aGroup]];
+    int triggerDecimation = [self limitIntValue:aValue min:0 max:0x3];
+	[triggerDecimations replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:triggerDecimation]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302TriggerDecimationChanged object:self];
 }
 
@@ -820,67 +873,73 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
 	unsigned long aValue = 0;
 	if(runMode == kMcaRunMode)   return;
-	else	numEnergyValues = energySampleLength;   
+	else {
+		numEnergyValues = energySampleLength;   
 
+		if(numEnergyValues > kSIS3302MaxEnergyWaveform){
+			// This should never be happen in the current implementation since we 
+			// handle this value internally, but checking nonetheless in case 
+			// in the future we modify this.  
+			NSLogColor([NSColor redColor],@"Number of energy values is to high (max = %d) ; actual = %d \n",
+					   kSIS3302MaxEnergyWaveform, numEnergyValues);
+			NSLogColor([NSColor redColor],@"Value forced to %d\n", kSIS3302MaxEnergyWaveform);
+			numEnergyValues = kSIS3302MaxEnergyWaveform;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
+		}
 
-	if(numEnergyValues > kSIS3302MaxEnergyWaveform){
-		// This should never be happen in the current implementation since we 
-		// handle this value internally, but checking nonetheless in case 
-		// in the future we modify this.  
-		NSLogColor([NSColor redColor],@"Number of energy values is to high (max = %d) ; actual = %d \n",
-				   kSIS3302MaxEnergyWaveform, numEnergyValues);
-		NSLogColor([NSColor redColor],@"Value forced to %d\n", kSIS3302MaxEnergyWaveform);
-		numEnergyValues = kSIS3302MaxEnergyWaveform;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
-	}
+		int group;
+		for(group=0;group<4;group++){
+			numRawDataLongWords = ([self sampleLength:group]>>1);
+			rawDataIndex  = 2 ;
+			
+			energyIndex    = 2 + numRawDataLongWords ;
+			energyMaxIndex = 2 + numEnergyValues + numRawDataLongWords ;
+			
+			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
+			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords/2  ;  
+			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 
-	numRawDataLongWords = ([self sampleLength]>>1);
-	rawDataIndex  = 2 ;
-	
-	energyIndex    = 2 + numRawDataLongWords ;
-	energyMaxIndex = 2 + numEnergyValues + numRawDataLongWords ;
-	
-	eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
-	eventLengthLongWords = eventLengthLongWords + numRawDataLongWords/2  ;  
-	eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
-
-    [self setEndAddressThreshold:eventLengthLongWords];
-	// Check the sample indices
-	// Don't call setEnergy* from in here!  Cause stack overflow...
-	if (numEnergyValues == 0) {
-		// Set all indices to 0
-		energySampleStartIndex1 = 1;
-		energySampleStartIndex2 = 0;
-		energySampleStartIndex3 = 0;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
-	} else if (energySampleStartIndex2 != 0 || energySampleStartIndex3 != 0) {
-		// Means we are requesting different pieces of the waveform.
-		// Make sure they are correct.
-		if (energySampleStartIndex2 < energySampleStartIndex1 + energySampleLength/3 + 1) {
-			aValue = energySampleLength/3 + energySampleStartIndex1 + 1;
-			energySampleStartIndex2 = aValue;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
-			if (energySampleStartIndex3 == 0) {
-				// This forces us to also reset the third index if it is set to 0.
+			[self setEndAddressThreshold:eventLengthLongWords];
+			// Check the sample indices
+			// Don't call setEnergy* from in here!  Cause stack overflow...
+			if (numEnergyValues == 0) {
+				// Set all indices to 0
+				energySampleStartIndex1 = 1;
+				energySampleStartIndex2 = 0;
 				energySampleStartIndex3 = 0;
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
+			} 
+			else if (energySampleStartIndex2 != 0 || energySampleStartIndex3 != 0) {
+				// Means we are requesting different pieces of the waveform.
+				// Make sure they are correct.
+				if (energySampleStartIndex2 < energySampleStartIndex1 + energySampleLength/3 + 1) {
+					aValue = energySampleLength/3 + energySampleStartIndex1 + 1;
+					energySampleStartIndex2 = aValue;
+					[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
+					if (energySampleStartIndex3 == 0) {
+						// This forces us to also reset the third index if it is set to 0.
+						energySampleStartIndex3 = 0;
+					}
+				}
+				
+				if (energySampleStartIndex2 == 0 && energySampleStartIndex3 != 0) {
+					energySampleStartIndex3 = 0;
+				} 
+				else if (energySampleStartIndex2 != 0 && 
+						   energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
+					aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
+					energySampleStartIndex3 = aValue;
+					[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
+				}
+			}
+			
+			// Finally check the trigger gate length to make sure it is big enough
+			if ([self triggerGateLength:group] < [self sampleLength:group]) {
+				[self setTriggerGateLength:group withValue:[self sampleLength:group]];
 			}
 		}
-		
-		if (energySampleStartIndex2 == 0 && energySampleStartIndex3 != 0) {
-			energySampleStartIndex3 = 0;
-		} else if (energySampleStartIndex2 != 0 && 
-				   energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
-			aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
-			energySampleStartIndex3 = aValue;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
-		}
-	}
-	
-	// Finally check the trigger gate length to make sure it is big enough
-	if (triggerGateLength < sampleLength) {
-		[self setTriggerGateLength:sampleLength];
 	}
 }
 
@@ -891,30 +950,35 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	// 100 MHz clock ticks, but everything else is in 
 	// Decimation clock ticks.  Convert this down to the correct
 	// decimation.
-	unsigned int delayInDecimationClockTicks = preTriggerDelay >> energyDecimation;
-	unsigned int temp = 0;
-	unsigned int temptwo = 0;
-	if (energySampleLength == 0) {
-		// Means that we are not shipping an energy waveform.
-		// Make sure the gate length is long enough
-		[self setEnergyGateLength:(delayInDecimationClockTicks +
-								   2*energyPeakingTime +
-								   energyGapTime + 20)]; // Add the 20 ticks for safety
-	} else {
-		// We are shipping an energy waveform, we require the waveform to be at least:
-		temp = delayInDecimationClockTicks + 
-			   energySampleStartIndex3 + 
-			   energySampleLength/3 + 20;
-		temptwo = delayInDecimationClockTicks +
-			      2*energyPeakingTime +
-				  energyGapTime + 20;
-		// Take the larger of the two.
-		if (temp > temptwo ) {
-			[self setEnergyGateLength:temp];
-		} else {
-			[self setEnergyGateLength:temptwo];			
+	int group;
+	for(group=0;group<4;group++){
+		int preTriggerDelay = [self preTriggerDelay:group];
+		unsigned int delayInDecimationClockTicks = preTriggerDelay >> [self energyDecimation:group];
+		unsigned int temp = 0;
+		unsigned int temptwo = 0;
+		if (energySampleLength == 0) {
+			// Means that we are not shipping an energy waveform.
+			// Make sure the gate length is long enough
+			[self setEnergyGateLength:group withValue:(delayInDecimationClockTicks +
+													   2*[self energyPeakingTime:group] +
+													   [self energyGapTime:group] + 20)]; // Add the 20 ticks for safety
+		} 
+		else {
+			// We are shipping an energy waveform, we require the waveform to be at least:
+			temp = delayInDecimationClockTicks + 
+				   energySampleStartIndex3 + 
+				   energySampleLength/3 + 20;
+			temptwo = delayInDecimationClockTicks +
+					  2*[self energyPeakingTime:group] +
+						[self energyGapTime:group] + 20;
+			// Take the larger of the two.
+			if (temp > temptwo ) {
+				[self setEnergyGateLength:group withValue:temp];
+			} 
+			else {
+				[self setEnergyGateLength:group withValue:temptwo];			
+			}
 		}
-		
 	}
 }
 
@@ -1067,30 +1131,35 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (void) writePreTriggerDelayAndTriggerGateDelay
 {
-	unsigned long aValue = (([self preTriggerDelay]&0x01ff)<<16) | [self triggerGateLength];
-	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302PretriggerDelayTriggerGateLengthAllAdc
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
+	int i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		unsigned long aValue = (([self preTriggerDelay:i]&0x01ff)<<16) | [self triggerGateLength:i];
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:[self baseAddress] + [self getPreTriggerDelayTriggerGateLengthOffset:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+	}	
 }
 
 - (void) writeEnergyGP
 {
-	unsigned long peakingTimeHi = ([self energyPeakingTime] >> 8) & 0x3;
-	unsigned long peakingTimeLo = [self energyPeakingTime] & 0xff; 
-	
-	unsigned long aValueMask = (([self energyDecimation]  & 0x3)<<28) | 
-								(peakingTimeHi <<16)				   | 
-								(([self energyGapTime]     & 0xff)<<8) | 
-								peakingTimeLo;
-	
-	[[self adapter] writeLongBlock:&aValueMask
-						 atAddress:[self baseAddress] + kSIS3302EnergySetupGPAllAdc
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+	int i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		unsigned long peakingTimeHi = ([self energyPeakingTime:i] >> 8) & 0x3;
+		unsigned long peakingTimeLo = [self energyPeakingTime:i] & 0xff; 
+		
+		unsigned long aValueMask = (([self energyDecimation:i]  & 0x3)<<28) | 
+									(peakingTimeHi <<16)				   | 
+									(([self energyGapTime:i]     & 0xff)<<8) | 
+									peakingTimeLo;
+		
+		[[self adapter] writeLongBlock:&aValueMask
+							 atAddress:[self baseAddress] + [self getEnergySetupGPOffset:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
 	
 	[self resetSamplingLogic];
 }
@@ -1107,28 +1176,29 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (void) writeEnergyGateLength
 {
-	unsigned long aValue = energyGateLength;
-	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302EnergyGateLengthAllAdc
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+	int group;
+	for(group=0;group<4;group++){
+		unsigned long aValue = [self energyGateLength:group];
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:[self baseAddress] + [self getEnergyGateLengthOffsets:group]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
 }
 
 - (void) writeEnergyTauFactor
 {
-	unsigned long 	aValue = energyTauFactor;
-	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc1357
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+	int i;
+	for(i=0;i<8;i++){
+		unsigned long 	aValue = [self energyTauFactor:i];
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:[self baseAddress] + [self getEnergyTauFactorOffset:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
 	
-	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302EnergyTauFactorAdc2468
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+	}
 }
 
 - (void) writeEnergySampleLength
@@ -1173,9 +1243,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 - (void) writeTriggerSetups
 {
 	int i;
+	int group;
 	for(i = 0; i < 8; i++) {
+		group = i/2;
 		unsigned long aExtValueMask = (([self internalTriggerDelay:i] & 0x00ffL) << 24) | 
-									  (([self triggerDecimation]      & 0x0003L) << 16) | 
+									  (([self triggerDecimation:group]      & 0x0003L) << 16) | 
 									  (([self sumG:i]                 & 0x0F00L)) | 
 									  (([self peakingTime:i]          & 0x0F00L) >> 8);
 		
@@ -1200,13 +1272,18 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (void) writeRawDataBufferConfiguration
 {	
-	unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
+	int group;
+	for(group=0;group<4;group++){
+		unsigned long sampleLength	   = [self sampleLength:group];
+		unsigned long sampleStartIndex = [self sampleStartIndex:group];
+		unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
 	
-	[[self adapter] writeLongBlock:&aValueMask
-						 atAddress:[self baseAddress] + kSIS3302RawDataBufferConfigAllAdc
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+		[[self adapter] writeLongBlock:&aValueMask
+							 atAddress:[self baseAddress] + [self getRawDataBufferConfigOffsets:group]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
 }
 
 - (void) readThresholds:(BOOL)verbose
@@ -1661,6 +1738,32 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     return (unsigned long)-1;
 }
 
+- (unsigned long) getEnergyTauFactorOffset:(int) channel 
+{
+    switch (channel) {
+        case 0: return kSIS3302EnergyTauFactorAdc1;
+        case 1: return kSIS3302EnergyTauFactorAdc2;
+        case 2: return kSIS3302EnergyTauFactorAdc3;
+        case 3: return kSIS3302EnergyTauFactorAdc4;
+        case 4: return kSIS3302EnergyTauFactorAdc5;
+        case 5: return kSIS3302EnergyTauFactorAdc6;
+        case 6: return kSIS3302EnergyTauFactorAdc7;
+        case 7: return kSIS3302EnergyTauFactorAdc8;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getPreTriggerDelayTriggerGateLengthOffset:(int) aGroup 
+{
+    switch (aGroup) {
+        case 0: return kSIS3302PreTriggerDelayTriggerGateLengthAdc12;
+        case 1: return kSIS3302PreTriggerDelayTriggerGateLengthAdc34;
+        case 2: return kSIS3302PreTriggerDelayTriggerGateLengthAdc56;
+        case 3: return kSIS3302PreTriggerDelayTriggerGateLengthAdc78;
+    }
+    return (unsigned long)-1;
+}
+
 - (unsigned long) getADCBufferRegisterOffset:(int) channel 
 {
     switch (channel) {
@@ -1733,7 +1836,18 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	}
 	return (unsigned long) -1;	 
 }
- 
+
+- (unsigned long) getRawDataBufferConfigOffsets:(int) channel 
+{
+    switch (channel) {
+        case 0: return kSIS3302RawDataBufferConfigAdc12;
+        case 1: return kSIS3302RawDataBufferConfigAdc34;
+        case 2: return kSIS3302RawDataBufferConfigAdc56;
+        case 3: return kSIS3302RawDataBufferConfigAdc78;
+    }
+    return (unsigned long)-1;
+}
+
 - (unsigned long) getSampleAddress:(int)channel
 {
     switch (channel) {
@@ -1757,6 +1871,17 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		 case 2: return kSIS3302EventConfigAdc56;
 		 case 3: return kSIS3302EventConfigAdc78;
 	 }
+	return (unsigned long) -1;	 
+}
+	
+- (unsigned long) getEnergyGateLengthOffsets:(int)group
+{
+	switch (group) {
+		case 0: return kSIS3302EnergyGateLengthAdc12;
+		case 1: return kSIS3302EnergyGateLengthAdc34;
+		case 2: return kSIS3302EnergyGateLengthAdc56;
+		case 3: return kSIS3302EnergyGateLengthAdc78;
+	}
 	return (unsigned long) -1;	 
 }
 
@@ -1784,6 +1909,17 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		case 7: return 	kSIS3302Adc8Offset;
  	}
    return (unsigned long) -1;	 
+}
+
+- (unsigned long) getEnergySetupGPOffset:(int)group
+{
+	switch (group) {
+		case 0: return kSIS3302EnergySetupGPAdc12;
+		case 1: return kSIS3302EnergySetupGPAdc34;
+		case 2: return kSIS3302EnergySetupGPAdc56;
+		case 3: return kSIS3302EnergySetupGPAdc78;
+	}
+	return (unsigned long) -1;	 
 }
 
 - (BOOL) isEvent
@@ -1847,8 +1983,14 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		return @"MCA Spectrum";
 	}
 	else {
-		summary = @"Energy\n";
-		if(sampleLength>0)	   summary = [summary stringByAppendingFormat:@"Adc Trace    : %d values\n",sampleLength];
+		BOOL tracesShipped = ([self sampleLength:0] || [self sampleLength:1] || [self sampleLength:2] || [self sampleLength:3]);
+		summary = @"Energy";
+		if(tracesShipped) summary = [summary stringByAppendingString:@" + Traces"];
+		if(shipEnergyWaveform) summary = [summary stringByAppendingString:@" + Energy Filter"];
+		summary = [summary stringByAppendingString:@"\n"];
+		if(tracesShipped){
+			summary = [summary stringByAppendingFormat:@"Traces 0:%d  1:%d  2:%d  3:%d\n", [self sampleLength:0],[self sampleLength:1],[self sampleLength:2],[self sampleLength:3]];
+		}
 		if(shipEnergyWaveform) summary = [summary stringByAppendingFormat:@"Energy Filter: 510 values\n"];
 		return summary;
 	}
@@ -1872,12 +2014,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     mcaId = anId;
 }
 
-- (unsigned long) timeId { return timeId; }
-- (void) setTimeId: (unsigned long) anId
-{
-    timeId = anId;
-}
-
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -1887,14 +2023,12 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
     dataId   = [assigner assignDataIds:kLongForm];
     mcaId    = [assigner assignDataIds:kLongForm]; 
-    timeId   = [assigner assignDataIds:kLongForm]; 
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
     [self setMcaId:[anotherCard mcaId]];
-    [self setTimeId:[anotherCard timeId]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -1916,15 +2050,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 						   [NSNumber numberWithLong:-1],	@"length",
 						   nil];
     [dataDictionary setObject:aDictionary forKey:@"MCA"];
-	
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORSIS3302DecoderForTime",			@"decoder",
-				   [NSNumber numberWithLong:timeId], @"dataId",
-				   [NSNumber numberWithBool:NO],   @"variable",
-				   [NSNumber numberWithLong:5],	@"length",
-				   nil];
-    [dataDictionary setObject:aDictionary forKey:@"Time"];
-	
 	
     return dataDictionary;
 }
@@ -2062,37 +2187,37 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Sample Length"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setSampleLength:) getMethod:@selector(sampleLength)];
+    [p setSetMethod:@selector(setSampleLength:withValue:) getMethod:@selector(sampleLength:)];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Pretrigger Delay"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPreTriggerDelay:) getMethod:@selector(preTriggerDelay)];
+    [p setSetMethod:@selector(setPreTriggerDelay:withValue:) getMethod:@selector(preTriggerDelay:)];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trigger Gate Length"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setTriggerGateLength:) getMethod:@selector(triggerGateLength)];
+    [p setSetMethod:@selector(setTriggerGateLength:withValue:) getMethod:@selector(triggerGateLength:)];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Gate Length"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyGateLength:) getMethod:@selector(energyGateLength)];
+    [p setSetMethod:@selector(setEnergyGateLength:withValue:) getMethod:@selector(energyGateLength:)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Gap Time"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyGapTime:) getMethod:@selector(energyGapTime)];
+    [p setSetMethod:@selector(setEnergyGapTime:withValue:) getMethod:@selector(energyGapTime:)];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Peaking Time"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyPeakingTime:) getMethod:@selector(energyPeakingTime)];
+    [p setSetMethod:@selector(setEnergyPeakingTime:withValue:) getMethod:@selector(energyPeakingTime:)];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -2104,7 +2229,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Tau Factor"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyTauFactor:) getMethod:@selector(energyTauFactor)];
+    [p setSetMethod:@selector(setEnergyTauFactor:withValue:) getMethod:@selector(energyTauFactor:)];
     [a addObject:p];
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -2179,14 +2304,19 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     
 	[self reset];
     [self initBoard];
-	firstTime = YES;
-	currentBank = 0;
 	[self setLed:YES];
-	isRunning = NO;
+	
+	firstTime	= YES;
+	currentBank = 0;
+	isRunning	= NO;
 	count=0;
 	
     [self startRates];
-	dataRecord = nil;
+	
+	int group;
+	for(group=0;group<4;group++){
+		dataRecord[group] = nil;
+	}
 	
 	if(runMode == kMcaRunMode){
 		mcaScanBank2Flag = NO;
@@ -2207,8 +2337,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		}
 		else {
 			if(firstTime){
-				dataRecordlength = 4+2+sampleLength/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
-				dataRecord = malloc(dataRecordlength*sizeof(long));
+				int group;
+				for(group=0;group<4;group++){
+					dataRecordlength[group] = 4+2+[self sampleLength:group]/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
+					dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(long));
+				}
 				isRunning = YES;
 				firstTime = NO;
 				[self disarmAndArmBank:0];
@@ -2236,47 +2369,35 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 					
 						if (endSampleAddress != 0) {
 							unsigned long addrOffset = 0;
+							int group = channel/2;
 							do {
 								BOOL goodRecord = NO;
 								long cachedEnergy;
 								long cachedTime0;
 								long cachedTime1;
 								int index = 0;
-								dataRecord[index++] =   dataId | dataRecordlength;
-								dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
+								dataRecord[group][index++] =   dataId | dataRecordlength[group];
+								dataRecord[group][index++] =   (([self crateNumber]&0x0000000f)<<21) | 
 														(([self slot] & 0x0000001f)<<16)      |
 														((channel & 0x000000ff)<<8);
-								dataRecord[index++] = sampleLength/2;
-								dataRecord[index++] = energySampleLength;
-								unsigned long* p = &dataRecord[index];
+								dataRecord[group][index++] = [self sampleLength:group]/2;
+								dataRecord[group][index++] = energySampleLength;
+								unsigned long* p = &dataRecord[group][index];
 								[[self adapter] readLongBlock: p
 													atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + addrOffset
-													numToRead: dataRecordlength-4
+													numToRead: dataRecordlength[group]-4
 												   withAddMod: [self addressModifier]
 												usingAddSpace: 0x01];
 		
-								if(dataRecord[dataRecordlength-1] == 0xdeadbeef){
-									cachedTime0  = dataRecord[0];
-									cachedTime1  = dataRecord[1];
-									cachedEnergy = dataRecord[dataRecordlength-4];
-									[aDataPacket addLongsToFrameBuffer:dataRecord length:dataRecordlength];
+								if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
+									cachedTime0  = dataRecord[group][0];
+									cachedTime1  = dataRecord[group][1];
+									cachedEnergy = dataRecord[group][dataRecordlength[group]-4];
+									[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
 									goodRecord = YES;
 								}
-								
-								if(goodRecord && shipTimeRecordAlso){
-									int index = 0;
-									dataRecord[index++] =   timeId | 5;
-									dataRecord[index++] =   (([self crateNumber]&0x0000000f)<<21) | 
-															(([self slot] & 0x0000001f)<<16)      |
-															((channel & 0x000000ff)<<8);	
-									
-									dataRecord[index++] = cachedTime0;
-									dataRecord[index++] = cachedTime1;
-									dataRecord[index++] = cachedEnergy;
-									[aDataPacket addLongsToFrameBuffer:dataRecord length:dataRecordlength];
-								}
-								
-								addrOffset += (dataRecordlength-4)*4;
+																
+								addrOffset += (dataRecordlength[group]-4)*4;
 							}while (addrOffset < endSampleAddress);
 						}
 					}
@@ -2347,9 +2468,12 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMcaStatus) object:nil];
 
-	if(dataRecord){
-		free(dataRecord);
-		dataRecord = nil;
+	int group;
+	for(group=0;group<4;group++){
+		if(dataRecord){
+			free(dataRecord[group]);
+			dataRecord[group] = nil;
+		}
 	}
 	[self disarmSampleLogic];
     isRunning = NO;
@@ -2367,15 +2491,16 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	else {
 		configStruct->total_cards++;
 		configStruct->card_info[index].hw_type_id				= kSIS3302; //should be unique
-		configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
-		configStruct->card_info[index].hw_mask[1]				= timeId; //better be unique
+		configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
 		configStruct->card_info[index].slot						= [self slot];
 		configStruct->card_info[index].crate					= [self crateNumber];
 		configStruct->card_info[index].add_mod					= [self addressModifier];
 		configStruct->card_info[index].base_add					= [self baseAddress];
-		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength]/2;
-		configStruct->card_info[index].deviceSpecificData[1]	= [self energySampleLength];
-		configStruct->card_info[index].deviceSpecificData[2]	= [self shipTimeRecordAlso];
+		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength:0]/2;
+		configStruct->card_info[index].deviceSpecificData[1]	= [self sampleLength:1]/2;
+		configStruct->card_info[index].deviceSpecificData[2]	= [self sampleLength:2]/2;
+		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
+		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
 		
 		configStruct->card_info[index].num_Trigger_Indexes		= 0;
 		
@@ -2456,16 +2581,9 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
     [self setLemoInEnabledMask:			[decoder decodeIntForKey:@"lemoInEnabledMask"]];
     [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
-    [self setEnergyTauFactor:			[decoder decodeIntForKey:@"energyTauFactor"]];
     [self setEnergySampleStartIndex2:	[decoder decodeIntForKey:@"energySampleStartIndex2"]];
     [self setEnergySampleStartIndex1:	[decoder decodeIntForKey:@"energySampleStartIndex1"]];
     [self setEnergySampleLength:		[decoder decodeIntForKey:@"energySampleLength"]];
-	[self setEnergyGapTime:				[decoder decodeIntForKey:@"energyGapTime"]];
-    [self setEnergyPeakingTime:			[decoder decodeIntForKey:@"energyPeakingTime"]];
-    [self setTriggerGateLength:			[decoder decodeIntForKey:@"triggerGateLength"]];
-    [self setPreTriggerDelay:			[decoder decodeIntForKey:@"preTriggerDelay"]];
-    [self setSampleStartIndex:			[decoder decodeIntForKey:@"sampleStartIndex"]];
-    [self setSampleLength:				[decoder decodeIntForKey:@"sampleLength"]];
     [self setLemoInMode:				[decoder decodeIntForKey:@"lemoInMode"]];
     [self setLemoOutMode:				[decoder decodeIntForKey:@"lemoOutMode"]];
 	
@@ -2479,17 +2597,24 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [self setAdc50KTriggerEnabledMask:	[decoder decodeInt32ForKey:@"adc50KtriggerEnabledMask"]];
 	[self setGtMask:					[decoder decodeIntForKey:@"gtMask"]];
 	[self setShipEnergyWaveform:		[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
-	[self setTriggerDecimation:			[decoder decodeIntForKey:   @"triggerDecimation"]];
-	[self setEnergyDecimation:			[decoder decodeIntForKey:   @"energyDecimation"]];
     [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 		
-	thresholds  =					[[decoder decodeObjectForKey:@"thresholds"] retain];
-    dacOffsets  =					[[decoder decodeObjectForKey:@"dacOffsets"] retain];
-	gateLengths =					[[decoder decodeObjectForKey:@"gateLengths"] retain];
-	pulseLengths =					[[decoder decodeObjectForKey:@"pulseLengths"] retain];
-	sumGs =							[[decoder decodeObjectForKey:@"sumGs"] retain];
-	peakingTimes =					[[decoder decodeObjectForKey:@"peakingTimes"] retain];
-	internalTriggerDelays =			[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
+    sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
+	thresholds  =				[[decoder decodeObjectForKey:@"thresholds"] retain];
+    dacOffsets  =				[[decoder decodeObjectForKey:@"dacOffsets"] retain];
+	gateLengths =				[[decoder decodeObjectForKey:@"gateLengths"] retain];
+	pulseLengths =				[[decoder decodeObjectForKey:@"pulseLengths"] retain];
+	sumGs =						[[decoder decodeObjectForKey:@"sumGs"] retain];
+	peakingTimes =				[[decoder decodeObjectForKey:@"peakingTimes"] retain];
+	internalTriggerDelays =		[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
+	triggerDecimations = 		[[decoder decodeObjectForKey:@"triggerDecimations"] retain];
+    triggerGateLengths =		[[decoder decodeObjectForKey:@"triggerGateLengths"] retain];
+    preTriggerDelays =			[[decoder decodeObjectForKey:@"preTriggerDelays"] retain];
+    sampleStartIndexes =		[[decoder decodeObjectForKey:@"sampleStartIndexes"] retain];
+    energyTauFactors =			[[decoder decodeObjectForKey:@"energyTauFactors"] retain];
+	energyDecimations=			[[decoder decodeObjectForKey:@"energyDecimations"]retain];
+	energyGapTimes = 			[[decoder decodeObjectForKey:@"energyGapTimes"]retain];
+    energyPeakingTimes =		[[decoder decodeObjectForKey:@"energyPeakingTimes"]retain];
 
 	if(!waveFormRateGroup){
 		[self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
@@ -2529,20 +2654,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
 	[encoder encodeInt:lemoInEnabledMask		forKey:@"lemoInEnabledMask"];
 	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
-	[encoder encodeInt:energyTauFactor			forKey:@"energyTauFactor"];
 	[encoder encodeInt:energySampleStartIndex2	forKey:@"energySampleStartIndex2"];
 	[encoder encodeInt:energySampleStartIndex1	forKey:@"energySampleStartIndex1"];
 	[encoder encodeInt:energySampleLength		forKey:@"energySampleLength"];
-	[encoder encodeInt:energyGapTime			forKey:@"energyGapTime"];
-	[encoder encodeInt:energyPeakingTime		forKey:@"energyPeakingTime"];
-	[encoder encodeInt:triggerGateLength		forKey:@"triggerGateLength"];
-	[encoder encodeInt:preTriggerDelay			forKey:@"preTriggerDelay"];
-	[encoder encodeInt:sampleStartIndex			forKey:@"sampleStartIndex"];
-	[encoder encodeInt:sampleLength				forKey:@"sampleLength"];
 	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
 	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
-	[encoder encodeInt:triggerDecimation		forKey:@"triggerDecimation"];
-	[encoder encodeInt:energyDecimation			forKey:@"energyDecimation"];
 	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
 
 	[encoder encodeBool:internalExternalTriggersOred	forKey:@"internalExternalTriggersOred"];
@@ -2554,7 +2670,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[encoder encodeInt32:externalGateEnabledMask		forKey:@"externalGateEnabledMask"];
 	[encoder encodeInt32:adc50KTriggerEnabledMask		forKey:@"adc50KtriggerEnabledMask"];
 	
+	[encoder encodeObject:energyDecimations		forKey:@"energyDecimations"];
+	[encoder encodeObject:energyGapTimes		forKey:@"energyGapTimes"];
+	[encoder encodeObject:energyPeakingTimes	forKey:@"energyPeakingTimes"];
     [encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
+	[encoder encodeObject:sampleLengths			forKey:@"sampleLengths"];
 	[encoder encodeObject:thresholds			forKey:@"thresholds"];
 	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
 	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
@@ -2562,6 +2682,11 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[encoder encodeObject:sumGs					forKey:@"sumGs"];
 	[encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
 	[encoder encodeObject:internalTriggerDelays	forKey:@"internalTriggerDelays"];
+	[encoder encodeObject:triggerGateLengths	forKey:@"triggerGateLengths"];
+	[encoder encodeObject:preTriggerDelays		forKey:@"preTriggerDelays"];
+	[encoder encodeObject:sampleStartIndexes	forKey:@"sampleStartIndexes"];
+	[encoder encodeObject:triggerDecimations	forKey:@"triggerDecimations"];
+	[encoder encodeObject:energyTauFactors		forKey:@"energyTauFactors"];
 	
 }
 
@@ -2579,36 +2704,36 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[objDictionary setObject: [NSNumber numberWithLong:internalGateEnabledMask]		forKey:@"internalGateEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:externalGateEnabledMask]		forKey:@"externalGateEnabledMask"];
     [objDictionary setObject: internalTriggerDelays									forKey:@"internalTriggerDelays"];	
-    [objDictionary setObject: [NSNumber numberWithInt:triggerDecimation]			forKey:@"triggerDecimation"];	
-    [objDictionary setObject: [NSNumber numberWithInt:energyDecimation]				forKey:@"energyDecimation"];	
+    [objDictionary setObject: energyDecimations										forKey:@"energyDecimations"];	
 	
 	[objDictionary setObject:[NSNumber numberWithInt:runMode]						forKey:@"runMode"];
 	[objDictionary setObject:[NSNumber numberWithInt:shipTimeRecordAlso]			forKey:@"shipTimeRecordAlso"];
 
 	[objDictionary setObject:[NSNumber numberWithInt:lemoInEnabledMask]				forKey:@"lemoInEnabledMask"];
-	[objDictionary setObject:[NSNumber numberWithInt:energyGateLength]				forKey:@"energyGateLength"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex3]		forKey:@"energySampleStartIndex3"];
-	[objDictionary setObject:[NSNumber numberWithInt:energyTauFactor]				forKey:@"energyTauFactor"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex2]		forKey:@"energySampleStartIndex2"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex1]		forKey:@"energySampleStartIndex1"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleLength]			forKey:@"energySampleLength"];
-	[objDictionary setObject:[NSNumber numberWithInt:energyGapTime]					forKey:@"energyGapTime"];
-	[objDictionary setObject:[NSNumber numberWithInt:energyPeakingTime]				forKey:@"energyPeakingTime"];
-	[objDictionary setObject:[NSNumber numberWithInt:triggerGateLength]				forKey:@"triggerGateLength"];
-	[objDictionary setObject:[NSNumber numberWithInt:preTriggerDelay]				forKey:@"preTriggerDelay"];
-	[objDictionary setObject:[NSNumber numberWithInt:sampleStartIndex]				forKey:@"sampleStartIndex"];
-	[objDictionary setObject:[NSNumber numberWithInt:sampleLength]					forKey:@"sampleLength"];
 	[objDictionary setObject:[NSNumber numberWithInt:lemoInMode]					forKey:@"lemoInMode"];
 	[objDictionary setObject:[NSNumber numberWithInt:lemoOutMode]					forKey:@"lemoOutMode"];
 	[objDictionary setObject:[NSNumber numberWithBool:shipEnergyWaveform]			forKey:@"shipEnergyWaveform"];
 	[objDictionary setObject:[NSNumber numberWithBool:internalExternalTriggersOred]	forKey:@"internalExternalTriggersOred"];
 	
+	[objDictionary setObject:energyTauFactors	forKey:@"energyTauFactors"];
+	[objDictionary setObject:energyGapTimes		forKey:@"energyGapTimes"];
+	[objDictionary setObject:energyPeakingTimes	forKey:@"energyPeakingTimes"];
+	[objDictionary setObject:sampleLengths		forKey:@"sampleLengths"];
 	[objDictionary setObject: dacOffsets		forKey:@"dacOffsets"];
     [objDictionary setObject: thresholds		forKey:@"thresholds"];	
     [objDictionary setObject: gateLengths		forKey:@"gateLengths"];	
     [objDictionary setObject: pulseLengths		forKey:@"pulseLengths"];	
     [objDictionary setObject: sumGs				forKey:@"sumGs"];	
     [objDictionary setObject: peakingTimes		forKey:@"peakingTimes"];	
+	[objDictionary setObject: triggerGateLengths	forKey:@"triggerGateLengths"];
+	[objDictionary setObject: preTriggerDelays		forKey:@"preTriggerDelays"];
+	[objDictionary setObject: sampleStartIndexes	forKey:@"sampleStartIndexes"];
+    [objDictionary setObject: triggerDecimations	forKey:@"triggerDecimations"];	
+	[objDictionary setObject: energyGateLengths		forKey:@"energyGateLengths"];
 	
     return objDictionary;
 }
@@ -2630,44 +2755,35 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 @end
 
 @implementation ORSIS3302Model (private)
-- (void) setUpArrays
+- (NSMutableArray*) arrayOfLength:(int)len
 {
 	int i;
-	if(!thresholds){
-		thresholds = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[thresholds addObject:[NSNumber numberWithInt:0]];
-	}
-	
-	if(!dacOffsets){
-		dacOffsets = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[dacOffsets addObject:[NSNumber numberWithInt:0]];
-	}
-	
-	if(!gateLengths){
-		gateLengths = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[gateLengths addObject:[NSNumber numberWithInt:0]];
-	}
-	
-	if(!pulseLengths){
-		pulseLengths = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[pulseLengths addObject:[NSNumber numberWithInt:0]];
-	}
-	
-	if(!sumGs){
-		sumGs = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[sumGs addObject:[NSNumber numberWithInt:0]];
-	}
-	
-	if(!peakingTimes){
-		peakingTimes = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[peakingTimes addObject:[NSNumber numberWithInt:0]];
-	}
-	
-	if(!internalTriggerDelays){
-		internalTriggerDelays = [[NSMutableArray arrayWithCapacity:kNumSIS3302Channels] retain];
-		for(i=0;i<kNumSIS3302Channels;i++)[internalTriggerDelays addObject:[NSNumber numberWithInt:0]];
-	}
-	
+	NSMutableArray* anArray = [NSMutableArray arrayWithCapacity:kNumSIS3302Channels];
+	for(i=0;i<len;i++)[anArray addObject:[NSNumber numberWithInt:0]];
+	return anArray;
+}
+
+- (void) setUpArrays
+{
+	if(!thresholds)				thresholds			  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!dacOffsets)				dacOffsets			  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!gateLengths)			gateLengths			  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!pulseLengths)			pulseLengths		  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!sumGs)					sumGs				  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!peakingTimes)			peakingTimes		  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!internalTriggerDelays)	internalTriggerDelays = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	if(!energyTauFactors)		energyTauFactors	  = [[self arrayOfLength:kNumSIS3302Channels] retain];
+		
+	if(!sampleLengths)		sampleLengths		= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!preTriggerDelays)	preTriggerDelays	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!triggerGateLengths)	triggerGateLengths	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!triggerDecimations)	triggerDecimations	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!energyGateLengths)	energyGateLengths	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!energyPeakingTimes)	energyPeakingTimes	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!energyDecimations)	energyDecimations	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!energyGapTimes)		energyGapTimes		= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!sampleStartIndexes)	sampleStartIndexes	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+
 	if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
         [waveFormRateGroup setIntegrationTime:5];

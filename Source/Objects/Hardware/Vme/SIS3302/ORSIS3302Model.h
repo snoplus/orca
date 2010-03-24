@@ -41,7 +41,6 @@
 	
 	unsigned long   dataId;
 	unsigned long   mcaId;
-	unsigned long   timeId;
 	
 	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
 	short			internalTriggerEnabledMask;
@@ -52,8 +51,7 @@
 	short			triggerOutEnabledMask;
 	short			adc50KTriggerEnabledMask;
 	short			gtMask;
-	short			triggerDecimation;
-	short			energyDecimation;
+	
 	NSMutableArray* thresholds;
     NSMutableArray* dacOffsets;
 	NSMutableArray* gateLengths;
@@ -61,6 +59,16 @@
 	NSMutableArray* sumGs;
 	NSMutableArray* peakingTimes;
 	NSMutableArray* internalTriggerDelays;
+	NSMutableArray* sampleLengths;
+    NSMutableArray* sampleStartIndexes;
+    NSMutableArray* preTriggerDelays;
+    NSMutableArray* triggerGateLengths;
+	NSMutableArray*	triggerDecimations;
+    NSMutableArray* energyGateLengths;
+	NSMutableArray* energyPeakingTimes;
+    NSMutableArray* energyGapTimes;
+    NSMutableArray* energyTauFactors;
+	NSMutableArray* energyDecimations;
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3302Channels];
@@ -73,29 +81,21 @@
 	long count;
     short lemoOutMode;
     short lemoInMode;
-    unsigned short sampleLength;
-    unsigned short sampleStartIndex;
 	BOOL bankOneArmed;
 	BOOL firstTime;
 	BOOL shipEnergyWaveform;
 	
-    int preTriggerDelay;
-    int triggerGateLength;
-    int energyGateLength;
-    int energyPeakingTime;
-    int energyGapTime;
     int energySampleLength;
     int energySampleStartIndex1;
     int energySampleStartIndex2;
     int energySampleStartIndex3;
-    int energyTauFactor;
     int endAddressThreshold;
     int runMode;
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
 	
-	unsigned long* dataRecord;
-	unsigned long  dataRecordlength;
+	unsigned long* dataRecord[4];
+	unsigned long  dataRecordlength[4];
 	
 	//calculated values
 	unsigned long numEnergyValues;
@@ -161,14 +161,12 @@
 - (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
 - (BOOL) lemoInEnabled:(unsigned short)aBit;
 - (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
-- (int)  energyGateLength;
-- (void) setEnergyGateLength:(int)aEnergyGateLength;
 - (int)  runMode;
 - (void) setRunMode:(int)aRunMode;
 - (int)  endAddressThreshold;
 - (void) setEndAddressThreshold:(int)aEndAddressThreshold;
-- (int)  energyTauFactor;
-- (void) setEnergyTauFactor:(int)aEnergyTauFactor;
+- (int) energyTauFactor:(short)aChannel;
+- (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue;
 - (int)  energySampleStartIndex3;
 - (void) setEnergySampleStartIndex3:(int)aEnergySampleStartIndex3;
 - (int)  energySampleStartIndex2;
@@ -177,27 +175,39 @@
 - (void) setEnergySampleStartIndex1:(int)aEnergySampleStartIndex1;
 - (int)  energySampleLength;
 - (void) setEnergySampleLength:(int)aEnergySampleLength;
-- (int)  energyGapTime;
-- (void) setEnergyGapTime:(int)aEnergyGapTime;
-- (int)  energyPeakingTime;
-- (void) setEnergyPeakingTime:(int)aEnergyPeakingTime;
-- (int)  triggerGateLength;
-- (void) setTriggerGateLength:(int)aTriggerGateLength;
-- (int)  preTriggerDelay;
-- (void) setPreTriggerDelay:(int)aPreTriggerDelay;
+- (int) energyGapTime:(short)aGroup;
+- (void) setEnergyGapTime:(short)aGroup withValue:(int)aValue;
+- (int) energyPeakingTime:(short)aGroup;
+- (void) setEnergyPeakingTime:(short)aGroup withValue:(int)aValue;
 - (unsigned long) getThresholdRegOffsets:(int) channel;
 - (unsigned long) getTriggerSetupRegOffsets:(int) channel; 
 - (unsigned long) getTriggerExtSetupRegOffsets:(int)channel;
-- (unsigned long) getEndThresholdRegOffsets:(int)group;
 - (unsigned long) getSampleAddress:(int)channel;
 - (unsigned long) getAdcMemory:(int)channel;
 - (unsigned long) getEventConfigOffsets:(int)group;
+- (unsigned long) getEnergyGateLengthOffsets:(int)group;
 - (unsigned long) getExtendedEventConfigOffsets:(int)group;
+- (unsigned long) getEndThresholdRegOffsets:(int)group;
+- (unsigned long) getRawDataBufferConfigOffsets:(int)group;
+- (unsigned long) getEnergyTauFactorOffset:(int) channel;
+- (unsigned long) getEnergySetupGPOffset:(int)group;
+- (unsigned long) getPreTriggerDelayTriggerGateLengthOffset:(int) aGroup; 
 
-- (unsigned short) sampleStartIndex;
-- (void) setSampleStartIndex:(unsigned short)aSampleStartIndex;
-- (unsigned short) sampleLength;
-- (void) setSampleLength:(unsigned short)aSampleLength;
+- (int) energyGateLength:(short)aGroup;
+- (void) setEnergyGateLength:(short)aGroup withValue:(int)aEnergyGateLength;
+
+- (unsigned short) sampleLength:(short)group;
+- (void) setSampleLength:(short)group withValue:(int)aValue;
+
+- (int)  triggerGateLength:(short)group;
+- (void) setTriggerGateLength:(short)group withValue:(int)aTriggerGateLength;
+
+- (int)  preTriggerDelay:(short)group;
+- (void) setPreTriggerDelay:(short)group withValue:(int)aPreTriggerDelay;
+
+- (int) sampleStartIndex:(int)aGroup;
+- (void) setSampleStartIndex:(int)aGroup withValue:(unsigned short)aSampleStartIndex;
+
 - (short) lemoInMode;
 - (void) setLemoInMode:(short)aLemoInMode;
 - (NSString*) lemoInAssignments;
@@ -255,10 +265,10 @@
 - (void) setPeakingTime:(short)chan withValue:(short)aValue;
 - (short) internalTriggerDelay:(short)chan;
 - (void) setInternalTriggerDelay:(short)chan withValue:(short)aValue;
-- (short) triggerDecimation;
-- (void) setTriggerDecimation:(short)aValue;
-- (short) energyDecimation;
-- (void) setEnergyDecimation:(short)aValue;
+- (int) triggerDecimation:(short)aGroup;
+- (void) setTriggerDecimation:(short)aGroup withValue:(short)aValue;
+- (short) energyDecimation:(short)aGroup;
+- (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue;
 
 - (int) threshold:(short)chan;
 - (void) setThreshold:(short)chan withValue:(int)aValue;
@@ -336,8 +346,6 @@
 - (NSString*) runSummary;
 
 #pragma mark •••Data Taker
-- (unsigned long) timeId;
-- (void) setTimeId: (unsigned long) anId;
 - (unsigned long) mcaId;
 - (void) setMcaId: (unsigned long) anId;
 - (unsigned long) dataId;

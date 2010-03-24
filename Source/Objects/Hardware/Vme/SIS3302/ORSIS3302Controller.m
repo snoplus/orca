@@ -47,7 +47,7 @@
 - (void) awakeFromNib
 {
 	
-    settingSize     = NSMakeSize(850,700);
+    settingSize     = NSMakeSize(1060,620);
     rateSize		= NSMakeSize(790,300);
     
     blankView = [[NSView alloc] init];
@@ -654,10 +654,28 @@
 		[[externalGateEnabledMatrix cellWithTag:i] setState:[model externalGateEnabled:i]];
 	}
 }
-
-- (void) energyGateLengthChanged:(NSNotification*)aNote
+- (void) energyTauFactorChanged:(NSNotification*)aNote
 {
-	[energyGateLengthField setIntValue: [model energyGateLength]];
+	short i;
+	for(i=0;i<8;i++){
+		[[energyTauFactorMatrix cellWithTag:i] setIntValue:[model energyTauFactor:i]];
+	}
+}
+
+- (void) energyGapTimeChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<4;i++){
+		[[energyGapTimeMatrix cellWithTag:i] setIntValue:[model energyGapTime:i]];
+	}
+}
+
+- (void) energyPeakingTimeChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<4;i++){
+		[[energyPeakingTimeMatrix cellWithTag:i] setIntValue:[model energyPeakingTime:i]];
+	}
 }
 
 - (void) runModeChanged:(NSNotification*)aNote
@@ -679,11 +697,6 @@
 	[energySampleStartIndex3Field setIntValue: [model energySampleStartIndex3]];
 }
 
-- (void) energyTauFactorChanged:(NSNotification*)aNote
-{
-	[energyTauFactorField setIntValue: [model energyTauFactor]];
-}
-
 - (void) energySampleStartIndex2Changed:(NSNotification*)aNote
 {
 	[energySampleStartIndex2Field setIntValue: [model energySampleStartIndex2]];
@@ -694,15 +707,6 @@
 	[energySampleStartIndex1Field setIntValue: [model energySampleStartIndex1]];
 }
 
-- (void) energyGapTimeChanged:(NSNotification*)aNote
-{
-	[energyGapTimeField setIntValue: [model energyGapTime]];
-}
-
-- (void) energyPeakingTimeChanged:(NSNotification*)aNote
-{
-	[energyPeakingTimeField setIntValue: [model energyPeakingTime]];
-}
 
 - (void) energySetShipWaveformChanged:(NSNotification*)aNote
 {
@@ -721,27 +725,6 @@
 	
 	[runSummaryField setStringValue: [model runSummary]];
 
-}
-
-- (void) triggerGateLengthChanged:(NSNotification*)aNote
-{
-	[triggerGateLengthField setIntValue: [model triggerGateLength]];
-}
-
-- (void) preTriggerDelayChanged:(NSNotification*)aNote
-{
-	[preTriggerDelayField setIntValue: [model preTriggerDelay]];
-}
-
-- (void) sampleStartIndexChanged:(NSNotification*)aNote
-{
-	[sampleStartIndexField setIntValue: [model sampleStartIndex]];
-}
-
-- (void) sampleLengthChanged:(NSNotification*)aNote
-{
-	[sampleLengthField setIntValue: [model sampleLength]];
-	[runSummaryField setStringValue: [model runSummary]];
 }
 
 - (void) lemoInModeChanged:(NSNotification*)aNote
@@ -801,6 +784,47 @@
 	}
 }
 
+- (void) sampleLengthChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		[[sampleLengthMatrix cellWithTag:i] setIntValue:[model sampleLength:i]];
+	}
+	[runSummaryField setStringValue: [model runSummary]];
+}
+
+- (void) energyGateLengthChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		[[energyGateLengthMatrix cellWithTag:i] setIntValue:[model energyGateLength:i]];
+	}
+}
+
+- (void) triggerGateLengthChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		[[triggerGateLengthMatrix cellWithTag:i] setIntValue:[model triggerGateLength:i]];
+	}
+}
+
+- (void) preTriggerDelayChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		[[preTriggerDelayMatrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
+	}
+}
+
+- (void) sampleStartIndexChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		[[sampleStartIndexMatrix cellWithTag:i] setIntValue:[model sampleStartIndex:i]];
+	}
+}
+
 - (void) dacOffsetChanged:(NSNotification*)aNote
 {
 	short i;
@@ -851,12 +875,18 @@
 
 - (void) triggerDecimationChanged:(NSNotification*)aNote
 {
-	[triggerDecimationPU selectItemAtIndex:[model triggerDecimation]];
+	[triggerDecimation0 selectItemAtIndex:[model triggerDecimation:0]];
+	[triggerDecimation1 selectItemAtIndex:[model triggerDecimation:1]];
+	[triggerDecimation2 selectItemAtIndex:[model triggerDecimation:2]];
+	[triggerDecimation3 selectItemAtIndex:[model triggerDecimation:3]];
 }
 
 - (void) energyDecimationChanged:(NSNotification*)aNote
 {
-	[energyDecimationPU selectItemAtIndex:[model energyDecimation]];
+	[energyDecimation0 selectItemAtIndex:[model energyDecimation:0]];
+	[energyDecimation1 selectItemAtIndex:[model energyDecimation:1]];
+	[energyDecimation2 selectItemAtIndex:[model energyDecimation:2]];
+	[energyDecimation3 selectItemAtIndex:[model energyDecimation:3]];
 }
 
 - (void) waveFormRateChanged:(NSNotification*)aNote
@@ -904,18 +934,24 @@
 	[probeButton				setEnabled:!lockedOrRunningMaintenance];
 	
     [internalExternalTriggersOredCB	setEnabled:!lockedOrRunningMaintenance];
-	[energyTauFactorField			setEnabled:!lockedOrRunningMaintenance];
-	[energyGapTimeField				setEnabled:!lockedOrRunningMaintenance];
-	[energyPeakingTimeField			setEnabled:!lockedOrRunningMaintenance];
-	[triggerGateLengthField			setEnabled:!lockedOrRunningMaintenance];
-	[preTriggerDelayField			setEnabled:!lockedOrRunningMaintenance];
+	[energyTauFactorMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[energyGapTimeMatrix			setEnabled:!lockedOrRunningMaintenance];
+	[energyPeakingTimeMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[triggerGateLengthMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[preTriggerDelayMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[lemoInModePU					setEnabled:!lockedOrRunningMaintenance];
 	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
-	[sampleStartIndexField			setEnabled:!lockedOrRunningMaintenance];
+	[sampleStartIndexMatrix			setEnabled:!lockedOrRunningMaintenance];
 
 	[clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
-	[triggerDecimationPU			setEnabled:!lockedOrRunningMaintenance];
-	[energyDecimationPU				setEnabled:!lockedOrRunningMaintenance];
+	[triggerDecimation0				setEnabled:!lockedOrRunningMaintenance];
+	[triggerDecimation1				setEnabled:!lockedOrRunningMaintenance];
+	[triggerDecimation2				setEnabled:!lockedOrRunningMaintenance];
+	[triggerDecimation3				setEnabled:!lockedOrRunningMaintenance];
+	[energyDecimation0				setEnabled:!lockedOrRunningMaintenance];
+	[energyDecimation1				setEnabled:!lockedOrRunningMaintenance];
+	[energyDecimation2				setEnabled:!lockedOrRunningMaintenance];
+	[energyDecimation3				setEnabled:!lockedOrRunningMaintenance];
 
 	[gtMatrix						setEnabled:!lockedOrRunningMaintenance];
 	[inputInvertedMatrix			setEnabled:!lockedOrRunningMaintenance];
@@ -952,7 +988,7 @@
     [mcaEnergyDividerField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
 
 	//can't be changed during a run or the sbc will be hosed.
-	[sampleLengthField				setEnabled:!locked && !runInProgress];
+	[sampleLengthMatrix				setEnabled:!locked && !runInProgress];
 	[energyShipWaveformButton		setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex3Field	setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
@@ -1165,11 +1201,6 @@
 	[model setEnergySampleStartIndex3:[sender intValue]];	
 }
 
-- (IBAction) energyTauFactorAction:(id)sender
-{
-	[model setEnergyTauFactor:[sender intValue]];	
-}
-
 - (IBAction) energySampleStartIndex2Action:(id)sender
 {
 	[model setEnergySampleStartIndex2:[sender intValue]];	
@@ -1195,35 +1226,6 @@
 	}
 }
 
-- (IBAction) energyGapTimeAction:(id)sender
-{
-	[model setEnergyGapTime:[sender intValue]];	
-}
-
-- (IBAction) energyPeakingTimeAction:(id)sender
-{
-	[model setEnergyPeakingTime:[sender intValue]];	
-}
-
-- (IBAction) triggerGateLengthAction:(id)sender
-{
-	[model setTriggerGateLength:[sender intValue]];	
-}
-
-- (IBAction) preTriggerDelayAction:(id)sender
-{
-	[model setPreTriggerDelay:[sender intValue]];	
-}
-
-- (IBAction) sampleStartIndexAction:(id)sender
-{
-	[model setSampleStartIndex:[sender intValue]];	
-}
-
-- (IBAction) sampleLengthAction:(id)sender
-{
-	[model setSampleLength:[sender intValue]];	
-}
 
 - (IBAction) lemoInModeAction:(id)sender
 {
@@ -1273,10 +1275,52 @@
 	[model setGtBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
+- (IBAction) triggerDecimationAction:(id)sender
+{
+	if([sender indexOfSelectedItem] != [model triggerDecimation:[sender tag]]){
+		[model setTriggerDecimation:[sender tag] withValue:[sender indexOfSelectedItem]];
+	}
+}
+
+- (IBAction) energyDecimationAction:(id)sender
+{
+    if([sender indexOfSelectedItem] != [model energyDecimation:[sender tag]]){
+		[model setEnergyDecimation:[sender tag] withValue:[sender indexOfSelectedItem]];
+	}
+}
+
 - (IBAction) thresholdAction:(id)sender
 {
     if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
 		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) triggerGateLengthAction:(id)sender
+{
+    if([sender intValue] != [model triggerGateLength:[[sender selectedCell] tag]]){
+		[model setTriggerGateLength:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) preTriggerDelayAction:(id)sender
+{
+    if([sender intValue] != [model preTriggerDelay:[[sender selectedCell] tag]]){
+		[model setPreTriggerDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) sampleStartIndexAction:(id)sender
+{
+	if([sender intValue] != [model sampleStartIndex:[[sender selectedCell] tag]]){
+		[model setSampleStartIndex:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) sampleLengthAction:(id)sender
+{
+    if([sender intValue] != [model sampleLength:[[sender selectedCell] tag]]){
+		[model setSampleLength:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 
@@ -1321,22 +1365,29 @@
 		[model setInternalTriggerDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
-
-- (IBAction) triggerDecimationAction:(id)sender
+- (IBAction) energyTauFactorAction:(id)sender
 {
-    if([sender indexOfSelectedItem] != [model triggerDecimation]){
-		[model setTriggerDecimation:[sender indexOfSelectedItem]];
+    if([sender intValue] != [model energyTauFactor:[[sender selectedCell] tag]]){
+		[model setEnergyTauFactor:[[sender selectedCell] tag] withValue:[sender intValue]];	
 	}
 }
 
-- (IBAction) energyDecimationAction:(id)sender
+- (IBAction) energyGapTimeAction:(id)sender
 {
-    if([sender indexOfSelectedItem] != [model energyDecimation]){
-		[model setEnergyDecimation:[sender indexOfSelectedItem]];
+    if([sender intValue] != [model energyGapTime:[[sender selectedCell] tag]]){
+		[model setEnergyGapTime:[[sender selectedCell] tag] withValue:[sender intValue]];	
 	}
 }
 
--(IBAction) baseAddressAction:(id)sender
+- (IBAction) energyPeakingTimeAction:(id)sender
+{
+    if([sender intValue] != [model energyPeakingTime:[[sender selectedCell] tag]]){
+		[model setEnergyPeakingTime:[[sender selectedCell] tag] withValue:[sender intValue]];	
+	}
+}
+
+
+- (IBAction) baseAddressAction:(id)sender
 {
     if([sender intValue] != [model baseAddress]){
         [model setBaseAddress:[sender intValue]];

@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #define kNumSIS3302Channels	8 
+#define kNumSIS3302Groups	4 
 
 #define kMcaRunMode			0
 #define kEnergyRunMode		1
