@@ -86,10 +86,9 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 	// this be changed?
     // read stop sample address
 	std::vector<uint32_t>& fTempVector = fSetOfTempVectors[channel];
-	size_t& fTempVectorIter = fSetOfTempVectorIters[channel];
+	size_t& fTempVectorIter            = fSetOfTempVectorIters[channel];
 	
-    uint32_t addr = GetBaseAddress() 
-           + GetPreviousBankSampleRegisterOffset(channel) ; 
+    uint32_t addr = GetBaseAddress() + GetPreviousBankSampleRegisterOffset(channel) ; 
     uint32_t end_sample_address = 0;
 
     if (VMERead(addr,GetAddressModifier(),
@@ -135,7 +134,7 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
     	}
 		
 		// Put the data into the data stream
-		size_t number_of_longs_in_raw_data = GetDeviceSpecificData()[channel];
+		size_t number_of_longs_in_raw_data = GetDeviceSpecificData()[channel/2];
 		size_t number_of_longs_in_energy_wf_data = GetDeviceSpecificData()[4];
 		size_t size_of_record = kHeaderSizeInLongs + kTrailerSizeInLongs + 
 			number_of_longs_in_raw_data + number_of_longs_in_energy_wf_data;
