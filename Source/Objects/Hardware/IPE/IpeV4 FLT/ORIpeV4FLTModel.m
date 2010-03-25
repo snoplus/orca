@@ -1601,13 +1601,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gap Length"];
-    [p setFormat:@"##0" upperLimit:0 lowerLimit:7 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setGapLength:) getMethod:@selector(gapLength)];
     [a addObject:p];			
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"FilterLength"];
-    [p setFormat:@"##0" upperLimit:2 lowerLimit:7 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:7 lowerLimit:2 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFilterLength:) getMethod:@selector(filterLength)];
     [a addObject:p];			
 	
