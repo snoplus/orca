@@ -294,9 +294,9 @@
 		840D56E50F39E9BF00F9A274 /* ORPacModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D56DD0F39E9BF00F9A274 /* ORPacModel.m */; };
 		840D56E60F39E9BF00F9A274 /* Pac.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840D56DE0F39E9BF00F9A274 /* Pac.nib */; };
 		840D56E70F39E9BF00F9A274 /* Pac.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840D56DF0F39E9BF00F9A274 /* Pac.tif */; };
-		840DE574115D0E44006AF231 /* ORWindowSaveSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 840DE571115D0E44006AF231 /* ORWindowSaveSet.h */; };
-		840DE575115D0E44006AF231 /* ORWindowSaveSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 840DE572115D0E44006AF231 /* ORWindowSaveSet.m */; };
-		840DE576115D0E44006AF231 /* WindowSaveSet.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840DE573115D0E44006AF231 /* WindowSaveSet.nib */; };
+		840DEA25115D7981006AF231 /* ORWindowSaveSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 840DEA22115D7981006AF231 /* ORWindowSaveSet.h */; };
+		840DEA26115D7981006AF231 /* ORWindowSaveSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 840DEA23115D7981006AF231 /* ORWindowSaveSet.m */; };
+		840DEA27115D7981006AF231 /* WindowSaveSet.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840DEA24115D7981006AF231 /* WindowSaveSet.nib */; };
 		840E00030944B29000049827 /* edu.washington.npl.orca.Process.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840EFFA50944B28F00049827 /* edu.washington.npl.orca.Process.plist */; };
 		840E00040944B29000049827 /* ORProcessController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840EFFA60944B28F00049827 /* ORProcessController.h */; };
 		840E00050944B29000049827 /* ORProcessController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840EFFA70944B28F00049827 /* ORProcessController.m */; };
@@ -2669,9 +2669,9 @@
 		840D56DD0F39E9BF00F9A274 /* ORPacModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPacModel.m; path = Source/Objects/Hardware/Serial/Pac/ORPacModel.m; sourceTree = SOURCE_ROOT; };
 		840D56DE0F39E9BF00F9A274 /* Pac.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Pac.nib; path = Source/Objects/Hardware/Serial/Pac/Pac.nib; sourceTree = SOURCE_ROOT; };
 		840D56DF0F39E9BF00F9A274 /* Pac.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Pac.tif; path = Source/Objects/Hardware/Serial/Pac/Pac.tif; sourceTree = SOURCE_ROOT; };
-		840DE571115D0E44006AF231 /* ORWindowSaveSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORWindowSaveSet.h; path = "Source/Main Dialogs/WindowSaveSetManager/ORWindowSaveSet.h"; sourceTree = SOURCE_ROOT; };
-		840DE572115D0E44006AF231 /* ORWindowSaveSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORWindowSaveSet.m; path = "Source/Main Dialogs/WindowSaveSetManager/ORWindowSaveSet.m"; sourceTree = SOURCE_ROOT; };
-		840DE573115D0E44006AF231 /* WindowSaveSet.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowSaveSet.nib; path = "Source/Main Dialogs/WindowSaveSetManager/WindowSaveSet.nib"; sourceTree = SOURCE_ROOT; };
+		840DEA22115D7981006AF231 /* ORWindowSaveSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORWindowSaveSet.h; path = "Source/Main Dialogs/WindowSaveSet/ORWindowSaveSet.h"; sourceTree = SOURCE_ROOT; };
+		840DEA23115D7981006AF231 /* ORWindowSaveSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORWindowSaveSet.m; path = "Source/Main Dialogs/WindowSaveSet/ORWindowSaveSet.m"; sourceTree = SOURCE_ROOT; };
+		840DEA24115D7981006AF231 /* WindowSaveSet.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowSaveSet.nib; path = "Source/Main Dialogs/WindowSaveSet/WindowSaveSet.nib"; sourceTree = SOURCE_ROOT; };
 		840DFF0B03C37EAA00DCF929 /* FanIn.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = FanIn.nib; sourceTree = "<group>"; };
 		840DFF0D03C37EAA00DCF929 /* ORFanInController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORFanInController.h; sourceTree = "<group>"; };
 		840DFF0E03C37EAA00DCF929 /* ORFanInController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORFanInController.m; sourceTree = "<group>"; };
@@ -5198,15 +5198,15 @@
 			path = Source/Objects/Hardware/Serial/Pac;
 			sourceTree = SOURCE_ROOT;
 		};
-		840DE570115D0E44006AF231 /* WindowSaveSetManager */ = {
+		840DEA21115D7981006AF231 /* WindowSaveSet */ = {
 			isa = PBXGroup;
 			children = (
-				840DE571115D0E44006AF231 /* ORWindowSaveSet.h */,
-				840DE572115D0E44006AF231 /* ORWindowSaveSet.m */,
-				840DE573115D0E44006AF231 /* WindowSaveSet.nib */,
+				840DEA22115D7981006AF231 /* ORWindowSaveSet.h */,
+				840DEA23115D7981006AF231 /* ORWindowSaveSet.m */,
+				840DEA24115D7981006AF231 /* WindowSaveSet.nib */,
 			);
-			name = WindowSaveSetManager;
-			path = "Source/Main Dialogs/WindowSaveSetManager";
+			name = WindowSaveSet;
+			path = "Source/Main Dialogs/WindowSaveSet";
 			sourceTree = SOURCE_ROOT;
 		};
 		840DFF0703C37EAA00DCF929 /* Data Flow */ = {
@@ -9518,10 +9518,10 @@
 				F51E696303AE4775015F64B1 /* Catalog */,
 				840B7DA0094DFAC200B1B135 /* ProcessCenter */,
 				F51E696903AE4775015F64B1 /* StatusWindow */,
+				840DEA21115D7981006AF231 /* WindowSaveSet */,
 				84AD4C2C0BA21B7A003C7ABE /* WindowList */,
 				8407750B0CEE7CAC0073F5A9 /* HelpCenter */,
 				848E3BC509DB0B3E0003F7A2 /* MailCenter */,
-				840DE570115D0E44006AF231 /* WindowSaveSetManager */,
 				84FB4E1E0D92F7560055813E /* BugReporter */,
 				842539F40BCD7BFE004C8065 /* ORCARootService */,
 			);
@@ -10637,7 +10637,7 @@
 				843175D01152766E005643AB /* HaloController.h in Headers */,
 				843175D21152766E005643AB /* HaloDetectorView.h in Headers */,
 				843175D41152766E005643AB /* HaloModel.h in Headers */,
-				840DE574115D0E44006AF231 /* ORWindowSaveSet.h in Headers */,
+				840DEA25115D7981006AF231 /* ORWindowSaveSet.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11317,7 +11317,7 @@
 				2D159238113EE62C00EA1552 /* IpeV4SLTScript in Resources */,
 				843175CD1152766E005643AB /* Halo.gif in Resources */,
 				843175CE1152766E005643AB /* Halo.nib in Resources */,
-				840DE576115D0E44006AF231 /* WindowSaveSet.nib in Resources */,
+				840DEA27115D7981006AF231 /* WindowSaveSet.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12076,7 +12076,7 @@
 				843175D11152766E005643AB /* HaloController.m in Sources */,
 				843175D31152766E005643AB /* HaloDetectorView.m in Sources */,
 				843175D51152766E005643AB /* HaloModel.m in Sources */,
-				840DE575115D0E44006AF231 /* ORWindowSaveSet.m in Sources */,
+				840DEA26115D7981006AF231 /* ORWindowSaveSet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
