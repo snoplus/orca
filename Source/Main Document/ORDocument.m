@@ -714,5 +714,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         [aController release];
     }
 }
-
+- (void) closeAllWindows
+{
+	[orcaControllers makeObjectsPerformSelector:@selector(close)];
+}
 @end

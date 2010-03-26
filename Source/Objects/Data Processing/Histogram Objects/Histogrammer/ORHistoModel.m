@@ -127,6 +127,29 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 }
 
+- (id) findObjectWithFullID:(NSString*)aFullID;
+{
+    if([aFullID isEqualToString:[self fullID]])return self;
+    else {
+		return [dataSet findObjectWithFullID:aFullID];
+	}
+}
+
+- (NSArray*) collectObjectsOfClass:(Class)aClass
+{
+    NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
+    
+    [collection addObjectsFromArray:[super collectObjectsOfClass:aClass]];
+	
+    NSEnumerator* e  = [dataSet objectEnumerator];
+    OrcaObject* anObject;
+    while(anObject = [e nextObject]){
+        [collection addObjectsFromArray:[anObject collectObjectsOfClass:aClass]];
+    }	
+    return collection;
+}
+
+
 - (void) makeMainController
 {
     [self linkToController:@"ORHistoController"];
@@ -327,19 +350,6 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 {
 }
 
-- (NSArray*) collectObjectsOfClass:(Class)aClass
-{
-    NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
-    
-    [collection addObjectsFromArray:[super collectObjectsOfClass:aClass]];
-	
-    NSEnumerator* e  = [dataSet objectEnumerator];
-    OrcaObject* anObject;
-    while(anObject = [e nextObject]){
-        [collection addObjectsFromArray:[anObject collectObjectsOfClass:aClass]];
-    }	
-    return collection;
-}
 - (BOOL) leafNode
 {
 	return NO;

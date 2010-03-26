@@ -38,6 +38,8 @@
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (id) findObjectWithFullID:(NSString*)aFullID;
+- (NSArray*) collectObjectsOfClass:(Class)aClass;
 - (long) runNumber;
 - (void) setRunNumber:(long)aRunNumber;
 - (id) objectForKeyArray:(NSMutableArray*)anArray;

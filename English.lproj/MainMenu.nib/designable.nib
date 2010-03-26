@@ -955,7 +955,7 @@
 								</object>
 								<object class="NSMenuItem" id="299048341">
 									<reference key="NSMenu" ref="538601274"/>
-									<string key="NSTitle">Save Window Positions</string>
+									<string key="NSTitle">Manage Window Savesets...</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="452980312"/>
@@ -963,7 +963,7 @@
 								</object>
 								<object class="NSMenuItem" id="1013220786">
 									<reference key="NSMenu" ref="538601274"/>
-									<string key="NSTitle">Restore Window Positions</string>
+									<string key="NSTitle">Restore Default Window Saveset</string>
 									<string key="NSKeyEquiv">1</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1068,6 +1068,9 @@
 			</object>
 			<object class="NSCustomObject" id="428505348">
 				<string key="NSClassName">ORBugReporter</string>
+			</object>
+			<object class="NSCustomObject" id="107809585">
+				<string key="NSClassName">ORWindowSaveSet</string>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -1611,19 +1614,27 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">restoreWindowSet:</string>
-						<reference key="source" ref="698043728"/>
-						<reference key="destination" ref="1013220786"/>
+						<string key="label">showWindowSaveSet:</string>
+						<reference key="source" ref="107809585"/>
+						<reference key="destination" ref="299048341"/>
 					</object>
-					<int key="connectionID">451</int>
+					<int key="connectionID">455</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">windowSaveSet</string>
+						<reference key="source" ref="698043728"/>
+						<reference key="destination" ref="107809585"/>
+					</object>
+					<int key="connectionID">457</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">saveWindowSet:</string>
+						<string key="label">restoreToCmdOneSet:</string>
 						<reference key="source" ref="698043728"/>
-						<reference key="destination" ref="299048341"/>
+						<reference key="destination" ref="1013220786"/>
 					</object>
-					<int key="connectionID">452</int>
+					<int key="connectionID">458</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2421,6 +2432,12 @@
 						<reference key="object" ref="928773544"/>
 						<reference key="parent" ref="538601274"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">454</int>
+						<reference key="object" ref="107809585"/>
+						<reference key="parent" ref="0"/>
+						<string key="objectName">Window Save Sets</string>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -2631,6 +2648,7 @@
 					<string>448.ImportedFromIB2</string>
 					<string>453.IBPluginDependency</string>
 					<string>453.ImportedFromIB2</string>
+					<string>454.ImportedFromIB2</string>
 					<string>56.IBPluginDependency</string>
 					<string>56.ImportedFromIB2</string>
 					<string>57.IBPluginDependency</string>
@@ -2775,7 +2793,7 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{336, 721}, {253, 393}}</string>
+					<string>{{336, 721}, {295, 393}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2863,6 +2881,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -2908,7 +2927,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">453</int>
+			<int key="maxID">458</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3239,6 +3258,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/SBC/SBC Link/SBC_Link.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/Serial/Pac/ORPacModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -3818,8 +3844,7 @@
 							<string>openDocument:</string>
 							<string>openRecentDocument:</string>
 							<string>performClose:</string>
-							<string>restoreWindowSet:</string>
-							<string>saveWindowSet:</string>
+							<string>restoreToCmdOneSet:</string>
 							<string>showAlarms:</string>
 							<string>showAutoTester:</string>
 							<string>showCatalog:</string>
@@ -3856,7 +3881,6 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
@@ -3865,11 +3889,13 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>document</string>
 							<string>helpCenter</string>
+							<string>windowSaveSet</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>ORHelpCenter</string>
+							<string>ORWindowSaveSet</string>
 						</object>
 					</object>
 					<reference key="sourceIdentifier" ref="693912906"/>
@@ -5077,6 +5103,7 @@
 							<string>removeItemAction:</string>
 							<string>setPointAction:</string>
 							<string>shipRecordsAction:</string>
+							<string>showDebugOutputAction:</string>
 							<string>toggleTreeDrawer:</string>
 							<string>toggleWebDrawer:</string>
 							<string>viewItemInWebAction:</string>
@@ -5111,20 +5138,14 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Hardware/IPE/IPE SlowControl/ORIpeSlowControlController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORIpeSlowControlController</string>
-					<string key="superclassName">OrcaObjectController</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>editChannelNumberView</string>
 							<string>fastGenSetupButton</string>
 							<string>ipNumberComboBox</string>
 							<string>itemDetailsView</string>
@@ -5133,11 +5154,13 @@
 							<string>itemTypeMatrix</string>
 							<string>lastRequestField</string>
 							<string>lockButton</string>
+							<string>newChannelNumberPopup</string>
 							<string>pendingRequestsTable</string>
 							<string>pollTimePopup</string>
 							<string>setPointButton</string>
 							<string>setPointField</string>
 							<string>shipRecordsCB</string>
+							<string>showDebugOutputCB</string>
 							<string>timeOutCountField</string>
 							<string>timingPlotter</string>
 							<string>totalRequestCountField</string>
@@ -5152,6 +5175,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>NSButton</string>
 							<string>NSComboBox</string>
 							<string>NSTextView</string>
@@ -5160,10 +5184,12 @@
 							<string>NSMatrix</string>
 							<string>ORTimedTextField</string>
 							<string>NSButton</string>
+							<string>NSPopUpButton</string>
 							<string>NSTableView</string>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>ORPlotter1D</string>
@@ -5178,6 +5204,14 @@
 							<string>NSButton</string>
 						</object>
 					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/IPE/IPE SlowControl/ORIpeSlowControlController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ORIpeSlowControlController</string>
+					<string key="superclassName">OrcaObjectController</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
@@ -6116,6 +6150,56 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ORWindowSaveSet</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>cancel:</string>
+							<string>restoreToCmdOneSet:</string>
+							<string>restoreWindowSet:</string>
+							<string>saveWindowSet:</string>
+							<string>setCmdOneSet:</string>
+							<string>showWindowSaveSet:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>cmdOneSaveButton</string>
+							<string>cmdOneSetField</string>
+							<string>messageField</string>
+							<string>newSetNameField</string>
+							<string>restoreButton</string>
+							<string>savedSetsTableView</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>ORTimedTextField</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSTableView</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Main Dialogs/WindowSaveSetManager/ORWindowSaveSet.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

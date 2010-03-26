@@ -18,14 +18,13 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
-
 
 @class ORAlarmCollection;
 @class MemoryWatcher;
 @class ORSplashWindowController;
 @class ORHelpCenter;
+@class ORWindowSaveSet;
 
 @interface ORAppDelegate : NSObject {
     id   document;
@@ -33,6 +32,7 @@
     MemoryWatcher*     memoryWatcher;
     ORSplashWindowController* theSplashController;
 	IBOutlet ORHelpCenter* helpCenter;
+	IBOutlet ORWindowSaveSet* windowSaveSet;
 	NSString* ethernetHardwareAddress;
 }
 + (BOOL)isMacOSX10_5;
@@ -72,8 +72,7 @@
 - (IBAction) showTemplates:(id)sender;
 - (IBAction) openRecentDocument:(id)sender;
 - (IBAction) showAutoTester:(id)sender;
-- (IBAction) saveWindowSet:(id)sender;
-- (IBAction) restoreWindowSet:(id)sender;
+- (IBAction) restoreToCmdOneSet:(id)sender;
 
 #pragma mark ¥¥¥Accessors
 - (id) document;

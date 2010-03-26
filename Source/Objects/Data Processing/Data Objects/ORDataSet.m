@@ -74,6 +74,22 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     [super dealloc];
 }
 
+- (id) findObjectWithFullID:(NSString*)aFullID;
+{
+    if([self leafNode]){
+		return [data findObjectWithFullID:aFullID];
+	}
+    else {
+        NSArray* theKeys = [realDictionary allKeys];
+        for(id akey in theKeys){
+			id anObj = [realDictionary objectForKey:akey];
+			id theResult = [anObj findObjectWithFullID:aFullID];
+			if(theResult) return theResult;
+        }
+        return nil;
+    }
+}
+
 - (void) removeAllObjects
 {
     [realDictionary removeAllObjects];
@@ -1398,6 +1414,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     else {
 		[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];
  	}
+	[[currentLevel data] askForUniqueIDNumber];
 	[[currentLevel data] makeMainController];
 }
 
@@ -1435,7 +1452,10 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (void) doDoubleClick:(id)sender
 {
-    if([self leafNode])[data makeMainController];
+    if([self leafNode]){
+		[data askForUniqueIDNumber];
+		[data makeMainController];
+	}
     else {
         NSEnumerator* e = [realDictionary objectEnumerator];
         id obj;
@@ -1444,6 +1464,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
                 return;
             }
         }
+		[self askForUniqueIDNumber];
         [self makeMainController];
         
     }
