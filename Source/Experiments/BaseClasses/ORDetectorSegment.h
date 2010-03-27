@@ -71,7 +71,7 @@
 - (void) setSegmentError:(BOOL)state;
 - (void) clearSegmentError;
 - (void) setSegmentError;
-- (short) threshold;
+- (unsigned long) threshold;
 - (void) setGain:(id)aValue;
 - (void) setThreshold:(id)aValue;
 - (float) totalCounts;

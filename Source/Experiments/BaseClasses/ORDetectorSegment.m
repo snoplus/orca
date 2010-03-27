@@ -85,7 +85,7 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 	return [params objectForKey:mapKey(kName)];
 }
 
-- (short) threshold
+- (unsigned long) threshold
 {
 	int channel = [[params objectForKey:mapKey(kChannel)] intValue];
 	if(channel>=0) return [hardwareCard threshold:channel];
