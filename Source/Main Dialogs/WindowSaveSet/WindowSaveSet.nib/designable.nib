@@ -129,13 +129,13 @@
 						<object class="NSButton" id="120324709">
 							<reference key="NSNextResponder" ref="684159285"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{424, 116}, {65, 20}}</string>
+							<string key="NSFrame">{{386, 116}, {103, 20}}</string>
 							<reference key="NSSuperview" ref="684159285"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="1060050703">
 								<int key="NSCellFlags">-2080244224</int>
 								<int key="NSCellFlags2">134348800</int>
-								<string key="NSContents">Set ⌘-1</string>
+								<string key="NSContents">Set Default Set</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="120324709"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -431,7 +431,7 @@
 						<object class="NSTextField" id="529512954">
 							<reference key="NSNextResponder" ref="684159285"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{110, 119}, {299, 14}}</string>
+							<string key="NSFrame">{{110, 119}, {248, 14}}</string>
 							<reference key="NSSuperview" ref="684159285"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="467577584">
@@ -470,13 +470,13 @@
 						<object class="NSTextField" id="557439364">
 							<reference key="NSNextResponder" ref="684159285"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{63, 83}, {187, 17}}</string>
+							<string key="NSFrame">{{46, 83}, {204, 17}}</string>
 							<reference key="NSSuperview" ref="684159285"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="313406838">
 								<int key="NSCellFlags">68288064</int>
-								<int key="NSCellFlags2">205521920</int>
-								<string key="NSContents">⌘-1 Resets Positions To Set:</string>
+								<int key="NSCellFlags2">71304192</int>
+								<string key="NSContents">Default Window Save Set (⌘-1):</string>
 								<reference key="NSSupport" ref="454768119"/>
 								<reference key="NSControlView" ref="557439364"/>
 								<reference key="NSBackgroundColor" ref="386733702"/>
@@ -491,7 +491,7 @@
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="650843247">
 								<int key="NSCellFlags">68288064</int>
-								<int key="NSCellFlags2">205521920</int>
+								<int key="NSCellFlags2">71304192</int>
 								<string key="NSContents">Save Window Positions Into Set:</string>
 								<reference key="NSSupport" ref="454768119"/>
 								<reference key="NSControlView" ref="376083711"/>
@@ -701,7 +701,6 @@
 							<reference ref="680096270"/>
 							<reference ref="227107001"/>
 							<reference ref="159073861"/>
-							<reference ref="376083711"/>
 							<reference ref="557439364"/>
 							<reference ref="540203033"/>
 							<reference ref="40276871"/>
@@ -711,6 +710,7 @@
 							<reference ref="509748335"/>
 							<reference ref="529512954"/>
 							<reference ref="838766112"/>
+							<reference ref="376083711"/>
 						</object>
 						<reference key="parent" ref="637489463"/>
 					</object>
