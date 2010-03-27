@@ -494,22 +494,6 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">window</string>
-						<reference key="source" ref="338717068"/>
-						<reference key="destination" ref="637489463"/>
-					</object>
-					<int key="connectionID">26</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="637489463"/>
-						<reference key="destination" ref="338717068"/>
-					</object>
-					<int key="connectionID">62</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">dataSource</string>
 						<reference key="source" ref="1064520931"/>
 						<reference key="destination" ref="338717068"/>
@@ -595,6 +579,22 @@
 						<reference key="destination" ref="120324709"/>
 					</object>
 					<int key="connectionID">247</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="637489463"/>
+						<reference key="destination" ref="338717068"/>
+					</object>
+					<int key="connectionID">249</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">window</string>
+						<reference key="source" ref="338717068"/>
+						<reference key="destination" ref="637489463"/>
+					</object>
+					<int key="connectionID">250</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -996,7 +996,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">247</int>
+			<int key="maxID">250</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1615,7 +1615,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Main Dialogs/WindowSaveSetManager/ORWindowSaveSet.h</string>
+						<string key="minorKey">Source/Main Dialogs/WindowSaveSet/ORWindowSaveSet.h</string>
 					</object>
 				</object>
 			</object>

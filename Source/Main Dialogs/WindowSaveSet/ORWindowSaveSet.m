@@ -52,7 +52,7 @@
 	[savedSetsTableView setDoubleAction:@selector(restoreWindowSet:)];
 }
 
-//this method is needed so the global menu commands will be passes on correctly.
+//this method is needed so the global menu commands will be passed on correctly.
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
     return [[NSApp delegate]  undoManager];
