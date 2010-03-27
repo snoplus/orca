@@ -27,6 +27,7 @@
 	IBOutlet ORTimedTextField*	messageField;
 	IBOutlet NSButton*			restoreButton;
 	IBOutlet NSButton*			cmdOneSaveButton;
+	IBOutlet NSButton*			deleteButton;
 	
 	//cache of file names so we don't have to keep going back to the disk
 	NSMutableArray* saveSetNames;
@@ -48,4 +49,6 @@
 - (IBAction) setCmdOneSet:(id)sender;
 - (IBAction) restoreToCmdOneSet:(id)sender;
 - (IBAction) cancel:(id)sender;
+- (IBAction) deleteSelected:(id)sender;
+
 @end

@@ -75,6 +75,7 @@
 	NSIndexSet* selection = [savedSetsTableView selectedRowIndexes];
 	[restoreButton setEnabled:[selection count]];
 	[cmdOneSaveButton setEnabled:[selection count]];
+	[deleteButton setEnabled:[selection count]];
 }
 
 - (id) document
@@ -225,6 +226,24 @@
 - (IBAction) cancel:(id)sender
 {
 	[[self window] close];
+}
+
+- (IBAction) deleteSelected:(id)sender
+{
+	NSIndexSet* selection = [savedSetsTableView selectedRowIndexes];
+	int row = [selection firstIndex];
+	if(row>=0 && row < [saveSetNames count]) {                      
+		NSString* theSaveSetName = [[saveSetNames objectAtIndex:row] objectForKey:@"Name"];
+		NSString* tempFolder	 = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"WindowSets"];
+		NSString* windowSetFile  = [tempFolder stringByAppendingPathComponent:theSaveSetName];
+		NSFileManager* fm = [NSFileManager defaultManager]; 
+		if([fm fileExistsAtPath:windowSetFile])[fm removeItemAtPath:windowSetFile error:nil];
+		if([theSaveSetName isEqualToString:theSaveSetName]){
+			[cmdOneSetField setStringValue:@""];
+			[[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CmdOneWindowSaveSet"]; 
+		}
+		[savedSetsTableView reloadData];
+	}
 }
 
 #pragma mark •••Table Data Source

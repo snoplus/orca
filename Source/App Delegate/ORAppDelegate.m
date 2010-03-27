@@ -461,8 +461,10 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
         else return documentIsOpen ? NO : YES;
     }
 	
-    if(theAction == @selector(restoreWindowSet:)){
+    if(theAction == @selector(restoreToCmdOneSet:)){
 		NSString* theSaveSetName = [[NSUserDefaults standardUserDefaults] objectForKey:@"CmdOneWindowSaveSet"]; 
+		if(![theSaveSetName length])return NO;
+		
 		NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"WindowSets"];
 		NSString* windowSetFile = [tempFolder stringByAppendingPathComponent:theSaveSetName];
 		NSFileManager* fm = [NSFileManager defaultManager]; 
