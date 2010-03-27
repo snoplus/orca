@@ -1634,7 +1634,7 @@
 						<reference key="source" ref="698043728"/>
 						<reference key="destination" ref="1013220786"/>
 					</object>
-					<int key="connectionID">458</int>
+					<int key="connectionID">459</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2786,14 +2786,14 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{0, 1114}, {473, 20}}</string>
+					<string>{{0, 836}, {473, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{336, 721}, {295, 393}}</string>
+					<string>{{336, 443}, {295, 393}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2927,7 +2927,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">458</int>
+			<int key="maxID">459</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -6160,6 +6160,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>cancel:</string>
+							<string>deleteSelected:</string>
 							<string>restoreToCmdOneSet:</string>
 							<string>restoreWindowSet:</string>
 							<string>saveWindowSet:</string>
@@ -6174,6 +6175,7 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
@@ -6182,6 +6184,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>cmdOneSaveButton</string>
 							<string>cmdOneSetField</string>
+							<string>deleteButton</string>
 							<string>messageField</string>
 							<string>newSetNameField</string>
 							<string>restoreButton</string>
@@ -6191,6 +6194,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSButton</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>ORTimedTextField</string>
 							<string>NSTextField</string>
 							<string>NSButton</string>
@@ -6199,7 +6203,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Main Dialogs/WindowSaveSetManager/ORWindowSaveSet.h</string>
+						<string key="minorKey">Source/Main Dialogs/WindowSaveSet/ORWindowSaveSet.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
