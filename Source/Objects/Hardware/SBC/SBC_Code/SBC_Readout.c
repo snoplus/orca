@@ -801,14 +801,17 @@ void LogMessage (const char *format,...)
 
 void LogError (const char *format,...)
 {
-    if(strlen(format) > kSBC_MaxStrSize*.75){ //not a perfect check, but it will have to do....
-		int32_t i = kSBC_MaxStrSize*.75;
-		format[i] = '\0';
-	}
     va_list ap;
     va_start (ap, format);
+	int32_t len = strlen(format);
+    if(len > kSBC_MaxStrSize-1) {
+		len = kSBC_MaxStrSize-1;
+	}
+	char finalStr[kSBC_MaxStrSize];
+	strncpy(finalStr,format,len);
+	finalStr[len] = '\0';
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
-    vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
+    vsprintf (run_info.errorStrings[run_info.err_buf_index], finalStr, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     run_info.err_count++;
     pthread_mutex_unlock (&runInfoMutex);//end critical section
@@ -817,14 +820,17 @@ void LogError (const char *format,...)
 
 void LogBusError (const char *format,...)
 {
-    if(strlen(format) > kSBC_MaxStrSize*.75){//not a perfect check, but it will have to do....
-		int32_t i = kSBC_MaxStrSize*.75;
-		format[i] = '\0';
-	}
     va_list ap;
     va_start (ap, format);
+	int32_t len = strlen(format);
+    if(len > kSBC_MaxStrSize-1) { 
+		len = kSBC_MaxStrSize-1;
+	}
+	char finalStr[kSBC_MaxStrSize];
+	strncpy(finalStr,format,len);
+	finalStr[len] = '\0';
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
-    vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
+    vsprintf (run_info.errorStrings[run_info.err_buf_index], finalStr, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     run_info.err_count++;
     run_info.busErrorCount++;
