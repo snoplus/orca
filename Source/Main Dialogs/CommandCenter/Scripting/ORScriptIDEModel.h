@@ -101,6 +101,12 @@
 - (void) loadScriptFromFile:(NSString*)aFilePath;
 - (void) saveScriptToFile:(NSString*)aFilePath;
 - (id) evaluator;
+- (int) second;
+- (int) minute; 
+- (int) hour; 
+- (int) day; 
+- (int) month; 
+- (int) year; 
 
 //functions for testing script objC calls
 - (float) testNoArgFunc;

@@ -63,12 +63,6 @@
 - (id) valueForSymbol:(NSString*) aSymbol;
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol;
 - (void) setUpSysCallTable;
-- (int) second;
-- (int) minute; 
-- (int) hour; 
-- (int) day; 
-- (int) month; 
-- (int) year; 
 
 #pragma mark •••Finders and Makers
 - (id) findObject:(id) p;
