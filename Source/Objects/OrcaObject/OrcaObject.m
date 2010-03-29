@@ -930,6 +930,37 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 {
 	return 1;
 }
+
+- (int) second 
+{
+	return [[NSCalendarDate date] secondOfMinute];
+}
+
+- (int) minute 
+{
+	return [[NSCalendarDate date] minuteOfHour];
+}
+
+- (int) hour 
+{
+	return [[NSCalendarDate date] hourOfDay];
+}
+
+- (int) day 
+{
+	return [[NSCalendarDate date] dayOfMonth];
+}
+
+- (int) month 
+{
+	return [[NSCalendarDate date] monthOfYear];
+}
+
+- (int)year 
+{
+	return [[NSCalendarDate date] yearOfCommonEra];
+}
+
 @end
 
 @implementation NSObject (OrcaObject_Catagory)
