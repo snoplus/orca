@@ -398,6 +398,18 @@
 	
 }
 
+//scripting helper
+- (void) savePlotToFile:(NSString*)aFile
+{
+	aFile = [aFile stringByExpandingTildeInPath];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:aFile]){
+		[fm removeItemAtPath:aFile error:nil];
+	}
+	NSData* pdfData = [plotter plotAsPDFData];
+	[pdfData writeToFile:aFile atomically:NO];
+}
+
 
 @end
 

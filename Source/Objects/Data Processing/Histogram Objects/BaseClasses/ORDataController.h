@@ -73,6 +73,9 @@
 - (IBAction) pauseAction:(id)sender;
 - (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
+//scripting helper
+- (void) savePlotToFile:(NSString*)aFile;
+
 @end
 
 @interface NSObject (ORDataController_Cat)
