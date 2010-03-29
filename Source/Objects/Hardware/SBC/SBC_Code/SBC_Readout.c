@@ -801,7 +801,10 @@ void LogMessage (const char *format,...)
 
 void LogError (const char *format,...)
 {
-    if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
+    if(strlen(format) > kSBC_MaxStrSize*.75){ //not a perfect check, but it will have to do....
+		int32_t i = kSBC_MaxStrSize*.75;
+		format[i] = '\0';
+	}
     va_list ap;
     va_start (ap, format);
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
@@ -814,7 +817,10 @@ void LogError (const char *format,...)
 
 void LogBusError (const char *format,...)
 {
-    if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
+    if(strlen(format) > kSBC_MaxStrSize*.75){//not a perfect check, but it will have to do....
+		int32_t i = kSBC_MaxStrSize*.75;
+		format[i] = '\0';
+	}
     va_list ap;
     va_start (ap, format);
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
