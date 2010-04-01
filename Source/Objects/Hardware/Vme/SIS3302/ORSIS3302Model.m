@@ -1092,7 +1092,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	int i;
 	unsigned long tempIntGateMask  = ~internalGateEnabledMask;
 	unsigned long tempExtGateMask  = ~externalGateEnabledMask;
-	
 	ORCommandList* aList = [ORCommandList commandList];
 	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
@@ -1108,6 +1107,9 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		aValueMask |= ((tempExtGateMask & (1<<(i*2)))!=0)       << 5;
 		aValueMask |= ((tempExtGateMask & (1<<((i*2)+1)))!=0)   << 13;
 		
+		aValueMask |= ((inputInvertedMask & (1<<(i*2)))!=0)       << 0;
+		aValueMask |= ((inputInvertedMask & (1<<((i*2)+1)))!=0)   << 8;
+				
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
 													   atAddress: [self baseAddress] + [self getEventConfigOffsets:i]
 													  numToWrite: 1
