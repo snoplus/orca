@@ -123,6 +123,7 @@
 - (void) setLogFile:(NSString*)aLogFile;
 - (BOOL) logToFile;
 - (void) setLogToFile:(BOOL)aLogToFile;
+- (int) queCount;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -174,3 +175,5 @@ extern NSString* ORPacModelMultiPlotsChanged;
 extern NSString* ORPacModelPollingStateChanged;
 extern NSString* ORPacModelLogToFileChanged;
 extern NSString* ORPacModelLogFileChanged;
+extern NSString* ORPacModelQueCountChanged;
+

@@ -26,6 +26,7 @@
 	IBOutlet NSTableView*	rdacTableView;
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSButton*		setAllRDacsButton;
+	IBOutlet NSTextField*	cmdQueCountField;
 	IBOutlet NSTextField*	rdacChannelTextField;
 	IBOutlet NSTextField*	preAmpTextField;
 	IBOutlet NSTextField*	moduleTextField;
@@ -86,6 +87,7 @@
 - (void) logToFileChanged:(NSNotification*)aNote;
 - (void) loadAdcTimeValuesForIndex:(int)index;
 - (void) logFileChanged:(NSNotification*)aNote;
+- (void) queueCountChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) setAllRDacsAction:(id)sender;

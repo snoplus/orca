@@ -170,7 +170,10 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
-	
+    [notifyCenter addObserver : self
+					 selector : @selector(queCountChanged:)
+						 name : ORPacModelQueCountChanged
+					   object : nil];	
 }
 
 - (void) setModel:(id)aModel
@@ -198,6 +201,7 @@
 	[self logFileChanged:nil];
     [self pollingStateChanged:nil];
     [self miscAttributesChanged:nil];
+	[self queueCountChanged:nil];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -270,6 +274,11 @@
 - (void) pollingStateChanged:(NSNotification*)aNotification
 {
 	[pollingButton selectItemAtIndex:[pollingButton indexOfItemWithTag:[model pollingState]]];
+}
+
+- (void) queueCountChanged:(NSNotification*)aNotification
+{
+	[cmdQueCountField setIntValue:[model queCount]];
 }
 
 - (void) logFileChanged:(NSNotification*)aNote

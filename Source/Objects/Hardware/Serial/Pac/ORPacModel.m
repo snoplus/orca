@@ -45,6 +45,7 @@ NSString* ORPacModelPollingStateChanged	= @"ORPacModelPollingStateChangedNotific
 NSString* ORPacModelMultiPlotsChanged	= @"ORPacModelMultiPlotsChanged";
 NSString* ORPacModelLogToFileChanged	= @"ORPacModelLogToFileChanged";
 NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
+NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 
 @interface ORPacModel (private)
 - (void) timeout;
@@ -129,6 +130,11 @@ NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 }
 
 #pragma mark •••Accessors
+- (int) queCount
+{
+	return [cmdQueue count];
+}
+
 - (ORTimeRate*)timeRate:(int)index
 {
 	return timeRates[index];
@@ -548,7 +554,7 @@ NSString* ORPacModelLogFileChanged		= @"ORPacModelLogFileChanged";
 {
 	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	[cmdQueue addObject:someData];
-	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
 	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
