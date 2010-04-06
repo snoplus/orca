@@ -87,7 +87,7 @@
 - (void) logToFileChanged:(NSNotification*)aNote;
 - (void) loadAdcTimeValuesForIndex:(int)index;
 - (void) logFileChanged:(NSNotification*)aNote;
-- (void) queueCountChanged:(NSNotification*)aNote;
+- (void) queCountChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) setAllRDacsAction:(id)sender;

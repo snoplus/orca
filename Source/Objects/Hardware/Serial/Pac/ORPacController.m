@@ -201,7 +201,7 @@
 	[self logFileChanged:nil];
     [self pollingStateChanged:nil];
     [self miscAttributesChanged:nil];
-	[self queueCountChanged:nil];
+	[self queCountChanged:nil];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -276,7 +276,7 @@
 	[pollingButton selectItemAtIndex:[pollingButton indexOfItemWithTag:[model pollingState]]];
 }
 
-- (void) queueCountChanged:(NSNotification*)aNotification
+- (void) queCountChanged:(NSNotification*)aNotification
 {
 	[cmdQueCountField setIntValue:[model queCount]];
 }

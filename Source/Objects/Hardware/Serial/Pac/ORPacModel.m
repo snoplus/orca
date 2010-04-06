@@ -802,7 +802,9 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"PAC",@"command timeout",nil);
 	[self setLastRequest:nil];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
+	[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
+	//[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
 - (void) processOneCommandFromQueue
@@ -810,10 +812,13 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	if([cmdQueue count] == 0) return;
 	NSData* cmdData = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
 	unsigned char* cmd = (unsigned char*)[cmdData bytes];
 	if(cmd[0] == kPacShipAdcs){
+		[self setLastRequest:nil];
 		[self shipAdcValues];
 		[self loadLogBuffer];
+		[self processOneCommandFromQueue];
 	}
 	else {
 		[self setLastRequest:cmdData];
@@ -850,8 +855,10 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 
 - (void) _pollAllChannels
 {
+	float nextTry = pollingState;
     @try { 
-        [self readAdcs]; 
+		if([cmdQueue count] == 0)[self readAdcs];
+		else nextTry = .5;
     }
 	@catch(NSException* localException) { 
 		//catch this here to prevent it from falling thru, but nothing to do.
@@ -859,7 +866,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
 	if(pollingState!=0){
-		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
+		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:nextTry];
 	}
 }
 
