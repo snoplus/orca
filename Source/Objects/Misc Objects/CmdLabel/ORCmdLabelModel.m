@@ -83,6 +83,12 @@ NSString* ORCmdLableDetailsChanged  = @"ORCmdLableDetailsChanged";
 	scheduledForUpdate = NO;
 }
 
+- (NSString*) helpURL
+{
+	//return @"Subsystems/Containers_and_Dynamic_Labels.html";
+	return nil;
+}
+
 #pragma mark ***Accessors
 
 - (void) postDetailsChanged
