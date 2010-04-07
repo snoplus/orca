@@ -18,9 +18,55 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
 @implementation NSInvocation (OrcaExtensions)
+
+//parse a string of the form method:var1 name:var2 ....	to selector			
++ (NSArray*) argumentsListFromSelector:(NSString*) aSelectorString
+{
+	NSCharacterSet* delimiterset = [NSCharacterSet characterSetWithCharactersInString:@": "];
+	NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
+	NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
+	
+	aSelectorString		     = [aSelectorString stringByTrimmingCharactersInSet:trimSet]; //get rid of leading white space the user might have put in
+	NSScanner* 	scanner      = [NSScanner scannerWithString:aSelectorString];
+	NSMutableArray* cmdItems = [NSMutableArray array];
+	
+	//parse a string of the form method:var1 name:var2 ....				
+	while(![scanner isAtEnd]) {
+		NSString*  result = [NSString string];
+		[scanner scanUpToCharactersFromSet:inverteddelimiterset intoString:nil];            //skip leading delimiters
+		if([scanner scanUpToCharactersFromSet:delimiterset intoString:&result]){            //store up to next delimiter
+			if([result length]){
+				[cmdItems addObject:result];
+			}
+		}
+	}
+	return cmdItems;
+}
+
++ (SEL) makeSelectorFromString:(NSString*) aSelectorString
+{
+	NSCharacterSet* delimiterset = [NSCharacterSet characterSetWithCharactersInString:@": "];
+	NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
+	NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
+
+	aSelectorString		     = [aSelectorString stringByTrimmingCharactersInSet:trimSet]; //get rid of leading white space the user might have put in
+	NSScanner* 	scanner      = [NSScanner scannerWithString:aSelectorString];
+	NSMutableArray* cmdItems = [NSMutableArray array];
+	
+	//parse a string of the form method:var1 name:var2 ....				
+	while(![scanner isAtEnd]) {
+		NSString*  result = [NSString string];
+		[scanner scanUpToCharactersFromSet:inverteddelimiterset intoString:nil];            //skip leading delimiters
+		if([scanner scanUpToCharactersFromSet:delimiterset intoString:&result]){            //store up to next delimiter
+			if([result length]){
+				[cmdItems addObject:result];
+			}
+		}
+	}
+	return [NSInvocation makeSelectorFromArray:cmdItems];
+}
+
 + (SEL) makeSelectorFromArray:(NSArray*)cmdItems
 {
     int n = [cmdItems count];
@@ -29,7 +75,8 @@
     if(n>1)for(i=0;i<n;i+=2){
         [theSelectorString appendFormat:@"%@:",[cmdItems objectAtIndex:i]];
     }
-        else [theSelectorString appendFormat:@"%@",[cmdItems objectAtIndex:i]];
+	else if(i<n)[theSelectorString appendFormat:@"%@",[cmdItems objectAtIndex:i]];
+	else theSelectorString = [NSMutableString stringWithString:@""];
     
     return NSSelectorFromString(theSelectorString);
 }

@@ -23,6 +23,8 @@
 
 @interface NSInvocation (OrcaExtensions) 
 
++ (NSArray*) argumentsListFromSelector:(NSString*) aSelectorString;
++ (SEL) makeSelectorFromString:(NSString*) aSelectorString;
 + (SEL) makeSelectorFromArray:(NSArray*)cmdItems;
 + (id) invoke:(NSString*)args withTarget:(id)aTarget;
 - (BOOL) setArgument:(int)argIndex to:(id)aVal;
