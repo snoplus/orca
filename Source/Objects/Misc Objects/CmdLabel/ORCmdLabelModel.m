@@ -62,8 +62,8 @@ NSString* ORCmdLableDetailsChanged  = @"ORCmdLableDetailsChanged";
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
     //so, we cache the image here so that each Label can have its own version for drawing into.
     //---------------------------------------------------------------------------------------------------
-	if(label){
-		NSAttributedString* n = [self stringToDisplay:NO];
+	NSAttributedString* n = [self stringToDisplay:NO];
+	if(n){
 		if([n length] == 0)n = [[[NSMutableAttributedString alloc] initWithString:@"Cmd Label" attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 																											 [NSFont fontWithName:@"Monaco" size:textSize],NSFontAttributeName,nil]] autorelease];
 		NSSize theSize = [n size];
@@ -77,7 +77,7 @@ NSString* ORCmdLableDetailsChanged  = @"ORCmdLableDetailsChanged";
 		[i release];
     }
 	else {
-		[self setImage:[NSImage imageNamed:@"Label"]];
+		[self setImage:[NSImage imageNamed:@"CmdLabel"]];
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
 	scheduledForUpdate = NO;
