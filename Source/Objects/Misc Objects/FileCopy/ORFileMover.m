@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORFileMover.h"
+#import "ORTaskSequence.h"
 
 NSString* ORFileMoverIsDoneNotification = @"ORFileMover Is Done Notification";
 NSString* ORFileMoverCopiedFile         = @"ORFileMoverCopiedFile";
@@ -251,7 +252,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     NSMutableDictionary* environment = [[NSMutableDictionary alloc] initWithDictionary:defaultEnvironment];
     [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
     [task setEnvironment: environment];
-    
+    NSString* tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
     if([self transferType] == eUseCURL){
 		
         [task setLaunchPath:@"/usr/bin/curl"];
@@ -261,7 +262,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
         [params addObject:[NSString stringWithFormat:@"%@",[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]]];
         [params addObject:@"-u"];
         [params addObject:[NSString stringWithFormat:@"%@:%@",remoteUserName,remotePassWord]];
-        [params addObject:[NSString stringWithFormat:@"sftp://%@/%@",remoteHost,remotePath]];
+        [params addObject:[NSString stringWithFormat:@"sftp://%@/%@",remoteHost,tmpRemotePath]];
         //[params addObject:@"--create-dirs"];
 		
         if(verbose)[params addObject:@"-v"];
@@ -289,7 +290,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					[theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
 					[theScript replace:@"<userName>" with:remoteUserName];
 					[theScript replace:@"<host>" with:remoteHost];
-					[theScript replace:@"<destinationPath>" with:remotePath];
+					[theScript replace:@"<destinationPath>" with:tmpRemotePath];
 					[theScript replace:@"<password>" with:remotePassWord];
 					[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 				}
@@ -306,7 +307,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					[theScript replace:@"<host>" with:remoteHost];
 					[theScript replace:@"<password>" with:remotePassWord];
 					[theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
-					[theScript replace:@"<destinationPath>" with:remotePath];
+					[theScript replace:@"<destinationPath>" with:tmpRemotePath];
 					[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 				}
                     break;
@@ -420,6 +421,19 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                 else [self moveToSentFolder];
             }
             else [self moveToSentFolder];
+			NSString* tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
+
+			ORTaskSequence* aSequence;	
+			NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+			aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+			[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginExpectScript"] 
+					 arguments:[NSArray arrayWithObjects:remoteUserName,remotePassWord,remoteHost,@"mv",tmpRemotePath,remotePath,nil]];
+			
+			[aSequence setVerbose:YES];
+			[aSequence setTextToDelegate:YES];
+			
+			[aSequence launch];
+			
         }
         else {
             NSLogColor([NSColor redColor],@"FAILED to copy %@ to %@@%@:%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteUserName,remoteHost,remotePath);	

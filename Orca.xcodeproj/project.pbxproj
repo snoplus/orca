@@ -1778,6 +1778,14 @@
 		84B74CEA0FEBE9B90033E658 /* ORCaen965Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B74CE40FEBE9B90033E658 /* ORCaen965Controller.m */; };
 		84B74CEB0FEBE9B90033E658 /* ORCaen965Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B74CE50FEBE9B90033E658 /* ORCaen965Model.h */; };
 		84B74CEC0FEBE9B90033E658 /* ORCaen965Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B74CE60FEBE9B90033E658 /* ORCaen965Model.m */; };
+		84B7545E1160E01C00667631 /* CC4189.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B754561160E01C00667631 /* CC4189.nib */; };
+		84B7545F1160E01C00667631 /* ORCC4189Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B754571160E01C00667631 /* ORCC4189Controller.h */; };
+		84B754601160E01C00667631 /* ORCC4189Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B754581160E01C00667631 /* ORCC4189Controller.m */; };
+		84B754611160E01C00667631 /* ORCC4189Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B754591160E01C00667631 /* ORCC4189Decoders.h */; };
+		84B754621160E01C00667631 /* ORCC4189Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7545A1160E01C00667631 /* ORCC4189Decoders.m */; };
+		84B754631160E01C00667631 /* ORCC4189Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B7545B1160E01C00667631 /* ORCC4189Model.h */; };
+		84B754641160E01C00667631 /* ORCC4189Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7545C1160E01C00667631 /* ORCC4189Model.m */; };
+		84B754671160E03D00667631 /* CC4189.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B754661160E03D00667631 /* CC4189.gif */; };
 		84B771400DB3DFBB004798B2 /* ORCaen1720Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B7713E0DB3DFBB004798B2 /* ORCaen1720Decoder.h */; };
 		84B771410DB3DFBB004798B2 /* ORCaen1720Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7713F0DB3DFBB004798B2 /* ORCaen1720Decoder.m */; };
 		84B7F8D60820551F00721869 /* bigdotcolormask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7F8D30820551F00721869 /* bigdotcolormask.tif */; };
@@ -2087,6 +2095,13 @@
 		84F480560CB047C1007EFADA /* ORIpeSLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F480540CB047C1007EFADA /* ORIpeSLTDecoder.m */; };
 		84F4B4D20822A875001F48F5 /* ORTimedTextField.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F4B4D00822A875001F48F5 /* ORTimedTextField.h */; };
 		84F4B4D30822A875001F48F5 /* ORTimedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F4B4D10822A875001F48F5 /* ORTimedTextField.m */; };
+		84F50A2C116B7151000275F2 /* CmdLabel.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F50A26116B7151000275F2 /* CmdLabel.nib */; };
+		84F50A2D116B7151000275F2 /* CmdLabel.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84F50A27116B7151000275F2 /* CmdLabel.tif */; };
+		84F50A2E116B7151000275F2 /* ORCmdLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F50A28116B7151000275F2 /* ORCmdLabelController.h */; };
+		84F50A2F116B7151000275F2 /* ORCmdLabelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F50A29116B7151000275F2 /* ORCmdLabelController.m */; };
+		84F50A30116B7151000275F2 /* ORCmdLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F50A2A116B7151000275F2 /* ORCmdLabelModel.h */; };
+		84F50A31116B7151000275F2 /* ORCmdLabelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F50A2B116B7151000275F2 /* ORCmdLabelModel.m */; };
+		84F50E14116CCAEE000275F2 /* loginExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84F50E13116CCAEE000275F2 /* loginExpectScript */; };
 		84F5E10D0A151D9300707A0F /* ORBasicOpenGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F5E10B0A151D9300707A0F /* ORBasicOpenGLView.h */; };
 		84F5E10E0A151D9300707A0F /* ORBasicOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F5E10C0A151D9300707A0F /* ORBasicOpenGLView.m */; };
 		84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84F5E11A0A151E0B00707A0F /* OpenGL.framework */; };
@@ -3963,6 +3978,14 @@
 		84B74CE40FEBE9B90033E658 /* ORCaen965Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen965Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Controller.m; sourceTree = SOURCE_ROOT; };
 		84B74CE50FEBE9B90033E658 /* ORCaen965Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen965Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Model.h; sourceTree = SOURCE_ROOT; };
 		84B74CE60FEBE9B90033E658 /* ORCaen965Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen965Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Model.m; sourceTree = SOURCE_ROOT; };
+		84B754561160E01C00667631 /* CC4189.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CC4189.nib; path = Source/Objects/Hardware/Serial/CC4189/CC4189.nib; sourceTree = SOURCE_ROOT; };
+		84B754571160E01C00667631 /* ORCC4189Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCC4189Controller.h; path = Source/Objects/Hardware/Serial/CC4189/ORCC4189Controller.h; sourceTree = SOURCE_ROOT; };
+		84B754581160E01C00667631 /* ORCC4189Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCC4189Controller.m; path = Source/Objects/Hardware/Serial/CC4189/ORCC4189Controller.m; sourceTree = SOURCE_ROOT; };
+		84B754591160E01C00667631 /* ORCC4189Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCC4189Decoders.h; path = Source/Objects/Hardware/Serial/CC4189/ORCC4189Decoders.h; sourceTree = SOURCE_ROOT; };
+		84B7545A1160E01C00667631 /* ORCC4189Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCC4189Decoders.m; path = Source/Objects/Hardware/Serial/CC4189/ORCC4189Decoders.m; sourceTree = SOURCE_ROOT; };
+		84B7545B1160E01C00667631 /* ORCC4189Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCC4189Model.h; path = Source/Objects/Hardware/Serial/CC4189/ORCC4189Model.h; sourceTree = SOURCE_ROOT; };
+		84B7545C1160E01C00667631 /* ORCC4189Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCC4189Model.m; path = Source/Objects/Hardware/Serial/CC4189/ORCC4189Model.m; sourceTree = SOURCE_ROOT; };
+		84B754661160E03D00667631 /* CC4189.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CC4189.gif; sourceTree = "<group>"; };
 		84B7713E0DB3DFBB004798B2 /* ORCaen1720Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1720Decoder.h; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Decoder.h; sourceTree = SOURCE_ROOT; };
 		84B7713F0DB3DFBB004798B2 /* ORCaen1720Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Decoder.m; sourceTree = SOURCE_ROOT; };
 		84B7DF8604E1A425005F64B1 /* ORRateGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRateGroup.h; sourceTree = "<group>"; };
@@ -4367,6 +4390,13 @@
 		84F480540CB047C1007EFADA /* ORIpeSLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORIpeSLTDecoder.m; path = "Source/Objects/Hardware/IPE/IPE SLT/ORIpeSLTDecoder.m"; sourceTree = SOURCE_ROOT; };
 		84F4B4D00822A875001F48F5 /* ORTimedTextField.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTimedTextField.h; sourceTree = "<group>"; };
 		84F4B4D10822A875001F48F5 /* ORTimedTextField.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTimedTextField.m; sourceTree = "<group>"; };
+		84F50A26116B7151000275F2 /* CmdLabel.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CmdLabel.nib; path = "Source/Objects/Misc Objects/CmdLabel/CmdLabel.nib"; sourceTree = SOURCE_ROOT; };
+		84F50A27116B7151000275F2 /* CmdLabel.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CmdLabel.tif; path = "Source/Objects/Misc Objects/CmdLabel/CmdLabel.tif"; sourceTree = SOURCE_ROOT; };
+		84F50A28116B7151000275F2 /* ORCmdLabelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCmdLabelController.h; path = "Source/Objects/Misc Objects/CmdLabel/ORCmdLabelController.h"; sourceTree = SOURCE_ROOT; };
+		84F50A29116B7151000275F2 /* ORCmdLabelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCmdLabelController.m; path = "Source/Objects/Misc Objects/CmdLabel/ORCmdLabelController.m"; sourceTree = SOURCE_ROOT; };
+		84F50A2A116B7151000275F2 /* ORCmdLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCmdLabelModel.h; path = "Source/Objects/Misc Objects/CmdLabel/ORCmdLabelModel.h"; sourceTree = SOURCE_ROOT; };
+		84F50A2B116B7151000275F2 /* ORCmdLabelModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCmdLabelModel.m; path = "Source/Objects/Misc Objects/CmdLabel/ORCmdLabelModel.m"; sourceTree = SOURCE_ROOT; };
+		84F50E13116CCAEE000275F2 /* loginExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = loginExpectScript; sourceTree = "<group>"; };
 		84F5E10B0A151D9300707A0F /* ORBasicOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBasicOpenGLView.h; path = "Source/Objects/Misc Objects/Views/OpenGLView/ORBasicOpenGLView.h"; sourceTree = SOURCE_ROOT; };
 		84F5E10C0A151D9300707A0F /* ORBasicOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBasicOpenGLView.m; path = "Source/Objects/Misc Objects/Views/OpenGLView/ORBasicOpenGLView.m"; sourceTree = SOURCE_ROOT; };
 		84F5E11A0A151E0B00707A0F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
@@ -5760,6 +5790,7 @@
 				2A178EB608DB3F66001D78BC /* FireWire */,
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
 				849013BD10E27B13007591B5 /* PlotLink */,
+				84F50A25116B7151000275F2 /* CmdLabel */,
 				849516AF10C95382001C8112 /* StateLabel */,
 				840B8135094E4D8D00B1B135 /* Label */,
 				847597450B5EF26500123411 /* SQL */,
@@ -6324,6 +6355,7 @@
 				84098F4D0F964F0100036BE8 /* PDcu */,
 				840D56D70F39E9BF00F9A274 /* Pac */,
 				84B28D180F4C614000E2B056 /* XYScanner */,
+				84B754541160E01C00667631 /* CC4189 */,
 				84D791320FFA4CD000DC81D2 /* Keithley6487 */,
 				84B28D340F4C63A000E2B056 /* LakeShore210 */,
 				84B28D830F4C66BE00E2B056 /* VXM */,
@@ -8229,6 +8261,22 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV965;
 			sourceTree = SOURCE_ROOT;
 		};
+		84B754541160E01C00667631 /* CC4189 */ = {
+			isa = PBXGroup;
+			children = (
+				84B754661160E03D00667631 /* CC4189.gif */,
+				84B754561160E01C00667631 /* CC4189.nib */,
+				84B754571160E01C00667631 /* ORCC4189Controller.h */,
+				84B754581160E01C00667631 /* ORCC4189Controller.m */,
+				84B754591160E01C00667631 /* ORCC4189Decoders.h */,
+				84B7545A1160E01C00667631 /* ORCC4189Decoders.m */,
+				84B7545B1160E01C00667631 /* ORCC4189Model.h */,
+				84B7545C1160E01C00667631 /* ORCC4189Model.m */,
+			);
+			name = CC4189;
+			path = Source/Objects/Hardware/Serial/CC4189;
+			sourceTree = SOURCE_ROOT;
+		};
 		84B7DF9C04E1C53D005F64B1 /* Bar Graph */ = {
 			isa = PBXGroup;
 			children = (
@@ -8967,6 +9015,7 @@
 				848463A60625D65F00128299 /* ORSmartFolder.m */,
 				845498C310628DF400F8DE1C /* scpExpectScript */,
 				84B74ACF0FEAAB460033E658 /* ftpExpectScript */,
+				84F50E13116CCAEE000275F2 /* loginExpectScript */,
 				848463B70625D76A00128299 /* SmartFolder.nib */,
 			);
 			name = FileMover;
@@ -9189,6 +9238,20 @@
 			);
 			name = TimedTextField;
 			path = "Source/Objects/Misc Objects/Views/TimedTextField";
+			sourceTree = SOURCE_ROOT;
+		};
+		84F50A25116B7151000275F2 /* CmdLabel */ = {
+			isa = PBXGroup;
+			children = (
+				84F50A26116B7151000275F2 /* CmdLabel.nib */,
+				84F50A27116B7151000275F2 /* CmdLabel.tif */,
+				84F50A28116B7151000275F2 /* ORCmdLabelController.h */,
+				84F50A29116B7151000275F2 /* ORCmdLabelController.m */,
+				84F50A2A116B7151000275F2 /* ORCmdLabelModel.h */,
+				84F50A2B116B7151000275F2 /* ORCmdLabelModel.m */,
+			);
+			name = CmdLabel;
+			path = "Source/Objects/Misc Objects/CmdLabel";
 			sourceTree = SOURCE_ROOT;
 		};
 		84F5E10A0A151D9300707A0F /* OpenGLView */ = {
@@ -10638,6 +10701,11 @@
 				843175D21152766E005643AB /* HaloDetectorView.h in Headers */,
 				843175D41152766E005643AB /* HaloModel.h in Headers */,
 				840DEA25115D7981006AF231 /* ORWindowSaveSet.h in Headers */,
+				84B7545F1160E01C00667631 /* ORCC4189Controller.h in Headers */,
+				84B754611160E01C00667631 /* ORCC4189Decoders.h in Headers */,
+				84B754631160E01C00667631 /* ORCC4189Model.h in Headers */,
+				84F50A2E116B7151000275F2 /* ORCmdLabelController.h in Headers */,
+				84F50A30116B7151000275F2 /* ORCmdLabelModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11318,6 +11386,11 @@
 				843175CD1152766E005643AB /* Halo.gif in Resources */,
 				843175CE1152766E005643AB /* Halo.nib in Resources */,
 				840DEA27115D7981006AF231 /* WindowSaveSet.nib in Resources */,
+				84B7545E1160E01C00667631 /* CC4189.nib in Resources */,
+				84B754671160E03D00667631 /* CC4189.gif in Resources */,
+				84F50A2C116B7151000275F2 /* CmdLabel.nib in Resources */,
+				84F50A2D116B7151000275F2 /* CmdLabel.tif in Resources */,
+				84F50E14116CCAEE000275F2 /* loginExpectScript in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12077,6 +12150,11 @@
 				843175D31152766E005643AB /* HaloDetectorView.m in Sources */,
 				843175D51152766E005643AB /* HaloModel.m in Sources */,
 				840DEA26115D7981006AF231 /* ORWindowSaveSet.m in Sources */,
+				84B754601160E01C00667631 /* ORCC4189Controller.m in Sources */,
+				84B754621160E01C00667631 /* ORCC4189Decoders.m in Sources */,
+				84B754641160E01C00667631 /* ORCC4189Model.m in Sources */,
+				84F50A2F116B7151000275F2 /* ORCmdLabelController.m in Sources */,
+				84F50A31116B7151000275F2 /* ORCmdLabelModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
