@@ -110,6 +110,7 @@
 - (id) dbObjectByName:(NSString*)aKey;
 - (void) setMtcDataBase:(NSMutableDictionary*)aNestedDictionary;
 - (unsigned long) memBaseAddress;
+- (unsigned long) memAddressModifier;
 - (unsigned long) baseAddress;
 
 - (short) dbLookTableSize;

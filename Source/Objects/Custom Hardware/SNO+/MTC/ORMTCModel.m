@@ -73,7 +73,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 { @"PmskReg"		, 32  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //8
 { @"ScaleReg"		, 36  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //9
 { @"BwrAddOutReg"	, 40  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //10
-{ @"BbaReg"			, 44  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //11
+{ @"BbaReg"		, 44  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //11
 { @"GtLockReg"		, 48  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //12
 { @"MaskReg"		, 52  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //13
 { @"XilProgReg"		, 56  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //14
@@ -495,6 +495,11 @@ kPEDCrateMask
     return kMTCMemAddressBase;
 }
 
+- (unsigned long) memAddressModifier
+{
+	return kMTCMemAddressModifier;
+}
+
 - (unsigned long) baseAddress
 {
     return kMTCRegAddressBase;
@@ -563,10 +568,10 @@ kPEDCrateMask
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORMTCDecoderForMTC",								@"decoder",
-								 [NSNumber numberWithLong:dataId],					@"dataId",
-								 [NSNumber numberWithBool:NO],						@"variable",
-								 [NSNumber numberWithLong:10],						@"length",  //****put in actual length
+								 @"ORMTCDecoderForMTC",	@"decoder",
+								 [NSNumber numberWithLong:dataId], @"dataId",
+								 [NSNumber numberWithBool:NO], @"variable",
+								 [NSNumber numberWithLong:7], @"length",  //****put in actual length
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"MTC"];
     
@@ -651,13 +656,21 @@ kPEDCrateMask
     configStruct->card_info[index].slot				= [self slot];
     configStruct->card_info[index].add_mod			= [self addressModifier];
     configStruct->card_info[index].base_add			= [self baseAddress];
-    
-	configStruct->card_info[index].deviceSpecificData[0] = [self memoryOffset];
-	configStruct->card_info[index].deviceSpecificData[1] = 0x01; //address space for the reg access
-	configStruct->card_info[index].deviceSpecificData[2] = 0x02; //address space for the memory access
+	configStruct->card_info[index].deviceSpecificData[0] = reg[kMtcBbaReg].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[1] = reg[kMtcBwrAddOutReg].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
+	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];	
+	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
+	configStruct->card_info[index].next_Card_Index = index + 1;
 	
-    configStruct->card_info[index].num_Trigger_Indexes = 1;
-    int nextIndex = index+1;
+	return index + 1;
+
+	
+// this doesn't work in the XL3 push mode
+// it would be great if it did
+/*
+	configStruct->card_info[index].num_Trigger_Indexes = 1;
+	int nextIndex = index+1;
     
 	configStruct->card_info[index].next_Trigger_Index[0] = -1;
 	NSEnumerator* e = [dataTakers objectEnumerator];
@@ -678,6 +691,8 @@ kPEDCrateMask
     configStruct->card_info[index].next_Card_Index 	 = nextIndex;
     
     return nextIndex;
+*/
+	
 }
 
 
