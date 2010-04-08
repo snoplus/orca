@@ -1,7 +1,7 @@
-#include "ORFECReadout.hh"
-#include <cmath>
+#include "ORSNOCrateReadout.hh"
 #include "readout_code.h" 
-bool ORFECReadout::Readout(SBC_LAM_Data* lamData)
+
+bool ORSNOCrateReadout::Readout(SBC_LAM_Data* lamData)
 {
     //uint32_t baseAddress            = GetBaseAddress() 
     //uint32_t conversionRegOffset    = GetDeviceSpecificData()[1];
@@ -10,3 +10,4 @@ bool ORFECReadout::Readout(SBC_LAM_Data* lamData)
 	
     return true; 
 }
+
