@@ -52,6 +52,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 {
     if( self = [super init] ){
         [NSBundle loadNibNamed: @"ORTask" owner: self];	
+		[self setTaskState:eRunStopped];
     }
     return self;
 }
@@ -333,7 +334,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 
 - (void) startTask
 {
-	if([self taskState] != eTaskStopped)return;
+	if([self taskState] == eTaskRunning)return;
 	[startButton setTitle:@"Stop"];
     NSLog(@"Starting Task: %@\n",[titleField stringValue]);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTaskDidStartNotification object:self];
@@ -444,8 +445,8 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     if(taskState == eTaskRunning || taskState == eTaskWaiting){
         [willRepeatMatrix setEnabled:NO];
         [delayStartCB setEnabled:NO];
-        [timeDelayField setEnabled:NO];
-        [timeDelayStepper setEnabled:NO];
+        [timeDelayField setEnabled:YES];
+        [timeDelayStepper setEnabled:YES];
         [timeIntervalField setEnabled:NO];
         [timeIntervalStepper setEnabled:NO];
         [self enableGUI:NO];
