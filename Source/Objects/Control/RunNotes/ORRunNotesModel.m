@@ -165,17 +165,17 @@ NSString* ORRunNotesListLock				 = @"ORRunNotesListLock";
 		if(!myWindow)continueRun = YES;
 		else {
 			[self setIsModal:YES];
-			int result = 0;
+			modalResult = 0;
 			NSModalSession session = [NSApp beginModalSessionForWindow:myWindow];
 			for (;;) {
-				result = [NSApp runModalSession:session];
+				NSInteger result = [NSApp runModalSession:session];
 				if (result != NSRunContinuesResponse){
 					break;
 				}
 			}
 			[NSApp endModalSession:session];
 			[self setIsModal:NO];
-			continueRun = result;
+			continueRun = modalResult;
 		}
 	}	
 	return continueRun;
@@ -183,14 +183,16 @@ NSString* ORRunNotesListLock				 = @"ORRunNotesListLock";
 
 - (void) cancelRun
 {
-	NSLog(@"got cancel\n");
-	[NSApp stopModalWithCode:0];
+	NSLog(@"RunNotes canceling run\n");
+	[NSApp stopModalWithCode:0]; //Arg... seems to have no effect
+	modalResult = 0;			 //so we have to set this variable
 	[self setIsModal:NO];
 }
 
 - (void) continueWithRun
 {
-	[NSApp stopModalWithCode:1];
+	[NSApp stopModalWithCode:1]; //Arg... seems to have no effect
+	modalResult = 1;			 //so we have to set this variable
 	[self setIsModal:NO];
 }
 

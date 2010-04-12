@@ -33,6 +33,7 @@
     BOOL ignoreValues;
     BOOL doNotOpen;
 	BOOL isModal;
+	BOOL modalResult;
  }
 
 #pragma mark •••Accessors
