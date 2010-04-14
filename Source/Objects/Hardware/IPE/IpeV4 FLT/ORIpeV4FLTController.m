@@ -696,7 +696,7 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	// Set title of FLT configuration window, ak 15.6.07
-	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V4 FLT Card (Slot %d)",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V4 FLT Card (StationNumber %d)",[model stationNumber]]];
     [fltSlotNumTextField setStringValue: [NSString stringWithFormat:@"FLT %d",[model stationNumber]]];
 }
 
@@ -838,7 +838,7 @@
 {
 	[noiseFloorPanel endEditingFor:nil];		
     @try {
-        NSLog(@"IPE V4 FLT (slot %d) Finding Thresholds \n",[model slot]);
+        NSLog(@"IPE V4 FLT (StationNumber %d) Finding Thresholds \n",[model stationNumber]);
 		[model findNoiseFloors];
     }
 	@catch(NSException* localException) {
