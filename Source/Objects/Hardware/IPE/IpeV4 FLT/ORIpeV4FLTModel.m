@@ -211,6 +211,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return (eventMask & (1L<<chan)) != 0;
 }
 
+- (int) stationNumber
+{
+	if([self slot]<11)return [self slot]+1;
+	else return [self slot] + 2;
+}
+
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
