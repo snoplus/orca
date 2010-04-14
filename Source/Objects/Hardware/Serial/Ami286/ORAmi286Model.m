@@ -65,7 +65,6 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) stopExpiredTimer:(int)i;
 - (void) addReason:(NSString*) aReason;
 - (void) clearReasons;
-
 @end
 
 @implementation ORAmi286Model
@@ -446,6 +445,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 				[self scheduleStatusSend];
 			}
 			if(sendOnExpired)[self startExpiredTimer:index];
+			NSLog(@"<%@>: Chan %d. Fill State Changed to %@\n",[self fullID], index,[self fillStatusName:aValue]);
 		}
 		
 		fillStatus[index] = aValue;
@@ -1120,7 +1120,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		[self performSelector:@selector(sendEMails) withObject:nil afterDelay:kAmi286EMailDelay];
 	}
 }
-		
+
+
 - (void) sendEMails
 {
 	if([serialPort isOpen]){ 
@@ -1213,6 +1214,5 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[self autorelease]; //now it's OK for object to go away
 	[pool release];
 }
-
 
 @end
