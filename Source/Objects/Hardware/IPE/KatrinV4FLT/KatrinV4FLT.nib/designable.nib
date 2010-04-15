@@ -21,8 +21,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3175"/>
 			<integer value="3001"/>
+			<integer value="3175"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -6645,13 +6645,13 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 								<object class="NSTextField" id="749133473">
 									<reference key="NSNextResponder" ref="405881282"/>
 									<int key="NSvFlags">268</int>
-									<string key="NSFrame">{{22, 419}, {38, 14}}</string>
+									<string key="NSFrame">{{17, 419}, {50, 14}}</string>
 									<reference key="NSSuperview" ref="405881282"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="733874086">
 										<int key="NSCellFlags">67239488</int>
 										<int key="NSCellFlags2">272761856</int>
-										<string key="NSContents">FLT 0</string>
+										<string key="NSContents">FLT# 20</string>
 										<reference key="NSSupport" ref="26"/>
 										<reference key="NSControlView" ref="749133473"/>
 										<reference key="NSBackgroundColor" ref="279876502"/>
@@ -14927,6 +14927,13 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/SBC/SBC Link/SBC_Link.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/Serial/Pac/ORPacModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

@@ -26,6 +26,7 @@
 #include <errno.h>
 
 #define USE_PBUS 0
+//Define USE_PBUS for usage of the pbusaccess library (obsolete, will be removed/changed in the future) -tb- 2010-04-09
 
 
 #ifdef __cplusplus
@@ -40,7 +41,11 @@ extern "C" {
 }
 #endif
 
-#if PMC_COMPILE_IN_SIMULATION_MODE
+#ifndef PMC_COMPILE_IN_SIMULATION_MODE
+	#define PMC_COMPILE_IN_SIMULATION_MODE 0
+#endif
+
+#if (PMC_COMPILE_IN_SIMULATION_MODE == 1)
     #warning MESSAGE: HW_Readout: PMC_COMPILE_IN_SIMULATION_MODE is 1
 #else
     #warning MESSAGE: HW_Readout: PMC_COMPILE_IN_SIMULATION_MODE is 0
@@ -59,7 +64,7 @@ extern "C" {
 
 
 #if PMC_COMPILE_IN_SIMULATION_MODE
-    //# warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 1
+    # warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 1
 #else
     //# warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 0
 	#include "hw4/baseregister.h"
@@ -81,6 +86,13 @@ extern int32_t* data;
 
 hw4::SubrackKatrin* get_sub_rack() { return srack; }
 
+
+
+#if !PMC_COMPILE_IN_SIMULATION_MODE
+// (this is the standard code accessing the v4 crate-tb-)
+//----------------------------------------------------------------
+
+
 void processHWCommand(SBC_Packet* aPacket)
 {
     /*look at the first word to get the destination*/
@@ -98,7 +110,6 @@ void FindHardware(void)
 #if USE_PBUS
     pbusInit((char*)name);
 #else
-#endif
     //TODO: check here blocking semaphores? -tb-
     srack = new hw4::SubrackKatrin((char*)name,0);
     srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
@@ -113,6 +124,7 @@ void FindHardware(void)
         printf("  ->register name is %s, addr 0x%08lx\n", reg->getName(),reg->getAddr());
         fflush(stdout);
     }
+#endif
 }
 
 void ReleaseHardware(void)
@@ -231,5 +243,121 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     if(needToSwap) SwapLongBlock(returnDataPtr,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
     if(reply)writeBuffer(aPacket);
 }
+
+#else //of #if !PMC_COMPILE_IN_SIMULATION_MODE
+// (here follow the 'simulation' versions of all functions -tb-)
+//----------------------------------------------------------------
+
+void processHWCommand(SBC_Packet* aPacket)  // 'simulation' version -tb-
+{
+    /*look at the first word to get the destination*/
+    int32_t aCmdID = aPacket->cmdHeader.cmdID;
+    
+    switch(aCmdID){
+            //        default:              processUnknownCommand(aPacket); break;
+    }
+}
+
+void FindHardware(void)  // 'simulation' version -tb-
+{
+	printf("Called HW_Readout-FindHardware\n");
+}
+
+void ReleaseHardware(void)  // 'simulation' version -tb-
+{
+	printf("Called HW_Readout-ReleaseHardware\n");
+}
+
+
+void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb-
+{
+	printf("Called HW_Readout-doWriteBlock\n");
+    SBC_IPEv4WriteBlockStruct* p = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
+    if(needToSwap)SwapLongBlock(p,sizeof(SBC_IPEv4WriteBlockStruct)/sizeof(int32_t));
+    
+    uint32_t startAddress   = p->address;
+    uint32_t numItems       = p->numItems;
+    
+    p++;                                /*point to the data*/
+    int32_t* lptr = (int32_t*)p;        /*cast to the data type*/ 
+    if(needToSwap) SwapLongBlock(lptr,numItems);
+    
+    //**** use device driver call to write data to HW
+    int32_t perr = 0;
+	//hardware write access removed (was here) -tb-
+    
+    /* echo the structure back with the error code*/
+    /* 0 == no Error*/
+    /* non-0 means an error*/
+    SBC_IPEv4WriteBlockStruct* returnDataPtr = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
+    returnDataPtr->address         = startAddress;
+    returnDataPtr->numItems        = 0;
+    
+    //assuming that the device driver returns the number of bytes read
+    if(perr == 0){
+        returnDataPtr->errorCode = 0;
+    }
+    else {
+        aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_IPEv4WriteBlockStruct);
+        returnDataPtr->errorCode = perr;        
+    }
+    
+    lptr = (int32_t*)returnDataPtr;
+    if(needToSwap)SwapLongBlock(lptr,numItems);
+    
+    //send back to ORCA
+    if(reply)writeBuffer(aPacket);    
+    
+}
+
+void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb-
+{
+	printf("Called HW_Readout-doReadBlock\n");
+    SBC_IPEv4ReadBlockStruct* p = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
+    if(needToSwap) SwapLongBlock(p,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
+    
+    uint32_t startAddress   = p->address;
+    int32_t numItems        = p->numItems;
+    //TODO: -tb- debug printf("starting read: %08x %d\n",startAddress,numItems);
+    
+    if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSizeBytes) {
+        sprintf(aPacket->message,"error: requested greater than payload size.");
+        p->errorCode = -1;
+        if(reply)writeBuffer(aPacket);
+        return;
+    }
+    
+    /*OK, got address and # to read, set up the response and go get the data*/
+    aPacket->cmdHeader.destination = kSBC_Process;
+    aPacket->cmdHeader.cmdID       = kSBC_ReadBlock;
+    aPacket->cmdHeader.numberBytesinPayload    = sizeof(SBC_IPEv4ReadBlockStruct) + numItems*sizeof(uint32_t);
+    
+    SBC_IPEv4ReadBlockStruct* returnDataPtr = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
+    char* returnPayload = (char*)(returnDataPtr+1);
+    unsigned long *lPtr = (unsigned long *) returnPayload;
+    
+    int32_t perr   = 0;
+	//hardware read access removed (was here) -tb-
+     
+    returnDataPtr->address         = startAddress;
+    returnDataPtr->numItems        = numItems;
+    if(perr == 0){
+        returnDataPtr->errorCode = 0;
+        if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
+    }
+    else {
+        //TODO: -tb- sprintf(aPacket->message,"error: %d %d : %s\n",perr,(int32_t)errno,strerror(errno));
+        aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_IPEv4ReadBlockStruct);
+        returnDataPtr->numItems  = 0;
+        returnDataPtr->errorCode = perr;        
+    }
+    
+    if(needToSwap) SwapLongBlock(returnDataPtr,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
+    if(reply)writeBuffer(aPacket);
+}
+
+
+#endif //of #if !PMC_COMPILE_IN_SIMULATION_MODE ... #else ...
+//----------------------------------------------------------------
 
 

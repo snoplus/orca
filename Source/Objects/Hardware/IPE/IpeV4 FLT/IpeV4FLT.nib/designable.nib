@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.SystemVersion">10C2234</string>
 		<string key="IBDocument.InterfaceBuilderVersion">740</string>
 		<string key="IBDocument.AppKitVersion">1038.25</string>
 		<string key="IBDocument.HIToolboxVersion">458.00</string>
@@ -21,8 +21,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3001"/>
 			<integer value="3175"/>
+			<integer value="3001"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -6645,13 +6645,13 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 								<object class="NSTextField" id="749133473">
 									<reference key="NSNextResponder" ref="405881282"/>
 									<int key="NSvFlags">268</int>
-									<string key="NSFrame">{{22, 419}, {38, 14}}</string>
+									<string key="NSFrame">{{17, 419}, {50, 14}}</string>
 									<reference key="NSSuperview" ref="405881282"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="733874086">
 										<int key="NSCellFlags">67239488</int>
 										<int key="NSCellFlags2">272761856</int>
-										<string key="NSContents">FLT 0</string>
+										<string key="NSContents">FLT# 20</string>
 										<reference key="NSSupport" ref="26"/>
 										<reference key="NSControlView" ref="749133473"/>
 										<reference key="NSBackgroundColor" ref="279876502"/>
@@ -14103,9 +14103,9 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{108, 139}, {661, 717}}</string>
+					<string>{{335, 139}, {661, 717}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{108, 139}, {661, 717}}</string>
+					<string>{{335, 139}, {661, 717}}</string>
 					<integer value="1"/>
 					<string>{{28, 62}, {661, 717}}</string>
 					<boolean value="NO"/>
@@ -14495,9 +14495,9 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{42, 727}, {388, 129}}</string>
+					<string>{{335, 727}, {388, 129}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{42, 727}, {388, 129}}</string>
+					<string>{{335, 727}, {388, 129}}</string>
 					<integer value="1"/>
 					<string>{{21, 146}, {388, 129}}</string>
 					<boolean value="NO"/>

@@ -1,13 +1,22 @@
 #include "ORFLTv4Readout.hh"
 #include "SLTv4_HW_Definitions.h"
 
+#ifndef PMC_COMPILE_IN_SIMULATION_MODE
+	#define PMC_COMPILE_IN_SIMULATION_MODE 0
+#endif
+
 #if PMC_COMPILE_IN_SIMULATION_MODE
     #warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 1
 #else
-    #warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 0
+    //#warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 0
 	#include "katrinhw4/subrackkatrin.h"
 #endif
 
+
+
+#if !PMC_COMPILE_IN_SIMULATION_MODE
+// (this is the standard code accessing the v4 crate-tb-)
+//----------------------------------------------------------------
 
 extern hw4::SubrackKatrin* srack; 
 
@@ -30,8 +39,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t dataId     = GetHardwareMask()[0];//this is energy record
     uint32_t waveformId = GetHardwareMask()[1];
     uint32_t histogramId = GetHardwareMask()[2];
-    uint32_t col        = GetSlot() - 1; //the mac slots go from 1 to n
-    uint32_t crate        = GetCrate();
+    uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
+    uint32_t crate      = GetCrate();
     uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
     
     uint32_t postTriggerTime = GetDeviceSpecificData()[0];
@@ -506,6 +515,40 @@ bool ORFLTv4Readout::Stop()
     return true; 
 }
 #endif
+
+
+#else //of #if !PMC_COMPILE_IN_SIMULATION_MODE
+// (here follow the 'simulation' versions of all functions -tb-)
+//----------------------------------------------------------------
+
+bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
+{
+    //
+    uint32_t dataId     = GetHardwareMask()[0];//this is energy record
+    uint32_t waveformId = GetHardwareMask()[1];
+    uint32_t histogramId = GetHardwareMask()[2];
+    uint32_t col        = GetSlot() - 1; //the mac slots go from 1 to n
+    uint32_t crate        = GetCrate();
+    uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
+    
+    uint32_t postTriggerTime = GetDeviceSpecificData()[0];
+    uint32_t eventType  = GetDeviceSpecificData()[1];
+    uint32_t fltRunMode = GetDeviceSpecificData()[2];
+    uint32_t runFlags   = GetDeviceSpecificData()[3];
+    uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
+    uint32_t daqRunMode = GetDeviceSpecificData()[5];
+    
+    return true;
+}
+
+bool ORFLTv4Readout::Stop()
+{
+	return true;
+}
+
+
+#endif //of #if !PMC_COMPILE_IN_SIMULATION_MODE ... #else ...
+//----------------------------------------------------------------
 
 
 

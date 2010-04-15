@@ -1,4 +1,4 @@
-#this configures the make process:
+#this configures the make process (-include will silently skip if the file does not exist -tb-):
 -include simulationmode.mk
 
 
@@ -23,7 +23,7 @@
 
 
 
-#-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
+#-tb- Conditional compiling (with hardware library or with hardware simulation):
 ifeq ($(PMC_COMPILE_IN_SIMULATION_MODE),1)
   defflags='-DPMC_COMPILE_IN_SIMULATION_MODE=1'
 else
@@ -49,5 +49,11 @@ UCFLAGS =  -g -Wall  -gstabs+ -I ~/src/v4/fdhwlib/src  $(defflags)
 #LIBs    = 
 
 
-LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+#-tb- Conditional compiling (with hardware library or with hardware simulation):
+ifeq ($(PMC_COMPILE_IN_SIMULATION_MODE),1)
+  LFLAGS  =  -fexceptions -lpthread -lstdc++
+else
+  LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+endif
+#LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
 LIBs    = 

@@ -320,6 +320,7 @@
 - (unsigned short) readGain:(int)i;
 - (void) writeTriggerControl;
 - (BOOL) partOfEvent:(short)chan;
+- (int) stationNumber;
 - (unsigned long) eventMask;
 - (void) eventMask:(unsigned long)aMask;
 - (NSString*) boardTypeName:(int)aType;

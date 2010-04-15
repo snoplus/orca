@@ -408,7 +408,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) hwVersionChanged:(NSNotification*) aNote
 {
-	NSString* s = [NSString stringWithFormat:@"%d.%d.%d",[model projectVersion],[model documentVersion],[model implementation]];
+	NSString* s = [NSString stringWithFormat:@"%d,0x%x,0x%x",[model projectVersion],[model documentVersion],[model implementation]];
 	[hwVersionField setStringValue:s];
 }
 
@@ -706,7 +706,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	@try {
 		[model readHwVersion];
-		NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
+		//NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
+		NSLog(@"%@ Project:%d Doc:0x%x Implementation:0x%x\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT HW Model Version\n");

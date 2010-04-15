@@ -214,7 +214,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) stationNumber
 {
 	if([self slot]<11)return [self slot]+1;
-	else return [self slot] + 2;
+	else return [self slot]; //there is a gap at slot 11 (for the SLT) -tb-
 }
 
 - (ORTimeRate*) totalRate   { return totalRate; }

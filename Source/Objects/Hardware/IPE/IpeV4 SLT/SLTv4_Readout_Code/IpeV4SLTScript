@@ -16,18 +16,26 @@ then
 elif  [ "$1" = "SimulationConfigScriptON" ]
 then
 	echo "- I recognized the argument '$1'! - "
-	if test -a ORCA; then
-		cd ORCA
+	if test -a ~/ORCA; then
+		cd ~/ORCA
 		echo "PMC_COMPILE_IN_SIMULATION_MODE=1"> simulationmode.mk
+		#touch HW_Readout.cc
+		#touch ORSLTv4Readout.cc
+		#touch ORFLTv4Readout.cc
+		make -B
 	else echo Directory ORCA does not exist: upload readout code, send ON again and recompile!
 	fi
 elif  [ "$1" = "SimulationConfigScriptOFF" ]
 then
 	echo "- I recognized the argument '$1'! - "
 	if test -a ~/ORCA/ ; then
-		cd ORCA
+		cd ~/ORCA
 		echo "PMC_COMPILE_IN_SIMULATION_MODE=0"> simulationmode.mk
-		#rm simulationmode.config
+		#touch HW_Readout.cc
+		#touch ORSLTv4Readout.cc
+		#touch ORFLTv4Readout.cc
+		#rm simulationmode.mk
+		make -B
 	else echo "OK (nothing needed to be done)"
 	# shall I remove the file simulationmode.config?
 	fi

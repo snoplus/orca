@@ -211,6 +211,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return (eventMask & (1L<<chan)) != 0;
 }
 
+- (int) stationNumber
+{
+	if([self slot]<11)return [self slot]+1;
+	else return [self slot]; //there is a gap at slot 11 (for the SLT) -tb-
+}
+
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
@@ -1496,7 +1502,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].hw_mask[0] 	= dataId;					//record id for energies
 	configStruct->card_info[index].hw_mask[1] 	= waveFormId;				//record id for the waveforms
 	configStruct->card_info[index].hw_mask[2] 	= histogramId;				//record id for the histograms
-	configStruct->card_info[index].slot			= [self stationNumber];		//the PMC readout uses col 0 thru n
+	configStruct->card_info[index].slot			= [self stationNumber];		//the PMC readout (fdhwlib) uses col 0 thru n-1; stationNumber is from 1 to n (and FLT register entry SlotID too)
 	configStruct->card_info[index].crate		= [self crateNumber];
 	
 	configStruct->card_info[index].deviceSpecificData[0] = postTriggerTime;	//needed to align the waveforms

@@ -696,8 +696,9 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	// Set title of FLT configuration window, ak 15.6.07
-	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ V4 KATRIN FLT Card (Slot %d)",[model stationNumber]]];
-    [fltSlotNumTextField setStringValue: [NSString stringWithFormat:@"FLT %d",[model stationNumber]]];
+	// for FLTv4 'slot' go from 0-9, 11-20 (SLTv4 has slot 10)
+	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ V4 KATRIN FLT Card (Slot %d, FLT# %d)",[model slot]+1,[model stationNumber]]];
+    [fltSlotNumTextField setStringValue: [NSString stringWithFormat:@"FLT# %d",[model stationNumber]]];
 }
 
 - (void) gainArrayChanged:(NSNotification*)aNotification
