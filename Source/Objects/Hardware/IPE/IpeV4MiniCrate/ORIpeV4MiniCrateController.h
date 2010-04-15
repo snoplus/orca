@@ -17,10 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
 #pragma mark •••Imported Files
-
 #import "ORIpeV4CrateController.h"
 
 @interface ORIpeV4MiniCrateController : ORIpeV4CrateController

@@ -20,7 +20,6 @@
 
 #pragma mark •••Imported Files
 #import "ORIpeV4MiniCrateModel.h"
-#import "ORIpeV4SLTModel.h"
 
 @implementation ORIpeV4MiniCrateModel
 
@@ -36,18 +35,10 @@
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-    if(powerOff){
-        NSAttributedString* s = [[[NSAttributedString alloc] initWithString:@"No Pwr"
-                                                                 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                     [NSColor redColor],NSForegroundColorAttributeName,
-                                                                     [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-                                                                     nil]] autorelease]; 
-        [s drawAtPoint:NSMakePoint(25,5)];
-    }
     
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
-        [transform translateXBy:5 yBy:47];
+        [transform translateXBy:8 yBy:35];
         [transform scaleXBy:.45 yBy:.45];
         [transform concat];
         NSEnumerator* e  = [[self orcaObjects] objectEnumerator];

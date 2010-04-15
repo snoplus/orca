@@ -22,7 +22,6 @@
 
 #pragma mark •••Imported Files
 #import "ORIpeV4MiniCrateController.h"
-#import "ORIpeV4MiniCrateModel.h"
 
 @implementation ORIpeV4MiniCrateController
 
@@ -30,15 +29,6 @@
 {
     self = [super initWithWindowNibName:@"IpeV4MiniCrate"];
     return self;
-}
-
-- (void) awakeFromNib
-{
-	[super awakeFromNib];
-	
-	// Set title of crate window, ak 15.6.07
-    [[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V4 Crate %d",[model crateNumber]]];
-
 }
 
 @end
