@@ -213,8 +213,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (int) stationNumber
 {
-	if([self slot]<11)return [self slot]+1;
-	else return [self slot]; //there is a gap at slot 11 (for the SLT) -tb-
+	//is it a minicrate?
+	if([[[self crate] class]  isSubclassOfClass: NSClassFromString(@"ORIpeV4MiniCrateModel")]){
+		if([self slot]<3)return [self slot]+1;
+		else return [self slot]; //there is a gap at slot 3 (for the SLT) -tb-
+	}
+	//... or a full crate?
+	if([[[self crate] class]  isSubclassOfClass: NSClassFromString(@"ORIpeV4CrateModel")]){
+		if([self slot]<11)return [self slot]+1;
+		else return [self slot]; //there is a gap at slot 11 (for the SLT) -tb-
+	}
+	//fallback
+	return [self slot]+1;
 }
 
 - (ORTimeRate*) totalRate   { return totalRate; }
