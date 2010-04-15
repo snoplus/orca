@@ -1299,6 +1299,13 @@
 		849013C810E27B13007591B5 /* PlotLink.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849013C210E27B13007591B5 /* PlotLink.nib */; };
 		849013C910E27B13007591B5 /* 2DPlotLink.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849013C310E27B13007591B5 /* 2DPlotLink.tif */; };
 		8490160810E31582007591B5 /* 1DPlotLink.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8490160710E31582007591B5 /* 1DPlotLink.tif */; };
+		8490D2951177532C00D25B1F /* IpeV4MiniCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8490D28E1177532C00D25B1F /* IpeV4MiniCrate.nib */; };
+		8490D2961177532C00D25B1F /* IpeV4MiniCrate.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8490D28F1177532C00D25B1F /* IpeV4MiniCrate.tif */; };
+		8490D2971177532C00D25B1F /* IpeV4MiniCrateBig.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8490D2901177532C00D25B1F /* IpeV4MiniCrateBig.tif */; };
+		8490D2981177532C00D25B1F /* ORIpeV4MiniCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8490D2911177532C00D25B1F /* ORIpeV4MiniCrateController.h */; };
+		8490D2991177532C00D25B1F /* ORIpeV4MiniCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8490D2921177532C00D25B1F /* ORIpeV4MiniCrateController.m */; };
+		8490D29A1177532C00D25B1F /* ORIpeV4MiniCrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8490D2931177532C00D25B1F /* ORIpeV4MiniCrateModel.h */; };
+		8490D29B1177532C00D25B1F /* ORIpeV4MiniCrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8490D2941177532C00D25B1F /* ORIpeV4MiniCrateModel.m */; };
 		8491917F0725B43500F454F1 /* ORToolbarFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491917D0725B43400F454F1 /* ORToolbarFactory.m */; };
 		849191800725B43500F454F1 /* ORToolbarFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491917E0725B43500F454F1 /* ORToolbarFactory.h */; };
 		849191C70725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */; };
@@ -3471,6 +3478,13 @@
 		849013C210E27B13007591B5 /* PlotLink.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PlotLink.nib; path = "Source/Objects/Misc Objects/PlotLink/PlotLink.nib"; sourceTree = SOURCE_ROOT; };
 		849013C310E27B13007591B5 /* 2DPlotLink.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = 2DPlotLink.tif; sourceTree = "<group>"; };
 		8490160710E31582007591B5 /* 1DPlotLink.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = 1DPlotLink.tif; path = "Source/Objects/Misc Objects/PlotLink/1DPlotLink.tif"; sourceTree = SOURCE_ROOT; };
+		8490D28E1177532C00D25B1F /* IpeV4MiniCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4MiniCrate.nib; path = Source/Objects/Hardware/IPE/IpeV4MiniCrate/IpeV4MiniCrate.nib; sourceTree = SOURCE_ROOT; };
+		8490D28F1177532C00D25B1F /* IpeV4MiniCrate.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeV4MiniCrate.tif; path = Source/Objects/Hardware/IPE/IpeV4MiniCrate/IpeV4MiniCrate.tif; sourceTree = SOURCE_ROOT; };
+		8490D2901177532C00D25B1F /* IpeV4MiniCrateBig.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeV4MiniCrateBig.tif; path = Source/Objects/Hardware/IPE/IpeV4MiniCrate/IpeV4MiniCrateBig.tif; sourceTree = SOURCE_ROOT; };
+		8490D2911177532C00D25B1F /* ORIpeV4MiniCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4MiniCrateController.h; path = Source/Objects/Hardware/IPE/IpeV4MiniCrate/ORIpeV4MiniCrateController.h; sourceTree = SOURCE_ROOT; };
+		8490D2921177532C00D25B1F /* ORIpeV4MiniCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4MiniCrateController.m; path = Source/Objects/Hardware/IPE/IpeV4MiniCrate/ORIpeV4MiniCrateController.m; sourceTree = SOURCE_ROOT; };
+		8490D2931177532C00D25B1F /* ORIpeV4MiniCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4MiniCrateModel.h; path = Source/Objects/Hardware/IPE/IpeV4MiniCrate/ORIpeV4MiniCrateModel.h; sourceTree = SOURCE_ROOT; };
+		8490D2941177532C00D25B1F /* ORIpeV4MiniCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4MiniCrateModel.m; path = Source/Objects/Hardware/IPE/IpeV4MiniCrate/ORIpeV4MiniCrateModel.m; sourceTree = SOURCE_ROOT; };
 		8491917D0725B43400F454F1 /* ORToolbarFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORToolbarFactory.m; path = Source/Misc/ORToolbarFactory.m; sourceTree = SOURCE_ROOT; };
 		8491917E0725B43500F454F1 /* ORToolbarFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORToolbarFactory.h; path = Source/Misc/ORToolbarFactory.h; sourceTree = SOURCE_ROOT; };
 		849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Document.plist; path = "Source/Main Document/edu.washington.npl.orca.Document.plist"; sourceTree = SOURCE_ROOT; };
@@ -7029,6 +7043,21 @@
 			path = "Source/Objects/Misc Objects/PlotLink";
 			sourceTree = SOURCE_ROOT;
 		};
+		8490D28D1177532C00D25B1F /* IpeV4MiniCrate */ = {
+			isa = PBXGroup;
+			children = (
+				8490D28E1177532C00D25B1F /* IpeV4MiniCrate.nib */,
+				8490D28F1177532C00D25B1F /* IpeV4MiniCrate.tif */,
+				8490D2901177532C00D25B1F /* IpeV4MiniCrateBig.tif */,
+				8490D2911177532C00D25B1F /* ORIpeV4MiniCrateController.h */,
+				8490D2921177532C00D25B1F /* ORIpeV4MiniCrateController.m */,
+				8490D2931177532C00D25B1F /* ORIpeV4MiniCrateModel.h */,
+				8490D2941177532C00D25B1F /* ORIpeV4MiniCrateModel.m */,
+			);
+			name = IpeV4MiniCrate;
+			path = Source/Objects/Hardware/IPE/IpeV4MiniCrate;
+			sourceTree = SOURCE_ROOT;
+		};
 		8491F4730EC0CDEF0084BAD6 /* pmtImage */ = {
 			isa = PBXGroup;
 			children = (
@@ -9138,6 +9167,7 @@
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
 				84FDF5450D7F084E003AE119 /* IpeV4 Crate */,
+				8490D28D1177532C00D25B1F /* IpeV4MiniCrate */,
 				842251230D8845390048D331 /* IpeV4 SLT */,
 				8444456D0E81311500A1440D /* IpeV4 FLT */,
 				84F46F1A0CA44255007EFADA /* IPE FLT */,
@@ -10705,6 +10735,8 @@
 				84F50A2E116B7151000275F2 /* ORCmdLabelController.h in Headers */,
 				84F50A30116B7151000275F2 /* ORCmdLabelModel.h in Headers */,
 				EF69C433116E5DC3008ABADC /* ORSNOCrateReadout.hh in Headers */,
+				8490D2981177532C00D25B1F /* ORIpeV4MiniCrateController.h in Headers */,
+				8490D29A1177532C00D25B1F /* ORIpeV4MiniCrateModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11390,6 +11422,9 @@
 				84F50A2C116B7151000275F2 /* CmdLabel.nib in Resources */,
 				84F50A2D116B7151000275F2 /* CmdLabel.tif in Resources */,
 				84F50E14116CCAEE000275F2 /* loginExpectScript in Resources */,
+				8490D2951177532C00D25B1F /* IpeV4MiniCrate.nib in Resources */,
+				8490D2961177532C00D25B1F /* IpeV4MiniCrate.tif in Resources */,
+				8490D2971177532C00D25B1F /* IpeV4MiniCrateBig.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12154,6 +12189,8 @@
 				84B754641160E01C00667631 /* ORCC4189Model.m in Sources */,
 				84F50A2F116B7151000275F2 /* ORCmdLabelController.m in Sources */,
 				84F50A31116B7151000275F2 /* ORCmdLabelModel.m in Sources */,
+				8490D2991177532C00D25B1F /* ORIpeV4MiniCrateController.m in Sources */,
+				8490D29B1177532C00D25B1F /* ORIpeV4MiniCrateModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
