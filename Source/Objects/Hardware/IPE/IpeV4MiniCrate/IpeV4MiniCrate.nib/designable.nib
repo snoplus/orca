@@ -144,7 +144,7 @@
 						<object class="NSCustomView" id="1007771159">
 							<reference key="NSNextResponder" ref="801940539"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{69, 132}, {64, 152}}</string>
+							<string key="NSFrame">{{69, 136}, {64, 152}}</string>
 							<reference key="NSSuperview" ref="801940539"/>
 							<string key="NSClassName">ORCardContainerView</string>
 							<string key="NSExtension">NSView</string>
