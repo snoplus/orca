@@ -35,9 +35,11 @@
 {
 	self = [super init];
 	tasks = [[NSMutableArray alloc] init];
-	delegate = aDelegate;
 	verbose = YES;
 	textToDelegate = NO;
+	//normally we would not retain our delegate, but in this case we have to make sure that the delegate 
+	//doesn't go away before we are done.
+	delegate = [aDelegate retain];
 	return self;
 }
 
@@ -151,6 +153,8 @@
 	}
 	else {
 		[delegate tasksCompleted:self];
+		[delegate release];
+		delegate = nil;
 		[self autorelease];
 	}
 }
