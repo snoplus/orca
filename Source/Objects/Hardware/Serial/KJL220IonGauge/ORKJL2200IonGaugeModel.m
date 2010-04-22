@@ -305,7 +305,7 @@ NSString* ORKJL2200IonGaugeLock = @"ORKJL2200IonGaugeLock";
 - (void) pollPressure
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressure) object:nil];
-	[self decodeCommand:@"V=5.0-07"];
+	//testing: [self decodeCommand:@"V=5.0-07"];
 	[self readPressure];
 	[self performSelector:@selector(pollPressure) withObject:nil afterDelay:pollTime];
 }
