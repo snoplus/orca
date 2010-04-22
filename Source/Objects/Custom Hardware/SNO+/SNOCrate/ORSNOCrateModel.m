@@ -30,6 +30,8 @@
 #import "OROrderedObjManager.h"
 #import "ORSelectorSequence.h"
 #import "SBC_Link.h"
+#import "VME_HW_Definitions.h"
+#import "ORDataTypeAssigner.h"
 
 
 const struct {
@@ -596,6 +598,80 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	
 }
 
+#pragma mark •••Data Taker
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+	dataId = DataId;
+}
+
+// todo: add cmos data id
+- (void) setDataIds:(id)assigner
+{
+	dataId = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherSNOCrate
+{
+	[self setDataId:[anotherSNOCrate dataId]];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				     @"ORSNOCrateDecoderForPMT",	@"decoder",
+				     [NSNumber numberWithLong:dataId],	@"dataId",
+				     [NSNumber numberWithBool:NO],	@"variable",
+				     [NSNumber numberWithLong:4],	@"length",  //modified kLong header
+				     nil];
+	[dataDictionary setObject:aDictionary forKey:@"PMT"];
+	
+	return dataDictionary;
+}
+
+- (void) reset
+{
+}
+
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	if(![[self adapter] controllerCard]){
+		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
+	}
+	
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSNOCrateModel"];	
+}
+
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	//never called, data come from an SBC at VME_Readout_Code/ORSNOCrateReadout.cc
+}
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	//stop cmos rate if ecal
+}
+
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id		= kSnoCrate;		//should be unique 
+	configStruct->card_info[index].hw_mask[0]		= dataId;		//better be unique
+	configStruct->card_info[index].slot			= [self slot];
+	configStruct->card_info[index].add_mod			= 0x29UL;
+	configStruct->card_info[index].base_add			= [[self xl2] xl2RegAddress:XL2_SELECT_REG];
+/*
+	configStruct->card_info[index].deviceSpecificData[0] = reg[kMtcBbaReg].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[1] = reg[kMtcBwrAddOutReg].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
+	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];
+*/ 
+	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
+	configStruct->card_info[index].next_Card_Index = index + 1;
+	
+	return index + 1;	
+}
 @end
 
 @implementation ORSNOCrateModel (OROrderedObjHolding)
