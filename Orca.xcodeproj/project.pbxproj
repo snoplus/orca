@@ -1017,6 +1017,15 @@
 		844E49F3057538B1005F11A0 /* ORTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 844E49F1057538B1005F11A0 /* ORTask.m */; };
 		844E5CD706236ACD0051849B /* CommandCenter.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844E5CD506236ACD0051849B /* CommandCenter.gif */; };
 		844E5CD806236ACD0051849B /* TaskMaster.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844E5CD606236ACD0051849B /* TaskMaster.gif */; };
+		844FD9DC1180E89B00FD5A46 /* KJL2200IonGauge.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844FD9D31180E89B00FD5A46 /* KJL2200IonGauge.nib */; };
+		844FD9DD1180E89B00FD5A46 /* KJL2200IonGauge.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844FD9D41180E89B00FD5A46 /* KJL2200IonGauge.tif */; };
+		844FD9DE1180E89B00FD5A46 /* KJL220IonGauge.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844FD9D51180E89B00FD5A46 /* KJL220IonGauge.gif */; };
+		844FD9DF1180E89B00FD5A46 /* ORKJL2200IonGaugeController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844FD9D61180E89B00FD5A46 /* ORKJL2200IonGaugeController.h */; };
+		844FD9E01180E89B00FD5A46 /* ORKJL2200IonGaugeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844FD9D71180E89B00FD5A46 /* ORKJL2200IonGaugeController.m */; };
+		844FD9E11180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 844FD9D81180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.h */; };
+		844FD9E21180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 844FD9D91180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.m */; };
+		844FD9E31180E89B00FD5A46 /* ORKJL2200IonGaugeModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844FD9DA1180E89B00FD5A46 /* ORKJL2200IonGaugeModel.h */; };
+		844FD9E41180E89B00FD5A46 /* ORKJL2200IonGaugeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 844FD9DB1180E89B00FD5A46 /* ORKJL2200IonGaugeModel.m */; };
 		84519C6C0B5C0B0900B08915 /* GoToLine.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84519C690B5C0B0900B08915 /* GoToLine.nib */; };
 		84519C6D0B5C0B0900B08915 /* GoToLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 84519C6A0B5C0B0900B08915 /* GoToLine.h */; };
 		84519C6E0B5C0B0900B08915 /* GoToLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84519C6B0B5C0B0900B08915 /* GoToLine.m */; };
@@ -3170,6 +3179,15 @@
 		844E6B6503C27544005F64B1 /* ORHistoController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHistoController.m; path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer/ORHistoController.m"; sourceTree = SOURCE_ROOT; };
 		844E6B6603C27544005F64B1 /* ORHistoController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHistoController.h; path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer/ORHistoController.h"; sourceTree = SOURCE_ROOT; };
 		844E6B7003C27B28005F64B1 /* Histo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Histo.gif; path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer/Histo.gif"; sourceTree = SOURCE_ROOT; };
+		844FD9D31180E89B00FD5A46 /* KJL2200IonGauge.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = KJL2200IonGauge.nib; path = Source/Objects/Hardware/Serial/KJL220IonGauge/KJL2200IonGauge.nib; sourceTree = SOURCE_ROOT; };
+		844FD9D41180E89B00FD5A46 /* KJL2200IonGauge.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = KJL2200IonGauge.tif; path = Source/Objects/Hardware/Serial/KJL220IonGauge/KJL2200IonGauge.tif; sourceTree = SOURCE_ROOT; };
+		844FD9D51180E89B00FD5A46 /* KJL220IonGauge.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = KJL220IonGauge.gif; path = Source/Objects/Hardware/Serial/KJL220IonGauge/KJL220IonGauge.gif; sourceTree = SOURCE_ROOT; };
+		844FD9D61180E89B00FD5A46 /* ORKJL2200IonGaugeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKJL2200IonGaugeController.h; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeController.h; sourceTree = SOURCE_ROOT; };
+		844FD9D71180E89B00FD5A46 /* ORKJL2200IonGaugeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKJL2200IonGaugeController.m; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeController.m; sourceTree = SOURCE_ROOT; };
+		844FD9D81180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKJL2200IonGaugeDecoders.h; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeDecoders.h; sourceTree = SOURCE_ROOT; };
+		844FD9D91180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKJL2200IonGaugeDecoders.m; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeDecoders.m; sourceTree = SOURCE_ROOT; };
+		844FD9DA1180E89B00FD5A46 /* ORKJL2200IonGaugeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKJL2200IonGaugeModel.h; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeModel.h; sourceTree = SOURCE_ROOT; };
+		844FD9DB1180E89B00FD5A46 /* ORKJL2200IonGaugeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKJL2200IonGaugeModel.m; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeModel.m; sourceTree = SOURCE_ROOT; };
 		845115E504030088005F64B1 /* IP408.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = IP408.gif; sourceTree = "<group>"; };
 		845115E604030088005F64B1 /* IP408.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = IP408.nib; sourceTree = "<group>"; };
 		845115E804030088005F64B1 /* ORIP408Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORIP408Controller.h; sourceTree = "<group>"; };
@@ -6375,6 +6393,7 @@
 				84B28D180F4C614000E2B056 /* XYScanner */,
 				84B754541160E01C00667631 /* CC4189 */,
 				84D791320FFA4CD000DC81D2 /* Keithley6487 */,
+				844FD9D21180E89B00FD5A46 /* KJL220IonGauge */,
 				84B28D340F4C63A000E2B056 /* LakeShore210 */,
 				84B28D830F4C66BE00E2B056 /* VXM */,
 				84D258590FA7340B00626276 /* MotionNode */,
@@ -6482,6 +6501,23 @@
 			);
 			name = Histogrammer;
 			path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer";
+			sourceTree = SOURCE_ROOT;
+		};
+		844FD9D21180E89B00FD5A46 /* KJL220IonGauge */ = {
+			isa = PBXGroup;
+			children = (
+				844FD9D31180E89B00FD5A46 /* KJL2200IonGauge.nib */,
+				844FD9D41180E89B00FD5A46 /* KJL2200IonGauge.tif */,
+				844FD9D51180E89B00FD5A46 /* KJL220IonGauge.gif */,
+				844FD9D61180E89B00FD5A46 /* ORKJL2200IonGaugeController.h */,
+				844FD9D71180E89B00FD5A46 /* ORKJL2200IonGaugeController.m */,
+				844FD9D81180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.h */,
+				844FD9D91180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.m */,
+				844FD9DA1180E89B00FD5A46 /* ORKJL2200IonGaugeModel.h */,
+				844FD9DB1180E89B00FD5A46 /* ORKJL2200IonGaugeModel.m */,
+			);
+			name = KJL220IonGauge;
+			path = Source/Objects/Hardware/Serial/KJL220IonGauge;
 			sourceTree = SOURCE_ROOT;
 		};
 		845115E104030088005F64B1 /* IPCarrier */ = {
@@ -10744,6 +10780,9 @@
 				8490D2981177532C00D25B1F /* ORIpeV4MiniCrateController.h in Headers */,
 				8490D29A1177532C00D25B1F /* ORIpeV4MiniCrateModel.h in Headers */,
 				EFCC4546117FD45E008DC12C /* ORSNOCrateDecoders.h in Headers */,
+				844FD9DF1180E89B00FD5A46 /* ORKJL2200IonGaugeController.h in Headers */,
+				844FD9E11180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.h in Headers */,
+				844FD9E31180E89B00FD5A46 /* ORKJL2200IonGaugeModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11432,6 +11471,9 @@
 				8490D2951177532C00D25B1F /* IpeV4MiniCrate.nib in Resources */,
 				8490D2961177532C00D25B1F /* IpeV4MiniCrate.tif in Resources */,
 				8490D2971177532C00D25B1F /* IpeV4MiniCrateBig.tif in Resources */,
+				844FD9DC1180E89B00FD5A46 /* KJL2200IonGauge.nib in Resources */,
+				844FD9DD1180E89B00FD5A46 /* KJL2200IonGauge.tif in Resources */,
+				844FD9DE1180E89B00FD5A46 /* KJL220IonGauge.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12199,6 +12241,9 @@
 				8490D2991177532C00D25B1F /* ORIpeV4MiniCrateController.m in Sources */,
 				8490D29B1177532C00D25B1F /* ORIpeV4MiniCrateModel.m in Sources */,
 				EFCC4547117FD45E008DC12C /* ORSNOCrateDecoders.m in Sources */,
+				844FD9E01180E89B00FD5A46 /* ORKJL2200IonGaugeController.m in Sources */,
+				844FD9E21180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.m in Sources */,
+				844FD9E41180E89B00FD5A46 /* ORKJL2200IonGaugeModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
