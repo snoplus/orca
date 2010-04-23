@@ -7,6 +7,7 @@
 
 #if PMC_COMPILE_IN_SIMULATION_MODE
     #warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 1
+    #include <sys/time.h> // for gettimeofday on MAC OSX -tb-
 #else
     //#warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 0
 	#include "katrinhw4/subrackkatrin.h"
@@ -537,6 +538,58 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t runFlags   = GetDeviceSpecificData()[3];
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
+	
+#if 1
+    //"counter" for debugging/simulation
+    static int currentSec=0;
+    static int currentUSec=0;
+    static int lastSec=0;
+    static int lastUSec=0;
+    //static long int counter=0;
+    static long int secCounter=0;
+    
+    struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+    //timing
+    gettimeofday(&t,NULL);
+    currentSec = t.tv_sec;  
+    currentUSec = t.tv_usec;  
+    double diffTime = (double)(currentSec  - lastSec) +
+    ((double)(currentUSec - lastUSec)) * 0.000001;
+    
+    if(diffTime >1.0){
+        secCounter++;
+        printf("PrPMC (FLTv4 simulation mode) sec %ld: 1 sec is over ...\n",secCounter);
+        fflush(stdout);
+        //remember for next call
+        lastSec      = currentSec; 
+        lastUSec     = currentUSec; 
+		//FROM HERE: PUT THE SIMULATION CODE
+		{
+                        uint32_t evsec      = currentSec; 
+                        uint32_t evsubsec   = currentUSec * 20; 
+                        uint32_t precision  = 0;
+                        uint32_t eventchan  = 2, chmap = 0x4;
+						uint32_t readptr  =  secCounter % 512;
+						uint32_t pagenr   =  secCounter % 64;
+                        uint32_t fifoFlags = 0;
+                        uint32_t energy = 1234;
+                         ensureDataCanHold(7); 
+                                data[dataIndex++] = dataId | 7;    
+                                data[dataIndex++] = location | eventchan<<8;
+                                data[dataIndex++] = evsec;        //sec
+                                data[dataIndex++] = evsubsec;     //subsec
+                                data[dataIndex++] = chmap;
+                                data[dataIndex++] = readptr | (pagenr<<10) | (precision<<16)  | (fifoFlags <<20);  //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit)
+                                data[dataIndex++] = energy;
+		}
+		//END OF SIMULATION CODE
+		
+    }else{
+        // skip shipping data record
+        // obsolete ... return config->card_info[index].next_Card_Index;
+        // obsolete, too ... return GetNextCardIndex();
+    }
+#endif
     
     return true;
 }

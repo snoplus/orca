@@ -137,7 +137,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (void) doCmdDoubleClick:(id)sender
 {
-	if([controllerString length]) [self openMainDialog:self];		
+	if([controllerString length]) [self openMainDialog:self];//TODO: I think this should be vice versa? -tb-		
     else				 [self openAltDialog:self];
 }
 

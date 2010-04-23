@@ -542,10 +542,18 @@
     [readHistogramStatusRegButton setEnabled:!lockedOrRunningMaintenance && [model histoFeatureIsAvailable]];
 	
     //veto GUI -tb- 2008
+	#if 0 
     [vetoEnableButton       setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
     [readEnableVetoButton   setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
     [writeEnableVetoButton  setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
     [readVetoDataButton     setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
+	#else
+	//this locks during run (except in Maintenance mode -tb-
+    [vetoEnableButton       setEnabled:!lockedOrRunningMaintenance ];
+    [readEnableVetoButton   setEnabled:!lockedOrRunningMaintenance ];
+    [writeEnableVetoButton  setEnabled:!lockedOrRunningMaintenance ];
+    [readVetoDataButton     setEnabled:!lockedOrRunningMaintenance ];
+	#endif
 	
     //set the checkmarks
     [versionStdCheckButton   setIntValue: [model stdFeatureIsAvailable]];

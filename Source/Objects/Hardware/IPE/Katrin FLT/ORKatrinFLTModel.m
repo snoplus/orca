@@ -5418,7 +5418,11 @@ clean_up_mark:
  */  //-tb- 2008-02-26
 - (void) takeDataVetoMode:(ORDataPacket*)aDataPacket;
 {
-	NSLog(@"This is   takeDataVetoMode\n");
+    static int counter=0; //TODO: as a reminder -tb-
+	counter++;
+	if(counter>0 && counter <20) NSLog(@"This is   takeDataVetoMode:: UNDER CONSTRUCTION\n");
+	
+	//TODO: for the V3 Veto firmware I can reuse the Energy mode readout - the event buffer has the same structure -tb- 2010-03-17
 #if 0
     struct timeval t;
     struct timezone tz;

@@ -1,6 +1,7 @@
 #ifndef _ORFLTv4Readout_hh_
 #define _ORFLTv4Readout_hh_
 #include "ORVCard.hh"
+#include <iostream>
 
 class ORFLTv4Readout : public ORVCard
 {

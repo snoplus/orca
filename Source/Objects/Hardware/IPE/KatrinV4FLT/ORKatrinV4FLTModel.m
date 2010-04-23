@@ -1797,10 +1797,27 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
 	unsigned long data;
 	data = [self readVersion];
+	if(0x1f000000 == data){
+		NSLogColor([NSColor redColor],@"FLTv4: Could not access hardware, no version register read!\n");
+		return;
+	}
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"CFPGA Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
 	data = [self readpVersion];
 	NSLogFont(aFont,@"FPGA8 Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
+
+
+	switch ( ((data>>28)&0xf) ) {
+		case 1: //AUGER
+			NSLogFont(aFont,@"    This is a Auger FLTv4 firmware configuration! (WARNING: You are using a KATRIN V4 FLT object!)\n");
+			break;
+		case 2: //KATRIN
+			NSLogFont(aFont,@"    This is a KATRIN FLTv4 firmware configuration!\n");
+			break;
+		default:
+			NSLogFont(aFont,@"    This is a Unknown FLTv4 firmware configuration!\n");
+			break;
+	}
 }
 
 - (void) printStatusReg
