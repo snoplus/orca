@@ -3,7 +3,7 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">10D573</string>
-		<string key="IBDocument.InterfaceBuilderVersion">740</string>
+		<string key="IBDocument.InterfaceBuilderVersion">762</string>
 		<string key="IBDocument.AppKitVersion">1038.29</string>
 		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
@@ -15,7 +15,7 @@
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>740</string>
+				<string>762</string>
 				<string>1</string>
 			</object>
 		</object>
@@ -6280,6 +6280,59 @@
 														<reference key="NSColor" ref="421922390"/>
 														<reference key="NSTabView" ref="771472936"/>
 													</object>
+													<object class="NSTabViewItem" id="135415203">
+														<object class="NSView" key="NSView" id="346634840">
+															<nil key="NSNextResponder"/>
+															<int key="NSvFlags">256</int>
+															<object class="NSMutableArray" key="NSSubviews">
+																<bool key="EncodedWithXMLCoder">YES</bool>
+																<object class="NSTextField" id="670558465">
+																	<reference key="NSNextResponder" ref="346634840"/>
+																	<int key="NSvFlags">256</int>
+																	<string key="NSFrame">{{294, 18}, {136, 13}}</string>
+																	<reference key="NSSuperview" ref="346634840"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSTextFieldCell" key="NSCell" id="619425829">
+																		<int key="NSCellFlags">67239424</int>
+																		<int key="NSCellFlags2">138412032</int>
+																		<string key="NSContents">MAJORANA Main Dialog</string>
+																		<reference key="NSSupport" ref="625969386"/>
+																		<reference key="NSControlView" ref="670558465"/>
+																		<reference key="NSBackgroundColor" ref="421922390"/>
+																		<reference key="NSTextColor" ref="688154912"/>
+																	</object>
+																</object>
+																<object class="NSButton" id="569358862">
+																	<reference key="NSNextResponder" ref="346634840"/>
+																	<int key="NSvFlags">256</int>
+																	<string key="NSFrame">{{259, 26}, {219, 122}}</string>
+																	<reference key="NSSuperview" ref="346634840"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSButtonCell" key="NSCell" id="84308780">
+																		<int key="NSCellFlags">67239424</int>
+																		<int key="NSCellFlags2">134217728</int>
+																		<string key="NSContents"/>
+																		<reference key="NSSupport" ref="625969386"/>
+																		<reference key="NSControlView" ref="569358862"/>
+																		<int key="NSButtonFlags">-2042347265</int>
+																		<int key="NSButtonFlags2">2</int>
+																		<object class="NSCustomResource" key="NSNormalImage">
+																			<string key="NSClassName">NSImage</string>
+																			<string key="NSResourceName">Majorana</string>
+																		</object>
+																		<string key="NSAlternateContents"/>
+																		<string key="NSKeyEquivalent"/>
+																		<int key="NSPeriodicDelay">400</int>
+																		<int key="NSPeriodicInterval">75</int>
+																	</object>
+																</object>
+															</object>
+															<string key="NSFrame">{{10, 7}, {734, 182}}</string>
+														</object>
+														<string key="NSLabel">MAJORANA</string>
+														<reference key="NSColor" ref="421922390"/>
+														<reference key="NSTabView" ref="771472936"/>
+													</object>
 													<object class="NSTabViewItem" id="461779612">
 														<object class="NSView" key="NSView" id="631327997">
 															<nil key="NSNextResponder"/>
@@ -10016,6 +10069,7 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="74048890"/>
 							<reference ref="550623315"/>
 							<reference ref="461779612"/>
+							<reference ref="135415203"/>
 						</object>
 						<reference key="parent" ref="272099301"/>
 					</object>
@@ -14540,6 +14594,53 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="object" ref="875077119"/>
 						<reference key="parent" ref="1031377301"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26171</int>
+						<reference key="object" ref="135415203"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="346634840"/>
+						</object>
+						<reference key="parent" ref="771472936"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26172</int>
+						<reference key="object" ref="346634840"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="670558465"/>
+							<reference ref="569358862"/>
+						</object>
+						<reference key="parent" ref="135415203"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26173</int>
+						<reference key="object" ref="670558465"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="619425829"/>
+						</object>
+						<reference key="parent" ref="346634840"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26174</int>
+						<reference key="object" ref="569358862"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="84308780"/>
+						</object>
+						<reference key="parent" ref="346634840"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26175</int>
+						<reference key="object" ref="84308780"/>
+						<reference key="parent" ref="569358862"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26176</int>
+						<reference key="object" ref="619425829"/>
+						<reference key="parent" ref="670558465"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -15447,6 +15548,18 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26168.ImportedFromIB2</string>
 					<string>26169.IBPluginDependency</string>
 					<string>26170.IBPluginDependency</string>
+					<string>26171.IBPluginDependency</string>
+					<string>26171.ImportedFromIB2</string>
+					<string>26172.IBPluginDependency</string>
+					<string>26172.ImportedFromIB2</string>
+					<string>26173.IBPluginDependency</string>
+					<string>26173.ImportedFromIB2</string>
+					<string>26174.CustomClassName</string>
+					<string>26174.IBAttributePlaceholdersKey</string>
+					<string>26174.IBPluginDependency</string>
+					<string>26174.ImportedFromIB2</string>
+					<string>26175.IBPluginDependency</string>
+					<string>26176.IBPluginDependency</string>
 					<string>267.IBPluginDependency</string>
 					<string>267.ImportedFromIB2</string>
 					<string>2709.IBPluginDependency</string>
@@ -17651,6 +17764,25 @@ ZSBjb250cm9sbGVyLg</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>ObjectFactory</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="569358862"/>
+							<string key="toolTip">MajoranaModel</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
 					<string>ObjectFactory</string>
 					<object class="NSMutableDictionary">
 						<string key="NS.key.0">ToolTip</string>
@@ -17970,9 +18102,9 @@ ZSBjb250cm9sbGVyLg</string>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{51, 571}, {818, 285}}</string>
+					<string>{{50, 571}, {818, 285}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{51, 571}, {818, 285}}</string>
+					<string>{{50, 571}, {818, 285}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
@@ -19339,7 +19471,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26170</int>
+			<int key="maxID">26176</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -20747,6 +20879,7 @@ ZSBjb250cm9sbGVyLg</string>
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
+		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
@@ -20758,5 +20891,380 @@ ZSBjb250cm9sbGVyLg</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<string key="IBDocument.LastKnownRelativeProjectPath">../../../Orca.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>2228ACard</string>
+				<string>2DPlotLink</string>
+				<string>4ChanTriggerCard</string>
+				<string>617Card</string>
+				<string>620Card</string>
+				<string>775Card</string>
+				<string>AD3511Card</string>
+				<string>AD413ACard</string>
+				<string>AD811Card</string>
+				<string>ADC2249Card</string>
+				<string>ADU200</string>
+				<string>AcqirisDC440</string>
+				<string>AlarmElementOff</string>
+				<string>Ami286</string>
+				<string>AmrelHV</string>
+				<string>AndGate</string>
+				<string>BiRa2351ICard</string>
+				<string>BiRa3251OCard</string>
+				<string>Bit3Card</string>
+				<string>BocTIC3</string>
+				<string>C111C</string>
+				<string>C1190</string>
+				<string>C785</string>
+				<string>C792</string>
+				<string>C862</string>
+				<string>CC32Card</string>
+				<string>CCUSB</string>
+				<string>CMC203Card</string>
+				<string>CRGetterOff</string>
+				<string>CRSetterOff</string>
+				<string>CTITemp</string>
+				<string>CV260Card</string>
+				<string>Caen1720Card</string>
+				<string>Caen265Card</string>
+				<string>Caen419</string>
+				<string>Caen965</string>
+				<string>CamacCrateSmall</string>
+				<string>CmdLabel</string>
+				<string>Container</string>
+				<string>ContainerInput</string>
+				<string>ContainerOutput</string>
+				<string>Count</string>
+				<string>CountDown</string>
+				<string>Crate</string>
+				<string>DGF4cCard</string>
+				<string>DataExplorer</string>
+				<string>DataFile</string>
+				<string>DataGen</string>
+				<string>DataTask</string>
+				<string>Dispatcher</string>
+				<string>DualPortLAM</string>
+				<string>Fec32Card</string>
+				<string>FecDaughterCard</string>
+				<string>Filter</string>
+				<string>GpibEnetBox</string>
+				<string>Gretina4Card</string>
+				<string>HP3458a</string>
+				<string>HP4405A</string>
+				<string>HP6622a</string>
+				<string>HPPulserIcon</string>
+				<string>HV2132Card</string>
+				<string>HV4032Off</string>
+				<string>HVRamp</string>
+				<string>Halo</string>
+				<string>HeaderExplorer</string>
+				<string>Histo</string>
+				<string>ICS8065Box</string>
+				<string>IP220</string>
+				<string>IP320</string>
+				<string>IP408</string>
+				<string>IPCarrierCard</string>
+				<string>IPFifo</string>
+				<string>Inverter</string>
+				<string>IpeCrate</string>
+				<string>IpeFLTCard</string>
+				<string>IpeSLTCard</string>
+				<string>IpeSlowControl</string>
+				<string>IpeV4Crate</string>
+				<string>IpeV4FLTCard</string>
+				<string>IpeV4MiniCrate</string>
+				<string>IpeV4SLTCard</string>
+				<string>JADCLCard</string>
+				<string>JAMF</string>
+				<string>K3655Card</string>
+				<string>KJL2200IonGauge</string>
+				<string>KatrinFLTCard</string>
+				<string>KatrinSLTCard</string>
+				<string>KatrinV4FLTCard</string>
+				<string>Keithley6487</string>
+				<string>L2551Card</string>
+				<string>L4532</string>
+				<string>L8013CrateSmall</string>
+				<string>LC950Oscilloscope</string>
+				<string>LDA102</string>
+				<string>Label</string>
+				<string>LakeShore210</string>
+				<string>Listener</string>
+				<string>M321</string>
+				<string>MCA927</string>
+				<string>MCarrierCard</string>
+				<string>MITPulser</string>
+				<string>Mac</string>
+				<string>Majorana</string>
+				<string>ManualPlot</string>
+				<string>MksPdr2000</string>
+				<string>ModBus</string>
+				<string>MotionNode</string>
+				<string>Motor</string>
+				<string>NPLCommBoardIcon</string>
+				<string>NandGate</string>
+				<string>Ncd</string>
+				<string>NcdMux</string>
+				<string>NcdMuxBox</string>
+				<string>NorGate</string>
+				<string>NplHVIcon</string>
+				<string>NplpCMeterIcon</string>
+				<string>ORGate</string>
+				<string>ORPulserDistrib</string>
+				<string>OneShot</string>
+				<string>OutputRelayOff</string>
+				<string>PCICamacCard</string>
+				<string>PDcu</string>
+				<string>Pac</string>
+				<string>PciBit3Card</string>
+				<string>Process</string>
+				<string>ProcessHistory</string>
+				<string>ProcessPulser</string>
+				<string>Pulser33220Icon</string>
+				<string>PushButtonOff</string>
+				<string>RSFlipFlop</string>
+				<string>Ramper</string>
+				<string>RandomPulser</string>
+				<string>RemoteRunControl</string>
+				<string>ReplayData</string>
+				<string>RunControl</string>
+				<string>RunNotVetoed</string>
+				<string>RunNotes</string>
+				<string>RunScript</string>
+				<string>SBC_LAM</string>
+				<string>SIS3300Card</string>
+				<string>SIS3302Card</string>
+				<string>SIS3350Card</string>
+				<string>SNO</string>
+				<string>SNOCrate</string>
+				<string>SNORack</string>
+				<string>SPDTRelayOff</string>
+				<string>SPSTRelayOff</string>
+				<string>Script</string>
+				<string>ScriptTask</string>
+				<string>ShaperCard</string>
+				<string>Sql</string>
+				<string>StateLabel</string>
+				<string>TDC3377</string>
+				<string>TRS1Card</string>
+				<string>Tek220</string>
+				<string>Tek754DOscilloscope</string>
+				<string>Trigger32Card</string>
+				<string>TriggerCard</string>
+				<string>USBtoGPIB</string>
+				<string>UnivVoltHVCrateSmall</string>
+				<string>UnivVoltHVIcon</string>
+				<string>VHQ224L</string>
+				<string>VHS4030</string>
+				<string>VXM</string>
+				<string>VarianTPS</string>
+				<string>Vme64CrateSmall</string>
+				<string>Vmecpu</string>
+				<string>XL1Card</string>
+				<string>XL2Card</string>
+				<string>XNorGate</string>
+				<string>XYCom200Card</string>
+				<string>XYScanner</string>
+				<string>XorGate</string>
+				<string>ZupIcon</string>
+				<string>adc</string>
+				<string>cPCICrateSmall</string>
+				<string>cPCIcpu</string>
+				<string>eCPU147</string>
+				<string>eGun</string>
+				<string>katrin</string>
+				<string>nTPC</string>
+				<string>prespectrometer</string>
+				<string>rangeTimer</string>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>{16, 128}</string>
+				<string>{50, 50}</string>
+				<string>{16, 128}</string>
+				<string>{94, 20}</string>
+				<string>{94, 20}</string>
+				<string>{16, 128}</string>
+				<string>{32, 128}</string>
+				<string>{32, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{75, 45}</string>
+				<string>{12, 150}</string>
+				<string>{53, 69}</string>
+				<string>{110, 57}</string>
+				<string>{40, 72}</string>
+				<string>{58, 32}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{40, 73}</string>
+				<string>{32, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{32, 128}</string>
+				<string>{32, 128}</string>
+				<string>{16, 128}</string>
+				<string>{46, 20}</string>
+				<string>{36, 20}</string>
+				<string>{50, 69}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{283, 154}</string>
+				<string>{70, 11}</string>
+				<string>{105, 105}</string>
+				<string>{100, 34}</string>
+				<string>{100, 34}</string>
+				<string>{80, 36}</string>
+				<string>{90, 50}</string>
+				<string>{159, 128}</string>
+				<string>{16, 128}</string>
+				<string>{70, 83}</string>
+				<string>{60, 65}</string>
+				<string>{74, 51}</string>
+				<string>{120, 95}</string>
+				<string>{40, 57}</string>
+				<string>{48, 16}</string>
+				<string>{12, 92}</string>
+				<string>{84, 39}</string>
+				<string>{110, 79}</string>
+				<string>{92, 50}</string>
+				<string>{16, 128}</string>
+				<string>{144, 39}</string>
+				<string>{125, 63}</string>
+				<string>{90, 38}</string>
+				<string>{100, 54}</string>
+				<string>{16, 128}</string>
+				<string>{90, 45}</string>
+				<string>{50, 42}</string>
+				<string>{100, 87}</string>
+				<string>{77, 83}</string>
+				<string>{85, 72}</string>
+				<string>{114, 61}</string>
+				<string>{58, 125}</string>
+				<string>{58, 125}</string>
+				<string>{58, 125}</string>
+				<string>{16, 128}</string>
+				<string>{58, 125}</string>
+				<string>{58, 32}</string>
+				<string>{145, 146}</string>
+				<string>{12, 218}</string>
+				<string>{12, 218}</string>
+				<string>{50, 53}</string>
+				<string>{125, 118}</string>
+				<string>{12, 152}</string>
+				<string>{43, 114}</string>
+				<string>{12, 152}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{75, 40}</string>
+				<string>{12, 218}</string>
+				<string>{12, 218}</string>
+				<string>{12, 152}</string>
+				<string>{100, 46}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{167, 107}</string>
+				<string>{100, 66}</string>
+				<string>{75, 48}</string>
+				<string>{74, 14}</string>
+				<string>{118, 58}</string>
+				<string>{44, 25}</string>
+				<string>{60, 177}</string>
+				<string>{26.25, 70.5}</string>
+				<string>{16, 128}</string>
+				<string>{100, 54}</string>
+				<string>{75, 86}</string>
+				<string>{200, 106}</string>
+				<string>{50, 42}</string>
+				<string>{87, 50}</string>
+				<string>{50, 62}</string>
+				<string>{50, 41}</string>
+				<string>{60, 48}</string>
+				<string>{120, 101}</string>
+				<string>{62, 32}</string>
+				<string>{75, 113}</string>
+				<string>{100, 50}</string>
+				<string>{74, 38}</string>
+				<string>{66, 32}</string>
+				<string>{75, 26}</string>
+				<string>{80, 70}</string>
+				<string>{62, 32}</string>
+				<string>{76, 58}</string>
+				<string>{72, 39}</string>
+				<string>{48, 54}</string>
+				<string>{94, 20}</string>
+				<string>{50, 56}</string>
+				<string>{87, 50}</string>
+				<string>{94, 20}</string>
+				<string>{300, 37}</string>
+				<string>{112, 43}</string>
+				<string>{72, 39}</string>
+				<string>{100, 49}</string>
+				<string>{60, 40}</string>
+				<string>{62, 45}</string>
+				<string>{50, 60}</string>
+				<string>{130, 24}</string>
+				<string>{80, 74}</string>
+				<string>{80, 55}</string>
+				<string>{45, 64}</string>
+				<string>{30, 43}</string>
+				<string>{70, 70}</string>
+				<string>{147, 25}</string>
+				<string>{48, 16}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{75, 113}</string>
+				<string>{98, 56}</string>
+				<string>{102, 173}</string>
+				<string>{59, 42}</string>
+				<string>{59, 32}</string>
+				<string>{40, 41}</string>
+				<string>{50, 51}</string>
+				<string>{16, 128}</string>
+				<string>{75, 68}</string>
+				<string>{70, 11}</string>
+				<string>{16, 128}</string>
+				<string>{48, 128}</string>
+				<string>{120, 59}</string>
+				<string>{120, 64}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{40, 44}</string>
+				<string>{161, 118}</string>
+				<string>{21, 206}</string>
+				<string>{32, 128}</string>
+				<string>{16, 128}</string>
+				<string>{70, 63}</string>
+				<string>{80, 67}</string>
+				<string>{236, 126}</string>
+				<string>{16, 128}</string>
+				<string>{16, 128}</string>
+				<string>{12, 96}</string>
+				<string>{66, 32}</string>
+				<string>{16, 128}</string>
+				<string>{75, 50}</string>
+				<string>{63, 32}</string>
+				<string>{205, 24}</string>
+				<string>{83, 67}</string>
+				<string>{92, 125}</string>
+				<string>{12, 150}</string>
+				<string>{16, 128}</string>
+				<string>{100, 86}</string>
+				<string>{250, 71}</string>
+				<string>{100, 84}</string>
+				<string>{72, 48}</string>
+				<string>{67, 66}</string>
+			</object>
+		</object>
 	</data>
 </archive>

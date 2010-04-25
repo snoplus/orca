@@ -2033,6 +2033,14 @@
 		84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */; };
 		84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E743420DAD5EEF0099CAEE /* ORMailer.h */; };
 		84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E743430DAD5EEF0099CAEE /* ORMailer.m */; };
+		84E966CF11848BEF008D9119 /* Majorana.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E966C711848BEF008D9119 /* Majorana.nib */; };
+		84E966D011848BEF008D9119 /* Majorana.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E966C811848BEF008D9119 /* Majorana.tif */; };
+		84E966D111848BEF008D9119 /* MajoranaController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E966C911848BEF008D9119 /* MajoranaController.h */; };
+		84E966D211848BEF008D9119 /* MajoranaController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E966CA11848BEF008D9119 /* MajoranaController.m */; };
+		84E966D311848BEF008D9119 /* MajoranaDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E966CB11848BEF008D9119 /* MajoranaDetectorView.h */; };
+		84E966D411848BEF008D9119 /* MajoranaDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */; };
+		84E966D511848BEF008D9119 /* MajoranaModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E966CD11848BEF008D9119 /* MajoranaModel.h */; };
+		84E966D611848BEF008D9119 /* MajoranaModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E966CE11848BEF008D9119 /* MajoranaModel.m */; };
 		84EA6C9F0C73D11200083319 /* nTPC.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EA6C950C73D11200083319 /* nTPC.nib */; };
 		84EA6CA00C73D11200083319 /* nTPC.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EA6C960C73D11200083319 /* nTPC.tif */; };
 		84EA6CA10C73D11200083319 /* nTPCConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6C970C73D11200083319 /* nTPCConstants.h */; };
@@ -4346,6 +4354,14 @@
 		84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ObjectFactory.h; path = Source/Objects/OrcaObject/ObjectFactory.h; sourceTree = SOURCE_ROOT; };
 		84E743420DAD5EEF0099CAEE /* ORMailer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMailer.h; path = "Source/Main Dialogs/MailCenter/ORMailer.h"; sourceTree = SOURCE_ROOT; };
 		84E743430DAD5EEF0099CAEE /* ORMailer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMailer.m; path = "Source/Main Dialogs/MailCenter/ORMailer.m"; sourceTree = SOURCE_ROOT; };
+		84E966C711848BEF008D9119 /* Majorana.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Majorana.nib; path = Source/Experiments/Majorana/Majorana.nib; sourceTree = SOURCE_ROOT; };
+		84E966C811848BEF008D9119 /* Majorana.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Majorana.tif; path = Source/Experiments/Majorana/Majorana.tif; sourceTree = SOURCE_ROOT; };
+		84E966C911848BEF008D9119 /* MajoranaController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MajoranaController.h; path = Source/Experiments/Majorana/MajoranaController.h; sourceTree = SOURCE_ROOT; };
+		84E966CA11848BEF008D9119 /* MajoranaController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MajoranaController.m; path = Source/Experiments/Majorana/MajoranaController.m; sourceTree = SOURCE_ROOT; };
+		84E966CB11848BEF008D9119 /* MajoranaDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MajoranaDetectorView.h; path = Source/Experiments/Majorana/MajoranaDetectorView.h; sourceTree = SOURCE_ROOT; };
+		84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MajoranaDetectorView.m; path = Source/Experiments/Majorana/MajoranaDetectorView.m; sourceTree = SOURCE_ROOT; };
+		84E966CD11848BEF008D9119 /* MajoranaModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MajoranaModel.h; path = Source/Experiments/Majorana/MajoranaModel.h; sourceTree = SOURCE_ROOT; };
+		84E966CE11848BEF008D9119 /* MajoranaModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MajoranaModel.m; path = Source/Experiments/Majorana/MajoranaModel.m; sourceTree = SOURCE_ROOT; };
 		84EA6C950C73D11200083319 /* nTPC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nTPC.nib; path = Source/Experiments/nTPC/nTPC.nib; sourceTree = SOURCE_ROOT; };
 		84EA6C960C73D11200083319 /* nTPC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = nTPC.tif; path = Source/Experiments/nTPC/nTPC.tif; sourceTree = SOURCE_ROOT; };
 		84EA6C970C73D11200083319 /* nTPCConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = nTPCConstants.h; path = Source/Experiments/nTPC/nTPCConstants.h; sourceTree = SOURCE_ROOT; };
@@ -8363,6 +8379,7 @@
 			isa = PBXGroup;
 			children = (
 				849B26D60B2F48490007484F /* BaseClasses */,
+				84E966C611848BEF008D9119 /* Majorana */,
 				843175C31152766E005643AB /* Halo */,
 				54F5B6F9087206D9003AC228 /* Katrin */,
 				849B25E30B2F34F90007484F /* Prespectrometer */,
@@ -9154,6 +9171,22 @@
 			);
 			name = CableCheckTask;
 			path = Source/Experiments/Ncd/CableCheckTask;
+			sourceTree = SOURCE_ROOT;
+		};
+		84E966C611848BEF008D9119 /* Majorana */ = {
+			isa = PBXGroup;
+			children = (
+				84E966C711848BEF008D9119 /* Majorana.nib */,
+				84E966C811848BEF008D9119 /* Majorana.tif */,
+				84E966C911848BEF008D9119 /* MajoranaController.h */,
+				84E966CA11848BEF008D9119 /* MajoranaController.m */,
+				84E966CB11848BEF008D9119 /* MajoranaDetectorView.h */,
+				84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */,
+				84E966CD11848BEF008D9119 /* MajoranaModel.h */,
+				84E966CE11848BEF008D9119 /* MajoranaModel.m */,
+			);
+			name = Majorana;
+			path = Source/Experiments/Majorana;
 			sourceTree = SOURCE_ROOT;
 		};
 		84EA6C940C73D11200083319 /* nTPC */ = {
@@ -10780,6 +10813,9 @@
 				844FD9DF1180E89B00FD5A46 /* ORKJL2200IonGaugeController.h in Headers */,
 				844FD9E11180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.h in Headers */,
 				844FD9E31180E89B00FD5A46 /* ORKJL2200IonGaugeModel.h in Headers */,
+				84E966D111848BEF008D9119 /* MajoranaController.h in Headers */,
+				84E966D311848BEF008D9119 /* MajoranaDetectorView.h in Headers */,
+				84E966D511848BEF008D9119 /* MajoranaModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11470,6 +11506,8 @@
 				8490D2971177532C00D25B1F /* IpeV4MiniCrateBig.tif in Resources */,
 				844FD9DC1180E89B00FD5A46 /* KJL2200IonGauge.nib in Resources */,
 				844FD9DD1180E89B00FD5A46 /* KJL2200IonGauge.tif in Resources */,
+				84E966CF11848BEF008D9119 /* Majorana.nib in Resources */,
+				84E966D011848BEF008D9119 /* Majorana.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12240,6 +12278,9 @@
 				844FD9E01180E89B00FD5A46 /* ORKJL2200IonGaugeController.m in Sources */,
 				844FD9E21180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.m in Sources */,
 				844FD9E41180E89B00FD5A46 /* ORKJL2200IonGaugeModel.m in Sources */,
+				84E966D211848BEF008D9119 /* MajoranaController.m in Sources */,
+				84E966D411848BEF008D9119 /* MajoranaDetectorView.m in Sources */,
+				84E966D611848BEF008D9119 /* MajoranaModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
