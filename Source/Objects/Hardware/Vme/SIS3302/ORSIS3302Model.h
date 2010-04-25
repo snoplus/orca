@@ -24,6 +24,7 @@
 #import "SBC_Config.h"
 #import "AutoTesting.h"
 #import "ORSISRegisterDefs.h"
+#import "ORAdcInfoProviding.h"
 
 #define kNumMcaStatusRequests 35 //don't change this unless you know what you are doing....
 
@@ -31,7 +32,7 @@
 @class ORAlarm;
 @class ORCommandList;
 
-@interface ORSIS3302Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
+@interface ORSIS3302Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding>
 {
   @private
 	BOOL			isRunning;

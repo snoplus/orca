@@ -770,6 +770,26 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ThresholdChanged object:self];
+	//ORAdcInfoProviding protocol requirement
+	[self postAdcInfoProvidingValueChanged];
+}
+
+//ORAdcInfoProviding protocol requirement
+- (unsigned short) gain:(unsigned short) aChan
+{
+    return 0;
+}
+- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain
+{
+}
+- (BOOL) partOfEvent:(unsigned short)chan
+{
+	return (gtMask & (1L<<chan)) != 0;
+}
+- (BOOL)onlineMaskBit:(int)bit
+{
+	//translate back to the triggerEnabled Bit
+	return (gtMask & (1L<<bit)) != 0;
 }
 
 - (unsigned short) sampleLength:(short)aChan { return [[sampleLengths objectAtIndex:aChan]unsignedShortValue]; }
@@ -2754,6 +2774,22 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	return myTests;
 }
 
+//ORAdcInfoProviding protocol requirement
+- (void) postAdcInfoProvidingValueChanged
+{
+	[[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORAdcInfoProvidingValueChanged
+	 object:self
+	 userInfo: nil];
+}
+//for adcProvidingProtocol... but not used for now
+- (unsigned long) eventCount:(int)channel
+{
+	return 0;
+}
+- (void) clearEventCounts
+{
+}
 @end
 
 @implementation ORSIS3302Model (private)
