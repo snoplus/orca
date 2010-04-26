@@ -636,10 +636,11 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+/*
 	if(![[self adapter] controllerCard]){
 		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
 	}
-	
+*/	
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSNOCrateModel"];	
 }
 

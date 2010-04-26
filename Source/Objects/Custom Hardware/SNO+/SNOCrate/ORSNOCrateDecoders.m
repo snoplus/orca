@@ -37,34 +37,35 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 	ptr++;
-	NSString* sCnt10Mhz = [NSString stringWithFormat:@"10 Mhz = 0x%014qx\n",
-		((unsigned long long) (ptr[1] & 0x001fffff) << 32 | *ptr)];
-	ptr++;
-	NSString* sCnt50Mhz = [NSString stringWithFormat:@"50 Mhz = 0x%011qx\n",
-		((unsigned long long) ptr[1]) << 11 | (*ptr & 0xffe00000) >> 21];
-	ptr +=2;
-	NSString* sGTId = [NSString stringWithFormat:@"GTId = 0x%06x\n", *ptr & 0x00ffffff];
+	NSString* sGTId = [NSString stringWithFormat:@"GTId = 0x%06x\n",
+		(*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
+	NSString* sCrate = [NSString stringWithFormat:@"Crate = %d\n", (*ptr >> 21) & 0x1fUL];
+	NSString* sBoard = [NSString stringWithFormat:@"Board = %d\n", (*ptr >> 26) & 0x0fUL];
+	NSString* sChannel = [NSString stringWithFormat:@"Channel = %d\n", (*ptr >> 16) & 0x1fUL];
+	NSString* sCell = [NSString stringWithFormat:@"Cell = %d\n", (ptr[1] >> 12) & 0x0fUL];
+	NSString* sQHL = [NSString stringWithFormat:@"QHL = 0x%03x\n", ptr[2] & 0x07ffUL];
+	NSString* sQHS = [NSString stringWithFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x07ffUL];
+	NSString* sQLX = [NSString stringWithFormat:@"QLX = 0x%03x\n", ptr[1] & 0x07ffUL];
+	NSString* sTAC = [NSString stringWithFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x07ffUL];
+	NSString* sCGT16 = [NSString stringWithFormat:@"CGT16 sync error: %@\n",
+		((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
+	NSString* sCGT24 = [NSString stringWithFormat:@"CGT24 sync error: %@\n",
+		((*ptr >> 31) & 0x1UL) ? @"Yes" : @"No"];
+	NSString* sES16 = [NSString stringWithFormat:@"CMOS16 sync error: %@\n",
+		((ptr[1] >> 31) & 0x1UL) ? @"Yes" : @"No"];
+	NSString* sMissed = [NSString stringWithFormat:@"Missed count error: %@\n",
+		((ptr[1] >> 28) & 0x1UL) ? @"Yes" : @"No"];
+	NSString* sNC = [NSString stringWithFormat:@"NC / CC flag: %@\n",
+		((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
+	NSString* sLGI = [NSString stringWithFormat:@"LGI select: %@\n",
+		((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
+	NSString* sWrd0 = [NSString stringWithFormat:@"Wrd0 = 0x%08x\n", *ptr];
+	NSString* sWrd1 = [NSString stringWithFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
+	NSString* sWrd2 = [NSString stringWithFormat:@"Wrd2 = 0x%08x\n", ptr[2]];
 
-	NSString* sGTMask = [NSString stringWithFormat:@"GTMask = 0x%07x\n",
-		((*ptr >> 24) & 0xff) | ((ptr[1] & 0x0003ffff) << 8)];  
-	ptr++;
-	NSString* sMissTrg = [NSString stringWithFormat:@"Missed Trigger: %@\n",
-		(*ptr & 0x00040000) ? @"Yes" : @"No"];
-
-	NSString* sVlt = [NSString stringWithFormat:@"Voltage peak = 0x%03x\n",
-			      *ptr >> 19 & 0x01ff];
-
-	NSString* sSlp = [NSString stringWithFormat:@"Voltage slope = 0x%03x\n",
-			  *ptr >> 29 | ((ptr[1] & 0x7fUL) << 3 )];
-	ptr++;
-	NSString* sInt = [NSString stringWithFormat:@"Integral thr = 0x%03x\n",
-			  *ptr >> 7 & 0x3ffUL];
-
-	NSString* sWrd5 = [NSString stringWithFormat:@"wrd5_hi = 0x%04x\n", *ptr >> 16];
-	
-	return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@", 
-		sCnt10Mhz, sCnt50Mhz, sGTId, sGTMask, sMissTrg, sVlt, sSlp, sInt, sWrd5];
+	return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@", 
+		sGTId, sCrate, sBoard, sChannel, sCell, sQHL, sQHS, sQLX, sTAC, sCGT16,
+		sCGT24, sES16, sMissed, sNC, sLGI, sWrd0, sWrd1, sWrd2];
 }
-
 
 @end
