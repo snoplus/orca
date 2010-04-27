@@ -1849,6 +1849,14 @@
 		84BC89130F9CDDAC00336DF1 /* ORSerialPortModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC89120F9CDDAC00336DF1 /* ORSerialPortModel.m */; };
 		84BC89C20F9CE75F00336DF1 /* SerialPortControls.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BC89C10F9CE75F00336DF1 /* SerialPortControls.nib */; };
 		84BC8DF40F9DF76500336DF1 /* NoOilHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84BC8DF30F9DF76500336DF1 /* NoOilHelp.plist */; };
+		84BF43CC118793FA00F55216 /* Caen1785.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BF43C4118793FA00F55216 /* Caen1785.gif */; };
+		84BF43CD118793FA00F55216 /* Caen1785.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BF43C5118793FA00F55216 /* Caen1785.nib */; };
+		84BF43CE118793FA00F55216 /* ORCaen1785Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BF43C6118793FA00F55216 /* ORCaen1785Controller.h */; };
+		84BF43CF118793FA00F55216 /* ORCaen1785Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BF43C7118793FA00F55216 /* ORCaen1785Controller.m */; };
+		84BF43D0118793FA00F55216 /* ORCaen1785Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BF43C8118793FA00F55216 /* ORCaen1785Decoder.h */; };
+		84BF43D1118793FA00F55216 /* ORCaen1785Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BF43C9118793FA00F55216 /* ORCaen1785Decoder.m */; };
+		84BF43D2118793FA00F55216 /* ORCaen1785Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BF43CA118793FA00F55216 /* ORCaen1785Model.h */; };
+		84BF43D3118793FA00F55216 /* ORCaen1785Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BF43CB118793FA00F55216 /* ORCaen1785Model.m */; };
 		84C12E780993E3FA006F2901 /* ORProcessHistoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */; };
 		84C12E790993E3FA006F2901 /* ORProcessHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */; };
 		84C12E7A0993E3FA006F2901 /* ORProcessHistoryModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */; };
@@ -4104,6 +4112,14 @@
 		84BC89120F9CDDAC00336DF1 /* ORSerialPortModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSerialPortModel.m; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPortModel.m"; sourceTree = SOURCE_ROOT; };
 		84BC89C10F9CE75F00336DF1 /* SerialPortControls.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SerialPortControls.nib; path = "Source/Objects/Misc Objects/SerialPorts/SerialPortControls.nib"; sourceTree = SOURCE_ROOT; };
 		84BC8DF30F9DF76500336DF1 /* NoOilHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoOilHelp.plist; path = Source/Objects/Hardware/Serial/PDcu/NoOilHelp.plist; sourceTree = SOURCE_ROOT; };
+		84BF43C4118793FA00F55216 /* Caen1785.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Caen1785.gif; path = Source/Objects/Hardware/Vme/CAEN/CV1785/Caen1785.gif; sourceTree = SOURCE_ROOT; };
+		84BF43C5118793FA00F55216 /* Caen1785.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen1785.nib; path = Source/Objects/Hardware/Vme/CAEN/CV1785/Caen1785.nib; sourceTree = SOURCE_ROOT; };
+		84BF43C6118793FA00F55216 /* ORCaen1785Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1785Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Controller.h; sourceTree = SOURCE_ROOT; };
+		84BF43C7118793FA00F55216 /* ORCaen1785Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1785Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Controller.m; sourceTree = SOURCE_ROOT; };
+		84BF43C8118793FA00F55216 /* ORCaen1785Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1785Decoder.h; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Decoder.h; sourceTree = SOURCE_ROOT; };
+		84BF43C9118793FA00F55216 /* ORCaen1785Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1785Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Decoder.m; sourceTree = SOURCE_ROOT; };
+		84BF43CA118793FA00F55216 /* ORCaen1785Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1785Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Model.h; sourceTree = SOURCE_ROOT; };
+		84BF43CB118793FA00F55216 /* ORCaen1785Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1785Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Model.m; sourceTree = SOURCE_ROOT; };
 		84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessHistoryController.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryController.h; sourceTree = SOURCE_ROOT; };
 		84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessHistoryController.m; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryController.m; sourceTree = SOURCE_ROOT; };
 		84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessHistoryModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryModel.h; sourceTree = SOURCE_ROOT; };
@@ -8526,6 +8542,22 @@
 			path = Source/Objects/Hardware/Vme/eCPU/CircularBuffer;
 			sourceTree = SOURCE_ROOT;
 		};
+		84BF43C3118793FA00F55216 /* CV1785 */ = {
+			isa = PBXGroup;
+			children = (
+				84BF43C4118793FA00F55216 /* Caen1785.gif */,
+				84BF43C5118793FA00F55216 /* Caen1785.nib */,
+				84BF43C6118793FA00F55216 /* ORCaen1785Controller.h */,
+				84BF43C7118793FA00F55216 /* ORCaen1785Controller.m */,
+				84BF43C8118793FA00F55216 /* ORCaen1785Decoder.h */,
+				84BF43C9118793FA00F55216 /* ORCaen1785Decoder.m */,
+				84BF43CA118793FA00F55216 /* ORCaen1785Model.h */,
+				84BF43CB118793FA00F55216 /* ORCaen1785Model.m */,
+			);
+			name = CV1785;
+			path = Source/Objects/Hardware/Vme/CAEN/CV1785;
+			sourceTree = SOURCE_ROOT;
+		};
 		84C12E710993E3FA006F2901 /* ProcessHistory */ = {
 			isa = PBXGroup;
 			children = (
@@ -9960,6 +9992,7 @@
 			isa = PBXGroup;
 			children = (
 				F5B1802103B297FD015F64B1 /* Base */,
+				84BF43C3118793FA00F55216 /* CV1785 */,
 				84EBBEDE0F52D9A700F57BDD /* CV419 */,
 				84FFCA9F0636D5B10069432F /* CV792 */,
 				9C7CE7DB0E2FC22500F63679 /* CV260 */,
@@ -10816,6 +10849,9 @@
 				84E966D111848BEF008D9119 /* MajoranaController.h in Headers */,
 				84E966D311848BEF008D9119 /* MajoranaDetectorView.h in Headers */,
 				84E966D511848BEF008D9119 /* MajoranaModel.h in Headers */,
+				84BF43CE118793FA00F55216 /* ORCaen1785Controller.h in Headers */,
+				84BF43D0118793FA00F55216 /* ORCaen1785Decoder.h in Headers */,
+				84BF43D2118793FA00F55216 /* ORCaen1785Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11508,6 +11544,8 @@
 				844FD9DD1180E89B00FD5A46 /* KJL2200IonGauge.tif in Resources */,
 				84E966CF11848BEF008D9119 /* Majorana.nib in Resources */,
 				84E966D011848BEF008D9119 /* Majorana.tif in Resources */,
+				84BF43CC118793FA00F55216 /* Caen1785.gif in Resources */,
+				84BF43CD118793FA00F55216 /* Caen1785.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12281,6 +12319,9 @@
 				84E966D211848BEF008D9119 /* MajoranaController.m in Sources */,
 				84E966D411848BEF008D9119 /* MajoranaDetectorView.m in Sources */,
 				84E966D611848BEF008D9119 /* MajoranaModel.m in Sources */,
+				84BF43CF118793FA00F55216 /* ORCaen1785Controller.m in Sources */,
+				84BF43D1118793FA00F55216 /* ORCaen1785Decoder.m in Sources */,
+				84BF43D3118793FA00F55216 /* ORCaen1785Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

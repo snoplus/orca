@@ -29,19 +29,19 @@
 #import "ORTimeRate.h"
 
 #pragma mark ***External Strings
-NSString* ORKJL2200IonGaugeModelDegasTimeChanged = @"ORKJL2200IonGaugeModelDegasTimeChanged";
-NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged = @"ORKJL2200IonGaugeModelEmissionCurrentChanged";
-NSString* ORKJL2200IonGaugeModelSensitivityChanged = @"ORKJL2200IonGaugeModelSensitivityChanged";
-NSString* ORKJL2200IonGaugeModelSetPointChanged = @"ORKJL2200IonGaugeModelSetPointChanged";
-NSString* ORKJL2200IonGaugeModelStatusBitsChanged = @"ORKJL2200IonGaugeModelStatusBitsChanged";
-NSString* ORKJL2200IonGaugePressureChanged = @"ORKJL2200IonGaugePressureChanged";
-NSString* ORKJL2200IonGaugeShipPressureChanged = @"ORKJL2200IonGaugeShipPressureChanged";
-NSString* ORKJL2200IonGaugePollTimeChanged	= @"ORKJL2200IonGaugePollTimeChanged";
-NSString* ORKJL2200IonGaugeSerialPortChanged	= @"ORKJL2200IonGaugeSerialPortChanged";
-NSString* ORKJL2200IonGaugePortNameChanged	= @"ORKJL2200IonGaugePortNameChanged";
-NSString* ORKJL2200IonGaugePortStateChanged	= @"ORKJL2200IonGaugePortStateChanged";
-
-NSString* ORKJL2200IonGaugeLock = @"ORKJL2200IonGaugeLock";
+NSString* ORKJL2200IonGaugeModelDegasTimeChanged		= @"ORKJL2200IonGaugeModelDegasTimeChanged";
+NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged	= @"ORKJL2200IonGaugeModelEmissionCurrentChanged";
+NSString* ORKJL2200IonGaugeModelSensitivityChanged		= @"ORKJL2200IonGaugeModelSensitivityChanged";
+NSString* ORKJL2200IonGaugeModelSetPointChanged			= @"ORKJL2200IonGaugeModelSetPointChanged";
+NSString* ORKJL2200IonGaugeModelStatusBitsChanged		= @"ORKJL2200IonGaugeModelStatusBitsChanged";
+NSString* ORKJL2200IonGaugePressureChanged				= @"ORKJL2200IonGaugePressureChanged";
+NSString* ORKJL2200IonGaugeShipPressureChanged			= @"ORKJL2200IonGaugeShipPressureChanged";
+NSString* ORKJL2200IonGaugePollTimeChanged				= @"ORKJL2200IonGaugePollTimeChanged";
+NSString* ORKJL2200IonGaugeSerialPortChanged			= @"ORKJL2200IonGaugeSerialPortChanged";
+NSString* ORKJL2200IonGaugePortNameChanged				= @"ORKJL2200IonGaugePortNameChanged";
+NSString* ORKJL2200IonGaugePortStateChanged				= @"ORKJL2200IonGaugePortStateChanged";
+NSString* ORKJL2200IonGaugeModelStateMaskChanged		= @"ORKJL2200IonGaugeModelStateMaskChanged";
+NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 
 @interface ORKJL2200IonGaugeModel (private)
 - (void) runStarted:(NSNotification*)aNote;
@@ -68,7 +68,6 @@ NSString* ORKJL2200IonGaugeLock = @"ORKJL2200IonGaugeLock";
     [serialPort release];
 	[timeRate release];
     [buffer release];
-
 
 	[super dealloc];
 }
@@ -157,6 +156,16 @@ NSString* ORKJL2200IonGaugeLock = @"ORKJL2200IonGaugeLock";
 
 
 #pragma mark ***Accessors
+- (void) setStateMask:(unsigned short)aMask
+{
+	stateMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelStateMaskChanged object:self];
+}
+
+- (unsigned short)stateMask
+{
+	return stateMask;
+}
 
 - (float) degasTime
 {

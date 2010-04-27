@@ -22,6 +22,7 @@
 
 @interface ORKJL2200IonGaugeController : OrcaObjectController
 {
+    IBOutlet NSTextField*   degasOnField;
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSTextField*	degasTimeField;
 	IBOutlet NSTextField*	emissionCurrentField;
@@ -43,6 +44,8 @@
     IBOutlet BiStateView*	setPoint2State;
     IBOutlet BiStateView*	setPoint3State;
     IBOutlet BiStateView*	setPoint4State;
+    IBOutlet NSButton*		hideShowButton;
+    IBOutlet NSView*        containingView;
 }
 
 #pragma mark ***Initialization
@@ -55,6 +58,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) stateMaskChanged:(NSNotification*)aNote;
 - (void) degasTimeChanged:(NSNotification*)aNote;
 - (void) emissionCurrentChanged:(NSNotification*)aNote;
 - (void) sensitivityChanged:(NSNotification*)aNote;
@@ -81,6 +85,7 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) initBoard:(id)sender;
+- (IBAction) hideShowControls:(id)sender;
 
 @end
 

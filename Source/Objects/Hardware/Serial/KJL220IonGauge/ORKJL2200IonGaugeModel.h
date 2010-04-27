@@ -22,6 +22,13 @@
 @class ORSerialPort;
 @class ORTimeRate;
 
+#define kKJL2200IonGaugeOnMask	0x20
+#define kKJL2200DegasOnMask		0x10
+#define kKJL2200SetPoint1Mask	0x08
+#define kKJL2200SetPoint2Mask	0x04
+#define kKJL2200SetPoint3Mask	0x02
+#define kKJL2200SetPoint4Mask	0x01
+
 @interface ORKJL2200IonGaugeModel : OrcaObject
 {
     @private
@@ -40,6 +47,7 @@
 		int sensitivity;
 		float emissionCurrent;
 		float degasTime;
+		unsigned short stateMask;
 }
 
 #pragma mark ***Initialization
@@ -51,6 +59,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (void) setStateMask:(unsigned short)aMask;
+- (unsigned short)stateMask;
 - (float) degasTime;
 - (void) setDegasTime:(float)aDegasTime;
 - (float) emissionCurrent;
@@ -93,9 +103,7 @@
 - (void) initBoard;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
 @end
-
 
 extern NSString* ORKJL2200IonGaugeModelDegasTimeChanged;
 extern NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged;
@@ -109,3 +117,4 @@ extern NSString* ORKJL2200IonGaugeSerialPortChanged;
 extern NSString* ORKJL2200IonGaugeLock;
 extern NSString* ORKJL2200IonGaugePortNameChanged;
 extern NSString* ORKJL2200IonGaugePortStateChanged;
+extern NSString* ORKJL2200IonGaugeModelStateMaskChanged;

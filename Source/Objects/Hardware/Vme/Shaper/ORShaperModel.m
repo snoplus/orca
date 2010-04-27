@@ -1087,6 +1087,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
         case 1: 	return @"EMIT";
         case 2: 	return @"NCD";
         case 3: 	return @"Time Tag";
+        case 5: 	return @"KATRIN";
         default: 	return @"Unknown";
     }
 }

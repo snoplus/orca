@@ -139,6 +139,11 @@
                          name : ORKJL2200IonGaugeModelDegasTimeChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(stateMaskChanged:)
+                         name : ORKJL2200IonGaugeModelStateMaskChanged
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -157,6 +162,19 @@
 	[self sensitivityChanged:nil];
 	[self emissionCurrentChanged:nil];
 	[self degasTimeChanged:nil];
+	[self stateMaskChanged:nil];
+}
+
+- (void) stateMaskChanged:(NSNotification*)aNote
+{
+	unsigned short aMask = [model stateMask];
+	[setPoint1State setState:aMask & kKJL2200SetPoint1Mask];
+	[setPoint2State setState:aMask & kKJL2200SetPoint2Mask];
+	[setPoint3State setState:aMask & kKJL2200SetPoint3Mask];
+	[setPoint4State setState:aMask & kKJL2200SetPoint4Mask];
+	BOOL degassOn = aMask & kKJL2200DegasOnMask;
+	[degasOnField setStringValue:degassOn?@"Degas":@""];
+	[self pressureChanged:nil];
 }
 
 - (void) degasTimeChanged:(NSNotification*)aNote
@@ -186,7 +204,6 @@
 {
 	[statusBitsField setIntValue: [model statusBits]];
 }
-
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
@@ -222,7 +239,6 @@
 			[[plotter0 yScale] setNeedsDisplay:YES];
 		}
 	}
-
 }
 
 - (void) updateTimePlot:(NSNotification*)aNote
@@ -239,7 +255,12 @@
 
 - (void) pressureChanged:(NSNotification*)aNote
 {
-	[pressureField setStringValue:[NSString stringWithFormat:@"%.1E",[model pressure]]];
+	if([model stateMask] & kKJL2200IonGaugeOnMask){
+		[pressureField setStringValue:[NSString stringWithFormat:@"%.1E",[model pressure]]];
+	}
+	else {
+		[pressureField setStringValue:@"OFF"];
+	}
 	unsigned long t = [model timeMeasured];
 	NSCalendarDate* theDate;
 	if(t){
@@ -373,6 +394,25 @@
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[[sender selectedItem] tag]];
+}
+
+- (IBAction) hideShowControls:(id)sender
+{
+	
+  // unsigned int oldResizeMask = [containingView autoresizingMask];
+//	[containingView setAutoresizingMask:NSViewMinYMargin];
+	
+    NSRect aFrame = [NSWindow contentRectForFrameRect:[[self window] frame] 
+											styleMask:[[self window] styleMask]];
+    if([hideShowButton state] == NSOnState){
+        aFrame.size.height += 85;
+    }
+    else {
+        aFrame.size.height -= 85;
+    }
+    [self resizeWindowToSize:aFrame.size];
+   // [containingView setAutoresizingMask:oldResizeMask];
+	
 }
 
 #pragma mark •••Data Source
