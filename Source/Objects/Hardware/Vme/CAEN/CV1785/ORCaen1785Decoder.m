@@ -20,7 +20,7 @@
 #import "ORCaen1785Decoder.h"
 #import "ORDataSet.h"
 
-@implementation ORCaen1785DecoderForQdc
+@implementation ORCaen1785DecoderForAdc
 
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet
 {
@@ -35,7 +35,7 @@
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
 			int chan     = ShiftAndExtract(ptr[i],17,0xf);
 			NSString* channelKey  = [self getChannelKey: chan];
-			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN965 QDC",crateKey,cardKey,channelKey,nil];
+			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN1785 ADC",crateKey,cardKey,channelKey,nil];
         }
     }
     return length;
@@ -44,9 +44,9 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 	long length = ExtractLength(ptr[0]);
-    NSString* title= @"CAEN965 QDC Record\n\n";
+    NSString* title= @"CAEN1785 ADC Record\n\n";
 
-    NSString* len	=[NSString stringWithFormat: @"# QDC = %d\n",length-2];
+    NSString* len	=[NSString stringWithFormat: @"# ADC = %d\n",length-2];
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(ptr[1] >> 21)&0x0000000f];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(ptr[1] >> 16)&0x0000001f];    
    
@@ -78,7 +78,7 @@
         NSLog(@"Data Buffer for %@ %@\n",crateKey,cardKey);        
         for( i = 2; i < length; i++ ){
             if( ShiftAndExtract(ptr[i],24,0x7) == 0x0){ //is valid data?
-                NSLogFont([NSFont fontWithName:@"Monaco" size:12],  @"Chan: %2d  (un:%d ov:%d) qdc: 0x%x\n", 
+                NSLogFont([NSFont fontWithName:@"Monaco" size:12],  @"Chan: %2d  (un:%d ov:%d) adc: 0x%x\n", 
 													ShiftAndExtract(ptr[i],17,0xf),
 													ShiftAndExtract(ptr[i],13,0x1),
 													ShiftAndExtract(ptr[i],12,0x1),

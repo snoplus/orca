@@ -34,7 +34,7 @@
 //-------------------------^^^^ ^^^^ ^^^^- qdc value
 //.... may be followed by more qdc words
 
-@interface ORCaen1785DecoderForQdc : ORVmeCardDecoder {
+@interface ORCaen1785DecoderForAdc : ORVmeCardDecoder {
 }
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;

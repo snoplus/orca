@@ -1857,6 +1857,9 @@
 		84BF43D1118793FA00F55216 /* ORCaen1785Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BF43C9118793FA00F55216 /* ORCaen1785Decoder.m */; };
 		84BF43D2118793FA00F55216 /* ORCaen1785Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BF43CA118793FA00F55216 /* ORCaen1785Model.h */; };
 		84BF43D3118793FA00F55216 /* ORCaen1785Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BF43CB118793FA00F55216 /* ORCaen1785Model.m */; };
+		84BF445F1187ACEE00F55216 /* ORCAEN1785Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
+		84BF44621187AD4300F55216 /* ORCAEN1785Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */; };
+		84BF44631187AD4300F55216 /* ORCAEN1785Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
 		84C12E780993E3FA006F2901 /* ORProcessHistoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */; };
 		84C12E790993E3FA006F2901 /* ORProcessHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */; };
 		84C12E7A0993E3FA006F2901 /* ORProcessHistoryModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */; };
@@ -2352,6 +2355,8 @@
 				EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */,
 				EF69C483116E6526008ABADC /* ORSNOCrateReadout.hh in VME_Copy */,
 				43ADFEBA10B6E2090044617C /* HWMakefile.mk in VME_Copy */,
+				84BF44621187AD4300F55216 /* ORCAEN1785Readout.cc in VME_Copy */,
+				84BF44631187AD4300F55216 /* ORCAEN1785Readout.hh in VME_Copy */,
 				84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */,
 				43ADFEBB10B6E2090044617C /* ORCAEN419Readout.cc in VME_Copy */,
 				43ADFEBC10B6E2090044617C /* ORCAEN419Readout.hh in VME_Copy */,
@@ -4120,6 +4125,8 @@
 		84BF43C9118793FA00F55216 /* ORCaen1785Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1785Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Decoder.m; sourceTree = SOURCE_ROOT; };
 		84BF43CA118793FA00F55216 /* ORCaen1785Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1785Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Model.h; sourceTree = SOURCE_ROOT; };
 		84BF43CB118793FA00F55216 /* ORCaen1785Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1785Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Model.m; sourceTree = SOURCE_ROOT; };
+		84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN1785Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1785Readout.cc; sourceTree = SOURCE_ROOT; };
+		84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN1785Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1785Readout.hh; sourceTree = SOURCE_ROOT; };
 		84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessHistoryController.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryController.h; sourceTree = SOURCE_ROOT; };
 		84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessHistoryController.m; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryController.m; sourceTree = SOURCE_ROOT; };
 		84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessHistoryModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryModel.h; sourceTree = SOURCE_ROOT; };
@@ -7266,6 +7273,8 @@
 			children = (
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
+				84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */,
+				84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */,
 				84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */,
 				84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */,
 				43ADFE5810B6DBCF0044617C /* ORCAEN419Readout.cc */,
@@ -10852,6 +10861,7 @@
 				84BF43CE118793FA00F55216 /* ORCaen1785Controller.h in Headers */,
 				84BF43D0118793FA00F55216 /* ORCaen1785Decoder.h in Headers */,
 				84BF43D2118793FA00F55216 /* ORCaen1785Model.h in Headers */,
+				84BF445F1187ACEE00F55216 /* ORCAEN1785Readout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

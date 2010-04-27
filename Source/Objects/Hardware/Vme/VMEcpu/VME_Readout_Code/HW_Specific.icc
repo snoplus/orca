@@ -10,6 +10,7 @@
 #include "ORCAEN1720Readout.hh"
 #include "ORCAEN419Readout.hh"
 #include "ORCAEN965Readout.hh"
+#include "ORCAEN1785Readout.hh"
 #include "ORSIS3300Readout.hh"
 #include "ORSIS3302Card.hh"
 #include "ORVMETrigger32Readout.hh"
@@ -60,6 +61,9 @@ int32_t load_card(SBC_card_info* card_info, int32_t index)
       break;
     case kCaen965:
       aCard = new ORCaen965Readout(card_info);
+      break;
+    case kCaen1785:
+      aCard = new ORCaen1785Readout(card_info);
       break;
   }
   if (!aCard) return 0;

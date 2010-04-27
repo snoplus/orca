@@ -235,7 +235,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
             if([[tempDataPacket dataArray]count]){
 				NSData* theData = [[tempDataPacket dataArray] objectAtIndex:0];
 				unsigned long* someData = (unsigned long*)[theData bytes];
-                ORCaen1785DecoderForQdc* aDecoder = [[ORCaen1785DecoderForQdc alloc] init];
+                ORCaen1785DecoderForAdc* aDecoder = [[ORCaen1785DecoderForAdc alloc] init];
                 [aDecoder printData:@"CAEN 965" data:someData];
                 [aDecoder release];
             }
@@ -515,12 +515,12 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORCaen1785DecoderForQdc",							@"decoder",
+								 @"ORCaen1785DecoderForAdc",							@"decoder",
 								 [NSNumber numberWithLong:dataId],					@"dataId",
 								 [NSNumber numberWithBool:YES],						@"variable",
 								 [NSNumber numberWithLong:-1],	@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Qdc"];
+    [dataDictionary setObject:aDictionary forKey:@"Adc"];
     
     return dataDictionary;
 }
@@ -529,7 +529,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"Qdc",								@"name",
+				   @"Adc",								@"name",
 				   [NSNumber numberWithLong:dataId],   @"dataId",
 				   [NSNumber numberWithLong:16],		@"maxChannels",
 				   nil];
@@ -741,7 +741,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 965 QDC (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 965 ADC (Slot %d) ",[self slot]];
 }
 
 #pragma mark ***HWWizard Support
