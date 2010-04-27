@@ -61,19 +61,17 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Crate Select",       false,	true, 	true,	0x103C,		kReadWrite,	kD16},
 	{@"Test Event Write",	false,	false, 	false,	0x103E,		kWriteOnly,	kD16},
 	{@"Event Counter Reset",false,	false, 	false,	0x1040,		kWriteOnly,	kD16},
-	{@"I current pedestal", false,  true,   true,	0x1060,		kReadWrite, kD16},
 	{@"R Test Address",     false,	true, 	true,	0x1064,		kWriteOnly,	kD16},
 	{@"SW Comm",			false,	false, 	false,	0x1068,		kWriteOnly,	kD16},
+	{@"Slide Constant",		false,	true, 	true,	0x106A,		kReadWrite,	kD16},
 	{@"ADD",				false,	false, 	false,	0x1070,		kReadOnly,	kD16},
 	{@"BADD",				false,	false, 	false,	0x1072,		kReadOnly,	kD16},
-	{@"Hi Thresholds",		false,	false, 	false,	0x1080,		kReadWrite,	kD16},
-	{@"Low Thresholds",		false,	false, 	false,	0x1082,		kReadWrite,	kD16},
+	{@"Thresholds",			false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
 
 
 NSString* ORCaen1785ModelOnlineMaskChanged   = @"ORCaen1785ModelOnlineMaskChanged";
-NSString* ORCaen1785LowThresholdChanged		= @"ORCaen1785LowThresholdChanged";
-NSString* ORCaen1785HighThresholdChanged		= @"ORCaen1785HighThresholdChanged";
+NSString* ORCaen1785ThresholdChanged		= @"ORCaen1785ThresholdChanged";
 NSString* ORCaen1785BasicLock				= @"ORCaen1785BasicLock";
 NSString* ORCaen1785SelectedRegIndexChanged	= @"ORCaen1785SelectedRegIndexChanged";
 NSString* ORCaen1785SelectedChannelChanged	= @"ORCaen1785SelectedChannelChanged";
@@ -135,33 +133,21 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
     writeValue = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785WriteValueChanged object:self];
 }
-- (unsigned long) lowThreshold:(unsigned short) aChnl
-{
-    return lowThresholds[aChnl];
-}
 
-- (void) setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
+- (void) setThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setLowThreshold:aChnl withValue:[self lowThreshold:aChnl]];
-    lowThresholds[aChnl] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl withValue:[self threshold:aChnl]];
+    thresholds[aChnl] = aValue;
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785LowThresholdChanged object:self userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785ThresholdChanged object:self userInfo:userInfo];
 }
 
-- (unsigned long) highThreshold:(unsigned short) aChnl
+- (unsigned short) threshold:(unsigned short) aChnl
 {
-    return highThresholds[aChnl];
+    return thresholds[aChnl];
 }
 
-- (void) setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:aChnl withValue:[self highThreshold:aChnl]];
-    highThresholds[aChnl] = aValue;
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785HighThresholdChanged object:self userInfo:userInfo];
-}
 
 - (unsigned short)onlineMask {
 	
@@ -216,27 +202,21 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
     
     @try {
         
-        if (theRegIndex == kLowThresholds || theRegIndex == kHiThresholds){
+        if (theRegIndex == kThresholds){
             start = theChannelIndex;
             end = theChannelIndex;
             if(theChannelIndex >= [self numberOfChannels]) {
                 start = 0;
-                end = kCV965NumberChannels - 1;
+                end = kCV1785NumberChannels - 1;
             }
             
             // Loop through the thresholds and read them.
-			if(theRegIndex == kLowThresholds){
+			if(theRegIndex == kThresholds){
 				for(i = start; i <= end; i++){
-					[self readLowThreshold:i];
-					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+					[self readThreshold:i];
+					NSLog(@"Threshold %2d = 0x%04lx\n", i, [self threshold:i]);
 				}
 			}
-			else {
-				for(i = start; i <= end; i++){
-					[self readHighThreshold:i];
-					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
-				}
-            }
         }
         
         // If user selected the output buffer then read it.
@@ -293,29 +273,22 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
         NSLog(@"Register is:%d\n", theRegIndex);
         NSLog(@"Index is   :%d\n", theChannelIndex);
         NSLog(@"Value is   :0x%04x\n", theValue);
-		if (theRegIndex == kLowThresholds || theRegIndex == kHiThresholds){
+		if (theRegIndex == kThresholds){
             start = theChannelIndex;
             end = theChannelIndex;
             if(theChannelIndex >= [self numberOfChannels]) {
                 start = 0;
-                end = kCV965NumberChannels - 1;
+                end = kCV1785NumberChannels - 1;
             }
             
             // Loop through the thresholds and read them.
-			if(theRegIndex == kLowThresholds){
+			if(theRegIndex == kThresholds){
 				for(i = start; i <= end; i++){
-					[self setLowThreshold:i withValue:theValue];
-					[self writeLowThreshold:i];
-					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+					[self setThreshold:i withValue:theValue];
+					[self writeThreshold:i];
+					NSLog(@"Threshold %2d = 0x%04lx\n", i, [self threshold:i]);
 				}
 			}
-			else {
-				for(i = start; i <= end; i++){
-					[self setHighThreshold:i withValue:theValue];
-					[self writeHighThreshold:i];
-					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
-				}
-            }
         }
 		
 		else if ([self getAccessSize:theRegIndex] == kD16){
@@ -381,77 +354,51 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 - (void) writeThresholds
 {
     short i;
-    for (i = 0; i < kCV965NumberChannels; i++){
-        [self writeLowThreshold:i];
-        [self writeHighThreshold:i];
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        [self writeThreshold:i];
     }
 }
 
 - (void) readThresholds
 {
     short i;
-    for (i = 0; i < kCV965NumberChannels; i++){
-        [self readLowThreshold:i];
-        [self readHighThreshold:i];
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        [self readThreshold:i];
     }
 }
 
-- (void) writeLowThreshold:(unsigned short) pChan
+- (void) writeThreshold:(unsigned short) pChan
 {    
 	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
-	unsigned short lowThreshold = lowThresholds[pChan] | kill;
-    [[self adapter] writeWordBlock:&lowThreshold
-                         atAddress:[self baseAddress] + [self lowThresholdOffset:pChan]
+	unsigned short threshold = thresholds[pChan] | kill;
+    [[self adapter] writeWordBlock:&threshold
+                         atAddress:[self baseAddress] + [self thresholdOffset:pChan]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	
 }
 
-- (void) writeHighThreshold:(unsigned short) pChan
+
+- (unsigned short) readThreshold:(unsigned short) pChan
 {    
-	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
-	unsigned short highThreshold = highThresholds[pChan] | kill;
-    [[self adapter] writeWordBlock:&highThreshold
-                         atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-- (unsigned short) readLowThreshold:(unsigned short) pChan
-{    
-	int lowOffset = [self lowThresholdOffset:pChan];
-	unsigned short lowThreshold;
-    [[self adapter] readWordBlock:&lowThreshold
+	int lowOffset = [self thresholdOffset:pChan];
+	unsigned short threshold;
+    [[self adapter] readWordBlock:&threshold
 						atAddress:[self baseAddress] + lowOffset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 	
-	return lowThreshold;
+	return threshold;
 }
 
-- (unsigned short) readHighThreshold:(unsigned short) pChan
-{    
-	
-	unsigned short highThreshold;
-    [[self adapter] readWordBlock:&highThreshold
-						atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	return highThreshold;
-}
 
-- (int) lowThresholdOffset:(unsigned short)aChan
+- (int) thresholdOffset:(unsigned short)aChan
 {
-	return reg[kLowThresholds].addressOffset + (aChan * 4);
+	return reg[kThresholds].addressOffset + (aChan * 2);
 }
 
-- (int) highThresholdOffset:(unsigned short)aChan
-{
-	return reg[kHiThresholds].addressOffset + (aChan * 4);
-}
 
 - (short) getNumberRegisters
 {
@@ -465,7 +412,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 
 - (unsigned short) getDataBufferSize
 {
-    return k965OutputBufferSize;
+    return kCV1785OutputBufferSize;
 }
 
 - (short) getStatusRegisterIndex:(short) aRegister
@@ -761,7 +708,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 - (void) clearAdcCounts
 {
     int i;
-    for(i=0;i<kCV965NumberChannels;i++){
+    for(i=0;i<kCV1785NumberChannels;i++){
 		adcCount[i]=0;
     }
 }
@@ -769,7 +716,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
-		if(counterTag>=0 && counterTag<kCV965NumberChannels){
+		if(counterTag>=0 && counterTag<kCV1785NumberChannels){
 			return adcCount[counterTag];
 		}	
 		else return 0;
@@ -781,16 +728,12 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     int i;
-    NSMutableArray* array = [NSMutableArray arrayWithCapacity:kCV965NumberChannels];
-    for(i=0;i<kCV965NumberChannels;i++)[array addObject:[NSNumber numberWithShort:lowThresholds[i]]];
-    [objDictionary setObject:array forKey:@"lowThresholds"];
-	
-	array = [NSMutableArray arrayWithCapacity:kCV965NumberChannels];
-    for(i=0;i<kCV965NumberChannels;i++)[array addObject:[NSNumber numberWithShort:highThresholds[i]]];
-    [objDictionary setObject:array forKey:@"highThresholds"];
-	
-	array = [NSMutableArray arrayWithCapacity:kCV965NumberChannels];
-    for(i=0;i<kCV965NumberChannels;i++)[array addObject:[NSNumber numberWithBool:[self onlineMaskBit:i]]];
+    NSMutableArray* array = [NSMutableArray arrayWithCapacity:kCV1785NumberChannels];
+    for(i=0;i<kCV1785NumberChannels;i++)[array addObject:[NSNumber numberWithShort:thresholds[i]]];
+    [objDictionary setObject:array forKey:@"thresholds"];
+		
+	array = [NSMutableArray arrayWithCapacity:kCV1785NumberChannels];
+    for(i=0;i<kCV1785NumberChannels;i++)[array addObject:[NSNumber numberWithBool:[self onlineMaskBit:i]]];
     [objDictionary setObject:array forKey:@"online"];
 	
     return objDictionary;
@@ -804,7 +747,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 #pragma mark ***HWWizard Support
 - (int) numberOfChannels
 {
-    return kCV965NumberChannels;
+    return kCV1785NumberChannels;
 }
 
 - (BOOL) hasParmetersToRamp
@@ -870,8 +813,8 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 {
     short	i;
     NSLog(@"%@ Thresholds\n",[self identifier]);
-    for (i = 0; i < kCV965NumberChannels; i++){
-        NSLog(@"chan:%d low:0x%04x high:0x%04x\n",i,[self lowThreshold:i],[self highThreshold:i]);
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        NSLog(@"%d: 0x%04x \n",i,[self threshold:i]);
     }
     
 }
@@ -881,9 +824,8 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
     self = [super initWithCoder:aDecoder];
     [[self undoManager] disableUndoRegistration];
 	int i;
-    for (i = 0; i < kCV965NumberChannels; i++){
-        [self setLowThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]]];
-        [self setHighThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]]];
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        [self setThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENThresholdChnl%d", i]]];
     }    
 	
 	[self setOnlineMask:[aDecoder decodeIntForKey:@"onlineMask"]];
@@ -900,9 +842,8 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
     [super encodeWithCoder:anEncoder];
     [anEncoder encodeInt:onlineMask forKey:@"onlineMask"];
 	int i;
-	for (i = 0; i < kCV965NumberChannels; i++){
-        [anEncoder encodeInt:lowThresholds[i] forKey:[NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]];
-        [anEncoder encodeInt:highThresholds[i] forKey:[NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]];
+	for (i = 0; i < kCV1785NumberChannels; i++){
+        [anEncoder encodeInt:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresholdChnl%d", i]];
     }
 	[anEncoder encodeInt:selectedRegIndex forKey:@"selectedRegIndex"];
     [anEncoder encodeInt:selectedChannel forKey:@"selectedChannel"];

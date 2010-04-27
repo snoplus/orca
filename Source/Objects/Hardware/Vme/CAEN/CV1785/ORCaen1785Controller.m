@@ -36,7 +36,7 @@
 {
 	
     settingSize     = NSMakeSize(280,400);
-    thresholdSize   = NSMakeSize(290,570);
+    thresholdSize   = NSMakeSize(290,360);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -55,7 +55,7 @@
 	
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     [ super registerNotificationObservers ];
@@ -77,15 +77,10 @@
 					   object : model];
 	
 	[notifyCenter addObserver:self
-					 selector:@selector(lowThresholdChanged:)
-						 name:ORCaen1785LowThresholdChanged
+					 selector:@selector(thresholdChanged:)
+						 name:ORCaen1785ThresholdChanged
 					   object:model];
-	
-	[notifyCenter addObserver:self
-					 selector:@selector(highThresholdChanged:)
-						 name:ORCaen1785HighThresholdChanged
-					   object:model];
-	
+		
 	[notifyCenter addObserver : self
                      selector : @selector(basicLockChanged:)
                          name : ORCaen1785BasicLock
@@ -124,11 +119,10 @@
     [self selectedRegIndexChanged:nil];
     [self selectedRegIndexChanged:nil];
     short 	i;
-    for (i = 0; i < kCV965NumberChannels; i++){
+    for (i = 0; i < kCV1785NumberChannels; i++){
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:@"channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785LowThresholdChanged object:model userInfo:userInfo];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785HighThresholdChanged object:model userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785ThresholdChanged object:model userInfo:userInfo];
 	}
     [self basicLockChanged:nil];
     [self slotChanged:nil];
@@ -159,16 +153,10 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
-- (void) lowThresholdChanged:(NSNotification*) aNote
+- (void) thresholdChanged:(NSNotification*) aNote
 {
 	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
-	[[lowThresholdMatrix cellWithTag:chnl] setIntValue:[model lowThreshold:chnl]];
-}
-
-- (void) highThresholdChanged:(NSNotification*) aNote
-{
-	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
-	[[highThresholdMatrix cellWithTag:chnl] setIntValue:[model highThreshold:chnl]];
+	[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
 }
 
 - (void) basicLockChanged:(NSNotification*)aNotification
@@ -177,8 +165,7 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1785BasicLock];
     BOOL locked = [gSecurity isLocked:ORCaen1785BasicLock];
     [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-    [lowThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-    [highThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
+    [thresholdMatrix setEnabled:!lockedOrRunningMaintenance];
     [reportButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
     [resetButton setEnabled:!lockedOrRunningMaintenance];
@@ -204,7 +191,7 @@
 {
 	short i;
 	unsigned short theMask = [model onlineMask];
-	for(i=0;i<kCV965NumberChannels;i++){
+	for(i=0;i<kCV1785NumberChannels;i++){
 		[[onlineMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
 }
@@ -232,8 +219,7 @@
 	[basicReadButton setEnabled:readAllowed];
 	[writeValueTextField setEnabled:writeAllowed];
 	[writeValueStepper setEnabled:writeAllowed];
-	[channelPopUp setEnabled:index==kHiThresholds || index==kLowThresholds];
-    
+	[channelPopUp setEnabled:index==kThresholds];
 }
 
 - (void) selectedRegChannelChanged:(NSNotification*) aNotification
@@ -241,7 +227,7 @@
 	[self updatePopUpButton:channelPopUp setting:[model selectedChannel]];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) baseAddressAction: (id) aSender
 {
 	[model setBaseAddress:[aSender intValue]];
@@ -262,17 +248,12 @@
 	[model setSelectedChannel:[aSender indexOfSelectedItem]];
 }
 
-- (IBAction) lowThresholdAction:(id) sender
+- (IBAction) thresholdAction:(id) sender
 {
-	[model setLowThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; 
+	[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; 
 }
 
-- (IBAction) highThresholdAction:(id) sender
-{
-    if ([sender intValue] != [model highThreshold:[[sender selectedCell] tag]]){
-        [model setHighThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; 
-    }
-}
+
 - (IBAction) resetBoard:(id)sender
 {
 	@try {
@@ -362,12 +343,12 @@
     }
     
 	// Populate the channel popup
-    for (i = 0; i < kCV965NumberChannels; i++) {
+    for (i = 0; i < kCV1785NumberChannels; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i] 
 								  atIndex:i];
     }
 	
-    [channelPopUp insertItemWithTitle:@"All" atIndex:kCV965NumberChannels];
+    [channelPopUp insertItemWithTitle:@"All" atIndex:kCV1785NumberChannels];
 	
     [self selectedRegIndexChanged:nil];
 	

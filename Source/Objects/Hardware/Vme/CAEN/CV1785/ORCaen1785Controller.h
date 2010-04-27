@@ -19,7 +19,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 
 #import "OrcaObjectController.h"
 
@@ -27,8 +27,7 @@
 @interface ORCaen1785Controller : OrcaObjectController {
     IBOutlet NSTabView* tabView;
     IBOutlet NSMatrix*	onlineMaskMatrix;
-    IBOutlet NSMatrix*	lowThresholdMatrix;
-    IBOutlet NSMatrix*	highThresholdMatrix;
+    IBOutlet NSMatrix*	thresholdMatrix;
     IBOutlet NSTextField* slotField;
     IBOutlet NSTextField* basicLockDocField;
     IBOutlet NSButton*	  basicLock1Button;
@@ -68,26 +67,23 @@
 - (void) checkGlobalSecurity;
 - (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
-- (void) lowThresholdChanged:(NSNotification*)aNote;
-- (void) highThresholdChanged:(NSNotification*)aNote;
+- (void) thresholdChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) onlineMaskChanged:(NSNotification*)aNote;
 - (void) writeValueChanged:(NSNotification*)aNote;
 - (void) selectedRegIndexChanged:(NSNotification*)aNote;
 - (void) selectedRegChannelChanged:(NSNotification*)aNote;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) baseAddressAction: (id)aSender;
-- (IBAction) lowThresholdAction:(id)sender;
-- (IBAction) highThresholdAction:(id)sender;
+- (IBAction) thresholdAction:(id)sender;
 - (IBAction) onlineAction:(id)sender;
 - (IBAction) basicLockAction:(id)sender;
 - (IBAction) writeValueAction:(id)sender;
 
 - (IBAction) selectRegisterAction:(id)sender;
 - (IBAction) selectChannelAction:(id)sender;
-- (IBAction) lowThresholdAction:(id)sender;
-- (IBAction) highThresholdAction:(id)sender;
+- (IBAction) thresholdAction:(id)sender;
 - (IBAction) read:(id)sender;
 - (IBAction) write:(id)sender;
 - (IBAction) onlineAction:(id)sender;

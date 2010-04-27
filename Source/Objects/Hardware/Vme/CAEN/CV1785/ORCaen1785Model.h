@@ -58,30 +58,28 @@ enum {
     kCrateSelect,		// 103C
     kTestEventWrite,	// 103E
     kEventCounterReset,	// 1040
-	kIpedReg,			// 1060
-    kRTestAddress,		// 1064
+	kRTestAddress,		// 1064
     kSWComm,			// 1068
+	kSlideConstant,		// 106A
     kADD,				// 1070
     kBADD,				// 1072
-    kHiThresholds,		// 1080
-    kLowThresholds,		// 1082
+    kThresholds,		// 1080
     kNumRegisters
 };
 
 // Size of output buffer
-#define k965OutputBufferSize 0x07FF
-#define kCV965NumberChannels 16
+#define kCV1785OutputBufferSize 0x07FF
+#define kCV1785NumberChannels 8
 
 // Class definition
 @interface ORCaen1785Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
 	unsigned long dataId;
 	ORRateGroup*	adcRateGroup;
-	unsigned long 	adcCount[kCV965NumberChannels];
+	unsigned long 	adcCount[kCV1785NumberChannels];
 	BOOL isRunning;
-    unsigned short  lowThresholds[kCV965NumberChannels];
-    unsigned short  highThresholds[kCV965NumberChannels];
-	unsigned short   onlineMask;
+    unsigned short  thresholds[kCV1785NumberChannels];
+	unsigned short  onlineMask;
 	unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
     unsigned long   writeValue;
@@ -96,11 +94,9 @@ enum {
 - (id) init;
 
 #pragma mark ***Accessors
-- (unsigned long)	lowThreshold:(unsigned short) aChnl;
-- (void)			setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
-- (unsigned long)	highThreshold:(unsigned short) aChnl;
-- (void)			setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
-- (unsigned short)onlineMask;
+- (unsigned short)	threshold:(unsigned short) aChnl;
+- (void)			setThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue;
+- (unsigned short)  onlineMask;
 - (void)			setOnlineMask:(unsigned short)anOnlineMask;
 - (BOOL)			onlineMaskBit:(int)bit;
 - (void)			setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
@@ -117,12 +113,9 @@ enum {
 #pragma mark ***Register - General routines
 - (void) writeThresholds;
 - (void) readThresholds;
-- (void) writeLowThreshold:(unsigned short) pChan;
-- (void) writeHighThreshold:(unsigned short) pChan;
-- (unsigned short) readLowThreshold:(unsigned short) pChan;
-- (unsigned short) readHighThreshold:(unsigned short) pChan;
-- (int) lowThresholdOffset:(unsigned short)aChan;
-- (int) highThresholdOffset:(unsigned short)aChan;
+- (void) writeThreshold:(unsigned short) pChan;
+- (unsigned short) readThreshold:(unsigned short) pChan;
+- (int) thresholdOffset:(unsigned short)aChan;
 - (short) getNumberRegisters;
 - (unsigned long) getBufferOffset;
 - (unsigned short) getDataBufferSize;
@@ -177,8 +170,7 @@ enum {
 
 extern NSString* ORCaen1785BasicLock;
 extern NSString* ORCaen1785ModelOnlineMaskChanged;
-extern NSString* ORCaen1785LowThresholdChanged;
-extern NSString* ORCaen1785HighThresholdChanged;
+extern NSString* ORCaen1785ThresholdChanged;
 extern NSString* ORCaen1785SelectedRegIndexChanged;
 extern NSString* ORCaen1785SelectedChannelChanged;
 extern NSString* ORCaen1785WriteValueChanged;
