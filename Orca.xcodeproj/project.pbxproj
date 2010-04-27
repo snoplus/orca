@@ -12489,12 +12489,6 @@
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_4 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_5 = "\"$(SRCROOT)/../../Downloads/MotionNodeAccelAPI\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_6 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
 					"-falign-loops=32",
