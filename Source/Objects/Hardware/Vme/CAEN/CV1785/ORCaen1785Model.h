@@ -67,111 +67,39 @@ enum {
     kNumRegisters
 };
 
-// Size of output buffer
-#define kCV1785OutputBufferSize 0x07FF
-#define kCV1785NumberChannels 8
+#define kADCOutputBufferSize 0x07FF + 0x0004
 
 // Class definition
-@interface ORCaen1785Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface ORCaen1785Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
-	unsigned long dataId;
-	ORRateGroup*	adcRateGroup;
-	unsigned long 	adcCount[kCV1785NumberChannels];
-	BOOL isRunning;
-    unsigned short  thresholds[kCV1785NumberChannels];
-	unsigned short  onlineMask;
-	unsigned short  selectedRegIndex;
-    unsigned short  selectedChannel;
-    unsigned long   writeValue;
-	
-	//cached values for speed.
-	unsigned long statusAddress;
-	unsigned long dataBufferAddress;
-	unsigned long location;
 }
 
 #pragma mark ***Accessors
-- (id) init;
-
-#pragma mark ***Accessors
-- (unsigned short)	threshold:(unsigned short) aChnl;
-- (void)			setThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue;
-- (unsigned short)  onlineMask;
-- (void)			setOnlineMask:(unsigned short)anOnlineMask;
-- (BOOL)			onlineMaskBit:(int)bit;
-- (void)			setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
-- (void)			setUpImage;
-- (void)			makeMainController;
-- (NSRange)			memoryFootprint;
-- (unsigned short) 	selectedRegIndex;
-- (void)			setSelectedRegIndex: (unsigned short) anIndex;
-- (unsigned short) 	selectedChannel;
-- (void)			setSelectedChannel: (unsigned short) anIndex;
-- (unsigned long) 	writeValue;
-- (void)			setWriteValue: (unsigned long) anIndex;
 
 #pragma mark ***Register - General routines
-- (void) writeThresholds;
-- (void) readThresholds;
-- (void) writeThreshold:(unsigned short) pChan;
-- (unsigned short) readThreshold:(unsigned short) pChan;
-- (int) thresholdOffset:(unsigned short)aChan;
-- (short) getNumberRegisters;
-- (unsigned long) getBufferOffset;
-- (unsigned short) getDataBufferSize;
-- (short) getStatusRegisterIndex:(short) aRegister;
-- (short) getOutputBufferIndex;
+- (short)		getNumberRegisters;
+- (unsigned long) 	getBufferOffset;
+- (unsigned short) 	getDataBufferSize;
+- (unsigned long) 	getThresholdOffset;
+- (short)		getStatusRegisterIndex: (short) aRegister;
+- (short)		getThresholdIndex;
+- (short)		getOutputBufferIndex;
 
 #pragma mark ***Register - Register specific routines
-- (NSString*) getRegisterName:(short) anIndex;
-- (unsigned long) getAddressOffset:(short) anIndex;
-- (short) getAccessType:(short) anIndex;
-- (short) getAccessSize:(short) anIndex;
-- (BOOL) dataReset:(short) anIndex;
-- (BOOL) swReset:(short) anIndex;
-- (BOOL) hwReset:(short) anIndex;
-- (void) initBoard;
-- (void) write;
-- (void) read:(unsigned short) pReg returnValue:(void*) pValue;
-- (void) clearData;
-- (void) resetEventCounter;
+- (NSString*) 		getRegisterName: (short) anIndex;
+- (unsigned long) 	getAddressOffset: (short) anIndex;
+- (short)		getAccessType: (short) anIndex;
+- (short)		getAccessSize: (short) anIndex;
+- (BOOL)		dataReset: (short) anIndex;
+- (BOOL)		swReset: (short) anIndex;
+- (BOOL)		hwReset: (short) anIndex;
 
-#pragma mark ***DataTaker
-- (int)  load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (NSDictionary*) dataRecordDescription;
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
-- (void) reset;
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (BOOL) bumpRateFromDecodeStage:(short)channel;
-- (unsigned long) adcCount:(int)aChannel;
-- (void) startRates;
-- (void) clearAdcCounts;
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
-- (NSString*) identifier;
+#pragma mark ***Hardware Access
 
-#pragma mark ***HWWizard Support
-- (BOOL)      hasParmetersToRamp;
-- (NSArray*)  wizardSelections;
-- (NSArray*)  wizardParameters;
-- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
-- (void)	  logThresholds;
-
-#pragma mark ***Archival
-- (id)   initWithCoder:(NSCoder*) aDecoder;
-- (void) encodeWithCoder:(NSCoder*) anEncoder;
 @end
 
-extern NSString* ORCaen1785BasicLock;
-extern NSString* ORCaen1785ModelOnlineMaskChanged;
-extern NSString* ORCaen1785ThresholdChanged;
-extern NSString* ORCaen1785SelectedRegIndexChanged;
-extern NSString* ORCaen1785SelectedChannelChanged;
-extern NSString* ORCaen1785WriteValueChanged;
-
+//the decoder concrete decoder class
+@interface ORCaen1785DecoderForCAEN : ORCaenDataDecoder
+{}
+- (NSString*) identifier;
+@end
