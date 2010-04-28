@@ -1,9 +1,9 @@
-#ifndef _ORCaen1785Readout_hh_
-#define _ORCaen1785Readout_hh_
+#ifndef _ORCAEN1785Readout_hh_
+#define _ORCAEN1785Readout_hh_
 #include "ORVVmeCard.hh"
 #include <iostream>
 
-class ORCaen1785Readout : public ORVVmeCard
+class ORCAEN1785Readout : public ORVVmeCard
 {
   public:
     ORCaen1785Readout(SBC_card_info* ci) : ORVVmeCard(ci) {} 
