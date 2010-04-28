@@ -396,7 +396,7 @@ NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 
 - (int) thresholdOffset:(unsigned short)aChan
 {
-	return reg[kThresholds].addressOffset + (aChan * 2);
+	return reg[kThresholds].addressOffset + (aChan * 4);
 }
 
 
