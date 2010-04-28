@@ -26,8 +26,8 @@
 #import "ORRateGroup.h"
 
 // Address information for this unit.
-#define k965DefaultBaseAddress 		0xd0000
-#define k965DefaultAddressModifier 	0x39
+#define k1785DefaultBaseAddress 		0xee000000
+#define k1785DefaultAddressModifier 	0x39
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
@@ -66,55 +66,35 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Slide Constant",		false,	true, 	true,	0x106A,		kReadWrite,	kD16},
 	{@"ADD",				false,	false, 	false,	0x1070,		kReadOnly,	kD16},
 	{@"BADD",				false,	false, 	false,	0x1072,		kReadOnly,	kD16},
-	{@"Thresholds",			false,	false, 	false,	0x1080,		kReadWrite,	kD16},
+	{@"Hi Thresholds",		false,	false, 	false,	0x1080,		kReadWrite,	kD16},
+	{@"Low Thresholds",		false,	false, 	false,	0x1084,		kReadWrite,	kD16},
 };
 
-#define k1785DefaultBaseAddress 0xee000000
+
+
+NSString* ORCaen1785ModelOnlineMaskChanged   = @"ORCaen1785ModelOnlineMaskChanged";
+NSString* ORCaen1785LowThresholdChanged		= @"ORCaen1785LowThresholdChanged";
+NSString* ORCaen1785HighThresholdChanged		= @"ORCaen1785HighThresholdChanged";
+NSString* ORCaen1785BasicLock				= @"ORCaen1785BasicLock";
+NSString* ORCaen1785SelectedRegIndexChanged	= @"ORCaen1785SelectedRegIndexChanged";
+NSString* ORCaen1785SelectedChannelChanged	= @"ORCaen1785SelectedChannelChanged";
+NSString* ORCaen1785WriteValueChanged		= @"ORCaen1785WriteValueChanged";
 
 @implementation ORCaen1785Model
 
 #pragma mark ***Initialization
-//--------------------------------------------------------------------------------
-/*!\method  init
- * \brief	Called first time class is initialized.  Used to set basic
- *			default values first time object is created.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) init //designated initializer
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
 	
     [self setBaseAddress:k1785DefaultBaseAddress];
-    [self setAddressModifier:0x39];
+    [self setAddressModifier:k1785DefaultAddressModifier];
+	[self setOnlineMask:0xffff];
 	
     [[self undoManager] enableUndoRegistration];
 	
     return self;
-}
-
-//--------------------------------------------------------------------------------
-/*!\method  setUpImage
- * \brief	Sets the image used by this device in the catalog window.
- * \note	
- */
-//--------------------------------------------------------------------------------
-- (void) setUpImage
-{
-    [self setImage:[NSImage imageNamed:@"Caen1785"]];
-}
-
-//--------------------------------------------------------------------------------
-/*!\method  makeMainController
- * \brief	Makes the controller object that interfaces between the GUI and
- *			this model.
- * \note	
- */
-//--------------------------------------------------------------------------------
-- (void) makeMainController
-{
-    [self linkToController:@"ORCaen1785Controller"];
 }
 
 - (NSString*) helpURL
@@ -122,14 +102,356 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	return @"VME/V1785.html";
 }
 
-- (NSRange)	memoryFootprint
+#pragma mark ***Accessors
+- (unsigned short) selectedRegIndex
 {
-	return NSMakeRange(baseAddress,0x10BF);
+    return selectedRegIndex;
+}
+- (void) setSelectedRegIndex:(unsigned short) anIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self]setSelectedRegIndex:[self selectedRegIndex]];
+    selectedRegIndex = anIndex;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785SelectedRegIndexChanged object:self];
 }
 
-- (int) thresholdOffset:(unsigned short)aChan
+- (unsigned short) selectedChannel
 {
-	return reg[kThresholds].addressOffset + (aChan * 4);
+    return selectedChannel;
+}
+- (void) setSelectedChannel:(unsigned short) anIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self]setSelectedChannel:[self selectedChannel]];
+    selectedChannel = anIndex;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785SelectedChannelChanged object:self];
+}
+
+- (unsigned long) writeValue
+{
+    return writeValue;
+}
+
+- (void) setWriteValue:(unsigned long) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
+    writeValue = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785WriteValueChanged object:self];
+}
+- (unsigned long) lowThreshold:(unsigned short) aChnl
+{
+    return lowThresholds[aChnl];
+}
+
+- (void) setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowThreshold:aChnl withValue:[self lowThreshold:aChnl]];
+    lowThresholds[aChnl] = aValue;
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785LowThresholdChanged object:self userInfo:userInfo];
+}
+
+- (unsigned long) highThreshold:(unsigned short) aChnl
+{
+    return highThresholds[aChnl];
+}
+
+- (void) setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:aChnl withValue:[self highThreshold:aChnl]];
+    highThresholds[aChnl] = aValue;
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785HighThresholdChanged object:self userInfo:userInfo];
+}
+
+- (unsigned short)onlineMask {
+	
+    return onlineMask;
+}
+
+- (void)setOnlineMask:(unsigned short)anOnlineMask {
+    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
+    onlineMask = anOnlineMask;	    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785ModelOnlineMaskChanged object:self];
+}
+
+- (BOOL)onlineMaskBit:(int)bit
+{
+	return onlineMask&(1<<bit);
+}
+
+- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned short aMask = onlineMask;
+	if(aValue)aMask |= (1<<bit);
+	else      aMask &= ~(1<<bit);
+	[self setOnlineMask:aMask];
+}
+
+- (void) setUpImage
+{
+    [self setImage:[NSImage imageNamed:@"Caen1785"]];
+}
+
+- (void) makeMainController
+{
+    [self linkToController:@"ORCaen1785Controller"];
+}
+
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x1080);
+}
+
+#pragma mark ***Register - General routines
+- (void) read
+{
+    
+    unsigned short 	theValue   = 0;
+    short		start;
+    short		end;
+    short		i;
+    // Get register and channel from dialog box.
+    short theChannelIndex	= [self selectedChannel];
+    short theRegIndex 		= [self selectedRegIndex];
+    
+    @try {
+        
+        if (theRegIndex == kLowThresholds || theRegIndex == kHiThresholds){
+            start = theChannelIndex;
+            end = theChannelIndex;
+            if(theChannelIndex >= [self numberOfChannels]) {
+                start = 0;
+                end = kCV1785NumberChannels - 1;
+            }
+            
+            // Loop through the thresholds and read them.
+			if(theRegIndex == kLowThresholds){
+				for(i = start; i <= end; i++){
+					[self readLowThreshold:i];
+					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+				}
+			}
+			else {
+				for(i = start; i <= end; i++){
+					[self readHighThreshold:i];
+					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
+				}
+            }
+        }
+        
+        // If user selected the output buffer then read it.
+        else if (theRegIndex == [self getOutputBufferIndex]){
+            ORDataPacket* tempDataPacket = [[ORDataPacket alloc]init];
+			
+			statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
+			dataBufferAddress   = [self baseAddress]+[self getBufferOffset];;
+			location			=  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+			controller			= [self adapter]; //cache for speed
+			
+            [self takeData:tempDataPacket userInfo:nil];
+			[tempDataPacket addFrameBuffer:YES];
+			isRunning = NO;
+			
+            if([[tempDataPacket dataArray]count]){
+				NSData* theData = [[tempDataPacket dataArray] objectAtIndex:0];
+				unsigned long* someData = (unsigned long*)[theData bytes];
+                ORCaen1785DecoderForAdc* aDecoder = [[ORCaen1785DecoderForAdc alloc] init];
+                [aDecoder printData:@"CAEN 1785" data:someData];
+                [aDecoder release];
+            }
+			else NSLog(@"No Data in buffer\n");
+        }
+        
+        // Handle all other registers.  Just read them.
+        else {
+            [self read:theRegIndex returnValue:&theValue];
+            NSLog(@"CAEN reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
+        }
+        
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Can't Read [%@] on the %@.\n",
+			  [self getRegisterName:theRegIndex], [self identifier]);
+		[localException raise];
+	}
+}
+
+
+- (void) write
+{
+    // Get the value - Already validated by stepper.
+    unsigned long theValue =  [self writeValue];
+    // Get register and channel from dialog box.
+    short theChannelIndex	= [self selectedChannel];
+    short theRegIndex 		= [self selectedRegIndex];
+	short		start;
+    short		end;
+    short		i;
+	
+    @try {
+        
+        NSLog(@"Register is:%d\n", theRegIndex);
+        NSLog(@"Index is   :%d\n", theChannelIndex);
+        NSLog(@"Value is   :0x%04x\n", theValue);
+		if (theRegIndex == kLowThresholds || theRegIndex == kHiThresholds){
+            start = theChannelIndex;
+            end = theChannelIndex;
+            if(theChannelIndex >= [self numberOfChannels]) {
+                start = 0;
+                end = kCV1785NumberChannels - 1;
+            }
+            
+            // Loop through the thresholds and read them.
+			if(theRegIndex == kLowThresholds){
+				for(i = start; i <= end; i++){
+					[self setLowThreshold:i withValue:theValue];
+					[self writeLowThreshold:i];
+					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+				}
+			}
+			else {
+				for(i = start; i <= end; i++){
+					[self setHighThreshold:i withValue:theValue];
+					[self writeHighThreshold:i];
+					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
+				}
+            }
+        }
+		
+		else if ([self getAccessSize:theRegIndex] == kD16){
+			unsigned short sValue = (unsigned short)theValue;
+			[[self adapter] writeWordBlock:&sValue
+								 atAddress:[self baseAddress] + [self getAddressOffset:theRegIndex]
+								numToWrite:1
+								withAddMod:[self addressModifier]
+							 usingAddSpace:0x01];
+        }
+		else {
+			[[self adapter] writeLongBlock:&theValue
+								 atAddress:[self baseAddress] + [self getAddressOffset:theRegIndex]
+								numToWrite:1
+								withAddMod:[self addressModifier]
+							 usingAddSpace:0x01];
+		}
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
+			  theValue, [self getRegisterName:theRegIndex],[self identifier]);
+		[localException raise];
+	}
+}
+
+
+- (void) read:(unsigned short) pReg returnValue:(void*) pValue
+{
+    // Make sure that register is valid
+    if (pReg >= [self getNumberRegisters]) {
+        [NSException raise:@"Illegal Register" format:@"Register index out of bounds on %@",[self identifier]];
+    }
+    
+    // Make sure that one can read from register
+    if([self getAccessType:pReg] != kReadOnly
+       && [self getAccessType:pReg] != kReadWrite) {
+        [NSException raise:@"Illegal Operation" format:@"Illegal operation (read not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
+    }
+    
+    // Perform the read operation.
+	if ([self getAccessSize:pReg] == kD16){
+		unsigned short aValue;
+		[[self adapter] readWordBlock:&aValue
+							atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		*((unsigned short*)pValue) = aValue;
+	}
+	else {
+		unsigned long aValue;
+		[[self adapter] readLongBlock:&aValue
+							atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		*((unsigned long*)pValue) = aValue;
+	}
+}
+
+
+
+- (void) writeThresholds
+{
+    short i;
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        [self writeLowThreshold:i];
+        [self writeHighThreshold:i];
+    }
+}
+
+- (void) readThresholds
+{
+    short i;
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        [self readLowThreshold:i];
+        [self readHighThreshold:i];
+    }
+}
+
+- (void) writeLowThreshold:(unsigned short) pChan
+{    
+	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
+	unsigned short lowThreshold = lowThresholds[pChan] | kill;
+    [[self adapter] writeWordBlock:&lowThreshold
+                         atAddress:[self baseAddress] + [self lowThresholdOffset:pChan]
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+	
+}
+
+- (void) writeHighThreshold:(unsigned short) pChan
+{    
+	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
+	unsigned short highThreshold = highThresholds[pChan] | kill;
+    [[self adapter] writeWordBlock:&highThreshold
+                         atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+- (unsigned short) readLowThreshold:(unsigned short) pChan
+{    
+	int lowOffset = [self lowThresholdOffset:pChan];
+	unsigned short lowThreshold;
+    [[self adapter] readWordBlock:&lowThreshold
+						atAddress:[self baseAddress] + lowOffset
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	
+	return lowThreshold;
+}
+
+- (unsigned short) readHighThreshold:(unsigned short) pChan
+{    
+	
+	unsigned short highThreshold;
+    [[self adapter] readWordBlock:&highThreshold
+						atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	return highThreshold;
+}
+
+- (int) lowThresholdOffset:(unsigned short)aChan
+{
+	return reg[kLowThresholds].addressOffset + (aChan * 4);
+}
+
+- (int) highThresholdOffset:(unsigned short)aChan
+{
+	return reg[kHiThresholds].addressOffset + (aChan * 4);
 }
 
 - (short) getNumberRegisters
@@ -144,12 +466,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 - (unsigned short) getDataBufferSize
 {
-    return kADCOutputBufferSize;
-}
-
-- (unsigned long) getThresholdOffset
-{
-    return reg[kThresholds].addressOffset;
+    return k1785OutputBufferSize;
 }
 
 - (short) getStatusRegisterIndex:(short) aRegister
@@ -158,23 +475,16 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     else		return kStatusRegister2;
 }
 
-- (short) getThresholdIndex
-{
-    return(kThresholds);
-}
-
 - (short) getOutputBufferIndex
 {
     return(kOutputBuffer);
 }
-
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) getRegisterName:(short) anIndex
 {
     return reg[anIndex].regName;
 }
-
 - (unsigned long) getAddressOffset:(short) anIndex
 {
     return(reg[anIndex].addressOffset);
@@ -185,141 +495,422 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return reg[anIndex].accessType;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAccessSize
- * \brief	Get the access size, either 32 or 16 bit for the
- *			register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The access type.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getAccessSize:(short) anIndex
 {
     return reg[anIndex].size;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  dataReset
- * \brief	Get the data reset flag for register at index anIndex.
- * \param	anIndex			- Index of the register.
- * \return	The data reset flag either true of false.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) dataReset:(short) anIndex
 {
     return reg[anIndex].dataReset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  swReset
- * \brief	Get the software reset flag for register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The software reset flag.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) swReset:(short) anIndex
 {
     return reg[anIndex].softwareReset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  hwReset
- * \brief	Get the hardware reset flag for register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The hardware reset flag.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) hwReset:(short) anIndex
 {
     return reg[anIndex].hwReset;
 }
 
-
-#pragma mark ***DataTaker
-//--------------------------------------------------------------------------------
-/*!\method  runTaskStarted
- * \brief	Beginning of run.  Prepare this object to take data.  Write out hardware settings
- *			to data stream.
- * \param	aDataPacket				- Object where data is written.
- * \note	
- */
-//--------------------------------------------------------------------------------
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) initBoard
 {
-    [super runTaskStarted:aDataPacket userInfo:userInfo];
-    
-    // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];		// Clear data, 
-    [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
-    [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
-	
-    // Set options
-	
-    // Set thresholds in unit
-    [self writeThresholds];
-    
+	[self writeThresholds];
 }
 
+- (void) clearData
+{
+	unsigned short aValue = kClearData;
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + [self getAddressOffset:kBitSet2]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	aValue = kClearData;
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + [self getAddressOffset:kBitClear2]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
 
-//--------------------------------------------------------------------------------
-/*!\method  runTaskStopped
- * \brief	Resets the oscilloscope so that it is in continuous acquisition mode.
- * \param	aDataPacket			- Data from most recent event.
- * \note	
- */
-//--------------------------------------------------------------------------------
+- (void) resetEventCounter
+{
+	unsigned short aValue = 0x0;
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + [self getAddressOffset:kEventCounterReset]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+#pragma mark ***DataTaker
+
+- (void) setDataIds:(id)assigner
+{
+    dataId = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId:[anotherObj dataId]];
+}
+
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCaen1785DecoderForQdc",							@"decoder",
+								 [NSNumber numberWithLong:dataId],					@"dataId",
+								 [NSNumber numberWithBool:YES],						@"variable",
+								 [NSNumber numberWithLong:-1],	@"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"Qdc"];
+    
+    return dataDictionary;
+}
+
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
+{
+	NSDictionary* aDictionary;
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"Qdc",								@"name",
+				   [NSNumber numberWithLong:dataId],   @"dataId",
+				   [NSNumber numberWithLong:16],		@"maxChannels",
+				   nil];
+	
+	[anEventDictionary setObject:aDictionary forKey:@"Caen1785"];
+}
+
+- (void) reset
+{	
+}
+
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+{  
+	
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
+	
+    // Clear unit
+	[self clearData];
+	[self resetEventCounter];
+	
+    //Cache some values
+	statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
+	dataBufferAddress   = [self baseAddress]+[self getBufferOffset];;
+	location			=  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+    controller			= [self adapter]; //cache for speed
+	
+    // Set thresholds in unit
+    [self initBoard];
+	
+	isRunning = NO;
+	
+    [self startRates];
+	
+}
+
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	isRunning = YES;
+	
+    @try {
+		unsigned short statusValue = 0;
+		[controller readWordBlock:&statusValue
+						atAddress:statusAddress
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+		
+		if(statusValue & 0x0001){
+			
+			//OK, at least one data value is ready
+			unsigned long dataValue;
+			[controller readLongBlock:&dataValue
+							atAddress:dataBufferAddress
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+			
+			//if this is a header, must be valid data.
+			BOOL validData = YES; //assume OK until shown otherwise
+			if(ShiftAndExtract(dataValue,24,0x7) == 0x2){
+				//get the number of memorized channels
+				int numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
+				int i;
+				if((numMemorizedChannels>0)){
+					unsigned long dataRecord[0xffff];
+					//we fill in dataRecord[0] below once we know the final size
+					dataRecord[1] = location;
+					int index = 2;
+					for(i=0;i<numMemorizedChannels;i++){
+						[controller readLongBlock:&dataValue
+										atAddress:dataBufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						int channel = ShiftAndExtract(dataValue,17,0xf);
+						if(dataType == 0x000){
+							dataRecord[index] = dataValue;
+							index++;
+						}
+						else {
+							validData = NO;
+							break;
+						}
+						++adcCount[channel]; 
+					}
+					if(validData){
+						//OK we read the data, get the end of block
+						[controller readLongBlock:&dataValue
+										atAddress:dataBufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						//make sure it really is an end of block
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						if(dataType == 0x4){
+							//dataRecord[index] = dataValue; //we don't ship the end of block for now
+							//index++;
+							//got a end of block fill in the ORCA header and ship the data
+							dataRecord[0] = dataId | index; //see.... filled it in here....
+							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
+						}
+						else {
+							validData = NO;
+						}
+					}
+				}
+			}
+			if(!validData){
+				//flush the buffer, read until not valid datum
+				int i;
+				for(i=0;i<0x07FC;i++) {
+					unsigned long dataValue;
+					[controller readLongBlock:&dataValue
+									atAddress:dataBufferAddress
+									numToRead:1
+								   withAddMod:[self addressModifier]
+								usingAddSpace:0x01];
+					if(ShiftAndExtract(dataValue,24,0x7) == 0x6) {
+						break;
+					}
+				}
+			}
+		}
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"Caen1785 Card Error",nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
+}
+
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
-    [super runTaskStopped:aDataPacket userInfo:userInfo];
+	[adcRateGroup stop];
+    controller = nil;
+	isRunning = NO;
+}
+
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id = kCaen1785; //should be unique
+	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	configStruct->card_info[index].slot 	 = [self slot];
+	configStruct->card_info[index].crate 	 = [self crateNumber];
+	configStruct->card_info[index].add_mod 	 = [self addressModifier];
+	configStruct->card_info[index].base_add  = [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0] = reg[kStatusRegister1].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	
+	return index+1;
+}
+
+- (BOOL) bumpRateFromDecodeStage:(short)channel
+{
+	if(isRunning)return NO;
+    ++adcCount[channel];
+    return YES;
+}
+
+- (unsigned long) adcCount:(int)aChannel
+{
+    return adcCount[aChannel];
+}
+
+-(void) startRates
+{
+	[self clearAdcCounts];
+    [adcRateGroup start:self];
+}
+
+- (void) clearAdcCounts
+{
+    int i;
+    for(i=0;i<kCV1785NumberChannels;i++){
+		adcCount[i]=0;
+    }
+}
+
+- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+{
+	if(groupTag == 0){
+		if(counterTag>=0 && counterTag<kCV1785NumberChannels){
+			return adcCount[counterTag];
+		}	
+		else return 0;
+	}
+	else return 0;
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    int i;
+    NSMutableArray* array = [NSMutableArray arrayWithCapacity:kCV1785NumberChannels];
+    for(i=0;i<kCV1785NumberChannels;i++)[array addObject:[NSNumber numberWithShort:lowThresholds[i]]];
+    [objDictionary setObject:array forKey:@"lowThresholds"];
+	
+	array = [NSMutableArray arrayWithCapacity:kCV1785NumberChannels];
+    for(i=0;i<kCV1785NumberChannels;i++)[array addObject:[NSNumber numberWithShort:highThresholds[i]]];
+    [objDictionary setObject:array forKey:@"highThresholds"];
+	
+	array = [NSMutableArray arrayWithCapacity:kCV1785NumberChannels];
+    for(i=0;i<kCV1785NumberChannels;i++)[array addObject:[NSNumber numberWithBool:[self onlineMaskBit:i]]];
+    [objDictionary setObject:array forKey:@"online"];
+	
+    return objDictionary;
 }
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 1785 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 1785 QDC (Slot %d) ",[self slot]];
 }
 
+#pragma mark ***HWWizard Support
+- (int) numberOfChannels
+{
+    return kCV1785NumberChannels;
+}
+
+- (BOOL) hasParmetersToRamp
+{
+	return YES;
+}
+
+- (NSArray*) wizardSelections
+{
+    NSMutableArray* a = [NSMutableArray array];
+    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORVmeCrateModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:NSStringFromClass([self class])]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:NSStringFromClass([self class])]];
+    return a;
+}
+
+- (NSArray*) wizardParameters
+{
+    NSMutableArray* a = [NSMutableArray array];
+    ORHWWizParam* p;
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Low Threshold"];
+    [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setLowThreshold:withValue:) getMethod:@selector(lowThreshold:)];
+	[p setCanBeRamped:YES];
+	[p setInitMethodSelector:@selector(writeLowThresholds)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"High Threshold"];
+    [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHighThreshold:withValue:) getMethod:@selector(highThreshold:)];
+	[p setCanBeRamped:YES];
+	[p setInitMethodSelector:@selector(writeLHighThresholds)];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Online"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setOnlineMaskBit:withValue:) getMethod:@selector(onlineMaskBit:)];
+    [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
+    [a addObject:p];
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+	[p setUseValue:NO];
+	[p setName:@"Init"];
+	[p setSetMethodSelector:@selector(initBoard)];
+	[a addObject:p];
+    
+    return a;
+}
+
+- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
+{
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
+    if([param isEqualToString:@"Low Threshold"])return [[cardDictionary objectForKey:@"lowThresholds"] objectAtIndex:aChannel];
+    if([param isEqualToString:@"High Threshold"])return [[cardDictionary objectForKey:@"highThresholds"] objectAtIndex:aChannel];
+    else if([param isEqualToString:@"Online"]) return [cardDictionary objectForKey:@"onlineMask"];
+    else return nil;
+}
+- (void) logThresholds
+{
+    short	i;
+    NSLog(@"%@ Thresholds\n",[self identifier]);
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        NSLog(@"chan:%d low:0x%04x high:0x%04x\n",i,[self lowThreshold:i],[self highThreshold:i]);
+    }
+    
+}
 #pragma mark ***Archival
-//--------------------------------------------------------------------------------
-/*!\method  initWithCoder  
- * \brief	Initialize object using archived settings.
- * \param	aDecoder			- Object used for getting archived internal parameters.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
     self = [super initWithCoder:aDecoder];
-	
     [[self undoManager] disableUndoRegistration];
+	int i;
+    for (i = 0; i < kCV1785NumberChannels; i++){
+        [self setLowThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]]];
+        [self setHighThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]]];
+    }    
 	
-    
+	[self setOnlineMask:[aDecoder decodeIntForKey:@"onlineMask"]];
+    [self setSelectedRegIndex:[aDecoder decodeIntForKey:@"selectedRegIndex"]];
+    [self setSelectedChannel:[aDecoder decodeIntForKey:@"selectedChannel"]];
+    [self setWriteValue:[aDecoder decodeInt32ForKey:@"writeValue"]];
+	
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  encodeWithCoder  
- * \brief	Save the internal settings to the archive.  OscBase saves most
- *			of the settings.
- * \param	anEncoder			- Object used for encoding.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+    [anEncoder encodeInt:onlineMask forKey:@"onlineMask"];
+	int i;
+	for (i = 0; i < kCV1785NumberChannels; i++){
+        [anEncoder encodeInt:lowThresholds[i] forKey:[NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]];
+        [anEncoder encodeInt:highThresholds[i] forKey:[NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]];
+    }
+	[anEncoder encodeInt:selectedRegIndex forKey:@"selectedRegIndex"];
+    [anEncoder encodeInt:selectedChannel forKey:@"selectedChannel"];
+    [anEncoder encodeInt32:writeValue forKey:@"writeValue"];
+	
 }
 
 @end
 
-@implementation ORCaen1785DecoderForCAEN : ORCaenDataDecoder
-- (NSString*) identifier
-{
-    return @"CAEN 1785 ADC";
-}
-@end
 
