@@ -127,226 +127,42 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	return NSMakeRange(baseAddress,0x10BF);
 }
 
-
-- (void) write
-{
-    // Get the value - Already validated by stepper.
-    unsigned long theValue =  [self writeValue];
-    // Get register and channel from dialog box.
-    short theChannelIndex	= [self selectedChannel];
-    short theRegIndex 		= [self selectedRegIndex];
-	short		start;
-    short		end;
-    short		i;
-	
-    @try {
-        
-        NSLog(@"Register is:%d\n", theRegIndex);
-        NSLog(@"Index is   :%d\n", theChannelIndex);
-        NSLog(@"Value is   :0x%04x\n", theValue);
-		if (theRegIndex == kThresholds){
-            start = theChannelIndex;
-            end = theChannelIndex;
-            if(theChannelIndex >= [self numberOfChannels]) {
-                start = 0;
-                end = kCV1785NumberChannels - 1;
-            }
-            
-            // Loop through the thresholds and read them.
-			if(theRegIndex == kThresholds){
-				for(i = start; i <= end; i++){
-					[self setThreshold:i withValue:theValue];
-					[self writeThreshold:i];
-					NSLog(@"Threshold %2d = 0x%04lx\n", i, [self threshold:i]);
-				}
-			}
-        }
-		
-		else if ([self getAccessSize:theRegIndex] == kD16){
-			unsigned short sValue = (unsigned short)theValue;
-			[[self adapter] writeWordBlock:&sValue
-								 atAddress:[self baseAddress] + [self getAddressOffset:theRegIndex]
-								numToWrite:1
-								withAddMod:[self addressModifier]
-							 usingAddSpace:0x01];
-        }
-		else {
-			[[self adapter] writeLongBlock:&theValue
-								 atAddress:[self baseAddress] + [self getAddressOffset:theRegIndex]
-								numToWrite:1
-								withAddMod:[self addressModifier]
-							 usingAddSpace:0x01];
-		}
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
-			  theValue, [self getRegisterName:theRegIndex],[self identifier]);
-		[localException raise];
-	}
-}
-
-
-- (void) read:(unsigned short) pReg returnValue:(void*) pValue
-{
-    // Make sure that register is valid
-    if (pReg >= [self getNumberRegisters]) {
-        [NSException raise:@"Illegal Register" format:@"Register index out of bounds on %@",[self identifier]];
-    }
-    
-    // Make sure that one can read from register
-    if([self getAccessType:pReg] != kReadOnly
-       && [self getAccessType:pReg] != kReadWrite) {
-        [NSException raise:@"Illegal Operation" format:@"Illegal operation (read not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
-    }
-    
-    // Perform the read operation.
-	if ([self getAccessSize:pReg] == kD16){
-		unsigned short aValue;
-		[[self adapter] readWordBlock:&aValue
-							atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		*((unsigned short*)pValue) = aValue;
-	}
-	else {
-		unsigned long aValue;
-		[[self adapter] readLongBlock:&aValue
-							atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		*((unsigned long*)pValue) = aValue;
-	}
-}
-
-
-
-- (void) writeThresholds
-{
-    short i;
-    for (i = 0; i < kCV1785NumberChannels; i++){
-        [self writeThreshold:i];
-    }
-}
-
-- (void) readThresholds
-{
-    short i;
-    for (i = 0; i < kCV1785NumberChannels; i++){
-        [self readThreshold:i];
-    }
-}
-
-- (void) writeThreshold:(unsigned short) pChan
-{    
-	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
-	unsigned short threshold = thresholds[pChan] | kill;
-    [[self adapter] writeWordBlock:&threshold
-                         atAddress:[self baseAddress] + [self thresholdOffset:pChan]
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
-}
-
-
-- (unsigned short) readThreshold:(unsigned short) pChan
-{    
-	int lowOffset = [self thresholdOffset:pChan];
-	unsigned short threshold;
-    [[self adapter] readWordBlock:&threshold
-						atAddress:[self baseAddress] + lowOffset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-	return threshold;
-}
-
-
 - (int) thresholdOffset:(unsigned short)aChan
 {
 	return reg[kThresholds].addressOffset + (aChan * 4);
 }
-
 
 - (short) getNumberRegisters
 {
     return kNumRegisters;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getBufferOffset
- * \brief	Get the output buffer offset relative to the module's base address.
- * \return	The output buffer offset.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getBufferOffset
 {
     return reg[kOutputBuffer].addressOffset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getDataBufferSize
- * \brief	Get size of class data buffer.
- * \return	The size of the data buffer.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) getDataBufferSize
 {
     return kADCOutputBufferSize;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getThresholdOffset
- * \brief	Get the offset relative to the module's base address for the threshold
- *			registers.
- * \return	The threshold offset.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getThresholdOffset
 {
     return reg[kThresholds].addressOffset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getStatusRegisterIndex
- * \brief	Get the offset relative to the module's base address for
- *			either status register 1 or 2.
- * \param	aRegister			- Either 1 or 2 for status register 1 or 2.
- * \return	The offset
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getStatusRegisterIndex:(short) aRegister
 {
     if (aRegister == 1) return kStatusRegister1;
     else		return kStatusRegister2;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getThresholdIndex
- * \brief	Get the index number within mreg for the thresholds. 
- * \return	The index
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getThresholdIndex
 {
     return(kThresholds);
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getOutputBufferIndex
- * \brief	Get the index number within mreg for the output buffer. 
- * \return	The index
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getOutputBufferIndex
 {
     return(kOutputBuffer);
@@ -354,41 +170,16 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 
 #pragma mark ***Register - Register specific routines
-//--------------------------------------------------------------------------------
-/*!\method  getRegisterName
- * \brief	Get the name of the register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The name of the register.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (NSString*) getRegisterName:(short) anIndex
 {
     return reg[anIndex].regName;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAddressOffset
- * \brief	Get the address offset for the specific register.
- * \param	anIndex			- Register index.
- * \return	The offset to the register.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getAddressOffset:(short) anIndex
 {
     return(reg[anIndex].addressOffset);
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAccessType
- * \brief	Get the access type, either read, write or readWrite for the
- *			register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The access type.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getAccessType:(short) anIndex
 {
     return reg[anIndex].accessType;
