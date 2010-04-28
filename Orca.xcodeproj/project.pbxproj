@@ -1590,6 +1590,8 @@
 		84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AD4C2D0BA21B7A003C7ABE /* ORWindowListController.h */; };
 		84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */; };
 		84AD4CD70BA23300003C7ABE /* WindowList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */; };
+		84AF17521188C88500449ACE /* ORCAEN1785Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */; };
+		84AF17531188C88500449ACE /* ORCAEN1785Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
 		84AFC24A1029F35E009F4139 /* downRamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC23E1029F35E009F4139 /* downRamp.png */; };
 		84AFC24B1029F35E009F4139 /* highVoltage.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC23F1029F35E009F4139 /* highVoltage.png */; };
 		84AFC24C1029F35E009F4139 /* lowVoltage.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC2401029F35E009F4139 /* lowVoltage.png */; };
@@ -1858,8 +1860,6 @@
 		84BF43D2118793FA00F55216 /* ORCaen1785Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BF43CA118793FA00F55216 /* ORCaen1785Model.h */; };
 		84BF43D3118793FA00F55216 /* ORCaen1785Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BF43CB118793FA00F55216 /* ORCaen1785Model.m */; };
 		84BF445F1187ACEE00F55216 /* ORCAEN1785Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
-		84BF44621187AD4300F55216 /* ORCAEN1785Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */; };
-		84BF44631187AD4300F55216 /* ORCAEN1785Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
 		84C12E780993E3FA006F2901 /* ORProcessHistoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */; };
 		84C12E790993E3FA006F2901 /* ORProcessHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */; };
 		84C12E7A0993E3FA006F2901 /* ORProcessHistoryModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */; };
@@ -2355,8 +2355,8 @@
 				EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */,
 				EF69C483116E6526008ABADC /* ORSNOCrateReadout.hh in VME_Copy */,
 				43ADFEBA10B6E2090044617C /* HWMakefile.mk in VME_Copy */,
-				84BF44621187AD4300F55216 /* ORCAEN1785Readout.cc in VME_Copy */,
-				84BF44631187AD4300F55216 /* ORCAEN1785Readout.hh in VME_Copy */,
+				84AF17521188C88500449ACE /* ORCAEN1785Readout.cc in VME_Copy */,
+				84AF17531188C88500449ACE /* ORCAEN1785Readout.hh in VME_Copy */,
 				84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */,
 				43ADFEBB10B6E2090044617C /* ORCAEN419Readout.cc in VME_Copy */,
 				43ADFEBC10B6E2090044617C /* ORCAEN419Readout.hh in VME_Copy */,
