@@ -106,14 +106,25 @@
 						 name:ORCaen1785SelectedChannelChanged
 					   object:model];
 	
-	
-    [notifyCenter addObserver:self
+	[notifyCenter addObserver:self
 					 selector:@selector(writeValueChanged:)
 						 name:ORCaen1785WriteValueChanged
 					   object:model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(zeroSuppressionChanged:)
+                         name : ORCaen1785ModelZeroSuppressionChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
+
+- (void) zeroSuppressionChanged:(NSNotification*)aNote
+{
+	[zeroSuppressionCB setIntValue: [model zeroSuppression]];
+}
+
 - (void) updateWindow
 {
 	[super updateWindow ];
@@ -130,6 +141,7 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785LowThresholdChanged object:model userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785HighThresholdChanged object:model userInfo:userInfo];
 	}
+	[self zeroSuppressionChanged:nil];
     [self basicLockChanged:nil];
     [self slotChanged:nil];
 }
@@ -242,6 +254,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) zeroSuppressionAction:(id)sender
+{
+	[model setZeroSuppression:[sender intValue]];	
+}
+
 - (IBAction) baseAddressAction: (id) aSender
 {
 	[model setBaseAddress:[aSender intValue]];

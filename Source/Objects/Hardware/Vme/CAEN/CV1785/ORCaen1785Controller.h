@@ -24,6 +24,7 @@
 
 @interface ORCaen1785Controller : OrcaObjectController {
     IBOutlet NSTabView* tabView;
+	IBOutlet NSButton*  zeroSuppressionCB;
     IBOutlet NSMatrix*	onlineMaskMatrix;
     IBOutlet NSMatrix*	lowThresholdMatrix;
     IBOutlet NSMatrix*	highThresholdMatrix;
@@ -60,6 +61,7 @@
 - (id) init;
 
 #pragma mark ***Interface Management
+- (void) zeroSuppressionChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) setModel:(id)aModel;
@@ -75,6 +77,7 @@
 - (void) selectedRegChannelChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) zeroSuppressionAction:(id)sender;
 - (IBAction) baseAddressAction: (id)aSender;
 - (IBAction) lowThresholdAction:(id)sender;
 - (IBAction) highThresholdAction:(id)sender;

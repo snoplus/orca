@@ -80,13 +80,14 @@ enum {
 	unsigned long dataId;
 	ORRateGroup*	adcRateGroup;
 	unsigned long 	adcCount[kCV1785NumberChannels];
-	BOOL isRunning;
+	BOOL			isRunning;
     unsigned short  lowThresholds[kCV1785NumberChannels];
     unsigned short  highThresholds[kCV1785NumberChannels];
 	unsigned short   onlineMask;
 	unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
     unsigned long   writeValue;
+    BOOL			zeroSuppression;
 	
 	//cached values for speed.
 	unsigned long statusAddress;
@@ -95,6 +96,8 @@ enum {
 }
 
 #pragma mark ***Accessors
+- (BOOL) zeroSuppression;
+- (void) setZeroSuppression:(BOOL)aZeroSuppression;
 - (id) init;
 
 #pragma mark ***Accessors
@@ -144,6 +147,7 @@ enum {
 - (void) read:(unsigned short) pReg returnValue:(void*) pValue;
 - (void) clearData;
 - (void) resetEventCounter;
+- (void) writeZeroSuppression;
 
 #pragma mark ***DataTaker
 - (int)  load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
@@ -177,6 +181,7 @@ enum {
 - (void) encodeWithCoder:(NSCoder*) anEncoder;
 @end
 
+extern NSString* ORCaen1785ModelZeroSuppressionChanged;
 extern NSString* ORCaen1785BasicLock;
 extern NSString* ORCaen1785ModelOnlineMaskChanged;
 extern NSString* ORCaen1785LowThresholdChanged;

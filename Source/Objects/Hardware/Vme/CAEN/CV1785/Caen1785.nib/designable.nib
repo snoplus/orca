@@ -1324,7 +1324,7 @@
 											<object class="NSTextField" id="131637120">
 												<reference key="NSNextResponder" ref="379893597"/>
 												<int key="NSvFlags">264</int>
-												<string key="NSFrame">{{59, 15}, {146, 14}}</string>
+												<string key="NSFrame">{{49, 5}, {146, 14}}</string>
 												<reference key="NSSuperview" ref="379893597"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="247358628">
@@ -1343,7 +1343,7 @@
 											<object class="NSButton" id="728931040">
 												<reference key="NSNextResponder" ref="379893597"/>
 												<int key="NSvFlags">264</int>
-												<string key="NSFrame">{{8, 13}, {36, 33}}</string>
+												<string key="NSFrame">{{-2, 3}, {36, 33}}</string>
 												<reference key="NSSuperview" ref="379893597"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="521623594">
@@ -1449,7 +1449,7 @@
 														<reference key="NSControlView" ref="422580392"/>
 														<int key="NSButtonFlags">1211912703</int>
 														<int key="NSButtonFlags2">2</int>
-														<object class="NSCustomResource" key="NSNormalImage">
+														<object class="NSCustomResource" key="NSNormalImage" id="206840373">
 															<string key="NSClassName">NSImage</string>
 															<string key="NSResourceName">NSSwitch</string>
 														</object>
@@ -1580,6 +1580,28 @@
 												<int key="NSSelectedCol">-1</int>
 												<reference key="NSBackgroundColor" ref="490361384"/>
 												<reference key="NSCellBackgroundColor" ref="490361384"/>
+											</object>
+											<object class="NSButton" id="4450324">
+												<reference key="NSNextResponder" ref="379893597"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{129, 35}, {115, 18}}</string>
+												<reference key="NSSuperview" ref="379893597"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="4537535">
+													<int key="NSCellFlags">-2080244224</int>
+													<int key="NSCellFlags2">131072</int>
+													<string key="NSContents">Zero Suppression</string>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="4450324"/>
+													<int key="NSButtonFlags">1211912703</int>
+													<int key="NSButtonFlags2">2</int>
+													<reference key="NSNormalImage" ref="206840373"/>
+													<reference key="NSAlternateImage" ref="1394381"/>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">200</int>
+													<int key="NSPeriodicInterval">25</int>
+												</object>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {266, 359}}</string>
@@ -1949,6 +1971,22 @@
 						<reference key="destination" ref="1004672229"/>
 					</object>
 					<int key="connectionID">973</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">zeroSuppressionCB</string>
+						<reference key="source" ref="612278147"/>
+						<reference key="destination" ref="4450324"/>
+					</object>
+					<int key="connectionID">976</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">zeroSuppressionAction:</string>
+						<reference key="source" ref="612278147"/>
+						<reference key="destination" ref="4450324"/>
+					</object>
+					<int key="connectionID">977</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2445,8 +2483,6 @@
 							<reference ref="300718525"/>
 							<reference ref="760898617"/>
 							<reference ref="235984401"/>
-							<reference ref="728931040"/>
-							<reference ref="131637120"/>
 							<reference ref="1013953607"/>
 							<reference ref="1004672229"/>
 							<reference ref="309101562"/>
@@ -2454,6 +2490,9 @@
 							<reference ref="422580392"/>
 							<reference ref="946033543"/>
 							<reference ref="707154621"/>
+							<reference ref="131637120"/>
+							<reference ref="728931040"/>
+							<reference ref="4450324"/>
 						</object>
 						<reference key="parent" ref="1003235711"/>
 					</object>
@@ -2947,6 +2986,20 @@
 						<reference key="object" ref="1014429535"/>
 						<reference key="parent" ref="422580392"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">974</int>
+						<reference key="object" ref="4450324"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="4537535"/>
+						</object>
+						<reference key="parent" ref="379893597"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">975</int>
+						<reference key="object" ref="4537535"/>
+						<reference key="parent" ref="4450324"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -3048,62 +3101,122 @@
 					<string>754.IBPluginDependency</string>
 					<string>754.ImportedFromIB2</string>
 					<string>755.IBPluginDependency</string>
+					<string>786.IBPluginDependency</string>
 					<string>786.ImportedFromIB2</string>
+					<string>787.IBPluginDependency</string>
 					<string>787.ImportedFromIB2</string>
+					<string>788.IBPluginDependency</string>
 					<string>788.ImportedFromIB2</string>
+					<string>789.IBPluginDependency</string>
 					<string>789.ImportedFromIB2</string>
+					<string>790.IBPluginDependency</string>
 					<string>790.ImportedFromIB2</string>
+					<string>791.IBPluginDependency</string>
 					<string>791.ImportedFromIB2</string>
+					<string>792.IBPluginDependency</string>
 					<string>792.ImportedFromIB2</string>
+					<string>793.IBPluginDependency</string>
 					<string>793.ImportedFromIB2</string>
+					<string>794.IBPluginDependency</string>
 					<string>794.ImportedFromIB2</string>
+					<string>795.IBPluginDependency</string>
 					<string>795.ImportedFromIB2</string>
+					<string>796.IBPluginDependency</string>
 					<string>796.ImportedFromIB2</string>
+					<string>799.IBPluginDependency</string>
 					<string>799.ImportedFromIB2</string>
+					<string>800.IBPluginDependency</string>
 					<string>800.ImportedFromIB2</string>
+					<string>803.IBPluginDependency</string>
 					<string>803.ImportedFromIB2</string>
+					<string>804.IBPluginDependency</string>
 					<string>804.ImportedFromIB2</string>
+					<string>805.IBPluginDependency</string>
+					<string>806.IBPluginDependency</string>
+					<string>841.IBPluginDependency</string>
+					<string>842.IBPluginDependency</string>
+					<string>845.IBPluginDependency</string>
+					<string>846.IBPluginDependency</string>
 					<string>846.ImportedFromIB2</string>
+					<string>851.IBPluginDependency</string>
 					<string>851.ImportedFromIB2</string>
+					<string>853.IBPluginDependency</string>
 					<string>853.ImportedFromIB2</string>
+					<string>854.IBPluginDependency</string>
 					<string>854.ImportedFromIB2</string>
+					<string>855.IBPluginDependency</string>
 					<string>855.ImportedFromIB2</string>
+					<string>858.IBPluginDependency</string>
 					<string>858.ImportedFromIB2</string>
+					<string>859.IBPluginDependency</string>
 					<string>859.ImportedFromIB2</string>
 					<string>86.IBPluginDependency</string>
 					<string>86.ImportedFromIB2</string>
+					<string>861.IBPluginDependency</string>
 					<string>861.ImportedFromIB2</string>
+					<string>862.IBPluginDependency</string>
+					<string>864.IBPluginDependency</string>
 					<string>864.ImportedFromIB2</string>
+					<string>865.IBPluginDependency</string>
 					<string>865.ImportedFromIB2</string>
+					<string>868.IBPluginDependency</string>
 					<string>868.ImportedFromIB2</string>
+					<string>870.IBPluginDependency</string>
 					<string>870.ImportedFromIB2</string>
+					<string>875.IBPluginDependency</string>
 					<string>875.ImportedFromIB2</string>
+					<string>876.IBPluginDependency</string>
 					<string>876.ImportedFromIB2</string>
+					<string>877.IBPluginDependency</string>
 					<string>877.ImportedFromIB2</string>
+					<string>878.IBPluginDependency</string>
 					<string>878.ImportedFromIB2</string>
+					<string>879.IBPluginDependency</string>
 					<string>88.IBPluginDependency</string>
 					<string>88.ImportedFromIB2</string>
+					<string>880.IBPluginDependency</string>
 					<string>880.ImportedFromIB2</string>
+					<string>883.IBPluginDependency</string>
 					<string>883.ImportedFromIB2</string>
+					<string>884.IBPluginDependency</string>
 					<string>884.ImportedFromIB2</string>
+					<string>888.IBPluginDependency</string>
 					<string>888.ImportedFromIB2</string>
 					<string>89.IBPluginDependency</string>
 					<string>89.ImportedFromIB2</string>
+					<string>890.IBPluginDependency</string>
 					<string>890.ImportedFromIB2</string>
+					<string>891.IBPluginDependency</string>
 					<string>891.ImportedFromIB2</string>
+					<string>892.IBPluginDependency</string>
 					<string>892.ImportedFromIB2</string>
+					<string>895.IBPluginDependency</string>
 					<string>895.ImportedFromIB2</string>
+					<string>896.IBPluginDependency</string>
+					<string>898.IBPluginDependency</string>
 					<string>898.ImportedFromIB2</string>
+					<string>901.IBPluginDependency</string>
 					<string>901.ImportedFromIB2</string>
+					<string>904.IBPluginDependency</string>
 					<string>904.ImportedFromIB2</string>
+					<string>906.IBPluginDependency</string>
 					<string>906.ImportedFromIB2</string>
+					<string>907.IBPluginDependency</string>
 					<string>907.ImportedFromIB2</string>
+					<string>908.IBPluginDependency</string>
 					<string>908.ImportedFromIB2</string>
+					<string>909.IBPluginDependency</string>
 					<string>909.ImportedFromIB2</string>
+					<string>910.IBPluginDependency</string>
 					<string>910.ImportedFromIB2</string>
+					<string>913.IBPluginDependency</string>
 					<string>913.ImportedFromIB2</string>
+					<string>914.IBPluginDependency</string>
 					<string>914.ImportedFromIB2</string>
+					<string>915.IBPluginDependency</string>
 					<string>915.ImportedFromIB2</string>
+					<string>916.IBPluginDependency</string>
+					<string>917.IBPluginDependency</string>
 					<string>941.IBPluginDependency</string>
 					<string>941.ImportedFromIB2</string>
 					<string>942.IBPluginDependency</string>
@@ -3123,6 +3236,8 @@
 					<string>964.IBPluginDependency</string>
 					<string>965.IBPluginDependency</string>
 					<string>966.IBPluginDependency</string>
+					<string>974.IBPluginDependency</string>
+					<string>975.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3187,9 +3302,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
-					<string>{{573, 444}, {302, 412}}</string>
+					<string>{{154, 394}, {302, 412}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{573, 444}, {302, 412}}</string>
+					<string>{{154, 394}, {302, 412}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<string>{270, 404}</string>
@@ -3221,61 +3336,11 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -3283,6 +3348,118 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3314,7 +3491,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">973</int>
+			<int key="maxID">977</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3914,9 +4091,11 @@
 							<string>selectRegisterAction:</string>
 							<string>write:</string>
 							<string>writeValueAction:</string>
+							<string>zeroSuppressionAction:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -3960,6 +4139,7 @@
 							<string>tabView</string>
 							<string>writeValueStepper</string>
 							<string>writeValueTextField</string>
+							<string>zeroSuppressionCB</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3987,6 +4167,7 @@
 							<string>NSTabView</string>
 							<string>NSStepper</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
