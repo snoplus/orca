@@ -3,7 +3,7 @@
 
 #define ShiftAndExtract(aValue,aShift,aMask) (((aValue)>>(aShift)) & (aMask))
 
-bool ORCaen1785Readout::Readout(SBC_LAM_Data* lamData)
+bool ORCAEN1785Readout::Readout(SBC_LAM_Data* lamData)
 {
 	uint32_t dataId               = GetHardwareMask()[0];
 	uint32_t locationMask         = ((GetCrate() & 0x01e)<<21) | 
@@ -53,7 +53,7 @@ bool ORCaen1785Readout::Readout(SBC_LAM_Data* lamData)
     return true; 
 }
 
-void ORCaen1785Readout::FlushDataBuffer()
+void ORCAEN1785Readout::FlushDataBuffer()
 {
  	uint32_t dataBufferOffset     = GetDeviceSpecificData()[1];
 	//flush the buffer, read until not valid datum
