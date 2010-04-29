@@ -72,7 +72,7 @@ enum {
 
 // Size of output buffer
 #define k1785OutputBufferSize 0x07FF
-#define kCV1785NumberChannels 16
+#define kCV1785NumberChannels 8
 
 // Class definition
 @interface ORCaen1785Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>

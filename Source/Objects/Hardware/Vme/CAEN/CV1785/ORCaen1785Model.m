@@ -242,13 +242,13 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 			if(theRegIndex == kLowThresholds){
 				for(i = start; i <= end; i++){
 					[self readLowThreshold:i];
-					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+					NSLog(@"Low Threshold %2d = %d\n", i, [self lowThreshold:i]);
 				}
 			}
 			else {
 				for(i = start; i <= end; i++){
 					[self readHighThreshold:i];
-					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
+					NSLog(@"Hi Threshold %2d = %d\n", i, [self highThreshold:i]);
 				}
             }
         }
@@ -405,8 +405,8 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 {
     short i;
     for (i = 0; i < kCV1785NumberChannels; i++){
-        [self readLowThreshold:i];
         [self readHighThreshold:i];
+        [self readLowThreshold:i];
     }
 }
 
@@ -419,6 +419,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+	NSLog(@"low %d 0x%4x : %d\n",pChan,[self baseAddress] + [self lowThresholdOffset:pChan],lowThreshold);
 	
 }
 
@@ -431,18 +432,19 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+	NSLog(@"Hi %d 0x%4x : %d\n",pChan,[self baseAddress] + [self highThresholdOffset:pChan],highThreshold);
+
 }
 - (unsigned short) readLowThreshold:(unsigned short) pChan
 {    
-	int lowOffset = [self lowThresholdOffset:pChan];
 	unsigned short lowThreshold;
     [[self adapter] readWordBlock:&lowThreshold
-						atAddress:[self baseAddress] + lowOffset
+						atAddress:[self baseAddress] + [self lowThresholdOffset:pChan]
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 	
-	return lowThreshold;
+	return lowThreshold & 0xFF;
 }
 
 - (unsigned short) readHighThreshold:(unsigned short) pChan
@@ -454,17 +456,17 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	return highThreshold;
+	return highThreshold  & 0xFF;
 }
 
 - (int) lowThresholdOffset:(unsigned short)aChan
 {
-	return reg[kLowThresholds].addressOffset + (aChan * 4);
+	return reg[kLowThresholds].addressOffset + (aChan * 8);
 }
 
 - (int) highThresholdOffset:(unsigned short)aChan
 {
-	return reg[kHiThresholds].addressOffset + (aChan * 4);
+	return reg[kHiThresholds].addressOffset + (aChan * 8);
 }
 
 - (short) getNumberRegisters
@@ -475,6 +477,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 - (unsigned long) getBufferOffset
 {
     return reg[kOutputBuffer].addressOffset;
+
 }
 
 - (unsigned short) getDataBufferSize
@@ -598,12 +601,12 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORCaen1785DecoderForQdc",							@"decoder",
+								 @"ORCaen1785DecoderForAdc",							@"decoder",
 								 [NSNumber numberWithLong:dataId],					@"dataId",
 								 [NSNumber numberWithBool:YES],						@"variable",
 								 [NSNumber numberWithLong:-1],	@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Qdc"];
+    [dataDictionary setObject:aDictionary forKey:@"Adc"];
     
     return dataDictionary;
 }
@@ -612,7 +615,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"Qdc",								@"name",
+				   @"Adc",								@"name",
 				   [NSNumber numberWithLong:dataId],   @"dataId",
 				   [NSNumber numberWithLong:16],		@"maxChannels",
 				   nil];
@@ -660,7 +663,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 		
-		if(statusValue & 0x0001){
+		if(statusValue & 0x1){
 			
 			//OK, at least one data value is ready
 			unsigned long dataValue;
@@ -688,16 +691,16 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 									   withAddMod:[self addressModifier]
 									usingAddSpace:0x01];
 						int dataType = ShiftAndExtract(dataValue,24,0x7);
-						int channel = ShiftAndExtract(dataValue,17,0xf);
 						if(dataType == 0x000){
 							dataRecord[index] = dataValue;
+							int channel = ShiftAndExtract(dataValue,18,0x7);
+							++adcCount[channel]; 
 							index++;
 						}
 						else {
 							validData = NO;
 							break;
 						}
-						++adcCount[channel]; 
 					}
 					if(validData){
 						//OK we read the data, get the end of block
@@ -731,7 +734,8 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 									numToRead:1
 								   withAddMod:[self addressModifier]
 								usingAddSpace:0x01];
-					if(ShiftAndExtract(dataValue,24,0x7) == 0x6) {
+					int dataType=ShiftAndExtract(dataValue,24,0x7);
+					if(dataType == 0x4) {
 						break;
 					}
 				}
@@ -828,7 +832,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 1785 QDC (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 1785 ADC (Slot %d) ",[self slot]];
 }
 
 #pragma mark ***HWWizard Support
@@ -901,7 +905,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
     short	i;
     NSLog(@"%@ Thresholds\n",[self identifier]);
     for (i = 0; i < kCV1785NumberChannels; i++){
-        NSLog(@"chan:%d low:0x%04x high:0x%04x\n",i,[self lowThreshold:i],[self highThreshold:i]);
+        NSLog(@"chan:%d low:%d high:%d\n",i,[self lowThreshold:i],[self highThreshold:i]);
     }
     
 }

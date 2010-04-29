@@ -36,7 +36,7 @@
 {
 	
     settingSize     = NSMakeSize(280,400);
-    thresholdSize   = NSMakeSize(290,570);
+    thresholdSize   = NSMakeSize(290,400);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
