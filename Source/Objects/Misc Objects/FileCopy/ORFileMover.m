@@ -36,6 +36,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     
     allOutput = [[NSMutableString stringWithCapacity:512] retain];
 	moveFilesToSentFolder = YES; //default
+	useTempFile			  = YES; //default
     return self;
 }
 
@@ -209,6 +210,12 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFileMoverPercentDoneChanged object:self];
 }
 
+- (void) doNotUseTempFile
+{
+	useTempFile = NO;
+}
+
+
 - (void) doNotMoveFilesToSentFolder
 {
 	moveFilesToSentFolder = NO;
@@ -252,7 +259,9 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     NSMutableDictionary* environment = [[NSMutableDictionary alloc] initWithDictionary:defaultEnvironment];
     [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
     [task setEnvironment: environment];
-    NSString* tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
+    NSString* tmpRemotePath;
+	if(useTempFile) tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
+	else			tmpRemotePath = remotePath;
     if([self transferType] == eUseCURL){
 		
         [task setLaunchPath:@"/usr/bin/curl"];
@@ -421,18 +430,20 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
                 else [self moveToSentFolder];
             }
             else [self moveToSentFolder];
-			NSString* tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
 
-			ORTaskSequence* aSequence;	
-			NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
-			aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-			[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginExpectScript"] 
-					 arguments:[NSArray arrayWithObjects:remoteUserName,remotePassWord,remoteHost,@"mv",tmpRemotePath,remotePath,nil]];
-			
-			[aSequence setVerbose:YES];
-			[aSequence setTextToDelegate:YES];
-			
-			[aSequence launch];
+			if(useTempFile){
+				NSString* tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
+				ORTaskSequence* aSequence;	
+				NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
+				aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+				[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginExpectScript"] 
+						 arguments:[NSArray arrayWithObjects:remoteUserName,remotePassWord,remoteHost,@"mv",tmpRemotePath,remotePath,nil]];
+				
+				[aSequence setVerbose:YES];
+				[aSequence setTextToDelegate:YES];
+				
+				[aSequence launch];
+			}
 			
         }
         else {

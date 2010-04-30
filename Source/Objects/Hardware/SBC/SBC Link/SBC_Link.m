@@ -254,6 +254,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		else driverCodePath = [resourcePath stringByAppendingPathComponent:[delegate codeResourcePath]];
 		driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
 		driverScriptFileMover = [[ORFileMover alloc] init];
+		[driverScriptFileMover doNotUseTempFile];
 		[driverScriptFileMover setDelegate:aSequence];
 		
 		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
@@ -885,6 +886,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		[aSequence setTextToDelegate:YES];
 		
 		SBCFileMover = [[ORFileMover alloc] init];
+		[SBCFileMover doNotUseTempFile];
 		[SBCFileMover setDelegate:aSequence];
 		[SBCFileMover setMoveParams:[mainStagingFolder stringByExpandingTildeInPath]
 									 to:@"ORCA" 

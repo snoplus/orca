@@ -43,6 +43,7 @@ typedef enum _eFileTransferType {
 	eFileTransferType   transferType;
 	BOOL verbose;
 	BOOL moveFilesToSentFolder;
+	BOOL useTempFile;
 }
 - (id) init;
 - (void) dealloc;
@@ -73,6 +74,7 @@ typedef enum _eFileTransferType {
 - (void) setPercentDone: (int) aPercentDone;
 - (void) doNotMoveFilesToSentFolder;
 - (void) moveFilesToSentFolder;
+- (void) doNotUseTempFile;
 
 #pragma mark •••Move Methods
 - (void) launch;
