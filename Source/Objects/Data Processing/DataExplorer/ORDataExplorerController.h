@@ -25,6 +25,7 @@
 @interface ORDataExplorerController : OrcaObjectController  {
     @private
         IBOutlet NSButton*          selectFileButton;
+		IBOutlet NSButton*			headerOnlyCB;
 		IBOutlet NSButton*			multiCatalogCB;
         IBOutlet NSButton*          parseButton;
         IBOutlet NSButton*          clearCountsButton;
@@ -57,6 +58,7 @@
 - (void) setScanInProgress:(BOOL)state;
 
 #pragma  mark ¥¥¥Actions
+- (IBAction) headerOnlyAction:(id)sender;
 - (IBAction) multiCatalogAction:(id)sender;
 - (IBAction) catalogAllAction:(id)sender;
 - (IBAction) scanNextButtonAction:(id)sender;
@@ -76,6 +78,7 @@
 - (void) catalogAll;
 
 #pragma mark ¥¥¥Interface Management
+- (void) headerOnlyChanged:(NSNotification*)aNote;
 - (void) histoErrorFlagChanged:(NSNotification*)aNote;
 - (void) multiCatalogChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;

@@ -40,9 +40,12 @@
 		BOOL			histoErrorFlag;
 		ORRecordIndexer* recordIndexer;
 		NSOperationQueue*   queue;
+    BOOL headerOnly;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) headerOnly;
+- (void) setHeaderOnly:(BOOL)aHeaderOnly;
 - (BOOL) histoErrorFlag;
 - (void) setHistoErrorFlag:(BOOL)aHistoErrorFlag;
 - (BOOL) multiCatalog;
@@ -86,6 +89,7 @@
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORDataExplorerModelHeaderOnlyChanged;
 extern NSString* ORDataExplorerModelHistoErrorFlagChanged;
 extern NSString* ORDataExplorerModelMultiCatalogChanged;
 extern NSString* ORDataExplorerFileChangedNotification;
