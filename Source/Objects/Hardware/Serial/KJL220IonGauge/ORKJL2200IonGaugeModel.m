@@ -530,7 +530,7 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 
 - (void) sendFromOutgoingBuffer
 {
-	if([serialPort isOpen] && [outgoingBuffer count}>0){
+	if([serialPort isOpen] && [outgoingBuffer count]>0){
 		id aCmd = [[[outgoingBuffer objectAtIndex:0] retain] autorelease];
 		[outgoingBuffer removeObjectAtIndex:0];
 		[serialPort writeString:aCmd];
