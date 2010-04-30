@@ -181,6 +181,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) dealloc
 {	
+#if 0
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [testEnabledArray release];
     [testStatusArray release];
@@ -188,6 +189,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[thresholds release];
 	[gains release];
 	[totalRate release];
+#endif
 	[super dealloc];
 }
 
@@ -1191,6 +1193,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     [[self undoManager] disableUndoRegistration];
 	
+#if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
     [self setTargetRate:[decoder decodeIntForKey:@"targetRate"]];
     [self setHistClrMode:		[decoder decodeIntForKey:@"histClrMode"]];
     [self setHistMode:			[decoder decodeIntForKey:@"histMode"]];
@@ -1245,6 +1248,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self setTestEnabledArray: [NSMutableArray array]];
 		for(i=0;i<kNumKatrinV4FLTTests;i++) [testEnabledArray addObject:[NSNumber numberWithBool:YES]];
 	}
+#endif
 	
     [[self undoManager] enableUndoRegistration];
 	
@@ -1255,6 +1259,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [super encodeWithCoder:encoder];
 	
+#if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
     [encoder encodeInt:targetRate			forKey:@"targetRate"];
     [encoder encodeInt:histClrMode			forKey:@"histClrMode"];
     [encoder encodeInt:histMode				forKey:@"histMode"];
@@ -1283,6 +1288,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [encoder encodeInt:writeValue           forKey:@"writeValue"];	
     [encoder encodeInt:selectedRegIndex  	forKey:@"selectedRegIndex"];	
     [encoder encodeInt:selectedChannelValue	forKey:@"selectedChannelValue"];	
+#endif
 }
 
 #pragma mark Data Taking

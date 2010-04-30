@@ -21,6 +21,7 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
 #import "ORIpeCard.h"
+#import "ORIpeV4FLTModel.h"
 #import "ORIpeV4SLTModel.h"
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
@@ -66,9 +67,24 @@
  * to the occured events and this histogram is read out frequently.
  *
  */ 
-@interface ORKatrinV4FLTModel : ORIpeCard <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
+
+//
+//@interface ORKatrinV4FLTModel : ORIpeCard <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
+//
+// 2010-04-25 -tb-
+// I started subclassing ORKatrinV4FLTModel from ORIpeV4FLTModel.
+// Necessary changes were:
+// - comment out all data members (see below); the KATRIN related should move here
+// - (void) dealloc: just needs to call the super dealloc; change acording to the data members in the future!
+// - (void)encodeWithCoder:
+// - initWithCoder:     these two were called twice; change acording to the data members in the future!
+// - in ORKatrinV4FLTDefs.h ipeFltHitRateDataStruct already was known from ORIpeV4FLTDefs.h
+
+
+@interface ORKatrinV4FLTModel : ORIpeV4FLTModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     // Hardware configuration
+#if 0
     int				fltRunMode;		//!< Run modes: 0=standby, 1=standard, 2=histogram, 3=test
     NSMutableArray* thresholds;     //!< Array to keep the threshold of all 24 channel
     NSMutableArray* gains;			//!< Aarry to keep the gains
@@ -141,6 +157,7 @@
 	long newThreshold[kNumV4FLTChannels];
 	
 	unsigned long eventCount[kNumV4FLTChannels];
+#endif
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization

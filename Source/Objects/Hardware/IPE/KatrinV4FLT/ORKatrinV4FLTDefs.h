@@ -88,11 +88,13 @@
 
 #define SELECT_ALL_CHANNELS ( 0x1F <<16) // ak, 7.10.07
 
+#if 0 //is already in ORIpeV4FLTDefs.h -tb-
 typedef struct {
 	unsigned long channelMap; // 8bit channel + 24 channelMap
 	unsigned long threshold;   
 	unsigned long hitrate;
 } ipeFltHitRateDataStruct;
+#endif
 
 #if 0
 typedef struct { // -tb- 2008-02-27
