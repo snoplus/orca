@@ -44,15 +44,13 @@
 
 - (void) awakeFromNib
 {
-    [super awakeFromNib];
     [self setScanInProgress:NO];
     [detailsView setFont:[NSFont fontWithName:@"Monaco" size:10]];
     [dataCatalogView setDoubleAction:@selector(doubleClick:)];
-
+    [super awakeFromNib];
 }
 
 #pragma mark ¥¥¥Accessors
-
 - (void) setScanInProgress:(BOOL)state
 {
     scanInProgress = state;
@@ -69,7 +67,12 @@
 
 #pragma  mark ¥¥¥Actions
 
-- (void) multiCatalogAction:(id)sender
+- (IBAction) headerOnlyAction:(id)sender
+{
+	[model setHeaderOnly:[sender intValue]];	
+}
+
+- (IBAction) multiCatalogAction:(id)sender
 {
 	[model setMultiCatalog:[sender intValue]];	
 }
@@ -316,6 +319,11 @@
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) headerOnlyChanged:(NSNotification*)aNote
+{
+	[headerOnlyCB setIntValue: [model headerOnly]];
+}
+
 - (void) multiCatalogChanged:(NSNotification*)aNote
 {
 	[multiCatalogCB setIntValue: [model multiCatalog]];
@@ -361,6 +369,11 @@
                          name : ORDataExplorerModelHistoErrorFlagChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(headerOnlyChanged:)
+                         name : ORDataExplorerModelHeaderOnlyChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -370,6 +383,7 @@
     [self fileParseEnded:nil];
 	[self multiCatalogChanged:nil];
 	[self histoErrorFlagChanged:nil];
+	[self headerOnlyChanged:nil];
 }
 
 

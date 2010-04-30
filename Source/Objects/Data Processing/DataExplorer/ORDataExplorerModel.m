@@ -26,8 +26,9 @@
 #import "ORRecordIndexer.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORDataExplorerModelHistoErrorFlagChanged = @"ORDataExplorerModelHistoErrorFlagChanged";
-NSString* ORDataExplorerModelMultiCatalogChanged = @"ORDataExplorerModelMultiCatalogChanged";
+NSString* ORDataExplorerModelHeaderOnlyChanged		= @"ORDataExplorerModelHeaderOnlyChanged";
+NSString* ORDataExplorerModelHistoErrorFlagChanged	= @"ORDataExplorerModelHistoErrorFlagChanged";
+NSString* ORDataExplorerModelMultiCatalogChanged	= @"ORDataExplorerModelMultiCatalogChanged";
 NSString* ORDataExplorerFileChangedNotification     = @"ORDataExplorerFileChangedNotification";
 NSString* ORDataExplorerParseStartedNotification    = @"ORDataExplorerParseStartedNotification";
 NSString* ORDataExplorerParseEndedNotification      = @"ORDataExplorerParseEndedNotification";
@@ -62,6 +63,20 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) headerOnly
+{
+    return headerOnly;
+}
+
+- (void) setHeaderOnly:(BOOL)aHeaderOnly
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHeaderOnly:headerOnly];
+    
+    headerOnly = aHeaderOnly;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerModelHeaderOnlyChanged object:self];
+}
 
 - (BOOL) histoErrorFlag
 {
@@ -254,12 +269,27 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 	if(!queue){
 		queue = [[NSOperationQueue alloc] init];
 	}
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseStartedNotification object: self];
-	[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-	if(recordIndexer)[recordIndexer release];
-	recordIndexer = [[ORRecordIndexer alloc] initWithPath:fileToExplore delegate:self];
-	[queue addOperation:recordIndexer];
+	if(headerOnly){
+		NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:fileToExplore];
+		NSData* data =  [fh readDataOfLength:8];
+		unsigned long* ptr = (unsigned long*)[data bytes];
+		unsigned long headerLenInBytes = ptr[1];
+		NSData* headerAsData = [fh readDataOfLength:headerLenInBytes];
+		NSString* theHeaderAsString = [[NSString alloc] initWithBytes:[headerAsData bytes] length:headerLenInBytes encoding:NSASCIIStringEncoding];
+		NSDictionary* theHeader = [theHeaderAsString propertyList];
+		if(theHeader){
+			ORHeaderItem* d = [ORHeaderItem headerFromObject:theHeader named:@"Root"];
+			if(d)[self setHeader:d ];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseEndedNotification object:self];
+		}
+	}
+	else {
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseStartedNotification object: self];
+		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+		if(recordIndexer)[recordIndexer release];
+		recordIndexer = [[ORRecordIndexer alloc] initWithPath:fileToExplore delegate:self];
+		[queue addOperation:recordIndexer];
+	}
 
 }
 
@@ -295,6 +325,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     self = [super initWithCoder:decoder];
     
 	[[self undoManager] disableUndoRegistration];
+    [self setHeaderOnly:	[decoder decodeBoolForKey:@"headerOnly"]];
     [self setMultiCatalog:	[decoder decodeBoolForKey:		@"ORDataExplorerModelMultiCatalog"]];
 	[self setFileToExplore:	[decoder decodeObjectForKey:	@"ORDataExplorerFileName"]];
     [self setDataSet:		[decoder decodeObjectForKey:	@"ORDataExplorerDataSet"]];
@@ -309,6 +340,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:headerOnly		forKey:@"headerOnly"];
     [encoder encodeBool:multiCatalog	forKey: @"ORDataExplorerModelMultiCatalog"];
     [encoder encodeObject:fileToExplore forKey: @"ORDataExplorerFileName"];
     [encoder encodeObject:dataSet		forKey: @"ORDataExplorerDataSet"];
