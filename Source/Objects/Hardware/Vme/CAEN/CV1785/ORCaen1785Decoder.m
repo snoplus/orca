@@ -32,7 +32,7 @@
     for( i = 2; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
-			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
+			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff) & 0xfff;
 			int chan     = ShiftAndExtract(ptr[i],18,0x7);
 			NSString* channelKey  = [self getChannelKey: chan];
 			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN1785 ADC",crateKey,cardKey,channelKey,nil];

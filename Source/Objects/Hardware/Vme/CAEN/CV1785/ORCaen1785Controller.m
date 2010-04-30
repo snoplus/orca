@@ -110,20 +110,9 @@
 					 selector:@selector(writeValueChanged:)
 						 name:ORCaen1785WriteValueChanged
 					   object:model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(zeroSuppressionChanged:)
-                         name : ORCaen1785ModelZeroSuppressionChanged
-						object: model];
-
 }
 
 #pragma mark ***Interface Management
-
-- (void) zeroSuppressionChanged:(NSNotification*)aNote
-{
-	[zeroSuppressionCB setIntValue: [model zeroSuppression]];
-}
 
 - (void) updateWindow
 {
@@ -141,7 +130,6 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785LowThresholdChanged object:model userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785HighThresholdChanged object:model userInfo:userInfo];
 	}
-	[self zeroSuppressionChanged:nil];
     [self basicLockChanged:nil];
     [self slotChanged:nil];
 }
@@ -245,7 +233,6 @@
 	[writeValueTextField setEnabled:writeAllowed];
 	[writeValueStepper setEnabled:writeAllowed];
 	[channelPopUp setEnabled:index==kHiThresholds || index==kLowThresholds];
-    
 }
 
 - (void) selectedRegChannelChanged:(NSNotification*) aNotification
@@ -254,11 +241,6 @@
 }
 
 #pragma mark •••Actions
-
-- (void) zeroSuppressionAction:(id)sender
-{
-	[model setZeroSuppression:[sender intValue]];	
-}
 
 - (IBAction) baseAddressAction: (id) aSender
 {

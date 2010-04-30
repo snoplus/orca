@@ -70,7 +70,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Low Thresholds",		false,	false, 	false,	0x1084,		kReadWrite,	kD16},
 };
 
-NSString* ORCaen1785ModelZeroSuppressionChanged = @"ORCaen1785ModelZeroSuppressionChanged";
 NSString* ORCaen1785ModelOnlineMaskChanged		= @"ORCaen1785ModelOnlineMaskChanged";
 NSString* ORCaen1785LowThresholdChanged			= @"ORCaen1785LowThresholdChanged";
 NSString* ORCaen1785HighThresholdChanged		= @"ORCaen1785HighThresholdChanged";
@@ -103,19 +102,6 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 #pragma mark ***Accessors
 
-- (BOOL) zeroSuppression
-{
-    return zeroSuppression;
-}
-
-- (void) setZeroSuppression:(BOOL)aZeroSuppression
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setZeroSuppression:zeroSuppression];
-    
-    zeroSuppression = aZeroSuppression;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1785ModelZeroSuppressionChanged object:self];
-}
 - (unsigned short) selectedRegIndex
 {
     return selectedRegIndex;
@@ -244,13 +230,11 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 			if(theRegIndex == kLowThresholds){
 				for(i = start; i <= end; i++){
 					[self readLowThreshold:i];
-					NSLog(@"Low Threshold %2d = %d\n", i, [self lowThreshold:i]);
 				}
 			}
 			else {
 				for(i = start; i <= end; i++){
 					[self readHighThreshold:i];
-					NSLog(@"Hi Threshold %2d = %d\n", i, [self highThreshold:i]);
 				}
             }
         }
@@ -287,7 +271,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Can't Read [%@] on the %@.\n",
-			  [self getRegisterName:theRegIndex], [self identifier]);
+		[self getRegisterName:theRegIndex], [self identifier]);
 		[localException raise];
 	}
 }
@@ -421,7 +405,6 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-	NSLog(@"low %d 0x%4x : %d\n",pChan,[self baseAddress] + [self lowThresholdOffset:pChan],lowThreshold);
 	
 }
 
@@ -434,7 +417,6 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-	NSLog(@"Hi %d 0x%4x : %d\n",pChan,[self baseAddress] + [self highThresholdOffset:pChan],highThreshold);
 
 }
 - (unsigned short) readLowThreshold:(unsigned short) pChan
@@ -535,24 +517,9 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 - (void) initBoard
 {
-	[self writeZeroSuppression];
 	[self writeThresholds];
 }
 
-- (void) writeZeroSuppression
-{
-	unsigned short zeroSuppressionMask = 0x10;
-	unsigned long addOffset;
-	if(zeroSuppression)	addOffset = [self getAddressOffset:kBitSet2];
-	else				addOffset = [self getAddressOffset:kBitClear2];
-		
-	[[self adapter] writeWordBlock:&zeroSuppressionMask
-						 atAddress:[self baseAddress] + addOffset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-}
 
 - (void) clearData
 {
@@ -922,7 +889,6 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
         [self setHighThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]]];
     }    
 	
-    [self setZeroSuppression:[aDecoder decodeBoolForKey:@"zeroSuppression"]];
 	[self setOnlineMask:[aDecoder decodeIntForKey:@"onlineMask"]];
     [self setSelectedRegIndex:[aDecoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannel:[aDecoder decodeIntForKey:@"selectedChannel"]];
@@ -935,7 +901,6 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
-    [anEncoder encodeBool:zeroSuppression forKey:@"zeroSuppression"];
     [anEncoder encodeInt:onlineMask forKey:@"onlineMask"];
 	int i;
 	for (i = 0; i < kCV1785NumberChannels; i++){
