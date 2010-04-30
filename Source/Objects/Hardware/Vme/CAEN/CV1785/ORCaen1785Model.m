@@ -67,7 +67,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"ADD",				false,	false, 	false,	0x1070,		kReadOnly,	kD16},
 	{@"BADD",				false,	false, 	false,	0x1072,		kReadOnly,	kD16},
 	{@"Hi Thresholds",		false,	false, 	false,	0x1080,		kReadWrite,	kD16},
-	{@"Low Thresholds",		false,	false, 	false,	0x1082,		kReadWrite,	kD16},
+	{@"Low Thresholds",		false,	false, 	false,	0x1084,		kReadWrite,	kD16},
 };
 
 NSString* ORCaen1785ModelZeroSuppressionChanged = @"ORCaen1785ModelZeroSuppressionChanged";
@@ -156,6 +156,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 - (void) setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
 {
+	if(aValue>0xff)aValue = 0xff;
     [[[self undoManager] prepareWithInvocationTarget:self] setLowThreshold:aChnl withValue:[self lowThreshold:aChnl]];
     lowThresholds[aChnl] = aValue;
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -170,6 +171,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 - (void) setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
 {
+	if(aValue>0xff)aValue = 0xff;
     [[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:aChnl withValue:[self highThreshold:aChnl]];
     highThresholds[aChnl] = aValue;
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
