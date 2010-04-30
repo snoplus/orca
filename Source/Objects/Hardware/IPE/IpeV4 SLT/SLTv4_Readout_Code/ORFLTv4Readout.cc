@@ -547,6 +547,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     static int lastUSec=0;
     //static long int counter=0;
     static long int secCounter=0;
+	static uint32_t writeSimEventMask = 0; //one bit per FLT (flags 'write simulated event' next time) -tb-
     
     struct timeval t;//    struct timezone tz; is obsolete ... -tb-
     //timing
@@ -563,8 +564,22 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         //remember for next call
         lastSec      = currentSec; 
         lastUSec     = currentUSec; 
-		//FROM HERE: PUT THE SIMULATION CODE
-		{
+		//set the 'write event' mask
+		writeSimEventMask = 0xfffff; //20 FLTs
+    }else{
+        // skip shipping data record
+        // obsolete ... return config->card_info[index].next_Card_Index;
+        // obsolete, too ... return GetNextCardIndex();
+    }
+#endif
+
+	//FROM HERE: PUT THE SIMULATION CODE
+	{
+	if(writeSimEventMask & (1<<col)){
+        printf("mask is 0x%x  ,  col %i\n", writeSimEventMask,col);
+        fflush(stdout);
+		writeSimEventMask &= ~(1<<col);
+			//we write one energy event per channel per card ...
                         uint32_t evsec      = currentSec; 
                         uint32_t evsubsec   = currentUSec * 20; 
                         uint32_t precision  = 0;
@@ -572,8 +587,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 						uint32_t readptr  =  secCounter % 512;
 						uint32_t pagenr   =  secCounter % 64;
                         uint32_t fifoFlags = 0;
-                        uint32_t energy = 1234;
-                         ensureDataCanHold(7); 
+                        uint32_t energy = 10000 + (col+1)*100 + eventchan;
+						ensureDataCanHold(7); 
                                 data[dataIndex++] = dataId | 7;    
                                 data[dataIndex++] = location | eventchan<<8;
                                 data[dataIndex++] = evsec;        //sec
@@ -582,14 +597,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = readptr | (pagenr<<10) | (precision<<16)  | (fifoFlags <<20);  //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit)
                                 data[dataIndex++] = energy;
 		}
-		//END OF SIMULATION CODE
+	}
+	//END OF SIMULATION CODE
 		
-    }else{
-        // skip shipping data record
-        // obsolete ... return config->card_info[index].next_Card_Index;
-        // obsolete, too ... return GetNextCardIndex();
-    }
-#endif
     
     return true;
 }

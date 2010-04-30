@@ -312,12 +312,17 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -t
 
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb-
 {
-	printf("Called HW_Readout-doReadBlock\n");
     SBC_IPEv4ReadBlockStruct* p = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     if(needToSwap) SwapLongBlock(p,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
     
     uint32_t startAddress   = p->address;
     int32_t numItems        = p->numItems;
+	//DEBUGGING
+	{
+	static int counter=0;
+	counter++;
+	if(counter<150){ printf("Called HW_Readout-doReadBlock in Simulation mode, log some accesses: addr: 0x%x, (numitems %i)\n",startAddress,numItems);fflush(stdout);}
+	}
     //TODO: -tb- debug printf("starting read: %08x %d\n",startAddress,numItems);
     
     if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSizeBytes) {
@@ -338,7 +343,17 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb
     
     int32_t perr   = 0;
 	//hardware read access removed (was here) -tb-
-     
+	for(int i=0; i<numItems;i++) lPtr[i] = 0;
+	{
+		//this simulates a hitrate (startAddress &  0x001100>>2  are the hitrate registers) -tb
+		if(startAddress & (0x001100>>2)){ //this is KATRINv4FLT specific! -tb-
+			//printf("Probably Hitrate readout: addr 0x%x (numItems %i)\n",startAddress,numItems);
+			//fflush(stdout);
+			for(int i=0; i<numItems;i++) lPtr[i] = 100 * ((startAddress>>17)&0x1f)+ ((startAddress>>12)&0x1f) + i*1000;
+			//*lPtr = 2;
+		}
+	}
+	
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = numItems;
     if(perr == 0){

@@ -23,7 +23,15 @@ then
 		#touch ORSLTv4Readout.cc
 		#touch ORFLTv4Readout.cc
 		make -B
-	else echo Directory ORCA does not exist: upload readout code, send ON again and recompile!
+		if [ x"$2" = x"" ] ; then
+			echo Start OrcaReadout with standard port 44667 ...
+			~/ORCA/OrcaReadout 44667 &
+		else
+			echo Start OrcaReadout with port $2 ...
+			~/ORCA/OrcaReadout $2 &
+		fi
+	else 
+		echo Directory ORCA does not exist: upload readout code, send ON again and recompile!
 	fi
 elif  [ "$1" = "SimulationConfigScriptOFF" ]
 then
@@ -36,8 +44,16 @@ then
 		#touch ORFLTv4Readout.cc
 		#rm simulationmode.mk
 		make -B
+		# maybe I should leave it to the user to restart the readout code? -tb-
+		if [ x"$2" = x"" ] ; then
+			echo Start OrcaReadout with standard port 44667 ...
+			~/ORCA/OrcaReadout 44667 &
+		else
+			echo Start OrcaReadout with port $2 ...
+			~/ORCA/OrcaReadout $2 &
+		fi
 	else echo "OK (nothing needed to be done)"
-	# shall I remove the file simulationmode.config?
+	# shall I remove the file simulationmode.mk?
 	fi
 elif  [ "$1" = "shellcommand" ]
 then
