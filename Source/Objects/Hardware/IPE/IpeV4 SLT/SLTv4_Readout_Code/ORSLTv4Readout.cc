@@ -38,7 +38,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 // (here follow the 'simulation' versions of all functions -tb-)
 //----------------------------------------------------------------
 
-
+// 'simulation' of hitrate is done in HW_Readout.cc in doReadBlock -tb-
 
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
