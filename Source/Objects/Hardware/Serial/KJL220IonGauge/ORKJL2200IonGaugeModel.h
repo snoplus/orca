@@ -48,6 +48,7 @@
 		float emissionCurrent;
 		float degasTime;
 		unsigned short stateMask;
+		NSMutableArray* outgoingBuffer;
 }
 
 #pragma mark ***Initialization

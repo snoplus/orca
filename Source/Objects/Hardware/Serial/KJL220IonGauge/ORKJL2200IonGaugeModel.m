@@ -46,6 +46,7 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 @interface ORKJL2200IonGaugeModel (private)
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
+- (void) sendFromOutgoingBuffer;
 - (void) decodeCommand:(NSString*)aCmd;
 @end
 
@@ -62,6 +63,8 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [portName release];
+	[outgoingBuffer release];
+	
     if([serialPort isOpen]){
         [serialPort close];
     }
@@ -391,8 +394,13 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 		[serialPort setStopBits2:0];
 		[serialPort setDataBits:8];
         [serialPort open];
+		[self sendFromOutgoingBuffer];
     }
-    else      [serialPort close];
+    else  {
+		[outgoingBuffer release];
+		outgoingBuffer = nil;
+		[serialPort close];
+	}
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugePortStateChanged object:self];
     
@@ -441,10 +449,13 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 #pragma mark *** Commands
 - (void) sendCommand:(NSString*)aCmd
 {
+	if(!outgoingBuffer)outgoingBuffer = [[NSMutableArray array] retain];
 	if([serialPort isOpen]){
-		[serialPort writeString:aCmd];
+		NSArray* cmdList = [aCmd componentsSeparatedByString:@"\r"];
+		for(id oneCommand in cmdList)[outgoingBuffer addObject:oneCommand];
 	}
 }
+
 
 - (void) initBoard
 {
@@ -516,5 +527,16 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 		[self setPressure:[value floatValue]];
 	}
 }
+
+- (void) sendFromOutgoingBuffer
+{
+	if([serialPort isOpen] && [outgoingBuffer count}>0){
+		id aCmd = [[[outgoingBuffer objectAtIndex:0] retain] autorelease];
+		[outgoingBuffer removeObjectAtIndex:0];
+		[serialPort writeString:aCmd];
+		[self performSelector:@selector(sendFromOutgoingBuffer) withObject:nil afterDelay:.1];
+	}
+}
+
 
 @end
