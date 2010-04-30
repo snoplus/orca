@@ -686,7 +686,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
 	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
 	
-	[self sendPMCCommandScript: @"SimulationConfigScriptON"];
+	//[self sendPMCCommandScript: @"SimulationConfigScriptON"];
+	[self sendPMCCommandScript: [NSString stringWithFormat:@"%@ %i",@"SimulationConfigScriptON",[pmcLink portNumber]]];//send the port number, too
 
 	#if 0
 	NSString *scriptName = @"IpeV4SLTScript";

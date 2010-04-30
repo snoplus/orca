@@ -188,5 +188,6 @@
 - (IBAction) sendCommandScript:(id)sender;
 - (IBAction) sendSimulationConfigScriptON:(id)sender;
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
+- (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 @end

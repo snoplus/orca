@@ -23,6 +23,7 @@
 #import "ORIpeV4SLTController.h"
 #import "ORIpeV4SLTModel.h"
 #import "TimedWorker.h"
+#import "SBC_Link.h"
 
 #define kFltNumberTriggerSources 5
 
@@ -739,7 +740,38 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 - (IBAction) sendSimulationConfigScriptON:(id)sender
-{	[model sendSimulationConfigScriptON];  }
+{
+	//[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
+    NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting simulation mode. "
+						"There may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
+                      @"Cancel",
+                      @"Yes, Kill Crate",
+                      nil,[self window],
+                      self,
+                      @selector(_SLTv4killCrateAndStartSimDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Is this really what you want?");
+}
+
+- (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+//NSLog(@"This is my _killCrateDidEnd: -tb-\n");
+	//called
+	if(returnCode == NSAlertAlternateReturn){		
+		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+		BOOL rememberState = [[model sbcLink] forceReload];
+		if(rememberState) [[model sbcLink] setForceReload: NO];
+		[model sendSimulationConfigScriptON];  
+		//[self connectionAction: nil];
+		//[self toggleCrateAction: nil];
+		//[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+		//   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+		[[model sbcLink] startCrate];
+		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+	}
+}
+
+
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender
 {	[model sendSimulationConfigScriptOFF];  }
 
