@@ -22,12 +22,12 @@
 @class ORSerialPort;
 @class ORTimeRate;
 
-#define kKJL2200IonGaugeOnMask	0x20
-#define kKJL2200DegasOnMask		0x10
-#define kKJL2200SetPoint1Mask	0x08
-#define kKJL2200SetPoint2Mask	0x04
-#define kKJL2200SetPoint3Mask	0x02
-#define kKJL2200SetPoint4Mask	0x01
+#define kKJL2200IonGaugeOnMask	0x01
+#define kKJL2200DegasOnMask		0x02
+#define kKJL2200SetPoint1Mask	0x04
+#define kKJL2200SetPoint2Mask	0x08
+#define kKJL2200SetPoint3Mask	0x10
+#define kKJL2200SetPoint4Mask	0x20
 
 @interface ORKJL2200IonGaugeModel : OrcaObject
 {
@@ -100,8 +100,14 @@
 
 #pragma mark ***Commands
 - (void) readPressure;
+- (void) pollPressure;
+- (void) getStatus;
 - (void) sendCommand:(NSString*)aCmd;
 - (void) initBoard;
+- (void) turnOn;
+- (void) turnOff;
+
+
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end

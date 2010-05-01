@@ -173,7 +173,10 @@
 	[setPoint3State setState:aMask & kKJL2200SetPoint3Mask];
 	[setPoint4State setState:aMask & kKJL2200SetPoint4Mask];
 	BOOL degassOn = aMask & kKJL2200DegasOnMask;
+	BOOL isOn     = aMask & kKJL2200IonGaugeOnMask;
 	[degasOnField setStringValue:degassOn?@"Degas":@""];
+	NSString* onOffString = isOn?@"Turn Off":@"Turn On";
+	[onOffButton setTitle:onOffString];
 	[self pressureChanged:nil];
 }
 
@@ -196,7 +199,7 @@
 {
 	int i;
 	for(i=0;i<4;i++){
-		[[setPointMatrix cellWithTag:i] setFloatValue: [model setPoint:i]];
+		[[setPointMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.2E",[model setPoint:i]]];
 	}
 }
 
@@ -350,6 +353,10 @@
 
 
 #pragma mark ***Actions
+- (IBAction) readNowAction:(id)sender
+{
+	[model pollPressure];
+}
 
 - (IBAction) degasTimeAction:(id)sender
 {
@@ -375,6 +382,21 @@
 {
 	[model initBoard];	
 }
+- (IBAction) toggleIonGauge:(id)sender
+{
+	if([model stateMask] & kKJL2200IonGaugeOnMask) [model turnOff];	
+	else [model turnOn];
+}
+
+- (IBAction) setPointAction:(id)sender
+{
+	NSString* s = [[sender selectedCell] stringValue];
+	s = [s stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+	s = [s stringByReplacingOccurrencesOfString:@"EE-" withString:@"E-"];
+	float theValue = [s floatValue];
+	[model setSetPoint:[[sender selectedCell] tag] withValue:theValue];	
+}
+
 
 - (IBAction) lockAction:(id) sender
 {

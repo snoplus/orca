@@ -22,6 +22,7 @@
 
 @interface ORKJL2200IonGaugeController : OrcaObjectController
 {
+	IBOutlet NSButton*		onOffButton;
     IBOutlet NSTextField*   degasOnField;
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSTextField*	degasTimeField;
@@ -84,8 +85,11 @@
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+- (IBAction) readNowAction:(id)sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) hideShowControls:(id)sender;
+- (IBAction) toggleIonGauge:(id)sender;
+- (IBAction) setPointAction:(id)sender;
 
 @end
 

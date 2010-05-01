@@ -55,6 +55,7 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 {
 	self = [super init];
     [self registerNotificationObservers];
+
 	return self;
 }
 
@@ -113,7 +114,7 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 
 - (void) dataReceived:(NSNotification*)note
 {
-    if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+    if([note object] == serialPort){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
@@ -275,6 +276,10 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 {
 	[self sendCommand:@"=RV\r"];
 }
+- (void) getStatus
+{
+	[self sendCommand:@"=R*\r"];
+}
 
 - (ORTimeRate*)timeRate
 {
@@ -317,9 +322,11 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 - (void) pollPressure
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressure) object:nil];
-	//testing: [self decodeCommand:@"V=5.0-07"];
+	[self getStatus];
 	[self readPressure];
-	[self performSelector:@selector(pollPressure) withObject:nil afterDelay:pollTime];
+	if(pollTime){
+		[self performSelector:@selector(pollPressure) withObject:nil afterDelay:pollTime];
+	}
 }
 
 
@@ -391,10 +398,9 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
     if(state) {
 		[serialPort setSpeed:2400];
 		[serialPort setParityNone];
-		[serialPort setStopBits2:0];
+		//[serialPort setStopBits2:0];
 		[serialPort setDataBits:8];
         [serialPort open];
-		[self sendFromOutgoingBuffer];
     }
     else  {
 		[outgoingBuffer release];
@@ -449,11 +455,17 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 #pragma mark *** Commands
 - (void) sendCommand:(NSString*)aCmd
 {
+	NSLog(@"com: %@\n",aCmd);
+	[serialPort writeString:aCmd];
+/*
 	if(!outgoingBuffer)outgoingBuffer = [[NSMutableArray array] retain];
 	if([serialPort isOpen]){
 		NSArray* cmdList = [aCmd componentsSeparatedByString:@"\r"];
-		for(id oneCommand in cmdList)[outgoingBuffer addObject:oneCommand];
+		for(id oneCommand in cmdList){
+			if([oneCommand length]>1)[outgoingBuffer addObject:oneCommand];
+		}
 	}
+ */
 }
 
 
@@ -461,13 +473,23 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 {
 	NSString* aCmd = [NSString stringWithFormat:@"=SS:%d\r",sensitivity];
 	aCmd = [aCmd stringByAppendingFormat:@"=SE:%.1f\r",emissionCurrent];
-	aCmd = [aCmd stringByAppendingFormat:@"=ST:%d\r",degasTime];
+	aCmd = [aCmd stringByAppendingFormat:@"=ST:%.0f\r",degasTime];
 	int i;
 	for(i=0;i<4;i++){
-		aCmd = [aCmd stringByAppendingFormat:@"=S%d:%.1E\r",setPoint[i]];
+		aCmd = [aCmd stringByAppendingFormat:@"=S%d:%.1E\r",i,setPoint[i]];
 	}
 	aCmd = [aCmd stringByReplacingOccurrencesOfString:@"E-" withString:@"-"];
 	[self sendCommand:aCmd];
+}
+
+- (void) turnOn
+{
+	[self sendCommand:@"=SF1\r"];
+}
+
+- (void) turnOff
+{
+	[self sendCommand:@"=SF0\r"];
 }
 
 #pragma mark ***Data Records
@@ -526,6 +548,19 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
 		[self setPressure:[value floatValue]];
 	}
+	else if([prefix isEqualToString:@"*="]){
+		aCmd = [aCmd substringFromIndex:2];
+		int i;
+		int n = [aCmd length];
+		unsigned short aMask = 0;
+		for(i=0;i<n;i++){
+			if([aCmd characterAtIndex:i] == '1'){
+				aMask |= (1<<i);
+			}
+		}
+		[self setStateMask:aMask];
+	}
+	
 }
 
 - (void) sendFromOutgoingBuffer
@@ -533,9 +568,13 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 	if([serialPort isOpen] && [outgoingBuffer count]>0){
 		id aCmd = [[[outgoingBuffer objectAtIndex:0] retain] autorelease];
 		[outgoingBuffer removeObjectAtIndex:0];
+		if([aCmd rangeOfString:@"\r"].location == NSNotFound){
+			aCmd = [aCmd stringByAppendingString:@"\r"];
+		}
+		NSLog(@"com: %@\n",aCmd);
 		[serialPort writeString:aCmd];
-		[self performSelector:@selector(sendFromOutgoingBuffer) withObject:nil afterDelay:.1];
 	}
+	[self performSelector:@selector(sendFromOutgoingBuffer) withObject:nil afterDelay:.1];
 }
 
 
