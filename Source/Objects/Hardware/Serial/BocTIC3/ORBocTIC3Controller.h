@@ -58,7 +58,6 @@
 - (void) pressureChanged:(NSNotification*)aNotification;
 - (void) pollTimeChanged:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
-- (void) scaleAction:(NSNotification*)aNotification;
 - (void) loadPressureTimeValuesForIndex:(int)index;
 
 #pragma mark ***Actions
