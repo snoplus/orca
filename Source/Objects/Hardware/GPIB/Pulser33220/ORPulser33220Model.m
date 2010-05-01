@@ -441,7 +441,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) checkNoUsbAlarm
 {
-	if((usbInterface && [self getUSBController]) || !guardian){
+	if((connectionProtocol != kHPPulserUseUSB) || (usbInterface && [self getUSBController]) || !guardian){
 		[noUSBAlarm clearAlarm];
 		[noUSBAlarm release];
 		noUSBAlarm = nil;
