@@ -22,22 +22,24 @@
 
 @interface ORKJL2200IonGaugeController : OrcaObjectController
 {
+	IBOutlet NSPopUpButton*	pressureScalePU;
 	IBOutlet NSButton*		onOffButton;
-    IBOutlet NSTextField*   degasOnField;
+	IBOutlet NSButton*      degasButton;
+	IBOutlet NSTextField*   degasOnField;
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSTextField*	degasTimeField;
 	IBOutlet NSTextField*	emissionCurrentField;
 	IBOutlet NSTextField*	sensitivityField;
 	IBOutlet NSMatrix*		setPointMatrix;
-	IBOutlet NSTextField*	statusBitsField;
+	IBOutlet NSMatrix*		setPointLabelMatrix;
 	IBOutlet NSTextField*	pressureField;
+	IBOutlet NSTextField*	shippingStateField;
 	IBOutlet NSButton*		shipPressureButton;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
-    IBOutlet NSButton*      readCurrentButton;
     IBOutlet NSTextField*   timeField;
 	IBOutlet ORPlotter1D*   plotter0;
 	
@@ -45,8 +47,6 @@
     IBOutlet BiStateView*	setPoint2State;
     IBOutlet BiStateView*	setPoint3State;
     IBOutlet BiStateView*	setPoint4State;
-    IBOutlet NSButton*		hideShowButton;
-    IBOutlet NSView*        containingView;
 }
 
 #pragma mark ***Initialization
@@ -59,12 +59,12 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) pressureScaleChanged:(NSNotification*)aNote;
 - (void) stateMaskChanged:(NSNotification*)aNote;
 - (void) degasTimeChanged:(NSNotification*)aNote;
 - (void) emissionCurrentChanged:(NSNotification*)aNote;
 - (void) sensitivityChanged:(NSNotification*)aNote;
 - (void) setPointChanged:(NSNotification*)aNote;
-- (void) statusBitsChanged:(NSNotification*)aNote;
 - (void) pressureChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
@@ -77,6 +77,7 @@
 - (void) scaleAction:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
+- (IBAction) pressureScaleAction:(id)sender;
 - (IBAction) degasTimeAction:(id)sender;
 - (IBAction) emissionCurrentAction:(id)sender;
 - (IBAction) sensitivityAction:(id)sender;
@@ -87,9 +88,9 @@
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) readNowAction:(id)sender;
 - (IBAction) initBoard:(id)sender;
-- (IBAction) hideShowControls:(id)sender;
 - (IBAction) toggleIonGauge:(id)sender;
 - (IBAction) setPointAction:(id)sender;
+- (IBAction) toggleDegass:(id)sender;
 
 @end
 

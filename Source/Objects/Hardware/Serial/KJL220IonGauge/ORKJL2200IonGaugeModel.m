@@ -33,7 +33,6 @@ NSString* ORKJL2200IonGaugeModelDegasTimeChanged		= @"ORKJL2200IonGaugeModelDega
 NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged	= @"ORKJL2200IonGaugeModelEmissionCurrentChanged";
 NSString* ORKJL2200IonGaugeModelSensitivityChanged		= @"ORKJL2200IonGaugeModelSensitivityChanged";
 NSString* ORKJL2200IonGaugeModelSetPointChanged			= @"ORKJL2200IonGaugeModelSetPointChanged";
-NSString* ORKJL2200IonGaugeModelStatusBitsChanged		= @"ORKJL2200IonGaugeModelStatusBitsChanged";
 NSString* ORKJL2200IonGaugePressureChanged				= @"ORKJL2200IonGaugePressureChanged";
 NSString* ORKJL2200IonGaugeShipPressureChanged			= @"ORKJL2200IonGaugeShipPressureChanged";
 NSString* ORKJL2200IonGaugePollTimeChanged				= @"ORKJL2200IonGaugePollTimeChanged";
@@ -42,11 +41,11 @@ NSString* ORKJL2200IonGaugePortNameChanged				= @"ORKJL2200IonGaugePortNameChang
 NSString* ORKJL2200IonGaugePortStateChanged				= @"ORKJL2200IonGaugePortStateChanged";
 NSString* ORKJL2200IonGaugeModelStateMaskChanged		= @"ORKJL2200IonGaugeModelStateMaskChanged";
 NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
+NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelPressureScaleChanged";
 
 @interface ORKJL2200IonGaugeModel (private)
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
-- (void) sendFromOutgoingBuffer;
 - (void) decodeCommand:(NSString*)aCmd;
 @end
 
@@ -64,7 +63,6 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [portName release];
-	[outgoingBuffer release];
 	
     if([serialPort isOpen]){
         [serialPort close];
@@ -160,6 +158,30 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 
 
 #pragma mark ***Accessors
+- (float) pressureScaleValue
+{
+	return pressureScaleValue;
+}
+
+- (int) pressureScale
+{
+    return pressureScale;
+}
+
+- (void) setPressureScale:(int)aPressureScale
+{
+	if(aPressureScale<0)aPressureScale=0;
+	else if(aPressureScale>11)aPressureScale=11;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setPressureScale:pressureScale];
+    
+    pressureScale = aPressureScale;
+	
+	pressureScaleValue = powf(10.,(float)pressureScale);
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelPressureScaleChanged object:self];
+}
+
 - (void) setStateMask:(unsigned short)aMask
 {
 	stateMask = aMask;
@@ -235,19 +257,6 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelSetPointChanged object:self];
 	}
 }
-
-- (int) statusBits
-{
-    return statusBits;
-}
-
-- (void) setStatusBits:(int)aStatusBits
-{
-    statusBits = aStatusBits;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelStatusBitsChanged object:self];
-}
-
 - (float) pressure
 {
     return pressure;
@@ -403,8 +412,6 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
         [serialPort open];
     }
     else  {
-		[outgoingBuffer release];
-		outgoingBuffer = nil;
 		[serialPort close];
 	}
     portWasOpen = [serialPort isOpen];
@@ -417,6 +424,7 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setPressureScale:[decoder decodeIntForKey:@"pressureScale"]];
 	[self setDegasTime:		 [decoder decodeFloatForKey:@"degasTime"]];
 	[self setEmissionCurrent:[decoder decodeFloatForKey:@"emissionCurrent"]];
 	[self setSensitivity:	 [decoder decodeIntForKey:@"sensitivity"]];
@@ -439,6 +447,7 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:pressureScale forKey:@"pressureScale"];
     [encoder encodeFloat:degasTime forKey:@"degasTime"];
     [encoder encodeFloat:emissionCurrent forKey:@"emissionCurrent"];
     [encoder encodeInt:sensitivity forKey:@"sensitivity"];
@@ -455,19 +464,8 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 #pragma mark *** Commands
 - (void) sendCommand:(NSString*)aCmd
 {
-	NSLog(@"com: %@\n",aCmd);
 	[serialPort writeString:aCmd];
-/*
-	if(!outgoingBuffer)outgoingBuffer = [[NSMutableArray array] retain];
-	if([serialPort isOpen]){
-		NSArray* cmdList = [aCmd componentsSeparatedByString:@"\r"];
-		for(id oneCommand in cmdList){
-			if([oneCommand length]>1)[outgoingBuffer addObject:oneCommand];
-		}
-	}
- */
 }
-
 
 - (void) initBoard
 {
@@ -490,6 +488,16 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 - (void) turnOff
 {
 	[self sendCommand:@"=SF0\r"];
+}
+
+- (void) turnDegasOn
+{
+	[self sendCommand:@"=SD1\r"];
+}
+
+- (void) turnDegasOff
+{
+	[self sendCommand:@"=SD0\r"];
 }
 
 #pragma mark ***Data Records
@@ -562,20 +570,5 @@ NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 	}
 	
 }
-
-- (void) sendFromOutgoingBuffer
-{
-	if([serialPort isOpen] && [outgoingBuffer count]>0){
-		id aCmd = [[[outgoingBuffer objectAtIndex:0] retain] autorelease];
-		[outgoingBuffer removeObjectAtIndex:0];
-		if([aCmd rangeOfString:@"\r"].location == NSNotFound){
-			aCmd = [aCmd stringByAppendingString:@"\r"];
-		}
-		NSLog(@"com: %@\n",aCmd);
-		[serialPort writeString:aCmd];
-	}
-	[self performSelector:@selector(sendFromOutgoingBuffer) withObject:nil afterDelay:.1];
-}
-
 
 @end

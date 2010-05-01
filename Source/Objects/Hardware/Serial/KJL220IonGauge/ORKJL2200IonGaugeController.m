@@ -57,6 +57,11 @@
 	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [super awakeFromNib];
 }
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"KJL2200 (%d)",[model uniqueIdNumber]]];
+}
 
 #pragma mark ***Notifications
 
@@ -115,11 +120,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(statusBitsChanged:)
-                         name : ORKJL2200IonGaugeModelStatusBitsChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(setPointChanged:)
                          name : ORKJL2200IonGaugeModelSetPointChanged
 						object: model];
@@ -144,6 +144,11 @@
                          name : ORKJL2200IonGaugeModelStateMaskChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(pressureScaleChanged:)
+                         name : ORKJL2200IonGaugeModelPressureScaleChanged
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -157,12 +162,18 @@
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
 	[self pressureChanged:nil];
-	[self statusBitsChanged:nil];
 	[self setPointChanged:nil];
 	[self sensitivityChanged:nil];
 	[self emissionCurrentChanged:nil];
 	[self degasTimeChanged:nil];
 	[self stateMaskChanged:nil];
+	[self pressureScaleChanged:nil];
+}
+
+- (void) pressureScaleChanged:(NSNotification*)aNote
+{
+	[pressureScalePU selectItemAtIndex: [model pressureScale]];
+	[plotter0 setNeedsDisplay:YES];
 }
 
 - (void) stateMaskChanged:(NSNotification*)aNote
@@ -175,8 +186,14 @@
 	BOOL degassOn = aMask & kKJL2200DegasOnMask;
 	BOOL isOn     = aMask & kKJL2200IonGaugeOnMask;
 	[degasOnField setStringValue:degassOn?@"Degas":@""];
-	NSString* onOffString = isOn?@"Turn Off":@"Turn On";
-	[onOffButton setTitle:onOffString];
+	[onOffButton setTitle:isOn?@"Turn Off":@"Turn On"];
+	[degasButton setTitle:isOn?@"Turn Degas Off":@"Turn Degas On"];
+	
+	[[setPointLabelMatrix cellWithTag:0] setStringValue:aMask & kKJL2200SetPoint1Mask ? @"S1":@""];
+	[[setPointLabelMatrix cellWithTag:1] setStringValue:aMask & kKJL2200SetPoint2Mask ? @"S2":@""];
+	[[setPointLabelMatrix cellWithTag:2] setStringValue:aMask & kKJL2200SetPoint3Mask ? @"S3":@""];
+	[[setPointLabelMatrix cellWithTag:3] setStringValue:aMask & kKJL2200SetPoint4Mask ? @"S4":@""];
+	
 	[self pressureChanged:nil];
 }
 
@@ -201,11 +218,6 @@
 	for(i=0;i<4;i++){
 		[[setPointMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.2E",[model setPoint:i]]];
 	}
-}
-
-- (void) statusBitsChanged:(NSNotification*)aNote
-{
-	[statusBitsField setIntValue: [model statusBits]];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -254,6 +266,7 @@
 - (void) shipPressureChanged:(NSNotification*)aNote
 {
 	[shipPressureButton setIntValue: [model shipPressure]];
+	[shippingStateField setStringValue:[model shipPressure]?@"Shipping Enabled":@""];
 }
 
 - (void) pressureChanged:(NSNotification*)aNote
@@ -294,7 +307,9 @@
     [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     [shipPressureButton setEnabled:!locked];
-    
+    [degasButton setEnabled:!locked];
+    [onOffButton setEnabled:!locked];
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORKJL2200IonGaugeLock])s = @"Not in Maintenance Run.";
@@ -353,6 +368,10 @@
 
 
 #pragma mark ***Actions
+- (void) pressureScaleAction:(id)sender
+{
+	[model setPressureScale:[sender indexOfSelectedItem]];	
+}
 - (IBAction) readNowAction:(id)sender
 {
 	[model pollPressure];
@@ -388,6 +407,12 @@
 	else [model turnOn];
 }
 
+- (IBAction) toggleDegass:(id)sender
+{
+	if([model stateMask] & kKJL2200DegasOnMask) [model turnDegasOff];	
+	else [model turnDegasOn];
+}
+
 - (IBAction) setPointAction:(id)sender
 {
 	NSString* s = [[sender selectedCell] stringValue];
@@ -418,25 +443,6 @@
 	[model setPollTime:[[sender selectedItem] tag]];
 }
 
-- (IBAction) hideShowControls:(id)sender
-{
-	
-  // unsigned int oldResizeMask = [containingView autoresizingMask];
-//	[containingView setAutoresizingMask:NSViewMinYMargin];
-	
-    NSRect aFrame = [NSWindow contentRectForFrameRect:[[self window] frame] 
-											styleMask:[[self window] styleMask]];
-    if([hideShowButton state] == NSOnState){
-        aFrame.size.height += 85;
-    }
-    else {
-        aFrame.size.height -= 85;
-    }
-    [self resizeWindowToSize:aFrame.size];
-   // [containingView setAutoresizingMask:oldResizeMask];
-	
-}
-
 #pragma mark •••Data Source
 - (int) numberOfDataSetsInPlot:(id)aPlotter
 {
@@ -451,7 +457,7 @@
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
 	int count = [[model timeRate] count];
-	return [[model timeRate] valueAtIndex:count-x-1];
+	return [[model timeRate] valueAtIndex:count-x-1] * [model pressureScaleValue];
 
 }
 

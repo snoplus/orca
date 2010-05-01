@@ -34,7 +34,7 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Pressure encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time Pressure taken in seconds since Jan 1, 1970
 //------------------------------------------------------------------------------------------------
-static NSString* kKeithleyUnit[8] = {
+static NSString* kKJL2200Unit[8] = {
     //pre-make some keys for speed.
     @"Unit 0",  @"Unit 1",  @"Unit 2",  @"Unit 3",
     @"Unit 4",  @"Unit 5",  @"Unit 6",  @"Unit 7"
@@ -46,7 +46,7 @@ static NSString* kKeithleyUnit[8] = {
 
 - (NSString*) getUnitKey:(unsigned short)aUnit
 {
-    if(aUnit<8) return kKeithleyUnit[aUnit];
+    if(aUnit<8) return kKJL2200Unit[aUnit];
     else return [NSString stringWithFormat:@"Unit %d",aUnit];			
 }
 

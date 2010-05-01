@@ -41,14 +41,14 @@
         NSMutableString*       buffer;
 		BOOL			shipPressure;
 		ORTimeRate*		timeRate;
-		float pressure;
-		int statusBits;
-		float setPoint[4];
-		int sensitivity;
-		float emissionCurrent;
-		float degasTime;
-		unsigned short stateMask;
-		NSMutableArray* outgoingBuffer;
+		float			pressure;
+		float			setPoint[4];
+		int				sensitivity;
+		float			emissionCurrent;
+		float			degasTime;
+		unsigned short	stateMask;
+		int				pressureScale;
+		float			pressureScaleValue;
 }
 
 #pragma mark ***Initialization
@@ -60,6 +60,9 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (float) pressureScaleValue;
+- (int) pressureScale;
+- (void) setPressureScale:(int)aPressureScale;
 - (void) setStateMask:(unsigned short)aMask;
 - (unsigned short)stateMask;
 - (float) degasTime;
@@ -70,8 +73,6 @@
 - (void) setSensitivity:(int)aSensitivity;
 - (float) setPoint:(int)index;
 - (void) setSetPoint:(int)index withValue:(float)aSetPoint;
-- (int) statusBits;
-- (void) setStatusBits:(int)aStatusBits;
 - (float) pressure;
 - (void) setPressure:(float)aPressure;
 - (ORTimeRate*)timeRate;
@@ -106,17 +107,18 @@
 - (void) initBoard;
 - (void) turnOn;
 - (void) turnOff;
-
+- (void) turnDegasOn;
+- (void) turnDegasOff;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORKJL2200IonGaugeModelPressureScaleChanged;
 extern NSString* ORKJL2200IonGaugeModelDegasTimeChanged;
 extern NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged;
 extern NSString* ORKJL2200IonGaugeModelSensitivityChanged;
 extern NSString* ORKJL2200IonGaugeModelSetPointChanged;
-extern NSString* ORKJL2200IonGaugeModelStatusBitsChanged;
 extern NSString* ORKJL2200IonGaugePressureChanged;
 extern NSString* ORKJL2200IonGaugeShipPressureChanged;
 extern NSString* ORKJL2200IonGaugePollTimeChanged;
