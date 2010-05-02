@@ -127,7 +127,6 @@
 		[selectionPU selectItemWithTitle:[nameField stringValue]];
 	}
 	[[contextInfo objectForKey:@"ObjectToCalibrate"] setCalibration:cal];
-	[[contextInfo objectForKey:@"ObjectToUpdate"] postUpdate];
 	[cal release];
 }
 

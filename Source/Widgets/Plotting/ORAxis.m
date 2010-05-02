@@ -1,3 +1,9 @@
+//
+//  ORAxis.m
+//  Orca
+//
+//  Created by Mark Howe on 2/20/10.
+//  Copyright 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -12,8 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORAxis.h"
-#import <math.h>
-#import "ORAxisPreferences.h"
 #import "ORCalibration.h"
 
 @interface ORAxis (private)
@@ -907,7 +911,7 @@ enum {
 	mMarkerDragInProgress = NO;
 	
 	[[self window] resetCursorRects];
-	
+	[self clearPin];
 	[NSCursor pop];
 }
 
@@ -1528,20 +1532,20 @@ enum {
 	int imageOffset;
 	NSSize imageSize = [markerImage size];
 	if(isX){
-		if(isOpposite) imageOffset = imageSize.height;
-		else           imageOffset = -imageSize.height;
+		if(isOpposite) imageOffset = imageSize.height+2;
+		else           imageOffset = -imageSize.height-2;
 	}
 	else {
-		if(isOpposite) imageOffset = imageSize.width;
-		else           imageOffset = -imageSize.width;
+		if(isOpposite) imageOffset = imageSize.width+2;
+		else           imageOffset = -imageSize.width-2;
 	}
 	
 	val = [self getPixAbs:val];
 	NSPoint p;
-	if(isX)p = NSMakePoint(val+imageSize.width/2-1,axisPosition+imageOffset);
+	if(isX)p = NSMakePoint(val-imageSize.width/2+lowOffset,axisPosition+imageOffset);
 	else   p = NSMakePoint(axisPosition+imageOffset,val-imageSize.height/2+lowOffset);
 	
-	[markerImage drawAtPoint:p fromRect:sourceRect operation:NSCompositeSourceOver fraction:.5];
+	[markerImage drawAtPoint:p fromRect:sourceRect operation:NSCompositeSourceOver fraction:.8];
 
 }
 

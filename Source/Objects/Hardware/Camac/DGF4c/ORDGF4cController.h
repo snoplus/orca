@@ -23,12 +23,12 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDGF4cModel.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORAxis;
 
 @interface ORDGF4cController : OrcaObjectController {
 	@private
-		IBOutlet ORPlotter1D*   plotter;
+		IBOutlet ORPlotView*   plotter;
 		IBOutlet ORAxis*		xScale;
 		IBOutlet ORAxis*		yScale;
 		IBOutlet NSButton*		sampleContinousButton;
@@ -176,5 +176,8 @@
 
 
 - (void) takeSample;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

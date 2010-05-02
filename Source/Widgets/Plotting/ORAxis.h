@@ -1,4 +1,9 @@
-/* ORAxis */
+//
+//  ORAxis.h
+//  Orca
+//
+//  Created by Mark Howe on 2/20/10.
+//  Copyright 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 

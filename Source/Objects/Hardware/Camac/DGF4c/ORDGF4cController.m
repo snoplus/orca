@@ -23,7 +23,8 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDGF4cController.h"
-#import "ORPlotter1D.h"
+#import "ORPlot.h"
+#import "ORPlotView.h"
 #import "ORAxis.h"
 #import "ORTimedTextField.h"
 
@@ -62,7 +63,22 @@
 	[yScale setRngLimitsLow:-65535 withHigh:65535 withMinRng:10];
 	[yScale setRngDefaultsLow:-65535 withHigh:65535];
 	[yScale setRngLow:-65535 withHigh:65535];
-    
+	
+	NSColor* theColors[4] =
+	{
+		[NSColor redColor],
+		[NSColor blueColor],
+		[NSColor blackColor],
+		[NSColor greenColor]	
+	};
+	int i;
+	for(i=0;i<4;i++){
+		ORPlot* aPlot = [[ORPlot alloc] initWithTag:i andDataSource:self];
+		[aPlot setLineColor:theColors[i]];
+		[plotter addPlot: aPlot];
+		[aPlot release];
+	}
+	
 	[super awakeFromNib];
 }
 
@@ -1095,28 +1111,20 @@
     }
 }
 
-- (BOOL)   	willSupplyColors
+- (int) numberPointsInPlot:(id)aPlotter
 {
-	return NO;
-}
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-	return 4;
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
+	int set = [aPlotter tag];
 	if([model oscEnabledMask] & (1<<set)){
 		return [model numOscPoints];
 	}
 	else return 0;
 }
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
-{
-	return [model oscData:set value:x];
-}
 
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+{
+	*yValue = [model oscData:[aPlotter tag] value:i];
+	*xValue = i;
+}
 
 @end
 

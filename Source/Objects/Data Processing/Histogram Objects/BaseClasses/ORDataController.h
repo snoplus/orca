@@ -18,28 +18,27 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class ORPlotView;
 
 @interface ORDataController : OrcaObjectController {
 	    
-    IBOutlet id             plotter;
     IBOutlet NSDrawer*		analysisDrawer;
 
     IBOutlet NSTextField*   titleField;
     IBOutlet NSView*		plotterGroupView;
     IBOutlet NSButton*		hideShowButton;
     IBOutlet NSView*        containingView;
-    IBOutlet NSTextField*   positionField;
     IBOutlet NSTextField*   pausedField;
     IBOutlet NSTableView*   rawDataTable;
     IBOutlet NSTabView*		rawDataTabView;
     IBOutlet NSPopUpButton*	refreshModePU;
 	IBOutlet NSButton*		pauseButton;
+    IBOutlet NSButton*		refreshButton;
+	IBOutlet ORPlotView*	plotView;
 }
 
-
 #pragma mark •••Accessors
-- (id) plotter;
-- (id) curve:(int)aCurveIndex gate:(int)aGateIndex;
+- (id) plotView;
 - (id) analysisDrawer;
 
 #pragma mark •••Interface Management
@@ -48,11 +47,11 @@
 - (void) updateWindow;
 
 - (void) dataSetChanged:(NSNotification*)aNote;
+- (void) calibrationChanged:(NSNotification*)aNote;
 - (void) drawerDidOpen:(NSNotification*)aNote;
 - (void) drawerDidClose:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
-- (void) serviceResponse:(NSNotification*)aNote;
 - (void) refreshModeChanged:(NSNotification*)aNote;
 - (void) pausedChanged:(NSNotification*)aNote;
 - (void) openAnalysisDrawer;
@@ -61,18 +60,11 @@
 - (NSTextField*) titleField;
 
 - (IBAction) printDocument:(id)sender;
-
-- (IBAction) logLin:(NSToolbarItem*)item;
 - (IBAction) toggleRaw:(NSToolbarItem*)item;
-- (IBAction) clearROI:(NSToolbarItem*)item;
 - (IBAction) clear:(NSToolbarItem*)item;
-- (IBAction) doAnalysis:(NSToolbarItem*)item;
-- (IBAction) autoScale:(NSToolbarItem*)item;
 - (IBAction) hideShowControls:(id)sender;
 - (IBAction) refreshModeAction:(id)sender;
 - (IBAction) pauseAction:(id)sender;
-- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-
 //scripting helper
 - (void) savePlotToFile:(NSString*)aFile;
 
@@ -82,4 +74,5 @@
 - (int)  numberBins;
 - (long) value:(unsigned short)aChan;
 @end
+ 
 
