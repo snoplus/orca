@@ -18,13 +18,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORWaveform.h"
-#import "OR1DHisto.h"
+#import "OR1dRoi.h"
 
-
-NSString* ORWaveformIntegrateChanged	 = @"ORWaveformIntegrateChanged";
-NSString* ORWaveformBaselineValueChanged = @"ORWaveformBaselineValueChanged";
 NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 
 @implementation ORWaveform
@@ -38,11 +34,11 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 
 - (void) dealloc
 {
-	[integratedWaveform release];
 	[dataLock release];
     [waveform release];
     waveform = nil;
-    [super dealloc];
+ 	[rois release];
+	[super dealloc];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -54,46 +50,10 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 - (void) setUseUnsignedValues:(BOOL)aState
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setUseUnsignedValues:useUnsignedValues];
-		
     useUnsignedValues = aState;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORWaveformUseUnsignedChanged object:self];
-	
 }
 
-- (BOOL) integrate
-{
-    return integrate;
-}
-
-- (void) setIntegrate:(BOOL)aIntegrate
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setIntegrate:integrate];
-		
-    integrate = aIntegrate;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORWaveformIntegrateChanged object:self];
-}
-
-- (void) clearIntegration
-{
-	[integratedWaveform release];
-	integratedWaveform = nil;
-}
-
-- (int) baselineValue
-{
-    return baselineValue;
-}
-
-- (void) setBaselineValue:(int)aBaselineValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setBaselineValue:baselineValue];
-    
-    baselineValue = aBaselineValue;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORWaveformBaselineValueChanged object:self];
-}
 - (int) unitSize
 {
 	return unitSize;
@@ -128,11 +88,6 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
     else return 1;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-    return [self value:x];
-}
-    
 -(long) value:(unsigned short)aChan
 {
 	[dataLock lock];
@@ -161,7 +116,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 					{
 						const long* lptr = (const long*)cptr;
 						if(useUnsignedValues) theValue =  (unsigned long)((unsigned long*)lptr)[aChan];
-						else				  theValue =  (long)lptr[aChan];
+						else				  theValue =  lptr[aChan];
 					}
 				break;
 			}
@@ -173,62 +128,24 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 	return theValue;
 }
 
-- (long) integratedValue:(unsigned short)aChan
-{
-	return [integratedWaveform value:aChan];
-}
-
 #pragma mark ¥¥¥Data Management
--(void)clear
+- (void) clear
 {
 	[dataLock lock];
     [waveform release];
     waveform = nil;
 	
-	[self clearIntegration];
-
     [self setTotalCounts:0];
 	[dataLock unlock];
 	
 }
 
-- (void) incrementTotalCounts
-{
-	[super incrementTotalCounts];
-	if(integrate && ![self paused]){
-		if(!integratedWaveform){
-			integratedWaveform = [[OR1DHisto alloc] init];
-			[integratedWaveform setNumberBins:65536];
-		}
-		[integratedWaveform histogram:[self integrateWaveform:baselineValue]];
-	}
-}
-
-- (long) integrateWaveform:(int) aBaseLine
-{
-	int i;
-	int n = [self numberBins];
-	long theValue = 0;
-	for(i=0;i<n;i++){
-		long dataPoint = [self value:i];
-		if(dataPoint > aBaseLine){
-			theValue += dataPoint - aBaseLine;
-		}
-	}
-	return theValue;
-}
-
 #pragma mark ¥¥¥Data Source Methods
-
-- (id)   name
+- (id) name
 {
     return [NSString stringWithFormat:@"%@ Waveform  Counts: %d",[self key], [self totalCounts]];
 }
 
-- (BOOL) useDataObject:(id)aPlotter  dataSet:(int)set
-{
-	return YES;
-}
 - (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
     return [self numberBins];
@@ -238,20 +155,11 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 {
 	return dataOffset;
 }
+
 - (unsigned short) unitSize:(id)aPlotter  dataSet:(int)set
 {
 	return unitSize;
 }
-- (NSData*) plotter:(id) aPlotter dataSet:(int)set
-{
-	NSData* temp;
-	[dataLock lock];
-	[[waveform retain] autorelease];
-	temp = waveform;
-	[dataLock unlock];
-	return temp;
-}
-
 
 - (void) setWaveform:(NSData*)aWaveform
 {
@@ -287,11 +195,10 @@ static NSString *ORWaveformUnitSize 	= @"Waveform Data Unit Size";
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setIntegrate:[decoder decodeBoolForKey:@"ORWaveformIntegrate"]];
-    [self setBaselineValue:[decoder decodeIntForKey:@"ORWaveformBaselineValue"]];
     [self setDataOffset:[decoder decodeInt32ForKey:ORWaveformDataOffset]];
     [self setUnitSize:[decoder decodeInt32ForKey:ORWaveformUnitSize]];
     [self setUseUnsignedValues:[decoder decodeBoolForKey:@"UseUnsignedValues"]];
+	rois = [[decoder decodeObjectForKey:@"rois"] retain];
     [[self undoManager] enableUndoRegistration];
 	
 	dataLock = [[NSRecursiveLock alloc] init];
@@ -302,12 +209,32 @@ static NSString *ORWaveformUnitSize 	= @"Waveform Data Unit Size";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:integrate forKey:@"ORWaveformIntegrate"];
-    [encoder encodeInt:baselineValue forKey:@"ORWaveformBaselineValue"];
     [encoder encodeInt32:dataOffset forKey:ORWaveformDataOffset];
     [encoder encodeInt:unitSize forKey:ORWaveformUnitSize];
     [encoder encodeBool:useUnsignedValues forKey:@"UseUnsignedValues"];
+    [encoder encodeObject:rois forKey:@"rois"];
 
+}
+
+#pragma mark ¥¥¥Data Source
+- (NSMutableArray*) rois
+{
+	if(!rois){
+		rois = [[NSMutableArray alloc] init];
+		[rois addObject:[[[OR1dRoi alloc] initWithMin:20 max:30] autorelease]];
+	}
+	return rois;
+}
+
+- (int) numberPointsInPlot:(id)aPlot
+{
+	return [self numberBins];
+}
+
+- (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y
+{
+	*y =  [self value:index];
+	*x = index;
 }
 
 

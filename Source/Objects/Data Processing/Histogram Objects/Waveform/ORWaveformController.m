@@ -18,29 +18,54 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
-#import "ORWaveformController.h"
 #import "ORWaveform.h"
-#import "ORPlotter1D.h"
+#import "ORWaveformController.h"
+#import "OR1dRoiController.h"
+#import "OR1dFitController.h"
+#import "ORFFTController.h"
 #import "ORAxis.h"
+#import "ORPlotView.h"
+#import "ORPlotWithROI.h"
 
 @implementation ORWaveformController
 
 #pragma mark ¥¥¥Initialization
-
-
 -(id)init
 {
     self = [super initWithWindowNibName:@"Waveform"];
     return self;
 }
 
+- (void) dealloc
+{
+	[roiController release];
+	[fitController release];
+	[fftController release];
+	[super dealloc];
+}
 
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-	[self differentiateChanged:nil];
+	[[plotView yScale] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
+    [[plotView xScale] setRngLimitsLow:0 withHigh:[model numberBins] withMinRng:25];
+
+	ORPlotWithROI* aPlot = [[ORPlotWithROI alloc] initWithTag:0 andDataSource:self];
+	[plotView addPlot: aPlot];
+	[aPlot setRoi: [[model rois] objectAtIndex:0]];
+	[aPlot release];
+	
+	roiController = [[OR1dRoiController panel] retain];
+	[roiView addSubview:[roiController view]];
+	
+	fitController = [[OR1dFitController panel] retain];
+	[fitView addSubview:[fitController view]];
+
+	fftController = [[ORFFTController panel] retain];
+	[fftView addSubview:[fftController view]];
+
+	[self plotOrderDidChange:plotView];
 }
 
 - (void) registerNotificationObservers
@@ -49,27 +74,7 @@
 	
     [super registerNotificationObservers];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(differentiateChanged:)
-                         name : ORPlotter1DDifferentiateChanged
-                        object: [self plotter]];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(averageWindowChanged:)
-                         name : ORPlotter1DAverageWindowChanged
-                        object: [self plotter]];
-	
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(integrateChanged:)
-                         name : ORWaveformIntegrateChanged
-                        object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(baselineValueChanged:)
-                         name : ORWaveformBaselineValueChanged
-                        object: model];
-	
+
     [notifyCenter addObserver : self
                      selector : @selector(useUnsignedValuesChanged:)
                          name : ORWaveformUseUnsignedChanged
@@ -80,50 +85,7 @@
 - (void) updateWindow
 {
 	[super updateWindow];
-	[self differentiateChanged:nil];
-	[self averageWindowChanged:nil];
-	[self integrateChanged:nil];
-	[self baselineValueChanged:nil];
 	[self useUnsignedValuesChanged:nil];
-}
-
-- (void) differentiateChanged:(NSNotification*)aNote
-{
-	[differentiateButton setState:[[self plotter] differentiate]];
-	if([[self plotter] differentiate]){
-		[differentiateText setStringValue:@"differentiated"];
-	}
-	else {
-		[differentiateText setStringValue:@""];
-	}
-	//[[self plotter] autoScale:nil];
-}
-
-- (void) averageWindowChanged:(NSNotification*)aNote
-{
-	[averageWindowField setIntValue:[[self plotter] averageWindow]];
-	//[[self plotter] autoScale:nil];
-}
-
-- (void) integrateChanged:(NSNotification*)aNote
-{
-	[integrateButton setState:[model integrate]];
-	
-	if([model integrate])[integratingText setStringValue:@"integrating"];
-	else				 [integratingText setStringValue:@""];
-	
-	if([model integrate]){
-		[[[self plotter] xScale] setRngLow:0 withHigh:65535];
-	}
-	else {
-		[[[self plotter] xScale] setRngLow:0 withHigh:[model numberBins]];
-	}
-	//[[self plotter] autoScale:nil];
-}
-
-- (void) baselineValueChanged:(NSNotification*)aNote
-{
-	[baselineValueField setIntValue:[model baselineValue]];
 }
 
 - (void) useUnsignedValuesChanged:(NSNotification*)aNote;
@@ -135,40 +97,26 @@
 - (IBAction) useUnsignedValuesAction:(id)sender
 {
 	[model setUseUnsignedValues:[sender state]];
-	[[self plotter] setNeedsDisplay:YES];
-	[[self plotter] autoScale:nil];
-	[[self plotter] resetScales:nil];
+	[plotView setNeedsDisplay:YES];
 }
 
-
-- (IBAction) differentiateAction:(id)sender
-{
-	[[self plotter] setDifferentiate:[sender state]];
-}
-
-- (IBAction) averageWindowAction:(id)sender
-{
-	[[self plotter] setAverageWindow:[sender intValue]];
-}
-
-- (IBAction) integrateAction:(id)sender
-{
-	[self endEditing];
-	[model setIntegrate:[sender intValue]];
-}
-
-- (IBAction) baselineValueAction:(id)sender
-{
-	[model setBaselineValue:[sender intValue]];	
-}
 
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender
 {
-	[plotter copy:sender];
+	[plotView copy:sender];
 }
 
 #pragma mark ¥¥¥Data Source
+
+- (void) plotOrderDidChange:(id)aPlotView
+{
+	id topRoi = [[aPlotView topPlot] roi];
+	[roiController setModel:topRoi];
+	[fitController setModel:[topRoi fit]];
+	[fftController setModel:[topRoi fft]];
+}
+
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [model numberBins];
@@ -182,31 +130,31 @@
 	else return [NSNumber numberWithInt:row];
 }
 
-
 - (BOOL) useUnsignedValues
 {
 	return [model useUnsignedValues];
 }
-- (BOOL) useDataObject:(id)aPlotter  dataSet:(int)set
+
+- (BOOL) plotterShouldShowRoi:(id)aPlot
 {
-	if([model integrate])return NO;
-	else return [model useDataObject:aPlotter dataSet:set];
+	if([analysisDrawer state] == NSDrawerOpenState)return YES;
+	else return NO;
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlot
 {
-	if([model integrate])return 65536;
-	else return [model numberBins];
+	return [model numberBins];
 }
 
-- (float) plotter:(id) aPlotter  dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y
 {
-	if([model integrate]){
-		return [model integratedValue:x];
-	}
-    else {
-		return [model value:x];
-	}
+	*y =  [model value:index];
+	*x = index;
+}
+
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot
+{
+	return [model rois];
 }
 
 @end

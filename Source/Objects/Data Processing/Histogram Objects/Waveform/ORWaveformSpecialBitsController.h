@@ -1,5 +1,5 @@
 //
-//  ORWaveformController.h
+//  ORWaveformSpecialBitsController.h
 //  Orca
 //
 //  Created by Mark Howe on Mon Jan 06 2003.
@@ -20,36 +20,11 @@
 
 
 #pragma mark ¥¥¥Imported Files
-#import "ORDataController.h"
-@class OR1dRoiController;
-@class OR1dFitController;
-@class ORFFTController;
+#import "ORWaveformController.h"
 
-@interface ORWaveformController : ORDataController {
-	IBOutlet NSView*		roiView;
-	IBOutlet NSView*		fitView;
-	IBOutlet NSView*		fftView;
-	IBOutlet NSButton*		useUnsignedValuesButton;
-    OR1dRoiController*		roiController;
-	OR1dFitController*		fitController;
-	ORFFTController*		fftController;
+@interface ORWaveformSpecialBitsController : ORWaveformController {
 }
 
-#pragma mark ¥¥¥Initialzation
-- (id)init;
-- (void) awakeFromNib;
-
-#pragma mark ¥¥¥Notifications
-- (void) useUnsignedValuesChanged:(NSNotification*)aNote;
-
-#pragma mark ¥¥¥Actions
-- (IBAction) useUnsignedValuesAction:(id)sender;
-
 #pragma mark ¥¥¥Data Source
-- (BOOL) useUnsignedValues;
-- (void) plotOrderDidChange:(id)aPlotView;
-- (BOOL) plotterShouldShowRoi:(id)aPlot;
-- (int) numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y;
-- (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
 @end

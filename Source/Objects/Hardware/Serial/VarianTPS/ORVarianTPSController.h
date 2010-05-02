@@ -19,7 +19,7 @@
 
 #pragma mark •••Imported Files
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORSerialPortController;
 @class ORTimedTextField;
 
@@ -34,7 +34,7 @@
     IBOutlet NSButton*		stationOnButton;
     IBOutlet NSButton*		stationOffButton;
     IBOutlet NSButton*		updateButton;
-    IBOutlet ORPlotter1D*		plotter;
+    IBOutlet ORPlotView*	plotter;
 	IBOutlet NSPopUpButton*	pressureScalePU;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;

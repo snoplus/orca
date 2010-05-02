@@ -21,7 +21,8 @@
 
 #import "ORXYScannerController.h"
 #import "ORXYScannerModel.h"
-#import "ORPlotter2D.h"
+#import "ORPlotView.h"
+#import "ORVectorPlot.h"
 #import "ORAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
@@ -53,10 +54,17 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];
-    [xyPlot setVectorMode:YES];
     [[xyPlot xScale] setRngLimitsLow:0 withHigh:110 withMinRng:110];
     [[xyPlot yScale] setRngLimitsLow:0 withHigh:110 withMinRng:110];
+	
+	[xyPlot setUseGradient:NO];
     [xyPlot setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
+	[xyPlot setShowGrid:NO];
+	ORVectorPlot* aPlot;
+	aPlot = [[ORVectorPlot alloc] initWithTag:0 andDataSource:self];
+	[xyPlot addPlot: aPlot];
+	[aPlot release];
+	
     [super awakeFromNib];
 }
 
@@ -109,12 +117,6 @@
                      selector : @selector(cmdFileChanged:)
                          name : ORXYScannerModelCmdFileChanged
                        object : model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(mousePositionReported:)
-                         name : ORPlotter2DMousePosition
-                       object : xyPlot];
-
 
    [notifyCenter addObserver : self
                      selector : @selector(patternChanged:)
@@ -325,13 +327,6 @@
     }
 }
 
-- (void) mousePositionReported: (NSNotification*)aNote
-{
-    if((GetCurrentKeyModifiers() & shiftKey)){
-        [model setCmdPosition:NSMakePoint([[[aNote userInfo] objectForKey:@"x"]floatValue],[[[aNote userInfo] objectForKey:@"y"]floatValue])];
-    }
-}
-
 #pragma mark ***Actions
 - (IBAction) lockAction:(id) sender
 {
@@ -409,25 +404,24 @@
 
 #pragma mark ***Plotter delegate methods
 
-- (unsigned long) plotter:(id)aPlotter numPointsInSet:(int)set
+- (int)	numberPointsInPlot:(id)aPlotter
 {
     return [model validTrackCount];
 }
 
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
 {
     if(index>kNumTrackPoints){
         *xValue = 0;
         *yValue = 0;
-        return NO;
+        return;
     }
     NSPoint track = [model track:index];
     *xValue = track.x;
     *yValue = track.y;
-    return YES;    
 }
 
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue
+- (BOOL) plotter:(id)aPlotter crossHairX:(double*)xValue crossHairY:(double*)yValue
 {
     *xValue = [model xyPosition].x;
     *yValue = [model xyPosition].y;

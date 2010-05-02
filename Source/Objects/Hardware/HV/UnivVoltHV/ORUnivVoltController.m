@@ -21,8 +21,9 @@
 #import "ORUnivVoltModel.h"
 #import "ORUnivVoltHVCrateModel.h"
 #import "ORCircularBufferUV.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
+#import "ORPlotView.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeAxis.h"
 
 const int MAXcCHNLS_PER_PLOT = 6;
 
@@ -176,15 +177,24 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	[mCmdStatus setStringValue: @"Undefined"];
 	
 	// Set all measured values to undefined
-	for ( i = 0; i < UVkNumChannels; i++ )
-	{
+	for ( i = 0; i < UVkNumChannels; i++ ) {
 		if ( [model updateFirst: i] ) {
-			
 		}
-		else
-		{
+		else {
 			[model setStatus: i status: @"Undefined"];
 		}
+	}
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[mPlottingObj1 addPlot: aPlot];
+		[(ORTimeAxis*)[mPlottingObj1 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
+		[mPlottingObj2 addPlot: aPlot];
+		[(ORTimeAxis*)[mPlottingObj2 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
 	}
 //	[mPointsXAxis setIntValue: [model plotterPoints]];
 	
@@ -532,36 +542,16 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 
 #pragma mark •••Code for plotter
-- (void) setNumberOfPoints: (int) aNumOfPoints
+- (int)	numberPointsInPlot: (id) aPlotter
 {
-	[model setNumberOfPoints: aNumOfPoints];
+	int aChnl = [aPlotter tag];
+	return( [model numPointsInCB: aChnl] );
 }
 
-- (int) numberOfDataSetsInPlot: (id) aPlotter
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int totalChnls;
-	
-	totalChnls = [model numChnlsEnabled];
-	NSLog( @"UnivVoltController - Total chnls: %d\n", totalChnls );
-	
-	if ( aPlotter == mPlottingObj1 ) {
-		if ( totalChnls > MAXcCHNLS_PER_PLOT ) {
-			return( MAXcCHNLS_PER_PLOT );
-		}
-		else {
-			return( totalChnls );
-		}
-	}
-	else {
-		return( totalChnls - MAXcCHNLS_PER_PLOT );
-	}
-	return( 0 );
-}
-
-- (float) plotter: (id) aPlotter dataSet: (int) aChnl dataValue: (int) anX 
-{
-	float retVal;
-	retVal = 0.0;
+	int aChnl = [aPlotter tag];
+	double aValue = 0;
 	if ( aChnl >= 0 ) {
 		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
 /* Used for debugging
@@ -572,24 +562,25 @@ const int MAXcCHNLS_PER_PLOT = 6;
 		}
 */
 	
-		if ( anX < [cbObj count] ) {			
-			NSDictionary* retDataObj = [cbObj HVEntry: anX];
+		if ( i < [cbObj count] ) {			
+			NSDictionary* retDataObj = [cbObj HVEntry: i];
 			NSNumber* hvValueObj = [retDataObj objectForKey: @"Value"]; //MAH -- key was wrong
-			retVal = [hvValueObj floatValue];
+			aValue = [hvValueObj floatValue];
 		}
 	}
-	return (retVal);
+	*xValue = (double)i;
+	*yValue = aValue;
 }
 
 //a fake action from the scale object
 - (void) scaleAction: (NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [mPlottingObj1 yScale]){
-		[model setMiscAttributes:[[mPlottingObj1 yScale]attributes] forKey: @"HVPlot1YAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[mPlottingObj1 yScale]attributes] forKey: @"HVPlot1YAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [mPlottingObj2 yScale]){
-		[model setMiscAttributes:[[mPlottingObj2 yScale]attributes] forKey: @"HVPlot2YAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[mPlottingObj2 yScale]attributes] forKey: @"HVPlot2YAttributes"];
 	};	
 }
 
@@ -602,7 +593,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	if(aNote == nil || [key isEqualToString: @"HVPlot1YAttributes"]){
 		if( aNote == nil ) attrib = [model miscAttributesForKey: @"HVPlot1YAttributes"];
 		if( attrib ){
-			[[mPlottingObj1 yScale] setAttributes: attrib];
+			[(ORAxis*)[mPlottingObj1 yScale] setAttributes: attrib];
 			[mPlottingObj1 setNeedsDisplay: YES]; // Probably not needed.
 			[[mPlottingObj1 yScale] setNeedsDisplay: YES];
 //			[rateLogCB setState: [[attrib objectForKey: ORAxisUseLog] boolValue]];
@@ -611,95 +602,13 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	if( aNote == nil || [key isEqualToString: @"HVPlot2YAttributes"]){
 		if( aNote == nil ) attrib = [model miscAttributesForKey: @"HVPlot2YAttributes"];
 		if( attrib ){
-			[[mPlottingObj2 yScale] setAttributes: attrib];
+			[(ORAxis*)[mPlottingObj2 yScale] setAttributes: attrib];
 			[mPlottingObj2 setNeedsDisplay: YES];
 			[[mPlottingObj2 yScale] setNeedsDisplay: YES];
 //			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
 }
-
-- (int)	numberOfPointsInPlot: (id) aPlotter dataSet: (int) aChnl
-{
-	//mah. changed from a fixed value to the actual number of points in the CB
-	return( [model numPointsInCB: aChnl] );
-}
-
-
-/*- (float) plotter: (id) aPlotter dataSet: (int) aChnl dataValue: (int) x  
-{
-	
-	if( aChnl ) {
-		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
-		NSDictionary* dictObj = [cbObj HVEntry: -1 * x];
-//		NSString* keyStr = [[cbObj mKeys] objectAtIndex: 1];
-		NSNumber* numObj = [dictObj objectForKey: CBkHVKey];
-		return [numObj floatValue];
-
-	}
-	return 0;
-}
-*/
-
-- (unsigned long) secondsPerUnit: (id) aPlotter
-{
-	unsigned long sampleTime = [mPollingTimeMinsField intValue];
-	return( sampleTime );
-}
-
-
-#pragma mark ***Code no longer used.
-/*
-- (IBAction) setChnlEnabled: (id) aSender
-{
-	bool enabled = [mChnlEnabled state];
-	
-	NSNumber* enabledObj = [NSNumber numberWithBool: enabled];
-
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
-	[tmpChnl setObject: enabledObj forKey: ORHVkChnlEnabled];
-}
-
-- (IBAction) setTripCurrent: (id) aSender
-{
-	NSString* tripCurrent = [NSString stringWithString: [mTripCurrent stringValue]];
-
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
-	[tmpChnl setObject: tripCurrent forKey: ORHVkTripCurrent];
-}
-
-- (IBAction) setRampUpRate: (id) aSender
-{
-	NSString* rampUpRate = [NSString stringWithString: [mRampUpRate stringValue]];
-
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
-	[tmpChnl setObject: rampUpRate forKey: ORHVkRampUpRate];
-}
-
-- (IBAction) setRampDownRate: (id) aSender
-{
-	NSString* rampDownRate = [NSString stringWithString: [mRampDownRate stringValue]];
-
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
-	[tmpChnl setObject: rampDownRate forKey: ORHVkRampDownRate];
-}
-
-- (IBAction) setMVDZ: (id) aSender
-{
-	NSString* MVDZ = [NSString stringWithString: [mMVDZ stringValue]];
-
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
-	[tmpChnl setObject: MVDZ forKey: ORHVkMVDZ];
-}
-
-- (IBAction) setMCDZ: (id) aSender
-{
-	NSString* MCDZ = [NSString stringWithString: [mMVDZ stringValue]];
-
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
-	[tmpChnl setObject: MCDZ forKey: ORHVkMCDZ];
-}
-*/
 
 #pragma mark •••Delegate
 - (void) tabView: (NSTabView*) aTabView didSelectTabViewItem: (NSTabViewItem*) aTabViewItem

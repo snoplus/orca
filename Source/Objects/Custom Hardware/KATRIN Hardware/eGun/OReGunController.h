@@ -19,14 +19,14 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotter2D;
+@class ORPlotView;
 
 @interface OReGunController : OrcaObjectController
 {
 	IBOutlet NSPopUpButton* interfaceObjPUx;
-	IBOutlet   NSTextField* stepTimeTextField;
-	IBOutlet   NSTextField* overshootTextField;
-	IBOutlet   NSTextField* stateStringTextField;
+	IBOutlet NSTextField* stepTimeTextField;
+	IBOutlet NSTextField* overshootTextField;
+	IBOutlet NSTextField* stateStringTextField;
 	IBOutlet NSTextField*	decayTimeTextField;
 	IBOutlet NSTextField*	decayRateTextField;
 	IBOutlet NSTextField*	excursionTextField;
@@ -34,7 +34,7 @@
 	IBOutlet NSTextField*	millimetersPerVoltTextField;
     IBOutlet NSPopUpButton* interfaceObjPUy;
 	IBOutlet NSForm*		channelMatrix;
-	IBOutlet ORPlotter2D*   xyPlot;
+	IBOutlet ORPlotView*    xyPlot;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      getPositionButton;
     IBOutlet NSTextField*   xPositionField;
@@ -92,6 +92,12 @@
 - (IBAction) absMotionAction:(id)sender;
 - (IBAction) goAction:(id)sender;
 - (IBAction) stopAction:(id)sender;
+
+#pragma mark ***Data Source
+- (int)	numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
+- (BOOL) plotter:(id)aPlotter crossHairX:(double*)xValue crossHairY:(double*)yValue;
+
 @end
 
 

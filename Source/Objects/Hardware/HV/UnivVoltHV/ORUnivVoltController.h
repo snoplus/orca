@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #import "OrcaObjectController.h"
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORCircularBufferUV;
 
 @interface ORUnivVoltController : OrcaObjectController {
@@ -44,8 +44,8 @@
 	IBOutlet NSTextField*			mLastPoll;			// Time when last poll conducted.
 	IBOutlet NSTextField*			mPointsXAxis;		// Number of points in x-axis for HV (y) vs time (x)
 	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.
-	IBOutlet ORPlotter1D*			mPlottingObj1;
-	IBOutlet ORPlotter1D*			mPlottingObj2;
+	IBOutlet ORPlotView*			mPlottingObj1;
+	IBOutlet ORPlotView*			mPlottingObj2;
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
 	int								mOrigChnl;			// Channel last displayed in channel view.
@@ -120,6 +120,8 @@
 #pragma mark ***Utilities
 - (void) setCurrentChnl: (NSNotification *) aNote;      // Helper function
 - (void) setChnlValues: (int) aCurrentChannel;
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

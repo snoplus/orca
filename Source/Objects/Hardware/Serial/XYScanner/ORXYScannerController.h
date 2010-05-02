@@ -19,11 +19,11 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotter2D;
+@class ORPlotView;
 
 @interface ORXYScannerController : OrcaObjectController
 {
-    IBOutlet ORPlotter2D*   xyPlot;
+    IBOutlet ORPlotView*    xyPlot;
     IBOutlet NSTextField*   lockDocField;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSButton*      lockButton;
@@ -72,9 +72,6 @@
 - (void) dwellTimeChanged:(NSNotification*)aNotification;
 - (void) optionsChanged:(NSNotification*)aNotification;
 
-#pragma mark ***Accessors
-
-
 #pragma mark ***Actions
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
@@ -91,6 +88,11 @@
 - (IBAction) patternAction:(id)sender;
 - (IBAction) dwellTimeAction:(id)sender;
 - (IBAction) optionsAction:(id)sender;
+
+#pragma mark ***Data Source
+- (int)	numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
+- (BOOL) plotter:(id)aPlotter crossHairX:(double*)xValue crossHairY:(double*)yValue;
 
 @end
 

@@ -32,6 +32,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 {
 	self = [super init];
 	writeIndex = 0;
+	lastWriteIndex = 0;
 	readIndex = 0;
 	return self;
 }
@@ -55,18 +56,19 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 }
 
 - (void) addValue:(float)aValue atTime:(unsigned long)aTime
-{				
-	value[writeIndex] = aValue;
-	time[writeIndex]  = aTime;
-
-	writeIndex = (writeIndex+1)%kTimeSeriesBufferSize;
-	if(writeIndex == readIndex){
-		//the circular buffer is full, advance the read position
-		readIndex = (readIndex+1)%kTimeSeriesBufferSize;
+{		
+	if(aTime != time[lastWriteIndex]){
+		value[writeIndex] = aValue;
+		time[writeIndex]  = aTime;
+		lastWriteIndex = writeIndex;
+		writeIndex = (writeIndex+1)%kTimeSeriesBufferSize;
+		if(writeIndex == readIndex){
+			//the circular buffer is full, advance the read position
+			readIndex = (readIndex+1)%kTimeSeriesBufferSize;
+		}
+				
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORTimeSeriesChangedNotification object:self userInfo:nil];
 	}
-			
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORTimeSeriesChangedNotification object:self userInfo:nil];
-		
 }
 
 - (unsigned) count
@@ -77,26 +79,31 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 }
 
 
-- (void) index:(unsigned)index time:(unsigned long*)theTime value:(float*)y
+- (void) index:(unsigned)index time:(unsigned long*)theTime value:(double*)y
 {
-	NSAssert(index>=0 && index < kTimeSeriesBufferSize,@"Time Series Index Out Of Bounds");
-	int i = (readIndex+index)%kTimeSeriesBufferSize;
-	*y = value[i];
-	*theTime = time[i];
+	if(index>=0 && index<kTimeSeriesBufferSize){
+		int i = (readIndex+index)%kTimeSeriesBufferSize;
+		*y = value[i];
+		*theTime = time[i];
+	}
 }
 
 - (unsigned long) timeAtIndex:(unsigned)index
 {
-	NSAssert(index>=0 && index < kTimeSeriesBufferSize,@"Time Series Index Out Of Bounds");
-	int i = (readIndex+index)%kTimeSeriesBufferSize;
-	return time[i];
+	if(index>=0 && index<kTimeSeriesBufferSize){
+		int i = (readIndex+index)%kTimeSeriesBufferSize;
+		return time[i];
+	}
+	else return [self startTime];
 }
 
 - (float) valueAtIndex:(unsigned)index
 {
-	NSAssert(index>=0 && index < kTimeSeriesBufferSize,@"Time Series Index Out Of Bounds");
-	int i = (readIndex+index)%kTimeSeriesBufferSize;
-	return value[i];
+	if(index>=0 && index<kTimeSeriesBufferSize){
+		int i = (readIndex+index)%kTimeSeriesBufferSize;
+		return value[i];
+	}
+	else return [self startTime];
 }
 
 @end
