@@ -28,5 +28,6 @@
 - (void) drawLogScale;			// draw a Log scale (calls drawLinScale)
 - (void) drawLinScale;			// draw a linear scale
 - (void) setStartTime:(NSTimeInterval)aStartTime;
+- (NSTimeInterval) startTime;
 
 @end

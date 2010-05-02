@@ -26,8 +26,9 @@
 
 @interface ORTimeRate : NSObject {
 	
-	float averageStack[kAverageStackSize];
-	float timeAverage[kTimeAverageBufferSize];
+	double averageStack[kAverageStackSize];
+	double timeAverage[kTimeAverageBufferSize];
+	NSTimeInterval timeSampled[kTimeAverageBufferSize];
 	int timeAverageWrite;
 	int timeAverageRead;
 	int averageStackCount;
@@ -41,7 +42,8 @@
 - (unsigned long) sampleTime;
 - (void) setSampleTime:(unsigned long)newSampleTime;
 - (unsigned) count;
-- (float)valueAtIndex:(unsigned)index;
+- (double)valueAtIndex:(unsigned)index;
+- (NSTimeInterval)timeSampledAtIndex:(unsigned)index;
 
 
 - (void) addDataToTimeAverage:(float)aValue;

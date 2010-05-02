@@ -23,7 +23,8 @@
 #pragma mark •••Imported Files
 #import "ORTimeMultiPlotController.h"
 #import "ORTimeMultiPlot.h"
-#import "ORPlotter1D.h"
+#import "ORTimeSeriesPlot.h"
+#import "ORPlotView.h"
 #import "ORAxis.h"
 
 
@@ -41,8 +42,8 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-	[[plotter yScale] setInteger:NO];
-    [[plotter yScale] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:2];
+	[[plotView yScale] setInteger:NO];
+    [[plotView yScale] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:2];
 
 }
 
@@ -52,6 +53,37 @@
 	[plotNameField setStringValue:[model plotName]];
 	[plotNameField resignFirstResponder];
 	[[self window] setTitle:[model plotName]];
+}
+
+- (void) setUpPlots
+{
+	[plotView removeAllPlots];
+	int n = [model cachedCount];
+    int i;
+    for(i=0;i<n;i++){
+		
+		NSColor* theColor;
+		switch (i%10){
+			case 0: theColor = [NSColor redColor]; break;
+			case 1: theColor = [NSColor blueColor]; break;
+			case 2: theColor = [NSColor purpleColor]; break;
+			case 3: theColor = [NSColor brownColor]; break;
+			case 4: theColor = [NSColor greenColor]; break;
+			case 5: theColor = [NSColor blackColor]; break;
+			case 6: theColor = [NSColor cyanColor]; break;
+			case 7: theColor = [NSColor orangeColor]; break;
+			case 8: theColor = [NSColor magentaColor]; break;
+			case 9: theColor = [NSColor yellowColor]; break;
+		}
+		if([[model cachedObjectAtIndex:i] isKindOfClass:NSClassFromString(@"ORTimeSeriesPlot")]){
+			ORTimeSeriesPlot* aPlot = [[ORTimeSeriesPlot alloc] initWithTag:i andDataSource:self];
+			[aPlot setLineColor:theColor];
+			[aPlot setRoi: [[model rois:i] objectAtIndex:0]];
+			[plotView addPlot: aPlot];
+			[aPlot release];
+		}
+	}
+	[self setLegend];
 }
 
 @end

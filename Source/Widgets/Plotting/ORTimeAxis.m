@@ -17,11 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
 #import "ORTimeAxis.h"
-#import "ORPlotter1D.h"
-
 
 @implementation ORTimeAxis
 
@@ -45,15 +41,6 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 {
     self = [super initWithFrame:aFrame];
     return self;
-}
-
-- (unsigned long) secondsPerUnit
-{
-    return secondsPerUnit;
-}
-- (void) setSecondsPerUnit:(unsigned long)newSecondsPerUnit
-{
-    secondsPerUnit=newSecondsPerUnit;
 }
 
 - (void) drawLogScale
@@ -81,7 +68,6 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
     NSBezierPath* 	theAxisColoredTicks = [NSBezierPath bezierPath];
     [theAxisColoredTicks setLineWidth:3];
     
-    secondsPerUnit = [viewToScale secondsPerUnit:viewToScale];
 	gridCount = 0;    
     tstep  = [self getValRel:[self optimalLabelSeparation]];
     
@@ -165,7 +151,7 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
                 ++i;
 			} 
 			else {
-                if ((nthTick % 4) == 0) {
+                if ((nthTick % 3) == 0) {
 					NSString* axisNumberString;
 					int dateOffset = -20;
                     [theAxisColoredTicks moveToPoint:NSMakePoint(x,y)];
@@ -175,11 +161,8 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 						axisNumberString = [NSString stringWithString:@"Now"];
 						dateOffset = 3;
 					}
-					else if ((nthTick % 4) == 0) {
-						double theValue = ival*secondsPerUnit;
-						if(suffix == 'k')theValue *= 1000;
-						else if(suffix == 'M') theValue *= 1000000;
-						else if(suffix == 'G') theValue *= 1000000000;
+					else if ((nthTick % 3) == 0) {
+						double theValue = val;
 						NSCalendarDate *aDate = [[NSCalendarDate date] dateByAddingYears:0 months:0 days:0 hours:0 minutes:0 seconds:-theValue];
 						axisNumberString = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
 						nthTick = 0;

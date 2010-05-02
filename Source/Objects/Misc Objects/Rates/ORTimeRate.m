@@ -71,7 +71,7 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
 - (void) addDataToTimeAverage:(float)aValue
 {
 	if(sampleTime == 0)sampleTime = 30;
-	if(averageStackCount<kAverageStackSize){
+	if(averageStackCount<kAverageStackSize){		
 		averageStack[averageStackCount] = aValue;
 		averageStackCount++;
 	}
@@ -81,11 +81,12 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
 
 	if(lastAverageTime==0 || deltaTime>=sampleTime){
 			
-		aValue = [self _getAverageFromStack];
+		aValue = [self _getAverageFromStack];	
 								
 		[self setLastAverageTime:now];
 		
 		timeAverage[timeAverageWrite] = aValue;
+		timeSampled[timeAverageWrite] = [now timeIntervalSince1970];
 
 		timeAverageWrite = (timeAverageWrite+1)%kTimeAverageBufferSize;
 		if(timeAverageWrite == timeAverageRead){
@@ -104,10 +105,16 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
 	else return kTimeAverageBufferSize-timeAverageRead + timeAverageWrite;
 }
 
-- (float)valueAtIndex:(unsigned)index
+- (double)valueAtIndex:(unsigned)index
 {
 	NSAssert(index>=0 && index < kTimeAverageBufferSize,@"Time Average Index Out Of Bounds");
 	return timeAverage[(timeAverageRead+index)%kTimeAverageBufferSize];
+}
+
+- (NSTimeInterval)timeSampledAtIndex:(unsigned)index
+{
+	NSAssert(index>=0 && index < kTimeAverageBufferSize,@"Time Average Index Out Of Bounds");
+	return timeSampled[(timeAverageRead+index)%kTimeAverageBufferSize];
 }
 
 #pragma mark •••Archival

@@ -20,7 +20,10 @@
 
 
 #import "ORSubPlotController.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
+#import "OR2DHistoPlot.h"
+#import "ORWaveform.h"
 #import "ORAxis.h"
 #import "ORDataSetModel.h"
 
@@ -32,10 +35,10 @@
 }
 
 // This method initializes a new instance of this class which loads in nibs and facilitates the communcation between the nib and the controller of the main window.
--(id)init 
+- (id) init 
 {
     if(self = [super init]){
-	[NSBundle loadNibNamed:@"PlotSubview" owner:self];
+		[NSBundle loadNibNamed:@"PlotSubview" owner:self];
     }
     return self;
 }
@@ -52,15 +55,30 @@
     [self registerNotificationObservers];
 }
 
-- (ORPlotter1D*) plotter
+- (ORPlotView*) plotView
 {
-    return plotter;
+    return plotView;
 }
 
 - (void) setModel:(id)aModel
 {
-    [plotter setDataSource:aModel];
-    [plotter setNeedsDisplay:YES];
+	[plotView removeAllPlots];
+
+	if([aModel isKindOfClass:NSClassFromString(@"OR1DHisto")]){
+		OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:aModel];
+		[plotView addPlot: aPlot];
+		[aPlot release];
+	}
+	else if([aModel isKindOfClass:NSClassFromString(@"ORWaveform")]){
+		ORPlot* aPlot = [[ORPlot alloc] initWithTag:0 andDataSource:aModel];
+		[plotView addPlot: aPlot];
+		[aPlot release];
+	}
+	else if([aModel isKindOfClass:NSClassFromString(@"OR2DHisto")]){
+		OR2DHistoPlot* aPlot = [[OR2DHistoPlot alloc] initWithTag:0 andDataSource:aModel];
+		[plotView addPlot: aPlot];
+		[aPlot release];
+	}
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self registerNotificationObservers];
@@ -69,19 +87,20 @@
 
 - (void) registerNotificationObservers
 {
+
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-     
+	[notifyCenter removeObserver: self];
     [notifyCenter addObserver : self
                      selector : @selector(dataChanged:)
                          name : ORDataSetDataChanged
-                       object : [plotter dataSource]];
+                       object : [[plotView topPlot] dataSource]];
+ 
 }
 
 - (void) dataChanged:(NSNotification*)aNotification
 {
-    [plotter setNeedsDisplay:YES];
+    [plotView setNeedsDisplay:YES];
 }
-
 
 // This method returns a pointer to the view in the nib loaded.
 -(NSView*)view
@@ -89,21 +108,19 @@
 	return view;
 }
 
-
 - (IBAction) centerOnPeak:(id)sender
 {
-   [plotter centerOnPeak:sender]; 
+   [plotView centerOnPeak:sender]; 
 }
 
 - (IBAction) autoScale:(id)sender
 {
-    [plotter resetScales:sender];
+    [plotView autoscaleAll:sender];
 }
 
 - (IBAction) toggleLog:(id)sender
 {
-    [[plotter yScale] setLog:![[plotter yScale] isLog]];
+    [[plotView yScale] setLog:![[plotView yScale] isLog]];
 }
-
 
 @end

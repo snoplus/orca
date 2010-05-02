@@ -56,6 +56,11 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
     return [attributes objectForKey:@"dateFormat"];
 }
 
+- (NSTimeInterval) startTime
+{
+	return startTime;
+}
+
 - (void) setStartTime:(NSTimeInterval)aStartTime
 {
 	startTime = aStartTime;
