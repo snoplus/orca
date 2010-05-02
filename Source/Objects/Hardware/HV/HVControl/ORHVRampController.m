@@ -23,7 +23,8 @@
 #import "ORHVRampController.h"
 #import "ORHVRampModel.h"
 #import "ORHVSupply.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "ORTimeLinePlot.h"
 #import "ORAxis.h"
 
 @interface ORHVRampController (private)
@@ -49,6 +50,28 @@
     [model pollHardware:model];
     [self performSelector:@selector(updateButtons) withObject:nil afterDelay:2];
 	[[currentPlotter yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
+	
+	ORTimeLinePlot* aPlot;
+	
+	int i;
+	NSColor* aColor = [NSColor redColor];
+	for(i=0;i<8;i++){
+		switch(i){
+			case 0: aColor =[NSColor redColor]; break;
+			case 1: aColor = [NSColor greenColor]; break;
+			case 2: aColor = [NSColor blueColor]; break;
+			case 3: aColor = [NSColor cyanColor]; break;
+			case 4: aColor = [NSColor yellowColor]; break;
+			case 5: aColor = [NSColor magentaColor]; break;
+			case 6: aColor = [NSColor orangeColor]; break;
+			case 7: aColor = [NSColor purpleColor]; break;
+		}
+		aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[aPlot setUseConstantColor:YES];
+		[aPlot setLineColor: [NSColor redColor]];
+		[currentPlotter addPlot: aPlot];
+		[aPlot release];
+	}
 }
 
 
@@ -812,46 +835,21 @@
 }
 
 #pragma mark ¥¥¥Plot Data Source
-- (BOOL)   	willSupplyColors
-{
-	return YES;
-}
 
-- (NSColor*) colorForDataSet:(int)set
+- (int)	numberPointsInPlot:(id)aPlotter
 {
-	switch(set){
-		case 0: return [NSColor redColor];
-		case 1: return [NSColor greenColor];
-		case 2: return [NSColor blueColor];
-		case 3: return [NSColor cyanColor];
-		case 4: return [NSColor yellowColor];
-		case 5: return [NSColor magentaColor];
-		case 6: return [NSColor orangeColor];
-		case 7: return [NSColor purpleColor];
-		default: return [NSColor blackColor];
-	}
-}
-
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-	return 8;
-}
-
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return 1;
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
+	int set = [aPlotter tag];
 	return [model currentTrendCount:set];
 }
 
-- (float)  plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
+	double aValue = 0;
+	int set = [aPlotter tag];
 	int count = [model currentTrendCount:set];
-	return [model currentValue:count-x-1 supply:set];
+	aValue =  [model currentValue:count-i-1 supply:set];
+	*xValue = (double)i;
+	*yValue = aValue;
 }
 
 

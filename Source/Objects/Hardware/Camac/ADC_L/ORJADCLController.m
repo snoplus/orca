@@ -24,8 +24,9 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORJADCLController.h"
 #import "ORCamacExceptions.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
+#import "ORPlotView.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 
 // methods
@@ -61,6 +62,45 @@
 	[[plotter2 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[plotter3 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter3 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+
+	NSColor* theColors[4] =
+	{
+		[NSColor redColor],
+		[NSColor greenColor],
+		[NSColor blueColor],
+		[NSColor yellowColor]	
+	};	
+	
+	int i;
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[aPlot setLineColor:theColors[i]];
+		[plotter0 addPlot: aPlot];
+		[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
+		[aPlot setLineColor:theColors[i]];
+		[plotter1 addPlot: aPlot];
+		[(ORTimeAxis*)[plotter1 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+8 andDataSource:self];
+		[aPlot setLineColor:theColors[i]];
+		[plotter2 addPlot: aPlot];
+		[(ORTimeAxis*)[plotter2 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+12 andDataSource:self];
+		[aPlot setLineColor:theColors[i]];
+		[plotter3 addPlot: aPlot];
+		[(ORTimeAxis*)[plotter3 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
 }
 
 
@@ -165,35 +205,35 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
-		[model setMiscAttributes:[[plotter0 xScale]attributes] forKey:@"XAttributes0"];
+		[model setMiscAttributes:[(ORAxis*)[plotter0 xScale]attributes] forKey:@"XAttributes0"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
-		[model setMiscAttributes:[[plotter0 yScale]attributes] forKey:@"YAttributes0"];
+		[model setMiscAttributes:[(ORAxis*)[plotter0 yScale]attributes] forKey:@"YAttributes0"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter1 xScale]){
-		[model setMiscAttributes:[[plotter1 xScale]attributes] forKey:@"XAttributes1"];
+		[model setMiscAttributes:[(ORAxis*)[plotter1 xScale]attributes] forKey:@"XAttributes1"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter1 yScale]){
-		[model setMiscAttributes:[[plotter1 yScale]attributes] forKey:@"YAttributes1"];
+		[model setMiscAttributes:[(ORAxis*)[plotter1 yScale]attributes] forKey:@"YAttributes1"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter2 xScale]){
-		[model setMiscAttributes:[[plotter2 xScale]attributes] forKey:@"XAttributes2"];
+		[model setMiscAttributes:[(ORAxis*)[plotter2 xScale]attributes] forKey:@"XAttributes2"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter2 yScale]){
-		[model setMiscAttributes:[[plotter2 yScale]attributes] forKey:@"YAttributes2"];
+		[model setMiscAttributes:[(ORAxis*)[plotter2 yScale]attributes] forKey:@"YAttributes2"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter3 xScale]){
-		[model setMiscAttributes:[[plotter3 xScale]attributes] forKey:@"XAttributes3"];
+		[model setMiscAttributes:[(ORAxis*)[plotter3 xScale]attributes] forKey:@"XAttributes3"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter3 yScale]){
-		[model setMiscAttributes:[[plotter3 yScale]attributes] forKey:@"YAttributes3"];
+		[model setMiscAttributes:[(ORAxis*)[plotter3 yScale]attributes] forKey:@"YAttributes3"];
 	};
 	
 }
@@ -207,7 +247,7 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
 		if(attrib){
-			[[plotter0 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 xScale] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
 			[[plotter0 xScale] setNeedsDisplay:YES];
 		}
@@ -215,7 +255,7 @@
 	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
 		if(attrib){
-			[[plotter0 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 yScale] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
 			[[plotter0 yScale] setNeedsDisplay:YES];
 		}
@@ -224,7 +264,7 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes1"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes1"];
 		if(attrib){
-			[[plotter1 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter1 xScale] setAttributes:attrib];
 			[plotter1 setNeedsDisplay:YES];
 			[[plotter1 xScale] setNeedsDisplay:YES];
 		}
@@ -232,7 +272,7 @@
 	if(aNote == nil || [key isEqualToString:@"YAttributes1"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes1"];
 		if(attrib){
-			[[plotter1 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter1 yScale] setAttributes:attrib];
 			[plotter1 setNeedsDisplay:YES];
 			[[plotter1 yScale] setNeedsDisplay:YES];
 		}
@@ -240,7 +280,7 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes2"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes2"];
 		if(attrib){
-			[[plotter2 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter2 xScale] setAttributes:attrib];
 			[plotter2 setNeedsDisplay:YES];
 			[[plotter2 xScale] setNeedsDisplay:YES];
 		}
@@ -248,7 +288,7 @@
 	if(aNote == nil || [key isEqualToString:@"YAttributes2"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes2"];
 		if(attrib){
-			[[plotter2 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter2 yScale] setAttributes:attrib];
 			[plotter2 setNeedsDisplay:YES];
 			[[plotter2 yScale] setNeedsDisplay:YES];
 		}
@@ -256,7 +296,7 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes3"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes3"];
 		if(attrib){
-			[[plotter3 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter3 xScale] setAttributes:attrib];
 			[plotter3 setNeedsDisplay:YES];
 			[[plotter3 xScale] setNeedsDisplay:YES];
 		}
@@ -264,7 +304,7 @@
 	if(aNote == nil || [key isEqualToString:@"YAttributes3"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes3"];
 		if(attrib){
-			[[plotter3 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter3 yScale] setAttributes:attrib];
 			[plotter3 setNeedsDisplay:YES];
 			[[plotter3 yScale] setNeedsDisplay:YES];
 		}
@@ -512,43 +552,19 @@
 
 
 #pragma mark ¥¥¥Data Source
-- (int) numberOfDataSetsInPlot:(id)aPlotter
+- (int) numberPointsInPlot:(id)aPlotter
 {
-    return 4;
+	int set = [aPlotter tag];
+	return [[model timeRate:set] count];
 }
 
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	if(aPlotter == plotter0) return [[model timeRate:set] count];
-	else if(aPlotter == plotter1) return [[model timeRate:set+4] count];
-	else if(aPlotter == plotter2) return [[model timeRate:set+8] count];
-	else if(aPlotter == plotter3) return [[model timeRate:set+12] count];
-	else return 0;
-}
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	if(aPlotter == plotter0){
-		int count = [[model timeRate:set] count];
-		return [[model timeRate:set] valueAtIndex:count-x-1];
-	}
-	else if(aPlotter == plotter1){
-		int count = [[model timeRate:set+4] count];
-		return [[model timeRate:set+4] valueAtIndex:count-x-1];
-	}
-	else if(aPlotter == plotter2){
-		int count = [[model timeRate:set+8] count];
-		return [[model timeRate:set+8] valueAtIndex:count-x-1];
-	}
-	else if(aPlotter == plotter3){
-		int count = [[model timeRate:set+12] count];
-		return [[model timeRate:set+12] valueAtIndex:count-x-1];
-	}
-	else return 0;
-}
-
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return [[model timeRate:0] sampleTime]; //all should be the same, just return value for rate 0
+	int set = [aPlotter tag];
+	int count = [[model timeRate:set] count];
+	int index = count-i-1;
+	*yValue = [[model timeRate:set] valueAtIndex:index];
+	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 }
 
 @end

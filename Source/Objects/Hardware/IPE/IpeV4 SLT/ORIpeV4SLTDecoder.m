@@ -155,7 +155,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
                     y: j
 					size: 130                          
 					sender: self 
-					withKeys: @"SLT", @"TriggerData",crateKey,stationKey,nil];
+					withKeys: @"SLTv4", @"TriggerData",crateKey,stationKey,nil];
 			}
 		}
 		//[s appendFormat:@"   "];
@@ -170,7 +170,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
                     y: j
 					size: 130                          
 					sender: self 
-					withKeys: @"SLT", @"TriggerData",crateKey,stationKey,nil];
+					withKeys: @"SLTv4", @"TriggerData",crateKey,stationKey,nil];
 			}			
 		}
 		//NSLogFont(aFont, @"%@\n", s);

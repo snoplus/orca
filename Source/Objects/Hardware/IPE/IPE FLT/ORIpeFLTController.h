@@ -23,13 +23,13 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORIpeFLTModel.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORValueBar;
 
 @interface ORIpeFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
-	IBOutlet   NSTextField* dataMaskTextField;
+		IBOutlet NSTextField*	dataMaskTextField;
 		IBOutlet NSTextField*	thresholdOffsetField;
 		IBOutlet NSTextField*	ledOffField;
 		IBOutlet NSTextField*	interruptMaskField;
@@ -58,7 +58,7 @@
 		IBOutlet ORValueBar*	rate0;
 		IBOutlet ORValueBar*	totalRate;
 		IBOutlet NSButton*		rateLogCB;
-		IBOutlet ORPlotter1D*	timeRatePlot;
+		IBOutlet ORPlotView*	timeRatePlot;
 		IBOutlet NSButton*		timeRateLogCB;
 		IBOutlet NSButton*		totalRateLogCB;
 		IBOutlet NSTextField*	totalHitRateField;
@@ -150,8 +150,7 @@
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 #pragma mark ¥¥¥Plot DataSource
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x ;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

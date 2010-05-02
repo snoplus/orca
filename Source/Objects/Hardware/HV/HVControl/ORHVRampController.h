@@ -21,7 +21,7 @@
 
 
 @class ORHVSupply;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORHVRampController : OrcaObjectController {
 
@@ -57,7 +57,7 @@
     IBOutlet NSButton*		setCurrentToFileButton;
     IBOutlet NSButton*		saveCurrentToFileButton;
     IBOutlet NSTextField*	currentFileField;
-	IBOutlet ORPlotter1D*   currentPlotter;
+	IBOutlet ORPlotView*   currentPlotter;
 }
 
 #pragma mark ¥¥¥Notifications
@@ -109,5 +109,7 @@
 - (IBAction) setCurrentFileAction:(id)sender;
 
 - (void) setTextColor:(NSTextFieldCell*)aCell supply:(ORHVSupply*)aSupply;
+- (int)	numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

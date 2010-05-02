@@ -16,7 +16,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-@class ORPlotter1D;
+@class ORPlotView;
 @class WebView;
 
 @interface ORIpeSlowControlController : OrcaObjectController
@@ -26,7 +26,7 @@
 #endif
 
 {
-	IBOutlet ORPlotter1D*		timingPlotter;   
+	IBOutlet ORPlotView*		timingPlotter;   
 	IBOutlet NSButton*			showDebugOutputCB;
 	IBOutlet NSButton*			shipRecordsCB;
 	IBOutlet NSTextField*		totalRequestCountField;
@@ -134,6 +134,11 @@
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 - (BOOL) tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard;
 - (void) dragDone;
+
+#pragma mark •••Data Source Methods (Plotter)
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
 @end
 
 @interface ORIpeTableView : NSTableView

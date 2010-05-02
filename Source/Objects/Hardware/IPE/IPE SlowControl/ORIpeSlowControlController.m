@@ -21,7 +21,9 @@
 #import "ORIpeSlowControlController.h"
 #import "ORIpeSlowControlModel.h"
 #import "ORTimedTextField.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
+#import "ORAxis.h"
 #import "ORAdeiLoader.h"
 
 @implementation ORIpeSlowControlController
@@ -54,6 +56,11 @@
     [[timingPlotter xScale] setRngLimitsLow:0 withHigh:kResponseTimeHistogramSize withMinRng:100];
     [[timingPlotter xScale] setRngLow:0 withHigh:kResponseTimeHistogramSize];
     [[timingPlotter xScale] setLog:NO];
+	
+	[timingPlotter setUseGradient:YES];
+	OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
+	[timingPlotter addPlot: aPlot];
+	[aPlot release];
 	
     [itemTreeOutlineView setVerticalMotionCanBeginDrag:YES];
     [itemTableView registerForDraggedTypes:[NSArray arrayWithObjects:@"ORItemType",NSStringPboardType, nil]];
@@ -916,14 +923,15 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 }
 
 #pragma mark •••Histogram DataSource
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
     return kResponseTimeHistogramSize;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	return [model dataTimeHist:x];
+	*yValue = [model dataTimeHist:i];
+	*xValue = i;
 }
 
 @end

@@ -24,7 +24,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORJADCLModel.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORJADCLController : OrcaObjectController {
 	@private
@@ -38,10 +38,10 @@
 		IBOutlet NSMatrix*		highLimitsMatrix;
 		IBOutlet NSMatrix*		adcValueMatrix;
         IBOutlet NSTextField*   settingLockDocField;
-        IBOutlet ORPlotter1D*   plotter0;
-        IBOutlet ORPlotter1D*   plotter1;
-        IBOutlet ORPlotter1D*   plotter2;
-        IBOutlet ORPlotter1D*   plotter3;
+        IBOutlet ORPlotView*	plotter0;
+        IBOutlet ORPlotView*	plotter1;
+        IBOutlet ORPlotView*	plotter2;
+        IBOutlet ORPlotView*	plotter3;
  };
 
 - (void) registerNotificationObservers;
@@ -78,5 +78,7 @@
  - (void) showError:(NSException*)anException name:(NSString*)name fCode:(int)i;
  - (void) showError:(NSException*)anException name:(NSString*)name;
 
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

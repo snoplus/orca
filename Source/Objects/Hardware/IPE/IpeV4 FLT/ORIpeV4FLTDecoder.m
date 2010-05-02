@@ -89,17 +89,17 @@
 	//channel by channel histograms
 	[aDataSet histogram:energy - page*kPageLength 
 				numBins:kPageLength sender:self  
-			   withKeys:@"FLT", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,stationKey,channelKey,nil];
+			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,stationKey,channelKey,nil];
 	
 	//accumulated card level histograms
 	[aDataSet histogram:energy - page*kPageLength 
 				numBins:kPageLength sender:self  
-			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Card Energy (%d - %d)",startPage,endPage], crateKey,stationKey,nil];
+			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Total Card Energy (%d - %d)",startPage,endPage], crateKey,stationKey,nil];
 	
 	//accumulated crate level histograms
 	[aDataSet histogram:energy - page*kPageLength 
 				numBins:kPageLength sender:self  
-			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
+			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
 
 	//get the actual object
 	if(getRatesFromDecodeStage){
@@ -222,17 +222,17 @@
 	//channel by channel histograms
 	[aDataSet histogram:energy - page*kPageLength 
 				numBins:kPageLength sender:self  
-			   withKeys:@"FLT", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,stationKey,channelKey,nil];
+			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,stationKey,channelKey,nil];
 	
 	//accumulated card level histograms
 	[aDataSet histogram:energy - page*kPageLength 
 				numBins:kPageLength sender:self  
-			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Card Energy (%d - %d)",startPage,endPage], crateKey,stationKey,nil];
+			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Total Card Energy (%d - %d)",startPage,endPage], crateKey,stationKey,nil];
 	
 	//accumulated crate level histograms
 	[aDataSet histogram:energy - page*kPageLength 
 				numBins:kPageLength sender:self  
-			   withKeys:@"FLT", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
+			   withKeys:@"FLTv4", [NSString stringWithFormat:@"Total Crate Energy (%d - %d)",startPage,endPage], crateKey,nil];
 	
 	
 	// Set up the waveform
@@ -264,7 +264,7 @@ startIndex=traceStart16;
 					startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					mask:	0x0FFF							// when displayed all values will be masked with this value
 					sender: self 
-					withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
+					withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
 	
 	//get the actual object
 	if(getRatesFromDecodeStage){
@@ -378,17 +378,17 @@ startIndex=traceStart16;
 			[aDataSet histogram:hitRate
 							   numBins:65536 
 								sender:self  
-							  withKeys: @"FLT",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
+							  withKeys: @"FLTv4",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
 			
-			[aDataSet loadData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLT",@"HitRate_2D",crateKey, nil];
-			[aDataSet sumData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLT",@"HitRateSum_2D",crateKey, nil];
+			[aDataSet loadData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLTv4",@"HitRate_2D",crateKey, nil];
+			[aDataSet sumData2DX:card y:chan z:hitRate size:25  sender:self  withKeys:@"FLTv4",@"HitRateSum_2D",crateKey, nil];
 		}
 	}
 	
 	[aDataSet loadTimeSeries: hitRateTotal
                       atTime:seconds
 					  sender:self  
-					withKeys: @"FLT",@"HitrateTimeSeries",crateKey,stationKey,nil];
+					withKeys: @"FLTv4",@"HitrateTimeSeries",crateKey,stationKey,nil];
 	
 	
 	
@@ -484,7 +484,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	
 	katrinV4HistogramDataStruct* ePtr = (katrinV4HistogramDataStruct*) ptr;
     #if 0 //debug output -tb-
-	NSLog(@"Keys:%@ %@ %@ %@ %@ \n", @"FLT",@"HitrateTimeSerie",crateKey,stationKey,channelKey);
+	NSLog(@"Keys:%@ %@ %@ %@ %@ \n", @"FLTv4",@"HitrateTimeSerie",crateKey,stationKey,channelKey);
 	NSLog(@"  readoutSec = %d \n", ePtr->readoutSec);
 	//NSLog(@"  recordingTimeSec = %d \n", ePtr->recordingTimeSec);
 	NSLog(@"  refreshTimeSec = %d \n", ePtr->recordingTimeSec);
@@ -516,7 +516,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
                 [aDataSet histogram:aBin 
                             numBins:2048 
                              sender:self  
-                           withKeys: @"FLT",
+                           withKeys: @"FLTv4",
                  @"Histogram (all counts)", // use better name -tb-
                  crateKey,stationKey,channelKey,nil];
             }
@@ -540,7 +540,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
             //NSLog(@"Decoder: HistoEntry %i: bin %i val %i\n",i,i+(ePtr->firstBin),data[i+(ePtr->firstBin)]);
         }
         NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
-        [keyArray insertObject:@"FLT" atIndex:0];
+        [keyArray insertObject:@"FLTv4" atIndex:0];
         [keyArray insertObject:@"Energy Histogram (HW)" atIndex:1]; //TODO: 1. use better name 2. keep memory clean -tb-
         [keyArray insertObject:crateKey atIndex:2];
         [keyArray insertObject:stationKey atIndex:3];
@@ -558,7 +558,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
     // test - ok  -tb-
     {        
         NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
-        [keyArray insertObject:@"FLT" atIndex:0];
+        [keyArray insertObject:@"FLTv4" atIndex:0];
         [keyArray insertObject:@"Histogram (loadHistogram test)" atIndex:1];
         [keyArray insertObject:crateKey atIndex:2];
         [keyArray insertObject:stationKey atIndex:3];
@@ -600,7 +600,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
                          firstBin: energy   
                          stepSize: stepSize
                            counts: sumEvents
-                         withKeys: @"FLT",
+                         withKeys: @"FLTv4",
                                    @"Energy Histogram (HW, energy mode units)", // use better name -tb-
                                    crateKey,stationKey,channelKey,nil];
         
