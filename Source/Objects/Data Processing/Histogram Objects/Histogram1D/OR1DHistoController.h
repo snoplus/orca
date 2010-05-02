@@ -21,22 +21,31 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
 
+@class OR1dRoiController;
+@class OR1dFitController;
+
 @interface OR1DHistoController : ORDataController {
-	IBOutlet NSButton*		rebinCB;
-	IBOutlet NSTextField*	rebinNumberTextField;
+	IBOutlet NSView*		roiView;
+	IBOutlet NSView*		fitView;
+	IBOutlet NSButton*		fitButton;
 	id						calibrationPanel;				
+    OR1dRoiController*		roiController;
+	OR1dFitController*		fitController;
 }
+
 - (id) init;
 - (void) awakeFromNib;
+- (OR1dRoiController*) roiController;
+- (OR1dFitController*) fitController;
 
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
-- (void) mousePositionChanged:(NSNotification*) aNote;
-- (void) rebinNumberChanged:(NSNotification*) aNote;
-- (void) rebinChanged:(NSNotification*) aNote;
-
-- (IBAction) rebinAction:(id)sender;
-- (IBAction) rebinNumberAction:(id)sender;
+#pragma mark ¥¥¥Alarms
 - (IBAction) calibrate:(id)sender;
+
+#pragma mark ¥¥¥Data Source
+- (BOOL) plotterShouldShowRoi:(id)aPlot;
+- (int) numberPointsInPlot:(id)aPlot;
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
+- (void) plotOrderDidChange:(id)aPlotView;
 
 @end

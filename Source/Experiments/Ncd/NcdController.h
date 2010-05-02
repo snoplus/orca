@@ -21,15 +21,15 @@
 
 @class NcdDetector;
 @class ORColorScale;
-@class ORPlotter1D;
 @class BiStateView;
+@class ORPlotView;
 
 @interface NcdController : OrcaObjectController {
     IBOutlet NSView* 	  detectorView;
     IBOutlet NSTextView*  tubeInfoView;
     IBOutlet ORColorScale*  detectorColorBar;
     IBOutlet NSButton*	  colorBarLogCB;
-    IBOutlet ORPlotter1D* ratePlot;
+    IBOutlet ORPlotView*  ratePlot;
     IBOutlet NSButton*	  rateLogCB;
     IBOutlet NSMatrix*	  displayOptionMatrix;
     IBOutlet NSTableView* hwTableView;
@@ -88,7 +88,7 @@
 #pragma mark ¥¥¥Accessors
 - (NSArray *)sourceMasks;
 - (NSView*) detectorView;
-- (ORPlotter1D*) ratePlot;
+- (ORPlotView*) ratePlot;
 
 - (NSMutableArray *)altMuxThresholds;
 - (void)setAltMuxThresholds:(NSMutableArray *)anArray;
@@ -140,8 +140,6 @@
 
 #pragma mark ¥¥¥Interface Management
 - (void) scaleAction:(NSNotification*)aNotification;
-- (void) scaleXAttributesChanged:(NSNotification*)aNotification;
-- (void) scaleYAttributesChanged:(NSNotification*)aNotification;
 - (void) objectsChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -170,9 +168,7 @@
 - (void) nominalSettingsFileChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Data Source
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter  dataSet:(int)set dataValue:(int) x;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
+
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 
                                 row:(int) rowIndex;
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row;

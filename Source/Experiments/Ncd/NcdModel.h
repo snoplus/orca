@@ -113,10 +113,10 @@
 
 - (id) dependentTask:(ORTask*)aTask;
 - (NSMutableDictionary*) colorBarAttributes;
-- (NSDictionary*)   xAttributes;
-- (void) setYAttributes:(NSDictionary*)someAttributes;
-- (NSDictionary*)   yAttributes;
-- (void) setXAttributes:(NSDictionary*)someAttributes;
+- (NSMutableDictionary*)   xAttributes;
+- (void) setYAttributes:(NSMutableDictionary*)someAttributes;
+- (NSMutableDictionary*)   yAttributes;
+- (void) setXAttributes:(NSMutableDictionary*)someAttributes;
 - (void) setColorBarAttributes:(NSMutableDictionary*)newColorBarAttributes;
 - (NcdDetector*) detector;
 - (void) collectRates;

@@ -1,11 +1,11 @@
 //
-//  OR1DHistoDecoders.h
-//  Orca
+//  OR1DHistoPlot.h
+//  plotterDev
 //
-//  Created by Mark Howe on 9/21/04.
-//  Copyright 2004 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on 2/20/10.
+//  Copyright 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
+//This program was prepared for the Regents of the University of  
 //Washington at the Center for Experimental Nuclear Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
@@ -17,14 +17,16 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORPlotWithROI.h"
 
-#import "ORBaseDecoder.h"
-
-@class ORDataSet;
-
-@interface OR1DHistoDecoder : ORBaseDecoder {
-    @private 
+@interface OR1DHistoPlot : ORPlotWithROI {
 }
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+
+#pragma mark ***Drawing
+- (void) drawData;
+- (void) drawExtras;
+
+#pragma mark ***Conversions
+- (NSPoint) convertFromWindowToPlot:(NSPoint)aWindowLocation;
+
 @end

@@ -22,10 +22,12 @@
 #pragma mark ¥¥¥Imported Files
 #import "OR1DHisto.h"
 #import "OR1DHistoController.h"
-#import "ORPlotter1D.h"
 #import "ORAxis.h"
-#import "ORCurve1D.h"
 #import "ORCalibration.h"
+#import "OR1dRoiController.h"
+#import "OR1dFitController.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
 
 @interface OR1DHistoController (private)
 - (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -43,76 +45,39 @@
 
 - (void) dealloc
 {
+	[roiController release];
+	[fitController release];
 	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-	[plotter setUseGradient:YES];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
-	[self rebinChanged:nil];
-	[self rebinNumberChanged:nil];
+    [[plotView yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+    [[plotView xScale] setRngLimitsLow:0 withHigh:[model numberBins] withMinRng:25];
+
+	OR1DHistoPlot* histo1 = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
+	[histo1 setRoi: [[model rois] objectAtIndex:0]];
+	[plotView addPlot: histo1];
+	[histo1 release];
+	
+	roiController = [[OR1dRoiController panel] retain];
+	[roiView addSubview:[roiController view]];
+
+	fitController = [[OR1dFitController panel] retain];
+	[fitView addSubview:[fitController view]];
+
+	[self plotOrderDidChange:plotView];
 }
 
-- (void) registerNotificationObservers
+- (OR1dRoiController*) roiController
 {
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [super registerNotificationObservers];
-    
- 
-     [notifyCenter addObserver : self
-                     selector : @selector(mousePositionChanged:)
-                         name : ORPlotter1DMousePosition
-                       object : plotter];
-    
-     [notifyCenter addObserver : self
-                     selector : @selector(rebinChanged:)
-                         name : OR1DHisotRebinChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(rebinNumberChanged:)
-                         name : OR1DHisotRebinNumberChanged
-                       object : model];
-
+	return roiController;
 }
 
-- (void) rebinNumberChanged:(NSNotification*) aNote
+- (OR1dFitController*) fitController
 {
-	[rebinNumberTextField setIntValue:[model rebinNumber]];
-	if([model fullName]){
-        [[self window] setTitle:[model fullName]];
-        [titleField setStringValue:[model fullNameWithRunNumber]];
-    }
-
-    [plotter setNeedsDisplay:YES];
-}
-
-- (void) rebinChanged:(NSNotification*) aNote
-{
-	[rebinCB setIntValue:[model rebin]];
-	if([model fullName]){
-        [[self window] setTitle:[model fullName]];
-        [titleField setStringValue:[model fullNameWithRunNumber]];
-    }
-    [plotter setNeedsDisplay:YES];
-}
-
-- (void) mousePositionChanged:(NSNotification*) aNote
-{
-    if([aNote userInfo]){
-        NSDictionary* info = [aNote userInfo];
-        float x = [[info objectForKey:@"x"] floatValue];
-        float y = [[info objectForKey:@"y"] floatValue];
-        [positionField setStringValue:[NSString stringWithFormat:@"x: %.3f  y: %.0f",x,y]];
-		[plotter drawPositionLinesAt:NSMakePoint(x,y)];
-    }
-    else {
-        [positionField setStringValue:@""];
-		[plotter drawPositionLinesAt:NSMakePoint(0,0)];
-    }
+	return fitController;
 }
 
 #pragma mark ¥¥¥Actions
@@ -125,30 +90,41 @@
 										   modalDelegate:self 
 										  didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
 											 contextInfo:aContextInfo] retain];
-
 }
-
 
 - (IBAction) copy:(id)sender
 {
-	[plotter copy:sender];
-}
-
-- (IBAction) rebinAction:(id)sender
-{
-	[self endEditing];
-	[model setRebin:[sender intValue]];
-}
-
-- (IBAction) rebinNumberAction:(id)sender
-{
-	[model setRebinNumber:[sender intValue]];
+	[plotView copy:sender];
 }
 
 #pragma mark ¥¥¥Data Source
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (BOOL) plotterShouldShowRoi:(id)aPlot
 {
-    return [model numberOfPointsInPlot:aPlotter dataSet:set];
+	if([analysisDrawer state] == NSDrawerOpenState)return YES;
+	else return NO;
+}
+
+- (int) numberPointsInPlot:(id)aPlot
+{
+	return [model numberBins];
+}
+
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue
+{
+	*yValue = [model value:i];
+	*xValue = i;
+}
+
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot
+{
+	return [model rois];
+}
+
+- (void) plotOrderDidChange:(id)aPlotView
+{
+	id topRoi = [[aPlotView topPlot] roi];
+	[roiController setModel:topRoi];
+	[fitController setModel:[topRoi fit]];
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
@@ -170,6 +146,7 @@
 {
 	[calibrationPanel release];
 	calibrationPanel = nil;
+	[plotView setNeedsDisplay:YES];
 }
 
 @end

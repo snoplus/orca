@@ -27,8 +27,9 @@
 #import "NcdTube.h"
 #import "ORShaperModel.h"
 #import "ORColorScale.h"
-#import "ORAxis.h"
-#import "ORPlotter1D.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeAxis.h"
+#import "ORPlotView.h"
 #import "ORTimeRate.h"
 #import "ORValidatePassword.h"
 #import "BiStateView.h"
@@ -73,8 +74,13 @@
     
     [super awakeFromNib];
     
-    [[ratePlot xScale] setNeedsDisplay:YES];
-    [[ratePlot yScale] setNeedsDisplay:YES];
+ 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[ratePlot addPlot: aPlot];
+	[(ORTimeAxis*)[ratePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+	
+	[ratePlot orderChanged];
+	
     [tubeInfoView setFont:[NSFont fontWithName:@"Monaco" size:9]];
 }
 
@@ -90,7 +96,7 @@
     return detectorView;
 }
 
-- (ORPlotter1D*) ratePlot
+- (ORPlotView*) ratePlot
 {
     return ratePlot;
 }
@@ -162,16 +168,6 @@
                      selector : @selector(colorAttributesChanged:)
                          name : ORNcdRateColorBarChangedNotification
                        object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(scaleXAttributesChanged:)
-                         name : ORAxisRangeChangedNotification
-                       object : [ratePlot xScale]];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(scaleYAttributesChanged:)
-                         name : ORAxisRangeChangedNotification
-                       object : [ratePlot yScale]];
     
     //a fake action for the scale objects
     [notifyCenter addObserver : self
@@ -481,17 +477,6 @@
     }
 }
 
-//a fake action from the scale object
-- (void) scaleAction:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [detectorColorBar colorAxis]){
-        [[self undoManager] setActionName: @"Set Color Bar Attributes"];
-        [model setColorBarAttributes:[[detectorColorBar colorAxis]attributes]];
-    }
-}
-
-
-
 - (IBAction) delete:(id)sender
 {
     [[NcdDetector sharedInstance] removeTubeAtIndex:[hwTableView selectedRow]];
@@ -667,8 +652,6 @@
     [super updateWindow];
     [self totalRateChanged:nil];
     [self colorAttributesChanged:nil];
-    [self scaleXAttributesChanged:nil];
-    [self scaleYAttributesChanged:nil];
     [self tubeRateChanged:nil];
     [self displayOptionsChanged:nil];
     [self mapFileNameChanged:nil];
@@ -693,24 +676,22 @@
     [detectorView setNeedsDisplay:state];
 }
 
-- (void) scaleXAttributesChanged:(NSNotification*)aNotification
+//a fake action from the scale object
+- (void) scaleAction:(NSNotification*)aNotification
 {
-    if(aNotification == nil || [aNotification object] == [ratePlot xScale]){
-        [model setXAttributes:[[ratePlot xScale] attributes]];
+    if(aNotification == nil || [aNotification object] == [detectorColorBar colorAxis]){
+        [model setColorBarAttributes:[[detectorColorBar colorAxis]attributes]];
     }
-}
-- (void) scaleYAttributesChanged:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [ratePlot yScale]){
-        BOOL isLog = [[ratePlot yScale] isLog];
-        [rateLogCB setState:isLog];
-        [model setYAttributes:[[ratePlot yScale] attributes]];
-    }
+	if(aNotification == nil || [aNotification object] == [ratePlot yScale]){
+		[model setMiscAttributes:[(ORAxis*)[ratePlot yScale] attributes] forKey: @"NCDYAttributes"];
+	};
+	
+	
 }
 
 - (void) colorAttributesChanged:(NSNotification*)aNote
 {        
-	[[detectorColorBar colorAxis] setAttributes:[model colorBarAttributes]];
+	[(ORAxis*)[detectorColorBar colorAxis] setAttributes:[model colorBarAttributes]];
 	[detectorColorBar setNeedsDisplay:YES];
 	[[detectorColorBar colorAxis]setNeedsDisplay:YES];
 	
@@ -951,53 +932,35 @@
     [deleteTubeButton setEnabled: !runningOrLocked && [hwTableView selectedRow]>=0];
 }
 
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
-    if(set == 0)return [[[model detector]shaperTotalRate]count];
+ 	int set = [aPlotter tag];
+	if(set == 0)return [[[model detector]shaperTotalRate]count];
     else return [[[model detector]muxTotalRate]count];
 }
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    if(set == 0){
+  	int set = [aPlotter tag];
+	double aValue = 0;
+	if(set == 0){
         int count = [[[model detector]shaperTotalRate]count];
-        if(count==0)return 0;
-        return [[[model detector]shaperTotalRate]valueAtIndex:count-x-1];
+		if(count==0) aValue = 0;
+        else aValue = [[[model detector]shaperTotalRate]valueAtIndex:count-i-1];
     }
     else {
         int count = [[[model detector]muxTotalRate]count];
-        if(count==0)return 0;
-        return [[[model detector]muxTotalRate]valueAtIndex:count-x-1];
+		if(count==0) aValue = 0;
+        else aValue = [[[model detector]muxTotalRate]valueAtIndex:count-i-1];
     }
-    return 0;
-}
-
-- (unsigned long) secondsPerUnit:(id) aPlotter
-{
-    return [[[model detector]shaperTotalRate]sampleTime];
+	*xValue = (double)i;
+    *yValue = aValue;
 }
 
 - (void) drawView:(NSView*)aView inRect:(NSRect)aRect
 {
     [[model detector] drawInRect:aRect withColorBar:detectorColorBar];
 }
-
-
-- (int)	numberOfDataSetsInPlot:(id)aPlotter
-{
-    return 2;
-}
-
-- (BOOL)   	willSupplyColors
-{
-    return YES;
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-    if(set == 0)return [NSColor redColor];
-    else return [NSColor blueColor];
-}
-
 
 
 #pragma mark ¥¥¥Data Source Methods

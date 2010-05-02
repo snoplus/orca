@@ -33,16 +33,11 @@
     unsigned int 	numberBins;
     unsigned long* 	histogram;
     unsigned long* 	pausedHistogram;
-	BOOL			rebin;
-	unsigned int	rebinNumber;
+	NSMutableArray* rois;
 }
 
 
 #pragma mark ¥¥¥Accessors
-- (BOOL)rebin;
-- (void) setRebin:(BOOL)aFlag;
-- (unsigned short) rebinNumber;
-- (void) setRebinNumber:(unsigned int)avalue;
 - (void) processResponse:(NSDictionary*)aResponse;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
@@ -50,6 +45,7 @@
 - (int) numberBins;
 - (unsigned long)value:(unsigned short)aBin;
 - (unsigned long) overFlow;
+- (NSMutableArray*) rois;
 
 #pragma mark ¥¥¥Data Management
 - (void) histogram:(unsigned long)aValue;
@@ -71,10 +67,7 @@
 
 #pragma mark ¥¥¥Data Source Methods
 - (id)   name;
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
+- (int) numberPointsInPlot:(id)aPlot;
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
 @end
-
-extern NSString* OR1DHisotRebinChanged;
-extern NSString* OR1DHisotRebinNumberChanged;
 

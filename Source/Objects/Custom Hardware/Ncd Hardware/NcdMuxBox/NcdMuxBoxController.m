@@ -26,8 +26,9 @@
 #import "ORRate.h"
 #import "ORRateGroup.h"
 #import "ORValueBar.h"
-#import "ORAxis.h"
-#import "ORPlotter1D.h"
+#import "ORTimeLinePlot.h"
+#import "ORPlotView.h"
+#import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 #import "ThresholdCalibrationTask.h"
 
@@ -60,7 +61,11 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
     
-    
+ 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[timeRatePlot addPlot: aPlot];
+	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release]; 
+	
     //[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     [super  awakeFromNib];
 }
@@ -587,7 +592,7 @@
 
 - (void) timeRateXAttributesChanged:(NSNotification*)aNote
 {
-	[[timeRatePlot xScale] setAttributes:[model timeRateXAttributes]];
+	[(ORAxis*)[timeRatePlot xScale] setAttributes:[model timeRateXAttributes]];
 	[timeRatePlot setNeedsDisplay:YES];
 	[[timeRatePlot xScale]setNeedsDisplay:YES];
 }
@@ -596,7 +601,7 @@
 
 - (void) timeRateYAttributesChanged:(NSNotification*)aNote
 {	
-	[[timeRatePlot yScale] setAttributes:[model timeRateYAttributes]];
+	[(ORAxis*)[timeRatePlot yScale] setAttributes:[model timeRateYAttributes]];
 	[timeRatePlot setNeedsDisplay:YES];
 	[[timeRatePlot yScale]setNeedsDisplay:YES];
 	
@@ -642,11 +647,11 @@
     
     if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
 		[[self undoManager] setActionName: @"Set Mux Time Rate X Attributes"];
-		[model setTimeRateXAttributes:[[timeRatePlot xScale]attributes]];
+		[model setTimeRateXAttributes:[(ORAxis*)[timeRatePlot xScale]attributes]];
     };
     if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
 		[[self undoManager] setActionName: @"Set Mux Time Rate Y Attributes"];
-		[model setTimeRateYAttributes:[[timeRatePlot yScale]attributes]];
+		[model setTimeRateYAttributes:[(ORAxis*)[timeRatePlot yScale]attributes]];
     };
     
 }
@@ -682,7 +687,7 @@
 - (IBAction) timeRateUsesLogAction:(id)sender
 {
     if([sender state] != [[timeRatePlot yScale] isLog]){
-		NSMutableDictionary* attributes = [[timeRatePlot yScale]attributes];
+		NSMutableDictionary* attributes = [(ORAxis*)[timeRatePlot yScale]attributes];
 		[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
 		[model setTimeRateYAttributes:attributes];
     }
@@ -784,29 +789,22 @@
     [model setCalibrationEnabledMask:0x0];
 }
 
-
 - (double) getBarValue:(int)tag
 {
     return [[[[model rateGroup]rates] objectAtIndex:tag] rate];
 }
 
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
     return [[[model rateGroup]timeRate]count];
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    if(set == 0){
-		int count = [[[model rateGroup]timeRate]count];
-		return [[[model rateGroup]timeRate]valueAtIndex:count-x-1];
-    }
-    return 0;
-}
-
-- (unsigned long) secondsPerUnit:(id) aPlotter
-{
-    return [[[model rateGroup]timeRate]sampleTime];
+	int count = [[[model rateGroup]timeRate] count];
+	int index = count-i-1;
+	*yValue =  [[[model rateGroup]timeRate]valueAtIndex:index];
+	*xValue =  [[[model rateGroup]timeRate]timeSampledAtIndex:index];
 }
 
 

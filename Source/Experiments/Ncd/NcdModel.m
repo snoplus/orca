@@ -486,7 +486,7 @@ enum {
 }
 
 
-- (NSMutableDictionary*) colorBarAttributes
+- (NSDictionary*) colorBarAttributes
 {
     return colorBarAttributes;
 }
@@ -504,7 +504,7 @@ enum {
     
 }
 
-- (NSDictionary*)   xAttributes
+- (NSDictionary*)xAttributes
 {
     return xAttributes;
 }
@@ -514,13 +514,13 @@ enum {
     return yAttributes;
 }
 
-- (void) setYAttributes:(NSDictionary*)someAttributes
+- (void) setYAttributes:(NSMutableDictionary*)someAttributes
 {
     [yAttributes release];
     yAttributes = [someAttributes copy];
 }
 
-- (void) setXAttributes:(NSDictionary*)someAttributes
+- (void) setXAttributes:(NSMutableDictionary*)someAttributes
 {
     [xAttributes release];
     xAttributes = [someAttributes copy];
