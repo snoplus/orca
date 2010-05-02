@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORPacController : OrcaObjectController
 {
@@ -54,8 +54,8 @@
 	IBOutlet NSTextField*	logFileTextField;
 	IBOutlet NSButton*		logToFileButton;
 	
-	IBOutlet ORPlotter1D*   plotter0;
-	IBOutlet ORPlotter1D*   plotter1;
+	IBOutlet ORPlotView*   plotter0;
+	IBOutlet ORPlotView*   plotter1;
 	
 }
 

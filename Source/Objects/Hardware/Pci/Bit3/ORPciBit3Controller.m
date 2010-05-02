@@ -36,8 +36,9 @@
 #import "ORPciBit3Controller.h"
 #import "ORDualPortLAMModel.h"
 
-#import "ORAxis.h"
-#import "ORPlotter1D.h"
+#import "ORTimeLinePlot.h"
+#import "ORPlotView.h"
+#import "ORTimeAxis.h"
 #import "ORRate.h"
 #import "ORRateGroup.h"
 #import "ORTimeRate.h"
@@ -68,7 +69,16 @@
     [[errorRatePlot yScale] setLog:YES];
     [addressStepper setMaxValue:(double)0x7fffffff];
 	[groupView setGroup:model];
-    [super awakeFromNib];
+ 
+	int i;
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+		[aPlot setLineColor:[self colorForDataSet:i]];
+		[errorRatePlot addPlot: aPlot];
+		[(ORTimeAxis*)[errorRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release]; 
+	}
+	[super awakeFromNib];
 }
 
 - (void) setModel:(OrcaObject*)aModel
@@ -320,7 +330,7 @@
 
 - (void) errorRateXAttributesChanged:(NSNotification*)aNote
 {
-	[model setErrorRateXAttributes:[[errorRatePlot xScale] attributes]];
+	[model setErrorRateXAttributes:[(ORAxis*)[errorRatePlot xScale] attributes]];
 }
 
 
@@ -329,7 +339,7 @@
 {
 	BOOL isLog = [[errorRatePlot yScale] isLog];
 	[errorRateLogCB setState:isLog];
-	[model setErrorRateYAttributes:[[errorRatePlot yScale] attributes]];
+	[model setErrorRateYAttributes:[(ORAxis*)[errorRatePlot yScale] attributes]];
 }
 
 
@@ -804,34 +814,19 @@
     }
 }
 
-
-
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
+	int set = [aPlotter tag];
     return [[[[model errorRateGroup]rateObject:set]timeRate] count];
 }
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-    if(set == 0){
-        int count = [[[[model errorRateGroup]rateObject:set]timeRate] count];
-        return [[[[model errorRateGroup]rateObject:set]timeRate] valueAtIndex:count-x-1];
-    }
-    return 0;
-}
 
-- (unsigned long) secondsPerUnit:(id) aPlotter
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	return [[[model errorRateGroup] timeRate] sampleTime];
-}
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-	return kNumRetryIndexes;
-}
-
-- (BOOL) willSupplyColors
-{
-	return YES;
+	int set = [aPlotter tag];
+	int count = [[[[model errorRateGroup] rateObject:set] timeRate] count];
+	int index = count-i-1;
+	*yValue =  [[[[model errorRateGroup]rateObject:set] timeRate] valueAtIndex:index];
+	*xValue =  [[[[model errorRateGroup]rateObject:set] timeRate] timeSampledAtIndex:index];
 }
 
 - (NSColor*) colorForDataSet:(int)set

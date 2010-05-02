@@ -20,7 +20,7 @@
 #pragma mark •••Imported Files
 
 @class StopLightView;
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORSerialPortController;
 
 @interface ORPDcuController : OrcaObjectController
@@ -44,7 +44,7 @@
     IBOutlet NSButton*		updateButton;
     IBOutlet NSButton*		initButton;
     IBOutlet StopLightView* lightBoardView;
-    IBOutlet ORPlotter1D*		plotter;
+    IBOutlet ORPlotView*	plotter;
 	IBOutlet NSPopUpButton*	pressureScalePU;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;
@@ -100,6 +100,10 @@
 - (IBAction) updateAllAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) initAction:(id)sender;
+
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

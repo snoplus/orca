@@ -38,7 +38,6 @@
 	NSRecursiveLock*	dataLock;
 }
 
-
 #pragma mark ¥¥¥Accessors
 - (void) processResponse:(NSDictionary*)aResponse;
 - (void) setRealArray:(NSArray*)aaRealArray imaginaryArray:(NSArray*)anImaginaryArray;
@@ -60,9 +59,9 @@
 
 #pragma mark ¥¥¥Data Source Methods
 - (id)   name;
-- (int) numberOfDataSetsInPlot:(id)aPlotter;
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
+- (int)	numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(unsigned long)i x:(double*)xValue y:(double*)yValue;
+- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x; 
 @end
 
 extern NSString* ORPlotFFTShowChanged;

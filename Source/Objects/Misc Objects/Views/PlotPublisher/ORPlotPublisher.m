@@ -19,8 +19,8 @@
 //-------------------------------------------------------------
 
 #import "ORPlotPublisher.h"
-#import "ORPlotter.h"
-#import "ORPlotter1D.h"
+#import "ORPlot.h"
+#import "ORPlotView.h"
 
 #define kPlotPublisherDefaultFile @"orca.plotpublisher.defaultsavesetFile"
 
@@ -58,7 +58,7 @@
 - (id) initWithPlot:(id)aPlot 
 {
     self = [super initWithWindowNibName:@"PlotPublisher"];
-	plotter = aPlot;
+	plotView = aPlot;
 	return self;
 }
 
@@ -84,31 +84,31 @@
 	if(!startingFile)startingFile = @"---";
 	[saveSetField setStringValue:startingFile];
 	
-	if([plotter isKindOfClass:NSClassFromString(@"ORPlotter2D")]){
-		[dataSetField setEnabled:NO];
-		[colorWell setEnabled:NO];
-		[[optionMatrix cellWithTag:kPlotPublisherUseGridOption] setEnabled:NO];
-	}
+//	if([plotter isKindOfClass:NSClassFromString(@"ORPlotter2D")]){
+//		[dataSetField setEnabled:NO];
+//		[colorWell setEnabled:NO];
+//		[[optionMatrix cellWithTag:kPlotPublisherUseGridOption] setEnabled:NO];
+//	}
 	[dataSetField setIntValue:0];
-	[colorWell setColor:[plotter colorForDataSet:0]];
+	[colorWell setColor:[[plotView plot:0] lineColor]];
 
-	[previewImage setImage: [[[NSImage alloc] initWithData: [plotter plotAsPDFData]] autorelease]];
+	[previewImage setImage: [[[NSImage alloc] initWithData: [plotView plotAsPDFData]] autorelease]];
 }
 
 - (void) beginSheet
 {
 	[self retain];
-	oldAttributes = [[plotter attributes] mutableCopy];
-	oldXLabel = [[[plotter xScale] label] copy];
-	oldYLabel = [[[plotter yScale] label] copy];
-	oldTitle  = [[[[plotter dataSource] titleField] stringValue] copy];
+	oldAttributes	= [[plotView attributes] mutableCopy];
+	oldXLabel		= [[[plotView xScale] label] copy];
+	oldYLabel		= [[[plotView yScale] label] copy];
+	oldTitle		= [[[plotView titleField] stringValue] copy];
 	
-	[plotter setBackgroundColor:[NSColor whiteColor]];
-	[plotter setGridColor:[NSColor whiteColor]];
+	[plotView setBackgroundColor:[NSColor whiteColor]];
+	[plotView setGridColor:[NSColor whiteColor]];
 	
-	[plotter setUseGradient:NO];
+	[plotView setUseGradient:NO];
 	
-    [NSApp beginSheet:[self window] modalForWindow:[plotter window] modalDelegate:self didEndSelector:@selector(_publishingDidEnd:returnCode:contextInfo:) contextInfo:nil];
+    [NSApp beginSheet:[self window] modalForWindow:[plotView window] modalDelegate:self didEndSelector:@selector(_publishingDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
 - (IBAction) publish:(id)sender
@@ -126,47 +126,46 @@
 - (IBAction) labelingOptionsAction: (id) sender
 {
 	if([[optionMatrix cellWithTag:kPlotPublisherXLabelOption] intValue]) {
-		[[plotter xScale] setLabel:[[labelMatrix cellWithTag:kPlotPublisherXLabel] stringValue]];
+		[[plotView xScale] setLabel:[[labelMatrix cellWithTag:kPlotPublisherXLabel] stringValue]];
 	}
-	else [[plotter xScale] setLabel:@""];
+	else [[plotView xScale] setLabel:@""];
 	
 	if([[optionMatrix cellWithTag:kPlotPublisherYLabelOption] intValue]) {
-		[[plotter yScale] setLabel:[[labelMatrix cellWithTag:kPlotPublisherYLabel] stringValue]];
+		[[plotView yScale] setLabel:[[labelMatrix cellWithTag:kPlotPublisherYLabel] stringValue]];
 	}
-	else [[plotter yScale] setLabel:@""];
+	else [[plotView yScale] setLabel:@""];
 
 	if([[optionMatrix cellWithTag:kPlotPublisherUseTitleOption] intValue]) {
-		[[[plotter dataSource]titleField] setStringValue:[[labelMatrix cellWithTag:kPlotPublisherTitle] stringValue]];
+		[[plotView titleField] setStringValue:[[labelMatrix cellWithTag:kPlotPublisherTitle] stringValue]];
 	}
-	else [[[plotter dataSource]titleField] setStringValue:@""];
+	else [[plotView titleField] setStringValue:@""];
 	
 	
-	if([[optionMatrix cellWithTag:kPlotPublisherUseGridOption] intValue]) [plotter setGridColor:[NSColor grayColor]];
-	else [plotter setGridColor:[NSColor whiteColor]];
+	if([[optionMatrix cellWithTag:kPlotPublisherUseGridOption] intValue]) [plotView setGridColor:[NSColor grayColor]];
+	else [plotView setGridColor:[NSColor whiteColor]];
 	
-	[previewImage setImage: [[[NSImage alloc] initWithData: [plotter plotAsPDFData]] autorelease]];
+	[previewImage setImage: [[[NSImage alloc] initWithData: [plotView plotAsPDFData]] autorelease]];
 
 }
 
 - (IBAction) dataSetAction: (id) sender
 {
-	int dataSet = [dataSetField intValue];
+	int i = [dataSetField intValue];
+	int maxPlots = [plotView numberOfPlots];
+	if(i < 0) i = 0;
+	else if(i>maxPlots-1)i = maxPlots-1;
 	
-	if(dataSet < 0) dataSet = 0;
-	else if(dataSet>6)dataSet = 6;
-	
-	[dataSetField setIntValue:dataSet];
-	[colorWell setColor:[plotter colorForDataSet:dataSet]];
+	[dataSetField setIntValue:i];
+	[colorWell setColor:[[plotView plot:i] lineColor]];
 }
 
 - (IBAction) colorOptionsAction: (id) sender
 {
-	int dataSet = [dataSetField intValue];
-	[plotter setDataColor:[colorWell color] dataSet:dataSet];
-
-	//this notification is a work around to force the legend to be redrawn with the right colors
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORPlotter1DActiveCurveChanged object:plotter];
-	[previewImage setImage: [[[NSImage alloc] initWithData: [plotter plotAsPDFData]] autorelease]];
+	int i = [dataSetField intValue];
+	[[plotView plot:i] saveColor];
+	[[plotView plot:i] setLineColor:[colorWell color]];
+	[plotView setNeedsDisplay:YES];
+	[previewImage setImage: [[[NSImage alloc] initWithData: [plotView plotAsPDFData]] autorelease]];
 }
 
 - (IBAction) saveSetAction:(id) sender
@@ -237,7 +236,7 @@
     [savePanel setPrompt:@"Save"];
     [savePanel beginSheetForDirectory:NSHomeDirectory()
 								 file:@"Plot.pdf"
-					   modalForWindow:[plotter window]
+					   modalForWindow:[plotView window]
 						modalDelegate:self
 					   didEndSelector:@selector(_saveFileDidEnd:returnCode:contextInfo:)
 						  contextInfo:nil];
@@ -249,13 +248,18 @@
 		[self dumpAndStore];
 	}
 	else [self finish];
+	int maxPlots = [plotView numberOfPlots];
+	int i;
+	for(i=0;i<maxPlots;i++){
+		[[plotView plot:i] restoreColor];
+	}
 }
 
 - (void) _saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         NSString* savePath = [sheet filename];
-		NSData* pdfData = [plotter plotAsPDFData];
+		NSData* pdfData = [plotView plotAsPDFData];
 		[pdfData writeToFile:[savePath stringByExpandingTildeInPath] atomically:NO];
     }
 	[self finish];
@@ -263,16 +267,14 @@
 
 - (void) finish
 {
-	[plotter setAttributes:oldAttributes];
-	[[plotter xScale] setLabel:oldXLabel];
-	[[plotter yScale] setLabel:oldYLabel];
-	[[[plotter dataSource] titleField] setStringValue:oldTitle];
-	[plotter setNeedsDisplay:YES];
+	[plotView setAttributes:oldAttributes];
+	[[plotView xScale] setLabel:oldXLabel];
+	[[plotView yScale] setLabel:oldYLabel];
+	[[plotView titleField] setStringValue:oldTitle];
+	[plotView setNeedsDisplay:YES];
 	if([NSColorPanel sharedColorPanelExists]){
 		[[NSColorPanel sharedColorPanel] orderOut:self];
 	}
-	//this notification is a work around to force the legend to be redrawn with the right colors
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORPlotter1DActiveCurveChanged object:plotter];
 	[self autorelease];
 }
 
@@ -324,11 +326,11 @@
 	[newAttributes setObject:[NSNumber numberWithInt:[dataSetField intValue]] forKey:@"colorIndex"];
 	
 	NSMutableArray* colorArray = [NSMutableArray array];
-	int n = [plotter numberDataSets];
+	int n = [plotView numberOfPlots];
 	int i;
 	for(i=0;i<n;i++){
-		id aColor = [NSArchiver archivedDataWithRootObject: [plotter colorForDataSet:i]];
-		[colorArray addObject:aColor];
+		//id aColor = [NSArchiver archivedDataWithRootObject: [plotter colorForDataSet:i]];
+		//[colorArray addObject:aColor];
 	}
 	[newAttributes setObject:colorArray forKey:@"colors"];
 }

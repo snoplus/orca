@@ -30,9 +30,15 @@
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
-- (void) mousePositionChanged:(NSNotification*) aNote;
 - (void) showChanged:(NSNotification*) aNote;
+- (void) plotOrderDidChange:(id)aPlotView;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) showAction:(id)sender;
+
+#pragma mark ¥¥¥Data Source
+- (int)  numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
+- (int)  numberOfRowsInTableView:(NSTableView *)tableView;
+- (id)   tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 @end

@@ -22,9 +22,9 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORPlotFFTController.h"
 #import "ORPlotFFT.h"
-#import "ORPlotter1D.h"
 #import "ORAxis.h"
-#import "ORCurve1D.h"
+#import "ORPlotWithROI.h"
+#import "ORPlotView.h"
 
 @implementation ORPlotFFTController
 
@@ -39,7 +39,26 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+    [[plotView yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+	
+	ORPlotWithROI* aPlot;
+	aPlot = [[ORPlotWithROI alloc] initWithTag:0 andDataSource:self];
+	[plotView addPlot: aPlot];
+	[aPlot setLineColor:[NSColor blueColor]];
+	[aPlot release];
+
+	aPlot = [[ORPlotWithROI alloc] initWithTag:1 andDataSource:self];
+	[plotView addPlot: aPlot];
+	[aPlot setLineColor:[NSColor redColor]];
+	[aPlot release];
+
+	aPlot = [[ORPlotWithROI alloc] initWithTag:2 andDataSource:self];
+	[plotView addPlot: aPlot];
+	[aPlot setLineColor:[NSColor blackColor]];
+	[aPlot release];
+		
+	[self plotOrderDidChange:plotView];
+	
 	[self updateWindow];
 
 }
@@ -49,11 +68,6 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
-    
-     [notifyCenter addObserver : self
-                     selector : @selector(mousePositionChanged:)
-                         name : ORPlotter1DMousePosition
-                       object : plotter];
     
      [notifyCenter addObserver : self
                      selector : @selector(showChanged:)
@@ -66,7 +80,11 @@
 {
 	[super updateWindow];
 	[self showChanged:nil];
-	[self mousePositionChanged:nil];
+}
+
+- (void) plotOrderDidChange:(id)aPlotView
+{
+	[aPlotView setNeedsDisplay:YES];
 }
 
 - (void) showChanged:(NSNotification*) aNote
@@ -74,20 +92,7 @@
 	[[showMatrix cellWithTag:0] setIntValue:[model showReal]];
 	[[showMatrix cellWithTag:1] setIntValue:[model showImaginary]];
 	[[showMatrix cellWithTag:2] setIntValue:[model showPowerSpectrum]];
-	[plotter setNeedsDisplay:YES];
-}
-
-- (void) mousePositionChanged:(NSNotification*) aNote
-{
-    if([aNote userInfo]){
-        NSDictionary* info = [aNote userInfo];
-        int x = [[info objectForKey:@"x"] intValue];
-        float y = [[info objectForKey:@"y"] floatValue];
-        [positionField setStringValue:[NSString stringWithFormat:@"x: %d  y: %.0f",x,y]];
-    }
-    else {
-        [positionField setStringValue:@""];
-    }
+	[plotView setNeedsDisplay:YES];
 }
 
 - (IBAction) showAction:(id)sender
@@ -97,33 +102,14 @@
 	else [model setShowPowerSpectrum:[[sender selectedCell] intValue]];
 }
 
-- (BOOL) useDataObject:(id)aPlotter  dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
-	return NO;
-}
-- (BOOL)   	willSupplyColors
-{
-    return YES;
+    return [model numberPointsInPlot:aPlotter];
 }
 
-- (NSColor*) colorForDataSet:(int)set
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
 {
-    return [model colorForDataSet:set];
-}
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-	return [model numberOfDataSetsInPlot:aPlotter];
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
-    return [model numberOfPointsInPlot:aPlotter dataSet:set];
-}
-
-- (float) plotter:(id) aPlotter  dataSet:(int)set dataValue:(int) x
-{
-    return [model plotter:aPlotter dataSet:set dataValue:x];
+    return [model plotter:aPlotter index:index x:xValue y:yValue];
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView

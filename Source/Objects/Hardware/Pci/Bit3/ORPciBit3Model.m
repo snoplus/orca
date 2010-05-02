@@ -65,7 +65,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORPciBit3Model.h"
 #import "ORRateGroup.h"
-#import "ORScale.h"
+#import "ORAxis.h"
 #import "ORPciBit3Commands.h"
 #import "ORCommandList.h"
 #import "ORVmeReadWriteCommand.h"

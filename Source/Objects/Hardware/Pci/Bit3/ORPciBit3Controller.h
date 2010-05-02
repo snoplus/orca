@@ -33,7 +33,7 @@ for the use of this software.
 #pragma mark ¥¥¥Imported Files
 #import "ORPciBit3Model.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORGroupView;
  
 @interface ORPciBit3Controller : OrcaObjectController {
@@ -54,7 +54,7 @@ for the use of this software.
 	IBOutlet NSPopUpButton* readWriteIOSpacePopUp;
 	IBOutlet NSPopUpButton* readWriteAddressModifierPopUp;	
 	IBOutlet NSButton*      lockButton;
-	IBOutlet ORPlotter1D*   errorRatePlot;
+	IBOutlet ORPlotView*	errorRatePlot;
 	IBOutlet NSButton*      errorRateLogCB;
 	IBOutlet NSStepper* 	integrationStepper;
 	IBOutlet NSTextField* 	integrationText;
@@ -103,5 +103,10 @@ for the use of this software.
 - (IBAction) write:(id)sender;
 
 - (IBAction) integrationAction:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+- (NSColor*) colorForDataSet:(int)set;
+
 
 @end

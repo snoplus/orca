@@ -21,8 +21,9 @@
 
 #import "ORPDcuController.h"
 #import "ORPDcuModel.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
+#import "ORTimeLinePlot.h"
+#import "ORPlotView.h"
+#import "ORTimeAxis.h"
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
 #import "OHexFormatter.h"
@@ -57,6 +58,12 @@
 	
     [[plotter xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+
+	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[(ORTimeAxis*)[plotter xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+	
 	[super awakeFromNib];	
 	//[model getPressure];
 }
@@ -218,11 +225,11 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [plotter xScale]){
-		[model setMiscAttributes:[[plotter xScale]attributes] forKey:@"XAttributes0"];
+		[model setMiscAttributes:[(ORAxis*)[plotter xScale]attributes] forKey:@"XAttributes0"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter yScale]){
-		[model setMiscAttributes:[[plotter yScale]attributes] forKey:@"YAttributes0"];
+		[model setMiscAttributes:[(ORAxis*)[plotter yScale]attributes] forKey:@"YAttributes0"];
 	};
 	
 }
@@ -236,7 +243,7 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
 		if(attrib){
-			[[plotter xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter xScale] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter xScale] setNeedsDisplay:YES];
 		}
@@ -244,7 +251,7 @@
 	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
 		if(attrib){
-			[[plotter yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter yScale] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter yScale] setNeedsDisplay:YES];
 		}
@@ -417,32 +424,18 @@
 	[model initUnit];
 }
 
-
 #pragma mark •••Data Source
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
+- (int) numberPointsInPlot:(id)aPlotter
 {
-    return 1;
+	return [[model timeRate] count];
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	if(aPlotter == plotter) return [[model timeRate] count];
-	else return 0;
-}
-
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	if(aPlotter == plotter){
-		int count = [[model timeRate] count];
-		return [[model timeRate] valueAtIndex:count-x-1] * [model pressureScaleValue];
-	}
-	else return 0;
-}
-
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return [[model timeRate] sampleTime]; //all should be the same, just return value for rate 0
+	int count = [[model timeRate] count];
+	int index = count-i-1;
+	*xValue = [[model timeRate] timeSampledAtIndex:index];
+	*yValue = [[model timeRate] valueAtIndex:index] * [model pressureScaleValue];
 }
 
 @end

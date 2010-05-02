@@ -17,8 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-@class ORPlotter;
+@class ORPlotView;
 
 @interface ORPlotPublisher : NSWindowController 
 {
@@ -31,7 +30,7 @@
 	IBOutlet NSImageView*	previewImage;
 	IBOutlet NSTextField*	saveSetField;
 	
-	ORPlotter*				plotter;
+	ORPlotView*						plotView;
 	NSMutableDictionary*    oldAttributes;
 	NSString*				oldXLabel;
 	NSString*				oldYLabel;

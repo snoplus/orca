@@ -20,7 +20,6 @@
 
 
 #import "ORPlotTimeSeries.h"
-#import "ORPlotter1D.h"
 #import "ORDataPacket.h"
 #import "ORTimeSeries.h"
 

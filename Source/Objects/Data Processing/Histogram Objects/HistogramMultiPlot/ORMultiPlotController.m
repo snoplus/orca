@@ -22,13 +22,19 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORMultiPlotController.h"
 #import "ORMultiPlot.h"
-#import "ORPlotter1D.h"
 #import "ORAxis.h"
 #import "ORDataSet.h"
 #import "ORCalibration.h"
+#import "ORPlotView.h"
+#import "ORPlotWithROI.h"
+#import "OR1DHistoPlot.h"
+#import "ORPlotWithROI.h"
+#import "OR1dRoiController.h"
+#import "OR1dFitController.h"
 
 @interface ORMultiPlotController (private)
 - (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) setUpPlots;
 @end
 
 @implementation ORMultiPlotController
@@ -39,6 +45,33 @@
 {
     self = [super initWithWindowNibName:@"MultiPlot"];
     return self;
+}
+
+- (void) dealloc
+{
+	[roiController release];
+	[fitController release];
+	[super dealloc];
+}
+
+- (void) awakeFromNib
+{
+    [super awakeFromNib];
+    [self plotNameChanged:nil];
+	
+	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:230/255. green:1 blue:253/255. alpha:1]];
+	
+    [[plotView yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+	[self setUpPlots];
+	
+	roiController = [[OR1dRoiController panel] retain];
+	[roiView addSubview:[roiController view]];
+	
+	fitController = [[OR1dFitController panel] retain];
+	[fitView addSubview:[fitController view]];
+	
+	[self plotOrderDidChange:plotView];
+	
 }
 
 - (void) registerNotificationObservers
@@ -55,7 +88,6 @@
                          name : ORMultiPlotReCachedNotification
                         object: model];
 
-
     [notifyCenter addObserver : self
                      selector : @selector(plotNameChanged:)
                          name : ORMultiPlotNameChangedNotification
@@ -69,38 +101,23 @@
                              name : ORDataSetDataChanged
                             object: [model cachedObjectAtIndex:i]];
     }
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(activePlotChanged:)
-                         name : ORPlotter1DActiveCurveChanged
-                        object: plotter];
-    
+        
 }
 
-- (void) awakeFromNib
-{
-    [super awakeFromNib];
-    [self activePlotChanged:nil];
-    [self plotNameChanged:nil];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
-	[plotter setUseGradient:YES];
 
-}
 
 - (void) setModel:(id)aModel
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super setModel:aModel];
-    [plotter setDataSource:model];
-    [plotter initCurves];
+	[self setUpPlots];
     [self plotNameChanged:nil];
-    [self activePlotChanged:nil];
     [self registerNotificationObservers];
 }
 
 - (void) setLegend
 {
-    int n = [model numberOfDataSetsInPlot:plotter];
+    int n = [plotView numberOfPlots];
     int maxn = [legendMatrix numberOfRows];
     int i;
     
@@ -109,10 +126,10 @@
     }
     
     for(i=0;i<MIN(n,maxn);i++){
-        if(i< [model count] && model && plotter){
-            NSString* s = [NSString stringWithFormat:@"%@%@",i==[plotter activeCurveIndex]?@"-":@" ",[model objectAtIndex:i]];
+        if(i< [model count] && model && plotView){
+            NSString* s = [NSString stringWithFormat:@"%@%@",i==[[plotView topPlot] tag]?@"+ ":@"  ",[model objectAtIndex:i]];
             [[legendMatrix cellWithTag:i] setStringValue:s];
-            [[legendMatrix cellWithTag:i]setTextColor:[plotter colorForDataSet:i]];
+			[[legendMatrix cellWithTag:i]setTextColor:[[plotView plotWithTag:i] lineColor]];
         }
         else {
             [[legendMatrix cellWithTag:i] setStringValue:@""];
@@ -129,13 +146,6 @@
 	[[self window] setTitle:[model plotName]];
 }
 
-- (void) activePlotChanged:(NSNotification*)aNote
-{
-    if(aNote==nil || [aNote object] == plotter){
-        [self setLegend];
-    }
-}
-
 - (void) modelRemoved:(NSNotification*)aNote
 {
     if([aNote object] == model){
@@ -147,8 +157,7 @@
 {
     if([aNote object] == model){
         [[NSNotificationCenter defaultCenter] removeObserver:self];
-        [plotter initCurves];
-        [self activePlotChanged:nil];
+		[self setUpPlots];
         [self registerNotificationObservers];
     }
 }
@@ -165,7 +174,7 @@
 
 - (void) postUpdate
 {
-    [plotter setNeedsDisplay:YES];
+    [plotView setNeedsDisplay:YES];
 	scheduledForUpdate = NO;
 }
 
@@ -189,23 +198,43 @@
 
 - (IBAction) copy:(id)sender
 {
-	[plotter copy:sender];
+	[plotView copy:sender];
 }
 
 #pragma mark ¥¥¥Data Source
-- (int) numberOfDataSetsInPlot:(id)aPlotter
+- (BOOL) plotterShouldShowRoi:(id)aPlot
 {
-    return [model numberOfDataSetsInPlot:aPlotter];
+	if([analysisDrawer state] == NSDrawerOpenState)return YES;
+	else return NO;
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{     
-    return [model numberOfPointsInPlot:aPlotter dataSet:set];
+- (void) plotOrderDidChange:(id)aPlotView
+{
+	id topRoi = [(ORPlotWithROI*)[aPlotView topPlot] roi];
+	[roiController setModel:topRoi];
+	[fitController setModel:[topRoi fit]];
+	[self setLegend];
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+- (int) numberPointsInPlot:(id)aPlot
 {
-    return [model plotter:aPlotter dataSet:set dataValue:x];
+	int tag = [aPlot tag];
+	if(tag>=0 && tag<[model cachedCount]){
+		return [[model cachedObjectAtIndex:tag] numberBins];
+	}
+	else return 0;
+}
+
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
+{
+	int tag = [aPlot tag];
+	id aDataSet = [model cachedObjectAtIndex:tag];
+	*yValue =  [aDataSet value:i];
+}
+
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot
+{
+	return [model rois:[aPlot tag]];
 }
 
 @end
@@ -216,6 +245,44 @@
 {
 	[calibrationPanel release];
 	calibrationPanel = nil;
+}
+
+- (void) setUpPlots
+{
+	[plotView removeAllPlots];
+	int n = [model cachedCount];
+    int i;
+    for(i=0;i<n;i++){
+		
+		NSColor* theColor;
+		switch (i%10){
+			case 0: theColor = [NSColor redColor]; break;
+			case 1: theColor = [NSColor blueColor]; break;
+			case 2: theColor = [NSColor purpleColor]; break;
+			case 3: theColor = [NSColor brownColor]; break;
+			case 4: theColor = [NSColor greenColor]; break;
+			case 5: theColor = [NSColor blackColor]; break;
+			case 6: theColor = [NSColor cyanColor]; break;
+			case 7: theColor = [NSColor orangeColor]; break;
+			case 8: theColor = [NSColor magentaColor]; break;
+			case 9: theColor = [NSColor yellowColor]; break;
+		}
+		if([[model cachedObjectAtIndex:i] isKindOfClass:NSClassFromString(@"OR1DHisto")]){
+			OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:i andDataSource:self];
+			[aPlot setLineColor:theColor];
+			[aPlot setRoi: [[model rois:i] objectAtIndex:0]];
+			[plotView addPlot: aPlot];
+			[aPlot release];
+		}
+		else if([[model cachedObjectAtIndex:i] isKindOfClass:NSClassFromString(@"ORWaveform")]){
+			ORPlotWithROI* aPlot = [[ORPlotWithROI alloc] initWithTag:i andDataSource:self];
+			[aPlot setLineColor:theColor];
+			[aPlot setRoi: [[model rois:i] objectAtIndex:0]];
+			[plotView addPlot: aPlot];
+			[aPlot release];
+		}
+	}
+	[self setLegend];
 }
 
 @end

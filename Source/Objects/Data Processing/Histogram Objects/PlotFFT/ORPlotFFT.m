@@ -20,7 +20,6 @@
 
 
 #import "ORPlotFFT.h"
-#import "ORPlotter1D.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
 
@@ -162,15 +161,31 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 */
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int)	numberPointsInPlot:(id)aPlotter
 {
+	int set = [aPlotter tag];
 	if(set == 0) return showReal?[realArray count]:0;
 	else if(set==1)return showImaginary?[imaginaryArray count]:0;
 	else return showPowerSpectrum?[powerSpectrumArray count]:0;
 }
-- (int) numberOfDataSetsInPlot:(id)aPlotter
+
+- (void) plotter:(id)aPlotter index:(unsigned long)i x:(double*)xValue y:(double*)yValue
 {
-	return 3;
+	[dataLock lock];
+	int set = [aPlotter tag];
+	if(set==0){
+		*yValue = [[realArray objectAtIndex:i] floatValue];
+		*xValue = i;
+	}
+    else if(set==1){
+		*yValue =  [[imaginaryArray objectAtIndex:i] floatValue];
+		*xValue = i;
+	}
+    else {
+		*yValue =  [[powerSpectrumArray objectAtIndex:i] floatValue];
+		*xValue = i;
+	}
+	[dataLock unlock];
 }
 
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
@@ -181,6 +196,8 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
     else return [[powerSpectrumArray objectAtIndex:x] floatValue];
 	[dataLock unlock];
 }
+
+
 - (NSColor*) colorForDataSet:(int)set
 {
     if(set==0) return [NSColor blueColor];
