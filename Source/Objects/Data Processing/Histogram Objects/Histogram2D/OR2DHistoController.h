@@ -21,11 +21,22 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
+
+@class OR2dRoiController;
+
 @interface OR2DHistoController : ORDataController {
+	IBOutlet NSView*		roiView;
+    OR2dRoiController*		roiController;
 }
 - (id) init;
+- (BOOL) plotterShouldShowRoi:(id)aPlot;
 - (IBAction) logLin:(NSToolbarItem*)item;
 - (IBAction) zoomIn:(id)sender;
 - (IBAction) zoomOut:(id)sender;
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
+
+#pragma mark ¥¥¥Data Source
+- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
+- (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
 
 @end

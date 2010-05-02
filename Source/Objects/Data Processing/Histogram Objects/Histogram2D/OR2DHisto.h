@@ -32,6 +32,7 @@
     unsigned short      numberBinsPerSide;
     unsigned short      minX,maxX,minY,maxY;
     unsigned long*      histogram; //actually a 2D array stuffed into a 1D
+	NSMutableArray*		rois;
 }
 
 - (void) freeHistogram;
@@ -44,6 +45,7 @@
 - (unsigned long)valueX:(unsigned short)aXBin y:(unsigned short)aYBin;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
+- (NSMutableArray*) rois;
 
 #pragma mark ¥¥¥Data Management
 - (NSDictionary*) dataRecordDescription;
@@ -63,6 +65,8 @@
 - (id)   name;
 - (unsigned long*) getDataSetAndNumBinsPerSize:(unsigned short*)value;
 - (void) getXMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
+- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue;
+- (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY;
 @end
 
 

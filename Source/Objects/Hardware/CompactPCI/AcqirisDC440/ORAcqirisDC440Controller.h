@@ -22,7 +22,7 @@
 #import <Cocoa/Cocoa.h>
 #import "OrcaObjectController.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORValueBar;
 
 @interface ORAcqirisDC440Controller : OrcaObjectController
@@ -42,7 +42,7 @@
 	IBOutlet NSTextField*	sampleIntervalField;
 	IBOutlet NSTextField*	triggerLablel1Field;
 	IBOutlet NSTextField*	triggerLablel2Field;
-	IBOutlet ORPlotter1D*	plotter;
+	IBOutlet ORPlotView*	plotter;
 	IBOutlet NSTextField*	baseAddressField;
 	IBOutlet NSButton*		loadDialogButton;
 	IBOutlet NSButton*		readOneButton;
@@ -110,6 +110,9 @@
 - (IBAction) get1Waveform:(id)sender;
 - (IBAction) report:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

@@ -422,23 +422,27 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel value:(float)aValue
 {
-	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %f\r\n",aChannel+1,aValue]];
-	if(!lastRequest)[self processOneCommandFromQueue];	
+	if([serialPort isOpen]){
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %f\r\n",aChannel+1,aValue]];
+		if(!lastRequest)[self processOneCommandFromQueue];	
+	}
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel boolValue:(BOOL)aValue
 {
 	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d %d\r\n",aChannel+1,aValue]];
-	if(!lastRequest)[self processOneCommandFromQueue];	
+	if(!lastRequest && [serialPort isOpen])[self processOneCommandFromQueue];	
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel
 {
-	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-	[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d\r\n",aChannel+1]];
-	if(!lastRequest)[self processOneCommandFromQueue];	
+	if([serialPort isOpen]){
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		[cmdQueue addObject:[aCommand stringByAppendingFormat:@" %d\r\n",aChannel+1]];
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
 }
 
 - (void) sendCmd:(NSString*)aCommand
@@ -530,7 +534,10 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 		[serialPort setDelegate:self];
 
 	}
-    else      [serialPort close];
+    else {
+		[serialPort close];
+		[cmdQueue removeAllObjects];
+	}
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmrelHVModelPortStateChanged object:self];
     

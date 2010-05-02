@@ -22,9 +22,10 @@
 #pragma mark ¥¥¥Imported Files
 #import "OR2DHisto.h"
 #import "OR2DHistoController.h"
-#import "ORPlotter2D.h"
+#import "OR2DHistoPlot.h"
 #import "ORAxis.h"
-
+#import "ORPlotView.h"
+#import "OR2DRoiController.h"
 
 @implementation OR2DHistoController
 
@@ -36,50 +37,81 @@
     return self;
 }
 
+- (void) dealloc
+{
+	[roiController release];
+	[super dealloc];
+}
+
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [[plotter xScale] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
-    [[plotter zScale] setRngLimitsLow:0 withHigh:0xffffffff withMinRng:16];
-    [[plotter yScale] setLog:NO];
+    [[plotView xScale] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
+    [[plotView yScale] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
+    [[plotView zScale] setRngLimitsLow:0 withHigh:0xffffffff withMinRng:16];
+    [[plotView yScale] setLog:NO];
 	
-	[plotter setBackgroundColor:[NSColor colorWithCalibratedRed:1. green:1. blue:1. alpha:1]];
-	[plotter setGridColor:[NSColor grayColor]];
-	[plotter  setUseGradient:YES];
+	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:1. green:1. blue:1. alpha:1]];
 	
     NSSize minSize = [[self window] minSize];
     minSize.width = 335;
     minSize.height = 335;
     [[self window] setMinSize:minSize];
 	[titleField setStringValue:[model fullNameWithRunNumber]];
-}
+	
+	[plotView setShowGrid: NO];
+	OR2DHistoPlot* aPlot = [[OR2DHistoPlot alloc] initWithTag:0 andDataSource:self];
+	[aPlot setRoi: [[model rois] objectAtIndex:0]];
+	[plotView addPlot: aPlot];
+	[aPlot release];
+	
+	roiController = [[OR2dRoiController panel] retain];
+	[roiView addSubview:[roiController view]];
+	
+	[self plotOrderDidChange:plotView];
 
+}
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot
+{
+	return [model rois];
+}
 - (void) dataSetChanged:(NSNotification*)aNotification
 {
 	//[titleField setStringValue:[model fullNameWithRunNumber]];
 	[super dataSetChanged:aNotification];
 }
 
-- (IBAction)logLin:(NSToolbarItem*)item 
+- (void) plotOrderDidChange:(id)aPlotView
 {
-	[[plotter zScale] setLog:![[plotter zScale] isLog]];
+	id topRoi = [(ORPlotWithROI*)[aPlotView topPlot] roi];
+	[roiController setModel:topRoi];
+}
+
+- (BOOL) plotterShouldShowRoi:(id)aPlot
+{
+	if([analysisDrawer state] == NSDrawerOpenState)return YES;
+	else return NO;
+}
+
+- (IBAction) logLin:(id)sender 
+{
+	[[plotView zScale] setLog:![[plotView zScale] isLog]];
 }
 
 - (IBAction) zoomIn:(id)sender      
 { 
-    [[plotter xScale] zoomIn:sender];
-    [[plotter yScale] zoomIn:sender];
+    [[plotView xScale] zoomIn:sender];
+    [[plotView yScale] zoomIn:sender];
 }
+
 - (IBAction) zoomOut:(id)sender     
 { 
-    [[plotter xScale] zoomOut:sender];
-    [[plotter yScale] zoomOut:sender];
+    [[plotView xScale] zoomOut:sender];
+    [[plotView yScale] zoomOut:sender];
 }
 
 - (IBAction) hideShowControls:(id)sender
 {
-    [plotter setIgnoreDoNotDrawFlag:YES];
     unsigned int oldResizeMask = [containingView autoresizingMask];
     [containingView setAutoresizingMask:NSViewMinYMargin];
 
@@ -97,7 +129,6 @@
     [[self window] setMinSize:minSize];
     [self resizeWindowToSize:aFrame.size];
     [containingView setAutoresizingMask:oldResizeMask];
-    [plotter setIgnoreDoNotDrawFlag:NO];
 
 }
 
@@ -105,16 +136,16 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender
 {
-	[plotter copy:sender];
+	[plotView copy:sender];
 }
 
 #pragma mark ¥¥¥Data Source
-- (unsigned long*) plotter:(id) aPlotter dataSet:(int)set numberBinsPerSide:(unsigned short*)xValue
+- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
 {
     return [model getDataSetAndNumBinsPerSize:xValue];
 }
 
-- (void) plotter:(id) aPlotter dataSet:(int)set xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY
+- (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY
 {
     [model getXMin:aMinX xMax:aMaxX yMin:aMinY yMax:aMaxY];
 }

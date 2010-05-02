@@ -21,7 +21,8 @@
 
 #import "ORAcqirisDC440Controller.h"
 #import "ORAcqirisDC440Model.h"
-#import "ORPlotter1D.h"
+#import "ORPlot.h"
+#import "ORPlotView.h"
 #import "ORAxis.h"
 #import "SBC_Link.h"
 #import "ORRate.h"
@@ -51,8 +52,18 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[plotter setUseGradient:YES];
 	[[plotter yScale] setRngLimitsLow:-32768 withHigh:32768 withMinRng:128];
+
+	ORPlot* aPlot;
+	aPlot = [[ORPlot alloc] initWithTag:0 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[aPlot setLineColor:[NSColor redColor]];
+	[aPlot release];
+
+	aPlot = [[ORPlot alloc] initWithTag:1 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[aPlot setLineColor:[NSColor blueColor]];
+	[aPlot release];
 }
 
 #pragma mark ¥¥¥Notifications
@@ -549,26 +560,19 @@
 	return [[[[model sampleRateGroup] rates] objectAtIndex:tag] rate];
 }
 
-- (BOOL)   	willSupplyColors
+- (int) numberPointsInPlot:(id)aPlotter;
 {
-	return NO;
-}
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-	return 2;
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
+	int set = [aPlotter tag];
 	int len =  [model lengthBuffer:set];
 	if(len<0)return 0;
 	else return len;
 }
 
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	return [model buffer:x set:set];
+	int set = [aPlotter tag];
+	*yValue =  [model buffer:i set:set];
+	*xValue = i;
 }
 
 @end

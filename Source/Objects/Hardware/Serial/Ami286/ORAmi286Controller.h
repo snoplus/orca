@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORLevelMonitor;
 
 @interface ORAmi286Controller : OrcaObjectController
@@ -48,7 +48,7 @@
     IBOutlet NSMatrix*			hiFillPointMatrix;
     IBOutlet NSMatrix*			lowFillPointMatrix;
     IBOutlet NSMatrix*			timeMatrix;
-	IBOutlet ORPlotter1D*		plotter0;
+	IBOutlet ORPlotView*		plotter0;
 	IBOutlet NSPopUpButton*		fillStatePU0;
 	IBOutlet NSPopUpButton*		fillStatePU1;
 	IBOutlet NSTextField*		alarmStatus0;
@@ -131,6 +131,10 @@
 - (void) setLevelMonitor:(ORLevelMonitor*)aMonitor hiFillPoint:(float)aValue;
 - (float) levelMonitorHiFillPoint:(id)aLevelMonitor;
 - (float) levelMonitorLowFillPoint:(id)aLevelMonitor;
+
+- (NSColor*) colorForDataSet:(int)set;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

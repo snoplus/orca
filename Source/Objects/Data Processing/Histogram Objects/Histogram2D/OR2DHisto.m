@@ -22,6 +22,8 @@
 #import "OR2DHisto.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
+#import "OR2dRoi.h"
+
 #import <math.h>
 @implementation OR2DHisto
 
@@ -38,6 +40,7 @@
 - (void) dealloc
 {
     [self freeHistogram];
+	[rois release];
     [super dealloc];
 }
 
@@ -352,16 +355,37 @@ static NSString *OR2DHistoNumberXBins	= @"OR2DHistoNumberXBins";
     [[self undoManager] disableUndoRegistration];
     
     [self setNumberBinsPerSide:[decoder decodeIntForKey:OR2DHistoNumberXBins]];
-    
+ 	rois = [[decoder decodeObjectForKey:@"rois"] retain];
+   
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
+#pragma mark ¥¥¥Data Source
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:numberBinsPerSide forKey:OR2DHistoNumberXBins];
+    [encoder encodeObject:rois forKey:@"rois"];
 }
 
+- (NSMutableArray*) rois
+{
+	if(!rois){
+		rois = [[NSMutableArray alloc] init];
+		[rois addObject:[[[OR2dRoi alloc] initAtPoint:NSMakePoint(50,50)] autorelease]];
+	}
+	return rois;
+}
+
+- (unsigned long*) plotter:(id)aPlotter numberBinsPerSide:(unsigned short*)xValue
+{
+    return [self getDataSetAndNumBinsPerSize:xValue];
+}
+
+- (void) plotter:(id)aPlotter xMin:(unsigned short*)aMinX xMax:(unsigned short*)aMaxX yMin:(unsigned short*)aMinY yMax:(unsigned short*)aMaxY
+{
+    [self getXMin:aMinX xMax:aMaxX yMin:aMinY yMax:aMaxY];
+}
 
 @end
