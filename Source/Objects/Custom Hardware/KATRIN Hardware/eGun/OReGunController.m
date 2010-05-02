@@ -21,7 +21,8 @@
 
 #import "OReGunController.h"
 #import "OReGunModel.h"
-#import "ORPlotter2D.h"
+#import "ORVectorPlot.h"
+#import "ORPlotView.h"
 #import "ORAxis.h"
 #import "ORIP220Model.h"
 #import "ORObjectProxy.h"
@@ -46,10 +47,16 @@
 
 - (void) awakeFromNib
 {
-    [xyPlot setVectorMode:YES];
-    [xyPlot setUseGradient:YES];
 	[[xyPlot xScale] setInteger:YES];
+	[xyPlot setUseGradient:NO];
     [xyPlot setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
+	[xyPlot setShowGrid:NO];
+	
+	ORVectorPlot* aPlot;
+	aPlot = [[ORVectorPlot alloc] initWithTag:0 andDataSource:self];
+	[xyPlot addPlot: aPlot];
+	[aPlot release];
+	
 	[super awakeFromNib];
 }
 
@@ -95,12 +102,7 @@
                      selector : @selector(absMotionChanged:)
                          name : OReGunModelAbsMotionChanged
                        object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(mousePositionReported:)
-                         name : ORPlotter2DMousePosition
-                       object : xyPlot];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(chanChanged:)
                          name : OReGunModelChanXChanged
@@ -317,16 +319,6 @@
 	[yPositionField setFloatValue:(xyVoltage.y + 0.01*xyVoltage.x)*millimetersPerVolt];
 }
 
-- (void) mousePositionReported: (NSNotification*)aNote
-{
-    if((GetCurrentKeyModifiers() & shiftKey)){
-		float millimetersPerVolt = [model millimetersPerVolt];
-		float x = [[[aNote userInfo] objectForKey:@"x"]floatValue]/millimetersPerVolt;
-		float y = [[[aNote userInfo] objectForKey:@"y"]floatValue]/millimetersPerVolt;
-        [model setCmdPosition:NSMakePoint(x,y)];
-    }
-}
-
 #pragma mark ***Actions
 
 - (void) stepTimeTextFieldAction:(id)sender
@@ -423,29 +415,26 @@
 	[model degauss];
 }
 
-
-
 #pragma mark ***Plotter delegate methods
-- (unsigned long) plotter:(id)aPlotter numPointsInSet:(int)set
+- (int)	numberPointsInPlot:(id)aPlotter
 {
     return [model validTrackCount];
 }
 
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
 {
 	float millimetersPerVolt = [model millimetersPerVolt];
     if(index>kNumTrackPoints){
         *xValue = 0;
         *yValue = 0;
-        return NO;
+		return;
     }
     NSPoint track = [model track:index];
     *xValue = track.x*millimetersPerVolt;
     *yValue = track.y*millimetersPerVolt;
-    return YES;    
 }
 
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue
+- (BOOL) plotter:(id)aPlotter crossHairX:(double*)xValue crossHairY:(double*)yValue
 {
 	float millimetersPerVolt = [model millimetersPerVolt];
 	NSPoint voltage = [model xyVoltage];
