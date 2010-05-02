@@ -21,7 +21,6 @@
 
 #import "ORHP6622aController.h"
 #import "ORHP6622aModel.h"
-#import "ORPlotter1D.h"
 #import "ORAxis.h"
 
 

@@ -20,7 +20,7 @@
 
 @class ORTimedTextField;
 @class ORScriptView;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORFilterController : OrcaObjectController {
 
@@ -43,7 +43,7 @@
 	IBOutlet NSButton*			runButton;
 	IBOutlet NSButton*			loadSaveButton;
 	IBOutlet NSButton*			timerEnabledCB;
-	IBOutlet ORPlotter1D*		timePlot;
+	IBOutlet ORPlotView*		timePlot;
 	IBOutlet NSButton*			addInputButton;
 	IBOutlet NSButton*			removeInputButton;
 	IBOutlet NSButton*			parseButton;
@@ -63,6 +63,7 @@
 - (void) timerEnabledChanged:(NSNotification*)aNote;
 - (void) updateTiming:(NSNotification*)aNote;
 - (void) displayValuesChanged:(NSNotification*)aNote;
+- (void) inputValuesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) listDecoders:(id)sender;
@@ -88,5 +89,7 @@
 - (int)  numberOfRowsInTableView:(NSTableView *)aTable;
 - (id) tableView:(NSTableView *)aTable objectValueForTableColumn:(NSTableColumn *)aCol row:(int)aRow;
 - (void) tableView:(NSTableView*)aTable setObjectValue:(id)aData forTableColumn:(NSTableColumn*)aCol row:(int)aRow;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

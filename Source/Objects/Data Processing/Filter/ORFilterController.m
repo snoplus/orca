@@ -25,8 +25,9 @@
 #import "ORTimedTextField.h"
 #import "ORScriptView.h"
 #import "ORScriptRunner.h"
-#import "ORPlotter1D.h"
 #import "ORDataPacket.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
 
 @interface ORFilterController (private)
 - (void) pluginPathSelectDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -52,6 +53,10 @@
 	[helpView readRTFDFromFile:path];
 	[scriptView setSyntaxDefinitionFilename:@"FilterSyntaxDefinition"];
 	[scriptView recolorCompleteFile:self];
+	
+	OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
+	[timePlot addPlot: aPlot];
+	[aPlot release];
 }
 
 
@@ -130,6 +135,12 @@
                      selector : @selector(usePluginChanged:)
                          name : ORFilterModelUsePluginChanged
 						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(inputValuesChanged:)
+                         name : ORFilterInputValuesChanged
+						object: model];
+	
 
 }
 
@@ -142,6 +153,7 @@
 	[self pluginPathChanged:nil];
 	[self pluginValidChanged:nil];
 	[self usePluginChanged:nil];
+	[self inputValuesChanged:nil];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
@@ -233,6 +245,11 @@
 - (void) displayValuesChanged:(NSNotification*)aNote
 {
 	[outputVariablesTableView reloadData];
+}
+
+- (void) inputValuesChanged:(NSNotification*)aNote
+{
+	[inputVariablesTableView reloadData];
 }
 
 #pragma mark •••Actions
@@ -420,14 +437,15 @@
 	else [model saveFile];
 }
 
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter;
 {
     return kFilterTimeHistoSize;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	return [model processingTimeHist:x];
+	*yValue = [model processingTimeHist:i];
+	*xValue = i;
 }
 
 

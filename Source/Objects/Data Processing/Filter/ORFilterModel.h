@@ -148,6 +148,7 @@
 - (void) setOutput:(int)index withValue:(unsigned long)aValue;
 - (void) resetDisplays;
 - (void) scheduledUpdate;
+- (void) refreshInputs;
 
 #pragma mark •••Parsers
 - (void) parseFile:(NSString*)aPath;
@@ -173,6 +174,7 @@ extern NSString* ORFilterLastFileChanged;
 extern NSString* ORFilterNameChanged;
 extern NSString* ORFilterLastFileChangedChanged;
 extern NSString* ORFilterScriptChanged;
+extern NSString* ORFilterInputValuesChanged;
 extern NSString* ORFilterDisplayValuesChanged;
 extern NSString* ORFilterTimerEnabledChanged;
 extern NSString* ORFilterUpdateTiming;

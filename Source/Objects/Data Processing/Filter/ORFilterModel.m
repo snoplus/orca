@@ -38,6 +38,7 @@ static NSString* ORFilterFilteredConnector  = @"Filtered Out Connector";
 
 NSString* ORFilterLastFileChanged			= @"ORFilterLastFileChanged";
 NSString* ORFilterNameChanged				= @"ORFilterNameChanged";
+NSString* ORFilterInputValuesChanged		= @"ORFilterInputValuesChanged";
 NSString* ORFilterDisplayValuesChanged		= @"ORFilterDisplayValuesChanged";
 NSString* ORFilterBreakChainChanged			= @"ORFilterBreakChainChanged";
 NSString* ORFilterLastFileChangedChanged	= @"ORFilterLastFileChangedChanged";
@@ -226,6 +227,11 @@ int filterGraph(nodeType*);
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterModelPluginPathChanged object:self];
 	
+}
+
+- (void) refreshInputs
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterInputValuesChanged object:self];
 }
 
 - (NSMutableArray*) inputValues

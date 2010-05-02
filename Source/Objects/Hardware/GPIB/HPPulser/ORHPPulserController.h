@@ -22,7 +22,7 @@
 
 #import "ORGpibDeviceController.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORAxis;
 
 @interface ORHPPulserController : ORGpibDeviceController {
@@ -45,8 +45,6 @@
     IBOutlet NSStepper* 	burstPhaseStepper;
     IBOutlet NSTextField* 	burstCyclesField;
     IBOutlet NSStepper* 	burstCyclesStepper;
-//    IBOutlet NSTextField* 	totalWidthField;
-//    IBOutlet NSStepper* 	totalWidthStepper;
     IBOutlet NSMatrix*          triggerModeMatrix;
     IBOutlet NSButton* 		triggerButton;	
 
@@ -59,11 +57,10 @@
 
 
     IBOutlet NSTextField* 	voltageDisplay;
-//    IBOutlet NSTextField* 	totalWidthDisplay;
     IBOutlet NSTextField* 	burstRateDisplay;
     IBOutlet NSButton*		loadParamsButton;	
 
-    IBOutlet ORPlotter1D*	plotter;
+    IBOutlet ORPlotView*	plotter;
     IBOutlet ORAxis*		yScale;
     IBOutlet ORAxis*		xScale;
 
@@ -104,8 +101,8 @@
 
 - (void) downloadWaveform;
 
-- (int)		numberOfPointsInPlot:(ORPlotter1D*)aPlotter dataSet:(int)set;
-- (float)  	plotter:(ORPlotter1D *) aPlotter  dataSet:(int)set dataValue:(int) x;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 - (void) setButtonStates;
 

@@ -23,7 +23,7 @@
 #import "OrcaObjectController.h"
 #import "ORGretina4Model.h"
 @class ORValueBar;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORGretina4Controller : OrcaObjectController 
 {
@@ -100,7 +100,7 @@
     IBOutlet ORValueBar*    totalRate;
     IBOutlet NSButton*      rateLogCB;
     IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotter1D*   timeRatePlot;
+    IBOutlet ORPlotView*    timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
 	
     //register page
@@ -213,10 +213,9 @@
 - (IBAction) setEnableStatusOfAllChannelsWhileInitAction:(id)sender; //jing's code
 
 #pragma mark ¥¥¥Data Source
-- (double)  getBarValue:(int)tag;
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (double)  getBarValue:(int)tag;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

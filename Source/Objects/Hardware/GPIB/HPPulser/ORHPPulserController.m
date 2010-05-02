@@ -21,7 +21,8 @@
 
 #import "ORHPPulserController.h"
 #import "ORHPPulserModel.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "ORPlot.h"
 #import "ORAxis.h"
 
 
@@ -41,6 +42,11 @@
 {
 	[super awakeFromNib];
 	[yScale setRngLimitsLow:-1 withHigh:1 withMinRng:2];
+	[plotter setShowGrid:NO];
+	ORPlot* aPlot;
+	aPlot= [[ORPlot alloc] initWithTag:0 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[aPlot release];
 }
 
 
@@ -729,15 +735,16 @@
 }
 
 
-- (int)	numberOfPointsInPlot:(ORPlotter1D*)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
     return [model numPoints];
 }
 
-- (float) plotter:(ORPlotter1D *) aPlotter  dataSet:(int)set dataValue:(int) index
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
     float* d = (float*)[[model waveform] mutableBytes];
-    return d[index];
+    *yValue = (double)d[i];
+	*xValue = i;
 }
 
 - (void) setButtonStates
