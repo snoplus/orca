@@ -8,21 +8,31 @@
 		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
+			<object class="NSArray" key="dict.sortedKeys">
 				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string>com.yourcompany.OrcaPlugin</string>
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>762</string>
+				<string>1</string>
 			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="21"/>
+			<integer value="380"/>
 		</object>
-		<reference key="IBDocument.PluginDependencies" ref="0"/>
+		<object class="NSArray" key="IBDocument.PluginDependencies">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<string>com.yourcompany.OrcaPlugin</string>
+			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<reference key="dict.sortedKeys" ref="0"/>
+			<object class="NSArray" key="dict.sortedKeys" id="0">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 			</object>
@@ -933,66 +943,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 												</object>
 											</object>
 										</object>
-										<object class="ORPlotter1D" id="76232143">
-											<reference key="NSNextResponder" ref="655704574"/>
-											<int key="NSvFlags">256</int>
-											<string key="NSFrame">{{50, 49}, {268, 59}}</string>
-											<reference key="NSSuperview" ref="655704574"/>
-											<object class="NSMutableDictionary" key="attributes">
-												<bool key="EncodedWithXMLCoder">YES</bool>
-												<object class="NSArray" key="dict.sortedKeys">
-													<bool key="EncodedWithXMLCoder">YES</bool>
-													<string>ORPlotter1DAverageWindow</string>
-													<string>ORPlotterBackgroundColor</string>
-													<string>ORPlotterDataColor</string>
-													<string>ORPlotterGridColor</string>
-												</object>
-												<object class="NSMutableArray" key="dict.values">
-													<bool key="EncodedWithXMLCoder">YES</bool>
-													<integer value="10"/>
-													<object class="NSMutableData">
-														<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMDhAJmZgEBhg</bytes>
-													</object>
-													<object class="NSMutableDictionary">
-														<bool key="EncodedWithXMLCoder">YES</bool>
-														<object class="NSArray" key="dict.sortedKeys">
-															<bool key="EncodedWithXMLCoder">YES</bool>
-															<integer value="0"/>
-															<integer value="1"/>
-															<integer value="2"/>
-															<integer value="3"/>
-															<integer value="4"/>
-															<integer value="5"/>
-														</object>
-														<object class="NSMutableArray" key="dict.values">
-															<bool key="EncodedWithXMLCoder">YES</bool>
-															<object class="NSMutableData">
-																<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMBhARmZmZmAQAAAYY</bytes>
-															</object>
-															<object class="NSMutableData">
-																<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMBhARmZmZmAAEAAYY</bytes>
-															</object>
-															<object class="NSMutableData">
-																<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMBhARmZmZmAAABAYY</bytes>
-															</object>
-															<object class="NSMutableData">
-																<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMBhARmZmZmAQEAAYY</bytes>
-															</object>
-															<object class="NSMutableData">
-																<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMBhARmZmZmg5qZGT+D
-zczMPoPNzEw+AYY</bytes>
-															</object>
-															<object class="NSMutableData">
-																<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMDhAJmZgABhg</bytes>
-															</object>
-														</object>
-													</object>
-													<object class="NSMutableData">
-														<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMDhAJmZoMAAAA/AYY</bytes>
-													</object>
-												</object>
-											</object>
-										</object>
 										<object class="ORTimeAxis" id="823773140">
 											<reference key="NSNextResponder" ref="655704574"/>
 											<int key="NSvFlags">256</int>
@@ -1067,6 +1017,13 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 												<int key="NSPeriodicDelay">200</int>
 												<int key="NSPeriodicInterval">25</int>
 											</object>
+										</object>
+										<object class="NSCustomView" id="882660289">
+											<reference key="NSNextResponder" ref="655704574"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{50, 49}, {268, 59}}</string>
+											<reference key="NSSuperview" ref="655704574"/>
+											<string key="NSClassName">ORPlotView</string>
 										</object>
 									</object>
 									<string key="NSFrame">{{2, 2}, {441, 118}}</string>
@@ -1529,14 +1486,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">errorRatePlot</string>
-						<reference key="source" ref="331248420"/>
-						<reference key="destination" ref="76232143"/>
-					</object>
-					<int key="connectionID">436</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">groupView</string>
 						<reference key="source" ref="331248420"/>
 						<reference key="destination" ref="857886051"/>
@@ -1614,6 +1563,62 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="destination" ref="561269064"/>
 					</object>
 					<int key="connectionID">478</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">yScale</string>
+						<reference key="source" ref="882660289"/>
+						<reference key="destination" ref="44342837"/>
+					</object>
+					<int key="connectionID">505</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">xScale</string>
+						<reference key="source" ref="882660289"/>
+						<reference key="destination" ref="823773140"/>
+					</object>
+					<int key="connectionID">506</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">viewToScale</string>
+						<reference key="source" ref="823773140"/>
+						<reference key="destination" ref="882660289"/>
+					</object>
+					<int key="connectionID">507</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">viewToScale</string>
+						<reference key="source" ref="44342837"/>
+						<reference key="destination" ref="882660289"/>
+					</object>
+					<int key="connectionID">508</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="56283584"/>
+						<reference key="destination" ref="331248420"/>
+					</object>
+					<int key="connectionID">509</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="882660289"/>
+						<reference key="destination" ref="331248420"/>
+					</object>
+					<int key="connectionID">510</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">errorRatePlot</string>
+						<reference key="source" ref="331248420"/>
+						<reference key="destination" ref="882660289"/>
+					</object>
+					<int key="connectionID">511</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1726,9 +1731,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="822818708"/>
 							<reference ref="44342837"/>
-							<reference ref="76232143"/>
 							<reference ref="823773140"/>
 							<reference ref="241218504"/>
+							<reference ref="882660289"/>
 						</object>
 						<reference key="parent" ref="48418495"/>
 					</object>
@@ -2105,11 +2110,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="parent" ref="202409863"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">419</int>
-						<reference key="object" ref="76232143"/>
-						<reference key="parent" ref="202409863"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">423</int>
 						<reference key="object" ref="823773140"/>
 						<reference key="parent" ref="202409863"/>
@@ -2249,127 +2249,251 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="56002989"/>
 						<reference key="parent" ref="479088811"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">504</int>
+						<reference key="object" ref="882660289"/>
+						<reference key="parent" ref="202409863"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="NSArray" key="dict.sortedKeys">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>-3.IBPluginDependency</string>
 					<string>-3.ImportedFromIB2</string>
+					<string>198.IBPluginDependency</string>
 					<string>198.ImportedFromIB2</string>
+					<string>199.IBPluginDependency</string>
 					<string>199.ImportedFromIB2</string>
+					<string>2.IBPluginDependency</string>
 					<string>2.ImportedFromIB2</string>
+					<string>200.IBPluginDependency</string>
 					<string>200.ImportedFromIB2</string>
+					<string>203.IBPluginDependency</string>
 					<string>203.ImportedFromIB2</string>
+					<string>204.IBPluginDependency</string>
 					<string>204.ImportedFromIB2</string>
+					<string>205.IBPluginDependency</string>
 					<string>205.ImportedFromIB2</string>
+					<string>208.IBPluginDependency</string>
 					<string>208.ImportedFromIB2</string>
+					<string>209.IBPluginDependency</string>
 					<string>209.ImportedFromIB2</string>
 					<string>21.IBEditorWindowLastContentRect</string>
+					<string>21.IBPluginDependency</string>
 					<string>21.IBWindowTemplateEditedContentRect</string>
 					<string>21.ImportedFromIB2</string>
 					<string>21.NSWindowTemplate.visibleAtLaunch</string>
 					<string>21.windowTemplate.hasMinSize</string>
 					<string>21.windowTemplate.minSize</string>
+					<string>210.IBPluginDependency</string>
 					<string>210.ImportedFromIB2</string>
+					<string>229.IBPluginDependency</string>
 					<string>229.ImportedFromIB2</string>
+					<string>258.IBPluginDependency</string>
 					<string>258.ImportedFromIB2</string>
+					<string>259.IBPluginDependency</string>
 					<string>259.ImportedFromIB2</string>
+					<string>261.IBPluginDependency</string>
 					<string>261.ImportedFromIB2</string>
+					<string>274.IBPluginDependency</string>
 					<string>274.ImportedFromIB2</string>
+					<string>275.IBPluginDependency</string>
 					<string>275.ImportedFromIB2</string>
+					<string>276.IBPluginDependency</string>
 					<string>276.ImportedFromIB2</string>
+					<string>277.IBPluginDependency</string>
 					<string>277.ImportedFromIB2</string>
+					<string>278.IBPluginDependency</string>
 					<string>278.ImportedFromIB2</string>
+					<string>279.IBPluginDependency</string>
 					<string>279.ImportedFromIB2</string>
+					<string>280.IBPluginDependency</string>
 					<string>280.ImportedFromIB2</string>
+					<string>281.IBPluginDependency</string>
 					<string>281.ImportedFromIB2</string>
+					<string>282.IBPluginDependency</string>
 					<string>282.ImportedFromIB2</string>
+					<string>283.IBPluginDependency</string>
 					<string>283.ImportedFromIB2</string>
+					<string>309.IBPluginDependency</string>
 					<string>309.ImportedFromIB2</string>
+					<string>311.IBPluginDependency</string>
 					<string>311.ImportedFromIB2</string>
+					<string>312.IBPluginDependency</string>
 					<string>312.ImportedFromIB2</string>
+					<string>316.IBPluginDependency</string>
 					<string>316.ImportedFromIB2</string>
 					<string>318.ImportedFromIB2</string>
+					<string>329.IBPluginDependency</string>
 					<string>329.ImportedFromIB2</string>
+					<string>350.IBPluginDependency</string>
 					<string>350.ImportedFromIB2</string>
+					<string>380.IBPluginDependency</string>
 					<string>380.ImportedFromIB2</string>
+					<string>399.IBPluginDependency</string>
 					<string>399.ImportedFromIB2</string>
+					<string>401.IBPluginDependency</string>
 					<string>401.ImportedFromIB2</string>
+					<string>402.IBPluginDependency</string>
 					<string>402.ImportedFromIB2</string>
+					<string>403.IBPluginDependency</string>
 					<string>403.ImportedFromIB2</string>
+					<string>412.IBPluginDependency</string>
 					<string>412.ImportedFromIB2</string>
 					<string>413.IBAttributePlaceholdersKey</string>
+					<string>413.IBPluginDependency</string>
 					<string>413.ImportedFromIB2</string>
+					<string>414.IBPluginDependency</string>
 					<string>414.ImportedFromIB2</string>
 					<string>417.IBAttributePlaceholdersKey</string>
+					<string>417.IBPluginDependency</string>
 					<string>417.ImportedFromIB2</string>
-					<string>419.IBAttributePlaceholdersKey</string>
-					<string>419.ImportedFromIB2</string>
 					<string>423.IBAttributePlaceholdersKey</string>
+					<string>423.IBPluginDependency</string>
 					<string>423.ImportedFromIB2</string>
+					<string>433.IBPluginDependency</string>
 					<string>433.ImportedFromIB2</string>
+					<string>439.IBPluginDependency</string>
 					<string>439.ImportedFromIB2</string>
+					<string>454.IBPluginDependency</string>
 					<string>454.ImportedFromIB2</string>
+					<string>455.IBPluginDependency</string>
 					<string>455.ImportedFromIB2</string>
+					<string>456.IBPluginDependency</string>
 					<string>456.ImportedFromIB2</string>
+					<string>457.IBPluginDependency</string>
 					<string>457.ImportedFromIB2</string>
+					<string>458.IBPluginDependency</string>
 					<string>458.ImportedFromIB2</string>
+					<string>459.IBPluginDependency</string>
 					<string>459.ImportedFromIB2</string>
+					<string>460.IBPluginDependency</string>
 					<string>460.ImportedFromIB2</string>
+					<string>461.IBPluginDependency</string>
 					<string>461.ImportedFromIB2</string>
+					<string>462.IBPluginDependency</string>
 					<string>462.ImportedFromIB2</string>
+					<string>463.IBPluginDependency</string>
 					<string>463.ImportedFromIB2</string>
+					<string>465.IBPluginDependency</string>
 					<string>465.ImportedFromIB2</string>
+					<string>467.IBPluginDependency</string>
 					<string>467.ImportedFromIB2</string>
+					<string>468.IBPluginDependency</string>
 					<string>468.ImportedFromIB2</string>
+					<string>469.IBPluginDependency</string>
 					<string>469.ImportedFromIB2</string>
+					<string>480.IBPluginDependency</string>
+					<string>481.IBPluginDependency</string>
+					<string>482.IBPluginDependency</string>
+					<string>483.IBPluginDependency</string>
+					<string>484.IBPluginDependency</string>
+					<string>485.IBPluginDependency</string>
+					<string>486.IBPluginDependency</string>
+					<string>487.IBPluginDependency</string>
+					<string>488.IBPluginDependency</string>
+					<string>489.IBPluginDependency</string>
+					<string>490.IBPluginDependency</string>
+					<string>491.IBPluginDependency</string>
+					<string>492.IBPluginDependency</string>
+					<string>493.IBPluginDependency</string>
+					<string>494.IBPluginDependency</string>
+					<string>495.IBPluginDependency</string>
+					<string>496.IBPluginDependency</string>
+					<string>497.IBPluginDependency</string>
+					<string>498.IBPluginDependency</string>
+					<string>499.IBPluginDependency</string>
+					<string>500.IBPluginDependency</string>
+					<string>501.IBPluginDependency</string>
+					<string>502.IBPluginDependency</string>
+					<string>503.IBPluginDependency</string>
+					<string>504.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>{{21, 489}, {435, 333}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{21, 489}, {435, 333}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<object class="NSMutableDictionary">
 						<string key="NS.key.0">ToolTip</string>
@@ -2379,7 +2503,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string key="toolTip">Drag LAMS here for Dual-port mem access in Read-out list</string>
 						</object>
 					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<object class="NSMutableDictionary">
 						<string key="NS.key.0">ToolTip</string>
@@ -2389,15 +2515,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string key="toolTip">Y Scale</string>
 						</object>
 					</object>
-					<boolean value="YES"/>
-					<object class="NSMutableDictionary">
-						<string key="NS.key.0">ToolTip</string>
-						<object class="IBToolTipAttribute" key="NS.object.0">
-							<string key="name">ToolTip</string>
-							<reference key="object" ref="76232143"/>
-							<string key="toolTip">Plotter</string>
-						</object>
-					</object>
+					<string>com.yourcompany.OrcaPlugin</string>
 					<boolean value="YES"/>
 					<object class="NSMutableDictionary">
 						<string key="NS.key.0">ToolTip</string>
@@ -2407,23 +2525,65 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string key="toolTip">Time Scale</string>
 						</object>
 					</object>
+					<string>com.yourcompany.OrcaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -2442,7 +2602,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">503</int>
+			<int key="maxID">511</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2944,23 +3104,100 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="437183754">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="831964679">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter1D.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dFit.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter2D.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dFitController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dRoi.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dRoiController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR2dRoi.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORFFT.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORFFTController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORXYFit.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/OR2DHistoPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="269113739">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlotView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlotWithROI.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORTimeSeriesPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORVectorPlot.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -3078,22 +3315,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORCardContainerView</string>
 					<string key="superclassName">ORGroupView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBUserSource</string>
-						<string key="minorKey"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORFlippedView</string>
-					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Misc Objects/Views/FlippedView/ORFlippedView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORFlippedView</string>
-					<string key="superclassName">NSView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
@@ -3236,7 +3457,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
-							<string>ORPlotter1D</string>
+							<string>ORPlotView</string>
 							<string>ORGroupView</string>
 							<string>NSStepper</string>
 							<string>NSTextField</string>
@@ -3285,64 +3506,26 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ORPlotter</string>
+					<string key="className">ORPlotView</string>
 					<string key="superclassName">NSView</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>analyze:</string>
-							<string>publishToPDF:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>analysisDrawer</string>
-							<string>analysisView</string>
-							<string>mDataSource</string>
-							<string>mXScale</string>
-							<string>mYScale</string>
-							<string>viewForPDF</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSDrawer</string>
-							<string>ORFlippedView</string>
-							<string>id</string>
-							<string>ORAxis</string>
-							<string>ORAxis</string>
-							<string>NSView</string>
-						</object>
-					</object>
-					<reference key="sourceIdentifier" ref="437183754"/>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORPlotter1D</string>
-					<string key="superclassName">ORPlotter</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>addGateAction:</string>
-							<string>autoScale:</string>
-							<string>averageWindowAction:</string>
+							<string>autoScaleX:</string>
+							<string>autoScaleY:</string>
+							<string>autoScaleZ:</string>
+							<string>autoscaleAll:</string>
 							<string>centerOnPeak:</string>
-							<string>clearActiveCurveGates:</string>
-							<string>clearActiveGate:</string>
-							<string>clearAllGates:</string>
 							<string>copy:</string>
-							<string>differentiateAction:</string>
+							<string>logLin:</string>
+							<string>publishToPDF:</string>
 							<string>refresh:</string>
-							<string>removeGateAction:</string>
 							<string>resetScales:</string>
-							<string>xAndYAutoScale:</string>
+							<string>zoomIn:</string>
+							<string>zoomOut:</string>
+							<string>zoomXYIn:</string>
+							<string>zoomXYOut:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3358,23 +3541,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<reference key="sourceIdentifier" ref="831964679"/>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORPlotter1D</string>
-					<string key="superclassName">ORPlotter</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>analyze:</string>
-							<string>savePDF:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -3383,33 +3549,26 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>analysisDrawer</string>
-							<string>analysisView</string>
-							<string>mDataSource</string>
-							<string>mXScale</string>
-							<string>mYScale</string>
+							<string>colorScale</string>
+							<string>delegate</string>
+							<string>titleField</string>
+							<string>viewForPDF</string>
+							<string>xScale</string>
+							<string>yScale</string>
+							<string>zScale</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSDrawer</string>
-							<string>ORFlippedView</string>
 							<string>id</string>
-							<string>ORAxis</string>
-							<string>ORAxis</string>
+							<string>id</string>
+							<string>NSTextField</string>
+							<string>NSView</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBUserSource</string>
-						<string key="minorKey"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORTimeAxis</string>
-					<string key="superclassName">ORAxis</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORTimeAxis.h</string>
-					</object>
+					<reference key="sourceIdentifier" ref="269113739"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORTimeAxis</string>
@@ -3579,14 +3738,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="786134750">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSControl.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSDrawer</string>
-					<string key="superclassName">NSResponder</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="626778178">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSDrawer.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -4052,7 +4203,10 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSWindow</string>
-					<reference key="sourceIdentifier" ref="626778178"/>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSDrawer.h</string>
+					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSWindow</string>
