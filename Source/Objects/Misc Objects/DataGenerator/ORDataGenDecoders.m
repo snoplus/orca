@@ -164,13 +164,19 @@ static NSString* kCardKey[8] = {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = ExtractLength(*ptr);
 	NSData* data = [NSData dataWithBytes:&ptr[2] length:(length-2)*sizeof(long)];
-    [aDataSet loadWaveform:data offset:0 unitSize:sizeof(long) sender:self withKeys:@"DataGenWaveform",
-		kCardKey[ShiftAndExtract(ptr[1],16,0xf)],
-		kChanKey[ShiftAndExtract(ptr[1],12,0xf)],
-        nil];
+    [aDataSet loadWaveform:data 
+					offset:0 
+				  unitSize:sizeof(long) 
+				startIndex:0 
+					  mask:0x0fffffff 
+			   specialBits:0xf0000000
+					sender:self
+				  withKeys:@"DataGen_Waveform",
+							kCardKey[ShiftAndExtract(ptr[1],16,0xf)],
+							kChanKey[ShiftAndExtract(ptr[1],12,0xf)],
+							nil];
 
-
-    return length; //must return number of longs processed.
+	return length; //must return number of longs processed.
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
@@ -183,5 +189,42 @@ static NSString* kCardKey[8] = {
     return [NSString stringWithFormat:@"%@%@%@",title,card,chan];               
 }
 
+@end
 
+@implementation ORDataGenDecoderForTimeSeries
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+	unsigned long *dataPtr = (unsigned long*)someData;
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theTemp;
+	theTemp.asLong = dataPtr[2];									//encoded as float, use union to convert
+	[aDataSet loadTimeSeries:theTemp.asFloat										
+					  atTime:dataPtr[3]
+					  sender:self 
+					withKeys:@"DataGenTimeSeries",@"Unit 1",
+					nil];
+	
+	return ExtractLength(dataPtr[0]);
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+{
+    NSString* title= @"DataGen\n\n";
+    NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theData;
+	
+	theData.asLong = dataPtr[2];
+	
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	
+	theString = [theString stringByAppendingFormat:@"%.2E %@\n",theData.asFloat,date];
+	
+	return theString;
+}
 @end

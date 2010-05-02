@@ -19,8 +19,7 @@
 //-------------------------------------------------------------
 
 @class ORDetectorView;
-@class ORAxis;
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORColorScale;
 @class BiStateView;
 @class ORRunModel;
@@ -36,7 +35,7 @@
     IBOutlet ORDetectorView* detectorView;
     IBOutlet ORColorScale*	primaryColorScale;
     IBOutlet NSButton*		primaryColorAxisLogCB;
-    IBOutlet ORPlotter1D*	ratePlot;
+    IBOutlet ORPlotView*	ratePlot;
     IBOutlet NSButton*		rateLogCB;
     IBOutlet NSTableView*	primaryTableView;
     IBOutlet NSButton*		detectorLockButton;
@@ -60,7 +59,7 @@
 
 	//items in the  details tab view
 	IBOutlet NSPopUpButton*	displayTypePU1;
-    IBOutlet ORPlotter1D*	valueHistogramsPlot;
+    IBOutlet ORPlotView*	valueHistogramsPlot;
 	IBOutlet NSTextField*	histogramTitle;
     IBOutlet NSTableView*	primaryValuesView;
     IBOutlet NSButton*		initButton;
@@ -146,9 +145,8 @@
 - (void) detailsLockChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Data Source For Plots
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter  dataSet:(int)set dataValue:(int) x;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 #pragma mark •••Data Source For Tables
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 

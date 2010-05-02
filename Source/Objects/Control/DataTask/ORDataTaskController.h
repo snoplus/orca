@@ -22,7 +22,7 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORValueBar;
 @class ORScale;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORDataTaskController : OrcaObjectController {
     IBOutlet NSDrawer*      totalListViewDrawer;
@@ -37,7 +37,7 @@
     IBOutlet NSButton*      viewListButton;
     IBOutlet NSButton*      saveAsButton;
     IBOutlet NSButton*      loadListButton;
-	IBOutlet ORPlotter1D*   plotter;
+	IBOutlet ORPlotView*    plotter;
 	IBOutlet NSMatrix*		timeScaleMatrix;
 	IBOutlet NSPopUpButton* refreshRatePU;
     IBOutlet NSButton*      refreshButton;
@@ -93,7 +93,7 @@
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
 
 #pragma mark ¥¥¥Data Source
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter  dataSet:(int)set dataValue:(int) x;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 @end
 

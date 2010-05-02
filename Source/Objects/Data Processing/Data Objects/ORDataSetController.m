@@ -24,7 +24,7 @@
 #import "ORDataSet.h"
 
 #import "ORSubPlotController.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
 #import "ORAxis.h"
 #import "ORHistoModel.h"
 #import "ZFlowLayout.h"
@@ -56,10 +56,10 @@
 {
     [super setModel:aModel];
     if(inited){
-	[self removeSubPlotViews];
-	[[self window] setTitle:[model shortName]];
-	[self modelChanged:nil];
-	[self setUpViews];
+		[self removeSubPlotViews];
+		[[self window] setTitle:[model shortName]];
+		[self modelChanged:nil];
+		[self setUpViews];
     }
 }
 
@@ -78,10 +78,10 @@
     int i;
     int n = [model numberOfChildren];
     for(i=0;i<n;i++){ 
-	ORSubPlotController* subPlotController = [ORSubPlotController panel];
-	[self addSubController:subPlotController];
-	[subPlotController  setModel:[(ORDataSet*)[model childAtIndex:i]data]];
-    }
+		ORSubPlotController* subPlotController = [ORSubPlotController panel];
+		[self addSubController:subPlotController];
+		[subPlotController  setModel:[(ORDataSet*)[model childAtIndex:i]data]];
+	}
 }
 
 
@@ -103,7 +103,7 @@
     NSEnumerator* e = [subControllers objectEnumerator];
    id obj;
    while(obj = [e nextObject]){
-       [[obj plotter] setNeedsDisplay:YES];
+       [[obj plotView] setNeedsDisplay:YES];
     }
 }
 
@@ -128,18 +128,14 @@
     subControllers=newSubControllers;
 }
 
-
-
 #pragma mark ¥¥¥Interface Management
 - (void) updateWindow
 {
    [self modelChanged:nil];
 }
 
-
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-    
 }
 
 #pragma mark ¥¥¥Actions
@@ -164,7 +160,7 @@
     NSEnumerator* e = [subControllers objectEnumerator];
     ORSubPlotController* obj;
     while(obj = [e nextObject]){
-        [[[obj plotter]yScale] setLog:![[[obj plotter]yScale] isLog]];
+        [[[obj plotView] yScale] setLog:![[[obj plotView]yScale] isLog]];
     }
 }
 
@@ -183,5 +179,7 @@
     [view setSizing:ZMakeFlowLayoutSizing( [[aController view] frame].size, 5, ZSpringRight, NO )];
     [view addSubview:[aController view]];
 }
+
+
 
 @end

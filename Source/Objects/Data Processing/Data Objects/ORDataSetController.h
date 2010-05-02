@@ -35,13 +35,9 @@
 - (void) modelChanged:(NSNotification*)aNotification;
 - (void) dataSetRemoved:(NSNotification*)aNote;
 
-#pragma mark ¥¥¥Interface Management
-
 #pragma mark ¥¥¥Actions
 - (IBAction) reLoad:(id)sender;
 - (IBAction) centerOnPeak:(id)sender;
 - (IBAction) toggleLog:(id)sender;
 - (IBAction) autoScale:(id)sender;
-
-
 @end

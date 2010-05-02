@@ -28,13 +28,18 @@
     unsigned long dataId1D;
     unsigned long dataId2D;
     unsigned long dataIdWaveform;
+	unsigned long timeSeriesId;
 	BOOL first;
 	float adcValue;
 	int theta;
+	NSDate* lastTime;
+	float   timeIndex;
 }
+- (unsigned long) timeSeriesId;
 - (unsigned long) dataId1D;
 - (unsigned long) dataId2D;
 - (unsigned long) dataIdWaveform;
+- (void) setTimeSeriesId: (unsigned long) aDataId;
 - (void) setDataId1D: (unsigned long) aDataId;
 - (void) setDataId2D: (unsigned long) aDataId;
 - (void) setDataIdWaveform: (unsigned long) aDataId;

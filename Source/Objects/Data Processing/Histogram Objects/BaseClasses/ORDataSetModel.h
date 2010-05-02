@@ -34,7 +34,6 @@
 }
 
 #pragma mark ¥¥¥Accessors
-- (id) curve:(int)aCurveIndex gate:(int)aGateIndex;
 - (BOOL) paused;
 - (void) setPaused:(BOOL)aPaused;
 - (int) refreshMode;
@@ -88,4 +87,5 @@ extern NSString* ORDataSetModelPausedChanged;
 extern NSString* ORDataSetModelRefreshModeChanged;
 extern NSString* ORDataSetModelRemoved;
 extern NSString* ORDataSetDataChanged;
+extern NSString* ORDataSetCalibrationChanged;
 

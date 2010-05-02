@@ -18,13 +18,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORDataController.h"
 #import "ORDataSetModel.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
 #import "ORAxis.h"
-#import "ORHistoModel.h"
 #import "ORCARootServiceDefs.h"
+
+@interface ORDataController (private)
+- (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+@end
 
 @implementation ORDataController
 
@@ -32,11 +34,10 @@
 {
 	self = [super init];
 	RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
-
 	return self;
 }
 
-- (void)dealloc {
+- (void) dealloc {
     [super dealloc];
 }
 
@@ -45,27 +46,27 @@
     NSSize minSize = [[self window] minSize];
     minSize.height = 300;
     [[self window] setMinSize:minSize];
-    
     [super awakeFromNib];
 }
-- (BOOL)acceptsFirstResponder
+
+- (BOOL) acceptsFirstResponder
 {
     return YES;
 }
 
-- (id) curve:(int)aCurveIndex gate:(int)aGateIndex
+- (id) plotView
 {
-	return [plotter curve:aCurveIndex gate:aGateIndex];
+	return plotView;
 }
 
-- (void)flagsChanged:(NSEvent*)inEvent
+- (void) flagsChanged:(NSEvent*)inEvent
 {
 	[[self window] resetCursorRects];
 }
 
 // this is needed too because the modifiers can change 
 // when it's not main without it being told
-- (void)windowDidBecomeMain:(NSNotification*)inNot
+- (void) windowDidBecomeMain:(NSNotification*)inNot
 {
 	[[self window] resetCursorRects];
 }	
@@ -86,7 +87,6 @@
                      selector : @selector(dataSetRemoved:)
                          name : ORDataSetModelRemoved
                        object : model];
-    
     
     [notifyCenter addObserver : self
                      selector : @selector(dataSetChanged:)
@@ -114,11 +114,6 @@
 					   object : model];
 					   
     [notifyCenter addObserver : self
-					 selector : @selector(serviceResponse:)
-						 name : ORCARootServiceReponseNotification
-					   object : plotter];
-
-    [notifyCenter addObserver : self
 					 selector : @selector(refreshModeChanged:)
 						 name : ORDataSetModelRefreshModeChanged
 					   object : model];
@@ -127,6 +122,17 @@
 					 selector : @selector(pausedChanged:)
 						 name : ORDataSetModelPausedChanged
 					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(calibrationChanged:)
+						 name : ORDataSetCalibrationChanged
+					   object : model];
+	
+
+    [notifyCenter addObserver : self
+					 selector : @selector(serviceResponse:)
+						 name : ORCARootServiceReponseNotification
+					   object : nil];
 	
 }
 
@@ -153,12 +159,14 @@
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotter xScale]){
-		[model setMiscAttributes:[[plotter xScale]attributes] forKey:@"XAttributes"];
+	if(aNotification == nil || [aNotification object] == [plotView xScale]){
+		ORAxis* axis = [plotView xScale];
+		[model setMiscAttributes:[axis attributes] forKey:@"XAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter yScale]){
-		[model setMiscAttributes:[[plotter yScale]attributes] forKey:@"YAttributes"];
+	if(aNotification == nil || [aNotification object] == [plotView yScale]){
+		ORAxis* axis = [plotView yScale];
+		[model setMiscAttributes:[axis attributes] forKey:@"YAttributes"];
 	};
 }
 
@@ -170,27 +178,35 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes"];
 		if(attrib){
-			[[plotter xScale] setAttributes:attrib];
-			[plotter setNeedsDisplay:YES];
-			[[plotter xScale] setNeedsDisplay:YES];
+			ORAxis* axis = [plotView xScale];
+			[axis setAttributes:attrib];
+			[plotView setNeedsDisplay:YES];
+			[[plotView xScale] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes"];
 		if(attrib){
-			[[plotter yScale] setAttributes:attrib];
-			[plotter setNeedsDisplay:YES];
-			[[plotter yScale] setNeedsDisplay:YES];
+			ORAxis* axis = [plotView yScale];
+			[axis setAttributes:attrib];
+			[plotView setNeedsDisplay:YES];
+			[[plotView yScale] setNeedsDisplay:YES];
 		}
 	}
+}
+
+- (void) calibrationChanged:(NSNotification*)aNotification
+{
+	[[plotView xScale] setNeedsDisplay:YES];
 }
 
 - (void) dataSetChanged:(NSNotification*)aNotification
 {
     if(!aNotification || [aNotification object] == model || [aNotification object] == self){
-        [plotter setNeedsDisplay:YES];
-        [[plotter xScale] setNeedsDisplay:YES];
-		[rawDataTable reloadData];
+        [plotView setNeedsDisplay:YES];
+		@synchronized(model){
+			[rawDataTable reloadData];
+		}
     }
 }
 
@@ -201,6 +217,7 @@
 
 - (void) pausedChanged:(NSNotification*)aNotification
 {
+	[refreshButton setEnabled:![model paused]];
 	[pausedField setStringValue:[model paused]?@"Paused":@""];
 	[pauseButton setTitle:[model paused]?@"Update":@"Pause"];
 }
@@ -215,17 +232,19 @@
 - (void)drawerDidOpen:(NSNotification *)aNotification
 {
     if([aNotification object] == analysisDrawer){
-        [plotter setShowActiveGate:YES];    
+        [plotView enableCursorRects];  
+		[plotView becomeFirstResponder];
+        [plotView setNeedsDisplay:YES];    
     }
 }
 
 - (void)drawerDidClose:(NSNotification *)aNotification
 {
     if([aNotification object] == analysisDrawer){
-        [plotter setShowActiveGate:NO];
+		[plotView disableCursorRects];    
+		[plotView setNeedsDisplay:YES];  
     }
 }
-
 
 - (void) setModel:(id)aModel
 {
@@ -241,61 +260,20 @@
 {
 	return analysisDrawer;
 }
-
-- (id) plotter
+- (BOOL) analysisDrawerIsOpen
 {
-	return plotter;
-}
-- (BOOL) useDataObject:(id)aPlotter  dataSet:(int)set
-{
-	return [model useDataObject:aPlotter dataSet:set];
+	return [analysisDrawer state] == NSDrawerOpenState;
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (void) openAnalysisDrawer
 {
-    return [model numberBins];
+	[analysisDrawer open];
 }
 
-- (BOOL) differentiate
+- (void) closeAnalysisDrawer
 {
-	return [model differentiate];
+	[analysisDrawer close];
 }
-
-- (float) plotter:(id) aPlotter  dataSet:(int)set dataValue:(int) x
-{
-    return [model value:x];
-}
-
-- (unsigned long) startingByteOffset:(id)aPlotter  dataSet:(int)set
-{
-	return [model startingByteOffset:aPlotter dataSet:set];
-}
-
-- (unsigned short) unitSize:(id)aPlotter  dataSet:(int)set
-{
-	return [model unitSize:aPlotter dataSet:set];
-}
-
-- (NSData*) plotter:(id) aPlotter dataSet:(int)set
-{
-	return [model plotter:aPlotter dataSet:set];
-}
-
-- (IBAction) logLin:(NSToolbarItem*)item 
-{
-	[[plotter yScale] setLog:![[plotter yScale] isLog]];
-}
-
-- (IBAction) autoScale:(NSToolbarItem*)item 
-{
-	[plotter autoScale:nil];
-}
-
-- (IBAction) clearROI:(NSToolbarItem*)item 
-{
-	[plotter clearActiveGate:self];
-}
-
 - (IBAction) refreshModeAction:(id)sender 
 {
 	[model setRefreshMode:[sender indexOfSelectedItem]];
@@ -318,14 +296,9 @@
                       nil,@"Really Clear them? You will not be able to undo this.");
 }
 
-
-- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (IBAction)doAnalysis:(NSToolbarItem*)item
 {
-    if(returnCode == NSAlertAlternateReturn){
-        [model clear];
-        [plotter setNeedsDisplay:YES];
-		[rawDataTable reloadData];
-    }
+	[analysisDrawer toggle:self];
 }
 
 - (IBAction) toggleRaw:(NSToolbarItem*)item
@@ -336,32 +309,6 @@
 	if(index>=maxIndex)index = 0;
 	[rawDataTabView selectTabViewItemAtIndex:index];
 }
-
-- (BOOL) analysisDrawerIsOpen
-{
-	return [analysisDrawer state] == NSDrawerOpenState;
-}
-
-- (void) openAnalysisDrawer
-{
-	[analysisDrawer open];
-	[plotter analyze:nil];
-	[plotter setNeedsDisplay:YES];
-}
-
-- (void) closeAnalysisDrawer
-{
-	[analysisDrawer close];
-	[plotter analyze:nil];
-	[plotter setNeedsDisplay:YES];
-}
-- (IBAction)doAnalysis:(NSToolbarItem*)item
-{
-	[analysisDrawer toggle:self];
-	[plotter analyze:nil];
-	[plotter setNeedsDisplay:YES];
-}
-
 
 - (IBAction) printDocument:(id)sender
 {
@@ -376,7 +323,6 @@
 - (IBAction) hideShowControls:(id)sender
 {
 	
-    [plotter setIgnoreDoNotDrawFlag:YES];
     unsigned int oldResizeMask = [containingView autoresizingMask];
     [containingView setAutoresizingMask:NSViewMinYMargin];
 	
@@ -394,8 +340,6 @@
     [[self window] setMinSize:minSize];
     [self resizeWindowToSize:aFrame.size];
     [containingView setAutoresizingMask:oldResizeMask];
-    [plotter setIgnoreDoNotDrawFlag:NO];
-	
 }
 
 //scripting helper
@@ -406,11 +350,20 @@
 	if([fm fileExistsAtPath:aFile]){
 		[fm removeItemAtPath:aFile error:nil];
 	}
-	NSData* pdfData = [plotter plotAsPDFData];
+	NSData* pdfData = [plotView plotAsPDFData];
 	[pdfData writeToFile:aFile atomically:NO];
 }
+@end
+@implementation ORDataController (private)
 
-
+- (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [model clear];
+        [plotView setNeedsDisplay:YES];
+		[rawDataTable reloadData];
+    }
+}
 @end
 
 @implementation NSObject (ORDataController_Cat)

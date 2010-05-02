@@ -21,12 +21,12 @@
 
 #import "ORDataSetModel.h"
 #import "ORDataController.h"
-#import "ORScale.h"
 
 NSString* ORDataSetModelPausedChanged		= @"ORDataSetModelPausedChanged";
 NSString* ORDataSetModelRefreshModeChanged	= @"ORDataSetModelRefreshModeChanged";
 NSString* ORDataSetModelRemoved				= @"ORDataSetModelRemoved";
 NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
+NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
 @implementation ORDataSetModel
 - (id) init
@@ -41,9 +41,9 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORDataSetModelRemoved
-						  object:self
-						userInfo: nil];
+	 postNotificationName:ORDataSetModelRemoved
+	 object:self
+	 userInfo: nil];
 	
     
 	[dataSetLock release];
@@ -55,12 +55,6 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 }
 
 #pragma mark ¥¥¥Accessors
-- (id) curve:(int)aCurveIndex gate:(int)aGateIndex
-{
-	ORDataController* dialog = [self findController];
-	return [dialog curve:aCurveIndex gate:aGateIndex];
-}
-
 - (BOOL) paused
 {
     return paused;
@@ -97,6 +91,7 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 	[aCalibration retain];
 	[calibration release];
 	calibration  = aCalibration;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetCalibrationChanged object:self];
 }
 
 - (void) setDataSet:(id)aDataSet
@@ -111,72 +106,75 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 
 - (void) setKey:(NSString*)aKey
 {
-	[dataSetLock lock];
-	[key autorelease];
-	key = [aKey copy];
-	[dataSetLock unlock];
+	@synchronized(self){
+		[key autorelease];
+		key = [aKey copy];
+	}
 }
 
 - (NSString*)key
 {
-	[dataSetLock lock];
-	NSString* temp = [[key retain] autorelease];
-	[dataSetLock unlock];
+	NSString* temp = nil;
+	@synchronized(self){
+		temp = [[key retain] autorelease];
+	}
 	return temp;
 }
 - (void) setFullName:(NSString*)aString
 {
-	[dataSetLock lock];
-    [fullName autorelease];
-    fullName = [aString copy];
-    if(fullName){
-		
-		//also parse the full name to create a short version the name.
-		NSScanner* 		 scanner  	= [NSScanner scannerWithString:fullName];
-		NSCharacterSet*  numbers 	= [NSCharacterSet decimalDigitCharacterSet];
-		NSCharacterSet*  delimiters = [NSCharacterSet characterSetWithCharactersInString:@"\r\n\t,"];
-		NSString* 		 scanResult = [NSString string];
-		NSString* comma = @",";
-		NSMutableString* result = [NSMutableString string];
-		[scanner scanUpToCharactersFromSet:[delimiters invertedSet] intoString:nil];//skip any leading whitespace
-		[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];		//read in the leading name i.e.'Shaper'
-		[result appendString:scanResult];
-		[result appendString:comma];
-		
-		[scanner scanUpToCharactersFromSet:[delimiters invertedSet] intoString:nil];//skip any leading whitespace
-		[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];	//skip any non-alphanumerics
-		[result appendString:scanResult];
-	   
-		while(![scanner isAtEnd]) {
-			[result appendString:comma];											//add a ','	
-			[scanner scanUpToCharactersFromSet:numbers intoString:nil];				//skip any non-alphanumerics
+	@synchronized(self){
+		[fullName autorelease];
+		fullName = [aString copy];
+		if(fullName){
+			
+			//also parse the full name to create a short version the name.
+			NSScanner* 		 scanner  	= [NSScanner scannerWithString:fullName];
+			NSCharacterSet*  numbers 	= [NSCharacterSet decimalDigitCharacterSet];
+			NSCharacterSet*  delimiters = [NSCharacterSet characterSetWithCharactersInString:@"\r\n\t,"];
+			NSString* 		 scanResult = [NSString string];
+			NSString* comma = @",";
+			NSMutableString* result = [NSMutableString string];
+			[scanner scanUpToCharactersFromSet:[delimiters invertedSet] intoString:nil];//skip any leading whitespace
+			[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];		//read in the leading name i.e.'Shaper'
+			[result appendString:scanResult];
+			[result appendString:comma];
+			
+			[scanner scanUpToCharactersFromSet:[delimiters invertedSet] intoString:nil];//skip any leading whitespace
 			[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];	//skip any non-alphanumerics
-			[result appendString:scanResult];										
+			[result appendString:scanResult];
+			
+			while(![scanner isAtEnd]) {
+				[result appendString:comma];											//add a ','	
+				[scanner scanUpToCharactersFromSet:numbers intoString:nil];				//skip any non-alphanumerics
+				[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];	//skip any non-alphanumerics
+				[result appendString:scanResult];										
+			}
+			[result stringByReplacingOccurrencesOfString:@" " withString:@""];
+			[result replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+			[result replaceOccurrencesOfString:@"Card" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+			[result replaceOccurrencesOfString:@"Channel" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+			
+			[shortName release];
+			shortName = [result copy];
 		}
-		[result stringByReplacingOccurrencesOfString:@" " withString:@""];
-		[result replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
-		[result replaceOccurrencesOfString:@"Card" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
-		[result replaceOccurrencesOfString:@"Channel" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
-
-		[shortName release];
-		shortName = [result copy];
 	}
-	[dataSetLock unlock];
 }
 
 -(NSString*) fullName
 {
-	[dataSetLock lock];
-	NSString* temp = [[fullName retain] autorelease];
-	[dataSetLock unlock];
+	NSString* temp = nil;
+	@synchronized(self){
+		temp = [[fullName retain] autorelease];
+	}
 	return temp;
 }
 
 -(NSString*) shortName
 {
-	[dataSetLock lock];
-	NSString* temp = [[shortName retain] autorelease];
-	[dataSetLock unlock];
+	NSString* temp = nil;
+	@synchronized(self){
+		temp = [[shortName retain] autorelease];
+	}
 	return temp;
 }
 
@@ -220,14 +218,18 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 
 - (void) postUpdateOnMainThread
 {
-	[self performSelectorOnMainThread:@selector(postUpdate) withObject:nil waitUntilDone:NO];
+	@synchronized(self){
+		[self performSelectorOnMainThread:@selector(postUpdate) withObject:nil waitUntilDone:NO];
+	}
 }
 
 - (void) scheduleUpdateOnMainThread
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postUpdate) object:nil];;
-	[self performSelector:@selector(postUpdate) withObject:nil afterDelay:[self refreshRate]];
-	scheduledForUpdate = YES;
+	@synchronized(self){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postUpdate) object:nil];;
+		[self performSelector:@selector(postUpdate) withObject:nil afterDelay:[self refreshRate]];
+		scheduledForUpdate = YES;
+	}
 }
 
 - (float) refreshRate
@@ -243,10 +245,10 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 
 - (void) postUpdate
 {
-	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORDataSetDataChanged
-					  object:self];    
-	scheduledForUpdate = NO;
+	@synchronized(self){
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetDataChanged object:self];    
+		scheduledForUpdate = NO;
+	}
 }
 
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

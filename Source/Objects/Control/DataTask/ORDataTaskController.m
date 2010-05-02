@@ -25,7 +25,8 @@
 #import "ORDataTaker.h"
 #import "ORReadOutList.h"
 #import "ORValueBar.h"
-#import "ORPlotter.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
 #import "ORAxis.h"
 #import "ORGroupView.h"
 
@@ -86,8 +87,17 @@
 
     [totalListView setVerticalMotionCanBeginDrag:YES];
     [readoutListView setVerticalMotionCanBeginDrag:YES];
-   
-    
+	
+	
+	OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[aPlot release]; 
+	
+	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:1 andDataSource:self];
+	[aPlot1 setLineColor:[NSColor blueColor]];
+	[plotter addPlot: aPlot1];
+	[aPlot1 release]; 
+	
     [self updateWindow];
 }
 
@@ -601,35 +611,19 @@ else {\
     }
 }
 
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
     return kTimeHistoSize;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    if(set == 0){
-        return [model dataTimeHist:x];
-    }
-    else {
-        return [model processingTimeHist:x];
-    }
-}
-
-- (int)	numberOfDataSetsInPlot:(id)aPlotter
-{
-    return 2;
-}
-
-- (BOOL)   	willSupplyColors
-{
-    return YES;
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-    if(set == 0)return [NSColor redColor];
-    else return [NSColor blueColor];
+	int set = [aPlotter tag];
+	double aValue = 0;
+    if(set == 0)aValue =  [model dataTimeHist:i];
+    else		aValue =  [model processingTimeHist:i];
+	*yValue = aValue;
+	*xValue = i;
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem

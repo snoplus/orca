@@ -29,7 +29,7 @@
     NSString*               key;		//crate x, card y, etc...
     id                      data;		//data will be nil unless this is a leaf node.	
     unsigned long			totalCounts;
-	NSLock*					dataSetLock;
+	//NSLock*					dataSetLock;
 	long					runNumber;
 }
 
@@ -90,6 +90,7 @@
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)unitSize sender:(id)obj  withKeys:(NSString*)keyArg,...;
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...;
+- (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask specialBits:(unsigned long)aSpecialMask sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) loadFFTReal:(NSArray*)realArray imaginary:(NSArray*)imaginaryArray withKeyArray:(NSArray*)keyArray;
 - (void) loadGenericData:(NSString*)aString sender:(id)obj withKeys:(NSString*)topLevel,...;
 - (void) loadGenericData:(NSString*)aString sender:(id)obj usingKeyArray:(NSArray*)myArgs;

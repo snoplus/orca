@@ -22,8 +22,7 @@
 #import "ORExperimentController.h"
 #import "ORExperimentModel.h"
 #import "ORColorScale.h"
-#import "ORAxis.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
 #import "ORTimeRate.h"
 #import "BiStateView.h"
 #import "ORReplayDataModel.h"
@@ -32,6 +31,9 @@
 #import "ORAdcInfoProviding.h"
 #import "ORSegmentGroup.h"
 #import "ORRunModel.h"
+#import "ORTimeLinePlot.h"
+#import "OR1DHistoPlot.h"
+#import "ORTimeAxis.h"
 
 @interface ORExperimentController (private)
 - (void) readPrimaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -55,19 +57,26 @@
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: tabPrefName];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-        
-	[[valueHistogramsPlot xScale] setRngLimitsLow:0 withHigh:128000000 withMinRng:64];
-	[[primaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000000 withMinRng:5];
- 	[[primaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:128000000];
+	
    
-    [[ratePlot xScale] setNeedsDisplay:YES];
-    [[ratePlot yScale] setNeedsDisplay:YES];
-	[[ratePlot yScale] setInteger:NO];
+	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[ratePlot addPlot: aPlot];
+	[(ORTimeAxis*)[ratePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+
+	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:10 andDataSource:self];
+	[aPlot1 setUseConstantColor:YES];
+	[valueHistogramsPlot addPlot: aPlot1];
+	[aPlot1 release];
+	
 	[[ratePlot yScale] setRngLimitsLow:0 withHigh:5000000 withMinRng:1];
 
     [[primaryColorScale colorAxis] setNeedsDisplay:YES];
     [selectionStringTextView setFont:[NSFont fontWithName:@"Monaco" size:9]];
-
+	
+	[[primaryColorScale colorAxis] setRngLimitsLow:0 withHigh:128000000 withMinRng:5];
+ 	[[primaryColorScale colorAxis] setRngDefaultsLow:0 withHigh:128000000];
+	
 	[self populateClassNamePopup:primaryAdcClassNamePopup];
 
 	if([model replayMode]){
@@ -568,11 +577,15 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [ratePlot xScale]){
-		[model setMiscAttributes:[[ratePlot xScale]attributes] forKey:@"XAttributes"];
+		ORAxis* xScale = [ratePlot xScale];
+		NSMutableDictionary* attrib = [xScale attributes];
+		[model setMiscAttributes:attrib forKey:@"XAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [ratePlot yScale]){
-		[model setMiscAttributes:[[ratePlot yScale]attributes] forKey:@"YAttributes"];
+		ORAxis* yScale = [ratePlot yScale];
+		NSMutableDictionary* attrib = [yScale attributes];
+		[model setMiscAttributes:attrib forKey:@"YAttributes"];
 	};
 }
 
@@ -584,7 +597,8 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes"];
 		if(attrib){
-			[[ratePlot xScale] setAttributes:attrib];
+			ORAxis* xScale = [ratePlot xScale];
+			[xScale setAttributes:attrib];
 			[ratePlot setNeedsDisplay:YES];
 			[[ratePlot xScale] setNeedsDisplay:YES];
 		}
@@ -592,7 +606,8 @@
 	if(aNote == nil || [key isEqualToString:@"YAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes"];
 		if(attrib){
-			[[ratePlot yScale] setAttributes:attrib];
+			ORAxis* yScale = [ratePlot yScale];
+			[yScale setAttributes:attrib];
 			[ratePlot setNeedsDisplay:YES];
 			[[ratePlot yScale] setNeedsDisplay:YES];
 			[rateLogCB setState:[[ratePlot yScale] isLog]];
@@ -744,29 +759,11 @@
 		case kDisplayThresholds:
 		case kDisplayGains:		
 		case kDisplayTotalCounts:		
-			[valueHistogramsPlot xAndYAutoScale];
+			[valueHistogramsPlot autoScaleX:self];
+			[valueHistogramsPlot autoScaleY:self];
 		break;
 		default: break;
 	}
-}
-
-
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
-	if(aPlotter == ratePlot){
-		return [[[segmentGroups objectAtIndex:set]  totalRate] count];
-	}
-	else if(aPlotter == valueHistogramsPlot){
-		int displayType = [model displayType];
-		switch(displayType){
-			case kDisplayRates:			return [[segmentGroups objectAtIndex:set] numSegments];
-			case kDisplayTotalCounts:	return [[segmentGroups objectAtIndex:set] numSegments];
-			case kDisplayThresholds:	return 32*1024;
-			case kDisplayGains:			return 1024;
-			default:					return 1000;
-		}
-	}
-	else return 0;
 }
 
 #pragma mark •••Details Interface Management
@@ -794,55 +791,75 @@
 	switch([model displayType]){
 		case kDisplayRates:			
 			[histogramTitle setStringValue:@"Channel Rates"];
-			[valueHistogramsPlot setXLabel:@"Channel" yLabel:@"Counts/Sec"];	
+			[[valueHistogramsPlot xScale ] setLabel:@"Channel"];	
+			[[valueHistogramsPlot yScale ] setLabel:@"Counts/Sec"];	
 		break;
 		case kDisplayTotalCounts:			
 			[histogramTitle setStringValue:@"Total Counts Distribution"];		
-			[valueHistogramsPlot setXLabel:@"Channel" yLabel:@"Total Counts"];	
+			[[valueHistogramsPlot xScale] setLabel:@"Channel"];	
+			[[valueHistogramsPlot yScale] setLabel:@"Total Counts"];	
 		break;
 		case kDisplayThresholds:	
 			[histogramTitle setStringValue:@"Threshold Distribution"];	
-			[valueHistogramsPlot setXLabel:@"Raw Threshold Value" yLabel:@"# Channels"];	
+			[[valueHistogramsPlot xScale] setLabel:@"Raw Threshold Value"];	
+			[[valueHistogramsPlot yScale] setLabel:@"# Channels"];	
 		break;
 		case kDisplayGains:			
 			[histogramTitle setStringValue:@"Gain Distribution"];		
-			[valueHistogramsPlot setXLabel:@"Gain Value" yLabel:@"# Channels"];	
+			[[valueHistogramsPlot xScale] setLabel:@"Gain Value"];	
+			[[valueHistogramsPlot yScale] setLabel:@"# Channels"];	
 		break;
 		default: break;
 	}
 }
 
 #pragma mark •••Data Source For Plots
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (int) numberPointsInPlot:(id)aPlotter
 {
-	if(aPlotter == ratePlot){
-		int count = [[[segmentGroups objectAtIndex:set] totalRate] count];
-		if(count==0)return 0;
-		return [[[segmentGroups objectAtIndex:set] totalRate] valueAtIndex:count-x-1];
+	int tag = [aPlotter tag];
+	if(tag < 10){ //rate plots
+		int set = tag;
+		return [[[segmentGroups objectAtIndex:set]  totalRate] count];
 	}
-	else if(aPlotter == valueHistogramsPlot){
-		int displayType = [model displayType];
-		float aValue = 0;
-		switch(displayType){
-			case kDisplayThresholds:	aValue = [[segmentGroups objectAtIndex:set] thresholdHistogram:x];	break;
-			case kDisplayGains:			aValue = [[segmentGroups objectAtIndex:set] gainHistogram:x];		break;
-			case kDisplayRates:			aValue = [[segmentGroups objectAtIndex:set] getRate:x];				break;
-			case kDisplayTotalCounts:	aValue = [[segmentGroups objectAtIndex:set] totalCountsHistogram:x];break;
-			default:	break;
+	else if(tag >= 10){ //value plots
+		int set = tag-10;
+		switch([model displayType]){
+			case kDisplayRates:			return [[segmentGroups objectAtIndex:set] numSegments];
+			case kDisplayTotalCounts:	return [[segmentGroups objectAtIndex:set] numSegments];
+			case kDisplayThresholds:	return 32*1024;
+			case kDisplayGains:			return 1024;
+			default:					return 0;
 		}
-		return aValue;
 	}
 	else return 0;
 }
 
-- (unsigned long) secondsPerUnit:(id) aPlotter
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    return [[[segmentGroups objectAtIndex:0] totalRate] sampleTime];
-}
-
-- (int)	numberOfDataSetsInPlot:(id)aPlotter
-{
-    return [segmentGroups count];
+	double aValue = 0;
+	int tag = [aPlotter tag];
+	if(tag < 10){ //rate plots
+		int set = tag;
+		int count = [[[segmentGroups objectAtIndex:set] totalRate] count];
+		int index = count-i-1;
+		if(count==0) aValue = 0;
+		else {
+			*yValue = [[[segmentGroups objectAtIndex:set] totalRate] valueAtIndex:index];
+			*xValue = [[[segmentGroups objectAtIndex:set] totalRate] timeSampledAtIndex:index];
+		}
+	}
+	else if(tag >= 10){ //value plots
+		int set = tag-10;
+		switch([model displayType]){
+			case kDisplayThresholds:	aValue = [[segmentGroups objectAtIndex:set] thresholdHistogram:i];	break;
+			case kDisplayGains:			aValue = [[segmentGroups objectAtIndex:set] gainHistogram:i];		break;
+			case kDisplayRates:			aValue = [[segmentGroups objectAtIndex:set] getRate:i];				break;
+			case kDisplayTotalCounts:	aValue = [[segmentGroups objectAtIndex:set] totalCountsHistogram:i];break;
+			default:	break;
+		}
+		*xValue = (double)i;
+		*yValue = aValue;
+	}
 }
 
 #pragma mark •••Data Source For Tables
@@ -908,7 +925,8 @@
 		case kDisplayTotalCounts:	[[valueHistogramsPlot xScale] setRngLow:0 withHigh:[model maxNumSegments]]; break;
 		case kDisplayThresholds:
 		case kDisplayGains:		
-			[valueHistogramsPlot xAndYAutoScale];
+			[valueHistogramsPlot autoScaleX:self];
+			[valueHistogramsPlot autoScaleY:self];
 		break;
 		default: break;
 	}

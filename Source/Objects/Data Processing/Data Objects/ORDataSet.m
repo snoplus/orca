@@ -47,7 +47,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [self setKey:aKey];
         [self setGuardian:aGuardian]; //we don't retain the guardian, so just set it here.
         data = nil;
-		dataSetLock = [[NSLock alloc] init];
+//		dataSetLock = [[NSLock alloc] init];
 		RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
 	}
     return self;
@@ -55,22 +55,23 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (void) dealloc
 {
-	[dataSetLock lock];
-    [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORDataSetRemoved
-                          object:self
-                        userInfo: nil];
-    
-    [realDictionary release];
-    realDictionary = nil;
-    
-    [key release];
-    [data release];
-    
-    [sortedArray release];
-    sortedArray = nil;
-	[dataSetLock unlock];
-	[dataSetLock release];
+	@synchronized(self){  
+		
+		[[NSNotificationCenter defaultCenter]
+		 postNotificationName:ORDataSetRemoved
+		 object:self
+		 userInfo: nil];
+		
+		[realDictionary release];
+		realDictionary = nil;
+		
+		[key release];
+		[data release];
+		
+		[sortedArray release];
+		sortedArray = nil;
+	}
+//	[dataSetLock release];
     [super dealloc];
 }
 
@@ -112,7 +113,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
             [d appendDataDescription:aDataPacket userInfo:userInfo];
         }
     }
- }
+}
 
 - (ORDataSet*) dataSetWithName:(NSString*)aName
 {
@@ -174,10 +175,10 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     
     [data clear];
 	if(update){
-         [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORDataSetCleared
-                          object:self
-                        userInfo: nil];
+		[[NSNotificationCenter defaultCenter]
+		 postNotificationName:ORDataSetCleared
+		 object:self
+		 userInfo: nil];
 	}
 }
 
@@ -193,9 +194,9 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     [data clear];
     
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORDataSetCleared
-                          object:self
-                        userInfo: nil];
+	 postNotificationName:ORDataSetCleared
+	 object:self
+	 userInfo: nil];
     
     
 }
@@ -310,46 +311,48 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (void) removeObject:(id)anObj
 {
-	[dataSetLock lock];
-    NSEnumerator* e = [realDictionary keyEnumerator];
-    id aKey;
-	NSMutableArray* keysToRemoveFromSelf = [NSMutableArray array];
-    while(aKey = [e nextObject]){
-        ORDataSet* aDataSet = [realDictionary objectForKey:aKey];
-        if(aDataSet == anObj){
-			[keysToRemoveFromSelf addObject:aKey];
-        }
-        else {
-            [[realDictionary objectForKey:aKey] removeObject:anObj];
-        }
-    }
-    [realDictionary removeObjectsForKeys: keysToRemoveFromSelf];
-    [sortedArray release];
-    sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
-	[dataSetLock unlock];
-
+	@synchronized(self){  
+		NSEnumerator* e = [realDictionary keyEnumerator];
+		id aKey;
+		NSMutableArray* keysToRemoveFromSelf = [NSMutableArray array];
+		while(aKey = [e nextObject]){
+			ORDataSet* aDataSet = [realDictionary objectForKey:aKey];
+			if(aDataSet == anObj){
+				[keysToRemoveFromSelf addObject:aKey];
+			}
+			else {
+				[[realDictionary objectForKey:aKey] removeObject:anObj];
+			}
+		}
+		[realDictionary removeObjectsForKeys: keysToRemoveFromSelf];
+		[sortedArray release];
+		sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
+	}
+	
 }
 
 - (void) removeObjectForKey: (id) aKey;
 {
- 	[dataSetLock lock];
-	[realDictionary removeObjectForKey: aKey];
-    [sortedArray release];
-    sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
-	[dataSetLock unlock];
+	@synchronized(self){  
+		
+		[realDictionary removeObjectForKey: aKey];
+		[sortedArray release];
+		sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
+	}
 }
 
 - (void) setObject: (id) anObject forKey: (id) aKey;
 {
- 	[dataSetLock lock];
- //   BOOL newObj = NO;
-//    if(![realDictionary objectForKey:aKey])newObj = YES;
-    
-    [realDictionary setObject: anObject  forKey: aKey];
-    [sortedArray release];
-    sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
-	[dataSetLock unlock];
-
+	@synchronized(self){  
+		
+		//   BOOL newObj = NO;
+		//    if(![realDictionary objectForKey:aKey])newObj = YES;
+		
+		[realDictionary setObject: anObject  forKey: aKey];
+		[sortedArray release];
+		sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
+	}
+	
 }
 
 - (NSComparisonResult) compare:(NSString *)aString
@@ -390,12 +393,13 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (void) setData:(id)someData
 {	
-	[dataSetLock lock];
-    [someData retain];
-    [data release];
-    data = someData;
-	[dataSetLock unlock];
-
+	@synchronized(self){  
+		
+		[someData retain];
+		[data release];
+		data = someData;
+	}
+	
 }
 
 
@@ -449,7 +453,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector
 {
     NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
-
+	
     if([self leafNode]){
         [collection addObjectsFromArray:[[self data] collectObjectsRespondingTo:aSelector]];
     }
@@ -468,600 +472,590 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 #pragma mark •••Data Insertion
 - (void)loadHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray
 {
-    
-    int n = [keyArray count];
-    int i;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    for(i=0;i<n;i++){
-        NSString* s = [keyArray objectAtIndex:i];
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-    }
-    
-    OR1DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR1DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBins:numBins];
-        [nextLevel setData:histo];
-		[histo setDataSet:self];
-        [histo mergeHistogram:ptr numValues:numBins];
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
-    }
-    else [histo mergeHistogram:ptr numValues:numBins];
+	@synchronized(self){  
+		int n = [keyArray count];
+		int i;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		for(i=0;i<n;i++){
+			NSString* s = [keyArray objectAtIndex:i];
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+		}
+		
+		OR1DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR1DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBins:numBins];
+			[nextLevel setData:histo];
+			[histo setDataSet:self];
+			[histo mergeHistogram:ptr numValues:numBins];
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else [histo mergeHistogram:ptr numValues:numBins];
+	}
 }
 
 
 
 - (void) histogram:(unsigned long)aValue numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    
-    OR1DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR1DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBins:numBins];
-		[histo setDataSet:self];
-        [nextLevel setData:histo];
-        [histo histogram:aValue];
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		
+		OR1DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR1DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBins:numBins];
+			[histo setDataSet:self];
+			[nextLevel setData:histo];
+			[histo histogram:aValue];
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else [histo histogram:aValue];
+		
+		va_end(myArgs);
     }
-    else [histo histogram:aValue];
-    
-    va_end(myArgs);
-    
 }
 
 // ak 6.8.07 
 - (void) histogramWW:(unsigned long)aValue weight:(unsigned long)aWeight numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    
-    OR1DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR1DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBins:numBins];
-		[histo setDataSet:self];
-        [nextLevel setData:histo];
-        [histo histogramWW:aValue weight:aWeight];
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
-    }
-    else [histo histogramWW:aValue weight:aWeight];
-    
-    va_end(myArgs);
-    
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		
+		OR1DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR1DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBins:numBins];
+			[histo setDataSet:self];
+			[nextLevel setData:histo];
+			[histo histogramWW:aValue weight:aWeight];
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else [histo histogramWW:aValue weight:aWeight];
+		
+		va_end(myArgs);
+	}   
 }
 
 //! merger for hw histograms -tb- 2008-03-23
 - (void) mergeHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray
 {
-    
-    int n = [keyArray count];
-    int i;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    for(i=0;i<n;i++){
-        NSString* s = [keyArray objectAtIndex:i];
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-    }
-    
-    OR1DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR1DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBins:numBins];
-        [nextLevel setData:histo];
-		[histo setDataSet:self];
-        [histo mergeHistogram:ptr numValues:numBins];
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
-    }
-    else [histo mergeHistogram:ptr numValues:numBins];
+	@synchronized(self){  
+		
+		int n = [keyArray count];
+		int i;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		for(i=0;i<n;i++){
+			NSString* s = [keyArray objectAtIndex:i];
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+		}
+		
+		OR1DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR1DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBins:numBins];
+			[nextLevel setData:histo];
+			[histo setDataSet:self];
+			[histo mergeHistogram:ptr numValues:numBins];
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else [histo mergeHistogram:ptr numValues:numBins];
+	}
 }
 
 
 
 /** Merger for hw histograms with offset, stepsize and sum -tb- 2008-08-05.
-  *
-  * Fills the histogram beginning from firstBin, every 'stepSize'-th entry will be 
-  * filled (firstBin, firstBin+stepSize,firstBin+2*stepSize, ...).
-  */
+ *
+ * Fills the histogram beginning from firstBin, every 'stepSize'-th entry will be 
+ * filled (firstBin, firstBin+stepSize,firstBin+2*stepSize, ...).
+ */
 - (void) mergeEnergyHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins   maxBins:(unsigned long)maxBins  firstBin:(unsigned long)firstBin  stepSize:(unsigned long)stepSize   counts:(unsigned long)counts withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCountsBy: counts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCountsBy: counts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    
-    #if 0
-    int n = [keyArray count];
-    int i;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    for(i=0;i<n;i++){
-        NSString* s = [keyArray objectAtIndex:i];
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-    }
-    #endif
-    
-    OR1DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR1DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBins:maxBins];
-        [nextLevel setData:histo];
-		[histo setDataSet:self];
-        //--> [histo mergeHistogram:ptr numValues:numBins];
-        [histo mergeEnergyHistogram:ptr numBins:numBins    maxBins:maxBins
-                                       firstBin:firstBin  stepSize:stepSize 
-                                         counts:counts];
-
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
-    }
-    else //[histo mergeHistogram:ptr numValues:numBins];
-            [histo mergeEnergyHistogram:ptr numBins:numBins maxBins:maxBins
-                                                 firstBin:firstBin   stepSize:stepSize 
-                                                   counts:counts];
-
+	@synchronized(self){  
+		
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCountsBy: counts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCountsBy: counts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		OR1DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR1DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBins:maxBins];
+			[nextLevel setData:histo];
+			[histo setDataSet:self];
+			//--> [histo mergeHistogram:ptr numValues:numBins];
+			[histo mergeEnergyHistogram:ptr numBins:numBins    maxBins:maxBins
+							   firstBin:firstBin  stepSize:stepSize 
+								 counts:counts];
+			
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else //[histo mergeHistogram:ptr numValues:numBins];
+			[histo mergeEnergyHistogram:ptr numBins:numBins maxBins:maxBins
+							   firstBin:firstBin   stepSize:stepSize 
+								 counts:counts];
+	}
 }
 
 
 
 - (void) histogram2DX:(unsigned long)xValue y:(unsigned long)yValue size:(unsigned short)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    
-    OR2DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR2DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBinsPerSide:numBins];
-        [nextLevel setData:histo];
- 		[histo setDataSet:self];
-		[histo histogramX:xValue y:yValue];  
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		
+		OR2DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR2DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBinsPerSide:numBins];
+			[nextLevel setData:histo];
+			[histo setDataSet:self];
+			[histo histogramX:xValue y:yValue];  
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		else [histo histogramX:xValue y:yValue];
+		
+		va_end(myArgs);
     }
-    
-    else [histo histogramX:xValue y:yValue];
-    
-    va_end(myArgs);
-    
 }
 
 
 - (void)loadHistogram2D:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray
 {
-    
-    int n = [keyArray count];
-    int i;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    for(i=0;i<n;i++){
-        NSString* s = [keyArray objectAtIndex:i];
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-    }
-    
-    OR2DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR2DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBinsPerSide:(unsigned int)pow((float)numBins,.5)];
-        [nextLevel setData:histo];
-  		[histo setDataSet:self];
-		[histo mergeHistogram:ptr numValues:numBins];
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
-    }
-    else [histo mergeHistogram:ptr numValues:numBins];
+	@synchronized(self){  
+		
+		int n = [keyArray count];
+		int i;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		for(i=0;i<n;i++){
+			NSString* s = [keyArray objectAtIndex:i];
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+		}
+		
+		OR2DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR2DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBinsPerSide:(unsigned int)pow((float)numBins,.5)];
+			[nextLevel setData:histo];
+			[histo setDataSet:self];
+			[histo mergeHistogram:ptr numValues:numBins];
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else [histo mergeHistogram:ptr numValues:numBins];
+	}
 }
 
 - (void) loadData2DX:(unsigned long)xValue y:(unsigned long)yValue z:(unsigned long)zValue size:(unsigned short)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    
-    OR2DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR2DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBinsPerSide:numBins];
-        [nextLevel setData:histo];
- 		[histo setDataSet:self];
-        [histo loadX:xValue y:yValue z:zValue];  
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
-    }
-    
-    else {
-		[histo loadX:xValue y:yValue z:zValue];
-    }
-    va_end(myArgs);
-    
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		
+		OR2DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR2DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBinsPerSide:numBins];
+			[nextLevel setData:histo];
+			[histo setDataSet:self];
+			[histo loadX:xValue y:yValue z:zValue];  
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		else {
+			[histo loadX:xValue y:yValue z:zValue];
+		}
+		va_end(myArgs);
+	}
 }
 
 
 
 - (void) sumData2DX:(unsigned long)xValue y:(unsigned long)yValue z:(unsigned long)zValue size:(unsigned short)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    
-    OR2DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR2DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [histo setNumberBinsPerSide:numBins];
-        [nextLevel setData:histo];
- 		[histo setDataSet:self];
-        [histo sumX:xValue y:yValue z:zValue];  
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetAdded
-		 object:self
-		 userInfo: nil];
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		
+		OR2DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR2DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setNumberBinsPerSide:numBins];
+			[nextLevel setData:histo];
+			[histo setDataSet:self];
+			[histo sumX:xValue y:yValue z:zValue];  
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		else {
+			[histo sumX:xValue y:yValue z:zValue];
+		}
+		va_end(myArgs);
     }
-    
-    else {
-		[histo sumX:xValue y:yValue z:zValue];
-    }
-    va_end(myArgs);
-    
 }
 
 - (void) clearDataUpdate:(BOOL)update withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-	[nextLevel clearWithUpdate:update];
-	
-    va_end(myArgs);
-    
+ 	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		[nextLevel clearWithUpdate:update];
+		
+		va_end(myArgs);
+    }
 }
 
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    ORWaveform* waveform = [nextLevel data];
-    if(!waveform){
-        waveform = [[ORWaveform alloc] init];
-		[waveform setDataSet:self];
-        [waveform setDataOffset:anOffset];
-        [waveform setKey:[nextLevel key]];
-        [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-		[waveform setUnitSize:aUnitSize];
-        [nextLevel setData:waveform];
-        [waveform setWaveform:aWaveForm];       
-        [waveform release];
-        [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
-    }
-    
-    else {
-		[waveform setWaveform:aWaveForm];
-    }
-    va_end(myArgs);
-    
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		ORWaveform* waveform = [nextLevel data];
+		if(!waveform){
+			waveform = [[ORWaveform alloc] init];
+			[waveform setDataSet:self];
+			[waveform setDataOffset:anOffset];
+			[waveform setKey:[nextLevel key]];
+			[waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[waveform setUnitSize:aUnitSize];
+			[nextLevel setData:waveform];
+			[waveform setWaveform:aWaveForm];       
+			[waveform release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		else {
+			[waveform setWaveform:aWaveForm];
+		}
+		va_end(myArgs);
+	}   
 }
 
 - (void) loadSpectrum:(NSData*)aSpectrum  sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-	va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while(s = va_arg(myArgs, NSString *));
-    
-    [[aSpectrum retain] autorelease];
-    OR1DHisto* histo = [nextLevel data];
-    if(!histo){
-        histo = [[OR1DHisto alloc] init];
-        [histo setKey:[nextLevel key]];
-        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-		[histo setDataSet:self];
-		[histo setNumberBins:[aSpectrum length]/4];
-		[nextLevel setData:histo];
-        [histo loadData:aSpectrum];
-        [histo release];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetAdded
-		 object:self
-		 userInfo: nil];
-    }
-    else [histo loadData:aSpectrum];
-    
-    va_end(myArgs);
-	
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while(s = va_arg(myArgs, NSString *));
+		
+		[[aSpectrum retain] autorelease];
+		OR1DHisto* histo = [nextLevel data];
+		if(!histo){
+			histo = [[OR1DHisto alloc] init];
+			[histo setKey:[nextLevel key]];
+			[histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[histo setDataSet:self];
+			[histo setNumberBins:[aSpectrum length]/4];
+			[nextLevel setData:histo];
+			[histo loadData:aSpectrum];
+			[histo release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else [histo loadData:aSpectrum];
+		
+		va_end(myArgs);
+	}	
 }
 
 
@@ -1106,7 +1100,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     ORDataSet* currentLevel = self;
     ORDataSet* nextLevel    = nil;
     [currentLevel incrementTotalCounts];
-
+	
     
     do {
         nextLevel = [currentLevel objectForKey:s];
@@ -1144,6 +1138,8 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     va_end(myArgs);
     
 }
+
+
 
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
@@ -1196,6 +1192,60 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     va_end(myArgs);
 }
 
+- (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask specialBits:(unsigned long)aSpecialMask sender:(id)obj  withKeys:(NSString*)firstArg,...
+{
+    va_list myArgs;
+    va_start(myArgs,firstArg);
+    
+    NSString* s             = firstArg;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts];
+	
+    
+    do {
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCounts];
+        
+    } while(s = va_arg(myArgs, NSString *));
+    
+    ORMaskedIndexedWaveformWithSpecialBits* waveform = [nextLevel data];
+    if(!waveform){
+        waveform = [[ORMaskedIndexedWaveformWithSpecialBits alloc] init];
+		[waveform setDataSet:self];
+		[waveform setMask:aMask];
+		[waveform setSpecialBitMask:aSpecialMask];
+		[waveform setStartIndex:aStartIndex];
+        [waveform setDataOffset:anOffset];
+        [waveform setKey:[nextLevel key]];
+        [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+		[waveform setUnitSize:aUnitSize];
+        [nextLevel setData:waveform];
+        [waveform setWaveform:aWaveForm];       
+        [waveform release];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+    }
+    
+    else {
+		[waveform setMask:aMask];
+		[waveform setSpecialBitMask:aSpecialMask];
+		[waveform setStartIndex:aStartIndex];
+		[waveform setWaveform:aWaveForm];
+    }
+    va_end(myArgs);
+}
+
+
 
 - (void) loadGenericData:(NSString*)aString sender:(id)obj withKeys:(NSString*)firstArg,...
 {
@@ -1222,7 +1272,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [currentLevel incrementTotalCounts];
         
     } while(s = va_arg(myArgs, NSString *));
-
+	
     ORGenericData* genericData = [nextLevel data];
     if(!genericData){
         genericData = [[ORGenericData alloc] init];
@@ -1230,9 +1280,9 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [nextLevel setData:genericData];
         [genericData release];
         [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
+		 postNotificationName:ORDataSetAdded
+		 object:self
+		 userInfo: nil];
     }
     
     [genericData setGenericData:aString];
@@ -1278,9 +1328,9 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [genericData setGenericData:aString];
         [genericData release];
         [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
+		 postNotificationName:ORDataSetAdded
+		 object:self
+		 userInfo: nil];
     }
     
     else [genericData setGenericData:aString];
@@ -1309,7 +1359,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         }
         
     } while(s = va_arg(myArgs, NSString *));
-
+	
     ORScalerSum* scalerSumData = [nextLevel data];
     if(!scalerSumData){
         scalerSumData = [[ORScalerSum alloc] init];
@@ -1317,9 +1367,9 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [nextLevel setData:scalerSumData];
         [scalerSumData release];
         [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
+		 postNotificationName:ORDataSetAdded
+		 object:self
+		 userInfo: nil];
     }
     
     [scalerSumData loadScalerValue:aValue];
@@ -1352,7 +1402,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [currentLevel incrementTotalCounts];
         
     } while(s = va_arg(myArgs, NSString *));
-
+	
     ORPlotTimeSeries* timeSeries = [nextLevel data];
     if(!timeSeries){
         timeSeries = [[ORPlotTimeSeries alloc] init];
@@ -1362,9 +1412,9 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [timeSeries setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
         [timeSeries release];
         [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
+		 postNotificationName:ORDataSetAdded
+		 object:self
+		 userInfo: nil];
     }
     
     [timeSeries addValue:aValue atTime:aTime];
@@ -1407,9 +1457,9 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [nextLevel setData:fftPlot];
         [fftPlot release];
         [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataSetAdded
-                              object:self
-                            userInfo: nil];
+		 postNotificationName:ORDataSetAdded
+		 object:self
+		 userInfo: nil];
     }
     else {
 		[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];
@@ -1437,16 +1487,17 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (id)   childAtIndex:(int)index
 {
-	[dataSetLock lock];
 	id theData = nil;
-    if([self leafNode])theData = [[data retain] autorelease];
-    else {
-		if(index < [sortedArray count]){
-			id obj = [realDictionary objectForKey:[sortedArray objectAtIndex:index]];
-			if(obj)theData =  [[obj retain] autorelease];
+	@synchronized(self){  
+		
+		if([self leafNode])theData = [[data retain] autorelease];
+		else {
+			if(index < [sortedArray count]){
+				id obj = [realDictionary objectForKey:[sortedArray objectAtIndex:index]];
+				if(obj)theData =  [[obj retain] autorelease];
+			}
 		}
-    }
-	[dataSetLock unlock];
+	}
 	return theData;
 }
 
@@ -1507,7 +1558,7 @@ static NSString *ORDataKey 			= @"OR Data Key";
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    dataSetLock = [[NSLock alloc] init];
+//    dataSetLock = [[NSLock alloc] init];
     realDictionary = [[decoder decodeObjectForKey:ORDataSetRealDictionary] retain];
     if(data == nil){
         [sortedArray release];

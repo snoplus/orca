@@ -30,6 +30,12 @@
 
 #pragma mark ¥¥¥Initialization
 
+- (void) dealloc
+{
+	[lastTime release];
+	[super dealloc];
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"DataGen"]];
@@ -40,8 +46,13 @@
 	return NO;
 }
 
-
+- (unsigned long) timeSeriesId { return timeSeriesId; }
+- (void) setTimeSeriesId: (unsigned long) aDataId
+{
+    timeSeriesId = aDataId;
+}
 - (unsigned long) dataId1D { return dataId1D; }
+
 - (void) setDataId1D: (unsigned long) aDataId
 {
     dataId1D = aDataId;
@@ -63,6 +74,7 @@
     dataId1D       = [assigner assignDataIds:kLongForm];
     dataId2D       = [assigner assignDataIds:kLongForm];
 	dataIdWaveform = [assigner assignDataIds:kLongForm];
+	timeSeriesId	= [assigner assignDataIds:kLongForm];
 }
 
 
@@ -71,20 +83,28 @@
     [self setDataId1D:[anotherObj dataId1D]];
     [self setDataId2D:[anotherObj dataId2D]];
     [self setDataIdWaveform:[anotherObj dataIdWaveform]];
+    [self setTimeSeriesId:[anotherObj timeSeriesId]];
 }
 
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+		 @"ORDataGenDecoderForTimeSeries",       @"decoder",
+		 [NSNumber numberWithLong:timeSeriesId],		 @"dataId",
+		 [NSNumber numberWithBool:NO],           @"variable",
+		 [NSNumber numberWithLong:4],            @"length",								 
+		 nil];
+	[dataDictionary setObject:aDictionary forKey:@"TestSeries"];
+	
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
         @"ORDataGenDecoderForTestData1D",       @"decoder",
         [NSNumber numberWithLong:dataId1D],     @"dataId",
         [NSNumber numberWithBool:NO],           @"variable",
         [NSNumber numberWithLong:2],            @"length",
-        [NSNumber numberWithBool:YES],          @"canBeGated",
-
         nil];
     [dataDictionary setObject:aDictionary forKey:@"TestData1D"];
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
         @"ORDataGenDecoderForTestData2D",       @"decoder",
         [NSNumber numberWithLong:dataId2D],     @"dataId",
@@ -92,6 +112,7 @@
         [NSNumber numberWithLong:3],            @"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"TestData2D"];
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
         @"ORDataGenDecoderForTestDataWaveform",		@"decoder",
         [NSNumber numberWithLong:dataIdWaveform],   @"dataId",
@@ -108,7 +129,9 @@
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORDataGenModel"];  
-	first = YES;  
+	first = YES; 
+	lastTime = [[NSDate date]retain];
+	timeIndex = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -118,8 +141,37 @@
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	
      if(random()%500 > 480 ){
         
+		 NSDate* now = [NSDate date];
+		 if([now timeIntervalSinceDate:lastTime] >= 1){
+			 [now retain];
+			 [lastTime release];
+			 lastTime = now;
+			 float theValue = 10.*sin(timeIndex*3.14159/180.)-5.;
+			 timeIndex = (timeIndex+10);
+	
+			 time_t	ut_Time;
+			 time(&ut_Time);
+			 unsigned long timeMeasured = ut_Time;
+			 
+			 unsigned long data[4];
+			 data[0] = timeSeriesId | 4;
+			 data[1] = [self uniqueIdNumber]&0xfff;
+			 
+			 union {
+				 float asFloat;
+				 unsigned long asLong;
+			 }theData;
+			 theData.asFloat = theValue;
+			 data[2] = theData.asLong;			 
+			 data[3] = timeMeasured;
+			 
+			 [aDataPacket addLongsToFrameBuffer:data length:4];
+		 }
+		 
+		 
         short card = random()%2;
         short chan = random()%8;
         unsigned long aValue = (100*chan) + ((random()%500 + random()%500 + random()%500+ random()%500)/4);
@@ -147,8 +199,19 @@
 		float delta = 2*3.141592/360.;
 		 short a = random()%20;
 		 short b = random()%20;
+		int count = 0;
+		int toggle = 0;
 		for(i=0;i<2048;i++){
-			data[i] = (long)(a*sinf(radians) + b*sinf(2*radians));
+			count++;
+			data[i] = 50+(long)(a*sinf(radians) + b*sinf(2*radians)) & 0x0fffffff;
+			if(i<512)data[i]  |= 0x10000000;
+			if(i<1024)data[i] |= 0x20000000;
+			if(i<1563)data[i] |= 0x40000000;
+			if(count>50){
+				count=0;
+				toggle = !toggle;
+			}
+			if(toggle)data[i] |= 0x80000000;
 			radians += delta;
 		}
         [aDataPacket addLongsToFrameBuffer:data length:2048];
@@ -159,7 +222,7 @@
 		radians = 0;
 		delta = 2*3.141592/360.;
 		for(i=0;i<2048;i++){
-			data[i] = (long)(a*sinf(4*radians));
+			data[i] = 50+(long)(a*sinf(4*radians));
 			radians += delta;
 		}
         [aDataPacket addLongsToFrameBuffer:data length:2048];
