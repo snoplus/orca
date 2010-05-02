@@ -21,12 +21,12 @@
 
 
 @class MemoryWatcher;
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORAxis;
 
 @interface MemoryWatcherController : NSWindowController {
     MemoryWatcher* watcher;
-    IBOutlet ORPlotter1D* plotter;
+    IBOutlet ORPlotView* plotView;
     IBOutlet NSTextField* upTimeField;
     IBOutlet NSTextField* taskIntervalField;
     IBOutlet ORAxis* xScale;
@@ -41,4 +41,7 @@
 
 #pragma mark ***Accessors
 - (void) setMemoryWatcher:(MemoryWatcher*)aWatcher;
+- (int)	 numberPointsInPlot:(id)aPlot;
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
+
 @end

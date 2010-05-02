@@ -20,7 +20,8 @@
 
 #import "MemoryWatcherController.h"
 #import "MemoryWatcher.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "ORPlot.h"
 #import "ORAxis.h"
 #import "SynthesizeSingleton.h"
 
@@ -44,9 +45,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 
 - (void) awakeFromNib
 {
-	[plotter setUseGradient:YES];
     [self registerNotificationObservers];
-    [plotter setNeedsDisplay:YES];
     [self upTimeChanged:nil];
 	[self taskIntervalChanged:nil];
 	
@@ -54,7 +53,34 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
     [yScale setRngLow:0.0 withHigh:300.];
 
 	[xScale setRngLimitsLow:0.0 withHigh:4096. withMinRng:50.];
-	[yScale setRngLimitsLow:0.0 withHigh:1000. withMinRng:50.];
+	[yScale setRngLimitsLow:0.0 withHigh:10000. withMinRng:50.];
+	
+	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1]];
+	
+	ORPlot* thePlot;
+	
+	thePlot = [[ORPlot alloc] initWithTag:0 andDataSource:self];
+	[thePlot setLineWidth:1];
+	[thePlot setLineColor:[NSColor colorWithCalibratedRed:0 green:.5 blue:0 alpha:1]];
+	[thePlot setUseConstantColor:YES];
+	[plotView addPlot: thePlot];
+	[thePlot release];
+	
+	thePlot = [[ORPlot alloc] initWithTag:1 andDataSource:self];
+	[thePlot setLineWidth:1];
+	[thePlot setLineColor:[NSColor redColor]];
+	[thePlot setUseConstantColor:YES];
+	[plotView addPlot: thePlot];
+	[thePlot release];
+	
+	thePlot = [[ORPlot alloc] initWithTag:2 andDataSource:self];
+	[thePlot setLineWidth:1];
+	[thePlot setLineColor:[NSColor blueColor]];
+	[thePlot setUseConstantColor:YES];
+	[plotView addPlot: thePlot];
+	[thePlot release];
+	
+    [plotView setNeedsDisplay:YES];
 
 }
 
@@ -101,7 +127,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 - (void) memoryStatsChanged:(NSNotification*)aNote
 {
     if(aNote == nil || [aNote object] == watcher){
-        [plotter setNeedsDisplay:YES];
+        [plotView setNeedsDisplay:YES];
     }
 }
 
@@ -124,37 +150,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
     watcher = aWatcher;
 }
 
-
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlot
 {
-	if(set < kNumWatchedValues) return [watcher timeRateCount:set];
+	int theTag = [aPlot tag];
+	if(theTag < kNumWatchedValues) return [watcher timeRateCount:theTag];
 	else return 0;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	if(set < kNumWatchedValues) return [watcher timeRate:set value:x];
-	else return 0;
+	int theTag = [aPlot tag];
+	if(theTag < kNumWatchedValues) *yValue =  [watcher timeRate:theTag value:i];
+	else *yValue = 0;
 }
-
-- (int)	numberOfDataSetsInPlot:(id)aPlotter
-{
-    return kNumWatchedValues;
-}
-
-- (BOOL)   	willSupplyColors
-{
-    return YES;
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-    switch(set){
-        case 0:  return [NSColor colorWithCalibratedRed:10/255. green:90/255. blue:0 alpha:1];
-        case 1:  return [NSColor redColor];
-        default: return [NSColor blueColor];
-    }
-}
-
 
 @end

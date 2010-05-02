@@ -24,9 +24,12 @@
 #import "KatrinModel.h"
 #import "KatrinConstants.h"
 #import "ORColorScale.h"
-#import "ORAxis.h"
+#import "ORTimeAxis.h"
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
+#import "ORPlotView.h"
+#import "ORTimeLinePlot.h"
+#import "OR1DHistoPlot.h"
 
 @interface KatrinController (private)
 - (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -90,6 +93,16 @@
     [[secondaryColorScale colorAxis] setOppositePosition:YES];
 	[[secondaryColorScale colorAxis] setNeedsDisplay:YES];
 
+	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
+	[aPlot setUseConstantColor:YES];
+	[ratePlot addPlot: aPlot];
+	[aPlot release];
+	
+	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:11 andDataSource:self];
+	[valueHistogramsPlot addPlot: aPlot1];
+	[aPlot1 release];
+	
+	
 	[self populateClassNamePopup:secondaryAdcClassNamePopup];
 		
 }

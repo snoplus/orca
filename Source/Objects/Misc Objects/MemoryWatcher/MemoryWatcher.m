@@ -23,6 +23,7 @@
 
 #import "MemoryWatcher.h"
 #import "ORTimeRate.h"
+#import "NSString+Extensions.h"
 
 @interface MemoryWatcher (private)
 - (void) processResult;
@@ -147,13 +148,15 @@ enum {
 
 - (unsigned) timeRateCount:(int)rateIndex
 {
-	return [timeRate[rateIndex] count];
-}
-- (float) timeRate:(int)rateIndex value:(int)valueIndex
-{
-	return [timeRate[rateIndex] valueAtIndex:valueIndex];
+	if(rateIndex<kNumWatchedValues)return [timeRate[rateIndex] count];
+	else return 0;
 }
 
+- (float) timeRate:(int)rateIndex value:(int)valueIndex
+{	
+	if(rateIndex<kNumWatchedValues)return [timeRate[rateIndex] valueAtIndex:valueIndex];
+	else return 0;
+}
 
 - (void) launchTask
 {
@@ -187,7 +190,7 @@ enum {
         [readHandle readInBackgroundAndNotify];
         
         [vmTask setLaunchPath:@"/usr/bin/top"];
-        [vmTask setArguments: [NSArray arrayWithObjects:@"-l",@"2",nil]];
+        [vmTask setArguments: [NSArray arrayWithObjects:@"-l",@"2",@"-i",@"1",@"-stats",@"command,cpu,rsize,vsize",nil]];
         [vmTask setStandardOutput:newPipe];
         [vmTask setStandardError:newPipe];
         [vmTask launch];
@@ -244,32 +247,29 @@ enum {
 - (void) processResult
 {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    //---------------------------------------
-    //process lines that have the form:
-    //Pages free:                     2932.
-    //---------------------------------------
-    NSString* multiplier;
-    NSScanner* scanner = [[NSScanner alloc] initWithString:taskResult];
-    if([scanner scanUpToString:@"Orca" intoString:nil]){
-		[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
-		if([scanner scanUpToString:@"Orca" intoString:nil]){
+	NSArray* lines = [taskResult componentsSeparatedByString:@"\n"];
+	NSString* goodLine = @"";
+	for(id aLine in lines){
+		if([aLine rangeOfString:@"Orca "].location != NSNotFound){
+			aLine = [aLine removeExtraSpaces];
+			NSArray* parts = [aLine componentsSeparatedByString:@" "];
+			if([parts count]==4 && [[parts objectAtIndex:1] floatValue]){
+				goodLine = aLine;
+				break;
+			}
+		}
+	}
+	if([goodLine length]){
+		//should now have a line that looks like "Orca 0.2 40M+ 1056M"
+		NSScanner* scanner = [[NSScanner alloc] initWithString:goodLine];
+		if([scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil]){
 			float value;
-
-			//scan in CPU
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-			if([scanner scanFloat:&value]){
-				[timeRate[kCPU] addDataToTimeAverage:value];
-			}
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
-
-			
-			int i,n=6;
-			for(i=0;i<n;i++){
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:nil];
-			}
+			//scan in cpu
+			[scanner scanFloat:&value];
+			[timeRate[kCPU] addDataToTimeAverage:value];
 			
 			//scan in RSIZE
+			NSString* multiplier;
 			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
 			[scanner scanFloat:&value];
 			if([scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&multiplier]){
@@ -283,13 +283,10 @@ enum {
 				[timeRate[kVSize] addDataToTimeAverage:[self convertValue:value withMultiplier:multiplier]];
 			}
 			
-			
-			[[NSNotificationCenter defaultCenter]
-						postNotificationName:MemoryWatcherChangedNotification
-									  object:self];
+			[[NSNotificationCenter defaultCenter] postNotificationName:MemoryWatcherChangedNotification object:self];
 		}
-    }
-	[scanner release];
+		[scanner release];
+	}
     [pool release];
 }
 
