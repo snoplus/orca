@@ -22,8 +22,6 @@
 #pragma mark ¥¥¥Imported Files
 #import "HaloController.h"
 #import "HaloModel.h"
-#import "ORColorScale.h"
-#import "ORAxis.h"
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
 
