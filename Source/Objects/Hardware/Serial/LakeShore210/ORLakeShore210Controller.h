@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORLakeShore210Controller : OrcaObjectController
 {
@@ -35,8 +35,8 @@
     IBOutlet NSButton*      readTempsButton;
     IBOutlet NSMatrix*      tempMatrix;
     IBOutlet NSMatrix*      timeMatrix;
-	IBOutlet ORPlotter1D*   plotter0;
-	IBOutlet ORPlotter1D*   plotter1;
+	IBOutlet ORPlotView*	plotter0;
+	IBOutlet ORPlotView*	plotter1;
 }
 
 #pragma mark ***Initialization
@@ -70,6 +70,9 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) readTempsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

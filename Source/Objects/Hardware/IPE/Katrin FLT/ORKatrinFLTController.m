@@ -24,10 +24,12 @@
 #import "ORKatrinFLTModel.h"
 #import "ORIpeFLTDefs.h"
 #import "ORFireWireInterface.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
 #import "ORValueBar.h"
-#import "ORAxis.h"
+#import "ORTimeAxis.h"
 #import "ORTimeRate.h"
+#import "ORTimeLinePlot.h"
+#import "OR1DHistoPlot.h"
 
 @implementation ORKatrinFLTController
 
@@ -86,6 +88,16 @@
     //NSLog(@"Awaking from NIB ...[[histogramPlotterId  yScale] setInteger:NO] %i\n",histogramPlotterId);
     //[[histogramPlotterId  yScale] setInteger:YES];//TODO : what is it? -tb- I think e.g. values smaller 1 ...
     [[histogramPlotterId  yScale] setMaxLimit:1e32]; //TODO: I think I am still limited (to 72 M?) -tb-
+	
+	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[timeRatePlot addPlot: aPlot];
+	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+	
+	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:1 andDataSource:self];
+	[histogramPlotterId addPlot: aPlot1];
+	[aPlot1 release];
+	
 	
 #if 0
     [eSamplePopUpButton insertItemWithTitle: @"0 (1)" atIndex: 0];
@@ -707,11 +719,11 @@
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-		[model setMiscAttributes:[[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-		[model setMiscAttributes:[[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
 	};
 	
 }
@@ -742,7 +754,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
 		if(attrib){
-			[[timeRatePlot xScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot xScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot xScale] setNeedsDisplay:YES];
 		}
@@ -750,7 +762,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
 		if(attrib){
-			[[timeRatePlot yScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot yScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot yScale] setNeedsDisplay:YES];
 			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
@@ -1854,48 +1866,45 @@
 
 
 #pragma mark ¥¥¥Plot DataSource
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
-	//NSLog(@"    DEBUG: This is  - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set\n" );
-    //if(aPlotter)
-	//  NSLog(@"Plottername is %@\n",[aPlotter name] );
-    if(histogramPlotterId == aPlotter){
-        //[[histogramPlotterId xScale] setInteger:FALSE];   TODO: what is it?????? -tb-
-  	    //NSLog(@"    DEBUG:   Testing: YES, it is the histo plotter\n" );
+	int tag = [aPlotter tag];
+	if(tag == 0) return [[model  totalRate]count];
+	else if(tag == 1){
         if([model  histogramData]) return 512;//return 512;
         else return 1024;
-        //if([model versionRegHWVersion]>=3) return 512;
-    }else{
-	    //NSLog(@"    DEBUG:   Testing: NO, it is not the histo plotter\n" );
-    }
-	
-    //the default is "hitrate plotter" / "RatesPlotter1D" -tb-
-	return [[model  totalRate]count];
-}
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	//-tb- NSLog(@"This is  - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x\n" );
-    if(histogramPlotterId == aPlotter){
-        if(![model histogramData]) return 200.0 + 100.0 * sin(0.01*x);   // testing: returns a sine wave
-        NSMutableArray *histogramData=[model  histogramData];
-        if(histogramData){//new storage style: for all pixels
-            int chan = [model histoCalibrationChan];
-            //Debug-output -tb- if(x==0) NSLog(@"Reading mutable data for Plotter, chan %i\n",chan);//debug
-            if(chan<0 || chan>=kNumFLTChannels) return 0.0;
-            unsigned int *dataPtr=(unsigned int *)[[histogramData objectAtIndex:chan] bytes];
-            return (float) (dataPtr[x]);
-        }
-        return (float)123.0;
-    }
-    
-    //the default "hitrate plotter" ...
-	int count = [[model totalRate]count];
-	return [[model totalRate] valueAtIndex:count-x-1];
+	}
+	else return 0;
 }
 
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	return [[model totalRate] sampleTime];
+	int tag = [aPlotter tag];
+	if(tag == 0){
+		int count = [[model totalRate]count];
+		int index = count-i-1;
+		*yValue = [[model totalRate] valueAtIndex:index];
+		*xValue = [[model totalRate] timeSampledAtIndex:index];
+	}
+    else if(tag == 1){
+        NSMutableArray *histogramData=[model  histogramData];
+        if(histogramData) {
+            int chan = [model histoCalibrationChan];
+            if(chan<0 || chan>=kNumFLTChannels){
+				*xValue = 0;
+				*yValue = 0;
+			}
+			else {
+				unsigned int *dataPtr=(unsigned int *)[[histogramData objectAtIndex:chan] bytes];
+				*yValue = (double)dataPtr[i];
+				*xValue = (double)i;
+			}
+        }
+    }
+	else {
+		*xValue = 0;
+		*yValue = 0;
+	}
 }
 
 //table 

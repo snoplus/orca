@@ -24,7 +24,6 @@
 #import "ORRateGroup.h"
 #import "ORValueBar.h"
 #import "ORAxis.h"
-#import "ORPlotter1D.h"
 #import "ORTimeRate.h"
 #import "ORMTC_Constants.h"
 #import "ORSelectorSequence.h"

@@ -24,7 +24,8 @@
 #import "ORUSB.h"
 #import "ORUSBInterface.h"
 #import "ORAxis.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
 
 @interface ORMCA927Controller (private)
 - (void) openPanelForFPGADidEnd:(NSOpenPanel*)sheet
@@ -198,6 +199,15 @@
 	[self populateInterfacePopup:[model getUSBController]];
 	[super awakeFromNib];
     [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+	
+	int i;
+	for(i=0;i<4;i++){
+		OR1DHistoPlot* aPlot;
+		aPlot= [[OR1DHistoPlot alloc] initWithTag:i andDataSource:self];
+		[plotter addPlot: aPlot];
+		[aPlot setLineColor:[self colorForDataSet:i]];		
+		[aPlot release];
+	}	
 }
 
 - (void) updateWindow
@@ -235,10 +245,10 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [plotter yScale]){
-		[model setMiscAttributes:[[plotter yScale]attributes] forKey:@"PlotterYAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[plotter yScale]attributes] forKey:@"PlotterYAttributes"];
 	}
 	else if(aNotification == nil || [aNotification object] == [plotter xScale]){
-		[model setMiscAttributes:[[plotter xScale]attributes] forKey:@"PlotterXAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[plotter xScale]attributes] forKey:@"PlotterXAttributes"];
 	}
 	
 }
@@ -251,7 +261,7 @@
 	if(aNote == nil || [key isEqualToString:@"PlotterYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"PlotterYAttributes"];
 		if(attrib){
-			[[plotter yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter yScale] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter yScale] setNeedsDisplay:YES];
 			[logCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
@@ -260,7 +270,7 @@
 	else if(aNote == nil || [key isEqualToString:@"PlotterXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"PlotterXAttributes"];
 		if(attrib){
-			[[plotter xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter xScale] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter xScale] setNeedsDisplay:YES];
 		}
@@ -828,14 +838,17 @@
 	}
 	
 }
-
-- (int)	numberOfDataSetsInPlot:(id)aPlotter
+- (NSColor*) colorForDataSet:(int)set
 {
-    return 4;
+	if(set==0)return [NSColor redColor];
+	else if(set==1)return [NSColor orangeColor];
+	else if(set==2)return [NSColor blueColor];
+	else return [NSColor blackColor];
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
+	int set = [aPlotter tag];
 	if(set == 0 || set == 1)return [model numChannels:set];
 	else {
 		if(set==2){
@@ -850,9 +863,11 @@
 	return 0;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	return [model spectrum:set valueAtChannel:x];
+	int set = [aPlotter tag];
+	*xValue = i;
+	*yValue = [model spectrum:set valueAtChannel:i];
 }
 
 @end

@@ -17,7 +17,7 @@
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class BiStateView;
 
 @interface ORKJL2200IonGaugeController : OrcaObjectController
@@ -41,7 +41,7 @@
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotter1D*   plotter0;
+	IBOutlet ORPlotView*   plotter0;
 	
     IBOutlet BiStateView*	setPoint1State;
     IBOutlet BiStateView*	setPoint2State;

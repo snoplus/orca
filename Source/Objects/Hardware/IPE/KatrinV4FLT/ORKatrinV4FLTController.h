@@ -20,10 +20,10 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "ORKatrinV4FLTModel.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORValueBar;
 
 @interface ORKatrinV4FLTController : OrcaObjectController {
@@ -74,7 +74,7 @@
 		IBOutlet ORValueBar*	rate0;
 		IBOutlet ORValueBar*	totalRate;
 		IBOutlet NSButton*		rateLogCB;
-		IBOutlet ORPlotter1D*	timeRatePlot;
+		IBOutlet ORPlotView*	timeRatePlot;
 		IBOutlet NSButton*		timeRateLogCB;
 		IBOutlet NSButton*		totalRateLogCB;
 		IBOutlet NSTextField*	totalHitRateField;
@@ -111,16 +111,16 @@
 		IBOutlet NSTextField*			noiseFloorStateField2;
 		
 };
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (id)   init;
 - (void) dealloc;
 - (void) awakeFromNib;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) updateButtons;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+#pragma mark •••Interface Management
 - (void) targetRateChanged:(NSNotification*)aNote;
 - (void) histMaxEnergyChanged:(NSNotification*)aNote;
 - (void) histPageABChanged:(NSNotification*)aNote;
@@ -169,7 +169,7 @@
 - (void) writeValueChanged:(NSNotification*) aNote;
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 - (IBAction) targetRateAction:(id)sender;
 - (IBAction) histClrModeAction:(id)sender;
 - (IBAction) histModeAction:(id)sender;
@@ -220,9 +220,8 @@
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 
 	
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Plot DataSource
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x ;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
+#pragma mark •••Plot DataSource
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

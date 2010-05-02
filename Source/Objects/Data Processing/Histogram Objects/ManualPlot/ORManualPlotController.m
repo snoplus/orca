@@ -22,9 +22,11 @@
 #pragma mark •••Imported Files
 #import "ORManualPlotController.h"
 #import "ORManualPlotModel.h"
-#import "ORPlotter1D.h"
-#import "ORCurve1D.h"
+#import "ORPlotView.h"
+#import "ORXYPlot.h"
 #import "ORCalibration.h"
+#import "OR1dRoiController.h"
+#import "OR1dFitController.h"
 
 @interface ORManualPlotController (private)
 - (void) selectWriteFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -38,6 +40,34 @@
 {
     self = [super initWithWindowNibName:@"ManualPlot"];
     return self;
+}
+
+- (void) awakeFromNib
+{
+	[super awakeFromNib];
+	
+	ORXYPlot* aPlot;
+	aPlot = [[ORXYPlot alloc] initWithTag:0 andDataSource:self];
+	[aPlot setRoi: [[model rois:0] objectAtIndex:0]];
+	[aPlot setLineColor:[NSColor redColor]];
+	[plotView addPlot: aPlot];
+	[aPlot release];
+	
+	aPlot = [[ORXYPlot alloc] initWithTag:1 andDataSource:self];
+	[aPlot setRoi: [[model rois:1] objectAtIndex:0]];
+	[aPlot setLineColor:[NSColor blueColor]];
+	[aPlot setShowSymbols:YES];
+	[aPlot setShowLine:YES];
+	[plotView addPlot: aPlot];
+	[aPlot release];
+	
+	roiController = [[OR1dRoiController panel] retain];
+	[roiView addSubview:[roiController view]];
+	
+	fitController = [[OR1dFitController panel] retain];
+	[fitView addSubview:[fitController view]];
+	
+	[self plotOrderDidChange:plotView];
 }
 
 - (void) registerNotificationObservers
@@ -77,11 +107,6 @@
 	
 }
 
-- (void) awakeFromNib
-{
-	[super awakeFromNib];
-	[plotter setUseGradient:YES];
-}
 
 - (void) updateWindow
 {
@@ -143,7 +168,7 @@
 - (void) dataChanged:(NSNotification*)aNotification
 {
 	[dataTableView reloadData];
-	[plotter setNeedsDisplay:YES];
+	[plotView setNeedsDisplay:YES];
 }
 
 - (void) refreshModeChanged:(NSNotification*)aNotification
@@ -158,7 +183,7 @@
 #pragma mark •••Actions
 - (IBAction) copy:(id)sender
 {
-	[plotter copy:sender];
+	[plotView copy:sender];
 }
 
 - (IBAction) refreshPlot:(id)sender
@@ -167,7 +192,7 @@
 	NSString* title;
 	if(col0Key > 2) title = @"Index";
 	else title = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col0Key]] headerCell] title];
-	[[plotter xScale] setLabel:title];
+	[[plotView xScale] setLabel:title];
 	
 	title = @"";
 	int col1Key = [model col1Key];
@@ -187,12 +212,8 @@
 	}
 	if([title length]==0)title = @"Index";
 	
-	
-	[y1LengendField setTextColor:[self colorForDataSet:0]];
-	[y2LengendField setTextColor:[self colorForDataSet:1]];
-
-	[[plotter yScale] setLabel:title];
-	[plotter setNeedsDisplay:YES];
+	[[plotView yScale] setLabel:title];
+	[plotView setNeedsDisplay:YES];
 }
 
 - (IBAction) col2KeyAction:(id)sender
@@ -237,9 +258,40 @@
 }
 
 #pragma mark •••Data Source
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
+- (BOOL) plotterShouldShowRoi:(id)aPlot
+{
+	if([analysisDrawer state] == NSDrawerOpenState)return YES;
+	else return NO;
+}
+
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot
+{
+	return [model rois:[aPlot tag]];
+}
+
+- (int) numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [model numPoints];
+}
+
+- (void) plotOrderDidChange:(id)aPlotView
+{
+	id topRoi = [(ORPlotWithROI*)[aPlotView topPlot] roi];
+	[roiController setModel:topRoi];
+	[fitController setModel:[topRoi fit]];
+	int i;
+	for(i=0;i<2;i++){
+		int tag = [[aPlotView plot:i] tag];
+		id aPlot = [aPlotView plot:i];
+		NSColor* theColor;
+		if(aPlot != [aPlotView topPlot])theColor = [[aPlot lineColor] highlightWithLevel:.5];
+		else							theColor = [aPlot lineColor];
+		if(tag == 1) [y1LengendField setTextColor:theColor];
+		else [y2LengendField setTextColor:theColor];
+
+		if(tag == 0) [y2LengendField setTextColor:theColor];
+		else [y1LengendField setTextColor:theColor];
+	}
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
@@ -247,38 +299,16 @@
 	return [model dataAtRow:row column:[[tableColumn identifier] intValue]];
 }
 
-- (BOOL) useXYPlot
-{
-	return YES;
-}
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-	return 2;
-}
-
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
 	return [model numPoints];
 }
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
+
+- (BOOL) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
 {
-	return [model dataSet:set index:index x:xValue y:yValue];
+	return [model dataSet:[aPlotter tag] index:index x:xValue y:yValue];
 }
 
-- (BOOL)   	willSupplyColors
-{
-    return YES;
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-    switch(set){
-        case 0:  return [NSColor redColor];
-        case 1:  return [NSColor blueColor];
-		default: return [NSColor colorWithCalibratedRed:10/255. green:90/255. blue:0 alpha:1];
-    }
-}
 @end
 
 @implementation ORManualPlotController (private)

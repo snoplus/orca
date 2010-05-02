@@ -23,7 +23,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORKatrinFLTModel.h"
 
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORValueBar;
 
 @interface ORKatrinFLTController : OrcaObjectController {
@@ -94,7 +94,7 @@
         // TRun buttons missing - up to now not necessary -tb-
         IBOutlet NSTextField*	firstBinField;
         IBOutlet NSTextField*	lastBinField;
-        IBOutlet ORPlotter1D*      histogramPlotterId;
+        IBOutlet ORPlotView*    histogramPlotterId;
         IBOutlet NSPopUpButton* eSamplePopUpButton;////eSample=BW TODO: rename to binWidth -tb-
         IBOutlet NSProgressIndicator* histoProgressIndicator;
         IBOutlet NSTextField*	histoElapsedTimeField;
@@ -120,7 +120,7 @@
 		IBOutlet ORValueBar*	rate0;
 		IBOutlet ORValueBar*	totalRate;
 		IBOutlet NSButton*		rateLogCB;
-		IBOutlet ORPlotter1D*	timeRatePlot;
+		IBOutlet ORPlotView*	timeRatePlot;
 		IBOutlet NSButton*		timeRateLogCB;
 		IBOutlet NSButton*		totalRateLogCB;
 		IBOutlet NSTextField*	totalHitRateField;
@@ -297,13 +297,8 @@
 - (IBAction) readRegisterWithAdressButtonAction:(id)sender;
 - (IBAction) writeRegisterWithAdressButtonAction:(id)sender;
 
-
-
-
-
 #pragma mark ¥¥¥Plot DataSource
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x ;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

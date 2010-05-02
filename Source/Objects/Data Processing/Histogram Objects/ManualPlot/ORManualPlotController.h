@@ -19,6 +19,10 @@
 //-------------------------------------------------------------
 #import "ORDataController.h"
 
+@class OR1dRoiController;
+@class OR1dFitController;
+@class ORXYPlot;
+
 @interface ORManualPlotController : ORDataController
 {
     IBOutlet NSTableView* dataTableView;
@@ -32,6 +36,11 @@
 	IBOutlet NSTextField*   y2LengendField;
 	id						calibrationPanel;
     IBOutlet NSDrawer*		dataDrawer;
+	IBOutlet NSView*		roiView;
+	IBOutlet NSView*		fitView;
+    OR1dRoiController*		roiController;
+	OR1dFitController*		fitController;
+
 }
 
 #pragma mark •••Initialization
@@ -57,9 +66,12 @@
 - (IBAction) copy:(id)sender;
 
 #pragma mark •••Data Source
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (int)numberOfRowsInTableView:(NSTableView *)tableView;
+- (void) plotOrderDidChange:(id)aPlotView;
+- (BOOL) plotterShouldShowRoi:(id)aPlot;
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (BOOL) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
+- (int) numberOfRowsInTableView:(NSTableView *)tableView;
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue;
 
 @end
