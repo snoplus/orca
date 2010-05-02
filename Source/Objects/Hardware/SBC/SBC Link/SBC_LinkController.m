@@ -25,8 +25,9 @@
 #import "ORCard.h"
 #import "ORVmeAdapter.h"
 #import "ORSBC_LAMModel.h"
-#import "ORPlotter2D.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
+#import "ORVectorPlot.h"
 #import "ORAxis.h"
 
 @interface SBC_LinkController (private)
@@ -63,15 +64,22 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-    [plotter setVectorMode:YES];
     [[plotter xScale] setRngLimitsLow:0 withHigh:300 withMinRng:300];
     [[plotter yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
-    [plotter setUseGradient:YES];
-    [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
 	
 	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
     [[histogram yScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
-    [histogram setUseGradient:YES];
+
+    [plotter setUseGradient:YES];
+    [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
+	
+	ORVectorPlot* aPlot = [[ORVectorPlot alloc] initWithTag:0 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[aPlot release];
+
+	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:1 andDataSource:self];
+	[histogram addPlot: aPlot1];
+	[aPlot1 release];
 	
 	[payloadSizeSlider setMinValue:0];
 	[payloadSizeSlider setMaxValue:300];
@@ -1047,41 +1055,43 @@
 	[[model sbcLink] setPayloadSize:[sender intValue]*1000];
 }
 
-
-- (unsigned long) plotter:(id)aPlotter numPointsInSet:(int)set
+- (int)	numberPointsInPlot:(id)aPlotter
 {
-    return [[model sbcLink] cbTestCount];
+	int tag = [aPlotter tag];
+    if(tag == 0) return [[model sbcLink] cbTestCount];
+	else		 return 1000;
+}
+   
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
+{
+	int tag = [aPlotter tag];
+    if(tag == 0){
+		if(index>100){
+			*xValue = 0;
+			*yValue = 0;
+		}
+		else {
+			NSPoint track = [[model sbcLink] cbPoint:index];
+			*xValue = track.x;
+			*yValue = track.y;
+		}
+	}
+	else {
+		*yValue = [[model sbcLink] recordSizeHisto:index];
+		*xValue = index;
+	}
 }
 
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
+- (BOOL) plotter:(id)aPlotter crossHairX:(double*)xValue crossHairY:(double*)yValue
 {
-    if(index>100){
-        *xValue = 0;
-        *yValue = 0;
-        return NO;
-    }
-    NSPoint track = [[model sbcLink] cbPoint:index];
-    *xValue = track.x;
-    *yValue = track.y;
-    return YES;    
-}
-
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
-    return 1000;
-}
-
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
-{
-    return (float)[[model sbcLink] recordSizeHisto:x];
-}
-
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue
-{
-    *xValue = [[model sbcLink] payloadSize]/1000.;
-	if([[model sbcLink] productionSpeedValueValid])*yValue = [[model sbcLink] productionSpeed];
-    else *yValue = 0;
-    return YES;
+	if([aPlotter tag] == 0){
+		if([[model sbcLink] productionSpeedValueValid])	{
+			*xValue = [[model sbcLink] payloadSize]/1000.;
+			*yValue = [[model sbcLink] productionSpeed];
+			return YES;
+		}
+	}
+	return NO;
 }
 
 - (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
@@ -1124,8 +1134,6 @@
 		[[model sbcLink] installDriver:[driverPassWordField stringValue]];  
 	}
 }
-
-
 
 @end
 

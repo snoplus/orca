@@ -22,8 +22,7 @@
 @class ORQueueView;
 @class ORTimedTextField;
 @class ORValueBar;
-@class ORPlotter2D;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface SBC_LinkController : OrcaObjectController
 {
@@ -96,8 +95,8 @@
 	IBOutlet NSProgressIndicator* pingTaskProgress;
 	IBOutlet NSButton*		cbTestButton;
 	IBOutlet NSProgressIndicator* cbTestProgress;
-	IBOutlet ORPlotter2D*	plotter;
-	IBOutlet ORPlotter1D*	histogram;
+	IBOutlet ORPlotView*	plotter;
+	IBOutlet ORPlotView*	histogram;
 	IBOutlet NSTextField*	numTestPointsField;
 	IBOutlet NSTextField*	numRecordsField;
 	IBOutlet NSTextField*	numErrorsField;
@@ -196,9 +195,11 @@
 #pragma mark ¥¥¥DataSource
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
-- (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue;
+
+- (int)	numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
+- (BOOL) plotter:(id)aPlotter crossHairX:(double*)xValue crossHairY:(double*)yValue;
+
 @end
 
 @interface OrcaObject (SBC_Link)
