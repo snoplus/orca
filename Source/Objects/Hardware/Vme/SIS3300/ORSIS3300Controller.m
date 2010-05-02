@@ -23,8 +23,10 @@
 #import "ORRateGroup.h"
 #import "ORRate.h"
 #import "ORValueBar.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
+#import "ORPlot.h"
+#import "ORPlotView.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 #import "ORRate.h"
 #import "OHexFormatter.h"
@@ -73,8 +75,31 @@
 		NSCell* theCell = [rateTextFields cellAtRow:i column:0];
 		[theCell setFormatter:rateFormatter];
 	}
-	[super awakeFromNib];
 	
+	NSColor* color[8] = {
+		[NSColor redColor],
+		[NSColor greenColor],
+		[NSColor blueColor],
+		[NSColor brownColor],
+		[NSColor blackColor],
+		[NSColor orangeColor],
+		[NSColor purpleColor],
+		[NSColor cyanColor],
+	};
+	
+	for(i=0;i<8;i++){
+		ORPlot* aPlot = [[ORPlot alloc] initWithTag:i andDataSource:self];
+		[aPlot setLineColor:color[i]];
+		[plotter addPlot: aPlot];
+		[aPlot release];
+	}
+	
+	ORTimeLinePlot* aPlot1 = [[ORTimeLinePlot alloc] initWithTag:8 andDataSource:self];
+	[timeRatePlot addPlot: aPlot1];
+	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot1 release];
+	
+	[super awakeFromNib];
 }
 
 #pragma mark •••Notifications
@@ -453,11 +478,11 @@
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-		[model setMiscAttributes:[[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-		[model setMiscAttributes:[[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
 	};
 	
 }
@@ -488,7 +513,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
 		if(attrib){
-			[[timeRatePlot xScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot xScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot xScale] setNeedsDisplay:YES];
 		}
@@ -496,7 +521,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
 		if(attrib){
-			[[timeRatePlot yScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot yScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot yScale] setNeedsDisplay:YES];
 			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
@@ -726,42 +751,33 @@
 
 - (double) getBarValue:(int)tag
 {
-	
 	return [[[[model waveFormRateGroup]rates] objectAtIndex:tag] rate];
 }
-- (BOOL)   	willSupplyColors
+
+- (int) numberPointsInPlot:(id)aPlotter
 {
-    return NO;
+	int set = [aPlotter tag];
+	if(set<8)return [model numberOfSamples];
+	else return [[[model waveFormRateGroup] timeRate]count];
 }
 
-- (int) 	numberOfDataSetsInPlot:(id)aPlotter
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	if(aPlotter== plotter)return 8;
-	else return 1;
-}
-
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
-	if(aPlotter== plotter)return [model numberOfSamples];
-	else return [[[model waveFormRateGroup]timeRate]count];
-}
-
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	if(aPlotter== plotter){
-		return [model dataWord:set index:x];
+	int set = [aPlotter tag];
+	if(set<8){
+		*yValue =  [model dataWord:set index:i];
+		*xValue = i;
 	}
-	else if(set == 0){
+	else if(set == 8){
 		int count = [[[model waveFormRateGroup]timeRate] count];
-		return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
-		
+		int index = count-i-1;
+		*yValue = [[[model waveFormRateGroup] timeRate] valueAtIndex:index];
+		*xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];
 	}
-	return 0;
-}
-
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return [[[model waveFormRateGroup]timeRate]sampleTime];
+	else {
+		*yValue = 0;
+		*xValue = 0;		
+	}
 }
 
 @end

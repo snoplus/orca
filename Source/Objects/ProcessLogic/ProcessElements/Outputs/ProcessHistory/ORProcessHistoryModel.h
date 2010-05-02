@@ -41,9 +41,8 @@
 - (void) postUpdate;
 
 #pragma mark ¥¥¥Plot Data Source
-- (int) 	numberOfDataSetsInPlot:(id)aPlotter;
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x ;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 @end
 
 @interface NSObject (ProcessHistory)

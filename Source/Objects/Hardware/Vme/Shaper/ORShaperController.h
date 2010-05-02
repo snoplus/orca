@@ -20,7 +20,7 @@
 
 
 @class ORValueBar;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORShaperController : OrcaObjectController {
 
@@ -61,7 +61,7 @@
     IBOutlet ORValueBar*	totalRate;
     IBOutlet NSButton*		rateLogCB;
     IBOutlet NSButton*		totalRateLogCB;
-    IBOutlet ORPlotter1D*	timeRatePlot;
+    IBOutlet ORPlotView*	timeRatePlot;
     IBOutlet NSButton*		timeRateLogCB;
 }
 
@@ -126,5 +126,7 @@
 
 - (IBAction) integrationAction:(id)sender;
 
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

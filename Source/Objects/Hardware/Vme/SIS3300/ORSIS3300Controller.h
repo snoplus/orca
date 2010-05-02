@@ -23,7 +23,7 @@
 #import "OrcaObjectController.h"
 #import "ORSIS3300Model.h"
 @class ORValueBar;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORSIS3300Controller : OrcaObjectController 
 {
@@ -48,7 +48,7 @@
 	IBOutlet NSPopUpButton* clockSourcePU;
 	IBOutlet NSTextField*	stopDelayField;
 	IBOutlet NSPopUpButton* pageSizePU;
-	IBOutlet ORPlotter1D*   plotter;
+	IBOutlet ORPlotView*   plotter;
 
 	//thresholds
 	IBOutlet NSMatrix*		enabledMatrix;
@@ -72,7 +72,7 @@
     IBOutlet ORValueBar*    totalRate;
     IBOutlet NSButton*      rateLogCB;
     IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotter1D*   timeRatePlot;
+    IBOutlet ORPlotView*	timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
 	IBOutlet NSTextField*	moduleIDField;
 	
@@ -143,10 +143,8 @@
 
 #pragma mark •••Data Source
 - (double)  getBarValue:(int)tag;
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
-- (int) 	numberOfDataSetsInPlot:(id)aPlotter;
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

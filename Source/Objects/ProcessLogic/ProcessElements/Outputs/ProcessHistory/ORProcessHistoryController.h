@@ -20,12 +20,13 @@
 
 
 #pragma mark ¥¥¥Imported Files
-
 #import "ORProcessHwAccessorController.h"
+
+@class ORPlotView;
 
 @interface ORProcessHistoryController : ORProcessHwAccessorController 
 {
-	IBOutlet id plotter;
+	IBOutlet ORPlotView* plotter;
     BOOL scheduledToUpdate;
 }
 
@@ -45,8 +46,7 @@
 #pragma mark ¥¥¥Actions
 
 #pragma mark ¥¥¥Plot Data Source
-- (int)   numberOfDataSetsInPlot:(id)aPlotter;
-- (int)	  numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

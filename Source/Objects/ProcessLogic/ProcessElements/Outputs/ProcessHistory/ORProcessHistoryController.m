@@ -22,8 +22,9 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORProcessHistoryController.h"
 #import "ORProcessHistoryModel.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
+#import "ORPlotView.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeAxis.h"
 #import "ORProcessThread.h"
 
 @implementation ORProcessHistoryController
@@ -47,9 +48,24 @@
 	[[plotter yScale] setRngLimitsLow:-1000 withHigh:1000 withMinRng:5];
 	[[plotter yScale] setRngDefaultsLow:0 withHigh:20];
 
-	[[plotter xScale] setRngLimitsLow:0 withHigh:50000 withMinRng:10];
+	[[plotter xScale] setRngLimitsLow:0 withHigh:50000 withMinRng:3];
 	[[plotter xScale] setRngDefaultsLow:0 withHigh:50000];
-
+	
+	NSColor* theColors[4] = {
+		[NSColor redColor],
+		[NSColor blueColor],
+		[NSColor blackColor],
+		[NSColor greenColor],
+	};
+	int i;
+	for(i=0;i<4;i++){
+		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[aPlot setLineColor:theColors[i]];
+		[plotter addPlot: aPlot];
+		[(ORTimeAxis*)[plotter xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release]; 
+	}
+	
 }
 
 #pragma mark ¥¥¥Notifications
@@ -85,11 +101,11 @@
 {
 	
 	if(aNotification == nil || [aNotification object] == [plotter xScale]){
-		[model setMiscAttributes:[[plotter xScale]attributes] forKey:@"plotterXAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[plotter xScale]attributes] forKey:@"plotterXAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter yScale]){
-		[model setMiscAttributes:[[plotter yScale]attributes] forKey:@"plotterYAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[plotter yScale]attributes] forKey:@"plotterYAttributes"];
 	};
 	
 }
@@ -102,7 +118,7 @@
 	if(aNote == nil || [key isEqualToString:@"plotterXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"plotterXAttributes"];
 		if(attrib){
-			[[plotter xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter xScale] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter xScale] setNeedsDisplay:YES];
 		}
@@ -110,7 +126,7 @@
 	if(aNote == nil || [key isEqualToString:@"plotterYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"plotterYAttributes"];
 		if(attrib){
-			[[plotter yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter yScale] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
 			[[plotter yScale] setNeedsDisplay:YES];
 		}
@@ -133,19 +149,13 @@
 }
 
 #pragma mark ¥¥¥Plot Data Source
-- (int) numberOfDataSetsInPlot:(id)aPlotter
+- (int) numberPointsInPlot:(id)aPlotter
 {
-	return [model numberOfDataSetsInPlot:aPlotter];
+	return [model numberPointsInPlot:aPlotter];
 }
 
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	return [model numberOfPointsInPlot:aPlotter dataSet:set];
-}
-
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	 return [model plotter:aPlotter dataSet:set dataValue:x];
-
+	[model plotter:aPlotter index:i x:xValue y:yValue];
 }
 @end

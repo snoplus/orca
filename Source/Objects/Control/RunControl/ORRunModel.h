@@ -88,6 +88,7 @@
 		NSString* startScriptState;
 		NSString* shutDownScriptState;
 		int subRunNumber;
+		BOOL runModeCache;
 }
 
 

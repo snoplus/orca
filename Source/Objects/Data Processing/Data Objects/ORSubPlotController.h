@@ -18,17 +18,14 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
-
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORSubPlotController : NSObject 
 {
     @private
-        IBOutlet NSView * 	view;
-        IBOutlet ORPlotter1D*   plotter;
-        IBOutlet NSTextField*   title;
+        IBOutlet NSView*		view;
+        IBOutlet ORPlotView*	plotView;
+        IBOutlet NSTextField*	title;
 }
 
 + (ORSubPlotController*) panel;
@@ -38,7 +35,7 @@
 // The nib file's have an outlet on the file's owner connected to the view.  This method 
 // returns that view.
 - (NSView*)view;
-- (ORPlotter1D*) plotter;
+- (ORPlotView*) plotView;
 
 - (void) setModel:(id)aModel;
 - (void) registerNotificationObservers;

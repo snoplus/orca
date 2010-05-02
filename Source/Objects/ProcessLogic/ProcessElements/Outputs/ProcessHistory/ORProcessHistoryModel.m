@@ -139,24 +139,19 @@ NSString* historyConnectors[4] = {
 //--------------------------------
 
 #pragma mark ¥¥¥Plot Data Source
-- (int) 	numberOfDataSetsInPlot:(id)aPlotter
+- (int) numberPointsInPlot:(id)aPlotter
 {
-	return 4;
-}
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return 10;
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
+	int set = [aPlotter tag];
 	return [inputValue[set] count];
 }
 
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
+	int set = [aPlotter tag];
 	int count = [inputValue[set] count];
-	return [inputValue[set] valueAtIndex:count-x-1];
+	int index = count-i-1;
+	*yValue =  [inputValue[set] valueAtIndex:index];
+	*xValue =  [inputValue[set] timeSampledAtIndex:index];
 }
 
 @end

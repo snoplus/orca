@@ -110,6 +110,24 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [super dealloc];
 }
 
+- (void) wakeUp
+{
+    if([self aWake])return;
+    [super wakeUp];
+	[self setOfflineRun:[[ORGlobal sharedGlobal] runMode]];
+}	
+
+- (void) sleep
+{
+	runModeCache = [self offlineRun];
+	[self setOfflineRun:NO];
+	[super sleep];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+	[self setOfflineRun:[[ORGlobal sharedGlobal] runMode]];
+}
 
 - (void) makeConnectors
 {
@@ -1578,7 +1596,6 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
     [self setRunTypeNames:[decoder decodeObjectForKey:ORRunTypeNames]];
     [self setDefinitionsFilePath:[decoder decodeObjectForKey:ORRunDefinitions]];
     [self setRemoteInterface:[decoder decodeBoolForKey:@"RemoteInterface"]];
-    
     [[self undoManager] enableUndoRegistration];
     
     _ignoreMode = NO;
