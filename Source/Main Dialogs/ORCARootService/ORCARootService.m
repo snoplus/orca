@@ -310,9 +310,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 		[aDataPacket makeFileHeader];
 		[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORCARootService"];
 		
-		
-		NSData* dataHeader = [ORDecoder  convertHeaderToData:[aDataPacket fileHeader]];
-		if(dataHeader)[socket writeData:dataHeader];
+		id aFileHeader = [aDataPacket fileHeader];
+		if(aFileHeader){
+			NSData* dataHeader = [ORDecoder  convertHeaderToData:aFileHeader];
+			if(dataHeader)[socket writeData:dataHeader];
+		}
 		[aDataPacket release];
 		
         [self setIsConnected:[socket isConnected]];

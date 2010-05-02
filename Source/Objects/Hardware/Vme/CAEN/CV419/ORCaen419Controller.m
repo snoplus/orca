@@ -23,9 +23,10 @@
 #import "ORRate.h"
 #import "ORRateGroup.h"
 #import "ORValueBar.h"
-#import "ORAxis.h"
-#import "ORPlotter1D.h"
 #import "ORTimeRate.h"
+#import "ORTimeLinePlot.h"
+#import "ORPlotView.h"
+#import "ORTimeAxis.h"
 
 @implementation ORCaen419Controller
 #pragma mark ***Initialization
@@ -44,6 +45,12 @@
     [tabView selectTabViewItemAtIndex: index];
 	[[rate0 xScale] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
 	[[totalRate xScale] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
+
+	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[timeRatePlot addPlot: aPlot];
+	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+	
 }
 
 #pragma mark •••Notfications
@@ -353,11 +360,11 @@
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-		[model setMiscAttributes:[[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-		[model setMiscAttributes:[[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
 	};
 	
 }
@@ -388,7 +395,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
 		if(attrib){
-			[[timeRatePlot xScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot xScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot xScale] setNeedsDisplay:YES];
 		}
@@ -396,7 +403,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
 		if(attrib){
-			[[timeRatePlot yScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot yScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot yScale] setNeedsDisplay:YES];
 			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
@@ -555,23 +562,17 @@
 }
 
 
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
 	return [[[model adcRateGroup]timeRate]count];
 }
 
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	if(set == 0){
-		int count = [[[model adcRateGroup]timeRate] count];
-		return [[[model adcRateGroup]timeRate]valueAtIndex:count-x-1];
-	}
-	return 0;
-}
-
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return [[[model adcRateGroup]timeRate]sampleTime];
+	int count = [[[model adcRateGroup]timeRate] count];
+	int index = count-i-1;
+	*yValue =  [[[model adcRateGroup] timeRate] valueAtIndex:index];
+	*xValue =  [[[model adcRateGroup] timeRate] timeSampledAtIndex:index];
 }
 
 @end

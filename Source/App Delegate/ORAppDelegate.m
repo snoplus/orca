@@ -355,19 +355,23 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     }
     
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
-    
-    
+   
+    NSError* fileOpenError = nil;
 	@try {
 		if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
 			NSString* lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
-			if([[NSDocumentController sharedDocumentController] openDocumentWithContentsOfFile: lastFile display:YES] == nil){
-				NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
-				NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
-				[self closeSplashWindow];
-				NSRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
-			}
-			else {
-				NSLog(@"Opened Configuration: %@\n",lastFile);
+			if(lastFile){
+				NSLog(@"Trying to open: %@\n",lastFile);
+				NSURL* asURL = [NSURL fileURLWithPath:lastFile];
+				if(![[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:asURL display:YES error:&fileOpenError]){
+					[self closeSplashWindow];
+					NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
+					NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
+					NSRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
+				}
+				else {
+					NSLog(@"Opened Configuration: %@\n",lastFile);
+				}
 			}
 			if([[[NSUserDefaults standardUserDefaults] objectForKey: OROrcaSecurityEnabled] boolValue]){
 				NSLog(@"Orca global security is enabled.\n");
@@ -380,6 +384,8 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	}
 	@catch(NSException* localException) {
 		NSLogColor([NSColor redColor],@"There was an exception thrown during load... configuration may not be complete!\n");
+		if(fileOpenError)[NSApp presentError:fileOpenError];
+		[self setDocument:nil];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
@@ -426,8 +432,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 - (void) closeSplashWindow
 {
 	[theSplashController close];
-	[theSplashController release];
-	theSplashController = nil;	
+	[theSplashController autorelease];
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender

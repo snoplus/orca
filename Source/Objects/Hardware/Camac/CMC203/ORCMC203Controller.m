@@ -24,8 +24,10 @@
 #import "ORRate.h"
 #import "ORRateGroup.h"
 #import "ORValueBar.h"
-#import "ORAxis.h"
-#import "ORPlotter1D.h"
+#import "ORTimeAxis.h"
+#import "ORPlotView.h"
+#import "OR1DHistoPlot.h"
+#import "ORTimeLinePlot.h"
 #import "ORTimeRate.h"
 
 @interface ORCMC203Controller (private)
@@ -51,6 +53,16 @@
 - (void) awakeFromNib
 {
 	[[totalRate xScale] setRngLimitsLow:0 withHigh:100E6 withMinRng:10000];
+	
+	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[timeRatePlot addPlot: aPlot];
+	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+
+	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:1 andDataSource:self];
+	[histoPlot addPlot: aPlot1];
+	[aPlot1 release];
+	
 	[super awakeFromNib];
 }
 
@@ -253,18 +265,18 @@
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-		[model setMiscAttributes:[[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-		[model setMiscAttributes:[[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
 	};
 
 	if(aNotification == nil || [aNotification object] == [histoPlot yScale]){
-		[model setMiscAttributes:[[histoPlot yScale]attributes] forKey:@"histoYAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[histoPlot yScale]attributes] forKey:@"histoYAttributes"];
 	};
 	if(aNotification == nil || [aNotification object] == [histoPlot xScale]){
-		[model setMiscAttributes:[[histoPlot xScale]attributes] forKey:@"histoXAttributes"];
+		[model setMiscAttributes:[(ORAxis*)[histoPlot xScale]attributes] forKey:@"histoXAttributes"];
 	};
 	
 	
@@ -287,7 +299,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
 		if(attrib){
-			[[timeRatePlot xScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot xScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot xScale] setNeedsDisplay:YES];
 		}
@@ -295,7 +307,7 @@
 	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
 		if(attrib){
-			[[timeRatePlot yScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot yScale] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
 			[[timeRatePlot yScale] setNeedsDisplay:YES];
 			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
@@ -305,7 +317,7 @@
 	if(aNote == nil || [key isEqualToString:@"HistoYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"HistoYAttributes"];
 		if(attrib){
-			[[histoPlot yScale] setAttributes:attrib];
+			[(ORAxis*)[histoPlot yScale] setAttributes:attrib];
 			[histoPlot setNeedsDisplay:YES];
 			[[histoPlot yScale] setNeedsDisplay:YES];
 		}
@@ -314,7 +326,7 @@
 	if(aNote == nil || [key isEqualToString:@"HistoXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"HistoXAttributes"];
 		if(attrib){
-			[[histoPlot xScale] setAttributes:attrib];
+			[(ORAxis*)[histoPlot xScale] setAttributes:attrib];
 			[histoPlot setNeedsDisplay:YES];
 			[[histoPlot xScale] setNeedsDisplay:YES];
 		}
@@ -419,24 +431,30 @@
 }
 
 
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
-	if(aPlotter == histoPlot)	return [model histogramCount];
-	else						return [[[model fifoRateGroup]timeRate]count];
-}
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	if(aPlotter == histoPlot) return [model histoDataValueAtIndex:x];
-	else {
-		int count = [[[model fifoRateGroup]timeRate] count];
-		return [[[model fifoRateGroup]timeRate]valueAtIndex:count-x-1];
-	}
-	return 0;
+	int tag = [aPlotter tag];
+	if(tag == 0) return [[[model fifoRateGroup]timeRate]count];
+	else		 return [model histogramCount];
 }
 
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	return [[[model fifoRateGroup]timeRate]sampleTime];
+	int tag = [aPlotter tag];
+	if(tag == 0){
+		int count = [[[model fifoRateGroup]timeRate] count];
+		int index = count-i-1;
+		*yValue =  [[[model fifoRateGroup] timeRate] valueAtIndex:index];
+		*xValue =  [[[model fifoRateGroup] timeRate] timeSampledAtIndex:index];
+	}
+	else if(tag == 1){
+		*yValue =   [model histoDataValueAtIndex:i];
+		*xValue = i;
+	}
+	else {
+		*yValue = 0;
+		*xValue = i;
+	}
 }
 
 

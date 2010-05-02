@@ -21,8 +21,9 @@
 
 #import "ORBocTIC3Controller.h"
 #import "ORBocTIC3Model.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
+#import "ORTimeLinePlot.h"
+#import "ORPlotView.h"
+#import "ORTimeAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #define __CARBONSOUND__ //temp until undated to >10.3
@@ -54,11 +55,21 @@
     [self populatePortListPopup];
     [[plotter0 yScale] setRngLow:0.0 withHigh:1000.];
 	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100000 withMinRng:10];
-	[plotter0 setUseGradient:YES];
 
     [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [super awakeFromNib];
+
+	int i;
+	for(i=0;i<3;i++){
+		ORTimeLinePlot* aPlot;
+		aPlot= [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
+		[plotter0 addPlot: aPlot];
+		[aPlot setLineColor:[self colorForDataSet:i]];
+
+		[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot release];
+	}
+	[super awakeFromNib];
 }
 
 #pragma mark ***Notifications
@@ -153,11 +164,11 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
-		[model setMiscAttributes:[[plotter0 xScale]attributes] forKey:@"XAttributes0"];
+		[model setMiscAttributes:[(ORAxis*)[plotter0 xScale]attributes] forKey:@"XAttributes0"];
 	};
 	
 	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
-		[model setMiscAttributes:[[plotter0 yScale]attributes] forKey:@"YAttributes0"];
+		[model setMiscAttributes:[(ORAxis*)[plotter0 yScale]attributes] forKey:@"YAttributes0"];
 	};
 
 }
@@ -171,7 +182,7 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
 		if(attrib){
-			[[plotter0 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 xScale] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
 			[[plotter0 xScale] setNeedsDisplay:YES];
 		}
@@ -179,7 +190,7 @@
 	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
 		if(attrib){
-			[[plotter0 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 yScale] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
 			[[plotter0 yScale] setNeedsDisplay:YES];
 		}
@@ -345,10 +356,6 @@
 
 
 #pragma mark ¥¥¥Data Source
-- (BOOL) willSupplyColors
-{
-	return YES;
-}
 
 - (NSColor*) colorForDataSet:(int)set
 {
@@ -358,30 +365,19 @@
 	else return [NSColor blackColor];
 }
 
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
+- (int) numberPointsInPlot:(id)aPlotter
 {
-    return 3;
+	int set = [aPlotter tag];
+	return [[model timeRate:set] count];
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	if(aPlotter == plotter0) return [[model timeRate:set] count];
-	else return 0;
-}
-
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	if(aPlotter == plotter0){
-		int count = [[model timeRate:set] count];
-		return [[model timeRate:set] valueAtIndex:count-x-1] * [model pressureScaleValue];
-	}
-	else return 0;
-}
-
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return [[model timeRate:0] sampleTime]; //all should be the same, just return value for rate 0
+	int set = [aPlotter tag];
+	int count = [[model timeRate:set] count];
+	int index = count-i-1;
+	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
+	*yValue = [[model timeRate:set] valueAtIndex:index] * [model pressureScaleValue];
 }
 
 @end

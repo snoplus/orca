@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORCTITempController : OrcaObjectController
 {
@@ -33,7 +33,7 @@
     IBOutlet NSButton*      readTempsButton;
     IBOutlet NSTextField*   tempField;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotter1D*   plotter0;
+	IBOutlet ORPlotView*   plotter0;
 }
 
 #pragma mark ***Initialization
@@ -64,6 +64,9 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) readTempsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

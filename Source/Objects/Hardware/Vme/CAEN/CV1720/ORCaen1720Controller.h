@@ -22,7 +22,7 @@
 #import "OrcaObjectController.h"
 
 @class ORValueBar;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORCaen1720Controller : OrcaObjectController {
     IBOutlet NSTabView* 	tabView;
@@ -78,7 +78,7 @@
     IBOutlet ORValueBar*    totalRate;
     IBOutlet NSButton*      rateLogCB;
     IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotter1D*   timeRatePlot;
+    IBOutlet ORPlotView*    timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
     IBOutlet NSTextField*   bufferStateField;
 
@@ -164,8 +164,8 @@
 
 #pragma mark •••Data Source
 - (double) getBarValue:(int)tag;
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
 
 @end

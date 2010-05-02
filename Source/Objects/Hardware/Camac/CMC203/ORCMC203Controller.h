@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 @class ORValueBar;
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORCMC203Controller : OrcaObjectController
 {
@@ -42,11 +42,11 @@
 	
     IBOutlet ORValueBar*	totalRate;
     IBOutlet NSButton*		totalRateLogCB;
-    IBOutlet ORPlotter1D*	timeRatePlot;
+    IBOutlet ORPlotView*	timeRatePlot;
     IBOutlet NSButton*		timeRateLogCB;
 	
 	//histograms (histo mode)
-    IBOutlet ORPlotter1D*	histoPlot;
+    IBOutlet ORPlotView*	histoPlot;
 }
 
 #pragma mark ***Initialization
@@ -86,6 +86,9 @@
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) initAction:(id)sender;
 - (IBAction) loadFPGAAction:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

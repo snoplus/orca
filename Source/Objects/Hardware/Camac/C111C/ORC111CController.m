@@ -23,7 +23,8 @@
 
 #pragma mark •••Imported Files
 #import "ORC111CController.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "ORPlot.h"
 #import "ORC111CModel.h"
 #import "ORCmdHistory.h"
 
@@ -45,8 +46,12 @@
 
 - (void) awakeFromNib
 {
+	ORPlot* aPlot = [[ORPlot alloc] initWithTag:0 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[aPlot release];
+	
 	[super awakeFromNib];
-	[plotter setUseGradient:YES];
+	
 	if([model trackTransactions]){
 		[self performSelector:@selector(updatePlot) withObject:nil afterDelay:1.0];
 	}
@@ -221,15 +226,15 @@
 
 
 #pragma mark •••Plotter Datasource
-- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) numberPointsInPlot:(id)aPlotter
 {
     return kMaxNumberC111CTransactionsPerSecond;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	return [model transactionsPerSecondHistogram:x];
- 
+	*yValue =  [model transactionsPerSecondHistogram:i];
+ 	*xValue = i;
 }
 
 

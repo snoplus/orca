@@ -21,7 +21,7 @@
 #import "OrcaObjectController.h"
 
 @class ORValueBar;
-@class ORPlotter1D;
+@class ORPlotView;
 
 // Definition of class
 @interface ORCaen419Controller : OrcaObjectController {
@@ -56,7 +56,7 @@
     IBOutlet ORValueBar*	totalRate;
     IBOutlet NSButton*		rateLogCB;
     IBOutlet NSButton*		totalRateLogCB;
-    IBOutlet ORPlotter1D*	timeRatePlot;
+    IBOutlet ORPlotView*	timeRatePlot;
     IBOutlet NSButton*		timeRateLogCB;
 	
 }
@@ -103,5 +103,8 @@
 - (IBAction) fire:(id) sender;
 - (IBAction) reset:(id) sender;
 - (IBAction) integrationAction:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end

@@ -26,7 +26,7 @@
 #import "ORCC32Controller.h"
 
 #pragma mark •••Forward Declarations
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORC111CController : ORCC32Controller {
 	@private
@@ -37,7 +37,7 @@
 		IBOutlet NSButton*		ipConnectButton;
 		IBOutlet NSButton*		sendAsciiCmdButton;
 		IBOutlet NSTextField*	asciiCmdTextField;
-		IBOutlet ORPlotter1D*	plotter;
+		IBOutlet ORPlotView*	plotter;
 };
 
 #pragma mark •••Initialization
@@ -62,5 +62,8 @@
 - (IBAction) connectAction:(id)sender;
 - (IBAction) sendAsciiCmd:(id)sender;
 - (IBAction) clearTransactions:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
