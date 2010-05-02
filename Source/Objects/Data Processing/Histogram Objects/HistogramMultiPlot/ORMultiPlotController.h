@@ -21,12 +21,20 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
+
+@class OR1dRoiController;
+@class OR1dFitController;
+
 @interface ORMultiPlotController : ORDataController {
 	@protected
 		IBOutlet NSMatrix* legendMatrix;
 		IBOutlet NSTextField* plotNameField;
+		IBOutlet NSView*		roiView;
+		IBOutlet NSView*		fitView;
 		BOOL	scheduledForUpdate;
 		id		calibrationPanel;
+		OR1dRoiController*		roiController;
+		OR1dFitController*		fitController;
 }
 
 - (id)   init;
@@ -36,8 +44,15 @@
 - (void) dataChanged:(NSNotification*)aNote;
 - (void) modelRecached:(NSNotification*)aNote;
 - (void) plotNameChanged:(NSNotification*)aNote;
-- (void) activePlotChanged:(NSNotification*)aNote;
 
 - (IBAction) plotNameAction:(id)sender;
 - (IBAction) calibrate:(id)sender;
+
+#pragma mark ¥¥¥Data Source
+- (BOOL) plotterShouldShowRoi:(id)aPlot;
+- (void) plotOrderDidChange:(ORPlotView*)aPlotView;
+- (int) numberPointsInPlot:(id)aPlot;
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
+- (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
+
 @end

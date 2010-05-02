@@ -23,11 +23,6 @@
 @implementation ORMaskedWaveform
 
 #pragma mark ¥¥¥Accessors
-- (BOOL) useDataObject:(id)aPlotter  dataSet:(int)set
-{
-	return NO;
-}
-
 - (unsigned long) mask
 {
 	return mask;
@@ -42,6 +37,27 @@
 {
 	if(!mask)return [super value:aChan];
 	return [super value:aChan] & mask;
+}
+
+-(long) unMaskedValue:(unsigned short)aChan
+{
+	return [super value:aChan];
+}
+
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    [[self undoManager] disableUndoRegistration];
+    [self setMask:[decoder decodeInt32ForKey:@"mask"]];
+    [[self undoManager] enableUndoRegistration];
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt32:mask forKey:@"mask"];
 }
 
 @end
@@ -67,6 +83,82 @@
 	return [super value:aChan] & mask;
 }
 
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    [[self undoManager] disableUndoRegistration];
+    [self setStartIndex:[decoder decodeInt32ForKey:@"startIndex"]];
+    [[self undoManager] enableUndoRegistration];
+	
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt32:startIndex forKey:@"startIndex"];
+}
 @end
+
+@implementation ORMaskedIndexedWaveformWithSpecialBits
+
+- (void) makeMainController
+{
+    [self linkToController:@"ORWaveformSpecialBitsController"];
+}
+
+#pragma mark ¥¥¥Accessors
+- (void) setSpecialBitMask:(unsigned long)aMask
+{
+	specialBitMask=aMask;
+	numBits = 0;
+	firstBitMask = 0;
+	int i;
+	for(i=0;i<32;i++){
+		if(specialBitMask & (1L<<i)) {
+			numBits++;
+			if(firstBitMask==0)firstBitMask = (1L<<i);
+		}
+	}
+}
+- (unsigned long) specialBitMask
+{
+	return specialBitMask;
+}
+
+- (int) numBits
+{
+	return numBits;
+}
+
+- (unsigned long) firstBitMask
+{
+	return firstBitMask;
+}
+
+-(long) value:(unsigned short)aChan
+{
+	aChan = (aChan + startIndex)%[self numberBins];;
+	return [self unMaskedValue:aChan];
+}
+
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    [[self undoManager] disableUndoRegistration];
+    [self setSpecialBitMask:[decoder decodeInt32ForKey:@"specialBitMask"]];
+    [[self undoManager] enableUndoRegistration];
+	
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt32:specialBitMask forKey:@"specialBitMask"];
+}
+
+@end
+
 
 

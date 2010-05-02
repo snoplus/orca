@@ -29,6 +29,7 @@
 #pragma mark ¥¥¥Accessors 
 - (void) setMask:(unsigned long)aMask;
 - (unsigned long) mask;
+-(long) unMaskedValue:(unsigned short)aChan;
 @end
 
 @interface ORMaskedIndexedWaveform : ORMaskedWaveform  {
@@ -39,6 +40,20 @@
 - (void) setStartIndex:(unsigned long)anIndex;
 - (unsigned long) startIndex;
 @end
+
+@interface ORMaskedIndexedWaveformWithSpecialBits : ORMaskedIndexedWaveform  {
+    unsigned long   specialBitMask;
+	int numBits;
+	unsigned long firstBitMask;
+}
+
+#pragma mark ¥¥¥Accessors 
+- (void) setSpecialBitMask:(unsigned long)aMask;
+- (unsigned long) specialBitMask;
+- (int) numBits;
+- (unsigned long) firstBitMask;
+@end
+
 
 
 

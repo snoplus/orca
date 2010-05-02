@@ -21,7 +21,7 @@
 #import "ORHPPulserController.h"
 
 @class ORSerialPortController;
-@class ORPlotter1D;
+@class ORPlotView;
 @class ORLongTermView;
 
 @interface ORMotionNodeController : OrcaObjectController 
@@ -45,7 +45,7 @@
 	IBOutlet NSTextField*	isAccelOnlyField;
 	IBOutlet NSTextField*	versionField;
 	IBOutlet ORSerialPortController* serialPortController;
-	IBOutlet ORPlotter1D*	tracePlot;
+	IBOutlet ORPlotView*	tracePlot;
 	IBOutlet NSMatrix*		displayComponentsMatrix;
 	IBOutlet NSTextField*	xLabel;
 	IBOutlet NSTextField*	yLabel;
@@ -98,6 +98,9 @@
 - (int) numLinesInLongTermView:(id)aLongTermView;
 - (int) numPointsPerLineInLongTermView:(id)aLongTermView;
 - (float) longTermView:(id)aLongTermView line:(int)m point:(int)i;
+
+- (int)	numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

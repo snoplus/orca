@@ -35,6 +35,7 @@
     NSString*		col2Title;
 	id				calibration;
 	ORDataSet*		fftDataSet;
+	NSMutableArray* roiSet;
 }
 
 #pragma mark ***Accessors
@@ -64,7 +65,8 @@
 #pragma mark •••Data Source Methods
 - (void) processResponse:(NSDictionary*)aResponse;
 - (unsigned long) numPoints;
-- (BOOL) dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue;
+- (NSMutableArray*) rois:(int)index;
+- (BOOL) dataSet:(int)set index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
 @end
 
 extern NSString* ORManualPlotModelCol2TitleChanged;

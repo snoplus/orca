@@ -22,6 +22,7 @@
 #import "ORMultiPlot.h"
 #import "ORDataSet.h"
 #import "ORHistoModel.h"
+#import "OR1dRoi.h"
 
 NSString* ORMultiPlotDataSetItemsChangedNotification = @"ORMultiPlotDataSetItemsChangedNotification";
 NSString* ORMultiPlotRemovedNotification             = @"ORMultiPlotRemovedNotification";
@@ -42,7 +43,7 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
     [dataSetItems release];
     [cachedDataSets release];
     [plotName release];
-    
+ 	[roiSet release];
     [super dealloc];
 }
 
@@ -81,18 +82,20 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 
 - (void) reCache:(NSNotification*)aNote
 {
-    
-    [cachedDataSets release];
-    cachedDataSets = [[NSMutableArray array] retain];
-    int n = [dataSetItems count];
-    int i;
-    for(i=0;i<n;i++){
-        id obj = [dataSource dataSetWithName:[[dataSetItems objectAtIndex:i]name]];
-        if(obj)[cachedDataSets addObject:obj];
-    }
-    [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORMultiPlotReCachedNotification
-                              object: self ];
+   	@synchronized(self){  
+	 
+		[cachedDataSets release];
+		cachedDataSets = [[NSMutableArray array] retain];
+		int n = [dataSetItems count];
+		int i;
+		for(i=0;i<n;i++){
+			id obj = [dataSource dataSetWithName:[[dataSetItems objectAtIndex:i]name]];
+			if(obj)[cachedDataSets addObject:obj];
+		}
+		[[NSNotificationCenter defaultCenter]
+					postNotificationName:ORMultiPlotReCachedNotification
+								  object: self ];
+	}
 }
 
 - (BOOL) dataSetInCache:(id)aDataSet
@@ -203,11 +206,6 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 
 #pragma mark ¥¥¥Data Source Methods
 
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-    return [dataSetItems count];
-}
-
 - (unsigned)  count
 {
     return [dataSetItems count];
@@ -220,24 +218,20 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 
 - (id)   objectAtIndex:(int)index
 {
-    return [dataSetItems objectAtIndex:index];
+	id obj = nil;
+	@synchronized(self){
+		obj= [dataSetItems objectAtIndex:index];
+	}
+	return obj;
 }
 
 - (id) cachedObjectAtIndex:(int)index
 {
-    return [cachedDataSets objectAtIndex:index];
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{ 
-    if(!cachedDataSets)[self reCache:nil];
-    if(set>=[cachedDataSets count])return 0;
-    else return [[cachedDataSets objectAtIndex:set] numberOfPointsInPlot:aPlotter dataSet:set];
-}
-
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-    return [[cachedDataSets objectAtIndex:set] plotter:aPlotter dataSet:set dataValue:x];
+	id obj = nil;
+	@synchronized(self){	
+		obj =  [cachedDataSets objectAtIndex:index];
+	}
+	return obj;
 }
 
 - (id) description
@@ -267,7 +261,8 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
     
     [self setDataSetItems:[decoder decodeObjectForKey:@"ORMultiPlotDataSetItems"]];
     [self setPlotName:[decoder decodeObjectForKey:@"ORMultiPlotName"]];
-    
+	roiSet			  = [[decoder decodeObjectForKey:@"roiSet"] retain];
+   
     if(plotName == nil) [self setPlotName:@"MultiPlot"];
     
     [[self undoManager] enableUndoRegistration];
@@ -280,8 +275,34 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:dataSetItems forKey:@"ORMultiPlotDataSetItems"];
-    [encoder encodeObject:plotName forKey:@"ORMultiPlotName"];
+    [encoder encodeObject:dataSetItems	forKey:@"ORMultiPlotDataSetItems"];
+    [encoder encodeObject:plotName		forKey:@"ORMultiPlotName"];
+    [encoder encodeObject:roiSet		forKey:@"roiSet"];
+}
+
+#pragma mark ¥¥¥Data Source
+- (NSMutableArray*) rois:(int)index
+{
+	if(!roiSet)roiSet = [[NSMutableArray alloc] init];
+	if(index >= [roiSet count]){
+		if(index >0){
+			int i;
+			for(i=0;i<index;i++){
+				NSMutableArray* theRois = [[NSMutableArray alloc] init];
+				[theRois addObject:[[[OR1dRoi alloc] initWithMin:20 max:30] autorelease]];
+				[roiSet addObject:theRois];
+				[theRois release];
+			}
+		}
+		else if([roiSet count] == 0){
+			NSMutableArray* theRois = [[NSMutableArray alloc] init];
+			[theRois addObject:[[[OR1dRoi alloc] initWithMin:20 max:30] autorelease]];
+			[roiSet addObject:theRois];
+			[theRois release];		
+		}
+	}
+
+	return [roiSet objectAtIndex:index];
 }
 
 
@@ -347,16 +368,18 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 {
     self = [super init];
     
-    [self setName:  [decoder decodeObjectForKey:@"ORMultiPlotDataItemName"]];
-    [self setGuardian:[decoder decodeObjectForKey:@"ORMultiPlotDataItemParent"]];
-    
+    [self setName:		[decoder decodeObjectForKey:@"ORMultiPlotDataItemName"]];
+    [self setGuardian:	[decoder decodeObjectForKey:@"ORMultiPlotDataItemParent"]];
+ 
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeObject:name  forKey:@"ORMultiPlotDataItemName"];
-    [encoder encodeObject:guardian forKey:@"ORMultiPlotDataItemParent"];
+    [encoder encodeObject:name		forKey:@"ORMultiPlotDataItemName"];
+    [encoder encodeObject:guardian	forKey:@"ORMultiPlotDataItemParent"];
 }
+
+
 
 @end

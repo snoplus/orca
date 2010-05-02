@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORMksPdr2000Controller : OrcaObjectController
 {
@@ -37,7 +37,7 @@
     IBOutlet NSMatrix*      pressureMatrix;
     IBOutlet NSMatrix*      pressure1Matrix;
     IBOutlet NSMatrix*      timeMatrix;
-	IBOutlet ORPlotter1D*   plotter0;
+	IBOutlet ORPlotView*    plotter0;
 }
 
 #pragma mark ***Initialization
@@ -72,6 +72,9 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) readPressuresAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
 @end
 

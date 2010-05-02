@@ -21,8 +21,6 @@
 
 #import "ORModBusController.h"
 #import "ORModBusModel.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
@@ -54,9 +52,6 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];
-    [[plotter0 yScale] setRngLow:0.0 withHigh:100.];
-	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100 withMinRng:10];
-	[plotter0 setUseGradient:YES];
     [super awakeFromNib];
 }
 
@@ -89,21 +84,6 @@
                      selector : @selector(pollTimeChanged:)
                          name : ORModBusModelPollTimeChanged
                        object : nil];
-		
-    [notifyCenter addObserver : self
-					 selector : @selector(scaleAction:)
-						 name : ORAxisRangeChangedNotification
-					   object : nil];
-	
-    [notifyCenter addObserver : self
-					 selector : @selector(miscAttributesChanged:)
-						 name : ORMiscAttributesChanged
-					   object : model];
-	
-    [notifyCenter addObserver : self
-					 selector : @selector(updateTimePlot:)
-						 name : ORRateAverageChangedNotification
-					   object : nil];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(sensorsChanged:)
@@ -139,50 +119,7 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self pollTimeChanged:nil];
-	[self updateTimePlot:nil];
 	[self shipValuesChanged:nil];
-    [self miscAttributesChanged:nil];
-}
-
-- (void) scaleAction:(NSNotification*)aNotification
-{
-	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
-		[model setMiscAttributes:[[plotter0 xScale]attributes] forKey:@"XAttributes0"];
-	}
-	
-	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
-		[model setMiscAttributes:[[plotter0 yScale]attributes] forKey:@"YAttributes0"];
-	}
-}
-
-- (void) miscAttributesChanged:(NSNotification*)aNote
-{
-	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
-	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
-	
-	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
-		if(attrib){
-			[[plotter0 xScale] setAttributes:attrib];
-			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 xScale] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
-		if(attrib){
-			[[plotter0 yScale] setAttributes:attrib];
-			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 yScale] setNeedsDisplay:YES];
-		}
-	}
-}
-
-- (void) updateTimePlot:(NSNotification*)aNote
-{
-	if(!aNote || ([aNote object] == [model timeRate])){
-		[plotter0 setNeedsDisplay:YES];
-	}
 }
 
 - (void) checkGlobalSecurity
@@ -369,45 +306,6 @@
 - (IBAction) shipValuesAction:(id)sender
 {
 	[model setShipValues:[sender intValue]];	
-}
-
-#pragma mark •••Data Source
-- (BOOL) willSupplyColors
-{
-	return YES;
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-	if(set==0)return [NSColor redColor];
-	else if(set==1)return [NSColor orangeColor];
-	else if(set==2)return [NSColor blueColor];
-	else return [NSColor blackColor];
-}
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-    return 4;
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
-	if(aPlotter == plotter0) return [[model timeRate] count];
-	else return 0;
-}
-
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	if(aPlotter == plotter0){
-		int count = [[model timeRate] count];
-		return [[model timeRate] valueAtIndex:count-x-1];
-	}
-	else return 0;
-}
-
-- (unsigned long) secondsPerUnit:(id) aPlotter
-{
-	return [[model timeRate] sampleTime]; //all should be the same, just return value for rate 0
 }
 
 @end

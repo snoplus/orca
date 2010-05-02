@@ -22,7 +22,8 @@
 #import "ORMotionNodeModel.h"
 #import "ORSerialPortController.h"
 #import "ORSerialPort.h"
-#import "ORPlotter1D.h"
+#import "ORPlotView.h"
+#import "ORXYPlot.h"
 #import "ORAxis.h"
 #import "ORLongTermView.h"
 
@@ -159,6 +160,28 @@
 	[[tracePlot yScale]  setRngDefaultsLow:-2 withHigh:2];
 	[[tracePlot yScale] setRngLow:-2 withHigh:2];
 	[[tracePlot yScale] setRngLimitsLow:-2 withHigh:2 withMinRng:.02];
+	
+	ORXYPlot* aPlot;
+	aPlot = [[ORXYPlot alloc] initWithTag:0 andDataSource:self];
+	[aPlot setLineColor:[NSColor redColor]];
+	[tracePlot addPlot: aPlot];
+	[aPlot release];
+	
+	aPlot = [[ORXYPlot alloc] initWithTag:1 andDataSource:self];
+	[aPlot setLineColor:[NSColor greenColor]];
+	[tracePlot addPlot: aPlot];
+	[aPlot release];
+	
+	aPlot = [[ORXYPlot alloc] initWithTag:2 andDataSource:self];
+	[aPlot setLineColor:[NSColor blueColor]];
+	[tracePlot addPlot: aPlot];
+	[aPlot release];
+	
+	aPlot = [[ORXYPlot alloc] initWithTag:3 andDataSource:self];
+	[aPlot setLineColor:[NSColor brownColor]];
+	[tracePlot addPlot: aPlot];
+	[aPlot release];
+	
 	[super awakeFromNib];
 }
 
@@ -404,13 +427,9 @@
 	[model stopDevice];
 }
 
-- (int)	numberOfDataSetsInPlot:(id)aPlotter
+- (int)	numberPointsInPlot:(id)aPlotter
 {
-	return 4;
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
+	int set = [aPlotter tag];
 	if([model displayComponents]){
 		if(set == 3) return 0;
 		else return kModeNodeTraceLength;
@@ -421,22 +440,24 @@
 	}
 }
 
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) i 
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
+	double aValue = 0;
+	int set = [aPlotter tag];
 	if([model showDeltaFromAve]){
-		if(set == 2)		return [model axDeltaAveAt:i];
-		else if(set == 1)	return [model ayDeltaAveAt:i];
-		else if(set == 0)	return [model azDeltaAveAt:i];
-		else if(set == 3)	return [model xyzDeltaAveAt:i];
-		return 0;
+		if(set == 2)		aValue =  [model axDeltaAveAt:i];
+		else if(set == 1)	aValue =  [model ayDeltaAveAt:i];
+		else if(set == 0)	aValue =  [model azDeltaAveAt:i];
+		else if(set == 3)	aValue =  [model xyzDeltaAveAt:i];
 	}
 	else {
-		if(set == 2)		return [model axAt:i];
-		else if(set == 1)	return [model ayAt:i];
-		else if(set == 0)	return [model azAt:i];
-		else if(set == 3)	return [model totalxyzAt:i];
-		return 0;
+		if(set == 2)		aValue =  [model axAt:i];
+		else if(set == 1)	aValue =  [model ayAt:i];
+		else if(set == 0)	aValue =  [model azAt:i];
+		else if(set == 3)	aValue =  [model totalxyzAt:i];
 	}
+	*xValue = i;
+	*yValue = aValue;
 }
 
 - (int) startingLineInLongTermView:(id)aView 

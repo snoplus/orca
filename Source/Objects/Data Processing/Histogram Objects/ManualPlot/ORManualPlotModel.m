@@ -23,6 +23,7 @@
 #import "NSNotifications+Extensions.h"
 #import "ORDataSet.h"
 #import "ORCARootServiceDefs.h"
+#import "ORXYRoi.h"
 
 NSString* ORManualPlotModelCol2TitleChanged = @"ORManualPlotModelCol2TitleChanged";
 NSString* ORManualPlotModelCol1TitleChanged = @"ORManualPlotModelCol1TitleChanged";
@@ -51,6 +52,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	[dataSetLock release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[data release];
+ 	[roiSet release];
     [super dealloc];
 }
 
@@ -194,6 +196,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [self setCol1Key:[decoder decodeIntForKey:@"ORManualPlotModelCol1Key"]];
     [self setCol0Key:[decoder decodeIntForKey:@"ORManualPlotModelCol0Key"]];
 	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
+	roiSet			  = [[decoder decodeObjectForKey:@"roiSet"] retain];
 	if(col0Key==0 && col1Key==0 && col2Key==0){
 		[self setCol0Key:0]; 
 		[self setCol1Key:1];		
@@ -212,6 +215,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [encoder encodeInt:col1Key forKey:@"ORManualPlotModelCol1Key"];
     [encoder encodeInt:col0Key forKey:@"ORManualPlotModelCol0Key"];
     [encoder encodeObject:calibration forKey:@"calibration"];
+    [encoder encodeObject:roiSet		forKey:@"roiSet"];
 }
 
 -(void)clear
@@ -282,7 +286,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     return [data count];
 }
 
-- (BOOL) dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
+- (BOOL) dataSet:(int)set index:(unsigned long)index x:(double*)xValue y:(double*)yValue
 {
 	BOOL valid = YES;
 	[dataSetLock lock];
@@ -309,5 +313,29 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     return valid;    
 }
 
+#pragma mark •••Data Source
+- (NSMutableArray*) rois:(int)index
+{
+	if(!roiSet)roiSet = [[NSMutableArray alloc] init];
+	if(index >= [roiSet count]){
+		if(index >0){
+			int i;
+			for(i=0;i<index;i++){
+				NSMutableArray* theRois = [[NSMutableArray alloc] init];
+				[theRois addObject:[[[ORXYRoi alloc] initWithMin:20 max:30] autorelease]];
+				[roiSet addObject:theRois];
+				[theRois release];
+			}
+		}
+		else if([roiSet count] == 0){
+			NSMutableArray* theRois = [[NSMutableArray alloc] init];
+			[theRois addObject:[[[ORXYRoi alloc] initWithMin:20 max:30] autorelease]];
+			[roiSet addObject:theRois];
+			[theRois release];		
+		}
+	}
+	
+	return [roiSet objectAtIndex:index];
+}
 
 @end

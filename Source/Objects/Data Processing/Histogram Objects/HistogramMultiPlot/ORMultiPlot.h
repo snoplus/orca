@@ -33,7 +33,7 @@
     NSString* plotName;
     
     NSMutableArray* cachedDataSets;
-
+	NSMutableArray* roiSet;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -55,14 +55,11 @@
 - (ORMultiPlotDataItem*) dataItemWithName:(NSString*)aName;
 - (void) appQuiting:(NSNotification*)aNote;
 
-#pragma mark ¥¥¥Writing Data
-
 #pragma mark ¥¥¥Data Source Methods
+- (NSMutableArray*) rois:(int)index;
 - (unsigned)  count;
 - (unsigned)  cachedCount;
 - (id)   name;
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
 @end
 
 extern NSString* ORMultiPlotDataSetItemsChangedNotification;

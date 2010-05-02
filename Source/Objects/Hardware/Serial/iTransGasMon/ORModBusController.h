@@ -18,7 +18,6 @@
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
 
-@class ORPlotter1D;
 @class ORFlippedView;
 
 @interface ORModBusController : OrcaObjectController
@@ -29,7 +28,6 @@
     IBOutlet NSPopUpButton*		pollTimePopup;
     IBOutlet NSButton*			openPortButton;
     IBOutlet NSMatrix*			timeMatrix;
-	IBOutlet ORPlotter1D*		plotter0;
     IBOutlet NSButton*			addSensorButton;
 	IBOutlet ORFlippedView*		sensorsView;
 	IBOutlet NSButton*			shipValuesCB;
@@ -46,12 +44,9 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
-- (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
-- (void) miscAttributesChanged:(NSNotification*)aNote;
-- (void) scaleAction:(NSNotification*)aNote;
 - (void) sensorsChanged:(NSNotification*)aNote;
 - (void) sensorAdded:(NSNotification*)aNote;
 - (void) sensorRemoved:(NSNotification*)aNote;
