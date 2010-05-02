@@ -23,13 +23,14 @@
 #import "ORDataController.h"
 @interface ORPlotTimeSeriesController : ORDataController {
 }
--(id)init;
+- (id)   init;
 - (void) awakeFromNib;
-- (void) updateWindow;
 
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
-- (void) mousePositionChanged:(NSNotification*) aNote;
-
-#pragma mark ¥¥¥Actions
+#pragma mark ¥¥¥DataSource
+- (NSTimeInterval) plotterStartTime:(id)aPlotter;
+- (int)	numberPointsInPlot:(id)aPlotter;
+- (float)  plotter:(id) aPlotter dataValue:(int)i;
+- (void)  plotter:(id) aPlotter index:(int)i x:(double*)x y:(double*)y;
+- (int)numberOfRowsInTableView:(NSTableView *)tableView;
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 @end

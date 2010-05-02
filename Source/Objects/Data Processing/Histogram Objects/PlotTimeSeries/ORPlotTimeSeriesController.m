@@ -22,10 +22,10 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORPlotTimeSeriesController.h"
 #import "ORPlotTimeSeries.h"
-#import "ORPlotter1D.h"
 #import "ORAxis.h"
-#import "ORCurve1D.h"
 #import "ORTimeSeries.h"
+#import "ORPlotView.h"
+#import "ORTimeSeriesPlot.h"
 
 @implementation ORPlotTimeSeriesController
 
@@ -40,86 +40,48 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-	[[plotter yScale]  setInteger:NO];
-    [[plotter yScale] setRngLimitsLow:-500 withHigh:5E9 withMinRng:.1];
-    [[plotter yScale] setRngDefaultsLow:0 withHigh:500];
+	[[plotView yScale]  setInteger:NO];
+	[[plotView yScale] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
+	
+	ORTimeSeriesPlot* aPlot = [[ORTimeSeriesPlot alloc] initWithTag:0 andDataSource:self];
+	[plotView addPlot: aPlot];
+	[aPlot release];
+	
 	[self updateWindow];
 
-}
-
-- (void) registerNotificationObservers
-{
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [super registerNotificationObservers];
-    
-     [notifyCenter addObserver : self
-                     selector : @selector(mousePositionChanged:)
-                         name : ORPlotter1DMousePosition
-                       object : plotter];
-    
-}
-
-- (void) updateWindow
-{
-	[super updateWindow];
-	[self mousePositionChanged:nil];
-}
-
-- (void) mousePositionChanged:(NSNotification*) aNote
-{
-    if([aNote userInfo]){
-        NSDictionary* info = [aNote userInfo];
-        int y = [[info objectForKey:@"y"] intValue];
-        NSTimeInterval t = [[info objectForKey:@"x"] floatValue];
-		NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-        [positionField setStringValue:[NSString stringWithFormat:@"time: %@  y: %.0f",theDate,y]];
-    }
-    else {
-        [positionField setStringValue:@""];
-    }
 }
 
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender
 {
-	[plotter copy:sender];
+	[plotView copy:sender];
 }
 
 #pragma mark ¥¥¥Data Source
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-    return 1;
-}
-
-- (BOOL) useXYTimePlot
-{
-	return YES;
-}
-
 - (NSTimeInterval) plotterStartTime:(id)aPlotter
 {
 	return (NSTimeInterval)[[model timeSeries] startTime];
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int)	numberPointsInPlot:(id)aPlotter
 {
 	return [[model timeSeries] count];
 }
 
-- (float)  plotter:(id) aPlotter dataSet:(int)set dataValue:(int)i
+- (float)  plotter:(id) aPlotter dataValue:(int)i
 {
 	ORTimeSeries* ts = [model timeSeries];
 	unsigned long theTime;
-	float y;
+	double y;
 	[ts index:i time:&theTime value:&y];
 	return y;
 }
 
-- (void)  plotter:(id) aPlotter dataSet:(int)set index:(unsigned long)i time:(unsigned long*)x y:(float*)y
+- (void)  plotter:(id) aPlotter index:(int)i x:(double*)x y:(double*)y
 {
-	[[model timeSeries] index:i time:x value:y];
+	unsigned long theTime;
+	[[model timeSeries] index:i time:&theTime value:y];
+	*x = (double)theTime;
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
