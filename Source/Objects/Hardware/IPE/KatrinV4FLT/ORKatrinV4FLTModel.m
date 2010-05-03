@@ -398,7 +398,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setFilterLength:(int)aFilterLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterLength:filterLength];
-    filterLength = [self restrictIntValue:aFilterLength min:2 max:8];
+    filterLength = [self restrictIntValue:aFilterLength min:0 max:6];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterLengthChanged object:self];
 }
 
@@ -553,6 +553,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
 	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
+}
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+	return [self threshold:aChan];
+}
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+	return [self gain:aChan];
 }
 
 -(BOOL) triggerEnabled:(unsigned short) aChan
@@ -863,7 +871,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-	((filterLength & 0xf)<<8)		| 
+	(((filterLength+2) & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6
 	((gapLength & 0xf)<<4)			| 
 	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
 	((startSampling & 0x1)<<3)		|		// run trigger unit
@@ -1617,19 +1625,19 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Hit Rate Length"];
-    [p setFormat:@"##0" upperLimit:4095 lowerLimit:255 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:4095 lowerLimit:255 stepSize:1 units:@"index"];
     [p setSetMethod:@selector(setHitRateLength:) getMethod:@selector(hitRateLength)];
     [a addObject:p];			
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gap Length"];
-    [p setFormat:@"##0" upperLimit:0 lowerLimit:7 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@"index"];
     [p setSetMethod:@selector(setGapLength:) getMethod:@selector(gapLength)];
     [a addObject:p];			
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"FilterLength"];
-    [p setFormat:@"##0" upperLimit:2 lowerLimit:7 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:6 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFilterLength:) getMethod:@selector(filterLength)];
     [a addObject:p];			
 	

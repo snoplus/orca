@@ -5751,6 +5751,14 @@ clean_up_mark:
 - (void) clearEventCounts
 {
 }
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+	return [self threshold:aChan];
+}
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+	return [self gain:aChan];
+}
 @end
 
 @implementation ORKatrinFLTModel (tests)

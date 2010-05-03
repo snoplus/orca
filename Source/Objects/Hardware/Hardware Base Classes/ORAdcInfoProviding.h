@@ -28,8 +28,8 @@
 
 @protocol ORAdcInfoProviding
 
-- (unsigned short) threshold:(unsigned short) aChan;
-- (unsigned short) gain:(unsigned short) aChan;
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan;
+- (unsigned short) gainForDisplay:(unsigned short) aChan;
 - (BOOL) onlineMaskBit:(int)bit;
 - (void) makeMainController;
 - (void) initBoard;

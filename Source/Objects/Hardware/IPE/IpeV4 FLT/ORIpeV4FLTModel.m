@@ -1901,6 +1901,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		default: return @"?";
 	}	
 }
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+	return [self threshold:aChan];
+}
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+	return [self gain:aChan];
+}
 @end
 
 @implementation ORIpeV4FLTModel (tests)

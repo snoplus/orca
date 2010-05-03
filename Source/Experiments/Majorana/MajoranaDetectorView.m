@@ -121,11 +121,11 @@
 		float height = [self bounds].size.height;
 //		float width = [self bounds].size.height;
 		float detWidth = 35;
-		float detHeight = detWidth*.3;
+		float detHeight = detWidth*.5;
 		int det;
 		float x = 20;
 		int mod;
-		for(mod=0;mod<3;mod++){
+		for(mod=0;mod<2;mod++){
 			int col;
 			x=20;
 			for(col=0;col<7;col++){

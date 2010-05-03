@@ -1733,5 +1733,12 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 		eventCount[i]=0;
     }
 }
-
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+	return [self threshold:aChan];
+}
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+	return [self gain:aChan];
+}
 @end

@@ -1540,6 +1540,14 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 - (void) clearEventCounts
 {
 }
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+	return [self threshold:aChan];
+}
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+	return [self gain:aChan];
+}
 @end
 
 @implementation ORIpeFLTModel (tests)

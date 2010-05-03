@@ -21,8 +21,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="3001"/>
 			<integer value="3175"/>
-			<integer value="1185"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3472,7 +3472,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																	<object class="NSTextField" id="118967055">
 																		<reference key="NSNextResponder" ref="872182945"/>
 																		<int key="NSvFlags">256</int>
-																		<string key="NSFrame">{{8, 12}, {47, 17}}</string>
+																		<string key="NSFrame">{{2, 12}, {47, 17}}</string>
 																		<reference key="NSSuperview" ref="872182945"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="795907598">
@@ -3488,7 +3488,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																	<object class="NSTextField" id="571347843">
 																		<reference key="NSNextResponder" ref="872182945"/>
 																		<int key="NSvFlags">256</int>
-																		<string key="NSFrame">{{18, 36}, {34, 17}}</string>
+																		<string key="NSFrame">{{15, 36}, {34, 17}}</string>
 																		<reference key="NSSuperview" ref="872182945"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="285078054">
@@ -3529,7 +3529,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																	<object class="NSPopUpButton" id="975430056">
 																		<reference key="NSNextResponder" ref="872182945"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{56, 39}, {61, 15}}</string>
+																		<string key="NSFrame">{{53, 39}, {64, 15}}</string>
 																		<reference key="NSSuperview" ref="872182945"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSPopUpButtonCell" key="NSCell" id="1065498610">
@@ -3549,7 +3549,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
-																				<int key="NSState">1</int>
 																				<reference key="NSOnImage" ref="415303371"/>
 																				<reference key="NSMixedImage" ref="417122362"/>
 																				<string key="NSAction">_popUpItemAction:</string>
@@ -3640,7 +3639,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																					</object>
 																				</object>
 																			</object>
-																			<int key="NSSelectedIndex">1</int>
 																			<int key="NSPreferredEdge">1</int>
 																			<bool key="NSUsesItemFromMenu">YES</bool>
 																			<bool key="NSAltersState">YES</bool>
@@ -3650,7 +3648,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																	<object class="NSPopUpButton" id="106726182">
 																		<reference key="NSNextResponder" ref="872182945"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{56, 15}, {61, 15}}</string>
+																		<string key="NSFrame">{{53, 15}, {64, 15}}</string>
 																		<reference key="NSSuperview" ref="872182945"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSPopUpButtonCell" key="NSCell" id="795027289">
@@ -3670,7 +3668,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
-																				<int key="NSState">1</int>
 																				<reference key="NSOnImage" ref="415303371"/>
 																				<reference key="NSMixedImage" ref="417122362"/>
 																				<string key="NSAction">_popUpItemAction:</string>
@@ -11765,10 +11762,10 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="178578928"/>
-							<reference ref="571347843"/>
 							<reference ref="975430056"/>
 							<reference ref="106726182"/>
 							<reference ref="118967055"/>
+							<reference ref="571347843"/>
 						</object>
 						<reference key="parent" ref="1072289978"/>
 					</object>
@@ -14038,9 +14035,9 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{501, 139}, {661, 717}}</string>
+					<string>{{245, 139}, {661, 717}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{501, 139}, {661, 717}}</string>
+					<string>{{245, 139}, {661, 717}}</string>
 					<integer value="1"/>
 					<string>{{28, 62}, {661, 717}}</string>
 					<boolean value="NO"/>
@@ -14359,14 +14356,14 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{755, 718}, {86, 123}}</string>
+					<string>{{804, 480}, {86, 123}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{755, 709}, {92, 108}}</string>
+					<string>{{804, 471}, {89, 108}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>

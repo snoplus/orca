@@ -373,7 +373,7 @@
 
 - (void) filterLengthChanged:(NSNotification*)aNote
 {
-	[filterLengthPU selectItemAtIndex:[model filterLength]-2];
+	[filterLengthPU selectItemAtIndex:[model filterLength]];
 }
 
 - (void) gapLengthChanged:(NSNotification*)aNote
