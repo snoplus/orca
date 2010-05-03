@@ -263,6 +263,7 @@ startIndex=traceStart16;
 				    unitSize: sizeof(short)					// unit size in bytes
 					startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					mask:	0x0FFF							// when displayed all values will be masked with this value
+					specialBits:0xF000						
 					sender: self 
 					withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
 	

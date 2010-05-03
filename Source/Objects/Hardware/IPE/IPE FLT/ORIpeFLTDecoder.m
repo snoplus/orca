@@ -66,10 +66,14 @@ followed by waveform data (n x 1024 16-bit words)
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 2*sizeof(long)					// Offset in bytes (2 header words)
 				    unitSize: sizeof(short)					// unit size in bytes
+					startIndex:	0							// first Point Index (past the header offset!!!)
 					mask:	0x0FFF							// when displayed all values will be masked with this value
+					specialBits:0xF000						
 					sender: self 
 					withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
-										
+
+	
+	
     return length; //must return number of longs processed.
 }
 
