@@ -893,7 +893,7 @@
 
 - (IBAction) filterLengthAction:(id)sender
 {
-	[model setFilterLength:[sender indexOfSelectedItem]+2];	 //tranlate back to range of 2 to 8
+	[model setFilterLength:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) gapLengthAction:(id)sender
