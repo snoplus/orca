@@ -33,6 +33,7 @@ NSString* ORKJL2200IonGaugeModelDegasTimeChanged		= @"ORKJL2200IonGaugeModelDega
 NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged	= @"ORKJL2200IonGaugeModelEmissionCurrentChanged";
 NSString* ORKJL2200IonGaugeModelSensitivityChanged		= @"ORKJL2200IonGaugeModelSensitivityChanged";
 NSString* ORKJL2200IonGaugeModelSetPointChanged			= @"ORKJL2200IonGaugeModelSetPointChanged";
+NSString* ORKJL2200IonGaugeModelSetPointReadBackChanged			= @"ORKJL2200IonGaugeModelSetPointReadBackChanged";
 NSString* ORKJL2200IonGaugePressureChanged				= @"ORKJL2200IonGaugePressureChanged";
 NSString* ORKJL2200IonGaugeShipPressureChanged			= @"ORKJL2200IonGaugeShipPressureChanged";
 NSString* ORKJL2200IonGaugePollTimeChanged				= @"ORKJL2200IonGaugePollTimeChanged";
@@ -257,6 +258,21 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelSetPointChanged object:self];
 	}
 }
+
+- (float) setPointReadBack:(int)index
+{
+	if(index>=0 && index<4)return setPointReadBack[index];
+	else return 0;
+}
+
+- (void) setSetPointReadBack:(int)index withValue:(float)aSetPoint
+{
+	if(index>=0 && index<4){
+		setPointReadBack[index] = aSetPoint;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelSetPointReadBackChanged object:self];
+	}
+}
+
 - (float) pressure
 {
     return pressure;
@@ -474,10 +490,16 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 	aCmd = [aCmd stringByAppendingFormat:@"=ST:%.0f\r",degasTime];
 	int i;
 	for(i=0;i<4;i++){
-		aCmd = [aCmd stringByAppendingFormat:@"=S%d:%.1E\r",i,setPoint[i]];
+		if([self setPoint:i]!=0) aCmd = [aCmd stringByAppendingFormat:@"=S%d:%.1E\r",i+1,setPoint[i]];
+		   else aCmd = [aCmd stringByAppendingString:@"0.0-0"];
 	}
 	aCmd = [aCmd stringByReplacingOccurrencesOfString:@"E-" withString:@"-"];
 	[self sendCommand:aCmd];
+}
+
+- (void) readSettings
+{
+	[self sendCommand:@"=RS\r=RE\r=RT\r=R1\r=R2\r=R3\r=R4/r"];
 }
 
 - (void) turnOn
@@ -550,13 +572,38 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 
 - (void) decodeCommand:(NSString*)aCmd
 {
-	NSString* prefix = [aCmd substringToIndex:2];
-	NSString* value = [aCmd substringFromIndex:2];
-	if([prefix isEqualToString:@"V="]){
+	
+	if([aCmd hasPrefix:@"V="]){
+		NSString* value = [aCmd substringFromIndex:2];
 		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
 		[self setPressure:[value floatValue]];
 	}
-	else if([prefix isEqualToString:@"*="]){
+	
+	else if([aCmd hasPrefix:@"1="]){
+		NSString* value = [aCmd substringFromIndex:2];
+		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:0 withValue:[value floatValue]];
+	}
+	
+	else if([aCmd hasPrefix:@"2="]){
+		NSString* value = [aCmd substringFromIndex:2];
+		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:1 withValue:[value floatValue]];
+	}
+	
+	else if([aCmd hasPrefix:@"3="]){
+		NSString* value = [aCmd substringFromIndex:2];
+		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:2 withValue:[value floatValue]];
+	}
+	
+	else if([aCmd hasPrefix:@"4="]){
+		NSString* value = [aCmd substringFromIndex:2];
+		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:3 withValue:[value floatValue]];
+	}
+	
+	else if([aCmd hasPrefix:@"*="]){
 		aCmd = [aCmd substringFromIndex:2];
 		int i;
 		int n = [aCmd length];

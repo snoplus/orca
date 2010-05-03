@@ -31,6 +31,7 @@
 	IBOutlet NSTextField*	emissionCurrentField;
 	IBOutlet NSTextField*	sensitivityField;
 	IBOutlet NSMatrix*		setPointMatrix;
+	IBOutlet NSMatrix*		setPointReadBackMatrix;
 	IBOutlet NSMatrix*		setPointLabelMatrix;
 	IBOutlet NSTextField*	pressureField;
 	IBOutlet NSTextField*	shippingStateField;
@@ -75,8 +76,10 @@
 - (void) pollTimeChanged:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
+- (void) setPointReadBackChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) readBoard:(id)sender;
 - (IBAction) pressureScaleAction:(id)sender;
 - (IBAction) degasTimeAction:(id)sender;
 - (IBAction) emissionCurrentAction:(id)sender;

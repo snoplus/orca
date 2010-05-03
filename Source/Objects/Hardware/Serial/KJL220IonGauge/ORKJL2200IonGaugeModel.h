@@ -43,6 +43,7 @@
 		ORTimeRate*		timeRate;
 		float			pressure;
 		float			setPoint[4];
+		float			setPointReadBack[4];
 		int				sensitivity;
 		float			emissionCurrent;
 		float			degasTime;
@@ -73,6 +74,8 @@
 - (void) setSensitivity:(int)aSensitivity;
 - (float) setPoint:(int)index;
 - (void) setSetPoint:(int)index withValue:(float)aSetPoint;
+- (float) setPointReadBack:(int)index;
+- (void) setSetPointReadBack:(int)index withValue:(float)aSetPoint;
 - (float) pressure;
 - (void) setPressure:(float)aPressure;
 - (ORTimeRate*)timeRate;
@@ -100,11 +103,12 @@
 - (void) shipPressureValue;
 
 #pragma mark ***Commands
+- (void) initBoard;
+- (void) readSettings;
 - (void) readPressure;
 - (void) pollPressure;
 - (void) getStatus;
 - (void) sendCommand:(NSString*)aCmd;
-- (void) initBoard;
 - (void) turnOn;
 - (void) turnOff;
 - (void) turnDegasOn;
@@ -119,6 +123,7 @@ extern NSString* ORKJL2200IonGaugeModelDegasTimeChanged;
 extern NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged;
 extern NSString* ORKJL2200IonGaugeModelSensitivityChanged;
 extern NSString* ORKJL2200IonGaugeModelSetPointChanged;
+extern NSString* ORKJL2200IonGaugeModelSetPointReadBackChanged;
 extern NSString* ORKJL2200IonGaugePressureChanged;
 extern NSString* ORKJL2200IonGaugeShipPressureChanged;
 extern NSString* ORKJL2200IonGaugePollTimeChanged;

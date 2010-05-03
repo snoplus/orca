@@ -131,7 +131,12 @@
                      selector : @selector(setPointChanged:)
                          name : ORKJL2200IonGaugeModelSetPointChanged
 						object: model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(setPointReadBackChanged:)
+                         name : ORKJL2200IonGaugeModelSetPointReadBackChanged
+						object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(sensitivityChanged:)
                          name : ORKJL2200IonGaugeModelSensitivityChanged
@@ -171,6 +176,7 @@
     [self miscAttributesChanged:nil];
 	[self pressureChanged:nil];
 	[self setPointChanged:nil];
+	[self setPointReadBackChanged:nil];
 	[self sensitivityChanged:nil];
 	[self emissionCurrentChanged:nil];
 	[self degasTimeChanged:nil];
@@ -225,6 +231,14 @@
 	int i;
 	for(i=0;i<4;i++){
 		[[setPointMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.2E",[model setPoint:i]]];
+	}
+}
+
+- (void) setPointReadBackChanged:(NSNotification*)aNote
+{
+	int i;
+	for(i=0;i<4;i++){
+		[[setPointReadBackMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.2E",[model setPointReadBack:i]]];
 	}
 }
 
@@ -409,6 +423,11 @@
 {
 	[model initBoard];	
 }
+
+- (IBAction) readBoard:(id)sender
+{
+	[model readSettings];	
+}
 - (IBAction) toggleIonGauge:(id)sender
 {
 	if([model stateMask] & kKJL2200IonGaugeOnMask) [model turnOff];	
@@ -424,6 +443,7 @@
 - (IBAction) setPointAction:(id)sender
 {
 	NSString* s = [[sender selectedCell] stringValue];
+	s = [s stringByReplacingOccurrencesOfString:@"e" withString:@"E"];
 	s = [s stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
 	s = [s stringByReplacingOccurrencesOfString:@"EE-" withString:@"E-"];
 	float theValue = [s floatValue];
