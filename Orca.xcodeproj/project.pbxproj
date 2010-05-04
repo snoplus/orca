@@ -1228,6 +1228,8 @@
 		847A46D90D9C3C18002125DE /* ORJAMFDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 847A46D70D9C3C18002125DE /* ORJAMFDecoders.m */; };
 		847A48540D9C5D30002125DE /* ORFilterPluginBaseClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 847A48520D9C5D30002125DE /* ORFilterPluginBaseClass.m */; };
 		847A48550D9C5D30002125DE /* ORFilterPluginBaseClass.h in Headers */ = {isa = PBXBuildFile; fileRef = 847A48530D9C5D30002125DE /* ORFilterPluginBaseClass.h */; };
+		847A5AFF1190D88D00094181 /* ORWaveformSpecialBitsController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847A5AFD1190D88D00094181 /* ORWaveformSpecialBitsController.h */; };
+		847A5B001190D88D00094181 /* ORWaveformSpecialBitsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 847A5AFE1190D88D00094181 /* ORWaveformSpecialBitsController.m */; };
 		847BC83205E293E80054841E /* Unlocked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC82E05E293E80054841E /* Unlocked.tif */; };
 		847BC83305E293E80054841E /* Locked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83005E293E80054841E /* Locked.tif */; };
 		847BC83805E2940D0054841E /* ORHWUndoSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 847BC83405E2940D0054841E /* ORHWUndoSet.h */; };
@@ -3461,6 +3463,8 @@
 		847A46D70D9C3C18002125DE /* ORJAMFDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFDecoders.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFDecoders.m; sourceTree = SOURCE_ROOT; };
 		847A48520D9C5D30002125DE /* ORFilterPluginBaseClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFilterPluginBaseClass.m; path = "Source/Objects/Data Processing/Filter/ORFilterPluginBaseClass.m"; sourceTree = SOURCE_ROOT; };
 		847A48530D9C5D30002125DE /* ORFilterPluginBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFilterPluginBaseClass.h; path = "Source/Objects/Data Processing/Filter/ORFilterPluginBaseClass.h"; sourceTree = SOURCE_ROOT; };
+		847A5AFD1190D88D00094181 /* ORWaveformSpecialBitsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORWaveformSpecialBitsController.h; path = "Source/Objects/Data Processing/Histogram Objects/Waveform/ORWaveformSpecialBitsController.h"; sourceTree = SOURCE_ROOT; };
+		847A5AFE1190D88D00094181 /* ORWaveformSpecialBitsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORWaveformSpecialBitsController.m; path = "Source/Objects/Data Processing/Histogram Objects/Waveform/ORWaveformSpecialBitsController.m"; sourceTree = SOURCE_ROOT; };
 		847BC82F05E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Unlocked.tif; sourceTree = "<group>"; };
 		847BC83105E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Locked.tif; sourceTree = "<group>"; };
 		847BC83405E2940D0054841E /* ORHWUndoSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHWUndoSet.h; path = "Source/Main Dialogs/HardwareWizard/ORHWUndoSet.h"; sourceTree = SOURCE_ROOT; };
@@ -9497,6 +9501,8 @@
 				844DF9040C6A836700BEB215 /* ORMaskedWaveform.m */,
 				84F689CD044F7837005F64B1 /* ORWaveformController.h */,
 				84F689CE044F7837005F64B1 /* ORWaveformController.m */,
+				847A5AFD1190D88D00094181 /* ORWaveformSpecialBitsController.h */,
+				847A5AFE1190D88D00094181 /* ORWaveformSpecialBitsController.m */,
 				849194450725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist */,
 				84F689CF044F7837005F64B1 /* Waveform.nib */,
 			);
@@ -10943,6 +10949,7 @@
 				8476203D118CD53D00016A8D /* ORTimeSeriesPlot.h in Headers */,
 				8476203F118CD53D00016A8D /* ORVectorPlot.h in Headers */,
 				84762041118CD53D00016A8D /* ORXYPlot.h in Headers */,
+				847A5AFF1190D88D00094181 /* ORWaveformSpecialBitsController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12425,6 +12432,7 @@
 				8476203E118CD53D00016A8D /* ORTimeSeriesPlot.m in Sources */,
 				84762040118CD53D00016A8D /* ORVectorPlot.m in Sources */,
 				84762042118CD53D00016A8D /* ORXYPlot.m in Sources */,
+				847A5B001190D88D00094181 /* ORWaveformSpecialBitsController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
