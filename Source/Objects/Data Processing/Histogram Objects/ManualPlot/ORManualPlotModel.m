@@ -332,7 +332,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 			[theRois addObject:[[[ORXYRoi alloc] initWithMin:20 max:30] autorelease]];
 			[roiSet addObject:theRois];
 			[theRois release];		
-		}
+		};
 	}
 	
 	return [roiSet objectAtIndex:index];

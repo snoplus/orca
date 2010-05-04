@@ -56,7 +56,6 @@
 	aPlot = [[ORXYPlot alloc] initWithTag:1 andDataSource:self];
 	[aPlot setRoi: [[model rois:1] objectAtIndex:0]];
 	[aPlot setLineColor:[NSColor blueColor]];
-	[aPlot setShowSymbols:YES];
 	[aPlot setShowLine:YES];
 	[plotView addPlot: aPlot];
 	[aPlot release];
