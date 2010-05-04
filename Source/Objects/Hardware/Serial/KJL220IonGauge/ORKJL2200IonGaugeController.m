@@ -162,6 +162,20 @@
                          name : ORKJL2200IonGaugeModelPressureScaleChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(sensitivityReadChanged:)
+                         name : ORKJL2200IonGaugeModelSensitivityReadChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(EmissionReadChanged:)
+                         name : ORKJL2200IonGaugeModelEmissionReadChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(degasTimeReadChanged:)
+                         name : ORKJL2200IonGaugeModelDegasTimeReadChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -182,6 +196,24 @@
 	[self degasTimeChanged:nil];
 	[self stateMaskChanged:nil];
 	[self pressureScaleChanged:nil];
+	[self sensitivityReadChanged:nil];
+	[self emissionReadChanged:nil];
+	[self degasTimeReadChanged:nil];
+}
+
+- (void) degasTimeReadChanged:(NSNotification*)aNote
+{
+	[degasTimeReadField setIntValue: [model degasTimeRead]];
+}
+
+- (void) emissionReadChanged:(NSNotification*)aNote
+{
+	[emissionReadField setFloatValue: [model emissionRead]];
+}
+
+- (void) sensitivityReadChanged:(NSNotification*)aNote
+{
+	[sensitivityReadField setIntValue: [model sensitivityRead]];
 }
 
 - (void) pressureScaleChanged:(NSNotification*)aNote
@@ -203,10 +235,10 @@
 	[onOffButton setTitle:isOn?@"Turn Off":@"Turn On"];
 	[degasButton setTitle:isOn?@"Turn Degas Off":@"Turn Degas On"];
 	
-	[[setPointLabelMatrix cellWithTag:0] setStringValue:aMask & kKJL2200SetPoint1Mask ? @"S1":@""];
-	[[setPointLabelMatrix cellWithTag:1] setStringValue:aMask & kKJL2200SetPoint2Mask ? @"S2":@""];
-	[[setPointLabelMatrix cellWithTag:2] setStringValue:aMask & kKJL2200SetPoint3Mask ? @"S3":@""];
-	[[setPointLabelMatrix cellWithTag:3] setStringValue:aMask & kKJL2200SetPoint4Mask ? @"S4":@""];
+	[[setPointLabelMatrix cellWithTag:0] setStringValue:(aMask & kKJL2200SetPoint1Mask) ? @"S1":@"  "];
+	[[setPointLabelMatrix cellWithTag:1] setStringValue:(aMask & kKJL2200SetPoint2Mask) ? @"S2":@"  "];
+	[[setPointLabelMatrix cellWithTag:2] setStringValue:(aMask & kKJL2200SetPoint3Mask) ? @"S3":@"  "];
+	[[setPointLabelMatrix cellWithTag:3] setStringValue:(aMask & kKJL2200SetPoint4Mask) ? @"S4":@"  "];
 	
 	[self pressureChanged:nil];
 }
@@ -390,6 +422,7 @@
 
 
 #pragma mark ***Actions
+
 - (void) pressureScaleAction:(id)sender
 {
 	[model setPressureScale:[sender indexOfSelectedItem]];	

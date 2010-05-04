@@ -50,6 +50,11 @@
 		unsigned short	stateMask;
 		int				pressureScale;
 		float			pressureScaleValue;
+		NSMutableArray*		cmdQueue;
+		int sensitivityRead;
+		float emissionRead;
+		int degasTimeRead;
+	NSString* lastRequest;
 }
 
 #pragma mark ***Initialization
@@ -61,6 +66,15 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (NSString*) lastRequest;
+- (void) setLastRequest:(NSString*)aRequest;
+- (int) degasTimeRead;
+- (void) setDegasTimeRead:(int)aDegasTimeRead;
+- (float) emissionRead;
+- (void) setEmissionRead:(float)aEmissionRead;
+- (int) sensitivityRead;
+- (void) setSensitivityRead:(int)aSensitivityRead;
+- (int) queCount;
 - (float) pressureScaleValue;
 - (int) pressureScale;
 - (void) setPressureScale:(int)aPressureScale;
@@ -103,12 +117,12 @@
 - (void) shipPressureValue;
 
 #pragma mark ***Commands
+- (void) enqueCmdData:(NSString*)aCommand;
 - (void) initBoard;
 - (void) readSettings;
 - (void) readPressure;
 - (void) pollPressure;
 - (void) getStatus;
-- (void) sendCommand:(NSString*)aCmd;
 - (void) turnOn;
 - (void) turnOff;
 - (void) turnDegasOn;
@@ -118,6 +132,10 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORKJL2200IonGaugeModelSetPointReadChanged;
+extern NSString* ORKJL2200IonGaugeModelDegasTimeReadChanged;
+extern NSString* ORKJL2200IonGaugeModelEmissionReadChanged;
+extern NSString* ORKJL2200IonGaugeModelSensitivityReadChanged;
 extern NSString* ORKJL2200IonGaugeModelPressureScaleChanged;
 extern NSString* ORKJL2200IonGaugeModelDegasTimeChanged;
 extern NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged;
@@ -132,3 +150,4 @@ extern NSString* ORKJL2200IonGaugeLock;
 extern NSString* ORKJL2200IonGaugePortNameChanged;
 extern NSString* ORKJL2200IonGaugePortStateChanged;
 extern NSString* ORKJL2200IonGaugeModelStateMaskChanged;
+extern NSString* ORKJL2200IonGaugeModelQueCountChanged;

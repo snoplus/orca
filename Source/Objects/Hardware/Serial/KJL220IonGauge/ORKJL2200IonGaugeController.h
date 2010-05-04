@@ -23,6 +23,9 @@
 @interface ORKJL2200IonGaugeController : OrcaObjectController
 {
 	IBOutlet NSPopUpButton*	pressureScalePU;
+	IBOutlet NSTextField*	degasTimeReadField;
+	IBOutlet NSTextField*	emissionReadField;
+	IBOutlet NSTextField*	sensitivityReadField;
 	IBOutlet NSButton*		onOffButton;
 	IBOutlet NSButton*      degasButton;
 	IBOutlet NSTextField*   degasOnField;
@@ -60,6 +63,9 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) degasTimeReadChanged:(NSNotification*)aNote;
+- (void) emissionReadChanged:(NSNotification*)aNote;
+- (void) sensitivityReadChanged:(NSNotification*)aNote;
 - (void) pressureScaleChanged:(NSNotification*)aNote;
 - (void) stateMaskChanged:(NSNotification*)aNote;
 - (void) degasTimeChanged:(NSNotification*)aNote;
