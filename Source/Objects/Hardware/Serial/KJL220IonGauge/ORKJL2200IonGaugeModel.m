@@ -28,7 +28,13 @@
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
 
+#define kShipPressure @"kShipPressure"
+
 #pragma mark ***External Strings
+NSString* ORKJL2200IonGaugeModelSetPointReadChanged = @"ORKJL2200IonGaugeModelSetPointReadChanged";
+NSString* ORKJL2200IonGaugeModelDegasTimeReadChanged = @"ORKJL2200IonGaugeModelDegasTimeReadChanged";
+NSString* ORKJL2200IonGaugeModelEmissionReadChanged = @"ORKJL2200IonGaugeModelEmissionReadChanged";
+NSString* ORKJL2200IonGaugeModelSensitivityReadChanged = @"ORKJL2200IonGaugeModelSensitivityReadChanged";
 NSString* ORKJL2200IonGaugeModelDegasTimeChanged		= @"ORKJL2200IonGaugeModelDegasTimeChanged";
 NSString* ORKJL2200IonGaugeModelEmissionCurrentChanged	= @"ORKJL2200IonGaugeModelEmissionCurrentChanged";
 NSString* ORKJL2200IonGaugeModelSensitivityChanged		= @"ORKJL2200IonGaugeModelSensitivityChanged";
@@ -43,11 +49,14 @@ NSString* ORKJL2200IonGaugePortStateChanged				= @"ORKJL2200IonGaugePortStateCha
 NSString* ORKJL2200IonGaugeModelStateMaskChanged		= @"ORKJL2200IonGaugeModelStateMaskChanged";
 NSString* ORKJL2200IonGaugeLock							= @"ORKJL2200IonGaugeLock";
 NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelPressureScaleChanged";
+NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueCountChanged";
 
 @interface ORKJL2200IonGaugeModel (private)
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
 - (void) decodeCommand:(NSString*)aCmd;
+- (void) timeout;
+- (void) processOneCommandFromQueue;
 @end
 
 @implementation ORKJL2200IonGaugeModel
@@ -71,6 +80,8 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
     [serialPort release];
 	[timeRate release];
     [buffer release];
+	[cmdQueue release];
+	[lastRequest release];
 
 	[super dealloc];
 }
@@ -114,6 +125,7 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 - (void) dataReceived:(NSNotification*)note
 {
     if([note object] == serialPort){
+		if(!lastRequest)return;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
@@ -159,6 +171,46 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 
 
 #pragma mark ***Accessors
+
+- (int) degasTimeRead
+{
+    return degasTimeRead;
+}
+
+- (void) setDegasTimeRead:(int)aDegasTimeRead
+{
+    degasTimeRead = aDegasTimeRead;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelDegasTimeReadChanged object:self];
+}
+
+- (float) emissionRead
+{
+    return emissionRead;
+}
+
+- (void) setEmissionRead:(float)aEmissionRead
+{
+    emissionRead = aEmissionRead;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelEmissionReadChanged object:self];
+}
+
+- (int) sensitivityRead
+{
+    return sensitivityRead;
+}
+
+- (void) setSensitivityRead:(int)aSensitivityRead
+{
+    sensitivityRead = aSensitivityRead;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelSensitivityReadChanged object:self];
+}
+- (int) queCount
+{
+	return [cmdQueue count];
+}
 - (float) pressureScaleValue
 {
 	return pressureScaleValue;
@@ -299,11 +351,11 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 
 - (void) readPressure
 {
-	[self sendCommand:@"=RV\r"];
+	[self enqueCmdData:@"=RV\r"];
 }
 - (void) getStatus
 {
-	[self sendCommand:@"=R*\r"];
+	[self enqueCmdData:@"=R*\r"];
 }
 
 - (ORTimeRate*)timeRate
@@ -359,7 +411,16 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 {
 	return timeMeasured;
 }
+- (NSString*) lastRequest
+{
+	return lastRequest;
+}
 
+- (void) setLastRequest:(NSString*)aRequest
+{
+	lastRequest = [aRequest copy];    
+	[aRequest autorelease];
+}
 - (BOOL) portWasOpen
 {
     return portWasOpen;
@@ -478,48 +539,52 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 }
 
 #pragma mark *** Commands
-- (void) sendCommand:(NSString*)aCmd
+- (void) enqueCmdData:(NSString*)aCommand
 {
-	[serialPort writeString:aCmd];
+	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+	[cmdQueue addObject:aCommand];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelQueCountChanged object: self];
+	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
 - (void) initBoard
 {
-	NSString* aCmd = [NSString stringWithFormat:@"=SS:%d\r",sensitivity];
-	aCmd = [aCmd stringByAppendingFormat:@"=SE:%.1f\r",emissionCurrent];
-	aCmd = [aCmd stringByAppendingFormat:@"=ST:%.0f\r",degasTime];
+	NSString* aCmd;
+	[self enqueCmdData:[NSString stringWithFormat:@"=SS:%d\r",sensitivity]];
+	[self enqueCmdData:[aCmd stringByAppendingFormat:@"=SE:%.1f\r",emissionCurrent]];
+	[self enqueCmdData:[aCmd stringByAppendingFormat:@"=ST:%.0f\r",degasTime]];
 	int i;
 	for(i=0;i<4;i++){
 		if([self setPoint:i]!=0) aCmd = [aCmd stringByAppendingFormat:@"=S%d:%.1E\r",i+1,setPoint[i]];
-		   else aCmd = [aCmd stringByAppendingString:@"0.0-0"];
+		else aCmd = [aCmd stringByAppendingString:@"0.0-0"];
+		aCmd = [aCmd stringByReplacingOccurrencesOfString:@"E-" withString:@"-"];
+		[self enqueCmdData:aCmd];
 	}
-	aCmd = [aCmd stringByReplacingOccurrencesOfString:@"E-" withString:@"-"];
-	[self sendCommand:aCmd];
 }
 
 - (void) readSettings
 {
-	[self sendCommand:@"=RS\r=RE\r=RT\r=R1\r=R2\r=R3\r=R4/r"];
+	[self enqueCmdData:@"=RS\r=RE\r=RT\r=R1\r=R2\r=R3\r=R4/r"];
 }
 
 - (void) turnOn
 {
-	[self sendCommand:@"=SF1\r"];
+	[self enqueCmdData:@"=SF1\r"];
 }
 
 - (void) turnOff
 {
-	[self sendCommand:@"=SF0\r"];
+	[self enqueCmdData:@"=SF0\r"];
 }
 
 - (void) turnDegasOn
 {
-	[self sendCommand:@"=SD1\r"];
+	[self enqueCmdData:@"=SD1\r"];
 }
 
 - (void) turnDegasOff
 {
-	[self sendCommand:@"=SD0\r"];
+	[self enqueCmdData:@"=SD0\r"];
 }
 
 #pragma mark ***Data Records
@@ -572,37 +637,13 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 
 - (void) decodeCommand:(NSString*)aCmd
 {
-	
+	aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+
 	if([aCmd hasPrefix:@"V="]){
-		NSString* value = [aCmd substringFromIndex:2];
-		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		NSString* value = [[aCmd substringFromIndex:2] stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+	
 		[self setPressure:[value floatValue]];
 	}
-	
-	else if([aCmd hasPrefix:@"1="]){
-		NSString* value = [aCmd substringFromIndex:2];
-		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
-		[self setSetPointReadBack:0 withValue:[value floatValue]];
-	}
-	
-	else if([aCmd hasPrefix:@"2="]){
-		NSString* value = [aCmd substringFromIndex:2];
-		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
-		[self setSetPointReadBack:1 withValue:[value floatValue]];
-	}
-	
-	else if([aCmd hasPrefix:@"3="]){
-		NSString* value = [aCmd substringFromIndex:2];
-		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
-		[self setSetPointReadBack:2 withValue:[value floatValue]];
-	}
-	
-	else if([aCmd hasPrefix:@"4="]){
-		NSString* value = [aCmd substringFromIndex:2];
-		value = [value stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
-		[self setSetPointReadBack:3 withValue:[value floatValue]];
-	}
-	
 	else if([aCmd hasPrefix:@"*="]){
 		aCmd = [aCmd substringFromIndex:2];
 		int i;
@@ -615,7 +656,73 @@ NSString* ORKJL2200IonGaugeModelPressureScaleChanged	= @"ORKJL2200IonGaugeModelP
 		}
 		[self setStateMask:aMask];
 	}
+	else if([aCmd hasPrefix:@"S="]){
+		[self setSensitivityRead:[[aCmd substringFromIndex:2] intValue]];
+	}
+	else if([aCmd hasPrefix:@"E="]){
+		[self setEmissionRead:[[aCmd substringFromIndex:2] floatValue]];
+	}
+	else if([aCmd hasPrefix:@"T="]){
+		[self setDegasTimeRead:[[aCmd substringFromIndex:2] intValue]];
+	}
+	else if([aCmd hasPrefix:@"1="]){
+		NSString* value = [[aCmd substringFromIndex:2] stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:0 withValue:[value floatValue]];
+	}
+	else if([aCmd hasPrefix:@"2="]){
+		NSString* value = [[aCmd substringFromIndex:2] stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:1 withValue:[value floatValue]];
+	}
+	else if([aCmd hasPrefix:@"3="]){
+		NSString* value = [[aCmd substringFromIndex:2] stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:2 withValue:[value floatValue]];
+	}
+	else if([aCmd hasPrefix:@"4="]){
+		NSString* value = [[aCmd substringFromIndex:2] stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
+		[self setSetPointReadBack:3 withValue:[value floatValue]];
+	}
+	else if([aCmd hasSuffix:@"OK"]){
+	}
+	else if([aCmd hasSuffix:@"On"]){
+	}
+	else if([aCmd hasSuffix:@"Off"]){
+	}
+	else if([aCmd hasPrefix:@"Error 1"]){
+	}
+	else if([aCmd hasPrefix:@"Error 2"]){
+	}
+	else if([aCmd hasPrefix:@"Error 3"]){
+	}
+	else if([aCmd hasPrefix:@"IGS"]){
+	}
+	
+	[self setLastRequest:nil];			 //clear the last request
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	[self processOneCommandFromQueue];	 //do the next command in the queue
 	
 }
 
+- (void) timeout
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	NSLogError(@"KJL IonGauge",@"command timeout",nil);
+	[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelQueCountChanged object: self];
+}
+
+- (void) processOneCommandFromQueue
+{
+	if([cmdQueue count] == 0) return;
+	NSString* aCommand = [[[cmdQueue objectAtIndex:0] retain] autorelease];
+	[cmdQueue removeObjectAtIndex:0];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelQueCountChanged object: self];
+	if([aCommand isEqualToString:kShipPressure]){
+		[self shipPressure];
+		[self processOneCommandFromQueue];
+	}
+	else {
+		[serialPort writeString:aCommand];
+		[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
+	}
+}
 @end
