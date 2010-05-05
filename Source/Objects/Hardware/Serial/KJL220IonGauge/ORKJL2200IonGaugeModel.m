@@ -482,10 +482,10 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
     if(state) {
         [serialPort open];
 		[serialPort setParityNone];
-		//[serialPort setStopBits2:0];
+		[serialPort setStopBits2:0];
 		[serialPort setDataBits:8];
 		[serialPort setSpeed:2400];
-		setStopBits = NO;
+		[serialPort commitChanges];
     }
     else  {
 		[serialPort close];
@@ -747,9 +747,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	
 	[self setLastRequest:aCommand];
 	[serialPort writeString:aCommand];
-	if(!setStopBits){
-		[serialPort setStopBits2:NO];
-	}
+
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
 	
 }
