@@ -595,7 +595,7 @@
 	double minX = 0;
 	double maxX = 0;
 	[[self topPlot] getxMin:&minX xMax:&maxX];
-	double pad = MIN((0.2*maxX),(0.2*minX));
+	double pad = 0.2*fabs(maxX-minX);
 	if(minX == 0) [xScale setRngLow:0 withHigh:maxX+pad];
 	else		  [xScale setRngLow:minX-pad withHigh:maxX+pad];
 	[xScale setNeedsDisplay:YES];	
@@ -608,7 +608,8 @@
 		double maxY = 0;
 		[[self topPlot] getyMin:&minY yMax:&maxY];
 		[yScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:10];
-		double pad = MAX((0.2*maxY),(0.2*minY));
+		double pad = 0.2*fabs(maxY-minY);
+		//double pad = MAX((0.2*maxY),(0.2*minY));
 		if(minY == 0) [yScale setRngLow:0 withHigh:maxY+pad];
 		else		  [yScale setRngLow:minY-pad withHigh:maxY+pad];
 		[yScale setNeedsDisplay:YES];	
