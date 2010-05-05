@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10C540</string>
-		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.25</string>
-		<string key="IBDocument.HIToolboxVersion">458.00</string>
+		<string key="IBDocument.SystemVersion">10D573</string>
+		<string key="IBDocument.InterfaceBuilderVersion">762</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">740</string>
+			<string key="NS.object.0">762</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1246,7 +1246,7 @@
 													<string>public.url</string>
 												</object>
 											</object>
-											<string key="NSFrameSize">{256, 165}</string>
+											<string key="NSFrameSize">{256, 156}</string>
 											<reference key="NSSuperview" ref="641865811"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="343147219">
 												<object class="NSLayoutManager" key="NSLayoutManager">
@@ -1573,13 +1573,13 @@
 						<object class="NSButton" id="399046166">
 							<reference key="NSNextResponder" ref="963545427"/>
 							<int key="NSvFlags">265</int>
-							<string key="NSFrame">{{474, 510}, {106, 18}}</string>
+							<string key="NSFrame">{{474, 510}, {108, 18}}</string>
 							<reference key="NSSuperview" ref="963545427"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="65908454">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">131072</int>
-								<string key="NSContents">Start With Doc</string>
+								<string key="NSContents">Start With ORCA</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="399046166"/>
 								<int key="NSButtonFlags">1211912703</int>
@@ -1650,17 +1650,18 @@
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
-								<object class="NSMenuItem" key="NSMenuItem" id="144822702">
+								<object class="NSMenuItem" key="NSMenuItem" id="480606651">
 									<reference key="NSMenu" ref="90816686"/>
-									<string key="NSTitle">if/else block</string>
+									<string key="NSTitle">function</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
-									<object class="NSCustomResource" key="NSOnImage" id="858540336">
+									<int key="NSState">1</int>
+									<object class="NSCustomResource" key="NSOnImage" id="946113524">
 										<string key="NSClassName">NSImage</string>
 										<string key="NSResourceName">NSMenuCheckmark</string>
 									</object>
-									<object class="NSCustomResource" key="NSMixedImage" id="639126837">
+									<object class="NSCustomResource" key="NSMixedImage" id="415564298">
 										<string key="NSClassName">NSImage</string>
 										<string key="NSResourceName">NSMenuMixedState</string>
 									</object>
@@ -1672,25 +1673,15 @@
 									<string key="NSTitle">OtherViews</string>
 									<object class="NSMutableArray" key="NSMenuItems">
 										<bool key="EncodedWithXMLCoder">YES</bool>
-										<object class="NSMenuItem" id="480606651">
-											<reference key="NSMenu" ref="90816686"/>
-											<string key="NSTitle">function</string>
-											<string key="NSKeyEquiv"/>
-											<int key="NSKeyEquivModMask">1048576</int>
-											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="858540336"/>
-											<reference key="NSMixedImage" ref="639126837"/>
-											<string key="NSAction">_popUpItemAction:</string>
-											<reference key="NSTarget" ref="890447623"/>
-										</object>
+										<reference ref="480606651"/>
 										<object class="NSMenuItem" id="891511781">
 											<reference key="NSMenu" ref="90816686"/>
 											<string key="NSTitle">for loop</string>
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="858540336"/>
-											<reference key="NSMixedImage" ref="639126837"/>
+											<reference key="NSOnImage" ref="946113524"/>
+											<reference key="NSMixedImage" ref="415564298"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="890447623"/>
 										</object>
@@ -1700,8 +1691,8 @@
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="858540336"/>
-											<reference key="NSMixedImage" ref="639126837"/>
+											<reference key="NSOnImage" ref="946113524"/>
+											<reference key="NSMixedImage" ref="415564298"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="890447623"/>
 										</object>
@@ -1711,8 +1702,8 @@
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="858540336"/>
-											<reference key="NSMixedImage" ref="639126837"/>
+											<reference key="NSOnImage" ref="946113524"/>
+											<reference key="NSMixedImage" ref="415564298"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="890447623"/>
 										</object>
@@ -1722,20 +1713,30 @@
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="858540336"/>
-											<reference key="NSMixedImage" ref="639126837"/>
+											<reference key="NSOnImage" ref="946113524"/>
+											<reference key="NSMixedImage" ref="415564298"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="890447623"/>
 										</object>
-										<reference ref="144822702"/>
+										<object class="NSMenuItem" id="144822702">
+											<reference key="NSMenu" ref="90816686"/>
+											<string key="NSTitle">if/else block</string>
+											<string key="NSKeyEquiv"/>
+											<int key="NSKeyEquivModMask">1048576</int>
+											<int key="NSMnemonicLoc">2147483647</int>
+											<reference key="NSOnImage" ref="946113524"/>
+											<reference key="NSMixedImage" ref="415564298"/>
+											<string key="NSAction">_popUpItemAction:</string>
+											<reference key="NSTarget" ref="890447623"/>
+										</object>
 										<object class="NSMenuItem" id="696471905">
 											<reference key="NSMenu" ref="90816686"/>
 											<string key="NSTitle">switch</string>
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="858540336"/>
-											<reference key="NSMixedImage" ref="639126837"/>
+											<reference key="NSOnImage" ref="946113524"/>
+											<reference key="NSMixedImage" ref="415564298"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="890447623"/>
 										</object>
@@ -1745,8 +1746,8 @@
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="858540336"/>
-											<reference key="NSMixedImage" ref="639126837"/>
+											<reference key="NSOnImage" ref="946113524"/>
+											<reference key="NSMixedImage" ref="415564298"/>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="890447623"/>
 										</object>
@@ -3371,9 +3372,9 @@
 							<reference ref="533847688"/>
 							<reference ref="560108941"/>
 							<reference ref="696708857"/>
-							<reference ref="399046166"/>
 							<reference ref="791750044"/>
 							<reference ref="1007962745"/>
+							<reference ref="399046166"/>
 						</object>
 						<reference key="parent" ref="810508401"/>
 					</object>
@@ -5562,6 +5563,13 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/Serial/Pac/ORPacModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Channel.h</string>
 					</object>
 				</object>
@@ -5803,21 +5811,98 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dFit.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter1D.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dFitController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter2D.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dRoi.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dRoiController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR2dRoi.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORFFT.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORFFTController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORXYFit.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/OR2DHistoPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlotView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlotWithROI.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORTimeSeriesPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORVectorPlot.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -6805,6 +6890,7 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
+		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
@@ -6816,5 +6902,42 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<string key="IBDocument.LastKnownRelativeProjectPath">../../../../Orca.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<bool key="EncodedWithXMLCoder">YES</bool>
+			<object class="NSArray" key="dict.sortedKeys">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>Bugs</string>
+				<string>Folder</string>
+				<string>Get Info</string>
+				<string>Locked</string>
+				<string>NSMenuCheckmark</string>
+				<string>NSMenuMixedState</string>
+				<string>NSSwitch</string>
+				<string>Pause</string>
+				<string>Play</string>
+				<string>SingleStep</string>
+				<string>StepInto</string>
+				<string>StepOut</string>
+				<string>Unlocked</string>
+				<string>checkScript</string>
+			</object>
+			<object class="NSMutableArray" key="dict.values">
+				<bool key="EncodedWithXMLCoder">YES</bool>
+				<string>{100, 71}</string>
+				<string>{32, 32}</string>
+				<string>{32, 32}</string>
+				<string>{33, 36}</string>
+				<string>{9, 8}</string>
+				<string>{7, 2}</string>
+				<string>{15, 15}</string>
+				<string>{26, 27}</string>
+				<string>{32, 32}</string>
+				<string>{36, 27}</string>
+				<string>{26, 27}</string>
+				<string>{26, 27}</string>
+				<string>{33, 36}</string>
+				<string>{26, 29}</string>
+			</object>
+		</object>
 	</data>
 </archive>

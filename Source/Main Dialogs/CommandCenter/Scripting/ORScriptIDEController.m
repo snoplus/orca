@@ -209,6 +209,7 @@
 	[self autoStartWithDocumentChanged:nil];
 	[self autoStartWithRunChanged:nil];
 	[self autoStopWithRunChanged:nil];
+	[codeHelperPU selectItemAtIndex:0];
 }
 
 - (void) checkGlobalSecurity
