@@ -42,7 +42,6 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t histogramId = GetHardwareMask()[2];
     uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
     uint32_t crate      = GetCrate();
-    uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
     
     uint32_t postTriggerTime = GetDeviceSpecificData()[0];
     uint32_t eventType  = GetDeviceSpecificData()[1];
@@ -50,7 +49,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t runFlags   = GetDeviceSpecificData()[3];
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
-    
+    uint32_t filterIndex = GetDeviceSpecificData()[6];
+
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndx<<4);
 
 
     if(srack->theFlt[col]->isPresent()){
