@@ -28,8 +28,6 @@
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
 
-#define kShipPressure @"kShipPressure"
-
 #pragma mark ***External Strings
 NSString* ORKJL2200IonGaugeModelSetPointReadChanged = @"ORKJL2200IonGaugeModelSetPointReadChanged";
 NSString* ORKJL2200IonGaugeModelDegasTimeReadChanged = @"ORKJL2200IonGaugeModelDegasTimeReadChanged";
@@ -125,7 +123,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 - (void) dataReceived:(NSNotification*)note
 {
     if([note object] == serialPort){
-		if(!lastRequest)return;
+		//if(!lastRequest)return;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
@@ -246,12 +244,12 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	return stateMask;
 }
 
-- (float) degasTime
+- (int) degasTime
 {
     return degasTime;
 }
 
-- (void) setDegasTime:(float)aDegasTime
+- (void) setDegasTime:(int)aDegasTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDegasTime:degasTime];
     
@@ -482,11 +480,12 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 - (void) openPort:(BOOL)state
 {
     if(state) {
-		[serialPort setSpeed:2400];
+        [serialPort open];
 		[serialPort setParityNone];
 		//[serialPort setStopBits2:0];
 		[serialPort setDataBits:8];
-        [serialPort open];
+		[serialPort setSpeed:2400];
+		setStopBits = NO;
     }
     else  {
 		[serialPort close];
@@ -502,7 +501,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setPressureScale:[decoder decodeIntForKey:@"pressureScale"]];
-	[self setDegasTime:		 [decoder decodeFloatForKey:@"degasTime"]];
+	[self setDegasTime:		 [decoder decodeIntForKey:@"degasTime "]];
 	[self setEmissionCurrent:[decoder decodeFloatForKey:@"emissionCurrent"]];
 	[self setSensitivity:	 [decoder decodeIntForKey:@"sensitivity"]];
 	[self setShipPressure:	 [decoder decodeBoolForKey:@"shipPressure"]];
@@ -525,7 +524,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:pressureScale forKey:@"pressureScale"];
-    [encoder encodeFloat:degasTime forKey:@"degasTime"];
+    [encoder encodeInt:degasTime forKey:@"degasTime "];
     [encoder encodeFloat:emissionCurrent forKey:@"emissionCurrent"];
     [encoder encodeInt:sensitivity forKey:@"sensitivity"];
     [encoder encodeBool:shipPressure forKey:@"shipPressure"];
@@ -542,7 +541,8 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 - (void) enqueCmdData:(NSString*)aCommand
 {
 	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-	[cmdQueue addObject:aCommand];
+	
+	[cmdQueue addObject:[[aCommand copy] autorelease]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelQueCountChanged object: self];
 	if(!lastRequest)[self processOneCommandFromQueue];
 }
@@ -551,20 +551,29 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 {
 	NSString* aCmd;
 	[self enqueCmdData:[NSString stringWithFormat:@"=SS:%d\r",sensitivity]];
-	[self enqueCmdData:[aCmd stringByAppendingFormat:@"=SE:%.1f\r",emissionCurrent]];
-	[self enqueCmdData:[aCmd stringByAppendingFormat:@"=ST:%.0f\r",degasTime]];
+	[self enqueCmdData:[NSString stringWithFormat:@"=SE:%.1f\r",emissionCurrent]];
+	[self enqueCmdData:[NSString stringWithFormat:@"=ST:%d\r",degasTime]];
 	int i;
 	for(i=0;i<4;i++){
-		if([self setPoint:i]!=0) aCmd = [aCmd stringByAppendingFormat:@"=S%d:%.1E\r",i+1,setPoint[i]];
-		else aCmd = [aCmd stringByAppendingString:@"0.0-0"];
+		if([self setPoint:i]!=0) aCmd = [NSString stringWithFormat:@"=S%d:%.1E\r",i+1,setPoint[i]];
+		else aCmd = [NSString stringWithFormat:@"=S%d:0.0E-00\r",i+1];
 		aCmd = [aCmd stringByReplacingOccurrencesOfString:@"E-" withString:@"-"];
 		[self enqueCmdData:aCmd];
 	}
+	[self getStatus];
+	[self readSettings];
+
 }
 
 - (void) readSettings
 {
-	[self enqueCmdData:@"=RS\r=RE\r=RT\r=R1\r=R2\r=R3\r=R4/r"];
+	[self enqueCmdData:@"=RS\r"];
+	[self enqueCmdData:@"=RE\r"];
+	[self enqueCmdData:@"=RT\r"];
+	[self enqueCmdData:@"=R1\r"];
+	[self enqueCmdData:@"=R2\r"];
+	[self enqueCmdData:@"=R3\r"];
+	[self enqueCmdData:@"=R4\r"];
 }
 
 - (void) turnOn
@@ -585,6 +594,13 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 - (void) turnDegasOff
 {
 	[self enqueCmdData:@"=SD0\r"];
+}
+
+- (void) sendReset
+{
+	[cmdQueue removeAllObjects];
+	[self setLastRequest:nil];
+	[self enqueCmdData:@"=X\r"];
 }
 
 #pragma mark ***Data Records
@@ -637,12 +653,15 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 
 - (void) decodeCommand:(NSString*)aCmd
 {
+	BOOL commandEcho = NO;
 	aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-
-	if([aCmd hasPrefix:@"V="]){
+	if([aCmd hasPrefix:@"="]){
+		commandEcho = YES;
+	}
+	else if([aCmd hasPrefix:@"V="]){
 		NSString* value = [[aCmd substringFromIndex:2] stringByReplacingOccurrencesOfString:@"-" withString:@"E-"];
-	
 		[self setPressure:[value floatValue]];
+		[self shipPressure];
 	}
 	else if([aCmd hasPrefix:@"*="]){
 		aCmd = [aCmd substringFromIndex:2];
@@ -656,8 +675,15 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 		}
 		[self setStateMask:aMask];
 	}
+	else if([aCmd hasPrefix:@"F="]){
+		[self performSelector:@selector(pollPressure) withObject:nil afterDelay:10];
+	}
+	else if([aCmd hasPrefix:@"D="]){
+		[self performSelector:@selector(pollPressure) withObject:nil afterDelay:10];
+	}
 	else if([aCmd hasPrefix:@"S="]){
 		[self setSensitivityRead:[[aCmd substringFromIndex:2] intValue]];
+		[self performSelector:@selector(pollPressure) withObject:nil afterDelay:10];
 	}
 	else if([aCmd hasPrefix:@"E="]){
 		[self setEmissionRead:[[aCmd substringFromIndex:2] floatValue]];
@@ -696,16 +722,18 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	else if([aCmd hasPrefix:@"IGS"]){
 	}
 	
-	[self setLastRequest:nil];			 //clear the last request
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
-	
+	if(!commandEcho){
+		[self setLastRequest:nil];			 //clear the last request
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		[self processOneCommandFromQueue];	 //do the next command in the queue
+	}
 }
 
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"KJL IonGauge",@"command timeout",nil);
+	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelQueCountChanged object: self];
 }
@@ -716,13 +744,13 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	NSString* aCommand = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelQueCountChanged object: self];
-	if([aCommand isEqualToString:kShipPressure]){
-		[self shipPressure];
-		[self processOneCommandFromQueue];
+	
+	[self setLastRequest:aCommand];
+	[serialPort writeString:aCommand];
+	if(!setStopBits){
+		[serialPort setStopBits2:NO];
 	}
-	else {
-		[serialPort writeString:aCommand];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
-	}
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
+	
 }
 @end

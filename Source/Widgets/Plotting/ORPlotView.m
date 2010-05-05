@@ -257,15 +257,15 @@
 - (NSDictionary*) textAttributes
 {
 	NSFont* font = [NSFont systemFontOfSize:12.0];
-	float red,green,blue,alpha;
-	NSColor* color = [[self backgroundColor] colorUsingColorSpaceName:NSDeviceRGBColorSpace];
-	[color getRed:&red green:&green blue:&blue alpha:&alpha];
-	NSColor* textBackgroundColor = [NSColor colorWithCalibratedRed:red
-															 green:green
-															  blue:blue
-															 alpha:.5];
+//	float red,green,blue,alpha;
+//	NSColor* color = [[self backgroundColor] colorUsingColorSpaceName:NSDeviceRGBColorSpace];
+//	[color getRed:&red green:&green blue:&blue alpha:&alpha];
+//	NSColor* textBackgroundColor = [NSColor colorWithCalibratedRed:red
+//															 green:green
+//															  blue:blue
+//															 alpha:.5];
 	
-	return [NSDictionary dictionaryWithObjectsAndKeys:font,NSFontAttributeName,textBackgroundColor,NSBackgroundColorAttributeName,nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:font,NSFontAttributeName,/*textBackgroundColor,NSBackgroundColorAttributeName,*/nil];
 }
 
 #pragma mark ***Drawing

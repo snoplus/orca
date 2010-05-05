@@ -168,7 +168,7 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(EmissionReadChanged:)
+                     selector : @selector(emissionReadChanged:)
                          name : ORKJL2200IonGaugeModelEmissionReadChanged
 						object: model];
 
@@ -176,6 +176,11 @@
                      selector : @selector(degasTimeReadChanged:)
                          name : ORKJL2200IonGaugeModelDegasTimeReadChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(queCountChanged:)
+						 name : ORKJL2200IonGaugeModelQueCountChanged
+					   object : model];	
 }
 
 - (void) updateWindow
@@ -225,27 +230,27 @@
 - (void) stateMaskChanged:(NSNotification*)aNote
 {
 	unsigned short aMask = [model stateMask];
-	[setPoint1State setState:aMask & kKJL2200SetPoint1Mask];
-	[setPoint2State setState:aMask & kKJL2200SetPoint2Mask];
-	[setPoint3State setState:aMask & kKJL2200SetPoint3Mask];
-	[setPoint4State setState:aMask & kKJL2200SetPoint4Mask];
+	[setPoint1State setState:(aMask & kKJL2200SetPoint1Mask)==kKJL2200SetPoint1Mask];
+	[setPoint2State setState:(aMask & kKJL2200SetPoint2Mask)==kKJL2200SetPoint2Mask];
+	[setPoint3State setState:(aMask & kKJL2200SetPoint3Mask)==kKJL2200SetPoint3Mask];
+	[setPoint4State setState:(aMask & kKJL2200SetPoint4Mask)==kKJL2200SetPoint4Mask];
 	BOOL degassOn = aMask & kKJL2200DegasOnMask;
 	BOOL isOn     = aMask & kKJL2200IonGaugeOnMask;
 	[degasOnField setStringValue:degassOn?@"Degas":@""];
 	[onOffButton setTitle:isOn?@"Turn Off":@"Turn On"];
-	[degasButton setTitle:isOn?@"Turn Degas Off":@"Turn Degas On"];
+	[degasButton setTitle:degassOn?@"Turn Degas Off":@"Turn Degas On"];
 	
-	[[setPointLabelMatrix cellWithTag:0] setStringValue:(aMask & kKJL2200SetPoint1Mask) ? @"S1":@"  "];
-	[[setPointLabelMatrix cellWithTag:1] setStringValue:(aMask & kKJL2200SetPoint2Mask) ? @"S2":@"  "];
-	[[setPointLabelMatrix cellWithTag:2] setStringValue:(aMask & kKJL2200SetPoint3Mask) ? @"S3":@"  "];
-	[[setPointLabelMatrix cellWithTag:3] setStringValue:(aMask & kKJL2200SetPoint4Mask) ? @"S4":@"  "];
+	[[setPointMatrix cellWithTag:0] setStringValue:(aMask & kKJL2200SetPoint1Mask) ? @"S1":@"  "];
+	[[setPointMatrix cellWithTag:1] setStringValue:(aMask & kKJL2200SetPoint2Mask) ? @"S2":@"  "];
+	[[setPointMatrix cellWithTag:2] setStringValue:(aMask & kKJL2200SetPoint3Mask) ? @"S3":@"  "];
+	[[setPointMatrix cellWithTag:3] setStringValue:(aMask & kKJL2200SetPoint4Mask) ? @"S4":@"  "];
 	
 	[self pressureChanged:nil];
 }
 
 - (void) degasTimeChanged:(NSNotification*)aNote
 {
-	[degasTimeField setFloatValue: [model degasTime]];
+	[degasTimeField setIntValue: [model degasTime]];
 }
 
 - (void) emissionCurrentChanged:(NSNotification*)aNote
@@ -262,7 +267,7 @@
 {
 	int i;
 	for(i=0;i<4;i++){
-		[[setPointMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.2E",[model setPoint:i]]];
+		[[setPointLabelMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.1E",[model setPoint:i]]];
 	}
 }
 
@@ -270,7 +275,7 @@
 {
 	int i;
 	for(i=0;i<4;i++){
-		[[setPointReadBackMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.2E",[model setPointReadBack:i]]];
+		[[setPointReadBackMatrix cellWithTag:i] setStringValue: [NSString stringWithFormat:@"%.1E",[model setPointReadBack:i]]];
 	}
 }
 
@@ -327,9 +332,12 @@
 {
 	if([model stateMask] & kKJL2200IonGaugeOnMask){
 		[pressureField setStringValue:[NSString stringWithFormat:@"%.1E",[model pressure]]];
+		[smallPressureField setStringValue:[NSString stringWithFormat:@"%.1E Torr",[model pressure]]];
+		
 	}
 	else {
 		[pressureField setStringValue:@"OFF"];
+		[smallPressureField setStringValue:@"OFF"];
 	}
 	unsigned long t = [model timeMeasured];
 	NSCalendarDate* theDate;
@@ -363,6 +371,7 @@
     [shipPressureButton setEnabled:!locked];
     [degasButton setEnabled:!locked];
     [onOffButton setEnabled:!locked];
+	[resetButton setEnabled:!locked];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -420,9 +429,16 @@
     [self portStateChanged:nil];
 }
 
+- (void) queCountChanged:(NSNotification*)aNotification
+{
+	[cmdQueCountField setIntValue:[model queCount]];
+}
 
 #pragma mark ***Actions
-
+- (void) resetAction:(id)sender
+{
+	[model sendReset];	
+}
 - (void) pressureScaleAction:(id)sender
 {
 	[model setPressureScale:[sender indexOfSelectedItem]];	
@@ -434,7 +450,7 @@
 
 - (IBAction) degasTimeAction:(id)sender
 {
-	[model setDegasTime:[sender floatValue]];	
+	[model setDegasTime:[sender intValue]];	
 }
 
 - (IBAction) emissionCurrentAction:(id)sender
@@ -515,7 +531,7 @@
 	int count = [[model timeRate] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate] timeSampledAtIndex:index];
-	*yValue = [[model timeRate] valueAtIndex:index];
+	*yValue = [[model timeRate] valueAtIndex:index] * [model pressureScaleValue];
 }
 
 @end

@@ -54,7 +54,8 @@
 		int sensitivityRead;
 		float emissionRead;
 		int degasTimeRead;
-	NSString* lastRequest;
+		NSString* lastRequest;
+		BOOL setStopBits;
 }
 
 #pragma mark ***Initialization
@@ -80,8 +81,8 @@
 - (void) setPressureScale:(int)aPressureScale;
 - (void) setStateMask:(unsigned short)aMask;
 - (unsigned short)stateMask;
-- (float) degasTime;
-- (void) setDegasTime:(float)aDegasTime;
+- (int) degasTime;
+- (void) setDegasTime:(int)aDegasTime;
 - (float) emissionCurrent;
 - (void) setEmissionCurrent:(float)aEmissionCurrent;
 - (int) sensitivity;
@@ -127,6 +128,7 @@
 - (void) turnOff;
 - (void) turnDegasOn;
 - (void) turnDegasOff;
+- (void) sendReset;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;

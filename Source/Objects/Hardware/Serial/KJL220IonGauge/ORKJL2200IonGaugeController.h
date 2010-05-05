@@ -37,6 +37,7 @@
 	IBOutlet NSMatrix*		setPointReadBackMatrix;
 	IBOutlet NSMatrix*		setPointLabelMatrix;
 	IBOutlet NSTextField*	pressureField;
+	IBOutlet NSTextField*	smallPressureField;
 	IBOutlet NSTextField*	shippingStateField;
 	IBOutlet NSButton*		shipPressureButton;
     IBOutlet NSButton*      lockButton;
@@ -44,8 +45,10 @@
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
+    IBOutlet NSButton*      resetButton;
     IBOutlet NSTextField*   timeField;
 	IBOutlet ORPlotView*   plotter0;
+	IBOutlet NSTextField*	cmdQueCountField;
 	
     IBOutlet BiStateView*	setPoint1State;
     IBOutlet BiStateView*	setPoint2State;
@@ -73,16 +76,17 @@
 - (void) sensitivityChanged:(NSNotification*)aNote;
 - (void) setPointChanged:(NSNotification*)aNote;
 - (void) pressureChanged:(NSNotification*)aNote;
-- (void) updateTimePlot:(NSNotification*)aNotification;
-- (void) scaleAction:(NSNotification*)aNotification;
-- (void) shipPressureChanged:(NSNotification*)aNotification;
-- (void) lockChanged:(NSNotification*)aNotification;
-- (void) portNameChanged:(NSNotification*)aNotification;
-- (void) portStateChanged:(NSNotification*)aNotification;
-- (void) pollTimeChanged:(NSNotification*)aNotification;
-- (void) miscAttributesChanged:(NSNotification*)aNotification;
+- (void) updateTimePlot:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) shipPressureChanged:(NSNotification*)aNote;
+- (void) lockChanged:(NSNotification*)aNote;
+- (void) portNameChanged:(NSNotification*)aNote;
+- (void) portStateChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) setPointReadBackChanged:(NSNotification*)aNote;
+- (void) queCountChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) readBoard:(id)sender;
@@ -100,6 +104,7 @@
 - (IBAction) toggleIonGauge:(id)sender;
 - (IBAction) setPointAction:(id)sender;
 - (IBAction) toggleDegass:(id)sender;
+- (void) resetAction:(id)sender;
 
 @end
 

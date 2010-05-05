@@ -193,10 +193,11 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
+	
     [notifyCenter addObserver : self
 					 selector : @selector(queCountChanged:)
 						 name : ORPacModelQueCountChanged
-					   object : nil];	
+					   object : model];	
 }
 
 - (void) setModel:(id)aModel
