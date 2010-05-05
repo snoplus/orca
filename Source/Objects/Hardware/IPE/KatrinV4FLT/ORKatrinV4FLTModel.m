@@ -1549,7 +1549,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;	
     //the daq mode (should replace the flt mode)
     configStruct->card_info[index].deviceSpecificData[5] = runMode;			//the daqRunMode
-	configStruct->card_info[index].deviceSpecificData[6] = filterLen;		//packed into the records for normalization (MAH/May5,2010)
+	configStruct->card_info[index].deviceSpecificData[6] = [self filterLength];		//packed into the records for normalization (MAH/May5,2010)
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
