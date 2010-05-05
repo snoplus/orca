@@ -74,7 +74,7 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 {
 	[label autorelease];
 	label = [aLabel copy];
-//	[[NSNotificationCenter defaultCenter] postNotificationName:OR1dRoiAnalysisChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:OR1dRoiAnalysisChanged object:self];
 }
 
 - (NSString*) label

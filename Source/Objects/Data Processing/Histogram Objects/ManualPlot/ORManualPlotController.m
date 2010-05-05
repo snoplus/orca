@@ -41,6 +41,13 @@
     self = [super initWithWindowNibName:@"ManualPlot"];
     return self;
 }
+- (void) dealloc 
+{
+	[roiController release];
+	[fitController release];
+	
+	[super dealloc];
+}
 
 - (void) awakeFromNib
 {
