@@ -78,8 +78,15 @@
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
 	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
 	unsigned short filterDiv;
-	if(filterIndex==0)	filterDiv = 256;
-	else				filterDiv = 1L << (filterIndex+2);
+	unsigned long histoLen;
+	if(filterIndex==0)	{
+		histoLen = 16*1024;
+		filterDiv = 32;
+	}
+	else {
+		histoLen = 4096;
+		filterDiv = 1L << (filterIndex+2);
+	}
 	
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
@@ -89,17 +96,17 @@
 		
 	//channel by channel histograms
 	[aDataSet histogram:energy
-				numBins:4096 sender:self  
+				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Energy", crateKey,stationKey,channelKey,nil];
 	
 	//accumulated card level histograms
 	[aDataSet histogram:energy
-				numBins:4096 sender:self  
+				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Total Card Energy", crateKey,stationKey,nil];
 	
 	//accumulated crate level histograms
 	[aDataSet histogram:energy 
-				numBins:4096 sender:self  
+				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Total Crate Energy", crateKey,nil];
 
 	//get the actual object
@@ -212,8 +219,15 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
 	NSString* channelKey	= [self getChannelKey: chan];	
 	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
 	unsigned short filterDiv;
-	if(filterIndex==0)	filterDiv = 256;
-	else				filterDiv = 1L << (filterIndex+2);
+	unsigned long histoLen;
+	if(filterIndex==0)	{
+		histoLen = 16*1024;
+		filterDiv = 32;
+	}
+	else {
+		histoLen = 4096;
+		filterDiv = 1L << (filterIndex+2);
+	}
 	
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
@@ -224,17 +238,17 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
 	
 	//channel by channel histograms
 	[aDataSet histogram:energy 
-				numBins:4096 sender:self  
+				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Energy", crateKey,stationKey,channelKey,nil];
 	
 	//accumulated card level histograms
 	[aDataSet histogram:energy 
-				numBins:4096 sender:self  
+				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Total Card Energy", crateKey,stationKey,nil];
 	
 	//accumulated crate level histograms
 	[aDataSet histogram:energy 
-				numBins:4096 sender:self  
+				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Total Crate Energy", crateKey,nil];
 	
 	
