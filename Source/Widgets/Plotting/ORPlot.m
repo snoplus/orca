@@ -421,7 +421,7 @@
 			double xValue,yValue;
 			[dataSource plotter:self index:i x:&xValue y:&yValue];
 			if(yValue!=0){
-				minX = i;
+				minX = xValue;
 				gotOne = YES;
 				break;
 			}
@@ -431,7 +431,7 @@
 			double xValue,yValue;
 			[dataSource plotter:self index:i x:&xValue y:&yValue];
 			if(yValue!=0){
-				maxX = i;
+				maxX = xValue;
 				gotOne = YES;
 				break;
 			}
