@@ -91,10 +91,10 @@
                          name : OR1dRoiAnalysisChanged
                        object : model];
 	
-//	[notifyCenter addObserver : self
-//					 selector : @selector(analysisChanged:)
-//						 name : ORRunStatusChangedNotification
-//					   object : nil];
+	[notifyCenter addObserver : self
+					 selector : @selector(analysisChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
 	
 	[self updateWindow];
 
