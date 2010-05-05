@@ -122,3 +122,23 @@
 #define SLT_TRIGGER_INT   0x08  // Internal
 #define SLT_TRIGGER_EXT   0x10  // External
 
+
+/*  Time Stamp Record Types used with the
+  * Slt counters (see shipSltTimestamp).
+  */
+  
+#define kUnknownType		0
+#define kSecondsCounterType	1
+#define kVetoCounterType	2
+#define kDeadCounterType	3
+#define kRunCounterType		4
+
+/*  Time Stamp Record Types used with the
+  * Slt time stamps (see shipSltTimestamp). Used with the Counter Type above ...
+  */
+#define kStartRunType		1
+#define kStopRunType		2
+#define kStartSubRunType	3
+#define kStopSubRunType		4
+
+

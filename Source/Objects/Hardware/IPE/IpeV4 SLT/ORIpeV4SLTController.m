@@ -201,9 +201,20 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : ORIpeV4SLTModelSltScriptArgumentsChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(secondsSetInitWithHostChanged:)
+                         name : ORIpeV4SLTModelSecondsSetInitWithHostChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) secondsSetInitWithHostChanged:(NSNotification*)aNote
+{
+	[secondsSetInitWithHostButton setState: [model secondsSetInitWithHost]];
+	[secondsSetField setEnabled:![model secondsSetInitWithHost]];
+}
 
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote
 {
@@ -222,17 +233,27 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) runTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:2] setIntValue:[model runTime]];
+	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",(unsigned long long)[model runTime]]];
+	unsigned long long t=[model runTime];
+	[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
+	//[[countersMatrix cellWithTag:2] setIntValue:  [model runTime]];
 }
 
 - (void) vetoTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:1] setIntValue:[model vetoTime]];
+	unsigned long long t=[model vetoTime];
+	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
+	//[[countersMatrix cellWithTag:1] setIntValue:[model vetoTime]];
 }
 
 - (void) deadTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:0] setIntValue:[model deadTime]];
+	unsigned long long t=[model deadTime];
+	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+	//[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
+	//[[countersMatrix cellWithTag:0] setIntValue:[model deadTime]];
 }
 
 - (void) secondsSetChanged:(NSNotification*)aNote
@@ -337,6 +358,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self clockTimeChanged:nil];
 	[self countersEnabledChanged:nil];
 	[self sltScriptArgumentsChanged:nil];
+	[self secondsSetInitWithHostChanged:nil];
 }
 
 
@@ -484,6 +506,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 
 #pragma mark ***Actions
+
+- (void) secondsSetInitWithHostButtonAction:(id)sender
+{
+	[model setSecondsSetInitWithHost:[secondsSetInitWithHostButton intValue]];	
+}
 
 - (void) sltScriptArgumentsTextFieldAction:(id)sender
 {
@@ -773,7 +800,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender
-{	[model sendSimulationConfigScriptOFF];  }
+{
+	[model sendSimulationConfigScriptOFF];  
+	NSLog(@"Sending simulation-mode-off script is still under development. If it fails just stop and force-reload-start the crate.\n");
+}
 
 - (IBAction) pulserAmpAction: (id) sender
 {

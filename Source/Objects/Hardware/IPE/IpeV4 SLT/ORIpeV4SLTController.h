@@ -27,11 +27,12 @@
 @interface ORIpeV4SLTController : SBC_LinkController {
 	@private
 	
-		IBOutlet NSTextField* hwVersionField;
-		IBOutlet NSTextField* sltScriptArgumentsTextField;
-		IBOutlet NSMatrix*	  countersMatrix;
-		IBOutlet NSTextField* secondsSetField;
-		IBOutlet NSButton*	  hwVersionButton;
+		IBOutlet NSTextField*	hwVersionField;
+		IBOutlet NSTextField*	sltScriptArgumentsTextField;
+		IBOutlet NSMatrix*		countersMatrix;
+		IBOutlet NSTextField*	secondsSetField;
+		IBOutlet NSButton*		secondsSetInitWithHostButton;
+		IBOutlet NSButton*		hwVersionButton;
 	
 		//control reg
 		IBOutlet NSMatrix*		triggerEnableMatrix;
@@ -103,6 +104,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
 - (void) countersEnabledChanged:(NSNotification*)aNote;
 - (void) clockTimeChanged:(NSNotification*)aNote;
@@ -136,6 +138,7 @@
 - (void) enableRegControls;
 
 #pragma mark •••Actions
+- (IBAction) secondsSetInitWithHostButtonAction:(id)sender;
 - (IBAction) sltScriptArgumentsTextFieldAction:(id)sender;
 - (IBAction) enableDisableCounterAction:(id)sender;
 - (IBAction) secondsSetAction:(id)sender;

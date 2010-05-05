@@ -36,10 +36,20 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^--------------------------------spare
         ^ ^^^---------------------------crate
              ^ ^^^^---------------------card
-					^^^^ ^^^^ ^^^^ ^^^^-spare
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventCounter
+					^^^^ ^^^^-----------spare
+					          ^^^^------counter type
+					               ^^^^-record type (sub type)
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventCounter (when record type != 0 see below)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Hi
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Lo
+when record type != 0 the eventCounter is 0 (has no meaning) and for
+record type = 1 = kStartRunType:	the timestamp is a run start timestamp
+record type = 2 = kStopRunType:		the timestamp is a run stop timestamp
+record type = 3 = kStartSubRunType: the timestamp is a subrun start timestamp
+record type = 4 = kStopSubRunType:	the timestamp is a subrun stop timestamp
+
+counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCounterType
+1:
 **/
 //-------------------------------------------------------------
 
@@ -54,21 +64,48 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Lo
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 
-	NSString* title= @"Ipe SLT Event Record\n\n";
+	NSString* title= @"Ipe SLTv4 Event Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
     NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
     NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-
+	int recordType = (*ptr) & 0xf;
+	int counterType = ((*ptr)>>4) & 0xf;
+	
 	++ptr;		//point to event counter
 	
-	NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %d\n",*ptr++];
+	if (recordType == 0) {
+		NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %d\n",*ptr++];
+		NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %d\n",*ptr++];
+		NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %d\n",*ptr];		
+
+		return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
+							eventCounter,timeStampHi,timeStampLo];               
+	}
+	
+	++ptr;		//skip event counter
+	//timestamp events
+	NSString* counterString;
+	switch (counterType) {
+		case kSecondsCounterType:	counterString    = [NSString stringWithFormat:@"Seconds Counter\n"]; break;
+		case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
+		case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
+		case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
+		default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
+	}
+	NSString* typeString;
+	switch (recordType) {
+		case kStartRunType:		typeString    = [NSString stringWithFormat:@"Start Run Timestamp\n"]; break;
+		case kStopRunType:		typeString    = [NSString stringWithFormat:@"Stop Run Timestamp\n"]; break;
+		case kStartSubRunType:	typeString    = [NSString stringWithFormat:@"Start SubRun Timestamp\n"]; break;
+		case kStopSubRunType:	typeString    = [NSString stringWithFormat:@"Stop SubRun Timestamp\n"]; break;
+		default:				typeString    = [NSString stringWithFormat:@"Unknown Timestamp Type\n"]; break;
+	}
 	NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %d\n",*ptr++];
 	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %d\n",*ptr];		
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,
-	                    eventCounter,timeStampHi,timeStampLo];               
-
+	return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,
+						counterString,typeString,timeStampHi,timeStampLo];               
 }
 @end
 

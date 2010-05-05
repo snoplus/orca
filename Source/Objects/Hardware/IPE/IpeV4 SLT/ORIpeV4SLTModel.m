@@ -52,12 +52,13 @@ enum IpeV4Enum {
 	kSltV4PixelBusTestReg,
 	kSltV4AuxBusTestReg,
 	kSltV4DebugStatusReg,
-	kSltV4DeadTimeCounterLoReg,
-	kSltV4DeadTimeCounterHiReg,
-	kSltV4VetoCounterLoReg,
-	kSltV4VetoCounterHiReg,
-	kSltV4RunCounterLoReg,
-	kSltV4RunCounterHiReg,
+	kSltV4VetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4VetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4DeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4DeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+								//TODO: and dead time and veto time counter are confused, too -tb-
+	kSltV4RunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kSltV4RunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
 	kSltV4SecondSetReg,
 	kSltV4SecondCounterReg,
 	kSltV4SubSecondCounterReg,
@@ -96,12 +97,12 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 {@"Pixel Bus Test",		0xA8002C, 		1, 			kIpeRegReadable | kIpeRegWriteable },
 {@"Aux Bus Test",		0xA80030, 		1, 			kIpeRegReadable | kIpeRegWriteable },
 {@"Debug Status",		0xA80034,  		1, 			kIpeRegReadable | kIpeRegWriteable },
-{@"Dead Counter (LSB)",	0xA80080, 		1,			kIpeRegReadable },	
-{@"Dead Counter (MSB)",	0xA80084,		1,			kIpeRegReadable },	
-{@"Veto Counter (LSB)",	0xA80088, 		1,			kIpeRegReadable },	
-{@"Veto Counter (MSB)",	0xA8008C, 		1,			kIpeRegReadable },	
-{@"Run Counter  (LSB)",	0xA80090,		1,			kIpeRegReadable },	
-{@"Run Counter  (MSB)",	0xA80094, 		1,			kIpeRegReadable },	
+{@"Veto Counter (MSB)",	0xA80080, 		1,			kIpeRegReadable },	
+{@"Veto Counter (LSB)",	0xA80084,		1,			kIpeRegReadable },	
+{@"Dead Counter (MSB)",	0xA80088, 		1,			kIpeRegReadable },	
+{@"Dead Counter (LSB)",	0xA8008C, 		1,			kIpeRegReadable },	
+{@"Run Counter  (MSB)",	0xA80090,		1,			kIpeRegReadable },	
+{@"Run Counter  (LSB)",	0xA80094, 		1,			kIpeRegReadable },	
 {@"Second Set",			0xB00000,  		1, 			kIpeRegReadable | kIpeRegWriteable }, 
 {@"Second Counter",		0xB00004, 		1,			kIpeRegReadable },
 {@"Sub-second Counter",	0xB00008, 		1,			kIpeRegReadable }, 
@@ -132,6 +133,7 @@ static IpeRegisterNamesStruct regV4[kSltV4NumRegs] = {
 
 #pragma mark ***External Strings
 
+NSString* ORIpeV4SLTModelSecondsSetInitWithHostChanged = @"ORIpeV4SLTModelSecondsSetInitWithHostChanged";
 NSString* ORIpeV4SLTModelSltScriptArgumentsChanged = @"ORIpeV4SLTModelSltScriptArgumentsChanged";
 NSString* ORIpeV4SLTModelCountersEnabledChanged = @"ORIpeV4SLTModelCorntersEnabledChanged";
 NSString* ORIpeV4SLTModelClockTimeChanged = @"ORIpeV4SLTModelClockTimeChanged";
@@ -181,6 +183,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [self makePoller:0];
 	[readList release];
 	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
+	[self setSecondsSetInitWithHost: YES];
     return self;
 }
 
@@ -273,6 +276,18 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 #pragma mark •••Accessors
 
+- (BOOL) secondsSetInitWithHost
+{
+    return secondsSetInitWithHost;
+}
+
+- (void) setSecondsSetInitWithHost:(BOOL)aSecondsSetInitWithHost
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSecondsSetInitWithHost:secondsSetInitWithHost];
+    secondsSetInitWithHost = aSecondsSetInitWithHost;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelSecondsSetInitWithHostChanged object:self];
+}
+
 - (NSString*) sltScriptArguments
 {
 	if(!sltScriptArguments)return @"";
@@ -306,48 +321,48 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelCountersEnabledChanged object:self];
 }
 
-- (float) clockTime
+- (unsigned long) clockTime
 {
     return clockTime;
 }
 
-- (void) setClockTime:(float)aClockTime
+- (void) setClockTime:(unsigned long)aClockTime
 {
     clockTime = aClockTime;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelClockTimeChanged object:self];
 }
 
-- (unsigned long) runTime
+- (unsigned long long) runTime
 {
     return runTime;
 }
 
-- (void) setRunTime:(unsigned long)aRunTime
+- (void) setRunTime:(unsigned long long)aRunTime
 {
     runTime = aRunTime;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelRunTimeChanged object:self];
 }
 
-- (unsigned long) vetoTime
+- (unsigned long long) vetoTime
 {
     return vetoTime;
 }
 
-- (void) setVetoTime:(unsigned long)aVetoTime
+- (void) setVetoTime:(unsigned long long)aVetoTime
 {
     vetoTime = aVetoTime;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelVetoTimeChanged object:self];
 }
 
-- (unsigned long) deadTime
+- (unsigned long long) deadTime
 {
     return deadTime;
 }
 
-- (void) setDeadTime:(unsigned long)aDeadTime
+- (void) setDeadTime:(unsigned long long)aDeadTime
 {
     deadTime = aDeadTime;
 
@@ -450,15 +465,17 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runIsAboutToStart:(NSNotification*)aNote
 {
-	if([readOutGroup count] == 0){
+	if([readOutGroup count] == 0){//TODO: I don't understand this -tb-
 		[self initBoard];
 	}	
 }
 
 - (void) runIsStopped:(NSNotification*)aNote
 {	
+	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+	NSLog(@"%@::%@  [readOutGroup count] is %i!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[readOutGroup count]);//TODO: debug -tb-
 	// Stop all activities by software inhibit
-	if([readOutGroup count] == 0){
+	if([readOutGroup count] == 0){//TODO: I don't understand this -tb-
 		[self writeSetInhibit];
 	}
 	
@@ -471,13 +488,16 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote
 {
-	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+	[self shipSltSecondCounter: kStopSubRunType];
+	//TODO: I could set inhibit to measure the 'netto' run time precisely -tb-
 }
 
 
 - (void) runIsStartingSubRun:(NSNotification*)aNote
 {
-	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
+	[self shipSltSecondCounter: kStartSubRunType];
 }
 
 
@@ -1027,17 +1047,23 @@ NSLog(@"  arguments: %@ \n" , arguments);
 - (void) loadSecondsReg
 {
     //TODO: add option to set system time? -tb-
-	[self writeReg:kSltV4SecondSetReg value:secondsSet];
+	unsigned long secSetpoint = secondsSet;
+	if(secondsSetInitWithHost){ 
+		struct timeval t;//    call with struct timezone tz; is obsolete ... -tb-
+		gettimeofday(&t,NULL);
+		secSetpoint = t.tv_sec;  
+	}
+	[self writeReg:kSltV4SecondSetReg value:secSetpoint];
     //Wait until next second srobe!
     uint32_t i,sltsec;
-    for(i=0;i<10000;i++){
+    for(i=0;i<10000;i++){// when the time already was set, this will leave the loop immediately
         usleep(100);
         [self readReg:kSltV4SubSecondCounterReg];
         sltsec=[self readReg:kSltV4SecondCounterReg];
-        if(sltsec==secondsSet) break;
+        if(sltsec==secSetpoint) break;
     }
-    if(i==10000) NSLog(@"ORIpeV4SLTModel::loadSecondsReg: ERROR: could not read back SLT time %i (is %i)!\n",secondsSet,sltsec);
-    NSLog(@"ORIpeV4SLTModel::loadSecondsReg:  setpoint SLT time %i (is %i) loops %i!\n",secondsSet,sltsec,i);
+    if(i==10000) NSLog(@"ORIpeV4SLTModel::loadSecondsReg: ERROR: could not read back SLT time %i (is %i)!\n",secSetpoint,sltsec);
+    //NSLog(@"ORIpeV4SLTModel::loadSecondsReg:  setpoint SLT time %i (is %i) loops %i!\n",secSetpoint,sltsec,i);
 }
 
 - (void) writeInterruptMask
@@ -1122,10 +1148,12 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (unsigned long long) readRunTime
 {
-	unsigned long low  = [self readReg:kSltV4RunCounterLoReg];
-	unsigned long high = [self readReg:kSltV4RunCounterHiReg];
-	[self setRunTime:((unsigned long long)high << 32) | low];
-	return runTime;
+	unsigned long long low  = [self readReg:kSltV4RunCounterLoReg];
+	unsigned long long high = [self readReg:kSltV4RunCounterHiReg];
+	unsigned long long theTime = ((unsigned long long)high << 32) | low;
+	//NSLog(@"runtime lo %llx high %llx   ---   time %llx  %llu\n",low,high, theTime, theTime);
+	[self setRunTime:theTime];
+	return theTime;
 }
 
 - (unsigned long) readSecondsCounter
@@ -1148,6 +1176,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 - (void) initBoard
 {
 	if(countersEnabled)[self writeEnCnt];
+	else [self writeDisCnt];
+	if(countersEnabled  && !(controlReg & (0x1 << kCtrlInhEnShift))  ){
+		NSLog(@"WARNING: IPE-DAQ SLTv4: you use 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
+	}
 	[self loadSecondsReg];
 	[self writeControlReg];
 	[self writeInterruptMask];
@@ -1269,6 +1301,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 	[self setControlReg:		[decoder decodeInt32ForKey:@"controlReg"]];
 	[self setSecondsSet:		[decoder decodeInt32ForKey:@"secondsSet"]];
+	if([decoder containsValueForKey:@"secondsSetInitWithHost"])
+		[self setSecondsSetInitWithHost:[decoder decodeBoolForKey:@"secondsSetInitWithHost"]];
+	else[self setSecondsSetInitWithHost: YES];
+	
 	[self setCountersEnabled:	[decoder decodeBoolForKey:@"countersEnabled"]];
 
 	//status reg
@@ -1307,6 +1343,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:secondsSetInitWithHost forKey:@"secondsSetInitWithHost"];
 	[encoder encodeObject:sltScriptArguments forKey:@"sltScriptArguments"];
 	[encoder encodeBool:countersEnabled forKey:@"countersEnabled"];
 	[encoder encodeInt32:secondsSet forKey:@"secondsSet"];
@@ -1409,6 +1446,8 @@ NSLog(@"  arguments: %@ \n" , arguments);
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
+	if(countersEnabled)[self writeClrCnt];//If enabled run counter will be reset to 0 at run start -tb-
+	
 	[self readStatusReg];
 	actualPageIndex = 0;
 	eventCounter    = 0;
@@ -1431,12 +1470,14 @@ NSLog(@"  arguments: %@ \n" , arguments);
 		//the resulting data from a generic circular buffer in the pmc code.
 		[pmcLink takeData:aDataPacket userInfo:userInfo];
 	}
-	else {
+	else {// the first time
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
+		unsigned long long runcount = [self readRunTime];
+		[self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 		[self writeClrInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
+		[self shipSltSecondCounter: kStartRunType];
 		first = NO;
-		
 	}
 }
 
@@ -1451,6 +1492,9 @@ NSLog(@"  arguments: %@ \n" , arguments);
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
+	[self shipSltSecondCounter: kStopRunType];
+	unsigned long long runcount = [self readRunTime];
+	[self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
 	
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
@@ -1466,6 +1510,43 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	dataTakers = nil;
 
 }
+
+/** For the V4 SLT (Auger/KATRIN)the subseconds count 100 nsec tics! (Despite the fact that the ADC sampling has a 50 nsec base.)
+  */ //-tb- 
+- (void) shipSltSecondCounter:(unsigned char)aType
+{
+	//aType = 1 start run, =2 stop run, = 3 start subrun, =4 stop subrun, see #defines in ORIpeV4SLTDefs.h -tb-
+	unsigned long subseconds = [self readSubSecondsCounter];
+	unsigned long seconds = [self readSecondsCounter];
+	
+
+	[self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:seconds low:subseconds ];
+	#if 0
+	unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+	unsigned long data[5];
+			data[0] = eventDataId | 5; 
+			data[1] = location | (aType & 0xf);
+			data[2] = 0;	
+			data[3] = seconds;	
+			data[4] = subseconds;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:data length:sizeof(long)*(5)]];
+	#endif
+}
+
+- (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l
+{
+	unsigned long location = (([self crateNumber]&0x1e)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+	unsigned long data[5];
+			data[0] = eventDataId | 5; 
+			data[1] = location | ((aCounterType & 0xf)<<4) | (aType & 0xf);
+			data[2] = c;	
+			data[3] = h;	
+			data[4] = l;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:data length:sizeof(long)*(5)]];
+}
+
 
 - (BOOL) doneTakingData
 {

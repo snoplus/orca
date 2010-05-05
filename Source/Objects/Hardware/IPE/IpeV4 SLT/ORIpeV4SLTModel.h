@@ -164,12 +164,13 @@
 		unsigned long controlReg;
 		unsigned long statusReg;
 		unsigned long secondsSet;
-		unsigned long deadTime;
-		unsigned long vetoTime;
-		unsigned long runTime;
+		unsigned long long deadTime;
+		unsigned long long vetoTime;
+		unsigned long long runTime;
 		unsigned long clockTime;
 		BOOL countersEnabled;
     NSString* sltScriptArguments;
+    BOOL secondsSetInitWithHost;
 }
 
 #pragma mark •••Initialization
@@ -187,18 +188,20 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
+- (BOOL) secondsSetInitWithHost;
+- (void) setSecondsSetInitWithHost:(BOOL)aSecondsSetInitWithHost;
 - (NSString*) sltScriptArguments;
 - (void) setSltScriptArguments:(NSString*)aSltScriptArguments;
 - (BOOL) countersEnabled;
 - (void) setCountersEnabled:(BOOL)aContersEnabled;
-- (float) clockTime;
-- (void) setClockTime:(float)aClockTime;
-- (unsigned long) runTime;
-- (void) setRunTime:(unsigned long)aRunTime;
-- (unsigned long) vetoTime;
-- (void) setVetoTime:(unsigned long)aVetoTime;
-- (unsigned long) deadTime;
-- (void) setDeadTime:(unsigned long)aDeadTime;
+- (unsigned long) clockTime;
+- (void) setClockTime:(unsigned long)aClockTime;
+- (unsigned long long) runTime;
+- (void) setRunTime:(unsigned long long)aRunTime;
+- (unsigned long long) vetoTime;
+- (void) setVetoTime:(unsigned long long)aVetoTime;
+- (unsigned long long) deadTime;
+- (void) setDeadTime:(unsigned long long)aDeadTime;
 - (unsigned long) secondsSet;
 - (void) setSecondsSet:(unsigned long)aSecondsSet;
 - (unsigned long) statusReg;
@@ -326,6 +329,9 @@
 - (void) loadReadOutList:(NSFileHandle*)aFile;
 - (BOOL) doneTakingData;
 
+- (void) shipSltSecondCounter:(unsigned char)aType;
+- (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l;
+
 - (ORReadOutList*)	readOutGroup;
 - (void)			setReadOutGroup:(ORReadOutList*)newReadOutGroup;
 - (NSMutableArray*) children;
@@ -344,6 +350,7 @@
 
 @end
 
+extern NSString* ORIpeV4SLTModelSecondsSetInitWithHostChanged;
 extern NSString* ORIpeV4SLTModelSltScriptArgumentsChanged;
 extern NSString* ORIpeV4SLTModelCountersEnabledChanged;
 extern NSString* ORIpeV4SLTModelClockTimeChanged;
