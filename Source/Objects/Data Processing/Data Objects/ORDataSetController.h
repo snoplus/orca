@@ -39,5 +39,6 @@
 - (IBAction) reLoad:(id)sender;
 - (IBAction) centerOnPeak:(id)sender;
 - (IBAction) toggleLog:(id)sender;
-- (IBAction) autoScale:(id)sender;
+- (IBAction) autoScaleX:(id)sender;
+- (IBAction) autoScaleY:(id)sender;
 @end

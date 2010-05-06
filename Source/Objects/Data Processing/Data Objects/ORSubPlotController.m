@@ -113,9 +113,13 @@
    [plotView centerOnPeak:sender]; 
 }
 
-- (IBAction) autoScale:(id)sender
+- (IBAction) autoScaleX:(id)sender
 {
-    [plotView autoscaleAll:sender];
+    [plotView autoScaleX:sender];
+}
+- (IBAction) autoScaleY:(id)sender
+{
+    [plotView autoScaleY:sender];
 }
 
 - (IBAction) toggleLog:(id)sender

@@ -149,11 +149,18 @@
    [subControllers makeObjectsPerformSelector:@selector(centerOnPeak:) withObject:sender]; 
 }
 
-- (IBAction) autoScale:(id)sender
+- (IBAction) autoScaleX:(id)sender
 {
 
-    [subControllers makeObjectsPerformSelector:@selector(autoScale:) withObject:sender]; 
+    [subControllers makeObjectsPerformSelector:@selector(autoScaleX:) withObject:sender]; 
 }
+
+- (IBAction) autoScaleY:(id)sender
+{
+	
+    [subControllers makeObjectsPerformSelector:@selector(autoScaleY:) withObject:sender]; 
+}
+
 
 - (IBAction) toggleLog:(id)sender
 {

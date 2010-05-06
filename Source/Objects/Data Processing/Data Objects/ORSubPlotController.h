@@ -42,7 +42,8 @@
 - (void) dataChanged:(NSNotification*)aNotification;
 
 - (IBAction) centerOnPeak:(id)sender;
-- (IBAction) autoScale:(id)sender;
+- (IBAction) autoScaleX:(id)sender;
+- (IBAction) autoScaleY:(id)sender;
 - (IBAction) toggleLog:(id)sender;
 
 @end

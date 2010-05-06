@@ -374,6 +374,7 @@ static NSString *OR1DHistoNumberBins	= @"1D Histogram Number Bins";
 - (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue
 {
 	*yValue =  [self value:i];
+	*xValue = i;
 }
 
 @end
