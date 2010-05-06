@@ -336,11 +336,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	time(&ut_Time);
 	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 	timeMeasured = ut_Time;
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugePressureChanged 
-														object:self 
-													  userInfo:nil];
-	
+		
 	if(timeRate == nil) timeRate = [[ORTimeRate alloc] init];
 	[timeRate addDataToTimeAverage:aPressure];
 	
@@ -480,12 +476,12 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 - (void) openPort:(BOOL)state
 {
     if(state) {
+		[serialPort open];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:0];
 		[serialPort setDataBits:8];
 		[serialPort setSpeed:2400];
 		[serialPort commitChanges];
-		[serialPort open];
 	}
 
     else  {
