@@ -51,7 +51,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
     uint32_t filterIndex = GetDeviceSpecificData()[6];
 
-	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndx<<4);
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndex<<4);
 
 
     if(srack->theFlt[col]->isPresent()){
