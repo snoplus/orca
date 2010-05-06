@@ -31,7 +31,7 @@
 %token <cString> CONSTANT
 %token <cString> STRING
 %token <symKey> VARIABLE
-%token FUNCTION WHILE DO FOR IF PRINT LOGFILE FIND MAKE BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
+%token FUNCTION WHILE DO FOR IF PRINT LOGFILE PRINTFILE FIND MAKE BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN TIME
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSARRAY
@@ -42,7 +42,7 @@
 %nonassoc NOT UMINUS INVERT
 
 %type <nPtr> program  functionCall statement arrayElement make_string  cat_string break_statement
-%type <nPtr> hex_str expr statement_list objC findObj makeObj selection_statement iteration_statement 
+%type <nPtr> hex_str expr statement_list objC findObj makeObj selection_statement iteration_statement printfile_statement
 %type <nPtr> objVar objVar_list print_list log_list print_statement log_statement arg_list argName_list clear_statement
 %type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object
 %type <nPtr> case_statement case_list constant_expr point_str rect_str wait_statement alarm_statement
@@ -87,6 +87,7 @@ statement
 special_statement 
 : objC ';'							 { $$ = $1; }
 | print_statement					 { $$ = $1; }
+| printfile_statement				 { $$ = $1; }
 | log_statement ';' 				 { $$ = $1; }
 | wait_statement ';'				 { $$ = $1; }
 | alarm_statement ';'				 { $$ = $1; }
@@ -332,6 +333,11 @@ cat_string
 print_statement
 : PRINT '(' print_list ')' ';'	{ $$ = executionNode(PRINT, $3,nil); }
 | PRINT  print_list  ';'		{ $$ = executionNode(PRINT, $2,nil); }
+;
+
+printfile_statement
+: PRINTFILE '(' print_list ')' ';'	{ $$ = executionNode(PRINTFILE, $3,nil); }
+| PRINTFILE  print_list  ';'		{ $$ = executionNode(PRINTFILE, $2,nil); }
 ;
 
 //the arguments for the print or string functions

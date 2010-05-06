@@ -32,6 +32,7 @@
 		<string>waitUntil</string>
 		<string>sleep</string>
 		<string>print</string>
+		<string>printfile</string>
 		<string>display</string>
 		<string>hex</string>
 		<string>logfile</string>

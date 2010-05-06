@@ -35,6 +35,7 @@
 - (id)		processStatements:(id) p;
 - (id)		doOperation:(id) p container:(id)aContainer;
 - (id)		print:(id) p;
+- (id)		printFile:(id) p;
 - (id)		openLogFile:(id) p;
 - (id)		arrayList:(id) p;
 - (id)		makeString:(id) p;
@@ -537,6 +538,7 @@
 			
 			//printing
 		case PRINT:			return [self print:p];
+		case PRINTFILE:		return [self printFile:p];
 		case LOGFILE:		return [self openLogFile:p];
 		case kAppend:		return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@" " stringByAppendingFormat:@"%@",NodeValue(1)]];
 		case kTightAppend:	return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[NSString stringWithFormat:@"%@",NodeValue(1)]];
@@ -739,6 +741,13 @@
 	NSString* s = [[delegate scriptName] length]?[delegate scriptName]:@"OrcaScript";
 	id output = NodeValue(0);
 	NSLog(@"[%@] %@\n",s, output);
+
+	return nil;
+}	
+
+- (id) printFile:(id) p
+{
+	id output = NodeValue(0);
 	
 	if(logFileHandle){
         NSCalendarDate* now  	= [NSCalendarDate calendarDate];
@@ -1278,6 +1287,7 @@
                 case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
                 case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;
                 case PRINT:				line = [NSMutableString stringWithString:@"[print]"];		break;
+                case PRINTFILE:			line = [NSMutableString stringWithString:@"[printFile]"];	break;
                 case DISPLAY:			line = [NSMutableString stringWithString:@"[display]"];		break;
                 case LOGFILE:			line = [NSMutableString stringWithString:@"[logFile]"];		break;
 				case MAKESTRING:		line = [NSMutableString stringWithString:@"[makeString]"];	break;
