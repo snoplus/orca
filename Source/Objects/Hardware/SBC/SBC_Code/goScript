@@ -57,7 +57,7 @@ else
 	
 	echo "$(date +%s)" >> $STATUS_FILE
 	
-	~/ORCA/OrcaReadout 44667 &
+	~/ORCA/OrcaReadout <port> &
 fi
 
 
