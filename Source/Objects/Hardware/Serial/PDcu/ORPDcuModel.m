@@ -361,6 +361,8 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
+		[serialPort commitChanges];
+
         [serialPort open];
 		[serialPort setDelegate:self];
     }

@@ -55,7 +55,6 @@
 		float emissionRead;
 		int degasTimeRead;
 		NSString* lastRequest;
-		BOOL setStopBits;
 }
 
 #pragma mark ***Initialization

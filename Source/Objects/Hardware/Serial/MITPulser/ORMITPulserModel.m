@@ -206,6 +206,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 		[serialPort setParityNone];
 		[serialPort setStopBits2:1];
 		[serialPort setDataBits:8];
+ 		[serialPort commitChanges];
         [serialPort open];
     }
     else      [serialPort close];
