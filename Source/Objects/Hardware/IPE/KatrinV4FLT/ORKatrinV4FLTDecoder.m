@@ -81,7 +81,7 @@
 	unsigned long histoLen;
 	if(filterIndex==0)	{
 		histoLen = 16*1024;
-		filterDiv = 32;
+		filterDiv = 64;
 	}
 	else {
 		histoLen = 4096;
@@ -222,7 +222,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
 	unsigned long histoLen;
 	if(filterIndex==0)	{
 		histoLen = 16*1024;
-		filterDiv = 32;
+		filterDiv = 64;
 	}
 	else {
 		histoLen = 4096;
