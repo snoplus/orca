@@ -838,7 +838,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self loadThresholdsAndGains];
 	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
 	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
-	[self writeHitRateMask];			//set hitRage control mask
+	[self writeHitRateMask];			//set hitRate control mask
 	[self enableStatistics];			//TODO: OBSOLETE -tb- enable hardware ADC statistics, ak 7.1.07
 	
 	if(fltRunMode == kIpeFltV4Katrin_Histo_Mode){
@@ -1199,7 +1199,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self setRunMode:			[decoder decodeIntForKey:@"runMode"]];
     [self setRunBoxCarFilter:	[decoder decodeBoolForKey:@"runBoxCarFilter"]];
     [self setStoreDataInRam:	[decoder decodeBoolForKey:@"storeDataInRam"]];
-    [self setFilterLength:		[decoder decodeIntForKey:@"filterLength"]];
+    [self setFilterLength:		[decoder decodeIntForKey:@"filterLength"]-2];//to be backward compatible with old Orca config files -tb-
     [self setGapLength:			[decoder decodeIntForKey:@"gapLength"]];
     [self setHistNofMeas:		[decoder decodeInt32ForKey:@"histNofMeas"]];
     [self setHistMeasTime:		[decoder decodeInt32ForKey:@"histMeasTime"]];
@@ -1263,7 +1263,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [encoder encodeInt:runMode				forKey:@"runMode"];
     [encoder encodeBool:runBoxCarFilter		forKey:@"runBoxCarFilter"];
     [encoder encodeBool:storeDataInRam		forKey:@"storeDataInRam"];
-    [encoder encodeInt:filterLength			forKey:@"filterLength"];
+    [encoder encodeInt:(filterLength+2)			forKey:@"filterLength"];//to be backward compatible with old Orca config files (this is the register value)-tb-
     [encoder encodeInt:gapLength			forKey:@"gapLength"];
     [encoder encodeInt32:histNofMeas		forKey:@"histNofMeas"];
     [encoder encodeInt32:histMeasTime		forKey:@"histMeasTime"];
