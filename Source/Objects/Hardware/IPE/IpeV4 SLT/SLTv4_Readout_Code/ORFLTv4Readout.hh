@@ -3,6 +3,9 @@
 #include "ORVCard.hh"
 #include <iostream>
 
+
+/** For every card in the Orca configuration one instance of ORFLTv4Readout is constructed.
+  */
 class ORFLTv4Readout : public ORVCard
 {
   public:
@@ -10,11 +13,17 @@ class ORFLTv4Readout : public ORVCard
     virtual ~ORFLTv4Readout() {} 
     virtual bool Readout(SBC_LAM_Data*);
 	virtual bool Stop();
+	void ClearSumHistogramBuffer();
 
     enum EORFLTv4Consts {
         kFifoEmpty = 0x01,
-        kNumChan   = 24
+        kNumChan   = 24,
+        kNumFLTs   = 24,
+		kMaxHistoLength   = 2048
     };
+	
+	static uint32_t sumHistogram[kNumChan][kMaxHistoLength];
+	static uint32_t recordingTimeSum[kNumChan];
 };
 
 #endif /* _ORFLTv4Readout_hh_*/
