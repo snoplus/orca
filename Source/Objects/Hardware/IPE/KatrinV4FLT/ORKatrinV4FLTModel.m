@@ -30,6 +30,8 @@
 #import "SLTv4_HW_Definitions.h"
 #import "ORCommandList.h"
 
+
+NSString* ORKatrinV4FLTModelShipSumHistogramChanged = @"ORKatrinV4FLTModelShipSumHistogramChanged";
 NSString* ORKatrinV4FLTModelTargetRateChanged			= @"ORKatrinV4FLTModelTargetRateChanged";
 NSString* ORKatrinV4FLTModelHistMaxEnergyChanged       = @"ORKatrinV4FLTModelHistMaxEnergyChanged";
 NSString* ORKatrinV4FLTModelHistPageABChanged          = @"ORKatrinV4FLTModelHistPageABChanged";
@@ -233,6 +235,24 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+/** This is the setting of the 'Ship Sum Histogram' popup button; tag values are:
+  * - 0 NO, don't ship sum histogram
+  * - 1 YES, ship sum histogram
+  * - 2 ship ONLY sum histogram (not yet implemented)
+  */
+- (int) shipSumHistogram 
+{
+    return shipSumHistogram;
+}
+
+- (void) setShipSumHistogram:(int)aShipSumHistogram
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipSumHistogram:shipSumHistogram];
+    shipSumHistogram = aShipSumHistogram;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelShipSumHistogramChanged object:self];
+}
+
 - (int) targetRate { return targetRate; }
 - (void) setTargetRate:(int)aTargetRate
 {
@@ -1201,6 +1221,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
+	
 #if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
     [self setTargetRate:[decoder decodeIntForKey:@"targetRate"]];
     [self setHistClrMode:		[decoder decodeIntForKey:@"histClrMode"]];
@@ -1266,6 +1288,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	
+    [encoder encodeInt:shipSumHistogram forKey:@"shipSumHistogram"];
 	
 #if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
     [encoder encodeInt:targetRate			forKey:@"targetRate"];
@@ -1541,6 +1565,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
     if(runMode == kIpeFlt_EnergyMode | runMode == kIpeFlt_EnergyTrace)
         runFlagsMask |= kSyncFltWithSltTimerFlag;//bit 17 = "sync flt with slt timer" flag
+    if(shipSumHistogram == 1) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag
+	
     
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
 //NSLog(@"RunFlags 0x%x\n",configStruct->card_info[index].deviceSpecificData[3]);
