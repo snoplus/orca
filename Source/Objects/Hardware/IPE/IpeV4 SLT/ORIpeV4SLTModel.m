@@ -472,16 +472,22 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runIsStopped:(NSNotification*)aNote
 {	
-	NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
-	NSLog(@"%@::%@  [readOutGroup count] is %i!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[readOutGroup count]);//TODO: debug -tb-
+	//NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+	//NSLog(@"%@::%@  [readOutGroup count] is %i!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[readOutGroup count]);//TODO: debug -tb-
+
+	//writing the SLT time counters is done in runTaskStopped:userInfo:   -tb-
+	//see SBC_Link.m, runIsStopping:userInfo:: if(runInfo.amountInBuffer > 0)... this is data sent out during 'Stop()...' of readout code, e.g.
+	//the histogram (2060 int32_t's per histogram and one extra word) -tb-
+
 	// Stop all activities by software inhibit
-	if([readOutGroup count] == 0){//TODO: I don't understand this -tb-
+	if([readOutGroup count] == 0){//TODO: I don't understand this - remove it? -tb-
 		[self writeSetInhibit];
 	}
 	
 	// TODO: Save dead time counters ?!
 	// Is it sensible to send a new package here?
 	// ak 18.7.07
+	// run counter is shipped in runTaskStopped:userInfo: -tb-
 	
 	//NSLog(@"Deadtime: %lld\n", [self readDeadTime]);
 }
