@@ -29,6 +29,7 @@
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+		IBOutlet NSPopUpButton* shipSumHistogramPU;
 		IBOutlet NSMatrix*		displayEventRateMatrix;
 		IBOutlet NSTextField*	targetRateField;
         IBOutlet NSTextField*   histMaxEnergyTextField;
@@ -121,6 +122,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) shipSumHistogramChanged:(NSNotification*)aNote;
 - (void) targetRateChanged:(NSNotification*)aNote;
 - (void) histMaxEnergyChanged:(NSNotification*)aNote;
 - (void) histPageABChanged:(NSNotification*)aNote;
@@ -170,6 +172,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) shipSumHistogramPUAction:(id)sender;
 - (IBAction) targetRateAction:(id)sender;
 - (IBAction) histClrModeAction:(id)sender;
 - (IBAction) histModeAction:(id)sender;
