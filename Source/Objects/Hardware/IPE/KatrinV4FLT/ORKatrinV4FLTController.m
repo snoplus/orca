@@ -313,9 +313,20 @@
                          name : ORKatrinV4FLTModelTargetRateChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipSumHistogramChanged:)
+                         name : ORKatrinV4FLTModelShipSumHistogramChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) shipSumHistogramChanged:(NSNotification*)aNote
+{
+	[shipSumHistogramPU selectItemWithTag: [model shipSumHistogram]];
+}
+
 - (void) targetRateChanged:(NSNotification*)aNote
 {
 	[targetRateField setIntValue: [model targetRate]];
@@ -484,6 +495,7 @@
 	[self histPageABChanged:nil];
 	[self histMaxEnergyChanged:nil];
 	[self targetRateChanged:nil];
+	[self shipSumHistogramChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -822,6 +834,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) shipSumHistogramPUAction:(id)sender
+{
+	//[model setShipSumHistogram:[sender intValue]];	
+	[model setShipSumHistogram:[[shipSumHistogramPU selectedItem] tag]];
+}
 
 - (void) targetRateAction:(id)sender
 {
