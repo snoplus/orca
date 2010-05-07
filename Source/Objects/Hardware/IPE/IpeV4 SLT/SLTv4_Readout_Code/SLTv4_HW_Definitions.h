@@ -40,6 +40,7 @@
 //flags in the runFlagsMask, sent to PrPMC by ORIpeV4FLTModel::load_HW_Config_Structure
 #define kFirstTimeFlag              0x10000
 #define kSyncFltWithSltTimerFlag    0x20000
+#define kShipSumHistogramFlag		0x40000
 
 typedef struct { // -tb- 2008-02-27
 	int32_t readoutSec;
