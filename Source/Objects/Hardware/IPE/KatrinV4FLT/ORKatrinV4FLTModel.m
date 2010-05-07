@@ -1434,7 +1434,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    [objDictionary setObject:[NSNumber numberWithLong:filterLength]			forKey:@"filterLength"+2];//this is the fpga register value -tb-
+    [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]			forKey:@"filterLength"];//this is the fpga register value -tb-
 	return objDictionary;
 }
 
