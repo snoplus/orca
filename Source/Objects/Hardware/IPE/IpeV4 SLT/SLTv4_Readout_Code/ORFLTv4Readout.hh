@@ -22,8 +22,8 @@ class ORFLTv4Readout : public ORVCard
 		kMaxHistoLength   = 2048
     };
 	
-	static uint32_t sumHistogram[kNumChan][kMaxHistoLength];
-	static uint32_t recordingTimeSum[kNumChan];
+	uint32_t sumHistogram[kNumChan][kMaxHistoLength];
+	uint32_t recordingTimeSum[kNumChan];
 };
 
 #endif /* _ORFLTv4Readout_hh_*/

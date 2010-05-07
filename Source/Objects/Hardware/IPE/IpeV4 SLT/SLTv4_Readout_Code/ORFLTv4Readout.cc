@@ -13,10 +13,7 @@
 	#include "katrinhw4/subrackkatrin.h"
 #endif
 
-//init static members
-uint32_t ORFLTv4Readout::sumHistogram[kNumChan][kMaxHistoLength];
-uint32_t ORFLTv4Readout::recordingTimeSum[kNumChan];
-
+//init static members and globals
 uint32_t histoShipSumHistogram = 0;
 
 
@@ -481,11 +478,11 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 								
 								//add histogram to sum histogram
 								if( histoShipSumHistogram & kShipSumHistogramFlag ){
-									if(theEventData.histogramLength>0){
+									recordingTimeSum[chan] += theEventData.refreshTimeSec;
+									if(theEventData.histogramLength>0){//don't fill in empty histograms
 										for(i=0; i<theEventData.histogramLength;i++){//TODO: need to use firstBin...lastBin for parts of histograms -tb-
 											sumHistogram[chan][i] += shipHistogramBuffer32[i];
 										}
-										recordingTimeSum[chan] += theEventData.refreshTimeSec;
 									}
 								}
                             }
