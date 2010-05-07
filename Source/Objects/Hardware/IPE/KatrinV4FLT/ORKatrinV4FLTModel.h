@@ -79,6 +79,7 @@
 // - (void)encodeWithCoder:
 // - initWithCoder:     these two were called twice; change acording to the data members in the future!
 // - in ORKatrinV4FLTDefs.h ipeFltHitRateDataStruct already was known from ORIpeV4FLTDefs.h
+// - in Interface Builder: File's Owner need to be changed to ORKatrinV4FLTModel (was ORIpeV4FLTModel)
 
 
 @interface ORKatrinV4FLTModel : ORIpeV4FLTModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
@@ -158,6 +159,7 @@
 	
 	unsigned long eventCount[kNumV4FLTChannels];
 #endif
+    int shipSumHistogram;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -168,6 +170,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) shipSumHistogram;
+- (void) setShipSumHistogram:(int)aShipSumHistogram;
 - (int) targetRate;
 - (void) setTargetRate:(int)aTargetRate;
 - (int) histMaxEnergy;
@@ -403,6 +407,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelShipSumHistogramChanged;
 extern NSString* ORKatrinV4FLTModelTargetRateChanged;
 extern NSString* ORKatrinV4FLTModelHistMaxEnergyChanged;
 extern NSString* ORKatrinV4FLTModelHistPageABChanged;
