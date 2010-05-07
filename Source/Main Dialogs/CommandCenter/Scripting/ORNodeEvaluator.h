@@ -75,6 +75,8 @@
 - (id)		execute:(id) p container:(id)aContainer;
 - (id)		printNode:(id) p;
 - (void)	printAll:(NSArray*)someNodes;
+- (id)		sciString:(id) p precision:(id)thePrecision;
+- (id)		fixedString:(id) p precision:(id)thePrecision;
 @end
 
 @interface ORSysCall : NSObject

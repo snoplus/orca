@@ -462,6 +462,23 @@
 	return _zero;
 }
 
+- (id) sciString:(id) p precision:(id)thePrecision
+{
+	if([p isKindOfClass:NSClassFromString(@"NSDecimalNumber")]){
+		NSString* format = [NSString stringWithFormat:@"%%.%dE",[thePrecision intValue]];
+		return [NSString stringWithFormat:format,[p floatValue]];
+	}
+	return _zero;
+}
+
+- (id) fixedString:(id) p precision:(id)thePrecision
+{
+	if([p isKindOfClass:NSClassFromString(@"NSDecimalNumber")]){
+		NSString* format = [NSString stringWithFormat:@"%%.%df",[thePrecision intValue]];
+		return [NSString stringWithFormat:format,[p floatValue]];
+	}
+	return _zero;
+}
 
 - (void) printAll:(NSArray*)someNodes
 {
@@ -545,7 +562,9 @@
 		case HEX:			return [NSString stringWithFormat:@"0x%x",[NodeValue(0) unsignedLongValue]];
 		case MAKEPOINT:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case MAKERECT:		return [NSString stringWithFormat:@"@(%@,%@,%@,%@)",NodeValue(0),NodeValue(1),NodeValue(2),NodeValue(3)];
-			
+		case FIXED:			return [self fixedString:NodeValue(0) precision:NodeValue(1)];
+		case SCI:			return [self sciString:NodeValue(0) precision:NodeValue(1)];
+
 			//obj-C ops
 		case '@':			return [self processObjC:p];
 		case kObjList:		return [NodeValue(0) stringByAppendingFormat:@"%@",NodeValue(1)];

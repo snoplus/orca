@@ -110,6 +110,8 @@ E			[Ee][+-]?{D}+
 "nsdictionary"	return NSDICTIONARY;
 "nsarray"		return NSARRAY;
 "time"			return TIME;
+"sci"			return SCI;
+"fixed"			return FIXED;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);
