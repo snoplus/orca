@@ -2,7 +2,9 @@
 
 STATUS_FILE=${HOME}/ORCA/stat.txt
 
-if [ "$(pidof -s OrcaReadout)" ]
+#if [ "$(pidof -s OrcaReadout)" ] TODO: I commented this out as pidof is not Unix standard (e.g. does not exist on Darwin) -tb-
+#So now the user is responsible to stop a running OrcaReadout before starting it again. -tb-
+if false
 then
 	#Orca loop running
 	#output is logged if it includes "goscript:"
