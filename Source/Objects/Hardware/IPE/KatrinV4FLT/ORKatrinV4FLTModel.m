@@ -801,7 +801,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	else					  return aValue;
 }
 
-- (void) enableStatistics
+- (void) enableStatistics  //TODO: remove it -tb-
 {
 #if (0)
     unsigned long aValue;
@@ -823,7 +823,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 
-- (void) getStatistics:(int)aChannel mean:(double *)aMean  var:(double *)aVar 
+- (void) getStatistics:(int)aChannel mean:(double *)aMean  var:(double *)aVar   //TODO: remove it -tb-
 {
 #if (0)
     unsigned long data;
@@ -1434,7 +1434,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    [objDictionary setObject:[NSNumber numberWithLong:filterLength]			forKey:@"filterLength"];
+    [objDictionary setObject:[NSNumber numberWithLong:filterLength]			forKey:@"filterLength"+2];//this is the fpga register value -tb-
 	return objDictionary;
 }
 
