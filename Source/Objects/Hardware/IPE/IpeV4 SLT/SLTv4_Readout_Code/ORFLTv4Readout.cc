@@ -13,6 +13,11 @@
 	#include "katrinhw4/subrackkatrin.h"
 #endif
 
+//init static members
+uint32_t ORFLTv4Readout::sumHistogram[kNumChan][kMaxHistoLength];
+uint32_t ORFLTv4Readout::recordingTimeSum[kNumChan];
+
+uint32_t histoShipSumHistogram = 0;
 
 
 #if !PMC_COMPILE_IN_SIMULATION_MODE
@@ -40,18 +45,18 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t dataId     = GetHardwareMask()[0];//this is energy record
     uint32_t waveformId = GetHardwareMask()[1];
     uint32_t histogramId = GetHardwareMask()[2];
+    uint32_t filterIndex = GetDeviceSpecificData()[6];
     uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
     uint32_t crate      = GetCrate();
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndex<<4);
     
     uint32_t postTriggerTime = GetDeviceSpecificData()[0];
     uint32_t eventType  = GetDeviceSpecificData()[1];
     uint32_t fltRunMode = GetDeviceSpecificData()[2];
-    uint32_t runFlags   = GetDeviceSpecificData()[3];
+    uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
-    uint32_t filterIndex = GetDeviceSpecificData()[6];
-
-	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndex<<4);
+    
 
 
     if(srack->theFlt[col]->isPresent()){
@@ -59,7 +64,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         #if 1
         //check timing
         //TODO: hmm, this should be done even before SLT releases inhibit ... -tb-
-        if(runFlags & kSyncFltWithSltTimerFlag){
+        if(0 /*runFlags & kSyncFltWithSltTimerFlag*/){ //TODO: FLT sec counter has only 13 bit, so this currently makes no sense; maybe after firmware redesign ... -tb-
             GetDeviceSpecificData()[3] &= ~(kSyncFltWithSltTimerFlag);
             uint32_t sltsubsec;
             uint32_t sltsec1;
@@ -367,6 +372,11 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
                     histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
                     histoRefreshTime    = currentFlt->histMeasTime->read();
+					histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
+
+					//clear the buffers for the sum histogram
+					ClearSumHistogramBuffer();
+				
 					//set page manager to automatic mode
 					//srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
 					srack->theSlt->pageSelect->write((long unsigned int)0x0);
@@ -374,7 +384,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     srack->theFlt[col]->command->resetPages->write(1);
                     //init page AB flag
                     pageAB = srack->theFlt[col]->status->histPageAB->read();
-                    GetDeviceSpecificData()[3]=pageAB;
+                    GetDeviceSpecificData()[3]=pageAB;// runFlags is GetDeviceSpecificData()[3], so this clears the 'first time' flag -tb-
+					//TODO: better use a local static variable and init it the first time, as changing GetDeviceSpecificData()[3] could be dangerous -tb-
                     //debug: fprintf(stdout,"FLT %i: first cycle\n",col+1);fflush(stdout);
                     //debug: //sleep(1);
                 }
@@ -399,7 +410,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                         uint32_t last,first;
                         uint32_t fpgaHistogramID;
                         static uint32_t shipHistogramBuffer32[2048];
-                        fpgaHistogramID     = currentFlt->histNofMeas->read();;
+                        fpgaHistogramID     = currentFlt->histNofMeas->read();
                         // CHANNEL LOOP ----------------
                         for(chan=0;chan<kNumChan;chan++) {//read out histogram
                             if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
@@ -460,14 +471,23 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = theEventData.offsetEMin;
                                 data[dataIndex++] = theEventData.histogramID;// don't confuse with Orca data ID 'histogramID' -tb-
                                 data[dataIndex++] = theEventData.histogramInfo;
-                                if( ((dataIndex-checkDataIndexLength)*sizeof(int32_t)) != sizeof(katrinV4HistogramDataStruct) ) fprintf(stdout,"ORFLTv4Readout: WARNING: bad record size!\n");
-                                fflush(stdout);   
+                                if( ((dataIndex-checkDataIndexLength)*sizeof(int32_t)) != sizeof(katrinV4HistogramDataStruct) ){ fprintf(stdout,"ORFLTv4Readout: WARNING: bad record size!\n");fflush(stdout); }  
                                 int i;
 								if(theEventData.histogramLength>0){
 									for(i=0; i<theEventData.histogramLength;i++)
 										data[dataIndex++] = shipHistogramBuffer32[i];
 								}
-								//debug: fprintf(stdout," Shipping histogram with ID %i\n",histogramID);     fflush(stdout);   
+								//debug: fprintf(stdout," Shipping histogram with ID %i\n",histogramID);     fflush(stdout);  
+								
+								//add histogram to sum histogram
+								if( histoShipSumHistogram & kShipSumHistogramFlag ){
+									if(theEventData.histogramLength>0){
+										for(i=0; i<theEventData.histogramLength;i++){//TODO: need to use firstBin...lastBin for parts of histograms -tb-
+											sumHistogram[chan][i] += shipHistogramBuffer32[i];
+										}
+										recordingTimeSum[chan] += theEventData.refreshTimeSec;
+									}
+								}
                             }
                             #endif
                             
@@ -485,16 +505,89 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     
 }
 
-#if 1 //Test to prepare single histogram readout -tb-
+#if 1 //Test to prepare single sum histogram readout -tb-
 //TODO: using this inhibits stopping a waveform run (?) -tb-
 bool ORFLTv4Readout::Stop()
 {
 	//-tb- a test:
 	//fprintf(stdout,"ORFLTv4Readout.cc: This is bool ORFLTv4Readout::Stop() for slot %i (ct is %i)!\n",GetSlot()); fflush(stdout);
     // it seems to me that nobody cares when I return false; -tb-
+	
+    if( histoShipSumHistogram & kShipSumHistogramFlag ) {
+		//fprintf(stdout,"ORFLTv4Readout.cc: Writing out sum histogram\n"); fflush(stdout);
+		//ship the sum histograms
+		uint32_t histogramId = GetHardwareMask()[2];
+		uint32_t crate      = GetCrate();
+		uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
+		uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
+		uint32_t fltRunMode = GetDeviceSpecificData()[2];
+		uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
+		uint32_t daqRunMode = GetDeviceSpecificData()[5];
+		//data to ship
+		uint32_t chan=0;
+		uint32_t readoutSec;
+		unsigned long totalLength=kMaxHistoLength;
+		uint32_t last=kMaxHistoLength-1,first=0;
+		uint32_t fpgaHistogramID;
+		uint32_t histoBinWidth = 0;
+		uint32_t histoEnergyOffset = 0;
+		if(fltRunMode == kIpeFltV4Katrin_Histo_Mode ) {//only in histogram mode ...
+			// buffer some data:
+			hw4::FltKatrin *currentFlt = srack->theFlt[col];
+			//read sec
+			readoutSec=currentFlt->secondCounter->read();
+			//readoutSec=2303;
+			histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
+			histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
+			//histoBinWidth       = 4;
+			//histoEnergyOffset   = 20000;
+			// CHANNEL LOOP ----------------
+			for(chan=0; chan < kNumChan ; chan++) {//read out histogram
+				if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
+				katrinV4HistogramDataStruct theEventData;
+				theEventData.readoutSec = readoutSec;
+				theEventData.refreshTimeSec =  recordingTimeSum[chan];//histoRunTime;   
+				
+				theEventData.maxHistogramLength = 2048; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
+				theEventData.binSize    = histoBinWidth;        
+				theEventData.offsetEMin = histoEnergyOffset;
+				theEventData.histogramID    = (col+1)*100+chan;
+				theEventData.histogramInfo  = 0x2;// bit1 means 'this is a sum histogram'
+				
+				theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
+				theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
+				theEventData.histogramLength =2048;
+				
+				//ship data record
+				totalLength = 2 + (sizeof(katrinV4HistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
+				ensureDataCanHold(totalLength); 
+				data[dataIndex++] = histogramId | totalLength;    
+				data[dataIndex++] = location | chan<<8;
+				int32_t checkDataIndexLength = dataIndex;
+				data[dataIndex++] = theEventData.readoutSec;
+				data[dataIndex++] = theEventData.refreshTimeSec;
+				data[dataIndex++] = theEventData.firstBin;
+				data[dataIndex++] = theEventData.lastBin;
+				data[dataIndex++] = theEventData.histogramLength;
+				data[dataIndex++] = theEventData.maxHistogramLength;
+				data[dataIndex++] = theEventData.binSize;
+				data[dataIndex++] = theEventData.offsetEMin;
+				data[dataIndex++] = theEventData.histogramID;// don't confuse with Orca data ID 'histogramID' -tb-
+				data[dataIndex++] = theEventData.histogramInfo;
+				if( ((dataIndex-checkDataIndexLength)*sizeof(int32_t)) != sizeof(katrinV4HistogramDataStruct) ){ fprintf(stdout,"ORFLTv4Readout: WARNING: bad record size!\n");fflush(stdout); }
+				int i;
+				if(theEventData.histogramLength>0){
+					for(i=0; i<theEventData.histogramLength;i++)
+						data[dataIndex++] = sumHistogram[chan][i];
+				}
+			}
+		}
+	}
+	
 	return true;
 }
 #endif
+
 
 #if (0)
 //maybe read hit rates in the pmc at some point..... here's how....
@@ -614,6 +707,15 @@ bool ORFLTv4Readout::Stop()
 #endif //of #if !PMC_COMPILE_IN_SIMULATION_MODE ... #else ...
 //----------------------------------------------------------------
 
+
+void ORFLTv4Readout::ClearSumHistogramBuffer()
+{
+	int i,j;
+	for(i=0; i<kNumChan; i++){
+		for(j=0; j<kMaxHistoLength; j++) sumHistogram[i][j] = 0;// i*1000 +j;
+		recordingTimeSum[i] = 0;//i;
+	}
+}
 
 
 
