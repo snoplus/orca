@@ -374,14 +374,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self setHistMaxEnergy: -1];
 }
 
+//! This is number of cycles (internal FLT counter)
 - (unsigned long) histNofMeas { return histNofMeas; }
 - (void) setHistNofMeas:(unsigned long)aHistNofMeas
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHistNofMeas:histNofMeas];
+    //[[[self undoManager] prepareWithInvocationTarget:self] setHistNofMeas:histNofMeas];
     histNofMeas = aHistNofMeas;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistNofMeasChanged object:self];
 }
 
+//! This is the time after which a intermediate histogram will be read out.
 - (unsigned long) histMeasTime { return histMeasTime; }
 - (void) setHistMeasTime:(unsigned long)aHistMeasTime
 {
@@ -390,10 +392,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistMeasTimeChanged object:self];
 }
 
+//! This timer counts from 0 to histMeasTime-1.
 - (unsigned long) histRecTime { return histRecTime; }
 - (void) setHistRecTime:(unsigned long)aHistRecTime
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHistRecTime:histRecTime];
+    //[[[self undoManager] prepareWithInvocationTarget:self] setHistRecTime:histRecTime];
     histRecTime = aHistRecTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistRecTimeChanged object:self];
 }
