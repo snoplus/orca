@@ -172,7 +172,7 @@
  -------------^ ^^^^---------------------card
  --------------------^^^^ ^^^^-----------channel
  ------------------------------^^^^------filterIndex 
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ----------^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
@@ -472,6 +472,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramID
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare for future extensions)
                                       ^-pageAB flag
+									 ^--is set for sum histogram
 </pre>
 
   * For more infos: see
@@ -545,9 +546,11 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
     
 
     #if 1
+	int isSumHistogram = ePtr->histogramInfo & 0x2; //the bit1 marks the Sum Histograms
     // this counts one histogram as one event in data monitor -tb-
-    //if(ePtr->histogramLength){
-    {// I want to see empty histograms
+    //if(ePtr->histogramLength){ //uncommented -  I want to see empty histograms
+	if(!isSumHistogram)
+    {
         int numBins = 2048; //TODO: this has changed for V4 to 2048!!!! -tb-512;
 		if(ePtr->maxHistogramLength>numBins) numBins=ePtr->maxHistogramLength;
         unsigned long data[numBins];// v3: histogram length is 512 -tb-
@@ -560,6 +563,28 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
         NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
         [keyArray insertObject:@"FLT" atIndex:0];
         [keyArray insertObject:@"Energy Histogram (HW)" atIndex:1]; //TODO: 1. use better name 2. keep memory clean -tb-
+        [keyArray insertObject:crateKey atIndex:2];
+        [keyArray insertObject:stationKey atIndex:3];
+        [keyArray insertObject:channelKey atIndex:4];
+        
+        [aDataSet mergeHistogram:  data  
+                         numBins:  numBins  // is fixed in the current FPGA version -tb- 2008-03-13 
+                    withKeyArray:  keyArray];
+    }
+	else
+    {
+        int numBins = 2048; //TODO: this has changed for V4 to 2048!!!! -tb-512;
+		if(ePtr->maxHistogramLength>numBins) numBins=ePtr->maxHistogramLength;
+        unsigned long data[numBins];// v3: histogram length is 512 -tb-
+        int i;
+        for(i=0; i< numBins;i++) data[i]=0;
+        for(i=0; i< ePtr->histogramLength;i++){
+            data[i+(ePtr->firstBin)]=*(ptr+i);
+            //NSLog(@"Decoder: HistoEntry %i: bin %i val %i\n",i,i+(ePtr->firstBin),data[i+(ePtr->firstBin)]);
+        }
+        NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
+        [keyArray insertObject:@"FLT" atIndex:0];
+        [keyArray insertObject:@"Energy Histogram (HW) Summed" atIndex:1]; //TODO: 1. use better name 2. keep memory clean -tb-
         [keyArray insertObject:crateKey atIndex:2];
         [keyArray insertObject:stationKey atIndex:3];
         [keyArray insertObject:channelKey atIndex:4];
@@ -634,7 +659,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 
-    NSString* title= @"Katrin V4 FLT Histogram Record\n\n";
+    NSString* title; //= @"Katrin V4 FLT Histogram Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
     NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
@@ -643,6 +668,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	++ptr;		//point to next structure
 
 	katrinV4HistogramDataStruct* ePtr = (katrinV4HistogramDataStruct*)ptr;			//recast to event structure
+
+	int isSumHistogram = ePtr->histogramInfo & 0x2; //the bit1 marks the Sum Histograms
+	if(!isSumHistogram) title= @"Katrin V4 FLT Histogram Record\n\n";
+	else title= @"Katrin V4 FLT Summed Histogram Record\n\n";
 
     #if 0
     //debug output
@@ -656,7 +685,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	
 	NSString* readoutSec	= [NSString stringWithFormat:@"ReadoutSec = %d\n",ePtr->readoutSec];
 	//NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
-	NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->refreshTimeSec];
+	//NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->refreshTimeSec];
+	NSString* refreshTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->refreshTimeSec];
 	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
 	NSString* lastBin	= [NSString stringWithFormat:@"lastBin  = %d\n",ePtr->lastBin];
 	NSString* histogramLength		= [NSString stringWithFormat:@"histogramLength    = %d\n",ePtr->histogramLength];
