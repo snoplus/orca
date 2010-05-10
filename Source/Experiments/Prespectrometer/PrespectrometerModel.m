@@ -50,6 +50,13 @@
 	[group release];
 }
 
+- (float) getTotalRate
+{
+	float rate=0;
+	if([segmentGroups objectAtIndex:0]) rate = [[segmentGroups objectAtIndex:0] rate];
+	return rate;
+}
+
 - (void) showDataSetForSet:(int)aSet segment:(int)index
 { 
 	if(aSet>=0 && aSet < [segmentGroups count]){

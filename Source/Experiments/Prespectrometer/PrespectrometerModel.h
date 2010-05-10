@@ -29,6 +29,8 @@
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
 
+- (float) getTotalRate;
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
 - (NSString*) experimentDetectorLock;
