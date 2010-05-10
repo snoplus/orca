@@ -53,7 +53,7 @@
 - (float) getTotalRate
 {
 	float rate=0;
-	if([segmentGroups objectAtIndex:0]) rate = [[segmentGroups objectAtIndex:0] rate];
+	if([segmentGroups count]!=0) rate = [[segmentGroups objectAtIndex:0] rate];
 	return rate;
 }
 
