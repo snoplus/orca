@@ -29,22 +29,14 @@
 #import "ORTimeRate.h"
 
 #pragma mark ***External Strings
-NSString* ORCC4189ModelShipCurrentChanged = @"ORCC4189ModelShipCurrentChanged";
-NSString* ORCC4189ModelPollTimeChanged	= @"ORCC4189ModelPollTimeChanged";
-NSString* ORCC4189ModelSerialPortChanged	= @"ORCC4189ModelSerialPortChanged";
+NSString* ORCC4189ModelShipValuesChanged = @"ORCC4189ModelShipValuesChanged";
+NSString* ORCC4189ModelSerialPortChanged= @"ORCC4189ModelSerialPortChanged";
 NSString* ORCC4189ModelPortNameChanged	= @"ORCC4189ModelPortNameChanged";
 NSString* ORCC4189ModelPortStateChanged	= @"ORCC4189ModelPortStateChanged";
-NSString* ORCC4189CurrentChanged			= @"ORCC4189CurrentChanged";
+NSString* ORCC4189TemperatureChanged	= @"ORCC4189TemperatureChanged";
+NSString* ORCC4189HumidityChanged		= @"ORCC4189HumidityChanged";
 
 NSString* ORCC4189Lock = @"ORCC4189Lock";
-
-@interface ORCC4189Model (private)
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
-- (void) timeout;
-- (void) processOneCommandFromQueue;
-//- (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs;
-@end
 
 @implementation ORCC4189Model
 - (id) init
@@ -59,16 +51,16 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
-	[cmdQueue release];
-	[lastRequest release];
     [portName release];
     if([serialPort isOpen]){
         [serialPort close];
     }
     [serialPort release];
-	[timeRate release];
-
-
+	int i;
+	for(i=0;i<2;i++){
+		[timeRates[i] release];
+	}
+	
 	[super dealloc];
 }
 
@@ -95,17 +87,6 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
                      selector : @selector(dataReceived:)
                          name : ORSerialPortDataReceived
                        object : nil];
-
-    [notifyCenter addObserver: self
-                     selector: @selector(runStarted:)
-                         name: ORRunStartedNotification
-                       object: nil];
-    
-    [notifyCenter addObserver: self
-                     selector: @selector(runStopped:)
-                         name: ORRunStoppedNotification
-                       object: nil];
-
 }
 
 - (void) dataReceived:(NSNotification*)note
@@ -114,10 +95,6 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-
-		//the serial port may break the data up into small chunks, so we have to accumulate the chunks until
-		//we get a full piece.
-        theString = [[theString componentsSeparatedByString:@"\n"] componentsJoinedByString:@""];
         if(!buffer)buffer = [[NSMutableString string] retain];
         [buffer appendString:theString];					
 		
@@ -126,35 +103,47 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
             if(lineRange.location!= NSNotFound){
                 NSMutableString* theResponse = [[[buffer substringToIndex:lineRange.location+1] mutableCopy] autorelease];
                 [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
-				//NSArray* lastCmdParts = [lastRequest componentsSeparatedByString:@" "];
-				//NSString* lastCmd = [lastCmdParts objectAtIndex:0];
-				NSLog(@"Received: <%@>\n",theResponse);
-				//if([lastCmd isEqualToString: @"KRDG?"])      [self process_xrdg_response:theResponse args:lastCmdParts];
-				//else if([lastCmd isEqualToString: @"CRDG?"]) [self process_xrdg_response:theResponse args:lastCmdParts];
-		
-				[self setLastRequest:nil];			 //clear the last request
-				[self processOneCommandFromQueue];	 //do the next command in the queue
+				//get the different parts
+				float theNumber = [[theResponse substringWithRange:NSMakeRange(7,8)] floatValue];
+				float precision   = [[theResponse substringWithRange:NSMakeRange(6,1)] floatValue];
+				int sign   = [[theResponse substringWithRange:NSMakeRange(5,1)] intValue];
+				int symbol = [[theResponse substringWithRange:NSMakeRange(3,2)] intValue];
+				int end    = [[theResponse substringWithRange:NSMakeRange(1,1)] intValue];
+				if(end == 4){
+					theNumber = theNumber / powf(10.,precision);
+					if(sign == 1)theNumber *= -1;
+					if(symbol == 4)[self setHumidity:theNumber];
+					else if(symbol == 1)[self setTemperature:theNumber];
+					else if(symbol == 2){
+						[self setTemperature:(5/9.)*(theNumber-32.)];
+					}
+				}
             }
         } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
 	}
 }
 
 
-- (void) shipCurrentValue
+- (void) shipAllValues
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
-		
-		unsigned long data[4];
-		data[0] = dataId | 4;
-		data[1] =  ([self uniqueIdNumber]&0x0000fffff);
 		
 		union {
 			float asFloat;
 			unsigned long asLong;
 		}theData;
-		theData.asFloat = current;
+		
+		unsigned long data[4];
+		data[0] = dataId | 4;
+		data[1] =  ([self uniqueIdNumber]&0x0000fffff);
+		
+		theData.asFloat = temperature;
 		data[2] = theData.asLong;
-		data[3] = timeMeasured;
+		
+		theData.asFloat = humidity;
+		data[3] = theData.asLong;
+		
+		data[4] = timeMeasured;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 															object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
@@ -163,62 +152,23 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 
 
 #pragma mark ***Accessors
-- (ORTimeRate*)timeRate
+- (ORTimeRate*)timeRate:(int)index
 {
-	return timeRate;
+	return timeRates[index];
 }
 
-- (BOOL) shipCurrent
+- (BOOL) shipValues
 {
-    return shipCurrent;
+    return shipValues;
 }
 
-- (void) setShipCurrent:(BOOL)aFlag
+- (void) setShipValues:(BOOL)aFlag
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setShipCurrent:shipCurrent];
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipValues:shipValues];
     
-    shipCurrent = aFlag;
+    shipValues = aFlag;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelShipCurrentChanged object:self];
-}
-
-- (int) pollTime
-{
-    return pollTime;
-}
-
-- (void) setPollTime:(int)aPollTime
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
-    pollTime = aPollTime;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelPollTimeChanged object:self];
-
-	if(pollTime){
-		[self performSelector:@selector(pollCurrent) withObject:nil afterDelay:2];
-	}
-	else {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCurrent) object:nil];
-	}
-}
-
-- (void) pollCurrent
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCurrent) object:nil];
-	[self readCurrent];
-	
-//---for testing---	
-//	testValue = testValue+2;
-//	[self setCurrent:200 + 10 + testValue];
-	
-//	if(shipCurrent) [self shipCurrent];
-//-------------	
-
-	[self performSelector:@selector(pollCurrent) withObject:nil afterDelay:pollTime];
-}
-
-- (float) current
-{
-	return current;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelShipValuesChanged object:self];
 }
 
 - (unsigned long) timeMeasured
@@ -226,34 +176,47 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 	return timeMeasured;
 }
 
-- (void) setCurrent:(float)aValue;
+- (float) temperature
 {
-	current = aValue;
+	return temperature;
+}
+									
+- (void) setTemperature:(float)aValue;
+{
+	temperature = aValue;
 	//get the time(UT!)
 	time_t	ut_Time;
 	time(&ut_Time);
 	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 	timeMeasured = ut_Time;
 
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189CurrentChanged 
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189TemperatureChanged 
 														object:self 
 													userInfo:nil];
 
-	if(timeRate == nil) timeRate = [[ORTimeRate alloc] init];
-	[timeRate addDataToTimeAverage:aValue];
+	if(timeRates[0] == nil) timeRates[0] = [[ORTimeRate alloc] init];
+	[timeRates[0] addDataToTimeAverage:aValue];
 
 }
-
-- (NSString*) lastRequest
+									
+- (float) humidity
 {
-	return lastRequest;
+	return humidity;
 }
-
-- (void) setLastRequest:(NSString*)aRequest
+				
+- (void) setHumidity:(float)aValue;
 {
-	[lastRequest autorelease];
-	lastRequest = [aRequest copy];    
+	humidity = aValue;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189HumidityChanged 
+														object:self 
+													  userInfo:nil];
+	
+	if(timeRates[1] == nil) timeRates[1] = [[ORTimeRate alloc] init];
+	[timeRates[1] addDataToTimeAverage:aValue];
+	
 }
+									
 
 - (BOOL) portWasOpen
 {
@@ -334,12 +297,12 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setShipCurrent:	[decoder decodeBoolForKey:@"shipCurrent"]];
-	[self setPollTime:		[decoder decodeIntForKey:@"pollTime"]];
+	[self setShipValues:	[decoder decodeBoolForKey:@"shipValues"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:@"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
-	timeRate = [[ORTimeRate alloc] init];
+	int i;
+	for(i=0;i<2;i++)timeRates[i] = [[ORTimeRate alloc] init];
 
     [self registerNotificationObservers];
 
@@ -348,27 +311,9 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:shipCurrent forKey:@"shipCurrent"];
-    [encoder encodeInt:pollTime		forKey:@"pollTime"];
+    [encoder encodeBool:shipValues forKey:@"shipValues"];
     [encoder encodeBool:portWasOpen forKey:@"portWasOpen"];
     [encoder encodeObject:portName	forKey: @"portName"];
-}
-
-#pragma mark *** Commands
-- (void) addCmdToQueue:(NSString*)aCmd
-{
-    if([serialPort isOpen]){ 
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:aCmd];
-		if(!lastRequest){
-			[self processOneCommandFromQueue];
-		}
-	}
-}
-
-- (void) readCurrent
-{
-	[self addCmdToQueue:@"FETCH?"];
 }
 
 #pragma mark ***Data Records
@@ -398,56 +343,14 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORCC4189DecoderForCurrent",@"decoder",
+        @"ORCC4189DecoderForValues",		@"decoder",
         [NSNumber numberWithLong:dataId],   @"dataId",
         [NSNumber numberWithBool:NO],       @"variable",
-        [NSNumber numberWithLong:18],       @"length",
+        [NSNumber numberWithLong:5],       @"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"Current"];
     
     return dataDictionary;
 }
-
-@end
-
-@implementation ORCC4189Model (private)
-- (void) runStarted:(NSNotification*)aNote
-{
-}
-
-- (void) runStopped:(NSNotification*)aNote
-{
-}
-
-- (void) timeout
-{
-	NSLogError(@"Keithley 6487",@"command timeout",nil);
-	[self setLastRequest:nil];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
-}
-
-- (void) processOneCommandFromQueue
-{
-	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
-	[cmdQueue removeObjectAtIndex:0];
-	
-	if([aCmd rangeOfString:@"?"].location != NSNotFound){
-		[self setLastRequest:aCmd];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-	}
-	if(![aCmd hasSuffix:@"\r\n"]) aCmd = [aCmd stringByAppendingString:@"\r\n"];
-	[serialPort writeString:aCmd];
-	if(!lastRequest){
-		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.01];
-	}
-}
-
-//- (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs
-//{
-//	NSArray* t = [theResponse componentsSeparatedByString:@","];
-//	[self setCurrent:[[t objectAtIndex:i] floatValue]];
-//	if(shipCurrent) [self shipCurrent];
-//}
 
 @end

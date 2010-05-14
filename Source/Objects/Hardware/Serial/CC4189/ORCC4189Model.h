@@ -31,12 +31,13 @@
         unsigned long	dataId;
 		NSString*		lastRequest;
 		NSMutableArray* cmdQueue;
-		float		    current;
+		float		    temperature;
+		float		    humidity;
 		unsigned long	timeMeasured;
 		int				pollTime;
-        NSMutableString*       buffer;
-		BOOL			shipCurrent;
-		ORTimeRate*		timeRate;
+        NSMutableString*  buffer;
+		BOOL			shipValues;
+		ORTimeRate*		timeRates[2];
 }
 
 #pragma mark ***Initialization
@@ -48,23 +49,21 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
-- (ORTimeRate*)timeRate;
-- (BOOL) shipCurrent;
-- (void) setShipCurrent:(BOOL)aFlag;
-- (int) pollTime;
-- (void) setPollTime:(int)aPollTime;
+- (ORTimeRate*)timeRate:(int)index;
+- (BOOL) shipValues;
+- (void) setShipValues:(BOOL)aFlag;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
-- (float) current;
 - (unsigned long) timeMeasured;
-- (void) setCurrent:(float)aValue;
+- (float) temperature;
+- (void) setTemperature:(float)aValue;
+- (float) humidity;
+- (void) setHumidity:(float)aValue;
 
 #pragma mark ***Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -74,11 +73,7 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCC4189;
 
-- (void) shipCurrentValue;
-
-#pragma mark ***Commands
-- (void) addCmdToQueue:(NSString*)aCmd;
-- (void) readCurrent;
+- (void) shipAllValues;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -86,10 +81,11 @@
 @end
 
 
-extern NSString* ORCC4189ModelShipCurrentChanged;
+extern NSString* ORCC4189ModelShipValuesChanged;
 extern NSString* ORCC4189ModelPollTimeChanged;
 extern NSString* ORCC4189ModelSerialPortChanged;
 extern NSString* ORCC4189Lock;
 extern NSString* ORCC4189ModelPortNameChanged;
 extern NSString* ORCC4189ModelPortStateChanged;
-extern NSString* ORCC4189CurrentChanged;
+extern NSString* ORCC4189TemperatureChanged;
+extern NSString* ORCC4189HumidityChanged;

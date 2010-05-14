@@ -31,10 +31,11 @@
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                     ^^^^ ^^^^ ^^^^ ^^^^- device id
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Current encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Temperature encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Humidity encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time current taken in seconds since Jan 1, 1970
 //------------------------------------------------------------------------------------------------
-static NSString* kKeithleyUnit[8] = {
+static NSString* kCCUnit[8] = {
     //pre-make some keys for speed.
     @"Unit 0",  @"Unit 1",  @"Unit 2",  @"Unit 3",
     @"Unit 4",  @"Unit 5",  @"Unit 6",  @"Unit 7"
@@ -42,11 +43,11 @@ static NSString* kKeithleyUnit[8] = {
 };
 
 
-@implementation ORCC4189DecoderForCurrent
+@implementation ORCC4189DecoderForValues
 
 - (NSString*) getUnitKey:(unsigned short)aUnit
 {
-    if(aUnit<8) return kKeithleyUnit[aUnit];
+    if(aUnit<8) return kCCUnit[aUnit];
     else return [NSString stringWithFormat:@"Unit %d",aUnit];			
 }
 
@@ -64,8 +65,17 @@ static NSString* kKeithleyUnit[8] = {
 					  sender:self 
 					withKeys:@"CC4189",
 							[self getUnitKey:dataPtr[1] & 0x0000ffff],
-							@"Current",
+							@"Temperature",
 							nil];
+	
+	[aDataSet loadTimeSeries:theCurrent.asFloat										
+					  atTime:dataPtr[4]
+					  sender:self 
+					withKeys:@"CC4189",
+	 [self getUnitKey:dataPtr[1] & 0x0000ffff],
+	 @"Humidity",
+	 
+	 nil];
 	
 	
 	return ExtractLength(dataPtr[0]);
@@ -73,7 +83,7 @@ static NSString* kKeithleyUnit[8] = {
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
-    NSString* title= @"Keithley 6487 Current\n\n";
+    NSString* title= @"CC4189\n\n";
     NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
 	union {
 		float asFloat;
@@ -82,11 +92,15 @@ static NSString* kKeithleyUnit[8] = {
 	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
 	
 	theData.asLong = dataPtr[2];
+	float temp = theData.asFloat;
+	
+	theData.asLong = dataPtr[3];
+	float humidity = theData.asFloat;
 	
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
 	
-	theString = [theString stringByAppendingFormat:@"%.2f %@\n",theData.asFloat,date];
+	theString = [theString stringByAppendingFormat:@"%.2f %.2f %@\n",temp,humidity,date];
 	
 	return theString;
 }

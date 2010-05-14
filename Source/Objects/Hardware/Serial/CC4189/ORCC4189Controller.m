@@ -61,6 +61,13 @@
 	ORTimeLinePlot* aPlot;
 	aPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor redColor]];
+	[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[aPlot release];
+	
+	aPlot= [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor blueColor]];
 	[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
@@ -94,18 +101,18 @@
                        object : nil];
                                               
     [notifyCenter addObserver : self
-                     selector : @selector(currentChanged:)
-                         name : ORCC4189CurrentChanged
-                       object : nil];
-
+                     selector : @selector(temperatureChanged:)
+                         name : ORCC4189TemperatureChanged
+                       object : model];
+	
     [notifyCenter addObserver : self
-                     selector : @selector(pollTimeChanged:)
-                         name : ORCC4189ModelPollTimeChanged
-                       object : nil];
-
+                     selector : @selector(humidityChanged:)
+                         name : ORCC4189HumidityChanged
+                       object : model];
+	
     [notifyCenter addObserver : self
-                     selector : @selector(shipCurrentChanged:)
-                         name : ORCC4189ModelShipCurrentChanged
+                     selector : @selector(shipValuesChanged:)
+                         name : ORCC4189ModelShipValuesChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -130,9 +137,9 @@
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
-	[self currentChanged:nil];
-	[self pollTimeChanged:nil];
-	[self shipCurrentChanged:nil];
+	[self temperatureChanged:nil];
+	[self humidityChanged:nil];
+	[self shipValuesChanged:nil];
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
 }
@@ -176,19 +183,17 @@
 
 - (void) updateTimePlot:(NSNotification*)aNote
 {
-	if(!aNote || ([aNote object] == [model timeRate])){
-		[plotter0 setNeedsDisplay:YES];
-	}
+	[plotter0 setNeedsDisplay:YES];
 }
 
-- (void) shipCurrentChanged:(NSNotification*)aNote
+- (void) shipValuesChanged:(NSNotification*)aNote
 {
-	[shipCurrentButton setIntValue: [model shipCurrent]];
+	[shipValuesButton setIntValue: [model shipValues]];
 }
 
-- (void) currentChanged:(NSNotification*)aNote
+- (void) temperatureChanged:(NSNotification*)aNote
 {
-	[currentField setFloatValue:[model current]];
+	[temperatureField setFloatValue:[model temperature]];
 	unsigned long t = [model timeMeasured];
 	NSCalendarDate* theDate;
 	if(t){
@@ -197,6 +202,11 @@
 		[timeField setObjectValue:theDate];
 	}
 	else [timeField setObjectValue:@"--"];
+}
+
+- (void) humidityChanged:(NSNotification*)aNote
+{
+	[humidityField setFloatValue:[model humidity]];
 }
 
 - (void) checkGlobalSecurity
@@ -217,8 +227,7 @@
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
-    [pollTimePopup setEnabled:!locked];
-    [shipCurrentButton setEnabled:!locked];
+    [shipValuesButton setEnabled:!locked];
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -254,11 +263,6 @@
     }
 }
 
-- (void) pollTimeChanged:(NSNotification*)aNotification
-{
-	[pollTimePopup selectItemWithTag:[model pollTime]];
-}
-
 - (void) portNameChanged:(NSNotification*)aNotification
 {
     NSString* portName = [model portName];
@@ -279,9 +283,9 @@
 
 #pragma mark ***Actions
 
-- (void) shipCurrentAction:(id)sender
+- (void) shipValuesAction:(id)sender
 {
-	[model setShipCurrent:[sender intValue]];	
+	[model setShipValues:[sender intValue]];	
 }
 
 - (IBAction) lockAction:(id) sender
@@ -299,29 +303,18 @@
     [model openPort:![[model serialPort] isOpen]];
 }
 
-- (IBAction) readCurrentAction:(id)sender
-{
-	[model readCurrent];
-}
-
-- (IBAction) pollTimeAction:(id)sender
-{
-	[model setPollTime:[[sender selectedItem] tag]];
-}
-
-
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
+#pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate] count];
-}
- 
+	return [[model timeRate:[aPlotter tag]] count];
+} 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model timeRate] count];
+	int set = [aPlotter tag];
+	int count = [[model timeRate:set] count];
 	int index = count-i-1;
-	*xValue = [[model timeRate] timeSampledAtIndex:index];
-	*yValue = [[model timeRate] valueAtIndex:index];
+	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
+	*yValue = [[model timeRate:set] valueAtIndex:index];
 }
 
 @end

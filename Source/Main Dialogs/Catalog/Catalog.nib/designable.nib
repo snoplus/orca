@@ -5307,7 +5307,7 @@
 											<object class="NSButton" id="1045552353">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{146, 156}, {109, 52}}</string>
+												<string key="NSFrame">{{139, 156}, {109, 52}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="851279286">
@@ -5331,7 +5331,7 @@
 											<object class="NSTextField" id="18068288">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{153, 142}, {86, 13}}</string>
+												<string key="NSFrame">{{146, 142}, {86, 13}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="834179716">
@@ -5427,7 +5427,7 @@
 											<object class="NSButton" id="554029811">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{496, 156}, {87, 60}}</string>
+												<string key="NSFrame">{{450, 156}, {87, 60}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="303838546">
@@ -5451,7 +5451,7 @@
 											<object class="NSTextField" id="99595767">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{492, 138}, {96, 14}}</string>
+												<string key="NSFrame">{{446, 138}, {96, 14}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="853987326">
@@ -5467,7 +5467,7 @@
 											<object class="NSButton" id="352952263">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{391, 159}, {87, 53}}</string>
+												<string key="NSFrame">{{357, 159}, {87, 53}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="161489042">
@@ -5491,7 +5491,7 @@
 											<object class="NSTextField" id="207167269">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{383, 138}, {96, 13}}</string>
+												<string key="NSFrame">{{349, 138}, {96, 13}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="844680115">
@@ -5664,10 +5664,50 @@
 													<reference key="NSTextColor" ref="688154912"/>
 												</object>
 											</object>
+											<object class="NSButton" id="336421191">
+												<reference key="NSNextResponder" ref="96996822"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{692, 147}, {86, 75}}</string>
+												<reference key="NSSuperview" ref="96996822"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="224412067">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">134217728</int>
+													<string key="NSContents"/>
+													<reference key="NSSupport" ref="625969386"/>
+													<reference key="NSControlView" ref="336421191"/>
+													<int key="NSButtonFlags">-2041822977</int>
+													<int key="NSButtonFlags2">2</int>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">CC4189</string>
+													</object>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">400</int>
+													<int key="NSPeriodicInterval">75</int>
+												</object>
+											</object>
+											<object class="NSTextField" id="262524027">
+												<reference key="NSNextResponder" ref="96996822"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{693, 129}, {84, 13}}</string>
+												<reference key="NSSuperview" ref="96996822"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSTextFieldCell" key="NSCell" id="14600706">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">138412032</int>
+													<string key="NSContents">CC4189 </string>
+													<reference key="NSSupport" ref="625969386"/>
+													<reference key="NSControlView" ref="262524027"/>
+													<reference key="NSBackgroundColor" ref="421922390"/>
+													<reference key="NSTextColor" ref="688154912"/>
+												</object>
+											</object>
 											<object class="NSButton" id="428753798">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{627, 149}, {116, 74}}</string>
+												<string key="NSFrame">{{555, 150}, {116, 74}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="544913247">
@@ -5691,7 +5731,7 @@
 											<object class="NSTextField" id="35249404">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{606, 138}, {159, 13}}</string>
+												<string key="NSFrame">{{534, 139}, {159, 13}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="729005439">
@@ -5803,7 +5843,7 @@
 											<object class="NSTextField" id="8585438">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{286, 138}, {82, 17}}</string>
+												<string key="NSFrame">{{267, 138}, {82, 17}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="574130309">
@@ -5819,7 +5859,7 @@
 											<object class="NSButton" id="636415753">
 												<reference key="NSNextResponder" ref="96996822"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{273, 160}, {94, 52}}</string>
+												<string key="NSFrame">{{254, 160}, {94, 52}}</string>
 												<reference key="NSSuperview" ref="96996822"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="599731825">
@@ -12109,8 +12149,6 @@ ZSBjb250cm9sbGVyLg</string>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="258242806"/>
 							<reference ref="154452257"/>
-							<reference ref="428753798"/>
-							<reference ref="35249404"/>
 							<reference ref="554029811"/>
 							<reference ref="99595767"/>
 							<reference ref="352952263"/>
@@ -12136,6 +12174,10 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="216554337"/>
 							<reference ref="1031377301"/>
 							<reference ref="824791252"/>
+							<reference ref="428753798"/>
+							<reference ref="35249404"/>
+							<reference ref="262524027"/>
+							<reference ref="336421191"/>
 						</object>
 						<reference key="parent" ref="334999773"/>
 					</object>
@@ -14711,6 +14753,34 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="object" ref="747374617"/>
 						<reference key="parent" ref="510486953"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26181</int>
+						<reference key="object" ref="336421191"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="224412067"/>
+						</object>
+						<reference key="parent" ref="96996822"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26182</int>
+						<reference key="object" ref="262524027"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="14600706"/>
+						</object>
+						<reference key="parent" ref="96996822"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26183</int>
+						<reference key="object" ref="14600706"/>
+						<reference key="parent" ref="262524027"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26184</int>
+						<reference key="object" ref="224412067"/>
+						<reference key="parent" ref="336421191"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -15638,6 +15708,14 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26178.ImportedFromIB2</string>
 					<string>26179.IBPluginDependency</string>
 					<string>26180.IBPluginDependency</string>
+					<string>26181.CustomClassName</string>
+					<string>26181.IBAttributePlaceholdersKey</string>
+					<string>26181.IBPluginDependency</string>
+					<string>26181.ImportedFromIB2</string>
+					<string>26182.IBPluginDependency</string>
+					<string>26182.ImportedFromIB2</string>
+					<string>26183.IBPluginDependency</string>
+					<string>26184.IBPluginDependency</string>
 					<string>267.IBPluginDependency</string>
 					<string>267.ImportedFromIB2</string>
 					<string>2709.IBPluginDependency</string>
@@ -17872,6 +17950,21 @@ ZSBjb250cm9sbGVyLg</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ObjectFactory</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="336421191"/>
+							<string key="toolTip">ORCC4189Model</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -18195,9 +18288,9 @@ ZSBjb250cm9sbGVyLg</string>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{50, 571}, {818, 285}}</string>
+					<string>{{67, 586}, {818, 285}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{50, 571}, {818, 285}}</string>
+					<string>{{67, 586}, {818, 285}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
@@ -19564,7 +19657,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26180</int>
+			<int key="maxID">26184</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -20072,21 +20165,98 @@ ZSBjb250cm9sbGVyLg</string>
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dFit.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter1D.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dFitController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORPlotter2D.h</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dRoi.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR1dRoiController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/OR2dRoi.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORFFT.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORFFTController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/AnalysisSupport/ORXYFit.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/OR2DHistoPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlotView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORPlotWithROI.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORTimeSeriesPlot.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/Plotting/ORVectorPlot.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -21014,6 +21184,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>C792</string>
 				<string>C862</string>
 				<string>CC32Card</string>
+				<string>CC4189</string>
 				<string>CCUSB</string>
 				<string>CMC203Card</string>
 				<string>CRGetterOff</string>
@@ -21201,6 +21372,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{16, 128}</string>
 				<string>{16, 128}</string>
 				<string>{32, 128}</string>
+				<string>{40, 91}</string>
 				<string>{32, 128}</string>
 				<string>{16, 128}</string>
 				<string>{46, 20}</string>

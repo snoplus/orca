@@ -18,21 +18,20 @@
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
 
-@class ORPlotter1D;
+@class ORPlotView;
 
 @interface ORCC4189Controller : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
-	IBOutlet NSButton*		shipCurrentButton;
+	IBOutlet NSButton*		shipValuesButton;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
-    IBOutlet NSButton*      readCurrentButton;
-    IBOutlet NSTextField*   currentField;
+    IBOutlet NSTextField*   temperatureField;
+    IBOutlet NSTextField*   humidityField;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotter1D*   plotter0;
+	IBOutlet ORPlotView*    plotter0;
 }
 
 #pragma mark ***Initialization
@@ -47,22 +46,20 @@
 #pragma mark ***Interface Management
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
-- (void) shipCurrentChanged:(NSNotification*)aNotification;
+- (void) shipValuesChanged:(NSNotification*)aNotification;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNotification;
 - (void) portStateChanged:(NSNotification*)aNotification;
-- (void) currentChanged:(NSNotification*)aNotification;
-- (void) pollTimeChanged:(NSNotification*)aNotification;
+- (void) temperatureChanged:(NSNotification*)aNotification;
+- (void) humidityChanged:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
-- (IBAction) shipCurrentAction:(id)sender;
+- (IBAction) shipValuesAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
-- (IBAction) readCurrentAction:(id)sender;
-- (IBAction) pollTimeAction:(id)sender;
 
 @end
 
