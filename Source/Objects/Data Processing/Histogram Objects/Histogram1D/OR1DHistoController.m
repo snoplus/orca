@@ -97,6 +97,17 @@
 	[plotView copy:sender];
 }
 
+- (id) curve:(int)c gate:(int)g; //for backward compatiblity with scripts
+{
+	id plot = [plotView plot:c];
+	NSArray* roisForPlot = [self  roiArrayForPlotter:plot];
+	if([roisForPlot count]>g){
+		return [roisForPlot objectAtIndex:g];
+	}
+	else return nil;
+
+}
+
 #pragma mark ¥¥¥Data Source
 - (BOOL) plotterShouldShowRoi:(id)aPlot
 {

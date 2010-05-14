@@ -271,6 +271,11 @@
 	[analysisDrawer open];
 }
 
+- (id) curve:(int)c gate:(int)g; //for backward compatiblity with scripts
+{
+	return nil; //subclasses can override
+}
+
 - (void) closeAnalysisDrawer
 {
 	[analysisDrawer close];

@@ -67,7 +67,7 @@
 - (IBAction) pauseAction:(id)sender;
 //scripting helper
 - (void) savePlotToFile:(NSString*)aFile;
-
+- (id) curve:(int)c gate:(int)g; //for backward compatiblity with scripts
 @end
 
 @interface NSObject (ORDataController_Cat)
