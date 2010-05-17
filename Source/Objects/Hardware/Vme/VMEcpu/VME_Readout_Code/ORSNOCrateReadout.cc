@@ -15,7 +15,7 @@ bool ORSNOCrateReadout::Stop() {
 
 bool ORSNOCrateReadout::Readout(SBC_LAM_Data* lamData)
 {
-	const uint32_t mem_read_reg = 0x270UL; //GetDeviceSpecificData()[0]; // 0x2CUL;
+//	const uint32_t mem_read_reg = 0x270UL; //GetDeviceSpecificData()[0]; // 0x2CUL;
 //	const uint32_t mem_write_reg = 0x274UL; //GetDeviceSpecificData()[1]; // 0x28UL;
 	const uint32_t mem_diff_reg = 0x278UL; //GetDeviceSpecificData()[1]; // 0x28UL;
 	const uint32_t data_avail_reg = 0x4UL;
@@ -26,7 +26,7 @@ bool ORSNOCrateReadout::Readout(SBC_LAM_Data* lamData)
 	
 	uint32_t value = 0;
 	uint32_t diff = 0;
-	uint32_t read_ptr = 0;
+//	uint32_t read_ptr = 0;
 	uint32_t data_avail = 0;
 	
 	//data available?
@@ -62,7 +62,9 @@ bool ORSNOCrateReadout::Readout(SBC_LAM_Data* lamData)
 					return true; 
 				}
 				*/
-				if (diff > 2) {
+				uint32_t num_to_read = diff / 3;
+				if (num_to_read > 32) num_to_read = 32;
+				while (num_to_read > 0) {
 					ensureDataCanHold(4);
 					int32_t savedIndex = dataIndex;
 					data[dataIndex++] = GetHardwareMask()[0] | 4;
@@ -75,6 +77,7 @@ bool ORSNOCrateReadout::Readout(SBC_LAM_Data* lamData)
 						}
 						data[dataIndex++] = value;
 					}
+					num_to_read--;
 				}
 				//get read
 				/*

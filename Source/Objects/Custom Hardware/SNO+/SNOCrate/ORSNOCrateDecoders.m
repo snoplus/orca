@@ -43,10 +43,10 @@
 	NSString* sBoard = [NSString stringWithFormat:@"Board = %d\n", (*ptr >> 26) & 0x0fUL];
 	NSString* sChannel = [NSString stringWithFormat:@"Channel = %d\n", (*ptr >> 16) & 0x1fUL];
 	NSString* sCell = [NSString stringWithFormat:@"Cell = %d\n", (ptr[1] >> 12) & 0x0fUL];
-	NSString* sQHL = [NSString stringWithFormat:@"QHL = 0x%03x\n", ptr[2] & 0x07ffUL];
-	NSString* sQHS = [NSString stringWithFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x07ffUL];
-	NSString* sQLX = [NSString stringWithFormat:@"QLX = 0x%03x\n", ptr[1] & 0x07ffUL];
-	NSString* sTAC = [NSString stringWithFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x07ffUL];
+	NSString* sQHL = [NSString stringWithFormat:@"QHL = 0x%03x\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
+	NSString* sQHS = [NSString stringWithFormat:@"QHS = 0x%03x\n", (ptr[1] >> 16) & 0x0fffUL ^ 0x0800UL];
+	NSString* sQLX = [NSString stringWithFormat:@"QLX = 0x%03x\n", ptr[1] & 0x0fffUL ^ 0x0800UL];
+	NSString* sTAC = [NSString stringWithFormat:@"TAC = 0x%03x\n", (ptr[2] >> 16) & 0x0fffUL ^ 0x0800UL];
 	NSString* sCGT16 = [NSString stringWithFormat:@"CGT16 sync error: %@\n",
 		((*ptr >> 30) & 0x1UL) ? @"Yes" : @"No"];
 	NSString* sCGT24 = [NSString stringWithFormat:@"CGT24 sync error: %@\n",
