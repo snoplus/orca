@@ -259,7 +259,21 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	//add in the document parameters
 	NSMutableDictionary* docDict = [NSMutableDictionary dictionary];
     [docDict setObject:[[self fileURL]path] forKey:@"documentName"];
-    [docDict setObject:[[[NSBundle mainBundle] infoDictionary]       objectForKey:@"CFBundleVersion"] forKey:@"OrcaVersion"];
+    [docDict setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"OrcaVersion"];
+	
+	NSFileManager* fm			= [NSFileManager defaultManager];
+	NSString* svnVersionPath	= [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
+	NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
+	
+	if([fm fileExistsAtPath:svnVersionPath]){
+		svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
+		if([svnVersion hasSuffix:@"\n"]){
+			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
+		}
+	}
+	
+    [docDict setObject:[svnVersion length]?svnVersion:@"0"   forKey:@"svnModVersion"];
+
     [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
 		
