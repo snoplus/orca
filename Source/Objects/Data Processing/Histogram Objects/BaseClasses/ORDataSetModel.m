@@ -151,6 +151,7 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 			}
 			[result stringByReplacingOccurrencesOfString:@" " withString:@""];
 			[result replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+			[result replaceOccurrencesOfString:@"Crate" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
 			[result replaceOccurrencesOfString:@"Card" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
 			[result replaceOccurrencesOfString:@"Channel" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
 			
