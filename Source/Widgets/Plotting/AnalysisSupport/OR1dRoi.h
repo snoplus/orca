@@ -77,6 +77,7 @@ enum {
 - (void)	setMinChannel:(long)aChannel;
 - (long)	maxChannel;
 - (void)	setMaxChannel:(long)aChannel;
+- (void) setDefaultMin:(long)aMinChannel max:(long)aMaxChannel;
 - (double)	average;	
 - (double)	centroid;	
 - (double)	sigma;	

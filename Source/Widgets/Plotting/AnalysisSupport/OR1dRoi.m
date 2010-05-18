@@ -113,7 +113,11 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 {
     return minChannel;
 }
-
+- (void) setDefaultMin:(long)aMinChannel max:(long)aMaxChannel
+{
+	[self setMinChannel:aMinChannel];
+	[self setMaxChannel:aMaxChannel];
+}
 - (void) setMinChannel:(long)aChannel
 {
 	minChannel = aChannel;
