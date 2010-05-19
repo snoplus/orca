@@ -343,6 +343,10 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 		NSLog(@"   (After crash or hard debugger stop)           \n");
     }
     NSLog(@"-------------------------------------------------\n");
+	if(![fm fileExistsAtPath:svnVersionPath]){
+		NSLogColor([NSColor redColor], @"Warning: The svn revision number is not available");
+		NSLogColor([NSColor redColor], @"It appears svn is NOT installed.");
+	}
 	unsigned major, minor, bugFix;
     [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
     NSLog(@"Running MacOS %u.%u.%u %@\n", major, minor, bugFix,minor>=5?@"":@"(Note: some ORCA features require 10.5. Please update)");
