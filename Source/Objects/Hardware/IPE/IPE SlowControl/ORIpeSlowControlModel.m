@@ -44,7 +44,8 @@ NSString* ORIpeSlowItemTreeChanged					= @"ORIpeSlowItemTreeChanged";
 NSString* ORIpeSlowControlModelHistogramChanged		= @"ORIpeSlowControlModelHistogramChanged";
 NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequestsChanged";
 
-NSString* ORADEIInConnection						= @"ORADEIInConnection";
+//Removed connector MAH May 18,2010
+//NSString* ORADEIInConnection						= @"ORADEIInConnection";
 
 #define IPE_SLOW_CONTROL_SHORT_NAME @"IPE-ADEI"
 
@@ -85,6 +86,18 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	[super dealloc];
 }
 
+- (void) awakeAfterDocumentLoaded
+{
+	//----------------------------------------------------------------
+	//Removed connector MAH May 18,2010
+	//this bit of code is for backward compatibility
+	ORConnector* aConnector = [self connectorOn:@"ORADEIInConnection"];
+	[aConnector disconnect];
+	[connectors release];
+	connectors = nil;
+	//----------------------------------------------------------------
+}
+
 - (void) setUpImage
 {
 	[self setImage:[NSImage imageNamed:@"IpeSlowControl"]];
@@ -95,12 +108,9 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	[self linkToController:@"ORIpeSlowControlController"];
 }
 
-- (BOOL) solitaryObject
-{
-    return YES;
-}
 
--(void) makeConnectors
+//Removed connector MAH May 18,2010
+/*-(void) makeConnectors
 {
 	//we  have three permanent connectors. The rest we manage for the pci objects.
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(0, 0) withGuardian:self withObjectLink:self];
@@ -111,6 +121,7 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	[aConnector addRestrictedConnectionType: 'ADEO']; //can only connect to DB Inputs
     [aConnector release];
 }
+*/
 
 - (void) initConnectionHistory
 {
@@ -625,7 +636,8 @@ NSString* ORADEIInConnection						= @"ORADEIInConnection";
 	[self makeChannelLookup];
 
 	[[self undoManager] enableUndoRegistration];
-        
+     
+	
 	return self;
 }
 
