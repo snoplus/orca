@@ -1384,6 +1384,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
+	//TODO: some of these shall move to ORKatrinV4FLTModel.m in the future ... -tb- 2010-05-19
     //TO DO....other things need to be added here.....
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds										forKey:@"thresholds"];
@@ -1396,7 +1397,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    [objDictionary setObject:[NSNumber numberWithLong:filterLength]			forKey:@"filterLength"];
+    [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]			forKey:@"filterLength"];//this is the fpga register value -tb-
 	return objDictionary;
 }
 
