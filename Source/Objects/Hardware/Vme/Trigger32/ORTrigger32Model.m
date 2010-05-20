@@ -30,7 +30,7 @@
 
 #pragma mark ¥¥¥Definitions
 #define kDefaultAddressModifier		    0x29
-#define kDefaultBaseAddress		    0x0007000
+#define kDefaultBaseAddress		    0x0007100
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORTrigger32ModelRestartClkAtRunStartChanged = @"ORTrigger32ModelRestartClkAtRunStartChanged";
