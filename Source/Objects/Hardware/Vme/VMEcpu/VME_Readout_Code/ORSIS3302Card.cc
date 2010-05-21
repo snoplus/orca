@@ -141,7 +141,7 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 		
 		size_t total_data_in_vector = fTempVectorIter + num_bytes_to_read/4;
 		for (size_t temp_iter = 0; temp_iter < total_data_in_vector; temp_iter += size_of_record) {
-			if (temp_iter + size_of_record >= total_data_in_vector) { 
+			if (temp_iter + size_of_record > total_data_in_vector) { 
 				// OK this means we don't have a complete record here.
 				// We will catch the rest on the next read cycle.
 				size_t num_data_left = total_data_in_vector - temp_iter;
