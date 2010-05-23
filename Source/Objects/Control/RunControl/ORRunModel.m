@@ -289,10 +289,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) setRunPaused:(BOOL)aFlag
 {    
 	runPaused = aFlag;
+	
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+							  [NSNumber numberWithInt:runningState], ORRunStatusValue,
+							  runState[runningState],				 ORRunStatusString,
+							  [NSNumber numberWithLong:runType],	 ORRunTypeMask,
+							  [NSNumber numberWithInt:runPaused],	@"ORRunPaused",
+							  nil];
     
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORRunStatusChangedNotification
-	 object:self];	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStatusChangedNotification object: self userInfo: userInfo];
+
 }
 
 - (BOOL) remoteInterface

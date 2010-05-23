@@ -22,18 +22,22 @@
 @interface ORSqlController : OrcaObjectController 
 {	
 	IBOutlet NSTextField* hostNameField;
+	IBOutlet   NSTextField* webSitePathField;
 	IBOutlet NSTextField* userNameField;
 	IBOutlet NSTextField* passwordField;
 	IBOutlet NSTextField* dataBaseNameField;
     IBOutlet NSButton*    sqlLockButton;
     IBOutlet NSButton*    connectionButton;
+	IBOutlet NSTextField* dbParamsOKField;
 }
 
-#pragma mark â€¢â€¢â€¢Initialization
+#pragma mark ¥¥¥Initialization
 
-#pragma mark â€¢â€¢â€¢Registration
+#pragma mark ¥¥¥Registration
 - (void) registerNotificationObservers;
 
+#pragma mark ***Interface Management
+- (void) webSitePathChanged:(NSNotification*)aNote;
 - (void) hostNameChanged:(NSNotification*)aNote;
 - (void) userNameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
@@ -41,7 +45,8 @@
 - (void) sqlLockChanged:(NSNotification*)aNote;
 - (void) connectionChanged:(NSNotification*)aNote;
 
-#pragma mark â€¢â€¢â€¢Actions
+#pragma mark ¥¥¥Actions
+- (IBAction) webSitePathAction:(id)sender;
 - (IBAction) hostNameAction:(id)sender;
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) passwordAction:(id)sender;
@@ -50,3 +55,4 @@
 - (IBAction) connectionAction:(id)sender;
 
 @end
+

@@ -64,8 +64,9 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - 35,2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:KatrinDbConnector];
     [aConnector setOffColor:[NSColor brownColor]];
-	[aConnector setConnectorType: 'ADEO'];
-	[aConnector addRestrictedConnectionType: 'ADEI']; //can only connect to DB Inputs
+    [aConnector setOnColor:[NSColor magentaColor]];
+	[ aConnector setConnectorType: 'DB O' ];
+	[ aConnector addRestrictedConnectionType: 'DB I' ]; //can only connect to DB outputs
     [aConnector release];
 }
 

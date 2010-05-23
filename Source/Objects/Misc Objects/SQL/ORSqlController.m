@@ -24,7 +24,7 @@
 
 @implementation ORSqlController
 
-#pragma mark â€¢â€¢â€¢Initialization
+#pragma mark ¥¥¥Initialization
 -(id)init
 {
     self = [super initWithWindowNibName:@"Sql"];
@@ -42,13 +42,11 @@
 }
 
 
-#pragma mark â€¢â€¢â€¢Registration
+#pragma mark ¥¥¥Registration
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [super registerNotificationObservers];
-    
+        
     [notifyCenter addObserver : self
                      selector : @selector(hostNameChanged:)
                          name : ORSqlHostNameChanged
@@ -81,8 +79,14 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(connectionChanged:)
-                         name : ORSqlConnectionChanged
+                         name : ORDBConnectionVerifiedChanged
                        object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(webSitePathChanged:)
+                         name : ORSqlModelWebSitePathChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -94,12 +98,17 @@
 	[self dataBaseNameChanged:nil];
 	[self connectionChanged:nil];
     [self sqlLockChanged:nil];
+	[self webSitePathChanged:nil];
+}
+
+- (void) webSitePathChanged:(NSNotification*)aNote
+{
+	[webSitePathField setStringValue: [model webSitePath]];
 }
 
 - (void) connectionChanged:(NSNotification*)aNote
 {
-	if([model isConnected])[connectionButton setTitle:@"Disconnect"];
-	else [connectionButton setTitle:@"Connect"];
+	[dbParamsOKField setStringValue:[model dbConnectionVerified]?@"Verified":@"Unable to Connect"];
 }
 
 - (void) hostNameChanged:(NSNotification*)aNote
@@ -143,7 +152,12 @@
     [sqlLockButton setEnabled: secure];
 }
 
-#pragma mark â€¢â€¢â€¢Actions
+#pragma mark ¥¥¥Actions
+
+- (void) webSitePathAction:(id)sender
+{
+	[model setWebSitePath:[sender stringValue]];	
+}
 - (IBAction) sqlLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORSqlLock to:[sender intValue] forWindow:[self window]];
@@ -172,7 +186,7 @@
 - (IBAction) connectionAction:(id)sender
 {
 	[self endEditing];
-	[model toggleConnection];
+	[model apply];
 }
 
 

@@ -17,27 +17,30 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-
 #pragma mark ***Imported Files
-#import "mysql.h"
 
 @interface ORSqlModel : OrcaObject
 {
   @private
-	MYSQL*		conn;
-	BOOL		connected;
+	BOOL		dbConnectionVerified;
 	NSString*	hostName;
     NSString*	userName;
     NSString*	password;
     NSString*	dataBaseName;
+	NSMutableData* responseData;
+    NSString* webSitePath;
+	NSMutableArray* dataMonitors;
 }
 
 #pragma mark ***Initialization
 - (id)   init;
 - (void) dealloc;
+- (void) registerNotificationObservers;
 
 #pragma mark ***Accessors
+- (NSString*) webSitePath;
+- (void) setWebSitePath:(NSString*)aWebSitePath;
+- (void) setConnected:(BOOL) aState;
 - (NSString*) dataBaseName;
 - (void) setDataBaseName:(NSString*)aDataBaseName;
 - (NSString*) password;
@@ -51,32 +54,15 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-#pragma mark ***SQL Access
-- (void) toggleConnection;
-- (BOOL) isConnected;
-- (BOOL) connect;
-- (void) disconnect;
-- (NSArray*) databases;
-- (void) use:(NSString*)aDataBase;
-- (MYSQL_RES*) sendQuery:(NSString*)query;
-- (NSArray*) tables;
+- (BOOL) dbConnectionVerified;
+-(void) apply;
 
 @end
 
+extern NSString* ORSqlModelWebSitePathChanged;
 extern NSString* ORSqlDataBaseNameChanged;
 extern NSString* ORSqlPasswordChanged;
 extern NSString* ORSqlUserNameChanged;
 extern NSString* ORSqlHostNameChanged;
-extern NSString* ORSqlConnectionChanged;
+extern NSString* ORDBConnectionVerifiedChanged;
 extern NSString* ORSqlLock;
-
-
-@interface ORSqlTempResult : NSObject
-{
-	MYSQL_RES* resultPtr;
-}
-+ (id) sqlResult:(MYSQL_RES*)aResultPtr;
-- (id) initWithResult:(MYSQL_RES*)aResultPtr;
-- (void) dealloc;
-@end
-

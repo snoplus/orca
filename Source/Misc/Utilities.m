@@ -246,6 +246,12 @@ const char* decodeType(const char* aType)
 	
 }
 
+NSString* computerName()
+{
+	NSString *computerName = [[NSHost currentHost] localizedName];
+	return computerName;
+}
+
 NSString* macAddress()
 {
 	kern_return_t	kernResult = KERN_SUCCESS; // on PowerPC this is an int (4 bytes)

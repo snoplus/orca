@@ -383,7 +383,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	[dataSet setRunNumber:runNumber];
     [dataSet clear];
 
-    [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStarted:userInfo];
+ 	id nextObject =  [self objectConnectedTo: ORHistoPassThruConnection];
+	[nextObject runTaskStarted:userInfo];
+	[nextObject setInvolvedInCurrentRun:YES];
+	
 }
 
 - (void) subRunTaskStarted:(id)userInfo
@@ -393,8 +396,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) runTaskStopped:(id)userInfo
 {
-	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:userInfo];
-    [dataSet runTaskStopped];
+  	id nextObject =  [self objectConnectedTo: ORHistoPassThruConnection];
+	[nextObject runTaskStopped:userInfo];
+	[nextObject setInvolvedInCurrentRun:NO];
+	[dataSet runTaskStopped];
 }
 
 - (void) endOfRunCleanup:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

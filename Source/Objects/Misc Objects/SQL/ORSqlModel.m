@@ -18,17 +18,28 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORSqlModel.h"
+#import "ORRunModel.h"
+#import "OR1DHisto.h"
 
-NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
-NSString* ORSqlPasswordChanged		= @"ORSqlPasswordChanged";
-NSString* ORSqlUserNameChanged		= @"ORSqlUserNameChanged";
-NSString* ORSqlHostNameChanged		= @"ORSqlHostNameChanged";
-NSString* ORSqlConnectionChanged	= @"ORSqlConnectionChanged";
-NSString* ORSqlLock					= @"ORSqlLock";
+NSString* ORSqlModelWebSitePathChanged	= @"ORSqlModelWebSitePathChanged";
+NSString* ORSqlDataBaseNameChanged		= @"ORSqlDataBaseNameChanged";
+NSString* ORSqlPasswordChanged			= @"ORSqlPasswordChanged";
+NSString* ORSqlUserNameChanged			= @"ORSqlUserNameChanged";
+NSString* ORSqlHostNameChanged			= @"ORSqlHostNameChanged";
+NSString* ORDBConnectionVerifiedChanged	= @"ORDBConnectionVerifiedChanged";
+NSString* ORSqlLock						= @"ORSqlLock";
 
 static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
+@interface ORSqlModel (private)
+- (NSString*) dbPartOfPost;
+- (void) submitPost:(NSString*)postString to:(NSString*)aPHPScript;
+- (void) postMachineName;
+- (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber;
+- (NSString *)urlEncodeValue:(NSString *)str;
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)response;
+- (void) updateDataSets;
+@end
 
 @implementation ORSqlModel
 
@@ -36,20 +47,28 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (id) init
 {
 	[super init];
+	[self registerNotificationObservers];
 	return self;
 }
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-	if(conn){
-		mysql_close (conn);
-	}
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[webSitePath release];
+	[dataMonitors release];
     [dataBaseName release];
     [password release];
     [userName release];
     [hostName release];
+	[responseData release];
 	[super dealloc];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+	[self setConnected:YES];
+	[self postMachineName];
 }
 
 - (void) setUpImage
@@ -67,6 +86,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(15,8) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORSqlModelInConnector];
     [aConnector setOffColor:[NSColor brownColor]];
+    [aConnector setOnColor:[NSColor magentaColor]];
 	[ aConnector setConnectorType: 'DB I' ];
 	[ aConnector addRestrictedConnectionType: 'DB O' ]; //can only connect to DB outputs
 
@@ -77,14 +97,57 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+	[notifyCenter removeObserver:self];
+   
     [notifyCenter addObserver : self
-                     selector : @selector(disconnect)
-                         name : @"ORAppTerminating"
-                       object : [NSApp delegate]];
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
 }
 
+- (void) runStatusChanged:(NSNotification*)aNote
+{
+	id pausedKeyIncluded = [[aNote userInfo] objectForKey:@"ORRunPaused"];
+	if(!pausedKeyIncluded){
+		int runState = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+		int runNumber    = [[aNote object] runNumber];
+		int subRunNumber = [[aNote object] subRunNumber];
+		[self postRunState: runState runNumber:runNumber subRunNumber:subRunNumber];
+		if(runState == eRunInProgress){
+			if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
+			NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+			for(ORDataChainObject* aDataMonitor in list){
+				if([aDataMonitor involvedInCurrentRun]){
+					[dataMonitors addObject:aDataMonitor];
+				}
+			}
+			[self updateDataSets];
+		}
+		else if(runState == eRunStopped){
+			[dataMonitors release];
+			dataMonitors = nil;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+		}
+	}
+}
+
+
 #pragma mark ***Accessors
+
+- (NSString*) webSitePath
+{
+    return webSitePath;
+}
+
+- (void) setWebSitePath:(NSString*)aWebSitePath
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWebSitePath:webSitePath];
+    
+    [webSitePath autorelease];
+    webSitePath = [aWebSitePath copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSqlModelWebSitePathChanged object:self];
+}
 
 - (NSString*) dataBaseName
 {
@@ -164,6 +227,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+    [self setWebSitePath:[decoder decodeObjectForKey:@"webSitePath"]];
     [self setDataBaseName:[decoder decodeObjectForKey:@"DataBaseName"]];
     [self setPassword:[decoder decodeObjectForKey:@"Password"]];
     [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
@@ -176,137 +240,122 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:webSitePath forKey:@"webSitePath"];
     [encoder encodeObject:dataBaseName forKey:@"DataBaseName"];
     [encoder encodeObject:password forKey:@"Password"];
     [encoder encodeObject:userName forKey:@"UserName"];
     [encoder encodeObject:hostName forKey:@"HostName"];
 }
 
-#pragma mark ***SQL Access
-- (void) toggleConnection
+- (BOOL) dbConnectionVerified
 {
-	if(conn) [self disconnect];
-	else     [self connect];
-}
-- (BOOL) isConnected
-{
-	return connected;
+	return dbConnectionVerified;
 }
 
--(BOOL) connect
+- (void) setConnected:(BOOL) aState
 {
-	conn = mysql_init (NULL);  /* allocate, initialize connection handler */
-	
-	if (conn == nil){
-		NSLog(@"ORSql: mysql_init() failed\n");
-		connected = NO;
-		return NO;
-	}
-	
-	if (mysql_real_connect (conn, [hostName UTF8String], [userName UTF8String], [password UTF8String],
-							[dataBaseName UTF8String], 0, nil, 0) == nil){
-		NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (conn));
-		NSLog(@"Error: (%s)\n",mysql_error (conn));
-		[self disconnect];
-		return NO;
-	}
-	connected = YES;
-	NSLog(@"Connected to DataBase %@ on %@\n",dataBaseName,hostName);
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionChanged object:self];
-	if(dataBaseName && [dataBaseName length]){
-		NSLog(@"%@\n",[self databases]);
-		[self use:dataBaseName];
-		NSLog(@"%@\n",[self tables]);
-	}
-	return YES;     /* connection is established */
+	dbConnectionVerified = aState;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORDBConnectionVerifiedChanged object:self];	
 }
 
--(void) disconnect
+-(void) apply
 {
-	if(conn){
-		mysql_close (conn);
-		conn = nil;
-		if(connected){
-			NSLog(@"Disconnected from DataBase %@ on %@\n",dataBaseName,hostName);
-			connected = NO;
-		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionChanged object:self];
-	}
-}
-- (MYSQL_RES*) sendQuery:(NSString*)query
-{
-	if(conn){
-		if(mysql_query(conn,[query UTF8String])){
-			NSLog(@"%@ failed\n",query);
-			NSLog(@"%s\n",mysql_error(conn));
-			return NO;
-		}
-		MYSQL_RES* theResult =  mysql_store_result(conn);
-		if(theResult)[ORSqlTempResult sqlResult:theResult];
-		
-		return theResult;
-	}
-	
-	NSLog(@"Not connected to any database\n");
-	return NO;
+	[self setConnected:YES];
+	[self postMachineName];
+
 }
 
-- (void) use:(NSString*)aDataBase
-{
-	NSString* query = [NSString stringWithFormat:@"USE %@",aDataBase];
-	if([self sendQuery:query]) NSLog(@"Using DataBase: %@\n",aDataBase);
-}
-
-- (NSArray*) tables
-{
-	NSString* query = @"SHOW TABLES";
-	MYSQL_RES* resTables = [self sendQuery:query];
-	if(resTables){
-		NSMutableArray* result = [NSMutableArray array];
-		MYSQL_ROW table;
-		while((table = mysql_fetch_row(resTables))!=nil){
-			[result addObject:[NSString stringWithUTF8String:table[0]]];
-		}
-		return result;
-	}
-	return nil;
-}
-
-- (NSArray*) databases
-{
-	MYSQL_RES* theResult = [self sendQuery:@"SHOW databases"];
-	if(theResult){
-		NSMutableArray* result = [NSMutableArray array];
-		MYSQL_ROW row;
-		while((row = mysql_fetch_row(theResult))!=nil){
-			int i;
-			for(i=0;i<mysql_num_fields(theResult);i++){
-				[result addObject:[NSString stringWithUTF8String:row[i]]];
-			}
-		}
-		return result;
-	}
-	return nil;
-}
 @end
 
-@implementation ORSqlTempResult
-+ (id) sqlResult:(MYSQL_RES*)aResultPtr
+@implementation ORSqlModel (private)
+- (void) postMachineName
 {
-	return [[[ORSqlTempResult alloc] initWithResult:aResultPtr] autorelease];
+	NSString* name = computerName();
+	
+	NSString *postString = [NSString stringWithFormat:@"%@&name=%@",
+					  [self dbPartOfPost],
+					  [self urlEncodeValue:name]];
+	[self submitPost:postString to:@"addMachineInfo.php"];
 }
 
-- (id) initWithResult:(MYSQL_RES*)aResultPtr
+- (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber
 {
-	[super init];
-	resultPtr = aResultPtr;
-	return self;
+	NSString *postString = [NSString stringWithFormat:@"%@&runNumber=%d&subRunNumber=%d&runState=%d",
+					  [self dbPartOfPost],
+					  runNumber,
+					  subRunNumber,
+					  aRunState];
+	[self submitPost:postString to:@"setRunState.php"];
 }
-- (void) dealloc
+
+- (void) submitPost:(NSString*)postString to:(NSString*)aPHPScript
 {
-	if(resultPtr!=nil){
-		mysql_free_result(resultPtr);
+	NSData *postData = [postString dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+	NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+	
+	NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
+	NSString* phpScriptName = [NSString stringWithFormat:@"http://%@/%@/%@",hostName,webSitePath,aPHPScript];
+	[request setURL:[NSURL URLWithString:phpScriptName]];
+	[request setHTTPMethod:@"POST"];
+	[request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+	[request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+	[request setHTTPBody:postData];
+	
+	NSURLConnection *urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+	if (!urlConnection) {
+		NSLog(@"Failed to submit request");
+	} 
+}
+
+- (NSString*) dbPartOfPost
+{
+	NSString* hw_address = macAddress();
+	return [NSString stringWithFormat:@"hostName=%@&dataBase=%@&userName=%@&pw=%@&hwaddress=%@",
+			[self urlEncodeValue:hostName],
+			[self urlEncodeValue:dataBaseName],
+			[self urlEncodeValue:userName],
+			[self urlEncodeValue:password],
+			[self urlEncodeValue:hw_address]];
+}
+
+- (NSString*) urlEncodeValue:(NSString *)str
+{
+	NSString *result = (NSString *) CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)str, NULL, CFSTR("?=&+"), kCFStringEncodingUTF8);
+	return [result autorelease];
+}
+
+- (void) connection:(NSURLConnection *)connection didReceiveData:(NSData *)response 
+{
+	if(!responseData){
+		responseData = [[NSMutableData alloc] init];
 	}
-	[super dealloc];
+	[responseData setLength:0];
+	[responseData appendData:response];
+	NSString* resultString = [[[NSString alloc] initWithData:responseData encoding:NSASCIIStringEncoding] autorelease];
+	if([resultString rangeOfString:@"Connection Failed"].location != NSNotFound){
+		[self setConnected:NO];
+	}
+}
+
+- (void) connection:(NSURLConnection *)connection didFinishLoading:(NSData *)response 
+{
+	[connection release];
+}
+
+- (void) updateDataSets
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+	for(id aDataMonitor in dataMonitors) {
+		NSArray* dataSets = [aDataMonitor collectObjectsOfClass:NSClassFromString(@"OR1DHisto")];
+		for(ORDataSet* aSet in dataSets){
+			NSString *postString = [NSString stringWithFormat:@"%@&monitor_id=%d&name=%@&counts=%d",
+									[self dbPartOfPost],
+									[aDataMonitor uniqueIdNumber],
+									[aSet fullName],
+									[aSet totalCounts]];
+			[self submitPost:postString to:@"updateDataSet.php"];
+		}
+	}
+	[self performSelector:@selector(updateDataSets) withObject:self afterDelay:10];
 }
 @end
