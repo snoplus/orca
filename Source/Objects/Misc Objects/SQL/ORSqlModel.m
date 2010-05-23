@@ -301,8 +301,9 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
 	[request setHTTPBody:postData];
 	
-	NSURLConnection *urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+	NSURLConnection *urlConnection = [[[NSURLConnection alloc] initWithRequest:request delegate:self] autorelease];
 	if (!urlConnection) {
+		[self setConnected:NO];
 		NSLog(@"Failed to submit request");
 	} 
 }
@@ -323,7 +324,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	NSString *result = (NSString *) CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)str, NULL, CFSTR("?=&+"), kCFStringEncodingUTF8);
 	return [result autorelease];
 }
-
+- (void) connection:(NSURLConnection *)connection didFail:(NSData *)response 
+{
+	[self setConnected:NO];
+}
 - (void) connection:(NSURLConnection *)connection didReceiveData:(NSData *)response 
 {
 	if(!responseData){
@@ -335,6 +339,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if([resultString rangeOfString:@"Connection Failed"].location != NSNotFound){
 		[self setConnected:NO];
 	}
+	NSLog(@"%@\n",resultString);
 }
 
 - (void) connection:(NSURLConnection *)connection didFinishLoading:(NSData *)response 
