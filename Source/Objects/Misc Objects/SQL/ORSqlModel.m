@@ -31,6 +31,7 @@ NSString* ORDBConnectionVerifiedChanged	= @"ORDBConnectionVerifiedChanged";
 NSString* ORSqlLock						= @"ORSqlLock";
 
 static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
+
 @interface ORSqlModel (private)
 - (NSString*) dbPartOfPost;
 - (void) submitPost:(NSString*)postString to:(NSString*)aPHPScript;
@@ -121,7 +122,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					[dataMonitors addObject:aDataMonitor];
 				}
 			}
-			[self updateDataSets];
+			[self performSelector:@selector(updateDataSets) withObject:self afterDelay:3];
 		}
 		else if(runState == eRunStopped){
 			[dataMonitors release];
@@ -280,11 +281,22 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 - (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber
 {
-	NSString *postString = [NSString stringWithFormat:@"%@&runNumber=%d&subRunNumber=%d&runState=%d",
+	id nextObject = [self objectConnectedTo:ORSqlModelInConnector];
+	NSString* objectClassName;
+	if(nextObject){
+		objectClassName = [nextObject className];
+		if([objectClassName hasPrefix:@"OR"])    objectClassName = [objectClassName substringFromIndex:2];
+		if([objectClassName hasSuffix:@"Model"]) objectClassName = [objectClassName substringToIndex:[objectClassName length]-5];
+	}
+	else objectClassName = @"TestStand";
+
+	
+	NSString *postString = [NSString stringWithFormat:@"%@&runNumber=%d&subRunNumber=%d&runState=%d&experiment=%@",
 					  [self dbPartOfPost],
 					  runNumber,
 					  subRunNumber,
-					  aRunState];
+					  aRunState,
+					  objectClassName];
 	[self submitPost:postString to:@"setRunState.php"];
 }
 
@@ -311,8 +323,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (NSString*) dbPartOfPost
 {
 	NSString* hw_address = macAddress();
-	return [NSString stringWithFormat:@"hostName=%@&dataBase=%@&userName=%@&pw=%@&hwaddress=%@",
-			[self urlEncodeValue:hostName],
+	return [NSString stringWithFormat:@"dataBase=%@&userName=%@&pw=%@&hwaddress=%@",
 			[self urlEncodeValue:dataBaseName],
 			[self urlEncodeValue:userName],
 			[self urlEncodeValue:password],
@@ -339,7 +350,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if([resultString rangeOfString:@"Connection Failed"].location != NSNotFound){
 		[self setConnected:NO];
 	}
-	NSLog(@"%@\n",resultString);
 }
 
 - (void) connection:(NSURLConnection *)connection didFinishLoading:(NSData *)response 
@@ -352,15 +362,16 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
 	for(id aDataMonitor in dataMonitors) {
 		NSArray* dataSets = [aDataMonitor collectObjectsOfClass:NSClassFromString(@"OR1DHisto")];
-		for(ORDataSet* aSet in dataSets){
-			NSString *postString = [NSString stringWithFormat:@"%@&monitor_id=%d&name=%@&counts=%d",
-									[self dbPartOfPost],
-									[aDataMonitor uniqueIdNumber],
-									[aSet fullName],
-									[aSet totalCounts]];
+		if([dataSets count]){
+			NSString* postString = [NSString stringWithFormat:@"%@&monitor_id=%d&data=",[self dbPartOfPost],[aDataMonitor uniqueIdNumber]];
+			for(ORDataSet* aSet in dataSets){
+				postString = [postString stringByAppendingFormat:@"name#%@;counts#%d\n",
+										[aSet fullName],
+										[aSet totalCounts]];
+			}
 			[self submitPost:postString to:@"updateDataSet.php"];
 		}
 	}
-	[self performSelector:@selector(updateDataSets) withObject:self afterDelay:10];
+	[self performSelector:@selector(updateDataSets) withObject:self afterDelay:30];
 }
 @end
