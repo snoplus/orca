@@ -46,6 +46,7 @@
 	IBOutlet NSButton*		internalExternalTriggersOredCB;
 	IBOutlet NSMatrix*		internalTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		externalTriggerEnabledMatrix;
+	IBOutlet NSMatrix*		extendedThresholdEnabledMatrix;
 	IBOutlet NSMatrix*		internalGateEnabledMatrix;
 	IBOutlet NSMatrix*		externalGateEnabledMatrix;
 	IBOutlet NSMatrix*		triggerGateLengthMatrix;
@@ -150,6 +151,7 @@
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) externalTriggerEnabledChanged:(NSNotification*)aNote;
+- (void) extendedThresholdEnabledChanged:(NSNotification*)aNote;
 - (void) internalGateEnabledChanged:(NSNotification*)aNote;
 - (void) externalGateEnabledChanged:(NSNotification*)aNote;
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote;
@@ -170,6 +172,7 @@
 - (void) dacOffsetChanged:(NSNotification*)aNote;
 - (void) lemoInModeChanged:(NSNotification*)aNote;
 - (void) lemoOutModeChanged:(NSNotification*)aNote;
+- (void) extendedThresholdEnabledChanged:(NSNotification*)aNote;
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -214,6 +217,7 @@
 - (IBAction) internalExternalTriggersOredAction:(id)sender;
 - (IBAction) internalTriggerEnabledMaskAction:(id)sender;
 - (IBAction) externalTriggerEnabledMaskAction:(id)sender;
+- (IBAction) extendedThresholdEnabledMaskAction:(id)sender;
 - (IBAction) internalGateEnabledMaskAction:(id)sender;
 - (IBAction) externalGateEnabledMaskAction:(id)sender;
 - (IBAction) lemoInEnabledMaskAction:(id)sender;

@@ -307,6 +307,11 @@
                          name : ORSIS3302ModelInternalExternalTriggersOredChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(extendedThresholdEnabledChanged:)
+                         name : ORSIS3302ExtendedThresholdEnabledChanged
+						object: model];
+	
 	[notifyCenter addObserver : self
                      selector : @selector(internalTriggerEnabledChanged:)
                          name : ORSIS3302InternalTriggerEnabledChanged
@@ -466,6 +471,7 @@
 	[self energyGateLengthChanged:nil];
 	[self lemoInEnabledMaskChanged:nil];
 	[self internalExternalTriggersOredChanged:nil];
+	[self extendedThresholdEnabledChanged:nil];
 	
 	[self internalTriggerEnabledChanged:nil];
 	[self externalTriggerEnabledChanged:nil];
@@ -622,6 +628,7 @@
 	[internalExternalTriggersOredCB setIntValue: [model internalExternalTriggersOred]];
 }
 
+
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote
 {
 	short i;
@@ -643,6 +650,14 @@
 	short i;
 	for(i=0;i<8;i++){
 		[[externalTriggerEnabledMatrix cellWithTag:i] setState:[model externalTriggerEnabled:i]];
+	}
+}
+
+- (void) extendedThresholdEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<8;i++){
+		[[extendedThresholdEnabledMatrix cellWithTag:i] setState:[model extendedThresholdEnabled:i]];
 	}
 }
 
@@ -1186,6 +1201,11 @@
 - (IBAction) externalTriggerEnabledMaskAction:(id)sender
 {
 	[model setExternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) extendedThresholdEnabledMaskAction:(id)sender
+{
+	[model setExtendedThresholdEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) internalExternalTriggersOredAction:(id)sender

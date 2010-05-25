@@ -46,6 +46,7 @@
 	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
 	short			internalTriggerEnabledMask;
 	short			externalTriggerEnabledMask;
+	short			extendedThresholdEnabledMask;
 	short			internalGateEnabledMask;
 	short			externalGateEnabledMask;
 	short			inputInvertedMask;
@@ -181,6 +182,7 @@
 - (int) energyPeakingTime:(short)aGroup;
 - (void) setEnergyPeakingTime:(short)aGroup withValue:(int)aValue;
 - (unsigned long) getThresholdRegOffsets:(int) channel;
+- (unsigned long) getExtendedThresholdRegOffsets:(int) channel;
 - (unsigned long) getTriggerSetupRegOffsets:(int) channel; 
 - (unsigned long) getTriggerExtSetupRegOffsets:(int)channel;
 - (unsigned long) getSampleAddress:(int)channel;
@@ -229,6 +231,12 @@
 - (void) setExternalTriggerEnabledMask:(short)aMask;
 - (BOOL) externalTriggerEnabled:(short)chan;
 - (void) setExternalTriggerEnabled:(short)chan withValue:(BOOL)aValue;
+
+- (short) extendedThresholdEnabledMask;
+- (void) setExtendedThresholdEnabledMask:(short)aMask;
+- (BOOL) extendedThresholdEnabled:(short)chan;
+- (void) setExtendedThresholdEnabled:(short)chan withValue:(BOOL)aValue;
+
 
 - (short) internalGateEnabledMask;
 - (void) setInternalGateEnabledMask:(short)aMask;
@@ -440,6 +448,7 @@ extern NSString* ORSIS3302InputInvertedChanged;
 
 extern NSString* ORSIS3302InternalTriggerEnabledChanged;
 extern NSString* ORSIS3302ExternalTriggerEnabledChanged;
+extern NSString* ORSIS3302ExtendedThresholdEnabledChanged;
 extern NSString* ORSIS3302InternalGateEnabledChanged;
 extern NSString* ORSIS3302ExternalGateEnabledChanged;
 extern NSString* ORSIS3302McaStatusChanged;

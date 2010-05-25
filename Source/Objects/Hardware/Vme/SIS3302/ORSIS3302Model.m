@@ -70,6 +70,7 @@ NSString* ORSIS3302InternalTriggerEnabledChanged = @"ORSIS3302InternalTriggerEna
 NSString* ORSIS3302ExternalTriggerEnabledChanged = @"ORSIS3302ExternalTriggerEnabledChanged";
 NSString* ORSIS3302InternalGateEnabledChanged	= @"ORSIS3302InternalGateEnabledChanged";
 NSString* ORSIS3302ExternalGateEnabledChanged	= @"ORSIS3302ExternalGateEnabledChanged";
+NSString* ORSIS3302ExtendedThresholdEnabledChanged = @"ORSIS3302ExtendedThresholdEnabledChanged";
 
 NSString* ORSIS3302ClockSourceChanged			= @"ORSIS3302ClockSourceChanged";
 
@@ -533,6 +534,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[self setAdc50KTriggerEnabledMask:0x00];
 	[self setInternalGateEnabledMask:0xff];
 	[self setExternalGateEnabledMask:0x00];
+	[self setExtendedThresholdEnabledMask:0x00];
 	
 	[self setInternalTriggerEnabledMask:0xff];
 	[self setExternalTriggerEnabledMask:0x0];
@@ -665,6 +667,23 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	else aMask &= ~(1<<chan);
 	[self setExternalGateEnabledMask:aMask];
 }
+
+- (short) extendedThresholdEnabledMask { return extendedThresholdEnabledMask; }
+- (void) setExtendedThresholdEnabledMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setExtendedThresholdEnabledMask:extendedThresholdEnabledMask];
+	extendedThresholdEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ExtendedThresholdEnabledChanged object:self];
+}
+- (BOOL) extendedThresholdEnabled:(short)chan { return extendedThresholdEnabledMask & (1<<chan); }
+- (void) setExtendedThresholdEnabled:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = extendedThresholdEnabledMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setExtendedThresholdEnabledMask:aMask];
+}
+
 
 - (short) inputInvertedMask { return inputInvertedMask; }
 - (void) setInputInvertedMask:(short)aMask
@@ -1094,13 +1113,24 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		BOOL gtEnabled = [self gt:i];
 		if(!enabled)	thresholdMask |= (1<<26); //logic is inverted on the hw
 		if(gtEnabled)	thresholdMask |= (1<<25);
-		thresholdMask |= (0x00010000 | [self threshold:i]);
+		if([self extendedThresholdEnabled:i])	thresholdMask |= (1<<23);
+		
+		thresholdMask |= ([self threshold:i] & 0xffff);
 		
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
 													   atAddress: [self baseAddress] + [self getThresholdRegOffsets:i]
 													   numToWrite: 1
 													  withAddMod: [self addressModifier]
 												   usingAddSpace: 0x01]];
+		if([self extendedThresholdEnabled:i]){
+			unsigned long aThresholdValue = [self threshold:i];
+			[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
+														   atAddress: [self baseAddress] + [self getExtendedThresholdRegOffsets:i]
+														  numToWrite: 1
+														  withAddMod: [self addressModifier]
+													   usingAddSpace: 0x01]];
+		}
+		
 		
 	}
 	[self executeCommandList:aList];
@@ -1739,9 +1769,9 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		if(runMode == kMcaRunMode){
 			[self writeMcaArmMode];
 		}
-		else {
-			[self disarmAndArmBank:0];
-		}
+		//else {
+		//	[self disarmAndArmBank:0];
+		//}
 	}
 }
 
@@ -1816,6 +1846,24 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     }
     return (unsigned long) -1;
 }
+
+- (unsigned long) getExtendedThresholdRegOffsets:(int) channel 
+{
+    switch (channel) {
+        case 0: return 	kSIS3302TriggerExtendedThresholdAdc1;
+		case 1: return 	kSIS3302TriggerExtendedThresholdAdc2;
+		case 2: return 	kSIS3302TriggerExtendedThresholdAdc3;
+		case 3: return 	kSIS3302TriggerExtendedThresholdAdc4;
+		case 4:	return 	kSIS3302TriggerExtendedThresholdAdc5;
+		case 5: return 	kSIS3302TriggerExtendedThresholdAdc6;
+		case 6: return 	kSIS3302TriggerExtendedThresholdAdc7;
+		case 7: return 	kSIS3302TriggerExtendedThresholdAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+
+
 
 - (unsigned long) getTriggerSetupRegOffsets:(int) channel 
 {
@@ -1957,8 +2005,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	else return YES;
 }
 
-
-
 - (void) disarmSampleLogic
 {
 	unsigned long aValue = 0;
@@ -1985,7 +2031,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 - (void) disarmAndArmNextBank
 { 
-	return (bankOneArmed) ? [self disarmAndArmBank:0] : [self disarmAndArmBank:1]; 
+	return (bankOneArmed) ? [self disarmAndArmBank:1] : [self disarmAndArmBank:0]; 
 }
 
 - (void) writePageRegister:(int) aPage 
@@ -2143,6 +2189,13 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setExternalGateEnabled:withValue:) getMethod:@selector(externalGateEnabled:)];
     [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Extended Threshold Enable"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setExtendedThresholdEnabled:withValue:) getMethod:@selector(extendedThresholdEnabled:)];
+    [a addObject:p];
+	
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Source"];
@@ -2305,6 +2358,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     else if([param isEqualToString:@"Trigger Gate Delay"])			return [cardDictionary objectForKey:@"triggerGateLength"];
     else if([param isEqualToString:@"Pretrigger Delay"])			return [cardDictionary objectForKey:@"preTriggerDelay"];
     else if([param isEqualToString:@"Sample Length"])				return [cardDictionary objectForKey:@"sampleLength"];
+    else if([param isEqualToString:@"Extended Threshold Enabled"])	return [cardDictionary objectForKey:@"extendedThresholdEnabledMask"];
 	
 	else return nil;
 }
@@ -2361,7 +2415,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 			if(firstTime){
 				int group;
 				for(group=0;group<4;group++){
-					dataRecordlength[group] = 4+2+[self sampleLength:group]/2+energySampleLength+4; //Orca header-sisheader-samples-energy-sistrailer
+					dataRecordlength[group] = 4+2+[self sampleLength:group]/2+energySampleLength+4; //Orca header+sisheader+samples+energy+sistrailer
 					dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(long));
 				}
 				isRunning = YES;
@@ -2370,10 +2424,9 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 			}
 			else {
 				if([self isEvent]) {
-					[self disarmSampleLogic];
-
-					if(bankOneArmed)[self writePageRegister:0x0];
-					else			[self writePageRegister:0x4];
+					[self disarmAndArmNextBank];
+					if(bankOneArmed)[self writePageRegister:0x4]; //bank one is armed, so bank2 (page 4) has to be readout
+					else			[self writePageRegister:0x0]; //Bank2 is armed and Bank1 (page 0) has to be readout
 					int channel;
 					for( channel=0;channel<kNumSIS3302Channels;channel++) {
 						unsigned long endSampleAddress = 0;
@@ -2423,7 +2476,6 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 							}while (addrOffset < endSampleAddress);
 						}
 					}
-					[self disarmAndArmBank:0];
 				}
 			}
 		}
@@ -2614,6 +2666,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
     [self setInputInvertedMask:			[decoder decodeInt32ForKey:@"inputInvertedMask"]];
     [self setInternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"internalTriggerEnabledMask"]];
     [self setExternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
+    [self setExtendedThresholdEnabledMask:[decoder decodeInt32ForKey:@"extendedThresholdEnabledMask"]];
     [self setInternalGateEnabledMask:	[decoder decodeInt32ForKey:@"internalGateEnabledMask"]];
     [self setExternalGateEnabledMask:	[decoder decodeInt32ForKey:@"externalGateEnabledMask"]];
     [self setAdc50KTriggerEnabledMask:	[decoder decodeInt32ForKey:@"adc50KtriggerEnabledMask"]];
@@ -2688,6 +2741,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[encoder encodeInt32:inputInvertedMask				forKey:@"inputInvertedMask"];
 	[encoder encodeInt32:internalTriggerEnabledMask		forKey:@"internalTriggerEnabledMask"];
 	[encoder encodeInt32:externalTriggerEnabledMask		forKey:@"externalTriggerEnabledMask"];
+	[encoder encodeInt32:extendedThresholdEnabledMask	forKey:@"extendedThresholdEnabledMask"];
 	[encoder encodeInt32:internalGateEnabledMask		forKey:@"internalGateEnabledMask"];
 	[encoder encodeInt32:externalGateEnabledMask		forKey:@"externalGateEnabledMask"];
 	[encoder encodeInt32:adc50KTriggerEnabledMask		forKey:@"adc50KtriggerEnabledMask"];
@@ -2725,6 +2779,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	[objDictionary setObject: [NSNumber numberWithLong:externalTriggerEnabledMask]	forKey:@"externalTriggerEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:internalGateEnabledMask]		forKey:@"internalGateEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:externalGateEnabledMask]		forKey:@"externalGateEnabledMask"];
+	[objDictionary setObject: [NSNumber numberWithLong:extendedThresholdEnabledMask]	forKey:@"extendedThresholdEnabledMask"];
     [objDictionary setObject: internalTriggerDelays									forKey:@"internalTriggerDelays"];	
     [objDictionary setObject: energyDecimations										forKey:@"energyDecimations"];	
 	
