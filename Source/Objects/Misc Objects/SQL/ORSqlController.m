@@ -46,47 +46,43 @@
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-        
+    
+    [super registerNotificationObservers];
+    
     [notifyCenter addObserver : self
                      selector : @selector(hostNameChanged:)
                          name : ORSqlHostNameChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(userNameChanged:)
                          name : ORSqlUserNameChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(passwordChanged:)
                          name : ORSqlPasswordChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(dataBaseNameChanged:)
                          name : ORSqlDataBaseNameChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(sqlLockChanged:)
                          name : ORSqlLock
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(sqlLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(connectionChanged:)
-                         name : ORDBConnectionVerifiedChanged
-                       object : nil];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(webSitePathChanged:)
-                         name : ORSqlModelWebSitePathChanged
-						object: model];
-
+                     selector : @selector(connectionChanged:)
+                         name : ORSqlConnectionChanged
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -98,17 +94,12 @@
 	[self dataBaseNameChanged:nil];
 	[self connectionChanged:nil];
     [self sqlLockChanged:nil];
-	[self webSitePathChanged:nil];
-}
-
-- (void) webSitePathChanged:(NSNotification*)aNote
-{
-	[webSitePathField setStringValue: [model webSitePath]];
 }
 
 - (void) connectionChanged:(NSNotification*)aNote
 {
-	[dbParamsOKField setStringValue:[model dbConnectionVerified]?@"Verified":@"Unable to Connect"];
+	if([model isConnected])[connectionButton setTitle:@"Disconnect"];
+	else [connectionButton setTitle:@"Connect"];
 }
 
 - (void) hostNameChanged:(NSNotification*)aNote
@@ -153,11 +144,6 @@
 }
 
 #pragma mark ¥¥¥Actions
-
-- (void) webSitePathAction:(id)sender
-{
-	[model setWebSitePath:[sender stringValue]];	
-}
 - (IBAction) sqlLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORSqlLock to:[sender intValue] forWindow:[self window]];
@@ -186,7 +172,7 @@
 - (IBAction) connectionAction:(id)sender
 {
 	[self endEditing];
-	[model apply];
+	[model toggleConnection];
 }
 
 
