@@ -675,6 +675,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 	extendedThresholdEnabledMask = aMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ExtendedThresholdEnabledChanged object:self];
 }
+
 - (BOOL) extendedThresholdEnabled:(short)chan { return extendedThresholdEnabledMask & (1<<chan); }
 - (void) setExtendedThresholdEnabled:(short)chan withValue:(BOOL)aValue
 {
@@ -1115,7 +1116,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 		if(gtEnabled)	thresholdMask |= (1<<25);
 		if([self extendedThresholdEnabled:i])	thresholdMask |= (1<<23);
 		
-		thresholdMask |= ([self threshold:i] & 0xffff);
+		thresholdMask |= ([self threshold:i] & 0xffff)+ 0x10000;
 		
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
 													   atAddress: [self baseAddress] + [self getThresholdRegOffsets:i]
@@ -1123,7 +1124,7 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 													  withAddMod: [self addressModifier]
 												   usingAddSpace: 0x01]];
 		if([self extendedThresholdEnabled:i]){
-			unsigned long aThresholdValue = [self threshold:i];
+			unsigned long aThresholdValue = [self threshold:i]+0x2000000;
 			[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
 														   atAddress: [self baseAddress] + [self getExtendedThresholdRegOffsets:i]
 														  numToWrite: 1
@@ -1140,8 +1141,8 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 {
 	//******the extern/internal gates seem to have an inverted logic, so the extern/internal gate matrixes in IB are swapped.
 	int i;
-	unsigned long tempIntGateMask  = ~internalGateEnabledMask;
-	unsigned long tempExtGateMask  = ~externalGateEnabledMask;
+	unsigned long tempIntGateMask  = internalGateEnabledMask;
+	unsigned long tempExtGateMask  = externalGateEnabledMask;
 	ORCommandList* aList = [ORCommandList commandList];
 	for(i=0;i<kNumSIS3302Channels/2;i++){
 		unsigned long aValueMask = 0x0;
