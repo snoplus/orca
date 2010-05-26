@@ -2521,6 +2521,46 @@
 																		<int key="NSPeriodicInterval">75</int>
 																	</object>
 																</object>
+																<object class="NSTextField" id="98484983">
+																	<reference key="NSNextResponder" ref="543308063"/>
+																	<int key="NSvFlags">256</int>
+																	<string key="NSFrame">{{75, 26}, {86, 17}}</string>
+																	<reference key="NSSuperview" ref="543308063"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSTextFieldCell" key="NSCell" id="422960196">
+																		<int key="NSCellFlags">67239424</int>
+																		<int key="NSCellFlags2">138412032</int>
+																		<string key="NSContents">SIS3800</string>
+																		<reference key="NSSupport" ref="625969386"/>
+																		<reference key="NSControlView" ref="98484983"/>
+																		<reference key="NSBackgroundColor" ref="421922390"/>
+																		<reference key="NSTextColor" ref="688154912"/>
+																	</object>
+																</object>
+																<object class="ObjectFactory" id="1019484663">
+																	<reference key="NSNextResponder" ref="543308063"/>
+																	<int key="NSvFlags">256</int>
+																	<string key="NSFrame">{{110, 47}, {16, 127}}</string>
+																	<reference key="NSSuperview" ref="543308063"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSButtonCell" key="NSCell" id="3300851">
+																		<int key="NSCellFlags">67239424</int>
+																		<int key="NSCellFlags2">134217728</int>
+																		<string key="NSContents"/>
+																		<reference key="NSSupport" ref="625969386"/>
+																		<reference key="NSControlView" ref="1019484663"/>
+																		<int key="NSButtonFlags">-2046017281</int>
+																		<int key="NSButtonFlags2">2</int>
+																		<object class="NSCustomResource" key="NSNormalImage">
+																			<string key="NSClassName">NSImage</string>
+																			<string key="NSResourceName">SIS3800Card</string>
+																		</object>
+																		<string key="NSAlternateContents"/>
+																		<string key="NSKeyEquivalent"/>
+																		<int key="NSPeriodicDelay">400</int>
+																		<int key="NSPeriodicInterval">75</int>
+																	</object>
+																</object>
 															</object>
 															<string key="NSFrame">{{10, 7}, {719, 206}}</string>
 														</object>
@@ -9628,6 +9668,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="960377520"/>
 							<reference ref="1072143995"/>
 							<reference ref="1072695849"/>
+							<reference ref="98484983"/>
+							<reference ref="1019484663"/>
 						</object>
 						<reference key="parent" ref="761815348"/>
 					</object>
@@ -14781,6 +14823,34 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="object" ref="224412067"/>
 						<reference key="parent" ref="336421191"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26185</int>
+						<reference key="object" ref="98484983"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="422960196"/>
+						</object>
+						<reference key="parent" ref="543308063"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26186</int>
+						<reference key="object" ref="1019484663"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="3300851"/>
+						</object>
+						<reference key="parent" ref="543308063"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26187</int>
+						<reference key="object" ref="3300851"/>
+						<reference key="parent" ref="1019484663"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26188</int>
+						<reference key="object" ref="422960196"/>
+						<reference key="parent" ref="98484983"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -15716,6 +15786,13 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26182.ImportedFromIB2</string>
 					<string>26183.IBPluginDependency</string>
 					<string>26184.IBPluginDependency</string>
+					<string>26185.IBPluginDependency</string>
+					<string>26185.ImportedFromIB2</string>
+					<string>26186.IBAttributePlaceholdersKey</string>
+					<string>26186.IBPluginDependency</string>
+					<string>26186.ImportedFromIB2</string>
+					<string>26187.IBPluginDependency</string>
+					<string>26188.IBPluginDependency</string>
 					<string>267.IBPluginDependency</string>
 					<string>267.ImportedFromIB2</string>
 					<string>2709.IBPluginDependency</string>
@@ -17967,6 +18044,20 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="1019484663"/>
+							<string key="toolTip">ORSIS3800Model</string>
+						</object>
+					</object>
+					<string>com.yourcompany.OrcaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>ObjectFactory</string>
@@ -19657,7 +19748,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26184</int>
+			<int key="maxID">26188</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -21302,6 +21393,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>SIS3300Card</string>
 				<string>SIS3302Card</string>
 				<string>SIS3350Card</string>
+				<string>SIS3800Card</string>
 				<string>SNO</string>
 				<string>SNOCrate</string>
 				<string>SNORack</string>
@@ -21487,6 +21579,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{70, 70}</string>
 				<string>{147, 25}</string>
 				<string>{48, 16}</string>
+				<string>{16, 128}</string>
 				<string>{16, 128}</string>
 				<string>{16, 128}</string>
 				<string>{16, 128}</string>
