@@ -20,6 +20,8 @@
 
 
 #import "ORSqlModel.h"
+#import "ORRunModel.h"
+#import "OR1DHisto.h"
 
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
 NSString* ORSqlPasswordChanged		= @"ORSqlPasswordChanged";
@@ -29,6 +31,9 @@ NSString* ORSqlConnectionChanged	= @"ORSqlConnectionChanged";
 NSString* ORSqlLock					= @"ORSqlLock";
 
 static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
+@interface ORSqlModel (private)
+- (void) postMachineName;
+@end
 
 @implementation ORSqlModel
 
@@ -52,6 +57,11 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[super dealloc];
 }
 
+- (void) awakeAfterDocumentLoaded
+{
+	[self postMachineName];
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"Sql"]];
@@ -67,6 +77,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(15,8) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORSqlModelInConnector];
     [aConnector setOffColor:[NSColor brownColor]];
+    [aConnector setOnColor:[NSColor magentaColor]];
 	[ aConnector setConnectorType: 'DB I' ];
 	[ aConnector addRestrictedConnectionType: 'DB O' ]; //can only connect to DB outputs
 	
@@ -78,10 +89,46 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
+	[notifyCenter removeObserver:self];
+	
     [notifyCenter addObserver : self
                      selector : @selector(disconnect)
                          name : @"ORAppTerminating"
                        object : [NSApp delegate]];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+	
+}
+
+- (void) runStatusChanged:(NSNotification*)aNote
+{
+	id pausedKeyIncluded = [[aNote userInfo] objectForKey:@"ORRunPaused"];
+	if(!pausedKeyIncluded){
+		int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+		//int runNumber    = [[aNote object] runNumber];
+		//int subRunNumber = [[aNote object] subRunNumber];
+		
+		//[self postRunState: runState runNumber:runNumber subRunNumber:subRunNumber];
+		
+		if(runState == eRunInProgress){
+			if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
+			NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+			for(ORDataChainObject* aDataMonitor in list){
+				if([aDataMonitor involvedInCurrentRun]){
+					[dataMonitors addObject:aDataMonitor];
+				}
+			}
+			//[self updateDataSets];
+		}
+		else if(runState == eRunStopped){
+			[dataMonitors release];
+			dataMonitors = nil;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+		}
+	}
 }
 
 #pragma mark ***Accessors
@@ -216,8 +263,9 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if(dataBaseName && [dataBaseName length]){
 		NSLog(@"%@\n",[self databases]);
 		[self use:dataBaseName];
+		[self postMachineName];
 		NSLog(@"%@\n",[self tables]);
-		NSLog(@"%@\n",[self machines]);
+		//NSLog(@"%@\n",[self machines]);
 	}
 	return YES;     /* connection is established */
 }
@@ -313,6 +361,50 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 	return nil;
 }
+@end
+
+@implementation ORSqlModel (private)
+- (void) postMachineName
+{
+	if(conn){
+		NSString* name = computerName();
+		NSString* hw_address = macAddress();
+
+		NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES ('%@','%@')",name,hw_address];
+		if(mysql_query(conn,[query UTF8String])!=0){
+			NSLog(@"post Machine Name failed\n");
+		}				
+	}
+}
+
+- (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber
+{
+/*	NSString* name       = computerName();
+	NSString* hw_address = macAddress();
+	
+	NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = '%@'",hw_address];
+	MYSQL_RES* theResult = mysql_query(conn,[query UTF8String])!=0);
+	if(theResult){
+		int numFields = mysql_num_fields (resSet);
+		MYSQL_ROW row;
+		while((row = mysql_fetch_row(theResult))!=nil){
+		}
+		mysql_free_result (theResult);
+	}
+ */
+}
+/*
+int numFields = mysql_num_fields (resSet);
+if(numFields>0){
+	NSMutableArray* fields = [NSMutableArray array];
+	int i;
+	for (i = 0; i < numFields; i++) {
+		[fields addObject:[NSString stringWithUTF8String:row[i]]];
+	}
+	[result addObject:fields];
+}
+*/
+
 @end
 
 @implementation ORSqlTempResult

@@ -31,6 +31,7 @@
     NSString*	userName;
     NSString*	password;
     NSString*	dataBaseName;
+	NSMutableArray* dataMonitors;
 }
 
 #pragma mark ***Initialization
