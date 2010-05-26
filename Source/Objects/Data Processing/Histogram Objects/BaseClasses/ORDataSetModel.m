@@ -151,10 +151,13 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 			}
 			[result stringByReplacingOccurrencesOfString:@" " withString:@""];
 			[result replaceOccurrencesOfString:@" " withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
-			[result replaceOccurrencesOfString:@"Crate" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
-			[result replaceOccurrencesOfString:@"Card" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
-			[result replaceOccurrencesOfString:@"Station" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
-			[result replaceOccurrencesOfString:@"Channel" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[result length])];
+			NSUInteger firstCommaLocation = [result rangeOfString:@","].location;
+			if(firstCommaLocation==NSNotFound)firstCommaLocation = 0;
+			[result replaceOccurrencesOfString:@"Crate" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(firstCommaLocation,[result length]-firstCommaLocation)];
+			[result replaceOccurrencesOfString:@"Card" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(firstCommaLocation,[result length]-firstCommaLocation)];
+			[result replaceOccurrencesOfString:@"Station" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(firstCommaLocation,[result length]-firstCommaLocation)];
+			[result replaceOccurrencesOfString:@"Channel" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(firstCommaLocation,[result length]-firstCommaLocation)];
+			[result replaceOccurrencesOfString:@"Unit" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(firstCommaLocation,[result length]-firstCommaLocation)];
 			
 			[shortName release];
 			shortName = [result copy];
