@@ -33,6 +33,7 @@ NSString* ORSqlLock					= @"ORSqlLock";
 static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @interface ORSqlModel (private)
 - (void) postMachineName;
+- (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber;
 @end
 
 @implementation ORSqlModel
@@ -95,7 +96,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
                      selector : @selector(disconnect)
                          name : @"ORAppTerminating"
                        object : [NSApp delegate]];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
@@ -108,10 +109,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	id pausedKeyIncluded = [[aNote userInfo] objectForKey:@"ORRunPaused"];
 	if(!pausedKeyIncluded){
 		int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
-		//int runNumber    = [[aNote object] runNumber];
-		//int subRunNumber = [[aNote object] subRunNumber];
+		int runNumber    = [[aNote object] runNumber];
+		int subRunNumber = [[aNote object] subRunNumber];
 		
-		//[self postRunState: runState runNumber:runNumber subRunNumber:subRunNumber];
+		[self postRunState: runState runNumber:runNumber subRunNumber:subRunNumber];
 		
 		if(runState == eRunInProgress){
 			if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
@@ -288,7 +289,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		if(mysql_query(conn,[query UTF8String])){
 			NSLog(@"%@ failed\n",query);
 			NSLog(@"%s\n",mysql_error(conn));
-			return NO;
+			return nil;
 		}
 		MYSQL_RES* theResult =  mysql_store_result(conn);
 		if(theResult)[ORSqlTempResult sqlResult:theResult];
@@ -369,41 +370,86 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if(conn){
 		NSString* name = computerName();
 		NSString* hw_address = macAddress();
-
-		NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES ('%@','%@')",name,hw_address];
-		if(mysql_query(conn,[query UTF8String])!=0){
-			NSLog(@"post Machine Name failed\n");
-		}				
+		NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = '%@'",hw_address];
+		MYSQL_RES* theResult = [self sendQuery:query];
+		if(theResult){
+			MYSQL_ROW row = mysql_fetch_row (theResult);
+			if(!row){
+				NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES ('%@','%@')",name,hw_address];
+				[self sendQuery:query];
+			}
+		}
 	}
 }
 
 - (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber
 {
-/*	NSString* name       = computerName();
+	NSString* name       = computerName();
 	NSString* hw_address = macAddress();
 	
 	NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = '%@'",hw_address];
-	MYSQL_RES* theResult = mysql_query(conn,[query UTF8String])!=0);
+	MYSQL_RES* theResult = [self sendQuery:query];
 	if(theResult){
-		int numFields = mysql_num_fields (resSet);
-		MYSQL_ROW row;
-		while((row = mysql_fetch_row(theResult))!=nil){
+		MYSQL_ROW row = mysql_fetch_row(theResult);
+		if(row){
+			NSString* machine_id = [NSString stringWithUTF8String:row[0]];
+			NSString* query = [NSString stringWithFormat:@"SELECT run_id,state from runs where machine_id = '%@'",machine_id];
+			MYSQL_RES* theResult = [self sendQuery:query];
+			if(theResult){
+				MYSQL_ROW row;
+				while((row = mysql_fetch_row(theResult))!=nil){
+					int numFields = mysql_num_fields (theResult);
+					if(numFields>0){
+						int i;
+						for (i = 0; i < numFields; i++) {
+							NSLog(@"%@\n",[NSString stringWithUTF8String:row[i]]);
+						}
+					}
+				}
+				
+				
+				if(row){
+					NSString* query = [NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d WHERE machine_id=%@",runNumber,subRunNumber,aRunState,machine_id];
+					[self sendQuery:query];	
+				}
+				else {
+					NSString* query = [NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",runNumber,subRunNumber,aRunState,machine_id];
+					[self sendQuery:query];	
+				}
+			}
 		}
-		mysql_free_result (theResult);
 	}
- */
 }
 /*
-int numFields = mysql_num_fields (resSet);
-if(numFields>0){
-	NSMutableArray* fields = [NSMutableArray array];
-	int i;
-	for (i = 0; i < numFields; i++) {
-		[fields addObject:[NSString stringWithUTF8String:row[i]]];
-	}
-	[result addObject:fields];
-}
-*/
+ $query 	= "SELECT machine_id from machines where hw_address = '$macAddress'";
+ $result = mysqli_query($dbc,$query);
+ 
+ $row =  mysqli_fetch_array($result);
+ $machine_id =  $row['machine_id'];
+ 
+ $query  = "SELECT machine_id from runs where machine_id = '$machine_id'";
+ $result = mysqli_query($dbc,$query);
+ $row =  mysqli_fetch_array($result);
+ 
+ if($runState == 1){
+ //at the start of run, clear all datasets for this machins
+ $query = "DELETE from datasets where machine_id='$machine_id'";
+ $result = mysqli_query($dbc,$query);
+ }
+ 
+ $query = "UPDATE runs SET experiment ='$experiment' where machine_id='$machine_id'";
+ $result = mysqli_query($dbc,$query);
+ 
+ if($row){
+ $query = "UPDATE runs SET runState='$runState', runNumber='$runNumber', subRunNumber='$subRunNumber'" .
+ "where machine_id='$machine_id'";
+ }
+ else {
+ $query = "INSERT INTO runs (runNumber,subRunNumber,runState,machine_id) " .
+ "VALUES (\"$runNumber\",\"$subRunNumber\",\"$runState\",\"$machine_id\")";
+ }
+ 
+ $result = mysqli_query($dbc,$query);*/
 
 @end
 
