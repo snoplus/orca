@@ -108,6 +108,7 @@
 - (void) clearOverFlowCounter:(int)i;
 - (void) readOverFlowRegisters;
 - (void) timeToPoll;
+- (void) writeCountEnableMask;
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId;

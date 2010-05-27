@@ -496,6 +496,7 @@
                         localException);
     }
 }
+
 - (IBAction) clearAll:(id)sender;
 {
     @try {

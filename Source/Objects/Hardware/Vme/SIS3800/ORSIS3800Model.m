@@ -399,6 +399,7 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 {  
 	[self reset];
 	[self writeControlRegister];
+	[self writeCountEnableMask];
 	[self readStatusRegister];
 	[self enableReferencePulser:enableReferencePulser];
 }
@@ -477,6 +478,17 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 		counts[i] = 0;
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];	
+}
+
+
+- (void) writeCountEnableMask
+{
+	unsigned long aValue = ~countEnableMask;
+	[[self adapter] writeLongBlock:&aValue
+						 atAddress:[self baseAddress] + kSelectiveCountDisable
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
 }
 
 - (void) clearOverFlowCounter:(int)i
