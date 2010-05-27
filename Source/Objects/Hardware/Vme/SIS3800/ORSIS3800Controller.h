@@ -27,8 +27,15 @@
 
 @interface ORSIS3800Controller : OrcaObjectController 
 {
-    IBOutlet NSTabView* 	tabView;
+	IBOutlet NSPopUpButton* pollTimePU;
+	IBOutlet NSButton*		syncWithRunButton;
+	IBOutlet NSButton*		clearOnRunStartButton;
 	IBOutlet NSPopUpButton* lemoInModePU;
+	IBOutlet NSButton*		enableReferencePulserButton;
+	IBOutlet NSButton*		enableInputTestModeButton;
+	IBOutlet NSButton*		enable25MHzPulsesButton;
+	IBOutlet NSTextField*	lemoInText;
+	
 	IBOutlet NSMatrix*		countEnableMatrix0;
 	IBOutlet NSMatrix*		countEnableMatrix1;
 	IBOutlet NSMatrix*		countEnableMatrix2;
@@ -42,11 +49,32 @@
 	//base address
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
+    IBOutlet NSTextField*   statusText;
 	
 	IBOutlet NSTextField*	moduleIDField;
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
-	IBOutlet NSTextField*	lemoInText;
+    IBOutlet NSButton*      enableAllInGroupButton0;
+    IBOutlet NSButton*      enableAllInGroupButton1;
+    IBOutlet NSButton*      enableAllInGroupButton2;
+    IBOutlet NSButton*      enableAllInGroupButton3;
+	
+    IBOutlet NSButton*      disableAllInGroupButton0;
+    IBOutlet NSButton*      disableAllInGroupButton1;
+    IBOutlet NSButton*      disableAllInGroupButton2;
+    IBOutlet NSButton*      disableAllInGroupButton3;
+	
+    IBOutlet NSButton*      disableAllButton;
+    IBOutlet NSButton*      enableAllButton;
+    IBOutlet NSButton*      clearAllButton;
+    IBOutlet NSButton*      startCountingButton;
+    IBOutlet NSButton*      stopCountingButton;
+	
+	IBOutlet NSButton*      readNow;
+    IBOutlet NSButton*      readAndClearButton;
+    IBOutlet NSButton*      probeButton;
+    IBOutlet NSButton*      clearOverFlowButton;
+	
 }
 
 - (id)   init;
@@ -54,6 +82,13 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) isCountingChanged:(NSNotification*)aNote;
+- (void) syncWithRunChanged:(NSNotification*)aNote;
+- (void) clearOnRunStartChanged:(NSNotification*)aNote;
+- (void) overFlowMaskChanged:(NSNotification*)aNote;
+- (void) enableReferencePulserChanged:(NSNotification*)aNote;
+- (void) enableInputTestModeChanged:(NSNotification*)aNote;
+- (void) enable25MHzPulsesChanged:(NSNotification*)aNote;
 - (void) lemoInModeChanged:(NSNotification*)aNote;
 - (void) countEnableMaskChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -61,8 +96,15 @@
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) moduleIDChanged:(NSNotification*)aNote;
 - (void) countersChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
+
 
 #pragma mark •••Actions
+- (IBAction) syncWithRunAction:(id)sender;
+- (IBAction) clearOnRunStartAction:(id)sender;
+- (IBAction) enableReferencePulserAction:(id)sender;
+- (IBAction) enableInputTestModeAction:(id)sender;
+- (IBAction) enable25MHzPulsesAction:(id)sender;
 - (IBAction) lemoInModeAction:(id)sender;
 - (IBAction) countEnableMask1Action:(id)sender;
 - (IBAction) countEnableMask2Action:(id)sender;
@@ -76,5 +118,13 @@
 - (IBAction) readNoClear:(id)sender;
 - (IBAction) readAndClear:(id)sender;
 - (IBAction) clearAll:(id)sender;
+- (IBAction) enableAllInGroup:(id)sender;
+- (IBAction) disableAllInGroup:(id)sender;
+- (IBAction) enableAll:(id)sender;
+- (IBAction) disableAll:(id)sender;
+- (IBAction) pollTimeAction:(id)sender;
+- (IBAction) startAction:(id)sender;
+- (IBAction) stopAction:(id)sender;
+- (IBAction) clearAllOverFlowFlags:(id)sender;
 
 @end

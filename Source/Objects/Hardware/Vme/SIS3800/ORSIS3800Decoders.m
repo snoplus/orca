@@ -22,7 +22,6 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORDataTypeAssigner.h"
-#import "ORSIS3800Model.h"
 
 /*
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
@@ -31,64 +30,86 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  --------^-^^^--------------------------- Crate number
  -------------^-^^^^--------------------- Card number
- --------------------------------------^- 1==SIS38001, 0==SIS3000 
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-Trigger Event Word
- ^---------------------------------------1 if ADC0 in this event
- -^--------------------------------------1 if ADC1 in this event
- --^-------------------------------------1 if ADC2 in this event
- ---^------------------------------------1 if ADC3 in this event
- -----^----------------------------------1 if ADC4 in this event
- ------^---------------------------------1 if ADC5 in this event
- -------^--------------------------------1 if ADC6 in this event
- --------^-------------------------------1 if ADC7 in this event
- ------------^---------------------------1 if wrapped
- ---------------^^^^ ^^^^ ^^^^ ^^^^ ^^^^-Event Data End Address
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^^^^ ^^^^-------------------------------Event #
- ----------^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-Time from previous event always zero unless in multievent mode
- 
- waveform follows:
- Each word may have data for two ADC channels. The high order 16
- bits are for ADC0,2,4,6. The low order bits are for ADC1,3,5,7
- 
- if SIS3800:
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^----------------------------------------Status of User Bit
- --------------------^--------------------Status of Gate Chaining Bit
- ---^-------------------^-----------------Out of Range Bit
- -----^^^^ ^^^^ ^^^^------^^^^ ^^^^ ^^^^--12 bit Data
- if SIS3301:
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
- ^---------------------------------------Status of User Bit
- --------------------^-------------------Status of Gate Chaining Bit
- -^-------------------^------------------Out of Range Bit
- --^^ ^^^^ ^^^^ ^^^^---^^ ^^^^ ^^^^ ^^^^-14-bit Data
+ --------------------------------------^- 1==SIS38020, 0==SIS3000 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time read in seconds since Jan 1, 1970
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  last time read in seconds since Jan 1, 1970 (zero if first sample)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  count enabled mask
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  overFlow mask
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  options
+ -------------------------------------^^- lemo in mode
+ ------------------------------------^--- enable25MHzPulses
+ -----------------------------------^---- enableInputTestMode
+ ---------------------------------^------ enableReferencePulser
+ --------------------------------^------- clearOnRunStart
+ -------------------------------^-------- enable25MHzPulses
+ ------------------------------^--------- syncWithRun
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counts for chan 1
+ ..
+ ..
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counts for chan 32
+
  */
 
-@implementation ORSIS3800WaveformDecoder
+@implementation ORSIS3800DecoderForCounts
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
- 
-    return length; //must return number of longs
+    unsigned long* ptr    = (unsigned long*)someData; 
+	unsigned long  length = ExtractLength(ptr[0]);
+
+	short crate    = ShiftAndExtract(ptr[1],21,0xf);
+	short card     = ShiftAndExtract(ptr[1],16,0x1f);
+	NSString* module = (ptr[1]&0x1)?@"SIS3820":@"SIS3800";
+	NSString* crateKey	= [self getCrateKey: crate];
+	NSString* cardKey	= [self getCardKey: card];
+	
+	int i;
+	for(i=0;i<32;i++){
+		NSString* scalerValue = [NSString stringWithFormat:@"%u",ptr[7+i]];
+		NSString* channelKey	= [self getCardKey: i];
+
+		[aDataSet loadGenericData:scalerValue sender:self withKeys:@"Scalers",module, crateKey,cardKey,channelKey,nil];
+	}
+	
+	return length; //must return number of longs
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-	ptr++;
-    NSString* title= @"SIS3800 Waveform Record\n\n";
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-	NSString* moduleID = (*ptr&0x1)?@"SIS3301":@"SIS3800";
-	ptr++;
-	NSString* triggerWord = [NSString stringWithFormat:@"TriggerWord  = 0x08%x\n",*ptr];
-	ptr++;
-	NSString* Event = [NSString stringWithFormat:@"Event  = 0x%08x\n",(*ptr>>24)&0xff];
-	NSString* Time = [NSString stringWithFormat:@"Time Since Last Trigger  = 0x%08x\n",*ptr&0xffffff];
+	NSString* s = @"";
+	s = [s stringByAppendingString: @"SIS3800 Scaler Record\n\n"];
+	s = [s stringByAppendingFormat:@"Crate = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
+	s = [s stringByAppendingFormat:@"Card  = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
+	s = [s stringByAppendingString:(ptr[1]&0x1)?@"SIS3820\n":@"SIS3800\n"];
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];               
+	NSCalendarDate* date;	 
+	date= [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[2]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	s = [s stringByAppendingFormat:@"This Read: %@\n",date];
+	
+	date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[3]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	s = [s stringByAppendingFormat:@"Last Read: %@\n",date];
+		 
+	s = [s stringByAppendingFormat:@"Enabled  Mask: 0x%08x\n",ptr[4]];
+	s = [s stringByAppendingFormat:@"OverFlow Mask: 0x%08x\n",ptr[5]];
+	
+	s = [s stringByAppendingFormat:@"LemoInMod: %d\n",ShiftAndExtract(ptr[6],0,0x3)];
+	s = [s stringByAppendingFormat:@"25MHz Pulses Enabled: %@\n",ShiftAndExtract(ptr[6],3,0x1)?@"YES":@"NO"];
+	s = [s stringByAppendingFormat:@"Input Test Mode Enabled: %@\n",ShiftAndExtract(ptr[6],4,0x1)?@"YES":@"NO"];
+	s = [s stringByAppendingFormat:@"Ref Pulser Enabled: %@\n",ShiftAndExtract(ptr[6],5,0x1)?@"YES":@"NO"];
+	s = [s stringByAppendingFormat:@"Clear On Run Start: %@\n",ShiftAndExtract(ptr[6],6,0x1)?@"YES":@"NO"];
+	s = [s stringByAppendingFormat:@"Sync With Run Start: %@\n",ShiftAndExtract(ptr[6],7,0x1)?@"YES":@"NO"];
+
+	s = [s stringByAppendingString:@"Counts:\n"];
+	
+	int i;
+	for(i=0;i<32;i++){
+		s = [s stringByAppendingFormat:@"%2d: %u\n",i,ptr[7+i]];
+	}
+	
+
+    return s;               
 }
 
 @end

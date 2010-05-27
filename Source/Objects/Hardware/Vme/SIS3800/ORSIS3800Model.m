@@ -26,12 +26,19 @@
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
 
-NSString* ORSIS3800ModelLemoInModeChanged = @"ORSIS3800ModelLemoInModeChanged";
-NSString* ORSIS3800ModelCountEnableMaskChanged = @"ORSIS3800ModelCountEnableMaskChanged";
-NSString* ORSIS3800SettingsLock					= @"ORSIS3800SettingsLock";
-NSString* ORSIS3800ModelIDChanged				= @"ORSIS3800ModelIDChanged";
-NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
-
+NSString* ORSIS3800ModelIsCountingChanged			 = @"ORSIS3800ModelIsCountingChanged";
+NSString* ORSIS3800ModelSyncWithRunChanged			 = @"ORSIS3800ModelSyncWithRunChanged";
+NSString* ORSIS3800ModelClearOnRunStartChanged		 = @"ORSIS3800ModelClearOnRunStartChanged";
+NSString* ORSIS3800ModelEnableReferencePulserChanged = @"ORSIS3800ModelEnableReferencePulserChanged";
+NSString* ORSIS3800ModelEnableInputTestModeChanged	 = @"ORSIS3800ModelEnableInputTestModeChanged";
+NSString* ORSIS3800ModelEnable25MHzPulsesChanged	 = @"ORSIS3800ModelEnable25MHzPulsesChanged";
+NSString* ORSIS3800ModelLemoInModeChanged			 = @"ORSIS3800ModelLemoInModeChanged";
+NSString* ORSIS3800ModelCountEnableMaskChanged		 = @"ORSIS3800ModelCountEnableMaskChanged";
+NSString* ORSIS3800SettingsLock						 = @"ORSIS3800SettingsLock";
+NSString* ORSIS3800ModelIDChanged					 = @"ORSIS3800ModelIDChanged";
+NSString* ORSIS3800CountersChanged					 = @"ORSIS3800CountersChanged";
+NSString* ORSIS3800ModelOverFlowMaskChanged			 = @"ORSIS3800ModelOverFlowMaskChanged";
+NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 
 //general register offsets
 #define kControlStatus				0x00	
@@ -109,8 +116,15 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 #define kDisableIRQSource1			(1L<<29)
 #define kDisableIRQSource2			(1L<<30)
 
-@implementation ORSIS3800Model
 
+#define kSIS3800DataLen (7+32)
+
+@interface ORSIS3800Model (private)
+- (void) shipData;
+- (void) logTime;
+@end
+
+@implementation ORSIS3800Model
 
 #pragma mark ***Initialization
 - (id) init 
@@ -126,7 +140,8 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 
 - (void) dealloc 
 {
-    [super dealloc];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super dealloc];
 }
 
 - (void) setUpImage
@@ -151,6 +166,117 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 
 #pragma mark ***Accessors
 
+- (BOOL) isCounting
+{
+    return isCounting;
+}
+
+- (void) setIsCounting:(BOOL)aState
+{
+	if(aState != isCounting){
+		isCounting = aState;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelIsCountingChanged object:self];
+	}
+}
+
+- (BOOL) syncWithRun
+{
+    return syncWithRun;
+}
+
+- (void) setSyncWithRun:(BOOL)aSyncWithRun
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSyncWithRun:syncWithRun];
+    syncWithRun = aSyncWithRun;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelSyncWithRunChanged object:self];
+}
+
+- (BOOL) clearOnRunStart
+{
+    return clearOnRunStart;
+}
+
+- (void) setClearOnRunStart:(BOOL)aClearOnRunStart
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClearOnRunStart:clearOnRunStart];
+    clearOnRunStart = aClearOnRunStart;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelClearOnRunStartChanged object:self];
+}
+
+- (float) convertedPollTime
+{
+	//if you change this you have to change the popup in the dialog as well
+	float convertedPollTime[8] = {0,.5,1,2,5,10,20,60};
+	if(pollTime>=0 && pollTime<8){
+		return convertedPollTime[pollTime];
+	}
+	else return 0.0;
+}
+
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
+    pollTime = aPollTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800PollTimeChanged object:self];
+	
+	if(pollTime){
+		[self performSelector:@selector(timeToPoll) withObject:nil afterDelay:0];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeToPoll) object:nil];
+	}
+}
+
+- (void) timeToPoll
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeToPoll) object:nil];
+	[self readCounts:NO];
+	[self shipData];
+	
+	[self performSelector:@selector(timeToPoll) withObject:nil afterDelay:[self convertedPollTime]];
+}
+
+- (BOOL) enableReferencePulser
+{
+    return enableReferencePulser;
+}
+
+- (void) setEnableReferencePulser:(BOOL)aEnableReferencePulser
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnableReferencePulser:enableReferencePulser];
+    enableReferencePulser = aEnableReferencePulser;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelEnableReferencePulserChanged object:self];
+}
+
+- (BOOL) enableInputTestMode
+{
+    return enableInputTestMode;
+}
+
+- (void) setEnableInputTestMode:(BOOL)aEnableInputTestMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnableInputTestMode:enableInputTestMode];
+    enableInputTestMode = aEnableInputTestMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelEnableInputTestModeChanged object:self];
+}
+
+- (BOOL) enable25MHzPulses
+{
+    return enable25MHzPulses;
+}
+
+- (void) setEnable25MHzPulses:(BOOL)aEnable25MHzPulses
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnable25MHzPulses:enable25MHzPulses];
+    enable25MHzPulses = aEnable25MHzPulses;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelEnable25MHzPulsesChanged object:self];
+}
+
 - (int) lemoInMode
 {
     return lemoInMode;
@@ -159,9 +285,7 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 - (void) setLemoInMode:(int)aLemoInMode
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLemoInMode:lemoInMode];
-    
     lemoInMode = aLemoInMode;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelLemoInModeChanged object:self];
 }
 
@@ -174,7 +298,6 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 - (unsigned long) countEnableMask { return countEnableMask; }
 - (void) setCountEnableMask:(unsigned long)aCountEnableMask
 {
-	NSLog(@"0x%08x  new:0x%08x\n",countEnableMask, aCountEnableMask);
     [[[self undoManager] prepareWithInvocationTarget:self] setCountEnableMask:countEnableMask];
     countEnableMask = aCountEnableMask;
 	
@@ -189,6 +312,13 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 	if(aValue)aMask |= (1L<<chan);
 	else aMask &= ~(1L<<chan);
 	[self setCountEnableMask:aMask];
+}
+
+- (unsigned long) overFlowMask { return overFlowMask; }
+- (void) setOverFlowMask:(unsigned long)aMask
+{
+    overFlowMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelOverFlowMaskChanged object:self];
 }
 
 - (void) setDefaults
@@ -217,8 +347,11 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 	unsigned short version = (result >> 12) & 0xf;
 	if(verbose)NSLog(@"SIS3800 ID: %x  Version:%x\n",moduleID,version);
 	
+	[self readStatusRegister];
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelIDChanged object:self];
 }
+
 
 - (void) readStatusRegister
 {		
@@ -228,19 +361,26 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
                         numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+	[self setIsCounting: (aMask & kStatusGlobalCountEnable)==kStatusGlobalCountEnable ];
 }
 
 - (void) writeControlRegister
 {
 	unsigned long aMask = 0x0;
-			
+	aMask |= 
+	((lemoInMode & 0x3) << 2)			|  //the '1' bits set the mode bits
+	((~lemoInMode & 0x3) << 10)			|  //the '0' bits set the mode clr bits
+	((enable25MHzPulses & 0x1) << 4)	|
+	((~enable25MHzPulses & 0x1) << 12)	|
+	((enableInputTestMode & 0x1) << 5)	|
+	((~enableInputTestMode & 0x1) << 13);
+			  
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:[self baseAddress] + kControlStatus
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
-
 
 - (void) setLed:(BOOL)state
 {
@@ -257,18 +397,18 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 
 - (void) initBoard
 {  
-	[self reset];							//reset the card
-	[self writeControlRegister];		//set up Control/Status Register
+	[self reset];
+	[self writeControlRegister];
+	[self readStatusRegister];
+	[self enableReferencePulser:enableReferencePulser];
 }
 
-
-
-- (void) readAndClear
+- (void) readCounts:(BOOL)clear
 {
 	//To ensure synchronicity to 5ns read the first scaler from 0x300 and the rest from the shadow registers
 	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kReadAndClearAllCounters
+						atAddress:[self baseAddress] + (clear ? kReadAndClearAllCounters : kReadCounter)
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -282,29 +422,47 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 						usingAddSpace:0x01];
 		counts[i] = aValue;
 	}
+	[self readOverFlowRegisters];
+	
+	[self logTime];
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];
 
 }
 
-- (void) readNoClear
+- (void) readOverFlowRegisters
 {
+	unsigned long aMask = 0;
 	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kReadCounter
+						atAddress:[self baseAddress] + kOverflowReg1_8
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	counts[0] = aValue;
-	int i;
-	for(i=1;i<32;i++){
-		[[self adapter] readLongBlock:&aValue
-							atAddress:[self baseAddress] + + kReadShadowReg + (4*i)
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		counts[i] = aValue;
-	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];	
+	aMask |= (aValue&0xff000000)>>24;
+	
+	[[self adapter] readLongBlock:&aValue
+						atAddress:[self baseAddress] + kOverflowReg9_16
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	aMask |= (aValue & 0xff000000)<<16;
+	
+	[[self adapter] readLongBlock:&aValue
+						atAddress:[self baseAddress] + kOverflowReg17_24
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	aMask |= (aValue & 0xff000000)<<8;
+	
+	[[self adapter] readLongBlock:&aValue
+						atAddress:[self baseAddress] + kOverflowReg25_32
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	aMask |= (aValue & 0xff000000);
+	
+	[self setOverFlowMask:aMask];
 }
 
 - (void) clearCounter:(int)i
@@ -330,8 +488,8 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
-		counts[i] = 0;
 	}
+	[self readOverFlowRegisters];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];	
 }
 
@@ -424,8 +582,6 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-	int i;
-	for(i=24;i<32;i++)counts[i] = 0;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];	
 }
@@ -462,12 +618,12 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORSIS3800WaveformDecoder",            @"decoder",
-								 [NSNumber numberWithLong:dataId],       @"dataId",
-								 [NSNumber numberWithBool:YES],          @"variable",
-								 [NSNumber numberWithLong:-1],			 @"length",
+								 @"ORSIS3800DecoderForCounts",				@"decoder",
+								 [NSNumber numberWithLong:dataId],			@"dataId",
+								 [NSNumber numberWithBool:NO],				@"variable",
+								 [NSNumber numberWithLong:kSIS3800DataLen],	@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Waveform"];
+    [dataDictionary setObject:aDictionary forKey:@"Counts"];
     
     return dataDictionary;
 }
@@ -537,10 +693,15 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
     
     //cache some stuff
   	if(!moduleID)[self readModuleID:NO];
-  
+	lastTimeMeasured = 0;
 	[self reset];
     [self initBoard];
-	[self startCounting];
+	if([self clearOnRunStart]){
+		[self clearAll];
+	}
+	if([self syncWithRun]){
+		[self startCounting];
+	}
 	[self setLed:YES];
 	isRunning = NO;
 }
@@ -555,7 +716,9 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[self stopCounting];
+	if([self syncWithRun]){
+		[self stopCounting];
+	}
 	[self setLed:NO];
 }
 
@@ -595,6 +758,7 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+	[self readStatusRegister];
 }
 
 - (void) stopCounting
@@ -605,7 +769,9 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+	[self readStatusRegister];
 }
+
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -614,7 +780,13 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setSyncWithRun:[decoder decodeBoolForKey:@"syncWithRun"]];
+    [self setClearOnRunStart:[decoder decodeBoolForKey:@"clearOnRunStart"]];
+    [self setEnableReferencePulser:[decoder decodeBoolForKey:@"enableReferencePulser"]];
+    [self setEnableInputTestMode:[decoder decodeBoolForKey:@"enableInputTestMode"]];
+    [self setEnable25MHzPulses:[decoder decodeBoolForKey:@"enable25MHzPulses"]];
     [self setLemoInMode:[decoder decodeIntForKey:@"lemoInMode"]];
+    [self setPollTime:[decoder decodeIntForKey:@"pollTime"]];
     [self setCountEnableMask:[decoder decodeInt32ForKey:@"countEnableMask"]];
 
     [[self undoManager] enableUndoRegistration];
@@ -625,8 +797,57 @@ NSString* ORSIS3800CountersChanged				= @"ORSIS3800CountersChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:syncWithRun forKey:@"syncWithRun"];
+    [encoder encodeBool:clearOnRunStart forKey:@"clearOnRunStart"];
+    [encoder encodeBool:enableReferencePulser forKey:@"enableReferencePulser"];
+    [encoder encodeBool:enableInputTestMode forKey:@"enableInputTestMode"];
+    [encoder encodeBool:enable25MHzPulses forKey:@"enable25MHzPulses"];
     [encoder encodeInt:lemoInMode forKey:@"lemoInMode"];
+    [encoder encodeInt:pollTime forKey:@"pollTime"];
     [encoder encodeInt32:countEnableMask forKey:@"countEnableMask"];
 }
 
 @end
+
+@implementation ORSIS3800Model (private)
+- (void) logTime
+{
+	time_t	ut_Time;
+	time(&ut_Time);
+	lastTimeMeasured = timeMeasured;
+	timeMeasured = ut_Time;
+}
+
+- (void) shipData
+{
+	if([[ORGlobal sharedGlobal] runInProgress]){
+		
+		unsigned long data[kSIS3800DataLen];
+		data[0] = dataId | kSIS3800DataLen;
+		data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
+		if(moduleID == 3820)data[1] |= 1;
+		
+		data[2] = timeMeasured;
+		data[3] = lastTimeMeasured;
+		data[4] = countEnableMask;
+		data[5] = overFlowMask;
+		
+		data[6] =	
+			lemoInMode |
+			enable25MHzPulses<<3 |
+			enableInputTestMode<<4 |
+			enableReferencePulser<<5 |
+			clearOnRunStart<<6 |
+			syncWithRun<<7;
+		   
+		int i;
+		for(i=0;i<32;i++){
+			data[7+i] = counts[i];
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:&data length:sizeof(long)*kSIS3800DataLen]];
+	}
+}
+
+@end
+

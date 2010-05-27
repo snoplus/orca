@@ -33,13 +33,23 @@
 @interface ORSIS3800Model : ORVmeIOCard <ORDataTaker,ORHWWizard>
 {
   @private
+	int				pollTime;
 	BOOL			isRunning;
  	unsigned short	moduleID;
 	unsigned long   dataId;
 	unsigned long	counts[32];
-
+	unsigned long   timeMeasured;
+	unsigned long   lastTimeMeasured;
     unsigned long	countEnableMask;
+    unsigned long	overFlowMask;
+	
     int lemoInMode;
+    BOOL enable25MHzPulses;
+    BOOL enableInputTestMode;
+    BOOL enableReferencePulser;
+    BOOL clearOnRunStart;
+    BOOL syncWithRun;
+    BOOL isCounting;
 }
 
 - (id) init;
@@ -48,13 +58,31 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (BOOL) isCounting;
+- (void) setIsCounting:(BOOL)aIsCounting;
+- (BOOL) syncWithRun;
+- (void) setSyncWithRun:(BOOL)aSyncWithRun;
+- (BOOL) clearOnRunStart;
+- (void) setClearOnRunStart:(BOOL)aClearOnRunStart;
+- (float) convertedPollTime;
+- (int) pollTime;
+- (void) setPollTime:(int)aPollTime;
+- (BOOL) enableReferencePulser;
+- (void) setEnableReferencePulser:(BOOL)aEnableReferencePulser;
+- (BOOL) enableInputTestMode;
+- (void) setEnableInputTestMode:(BOOL)aEnableInputTestMode;
+- (BOOL) enable25MHzPulses;
+- (void) setEnable25MHzPulses:(BOOL)aEnable25MHzPulses;
 - (int) lemoInMode;
 - (void) setLemoInMode:(int)aLemoInMode;
 - (unsigned long) counts:(int)i;
 - (unsigned long) countEnableMask;
 - (void) setCountEnableMask:(unsigned long)aCountEnableMask;
 - (BOOL) countEnabled:(short)chan;
-- (void) setCountEnabled:(short)chan withValue:(BOOL)aValue;		
+- (void) setCountEnabled:(short)chan withValue:(BOOL)aValue;	
+- (unsigned long) overFlowMask;
+- (void) setOverFlowMask:(unsigned long)aMask;
+
 
 - (void) setDefaults;
 - (unsigned short) moduleID;
@@ -67,8 +95,7 @@
 - (void) setLed:(BOOL)state;
 - (void) startCounting;
 - (void) stopCounting;
-- (void) readNoClear;
-- (void) readAndClear;
+- (void) readCounts:(BOOL)clear;
 - (void) clearAll;
 - (void) clearCounter:(int)i;
 - (void) clearCounterGroup:(int)group;
@@ -79,6 +106,8 @@
 - (void) enableReferencePulser:(BOOL)state;
 - (void) generateTestPulse;
 - (void) clearOverFlowCounter:(int)i;
+- (void) readOverFlowRegisters;
+- (void) timeToPoll;
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
@@ -104,9 +133,17 @@
 
 @end
 
+extern NSString* ORSIS3800ModelIsCountingChanged;
+extern NSString* ORSIS3800ModelSyncWithRunChanged;
+extern NSString* ORSIS3800ModelClearOnRunStartChanged;
+extern NSString* ORSIS3800ModelEnableReferencePulserChanged;
+extern NSString* ORSIS3800ModelEnableInputTestModeChanged;
+extern NSString* ORSIS3800ModelEnable25MHzPulsesChanged;
 extern NSString* ORSIS3800ModelLemoInModeChanged;
 extern NSString* ORSIS3800ModelCountEnableMaskChanged;
 extern NSString* ORSIS3800SettingsLock;
 extern NSString* ORSIS3800ModelIDChanged;
 extern NSString* ORSIS3800CountersChanged;
+extern NSString* ORSIS3800ModelOverFlowMaskChanged;
+extern NSString* ORSIS3800PollTimeChanged;
 
