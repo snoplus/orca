@@ -688,6 +688,16 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	[objDictionary setObject:[NSNumber numberWithLong:countEnableMask] forKey:@"countEnableMask"];
+
+	unsigned long options =	
+		lemoInMode				 | 
+		enable25MHzPulses<<3	 | 
+		enableInputTestMode<<4	 |
+		enableReferencePulser<<5 |
+		clearOnRunStart<<6		 |
+		syncWithRun<<7;
+	
+	[objDictionary setObject:[NSNumber numberWithLong:options] forKey:@"options"];
 	
     return objDictionary;
 }
@@ -700,7 +710,6 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
     
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
-    
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSIS3800Model"];    
     
     //cache some stuff
@@ -718,12 +727,9 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 	isRunning = NO;
 }
 
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card
-//**************************************************************************************
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	//nothing to do for this card
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -736,20 +742,9 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id				= kSIS3800; //should be unique
-	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
-	configStruct->card_info[index].slot						= [self slot];
-	configStruct->card_info[index].crate					= [self crateNumber];
-	configStruct->card_info[index].add_mod					= [self addressModifier];
-	configStruct->card_info[index].base_add					= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= moduleID;
-	configStruct->card_info[index].num_Trigger_Indexes		= 0;
-	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
-	
-	return index+1;
+{	
+	//we don't let the SBC do anything so no point in loading a config
+	return index;
 }
 
 - (void) reset
