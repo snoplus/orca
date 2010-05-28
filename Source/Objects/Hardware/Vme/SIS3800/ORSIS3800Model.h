@@ -82,6 +82,7 @@
 - (void) setCountEnabled:(short)chan withValue:(BOOL)aValue;	
 - (unsigned long) overFlowMask;
 - (void) setOverFlowMask:(unsigned long)aMask;
+- (void) dumpCounts;
 
 
 - (void) setDefaults;

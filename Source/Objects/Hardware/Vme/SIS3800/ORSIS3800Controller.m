@@ -308,6 +308,7 @@
 	[readNow				setEnabled:!lockedOrRunningMaintenance];
 	[probeButton			setEnabled:!lockedOrRunningMaintenance];
 	[clearOverFlowButton	setEnabled:!lockedOrRunningMaintenance];
+	[resetButton			setEnabled:!locked && !runInProgress];
 }
 
 
@@ -471,6 +472,10 @@
         NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Init", @"OK", nil, nil,
                         localException);
     }
+}
+- (IBAction) dumpBoard:(id)sender
+{
+	[model dumpCounts];
 }
 
 - (IBAction) resetBoard:(id)sender

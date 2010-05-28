@@ -25,6 +25,8 @@
 #import "ORVmeCrateModel.h"
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
+#import "ORCommandList.h"
+#import "ORVmeReadWriteCommand.h"
 
 NSString* ORSIS3800ModelIsCountingChanged			 = @"ORSIS3800ModelIsCountingChanged";
 NSString* ORSIS3800ModelSyncWithRunChanged			 = @"ORSIS3800ModelSyncWithRunChanged";
@@ -122,6 +124,7 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 @interface ORSIS3800Model (private)
 - (void) shipData;
 - (void) logTime;
+- (void) executeCommandList:(ORCommandList*) aList;
 @end
 
 @implementation ORSIS3800Model
@@ -405,6 +408,32 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 
 - (void) readCounts:(BOOL)clear
 {
+	
+	ORCommandList* aList = [ORCommandList commandList];
+	int i;
+	for(i=0;i<32;i++){
+		if(i==0){
+			[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + (clear ? kReadAndClearAllCounters : kReadCounter)
+																   numToRead: 1
+																  withAddMod: [self addressModifier]
+															   usingAddSpace: 0x01]];
+		}
+		else {
+			[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + kReadShadowReg + (4*i)
+																   numToRead: 1
+																  withAddMod: [self addressModifier]
+															   usingAddSpace: 0x01]];
+		}
+	}
+	[self executeCommandList:aList];
+	
+	//if we get here, the results can retrieved in the same order as sent
+	for(i=0;i<32;i++){
+		counts[i] = [aList longValueForCmd:i];
+	}
+	[self readOverFlowRegisters];
+	
+	/*
 	//To ensure synchronicity to 5ns read the first scaler from 0x300 and the rest from the shadow registers
 	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
@@ -422,45 +451,54 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 						usingAddSpace:0x01];
 		counts[i] = aValue;
 	}
-	[self readOverFlowRegisters];
-	
+*/	
 	[self logTime];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];
 
 }
 
+
 - (void) readOverFlowRegisters
 {
 	unsigned long aMask = 0;
-	unsigned long aValue = 0;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kOverflowReg1_8
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	aMask |= (aValue&0xff000000)>>24;
 	
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kOverflowReg9_16
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	aMask |= (aValue & 0xff000000)<<16;
+	//consolidate some commands for speed. DON'T change the order unless you change the order of the extracted values as well
+	ORCommandList* aList = [ORCommandList commandList];
+	[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + kOverflowReg1_8 //cmd 0
+														   numToRead: 1
+														  withAddMod: [self addressModifier]
+													   usingAddSpace: 0x01]];
 	
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kOverflowReg17_24
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	aMask |= (aValue & 0xff000000)<<8;
+	[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + kOverflowReg9_16 //cmd1
+														   numToRead: 1
+														  withAddMod: [self addressModifier]
+													   usingAddSpace: 0x01]];
 	
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kOverflowReg25_32
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	aMask |= (aValue & 0xff000000);
+	[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + kOverflowReg17_24 //cmd2
+														   numToRead: 1
+														  withAddMod: [self addressModifier]
+													   usingAddSpace: 0x01]];
+	
+	[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + kOverflowReg25_32 //cmd3
+														   numToRead: 1
+														  withAddMod: [self addressModifier]
+													   usingAddSpace: 0x01]];
+
+	[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + kControlStatus //cmd4
+														   numToRead: 1
+														  withAddMod: [self addressModifier]
+													   usingAddSpace: 0x01]];
+	
+	[self executeCommandList:aList];
+
+	//if we get here we can extract the values from the result. Order is dependent on the order above
+	aMask |= ([aList longValueForCmd:0] & 0xff000000)>>24;
+	aMask |= ([aList longValueForCmd:1] & 0xff000000)<<16;
+	aMask |= ([aList longValueForCmd:2] & 0xff000000)<<8;
+	aMask |= ([aList longValueForCmd:3] & 0xff000000);
+	
+	[self setIsCounting: ([aList longValueForCmd:4] & kStatusGlobalCountEnable)==kStatusGlobalCountEnable ];
 	
 	[self setOverFlowMask:aMask];
 }
@@ -719,8 +757,10 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 		[self clearAll];
 	}
 	if([self syncWithRun]){
-		[self startCounting];
+		[self startCounting]; //also does initBoard
 	}
+	else [self initBoard]; 
+
 	[self setLed:YES];
 	isRunning = NO;
 }
@@ -757,6 +797,7 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 
 - (void) startCounting
 {
+	[self initBoard];
  	unsigned long aValue = 0; //value doesn't matter 
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kGlobalCountEnable
@@ -764,6 +805,7 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	[self readStatusRegister];
+	[self timeToPoll];
 }
 
 - (void) stopCounting
@@ -777,6 +819,15 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 	[self readStatusRegister];
 }
 
+- (void) dumpCounts
+{
+	NSFont* aFont =[NSFont fontWithName:@"Monaco" size:11];
+	NSLogFont(aFont, @"SIS3800,%d,%d Scaler Counts\n",[self crateNumber],[self slot]);
+	int i;
+	for(i=0;i<32;i++){
+		NSLogFont(aFont, @"%2d : %11u\n",i,counts[i]);
+	}
+}
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -852,6 +903,11 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 															object:[NSData dataWithBytes:&data length:sizeof(long)*kSIS3800DataLen]];
 	}
+}
+
+- (void) executeCommandList:(ORCommandList*) aList
+{
+	[[self adapter] executeCommandList:aList];
 }
 
 @end

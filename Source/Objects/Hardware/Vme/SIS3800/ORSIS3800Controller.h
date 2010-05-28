@@ -75,6 +75,7 @@
     IBOutlet NSButton*      probeButton;
     IBOutlet NSButton*      clearOverFlowButton;
     IBOutlet NSButton*      resetButton;
+    IBOutlet NSButton*      dumpButton;
 	
 }
 
@@ -103,6 +104,7 @@
 #pragma mark •••Actions
 - (IBAction) resetBoard:(id)sender;
 - (IBAction) initBoard:(id)sender;
+- (IBAction) dumpBoard:(id)sender;
 
 - (IBAction) syncWithRunAction:(id)sender;
 - (IBAction) clearOnRunStartAction:(id)sender;
