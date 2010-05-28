@@ -467,8 +467,23 @@
         
     }
 	@catch(NSException* localException) {
-        NSLog(@"Reset and Init of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Reset and Init", @"OK", nil, nil,
+        NSLog(@"Init of SIS3800 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Init", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) resetBoard:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model reset];
+        NSLog(@"Reset SIS3800 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    }
+	@catch(NSException* localException) {
+        NSLog(@"Reset of SIS3800 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Reset", @"OK", nil, nil,
                         localException);
     }
 }

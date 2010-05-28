@@ -74,6 +74,7 @@
     IBOutlet NSButton*      readAndClearButton;
     IBOutlet NSButton*      probeButton;
     IBOutlet NSButton*      clearOverFlowButton;
+    IBOutlet NSButton*      resetButton;
 	
 }
 
@@ -100,6 +101,9 @@
 
 
 #pragma mark •••Actions
+- (IBAction) resetBoard:(id)sender;
+- (IBAction) initBoard:(id)sender;
+
 - (IBAction) syncWithRunAction:(id)sender;
 - (IBAction) clearOnRunStartAction:(id)sender;
 - (IBAction) enableReferencePulserAction:(id)sender;
@@ -113,7 +117,6 @@
 
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
-- (IBAction) initBoard:(id)sender;
 - (IBAction) probeBoardAction:(id)sender;
 - (IBAction) readNoClear:(id)sender;
 - (IBAction) readAndClear:(id)sender;

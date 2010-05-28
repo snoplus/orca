@@ -397,7 +397,6 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 
 - (void) initBoard
 {  
-	[self reset];
 	[self writeControlRegister];
 	[self writeCountEnableMask];
 	[self readStatusRegister];
@@ -715,7 +714,6 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
     //cache some stuff
   	if(!moduleID)[self readModuleID:NO];
 	lastTimeMeasured = 0;
-	[self reset];
     [self initBoard];
 	if([self clearOnRunStart]){
 		[self clearAll];
