@@ -22,6 +22,8 @@
 #import "ORSqlModel.h"
 #import "ORRunModel.h"
 #import "OR1DHisto.h"
+#import "ORSqlConnection.h"
+#import "ORSqlResult.h"
 
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
 NSString* ORSqlPasswordChanged		= @"ORSqlPasswordChanged";
@@ -241,9 +243,25 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	return connected;
 }
 
--(BOOL) connect
+- (BOOL) connect
 {
-	conn = mysql_init (NULL);  /* allocate, initialize connection handler */
+	
+	ORSqlConnection* testCon = [[ORSqlConnection alloc] init];
+	if([testCon connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
+		NSLog(@"new connection works\n");
+		ORSqlResult* r = [testCon queryString:@"select * from machines"];
+		while (1){
+			id d = [r fetchRowAsDictionary];
+			if(!d)break;
+			NSLog(@"%@\n",d);
+		}
+		[testCon release];
+	}
+	else NSLog(@"test failed\n");
+
+	
+	
+	conn = mysql_init (NULL);
 	
 	if (conn == nil){
 		NSLog(@"ORSql: mysql_init() failed\n");
@@ -266,7 +284,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[self use:dataBaseName];
 		[self postMachineName];
 		NSLog(@"%@\n",[self tables]);
-		//NSLog(@"%@\n",[self machines]);
 	}
 	return YES;     /* connection is established */
 }
