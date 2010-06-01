@@ -1055,6 +1055,14 @@
 		84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
 		8457BDF511B001F600C4082D /* ORSqlConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BDF311B001F600C4082D /* ORSqlConnection.h */; };
 		8457BDF611B001F600C4082D /* ORSqlConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BDF411B001F600C4082D /* ORSqlConnection.m */; };
+		8457BE3511B0183500C4082D /* ORSIS3820Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */; };
+		8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */; };
+		8457BE3711B0183500C4082D /* ORSIS3820Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */; };
+		8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BE3011B0183500C4082D /* ORSIS3820Decoders.m */; };
+		8457BE3911B0183500C4082D /* ORSIS3820Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE3111B0183500C4082D /* ORSIS3820Model.h */; };
+		8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BE3211B0183500C4082D /* ORSIS3820Model.m */; };
+		8457BE3B11B0183500C4082D /* SIS3820.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8457BE3311B0183500C4082D /* SIS3820.nib */; };
+		8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8457BE3411B0183500C4082D /* SIS3820Card.gif */; };
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
@@ -3294,6 +3302,14 @@
 		84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN965Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.hh; sourceTree = SOURCE_ROOT; };
 		8457BDF311B001F600C4082D /* ORSqlConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSqlConnection.h; path = "Source/Objects/Misc Objects/SQL/ORSqlConnection.h"; sourceTree = SOURCE_ROOT; };
 		8457BDF411B001F600C4082D /* ORSqlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSqlConnection.m; path = "Source/Objects/Misc Objects/SQL/ORSqlConnection.m"; sourceTree = SOURCE_ROOT; };
+		8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Controller.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.h; sourceTree = SOURCE_ROOT; };
+		8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3820Controller.m; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.m; sourceTree = SOURCE_ROOT; };
+		8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Decoders.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Decoders.h; sourceTree = SOURCE_ROOT; };
+		8457BE3011B0183500C4082D /* ORSIS3820Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3820Decoders.m; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Decoders.m; sourceTree = SOURCE_ROOT; };
+		8457BE3111B0183500C4082D /* ORSIS3820Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Model.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Model.h; sourceTree = SOURCE_ROOT; };
+		8457BE3211B0183500C4082D /* ORSIS3820Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3820Model.m; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Model.m; sourceTree = SOURCE_ROOT; };
+		8457BE3311B0183500C4082D /* SIS3820.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SIS3820.nib; path = Source/Objects/Hardware/Vme/SIS3820/SIS3820.nib; sourceTree = SOURCE_ROOT; };
+		8457BE3411B0183500C4082D /* SIS3820Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3820Card.gif; path = Source/Objects/Hardware/Vme/SIS3820/SIS3820Card.gif; sourceTree = SOURCE_ROOT; };
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
@@ -6736,6 +6752,22 @@
 			path = "Source/Objects/Data Processing/Listener";
 			sourceTree = SOURCE_ROOT;
 		};
+		8457BE2C11B0183500C4082D /* SIS3820 */ = {
+			isa = PBXGroup;
+			children = (
+				8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */,
+				8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */,
+				8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */,
+				8457BE3011B0183500C4082D /* ORSIS3820Decoders.m */,
+				8457BE3111B0183500C4082D /* ORSIS3820Model.h */,
+				8457BE3211B0183500C4082D /* ORSIS3820Model.m */,
+				8457BE3311B0183500C4082D /* SIS3820.nib */,
+				8457BE3411B0183500C4082D /* SIS3820Card.gif */,
+			);
+			name = SIS3820;
+			path = Source/Objects/Hardware/Vme/SIS3820;
+			sourceTree = SOURCE_ROOT;
+		};
 		84662A63070A3231001CDA7E /* BiStateView */ = {
 			isa = PBXGroup;
 			children = (
@@ -9992,6 +10024,7 @@
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 				844445FE0E815C0D00A1440D /* XYCom200 */,
 				84E2063C11AD7841007D757F /* SIS3800 */,
+				8457BE2C11B0183500C4082D /* SIS3820 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
 				84D34AFB10B1D6C90013473E /* SIS3302 */,
 				84FA6383102B041800B426A6 /* SIS3350 */,
@@ -11000,6 +11033,9 @@
 				84E2064911AD7841007D757F /* ORSIS3800Model.h in Headers */,
 				8496AF2A11AF39A100A89F1C /* ORSqlResult.h in Headers */,
 				8457BDF511B001F600C4082D /* ORSqlConnection.h in Headers */,
+				8457BE3511B0183500C4082D /* ORSIS3820Controller.h in Headers */,
+				8457BE3711B0183500C4082D /* ORSIS3820Decoders.h in Headers */,
+				8457BE3911B0183500C4082D /* ORSIS3820Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11697,6 +11733,8 @@
 				84762046118CD53D00016A8D /* yAxisMarkerOpposite.gif in Resources */,
 				84E2064B11AD7841007D757F /* SIS3800.nib in Resources */,
 				84E2064C11AD7841007D757F /* SIS3800Card.gif in Resources */,
+				8457BE3B11B0183500C4082D /* SIS3820.nib in Resources */,
+				8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12490,6 +12528,9 @@
 				84E2064A11AD7841007D757F /* ORSIS3800Model.m in Sources */,
 				8496AF2B11AF39A100A89F1C /* ORSqlResult.m in Sources */,
 				8457BDF611B001F600C4082D /* ORSqlConnection.m in Sources */,
+				8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */,
+				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
+				8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
