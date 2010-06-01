@@ -28,6 +28,9 @@
 #import "ORCommandList.h"
 #import "ORVmeReadWriteCommand.h"
 
+NSString* ORSIS3800ModelShowDeadTimeChanged			 = @"ORSIS3800ModelShowDeadTimeChanged";
+NSString* ORSIS3800ModelDeadTimeRefChannelChanged	 = @"ORSIS3800ModelDeadTimeRefChannelChanged";
+NSString* ORSIS3800ModelShipAtRunEndOnlyChanged		 = @"ORSIS3800ModelShipAtRunEndOnlyChanged";
 NSString* ORSIS3800ModelIsCountingChanged			 = @"ORSIS3800ModelIsCountingChanged";
 NSString* ORSIS3800ModelSyncWithRunChanged			 = @"ORSIS3800ModelSyncWithRunChanged";
 NSString* ORSIS3800ModelClearOnRunStartChanged		 = @"ORSIS3800ModelClearOnRunStartChanged";
@@ -41,6 +44,7 @@ NSString* ORSIS3800ModelIDChanged					 = @"ORSIS3800ModelIDChanged";
 NSString* ORSIS3800CountersChanged					 = @"ORSIS3800CountersChanged";
 NSString* ORSIS3800ModelOverFlowMaskChanged			 = @"ORSIS3800ModelOverFlowMaskChanged";
 NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
+NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
 
 //general register offsets
 #define kControlStatus				0x00	
@@ -144,6 +148,8 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 - (void) dealloc 
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	int i;
+	if(i>=0 && i<32) [channelName[i] release];
 	[super dealloc];
 }
 
@@ -168,6 +174,74 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 }
 
 #pragma mark ***Accessors
+- (BOOL) showDeadTime
+{
+    return showDeadTime;
+}
+
+- (void) setShowDeadTime:(BOOL)aShowDeadTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowDeadTime:showDeadTime];
+    
+    showDeadTime = aShowDeadTime;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelShowDeadTimeChanged object:self];
+}
+
+- (int) deadTimeRefChannel
+{
+    return deadTimeRefChannel;
+}
+
+- (void) setDeadTimeRefChannel:(int)aDeadTimeRefChannel
+{
+	if(aDeadTimeRefChannel<=0)aDeadTimeRefChannel = 0;
+	else if(aDeadTimeRefChannel>31)aDeadTimeRefChannel=31;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDeadTimeRefChannel:deadTimeRefChannel];
+    
+    deadTimeRefChannel = aDeadTimeRefChannel;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelDeadTimeRefChannelChanged object:self];
+}
+
+- (NSString*) channelName:(int)i
+{
+	if(i>=0 && i<32){
+		if([channelName[i] length])return channelName[i];
+		else return [NSString stringWithFormat:@"Channel %2d",i];
+	}
+	else return @"";
+}
+
+- (void) setChannel:(int)i name:(NSString*)aName
+{
+	if(i>=0 && i<32){
+		[[[self undoManager] prepareWithInvocationTarget:self] setChannel:i name:channelName[i]];
+		
+		[channelName[i] autorelease];
+		channelName[i] = [aName copy]; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ChannelNameChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (BOOL) shipAtRunEndOnly
+{
+    return shipAtRunEndOnly;
+}
+
+- (void) setShipAtRunEndOnly:(BOOL)aShipAtRunEndOnly
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipAtRunEndOnly:shipAtRunEndOnly];
+    
+    shipAtRunEndOnly = aShipAtRunEndOnly;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelShipAtRunEndOnlyChanged object:self];
+}
 
 - (BOOL) isCounting
 {
@@ -241,7 +315,9 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 	[self readCounts:NO];
 	[self shipData];
 	
-	[self performSelector:@selector(timeToPoll) withObject:nil afterDelay:[self convertedPollTime]];
+	if(pollTime>0){
+		[self performSelector:@selector(timeToPoll) withObject:nil afterDelay:[self convertedPollTime]];
+	}
 }
 
 - (BOOL) enableReferencePulser
@@ -349,7 +425,8 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 	moduleID = result >> 16;
 	unsigned short version = (result >> 12) & 0xf;
 	if(verbose)NSLog(@"SIS3800 ID: %x  Version:%x\n",moduleID,version);
-	
+	if(moduleID != 3800)NSLogColor([NSColor redColor],@"Slot %d has a %d but you are using a SIS3800 object.\n",[self slot],moduleID);
+	   
 	[self readStatusRegister];
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800ModelIDChanged object:self];
@@ -433,25 +510,6 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 	}
 	[self readOverFlowRegisters];
 	
-	/*
-	//To ensure synchronicity to 5ns read the first scaler from 0x300 and the rest from the shadow registers
-	unsigned long aValue = 0;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + (clear ? kReadAndClearAllCounters : kReadCounter)
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	counts[0] = aValue;
-	int i;
-	for(i=1;i<32;i++){
-		[[self adapter] readLongBlock:&aValue
-							atAddress:[self baseAddress] + kReadShadowReg + (4*i)
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		counts[i] = aValue;
-	}
-*/	
 	[self logTime];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];
@@ -643,8 +701,6 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3800CountersChanged object:self];	
 }
 
 #pragma mark •••Data Taker
@@ -763,6 +819,7 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 
 	[self setLed:YES];
 	isRunning = NO;
+	endOfRun = NO;
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -775,6 +832,8 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 	if([self syncWithRun]){
 		[self stopCounting];
 	}
+	endOfRun = YES;
+	[self timeToPoll];
 	[self setLed:NO];
 }
 
@@ -793,6 +852,8 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+	[self readStatusRegister];
+
 }
 
 - (void) startCounting
@@ -836,6 +897,9 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setShowDeadTime:[decoder decodeBoolForKey:@"showDeadTime"]];
+    [self setDeadTimeRefChannel:[decoder decodeIntForKey:@"deadTimeRefChannel"]];
+    [self setShipAtRunEndOnly:[decoder decodeBoolForKey:@"shipAtRunEndOnly"]];
     [self setSyncWithRun:[decoder decodeBoolForKey:@"syncWithRun"]];
     [self setClearOnRunStart:[decoder decodeBoolForKey:@"clearOnRunStart"]];
     [self setEnableReferencePulser:[decoder decodeBoolForKey:@"enableReferencePulser"]];
@@ -844,7 +908,12 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
     [self setLemoInMode:[decoder decodeIntForKey:@"lemoInMode"]];
     [self setPollTime:[decoder decodeIntForKey:@"pollTime"]];
     [self setCountEnableMask:[decoder decodeInt32ForKey:@"countEnableMask"]];
-
+	int i;
+	for(i=0;i<32;i++) {
+		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelName%d",i]];
+		if(aName)[self setChannel:i name:aName];
+		else [self setChannel:i name:[NSString stringWithFormat:@"Channel %2d",i]];
+	}
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -853,6 +922,9 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeBool:showDeadTime forKey:@"showDeadTime"];
+	[encoder encodeInt:deadTimeRefChannel forKey:@"deadTimeRefChannel"];
+    [encoder encodeBool:shipAtRunEndOnly forKey:@"shipAtRunEndOnly"];
     [encoder encodeBool:syncWithRun forKey:@"syncWithRun"];
     [encoder encodeBool:clearOnRunStart forKey:@"clearOnRunStart"];
     [encoder encodeBool:enableReferencePulser forKey:@"enableReferencePulser"];
@@ -861,6 +933,10 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
     [encoder encodeInt:lemoInMode forKey:@"lemoInMode"];
     [encoder encodeInt:pollTime forKey:@"pollTime"];
     [encoder encodeInt32:countEnableMask forKey:@"countEnableMask"];
+	int i;
+	for(i=0;i<32;i++) {
+		[encoder encodeObject:channelName[i] forKey:[NSString stringWithFormat:@"channelName%d",i]];
+	}
 }
 
 @end
@@ -870,38 +946,40 @@ NSString* ORSIS3800PollTimeChanged					 = @"ORSIS3800PollTimeChanged";
 {
 	time_t	ut_Time;
 	time(&ut_Time);
-	lastTimeMeasured = timeMeasured;
 	timeMeasured = ut_Time;
 }
 
 - (void) shipData
 {
 	if([[ORGlobal sharedGlobal] runInProgress]){
-		
-		unsigned long data[kSIS3800DataLen];
-		data[0] = dataId | kSIS3800DataLen;
-		data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
-		if(moduleID == 3820)data[1] |= 1;
-		
-		data[2] = timeMeasured;
-		data[3] = lastTimeMeasured;
-		data[4] = countEnableMask;
-		data[5] = overFlowMask;
-		
-		data[6] =	
-			lemoInMode |
-			enable25MHzPulses<<3 |
-			enableInputTestMode<<4 |
-			enableReferencePulser<<5 |
-			clearOnRunStart<<6 |
-			syncWithRun<<7;
-		   
-		int i;
-		for(i=0;i<32;i++){
-			data[7+i] = counts[i];
+		if(!shipAtRunEndOnly || endOfRun){
+			endOfRun = NO;
+			unsigned long data[kSIS3800DataLen];
+			data[0] = dataId | kSIS3800DataLen;
+			data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
+			if(moduleID == 3820)data[1] |= 1;
+			
+			data[2] = timeMeasured;
+			data[3] = lastTimeMeasured;
+			data[4] = countEnableMask;
+			data[5] = overFlowMask;
+			
+			data[6] =	
+				lemoInMode |
+				enable25MHzPulses<<3 |
+				enableInputTestMode<<4 |
+				enableReferencePulser<<5 |
+				clearOnRunStart<<6 |
+				syncWithRun<<7;
+			   
+			int i;
+			for(i=0;i<32;i++){
+				data[7+i] = counts[i];
+			}
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:&data length:sizeof(long)*kSIS3800DataLen]];
+			lastTimeMeasured = timeMeasured;
 		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*kSIS3800DataLen]];
 	}
 }
 

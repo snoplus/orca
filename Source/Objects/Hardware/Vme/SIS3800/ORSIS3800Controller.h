@@ -28,6 +28,9 @@
 @interface ORSIS3800Controller : OrcaObjectController 
 {
 	IBOutlet NSPopUpButton* pollTimePU;
+	IBOutlet NSMatrix*		showDeadTimeMatrix;
+	IBOutlet NSTextField*	deadTimeRefChannelField;
+	IBOutlet NSButton*		shipAtRunEndOnlyCB;
 	IBOutlet NSButton*		syncWithRunButton;
 	IBOutlet NSButton*		clearOnRunStartButton;
 	IBOutlet NSPopUpButton* lemoInModePU;
@@ -38,13 +41,12 @@
 	
 	IBOutlet NSMatrix*		countEnableMatrix0;
 	IBOutlet NSMatrix*		countEnableMatrix1;
-	IBOutlet NSMatrix*		countEnableMatrix2;
-	IBOutlet NSMatrix*		countEnableMatrix3;
 
 	IBOutlet NSMatrix*		countMatrix0;
 	IBOutlet NSMatrix*		countMatrix1;
-	IBOutlet NSMatrix*		countMatrix2;
-	IBOutlet NSMatrix*		countMatrix3;
+	
+	IBOutlet NSMatrix*		nameMatrix0;
+	IBOutlet NSMatrix*		nameMatrix1;
 	
 	//base address
     IBOutlet NSTextField*   slotField;
@@ -56,13 +58,9 @@
     IBOutlet NSButton*      initButton;
     IBOutlet NSButton*      enableAllInGroupButton0;
     IBOutlet NSButton*      enableAllInGroupButton1;
-    IBOutlet NSButton*      enableAllInGroupButton2;
-    IBOutlet NSButton*      enableAllInGroupButton3;
 	
     IBOutlet NSButton*      disableAllInGroupButton0;
     IBOutlet NSButton*      disableAllInGroupButton1;
-    IBOutlet NSButton*      disableAllInGroupButton2;
-    IBOutlet NSButton*      disableAllInGroupButton3;
 	
     IBOutlet NSButton*      disableAllButton;
     IBOutlet NSButton*      enableAllButton;
@@ -77,6 +75,10 @@
     IBOutlet NSButton*      resetButton;
     IBOutlet NSButton*      dumpButton;
 	
+	IBOutlet NSTextField*	pollDescriptionTextField;
+	IBOutlet NSTextField*	count0DisplayTypeTextField;
+	IBOutlet NSTextField*	count1DisplayTypeTextField;
+
 }
 
 - (id)   init;
@@ -84,6 +86,9 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) showDeadTimeChanged:(NSNotification*)aNote;
+- (void) deadTimeRefChannelChanged:(NSNotification*)aNote;
+- (void) shipAtRunEndOnlyChanged:(NSNotification*)aNote;
 - (void) isCountingChanged:(NSNotification*)aNote;
 - (void) syncWithRunChanged:(NSNotification*)aNote;
 - (void) clearOnRunStartChanged:(NSNotification*)aNote;
@@ -99,9 +104,13 @@
 - (void) moduleIDChanged:(NSNotification*)aNote;
 - (void) countersChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) channelNameChanged:(NSNotification*)aNote;
 
 
 #pragma mark •••Actions
+- (IBAction) showDeadTimeAction:(id)sender;
+- (IBAction) deadTimeRefChannelAction:(id)sender;
+- (IBAction) shipAtRunEndOnlyAction:(id)sender;
 - (IBAction) resetBoard:(id)sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) dumpBoard:(id)sender;
@@ -114,8 +123,6 @@
 - (IBAction) lemoInModeAction:(id)sender;
 - (IBAction) countEnableMask1Action:(id)sender;
 - (IBAction) countEnableMask2Action:(id)sender;
-- (IBAction) countEnableMask3Action:(id)sender;
-- (IBAction) countEnableMask4Action:(id)sender;
 
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
@@ -131,5 +138,6 @@
 - (IBAction) startAction:(id)sender;
 - (IBAction) stopAction:(id)sender;
 - (IBAction) clearAllOverFlowFlags:(id)sender;
+- (IBAction) channelNameAction:(id)sender;
 
 @end

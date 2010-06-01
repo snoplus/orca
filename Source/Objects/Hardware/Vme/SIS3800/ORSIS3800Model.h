@@ -38,6 +38,7 @@
  	unsigned short	moduleID;
 	unsigned long   dataId;
 	unsigned long	counts[32];
+	NSString*		channelName[32];
 	unsigned long   timeMeasured;
 	unsigned long   lastTimeMeasured;
     unsigned long	countEnableMask;
@@ -50,6 +51,10 @@
     BOOL clearOnRunStart;
     BOOL syncWithRun;
     BOOL isCounting;
+    BOOL shipAtRunEndOnly;
+	BOOL endOfRun;
+    int deadTimeRefChannel;
+    BOOL showDeadTime;
 }
 
 - (id) init;
@@ -58,6 +63,14 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (BOOL) showDeadTime;
+- (void) setShowDeadTime:(BOOL)aShowDeadTime;
+- (int) deadTimeRefChannel;
+- (void) setDeadTimeRefChannel:(int)aDeadTimeRefChannel;
+- (NSString*) channelName:(int)i;
+- (void) setChannel:(int)i name:(NSString*)aName;
+- (BOOL) shipAtRunEndOnly;
+- (void) setShipAtRunEndOnly:(BOOL)aShipAtRunEndOnly;
 - (BOOL) isCounting;
 - (void) setIsCounting:(BOOL)aIsCounting;
 - (BOOL) syncWithRun;
@@ -135,6 +148,9 @@
 
 @end
 
+extern NSString* ORSIS3800ModelShowDeadTimeChanged;
+extern NSString* ORSIS3800ModelDeadTimeRefChannelChanged;
+extern NSString* ORSIS3800ModelShipAtRunEndOnlyChanged;
 extern NSString* ORSIS3800ModelIsCountingChanged;
 extern NSString* ORSIS3800ModelSyncWithRunChanged;
 extern NSString* ORSIS3800ModelClearOnRunStartChanged;
@@ -148,4 +164,5 @@ extern NSString* ORSIS3800ModelIDChanged;
 extern NSString* ORSIS3800CountersChanged;
 extern NSString* ORSIS3800ModelOverFlowMaskChanged;
 extern NSString* ORSIS3800PollTimeChanged;
+extern NSString* ORSIS3800ChannelNameChanged;
 

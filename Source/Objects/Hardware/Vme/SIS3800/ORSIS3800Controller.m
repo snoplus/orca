@@ -25,7 +25,6 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"SIS3800"];
-    
     return self;
 }
 
@@ -37,15 +36,18 @@
 - (void) awakeFromNib
 {
 	short i;
-	for(i=0;i<8;i++){	
+	for(i=0;i<16;i++){	
 		[[countEnableMatrix0 cellAtRow:i column:0] setTag:i];
-		[[countEnableMatrix1 cellAtRow:i column:0] setTag:i+8];
-		[[countEnableMatrix2 cellAtRow:i column:0] setTag:i+16];
-		[[countEnableMatrix3 cellAtRow:i column:0] setTag:i+24];
+		[[countEnableMatrix1 cellAtRow:i column:0] setTag:i+16];
 		[[countMatrix0 cellAtRow:i column:0] setTag:i];
-		[[countMatrix1 cellAtRow:i column:0] setTag:i+8];
-		[[countMatrix2 cellAtRow:i column:0] setTag:i+16];
-		[[countMatrix3 cellAtRow:i column:0] setTag:i+24];
+		[[countMatrix1 cellAtRow:i column:0] setTag:i+16];
+		[[nameMatrix0 cellAtRow:i column:0] setEditable:YES];
+		[[nameMatrix1 cellAtRow:i column:0] setEditable:YES];
+		[[nameMatrix0 cellAtRow:i column:0] setTag:i];
+		[[nameMatrix1 cellAtRow:i column:0] setTag:i+16];
+		[[nameMatrix0 cellAtRow:i column:0] setFocusRingType:NSFocusRingTypeNone];
+		[[nameMatrix1 cellAtRow:i column:0] setFocusRingType:NSFocusRingTypeNone];
+		
 	}
 	
 	[super awakeFromNib];
@@ -137,7 +139,25 @@
                          name : ORSIS3800ModelIsCountingChanged
 						object: model];
 
-}
+    [notifyCenter addObserver : self
+                     selector : @selector(shipAtRunEndOnlyChanged:)
+                         name : ORSIS3800ModelShipAtRunEndOnlyChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(channelNameChanged:)
+                         name : ORSIS3800ChannelNameChanged
+						object: model];	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(deadTimeRefChannelChanged:)
+                         name : ORSIS3800ModelDeadTimeRefChannelChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(showDeadTimeChanged:)
+                         name : ORSIS3800ModelShowDeadTimeChanged
+						object: model];}
 
 - (void) updateWindow
 {
@@ -157,9 +177,58 @@
 	[self clearOnRunStartChanged:nil];
 	[self syncWithRunChanged:nil];
 	[self isCountingChanged:nil];
+	[self shipAtRunEndOnlyChanged:nil];
+	[self channelNameChanged:nil];
+	[self deadTimeRefChannelChanged:nil];
+	[self showDeadTimeChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) showDeadTimeChanged:(NSNotification*)aNote
+{
+	[showDeadTimeMatrix selectCellWithTag: [model showDeadTime]];
+	[count0DisplayTypeTextField setStringValue:[model showDeadTime]?@"Live Time (%)":@"Counts"];
+	[count1DisplayTypeTextField setStringValue:[model showDeadTime]?@"Live Time (%)":@"Counts"];
+	[self countersChanged:nil];
+}
+
+- (void) deadTimeRefChannelChanged:(NSNotification*)aNote
+{
+	[deadTimeRefChannelField setIntValue: [model deadTimeRefChannel]];
+	[self countersChanged:nil];
+}
+
+- (void) channelNameChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<16;i++){
+			[[nameMatrix0 cellWithTag:i] setStringValue:[model channelName:i]];
+			[[nameMatrix1 cellWithTag:i+16] setStringValue:[model channelName:i+16]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
+		if(chan<16){
+			[[nameMatrix0 cellWithTag:chan] setStringValue:[model channelName:chan]];
+		}
+		else {
+			[[nameMatrix1 cellWithTag:chan] setStringValue:[model channelName:chan]];
+		}
+	}
+}
+
+- (void) updatePollDescription
+{
+	if([model shipAtRunEndOnly]) [pollDescriptionTextField setStringValue:@"Data shipped at run end ONLY"];
+	else						 [pollDescriptionTextField setStringValue:@"Data shipped at every poll"];
+}
+
+- (void) shipAtRunEndOnlyChanged:(NSNotification*)aNote
+{
+	[shipAtRunEndOnlyCB setIntValue: [model shipAtRunEndOnly]];
+	[self updatePollDescription];
+}
 
 - (void) isCountingChanged:(NSNotification*)aNote
 {
@@ -181,18 +250,12 @@
 	NSColor* red = [NSColor colorWithCalibratedRed:.8 green:0 blue:0 alpha:1];
 	unsigned long aMask = [model overFlowMask];
 	int i;
-	for(i=0;i<8;i++){
+	for(i=0;i<16;i++){
 		if(aMask & (0x00000001<<i))	[[countMatrix0 cellWithTag:i] setTextColor:red];
 		else						[[countMatrix0 cellWithTag:i] setTextColor:[NSColor blackColor]];
 		
-		if(aMask & (0x00000100<<i))	[[countMatrix1 cellWithTag:i+8] setTextColor:red];
-		else						[[countMatrix1 cellWithTag:i+8] setTextColor:[NSColor blackColor]];
-		
-		if(aMask & (0x00010000<<i))	[[countMatrix2 cellWithTag:i+16] setTextColor:red];
-		else						[[countMatrix2 cellWithTag:i+16] setTextColor:[NSColor blackColor]];
-
-		if(aMask & (0x01000000<<i))	[[countMatrix3 cellWithTag:i+24] setTextColor:red];
-		else						[[countMatrix3 cellWithTag:i+24] setTextColor:[NSColor blackColor]];
+		if(aMask & (0x00010000<<i))	[[countMatrix1 cellWithTag:i+16] setTextColor:red];
+		else						[[countMatrix1 cellWithTag:i+16] setTextColor:[NSColor blackColor]];
 	}
 }
 
@@ -285,18 +348,12 @@
 	
     [countEnableMatrix0	 setEnabled:!locked && !runInProgress];
     [countEnableMatrix1	 setEnabled:!locked && !runInProgress];
-    [countEnableMatrix2	 setEnabled:!locked && !runInProgress];
-    [countEnableMatrix3	 setEnabled:!locked && !runInProgress];
 	
     [enableAllInGroupButton0	setEnabled:!locked && !runInProgress];
     [enableAllInGroupButton1	setEnabled:!locked && !runInProgress];
-    [enableAllInGroupButton2	setEnabled:!locked && !runInProgress];
-    [enableAllInGroupButton3	setEnabled:!locked && !runInProgress];
 	
 	[disableAllInGroupButton0	 setEnabled:!locked && !runInProgress];
     [disableAllInGroupButton1	 setEnabled:!locked && !runInProgress];
-    [disableAllInGroupButton2	 setEnabled:!locked && !runInProgress];
-    [disableAllInGroupButton3	 setEnabled:!locked && !runInProgress];
 	
     [disableAllButton	 setEnabled:!locked && !runInProgress];
     [enableAllButton	 setEnabled:!locked && !runInProgress];
@@ -309,6 +366,8 @@
 	[probeButton			setEnabled:!lockedOrRunningMaintenance];
 	[clearOverFlowButton	setEnabled:!lockedOrRunningMaintenance];
 	[resetButton			setEnabled:!locked && !runInProgress];
+	[shipAtRunEndOnlyCB		setEnabled:!locked && !runInProgress];
+	[deadTimeRefChannelField setEnabled:!locked && !runInProgress];
 }
 
 
@@ -336,28 +395,68 @@
 
 	for(i=0;i<32;i++){
 		BOOL bitSet = (theMask&(1L<<i))>0;
-		if(i>=0 && i<8)			[[countEnableMatrix0 cellWithTag:i] setState:bitSet];
-		else if(i>=8 && i<16)	[[countEnableMatrix1 cellWithTag:i] setState:bitSet];
-		else if(i>=16 && i<24)	[[countEnableMatrix2 cellWithTag:i] setState:bitSet];
-		else if(i>=24 && i<32)	[[countEnableMatrix3 cellWithTag:i] setState:bitSet];
+		if(i>=0 && i<16)		[[countEnableMatrix0 cellWithTag:i] setState:bitSet];
+		else if(i>=16 && i<32)	[[countEnableMatrix1 cellWithTag:i] setState:bitSet];
 	}	
 }
 - (void) countersChanged:(NSNotification*)aNote
 {
 	short i;	
-	for(i=0;i<8;i++)	[[countMatrix0  cellWithTag:i] setDoubleValue:[model counts:i]];
-	for(i=8;i<16;i++)	[[countMatrix1  cellWithTag:i] setDoubleValue:[model counts:i]];
-	for(i=16;i<124;i++)	[[countMatrix2  cellWithTag:i] setDoubleValue:[model counts:i]];
-	for(i=24;i<32;i++)	[[countMatrix3  cellWithTag:i] setDoubleValue:[model counts:i]];
+	if([model showDeadTime]){
+		int refChan = [model deadTimeRefChannel];
+		unsigned long refCounts = [model counts:refChan];
+		for(i=0;i<16;i++){
+			if(i == refChan) [[countMatrix0  cellWithTag:i] setStringValue: @"Reference"];
+			else {
+				if(refCounts){
+					unsigned long theCounts = [model counts:i];
+					double liveTime = 100.0 *(theCounts/(double)refCounts);
+					[[countMatrix0  cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%.6f",liveTime]];
+				}
+				else [[countMatrix0  cellWithTag:i] setStringValue:@"?"];
+				
+			}
+		}
+		for(i=16;i<32;i++){
+			if(i == refChan) [[countMatrix1  cellWithTag:i] setStringValue: @"Reference"];
+			else {
+				if(refCounts){
+					unsigned long theCounts = [model counts:i];
+					double liveTime = 100.0 *(theCounts/(double)refCounts);
+					[[countMatrix1  cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%.6f",liveTime]];
+				}
+				else [[countMatrix1  cellWithTag:i] setStringValue:@"?"];
+				
+			}
+		}
+	}
+	else {
+		for(i=0;i<16;i++)	[[countMatrix0  cellWithTag:i] setDoubleValue:[model counts:i]];
+		for(i=16;i<32;i++)	[[countMatrix1  cellWithTag:i] setDoubleValue:[model counts:i]];
+	}
 }
 
 #pragma mark •••Actions
-- (void) syncWithRunAction:(id)sender
+- (IBAction) showDeadTimeAction:(id)sender
+{
+	[model setShowDeadTime:[[sender selectedCell]tag]];	
+}
+
+- (IBAction) deadTimeRefChannelAction:(id)sender
+{
+	[model setDeadTimeRefChannel:[sender intValue]];	
+}
+
+- (IBAction) shipAtRunEndOnlyAction:(id)sender
+{
+	[model setShipAtRunEndOnly:[sender intValue]];	
+}
+- (IBAction) syncWithRunAction:(id)sender
 {
 	[model setSyncWithRun:[sender intValue]];	
 }
 
-- (void) clearOnRunStartAction:(id)sender
+- (IBAction) clearOnRunStartAction:(id)sender
 {
 	[model setClearOnRunStart:[sender intValue]];	
 }
@@ -388,17 +487,6 @@
 }
 
 - (IBAction) countEnableMask2Action:(id)sender
-{
-	NSLog(@"--- %d\n",[[sender selectedCell] tag]);
-	[model setCountEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-
-- (IBAction) countEnableMask3Action:(id)sender
-{
-	[model setCountEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-
-- (IBAction) countEnableMask4Action:(id)sender
 {
 	[model setCountEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
@@ -434,10 +522,8 @@
 {
 	unsigned long aMask = [model countEnableMask];
 	switch ([sender tag]) {
-		case 0: aMask |= 0x000000ff; break;
-		case 1: aMask |= 0x0000ff00; break;
-		case 2: aMask |= 0x00ff0000; break;
-		case 3: aMask |= 0xff000000; break;
+		case 0: aMask |= 0x0000ffff; break;
+		case 1: aMask |= 0xffff0000; break;
 	}
 	[model setCountEnableMask:aMask];
 }
@@ -446,10 +532,8 @@
 {
 	unsigned long aMask = [model countEnableMask];
 	switch ([sender tag]) {
-		case 0: aMask &= ~0x000000ff; break;
-		case 1: aMask &= ~0x0000ff00; break;
-		case 2: aMask &= ~0x00ff0000; break;
-		case 3: aMask &= ~0xff000000; break;
+		case 0: aMask &= ~0x0000ffff; break;
+		case 1: aMask &= ~0xffff0000; break;
 	}
 	[model setCountEnableMask:aMask];
 }
@@ -547,6 +631,7 @@
 - (IBAction) startAction:(id)sender
 {
 	@try {
+		[model initBoard];
 		[model startCounting];
     }
 	@catch(NSException* localException) {
@@ -572,6 +657,11 @@
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) channelNameAction:(id)sender
+{
+	[model setChannel:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
 }
 
 
