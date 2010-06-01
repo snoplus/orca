@@ -1063,6 +1063,8 @@
 		8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BE3211B0183500C4082D /* ORSIS3820Model.m */; };
 		8457BE3B11B0183500C4082D /* SIS3820.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8457BE3311B0183500C4082D /* SIS3820.nib */; };
 		8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8457BE3411B0183500C4082D /* SIS3820Card.gif */; };
+		8457C2DE11B59DEC00C4082D /* ORCaen785Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */; };
+		8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */; };
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
@@ -3310,6 +3312,8 @@
 		8457BE3211B0183500C4082D /* ORSIS3820Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3820Model.m; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Model.m; sourceTree = SOURCE_ROOT; };
 		8457BE3311B0183500C4082D /* SIS3820.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SIS3820.nib; path = Source/Objects/Hardware/Vme/SIS3820/SIS3820.nib; sourceTree = SOURCE_ROOT; };
 		8457BE3411B0183500C4082D /* SIS3820Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3820Card.gif; path = Source/Objects/Hardware/Vme/SIS3820/SIS3820Card.gif; sourceTree = SOURCE_ROOT; };
+		8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen785Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.h; sourceTree = SOURCE_ROOT; };
+		8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen785Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.m; sourceTree = SOURCE_ROOT; };
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
@@ -9268,6 +9272,8 @@
 				84DE5926051F7AF9005F64B1 /* ORCaen785Model.m */,
 				84DE5921051F7AF9005F64B1 /* ORCaen785Controller.h */,
 				84DE5922051F7AF9005F64B1 /* ORCaen785Controller.m */,
+				8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */,
+				8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */,
 				84DE5920051F7AF9005F64B1 /* C785.gif */,
 				84DE5944051FB3D1005F64B1 /* Caen785.nib */,
 			);
@@ -11036,6 +11042,7 @@
 				8457BE3511B0183500C4082D /* ORSIS3820Controller.h in Headers */,
 				8457BE3711B0183500C4082D /* ORSIS3820Decoders.h in Headers */,
 				8457BE3911B0183500C4082D /* ORSIS3820Model.h in Headers */,
+				8457C2DE11B59DEC00C4082D /* ORCaen785Decoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12531,6 +12538,7 @@
 				8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */,
 				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
 				8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */,
+				8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
