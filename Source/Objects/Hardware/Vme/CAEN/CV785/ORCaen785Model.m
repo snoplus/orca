@@ -22,9 +22,7 @@
 #define k785DefaultBaseAddress 		0xa00000
 #define k785DefaultAddressModifier 	0x39
 
-//NSString* OR785SelectedRegIndexChanged 	= @"785 Selected Register Index Changed";
-//NSString* OR785SelectedChannelChanged 	= @"785 Selected Channel Changed";
-//NSString* OR785WriteValueChanged 		= @"785 Write Value Changed";
+NSString* ORCaen785ModelModelTypeChanged = @"ORCaen785ModelModelTypeChanged";
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
@@ -123,6 +121,19 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 #pragma mark ***Register - General routines
+- (int) modelType
+{
+    return modelType;
+}
+
+- (void) setModelType:(int)aModelType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setModelType:modelType];
+    
+    modelType = aModelType;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen785ModelModelTypeChanged object:self];
+}
 //--------------------------------------------------------------------------------
 /*!\method  getNumberRegisters
  * \brief	Get the number of registers used by this module.
@@ -145,6 +156,12 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (unsigned long) getBufferOffset
 {
     return reg[kOutputBuffer].addressOffset;
+}
+
+- (int) numberOfChannels
+{
+	if([self modelType] == kModel785) return 32;
+	else							  return 16;
 }
 
 //--------------------------------------------------------------------------------
@@ -306,6 +323,26 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return reg[anIndex].hwReset;
 }
 
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	NSString* decoderName;
+	if(modelType == kModel785){
+		decoderName = @"ORCAEN785DecoderForAdc";
+	}
+	else {
+		decoderName = @"ORCAEN785NDecoderForAdc";
+	}
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 decoderName,								@"decoder",
+								 [NSNumber numberWithLong:dataId],           @"dataId",
+								 [NSNumber numberWithBool:YES],              @"variable",
+								 [NSNumber numberWithLong:-1],               @"length",
+								 nil];
+		
+    [dataDictionary setObject:aDictionary forKey:@"Adc"];
+    return dataDictionary;
+}
 
 #pragma mark ***DataTaker
 //--------------------------------------------------------------------------------
@@ -364,7 +401,8 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
     [[self undoManager] disableUndoRegistration];
 
-    
+	[self setModelType:[aDecoder decodeIntForKey:@"modelType"]];
+
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -380,6 +418,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+	[anEncoder encodeInt:modelType forKey:@"modelType"];
 }
 
 @end

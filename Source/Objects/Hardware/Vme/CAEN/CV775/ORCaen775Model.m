@@ -384,7 +384,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     self = [super initWithCoder: aDecoder];
     
     [[self undoManager] disableUndoRegistration];
-    
+    [self setModelType:[aDecoder decodeIntForKey:@"modelType"]];
     
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -402,6 +402,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) encodeWithCoder: (NSCoder*) anEncoder
 {
     [super encodeWithCoder: anEncoder];
+	[anEncoder encodeInt:modelType forKey:@"modelType"];
 }
 
 

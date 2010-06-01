@@ -1,13 +1,9 @@
-//--------------------------------------------------------------------------------
-/*!\class	ORCaen785Controller
- * \brief	Handles high level commands to CAEN 785.
- * \methods
- *			\li \b 			- Constructor
- *			\li \b 
- * \note
- * \author	Jan M. Wouters
- * \history	2003-06-25 (mah) - Original
- */
+//
+//  ORCaenDataDecoders.m
+//  Orca
+//
+//  Created by Mark Howe on Tues June 1 2010.
+//  Copyright Â© 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -21,26 +17,24 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#pragma mark ¥¥¥Imported Files
 
-#import "ORCaenCardController.h"
+#import "ORCaen785Decoders.h"
 
-// Definition of class.
-@interface ORCaen785Controller : ORCaenCardController {
-	IBOutlet NSPopUpButton* modelTypePU;
+@implementation ORCAEN785DecoderForAdc
+
+- (unsigned short) channel: (unsigned long) pDataValue
+{
+    return	ShiftAndExtract(pDataValue,16,0x1F);
 }
 
-#pragma mark ***Initialization
-- (id)		init;
- 	
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
-- (void) modelTypeChanged:(NSNotification*)aNote;
-
-#pragma mark ***Interface Management
-- (void) updateWindow;
-
-#pragma mark ***Actions
-- (void) modelTypePUAction:(id)sender;
-	
 @end
+
+@implementation ORCAEN785NDecoderForAdc
+
+- (unsigned short) channel: (unsigned long) pDataValue
+{
+    return	ShiftAndExtract(pDataValue,17,0xF);
+}
+
+@end
+

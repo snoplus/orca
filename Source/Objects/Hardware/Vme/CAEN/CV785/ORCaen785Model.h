@@ -71,13 +71,18 @@ enum {
 // Size of output buffer
 #define kADCOutputBufferSize 0x07FF + 0x0004
 
+#define kModel785  0
+#define kModel785N 1
 
 // Class definition
 @interface ORCaen785Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
+    int modelType;
 }
 
 #pragma mark ***Accessors
+- (int) modelType;
+- (void) setModelType:(int)aModelType;
 
 #pragma mark ***Register - General routines
 - (short)		getNumberRegisters;
@@ -101,6 +106,8 @@ enum {
 #pragma mark ***Hardware Access
 
 @end
+
+extern NSString* ORCaen785ModelModelTypeChanged;
 
 //the decoder concrete decoder class
 @interface ORCaen785DecoderForCAEN : ORCaenDataDecoder
