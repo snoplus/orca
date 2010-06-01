@@ -163,10 +163,10 @@ NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
     [self linkToController:@"ORSIS3800Controller"];
 }
 
-//- (NSString*) helpURL
-//{
-//	return @"VME/SIS330x.html";
-//}
+- (NSString*) helpURL
+{
+	return @"VME/SIS3300.html";
+}
 
 - (NSRange)	memoryFootprint
 {

@@ -146,10 +146,10 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
     [self linkToController:@"ORSIS3820Controller"];
 }
 
-//- (NSString*) helpURL
-//{
-//	return @"VME/SIS3820.html";
-//}
+- (NSString*) helpURL
+{
+	return @"VME/SIS3820.html";
+}
 
 - (NSRange)	memoryFootprint
 {
