@@ -106,6 +106,7 @@ enum {
 - (BOOL)		dataReset: (short) anIndex;
 - (BOOL)		swReset: (short) anIndex;
 - (BOOL)		hwReset: (short) anIndex;
+- (void)		reset;
 
 
 #pragma mark ***Hardware Access

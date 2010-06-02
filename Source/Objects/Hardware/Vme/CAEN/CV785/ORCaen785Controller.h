@@ -30,6 +30,7 @@
 	IBOutlet NSPopUpButton* modelTypePU;
     IBOutlet NSMatrix*	onlineMaskMatrixA;
     IBOutlet NSMatrix*	onlineMaskMatrixB;
+    IBOutlet NSButton*	resetButton;
 }
 
 #pragma mark ***Initialization
@@ -44,7 +45,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Actions
-- (void) modelTypePUAction:(id)sender;
+- (IBAction) modelTypePUAction:(id)sender;
 - (IBAction) onlineAction:(id)sender;
+- (IBAction) resetAction:(id)sender;
 
 @end

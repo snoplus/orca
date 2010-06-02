@@ -74,6 +74,14 @@
     [self onlineMaskChanged:nil];
 }
 
+- (void) thresholdLockChanged:(NSNotification*)aNotification
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
+    
+    [resetButton setEnabled:!locked && !runInProgress];
+}
+
 - (void) onlineMaskChanged:(NSNotification*)aNotification
 {
 	short i;
@@ -103,7 +111,7 @@
 
 - (NSSize) thresholdDialogSize
 {
-	return NSMakeSize(320,607);
+	return NSMakeSize(370,607);
 }
 #pragma mark ¥¥¥Actions
 - (void) modelTypePUAction:(id)sender
@@ -114,6 +122,18 @@
 - (IBAction) onlineAction:(id)sender
 {
 	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) resetAction:(id)sender
+{
+	@try {
+		[model reset];
+	}
+	@catch (NSException* localException){
+        NSLog(@"Reset of CV785 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed CV785 Reset", @"OK", nil, nil,
+                        localException);
+	}
 }
 
 @end

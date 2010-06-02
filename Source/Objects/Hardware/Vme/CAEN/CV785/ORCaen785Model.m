@@ -292,6 +292,21 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     // Set thresholds in unit
     [self writeThresholds];
 }
+- (void) reset
+{
+	unsigned short aValue = 0x80; //soft reset
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + reg[kBitSet1].addressOffset
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + reg[kBitClear1].addressOffset
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+}
 
 - (unsigned short) threshold:(unsigned short) aChnl
 {
