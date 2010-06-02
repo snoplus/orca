@@ -117,7 +117,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 - (NSRange)	memoryFootprint
 {
-	return NSMakeRange(baseAddress,0x1080);
+	return NSMakeRange(baseAddress,0x1080+[self getDataBufferSize]);
 }
 
 #pragma mark ***Register - General routines
@@ -342,6 +342,22 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 		
     [dataDictionary setObject:aDictionary forKey:@"Adc"];
     return dataDictionary;
+}
+
+- (void) flushBuffer
+{
+	return; //temp.......
+    short n = [self getDataBufferSize]/sizeof(long);
+    int i;
+    unsigned long dataValue;
+    for(i=0;i<n;i++){
+        [[self adapter] readLongBlock:&dataValue
+                            atAddress:[self baseAddress] + [self getBufferOffset]
+                            numToRead:1
+                           withAddMod:[self addressModifier]
+                        usingAddSpace:0x01];
+        if([dataDecoder isNotValidDatum:dataValue]) break;
+    }
 }
 
 #pragma mark ***DataTaker
