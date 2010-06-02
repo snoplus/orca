@@ -357,7 +357,7 @@
 	if(theMode == 0){
 		s = [s stringByAppendingString:@"5->scaler mode\n"];
 		s = [s stringByAppendingString:@"6->SDRAM empty\n"];
-		s = [s stringByAppendingString:@"7->SDRAM threshol\n"];
+		s = [s stringByAppendingString:@"7->SDRAM threshold\n"];
 		s = [s stringByAppendingString:@"8->user output\n"];
 	}
 	else if(theMode == 1){

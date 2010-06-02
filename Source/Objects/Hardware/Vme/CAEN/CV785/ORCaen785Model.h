@@ -78,11 +78,16 @@ enum {
 @interface ORCaen785Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
     int modelType;
+	unsigned long   onlineMask;
 }
 
 #pragma mark ***Accessors
 - (int) modelType;
 - (void) setModelType:(int)aModelType;
+- (unsigned long)onlineMask;
+- (void)			setOnlineMask:(unsigned long)anOnlineMask;
+- (BOOL)			onlineMaskBit:(int)bit;
+- (void)			setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
 
 #pragma mark ***Register - General routines
 - (short)		getNumberRegisters;
@@ -108,6 +113,7 @@ enum {
 @end
 
 extern NSString* ORCaen785ModelModelTypeChanged;
+extern NSString* ORCaen785ModelOnlineMaskChanged;
 
 //the decoder concrete decoder class
 @interface ORCaen785DecoderForCAEN : ORCaenDataDecoder

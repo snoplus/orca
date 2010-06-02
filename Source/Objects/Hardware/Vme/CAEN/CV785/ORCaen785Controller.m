@@ -35,7 +35,15 @@
 }
 
 
-
+- (void) awakeFromNib 
+{
+	int i;
+	for(i=0;i<16;i++){
+		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
+		[[onlineMaskMatrixB cellAtRow:i column:0] setTag:i+16];
+	}
+	[super awakeFromNib];
+}
 #pragma mark ¥¥¥Notifications
 //--------------------------------------------------------------------------------
 /*!\method  registerNotificationObservers
@@ -51,13 +59,29 @@
                      selector : @selector(modelTypeChanged:)
                          name : ORCaen785ModelModelTypeChanged
 						object: model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(onlineMaskChanged:)
+						 name : ORCaen785ModelOnlineMaskChanged
+					   object : model];
 }
 
 #pragma mark ***Interface Management
 - (void) updateWindow
 {
-   [ super updateWindow ];
+	[super updateWindow];
 	[self modelTypeChanged:nil];
+    [self onlineMaskChanged:nil];
+}
+
+- (void) onlineMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned long theMask = [model onlineMask];
+	for(i=0;i<16;i++){
+		[[onlineMaskMatrixA cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+		[[onlineMaskMatrixB cellWithTag:i+16] setIntValue:(theMask&(1<<(i+16)))!=0];
+	}
 }
 
 - (void) modelTypeChanged:(NSNotification*)aNote
@@ -65,11 +89,11 @@
 	[modelTypePU selectItemAtIndex: [model modelType]];
 	if([model modelType] == kModel785){
 		[thresholdB setEnabled:YES];
-		[stepperB setEnabled:YES];
+		[onlineMaskMatrixB setEnabled:YES];
 	}
 	else {
 		[thresholdB setEnabled:NO];
-		[stepperB setEnabled:NO];
+		[onlineMaskMatrixB setEnabled:NO];
 	}
 }
 
@@ -79,11 +103,17 @@
 
 - (NSSize) thresholdDialogSize
 {
-	return NSMakeSize(286,607);
+	return NSMakeSize(320,607);
 }
 #pragma mark ¥¥¥Actions
 - (void) modelTypePUAction:(id)sender
 {
 	[model setModelType:[sender indexOfSelectedItem]];	
 }
+
+- (IBAction) onlineAction:(id)sender
+{
+	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 @end

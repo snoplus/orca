@@ -22,7 +22,8 @@
 #define k785DefaultBaseAddress 		0xa00000
 #define k785DefaultAddressModifier 	0x39
 
-NSString* ORCaen785ModelModelTypeChanged = @"ORCaen785ModelModelTypeChanged";
+NSString* ORCaen785ModelModelTypeChanged  = @"ORCaen785ModelModelTypeChanged";
+NSString* ORCaen785ModelOnlineMaskChanged = @"ORCaen785ModelOnlineMaskChanged";
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
@@ -134,25 +135,37 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen785ModelModelTypeChanged object:self];
 }
-//--------------------------------------------------------------------------------
-/*!\method  getNumberRegisters
- * \brief	Get the number of registers used by this module.
- * \return	The number of registers.
- * \note	
- */
-//--------------------------------------------------------------------------------
+
+- (unsigned long)onlineMask {
+	
+    return onlineMask;
+}
+
+- (void)setOnlineMask:(unsigned long)anOnlineMask 
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
+    onlineMask = anOnlineMask;	    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen785ModelOnlineMaskChanged object:self];
+}
+
+- (BOOL)onlineMaskBit:(int)bit
+{
+	return onlineMask&(1<<bit);
+}
+
+- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned long aMask = onlineMask;
+	if(aValue)aMask |= (1<<bit);
+	else      aMask &= ~(1<<bit);
+	[self setOnlineMask:aMask];
+}
+
 - (short) getNumberRegisters
 {
     return kNumRegisters;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getBufferOffset
- * \brief	Get the output buffer offset relative to the module's base address.
- * \return	The output buffer offset.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getBufferOffset
 {
     return reg[kOutputBuffer].addressOffset;
@@ -164,65 +177,27 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	else							  return 16;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getDataBufferSize
- * \brief	Get size of class data buffer.
- * \return	The size of the data buffer.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned short) getDataBufferSize
 {
     return kADCOutputBufferSize;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getThresholdOffset
- * \brief	Get the offset relative to the module's base address for the threshold
- *			registers.
- * \return	The threshold offset.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getThresholdOffset
 {
     return reg[kThresholds].addressOffset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getStatusRegisterIndex
- * \brief	Get the offset relative to the module's base address for
- *			either status register 1 or 2.
- * \param	aRegister			- Either 1 or 2 for status register 1 or 2.
- * \return	The offset
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getStatusRegisterIndex:(short) aRegister
 {
     if (aRegister == 1) return kStatusRegister1;
     else		return kStatusRegister2;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getThresholdIndex
- * \brief	Get the index number within mreg for the thresholds. 
- * \return	The index
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getThresholdIndex
 {
     return(kThresholds);
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getOutputBufferIndex
- * \brief	Get the index number within mreg for the output buffer. 
- * \return	The index
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getOutputBufferIndex
 {
     return(kOutputBuffer);
@@ -230,94 +205,36 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 
 #pragma mark ***Register - Register specific routines
-//--------------------------------------------------------------------------------
-/*!\method  getRegisterName
- * \brief	Get the name of the register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The name of the register.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (NSString*) getRegisterName:(short) anIndex
 {
     return reg[anIndex].regName;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAddressOffset
- * \brief	Get the address offset for the specific register.
- * \param	anIndex			- Register index.
- * \return	The offset to the register.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (unsigned long) getAddressOffset:(short) anIndex
 {
     return(reg[anIndex].addressOffset);
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAccessType
- * \brief	Get the access type, either read, write or readWrite for the
- *			register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The access type.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getAccessType:(short) anIndex
 {
     return reg[anIndex].accessType;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  getAccessSize
- * \brief	Get the access size, either 32 or 16 bit for the
- *			register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The access type.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (short) getAccessSize:(short) anIndex
 {
     return reg[anIndex].size;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  dataReset
- * \brief	Get the data reset flag for register at index anIndex.
- * \param	anIndex			- Index of the register.
- * \return	The data reset flag either true of false.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) dataReset:(short) anIndex
 {
     return reg[anIndex].dataReset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  swReset
- * \brief	Get the software reset flag for register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The software reset flag.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) swReset:(short) anIndex
 {
     return reg[anIndex].softwareReset;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  hwReset
- * \brief	Get the hardware reset flag for register at index anIndex.
- * \param	anIndex			- Register index.
- * \return	The hardware reset flag.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (BOOL) hwReset:(short) anIndex
 {
     return reg[anIndex].hwReset;
@@ -361,14 +278,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 #pragma mark ***DataTaker
-//--------------------------------------------------------------------------------
-/*!\method  runTaskStarted
- * \brief	Beginning of run.  Prepare this object to take data.  Write out hardware settings
- *			to data stream.
- * \param	aDataPacket				- Object where data is written.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
@@ -382,17 +291,28 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
     // Set thresholds in unit
     [self writeThresholds];
-    
 }
 
+- (unsigned short) threshold:(unsigned short) aChnl
+{
+	return [super threshold:aChnl] & 0xFF;
+}
 
-//--------------------------------------------------------------------------------
-/*!\method  runTaskStopped
- * \brief	Resets the oscilloscope so that it is in continuous acquisition mode.
- * \param	aDataPacket			- Data from most recent event.
- * \note	
- */
-//--------------------------------------------------------------------------------
+- (void) writeThresholds
+{
+	int i;
+	int n = (modelType==kModel785?32:16);
+	for(i=0;i<n;i++){
+		int kill = ((onlineMask & (1<<i))!=0)?0x0:0x100;
+		unsigned short aValue = [self threshold:i] | kill;
+		[[self adapter] writeWordBlock:&aValue
+							 atAddress:[self baseAddress] + [self getThresholdOffset] + (i * 4)
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
+}
+
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStopped:aDataPacket userInfo:userInfo];
@@ -404,13 +324,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 #pragma mark ***Archival
-//--------------------------------------------------------------------------------
-/*!\method  initWithCoder  
- * \brief	Initialize object using archived settings.
- * \param	aDecoder			- Object used for getting archived internal parameters.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
     self = [super initWithCoder:aDecoder];
@@ -418,23 +331,17 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [[self undoManager] disableUndoRegistration];
 
 	[self setModelType:[aDecoder decodeIntForKey:@"modelType"]];
+	[self setOnlineMask:[aDecoder decodeInt32ForKey:@"onlineMask"]];
 
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  encodeWithCoder  
- * \brief	Save the internal settings to the archive.  OscBase saves most
- *			of the settings.
- * \param	anEncoder			- Object used for encoding.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
 	[anEncoder encodeInt:modelType forKey:@"modelType"];
+	[anEncoder encodeInt32:onlineMask forKey:@"onlineMask"];
 }
 
 @end
