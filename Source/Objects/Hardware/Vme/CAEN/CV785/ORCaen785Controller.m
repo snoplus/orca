@@ -80,6 +80,8 @@
     BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
     
     [resetButton setEnabled:!locked && !runInProgress];
+	[super thresholdLockChanged:aNotification];
+	[self modelTypeChanged:nil];
 }
 
 - (void) onlineMaskChanged:(NSNotification*)aNotification
