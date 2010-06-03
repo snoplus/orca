@@ -476,8 +476,8 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 	majorRevision = (result&0xff00) >> 8;
 	minorRevision = (result & 0xff) >> 0;
 	if(verbose)NSLog(@"SIS3820 ID: %x  0x%02x.%d\n",moduleID,majorRevision,minorRevision);
-	if(moduleID != 3820) {
-		NSLogColor([NSColor redColor],@"Slot %d has a %d but you are using a SIS3820 object.\n",[self slot],moduleID);
+	if(moduleID != 0x3820) {
+		NSLogColor([NSColor redColor],@"Slot %d has a %04x but you are using a SIS3820 object.\n",[self slot],moduleID);
 	}
 	else {
 		if(majorRevision != 1)NSLogColor([NSColor redColor],@"Wrong Firmware version. ORCA currently supports only the Generic 32 channel design\n");
