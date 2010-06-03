@@ -29,11 +29,15 @@ NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
 NSString* ORSqlPasswordChanged		= @"ORSqlPasswordChanged";
 NSString* ORSqlUserNameChanged		= @"ORSqlUserNameChanged";
 NSString* ORSqlHostNameChanged		= @"ORSqlHostNameChanged";
-NSString* ORSqlConnectionChanged	= @"ORSqlConnectionChanged";
+NSString* ORSqlConnectionValidChanged	= @"ORSqlConnectionValidChanged";
 NSString* ORSqlLock					= @"ORSqlLock";
 
 static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @interface ORSqlModel (private)
+- (BOOL) validateConnection;
+- (void) listMachines;
+- (void) updateDataSets;
+
 - (void) postMachineName;
 - (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber;
 @end
@@ -50,9 +54,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	if(conn){
-		mysql_close (conn);
-	}
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[sqlConnection release];
     [dataBaseName release];
     [password release];
     [userName release];
@@ -85,7 +88,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[ aConnector addRestrictedConnectionType: 'DB O' ]; //can only connect to DB outputs
 	
     [aConnector release];
-    
 }
 
 - (void) registerNotificationObservers
@@ -110,26 +112,31 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
 	id pausedKeyIncluded = [[aNote userInfo] objectForKey:@"ORRunPaused"];
 	if(!pausedKeyIncluded){
-		int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
-		int runNumber    = [[aNote object] runNumber];
-		int subRunNumber = [[aNote object] subRunNumber];
-		
-		[self postRunState: runState runNumber:runNumber subRunNumber:subRunNumber];
-		
-		if(runState == eRunInProgress){
-			if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
-			NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
-			for(ORDataChainObject* aDataMonitor in list){
-				if([aDataMonitor involvedInCurrentRun]){
-					[dataMonitors addObject:aDataMonitor];
+		@try {
+			int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+			int runNumber    = [[aNote object] runNumber];
+			int subRunNumber = [[aNote object] subRunNumber];
+			
+			[self postRunState: runState runNumber:runNumber subRunNumber:subRunNumber];
+			
+			if(runState == eRunInProgress){
+				if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
+				NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+				for(ORDataChainObject* aDataMonitor in list){
+					if([aDataMonitor involvedInCurrentRun]){
+						[dataMonitors addObject:aDataMonitor];
+					}
 				}
+				[self updateDataSets];
 			}
-			//[self updateDataSets];
+			else if(runState == eRunStopped){
+				[dataMonitors release];
+				dataMonitors = nil;
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+			}
 		}
-		else if(runState == eRunStopped){
-			[dataMonitors release];
-			dataMonitors = nil;
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+		@catch (NSException* e) {
+			//silently catch and continue
 		}
 	}
 }
@@ -233,260 +240,155 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 }
 
 #pragma mark ***SQL Access
-- (void) toggleConnection
+- (BOOL) testConnection
 {
-	if(conn) [self disconnect];
-	else     [self connect];
-}
-- (BOOL) isConnected
-{
-	return connected;
-}
-
-- (BOOL) connect
-{
+	if(!sqlConnection) sqlConnection = [[ORSqlConnection alloc] init];
+	if([sqlConnection isConnected]){
+		[sqlConnection disconnect];
+	} 
 	
-	ORSqlConnection* testCon = [[ORSqlConnection alloc] init];
-	if([testCon connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
-		NSLog(@"new connection works\n");
-		ORSqlResult* r = [testCon queryString:@"select * from machines"];
-		while (1){
-			id d = [r fetchRowAsDictionary];
-			if(!d)break;
-			NSLog(@"%@\n",d);
-		}
-		[testCon release];
+	if([sqlConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
+		connectionValid = YES;
 	}
-	else NSLog(@"test failed\n");
-
-	
-	
-	conn = mysql_init (NULL);
-	
-	if (conn == nil){
-		NSLog(@"ORSql: mysql_init() failed\n");
-		connected = NO;
-		return NO;
+	else {
+		connectionValid = NO;
+		[sqlConnection release];
+		sqlConnection = nil;
 	}
 	
-	if (mysql_real_connect (conn, [hostName UTF8String], [userName UTF8String], [password UTF8String],
-							[dataBaseName UTF8String], 0, nil, 0) == nil){
-		NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (conn));
-		NSLog(@"Error: (%s)\n",mysql_error (conn));
-		[self disconnect];
-		return NO;
-	}
-	connected = YES;
-	NSLog(@"Connected to DataBase %@ on %@\n",dataBaseName,hostName);
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionChanged object:self];
-	if(dataBaseName && [dataBaseName length]){
-		NSLog(@"%@\n",[self databases]);
-		[self use:dataBaseName];
-		[self postMachineName];
-		NSLog(@"%@\n",[self tables]);
-	}
-	return YES;     /* connection is established */
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionValidChanged object:self];
+	
+	[self listMachines];
+	return connectionValid;
 }
 
 -(void) disconnect
 {
-	if(conn){
-		mysql_close (conn);
-		conn = nil;
-		if(connected){
+	if(sqlConnection){
+		[sqlConnection release];
+		sqlConnection = nil;
+		if(connectionValid){
 			NSLog(@"Disconnected from DataBase %@ on %@\n",dataBaseName,hostName);
-			connected = NO;
+			connectionValid = NO;
 		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionChanged object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionValidChanged object:self];
 	}
 }
-- (MYSQL_RES*) sendQuery:(NSString*)query
+- (BOOL) connectionValid
 {
-	if(conn){
-		if(mysql_query(conn,[query UTF8String])){
-			NSLog(@"%@ failed\n",query);
-			NSLog(@"%s\n",mysql_error(conn));
-			return nil;
-		}
-		MYSQL_RES* theResult =  mysql_store_result(conn);
-		if(theResult)[ORSqlTempResult sqlResult:theResult];
-		
-		return theResult;
-	}
-	
-	NSLog(@"Not connected to any database\n");
-	return NO;
+	return connectionValid;
 }
 
-- (void) use:(NSString*)aDataBase
-{
-	NSString* query = [NSString stringWithFormat:@"USE %@",aDataBase];
-	if([self sendQuery:query]) NSLog(@"Using DataBase: %@\n",aDataBase);
-}
-
-- (NSArray*) tables
-{
-	NSString* query = @"SHOW TABLES";
-	MYSQL_RES* resTables = [self sendQuery:query];
-	if(resTables){
-		NSMutableArray* result = [NSMutableArray array];
-		MYSQL_ROW table;
-		while((table = mysql_fetch_row(resTables))!=nil){
-			[result addObject:[NSString stringWithUTF8String:table[0]]];
-		}
-		return result;
-	}
-	return nil;
-}
-
-- (NSArray*) machines
-{
-	NSString* query = @"Select * from machines";
-	MYSQL_RES* resSet = [self sendQuery:query];
-	if(resSet){
-		MYSQL_ROW row;
-		NSMutableArray* result = [NSMutableArray array];
-		while((row = mysql_fetch_row(resSet))!=nil){
-			int numFields = mysql_num_fields (resSet);
-			if(numFields>0){
-				NSMutableArray* fields = [NSMutableArray array];
-				int i;
-				for (i = 0; i < numFields; i++) {
-					[fields addObject:[NSString stringWithUTF8String:row[i]]];
-				}
-				[result addObject:fields];
-			}
-		}
-		return result;
-	}
-	return nil;
-}
-
-
-- (NSArray*) databases
-{
-	MYSQL_RES* theResult = [self sendQuery:@"SHOW databases"];
-	if(theResult){
-		NSMutableArray* result = [NSMutableArray array];
-		MYSQL_ROW row;
-		while((row = mysql_fetch_row(theResult))!=nil){
-			int i;
-			for(i=0;i<mysql_num_fields(theResult);i++){
-				[result addObject:[NSString stringWithUTF8String:row[i]]];
-			}
-		}
-		return result;
-	}
-	return nil;
-}
 @end
 
 @implementation ORSqlModel (private)
+
+- (BOOL) validateConnection
+{
+	BOOL oldConnectionValid = connectionValid;
+	if(!sqlConnection) sqlConnection = [[ORSqlConnection alloc] init];
+	if(![sqlConnection isConnected]){
+		if([sqlConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
+			connectionValid = YES;
+		}
+		else {
+			connectionValid = NO;
+		}
+	}
+	
+	if(connectionValid != oldConnectionValid){
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionValidChanged object:self];
+	}
+	return connectionValid;
+}
+
+- (void) listMachines
+{
+	if([self validateConnection]){
+		ORSqlResult* theResult = [sqlConnection queryString:@"select * from machines"];
+		while (1){
+			id d = [theResult fetchRowAsDictionary];
+			if(!d)break;
+			NSLog(@"%@\n",d);
+		}
+	}
+}
+
 - (void) postMachineName
 {
-	if(conn){
+	if([self validateConnection]){
+		
 		NSString* name = computerName();
 		NSString* hw_address = macAddress();
+		
 		NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = '%@'",hw_address];
-		MYSQL_RES* theResult = [self sendQuery:query];
-		if(theResult){
-			MYSQL_ROW row = mysql_fetch_row (theResult);
-			if(!row){
-				NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES ('%@','%@')",name,hw_address];
-				[self sendQuery:query];
-			}
+		ORSqlResult* theResult = [sqlConnection queryString:query];
+		id d = [theResult fetchRowAsDictionary];
+		if(!d){
+			NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES ('%@','%@')",name,hw_address];
+			[sqlConnection queryString:query];
 		}
 	}
 }
 
 - (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber
 {
-	NSString* name       = computerName();
-	NSString* hw_address = macAddress();
-	
-	NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = '%@'",hw_address];
-	MYSQL_RES* theResult = [self sendQuery:query];
-	if(theResult){
-		MYSQL_ROW row = mysql_fetch_row(theResult);
-		if(row){
-			NSString* machine_id = [NSString stringWithUTF8String:row[0]];
-			NSString* query = [NSString stringWithFormat:@"SELECT run_id,state from runs where machine_id = '%@'",machine_id];
-			MYSQL_RES* theResult = [self sendQuery:query];
-			if(theResult){
-				MYSQL_ROW row;
-				while((row = mysql_fetch_row(theResult))!=nil){
-					int numFields = mysql_num_fields (theResult);
-					if(numFields>0){
-						int i;
-						for (i = 0; i < numFields; i++) {
-							NSLog(@"%@\n",[NSString stringWithUTF8String:row[i]]);
-						}
-					}
-				}
-				
-				
-				if(row){
-					NSString* query = [NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d WHERE machine_id=%@",runNumber,subRunNumber,aRunState,machine_id];
-					[self sendQuery:query];	
-				}
-				else {
-					NSString* query = [NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",runNumber,subRunNumber,aRunState,machine_id];
-					[self sendQuery:query];	
+	if([self validateConnection]){
+		//get our machine id using our MAC Address
+		ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = '%@'",macAddress()]];
+		id row				   = [theResult fetchRowAsDictionary];
+		
+		//get the entry for our run state using our machine_id
+		id machine_id	= [row objectForKey:@"machine_id"];
+		theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id,state,experiment from runs where machine_id = '%@'",machine_id]];
+		id ourRunEntry	= [theResult fetchRowAsDictionary];
+		id oldExperiment = [ourRunEntry objectForKey:@"experiment"];
+		
+		//if we have a run entry, update it. Otherwise create it.
+		if(ourRunEntry)[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run='%d', subrun='%d', state='%d' WHERE machine_id='%@'",runNumber,subRunNumber,aRunState,machine_id]];
+		else   [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES ('%d','%d','%d','%@')",runNumber,subRunNumber,aRunState,machine_id]];
+		
+		if(aRunState == 1){
+			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM datasets WHERE machine_id='%@'",machine_id]];
+			id nextObject = [self objectConnectedTo:ORSqlModelInConnector];
+			NSString* experimentName;
+			if(!nextObject)experimentName = @"TestStand";
+			else {
+				experimentName = [nextObject className];
+				if([experimentName hasPrefix:@"OR"])experimentName = [experimentName substringFromIndex:2];
+				if([experimentName hasSuffix:@"Model"])experimentName = [experimentName substringToIndex:[experimentName length] - 5];
+				if(![oldExperiment isEqualToString:experimentName]){
+					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment='%@' WHERE machine_id='%@'",experimentName, machine_id]];
 				}
 			}
 		}
 	}
 }
-/*
- $query 	= "SELECT machine_id from machines where hw_address = '$macAddress'";
- $result = mysqli_query($dbc,$query);
- 
- $row =  mysqli_fetch_array($result);
- $machine_id =  $row['machine_id'];
- 
- $query  = "SELECT machine_id from runs where machine_id = '$machine_id'";
- $result = mysqli_query($dbc,$query);
- $row =  mysqli_fetch_array($result);
- 
- if($runState == 1){
- //at the start of run, clear all datasets for this machins
- $query = "DELETE from datasets where machine_id='$machine_id'";
- $result = mysqli_query($dbc,$query);
- }
- 
- $query = "UPDATE runs SET experiment ='$experiment' where machine_id='$machine_id'";
- $result = mysqli_query($dbc,$query);
- 
- if($row){
- $query = "UPDATE runs SET runState='$runState', runNumber='$runNumber', subRunNumber='$subRunNumber'" .
- "where machine_id='$machine_id'";
- }
- else {
- $query = "INSERT INTO runs (runNumber,subRunNumber,runState,machine_id) " .
- "VALUES (\"$runNumber\",\"$subRunNumber\",\"$runState\",\"$machine_id\")";
- }
- 
- $result = mysqli_query($dbc,$query);*/
 
-@end
+- (void) updateDataSets
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if([self validateConnection]){
+		//get our machine_id using our MAC Address
+		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = '%@'",macAddress()]];
+		id row				    = [theResult fetchRowAsDictionary];
+		id machine_id			= [row objectForKey:@"machine_id"];
+		
+		for(id aMonitor in dataMonitors){
+			NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
+			for(id aDataSet in objs1d){
+				ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id from datasets where (machine_id='%@' and name='%@' and monitor_id='%d')",machine_id,[aDataSet fullName],[aMonitor uniqueIdNumber]]];
+				id dataSetEntry		   = [theResult fetchRowAsDictionary];
+				id dataset_id		   = [dataSetEntry objectForKey:@"dataset_id"];
 
-@implementation ORSqlTempResult
-+ (id) sqlResult:(MYSQL_RES*)aResultPtr
-{
-	return [[[ORSqlTempResult alloc] initWithResult:aResultPtr] autorelease];
-}
-
-- (id) initWithResult:(MYSQL_RES*)aResultPtr
-{
-	[super init];
-	resultPtr = aResultPtr;
-	return self;
-}
-- (void) dealloc
-{
-	if(resultPtr!=nil){
-		mysql_free_result(resultPtr);
+				if(dataset_id) [sqlConnection queryString:[NSString stringWithFormat:@"UPDATE datasets SET counts=%d WHERE dataset_id=%@",[aDataSet totalCounts],dataset_id]];
+				else		   [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO datasets (monitor_id,machine_id,name,counts) VALUES ('%d','%@','%@','%d')",[aMonitor uniqueIdNumber],machine_id,[aDataSet fullName],[aDataSet totalCounts]]];
+				
+			}
+		}
 	}
-	[super dealloc];
+	[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
 }
+
 @end
+

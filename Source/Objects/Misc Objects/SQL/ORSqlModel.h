@@ -18,13 +18,14 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "mysql.h"
+
+@class ORSqlConnection;
 
 @interface ORSqlModel : OrcaObject
 {
 @private
-	MYSQL*		conn;
-	BOOL		connected;
+	ORSqlConnection* sqlConnection;
+	BOOL		connectionValid;
 	NSString*	hostName;
     NSString*	userName;
     NSString*	password;
@@ -51,14 +52,9 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ***SQL Access
-- (void) toggleConnection;
-- (BOOL) isConnected;
-- (BOOL) connect;
+- (BOOL) testConnection;
+- (BOOL) connectionValid;
 - (void) disconnect;
-- (NSArray*) databases;
-- (void) use:(NSString*)aDataBase;
-- (MYSQL_RES*) sendQuery:(NSString*)query;
-- (NSArray*) tables;
 
 @end
 
@@ -66,16 +62,6 @@ extern NSString* ORSqlDataBaseNameChanged;
 extern NSString* ORSqlPasswordChanged;
 extern NSString* ORSqlUserNameChanged;
 extern NSString* ORSqlHostNameChanged;
-extern NSString* ORSqlConnectionChanged;
+extern NSString* ORSqlConnectionValidChanged;
 extern NSString* ORSqlLock;
-
-
-@interface ORSqlTempResult : NSObject
-{
-	MYSQL_RES* resultPtr;
-}
-+ (id) sqlResult:(MYSQL_RES*)aResultPtr;
-- (id) initWithResult:(MYSQL_RES*)aResultPtr;
-- (void) dealloc;
-@end
 

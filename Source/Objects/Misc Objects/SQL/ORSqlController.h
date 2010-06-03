@@ -25,21 +25,19 @@
 	IBOutlet NSTextField* userNameField;
 	IBOutlet NSTextField* passwordField;
 	IBOutlet NSTextField* dataBaseNameField;
+	IBOutlet NSTextField* connectionValidField;
     IBOutlet NSButton*    sqlLockButton;
     IBOutlet NSButton*    connectionButton;
 }
 
 #pragma mark ¥¥¥Initialization
-
-#pragma mark ¥¥¥Registration
 - (void) registerNotificationObservers;
-
 - (void) hostNameChanged:(NSNotification*)aNote;
 - (void) userNameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
 - (void) dataBaseNameChanged:(NSNotification*)aNote;
 - (void) sqlLockChanged:(NSNotification*)aNote;
-- (void) connectionChanged:(NSNotification*)aNote;
+- (void) connectionValidChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) hostNameAction:(id)sender;

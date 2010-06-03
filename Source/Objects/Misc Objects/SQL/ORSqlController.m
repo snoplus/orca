@@ -80,8 +80,8 @@
                        object : nil];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(connectionChanged:)
-                         name : ORSqlConnectionChanged
+                     selector : @selector(connectionValidChanged:)
+                         name : ORSqlConnectionValidChanged
                        object : nil];
 }
 
@@ -92,14 +92,13 @@
 	[self userNameChanged:nil];
 	[self passwordChanged:nil];
 	[self dataBaseNameChanged:nil];
-	[self connectionChanged:nil];
+	[self connectionValidChanged:nil];
     [self sqlLockChanged:nil];
 }
 
-- (void) connectionChanged:(NSNotification*)aNote
+- (void) connectionValidChanged:(NSNotification*)aNote
 {
-	if([model isConnected])[connectionButton setTitle:@"Disconnect"];
-	else [connectionButton setTitle:@"Connect"];
+	[connectionValidField setStringValue:[model connectionValid]?@"Valid":@"?"];
 }
 
 - (void) hostNameChanged:(NSNotification*)aNote
@@ -137,8 +136,6 @@
 - (void) checkGlobalSecurity
 {
     BOOL secure = [gSecurity globalSecurityEnabled];
-    //add setLock calls here as new lock buttons
-    //are added to this dialog.
     [gSecurity setLock:ORSqlLock to:secure];
     [sqlLockButton setEnabled: secure];
 }
@@ -172,7 +169,7 @@
 - (IBAction) connectionAction:(id)sender
 {
 	[self endEditing];
-	[model toggleConnection];
+	[model testConnection];
 }
 
 
