@@ -255,6 +255,26 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	}
 }
 
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	NSString* decoderName;
+	if(modelType == kModel775){
+		decoderName = @"ORCAEN775DecoderForTdc";
+	}
+	else {
+		decoderName = @"ORCAEN775NDecoderForTdc";
+	}
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 decoderName,								@"decoder",
+								 [NSNumber numberWithLong:dataId],           @"dataId",
+								 [NSNumber numberWithBool:YES],              @"variable",
+								 [NSNumber numberWithLong:-1],               @"length",
+								 nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"Tdc"];
+    return dataDictionary;
+}
 #pragma mark ***DataTaker
 - (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
@@ -270,93 +290,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     // Set thresholds in unit
     [self writeThresholds];
     
-}
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-{
-    
-    unsigned short 	theStatus1;
-    unsigned short 	theStatus2;
-    
-    @try {
-        
-        //first read the status resisters to see if there is anything to read.
-        [self read:[self getStatusRegisterIndex:1] returnValue:&theStatus1];
-        [self read:[self getStatusRegisterIndex:2] returnValue:&theStatus2];
-        
-        // Get some values from the status register using the decoder.
-        BOOL bufferIsNotBusy 	= ![dataDecoder isBusy:theStatus1];
-        BOOL dataIsReady 		= [dataDecoder isDataReady:theStatus1];
-        BOOL bufferIsFull 		= [dataDecoder isBufferFull:theStatus2];
-        unsigned long bufferAddress = [self baseAddress] + [self getBufferOffset];
-        
-        // Read the buffer.
-        if ((bufferIsNotBusy && dataIsReady) || bufferIsFull) {
-			
-			//OK, at least one data value is ready
-			unsigned long dataValue;
-			[controller readLongBlock:&dataValue
-							atAddress:bufferAddress
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-			
-			//if this is a header, must be valid data.
-			BOOL validData = YES; //assume OK until shown otherwise
-			if(ShiftAndExtract(dataValue,24,0x7) == 0x2){
-				//get the number of memorized channels
-				int numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
-				int i;
-				if((numMemorizedChannels>0)){
-					unsigned long dataRecord[0xffff];
-					//we fill in dataRecord[0] below once we know the final size
-					dataRecord[1] = location;
-					int index = 2;
-					for(i=0;i<numMemorizedChannels;i++){
-						[controller readLongBlock:&dataValue
-										atAddress:bufferAddress
-										numToRead:1
-									   withAddMod:[self addressModifier]
-									usingAddSpace:0x01];
-						int dataType = ShiftAndExtract(dataValue,24,0x7);
-						if(dataType == 0x000){
-							dataRecord[index] = dataValue;
-							index++;
-						}
-						else {
-							validData = NO;
-							break;
-						}
-					}
-					if(validData){
-						//OK we read the data, get the end of block
-						[controller readLongBlock:&dataValue
-										atAddress:bufferAddress
-										numToRead:1
-									   withAddMod:[self addressModifier]
-									usingAddSpace:0x01];
-						//make sure it really is an end of block
-						int dataType = ShiftAndExtract(dataValue,24,0x7);
-						if(dataType == 0x4){
-							dataRecord[index] = dataValue; //we don't ship the end of block for now
-							index++;
-							//got a end of block fill in the ORCA header and ship the data
-							dataRecord[0] = dataId | index; //see.... filled it in here....
-							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
-						}
-						else {
-							validData = NO;
-						}
-					}
-				}
-			}
-			if(!validData){
-				[self flushBuffer];
-			}
-		}
-	}
-	@catch(NSException* localException) {
-		errorCount++;
-	}
 }
 
 - (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo

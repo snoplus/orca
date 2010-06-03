@@ -92,6 +92,9 @@
 		4398E6BA11B7E36400FC4DDE /* ORCAEN785Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4398E6B811B7E36400FC4DDE /* ORCAEN785Readout.hh */; };
 		4398E6C211B7E3BB00FC4DDE /* ORCAEN785Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4398E6B711B7E36400FC4DDE /* ORCAEN785Readout.cc */; };
 		4398E6C311B7E3BB00FC4DDE /* ORCAEN785Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4398E6B811B7E36400FC4DDE /* ORCAEN785Readout.hh */; };
+		4398E7CD11B81B8B00FC4DDE /* ORCaen775Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4398E7CC11B81B8B00FC4DDE /* ORCaen775Controller.m */; };
+		4398E7E011B81BBD00FC4DDE /* ORCaen775Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 4398E7DE11B81BBD00FC4DDE /* ORCaen775Decoders.h */; };
+		4398E7E111B81BBD00FC4DDE /* ORCaen775Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 4398E7DF11B81BBD00FC4DDE /* ORCaen775Decoders.m */; };
 		43ADFE3F10B6DAF90044617C /* readout_code.h in Headers */ = {isa = PBXBuildFile; fileRef = 43ADFE3B10B6DAF90044617C /* readout_code.h */; };
 		43ADFE4010B6DAF90044617C /* ORVCard.hh in Headers */ = {isa = PBXBuildFile; fileRef = 43ADFE3C10B6DAF90044617C /* ORVCard.hh */; };
 		43ADFE5110B6DB240044617C /* readout_code.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 43ADFE3B10B6DAF90044617C /* readout_code.h */; };
@@ -816,7 +819,6 @@
 		8434A33E055B3287002D3102 /* ORCaenCardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DE590C051F7606005F64B1 /* ORCaenCardModel.m */; };
 		8434A33F055B3287002D3102 /* ORCaenDataDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = F5B1802603B297FD015F64B1 /* ORCaenDataDecoder.m */; };
 		8434A340055B3287002D3102 /* ORCaen775Model.m in Sources */ = {isa = PBXBuildFile; fileRef = F5B1802C03B297FD015F64B1 /* ORCaen775Model.m */; };
-		8434A341055B3287002D3102 /* ORCaen775Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = F5B1802E03B297FD015F64B1 /* ORCaen775Controller.m */; };
 		8434A343055B3287002D3102 /* ORCaenCardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DE591A051F762E005F64B1 /* ORCaenCardController.m */; };
 		8434A344055B3287002D3102 /* ORCaen785Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DE5922051F7AF9005F64B1 /* ORCaen785Controller.m */; };
 		8434A346055B3287002D3102 /* ORCaen785Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DE5926051F7AF9005F64B1 /* ORCaen785Model.m */; };
@@ -2579,6 +2581,9 @@
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
 		4398E6B711B7E36400FC4DDE /* ORCAEN785Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN785Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN785Readout.cc; sourceTree = SOURCE_ROOT; };
 		4398E6B811B7E36400FC4DDE /* ORCAEN785Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN785Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN785Readout.hh; sourceTree = SOURCE_ROOT; };
+		4398E7CC11B81B8B00FC4DDE /* ORCaen775Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen775Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Controller.m; sourceTree = SOURCE_ROOT; };
+		4398E7DE11B81BBD00FC4DDE /* ORCaen775Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen775Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Decoders.h; sourceTree = SOURCE_ROOT; };
+		4398E7DF11B81BBD00FC4DDE /* ORCaen775Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen775Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Decoders.m; sourceTree = SOURCE_ROOT; };
 		43ADFE3B10B6DAF90044617C /* readout_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = readout_code.h; path = Source/Objects/Hardware/SBC/SBC_Code/readout_code.h; sourceTree = SOURCE_ROOT; };
 		43ADFE3C10B6DAF90044617C /* ORVCard.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORVCard.hh; path = Source/Objects/Hardware/SBC/SBC_Code/ORVCard.hh; sourceTree = SOURCE_ROOT; };
 		43ADFE3D10B6DAF90044617C /* readout_code.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = readout_code.cc; path = Source/Objects/Hardware/SBC/SBC_Code/readout_code.cc; sourceTree = SOURCE_ROOT; };
@@ -4780,7 +4785,6 @@
 		F5B1802B03B297FD015F64B1 /* ORCaen775Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen775Model.h; sourceTree = "<group>"; };
 		F5B1802C03B297FD015F64B1 /* ORCaen775Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCaen775Model.m; sourceTree = "<group>"; };
 		F5B1802D03B297FD015F64B1 /* ORCaen775Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen775Controller.h; sourceTree = "<group>"; };
-		F5B1802E03B297FD015F64B1 /* ORCaen775Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCaen775Controller.m; sourceTree = "<group>"; };
 		F5B1803C03B299AD015F64B1 /* 775Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 775Card.gif; path = Source/Objects/Hardware/Vme/CAEN/CV775/775Card.gif; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -10205,7 +10209,9 @@
 				F5B1802B03B297FD015F64B1 /* ORCaen775Model.h */,
 				F5B1802C03B297FD015F64B1 /* ORCaen775Model.m */,
 				F5B1802D03B297FD015F64B1 /* ORCaen775Controller.h */,
-				F5B1802E03B297FD015F64B1 /* ORCaen775Controller.m */,
+				4398E7CC11B81B8B00FC4DDE /* ORCaen775Controller.m */,
+				4398E7DE11B81BBD00FC4DDE /* ORCaen775Decoders.h */,
+				4398E7DF11B81BBD00FC4DDE /* ORCaen775Decoders.m */,
 				F5B1803C03B299AD015F64B1 /* 775Card.gif */,
 				F5B1802903B297FD015F64B1 /* Caen775.nib */,
 			);
@@ -11053,6 +11059,7 @@
 				8457BE3911B0183500C4082D /* ORSIS3820Model.h in Headers */,
 				8457C2DE11B59DEC00C4082D /* ORCaen785Decoders.h in Headers */,
 				4398E6BA11B7E36400FC4DDE /* ORCAEN785Readout.hh in Headers */,
+				4398E7E011B81BBD00FC4DDE /* ORCaen775Decoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11894,7 +11901,6 @@
 				8434A33E055B3287002D3102 /* ORCaenCardModel.m in Sources */,
 				8434A33F055B3287002D3102 /* ORCaenDataDecoder.m in Sources */,
 				8434A340055B3287002D3102 /* ORCaen775Model.m in Sources */,
-				8434A341055B3287002D3102 /* ORCaen775Controller.m in Sources */,
 				8434A343055B3287002D3102 /* ORCaenCardController.m in Sources */,
 				8434A344055B3287002D3102 /* ORCaen785Controller.m in Sources */,
 				8434A346055B3287002D3102 /* ORCaen785Model.m in Sources */,
@@ -12549,6 +12555,8 @@
 				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
 				8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */,
 				8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */,
+				4398E7CD11B81B8B00FC4DDE /* ORCaen775Controller.m in Sources */,
+				4398E7E111B81BBD00FC4DDE /* ORCaen775Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
