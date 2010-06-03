@@ -52,7 +52,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 			int32_t i;
 			if((numMemorizedChannels>0)){
 				//make sure the data buffer can hold our data. Note that we do NOT ship the end of block. 
-				ensureDataCanHold(numMemorizedChannels + 2);
+				ensureDataCanHold(numMemorizedChannels + 3);
 				
 				int32_t savedDataIndex = dataIndex;
 				data[dataIndex++] = dataId | (numMemorizedChannels + 3);
