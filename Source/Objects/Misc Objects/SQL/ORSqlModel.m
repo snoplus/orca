@@ -365,7 +365,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				experimentName = [nextObject className];
 				if([experimentName hasPrefix:@"OR"])experimentName = [experimentName substringFromIndex:2];
 				if([experimentName hasSuffix:@"Model"])experimentName = [experimentName substringToIndex:[experimentName length] - 5];
-				if(![oldExperiment isEqualToString:experimentName]){
+				if( ![oldExperiment isEqual:experimentName]){
 					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment='%@' WHERE machine_id='%@'",experimentName, machine_id]];
 				}
 			}
