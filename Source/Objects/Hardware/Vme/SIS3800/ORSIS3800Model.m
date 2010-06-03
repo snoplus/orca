@@ -425,7 +425,7 @@ NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
 	moduleID = result >> 16;
 	unsigned short version = (result >> 12) & 0xf;
 	if(verbose)NSLog(@"SIS3800 ID: %x  Version:%x\n",moduleID,version);
-	if(moduleID != 3800)NSLogColor([NSColor redColor],@"Slot %d has a %d but you are using a SIS3800 object.\n",[self slot],moduleID);
+	if(moduleID != 0x3800)NSLogColor([NSColor redColor],@"Slot %d has a %04x but you are using a SIS3800 object.\n",[self slot],moduleID);
 	   
 	[self readStatusRegister];
 	

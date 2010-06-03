@@ -291,7 +291,13 @@ NSString* 	caenChnl				= @"CAEN Chnl";
         
         // If user selected the output buffer then read it.
         else if (theRegIndex == [self getOutputBufferIndex]){
+			
             ORDataPacket* tempDataPacket = [[ORDataPacket alloc]init];
+			dataDecoder = [[ORCaenDataDecoder alloc] init];
+			//make buffer for data with extra room for our 2 long word header.
+			dataBuffer = (unsigned long*)malloc([self getDataBufferSize]+2*sizeof(long));
+			controller = [self adapter]; //cache for speed
+			
             [self takeData:tempDataPacket userInfo:nil];
 			if([[tempDataPacket dataArray]count]){
 				NSData* theData = [[tempDataPacket dataArray] objectAtIndex:0];
@@ -313,6 +319,13 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 		NSLog(@"Can't Read [%@] on the %@.\n",
 			  [self getRegisterName:theRegIndex], [self identifier]);
 		[localException raise];
+	}
+	@finally {
+		[dataDecoder release];
+		dataDecoder = nil;
+		free (dataBuffer);
+		dataBuffer = 0;
+		controller = 0;
 	}
 }
 
@@ -788,6 +801,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 					dataBuffer[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
 					[aDataPacket addLongsToFrameBuffer:dataBuffer length:dataIndex];
 					dataIndex = 2;
+					break;
                 }
                 else {
                     //error...the end of block not where we expected it
