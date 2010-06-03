@@ -34,7 +34,15 @@
     return self;
 }
 
-
+- (void) awakeFromNib 
+{
+	int i;
+	for(i=0;i<16;i++){
+		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
+		[[onlineMaskMatrixB cellAtRow:i column:0] setTag:i+16];
+	}
+	[super awakeFromNib];
+}
 #pragma mark ¥¥¥Notifications
 //--------------------------------------------------------------------------------
 /*!\method  registerNotificationObservers
@@ -51,9 +59,19 @@
                          name : ORCaen775ModelModelTypeChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+					 selector : @selector(onlineMaskChanged:)
+						 name : ORCaen775ModelOnlineMaskChanged
+					   object : model];
 }
 
 #pragma mark ***Interface Management
+- (void) updateWindow
+{
+	[ super updateWindow ];
+	[self modelTypeChanged:nil];
+}
+
 - (void) modelTypeChanged:(NSNotification*)aNote
 {
 	[modelTypePU selectItemAtIndex: [model modelType]];
@@ -67,9 +85,19 @@
 	}
 }
 
-- (void) updateWindow
+- (void) onlineMaskChanged:(NSNotification*)aNotification
 {
-   [ super updateWindow ];
+	short i;
+	unsigned long theMask = [model onlineMask];
+	for(i=0;i<16;i++){
+		[[onlineMaskMatrixA cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+		[[onlineMaskMatrixB cellWithTag:i+16] setIntValue:(theMask&(1<<(i+16)))!=0];
+	}
+}
+
+- (void) thresholdLockChanged:(NSNotification*)aNotification
+{    
+	[super thresholdLockChanged:aNotification];
 	[self modelTypeChanged:nil];
 }
 
@@ -85,5 +113,10 @@
 - (void) modelTypePUAction:(id)sender
 {
 	[model setModelType:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) onlineAction:(id)sender
+{
+	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 @end
