@@ -79,6 +79,10 @@ enum {
 {
     int modelType;
 	unsigned long   onlineMask;
+	//cached values for speed.
+	unsigned long statusAddress;
+	unsigned long dataBufferAddress;
+	unsigned long location;
 }
 
 #pragma mark ***Accessors
