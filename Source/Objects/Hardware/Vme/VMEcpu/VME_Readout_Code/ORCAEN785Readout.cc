@@ -57,22 +57,29 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 				int32_t savedDataIndex = dataIndex;
 				data[dataIndex++] = dataId | (numMemorizedChannels + 3);
 				data[dataIndex++] = locationMask;
-				
+				uint8_t dataOK = true;
 				for(i=0;i<numMemorizedChannels;i++){
 					result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
 					if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x0))data[dataIndex++] = dataValue;
-					else break;
+					else {
+						dataOK = false;
+						dataIndex = savedDataIndex;
+						LogBusError("Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+						FlushDataBuffer();
+						break;
+					}
 				}
-				
-				//OK we read the data, get the end of block
-				result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
-				if((result != sizeof(dataValue)) || (ShiftAndExtract(dataValue,24,0x7) != 0x4)){
-					//some kind of bad error, report and flush the buffer
-					LogBusError("Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno)); 
-					dataIndex = savedDataIndex;
-					FlushDataBuffer();
+				if(dataOK){
+					//OK we read the data, get the end of block
+					result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+					if((result != sizeof(dataValue)) || (ShiftAndExtract(dataValue,24,0x7) != 0x4)){
+						//some kind of bad error, report and flush the buffer
+						LogBusError("Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+						dataIndex = savedDataIndex;
+						FlushDataBuffer();
+					}
+					else data[dataIndex++] = dataValue;
 				}
-				else data[dataIndex++] = dataValue;
 			}
 		}
 	}
