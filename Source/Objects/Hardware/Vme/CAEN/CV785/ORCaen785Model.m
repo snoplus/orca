@@ -29,16 +29,16 @@ NSString* ORCaen785ModelOnlineMaskChanged = @"ORCaen785ModelOnlineMaskChanged";
 static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly,	kD32},
 	{@"FirmWare Revision",	false,  false, 	false,	0x1000,		kReadOnly,	kD16},
-	{@"Geo Address",	false,	false, 	false,	0x1002,		kReadWrite,	kD16},
+	{@"Geo Address",		false,	false, 	false,	0x1002,		kReadWrite,	kD16},
 	{@"MCST CBLT Address",	false,	false, 	true,	0x1004,		kReadWrite,	kD16},
-	{@"Bit Set 1",		false,	true, 	true,	0x1006,		kReadWrite,	kD16},
-	{@"Bit Clear 1",	false,	true, 	true,	0x1008,		kReadWrite,	kD16},
+	{@"Bit Set 1",			false,	true, 	true,	0x1006,		kReadWrite,	kD16},
+	{@"Bit Clear 1",		false,	true, 	true,	0x1008,		kReadWrite,	kD16},
 	{@"Interrup Level",     false,	true, 	true,	0x100A,		kReadWrite,	kD16},
 	{@"Interrup Vector",	false,	true, 	true,	0x100C,		kReadWrite,	kD16},
 	{@"Status Register 1",	false,	true, 	true,	0x100E,		kReadOnly,	kD16},
 	{@"Control Register 1",	false,	true, 	true,	0x1010,		kReadWrite,	kD16},
-	{@"ADER High",		false,	false, 	true,	0x1012,		kReadWrite,	kD16},
-	{@"ADER Low",		false,	false, 	true,	0x1014,		kReadWrite,	kD16},
+	{@"ADER High",			false,	false, 	true,	0x1012,		kReadWrite,	kD16},
+	{@"ADER Low",			false,	false, 	true,	0x1014,		kReadWrite,	kD16},
 	{@"Single Shot Reset",	false,	false, 	false,	0x1016,		kWriteOnly,	kD16},
 	{@"MCST CBLT Ctrl",     false,	false, 	true,	0x101A,		kReadWrite,	kD16},
 	{@"Event Trigger Reg",	false,	true, 	true,	0x1020,		kReadWrite,	kD16},
@@ -48,9 +48,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Increment Event",	false,	false, 	false,	0x1028,		kWriteOnly,	kD16},
 	{@"Increment Offset",	false,	false, 	false,	0x102A,		kWriteOnly,	kD16},
 	{@"Load Test Register",	false,	false, 	false,	0x102C,		kReadWrite,	kD16},
-	{@"FCLR Window",	false,	true, 	true,	0x102E,		kReadWrite,	kD16},
-	{@"Bit Set 2",		false,	true, 	true,	0x1032,		kReadWrite,	kD16},
-	{@"Bit Clear 2",	false,	true, 	true,	0x1034,		kWriteOnly,	kD16},
+	{@"FCLR Window",		false,	true, 	true,	0x102E,		kReadWrite,	kD16},
+	{@"Bit Set 2",			false,	true, 	true,	0x1032,		kReadWrite,	kD16},
+	{@"Bit Clear 2",		false,	true, 	true,	0x1034,		kWriteOnly,	kD16},
 	{@"W Mem Test Address",	false,	true, 	true,	0x1036,		kWriteOnly,	kD16},
 	{@"Mem Test Word High",	false,	true, 	true,	0x1038,		kWriteOnly,	kD16},
 	{@"Mem Test Word Low",	false,	false, 	false,	0x103A,		kWriteOnly,	kD16},
@@ -58,23 +58,16 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Test Event Write",	false,	false, 	false,	0x103E,		kWriteOnly,	kD16},
 	{@"Event Counter Reset",false,	false, 	false,	0x1040,		kWriteOnly,	kD16},
 	{@"R Test Address",     false,	true, 	true,	0x1064,		kWriteOnly,	kD16},
-	{@"SW Comm",		false,	false, 	false,	0x1068,		kWriteOnly,	kD16},
+	{@"SW Comm",			false,	false, 	false,	0x1068,		kWriteOnly,	kD16},
 	{@"Slide Cons Reg",     false,	true,	true,	0x106A,		kReadWrite,     kD16},
-	{@"ADD",		false,	false, 	false,	0x1070,		kReadOnly,	kD16},
-	{@"BADD",		false,	false, 	false,	0x1072,		kReadOnly,	kD16},
-	{@"Thresholds",		false,	false, 	false,	0x1080,		kReadWrite,	kD16},
+	{@"ADD",				false,	false, 	false,	0x1070,		kReadOnly,	kD16},
+	{@"BADD",				false,	false, 	false,	0x1072,		kReadOnly,	kD16},
+	{@"Thresholds",			false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
 
 @implementation ORCaen785Model
 
 #pragma mark ***Initialization
-//--------------------------------------------------------------------------------
-/*!\method  init
- * \brief	Called first time class is initialized.  Used to set basic
- *			default values first time object is created.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) init //designated initializer
 {
     self = [super init];
@@ -88,24 +81,11 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return self;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  setUpImage
- * \brief	Sets the image used by this device in the catalog window.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"C785"]];
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  makeMainController
- * \brief	Makes the controller object that interfaces between the GUI and
- *			this model.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) makeMainController
 {
     [self linkToController:@"ORCaen785Controller"];
@@ -130,9 +110,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) setModelType:(int)aModelType
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setModelType:modelType];
-    
     modelType = aModelType;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen785ModelModelTypeChanged object:self];
 }
 
