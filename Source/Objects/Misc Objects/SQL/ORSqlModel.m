@@ -97,7 +97,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[notifyCenter removeObserver:self];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(disconnect)
+                     selector : @selector(applicationIsTerminating:)
                          name : @"ORAppTerminating"
                        object : [NSApp delegate]];
 	
@@ -106,6 +106,14 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
                          name : ORRunStatusChangedNotification
                        object : nil];
 	
+}
+
+- (void) applicationIsTerminating:(NSNotification*)aNote
+{
+	if([self validateConnection]){
+		[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = '%@'",macAddress()]];
+	}
+	[self disconnect];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNote
