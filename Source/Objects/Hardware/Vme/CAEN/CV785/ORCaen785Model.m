@@ -263,7 +263,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 - (void) flushBuffer
 {
-	return; //temp.......
+	//return; //temp.......
     short n = [self getDataBufferSize]/sizeof(long);
     int i;
     unsigned long dataValue;
