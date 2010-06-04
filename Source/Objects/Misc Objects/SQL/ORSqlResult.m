@@ -180,11 +180,11 @@ NSCalendarDate		*MCPYear0000;
                     theCurrentObj = [NSString stringWithUTF8String:theData];
 				    break;
                 case FIELD_TYPE_DATETIME:
-                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithCString:theData encoding:NSUTF8StringEncoding] calendarFormat:@"%Y-%m-%d %H:%M:%S"];
+                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y-%m-%d %H:%M:%S"];
                     [theCurrentObj setCalendarFormat:@"%Y-%m-%d %H:%M:%S"];
                     break;
                 case FIELD_TYPE_YEAR:
-                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithCString:theData encoding:NSUTF8StringEncoding] calendarFormat:@"%Y"];
+                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y"];
                     [theCurrentObj setCalendarFormat:@"%Y"];
                     if (! theCurrentObj) {
                         theCurrentObj = MCPYear0000;
@@ -192,7 +192,7 @@ NSCalendarDate		*MCPYear0000;
                     break;
                 case FIELD_TYPE_VAR_STRING:
                 case FIELD_TYPE_STRING:
-					theCurrentObj = [NSString stringWithCString:theData encoding:NSUTF8StringEncoding];
+					theCurrentObj = [NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding];
                     break;
                 case FIELD_TYPE_TINY_BLOB:
                 case FIELD_TYPE_BLOB:
@@ -204,16 +204,16 @@ NSCalendarDate		*MCPYear0000;
                    }
                     break;
                 case FIELD_TYPE_SET:
-					theCurrentObj = [NSString stringWithCString:theData encoding:NSUTF8StringEncoding];
+					theCurrentObj = [NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding];
                     break;
                 case FIELD_TYPE_ENUM:
-					theCurrentObj = [NSString stringWithCString:theData encoding:NSUTF8StringEncoding];
+					theCurrentObj = [NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding];
                     break;
                 case FIELD_TYPE_NULL:
 				   theCurrentObj = [NSNull null];
                     break;
                 case FIELD_TYPE_NEWDATE:
-					theCurrentObj = [NSString stringWithCString:theData encoding:NSUTF8StringEncoding];
+					theCurrentObj = [NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding];
                     break;
                 default:
                     NSLog (@"in fetchRowAsDictionary : Unknown type : %d for column %d, send back a NSData object", (int)theField[i].type, (int)i);
@@ -285,7 +285,7 @@ NSCalendarDate		*MCPYear0000;
     theNamesArray = [NSMutableArray arrayWithCapacity: theNumFields];
     theField = mysql_fetch_fields(mResult);    
     for (i=0; i<theNumFields; i++) {
-        NSString	*theName = [NSString stringWithCString:theField[i].name encoding:NSUTF8StringEncoding];
+        NSString	*theName = [NSString stringWithCString:theField[i].name encoding:NSISOLatin1StringEncoding];
         if ((theName) && (![theName isEqualToString:@""])) {
             [theNamesArray addObject:theName];
         }
@@ -563,7 +563,7 @@ NSCalendarDate		*MCPYear0000;
     if (theTextData == nil) {
         return nil;
     }
-    theString = [[NSString alloc] initWithData:theTextData encoding:NSUTF8StringEncoding];				
+    theString = [[NSString alloc] initWithData:theTextData encoding:NSISOLatin1StringEncoding];				
     if (theString) {
         [theString autorelease];
     }
