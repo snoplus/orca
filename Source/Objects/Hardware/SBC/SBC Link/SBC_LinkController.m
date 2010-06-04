@@ -93,7 +93,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[model cpuName]];	
+	if(aModel)[[self window] setTitle:[model cpuName]];	
 	[self setDriverInfo];
 }
 
