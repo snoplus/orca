@@ -267,7 +267,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+	if(model)[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
 - (void) basicLockChanged:(NSNotification*)aNotification
