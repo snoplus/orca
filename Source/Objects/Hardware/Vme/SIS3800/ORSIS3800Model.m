@@ -977,7 +977,7 @@ NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
 				data[7+i] = counts[i];
 			}
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:&data length:sizeof(long)*kSIS3800DataLen]];
+																object:[NSData dataWithBytes:data length:sizeof(long)*kSIS3800DataLen]];
 			lastTimeMeasured = timeMeasured;
 		}
 	}

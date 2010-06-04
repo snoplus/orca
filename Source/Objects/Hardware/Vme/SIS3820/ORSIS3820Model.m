@@ -969,7 +969,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 				data[7+i] = counts[i];
 			}
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:&data length:sizeof(long)*kSIS3820DataLen]];
+																object:[NSData dataWithBytes:data length:sizeof(long)*kSIS3820DataLen]];
 			lastTimeMeasured = timeMeasured;
 		}
 	}
