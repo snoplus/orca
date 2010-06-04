@@ -95,7 +95,7 @@
 
 - (NSString *) getLastErrorMessage
 {
-    if (mConnection) return [NSString stringWithCString:mysql_error(mConnection) encoding:NSUTF8StringEncoding];
+    if (mConnection) return [NSString stringWithCString:mysql_error(mConnection) encoding:NSISOLatin1StringEncoding];
     else			 return @"No connection initailized yet (MYSQL* still NULL)\n";
 }
 
@@ -123,7 +123,7 @@
     NSString*	 theReturn;
 	
     mysql_real_escape_string(mConnection, theCEscBuffer, theCDataBuffer, theLength);
-    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSUTF8StringEncoding];
+    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
     free (theCEscBuffer);
     return theReturn;
 }
@@ -142,7 +142,7 @@
     theLength = strlen(theCStringBuffer);
     theCEscBuffer = (char *)calloc(sizeof(char),(theLength * 2) + 1);
     mysql_real_escape_string(mConnection, theCEscBuffer, theCStringBuffer, theLength);
-    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSUTF8StringEncoding];
+    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
     free (theCEscBuffer);
     return theReturn;    
 }
@@ -280,7 +280,7 @@
 
 - (NSString*) clientInfo
 {
-    return [NSString stringWithCString:mysql_get_client_info() encoding:NSUTF8StringEncoding];
+    return [NSString stringWithCString:mysql_get_client_info() encoding:NSISOLatin1StringEncoding];
 }
 
 
@@ -289,14 +289,14 @@
  Returns a string giving information on the host of the DB server.
  "*/
 {
-    return [NSString stringWithCString:mysql_get_host_info(mConnection) encoding:NSUTF8StringEncoding];
+    return [NSString stringWithCString:mysql_get_host_info(mConnection) encoding:NSISOLatin1StringEncoding];
 }
 
 
 - (NSString *) serverInfo
 {
     if (connected) {
-        return [NSString stringWithCString: mysql_get_server_info(mConnection) encoding:NSUTF8StringEncoding];
+        return [NSString stringWithCString: mysql_get_server_info(mConnection) encoding:NSISOLatin1StringEncoding];
     }
     return @"";
 }
