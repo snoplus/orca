@@ -20,7 +20,7 @@
 
 // Address information for this unit.
 #define k785DefaultBaseAddress 		0x06000000
-#define k785DefaultAddressModifier 	0x39
+#define k785DefaultAddressModifier 	0x09
 
 NSString* ORCaen785ModelModelTypeChanged  = @"ORCaen785ModelModelTypeChanged";
 NSString* ORCaen785ModelOnlineMaskChanged = @"ORCaen785ModelOnlineMaskChanged";
