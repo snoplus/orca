@@ -33,11 +33,10 @@ NSString* ORSqlConnectionValidChanged	= @"ORSqlConnectionValidChanged";
 NSString* ORSqlLock					= @"ORSqlLock";
 
 static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
+
 @interface ORSqlModel (private)
 - (BOOL) validateConnection;
-- (void) listMachines;
 - (void) updateDataSets;
-
 - (void) postMachineName;
 - (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber;
 @end
@@ -55,6 +54,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[queue cancelAllOperations];
+	[queue release];
 	[sqlConnection release];
     [dataBaseName release];
     [password release];
@@ -65,6 +66,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 - (void) awakeAfterDocumentLoaded
 {
+	if(!queue){
+		queue = [[NSOperationQueue alloc] init];
+		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+	}
 	[self postMachineName];
 }
 
@@ -266,7 +271,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionValidChanged object:self];
 	
-	[self listMachines];
 
 	return connectionValid;
 }
@@ -311,17 +315,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	return connectionValid;
 }
 
-- (void) listMachines
-{
-	if([self validateConnection]){
-		ORSqlResult* theResult = [sqlConnection queryString:@"select * from machines"];
-		while (1){
-			id d = [theResult fetchRowAsDictionary];
-			if(!d)break;
-			NSLog(@"%@\n",d);
-		}
-	}
-}
 
 /* Table: machines
 +------------+-------------+------+-----+---------+----------------+
@@ -335,20 +328,9 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) postMachineName
 {
 	if([self validateConnection]){
-		
-		NSString* name = computerName();
-		NSString* hw_address = macAddress();
-		
-		NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",
-						   [sqlConnection quoteObject:hw_address]];
-		ORSqlResult* theResult = [sqlConnection queryString:query];
-		id d = [theResult fetchRowAsDictionary];
-		if(!d){
-			NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES (%@,%@)",
-							   [sqlConnection quoteObject:name],
-							   [sqlConnection quoteObject:hw_address]];
-			[sqlConnection queryString:query];
-		}
+		ORPostMachineNameOp* anOp = [[ORPostMachineNameOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[queue addOperation:anOp];
+		[anOp release];
 	}
 }
 
@@ -363,40 +345,29 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
  | machine_id | int(11)     | NO   | MUL | NULL    |                |
  | experiment | varchar(64) | YES  |     | NULL    |                |
  +------------+-------------+------+-----+---------+----------------+
+ run types:
+	0 stopped
+	1 running
+	2 starting
+	3 stopping
+	4 between subruns
  */
 - (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber
 {
-	if([self validateConnection]){
-		//get our machine id using our MAC Address
-		ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-		id row				   = [theResult fetchRowAsDictionary];
-		
-		//get the entry for our run state using our machine_id
-		id machine_id	= [row objectForKey:@"machine_id"];
-		theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id,state,experiment from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
-		id ourRunEntry	= [theResult fetchRowAsDictionary];
-		id oldExperiment = [ourRunEntry objectForKey:@"experiment"];
-		
-		//if we have a run entry, update it. Otherwise create it.
-		if(ourRunEntry)[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d WHERE machine_id=%@",runNumber,subRunNumber,aRunState,[sqlConnection quoteObject:machine_id]]];
-		else   [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",runNumber,subRunNumber,aRunState,[sqlConnection quoteObject:machine_id]]];
-		
-		if(aRunState == 1){
-			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM datasets WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
-			id nextObject = [self objectConnectedTo:ORSqlModelInConnector];
-			NSString* experimentName;
-			if(!nextObject)experimentName = @"TestStand";
-			else {
-				experimentName = [nextObject className];
-				if([experimentName hasPrefix:@"OR"])experimentName = [experimentName substringFromIndex:2];
-				if([experimentName hasSuffix:@"Model"])experimentName = [experimentName substringToIndex:[experimentName length] - 5];
-				if( ![oldExperiment isEqual:experimentName]){
-					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment=%@ WHERE machine_id=%@",
-												[sqlConnection quoteObject:experimentName], 
-												[sqlConnection quoteObject:machine_id]]];
-				}
-			}
+	if([self validateConnection]){		
+		id nextObject = [self objectConnectedTo:ORSqlModelInConnector];
+		NSString* experimentName;
+		if(!nextObject)	experimentName = @"TestStand";
+		else {
+			experimentName = [nextObject className];
+			if([experimentName hasPrefix:@"OR"])experimentName = [experimentName substringFromIndex:2];
+			if([experimentName hasSuffix:@"Model"])experimentName = [experimentName substringToIndex:[experimentName length] - 5];
 		}
+		ORPostRunStateOp* anOp = [[ORPostRunStateOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[anOp setRunState:aRunState runNumber:runNumber subRunNumber:subRunNumber];
+		[anOp setExperimentName:experimentName];
+		[queue addOperation:anOp];
+		[anOp release];
 	}
 }
 
@@ -424,51 +395,158 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) updateDataSets
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	if([self validateConnection]){
-		//get our machine_id using our MAC Address
-		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-		id row				    = [theResult fetchRowAsDictionary];
-		id machine_id			= [row objectForKey:@"machine_id"];
+	if([self validateConnection]){		
+		ORPostDataOp* anOp = [[ORPostDataOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[anOp setDataMonitors:dataMonitors];
+		[queue addOperation:anOp];
+		[anOp release];
 		
-		for(id aMonitor in dataMonitors){
-			NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
-			for(id aDataSet in objs1d){
-				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from datasets where (machine_id=%@ and name=%@ and monitor_id=%d)",
-																	   machine_id,
-																	   [sqlConnection quoteObject:[aDataSet fullName]],
-																	   [aMonitor uniqueIdNumber]]];
-				id dataSetEntry			 = [theResult fetchRowAsDictionary];
-				id dataset_id			 = [dataSetEntry objectForKey:@"dataset_id"];
-				unsigned long lastCounts = [[dataSetEntry objectForKey:@"counts"] longValue];
-				unsigned long countsNow  = [aDataSet totalCounts];
-				unsigned long start,end;
-				if(dataset_id) {
-					if(lastCounts != countsNow){
-						NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
-						[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE datasets SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
-													[aDataSet totalCounts],
-													start,end,
-													[sqlConnection quoteObject:theData],
-													[sqlConnection quoteObject:dataset_id]]];
-					
-					}
-				}
-				else {
-					NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
-					[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO datasets (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
-												[aMonitor uniqueIdNumber],
-												[sqlConnection quoteObject:machine_id],
-												[sqlConnection quoteObject:[aDataSet fullName]],
-												[aDataSet totalCounts],
-												start,end,
-												[aDataSet numberBins],
-												[sqlConnection quoteObject:theData]]];
-				}
-			}
-		}
 	}
 	[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
+}
+@end
+
+@implementation ORSqlOperation
+- (id) initWithSqlConnection:(ORSqlConnection*)aSqlConnection delegate:(id)aDelegate
+{
+	self = [super init];
+	sqlConnection = [aSqlConnection retain];
+	delegate = aDelegate;
+    return self;
+}
+
+- (void) dealloc
+{
+	[sqlConnection release];	
+	[super dealloc];
 }
 
 @end
 
+@implementation ORPostMachineNameOp
+- (void) main
+{
+	NSString* name		 = computerName();
+	NSString* hw_address = macAddress();
+	
+	NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",
+					   [sqlConnection quoteObject:hw_address]];
+	ORSqlResult* theResult = [sqlConnection queryString:query];
+	id d = [theResult fetchRowAsDictionary];
+	if(!d){
+		NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES (%@,%@)",
+						   [sqlConnection quoteObject:name],
+						   [sqlConnection quoteObject:hw_address]];
+		[sqlConnection queryString:query];
+	}
+	
+}
+@end
+
+@implementation ORPostRunStateOp
+- (void) dealloc
+{
+	[experimentName release];
+	[super dealloc];
+}
+
+- (void) setRunState:(int)aRunState runNumber:(int)aRunNumber subRunNumber:(int)aSubRunNumber
+{
+	runNumber = aRunNumber;
+	subRunNumber = aSubRunNumber;
+	runState = aRunState;
+}
+
+- (void) setExperimentName:(NSString*)anExperiment
+{
+	[experimentName autorelease];
+	experimentName = [anExperiment copy];
+}
+
+- (void) main
+{
+	//get our machine id using our MAC Address
+	ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+	id row				   = [theResult fetchRowAsDictionary];
+	
+	//get the entry for our run state using our machine_id
+	id machine_id	= [row objectForKey:@"machine_id"];
+	theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id,state,experiment from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
+	id ourRunEntry	= [theResult fetchRowAsDictionary];
+	id oldExperiment = [ourRunEntry objectForKey:@"experiment"];
+	
+	//if we have a run entry, update it. Otherwise create it.
+	if(ourRunEntry)[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d WHERE machine_id=%@",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
+	else   [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
+	
+	if(runState == 1){
+		[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM datasets WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
+		if( ![oldExperiment isEqual:experimentName]){
+			[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment=%@ WHERE machine_id=%@",
+										[sqlConnection quoteObject:experimentName], 
+										[sqlConnection quoteObject:machine_id]]];
+		}
+	}
+}
+@end
+@implementation ORPostDataOp
+
+- (void) dealloc
+{
+	[dataMonitors release];
+	[super dealloc];
+}
+
+- (void) setDataMonitors:(id)someMonitors
+{
+	[someMonitors retain];
+	[dataMonitors release];
+	dataMonitors = someMonitors;
+}
+
+- (void) main
+{
+	//get our machine_id using our MAC Address
+	ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+	id row				    = [theResult fetchRowAsDictionary];
+	id machine_id			= [row objectForKey:@"machine_id"];
+
+	for(id aMonitor in dataMonitors){
+		NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
+		for(id aDataSet in objs1d){
+			ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from datasets where (machine_id=%@ and name=%@ and monitor_id=%d)",
+																   machine_id,
+																   [sqlConnection quoteObject:[aDataSet fullName]],
+																   [aMonitor uniqueIdNumber]]];
+			id dataSetEntry			 = [theResult fetchRowAsDictionary];
+			id dataset_id			 = [dataSetEntry objectForKey:@"dataset_id"];
+			unsigned long lastCounts = [[dataSetEntry objectForKey:@"counts"] longValue];
+			unsigned long countsNow  = [aDataSet totalCounts];
+			unsigned long start,end;
+			if(dataset_id) {
+				if(lastCounts != countsNow){
+					NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
+					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE datasets SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
+												[aDataSet totalCounts],
+												start,end,
+												[sqlConnection quoteObject:theData],
+												[sqlConnection quoteObject:dataset_id]]];
+					
+				}
+			}
+			else {
+				NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
+				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO datasets (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
+											[aMonitor uniqueIdNumber],
+											[sqlConnection quoteObject:machine_id],
+											[sqlConnection quoteObject:[aDataSet fullName]],
+											[aDataSet totalCounts],
+											start,end,
+											[aDataSet numberBins],
+											[sqlConnection quoteObject:theData]]];
+			}
+		}
+	}
+}
+
+@end

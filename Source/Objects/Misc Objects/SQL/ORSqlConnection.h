@@ -38,8 +38,6 @@
 - (unsigned int) getLastErrorID;
 - (BOOL) isConnected;
 - (BOOL) checkConnection;
-- (NSString*) prepareBinaryData:(NSData *) theData;
-- (NSString *) prepareString:(NSString *) theString;
 - (NSString *) quoteObject:(id) theObject;
 - (ORSqlResult*) queryString:(NSString *) query;
 - (unsigned long long) affectedRows;

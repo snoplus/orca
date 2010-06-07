@@ -22,6 +22,10 @@
 #import "ORSqlConnection.h"
 #import "ORSqlResult.h"
 
+@interface ORSqlConnection (private)
+- (NSString*) prepareBinaryData:(NSData *) theData;
+- (NSString*) prepareString:(NSString *) theString;
+@end
 
 @implementation ORSqlConnection
 
@@ -40,69 +44,81 @@
 
 - (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase
 {
-	if(mConnection) return YES;
-	mConnection = mysql_init (NULL);
-	
-	if (mConnection == nil){
-		NSLog(@"ORSql: mysql_init() failed\n");
-		connected = NO;
-		return NO;
+	@synchronized(self){
+		if(!mConnection){
+			mConnection = mysql_init (NULL);
+			if(mConnection){
+			
+				if (mysql_real_connect (mConnection,			[aHostName UTF8String], 
+										[aUserName UTF8String], [aPassWord UTF8String],
+										[aDataBase UTF8String], 0, nil, 0) == nil){
+					
+					NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (mConnection));
+					NSLog(@"Error: (%s)\n",mysql_error (mConnection));
+					[self disconnect];
+					return NO;
+				}
+				connected = YES;
+				NSLog(@"Connected to DataBase %@ on %@\n",aDataBase,aHostName);
+				if([aDataBase length]){
+					[self selectDB:aDataBase];
+				}
+			}
+			else {
+				NSLog(@"ORSql: mysql_init() failed\n");
+				connected = NO;				
+			}
+		}
 	}
-	
-	if (mysql_real_connect (mConnection,			[aHostName UTF8String], 
-							[aUserName UTF8String], [aPassWord UTF8String],
-							[aDataBase UTF8String], 0, nil, 0) == nil){
-		
-		NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (mConnection));
-		NSLog(@"Error: (%s)\n",mysql_error (mConnection));
-		[self disconnect];
-		return NO;
-	}
-	connected = YES;
-	NSLog(@"Connected to DataBase %@ on %@\n",aDataBase,aHostName);
-	//[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionChanged object:self];
-	if([aDataBase length]){
-		[self selectDB:aDataBase];
-	}
-	return YES;
+	return mConnection!=nil;
 }
 
 
 - (void) disconnect
 {
-    if (connected) {
-        mysql_close(mConnection);
-        mConnection = NULL;
-		connected = NO;
-		//[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionChanged object:self];
-    }
-    return;
+	@synchronized(self){
+		if (connected) {
+			mysql_close(mConnection);
+			mConnection = NULL;
+			connected = NO;
+		}
+	}
 }
 
 - (BOOL) selectDB:(NSString *) dbName
 {
-    if (dbName == nil) {
-        return NO;
-    }
-    if ([dbName length]  && connected) {
-        if (mysql_select_db(mConnection, [dbName UTF8String]) == 0) {
-            return YES;
-        }
-    }
-    return NO;
+	BOOL result = NO;
+	@synchronized(self){
+		if(connected){
+			if ([dbName length]) {
+				if (mysql_select_db(mConnection, [dbName UTF8String]) == 0) {
+					result =  YES;
+				}
+			}
+		}
+	}
+
+    return result;
 }
 
 
 - (NSString *) getLastErrorMessage
 {
-    if (mConnection) return [NSString stringWithCString:mysql_error(mConnection) encoding:NSISOLatin1StringEncoding];
-    else			 return @"No connection initailized yet (MYSQL* still NULL)\n";
+	NSString* result = @"";
+	@synchronized(self){
+		if (mConnection) result= [NSString stringWithCString:mysql_error(mConnection) encoding:NSISOLatin1StringEncoding];
+		else			 result= @"No connection initailized yet (MYSQL* still NULL)\n";
+	}
+	return result;
 }
 
 - (unsigned int) getLastErrorID
 {
-    if (mConnection) return mysql_errno(mConnection);
-    return			 6666;
+	unsigned int result = 666;
+	@synchronized(self){
+		if (mConnection) result =  mysql_errno(mConnection);
+	}
+	return result;
 }
 
 - (BOOL) isConnected
@@ -112,41 +128,12 @@
 
 - (BOOL) checkConnection
 {
-    return (BOOL)(! mysql_ping(mConnection));
+	BOOL result = NO;
+	@synchronized(self){
+		result = mysql_ping(mConnection);
+	}
+	return result;
 }
-
-- (NSString*) prepareBinaryData:(NSData *) theData
-{
-    const char*	 theCDataBuffer = [theData bytes];
-    unsigned int theLength = [theData length];
-    char*		 theCEscBuffer = (char *)calloc(sizeof(char),(theLength*2) + 1);
-    NSString*	 theReturn;
-	
-    mysql_real_escape_string(mConnection, theCEscBuffer, theCDataBuffer, theLength);
-    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
-    free (theCEscBuffer);
-    return theReturn;
-}
-
-
-- (NSString *) prepareString:(NSString *) theString
-{
-    const char*	 theCStringBuffer = [theString UTF8String];
-    unsigned int theLength;
-    char*		 theCEscBuffer;
-    NSString*    theReturn;
-	
-    if ([theString length]==0) {
-        return @"";
-    }
-    theLength = strlen(theCStringBuffer);
-    theCEscBuffer = (char *)calloc(sizeof(char),(theLength * 2) + 1);
-    mysql_real_escape_string(mConnection, theCEscBuffer, theCStringBuffer, theLength);
-    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
-    free (theCEscBuffer);
-    return theReturn;    
-}
-
 
 - (NSString *) quoteObject:(id) theObject
 /*" Use the class of the theObject to know how it should be prepared for usage with the database.
@@ -157,59 +144,61 @@
  the preferred format for the database.
  "*/
 {
-	if (!theObject) {
-		return @"NULL";
+	NSString* result;
+	@synchronized(self){
+		if (!theObject) {
+			return @"NULL";
+		}
+		if ([theObject isKindOfClass:[NSData class]]) {
+			result = [NSString stringWithFormat:@"'%@'", [self prepareBinaryData:(NSData *) theObject]];
+		}
+		if ([theObject isKindOfClass:[NSString class]]) {
+			result = [NSString stringWithFormat:@"'%@'", [self prepareString:(NSString *) theObject]];
+		}
+		if ([theObject isKindOfClass:[NSNumber class]]) {
+			result = [NSString stringWithFormat:@"%@", theObject];
+		}
+		if ([theObject isKindOfClass:[NSCalendarDate class]]) {
+			result = [NSString stringWithFormat:@"'%@'", [(NSCalendarDate *)theObject descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S"]];
+		}
+		if ((nil == theObject) || ([theObject isKindOfClass:[NSNull class]])) {
+			result = @"NULL";
+		}
+		// Default : quote as string:
+		else result = [NSString stringWithFormat:@"'%@'", [self prepareString:[theObject description]]];
 	}
-	if ([theObject isKindOfClass:[NSData class]]) {
-		return [NSString stringWithFormat:@"'%@'", [self prepareBinaryData:(NSData *) theObject]];
-	}
-	if ([theObject isKindOfClass:[NSString class]]) {
-		return [NSString stringWithFormat:@"'%@'", [self prepareString:(NSString *) theObject]];
-	}
-	if ([theObject isKindOfClass:[NSNumber class]]) {
-		return [NSString stringWithFormat:@"%@", theObject];
-	}
-	if ([theObject isKindOfClass:[NSCalendarDate class]]) {
-		return [NSString stringWithFormat:@"'%@'", [(NSCalendarDate *)theObject descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S"]];
-	}
-	if ((nil == theObject) || ([theObject isKindOfClass:[NSNull class]])) {
-		return @"NULL";
-	}
-	// Default : quote as string:
-	return [NSString stringWithFormat:@"'%@'", [self prepareString:[theObject description]]];
+	return result;
 }
 
 
 - (ORSqlResult*) queryString:(NSString *) query
 {
-    ORSqlResult*	theResult = [ORSqlResult alloc];
-    const char*	theCQuery = [query UTF8String];
-    int         theQueryCode;
-    if ((theQueryCode = mysql_query(mConnection, theCQuery)) == 0) {
-        if (mysql_field_count(mConnection) != 0) {
-            theResult = [theResult initWithMySQLPtr:mConnection];
-        }
-        else {
-            return nil;
-        }
-    }
-    else {
-		NSLog (@"Problem in queryString error code is : %d, query is : %s -in ObjC : %@-\n", theQueryCode, theCQuery, query);
-		NSLog(@"Error message is : %@\n", [self getLastErrorMessage]);
-		theResult = nil;
-    }
-    if (theResult) {
-        [theResult autorelease];
-    }
-    return theResult;
+	ORSqlResult*	theResult = nil;
+	@synchronized(self){
+		const char*	theCQuery = [query UTF8String];
+		int         theQueryCode;
+		if ((theQueryCode = mysql_query(mConnection, theCQuery)) == 0) {
+			if (mysql_field_count(mConnection) != 0) {
+				theResult = [[[ORSqlResult alloc] initWithMySQLPtr:mConnection]autorelease];
+			}
+		}
+		else {
+			NSLog(@"Problem in queryString error code is : %d, query is : %s -in ObjC : %@-\n", theQueryCode, theCQuery, query);
+			NSLog(@"Error message is : %@\n", [self getLastErrorMessage]);
+		}
+	}
+    return theResult ;
 }
 
 - (unsigned long long) affectedRows
 {
-    if (connected) {
-        return mysql_affected_rows(mConnection);
-    }
-    return 0;
+	unsigned long long num = 0;
+	@synchronized(self){
+		if (connected) {
+			num = mysql_affected_rows(mConnection);
+		}
+	}
+    return num;
 }
 
 
@@ -218,113 +207,124 @@
  If the last query was an insert in a table having a autoindex column, returns the id (autoindexed field) of the last row inserted.
  "*/
 {
-    if (connected) {
-        return mysql_insert_id(mConnection);
-    }
-    return 0;
+	unsigned long long num = 0;
+	@synchronized(self){
+		if (connected) {
+			num = mysql_insert_id(mConnection);
+		}
+	}
+    return num;
 }
-
 
 - (ORSqlResult *) listDBs
 {
-    ORSqlResult*  theResult = [ORSqlResult alloc];
-    MYSQL_RES*	theResPtr;
+    ORSqlResult*  theResult = nil;
+	@synchronized(self){
+		MYSQL_RES*	theResPtr;
 	
-	if (theResPtr = mysql_list_dbs(mConnection, NULL)) {
-		[theResult initWithResPtr: theResPtr];
+		if (theResPtr = mysql_list_dbs(mConnection, NULL)) {
+			theResult = [[[ORSqlResult alloc]initWithResPtr: theResPtr]autorelease];
+		}	
 	}
-	else {
-		[theResult init];
-	}
-	if (theResult) {
-        [theResult autorelease];
-    }
     return theResult;    
 }
 
 
 - (ORSqlResult*) listTables
 {
-    ORSqlResult* theResult = [ORSqlResult alloc];
-    MYSQL_RES* theResPtr;
+    ORSqlResult* theResult = nil;
+ 	@synchronized(self){
+		MYSQL_RES* theResPtr;
 	
-	if (theResPtr = mysql_list_tables(mConnection, NULL)) {
-		[theResult initWithResPtr: theResPtr];
+		if (theResPtr = mysql_list_tables(mConnection, NULL)) {
+			theResult = [[[ORSqlResult alloc] initWithResPtr: theResPtr]autorelease];
+		}
 	}
-	else {
-		[theResult init];
-	}
-
-    if (theResult) {
-        [theResult autorelease];
-    }
     return theResult;
 }
 
 
 - (ORSqlResult *) listTablesFromDB:(NSString *) dbName 
 {	
-	NSString* theQuery   = [NSString stringWithFormat:@"SHOW TABLES FROM %@", dbName];
-	ORSqlResult* theResult = [self queryString:theQuery];
+	ORSqlResult* theResult = nil;
+	@synchronized(self){
+		NSString* theQuery   = [NSString stringWithFormat:@"SHOW TABLES FROM %@", dbName];
+		theResult = [self queryString:theQuery];
+	}
     return theResult;
 }
 
 
 - (ORSqlResult*)listFieldsFromTable:(NSString *)tableName
 {	
-	NSString*  theQuery = [NSString stringWithFormat:@"SHOW COLUMNS FROM %@", tableName];
-	ORSqlResult* theResult = [self queryString:theQuery];
+	ORSqlResult* theResult = nil;
+	@synchronized(self){
+		NSString*  theQuery = [NSString stringWithFormat:@"SHOW COLUMNS FROM %@", tableName];
+		theResult = [self queryString:theQuery];
+	}
     return theResult;
 }
 
 
 - (NSString*) clientInfo
 {
-    return [NSString stringWithCString:mysql_get_client_info() encoding:NSISOLatin1StringEncoding];
+	NSString* result = nil;
+	@synchronized(self){
+		result =  [NSString stringWithCString:mysql_get_client_info() encoding:NSISOLatin1StringEncoding];
+	}
+	return result;
 }
-
 
 - (NSString *) hostInfo
 /*"
  Returns a string giving information on the host of the DB server.
  "*/
 {
-    return [NSString stringWithCString:mysql_get_host_info(mConnection) encoding:NSISOLatin1StringEncoding];
+	NSString* result = nil;
+	@synchronized(self){
+		if (connected) {
+			result = [NSString stringWithCString:mysql_get_host_info(mConnection) encoding:NSISOLatin1StringEncoding];
+		}
+	}
+	return result;
 }
 
 
 - (NSString *) serverInfo
 {
-    if (connected) {
-        return [NSString stringWithCString: mysql_get_server_info(mConnection) encoding:NSISOLatin1StringEncoding];
-    }
-    return @"";
+ 	NSString* result = nil;
+	@synchronized(self){
+		if (connected) {
+			result = [NSString stringWithCString: mysql_get_server_info(mConnection) encoding:NSISOLatin1StringEncoding];
+		}
+	}
+    return result;
 }
 
-
-- (NSNumber *) protoInfo
+- (NSNumber*) protoInfo
 {
-    return [NSNumber numberWithUnsignedInt:mysql_get_proto_info(mConnection) ];
+	NSNumber* result = nil;
+ 	@synchronized(self){
+		if (connected) {
+			result= [NSNumber numberWithUnsignedInt:mysql_get_proto_info(mConnection) ];
+		}
+	}
+	return result;
 }
 
 
 - (ORSqlResult *) listProcesses
 {
-    ORSqlResult* theResult = [ORSqlResult alloc];
-    MYSQL_RES* theResPtr;
+    ORSqlResult* theResult = nil;
+	@synchronized(self){
+		MYSQL_RES* theResPtr;
 	
-    if (theResPtr = mysql_list_processes(mConnection)) {
-        [theResult initWithResPtr:theResPtr];
-    } else {
-        [theResult init];
-    }
-	
-    if (theResult) {
-        [theResult autorelease];
-    }
+		if (theResPtr = mysql_list_processes(mConnection)) {
+			theResult = [[[ORSqlResult alloc] initWithResPtr:theResPtr] autorelease];
+		}
+	}
     return theResult;
 }
-
 
 /*
  - (BOOL)createDBWithName:(NSString *)dbName
@@ -346,11 +346,48 @@
  }
  */
 
-
 - (BOOL) killProcess:(unsigned long) pid
 {	
-    int theErrorCode = mysql_kill(mConnection, pid);
+    int theErrorCode = 0; 
+	@synchronized(self){
+		theErrorCode = mysql_kill(mConnection, pid);
+	}
     return (theErrorCode) ? NO : YES;
 }
 
+@end
+
+@implementation ORSqlConnection (private)
+
+- (NSString*) prepareBinaryData:(NSData *) theData
+{
+	const char*	 theCDataBuffer = [theData bytes];
+	unsigned int theLength = [theData length];
+	char*		 theCEscBuffer = (char *)calloc(sizeof(char),(theLength*2) + 1);
+	
+	mysql_real_escape_string(mConnection, theCEscBuffer, theCDataBuffer, theLength);
+	NSString* theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
+	free (theCEscBuffer);
+	
+    return theReturn;
+}
+
+
+- (NSString *) prepareString:(NSString *) theString
+{
+    const char*	 theCStringBuffer = [theString UTF8String];
+    unsigned int theLength;
+    char*		 theCEscBuffer;
+    NSString*    theReturn;
+	
+    if ([theString length]==0) {
+        return @"";
+    }
+    theLength = strlen(theCStringBuffer);
+    theCEscBuffer = (char *)calloc(sizeof(char),(theLength * 2) + 1);
+    mysql_real_escape_string(mConnection, theCEscBuffer, theCStringBuffer, theLength);
+    theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
+    free (theCEscBuffer);
+    return theReturn;    
+}
 @end

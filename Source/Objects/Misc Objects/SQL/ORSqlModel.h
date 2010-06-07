@@ -24,6 +24,7 @@
 @interface ORSqlModel : OrcaObject
 {
 @private
+	NSOperationQueue* queue;
 	ORSqlConnection* sqlConnection;
 	BOOL		connectionValid;
 	NSString*	hostName;
@@ -55,7 +56,6 @@
 - (BOOL) testConnection;
 - (BOOL) connectionValid;
 - (void) disconnect;
-
 @end
 
 extern NSString* ORSqlDataBaseNameChanged;
@@ -64,4 +64,38 @@ extern NSString* ORSqlUserNameChanged;
 extern NSString* ORSqlHostNameChanged;
 extern NSString* ORSqlConnectionValidChanged;
 extern NSString* ORSqlLock;
+
+@interface ORSqlOperation : NSOperation
+{
+	ORSqlConnection* sqlConnection;
+	id delegate;
+}
+
+- (id)	 initWithSqlConnection:(ORSqlConnection*)aSqlConnection delegate:(id)aDelegate;
+- (void) dealloc;
+@end
+
+@interface ORPostMachineNameOp : ORSqlOperation
+- (void) main;
+@end
+
+@interface ORPostRunStateOp : ORSqlOperation
+{
+	int runState;
+	int runNumber;
+	int subRunNumber;
+	NSString* experimentName;
+}
+- (void) setExperimentName:(NSString*)anExperiment;
+- (void) setRunState:(int)aRunState runNumber:(int)aRunNumber subRunNumber:(int)aSubRunNumber;
+- (void) main;
+@end
+
+@interface ORPostDataOp : ORSqlOperation
+{
+	NSArray* dataMonitors;
+}
+- (void) setDataMonitors:(id)someMonitors;
+- (void) main;
+@end
 

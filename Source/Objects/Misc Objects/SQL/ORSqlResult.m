@@ -28,14 +28,6 @@ NSCalendarDate		*MCPYear0000;
 - (id) initWithMySQLPtr:(MYSQL *) mySQLPtr
 {
     self = [super init];
-    if (mResult) {
-        mysql_free_result(mResult);
-        mResult = NULL;
-    }
-    if (mNames) {
-        [mNames release];
-        mNames = NULL;
-    }
     mResult = mysql_store_result(mySQLPtr);
     if (mResult) {
         mNumOfFields = mysql_num_fields(mResult);
@@ -50,14 +42,6 @@ NSCalendarDate		*MCPYear0000;
 - (id) initWithResPtr:(MYSQL_RES *) mySQLResPtr
 {
     self = [super init];
-    if (mResult) {
-        mysql_free_result(mResult);
-        mResult = NULL;
-    }
-    if (mNames) {
-        [mNames release];
-        mNames = NULL;
-    }
     mResult = mySQLResPtr;
     if (mResult) {
         mNumOfFields = mysql_num_fields(mResult);
@@ -71,14 +55,6 @@ NSCalendarDate		*MCPYear0000;
 - (id) init
 {
     self = [super init];
-    if (mResult) {
-        mysql_free_result(mResult);
-        mResult = NULL;
-    }
-    if (mNames) {
-        [mNames release];
-        mNames = NULL;
-    }
     mNumOfFields = 0;
     return self;    
 }
