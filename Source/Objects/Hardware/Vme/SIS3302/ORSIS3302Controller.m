@@ -952,7 +952,8 @@
     [runModePU					setEnabled:!locked && !runInProgress];
     [addressText				setEnabled:!locked && !runInProgress];
     [initButton					setEnabled:!lockedOrRunningMaintenance];
-	[reportButton				setEnabled:!lockedOrRunningMaintenance];
+	[briefReportButton			setEnabled:!lockedOrRunningMaintenance];
+	[regDumpButton				setEnabled:!lockedOrRunningMaintenance];
 	[probeButton				setEnabled:!lockedOrRunningMaintenance];
 	
     [internalExternalTriggersOredCB	setEnabled:!lockedOrRunningMaintenance];
@@ -1468,19 +1469,37 @@
 	
 }
 
-- (IBAction) report:(id)sender
+- (IBAction) briefReport:(id)sender
 {
     @try {
 		[self endEditing];
 		[model initBoard];
-		[model report];
+		[model briefReport];
 	}
 	@catch(NSException* localException) {
         NSLog(@"SIS3302 Report FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nSIS3302 Report FAILED", @"OK", nil, nil,
                         localException);
     }
+
 }
+
+- (IBAction) regDump:(id)sender
+{
+	BOOL ok = NO;
+    @try {
+		[self endEditing];
+		[model initBoard];
+		ok = YES;
+	}
+	@catch(NSException* localException) {
+        NSLog(@"SIS3302 Reg Dump FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3302 Reg Dump FAILED", @"OK", nil, nil,
+                        localException);
+    }
+	if(ok)[model regDump];
+}
+
 
 #pragma mark •••Data Source
 

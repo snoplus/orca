@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="4343"/>
+			<integer value="3463"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1660,6 +1660,29 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<string key="NSContents">Report</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="79322301"/>
+																	<int key="NSButtonFlags">-2038284033</int>
+																	<int key="NSButtonFlags2">1</int>
+																	<reference key="NSAlternateImage" ref="926225358"/>
+																	<string key="NSAlternateContents"/>
+																	<object class="NSMutableString" key="NSKeyEquivalent">
+																		<characters key="NS.bytes"/>
+																	</object>
+																	<int key="NSPeriodicDelay">200</int>
+																	<int key="NSPeriodicInterval">25</int>
+																</object>
+															</object>
+															<object class="NSButton" id="289683775">
+																<reference key="NSNextResponder" ref="310954209"/>
+																<int key="NSvFlags">265</int>
+																<string key="NSFrame">{{3, 100}, {82, 28}}</string>
+																<reference key="NSSuperview" ref="310954209"/>
+																<bool key="NSEnabled">YES</bool>
+																<object class="NSButtonCell" key="NSCell" id="501479135">
+																	<int key="NSCellFlags">67239424</int>
+																	<int key="NSCellFlags2">138018816</int>
+																	<string key="NSContents">Reg Dump</string>
+																	<reference key="NSSupport" ref="26"/>
+																	<reference key="NSControlView" ref="289683775"/>
 																	<int key="NSButtonFlags">-2038284033</int>
 																	<int key="NSButtonFlags2">1</int>
 																	<reference key="NSAlternateImage" ref="926225358"/>
@@ -3959,6 +3982,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<string key="NSKeyEquiv"/>
 																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
+																		<int key="NSState">1</int>
 																		<reference key="NSOnImage" ref="229067266"/>
 																		<reference key="NSMixedImage" ref="287520686"/>
 																		<string key="NSAction">_popUpItemAction:</string>
@@ -8897,14 +8921,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<int key="connectionID">3069</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">report:</string>
-						<reference key="source" ref="614878284"/>
-						<reference key="destination" ref="79322301"/>
-					</object>
-					<int key="connectionID">3079</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">lemoOutAssignmentsField</string>
 						<reference key="source" ref="614878284"/>
@@ -9343,14 +9359,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="destination" ref="633549651"/>
 					</object>
 					<int key="connectionID">4093</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">reportButton</string>
-						<reference key="source" ref="614878284"/>
-						<reference key="destination" ref="79322301"/>
-					</object>
-					<int key="connectionID">4105</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -9839,6 +9847,38 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="destination" ref="910996740"/>
 					</object>
 					<int key="connectionID">4385</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">briefReportButton</string>
+						<reference key="source" ref="614878284"/>
+						<reference key="destination" ref="79322301"/>
+					</object>
+					<int key="connectionID">4389</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">regDumpButton</string>
+						<reference key="source" ref="614878284"/>
+						<reference key="destination" ref="289683775"/>
+					</object>
+					<int key="connectionID">4390</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">briefReport:</string>
+						<reference key="source" ref="614878284"/>
+						<reference key="destination" ref="79322301"/>
+					</object>
+					<int key="connectionID">4391</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">regDump:</string>
+						<reference key="source" ref="614878284"/>
+						<reference key="destination" ref="289683775"/>
+					</object>
+					<int key="connectionID">4392</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -10967,6 +11007,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="433611584"/>
 							<reference ref="79322301"/>
 							<reference ref="221376426"/>
+							<reference ref="289683775"/>
 						</object>
 						<reference key="parent" ref="189780115"/>
 					</object>
@@ -14205,6 +14246,20 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="566875092"/>
 						<reference key="parent" ref="910996740"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4386</int>
+						<reference key="object" ref="289683775"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="501479135"/>
+						</object>
+						<reference key="parent" ref="1021825403"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4387</int>
+						<reference key="object" ref="501479135"/>
+						<reference key="parent" ref="289683775"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -15235,6 +15290,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>4381.ImportedFromIB2</string>
 					<string>4382.IBPluginDependency</string>
 					<string>4382.ImportedFromIB2</string>
+					<string>4386.IBPluginDependency</string>
+					<string>4386.ImportedFromIB2</string>
+					<string>4387.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -15555,9 +15613,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{406, 128}, {1050, 604}}</string>
+					<string>{{93, 422}, {1050, 604}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{406, 128}, {1050, 604}}</string>
+					<string>{{93, 422}, {1050, 604}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<string>{213, 107}</string>
@@ -16353,6 +16411,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -16371,7 +16432,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4385</int>
+			<int key="maxID">4392</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -17151,6 +17212,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>adc50KTriggerEnabledAction:</string>
 							<string>baseAddressAction:</string>
+							<string>briefReport:</string>
 							<string>clockSourceAction:</string>
 							<string>dacOffsetAction:</string>
 							<string>energyDecimationAction:</string>
@@ -17192,7 +17254,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>preTriggerDelayAction:</string>
 							<string>probeBoardAction:</string>
 							<string>pulseLengthAction:</string>
-							<string>report:</string>
+							<string>regDump:</string>
 							<string>runModeAction:</string>
 							<string>sampleLengthAction:</string>
 							<string>sampleStartIndexAction:</string>
@@ -17260,6 +17322,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
@@ -17268,6 +17331,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>adc50KTriggerEnabledMatrix</string>
 							<string>addressText</string>
+							<string>briefReportButton</string>
 							<string>clockSourcePU</string>
 							<string>dacOffsetMatrix</string>
 							<string>endAddressThresholdField</string>
@@ -17327,7 +17391,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>rate0</string>
 							<string>rateLogCB</string>
 							<string>rateTextFields</string>
-							<string>reportButton</string>
+							<string>regDumpButton</string>
 							<string>runModePU</string>
 							<string>runSummaryField</string>
 							<string>sampleLengthMatrix</string>
@@ -17354,6 +17418,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSMatrix</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSMatrix</string>
 							<string>NSTextField</string>

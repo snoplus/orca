@@ -89,7 +89,8 @@
 
 	IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
-    IBOutlet NSButton*      reportButton;
+    IBOutlet NSButton*      briefReportButton;
+    IBOutlet NSButton*      regDumpButton;
     IBOutlet NSButton*      probeButton;
 	
 	IBOutlet NSPopUpButton*	triggerDecimation0;
@@ -257,7 +258,8 @@
 - (IBAction) sumGAction:(id)sender;
 - (IBAction) peakingTimeAction:(id)sender;
 - (IBAction) internalTriggerDelayAction:(id)sender;
-- (IBAction) report:(id)sender;
+- (IBAction) briefReport:(id)sender;
+- (IBAction) regDump:(id)sender;
 
 #pragma mark •••Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

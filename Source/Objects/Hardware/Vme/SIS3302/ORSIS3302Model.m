@@ -95,6 +95,8 @@ NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabled
 NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 
 
+
+
 @interface ORSIS3302Model (private)
 - (void) writeDacOffsets;
 - (void) setUpArrays;
@@ -103,6 +105,198 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 @end
 
 @implementation ORSIS3302Model
+#pragma mark •••Static Declarations
+//offsets from the base address
+typedef struct {
+	unsigned long offset;
+	NSString* name;
+} SIS3302GammaRegisterInformation;
+
+#define kNumSIS3302ReadRegs 173
+
+static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs] = {
+	{0x00000000,  @"Control/Status"},                         
+	{0x00000004,  @"Module Id. and Firmware Revision"},                         
+	{0x00000008,  @"Interrupt configuration"},                         
+	{0x00000000,  @"Interrupt control"},     
+	{0x0000000C,  @"Acquisition control/status"}, 
+	{0x00000030,  @"Broadcast Setup register"},                         
+	{0x00000034,  @"ADC Memory Page register"},  
+	{0x00000050,  @"DAC Control Status register"},                         
+	{0x00000054,  @"DAC Data register"},    
+	{0x00000060,  @"XILINX JTAG_TEST/JTAG_DATA_IN"},
+	{0x00000080,  @"MCA Scan Nof Histograms preset"},    
+	{0x00000084,  @"MCA Scan Histogram counter"},    
+	{0x00000088,  @"MCA Scan LNE Setup and Prescaler Factor"},    
+	{0x0000008C,  @"MCA Scan Control register"},   
+	{0x00000090,  @"MCA Multiscan Nof Scans prese"},    
+	{0x00000094,  @"MCA Multiscan Scan counter"},    
+	{0x00000098,  @"MCA Multiscan last Scan Histogram count"},    
+
+	//group 1
+	{0x02000000,  @"Event configuration (ADC1, ADC2)"},    
+	{0x02000004,  @"End Address Threshold (ADC1, ADC2)"},    
+	{0x02000008,  @"Pretrigger Delay and Trigger Gate Length (ADC1, ADC2)"},    
+	{0x0200000C,  @"Raw Data Buffer Configuration (ADC1, ADC2)"},    
+	{0x02000010,  @"Actual Sample address ADC1"},    
+	{0x02000014,  @"Actual Next Sample address ADC2"},    
+	{0x02000018,  @"Pretrigger Delay and Trigger Gate Length (ADC1, ADC2)"},    
+	{0x0200001C,  @"Previous Bank Sample address ADC2"},    
+	{0x02000020,  @"Actual Sample Value (ADC1, ADC2)"},    
+	{0x02000024,  @"internal Test"},    
+	{0x02000028,  @"DDR2 Memory Logic Verification (ADC1, ADC2)"},    
+	{0x02000030,  @"Trigger Setup ADC1"},    
+	{0x02000034,  @"Trigger Threshold ADC1"},    
+	{0x02000038,  @"Trigger Setup ADC2"},    
+	{0x0200003C,  @"Trigger Threshold ADC2"},    
+	{0x02000040,  @"Energy Setup GP (ADC1, ADC2)"},    
+	{0x02000044,  @"Energy Gate Length (ADC1, ADC2)"},    
+	{0x02000048,  @"Energy Sample Length (ADC1, ADC2)"},    
+	{0x0200004C,  @"Energy Sample Start Index1 (ADC1, ADC2)"},    
+	{0x02000050,  @"Energy Sample Start Index2 (ADC1, ADC2)"},    
+	{0x02000054,  @"Energy Sample Start Index3 (ADC1, ADC2)"},    
+	{0x02000058,  @"Energy Tau Factor ADC1"},    
+	{0x0200005C,  @"Energy Tau Factor ADC2"},    
+	{0x02000060,  @"MCA Energy to Histogram Calculation Parameter ADC1"},    
+	{0x02000064,  @"MCA Energy to Histogram Calculation Parameter ADC2"},    
+	{0x02000068,  @"MCA Histogram Parameters (ADC1, ADC2)"},    
+	{0x02000070,  @"Event Extended configuration (ADC1, ADC2)"},    
+	{0x02000078,  @"Trigger Extended Setup ADC1"},    
+	{0x0200007C,  @"Trigger Extended Setup ADC2"},    
+	{0x02000080,  @"MCA Trigger Start Counter ADC1"},    
+	{0x02000084,  @"MCA Pileup Counter ADC1"},    
+	{0x02000088,  @"MCA 'Energy to high' counter ADC1"},    
+	{0x0200008C,  @"MCA 'Energy to low' counter ADC1"},    
+	{0x02000090,  @"MCA Trigger Start Counter ADC2"},    
+	{0x02000094,  @"MCA Pileup Counter ADC2"},    
+	{0x02000098,  @"MCA 'Energy to high' counter ADC2"},    
+	{0x0200009C,  @"MCA 'Energy to low' counter ADC2"},    
+	{0x020000A0,  @"Trigger Extended Threshold ADC1"},    
+	{0x020000A4,  @"Trigger Extended Threshold ADC2"},   
+	
+	//group 2
+	{0x02800000,  @"Event configuration (ADC3, ADC4)"},    
+	{0x02800004,  @"End Address Threshold (ADC13, ADC4)"},    
+	{0x02800008,  @"Pretrigger Delay and Trigger Gate Length (ADC3, ADC4)"},    
+	{0x0280000C,  @"Raw Data Buffer Configuration (ADC3, ADC4)"},    
+	{0x02800010,  @"Actual Sample address ADC3"},    
+	{0x02800014,  @"Actual Next Sample address ADC4"},    
+	{0x02800018,  @"Pretrigger Delay and Trigger Gate Length (ADC3, ADC4)"},    
+	{0x0280001C,  @"Previous Bank Sample address ADC4"},    
+	{0x02800020,  @"Actual Sample Value (ADC3, ADC4)"},    
+	{0x02800024,  @"internal Test"},    
+	{0x02800028,  @"DDR2 Memory Logic Verification (ADC3, ADC4)"},    
+	{0x02800030,  @"Trigger Setup ADC3"},    
+	{0x02800034,  @"Trigger Threshold ADC3"},    
+	{0x02800038,  @"Trigger Setup ADC4"},    
+	{0x0280003C,  @"Trigger Threshold ADC4"},    
+	{0x02800040,  @"Energy Setup GP (ADC3, ADC4)"},    
+	{0x02800044,  @"Energy Gate Length (ADC3, ADC4)"},    
+	{0x02800048,  @"Energy Sample Length (ADC3, ADC4)"},    
+	{0x0280004C,  @"Energy Sample Start Index1 (ADC3, ADC4)"},    
+	{0x02800050,  @"Energy Sample Start Index2 (ADC3, ADC4)"},    
+	{0x02800054,  @"Energy Sample Start Index3 (ADC3, ADC4)"},    
+	{0x02800058,  @"Energy Tau Factor ADC3"},    
+	{0x0280005C,  @"Energy Tau Factor ADC4"},    
+	{0x02800060,  @"MCA Energy to Histogram Calculation Parameter ADC3"},    
+	{0x02800064,  @"MCA Energy to Histogram Calculation Parameter ADC4"},    
+	{0x02800068,  @"MCA Histogram Parameters (ADC3, ADC4)"},   
+	{0x02800070,  @"Event Extended configuration (ADC3, ADC4)"},    
+	{0x02800078,  @"Trigger Extended Setup ADC3"},    
+	{0x0280007C,  @"Trigger Extended Setup ADC4"},    
+	{0x02800080,  @"MCA Trigger Start Counter ADC3"},    
+	{0x02800084,  @"MCA Pileup Counter ADC3"},    
+	{0x02800088,  @"MCA 'Energy to high' counter ADC3"},    
+	{0x0280008C,  @"MCA 'Energy to low' counter ADC3"},    
+	{0x02800090,  @"MCA Trigger Start Counter ADC4"},    
+	{0x02800094,  @"MCA Pileup Counter ADC4"},    
+	{0x02800098,  @"MCA 'Energy to high' counter ADC4"},    
+	{0x0280009C,  @"MCA 'Energy to low' counter ADC4"},    
+	{0x028000A0,  @"Trigger Extended Threshold ADC3"},    
+	{0x028000A4,  @"Trigger Extended Threshold ADC4"},    
+	
+	//group 3
+	{0x3000000,  @"Event configuration (ADC5, ADC6)"},    
+	{0x3000004,  @"End Address Threshold (ADC5, ADC6)"},    
+	{0x3000008,  @"Pretrigger Delay and Trigger Gate Length (ADC5, ADC6)"},    
+	{0x300000C,  @"Raw Data Buffer Configuration (ADC5, ADC6)"},    
+	{0x3000010,  @"Actual Sample address ADC5"},    
+	{0x3000014,  @"Actual Next Sample address ADC6"},    
+	{0x3000018,  @"Pretrigger Delay and Trigger Gate Length (ADC5, ADC6)"},    
+	{0x300001C,  @"Previous Bank Sample address ADC6"},    
+	{0x3000020,  @"Actual Sample Value (ADC5, ADC6)"},    
+	{0x3000024,  @"internal Test"},    
+	{0x3000028,  @"DDR2 Memory Logic Verification (ADC5, ADC6)"},    
+	{0x3000030,  @"Trigger Setup ADC5"},    
+	{0x3000034,  @"Trigger Threshold ADC5"},    
+	{0x3000038,  @"Trigger Setup ADC6"},    
+	{0x300003C,  @"Trigger Threshold ADC6"},    
+	{0x3000040,  @"Energy Setup GP (ADC5, ADC6)"},    
+	{0x3000044,  @"Energy Gate Length (ADC5, ADC6)"},    
+	{0x3000048,  @"Energy Sample Length (ADC5, ADC6)"},    
+	{0x300004C,  @"Energy Sample Start Index1 (ADC5, ADC6)"},    
+	{0x3000050,  @"Energy Sample Start Index2 (ADC5, ADC6)"},    
+	{0x3000054,  @"Energy Sample Start Index3 (ADC5, ADC6)"},    
+	{0x3000058,  @"Energy Tau Factor ADC5"},    
+	{0x300005C,  @"Energy Tau Factor ADC6"},    
+	{0x3000060,  @"MCA Energy to Histogram Calculation Parameter ADC5"},    
+	{0x3000064,  @"MCA Energy to Histogram Calculation Parameter ADC6"},    
+	{0x3000068,  @"MCA Histogram Parameters (ADC5, ADC6)"},   
+	{0x3000070,  @"Event Extended configuration (ADC5, ADC6)"},    
+	{0x3000078,  @"Trigger Extended Setup ADC5"},    
+	{0x300007C,  @"Trigger Extended Setup ADC6"},    
+	{0x3000080,  @"MCA Trigger Start Counter ADC5"},    
+	{0x3000084,  @"MCA Pileup Counter ADC5"},    
+	{0x3000088,  @"MCA 'Energy to high' counter ADC5"},    
+	{0x300008C,  @"MCA 'Energy to low' counter ADC5"},    
+	{0x3000090,  @"MCA Trigger Start Counter ADC6"},    
+	{0x3000094,  @"MCA Pileup Counter ADC6"},    
+	{0x3000098,  @"MCA 'Energy to high' counter ADC6"},    
+	{0x300009C,  @"MCA 'Energy to low' counter ADC6"},    
+	{0x30000A0,  @"Trigger Extended Threshold ADC5"},    
+	{0x30000A4,  @"Trigger Extended Threshold ADC6"},    
+	
+	//group 4
+	{0x3800000,  @"Event configuration (ADC7, ADC8)"},    
+	{0x3800004,  @"End Address Threshold (ADC7, ADC8)"},    
+	{0x3800008,  @"Pretrigger Delay and Trigger Gate Length (ADC7, ADC8)"},    
+	{0x380000C,  @"Raw Data Buffer Configuration (ADC7, ADC8)"},    
+	{0x3800010,  @"Actual Sample address ADC7"},    
+	{0x3800014,  @"Actual Next Sample address ADC8"},    
+	{0x3800018,  @"Pretrigger Delay and Trigger Gate Length (ADC7, ADC8)"},    
+	{0x380001C,  @"Previous Bank Sample address ADC8"},    
+	{0x3800020,  @"Actual Sample Value (ADC7, ADC8)"},    
+	{0x3800024,  @"internal Test"},    
+	{0x3800028,  @"DDR2 Memory Logic Verification (ADC7, ADC8)"},    
+	{0x3800030,  @"Trigger Setup ADC7"},    
+	{0x3800034,  @"Trigger Threshold ADC7"},    
+	{0x3800038,  @"Trigger Setup ADC8"},    
+	{0x380003C,  @"Trigger Threshold ADC8"},    
+	{0x3800040,  @"Energy Setup GP (ADC7, ADC8)"},    
+	{0x3800044,  @"Energy Gate Length (ADC7, ADC8)"},    
+	{0x3800048,  @"Energy Sample Length (ADC7, ADC8)"},    
+	{0x380004C,  @"Energy Sample Start Index1 (ADC7, ADC8)"},    
+	{0x3800050,  @"Energy Sample Start Index2 (ADC7, ADC8)"},    
+	{0x3800054,  @"Energy Sample Start Index3 (ADC7, ADC8)"},    
+	{0x3800058,  @"Energy Tau Factor ADC7"},    
+	{0x380005C,  @"Energy Tau Factor ADC8"},    
+	{0x3800060,  @"MCA Energy to Histogram Calculation Parameter ADC7"},    
+	{0x3800064,  @"MCA Energy to Histogram Calculation Parameter ADC8"},    
+	{0x3800068,  @"MCA Histogram Parameters (ADC7, ADC8)"},   
+	{0x3800070,  @"Event Extended configuration (ADC7, ADC8)"},    
+	{0x3800078,  @"Trigger Extended Setup ADC7"},    
+	{0x380007C,  @"Trigger Extended Setup ADC8"},    
+	{0x3800080,  @"MCA Trigger Start Counter ADC7"},    
+	{0x3800084,  @"MCA Pileup Counter ADC7"},    
+	{0x3800088,  @"MCA 'Energy to high' counter ADC7"},    
+	{0x380008C,  @"MCA 'Energy to low' counter ADC7"},    
+	{0x3800090,  @"MCA Trigger Start Counter ADC8"},    
+	{0x3800094,  @"MCA Pileup Counter ADC8"},    
+	{0x3800098,  @"MCA 'Energy to high' counter ADC8"},    
+	{0x380009C,  @"MCA 'Energy to low' counter ADC8"},    
+	{0x38000A0,  @"Trigger Extended Threshold ADC7"},    
+	{0x38000A4,  @"Trigger Extended Threshold ADC8"}
+};
 
 #pragma mark ***Initialization
 - (id) init 
@@ -1534,7 +1728,39 @@ NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
 					 usingAddSpace:0x01];	
 }
 
-- (void) report
+- (void) regDump
+{
+	@try {
+		NSFont* font = [NSFont fontWithName:@"Monaco" size:11];
+		NSLogFont(font,@"Reg Dump for SIS3302 (Slot %d)\n",[self slot]);
+		NSLogFont(font,@"-----------------------------------\n");
+		NSLogFont(font,@"[Add Offset]   Value        Name\n");
+		NSLogFont(font,@"-----------------------------------\n");
+		
+		ORCommandList* aList = [ORCommandList commandList];
+		int i;
+		for(i=0;i<kNumSIS3302ReadRegs;i++){
+			[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + register_information[i].offset
+																   numToRead: 1
+																  withAddMod: [self addressModifier]
+															   usingAddSpace: 0x01]];
+		}
+		[self executeCommandList:aList];
+		
+		//if we get here, the results can retrieved in the same order as sent
+		for(i=0;i<kNumSIS3302ReadRegs;i++){
+			NSLogFont(font, @"[0x%08x] 0x%08x    %@\n",register_information[i].offset,[aList longValueForCmd:i],register_information[i].name);
+		}
+
+	}
+	@catch(NSException* localException) {
+        NSLog(@"SIS3302 Reg Dump FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3302 Reg Dump FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (void) briefReport
 {
 	[self readThresholds:YES];
 	

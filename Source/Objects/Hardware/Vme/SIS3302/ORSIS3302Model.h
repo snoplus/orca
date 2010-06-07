@@ -312,7 +312,8 @@
 - (void) writeThresholds;
 - (void) readThresholds:(BOOL)verbose;
 - (void) setLed:(BOOL)state;
-- (void) report;
+- (void) briefReport;
+- (void) regDump;
 - (void) resetSamplingLogic;
 - (void) writePageRegister:(int) aPage;
 - (void) writePreTriggerDelayAndTriggerGateDelay;
