@@ -36,5 +36,6 @@
 #define kCaen965   14
 #define kCaen1785  15
 #define kCaen785   16
+#define kSIS3320   17 
 
 #endif
