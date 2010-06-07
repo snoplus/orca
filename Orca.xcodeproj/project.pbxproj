@@ -1582,6 +1582,14 @@
 		84A30C560A1E44D400DAE618 /* HPPulser33220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A30C530A1E44D400DAE618 /* HPPulser33220.nib */; };
 		84A30C570A1E44D400DAE618 /* ORPulser33220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */; };
 		84A30C580A1E44D400DAE618 /* ORPulser33220Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */; };
+		84A3ED9F11BD8165003A08A9 /* ORSIS3320Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A3ED9711BD8165003A08A9 /* ORSIS3320Controller.h */; };
+		84A3EDA011BD8165003A08A9 /* ORSIS3320Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A3ED9811BD8165003A08A9 /* ORSIS3320Controller.m */; };
+		84A3EDA111BD8165003A08A9 /* ORSIS3320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A3ED9911BD8165003A08A9 /* ORSIS3320Decoders.h */; };
+		84A3EDA211BD8165003A08A9 /* ORSIS3320Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A3ED9A11BD8165003A08A9 /* ORSIS3320Decoders.m */; };
+		84A3EDA311BD8165003A08A9 /* ORSIS3320Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A3ED9B11BD8165003A08A9 /* ORSIS3320Model.h */; };
+		84A3EDA411BD8165003A08A9 /* ORSIS3320Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A3ED9C11BD8165003A08A9 /* ORSIS3320Model.m */; };
+		84A3EDA511BD8165003A08A9 /* SIS3320.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A3ED9D11BD8165003A08A9 /* SIS3320.nib */; };
+		84A3EDA611BD8165003A08A9 /* SIS3320Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A3ED9E11BD8165003A08A9 /* SIS3320Card.gif */; };
 		84A4E8290C187A3E00CBC222 /* IP220.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A4E8230C187A3E00CBC222 /* IP220.gif */; };
 		84A4E82A0C187A3E00CBC222 /* IP220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A4E8240C187A3E00CBC222 /* IP220.nib */; };
 		84A4E82B0C187A3E00CBC222 /* ORIP220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A4E8250C187A3E00CBC222 /* ORIP220Controller.h */; };
@@ -3854,6 +3862,14 @@
 		84A30C530A1E44D400DAE618 /* HPPulser33220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser33220.nib; path = Source/Objects/Hardware/GPIB/Pulser33220/HPPulser33220.nib; sourceTree = SOURCE_ROOT; };
 		84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulser33220Controller.h; sourceTree = "<group>"; };
 		84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulser33220Controller.m; sourceTree = "<group>"; };
+		84A3ED9711BD8165003A08A9 /* ORSIS3320Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3320Controller.h; path = Source/Objects/Hardware/Vme/SIS3320/ORSIS3320Controller.h; sourceTree = SOURCE_ROOT; };
+		84A3ED9811BD8165003A08A9 /* ORSIS3320Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3320Controller.m; path = Source/Objects/Hardware/Vme/SIS3320/ORSIS3320Controller.m; sourceTree = SOURCE_ROOT; };
+		84A3ED9911BD8165003A08A9 /* ORSIS3320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3320Decoders.h; path = Source/Objects/Hardware/Vme/SIS3320/ORSIS3320Decoders.h; sourceTree = SOURCE_ROOT; };
+		84A3ED9A11BD8165003A08A9 /* ORSIS3320Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3320Decoders.m; path = Source/Objects/Hardware/Vme/SIS3320/ORSIS3320Decoders.m; sourceTree = SOURCE_ROOT; };
+		84A3ED9B11BD8165003A08A9 /* ORSIS3320Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3320Model.h; path = Source/Objects/Hardware/Vme/SIS3320/ORSIS3320Model.h; sourceTree = SOURCE_ROOT; };
+		84A3ED9C11BD8165003A08A9 /* ORSIS3320Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3320Model.m; path = Source/Objects/Hardware/Vme/SIS3320/ORSIS3320Model.m; sourceTree = SOURCE_ROOT; };
+		84A3ED9D11BD8165003A08A9 /* SIS3320.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SIS3320.nib; path = Source/Objects/Hardware/Vme/SIS3320/SIS3320.nib; sourceTree = SOURCE_ROOT; };
+		84A3ED9E11BD8165003A08A9 /* SIS3320Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3320Card.gif; path = Source/Objects/Hardware/Vme/SIS3320/SIS3320Card.gif; sourceTree = SOURCE_ROOT; };
 		84A4E8230C187A3E00CBC222 /* IP220.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = IP220.gif; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/IP220.gif; sourceTree = SOURCE_ROOT; };
 		84A4E8240C187A3E00CBC222 /* IP220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IP220.nib; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/IP220.nib; sourceTree = SOURCE_ROOT; };
 		84A4E8250C187A3E00CBC222 /* ORIP220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIP220Controller.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP220/ORIP220Controller.h; sourceTree = SOURCE_ROOT; };
@@ -7906,6 +7922,22 @@
 			path = Source/Objects/Hardware/Serial/MITPulser;
 			sourceTree = SOURCE_ROOT;
 		};
+		84A3ED9611BD8165003A08A9 /* SIS3320 */ = {
+			isa = PBXGroup;
+			children = (
+				84A3ED9711BD8165003A08A9 /* ORSIS3320Controller.h */,
+				84A3ED9811BD8165003A08A9 /* ORSIS3320Controller.m */,
+				84A3ED9911BD8165003A08A9 /* ORSIS3320Decoders.h */,
+				84A3ED9A11BD8165003A08A9 /* ORSIS3320Decoders.m */,
+				84A3ED9B11BD8165003A08A9 /* ORSIS3320Model.h */,
+				84A3ED9C11BD8165003A08A9 /* ORSIS3320Model.m */,
+				84A3ED9D11BD8165003A08A9 /* SIS3320.nib */,
+				84A3ED9E11BD8165003A08A9 /* SIS3320Card.gif */,
+			);
+			name = SIS3320;
+			path = Source/Objects/Hardware/Vme/SIS3320;
+			sourceTree = SOURCE_ROOT;
+		};
 		84A4E8220C187A3E00CBC222 /* IP220 */ = {
 			isa = PBXGroup;
 			children = (
@@ -10045,6 +10077,7 @@
 				84E2063C11AD7841007D757F /* SIS3800 */,
 				8457BE2C11B0183500C4082D /* SIS3820 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
+				84A3ED9611BD8165003A08A9 /* SIS3320 */,
 				84D34AFB10B1D6C90013473E /* SIS3302 */,
 				84FA6383102B041800B426A6 /* SIS3350 */,
 				848285A1112C5AD600BA30ED /* VHS4030 */,
@@ -11060,6 +11093,9 @@
 				8457C2DE11B59DEC00C4082D /* ORCaen785Decoders.h in Headers */,
 				4398E6BA11B7E36400FC4DDE /* ORCAEN785Readout.hh in Headers */,
 				4398E7E011B81BBD00FC4DDE /* ORCaen775Decoders.h in Headers */,
+				84A3ED9F11BD8165003A08A9 /* ORSIS3320Controller.h in Headers */,
+				84A3EDA111BD8165003A08A9 /* ORSIS3320Decoders.h in Headers */,
+				84A3EDA311BD8165003A08A9 /* ORSIS3320Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11759,6 +11795,8 @@
 				84E2064C11AD7841007D757F /* SIS3800Card.gif in Resources */,
 				8457BE3B11B0183500C4082D /* SIS3820.nib in Resources */,
 				8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */,
+				84A3EDA511BD8165003A08A9 /* SIS3320.nib in Resources */,
+				84A3EDA611BD8165003A08A9 /* SIS3320Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12557,6 +12595,9 @@
 				8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */,
 				4398E7CD11B81B8B00FC4DDE /* ORCaen775Controller.m in Sources */,
 				4398E7E111B81BBD00FC4DDE /* ORCaen775Decoders.m in Sources */,
+				84A3EDA011BD8165003A08A9 /* ORSIS3320Controller.m in Sources */,
+				84A3EDA211BD8165003A08A9 /* ORSIS3320Decoders.m in Sources */,
+				84A3EDA411BD8165003A08A9 /* ORSIS3320Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
