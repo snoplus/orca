@@ -161,8 +161,6 @@
 - (void) setLemoInEnabledMask:(unsigned short)aLemoInEnableMask;
 - (BOOL) lemoInEnabled:(unsigned short)aBit;
 - (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
-- (BOOL) lemoInEnabled:(unsigned short)aBit;
-- (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
 - (int)  runMode;
 - (void) setRunMode:(int)aRunMode;
 - (int)  endAddressThreshold;
