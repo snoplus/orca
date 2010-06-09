@@ -44,6 +44,11 @@
 
 - (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase
 {
+	return [self connectToHost:aHostName userName:aUserName passWord:aPassWord dataBase:aDataBase verbose:YES];
+}
+
+- (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase verbose:(BOOL)verbose
+{
 	@synchronized(self){
 		if(!mConnection){
 			mConnection = mysql_init (NULL);
@@ -52,9 +57,10 @@
 				if (mysql_real_connect (mConnection,			[aHostName UTF8String], 
 										[aUserName UTF8String], [aPassWord UTF8String],
 										[aDataBase UTF8String], 0, nil, 0) == nil){
-					
-					NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (mConnection));
-					NSLog(@"Error: (%s)\n",mysql_error (mConnection));
+					if(verbose){
+						NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (mConnection));
+						NSLog(@"Error: (%s)\n",mysql_error (mConnection));
+					}
 					[self disconnect];
 					return NO;
 				}
@@ -65,7 +71,9 @@
 				}
 			}
 			else {
-				NSLog(@"ORSql: mysql_init() failed\n");
+				if(verbose){
+					NSLog(@"ORSql: mysql_init() failed\n");
+				}
 				connected = NO;				
 			}
 		}
@@ -174,6 +182,7 @@
 - (ORSqlResult*) queryString:(NSString *) query
 {
 	ORSqlResult*	theResult = nil;
+	NSException* e;
 	@synchronized(self){
 		const char*	theCQuery = [query UTF8String];
 		int         theQueryCode;
@@ -183,8 +192,11 @@
 			}
 		}
 		else {
-			NSLog(@"Problem in queryString error code is : %d, query is : %s -in ObjC : %@-\n", theQueryCode, theCQuery, query);
-			NSLog(@"Error message is : %@\n", [self getLastErrorMessage]);
+			NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Problem in queryString error code is : %d, query is : %s -in ObjC : %@-\n", theQueryCode, theCQuery, query] forKey:@"Description"];
+			e = [NSException exceptionWithName: @"SQL Exception"
+													 reason: [self getLastErrorMessage]
+												   userInfo: userInfo];
+			@throw e;			
 		}
 	}
     return theResult ;

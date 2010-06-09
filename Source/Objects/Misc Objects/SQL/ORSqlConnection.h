@@ -31,6 +31,7 @@
 
 - (id) init;
 - (void) dealloc;
+- (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase verbose:(BOOL)verbose;
 - (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase;
 - (void) disconnect;
 - (BOOL) selectDB:(NSString *) dbName;

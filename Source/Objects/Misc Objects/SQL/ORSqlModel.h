@@ -47,6 +47,7 @@
 - (void) setUserName:(NSString*)aUserName;
 - (NSString*) hostName;
 - (void) setHostName:(NSString*)aHostName;
+- (void) logQueryException:(NSException*)e;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

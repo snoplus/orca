@@ -1159,7 +1159,6 @@
 		8475974E0B5EF26500123411 /* ORSqlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 847597470B5EF26500123411 /* ORSqlController.m */; };
 		8475974F0B5EF26500123411 /* ORSqlModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 847597480B5EF26500123411 /* ORSqlModel.h */; };
 		847597500B5EF26500123411 /* ORSqlModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 847597490B5EF26500123411 /* ORSqlModel.m */; };
-		847597510B5EF26500123411 /* Sql.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8475974A0B5EF26500123411 /* Sql.gif */; };
 		847597520B5EF26500123411 /* Sql.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8475974B0B5EF26500123411 /* Sql.nib */; };
 		847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847599850B5FF26500123411 /* QuartzCore.framework */; };
 		84759CF50B6036D600123411 /* OrcaScript.ym in Sources */ = {isa = PBXBuildFile; fileRef = 84759CF40B6036D600123411 /* OrcaScript.ym */; };
@@ -1824,6 +1823,7 @@
 		84B28E630F4C835500E2B056 /* UnivVoltHVCrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E510F4C835500E2B056 /* UnivVoltHVCrate.gif */; };
 		84B28E640F4C835500E2B056 /* UnivVoltHVCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E520F4C835500E2B056 /* UnivVoltHVCrate.nib */; };
 		84B28E650F4C835500E2B056 /* UnivVoltHVCrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E530F4C835500E2B056 /* UnivVoltHVCrateSmall.gif */; };
+		84B3D12311BFCB8300C17CD6 /* Sql.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B3D12211BFCB8300C17CD6 /* Sql.tif */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -3429,7 +3429,6 @@
 		847597470B5EF26500123411 /* ORSqlController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSqlController.m; path = "Source/Objects/Misc Objects/SQL/ORSqlController.m"; sourceTree = SOURCE_ROOT; };
 		847597480B5EF26500123411 /* ORSqlModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSqlModel.h; path = "Source/Objects/Misc Objects/SQL/ORSqlModel.h"; sourceTree = SOURCE_ROOT; };
 		847597490B5EF26500123411 /* ORSqlModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSqlModel.m; path = "Source/Objects/Misc Objects/SQL/ORSqlModel.m"; sourceTree = SOURCE_ROOT; };
-		8475974A0B5EF26500123411 /* Sql.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Sql.gif; path = "Source/Objects/Misc Objects/SQL/Sql.gif"; sourceTree = SOURCE_ROOT; };
 		8475974B0B5EF26500123411 /* Sql.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Sql.nib; path = "Source/Objects/Misc Objects/SQL/Sql.nib"; sourceTree = SOURCE_ROOT; };
 		847599850B5FF26500123411 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		84759A990B6025E200123411 /* OrcaScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = OrcaScriptGuide.rtf; sourceTree = "<group>"; };
@@ -4110,6 +4109,7 @@
 		84B28E510F4C835500E2B056 /* UnivVoltHVCrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrate.gif; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/UnivVoltHVCrate.gif; sourceTree = SOURCE_ROOT; };
 		84B28E520F4C835500E2B056 /* UnivVoltHVCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = UnivVoltHVCrate.nib; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/UnivVoltHVCrate.nib; sourceTree = SOURCE_ROOT; };
 		84B28E530F4C835500E2B056 /* UnivVoltHVCrateSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrateSmall.gif; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/UnivVoltHVCrateSmall.gif; sourceTree = SOURCE_ROOT; };
+		84B3D12211BFCB8300C17CD6 /* Sql.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Sql.tif; path = "Source/Objects/Misc Objects/SQL/Sql.tif"; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -6978,7 +6978,7 @@
 				847597470B5EF26500123411 /* ORSqlController.m */,
 				847597480B5EF26500123411 /* ORSqlModel.h */,
 				847597490B5EF26500123411 /* ORSqlModel.m */,
-				8475974A0B5EF26500123411 /* Sql.gif */,
+				84B3D12211BFCB8300C17CD6 /* Sql.tif */,
 				8475974B0B5EF26500123411 /* Sql.nib */,
 				8496AF2811AF39A100A89F1C /* ORSqlResult.h */,
 				8496AF2911AF39A100A89F1C /* ORSqlResult.m */,
@@ -11470,7 +11470,6 @@
 				844357550B5AC9E00033B918 /* Stop.tif in Resources */,
 				84519C6C0B5C0B0900B08915 /* GoToLine.nib in Resources */,
 				842702810B5EE938009176B4 /* katrin.gif in Resources */,
-				847597510B5EF26500123411 /* Sql.gif in Resources */,
 				847597520B5EF26500123411 /* Sql.nib in Resources */,
 				84759E9B0B6189E700123411 /* OrcaScriptGuide.rtf in Resources */,
 				849E7C930B69570700353D50 /* ADU200.tif in Resources */,
@@ -11797,6 +11796,7 @@
 				8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */,
 				84A3EDA511BD8165003A08A9 /* SIS3320.nib in Resources */,
 				84A3EDA611BD8165003A08A9 /* SIS3320Card.gif in Resources */,
+				84B3D12311BFCB8300C17CD6 /* Sql.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
