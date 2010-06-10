@@ -163,7 +163,7 @@ NSString* ORBocTIC3Lock = @"ORBocTIC3Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*8]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*8]];
 	}
 }
 
