@@ -970,7 +970,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
             data[3] = [self motorPosition];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
+                                                                object:[NSData dataWithBytes:data length:sizeof(long)*4]];
         }
     }
 }

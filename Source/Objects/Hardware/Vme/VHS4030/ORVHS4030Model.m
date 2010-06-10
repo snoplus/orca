@@ -1144,7 +1144,7 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
 		}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*kVHS403DataRecordLength]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*kVHS403DataRecordLength]];
 	}	
 	statusChanged = NO;
 }

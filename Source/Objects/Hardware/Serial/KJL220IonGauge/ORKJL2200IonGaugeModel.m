@@ -163,7 +163,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 		data[3] = timeMeasured;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
 	}
 }
 

@@ -625,7 +625,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 		}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*11]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*11]];
 	}	
 	statusChanged = NO;
 }

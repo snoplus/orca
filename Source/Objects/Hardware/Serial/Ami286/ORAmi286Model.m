@@ -220,7 +220,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*10]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*10]];
 	}
 }
 

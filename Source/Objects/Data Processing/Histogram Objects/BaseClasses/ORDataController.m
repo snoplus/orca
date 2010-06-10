@@ -28,6 +28,9 @@
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
+int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 title]]; }
+
+
 @implementation ORDataController
 
 - (id) init
@@ -359,6 +362,30 @@
 	NSData* pdfData = [plotView plotAsPDFData];
 	[pdfData writeToFile:aFile atomically:NO];
 }
+
+- (IBAction) tileWindows:(id)sender
+{
+	//get list of all plot windows
+	NSArray* windowList = [[NSApp windows] sortedArrayUsingFunction:windowSort context:nil];
+	NSMutableArray* plots = [NSMutableArray array];
+	for(id aWindow in windowList){
+		id aController = [aWindow windowController];
+		if([aController isKindOfClass:[self class]]){
+			[plots addObject:aWindow];
+		}
+	}
+	
+	//get screen size
+	NSRect screenRect = [[NSScreen mainScreen] visibleFrame];
+	float width = screenRect.size.width;
+	float height = screenRect.size.height;
+	int numWindows = [plots count];
+	width = width/numWindows;
+	height = height/numWindows;
+	//resize and position windows
+	
+}
+
 @end
 @implementation ORDataController (private)
 

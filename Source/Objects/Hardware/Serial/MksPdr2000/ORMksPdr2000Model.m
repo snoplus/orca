@@ -165,7 +165,7 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*6]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*6]];
 	}
 }
 

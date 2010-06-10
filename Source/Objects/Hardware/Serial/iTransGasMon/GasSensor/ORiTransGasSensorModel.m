@@ -478,7 +478,7 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 		data[7] = gasType;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*8]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*8]];
 	}
 }
 

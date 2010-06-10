@@ -198,7 +198,7 @@ NSString* ORVXMLock = @"ORVXMLock";
             data[4] = thePosition.asLong;
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                object:[NSData dataWithBytes:&data length:sizeof(long)*5]];
+                                                                object:[NSData dataWithBytes:data length:sizeof(long)*5]];
         }
     }
 }

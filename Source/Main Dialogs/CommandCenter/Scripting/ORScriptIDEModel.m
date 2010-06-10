@@ -650,7 +650,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 		data[3] = aState;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
     }
 }
 

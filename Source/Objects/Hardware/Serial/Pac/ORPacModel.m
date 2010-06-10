@@ -777,7 +777,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 			data[index++] = adc[i];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*18]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*18]];
 	}
 }
 - (void) loadLogBuffer

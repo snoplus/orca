@@ -716,7 +716,7 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 			}
 			
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*(3+shipLen)]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*(3+shipLen)]];
 		}
 		[self setTotalShipped:[self totalShipped]+1];
 		[self setLastRecordShipped:[NSDate date]];

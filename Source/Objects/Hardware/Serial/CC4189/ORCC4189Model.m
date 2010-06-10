@@ -146,7 +146,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 		data[4] = timeMeasured;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
 	}
 }
 

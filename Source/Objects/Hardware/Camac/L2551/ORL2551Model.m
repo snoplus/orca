@@ -354,7 +354,7 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
         data[2+i] = ((i&0xf)<<28) | scalerCount[i]&0x00ffffff;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                        object:[NSData dataWithBytes:&data length:sizeof(long)*14]];
+                                                        object:[NSData dataWithBytes:data length:sizeof(long)*14]];
 }
 
 - (void) readAllScalers

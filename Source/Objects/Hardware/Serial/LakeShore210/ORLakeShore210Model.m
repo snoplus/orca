@@ -167,7 +167,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*18]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*18]];
 	}
 }
 
