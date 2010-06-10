@@ -1340,7 +1340,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
             data[5] = packed.longValue;
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                object:[NSData dataWithBytes:&data length:sizeof(long)*kNcdPulserRecordSize]];
+                                                                object:[NSData dataWithBytes:data length:sizeof(long)*kNcdPulserRecordSize]];
             
         }
 		@catch(NSException* localException) {
@@ -1378,7 +1378,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
                 data[2] = aState;
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                    object:[NSData dataWithBytes:&data length:sizeof(long)*3]];
+                                                                    object:[NSData dataWithBytes:data length:sizeof(long)*3]];
                 
 			}
 			@catch(NSException* localException) {
