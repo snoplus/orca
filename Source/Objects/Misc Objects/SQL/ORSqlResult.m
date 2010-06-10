@@ -534,16 +534,9 @@ NSCalendarDate		*MCPYear0000;
 
 - (NSString *) stringWithText:(NSData *) theTextData
 {
-    NSString		* theString;
-
-    if (theTextData == nil) {
-        return nil;
-    }
-    theString = [[NSString alloc] initWithData:theTextData encoding:NSISOLatin1StringEncoding];				
-    if (theString) {
-        [theString autorelease];
-    }
-    return theString;
+    if (theTextData == nil) return nil;
+    NSString* theString = [[NSString alloc] initWithData:theTextData encoding:NSISOLatin1StringEncoding];				
+    return [theString autorelease];
 }
 
 

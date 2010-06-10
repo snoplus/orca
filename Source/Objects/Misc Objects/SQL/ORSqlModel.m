@@ -25,6 +25,7 @@
 #import "ORSqlConnection.h"
 #import "ORSqlResult.h"
 
+
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
 NSString* ORSqlPasswordChanged		= @"ORSqlPasswordChanged";
 NSString* ORSqlUserNameChanged		= @"ORSqlUserNameChanged";
@@ -38,7 +39,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (BOOL) validateConnection;
 - (void) updateDataSets;
 - (void) postMachineName;
-- (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber;
+- (void) postRunState:(NSNotification*)aNote;
 @end
 
 @implementation ORSqlModel
@@ -127,10 +128,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if(!pausedKeyIncluded){
 		@try {
 			int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
-			int runNumber    = [[aNote object] runNumber];
-			int subRunNumber = [[aNote object] subRunNumber];
 			
-			[self postRunState: runState runNumber:runNumber subRunNumber:subRunNumber];
+			[self postRunState:aNote];
 			
 			if(runState == eRunInProgress){
 				if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
@@ -360,7 +359,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	3 stopping
 	4 between subruns
  */
-- (void) postRunState:(int)aRunState runNumber:(int)runNumber subRunNumber:(int)subRunNumber
+- (void) postRunState:(NSNotification*)aNote
 {
 	if([self validateConnection]){		
 		id nextObject = [self objectConnectedTo:ORSqlModelInConnector];
@@ -372,7 +371,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 			if([experimentName hasSuffix:@"Model"])experimentName = [experimentName substringToIndex:[experimentName length] - 5];
 		}
 		ORPostRunStateOp* anOp = [[ORPostRunStateOp alloc] initWithSqlConnection:sqlConnection delegate:self];
-		[anOp setRunState:aRunState runNumber:runNumber subRunNumber:subRunNumber];
+		[anOp setRunState:aNote];
 		[anOp setExperimentName:experimentName];
 		[queue addOperation:anOp];
 		[anOp release];
@@ -462,11 +461,11 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[super dealloc];
 }
 
-- (void) setRunState:(int)aRunState runNumber:(int)aRunNumber subRunNumber:(int)aSubRunNumber
+- (void) setRunState:(NSNotification*)aNote
 {
-	runNumber = aRunNumber;
-	subRunNumber = aSubRunNumber;
-	runState = aRunState;
+	runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+	runNumber    = [[aNote object] runNumber];
+	subRunNumber = [[aNote object] subRunNumber];
 }
 
 - (void) setExperimentName:(NSString*)anExperiment
@@ -489,7 +488,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		id oldExperiment = [ourRunEntry objectForKey:@"experiment"];
 		
 		//if we have a run entry, update it. Otherwise create it.
-		if(ourRunEntry)[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d WHERE machine_id=%@",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
+		if(ourRunEntry)[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d  WHERE machine_id=%@",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
 		else   [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
 		
 		if(runState == 1){
@@ -545,24 +544,27 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				if(dataset_id) {
 					if(lastCounts != countsNow){
 						NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
-						[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE datasets SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
-													[aDataSet totalCounts],
-													start,end,
-													[sqlConnection quoteObject:theData],
-													[sqlConnection quoteObject:dataset_id]]];
-						
+						NSString* convertedData = [sqlConnection quoteObject:theData];
+						NSString* theQuery = [NSString stringWithFormat:@"UPDATE datasets SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
+											  [aDataSet totalCounts],
+											  start,end,
+											  convertedData,
+											  [sqlConnection quoteObject:dataset_id]];
+											  [sqlConnection queryString:theQuery];
 					}
 				}
 				else {
 					NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
-					[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO datasets (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
-												[aMonitor uniqueIdNumber],
-												[sqlConnection quoteObject:machine_id],
-												[sqlConnection quoteObject:[aDataSet fullName]],
-												[aDataSet totalCounts],
-												start,end,
-												[aDataSet numberBins],
-												[sqlConnection quoteObject:theData]]];
+					NSString* convertedData = [sqlConnection quoteObject:theData];
+					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO datasets (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
+										  [aMonitor uniqueIdNumber],
+										  [sqlConnection quoteObject:machine_id],
+										  [sqlConnection quoteObject:[aDataSet fullName]],
+										  [aDataSet totalCounts],
+										  start,end,
+										  [aDataSet numberBins],
+										  convertedData];
+					[sqlConnection queryString:theQuery];
 				}
 			}
 		}

@@ -157,19 +157,19 @@
 		if (!theObject) {
 			return @"NULL";
 		}
-		if ([theObject isKindOfClass:[NSData class]]) {
-			result = [NSString stringWithFormat:@"'%@'", [self prepareBinaryData:(NSData *) theObject]];
+		else if ([theObject isKindOfClass:[NSData class]]) {
+			result = [NSString stringWithFormat:@"'%@'",[self prepareBinaryData:(NSData *) theObject]];
 		}
-		if ([theObject isKindOfClass:[NSString class]]) {
+		else if ([theObject isKindOfClass:[NSString class]]) {
 			result = [NSString stringWithFormat:@"'%@'", [self prepareString:(NSString *) theObject]];
 		}
-		if ([theObject isKindOfClass:[NSNumber class]]) {
+		else if ([theObject isKindOfClass:[NSNumber class]]) {
 			result = [NSString stringWithFormat:@"%@", theObject];
 		}
-		if ([theObject isKindOfClass:[NSCalendarDate class]]) {
+		else if ([theObject isKindOfClass:[NSCalendarDate class]]) {
 			result = [NSString stringWithFormat:@"'%@'", [(NSCalendarDate *)theObject descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S"]];
 		}
-		if ((nil == theObject) || ([theObject isKindOfClass:[NSNull class]])) {
+		else if ((nil == theObject) || ([theObject isKindOfClass:[NSNull class]])) {
 			result = @"NULL";
 		}
 		// Default : quote as string:
@@ -366,24 +366,22 @@
 	}
     return (theErrorCode) ? NO : YES;
 }
-
 @end
 
 @implementation ORSqlConnection (private)
-
 - (NSString*) prepareBinaryData:(NSData *) theData
 {
 	const char*	 theCDataBuffer = [theData bytes];
+
 	unsigned int theLength = [theData length];
 	char*		 theCEscBuffer = (char *)calloc(sizeof(char),(theLength*2) + 1);
 	
 	mysql_real_escape_string(mConnection, theCEscBuffer, theCDataBuffer, theLength);
-	NSString* theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
+	NSString* theReturn = [[[NSString alloc] initWithBytes:theCEscBuffer length:strlen(theCEscBuffer) encoding:NSISOLatin1StringEncoding] autorelease];
 	free (theCEscBuffer);
-	
+
     return theReturn;
 }
-
 
 - (NSString *) prepareString:(NSString *) theString
 {

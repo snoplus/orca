@@ -85,10 +85,11 @@ extern NSString* ORSqlLock;
 	int runState;
 	int runNumber;
 	int subRunNumber;
+	int elapsedTime;
 	NSString* experimentName;
 }
 - (void) setExperimentName:(NSString*)anExperiment;
-- (void) setRunState:(int)aRunState runNumber:(int)aRunNumber subRunNumber:(int)aSubRunNumber;
+- (void) setRunState:(NSNotification*)aNote;
 - (void) main;
 @end
 
