@@ -378,7 +378,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 
-/*Table: datasets
+/*Table: Histogram1Ds
  +------------+-------------+------+-----+---------+----------------+
  | Field      | Type        | Null | Key | Default | Extra          |
  +------------+-------------+------+-----+---------+----------------+
@@ -492,7 +492,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		else   [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
 		
 		if(runState == 1){
-			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM datasets WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
+			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Histogram1Ds WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
 			if( ![oldExperiment isEqual:experimentName]){
 				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment=%@ WHERE machine_id=%@",
 											[sqlConnection quoteObject:experimentName], 
@@ -532,7 +532,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		for(id aMonitor in dataMonitors){
 			NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
 			for(id aDataSet in objs1d){
-				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from datasets where (machine_id=%@ and name=%@ and monitor_id=%d)",
+				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram1Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
 																	   machine_id,
 																	   [sqlConnection quoteObject:[aDataSet fullName]],
 																	   [aMonitor uniqueIdNumber]]];
@@ -545,7 +545,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					if(lastCounts != countsNow){
 						NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
 						NSString* convertedData = [sqlConnection quoteObject:theData];
-						NSString* theQuery = [NSString stringWithFormat:@"UPDATE datasets SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
+						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram1Ds SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
 											  [aDataSet totalCounts],
 											  start,end,
 											  convertedData,
@@ -556,7 +556,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				else {
 					NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
 					NSString* convertedData = [sqlConnection quoteObject:theData];
-					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO datasets (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
+					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram1Ds (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
 										  [aMonitor uniqueIdNumber],
 										  [sqlConnection quoteObject:machine_id],
 										  [sqlConnection quoteObject:[aDataSet fullName]],
