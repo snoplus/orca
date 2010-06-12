@@ -371,16 +371,7 @@
 @implementation ORSqlConnection (private)
 - (NSString*) prepareBinaryData:(NSData *) theData
 {
-	const char*	 theCDataBuffer = [theData bytes];
-
-	unsigned int theLength = [theData length];
-	char*		 theCEscBuffer = (char *)calloc(sizeof(char),(theLength*2) + 1);
-	
-	mysql_real_escape_string(mConnection, theCEscBuffer, theCDataBuffer, theLength);
-	NSString* theReturn = [[[NSString alloc] initWithBytes:theCEscBuffer length:strlen(theCEscBuffer) encoding:NSISOLatin1StringEncoding] autorelease];
-	free (theCEscBuffer);
-
-    return theReturn;
+	return [theData base64Encoding]; 
 }
 
 - (NSString *) prepareString:(NSString *) theString

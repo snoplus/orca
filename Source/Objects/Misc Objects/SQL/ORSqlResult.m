@@ -174,7 +174,7 @@ NSCalendarDate		*MCPYear0000;
                 case FIELD_TYPE_BLOB:
                 case FIELD_TYPE_MEDIUM_BLOB:
                 case FIELD_TYPE_LONG_BLOB:
-                    theCurrentObj = [NSData dataWithBytes:theData length:theLengths[i]];
+                    theCurrentObj = [NSString stringWithUTF8String:theData];
                    if (!(theField[i].flags & BINARY_FLAG)) { 
                       theCurrentObj = [self stringWithText:theCurrentObj];
                    }
