@@ -51,32 +51,38 @@ bool ORSIS3302Card::Stop()
 	return true;
 }
 
-bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/) 
+bool ORSIS3302Card::IsEvent()
 {
-    uint32_t addr = GetBaseAddress() + GetAcquisitionControl(); 
+	uint32_t addr = GetBaseAddress() + GetAcquisitionControl(); 
     uint32_t data_rd = 0;
     if (VMERead(addr,GetAddressModifier(),4,data_rd) != sizeof(data_rd)) { 
     	return false;
     }
-    if ((data_rd & 0x80000) != 0x80000) return false; // No threshold yet
+    if ((data_rd & 0x80000) == 0x80000) return true;
+	else return false;
+		
+}
 
-    // Try disarm current bank and arm the next one
-    if (! DisarmAndArmNextBank() ) return false;
-    // Otherwise, let's readout
-    uint32_t data_wr = 0x0; // Bank 2 is armed and bank one must be read
-    if (fBankOneArmed) data_wr = 0x4; // vice versa, must read bank two 
+bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/) 
+{
+    if (IsEvent()) {
+		// Try disarm current bank and arm the next one
+		if (! DisarmAndArmNextBank() ) return false;
+		// Otherwise, let's readout
+		uint32_t data_wr = 0x0;				// Bank 2 is armed and bank one must be read
+		if (fBankOneArmed) data_wr = 0x4;	// vice versa, must read bank two 
+		uint32_t addr = GetBaseAddress() + GetADCMemoryPageRegister() ;
+		if (VMEWrite(addr,GetAddressModifier(), GetDataWidth(),data_wr ) != sizeof(data_wr)) {
+			return false;
+		}
 
-    addr = GetBaseAddress() + GetADCMemoryPageRegister() ;
-    if (VMEWrite(addr,GetAddressModifier(),
-                 GetDataWidth(),data_wr ) != sizeof(data_wr)) {
-        return false;
-    }
-
-    // We've selected a particular page to readout for each channel
-    for( size_t i=0;i<GetNumberOfChannels();i++) {
-        if (!ReadOutChannel(i) ) return false;
-    }
-    return true;
+		// We've selected a particular page to readout for each channel
+		for( size_t i=0;i<GetNumberOfChannels();i++) {
+			if (!ReadOutChannel(i) ) return false;
+		}
+		return true;
+	}
+	else return false; // No threshold yet
 }
 
 bool ORSIS3302Card::ReadOutChannel(size_t channel) 
@@ -97,10 +103,10 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
     }
 
     // check if bank address flag is valid
-    if (((end_sample_address >> 24) & 0x1) != 
-        ((fBankOneArmed) ? 0x1 : 0x0) ) {   //  
+   // if (((end_sample_address >> 24) & 0x1) != 
+    //    ((fBankOneArmed) ? 0x1 : 0x0) ) {   //  
     	// in this case -> poll right arm flag or implement a delay
-    }
+   // }
 
     // check buffer address
     end_sample_address &= 0xffffff ; // mask bank2 address bit (bit 24)
@@ -181,8 +187,8 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 
 bool ORSIS3302Card::DisarmAndArmBank(size_t bank) 
 {
-    uint32_t addr = GetBaseAddress() + ((bank == 1) ? 0x420 : 0x424);
-    if (bank==1) fBankOneArmed = true;
+    uint32_t addr = GetBaseAddress() + ((bank == 0) ? 0x420 : 0x424);
+    if (bank==0) fBankOneArmed = true;
     else fBankOneArmed = false;
     return (VMEWrite(addr, GetAddressModifier(), 
                      GetDataWidth(), (uint32_t) 0x0) == sizeof(uint32_t));

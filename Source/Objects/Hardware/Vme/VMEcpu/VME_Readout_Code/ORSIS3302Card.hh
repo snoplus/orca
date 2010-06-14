@@ -26,13 +26,12 @@ class ORSIS3302Card: public ORVVmeCard
 
        virtual inline uint32_t GetDataWidth() { return 0x4; }
 
-
+	   virtual bool IsEvent();
        virtual bool ReadOutChannel(size_t channel);
 
        virtual bool DisarmAndArmBank(size_t bank);
        virtual bool DisarmAndArmNextBank()
-           { return (fBankOneArmed) ? 
-                    DisarmAndArmBank(0) : DisarmAndArmBank(1); }
+           { return (fBankOneArmed) ? DisarmAndArmBank(1) : DisarmAndArmBank(0); }
        virtual size_t GetNumberOfChannels() { return kNumberOfChannels; }
 
        bool fBankOneArmed;
