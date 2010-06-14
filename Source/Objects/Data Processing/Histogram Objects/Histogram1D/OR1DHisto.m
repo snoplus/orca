@@ -228,31 +228,35 @@
 
 - (NSData*) getNonZeroRawDataWithStart:(unsigned long*)start end:(unsigned long*)end
 {
-	
-	unsigned long i;
+	[dataSetLock lock];
+	BOOL atLeastOne = NO;
 	unsigned long n = [self numberBins];
 	unsigned long theFirstOne = 0;
 	unsigned long theLastOne = n-1;
-	BOOL atLeastOne = NO;
-	for(i=0;i<n;i++){
-		if(histogram[i]!=0){
-			theFirstOne = i;
-			atLeastOne = YES;
-			break;
+	if(histogram && n>0){
+		unsigned long i;
+		for(i=0;i<n;i++){
+			if(histogram[i]!=0){
+				theFirstOne = i;
+				atLeastOne = YES;
+				break;
+			}
+		}
+		for(i=n-1;i>=0;i--){
+			if(histogram[i]!=0){
+				theLastOne = i;
+				break;
+			}
 		}
 	}
-	for(i=n-1;i>=0;i--){
-		if(histogram[i]!=0){
-			theLastOne = i;
-			break;
-		}
-	}
+	NSData* theData = nil;
 	if(atLeastOne){
 		*start = theFirstOne;
 		*end = theLastOne;
-		return [NSData dataWithBytes:&histogram[theFirstOne] length:(theLastOne-theFirstOne+1)*sizeof(long)];
+		theData =  [NSData dataWithBytes:&histogram[theFirstOne] length:(theLastOne-theFirstOne+1)*sizeof(long)];
 	}
-	else return nil;
+	[dataSetLock unlock];
+	return theData;
 }
 
 - (void) loadData:(NSData*)someData;
