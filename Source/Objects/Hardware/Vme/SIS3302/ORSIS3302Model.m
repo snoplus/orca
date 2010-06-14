@@ -1965,7 +1965,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 - (void) initBoard
 {  
-	[self reset];							//reset the card
 	[self writeEventConfiguration];
 	[self writeEndAddressThreshold];
 	[self writePreTriggerDelayAndTriggerGateDelay];
@@ -2680,8 +2679,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 								int index = 0;
 								dataRecord[group][index++] =   dataId | dataRecordlength[group];
 								dataRecord[group][index++] =   (([self crateNumber]&0x0000000f)<<21) | 
-														(([self slot] & 0x0000001f)<<16)      |
-														((channel & 0x000000ff)<<8);
+															   (([self slot] & 0x0000001f)<<16)      |
+														       ((channel & 0x000000ff)<<8);
 								dataRecord[group][index++] = [self sampleLength:group]/2;
 								dataRecord[group][index++] = energySampleLength;
 								unsigned long* p = &dataRecord[group][index];
