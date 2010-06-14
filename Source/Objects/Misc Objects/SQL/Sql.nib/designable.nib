@@ -345,6 +345,33 @@
 								<reference key="NSTextColor" ref="773358581"/>
 							</object>
 						</object>
+						<object class="NSButton" id="114693226">
+							<reference key="NSNextResponder" ref="919807684"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{73, 15}, {85, 18}}</string>
+							<reference key="NSSuperview" ref="919807684"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="529814169">
+								<int key="NSCellFlags">-2080244224</int>
+								<int key="NSCellFlags2">131072</int>
+								<string key="NSContents">Disable</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="114693226"/>
+								<int key="NSButtonFlags">1211912703</int>
+								<int key="NSButtonFlags2">2</int>
+								<object class="NSCustomResource" key="NSNormalImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">NSSwitch</string>
+								</object>
+								<object class="NSButtonImageSource" key="NSAlternateImage">
+									<string key="NSImageName">NSSwitch</string>
+								</object>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
 					</object>
 					<string key="NSFrameSize">{388, 201}</string>
 					<reference key="NSSuperview"/>
@@ -469,6 +496,22 @@
 					</object>
 					<int key="connectionID">71</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">stealthModeButton</string>
+						<reference key="source" ref="274848598"/>
+						<reference key="destination" ref="114693226"/>
+					</object>
+					<int key="connectionID">74</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">stealthModeAction:</string>
+						<reference key="source" ref="274848598"/>
+						<reference key="destination" ref="114693226"/>
+					</object>
+					<int key="connectionID">75</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -519,6 +562,7 @@
 							<reference ref="498466698"/>
 							<reference ref="740673713"/>
 							<reference ref="490218534"/>
+							<reference ref="114693226"/>
 						</object>
 						<reference key="parent" ref="298004536"/>
 					</object>
@@ -710,6 +754,20 @@
 						<reference key="object" ref="685294844"/>
 						<reference key="parent" ref="390204220"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">72</int>
+						<reference key="object" ref="114693226"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="529814169"/>
+						</object>
+						<reference key="parent" ref="919807684"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">73</int>
+						<reference key="object" ref="529814169"/>
+						<reference key="parent" ref="114693226"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -765,13 +823,15 @@
 					<string>60.IBPluginDependency</string>
 					<string>60.ImportedFromIB2</string>
 					<string>61.IBPluginDependency</string>
+					<string>72.IBPluginDependency</string>
+					<string>73.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{401, 489}, {388, 201}}</string>
+					<string>{{564, 506}, {388, 201}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{401, 489}, {388, 201}}</string>
+					<string>{{564, 506}, {388, 201}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
@@ -817,6 +877,8 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -835,7 +897,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">71</int>
+			<int key="maxID">75</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1472,10 +1534,12 @@
 							<string>hostNameAction:</string>
 							<string>passwordAction:</string>
 							<string>sqlLockAction:</string>
+							<string>stealthModeAction:</string>
 							<string>userNameAction:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -1494,6 +1558,7 @@
 							<string>hostNameField</string>
 							<string>passwordField</string>
 							<string>sqlLockButton</string>
+							<string>stealthModeButton</string>
 							<string>userNameField</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -1503,6 +1568,7 @@
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 						</object>
@@ -2152,12 +2218,14 @@
 			<object class="NSArray" key="dict.sortedKeys">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<string>Locked</string>
+				<string>NSSwitch</string>
 				<string>Sql</string>
 				<string>Unlocked</string>
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<string>{33, 36}</string>
+				<string>{15, 15}</string>
 				<string>{105, 74}</string>
 				<string>{33, 36}</string>
 			</object>

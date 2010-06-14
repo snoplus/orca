@@ -26,6 +26,7 @@
 #import "ORSqlResult.h"
 
 
+NSString* ORSqlModelStealthModeChanged = @"ORSqlModelStealthModeChanged";
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
 NSString* ORSqlPasswordChanged		= @"ORSqlPasswordChanged";
 NSString* ORSqlUserNameChanged		= @"ORSqlUserNameChanged";
@@ -38,7 +39,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @interface ORSqlModel (private)
 - (BOOL) validateConnection;
 - (void) updateDataSets;
-- (void) postMachineName;
+- (void) addMachineName;
+- (void) removeMachineName;
 - (void) postRunState:(NSNotification*)aNote;
 @end
 
@@ -71,7 +73,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		queue = [[NSOperationQueue alloc] init];
 		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
 	}
-	[self postMachineName];
+	[self addMachineName];
 }
 
 - (void) setUpImage
@@ -116,10 +118,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
 {
-	if([self validateConnection]){
-		[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-	}
-	[self disconnect];
+	[self removeMachineName];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNote
@@ -154,6 +153,24 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) stealthMode
+{
+    return stealthMode;
+}
+
+- (void) setStealthMode:(BOOL)aStealthMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setStealthMode:stealthMode];
+    stealthMode = aStealthMode;
+	if(stealthMode){
+		[self removeMachineName];
+	}
+	else {
+		[self addMachineName];
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSqlModelStealthModeChanged object:self];
+}
 
 - (NSString*) dataBaseName
 {
@@ -233,6 +250,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+    [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
     [self setDataBaseName:[decoder decodeObjectForKey:@"DataBaseName"]];
     [self setPassword:[decoder decodeObjectForKey:@"Password"]];
     [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
@@ -245,6 +263,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:stealthMode forKey:@"stealthMode"];
     [encoder encodeObject:dataBaseName forKey:@"DataBaseName"];
     [encoder encodeObject:password forKey:@"Password"];
     [encoder encodeObject:userName forKey:@"UserName"];
@@ -261,6 +280,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	
 	if([sqlConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
 		connectionValid = YES;
+		[self addMachineName];
 	}
 	else {
 		connectionValid = NO;
@@ -305,6 +325,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 - (BOOL) validateConnection
 {
+	if(stealthMode)return NO;
 	BOOL oldConnectionValid = connectionValid;
 	if(!sqlConnection) sqlConnection = [[ORSqlConnection alloc] init];
 	if(![sqlConnection isConnected]){
@@ -332,13 +353,20 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 | hw_address | varchar(32) | YES  | UNI | NULL    |                |
 +------------+-------------+------+-----+---------+----------------+
 */
-- (void) postMachineName
+- (void) addMachineName
 {
 	if([self validateConnection]){
 		ORPostMachineNameOp* anOp = [[ORPostMachineNameOp alloc] initWithSqlConnection:sqlConnection delegate:self];
 		[queue addOperation:anOp];
 		[anOp release];
 	}
+}
+
+- (void) removeMachineName
+{
+	ORDeleteMachineNameOp* anOp = [[ORDeleteMachineNameOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+	[queue addOperation:anOp];
+	[anOp release];	
 }
 
 /* Table: runs
@@ -453,6 +481,20 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 @end
+
+@implementation ORDeleteMachineNameOp
+- (void) main
+{
+	@try {		
+		[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+		[delegate disconnect];
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+}
+@end
+
 
 @implementation ORPostRunStateOp
 - (void) dealloc

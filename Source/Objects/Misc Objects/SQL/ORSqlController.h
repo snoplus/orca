@@ -22,6 +22,7 @@
 @interface ORSqlController : OrcaObjectController 
 {	
 	IBOutlet NSTextField* hostNameField;
+	IBOutlet NSButton*	  stealthModeButton;
 	IBOutlet NSTextField* userNameField;
 	IBOutlet NSTextField* passwordField;
 	IBOutlet NSTextField* dataBaseNameField;
@@ -30,8 +31,9 @@
     IBOutlet NSButton*    connectionButton;
 }
 
-#pragma mark ¥¥¥Initialization
+#pragma mark ***Interface Management
 - (void) registerNotificationObservers;
+- (void) stealthModeChanged:(NSNotification*)aNote;
 - (void) hostNameChanged:(NSNotification*)aNote;
 - (void) userNameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
@@ -40,6 +42,7 @@
 - (void) connectionValidChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) stealthModeAction:(id)sender;
 - (IBAction) hostNameAction:(id)sender;
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) passwordAction:(id)sender;

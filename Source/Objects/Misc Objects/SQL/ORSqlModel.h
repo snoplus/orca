@@ -32,6 +32,7 @@
     NSString*	password;
     NSString*	dataBaseName;
 	NSMutableArray* dataMonitors;
+    BOOL		stealthMode;
 }
 
 #pragma mark ***Initialization
@@ -39,6 +40,8 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
+- (BOOL) stealthMode;
+- (void) setStealthMode:(BOOL)aStealthMode;
 - (NSString*) dataBaseName;
 - (void) setDataBaseName:(NSString*)aDataBaseName;
 - (NSString*) password;
@@ -59,6 +62,7 @@
 - (void) disconnect;
 @end
 
+extern NSString* ORSqlModelStealthModeChanged;
 extern NSString* ORSqlDataBaseNameChanged;
 extern NSString* ORSqlPasswordChanged;
 extern NSString* ORSqlUserNameChanged;
@@ -77,6 +81,10 @@ extern NSString* ORSqlLock;
 @end
 
 @interface ORPostMachineNameOp : ORSqlOperation
+- (void) main;
+@end
+
+@interface ORDeleteMachineNameOp : ORSqlOperation
 - (void) main;
 @end
 

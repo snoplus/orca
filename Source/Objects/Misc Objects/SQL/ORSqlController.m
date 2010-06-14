@@ -83,6 +83,11 @@
                      selector : @selector(connectionValidChanged:)
                          name : ORSqlConnectionValidChanged
                        object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(stealthModeChanged:)
+                         name : ORSqlModelStealthModeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -94,6 +99,12 @@
 	[self dataBaseNameChanged:nil];
 	[self connectionValidChanged:nil];
     [self sqlLockChanged:nil];
+	[self stealthModeChanged:nil];
+}
+
+- (void) stealthModeChanged:(NSNotification*)aNote
+{
+	[stealthModeButton setIntValue: [model stealthMode]];
 }
 
 - (void) connectionValidChanged:(NSNotification*)aNote
@@ -141,6 +152,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) stealthModeAction:(id)sender
+{
+	[model setStealthMode:[sender intValue]];	
+}
 - (IBAction) sqlLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORSqlLock to:[sender intValue] forWindow:[self window]];
