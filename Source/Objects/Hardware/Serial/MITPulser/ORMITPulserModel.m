@@ -30,6 +30,7 @@ NSString* ORMITPulserModelFrequencyChanged	= @"ORMITPulserModelFrequencyChanged"
 NSString* ORMITPulserModelDutyCycleChanged	= @"ORMITPulserModelDutyCycleChanged";
 NSString* ORMITPulserModelResistanceChanged	= @"ORMITPulserModelResistanceChanged";
 NSString* ORMITPulserModelClockSpeedChanged = @"ORMITPulserModelClockSpeedChanged";
+NSString* ORMITPulserModelPulserVersionChanged = @"ORMITPulserModelPulserVersionChanged";
 NSString* ORMITPulserModelSerialPortChanged = @"ORMITPulserModelSerialPortChanged";
 NSString* ORMITPulserModelPortNameChanged   = @"ORMITPulserModelPortNameChanged";
 NSString* ORMITPulserModelPortStateChanged  = @"ORMITPulserModelPortStateChanged";
@@ -125,6 +126,12 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     return clockSpeed;
 }
 
+- (int) pulserVersion
+{
+    return pulserVersion;
+}
+
+
 - (void) setClockSpeed:(int)aClockSpeed
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setClockSpeed:clockSpeed];
@@ -132,12 +139,28 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelClockSpeedChanged object:self];
 }
 
+- (void) setPulserVersion:(int)aPulserVersion
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPulserVersion:pulserVersion];
+	pulserVersion = aPulserVersion;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMITPulserModelPulserVersionChanged object:self];
+}
+
+
 - (float) actualClockSpeed
 {
-	switch ([self clockSpeed]){
-		case 0: 
-		default:  return 1e+06;
-		case 1:   return 1e+03;
+	switch ([self pulserVersion]){
+		case 0:
+		default: switch ([self clockSpeed]){
+			case 0: 
+			default:  return 1e+06;
+			case 1:   return 1e+03;
+		}
+		case 1:	switch ([self clockSpeed]){
+				case 0: 
+				default:  return 1e+03;
+				case 1:   return 1e+02;
+		}
 	}
 }
 
@@ -221,6 +244,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
 		
+    [objDictionary setObject:[NSNumber numberWithInt:pulserVersion]	forKey:@"pulserVersion"];
     [objDictionary setObject:[NSNumber numberWithInt:clockSpeed]	forKey:@"clockSpeed"];
     [objDictionary setObject:[NSNumber numberWithInt:resistance]	forKey:@"resistance"];
     [objDictionary setObject:[NSNumber numberWithInt:dutyCycle]		forKey:@"dutyCycle"];
@@ -274,14 +298,16 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	int frequencyTicks = 0;
 	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
 	if ((dutyCycle > 0) && (dutyCycle < 50)) dutyTicks = frequencyTicks * (1. - 2.* dutyCycle / 100.);
-	return [@"D" stringByAppendingFormat:@"%03x\r",dutyTicks];
+	if (pulserVersion == 0) return [@"D" stringByAppendingFormat:@"%03x\r",dutyTicks];
+	if (pulserVersion > 0 ) return [@"D" stringByAppendingFormat:@"%04x\r",dutyTicks];
 }
 
 - (NSString*) frequencyCommand
 {
 	int frequencyTicks = 0;
 	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
-	return  [@"P" stringByAppendingFormat:@"%03x\r",frequencyTicks];
+	if (pulserVersion == 0) return  [@"P" stringByAppendingFormat:@"%03x\r",frequencyTicks];
+	if (pulserVersion > 0 ) return  [@"P" stringByAppendingFormat:@"%04x\r",frequencyTicks];
 }
 
 #pragma mark ***Archival
@@ -290,7 +316,8 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setClockSpeed:[decoder decodeIntForKey:@"clockSpeed"]];
+    [self setPulserVersion:[decoder decodeIntForKey:@"pulserVersion"]];	
+	[self setClockSpeed:[decoder decodeIntForKey:@"clockSpeed"]];
     [self setFrequency:	[decoder decodeFloatForKey:@"frequency"]];
     [self setDutyCycle:	[decoder decodeIntForKey:@"dutyCycle"]];
     [self setResistance:	[decoder decodeIntForKey:@"resistance"]];
@@ -302,6 +329,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:clockSpeed	forKey:@"pulserVersion"];
     [encoder encodeInt:clockSpeed	forKey:@"clockSpeed"];
     [encoder encodeFloat:frequency	forKey:@"frequency"];
     [encoder encodeInt:dutyCycle	forKey:@"dutyCycle"];

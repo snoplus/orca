@@ -29,6 +29,7 @@
 	IBOutlet NSTextField*	resistanceField;
 	IBOutlet NSStepper*		resistanceStepper;
 	IBOutlet NSPopUpButton* clockSpeedPU;
+	IBOutlet NSPopUpButton* pulserVersionPU;
     IBOutlet NSButton*      loadHwButton;
     IBOutlet NSButton*      onButton;
     IBOutlet NSButton*      offButton;
@@ -53,6 +54,7 @@
 - (void) dutyCycleChanged:(NSNotification*)aNote;
 - (void) resistanceChanged:(NSNotification*)aNote;
 - (void) clockSpeedChanged:(NSNotification*)aNote;
+- (void) pulserVersionChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNotification;
 - (void) portStateChanged:(NSNotification*)aNotification;
@@ -65,6 +67,7 @@
 - (IBAction) dutyCycleAction:(id)sender;
 - (IBAction) resistanceAction:(id)sender;
 - (IBAction) clockSpeedAction:(id)sender;
+- (IBAction) pulserVersionAction:(id)sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) lockAction:(id) sender;

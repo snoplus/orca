@@ -28,6 +28,7 @@
         BOOL             portWasOpen;
         ORSerialPort*    serialPort;
 	
+		int				pulserVersion;
 		int				clockSpeed;
 		int				resistance;
 		int				dutyCycle;
@@ -46,6 +47,8 @@
 - (void) setResistance:(int)aResistance;
 - (int) clockSpeed;
 - (void) setClockSpeed:(int)aClockSpeed;
+- (int) pulserVersion;
+- (void) setPulserVersion:(int)aPulserVersion;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
@@ -72,6 +75,7 @@ extern NSString* ORMITPulserModelFrequencyChanged;
 extern NSString* ORMITPulserModelDutyCycleChanged;
 extern NSString* ORMITPulserModelResistanceChanged;
 extern NSString* ORMITPulserModelClockSpeedChanged;
+extern NSString* ORMITPulserModelPulserVersionChanged;
 extern NSString* ORMITPulserModelSerialPortChanged;
 extern NSString* ORMITPulserLock;
 extern NSString* ORMITPulserModelPortNameChanged;

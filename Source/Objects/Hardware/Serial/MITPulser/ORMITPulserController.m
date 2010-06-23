@@ -78,6 +78,11 @@
 						object: model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(pulserVersionChanged:)
+                         name : ORMITPulserModelPulserVersionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(resistanceChanged:)
                          name : ORMITPulserModelResistanceChanged
 						object: model];
@@ -101,6 +106,7 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self clockSpeedChanged:nil];
+	[self pulserVersionChanged:nil];
 	[self resistanceChanged:nil];
 	[self dutyCycleChanged:nil];
 	[self frequencyChanged:nil];
@@ -124,6 +130,11 @@
 - (void) clockSpeedChanged:(NSNotification*)aNote
 {
 	[clockSpeedPU selectItemAtIndex: [model clockSpeed]];
+}
+
+- (void) pulserVersionChanged:(NSNotification*)aNote
+{
+	[pulserVersionPU selectItemAtIndex: [model pulserVersion]];
 }
 
 - (void) checkGlobalSecurity
@@ -150,6 +161,7 @@
 	[dutyCycleStepper setEnabled:!lockedOrRunningMaintenance];
 	[resistanceStepper setEnabled:!lockedOrRunningMaintenance];
 	[clockSpeedPU setEnabled:!lockedOrRunningMaintenance];
+	[pulserVersionPU setEnabled:!lockedOrRunningMaintenance];
 	[loadHwButton setEnabled:!lockedOrRunningMaintenance];
 	[onButton setEnabled:!lockedOrRunningMaintenance];
 	[offButton setEnabled:!lockedOrRunningMaintenance];
@@ -222,6 +234,11 @@
 - (void) clockSpeedAction:(id)sender
 {
 	[model setClockSpeed:[sender indexOfSelectedItem]];	
+}
+
+- (void) pulserVersionAction:(id)sender
+{
+	[model setPulserVersion:[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) portListAction:(id) sender
