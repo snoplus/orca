@@ -78,7 +78,9 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFrequency:frequency];
     frequency = aFrequency;
-	float nBitsFrequency = 3;
+	float nBitsFrequency;
+	if ([self pulserVersion] == 0) nBitsFrequency = 3;
+	if ([self pulserVersion] == 1) nBitsFrequency = 4;
 	float maxFrequency = [self actualClockSpeed] / 2;
 	float minFrequency = ([self actualClockSpeed] / pow(16,nBitsFrequency) / 2);
 	if (frequency > maxFrequency) frequency = maxFrequency;     //  You can only be as fast as your clock
@@ -158,8 +160,8 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 		}
 		case 1:	switch ([self clockSpeed]){
 				case 0: 
-				default:  return 1e+03;
-				case 1:   return 1e+02;
+				default:  return 1e+05;
+				case 1:   return 1e+05;
 		}
 	}
 }
