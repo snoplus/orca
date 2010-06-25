@@ -351,8 +351,8 @@ printfile_statement
 print_list
 : assignment_expr					{ $$ = $1; }
 | hex_str							{ $$ = $1; }
-| print_list ',' hex_str			{ $$ = executionNode(kAppend, $1, $3,nil); }
-| print_list ',' assignment_expr	{ $$ = executionNode(kAppend, $1, $3,nil); }
+| print_list ',' hex_str			{ $$ = executionNode(kTightAppend, $1, $3,nil); }
+| print_list ',' assignment_expr	{ $$ = executionNode(kTightAppend, $1, $3,nil); }
 ;
 
 log_statement

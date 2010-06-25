@@ -808,7 +808,8 @@
 - (id) catString:(id) p
 {
 	NSString* s = NodeValue(0);
-	return [[s componentsSeparatedByString:@" "] componentsJoinedByString:@""]; 
+	return s;
+	//return [[s componentsSeparatedByString:@" "] componentsJoinedByString:@""]; 
 }	
 
 - (id) arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
