@@ -153,16 +153,21 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 {
 	switch ([self pulserVersion]){
 		case 0:
-		default: switch ([self clockSpeed]){
-			case 0: 
-			default:  return 1e+06;
-			case 1:   return 1e+03;
-		}
-		case 1:	switch ([self clockSpeed]){
+		default: 
+			switch ([self clockSpeed]){
+				case 0: 
+				default:  return 1e+06;
+				case 1:   return 1e+03;
+			}
+		break;
+			
+		case 1:	
+			switch ([self clockSpeed]){
 				case 0: 
 				default:  return 1e+05;
 				case 1:   return 1e+02;
-		}
+			}
+		break;
 	}
 }
 

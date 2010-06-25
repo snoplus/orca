@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10D578</string>
+		<string key="IBDocument.SystemVersion">10D573</string>
 		<string key="IBDocument.InterfaceBuilderVersion">762</string>
 		<string key="IBDocument.AppKitVersion">1038.29</string>
 		<string key="IBDocument.HIToolboxVersion">460.00</string>
@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="6"/>
+			<integer value="1308"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -648,13 +648,12 @@
 								</object>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
-								<object class="NSMenuItem" key="NSMenuItem" id="714128494">
+								<object class="NSMenuItem" key="NSMenuItem" id="461238692">
 									<reference key="NSMenu" ref="919339652"/>
-									<string key="NSTitle">Ver 0 (high frequency)</string>
+									<string key="NSTitle">Ver 1 (low frequency)</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
-									<int key="NSState">1</int>
 									<reference key="NSOnImage" ref="642628855"/>
 									<reference key="NSMixedImage" ref="623079855"/>
 									<string key="NSAction">_popUpItemAction:</string>
@@ -667,10 +666,9 @@
 									</object>
 									<object class="NSMutableArray" key="NSMenuItems">
 										<bool key="EncodedWithXMLCoder">YES</bool>
-										<reference ref="714128494"/>
-										<object class="NSMenuItem" id="461238692">
+										<object class="NSMenuItem" id="714128494">
 											<reference key="NSMenu" ref="919339652"/>
-											<string key="NSTitle">Ver 1 (low frequency)</string>
+											<string key="NSTitle">Ver 0 (high frequency)</string>
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
@@ -679,19 +677,10 @@
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="1057686922"/>
 										</object>
-										<object class="NSMenuItem" id="479911287">
-											<reference key="NSMenu" ref="919339652"/>
-											<string key="NSTitle"/>
-											<string key="NSKeyEquiv"/>
-											<int key="NSKeyEquivModMask">1048576</int>
-											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="642628855"/>
-											<reference key="NSMixedImage" ref="623079855"/>
-											<string key="NSAction">_popUpItemAction:</string>
-											<reference key="NSTarget" ref="1057686922"/>
-										</object>
+										<reference ref="461238692"/>
 									</object>
 								</object>
+								<int key="NSSelectedIndex">1</int>
 								<int key="NSPreferredEdge">3</int>
 								<bool key="NSUsesItemFromMenu">YES</bool>
 								<bool key="NSAltersState">YES</bool>
@@ -1434,7 +1423,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="461238692"/>
 							<reference ref="714128494"/>
-							<reference ref="479911287"/>
 						</object>
 						<reference key="parent" ref="1057686922"/>
 					</object>
@@ -1446,11 +1434,6 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">1355</int>
 						<reference key="object" ref="714128494"/>
-						<reference key="parent" ref="919339652"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1356</int>
-						<reference key="object" ref="479911287"/>
 						<reference key="parent" ref="919339652"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -1547,8 +1530,6 @@
 					<string>1354.ImportedFromIB2</string>
 					<string>1355.IBPluginDependency</string>
 					<string>1355.ImportedFromIB2</string>
-					<string>1356.IBPluginDependency</string>
-					<string>1356.ImportedFromIB2</string>
 					<string>1358.IBPluginDependency</string>
 					<string>1358.ImportedFromIB2</string>
 					<string>1359.IBPluginDependency</string>
@@ -1651,12 +1632,10 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{495, 731}, {154, 50}}</string>
+					<string>{{495, 748}, {154, 33}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{235, 778}, {126, 48}}</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
