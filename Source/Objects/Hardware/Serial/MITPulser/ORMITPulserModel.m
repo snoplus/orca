@@ -291,7 +291,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (NSString*) clockCommand
 {		
     if([self pulserVersion] == 0) return [@"H" stringByAppendingFormat:@"%01x\r",clockSpeed];
-	if([self pulserVersion] > 0) return [@"H" stringByAppendingFormat:@"%02x\r",clockSpeed];	
+	else return [@"H" stringByAppendingFormat:@"%02x\r",clockSpeed];	
 }
 
 - (NSString*) resistanceCommand
@@ -309,7 +309,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
 	if ((dutyCycle > 0) && (dutyCycle < 50)) dutyTicks = frequencyTicks * (1. - 2.* dutyCycle / 100.);
 	if (pulserVersion == 0) return [@"D" stringByAppendingFormat:@"%03x\r",dutyTicks];
-	if (pulserVersion > 0 ) return [@"D" stringByAppendingFormat:@"%04x\r",dutyTicks];
+	else return [@"D" stringByAppendingFormat:@"%04x\r",dutyTicks];
 }
 
 - (NSString*) frequencyCommand
@@ -317,7 +317,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	int frequencyTicks = 0;
 	if (frequency > 0) frequencyTicks = ((1./frequency)*([self actualClockSpeed])/2.);
 	if (pulserVersion == 0) return  [@"P" stringByAppendingFormat:@"%03x\r",frequencyTicks];
-	if (pulserVersion > 0 ) return  [@"P" stringByAppendingFormat:@"%04x\r",frequencyTicks];
+	else return  [@"P" stringByAppendingFormat:@"%04x\r",frequencyTicks];
 }
 
 #pragma mark ***Archival
