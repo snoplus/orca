@@ -157,6 +157,7 @@
 {
 	[model setStealthMode:[sender intValue]];	
 }
+
 - (IBAction) sqlLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORSqlLock to:[sender intValue] forWindow:[self window]];

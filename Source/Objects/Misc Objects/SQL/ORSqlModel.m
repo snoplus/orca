@@ -168,6 +168,14 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 	else {
 		[self addMachineName];
+		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+		if([runObjects count]){
+			ORRunModel* rc = [runObjects objectAtIndex:0];
+			NSDictionary* runInfo = [rc runInfo];
+			if(runInfo){
+				[self postRunState:[NSNotification notificationWithName:@"DoesNotMatter" object:rc userInfo:runInfo]];
+			}
+		}
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSqlModelStealthModeChanged object:self];
 }
@@ -250,11 +258,11 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
     [self setDataBaseName:[decoder decodeObjectForKey:@"DataBaseName"]];
     [self setPassword:[decoder decodeObjectForKey:@"Password"]];
     [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
     [self setHostName:[decoder decodeObjectForKey:@"HostName"]];
+    [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
     [[self undoManager] enableUndoRegistration];    
 	[self registerNotificationObservers];
     return self;
@@ -535,12 +543,13 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		
 		if(runState == 1){
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Histogram1Ds WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
-			if( ![oldExperiment isEqual:experimentName]){
-				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment=%@ WHERE machine_id=%@",
-											[sqlConnection quoteObject:experimentName], 
-											[sqlConnection quoteObject:machine_id]]];
-			}
 		}
+		if( ![oldExperiment isEqual:experimentName]){
+			[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment=%@ WHERE machine_id=%@",
+										[sqlConnection quoteObject:experimentName], 
+										[sqlConnection quoteObject:machine_id]]];
+		}
+		
 	}
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];

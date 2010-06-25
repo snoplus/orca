@@ -96,6 +96,8 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
+- (NSDictionary*)runInfo;
+
 - (NSString*) elapsedRunTimeString;
 - (int) subRunNumber;
 - (void) setSubRunNumber:(int)aSubRunNumber;

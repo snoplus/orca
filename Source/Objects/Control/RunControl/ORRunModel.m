@@ -1261,6 +1261,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORRunModel"];
 }
 
+- (NSDictionary*)runInfo
+{
+	return [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+				[NSNumber numberWithLong:runNumber],kRunNumber,
+				[NSNumber numberWithLong:subRunNumber],kSubRunNumber,
+				[NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+				nil] retain];
+}
+
+
 - (void) runStarted:(BOOL)doInit
 {
     //----------------------------------------------------------------------------------------

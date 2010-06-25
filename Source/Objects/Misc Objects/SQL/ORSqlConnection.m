@@ -65,7 +65,6 @@
 					return NO;
 				}
 				connected = YES;
-				NSLog(@"Connected to DataBase %@ on %@\n",aDataBase,aHostName);
 				if([aDataBase length]){
 					[self selectDB:aDataBase];
 				}
