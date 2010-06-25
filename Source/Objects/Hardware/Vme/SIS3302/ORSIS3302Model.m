@@ -2673,9 +2673,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 							int group = channel/2;
 							do {
 								BOOL goodRecord = NO;
-								long cachedEnergy;
-								long cachedTime0;
-								long cachedTime1;
+
 								int index = 0;
 								dataRecord[group][index++] =   dataId | dataRecordlength[group];
 								dataRecord[group][index++] =   (([self crateNumber]&0x0000000f)<<21) | 
@@ -2691,9 +2689,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 												usingAddSpace: 0x01];
 		
 								if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
-									cachedTime0  = dataRecord[group][0];
-									cachedTime1  = dataRecord[group][1];
-									cachedEnergy = dataRecord[group][dataRecordlength[group]-4];
 									[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
 									goodRecord = YES;
 								}
