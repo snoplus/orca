@@ -30,9 +30,11 @@
     int				col0Key;
     int				col1Key;
     int				col2Key;
+    int				col3Key;
     NSString*		col0Title;
     NSString*		col1Title;
     NSString*		col2Title;
+    NSString*		col3Title;
 	id				calibration;
 	ORDataSet*		fftDataSet;
 	NSMutableArray* roiSet;
@@ -40,20 +42,26 @@
 
 #pragma mark ***Accessors
 - (void) postUpdate;
+- (NSString*) col3Title;
+- (void) setCol3Title:(NSString*)aCol3Title;
 - (NSString*) col2Title;
 - (void) setCol2Title:(NSString*)aCol2Title;
 - (NSString*) col1Title;
 - (void) setCol1Title:(NSString*)aCol1Title;
 - (NSString*) col0Title;
 - (void) setCol0Title:(NSString*)aCol0Title;
+- (int)  col3Key;
+- (void) setCol3Key:(int)aCol3Key;
 - (int)  col2Key;
 - (void) setCol2Key:(int)aCol2Key;
 - (int)  col1Key;
 - (void) setCol1Key:(int)aCol1Key;
 - (int)	 col0Key;
 - (void) setCol0Key:(int)aCol0Key;
+- (void) addValue1:(float)v1 value2:(float)v2;
 - (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3;
--(id) dataAtRow:(int)r column:(int)c;
+- (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3 value4:(float)v4;
+- (id) dataAtRow:(int)r column:(int)c;
 - (void) clearData;
 - (NSString*) fullName;
 
@@ -69,6 +77,7 @@
 - (BOOL) dataSet:(int)set index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
 @end
 
+extern NSString* ORManualPlotModelCol3TitleChanged;
 extern NSString* ORManualPlotModelCol2TitleChanged;
 extern NSString* ORManualPlotModelCol1TitleChanged;
 extern NSString* ORManualPlotModelCol0TitleChanged;

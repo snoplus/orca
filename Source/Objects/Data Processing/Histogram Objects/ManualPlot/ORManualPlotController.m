@@ -66,6 +66,14 @@
 	[aPlot setShowLine:YES];
 	[plotView addPlot: aPlot];
 	[aPlot release];
+
+	aPlot = [[ORXYPlot alloc] initWithTag:2 andDataSource:self];
+	[aPlot setRoi: [[model rois:2] objectAtIndex:0]];
+	[aPlot setLineColor:[NSColor blueColor]];
+	[aPlot setShowLine:YES];
+	[plotView addPlot: aPlot];
+	[aPlot release];
+	
 	
 	roiController = [[OR1dRoiController panel] retain];
 	[roiView addSubview:[roiController view]];
@@ -104,6 +112,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(col2TitleChanged:)
                          name : ORManualPlotModelCol2TitleChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(col3TitleChanged:)
+                         name : ORManualPlotModelCol3TitleChanged
 						object: model];	
 	
     [notifyCenter addObserver : self
@@ -120,6 +133,7 @@
 	[self col0TitleChanged:nil];
 	[self col1TitleChanged:nil];
 	[self col2TitleChanged:nil];
+	[self col3TitleChanged:nil];
 	[self colKeyChanged:nil];
 }
 
@@ -136,6 +150,7 @@
 	[col0KeyPU selectItemAtIndex: [model col0Key]];
 	[col1KeyPU selectItemAtIndex: [model col1Key]];
 	[col2KeyPU selectItemAtIndex: [model col2Key]];
+	[col3KeyPU selectItemAtIndex: [model col3Key]];
 	[self refreshPlot:nil];
 }
 
@@ -167,6 +182,17 @@
 	[[[dataTableView tableColumnWithIdentifier:@"2"] headerCell] setTitle:title];
 	[col2LabelField setStringValue:title];
 		
+	[dataTableView reloadData];
+	[self refreshPlot:nil];
+}
+
+- (void) col3TitleChanged:(NSNotification*)aNotification
+{
+	NSString* title = [model col3Title];
+	if(!title)title = @"Col 3";
+	[[[dataTableView tableColumnWithIdentifier:@"3"] headerCell] setTitle:title];
+	[col3LabelField setStringValue:title];
+	
 	[dataTableView reloadData];
 	[self refreshPlot:nil];
 }
@@ -221,7 +247,10 @@
 	[[plotView yScale] setLabel:title];
 	[plotView setNeedsDisplay:YES];
 }
-
+- (IBAction) col3KeyAction:(id)sender
+{
+	[model setCol3Key:[sender indexOfSelectedItem]];	
+}
 - (IBAction) col2KeyAction:(id)sender
 {
 	[model setCol2Key:[sender indexOfSelectedItem]];	
@@ -286,17 +315,20 @@
 	[roiController setModel:topRoi];
 	[fitController setModel:[topRoi fit]];
 	int i;
-	for(i=0;i<2;i++){
+	for(i=0;i<3;i++){
 		int tag = [[aPlotView plot:i] tag];
 		id aPlot = [aPlotView plot:i];
 		NSColor* theColor;
 		if(aPlot != [aPlotView topPlot])theColor = [[aPlot lineColor] highlightWithLevel:.5];
 		else							theColor = [aPlot lineColor];
+
 		if(tag == 1) [y1LengendField setTextColor:theColor];
-		else [y2LengendField setTextColor:theColor];
+		else if(tag == 2) [y2LengendField setTextColor:theColor];
+		else [y3LengendField setTextColor:theColor];
 
 		if(tag == 0) [y2LengendField setTextColor:theColor];
-		else [y1LengendField setTextColor:theColor];
+		else if(tag == 1) [y2LengendField setTextColor:theColor];
+		else [y3LengendField setTextColor:theColor];
 	}
 }
 
