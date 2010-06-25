@@ -161,7 +161,7 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 		case 1:	switch ([self clockSpeed]){
 				case 0: 
 				default:  return 1e+05;
-				case 1:   return 1e+05;
+				case 1:   return 1e+02;
 		}
 	}
 }
@@ -260,8 +260,9 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void) loadHardware
 {
 	//option 1 -- send one by one
-	[self sendCommand: [self resistanceCommand]];
 	[self sendCommand: [self clockCommand]];
+	usleep(100000); //sleep 100 mSec
+	[self sendCommand: [self resistanceCommand]];
 	[self sendCommand: [self frequencyCommand]];
 	[self sendCommand: [self dutyCycleCommand]];
 	
@@ -276,14 +277,16 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 	//For the future...
 	NSString* powerCommand;
 	if(state == NO)  {
-		powerCommand = @"P000\rD000\r"; //format the off command
+		if([self pulserVersion] == 0) powerCommand = @"P000\rD000\r";
+		if([self pulserVersion] > 0) powerCommand = @"P0000\rD0000\r";
 		[self sendCommand: powerCommand];
 	}
 }
 
 - (NSString*) clockCommand
-{
-	return [@"H" stringByAppendingFormat:@"%01x\r",clockSpeed];;
+{		
+    if([self pulserVersion] == 0) return [@"H" stringByAppendingFormat:@"%01x\r",clockSpeed];
+	if([self pulserVersion] > 0) return [@"H" stringByAppendingFormat:@"%02x\r",clockSpeed];	
 }
 
 - (NSString*) resistanceCommand
@@ -331,11 +334,11 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:clockSpeed	forKey:@"pulserVersion"];
-    [encoder encodeInt:clockSpeed	forKey:@"clockSpeed"];
-    [encoder encodeFloat:frequency	forKey:@"frequency"];
-    [encoder encodeInt:dutyCycle	forKey:@"dutyCycle"];
-    [encoder encodeInt:resistance	forKey:@"resistance"];
+    [encoder encodeInt:pulserVersion	forKey:@"pulserVersion"];
+    [encoder encodeInt:clockSpeed	    forKey:@"clockSpeed"];
+    [encoder encodeFloat:frequency	    forKey:@"frequency"];
+    [encoder encodeInt:dutyCycle	    forKey:@"dutyCycle"];
+    [encoder encodeInt:resistance	    forKey:@"resistance"];
 }
 @end
 
