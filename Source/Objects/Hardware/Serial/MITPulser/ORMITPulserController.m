@@ -140,8 +140,8 @@
 		[clockSpeedPU insertItemWithTitle:@"1 MHz" atIndex:1];
 	}
 	else {
-		[clockSpeedPU insertItemWithTitle:@"100 Hz " atIndex:0];
-		[clockSpeedPU insertItemWithTitle:@"100 kHz" atIndex:1];
+		[clockSpeedPU insertItemWithTitle:@"100 kHz " atIndex:0];
+		[clockSpeedPU insertItemWithTitle:@"100 Hz" atIndex:1];
 	}
 	[pulserVersionPU selectItemAtIndex: [model pulserVersion]];
 	
