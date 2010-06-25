@@ -58,8 +58,8 @@ bool ORSIS3302Card::IsEvent()
     if (VMERead(addr,GetAddressModifier(),4,data_rd) != sizeof(data_rd)) { 
     	return false;
     }
-    if ((data_rd & 0x80000) == 0x80000) return true;
-	else return false;
+    if ((data_rd & 0x80000) != 0x80000) return false;
+	else return true;
 		
 }
 
@@ -75,7 +75,7 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 		if (VMEWrite(addr,GetAddressModifier(), GetDataWidth(),data_wr ) != sizeof(data_wr)) {
 			return false;
 		}
-
+		
 		// We've selected a particular page to readout for each channel
 		for( size_t i=0;i<GetNumberOfChannels();i++) {
 			if (!ReadOutChannel(i) ) return false;
@@ -96,29 +96,29 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 	
     uint32_t addr = GetBaseAddress() + GetPreviousBankSampleRegisterOffset(channel) ; 
     uint32_t end_sample_address = 0;
-
+	
     if (VMERead(addr,GetAddressModifier(),
                 GetDataWidth(),end_sample_address) != sizeof(end_sample_address)) { 
     	return false;
     }
-
+	
     // check if bank address flag is valid
-   // if (((end_sample_address >> 24) & 0x1) != 
+	// if (((end_sample_address >> 24) & 0x1) != 
     //    ((fBankOneArmed) ? 0x1 : 0x0) ) {   //  
-    	// in this case -> poll right arm flag or implement a delay
-   // }
-
+	// in this case -> poll right arm flag or implement a delay
+	// }
+	
     // check buffer address
     end_sample_address &= 0xffffff ; // mask bank2 address bit (bit 24)
-
+	
     if (end_sample_address > 0x3fffff) {   // more than 1 page memory buffer is used
         // Warning?
     }
-
+	
     // readout	   	
     if (end_sample_address != 0) {
     	addr = GetBaseAddress() 
-               + GetADCBufferRegisterOffset(channel);
+		+ GetADCBufferRegisterOffset(channel);
         uint32_t num_bytes_to_read = (end_sample_address & 0x3ffffc)*2;
 		uint32_t num_longs_to_read = num_bytes_to_read >> 2;
 		if (num_longs_to_read + fTempVectorIter > fTempVector.size()) {
@@ -130,20 +130,22 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 		
 		// Do DMA Read
     	int32_t error = DMARead(addr, 
-				(uint32_t)0x08, // Address Modifier, request MBLT 
-                (uint32_t)8, // Read 64-bits at a time (redundant request)
-				buffer,  
-                num_bytes_to_read);
+								(uint32_t)0x08, // Address Modifier, request MBLT 
+								(uint32_t)8, // Read 64-bits at a time (redundant request)
+								buffer,  
+								num_bytes_to_read);
     	if (error != (int32_t) num_bytes_to_read) { // vme error
 			// Reset the data
             return false;
     	}
 		
 		// Put the data into the data stream
-		size_t number_of_longs_in_raw_data = GetDeviceSpecificData()[channel/2];
+		size_t number_of_longs_in_raw_data		 = GetDeviceSpecificData()[channel/2];
 		size_t number_of_longs_in_energy_wf_data = GetDeviceSpecificData()[4];
-		size_t size_of_record = kHeaderSizeInLongs + kTrailerSizeInLongs + 
-			number_of_longs_in_raw_data + number_of_longs_in_energy_wf_data;
+		size_t size_of_record					 = kHeaderSizeInLongs + 
+												   kTrailerSizeInLongs + 
+												   number_of_longs_in_raw_data + 
+												   number_of_longs_in_energy_wf_data;
 		
 		size_t total_data_in_vector = fTempVectorIter + num_bytes_to_read/4;
 		for (size_t temp_iter = 0; temp_iter < total_data_in_vector; temp_iter += size_of_record) {
@@ -152,17 +154,12 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 				// We will catch the rest on the next read cycle.
 				size_t num_data_left = total_data_in_vector - temp_iter;
 				// Move it to the front of the vector
-				memmove(&fTempVector[0], &fTempVector[temp_iter], 
-						num_data_left*sizeof(fTempVector[0]));
+				memmove(&fTempVector[0], &fTempVector[temp_iter], num_data_left*sizeof(fTempVector[0]));
 				// Set the iterator correctly
 				fTempVectorIter = num_data_left;
 				break;
 			}
-			
-			size_t time0;
-			size_t time1;
-			size_t energy;
-			
+						
 			ensureDataCanHold(size_of_record + 4);
 			data[dataIndex++] = GetHardwareMask()[0] | (size_of_record+4); 
 			data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
@@ -172,12 +169,7 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 			data[dataIndex++] = number_of_longs_in_energy_wf_data;
 			size_t startOfDataIndex = dataIndex;
 			memcpy(data + dataIndex, &fTempVector[temp_iter], size_of_record*sizeof(fTempVector[0]));
-
-			//cache some stuff for below
-			time0 = data[startOfDataIndex];
-			time1 = data[startOfDataIndex+1];
-			energy = data[dataIndex-4];
-			
+						
 			dataIndex += size_of_record;
 			
 		}
@@ -193,3 +185,88 @@ bool ORSIS3302Card::DisarmAndArmBank(size_t bank)
     return (VMEWrite(addr, GetAddressModifier(), 
                      GetDataWidth(), (uint32_t) 0x0) == sizeof(uint32_t));
 }
+
+//non-DMA readout code that is slow but works
+#if 0
+bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/) 
+{
+    if (IsEvent()) {
+		// Try disarm current bank and arm the next one
+		if (! DisarmAndArmNextBank() ) return false;
+		// Otherwise, let's readout
+		uint32_t data_wr		   = 0x0;				// Bank 2 is armed and bank one must be read
+		if (fBankOneArmed) data_wr = 0x4;	// vice versa, must read bank two 
+		uint32_t addr = GetBaseAddress() + GetADCMemoryPageRegister() ;
+		if (VMEWrite(addr,GetAddressModifier(), GetDataWidth(),data_wr ) != sizeof(data_wr)) {
+			return false;
+		}
+		
+		// We've selected a particular page to readout for each channel
+		for( size_t i=0;i<GetNumberOfChannels();i++) {
+			if (!ReadOutChannel(i) ) return false;
+		}
+		return true;
+	}
+	else return false; // No threshold yet
+}
+
+bool ORSIS3302Card::ReadOutChannel(size_t channel) 
+{
+	// Function to readout a particular channel.
+    // read stop sample address	
+    uint32_t end_sample_address = 0;
+    uint32_t addr = GetBaseAddress() + GetPreviousBankSampleRegisterOffset(channel) ; 
+    if (VMERead(addr,GetAddressModifier(),GetDataWidth(),end_sample_address) != sizeof(end_sample_address)) { 
+    	return false;
+    }
+	
+    // check buffer address
+    end_sample_address &= 0xffffff ; // mask bank2 address bit (bit 24)
+	
+    if (end_sample_address > 0x3fffff) {   // more than 1 page memory buffer is used
+        // Warning?
+    }
+	
+    // readout	   	
+    if (end_sample_address != 0) {
+		
+		uint32_t addrOffset = 0;
+		
+		size_t number_of_longs_in_raw_data		 = GetDeviceSpecificData()[channel/2];
+		size_t number_of_longs_in_energy_wf_data = GetDeviceSpecificData()[4];
+		
+		size_t size_of_record_in_Longs = kOrcaHeaderInLongs + 
+		kHeaderSizeInLongs + 
+		number_of_longs_in_raw_data + 
+		number_of_longs_in_energy_wf_data +
+		kTrailerSizeInLongs;
+		
+		do {
+			// Put the data into the data stream
+			uint32_t savedIndex = dataIndex; //in case we have to dump the record due to an error
+			
+			ensureDataCanHold(size_of_record_in_Longs);
+			data[dataIndex++] = GetHardwareMask()[0] | size_of_record_in_Longs; 
+			data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
+			((GetSlot()  & 0x0000001f)<<16) | 
+			((channel & 0x000000ff)<<8);
+			data[dataIndex++] = number_of_longs_in_raw_data;
+			data[dataIndex++] = number_of_longs_in_energy_wf_data;
+			int32_t num_bytes_to_read = (size_of_record_in_Longs-kOrcaHeaderInLongs)*sizeof(size_t);
+			if (VMERead(GetBaseAddress() + GetADCBufferRegisterOffset(channel) + addrOffset,
+						GetAddressModifier(),GetDataWidth(),
+						(uint8_t*)&(data[dataIndex]),num_bytes_to_read ) != num_bytes_to_read) {
+				dataIndex = savedIndex;
+				return false;
+			}
+			dataIndex += num_bytes_to_read/4;
+			
+			addrOffset += num_bytes_to_read;
+			
+		}while (addrOffset < end_sample_address);
+		
+    } 
+    return true;
+}
+
+#endif

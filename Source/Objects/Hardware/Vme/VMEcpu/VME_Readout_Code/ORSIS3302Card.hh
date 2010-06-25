@@ -11,9 +11,10 @@ class ORSIS3302Card: public ORVVmeCard
        virtual bool Readout(SBC_LAM_Data* /* lam_data*/);  
 	   virtual bool Stop();
        enum EORSIS3302Consts {
-           kNumberOfChannels = 8,
-	       kHeaderSizeInLongs = 2,
-	       kTrailerSizeInLongs = 4};
+           kNumberOfChannels	= 8,
+	       kOrcaHeaderInLongs	= 4,
+	       kHeaderSizeInLongs	= 2,
+	       kTrailerSizeInLongs	= 4};
 
 
    protected:
