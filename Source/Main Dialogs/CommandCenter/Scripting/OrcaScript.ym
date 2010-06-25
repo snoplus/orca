@@ -23,8 +23,8 @@
 %}
 
 %union {
-    char symKey[64];	/* symbol table key i.e. a variable name */
-	char cString[64];	/* a string*/
+    char symKey[1024];	/* symbol table key i.e. a variable name */
+	char cString[1024];	/* a string*/
     id   nPtr;          /* node pointer */
 };
 

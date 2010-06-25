@@ -148,6 +148,10 @@ void grabString()
 	char c;
 	while ((c = input()) != '"'){
 		OrcaScriptlval.cString[i++] = c;
+		if(i>1022){
+			NSLog(@"<line %d> String too long. Truncated to length 1024\n",num_lines);
+			break;
+		}
 	}
 	OrcaScriptlval.cString[i] = '\0';
 }
