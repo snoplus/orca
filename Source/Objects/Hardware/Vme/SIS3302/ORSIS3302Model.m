@@ -2607,6 +2607,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self reset];
     [self initBoard];
 	[self setLed:YES];
+	[self clearTimeStamp];
 	
 	firstTime	= YES;
 	currentBank = 0;
