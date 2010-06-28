@@ -70,6 +70,12 @@
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet;
 - (NSString*) getPartStartingWith:(NSString*)aLable parts:(NSArray*)parts;
 
+- (int) numberSegmentsInGroup:(int)aGroup;
+- (NSMutableData*) thresholdDataForSet:(int)aSet;
+- (NSMutableData*) gainDataForSet:(int)aSet;
+- (NSMutableData*) rateDataForSet:(int)aSet;
+- (NSMutableData*) totalCountDataForSet:(int)aSet;
+
 #pragma mark •••Convience Methods
 - (void) clearAlarm:(NSString*)aName;
 - (void) postAlarm:(NSString*)aName;

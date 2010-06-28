@@ -109,3 +109,20 @@ extern NSString* ORSqlLock;
 - (void) main;
 @end
 
+@interface ORPostExperimentOp : ORSqlOperation
+{
+	id experiment;
+}
+- (void) dealloc;
+- (void) setExperiment:(id)anExperiment;
+- (void) main;
+@end
+
+@interface NSObject (ORSqlModel)
+- (int) maxNumSegments;
+- (NSMutableData*) thresholdDataForSet:(int)aSet;
+- (NSMutableData*) gainDataForSet:(int)aSet;
+- (NSMutableData*) rateDataForSet:(int)aSet;
+@end
+
+

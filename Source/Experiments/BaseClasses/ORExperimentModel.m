@@ -684,6 +684,70 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORAdcInfoProvidingValueChanged object:self];
 }
 
+- (int) numberSegmentsInGroup:(int)aGroup
+{
+	if(aGroup == 0) return [self maxNumSegments];
+	else			return 0;
+}
+
+- (NSMutableData*) thresholdDataForSet:(int)aSet
+{
+	NSMutableData* theData;
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	unsigned long* p = (unsigned long*)[theData bytes];
+	for(i = 0;i<numSegments;i++){
+		p[i] = [segmentGroup getThreshold:i];
+	}
+	
+	return theData;
+}
+
+- (NSMutableData*) gainDataForSet:(int)aSet
+{
+	NSMutableData* theData;
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	unsigned long* p = (unsigned long*)[theData bytes];
+	for(i = 0;i<numSegments;i++){
+		p[i] = [segmentGroup getGain:i];
+	}
+	
+	return theData;
+}
+
+- (NSMutableData*) rateDataForSet:(int)aSet;
+{
+	NSMutableData* theData;
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	unsigned long* p = (unsigned long*)[theData bytes];
+	for(i = 0;i<numSegments;i++){
+		p[i] = [segmentGroup getRate:i];
+	}
+	return theData;
+}
+
+- (NSMutableData*) totalCountDataForSet:(int)aSet;
+{
+	NSMutableData* theData;
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	unsigned long* p = (unsigned long*)[theData bytes];
+	for(i = 0;i<numSegments;i++){
+		p[i] = [segmentGroup getRate:i];
+	}
+	return theData;
+}
+
 @end
 
 @implementation ORExperimentModel (private)

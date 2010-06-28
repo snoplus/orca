@@ -238,6 +238,14 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	}
 }
 
+
+- (int) numberSegmentsInGroup:(int)aGroup
+{
+	if(aGroup == 0)		 return kNumFocalPlaneSegments;
+	else if(aGroup == 1) return kNumVetoSegments;
+}
+
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
 {

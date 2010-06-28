@@ -39,6 +39,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @interface ORSqlModel (private)
 - (BOOL) validateConnection;
 - (void) updateDataSets;
+- (void) updateExperiment;
 - (void) addMachineName;
 - (void) removeMachineName;
 - (void) postRunState:(NSNotification*)aNote;
@@ -129,7 +130,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 			int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
 			
 			[self postRunState:aNote];
-			
+
 			if(runState == eRunInProgress){
 				if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
 				NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
@@ -138,12 +139,14 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 						[dataMonitors addObject:aDataMonitor];
 					}
 				}
+				[self updateExperiment];
 				[self updateDataSets];
 			}
 			else if(runState == eRunStopped){
 				[dataMonitors release];
 				dataMonitors = nil;
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
 			}
 		}
 		@catch (NSException* e) {
@@ -437,7 +440,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 */ 
 - (void) updateDataSets
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
 	if([self validateConnection]){		
 		ORPostDataOp* anOp = [[ORPostDataOp alloc] initWithSqlConnection:sqlConnection delegate:self];
 		[anOp setDataMonitors:dataMonitors];
@@ -447,6 +450,37 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 	[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
 }
+
+/*Table: Experiment
+ +----------------+-------------+------+-----+---------+-------+
+ | Field          | Type        | Null | Key | Default | Extra |
+ +----------------+-------------+------+-----+---------+-------+
+ | experiment_id  | int(11)     | NO   |     | NULL    |       |
+ | machine_id     | int(11)     | NO   | MUL | NULL    |       |
+ | experiment     | varchar(64) | YES  |     | NULL    |       |
+ | numberSegments | int(11)     | YES  |     | NULL    |       |
+ | rates          | mediumblob  | YES  |     | NULL    |       |
+ | totalRate      | mediumblob  | YES  |     | NULL    |       |
+ | thresholds     | mediumblob  | YES  |     | NULL    |       |
+ | gains          | mediumblob  | YES  |     | NULL    |       |
+ +----------------+-------------+------+-----+---------+-------+
+ */ 
+- (void) updateExperiment
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
+	id nextObject = [self objectConnectedTo:ORSqlModelInConnector];
+	if(nextObject){
+		if([self validateConnection]){		
+			ORPostExperimentOp* anOp = [[ORPostExperimentOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+			[anOp setExperiment:nextObject];
+			[queue addOperation:anOp];
+			[anOp release];
+		}
+	}
+	
+	[self performSelector:@selector(updateExperiment) withObject:nil afterDelay:10];
+}
+
 @end
 
 @implementation ORSqlOperation
@@ -624,6 +658,66 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
 
+}
+
+@end
+
+@implementation ORPostExperimentOp
+- (void) dealloc
+{
+	[experiment release];
+	[super dealloc];
+}
+
+- (void) setExperiment:(id)anExperiment
+{
+	[anExperiment retain];
+	[experiment release];
+	experiment = anExperiment;
+}
+
+- (void) main
+{
+	@try {
+		if([experiment isKindOfClass:NSClassFromString(@"ORExperimentModel")]) {
+			NSString* experimentName = [experiment className];
+			if([experimentName hasPrefix:@"OR"])    experimentName = [experimentName substringFromIndex:2];
+			if([experimentName hasSuffix:@"Model"]) experimentName = [experimentName substringToIndex:[experimentName length] - 5];
+
+			//get our machine_id using our MAC Address
+			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+			id row				    = [theResult fetchRowAsDictionary];
+			id machine_id			= [row objectForKey:@"machine_id"];
+
+			theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT experiment_id from experiment where (machine_id = %@ and experiment = %@)",[sqlConnection quoteObject:machine_id],[sqlConnection quoteObject:experimentName]]];
+			row				    = [theResult fetchRowAsDictionary];
+			id experiment_id		= [row objectForKey:@"experiment_id"];
+
+		
+			//if we have a run entry, update it. Otherwise create it.
+			if(experiment_id){
+				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE experiment SET thresholds=%@,gains=%@,rates=%@ WHERE machine_id=%@",
+											[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
+											[sqlConnection quoteObject:[experiment gainDataForSet:0]],
+											[sqlConnection quoteObject:[experiment rateDataForSet:0]],
+											[sqlConnection quoteObject:machine_id]]];
+			}
+			else  {
+				int numberSegments = [experiment maxNumSegments];
+				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO experiment (machine_id,experiment,numberSegments,thresholds,gains,rates) VALUES (%@,%@,%d,%@,%@,%@)",
+											[sqlConnection quoteObject:machine_id],
+											[sqlConnection quoteObject:experimentName],
+											numberSegments,
+											[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
+											[sqlConnection quoteObject:[experiment gainDataForSet:0]],
+											[sqlConnection quoteObject:[experiment rateDataForSet:0]]]];
+			}
+		}
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+	
 }
 
 @end
