@@ -243,6 +243,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
 	if(aGroup == 0)		 return kNumFocalPlaneSegments;
 	else if(aGroup == 1) return kNumVetoSegments;
+	else return 0;
 }
 
 
