@@ -23,6 +23,7 @@
 @implementation ORMaskedWaveform
 
 #pragma mark ¥¥¥Accessors
+
 - (unsigned long) mask
 {
 	return mask;
@@ -108,6 +109,17 @@
 }
 
 #pragma mark ¥¥¥Accessors
+- (void) setBitNames:(NSArray*)someNames
+{
+	[someNames retain];
+	[bitNames release];
+	bitNames = someNames;
+}
+
+- (NSArray*) bitNames
+{
+	return bitNames;
+}
 - (void) setSpecialBitMask:(unsigned long)aMask
 {
 	specialBitMask=aMask;

@@ -90,7 +90,7 @@
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)unitSize sender:(id)obj  withKeys:(NSString*)keyArg,...;
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...;
-- (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask specialBits:(unsigned long)aSpecialMask sender:(id)obj  withKeys:(NSString*)firstArg,...;
+- (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask specialBits:(unsigned long)aSpecialMask bitNames:(NSArray*)someNames sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) loadFFTReal:(NSArray*)realArray imaginary:(NSArray*)imaginaryArray withKeyArray:(NSArray*)keyArray;
 - (void) loadGenericData:(NSString*)aString sender:(id)obj withKeys:(NSString*)topLevel,...;
 - (void) loadGenericData:(NSString*)aString sender:(id)obj usingKeyArray:(NSArray*)myArgs;

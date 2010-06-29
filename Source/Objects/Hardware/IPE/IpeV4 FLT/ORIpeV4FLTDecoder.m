@@ -260,13 +260,14 @@
 startIndex=traceStart16;
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
-				    unitSize: sizeof(short)					// unit size in bytes
-					startIndex:	startIndex					// first Point Index (past the header offset!!!)
-					mask:	0x0FFF							// when displayed all values will be masked with this value
-					specialBits:0xF000						
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0x0FFF							// when displayed all values will be masked with this value
+			   specialBits:0xF000	
+				  bitNames: [NSArray arrayWithObjects:@"trig",@"over",@"under", @"extern",nil]
 					sender: self 
-					withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
-	
+				  withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,channelKey,nil];
+
 	//get the actual object
 	if(getRatesFromDecodeStage){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];

@@ -45,9 +45,12 @@
     unsigned long   specialBitMask;
 	int numBits;
 	unsigned long firstBitMask;
+	NSArray* bitNames;
 }
 
 #pragma mark ¥¥¥Accessors 
+- (void) setBitNames:(NSArray*)someNames;
+- (NSArray*) bitNames;
 - (void) setSpecialBitMask:(unsigned long)aMask;
 - (unsigned long) specialBitMask;
 - (int) numBits;

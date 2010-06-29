@@ -1192,7 +1192,15 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     va_end(myArgs);
 }
 
-- (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask specialBits:(unsigned long)aSpecialMask sender:(id)obj  withKeys:(NSString*)firstArg,...
+- (void) loadWaveform:(NSData*)aWaveForm 
+			   offset:(unsigned long)anOffset 
+			 unitSize:(int)aUnitSize 
+		   startIndex:(unsigned long)aStartIndex 
+				 mask:(unsigned long)aMask 
+		  specialBits:(unsigned long)aSpecialMask 
+			 bitNames:(NSArray*)bitNames
+			   sender:(id)obj  
+			 withKeys:(NSString*)firstArg,...
 {
     va_list myArgs;
     va_start(myArgs,firstArg);
@@ -1225,6 +1233,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 		[waveform setDataSet:self];
 		[waveform setMask:aMask];
 		[waveform setSpecialBitMask:aSpecialMask];
+		[waveform setBitNames:bitNames];
 		[waveform setStartIndex:aStartIndex];
         [waveform setDataOffset:anOffset];
         [waveform setKey:[nextLevel key]];
@@ -1239,6 +1248,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     else {
 		[waveform setMask:aMask];
 		[waveform setSpecialBitMask:aSpecialMask];
+		[waveform setBitNames:bitNames];
 		[waveform setStartIndex:aStartIndex];
 		[waveform setWaveform:aWaveForm];
     }

@@ -32,8 +32,10 @@
     [super awakeFromNib];
 	
 	int i;
+	NSArray* bitNames = [(ORMaskedIndexedWaveformWithSpecialBits*)model bitNames];
 	for(i=0;i<[model numBits];i++){
 		ORBitStrip* aPlot = [[ORBitStrip alloc] initWithTag:1+i andDataSource:self];
+		if(i<[bitNames count]) [aPlot setBitName:[bitNames objectAtIndex:i]];
 		[aPlot setBitNum:i];
 		[aPlot setLineColor:[NSColor blueColor]];
 		[plotView addPlot: aPlot];
