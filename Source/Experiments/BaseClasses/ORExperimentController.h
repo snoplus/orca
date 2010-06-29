@@ -102,6 +102,16 @@
 - (IBAction) repeatRunCBAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 
+#pragma mark •••Toolbar
+- (IBAction) openHelp:(NSToolbarItem*)item;
+- (IBAction) statusLog:(NSToolbarItem*)item; 
+- (IBAction) alarmMaster:(NSToolbarItem*)item; 
+- (IBAction) openPreferences:(NSToolbarItem*)item; 
+- (IBAction) openHWWizard:(NSToolbarItem*)item; 
+- (IBAction) openCommandCenter:(NSToolbarItem*)item; 
+- (IBAction) openTaskMaster:(NSToolbarItem*)item; 
+- (IBAction) printDocument:(id)sender;
+
 #pragma mark •••Details Actions
 - (IBAction) detailsLockAction:(id)sender;
 - (IBAction) initAction:(id)sender;

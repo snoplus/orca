@@ -35,6 +35,14 @@
 #import "OR1DHistoPlot.h"
 #import "ORTimeAxis.h"
 
+#import "ORDocumentController.h"
+#import "ORStatusController.h"
+#import "ORAlarmController.h"
+#import "ORHelpCenter.h"
+#import "ORHWWizardController.h"
+#import "ORPreferencesController.h"
+#import "ORCommandCenterController.h"
+
 @interface ORExperimentController (private)
 - (void) readPrimaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) savePrimaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -548,6 +556,53 @@
 {
     [gSecurity tryToSetLock:[model experimentDetectorLock] to:[sender intValue] forWindow:[self window]];
 }
+
+#pragma mark •••Toolbar
+- (IBAction) openHelp:(NSToolbarItem*)item 
+{
+	[[[NSApp delegate] helpCenter] showHelpCenter:nil];
+}
+
+- (IBAction) statusLog:(NSToolbarItem*)item 
+{
+    [[ORStatusController sharedStatusController] showWindow:self];
+}
+
+- (IBAction) alarmMaster:(NSToolbarItem*)item 
+{
+    [[ORAlarmController sharedAlarmController] showWindow:self];
+}
+
+- (IBAction) openPreferences:(NSToolbarItem*)item 
+{
+    [[ORPreferencesController sharedPreferencesController] showWindow:self];
+}
+
+- (IBAction) openHWWizard:(NSToolbarItem*)item 
+{
+    [[ORHWWizardController sharedHWWizardController] showWindow:self];
+}
+
+- (IBAction) openCommandCenter:(NSToolbarItem*)item 
+{
+    [[ORCommandCenterController sharedCommandCenterController] showWindow:self];
+}
+
+- (IBAction) openTaskMaster:(NSToolbarItem*)item 
+{
+    [[NSApp  delegate] showTaskMaster:self];
+}
+
+- (IBAction) printDocument:(id)sender
+{
+    NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
+    NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:[[self window]contentView] printInfo:printInfo];
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
+    [printOp setShowPanels:YES];
+#endif
+    [printOp runOperation];
+}
+
 
 #pragma mark •••Details Actions
 - (IBAction) initAction:(id)sender;

@@ -194,6 +194,8 @@
 		8407751E0CEE7CAD0073F5A9 /* ORHelpCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 840775100CEE7CAC0073F5A9 /* ORHelpCenter.h */; };
 		8407751F0CEE7CAD0073F5A9 /* ORHelpCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 840775110CEE7CAC0073F5A9 /* ORHelpCenter.m */; };
 		840775220CEE7CAD0073F5A9 /* SnapBack.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 840775140CEE7CAC0073F5A9 /* SnapBack.tiff */; };
+		840795DE11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840795DD11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist */; };
+		840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840795EE11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist */; };
 		8407F0E50DEF66DB000F1441 /* Caen862.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8407F0DF0DEF66DB000F1441 /* Caen862.nib */; };
 		8407F0E60DEF66DB000F1441 /* ORCaen862Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407F0E00DEF66DB000F1441 /* ORCaen862Controller.h */; };
 		8407F0E70DEF66DB000F1441 /* ORCaen862Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407F0E10DEF66DB000F1441 /* ORCaen862Controller.m */; };
@@ -2677,6 +2679,8 @@
 		840775100CEE7CAC0073F5A9 /* ORHelpCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHelpCenter.h; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.h"; sourceTree = SOURCE_ROOT; };
 		840775110CEE7CAC0073F5A9 /* ORHelpCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHelpCenter.m; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.m"; sourceTree = SOURCE_ROOT; };
 		840775140CEE7CAC0073F5A9 /* SnapBack.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = SnapBack.tiff; path = "Source/Main Dialogs/HelpCenter/SnapBack.tiff"; sourceTree = SOURCE_ROOT; };
+		840795DD11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Katrin.plist; path = Source/Experiments/Katrin/edu.washington.npl.orca.Katrin.plist; sourceTree = SOURCE_ROOT; };
+		840795EE11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Prespectrometer.plist; path = Source/Experiments/Prespectrometer/edu.washington.npl.orca.Prespectrometer.plist; sourceTree = SOURCE_ROOT; };
 		8407F0DF0DEF66DB000F1441 /* Caen862.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen862.nib; path = Source/Objects/Hardware/Vme/CAEN/CV862/Caen862.nib; sourceTree = SOURCE_ROOT; };
 		8407F0E00DEF66DB000F1441 /* ORCaen862Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen862Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Controller.h; sourceTree = SOURCE_ROOT; };
 		8407F0E10DEF66DB000F1441 /* ORCaen862Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen862Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Controller.m; sourceTree = SOURCE_ROOT; };
@@ -5087,6 +5091,7 @@
 		54F5B6F9087206D9003AC228 /* Katrin */ = {
 			isa = PBXGroup;
 			children = (
+				840795DD11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist */,
 				84760D340B3728DF00512F67 /* KatrinConstants.h */,
 				54F5B6FF087206D9003AC228 /* KatrinModel.m */,
 				54F5B6FE087206D9003AC228 /* KatrinModel.h */,
@@ -7718,6 +7723,7 @@
 		849B25E30B2F34F90007484F /* Prespectrometer */ = {
 			isa = PBXGroup;
 			children = (
+				840795EE11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist */,
 				849B25EB0B2F34F90007484F /* PrespectrometerModel.m */,
 				849B25EA0B2F34F90007484F /* PrespectrometerModel.h */,
 				849B25E70B2F34F90007484F /* PrespectrometerController.m */,
@@ -11797,6 +11803,8 @@
 				84A3EDA511BD8165003A08A9 /* SIS3320.nib in Resources */,
 				84A3EDA611BD8165003A08A9 /* SIS3320Card.gif in Resources */,
 				84B3D12311BFCB8300C17CD6 /* Sql.tif in Resources */,
+				840795DE11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist in Resources */,
+				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
