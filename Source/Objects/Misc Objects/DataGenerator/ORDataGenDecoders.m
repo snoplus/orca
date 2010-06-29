@@ -170,7 +170,7 @@ static NSString* kCardKey[8] = {
 				startIndex:0 
 					  mask:0x0fffffff 
 			   specialBits:0xf0000000
-				  bitNames:[NSArray arrayWithObjects:@"bit1",@"bit2",@"bit3",,@"bit3",nil]
+				  bitNames:[NSArray arrayWithObjects:@"bit1",@"bit2",@"bit3",@"bit4",nil]
 					sender:self
 				  withKeys:@"DataGen_Waveform",
 							kCardKey[ShiftAndExtract(ptr[1],16,0xf)],
