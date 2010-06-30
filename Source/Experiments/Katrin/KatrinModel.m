@@ -238,6 +238,16 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	}
 }
 
+- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
+{
+	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
+
+	NSString* crateName = [theGroup segment:index objectForKey:@"kCrate"];
+	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
+	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
+	
+	return [NSString stringWithFormat:@"FLT,Energy,Crate %d,Station %d,Channel %d",[crateName intValue],[cardName intValue],[chanName intValue]];
+}
 
 - (int) numberSegmentsInGroup:(int)aGroup
 {

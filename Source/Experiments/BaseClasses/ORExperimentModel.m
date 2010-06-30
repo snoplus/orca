@@ -191,6 +191,12 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	//not implemented... up to subclasses to define
 }
 
+- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
+{ 
+	return @"";
+	//not implemented... up to subclasses to define
+}
+
 
 - (void) histogram
 {

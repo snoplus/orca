@@ -104,6 +104,7 @@
 - (void) setSegmentErrorClassName:(NSString*)aClassName card:(int)card channel:(int)channel;
 - (void) histogram;
 - (void) initHardware;
+- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index;
 
 #pragma mark •••Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
