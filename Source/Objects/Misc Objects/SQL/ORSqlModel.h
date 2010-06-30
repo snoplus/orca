@@ -109,12 +109,26 @@ extern NSString* ORSqlLock;
 - (void) main;
 @end
 
+
 @interface ORPostExperimentOp : ORSqlOperation
 {
 	id experiment;
 }
 - (void) dealloc;
 - (void) setExperiment:(id)anExperiment;
+- (void) main;
+@end
+
+#define kClear 0
+#define kPost  1
+@interface ORPostAlarmOp : ORSqlOperation
+{
+	BOOL opType;
+	id alarm;
+}
+- (void) dealloc;
+- (void) postAlarm:(id)anAlarm;
+- (void) clearAlarm:(id)anAlarm;
 - (void) main;
 @end
 

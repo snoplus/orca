@@ -24,7 +24,8 @@
 #import "OR1DHisto.h"
 #import "ORSqlConnection.h"
 #import "ORSqlResult.h"
-
+#import "ORAlarm.h"
+#import "ORAlarmCollection.h"
 
 NSString* ORSqlModelStealthModeChanged = @"ORSqlModelStealthModeChanged";
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
@@ -75,6 +76,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
 	}
 	[self addMachineName];
+
+	[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
 }
 
 - (void) setUpImage
@@ -114,6 +117,16 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(alarmPosted:)
+                         name : ORAlarmWasPostedNotification
+                       object : nil];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(alarmCleared:)
+                         name : ORAlarmWasClearedNotification
+                       object : nil];	
 	
 }
 
@@ -333,7 +346,17 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @end
 
 @implementation ORSqlModel (private)
-
+- (void) collectAlarms
+{
+	NSArray* alarms = [[ORAlarmCollection sharedAlarmCollection] alarms];
+	for(id anAlarm in alarms){
+		ORPostAlarmOp* anOp = [[ORPostAlarmOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[anOp postAlarm:anAlarm];
+		[queue addOperation:anOp];
+		[anOp release];
+	}
+	
+}
 - (BOOL) validateConnection
 {
 	if(stealthMode)return NO;
@@ -481,6 +504,37 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[self performSelector:@selector(updateExperiment) withObject:nil afterDelay:10];
 }
 
+/*
++------------+---------------+------+-----+---------+----------------+
+| Field      | Type          | Null | Key | Default | Extra          |
++------------+---------------+------+-----+---------+----------------+
+| alarm_id   | int(11)       | NO   | PRI | NULL    | auto_increment |
+| machine_id | int(11)       | NO   | MUL | NULL    |                |
+| timePosted | date          | NO   |     | NULL    |                |
+| serverity  | int(11)       | YES  |     | NULL    |                |
+| name       | varchar(64)   | YES  |     | NULL    |                |
+| help       | varchar(1024) | YES  |     | NULL    |                |
++------------+---------------+------+-----+---------+----------------+
+*/
+- (void) alarmPosted:(NSNotification*)aNote
+{
+	if([self validateConnection]){		
+		ORPostAlarmOp* anOp = [[ORPostAlarmOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[anOp postAlarm:[aNote object]];
+		[queue addOperation:anOp];
+		[anOp release];
+	}
+}
+
+- (void) alarmCleared:(NSNotification*)aNote
+{
+	if([self validateConnection]){		
+		ORPostAlarmOp* anOp = [[ORPostAlarmOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[anOp clearAlarm:[aNote object]];
+		[queue addOperation:anOp];
+		[anOp release];
+	}
+}
 @end
 
 @implementation ORSqlOperation
@@ -721,3 +775,65 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 }
 
 @end
+
+@implementation ORPostAlarmOp
+- (void) dealloc
+{
+	[alarm release];
+	[super dealloc];
+}
+
+- (void) postAlarm:(id)anAlarm
+{
+	[anAlarm retain];
+	[alarm release];
+	alarm = anAlarm;
+	opType = kPost;
+}
+
+- (void) clearAlarm:(id)anAlarm
+{
+	[anAlarm retain];
+	[alarm release];
+	alarm = anAlarm;
+	opType = kClear;
+}
+
+- (void) main
+{
+	@try {			
+		//get our machine_id using our MAC Address
+		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+		id row				    = [theResult fetchRowAsDictionary];
+		id machine_id			= [row objectForKey:@"machine_id"];
+		
+		if(machine_id){
+			if(opType == kPost){
+				theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT alarm_id from alarms where (machine_id = %@ and name = %@)",[sqlConnection quoteObject:machine_id],[sqlConnection quoteObject:[alarm name]]]];
+				row				= [theResult fetchRowAsDictionary];
+				id alarm_id		= [row objectForKey:@"alarm_id"];
+				if(!alarm_id){
+					[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO alarms (machine_id,timePosted,severity,name,help) VALUES (%@,%@,%d,%@,%@)",
+												[sqlConnection quoteObject:machine_id],
+												[sqlConnection quoteObject:[alarm timePosted]],
+												[alarm severity],
+												[sqlConnection quoteObject:[alarm name]],
+												[sqlConnection quoteObject:[alarm helpString]]]];
+				}
+			}
+			else {
+				[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM alarms where (machine_id=%@ AND name=%@)",
+											[sqlConnection quoteObject:machine_id],
+											[sqlConnection quoteObject:[alarm name]]]];
+			}
+		}		
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+	
+}
+
+@end
+
+
