@@ -30,6 +30,10 @@
 //                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+// ^^^^------------------------------------ fill state for level 3
+//      ^^^^------------------------------- fill state for level 2
+//           ^^^^-------------------------- fill state for level 1
+//                ^^^^--------------------- fill state for level 0
 //                          ^^^^ ^^^^ ^^^^- device id
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  level chan 0 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time level 0 taken in seconds since Jan 1, 1970
@@ -78,7 +82,17 @@ static NSString* kBocTicUnit[4] = {
 	
 	return ExtractLength(dataPtr[0]);
 }
-
+- (NSString*) fillStatusName:(int)i
+{
+	switch(i){
+		case 0: return @"Off";
+		case 1: return @"On";
+		case 2: return @"Auto-Off";
+		case 3: return @"Auto-On";
+		case 4: return @"Expired";
+		default: return @"?";
+	}
+}
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
     NSString* title= @"AMI 286 Controller\n\n";
@@ -93,11 +107,12 @@ static NSString* kBocTicUnit[4] = {
 	int index = 2;
 	for(i=0;i<4;i++){
 		theData.asLong = dataPtr[index];
-		
+		int fillState =  ShiftAndExtract(dataPtr[1],16+(i*4),0xf);
 		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
 		
 		theString = [theString stringByAppendingFormat:@"Level %d: %.2E %@\n",i,theData.asFloat,date];
+		theString = [theString stringByAppendingFormat:@"State: %@\n",[self fillState:fillState]];
 		index+=2;
 	}
 	return theString;

@@ -212,6 +212,9 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		int index = 2;
 		int i;
 		for(i=0;i<4;i++){
+			
+			data[1] |= ([self fillState:i] & 0xf) << (16 + i*4));
+			
 			theData.asFloat = level[i];
 			data[index] = theData.asLong;
 			index++;
