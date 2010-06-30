@@ -120,6 +120,8 @@ E			[Ee][+-]?{D}+
 				}
 			
 [ \t]+			;       /* ignore whitespace */
+[\xA0]+			;       /* ignore whitespace */
+[\xC2]+			;       /* ignore whitespace */
 
 \n				{++num_lines;}
 
