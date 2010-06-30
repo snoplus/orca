@@ -26,6 +26,8 @@
 #import "ORSqlResult.h"
 #import "ORAlarm.h"
 #import "ORAlarmCollection.h"
+#import "ORExperimentModel.h"
+#import "ORSegmentGroup.h"
 
 NSString* ORSqlModelStealthModeChanged = @"ORSqlModelStealthModeChanged";
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
@@ -44,6 +46,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) addMachineName;
 - (void) removeMachineName;
 - (void) postRunState:(NSNotification*)aNote;
+- (void) collectSegmentMap;
+- (void) collectAlarms;
 @end
 
 @implementation ORSqlModel
@@ -78,6 +82,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[self addMachineName];
 
 	[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
+	[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
 }
 
 - (void) setUpImage
@@ -169,6 +174,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 }
 
 #pragma mark ***Accessors
+- (id) nextObject
+{
+	return [self objectConnectedTo:ORSqlModelInConnector];
+}
 
 - (BOOL) stealthMode
 {
@@ -357,6 +366,14 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 	
 }
+
+- (void) collectSegmentMap
+{		
+	ORPostSegmentMapOp* anOp = [[ORPostSegmentMapOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+	[queue addOperation:anOp];
+	[anOp release];
+}
+
 - (BOOL) validateConnection
 {
 	if(stealthMode)return NO;
@@ -835,5 +852,58 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 }
 
 @end
+
+@implementation ORPostSegmentMapOp
+- (void) dealloc
+{
+	[super dealloc];
+}
+
+- (void) main
+{
+	ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
+	@try {			
+		//get our machine_id using our MAC Address
+		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+		id row				    = [theResult fetchRowAsDictionary];
+		id machine_id			= [row objectForKey:@"machine_id"];
+		
+		if(machine_id){
+			//since we only update this map on demand (i.e. if it changes we'll just delete and start over
+			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM segmentMap where machine_id=%@",
+										[sqlConnection quoteObject:machine_id]]];
+			
+			ORSegmentGroup* theGroup = [experiment segmentGroup:0];
+			NSArray* segments = [theGroup segments];
+			int segmentNumber = 0;
+			for(id aSegment in segments){
+				NSString* crateName		= [aSegment objectForKey:@"kCrate"];
+				NSString* cardName		= [aSegment objectForKey:@"kCardSlot"];
+				NSString* chanName		= [aSegment objectForKey:@"kChannel"];
+				NSString* dataSetName   = [experiment dataSetNameGroup:0 segment:segmentNumber];
+				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO segmentMap (machine_id,segment,histogram1DName,crate,card,channel) VALUES (%@,%d,%@,%@,%@,%@)",
+											[sqlConnection quoteObject:machine_id],
+											segmentNumber,
+											[sqlConnection quoteObject:dataSetName],
+											[sqlConnection quoteObject:crateName],
+											[sqlConnection quoteObject:cardName],
+											[sqlConnection quoteObject:chanName]]];
+				segmentNumber++;
+			}
+			
+			
+		}		
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+	@finally {
+		[experiment release];
+	}
+	
+}
+
+@end
+
 
 

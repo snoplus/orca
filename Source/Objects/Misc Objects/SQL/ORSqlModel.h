@@ -51,6 +51,7 @@
 - (NSString*) hostName;
 - (void) setHostName:(NSString*)aHostName;
 - (void) logQueryException:(NSException*)e;
+- (id) nextObject;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -131,6 +132,14 @@ extern NSString* ORSqlLock;
 - (void) clearAlarm:(id)anAlarm;
 - (void) main;
 @end
+
+@interface ORPostSegmentMapOp : ORSqlOperation
+{
+}
+- (void) dealloc;
+- (void) main;
+@end
+
 
 @interface NSObject (ORSqlModel)
 - (int) maxNumSegments;
