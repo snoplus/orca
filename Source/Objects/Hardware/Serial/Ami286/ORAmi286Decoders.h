@@ -30,4 +30,5 @@
 - (NSString*) getLevelKey:(unsigned short)aUnit;
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+- (NSString*) fillStatusName:(int)i;
 @end

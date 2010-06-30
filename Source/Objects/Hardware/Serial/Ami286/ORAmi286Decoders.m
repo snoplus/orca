@@ -112,7 +112,7 @@ static NSString* kBocTicUnit[4] = {
 		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
 		
 		theString = [theString stringByAppendingFormat:@"Level %d: %.2E %@\n",i,theData.asFloat,date];
-		theString = [theString stringByAppendingFormat:@"State: %@\n",[self fillState:fillState]];
+		theString = [theString stringByAppendingFormat:@"State: %@\n",[self fillStatusName:fillState]];
 		index+=2;
 	}
 	return theString;
