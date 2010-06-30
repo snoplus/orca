@@ -56,7 +56,7 @@
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
-			int channel  = ShiftAndExtract(ptr[i],16,0xf);
+			int channel  = [self channel:ptr[i]];
 			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
         }
     }
@@ -79,7 +79,7 @@
         for( i = 2; i < length; i++ ){
             if( ShiftAndExtract(ptr[i],24,0x7) == 0x0){ //is valid data?
                 NSLogFont([NSFont fontWithName:@"Monaco" size:12],  @"Chan: %2d  (un:%d ov:%d) qdc: 0x%x\n", 
-													ShiftAndExtract(ptr[i],17,0xf),
+													[self channel:ptr[i]],
 													ShiftAndExtract(ptr[i],13,0x1),
 													ShiftAndExtract(ptr[i],12,0x1),
 													ShiftAndExtract(ptr[i],0,0xfff));
@@ -88,5 +88,20 @@
     }
 }
 
+- (unsigned short) channel: (unsigned long) pDataValue
+{
+    return	ShiftAndExtract(pDataValue,17,0xf);
+}
+
 @end
+
+@implementation ORCAEN965ADecoderForTdc
+
+- (unsigned short) channel: (unsigned long) pDataValue
+{
+    return	ShiftAndExtract(pDataValue,18,0x7);
+}
+
+@end
+
 

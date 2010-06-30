@@ -71,6 +71,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 };
 
 
+NSString* ORCaen965ModelModelTypeChanged = @"ORCaen965ModelModelTypeChanged";
 NSString* ORCaen965ModelOnlineMaskChanged   = @"ORCaen965ModelOnlineMaskChanged";
 NSString* ORCaen965LowThresholdChanged		= @"ORCaen965LowThresholdChanged";
 NSString* ORCaen965HighThresholdChanged		= @"ORCaen965HighThresholdChanged";
@@ -102,6 +103,20 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 }
 
 #pragma mark ***Accessors
+
+- (int) modelType
+{
+    return modelType;
+}
+
+- (void) setModelType:(int)aModelType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setModelType:modelType];
+    
+    modelType = aModelType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965ModelModelTypeChanged object:self];
+}
 - (unsigned short) selectedRegIndex
 {
     return selectedRegIndex;
@@ -381,7 +396,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 - (void) writeThresholds
 {
     short i;
-    for (i = 0; i < kCV965NumberChannels; i++){
+	int n = (modelType==kModel965?16:8);
+    for (i = 0; i < n; i++){
         [self writeLowThreshold:i];
         [self writeHighThreshold:i];
     }
@@ -566,12 +582,21 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 
 - (NSDictionary*) dataRecordDescription
 {
+	
+	NSString* decoderName;
+	if(modelType == kModel965){
+		decoderName = @"ORCAEN965DecoderForQdc";
+	}
+	else {
+		decoderName = @"ORCAEN965ANDecoderForQdc";
+	}
+	
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORCaen965DecoderForQdc",							@"decoder",
-								 [NSNumber numberWithLong:dataId],					@"dataId",
-								 [NSNumber numberWithBool:YES],						@"variable",
-								 [NSNumber numberWithLong:-1],	@"length",
+								 decoderName,							@"decoder",
+								 [NSNumber numberWithLong:dataId],		@"dataId",
+								 [NSNumber numberWithBool:YES],			@"variable",
+								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Qdc"];
     
@@ -798,13 +823,14 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 965 QDC (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 965%@ QDC (Slot %d) ",modelType==0?@"":@"A",[self slot]];
 }
 
 #pragma mark ***HWWizard Support
 - (int) numberOfChannels
 {
-    return kCV965NumberChannels;
+	if([self modelType] == kModel965) return kCV965NumberChannels;
+	else							  return kCV965ANumberChannels;
 }
 
 - (BOOL) hasParmetersToRamp
@@ -882,6 +908,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     [[self undoManager] disableUndoRegistration];
 	int i;
     for (i = 0; i < kCV965NumberChannels; i++){
+    [self setModelType:[aDecoder decodeIntForKey:@"modelType"]];
         [self setLowThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]]];
         [self setHighThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]]];
     }    
@@ -898,6 +925,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+    [anEncoder encodeInt:modelType forKey:@"modelType"];
     [anEncoder encodeInt:onlineMask forKey:@"onlineMask"];
 	int i;
 	for (i = 0; i < kCV965NumberChannels; i++){

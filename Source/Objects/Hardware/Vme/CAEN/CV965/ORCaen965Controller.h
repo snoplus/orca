@@ -26,6 +26,7 @@
 // Definition of class.
 @interface ORCaen965Controller : OrcaObjectController {
     IBOutlet NSTabView* tabView;
+	IBOutlet NSPopUpButton* modelTypePU;
     IBOutlet NSMatrix*	onlineMaskMatrix;
     IBOutlet NSMatrix*	lowThresholdMatrix;
     IBOutlet NSMatrix*	highThresholdMatrix;
@@ -62,6 +63,7 @@
 - (id) init;
 
 #pragma mark ***Interface Management
+- (void) modelTypeChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) setModel:(id)aModel;
@@ -75,8 +77,10 @@
 - (void) writeValueChanged:(NSNotification*)aNote;
 - (void) selectedRegIndexChanged:(NSNotification*)aNote;
 - (void) selectedRegChannelChanged:(NSNotification*)aNote;
+- (void) enableControls;
 
 #pragma mark •••Actions
+- (IBAction) modelTypeAction:(id)sender;
 - (IBAction) baseAddressAction: (id)aSender;
 - (IBAction) lowThresholdAction:(id)sender;
 - (IBAction) highThresholdAction:(id)sender;

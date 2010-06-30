@@ -70,7 +70,10 @@ enum {
 
 // Size of output buffer
 #define k965OutputBufferSize 0x07FF
-#define kCV965NumberChannels 16
+#define kCV965NumberChannels  16
+#define kCV965ANumberChannels 8
+#define kModel965  0
+#define kModel965A 1
 
 // Class definition
 @interface ORCaen965Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
@@ -90,9 +93,12 @@ enum {
 	unsigned long statusAddress;
 	unsigned long dataBufferAddress;
 	unsigned long location;
+    int modelType;
 }
 
 #pragma mark ***Accessors
+- (int) modelType;
+- (void) setModelType:(int)aModelType;
 - (id) init;
 
 #pragma mark ***Accessors
@@ -175,6 +181,7 @@ enum {
 - (void) encodeWithCoder:(NSCoder*) anEncoder;
 @end
 
+extern NSString* ORCaen965ModelModelTypeChanged;
 extern NSString* ORCaen965BasicLock;
 extern NSString* ORCaen965ModelOnlineMaskChanged;
 extern NSString* ORCaen965LowThresholdChanged;

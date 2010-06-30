@@ -39,5 +39,10 @@
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 - (void) printData: (NSString*) pName data:(void*) theData;
+- (unsigned short) 	channel: (unsigned long) pDataValue;
+@end
 
+@interface ORCAEN965ADecoderForTdc : ORCaen965DecoderForQdc {
+}
+- (unsigned short) 	channel: (unsigned long) pDataValue;
 @end

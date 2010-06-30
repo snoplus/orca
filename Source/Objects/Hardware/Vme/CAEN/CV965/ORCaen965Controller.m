@@ -111,9 +111,23 @@
 					 selector:@selector(writeValueChanged:)
 						 name:ORCaen965WriteValueChanged
 					   object:model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(modelTypeChanged:)
+                         name : ORCaen965ModelModelTypeChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
+
+- (void) modelTypeChanged:(NSNotification*)aNote
+{
+	[modelTypePU selectItemAtIndex: [model modelType]];
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+	[self enableControls];
+}
+
 - (void) updateWindow
 {
 	[super updateWindow ];
@@ -129,6 +143,7 @@
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:@"channel"];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965LowThresholdChanged object:model userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965HighThresholdChanged object:model userInfo:userInfo];
+	[self modelTypeChanged:nil];
 	}
     [self basicLockChanged:nil];
     [self slotChanged:nil];
@@ -176,10 +191,8 @@
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen965BasicLock];
     BOOL locked = [gSecurity isLocked:ORCaen965BasicLock];
-    [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-    [lowThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-    [highThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-    [reportButton setEnabled:!lockedOrRunningMaintenance];
+	[self enableControls];
+	[reportButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
     [resetButton setEnabled:!lockedOrRunningMaintenance];
 	
@@ -199,6 +212,19 @@
     [basicLockDocField setStringValue:s];
 	
 }
+
+- (void) enableControls
+{    
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen965BasicLock];
+	
+	int n = [model numberOfChannels];
+	int i;
+	for(i=0;i<kCV965NumberChannels;i++){
+		[[onlineMaskMatrix cellWithTag:i]    setEnabled:!lockedOrRunningMaintenance && (i<n)];
+		[[lowThresholdMatrix cellWithTag:i]  setEnabled:!lockedOrRunningMaintenance && (i<n)];
+		[[highThresholdMatrix cellWithTag:i] setEnabled:!lockedOrRunningMaintenance && (i<n)];
+	}	
+}	 
 
 - (void) onlineMaskChanged:(NSNotification*)aNotification
 {
@@ -242,6 +268,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) modelTypeAction:(id)sender
+{
+	[model setModelType:[sender indexOfSelectedItem]];	
+}
+
 - (IBAction) baseAddressAction: (id) aSender
 {
 	[model setBaseAddress:[aSender intValue]];
