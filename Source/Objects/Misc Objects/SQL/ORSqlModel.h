@@ -135,8 +135,10 @@ extern NSString* ORSqlLock;
 
 @interface ORPostSegmentMapOp : ORSqlOperation
 {
+	int monitor_id;
 }
 - (void) dealloc;
+- (void) setDataMonitorId:(int)anID;
 - (void) main;
 @end
 

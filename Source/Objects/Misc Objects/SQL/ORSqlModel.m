@@ -355,6 +355,18 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @end
 
 @implementation ORSqlModel (private)
+/*
+ +------------+---------------+------+-----+---------+----------------+
+ | Field      | Type          | Null | Key | Default | Extra          |
+ +------------+---------------+------+-----+---------+----------------+
+ | alarm_id   | int(11)       | NO   | PRI | NULL    | auto_increment |
+ | machine_id | int(11)       | NO   | MUL | NULL    |                |
+ | timePosted | varchar(64)   | NO   |     | NULL    |                |
+ | severity   | int(11)       | YES  |     | NULL    |                |
+ | name       | varchar(64)   | YES  |     | NULL    |                |
+ | help       | varchar(1024) | YES  |     | NULL    |                |
+ +------------+---------------+------+-----+---------+----------------+
+*/
 - (void) collectAlarms
 {
 	NSArray* alarms = [[ORAlarmCollection sharedAlarmCollection] alarms];
@@ -366,12 +378,34 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 	
 }
-
+/*
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| segment_id      | int(11)     | NO   | PRI | NULL    | auto_increment |
+| machine_id      | int(11)     | NO   | MUL | NULL    |                |
+| monitor_id      | int(11)     | YES  |     | NULL    |                |
+| segment         | int(11)     | YES  |     | NULL    |                |
+| histogram1DName | varchar(64) | YES  |     | NULL    |                |
+| crate           | int(11)     | YES  |     | NULL    |                |
+| card            | int(11)     | YES  |     | NULL    |                |
+| channel         | int(11)     | YES  |     | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+ */
 - (void) collectSegmentMap
 {		
 	ORPostSegmentMapOp* anOp = [[ORPostSegmentMapOp alloc] initWithSqlConnection:sqlConnection delegate:self];
-	[queue addOperation:anOp];
-	[anOp release];
+	
+	[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
+	NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+	NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+	if([arrayOfHistos count]){
+		id histoObj = [arrayOfHistos objectAtIndex:0];
+		//assume first one in the data chain
+		[anOp setDataMonitorId:[histoObj uniqueIdNumber]];
+		[queue addOperation:anOp];
+		[anOp release];
+	}
 }
 
 - (BOOL) validateConnection
@@ -858,7 +892,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
 	[super dealloc];
 }
-
+- (void) setDataMonitorId:(int)anID
+{
+	monitor_id = anID;
+}
 - (void) main
 {
 	ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
@@ -881,8 +918,9 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				NSString* cardName		= [aSegment objectForKey:@"kCardSlot"];
 				NSString* chanName		= [aSegment objectForKey:@"kChannel"];
 				NSString* dataSetName   = [experiment dataSetNameGroup:0 segment:segmentNumber];
-				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO segmentMap (machine_id,segment,histogram1DName,crate,card,channel) VALUES (%@,%d,%@,%@,%@,%@)",
+				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO segmentMap (machine_id,monitor_id,segment,histogram1DName,crate,card,channel) VALUES (%@,%d,%d,%@,%@,%@,%@)",
 											[sqlConnection quoteObject:machine_id],
+											monitor_id,
 											segmentNumber,
 											[sqlConnection quoteObject:dataSetName],
 											[sqlConnection quoteObject:crateName],
