@@ -1268,11 +1268,18 @@
 }
 - (NSComparisonResult) compare:(id)a to:(id)b
 {
-	if([a class] == [b class])return [a compare:b];
-	else if([a class] != [NSDecimalNumber class]){
-		return [b compare:a];
+	if(([a class] == [b class]) && ([a class] == [NSDecimalNumber class]) && ([b class] == [NSDecimalNumber class])) return [a compare:b];
+	else if(([a class] != [NSDecimalNumber class]) && ([b class] == [NSDecimalNumber class])){
+		return [[NSDecimalNumber numberWithLong:(unsigned long)a] compare:b];
 	}
-	else return [a compare:b];
+	else if(([b class] != [NSDecimalNumber class]) && ([a class] == [NSDecimalNumber class])){
+		return [[NSDecimalNumber numberWithLong:(unsigned long)b] compare:a];
+	}
+	else if([a class] != [NSDecimalNumber class] && [b class] != [NSDecimalNumber class]){
+		return [[NSDecimalNumber numberWithLong:(unsigned long)a] compare:[NSDecimalNumber numberWithLong:(unsigned long)b]];
+	}
+	else return NSOrderedDescending;
+	[NSException raise:@"Run time" format:@"illegal Args to compare"];
 }
 @end
 
