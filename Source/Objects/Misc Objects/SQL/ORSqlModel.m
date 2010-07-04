@@ -167,7 +167,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				[self updateDataSets];
 			}
 			else if(runState == eRunStopped){
-				[self postRunTime:aNote];
+				//[self postRunTime:aNote];
 				[dataMonitors release];
 				dataMonitors = nil;
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
