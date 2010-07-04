@@ -46,6 +46,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) addMachineName;
 - (void) removeMachineName;
 - (void) postRunState:(NSNotification*)aNote;
+- (void) postRunTime:(NSNotification*)aNote;
 - (void) collectSegmentMap;
 - (void) collectAlarms;
 @end
@@ -122,6 +123,11 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(postRunTime:)
+                         name : ORRunElapsedTimesChangedNotification
+                       object : nil];
 	
     [notifyCenter addObserver : self
                      selector : @selector(alarmPosted:)
@@ -161,6 +167,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				[self updateDataSets];
 			}
 			else if(runState == eRunStopped){
+				[self postRunTime:aNote];
 				[dataMonitors release];
 				dataMonitors = nil;
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
@@ -455,16 +462,18 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 }
 
 /* Table: runs
- +------------+-------------+------+-----+---------+----------------+
- | Field      | Type        | Null | Key | Default | Extra          |
- +------------+-------------+------+-----+---------+----------------+
- | run_id     | int(11)     | NO   | PRI | NULL    | auto_increment |
- | run        | int(11)     | YES  |     | NULL    |                |
- | subrun     | int(11)     | YES  |     | NULL    |                |
- | state      | int(11)     | YES  |     | NULL    |                |
- | machine_id | int(11)     | NO   | MUL | NULL    |                |
- | experiment | varchar(64) | YES  |     | NULL    |                |
- +------------+-------------+------+-----+---------+----------------+
+ +-------------+-------------+------+-----+---------+----------------+
+ | Field       | Type        | Null | Key | Default | Extra          |
+ +-------------+-------------+------+-----+---------+----------------+
+ | run_id      | int(11)     | NO   | PRI | NULL    | auto_increment |
+ | run         | int(11)     | YES  |     | NULL    |                |
+ | subrun      | int(11)     | YES  |     | NULL    |                |
+ | state       | int(11)     | YES  |     | NULL    |                |
+ | machine_id  | int(11)     | NO   | MUL | NULL    |                |
+ | experiment  | varchar(64) | YES  |     | NULL    |                |
+ | startTime   | varchar(64) | YES  |     | NULL    |                |
+ | elapsedTime | varchar(64) | YES  |     | NULL    |                |
+ +-------------+-------------+------+-----+---------+----------------+
  run types:
 	0 stopped
 	1 running
@@ -490,6 +499,17 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[anOp release];
 	}
 }
+
+- (void) postRunTime:(NSNotification*)aNote
+{
+	if([self validateConnection]){		
+		ORPostRunTimesOp* anOp = [[ORPostRunTimesOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[anOp setParams:aNote];
+		[queue addOperation:anOp];
+		[anOp release];
+	}
+}
+
 
 /*Table: Histogram1Ds
  +------------+-------------+------+-----+---------+----------------+
@@ -677,8 +697,23 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		id oldExperiment = [ourRunEntry objectForKey:@"experiment"];
 		
 		//if we have a run entry, update it. Otherwise create it.
-		if(ourRunEntry)[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d  WHERE machine_id=%@",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
-		else   [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",runNumber,subRunNumber,runState,[sqlConnection quoteObject:machine_id]]];
+		if(ourRunEntry){
+			[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d  WHERE machine_id=%@",
+										runNumber,
+										subRunNumber,
+										runState,
+										[sqlConnection quoteObject:machine_id]
+										]];
+
+		}
+		else {
+			[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",
+										runNumber,
+										subRunNumber,
+										runState,
+										[sqlConnection quoteObject:machine_id]
+										]];
+		}
 		
 		if(runState == 1){
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Histogram1Ds WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
@@ -696,6 +731,50 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 }
 @end
+
+@implementation ORPostRunTimesOp
+- (void) dealloc
+{
+	[startTime release];
+	[elapsedTime release];
+	[super dealloc];
+}
+
+- (void) setParams:(NSNotification*)aNote
+{
+	startTime	 = [[[aNote object] startTimeAsString] copy];
+	elapsedTime	 = [[[aNote object] elapsedRunTimeString] copy];
+}
+
+- (void) main
+{
+	@try {
+		//get our machine id using our MAC Address
+		ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+		id row				   = [theResult fetchRowAsDictionary];
+		
+		//get the entry for our run state using our machine_id
+		id machine_id	= [row objectForKey:@"machine_id"];
+		theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
+		id ourRunEntry	= [theResult fetchRowAsDictionary];
+		
+		//if we have a run entry, update it. Otherwise create it.
+		if(ourRunEntry){
+			[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET startTime=%@,elapsedTime=%@  WHERE machine_id=%@",
+										[sqlConnection quoteObject:startTime],
+										[sqlConnection quoteObject:elapsedTime],
+										[sqlConnection quoteObject:machine_id]
+										]];
+		}		
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+	
+}
+@end
+
+
 @implementation ORPostDataOp
 
 - (void) dealloc
