@@ -629,17 +629,31 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) main
 {
 	@try {
-		NSString* name		 = computerName();
-		NSString* hw_address = macAddress();
-	
+		
+		NSString* name			 = computerName();
+		NSString* hw_address	 = macAddress();
+		NSString* thisHostAdress;
+		NSArray* names =  [[NSHost currentHost] addresses];
+		NSEnumerator* e = [names objectEnumerator];
+		id aName;
+		while(aName = [e nextObject]){
+			if([aName rangeOfString:@"::"].location == NSNotFound){
+				if([aName rangeOfString:@".0.0."].location == NSNotFound){
+					thisHostAdress = aName;
+					break;
+				}
+			}
+		}
+		
 		NSString* query = [NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",
 								[sqlConnection quoteObject:hw_address]];
 		ORSqlResult* theResult = [sqlConnection queryString:query];
 		id d = [theResult fetchRowAsDictionary];
 		if(!d){
-			NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address) VALUES (%@,%@)",
+			NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address,ip_address) VALUES (%@,%@,%@)",
 								[sqlConnection quoteObject:name],
-								[sqlConnection quoteObject:hw_address]];
+								[sqlConnection quoteObject:hw_address],
+							    [sqlConnection quoteObject:thisHostAdress]];
 			[sqlConnection queryString:query];
 		}
 	}
