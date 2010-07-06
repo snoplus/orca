@@ -661,13 +661,13 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	configStruct->card_info[index].hw_mask[0]		= dataId;		//better be unique
 	configStruct->card_info[index].slot			= [self slot];
 	configStruct->card_info[index].add_mod			= 0x29UL;
-	configStruct->card_info[index].base_add			= [[self xl2] xl2RegAddress:XL2_SELECT_REG];
-/*
-	configStruct->card_info[index].deviceSpecificData[0] = reg[kMtcBbaReg].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[1] = reg[kMtcBwrAddOutReg].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[2] = [self memBaseAddress];
-	configStruct->card_info[index].deviceSpecificData[3] = [self memAddressModifier];
-*/ 
+	configStruct->card_info[index].base_add			= [self registerBaseAddress];
+	
+	configStruct->card_info[index].deviceSpecificData[0] = [self memoryBaseAddress];
+	configStruct->card_info[index].deviceSpecificData[1] = 0x09UL;
+	configStruct->card_info[index].deviceSpecificData[2] = [[self xl2] xl2RegAddress:XL2_DATA_AVAILABLE_REG];
+	configStruct->card_info[index].deviceSpecificData[3] = [self registerBaseAddress] + FEC32_FIFO_POINTER_DIFF_REG;
+
 	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
 	configStruct->card_info[index].next_Card_Index = index + 1;
 	
