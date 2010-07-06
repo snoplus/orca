@@ -225,9 +225,9 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 				if([arrayOfHistos count]){
 					id histoObj = [arrayOfHistos objectAtIndex:0];
 				//	if([[aGroup adcClassName] isEqualToString:@"ORKatrinFLTModel"] || [[aGroup adcClassName] isEqualToString:@"ORIpeV4FLTModel"]){
-						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"FLT", @"Energy", @"Crate  0",
-																[NSString stringWithFormat:@"Station %2d",[cardName intValue]], 
-																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
+						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"FLT", @"Energy", @"Crate 0",
+																[NSString stringWithFormat:@"Station %d",[cardName intValue]], 
+																[NSString stringWithFormat:@"Channel %d",[chanName intValue]],
 																nil]];
 			//		}
 					
