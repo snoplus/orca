@@ -270,7 +270,13 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
             if([[tempDataPacket dataArray]count]){
 				NSData* theData = [[tempDataPacket dataArray] objectAtIndex:0];
 				unsigned long* someData = (unsigned long*)[theData bytes];
-                ORCaen965DecoderForQdc* aDecoder = [[ORCaen965DecoderForQdc alloc] init];
+                ORCaen965DecoderForQdc* aDecoder;
+				if(modelType==kModel965){
+					aDecoder = [[ORCaen965ADecoderForQdc alloc] init];
+				}
+				else {
+					aDecoder = [[ORCaen965ADecoderForQdc alloc] init];
+				}
                 [aDecoder printData:@"CAEN 965" data:someData];
                 [aDecoder release];
             }
@@ -585,10 +591,10 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	
 	NSString* decoderName;
 	if(modelType == kModel965){
-		decoderName = @"ORCAEN965DecoderForQdc";
+		decoderName = @"ORCaen965DecoderForQdc";
 	}
 	else {
-		decoderName = @"ORCAEN965ANDecoderForQdc";
+		decoderName = @"ORCaen965ADecoderForQdc";
 	}
 	
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];

@@ -42,7 +42,7 @@
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end
 
-@interface ORCAEN965ADecoderForTdc : ORCaen965DecoderForQdc {
+@interface ORCaen965ADecoderForQdc : ORCaen965DecoderForQdc {
 }
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end

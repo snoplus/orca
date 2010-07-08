@@ -95,7 +95,7 @@
 
 @end
 
-@implementation ORCAEN965ADecoderForTdc
+@implementation ORCaen965ADecoderForQdc
 
 - (unsigned short) channel: (unsigned long) pDataValue
 {
