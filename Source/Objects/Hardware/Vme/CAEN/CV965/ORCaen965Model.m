@@ -712,7 +712,13 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 									   withAddMod:[self addressModifier]
 									usingAddSpace:0x01];
 						int dataType = ShiftAndExtract(dataValue,24,0x7);
-						int channel = ShiftAndExtract(dataValue,17,0xf);
+						int channel;
+						if(modelType == kModel965){
+							channel = ShiftAndExtract(dataValue,17,0xf);
+						}
+						else {
+							channel = ShiftAndExtract(dataValue,18,0x7);
+						}
 						if(dataType == 0x000){
 							dataRecord[index] = dataValue;
 							index++;
