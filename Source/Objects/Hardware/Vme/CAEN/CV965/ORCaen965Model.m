@@ -272,7 +272,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 				unsigned long* someData = (unsigned long*)[theData bytes];
                 ORCaen965DecoderForQdc* aDecoder;
 				if(modelType==kModel965){
-					aDecoder = [[ORCaen965ADecoderForQdc alloc] init];
+					aDecoder = [[ORCaen965DecoderForQdc alloc] init];
 				}
 				else {
 					aDecoder = [[ORCaen965ADecoderForQdc alloc] init];
