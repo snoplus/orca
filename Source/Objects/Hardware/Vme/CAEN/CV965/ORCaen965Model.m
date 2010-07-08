@@ -573,11 +573,13 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 - (void) setDataIds:(id)assigner
 {
     dataId = [assigner assignDataIds:kLongForm];
+    dataIdA = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherObj
 {
     [self setDataId:[anotherObj dataId]];
+    [self setDataIdA:[anotherObj dataIdA]];
 }
 
 - (unsigned long) dataId { return dataId; }
@@ -585,40 +587,60 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 {
     dataId = DataId;
 }
+- (unsigned long) dataIdA { return dataIdA; }
+- (void) setDataIdA: (unsigned long) DataId
+{
+    dataIdA = DataId;
+}
 
 - (NSDictionary*) dataRecordDescription
 {
 	
 	NSString* decoderName;
-	if(modelType == kModel965){
-		decoderName = @"ORCaen965DecoderForQdc";
-	}
-	else {
-		decoderName = @"ORCaen965ADecoderForQdc";
-	}
 	
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 decoderName,							@"decoder",
+								 @"ORCaen965DecoderForQdc",				@"decoder",
 								 [NSNumber numberWithLong:dataId],		@"dataId",
 								 [NSNumber numberWithBool:YES],			@"variable",
 								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Qdc"];
+
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCaen965ADecoderForQdc",			@"decoder",
+								 [NSNumber numberWithLong:dataIdA],		@"dataId",
+								 [NSNumber numberWithBool:YES],			@"variable",
+								 [NSNumber numberWithLong:-1],			@"length",
+								 nil];
+	
+	[dataDictionary setObject:aDictionary forKey:@"Qdc"];
     
     return dataDictionary;
 }
 
 - (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
 {
-	NSDictionary* aDictionary;
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"Qdc",								@"name",
-				   [NSNumber numberWithLong:dataId],   @"dataId",
-				   [NSNumber numberWithLong:16],		@"maxChannels",
-				   nil];
 	
-	[anEventDictionary setObject:aDictionary forKey:@"Caen965"];
+	NSDictionary* aDictionary;
+	if(modelType == kModel965){
+		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+					   @"Qdc",								@"name",
+					   [NSNumber numberWithLong:dataId],   @"dataId",
+					   [NSNumber numberWithLong:16],		@"maxChannels",
+					   nil];
+		
+		[anEventDictionary setObject:aDictionary forKey:@"Caen965"];
+	}
+	else {
+		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+					   @"Qdc",								@"name",
+					   [NSNumber numberWithLong:dataIdA],    @"dataId",
+					   [NSNumber numberWithLong:8],		@"maxChannels",
+					   nil];
+		
+		[anEventDictionary setObject:aDictionary forKey:@"Caen965A"];
+		
+	}
 }
 
 - (void) reset
@@ -713,7 +735,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 							//dataRecord[index] = dataValue; //we don't ship the end of block for now
 							//index++;
 							//got a end of block fill in the ORCA header and ship the data
-							dataRecord[0] = dataId | index; //see.... filled it in here....
+							if(modelType = kModel965) dataRecord[0] = dataId  | index; //see.... filled it in here....
+							else					  dataRecord[0] = dataIdA | index; //see.... filled it in here....
 							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
 						}
 						else {
@@ -757,7 +780,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 {
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id = kCaen965; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	if(modelType == kModel965)	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	else						configStruct->card_info[index].hw_mask[0] 	 = dataIdA;
 	configStruct->card_info[index].slot 	 = [self slot];
 	configStruct->card_info[index].crate 	 = [self crateNumber];
 	configStruct->card_info[index].add_mod 	 = [self addressModifier];

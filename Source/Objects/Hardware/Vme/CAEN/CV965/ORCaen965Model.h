@@ -79,6 +79,7 @@ enum {
 @interface ORCaen965Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
 	unsigned long dataId;
+	unsigned long dataIdA;
 	ORRateGroup*	adcRateGroup;
 	unsigned long 	adcCount[kCV965NumberChannels];
 	BOOL isRunning;
@@ -155,6 +156,8 @@ enum {
 - (void) syncDataIdsWith:(id)anotherObj;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
+- (unsigned long) dataIdA;
+- (void) setDataIdA: (unsigned long) DataId;
 - (NSDictionary*) dataRecordDescription;
 - (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
 - (void) reset;
