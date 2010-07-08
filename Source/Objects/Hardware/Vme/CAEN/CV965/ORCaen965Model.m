@@ -717,7 +717,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 							channel = ShiftAndExtract(dataValue,17,0xf);
 						}
 						else {
-							channel = ShiftAndExtract(dataValue,17,0x7);
+							channel = ShiftAndExtract(dataValue,18,0x7);
 						}
 						if(dataType == 0x000){
 							dataRecord[index] = dataValue;

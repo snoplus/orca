@@ -99,7 +99,7 @@
 
 - (unsigned short) channel: (unsigned long) pDataValue
 {
-    return	ShiftAndExtract(pDataValue,17,0x7);
+    return	ShiftAndExtract(pDataValue,18,0x7);
 }
 
 @end
