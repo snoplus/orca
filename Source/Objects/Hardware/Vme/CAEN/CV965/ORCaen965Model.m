@@ -596,25 +596,27 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 - (NSDictionary*) dataRecordDescription
 {
 	
-	NSString* decoderName;
-	
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+	if(modelType == kModel965){
+		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORCaen965DecoderForQdc",				@"decoder",
 								 [NSNumber numberWithLong:dataId],		@"dataId",
 								 [NSNumber numberWithBool:YES],			@"variable",
 								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
 
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+		[dataDictionary setObject:aDictionary forKey:@"965Qdc"];
+	}
+	else {
+		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORCaen965ADecoderForQdc",			@"decoder",
 								 [NSNumber numberWithLong:dataIdA],		@"dataId",
 								 [NSNumber numberWithBool:YES],			@"variable",
 								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
 	
-	[dataDictionary setObject:aDictionary forKey:@"Qdc"];
-    
+		[dataDictionary setObject:aDictionary forKey:@"965AQdc"];
+	}
     return dataDictionary;
 }
 
@@ -624,8 +626,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	NSDictionary* aDictionary;
 	if(modelType == kModel965){
 		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-					   @"Qdc",								@"name",
-					   [NSNumber numberWithLong:dataId],   @"dataId",
+					   @"965Qdc",							@"name",
+					   [NSNumber numberWithLong:dataId],	@"dataId",
 					   [NSNumber numberWithLong:16],		@"maxChannels",
 					   nil];
 		
@@ -633,13 +635,12 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	}
 	else {
 		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-					   @"Qdc",								@"name",
-					   [NSNumber numberWithLong:dataIdA],    @"dataId",
-					   [NSNumber numberWithLong:8],		@"maxChannels",
+					   @"965AQdc",							@"name",
+					   [NSNumber numberWithLong:dataIdA],   @"dataId",
+					   [NSNumber numberWithLong:8],			@"maxChannels",
 					   nil];
 		
 		[anEventDictionary setObject:aDictionary forKey:@"Caen965A"];
-		
 	}
 }
 
