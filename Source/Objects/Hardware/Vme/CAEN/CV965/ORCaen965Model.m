@@ -605,7 +605,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
 
-		[dataDictionary setObject:aDictionary forKey:@"965Qdc"];
+		[dataDictionary setObject:aDictionary forKey:@"Qdc"];
 	}
 	else {
 		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -626,7 +626,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	NSDictionary* aDictionary;
 	if(modelType == kModel965){
 		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-					   @"965Qdc",							@"name",
+					   @"Qdc",								@"name",
 					   [NSNumber numberWithLong:dataId],	@"dataId",
 					   [NSNumber numberWithLong:16],		@"maxChannels",
 					   nil];
