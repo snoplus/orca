@@ -736,7 +736,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 							//dataRecord[index] = dataValue; //we don't ship the end of block for now
 							//index++;
 							//got a end of block fill in the ORCA header and ship the data
-							if(modelType = kModel965) dataRecord[0] = dataId  | index; //see.... filled it in here....
+							if(modelType == kModel965) dataRecord[0] = dataId  | index; //see.... filled it in here....
 							else					  dataRecord[0] = dataIdA | index; //see.... filled it in here....
 							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
 						}
@@ -939,11 +939,11 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
     [[self undoManager] disableUndoRegistration];
 	int i;
     for (i = 0; i < kCV965NumberChannels; i++){
-    [self setModelType:[aDecoder decodeIntForKey:@"modelType"]];
         [self setLowThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]]];
         [self setHighThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]]];
     }    
 	
+	[self setModelType:[aDecoder decodeIntForKey:@"modelType"]];
 	[self setOnlineMask:[aDecoder decodeIntForKey:@"onlineMask"]];
     [self setSelectedRegIndex:[aDecoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannel:[aDecoder decodeIntForKey:@"selectedChannel"]];

@@ -143,8 +143,8 @@
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:@"channel"];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965LowThresholdChanged object:model userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen965HighThresholdChanged object:model userInfo:userInfo];
-	[self modelTypeChanged:nil];
 	}
+	[self modelTypeChanged:nil];
     [self basicLockChanged:nil];
     [self slotChanged:nil];
 }
