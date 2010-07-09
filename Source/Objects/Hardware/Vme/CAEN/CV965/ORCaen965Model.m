@@ -241,15 +241,17 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
             
             // Loop through the thresholds and read them.
 			if(theRegIndex == kLowThresholds){
+				unsigned short m  = (modelType==kModel965A)?2:1;
 				for(i = start; i <= end; i++){
-					[self readLowThreshold:i];
-					NSLog(@"Low Threshold %2d = 0x%04lx\n", i, [self lowThreshold:i]);
+					unsigned short aValue = [self readLowThreshold:i];
+					NSLog(@"Low Threshold %2d = 0x%04lx\n", i*m, aValue);
 				}
 			}
 			else {
+				unsigned short m  = (modelType==kModel965A)?2:1;
 				for(i = start; i <= end; i++){
-					[self readHighThreshold:i];
-					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i, [self highThreshold:i]);
+					unsigned short aValue = [self readHighThreshold:i];
+					NSLog(@"Hi Threshold %2d = 0x%04lx\n", i*m, aValue);
 				}
             }
         }
@@ -401,8 +403,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 
 - (void) writeThresholds
 {
+	short n = (modelType==kModel965A)?8:16;
     short i;
-	int n = (modelType==kModel965?16:8);
     for (i = 0; i < n; i++){
         [self writeLowThreshold:i];
         [self writeHighThreshold:i];
@@ -412,7 +414,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 - (void) readThresholds
 {
     short i;
-    for (i = 0; i < kCV965NumberChannels; i++){
+	short n = (modelType==kModel965A)?8:16;
+    for (i = 0; i < n; i++){
         [self readLowThreshold:i];
         [self readHighThreshold:i];
     }
@@ -421,7 +424,9 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 - (void) writeLowThreshold:(unsigned short) pChan
 {    
 	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
+
 	unsigned short lowThreshold = lowThresholds[pChan] | kill;
+	if(modelType==kModel965A)pChan *= 2;
     [[self adapter] writeWordBlock:&lowThreshold
                          atAddress:[self baseAddress] + [self lowThresholdOffset:pChan]
                         numToWrite:1
@@ -434,6 +439,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 {    
 	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
 	unsigned short highThreshold = highThresholds[pChan] | kill;
+	if(modelType==kModel965A)pChan *= 2;
     [[self adapter] writeWordBlock:&highThreshold
                          atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
                         numToWrite:1
@@ -442,6 +448,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 }
 - (unsigned short) readLowThreshold:(unsigned short) pChan
 {    
+	if(modelType==kModel965A)pChan *= 2;
 	int lowOffset = [self lowThresholdOffset:pChan];
 	unsigned short lowThreshold;
     [[self adapter] readWordBlock:&lowThreshold
@@ -456,6 +463,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 - (unsigned short) readHighThreshold:(unsigned short) pChan
 {    
 	
+	if(modelType==kModel965A)pChan *= 2;
 	unsigned short highThreshold;
     [[self adapter] readWordBlock:&highThreshold
 						atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
@@ -933,7 +941,8 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 {
     short	i;
     NSLog(@"%@ Thresholds\n",[self identifier]);
-    for (i = 0; i < kCV965NumberChannels; i++){
+	int n = (modelType==kModel965A)?8:16;
+    for (i = 0; i < n; i++){
         NSLog(@"chan:%d low:0x%04x high:0x%04x\n",i,[self lowThreshold:i],[self highThreshold:i]);
     }
     
