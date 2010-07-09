@@ -474,8 +474,9 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 }
 
 - (int) lowThresholdOffset:(unsigned short)aChan
-{
-	return reg[kLowThresholds].addressOffset + (aChan * 4);
+{	
+	if(modelType==kModel965)return reg[kLowThresholds].addressOffset + (aChan * 4);
+	else					return reg[kLowThresholds].addressOffset + (aChan * 4) + 2;
 }
 
 - (int) highThresholdOffset:(unsigned short)aChan
