@@ -236,7 +236,7 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
             end = theChannelIndex;
             if(theChannelIndex >= [self numberOfChannels]) {
                 start = 0;
-                end = kCV965NumberChannels - 1;
+                end = [self numberOfChannels] - 1;
             }
             
             // Loop through the thresholds and read them.
