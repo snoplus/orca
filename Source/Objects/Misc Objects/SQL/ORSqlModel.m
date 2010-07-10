@@ -650,16 +650,28 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		ORSqlResult* theResult = [sqlConnection queryString:query];
 		id d = [theResult fetchRowAsDictionary];
 		if(!d){
-			NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address,ip_address) VALUES (%@,%@,%@)",
+			NSString* mangledPw = [self manglePw];
+			NSString* query = [NSString stringWithFormat:@"INSERT INTO machines (name,hw_address,ip_address,password) VALUES (%@,%@,%@,%@)",
 								[sqlConnection quoteObject:name],
 								[sqlConnection quoteObject:hw_address],
-							    [sqlConnection quoteObject:thisHostAdress]];
+							    [sqlConnection quoteObject:thisHostAdress],
+							    [sqlConnection quoteObject:mangledPw]];
 			[sqlConnection queryString:query];
 		}
 	}
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+}
+- (NSString*) manglePw
+{
+	NSString* pw =  [[NSUserDefaults standardUserDefaults] objectForKey:OROrcaPassword];
+	int i;
+	for(i=0;i<[pw length];i++){
+		char c = [pw characterAtIndex:i];
+		pw = [pw stringByReplacingCharactersInRange:NSMakeRange(i,1) withString:[NSString stringWithFormat:@"%c",c+1]];
+	}
+	return pw;
 }
 @end
 
