@@ -83,6 +83,7 @@ extern NSString* ORSqlLock;
 
 @interface ORPostMachineNameOp : ORSqlOperation
 - (void) main;
+- (NSString*) manglePw;
 @end
 
 @interface ORDeleteMachineNameOp : ORSqlOperation
