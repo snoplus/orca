@@ -225,9 +225,9 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 				if([arrayOfHistos count]){
 					id histoObj = [arrayOfHistos objectAtIndex:0];
 				//	if([[aGroup adcClassName] isEqualToString:@"ORKatrinFLTModel"] || [[aGroup adcClassName] isEqualToString:@"ORIpeV4FLTModel"]){
-						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"FLT", @"Energy", @"Crate 0",
-																[NSString stringWithFormat:@"Station %d",[cardName intValue]], 
-																[NSString stringWithFormat:@"Channel %d",[chanName intValue]],
+						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"FLT", @"Energy", @"Crate  0",
+																[NSString stringWithFormat:@"Station %2d",[cardName intValue]], 
+																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
 																nil]];
 			//		}
 					
@@ -246,7 +246,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
 	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
 	
-	return [NSString stringWithFormat:@"FLT,Energy,Crate %d,Station %d,Channel %d",[crateName intValue],[cardName intValue],[chanName intValue]];
+	return [NSString stringWithFormat:@"FLT,Energy,Crate %2d,Station %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
 
 - (int) numberSegmentsInGroup:(int)aGroup
