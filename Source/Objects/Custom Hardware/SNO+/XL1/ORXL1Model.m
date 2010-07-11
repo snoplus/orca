@@ -110,8 +110,8 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 - (void) setCrateNumbers
 {
 	//we'll drop in here if any of the XL1/2 connections change -- this is initiated from the XL2s only or we'll get an infinite loop
-	id nextXL2 = [connector connectedObject];
-	[nextXL2 setCrateNumber:0];
+	//id nextXL2 = [connector connectedObject];
+	//[nextXL2 setCrateNumber:0];
 }
 
 - (ORConnector*) connector

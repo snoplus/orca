@@ -2339,6 +2339,9 @@
 		EF69C433116E5DC3008ABADC /* ORSNOCrateReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */; };
 		EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */; };
 		EF69C483116E6526008ABADC /* ORSNOCrateReadout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */; };
+		EF7722B511E813120064A1CF /* ORXL3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = EF7722B211E813120064A1CF /* ORXL3Model.h */; };
+		EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7722B311E813120064A1CF /* ORXL3Model.m */; };
+		EF7722B711E813120064A1CF /* XL3Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = EF7722B411E813120064A1CF /* XL3Card.gif */; };
 		EFCC4546117FD45E008DC12C /* ORSNOCrateDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */; };
 		EFCC4547117FD45E008DC12C /* ORSNOCrateDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */; };
 /* End PBXBuildFile section */
@@ -4741,6 +4744,9 @@
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
 		EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSNOCrateReadout.cc; sourceTree = "<group>"; };
 		EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSNOCrateReadout.hh; sourceTree = "<group>"; };
+		EF7722B211E813120064A1CF /* ORXL3Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL3Model.h; sourceTree = "<group>"; };
+		EF7722B311E813120064A1CF /* ORXL3Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXL3Model.m; sourceTree = "<group>"; };
+		EF7722B411E813120064A1CF /* XL3Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = XL3Card.gif; sourceTree = "<group>"; };
 		EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNOCrateDecoders.h; sourceTree = "<group>"; };
 		EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSNOCrateDecoders.m; sourceTree = "<group>"; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
@@ -7656,6 +7662,7 @@
 				844B42B60DE5D5680061AE80 /* SNORack */,
 				8499FFD90DC90F5800E82DB4 /* XL1 */,
 				8499FFE00DC9102700E82DB4 /* XL2 */,
+				EF7722B111E813120064A1CF /* XL3 */,
 				8499280E0DCB997C00E82DB4 /* MTC */,
 				84CEA3620EA4EB2E0060076A /* Fec32 */,
 				84CEA6E00EA623A50060076A /* FecDaughterCard */,
@@ -9851,6 +9858,16 @@
 			name = PlugIns;
 			sourceTree = "<group>";
 		};
+		EF7722B111E813120064A1CF /* XL3 */ = {
+			isa = PBXGroup;
+			children = (
+				EF7722B211E813120064A1CF /* ORXL3Model.h */,
+				EF7722B311E813120064A1CF /* ORXL3Model.m */,
+				EF7722B411E813120064A1CF /* XL3Card.gif */,
+			);
+			path = XL3;
+			sourceTree = "<group>";
+		};
 		F51E693F03AE4775015F64B1 /* Source */ = {
 			isa = PBXGroup;
 			children = (
@@ -11102,6 +11119,7 @@
 				84A3ED9F11BD8165003A08A9 /* ORSIS3320Controller.h in Headers */,
 				84A3EDA111BD8165003A08A9 /* ORSIS3320Decoders.h in Headers */,
 				84A3EDA311BD8165003A08A9 /* ORSIS3320Model.h in Headers */,
+				EF7722B511E813120064A1CF /* ORXL3Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11805,6 +11823,7 @@
 				84B3D12311BFCB8300C17CD6 /* Sql.tif in Resources */,
 				840795DE11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist in Resources */,
 				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
+				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12606,6 +12625,7 @@
 				84A3EDA011BD8165003A08A9 /* ORSIS3320Controller.m in Sources */,
 				84A3EDA211BD8165003A08A9 /* ORSIS3320Decoders.m in Sources */,
 				84A3EDA411BD8165003A08A9 /* ORSIS3320Model.m in Sources */,
+				EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

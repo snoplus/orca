@@ -26,9 +26,10 @@
 {
 	IBOutlet NSTextField* memBaseAddressField;
 	IBOutlet NSTextField* regBaseAddressField;
-    IBOutlet NSTextField* crateNumberField;
-    IBOutlet NSProgressIndicator* xilinixLoadProgress;
-    IBOutlet NSTextField* xilinixStatusField;
+	IBOutlet NSTextField* iPBaseAddressField;
+	IBOutlet NSTextField* crateNumberField;
+	IBOutlet NSProgressIndicator* xilinixLoadProgress;
+	IBOutlet NSTextField* xilinixStatusField;
 	IBOutlet NSButton*  initXilinxButton;
 	IBOutlet NSButton*  initNoXilinxButton;
 	IBOutlet NSButton*  autoInitButton;

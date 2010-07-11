@@ -1,5 +1,5 @@
 //
-//  ORXL2Model.m
+//  ORXL3Model.m
 //  Orca
 //
 //  Created by Mark Howe on Tue, Apr 30, 2008.
@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-#import "ORXL2Model.h"
+#import "ORXL3Model.h"
 #import "ORXL1Model.h"
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
@@ -28,36 +28,19 @@
 #import "SNOCmds.h"
 #import "SBC_Link.h"
 
-unsigned long xl2_register_offsets[] =
-{	
-0,				// [ 0]  Select Register
-4,				// [ 1]  Data Available Register
-8,				// [ 2]  XL2 Control Status Register
-12,				// [ 3]  Mask Register
-16,				// [ 4]  Clock CSR
-20,				// [ 5]  HV Relay Control
-24,				// [ 6]  Xilinx User Control
-28, 			// [ 7]  General R/W display test register
-32,				// [ 8]  HV CSR
-36,				// [ 9]  HV Setpoints
-40,				// [10]  HV Voltage Readback
-44,				// [11]  HV Current Readback
-};
-
-
-@interface ORXL2Model (SBC)
+@interface ORXL3Model (SBC)
 - (void) loadClocksUsingSBC:(NSData*)theData;
 - (void) loadXilinixUsingSBC:(NSData*)theData selectBits:(unsigned long) selectBits;
 - (void) xilinxLoadStatus:(ORSBCLinkJobStatus*) jobStatus;
 @end
 
-@interface ORXL2Model (LocalAdapter)
+@interface ORXL3Model (LocalAdapter)
 - (void) loadClocksUsingLocalAdapter:(NSData*)theData;
 - (void) loadXilinixUsingLocalAdapter:(NSData*)theData selectBits:(unsigned long) selectBits;
 - (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask;
 @end
 
-@implementation ORXL2Model
+@implementation ORXL3Model
 
 #pragma mark •••Initialization
 
@@ -70,56 +53,18 @@ unsigned long xl2_register_offsets[] =
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"XL2Card"]];
+    [self setImage:[NSImage imageNamed:@"XL3Card"]];
 }
 
 
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [inputConnector release];
-    [outputConnector release];
     [super dealloc];
 }
 
 - (void) makeConnectors
 {
-    //make and cache our connector. However this connector will be 'owned' by another object (the SNORack)
-    //so we don't add it to our list of connectors. It will be added to the true owner later.
-    [self setInputConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
-    [self setOutputConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
-	
-	[inputConnector setConnectorType: 'XL2I'];
-	[inputConnector setConnectorImageType:kSmallDot]; 
-	[inputConnector setIoType:kInputConnector];
-	[inputConnector addRestrictedConnectionType: 'XL2O']; //can only connect to XL2O inputs
-	[inputConnector addRestrictedConnectionType: 'XL1O']; //and XL1O inputs
-	[inputConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
-	
-	[outputConnector setConnectorType: 'XL2O'];
-	[outputConnector setConnectorImageType:kSmallDot]; 
-	[outputConnector setIoType:kOutputConnector];
-	[outputConnector addRestrictedConnectionType: 'XL2I']; //can only connect to XL2I inputs
-	[outputConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
-	
-}
-
-- (void) positionConnector:(ORConnector*)aConnector
-{
-	
-	float x,y;
-	NSRect aFrame = [[self guardian] frame];
-	if(aConnector == inputConnector) {
-		x = 0;      
-		y = 0;
-	}
-	else {
-		x = 0;      
-		y = aFrame.size.height-10;
-	}
-	aFrame = [aConnector localFrame];
-	aFrame.origin = NSMakePoint(x,y);
-	[aConnector setLocalFrame:aFrame];
 }
 
 - (BOOL) solitaryInViewObject
@@ -128,37 +73,22 @@ unsigned long xl2_register_offsets[] =
 }
 
 #pragma mark •••Accessors
-
-- (ORConnector*) inputConnector
+- (void) setGuardian:(id)aGuardian
 {
-    return inputConnector;
-}
-
-- (void) setInputConnector:(ORConnector*)aConnector
-{
-    [aConnector retain];
-    [inputConnector release];
-    inputConnector = aConnector;
-}
-
-
-- (ORConnector*) outputConnector
-{
-    return outputConnector;
-}
-
-- (void) setOutputConnector:(ORConnector*)aConnector
-{
-    [aConnector retain];
-    [outputConnector release];
-    outputConnector = aConnector;
+	id oldGuardian = guardian;
+	[super setGuardian:aGuardian];
+	
+	if(oldGuardian != aGuardian){
+		[oldGuardian setAdapter:nil];	//old crate can't use this card any more
+	}
+	[aGuardian setAdapter:self];		//our new crate will use this card for hardware access
+	NSLog(@"setting XL3 as a crate controller for crate %d\n", [aGuardian crateNumber]);
 }
 
 - (void) setSlot:(int)aSlot
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self slot]];
     [self setTag:aSlot];
-    [self guardian:guardian positionConnectorsForCard:self];
     
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORSNOCardSlotChanged
@@ -185,79 +115,10 @@ unsigned long xl2_register_offsets[] =
     return [self stationNumber] - [otherCard stationNumber];
 }
 
-- (void) setGuardian:(id)aGuardian
-{
-    id oldGuardian = guardian;
-	
-	[super setGuardian:aGuardian];
-	
-    if(oldGuardian != aGuardian){
-		[oldGuardian setAdapter:nil];	//old crate can't use this card any more
-        [oldGuardian removeDisplayOf:[self inputConnector]];
-        [oldGuardian removeDisplayOf:[self outputConnector]];
-    }
-    [aGuardian setAdapter:self];		//our new crate will use this card for hardware access
-	
-    [aGuardian assumeDisplayOf:[self inputConnector]];
-    [aGuardian assumeDisplayOf:[self outputConnector]];
-    [self guardian:aGuardian positionConnectorsForCard:self];
-}
-- (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
-{
-    [aGuardian positionConnector:[self inputConnector] forCard:self];
-    [aGuardian positionConnector:[self outputConnector] forCard:self];
-}
-
-- (void) guardianRemovingDisplayOfConnectors:(id)aGuardian
-{
-    [aGuardian removeDisplayOf:[self inputConnector]];
-    [aGuardian removeDisplayOf:[self outputConnector]];
-}
-
-- (void) guardianAssumingDisplayOfConnectors:(id)aGuardian
-{
-    [aGuardian assumeDisplayOf:[self inputConnector]];
-    [aGuardian assumeDisplayOf:[self outputConnector]];
-}
-
-- (id) adapter
-{
-	id anAdapter = [self getXL1]; //should chain all the way back to the IC XL1
-	if(anAdapter)return anAdapter;
-	else [NSException raise:@"No XL1" format:@"Check that connections are made all the way back to an XL1.\n"];
-	return nil;
-}
-
-- (id) xl1
-{
-	return [self adapter];
-}
-
-- (id) getXL1
-{
-	id obj = [inputConnector connectedObject];
-	return [obj getXL1];
-}
-
-- (id) sbcLink
-{
-	return [[[self xl1] adapter] sbcLink];
-}
-
-- (void) connectionChanged
-{
-	ORXL1Model* theXL1 = [self getXL1];
-	[theXL1 setCrateNumbers];
-}
-
 - (void) setCrateNumber:(int)crateNumber
 {
 	[[self guardian] setCrateNumber:crateNumber];
-	//id nextXL2 = [outputConnector connectedObject];
-	//[nextXL2 setCrateNumber:crateNumber+1];
 }
-
-
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -265,11 +126,7 @@ unsigned long xl2_register_offsets[] =
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    
-    [self setInputConnector:		[decoder decodeObjectForKey:@"inputConnector"]];
-    [self setOutputConnector:		[decoder decodeObjectForKey:@"outputConnector"]];
 	[self setSlot:					[decoder decodeIntForKey:   @"slot"]];
-
 	[self setAddressModifier:0x29];
 	
     [[self undoManager] enableUndoRegistration];
@@ -280,8 +137,6 @@ unsigned long xl2_register_offsets[] =
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:[self inputConnector]		 forKey:@"inputConnector"];
-    [encoder encodeObject:[self outputConnector]	 forKey:@"outputConnector"];
     [encoder encodeInt:	  [self slot]			     forKey:@"slot"];
 }
 
@@ -318,7 +173,8 @@ unsigned long xl2_register_offsets[] =
 
 - (unsigned long) xl2RegAddress:(unsigned long)aRegOffset
 {
-	return [[self guardian] registerBaseAddress] + xl2_register_offsets[aRegOffset];
+	//return [[self guardian] registerBaseAddress] + xl2_register_offsets[aRegOffset];
+	return [[self guardian] registerBaseAddress];
 }
 
 // read bit pattern from specified register on XL2
@@ -428,7 +284,7 @@ unsigned long xl2_register_offsets[] =
 
 @end
 
-@implementation ORXL2Model (SBC)
+@implementation ORXL3Model (SBC)
 - (void) loadClocksUsingSBC:(NSData*)theData
 {
 	
@@ -532,7 +388,7 @@ unsigned long xl2_register_offsets[] =
 
 @end
 
-@implementation ORXL2Model (LocalAdapter)
+@implementation ORXL3Model (LocalAdapter)
 - (void) loadClocksUsingLocalAdapter:(NSData*)theData
 {
 	//-------------- variables -----------------

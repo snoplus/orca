@@ -25,6 +25,7 @@
 #import "ORSNOConstants.h"
 #import "ORXL1Model.h"
 #import "ORXL2Model.h"
+#import "ORXL3Model.h"
 #import "ORFec32Model.h"
 #import "ObjectFactory.h"
 #import "OROrderedObjManager.h"
@@ -35,34 +36,49 @@
 
 
 const struct {
-	unsigned long Register;
-	unsigned long Memory;
+	unsigned long Register;	//XL2
+	unsigned long Memory;	//XL2
+	NSString* IPAddress;	//XL3
 } kSnoCrateBaseAddress[]={
-{0x00002800, 	0x01400000},	//0
-{0x00003000,	0x01800000},	//1
-{0x00003800,	0x01c00000},	//2
-{0x00004000,	0x02000000},	//3
-{0x00004800,	0x02400000},	//4
-{0x00005000,	0x02800000},	//5
-{0x00005800,	0x02c00000},	//6
-{0x00006000,	0x03000000},	//7
-{0x00006800,	0x03400000},	//8
-{0x00007800,	0x03C00000},	//9
-{0x00008000,	0x04000000},	//10
-{0x00008800,	0x04400000},	//11
-{0x00009000,	0x04800000},	//12
-{0x00009800,	0x04C00000},	//13
-{0x0000a000,	0x05000000},	//14
-{0x0000a800,	0x05400000},	//15
-{0x0000b000,	0x05800000},	//16
-{0x0000b800,	0x05C00000},	//17
-{0x0000c000,	0x06000000},	//18
+{0x00002800, 	0x01400000,	@"10.0.0.10"},	//0
+{0x00003000,	0x01800000,	@"10.0.0.11"},	//1
+{0x00003800,	0x01c00000,	@"10.0.0.12"},	//2
+{0x00004000,	0x02000000,	@"10.0.0.13"},	//3
+{0x00004800,	0x02400000,	@"10.0.0.14"},	//4
+{0x00005000,	0x02800000,	@"10.0.0.15"},	//5
+{0x00005800,	0x02c00000,	@"10.0.0.16"},	//6
+{0x00006000,	0x03000000,	@"10.0.0.17"},	//7
+{0x00006800,	0x03400000,	@"10.0.0.18"},	//8
+{0x00007800,	0x03C00000,	@"10.0.0.19"},	//9
+{0x00008000,	0x04000000,	@"10.0.0.20"},	//10
+{0x00008800,	0x04400000,	@"10.0.0.6"},	//11 ip is correct
+{0x00009000,	0x04800000,	@"10.0.0.5"},	//12 ip is correct
+{0x00009800,	0x04C00000,	@"10.0.0.23"},	//13
+{0x0000a000,	0x05000000,	@"10.0.0.24"},	//14
+{0x0000a800,	0x05400000,	@"10.0.0.25"},	//15
+{0x0000b000,	0x05800000,	@"10.0.0.26"},	//16
+{0x0000b800,	0x05C00000,	@"10.0.0.27"},	//17
+{0x0000c000,	0x06000000,	@"10.0.0.28"},	//18
 //{0x0000c800,	0x06400000}	//crate 19 is really at 0xd000
-{0x0000d000,	0x06800000}		//19
+{0x0000d000,	0x06800000,	@"10.0.0.29"}	//19
 };
 
 
 NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
+
+@interface ORSNOCrateModel (XL2)
+- (id) xl2;
+- (void) initCrateUsingXL2:(BOOL) loadTheFEC32XilinxFile phase:(int) phase;
+- (void) loadXilinx;
+- (void) loadClocks;
+- (void) initFec32Cards;
+- (void) initCTCDelays;
+@end
+
+@interface ORSNOCrateModel (XL3)
+- (void) initCrateUsingXL3:(BOOL) loadTheFEC32XilinxFile phase:(int) phase;
+@end
+
 
 @implementation ORSNOCrateModel
 
@@ -83,11 +99,10 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
     if(powerOff){
         NSAttributedString* s = [[[NSAttributedString alloc] initWithString:@"No Pwr"
-                                                                 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-																			 [NSColor redColor],NSForegroundColorAttributeName,
-																			 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-																			 nil]] autorelease]; 
-        [s drawAtPoint:NSMakePoint(25,5)];
+			attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+			[NSColor redColor],NSForegroundColorAttributeName,
+			[NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,nil]] autorelease]; 
+	[s drawAtPoint:NSMakePoint(25,5)];
     }
     
     if([[self orcaObjects] count]){
@@ -166,10 +181,6 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 - (void) setAutoInit:(BOOL) aAutoInit {
 	autoInit = aAutoInit;
 }
-
-- (BOOL) autoInit {
-	return autoInit;
-}
 	
 - (void) setVoltageStatus:(eFecMonitorState)aState
 {
@@ -196,6 +207,18 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 		return 0; //to get rid of compiler warning, can't really get here
 	}
 }
+
+- (NSString*) iPAddress
+{
+	int index =  [self crateNumber];
+	if(index>=0 && index<=kMaxSNOCrates) return kSnoCrateBaseAddress[index].IPAddress;
+	else {
+		[[NSException exceptionWithName:@"SNO Crate" reason:@"SNO Crate Index out of bounds" userInfo:nil] raise];
+		return 0; //to get rid of compiler warning, can't really get here
+	}
+}
+
+
 - (void) assumeDisplayOf:(ORConnector*)aConnector
 {
     [guardian assumeDisplayOf:aConnector];
@@ -255,33 +278,21 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     return [NSString stringWithFormat:@"SNO Crate %d",[self crateNumber]];
 }
 
-- (id) xl2 
-{
-	return [self adapter];
-}
 
-/*
-- (void) autoInit
-{
-	NSLog(@"scanning crate %d for FEC32 cards\n",[self crateNumber]);
-	workingSlot = 16;
-	working = YES;
-	[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
-}
-*/
+#pragma mark •••HW Access
 
 - (void) scanWorkingSlot
 {
 	pauseWork = NO;
-	BOOL xl2OK = YES;
+	BOOL adapterOK = YES;
 	@try {
-		[[self xl2] selectCards:1L<<[self stationForSlot:workingSlot]];	
+		[[self adapter] selectCards:1L<<[self stationForSlot:workingSlot]];	
 	}
 	@catch(NSException* localException) {
-		xl2OK = NO;
-		NSLog(@"Unable to reach XL2 in crate: %d (Not inited?)\n",[self crateNumber]);
+		adapterOK = NO;
+		NSLog(@"Unable to reach XL2/3 in crate: %d (Not inited?)\n",[self crateNumber]);
 	}
-	if(!xl2OK)working = NO;
+	if(!adapterOK)working = NO;
 	if(working){
 		@try {
 			
@@ -321,7 +332,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
 		}	
 		else {
-			[[self xl2] deselectCards];
+			[[self adapter] deselectCards];
 		}
 	}
 }
@@ -348,9 +359,152 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	return 1;
 }
 
+
+- (BOOL) adapterIsXL3
+{
+	return [[self adapter] isKindOfClass:NSClassFromString(@"ORXL3Model")];
+}
+
 - (void) initCrate:(BOOL) loadTheFEC32XilinxFile phase:(int) phase
 {
+	if([self adapterIsXL3])	[self initCrateUsingXL3:loadTheFEC32XilinxFile phase:phase];
+	else			[self initCrateUsingXL2:loadTheFEC32XilinxFile phase:phase];
+}
 
+- (void) initCrateDone
+{
+	NSLog(@"Initialization of the crate %d done.\n", [self crateNumber]);
+}
+
+//get ready for the XL3 card
+- (void) resetCrate
+{
+	[[self adapter] reset];
+}
+
+
+#pragma mark •••Data Taker
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+	dataId = DataId;
+}
+
+// todo: add cmos data id
+- (void) setDataIds:(id)assigner
+{
+	dataId = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherSNOCrate
+{
+	[self setDataId:[anotherSNOCrate dataId]];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				     @"ORSNOCrateDecoderForPMT",	@"decoder",
+				     [NSNumber numberWithLong:dataId],	@"dataId",
+				     [NSNumber numberWithBool:NO],	@"variable",
+				     [NSNumber numberWithLong:4],	@"length",  //modified kLong header
+				     nil];
+	[dataDictionary setObject:aDictionary forKey:@"PMT"];
+	
+	return dataDictionary;
+}
+
+- (void) reset
+{
+}
+
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+/*
+	if(![[self adapter] controllerCard]){
+		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
+	}
+*/	
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSNOCrateModel"];	
+}
+
+// XL3 only
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	
+	//never called, data come from an SBC at VME_Readout_Code/ORSNOCrateReadout.cc
+}
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	//stop cmos rate if ecal
+}
+
+//XL2 only
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id		= kSnoCrate;		//should be unique 
+	configStruct->card_info[index].hw_mask[0]		= dataId;		//better be unique
+	configStruct->card_info[index].slot			= [self slot];
+	configStruct->card_info[index].add_mod			= 0x29UL;
+	configStruct->card_info[index].base_add			= [self registerBaseAddress];
+	
+	configStruct->card_info[index].deviceSpecificData[0] = [self memoryBaseAddress];
+	configStruct->card_info[index].deviceSpecificData[1] = 0x09UL;
+	configStruct->card_info[index].deviceSpecificData[2] = [[self xl2] xl2RegAddress:XL2_DATA_AVAILABLE_REG];
+	configStruct->card_info[index].deviceSpecificData[3] = [self registerBaseAddress] + FEC32_FIFO_POINTER_DIFF_REG;
+
+	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
+	configStruct->card_info[index].next_Card_Index = index + 1;
+	
+	return index + 1;	
+}
+@end
+
+@implementation ORSNOCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects
+{
+    return kNumSNOCrateSlots;
+}
+
+- (int) objWidth
+{
+    return 12;
+}
+
+- (int) stationForSlot:(int)aSlot
+{
+	return 16-aSlot;
+}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if( [anObj isKindOfClass:NSClassFromString(@"ORXL2Model")]){
+		return NSMakeRange(17,1);
+	}
+	else if( [anObj isKindOfClass:NSClassFromString(@"ORXL3Model")]){
+		return NSMakeRange(17,1);
+	}	
+	else {
+		return  NSMakeRange(1,[self maxNumberOfObjects]-2);
+	}
+}
+
+
+@end
+
+
+@implementation ORSNOCrateModel (XL2)
+- (id) xl2
+{
+	return [self adapter];
+}
+
+- (void) initCrateUsingXL2:(BOOL) loadTheFEC32XilinxFile phase:(int) phase
+{
+	
 	//don't proceed to load the XilinX if this crate is supplying high voltage!
 	//MAH TBC implement this check somehow
 	//			if( theHVStatus.IsThisSNOCrateSupplyingHV(its_SC_Number) ) {
@@ -367,7 +521,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			
 			[self resetCrate];
 			[self loadClocks];
-
+			
 			// don't load the Xilinx if this crate is supplying voltage
 			if (loadTheFEC32XilinxFile) {
 				[self loadXilinx];
@@ -375,7 +529,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			}
 			else phase = 1;
 		}
-
+		
 		if (phase == 1) {
 			[self initFec32Cards];
 			[self initCTCDelays];
@@ -388,22 +542,6 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];		
 	}
-}
-
-- (void) initCrateDone
-{
-	NSLog(@"Initialization of the crate %d done.\n", [self crateNumber]);
-}
-
-//get ready for the XL3 card
-- (void) resetCrate
-{
-	[[self xl2] reset];
-}
-
-- (void) loadClocks
-{
-	[[self xl2] loadTheClocks];
 }
 
 - (void) loadXilinx
@@ -419,16 +557,22 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			selectBits |= 1L << [proxyFec32 stationNumber];
 		}
 	}
-		
+	
 	[[self xl2] loadTheXilinx:selectBits];
 	
 }
+
+- (void) loadClocks
+{
+	[[self xl2] loadTheClocks];
+}
+
 
 - (void) initFec32Cards
 {
 	NSMutableArray* slotList = [NSMutableArray arrayWithCapacity:16];
 	ORFec32Model* proxyFec32;
-		
+	
 	if (autoInit) {
 		// will be replaced with the config data
 		int i;
@@ -510,9 +654,9 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			if(theCard && autoInit)[self removeObject:theCard];
 			proxyFec32 = nil;
 		}
-
+		
 		//3. daughter boards
-
+		
 		if (proxyFec32) {
 			[[self xl2] select:proxyFec32];
 			NSMutableArray* dcList = [NSMutableArray arrayWithCapacity:4];
@@ -562,7 +706,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 				}
 			}
 		}
-
+		
 		//call the fec32 init function...
 		if (proxyFec32) {
 			@try {
@@ -582,7 +726,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 
 - (void) initCTCDelays
 {
-
+	
 	//CTC_Control *theTCControl = NIL_POINTER;
 	//TRY {
 	//	theTCControl = new CTC_Control;
@@ -598,108 +742,14 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	
 }
 
-#pragma mark •••Data Taker
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
-{
-	dataId = DataId;
-}
-
-// todo: add cmos data id
-- (void) setDataIds:(id)assigner
-{
-	dataId = [assigner assignDataIds:kLongForm];
-}
-
-- (void) syncDataIdsWith:(id)anotherSNOCrate
-{
-	[self setDataId:[anotherSNOCrate dataId]];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				     @"ORSNOCrateDecoderForPMT",	@"decoder",
-				     [NSNumber numberWithLong:dataId],	@"dataId",
-				     [NSNumber numberWithBool:NO],	@"variable",
-				     [NSNumber numberWithLong:4],	@"length",  //modified kLong header
-				     nil];
-	[dataDictionary setObject:aDictionary forKey:@"PMT"];
-	
-	return dataDictionary;
-}
-
-- (void) reset
-{
-}
-
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-/*
-	if(![[self adapter] controllerCard]){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-	}
-*/	
-	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORSNOCrateModel"];	
-}
-
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	//never called, data come from an SBC at VME_Readout_Code/ORSNOCrateReadout.cc
-}
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	//stop cmos rate if ecal
-}
-
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id		= kSnoCrate;		//should be unique 
-	configStruct->card_info[index].hw_mask[0]		= dataId;		//better be unique
-	configStruct->card_info[index].slot			= [self slot];
-	configStruct->card_info[index].add_mod			= 0x29UL;
-	configStruct->card_info[index].base_add			= [self registerBaseAddress];
-	
-	configStruct->card_info[index].deviceSpecificData[0] = [self memoryBaseAddress];
-	configStruct->card_info[index].deviceSpecificData[1] = 0x09UL;
-	configStruct->card_info[index].deviceSpecificData[2] = [[self xl2] xl2RegAddress:XL2_DATA_AVAILABLE_REG];
-	configStruct->card_info[index].deviceSpecificData[3] = [self registerBaseAddress] + FEC32_FIFO_POINTER_DIFF_REG;
-
-	configStruct->card_info[index].num_Trigger_Indexes = 0; //no children
-	configStruct->card_info[index].next_Card_Index = index + 1;
-	
-	return index + 1;	
-}
 @end
 
-@implementation ORSNOCrateModel (OROrderedObjHolding)
-- (int) maxNumberOfObjects
-{
-    return kNumSNOCrateSlots;
-}
 
-- (int) objWidth
-{
-    return 12;
-}
+@implementation ORSNOCrateModel (XL3)
 
-- (int) stationForSlot:(int)aSlot
+- (void) initCrateUsingXL3:(BOOL) loadTheFEC32XilinxFile phase:(int) phase
 {
-	return 16-aSlot;
+	
 }
-
-- (NSRange) legalSlotsForObj:(id)anObj
-{
-	if( [anObj isKindOfClass:NSClassFromString(@"ORXL2Model")]){
-		return NSMakeRange(17,1);
-	}
-	else {
-		return  NSMakeRange(1,[self maxNumberOfObjects]-2);
-	}
-}
-
 
 @end

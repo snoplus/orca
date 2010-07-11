@@ -81,6 +81,7 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 	[memBaseAddressField setIntValue:[model memoryBaseAddress]];
 	[regBaseAddressField setIntValue:[model registerBaseAddress]];
+	[iPBaseAddressField setStringValue:[model iPAddress]];
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
@@ -90,12 +91,13 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 	[memBaseAddressField setIntValue:[model memoryBaseAddress]];
 	[regBaseAddressField setIntValue:[model registerBaseAddress]];
+	[iPBaseAddressField setStringValue:[model iPAddress]];
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
 - (void) xilinxLoadChanged:(NSNotification*)aNote
 {
-	if([aNote object] == [model xl2] ){
+	if(![model adapterIsXL3] && [aNote object] == [model adapter]){
 		ORSBCLinkJobStatus* jobStatus = [[aNote userInfo] objectForKey:@"jobStatus"];
 		if([jobStatus running]){
 			[xilinixStatusField setStringValue:@"Loading"];
@@ -118,6 +120,9 @@
 		[autoInitButton setEnabled:![jobStatus running]];
 		[initNoXilinxButton setEnabled:![jobStatus running]];
 		[initXilinxButton setEnabled:![jobStatus running]];
+	}
+	else {
+		NSLog(@"ORSNOCrateCongtroller xilinxLoadChanged error: not available for XL3\n");
 	}
 }
 

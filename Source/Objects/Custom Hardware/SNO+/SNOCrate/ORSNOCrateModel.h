@@ -33,7 +33,6 @@
 	eFecMonitorState  voltageStatus;
 
 	unsigned long dataId;
-
 }
 
 - (void) setUpImage;
@@ -44,26 +43,23 @@
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian;
 - (void) setSlot:(int)aSlot;
 - (int)  slot;
-- (id) xl2;
-//- (BOOL) autoInit;
 - (void) setAutoInit:(BOOL) autoInit;
 
 #pragma mark •••Accessors
 - (unsigned long) memoryBaseAddress;
 - (unsigned long) registerBaseAddress;
+- (NSString*) iPAddress;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
+#pragma mark •••HW Access
 - (void) scanWorkingSlot;
 - (short) numberSlotsUsed;
+- (BOOL) adapterIsXL3;
 - (void) initCrate:(BOOL) loadTheFEC32XilinxFile phase:(int) phase;
 - (void) initCrateDone;
 - (void) resetCrate;
-- (void) loadClocks;
-- (void) loadXilinx;
-- (void) initFec32Cards;
-- (void) initCTCDelays;
 - (eFecMonitorState) voltageStatus;
 - (void) setVoltageStatus:(eFecMonitorState)aState;
 
