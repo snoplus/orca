@@ -19,6 +19,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+#import "XL3_Cmds.h"
 #import "ORXL3Model.h"
 #import "ORXL1Model.h"
 #import "ORSNOCrateModel.h"
@@ -82,7 +83,6 @@
 		[oldGuardian setAdapter:nil];	//old crate can't use this card any more
 	}
 	[aGuardian setAdapter:self];		//our new crate will use this card for hardware access
-	NSLog(@"setting XL3 as a crate controller for crate %d\n", [aGuardian crateNumber]);
 }
 
 - (void) setSlot:(int)aSlot
@@ -162,6 +162,7 @@
 
 - (void) writeToXL2Register:(unsigned long) aRegister value:(unsigned long) aValue
 {
+/*
 	//NSLog(@"writexl2 value: 0x%x to 0x%x\n", aValue, [self xl2RegAddress:aRegister]);
 	if (aRegister > XL2_MASK_REG) {   //Higer registers require that bit 17 be set in the XL2 select register
 		unsigned long readValue = [self xl2RegAddress:XL2_SELECT_REG];
@@ -169,6 +170,7 @@
 		[[self xl1] writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
 	}
 	[[self xl1] writeHardwareRegister:[self xl2RegAddress:aRegister] value:aValue]; 		//Now write the value	
+*/
 }
 
 - (unsigned long) xl2RegAddress:(unsigned long)aRegOffset
@@ -193,45 +195,50 @@
 //call thrus for the Fec hardware access
 - (void) writeHardwareRegister:(unsigned long) anAddress value:(unsigned long) aValue
 {
-	[[self xl1] writeHardwareRegister:anAddress value:aValue];
+	//[[self xl1] writeHardwareRegister:anAddress value:aValue];
 }
 
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress
 {
-	return [[self xl1] readHardwareRegister:regAddress];
+	//return [[self xl1] readHardwareRegister:regAddress];
+	return 0;
 }
 
 - (unsigned long) readHardwareMemory:(unsigned long) memAddress
 {
 	unsigned long aValue=0;
+/*
 	[[[self xl1] adapter] readLongBlock:&aValue
 			    atAddress:memAddress
 			    numToRead:1
 			   withAddMod:0x09
 			usingAddSpace:0x01];
-	
+*/	
 	return aValue;
 }
 
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern
 {
-	return [[self xl1] writeHardwareRegisterCmd:aRegister value:aBitPattern];		
+	//return [[self xl1] writeHardwareRegisterCmd:aRegister value:aBitPattern];
+	return self;
 }
 
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress
 {
-	return [[self xl1] readHardwareRegisterCmd:regAddress];
+	//return [[self xl1] readHardwareRegisterCmd:regAddress];
+	return self;
 }
 
 - (id) delayCmd:(unsigned long) milliSeconds
 {
-	return [[self xl1] delayCmd:milliSeconds]; 		
+	//return [[self xl1] delayCmd:milliSeconds]; 
+	return self;
 }
 
 - (void) executeCommandList:(ORCommandList*)aList
 {
-	[[self xl1] executeCommandList:aList];		
+	//[[self xl1] executeCommandList:aList];		
 }
 #pragma mark •••Composite HW Functions
 
@@ -265,21 +272,26 @@
 
 - (BOOL) adapterIsSBC
 {
-	return [[[self xl1] adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")];
+	//return [[[self xl1] adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")];
+	return FALSE;
 }
 
 - (void) loadTheClocks
 {
+	/*
 	NSData* theData = [[self xl1] clockFileData];	// load the entire content of the file
 	if([self adapterIsSBC])	[self loadClocksUsingSBC:theData];
 	else			[self loadClocksUsingLocalAdapter:theData];
+	 */
 }
 
 - (void) loadTheXilinx:(unsigned long) selectBits
 {
+	/*
 	NSData* theData = [[self xl1] xilinxFileData];	// load the entire content of the file
 	if([self adapterIsSBC])	[self loadXilinixUsingSBC:theData selectBits:selectBits];
 	else			[self loadXilinixUsingLocalAdapter:theData selectBits:selectBits];
+	*/
 }
 
 @end
@@ -398,7 +410,7 @@
 	BOOL selectOK = NO;
 	@try {
 		
-		NSData* theData = [[self xl1] clockFileData];	// load the entire content of the file
+		NSData* theData; // = [[self xl1] clockFileData];	// load the entire content of the file
 		char* charData = (char*)[theData bytes];		// high in the heap and then lock it before dereferencing
 		
 		[self select:self];
@@ -487,7 +499,7 @@
 	@try {
 		
 		// Load the data from the Xilinx File
-		NSData* theData = [[self xl1] xilinxFileData];	// load the entire content of the file
+		NSData* theData; // = [[self xl1] xilinxFileData];	// load the entire content of the file
 		char*   charData = (char*)[theData bytes];
 		unsigned long length = [theData length];
 		unsigned long index = length; 

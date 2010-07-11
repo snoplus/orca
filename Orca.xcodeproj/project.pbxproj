@@ -2342,6 +2342,12 @@
 		EF7722B511E813120064A1CF /* ORXL3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = EF7722B211E813120064A1CF /* ORXL3Model.h */; };
 		EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = EF7722B311E813120064A1CF /* ORXL3Model.m */; };
 		EF7722B711E813120064A1CF /* XL3Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = EF7722B411E813120064A1CF /* XL3Card.gif */; };
+		EFAC072211E9856800336793 /* XL3_Cmds.h in Headers */ = {isa = PBXBuildFile; fileRef = EFAC072111E9856800336793 /* XL3_Cmds.h */; };
+		EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = EFAC072F11E9A6CB00336793 /* XL3_Link.h */; };
+		EFAC073211E9A6CB00336793 /* XL3_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = EFAC073011E9A6CB00336793 /* XL3_Link.m */; };
+		EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */; };
+		EFAC074011E9A9DB00336793 /* XL3_LinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFAC073E11E9A9DB00336793 /* XL3_LinkController.m */; };
+		EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */ = {isa = PBXBuildFile; fileRef = EFAC074211E9ADB500336793 /* XL3_Link.nib */; };
 		EFCC4546117FD45E008DC12C /* ORSNOCrateDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */; };
 		EFCC4547117FD45E008DC12C /* ORSNOCrateDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */; };
 /* End PBXBuildFile section */
@@ -4747,6 +4753,12 @@
 		EF7722B211E813120064A1CF /* ORXL3Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL3Model.h; sourceTree = "<group>"; };
 		EF7722B311E813120064A1CF /* ORXL3Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXL3Model.m; sourceTree = "<group>"; };
 		EF7722B411E813120064A1CF /* XL3Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = XL3Card.gif; sourceTree = "<group>"; };
+		EFAC072111E9856800336793 /* XL3_Cmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XL3_Cmds.h; sourceTree = "<group>"; };
+		EFAC072F11E9A6CB00336793 /* XL3_Link.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XL3_Link.h; sourceTree = "<group>"; };
+		EFAC073011E9A6CB00336793 /* XL3_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XL3_Link.m; sourceTree = "<group>"; };
+		EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XL3_LinkController.h; sourceTree = "<group>"; };
+		EFAC073E11E9A9DB00336793 /* XL3_LinkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XL3_LinkController.m; sourceTree = "<group>"; };
+		EFAC074211E9ADB500336793 /* XL3_Link.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = XL3_Link.nib; sourceTree = "<group>"; };
 		EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNOCrateDecoders.h; sourceTree = "<group>"; };
 		EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSNOCrateDecoders.m; sourceTree = "<group>"; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
@@ -9863,7 +9875,13 @@
 			children = (
 				EF7722B211E813120064A1CF /* ORXL3Model.h */,
 				EF7722B311E813120064A1CF /* ORXL3Model.m */,
+				EFAC072111E9856800336793 /* XL3_Cmds.h */,
+				EFAC072F11E9A6CB00336793 /* XL3_Link.h */,
+				EFAC073011E9A6CB00336793 /* XL3_Link.m */,
+				EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */,
+				EFAC073E11E9A9DB00336793 /* XL3_LinkController.m */,
 				EF7722B411E813120064A1CF /* XL3Card.gif */,
+				EFAC074211E9ADB500336793 /* XL3_Link.nib */,
 			);
 			path = XL3;
 			sourceTree = "<group>";
@@ -11120,6 +11138,9 @@
 				84A3EDA111BD8165003A08A9 /* ORSIS3320Decoders.h in Headers */,
 				84A3EDA311BD8165003A08A9 /* ORSIS3320Model.h in Headers */,
 				EF7722B511E813120064A1CF /* ORXL3Model.h in Headers */,
+				EFAC072211E9856800336793 /* XL3_Cmds.h in Headers */,
+				EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */,
+				EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11824,6 +11845,7 @@
 				840795DE11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist in Resources */,
 				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
 				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
+				EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12626,6 +12648,8 @@
 				84A3EDA211BD8165003A08A9 /* ORSIS3320Decoders.m in Sources */,
 				84A3EDA411BD8165003A08A9 /* ORSIS3320Model.m in Sources */,
 				EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */,
+				EFAC073211E9A6CB00336793 /* XL3_Link.m in Sources */,
+				EFAC074011E9A9DB00336793 /* XL3_LinkController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
