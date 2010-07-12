@@ -49,6 +49,7 @@ NSString* ORRunQuickStartChangedNotification    = @"ORRunQuickStartChangedNotifi
 NSString* ORRunDefinitionsFileChangedNotification    = @"ORRunDefinitionsFileChangedNotification";
 NSString* ORRunNumberLock						= @"ORRunNumberLock";
 NSString* ORRunTypeLock							= @"ORRunTypeLock";
+NSString* ORRunOfflineRunNotification			= @"ORRunOfflineRunNotification";
 
 static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
@@ -997,6 +998,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[[ORGlobal sharedGlobal] setRunMode:offline]; //0 = NormalRun, 1= offlineRun
     id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
 	[nextObject setRunMode:offline];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRunOfflineRunNotification
+                                                        object: self
+                                                      userInfo: nil];
 }
 
 - (BOOL) offlineRun

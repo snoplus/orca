@@ -257,6 +257,7 @@ extern NSString* ORRunMaskChangedNotification;
 extern NSString* ORRunTypeChangedNotification;
 extern NSString* ORRunQuickStartChangedNotification;
 extern NSString* ORRunDefinitionsFileChangedNotification;
+extern NSString* ORRunOfflineRunNotification;
 
 extern NSString* ORRunNumberLock;
 extern NSString* ORRunTypeLock;

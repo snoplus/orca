@@ -20,6 +20,7 @@
 #pragma mark ***Imported Files
 
 @class ORSqlConnection;
+@class ORRunModel;
 
 @interface ORSqlModel : OrcaObject
 {
@@ -92,24 +93,30 @@ extern NSString* ORSqlLock;
 
 @interface ORPostRunStateOp : ORSqlOperation
 {
-	int runState;
-	int runNumber;
-	int subRunNumber;
+	ORRunModel* runModel;
 	NSString* experimentName;
 }
 
 - (void) setExperimentName:(NSString*)anExperiment;
-- (void) setRunState:(NSNotification*)aNote;
+- (void) setRunModel:(ORRunModel*)aRunModel;
 - (void) main;
 @end
 
 @interface ORPostRunTimesOp : ORSqlOperation
 {
-	NSString* startTime;
-	NSString* elapsedTime;
+	ORRunModel* runModel;
 }
 
-- (void) setParams:(NSNotification*)aNote;
+- (void) setRunModel:(ORRunModel*)aRunModel;
+- (void) main;
+@end
+
+@interface ORPostRunOptions : ORSqlOperation
+{
+	ORRunModel* runModel;
+}
+
+- (void) setRunModel:(ORRunModel*)aRunModel;
 - (void) main;
 @end
 
