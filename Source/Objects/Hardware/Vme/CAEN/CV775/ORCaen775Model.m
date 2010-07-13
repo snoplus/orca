@@ -84,7 +84,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	
     [self setBaseAddress: k775DefaultBaseAddress];
     [self setAddressModifier: k775DefaultAddressModifier];
-	
+	[self setOnlineMask:0];
 	[[self undoManager] enableUndoRegistration];
     
     return self;
@@ -255,24 +255,46 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	}
 }
 
+- (void) setDataIds:(id)assigner
+{
+    dataId = [assigner assignDataIds:kLongForm];
+    dataIdN = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId:[anotherObj dataId]];
+    [self setDataIdN:[anotherObj dataIdN]];
+}
+
+- (unsigned long) dataIdN { return dataIdN; }
+- (void) setDataIdN: (unsigned long) DataId
+{
+    dataIdN = DataId;
+}
+
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	NSString* decoderName;
 	if(modelType == kModel775){
-		decoderName = @"ORCAEN775DecoderForTdc";
+		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+									 @"ORCAEN775DecoderForTdc",					@"decoder",
+									 [NSNumber numberWithLong:dataId],          @"dataId",
+									 [NSNumber numberWithBool:YES],             @"variable",
+									 [NSNumber numberWithLong:-1],              @"length",
+									 nil];
+		[dataDictionary setObject:aDictionary forKey:@"Tdc"];
 	}
 	else {
-		decoderName = @"ORCAEN775NDecoderForTdc";
+		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+									 @"ORCAEN775NDecoderForTdc",				@"decoder",
+									 [NSNumber numberWithLong:dataIdN],          @"dataId",
+									 [NSNumber numberWithBool:YES],             @"variable",
+									 [NSNumber numberWithLong:-1],				@"length",
+									 nil];
+		[dataDictionary setObject:aDictionary forKey:@"TdcN"];
 	}
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 decoderName,								@"decoder",
-								 [NSNumber numberWithLong:dataId],           @"dataId",
-								 [NSNumber numberWithBool:YES],              @"variable",
-								 [NSNumber numberWithLong:-1],               @"length",
-								 nil];
 	
-    [dataDictionary setObject:aDictionary forKey:@"Tdc"];
     return dataDictionary;
 }
 #pragma mark ***DataTaker
@@ -281,9 +303,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
     // Clear unit
-    [self write: kBitSet2 sendValue: kClearData];				// Clear data, 
-    [self write: kBitClear2 sendValue: kClearData];			// Clear "Clear data" bit of status reg.
-    [self write: kEventCounterReset sendValue: 0x0000];	// Clear event counter
+   // [self write: kBitSet2 sendValue: kClearData];			// Clear data, 
+    //[self write: kBitClear2 sendValue: kClearData];			// Clear "Clear data" bit of status reg.
+    [self write: kEventCounterReset sendValue: 0x0000];		// Clear event counter
     
     // Set options
     

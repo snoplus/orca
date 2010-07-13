@@ -78,10 +78,12 @@
 	if([model modelType] == kModel775){
 		[thresholdB setEnabled:YES];
 		[stepperB setEnabled:YES];
+		[onlineMaskMatrixB setEnabled:YES];
 	}
 	else {
 		[thresholdB setEnabled:NO];
 		[stepperB setEnabled:NO];
+		[onlineMaskMatrixB setEnabled:YES];
 	}
 }
 
@@ -97,8 +99,36 @@
 
 - (void) thresholdLockChanged:(NSNotification*)aNotification
 {    
-	[super thresholdLockChanged:aNotification];
-	[self modelTypeChanged:nil];
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self thresholdLockName]];
+    BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
+
+	[modelTypePU setEnabled:!runInProgress];
+	
+    [thresholdLockButton setState: locked];
+    
+	if([model modelType] == kModel775){
+		[onlineMaskMatrixB setEnabled:!lockedOrRunningMaintenance];
+		[thresholdB setEnabled:!lockedOrRunningMaintenance];
+		[stepperB setEnabled:!lockedOrRunningMaintenance];
+	}
+	else {
+		[onlineMaskMatrixB setEnabled:NO];
+		[thresholdB setEnabled:NO];
+		[stepperB setEnabled:NO];
+	}
+	[onlineMaskMatrixA setEnabled:!lockedOrRunningMaintenance];
+	[thresholdA setEnabled:!lockedOrRunningMaintenance];
+	[stepperA setEnabled:!lockedOrRunningMaintenance];
+	
+    [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
+    [thresholdReadButton setEnabled:!lockedOrRunningMaintenance]; 
+    
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
+    }
+    [thresholdLockDocField setStringValue:s];
 }
 
 - (NSSize) thresholdDialogSize

@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="88"/>
+			<integer value="453"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1826,7 +1826,7 @@
 														<int key="NSPeriodicInterval">25</int>
 													</object>
 													<object class="NSButtonCell" id="408178498">
-														<int key="NSCellFlags">67239424</int>
+														<int key="NSCellFlags">-2080244224</int>
 														<int key="NSCellFlags2">131072</int>
 														<string key="NSContents"/>
 														<reference key="NSSupport" ref="26"/>
@@ -1840,7 +1840,7 @@
 														<int key="NSPeriodicInterval">25</int>
 													</object>
 													<object class="NSButtonCell" id="818624219">
-														<int key="NSCellFlags">67239424</int>
+														<int key="NSCellFlags">-2080244224</int>
 														<int key="NSCellFlags2">131072</int>
 														<string key="NSContents"/>
 														<reference key="NSSupport" ref="26"/>
@@ -1870,8 +1870,8 @@
 													<int key="NSPeriodicDelay">200</int>
 													<int key="NSPeriodicInterval">25</int>
 												</object>
-												<int key="NSSelectedRow">-1</int>
-												<int key="NSSelectedCol">-1</int>
+												<int key="NSSelectedRow">15</int>
+												<reference key="NSSelectedCell" ref="818624219"/>
 												<reference key="NSBackgroundColor" ref="415412193"/>
 												<reference key="NSCellBackgroundColor" ref="415412193"/>
 											</object>
@@ -3040,14 +3040,6 @@
 					<int key="connectionID">481</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">onlineMaskMatrixB</string>
-						<reference key="source" ref="100753678"/>
-						<reference key="destination" ref="899684983"/>
-					</object>
-					<int key="connectionID">482</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">onlineAction:</string>
 						<reference key="source" ref="100753678"/>
@@ -3062,6 +3054,14 @@
 						<reference key="destination" ref="320902130"/>
 					</object>
 					<int key="connectionID">484</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">onlineMaskMatrixB</string>
+						<reference key="source" ref="100753678"/>
+						<reference key="destination" ref="320902130"/>
+					</object>
+					<int key="connectionID">485</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -3241,12 +3241,12 @@
 							<reference ref="389791255"/>
 							<reference ref="959067804"/>
 							<reference ref="744991530"/>
-							<reference ref="20538047"/>
 							<reference ref="392952168"/>
 							<reference ref="730133898"/>
 							<reference ref="899684983"/>
 							<reference ref="543658608"/>
 							<reference ref="320902130"/>
+							<reference ref="20538047"/>
 						</object>
 						<reference key="parent" ref="340952953"/>
 					</object>
@@ -5169,7 +5169,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">484</int>
+			<int key="maxID">485</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5510,6 +5510,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Misc Objects/Rates/ORRate.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Misc Objects/SQL/ORSqlModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
