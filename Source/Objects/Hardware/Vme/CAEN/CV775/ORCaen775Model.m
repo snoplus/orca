@@ -33,8 +33,8 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {@"MCST CBLT Address",	false,	false, 	true,	0x1004,		kReadWrite,	kD16},
 {@"Bit Set 1",			false,	true, 	true,	0x1006,		kReadWrite,	kD16},
 {@"Bit Clear 1",		false,	true, 	true,	0x1008,		kReadWrite,	kD16},
-{@"Interrup Level",		false,	true, 	true,	0x100A,		kReadWrite,	kD16},
-{@"Interrup Vector",	false,	true, 	true,	0x100C,		kReadWrite,	kD16},
+{@"Interrupt Level",	false,	true, 	true,	0x100A,		kReadWrite,	kD16},
+{@"Interrupt Vector",	false,	true, 	true,	0x100C,		kReadWrite,	kD16},
 {@"Status Register 1",	false,	true, 	true,	0x100E,		kReadOnly,	kD16},
 {@"Control Register 1",	false,	true, 	true,	0x1010,		kReadWrite,	kD16},
 {@"ADER High",			false,	false, 	true,	0x1012,		kReadWrite,	kD16},
@@ -60,6 +60,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {@"Full Scale Range",	false,	true, 	true,	0x1060,		kReadWrite,	kD16},
 {@"R Test Address",		false,	true, 	true,	0x1064,		kWriteOnly,	kD16},
 {@"SW Comm",			false,	false, 	false,	0x1068,		kWriteOnly,	kD16},
+{@"Slide Constant",		false,	false, 	false,	0x106A,		kReadWrite,	kD16},
 {@"ADD",				false,	false, 	false,	0x1070,		kReadOnly,	kD16},
 {@"BADD",				false,	false, 	false,	0x1072,		kReadOnly,	kD16},
 {@"Thresholds",			false,	false, 	false,	0x1080,		kReadWrite,	kD16},
@@ -313,13 +314,115 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [self writeThresholds];
     
 }
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+{
+    
+    unsigned short 	theStatus1;
+    unsigned short 	theStatus2;
+    
+    @try {
+        
+        //first read the status resisters to see if there is anything to read.
+        [self read:[self getStatusRegisterIndex:1] returnValue:&theStatus1];
+        
+        // Get some values from the status register using the decoder.
+        BOOL dataIsReady 		= [dataDecoder isDataReady:theStatus1];
+        unsigned long bufferAddress = [self baseAddress] + [self getBufferOffset];
+        
+        // Read the buffer.
+        if (dataIsReady) {
+			
+			//OK, at least one data value is ready
+			unsigned long dataValue;
+			[controller readLongBlock:&dataValue
+							atAddress:bufferAddress
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+			
+			//if this is a header, must be valid data.
+			BOOL validData = YES; //assume OK until shown otherwise
+			if(ShiftAndExtract(dataValue,24,0x7) == 0x2){
+				//get the number of memorized channels
+				int numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
+				int i;
+				if((numMemorizedChannels>0)){
+					unsigned long dataRecord[0xffff];
+					//we fill in dataRecord[0] below once we know the final size
+					dataRecord[1] = location;
+					int index = 2;
+					for(i=0;i<numMemorizedChannels;i++){
+						[controller readLongBlock:&dataValue
+										atAddress:bufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						if(dataType == 0x000){
+							dataRecord[index] = dataValue;
+							index++;
+						}
+						else {
+							validData = NO;
+							break;
+						}
+					}
+					if(validData){
+						//OK we read the data, get the end of block
+						[controller readLongBlock:&dataValue
+										atAddress:bufferAddress
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+						//make sure it really is an end of block
+						int dataType = ShiftAndExtract(dataValue,24,0x7);
+						if(dataType == 0x4){
+							dataRecord[index] = dataValue; //we don't ship the end of block for now
+							index++;
+							//got a end of block fill in the ORCA header and ship the data
+							if(modelType == kModel775) dataRecord[0] = dataId  | index; //see.... filled it in here....
+							else					  dataRecord[0] = dataIdN | index; //see.... filled it in here....
+							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
+						}
+						else {
+							validData = NO;
+						}
+					}
+				}
+			}
+			if(!validData){
+				[self flushBuffer];
+			}
+		}
+	}
+	@catch(NSException* localException) {
+		errorCount++;
+	}
+}
 
 - (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }
 
-
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id = kCaen775; //should be unique
+	if(modelType == kModel775)	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	else						configStruct->card_info[index].hw_mask[0] 	 = dataIdN;
+	configStruct->card_info[index].slot 	 = [self slot];
+	configStruct->card_info[index].crate 	 = [self crateNumber];
+	configStruct->card_info[index].add_mod 	 = [self addressModifier];
+	configStruct->card_info[index].base_add  = [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0] = reg[kStatusRegister1].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	
+	return index+1;
+}
 #pragma mark ¥¥¥Archival
 - (id) initWithCoder: (NSCoder*) aDecoder
 {

@@ -89,6 +89,9 @@
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
+		4342D59411ECB8AD007EFFB1 /* ORCAEN775Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */; };
+		4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */; };
+		4342D5F311ECC4D0007EFFB1 /* ORCAEN775Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */; };
 		4398E6BA11B7E36400FC4DDE /* ORCAEN785Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4398E6B811B7E36400FC4DDE /* ORCAEN785Readout.hh */; };
 		4398E6C211B7E3BB00FC4DDE /* ORCAEN785Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4398E6B711B7E36400FC4DDE /* ORCAEN785Readout.cc */; };
 		4398E6C311B7E3BB00FC4DDE /* ORCAEN785Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4398E6B811B7E36400FC4DDE /* ORCAEN785Readout.hh */; };
@@ -2436,6 +2439,8 @@
 				43ADFEBC10B6E2090044617C /* ORCAEN419Readout.hh in VME_Copy */,
 				43ADFEBD10B6E2090044617C /* ORCAEN1720Readout.cc in VME_Copy */,
 				43ADFEBE10B6E2090044617C /* ORCAEN1720Readout.hh in VME_Copy */,
+				4342D59411ECB8AD007EFFB1 /* ORCAEN775Readout.cc in VME_Copy */,
+				4342D5F311ECC4D0007EFFB1 /* ORCAEN775Readout.hh in VME_Copy */,
 				43ADFEBF10B6E2090044617C /* ORCAENReadout.cc in VME_Copy */,
 				43ADFEC010B6E2090044617C /* ORCAENReadout.hh in VME_Copy */,
 				43ADFEC110B6E2090044617C /* ORDataGenReadout.cc in VME_Copy */,
@@ -2598,6 +2603,8 @@
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
+		4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN775Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN775Readout.cc; sourceTree = SOURCE_ROOT; };
+		4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN775Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN775Readout.hh; sourceTree = SOURCE_ROOT; };
 		4398E6B711B7E36400FC4DDE /* ORCAEN785Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN785Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN785Readout.cc; sourceTree = SOURCE_ROOT; };
 		4398E6B811B7E36400FC4DDE /* ORCAEN785Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN785Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN785Readout.hh; sourceTree = SOURCE_ROOT; };
 		4398E7CC11B81B8B00FC4DDE /* ORCaen775Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen775Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Controller.m; sourceTree = SOURCE_ROOT; };
@@ -2616,7 +2623,7 @@
 		43ADFE5B10B6DBCF0044617C /* ORCAEN1720Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN1720Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1720Readout.hh; sourceTree = SOURCE_ROOT; };
 		43ADFE5C10B6DBCF0044617C /* ORCAENReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAENReadout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAENReadout.cc; sourceTree = SOURCE_ROOT; };
 		43ADFE5D10B6DBCF0044617C /* ORCAENReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAENReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAENReadout.hh; sourceTree = SOURCE_ROOT; };
-		43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORDataGenReadout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.cc; sourceTree = SOURCE_ROOT; };
+		43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORDataGenReadout.cc; path = Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.cc; sourceTree = "<group>"; };
 		43ADFE5F10B6DBCF0044617C /* ORDataGenReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORDataGenReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.hh; sourceTree = SOURCE_ROOT; };
 		43ADFE6210B6DBCF0044617C /* ORGretinaReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORGretinaReadout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORGretinaReadout.cc; sourceTree = SOURCE_ROOT; };
 		43ADFE6310B6DBCF0044617C /* ORGretinaReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORGretinaReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORGretinaReadout.hh; sourceTree = SOURCE_ROOT; };
@@ -7520,9 +7527,10 @@
 				43ADFE5910B6DBCF0044617C /* ORCAEN419Readout.hh */,
 				43ADFE5A10B6DBCF0044617C /* ORCAEN1720Readout.cc */,
 				43ADFE5B10B6DBCF0044617C /* ORCAEN1720Readout.hh */,
+				4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */,
+				4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */,
 				43ADFE5C10B6DBCF0044617C /* ORCAENReadout.cc */,
 				43ADFE5D10B6DBCF0044617C /* ORCAENReadout.hh */,
-				43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */,
 				43ADFE5F10B6DBCF0044617C /* ORDataGenReadout.hh */,
 				43ADFE6210B6DBCF0044617C /* ORGretinaReadout.cc */,
 				43ADFE6310B6DBCF0044617C /* ORGretinaReadout.hh */,
@@ -10047,6 +10055,7 @@
 				842F19A603B8EAF3005F64B1 /* Control */,
 				84C4948A0405A0C0005F64B1 /* Custom Hardware */,
 				F51E698503AE4775015F64B1 /* Hardware */,
+				43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */,
 			);
 			name = Objects;
 			path = Source/Objects;
@@ -11141,6 +11150,7 @@
 				EFAC072211E9856800336793 /* XL3_Cmds.h in Headers */,
 				EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */,
 				EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */,
+				4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

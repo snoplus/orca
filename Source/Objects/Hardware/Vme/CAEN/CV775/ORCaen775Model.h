@@ -63,6 +63,7 @@ enum {
 	kFullScaleRange,
 	kRTestAddress,
 	kSWComm,
+	kSlideConstant,
 	kADD,
 	kBADD,
 	kThresholds,
