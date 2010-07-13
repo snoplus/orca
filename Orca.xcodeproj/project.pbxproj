@@ -916,6 +916,7 @@
 		843DCF35058E546A000C5219 /* DataGen.gif in Resources */ = {isa = PBXBuildFile; fileRef = 843DCF2E058E546A000C5219 /* DataGen.gif */; };
 		843DCF3A058E546A000C5219 /* ORDataGenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843DCF33058E546A000C5219 /* ORDataGenModel.h */; };
 		843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843DCF34058E546A000C5219 /* ORDataGenModel.m */; };
+		843F28F911ECFEED0077E55B /* ORDataGenReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */; };
 		844048AE08350BEE000D03DB /* MemoryWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 844048AC08350BEE000D03DB /* MemoryWatcher.h */; };
 		844048AF08350BEE000D03DB /* MemoryWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 844048AD08350BEE000D03DB /* MemoryWatcher.m */; };
 		844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844049C108353B65000D03DB /* MemoryWatcherController.h */; };
@@ -2623,7 +2624,7 @@
 		43ADFE5B10B6DBCF0044617C /* ORCAEN1720Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN1720Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1720Readout.hh; sourceTree = SOURCE_ROOT; };
 		43ADFE5C10B6DBCF0044617C /* ORCAENReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAENReadout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAENReadout.cc; sourceTree = SOURCE_ROOT; };
 		43ADFE5D10B6DBCF0044617C /* ORCAENReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAENReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAENReadout.hh; sourceTree = SOURCE_ROOT; };
-		43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORDataGenReadout.cc; path = Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.cc; sourceTree = "<group>"; };
+		43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORDataGenReadout.cc; sourceTree = "<group>"; };
 		43ADFE5F10B6DBCF0044617C /* ORDataGenReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORDataGenReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.hh; sourceTree = SOURCE_ROOT; };
 		43ADFE6210B6DBCF0044617C /* ORGretinaReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORGretinaReadout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORGretinaReadout.cc; sourceTree = SOURCE_ROOT; };
 		43ADFE6310B6DBCF0044617C /* ORGretinaReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORGretinaReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORGretinaReadout.hh; sourceTree = SOURCE_ROOT; };
@@ -3164,6 +3165,7 @@
 		843DCF2E058E546A000C5219 /* DataGen.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = DataGen.gif; sourceTree = "<group>"; };
 		843DCF33058E546A000C5219 /* ORDataGenModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDataGenModel.h; sourceTree = "<group>"; };
 		843DCF34058E546A000C5219 /* ORDataGenModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDataGenModel.m; sourceTree = "<group>"; };
+		843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORDataGenReadout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORDataGenReadout.hh; sourceTree = SOURCE_ROOT; };
 		844048AC08350BEE000D03DB /* MemoryWatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MemoryWatcher.h; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.h"; sourceTree = SOURCE_ROOT; };
 		844048AD08350BEE000D03DB /* MemoryWatcher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = MemoryWatcher.m; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.m"; sourceTree = SOURCE_ROOT; };
 		844049C108353B65000D03DB /* MemoryWatcherController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryWatcherController.h; sourceTree = "<group>"; };
@@ -7557,6 +7559,8 @@
 				8493CC7F0C99FA4B00B46CD4 /* HW_Readout.c */,
 				8493CC800C99FA4B00B46CD4 /* HW_Readout.h */,
 				84BA99000E91279000E19946 /* SNOCmds.h */,
+				843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */,
+				43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */,
 				84BA98FA0E91260500E19946 /* SNO.c */,
 				84BA98FB0E91260500E19946 /* SNO.h */,
 			);
@@ -10055,7 +10059,6 @@
 				842F19A603B8EAF3005F64B1 /* Control */,
 				84C4948A0405A0C0005F64B1 /* Custom Hardware */,
 				F51E698503AE4775015F64B1 /* Hardware */,
-				43ADFE5E10B6DBCF0044617C /* ORDataGenReadout.cc */,
 			);
 			name = Objects;
 			path = Source/Objects;
@@ -11151,6 +11154,7 @@
 				EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */,
 				EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */,
 				4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */,
+				843F28F911ECFEED0077E55B /* ORDataGenReadout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
