@@ -466,7 +466,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 - (void) loadScriptFromFile:(NSString*)aFilePath
 {
 	[self setLastFile:aFilePath];
-	NSString* theContents = [[[NSString alloc] initWithContentsOfFile:[lastFile stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil] autorelease];
+	NSString* theContents = [[[NSString alloc] initWithContentsOfFile:[lastFile stringByExpandingTildeInPath] encoding:NSUTF8StringEncoding error:nil] autorelease];
 	//NSString* theContents = [NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]];
 	//if the name and description are prepended then strip off and restore
 	//the name is always first if it exists
@@ -545,11 +545,12 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 	else {
 		[theScript insertString:@"//#Name:OrcaScript\n" atIndex:0];
 	}
-
-	NSData* theData = [theScript dataUsingEncoding:NSASCIIStringEncoding];
+    if(![theScript canBeConvertedToEncoding:NSUTF8StringEncoding])NSLog(@"Can not convert\n");
+	NSData* theData = [theScript dataUsingEncoding:NSUTF8StringEncoding];
+	BOOL result = [fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
+	if(result)[self setLastFile:aFilePath];
+    else NSLogColor([NSColor redColor], @"Unable to save <%@> Reason unknown\n",aFilePath);
 	[theScript release];
-	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
-	[self setLastFile:aFilePath];
 }
 
 //functions for testing script objC calls
