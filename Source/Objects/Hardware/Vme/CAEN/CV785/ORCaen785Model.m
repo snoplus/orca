@@ -237,7 +237,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 									 [NSNumber numberWithBool:YES],             @"variable",
 									 [NSNumber numberWithLong:-1],              @"length",
 									 nil];
-		[dataDictionary setObject:aDictionary forKey:@"Adc"];
+		[dataDictionary setObject:aDictionary forKey:@"AdcN"];
 	}
 		
     return dataDictionary;
