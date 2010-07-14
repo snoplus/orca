@@ -83,6 +83,7 @@ enum {
 	unsigned long statusAddress;
 	unsigned long dataBufferAddress;
 	unsigned long location;
+	unsigned long dataIdN;
 }
 
 #pragma mark ***Accessors
@@ -92,6 +93,8 @@ enum {
 - (void)			setOnlineMask:(unsigned long)anOnlineMask;
 - (BOOL)			onlineMaskBit:(int)bit;
 - (void)			setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
+- (unsigned long) dataIdN;
+- (void) setDataIdN: (unsigned long) DataId;
 
 #pragma mark ***Register - General routines
 - (short)		getNumberRegisters;

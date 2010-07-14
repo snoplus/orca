@@ -221,21 +221,25 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	NSString* decoderName;
 	if(modelType == kModel785){
-		decoderName = @"ORCAEN785DecoderForAdc";
+		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+									 @"ORCAEN785DecoderForAdc",					@"decoder",
+									 [NSNumber numberWithLong:dataId],          @"dataId",
+									 [NSNumber numberWithBool:YES],             @"variable",
+									 [NSNumber numberWithLong:-1],              @"length",
+									 nil];
+		[dataDictionary setObject:aDictionary forKey:@"Adc"];
 	}
 	else {
-		decoderName = @"ORCAEN785NDecoderForAdc";
+		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+									 @"ORCAEN785NDecoderForAdc",				@"decoder",
+									 [NSNumber numberWithLong:dataIdN],         @"dataId",
+									 [NSNumber numberWithBool:YES],             @"variable",
+									 [NSNumber numberWithLong:-1],              @"length",
+									 nil];
+		[dataDictionary setObject:aDictionary forKey:@"Adc"];
 	}
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 decoderName,								@"decoder",
-								 [NSNumber numberWithLong:dataId],           @"dataId",
-								 [NSNumber numberWithBool:YES],              @"variable",
-								 [NSNumber numberWithLong:-1],               @"length",
-								 nil];
 		
-    [dataDictionary setObject:aDictionary forKey:@"Adc"];
     return dataDictionary;
 }
 
@@ -253,6 +257,24 @@ static RegisterNamesStruct reg[kNumRegisters] = {
                         usingAddSpace:0x01];
         if([dataDecoder isNotValidDatum:dataValue]) break;
     }
+}
+
+- (void) setDataIds:(id)assigner
+{
+    dataId = [assigner assignDataIds:kLongForm];
+    dataIdN = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId:[anotherObj dataId]];
+    [self setDataIdN:[anotherObj dataIdN]];
+}
+
+- (unsigned long) dataIdN { return dataIdN; }
+- (void) setDataIdN: (unsigned long) DataId
+{
+    dataIdN = DataId;
 }
 
 #pragma mark ***DataTaker
@@ -343,7 +365,8 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 							dataRecord[index] = dataValue; //we don't ship the end of block for now
 							index++;
 							//got a end of block fill in the ORCA header and ship the data
-							dataRecord[0] = dataId | index; //see.... filled it in here....
+							if(modelType == kModel785) dataRecord[0] = dataId  | index; //see.... filled it in here....
+							else					   dataRecord[0] = dataIdN | index; //see.... filled it in here....
 							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
 						}
 						else {
@@ -388,7 +411,8 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id	= kCaen785; //should be unique
-	configStruct->card_info[index].hw_mask[0]	= dataId; //better be unique
+	if(modelType == kModel785)	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	else						configStruct->card_info[index].hw_mask[0] 	 = dataIdN;
 	configStruct->card_info[index].slot			= [self slot];
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= [self addressModifier];
