@@ -96,8 +96,11 @@
 {
 	[plotView copy:sender];
 }
-
-- (id) curve:(int)c gate:(int)g; //for backward compatiblity with scripts
+- (id) curve:(int)c roi:(int)g
+{
+	return [self curve:c gate:g];
+}
+- (id) curve:(int)c gate:(int)g //for backward compatiblity with scripts
 {
 	id plot = [plotView plot:c];
 	NSArray* roisForPlot = [self  roiArrayForPlotter:plot];
