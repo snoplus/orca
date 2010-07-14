@@ -331,7 +331,8 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     
     // Set thresholds in unit
     [self writeThresholds];
-    
+ 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+   
 }
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 {
