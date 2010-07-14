@@ -22,6 +22,9 @@
 #define k775DefaultBaseAddress 		0xa00000
 #define k775DefaultAddressModifier 	0x39
 
+#define kStartStop	0x400
+
+NSString* ORCaen775ModelCommonStopModeChanged = @"ORCaen775ModelCommonStopModeChanged";
 NSString* ORCaen775ModelModelTypeChanged = @"ORCaen775ModelModelTypeChanged";
 NSString* ORCaen775ModelOnlineMaskChanged = @"ORCaen775ModelOnlineMaskChanged";
 
@@ -92,6 +95,20 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) commonStopMode
+{
+    return commonStopMode;
+}
+
+- (void) setCommonStopMode:(BOOL)aCommonStopMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCommonStopMode:commonStopMode];
+    
+    commonStopMode = aCommonStopMode;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen775ModelCommonStopModeChanged object:self];
+}
 
 - (int) modelType
 {
@@ -233,7 +250,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 775 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 775%@ (Slot %d) ",modelType==0?@"":@"N",[self slot]];
 }
 
 - (unsigned short) threshold:(unsigned short) aChnl
@@ -304,8 +321,10 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
     // Clear unit
-   // [self write: kBitSet2 sendValue: kClearData];			// Clear data, 
-    //[self write: kBitClear2 sendValue: kClearData];			// Clear "Clear data" bit of status reg.
+    [self write: kBitSet2 sendValue: kClearData];			// Clear data, 
+    [self write: kBitClear2 sendValue: kClearData];			// Clear "Clear data" bit of status reg.
+	if(commonStopMode)[self write: kBitSet2 sendValue: kClearData];
+	else [self write: kBitClear2 sendValue: kClearData];
     [self write: kEventCounterReset sendValue: 0x0000];		// Clear event counter
     
     // Set options
@@ -318,7 +337,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {
     
     unsigned short 	theStatus1;
-    unsigned short 	theStatus2;
     
     @try {
         
@@ -429,8 +447,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     self = [super initWithCoder: aDecoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setModelType:[aDecoder decodeIntForKey:@"modelType"]];
-   	[self setOnlineMask:[aDecoder decodeInt32ForKey:@"onlineMask"]];
+    [self setCommonStopMode:	[aDecoder decodeBoolForKey:@"commonStopMode"]];
+    [self setModelType:			[aDecoder decodeIntForKey:@"modelType"]];
+   	[self setOnlineMask:		[aDecoder decodeInt32ForKey:@"onlineMask"]];
  
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -440,8 +459,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) encodeWithCoder: (NSCoder*) anEncoder
 {
     [super encodeWithCoder: anEncoder];
-	[anEncoder encodeInt:modelType forKey:@"modelType"];
-	[anEncoder encodeInt32:onlineMask forKey:@"onlineMask"];
+	[anEncoder encodeBool:commonStopMode	forKey:@"commonStopMode"];
+	[anEncoder encodeInt:modelType			forKey:@"modelType"];
+	[anEncoder encodeInt32:onlineMask		forKey:@"onlineMask"];
 }
 
 @end

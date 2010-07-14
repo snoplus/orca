@@ -31,21 +31,25 @@
 // Definition of class
 @interface ORCaen775Controller : ORCaenCardController {
 	IBOutlet NSPopUpButton* modelTypePU;
+	IBOutlet NSMatrix* commonStopModeMatrix;
     IBOutlet NSMatrix*	onlineMaskMatrixA;
     IBOutlet NSMatrix*	onlineMaskMatrixB;
 }
 
 #pragma mark ***Initialization
 - (id)		init;
- 	
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
+- (void)	registerNotificationObservers;
+	
+#pragma mark ***Interface Management
+- (void) commonStopModeChanged:(NSNotification*)aNote;
 - (void) modelTypeChanged:(NSNotification*)aNote;
 - (void) onlineMaskChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) commonStopModeAction:(id)sender;
 - (IBAction) modelTypePUAction:(id)sender;
 - (IBAction) onlineAction:(id)sender;
 
 @end
+

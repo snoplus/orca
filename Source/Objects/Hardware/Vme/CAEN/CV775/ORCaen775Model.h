@@ -86,11 +86,13 @@ enum {
 	unsigned long dataBufferAddress;
 	unsigned long location;
 	unsigned long dataIdN;
-
+    BOOL commonStopMode;
 }
 
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) commonStopMode;
+- (void) setCommonStopMode:(BOOL)aCommonStopMode;
 - (int) modelType;
 - (void) setModelType:(int)aModelType;
 - (unsigned long)onlineMask;
@@ -123,6 +125,7 @@ enum {
 
 @end
 
+extern NSString* ORCaen775ModelCommonStopModeChanged;
 extern NSString* ORCaen775ModelModelTypeChanged;
 extern NSString* ORCaen775ModelOnlineMaskChanged;
 

@@ -63,13 +63,25 @@
 					 selector : @selector(onlineMaskChanged:)
 						 name : ORCaen775ModelOnlineMaskChanged
 					   object : model];
+    [notifyCenter addObserver : self
+                     selector : @selector(commonStopModeChanged:)
+                         name : ORCaen775ModelCommonStopModeChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
+- (void) commonStopModeChanged:(NSNotification*)aNote
+{
+	[commonStopModeMatrix selectCellWithTag: [model commonStopMode]];
+}
+
 - (void) updateWindow
 {
 	[ super updateWindow ];
 	[self modelTypeChanged:nil];
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+	[self commonStopModeChanged:nil];
 }
 
 - (void) modelTypeChanged:(NSNotification*)aNote
@@ -83,8 +95,9 @@
 	else {
 		[thresholdB setEnabled:NO];
 		[stepperB setEnabled:NO];
-		[onlineMaskMatrixB setEnabled:YES];
+		[onlineMaskMatrixB setEnabled:NO];
 	}
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
 - (void) onlineMaskChanged:(NSNotification*)aNotification
@@ -104,7 +117,7 @@
     BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
 
 	[modelTypePU setEnabled:!runInProgress];
-	
+	[commonStopModeMatrix setEnabled:!runInProgress];
     [thresholdLockButton setState: locked];
     
 	if([model modelType] == kModel775){
@@ -140,6 +153,11 @@
 - (NSString*) basicLockName     {return @"ORCaen775BasicLock";}
 
 #pragma mark ¥¥¥Actions
+- (void) commonStopModeAction:(id)sender
+{
+	[model setCommonStopMode:[[sender selectedCell] tag]];	
+}
+
 - (void) modelTypePUAction:(id)sender
 {
 	[model setModelType:[sender indexOfSelectedItem]];	
