@@ -211,7 +211,11 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return( kOutputBuffer );
 }
 
-
+- (void) setThreshold:(unsigned short) aChnl threshold:(unsigned short) aValue
+{
+	if(aValue > 0xff)aValue=0xff;
+	[super setThreshold:aChnl threshold:aValue];
+}
 #pragma mark ***Register - Register specific routines
 - (NSString*) getRegisterName: (short) anIndex
 {
