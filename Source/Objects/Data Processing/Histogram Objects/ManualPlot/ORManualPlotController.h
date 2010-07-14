@@ -54,7 +54,10 @@
 - (void) col1TitleChanged:(NSNotification*)aNote;
 - (void) col2TitleChanged:(NSNotification*)aNote;
 - (void) col3TitleChanged:(NSNotification*)aNote;
-- (void) colKeyChanged:(NSNotification*)aNote;
+- (void) colKey0Changed:(NSNotification*)aNote;
+- (void) colKey1Changed:(NSNotification*)aNote;
+- (void) colKey2Changed:(NSNotification*)aNote;
+- (void) colKey3Changed:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) dataChanged:(NSNotification*)aNote;

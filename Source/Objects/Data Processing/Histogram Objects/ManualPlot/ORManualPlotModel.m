@@ -29,7 +29,10 @@ NSString* ORManualPlotModelCol3TitleChanged = @"ORManualPlotModelCol3TitleChange
 NSString* ORManualPlotModelCol2TitleChanged = @"ORManualPlotModelCol2TitleChanged";
 NSString* ORManualPlotModelCol1TitleChanged = @"ORManualPlotModelCol1TitleChanged";
 NSString* ORManualPlotModelCol0TitleChanged = @"ORManualPlotModelCol0TitleChanged";
-NSString* ORManualPlotModelColKeyChanged	= @"ORManualPlotModelColKeyChanged";
+NSString* ORManualPlotModelColKey0Changed	= @"ORManualPlotModelColKey0Changed";
+NSString* ORManualPlotModelColKey1Changed	= @"ORManualPlotModelColKey1Changed";
+NSString* ORManualPlotModelColKey2Changed	= @"ORManualPlotModelColKey2Changed";
+NSString* ORManualPlotModelColKey3Changed	= @"ORManualPlotModelColKey3Changed";
 NSString* ORManualPlotLock					= @"ORManualPlotLock";
 NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 
@@ -72,8 +75,8 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	[data addObject:[NSArray arrayWithObjects:
 					 [NSNumber numberWithFloat:v1],
 					 [NSNumber numberWithFloat:v2],
-					 0,
-					 0,
+					 [NSNumber numberWithFloat:0],
+					 [NSNumber numberWithFloat:0],
 					 nil]];
 	[dataSetLock unlock];	
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORManualPlotDataChanged object:self];
@@ -86,13 +89,13 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	[data addObject:[NSArray arrayWithObjects:
 					 [NSNumber numberWithFloat:v1],
 					 [NSNumber numberWithFloat:v2],
-					 0,
-					 0,
+					 [NSNumber numberWithFloat:v3],
+					 [NSNumber numberWithFloat:0],
 					 nil]];
 	[dataSetLock unlock];	
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORManualPlotDataChanged object:self];
-
 }
+
 - (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3 value4:(float)v4
 {
 	[dataSetLock lock];
@@ -186,7 +189,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCol3Key:col3Key];
     col3Key = aCol3Key;    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKeyChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKey3Changed object:self];
 }
 - (int) col2Key;
 {
@@ -197,7 +200,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCol2Key:col2Key];
     col2Key = aCol2Key;    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKeyChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKey2Changed object:self];
 }
 
 - (int) col1Key;
@@ -209,7 +212,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCol1Key:col1Key];
     col1Key = aCol1Key;    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKeyChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKey1Changed object:self];
 }
 
 - (int) col0Key
@@ -221,7 +224,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCol0Key:col0Key];
     col0Key = aCol0Key;    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKeyChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKey0Changed object:self];
 }
 
 - (void) setUpImage
@@ -252,9 +255,9 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
 	roiSet			  = [[decoder decodeObjectForKey:@"roiSet"] retain];
 	if(col0Key==0)[self setCol0Key:0]; 
-	if(col1Key==1)[self setCol1Key:1]; 
-	if(col2Key==2)[self setCol2Key:2]; 
-	if(col3Key==3)[self setCol3Key:3]; 
+	if(col1Key==0)[self setCol1Key:1]; 
+	if(col2Key==0)[self setCol2Key:2]; 
+	if(col3Key==0)[self setCol3Key:3]; 
     [[self undoManager] enableUndoRegistration];
 
 	dataSetLock = [[NSLock alloc] init];

@@ -95,9 +95,25 @@
                        object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(colKeyChanged:)
-                         name : ORManualPlotModelColKeyChanged
+                     selector : @selector(colKey0Changed:)
+                         name : ORManualPlotModelColKey0Changed
 						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(colKey1Changed:)
+                         name : ORManualPlotModelColKey1Changed
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(colKey2Changed:)
+                         name : ORManualPlotModelColKey2Changed
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(colKey3Changed:)
+                         name : ORManualPlotModelColKey3Changed
+						object: model];
+	
 	
     [notifyCenter addObserver : self
                      selector : @selector(col0TitleChanged:)
@@ -134,7 +150,10 @@
 	[self col1TitleChanged:nil];
 	[self col2TitleChanged:nil];
 	[self col3TitleChanged:nil];
-	[self colKeyChanged:nil];
+	[self colKey0Changed:nil];
+	[self colKey1Changed:nil];
+	[self colKey2Changed:nil];
+	[self colKey3Changed:nil];
 }
 
 #pragma mark •••Interface Management
@@ -145,15 +164,29 @@
 	else if([aNote object] == dataDrawer)[[self analysisDrawer] close:nil];
 }
 
-- (void) colKeyChanged:(NSNotification*)aNote
+- (void) colKey0Changed:(NSNotification*)aNote
 {
 	[col0KeyPU selectItemAtIndex: [model col0Key]];
-	[col1KeyPU selectItemAtIndex: [model col1Key]];
-	[col2KeyPU selectItemAtIndex: [model col2Key]];
-	[col3KeyPU selectItemAtIndex: [model col3Key]];
 	[self refreshPlot:nil];
 }
 
+- (void) colKey1Changed:(NSNotification*)aNote
+{
+	[col1KeyPU selectItemAtIndex: [model col1Key]];
+	[self refreshPlot:nil];
+}
+
+- (void) colKey2Changed:(NSNotification*)aNote
+{
+	[col2KeyPU selectItemAtIndex: [model col2Key]];
+	[self refreshPlot:nil];
+}
+
+- (void) colKey3Changed:(NSNotification*)aNote
+{
+	[col3KeyPU selectItemAtIndex: [model col3Key]];
+	[self refreshPlot:nil];
+}
 
 - (void) col0TitleChanged:(NSNotification*)aNotification
 {
@@ -222,13 +255,14 @@
 {
 	int col0Key = [model col0Key];
 	NSString* title;
-	if(col0Key > 2) title = @"Index";
+	if(col0Key > 3) title = @"Index";
 	else title = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col0Key]] headerCell] title];
 	[[plotView xScale] setLabel:title];
 	
 	title = @"";
 	int col1Key = [model col1Key];
 	int col2Key = [model col2Key];
+	int col3Key = [model col3Key];
 	[y1LengendField setStringValue:@""];
 	[y2LengendField setStringValue:@""];
 	if(col1Key <= 2) {
@@ -242,15 +276,23 @@
 		title = [title stringByAppendingString:s];
 		[y2LengendField setStringValue:s];
 	}
+	if(col3Key <= 3) {
+		if([title length])title = [title stringByAppendingString:@" , "];
+		NSString* s = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col3Key]] headerCell] title];
+		title = [title stringByAppendingString:s];
+		[y2LengendField setStringValue:s];
+	}
 	if([title length]==0)title = @"Index";
 	
 	[[plotView yScale] setLabel:title];
 	[plotView setNeedsDisplay:YES];
 }
+
 - (IBAction) col3KeyAction:(id)sender
 {
 	[model setCol3Key:[sender indexOfSelectedItem]];	
 }
+
 - (IBAction) col2KeyAction:(id)sender
 {
 	[model setCol2Key:[sender indexOfSelectedItem]];	
