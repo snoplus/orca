@@ -51,11 +51,8 @@ bool ORCAEN775Readout::Readout(SBC_LAM_Data* lamData)
                                 
         if(!isNotValidCaenData(dataValue)) {
         
-            // FixME!!
-			ensureDataCanHold(kMaxDataBufferSizeLongs/2); 
-            //not sure how much this card can produce... 
-            //just ensure half the data buffer is free
-			
+			ensureDataCanHold(0xffc + 64); //the buffer size + some buffer
+ 			
 			//OK some data is apparently in the buffer and is valid
             uint32_t dataIndexStart = dataIndex; //save the start index in case we have to flush the data because of errors
             dataIndex += 2;                         //reserve two words for the ORCA header, we'll fill it in if we get valid data
