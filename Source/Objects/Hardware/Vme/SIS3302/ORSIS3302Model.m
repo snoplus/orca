@@ -2922,6 +2922,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	[self setUpArrays];
 
+	[self calculateEnergyGateLength];
 	
     [[self undoManager] enableUndoRegistration];
     
