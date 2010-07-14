@@ -25,7 +25,7 @@
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end
 
-@interface ORCAEN785NDecoderForAdc : ORCaenDataDecoder {
+@interface ORCAEN785NDecoderForAdc : ORCAEN785DecoderForAdc {
 }
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end
