@@ -451,3 +451,4 @@ extern NSString* ORSIS3302ExtendedThresholdEnabledChanged;
 extern NSString* ORSIS3302InternalGateEnabledChanged;
 extern NSString* ORSIS3302ExternalGateEnabledChanged;
 extern NSString* ORSIS3302McaStatusChanged;
+extern NSString* ORSIS3302CardInited;

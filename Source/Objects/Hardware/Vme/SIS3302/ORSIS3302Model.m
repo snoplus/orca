@@ -93,9 +93,7 @@ NSString* ORSIS3302EnergyDecimationChanged		= @"ORSIS3302EnergyDecimationChanged
 NSString* ORSIS3302SetShipWaveformChanged		= @"ORSIS3302SetShipWaveformChanged";
 NSString* ORSIS3302Adc50KTriggerEnabledChanged	= @"ORSIS3302Adc50KTriggerEnabledChanged";
 NSString* ORSIS3302McaStatusChanged				= @"ORSIS3302McaStatusChanged";
-
-
-
+NSString* ORSIS3302CardInited					= @"ORSIS3302CardInited";
 
 @interface ORSIS3302Model (private)
 - (void) writeDacOffsets;
@@ -1999,6 +1997,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		//	[self disarmAndArmBank:0];
 		//}
 	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CardInited object:self];
+
 }
 
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 

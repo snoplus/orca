@@ -45,6 +45,7 @@
 // ---- should end in 0xdeadbeef
 //------------------------------------------------------------------
 #define kPageLength (65*1024)
+#define kFilterLengthKey @"energyPeakingTimes"
 
 - (id) init
 
@@ -60,6 +61,24 @@
     [super dealloc];
 }
 
+- (void) registerNotifications
+{
+	[super registerNotifications];
+	NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+	[nc addObserver:self selector:@selector(filterLengthChanged:) name:ORSIS3302CardInited object:nil];
+}
+
+- (void) filterLengthChanged:(NSNotification*)aNote
+{
+	ORSIS3302Model* theCard		= [aNote object];
+	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
+	NSString* cardKey			= [self getCardKey: [theCard slot]];
+	int group;
+	for(group=0;group<[theCard numberOfChannels]/2;group++){
+		[self setObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]] forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+	}
+}
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
@@ -72,14 +91,26 @@
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
 	
+	if(![self cacheSetUp]){
+		[self cacheCardLevelObject:kFilterLengthKey fromHeader:[aDecoder fileHeader]];
+	}	
+	
 	unsigned long lastWord = ptr[length-1];
 	if(lastWord == 0xdeadbeef){
 		//histogram the energy.... prescale by dividing by 4 so we can have a histogram of reseanable length.... have to do something better at some point
 		unsigned long energy = ptr[length - 4]; 
-		int page = energy/kPageLength;
-		int startPage = page*kPageLength;
-		int endPage = (page+1)*kPageLength;
-		[aDataSet histogram:energy - page*kPageLength numBins:kPageLength sender:self  withKeys:@"SIS3302", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,cardKey,channelKey,nil];
+		//int page = energy/kPageLength;
+		//int startPage = page*kPageLength;
+		//int endPage = (page+1)*kPageLength;
+		//[aDataSet histogram:energy - page*kPageLength numBins:kPageLength sender:self  withKeys:@"SIS3302", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,cardKey,channelKey,nil];
+
+		NSArray* theFilterLengths = [self objectForNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+		if([theFilterLengths count]>channel/2){
+			int filterLength = [[theFilterLengths objectAtIndex:channel] intValue];
+			if(filterLength)energy = energy/filterLength;
+			[aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
+		}
+		
 		
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
 		long energyLength   = ptr[3]; //each energy value is a sum of two 
@@ -166,6 +197,7 @@
 //								^^^^ ^^^--spare
 // ---- followed by the mcadata record as read 
 //------------------------------------------------------------------
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
@@ -229,7 +261,7 @@
 //from hardware. see the manual.
 // ---- should end in 0xdeadbeef
 //------------------------------------------------------------------
-#define kPageLength (65*1024)
+//#define kPageLength (65*1024)
 
 - (id) init
 
@@ -245,6 +277,24 @@
     [super dealloc];
 }
 
+- (void) registerNotifications
+{
+	[super registerNotifications];
+	NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+	[nc addObserver:self selector:@selector(filterLengthChanged:) name:ORSIS3302CardInited object:nil];
+}
+
+- (void) filterLengthChanged:(NSNotification*)aNote
+{
+	ORSIS3302Model* theCard		= [aNote object];
+	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
+	NSString* cardKey			= [self getCardKey: [theCard slot]];
+	int group;
+	for(group=0;group<[theCard numberOfChannels]/2;group++){
+		[self setObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]] forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+	}
+}
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
@@ -252,6 +302,10 @@
 	int crate	= ShiftAndExtract(ptr[1],21,0xf);
 	int card	= ShiftAndExtract(ptr[1],16,0x1f);
 	int channel = ShiftAndExtract(ptr[1],8,0xff);
+	
+	if(![self cacheSetUp]){
+		[self cacheCardLevelObject:kFilterLengthKey fromHeader:[aDecoder fileHeader]];
+	}	
 	
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
@@ -261,10 +315,17 @@
 	if(lastWord == 0xdeadbeef){
 		//histogram the energy.... prescale by dividing by 4 so we can have a histogram of reseanable length.... have to do something better at some point
 		unsigned long energy = ptr[length - 4]; 
-		int page = energy/kPageLength;
-		int startPage = page*kPageLength;
-		int endPage = (page+1)*kPageLength;
-		[aDataSet histogram:energy - page*kPageLength numBins:kPageLength sender:self  withKeys:@"SIS3302", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,cardKey,channelKey,nil];
+		//int page = energy/kPageLength;
+		//int startPage = page*kPageLength;
+		//int endPage = (page+1)*kPageLength;
+		//[aDataSet histogram:energy - page*kPageLength numBins:kPageLength sender:self  withKeys:@"SIS3302", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,cardKey,channelKey,nil];
+
+		NSArray* theFilterLengths = [self objectForNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+		if([theFilterLengths count]>channel/2){
+			int filterLength = [[theFilterLengths objectAtIndex:channel] intValue];
+			if(filterLength)energy = energy/filterLength;
+			[aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
+		}
 		
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
 		long energyLength   = ptr[3]; //each energy value is a sum of two 
