@@ -221,24 +221,21 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	if(modelType == kModel785){
-		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									 @"ORCAEN785DecoderForAdc",					@"decoder",
-									 [NSNumber numberWithLong:dataId],          @"dataId",
-									 [NSNumber numberWithBool:YES],             @"variable",
-									 [NSNumber numberWithLong:-1],              @"length",
-									 nil];
-		[dataDictionary setObject:aDictionary forKey:@"Adc"];
-	}
-	else {
-		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									 @"ORCAEN785NDecoderForAdc",				@"decoder",
-									 [NSNumber numberWithLong:dataIdN],         @"dataId",
-									 [NSNumber numberWithBool:YES],             @"variable",
-									 [NSNumber numberWithLong:-1],              @"length",
-									 nil];
-		[dataDictionary setObject:aDictionary forKey:@"AdcN"];
-	}
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCAEN785DecoderForAdc",					@"decoder",
+								 [NSNumber numberWithLong:dataId],          @"dataId",
+								 [NSNumber numberWithBool:YES],             @"variable",
+								 [NSNumber numberWithLong:-1],              @"length",
+								 nil];
+	[dataDictionary setObject:aDictionary forKey:@"Adc"];
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCAEN785NDecoderForAdc",				@"decoder",
+								 [NSNumber numberWithLong:dataIdN],         @"dataId",
+								 [NSNumber numberWithBool:YES],             @"variable",
+								 [NSNumber numberWithLong:-1],              @"length",
+								 nil];
+	[dataDictionary setObject:aDictionary forKey:@"AdcN"];
+
 		
     return dataDictionary;
 }
@@ -272,9 +269,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 - (unsigned long) dataIdN { return dataIdN; }
-- (void) setDataIdN: (unsigned long) DataId
+- (void) setDataIdN: (unsigned long) aDataId
 {
-    dataIdN = DataId;
+    dataIdN = aDataId;
 }
 
 #pragma mark ***DataTaker

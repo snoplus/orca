@@ -298,25 +298,22 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	if(modelType == kModel775){
-		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									 @"ORCAEN775DecoderForTdc",					@"decoder",
-									 [NSNumber numberWithLong:dataId],          @"dataId",
-									 [NSNumber numberWithBool:YES],             @"variable",
-									 [NSNumber numberWithLong:-1],              @"length",
-									 nil];
-		[dataDictionary setObject:aDictionary forKey:@"Tdc"];
-	}
-	else {
-		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									 @"ORCAEN775NDecoderForTdc",				@"decoder",
-									 [NSNumber numberWithLong:dataIdN],          @"dataId",
-									 [NSNumber numberWithBool:YES],             @"variable",
-									 [NSNumber numberWithLong:-1],				@"length",
-									 nil];
-		[dataDictionary setObject:aDictionary forKey:@"TdcN"];
-	}
-	
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCAEN775DecoderForTdc",					@"decoder",
+								 [NSNumber numberWithLong:dataId],          @"dataId",
+								 [NSNumber numberWithBool:YES],             @"variable",
+								 [NSNumber numberWithLong:-1],              @"length",
+								 nil];
+	[dataDictionary setObject:aDictionary forKey:@"Tdc"];
+
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORCAEN775NDecoderForTdc",				@"decoder",
+								 [NSNumber numberWithLong:dataIdN],          @"dataId",
+								 [NSNumber numberWithBool:YES],             @"variable",
+								 [NSNumber numberWithLong:-1],				@"length",
+								 nil];
+	[dataDictionary setObject:aDictionary forKey:@"TdcN"];
+		
     return dataDictionary;
 }
 #pragma mark ***DataTaker

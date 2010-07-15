@@ -606,26 +606,24 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 {
 	
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-	if(modelType == kModel965){
-		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORCaen965DecoderForQdc",				@"decoder",
-								 [NSNumber numberWithLong:dataId],		@"dataId",
-								 [NSNumber numberWithBool:YES],			@"variable",
-								 [NSNumber numberWithLong:-1],			@"length",
-								 nil];
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+							 @"ORCaen965DecoderForQdc",				@"decoder",
+							 [NSNumber numberWithLong:dataId],		@"dataId",
+							 [NSNumber numberWithBool:YES],			@"variable",
+							 [NSNumber numberWithLong:-1],			@"length",
+							 nil];
 
-		[dataDictionary setObject:aDictionary forKey:@"Qdc"];
-	}
-	else {
-		NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORCaen965ADecoderForQdc",			@"decoder",
-								 [NSNumber numberWithLong:dataIdA],		@"dataId",
-								 [NSNumber numberWithBool:YES],			@"variable",
-								 [NSNumber numberWithLong:-1],			@"length",
-								 nil];
+	[dataDictionary setObject:aDictionary forKey:@"Qdc"];
 	
-		[dataDictionary setObject:aDictionary forKey:@"965AQdc"];
-	}
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+							 @"ORCaen965ADecoderForQdc",			@"decoder",
+							 [NSNumber numberWithLong:dataIdA],		@"dataId",
+							 [NSNumber numberWithBool:YES],			@"variable",
+							 [NSNumber numberWithLong:-1],			@"length",
+							 nil];
+
+	[dataDictionary setObject:aDictionary forKey:@"965AQdc"];
+	
     return dataDictionary;
 }
 
