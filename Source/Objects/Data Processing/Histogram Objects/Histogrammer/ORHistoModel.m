@@ -176,11 +176,15 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 		if([dummy2DHisto respondsToSelector:aSelector]){
 			[collection addObject:dummy2DHisto];
 		}
-	}   
-	[mLock lock];
-    NSArray* theCollection =  [dataSet collectObjectsRespondingTo:aSelector];  
-	[collection addObjectsFromArray:theCollection];
-	[mLock unlock];
+	} 
+    [mLock lock];
+    @try {  
+        NSArray* theCollection =  [dataSet collectObjectsRespondingTo:aSelector];  
+        [collection addObjectsFromArray:theCollection];
+    }
+    @finally {
+         [mLock unlock];
+    }
 	return collection;
 }
 
@@ -212,19 +216,24 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (ORDataSet*) dataSet
 {
-	[mLock lock];
-	ORDataSet* temp = [[dataSet retain] autorelease];
-	[mLock unlock];
+    ORDataSet* temp = nil;    
+    [mLock lock];
+    @try {
+        temp = [[dataSet retain] autorelease];
+    }
+    @finally {
+         [mLock unlock];
+    }
     return temp;
 }
 
 - (void) setDataSet:(ORDataSet*)aDataSet
 {
-	[mLock lock];
+    [mLock lock];
     [aDataSet retain];
     [dataSet release];
     dataSet = aDataSet;
-	[mLock unlock];
+    [mLock unlock];
     
     [multiPlots makeObjectsPerformSelector:@selector(setDataSource:) withObject:dataSet];
     
@@ -232,9 +241,14 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (ORDataSet*) dataSetWithName:(NSString*)aName
 {
-	[mLock lock];
-	ORDataSet* theSet =  [[[dataSet dataSetWithName:aName]retain] autorelease];
-	[mLock unlock];
+    ORDataSet* theSet = nil;
+    [mLock lock];
+    @try {
+        theSet =  [[[dataSet dataSetWithName:aName]retain] autorelease];
+    }
+    @finally {
+         [mLock unlock];
+    }
 	return theSet;
 }
 
@@ -330,17 +344,21 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder
 {
-	[mLock lock];
-    if(!dataSet){
+     if(!dataSet){
         [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease] ];
     }
-    
-	//process the data
-    for(id someData in dataArray){
-        [aDecoder decode:someData intoDataSet:dataSet];
+        
+    [mLock lock];
+    @try {
+        //process the data
+        for(id someData in dataArray){
+            [aDecoder decode:someData intoDataSet:dataSet];
+        }
     }
-	[mLock unlock];
-	
+    @finally {
+         [mLock unlock];
+    }
+
 	//pass it on
 	id theNextObject = [self objectConnectedTo:ORHistoPassThruConnection];
 	[theNextObject processData:dataArray decoder:aDecoder];
@@ -480,19 +498,23 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (id)   childAtIndex:(int)index
 {
-	[mLock lock];
-    NSEnumerator* e = [dataSet objectEnumerator];
-    id obj;
     id child = nil;
-    short i = 0;
-    while(obj = [e nextObject]){
-        if(i++ == index){
-            child = [[obj retain] autorelease];
-            break;
+    [mLock lock];
+    @try {
+        NSEnumerator* e = [dataSet objectEnumerator];
+        id obj;
+        short i = 0;
+        while(obj = [e nextObject]){
+            if(i++ == index){
+                child = [[obj retain] autorelease];
+                break;
+            }
         }
+     }
+    @finally {
+         [mLock unlock];
     }
-	[mLock unlock];
-    return child;
+   return child;
 }
 
 
@@ -507,9 +529,13 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
         [self setDataSet:nil];
     }
     else { 
-		[mLock lock];
-		[dataSet removeObject:item];
-		[mLock unlock];
+        [mLock lock];
+        @try {
+            [dataSet removeObject:item];
+        }
+        @finally {
+             [mLock unlock];
+        }
 	}
 }
 
@@ -562,10 +588,13 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 	NSArray* objs2d = [[self document]  collectObjectsOfClass:[OR2DHisto class]];
 	e = [objs2d objectEnumerator];
 	while(anObj = [e nextObject])[anObj setDataId:[dummy2DHisto dataId]];
-	
-	[mLock lock];
-	[dataSet packageData:aDataPacket userInfo:nil];
-	[mLock unlock];
+    [mLock lock];
+    @try {
+        [dataSet packageData:aDataPacket userInfo:nil];
+    }
+    @finally {
+         [mLock unlock];
+    }
 }
 @end
 
