@@ -70,13 +70,17 @@
 
 - (void) filterLengthChanged:(NSNotification*)aNote
 {
-	ORSIS3302Model* theCard		= [aNote object];
-	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
-	NSString* cardKey			= [self getCardKey: [theCard slot]];
-	int group;
-	for(group=0;group<[theCard numberOfChannels]/2;group++){
-		[self setObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]] forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
-	}
+    @synchronized (self){
+        ORSIS3302Model* theCard		= [aNote object];
+        NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
+        NSString* cardKey			= [self getCardKey: [theCard slot]];
+        NSMutableArray*  theValues  = [NSMutableArray arrayWithCapacity:8];
+        int group;
+        for(group=0;group<[theCard numberOfChannels]/2;group++){
+            [theValues addObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]]];
+        }
+        [self setObject:theValues forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+    }
 }
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
@@ -104,12 +108,16 @@
 		//int endPage = (page+1)*kPageLength;
 		//[aDataSet histogram:energy - page*kPageLength numBins:kPageLength sender:self  withKeys:@"SIS3302", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,cardKey,channelKey,nil];
 
-		NSArray* theFilterLengths = [self objectForNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
-		if([theFilterLengths count]>channel/2){
-			int filterLength = [[theFilterLengths objectAtIndex:channel] intValue];
-			if(filterLength)energy = energy/filterLength;
-			[aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
-		}
+        NSArray* theFilterLengths = nil;
+        @synchronized (self){
+            theFilterLengths = [self objectForNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+        }
+        if([theFilterLengths count]>channel/2){
+            int filterLength = [[theFilterLengths objectAtIndex:channel] intValue];
+            if(filterLength)energy = energy/filterLength;
+            [aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
+        }
+        
 		
 		
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
@@ -289,10 +297,12 @@
 	ORSIS3302Model* theCard		= [aNote object];
 	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
 	NSString* cardKey			= [self getCardKey: [theCard slot]];
+    NSMutableArray*  theValues  = [NSMutableArray arrayWithCapacity:8];
 	int group;
 	for(group=0;group<[theCard numberOfChannels]/2;group++){
-		[self setObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]] forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+        [theValues addObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]]];
 	}
+    [self setObject:theValues forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
 }
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
