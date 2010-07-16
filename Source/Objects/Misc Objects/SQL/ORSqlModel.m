@@ -82,7 +82,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
 	}
 	[self addMachineName];
-
+	[self postRunState:nil];
 	[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
 	[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
 }
