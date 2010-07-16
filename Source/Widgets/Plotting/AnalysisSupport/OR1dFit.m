@@ -199,13 +199,15 @@ NSString* OR1dFitFunctionChanged = @"OR1dFitFunctionChanged";
 		int numPoints = [fit count];
 		int minX		= MAX(0,MAX([self minChannel],[mXScale minValue]));
 		int maxX		= MIN(numPoints,MIN(roundToLong([mXScale maxValue]),[self maxChannel]));
-		float rawValue	= [[fit objectAtIndex:minX] floatValue];
+		float rawValue  = 0;
+		if(minX<[fit count]) rawValue	= [[fit objectAtIndex:minX] floatValue];
 		float y			= [mYScale getPixAbs:rawValue];
 		float x			= [mXScale getPixAbs:minX];
 		
 		[theDataPath moveToPoint:NSMakePoint(x,y)];			
 		long    ix;
 		for (ix=minX; ix<maxX;++ix) {
+			if(ix >= [fit count]-1)break;
 			rawValue = [[fit objectAtIndex:ix] floatValue];
 			y = [mYScale getPixAbs:rawValue];
 			x = [mXScale getPixAbs:ix];
@@ -246,8 +248,12 @@ NSString* OR1dFitFunctionChanged = @"OR1dFitFunctionChanged";
 		NSMutableArray* dataArray = [NSMutableArray array];
 		int numPoints = [dataSource numberPointsInPlot:aPlot];
 		long maxChan = MIN([self maxChannel],numPoints-1);
+		long minChan = MAX([self minChannel],0);
+		if((maxChan - minChan) > 1024){
+			maxChan = minChan + 1024;
+		}
 		int ix;
-		for (ix=0; ix<maxChan;++ix) {		
+		for (ix=minChan; ix<maxChan;++ix) {		
 			double xValue,yValue;
 			[dataSource plotter:aPlot index:ix x:&xValue y:&yValue];
 			[dataArray addObject:[NSNumber numberWithDouble:yValue]];
@@ -309,11 +315,14 @@ NSString* OR1dFitFunctionChanged = @"OR1dFitFunctionChanged";
 			fitParamNames	= [[aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputParametersNames",nil] retain];
 			fitParamErrors  = [[aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputErrorParameters",nil] retain];
 			chiSquare		= [[aResponse nestedObjectForKey:@"Request Outputs",@"FitChiSquare",nil] retain];
+			
+			int  theMinChannel = [[aResponse nestedObjectForKey:@"Request Outputs",@"FitLowerBound",nil] intValue];
+			int  theMaxChannel = [[aResponse nestedObjectForKey:@"Request Outputs",@"FitUpperBound",nil] intValue];
 			fitValid = YES;
 			
 			NSLog(@"----------------------------------------\n");
 			NSLog(@"Fit done on %@\n",[[aPlotView window] title]);
-			NSLog(@"Channels %d to %d\n",[self minChannel],[self maxChannel]);
+			NSLog(@"Channels %d to %d\n",theMinChannel,theMaxChannel);
 			NSLog(@"Fit Equation: %@\n",[aResponse nestedObjectForKey:@"Request Outputs",@"FitEquation",nil]);
 			int n = [fitParams count];
 			int i;
@@ -326,7 +335,18 @@ NSString* OR1dFitFunctionChanged = @"OR1dFitFunctionChanged";
 			NSLog(@"Chi Square = %@\n",chiSquare);
 			s = [s stringByAppendingFormat:@"Chi Square = %.5G\n",[chiSquare floatValue]];
 			[self setFitString:s];
-			[self setFit:[aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputYValues",nil]];
+			
+			
+			NSArray* theFit			    = [aResponse nestedObjectForKey:@"Request Outputs",@"FitOutputYValues",nil];
+			NSMutableArray* theFinalFit = [NSMutableArray array];
+			for( i=0;i<theMinChannel;i++){
+				[theFinalFit addObject:[NSNumber numberWithInt:0]];
+			}
+			for(id aValue in theFit){
+				[theFinalFit addObject:aValue];
+			}
+			
+			[self setFit:theFinalFit];
 			NSLog(@"----------------------------------------\n");
 
 		}

@@ -57,8 +57,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 		if(![connectionHistory containsObject:s])[connectionHistory addObject:s];
 	}
 	if(![connectionHistory containsObject:kORCARootServiceHost])[connectionHistory addObject:kORCARootServiceHost];
-	
-	[self setHostName:[connectionHistory objectAtIndex:	hostNameIndex]];
+	if(hostNameIndex<[connectionHistory count]){
+		[self setHostName:[connectionHistory objectAtIndex:	hostNameIndex]];
+	}
     [self setSocketPort:port];
     [[self undoManager] enableUndoRegistration];
     	
@@ -197,7 +198,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 
 - (id) connectionHistoryItem:(unsigned)index
 {
-	if(connectionHistory)return [connectionHistory objectAtIndex:index];
+	if(index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
@@ -477,6 +478,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	int i;
 	for(i=0;i<padSize;i++){
 		[dataToSend appendBytes:&padByte length:1];
+	}
+	
+	if([dataToSend length] * sizeof(long) > 0x3ffff){
+		[dataToSend setLength: 0x3ffff/sizeof(long)];
 	}
 	
 	[socket writeData:dataToSend];
