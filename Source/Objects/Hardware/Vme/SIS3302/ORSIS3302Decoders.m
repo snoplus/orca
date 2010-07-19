@@ -101,7 +101,6 @@
 	
 	unsigned long lastWord = ptr[length-1];
 	if(lastWord == 0xdeadbeef){
-		//histogram the energy.... prescale by dividing by 4 so we can have a histogram of reseanable length.... have to do something better at some point
 		unsigned long energy = ptr[length - 4]; 
 		//int page = energy/kPageLength;
 		//int startPage = page*kPageLength;
@@ -113,12 +112,13 @@
             theFilterLengths = [self objectForNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
         }
         if([theFilterLengths count]>channel/2){
-            int filterLength = [[theFilterLengths objectAtIndex:channel] intValue];
+            int filterLength = [[theFilterLengths objectAtIndex:channel/2] intValue];
             if(filterLength)energy = energy/filterLength;
-            [aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
         }
         
-		
+        if(energy< 65535){
+            [aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
+		}
 		
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
 		long energyLength   = ptr[3]; //each energy value is a sum of two 
