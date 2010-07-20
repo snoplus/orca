@@ -106,6 +106,16 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     TUVMEDevice* memMapHandle;
     bool deleteHandle = false;
     bool useDMADevice = false;
+    // Quick sanity checks, this is to ensure we are actually requesting
+    // a valid address
+    if ((addressModifier == 0x29 && startAddress >= 0x10000) ||
+        (addressModifier == 0x39 && startAddress >= 0x1000000)) {
+            sprintf(aPacket->message,"error: Address modifier requested (%x) but address out of range : %x\n",
+                    addressModifier, startAddress);
+            if(reply)writeBuffer(aPacket);
+            return;
+    
+    } 
 
     if (addressSpace == kControlSpace) {
         memMapHandle = controlHandle;
