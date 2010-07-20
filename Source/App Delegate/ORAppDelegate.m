@@ -436,7 +436,8 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 - (void) closeSplashWindow
 {
 	[theSplashController close];
-	[theSplashController autorelease];
+	[theSplashController release];
+	theSplashController = nil;
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
