@@ -27,7 +27,7 @@
 
 // Address information for this unit.
 #define k1785DefaultBaseAddress 		0xee000000
-#define k1785DefaultAddressModifier 	0x39
+#define k1785DefaultAddressModifier 	0x9
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
