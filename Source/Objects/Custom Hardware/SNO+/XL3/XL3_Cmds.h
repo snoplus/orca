@@ -160,4 +160,21 @@ typedef
 	}
 XL3_Packet;
 
+typedef
+	struct {
+		uint16_t cmdID;
+		uint8_t flags;
+		uint32_t address;
+		uint32_t data;
+}
+FECCommand;
+
+// orca specific anonymous
+typedef
+	struct {
+		uint32_t numberBytesinPayload;
+		char payload[XL3_MAXPAYLOADSIZE_BYTES];
+	}
+XL3_PayloadStruct;
+
 #endif

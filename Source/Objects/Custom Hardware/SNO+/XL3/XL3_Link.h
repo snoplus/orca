@@ -18,8 +18,76 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "XL3_Cmds.h"
+
+typedef enum eXL3_ConnectStates {
+	kDisconnected,
+	kWaiting,
+	kConnected,
+	kNumStates //must be last
+}
+eXL3_CrateStates;
+
+
 @interface XL3_Link : ORGroup
 {
+	int		serverSocket;
+	int		workingSocket;
+	NSLock*		socketLock;
+	bool		needToSwap;
+	NSString*	IPNumber;
+	NSString*	crateName;
+	int		portNumber;
+	BOOL		isConnected;
+	int		connectState;
+	NSCalendarDate*	timeConnected;
 }
 
+- (id)   init;
+- (void) dealloc;
+- (void) wakeUp; 
+- (void) sleep ;	
+
+#pragma mark •••Archival
+- (id)initWithCoder:(NSCoder*)decoder;
+- (void)encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark •••Accessors
+- (void) connectSocket;
+- (void) disconnectSocket;
+- (void) connectToPort;
+- (int)  serverSocket;
+- (void) setServerSocket:(int) aSocket;
+- (int)  workingSocket;
+- (void) setWorkingSocket:(int) aSocket;
+- (bool) needToSwap;
+- (void) setNeedToSwap;
+- (int)  connectState;
+- (BOOL) isConnected;
+- (void) setIsConnected:(BOOL)aNewIsConnected;
+- (void) toggleConnect;
+- (NSCalendarDate*) timeConnected;
+- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected;
+- (NSString*) IPNumber;
+- (void) setIPNumber:(NSString*)aIPNumber;
+- (int)  portNumber;
+- (void) setPortNumber:(int)aPortNumber;
+- (NSString*) crateName;
+- (void) setCrateName:(NSString*)aCrateName;
+
+
+- (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse;
+- (void) sendCommand:(long)aCmd expectResponse:(BOOL)askForResponse;
+- (void) sendFECCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value;
+- (void) send:(XL3_Packet*)aSendPacket receive:(XL3_Packet*)aReceivePacket;
+- (void) write:(int)aSocket buffer:(XL3_Packet*)aPacket;
+- (void) read:(int)aSocket buffer:(XL3_Packet*)aPacket;
+- (void) readSocket:(int)aSocket buffer:(XL3_Packet*)aPacket;
+
 @end
+
+
+extern NSString* XL3_LinkConnectionChanged;
+extern NSString* XL3_LinkTimeConnectedChanged;
+extern NSString* XL3_LinkIPNumberChanged;
+extern NSString* XL3_LinkConnectStateChanged;

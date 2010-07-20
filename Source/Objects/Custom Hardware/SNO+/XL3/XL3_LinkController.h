@@ -18,13 +18,48 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "OrcaObjectController.h"
+
 @interface XL3_LinkController : OrcaObjectController
 {
+	IBOutlet NSButton*	lockButton;
+	//basic
+	IBOutlet NSPopUpButton* selectedRegisterPU;
+
+	//composite
+
+	//connection
+	IBOutlet NSButton*      toggleConnectButton;
+
 }	
 
 #pragma mark •••Initialization
 - (id) init;
 - (void) dealloc;
 - (void) awakeFromNib;
+- (void) setModel:(id)aModel;
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers;
+- (void) updateWindow;
+
+#pragma mark •••Interface Management
+- (void) settingsLockChanged:(NSNotification*)aNotification;
+- (void) xl3LockChanged:(NSNotification*)aNotification;
+- (void) connectStateChanged:(NSNotification*)aNote;
+- (void) selectedRegisterChanged:(NSNotification*)aNote;
+- (void) ipNumberChanged:(NSNotification*)aNote;
+- (void) linkConnectionChanged:(NSNotification*)aNote;
+
+#pragma mark •••Helper
+- (void) populatePullDown;
+
+#pragma mark •••Actions
+- (IBAction) lockAction:(id)sender;
+//basic
+- (IBAction) basicSelectedRegisterAction:(id)sender;
+//composite
+//connection
+- (IBAction) toggleConnectAction:(id)sender;
 
 @end

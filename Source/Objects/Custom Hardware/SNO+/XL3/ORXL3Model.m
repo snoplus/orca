@@ -20,26 +20,32 @@
 
 #pragma mark •••Imported Files
 #import "XL3_Cmds.h"
+#import "XL3_Link.h"
 #import "ORXL3Model.h"
-#import "ORXL1Model.h"
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
 #import "ORSNOConstants.h"
-#import "SBC_Cmds.h"
-#import "SNOCmds.h"
-#import "SBC_Link.h"
 
-@interface ORXL3Model (SBC)
-- (void) loadClocksUsingSBC:(NSData*)theData;
-- (void) loadXilinixUsingSBC:(NSData*)theData selectBits:(unsigned long) selectBits;
-- (void) xilinxLoadStatus:(ORSBCLinkJobStatus*) jobStatus;
-@end
+static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
+	{ @"SelectReg",		RESET_REG },
+	{ @"DataAvailReg",	DATA_AVAIL_REG },
+	{ @"CtrlStatReg",	XL3_CS_REG },
+	{ @"SlotMaskReg",	XL3_MASK_REG},
+	{ @"ClockReg",		XL3_CLOCK_REG},
+	{ @"HVRelayReg",	RELAY_REG},
+	{ @"XilinxReg",		XL3_XLCON_REG},
+	{ @"TestReg",		TEST_REG},
+	{ @"HVCtrlStatReg",	HV_CS_REG},
+	{ @"HVSetPointReg",	HV_SETPOINTS},
+	{ @"HVVltReadReg",	HV_VR_REG},
+	{ @"HVCrntReadReg",	HV_CR_REG},
+	{ @"XL3VMReg",		XL3_VM_REG},
+	{ @"XL3VRReg",		XL3_VR_REG}
+};
 
-@interface ORXL3Model (LocalAdapter)
-- (void) loadClocksUsingLocalAdapter:(NSData*)theData;
-- (void) loadXilinixUsingLocalAdapter:(NSData*)theData selectBits:(unsigned long) selectBits;
-- (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask;
-@end
+#pragma mark •••Definitions
+
+NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChanged";
 
 @implementation ORXL3Model
 
@@ -48,39 +54,94 @@
 - (id) init
 {
 	self = [super init];
-	[self setAddressModifier:0x29];
+	//[self setXl3Link:[[XL3_Link alloc] init]];
+	//[xl3Link setCrateName:[NSString stringWithFormat:@"XL3 crate %d", [model uniqueIdNumber] + 1]];
+	//[xl3Link setIPNumber:[guardian iPAddress]];
+	//[xl3Link setPortNumber: PORT];
+	
 	return self;
 }
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"XL3Card"]];
+	[self setImage:[NSImage imageNamed:@"XL3Card"]];
 }
-
 
 -(void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super dealloc];
+	[xl3Link release];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[super dealloc];
 }
 
-- (void) makeConnectors
+- (void) wakeUp 
 {
+	[super wakeUp];
+	[xl3Link wakeUp];
 }
 
-- (BOOL) solitaryInViewObject
+- (void) sleep 
 {
-	return YES;
+	[super sleep];
+	if (xl3Link) {
+		[xl3Link release];
+		xl3Link = nil;
+	}
+}	
+
+- (void) makeMainController
+{
+	[self linkToController:@"XL3_LinkController"];
 }
 
 #pragma mark •••Accessors
+- (NSString*) shortName
+{
+	return @"XL3";
+}
+
+- (id) controllerCard
+{
+	return self;
+}
+
+- (XL3_Link*) xl3Link
+{
+	return xl3Link;
+}
+
+- (void) setXl3Link:(XL3_Link*) aXl3Link
+{
+	[xl3Link release];
+	xl3Link = [aXl3Link retain];
+}
+
 - (void) setGuardian:(id)aGuardian
 {
 	id oldGuardian = guardian;
 	[super setGuardian:aGuardian];
+	if (guardian){
+		if (!xl3Link) {
+			xl3Link = [[XL3_Link alloc] init];
+		}
+		[xl3Link setCrateName:[NSString stringWithFormat:@"XL3 crate %d", [self uniqueIdNumber] + 1]];
+		[xl3Link setIPNumber:[guardian iPAddress]];
+		[xl3Link setPortNumber: PORT];	
+	}
 	
 	if(oldGuardian != aGuardian){
 		[oldGuardian setAdapter:nil];	//old crate can't use this card any more
+	}
+	
+	if (!guardian) {
+		[xl3Link setCrateName:[NSString stringWithFormat:@"XL3 crate ---"]];
+		[xl3Link setIPNumber:[NSString stringWithFormat:@"0.0.0.0"]];
+		[xl3Link setPortNumber:0];
+		if ([xl3Link isConnected]) {
+			[xl3Link disconnectSocket];
+		}
+		[xl3Link release];
+		xl3Link = 0;
 	}
 	[aGuardian setAdapter:self];		//our new crate will use this card for hardware access
 }
@@ -95,6 +156,37 @@
 	 object: self];
 }
 
+- (short) getNumberRegisters
+{
+	return kXl3NumRegisters;
+}
+
+- (NSString*) getRegisterName:(short) anIndex
+{
+	return reg[anIndex].regName;
+}
+
+- (int) selectedRegister
+{
+	return selectedRegister;
+}
+
+- (void) setSelectedRegister:(int)aSelectedRegister
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegister:selectedRegister];
+	
+	selectedRegister = aSelectedRegister;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelSelectedRegisterChanged object:self];
+}
+
+- (NSString*) xl3LockName
+{
+	return @"ORXL3Lock";
+}
+
+
+//cont
 - (int) slotConv
 {
     return [self slot];
@@ -125,99 +217,80 @@
 {
     self = [super initWithCoder:decoder];
     
-    [[self undoManager] disableUndoRegistration];
-	[self setSlot:					[decoder decodeIntForKey:   @"slot"]];
-	[self setAddressModifier:0x29];
+	[[self undoManager] disableUndoRegistration];
+	[self setSlot:			[decoder decodeIntForKey:	@"slot"]];
+	[self setSelectedRegister:	[decoder decodeIntForKey:	@"ORXL3ModelSelectedRegister"]];
 	
-    [[self undoManager] enableUndoRegistration];
+	[[self undoManager] enableUndoRegistration];
     
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [super encodeWithCoder:encoder];
-    [encoder encodeInt:	  [self slot]			     forKey:@"slot"];
+	[super encodeWithCoder:encoder];
+	[encoder encodeInt:selectedRegister	forKey:@"ORXL3ModelSelectedRegister"];
+	[encoder encodeInt:[self slot]		forKey:@"slot"];
 }
 
 #pragma mark •••Hardware Access
-- (void) selectCards:(unsigned long) selectBits
-{
-	[self writeToXL2Register:XL2_SELECT_REG value: selectBits]; // select the cards by writing to the XL2 REG 0 
-}
-
 - (void) deselectCards
 {
-	[self writeToXL2Register:XL2_SELECT_REG value:0UL];	//deselect the cards by writing to the XL2 REG 0
+	[[self xl3Link] sendCommand:DESELECT_FECS_ID expectResponse:YES];
 }
+
+- (void) selectCards:(unsigned long) selectBits
+{
+	//??? xl2 compatibility
+	//[self writeToXL2Register:XL2_SELECT_REG value: selectBits]; // select the cards by writing to the XL2 REG 0 
+}
+
 
 - (void) select:(ORSNOCard*) aCard
 {
+	//???xl2 compatibility
+	/*
 	unsigned long selectBits;
-	if(aCard == self)	selectBits = XL2_SELECT_XL2;
+	if(aCard == self)	selectBits = 0; //XL2_SELECT_XL2;
 	else				selectBits = (1L<<[aCard stationNumber]);
 	//NSLog(@"selectBits for card in slot %d: 0x%x\n", [aCard slot], selectBits);
 	[self selectCards:selectBits];
+	*/
 }
 
-- (void) writeToXL2Register:(unsigned long) aRegister value:(unsigned long) aValue
+- (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue
 {
-/*
-	//NSLog(@"writexl2 value: 0x%x to 0x%x\n", aValue, [self xl2RegAddress:aRegister]);
-	if (aRegister > XL2_MASK_REG) {   //Higer registers require that bit 17 be set in the XL2 select register
-		unsigned long readValue = [self xl2RegAddress:XL2_SELECT_REG];
-		if(~0x00020000UL & readValue) NSLog(@"in readFromXL2Register: changing selection mask!");
-		[[self xl1] writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
-	}
-	[[self xl1] writeHardwareRegister:[self xl2RegAddress:aRegister] value:aValue]; 		//Now write the value	
-*/
-}
-
-- (unsigned long) xl2RegAddress:(unsigned long)aRegOffset
-{
-	//return [[self guardian] registerBaseAddress] + xl2_register_offsets[aRegOffset];
-	return [[self guardian] registerBaseAddress];
-}
-
-// read bit pattern from specified register on XL2
-- (unsigned long) readFromXL2Register:(unsigned long) aRegister
-{
-	if (aRegister > XL2_MASK_REG){   //Higer registers require that bit 17 be set in the XL2 select register
-		unsigned long readValue = [self xl2RegAddress:XL2_SELECT_REG];
-		if(~0x00020000UL & readValue) NSLog(@"in readFromXL2Register: changing selection mask!");
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
-	}
-	
-	// Now read the value
-	return  [self  readHardwareRegister:[self xl2RegAddress:aRegister]]; 	
-}
-
-//call thrus for the Fec hardware access
-- (void) writeHardwareRegister:(unsigned long) anAddress value:(unsigned long) aValue
-{
-	//[[self xl1] writeHardwareRegister:anAddress value:aValue];
+	// add FEC bit?
+	unsigned long xl3Address = regAddress + WRITE_REG;
+	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 }
 
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress
 {
-	//return [[self xl1] readHardwareRegister:regAddress];
-	return 0;
+	unsigned long xl3Address = regAddress + READ_REG;
+	unsigned long aValue = 0UL;
+	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	return aValue;
+}
+
+- (void) writeHardwareMemory:(unsigned long) memAddress value:(unsigned long) aValue
+{
+	unsigned long xl3Address = memAddress + WRITE_MEM;
+	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 }
 
 - (unsigned long) readHardwareMemory:(unsigned long) memAddress
 {
-	unsigned long aValue=0;
-/*
-	[[[self xl1] adapter] readLongBlock:&aValue
-			    atAddress:memAddress
-			    numToRead:1
-			   withAddMod:0x09
-			usingAddSpace:0x01];
-*/	
+	//FEC bit again
+	unsigned long xl3Address = memAddress + READ_MEM;
+	unsigned long aValue = 0UL;
+	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 	return aValue;
 }
 
 
+
+//multi command calls
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern
 {
 	//return [[self xl1] writeHardwareRegisterCmd:aRegister value:aBitPattern];
@@ -240,13 +313,16 @@
 {
 	//[[self xl1] executeCommandList:aList];		
 }
+
+
 #pragma mark •••Composite HW Functions
 
 - (void) reset
 {
 	@try {
 		[self deselectCards];
-		unsigned long readValue = [self readFromXL2Register: XL2_CONTROL_STATUS_REG];
+		//unsigned long readValue = 0; //[self readFromXL2Register: XL2_CONTROL_STATUS_REG];
+/*
 		if (readValue & XL2_CONTROL_DONE_PROG) {
 			NSLog(@"XilinX code found in the crate, keeping it.\n");
 			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_DONE_PROG]; 
@@ -259,7 +335,7 @@
 			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_CRATE_RESET];
 			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: 0UL];
 		}
-
+*/
 		[self deselectCards];
 		
 	}
@@ -270,392 +346,5 @@
 	
 }
 
-- (BOOL) adapterIsSBC
-{
-	//return [[[self xl1] adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")];
-	return FALSE;
-}
-
-- (void) loadTheClocks
-{
-	/*
-	NSData* theData = [[self xl1] clockFileData];	// load the entire content of the file
-	if([self adapterIsSBC])	[self loadClocksUsingSBC:theData];
-	else			[self loadClocksUsingLocalAdapter:theData];
-	 */
-}
-
-- (void) loadTheXilinx:(unsigned long) selectBits
-{
-	/*
-	NSData* theData = [[self xl1] xilinxFileData];	// load the entire content of the file
-	if([self adapterIsSBC])	[self loadXilinixUsingSBC:theData selectBits:selectBits];
-	else			[self loadXilinixUsingLocalAdapter:theData selectBits:selectBits];
-	*/
-}
-
 @end
 
-@implementation ORXL3Model (SBC)
-- (void) loadClocksUsingSBC:(NSData*)theData
-{
-	
-	NSLog(@"Sending Clock file\n");
-	
-	long errorCode = 0;
-	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kSNO;
-	aPacket.cmdHeader.cmdID					= kSNOXL2LoadClocks;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOXL2_ClockLoadStruct) + numLongs*sizeof(long);
-	
-	SNOXL2_ClockLoadStruct* payloadPtr		= (SNOXL2_ClockLoadStruct*)aPacket.payload;
-	payloadPtr->addressModifier				= [self addressModifier];
-	payloadPtr->xl2_select_reg				= [self xl2RegAddress:XL2_SELECT_REG];
-	payloadPtr->xl2_clock_cs_reg			= [self xl2RegAddress:XL2_CLOCK_CS_REG];
-	payloadPtr->xl2_select_xl2				= XL2_SELECT_XL2;
-	payloadPtr->xl2_master_clk_en			= XL2_MASTER_CLK_EN;
-	payloadPtr->allClocksEnabled			= XL2_MASTER_CLK_EN | XL2_MEMORY_CLK_EN | XL2_SEQUENCER_CLK_EN | XL2_ADC_CLK_EN;
-	payloadPtr->fileSize					= [theData length];
-	const char* dataPtr						= (const char*)[theData bytes];
-	//really should be an error check here that the file isn't bigger than the max payload size
-	char* p = (char*)payloadPtr + sizeof(SNOXL2_ClockLoadStruct);
-	bcopy(dataPtr, p, [theData length]);
-	
-	@try {
-		[[self sbcLink] send:&aPacket receive:&aPacket];
-		SNOXL2_ClockLoadStruct *responsePtr = (SNOXL2_ClockLoadStruct*)aPacket.payload;
-		errorCode = responsePtr->errorCode;
-		if(errorCode){
-			NSLog(@"%s\n",aPacket.message);
-			[NSException raise:@"Clock load failed" format:@""];
-		}
-		else NSLog(@"Looks like success.\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Clock load failed: %@\n",localException);
-		[NSException raise:@"XL2 Load Clocks Failed" format:@"%@",localException];
-	}
-}
-
-- (void) loadXilinixUsingSBC:(NSData*)theData selectBits:(unsigned long) selectBits
-{
-	
-	NSLog(@"Sending Xilinx file\n");
-	
-	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kSNO;
-	aPacket.cmdHeader.cmdID					= kSNOXL2LoadXilinx;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOXL2_XilinixLoadStruct) + numLongs*sizeof(long);
-	
-	SNOXL2_XilinixLoadStruct* payloadPtr	= (SNOXL2_XilinixLoadStruct*)aPacket.payload;
-	payloadPtr->addressModifier				= [self addressModifier];
-	payloadPtr->selectBits					= selectBits | XL2_SELECT_XL2;
-	payloadPtr->xl2_select_reg				= [self xl2RegAddress:XL2_SELECT_REG];
-	NSLog(@"sending the xilinx file to reg: 0x%08x selectBits: 0x%08x\n", payloadPtr->xl2_select_reg, payloadPtr->selectBits);
-	payloadPtr->xl2_control_status_reg		= [self xl2RegAddress:XL2_CONTROL_STATUS_REG];
-	payloadPtr->xl2_xilinx_user_control		= [self xl2RegAddress:XL2_XILINX_USER_CONTROL];
-	payloadPtr->xl2_select_xl2				= XL2_SELECT_XL2;
-	payloadPtr->xl2_control_bit11			= XL2_CONTROL_BIT11;
-	payloadPtr->xl2_xlpermit				= XL2_XLPERMIT;
-	payloadPtr->xl2_enable_dp				= XL2_ENABLE_DP;
-	payloadPtr->xl2_disable_dp				= XL2_DISABLE_DP;;
-	payloadPtr->xl2_control_clock			= XL2_CONTROL_CLOCK;
-	payloadPtr->xl2_control_data			= XL2_CONTROL_DATA;
-	payloadPtr->xl2_control_done_prog		= XL2_CONTROL_DONE_PROG;
-	payloadPtr->fileSize					= [theData length];
-	
-	const char* dataPtr						= (const char*)[theData bytes];
-	//really should be an error check here that the file isn't bigger than the max payload size
-	char* p = (char*)payloadPtr + sizeof(SNOXL2_XilinixLoadStruct);
-	bcopy(dataPtr, p, [theData length]);
-	
-	@try {
-		//launch the load job. The response will be a job status record
-		[[self sbcLink] send:&aPacket receive:&aPacket];
-		SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
-		long running = responsePtr->running;
-		if(running){
-			NSLog(@"Xinlinx load in progress on the SBC.\n");
-			[[self sbcLink] monitorJobFor:self statusSelector:@selector(xilinxLoadStatus:)];
-		}
-//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
-//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
-//		}
-//		else NSLog(@"Looks like success.\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Xilinx load failed. %@\n",localException);
-		[NSException raise:@"XL2 Load Xilinix Failed" format:@"%@",localException];
-	}
-}
-
-- (void) xilinxLoadStatus:(ORSBCLinkJobStatus*) jobStatus
-{
-	if(![jobStatus running]){
-		NSLog(@"%@\n",[jobStatus message]);
-	}
-}
-
-@end
-
-@implementation ORXL3Model (LocalAdapter)
-- (void) loadClocksUsingLocalAdapter:(NSData*)theData
-{
-	//-------------- variables -----------------
-	short 	theOffset = 0;	
-	unsigned long writeValue;
-	//------------------------------------------
-	BOOL selectOK = NO;
-	@try {
-		
-		NSData* theData; // = [[self xl1] clockFileData];	// load the entire content of the file
-		char* charData = (char*)[theData bytes];		// high in the heap and then lock it before dereferencing
-		
-		[self select:self];
-		selectOK = YES;
-		
-		// Enable master clock 
-//		[self writeToXL2Register:XL2_CLOCK_CS_REG value:XL2_MASTER_CLK_EN];
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:XL2_MASTER_CLK_EN];
-		
-		int j;
-		for(j = 1; j<=3; j++){			// there are three clocks, Memory, Sequencer and ADC
-			
-			// skip the comment line
-			while ( *charData != '\r' ) charData++;
-			
-			charData++;
-			
-			// the first field has to be a ONE or a ZERO
-			if ( ( *charData != '1') && ( *charData != '0')) {	
-				[NSException raise:@"Bad Clock File" format:@"Invalid first characer in clock file"];
-			}
-			int i;
-			for (i = 1; i<=4; i++){		// there are four lines of data per clock
-				while ( *charData != '\r' ){    
-					
-					writeValue = XL2_MASTER_CLK_EN;	// keep the master clock enabled
-					if( *charData == '1' ){
-						writeValue |= (1UL<< (1 + theOffset));
-					}
-					charData++;
-					
-					//[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
-					[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:writeValue];
-					
-					if (theOffset == 0)	writeValue += 1;
-					else				writeValue |= (1UL << theOffset);
-					
-					//[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
-					[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:writeValue];
-					
-				}
-				
-				charData++;
-			}
-			theOffset += 4;
-		}
-		
-		// keep the master clock enabled and enable all three clocks
-		writeValue = XL2_MASTER_CLK_EN | XL2_MEMORY_CLK_EN | XL2_SEQUENCER_CLK_EN | XL2_ADC_CLK_EN;	
-		//[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:writeValue];
-		
-		[self deselectCards];
-		NSLog(@"loaded the clock file\n");
-	}
-	@catch(NSException* localException) {
-		if(selectOK)[self deselectCards];
-		NSLog(@"Could not load the clock file!\n");	
-		[NSException raise:@"XL2 Load Clocks Failed" format:@"%@",localException];
-	}
-}
-
-
-- (void) loadXilinixUsingLocalAdapter:(NSData*)theData selectBits:(unsigned long) selectBits
-{
-	
-	//--------------------------- The file format as of 4/17/96 -------------------------------------
-	//
-	// 1st field: Beginning of the comment block -- /
-	//			  If no backslash then you will get an error message and Xilinx load will abort
-	// Now include your comment.
-	// The comment block is delimited by another backslash.
-	// If no backslash at the end of the comment block then you will get error message.
-	//
-	// After the comment block include the data in ACSII binary.
-	// No spaces or other characters in between data. It will complain otherwise.
-	//
-	//----------------------------------------------------------------------------------------------
-	
-	unsigned long bitCount		= 0UL;
-	unsigned long writeValue	= 0UL;
-	unsigned long mc_SelectBits	= 0;						
-	Boolean firstPass			= TRUE;
-	BOOL selectOK = NO;
-	
-	@try {
-		
-		// Load the data from the Xilinx File
-		NSData* theData; // = [[self xl1] xilinxFileData];	// load the entire content of the file
-		char*   charData = (char*)[theData bytes];
-		unsigned long length = [theData length];
-		unsigned long index = length; 
-		
-		// select the mother cards in the SNO Crate
-		//int card_index;
-		//for (card_index = 0; card_index < kNumSNOCards ; card_index++){
-			//TBD Make select mask based on old criteria
-			//if(    ( theConfigDB -> MCPresent(its_SC_Number,card_index) )
-			//   && ( theConfigDB -> SlotOnline(its_SC_Number,card_index) ) ){
-			
-			// build the bit pattern			
-			//mc_SelectBits |= ( 1UL << 8);
-			
-			//}
-		//}	
-		mc_SelectBits = selectBits | XL2_SELECT_XL2;
-		[self selectCards:mc_SelectBits];
-		selectOK = YES;
-		// make sure that the XL2 DP bit is set low and bit 11 (xilinx active) is high -- 
-		// this is not yet sent to the MB
-		writeValue = XL2_CONTROL_BIT11;	
-		//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
-		
-		// This seems to fix the xilinx reprogramming problem with the Power PC
-		[ORTimer delay:.200];   // doubled MAH 01/18/00
-		
-		// now toggle this on the MB and turn on the XL2 xilinx load permission bit
-		
-		// DO NOT USE CXL2_Secondary_Reg_Access here unless you retain the state
-		// of the select bits in register zero!!!!		
-		// !!! the next write resets the selectBits !!! to be corrected...
-		writeValue = XL2_XLPERMIT | XL2_ENABLE_DP;
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_XILINX_USER_CONTROL] value:writeValue];
-		//[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
-		//		Wait(100);   // 100 msec delay  QRA 1/18/98
-		// This seems to fix the xilinx reprogramming problem with the Power PC
-		[ORTimer delay:.200];   // doubled MAH 01/18/00
-		
-		// turn off the DP bit but keep 
-		writeValue = XL2_XLPERMIT | XL2_DISABLE_DP;
-		//[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_XILINX_USER_CONTROL] value:writeValue];
-		
-		// set  bit 11 high, bit 10 high
-		writeValue = XL2_CONTROL_BIT11 | XL2_CONTROL_CLOCK;
-		//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
-		
-		[ORTimer delay:.200];   // doubled MAH 01/18/00
-		
-		//unsigned long theDelay = theConfigDB->getXiLinxLoadDelay(its_SC_Number); 
-		unsigned long theDelay = 40000; //nSec
-		int i;
-		for (i = 1;i < index;i++){
-			
-			if ( (firstPass) && (*charData != '/') ){
-				[NSException raise:@"Bad Xilinx File" format:@"Invalid first characer in xilinx file"];
-			}
-			
-			if (firstPass){
-				charData++;							// for the first backslash
-				i++;  									// need to keep track of i
-				
-				while(*charData++ != '/'){
-					
-					i++;
-					if ( i>index ){
-						[NSException raise:@"Bad Xilinx File" format:@"Comment block not delimited by a backslash"];
-					}
-				}
-			}
-			
-			firstPass = FALSE;
-			
-			// strip carriage return, tabs
-			if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
-				charData++;
-			}
-			else {
-				bitCount++;
-				
-				if ( *charData == '1' ) {
-					writeValue = XL2_CONTROL_BIT11 | XL2_CONTROL_DATA;	// bit set in data to load
-				}
-				else if ( *charData == '0' ) {
-					writeValue = XL2_CONTROL_BIT11;						// bit not set in data
-				}
-				else {
-					[NSException raise:@"Bad Xilinx File" format:@"Invalid character in Xilinx file"];
-				}
-				charData++;	
-				
-				//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue | XL2_CONTROL_CLOCK];	// changed PMT 1/17/98 to match Penn code
-				[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue | XL2_CONTROL_CLOCK];
-				[ORTimer delayNanoseconds:theDelay];
-				
-				// toggle clock high
-				//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue]; // changed PMT 1/17/98 to match Penn code
-				[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
-				[ORTimer delayNanoseconds:theDelay];
-			}
-		}
-		//Wait(100);   // 100 msec delay
-		[ORTimer delay:.200];// doubled MAH 01/18/00
-		
-		// QRA :5/31/97 -- do this before reading the DON_PROG bit. Xilinx Load on our
-		// system now works. Why this should make any diferrence is a puzzle. 
-		// More Changes, RGV, PW : turn off XLPERMIT & clear this register
-		writeValue = 0UL;
-		//[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
-		[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
-		
-		[ORTimer delay:.200];// added MAH 01/18/00
-		
-		if(![self checkXlinixLoadOK:XL2_SELECT_XL2]){
-			NSLog(@"Xilinx load failed XL2! (Status bit checked twice)");
-		}
-		else NSLog(@"looks like a successful Xilinx load\n");
-		
-		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG];	//BLW 10/31/02-set bit 11 low, similar to previous version
-		
-		// now deselect all mother cards
-		[self deselectCards];
-		
-	}
-	@catch(NSException* localException) {
-		if(selectOK)[self deselectCards];
-		NSLog(@"Could not load the clock file!\n");	
-		[NSException raise:@"XL2 Load Clocks Failed" format:@"%@",localException];
-	}	
-	
-}
-
-- (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask
-{
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG];
-	[self selectCards:aSelectionMask];
-	
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_BIT11];
-	// More Changes, PW, RGV
-	// check to see if the Xilinx was loaded properly 
-	// read the bit 8, this should be high if the Xilinx was loaded
-	unsigned long readValue = [self readFromXL2Register:XL2_CONTROL_STATUS_REG];
-	
-	if (!(readValue & XL2_CONTROL_DONE_PROG)){	
-		[ORTimer delay:.1];
-		readValue = [self readFromXL2Register:XL2_CONTROL_STATUS_REG];
-		if (!(readValue & XL2_CONTROL_DONE_PROG)){	
-			return false;
-		}
-	}
-	
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG]; // set bit 11 low
-	return true;
-}
-
-@end
