@@ -426,7 +426,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 785 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 785%@ (Slot %d) ",modelType==0?@"":@"N",[self slot]];
 }
 
 - (unsigned short) threshold:(unsigned short) aChnl

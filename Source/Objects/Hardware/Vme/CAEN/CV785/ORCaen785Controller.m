@@ -105,6 +105,7 @@
 		[thresholdB setEnabled:NO];
 		[onlineMaskMatrixB setEnabled:NO];
 	}
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
 #pragma mark ***Interface Management - Module specific
