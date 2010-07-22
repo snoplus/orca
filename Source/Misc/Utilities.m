@@ -332,7 +332,7 @@ kern_return_t getMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8
 																 kCFAllocatorDefault,
 																 0);
             if (MACAddressAsCFData) {
-                CFShow(MACAddressAsCFData); // for display purposes only; output goes to stderr
+                //CFShow(MACAddressAsCFData); // for display purposes only; output goes to stderr
                 
                 // Get the raw bytes of the MAC address from the CFData
                 CFDataGetBytes(MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), MACAddress);
