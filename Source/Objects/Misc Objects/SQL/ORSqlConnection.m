@@ -80,6 +80,32 @@
 	return mConnection!=nil;
 }
 
+- (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord
+{
+	@synchronized(self){
+		if(!mConnection){
+			mConnection = mysql_init (NULL);
+			if(mConnection){
+				
+				if (mysql_real_connect (mConnection,			[aHostName UTF8String], 
+										[aUserName UTF8String], [aPassWord UTF8String],
+										NULL, 0, NULL, 0) == nil){
+					NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (mConnection));
+					NSLog(@"Error: (%s)\n",mysql_error (mConnection));
+					
+					[self disconnect];
+					return NO;
+				}
+				connected = YES;
+			}
+			else {
+				NSLog(@"ORSql: mysql_init() failed\n");
+				connected = NO;				
+			}
+		}
+	}
+	return mConnection!=nil;
+}
 
 - (void) disconnect
 {
@@ -337,16 +363,14 @@
     return theResult;
 }
 
-/*
- - (BOOL)createDBWithName:(NSString *)dbName
- {
- const char	*theDBName = [dbName UTF8String];
- if ((connected) && (! mysql_create_db(mConnection, theDBName))) {
- return YES;
- }
- return NO;
- }
- 
+- (BOOL)createDBWithName:(NSString *)dbName
+{
+	if ((connected) && (![self queryString: [NSString stringWithFormat:@"create database %@",dbName]])) {
+		return YES;
+	}
+	return NO;
+}
+ /*
  - (BOOL)dropDBWithName:(NSString *)dbName
  {
  const char	*theDBName = [dbName UTF8String];

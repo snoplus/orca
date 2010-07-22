@@ -386,6 +386,20 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	sqlConnection = nil;
 }
 
+- (void) makeDB
+{
+	ORSqlConnection* newConnection = [[ORSqlConnection alloc] init];	
+	@try {
+		if([newConnection connectToHost:hostName userName:userName passWord:password]){
+			if([newConnection isConnected]){
+				[newConnection createDBWithName:@"ORCATest"];
+			}
+		}
+	}
+	@catch (NSException* e){
+	}
+}
+
 @end
 
 @implementation ORSqlModel (private)

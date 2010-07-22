@@ -33,6 +33,7 @@
 - (void) dealloc;
 - (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase verbose:(BOOL)verbose;
 - (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord dataBase:(NSString*)aDataBase;
+- (BOOL) connectToHost:(NSString*)aHostName userName:(NSString*)aUserName passWord:(NSString*)aPassWord;
 - (void) disconnect;
 - (BOOL) selectDB:(NSString *) dbName;
 - (NSString*) getLastErrorMessage;
@@ -52,7 +53,7 @@
 - (NSString*)  serverInfo;
 - (NSNumber*)  protoInfo;
 - (ORSqlResult*) listProcesses;
-//- (BOOL)createDBWithName:(NSString *)dbName;
+- (BOOL)createDBWithName:(NSString *)dbName;
 //- (BOOL)dropDBWithName:(NSString *)dbName;
 - (BOOL) killProcess:(unsigned long) pid;
 @end

@@ -83,6 +83,7 @@
                      selector : @selector(connectionValidChanged:)
                          name : ORSqlConnectionValidChanged
                        object : nil];
+	
     [notifyCenter addObserver : self
                      selector : @selector(stealthModeChanged:)
                          name : ORSqlModelStealthModeChanged
@@ -152,7 +153,10 @@
 }
 
 #pragma mark ¥¥¥Actions
-
+- (void) makeDBAction:(id)sender
+{
+	[model makeDB];	
+}
 - (void) stealthModeAction:(id)sender
 {
 	[model setStealthMode:[sender intValue]];	
