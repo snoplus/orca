@@ -417,7 +417,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	configStruct->card_info[index].deviceSpecificData[0] = [self getAddressOffset:[self getStatusRegisterIndex:1]];
 	configStruct->card_info[index].deviceSpecificData[1] = [self getAddressOffset:[self getStatusRegisterIndex:2]];
 	configStruct->card_info[index].deviceSpecificData[2] = [self getDataBufferSize]/sizeof(long);
-	configStruct->card_info[index].deviceSpecificData[3] = [self baseAddress] + [self getBufferOffset];
+	configStruct->card_info[index].deviceSpecificData[3] = [self getBufferOffset];
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 	return index+1;

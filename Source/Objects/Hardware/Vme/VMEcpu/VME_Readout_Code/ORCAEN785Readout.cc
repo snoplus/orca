@@ -10,13 +10,13 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
     /* 1: statusTwo register                          */
     /* 2: fifo buffer size (in longs)                 */
     /* 3: fifo buffer address                         */
-    uint16_t statusOne, statusTwo;
+    uint16_t statusOne;//, statusTwo;
     int32_t result;
 	uint32_t dataId            = GetHardwareMask()[0];
 	uint32_t locationMask      = ((GetCrate() & 0x01e)<<21) | 
                                     ((GetSlot() & 0x0000001f)<<16);
     uint32_t statusOneAddress  = GetBaseAddress() + GetDeviceSpecificData()[0];
-    uint32_t statusTwoAddress  = GetBaseAddress() + GetDeviceSpecificData()[1];
+    //uint32_t statusTwoAddress  = GetBaseAddress() + GetDeviceSpecificData()[1];
     uint32_t fifoAddress       = GetDeviceSpecificData()[3];
 	
 	//read the states
@@ -30,20 +30,21 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
         return false; 
     }
 	
-	result = VMERead(statusTwoAddress,
-                     0x39,
-                     sizeof(statusTwo),
-                     statusTwo);
-    if (result != sizeof(statusTwo)) {
-        LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
-        return false; 
-    }
+	//result = VMERead(statusTwoAddress,
+    //                 0x39,
+    //                 sizeof(statusTwo),
+    //                 statusTwo);
+    //if (result != sizeof(statusTwo)) {
+    //    LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
+    //    return false; 
+   //}
 	
-	uint8_t bufferIsNotBusy =  !((statusOne & 0x0004) >> 2);
+	//uint8_t bufferIsNotBusy =  !((statusOne & 0x0004) >> 2);
     uint8_t dataIsReady     =  statusOne & 0x0001;
-    uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
+   // uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
 	
-    if ((bufferIsNotBusy && dataIsReady) || bufferIsFull) {
+    //if ((bufferIsNotBusy && dataIsReady) || bufferIsFull) {
+	if (dataIsReady) {
 		//OK, at least one data value is ready, first value read should be a header
 		uint32_t dataValue;
 		result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
