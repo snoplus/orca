@@ -36,14 +36,16 @@
 
 - (void) awakeFromNib 
 {
+	[super awakeFromNib];
 	int i;
 	for(i=0;i<16;i++){
 		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
 		[[onlineMaskMatrixB cellAtRow:i column:0] setTag:i+16];
+		[[thresholdA cellAtRow:i column:0] setTag:i];
+		[[thresholdB cellAtRow:i column:0] setTag:i+16];
 	}
-	[super awakeFromNib];
 }
-#pragma mark ¥¥¥Notifications
+#pragma mark â€¢â€¢â€¢Notifications
 //--------------------------------------------------------------------------------
 /*!\method  registerNotificationObservers
  * \brief	Register notices that we want to receive.
@@ -152,7 +154,7 @@
 - (NSString*) thresholdLockName {return @"ORCaen775ThresholdLock";}
 - (NSString*) basicLockName     {return @"ORCaen775BasicLock";}
 
-#pragma mark ¥¥¥Actions
+#pragma mark â€¢â€¢â€¢Actions
 - (void) commonStopModeAction:(id)sender
 {
 	[model setCommonStopMode:[[sender selectedCell] tag]];	

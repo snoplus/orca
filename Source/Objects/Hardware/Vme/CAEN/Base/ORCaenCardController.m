@@ -339,8 +339,8 @@
 		[[stepperA cellWithTag:chnl] setIntValue:[model threshold:chnl]];
 	}
 	else {
-		[[thresholdB cellWithTag:chnl-16] setIntValue:[model threshold:chnl]];
-		[[stepperB cellWithTag:chnl-16] setIntValue:[model threshold:chnl]];
+		[[thresholdB cellWithTag:chnl] setIntValue:[model threshold:chnl]];
+		[[stepperB cellWithTag:chnl] setIntValue:[model threshold:chnl]];
 	}
 	
 }
@@ -414,7 +414,7 @@
 {
     // NSMatrix which is aSender knows the intValue of the selected cell in the NSMatrix.
     if ([aSender intValue] != [model threshold:[[aSender selectedCell] tag]]){
-        [[[model document] undoManager] setActionName:@"Set thresholds"]; // Set name of undo.
+        [[[model document] undoManager] setActionName:@"Set thresholds"]; // Set name of undo.z
         [model setThreshold:[[aSender selectedCell] tag] threshold:[aSender intValue]]; // Set new value
     }
 }

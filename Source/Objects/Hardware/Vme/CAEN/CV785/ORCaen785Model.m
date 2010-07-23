@@ -160,9 +160,10 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return kADCOutputBufferSize;
 }
 
-- (unsigned long) getThresholdOffset
+- (unsigned long) 	getThresholdOffset:(int)aChan;
 {
-    return reg[kThresholds].addressOffset;
+	if(modelType==kModel785)return reg[kThresholds].addressOffset + (aChan * 4);
+	else					return reg[kThresholds].addressOffset + (aChan * 4);
 }
 
 - (short) getStatusRegisterIndex:(short) aRegister
@@ -240,6 +241,34 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     return dataDictionary;
 }
 
+- (void) readThreshold:(unsigned short) pChan
+{
+    
+    unsigned short		value;
+    
+    // Read the threshold
+    [[self adapter] readWordBlock:&value
+                        atAddress:[self baseAddress] + [self getThresholdOffset:pChan]
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    // Store new value
+	// [self setThreshold:pChan threshold:value];
+    
+}
+- (void) writeThreshold:(unsigned short) pChan
+{
+ 	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
+    unsigned short 	threshold = [self threshold:pChan] | kill;
+   
+    [[self adapter] writeWordBlock:&threshold
+                         atAddress:[self baseAddress] + [self getThresholdOffset:pChan]
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
 - (void) flushBuffer
 {
 	//return; //temp.......
@@ -287,7 +316,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     // Set options
 
     // Set thresholds in unit
-    [self writeThresholds];
+   [self writeThresholds];
 
 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
 
@@ -434,6 +463,12 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	return [super threshold:aChnl] & 0xFF;
 }
 
+- (void) setThreshold:(unsigned short) aChnl threshold:(unsigned short) aValue
+{
+	if(aValue > 0xff)aValue=0xff;
+	[super setThreshold:aChnl threshold:aValue];
+}
+
 - (void) writeThresholds
 {
 	int i;
@@ -441,8 +476,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	for(i=0;i<n;i++){
 		int kill = ((onlineMask & (1<<i))!=0)?0x0:0x100;
 		unsigned short aValue = [self threshold:i] | kill;
+		NSLog(@"%d 0x%x 0x%x\n",i,[self getThresholdOffset:i],aValue);
 		[[self adapter] writeWordBlock:&aValue
-							 atAddress:[self baseAddress] + [self getThresholdOffset] + (i * 4)
+							 atAddress:[self baseAddress] + [self getThresholdOffset:i] 
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
@@ -472,10 +508,5 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 @end
 
-@implementation ORCaen785DecoderForCAEN : ORCaenDataDecoder
-- (NSString*) identifier
-{
-    return @"CAEN 785";
-}
-@end
+
 

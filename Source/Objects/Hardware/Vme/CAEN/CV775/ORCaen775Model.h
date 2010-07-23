@@ -106,7 +106,7 @@ enum {
 - (short) 			getNumberRegisters;
 - (unsigned long) 	getBufferOffset;
 - (unsigned short) 	getDataBufferSize;
-- (unsigned long) 	getThresholdOffset;
+- (unsigned long) 	getThresholdOffset:(int)aChan;
 - (short) 			getStatusRegisterIndex: (short) aRegister;
 - (short)			getThresholdIndex;
 - (short)			getOutputBufferIndex;
@@ -128,9 +128,3 @@ enum {
 extern NSString* ORCaen775ModelCommonStopModeChanged;
 extern NSString* ORCaen775ModelModelTypeChanged;
 extern NSString* ORCaen775ModelOnlineMaskChanged;
-
-//the decoder concrete decoder class
-@interface ORCaen775DecoderForCAEN : ORCaenDataDecoder
-{}
-- (NSString*) identifier;
-@end

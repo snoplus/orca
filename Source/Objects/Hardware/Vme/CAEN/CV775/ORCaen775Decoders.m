@@ -19,12 +19,58 @@
 //-------------------------------------------------------------
 
 #import "ORCaen775Decoders.h"
+#import "ORDataSet.h"
 
 @implementation ORCAEN775DecoderForTdc
+- (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet
+{
+    short i;
+    long* ptr = (long*) aSomeData;
+	long length = ExtractLength(ptr[0]);
+	NSString* crateKey = [self getCrateKey:ShiftAndExtract(ptr[1],21,0x0000000f)];
+	NSString* cardKey  = [self getCardKey: ShiftAndExtract(ptr[1],16,0x0000001f)];
+    for( i = 2; i < length; i++ ){
+		int dataType = ShiftAndExtract(ptr[i],24,0x7);
+		if(dataType == 0x0){
+			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
+			int chan     = [self channel:ptr[i]];
+			NSString* channelKey  = [self getChannelKey: chan];
+			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN775 QDC",crateKey,cardKey,channelKey,nil];
+        }
+    }
+    return length;
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+	long length = ExtractLength(ptr[0]);
+    NSString* title= @"CAEN775 TDC Record\n\n";
+	
+    NSString* len	=[NSString stringWithFormat: @"# TDC = %d\n",length-2];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(ptr[1] >> 21)&0x0000000f];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(ptr[1] >> 16)&0x0000001f];    
+	
+    NSString* restOfString = [NSString string];
+    int i;
+    for( i = 2; i < length; i++ ){
+		int dataType = ShiftAndExtract(ptr[i],24,0x7);
+		if(dataType == 0x0){
+			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
+			int channel  = [self channel:ptr[i]];
+			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
+        }
+    }
+	
+    return [NSString stringWithFormat:@"%@%@%@%@%@",title,len,crate,card,restOfString];               
+}
 
 - (unsigned short) channel: (unsigned long) pDataValue
 {
     return	ShiftAndExtract(pDataValue,16,0x1F);
+}
+- (NSString*) identifier
+{
+    return @"CAEN 775";
 }
 
 @end

@@ -37,12 +37,14 @@
 
 - (void) awakeFromNib 
 {
+	[super awakeFromNib];
 	int i;
 	for(i=0;i<16;i++){
 		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
 		[[onlineMaskMatrixB cellAtRow:i column:0] setTag:i+16];
+		[[thresholdA cellAtRow:i column:0] setTag:i];
+		[[thresholdB cellAtRow:i column:0] setTag:i+16];
 	}
-	[super awakeFromNib];
 }
 #pragma mark ¥¥¥Notifications
 //--------------------------------------------------------------------------------
@@ -78,10 +80,32 @@
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
-    
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self thresholdLockName]];
+  	[modelTypePU setEnabled:!runInProgress];
+  
     [resetButton setEnabled:!locked && !runInProgress];
-	[super thresholdLockChanged:aNotification];
-	[self modelTypeChanged:nil];
+	if([model modelType] == kModel785){
+		[onlineMaskMatrixB setEnabled:!lockedOrRunningMaintenance];
+		[thresholdB setEnabled:!lockedOrRunningMaintenance];
+		[stepperB setEnabled:!lockedOrRunningMaintenance];
+	}
+	else {
+		[onlineMaskMatrixB setEnabled:NO];
+		[thresholdB setEnabled:NO];
+		[stepperB setEnabled:NO];
+	}
+	[onlineMaskMatrixA setEnabled:!lockedOrRunningMaintenance];
+	[thresholdA setEnabled:!lockedOrRunningMaintenance];
+	[stepperA setEnabled:!lockedOrRunningMaintenance];
+	
+    [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
+    [thresholdReadButton setEnabled:!lockedOrRunningMaintenance]; 
+    
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
+    }
+    [thresholdLockDocField setStringValue:s];
 }
 
 - (void) onlineMaskChanged:(NSNotification*)aNotification

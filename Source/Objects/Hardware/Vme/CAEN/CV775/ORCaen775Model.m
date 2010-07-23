@@ -17,7 +17,6 @@
 //-------------------------------------------------------------
 #import "ORCaen775Model.h"
 
-
 // Address information for this unit.
 #define k775DefaultBaseAddress 		0xa00000
 #define k775DefaultAddressModifier 	0x39
@@ -190,9 +189,10 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	else							  return 16;
 }
 
-- (unsigned long) getThresholdOffset
+- (unsigned long) getThresholdOffset:(int)aChan
 {
-	return reg[kThresholds].addressOffset;
+	if(modelType==kModel775)return reg[kThresholds].addressOffset + (aChan * 2);
+	else					return reg[kThresholds].addressOffset + (aChan * 4);
 }
 
 - (short) getStatusRegisterIndex: (short) aRegister
@@ -270,11 +270,23 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 		int kill = ((onlineMask & (1<<i))!=0)?0x0:0x100;
 		unsigned short aValue = [self threshold:i] | kill;
 		[[self adapter] writeWordBlock:&aValue
-							 atAddress:[self baseAddress] + [self getThresholdOffset] + (i * 4)
+							 atAddress:[self baseAddress] + [self getThresholdOffset:i]
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
 	}
+}
+
+- (void) writeThreshold:(unsigned short) pChan
+{
+ 	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
+    unsigned short 	threshold = [self threshold:pChan] | kill;
+	
+    [[self adapter] writeWordBlock:&threshold
+                         atAddress:[self baseAddress] + [self getThresholdOffset:pChan]
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
 }
 
 - (void) setDataIds:(id)assigner
@@ -468,10 +480,4 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 @end
 
-@implementation ORCaen775DecoderForCAEN : ORCaenDataDecoder
-- (NSString*) identifier
-{
-    return @"CAEN 775 TDC";
-}
-@end
 
