@@ -24,7 +24,7 @@
 
 #define kUseTubeView 0
 #define kUseCrateView 1
-#define kNumTubes	 35*3
+#define kNumTubes	 35*2
 
 @interface MajoranaModel :  ORExperimentModel
 {

@@ -28,6 +28,7 @@
 #import "ORSegmentGroup.h"
 
 
+
 @implementation MajoranaController
 #pragma mark ¥¥¥Initialization
 -(id)init

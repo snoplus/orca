@@ -25,6 +25,7 @@
 #import "ORSegmentGroup.h"
 
 NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
+static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 @implementation MajoranaModel
 
@@ -38,6 +39,17 @@ NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
 - (void) makeMainController
 {
     [self linkToController:@"MajoranaController"];
+}
+
+- (void) makeConnectors
+{
+    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:aConnector forKey:MajoranaDbConnector];
+    [aConnector setOffColor:[NSColor brownColor]];
+    [aConnector setOnColor:[NSColor magentaColor]];
+	[ aConnector setConnectorType: 'DB O' ];
+	[ aConnector addRestrictedConnectionType: 'DB I' ]; //can only connect to DB outputs
+    [aConnector release];
 }
 
 //- (NSString*) helpURL
@@ -85,7 +97,16 @@ NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
 		}
 	}
 }
-
+- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
+{
+	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
+	
+	NSString* crateName = [theGroup segment:index objectForKey:@"kCrate"];
+	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
+	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
+	
+	return [NSString stringWithFormat:@"SIS3302,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
+}
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock
 {
