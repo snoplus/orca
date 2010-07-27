@@ -40,6 +40,9 @@
 - (id)   init;
 - (void) dealloc;
 
+#pragma mark ***Notifications
+- (void) applicationIsTerminating:(NSNotification*)aNote;
+
 #pragma mark ***Accessors
 - (BOOL) stealthMode;
 - (void) setStealthMode:(BOOL)aStealthMode;
@@ -62,6 +65,10 @@
 - (BOOL) testConnection;
 - (BOOL) connectionValid;
 - (void) disconnect;
+
+#pragma mark ***DB Creation
+- (void) makeDB;
+
 @end
 
 extern NSString* ORSqlModelStealthModeChanged;

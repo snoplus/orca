@@ -257,9 +257,9 @@
 {
     ORSqlResult*  theResult = nil;
 	@synchronized(self){
-		MYSQL_RES*	theResPtr;
+		MYSQL_RES*	theResPtr = mysql_list_dbs(mConnection, NULL);
 	
-		if (theResPtr = mysql_list_dbs(mConnection, NULL)) {
+		if (theResPtr) {
 			theResult = [[[ORSqlResult alloc]initWithResPtr: theResPtr]autorelease];
 		}	
 	}
@@ -271,9 +271,9 @@
 {
     ORSqlResult* theResult = nil;
  	@synchronized(self){
-		MYSQL_RES* theResPtr;
+		MYSQL_RES* theResPtr = mysql_list_tables(mConnection, NULL);
 	
-		if (theResPtr = mysql_list_tables(mConnection, NULL)) {
+		if (theResPtr) {
 			theResult = [[[ORSqlResult alloc] initWithResPtr: theResPtr]autorelease];
 		}
 	}
@@ -354,9 +354,9 @@
 {
     ORSqlResult* theResult = nil;
 	@synchronized(self){
-		MYSQL_RES* theResPtr;
+		MYSQL_RES* theResPtr = mysql_list_processes(mConnection);
 	
-		if (theResPtr = mysql_list_processes(mConnection)) {
+		if (theResPtr) {
 			theResult = [[[ORSqlResult alloc] initWithResPtr:theResPtr] autorelease];
 		}
 	}

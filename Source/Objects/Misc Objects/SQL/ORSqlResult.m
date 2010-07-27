@@ -559,7 +559,7 @@ NSCalendarDate		*MCPYear0000;
         [theString appendFormat:@"%@\n", [mNames objectAtIndex:i]];
         thePosition = mysql_row_tell(mResult);
         [self dataSeek:0];
-        while (theRow = [self fetchRowAsArray]) {
+        for (;(theRow = [self fetchRowAsArray]);) {
             for (i=0; i<(mNumOfFields - 1); i++) {
                 [theString appendFormat:@"%@\t", [theRow objectAtIndex:i]];
             }

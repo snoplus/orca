@@ -50,6 +50,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) postRunOptions:(NSNotification*)aNote;
 - (void) collectSegmentMap;
 - (void) collectAlarms;
+- (void) alarmPosted:(NSNotification*)aNote;
+- (void) alarmCleared:(NSNotification*)aNote;
 @end
 
 @implementation ORSqlModel
