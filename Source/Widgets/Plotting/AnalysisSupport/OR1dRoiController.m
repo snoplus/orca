@@ -31,9 +31,9 @@
 
 -(id) init
 {
-    if( self = [super init] ){
-        [NSBundle loadNibNamed: @"1dRoi" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
-    }
+    self = [super init];
+	[NSBundle loadNibNamed: @"1dRoi" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
+    
     return self;
 }
 
