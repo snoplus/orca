@@ -53,6 +53,7 @@
 
 - (NSUndoManager *)undoManager;
 - (void) connectAtStartUp;
+- (void) reConnect;
 
 #pragma mark ¥¥¥Accessors
 - (void) clearHistory;

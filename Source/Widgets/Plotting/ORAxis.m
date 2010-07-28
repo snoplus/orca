@@ -1045,19 +1045,19 @@ enum {
 
 -(id)initWithCoder:(NSCoder*)coder
 {
-    if(self = [super initWithCoder:coder]){
+	self = [super initWithCoder:coder];
 
-        if([coder allowsKeyedCoding]){
-            [self setAttributes:[coder decodeObjectForKey:@"ORAxisAttributes"]];
-            [self setLabelAttributes:[coder decodeObjectForKey:@"ORAxisLabelAttributes"]];
-        }
-        else {
-            [self setAttributes:[[[coder decodeObject] mutableCopy]autorelease]];
-            [self setLabelAttributes:[[[coder decodeObject] mutableCopy]autorelease]];
-        }
-        if(!attributes) [self setDefaults];
-        [self calcFrameOffsets];
-    }
+	if([coder allowsKeyedCoding]){
+		[self setAttributes:[coder decodeObjectForKey:@"ORAxisAttributes"]];
+		[self setLabelAttributes:[coder decodeObjectForKey:@"ORAxisLabelAttributes"]];
+	}
+	else {
+		[self setAttributes:[[[coder decodeObject] mutableCopy]autorelease]];
+		[self setLabelAttributes:[[[coder decodeObject] mutableCopy]autorelease]];
+	}
+	if(!attributes) [self setDefaults];
+	[self calcFrameOffsets];
+    
     return self;
 }
 
@@ -1318,7 +1318,7 @@ enum {
         
     }
     else {
-        if (pinned^invertPin | dragFlag) {
+        if ((pinned^invertPin) | dragFlag) {
             if (pinPix != pix) {
                 //newMin = (pinVal*pix - mGrabValue*pinPix) / (pix - pinPix);
 				newMin = [self minValue];
