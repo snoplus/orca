@@ -76,10 +76,10 @@
 						 name: ORFilterScriptChanged 
 					   object: model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(nameChanged:)
-                         name : ORFilterNameChanged
-						object: model];	
+ //   [notifyCenter addObserver : self
+ //                    selector : @selector(nameChanged:)
+ //                        name : ORFilterNameChanged
+//						object: model];	
 
     [notifyCenter addObserver : self
                      selector : @selector(textDidChange:)

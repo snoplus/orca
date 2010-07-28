@@ -55,6 +55,9 @@
 - (id)			init;
 - (void) 		updateWindow;
 
+#pragma mark ***Notifications
+- (void) writeToMonitor: (NSNotification*) aNote;
+
 #pragma mark ¥¥¥Actions
 - (IBAction) 	query: (id) aSender;
 - (IBAction) 	write: (id) aSender;

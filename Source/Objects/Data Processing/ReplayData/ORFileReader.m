@@ -22,6 +22,7 @@
 #import "ORFileReader.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataProcessing.h"
+#import "ORReplayDataModel.h"
 
 #define kAmountToRead 5*1024*1024
 

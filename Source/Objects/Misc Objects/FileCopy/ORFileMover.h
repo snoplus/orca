@@ -92,5 +92,7 @@ extern NSString* ORFileMoverPercentDoneChanged;
 
 - (void)ourDelegate;
 - (BOOL)shouldRemoveFile:(NSString*)aFile;
+- (void) fileMoverPercentChanged: (NSNotification*)aNote;
+- (void) fileMoverIsDone:(NSNotification*)aNote;
 
 @end

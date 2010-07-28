@@ -80,6 +80,7 @@ NSString* ORGretina4ModelSetEnableStatusChanged				= @"ORGretina4ModelSetEnableS
 - (void) setProgressStateOnMainThread:(NSString*)aState;
 - (void) updateDownLoadProgress;
 - (void) downloadingMainFPGADone;
+- (void) fpgaDownLoadThread:(NSData*)dataFromFile;
 @end
 
 
@@ -1537,7 +1538,7 @@ static struct {
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Enabled"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setEnable:withValue:) getMethod:@selector(enable:)];
+    [p setSetMethod:@selector(setEnabled:withValue:) getMethod:@selector(enabled:)];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -1582,7 +1583,7 @@ static struct {
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Data Length"];
     [p setFormat:@"##0" upperLimit:0x3FF lowerLimit:1 stepSize:1 units:@"ns"];
-    [p setSetMethod:@selector(setDataLengthConverted:withValue:) getMethod:@selector(dataLengthConverted:)];
+    [p setSetMethod:@selector(setTraceLengthConverted:withValue:) getMethod:@selector(traceLengthConverted:)];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
