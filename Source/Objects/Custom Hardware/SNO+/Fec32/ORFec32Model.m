@@ -1200,12 +1200,14 @@ const short kVoltageADCMaximumAttempts = 10;
 	NSDate* lastTime = cmosCountTimeStamp;
 	NSDate* thisTime = [NSDate date];
 	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
-	
-	if (calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff)) {
+	float sampleFreq;
+    
+	if (calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff) || timeDiff==0) {
 		calcRates = 0;	// don't calculate rates if time diff is silly
 	}
-	
-	float sampleFreq = 1 / (thisTime - lastTime);
+	if(timeDiff){
+        sampleFreq = 1 / timeDiff;
+    }
 	
 	[cmosCountTimeStamp release];
 	cmosCountTimeStamp = [thisTime retain];
