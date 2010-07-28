@@ -179,6 +179,7 @@ typedef struct Channels {
 - (void)    syncDataIdsWith:(id)anotherShaper;
 - (void) incEventCount:(int)aChannel;
 - (unsigned long) eventCount:(int)aChannel;
+- (void)	takeDataTask:(id)userInfo;
 
 #pragma mark ***Commands
 - (void) 	setOscFromModel;

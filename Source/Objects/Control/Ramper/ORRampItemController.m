@@ -26,6 +26,10 @@
 #import "ORAxis.h"
 #import "ORHWWizard.h"
 
+@interface ORRamperController (private)
+- (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
+
 @implementation ORRampItemController
 - (id) initWithNib:(NSString*)aNibName
 {
@@ -366,14 +370,6 @@
     NSBeginAlertSheet(@"Panic!",@"Cancel",@"YES/Do Panic",nil,[owner window],self,@selector(sheetDidEnd:returnCode:contextInfo:),nil,nil, @"REALLY Panic this parameter to zero?\nIs this really what you want?");
 }
 
-- (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode == NSAlertAlternateReturn){
-		[model panic];
-	}
-}
-
-
 - (IBAction) targetSelectionAction:(id)sender
 {
 	[model setTargetName:[sender titleOfSelectedItem]];
@@ -426,6 +422,13 @@
 		[[owner window] endEditingFor:nil];		
 	}
 }
+@end
 
-
+@implementation ORRampItemController (private)
+- (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+		[model panic];
+	}
+}
 @end

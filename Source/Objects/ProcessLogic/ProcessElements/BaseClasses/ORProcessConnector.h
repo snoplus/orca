@@ -37,5 +37,8 @@
 - (NSImage*) stateOffImage;
 - (void) setStateOffImage:(NSImage *)anImage;
 
+@end
 
+@interface NSObject (ORProcessConnector)
+- (float) evalAndReturnAnalogValue;
 @end

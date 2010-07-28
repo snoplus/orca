@@ -49,4 +49,6 @@
 - (void) setTotalLength:(unsigned)aLength;
 - (void) setLengthDecoded:(unsigned)aLength;
 - (void) setHeader:(id)aHeader;
+- (void) checkStatus;
+
 @end

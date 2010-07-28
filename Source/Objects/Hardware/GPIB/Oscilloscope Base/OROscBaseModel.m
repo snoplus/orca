@@ -972,6 +972,11 @@ NSString*	OROscChnl								= @"Osc Chnl";
 	
 }
 
+- (void)	takeDataTask:(id)userInfo
+{
+	//subclass responsibility
+}
+
 #pragma mark ***Overridden methods
 //--------------------------------------------------------------------------------
 // Routines which must be overridden in derived class.

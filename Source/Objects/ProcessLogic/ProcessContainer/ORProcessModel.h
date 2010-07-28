@@ -82,6 +82,7 @@
 @interface OrcaObject (ProcessModel)
 - (void) setUseAltView:(BOOL)aState; 
 - (void) askForProcessID:(id)fromObj;
+- (BOOL) isTrueEndNode;
 @end
 
 extern NSString* ORProcessModelUseAltViewChanged;

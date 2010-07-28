@@ -79,6 +79,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (float)	extractFloat:(NSString*)aCommand;
 - (NSString*) extractString:(NSString*)aCommand;
 - (void) clearAlarms;
+- (void) pollPressures;
 @end
 
 @implementation ORPDcuModel
@@ -146,13 +147,6 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
 	}
-}
-
-- (void) pollPressures
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
-	[self updateAll];
-	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
 }
 
 - (float) pressureScaleValue
@@ -733,5 +727,10 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 		[self processOneCommandFromQueue];	 //do the next command in the queue
 	}
 }
-
+- (void) pollPressures
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
+	[self updateAll];
+	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
+}
 @end

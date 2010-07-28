@@ -67,6 +67,8 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (NSMutableDictionary*) miscAttributesForKey:(NSString*)aKey;
 - (void) populatePopups;
+- (void) reloadObjects:(NSNotification*)aNote;
+- (void) ramperRunningChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) rampTargetAction:(id)sender;
@@ -82,5 +84,4 @@
 - (IBAction) startStop:(id)sender;
 - (IBAction) panic:(id)sender;
 - (void)     endEditing;
-
 @end

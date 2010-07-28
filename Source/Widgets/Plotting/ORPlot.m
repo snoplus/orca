@@ -26,11 +26,10 @@
 @implementation ORPlot
 - (id) initWithTag:(int)aTag andDataSource:(id)aDataSource
 {
-    if ( self = [super init] ) {
-        [self setDataSource:aDataSource];
-        [self setTag:aTag];
-		[self setDefaults];
-    }
+    self = [super init];
+	[self setDataSource:aDataSource];
+	[self setTag:aTag];
+	[self setDefaults];
     return self;
 }
 

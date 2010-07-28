@@ -29,6 +29,10 @@
 
 #define ORHardwareWizardItem @"ORHardwareWizardItem"
 
+@interface ORRamperController (private)
+- (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
+
 @implementation ORRamperController
 - (id) init
 {
@@ -390,7 +394,9 @@
 {
     NSBeginAlertSheet(@"Global Panic!",@"Cancel",@"YES/Do Panic",nil,[self window],self,@selector(sheetDidEnd:returnCode:contextInfo:),nil,nil, @"REALLY Panic all enabled parameters to zero?\nIs this really what you want?");
 }
+@end
 
+@implementation ORRamperController (private)
 - (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode == NSAlertAlternateReturn){
