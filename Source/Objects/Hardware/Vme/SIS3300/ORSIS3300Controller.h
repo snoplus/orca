@@ -113,6 +113,7 @@
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
+- (void) updatePlot;
 
 #pragma mark •••Actions
 - (IBAction) csrAction:(id)sender;

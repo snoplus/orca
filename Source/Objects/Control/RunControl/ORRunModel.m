@@ -1871,5 +1871,9 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 	return YES;
 }
 
+- (BOOL) preRunChecks
+{
+	return YES;
+}
 
 @end

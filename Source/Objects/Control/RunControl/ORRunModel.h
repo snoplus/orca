@@ -236,6 +236,7 @@
 @interface NSObject (SpecialDataTakingFinishUp)
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (BOOL) doneTakingData;
+- (BOOL) preRunChecks;
 @end
 
 extern NSString* ORRunModelShutDownScriptStateChanged;

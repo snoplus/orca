@@ -27,6 +27,8 @@
 
 @interface ORRunController (private)
 - (void) populatePopups;
+- (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 
 @implementation ORRunController
@@ -680,13 +682,6 @@
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 }
-- (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setDirName:dirName];
-    }
-}
 
 - (IBAction) definitionsFileAction:(id)sender
 {
@@ -713,23 +708,6 @@
                        didEndSelector:@selector(definitionsPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 }
-
-
-- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setDefinitionsFilePath:[[sheet filenames] objectAtIndex:0]];
-        if(![model readRunTypeNames]){
-            NSLogColor([NSColor redColor],@"Unable to parse <%@> as a run type def file.\n",[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]);
-            NSLogColor([NSColor redColor],@"File must be list of items of the form: itemNumber,itemName\n");	
-            [model setDefinitionsFilePath:nil];
-        }
-        else {
-            [self definitionsFileChanged:nil];
-        }
-    }
-}
-
 
 - (IBAction) runTypeAction:(id)sender
 {
@@ -875,6 +853,27 @@
 	[self selectShutDownScript:shutDownScripts];
 
 	[[model undoManager] enableUndoRegistration];
+}
+- (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
+        [model setDirName:dirName];
+    }
+}
+- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setDefinitionsFilePath:[[sheet filenames] objectAtIndex:0]];
+        if(![model readRunTypeNames]){
+            NSLogColor([NSColor redColor],@"Unable to parse <%@> as a run type def file.\n",[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]);
+            NSLogColor([NSColor redColor],@"File must be list of items of the form: itemNumber,itemName\n");	
+            [model setDefinitionsFilePath:nil];
+        }
+        else {
+            [self definitionsFileChanged:nil];
+        }
+    }
 }
 
 @end
