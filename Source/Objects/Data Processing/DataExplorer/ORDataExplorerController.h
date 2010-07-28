@@ -71,11 +71,13 @@
 - (IBAction) removeItemAction:(id)sender;
 - (IBAction)cut:(id)sender;
 - (IBAction)delete:(id)sender;
+- (IBAction) doubleClick:(id)sender;
 
 #pragma mark ¥¥¥Timer Methods
 - (void) scanForNext:(id)currentDataName;
 - (void) scanForPrevious:(id)currentDataName;
 - (void) catalogAll;
+- (void) updateProgress;
 
 #pragma mark ¥¥¥Interface Management
 - (void) headerOnlyChanged:(NSNotification*)aNote;

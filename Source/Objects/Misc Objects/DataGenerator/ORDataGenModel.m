@@ -191,7 +191,7 @@
 	if(random()%500 > 495 ){
 		 
 		unsigned long data[2048];
-        data[0] = dataIdWaveform | 2048+2;
+        data[0] = dataIdWaveform | (2048+2);
         data[1] = 0; //card 0, chan 0
         [aDataPacket addLongsToFrameBuffer:data length:2];
 		int i;
@@ -203,7 +203,7 @@
 		int toggle = 0;
 		for(i=0;i<2048;i++){
 			count++;
-			data[i] = 50+(long)(a*sinf(radians) + b*sinf(2*radians)) & 0x0fffffff;
+			data[i] = (50+(long)(a*sinf(radians) + b*sinf(2*radians))) & 0x0fffffff;
 			if(i<512)data[i]  |= 0x10000000;
 			if(i<1024)data[i] |= 0x20000000;
 			if(i<1563)data[i] |= 0x40000000;
@@ -216,7 +216,7 @@
 		}
         [aDataPacket addLongsToFrameBuffer:data length:2048];
 
-        data[0] = dataIdWaveform | 2048+2;
+        data[0] = dataIdWaveform | (2048+2);
         data[1] = 0x00001000; //card 0, chan 1
         [aDataPacket addLongsToFrameBuffer:data length:2];
 		radians = 0;
