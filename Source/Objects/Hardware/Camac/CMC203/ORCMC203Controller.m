@@ -123,10 +123,10 @@
 						 name : ORRateGroupIntegrationChangedNotification
 					   object : nil];
 	
-    [notifyCenter addObserver : self
-					 selector : @selector(rateGroupChanged:)
-						 name : ORCMC203RateGroupChangedNotification
-					   object : model];
+//    [notifyCenter addObserver : self
+//					 selector : @selector(rateGroupChanged:)
+//						 name : ORCMC203RateGroupChangedNotification
+//					   object : model];
 	
     [notifyCenter addObserver : self
 					 selector : @selector(totalRateChanged:)

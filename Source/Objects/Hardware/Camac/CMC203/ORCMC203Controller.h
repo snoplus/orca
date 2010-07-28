@@ -73,6 +73,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) updateHistoPlot:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
 - (IBAction) integrationAction:(id)sender;
