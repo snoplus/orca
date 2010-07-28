@@ -45,6 +45,7 @@ NSString* ORCTITempLock = @"ORCTITempLock";
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
+- (void) pollTemps;
 @end
 
 @implementation ORCTITempModel
@@ -197,12 +198,6 @@ NSString* ORCTITempLock = @"ORCTITempLock";
 	}
 }
 
-- (void) pollTemps
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];
-	[self readTemps];
-	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
-}
 
 - (float) temperature
 {
@@ -440,5 +435,11 @@ NSString* ORCTITempLock = @"ORCTITempLock";
 	//}
 }
 
+- (void) pollTemps
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];
+	[self readTemps];
+	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
+}
 
 @end
