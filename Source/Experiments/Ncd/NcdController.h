@@ -139,6 +139,7 @@
 - (IBAction) restoreShaperThresoldsToNominal:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
+- (void) tubeSelectionChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) objectsChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;

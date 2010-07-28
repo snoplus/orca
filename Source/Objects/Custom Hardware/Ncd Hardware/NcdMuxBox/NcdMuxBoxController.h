@@ -99,6 +99,7 @@
 - (void) thresholdDacChanged:(NSNotification*)aNotification;
 - (void) thresholdAdcArrayChanged:(NSNotification*)aNotification;
 - (void) thresholdDacArrayChanged:(NSNotification*)aNotification;
+- (void) connectionChanged: (NSNotification*) aNotification;
 
 //rate page
 - (void) rateChanged:(NSNotification*)aNotification;
