@@ -98,10 +98,10 @@
                          name : ORVHQ224LModelStatusReg2Changed
 						object: model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(timeOutErrorChanged:)
-                         name : ORVHQ224LModelTimeOutErrorChanged
-						object: model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(timeOutErrorChanged:)
+//                         name : ORVHQ224LModelTimeOutErrorChanged
+//						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(actCurrentChanged:)

@@ -50,4 +50,5 @@
 
 @interface NSObject (ORVmeDaughterCard)
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard;
+- (void) calcBaseAddress;
 @end

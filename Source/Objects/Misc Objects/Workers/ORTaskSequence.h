@@ -39,6 +39,7 @@
 - (void) setTextToDelegate:(BOOL)flag;
 - (void) taskCompleted: (NSNotification*)aNote;
 - (void) taskDataAvailable:(NSNotification*)aNotification;
+- (void) movetoNextTask:(NSNotification*)aNote;
 
 @end
 

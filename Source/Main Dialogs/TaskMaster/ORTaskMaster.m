@@ -29,10 +29,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(TaskMaster);
 
 - (id) init
 {
-    if (self = [super initWithWindowNibName:@"TaskMaster"]) {
-        [self setWindowFrameAutosaveName:@"TaskMaster"];
-		[self registerNotificationObservers];
-    }
+    self = [super initWithWindowNibName:@"TaskMaster"];
+	[self setWindowFrameAutosaveName:@"TaskMaster"];
+	[self registerNotificationObservers];
     return self;
 }
 
@@ -74,16 +73,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(TaskMaster);
     NSArray* subViews   = [taskContentView subviews];
     float extraSpace         = 65;
     float totalHeightNeeded = 0;
-    NSEnumerator*   e   = [subViews objectEnumerator];
-    NSView* aView;
-    while(aView = [e nextObject]){
+    for (NSView* aView in subViews){
         totalHeightNeeded += [aView frame].size.height+5;
     }
     [taskContentView setFrameSize: NSMakeSize([taskContentView frame].size.width,totalHeightNeeded)];
 
     NSPoint origin = NSMakePoint(10,[taskContentView frame].size.height);
-    e              = [subViews objectEnumerator];
-    while(aView = [e nextObject]){
+    for (NSView* aView in subViews){
         NSRect viewRect = [aView frame];
         origin.y -= (viewRect.size.height+5);
         [aView setFrameOrigin: origin];
@@ -155,9 +151,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(TaskMaster);
 - (void) postRunningTaskList
 {
 	NSString* taskList = [NSString string];
-	NSEnumerator* e = [runningTasks objectEnumerator];
-	id aTask;
-	while(aTask = [e nextObject]){
+	for(id aTask in runningTasks){
 		taskList = [taskList stringByAppendingFormat:@"%@,",[aTask title]];
 	}
 	//take off the trailing ','

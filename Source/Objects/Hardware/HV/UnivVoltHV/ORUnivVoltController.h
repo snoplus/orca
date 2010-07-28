@@ -73,6 +73,8 @@
 - (void) plotterDataChanged: (NSNotification*) aNotes;
 - (void) miscAttributesChanged: (NSNotification* ) aNotes;
 - (void) scaleAction: (NSNotification*) aNotes;
+- (void) setValues: (NSNotification *) aNote;
+- (void) channelChanged: (NSNotification*) aNote;
 
 #pragma mark •••Actions
 - (IBAction) enableAllChannels: (id) aSender;

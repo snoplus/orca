@@ -73,6 +73,7 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 - (int)		extractInt:(NSData*)aCommand;
 - (float)	extractFloat:(NSData*)aCommand;
 - (int)		extractWindow:(NSData*)aCommand;
+- (void)	pollPressures;
 @end
 
 @implementation ORVarianTPSModel
@@ -146,12 +147,6 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 	}
 }
 
-- (void) pollPressures
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
-	[self updateAll];
-	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
-}
 
 - (float) pressureScaleValue
 {
@@ -645,6 +640,12 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 		[ORTimer delay:.1];
 		[self processOneCommandFromQueue];	 //do the next command in the queue
 	}
+}
+- (void) pollPressures
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
+	[self updateAll];
+	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
 }
 
 @end

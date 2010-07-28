@@ -102,5 +102,7 @@ extern NSString* ORUSBInterfacesChanged;
 - (void) registerWithUSB:(id)usb;
 - (unsigned long) vendorID;
 - (unsigned long) productID;
+- (void) interfaceAdded:(NSNotification*)aNote;
+- (void) interfaceRemoved:(NSNotification*)aNote;
 @end
 

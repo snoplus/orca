@@ -42,7 +42,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 - (void) wakeUp
 {
     [runStateField setStringValue:@"Idle"];
-    
+    [self setMessage:@"Idle"];
     [[ORTaskMaster sharedTaskMaster] addTask:self];
     if (delegate)[self setDelegate:delegate];
     [self updateButtons];
@@ -122,13 +122,16 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     if(taskState!=aState){
         [[NSNotificationCenter defaultCenter] postNotificationName:ORTaskStateChangedNotification
                                                             object:self];
-        
     }
     
     taskState = aState;
     if(taskState<eMaxTaskState){
-        if(isSlave) [runStateField setStringValue:@"Slave"];
-        else [runStateField setStringValue:ORTaskStateName[taskState]];
+        if(isSlave) {
+			[runStateField setStringValue:@"Slave"];
+		}
+        else {
+			[runStateField setStringValue:ORTaskStateName[taskState]];
+		}
     }
     else {
         [runStateField setStringValue:@"?"];
@@ -553,8 +556,12 @@ static NSString* ORTaskExpanded		= @"ORTaskExpanded";
 @end
 
 @implementation NSObject (ORTaskCatagory)
+//subclasses will override these
 - (BOOL) okToRun {return YES;}
 - (void) enableGUI:(BOOL)state{}
 - (void) stopTask{}
 - (id)   dependentTask:(ORTask*)aTask {return nil;}
+- (void) taskDidFinish:(NSNotification*)aNote{}
+- (void) taskDidStart:(NSNotification*)aNote{}
+- (void) taskDidStep:(NSNotification*)aNote{}
 @end

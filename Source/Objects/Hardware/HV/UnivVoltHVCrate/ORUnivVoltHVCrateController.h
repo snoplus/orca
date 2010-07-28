@@ -46,6 +46,7 @@
 - (void) displayHVStatus: (NSNotification *) aNotes;
 - (void) displayConfig: (NSNotification *) aNotes;
 - (void) displayEnet: (NSNotification *) aNotes;
+- (void) writeErrorMsg: (NSNotification*) aNote;
 
 #pragma mark •••Actions
 - (IBAction) ipAddressTextFieldAction: (id) aSender;

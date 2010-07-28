@@ -98,10 +98,10 @@
                          name : ORVHS4030ChannelEventStatusChanged
 						object: model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(timeOutErrorChanged:)
-                         name : ORVHS4030TimeOutErrorChanged
-						object: model];
+//    [notifyCenter addObserver : self
+//					selector : @selector(timeOutErrorChanged:)
+ //                        name : ORVHS4030TimeOutErrorChanged
+//						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(currentMeasureChanged:)
