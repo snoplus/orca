@@ -420,7 +420,7 @@
 	ORSerialPort *aPort;
 
     [portListPopup selectItemAtIndex:0]; //the default
-    while (aPort = [enumerator nextObject]) {
+    while ((aPort = [enumerator nextObject])) {
         if([portName isEqualToString:[aPort name]]){
             [portListPopup selectItemWithTitle:portName];
             break;
@@ -545,7 +545,7 @@
     [portListPopup removeAllItems];
     [portListPopup addItemWithTitle:@"--"];
 
-	while (aPort = [enumerator nextObject]) {
+	while ((aPort = [enumerator nextObject])) {
         [portListPopup addItemWithTitle:[aPort name]];
 	}    
 }

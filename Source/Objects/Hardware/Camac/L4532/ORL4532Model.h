@@ -119,4 +119,5 @@ extern NSString* ORL4532ModelDelaysChanged;
 
 @interface NSObject (setCAMACMode)
 - (void)setCheckLAM:(BOOL)aState;
+- (void) setCAMACMode: (BOOL) aState;
 @end

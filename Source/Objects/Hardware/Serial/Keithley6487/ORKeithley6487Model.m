@@ -43,6 +43,7 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 - (void) runStopped:(NSNotification*)aNote;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
+- (void) pollCurrent;
 //- (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs;
 @end
 
@@ -201,20 +202,6 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 	}
 }
 
-- (void) pollCurrent
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCurrent) object:nil];
-	[self readCurrent];
-	
-//---for testing---	
-//	testValue = testValue+2;
-//	[self setCurrent:200 + 10 + testValue];
-	
-//	if(shipCurrent) [self shipCurrent];
-//-------------	
-
-	[self performSelector:@selector(pollCurrent) withObject:nil afterDelay:pollTime];
-}
 
 - (float) current
 {
@@ -449,5 +436,19 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 //	[self setCurrent:[[t objectAtIndex:i] floatValue]];
 //	if(shipCurrent) [self shipCurrent];
 //}
+- (void) pollCurrent
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCurrent) object:nil];
+	[self readCurrent];
+	
+	//---for testing---	
+	//	testValue = testValue+2;
+	//	[self setCurrent:200 + 10 + testValue];
+	
+	//	if(shipCurrent) [self shipCurrent];
+	//-------------	
+	
+	[self performSelector:@selector(pollCurrent) withObject:nil afterDelay:pollTime];
+}
 
 @end

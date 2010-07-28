@@ -64,6 +64,7 @@
 - (void) shipScalersChanged:(NSNotification*)aNotification;
 - (void) clearOnStartChanged:(NSNotification*)aNotification;
 - (void) pollWhenRunningChanged:(NSNotification*)aNotification;
+- (void) scalerRateChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Accessors
 

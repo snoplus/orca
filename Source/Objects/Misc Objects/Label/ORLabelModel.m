@@ -256,7 +256,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (void) setUpImage
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setupImage) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setUpImage) object:nil];
 
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.

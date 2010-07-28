@@ -567,7 +567,7 @@ struct {
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Alarm Enabled"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setAlarmsEnabledMask:withValue:) getMethod:@selector(alarmsEnabledBit:)];
+    [p setSetMethod:@selector(setAlarmsEnabledBit:withValue:) getMethod:@selector(alarmsEnabledBit:)];
     [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
     [a addObject:p];
 	

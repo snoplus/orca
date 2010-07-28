@@ -134,6 +134,8 @@
 
 - (void) pulserAmpChanged:(NSNotification*) aNote;
 - (void) pulserDelayChanged:(NSNotification*) aNote;
+- (void) pollRateChanged:(NSNotification*)aNote;
+- (void) pollRunningChanged:(NSNotification*)aNote;
 
 - (void) enableRegControls;
 

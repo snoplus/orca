@@ -67,6 +67,8 @@
 - (void) includeTimingChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (IBAction) settingLockAction:(id) sender;
+- (void) triggerNamesChanged:(NSNotification*)aNote;
+- (void) delaysChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) showHideAction:(id)sender;

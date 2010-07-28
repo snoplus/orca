@@ -441,7 +441,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
         BOOL valid = NO;
         NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
         ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
+        while ((aPort = [enumerator nextObject])) {
             if([portName isEqualToString:[aPort name]]){
                 [self setSerialPort:aPort];
                 if(portWasOpen){

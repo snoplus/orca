@@ -35,6 +35,8 @@
     NSString* controllerString;
 }
 
+- (void) setUpImage;
+
 #pragma mark ***Accessors
 - (NSString*) controllerString;
 - (void) setControllerString:(NSString*)aControllerString;
