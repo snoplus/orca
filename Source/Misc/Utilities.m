@@ -248,7 +248,13 @@ const char* decodeType(const char* aType)
 
 NSString* computerName()
 {
-	NSString *computerName = [[NSHost currentHost] localizedName];
+	NSString *computerName;
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+	computerName = [[NSHost currentHost] localizedName];
+#else																						// pre-10.6 fallback
+	computerName = [[NSHost currentHost] name];
+#endif	
+	
 	return computerName;
 }
 
