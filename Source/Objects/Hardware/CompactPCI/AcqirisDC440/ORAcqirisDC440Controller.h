@@ -88,6 +88,9 @@
 - (void) connectionChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) samplingWaveformsChanged:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) sampleRateGroupChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) enableMaskAction:(id)sender;
