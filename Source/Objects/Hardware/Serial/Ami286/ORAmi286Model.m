@@ -65,6 +65,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) stopExpiredTimer:(int)i;
 - (void) addReason:(NSString*) aReason;
 - (void) clearReasons;
+- (void) changeTimerExpired: (NSTimer*) aTimer;
+- (void) pollLevels;
 @end
 
 @implementation ORAmi286Model
@@ -417,13 +419,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 }
 
-- (void) pollLevels
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLevels) object:nil];
-	[self readLevels];
-	
-	[self performSelector:@selector(pollLevels) withObject:nil afterDelay:pollTime];
-}
+
 - (unsigned long) timeMeasured:(int)index
 {
 	if(index>=0 && index<4 && (enabledMask&(1<<index)))return timeMeasured[index];
@@ -1217,5 +1213,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[self autorelease]; //now it's OK for object to go away
 	[pool release];
 }
-
+- (void) pollLevels
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLevels) object:nil];
+	[self readLevels];
+	
+	[self performSelector:@selector(pollLevels) withObject:nil afterDelay:pollTime];
+}
 @end

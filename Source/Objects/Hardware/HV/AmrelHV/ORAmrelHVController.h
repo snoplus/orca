@@ -96,6 +96,7 @@
 - (void) maxCurrentChanged:(NSNotification*)aNote;
 - (void) adjustWindowSize;
 - (void) updateButtons;
+- (void) updateChannels;
 - (void) updateChannelButtons:(int)i;
 
 #pragma mark •••Actions

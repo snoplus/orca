@@ -30,6 +30,8 @@ NSString*  ORAutoTesterRepeatCountNotification	= @"ORAutoTesterRepeatCountNotifi
 
 @interface ORAutoTester (private)
 - (void) runTestThread:(NSArray*)objectsToTest;
+- (void) testIsStopped;
+- (void) testIsRunning;
 @end
 
 @implementation ORAutoTester
