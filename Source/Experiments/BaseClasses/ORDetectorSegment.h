@@ -95,5 +95,9 @@
 - (void)encodeWithCoder:(NSCoder*)encoder;
 @end
 
+@interface NSObject (ORDetectorSegment)
+-(void) setThreshold:(unsigned short) aChan withValue:(unsigned short) aThreshold;
+- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
+@end
 
 extern NSString* KSegmentRateChangedNotification;

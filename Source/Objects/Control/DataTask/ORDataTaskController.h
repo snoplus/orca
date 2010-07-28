@@ -57,6 +57,7 @@
 - (void) listLockChanged:(NSNotification*)aNotification;
 - (void) timeScalerChanged:(NSNotification*)aNotification;
 - (void) cycleRateChanged:(NSNotification*)aNote;
+- (void) queueCountChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) clearAction:(id)sender;
@@ -97,3 +98,6 @@
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 @end
 
+@interface NSObject (ORDataTaskController)
+- (void) removeFromOwner;
+@end
