@@ -663,7 +663,7 @@
 	if(runInProgress && sampling){
 		//if running and sampling, turn off sampling
 		sampling = NO;
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample:) object:nil];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample) object:nil];
 		[sampleButton setTitle:sampling?@"Stop":@"Sample"];
 	}
 	
@@ -866,7 +866,7 @@
 	
 	if(sampling){
 		sampling = NO;
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample:) object:nil];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample) object:nil];
 	}
 	else {
 		sampling = [sampleContinousButton state];
@@ -878,7 +878,7 @@
 
 - (void) takeSample
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample:) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample) object:nil];
 	
 	int i,n=4;
 	for(i=0;i<n;i++){

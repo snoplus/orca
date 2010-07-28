@@ -54,6 +54,8 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) refreshModeChanged:(NSNotification*)aNote;
 - (void) pausedChanged:(NSNotification*)aNote;
+- (void) serviceResponse:(NSNotification*)aNote;
+
 - (void) openAnalysisDrawer;
 - (void) closeAnalysisDrawer;
 - (BOOL) analysisDrawerIsOpen;

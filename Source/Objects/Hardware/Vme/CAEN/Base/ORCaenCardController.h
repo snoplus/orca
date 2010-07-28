@@ -88,6 +88,7 @@
 - (void) thresholdLockChanged:(NSNotification*)aNotification;
 - (void) basicLockChanged:(NSNotification*)aNotification;
 - (void) checkGlobalSecurity;
+- (void) selectedRegChannelChanged:(NSNotification*) aNotification;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) baseAddressAction: (id) aSender;

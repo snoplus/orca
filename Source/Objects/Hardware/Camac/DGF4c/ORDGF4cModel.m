@@ -99,6 +99,7 @@ enum {
 - (long) computeMaxEvents:(long) runType;
 - (void) sampleWaveforms:(unsigned long*)recordPtr;
 - (BOOL) multipleCardEnvironment;
+- (void) updateOsc;
 @end
 
 @implementation ORDGF4cModel
