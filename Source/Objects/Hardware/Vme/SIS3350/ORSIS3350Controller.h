@@ -133,6 +133,7 @@
 
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) report:(id)sender;
