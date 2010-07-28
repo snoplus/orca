@@ -168,6 +168,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (id) findObjectWithFullID:(NSString*)aFullID;
 - (void) postWarning:(NSString*)warningString;
 - (id) findController;
+- (NSComparisonResult)sortCompare:(OrcaObject*)anObj;
 
 
 #pragma mark ¥¥¥Dialog Linking

@@ -495,10 +495,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) drawConnections:(NSRect)aRect withTransparency:(float)aTransparency
 {
-    
-    NSEnumerator *enumerator = [connectors keyEnumerator];
-    id key;
-    while ((key = [enumerator nextObject])) {
+    for (id key in connectors) {
         id aConnector = [connectors objectForKey:key];
         [aConnector drawSelf:aRect withTransparency:aTransparency];
         if(![self skipConnectionDraw]){
@@ -680,9 +677,7 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 	else alreadyVisitedInChainSearch = YES;
 	
 	BOOL result = NO;
-    NSEnumerator *enumerator = [connectors keyEnumerator];
-    id key;
-    while ((key = [enumerator nextObject])) {
+    for (id key in connectors) {
         ORConnector* aConnector = [connectors objectForKey:key];
 		result |= [[aConnector objectLink] isObjectInConnectionChain:anObject];
     }
@@ -836,9 +831,7 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 
 - (id) connectorAt:(NSPoint)aPoint
 {
-    NSEnumerator *enumerator = [connectors keyEnumerator];
-    id key;
-    while ((key = [enumerator nextObject])) {
+    for (id key in connectors) {
         ORConnector* aConnector = [connectors objectForKey:key];
         if([aConnector pointInRect:aPoint])return aConnector;
     }
@@ -847,9 +840,7 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 
 - (void) disconnect
 {
-    NSEnumerator *enumerator = [connectors keyEnumerator];
-    id key;
-    while ((key = [enumerator nextObject])) {
+    for (id key in connectors) {
         ORConnector* aConnector = [connectors objectForKey:key];
         [aConnector disconnect];
     }
