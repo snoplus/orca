@@ -127,6 +127,7 @@
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
+- (void) setBufferStateLabel;
 
 #pragma mark •••Actions
 - (IBAction) eventSizeAction:(id)sender;

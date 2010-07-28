@@ -833,16 +833,12 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
     [p setName:@"Low Threshold"];
     [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setLowThreshold:withValue:) getMethod:@selector(lowThreshold:)];
-	[p setCanBeRamped:YES];
-	[p setInitMethodSelector:@selector(writeLowThresholds)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"High Threshold"];
     [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setHighThreshold:withValue:) getMethod:@selector(highThreshold:)];
-	[p setCanBeRamped:YES];
-	[p setInitMethodSelector:@selector(writeLHighThresholds)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
