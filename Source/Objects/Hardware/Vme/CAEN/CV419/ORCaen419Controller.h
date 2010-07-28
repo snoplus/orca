@@ -86,6 +86,8 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) updateTimePlot:(NSNotification*)aNote;
+- (void) highThresholdChanged:(NSNotification*) aNote;
+- (void) lowThresholdChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
 - (IBAction) enabledMaskAction:(id)sender;

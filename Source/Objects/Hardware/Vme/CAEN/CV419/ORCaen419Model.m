@@ -591,16 +591,16 @@ static Caen419Registers reg[kNumRegisters] = {
     [p setName:@"Low Threshold"];
     [p setFormat:@"##0.00" upperLimit:0xffffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setLowThreshold:withValue:) getMethod:@selector(lowThreshold:)];
-	[p setCanBeRamped:YES];
-	[p setInitMethodSelector:@selector(writeLowThresholds)];
+	//[p setCanBeRamped:YES];
+	//[p setInitMethodSelector:@selector(writeLowThresholds)];
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"High Threshold"];
     [p setFormat:@"##0.00" upperLimit:0xffffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setHighThreshold:withValue:) getMethod:@selector(highThreshold:)];
-	[p setCanBeRamped:YES];
-	[p setInitMethodSelector:@selector(writeLHighThresholds)];
+	//[p setCanBeRamped:YES];
+	//[p setInitMethodSelector:@selector(writeLHighThresholds)];
     [a addObject:p];
 	
 	
