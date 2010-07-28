@@ -98,6 +98,7 @@
 - (void) stopMotion;
 - (void) loadBoard;
 - (void) degauss;
+- (void) processDegauss;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;

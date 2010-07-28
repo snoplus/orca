@@ -76,6 +76,9 @@
 
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 
+#pragma mark •••Notifications
+- (void)vmePowerFailed:(NSNotification*)aNote;
+
 #pragma mark •••Downloading
 - (NSData*) codeAsData;
 - (void) startUserCodeWithRetries:(int)num;

@@ -46,6 +46,17 @@ NSString* OReGunY220ObjectChanged		= @"OReGunY220ObjectChanged";
 
 NSString* OReGunLock = @"OReGunLock";
 
+@interface OReGunModel (private)
+- (void) resetTrackAndNotify;
+- (void) step1;
+- (void) step2;
+- (void) step3;
+- (void) step4;
+- (void) step5;
+- (void) step6;
+- (void) step7;
+@end
+
 @implementation OReGunModel
 - (id) init
 {
@@ -435,6 +446,85 @@ NSString* OReGunLock = @"OReGunLock";
 	[self performSelector:@selector(step1) withObject:nil afterDelay:stepTime];
 }
 
+
+
+
+- (void) resetTrack
+{
+    currentTrackIndex = 0;
+    validTrackCount   = 0;
+}
+
+- (void) degauss
+{
+ 	[self setMoving:YES];
+	degaussPosition = [self xyVoltage];
+	[self updateTrack];
+	firstPoint = YES;
+	
+	[self performSelector:@selector(processDegauss) withObject:nil afterDelay:decayTime];		
+}
+
+- (void) processDegauss
+{
+	//Note that all values are stored as raw values. Any conversion needed is done only for the display code.
+	[[self undoManager] disableUndoRegistration];
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(processDegauss) object:nil];
+	
+	if(firstPoint){
+		NSPoint newPt		= NSMakePoint(degaussPosition.x + [self excursion]/millimetersPerVolt,degaussPosition.y + [self excursion]/millimetersPerVolt);
+		[self setXyVoltage:newPt];
+		firstPoint = NO;
+		[self performSelector:@selector(processDegauss) withObject:nil afterDelay:[self decayTime]];
+	}
+	else {
+		NSPoint currentPt	= [self xyVoltage];
+		NSPoint delta 		= NSMakePoint((degaussPosition.x - currentPt.x)*[self decayRate]/100.,(degaussPosition.y - currentPt.y)*[self decayRate]/100.);
+		NSPoint newPt		= NSMakePoint(degaussPosition.x + delta.x,degaussPosition.y + delta.y);
+		
+		if(fabs(delta.x*millimetersPerVolt) > .5){
+			[self setXyVoltage:newPt];
+			[self performSelector:@selector(processDegauss) withObject:nil afterDelay:[self decayTime]];
+		}
+		else {
+			[self setXyVoltage:degaussPosition];
+			[self setMoving:NO];		
+		}
+		
+	}
+	
+	[self updateTrack];
+	[self loadBoard];
+	
+	[[self undoManager] enableUndoRegistration];
+	
+}
+
+- (void) loadBoard
+{
+	@try {
+		[x220Object initBoard];
+		if([x220Object hwObject] != [y220Object hwObject]){
+			[y220Object initBoard];
+		}
+	}
+	@catch(NSException* localException) {
+	}
+	
+}
+@end
+
+@implementation OReGunModel (private)
+- (void) resetTrackAndNotify
+{
+	[self resetTrack];
+	track[currentTrackIndex] = [self xyVoltage];
+	currentTrackIndex  = currentTrackIndex++;
+	validTrackCount++;
+	[[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelPositionChanged object:self];
+}
+
 - (void) step1
 {
 	//Step 1 move to -100,-100
@@ -518,78 +608,4 @@ NSString* OReGunLock = @"OReGunLock";
 	}
 }
 
-
-- (void) resetTrackAndNotify
-{
-	[self resetTrack];
-	track[currentTrackIndex] = [self xyVoltage];
-	currentTrackIndex  = currentTrackIndex++;
-	validTrackCount++;
-	[[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelPositionChanged object:self];
-}
-
-- (void) resetTrack
-{
-    currentTrackIndex = 0;
-    validTrackCount   = 0;
-}
-
-- (void) degauss
-{
- 	[self setMoving:YES];
-	degaussPosition = [self xyVoltage];
-	[self updateTrack];
-	firstPoint = YES;
-	
-	[self performSelector:@selector(processDegauss) withObject:nil afterDelay:decayTime];		
-}
-
-- (void) processDegauss
-{
-	//Note that all values are stored as raw values. Any conversion needed is done only for the display code.
-	[[self undoManager] disableUndoRegistration];
-	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(processDegauss) object:nil];
-	
-	if(firstPoint){
-		NSPoint newPt		= NSMakePoint(degaussPosition.x + [self excursion]/millimetersPerVolt,degaussPosition.y + [self excursion]/millimetersPerVolt);
-		[self setXyVoltage:newPt];
-		firstPoint = NO;
-		[self performSelector:@selector(processDegauss) withObject:nil afterDelay:[self decayTime]];
-	}
-	else {
-		NSPoint currentPt	= [self xyVoltage];
-		NSPoint delta 		= NSMakePoint((degaussPosition.x - currentPt.x)*[self decayRate]/100.,(degaussPosition.y - currentPt.y)*[self decayRate]/100.);
-		NSPoint newPt		= NSMakePoint(degaussPosition.x + delta.x,degaussPosition.y + delta.y);
-		
-		if(fabs(delta.x*millimetersPerVolt) > .5){
-			[self setXyVoltage:newPt];
-			[self performSelector:@selector(processDegauss) withObject:nil afterDelay:[self decayTime]];
-		}
-		else {
-			[self setXyVoltage:degaussPosition];
-			[self setMoving:NO];		
-		}
-		
-	}
-	
-	[self updateTrack];
-	[self loadBoard];
-	
-	[[self undoManager] enableUndoRegistration];
-	
-}
-
-- (void) loadBoard
-{
-	@try {
-		[x220Object initBoard];
-		if([x220Object hwObject] != [y220Object hwObject]){
-			[y220Object initBoard];
-		}
-	}
-	@catch(NSException* localException) {
-	}
-	
-}
 @end

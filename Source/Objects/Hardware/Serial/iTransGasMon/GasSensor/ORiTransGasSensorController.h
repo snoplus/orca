@@ -61,6 +61,7 @@
 - (void) sensorTypeChanged:(NSNotification*)aNote;
 - (void) gasReadingChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
+- (void) stateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) channelAction:(id)sender;
