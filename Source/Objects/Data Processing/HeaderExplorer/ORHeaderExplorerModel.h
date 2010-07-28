@@ -113,7 +113,7 @@
 		useSubRun:(unsigned long)aUseSubRun
 	 subRunNumber:(unsigned long)aSubRunNumber
 		 fileSize:(unsigned long)aFileSize
-		 fileName:(unsigned long)aFilePath;
+		 fileName:(NSString*)aFilePath;
 - (int) indexOfFile:(NSString*)aFilePath;
 
 #pragma mark •••Archival

@@ -19,6 +19,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "ORHeaderExplorerModel.h"
 #import "ORHeaderCollector.h"
 #import "ORDataTypeAssigner.h"
 

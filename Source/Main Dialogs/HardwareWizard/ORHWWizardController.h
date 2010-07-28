@@ -130,6 +130,7 @@
 - (void) marksChanged;
 - (void) actionChanged:(NSNotification*)aNotification;
 - (void) documentClosed:(NSNotification*)aNotification;
+- (void) setFileSelectionText;
 
 - (ORHWUndoManager *) hwUndoManager;
 - (void) setHwUndoManager: (ORHWUndoManager *) aHwUndoManager;

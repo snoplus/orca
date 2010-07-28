@@ -56,5 +56,5 @@
 	 subRunNumber:(unsigned long)subRunNumber
 		 fileSize:(unsigned long)fileSize		
 		 fileName:(NSString*)aFilePath;
-
+- (void) checkStatus;
 @end
