@@ -172,10 +172,10 @@
                          name : ORSIS3302ClockSourceChanged
 						object: model];
 			
-    [notifyCenter addObserver : self
-                     selector : @selector(eventConfigChanged:)
-                         name : ORSIS3302EventConfigChanged
-						object: model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(eventConfigChanged:)
+ //                        name : ORSIS3302EventConfigChanged
+//						object: model];
 		
     [notifyCenter addObserver : self
                      selector : @selector(gateLengthChanged:)

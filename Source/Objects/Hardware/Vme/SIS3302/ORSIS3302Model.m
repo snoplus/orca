@@ -2292,7 +2292,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 
 - (void) writeHistogramParams
 {
-	unsigned long aValue =   kSIS3302McaEnable2468 | kSIS3302McaEnable1357 | (mcaPileupEnabled << 3) + mcaHistoSize;
+	unsigned long aValue =   kSIS3302McaEnable2468 | kSIS3302McaEnable1357 | ((mcaPileupEnabled << 3) + mcaHistoSize);
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kSIS3302McaHistogramParamAllAdc
 						numToWrite:1
@@ -2365,7 +2365,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
   	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Run Mode"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setRunMode:withValue:) getMethod:@selector(runMode:)];
+    [p setSetMethod:@selector(setRunMode:) getMethod:@selector(runMode)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -2476,13 +2476,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Decimation"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyDecimation:) getMethod:@selector(energyDecimation)];
+    [p setSetMethod:@selector(setEnergyDecimation:withValue:) getMethod:@selector(energyDecimation:)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trigger Decimation"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setTriggerDecimation:) getMethod:@selector(triggerDecimation)];
+    [p setSetMethod:@selector(setTriggerDecimation:withValue:) getMethod:@selector(triggerDecimation:)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];

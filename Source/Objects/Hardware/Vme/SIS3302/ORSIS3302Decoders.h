@@ -32,6 +32,7 @@
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+- (void) filterLengthChanged:(NSNotification*)aNote;
 @end
 
 @interface ORSIS3302DecoderForMca : ORVmeCardDecoder {
