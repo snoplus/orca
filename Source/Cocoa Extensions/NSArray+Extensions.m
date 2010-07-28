@@ -86,10 +86,9 @@
 
 @implementation NSMutableArray (OrcaExtensions)
 
-- (void) insertObjectsFromArray:(NSArray *)array atIndex:(int)index {
-    NSObject *entry = nil;
-    NSEnumerator *enumerator = [array objectEnumerator];
-    while ((entry=[enumerator nextObject])) {
+- (void) insertObjectsFromArray:(NSArray *)array atIndex:(int)index 
+{
+    for (NSObject *entry in array) {
         [self insertObject:entry atIndex:index++];
     }
 }

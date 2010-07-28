@@ -19,6 +19,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 @interface NSNotificationCenter (OrcaExtensions)
+- (void) _postNotification:(NSNotification *) notification;
+- (void) _postNotificationName:(NSDictionary *) info;
 - (void) postNotificationOnMainThread:(NSNotification*) notification;
 - (void) postNotificationOnMainThread:(NSNotification*) notification waitUntilDone:(BOOL) wait;
 - (void) postNotificationOnMainThreadWithName:(NSString*) name object:(id) object;
