@@ -92,7 +92,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
         if(!buffer)buffer = [[NSMutableString string] retain];
@@ -244,7 +244,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
         BOOL valid = NO;
         NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
         ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
+        while ((aPort = [enumerator nextObject])) {
             if([portName isEqualToString:[aPort name]]){
                 [self setSerialPort:aPort];
                 if(portWasOpen){
