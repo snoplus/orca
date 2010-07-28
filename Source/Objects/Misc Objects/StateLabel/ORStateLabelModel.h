@@ -29,6 +29,7 @@
 #pragma mark •••Initialization
 - (id) init;
 - (void) makeMainController;
+- (void) setUpImage;
 
 #pragma mark •••Accessor
 - (int) boolType;

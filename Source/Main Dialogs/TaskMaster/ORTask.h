@@ -126,5 +126,8 @@ extern NSString* ORTaskDidFinishNotification;
 - (void) enableGUI:(BOOL)state;
 - (void) stopTask;
 - (id)   dependentTask:(ORTask*)aTask;
+- (void) taskDidFinish:(NSNotification*)aNote;
+- (void) taskDidStart:(NSNotification*)aNote;
+- (void) taskDidStep:(NSNotification*)aNote;
 @end
 

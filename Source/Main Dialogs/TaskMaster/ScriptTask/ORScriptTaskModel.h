@@ -43,6 +43,7 @@
 
 #pragma mark ***Script Methods
 - (id) nextScriptConnector;
+- (void) setMessage:(NSString*)aMessage;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

@@ -94,7 +94,7 @@
 
 - (void) runningChanged:(NSNotification*)aNote
 {
-	if([delegate running])[self setMessage:@"Running"];
+	if([[delegate scriptRunner] running])[self setMessage:@"Running"];
 	else [self setMessage:@"Idle"];
 }
 
@@ -145,12 +145,12 @@
 {
     [super finishUp];
     
-    [self setMessage:@"Idle"];
+    //[self setMessage:@"Idle"];
 }
 
 - (void) cleanUp
 {
-    [self setMessage:@"Idle"];
+   // [self setMessage:@"Idle"];
 }
 
 

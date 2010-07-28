@@ -71,5 +71,8 @@
 
 - (int)numberOfWriteInBackgroundThreads;
 
+- (void)writeDataInBackgroundThread:(NSData *)data;
+- (void)readDataInBackgroundThread;
+
 
 @end

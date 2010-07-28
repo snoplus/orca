@@ -68,6 +68,7 @@
 - (void) setSyntaxDefinitionFilename:(NSString*)aFileName;
 
 - (void) colorsChanged: (NSNotification*)notification;
+- (void) processEditing: (NSNotification*)notification;
 - (void) turnOffWrapping;
 - (void) recolorRange: (NSRange) range;
 - (void) recolorSyntaxTimer: (NSTimer*) sender;

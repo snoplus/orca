@@ -88,6 +88,7 @@
 - (void) debuggingChanged:(NSNotification*)aNote;
 - (void) debuggerStateChanged:(NSNotification*)aNote;
 - (void) displayDictionaryChanged:(NSNotification*)aNote;
+- (void) breakpointsAction:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) autoStopWithRunAction:(id)sender;

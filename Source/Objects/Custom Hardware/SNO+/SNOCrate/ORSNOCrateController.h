@@ -47,6 +47,7 @@
 #pragma mark •••Interface Management
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) setModel:(id)aModel;
+- (void) xilinxLoadChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender;

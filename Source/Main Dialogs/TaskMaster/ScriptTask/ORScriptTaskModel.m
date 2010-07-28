@@ -144,6 +144,11 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	return ORScriptTaskOutConnector;
 }
 
+- (void) setMessage:(NSString*)aMessage
+{
+	[task setMessage:aMessage];
+}
+
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
