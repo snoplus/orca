@@ -118,6 +118,7 @@
 - (IBAction) clearAction:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) scaleAction:(NSNotification*)aNote;
 - (void) ignoreHWChecksChanged:(NSNotification*)aNote;
 - (void) showNamesChanged:(NSNotification*)aNote;
 - (void) updateRunInfo:(NSNotification*)aNote;

@@ -39,10 +39,10 @@
 
 -(id)	init
 {
-    if( self = [super init] ){
-        [NSBundle loadNibNamed: @"FFT" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
-		RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
-    }
+    self = [super init];
+	[NSBundle loadNibNamed: @"FFT" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
+	RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
+    
     return self;
 }
 
