@@ -75,6 +75,8 @@
 - (void) modeChanged:(NSNotification*)aNote;
 - (void) modelChanged:(NSNotification*)aNote;
 - (void) doDataUpdate;
+- (void) dataChanged:(NSNotification*)aNote;
+- (void) multiPlotsChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) delete:(id)sender;

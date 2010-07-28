@@ -84,6 +84,8 @@
 - (void) lastRequestChanged:(NSNotification*)aNote;
 - (void) tableViewSelectionDidChange:(NSNotification *)aNote;
 - (void) histoPlotChanged:(NSNotification*)aNote;
+- (void) drawDidOpen:(NSNotification*)aNote;
+- (void) drawDidClose:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) showDebugOutputAction:(id)sender;

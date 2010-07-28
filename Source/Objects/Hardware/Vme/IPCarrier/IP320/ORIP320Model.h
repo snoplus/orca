@@ -174,6 +174,7 @@ struct{
 - (void) shipConvertedValues;
 - (void) loadConvertedTimeSeries:(float)convertedValue atTime:(time_t) aTime forChannel:(int) channel;
 - (void) loadRawTimeSeries:(float)convertedValue atTime:(time_t) aTime forChannel:(int) channel;
+- (void) writeLogBufferToFile;
 
 
 #pragma mark ¥¥¥DataSource
@@ -191,6 +192,8 @@ struct{
 
 @interface NSObject (ORHistModel)
 - (void) removeFrom:(NSMutableArray*)anArray;
+- (void) setAdcCard:(id)aCard;
+- (void) invalidateDataSource;
 @end
 
 #pragma mark ¥¥¥External String Definitions

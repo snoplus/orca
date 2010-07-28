@@ -44,6 +44,11 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 }
 };
 
+@interface ORIpeSLTController (private)
+- (void) loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+@end
+
 @implementation ORIpeSLTController
 
 #pragma mark ¥¥¥Initialization

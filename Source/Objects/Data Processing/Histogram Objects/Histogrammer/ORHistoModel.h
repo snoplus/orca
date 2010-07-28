@@ -94,6 +94,7 @@
 
 @interface NSObject (ORHistModel)
 - (void) removeFrom:(NSMutableArray*)anArray;
+- (void) invalidateDataSource;
 @end
 
 #pragma mark ¥¥¥External String Definitions

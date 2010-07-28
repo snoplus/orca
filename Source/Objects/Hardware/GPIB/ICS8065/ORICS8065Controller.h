@@ -67,7 +67,9 @@
 - (void)	primaryAddressChanged:(NSNotification*)aNote;
 - (void)	isConnectedChanged:(NSNotification*)aNote;
 - (void)	ipAddressChanged:(NSNotification*)aNote;
-- (void)    testLockChanged: (NSNotification*) aNotification;
+- (void)	testLockChanged: (NSNotification*) aNote;
+- (void)	writeToMonitor: (NSNotification*) aNote;
+
 - (void)    checkGlobalSecurity;
 - (void)    disableAll;
 

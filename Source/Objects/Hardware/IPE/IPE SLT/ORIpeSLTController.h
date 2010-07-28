@@ -119,6 +119,8 @@
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) serviceChanged:(NSNotification*)aNote;
 - (void) deviceOpenChanged:(NSNotification*)aNote;
+- (void) pollRateChanged:(NSNotification*)aNote;
+- (void) pollRunningChanged:(NSNotification*)aNote;
 
 - (void) endAllEditing:(NSNotification*)aNote;
 - (void) usePBusSimChanged:(NSNotification*)aNote;

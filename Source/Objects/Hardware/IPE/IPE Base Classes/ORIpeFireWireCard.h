@@ -51,6 +51,7 @@
 - (BOOL) serviceIsOpen;
 - (BOOL) serviceIsAlive;
 - (void) startConnectionAttempts;
+- (void) attemptConnection;
 
 
 
