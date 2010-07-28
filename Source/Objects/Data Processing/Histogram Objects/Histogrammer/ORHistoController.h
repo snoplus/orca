@@ -62,6 +62,7 @@
 - (IBAction) delete:(id)sender;
 - (IBAction) cut:(id)sender;
 - (IBAction) plotGroupAction:(id)sender;
+- (IBAction) doubleClickMultiPlot:(id)sender;
 
 - (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 

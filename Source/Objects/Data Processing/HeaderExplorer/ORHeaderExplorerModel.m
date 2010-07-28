@@ -624,7 +624,7 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 		useSubRun:(unsigned long)aUseSubRun
 	 subRunNumber:(unsigned long)aSubRunNumber
 		 fileSize:(unsigned long)aFileSize
-		 fileName:(unsigned long)aFilePath
+		 fileName:(NSString*)aFilePath
 {
 	if(aRunStart!=0 && aRunEnd!=0){
 	

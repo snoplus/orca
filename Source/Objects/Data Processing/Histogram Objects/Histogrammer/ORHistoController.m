@@ -26,6 +26,11 @@
 #import "ORMultiPlot.h"
 #import "ORDataSet.h"
 
+@interface ORHistoController (private)
+- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
+
+
 @implementation ORHistoController
 
 #pragma mark ¥¥¥Initialization
@@ -321,14 +326,6 @@
     
 }
 
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* directoryName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setDirectoryName:directoryName];
-    }
-}
-
 - (IBAction) writeFileAction:(id)sender
 {
     [model setWriteFile:[sender state]];
@@ -476,6 +473,15 @@
         else return nil;
     }
 }
+@end
 
+@implementation ORHistoController (private)
+- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* directoryName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
+        [model setDirectoryName:directoryName];
+    }
+}
 @end
 
