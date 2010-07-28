@@ -90,6 +90,7 @@
 - (void)	saveFinished;
 - (void)	afterSaveDo:(SEL)aSelector withTarget:(id)aTarget;
 - (void)	closeAllWindows;
+- (void) makePDFFromController:(id)aController;
 
 @end
 
