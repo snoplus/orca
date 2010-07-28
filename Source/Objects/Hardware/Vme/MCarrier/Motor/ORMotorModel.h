@@ -78,6 +78,8 @@ enum {
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
 - (NSString *)motorName;

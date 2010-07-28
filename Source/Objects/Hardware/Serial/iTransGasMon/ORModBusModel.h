@@ -46,6 +46,7 @@
 
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
+- (void) removeSensorByNote:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (NSData*) lastRequest;

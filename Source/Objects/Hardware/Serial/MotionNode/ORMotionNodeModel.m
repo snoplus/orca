@@ -89,6 +89,7 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 - (void) setTotalxyz;
 - (void) checkForDriver;
 - (void) createLongTermTraceStorage;
+- (void) flushCheck;
 @end
 
 

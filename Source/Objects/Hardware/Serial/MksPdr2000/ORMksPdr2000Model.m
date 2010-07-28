@@ -46,6 +46,7 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
+- (void) pollPressures;
 @end
 
 @implementation ORMksPdr2000Model
@@ -255,13 +256,7 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 	}
 }
 
-- (void) pollPressures
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
-	[self readPressures];
-	
-	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
-}
+
 
 - (float) pressure:(int)index
 {
@@ -526,5 +521,11 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 		[self setUnits:theResponse];
 	}
 }
-
+- (void) pollPressures
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
+	[self readPressures];
+	
+	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
+}
 @end

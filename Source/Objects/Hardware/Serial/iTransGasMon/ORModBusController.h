@@ -52,6 +52,7 @@
 - (void) sensorRemoved:(NSNotification*)aNote;
 - (void) tileSensors;
 - (void) shipValuesChanged:(NSNotification*)aNote;
+- (void) stateChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) addSensorAction:(id)sender;

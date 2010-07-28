@@ -39,6 +39,7 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
 - (void) sendCmd:(m321Cmd*)aCmd  result:(m321Cmd*)result numInArgs:(int)ni numOutArgs:(int)no;
 - (BOOL) waitForCmdToFinish;
 - (void) motorStarted:(id)aMotor;
+- (void) pollMotorStatus;
 @end
 
 

@@ -91,7 +91,7 @@
 - (void) runTaskStopped:(id)userInfo
 {
 	id obj = [[destination connector] objectLink];
-	if(obj && [obj respondsToSelector:@selector(processData:)]){
+	if(obj && [obj respondsToSelector:@selector(runTaskStopped:)]){
 		[obj runTaskStopped:userInfo];
 	}
 }
@@ -99,7 +99,7 @@
 - (void) closeOutRun:(id)userInfo
 {
 	id obj = [[destination connector] objectLink];
-	if(obj && [obj respondsToSelector:@selector(processData:)]){
+	if(obj && [obj respondsToSelector:@selector(closeOutRun:)]){
 		[obj closeOutRun:userInfo];
 	}
 }

@@ -46,6 +46,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs;
+- (void) pollTemps;
 @end
 
 @implementation ORLakeShore210Model
@@ -225,13 +226,6 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	}
 }
 
-- (void) pollTemps
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];
-	[self readTemps];
-
-	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
-}
 
 - (float) temp:(int)index
 {
@@ -476,6 +470,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 		[self setTemp:i value:[[t objectAtIndex:i] floatValue]];
 	}	
 	if(shipTemperatures) [self shipTemps];
+}
+- (void) pollTemps
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];
+	[self readTemps];
+	
+	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
 }
 
 @end

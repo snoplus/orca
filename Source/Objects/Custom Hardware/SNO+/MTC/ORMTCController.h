@@ -127,6 +127,7 @@
 - (void) lastFileLoadedChanged:(NSNotification*)aNote;
 - (void) sequenceRunning:(NSNotification*)aNote;
 - (void) sequenceStopped:(NSNotification*)aNote;
+- (void) sequenceProgress:(NSNotification*)aNote;
 
 #pragma mark •••Helper
 - (void) populatePullDown;

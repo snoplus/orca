@@ -64,6 +64,7 @@
 - (void) documentLockChanged:(NSNotification*)aNotification;
 - (void) groupChanged:(NSNotification*)note;
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote;
+- (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) listSupportedUSBDevices:(id)sender;
