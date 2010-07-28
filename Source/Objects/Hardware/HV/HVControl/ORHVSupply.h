@@ -98,7 +98,6 @@ enum {
 - (BOOL) checkActualVsSetValues;
 - (void) resolveActualVsSetValueProblem;
 - (BOOL) currentIsHigh:(id)checker pollingTime:(int)pollingTime;
-- (BOOL) checkAdcDacMismatch:(id)checker pollingTime:(int)pollingTime;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 @end
@@ -125,4 +124,7 @@ extern NSString* ORHVSupplyVoltageAdcSlopeChangedNotification;
 - (void) getActualRelayState:(id)aSupply;
 - (unsigned long) readRelayMask;
 - (unsigned long) lowPowerOn;
+- (void) checkCurrent:(ORHVSupply*) aSupply;
+- (BOOL) checkAdcDacMismatch:(id)checker pollingTime:(int)pollingTime;
+- (void) checkAdcDacMismatch:(ORHVSupply*) aSupply;
 @end

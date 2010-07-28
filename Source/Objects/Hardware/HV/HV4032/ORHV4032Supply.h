@@ -20,6 +20,7 @@
 
 
 #pragma mark ¥¥¥Imported Files
+@class ORHVSupply;
 
 enum {
     kHV4032Idle,
@@ -120,4 +121,5 @@ extern NSString* ORHV4032SupplyVoltageAdcSlopeChangedNotification;
 - (void) readAdc:(id)aSupply;
 - (void) readCurrent:(id)aSupply;
 - (void) getMainPowerState:(id)aSupply;
+- (void) checkCurrent:(ORHVSupply*) aSupply;
 @end

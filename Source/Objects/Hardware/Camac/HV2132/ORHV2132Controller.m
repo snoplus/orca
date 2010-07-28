@@ -27,7 +27,9 @@
 #import "ORHV2132Model.h"
 #import "ORTimedTextField.h"
 
-#pragma mark ¥¥¥Macros
+@interface ORHV2132Controller (private)
+- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
 
 // methods
 @implementation ORHV2132Controller
@@ -374,7 +376,9 @@
 						  contextInfo:NULL];
 	
 }
+@end
 
+@implementation ORHV2132Controller (private)
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
 	if(returnCode){
@@ -382,6 +386,5 @@
 		[model setDirName:dirName];
 	}
 }
-
 @end
 

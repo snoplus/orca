@@ -28,6 +28,7 @@
 
 @interface ORHPPulserController (private)
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) systemTest;
 @end
 
@@ -292,22 +293,6 @@
     
 }
 
-- (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if(returnCode == NSAlertDefaultReturn){
-		@try {
-			[model emptyVolatileMemory];
-		}
-		@catch(NSException* localException) {
-			NSLog( [ localException reason ] );
-			NSRunAlertPanel( [ localException name ], 	// Name of panel
-							[ localException reason ],	// Reason for error
-							@"OK",				// Okay button
-							nil,				// alternate button
-							nil );				// other button
-		}
-    }
-}
 
 -(IBAction) readIdAction:(id)sender
 {
@@ -346,20 +331,6 @@
 	[self performSelector:@selector(systemTest) withObject:nil afterDelay:0];
 }
 
-- (void) systemTest
-{
-	@try {
-	    [model systemTest];
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-}
 
 -(IBAction) loadParamsAction:(id)sender
 {
@@ -430,18 +401,6 @@
 						nil );				// other button
 	}
 }
-
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setFileName:fileName];
-        [self performSelector:@selector(downloadWaveform) withObject:self afterDelay:0.1];
-		NSLog(@"Downloading Waveform: %@\n",fileName);
-		
-    }
-}
-
 
 -(IBAction) triggerModeAction:(id)sender
 {
@@ -808,4 +767,48 @@
 	
 }
 
+@end
+
+@implementation ORHPPulserController (private)
+- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* fileName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
+        [model setFileName:fileName];
+        [self performSelector:@selector(downloadWaveform) withObject:self afterDelay:0.1];
+		NSLog(@"Downloading Waveform: %@\n",fileName);
+		
+    }
+}
+
+- (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertDefaultReturn){
+		@try {
+			[model emptyVolatileMemory];
+		}
+		@catch(NSException* localException) {
+			NSLog( [ localException reason ] );
+			NSRunAlertPanel( [ localException name ], 	// Name of panel
+							[ localException reason ],	// Reason for error
+							@"OK",				// Okay button
+							nil,				// alternate button
+							nil );				// other button
+		}
+    }
+}
+- (void) systemTest
+{
+	@try {
+	    [model systemTest];
+	}
+	@catch(NSException* localException) {
+        NSLog( [ localException reason ] );
+        NSRunAlertPanel( [ localException name ], 	// Name of panel
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
+}
 @end

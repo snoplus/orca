@@ -68,6 +68,7 @@
 #pragma mark ¥¥¥Hardware Access
 - (void) turnOnSupplies:(BOOL)aState;
 - (void) resetAdcs;
+- (void) doRamp;
 
 #pragma mark ¥¥¥Status
 -(unsigned short) relayOnMask;

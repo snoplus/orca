@@ -106,6 +106,7 @@
 #pragma mark ¥¥¥Ramp
 - (void) startRamping;
 - (void) stopRamping;
+- (void) doRamp;
 
 #pragma mark ¥¥¥Polling
 - (void) pollHardware;
