@@ -486,7 +486,7 @@ enum {
 }
 
 
-- (NSDictionary*) colorBarAttributes
+- (NSMutableDictionary*) colorBarAttributes
 {
     return colorBarAttributes;
 }

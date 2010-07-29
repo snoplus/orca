@@ -30,7 +30,7 @@
 }
 - (id) init;
 - (BOOL) plotterShouldShowRoi:(id)aPlot;
-- (IBAction) logLin:(NSToolbarItem*)item;
+- (IBAction) logLin:(id)sender;
 - (IBAction) zoomIn:(id)sender;
 - (IBAction) zoomOut:(id)sender;
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot;

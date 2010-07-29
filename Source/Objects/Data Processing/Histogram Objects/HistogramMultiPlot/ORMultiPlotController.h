@@ -50,7 +50,7 @@
 
 #pragma mark ¥¥¥Data Source
 - (BOOL) plotterShouldShowRoi:(id)aPlot;
-- (void) plotOrderDidChange:(ORPlotView*)aPlotView;
+- (void) plotOrderDidChange:(id)aPlotView;
 - (int) numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
