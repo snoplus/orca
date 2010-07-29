@@ -331,22 +331,17 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 #pragma mark ***DataTaker
 - (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
-    [super runTaskStarted:aDataPacket userInfo:userInfo];
     
     // Clear unit
+    [self writeThresholds];
     [self write: kBitSet2 sendValue: kClearData];			// Clear data, 
     [self write: kBitClear2 sendValue: kClearData];			// Clear "Clear data" bit of status reg.
-	if(commonStopMode)[self write: kBitSet2 sendValue: kClearData];
-	else [self write: kBitClear2 sendValue: kClearData];
     [self write: kEventCounterReset sendValue: 0x0000];		// Clear event counter
-    
-    // Set options
-    
-    // Set thresholds in unit
-    [self writeThresholds];
  	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
-   
+
+    [super runTaskStarted:aDataPacket userInfo:userInfo];
 }
+
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 {
     

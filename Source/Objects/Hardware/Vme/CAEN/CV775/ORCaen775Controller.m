@@ -36,7 +36,6 @@
 
 - (void) awakeFromNib 
 {
-	[super awakeFromNib];
 	int i;
 	for(i=0;i<16;i++){
 		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
@@ -44,6 +43,7 @@
 		[[thresholdA cellAtRow:i column:0] setTag:i];
 		[[thresholdB cellAtRow:i column:0] setTag:i+16];
 	}
+	[super awakeFromNib];
 }
 #pragma mark •••Notifications
 //--------------------------------------------------------------------------------
@@ -82,8 +82,9 @@
 {
 	[ super updateWindow ];
 	[self modelTypeChanged:nil];
-	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 	[self commonStopModeChanged:nil];
+	[self onlineMaskChanged:nil];
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
 - (void) modelTypeChanged:(NSNotification*)aNote

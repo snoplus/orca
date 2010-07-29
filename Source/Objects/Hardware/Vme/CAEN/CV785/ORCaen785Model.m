@@ -162,7 +162,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 - (unsigned long) 	getThresholdOffset:(int)aChan;
 {
-	if(modelType==kModel785)return reg[kThresholds].addressOffset + (aChan * 4);
+	if(modelType==kModel785)return reg[kThresholds].addressOffset + (aChan * 2);
 	else					return reg[kThresholds].addressOffset + (aChan * 4);
 }
 
@@ -307,17 +307,12 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
-    
-    // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];		// Clear data, 
+     
+	[self write:kBitSet2 sendValue:kClearData];			// Clear data, 
     [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
     [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
-
-    // Set options
-
-    // Set thresholds in unit
-   [self writeThresholds];
-
+	[self writeThresholds];
+	
 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
 
 }
@@ -476,7 +471,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	for(i=0;i<n;i++){
 		int kill = ((onlineMask & (1<<i))!=0)?0x0:0x100;
 		unsigned short aValue = [self threshold:i] | kill;
-		NSLog(@"%d 0x%x 0x%x\n",i,[self getThresholdOffset:i],aValue);
 		[[self adapter] writeWordBlock:&aValue
 							 atAddress:[self baseAddress] + [self getThresholdOffset:i] 
 							numToWrite:1

@@ -660,9 +660,6 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 	
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
 
-    // Clear unit
-	[self clearData];
-	[self resetEventCounter];
 	
     //Cache some values
 	statusAddress		= [self baseAddress]+reg[kStatusRegister1].addressOffset;
@@ -672,7 +669,11 @@ NSString* ORCaen965WriteValueChanged		= @"ORCaen965WriteValueChanged";
 
     // Set thresholds in unit
     [self initBoard];
-
+	
+    // Clear unit
+	[self clearData];
+	[self resetEventCounter];
+	
 	isRunning = NO;
 	
     [self startRates];
