@@ -313,8 +313,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     int i;
     for(i=0;i<cachedNumberDataTakers;i++){
 		id obj = [dataTakers objectAtIndex:i];
-        [obj runTaskStarted:aDataPacket userInfo:userInfo];
-		cachedDataTakers[i] = obj;
+ 		cachedDataTakers[i] = [obj retain];
+		[obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
     
     
@@ -464,6 +464,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     int i;
     for(i=0;i<cachedNumberDataTakers;i++){
         [cachedDataTakers[i] runTaskStopped:aDataPacket userInfo:userInfo];
+		[cachedDataTakers[i] release];
     }
     free(cachedDataTakers);
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
