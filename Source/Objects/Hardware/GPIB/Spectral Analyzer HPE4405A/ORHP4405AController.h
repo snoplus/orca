@@ -1,85 +1,139 @@
-/* ORHP4405AController */
-//--------------------------------------------------------------------------------
-/*!\class	ORHP4405AController
- * \brief	This class is the top level class handling interaction between the
- *			Agilent HP4405A GUI and its hardware.
- * \methods
- *			\li \b 	init						- Constructor - Opens correct nib
- *			\li \b 	dealloc						- Unregister messages, cleanup.
- *			\li \b	connect						- Connect device to GPIB.
- *			\li \b	primaryAddressChanged		- Respond when person changes address.
- *			\li \b	secondaryAddressChanged		- Respond when person changes address.
- * \private
- *			\li \b	populatePullDowns			- Populate pulldowns in GUI.
- * \note	1) The hardware access methods use the internally stored state
- *			   to actually set the hardware.  Thus one first has to use the
- *			   accessor methods prior to setting the oscilloscope hardware.
- *			
- * \author	J. A. Formaggio
- * \history	2007-07-15 (jaf) - Original.
- */
+//
+//  ORHP4405AController.h
+//  Orca
+//
+//  Created by Mark Howe on Wed Jul28, 2010.
+//  Copyright 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
+//North Carolina at the UNC Physics Dept sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
+//North Carolina reserve all rights in the program. Neither the authors,
 //University of Washington, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
 #pragma mark ¥¥¥Imported Files
 
-#import "OROscBaseController.h"
-#import <Cocoa/Cocoa.h>
+#import "ORGpibDeviceController.h"
 
-@interface ORHP4405AController : OROscBaseController {    
+@interface ORHP4405AController : ORGpibDeviceController {    
+	IBOutlet   NSTextField*		centerFreqField;
+	IBOutlet   NSButton*		continuousMeasurementCB;
+	IBOutlet   NSButton*		startMeasurementButton;
+	IBOutlet   NSButton*		stopMeasurementButton;
+	IBOutlet   NSTextField*		optimizePreselectorFreqField;
+	IBOutlet   NSTextField*		inputMaxMixerPowerField;
+	IBOutlet   NSButton*		inputGainEnabledCB;
+	IBOutlet   NSButton*		inputAttAutoEnabledCB;
+	IBOutlet   NSTextField*		inputAttenuationField;
+	IBOutlet   NSButton*		detectorGainEnabledCB;
+	
+	IBOutlet   NSButton*		burstPulseDiscrimEnabledCB;
+	IBOutlet   NSPopUpButton*	burstModeAbsPU;
+	IBOutlet   NSTextField*		burstModeSettingField;
+	IBOutlet   NSButton*		burstFreqEnabledCB;
+	IBOutlet   NSPopUpButton*	freqStepDirPU;
+	IBOutlet   NSTextField*		freqStepSizeField;
+	IBOutlet   NSPopUpButton*	unitsPU;
+	IBOutlet   NSTextField*		stopFreqField;
+	IBOutlet   NSTextField*		startFreqField;
+
+	IBOutlet   NSTextField*		triggerOffsetField;
+	IBOutlet   NSButton*		triggerOffsetEnabledCB;
+	IBOutlet   NSPopUpButton*	triggerOffsetUnitsPU;
+	IBOutlet   NSTextField*		triggerDelayField;
+	IBOutlet   NSButton*		triggerDelayEnableCB;
+	IBOutlet   NSPopUpButton*	triggerDelayUnitsPU;
+	IBOutlet   NSPopUpButton*	triggerSlopePU;
+	IBOutlet   NSPopUpButton*	triggerSourcePU;
 }
 
-// Register notifications that this class will listen for.
+#pragma mark ***Notifications
 - (void) registerNotificationObservers;
+- (void) updateWindow;
 
 #pragma mark ***Initialization
 - (id) 			init;
 
-#pragma mark ***Interface Management
+#pragma mark ***Notifications
+- (void) registerNotificationObservers;
 - (void)		updateWindow;
 
-#pragma mark ¥¥¥Accessors
+#pragma mark ***Interface Management
+- (void) statusOperationRegChanged:(NSNotification*)aNote;
+- (void) questionablePowerRegChanged:(NSNotification*)aNote;
+- (void) questionableIntegrityRegChanged:(NSNotification*)aNote;
+- (void) questionableFreqRegChanged:(NSNotification*)aNote;
+- (void) questionableEventRegChanged:(NSNotification*)aNote;
+- (void) questionableConditionRegChanged:(NSNotification*)aNote;
+- (void) questionableCalibrationRegChanged:(NSNotification*)aNote;
+- (void) standardEventRegChanged:(NSNotification*)aNote;
+- (void) statusRegChanged:(NSNotification*)aNote;
+- (void) continuousMeasurementChanged:(NSNotification*)aNote;
+- (void) optimizePreselectorFreqChanged:(NSNotification*)aNote;
+- (void) inputMaxMixerPowerChanged:(NSNotification*)aNote;
+- (void) inputGainEnabledChanged:(NSNotification*)aNote;
+- (void) inputAttAutoEnabledChanged:(NSNotification*)aNote;
+- (void) inputAttenuationChanged:(NSNotification*)aNote;
+- (void) detectorGainEnabledChanged:(NSNotification*)aNote;
+- (void) burstPulseDiscrimEnabledChanged:(NSNotification*)aNote;
+- (void) burstModeAbsChanged:(NSNotification*)aNote;
+- (void) burstModeSettingChanged:(NSNotification*)aNote;
+- (void) burstFreqEnabledChanged:(NSNotification*)aNote;
+- (void) triggerOffsetUnitsChanged:(NSNotification*)aNote;
+- (void) triggerDelayUnitsChanged:(NSNotification*)aNote;
+- (void) triggerSourceChanged:(NSNotification*)aNote;
+- (void) triggerOffsetEnabledChanged:(NSNotification*)aNote;
+- (void) triggerOffsetChanged:(NSNotification*)aNote;
+- (void) triggerSlopeChanged:(NSNotification*)aNote;
+- (void) triggerDelayEnabledChanged:(NSNotification*)aNote;
+- (void) triggerDelayChanged:(NSNotification*)aNote;
+- (void) freqStepDirChanged:(NSNotification*)aNote;
+- (void) freqStepSizeChanged:(NSNotification*)aNote;
+- (void) unitsChanged:(NSNotification*)aNote;
+- (void) stopFreqChanged:(NSNotification*)aNote;
+- (void) startFreqChanged:(NSNotification*)aNote;
+- (void) centerFreqChanged:(NSNotification*)aNote;
+- (void) lockChanged: (NSNotification*) aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) continuousMeasurementAction:(id)sender;
+- (IBAction) optimizePreselectorFreqAction:(id)sender;
+- (IBAction) inputMaxMixerPowerAction:(id)sender;
+- (IBAction) inputGainEnabledAction:(id)sender;
+- (IBAction) inputAttAutoEnabledAction:(id)sender;
+- (IBAction) inputAttenuationAction:(id)sender;
+- (IBAction) detectorGainEnabledAction:(id)sender;
+- (IBAction) burstPulseDiscrimEnabledAction:(id)sender;
+- (IBAction) burstModeAbsAction:(id)sender;
+- (IBAction) burstModeSettingAction:(id)sender;
+- (IBAction) burstFreqEnabledAction:(id)sender;
+- (IBAction) triggerOffsetUnitsAction:(id)sender;
+- (IBAction) triggerDelayUnitsAction:(id)sender;
+- (IBAction) triggerSourceAction:(id)sender;
+- (IBAction) triggerOffsetEnabledAction:(id)sender;
+- (IBAction) triggerOffsetAction:(id)sender;
+- (IBAction) triggerSlopeAction:(id)sender;
+- (IBAction) triggerDelayEnabledAction:(id)sender;
+- (IBAction) triggerDelayAction:(id)sender;
+- (IBAction) freqStepDirAction:(id)sender;
+- (IBAction) freqStepSizeAction:(id)sender;
+- (IBAction) unitsAction:(id)sender;
+- (IBAction) stopFreqAction:(id)sender;
+- (IBAction) startFreqAction:(id)sender;
+- (IBAction) centerFreqAction:(id)sender;
 
-- (IBAction)attenutation:(id)sender;
-- (IBAction)burstType:(id)sender;
-- (IBAction)calWideband:(id)sender;
-- (IBAction)centerFreq:(id)sender;
-- (IBAction)channelTCS:(id)sender;
-- (IBAction)delay:(id)sender;
-- (IBAction)detFormat:(id)sender;
-- (IBAction)freqUnit:(id)sender;
-- (IBAction)iqInvert:(id)sender;
-- (IBAction)measType:(id)sender;
-- (IBAction)modeType:(id)sender;
-- (IBAction)opt10MHz:(id)sender;
-- (IBAction)optFreq:(id)sender;
-- (IBAction)refFilter:(id)sender;
-- (IBAction)refLevel:(id)sender;
-- (IBAction)refUnit:(id)sender;
-- (IBAction)scaleLevel:(id)sender;
-- (IBAction)scaleUnit:(id)sender;
-- (IBAction)searchLengthUnit:(id)sender;
-- (IBAction)searchLengthValue:(id)sender;
-- (IBAction)searchThreshUnit:(id)sender;
-- (IBAction)searchThreshValue:(id)sender;
-- (IBAction)startFreq:(id)sender;
-- (IBAction)stopFreq:(id)sender;
-- (IBAction)symbolRate:(id)sender;
-- (IBAction)symbolUnit:(id)sender;
-- (IBAction)timeSlot:(id)sender;
-- (IBAction)traceMode:(id)sender;
-- (IBAction)triggerPolarity:(id)sender;
-- (IBAction)triggerType:(id)sender;
+- (IBAction) loadFreqSettingsAction:(id)sender;
+- (IBAction) loadTriggerSettingsAction:(id)sender;
+- (IBAction) loadRFBurstSettingsAction:(id)sender;
+- (IBAction) loadInputPortSettingsAction:(id)sender;
+- (IBAction) startMeasuremnt:(id)sender;
+- (IBAction) pauseMeasuremnt:(id)sender;
+
+- (IBAction) checkStatusAction:(id)sender;
+
 @end

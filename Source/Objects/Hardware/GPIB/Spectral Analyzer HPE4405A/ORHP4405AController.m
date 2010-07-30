@@ -2,51 +2,33 @@
 //  ORHP4405AController.m
 //  Orca
 //
-//  Created by J. A. Formaggio on Tue Jul 15 2008.
-//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Wed Jul28, 2010.
+//  Copyright 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
+//North Carolina at the UNC Physics Dept sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
+//North Carolina reserve all rights in the program. Neither the authors,
 //University of Washington, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
 #import "ORHP4405AController.h"
 #import "ORHP4405AModel.h"
 
 @implementation ORHP4405AController
 
 #pragma mark ¥¥¥Initialization
-//--------------------------------------------------------------------------------
-/*!\method  init
- * \brief	Top level initialization routine.  Calls inherited class initWith-
- *			WindowNibName that makes sure that correct nib is used for controller.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) init
 {
     self = [ super initWithWindowNibName: @"ORHP4405A" ];
     return self;
 }
 
-
-
-//--------------------------------------------------------------------------------
-/*!\method  registerNotificationObservers
- * \brief	Registers following messages: 
- *				1) Change primary address.
- *				2) Change secondary address.
- * \note	
- */
-//--------------------------------------------------------------------------------
+#pragma mark ***Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
@@ -62,520 +44,637 @@
                          name : ORHP4405ALock
                         object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(centerFreqChanged:)
+                         name : ORHP4405AModelCenterFreqChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(startFreqChanged:)
+                         name : ORHP4405AModelStartFreqChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stopFreqChanged:)
+                         name : ORHP4405AModelStopFreqChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(unitsChanged:)
+                         name : ORHP4405AModelUnitsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(freqStepSizeChanged:)
+                         name : ORHP4405AModelFreqStepSizeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(freqStepDirChanged:)
+                         name : ORHP4405AModelFreqStepDirChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerDelayChanged:)
+                         name : ORHP4405AModelTriggerDelayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerDelayEnabledChanged:)
+                         name : ORHP4405AModelTriggerDelayEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerSlopeChanged:)
+                         name : ORHP4405AModelTriggerSlopeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerOffsetChanged:)
+                         name : ORHP4405AModelTriggerOffsetChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerOffsetEnabledChanged:)
+                         name : ORHP4405AModelTriggerOffsetEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerSourceChanged:)
+                         name : ORHP4405AModelTriggerSourceChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerDelayUnitsChanged:)
+                         name : ORHP4405AModelTriggerDelayUnitsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerOffsetUnitsChanged:)
+                         name : ORHP4405AModelTriggerOffsetUnitsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(burstFreqEnabledChanged:)
+                         name : ORHP4405AModelBurstFreqEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(burstModeSettingChanged:)
+                         name : ORHP4405AModelBurstModeSettingChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(burstModeAbsChanged:)
+                         name : ORHP4405AModelBurstModeAbsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(burstPulseDiscrimEnabledChanged:)
+                         name : ORHP4405AModelBurstPulseDiscrimEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(detectorGainEnabledChanged:)
+                         name : ORHP4405AModelDetectorGainEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(inputAttenuationChanged:)
+                         name : ORHP4405AModelInputAttenuationChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(inputAttAutoEnabledChanged:)
+                         name : ORHP4405AModelInputAttAutoEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(inputGainEnabledChanged:)
+                         name : ORHP4405AModelInputGainEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(inputMaxMixerPowerChanged:)
+                         name : ORHP4405AModelInputMaxMixerPowerChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(optimizePreselectorFreqChanged:)
+                         name : ORHP4405AModelOptimizePreselectorFreqChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(continuousMeasurementChanged:)
+                         name : ORHP4405AModelContinuousMeasurementChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusRegChanged:)
+                         name : ORHP4405AModelStatusRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(standardEventRegChanged:)
+                         name : ORHP4405AModelStandardEventRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(questionableCalibrationRegChanged:)
+                         name : ORHP4405AModelQuestionableCalibrationRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(questionableConditionRegChanged:)
+                         name : ORHP4405AModelQuestionableConditionRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(questionableEventRegChanged:)
+                         name : ORHP4405AModelQuestionableEventRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(questionableFreqRegChanged:)
+                         name : ORHP4405AModelQuestionableFreqRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(questionableIntegrityRegChanged:)
+                         name : ORHP4405AModelQuestionableIntegrityRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(questionablePowerRegChanged:)
+                         name : ORHP4405AModelQuestionablePowerRegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusOperationRegChanged:)
+                         name : ORHP4405AModelStatusOperationRegChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(measurementInProgressChanged:)
+                         name : ORHP4405AModelMeasurementInProgressChanged
+						object: model];
 }
 
-#pragma mark ***Interface Management
-
-//--------------------------------------------------------------------------------
-/*!\method  updateWindow
- * \brief	Sets all GUI values to current model values.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) updateWindow
 {
     [ super updateWindow ];
+	[self centerFreqChanged:nil];
+	[self startFreqChanged:nil];
+	[self stopFreqChanged:nil];
+	[self unitsChanged:nil];
+	[self freqStepSizeChanged:nil];
+	[self freqStepDirChanged:nil];
+	[self triggerDelayChanged:nil];
+	[self triggerDelayEnabledChanged:nil];
+	[self triggerSlopeChanged:nil];
+	[self triggerOffsetChanged:nil];
+	[self triggerOffsetEnabledChanged:nil];
+	[self triggerSourceChanged:nil];
+	[self triggerDelayUnitsChanged:nil];
+	[self triggerOffsetUnitsChanged:nil];
+	[self burstFreqEnabledChanged:nil];
+	[self burstModeSettingChanged:nil];
+	[self burstModeAbsChanged:nil];
+	[self burstPulseDiscrimEnabledChanged:nil];
+	[self detectorGainEnabledChanged:nil];
+	[self inputAttenuationChanged:nil];
+	[self inputAttAutoEnabledChanged:nil];
+	[self inputGainEnabledChanged:nil];
+	[self inputMaxMixerPowerChanged:nil];
+	[self optimizePreselectorFreqChanged:nil];
+	[self continuousMeasurementChanged:nil];
+	[self statusRegChanged:nil];
+	[self standardEventRegChanged:nil];
+	[self questionableCalibrationRegChanged:nil];
+	[self questionableConditionRegChanged:nil];
+	[self questionableEventRegChanged:nil];
+	[self questionableFreqRegChanged:nil];
+	[self questionableIntegrityRegChanged:nil];
+	[self questionablePowerRegChanged:nil];
+	[self statusOperationRegChanged:nil];
+	[self measurementInProgressChanged:nil];
+    [self lockChanged:nil];
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  settingsLockName
- * \brief	Returns the lock name for this controller.
- * \note	
- */
-//--------------------------------------------------------------------------------
-- (NSString*) settingsLockName
+- (void) lockChanged: (NSNotification*) aNotification
 {
-    return ORHP4405ALock;
 }
 
-//--------------------------------------------------------------------------------
-/*!\method  gpibLockName
- * \brief	Returns the GPIB lock name for this controller.
- * \note	
- */
-//--------------------------------------------------------------------------------
-- (NSString*) gpibLockName
+
+
+#pragma mark ***Interface Management
+- (void) measurementInProgressChanged: (NSNotification*) aNotification
 {
-    return ORHP4405AGpibLock;
+	BOOL measuring = [model measurementInProgress];
+	[startMeasurementButton setEnabled: !measuring];
+	[continuousMeasurementCB setEnabled: !measuring];
+	[stopMeasurementButton setEnabled: measuring];
 }
 
-- (IBAction)attenutation:(id)sender
+- (void) statusOperationRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	NSLog(@"status Op: 0x%x\n",[model statusOperationReg]);
 }
 
-- (IBAction)burstType:(id)sender
+- (void) questionablePowerRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
 }
 
-- (IBAction)calWideband:(id)sender
+- (void) questionableIntegrityRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
 }
 
-- (IBAction)centerFreq:(id)sender
+- (void) questionableFreqRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
 }
 
-- (IBAction)channelTCS:(id)sender
+- (void) questionableEventRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
 }
 
-- (IBAction)delay:(id)sender
+- (void) questionableConditionRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
 }
 
-- (IBAction)detFormat:(id)sender
+- (void) questionableCalibrationRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
 }
 
-- (IBAction)freqUnit:(id)sender
+- (void) standardEventRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	NSLog(@"standard event: 0x%0x\n",[model standardEventReg]);
 }
 
-- (IBAction)iqInvert:(id)sender
+- (void) statusRegChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	NSLog(@"status event: 0x%0x\n",[model statusReg]);
 }
 
-- (IBAction)measType:(id)sender
+- (void) continuousMeasurementChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[continuousMeasurementCB setIntValue: [model continuousMeasurement]];
 }
 
-- (IBAction)modeType:(id)sender
+- (void) optimizePreselectorFreqChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[optimizePreselectorFreqField setIntValue: [model optimizePreselectorFreq]];
 }
 
-- (IBAction)opt10MHz:(id)sender
+- (void) inputMaxMixerPowerChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[inputMaxMixerPowerField setIntValue: [model inputMaxMixerPower]];
 }
 
-- (IBAction)optFreq:(id)sender
+- (void) inputGainEnabledChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[inputGainEnabledCB setIntValue: [model inputGainEnabled]];
 }
 
-- (IBAction)refFilter:(id)sender
+- (void) inputAttAutoEnabledChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[inputAttAutoEnabledCB setIntValue: [model inputAttAutoEnabled]];
 }
 
-- (IBAction)refLevel:(id)sender
+- (void) inputAttenuationChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[inputAttenuationField setIntValue: [model inputAttenuation]];
 }
 
-- (IBAction)refUnit:(id)sender
+- (void) detectorGainEnabledChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[detectorGainEnabledCB setIntValue: [model detectorGainEnabled]];
 }
 
-- (IBAction)scaleLevel:(id)sender
+- (void) burstPulseDiscrimEnabledChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[burstPulseDiscrimEnabledCB setIntValue: [model burstPulseDiscrimEnabled]];
 }
 
-- (IBAction)scaleUnit:(id)sender
+- (void) burstModeAbsChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[burstModeAbsPU setIntValue: [model burstModeAbs]];
 }
 
-- (IBAction)searchLengthUnit:(id)sender
+- (void) burstModeSettingChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[burstModeSettingField setIntValue: [model burstModeSetting]];
 }
 
-- (IBAction)searchLengthValue:(id)sender
+- (void) burstFreqEnabledChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[burstFreqEnabledCB setIntValue: [model burstFreqEnabled]];
 }
 
-- (IBAction)searchThreshUnit:(id)sender
+- (void) triggerOffsetUnitsChanged:(NSNotification*)aNote
 {
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[triggerOffsetUnitsPU selectItemAtIndex: [model triggerOffsetUnits]];
 }
 
-- (IBAction)searchThreshValue:(id)sender
+- (void) triggerDelayUnitsChanged:(NSNotification*)aNote
+{
+	[triggerDelayUnitsPU selectItemAtIndex: [model triggerDelayUnits]];
+}
+
+- (void) triggerSourceChanged:(NSNotification*)aNote
+{
+	[triggerSourcePU selectItemAtIndex: [model triggerSource]];
+}
+
+- (void) triggerOffsetEnabledChanged:(NSNotification*)aNote
+{
+	[triggerOffsetEnabledCB setIntValue: [model triggerOffsetEnabled]];
+}
+
+- (void) triggerOffsetChanged:(NSNotification*)aNote
+{
+	[triggerOffsetField setFloatValue: [model triggerOffset]];
+}
+
+- (void) triggerSlopeChanged:(NSNotification*)aNote
+{
+	[triggerSlopePU setIntValue: [model triggerSlope]];
+}
+
+- (void) triggerDelayEnabledChanged:(NSNotification*)aNote
+{
+	[triggerDelayEnableCB setFloatValue: [model triggerDelayEnabled]];
+}
+
+- (void) triggerDelayChanged:(NSNotification*)aNote
+{
+	[triggerDelayField setFloatValue: [model triggerDelay]];
+}
+
+- (void) freqStepDirChanged:(NSNotification*)aNote
+{
+	[freqStepDirPU selectItemAtIndex: [model freqStepDir]];
+}
+
+- (void) freqStepSizeChanged:(NSNotification*)aNote
+{
+	[freqStepSizeField setFloatValue: [model freqStepSize]];
+}
+- (void) unitsChanged:(NSNotification*)aNote
+{
+	[unitsPU selectItemAtIndex: [model units]];
+}
+
+- (void) stopFreqChanged:(NSNotification*)aNote
+{
+	[stopFreqField setFloatValue: [model stopFreq]];
+}
+
+- (void) startFreqChanged:(NSNotification*)aNote
+{
+	[startFreqField setFloatValue: [model startFreq]];
+}
+
+- (void) centerFreqChanged:(NSNotification*)aNote
+{
+	[centerFreqField setFloatValue: [model centerFreq]];
+}
+
+#pragma mark ¥¥¥Actions
+
+- (void) continuousMeasurementAction:(id)sender
+{
+	[model setContinuousMeasurement:[sender intValue]];	
+}
+
+- (void) optimizePreselectorFreqAction:(id)sender
+{
+	[model setOptimizePreselectorFreq:[sender intValue]];	
+}
+
+- (void) inputMaxMixerPowerAction:(id)sender
+{
+	[model setInputMaxMixerPower:[sender intValue]];	
+}
+
+- (void) inputGainEnabledAction:(id)sender
+{
+	[model setInputGainEnabled:[sender intValue]];	
+}
+
+- (void) inputAttAutoEnabledAction:(id)sender
+{
+	[model setInputAttAutoEnabled:[sender intValue]];	
+}
+
+- (void) inputAttenuationAction:(id)sender
+{
+	[model setInputAttenuation:[sender intValue]];	
+}
+
+- (void) detectorGainEnabledAction:(id)sender
+{
+	[model setDetectorGainEnabled:[sender intValue]];	
+}
+
+- (IBAction) burstPulseDiscrimEnabledAction:(id)sender
+{
+	[model setBurstPulseDiscrimEnabled:[sender intValue]];	
+}
+
+- (IBAction) burstModeAbsAction:(id)sender
+{
+	[model setBurstModeAbs:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) burstModeSettingAction:(id)sender
+{
+	[model setBurstModeSetting:[sender intValue]];	
+}
+
+- (void) burstFreqEnabledAction:(id)sender
+{
+	[model setBurstFreqEnabled:[sender intValue]];	
+}
+
+- (IBAction) triggerOffsetUnitsAction:(id)sender
+{
+	[model setTriggerOffsetUnits:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) triggerDelayUnitsAction:(id)sender
+{
+	[model setTriggerDelayUnits:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) triggerSourceAction:(id)sender
+{
+	[model setTriggerSource:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) triggerOffsetEnabledAction:(id)sender
+{
+	[model setTriggerOffsetEnabled:[sender intValue]];	
+}
+
+- (IBAction) triggerOffsetAction:(id)sender
+{
+	[model setTriggerOffset:[sender floatValue]];	
+}
+
+- (IBAction) triggerSlopeAction:(id)sender
+{
+	[model setTriggerSlope:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) triggerDelayEnabledAction:(id)sender
+{
+	[model setTriggerDelayEnabled:[sender intValue]];	
+}
+
+- (IBAction) triggerDelayAction:(id)sender
+{
+	[model setTriggerDelay:[sender floatValue]];	
+}
+
+- (IBAction) freqStepDirAction:(id)sender
+{
+	[model setFreqStepDir:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) freqStepSizeAction:(id)sender
+{
+	[model setFreqStepSize:[sender floatValue]];	
+}
+
+- (IBAction) unitsAction:(id)sender
+{
+	[model setUnits:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) stopFreqAction:(id)sender
+{
+	[model setStopFreq:[sender floatValue]];	
+}
+
+- (IBAction) startFreqAction:(id)sender
+{
+	[model setStartFreq:[sender floatValue]];	
+}
+
+- (IBAction) centerFreqAction:(id)sender
+{
+	[model setCenterFreq:[sender floatValue]];	
+}
+
+#pragma mark ¥¥¥Hardware Actions
+- (IBAction) loadFreqSettingsAction:(id)sender
 {
 	@try {
-		[model doNothing];
-		
+		[self endEditing];
+		[model loadFreqSettings];
 	}
 	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
+        NSLogColor([NSColor redColor],@"HP4405A Freq Settings Load Failed");
+        NSRunAlertPanel( @"HP4405A Freq Settings Load Failed",
+						[localException reason],
+						@"OK",
+						nil,
+						nil );
 	}
 }
 
-- (IBAction)startFreq:(id)sender
+- (IBAction) loadTriggerSettingsAction:(id)sender
 {
 	@try {
-		[model doNothing];
-		
+		[self endEditing];
+		[model loadTriggerSettings];
 	}
 	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
+        NSLogColor([NSColor redColor],@"HP4405A Trigger Settings Load Failed");
+        NSRunAlertPanel( @"HP4405A Trigger Settings Load Failed",
+						[localException reason],
+						@"OK",
+						nil,
+						nil );
 	}
 }
 
-- (IBAction)stopFreq:(id)sender
+- (IBAction) loadRFBurstSettingsAction:(id)sender
 {
 	@try {
-		[model doNothing];
-		
+		[self endEditing];
+		[model loadRFBurstSettings];
 	}
 	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
+        NSLogColor([NSColor redColor],@"HP4405A RF Burst Settings Load Failed");
+        NSRunAlertPanel( @"HP4405A RF Burst Settings Load Failed",
+						[localException reason],
+						@"OK",
+						nil,
+						nil );
+	}
+}
+- (IBAction) loadInputPortSettingsAction:(id)sender
+{
+	@try {
+		[self endEditing];
+		[model loadInputPortSettings];
+	}
+	@catch(NSException* localException) {
+        NSLogColor([NSColor redColor],@"HP4405A Input Port Settings Load Failed");
+        NSRunAlertPanel( @"HP4405A Input Port Settings Load Failed",
+						[localException reason],
+						@"OK",
+						nil,
+						nil );
 	}
 }
 
-- (IBAction)symbolRate:(id)sender
+- (IBAction) startMeasuremnt:(id)sender
 {
 	@try {
-		[model doNothing];
-		
+		[self endEditing];
+		[model initiateMeasurement];
 	}
 	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
+        NSLogColor([NSColor redColor],@"HP4405A Initiate Measurement Failed");
+        NSRunAlertPanel( @"HP4405A Initiate Measurement Failed",
+						[localException reason],
+						@"OK",
+						nil,
+						nil );
 	}
 }
 
-- (IBAction)symbolUnit:(id)sender
+- (IBAction) pauseMeasuremnt:(id)sender
 {
 	@try {
-		[model doNothing];
-		
+		[self endEditing];
+		[model pauseMeasurement];
 	}
 	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
+        NSLogColor([NSColor redColor],@"HP4405A Pause Measurement Failed");
+        NSRunAlertPanel( @"HP4405A Pause Measurement Failed",
+						[localException reason],
+						@"OK",
+						nil,
+						nil );
 	}
 }
 
-- (IBAction)timeSlot:(id)sender
+- (IBAction) checkStatusAction:(id)sender;
 {
 	@try {
-		[model doNothing];
-		
+		[self endEditing];
+		[model checkStatus];
 	}
 	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-}
-
-- (IBAction)traceMode:(id)sender
-{
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-}
-
-- (IBAction)triggerPolarity:(id)sender
-{
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-}
-
-- (IBAction)triggerType:(id)sender
-{
-	@try {
-		[model doNothing];
-		
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
+        NSLogColor([NSColor redColor],@"HP4405A Check Status Failed");
+        NSRunAlertPanel( @"HP4405A Check Status Failed",
+						[localException reason],
+						@"OK",
+						nil,
+						nil );
 	}
 }
 

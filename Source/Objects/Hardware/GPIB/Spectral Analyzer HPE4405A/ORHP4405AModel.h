@@ -1,110 +1,238 @@
-//--------------------------------------------------------------------------------
-/*!\class	ORHP4405AModel
- * \brief	This class the hardware interaction with the HP4405A Agilent spectral analyzer.
- * \methods
- *			\li \b 	init						- Constructor - Default first time
- *											      object is created
- *			\li \b 	dealloc						- Unregister messages, cleanup.
- * \private
- * \note	1) The hardware access methods use the internally stored state
- *			   to actually set the hardware.  Thus one first has to use the
- *			   accessor methods prior to setting the oscilloscope hardware.
- *			
- * \author	 J. A. Formaggio
- * \history	2008-15-07 (jaf) - Original.
- */
+//
+//  ORHP4405AModel.h
+//  Orca
+//
+//  Created by Mark Howe on Wed Jul28, 2010.
+//  Copyright 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
+//North Carolina at the UNC Physics Dept sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
+//North Carolina reserve all rights in the program. Neither the authors,
 //University of Washington, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "OROscBaseModel.h"
-#import "ORHP4405AData.h"
-#import "OROscDecoder.h"
+#import "ORGpibDeviceModel.h"
 
 #define ORHP4405A 1
 #define ORHPMaxRecSize 50000
 #define ORHPMaxSampleRate 0.125e-9;
 
 // Interface description of ORHP4405AModel oscilloscope.
-@interface ORHP4405AModel : OROscBaseModel {
-    @private
-	ORHP4405AData*		mDataObj[ kMaxOscChnls ];       // Pointers channel data.
+@interface ORHP4405AModel : ORGpibDeviceModel {
+	
+	NSData* trace1;
+	
+	unsigned long dataId;
+	BOOL  measurementInProgress;
+	float centerFreq;
+    float startFreq;
+    float stopFreq;
+    int   units;
+    float freqStepSize;
+    BOOL  freqStepDir;
+	
+    BOOL  triggerDelayEnabled;
+    BOOL  triggerOffsetEnabled;
+    float triggerOffset;
+    float triggerDelay;
+    int   triggerSource;
+    int   triggerDelayUnits;
+    int   triggerOffsetUnits;
+    int   triggerSlope;
+	
+    BOOL burstFreqEnabled;
+    int  burstModeSetting;
+    BOOL burstModeAbs;
+    BOOL burstPulseDiscrimEnabled;
+	
+    BOOL detectorGainEnabled;
+    BOOL inputAttAutoEnabled;
+    BOOL inputGainEnabled;
+    int  inputAttenuation;
+    int  inputMaxMixerPower;
+    int  optimizePreselectorFreq;
+    BOOL continuousMeasurement;
+	
+	//status
+    unsigned char statusReg;
+    unsigned char standardEventReg;
+    unsigned short questionableCalibrationReg;
+    unsigned short questionableConditionReg;
+    unsigned short questionableEventReg;
+    unsigned short questionableFreqReg;
+    unsigned short questionableIntegrityReg;
+    unsigned short questionablePowerReg;
+    unsigned short statusOperationReg;
 }
 
-#pragma mark ***Initialization
-- (id) 		init;
-- (void) 	dealloc;
-- (void)	setUpImage;
-- (void)	makeMainController;
+#pragma mark •••Initialization
+- (id) init;
+- (void) dealloc;
+- (void) setUpImage;
+- (void) makeMainController;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anOtherObj;
+
+#pragma mark •••Accessors
+- (unsigned short) statusOperationReg;
+- (void) setStatusOperationReg:(unsigned short)aStatusOperationReg;
+- (unsigned short) questionablePowerReg;
+- (void) setQuestionablePowerReg:(unsigned short)aQuestionablePowerReg;
+- (unsigned short) questionableIntegrityReg;
+- (void) setQuestionableIntegrityReg:(unsigned short)aQuestionableIntegrityReg;
+- (unsigned short) questionableFreqReg;
+- (void) setQuestionableFreqReg:(unsigned short)aQuestionableFreqReg;
+- (unsigned short) questionableEventReg;
+- (void) setQuestionableEventReg:(unsigned short)aQuestionableEventReg;
+- (unsigned short) questionableConditionReg;
+- (void) setQuestionableConditionReg:(unsigned short)aQuestionableConditionReg;
+- (unsigned short) questionableCalibrationReg;
+- (void) setQuestionableCalibrationReg:(unsigned short)aQuestionableCalibrationReg;
+- (unsigned char) standardEventReg;
+- (void) setStandardEventReg:(unsigned char)aStandardEventReg;
+- (unsigned char) statusReg;
+- (void) setStatusReg:(unsigned char)aStatusReg;
+
+- (BOOL) continuousMeasurement;
+- (void) setContinuousMeasurement:(BOOL)aContinuousMeasurement;
+- (int) optimizePreselectorFreq;
+- (void) setOptimizePreselectorFreq:(int)aOptimizePreselectorFreq;
+- (int) inputMaxMixerPower;
+- (void) setInputMaxMixerPower:(int)aInputMaxMixerPower;
+- (BOOL) inputGainEnabled;
+- (void) setInputGainEnabled:(BOOL)aInputGainEnabled;
+- (BOOL) inputAttAutoEnabled;
+- (void) setInputAttAutoEnabled:(BOOL)aInputAttAutoEnabled;
+- (int) inputAttenuation;
+- (void) setInputAttenuation:(int)aInputAttenuation;
+- (BOOL) detectorGainEnabled;
+- (void) setDetectorGainEnabled:(BOOL)aDetectorGainEnabled;
+- (BOOL) burstPulseDiscrimEnabled;
+- (void) setBurstPulseDiscrimEnabled:(BOOL)aBurstPulseDiscrimEnabled;
+- (BOOL) burstModeAbs;
+- (void) setBurstModeAbs:(BOOL)aBurstModeAbs;
+- (BOOL) burstModeSetting;
+- (void) setBurstModeSetting:(BOOL)aBurstModeSetting;
+- (BOOL) burstFreqEnabled;
+- (void) setBurstFreqEnabled:(BOOL)aBurstFreqEnabled;
+- (int) triggerOffsetUnits;
+- (void) setTriggerOffsetUnits:(int)aTriggerOffsetUnits;
+- (int) triggerDelayUnits;
+- (void) setTriggerDelayUnits:(int)aTriggerDelayUnits;
+- (int) triggerSource;
+- (void) setTriggerSource:(int)aTriggerSource;
+- (BOOL) triggerOffsetEnabled;
+- (void) setTriggerOffsetEnabled:(BOOL)aTriggerOffsetEnabled;
+- (float) triggerOffset;
+- (void) setTriggerOffset:(float)aTriggerOffset;
+- (int) triggerSlope;
+- (void) setTriggerSlope:(int)aTriggerSlope;
+- (BOOL) triggerDelayEnabled;
+- (void) setTriggerDelayEnabled:(BOOL)aTriggerDelayEnabled;
+- (float) triggerDelay;
+- (void) setTriggerDelay:(float)aTriggerDelay;
+- (BOOL) freqStepDir;
+- (void) setFreqStepDir:(BOOL)aFreqStepDir;
+- (float) freqStepSize;
+- (void) setFreqStepSize:(float)aFreqStepSize;
+- (int) units;
+- (void) setUnits:(int)aUnits;
+
+- (float) stopFreq;
+- (void) setStopFreq:(float)aStopFreq;
+- (float) startFreq;
+- (void) setStartFreq:(float)aStartFreq;
+- (float) centerFreq;
+- (void) setCenterFreq:(float)aCenterFreq;
+- (NSString*) unitName:(int)anIndex;
+- (NSString*) triggerSourceName:(int)anIndex;
+- (void) setTrace1:(NSData*)someData;
+
+- (BOOL) measurementInProgress;
+- (void) setMeasurementInProgress:(BOOL)aState;
 
 #pragma mark ***Hardware - General
-- (short)	oscScopeId;
-- (bool) 	oscBusy;
-- (long)	oscGetDateTime;
-- (void)	oscSetDateTime: (time_t) aTime;
-- (void)	oscLockPanel: (bool) aFlag;
-- (void)	oscResetOscilloscope;
-- (void)	oscSendTextMessage: (NSString*) aMessage;
-- (void)	oscSetQueryFormat: (short) aFormat;
-- (void)	oscSetScreenDisplay: (bool) aDisplayOn;
+- (void)			reset;
+- (void)			loadFormat;
+- (void)			setTime;
+- (unsigned long)	getPowerOnTime;
+- (void)			loadTriggerSettings;
+- (void)			loadFreqSettings;
+- (void)			loadRFBurstSettings;
+- (void)			loadInputPortSettings;
 
-#pragma mark ***Hardware - Channel
+- (void)			initiateMeasurement;
+- (void)			pauseMeasurement;
+- (void)			restartMeasurement;
+- (void)			resumeMeasurement;
 
-#pragma mark ***Hardware - Horizontal settings
+- (void)		   checkStatus;
+- (unsigned short) readStatusOperationReg;
+- (unsigned short) readQuestionableCalibrationReg;
+- (unsigned short) readQuestionableConditionReg;
+- (unsigned short) readQuestionableEventReg;
+- (unsigned short) readQuestionableFreqReg;
+- (unsigned short) readQuestionableIntegrityReg;
+- (unsigned short) readQuestionablePowerReg;
 
-#pragma mark ***Hardware - Trigger
-
-#pragma mark ***Get and set oscilloscope specific settings.
-
-#pragma mark ***Hardware - Data Acquisition
-- (BOOL)	runInProgress;
-- (void)	oscGetHeader;
-- (void)	oscGetWaveform: (unsigned short) aMask;
-- (void) 	oscGetWaveformTime: (unsigned short) aMask;
-- (void)	oscRunOsc: (NSString*) aStartMsg;
-- (void)	oscSetAcqMode: (short) aMode;
-- (void)	oscSetDataReturnMode;
-- (void)	oscStopAcquisition;
-                                                    
-#pragma mark •••DataTaker
+#pragma mark ***DataTaker
 - (NSDictionary*) dataRecordDescription;
-- (void) 	runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void)	takeDataTask:(id)userInfo;
-- (void) 	runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo: (id) anUserInfo;
+- (void) takeDataTask: (id) notUsed;
+- (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo: (id) anUserInfo;
 
-#pragma mark ***Specialty routines.
-//- (NSString*) 	triggerSourceAsString;
-- (void)	oscHP4405AConvertTime: (unsigned long long*) a10MhzTime timeToConvert: (char*) aCharTime;
-- (void) doNothing;
-/*- 
-- 
-- (BOOL)	OscResetOscilloscope;	
-- (BOOL)	OscWait;
-*/
+#pragma mark •••Archival
+- (id) initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark ***Helpers
+- (float) limitFloatValue:(float)aValue min:(float)aMin max:(float)aMax;
 
 @end
 
-@interface ORHP4405ADecoderForScopeData : OROscDecoder
-{}
-@end
-
-@interface ORHP4405ADecoderForScopeGTID : OROscDecoder
-{} 
-@end
-
-@interface ORHP4405ADecoderForScopeTime : OROscDecoder
-{}
-@end
-
+extern NSString* ORHP4405AModelStatusOperationRegChanged;
+extern NSString* ORHP4405AModelQuestionablePowerRegChanged;
+extern NSString* ORHP4405AModelQuestionableIntegrityRegChanged;
+extern NSString* ORHP4405AModelQuestionableFreqRegChanged;
+extern NSString* ORHP4405AModelQuestionableEventRegChanged;
+extern NSString* ORHP4405AModelQuestionableConditionRegChanged;
+extern NSString* ORHP4405AModelQuestionableCalibrationRegChanged;
+extern NSString* ORHP4405AModelStandardEventRegChanged;
+extern NSString* ORHP4405AModelStatusRegChanged;
+extern NSString* ORHP4405AModelMeasurementInProgressChanged;
+extern NSString* ORHP4405AModelContinuousMeasurementChanged;
+extern NSString* ORHP4405AModelOptimizePreselectorFreqChanged;
+extern NSString* ORHP4405AModelInputMaxMixerPowerChanged;
+extern NSString* ORHP4405AModelInputGainEnabledChanged;
+extern NSString* ORHP4405AModelInputAttAutoEnabledChanged;
+extern NSString* ORHP4405AModelInputAttenuationChanged;
+extern NSString* ORHP4405AModelDetectorGainEnabledChanged;
+extern NSString* ORHP4405AModelTrace1Changed;
+extern NSString* ORHP4405AModelBurstPulseDiscrimEnabledChanged;
+extern NSString* ORHP4405AModelBurstModeAbsChanged;
+extern NSString* ORHP4405AModelBurstModeSettingChanged;
+extern NSString* ORHP4405AModelBurstFreqEnabledChanged;
+extern NSString* ORHP4405AModelTriggerOffsetUnitsChanged;
+extern NSString* ORHP4405AModelTriggerDelayUnitsChanged;
+extern NSString* ORHP4405AModelTriggerSourceChanged;
+extern NSString* ORHP4405AModelTriggerOffsetEnabledChanged;
+extern NSString* ORHP4405AModelTriggerOffsetChanged;
+extern NSString* ORHP4405AModelTriggerSlopeChanged;
+extern NSString* ORHP4405AModelTriggerDelayEnabledChanged;
+extern NSString* ORHP4405AModelTriggerDelayChanged;
+extern NSString* ORHP4405AModelFreqStepDirChanged;
+extern NSString* ORHP4405AModelFreqStepSizeChanged;
+extern NSString* ORHP4405AModelUnitsChanged;
+extern NSString* ORHP4405AModelStopFreqChanged;
+extern NSString* ORHP4405AModelStartFreqChanged;
+extern NSString* ORHP4405AModelCenterFreqChanged;
 extern NSString* ORHP4405ALock;
 extern NSString* ORHP4405AGpibLock;
