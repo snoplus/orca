@@ -99,6 +99,7 @@
 - (void) startFreqChanged:(NSNotification*)aNote;
 - (void) centerFreqChanged:(NSNotification*)aNote;
 - (void) lockChanged: (NSNotification*) aNote;
+- (void) measurementInProgressChanged: (NSNotification*) aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) continuousMeasurementAction:(id)sender;
