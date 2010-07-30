@@ -2315,8 +2315,6 @@
 		9C8846850E2D8D960099B98E /* ORHP4405A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C88467D0E2D8D960099B98E /* ORHP4405A.nib */; };
 		9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C88467E0E2D8D960099B98E /* ORHP4405AController.h */; };
 		9C8846870E2D8D960099B98E /* ORHP4405AController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C88467F0E2D8D960099B98E /* ORHP4405AController.m */; };
-		9C8846880E2D8D960099B98E /* ORHP4405AData.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C8846800E2D8D960099B98E /* ORHP4405AData.h */; };
-		9C8846890E2D8D960099B98E /* ORHP4405AData.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8846810E2D8D960099B98E /* ORHP4405AData.m */; };
 		9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C8846820E2D8D960099B98E /* ORHP4405AModel.h */; };
 		9C88468B0E2D8D960099B98E /* ORHP4405AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8846830E2D8D960099B98E /* ORHP4405AModel.m */; };
 		9C8846A60E2D90ED0099B98E /* HP4405A.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9C8846A50E2D90ED0099B98E /* HP4405A.gif */; };
@@ -4732,8 +4730,6 @@
 		9C88467D0E2D8D960099B98E /* ORHP4405A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ORHP4405A.nib; sourceTree = "<group>"; };
 		9C88467E0E2D8D960099B98E /* ORHP4405AController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AController.h; sourceTree = "<group>"; };
 		9C88467F0E2D8D960099B98E /* ORHP4405AController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AController.m; sourceTree = "<group>"; };
-		9C8846800E2D8D960099B98E /* ORHP4405AData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AData.h; sourceTree = "<group>"; };
-		9C8846810E2D8D960099B98E /* ORHP4405AData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AData.m; sourceTree = "<group>"; };
 		9C8846820E2D8D960099B98E /* ORHP4405AModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AModel.h; sourceTree = "<group>"; };
 		9C8846830E2D8D960099B98E /* ORHP4405AModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AModel.m; sourceTree = "<group>"; };
 		9C8846A50E2D90ED0099B98E /* HP4405A.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = HP4405A.gif; sourceTree = "<group>"; };
@@ -9824,8 +9820,6 @@
 				9C88467D0E2D8D960099B98E /* ORHP4405A.nib */,
 				9C88467E0E2D8D960099B98E /* ORHP4405AController.h */,
 				9C88467F0E2D8D960099B98E /* ORHP4405AController.m */,
-				9C8846800E2D8D960099B98E /* ORHP4405AData.h */,
-				9C8846810E2D8D960099B98E /* ORHP4405AData.m */,
 				9C8846820E2D8D960099B98E /* ORHP4405AModel.h */,
 				9C8846830E2D8D960099B98E /* ORHP4405AModel.m */,
 			);
@@ -10877,7 +10871,6 @@
 				846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */,
 				846B8F1C0E15973500C41F9D /* vxi11.h in Headers */,
 				9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */,
-				9C8846880E2D8D960099B98E /* ORHP4405AData.h in Headers */,
 				9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */,
 				9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */,
 				9C7CE7E80E2FC22500F63679 /* ORCaen260Decoders.h in Headers */,
@@ -12423,7 +12416,6 @@
 				846B8F1D0E15973500C41F9D /* vxi11_clnt.m in Sources */,
 				846B8F200E15973500C41F9D /* vxi11_xdr.m in Sources */,
 				9C8846870E2D8D960099B98E /* ORHP4405AController.m in Sources */,
-				9C8846890E2D8D960099B98E /* ORHP4405AData.m in Sources */,
 				9C88468B0E2D8D960099B98E /* ORHP4405AModel.m in Sources */,
 				9C7CE7E70E2FC22500F63679 /* ORCaen260Controller.m in Sources */,
 				9C7CE7E90E2FC22500F63679 /* ORCaen260Decoders.m in Sources */,
@@ -12997,7 +12989,25 @@
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_GLOBAL_CONSTRUCTORS = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MISSING_PARENTHESES = NO;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_PROTOTYPE_CONVERSION = NO;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = "";
