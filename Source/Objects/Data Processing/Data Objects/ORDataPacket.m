@@ -251,7 +251,7 @@
 {
 	[theDataLock lock];   //-----begin critical section
     if(!frameBuffer){
-		[self setFrameBuffer:[NSMutableData dataWithLength:lastFrameBufferSize]];
+		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
 	}
 	if((frameIndex+length)*sizeof(long)>=[frameBuffer length]){
 		[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinSize];
@@ -269,7 +269,7 @@
 {
 	[theDataLock lock];   //-----begin critical section
     if(!frameBuffer){
-		[self setFrameBuffer:[NSMutableData dataWithLength:lastFrameBufferSize]];
+		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
 	}
 	unsigned long oldFrameIndex = frameIndex;
 	frameIndex += length;
@@ -286,7 +286,9 @@
 - (unsigned long)reserveSpaceInFrameBuffer:(unsigned long)length
 {
 	[theDataLock lock];   //-----begin critical section
-    if(!frameBuffer) [self setFrameBuffer:[NSMutableData dataWithLength:kMinSize]];
+    if(!frameBuffer){
+		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
+	}
 	
     reservePool[reserveIndex] = frameIndex;
 	unsigned long oldIndex = reserveIndex;
