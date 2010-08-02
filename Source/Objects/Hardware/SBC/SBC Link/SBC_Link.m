@@ -2094,7 +2094,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		struct timeval tv;
 		tv.tv_sec  = 2;
 		tv.tv_usec = 0;
-		selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
+		selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
 	} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
 	
 	if(selectionResult > 0){
@@ -2152,7 +2152,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 				struct timeval tv;
 				tv.tv_sec  = 2;
 				tv.tv_usec = 0;
-				selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
+				selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
 			} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
 
             if(selectionResult > 0){
@@ -2205,7 +2205,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			struct timeval tv;
 			tv.tv_sec  = 2;
 			tv.tv_usec = 0;
-			selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
+			selectionResult = select(aSocket+1, &read_fds, NULL,  NULL, &tv);
 		} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
 		
         if (selectionResult == kSelectionError){
