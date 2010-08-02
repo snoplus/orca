@@ -947,7 +947,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		[self setCompilerWarnings:compilerWarnings+1];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
-	else if([text rangeOfString:@"goscript:"].location != NSNotFound){
+	else if([text rangeOfString:@"goScript:"].location != NSNotFound){
 		[self setGoScriptFailed:YES];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
@@ -1013,7 +1013,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
 			 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/goScript",nil]];
-	
+
 	[aSequence setVerbose:verbose];
 	[aSequence setTextToDelegate:YES];
 	
@@ -1594,7 +1594,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			long testWord = 0x0000DCBA;
 			int bytesWritten = write(socketfd,&testWord,4);
 			if(bytesWritten!=4) [NSException raise:@"Test Send Failed" format:@"Couldn't write to %@",IPNumber];
-			
+		
 			//get the socket descriptor for the interrupt link
 			irqfd = [self connectToPort:portNumber+1];
 			
@@ -1881,6 +1881,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	switch(startCrateState){
 		case kTryToConnect:
 			@try {
+				NSLog(@"Trying to connect to SBC\n");
 				[self connect]; //will throw if can't connect
 				startCrateState = kDone;
 			}
@@ -1892,7 +1893,9 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			
 		case kTryToStartCode:
 			@try {
+				NSLog(@"Staring SBC code\n");
 				[self startCrateCode];
+				[ORTimer delay:.3];
 				startCrateState = kWaitingForStart;
 				waitCount = 0;
 			}
@@ -1921,7 +1924,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			
 		case kReloadCode:
 			[self reloadClient];
-			NSLog(@"waiting for code reload\n");
+			NSLog(@"Waiting for SBC code reload\n");
 			startCrateState = kWaitingForReload;
 			waitCount = 0;
 			break;

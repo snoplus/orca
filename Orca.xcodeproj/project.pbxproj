@@ -262,6 +262,9 @@
 		84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84098F6E0F96589B00036BE8 /* Turbo.gif */; };
 		840AF86D0819924D005B750D /* SourceMask.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AF86B0819924D005B750D /* SourceMask.h */; };
 		840AF86E0819924D005B750D /* SourceMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AF86C0819924D005B750D /* SourceMask.m */; };
+		840B00AA1206F70B009095A4 /* goScript in VME_Copy */ = {isa = PBXBuildFile; fileRef = 840B00721206F556009095A4 /* goScript */; };
+		840B00AB1206F754009095A4 /* goScript in cPCI_Code Copy */ = {isa = PBXBuildFile; fileRef = 840B00761206F57B009095A4 /* goScript */; };
+		840B00AC1206F774009095A4 /* goScript in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 840B00741206F56A009095A4 /* goScript */; };
 		840B207C0B4D79400021220C /* NSScanner+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B207A0B4D79400021220C /* NSScanner+Extensions.h */; };
 		840B207D0B4D79400021220C /* NSScanner+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B207B0B4D79400021220C /* NSScanner+Extensions.m */; };
 		840B20C60B4D7CE80021220C /* Editing.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840B20C50B4D7CE80021220C /* Editing.tif */; };
@@ -1265,10 +1268,8 @@
 		847CCA68058E8C75003522C8 /* ORQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA62058E8C75003522C8 /* ORQueue.h */; };
 		847CCA69058E8C75003522C8 /* ORQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA63058E8C75003522C8 /* ORQueue.m */; };
 		847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA65058E8C75003522C8 /* ORLinkedList.m */; };
-		847D76FA10B795DE00893F3A /* goScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76F710B795DE00893F3A /* goScript */; };
 		847D76FB10B795DE00893F3A /* killScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
 		847D76FE10B7963D00893F3A /* makeScript in Resources */ = {isa = PBXBuildFile; fileRef = 847D76FD10B7963D00893F3A /* makeScript */; };
-		847D771110B7977700893F3A /* goScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76F710B795DE00893F3A /* goScript */; };
 		847D771210B7977700893F3A /* killScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76F810B795DE00893F3A /* killScript */; };
 		847E6C100CFF4BF400E963C6 /* ORObjectProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 847E6C0E0CFF4BF400E963C6 /* ORObjectProxy.h */; };
 		847E6C110CFF4BF400E963C6 /* ORObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C0F0CFF4BF400E963C6 /* ORObjectProxy.m */; };
@@ -2389,6 +2390,7 @@
 				842251400D8845500048D331 /* HW_Readout.h in SLTv4_Copy */,
 				43ADFEA510B6E1600044617C /* HW_Specific.icc in SLTv4_Copy */,
 				43ADFEA610B6E1600044617C /* HWMakefile.mk in SLTv4_Copy */,
+				840B00AC1206F774009095A4 /* goScript in SLTv4_Copy */,
 				43ADFEA710B6E1600044617C /* ORFLTv4Readout.cc in SLTv4_Copy */,
 				43ADFEA810B6E1600044617C /* ORFLTv4Readout.hh in SLTv4_Copy */,
 				43ADFEA910B6E1600044617C /* ORSLTv4Readout.cc in SLTv4_Copy */,
@@ -2407,6 +2409,7 @@
 			files = (
 				43ADFEB310B6E1DF0044617C /* HW_Specific.icc in cPCI_Code Copy */,
 				43ADFEB410B6E1DF0044617C /* HWMakefile.mk in cPCI_Code Copy */,
+				840B00AB1206F754009095A4 /* goScript in cPCI_Code Copy */,
 				43ADFEB510B6E1DF0044617C /* ORAcqirisDC440Readout.cc in cPCI_Code Copy */,
 				43ADFEB610B6E1DF0044617C /* ORAcqirisDC440Readout.hh in cPCI_Code Copy */,
 				8493CC8E0C99FACA00B46CD4 /* AcqirisDC440Cmds.h in cPCI_Code Copy */,
@@ -2425,6 +2428,7 @@
 			dstSubfolderSpec = 7;
 			files = (
 				43ADFEB910B6E2090044617C /* HW_Specific.icc in VME_Copy */,
+				840B00AA1206F70B009095A4 /* goScript in VME_Copy */,
 				EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */,
 				EF69C483116E6526008ABADC /* ORSNOCrateReadout.hh in VME_Copy */,
 				43ADFEBA10B6E2090044617C /* HWMakefile.mk in VME_Copy */,
@@ -2479,7 +2483,6 @@
 			dstPath = SBC_Code;
 			dstSubfolderSpec = 7;
 			files = (
-				847D771110B7977700893F3A /* goScript in SBC_Code Copy */,
 				847D771210B7977700893F3A /* killScript in SBC_Code Copy */,
 				848A160A10BB00F3002A80D0 /* makeScript in SBC_Code Copy */,
 				84D351AB10B578470013473E /* loginScript in SBC_Code Copy */,
@@ -2759,6 +2762,9 @@
 		84098F6E0F96589B00036BE8 /* Turbo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Turbo.gif; path = Source/Objects/Hardware/Serial/PDcu/Turbo.gif; sourceTree = SOURCE_ROOT; };
 		840AF86B0819924D005B750D /* SourceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceMask.h; sourceTree = "<group>"; };
 		840AF86C0819924D005B750D /* SourceMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceMask.m; sourceTree = "<group>"; };
+		840B00721206F556009095A4 /* goScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = goScript; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/goScript; sourceTree = SOURCE_ROOT; };
+		840B00741206F56A009095A4 /* goScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = goScript; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/goScript"; sourceTree = SOURCE_ROOT; };
+		840B00761206F57B009095A4 /* goScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = goScript; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/goScript; sourceTree = SOURCE_ROOT; };
 		840B207A0B4D79400021220C /* NSScanner+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSScanner+Extensions.h"; path = "Source/Cocoa Extensions/NSScanner+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		840B207B0B4D79400021220C /* NSScanner+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSScanner+Extensions.m"; path = "Source/Cocoa Extensions/NSScanner+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		840B20C50B4D7CE80021220C /* Editing.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Editing.tif; sourceTree = "<group>"; };
@@ -3551,7 +3557,6 @@
 		847CCA62058E8C75003522C8 /* ORQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.h"; sourceTree = SOURCE_ROOT; };
 		847CCA63058E8C75003522C8 /* ORQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORQueue.m; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.m"; sourceTree = SOURCE_ROOT; };
 		847CCA65058E8C75003522C8 /* ORLinkedList.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLinkedList.m; path = "Source/Objects/Misc Objects/DataStructures/ORLinkedList.m"; sourceTree = SOURCE_ROOT; };
-		847D76F710B795DE00893F3A /* goScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = goScript; path = Source/Objects/Hardware/SBC/SBC_Code/goScript; sourceTree = SOURCE_ROOT; };
 		847D76F810B795DE00893F3A /* killScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = killScript; path = Source/Objects/Hardware/SBC/SBC_Code/killScript; sourceTree = SOURCE_ROOT; };
 		847D76F910B795DE00893F3A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = Source/Objects/Hardware/SBC/SBC_Code/Makefile; sourceTree = SOURCE_ROOT; };
 		847D76FD10B7963D00893F3A /* makeScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = makeScript; path = Source/Objects/Hardware/SBC/SBC_Code/makeScript; sourceTree = SOURCE_ROOT; };
@@ -6090,6 +6095,7 @@
 				43ADFE9A10B6DF980044617C /* ORSLTv4Readout.cc */,
 				43ADFE9B10B6DF980044617C /* ORSLTv4Readout.hh */,
 				842251310D8845390048D331 /* SLTv4_HW_Definitions.h */,
+				840B00741206F56A009095A4 /* goScript */,
 				2D159237113EE62C00EA1552 /* IpeV4SLTScript */,
 			);
 			name = SLTv4_Readout_Code;
@@ -7449,7 +7455,6 @@
 		8493CC3B0C99FA0700B46CD4 /* SBC_Code */ = {
 			isa = PBXGroup;
 			children = (
-				847D76F710B795DE00893F3A /* goScript */,
 				847D76F810B795DE00893F3A /* killScript */,
 				847D76FD10B7963D00893F3A /* makeScript */,
 				847D76F910B795DE00893F3A /* Makefile */,
@@ -7486,6 +7491,7 @@
 			children = (
 				43ADFEAB10B6E1C80044617C /* HW_Specific.icc */,
 				43ADFEAC10B6E1C80044617C /* HWMakefile.mk */,
+				840B00761206F57B009095A4 /* goScript */,
 				43ADFEAD10B6E1C80044617C /* ORAcqirisDC440Readout.cc */,
 				43ADFEAE10B6E1C80044617C /* ORAcqirisDC440Readout.hh */,
 				8493CC6A0C99FA3100B46CD4 /* AcqirisDC440Cmds.h */,
@@ -7515,6 +7521,7 @@
 			children = (
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
+				840B00721206F556009095A4 /* goScript */,
 				84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */,
 				84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */,
 				84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */,
@@ -11788,7 +11795,6 @@
 				84D34B0B10B1D6C90013473E /* SIS3302Card.gif in Resources */,
 				84D351C310B5822F0013473E /* UniverseDriverInstall in Resources */,
 				84D356E010B5C41B0013473E /* DriverInstall.gif in Resources */,
-				847D76FA10B795DE00893F3A /* goScript in Resources */,
 				847D76FB10B795DE00893F3A /* killScript in Resources */,
 				847D76FE10B7963D00893F3A /* makeScript in Resources */,
 				8435AACC10C6D0EF00E03F7F /* NoOilHelp.plist in Resources */,
