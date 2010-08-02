@@ -123,7 +123,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         
         
         // --- ENERGY MODE ------------------------------
-        if(daqRunMode == kIpeFlt_EnergyMode){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode
+        if((daqRunMode == kIpeFltV4_EnergyDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
             uint32_t fifoStatus;// = (status >> 24) & 0xf;
             uint32_t fifoFlags;// =   FF, AF, AE, EF
@@ -190,7 +190,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
             }//for(eventN=0; ...
         }
         // --- ENERGY+TRACE MODE ------------------------------
-        else if(daqRunMode == kIpeFlt_EnergyTrace){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode
+        else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
             uint32_t fifoStatus;// = (status >> 24) & 0xf;
             
@@ -377,6 +377,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 					//set page manager to automatic mode
 					//srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
 					srack->theSlt->pageSelect->write((long unsigned int)0x0);
+                    //reset histogram time counters (=histRecTime=refresh time -tb-) //TODO: unfortunately there is no such command for the histogramming -tb- 2010-07-28
+                    //TODO: srack->theFlt[col]->command->resetPointers->write(1);
                     //clear histogram (probably not really necessary with "automatic clear" -tb-) 
                     srack->theFlt[col]->command->resetPages->write(1);
                     //init page AB flag

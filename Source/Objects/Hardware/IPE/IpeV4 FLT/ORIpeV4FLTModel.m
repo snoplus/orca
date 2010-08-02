@@ -265,16 +265,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	readWaveforms = NO;
 	
 	switch (runMode) {
-		case kIpeFlt_EnergyMode:
+		case kIpeFltV4_EnergyDaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			break;
 			
-		case kIpeFlt_EnergyTrace:
+		case kIpeFltV4_EnergyTraceDaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			readWaveforms = YES;
 			break;
 			
-		case kIpeFlt_Histogram_Mode:
+		case kIpeFltV4_Histogram_DaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Histo_Mode];
 			//TODO: workaround - if set to kFifoStopOnFull the histogramming stops after some seconds - probably a FPGA bug? -tb-
 			if(fifoBehaviour == kFifoStopOnFull){
@@ -395,6 +395,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) filterLength { return filterLength; }
 - (void) setFilterLength:(int)aFilterLength
 {
+	if(aFilterLength == 6 && gapLength>0){
+		[self setGapLength:0];
+		NSLog(@"Warning: setFilterLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+	}
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterLength:filterLength];
     filterLength = [self restrictIntValue:aFilterLength min:2 max:8];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelFilterLengthChanged object:self];
@@ -403,6 +407,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) gapLength { return gapLength; }
 - (void) setGapLength:(int)aGapLength
 {
+	if(filterLength == 6 && aGapLength>0){
+		aGapLength=0;
+		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+	}
     [[[self undoManager] prepareWithInvocationTarget:self] setGapLength:gapLength];
     gapLength = [self restrictIntValue:aGapLength min:0 max:7];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelGapLengthChanged object:self];
@@ -1464,7 +1472,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
 	}
 		
-	if(runMode == kIpeFlt_Histogram_Mode){
+	if(runMode == kIpeFltV4_Histogram_DaqMode){
 		//start polling histogramming mode status
 		[self performSelector:@selector(readHistogrammingStatus) 
 				   withObject:nil
@@ -1526,7 +1534,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //"first time" flag (needed for histogram mode)
 	unsigned long runFlagsMask = 0;
 	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
-    if(runMode == kIpeFlt_EnergyMode | runMode == kIpeFlt_EnergyTrace)
+    if(runMode == kIpeFltV4_EnergyDaqMode | runMode == kIpeFltV4_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;//bit 17 = "sync flt with slt timer" flag
     
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
@@ -2344,9 +2352,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
 	//put into test mode
 	savedMode = fltRunMode;
-	fltRunMode = kIpeFltV4Katrin_Test_Mode;
+	fltRunMode = kIpeFltV4Katrin_StandBy_Mode; //TODO: test mode has changed for V4 -tb- kIpeFltV4Katrin_Test_Mode;
 	[self writeControl];
-	if([self readMode] != kIpeFltV4Katrin_Test_Mode){
+	//if([self readMode] != kIpeFltV4Katrin_Test_Mode){
+	if(1){//TODO: test mode has changed for V4 -tb-
 		NSLogColor([NSColor redColor],@"Could not put FLT %d into test mode\n",[self stationNumber]);
 		[NSException raise:@"Ram Test Failed" format:@"Could not put FLT %d into test mode\n",[self stationNumber]];
 	}

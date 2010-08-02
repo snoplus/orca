@@ -535,8 +535,8 @@
 	}
 	
 	int fltRunMode = [model fltRunMode];
-	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
-	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
+	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
+	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFltV4Katrin_Histo_Mode)];
 
 	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
 	
@@ -1113,6 +1113,8 @@
 
 - (IBAction) testAction: (id) sender
 {
+	NSLog(@"HW tests are currently not available!\n");//TODO: test mode does not exist any more ... -tb- 7/2010
+	return;
 	@try {
 		[model runTests];
 	}

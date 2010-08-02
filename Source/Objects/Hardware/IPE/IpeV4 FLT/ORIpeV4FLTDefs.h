@@ -61,7 +61,7 @@
 #define kIpeFlt_Periph_Integration_Shift	20
 #define kIpeFlt_Periph_Integration_Mask		0xf
 
-#if 0 //moved to SLTv4_HW_Definitions.h -tb-
+#if 0 //moved to SLTv4_HW_Definitions.h - names have changed -tb-
 //run modes set by user in popup
 #define kIpeFlt_EnergyMode		0
 #define kIpeFlt_EnergyTrace		1
