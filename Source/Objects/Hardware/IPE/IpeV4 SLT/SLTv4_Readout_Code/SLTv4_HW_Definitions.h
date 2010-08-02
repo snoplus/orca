@@ -30,12 +30,18 @@
 #define kIpeFltV4Katrin_StandBy_Mode		0
 #define kIpeFltV4Katrin_Run_Mode			1
 #define kIpeFltV4Katrin_Histo_Mode			2
-#define kIpeFltV4Katrin_Test_Mode			3
+#define kIpeFltV4Katrin_Veto_Mode			3
+//#define kIpeFltV4Katrin_Test_Mode			3   //TODO: see fpga8_package.vhd -tb-
 
 //daq run modes set by user in popup -> for daqRunMode -tb-
-#define kIpeFlt_EnergyMode		0
-#define kIpeFlt_EnergyTrace		1
-#define kIpeFlt_Histogram_Mode	2
+//old names: kIpeFlt_EnergyMode, kIpeFlt_EnergyTrace, kIpeFlt_Histogram_Mode
+#define kIpeFltV4_EnergyDaqMode					0
+#define kIpeFltV4_EnergyTraceDaqMode			1
+#define kIpeFltV4_Histogram_DaqMode				2
+#define kIpeFltV4_VetoEnergyDaqMode				3
+#define kIpeFltV4_VetoEnergyTraceDaqMode		4
+
+
 
 //flags in the runFlagsMask, sent to PrPMC by ORIpeV4FLTModel::load_HW_Config_Structure
 #define kFirstTimeFlag              0x10000
