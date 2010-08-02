@@ -326,6 +326,8 @@
 - (unsigned long) readControl;
 - (unsigned long) readHitRateMask;
 - (void) writeControl;
+- (void) writeControlWithFltRunMode:(int)aMode;
+- (void) writeControlWithStandbyMode;
 - (void) printStatusReg;
 - (void) printPStatusRegs;
 - (void) printVersions;

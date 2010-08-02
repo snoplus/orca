@@ -277,7 +277,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistPageABChanged object:self];
 }
 
-
+//! runMode is the DAQ run mode.
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
 {
@@ -287,16 +287,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	readWaveforms = NO;
 	
 	switch (runMode) {
-		case kIpeFlt_EnergyMode:
+		case kIpeFltV4_EnergyDaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			break;
 			
-		case kIpeFlt_EnergyTrace:
+		case kIpeFltV4_EnergyTraceDaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
 			readWaveforms = YES;
 			break;
 			
-		case kIpeFlt_Histogram_Mode:
+		case kIpeFltV4_Histogram_DaqMode:
 			[self setFltRunMode:kIpeFltV4Katrin_Histo_Mode];
 			//TODO: workaround - if set to kFifoStopOnFull the histogramming stops after some seconds - probably a FPGA bug? -tb-
 			if(fifoBehaviour == kFifoStopOnFull){
@@ -306,7 +306,17 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			}
 			break;
 			
+		case kIpeFltV4_VetoEnergyDaqMode:
+			[self setFltRunMode:kIpeFltV4Katrin_Veto_Mode];
+			break;
+			
+		case kIpeFltV4_VetoEnergyTraceDaqMode:
+			[self setFltRunMode:kIpeFltV4Katrin_Veto_Mode];
+			readWaveforms = YES;
+			break;
+			
 		default:
+			NSLog(@"ORKatrinV4FLTModel WARNING: setRunMode: received a unknown DAQ run mode!\n");
 			break;
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelRunModeChanged object:self];
@@ -420,6 +430,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) filterLength { return filterLength; }
 - (void) setFilterLength:(int)aFilterLength
 {
+	if(aFilterLength == 6 && gapLength>0){
+		[self setGapLength:0];
+		NSLog(@"Warning: setFilterLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+	}
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterLength:filterLength];
     filterLength = [self restrictIntValue:aFilterLength min:0 max:6];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterLengthChanged object:self];
@@ -428,6 +442,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) gapLength { return gapLength; }
 - (void) setGapLength:(int)aGapLength
 {
+	if(filterLength == 6 && aGapLength>0){
+		aGapLength=0;
+		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+	}
     [[[self undoManager] prepareWithInvocationTarget:self] setGapLength:gapLength];
     gapLength = [self restrictIntValue:aGapLength min:0 max:7];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelGapLengthChanged object:self];
@@ -865,7 +883,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) initBoard
 {
-	[self writeControl];
+	//[self writeControl]; //removed setting runmode from here -tb-
 	[self writeReg: kFLTV4HrControlReg value:hitRateLength];
 	[self writeReg: kFLTV4PostTrigger  value:postTriggerTime];
 	[self loadThresholdsAndGains];
@@ -913,6 +931,26 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeReg: kFLTV4ControlReg value:aValue];
 }
 
+/** Possible values are (see SLTv4_HW_Definitions.h):
+    kIpeFltV4Katrin_StandBy_Mode, 
+	kIpeFltV4Katrin_Run_Mode,
+	kIpeFltV4Katrin_Histo_Mode,
+	kIpeFltV4Katrin_Veto_Mode
+  */
+- (void) writeControlWithFltRunMode:(int)aMode
+{
+	unsigned long aValue =  ((aMode & 0xf)<<16) | 
+	((fifoBehaviour & 0x1)<<24) |
+	((ledOff & 0x1)<<1 );
+	[self writeReg: kFLTV4ControlReg value:aValue];
+}
+
+//! Write FLTv4 control register with flt run mode 'Standby' (=0).
+- (void) writeControlWithStandbyMode
+{
+	[self writeControlWithFltRunMode: kIpeFltV4Katrin_StandBy_Mode];
+}
+
 - (void) writeHistogramControl
 {
 	[self writeReg:kFLTV4HistMeasTimeReg value:histMeasTime];
@@ -942,7 +980,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (unsigned long) readReg:(int)aReg
 {
+#if 0
+//TODO: DEBUG output for crashed SLT 2010-08 -tb-
+    NSLog(@"debug-output: read reg addr is %i (0x%x)\n", [self regAddress:aReg], [self regAddress:aReg]);  //TODO: DEBUG-OUTPUT -tb-
+	unsigned long tmp = [self read: [self regAddress:aReg]];
+NSLog(@"debug-output: read value was (0x%x)\n", tmp);
+	return tmp;
+#else
 	return [self read: [self regAddress:aReg]];
+#endif
 }
 
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel
@@ -1489,6 +1535,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			break;
 		}
 	}
+
+	[self writeControlWithStandbyMode];//a run always should start from standby mode -tb-
 	
     //if([[userInfo objectForKey:@"doinit"]intValue]){
 	[self setLedOff:NO];
@@ -1504,14 +1552,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				   afterDelay: (1<<[self hitRateLength])];		//start reading out the rates
 	}
 		
-	if(runMode == kIpeFlt_Histogram_Mode){
+	if(runMode == kIpeFltV4_Histogram_DaqMode){
 		//start polling histogramming mode status
 		[self performSelector:@selector(readHistogrammingStatus) 
 				   withObject:nil
 				   afterDelay: 1];		//start reading out histogram timer and page toggle
 	}
 	
-	[self writeRunControl:YES];
+	[self writeRunControl:YES];//TODO: still necessary?? -tb-
+	[self writeControl];
 	[self writeSeconds:0];
 
 }
@@ -1533,7 +1582,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
-	[self setLedOff:YES];
+	[self writeControlWithStandbyMode];
+	//[self setLedOff:YES];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHistogrammingStatus) object:nil];
 	int chan;
@@ -1566,7 +1616,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //"first time" flag (needed for histogram mode)
 	unsigned long runFlagsMask = 0;
 	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
-    if(runMode == kIpeFlt_EnergyMode | runMode == kIpeFlt_EnergyTrace)
+    if(runMode == kIpeFltV4_EnergyDaqMode | runMode == kIpeFltV4_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;//bit 17 = "sync flt with slt timer" flag
     if(shipSumHistogram == 1) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag
 	
@@ -2288,6 +2338,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				}
 				
 				[self initBoard];
+				[self writeControl];
 				
 				if(atLeastOne)	noiseFloorState = 1;
 				else			noiseFloorState = 4; //nothing to do
@@ -2308,6 +2359,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 					}
 				}
 				[self initBoard];
+				[self writeControl];
 				
 				if(hitRateEnabledMask)	noiseFloorState = 2;	//go check for data
 				else					noiseFloorState = 3;	//done
@@ -2330,6 +2382,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 				}
 				
 				[self initBoard];
+				[self writeControl];
 				
 				noiseFloorState = 1;
 				break;
@@ -2341,6 +2394,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 					[self setThreshold:i withValue:newThreshold[i]];
 				}
 				[self initBoard];
+				[self writeControl];
 				noiseFloorRunning = NO;
 			break;
 		}
@@ -2359,6 +2413,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
             [self setThreshold:i withValue:oldThreshold[i]];
 			//[self reset];
 			[self initBoard];
+			[self writeControl];
         }
 		NSLog(@"FLT4 LED threshold finder quit because of exception\n");
     }
@@ -2376,13 +2431,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return [theString autorelease];
 }
 
-- (void) enterTestMode
+- (void) enterTestMode  //TODO: test tab deactivated for KATRIN v4; needs redesign 2010-08-02 -tb-
 {
 	//put into test mode
 	savedMode = fltRunMode;
-	fltRunMode = kIpeFltV4Katrin_Test_Mode;
+	fltRunMode = kIpeFltV4Katrin_StandBy_Mode; //TODO: test mode has changed for V4 -tb- kIpeFltV4Katrin_Test_Mode;
 	[self writeControl];
-	if([self readMode] != kIpeFltV4Katrin_Test_Mode){
+	//if([self readMode] != kIpeFltV4Katrin_Test_Mode){
+	if(1){//TODO: test mode has changed for V4 -tb-
 		NSLogColor([NSColor redColor],@"Could not put FLT %d into test mode\n",[self stationNumber]);
 		[NSException raise:@"Ram Test Failed" format:@"Could not put FLT %d into test mode\n",[self stationNumber]];
 	}

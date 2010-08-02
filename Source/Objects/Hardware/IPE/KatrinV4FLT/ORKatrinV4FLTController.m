@@ -546,9 +546,10 @@
 		[testButton setTitle: @"Test"];
 	}
 	
-	int fltRunMode = [model fltRunMode];
-	[histNofMeasField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
-	[histMeasTimeField setEnabled: !locked & (fltRunMode == kIpeFlt_Histogram_Mode)];
+	int daqMode = [model runMode];
+	//[histNofMeasField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histMeasTimeField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[histEMinTextField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 
 	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
 	
