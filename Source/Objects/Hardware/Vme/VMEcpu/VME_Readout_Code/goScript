@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# comment out this script for now... it takes too long to run
-if false
-then
 STATUS_FILE=${HOME}/ORCA/stat.txt
 
 if [ "$(pidof -s OrcaReadout)" ]
@@ -29,41 +26,9 @@ then
 	fi
 
 	echo "goScript: You may kill the crate."
-else
-	#no Orca loop running
-	#any output is logged if the verbose flag is checked in the gui
-	#"goScript:" not allowed in any output
-	if [ "$SSH_CONNECTION" = "" ]
-	then
-		ORCA_USER="a local user"
-		echo "$ORCA_USER" > $STATUS_FILE
-	else
-		#ORCA? relies on a spawn ssh session
-		if [ "$SSH_TTY" = "" ]; then ORCA_USER="ORCA"
-		else ORCA_USER="a remote user, but not ORCA"
-		fi
 
-		#IP address
-		IP="$(echo $SSH_CONNECTION | cut -d' ' -f1)"
-
-		#hostname iff resolved
-		HST="$(host $IP)"
-		if [ "$(echo $HST | cut -d' ' -f3)" = "not" ]
-		then
-			HST=""
-		else
-			HST="($(echo $HST | cut -d' ' -f5 | sed -e 's/\(.*\)\./\1/'))"
-		fi
-
-		echo "$ORCA_USER from $IP $HST" > $STATUS_FILE
-	fi
-	
-	echo "$(date +%s)" >> $STATUS_FILE
-	
-	~/ORCA/OrcaReadout <port> &
 fi
 
 else
-	
 ~/ORCA/OrcaReadout <port> &
 fi
