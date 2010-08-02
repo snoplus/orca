@@ -1887,6 +1887,8 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 			}
 			@catch (NSException* localException) {
 				//couldn't connect, try to start the code
+				NSLog(@"Connection to SBC Failed. SBC probably not running.\n");
+
 				startCrateState = kTryToStartCode;
 			}
 			break;
