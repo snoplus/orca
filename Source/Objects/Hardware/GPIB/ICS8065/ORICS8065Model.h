@@ -47,6 +47,8 @@
 - (id) 		init;
 - (void) 	dealloc;
 - (void) 	makeConnectors;
+- (void)	registerNotificationObservers;
+- (void)	applicationIsTerminating:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (NSString*) command;

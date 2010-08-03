@@ -195,13 +195,13 @@
 
 - (IBAction) read: (id) aSender
 {
-    char	data[2048];
+    char	data[10*1048];
     long	returnLen;
     
     @try {
         returnLen = [[self model] readFromDevice: [primaryAddressPU indexOfSelectedItem]
-											data: &data[0]
-									   maxLength: sizeof( data ) - 1];
+											data: data
+									   maxLength: 10*1048];
 		
         if ( returnLen > 0 )
             [mResult insertText: [NSString stringWithCString: data encoding:NSASCIIStringEncoding]];
@@ -268,6 +268,7 @@
     if ( [aSender indexOfSelectedItem] != [model primaryAddress]){
 		
         [model setPrimaryAddress: [aSender indexOfSelectedItem]];
+		[model setupDevice:[model primaryAddress]];
         NSLog ( [NSString stringWithFormat: @"New Address %d\n", [model primaryAddress]] );
         
 		// Check if address is configured.

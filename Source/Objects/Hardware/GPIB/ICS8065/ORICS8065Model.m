@@ -48,7 +48,8 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     for ( i = 0; i < kMaxGpibAddresses; i++ ){
         memset(&mDeviceLink[i],0,sizeof(Create_LinkResp));
     } 
-    
+  	[self registerNotificationObservers];
+   
 }
 
 - (id) init
@@ -63,6 +64,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [command release];
 	int i;
     for ( i = 0; i < kMaxGpibAddresses; i++ ){
@@ -85,6 +87,23 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 	}
 	@catch(NSException* localException) {
 	}
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+	[notifyCenter removeObserver:self];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(applicationIsTerminating:)
+                         name : @"ORAppTerminating"
+                       object : [NSApp delegate]];
+}	
+
+- (void) applicationIsTerminating:(NSNotification*)aNote
+{
+	if(rpcClient)clnt_destroy(rpcClient);
 }
 
 - (void) setUpImage
@@ -200,20 +219,22 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 - (void) connect
 {
 	if(!isConnected){
+		//not connected
 		CLIENT* aClient = clnt_create((char*)[ipAddress cStringUsingEncoding:NSASCIIStringEncoding],DEVICE_CORE,DEVICE_CORE_VERSION, "TCP");
 		[self setRpcClient:aClient];	
         [self setIsConnected: aClient!=nil];
 		
 	}
 	else {
-		[self setRpcClient:nil];	
-        [self setIsConnected:rpcClient!=nil];
+		//already connected, so disconnect
 		int i;
 		for( i=0; i<kMaxGpibAddresses; i++ ){
 			if(mDeviceLink[i].lid != 0){
 				[self deactivateDevice:i];
 			}
 		} 
+		[self setRpcClient:nil];	
+        [self setIsConnected:rpcClient!=nil];
 	}
 }
 
@@ -294,7 +315,10 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		char device[64];
 		sprintf(device,"gpib0,%d",aPrimaryAddress);
 		crlp.device = device;
-		memcpy(&mDeviceLink[aPrimaryAddress], create_link_1(&crlp, rpcClient),sizeof(Create_LinkResp));
+		Create_LinkResp* src = create_link_1(&crlp, rpcClient);
+		if(src){
+			memcpy(&mDeviceLink[aPrimaryAddress], src,sizeof(Create_LinkResp));
+		}
         [theHWLock unlock];   //-----end critical section
 		
     }
@@ -311,7 +335,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     @try {
         [theHWLock lock];   //-----begin critical section
 		
-		if ( mDeviceLink[aPrimaryAddress].lid != 0 ){
+		if ( mDeviceLink[aPrimaryAddress].lid != 0 && rpcClient!=0){
 			// Deactivate the device
 			destroy_link_1(&mDeviceLink[aPrimaryAddress].lid,rpcClient);
 			memset(&mDeviceLink[aPrimaryAddress],0,sizeof(Create_LinkResp));
@@ -326,62 +350,70 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     
 }
 
-- (long) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (long) aMaxLength
+- (long) readFromDevice: (short) aPrimaryAddress data: (char*) data maxLength: (long) aMaxLength
 {
 	
     if ( ! [self isEnabled]) return 0;
-    long	nReadBytes = 0;
     
+	long nReadBytes = 0;
     @try {
         // Make sure that device is initialized.
         [theHWLock lock];   //-----begin critical section
 		if ( mDeviceLink[aPrimaryAddress].lid == 0 ){
 			[self setupDevice:aPrimaryAddress];
 		}
-        
-	    //double t0 = [NSDate timeIntervalSinceReferenceDate];
-	    //while([NSDate timeIntervalSinceReferenceDate]-t0 < .01);
-        
-        // Perform the read.				
-		Device_ReadParms  dwrp; 
-		Device_ReadResp*  dwrr; 
-		dwrp.lid = mDeviceLink[aPrimaryAddress].lid; 
-		dwrp.requestSize = aMaxLength;
-		dwrp.io_timeout = 3000; 
-		dwrp.lock_timeout = 3000;
-		dwrp.flags = 0;
-		dwrp.termChar = '\n';
-		dwrr = device_read_1(&dwrp, rpcClient); 
 		
-		//To do: There has to be some serious error checking put in here, asap.....
-		memcpy(aData,dwrr->data.data_val,dwrr->data.data_len);
-        if (dwrr->error != 0) {
-            [mErrorMsg setString:  @"***Error: read"];
-            [self gpibError: mErrorMsg number:dwrr->error]; 
-            [NSException raise: OExceptionGpibError format: @"%@",mErrorMsg];
-        }
-        
-        // Successful read.
-        else {
-            nReadBytes = dwrr->data.data_len;
-			aData[nReadBytes] = '\0';
+		Device_ReadParms  devReadP; 
+		Device_ReadResp*  dwrrPtr;
+		int  thisRead;
+		
+		do {
+	        thisRead = -1;
+			// Perform the read.				
+			devReadP.lid = mDeviceLink[aPrimaryAddress].lid; 
+			devReadP.requestSize = aMaxLength;
+			devReadP.io_timeout = 3000; 
+			devReadP.lock_timeout = 3000;
+			devReadP.flags = 0;
+			//devReadP.flags = 0;
+			devReadP.termChar = '\n';
+			dwrrPtr = device_read_1(&devReadP, rpcClient); 
+			if(dwrrPtr){
+				
+				if (dwrrPtr->error != 0) {
+					[mErrorMsg setString:  @"***Error: read"];
+					[self gpibError: mErrorMsg number:dwrrPtr->error]; 
+					[NSException raise: OExceptionGpibError format: @"%@",mErrorMsg];
+				}
+				
+				thisRead = dwrrPtr->data.data_len;
+				if(thisRead>0){
+					memcpy(data, dwrrPtr->data.data_val, thisRead);
+					nReadBytes += thisRead;
+					data  += thisRead;
+					aMaxLength -= thisRead;
+				}
+			}
+			else break;
+		} while(!dwrrPtr->reason && thisRead>0);
+		
+		data[nReadBytes] = '\0';
+		
+		// Allow monitoring of commands.
+		if ( mMonitorRead ) {
+			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];	
+			NSString* dataStr = [[NSString alloc] initWithBytes: data length: nReadBytes encoding: NSASCIIStringEncoding];
+			[userInfo setObject: [NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n", 
+								  aPrimaryAddress, nReadBytes, dataStr] 
+						 forKey: ORGpib1Monitor]; 
 			
-            // Allow monitoring of commands.
-            if ( mMonitorRead ) {
-                NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];	
-                NSString* dataStr = [[NSString alloc] initWithBytes: aData length: nReadBytes encoding: NSASCIIStringEncoding];
-                [userInfo setObject: [NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n", 
-									  aPrimaryAddress, nReadBytes, dataStr] 
-							 forKey: ORGpib1Monitor]; 
-                
-                [[NSNotificationCenter defaultCenter]
-				 postNotificationName: ORGpib1MonitorNotification
-				 object: self
-				 userInfo: userInfo];
-                [dataStr release];
-            }
-            
-        }
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName: ORGpib1MonitorNotification
+			 object: self
+			 userInfo: userInfo];
+			[dataStr release];
+		}
+		
         [theHWLock unlock];   //-----end critical section
     }
 	@catch(NSException* localException) {
@@ -420,16 +452,16 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         
         // Write to device.
 		
-		Device_WriteParms  dwrp; 
+		Device_WriteParms  devReadP; 
 		Device_WriteResp*  dwrr; 
-		dwrp.lid = mDeviceLink[aPrimaryAddress].lid; 
-		dwrp.io_timeout = 3000; 
-		dwrp.lock_timeout = 3000;
-		dwrp.flags = 0;
+		devReadP.lid = mDeviceLink[aPrimaryAddress].lid; 
+		devReadP.io_timeout = 3000; 
+		devReadP.lock_timeout = 3000;
+		devReadP.flags = 0;
 		if(![aCommand hasSuffix:@"\n"])aCommand = [aCommand stringByAppendingString:@"\n"];
-		dwrp.data.data_len = [aCommand length];
-		dwrp.data.data_val = (char *)[aCommand cStringUsingEncoding:NSASCIIStringEncoding];
-		dwrr = device_write_1(&dwrp, rpcClient); 
+		devReadP.data.data_len = [aCommand length];
+		devReadP.data.data_val = (char *)[aCommand cStringUsingEncoding:NSASCIIStringEncoding];
+		dwrr = device_write_1(&devReadP, rpcClient); 
 		
         if (dwrr &&  dwrr->error != 0 ) {
             [mErrorMsg setString:  @"***Error: write"];
@@ -521,7 +553,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 	[self setPrimaryAddress:[decoder decodeIntForKey:   @"primaryAddress"]];
 	
     [[self undoManager] enableUndoRegistration];
-    
+   
     return self;
 }
 
