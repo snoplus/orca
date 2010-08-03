@@ -165,7 +165,7 @@
 - (void)			loadRFBurstSettings;
 - (void)			loadInputPortSettings;
 
-- (void)			initiateMeasurement;
+- (void)			startMeasurement;
 - (void)			pauseMeasurement;
 - (void)			restartMeasurement;
 - (void)			resumeMeasurement;

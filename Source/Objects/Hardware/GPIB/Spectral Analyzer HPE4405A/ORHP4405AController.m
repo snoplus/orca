@@ -675,7 +675,7 @@
 {
 	@try {
 		[self endEditing];
-		[model initiateMeasurement];
+		[model startMeasurement];
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Initiate Measurement Failed");

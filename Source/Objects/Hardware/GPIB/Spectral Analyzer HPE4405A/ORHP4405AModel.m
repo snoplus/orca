@@ -740,7 +740,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":POW:PADJ %d",optimizePreselectorFreq]];
 }
 
-- (void) initiateMeasurement
+- (void) startMeasurement
 {
 	[self setMeasurementInProgress:YES];
 	[self performSelector:@selector(doMeasurement) withObject:nil afterDelay:.1];
