@@ -27,6 +27,7 @@
 #define kIntegritySummary	0x0200
 
 
+NSString* ORHP4405AModelDataTypeChanged = @"ORHP4405AModelDataTypeChanged";
 NSString* ORHP4405AModelStatusOperationRegChanged = @"ORHP4405AModelStatusOperationRegChanged";
 NSString* ORHP4405AModelQuestionablePowerRegChanged = @"ORHP4405AModelQuestionablePowerRegChanged";
 NSString* ORHP4405AModelQuestionableIntegrityRegChanged = @"ORHP4405AModelQuestionableIntegrityRegChanged";
@@ -47,7 +48,6 @@ NSString* ORHP4405AModelBurstPulseDiscrimEnabledChanged = @"ORHP4405AModelBurstP
 NSString* ORHP4405AModelBurstModeAbsChanged = @"ORHP4405AModelBurstModeAbsChanged";
 NSString* ORHP4405AModelBurstModeSettingChanged = @"ORHP4405AModelBurstModeSettingChanged";
 NSString* ORHP4405AModelBurstFreqEnabledChanged = @"ORHP4405AModelBurstFreqEnabledChanged";
-NSString* ORHP4405AModelTriggerOffsetUnitsChanged = @"ORHP4405AModelTriggerOffsetUnitsChanged";
 NSString* ORHP4405AModelTriggerDelayUnitsChanged = @"ORHP4405AModelTriggerDelayUnitsChanged";
 NSString* ORHP4405AModelTriggerSourceChanged = @"ORHP4405AModelTriggerSourceChanged";
 NSString* ORHP4405AModelTriggerOffsetEnabledChanged = @"ORHP4405AModelTriggerOffsetEnabledChanged";
@@ -65,9 +65,11 @@ NSString* ORHP4405AModelStartFreqChanged	= @"ORHP4405AModelStartFreqChanged";
 NSString* ORHP4405AModelCenterFreqChanged	= @"ORHP4405AModelCenterFreqChanged";
 NSString* ORHP4405AModelTrace1Changed		= @"ORHP4405AModelTrace1Changed";
 NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasurementInProgressChanged";
+NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 
 @interface ORHP4405AModel (private)
 - (void) pollStatus;
+- (void) doMeasurement;
 @end
 
 @implementation ORHP4405AModel
@@ -103,6 +105,20 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 }
 
 #pragma mark •••Accessors
+
+- (int) dataType
+{
+    return dataType;
+}
+
+- (void) setDataType:(int)aDataType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDataType:dataType];
+    
+    dataType = [self limitIntValue:aDataType min:0 max:3];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHP4405AModelDataTypeChanged object:self];
+}
 
 - (unsigned short) statusOperationReg
 {
@@ -219,7 +235,7 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 {
     measurementInProgress = aState;
 	if(measurementInProgress){
-		[self pollStatus];
+		//[self pollStatus];
 	}
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHP4405AModelMeasurementInProgressChanged object:self];
@@ -379,34 +395,6 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHP4405AModelBurstFreqEnabledChanged object:self];
 }
 
-- (int) triggerOffsetUnits
-{
-    return triggerOffsetUnits;
-}
-
-- (void) setTriggerOffsetUnits:(int)aTriggerOffsetUnits
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerOffsetUnits:triggerOffsetUnits];
-    
-    triggerOffsetUnits = aTriggerOffsetUnits;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORHP4405AModelTriggerOffsetUnitsChanged object:self];
-}
-
-- (int) triggerDelayUnits
-{
-    return triggerDelayUnits;
-}
-
-- (void) setTriggerDelayUnits:(int)aTriggerDelayUnits
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerDelayUnits:triggerDelayUnits];
-    
-    triggerDelayUnits = aTriggerDelayUnits;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORHP4405AModelTriggerDelayUnitsChanged object:self];
-}
-
 - (int) triggerSource
 {
     return triggerSource;
@@ -528,6 +516,19 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 		default: return @"?";
 	}
 }
+- (NSString*) unitFullName:(int)anIndex
+{
+	switch(anIndex){
+		case 0: return @"dB";
+		case 1: return @"dB mV";
+		case 2: return @"dB µV";
+		case 3: return @"dB µA";
+		case 4: return @"Volts";
+		case 5: return @"Watts";
+		case 6: return @"Amps";
+		default: return @"?";
+	}
+}
 
 - (NSString*) triggerSourceName:(int)anIndex
 {
@@ -537,6 +538,28 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 		case 2: return @"EXT";
 		case 3: return @"RFB";
 		default: return @"?";
+	}
+}
+
+- (NSString*) dataTypeName:(int)anIndex
+{
+	switch(anIndex){
+		case 0: return @"ASC";
+		case 1: return @"INT,32";
+		case 2: return @"REAL,32";
+		case 3: return @"REAL,64";
+		default: return @"UNIT,16";
+	}
+}
+
+- (int) dataSize:(int)anIndex
+{
+	switch(anIndex){
+		case 0: return -1;
+		case 1: return 4;
+		case 2: return 4;
+		case 3: return 8;
+		default: return 2;
 	}
 }
 
@@ -590,9 +613,68 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 
 - (void) setTrace1:(NSData*)someData
 {
-	[someData retain];
-	[trace1 release];
-	trace1 = someData;
+	if(!trace1)trace1 = [[NSMutableArray array] retain];
+	[trace1 removeAllObjects];
+	
+	unsigned char* p = (unsigned char*)[someData bytes];
+	if([self dataType]>0){
+		if(p[0] == '#'){
+			int headerSizeBytes = 2 + (p[1] - 48);
+			NSData* theData = [NSData dataWithBytes:&p[headerSizeBytes] length:[someData length] - headerSizeBytes];
+			int lenInBytes = [theData length];
+			switch (dataType) {
+				case 1: //Int32
+				{
+					int i;
+					long* p = (long*) [theData bytes];
+					for(i=0;i<lenInBytes/sizeof(long);i++){
+						[trace1 addObject:[NSNumber numberWithDouble:(double)p[i]]];
+					}
+				}
+				break;
+					
+				case 2: //Real32
+				{
+					int i;
+					float* p = (float*) [theData bytes];
+					for(i=0;i<lenInBytes/sizeof(float);i++){
+						[trace1 addObject:[NSNumber numberWithDouble:(double)p[i]]];
+					}
+				}
+				break;
+					
+				case 3: //Real64
+				{
+					int i;
+					double* p = (double*) [theData bytes];
+					for(i=0;i<lenInBytes/sizeof(double);i++){
+						[trace1 addObject:[NSNumber numberWithDouble:(double)p[i]]];
+					}
+				}
+				break;
+					
+				case 4: //UInt16
+				{
+					int i;
+					unsigned short* p = (unsigned short*) [theData bytes];
+					for(i=0;i<lenInBytes/sizeof(unsigned short);i++){
+						[trace1 addObject:[NSNumber numberWithDouble:(double)p[i]]];
+					}
+				}
+				break;
+			}
+		}
+	}
+	else {
+		NSString* s = [[NSString alloc] initWithData:someData encoding:NSASCIIStringEncoding];
+		NSArray* theNumbers = [s componentsSeparatedByString:@","];
+		for(id aNumber in theNumbers){
+			double val = [aNumber doubleValue];
+			[trace1 addObject:[NSNumber numberWithDouble:val]];
+		}
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORHP4405AModelTraceChanged object:self];
+
 }
 
 #pragma mark ***Hardware Command
@@ -630,10 +712,10 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 
 - (void) loadTriggerSettings
 {
-	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:DEL %.6f",triggerDelay * pow(10.,triggerDelayUnits*-3.) ]];
+	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:DEL %.6f",triggerDelay]];
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:DEL:STAT %@",triggerDelayEnabled?@"ON":@"OFF"]];
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:EXT:SLOP %@",triggerSlope?@"POS":@"NEG"]];
-	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:OFFS %.6f",triggerOffset * pow(10.,triggerOffsetUnits*-3.)]];
+	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:OFFS %.6f",triggerOffset]];
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:OFFS:STAT %@",triggerOffsetEnabled?@"ON":@"OFF"]];
 	[self writeToGPIBDevice:[NSString stringWithFormat:@":TRIG:SOUR %@",[self triggerSourceName:triggerSource]]];
 }
@@ -660,12 +742,10 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 
 - (void) initiateMeasurement
 {
-	//start/restart a measurement
-	[self loadFormat];
-	[self writeToGPIBDevice:[NSString stringWithFormat:@":INIT:CONT %@",continuousMeasurement?@"ON":@"OFF"]];
-	[self writeToGPIBDevice:@":INIT:IMM"];
 	[self setMeasurementInProgress:YES];
+	[self performSelector:@selector(doMeasurement) withObject:nil afterDelay:.1];
 }
+
 
 - (void) pauseMeasurement
 {
@@ -687,19 +767,30 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 
 - (void) loadFormat
 {
-	[self writeToGPIBDevice:@":FORM:BORD NORM"];	//not byte swaped
-	[self writeToGPIBDevice:@":FORM:DATA REAL,32"];
+	[self writeToGPIBDevice:@":FORM:BORD SWAP"];	//not byte swaped
+	[self writeToGPIBDevice:[NSString stringWithFormat:@":FORM:DATA %@",[self dataTypeName:[self dataType]]]];
+}
+
+- (void) loadUnits
+{
+	[self writeToGPIBDevice:[NSString stringWithFormat:@":UNIT:POW %@",[self unitName:[self units]]]];
 }
 
 - (void) getTrace1
 {
-#define kMaxTraceLength 5*1024
-	NSMutableData* theTrace = [NSMutableData dataWithLength:kMaxTraceLength];
+	int maxTraceLength;
+	int theUnitSize = [self dataSize:[self dataType]];
+	if(theUnitSize>0) maxTraceLength = (401*theUnitSize + 6 + 1);
+	else maxTraceLength = 10*1024; //ascii
+	
+	NSMutableData* theTrace = [NSMutableData dataWithLength:maxTraceLength];
 	char* p = (char*)[theTrace bytes];
-    long n = [self writeReadGPIBDevice:@":TRAC? TRACE2 LLINE1" data:p maxLength:kMaxTraceLength];
+    long  n = [self writeReadGPIBDevice:@":TRAC:DATA? TRACE1" data:p maxLength:maxTraceLength];
     if(n){
+		[theTrace setLength:n];
 		[self setTrace1:theTrace];
 	}
+	[self setMeasurementInProgress:NO];
 }
 
 - (void) checkStatus
@@ -891,6 +982,7 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
     self = [ super initWithCoder: decoder ];
 	
     [[ self undoManager ] disableUndoRegistration ];
+    [self setDataType:[decoder decodeIntForKey:@"dataType"]];
     [self setContinuousMeasurement:[decoder decodeBoolForKey:@"continuousMeasurement"]];
     [self setOptimizePreselectorFreq:[decoder decodeIntForKey:@"optimizePreselectorFreq"]];
     [self setInputMaxMixerPower:[decoder decodeIntForKey:@"inputMaxMixerPower"]];
@@ -902,8 +994,6 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
     [self setBurstModeAbs:[decoder decodeBoolForKey:@"burstModeAbs"]];
     [self setBurstModeSetting:[decoder decodeIntForKey:@"burstModeSetting"]];
     [self setBurstFreqEnabled:[decoder decodeBoolForKey:@"burstFreqEnabled"]];
-    [self setTriggerOffsetUnits:[decoder decodeIntForKey:@"triggerOffsetUnits"]];
-    [self setTriggerDelayUnits:[decoder decodeIntForKey:@"triggerDelayUnits"]];
     [self setTriggerSource:[decoder decodeIntForKey:@"triggerSource"]];
     [self setTriggerOffsetEnabled:[decoder decodeBoolForKey:@"triggerOffsetEnabled"]];
     [self setTriggerOffset:[decoder decodeFloatForKey:@"triggerOffset"]];
@@ -923,6 +1013,7 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder: encoder];
+    [encoder encodeInt:dataType forKey:@"dataType"];
     [encoder encodeBool:continuousMeasurement forKey:@"continuousMeasurement"];
     [encoder encodeInt:optimizePreselectorFreq forKey:@"optimizePreselectorFreq"];
     [encoder encodeInt:inputMaxMixerPower forKey:@"inputMaxMixerPower"];
@@ -934,8 +1025,6 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
     [encoder encodeBool:burstModeAbs forKey:@"burstModeAbs"];
     [encoder encodeInt:burstModeSetting forKey:@"burstModeSetting"];
     [encoder encodeBool:burstFreqEnabled forKey:@"burstFreqEnabled"];
-    [encoder encodeInt:triggerOffsetUnits forKey:@"triggerOffsetUnits"];
-    [encoder encodeInt:triggerDelayUnits forKey:@"triggerDelayUnits"];
     [encoder encodeInt:triggerSource forKey:@"triggerSource"];
     [encoder encodeBool:triggerOffsetEnabled forKey:@"triggerOffsetEnabled"];
     [encoder encodeFloat:triggerOffset forKey:@"triggerOffset"];
@@ -956,6 +1045,23 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 	else if(aValue>aMax)return aMax;
 	else return aValue;
 }
+ - (float) limitIntValue:(int)aValue min:(float)aMin max:(float)aMax
+{
+	if(aValue<aMin)return aMin;
+	else if(aValue>aMax)return aMax;
+	else return aValue;
+}
+	 
+- (int) numPoints
+{
+	return [trace1 count];
+}
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
+{
+	*yValue = [[trace1 objectAtIndex:i] doubleValue];
+	*xValue = i;
+}
 @end
 
 @implementation ORHP4405AModel (private)
@@ -975,6 +1081,19 @@ NSString* ORHP4405AModelMeasurementInProgressChanged	= @"ORHP4405AModelMeasureme
 		}
 		[self performSelector:@selector(pollStatus) withObject:nil afterDelay:.1];
 	}
+}
+
+- (void) doMeasurement
+{
+	//start/restart a measurement
+	[self loadFormat];
+	[self loadUnits];
+	[self loadFreqSettings];
+	[self loadInputPortSettings];
+	[self loadTriggerSettings];
+	[self writeToGPIBDevice:@":INIT:CONT 0"];
+	[self writeToGPIBDevice:@":INIT:IMM;*WAI"];
+	[self getTrace1];
 }
 @end
 

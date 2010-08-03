@@ -26,7 +26,7 @@
 // Interface description of ORHP4405AModel oscilloscope.
 @interface ORHP4405AModel : ORGpibDeviceModel {
 	
-	NSData* trace1;
+	NSMutableArray* trace1;
 	
 	unsigned long dataId;
 	BOOL  measurementInProgress;
@@ -42,8 +42,6 @@
     float triggerOffset;
     float triggerDelay;
     int   triggerSource;
-    int   triggerDelayUnits;
-    int   triggerOffsetUnits;
     int   triggerSlope;
 	
     BOOL burstFreqEnabled;
@@ -69,6 +67,7 @@
     unsigned short questionableIntegrityReg;
     unsigned short questionablePowerReg;
     unsigned short statusOperationReg;
+    int dataType;
 }
 
 #pragma mark •••Initialization
@@ -82,6 +81,8 @@
 - (void) syncDataIdsWith:(id)anOtherObj;
 
 #pragma mark •••Accessors
+- (int) dataType;
+- (void) setDataType:(int)aDataType;
 - (unsigned short) statusOperationReg;
 - (void) setStatusOperationReg:(unsigned short)aStatusOperationReg;
 - (unsigned short) questionablePowerReg;
@@ -123,10 +124,6 @@
 - (void) setBurstModeSetting:(BOOL)aBurstModeSetting;
 - (BOOL) burstFreqEnabled;
 - (void) setBurstFreqEnabled:(BOOL)aBurstFreqEnabled;
-- (int) triggerOffsetUnits;
-- (void) setTriggerOffsetUnits:(int)aTriggerOffsetUnits;
-- (int) triggerDelayUnits;
-- (void) setTriggerDelayUnits:(int)aTriggerDelayUnits;
 - (int) triggerSource;
 - (void) setTriggerSource:(int)aTriggerSource;
 - (BOOL) triggerOffsetEnabled;
@@ -152,8 +149,6 @@
 - (void) setStartFreq:(float)aStartFreq;
 - (float) centerFreq;
 - (void) setCenterFreq:(float)aCenterFreq;
-- (NSString*) unitName:(int)anIndex;
-- (NSString*) triggerSourceName:(int)anIndex;
 - (void) setTrace1:(NSData*)someData;
 
 - (BOOL) measurementInProgress;
@@ -162,6 +157,7 @@
 #pragma mark ***Hardware - General
 - (void)			reset;
 - (void)			loadFormat;
+- (void)			loadUnits;
 - (void)			setTime;
 - (unsigned long)	getPowerOnTime;
 - (void)			loadTriggerSettings;
@@ -182,6 +178,7 @@
 - (unsigned short) readQuestionableFreqReg;
 - (unsigned short) readQuestionableIntegrityReg;
 - (unsigned short) readQuestionablePowerReg;
+- (void) getTrace1;
 
 #pragma mark ***DataTaker
 - (NSDictionary*) dataRecordDescription;
@@ -195,9 +192,18 @@
 
 #pragma mark ***Helpers
 - (float) limitFloatValue:(float)aValue min:(float)aMin max:(float)aMax;
-
+- (float) limitIntValue:(int)aValue min:(float)aMin max:(float)aMax;
+- (int) numPoints;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+- (NSString*) triggerSourceName:(int)anIndex;
+- (NSString*) dataTypeName:(int)anIndex;
+- (NSString*) unitName:(int)anIndex;
+- (NSString*) unitFullName:(int)anIndex;
+- (int) dataSize:(int)anIndex;
 @end
 
+extern NSString* ORHP4405AModelTraceChanged;
+extern NSString* ORHP4405AModelDataTypeChanged;
 extern NSString* ORHP4405AModelStatusOperationRegChanged;
 extern NSString* ORHP4405AModelQuestionablePowerRegChanged;
 extern NSString* ORHP4405AModelQuestionableIntegrityRegChanged;
@@ -220,8 +226,6 @@ extern NSString* ORHP4405AModelBurstPulseDiscrimEnabledChanged;
 extern NSString* ORHP4405AModelBurstModeAbsChanged;
 extern NSString* ORHP4405AModelBurstModeSettingChanged;
 extern NSString* ORHP4405AModelBurstFreqEnabledChanged;
-extern NSString* ORHP4405AModelTriggerOffsetUnitsChanged;
-extern NSString* ORHP4405AModelTriggerDelayUnitsChanged;
 extern NSString* ORHP4405AModelTriggerSourceChanged;
 extern NSString* ORHP4405AModelTriggerOffsetEnabledChanged;
 extern NSString* ORHP4405AModelTriggerOffsetChanged;
@@ -236,3 +240,4 @@ extern NSString* ORHP4405AModelStartFreqChanged;
 extern NSString* ORHP4405AModelCenterFreqChanged;
 extern NSString* ORHP4405ALock;
 extern NSString* ORHP4405AGpibLock;
+

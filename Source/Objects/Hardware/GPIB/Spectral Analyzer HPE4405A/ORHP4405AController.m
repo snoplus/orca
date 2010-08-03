@@ -18,6 +18,9 @@
 //-------------------------------------------------------------
 #import "ORHP4405AController.h"
 #import "ORHP4405AModel.h"
+#import "ORPlot.h"
+#import "ORPlotView.h"
+#import "ORAxis.h"
 
 @implementation ORHP4405AController
 
@@ -26,6 +29,15 @@
 {
     self = [ super initWithWindowNibName: @"ORHP4405A" ];
     return self;
+}
+- (void) awakeFromNib
+{
+	[super awakeFromNib];
+	ORPlot* aPlot= [[ORPlot alloc] initWithTag:0 andDataSource:self];
+	[plotter addPlot: aPlot];
+	[aPlot release];
+	[xScale setRngLimitsLow:0 withHigh:401 withMinRng:10];
+	[xScale setRngDefaultsLow:0 withHigh:401];
 }
 
 #pragma mark ***Notifications
@@ -102,16 +114,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(triggerSourceChanged:)
                          name : ORHP4405AModelTriggerSourceChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerDelayUnitsChanged:)
-                         name : ORHP4405AModelTriggerDelayUnitsChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerOffsetUnitsChanged:)
-                         name : ORHP4405AModelTriggerOffsetUnitsChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -218,6 +220,17 @@
                      selector : @selector(measurementInProgressChanged:)
                          name : ORHP4405AModelMeasurementInProgressChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(dataTypeChanged:)
+                         name : ORHP4405AModelDataTypeChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(traceChanged:)
+                         name : ORHP4405AModelTraceChanged
+						object: model];	
+
 }
 
 - (void) updateWindow
@@ -235,8 +248,6 @@
 	[self triggerOffsetChanged:nil];
 	[self triggerOffsetEnabledChanged:nil];
 	[self triggerSourceChanged:nil];
-	[self triggerDelayUnitsChanged:nil];
-	[self triggerOffsetUnitsChanged:nil];
 	[self burstFreqEnabledChanged:nil];
 	[self burstModeSettingChanged:nil];
 	[self burstModeAbsChanged:nil];
@@ -258,6 +269,8 @@
 	[self questionablePowerRegChanged:nil];
 	[self statusOperationRegChanged:nil];
 	[self measurementInProgressChanged:nil];
+	[self dataTypeChanged:nil];
+	[self traceChanged:nil];
     [self lockChanged:nil];
 }
 
@@ -265,15 +278,56 @@
 {
 }
 
-
-
 #pragma mark ***Interface Management
+- (void) traceChanged:(NSNotification*)aNote
+{
+	[plotter autoScaleY:self];
+	[plotter setNeedsDisplay:YES];
+}
+
+- (void) dataTypeChanged:(NSNotification*)aNote
+{
+	[dataTypePU selectItemAtIndex: [model dataType]];
+}
+
 - (void) measurementInProgressChanged: (NSNotification*) aNotification
 {
 	BOOL measuring = [model measurementInProgress];
 	[startMeasurementButton setEnabled: !measuring];
 	[continuousMeasurementCB setEnabled: !measuring];
 	[stopMeasurementButton setEnabled: measuring];
+	
+	
+	[centerFreqField setEnabled: !measuring];
+	[dataTypePU setEnabled: !measuring];
+	[optimizePreselectorFreqField setEnabled: !measuring];
+	[inputMaxMixerPowerField setEnabled: !measuring];
+	[inputGainEnabledCB setEnabled: !measuring];
+	[inputAttAutoEnabledCB setEnabled: !measuring];
+	[inputAttenuationField setEnabled: !measuring];
+	[detectorGainEnabledCB setEnabled: !measuring];
+	
+	[burstPulseDiscrimEnabledCB setEnabled: !measuring];
+	[burstModeAbsPU setEnabled: !measuring];
+	[burstModeSettingField setEnabled: !measuring];
+	[burstFreqEnabledCB setEnabled: !measuring];
+	[freqStepDirPU setEnabled: !measuring];
+	[freqStepSizeField setEnabled: !measuring];
+	[unitsPU setEnabled: !measuring];
+	[stopFreqField setEnabled: !measuring];
+	[startFreqField setEnabled: !measuring];
+	
+	[triggerOffsetField setEnabled: !measuring];
+	[triggerOffsetEnabledCB setEnabled: !measuring];
+	[triggerDelayField setEnabled: !measuring];
+	[triggerDelayEnableCB setEnabled: !measuring];
+	[triggerSlopePU setEnabled: !measuring];
+	[triggerSourcePU setEnabled: !measuring];
+	
+	[inputSettingsLoadButton setEnabled: !measuring];
+	[frequencySettingsLoadButton setEnabled: !measuring];
+	[triggerSettingsLoadButton setEnabled: !measuring];
+	
 }
 
 - (void) statusOperationRegChanged:(NSNotification*)aNote
@@ -370,16 +424,6 @@
 	[burstFreqEnabledCB setIntValue: [model burstFreqEnabled]];
 }
 
-- (void) triggerOffsetUnitsChanged:(NSNotification*)aNote
-{
-	[triggerOffsetUnitsPU selectItemAtIndex: [model triggerOffsetUnits]];
-}
-
-- (void) triggerDelayUnitsChanged:(NSNotification*)aNote
-{
-	[triggerDelayUnitsPU selectItemAtIndex: [model triggerDelayUnits]];
-}
-
 - (void) triggerSourceChanged:(NSNotification*)aNote
 {
 	[triggerSourcePU selectItemAtIndex: [model triggerSource]];
@@ -419,9 +463,11 @@
 {
 	[freqStepSizeField setFloatValue: [model freqStepSize]];
 }
+
 - (void) unitsChanged:(NSNotification*)aNote
 {
 	[unitsPU selectItemAtIndex: [model units]];
+	[yScale setLabel:[model unitFullName:[model units]]];
 }
 
 - (void) stopFreqChanged:(NSNotification*)aNote
@@ -441,37 +487,42 @@
 
 #pragma mark ¥¥¥Actions
 
-- (void) continuousMeasurementAction:(id)sender
+- (IBAction) dataTypeAction:(id)sender
+{
+	[model setDataType:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) continuousMeasurementAction:(id)sender
 {
 	[model setContinuousMeasurement:[sender intValue]];	
 }
 
-- (void) optimizePreselectorFreqAction:(id)sender
+- (IBAction) optimizePreselectorFreqAction:(id)sender
 {
 	[model setOptimizePreselectorFreq:[sender intValue]];	
 }
 
-- (void) inputMaxMixerPowerAction:(id)sender
+- (IBAction) inputMaxMixerPowerAction:(id)sender
 {
 	[model setInputMaxMixerPower:[sender intValue]];	
 }
 
-- (void) inputGainEnabledAction:(id)sender
+- (IBAction) inputGainEnabledAction:(id)sender
 {
 	[model setInputGainEnabled:[sender intValue]];	
 }
 
-- (void) inputAttAutoEnabledAction:(id)sender
+- (IBAction) inputAttAutoEnabledAction:(id)sender
 {
 	[model setInputAttAutoEnabled:[sender intValue]];	
 }
 
-- (void) inputAttenuationAction:(id)sender
+- (IBAction) inputAttenuationAction:(id)sender
 {
 	[model setInputAttenuation:[sender intValue]];	
 }
 
-- (void) detectorGainEnabledAction:(id)sender
+- (IBAction) detectorGainEnabledAction:(id)sender
 {
 	[model setDetectorGainEnabled:[sender intValue]];	
 }
@@ -494,16 +545,6 @@
 - (void) burstFreqEnabledAction:(id)sender
 {
 	[model setBurstFreqEnabled:[sender intValue]];	
-}
-
-- (IBAction) triggerOffsetUnitsAction:(id)sender
-{
-	[model setTriggerOffsetUnits:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) triggerDelayUnitsAction:(id)sender
-{
-	[model setTriggerDelayUnits:[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) triggerSourceAction:(id)sender
@@ -676,6 +717,17 @@
 						nil,
 						nil );
 	}
+}
+
+
+- (int) numberPointsInPlot:(id)aPlotter
+{
+    return [model numPoints];
+}
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
+{
+	[model plotter:aPlotter index:i x:xValue y:yValue];
 }
 
 @end

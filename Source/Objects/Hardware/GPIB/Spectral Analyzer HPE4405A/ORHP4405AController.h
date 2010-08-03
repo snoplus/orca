@@ -20,8 +20,12 @@
 
 #import "ORGpibDeviceController.h"
 
+@class ORPlotView;
+@class ORAxis;
+
 @interface ORHP4405AController : ORGpibDeviceController {    
 	IBOutlet   NSTextField*		centerFreqField;
+	IBOutlet   NSPopUpButton*	dataTypePU;
 	IBOutlet   NSButton*		continuousMeasurementCB;
 	IBOutlet   NSButton*		startMeasurementButton;
 	IBOutlet   NSButton*		stopMeasurementButton;
@@ -44,26 +48,37 @@
 
 	IBOutlet   NSTextField*		triggerOffsetField;
 	IBOutlet   NSButton*		triggerOffsetEnabledCB;
-	IBOutlet   NSPopUpButton*	triggerOffsetUnitsPU;
 	IBOutlet   NSTextField*		triggerDelayField;
 	IBOutlet   NSButton*		triggerDelayEnableCB;
-	IBOutlet   NSPopUpButton*	triggerDelayUnitsPU;
 	IBOutlet   NSPopUpButton*	triggerSlopePU;
 	IBOutlet   NSPopUpButton*	triggerSourcePU;
+
+	
+	IBOutlet   NSButton*		inputSettingsLoadButton;
+	IBOutlet   NSButton*		frequencySettingsLoadButton;
+	IBOutlet   NSButton*		triggerSettingsLoadButton;
+
+	IBOutlet ORPlotView*	plotter;
+    IBOutlet ORAxis*		yScale;
+    IBOutlet ORAxis*		xScale;
+	
 }
+
+#pragma mark ***Initialization
+- (id) 	 init;
+- (void) awakeFromNib;
 
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-
-#pragma mark ***Initialization
-- (id) 			init;
 
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void)		updateWindow;
 
 #pragma mark ***Interface Management
+- (void) traceChanged:(NSNotification*)aNote;
+- (void) dataTypeChanged:(NSNotification*)aNote;
 - (void) statusOperationRegChanged:(NSNotification*)aNote;
 - (void) questionablePowerRegChanged:(NSNotification*)aNote;
 - (void) questionableIntegrityRegChanged:(NSNotification*)aNote;
@@ -84,8 +99,6 @@
 - (void) burstModeAbsChanged:(NSNotification*)aNote;
 - (void) burstModeSettingChanged:(NSNotification*)aNote;
 - (void) burstFreqEnabledChanged:(NSNotification*)aNote;
-- (void) triggerOffsetUnitsChanged:(NSNotification*)aNote;
-- (void) triggerDelayUnitsChanged:(NSNotification*)aNote;
 - (void) triggerSourceChanged:(NSNotification*)aNote;
 - (void) triggerOffsetEnabledChanged:(NSNotification*)aNote;
 - (void) triggerOffsetChanged:(NSNotification*)aNote;
@@ -102,6 +115,7 @@
 - (void) measurementInProgressChanged: (NSNotification*) aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) dataTypeAction:(id)sender;
 - (IBAction) continuousMeasurementAction:(id)sender;
 - (IBAction) optimizePreselectorFreqAction:(id)sender;
 - (IBAction) inputMaxMixerPowerAction:(id)sender;
@@ -113,8 +127,6 @@
 - (IBAction) burstModeAbsAction:(id)sender;
 - (IBAction) burstModeSettingAction:(id)sender;
 - (IBAction) burstFreqEnabledAction:(id)sender;
-- (IBAction) triggerOffsetUnitsAction:(id)sender;
-- (IBAction) triggerDelayUnitsAction:(id)sender;
 - (IBAction) triggerSourceAction:(id)sender;
 - (IBAction) triggerOffsetEnabledAction:(id)sender;
 - (IBAction) triggerOffsetAction:(id)sender;
@@ -137,4 +149,8 @@
 
 - (IBAction) checkStatusAction:(id)sender;
 
+
+#pragma mark ¥¥¥Plot DataSource
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 @end
