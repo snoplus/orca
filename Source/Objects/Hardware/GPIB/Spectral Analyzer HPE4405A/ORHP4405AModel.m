@@ -614,7 +614,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 - (void) setTrace1:(NSData*)someData
 {
 	if(!trace1)trace1 = [[NSMutableArray array] retain];
-	[trace1 removeAllObjects];
+	if([trace1 count])[trace1 removeAllObjects];
 	
 	unsigned char* p = (unsigned char*)[someData bytes];
 	if([self dataType]>0){
