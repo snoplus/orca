@@ -60,6 +60,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (id) init
 {
 	[super init];
+	[self registerNotificationObservers];
 	return self;
 }
 

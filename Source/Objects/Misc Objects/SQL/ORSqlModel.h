@@ -41,6 +41,7 @@
 - (void) dealloc;
 
 #pragma mark ***Notifications
+- (void) registerNotificationObservers;
 - (void) applicationIsTerminating:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
