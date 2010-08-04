@@ -40,7 +40,7 @@ static NSString* kStationKey[32] = {
 
 - (NSString*) getStationKey:(unsigned short)aStation
 {
-	if(aStation<16) return kStationKey[aStation];
+	if(aStation<32) return kStationKey[aStation];
 	else return [NSString stringWithFormat:@"Station %2d",aStation];		
 	
 }

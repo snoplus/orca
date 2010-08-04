@@ -160,6 +160,7 @@
 	unsigned long eventCount[kNumV4FLTChannels];
 #endif
     int shipSumHistogram;
+    int vetoOverlapTime;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -170,6 +171,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) vetoOverlapTime;
+- (void) setVetoOverlapTime:(int)aVetoOverlapTime;
 - (int) shipSumHistogram;
 - (void) setShipSumHistogram:(int)aShipSumHistogram;
 - (int) targetRate;
@@ -409,6 +412,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
 extern NSString* ORKatrinV4FLTModelShipSumHistogramChanged;
 extern NSString* ORKatrinV4FLTModelTargetRateChanged;
 extern NSString* ORKatrinV4FLTModelHistMaxEnergyChanged;

@@ -318,9 +318,19 @@
                          name : ORKatrinV4FLTModelShipSumHistogramChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(vetoOverlapTimeChanged:)
+                         name : ORKatrinV4FLTModelVetoOverlapTimeChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) vetoOverlapTimeChanged:(NSNotification*)aNote
+{
+	[vetoOverlapTimePU selectItemAtIndex: [model vetoOverlapTime]];
+}
 
 - (void) shipSumHistogramChanged:(NSNotification*)aNote
 {
@@ -496,6 +506,7 @@
 	[self histMaxEnergyChanged:nil];
 	[self targetRateChanged:nil];
 	[self shipSumHistogramChanged:nil];
+	[self vetoOverlapTimeChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -550,6 +561,7 @@
 	//[histNofMeasField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histMeasTimeField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histEMinTextField setEnabled: !locked & (daqMode == kIpeFltV4_Histogram_DaqMode)];
+	[vetoActiveButton setState: !locked & ((daqMode == kIpeFltV4_VetoEnergyDaqMode)||(daqMode == kIpeFltV4_VetoEnergyTraceDaqMode))];
 
 	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
 	
@@ -835,6 +847,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) vetoOverlapTimePUAction:(id)sender
+{
+	[model setVetoOverlapTime:[vetoOverlapTimePU indexOfSelectedItem]];	
+}
 
 - (void) shipSumHistogramPUAction:(id)sender
 {
