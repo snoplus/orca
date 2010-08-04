@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
 NSString* ORKatrinV4FLTModelShipSumHistogramChanged = @"ORKatrinV4FLTModelShipSumHistogramChanged";
 NSString* ORKatrinV4FLTModelTargetRateChanged			= @"ORKatrinV4FLTModelTargetRateChanged";
 NSString* ORKatrinV4FLTModelHistMaxEnergyChanged       = @"ORKatrinV4FLTModelHistMaxEnergyChanged";
@@ -235,6 +236,24 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) vetoOverlapTime
+{
+    return vetoOverlapTime;
+}
+
+- (void) setVetoOverlapTime:(int)aVetoOverlapTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVetoOverlapTime:vetoOverlapTime];
+    
+    vetoOverlapTime = aVetoOverlapTime;
+	if(vetoOverlapTime<0) vetoOverlapTime = 0;
+	if(vetoOverlapTime>4) vetoOverlapTime = 4;
+        
+	//NSLog(@"%@::%@: set vetoOverlapTime to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),vetoOverlapTime);//-tb-NSLog-tb-
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelVetoOverlapTimeChanged object:self];
+}
 
 /** This is the setting of the 'Ship Sum Histogram' popup button; tag values are:
   * - 0 NO, don't ship sum histogram
@@ -912,7 +931,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
-	(((filterLength+2) & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6
+	(((vetoOverlapTime) & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
+	(((filterLength+2) & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6 [Note: in fact it is (((.+2) & 0x3f)<<8) but higher bits are unused -tb-]
 	((gapLength & 0xf)<<4)			| 
 	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
 	((startSampling & 0x1)<<3)		|		// run trigger unit
@@ -1270,6 +1290,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setVetoOverlapTime:[decoder decodeIntForKey:@"vetoOverlapTime"]];
     [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
 	
 #if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
@@ -1338,6 +1359,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:vetoOverlapTime forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram forKey:@"shipSumHistogram"];
 	
 #if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
@@ -1483,7 +1505,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]			forKey:@"filterLength"];//this is the fpga register value -tb-
+    [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]		forKey:@"filterLength"];//this is the fpga register value -tb-
+    [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
 	return objDictionary;
 }
 
