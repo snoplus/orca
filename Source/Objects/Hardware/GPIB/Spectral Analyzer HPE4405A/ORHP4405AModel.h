@@ -19,11 +19,6 @@
 
 #import "ORGpibDeviceModel.h"
 
-#define ORHP4405A 1
-#define ORHPMaxRecSize 50000
-#define ORHPMaxSampleRate 0.125e-9;
-
-// Interface description of ORHP4405AModel oscilloscope.
 @interface ORHP4405AModel : ORGpibDeviceModel {
 	
 	NSMutableArray* trace1;

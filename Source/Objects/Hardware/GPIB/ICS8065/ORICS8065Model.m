@@ -146,7 +146,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 
 - (NSString*) command
 {
-	if(!command)return @"";
+	if(!command)return @""; 
     else return command;
 }
 
@@ -215,6 +215,19 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORICS8065ModelIpAddressChanged object:self];
 }
 
+- (void) disconnect
+{
+	if(!isConnected)return;
+	
+	int i;
+	for( i=0; i<kMaxGpibAddresses; i++ ){
+		if(mDeviceLink[i].lid != 0){
+			[self deactivateDevice:i];
+		}
+	} 
+	[self setRpcClient:nil];	
+	[self setIsConnected:rpcClient!=nil];
+}
 
 - (void) connect
 {
@@ -226,15 +239,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		
 	}
 	else {
-		//already connected, so disconnect
-		int i;
-		for( i=0; i<kMaxGpibAddresses; i++ ){
-			if(mDeviceLink[i].lid != 0){
-				[self deactivateDevice:i];
-			}
-		} 
-		[self setRpcClient:nil];	
-        [self setIsConnected:rpcClient!=nil];
+		[self disconnect];
 	}
 }
 
@@ -303,9 +308,12 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 - (void) setupDevice: (short) aPrimaryAddress
 {  
     if(![self isEnabled])return;
-	if(mDeviceLink[aPrimaryAddress].lid != 0) return; //already setup  
 	
     @try {
+		if(mDeviceLink[aPrimaryAddress].lid != 0) {
+			[self deactivateDevice:aPrimaryAddress];
+		}
+		
         [theHWLock lock];   //-----begin critical section
 		
 		Create_LinkParms crlp;
@@ -462,7 +470,13 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		devReadP.data.data_len = [aCommand length];
 		devReadP.data.data_val = (char *)[aCommand cStringUsingEncoding:NSASCIIStringEncoding];
 		dwrr = device_write_1(&devReadP, rpcClient); 
-		
+		if(dwrr == 0){
+			[self disconnect]; //toggle the connection
+			[self connect];
+			[self setupDevice:aPrimaryAddress];
+			devReadP.lid = mDeviceLink[aPrimaryAddress].lid; 
+			dwrr = device_write_1(&devReadP, rpcClient); 
+		}
         if (dwrr &&  dwrr->error != 0 ) {
             [mErrorMsg setString:  @"***Error: write"];
             [self gpibError: mErrorMsg number: dwrr->error]; 
