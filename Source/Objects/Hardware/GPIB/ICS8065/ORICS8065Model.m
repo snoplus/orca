@@ -234,9 +234,13 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 	if(!isConnected){
 		//not connected
 		CLIENT* aClient = clnt_create((char*)[ipAddress cStringUsingEncoding:NSASCIIStringEncoding],DEVICE_CORE,DEVICE_CORE_VERSION, "TCP");
-		[self setRpcClient:aClient];	
-        [self setIsConnected: aClient!=nil];
-		
+		if(aClient){
+			[self setRpcClient:aClient];	
+			[self setIsConnected: aClient!=nil];
+		}
+		else {
+			NSLog(@"unable to connect IC8065 to device\n");
+		}
 	}
 	else {
 		[self disconnect];
@@ -323,9 +327,14 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		char device[64];
 		sprintf(device,"gpib0,%d",aPrimaryAddress);
 		crlp.device = device;
-		Create_LinkResp* src = create_link_1(&crlp, rpcClient);
-		if(src){
-			memcpy(&mDeviceLink[aPrimaryAddress], src,sizeof(Create_LinkResp));
+		if(rpcClient){
+			Create_LinkResp* src = create_link_1(&crlp, rpcClient);
+			if(src){
+				memcpy(&mDeviceLink[aPrimaryAddress], src,sizeof(Create_LinkResp));
+			}
+		}
+		else {
+			NSLog(@"unable to setup IC8065. Power may be off.\n");
 		}
         [theHWLock unlock];   //-----end critical section
 		
@@ -361,7 +370,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 - (long) readFromDevice: (short) aPrimaryAddress data: (char*) data maxLength: (long) aMaxLength
 {
 	
-    if ( ! [self isEnabled]) return 0;
+    if ( ! [self isEnabled] || !rpcClient) return 0;
     
 	long nReadBytes = 0;
     @try {
@@ -436,7 +445,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 
 - (void) writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand
 {
-    if ( ! [self isEnabled]) return;
+    if ( ! [self isEnabled] || !rpcClient) return;
     @try {
         [theHWLock lock];   //-----begin critical section
 		// Make sure that device is initialized.

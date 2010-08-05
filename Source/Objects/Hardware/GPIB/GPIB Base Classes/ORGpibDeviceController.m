@@ -134,7 +134,7 @@
     
 	// Check to see that device was connected.
 	int chnl = [[[ aNotification userInfo ] objectForKey: ORGpibAddress ] intValue ];
-	if ( chnl == [[ self model ] primaryAddress ] )
+	if ( chnl == [[ self model ] primaryAddress ] && [[model getGpibController ]isConnected])
 	{
 		
 		// Device was connected so update GUI appropriately.
