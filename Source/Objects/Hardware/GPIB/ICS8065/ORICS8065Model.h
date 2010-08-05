@@ -64,7 +64,7 @@
 - (BOOL)    isEnabled;
 - (NSMutableString*)	errorMsg;
 - (void)	connect;
-- (void)	disconnect;
+- (void)	dropConnection;
 
 #pragma mark ***Commands
 - (void) 	changeState: (short) aPrimaryAddress online: (BOOL) aState;

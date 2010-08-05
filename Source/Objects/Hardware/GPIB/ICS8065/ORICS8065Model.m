@@ -215,7 +215,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORICS8065ModelIpAddressChanged object:self];
 }
 
-- (void) disconnect
+- (void) dropConnection
 {
 	if(!isConnected)return;
 	
@@ -243,7 +243,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		}
 	}
 	else {
-		[self disconnect];
+		[self dropConnection];
 	}
 }
 
