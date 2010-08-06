@@ -69,7 +69,7 @@ enum {
 
 
 // Size of output buffer
-#define kADCOutputBufferSize 0x07FF
+#define kADCOutputBufferSize 0x0800
 
 #define kModel785  0
 #define kModel785N 1

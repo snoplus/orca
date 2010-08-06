@@ -72,7 +72,7 @@ enum {
 
 
 // Size of output buffer
-#define kTDCOutputBufferSize 0x0FFC + 0x0004
+#define kTDCOutputBufferSize 0x1000
 #define kModel775  0
 #define kModel775N 1
 

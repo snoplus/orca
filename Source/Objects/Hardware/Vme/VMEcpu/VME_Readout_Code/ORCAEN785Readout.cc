@@ -2,6 +2,8 @@
 #include <errno.h>
 
 #define ShiftAndExtract(aValue,aShift,aMask) (((aValue)>>(aShift)) & (aMask))
+#define v785BufferSizeInLongs 512
+#define v785BufferSizeInBytes (v785BufferSizeInLongs * sizeof(uint32_t))
 
 bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 {
@@ -16,7 +18,8 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 	uint32_t locationMask      = ((GetCrate() & 0x01e)<<21) | 
                                     ((GetSlot() & 0x0000001f)<<16);
     uint32_t statusOneAddress  = GetBaseAddress() + GetDeviceSpecificData()[0];
-    //uint32_t statusTwoAddress  = GetBaseAddress() + GetDeviceSpecificData()[1];
+    uint32_t statusTwoAddress  = GetBaseAddress() + GetDeviceSpecificData()[1];
+	uint32_t bufferSizeInLongs = GetDeviceSpecificData()[2];
     uint32_t fifoAddress       = GetDeviceSpecificData()[3];
 	
 	//read the states
@@ -30,56 +33,128 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
         return false; 
     }
 	
-	//result = VMERead(statusTwoAddress,
-    //                 0x39,
-    //                 sizeof(statusTwo),
-    //                 statusTwo);
-    //if (result != sizeof(statusTwo)) {
-    //    LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
-    //    return false; 
-   //}
+	result = VMERead(statusTwoAddress,
+                     0x39,
+                     sizeof(statusTwo),
+                     statusTwo);
+    if (result != sizeof(statusTwo)) {
+        LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
+        return false; 
+   }
 	
 	//uint8_t bufferIsNotBusy =  !((statusOne & 0x0004) >> 2);
     uint8_t dataIsReady     =  statusOne & 0x0001;
-   // uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
+    uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
+
 	
-    //if ((bufferIsNotBusy && dataIsReady) || bufferIsFull) {
 	if (dataIsReady) {
-		//OK, at least one data value is ready, first value read should be a header
-		uint32_t dataValue;
-		result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
-		if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x2)){
-			int32_t numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
-			int32_t i;
-			if((numMemorizedChannels>0)){
-				//make sure the data buffer can hold our data. Note that we do NOT ship the end of block. 
-				ensureDataCanHold(numMemorizedChannels + 3);
-				
+		if(bufferIsFull){
+			//wow, the buffer is full. We will use dma to read out the whole buffer and decoder it locally into events
+			uint32_t buffer[v785BufferSizeInLongs];
+			
+			result = DMARead(GetBaseAddress()+fifoAddress,
+                             0x39,
+                             (uint32_t) 4,
+                             (uint8_t*) buffer,
+                             v785BufferSizeInBytes);
+			
+			if(result == v785BufferSizeInBytes){
+				uint8_t doingEvent = 0;
+				int32_t numMemorizedChannels;
+				int32_t numDecoded;
 				int32_t savedDataIndex = dataIndex;
-				data[dataIndex++] = dataId | (numMemorizedChannels + 3);
-				data[dataIndex++] = locationMask;
-				uint8_t dataOK = true;
-				for(i=0;i<numMemorizedChannels;i++){
-					result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
-					if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x0))data[dataIndex++] = dataValue;
-					else {
-						dataOK = false;
-						dataIndex = savedDataIndex;
-						LogBusError("Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno)); 
-						FlushDataBuffer();
+				uint32_t i;
+				for(i=0;i<v785BufferSizeInLongs;i++){
+					
+					uint32_t dataWord = buffer[i];
+					uint8_t dataType = ShiftAndExtract(dataWord,24,0x7);
+					
+					switch (dataType) {
+						case 2: 
+							//header
+							savedDataIndex = dataIndex; 
+							numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
+							numDecoded = 0;
+							doingEvent = 1;
+							ensureDataCanHold(numMemorizedChannels + 3);
+							//load the ORCA header
+							data[dataIndex++] = dataId | (numMemorizedChannels + 3);
+							data[dataIndex++] = locationMask;
+						break;
+							
+						case 0: 
+							if(doingEvent){
+								//valid data. put into ORCA record
+								data[dataIndex++] = dataWord;
+								numDecoded++;
+								if(numDecoded > numMemorizedChannels){
+									//something is wrong, dump the event
+									dataIndex = savedDataIndex;
+								}
+							}
+						break;
+							
+						case 4: 
+							if(doingEvent){
+								//end of block. Put into ORCA record since it holds the event counter
+								data[dataIndex++] = dataWord;
+								doingEvent = 0;
+							}
+						break;
+							
+						default:
+							if(doingEvent){
+								//something is wrong, dump the current event
+								dataIndex = savedDataIndex;
+								doingEvent = 0;
+							}
 						break;
 					}
 				}
-				if(dataOK){
-					//OK we read the data, get the end of block
-					result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
-					if((result != sizeof(dataValue)) || (ShiftAndExtract(dataValue,24,0x7) != 0x4)){
-						//some kind of bad error, report and flush the buffer
-						LogBusError("Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno)); 
-						dataIndex = savedDataIndex;
-						FlushDataBuffer();
+			}
+			else {
+				LogBusError("CAEN 0x%0x dma read error",GetBaseAddress());
+				return false; 
+			}
+		}
+		
+		else {
+			//OK, at least one data value is ready, first value read should be a header
+			uint32_t dataValue;
+			result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+			if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x2)){
+				int32_t numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
+				int32_t i;
+				if((numMemorizedChannels>0)){
+					//make sure the data buffer can hold our data. Note that we do NOT ship the end of block. 
+					ensureDataCanHold(numMemorizedChannels + 3);
+					
+					int32_t savedDataIndex = dataIndex;
+					data[dataIndex++] = dataId | (numMemorizedChannels + 3);
+					data[dataIndex++] = locationMask;
+					uint8_t dataOK = true;
+					for(i=0;i<numMemorizedChannels;i++){
+						result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+						if((result == sizeof(dataValue)) && (ShiftAndExtract(dataValue,24,0x7) == 0x0))data[dataIndex++] = dataValue;
+						else {
+							dataOK = false;
+							dataIndex = savedDataIndex;
+							LogBusError("Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+							FlushDataBuffer();
+							break;
+						}
 					}
-					else data[dataIndex++] = dataValue;
+					if(dataOK){
+						//OK we read the data, get the end of block
+						result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+						if((result != sizeof(dataValue)) || (ShiftAndExtract(dataValue,24,0x7) != 0x4)){
+							//some kind of bad error, report and flush the buffer
+							LogBusError("Rd Err: CAEN 785 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+							dataIndex = savedDataIndex;
+							FlushDataBuffer();
+						}
+						else data[dataIndex++] = dataValue;
+					}
 				}
 			}
 		}
