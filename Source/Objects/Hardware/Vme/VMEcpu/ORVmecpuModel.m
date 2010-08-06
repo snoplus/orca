@@ -141,7 +141,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (NSString*) driverScriptInfo 
 {
-	return @"Install for the latest version of the Universe II driver";
+	return @"Install for the latest version of the Universe II driver.\n\nIf install fails you may have an older driver installed.\nTry updating the driver, reboot the sbc, then reinstall the driver again";
 }
 
 - (NSString*) cpuName
