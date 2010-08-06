@@ -444,6 +444,8 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	configStruct->card_info[index].base_add  = [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0] = reg[kStatusRegister1].addressOffset;
 	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[2] = reg[kStatusRegister2].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[3] = [self getDataBufferSize]/sizeof(long);
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
