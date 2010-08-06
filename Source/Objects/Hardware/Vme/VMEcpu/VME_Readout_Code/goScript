@@ -27,7 +27,6 @@ then
 
 	echo "goScript: You may kill the crate."
 
-fi
 
 else
 ~/ORCA/OrcaReadout <port> &

@@ -12,14 +12,14 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
     /* 1: statusTwo register                          */
     /* 2: fifo buffer size (in longs)                 */
     /* 3: fifo buffer address                         */
-    uint16_t statusOne;//, statusTwo;
+    uint16_t statusOne, statusTwo;
     int32_t result;
 	uint32_t dataId            = GetHardwareMask()[0];
 	uint32_t locationMask      = ((GetCrate() & 0x01e)<<21) | 
                                     ((GetSlot() & 0x0000001f)<<16);
     uint32_t statusOneAddress  = GetBaseAddress() + GetDeviceSpecificData()[0];
     uint32_t statusTwoAddress  = GetBaseAddress() + GetDeviceSpecificData()[1];
-	uint32_t bufferSizeInLongs = GetDeviceSpecificData()[2];
+	//uint32_t bufferSizeInLongs = GetDeviceSpecificData()[2];
     uint32_t fifoAddress       = GetDeviceSpecificData()[3];
 	
 	//read the states
@@ -73,7 +73,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 						case 2: 
 							//header
 							savedDataIndex = dataIndex; 
-							numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
+							numMemorizedChannels = ShiftAndExtract(dataWord,8,0x3f);
 							numDecoded = 0;
 							doingEvent = 1;
 							ensureDataCanHold(numMemorizedChannels + 3);
