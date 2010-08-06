@@ -69,7 +69,32 @@
 	[notifyCenter addObserver : self
 			 selector : @selector(selectedRegisterChanged:)
 			     name : ORXL3ModelSelectedRegisterChanged
-			    object: model];
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(repeatCountChanged:)
+			     name : ORXL3ModelRepeatCountChanged
+			   object : model];
+	
+	[notifyCenter addObserver : self
+			 selector : @selector(repeatDelayChanged:)
+			     name : ORXL3ModelRepeatDelayChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(autoIncrementChanged:)
+			     name : ORXL3ModelAutoIncrementChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(basicOpsRunningChanged:)
+			     name : ORXL3ModelBasicOpsRunningChanged
+			   object : model];
+	
+	[notifyCenter addObserver : self
+			 selector : @selector(writeValueChanged:)
+			     name : ORXL3ModelWriteValueChanged
+			   object : model];
 	
 	[notifyCenter addObserver : self
 			 selector : @selector(ipNumberChanged:)
@@ -80,17 +105,30 @@
 			 selector : @selector(connectStateChanged:)
 			     name : XL3_LinkConnectStateChanged
 			    object: [model xl3Link]];
-	
+
+	[notifyCenter addObserver : self
+			 selector : @selector(errorTimeOutChanged:)
+			     name : XL3_LinkErrorTimeOutChanged
+			   object : [model xl3Link]];		
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
 
+	[self settingsLockChanged:nil];
+	//basic ops
 	[self selectedRegisterChanged:nil];
+	[self repeatCountChanged:nil];
+	[self repeatDelayChanged:nil];
+	[self autoIncrementChanged:nil];
+	[self basicOpsRunningChanged:nil];
+	[self writeValueChanged:nil];
+
+	//ip connection
+	[self errorTimeOutChanged:nil];
 
 	/*
-	[self settingsLockChanged:nil];
 	
 	[self filePathChanged:nil];
 	[self verboseChanged:nil];
@@ -102,16 +140,9 @@
 	
 	[self ipNumberChanged:nil];
 	[self portNumberChanged:nil];
-	[self userNameChanged:nil];
-	[self passWordChanged:nil];
 	[self initAfterConnectChanged:nil];
 	
-	[self writeValueChanged:nil];
 	[self addressChanged:nil];
-	[self doRangeChanged:nil];
-	[self rangeChanged:nil];
-	[self readWriteTypeChanged:nil];
-	[self addressModifierChanged:nil];
 	[self infoTypeChanged:nil];
 	[self pingTaskChanged:nil];
 	[self cbTestChanged:nil];
@@ -119,7 +150,6 @@
 	[self payloadSizeChanged:nil];
 	
 	[self lamSlotChanged:nil];
-	[self errorTimeOutChanged:nil];
 */
 }
 
@@ -144,7 +174,7 @@
 {
 	
 	//BOOL runInProgress = [gOrcaGlobals runInProgress];
-	//BOOL locked = [gSecurity isLocked:[model xl3LockName]];
+	BOOL locked = [gSecurity isLocked:[model xl3LockName]];
 	//BOOL connected		 = [[model xl3Link] isConnected];
 /*	
 	[clearHistoryButton setEnabled:!locked  && !connected];
@@ -161,10 +191,48 @@
 	[loadModeMatrix setEnabled:!locked && !runInProgress];
 	[forceReloadButton setEnabled:!locked && !runInProgress];
 	[verboseButton setEnabled:!locked && !runInProgress];
-	[errorTimeOutPU setEnabled:!locked];
-	[self setToggleCrateButtonState];
 */
+	[errorTimeOutPU setEnabled:!locked];
+	//[self setToggleCrateButtonState];
+
 }
+
+#pragma mark •basic ops
+- (void) repeatCountChanged:(NSNotification*)aNote
+{
+	[repeatCountField setIntValue: [model repeatOpCount]];
+	[repeatCountStepper setIntValue: [model repeatOpCount]];
+}
+
+- (void) repeatDelayChanged:(NSNotification*)aNote
+{
+	[repeatDelayField setIntValue:[model repeatDelay]];
+	[repeatDelayStepper setIntValue: [model repeatDelay]];
+}
+
+- (void) autoIncrementChanged:(NSNotification*)aNote
+{
+	[autoIncrementCB setState:[model autoIncrement]];
+}
+
+- (void) basicOpsRunningChanged:(NSNotification*)aNote
+{
+	if ([model basicOpsRunning]) [basicOpsRunningIndicator startAnimation:model];
+	else [basicOpsRunningIndicator stopAnimation:model];
+}
+
+- (void) writeValueChanged:(NSNotification*)aNote
+{
+	[writeValueField setIntValue:[model writeValue]];
+	[writeValueStepper setIntValue:[model writeValue]];
+}
+
+- (void) selectedRegisterChanged:(NSNotification*)aNote
+{
+	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
+}
+
+#pragma mark •ip connection
 
 - (void) linkConnectionChanged:(NSNotification*)aNote
 {
@@ -192,15 +260,16 @@
 	}	
 }
 
-- (void) selectedRegisterChanged:(NSNotification*)aNote
-{
-	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
-}
-
 - (void) ipNumberChanged:(NSNotification*)aNote;
 {
 	//todo
 }
+
+- (void) errorTimeOutChanged:(NSNotification*)aNote
+{
+	[errorTimeOutPU selectItemAtIndex:[[model xl3Link] errorTimeOut]];
+}
+
 
 #pragma mark •••Helper
 
@@ -227,10 +296,54 @@
 	[model setSelectedRegister:[sender indexOfSelectedItem]];	
 }
 
+- (IBAction) basicReadAction:(id)sender
+{
+	[model readBasicOps];
+}
 
-- (void) toggleConnectAction:(id)sender;
+- (IBAction) basicWriteAction:(id)sender
+{
+	[model writeBasicOps];
+}
+
+- (IBAction) basicStopAction:(id)sender
+{
+	[model stopBasicOps];
+}
+
+- (IBAction) basicStatusAction:(id) sender
+{
+	[model reportStatus];
+}
+
+- (IBAction) repeatCountAction:(id) sender
+{
+	[model setRepeatOpCount:[sender intValue]];	
+}
+
+- (IBAction) repeatDelayAction:(id) sender
+{
+	[model setRepeatDelay:[sender intValue]];
+}
+
+- (IBAction) autoIncrementAction:(id) sender
+{
+	[model setAutoIncrement:[sender intValue]];
+}
+
+- (IBAction) writeValueAction:(id) sender;
+{
+	[model setWriteValue:[sender intValue]];
+}
+
+- (void) toggleConnectAction:(id)sender
 {
 	[[model xl3Link] toggleConnect];
+}
+
+- (IBAction) errorTimeOutAction:(id)sender
+{
+	[[model xl3Link] setErrorTimeOut:[sender indexOfSelectedItem]];
 }
 
 @end

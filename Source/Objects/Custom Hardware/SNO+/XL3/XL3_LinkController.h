@@ -22,14 +22,28 @@
 
 @interface XL3_LinkController : OrcaObjectController
 {
-	IBOutlet NSButton*	lockButton;
+	IBOutlet NSButton*		lockButton;
 	//basic
-	IBOutlet NSPopUpButton* selectedRegisterPU;
-
+	IBOutlet NSPopUpButton*		selectedRegisterPU;
+	IBOutlet NSButton*		basicReadButton;
+	IBOutlet NSButton*		basicWriteButton;
+	IBOutlet NSButton*		basicStopButton;
+	IBOutlet NSButton*		basicStatusButton;
+	IBOutlet NSProgressIndicator*	basicOpsRunningIndicator;
+	IBOutlet NSButton*		autoIncrementCB;
+	IBOutlet NSTextField*		repeatDelayField;
+	IBOutlet NSStepper*		repeatDelayStepper;
+	IBOutlet NSTextField*		repeatCountField;
+	IBOutlet NSStepper*		repeatCountStepper;
+	IBOutlet NSTextField*		writeValueField;
+	IBOutlet NSStepper*		writeValueStepper;
+	
 	//composite
 
 	//connection
 	IBOutlet NSButton*      toggleConnectButton;
+	IBOutlet NSPopUpButton* errorTimeOutPU;
+
 
 }	
 
@@ -46,10 +60,18 @@
 #pragma mark •••Interface Management
 - (void) settingsLockChanged:(NSNotification*)aNotification;
 - (void) xl3LockChanged:(NSNotification*)aNotification;
-- (void) connectStateChanged:(NSNotification*)aNote;
+//basic ops
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
+- (void) repeatCountChanged:(NSNotification*)aNote;
+- (void) repeatDelayChanged:(NSNotification*)aNote;
+- (void) autoIncrementChanged:(NSNotification*)aNote;
+- (void) basicOpsRunningChanged:(NSNotification*)aNote;
+- (void) writeValueChanged:(NSNotification*)aNote;
+//ip connection
+- (void) connectStateChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
 - (void) linkConnectionChanged:(NSNotification*)aNote;
+- (void) errorTimeOutChanged:(NSNotification*)aNote;
 
 #pragma mark •••Helper
 - (void) populatePullDown;
@@ -58,8 +80,18 @@
 - (IBAction) lockAction:(id)sender;
 //basic
 - (IBAction) basicSelectedRegisterAction:(id)sender;
+- (IBAction) basicReadAction:(id)sender;
+- (IBAction) basicWriteAction:(id)sender;
+- (IBAction) basicStopAction:(id)sender;
+- (IBAction) basicStatusAction:(id) sender;
+- (IBAction) repeatCountAction:(id) sender;
+- (IBAction) repeatDelayAction:(id) sender;
+- (IBAction) autoIncrementAction:(id) sender;
+- (IBAction) writeValueAction:(id) sender;
+
 //composite
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
+- (IBAction) errorTimeOutAction:(id)sender;
 
 @end

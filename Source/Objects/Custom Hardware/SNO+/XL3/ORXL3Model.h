@@ -48,10 +48,17 @@ enum {
 @class XL3_Link;
 @class ORCommandList;
 
-@interface ORXL3Model :  ORSNOCard 
+@interface ORXL3Model : ORSNOCard 
 {
 	XL3_Link*	xl3Link;
 	short		selectedRegister;
+	BOOL		basicOpsRunning;
+	BOOL		autoIncrement;
+	unsigned short	repeatDelay;
+	short		repeatOpCount;
+	BOOL		doReadOp;
+	unsigned long	workingCount;
+	unsigned long	writeValue;
 }
 
 #pragma mark •••Initialization
@@ -71,6 +78,18 @@ enum {
 - (void) setGuardian:(id)aGuardian;
 - (short) getNumberRegisters;
 - (NSString*) getRegisterName:(short) anIndex;
+- (unsigned long) getRegisterAddress: (short) anIndex;
+- (BOOL) basicOpsRunning;
+- (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;
+- (BOOL) autoIncrement;
+- (void) setAutoIncrement:(BOOL)aAutoIncrement;
+- (unsigned short) repeatDelay;
+- (void) setRepeatDelay:(unsigned short)aRepeatDelay;
+- (short) repeatOpCount;
+- (void) setRepeatOpCount:(short)aRepeatCount;
+- (unsigned long) writeValue;
+- (void) setWriteValue:(unsigned long)aWriteValue;
+
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
 - (NSString*) xl3LockName;
@@ -87,6 +106,16 @@ enum {
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress;
 - (void) writeHardwareMemory:(unsigned long) memAddress value:(unsigned long) aValue;
 - (unsigned long) readHardwareMemory:(unsigned long) memAddress;
+- (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue;
+- (unsigned long) readXL3Register:(short)aRegister;
+
+#pragma mark •••Basic Ops
+- (void) readBasicOps;
+- (void) writeBasicOps;
+- (void) stopBasicOps;
+- (void) reportStatus;
+
+#pragma mark •••Composite Ops
 - (void) reset;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
@@ -98,3 +127,8 @@ enum {
 @end
 
 extern NSString* ORXL3ModelSelectedRegisterChanged;
+extern NSString* ORXL3ModelRepeatCountChanged;
+extern NSString* ORXL3ModelRepeatDelayChanged;
+extern NSString* ORXL3ModelAutoIncrementChanged;
+extern NSString* ORXL3ModelBasicOpsRunningChanged;
+extern NSString* ORXL3ModelWriteValueChanged;

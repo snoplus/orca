@@ -45,7 +45,16 @@ static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 
 #pragma mark •••Definitions
 
-NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChanged";
+NSString* ORXL3ModelSelectedRegisterChanged =	@"ORXL3ModelSelectedRegisterChanged";
+NSString* ORXL3ModelRepeatCountChanged =	@"ORXL3ModelRepeatCountChanged";
+NSString* ORXL3ModelRepeatDelayChanged =	@"ORXL3ModelRepeatDelayChanged";
+NSString* ORXL3ModelAutoIncrementChanged =	@"ORXL3ModelAutoIncrementChanged";
+NSString* ORXL3ModelBasicOpsRunningChanged =	@"ORXL3ModelBasicOpsRunningChanged";
+NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
+
+@interface ORXL3Model (private)
+- (void) doBasicOp;
+@end
 
 @implementation ORXL3Model
 
@@ -54,11 +63,6 @@ NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChange
 - (id) init
 {
 	self = [super init];
-	//[self setXl3Link:[[XL3_Link alloc] init]];
-	//[xl3Link setCrateName:[NSString stringWithFormat:@"XL3 crate %d", [model uniqueIdNumber] + 1]];
-	//[xl3Link setIPNumber:[guardian iPAddress]];
-	//[xl3Link setPortNumber: PORT];
-	
 	return self;
 }
 
@@ -166,6 +170,82 @@ NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChange
 	return reg[anIndex].regName;
 }
 
+- (unsigned long) getRegisterAddress: (short) anIndex
+{
+	return reg[anIndex].address;
+}
+
+- (BOOL) basicOpsRunning
+{
+	return basicOpsRunning;
+}
+
+- (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning
+{
+	basicOpsRunning = aBasicOpsRunning;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelBasicOpsRunningChanged object:self];
+}
+
+- (BOOL) autoIncrement
+{
+	return autoIncrement;
+}
+
+- (void) setAutoIncrement:(BOOL)aAutoIncrement
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setAutoIncrement:autoIncrement];
+	
+	autoIncrement = aAutoIncrement;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelAutoIncrementChanged object:self];
+}
+
+- (unsigned short) repeatDelay
+{
+	return repeatDelay;
+}
+
+- (void) setRepeatDelay:(unsigned short)aRepeatDelay
+{
+	if(aRepeatDelay<=0)aRepeatDelay = 1;
+	[[[self undoManager] prepareWithInvocationTarget:self] setRepeatDelay:repeatDelay];
+	
+	repeatDelay = aRepeatDelay;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRepeatDelayChanged object:self];
+}
+
+- (short) repeatOpCount
+{
+	return repeatOpCount;
+}
+
+- (void) setRepeatOpCount:(short)aRepeatCount
+{
+	if(aRepeatCount<=0)aRepeatCount = 1;
+	[[[self undoManager] prepareWithInvocationTarget:self] setRepeatOpCount:repeatOpCount];
+	
+	repeatOpCount = aRepeatCount;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRepeatCountChanged object:self];
+}
+
+- (unsigned long) writeValue
+{
+	return writeValue;
+}
+
+- (void) setWriteValue:(unsigned long)aWriteValue
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:writeValue];
+	
+	writeValue = aWriteValue;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelWriteValueChanged object:self];
+}	
+
+
 - (int) selectedRegister
 {
 	return selectedRegister;
@@ -215,15 +295,18 @@ NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChange
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
-    self = [super initWithCoder:decoder];
-    
+	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+
 	[self setSlot:			[decoder decodeIntForKey:	@"slot"]];
 	[self setSelectedRegister:	[decoder decodeIntForKey:	@"ORXL3ModelSelectedRegister"]];
+	xl3Link = [[decoder decodeObjectForKey:@"XL3_Link"] retain];
+	[self setAutoIncrement:		[decoder decodeBoolForKey:	@"ORXL3ModelAutoIncrement"]];
+	[self setRepeatDelay:		[decoder decodeIntForKey:	@"ORXL3ModelRepeatDelay"]];
+	[self setRepeatOpCount:		[decoder decodeIntForKey:	@"ORXL3ModelRepeatOpCount"]];
 	
 	[[self undoManager] enableUndoRegistration];
-    
-    return self;
+	return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
@@ -231,6 +314,10 @@ NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChange
 	[super encodeWithCoder:encoder];
 	[encoder encodeInt:selectedRegister	forKey:@"ORXL3ModelSelectedRegister"];
 	[encoder encodeInt:[self slot]		forKey:@"slot"];
+	[encoder encodeObject:xl3Link		forKey:@"XL3_Link"];
+	[encoder encodeBool:autoIncrement	forKey:@"ORXL3ModelAutoIncrement"];
+	[encoder encodeInt:repeatDelay		forKey:@"ORXL3ModelRepeatDelay"];
+	[encoder encodeInt:repeatOpCount	forKey:@"ORXL3ModelRepeatOpCount"];
 }
 
 #pragma mark •••Hardware Access
@@ -289,6 +376,31 @@ NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChange
 }
 
 
+- (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue
+{
+	if (aRegister >= kXl3NumRegisters) {
+		NSLog(@"Error writing XL3 register out of range\n");
+		return;
+	}
+	
+	unsigned long address = XL3_SEL | [self getRegisterAddress:aRegister] | WRITE_REG;
+	[self writeHardwareRegister:address value:aValue];
+	return;
+}
+
+
+- (unsigned long) readXL3Register:(short)aRegister
+{
+	if (aRegister >= kXl3NumRegisters) {
+		NSLog(@"Error reading XL3 register out of range\n");
+		return 0;
+	}
+
+	unsigned long address = XL3_SEL | [self getRegisterAddress:aRegister] | READ_REG;
+	unsigned long value = [self readHardwareRegister:address];
+	return value;
+}
+
 
 //multi command calls
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern
@@ -312,6 +424,38 @@ NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChange
 - (void) executeCommandList:(ORCommandList*)aList
 {
 	//[[self xl1] executeCommandList:aList];		
+}
+
+#pragma mark •••Basic Ops
+- (void) readBasicOps
+{
+	doReadOp = YES;
+	workingCount = 0;
+	[self setBasicOpsRunning:YES];
+	[self doBasicOp];	
+}
+
+
+- (void) writeBasicOps
+{
+	doReadOp = NO;
+	workingCount = 0;
+	[self setBasicOpsRunning:YES];
+	[self doBasicOp];
+}
+
+- (void) stopBasicOps
+{
+	[self setBasicOpsRunning:NO];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doBasicOp) object:nil];
+}
+
+- (void) reportStatus
+{
+	NSLog(@"not yet implemented\n");
+	//that what we did for MTC
+	//NSLog(@"Mtc control reg: 0x%0x\n", [self getMTC_CSR]);
+	//parse csr to human friendly output, e.g. 0x3 firing pedestals...
 }
 
 
@@ -348,3 +492,38 @@ NSString* ORXL3ModelSelectedRegisterChanged = @"ORXL3ModelSelectedRegisterChange
 
 @end
 
+
+@implementation ORXL3Model (private)
+- (void) doBasicOp
+{
+	@try {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doBasicOp) object:nil];
+		if(doReadOp){
+			NSLog(@"%@: 0x%08x\n", reg[selectedRegister].regName, [self readXL3Register:selectedRegister]);
+		}
+		else {
+			[self writeXL3Register:selectedRegister value:writeValue];
+			NSLog(@"Wrote 0x%08x to %@\n", writeValue, reg[selectedRegister].regName);
+		}
+
+		if(++workingCount < repeatOpCount){
+			if (autoIncrement) {
+				selectedRegister++;
+				if (selectedRegister == kXl3NumRegisters) selectedRegister = 0;
+				[self setSelectedRegister:selectedRegister];
+			}
+			[self performSelector:@selector(doBasicOp) withObject:nil afterDelay:repeatDelay/1000.];
+		}
+		else {
+			[self setBasicOpsRunning:NO];
+		}
+	}
+	@catch(NSException* localException) {
+		[self setBasicOpsRunning:NO];
+		NSLog(@"Mtc basic op exception: %@\n",localException);
+		[localException raise];
+	}
+	
+}
+
+@end

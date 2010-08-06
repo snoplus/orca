@@ -19,6 +19,7 @@
 //-------------------------------------------------------------
 
 #import "XL3_Cmds.h"
+@class ORSafeQueue;
 
 typedef enum eXL3_ConnectStates {
 	kDisconnected,
@@ -33,14 +34,18 @@ eXL3_CrateStates;
 {
 	int		serverSocket;
 	int		workingSocket;
-	NSLock*		socketLock;
+	NSLock*		commandSocketLock;
+	NSLock*		coreSocketLock;
+	NSLock*		cmdArrayLock;
 	bool		needToSwap;
 	NSString*	IPNumber;
 	NSString*	crateName;
 	int		portNumber;
 	BOOL		isConnected;
 	int		connectState;
+	int		errorTimeOut;
 	NSCalendarDate*	timeConnected;
+	NSMutableArray*	cmdArray;
 }
 
 - (id)   init;
@@ -53,9 +58,6 @@ eXL3_CrateStates;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Accessors
-- (void) connectSocket;
-- (void) disconnectSocket;
-- (void) connectToPort;
 - (int)  serverSocket;
 - (void) setServerSocket:(int) aSocket;
 - (int)  workingSocket;
@@ -65,6 +67,9 @@ eXL3_CrateStates;
 - (int)  connectState;
 - (BOOL) isConnected;
 - (void) setIsConnected:(BOOL)aNewIsConnected;
+- (void) setErrorTimeOut:(int)aValue;
+- (int) errorTimeOut;
+- (int) errorTimeOutSeconds;
 - (void) toggleConnect;
 - (NSCalendarDate*) timeConnected;
 - (void) setTimeConnected:(NSCalendarDate*)newTimeConnected;
@@ -75,14 +80,18 @@ eXL3_CrateStates;
 - (NSString*) crateName;
 - (void) setCrateName:(NSString*)aCrateName;
 
-
+- (void) sendXL3Packet:(XL3_Packet*)aSendPacket;
 - (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse;
 - (void) sendCommand:(long)aCmd expectResponse:(BOOL)askForResponse;
 - (void) sendFECCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value;
-- (void) send:(XL3_Packet*)aSendPacket receive:(XL3_Packet*)aReceivePacket;
-- (void) write:(int)aSocket buffer:(XL3_Packet*)aPacket;
-- (void) read:(int)aSocket buffer:(XL3_Packet*)aPacket;
-- (void) readSocket:(int)aSocket buffer:(XL3_Packet*)aPacket;
+- (void) readXL3Packet:(XL3_Packet*)aPacket withCmdID:(int)cmdID;
+
+- (void) connectSocket;
+- (void) disconnectSocket;
+- (void) connectToPort;
+- (void) writePacket:(char*)aPacket;
+- (void) readPacket:(char*)aPacket;
+- (BOOL) canWriteTo:(int)aSocket;
 
 @end
 
@@ -91,3 +100,4 @@ extern NSString* XL3_LinkConnectionChanged;
 extern NSString* XL3_LinkTimeConnectedChanged;
 extern NSString* XL3_LinkIPNumberChanged;
 extern NSString* XL3_LinkConnectStateChanged;
+extern NSString* XL3_LinkErrorTimeOutChanged;

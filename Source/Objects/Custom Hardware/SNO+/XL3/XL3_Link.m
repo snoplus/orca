@@ -33,15 +33,21 @@ NSString* XL3_LinkConnectionChanged	= @"XL3_LinkConnectionChanged";
 NSString* XL3_LinkTimeConnectedChanged	= @"XL3_LinkTimeConnectedChanged";
 NSString* XL3_LinkIPNumberChanged	= @"XL3_LinkIPNumberChanged";
 NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
+NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
+
+#define kCmdArrayHighWater 100
 
 @implementation XL3_Link
 
 - (id)   init
 {
 	self = [super init];
-	socketLock = [[NSLock alloc] init];
+	commandSocketLock = [[NSLock alloc] init];
+	coreSocketLock = [[NSLock alloc] init];
+	cmdArrayLock = [[NSLock alloc] init];
 	[self setNeedToSwap];
 	connectState = kDisconnected;
+	cmdArray = [NSMutableArray arrayWithCapacity:100];
 	//[self initConnectionHistory];
 	return self;
 }
@@ -53,7 +59,13 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 	}
 	@catch (NSException* localException) {
 	}
-	[socketLock release];
+	[commandSocketLock release];
+	[coreSocketLock release];
+	[cmdArrayLock release];
+	if(cmdArray){
+		[cmdArray release];
+		cmdArray = nil;
+	}
 
 	[super dealloc];
 }
@@ -77,7 +89,11 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 
-	socketLock = [[NSLock alloc] init];
+	[self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];	
+
+	commandSocketLock = [[NSLock alloc] init];
+	coreSocketLock = [[NSLock alloc] init];
+	cmdArrayLock = [[NSLock alloc] init];
 
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -86,7 +102,7 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
-	
+	[encoder encodeInt:errorTimeOut    forKey:@"errorTimeOut"];
 }
 
 
@@ -144,6 +160,25 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 - (void) setWorkingSocket:(int) aSocket
 {
 	workingSocket = aSocket;
+}
+
+- (void) setErrorTimeOut:(int)aValue
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setErrorTimeOut:errorTimeOut];
+	errorTimeOut = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkErrorTimeOutChanged object:self];
+}
+
+- (int) errorTimeOut
+{
+	return errorTimeOut;
+}
+
+- (int) errorTimeOutSeconds
+{
+	static int translatedTimeOut[4] = {2,10,60,0};
+	if(errorTimeOut<0 || errorTimeOut>3)return 2;
+	else return translatedTimeOut[errorTimeOut];
 }
 
 - (void) toggleConnect
@@ -245,28 +280,49 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 	}
 }	
 
+- (void) sendXL3Packet:(XL3_Packet*)aPacket
+{
+	//expects the packet is swapped correctly
+	int cmdID;
+	if (needToSwap) cmdID = swapLong(aPacket->cmdHeader.cmdID);
+	else cmdID = aPacket->cmdHeader.cmdID;
+	
+	@try {
+		[commandSocketLock lock]; //begin critial section
+		[self writePacket:(char*) aPacket];
+		[self readXL3Packet:(XL3_Packet*)aPacket withCmdID:cmdID];
+		[commandSocketLock unlock]; //end critial section
+	}
+	@catch (NSException* localException) {
+		[commandSocketLock unlock]; //end critial section
+		[localException raise];
+	}
+}
+
+
 - (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse
 {
+	//client is responsible for payload swapping, we take care of the header
 	XL3_Packet aPacket;
 	aPacket.cmdHeader.cmdID = (uint32_t) aCmd;
 	if (needToSwap) aPacket.cmdHeader.cmdID = swapLong(aPacket.cmdHeader.cmdID);
 	memcpy(&aPacket.payload, &payloadBlock->payload, payloadBlock->numberBytesinPayload);
 	
 	@try {
-		[socketLock lock]; //begin critical section
-		[self write:workingSocket buffer:&aPacket];
+		[commandSocketLock lock]; //begin critical section
+		[self writePacket:(char*) &aPacket];
 		
 		if(askForResponse){
-			[self read:workingSocket buffer:&aPacket];
+			[self readXL3Packet:&aPacket withCmdID:aCmd];
 			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
 			memcpy(&payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
 		}
-		[socketLock unlock]; //end critical section
+		[commandSocketLock unlock]; //end critical section
 		
 	}
 	@catch (NSException* localException) {
-		[socketLock unlock]; //end critical section
-		[localException raise];
+		[commandSocketLock unlock]; //end critical section
+		@throw localException;
 	}	
 }
 
@@ -306,6 +362,55 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 	if (needToSwap) *value = swapLong(*value);	
 }
 
+
+- (void) readXL3Packet:(XL3_Packet*)aPacket withCmdID:(int)cmdID
+{
+	//look into the cmdArray
+	NSDictionary* aCmd;
+	NSMutableArray* foundCmds = [NSMutableArray array];
+	time_t t1 = time(0);
+
+	@try {
+		while(1) {
+			[cmdArrayLock lock];
+			for (aCmd in cmdArray) {
+				NSNumber* aCmdID = [aCmd objectForKey:@"cmdID"];
+				if ([aCmdID intValue] == cmdID) {
+					[foundCmds addObject:aCmd];
+				}
+			}
+			[cmdArrayLock unlock];
+			
+			if ([foundCmds count]) {
+				break;
+			}
+			else if ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds]) {
+				@throw [NSException exceptionWithName:@"ReadXL3Packet time out"
+					reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber]
+					userInfo:nil];
+			}
+			else {
+				[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+			}
+		}
+	}
+	@catch (NSException* localException) {
+		NSLog(@"%@ %@\n", [localException name], [localException reason]);
+		[cmdArrayLock unlock];
+		@throw localException;
+	}
+
+	if ([cmdArray count] > 1) {
+		NSLog(@"Multiple responses for XL3 command %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber);
+		// todo: do something not too retarded, ask a smart guy
+	}
+	
+	aCmd = [foundCmds objectAtIndex:0];
+	[[aCmd objectForKey:@"xl3Packet"] getBytes:aPacket length:XL3_PACKET_SIZE];
+	[cmdArray removeObjectsInArray:foundCmds];
+} 
+
+
 - (void) connectSocket
 {
 	if(!serverSocket && ([IPNumber length]!=0) && (portNumber!=0)){
@@ -325,7 +430,7 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 			[self setIsConnected: NO];
 			[self setTimeConnected:nil];
 			
-			@throw;
+			@throw localException;
 		}
 	}
 	else {
@@ -348,7 +453,7 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 		
 	[self setIsConnected: NO];
 	[self setTimeConnected:nil];
-	NSLog(@"Disconnected from %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber);
+	NSLog(@"Disconnected %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber);
 	//[[delegate crate] disconnected];	 
 }
 
@@ -362,42 +467,61 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 	int32_t yes=1;
 
 	//start try block here if we know how to handle the exceptions, ORCA gets killed now
-	if ((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-		[NSException raise:@"Socket Failed" format:@"Couldn't get a socket for local XL3 Port %d", portNumber];
-	//try harder...
-	//???TCP_NODELAY
-	if (setsockopt(serverSocket,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1)
-		[NSException raise:@"Socket Options Failed" format:@"Couldn't set socket options for local XL3 Port %d", portNumber];
+	@try {
+		if ((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
+			[NSException raise:@"Socket Failed" format:@"Couldn't get a socket for local XL3 Port %d", portNumber];
+		//todo: try harder...
+		//???TCP_NODELAY for the moment done with recv
+		if (setsockopt(serverSocket,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1)
+			[NSException raise:@"Socket Options Failed" format:@"Couldn't set socket options for local XL3 Port %d", portNumber];
+			
+		my_addr.sin_family = AF_INET;         // host byte order
+		my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
+		memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
+			
+		my_addr.sin_port = htons(portNumber);     // short, network byte order
+		if (bind(serverSocket, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
+			[NSException raise:@"Bind Failed" format:@"Couldn't bind to local XL3 Port %d", portNumber];
 		
-	my_addr.sin_family = AF_INET;         // host byte order
-	my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
-	memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
-		
-	my_addr.sin_port = htons(portNumber);     // short, network byte order
-	if (bind(serverSocket, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
-		[NSException raise:@"Bind Failed" format:@"Couldn't bind to local XL3 Port %d", portNumber];
-	
-	if (listen(serverSocket, 1) == -1)
-		[NSException raise:@"Listen Failed" format:@"Couldn't listen on local XL3 port %d\n", portNumber];
+		if (listen(serverSocket, 1) == -1)
+			[NSException raise:@"Listen Failed" format:@"Couldn't listen on local XL3 port %d\n", portNumber];
 
-	connectState = kWaiting;
-	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
+		connectState = kWaiting;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
-	//a single connection allowed only, no fork.
-	sin_size = sizeof(struct sockaddr_in);
-	workingSocket = 0;
-	if ((workingSocket = accept(serverSocket, (struct sockaddr *)&their_addr, &sin_size)) == -1) {
-		//if not socket connection was kill by UI... do something meaningful
-		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];		
-		if ([self serverSocket]) {
-			[NSException raise:@"Connection Failed" format:@"Couldn't accept connection on local XL3 port %d\n", portNumber];
-		}
-		else {
-			//disconnected by UI...
-			return;
+		//a single connection allowed only, no fork.
+		sin_size = sizeof(struct sockaddr_in);
+		workingSocket = 0;
+		if ((workingSocket = accept(serverSocket, (struct sockaddr *)&their_addr, &sin_size)) == -1) {
+			//if not socket connection was kill by UI... do something meaningful
+			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];		
+			if ([self serverSocket]) {
+				[NSException raise:@"Connection Failed" format:@"Couldn't accept connection on local XL3 port %d\n", portNumber];
+			}
+			else {
+				//disconnected by UI...
+				return;
+			}
 		}
 	}
-	//catch block to be added here
+	@catch (NSException* localException) {
+		NSLog(@"XL3 socket failed with exception: %@ with reason: %@\n", [localException name], [localException reason]);
+		
+		if (serverSocket) {
+			close(serverSocket);
+			serverSocket = 0;
+		}
+		if (workingSocket) {
+			close(workingSocket);
+			workingSocket = 0;
+		}
+		NSLog(@"XL3 disconnected from local port %d\n", [self portNumber]);
+		connectState = kDisconnected;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
+		[self setIsConnected:NO];
+		
+		return;
+	}
 	
 	//parse their_addr
 	//if not correct swap the xl3Link with the correct crate
@@ -406,305 +530,235 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 	connectState = kConnected;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 	[self setIsConnected:YES];
+
 	//[self getRunInfoBlock];
 	//[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];			
 
 	NSLog(@"XL3 connected on local port %d\n", [self portNumber]);
 
-	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:10]];
+	fd_set fds;
+	int selectionResult = 0;
+	struct timeval tv;
+	tv.tv_sec  = 0;
+	tv.tv_usec = 10000;
 
-	close(serverSocket);
-	serverSocket = 0;
-	close(workingSocket);
-	workingSocket = 0;
+	char aPacket[XL3_PACKET_SIZE];
 	
-	NSLog(@"XL3 disconnected from local port %d\n", [self portNumber]);
-	connectState = kDisconnected;
-	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
-	[self setIsConnected:NO];
+	while(1) {
+		if (!workingSocket) {
+			NSLog(@"XL3 Not Connected <%@> port: %d\n", IPNumber, portNumber);
+			break;
+		}
+				
+		FD_ZERO(&fds);
+		FD_SET(workingSocket, &fds);
+		selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
+		if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
+			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
+			if (workingSocket || serverSocket) {
+				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
+			}
+			break;
+		}
+			      
+		if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) {
+			@try {
+				[coreSocketLock lock];
+				[self readPacket:aPacket];
+				[coreSocketLock unlock];
 
+				if ((needToSwap && ((XL3_Packet*) aPacket)->cmdHeader.cmdID == 0x00010000) ||
+				    (!needToSwap && *(uint32_t*) aPacket == 0x00000100)) {
+					//PMT mega bundle
+					//ORSafeCircBuffer
+				}
+				else {	//cmd response
+					if (needToSwap) {
+						((XL3_Packet*) aPacket)->cmdHeader.cmdID = swapLong(((XL3_Packet*) aPacket)->cmdHeader.cmdID);
+					}
+					
+					NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+									[NSNumber numberWithLong:((XL3_Packet*) aPacket)->cmdHeader.cmdID],	@"cmdID",
+									[NSDate dateWithTimeIntervalSinceNow:0],				@"date",
+									[NSData dataWithBytes:aPacket length:XL3_PACKET_SIZE],			@"xl3Packet",
+									nil];
+					[cmdArrayLock lock];
+					[cmdArray addObject:aDictionary];
+					[cmdArrayLock unlock];
+					if ([cmdArray count] > kCmdArrayHighWater) {
+						//todo: post alarm
+						NSLog(@"Xl3 Command Array close to full for Xl3 crate %@\n", [self crateName]);
+					}
+				}
+								
+				aPacket[5] = '\0';
+				NSLog(@"XL3 packet: %s, in dictionary of: %d\n", aPacket, sizeof(NSDictionary));
+			}
+			@catch (NSException* localException) {
+				if (serverSocket || workingSocket) {
+					NSLog(@"Couldn't read from XL3 <%@> port:%d\n", IPNumber, portNumber);
+				}
+				[coreSocketLock unlock];
+				break;
+			}
+		}
+        }
 
+	if (serverSocket || workingSocket) {
+		if (serverSocket) {
+			close(serverSocket);
+			serverSocket = 0;
+		}
+		if (workingSocket) {
+			close(workingSocket);
+			workingSocket = 0;
+		}
+	
+		NSLog(@"XL3 disconnected from local port %d\n", [self portNumber]);
+		connectState = kDisconnected;
+		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
+		[self setIsConnected:NO];
+	}
+	
 	[pool release];
 }
 
 
-- (void) send:(XL3_Packet*)aSendPacket receive:(XL3_Packet*)aReceivePacket
+- (void) writePacket:(char*)aPacket
 {
-	@try {
-		[socketLock lock]; //begin critial section
-		[self write:workingSocket buffer:aSendPacket];
-		[self read:workingSocket buffer:aReceivePacket];
-		[socketLock unlock]; //end critial section
-	}
-	@catch (NSException* localException) {
-		[socketLock unlock]; //end critial section
-		[localException raise];
-	}
-}
+	//this is private method called from this object only, we lock the socket, and expect that thread lock is provided at a higher level
 
-- (void) write:(int)aSocket buffer:(XL3_Packet*)aPacket
-{
-	/*
-	//Note there are NO locks on this method, but it is private and can only be called from this object. Care must
-	//be taken that thread locks are provided at a higher level.
-	aPacket->message[0] = '\0';
-	if(!aSocket)	[NSException raise:@"Write Error" format:@"SBC Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
-	
-	
-	// wait until timeout or data received
+	if (!workingSocket) {
+		[NSException raise:@"Write Error" format:@"XL3 Not Connected %@ <%@> port: %d",[self crateName], IPNumber, portNumber];
+	}
+
+	int bytesWritten;
 	int selectionResult = 0;
-	int bytesWritten = 0;
-	int numBytesToSend = sizeof(long) +
-	sizeof(SBC_CommandHeader) + 
-	kSBC_MaxMessageSizeBytes + 
-	aPacket->cmdHeader.numberBytesinPayload;
-	aPacket->numBytes = numBytesToSend;
-	char* packetPtr = (char*)aPacket;		//recast the first 'real' word in the packet
-	while (numBytesToSend) {
-		// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
-		do {
-			// set up the file descriptor set
-			fd_set write_fds;
-			FD_ZERO(&write_fds);
-			FD_SET(aSocket, &write_fds);
-			
-			struct timeval tv;
-			tv.tv_sec  = 2;
-			tv.tv_usec = 0;
-			selectionResult = select(aSocket+1, NULL, &write_fds, NULL, &tv);
-		} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
-		
-		if (selectionResult == kSelectionError){
-			[NSException raise:@"Write Error" format:@"Write Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
-		}
-		else if (selectionResult == kSelectionTimeout) {
-			[NSException raise:@"ConnectionTimeOut" format:@"Write from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
-		}   
-		do {
-			bytesWritten = write(aSocket,packetPtr,numBytesToSend);
-		} while (bytesWritten < 0 && (errno == EAGAIN || errno == EINTR));
-		if (bytesWritten > 0) {
-			packetPtr += bytesWritten;
-			numBytesToSend -= bytesWritten;
-			bytesSent += bytesWritten;
-		} 
-		else if (bytesWritten < 0) {
-			if (errno == EPIPE) {
-				[self disconnect];
-			}
-			[NSException raise:@"Write Error" format:@"Write Error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
-		}
-	}
-	*/
-}
+	int numBytesToSend = XL3_PACKET_SIZE;
+	fd_set write_fds;
 
-- (void) read:(int)aSocket buffer:(XL3_Packet*)aPacket
-{
-	/*	
-	//Note that there are NO locks on this method, but it is private and can only be called from this object. 
-	//Care must be taken that thread locks are provided at a higher level in this object
-	if(!aSocket)	[NSException raise:@"Read Error" format:@"SBC Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
+	struct timeval tv;
+	tv.tv_sec  = [self errorTimeOutSeconds];
+	tv.tv_usec = 10000;
 	
-	// wait until timeout or data received
-	int  selectionResult;
-	
-	// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
-	do {
-		// set up the file descriptor set
-		fd_set read_fds;
-		FD_ZERO(&read_fds);
-		FD_SET(aSocket, &read_fds);
-		
-		struct timeval tv;
-		tv.tv_sec  = 2;
-		tv.tv_usec = 0;
-		selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
-	} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
-	
-	if(selectionResult > 0){
-		[self readSocket:aSocket buffer:aPacket];
-	}
-	else if (selectionResult == kSelectionError){
-		[NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName], IPNumber,strerror(errno)];
-	}
-	else if (selectionResult == kSelectionTimeout) {
-		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
-	}
-	if(aPacket->message[0])NSLog(@"%s\n",aPacket->message);
-	*/
-} 
-
-- (void) readSocket:(int)aSocket buffer:(XL3_Packet*)aPacket
-{
-	/*
-	int n;			
-	int  selectionResult = 0;
-	long numBytesToGet = 0;
 	time_t t1 = time(0);
-	do {
-		n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);
-		if(n<0 && (errno == EAGAIN || errno == EINTR)){
-			int timeout = [self errorTimeOutSeconds];
-			if(timeout>0){
-				if((time(0)-t1)>timeout) {
-					[self disconnect];
-					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-				}
-			}
-		}
-		else break;
-		
-	} while (1);
-	
-	if(n==0){
-		[self disconnect];
-		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-	} 
-	else if (n<0) {
-		[NSException raise:@"Socket Error" format:@"Error: %s",strerror(errno)];
-	} 
-	else if (n < sizeof(long)) {
-		// We didn't get the whole word.  This probably will never happen.
-		int numToGet = sizeof(numBytesToGet) - n;
-		char* ptrToNumBytesToGet = ((char*)&numBytesToGet) + n;
-		while (numToGet) {
+
+	[coreSocketLock lock];
+	@try {
+		while (numBytesToSend) {
 			// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
 			do {
-				// set up the file descriptor set
-				fd_set read_fds;
-				FD_ZERO(&read_fds);
-				FD_SET(aSocket, &read_fds);
+				FD_ZERO(&write_fds);
+				FD_SET(workingSocket, &write_fds);
 				
-				struct timeval tv;
-				tv.tv_sec  = 2;
-				tv.tv_usec = 0;
-				selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
-			} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
+				selectionResult = select(workingSocket+1, NULL, &write_fds, NULL, &tv);
+			} while (selectionResult == -1 && (errno == EAGAIN || errno == EINTR));
 			
-			if(selectionResult > 0){
-				time_t t1 = time(0);
-				do {
-					n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
-					if(n<0 && (errno == EAGAIN || errno == EINTR)){
-						int timeout = [self errorTimeOutSeconds];
-						if(timeout>0){
-							if((time(0)-t1)>timeout) {
-								[self disconnect];
-								[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-							}
-						}
-					}
-					else break;
-				} while (1);
-				if(n==0){
-					[self disconnect];
-					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-				} 
-				else if (n<0) {
-					[NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
-				} else {
-					numToGet -= n;
-					ptrToNumBytesToGet += n;    
+			if (selectionResult == -1){
+				[NSException raise:@"Write Error" format:@"Write Error %@ <%@>: %s",[self crateName], IPNumber, strerror(errno)];
+			}
+			else if (selectionResult == 0 || ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds])) {
+				[NSException raise:@"ConnectionTimeOut" format:@"Write to %@ <%@> port: %d timed out",[self crateName], IPNumber, portNumber];
+			}   
+
+			do {
+				bytesWritten = write(workingSocket, aPacket, numBytesToSend);
+			} while (bytesWritten < 0 && (errno == EAGAIN || errno == EINTR));
+
+			if (bytesWritten > 0) {
+				aPacket += bytesWritten;
+				numBytesToSend -= bytesWritten;
+			} 
+			else if (bytesWritten < 0) {
+				if (errno == EPIPE) {
+					//[self disconnect];
+					//what do we want to do?
 				}
+				[NSException raise:@"Write Error" format:@"Write Error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 			}
-			else if (selectionResult == kSelectionError){
-				[NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
-			}
-			else if (selectionResult == kSelectionTimeout) {
-				[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
-			}
-			
 		}
 	}
-	bytesReceived += sizeof(numBytesToGet);
-	numBytesToGet -= sizeof(numBytesToGet);
+	@catch (NSException* localException) {
+		if (serverSocket || workingSocket) {
+			NSLog(@"Couldn't write to XL3 <%@> port:%d\n", IPNumber, portNumber);
+		}
+		[coreSocketLock unlock];
+		@throw localException;
+	}
 	
-	char* packetPtr = (char*)&aPacket->cmdHeader;
+	[coreSocketLock unlock];
+}
+
+
+- (void) readPacket:(char*)aPacket
+{
+	//this is private method called from this object only, we lock the socket, and expect that xl3 thread is the only accessor
+
+	int n;			
+	int selectionResult = 0;
+	int numBytesToGet = XL3_PACKET_SIZE;
+	time_t t1 = time(0);
+	fd_set fds;
+	
+	struct timeval tv;
+	tv.tv_sec  = 0;
+	tv.tv_usec = 10000;
+	
 	while(numBytesToGet){
-		// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
 		do {
-			// set up the file descriptor set
-			fd_set read_fds;
-			FD_ZERO(&read_fds);
-			FD_SET(aSocket, &read_fds);
-			
-			struct timeval tv;
-			tv.tv_sec  = 2;
-			tv.tv_usec = 0;
-			selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
-		} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
-		
-		if (selectionResult == kSelectionError){
-			[NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
-		}
-		else if (selectionResult == kSelectionTimeout) {
-			[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
-		}
-		time_t t1 = time(0);
-		do {
-			n = recv(aSocket, packetPtr, numBytesToGet, 0);
-			if(n<0 && (errno == EAGAIN || errno == EINTR)){
-				int timeout = [self errorTimeOutSeconds];
-				if(timeout>0){
-					if((time(0)-t1)>timeout) {
-						[self disconnect];
-						[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-					}
+			n = recv(workingSocket, aPacket, numBytesToGet, MSG_DONTWAIT);
+			if(n < 0 && (errno == EAGAIN || errno == EINTR)){
+				if ([self errorTimeOutSeconds] && (time(0) - t1) > [self errorTimeOutSeconds]) {
+					//[self disconnect];
+					[NSException raise:@"Socket time out" format:@"%@ Disconnected", IPNumber];
 				}
 			}
 			else break;
-			
 		} while (1);
-		
-		if(n==0){
-			[self disconnect];
-			[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-		} 
-		else if (n<0) {
-			[NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
+
+		if (n > 0) {
+			numBytesToGet -= n;
+			if (numBytesToGet == 0) break;
+		}
+		else if(n==0){
+			//[self disconnect];
+			[NSException raise:@"Socket time out" format:@"%@ Disconnected", IPNumber];
 		} 
 		else {
-			packetPtr += n;
-			numBytesToGet -= n;
-			bytesReceived += n;
-			missedHeartBeat = 0;
-		}
+			[NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
+		} 
+		
+		while(1) {
+			FD_ZERO(&fds);
+			FD_SET(workingSocket, &fds);
+			selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
+			if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
+				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
+				[NSException raise:@"Socket Error" format:@"Error <%@>: %s", IPNumber, strerror(errno)];
+			}
+			if ([self errorTimeOutSeconds] && (time(0) - t1) > [self errorTimeOutSeconds]) {
+				//[self disconnect];
+				[NSException raise:@"Socket time out" format:@"%@ Disconnected",IPNumber];
+			}
+			
+			if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) break;
+		}			
  	}
-	*/
 }
 
-- (BOOL) canWriteTo:(int) sck
+- (BOOL) canWriteTo:(int)aSocket
 {
 	fd_set wfds;
 	struct timeval tv;
 	
 	FD_ZERO(&wfds);
-	FD_SET(sck, &wfds);
+	FD_SET(aSocket, &wfds);
 	
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
 	
-	int retval = select(sck + 1, NULL, &wfds, NULL, &tv);
-	return (retval > 0) && FD_ISSET(sck, &wfds);
+	int retval = select(aSocket + 1, NULL, &wfds, NULL, &tv);
+	return (retval > 0) && FD_ISSET(aSocket, &wfds);
 }
-
-- (BOOL) dataAvailable:(int) aSocket
-{
-	if(!aSocket)return NO;
-	
-	// set up the file descriptor set
-	fd_set fds;
-	FD_ZERO(&fds);
-	FD_SET(aSocket, &fds);
-	
-	struct timeval tv;
-	tv.tv_sec  = 0;
-	tv.tv_usec = 1000;
-	
-	// wait until timeout or data received
-	int  selectionResult = select(aSocket+1, &fds, NULL, NULL, &tv);
-	return (selectionResult > 0) && FD_ISSET(aSocket, &fds);
-}
-
 
 @end
