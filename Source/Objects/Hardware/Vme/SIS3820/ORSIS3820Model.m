@@ -125,6 +125,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
     [[self undoManager] disableUndoRegistration];
     [self setAddressModifier:0x09];
     [self setBaseAddress:0x38000000];
+	[self setPollTime:0];
 	[self setDefaults];
     [[self undoManager] enableUndoRegistration];
     return self;
