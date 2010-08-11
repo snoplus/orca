@@ -137,6 +137,12 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 	[super dealloc];
 }
 
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super sleep];
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"SIS3820Card"]];	
