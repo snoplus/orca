@@ -150,6 +150,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
 								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
 								(eventFIFOStatus->emptyFlag->getCache());
+								
                     //depending on 'diff' the loop should start here -tb-
                     
                     if(diff>0){
@@ -180,7 +181,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = evsec;        //sec
                                 data[dataIndex++] = evsubsec;     //subsec
                                 data[dataIndex++] = chmap;
-                                data[dataIndex++] = readptr | (pagenr<<10) | (precision<<16)  | (fifoFlags <<20);  //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit)
+                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit);flt mode (4 bit)
                                 data[dataIndex++] = energy;
                             }
                         }
@@ -193,6 +194,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         else if((daqRunMode == kIpeFltV4_EnergyTraceDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
             //uint32_t status         = srack->theFlt[col]->status->read();
             uint32_t fifoStatus;// = (status >> 24) & 0xf;
+            uint32_t fifoFlags;// =   FF, AF, AE, EF
             
             //TO DO... the number of events to read could (should) be made variable <-- depending on the readptr/witeptr -tb-
             uint32_t eventN;
@@ -211,6 +213,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     uint32_t writeptr = eventFIFOStatus->writePointer->getCache();
                     uint32_t readptr  = eventFIFOStatus->readPointer->getCache();
                     uint32_t diff = (writeptr-readptr+1024) % 512;
+					fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
+								(eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
+								(eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
+								(eventFIFOStatus->emptyFlag->getCache());
                     
                     //depending on 'diff' the loop should start here -tb-
                     
@@ -242,8 +248,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
                                 uint32_t traceStart16;//start of trace in short array
                                 
-                                wfRecordVersion = 0x1 ;//0x1=raw trace, full length, no additional analysis (use if fifo is almost full)
-                                
+                                //wfRecordVersion = 0x1 ;//0x1=raw trace, full length, search within 4 time slots for trigger
+                                wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
+                                //else: full trigger search (not recommended)
+								
                                 #if 0
                                 //check timing
                                 readSltSecSubsec(sltsec,sltsubsec);
@@ -267,7 +275,10 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 								for(adccount=0; adccount<1024;adccount++){
 									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
 								}
-                                if(wfRecordVersion == 0x1){
+                                if(wfRecordVersion == 0x2){
+                                    traceStart16 = (adcoffset + postTriggerTime + 1) % 2048;
+								}
+                                else if(wfRecordVersion == 0x1){
                                      //search trigger flag (usually in the same or adcoffset+2 bin 2009-12-15)
                                     searchTrig=adcoffset; //+2;
                                     searchTrig = searchTrig & 0x7ff;
@@ -316,7 +327,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                     //uint32_t copyindex = (triggerPos + 1024) % 2048; //<- this aligns the trigger in the middle (from Mark)
                                     //uint32_t copyindex = (triggerPos + postTriggerTime) % 2048 ;// this was the workaround without time info -tb-
                                     traceStart16 = (adcoffset + postTriggerTime) % 2048 ;
-                                 }
+								}
                                 
                                 //ship data record
                                 ensureDataCanHold(9 + waveformLength/2); 
@@ -326,7 +337,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = evsec;        //sec
                                 data[dataIndex++] = evsubsec;     //subsec
                                 data[dataIndex++] = chmap;
-                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16);        //event ID:read ptr (10 bit); pagenr (6 bit)
+                                data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
                                 data[dataIndex++] = energy;
                                 data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record

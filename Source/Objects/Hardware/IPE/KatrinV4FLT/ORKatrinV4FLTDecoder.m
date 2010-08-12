@@ -45,11 +45,12 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
            ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx event flags/infos
-           ^^^^------------------------- FIFO Flags: FF, AF, AE, EF
-                  ^^-------------------- time precision(2 bit)
-                     ^^^^ ^^------------ number of page in hardware buffer (0..63, 6 bit)
-                            ^^ ^^^^ ^^^^ eventID (0..511, 10 bit!)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+infos:
+ -----^^^^-------------------------------flt run mode
+ ----------^^^^--------------------------FIFO Flags: FF, AF, AE, EF
+ -----------------^^---------------------time precision(2 bit)
+ --------------------^^^^ ^^-------------number of page in hardware buffer (0..63, 6 bit)
+ ---------------------------^^ ^^^^ ^^^^-readPtr/eventID (0..511, 10 bit!)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  </pre>
  *
@@ -176,10 +177,12 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ----------^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID:
- -----------------^^---------------------precision
- --------------------^^^^ ^^-------------number of page in hardware buffer
- ---------------------------^^ ^^^^ ^^^^-readPtr (0..1024)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+infos:
+ -----^^^^-------------------------------flt run mode
+ ----------^^^^--------------------------FIFO Flags: FF, AF, AE, EF
+ -----------------^^---------------------time precision(2 bit)
+ --------------------^^^^ ^^-------------number of page in hardware buffer (0..63, 6 bit)
+ ---------------------------^^ ^^^^ ^^^^-readPtr/eventID (0..511, 10 bit!)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
                  ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
@@ -233,10 +236,15 @@
 
 	//channel by channel histograms
 	unsigned long energy = ptr[6]/filterDiv;
+
+uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);//TODO: DEBUG -tb-
+uint32_t eventID        = ptr[5];
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
 	
-	//channel by channel histograms
+//TODO: DEBUG -tb- NSLog(@"energy on chan %i is %i (%i), subsec %i , page# %i, traceStart16 %i\n", chan, ptr[6] ,energy, subsec, ShiftAndExtract(eventID,10,0x3f),traceStart16);//TODO: DEBUG -tb-
+	
+	//channel by channel histograms  NSScanner
 	[aDataSet histogram:energy 
 				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Energy", crateKey,stationKey,channelKey,nil];
