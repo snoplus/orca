@@ -143,6 +143,14 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 	[super sleep];
 }
 
+- (void) wakeUp
+{
+	[super wakeUp];
+	if(pollTime){
+		[self timeToPoll];
+	}
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"SIS3820Card"]];	
