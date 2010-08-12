@@ -72,6 +72,11 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 					switch (dataType) {
 						case 2: 
 							//header
+							if (doingEvent){
+								//something pathelogical happend. We were in an event and then
+								//got another header. dump the record in progress and start over.
+								dataIndex = savedDataIndex;
+							}
 							savedDataIndex = dataIndex; 
 							numMemorizedChannels = ShiftAndExtract(dataWord,8,0x3f);
 							numDecoded = 0;
@@ -90,6 +95,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 								if(numDecoded > numMemorizedChannels){
 									//something is wrong, dump the event
 									dataIndex = savedDataIndex;
+									doingEvent = 0;
 								}
 							}
 						break;
@@ -110,6 +116,10 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 							}
 						break;
 					}
+				}
+				if(doingEvent){
+					//appearently the last event was not complete. Dump it.
+					dataIndex = savedDataIndex;
 				}
 			}
 			else {
