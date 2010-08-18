@@ -48,6 +48,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 
 	
 	if (dataIsReady) {
+		/* temp comment out the dma stuff
 		if(bufferIsFull){
 			//wow, the buffer is full. We will use dma to read out the whole buffer and decoder it locally into events
 			uint32_t buffer[v785BufferSizeInLongs];
@@ -129,6 +130,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 		}
 		
 		else {
+			*/
 			//OK, at least one data value is ready, first value read should be a header
 			uint32_t dataValue;
 			result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
@@ -167,7 +169,7 @@ bool ORCaen785Readout::Readout(SBC_LAM_Data* lamData)
 					}
 				}
 			}
-		}
+		//}
 	}
 	
     return true; 
