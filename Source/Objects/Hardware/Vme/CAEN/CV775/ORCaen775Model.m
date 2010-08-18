@@ -262,6 +262,22 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	return [super threshold:aChnl] & 0xFF;
 }
 
+- (void) readThreshold:(unsigned short) pChan
+{
+    
+    unsigned short		value;
+    
+    // Read the threshold
+    [[self adapter] readWordBlock:&value
+                        atAddress:[self baseAddress] + [self getThresholdOffset:pChan]
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    // Store new value
+	// [self setThreshold:pChan threshold:value];
+    
+}
 - (void) writeThresholds
 {
 	int i;
