@@ -60,6 +60,7 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 - (NSTimeInterval) timeFromADEIDate:(NSString*)aDate;
 - (void) addItemKeyToPollingLookup:(NSString*) anItemKey;
 - (void) removeItemKeyFromPollingLookup:(NSString*) anItemKey;
+- (void) sortPollingItems;
 @end
 
 @implementation ORIpeSlowControlModel
@@ -443,6 +444,7 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 		}
 	}
 }
+
 
 - (BOOL) channelExists:(int)aChan
 {
@@ -1343,26 +1345,12 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 - (void) addItemKeyToPollingLookup:(NSString *)anItemKey
 {
     [[[self undoManager] prepareWithInvocationTarget:self] removeItemKeyFromPollingLookup:anItemKey];
-	NSDictionary* topLevelDictionary = [requestCache objectForKey:anItemKey];
-	int newItemChannelNumber		 = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
 
-	if([pollingLookUp count] == 0){
-		[pollingLookUp addObject:anItemKey];
-	}
-	else {
-		NSUInteger index = 0;
-		for(id itemKey in pollingLookUp){ //TODO: we need to see the channels used by scripts ... -tb-
-			NSDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
-			int anItemChannel = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
-			if(newItemChannelNumber > anItemChannel){
-				[pollingLookUp insertObject:anItemKey atIndex:index];
-				break;
-			}
-			index++;
-		}		
-	}
+	[pollingLookUp addObject:anItemKey];
+
     //TODO: restore the old channel ...
 	[self makeChannelLookup];
+	[self sortPollingItems];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
 }
 
@@ -1378,8 +1366,27 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 //TODO: [self setChannelNumber:-1 forItemKey:  anItemKey];     
 	[pollingLookUp removeObject:anItemKey];
 	[self makeChannelLookup];
+	[self sortPollingItems];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
 }
 
+- (void) sortPollingItems
+{
+	BOOL swapped;
+	do {
+		swapped = NO;
+		int i;
+		for(i=0;i<=[pollingLookUp count] - 2; i++){
+			NSDictionary* topLevelDictionary = [requestCache objectForKey:[pollingLookUp objectAtIndex:i]];
+			int thisOne = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+			topLevelDictionary = [requestCache objectForKey:[pollingLookUp objectAtIndex:i+1]];
+			int thatOne = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+			if (thisOne > thatOne) {
+				[pollingLookUp exchangeObjectAtIndex:i withObjectAtIndex:i+1];
+				swapped = YES;
+			}
+		}
+	} while (swapped);
+}
 
 @end
