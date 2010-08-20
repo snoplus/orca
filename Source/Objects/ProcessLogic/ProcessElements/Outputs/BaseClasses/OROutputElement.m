@@ -57,6 +57,12 @@ NSString* OROutputElementOutConnection  = @"OROutputElementOutConnection";
     return [NSString stringWithFormat:@"%@\n%@%@",s,prefix,obj?[obj description:nextPrefix]:noConnectionString];
 }
 
+- (id) description
+{
+	NSString* s =  [super description];
+	s =  [s stringByAppendingFormat:@"[State: %d]",[self evaluatedState]];
+	return s;
+}
 
 - (BOOL) isTrueEndNode
 {

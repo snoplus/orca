@@ -34,6 +34,7 @@
     IBOutlet NSTextView* detailsTextView;
     IBOutlet NSTextField* shortNameField;
     IBOutlet NSButton* altViewButton;
+    IBOutlet NSImageView* heartbeatImage;
 
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
@@ -57,6 +58,7 @@
 - (void) detailsChanged:(NSNotification*)aNote;
 - (void) useAltViewChanged:(NSNotification*)aNote;
 - (void) objectsChanged:(NSNotification*)aNote;
+- (void) eMailOptionsChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) useAltViewAction:(id)sender;
@@ -65,6 +67,7 @@
 - (IBAction) testModeAction:(id)sender;
 - (IBAction) shortNameAction:(id)sender;
 - (IBAction) doubleClick:(id)sender;
+- (IBAction) viewProcessCenter:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;

@@ -37,6 +37,8 @@
 	BOOL		useAltView;
 }
 
+- (void) registerNotificationObservers;
+
 #pragma mark ***Accessors
 - (void) setProcessIDs;
 - (BOOL) useAltView;

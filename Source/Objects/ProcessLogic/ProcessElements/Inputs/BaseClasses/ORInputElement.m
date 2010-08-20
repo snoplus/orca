@@ -45,6 +45,13 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
     return [NSString stringWithFormat:@"%@\n%@%@",s,prefix,obj?[obj description:nextPrefix]:noConnectionString];
 }
 
+- (id) description
+{
+	NSString* s =  [super description];
+	s =  [s stringByAppendingFormat:@"[State: %d]",[self evaluatedState]];
+	return s;
+}
+
 - (void) doCmdClick:(id)sender
 {
     if([guardian inTestMode]){

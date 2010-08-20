@@ -231,6 +231,15 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	else return @"";
 }
 
+- (id) description
+{
+	NSString* s = [super description];
+	s =  [s stringByAppendingFormat:@"Value: %@ ",[self iconValue]];
+	if(valueTooLow)		  s =  [s stringByAppendingString:@"[Low] "];
+	else if(valueTooHigh) s =  [s stringByAppendingString:@"[High] "];
+	else				  s =  [s stringByAppendingString:@"[In Range] "];
+	return s;
+}
 
 
 #pragma mark ***Archival

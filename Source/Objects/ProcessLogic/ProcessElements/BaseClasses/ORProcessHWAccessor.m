@@ -167,6 +167,11 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     return s;
 }
 
+- (id) description
+{
+	NSString* s =  [NSString stringWithFormat:@"%@   %@ ",[self className],[self fullHwName]];
+	return s;
+}
 
 - (int) viewIconType
 {

@@ -23,7 +23,7 @@
 #import "ORProcessElementModel.h"
 #import "ORProcessModel.h"
 #import "ORProcessThread.h"
-
+#import "ORProcessCenter.h"
 
 NSString* ORProcessModelSampleRateChanged			= @"ORProcessModelSampleRateChanged";
 NSString* ORProcessTestModeChangedNotification      = @"ORProcessTestModeChangedNotification";
@@ -39,11 +39,13 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 {
 	self = [super init];
 	sampleRate = 10;
+	[self registerNotificationObservers];
 	return self;
 }
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[comment release];
 	[shortName release];
 	[testModeAlarm clearAlarm];
@@ -56,6 +58,16 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	return @"Process_Control/Process_Container.html";
 }
 
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter addObserver : self
+                     selector : @selector(setUpImage)
+                         name : ORProcessEmailOptionsChangedNotification
+                       object : nil];
+    
+}
 
 #pragma mark ***Accessors
 - (void) setProcessIDs
@@ -274,6 +286,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
             if(inTestMode)stateString = @"Testing";
             else stateString = @"Running";
         }
+				
         NSAttributedString* n = [[NSAttributedString alloc] 
                                 initWithString:[NSString stringWithFormat:@"%d %@",[self uniqueIdNumber],stateString] 
                                     attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
@@ -305,7 +318,12 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
         NSImage* aLockedImage = [NSImage imageNamed:@"smallLock"];
         [aLockedImage compositeToPoint:NSMakePoint([self frame].size.width - [aLockedImage size].width,0)operation:NSCompositeSourceOver];
     }
-
+	
+	if([[ORProcessCenter sharedProcessCenter] heartbeatTimeIndex] == 0){
+        NSImage* noHeartbeatImage = [NSImage imageNamed:@"noHeartbeat"];
+        [noHeartbeatImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+	}
+	
 
     [i unlockFocus];
     [self setImage:i];
@@ -339,18 +357,21 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	if([outputNodes count] == 0){
 		NSLog(@"%@ has no output nodes. Process NOT started... nothing to do!\n",shortName);
 		return;
-		
 	}
 	
     if(![[ORProcessThread  sharedProcessThread] nodesRunning:outputNodes]){
-		if(inTestMode){
-			[self postTestAlarm];
-		}
 		[[ORProcessThread  sharedProcessThread] startNodes:outputNodes];
 		[self setProcessRunning:YES];
 		NSString* t = inTestMode?@"(Test Mode)":@"";
 		if([shortName length])NSLog(@"%@ Started %@\n",shortName,t);
 		else NSLog(@"Process %d Started %@\n",[self uniqueIdNumber],t);
+
+		if(inTestMode){
+			[self postTestAlarm];
+		}
+		else {
+			[[ORProcessCenter sharedProcessCenter] performSelector:@selector(sendStartNotice:) withObject:self afterDelay:1];
+		}
 	}
 }
 
@@ -365,6 +386,10 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 		NSString* t = inTestMode?@"(Test Mode)":@"";
 		if([shortName length])NSLog(@"%@ Stopped %@\n",shortName,t);
 		else NSLog(@"Process %d Stopped %@\n",[self uniqueIdNumber],t);
+		
+		if(!inTestMode){
+			[[ORProcessCenter sharedProcessCenter] sendStopNotice:self];
+		}
 	}
 }
 
@@ -447,6 +472,25 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	sampleGateOpen = NO;
 }
 
+- (id) description
+{
+	NSString* s =  [NSString stringWithFormat:@"\nProcess %@ ",[self shortName]];
+	if(processRunning){
+		s = [s stringByAppendingString:@"[Running]\n"];
+		s = [s stringByAppendingFormat:@"Sample Rate: %.1f\n",sampleRate];
+		for(id anObj in [self orcaObjects]){
+			if([anObj isKindOfClass:NSClassFromString(@"ORProcessHWAccessor")]){
+				s = [s stringByAppendingFormat:@"%@\n",anObj];
+			}
+		}
+	}
+	else {
+		s = [s stringByAppendingString:@"[NOT RUNNING]\n"];
+	}
+	s = [s stringByAppendingString:@"\n"];
+	return s;
+}
+
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -464,6 +508,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
     [self setUseAltView:[decoder decodeBoolForKey:@"useAltView"]];
 	
     [[self undoManager] enableUndoRegistration];
+	[self registerNotificationObservers];
 	
     return self;
 }

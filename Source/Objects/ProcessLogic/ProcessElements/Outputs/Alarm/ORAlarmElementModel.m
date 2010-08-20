@@ -173,6 +173,21 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
     return [NSString stringWithFormat:@"%@\n%@",s,
                                     obj1?[obj1 description:nextPrefix]:noConnectionString];
 }
+
+- (id) description
+{
+	NSString* s =  [super description];
+	s =  [s stringByAppendingFormat:@" Name: %@",alarmName];		
+	if([alarm isPosted]){
+		s =  [s stringByAppendingFormat:@" **ALARM IN PROGRESS**\n"];		
+		s =  [s stringByAppendingFormat:@"\tPosted: %@  [type: %@]\n",[alarm timePosted],[alarm severityName]];		
+	}
+	else {
+		s =  [s stringByAppendingString:@" No Alarm"];		
+	}
+	return s;
+}
+
 - (void) processIsStopping
 {
     [super processIsStopping];

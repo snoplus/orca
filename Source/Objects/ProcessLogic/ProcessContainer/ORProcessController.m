@@ -25,6 +25,7 @@
 #import "ORProcessModel.h"
 #import "ORProcessOutConnector.h"
 #import "ORProcessElementModel.h"
+#import "ORProcessCenter.h"
 
 int sortUpFunction(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
 int sortDnFunction(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
@@ -122,6 +123,11 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                      selector : @selector(objectsChanged:)
                          name : ORGroupObjectsAdded
 						object: nil];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(eMailOptionsChanged:)
+                         name : ORProcessEmailOptionsChangedNotification
+						object: nil];	
 }
 
 - (void) updateWindow
@@ -133,6 +139,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [self processRunningChanged:nil];
 	[self sampleRateChanged:nil];
 	[self useAltViewChanged:nil];
+	[self eMailOptionsChanged:nil];
 }
 
 - (void) useAltViewChanged:(NSNotification*)aNote
@@ -209,7 +216,23 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [tableView reloadData];
 }
 
+- (void) eMailOptionsChanged:(NSNotification*)aNote
+{
+	if([[ORProcessCenter sharedProcessCenter] heartbeatTimeIndex] == 0){
+		NSImage* noHeartbeatImage = [NSImage imageNamed:@"noHeartbeat"];
+		[heartbeatImage setImage:noHeartbeatImage];
+	}
+	else [heartbeatImage setImage:nil];
+
+}
+
 #pragma mark ¥¥¥Actions
+
+- (IBAction) viewProcessCenter:(id)sender
+{
+    [[[ORProcessCenter sharedProcessCenter] window] orderFront:nil];
+}
+
 - (IBAction) useAltViewAction:(id)sender
 {
 	[model setUseAltView:![model useAltView]];
