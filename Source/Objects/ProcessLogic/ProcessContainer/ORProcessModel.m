@@ -60,6 +60,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (void) awakeAfterDocumentLoaded
 {
+	[super awakeAfterDocumentLoaded];
 	if(wasRunning){
 		[self startRun];
 	}
