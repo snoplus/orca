@@ -58,6 +58,13 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	return @"Process_Control/Process_Container.html";
 }
 
+- (void) awakeAfterDocumentLoaded
+{
+	if(wasRunning){
+		[self startRun];
+	}
+}
+
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
@@ -498,13 +505,15 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	
     [[self undoManager] disableUndoRegistration];
 	
+	//after the document is loaded we use this flag to autostart
+	wasRunning = [decoder decodeBoolForKey:@"wasRunning"];
+	
     float aSampleRate = [decoder decodeFloatForKey:@"ORProcessModelSampleRate"];\
 	if(aSampleRate == 0)aSampleRate = 10;
     [self setSampleRate:aSampleRate];
     [self setInTestMode:[decoder decodeIntForKey:@"inTestMode"]];
     [self setComment:[decoder decodeObjectForKey:@"comment"]];
     [self setShortName:[decoder decodeObjectForKey:@"shortName"]];
-    [self setProcessRunning:NO];
     [self setUseAltView:[decoder decodeBoolForKey:@"useAltView"]];
 	
     [[self undoManager] enableUndoRegistration];
@@ -521,6 +530,8 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
     [encoder encodeObject:comment forKey:@"comment"];
     [encoder encodeObject:shortName forKey:@"shortName"];
     [encoder encodeBool:useAltView forKey:@"useAltView"];
+	//store the running flag so we can auto start next time
+    [encoder encodeBool:processRunning forKey:@"wasRunning"];
 }
 
 @end

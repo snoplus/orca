@@ -384,7 +384,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	NSString* theContent = @"";
 	
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-	theContent = [theContent stringByAppendingFormat:@"Process was manually %@\n",state?@"started":@"stopped"];
+	theContent = [theContent stringByAppendingFormat:@"Process was %@\n",state?@"started":@"stopped"];
 	if(state){
 		theContent = [theContent stringByAppendingString:@"Some Values may not have had time to be updated\n"];	
 	}

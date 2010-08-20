@@ -35,6 +35,7 @@
 	NSDate*		lastSampleTime;
 	BOOL		sampleGateOpen;
 	BOOL		useAltView;
+	BOOL		wasRunning;
 }
 
 - (void) registerNotificationObservers;
