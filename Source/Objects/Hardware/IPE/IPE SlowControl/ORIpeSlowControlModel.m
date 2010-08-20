@@ -1343,7 +1343,24 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 - (void) addItemKeyToPollingLookup:(NSString *)anItemKey
 {
     [[[self undoManager] prepareWithInvocationTarget:self] removeItemKeyFromPollingLookup:anItemKey];
-	[pollingLookUp addObject:anItemKey];
+	NSDictionary* topLevelDictionary = [requestCache objectForKey:anItemKey];
+	int newItemChannelNumber		 = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+
+	if([pollingLookUp count] == 0){
+		[pollingLookUp addObject:anItemKey];
+	}
+	else {
+		NSUInteger index = 0;
+		for(id itemKey in pollingLookUp){ //TODO: we need to see the channels used by scripts ... -tb-
+			NSDictionary* topLevelDictionary = [requestCache objectForKey:itemKey];
+			int anItemChannel = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
+			if(newItemChannelNumber > anItemChannel){
+				[pollingLookUp insertObject:anItemKey atIndex:index];
+				break;
+			}
+			index++;
+		}		
+	}
     //TODO: restore the old channel ...
 	[self makeChannelLookup];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
