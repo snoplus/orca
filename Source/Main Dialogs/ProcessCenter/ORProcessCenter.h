@@ -59,6 +59,7 @@
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window;
 - (void) updateButtons;
 - (void) setHeartbeatImage;
+- (int) numberRunningProcesses;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

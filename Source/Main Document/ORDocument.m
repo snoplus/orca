@@ -699,7 +699,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     }
 }
 
-- (BOOL)shouldCloseWindowController:(NSWindowController *)windowController 
+- (BOOL) shouldCloseWindowController:(NSWindowController *)windowController 
 {
 	if (![windowController isKindOfClass:NSClassFromString(@"ORDocumentController")]){
 		return YES;
@@ -712,8 +712,19 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         NSRunAlertPanel(@"Document Unsaved", @"Experiment can NOT be closed.", nil, nil,nil);
         return NO;
     }
-    else {
-        int choice = NSRunAlertPanel(@"Closing main window will close this experiment!",@"Is this really what you want?",@"Cancel",@"Close Experiment",nil);
+	else {
+		NSString* s;
+		NSString* buttonString;
+		int runningProcessCount = [[ORProcessCenter sharedProcessCenter] numberRunningProcesses];
+		if(runningProcessCount>0){
+			s = [NSString stringWithFormat:@"Closing main window will close this experiment and %d Running Process%@!",runningProcessCount,runningProcessCount>1?@"es":@""];
+			buttonString = @"Stop Processes and Close Experiment";
+		}
+		else {
+			s = @"Closing main window will close this experiment!";
+			buttonString = @"Close Experiment";
+		}
+        int choice = NSRunAlertPanel(s,@"Is this really what you want?",@"Cancel",buttonString,nil);
         if(choice == NSAlertAlternateReturn){
             //[[self undoManager] removeAllActions];
             [[NSNotificationCenter defaultCenter]

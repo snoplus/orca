@@ -283,14 +283,26 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
 - (IBAction) terminate:(id)sender
 {
-	[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
-	[[ORProcessCenter sharedProcessCenter] stopAll:nil];
-	[ORTimer delay:1];
-	
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];    
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    [NSApp terminate:sender];
+	BOOL okToQuit = YES;
+	int runningProcessCount = [[ORProcessCenter sharedProcessCenter] numberRunningProcesses];
+	if(runningProcessCount>0){
+		NSString* s = [NSString stringWithFormat:@"Quitting will stop %d Running Process%@!",runningProcessCount,runningProcessCount>1?@"es":@""];		
+		int choice = NSRunAlertPanel(s,@"Is this really what you want?",@"Cancel",@"Stop Processes and Quit",nil);
+		if(choice == NSAlertAlternateReturn){
+			okToQuit = YES;
+		}
+		else okToQuit = NO;
+	}
+	if(okToQuit){
+		[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
+		[[ORProcessCenter sharedProcessCenter] stopAll:nil];
+		[ORTimer delay:1];
+		
+		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];    
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		
+		[NSApp terminate:sender];
+	}
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender

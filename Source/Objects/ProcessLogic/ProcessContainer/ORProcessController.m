@@ -247,6 +247,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 {
 	[[self window] endEditingFor:nil];		
     [model startStopRun];
+	[self setDocumentEdited:YES];
 	[groupView setNeedsDisplayInRect:[groupView bounds]];
 }
 
