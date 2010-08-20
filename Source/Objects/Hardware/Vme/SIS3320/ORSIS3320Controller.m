@@ -45,7 +45,7 @@
 
 - (void) awakeFromNib
 {
-	settingSize     = NSMakeSize(750,400);
+	settingSize     = NSMakeSize(750,500);
     rateSize		= NSMakeSize(480,380);
     
     blankView = [[NSView alloc] init];
@@ -61,11 +61,23 @@
 	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
+	int i;
+	for(i=0;i<8;i++){
+		[[gtMatrix cellAtRow:i column:0] setTag:i];
+		[[ltMatrix cellAtRow:i column:0] setTag:i];
+		[[thresholdMatrix cellAtRow:i column:0] setTag:i];
+		[[trigPulseLenMatrix cellAtRow:i column:0] setTag:i];
+		[[sumGMatrix cellAtRow:i column:0] setTag:i];
+		[[peakingTimeMatrix cellAtRow:i column:0] setTag:i];
+		[[dacValueMatrix cellAtRow:i column:0] setTag:i];
+		
+	}
+	
 	[super awakeFromNib];
 	
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -121,32 +133,18 @@
                      selector : @selector(integrationChanged:)
                          name : ORRateGroupIntegrationChangedNotification
                        object : nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerModeChanged:)
-                         name : ORSIS3320ModelTriggerModeChanged
-                       object : model];
-		
+			
     [notifyCenter addObserver : self
                      selector : @selector(thresholdChanged:)
                          name : ORSIS3320ModelThresholdChanged
                        object : model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(gainChanged:)
-                         name : ORSIS3320ModelGainChanged
-                       object : model];
-	
+
     [notifyCenter addObserver : self
                      selector : @selector(dacValueChanged:)
                          name : ORSIS3320ModelDacValueChanged
                        object : model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(thresholdOffChanged:)
-                         name : ORSIS3320ModelThresholdOffChanged
-                       object : model];
-	
+		
     [self registerRates];
 	
 	
@@ -155,19 +153,10 @@
                          name : ORSIS3320ModelIDChanged
 						object: model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(operationModeChanged:)
-                         name : ORSIS3320ModelOperationModeChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3320ModelClockSourceChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerMaskChanged:)
-                         name : ORSIS3320ModelTriggerMaskChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -176,45 +165,10 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(invertLemoChanged:)
-                         name : ORSIS3320ModelInvertLemoChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(memoryTriggerDelayChanged:)
-                         name : ORSIS3320ModelMemoryTriggerDelayChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(memoryStartModeLengthChanged:)
-                         name : ORSIS3320ModelMemoryStartModeLengthChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(freqMChanged:)
-                         name : ORSIS3320ModelFreqMChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(freqNChanged:)
-                         name : ORSIS3320ModelFreqNChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(maxNumEventsChanged:)
                          name : ORSIS3320ModelMaxNumEventsChanged
 						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(gateSyncLimitLengthChanged:)
-                         name : ORSIS3320ModelGateSyncLimitLengthChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(gateSyncExtendLengthChanged:)
-                         name : ORSIS3320ModelGateSyncExtendLengthChanged
-						object: model];
-	
     [notifyCenter addObserver : self
                      selector : @selector(trigPulseLenChanged:)
                          name : ORSIS3320ModelTrigPulseLenChanged
@@ -229,27 +183,82 @@
                      selector : @selector(peakingTimeChanged:)
                          name : ORSIS3320ModelPeakingTimeChanged
 						object: model];
+			
+    [notifyCenter addObserver : self
+                     selector : @selector(autoStartModeChanged:)
+                         name : ORSIS3320ModelAutoStartModeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(internalTriggerAsStopChanged:)
+                         name : ORSIS3320ModelInternalTriggerAsStopChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoStartStopLogicChanged:)
+                         name : ORSIS3320ModelLemoStartStopLogicChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(startDelayChanged:)
+                         name : ORSIS3320ModelStartDelayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stopDelayChanged:)
+                         name : ORSIS3320ModelStopDelayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pageWrapSizeChanged:)
+                         name : ORSIS3320ModelPageWrapSizeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(enablePageWrapChanged:)
+                         name : ORSIS3320ModelEnablePageWrapChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(enableSampleLenStopChanged:)
+                         name : ORSIS3320ModelEnableSampleLenStopChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(enableUserInDataStreamChanged:)
+                         name : ORSIS3320ModelEnableUserInDataStreamChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(enableUserInAccumGateChanged:)
+                         name : ORSIS3320ModelEnableUserInAccumGateChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sampleLengthChanged:)
+                         name : ORSIS3320ModelSampleLengthChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sampleStartAddressChanged:)
+                         name : ORSIS3320ModelSampleStartAddressChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(gtMaskChanged:)
+                         name : ORSIS3320ModelGtMaskChanged
+						object: model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(ringBufferLenChanged:)
-                         name : ORSIS3320ModelRingBufferLenChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(ringBufferPreDelayChanged:)
-                         name : ORSIS3320ModelRingBufferPreDelayChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(endAddressThresholdChanged:)
-                         name : ORSIS3320ModelEndAddressThresholdChanged
+	[notifyCenter addObserver : self
+                     selector : @selector(ltMaskChanged:)
+                         name : ORSIS3320ModelLtMaskChanged
 						object: model];
 		
-    [notifyCenter addObserver : self
-                     selector : @selector(memoryWrapLengthChanged:)
-                         name : ORSIS3320ModelMemoryWrapLengthChanged
-						object: model];
-
+	[notifyCenter addObserver : self
+                     selector : @selector(triggerModeMaskChanged:)
+                         name : ORSIS3320ModelTriggerModeMaskChanged
+						object: model];	
+	
 }
 
 - (void) registerRates
@@ -258,9 +267,8 @@
     
     [notifyCenter removeObserver:self name:ORRateChangedNotification object:nil];
     
-    NSEnumerator* e = [[[model waveFormRateGroup] rates] objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
+    NSArray* theRates = [[model waveFormRateGroup] rates];
+    for(id obj in theRates){
 		
         [notifyCenter removeObserver:self name:ORRateChangedNotification object:obj];
 		
@@ -278,113 +286,134 @@
     [self baseAddressChanged:nil];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self triggerModeChanged:nil];
-	[self gainChanged:nil];
+	[self gtMaskChanged:nil];
+	[self ltMaskChanged:nil];
+	[self triggerModeMaskChanged:nil];
+	
 	[self dacValueChanged:nil];
 	[self thresholdChanged:nil];
-	[self thresholdOffChanged:nil];
     [self rateGroupChanged:nil];
     [self integrationChanged:nil];
     [self miscAttributesChanged:nil];
     [self totalRateChanged:nil];
     [self updateTimePlot:nil];
 	[self moduleIDChanged:nil];
-	[self operationModeChanged:nil];
 	[self clockSourceChanged:nil];
-	[self triggerMaskChanged:nil];
 	[self multiEventChanged:nil];
-	[self invertLemoChanged:nil];
-	[self memoryTriggerDelayChanged:nil];
-	[self memoryStartModeLengthChanged:nil];
-	[self freqMChanged:nil];
-	[self freqNChanged:nil];
 	[self maxNumEventsChanged:nil];
-	[self gateSyncLimitLengthChanged:nil];
-	[self gateSyncExtendLengthChanged:nil];
 	[self trigPulseLenChanged:nil];
 	[self sumGChanged:nil];
 	[self peakingTimeChanged:nil];
-	[self ringBufferLenChanged:nil];
-	[self ringBufferPreDelayChanged:nil];
-	[self endAddressThresholdChanged:nil];
-	[self memoryWrapLengthChanged:nil];
+	[self autoStartModeChanged:nil];
+	[self internalTriggerAsStopChanged:nil];
+	[self lemoStartStopLogicChanged:nil];
+	[self startDelayChanged:nil];
+	[self stopDelayChanged:nil];
+	[self pageWrapSizeChanged:nil];
+	[self enablePageWrapChanged:nil];
+	[self enableSampleLenStopChanged:nil];
+	[self enableUserInDataStreamChanged:nil];
+	[self enableUserInAccumGateChanged:nil];
+	[self sampleLengthChanged:nil];
+	[self sampleStartAddressChanged:nil];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
-- (void) memoryWrapLengthChanged:(NSNotification*)aNote
+#pragma mark •••Interface Management
+
+- (void) sampleStartAddressChanged:(NSNotification*)aNote
 {
-	[memoryWrapLengthField setIntValue: [model memoryWrapLength]];
+	[sampleStartAddressField setIntValue: [model sampleStartAddress]];
 }
 
-- (void) endAddressThresholdChanged:(NSNotification*)aNote
+- (void) sampleLengthChanged:(NSNotification*)aNote
 {
-	[endAddressThresholdField setIntValue: [model endAddressThreshold]];
+	[sampleLengthField setIntValue: [model sampleLength]];
 }
 
-- (void) ringBufferPreDelayChanged:(NSNotification*)aNote
+- (void) enableUserInAccumGateChanged:(NSNotification*)aNote
 {
-	[ringBufferPreDelayField setIntValue: [model ringBufferPreDelay]];
+	[enableUserInAccumGateButton setIntValue: [model enableUserInAccumGate]];
 }
 
-- (void) ringBufferLenChanged:(NSNotification*)aNote
+- (void) enableUserInDataStreamChanged:(NSNotification*)aNote
 {
-	[ringBufferLenField setIntValue: [model ringBufferLen]];
+	[enableUserInDataStreamButton setIntValue: [model enableUserInDataStream]];
 }
 
-- (void) gateSyncExtendLengthChanged:(NSNotification*)aNote
+- (void) enableSampleLenStopChanged:(NSNotification*)aNote
 {
-	[gateSyncExtendLengthField setIntValue: [model gateSyncExtendLength]];
+	[enableSampleLenStopButton setIntValue: [model enableSampleLenStop]];
 }
 
-- (void) gateSyncLimitLengthChanged:(NSNotification*)aNote
+- (void) enablePageWrapChanged:(NSNotification*)aNote
 {
-	[gateSyncLimitLengthField setIntValue: [model gateSyncLimitLength]];
+	[enablePageWrapButton setIntValue: [model enablePageWrap]];
+}
+
+- (void) pageWrapSizeChanged:(NSNotification*)aNote
+{
+	[pageWrapSizePU selectItemAtIndex: [model pageWrapSize]];
+}
+
+- (void) stopDelayChanged:(NSNotification*)aNote
+{
+	[stopDelayField setIntValue: [model stopDelay]];
+}
+
+- (void) startDelayChanged:(NSNotification*)aNote
+{
+	[startDelayField setIntValue: [model startDelay]];
+}
+- (void) multiEventChanged:(NSNotification*)aNote
+{
+	[multiEventCB setIntValue: [model multiEvent]];
+}
+
+- (void) autoStartModeChanged:(NSNotification*)aNote
+{
+	[autoStartModeButton setIntValue: [model autoStartMode]];
+}
+
+- (void) lemoStartStopLogicChanged:(NSNotification*)aNote
+{
+	[lemoStartStopLogicButton setIntValue: [model lemoStartStopLogic]];
+}
+
+- (void) internalTriggerAsStopChanged:(NSNotification*)aNote
+{
+	[internalTriggerAsStopButton setIntValue: [model internalTriggerAsStop]];
+}
+- (void) triggerModeMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned long theMask = [model triggerModeMask];
+	for(i=0;i<8;i++){
+		[[triggerModeMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+	}
+	[self  settingsLockChanged:nil];
+}
+
+- (void) gtMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned long theMask = [model gtMask];
+	for(i=0;i<8;i++){
+		[[gtMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+	}
+}
+
+- (void) ltMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned long theMask = [model ltMask];
+	for(i=0;i<8;i++){
+		[[ltMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+	}
 }
 
 - (void) maxNumEventsChanged:(NSNotification*)aNote
 {
 	[maxNumEventsField setIntValue: [model maxNumEvents]];
-}
-
-- (void) freqNChanged:(NSNotification*)aNote
-{
-	[freqNPU selectItemAtIndex: [model freqN]];
-}
-
-- (void) freqMChanged:(NSNotification*)aNote
-{
-	[freqMField setIntValue: [model freqM]];
-}
-
-- (void) memoryStartModeLengthChanged:(NSNotification*)aNote
-{
-	[memoryStartModeLengthField setIntValue: [model memoryStartModeLength]];
-}
-
-- (void) memoryTriggerDelayChanged:(NSNotification*)aNote
-{
-	[memoryTriggerDelayField setIntValue: [model memoryTriggerDelay]];
-}
-
-- (void) invertLemoChanged:(NSNotification*)aNote
-{
-	[invertLemoCB setIntValue: [model invertLemo]];
-}
-
-- (void) multiEventChanged:(NSNotification*)aNote
-{
-	[multiEventCB setIntValue: [model multiEvent]];
-	[self settingsLockChanged:nil];
-}
-
-- (void) triggerMaskChanged:(NSNotification*)aNote
-{
-	int aMask = [model triggerMask];
-	int i;
-	for(i=0;i<3;i++){
-		[[triggerMaskMatrix cellWithTag:i] setIntValue:aMask & (1<<i)];
-	}
-	[self settingsLockChanged:nil];
 }
 
 - (void) clockSourceChanged:(NSNotification*)aNote
@@ -393,44 +422,12 @@
 	[self settingsLockChanged:nil];
 }
 
-- (void) operationModeChanged:(NSNotification*)aNote
-{
-	[operationModePU selectItemAtIndex: [model operationMode]];
-	[self settingsLockChanged:nil];
-}
 
 - (void) moduleIDChanged:(NSNotification*)aNote
 {
 	unsigned short moduleID = [model moduleID];
 	if(moduleID) [moduleIDField setStringValue:[NSString stringWithFormat:@"%x",moduleID]];
 	else		 [moduleIDField setStringValue:@"---"];
-}
-
-- (void) triggerModeChanged:(NSNotification*)aNote
-{
-	if(![aNote userInfo]){
-		int i;
-		for(i=0;i<kNumSIS3320Channels;i++){
-			[triggerModePU[i] selectItemAtIndex:[model triggerMode:i]];
-		}
-	}
-	else {
-		int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-		[triggerModePU[i]  selectItemAtIndex:[model triggerMode:i]];
-	}
-	[self settingsLockChanged:nil];
-}
-
-- (void) gainChanged:(NSNotification*)aNote
-{
-	if(![aNote userInfo]){
-		short i;
-		for(i=0;i<kNumSIS3320Channels;i++)[[gainMatrix cellWithTag:i] setIntValue:[model gain:i]];
-	}
-	else {
-		int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-		[[gainMatrix cellWithTag:i] setIntValue:[model gain:i]];
-	}
 }
 
 - (void) dacValueChanged:(NSNotification*)aNote
@@ -456,18 +453,6 @@
 		[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
 	}
 }
-- (void) thresholdOffChanged:(NSNotification*)aNote
-{
-	if(![aNote userInfo]){
-		short i;
-		for(i=0;i<kNumSIS3320Channels;i++)[[thresholdOffMatrix cellWithTag:i] setIntValue:[model thresholdOff:i]];
-	}
-	else {
-		int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-		[[thresholdOffMatrix cellWithTag:i] setIntValue:[model thresholdOff:i]];
-	}
-}
-
 - (void) trigPulseLenChanged:(NSNotification*)aNote
 {
 	if(![aNote userInfo]){
@@ -541,134 +526,18 @@
     
     [settingLockButton			setState: locked];
     [addressText				setEnabled:!locked && !runInProgress];
-	[operationModePU			setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU				setEnabled:!lockedOrRunningMaintenance];
     [initButton					setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[trigPulseLenMatrix			setEnabled:!lockedOrRunningMaintenance];
 	
-	BOOL usingFreqSynesizer = ([model clockSource] == 0);
-	[freqNPU	setEnabled:!lockedOrRunningMaintenance && usingFreqSynesizer];
-	[freqMField setEnabled:!lockedOrRunningMaintenance && usingFreqSynesizer];
-
 	int i;
 	for(i=0;i<kNumSIS3320Channels;i++){
-		[triggerModePU[i]	setEnabled:!lockedOrRunningMaintenance];
-		int triggerMode = [model triggerMode:i];
-		BOOL enableCondition = YES;
-		if(triggerMode >= 0 && triggerMode <= 2)enableCondition = NO;
-		[[sumGMatrix cellWithTag:i]			setEnabled:!lockedOrRunningMaintenance && enableCondition];
-		[[peakingTimeMatrix cellWithTag:i] setEnabled:!lockedOrRunningMaintenance && enableCondition];
-	}
-	BOOL asynchronous_mode_flag;
-	switch([model operationMode]){
-		case kOperationRingBufferAsync:
-			[memoryTriggerDelayField	setEnabled:NO];
-			[memoryStartModeLengthField setEnabled:NO];
-			[memoryWrapLengthField		setEnabled:NO];
-			[gateSyncExtendLengthField  setEnabled:NO];
-			[gateSyncLimitLengthField   setEnabled:NO];
-			[thresholdOffMatrix			setEnabled:NO];
-			[ringBufferLenField			setEnabled:!lockedOrRunningMaintenance];
-			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
-			asynchronous_mode_flag = YES ;
-			break;
-			
-		case kOperationRingBufferSync:
-			[memoryTriggerDelayField	setEnabled:NO];
-			[memoryStartModeLengthField setEnabled:NO];
-			[memoryWrapLengthField		setEnabled:NO];
-			[gateSyncExtendLengthField  setEnabled:NO];
-			[gateSyncLimitLengthField   setEnabled:NO];			
-			[thresholdOffMatrix			setEnabled:NO];
-			[ringBufferLenField			setEnabled:!lockedOrRunningMaintenance];
-			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[endAddressThresholdField	setEnabled:NO];
-			asynchronous_mode_flag = NO ;
-			break;
-			
-		case kOperationDirectMemoryGateAsync:
-			[memoryTriggerDelayField	setEnabled:NO];
-			[memoryStartModeLengthField setEnabled:NO];
-			[memoryWrapLengthField		setEnabled:NO];
-			[gateSyncExtendLengthField  setEnabled:NO];
-			[gateSyncLimitLengthField   setEnabled:NO];			
-			[ringBufferLenField			setEnabled:!lockedOrRunningMaintenance];
-			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[thresholdOffMatrix			setEnabled:!lockedOrRunningMaintenance];
-			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
-			asynchronous_mode_flag = YES ;
-			break;
-			
-		case kOperationDirectMemoryGateSync:
-			[memoryTriggerDelayField	setEnabled:NO];
-			[memoryStartModeLengthField setEnabled:NO];
-			[memoryWrapLengthField		setEnabled:NO];
-			[gateSyncExtendLengthField  setEnabled:!lockedOrRunningMaintenance];
-			[gateSyncLimitLengthField   setEnabled:!lockedOrRunningMaintenance];			
-			[thresholdOffMatrix			setEnabled:!lockedOrRunningMaintenance];
-			[ringBufferLenField			setEnabled:NO];
-			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
-			asynchronous_mode_flag = NO;
-			break;
-			
-		case kOperationDirectMemoryStop:
-			[memoryTriggerDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[memoryStartModeLengthField setEnabled:NO];
-			[memoryWrapLengthField		setEnabled:!lockedOrRunningMaintenance];
-			[gateSyncExtendLengthField  setEnabled:NO];
-			[gateSyncLimitLengthField   setEnabled:NO];			
-			[ringBufferLenField			setEnabled:NO];
-			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[thresholdOffMatrix			setEnabled:NO];
-			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
-			asynchronous_mode_flag = NO;
-			break;
-			
-		case kOperationDirectMemoryStart:
-			[memoryTriggerDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[memoryStartModeLengthField setEnabled:!lockedOrRunningMaintenance];
-			[memoryWrapLengthField		setEnabled:NO];
-			[gateSyncExtendLengthField  setEnabled:NO];
-			[gateSyncLimitLengthField   setEnabled:NO];			
-			[ringBufferLenField			setEnabled:NO];
-			[ringBufferPreDelayField	setEnabled:!lockedOrRunningMaintenance];
-			[thresholdOffMatrix			setEnabled:NO];
-			[endAddressThresholdField	setEnabled:!lockedOrRunningMaintenance];
-			asynchronous_mode_flag = NO;
-			break;
+		BOOL enableCondition = [model triggerModeMaskBit:i];
+		[[sumGMatrix cellWithTag:i]				setEnabled:!lockedOrRunningMaintenance && !enableCondition];
+		[[peakingTimeMatrix cellWithTag:i]		setEnabled:!lockedOrRunningMaintenance && !enableCondition];
+		[[trigPulseLenMatrix	cellWithTag:i]	setEnabled:!lockedOrRunningMaintenance && !enableCondition];
 	}
 	
-	switch([model operationMode]){
-		case kOperationRingBufferAsync:  
-		case kOperationRingBufferSync:
-		case kOperationDirectMemoryStop:
-		case kOperationDirectMemoryStart:
-			[thresholdOnLabel  setStringValue:@"       Threshold"];
-			[thresholdOffLabel setStringValue:@"                 N/A"];
-		break;
-			
-		case kOperationDirectMemoryGateAsync:
-		case kOperationDirectMemoryGateSync:
-			[thresholdOnLabel  setStringValue:@" ON  Threshold"];
-			[thresholdOffLabel setStringValue:@"OFF Threshold"];
-			break;
-	}
-		
-	if (asynchronous_mode_flag == 0) {
-		[triggerMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-		[invertLemoCB setEnabled:!lockedOrRunningMaintenance];
-		[multiEventCB setEnabled:!lockedOrRunningMaintenance];
-		[maxNumEventsField setEnabled:!lockedOrRunningMaintenance && [model multiEvent]];
-	}
-	else {
-		[triggerMaskMatrix setEnabled:NO];
-		[invertLemoCB setEnabled:NO];
-		[multiEventCB setEnabled:NO];
-		[maxNumEventsField setEnabled:NO];
-	}
 }
 
 - (void) setModel:(id)aModel
@@ -699,7 +568,7 @@
 }
 
 
-- (void) scaleAction:(NSNotification*)aNotification
+- (IBAction) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [rate0 xScale]){
 		[model setMiscAttributes:[[rate0 xScale]attributes] forKey:@"RateXAttributes"];
@@ -769,109 +638,106 @@
     }
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
 
-- (IBAction) memoryWrapLengthAction:(id)sender
+- (IBAction) sampleStartAddressAction:(id)sender
 {
-	[model setMemoryWrapLength:[sender intValue]];	
+	[model setSampleStartAddress:[sender intValue]];	
 }
 
-- (IBAction) readTemperatureAction:(id)sender
+- (IBAction) sampleLengthAction:(id)sender
 {
-	@try {
-		[model readTemperature:YES];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Read SIS3320 board temperature failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3320 Temperature read FAILED", @"OK", nil, nil,
-                        localException);
-	}
-	
+	[model setSampleLength:[sender intValue]];	
 }
 
-- (IBAction) fire:(id)sender
+//- (IBAction) shiftAccumBy4Action:(id)sender
+//{
+//	[model setShiftAccumBy4:[sender intValue]];	
+//}
+
+- (IBAction) enableUserInAccumGateAction:(id)sender
 {
-	[model fireTrigger];	
+	[model setEnableUserInAccumGate:[sender intValue]];	
 }
 
-- (IBAction) endAddressThresholdAction:(id)sender
+- (IBAction) enableUserInDataStreamAction:(id)sender
 {
-	[model setEndAddressThreshold:[sender intValue]];	
+	[model setEnableUserInDataStream:[sender intValue]];	
 }
 
-- (IBAction) ringBufferPreDelayAction:(id)sender
+//- (IBAction) enableAccumModeAction:(id)sender
+//{
+//	[model setEnableAccumMode:[sender intValue]];	
+//}
+
+- (IBAction) enableSampleLenStopAction:(id)sender
 {
-	[model setRingBufferPreDelay:[sender intValue]];	
+	[model setEnableSampleLenStop:[sender intValue]];	
 }
 
-- (IBAction) ringBufferLenAction:(id)sender
+- (IBAction) enablePageWrapAction:(id)sender
 {
-	[model setRingBufferLen:[sender intValue]];	
+	[model setEnablePageWrap:[sender intValue]];	
 }
 
-- (IBAction) gateSyncExtendLengthAction:(id)sender
+- (IBAction) pageWrapSizeAction:(id)sender
 {
-	[model setGateSyncExtendLength:[sender intValue]];	
+	[model setPageWrapSize:[sender indexOfSelectedItem]];	
 }
 
-- (IBAction) gateSyncLimitLengthAction:(id)sender
+- (IBAction) stopDelayAction:(id)sender
 {
-	[model setGateSyncLimitLength:[sender intValue]];	
+	[model setStopDelay:[sender intValue]];	
 }
+
+- (IBAction) startDelayAction:(id)sender
+{
+	[model setStartDelay:[sender intValue]];	
+}
+
+- (IBAction) lemoStartStopLogicAction:(id)sender
+{
+	[model setLemoStartStopLogic:[sender intValue]];	
+}
+
+- (IBAction) internalTriggerAsStopAction:(id)sender
+{
+	[model setInternalTriggerAsStop:[sender intValue]];	
+}
+
+- (IBAction) autoStartModeAction:(id)sender
+{
+	[model setAutoStartMode:[sender intValue]];	
+}
+
+- (IBAction) triggerModeAction:(id)sender
+{
+	[model setTriggerModeMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) gtAction:(id)sender
+{
+	[model setGtMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) ltAction:(id)sender
+{
+	[model setLtMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 
 - (IBAction) maxNumEventsAction:(id)sender
 {
 	[model setMaxNumEvents:[sender intValue]];	
 }
-
-- (IBAction) freqNAction:(id)sender
-{
-	[model setFreqN:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) freqMAction:(id)sender
-{
-	[model setFreqM:[sender intValue]];	
-}
-
-- (IBAction) memoryStartModeLengthAction:(id)sender
-{
-	[model setMemoryStartModeLength:[sender intValue]];	
-}
-
-- (IBAction) memoryTriggerDelayAction:(id)sender
-{
-	[model setMemoryTriggerDelay:[sender intValue]];	
-}
-
-- (IBAction) invertLemoAction:(id)sender
-{
-	[model setInvertLemo:[sender intValue]];	
-}
-
 - (IBAction) multiEventAction:(id)sender
 {
 	[model setMultiEvent:[sender intValue]];	
 }
 
-- (IBAction) triggerMaskAction:(id)sender
-{
-	int aMask = 0;
-	int i;
-	for(i=0;i<3;i++){
-		if([[triggerMaskMatrix cellWithTag:i] intValue])aMask |= (1<<i);
-	}
-	[model setTriggerMask:aMask];	
-}
-
 - (IBAction) clockSourceAction:(id)sender
 {
 	[model setClockSource:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) operationModeAction:(id)sender
-{
-	[model setOperationMode:[sender indexOfSelectedItem]];	
 }
 
 //hardware actions
@@ -899,17 +765,6 @@
 	}
 }
 
-- (IBAction) triggerModeAction:(id)sender
-{
-	[model setTriggerMode:[sender tag] withValue:[sender indexOfSelectedItem]];
-}
-
-- (IBAction) gainAction:(id)sender
-{
-    if([sender intValue] != [model gain:[[sender selectedCell] tag]]){
-		[model setGain:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
 - (IBAction) dacValueAction:(id)sender
 {
     if([sender intValue] != [model dacValue:[[sender selectedCell] tag]]){
@@ -924,14 +779,6 @@
 		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
-
-- (IBAction) thresholdOffAction:(id)sender
-{
-    if([sender intValue] != [model thresholdOff:[[sender selectedCell] tag]]){
-		[model setThresholdOff:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
-
 
 - (IBAction) trigPulseLenAction:(id)sender
 {
@@ -1011,7 +858,7 @@
 }
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
+#pragma mark •••Data Source
 - (double) getBarValue:(int)tag
 {
 	return [[[[model waveFormRateGroup]rates] objectAtIndex:tag] rate];

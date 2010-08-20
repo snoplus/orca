@@ -29,14 +29,7 @@
 @class ORRateGroup;
 @class ORAlarm;
 
-#define kNumSIS3320Channels			4 
-
-#define kOperationRingBufferAsync 			0
-#define kOperationRingBufferSync			1
-#define kOperationDirectMemoryGateAsync		2
-#define kOperationDirectMemoryGateSync		3
-#define kOperationDirectMemoryStop			4
-#define kOperationDirectMemoryStart			5
+#define kNumSIS3320Channels			8
 
 @interface ORSIS3320Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
@@ -45,37 +38,40 @@
 	BOOL			ledOn;
 	unsigned short	moduleID;
 	unsigned long   dataId;
-	NSMutableArray*	triggerModes;
-	NSMutableArray* gains;
+	
 	NSMutableArray* dacValues;
 	NSMutableArray* thresholds;
-	NSMutableArray* thresholdOffs;
 	NSMutableArray* trigPulseLens;
 	NSMutableArray* sumGs;
 	NSMutableArray* peakingTimes;
 	
-	ORRateGroup*	waveFormRateGroup;
-	unsigned long 	waveFormCount[kNumSIS3320Channels];
-    int				operationMode;
+ 	unsigned char   triggerModeMask;
+ 	unsigned char   gtMask;
+ 	unsigned char   ltMask;
     int				clockSource;
-    int				triggerMask;
     BOOL			multiEvent;
-    BOOL			invertLemo;
-    long			memoryTriggerDelay;
-    long			memoryStartModeLength;
-    int				freqM;
-    int				freqN;
-    long			maxNumEvents;
-    int				gateSyncLimitLength;
-    int				gateSyncExtendLength;
-    int				ringBufferLen;
-    int				ringBufferPreDelay;
-    int				endAddressThreshold;
-    long			memoryWrapLength;
+     long			maxNumEvents;
 
 	unsigned long	location;
 	id				theController;
-	int				runningOperationMode;
+
+	ORRateGroup*	waveFormRateGroup;
+	unsigned long 	waveFormCount[kNumSIS3320Channels];
+
+    BOOL autoStartMode;
+    BOOL internalTriggerAsStop;
+    BOOL lemoStartStopLogic;
+    unsigned long startDelay;
+    unsigned long stopDelay;
+    int pageWrapSize;
+    BOOL enablePageWrap;
+    BOOL enableSampleLenStop;
+    BOOL enableUserInDataStream;
+    BOOL enableUserInAccumGate;
+    int sampleLength;
+    int sampleStartAddress;
+	
+	unsigned long* data;
 }
 
 - (id) init;
@@ -85,53 +81,59 @@
 - (void) setDefaults;
 
 #pragma mark ***Accessors
-- (long) memoryWrapLength;
-- (void) setMemoryWrapLength:(long)aMemoryWrapLength;
-- (int) endAddressThreshold;
-- (void) setEndAddressThreshold:(int)aEndAddressThreshold;
-- (int) ringBufferPreDelay;
-- (void) setRingBufferPreDelay:(int)aRingBufferPreDelay;
-- (int) ringBufferLen;
-- (void) setRingBufferLen:(int)aRingBufferLen;
-- (int) gateSyncExtendLength;
-- (void) setGateSyncExtendLength:(int)aGateSyncExtendLength;
-- (int) gateSyncLimitLength;
-- (void) setGateSyncLimitLength:(int)aGateSyncLimitLength;
+- (int) sampleStartAddress;
+- (void) setSampleStartAddress:(int)aSampleStartAddress;
+- (int) sampleLength;
+- (void) setSampleLength:(int)aSampleLength;
+- (BOOL) enableUserInAccumGate;
+- (void) setEnableUserInAccumGate:(BOOL)aEnableUserInAccumGate;
+- (BOOL) enableUserInDataStream;
+- (void) setEnableUserInDataStream:(BOOL)aEnableUserInDataStream;
+- (BOOL) enableSampleLenStop;
+- (void) setEnableSampleLenStop:(BOOL)aEnableSampleLenStop;
+- (BOOL) enablePageWrap;
+- (void) setEnablePageWrap:(BOOL)aEnablePageWrap;
+- (int) pageWrapSize;
+- (void) setPageWrapSize:(int)aPageWrapSize;
+- (unsigned long) stopDelay;
+- (void) setStopDelay:(unsigned long)aStopDelay;
+- (unsigned long) startDelay;
+- (void) setStartDelay:(unsigned long)aStartDelay;
+- (BOOL) lemoStartStopLogic;
+- (void) setLemoStartStopLogic:(BOOL)aLemoStartStopLogic;
+- (BOOL) internalTriggerAsStop;
+- (void) setInternalTriggerAsStop:(BOOL)aInternalTriggerAsStop;
+- (BOOL) autoStartMode;
+- (void) setAutoStartMode:(BOOL)aAutoStartMode;
+
+- (unsigned char)   triggerModeMask;
+- (void)			setTriggerModeMask:(unsigned char)aMask;
+- (BOOL)			triggerModeMaskBit:(int)bit;
+- (void)			setTriggerModeMaskBit:(int)bit withValue:(BOOL)aValue;
+
+- (unsigned char)   gtMask;
+- (void)			setGtMask:(unsigned char)aMask;
+- (BOOL)			gtMaskBit:(int)bit;
+- (void)			setGtMaskBit:(int)bit withValue:(BOOL)aValue;
+
+- (unsigned char)   ltMask;
+- (void)			setLtMask:(unsigned char)aMask;
+- (BOOL)			ltMaskBit:(int)bit;
+- (void)			setLtMaskBit:(int)bit withValue:(BOOL)aValue;
+
 - (long) maxNumEvents;
 - (void) setMaxNumEvents:(long)aMaxNumEvents;
-- (int) freqN;
-- (void) setFreqN:(int)aFreqN;;
-- (int) freqM;
-- (void) setFreqM:(int)aFreqM;;
-- (long) memoryStartModeLength;
-- (void) setMemoryStartModeLength:(long)aMemoryStartModeLength;
-- (long) memoryTriggerDelay;
-- (void) setMemoryTriggerDelay:(long)aMemoryTriggerDelay;
-- (BOOL) invertLemo;
-- (void) setInvertLemo:(BOOL)aInvertLemo;
 - (BOOL) multiEvent;
 - (void) setMultiEvent:(BOOL)aMultiEvent;
-- (int) triggerMask;
-- (void) setTriggerMask:(int)aTriggerMask;
 - (int) clockSource;
 - (void) setClockSource:(int)aClockSource;
 - (NSString*) clockSourceName:(int)aValue;
-- (int) operationMode;
-- (void) setOperationMode:(int)aOperationMode;
-- (NSString*) operationModeName:(int)aValue;
 - (unsigned short) moduleID;
 
 
-- (int) triggerMode:(short)chan;
-- (void) setTriggerMode:(short)channel withValue:(long)aValue;
-
-- (long) gain:(int)aChannel;
-- (void) setGain:(int)aChannel withValue:(long)aValue;
 - (long) dacValue:(int)aChannel;
 - (void) setDacValue:(int)aChannel withValue:(long)aValue;
 
-- (void) setThresholdOff:(short)chan withValue:(int)aValue;
-- (int) thresholdOff:(short)chan;
 - (void) setThreshold:(short)chan withValue:(int)aValue;
 - (int) threshold:(short)chan;
 - (int) trigPulseLen:(short)aChan;
@@ -147,31 +149,33 @@
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Hardware Access
+#pragma mark •••Hardware Access
 - (void) printReport;
 - (void) initBoard;
 - (unsigned long) readEventCounter;
 - (void) readModuleID:(BOOL)verbose;
-- (float) readTemperature:(BOOL)verbose;
+- (void) writeStartDelay:(unsigned long)aValue;
+- (void) writeStopDelay:(unsigned long)aValue;
+- (void) startSampling;
+- (void) stopSampling;
+- (void) writeEventConfigRegister;
+- (unsigned long) readEventDir:(int)aChannel;
+
 - (void) writeAcquisitionRegister;
 - (unsigned long) readAcquisitionRegister;
 - (void) writeControlStatusRegister;
 - (void) writeValue:(unsigned long)aValue offset:(long)anOffset;
-- (void) writeFreqSynthRegister;
 - (void) writeTriggerSetupRegisters;
 - (void) armSamplingLogic;
 - (void) disarmSamplingLogic;
-- (void) fireTrigger;
-- (void) clearTimeStamps;
-- (void) writeRingBufferParams;
 - (unsigned long) readAcqRegister;
 - (void) writeAdcMemoryPage:(unsigned long)aPage;
 - (void) writeSampleStartAddress:(unsigned long)aValue;
-- (void) clearTimeStamps;
-- (void) writeGains;
 - (void) writeDacOffsets;
+- (void) writeAdcTestMode;
+- (void) writeGainControlRegister;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
+#pragma mark •••Data Taker
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
@@ -186,42 +190,43 @@
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Wizard
+#pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Archival
+#pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 @end
 
-extern NSString* ORSIS3320ModelMemoryWrapLengthChanged;
-extern NSString* ORSIS3320ModelEndAddressThresholdChanged;
-extern NSString* ORSIS3320ModelRingBufferPreDelayChanged;
-extern NSString* ORSIS3320ModelRingBufferLenChanged;
-extern NSString* ORSIS3320ModelGateSyncExtendLengthChanged;
-extern NSString* ORSIS3320ModelGateSyncLimitLengthChanged;
+extern NSString* ORSIS3320ModelSampleStartAddressChanged;
+extern NSString* ORSIS3320ModelSampleLengthChanged;
+extern NSString* ORSIS3320ModelEnableUserInAccumGateChanged;
+extern NSString* ORSIS3320ModelEnableUserInDataStreamChanged;
+extern NSString* ORSIS3320ModelEnableSampleLenStopChanged;
+extern NSString* ORSIS3320ModelEnablePageWrapChanged;
+extern NSString* ORSIS3320ModelPageWrapSizeChanged;
+extern NSString* ORSIS3320ModelStopDelayChanged;
+extern NSString* ORSIS3320ModelStartDelayChanged;
+extern NSString* ORSIS3320ModelLemoStartStopLogicChanged;
+extern NSString* ORSIS3320ModelInternalTriggerAsStopChanged;
+extern NSString* ORSIS3320ModelAutoStartModeChanged;
+extern NSString* ORSIS3320ModelGtMaskChanged;
+extern NSString* ORSIS3320ModelLtMaskChanged;
+extern NSString* ORSIS3320ModelTriggerModeMaskChanged;
+
 extern NSString* ORSIS3320ModelMaxNumEventsChanged;
-extern NSString* ORSIS3320ModelFreqNChanged;
-extern NSString* ORSIS3320ModelFreqMChanged;
-extern NSString* ORSIS3320ModelMemoryStartModeLengthChanged;
-extern NSString* ORSIS3320ModelMemoryTriggerDelayChanged;
-extern NSString* ORSIS3320ModelInvertLemoChanged;
 extern NSString* ORSIS3320ModelMultiEventChanged;
-extern NSString* ORSIS3320ModelTriggerMaskChanged;
 extern NSString* ORSIS3320ModelClockSourceChanged;
-extern NSString* ORSIS3320ModelOperationModeChanged;
 extern NSString* ORSIS3320ModelTriggerModeChanged;
 extern NSString* ORSIS3320ModelThresholdChanged;
-extern NSString* ORSIS3320ModelThresholdOffChanged;
 extern NSString* ORSIS3320ModelTrigPulseLenChanged;
 extern NSString* ORSIS3320ModelSumGChanged;
 extern NSString* ORSIS3320ModelPeakingTimeChanged;
 extern NSString* ORSIS3320SettingsLock;
 extern NSString* ORSIS3320RateGroupChangedNotification;
 extern NSString* ORSIS3320ModelIDChanged;
-extern NSString* ORSIS3320ModelGainChanged;
 extern NSString* ORSIS3320ModelDacValueChanged;

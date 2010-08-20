@@ -1690,6 +1690,7 @@
 		84B0CFC208FC60BC00EBE23C /* ORContainerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B0CFBC08FC60BC00EBE23C /* ORContainerController.h */; };
 		84B0CFEE08FC6C9B00EBE23C /* OfflineRunAlarmHelp in Resources */ = {isa = PBXBuildFile; fileRef = 84AA48320461DE37005F64B1 /* OfflineRunAlarmHelp */; };
 		84B0CFF208FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFF108FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist */; };
+		84B11665121ED85100BC8464 /* noHeartbeat.png in Resources */ = {isa = PBXBuildFile; fileRef = 84B11664121ED85100BC8464 /* noHeartbeat.png */; };
 		84B194BC0FC44E1800775CF1 /* ORMotionNodeDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B194BA0FC44E1800775CF1 /* ORMotionNodeDecoders.m */; };
 		84B194BD0FC44E1800775CF1 /* ORMotionNodeDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B194BB0FC44E1800775CF1 /* ORMotionNodeDecoders.h */; };
 		84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B1B00B0FCDAA1400775CF1 /* help.tif */; };
@@ -2154,6 +2155,7 @@
 		84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */; };
 		84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
+		84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE03BE120AFA4400B804B3 /* ORInverterModel.m */; };
 		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
 		84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */; };
 		84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */; };
@@ -3991,6 +3993,7 @@
 		84B0CFBC08FC60BC00EBE23C /* ORContainerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORContainerController.h; path = Source/Objects/Container/ORContainerController.h; sourceTree = SOURCE_ROOT; };
 		84B0CFBD08FC60BC00EBE23C /* ORContainerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORContainerModel.m; path = Source/Objects/Container/ORContainerModel.m; sourceTree = SOURCE_ROOT; };
 		84B0CFF108FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Container.plist; path = Source/Objects/Container/edu.washington.npl.orca.Container.plist; sourceTree = SOURCE_ROOT; };
+		84B11664121ED85100BC8464 /* noHeartbeat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = noHeartbeat.png; sourceTree = "<group>"; };
 		84B180FA044C7AAC005F64B1 /* 620Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = 620Card.gif; sourceTree = "<group>"; };
 		84B18101044C7AAC005F64B1 /* OR620Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = OR620Model.h; sourceTree = "<group>"; };
 		84B18102044C7AAC005F64B1 /* OR620Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = OR620Model.m; sourceTree = "<group>"; };
@@ -4567,6 +4570,7 @@
 		84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoBit3DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoBit3DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthesizeSingleton.h; path = Source/Misc/SynthesizeSingleton.h; sourceTree = SOURCE_ROOT; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
+		84EE03BE120AFA4400B804B3 /* ORInverterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORInverterModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/ORInverterModel.m; sourceTree = SOURCE_ROOT; };
 		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
 		84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPMCReadWriteCommand.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.h"; sourceTree = SOURCE_ROOT; };
 		84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMCReadWriteCommand.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
@@ -5344,6 +5348,7 @@
 			isa = PBXGroup;
 			children = (
 				840B78F6094A47AF00B1B135 /* Inverter.tif */,
+				84EE03BE120AFA4400B804B3 /* ORInverterModel.m */,
 				840B78F7094A47AF00B1B135 /* ORInverterModel.h */,
 			);
 			name = Inverter;
@@ -5419,6 +5424,7 @@
 			children = (
 				840B7DA2094DFAC200B1B135 /* ORProcessCenter.h */,
 				840B7DA3094DFAC200B1B135 /* ORProcessCenter.m */,
+				84B11664121ED85100BC8464 /* noHeartbeat.png */,
 				840B7DA4094DFAC200B1B135 /* ProcessCenter.nib */,
 			);
 			name = ProcessCenter;
@@ -5535,9 +5541,8 @@
 				840EFFAC0944B28F00049827 /* ProcessElements */,
 				840E00000944B28F00049827 /* ProcessThread */,
 			);
-			name = ProcessLogic;
-			path = Source/Objects/ProcessLogic;
-			sourceTree = SOURCE_ROOT;
+			path = ProcessLogic;
+			sourceTree = "<group>";
 		};
 		840EFFA40944B28F00049827 /* ProcessContainer */ = {
 			isa = PBXGroup;
@@ -6189,7 +6194,6 @@
 		842F19A603B8EAF3005F64B1 /* Control */ = {
 			isa = PBXGroup;
 			children = (
-				840EFFA30944B28F00049827 /* ProcessLogic */,
 				84E22AAA0417F26A005F64B1 /* DataTask */,
 				84539C470807247A00615B6D /* RemoteRunControl */,
 				842F19A703B8EAF3005F64B1 /* RunControl */,
@@ -10057,6 +10061,7 @@
 				84B0CFB708FC600900EBE23C /* Container */,
 				842162EE043E6317005F64B1 /* Misc Objects */,
 				84AD1EE003C2476F005F64B1 /* Data Processing */,
+				840EFFA30944B28F00049827 /* ProcessLogic */,
 				842F19A603B8EAF3005F64B1 /* Control */,
 				84C4948A0405A0C0005F64B1 /* Custom Hardware */,
 				F51E698503AE4775015F64B1 /* Hardware */,
@@ -11859,6 +11864,7 @@
 				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
 				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
 				EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */,
+				84B11665121ED85100BC8464 /* noHeartbeat.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12662,6 +12668,7 @@
 				EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */,
 				EFAC073211E9A6CB00336793 /* XL3_Link.m in Sources */,
 				EFAC074011E9A9DB00336793 /* XL3_LinkController.m in Sources */,
+				84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

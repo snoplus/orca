@@ -54,26 +54,20 @@
 	unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
 	
-	ptr++; //point to location
-	int crate	= (*ptr&0x01e00000)>>21;
-    int card	= (*ptr&0x001f0000)>>16;
-    int channel = (*ptr&0x0000000f);
-
+	int crate	= ShiftAndExtract(ptr[1],21,0xf);
+	int card	= ShiftAndExtract(ptr[1],16,0x1f);
+	int channel = ShiftAndExtract(ptr[1],8,0xff);
 	
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
-	
-	ptr++; //point to the start of data
-	ptr += 4; //skip the time stamps and info
-	
-	NSMutableData* tmpData = [NSMutableData dataWithBytes:someData length:(length-6)*sizeof(long)];
+		
+	NSMutableData* tmpData = [NSMutableData dataWithBytes:someData length:(length-3)*sizeof(long)];
 	unsigned short* dp = (unsigned short*)[tmpData bytes];
 	int i;
-	for(i=0;i<length-6;i++){
-		*dp++ = *ptr & 0xfff;
-		*dp++ = (*ptr>>16) & 0xfff;
-		ptr++;
+	for(i=3;i<length-3;i++){
+		*dp++ = ptr[i] & 0xffff;
+		*dp++ = (ptr[i]>>16) & 0xffff;
 	}
 	[aDataSet loadWaveform:tmpData
 					offset:0 //bytes!
@@ -88,9 +82,7 @@
 		ORSIS3320Model* obj = [actualSIS3320Cards objectForKey:aKey];
 		if(!obj){
 			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3320Model")];
-			NSEnumerator* e = [listOfCards objectEnumerator];
-			ORSIS3320Model* aCard;
-			while(aCard = [e nextObject]){
+			for(ORSIS3320Model* aCard in listOfCards){
 				if([aCard slot] == card){
 					[actualSIS3320Cards setObject:aCard forKey:aKey];
 					obj = aCard;
@@ -106,11 +98,10 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-	ptr++;
     NSString* title    = @"SIS3320 Waveform Record\n\n";
-    NSString* crate    = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card     = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* channel  = [NSString stringWithFormat:@"Channel  = %d\n",*ptr&0x0000000f];
+    NSString* crate    = [NSString stringWithFormat:@"Crate = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
+    NSString* card     = [NSString stringWithFormat:@"Card  = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
+    NSString* channel  = [NSString stringWithFormat:@"Channel  = %d\n",ShiftAndExtract(ptr[1],0,0xf)];
     return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,channel];               
 }
 
