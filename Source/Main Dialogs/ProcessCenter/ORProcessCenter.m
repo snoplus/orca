@@ -74,7 +74,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
     [[[[NSApp delegate]document] undoManager] enableUndoRegistration];
 	
     [self registerNotificationObservers];
-    [self findObjects];
     [processView setDoubleAction:@selector(doubleClick:)];
 	
 	[self updateButtons];
@@ -93,7 +92,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 {
 	if([self heartbeatSeconds]){
 		[nextHeartbeat release];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 		nextHeartbeat = [[[NSDate date] dateByAddingTimeInterval:[self heartbeatSeconds]] retain];
+#else
+		nextHeartbeat = [[[NSDate date] addTimeInterval:[self heartbeatSeconds]] retain];
+#endif
 		[nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[nextHeartbeat description]]];
 	}
 	else [nextHeartbeatField setStringValue:@""];
@@ -172,10 +175,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (void) awakeAfterDocumentLoaded
 {
+    [self findObjects];
 	//force an update of the processor icons
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessEmailOptionsChangedNotification object:self userInfo:nil]; 
 }
 
+- (int) numberRunningProcesses
+{
+	int processCount = 0;
+	for(id aProcess in processorList){
+		if([aProcess processRunning]) processCount++;
+	}
+	return processCount;
+}
 
 - (void) doReload:(NSNotification*)aNote
 {
