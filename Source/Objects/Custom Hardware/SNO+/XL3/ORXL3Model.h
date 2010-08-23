@@ -53,12 +53,16 @@ enum {
 	XL3_Link*	xl3Link;
 	short		selectedRegister;
 	BOOL		basicOpsRunning;
-	BOOL		autoIncrement;
+	BOOL		autoIncrement;	
 	unsigned short	repeatDelay;
 	short		repeatOpCount;
 	BOOL		doReadOp;
 	unsigned long	workingCount;
 	unsigned long	writeValue;
+	BOOL		deselectCompositeRunning;
+	unsigned int	xl3Mode;
+	unsigned long	slotMask;
+	BOOL		xl3ModeRunning;
 }
 
 #pragma mark •••Initialization
@@ -81,6 +85,12 @@ enum {
 - (unsigned long) getRegisterAddress: (short) anIndex;
 - (BOOL) basicOpsRunning;
 - (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;
+- (BOOL) deselectCompositeRunning;
+- (void) setDeselectCompositeRunning:(BOOL)aDeselectCompositeRunning;
+- (BOOL) compositeXl3ModeRunning;
+- (void) setCompositeXl3ModeRunning:(BOOL)aCompositeXl3ModeRunning;
+- (unsigned long) slotMask;
+- (void) setSlotMask:(unsigned long)aSlotMask;
 - (BOOL) autoIncrement;
 - (void) setAutoIncrement:(BOOL)aAutoIncrement;
 - (unsigned short) repeatDelay;
@@ -89,6 +99,10 @@ enum {
 - (void) setRepeatOpCount:(short)aRepeatCount;
 - (unsigned long) writeValue;
 - (void) setWriteValue:(unsigned long)aWriteValue;
+- (unsigned int) xl3Mode;
+- (void) setXl3Mode:(unsigned int)aXl3Mode;
+- (BOOL) xl3ModeRunning;
+- (void) setXl3ModeRunning:(BOOL)anXl3ModeRunning;
 
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
@@ -115,14 +129,15 @@ enum {
 - (void) stopBasicOps;
 - (void) reportStatus;
 
-#pragma mark •••Composite Ops
+#pragma mark •••Composite
+- (void) deselectComposite;
+- (void) writeXl3Mode;
 - (void) reset;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress;
 - (void) executeCommandList:(ORCommandList*)aList;
 - (id) delayCmd:(unsigned long) milliSeconds;
-
 
 @end
 
@@ -132,3 +147,7 @@ extern NSString* ORXL3ModelRepeatDelayChanged;
 extern NSString* ORXL3ModelAutoIncrementChanged;
 extern NSString* ORXL3ModelBasicOpsRunningChanged;
 extern NSString* ORXL3ModelWriteValueChanged;
+extern NSString* ORXL3ModelDeselectCompositeRunningChanged;
+extern NSString* ORXL3ModelXl3ModeChanged;
+extern NSString* ORXL3ModelSlotMaskChanged;
+extern NSString* ORXL3ModelXl3ModeRunningChanged;

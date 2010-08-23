@@ -47,7 +47,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	cmdArrayLock = [[NSLock alloc] init];
 	[self setNeedToSwap];
 	connectState = kDisconnected;
-	cmdArray = [NSMutableArray arrayWithCapacity:100];
+	cmdArray = [[NSMutableArray alloc] init];
 	//[self initConnectionHistory];
 	return self;
 }
@@ -94,6 +94,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	commandSocketLock = [[NSLock alloc] init];
 	coreSocketLock = [[NSLock alloc] init];
 	cmdArrayLock = [[NSLock alloc] init];
+	cmdArray = [[NSMutableArray alloc] init];
 
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -318,7 +319,6 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			memcpy(&payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
 		}
 		[commandSocketLock unlock]; //end critical section
-		
 	}
 	@catch (NSException* localException) {
 		[commandSocketLock unlock]; //end critical section
@@ -331,8 +331,13 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 {
 	XL3_PayloadStruct payload;
 	payload.numberBytesinPayload = 0;
-	[self sendCommand:aCmd withPayload:&payload expectResponse:askForResponse];
-	//what about the response?
+	@try {
+		[self sendCommand:aCmd withPayload:&payload expectResponse:askForResponse];
+	}
+	@catch (NSException* localException) {
+		@throw localException;
+		//what about the response?		
+	}
 }
 
 - (void) sendFECCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value
@@ -366,13 +371,16 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 - (void) readXL3Packet:(XL3_Packet*)aPacket withCmdID:(int)cmdID
 {
 	//look into the cmdArray
+	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
 	NSDictionary* aCmd;
 	NSMutableArray* foundCmds = [NSMutableArray array];
+	BOOL locker = YES;
 	time_t t1 = time(0);
 
 	@try {
 		while(1) {
 			[cmdArrayLock lock];
+			locker = YES;
 			for (aCmd in cmdArray) {
 				NSNumber* aCmdID = [aCmd objectForKey:@"cmdID"];
 				if ([aCmdID intValue] == cmdID) {
@@ -380,6 +388,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				}
 			}
 			[cmdArrayLock unlock];
+			locker = NO;
 			
 			if ([foundCmds count]) {
 				break;
@@ -390,13 +399,16 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 					userInfo:nil];
 			}
 			else {
-				[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+				[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
 			}
 		}
 	}
 	@catch (NSException* localException) {
 		NSLog(@"%@ %@\n", [localException name], [localException reason]);
-		[cmdArrayLock unlock];
+		if (locker == YES) {
+			[cmdArrayLock unlock];
+			locker = NO;
+		}
 		@throw localException;
 	}
 
@@ -407,7 +419,23 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	
 	aCmd = [foundCmds objectAtIndex:0];
 	[[aCmd objectForKey:@"xl3Packet"] getBytes:aPacket length:XL3_PACKET_SIZE];
-	[cmdArray removeObjectsInArray:foundCmds];
+	
+	@try {
+		[cmdArrayLock lock];
+		locker = YES;
+		[cmdArray removeObjectsInArray:foundCmds];
+		[cmdArrayLock unlock];
+		locker = NO;
+	}
+	@catch (NSException* localException) {
+		if (locker == YES) {
+			[cmdArrayLock unlock];
+			locker = NO;
+		}
+		NSLog(@"XL3_Link error removing an XL3 packet from the command array\n");
+		NSLog(@"%@ %@\n", [localException name], [localException reason]);
+		@throw localException;
+	}
 } 
 
 
@@ -543,6 +571,8 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	tv.tv_usec = 10000;
 
 	char aPacket[XL3_PACKET_SIZE];
+	BOOL coreLocker = NO;
+	BOOL cmdLocker = NO;
 	
 	while(1) {
 		if (!workingSocket) {
@@ -564,8 +594,10 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) {
 			@try {
 				[coreSocketLock lock];
+				coreLocker = YES;
 				[self readPacket:aPacket];
 				[coreSocketLock unlock];
+				coreLocker = NO;
 
 				if ((needToSwap && ((XL3_Packet*) aPacket)->cmdHeader.cmdID == 0x00010000) ||
 				    (!needToSwap && *(uint32_t*) aPacket == 0x00000100)) {
@@ -583,22 +615,31 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 									[NSData dataWithBytes:aPacket length:XL3_PACKET_SIZE],			@"xl3Packet",
 									nil];
 					[cmdArrayLock lock];
+					cmdLocker = YES;
 					[cmdArray addObject:aDictionary];
 					[cmdArrayLock unlock];
+					cmdLocker = NO;
 					if ([cmdArray count] > kCmdArrayHighWater) {
 						//todo: post alarm
 						NSLog(@"Xl3 Command Array close to full for Xl3 crate %@\n", [self crateName]);
 					}
 				}
 								
-				aPacket[5] = '\0';
-				NSLog(@"XL3 packet: %s, in dictionary of: %d\n", aPacket, sizeof(NSDictionary));
+				//aPacket[5] = '\0';
+				//NSLog(@"XL3 packet: %s, in dictionary of: %d\n", aPacket, [cmdArray count]);
 			}
 			@catch (NSException* localException) {
 				if (serverSocket || workingSocket) {
 					NSLog(@"Couldn't read from XL3 <%@> port:%d\n", IPNumber, portNumber);
 				}
-				[coreSocketLock unlock];
+				if (coreLocker == YES) {
+					[coreSocketLock unlock];
+					coreLocker = NO;
+				}
+				if (cmdLocker == YES) {
+					[cmdArrayLock unlock];
+					cmdLocker = NO;
+				}
 				break;
 			}
 		}

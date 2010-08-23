@@ -85,7 +85,7 @@
 #define XL3_SEND_BUFSIZE	(1444)	// fixed buffer size of a mega bundle
 #define XL3_MEGA_SIZE		(120)	// packet payload size in PMT bundles (12 B) "a mega bundle"
 #define CMD_ID_BYTES		(4)	// packet header size in Bytes
-#define PORT			(6001)	// XL3 connects to PORT, ... PORT + 9
+#define PORT			(6012)	// XL3 connects to PORT, ... PORT + 9
 #define PORT2			(5002)	// ?
 
 //xl3_code/include/registers.h

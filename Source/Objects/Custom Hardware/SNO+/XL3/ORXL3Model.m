@@ -45,12 +45,16 @@ static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 
 #pragma mark •••Definitions
 
-NSString* ORXL3ModelSelectedRegisterChanged =	@"ORXL3ModelSelectedRegisterChanged";
-NSString* ORXL3ModelRepeatCountChanged =	@"ORXL3ModelRepeatCountChanged";
-NSString* ORXL3ModelRepeatDelayChanged =	@"ORXL3ModelRepeatDelayChanged";
-NSString* ORXL3ModelAutoIncrementChanged =	@"ORXL3ModelAutoIncrementChanged";
-NSString* ORXL3ModelBasicOpsRunningChanged =	@"ORXL3ModelBasicOpsRunningChanged";
-NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
+NSString* ORXL3ModelSelectedRegisterChanged =		@"ORXL3ModelSelectedRegisterChanged";
+NSString* ORXL3ModelRepeatCountChanged =		@"ORXL3ModelRepeatCountChanged";
+NSString* ORXL3ModelRepeatDelayChanged =		@"ORXL3ModelRepeatDelayChanged";
+NSString* ORXL3ModelAutoIncrementChanged =		@"ORXL3ModelAutoIncrementChanged";
+NSString* ORXL3ModelBasicOpsRunningChanged =		@"ORXL3ModelBasicOpsRunningChanged";
+NSString* ORXL3ModelWriteValueChanged =			@"ORXL3ModelWriteValueChanged";
+NSString* ORXL3ModelDeselectCompositeRunningChanged =	@"ORXL3ModelDeselectCompositeRunningChanged";
+NSString* ORXL3ModelXl3ModeChanged =			@"ORXL3ModelXl3ModeChanged";
+NSString* ORXL3ModelSlotMaskChanged =			@"ORXL3ModelSlotMaskChanged";
+NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 
 @interface ORXL3Model (private)
 - (void) doBasicOp;
@@ -187,6 +191,40 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelBasicOpsRunningChanged object:self];
 }
 
+- (BOOL) deselectCompositeRunning
+{
+	return deselectCompositeRunning;
+}
+
+- (void) setDeselectCompositeRunning:(BOOL)aDeselectCompositeRunning
+{
+	deselectCompositeRunning = aDeselectCompositeRunning;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelDeselectCompositeRunningChanged object:self];
+}	
+
+- (BOOL) compositeXl3ModeRunning
+{
+	return xl3ModeRunning;
+}
+
+- (void) setCompositeXl3ModeRunning:(BOOL)aCompositeXl3ModeRunning
+{
+	xl3ModeRunning = aCompositeXl3ModeRunning;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeRunningChanged object:self];
+}
+
+- (unsigned long) slotMask
+{
+	return slotMask;
+}
+
+- (void) setSlotMask:(unsigned long)aSlotMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setSlotMask:slotMask];
+	slotMask = aSlotMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelSlotMaskChanged object:self];
+}
+
 - (BOOL) autoIncrement
 {
 	return autoIncrement;
@@ -195,9 +233,7 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 - (void) setAutoIncrement:(BOOL)aAutoIncrement
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setAutoIncrement:autoIncrement];
-	
 	autoIncrement = aAutoIncrement;
-	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelAutoIncrementChanged object:self];
 }
 
@@ -253,10 +289,8 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 
 - (void) setSelectedRegister:(int)aSelectedRegister
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegister:selectedRegister];
-	
-	selectedRegister = aSelectedRegister;
-	
+	[[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegister:selectedRegister];	
+	selectedRegister = aSelectedRegister;	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelSelectedRegisterChanged object:self];
 }
 
@@ -265,8 +299,30 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 	return @"ORXL3Lock";
 }
 
+- (unsigned int) xl3Mode
+{
+	return xl3Mode;
+}
 
-//cont
+- (void) setXl3Mode:(unsigned int)aXl3Mode
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3Mode:xl3Mode];
+	xl3Mode = aXl3Mode;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeChanged object:self];
+}	
+
+- (BOOL) xl3ModeRunning
+{
+	return xl3ModeRunning;
+}
+
+- (void) setXl3ModeRunning:(BOOL)anXl3ModeRunning
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3ModeRunning:xl3ModeRunning];
+	xl3ModeRunning = anXl3ModeRunning;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeRunningChanged object:self];
+}
+
 - (int) slotConv
 {
     return [self slot];
@@ -304,6 +360,8 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 	[self setAutoIncrement:		[decoder decodeBoolForKey:	@"ORXL3ModelAutoIncrement"]];
 	[self setRepeatDelay:		[decoder decodeIntForKey:	@"ORXL3ModelRepeatDelay"]];
 	[self setRepeatOpCount:		[decoder decodeIntForKey:	@"ORXL3ModelRepeatOpCount"]];
+	[self setXl3Mode:		[decoder decodeIntForKey:	@"ORXL3ModelXl3Mode"]];
+	[self setSlotMask:		[decoder decodeIntForKey:	@"ORXL3ModelSlotMask"]];
 	
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -318,6 +376,8 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 	[encoder encodeBool:autoIncrement	forKey:@"ORXL3ModelAutoIncrement"];
 	[encoder encodeInt:repeatDelay		forKey:@"ORXL3ModelRepeatDelay"];
 	[encoder encodeInt:repeatOpCount	forKey:@"ORXL3ModelRepeatOpCount"];
+	[encoder encodeInt:xl3Mode		forKey:@"ORXL3ModelXl3Mode"];
+	[encoder encodeInt:slotMask		forKey:@"ORXL3ModelSlotMask"];
 }
 
 #pragma mark •••Hardware Access
@@ -348,13 +408,13 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 - (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue
 {
 	// add FEC bit?
-	unsigned long xl3Address = regAddress + WRITE_REG;
+	unsigned long xl3Address = regAddress | WRITE_REG;
 	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 }
 
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress
 {
-	unsigned long xl3Address = regAddress + READ_REG;
+	unsigned long xl3Address = regAddress | READ_REG;
 	unsigned long aValue = 0UL;
 	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 	return aValue;
@@ -362,14 +422,14 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 
 - (void) writeHardwareMemory:(unsigned long) memAddress value:(unsigned long) aValue
 {
-	unsigned long xl3Address = memAddress + WRITE_MEM;
+	unsigned long xl3Address = memAddress | WRITE_MEM;
 	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 }
 
 - (unsigned long) readHardwareMemory:(unsigned long) memAddress
 {
 	//FEC bit again
-	unsigned long xl3Address = memAddress + READ_MEM;
+	unsigned long xl3Address = memAddress | READ_MEM;
 	unsigned long aValue = 0UL;
 	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
 	return aValue;
@@ -461,6 +521,51 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 
 #pragma mark •••Composite HW Functions
 
+#define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
+#define swapShort(x) (((uint16_t)(x) <<  8) | ((uint16_t)(x)>>  8))
+
+- (void) deselectComposite
+{
+	[self setDeselectCompositeRunning:YES];
+	NSLog(@"Deselect FECs...\n");
+	@try {
+		[[self xl3Link] sendCommand:DESELECT_FECS_ID expectResponse:YES];
+		NSLog(@"OK\n");
+	}
+	@catch (NSException * e) {
+		NSLog(@"Deselect FECs FAILED; error: %@ reason: %@\n", [e name], [e reason]);
+	}
+	[self setDeselectCompositeRunning:NO];
+}
+
+- (void) writeXl3Mode
+{
+	XL3_PayloadStruct payload;
+	payload.numberBytesinPayload = 8;
+	unsigned long* data = (unsigned long*) payload.payload;
+
+	if ([xl3Link needToSwap]) {
+		data[0] = swapLong([self xl3Mode]);
+		data[1] = swapLong([self slotMask]);
+	}
+	else {
+		data[0] = [self xl3Mode];
+		data[1] = [self slotMask];
+	}
+	
+	[self setXl3ModeRunning:YES];
+	NSLog(@"Set XL3 Mode: %d slot mask: 0x%04x ...\n", [self xl3Mode], [self slotMask]);
+	@try {
+		[[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:&payload expectResponse:YES];
+		NSLog(@"OK\n");
+	}
+	@catch (NSException* e) {
+		NSLog(@"Set XL3 Mode FAILED; error: %@ reason: %@\n", [e name], [e reason]);
+	}
+	[self setXl3ModeRunning:NO];
+	//XL3 sends the payload back not touching it, should we check?	
+}
+
 - (void) reset
 {
 	@try {
@@ -520,7 +625,7 @@ NSString* ORXL3ModelWriteValueChanged =		@"ORXL3ModelWriteValueChanged";
 	}
 	@catch(NSException* localException) {
 		[self setBasicOpsRunning:NO];
-		NSLog(@"Mtc basic op exception: %@\n",localException);
+		NSLog(@"XL3 basic op exception: %@\n",localException);
 		[localException raise];
 	}
 	

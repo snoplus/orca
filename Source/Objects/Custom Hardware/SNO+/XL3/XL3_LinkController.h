@@ -37,14 +37,17 @@
 	IBOutlet NSStepper*		repeatCountStepper;
 	IBOutlet NSTextField*		writeValueField;
 	IBOutlet NSStepper*		writeValueStepper;
-	
 	//composite
+	IBOutlet NSProgressIndicator*	deselectCompositeRunningIndicator;
+	IBOutlet NSMatrix*		compositeSlotMaskMatrix;
+	IBOutlet NSTextField*		compositeSlotMaskField;
+	IBOutlet NSPopUpButton*		compositeXl3ModePU;
+	IBOutlet NSButton*		compositeSetXl3ModeButton;
+	IBOutlet NSProgressIndicator*	compositeXl3ModeRunningIndicator;
 
 	//connection
-	IBOutlet NSButton*      toggleConnectButton;
-	IBOutlet NSPopUpButton* errorTimeOutPU;
-
-
+	IBOutlet NSButton*		toggleConnectButton;
+	IBOutlet NSPopUpButton*		errorTimeOutPU;
 }	
 
 #pragma mark •••Initialization
@@ -67,6 +70,11 @@
 - (void) autoIncrementChanged:(NSNotification*)aNote;
 - (void) basicOpsRunningChanged:(NSNotification*)aNote;
 - (void) writeValueChanged:(NSNotification*)aNote;
+//composite
+- (void) compositeXl3ModeRunningChanged:(NSNotification*)aNote;
+- (void) compositeXl3ModeChanged:(NSNotification*)aNote;
+- (void) compositeSlotMaskChanged:(NSNotification*)aNote;
+- (void) compositeDeselectRunningChanged:(NSNotification*)aNote;
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
@@ -88,8 +96,15 @@
 - (IBAction) repeatDelayAction:(id) sender;
 - (IBAction) autoIncrementAction:(id) sender;
 - (IBAction) writeValueAction:(id) sender;
-
 //composite
+- (IBAction) compositeSlotMaskAction:(id) sender;
+- (IBAction) compositeSlotMaskFieldAction:(id) sender;
+- (IBAction) compositeSlotMaskSelectAction:(id) sender;
+- (IBAction) compositeSlotMaskDeselectAction:(id) sender;
+- (IBAction) compositeSlotMaskPresentAction:(id) sender;
+- (IBAction) compositeDeselectAction:(id) sender;
+- (IBAction) compositeXl3ModeAction:(id) sender;
+- (IBAction) compositeXl3ModeSetAction:(id) sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

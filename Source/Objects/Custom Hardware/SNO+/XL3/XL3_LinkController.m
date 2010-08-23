@@ -95,6 +95,26 @@
 			 selector : @selector(writeValueChanged:)
 			     name : ORXL3ModelWriteValueChanged
 			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(compositeDeselectRunningChanged:)
+			     name : ORXL3ModelDeselectCompositeRunningChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(compositeSlotMaskChanged:)
+			     name : ORXL3ModelSlotMaskChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(compositeXl3ModeChanged:)
+			     name : ORXL3ModelXl3ModeChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(compositeXl3ModeRunningChanged:)
+			     name : ORXL3ModelXl3ModeRunningChanged
+			   object : model];
 	
 	[notifyCenter addObserver : self
 			 selector : @selector(ipNumberChanged:)
@@ -124,32 +144,18 @@
 	[self autoIncrementChanged:nil];
 	[self basicOpsRunningChanged:nil];
 	[self writeValueChanged:nil];
-
+	//composite
+	[self compositeDeselectRunningChanged:nil];
+	[self compositeSlotMaskChanged:nil];
+	[self compositeXl3ModeChanged:nil];
+	[self compositeXl3ModeRunningChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
 
-	/*
-	
-	[self filePathChanged:nil];
-	[self verboseChanged:nil];
-	[self forceReloadChanged:nil];
-	[self setToggleCrateButtonState];
-	[self loadModeChanged:nil];
-	
-	[self byteRateChanged:nil];
-	
+/*
 	[self ipNumberChanged:nil];
 	[self portNumberChanged:nil];
 	[self initAfterConnectChanged:nil];
-	
-	[self addressChanged:nil];
-	[self infoTypeChanged:nil];
-	[self pingTaskChanged:nil];
-	[self cbTestChanged:nil];
-	[self numTestPointsChanged:nil];
-	[self payloadSizeChanged:nil];
-	
-	[self lamSlotChanged:nil];
 */
 }
 
@@ -231,6 +237,38 @@
 {
 	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
 }
+
+
+#pragma mark •composite
+- (void) compositeXl3ModeChanged:(NSNotification*)aNote
+{
+	[compositeXl3ModePU selectItemWithTag:[model xl3Mode]]; 
+}
+
+- (void) compositeXl3ModeRunningChanged:(NSNotification*)aNote
+{
+	if ([model xl3ModeRunning]) [compositeXl3ModeRunningIndicator startAnimation:model];
+	else [compositeXl3ModeRunningIndicator stopAnimation:model];
+}
+
+- (void) compositeSlotMaskChanged:(NSNotification*)aNote
+{
+	unsigned long mask = [model slotMask];
+	int i;
+	for(i=0; i<16; i++){
+		int pom = mask & 1UL << i;
+		//[[compositeSlotMaskMatrix cellWithTag:i] setIntValue:(mask & 1UL << i)];
+		[[compositeSlotMaskMatrix cellWithTag:i] setIntValue:pom];
+	}
+	[compositeSlotMaskField setIntValue:mask];
+}
+
+- (void) compositeDeselectRunningChanged:(NSNotification*)aNote
+{
+	if ([model deselectCompositeRunning]) [deselectCompositeRunningIndicator startAnimation:model];
+	else [deselectCompositeRunningIndicator stopAnimation:model];
+}
+
 
 #pragma mark •ip connection
 
@@ -344,6 +382,55 @@
 - (IBAction) errorTimeOutAction:(id)sender
 {
 	[[model xl3Link] setErrorTimeOut:[sender indexOfSelectedItem]];
+}
+
+//composite
+- (IBAction) compositeSlotMaskAction:(id) sender 
+{
+	unsigned long mask = 0;
+	int i;
+	for(i=0;i<16;i++){
+		if([[sender cellWithTag:i] intValue]){	
+			mask |= (1L << i);
+		}
+	}
+	[model setSlotMask:mask];	
+}
+
+- (IBAction) compositeSlotMaskFieldAction:(id) sender
+{
+	unsigned long mask = [sender intValue];
+	[model setSlotMask:mask];
+}
+
+- (IBAction) compositeSlotMaskSelectAction:(id) sender
+{
+	[model setSlotMask:0xffffUL];
+}
+
+- (IBAction) compositeSlotMaskDeselectAction:(id) sender
+{
+	[model setSlotMask:0UL];
+}
+
+- (IBAction) compositeSlotMaskPresentAction:(id) sender
+{
+	NSLog(@"not implemented\n");
+}
+
+- (IBAction) compositeDeselectAction:(id) sender
+{
+	[model deselectComposite];
+}
+
+- (IBAction) compositeXl3ModeAction:(id) sender
+{
+	[model setXl3Mode:[[sender selectedItem] tag]];
+}
+
+- (IBAction) compositeXl3ModeSetAction:(id) sender
+{
+	[model writeXl3Mode];
 }
 
 @end
