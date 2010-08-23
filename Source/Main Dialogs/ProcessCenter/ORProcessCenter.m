@@ -273,7 +273,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 		case 2: return 60*60;
 		case 3: return 2*60*60;
 		case 4: return 8*60*60;
-		case 5: return 24*60*60;
+		case 5: return 12*60*60;
+		case 6: return 24*60*60;
 		default: return 0;
 	}
 	return 0;
