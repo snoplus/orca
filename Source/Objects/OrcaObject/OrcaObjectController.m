@@ -31,6 +31,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 {
     if(self = [super initWithWindowNibName:aNibName]){
 		[self setShouldCloseDocument:NO];
+        [self setWindowFrameAutosaveName:aNibName];
     }
     return self;
 }
