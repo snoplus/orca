@@ -53,6 +53,7 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:plotter];
     [[NSNotificationCenter defaultCenter] removeObserver:plotter];
     //-------------------------------------------------------------------------------------------
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 
     [super dealloc];
 }
@@ -179,7 +180,7 @@
         [readoutListView deselectAll:self];
     }
     [self setButtonStates];
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL runInProgress = [gOrcaGlobals runRunning];
     if(runInProgress && [model timerEnabled] && (refreshDelay!=kManualRefresh)){
 		[self doTimedRefresh];
 	}
@@ -545,7 +546,7 @@ else {\
 	}
 
 	if([model refreshRate]>0){
-		[self performSelector:@selector(doTimedRefresh) withObject:self afterDelay:refreshDelay];
+		[self performSelector:@selector(doTimedRefresh) withObject:nil afterDelay:refreshDelay];
 	}
 	else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doTimedRefresh) object:nil];
