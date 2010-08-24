@@ -44,6 +44,8 @@
 #pragma mark ***Script Methods
 - (id) nextScriptConnector;
 - (void) setMessage:(NSString*)aMessage;
+- (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent;
+- (void) mailSent:(NSString*)to;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

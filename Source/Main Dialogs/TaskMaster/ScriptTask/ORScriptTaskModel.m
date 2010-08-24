@@ -23,6 +23,7 @@
 #import "ORScriptTaskModel.h"
 #import "ORScriptInterface.h"
 #import "ORScriptRunner.h"
+#import "ORMailer.h"
 
 NSString*  ORScriptTaskInConnector			= @"ORScriptTaskInConnector";
 NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
@@ -149,6 +150,23 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[task setMessage:aMessage];
 }
 
+- (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent
+{
+	ORMailer* mailer = [ORMailer mailer];
+	[mailer setTo:receipients];
+	[mailer setSubject:subject];
+	NSAttributedString* s = [[NSAttributedString alloc] initWithString:theContent];
+	[mailer setBody:s];
+	[mailer send:self];
+	[s release];
+}
+
+- (void) mailSent:(NSString*)to
+{
+	NSLog(@"Script sent mail to: %@\n",to);
+}
+
+
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -191,5 +209,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 {
    // [self shipTaskRecord:[aNote object] running:NO];
 }
+
+
 
 @end
