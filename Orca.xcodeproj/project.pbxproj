@@ -383,6 +383,13 @@
 		840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840E72E9103DA7BC0070AD70 /* ORAmrelHVModel.m */; };
 		840E72F3103DB4980070AD70 /* AmrelHV.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840E72F2103DB4980070AD70 /* AmrelHV.tif */; };
 		840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F539C97C03A7C80D015F64B1 /* IOKit.framework */; };
+		840F5AC41222C03800D49A75 /* Camera.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840F5ABE1222C03800D49A75 /* Camera.nib */; };
+		840F5AC61222C03800D49A75 /* ORCameraController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840F5AC01222C03800D49A75 /* ORCameraController.h */; };
+		840F5AC71222C03800D49A75 /* ORCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F5AC11222C03800D49A75 /* ORCameraController.m */; };
+		840F5AC81222C03800D49A75 /* ORCameraModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840F5AC21222C03800D49A75 /* ORCameraModel.h */; };
+		840F5AC91222C03800D49A75 /* ORCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F5AC31222C03800D49A75 /* ORCameraModel.m */; };
+		840F5AE81222C4CA00D49A75 /* Camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 840F5AE71222C4CA00D49A75 /* Camera.png */; };
+		840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840F5B181222C90000D49A75 /* QTKit.framework */; };
 		8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */; };
 		8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */; };
 		8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8411A93011063ACC00CD9544 /* ORUsbDeviceModel.h */; };
@@ -2896,6 +2903,13 @@
 		840EFFFD0944B28F00049827 /* ORProcessPulserModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessPulserModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ORProcessPulserModel.m; sourceTree = SOURCE_ROOT; };
 		840EFFFE0944B28F00049827 /* ProcessPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ProcessPulser.nib; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ProcessPulser.nib; sourceTree = SOURCE_ROOT; };
 		840EFFFF0944B28F00049827 /* ProcessPulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ProcessPulser.tif; path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser/ProcessPulser.tif; sourceTree = SOURCE_ROOT; };
+		840F5ABE1222C03800D49A75 /* Camera.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Camera.nib; path = "Source/Objects/Misc Objects/Camera/Camera.nib"; sourceTree = SOURCE_ROOT; };
+		840F5AC01222C03800D49A75 /* ORCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCameraController.h; path = "Source/Objects/Misc Objects/Camera/ORCameraController.h"; sourceTree = SOURCE_ROOT; };
+		840F5AC11222C03800D49A75 /* ORCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCameraController.m; path = "Source/Objects/Misc Objects/Camera/ORCameraController.m"; sourceTree = SOURCE_ROOT; };
+		840F5AC21222C03800D49A75 /* ORCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCameraModel.h; path = "Source/Objects/Misc Objects/Camera/ORCameraModel.h"; sourceTree = SOURCE_ROOT; };
+		840F5AC31222C03800D49A75 /* ORCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCameraModel.m; path = "Source/Objects/Misc Objects/Camera/ORCameraModel.m"; sourceTree = SOURCE_ROOT; };
+		840F5AE71222C4CA00D49A75 /* Camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Camera.png; path = "Source/Objects/Misc Objects/Camera/Camera.png"; sourceTree = SOURCE_ROOT; };
+		840F5B181222C90000D49A75 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = ../../../../System/Library/Frameworks/QTKit.framework; sourceTree = SOURCE_ROOT; };
 		8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSWindow+Extensions.h"; sourceTree = "<group>"; };
 		8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+Extensions.m"; path = "Source/Cocoa Extensions/NSWindow+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		8411A93011063ACC00CD9544 /* ORUsbDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUsbDeviceModel.h; path = "Source/Objects/Hardware/USB/USB Base Classes/ORUsbDeviceModel.h"; sourceTree = SOURCE_ROOT; };
@@ -4853,6 +4867,7 @@
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
 				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
 				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
+				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4862,6 +4877,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				840F5B181222C90000D49A75 /* QTKit.framework */,
 				84F5E11A0A151E0B00707A0F /* OpenGL.framework */,
 				8429C8F80665661100213F1E /* Message.framework */,
 				84AA7A540545B1B2005F64B1 /* Cocoa.framework */,
@@ -5171,9 +5187,8 @@
 				84073A4E05E3F3D3003E62AA /* ORValidatePassword.m */,
 				84073A5105E3F455003E62AA /* ValidatePassword.nib */,
 			);
-			name = ValidatePassword;
-			path = Source/ValidatePassword;
-			sourceTree = SOURCE_ROOT;
+			path = ValidatePassword;
+			sourceTree = "<group>";
 		};
 		8407750B0CEE7CAC0073F5A9 /* HelpCenter */ = {
 			isa = PBXGroup;
@@ -5802,6 +5817,20 @@
 			path = Source/Objects/ProcessLogic/ProcessElements/Timers/Pulser;
 			sourceTree = SOURCE_ROOT;
 		};
+		840F5ABD1222C03800D49A75 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				840F5ABE1222C03800D49A75 /* Camera.nib */,
+				840F5AE71222C4CA00D49A75 /* Camera.png */,
+				840F5AC01222C03800D49A75 /* ORCameraController.h */,
+				840F5AC11222C03800D49A75 /* ORCameraController.m */,
+				840F5AC21222C03800D49A75 /* ORCameraModel.h */,
+				840F5AC31222C03800D49A75 /* ORCameraModel.m */,
+			);
+			name = Camera;
+			path = "Source/Objects/Misc Objects/Camera";
+			sourceTree = SOURCE_ROOT;
+		};
 		8411A92F11063ACC00CD9544 /* USB Base Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -6026,6 +6055,7 @@
 				849516AF10C95382001C8112 /* StateLabel */,
 				840B8135094E4D8D00B1B135 /* Label */,
 				847597450B5EF26500123411 /* SQL */,
+				840F5ABD1222C03800D49A75 /* Camera */,
 			);
 			name = "Misc Objects";
 			path = "Source/Objects/Misc Objects";
@@ -11160,6 +11190,8 @@
 				EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */,
 				4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */,
 				843F28F911ECFEED0077E55B /* ORDataGenReadout.hh in Headers */,
+				840F5AC61222C03800D49A75 /* ORCameraController.h in Headers */,
+				840F5AC81222C03800D49A75 /* ORCameraModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11865,6 +11897,8 @@
 				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
 				EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */,
 				84B11665121ED85100BC8464 /* noHeartbeat.png in Resources */,
+				840F5AC41222C03800D49A75 /* Camera.nib in Resources */,
+				840F5AE81222C4CA00D49A75 /* Camera.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12669,6 +12703,8 @@
 				EFAC073211E9A6CB00336793 /* XL3_Link.m in Sources */,
 				EFAC074011E9A9DB00336793 /* XL3_LinkController.m in Sources */,
 				84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */,
+				840F5AC71222C03800D49A75 /* ORCameraController.m in Sources */,
+				840F5AC91222C03800D49A75 /* ORCameraModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
