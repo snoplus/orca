@@ -112,12 +112,12 @@
 	[super updateWindow];
     [self cameraLockChanged:nil];
     [self updateIntervalChanged:nil];
-	[self cameraRunningChanged:nil];
 	[self movieChanged:nil];
 	[self historyFolderChanged:nil];
 	[self saveFileIntervalChanged:nil];
 	[self keepFileIntervalChanged:nil];
 	[self deviceIndexChanged:nil];
+	[self cameraRunningChanged:nil];
 }
 
 - (void) movieChanged:(NSNotification*)aNote
@@ -128,7 +128,7 @@
 - (void) cameraRunningChanged:(NSNotification*)aNote
 {
 	[runStateField setStringValue:[NSString stringWithFormat:@"%@",[model running]?@"Running":@"Idle"]];
-	[startStopButton setTitle:[model running]?@"Stop":@"Start"];
+	[startStopButton setTitle:[model running]?@"Stop":@"Start"];	
 	[self setButtonStates];
 }
 
@@ -178,14 +178,15 @@
 {
     BOOL locked = [gSecurity isLocked:ORCameraLock];
 	BOOL isRunning = [model running];
+	BOOL validCamera = [[deviceIndexPU titleOfSelectedItem] length]>0;
+	[startStopButton setEnabled:validCamera & !locked];
     [updateIntervalPU setEnabled: !locked ];
     [deviceIndexPU setEnabled: !locked ];
-    [startStopButton setEnabled: !locked ];
     [updateIntervalPU setEnabled: !locked ];
     [setHistoryFolderButton setEnabled: !locked ];
     [saveFileIntervalPU setEnabled: !locked ];
     [keepFileIntervalPU setEnabled: !locked ];
-    [addFrameNowButton setEnabled: !isRunning ];
+    [addFrameNowButton setEnabled: isRunning ];
 }
 
 - (void) updateMovieFileSize
