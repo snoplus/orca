@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="70"/>
+			<integer value="19"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -7579,6 +7579,46 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSPeriodicInterval">75</int>
 												</object>
 											</object>
+											<object class="NSTextField" id="601075910">
+												<reference key="NSNextResponder" ref="626387338"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{688, 66}, {65, 17}}</string>
+												<reference key="NSSuperview" ref="626387338"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSTextFieldCell" key="NSCell" id="128894766">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">138412032</int>
+													<string key="NSContents">Camera</string>
+													<reference key="NSSupport" ref="625969386"/>
+													<reference key="NSControlView" ref="601075910"/>
+													<reference key="NSBackgroundColor" ref="421922390"/>
+													<reference key="NSTextColor" ref="688154912"/>
+												</object>
+											</object>
+											<object class="NSButton" id="59112249">
+												<reference key="NSNextResponder" ref="626387338"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{665, 83}, {116, 87}}</string>
+												<reference key="NSSuperview" ref="626387338"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="582802407">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">134217728</int>
+													<string key="NSContents"/>
+													<reference key="NSSupport" ref="625969386"/>
+													<reference key="NSControlView" ref="59112249"/>
+													<int key="NSButtonFlags">-2042347265</int>
+													<int key="NSButtonFlags2">2</int>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">Camera</string>
+													</object>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">400</int>
+													<int key="NSPeriodicInterval">75</int>
+												</object>
+											</object>
 											<object class="NSTextField" id="126356132">
 												<reference key="NSNextResponder" ref="626387338"/>
 												<int key="NSvFlags">256</int>
@@ -9967,6 +10007,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="650080701"/>
 							<reference ref="479615460"/>
 							<reference ref="488740178"/>
+							<reference ref="601075910"/>
+							<reference ref="59112249"/>
 						</object>
 						<reference key="parent" ref="99778089"/>
 					</object>
@@ -15202,6 +15244,34 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="object" ref="934541550"/>
 						<reference key="parent" ref="715343902"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26207</int>
+						<reference key="object" ref="601075910"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="128894766"/>
+						</object>
+						<reference key="parent" ref="626387338"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26208</int>
+						<reference key="object" ref="59112249"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="582802407"/>
+						</object>
+						<reference key="parent" ref="626387338"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26209</int>
+						<reference key="object" ref="582802407"/>
+						<reference key="parent" ref="59112249"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26210</int>
+						<reference key="object" ref="128894766"/>
+						<reference key="parent" ref="601075910"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -16174,6 +16244,14 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26205.IBPluginDependency</string>
 					<string>26205.ImportedFromIB2</string>
 					<string>26206.IBPluginDependency</string>
+					<string>26207.IBPluginDependency</string>
+					<string>26207.ImportedFromIB2</string>
+					<string>26208.CustomClassName</string>
+					<string>26208.IBAttributePlaceholdersKey</string>
+					<string>26208.IBPluginDependency</string>
+					<string>26208.ImportedFromIB2</string>
+					<string>26209.IBPluginDependency</string>
+					<string>26210.IBPluginDependency</string>
 					<string>267.IBPluginDependency</string>
 					<string>267.ImportedFromIB2</string>
 					<string>2709.IBPluginDependency</string>
@@ -18490,6 +18568,21 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>ObjectFactory</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="59112249"/>
+							<string key="toolTip">ORCameraModel</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>ObjectFactory</string>
@@ -20180,7 +20273,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26206</int>
+			<int key="maxID">26210</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -21748,6 +21841,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>Caen419</string>
 				<string>Caen965</string>
 				<string>CamacCrateSmall</string>
+				<string>Camera</string>
 				<string>CmdLabel</string>
 				<string>Container</string>
 				<string>ContainerInput</string>
@@ -21940,6 +22034,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{16, 128}</string>
 				<string>{16, 128}</string>
 				<string>{283, 154}</string>
+				<string>{75, 75}</string>
 				<string>{70, 11}</string>
 				<string>{105, 105}</string>
 				<string>{100, 34}</string>
