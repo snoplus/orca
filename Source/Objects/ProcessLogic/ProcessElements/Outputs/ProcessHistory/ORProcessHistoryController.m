@@ -39,6 +39,10 @@
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+	//normally we would not retain an IB object. But we are doing some delayed calls to it and
+	//need to make sure it sticks around if the controller window is closed. We retained it
+	//elsewhere and so we release it here.
+	[plotter release];
 	[super dealloc];
 }
 
@@ -65,7 +69,9 @@
 		[(ORTimeAxis*)[plotter xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release]; 
 	}
-	
+	//normally we would not retain an IB object. But we are doing some delayed calls to it and
+	//need to make sure it sticks around if the controller window is closed.
+	[plotter retain];
 }
 
 #pragma mark ¥¥¥Notifications
