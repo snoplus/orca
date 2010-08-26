@@ -203,7 +203,7 @@
 #pragma mark •••Actions
 - (IBAction) addFrameNowAction:(id)sender
 {
-	[model addFramNow];
+	[model addFrameNow];
 }
 
 - (IBAction) deviceIndexAction:(id)sender

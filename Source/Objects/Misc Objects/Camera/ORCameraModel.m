@@ -347,7 +347,7 @@ NSString* ORCameraModelMovieChanged				= @"ORCameraModelMovieChanged";
 - (void) addFrameNow
 {
     @synchronized(self){
-		[self addFrame];
+		[self addFrameNow];
 	}
 }
 @end
