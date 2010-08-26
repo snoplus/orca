@@ -87,12 +87,10 @@ NSString* ORCameraModelMovieChanged				= @"ORCameraModelMovieChanged";
 	
 }
 
-
-//- (NSString*) helpURL
-//{
-	//return @"Subsystems/Containers_and_Dynamic_Cameras.html";
-//}
-
+- (NSString*) helpURL
+{
+	return @"USB/Camera.html";
+}
 
 - (void) makeMainController
 {
