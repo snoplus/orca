@@ -274,9 +274,6 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
 {
     isRunning = YES; 
 	BOOL dataReady = NO;
-	++waveFormCount[3];  //grab the channel and inc the count
-	++waveFormCount[14];  //grab the channel and inc the count
-	++waveFormCount[30];  //grab the channel and inc the count
 
     @try {
 		if(dataReady){
