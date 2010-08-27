@@ -65,21 +65,27 @@
 	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
+	NSNumberFormatter* aFormatter = [[NSNumberFormatter alloc] init];
+	[aFormatter setFormat:@"0.00;0;-0.00"];
+
 	int i;
 	for(i=0;i<16;i++){
 		//settings Page
 		[[enabled01Matrix cellAtRow:i column:0] setTag:i];
 		[[threshold01Matrix cellAtRow:i column:0]  setTag:i];
 		[[rate1TextFields cellAtRow:i column:0]  setTag:i];
+		[[rate1TextFields cellAtRow:i column:0] setFormatter:aFormatter];
 		
 		[[enabled02Matrix cellAtRow:i column:0]  setTag:i+16];
 		[[threshold02Matrix cellAtRow:i column:0]  setTag:i+16];
 		[[rate2TextFields cellAtRow:i column:0]  setTag:i+16];
-		
+		[[rate2TextFields cellAtRow:i column:0] setFormatter:aFormatter];
+
 		//settings Page
 		[[enabled1Matrix cellAtRow:i column:0]  setTag:i];
 		[[enabled2Matrix cellAtRow:i column:0]  setTag:i+16];
 	}
+	[aFormatter release];
 	
 	
 	[super awakeFromNib];
@@ -197,6 +203,8 @@
 {
 	short i;
 	for(i=0;i<kNumPxi6289Channels/2;i++){
+		[[enabled1Matrix cellWithTag:i] setState:[model enabled:i]];
+		[[enabled2Matrix cellWithTag:i+16] setState:[model enabled:i+16]];
 		[[enabled01Matrix cellWithTag:i] setState:[model enabled:i]];
 		[[enabled02Matrix cellWithTag:i+16] setState:[model enabled:i+16]];
 	}
@@ -258,9 +266,11 @@
     [addressText setEnabled:!locked && !runInProgress];
     [initButton setEnabled:!lockedOrRunningMaintenance];
 	
+	[enabled1Matrix setEnabled:!lockedOrRunningMaintenance];
 	[enabled01Matrix setEnabled:!lockedOrRunningMaintenance];
 	[threshold01Matrix setEnabled:!lockedOrRunningMaintenance];
 	
+	[enabled2Matrix setEnabled:!lockedOrRunningMaintenance];
 	[enabled02Matrix setEnabled:!lockedOrRunningMaintenance];
 	[threshold02Matrix setEnabled:!lockedOrRunningMaintenance];
 }

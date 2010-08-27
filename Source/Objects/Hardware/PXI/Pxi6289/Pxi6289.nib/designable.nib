@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1346"/>
+			<integer value="1341"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2167,7 +2167,7 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																		<int key="NSCellFlags2">71303168</int>
 																		<real value="0.0" key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
-																		<object class="NSNumberFormatter" key="NSFormatter" id="792060993">
+																		<object class="NSNumberFormatter" key="NSFormatter" id="118194515">
 																			<object class="NSMutableDictionary" key="NS.attributes">
 																				<bool key="EncodedWithXMLCoder">YES</bool>
 																				<object class="NSArray" key="dict.sortedKeys">
@@ -2201,7 +2201,7 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<object class="NSDictionary" key="NSAttributes" id="203380448">
+																				<object class="NSDictionary" key="NSAttributes" id="355639864">
 																					<bool key="EncodedWithXMLCoder">YES</bool>
 																					<reference key="dict.sortedKeys" ref="0"/>
 																					<object class="NSMutableArray" key="dict.values">
@@ -2209,7 +2209,7 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																					</object>
 																				</object>
 																			</object>
-																			<object class="NSDecimalNumberPlaceholder" key="NS.min" id="92482614">
+																			<object class="NSDecimalNumberPlaceholder" key="NS.min" id="877118438">
 																				<int key="NS.exponent">0</int>
 																				<int key="NS.length">0</int>
 																				<bool key="NS.negative">YES</bool>
@@ -2217,7 +2217,7 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																				<int key="NS.mantissa.bo">1</int>
 																				<bytes key="NS.mantissa">AAAAAAAAAAAAAAAAAAAAAA</bytes>
 																			</object>
-																			<reference key="NS.max" ref="92482614"/>
+																			<reference key="NS.max" ref="877118438"/>
 																			<object class="NSDecimalNumberHandler" key="NS.rounding">
 																				<int key="NS.roundingmode">3</int>
 																				<bool key="NS.raise.overflow">YES</bool>
@@ -2240,7 +2240,7 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																		<int key="NSCellFlags2">71303168</int>
 																		<real value="0.0" key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
-																		<object class="NSNumberFormatter" key="NSFormatter" id="513041297">
+																		<object class="NSNumberFormatter" key="NSFormatter" id="864202722">
 																			<object class="NSMutableDictionary" key="NS.attributes">
 																				<bool key="EncodedWithXMLCoder">YES</bool>
 																				<object class="NSArray" key="dict.sortedKeys">
@@ -2272,10 +2272,10 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="203380448"/>
+																				<reference key="NSAttributes" ref="355639864"/>
 																			</object>
-																			<reference key="NS.min" ref="92482614"/>
-																			<reference key="NS.max" ref="92482614"/>
+																			<reference key="NS.min" ref="877118438"/>
+																			<reference key="NS.max" ref="877118438"/>
 																			<object class="NSDecimalNumberHandler" key="NS.rounding">
 																				<int key="NS.roundingmode">3</int>
 																				<bool key="NS.raise.overflow">YES</bool>
@@ -4849,7 +4849,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 											<boolean value="YES"/>
 											<object class="NSAttributedString" id="30562145">
 												<string key="NSString">0</string>
-												<reference key="NSAttributes" ref="203380448"/>
+												<reference key="NSAttributes" ref="355639864"/>
 											</object>
 											<string>.</string>
 											<integer value="1000"/>
@@ -4869,10 +4869,10 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 									</object>
 									<object class="NSAttributedString" key="NS.nan">
 										<string key="NSString">NaN</string>
-										<reference key="NSAttributes" ref="203380448"/>
+										<reference key="NSAttributes" ref="355639864"/>
 									</object>
-									<reference key="NS.min" ref="92482614"/>
-									<reference key="NS.max" ref="92482614"/>
+									<reference key="NS.min" ref="877118438"/>
+									<reference key="NS.max" ref="877118438"/>
 									<nil key="NS.rounding"/>
 									<string key="NS.decimal">.</string>
 									<string key="NS.thousand">,</string>
@@ -7932,7 +7932,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="329605369"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="792060993"/>
+							<reference ref="118194515"/>
 						</object>
 						<reference key="parent" ref="984053400"/>
 					</object>
@@ -7941,7 +7941,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="912886225"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="513041297"/>
+							<reference ref="864202722"/>
 						</object>
 						<reference key="parent" ref="984053400"/>
 					</object>
@@ -8479,12 +8479,12 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">3186</int>
-						<reference key="object" ref="792060993"/>
+						<reference key="object" ref="118194515"/>
 						<reference key="parent" ref="329605369"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">3187</int>
-						<reference key="object" ref="513041297"/>
+						<reference key="object" ref="864202722"/>
 						<reference key="parent" ref="912886225"/>
 					</object>
 				</object>
