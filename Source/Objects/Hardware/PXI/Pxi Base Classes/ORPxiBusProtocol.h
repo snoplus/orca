@@ -1,5 +1,5 @@
 //
-//  ORVmeBusProtocol.h
+//  ORPxiBusProtocol.h
 //  Orca
 //
 //  Created by Mark Howe on Thurs Aug 26 2010

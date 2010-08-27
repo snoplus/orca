@@ -223,8 +223,8 @@
         [model pxiSysReset:&cdata];
     }
 	@catch(NSException* localException) {
-        NSLog(@"*** Unable To Send VME SYSRESET ***\n");
-        NSLog(@"*** Check VME Bus Power and Cables ***\n");
+        NSLog(@"*** Unable To Send PXI SYSRESET ***\n");
+        NSLog(@"*** Check PXI Bus Power and Cables ***\n");
         NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
     }
@@ -284,7 +284,7 @@
 					
 					break;
 			}
-			NSLog(@"Vme Read @ (0x%08x): 0x%08x\n",address,ldata);
+			NSLog(@"PXI Read @ (0x%08x): 0x%08x\n",address,ldata);
 			address+=[addressStepper increment];
 		}while(address<endAddress);
 		
@@ -340,8 +340,8 @@
 			address+=[addressStepper increment];
 			
 		}while(address<endAddress);
-		if([model doRange]) NSLog(@"Vme Write Range @ (0x%08x-0x%08x): 0x%08x\n",startAddress,endAddress,ldata);
-		else				NSLog(@"Vme Write @ (0x%08x): 0x%08x\n",startAddress,ldata);
+		if([model doRange]) NSLog(@"PXI Write Range @ (0x%08x-0x%08x): 0x%08x\n",startAddress,endAddress,ldata);
+		else				NSLog(@"PXI Write @ (0x%08x): 0x%08x\n",startAddress,ldata);
 		
     }
 	@catch(NSException* localException) {
