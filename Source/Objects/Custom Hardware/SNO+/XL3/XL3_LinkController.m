@@ -25,6 +25,10 @@
 #import "ORXL3Model.h"
 #import "ORSNOCrateModel.h"
 
+static NSArray* xl3RWModes;
+static NSDictionary* xl3RWSelects;
+static NSDictionary* xl3RWAddresses;
+
 @implementation XL3_LinkController
 
 #pragma mark •••Initialization
@@ -43,7 +47,18 @@
 
 - (void) awakeFromNib
 {
+	basicSize	= NSMakeSize(452,290);
+	compositeSize	= NSMakeSize(452,452);
+	blankView = [[NSView alloc] init];
+	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+
 	[super awakeFromNib];
+
+	NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]]; //uniqueIdNumber?
+	int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+
+	[tabView selectTabViewItemAtIndex: index];	
 	[self populatePullDown];
 }	
 
@@ -115,7 +130,22 @@
 			 selector : @selector(compositeXl3ModeRunningChanged:)
 			     name : ORXL3ModelXl3ModeRunningChanged
 			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(compositeXl3RWAddressChanged:)
+			     name : ORXL3ModelXl3RWAddressValueChanged
+			   object : model];
 	
+	[notifyCenter addObserver : self
+			 selector : @selector(compositeXL3RWDataChanged:)
+			     name : ORXL3ModelXl3RWDataValueChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(compositeXl3RWRunningChanged:)
+			     name : ORXL3ModelXl3RWRunningChanged
+			   object : model];
+
 	[notifyCenter addObserver : self
 			 selector : @selector(ipNumberChanged:)
 			     name : XL3_LinkIPNumberChanged
@@ -166,9 +196,35 @@
 	[lockButton setEnabled:secure];
 }
 
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
+{
+	if([tabView indexOfTabViewItem:item] == 0){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:basicSize];
+		[[self window] setContentView:tabView];
+	}
+	else if([tabView indexOfTabViewItem:item] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:compositeSize];
+		[[self window] setContentView:tabView];
+	}
+	else if([tabView indexOfTabViewItem:item] == 2){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:basicSize];
+		[[self window] setContentView:tabView];
+	}
+	else if([tabView indexOfTabViewItem:item] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:basicSize];
+		[[self window] setContentView:tabView];
+	}
+		
+	NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]];
+	int index = [tabView indexOfTabViewItem:item];
+	[[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+}
+
 #pragma mark •••Interface Management
-
-
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
 	BOOL locked = [gSecurity isLocked:[model xl3LockName]];   
@@ -256,9 +312,7 @@
 	unsigned long mask = [model slotMask];
 	int i;
 	for(i=0; i<16; i++){
-		int pom = mask & 1UL << i;
-		//[[compositeSlotMaskMatrix cellWithTag:i] setIntValue:(mask & 1UL << i)];
-		[[compositeSlotMaskMatrix cellWithTag:i] setIntValue:pom];
+		[[compositeSlotMaskMatrix cellWithTag:i] setIntValue:(mask & 1UL << i)];
 	}
 	[compositeSlotMaskField setIntValue:mask];
 }
@@ -269,6 +323,28 @@
 	else [deselectCompositeRunningIndicator stopAnimation:model];
 }
 
+- (void) compositeXl3RWAddressChanged:(NSNotification*)aNote
+{
+	[compositeXl3RWAddressValueField setIntValue:[model xl3RWAddressValue]];
+	[compositeXl3RWModePU selectItemAtIndex:([model xl3RWAddressValue] >> 28)];
+
+	[compositeXl3RWSelectPU selectItemWithTitle:
+	 [[xl3RWSelects allKeysForObject:[NSNumber numberWithInt:[model xl3RWAddressValue] >> 20 & 0x0FF]] lastObject]];
+	
+	[compositeXl3RWRegisterPU selectItemWithTitle:
+	 [[xl3RWAddresses allKeysForObject:[NSNumber numberWithInt:[model xl3RWAddressValue] & 0xFFF]] lastObject]];
+}
+
+- (void) compositeXL3RWDataChanged:(NSNotification*)aNote
+{
+	[compositeXl3RWDataValueField setIntValue:[model xl3RWDataValue]];
+}
+
+- (void) compositeXl3RWRunningChanged:(NSNotification *)aNote
+{
+	if ([model xl3RWRunning]) [compositeXl3RWRunningIndicator startAnimation:model];
+	else [compositeXl3RWRunningIndicator stopAnimation:model];
+}
 
 #pragma mark •ip connection
 
@@ -276,7 +352,6 @@
 {
 	
 }
-
 
 - (void) connectStateChanged:(NSNotification*)aNote
 {
@@ -313,12 +388,93 @@
 
 - (void) populatePullDown
 {
+	xl3RWModes = [[NSArray alloc] initWithObjects:@"0: REG_READ",@"1: REG_WRITE",
+		       @"2: MEM_READ",@"3: MEM_WRITE", nil];
+
+	xl3RWSelects = [[NSDictionary alloc] initWithObjectsAndKeys:
+			[NSNumber numberWithInt:0x00], @"FEC 0", 
+			[NSNumber numberWithInt:0x01], @"FEC 1",
+			[NSNumber numberWithInt:0x02], @"FEC 2",
+			[NSNumber numberWithInt:0x03], @"FEC 3",
+			[NSNumber numberWithInt:0x04], @"FEC 4",
+			[NSNumber numberWithInt:0x05], @"FEC 5",
+			[NSNumber numberWithInt:0x06], @"FEC 6",
+			[NSNumber numberWithInt:0x07], @"FEC 7",
+			[NSNumber numberWithInt:0x08], @"FEC 8",
+			[NSNumber numberWithInt:0x09], @"FEC 9",
+			[NSNumber numberWithInt:0x0A], @"FEC 10",
+			[NSNumber numberWithInt:0x0B], @"FEC 11",
+			[NSNumber numberWithInt:0x0C], @"FEC 12",
+			[NSNumber numberWithInt:0x0D], @"FEC 13",
+			[NSNumber numberWithInt:0x0E], @"FEC 14",
+			[NSNumber numberWithInt:0x0F], @"FEC 15",
+			[NSNumber numberWithInt:0x10], @"CTC",
+			[NSNumber numberWithInt:0x20], @"XL3",
+			nil];
+
+	xl3RWAddresses = [[NSDictionary alloc] initWithObjectsAndKeys:
+			  [NSNumber numberWithInt:0x00], @"xl3 select",
+			  [NSNumber numberWithInt:0x01], @"xl3 data avail",
+			  [NSNumber numberWithInt:0x02], @"xl3 ctrl&stat",
+			  [NSNumber numberWithInt:0x03], @"xl3 slot mask",
+			  [NSNumber numberWithInt:0x04], @"xl3 dac clock",
+			  [NSNumber numberWithInt:0x05], @"xl3 hv relay",
+			  [NSNumber numberWithInt:0x06], @"xl3 xilinx csr",
+			  [NSNumber numberWithInt:0x07], @"xl3 test",
+			  [NSNumber numberWithInt:0x08], @"xl3 hv csr",
+			  [NSNumber numberWithInt:0x09], @"xl3 hv setpoints",
+			  [NSNumber numberWithInt:0x0A], @"xl3 hv vlt read",
+			  [NSNumber numberWithInt:0x0B], @"xl3 hv crnt read",
+			  [NSNumber numberWithInt:0x0C], @"xl3 vm",
+			  [NSNumber numberWithInt:0x0E], @"xl3 vr",
+			  [NSNumber numberWithInt:0x20], @"fec ctrl&stat",
+			  [NSNumber numberWithInt:0x21], @"fec adc value",
+			  [NSNumber numberWithInt:0x22], @"fec vlt mon",
+			  [NSNumber numberWithInt:0x23], @"fec ped enable",
+			  [NSNumber numberWithInt:0x24], @"fec dac prg",
+			  [NSNumber numberWithInt:0x25], @"fec caldac prg",
+			  [NSNumber numberWithInt:0x26], @"fec hvc csr",
+			  [NSNumber numberWithInt:0x27], @"fec cmos spy out",
+			  [NSNumber numberWithInt:0x28], @"fec cmos full",
+			  [NSNumber numberWithInt:0x29], @"fec cmos select",
+			  [NSNumber numberWithInt:0x2A], @"fec cmos 1_16",
+			  [NSNumber numberWithInt:0x2B], @"fec cmos 17_32",
+			  [NSNumber numberWithInt:0x2C], @"fec cmos lgisel",
+			  [NSNumber numberWithInt:0x2D], @"fec board id",
+			  [NSNumber numberWithInt:0x80], @"fec seq out csr",
+			  [NSNumber numberWithInt:0x84], @"fec seq in csr",
+			  [NSNumber numberWithInt:0x88], @"fec cmos dt avl",
+			  [NSNumber numberWithInt:0x8C], @"fec cmos chp sel",
+			  [NSNumber numberWithInt:0x90], @"fec cmos chp dis",
+			  [NSNumber numberWithInt:0x90], @"fec cmos dat out",
+			  [NSNumber numberWithInt:0x9C], @"fec fifo read",
+			  [NSNumber numberWithInt:0x9D], @"fec fifo writ",
+			  [NSNumber numberWithInt:0x9E], @"fec fifo diff",
+			  [NSNumber numberWithInt:0x101], @"fec cmos msd cnt",
+			  [NSNumber numberWithInt:0x102], @"fec cmos busy rg",
+			  [NSNumber numberWithInt:0x103], @"fec cmos tot cnt",
+			  [NSNumber numberWithInt:0x104], @"fec cmos test id",
+			  [NSNumber numberWithInt:0x105], @"fec cmos shft rg",
+			  [NSNumber numberWithInt:0x106], @"fec cmos arry pt",
+			  [NSNumber numberWithInt:0x107], @"fec cmos cnt inf",
+			  nil];
+			
 	short	i;
 	[selectedRegisterPU removeAllItems];
 	for (i = 0; i < [model getNumberRegisters]; i++) {
 		[selectedRegisterPU insertItemWithTitle:[model getRegisterName:i] atIndex:i];
 	}
 	[self selectedRegisterChanged:nil];
+
+	[compositeXl3RWModePU removeAllItems];
+	[compositeXl3RWModePU addItemsWithTitles:xl3RWModes];
+	
+	[compositeXl3RWSelectPU removeAllItems];
+	[compositeXl3RWSelectPU addItemsWithTitles:[xl3RWSelects keysSortedByValueUsingSelector:@selector(compare:)]];
+	
+	[compositeXl3RWRegisterPU removeAllItems];
+	[compositeXl3RWRegisterPU addItemsWithTitles:[xl3RWAddresses keysSortedByValueUsingSelector:@selector(compare:)]];
+	//for (id key in xl3RWAddresses) [compositeXl3RWRegisterPU addItemWithTitle:key]; // doesn't guarantee the order
 }
 
 
@@ -371,18 +527,9 @@
 
 - (IBAction) writeValueAction:(id) sender;
 {
-	[model setWriteValue:[sender intValue]];
+	[model setWriteValue:[sender unsignedIntValue]];
 }
 
-- (void) toggleConnectAction:(id)sender
-{
-	[[model xl3Link] toggleConnect];
-}
-
-- (IBAction) errorTimeOutAction:(id)sender
-{
-	[[model xl3Link] setErrorTimeOut:[sender indexOfSelectedItem]];
-}
 
 //composite
 - (IBAction) compositeSlotMaskAction:(id) sender 
@@ -400,6 +547,7 @@
 - (IBAction) compositeSlotMaskFieldAction:(id) sender
 {
 	unsigned long mask = [sender intValue];
+	if (mask > 0xFFFFUL) mask = 0xFFFF;
 	[model setSlotMask:mask];
 }
 
@@ -431,6 +579,53 @@
 - (IBAction) compositeXl3ModeSetAction:(id) sender
 {
 	[model writeXl3Mode];
+}
+
+- (IBAction) compositeXl3RWAddressValueAction:(id)sender
+{
+	[model setXl3RWAddressValue:[sender intValue]];
+}	
+
+- (IBAction) compositeXl3RWModeAction:(id)sender
+{
+	unsigned long addressValue = [model xl3RWAddressValue];
+	addressValue = addressValue & 0x0FFFFFFF | [sender indexOfSelectedItem] << 28;
+	[model setXl3RWAddressValue:addressValue];
+}
+
+- (IBAction) compositeXl3RWSelectAction:(id)sender
+{
+	unsigned long addressValue = [model xl3RWAddressValue];
+	addressValue = addressValue & 0xF00FFFFF | [[xl3RWSelects objectForKey:[[sender selectedItem] title]] intValue] << 20;
+	[model setXl3RWAddressValue:addressValue];
+}
+
+- (IBAction) compositeXl3RWRegisterAction:(id)sender
+{
+	unsigned long addressValue = [model xl3RWAddressValue];
+	addressValue = addressValue & 0xFFF00000 | [[xl3RWAddresses objectForKey:[[sender selectedItem] title]] intValue];
+	[model setXl3RWAddressValue:addressValue];
+}
+
+- (IBAction) compositeXl3RWDataValueAction:(id)sender;
+{
+	[model setXl3RWDataValue:[sender intValue]];
+}
+
+- (IBAction) compositeXl3RWSend:(id)sender
+{
+	[model compositeXl3RW];
+}
+
+//connection
+- (void) toggleConnectAction:(id)sender
+{
+	[[model xl3Link] toggleConnect];
+}
+
+- (IBAction) errorTimeOutAction:(id)sender
+{
+	[[model xl3Link] setErrorTimeOut:[sender indexOfSelectedItem]];
 }
 
 @end

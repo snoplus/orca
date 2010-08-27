@@ -43,6 +43,7 @@ static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 	{ @"XL3VRReg",		XL3_VR_REG}
 };
 
+
 #pragma mark •••Definitions
 
 NSString* ORXL3ModelSelectedRegisterChanged =		@"ORXL3ModelSelectedRegisterChanged";
@@ -55,6 +56,10 @@ NSString* ORXL3ModelDeselectCompositeRunningChanged =	@"ORXL3ModelDeselectCompos
 NSString* ORXL3ModelXl3ModeChanged =			@"ORXL3ModelXl3ModeChanged";
 NSString* ORXL3ModelSlotMaskChanged =			@"ORXL3ModelSlotMaskChanged";
 NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
+NSString* ORXL3ModelXl3RWAddressValueChanged =		@"ORXL3ModelXl3RWAddressValueChanged";
+NSString* ORXL3ModelXl3RWDataValueChanged =		@"ORXL3ModelXl3RWDataValueChanged";
+NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
+
 
 @interface ORXL3Model (private)
 - (void) doBasicOp;
@@ -323,6 +328,42 @@ NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeRunningChanged object:self];
 }
 
+- (BOOL) xl3RWRunning
+{
+	return xl3RWRunning;
+}
+
+- (void) setXl3RWRunning:(BOOL)anXl3RWRunning
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3RWRunning:xl3RWRunning];
+	xl3RWRunning = anXl3RWRunning;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3RWRunningChanged object:self];
+}
+
+- (unsigned long) xl3RWAddressValue
+{
+	return xl3RWAddressValue;
+}
+
+- (void) setXl3RWAddressValue:(unsigned long)anXl3RWAddressValue
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3RWAddressValue:xl3RWAddressValue];
+	xl3RWAddressValue = anXl3RWAddressValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3RWAddressValueChanged object:self];
+}
+
+- (unsigned long) xl3RWDataValue
+{
+	return xl3RWDataValue;
+}
+
+- (void) setXl3RWDataValue:(unsigned long)anXl3RWDataValue;
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3RWDataValue:xl3RWDataValue];
+	xl3RWDataValue = anXl3RWDataValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3RWDataValueChanged object:self];
+}
+
 - (int) slotConv
 {
     return [self slot];
@@ -362,7 +403,11 @@ NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 	[self setRepeatOpCount:		[decoder decodeIntForKey:	@"ORXL3ModelRepeatOpCount"]];
 	[self setXl3Mode:		[decoder decodeIntForKey:	@"ORXL3ModelXl3Mode"]];
 	[self setSlotMask:		[decoder decodeIntForKey:	@"ORXL3ModelSlotMask"]];
-	
+	[self setXl3RWAddressValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWAddressValue"]];
+	[self setXl3RWDataValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWDataValue"]];
+
+	if (xl3Mode == 0) [self setXl3Mode: 1];
+
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
@@ -378,6 +423,8 @@ NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 	[encoder encodeInt:repeatOpCount	forKey:@"ORXL3ModelRepeatOpCount"];
 	[encoder encodeInt:xl3Mode		forKey:@"ORXL3ModelXl3Mode"];
 	[encoder encodeInt:slotMask		forKey:@"ORXL3ModelSlotMask"];
+	[encoder encodeInt:xl3RWAddressValue	forKey:@"ORXL3ModelXl3RWAddressValue"];
+	[encoder encodeInt:xl3RWDataValue	forKey:@"ORXL3ModelXl3RWDataValue"];
 }
 
 #pragma mark •••Hardware Access
@@ -405,36 +452,60 @@ NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 	*/
 }
 
-- (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue
+- (void) writeHardwareRegister:(unsigned long)regAddress value:(unsigned long) aValue
 {
-	// add FEC bit?
 	unsigned long xl3Address = regAddress | WRITE_REG;
-	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 writeHadwareRegister at address: 0x%08x failed\n", regAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+	}
 }
 
-- (unsigned long) readHardwareRegister:(unsigned long) regAddress
+- (unsigned long) readHardwareRegister:(unsigned long)regAddress
 {
 	unsigned long xl3Address = regAddress | READ_REG;
 	unsigned long aValue = 0UL;
-	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 readHadwareRegister at address: 0x%08x failed\n", regAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+	}
+	
 	return aValue;
 }
 
-- (void) writeHardwareMemory:(unsigned long) memAddress value:(unsigned long) aValue
+- (void) writeHardwareMemory:(unsigned long)memAddress value:(unsigned long)aValue
 {
 	unsigned long xl3Address = memAddress | WRITE_MEM;
-	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 writeHadwareMemory at address: 0x%08x failed\n", memAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+	}
 }
 
 - (unsigned long) readHardwareMemory:(unsigned long) memAddress
 {
-	//FEC bit again
 	unsigned long xl3Address = memAddress | READ_MEM;
 	unsigned long aValue = 0UL;
-	[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:xl3Address withData:&aValue];
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3 readHadwareMemory at address: 0x%08x failed\n", memAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+	}
 	return aValue;
 }
-
 
 - (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue
 {
@@ -530,10 +601,10 @@ NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 	NSLog(@"Deselect FECs...\n");
 	@try {
 		[[self xl3Link] sendCommand:DESELECT_FECS_ID expectResponse:YES];
-		NSLog(@"OK\n");
+		NSLog(@"ok\n");
 	}
 	@catch (NSException * e) {
-		NSLog(@"Deselect FECs FAILED; error: %@ reason: %@\n", [e name], [e reason]);
+		NSLog(@"Deselect FECs failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
 	[self setDeselectCompositeRunning:NO];
 }
@@ -554,16 +625,33 @@ NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 	}
 	
 	[self setXl3ModeRunning:YES];
-	NSLog(@"Set XL3 Mode: %d slot mask: 0x%04x ...\n", [self xl3Mode], [self slotMask]);
+	NSLog(@"Set XL3 mode: %d slot mask: 0x%04x ...\n", [self xl3Mode], [self slotMask]);
 	@try {
 		[[self xl3Link] sendCommand:CHANGE_MODE_ID withPayload:&payload expectResponse:YES];
-		NSLog(@"OK\n");
+		NSLog(@"ok\n");
 	}
 	@catch (NSException* e) {
-		NSLog(@"Set XL3 Mode FAILED; error: %@ reason: %@\n", [e name], [e reason]);
+		NSLog(@"Set XL3 mode failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
 	[self setXl3ModeRunning:NO];
 	//XL3 sends the payload back not touching it, should we check?	
+}
+
+- (void) compositeXl3RW
+{
+	unsigned long aValue = [self xl3RWDataValue];
+	NSLog(@"XL3_rw to address: 0x%08x with data: 0x%08x\n", [self xl3RWAddressValue], aValue);
+	[self setXl3RWRunning: YES];
+	
+	@try {
+		[xl3Link sendFECCommand:0UL toAddress:[self xl3RWAddressValue] withData:&aValue];
+		NSLog(@"XL3_rw returned data: 0x%08x\n", aValue);
+	}
+	@catch (NSException* e) {
+		NSLog(@"XL3_rw failed; error: %@ reason: %@\n", [e name], [e reason]);
+	}
+		
+	[self setXl3RWRunning: NO];
 }
 
 - (void) reset

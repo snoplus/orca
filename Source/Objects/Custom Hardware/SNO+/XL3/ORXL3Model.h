@@ -44,7 +44,6 @@ enum {
 	kXl3NumRegisters //must be last
 };
 
-
 @class XL3_Link;
 @class ORCommandList;
 
@@ -63,6 +62,9 @@ enum {
 	unsigned int	xl3Mode;
 	unsigned long	slotMask;
 	BOOL		xl3ModeRunning;
+	unsigned long	xl3RWAddressValue;
+	unsigned long	xl3RWDataValue;
+	BOOL		xl3RWRunning;
 }
 
 #pragma mark •••Initialization
@@ -103,6 +105,12 @@ enum {
 - (void) setXl3Mode:(unsigned int)aXl3Mode;
 - (BOOL) xl3ModeRunning;
 - (void) setXl3ModeRunning:(BOOL)anXl3ModeRunning;
+- (BOOL) xl3RWRunning;
+- (void) setXl3RWRunning:(BOOL)anXl3RWRunning;
+- (unsigned long) xl3RWAddressValue;
+- (void) setXl3RWAddressValue:(unsigned long)anXl3RWAddressValue;
+- (unsigned long) xl3RWDataValue;
+- (void) setXl3RWDataValue:(unsigned long)anXl3RWDataValue;
 
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
@@ -132,6 +140,7 @@ enum {
 #pragma mark •••Composite
 - (void) deselectComposite;
 - (void) writeXl3Mode;
+- (void) compositeXl3RW;
 - (void) reset;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
@@ -151,3 +160,6 @@ extern NSString* ORXL3ModelDeselectCompositeRunningChanged;
 extern NSString* ORXL3ModelXl3ModeChanged;
 extern NSString* ORXL3ModelSlotMaskChanged;
 extern NSString* ORXL3ModelXl3ModeRunningChanged;
+extern NSString* ORXL3ModelXl3RWAddressValueChanged;
+extern NSString* ORXL3ModelXl3RWDataValueChanged;
+extern NSString* ORXL3ModelXl3RWRunningChanged;

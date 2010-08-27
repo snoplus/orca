@@ -22,8 +22,13 @@
 
 @interface XL3_LinkController : OrcaObjectController
 {
+	NSView* blankView;
+	NSSize  basicSize;
+	NSSize  compositeSize;
+	IBOutlet NSTabView*		tabView;
 	IBOutlet NSButton*		lockButton;
 	//basic
+	IBOutlet NSButton*		basicLockButton;
 	IBOutlet NSPopUpButton*		selectedRegisterPU;
 	IBOutlet NSButton*		basicReadButton;
 	IBOutlet NSButton*		basicWriteButton;
@@ -38,16 +43,24 @@
 	IBOutlet NSTextField*		writeValueField;
 	IBOutlet NSStepper*		writeValueStepper;
 	//composite
+	IBOutlet NSButton*		compositeLockButton;
 	IBOutlet NSProgressIndicator*	deselectCompositeRunningIndicator;
 	IBOutlet NSMatrix*		compositeSlotMaskMatrix;
 	IBOutlet NSTextField*		compositeSlotMaskField;
 	IBOutlet NSPopUpButton*		compositeXl3ModePU;
 	IBOutlet NSButton*		compositeSetXl3ModeButton;
 	IBOutlet NSProgressIndicator*	compositeXl3ModeRunningIndicator;
-
+	IBOutlet NSTextField*		compositeXl3RWAddressValueField;
+	IBOutlet NSPopUpButton*		compositeXl3RWModePU;
+	IBOutlet NSPopUpButton*		compositeXl3RWSelectPU;
+	IBOutlet NSPopUpButton*		compositeXl3RWRegisterPU;
+	IBOutlet NSTextField*		compositeXl3RWDataValueField;	
+	IBOutlet NSProgressIndicator*	compositeXl3RWRunningIndicator;
 	//connection
 	IBOutlet NSButton*		toggleConnectButton;
 	IBOutlet NSPopUpButton*		errorTimeOutPU;
+
+	
 }	
 
 #pragma mark •••Initialization
@@ -59,6 +72,8 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) checkGlobalSecurity;
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 
 #pragma mark •••Interface Management
 - (void) settingsLockChanged:(NSNotification*)aNotification;
@@ -75,6 +90,9 @@
 - (void) compositeXl3ModeChanged:(NSNotification*)aNote;
 - (void) compositeSlotMaskChanged:(NSNotification*)aNote;
 - (void) compositeDeselectRunningChanged:(NSNotification*)aNote;
+- (void) compositeXl3RWAddressChanged:(NSNotification*)aNote;
+- (void) compositeXL3RWDataChanged:(NSNotification*)aNote;
+- (void) compositeXl3RWRunningChanged:(NSNotification*)aNote;
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
@@ -97,14 +115,20 @@
 - (IBAction) autoIncrementAction:(id) sender;
 - (IBAction) writeValueAction:(id) sender;
 //composite
-- (IBAction) compositeSlotMaskAction:(id) sender;
-- (IBAction) compositeSlotMaskFieldAction:(id) sender;
-- (IBAction) compositeSlotMaskSelectAction:(id) sender;
-- (IBAction) compositeSlotMaskDeselectAction:(id) sender;
-- (IBAction) compositeSlotMaskPresentAction:(id) sender;
-- (IBAction) compositeDeselectAction:(id) sender;
-- (IBAction) compositeXl3ModeAction:(id) sender;
-- (IBAction) compositeXl3ModeSetAction:(id) sender;
+- (IBAction) compositeSlotMaskAction:(id)sender;
+- (IBAction) compositeSlotMaskFieldAction:(id)sender;
+- (IBAction) compositeSlotMaskSelectAction:(id)sender;
+- (IBAction) compositeSlotMaskDeselectAction:(id)sender;
+- (IBAction) compositeSlotMaskPresentAction:(id)sender;
+- (IBAction) compositeDeselectAction:(id)sender;
+- (IBAction) compositeXl3ModeAction:(id)sender;
+- (IBAction) compositeXl3ModeSetAction:(id)sender;
+- (IBAction) compositeXl3RWAddressValueAction:(id)sender;
+- (IBAction) compositeXl3RWModeAction:(id)sender;
+- (IBAction) compositeXl3RWSelectAction:(id)sender;
+- (IBAction) compositeXl3RWRegisterAction:(id)sender;
+- (IBAction) compositeXl3RWDataValueAction:(id)sender;
+- (IBAction) compositeXl3RWSend:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

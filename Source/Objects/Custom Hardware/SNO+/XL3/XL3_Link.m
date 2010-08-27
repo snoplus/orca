@@ -348,7 +348,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	command->cmdID = (uint16_t) aCmd;
 	command->flags = 0;
 	command->address = (uint32_t) address;
-	command->data = (uint32_t) value;
+	command->data = *(uint32_t*) value;
 
 	if (needToSwap) {
 		command->cmdID = swapShort(command->cmdID);
@@ -357,12 +357,19 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	}	
 
 	payload.numberBytesinPayload = sizeof(FECCommand);
-	[self sendCommand:SINGLE_CMD_ID withPayload:&payload expectResponse:YES];
-	
+	@try { 
+		[self sendCommand:SINGLE_CMD_ID withPayload:&payload expectResponse:YES];
+	}
+	@catch (NSException* e) {
+		NSLog(@"FECCommand error sending command\n");
+		@throw e;
+	}
 	//return the same packet!
-	//look for flags
-	if (command->flags != 0) NSLog(@"XL3 bus error\n");
-	//raise exception
+	if (command->flags != 0) {
+		NSLog(@"XL3 bus error\n");
+		@throw [NSException exceptionWithName:@"FECCommand error.\n" reason:@"XL3 bus error\n" userInfo:nil];
+	}	
+
 	*value = command->data;
 	if (needToSwap) *value = swapLong(*value);	
 }
@@ -374,13 +381,11 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
 	NSDictionary* aCmd;
 	NSMutableArray* foundCmds = [NSMutableArray array];
-	BOOL locker = YES;
 	time_t t1 = time(0);
 
-	@try {
-		while(1) {
+	while(1) {
+		@try {
 			[cmdArrayLock lock];
-			locker = YES;
 			for (aCmd in cmdArray) {
 				NSNumber* aCmdID = [aCmd objectForKey:@"cmdID"];
 				if ([aCmdID intValue] == cmdID) {
@@ -388,28 +393,24 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				}
 			}
 			[cmdArrayLock unlock];
-			locker = NO;
-			
-			if ([foundCmds count]) {
-				break;
-			}
-			else if ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds]) {
-				@throw [NSException exceptionWithName:@"ReadXL3Packet time out"
-					reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber]
-					userInfo:nil];
-			}
-			else {
-				[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
-			}
 		}
-	}
-	@catch (NSException* localException) {
-		NSLog(@"%@ %@\n", [localException name], [localException reason]);
-		if (locker == YES) {
+		@catch (NSException* e) {
 			[cmdArrayLock unlock];
-			locker = NO;
+			NSLog(@"Error in readXL3Packet parsing cmdArray: %@ %@\n", [e name], [e reason]);
+			@throw e;
+		}	
+
+		if ([foundCmds count]) {
+			break;
 		}
-		@throw localException;
+		else if ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds]) {
+			@throw [NSException exceptionWithName:@"ReadXL3Packet time out"
+				reason:[NSString stringWithFormat:@"Time out for %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber]
+				userInfo:nil];
+		}
+		else {
+			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+		}
 	}
 
 	if ([cmdArray count] > 1) {
@@ -422,16 +423,11 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	
 	@try {
 		[cmdArrayLock lock];
-		locker = YES;
 		[cmdArray removeObjectsInArray:foundCmds];
 		[cmdArrayLock unlock];
-		locker = NO;
 	}
 	@catch (NSException* localException) {
-		if (locker == YES) {
-			[cmdArrayLock unlock];
-			locker = NO;
-		}
+		[cmdArrayLock unlock];
 		NSLog(@"XL3_Link error removing an XL3 packet from the command array\n");
 		NSLog(@"%@ %@\n", [localException name], [localException reason]);
 		@throw localException;
@@ -497,11 +493,11 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	//start try block here if we know how to handle the exceptions, ORCA gets killed now
 	@try {
 		if ((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-			[NSException raise:@"Socket Failed" format:@"Couldn't get a socket for local XL3 Port %d", portNumber];
+			[NSException raise:@"Socket failed" format:@"Couldn't get a socket for local XL3 Port %d", portNumber];
 		//todo: try harder...
 		//???TCP_NODELAY for the moment done with recv
 		if (setsockopt(serverSocket,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1)
-			[NSException raise:@"Socket Options Failed" format:@"Couldn't set socket options for local XL3 Port %d", portNumber];
+			[NSException raise:@"Socket options failed" format:@"Couldn't set socket options for local XL3 Port %d", portNumber];
 			
 		my_addr.sin_family = AF_INET;         // host byte order
 		my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
@@ -509,10 +505,10 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			
 		my_addr.sin_port = htons(portNumber);     // short, network byte order
 		if (bind(serverSocket, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
-			[NSException raise:@"Bind Failed" format:@"Couldn't bind to local XL3 Port %d", portNumber];
+			[NSException raise:@"Bind failed" format:@"Couldn't bind to local XL3 Port %d", portNumber];
 		
 		if (listen(serverSocket, 1) == -1)
-			[NSException raise:@"Listen Failed" format:@"Couldn't listen on local XL3 port %d\n", portNumber];
+			[NSException raise:@"Listen failed" format:@"Couldn't listen on local XL3 port %d\n", portNumber];
 
 		connectState = kWaiting;
 		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
@@ -524,7 +520,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			//if not socket connection was kill by UI... do something meaningful
 			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];		
 			if ([self serverSocket]) {
-				[NSException raise:@"Connection Failed" format:@"Couldn't accept connection on local XL3 port %d\n", portNumber];
+				[NSException raise:@"Connection failed" format:@"Couldn't accept connection on local XL3 port %d\n", portNumber];
 			}
 			else {
 				//disconnected by UI...
@@ -576,7 +572,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	
 	while(1) {
 		if (!workingSocket) {
-			NSLog(@"XL3 Not Connected <%@> port: %d\n", IPNumber, portNumber);
+			NSLog(@"XL3 not connected <%@> port: %d\n", IPNumber, portNumber);
 			break;
 		}
 				
@@ -621,7 +617,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 					cmdLocker = NO;
 					if ([cmdArray count] > kCmdArrayHighWater) {
 						//todo: post alarm
-						NSLog(@"Xl3 Command Array close to full for Xl3 crate %@\n", [self crateName]);
+						NSLog(@"Xl3 command array close to full for XL3 crate %@\n", [self crateName]);
 					}
 				}
 								
@@ -670,7 +666,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	//this is private method called from this object only, we lock the socket, and expect that thread lock is provided at a higher level
 
 	if (!workingSocket) {
-		[NSException raise:@"Write Error" format:@"XL3 Not Connected %@ <%@> port: %d",[self crateName], IPNumber, portNumber];
+		[NSException raise:@"Write error" format:@"XL3 not connected %@ <%@> port: %d",[self crateName], IPNumber, portNumber];
 	}
 
 	int bytesWritten;
@@ -696,10 +692,10 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			} while (selectionResult == -1 && (errno == EAGAIN || errno == EINTR));
 			
 			if (selectionResult == -1){
-				[NSException raise:@"Write Error" format:@"Write Error %@ <%@>: %s",[self crateName], IPNumber, strerror(errno)];
+				[NSException raise:@"Write error" format:@"Write error %@ <%@>: %s",[self crateName], IPNumber, strerror(errno)];
 			}
 			else if (selectionResult == 0 || ([self errorTimeOutSeconds] && time(0) - t1 > [self errorTimeOutSeconds])) {
-				[NSException raise:@"ConnectionTimeOut" format:@"Write to %@ <%@> port: %d timed out",[self crateName], IPNumber, portNumber];
+				[NSException raise:@"Connection time out" format:@"Write to %@ <%@> port: %d timed out",[self crateName], IPNumber, portNumber];
 			}   
 
 			do {
@@ -715,7 +711,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 					//[self disconnect];
 					//what do we want to do?
 				}
-				[NSException raise:@"Write Error" format:@"Write Error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
+				[NSException raise:@"Write error" format:@"Write error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 			}
 		}
 	}
@@ -766,7 +762,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			[NSException raise:@"Socket time out" format:@"%@ Disconnected", IPNumber];
 		} 
 		else {
-			[NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
+			[NSException raise:@"Socket error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
 		} 
 		
 		while(1) {
