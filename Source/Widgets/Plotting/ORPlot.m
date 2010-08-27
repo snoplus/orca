@@ -206,6 +206,8 @@
 #pragma mark ***Drawing
 - (void) drawData
 {
+	NSAssert([NSThread mainThread],@"ORPlot drawing from non-gui thread");
+	
 	if(!dataSource) return;
 	
 	int numPoints = [dataSource numberPointsInPlot:self];

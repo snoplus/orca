@@ -271,6 +271,7 @@
 #pragma mark ***Drawing
 - (void) drawRect:(NSRect)rect 
 {	
+	NSAssert([NSThread mainThread],@"ORPlotView drawing from non-gui thread");
 	// Draw components in order
 	[self drawBackground];
 	if(backgroundImage){
@@ -328,8 +329,8 @@
 		[[self backgroundColor] set];
 		[NSBezierPath fillRect:bounds];
 	}
-	[[NSColor darkGrayColor] set];
-	[NSBezierPath strokeRect:bounds];
+	//[[NSColor darkGrayColor] set];
+	//[NSBezierPath strokeRect:bounds];
 }
 
 - (NSData*) plotAsPDFData

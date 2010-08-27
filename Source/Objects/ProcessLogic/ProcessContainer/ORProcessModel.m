@@ -46,11 +46,18 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[self stopRun];
 	[comment release];
 	[shortName release];
 	[testModeAlarm clearAlarm];
     [testModeAlarm release];
 	[super dealloc];
+}
+
+- (void) sleep
+{
+	[self stopRun];
+    [super sleep];
 }
 
 - (NSString*) helpURL
@@ -278,6 +285,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (void) setUpImage
 {
+	NSAssert([NSThread mainThread],@"ORProcessModel drawing from non-gui thread");
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
     //so, we cache the image here so that each Process can have its own version for drawing into.
@@ -329,7 +337,10 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	
 	if([[ORProcessCenter sharedProcessCenter] heartbeatTimeIndex] == 0){
         NSImage* noHeartbeatImage = [NSImage imageNamed:@"noHeartbeat"];
-        [noHeartbeatImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+		float x;
+		if(processRunning && inTestMode) x = 22;
+		else x = 0;
+        [noHeartbeatImage compositeToPoint:NSMakePoint(x,0) operation:NSCompositeSourceOver];
 	}
 	
 

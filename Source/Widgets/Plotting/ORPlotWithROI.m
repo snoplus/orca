@@ -251,7 +251,8 @@
 #pragma mark ***Drawing
 - (void) drawData
 {
-	
+	NSAssert([NSThread mainThread],@"ORPlotWithROI drawing from non-gui thread");
+
 	//default is to draw to the center of each point. 
 	//Subclasses can over-ride for different drawing behaviour
 	if(!dataSource) return;

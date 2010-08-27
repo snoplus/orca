@@ -1076,6 +1076,8 @@ enum {
 
 - (void) drawMarkInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
 {
+	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
+
 	NSNumber* markerNumber = [attributes objectForKey:kMarker];
 	if(markerNumber){
 		float oldLineWidth = [NSBezierPath defaultLineWidth];
@@ -1125,6 +1127,7 @@ enum {
 
 - (void) drawGridInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
 {    
+	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
 	float oldLineWidth = [NSBezierPath defaultLineWidth];
     [NSBezierPath setDefaultLineWidth:.5];
     [aColor set];
@@ -1553,6 +1556,7 @@ enum {
 /* drawLogScale - draw a logarithmic scale */
 /* Note: this routine only works for vertical scales which start at zero */
 - (void) drawLogScale {
+	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
     	
     NSBezierPath*	theAxis 	= [NSBezierPath bezierPath];
 	gridCount = 0;
@@ -1749,6 +1753,8 @@ enum {
 /* drawLinScale - draw a linear scale */
 - (void) drawLinScale 
 {
+	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
+
 	BOOL isX =	[self isXAxis];
     NSBezierPath* theAxis = [NSBezierPath bezierPath];
     

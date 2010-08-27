@@ -43,6 +43,8 @@
 - (void) drawData
 {
 	if(!dataSource) return;
+	
+	NSAssert([NSThread mainThread],@"OR2DHistoPlot drawing from non-gui thread");
 		
 	ORAxis*    mXScale = [plotView xScale];
 	ORAxis*    mYScale = [plotView yScale];

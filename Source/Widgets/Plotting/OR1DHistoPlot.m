@@ -37,6 +37,7 @@
 - (void) drawData
 {
 	if(!dataSource) return;
+	NSAssert([NSThread mainThread],@"OR1HistoPlot drawing from non-gui thread");
 		
 	int numPoints = [dataSource numberPointsInPlot:self];
 	if(numPoints == 0) return;
@@ -139,6 +140,7 @@
 
 - (void) drawExtras 
 {		
+	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
 	NSString* positionString; 
 	NSAttributedString* s;
 	NSSize labelSize;

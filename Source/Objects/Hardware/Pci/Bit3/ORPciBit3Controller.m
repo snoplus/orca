@@ -201,12 +201,6 @@
 
 
 #pragma mark ¥¥¥Interface Management
-
-- (void) isNowKeyWindow:(NSNotification*)aNotification
-{
-	[[self window] makeFirstResponder:(NSResponder*)groupView];
-}
-
 - (void) rangeChanged:(NSNotification*)aNote
 {
 	[rangeTextField setIntValue: [model rangeToDo]];
@@ -758,7 +752,7 @@
     
     [self endEditing];
     int 			startAddress 	= [model rwAddress];
-	int				endAddress		= [model doRange]?startAddress + [model valueRange]*[addressStepper increment] : startAddress;
+	int				endAddress		= [model doRange]?startAddress + [model rangeToDo] : startAddress;
     unsigned short 	addressModifier = [model rwAddressModifierValue];
     unsigned short 	addressSpace	= [model rwIOSpaceValue];
     unsigned long  	ldata			= [model writeValue];

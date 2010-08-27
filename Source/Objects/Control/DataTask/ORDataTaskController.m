@@ -47,13 +47,12 @@
 
 - (void) dealloc
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     //-------------------------------------------------------------------------------------------
-    //arghhhh...this is to work around a really nasty crash bug where the plotter isn't released
-    //after using the save/open panels.
     [NSObject cancelPreviousPerformRequestsWithTarget:plotter];
     [[NSNotificationCenter defaultCenter] removeObserver:plotter];
+	[plotter release];
     //-------------------------------------------------------------------------------------------
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 
     [super dealloc];
 }
@@ -98,6 +97,11 @@
 	[aPlot1 setLineColor:[NSColor blueColor]];
 	[plotter addPlot: aPlot1];
 	[aPlot1 release]; 
+	
+	//we would not normally retain an IB object, but in this cause we are doing doing some delayed refreshed
+	//from this object. We need to make sure that the plotter sticks around if we are closed with a delayed
+	//refresh pending.
+	[plotter retain];
 	
     [self updateWindow];
 }
