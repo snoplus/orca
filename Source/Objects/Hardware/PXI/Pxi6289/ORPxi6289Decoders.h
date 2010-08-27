@@ -20,11 +20,10 @@
 
 #import "ORBaseDecoder.h"
 
-@class ORDataPacket;
 @class ORDataSet;
 
-@interface ORPxi6289WaveformDecoder : ORBaseDecoder {
+@interface ORPxi6289DecoderForWaveform : ORBaseDecoder {
 }
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end

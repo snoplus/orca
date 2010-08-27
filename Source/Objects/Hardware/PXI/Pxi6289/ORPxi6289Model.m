@@ -184,10 +184,10 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORPxi62894WaveformDecoder",            @"decoder",
+								 @"ORPxi6289DecoderForWaveform",          @"decoder",
 								 [NSNumber numberWithLong:dataId],        @"dataId",
 								 [NSNumber numberWithBool:YES],           @"variable",
-								 [NSNumber numberWithLong:-1],			 @"length",
+								 [NSNumber numberWithLong:-1],			  @"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Waveform"];
     
@@ -254,7 +254,6 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
     
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
-    
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORPxi6289Model"];    
     
     //cache some stuff
@@ -275,24 +274,44 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
     isRunning = YES; 
 	BOOL dataReady = NO;
 
+	//------------
+	//just for testing the decoder chain. remove
+	if(++delay > 10000){
+		dataReady = YES;
+		delay = 0;
+	}
+	//------------
+	
     @try {
 		if(dataReady){
-			
-			//get the channel
-			int theChannel = 0;
-			
-			unsigned long numLongs = 0;
-			dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
-			dataBuffer[numLongs++] = location;
-			
-			//read the waveform and stuff into dataBuffer
-			//dataBuffer[numLongs++];
-			
-			//this gives us the rate
-			++waveFormCount[theChannel];  //grab the channel and inc the count
-				
-			dataBuffer[0] |= numLongs; //see, we did fill it in...
-			[aDataPacket addLongsToFrameBuffer:dataBuffer length:numLongs];
+			dataReady = NO;
+			int channel;
+			for(channel=0;channel<kNumPxi6289Channels;channel++){
+				if(enabled[channel]){
+					unsigned long numLongs = 0;
+					dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
+					dataBuffer[numLongs++] = location | (channel << 8);
+					dataBuffer[numLongs++] = 512; //number of longs in waveform
+					
+					//read the waveform and stuff into dataBuffer. This code is just for testing the decoder chain.
+					//we pack two shorts into a long. The actual digitizer data will be different.
+					int i;
+					int j = 0;
+					for(i=0;i<1024;i++){
+						dataBuffer[numLongs] = (unsigned long)(j*2) & 0xffff;
+						dataBuffer[numLongs] |= ((unsigned long)(j*2+1) & 0xffff)<<16;
+						numLongs++;
+						j+=2;
+						if(j>256)j=0;
+					
+					}
+					//this gives us the rate
+					++waveFormCount[channel];  //grab the channel and inc the count
+						
+					dataBuffer[0] |= numLongs; //see, we did fill it in...
+					[aDataPacket addLongsToFrameBuffer:dataBuffer length:numLongs];
+				}
+			}
 		}
 	}
 	@catch(NSException* localException) {

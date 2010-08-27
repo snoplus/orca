@@ -51,6 +51,9 @@ enum {
 
 	//cach to speed takedata
 	unsigned long location;
+	
+	//for testing
+	unsigned long delay;
 }
 
 - (id) init;

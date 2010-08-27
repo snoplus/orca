@@ -40,9 +40,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 Raw data points continue until the Data length is used up....
 */
 
-@implementation ORPxi6289WaveformDecoder
+@implementation ORPxi6289DecoderForWaveform
 
-- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(ptr[0]);
