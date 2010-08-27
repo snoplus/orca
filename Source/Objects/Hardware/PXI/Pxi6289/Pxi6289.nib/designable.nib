@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1341"/>
+			<integer value="1346"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2354,8 +2354,8 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																	<reference key="NSBackgroundColor" ref="125656912"/>
 																	<reference key="NSTextColor" ref="39517887"/>
 																</object>
-																<int key="NSSelectedRow">15</int>
-																<reference key="NSSelectedCell" ref="875923341"/>
+																<int key="NSSelectedRow">-1</int>
+																<int key="NSSelectedCol">-1</int>
 																<reference key="NSBackgroundColor" ref="125656912"/>
 																<reference key="NSCellBackgroundColor" ref="125656912"/>
 															</object>
@@ -2635,9 +2635,63 @@ ZSBDb21wdXRlciwgSW5jLiwgMjAwNQAAAAA</bytes>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="800913357">
 																	<int key="NSCellFlags">67239424</int>
-																	<int key="NSCellFlags2">71303168</int>
+																	<int key="NSCellFlags2">-2076180480</int>
 																	<string type="base64-UTF8" key="NSContents">MAo</string>
 																	<reference key="NSSupport" ref="26"/>
+																	<object class="NSNumberFormatter" key="NSFormatter" id="689902287">
+																		<object class="NSMutableDictionary" key="NS.attributes">
+																			<bool key="EncodedWithXMLCoder">YES</bool>
+																			<object class="NSArray" key="dict.sortedKeys">
+																				<bool key="EncodedWithXMLCoder">YES</bool>
+																				<string>allowsFloats</string>
+																				<string>formatterBehavior</string>
+																				<string>locale</string>
+																				<string>negativeFormat</string>
+																				<string>negativeInfinitySymbol</string>
+																				<string>nilSymbol</string>
+																				<string>numberStyle</string>
+																				<string>positiveFormat</string>
+																				<string>positiveInfinitySymbol</string>
+																			</object>
+																			<object class="NSMutableArray" key="dict.values">
+																				<bool key="EncodedWithXMLCoder">YES</bool>
+																				<boolean value="YES"/>
+																				<integer value="1040"/>
+																				<reference ref="281805746"/>
+																				<string>0.00</string>
+																				<string>-∞</string>
+																				<string/>
+																				<integer value="0"/>
+																				<string>0.00</string>
+																				<string>+∞</string>
+																			</object>
+																		</object>
+																		<string key="NS.positiveformat">0.00</string>
+																		<string key="NS.negativeformat">0.00</string>
+																		<nil key="NS.positiveattrs"/>
+																		<nil key="NS.negativeattrs"/>
+																		<nil key="NS.zero"/>
+																		<object class="NSAttributedString" key="NS.nil">
+																			<string key="NSString"/>
+																		</object>
+																		<object class="NSAttributedString" key="NS.nan">
+																			<string key="NSString">NaN</string>
+																			<reference key="NSAttributes" ref="355639864"/>
+																		</object>
+																		<reference key="NS.min" ref="877118438"/>
+																		<reference key="NS.max" ref="877118438"/>
+																		<object class="NSDecimalNumberHandler" key="NS.rounding">
+																			<int key="NS.roundingmode">3</int>
+																			<bool key="NS.raise.overflow">YES</bool>
+																			<bool key="NS.raise.underflow">YES</bool>
+																			<bool key="NS.raise.dividebyzero">YES</bool>
+																		</object>
+																		<string key="NS.decimal">.</string>
+																		<string key="NS.thousand">,</string>
+																		<bool key="NS.hasthousands">NO</bool>
+																		<bool key="NS.localized">NO</bool>
+																		<bool key="NS.allowsfloats">YES</bool>
+																	</object>
 																	<reference key="NSControlView" ref="782769350"/>
 																	<reference key="NSBackgroundColor" ref="125656912"/>
 																	<reference key="NSTextColor" ref="39517887"/>
@@ -7085,6 +7139,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="800913357"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="689902287"/>
 						</object>
 						<reference key="parent" ref="782769350"/>
 					</object>
@@ -8487,6 +8542,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="864202722"/>
 						<reference key="parent" ref="912886225"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3199</int>
+						<reference key="object" ref="689902287"/>
+						<reference key="parent" ref="800913357"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -9110,6 +9170,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>3187.IBNumberFormatterBehaviorMetadataKey</string>
 					<string>3187.IBNumberFormatterLocalizesFormatMetadataKey</string>
 					<string>3187.IBPluginDependency</string>
+					<string>3199.IBNumberFormatterBehaviorMetadataKey</string>
+					<string>3199.IBNumberFormatterLocalizesFormatMetadataKey</string>
+					<string>3199.IBPluginDependency</string>
 					<string>387.ImportedFromIB2</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
@@ -9498,9 +9561,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{86, 922}, {837, 617}}</string>
+					<string>{{54, 922}, {837, 617}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{86, 922}, {837, 617}}</string>
+					<string>{{54, 922}, {837, 617}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{837, 617}</string>
@@ -10011,6 +10074,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<integer value="1041"/>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<integer value="1040"/>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 				</object>
 			</object>
@@ -10030,7 +10096,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3198</int>
+			<int key="maxID">3199</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -11752,7 +11818,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<string>{33, 36}</string>
-				<string>{28, 172}</string>
+				<string>{28, 174}</string>
 				<string>{33, 36}</string>
 			</object>
 		</object>
