@@ -70,8 +70,11 @@
 		//settings Page
 		[[enabled01Matrix cellAtRow:i column:0] setTag:i];
 		[[threshold01Matrix cellAtRow:i column:0]  setTag:i];
+		[[rate1TextFields cellAtRow:i column:0]  setTag:i];
+		
 		[[enabled02Matrix cellAtRow:i column:0]  setTag:i+16];
 		[[threshold02Matrix cellAtRow:i column:0]  setTag:i+16];
+		[[rate2TextFields cellAtRow:i column:0]  setTag:i+16];
 		
 		//settings Page
 		[[enabled1Matrix cellAtRow:i column:0]  setTag:i];

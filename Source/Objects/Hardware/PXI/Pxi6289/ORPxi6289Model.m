@@ -90,9 +90,7 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
     [waveFormRateGroup release];
     waveFormRateGroup = newRateGroup;
     
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORPxi6289RateGroupChangedNotification
-	 object:self];    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPxi6289RateGroupChangedNotification object:self];    
 }
 
 - (id) rateObject:(int)channel
@@ -276,7 +274,10 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
 {
     isRunning = YES; 
 	BOOL dataReady = NO;
-	unsigned long totalNumLongs = 0;
+	++waveFormCount[3];  //grab the channel and inc the count
+	++waveFormCount[14];  //grab the channel and inc the count
+	++waveFormCount[30];  //grab the channel and inc the count
+
     @try {
 		if(dataReady){
 			
@@ -293,8 +294,8 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
 			//this gives us the rate
 			++waveFormCount[theChannel];  //grab the channel and inc the count
 				
-			dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
-			[aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
+			dataBuffer[0] |= numLongs; //see, we did fill it in...
+			[aDataPacket addLongsToFrameBuffer:dataBuffer length:numLongs];
 		}
 	}
 	@catch(NSException* localException) {
