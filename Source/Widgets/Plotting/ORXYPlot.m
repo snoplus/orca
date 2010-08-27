@@ -42,6 +42,7 @@
 #pragma mark ***Drawing
 - (void) drawData
 {
+	NSAssert([NSThread mainThread],@"ORXYPlot drawing from non-gui thread");
 	int numPoints = [dataSource numberPointsInPlot:self];
     if(numPoints == 0) return;
 
