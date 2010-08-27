@@ -186,6 +186,28 @@
 		840590EB0CCE5E9C0000DBF3 /* ORLevelMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */; };
 		840590EC0CCE5E9C0000DBF3 /* ORLevelMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */; };
 		8405A459108C99A8001F43F1 /* ORDetectorSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 8405A458108C99A8001F43F1 /* ORDetectorSegment.m */; };
+		84065D961226B600004E8970 /* ORPxi8336MacController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065D8D1226B600004E8970 /* ORPxi8336MacController.h */; };
+		84065D971226B600004E8970 /* ORPxi8336MacController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065D8E1226B600004E8970 /* ORPxi8336MacController.m */; };
+		84065D981226B600004E8970 /* ORPxi8336MacModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065D8F1226B600004E8970 /* ORPxi8336MacModel.h */; };
+		84065D991226B600004E8970 /* ORPxi8336MacModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065D901226B600004E8970 /* ORPxi8336MacModel.m */; };
+		84065D9C1226B600004E8970 /* Pxi8336Mac.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84065D931226B600004E8970 /* Pxi8336Mac.nib */; };
+		84065D9D1226B600004E8970 /* Pxi8336MacCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84065D941226B600004E8970 /* Pxi8336MacCard.gif */; };
+		84065F1A1226E18E004E8970 /* NoPxiCrate6PowerHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84065F0E1226E18E004E8970 /* NoPxiCrate6PowerHelp.plist */; };
+		84065F1B1226E18E004E8970 /* ORPxiCrate6Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065F0F1226E18E004E8970 /* ORPxiCrate6Controller.h */; };
+		84065F1C1226E18E004E8970 /* ORPxiCrate6Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065F101226E18E004E8970 /* ORPxiCrate6Controller.m */; };
+		84065F1D1226E18E004E8970 /* ORPxiCrate6Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065F111226E18E004E8970 /* ORPxiCrate6Model.h */; };
+		84065F1E1226E18E004E8970 /* ORPxiCrate6Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065F121226E18E004E8970 /* ORPxiCrate6Model.m */; };
+		84065F1F1226E18E004E8970 /* PxiCrate6.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84065F131226E18E004E8970 /* PxiCrate6.nib */; };
+		84065F201226E18E004E8970 /* ORPxiAdapterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065F151226E18E004E8970 /* ORPxiAdapterModel.h */; };
+		84065F211226E18E004E8970 /* ORPxiAdapterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065F161226E18E004E8970 /* ORPxiAdapterModel.m */; };
+		84065F311226E2E2004E8970 /* ORPxiCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065F2F1226E2E2004E8970 /* ORPxiCard.h */; };
+		84065F321226E2E2004E8970 /* ORPxiCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065F301226E2E2004E8970 /* ORPxiCard.m */; };
+		84065F341226E332004E8970 /* ORPxiBusProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065F331226E332004E8970 /* ORPxiBusProtocol.h */; };
+		84065F3D1226E3D2004E8970 /* ORPxiCrate.h in Headers */ = {isa = PBXBuildFile; fileRef = 84065F3B1226E3D2004E8970 /* ORPxiCrate.h */; };
+		84065F3E1226E3D2004E8970 /* ORPxiCrate.m in Sources */ = {isa = PBXBuildFile; fileRef = 84065F3C1226E3D2004E8970 /* ORPxiCrate.m */; };
+		84065F6F1226E9AD004E8970 /* PxiCrate6.png in Resources */ = {isa = PBXBuildFile; fileRef = 84065F6E1226E9AD004E8970 /* PxiCrate6.png */; };
+		84065F711226EA9E004E8970 /* PxiAdapterCard.png in Resources */ = {isa = PBXBuildFile; fileRef = 84065F701226EA9E004E8970 /* PxiAdapterCard.png */; };
+		84065F751226EBDE004E8970 /* PxiCrate6Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 84065F741226EBDE004E8970 /* PxiCrate6Small.png */; };
 		84071B690D185E7F00FD6EFD /* ORDataChainObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 84071B670D185E7F00FD6EFD /* ORDataChainObject.h */; };
 		84071B6A0D185E7F00FD6EFD /* ORDataChainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 84071B680D185E7F00FD6EFD /* ORDataChainObject.m */; };
 		84073A4F05E3F3D3003E62AA /* ORValidatePassword.h in Headers */ = {isa = PBXBuildFile; fileRef = 84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */; };
@@ -1086,6 +1108,16 @@
 		8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8457BE3411B0183500C4082D /* SIS3820Card.gif */; };
 		8457C2DE11B59DEC00C4082D /* ORCaen785Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */; };
 		8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */; };
+		845B13F71227E5D40022F207 /* ORPxiIOCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13F51227E5D40022F207 /* ORPxiIOCard.h */; };
+		845B13F81227E5D40022F207 /* ORPxiIOCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B13F61227E5D40022F207 /* ORPxiIOCard.m */; };
+		845B14061227E7DC0022F207 /* ORPxi6289Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */; };
+		845B14071227E7DC0022F207 /* ORPxi6289Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B13FF1227E7DC0022F207 /* ORPxi6289Controller.m */; };
+		845B14081227E7DC0022F207 /* ORPxi6289Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B14001227E7DC0022F207 /* ORPxi6289Decoders.h */; };
+		845B14091227E7DC0022F207 /* ORPxi6289Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B14011227E7DC0022F207 /* ORPxi6289Decoders.m */; };
+		845B140A1227E7DC0022F207 /* ORPxi6289Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B14021227E7DC0022F207 /* ORPxi6289Model.h */; };
+		845B140B1227E7DC0022F207 /* ORPxi6289Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B14031227E7DC0022F207 /* ORPxi6289Model.m */; };
+		845B140C1227E7DC0022F207 /* Pxi6289.nib in Resources */ = {isa = PBXBuildFile; fileRef = 845B14041227E7DC0022F207 /* Pxi6289.nib */; };
+		845B140F1227E8B00022F207 /* Pxi6289Card.png in Resources */ = {isa = PBXBuildFile; fileRef = 845B140E1227E8B00022F207 /* Pxi6289Card.png */; };
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
@@ -2695,6 +2727,28 @@
 		840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLevelMonitor.h; path = "Source/Widgets/Bar Graph/ORLevelMonitor.h"; sourceTree = SOURCE_ROOT; };
 		840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLevelMonitor.m; path = "Source/Widgets/Bar Graph/ORLevelMonitor.m"; sourceTree = SOURCE_ROOT; };
 		8405A458108C99A8001F43F1 /* ORDetectorSegment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDetectorSegment.m; path = Source/Experiments/BaseClasses/ORDetectorSegment.m; sourceTree = SOURCE_ROOT; };
+		84065D8D1226B600004E8970 /* ORPxi8336MacController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi8336MacController.h; path = Source/Objects/Hardware/Pci/Pxi8336Mac/ORPxi8336MacController.h; sourceTree = SOURCE_ROOT; };
+		84065D8E1226B600004E8970 /* ORPxi8336MacController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxi8336MacController.m; path = Source/Objects/Hardware/Pci/Pxi8336Mac/ORPxi8336MacController.m; sourceTree = SOURCE_ROOT; };
+		84065D8F1226B600004E8970 /* ORPxi8336MacModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi8336MacModel.h; path = Source/Objects/Hardware/Pci/Pxi8336Mac/ORPxi8336MacModel.h; sourceTree = SOURCE_ROOT; };
+		84065D901226B600004E8970 /* ORPxi8336MacModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxi8336MacModel.m; path = Source/Objects/Hardware/Pci/Pxi8336Mac/ORPxi8336MacModel.m; sourceTree = SOURCE_ROOT; };
+		84065D931226B600004E8970 /* Pxi8336Mac.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Pxi8336Mac.nib; path = Source/Objects/Hardware/Pci/Pxi8336Mac/Pxi8336Mac.nib; sourceTree = SOURCE_ROOT; };
+		84065D941226B600004E8970 /* Pxi8336MacCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Pxi8336MacCard.gif; path = Source/Objects/Hardware/Pci/Pxi8336Mac/Pxi8336MacCard.gif; sourceTree = SOURCE_ROOT; };
+		84065F0E1226E18E004E8970 /* NoPxiCrate6PowerHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoPxiCrate6PowerHelp.plist; path = Source/Objects/Hardware/PXI/Crate6/NoPxiCrate6PowerHelp.plist; sourceTree = SOURCE_ROOT; };
+		84065F0F1226E18E004E8970 /* ORPxiCrate6Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiCrate6Controller.h; path = Source/Objects/Hardware/PXI/Crate6/ORPxiCrate6Controller.h; sourceTree = SOURCE_ROOT; };
+		84065F101226E18E004E8970 /* ORPxiCrate6Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiCrate6Controller.m; path = Source/Objects/Hardware/PXI/Crate6/ORPxiCrate6Controller.m; sourceTree = SOURCE_ROOT; };
+		84065F111226E18E004E8970 /* ORPxiCrate6Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiCrate6Model.h; path = Source/Objects/Hardware/PXI/Crate6/ORPxiCrate6Model.h; sourceTree = SOURCE_ROOT; };
+		84065F121226E18E004E8970 /* ORPxiCrate6Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiCrate6Model.m; path = Source/Objects/Hardware/PXI/Crate6/ORPxiCrate6Model.m; sourceTree = SOURCE_ROOT; };
+		84065F131226E18E004E8970 /* PxiCrate6.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PxiCrate6.nib; path = Source/Objects/Hardware/PXI/Crate6/PxiCrate6.nib; sourceTree = SOURCE_ROOT; };
+		84065F151226E18E004E8970 /* ORPxiAdapterModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPxiAdapterModel.h; sourceTree = "<group>"; };
+		84065F161226E18E004E8970 /* ORPxiAdapterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPxiAdapterModel.m; sourceTree = "<group>"; };
+		84065F2F1226E2E2004E8970 /* ORPxiCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiCard.h; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiCard.h"; sourceTree = SOURCE_ROOT; };
+		84065F301226E2E2004E8970 /* ORPxiCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiCard.m; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiCard.m"; sourceTree = SOURCE_ROOT; };
+		84065F331226E332004E8970 /* ORPxiBusProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiBusProtocol.h; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiBusProtocol.h"; sourceTree = SOURCE_ROOT; };
+		84065F3B1226E3D2004E8970 /* ORPxiCrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiCrate.h; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiCrate.h"; sourceTree = SOURCE_ROOT; };
+		84065F3C1226E3D2004E8970 /* ORPxiCrate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiCrate.m; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiCrate.m"; sourceTree = SOURCE_ROOT; };
+		84065F6E1226E9AD004E8970 /* PxiCrate6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PxiCrate6.png; path = Source/Objects/Hardware/PXI/Crate6/PxiCrate6.png; sourceTree = SOURCE_ROOT; };
+		84065F701226EA9E004E8970 /* PxiAdapterCard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PxiAdapterCard.png; path = "Source/Objects/Hardware/PXI/Pxi Adaptor/PxiAdapterCard.png"; sourceTree = SOURCE_ROOT; };
+		84065F741226EBDE004E8970 /* PxiCrate6Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PxiCrate6Small.png; path = Source/Objects/Hardware/PXI/Crate6/PxiCrate6Small.png; sourceTree = SOURCE_ROOT; };
 		84071B670D185E7F00FD6EFD /* ORDataChainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORDataChainObject.h; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.h"; sourceTree = SOURCE_ROOT; };
 		84071B680D185E7F00FD6EFD /* ORDataChainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDataChainObject.m; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.m"; sourceTree = SOURCE_ROOT; };
 		84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORValidatePassword.h; sourceTree = "<group>"; };
@@ -3376,6 +3430,16 @@
 		8457BE3411B0183500C4082D /* SIS3820Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3820Card.gif; path = Source/Objects/Hardware/Vme/SIS3820/SIS3820Card.gif; sourceTree = SOURCE_ROOT; };
 		8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen785Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.h; sourceTree = SOURCE_ROOT; };
 		8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen785Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.m; sourceTree = SOURCE_ROOT; };
+		845B13F51227E5D40022F207 /* ORPxiIOCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiIOCard.h; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.h"; sourceTree = SOURCE_ROOT; };
+		845B13F61227E5D40022F207 /* ORPxiIOCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiIOCard.m; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.m"; sourceTree = SOURCE_ROOT; };
+		845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi6289Controller.h; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Controller.h; sourceTree = SOURCE_ROOT; };
+		845B13FF1227E7DC0022F207 /* ORPxi6289Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxi6289Controller.m; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Controller.m; sourceTree = SOURCE_ROOT; };
+		845B14001227E7DC0022F207 /* ORPxi6289Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi6289Decoders.h; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Decoders.h; sourceTree = SOURCE_ROOT; };
+		845B14011227E7DC0022F207 /* ORPxi6289Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxi6289Decoders.m; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Decoders.m; sourceTree = SOURCE_ROOT; };
+		845B14021227E7DC0022F207 /* ORPxi6289Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi6289Model.h; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Model.h; sourceTree = SOURCE_ROOT; };
+		845B14031227E7DC0022F207 /* ORPxi6289Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxi6289Model.m; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Model.m; sourceTree = SOURCE_ROOT; };
+		845B14041227E7DC0022F207 /* Pxi6289.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Pxi6289.nib; path = Source/Objects/Hardware/PXI/Pxi6289/Pxi6289.nib; sourceTree = SOURCE_ROOT; };
+		845B140E1227E8B00022F207 /* Pxi6289Card.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Pxi6289Card.png; path = Source/Objects/Hardware/PXI/Pxi6289/Pxi6289Card.png; sourceTree = SOURCE_ROOT; };
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
@@ -5168,6 +5232,74 @@
 			path = "Source/Objects/Hardware/Vme/Bit3 Adaptor";
 			sourceTree = SOURCE_ROOT;
 		};
+		84065D8B1226B600004E8970 /* Pxi8336Mac */ = {
+			isa = PBXGroup;
+			children = (
+				84065D8D1226B600004E8970 /* ORPxi8336MacController.h */,
+				84065D8E1226B600004E8970 /* ORPxi8336MacController.m */,
+				84065D8F1226B600004E8970 /* ORPxi8336MacModel.h */,
+				84065D901226B600004E8970 /* ORPxi8336MacModel.m */,
+				84065D931226B600004E8970 /* Pxi8336Mac.nib */,
+				84065D941226B600004E8970 /* Pxi8336MacCard.gif */,
+			);
+			name = Pxi8336Mac;
+			path = Source/Objects/Hardware/Pci/Pxi8336Mac;
+			sourceTree = SOURCE_ROOT;
+		};
+		84065F0B1226E18E004E8970 /* PXI */ = {
+			isa = PBXGroup;
+			children = (
+				84065F181226E18E004E8970 /* Pxi Base Classes */,
+				84065F0C1226E18E004E8970 /* Crate6 */,
+				84065F141226E18E004E8970 /* Pxi Adaptor */,
+				845B13FD1227E7DC0022F207 /* Pxi6289 */,
+			);
+			name = PXI;
+			path = Source/Objects/Hardware/PXI;
+			sourceTree = SOURCE_ROOT;
+		};
+		84065F0C1226E18E004E8970 /* Crate6 */ = {
+			isa = PBXGroup;
+			children = (
+				84065F741226EBDE004E8970 /* PxiCrate6Small.png */,
+				84065F6E1226E9AD004E8970 /* PxiCrate6.png */,
+				84065F0E1226E18E004E8970 /* NoPxiCrate6PowerHelp.plist */,
+				84065F0F1226E18E004E8970 /* ORPxiCrate6Controller.h */,
+				84065F101226E18E004E8970 /* ORPxiCrate6Controller.m */,
+				84065F111226E18E004E8970 /* ORPxiCrate6Model.h */,
+				84065F121226E18E004E8970 /* ORPxiCrate6Model.m */,
+				84065F131226E18E004E8970 /* PxiCrate6.nib */,
+			);
+			name = Crate6;
+			path = Source/Objects/Hardware/PXI/Crate6;
+			sourceTree = SOURCE_ROOT;
+		};
+		84065F141226E18E004E8970 /* Pxi Adaptor */ = {
+			isa = PBXGroup;
+			children = (
+				84065F151226E18E004E8970 /* ORPxiAdapterModel.h */,
+				84065F161226E18E004E8970 /* ORPxiAdapterModel.m */,
+				84065F701226EA9E004E8970 /* PxiAdapterCard.png */,
+			);
+			name = "Pxi Adaptor";
+			path = "Source/Objects/Hardware/PXI/Pxi Adaptor";
+			sourceTree = SOURCE_ROOT;
+		};
+		84065F181226E18E004E8970 /* Pxi Base Classes */ = {
+			isa = PBXGroup;
+			children = (
+				84065F2F1226E2E2004E8970 /* ORPxiCard.h */,
+				84065F301226E2E2004E8970 /* ORPxiCard.m */,
+				845B13F51227E5D40022F207 /* ORPxiIOCard.h */,
+				845B13F61227E5D40022F207 /* ORPxiIOCard.m */,
+				84065F331226E332004E8970 /* ORPxiBusProtocol.h */,
+				84065F3B1226E3D2004E8970 /* ORPxiCrate.h */,
+				84065F3C1226E3D2004E8970 /* ORPxiCrate.m */,
+			);
+			name = "Pxi Base Classes";
+			path = "Source/Objects/Hardware/PXI/Pxi Base Classes";
+			sourceTree = SOURCE_ROOT;
+		};
 		84071B660D185E7F00FD6EFD /* BaseClasses */ = {
 			isa = PBXGroup;
 			children = (
@@ -6865,6 +6997,22 @@
 			);
 			name = SIS3820;
 			path = Source/Objects/Hardware/Vme/SIS3820;
+			sourceTree = SOURCE_ROOT;
+		};
+		845B13FD1227E7DC0022F207 /* Pxi6289 */ = {
+			isa = PBXGroup;
+			children = (
+				845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */,
+				845B13FF1227E7DC0022F207 /* ORPxi6289Controller.m */,
+				845B14001227E7DC0022F207 /* ORPxi6289Decoders.h */,
+				845B14011227E7DC0022F207 /* ORPxi6289Decoders.m */,
+				845B14021227E7DC0022F207 /* ORPxi6289Model.h */,
+				845B14031227E7DC0022F207 /* ORPxi6289Model.m */,
+				845B14041227E7DC0022F207 /* Pxi6289.nib */,
+				845B140E1227E8B00022F207 /* Pxi6289Card.png */,
+			);
+			name = Pxi6289;
+			path = Source/Objects/Hardware/PXI/Pxi6289;
 			sourceTree = SOURCE_ROOT;
 		};
 		84662A63070A3231001CDA7E /* BiStateView */ = {
@@ -10119,6 +10267,7 @@
 				2A178E9908DB3D91001D78BC /* Hardware Base Classes */,
 				F51E698603AE4775015F64B1 /* Pci */,
 				84C135370997F1C1006F2901 /* CompactPCI */,
+				84065F0B1226E18E004E8970 /* PXI */,
 				841DA0050780D7CA0099BBF6 /* Camac */,
 				F51E69A103AE4776015F64B1 /* Vme */,
 				84F46F090CA44255007EFADA /* IPE */,
@@ -10136,6 +10285,7 @@
 			children = (
 				F51E6AAA03AE4C3D015F64B1 /* Pci Base Classes */,
 				849DE72608F6F1FA0052AFC6 /* Mac */,
+				84065D8B1226B600004E8970 /* Pxi8336Mac */,
 				847946C307330E5200C5E1FA /* Bit3 */,
 				84B180F7044C7AAC005F64B1 /* 620 */,
 				F51E6A9303AE4A5B015F64B1 /* 617 */,
@@ -11192,6 +11342,18 @@
 				843F28F911ECFEED0077E55B /* ORDataGenReadout.hh in Headers */,
 				840F5AC61222C03800D49A75 /* ORCameraController.h in Headers */,
 				840F5AC81222C03800D49A75 /* ORCameraModel.h in Headers */,
+				84065D961226B600004E8970 /* ORPxi8336MacController.h in Headers */,
+				84065D981226B600004E8970 /* ORPxi8336MacModel.h in Headers */,
+				84065F1B1226E18E004E8970 /* ORPxiCrate6Controller.h in Headers */,
+				84065F1D1226E18E004E8970 /* ORPxiCrate6Model.h in Headers */,
+				84065F201226E18E004E8970 /* ORPxiAdapterModel.h in Headers */,
+				84065F311226E2E2004E8970 /* ORPxiCard.h in Headers */,
+				84065F341226E332004E8970 /* ORPxiBusProtocol.h in Headers */,
+				84065F3D1226E3D2004E8970 /* ORPxiCrate.h in Headers */,
+				845B13F71227E5D40022F207 /* ORPxiIOCard.h in Headers */,
+				845B14061227E7DC0022F207 /* ORPxi6289Controller.h in Headers */,
+				845B14081227E7DC0022F207 /* ORPxi6289Decoders.h in Headers */,
+				845B140A1227E7DC0022F207 /* ORPxi6289Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11899,6 +12061,15 @@
 				84B11665121ED85100BC8464 /* noHeartbeat.png in Resources */,
 				840F5AC41222C03800D49A75 /* Camera.nib in Resources */,
 				840F5AE81222C4CA00D49A75 /* Camera.png in Resources */,
+				84065D9C1226B600004E8970 /* Pxi8336Mac.nib in Resources */,
+				84065D9D1226B600004E8970 /* Pxi8336MacCard.gif in Resources */,
+				84065F1A1226E18E004E8970 /* NoPxiCrate6PowerHelp.plist in Resources */,
+				84065F1F1226E18E004E8970 /* PxiCrate6.nib in Resources */,
+				84065F6F1226E9AD004E8970 /* PxiCrate6.png in Resources */,
+				84065F711226EA9E004E8970 /* PxiAdapterCard.png in Resources */,
+				84065F751226EBDE004E8970 /* PxiCrate6Small.png in Resources */,
+				845B140C1227E7DC0022F207 /* Pxi6289.nib in Resources */,
+				845B140F1227E8B00022F207 /* Pxi6289Card.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12705,6 +12876,17 @@
 				84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */,
 				840F5AC71222C03800D49A75 /* ORCameraController.m in Sources */,
 				840F5AC91222C03800D49A75 /* ORCameraModel.m in Sources */,
+				84065D971226B600004E8970 /* ORPxi8336MacController.m in Sources */,
+				84065D991226B600004E8970 /* ORPxi8336MacModel.m in Sources */,
+				84065F1C1226E18E004E8970 /* ORPxiCrate6Controller.m in Sources */,
+				84065F1E1226E18E004E8970 /* ORPxiCrate6Model.m in Sources */,
+				84065F211226E18E004E8970 /* ORPxiAdapterModel.m in Sources */,
+				84065F321226E2E2004E8970 /* ORPxiCard.m in Sources */,
+				84065F3E1226E3D2004E8970 /* ORPxiCrate.m in Sources */,
+				845B13F81227E5D40022F207 /* ORPxiIOCard.m in Sources */,
+				845B14071227E7DC0022F207 /* ORPxi6289Controller.m in Sources */,
+				845B14091227E7DC0022F207 /* ORPxi6289Decoders.m in Sources */,
+				845B140B1227E7DC0022F207 /* ORPxi6289Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
