@@ -51,7 +51,8 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 
 -(void)	drawLinScale
 {
-    
+ 	NSAssert([NSThread mainThread],@"TimeAxis drawing from non-gui thread");
+   
     short		i, x, y;			// general variables
     double		val;				// true value of scale units
     long		ival;				// integer mantissa of scale units

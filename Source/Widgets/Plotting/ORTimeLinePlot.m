@@ -39,6 +39,7 @@
 #pragma mark ***Drawing
 - (void) drawData
 {
+	NSAssert([NSThread mainThread],@"ORTimeLinePlot drawing from non-gui thread");
 	
 	ORAxis*    mXScale = [plotView xScale];
 	ORAxis*    mYScale = [plotView yScale];

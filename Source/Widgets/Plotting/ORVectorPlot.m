@@ -38,6 +38,8 @@
 - (void) drawData
 {
 	if(!dataSource) return;
+
+	NSAssert([NSThread mainThread],@"ORVectorPlot drawing from non-gui thread");
 	
 	int n = [dataSource numberPointsInPlot:self];
 	if(n == 0) return;
