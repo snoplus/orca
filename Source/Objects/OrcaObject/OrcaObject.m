@@ -67,6 +67,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) setImage:(NSImage*)anImage
 {
+	NSAssert([NSThread mainThread],@"OrcaObject drawing from non-gui thread");
     [anImage retain];
     [image release];
     image = anImage;
