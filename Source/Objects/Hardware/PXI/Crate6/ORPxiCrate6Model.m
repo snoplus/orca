@@ -48,7 +48,7 @@
                                                                      [NSColor redColor],NSForegroundColorAttributeName,
                                                                      [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
                                                                      nil]] autorelease]; 
-        [s drawAtPoint:NSMakePoint(25,5)];
+        [s drawAtPoint:NSMakePoint(90,0)];
     }
     
     if([[self orcaObjects] count]){
