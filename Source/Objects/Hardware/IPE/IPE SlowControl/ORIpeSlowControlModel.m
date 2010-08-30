@@ -1372,11 +1372,12 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 
 - (void) sortPollingItems
 {
+	if([pollingLookUp count]<=2)return;
 	BOOL swapped;
 	do {
 		swapped = NO;
 		int i;
-		for(i=0;i<=[pollingLookUp count] - 2; i++){
+		for(i=0;i<[pollingLookUp count] - 1; i++){
 			NSDictionary* topLevelDictionary = [requestCache objectForKey:[pollingLookUp objectAtIndex:i]];
 			int thisOne = [[topLevelDictionary objectForKey:@"ChannelNumber"] intValue];
 			topLevelDictionary = [requestCache objectForKey:[pollingLookUp objectAtIndex:i+1]];
