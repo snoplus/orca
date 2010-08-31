@@ -74,7 +74,7 @@
 -(void) awakeFromNib
 {
 	
-	detectorSize		= NSMakeSize(675,589);
+	detectorSize		= NSMakeSize(675,600);
 	slowControlsSize    = NSMakeSize(525,157);
 	detailsSize			= NSMakeSize(655,589);
 	focalPlaneSize		= NSMakeSize(827,589);
@@ -446,30 +446,48 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
-	
+	float toolBarOffset = 0;
+	BOOL toolBarVisible = [[[self window] toolbar] isVisible];
+	if(toolBarVisible){
+		switch([[[self window] toolbar] sizeMode]){
+			case NSToolbarSizeModeRegular:	toolBarOffset = 60; break;
+			case NSToolbarSizeModeSmall:	toolBarOffset = 50; break;
+			default:						toolBarOffset = 60; break;
+		}
+	}
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:detectorSize];
+		NSSize newSize = detectorSize;
+		newSize.height += toolBarOffset;
+		[self resizeWindowToSize:newSize];
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 1){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:slowControlsSize];
+		NSSize newSize = slowControlsSize;
+		newSize.height += toolBarOffset;
+		[self resizeWindowToSize:newSize];
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:detailsSize];
+		NSSize newSize = detailsSize;
+		newSize.height += toolBarOffset;
+		[self resizeWindowToSize:newSize];
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 3){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:focalPlaneSize];
+		NSSize newSize = focalPlaneSize;
+		newSize.height += toolBarOffset;
+		[self resizeWindowToSize:newSize];
 		[[self window] setContentView:tabView];
     }
 	else if([tabView indexOfTabViewItem:tabViewItem] == 4){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:vetoSize];
+		NSSize newSize = vetoSize;
+		newSize.height += toolBarOffset;
+		[self resizeWindowToSize:newSize];
 		[[self window] setContentView:tabView];
     }
 	int index = [tabView indexOfTabViewItem:tabViewItem];

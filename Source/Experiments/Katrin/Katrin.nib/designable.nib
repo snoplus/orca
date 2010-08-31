@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="103"/>
+			<integer value="105"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -477,7 +477,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 											</object>
 											<object class="NSButton" id="945896390">
 												<reference key="NSNextResponder" ref="663820862"/>
-												<int key="NSvFlags">256</int>
+												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{5, 8}, {36, 33}}</string>
 												<reference key="NSSuperview" ref="663820862"/>
 												<bool key="NSEnabled">YES</bool>
@@ -7377,9 +7377,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{585, 459}, {1090, 585}}</string>
+					<string>{{101, 466}, {1090, 585}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{585, 459}, {1090, 585}}</string>
+					<string>{{101, 466}, {1090, 585}}</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -7584,6 +7584,13 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Experiments/BaseClasses/ORDetectorSegment.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="81459831">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Experiments/BaseClasses/ORDetectorView.h</string>
@@ -7643,6 +7650,13 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Container/ORContainerModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Control/DataTask/ORDataTaskController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -8031,6 +8045,13 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="985525804">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/OrcaObject/OrcaObjectController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/ProcessLogic/ProcessElements/BaseClasses/ORProcessConnector.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -9044,6 +9065,55 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">Foundation.framework/Headers/NSURLDownload.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedAudioOutput.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedVideoOutput.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">QTKit.framework/Headers/QTCaptureFileOutput.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">QTKit.framework/Headers/QTCaptureVideoPreviewOutput.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">QTKit.framework/Headers/QTCaptureView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">QTKit.framework/Headers/QTMovie.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">QTKit.framework/Headers/QTMovieView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
