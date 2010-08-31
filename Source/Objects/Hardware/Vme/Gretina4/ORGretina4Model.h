@@ -186,6 +186,7 @@ enum Gretina4FIFOStates {
     short           dataLength[kNumGretina4Channels];
     short           cfdEnabled[kNumGretina4Channels];
     short           poleZeroEnabled[kNumGretina4Channels];
+    int				downSample;
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumGretina4Channels];
@@ -235,6 +236,8 @@ enum Gretina4FIFOStates {
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (int) downSample;
+- (void) setDownSample:(int)aDownSample;
 - (int) registerIndex;
 - (void) setRegisterIndex:(int)aRegisterIndex;
 - (unsigned long) registerWriteValue;
@@ -360,6 +363,7 @@ enum Gretina4FIFOStates {
 - (void) findNoiseFloors;
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
+- (void) writeDownSample;
 
 
 #pragma mark ¥¥¥FPGA download
@@ -400,6 +404,7 @@ enum Gretina4FIFOStates {
 - (NSArray*) autoTests;
 @end
 
+extern NSString* ORGretina4ModelDownSampleChanged;
 extern NSString* ORGretina4ModelRegisterIndexChanged;
 extern NSString* ORGretina4ModelRegisterWriteValueChanged;
 extern NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged;

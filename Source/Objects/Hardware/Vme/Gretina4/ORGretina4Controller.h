@@ -79,6 +79,7 @@
     IBOutlet NSButton*      statusButton;
     IBOutlet NSButton*      noiseFloorButton;
     IBOutlet NSTextField*   fifoState;
+	IBOutlet NSPopUpButton* downSamplePU;
 	
 	IBOutlet NSButton*      setEnableStatusOfChannelsWhileInitButton; //jing's code
 	
@@ -131,6 +132,7 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface Management
+- (void) downSampleChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote;
@@ -173,6 +175,7 @@
 - (void) setRegisterDisplay:(unsigned int)index;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) downSampleAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) cardInfoAction:(id) sender;

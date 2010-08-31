@@ -313,7 +313,12 @@
                          name : ORGretina4ModelSetEnableStatusChanged
 						object: model];
 	
-    [self registerRates];
+    [notifyCenter addObserver : self
+                     selector : @selector(downSampleChanged:)
+                         name : ORGretina4ModelDownSampleChanged
+						object: model];
+
+	[self registerRates];
 }
 
 - (void) registerRates
@@ -377,9 +382,15 @@
 	[self registerIndexChanged:nil];
 	[self registerWriteValueChanged:nil];
 	[self setEnableStatusOfAllChannelsWhileInitChanged:nil];
+	[self downSampleChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) downSampleChanged:(NSNotification*)aNote
+{
+	[downSamplePU selectItemAtIndex: [model downSample]];
+}
+
 - (void) registerWriteValueChanged:(NSNotification*)aNote
 {
 	[registerWriteValueField setIntValue: [model registerWriteValue]];
@@ -603,6 +614,7 @@
 	[resetButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[loadMainFPGAButton setEnabled:!locked && !downloading];
 	[stopFPGALoadButton setEnabled:!locked && downloading];
+	[downSamplePU setEnabled:!lockedOrRunningMaintenance && downloading];
 	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
@@ -795,6 +807,10 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (void) downSampleAction:(id)sender
+{
+	[model setDownSample:[sender indexOfSelectedItem]];	
+}
 
 - (IBAction) registerIndexPUAction:(id)sender
 {

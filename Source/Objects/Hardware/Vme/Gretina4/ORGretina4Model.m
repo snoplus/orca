@@ -30,15 +30,16 @@
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
 
-NSString* ORGretina4ModelRegisterIndexChanged = @"ORGretina4ModelRegisterIndexChanged";
-NSString* ORGretina4ModelRegisterWriteValueChanged		= @"ORGretina4ModelRegisterWriteValueChanged";
-NSString* ORGretina4ModelFpgaDownProgressChanged = @"ORGretina4ModelFpgaDownProgressChanged";
-NSString* ORGretina4ModelMainFPGADownLoadStateChanged = @"ORGretina4ModelMainFPGADownLoadStateChanged";
-NSString* ORGretina4ModelFpgaFilePathChanged	= @"ORGretina4ModelFpgaFilePathChanged";
-NSString* ORGretina4ModelNoiseFloorIntegrationTimeChanged = @"ORGretina4ModelNoiseFloorIntegrationTimeChanged";
-NSString* ORGretina4ModelNoiseFloorOffsetChanged = @"ORGretina4ModelNoiseFloorOffsetChanged";
-NSString* ORGretina4CardInfoUpdated				= @"ORGretina4CardInfoUpdated";
-NSString* ORGretina4RateGroupChangedNotification= @"ORGretina4RateGroupChangedNotification";
+NSString* ORGretina4ModelDownSampleChanged			= @"ORGretina4ModelDownSampleChanged";
+NSString* ORGretina4ModelRegisterIndexChanged		= @"ORGretina4ModelRegisterIndexChanged";
+NSString* ORGretina4ModelRegisterWriteValueChanged	= @"ORGretina4ModelRegisterWriteValueChanged";
+NSString* ORGretina4ModelFpgaDownProgressChanged	= @"ORGretina4ModelFpgaDownProgressChanged";
+NSString* ORGretina4ModelMainFPGADownLoadStateChanged		= @"ORGretina4ModelMainFPGADownLoadStateChanged";
+NSString* ORGretina4ModelFpgaFilePathChanged				= @"ORGretina4ModelFpgaFilePathChanged";
+NSString* ORGretina4ModelNoiseFloorIntegrationTimeChanged	= @"ORGretina4ModelNoiseFloorIntegrationTimeChanged";
+NSString* ORGretina4ModelNoiseFloorOffsetChanged	= @"ORGretina4ModelNoiseFloorOffsetChanged";
+NSString* ORGretina4CardInfoUpdated					= @"ORGretina4CardInfoUpdated";
+NSString* ORGretina4RateGroupChangedNotification	= @"ORGretina4RateGroupChangedNotification";
 
 NSString* ORGretina4NoiseFloorChanged			= @"ORGretina4NoiseFloorChanged";
 NSString* ORGretina4ModelFIFOCheckChanged		= @"ORGretina4ModelFIFOCheckChanged";
@@ -85,7 +86,7 @@ NSString* ORGretina4ModelSetEnableStatusChanged				= @"ORGretina4ModelSetEnableS
 
 
 @implementation ORGretina4Model
-#pragma mark â€¢â€¢â€¢Static Declarations
+#pragma mark ¥¥¥Static Declarations
 //offsets from the base address
 typedef struct {
 	unsigned long offset;
@@ -264,6 +265,20 @@ static struct {
 }
 
 #pragma mark ***Accessors
+
+- (int) downSample
+{
+    return downSample;
+}
+
+- (void) setDownSample:(int)aDownSample
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDownSample:downSample];
+    
+    downSample = aDownSample;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelDownSampleChanged object:self];
+}
 
 - (int) registerIndex
 {
@@ -568,7 +583,7 @@ static struct {
     [waveFormRateGroup setIntegrationTime:newIntegrationTime];
 }
 
-#pragma mark â€¢â€¢â€¢Rates
+#pragma mark ¥¥¥Rates
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
@@ -579,7 +594,7 @@ static struct {
 	}
 	else return 0;
 }
-#pragma mark â€¢â€¢â€¢specific accessors
+#pragma mark ¥¥¥specific accessors
 - (void) setExternalWindow:(int)aValue { [self cardInfo:kExternalWindowIndex  setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setPileUpWindow:(int)aValue   { [self cardInfo:kPileUpWindowIndex    setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setNoiseWindow:(int)aValue    { [self cardInfo:kNoiseWindowIndex		setObject:[NSNumber numberWithInt:aValue]]; }
@@ -763,7 +778,7 @@ static struct {
 	[self setDataLength:chan withValue:(aValue/10.0 + 2*kGretina4HeaderLengthLongs)];		//ns -> raw
 }  
 
-#pragma mark â€¢â€¢â€¢Hardware Access
+#pragma mark ¥¥¥Hardware Access
 - (unsigned long) baseAddress
 {
 	return (([self slot]+1)&0x1f)<<20;
@@ -1018,6 +1033,7 @@ static struct {
 		}
 	}
 		
+	[self writeDownSample];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4CardInited object:self];
 }
@@ -1115,6 +1131,16 @@ static struct {
     else if((theValue & kGretina4FIFOAlmostFull)!=0)	return kAlmostFull;
     else if((theValue & kGretina4FIFOAlmostEmpty)!=0)	return kAlmostEmpty;
     else						return kHalfFull;
+}
+
+- (void) writeDownSample
+{
+    unsigned long theValue = (downSample << 28);
+    [[self adapter] writeLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToWrite:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
 }
 
 - (int) clearFIFO
@@ -1429,7 +1455,7 @@ static struct {
 }
 
 
-#pragma mark â€¢â€¢â€¢Data Taker
+#pragma mark ¥¥¥Data Taker
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -1460,7 +1486,7 @@ static struct {
 }
 
 
-#pragma mark â€¢â€¢â€¢HW Wizard
+#pragma mark ¥¥¥HW Wizard
 -(BOOL) hasParmetersToRamp
 {
 	return YES;
@@ -1585,7 +1611,13 @@ static struct {
     [p setFormat:@"##0" upperLimit:0x3FF lowerLimit:1 stepSize:1 units:@"ns"];
     [p setSetMethod:@selector(setTraceLengthConverted:withValue:) getMethod:@selector(traceLengthConverted:)];
     [a addObject:p];
-    
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Down Sample"];
+    [p setFormat:@"##0" upperLimit:4 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setDownSample:) getMethod:@selector(downSample)];
+    [a addObject:p];
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Init"];
@@ -1833,13 +1865,14 @@ static struct {
 	return index+1;
 }
 
-#pragma mark â€¢â€¢â€¢Archival
+#pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setDownSample:				[decoder decodeIntForKey:@"downSample"]];
     [self setRegisterIndex:				[decoder decodeIntForKey:@"registerIndex"]];
     [self setRegisterWriteValue:		[decoder decodeInt32ForKey:@"registerWriteValue"]];
     [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
@@ -1880,6 +1913,7 @@ static struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:downSample					forKey:@"downSample"];
     [encoder encodeInt:registerIndex				forKey:@"registerIndex"];
     [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];
     [encoder encodeObject:fpgaFilePath				forKey:@"fpgaFilePath"];
@@ -1929,6 +1963,7 @@ static struct {
 		[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
 	}
     [objDictionary setObject:ar forKey:@"LED Threshold"];
+    [objDictionary setObject:[NSNumber numberWithInt:downSample] forKey:@"Down Sample"];
 	
 	
     return objDictionary;
