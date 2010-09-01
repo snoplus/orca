@@ -45,6 +45,7 @@
 	//composite
 	IBOutlet NSButton*		compositeLockButton;
 	IBOutlet NSProgressIndicator*	deselectCompositeRunningIndicator;
+	IBOutlet NSButton*		compositeDeselectButton;
 	IBOutlet NSMatrix*		compositeSlotMaskMatrix;
 	IBOutlet NSTextField*		compositeSlotMaskField;
 	IBOutlet NSPopUpButton*		compositeXl3ModePU;
@@ -56,6 +57,11 @@
 	IBOutlet NSPopUpButton*		compositeXl3RWRegisterPU;
 	IBOutlet NSTextField*		compositeXl3RWDataValueField;	
 	IBOutlet NSProgressIndicator*	compositeXl3RWRunningIndicator;
+	IBOutlet NSButton*		compositeQuitButton;	
+	IBOutlet NSProgressIndicator*	compositeQuitRunningIndicator;
+	IBOutlet NSTextField*		compositeSetPedestalField;	
+	IBOutlet NSButton*		compositeSetPedestalButton;	
+	IBOutlet NSProgressIndicator*	compositeSetPedestalRunningIndicator;
 	//connection
 	IBOutlet NSButton*		toggleConnectButton;
 	IBOutlet NSPopUpButton*		errorTimeOutPU;
@@ -78,6 +84,7 @@
 #pragma mark •••Interface Management
 - (void) settingsLockChanged:(NSNotification*)aNotification;
 - (void) xl3LockChanged:(NSNotification*)aNotification;
+- (void) opsRunningChanged:(NSNotification*)aNote;
 //basic ops
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
 - (void) repeatCountChanged:(NSNotification*)aNote;
@@ -89,10 +96,11 @@
 - (void) compositeXl3ModeRunningChanged:(NSNotification*)aNote;
 - (void) compositeXl3ModeChanged:(NSNotification*)aNote;
 - (void) compositeSlotMaskChanged:(NSNotification*)aNote;
-- (void) compositeDeselectRunningChanged:(NSNotification*)aNote;
 - (void) compositeXl3RWAddressChanged:(NSNotification*)aNote;
 - (void) compositeXL3RWDataChanged:(NSNotification*)aNote;
 - (void) compositeXl3RWRunningChanged:(NSNotification*)aNote;
+- (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote;
+
 //ip connection
 - (void) connectStateChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
@@ -100,10 +108,12 @@
 - (void) errorTimeOutChanged:(NSNotification*)aNote;
 
 #pragma mark •••Helper
+- (void) populateOps;
 - (void) populatePullDown;
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id)sender;
+- (IBAction) opsAction:(id)sender;
 //basic
 - (IBAction) basicSelectedRegisterAction:(id)sender;
 - (IBAction) basicReadAction:(id)sender;
@@ -120,7 +130,6 @@
 - (IBAction) compositeSlotMaskSelectAction:(id)sender;
 - (IBAction) compositeSlotMaskDeselectAction:(id)sender;
 - (IBAction) compositeSlotMaskPresentAction:(id)sender;
-- (IBAction) compositeDeselectAction:(id)sender;
 - (IBAction) compositeXl3ModeAction:(id)sender;
 - (IBAction) compositeXl3ModeSetAction:(id)sender;
 - (IBAction) compositeXl3RWAddressValueAction:(id)sender;
@@ -129,6 +138,7 @@
 - (IBAction) compositeXl3RWRegisterAction:(id)sender;
 - (IBAction) compositeXl3RWDataValueAction:(id)sender;
 - (IBAction) compositeXl3RWSend:(id)sender;
+- (IBAction) compositeSetPedestalValue:(id)sender;
 //connection
 - (IBAction) toggleConnectAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;

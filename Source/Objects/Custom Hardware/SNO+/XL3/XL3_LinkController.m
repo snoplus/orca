@@ -28,6 +28,7 @@
 static NSArray* xl3RWModes;
 static NSDictionary* xl3RWSelects;
 static NSDictionary* xl3RWAddresses;
+static NSDictionary* xl3Ops;
 
 @implementation XL3_LinkController
 
@@ -58,7 +59,8 @@ static NSDictionary* xl3RWAddresses;
 	int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
 	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
 
-	[tabView selectTabViewItemAtIndex: index];	
+	[tabView selectTabViewItemAtIndex: index];
+	[self populateOps];
 	[self populatePullDown];
 }	
 
@@ -112,8 +114,8 @@ static NSDictionary* xl3RWAddresses;
 			   object : model];
 
 	[notifyCenter addObserver : self
-			 selector : @selector(compositeDeselectRunningChanged:)
-			     name : ORXL3ModelDeselectCompositeRunningChanged
+			 selector : @selector(opsRunningChanged:)
+			     name : ORXL3ModelXl3OpsRunningChanged
 			   object : model];
 
 	[notifyCenter addObserver : self
@@ -147,6 +149,11 @@ static NSDictionary* xl3RWAddresses;
 			   object : model];
 
 	[notifyCenter addObserver : self
+			 selector : @selector(compositeXl3PedestalMaskChanged:)
+			     name : ORXL3ModelXl3PedestalMaskChanged
+			   object : model];
+	
+	[notifyCenter addObserver : self
 			 selector : @selector(ipNumberChanged:)
 			     name : XL3_LinkIPNumberChanged
 			   object : [model xl3Link]];
@@ -167,6 +174,7 @@ static NSDictionary* xl3RWAddresses;
 	[super updateWindow];
 
 	[self settingsLockChanged:nil];
+	[self opsRunningChanged:nil];
 	//basic ops
 	[self selectedRegisterChanged:nil];
 	[self repeatCountChanged:nil];
@@ -175,10 +183,10 @@ static NSDictionary* xl3RWAddresses;
 	[self basicOpsRunningChanged:nil];
 	[self writeValueChanged:nil];
 	//composite
-	[self compositeDeselectRunningChanged:nil];
 	[self compositeSlotMaskChanged:nil];
 	[self compositeXl3ModeChanged:nil];
 	[self compositeXl3ModeRunningChanged:nil];
+	[self compositeXl3PedestalMaskChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
 
@@ -259,6 +267,19 @@ static NSDictionary* xl3RWAddresses;
 
 }
 
+- (void) opsRunningChanged:(NSNotification*)aNote
+{
+	for (id key in xl3Ops) {
+		if ([model xl3OpsRunningForKey:key]) {
+			[[[xl3Ops objectForKey:key] objectForKey:@"spinner"] startAnimation:model];
+		}
+		else {
+			[[[xl3Ops objectForKey:key] objectForKey:@"spinner"] stopAnimation:model];			
+		}
+	}
+}
+
+
 #pragma mark •basic ops
 - (void) repeatCountChanged:(NSNotification*)aNote
 {
@@ -317,12 +338,6 @@ static NSDictionary* xl3RWAddresses;
 	[compositeSlotMaskField setIntValue:mask];
 }
 
-- (void) compositeDeselectRunningChanged:(NSNotification*)aNote
-{
-	if ([model deselectCompositeRunning]) [deselectCompositeRunningIndicator startAnimation:model];
-	else [deselectCompositeRunningIndicator stopAnimation:model];
-}
-
 - (void) compositeXl3RWAddressChanged:(NSNotification*)aNote
 {
 	[compositeXl3RWAddressValueField setIntValue:[model xl3RWAddressValue]];
@@ -344,6 +359,11 @@ static NSDictionary* xl3RWAddresses;
 {
 	if ([model xl3RWRunning]) [compositeXl3RWRunningIndicator startAnimation:model];
 	else [compositeXl3RWRunningIndicator stopAnimation:model];
+}
+
+- (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote
+{
+	[compositeSetPedestalField setIntValue:[model xl3PedestalMask]];
 }
 
 #pragma mark •ip connection
@@ -385,6 +405,25 @@ static NSDictionary* xl3RWAddresses;
 
 
 #pragma mark •••Helper
+- (void) populateOps
+{
+	
+	xl3Ops = [[NSDictionary alloc] initWithObjectsAndKeys:
+			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeDeselectButton, @"button",
+									deselectCompositeRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(deselectComposite)), @"selector",
+			 nil], @"compositeDeselect",
+			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeQuitButton, @"button",
+									compositeQuitRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(compositeQuit)), @"selector",
+			 nil], @"compositeQuit",
+			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeSetPedestalButton, @"button",
+									compositeSetPedestalRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(compositeSetPedestal)), @"selector",
+			 nil], @"compositeSetPedestal",
+		  nil];
+}
+
 
 - (void) populatePullDown
 {
@@ -458,7 +497,7 @@ static NSDictionary* xl3RWAddresses;
 			  [NSNumber numberWithInt:0x106], @"fec cmos arry pt",
 			  [NSNumber numberWithInt:0x107], @"fec cmos cnt inf",
 			  nil];
-			
+
 	short	i;
 	[selectedRegisterPU removeAllItems];
 	for (i = 0; i < [model getNumberRegisters]; i++) {
@@ -482,6 +521,21 @@ static NSDictionary* xl3RWAddresses;
 - (IBAction) lockAction:(id)sender
 {
 	[gSecurity tryToSetLock:[model xl3LockName] to:[sender intValue] forWindow:[self window]];
+}
+
+
+- (IBAction) opsAction:(id)sender
+{
+	NSString* theKey;
+	for (id key in xl3Ops) {
+		if ((id) [[xl3Ops objectForKey:key] objectForKey:@"button"] == sender) {
+			theKey = [NSString stringWithString: key];
+			NSLog(@"%@ found in keys\n", theKey);
+			break;
+		}
+	}
+	
+	[model performSelector:NSSelectorFromString([[xl3Ops objectForKey:theKey] objectForKey:@"selector"])];
 }
 
 
@@ -615,6 +669,11 @@ static NSDictionary* xl3RWAddresses;
 - (IBAction) compositeXl3RWSend:(id)sender
 {
 	[model compositeXl3RW];
+}
+
+- (IBAction) compositeSetPedestalValue:(id)sender
+{
+	[model setXl3PedestalMask:[sender intValue]];
 }
 
 //connection

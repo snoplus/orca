@@ -52,13 +52,14 @@ NSString* ORXL3ModelRepeatDelayChanged =		@"ORXL3ModelRepeatDelayChanged";
 NSString* ORXL3ModelAutoIncrementChanged =		@"ORXL3ModelAutoIncrementChanged";
 NSString* ORXL3ModelBasicOpsRunningChanged =		@"ORXL3ModelBasicOpsRunningChanged";
 NSString* ORXL3ModelWriteValueChanged =			@"ORXL3ModelWriteValueChanged";
-NSString* ORXL3ModelDeselectCompositeRunningChanged =	@"ORXL3ModelDeselectCompositeRunningChanged";
 NSString* ORXL3ModelXl3ModeChanged =			@"ORXL3ModelXl3ModeChanged";
 NSString* ORXL3ModelSlotMaskChanged =			@"ORXL3ModelSlotMaskChanged";
 NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 NSString* ORXL3ModelXl3RWAddressValueChanged =		@"ORXL3ModelXl3RWAddressValueChanged";
 NSString* ORXL3ModelXl3RWDataValueChanged =		@"ORXL3ModelXl3RWDataValueChanged";
 NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
+NSString* ORXL3ModelXl3OpsRunningChanged =		@"ORXL3ModelXl3OpsRunningChanged";
+NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged";
 
 
 @interface ORXL3Model (private)
@@ -195,17 +196,6 @@ NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelBasicOpsRunningChanged object:self];
 }
-
-- (BOOL) deselectCompositeRunning
-{
-	return deselectCompositeRunning;
-}
-
-- (void) setDeselectCompositeRunning:(BOOL)aDeselectCompositeRunning
-{
-	deselectCompositeRunning = aDeselectCompositeRunning;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelDeselectCompositeRunningChanged object:self];
-}	
 
 - (BOOL) compositeXl3ModeRunning
 {
@@ -364,6 +354,30 @@ NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3RWDataValueChanged object:self];
 }
 
+- (BOOL) xl3OpsRunningForKey:(id)aKey
+{
+	return [[xl3OpsRunning objectForKey:aKey] boolValue];
+}
+
+- (void) setXl3OpsRunning:(BOOL)anXl3OpsRunning forKey:(id)aKey
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3OpsRunning:NO forKey:aKey];
+	[xl3OpsRunning setObject:[NSNumber numberWithBool:anXl3OpsRunning] forKey:aKey];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3OpsRunningChanged object:self];
+}
+
+- (unsigned long) xl3PedestalMask
+{
+	return xl3PedestalMask;
+}
+
+- (void) setXl3PedestalMask:(unsigned long)anXl3PedestalMask;
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setXl3PedestalMask:xl3PedestalMask];
+	xl3PedestalMask = anXl3PedestalMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3PedestalMaskChanged object:self];
+}
+
 - (int) slotConv
 {
     return [self slot];
@@ -405,8 +419,10 @@ NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 	[self setSlotMask:		[decoder decodeIntForKey:	@"ORXL3ModelSlotMask"]];
 	[self setXl3RWAddressValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWAddressValue"]];
 	[self setXl3RWDataValue:	[decoder decodeIntForKey:	@"ORXL3ModelXl3RWDataValue"]];
+	[self setXl3PedestalMask:	[decoder decodeIntForKey:	@"ORXL3ModelXl3PedestalMask"]];
 
 	if (xl3Mode == 0) [self setXl3Mode: 1];
+	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
 
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -425,6 +441,7 @@ NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 	[encoder encodeInt:slotMask		forKey:@"ORXL3ModelSlotMask"];
 	[encoder encodeInt:xl3RWAddressValue	forKey:@"ORXL3ModelXl3RWAddressValue"];
 	[encoder encodeInt:xl3RWDataValue	forKey:@"ORXL3ModelXl3RWDataValue"];
+	[encoder encodeInt:xl3PedestalMask	forKey:@"ORXL3ModelXl3PedestalMask"];
 }
 
 #pragma mark •••Hardware Access
@@ -597,7 +614,7 @@ NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 
 - (void) deselectComposite
 {
-	[self setDeselectCompositeRunning:YES];
+	[self setXl3OpsRunning:YES forKey:@"compositeDeselect"];
 	NSLog(@"Deselect FECs...\n");
 	@try {
 		[[self xl3Link] sendCommand:DESELECT_FECS_ID expectResponse:YES];
@@ -606,7 +623,7 @@ NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 	@catch (NSException * e) {
 		NSLog(@"Deselect FECs failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
-	[self setDeselectCompositeRunning:NO];
+	[self setXl3OpsRunning:NO forKey:@"compositeDeselect"];
 }
 
 - (void) writeXl3Mode
@@ -652,6 +669,62 @@ NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 	}
 		
 	[self setXl3RWRunning: NO];
+}
+
+- (void) compositeQuit
+{
+	XL3_PayloadStruct payload;
+	payload.numberBytesinPayload = 8;
+	unsigned long* data = (unsigned long*) payload.payload;
+	
+	if ([xl3Link needToSwap]) {
+		data[0] = 0x20657942UL;
+		data[1] = 0x00334C58UL;
+	}
+	else {
+		data[0] = 0x42796520UL;
+		data[1] = 0x584C3300UL;
+	}
+	
+	[self setXl3OpsRunning:YES forKey:@"compositeQuit"];
+	NSLog(@"Send XL3 Quit ...\n");
+	@try {
+		[[self xl3Link] sendCommand:DAQ_QUIT_ID withPayload:&payload expectResponse:NO];
+		NSLog(@"ok\n");
+	}
+	@catch (NSException* e) {
+		NSLog(@"Send XL3 Quit failed; error: %@ reason: %@\n", [e name], [e reason]);
+	}
+	[self setXl3OpsRunning:NO forKey:@"compositeQuit"];
+}
+
+- (void) compositeSetPedestal
+{
+	XL3_PayloadStruct payload;
+	payload.numberBytesinPayload = 8;
+	unsigned long* data = (unsigned long*) payload.payload;
+
+	if ([xl3Link needToSwap]) {
+		data[0] = swapLong([self slotMask]);
+		data[1] = swapLong([self xl3PedestalMask]);
+	}
+	else {
+		data[0] = [self slotMask];
+		data[1] = [self xl3PedestalMask];
+	}
+	
+	[self setXl3OpsRunning:YES forKey:@"compositeSetPedestal"];
+	NSLog(@"Set Pedestal ...\n");
+	@try {
+		[[self xl3Link] sendCommand:SET_CRATE_PEDESTALS_ID withPayload:&payload expectResponse:YES];
+		if ([xl3Link needToSwap]) *data = swapLong(*data);
+		if (*data == 0) NSLog(@"ok\n");
+		else NSLog(@"failed with XL3 error: 0x%08x\n", *data);
+	}
+	@catch (NSException* e) {
+		NSLog(@"Send XL3 Quit failed; error: %@ reason: %@\n", [e name], [e reason]);
+	}
+	[self setXl3OpsRunning:NO forKey:@"compositeSetPedestal"];
 }
 
 - (void) reset

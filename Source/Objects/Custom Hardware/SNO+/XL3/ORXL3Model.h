@@ -58,13 +58,14 @@ enum {
 	BOOL		doReadOp;
 	unsigned long	workingCount;
 	unsigned long	writeValue;
-	BOOL		deselectCompositeRunning;
 	unsigned int	xl3Mode;
 	unsigned long	slotMask;
 	BOOL		xl3ModeRunning;
 	unsigned long	xl3RWAddressValue;
 	unsigned long	xl3RWDataValue;
 	BOOL		xl3RWRunning;
+	NSMutableDictionary*	xl3OpsRunning;
+	unsigned long	xl3PedestalMask;
 }
 
 #pragma mark •••Initialization
@@ -87,8 +88,6 @@ enum {
 - (unsigned long) getRegisterAddress: (short) anIndex;
 - (BOOL) basicOpsRunning;
 - (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;
-- (BOOL) deselectCompositeRunning;
-- (void) setDeselectCompositeRunning:(BOOL)aDeselectCompositeRunning;
 - (BOOL) compositeXl3ModeRunning;
 - (void) setCompositeXl3ModeRunning:(BOOL)aCompositeXl3ModeRunning;
 - (unsigned long) slotMask;
@@ -111,6 +110,10 @@ enum {
 - (void) setXl3RWAddressValue:(unsigned long)anXl3RWAddressValue;
 - (unsigned long) xl3RWDataValue;
 - (void) setXl3RWDataValue:(unsigned long)anXl3RWDataValue;
+- (BOOL) xl3OpsRunningForKey:(id)aKey;
+- (void) setXl3OpsRunning:(BOOL)anXl3OpsRunning forKey:(id)aKey;
+- (unsigned long) xl3PedestalMask;
+- (void) setXl3PedestalMask:(unsigned long)anXl3PedestalMask;
 
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
@@ -141,6 +144,8 @@ enum {
 - (void) deselectComposite;
 - (void) writeXl3Mode;
 - (void) compositeXl3RW;
+- (void) compositeQuit;
+- (void) compositeSetPedestal;
 - (void) reset;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
@@ -156,10 +161,11 @@ extern NSString* ORXL3ModelRepeatDelayChanged;
 extern NSString* ORXL3ModelAutoIncrementChanged;
 extern NSString* ORXL3ModelBasicOpsRunningChanged;
 extern NSString* ORXL3ModelWriteValueChanged;
-extern NSString* ORXL3ModelDeselectCompositeRunningChanged;
 extern NSString* ORXL3ModelXl3ModeChanged;
 extern NSString* ORXL3ModelSlotMaskChanged;
 extern NSString* ORXL3ModelXl3ModeRunningChanged;
 extern NSString* ORXL3ModelXl3RWAddressValueChanged;
 extern NSString* ORXL3ModelXl3RWDataValueChanged;
 extern NSString* ORXL3ModelXl3RWRunningChanged;
+extern NSString* ORXL3ModelXl3OpsRunningChanged;
+extern NSString* ORXL3ModelXl3PedestalMaskChanged;
