@@ -73,6 +73,7 @@ NSString* kDefFont = @"Helvetica";
 #define	kMaxArgumentForExp				1000	// maximum argument for exp()
 #define kBigNumber						1e100	// large number for divide by zero result
 
+
 static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 static char	powers[]	= {-15,-12,-9,-6,-3,0,3,6,9};		        // powers for exponents
 
@@ -100,8 +101,8 @@ NSString* ORAxisMaxSave				= @"ORAxisMaxSave";
 NSString* ORAxisAllowShifts			= @"ORAxisAllowShifts";
 NSString* ORAxisFont				= @"ORAxisFont";
 NSString* ORAxisLabel				= @"ORAxisLabel";
+NSString* ORAxisMarker				= @"kMarker";
 
-NSString* kMarker					= @"kMarker";
 
 NSString* kDefaultXAxisPrefs		= @".xaxis";
 NSString* kDefaultYAxisPrefs		= @".yaxis";
@@ -818,7 +819,7 @@ enum {
 	NSEventType modifierKeys = [theEvent modifierFlags];
     NSPoint mouseLoc         = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	
-	NSNumber* markerNumber = [attributes objectForKey:kMarker];
+	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
 
 	if(markerNumber){
 	
@@ -830,7 +831,7 @@ enum {
 		
 		if(checkValue <= (markerPixel+20) && checkValue>=(markerPixel-20)){
 			if(modifierKeys & NSCommandKeyMask){
-				[attributes removeObjectForKey:kMarker];
+				[attributes removeObjectForKey:ORAxisMarker];
 				[[self window] resetCursorRects];
 				[viewToScale setNeedsDisplay:YES];
 				[self setNeedsDisplay:YES];
@@ -932,7 +933,7 @@ enum {
 	if(markValue <= [self minValue])	 markValue = [self minValue];
 	else if(markValue >=[self maxValue]) markValue = [self maxValue];
 	
-	[attributes setObject:[NSNumber numberWithFloat:markValue] forKey:kMarker];
+	[attributes setObject:[NSNumber numberWithFloat:markValue] forKey:ORAxisMarker];
 	[viewToScale setNeedsDisplay:YES];
 	[self setNeedsDisplay:YES];
 }
@@ -1074,11 +1075,44 @@ enum {
     }
 }
 
+- (void) drawMarker:(float)val axisPosition:(int)axisPosition
+{
+	NSImage*	markerImage;
+    BOOL isX = [self isXAxis];
+	BOOL isOpposite = [self oppositePosition];
+	if (isX) {
+		if(isOpposite)	markerImage = [NSImage imageNamed:@"xAxisMarkerOpposite"];
+		else			markerImage = [NSImage imageNamed:@"xAxisMarker"];
+	}
+	else {
+		if(isOpposite)	markerImage = [NSImage imageNamed:@"yAxisMarkerOpposite"];
+		else			markerImage = [NSImage imageNamed:@"yAxisMarker"];
+	}
+	val = [self getPixAbs:val];
+	NSRect sourceRect = NSMakeRect(0,0,[markerImage size].width,[markerImage size].height);
+	int imageOffset;
+	NSSize imageSize = [markerImage size];
+	NSPoint p;
+	if(isX){
+		if(isOpposite) imageOffset = imageSize.height+2;
+		else           imageOffset = -imageSize.height-2;
+		p = NSMakePoint(val-imageSize.width/2+lowOffset,axisPosition+imageOffset);
+	}
+	else {
+		if(isOpposite) imageOffset = imageSize.width+2;
+		else           imageOffset = -imageSize.width-2;
+		p = NSMakePoint(axisPosition+imageOffset,val-imageSize.height/2+lowOffset);
+	}
+	
+	[markerImage drawAtPoint:p fromRect:sourceRect operation:NSCompositeSourceOver fraction:.8];
+	
+}
+
 - (void) drawMarkInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
 {
 	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
 
-	NSNumber* markerNumber = [attributes objectForKey:kMarker];
+	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
 	if(markerNumber){
 		float oldLineWidth = [NSBezierPath defaultLineWidth];
 		[NSBezierPath setDefaultLineWidth:.5];
@@ -1153,7 +1187,7 @@ enum {
 - (void) resetCursorRects
 {
     NSRect aRect = NSMakeRect(0,0,[self frame].size.width,[self frame].size.height);
-	NSNumber* markerNumber = [attributes objectForKey:kMarker];
+	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
 	NSRect lowRect;
 	NSRect highRect;
 	NSRect markerRect;
@@ -1280,6 +1314,7 @@ enum {
 		[context restoreGraphicsState];
 	}
 }
+
 @end
 
 @implementation ORAxis (private)
@@ -1518,41 +1553,6 @@ enum {
     pinPix = (pinVal-[self minValue]) * fscl;
 }
 
-- (void) drawMarker:(float)val axisPosition:(int)axisPosition
-{
-	NSImage*	markerImage;
-    BOOL isX = [self isXAxis];
-	BOOL isOpposite = [self oppositePosition];
-	if (isX) {
-		if(isOpposite)	markerImage = [NSImage imageNamed:@"xAxisMarkerOpposite"];
-		else			markerImage = [NSImage imageNamed:@"xAxisMarker"];
-	}
-	else {
-		if(isOpposite)	markerImage = [NSImage imageNamed:@"yAxisMarkerOpposite"];
-		else			markerImage = [NSImage imageNamed:@"yAxisMarker"];
-	}
-	NSRect sourceRect = NSMakeRect(0,0,[markerImage size].width,[markerImage size].height);
-	int imageOffset;
-	NSSize imageSize = [markerImage size];
-	if(isX){
-		if(isOpposite) imageOffset = imageSize.height+2;
-		else           imageOffset = -imageSize.height-2;
-	}
-	else {
-		if(isOpposite) imageOffset = imageSize.width+2;
-		else           imageOffset = -imageSize.width-2;
-	}
-	
-	val = [self getPixAbs:val];
-	NSPoint p;
-	if(isX)p = NSMakePoint(val-imageSize.width/2+lowOffset,axisPosition+imageOffset);
-	else   p = NSMakePoint(axisPosition+imageOffset,val-imageSize.height/2+lowOffset);
-	
-	[markerImage drawAtPoint:p fromRect:sourceRect operation:NSCompositeSourceOver fraction:.8];
-
-}
-
-
 /* drawLogScale - draw a logarithmic scale */
 /* Note: this routine only works for vertical scales which start at zero */
 - (void) drawLogScale {
@@ -1594,7 +1594,7 @@ enum {
 		longTicEndY   = lowOffset;
 	}    
 
-	NSNumber* markerNumber = [attributes objectForKey:kMarker];
+	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
 	if(markerNumber){	
 		[self drawMarker:[markerNumber floatValue] axisPosition:axisPosition];
 	}
@@ -1863,7 +1863,7 @@ enum {
 	}    
 
 	
-	NSNumber* markerNumber = [attributes objectForKey:kMarker];
+	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
 	if(markerNumber){	
 		[self drawMarker:[markerNumber floatValue] axisPosition:axisPosition];
 	}

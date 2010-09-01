@@ -59,6 +59,7 @@ long roundToLong(double x);
 - (id) initWithFrame:(NSRect)aFrame;
 - (void) awakeFromNib;
 - (void) drawGridInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor;
+- (void) drawMarker:(float)val axisPosition:(int)axisPosition;
 - (void) drawMarkInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor;
 - (void) drawTitle;
 
@@ -186,6 +187,7 @@ extern NSString* ORAxisPadding;
 extern NSString* ORAxisMinSave;
 extern NSString* ORAxisMaxSave;
 extern NSString* ORAxisLabel;
+extern NSString* ORAxisMarker;
 
 extern NSString* ORAxisAllowShifts;
 extern NSString* ORAxisFont;

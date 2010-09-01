@@ -40,6 +40,8 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 -(id) initWithFrame:(NSRect)aFrame
 {
     self = [super initWithFrame:aFrame];
+	NSDate* now = [NSDate date];
+	[self setStartTime:[now timeIntervalSince1970]];
     return self;
 }
 
@@ -49,7 +51,12 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
     [self drawLinScale];
 }
 
--(void)	drawLinScale
+- (void) setStartTime:(NSTimeInterval)aStartTime
+{
+	startTime = aStartTime;
+}
+
+- (void)	drawLinScale
 {
  	NSAssert([NSThread mainThread],@"TimeAxis drawing from non-gui thread");
    
@@ -135,8 +142,17 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
     
     lim  = [self valueRange] + tol;		// upper limit for scale value
 	unsigned short nthTick = 0;
-    
+ 
+	
     if ([self isXAxis]) {
+		
+		int			axisPosition;
+		if([self oppositePosition])	axisPosition  = 0;
+		else			axisPosition  = [self frame].size.height;
+		NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
+		if(markerNumber){	
+			[self drawMarker:[markerNumber floatValue] axisPosition:axisPosition];
+		}
 		
         y = [self frame].size.height;
 		
@@ -159,12 +175,13 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
                     [theAxisColoredTicks lineToPoint:NSMakePoint(x,y-LONG_TICK)];			// draw long tick
 
 					if (!ival) {
-						axisNumberString = [NSString stringWithString:@"Now"];
-						dateOffset = 3;
+						NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime];
+						axisNumberString = [aDate descriptionWithCalendarFormat:@"Newest"];
+						dateOffset = +20;
 					}
 					else if ((nthTick % 3) == 0) {
 						double theValue = val;
-						NSCalendarDate *aDate = [[NSCalendarDate date] dateByAddingYears:0 months:0 days:0 hours:0 minutes:0 seconds:-theValue];
+						NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime-theValue];
 						axisNumberString = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
 						nthTick = 0;
 					}
@@ -203,5 +220,37 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
     [theAxisColoredTicks stroke];
 }
 
+- (void) drawMarkInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
+{
+	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
+	
+	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
+	if(markerNumber){
+		float oldLineWidth = [NSBezierPath defaultLineWidth];
+		[NSBezierPath setDefaultLineWidth:.5];
+		[aColor set];
+		
+		float val = [self getPixAbs:[markerNumber floatValue]];
+		
+		float markerValue = [markerNumber floatValue];
+		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime-markerValue];
+		NSString* label = [aDate descriptionWithCalendarFormat:@"%H:%M:%S"];
+		
+		if([self isXAxis]){
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 
+									  toPoint:NSMakePoint(val,aFrame.size.height-1)];
+			
+			int labelWidth = [label sizeWithAttributes:[self labelAttributes]].width;
+			float x;
+			if(val + labelWidth > aFrame.size.width)x = val - labelWidth-3;
+			else x = val+3;
+			[label drawAtPoint:NSMakePoint(x,3) withAttributes:[self labelAttributes]];
+		}
+		else {
+		}
+		
+		[NSBezierPath setDefaultLineWidth:oldLineWidth];
+	}
+}
 
 @end

@@ -37,16 +37,25 @@
 }
 
 #pragma mark ***Drawing
+
 - (void) drawData
 {
 	NSAssert([NSThread mainThread],@"ORTimeLinePlot drawing from non-gui thread");
 	
-	ORAxis*    mXScale = [plotView xScale];
-	ORAxis*    mYScale = [plotView yScale];
-	
 	int numPoints = [dataSource numberPointsInPlot:self];
-    if(numPoints == 0) return;
-		    
+    if(numPoints < 2) return;
+
+	ORTimeAxis* mXScale = [plotView xScale];
+	ORAxis*		mYScale = [plotView yScale];
+	
+	[mXScale setNeedsDisplay:YES];
+	
+	//for this plot we have to set the axis. Remember they are drawn from newest to oldest
+	NSTimeInterval startTime;
+	double ydummy;
+	[dataSource plotter:self index:0 x:&startTime y:&ydummy];
+	if(ydummy>0)[mXScale setStartTime:startTime];
+	
 	BOOL aLog = [mYScale isLog];
 	BOOL aInt = [mYScale integer];
 	double aMinPad = [mYScale minPad];
@@ -54,11 +63,10 @@
 	float width		= [plotView bounds].size.width;
 	float chanWidth = width / [mXScale valueRange];
 	
-	NSTimeInterval startTime = [[NSDate date] timeIntervalSince1970];
 	
 	NSBezierPath* theDataPath = [NSBezierPath bezierPath];
-	double xValue,yValue;
 	float xl,yl;
+	double xValue,yValue;
 	long i;
 	for (i=0; i<numPoints;++i) {
 		[dataSource plotter:self index:i x:&xValue y:&yValue];

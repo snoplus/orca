@@ -282,13 +282,13 @@
 		[[self xScale] drawGridInFrame:[self bounds] usingColor:[self gridColor]];
 		[[self yScale] drawGridInFrame:[self bounds] usingColor:[self gridColor]];
 	}
-	[[self xScale] drawMarkInFrame:[self bounds] usingColor:[self gridColor]];
-	[[self yScale] drawMarkInFrame:[self bounds] usingColor:[self gridColor]];
 
 	
 	for ( id aPlot in plotArray) {
 		[aPlot drawData];		
     }
+	[[self xScale] drawMarkInFrame:[self bounds] usingColor:[NSColor blackColor]];
+	[[self yScale] drawMarkInFrame:[self bounds] usingColor:[NSColor blackColor]];
 		
     if ( [self delegate] && [[self delegate] respondsToSelector:@selector(plotViewDidDraw:)] ) {
         [[self delegate] plotViewDidDraw:self];
