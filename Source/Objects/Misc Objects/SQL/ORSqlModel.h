@@ -67,9 +67,6 @@
 - (BOOL) connectionValid;
 - (void) disconnect;
 
-#pragma mark ***DB Creation
-- (void) makeDB;
-
 @end
 
 extern NSString* ORSqlModelStealthModeChanged;
@@ -168,7 +165,6 @@ extern NSString* ORSqlLock;
 - (void) setDataMonitorId:(int)anID;
 - (void) main;
 @end
-
 
 @interface NSObject (ORSqlModel)
 - (int) maxNumSegments;

@@ -28,13 +28,12 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 - (id) init
 {
     self = [super init];
-	dataLock = [[NSRecursiveLock alloc] init];
     return self;
 }
 
 - (void) dealloc
 {
-	[dataLock release];
+	[dataSetLock release];
     [waveform release];
     waveform = nil;
  	[rois release];
@@ -78,11 +77,11 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 -(int) numberBins
 {
     if(waveform){
-		[dataLock lock];
+		[dataSetLock lock];
 		int temp;
 		if(unitSize == 0)unitSize = 1;
 		temp =  ([waveform length] - dataOffset)/unitSize;
-		[dataLock unlock];
+		[dataSetLock unlock];
 		return temp;
 	}
     else return 1;
@@ -90,7 +89,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 
 -(long) value:(unsigned short)aChan
 {
-	[dataLock lock];
+	[dataSetLock lock];
 
     long theValue = 0;
 	const char* cptr = (const char*)[waveform bytes];
@@ -124,19 +123,19 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 		else theValue =  0;
 	}
 
-	[dataLock unlock];
+	[dataSetLock unlock];
 	return theValue;
 }
 
 #pragma mark ¥¥¥Data Management
 - (void) clear
 {
-	[dataLock lock];
+	[dataSetLock lock];
     [waveform release];
     waveform = nil;
 	
     [self setTotalCounts:0];
-	[dataLock unlock];
+	[dataSetLock unlock];
 	
 }
 
@@ -163,7 +162,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 
 - (void) setWaveform:(NSData*)aWaveform
 {
-	[dataLock lock];
+	[dataSetLock lock];
 	
 	if(![self paused]){
 		[aWaveform retain];
@@ -172,8 +171,17 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
     }
 	
     if(aWaveform)[self incrementTotalCounts];
-	[dataLock unlock];
+	[dataSetLock unlock];
 
+}
+
+- (NSData*) rawData
+{
+	NSData* theRawData;
+	[dataSetLock lock];
+	theRawData =  [waveform retain];
+	[dataSetLock unlock];
+	return [theRawData autorelease];
 }
 
 - (BOOL) canJoinMultiPlot
@@ -200,9 +208,7 @@ static NSString *ORWaveformUnitSize 	= @"Waveform Data Unit Size";
     [self setUseUnsignedValues:[decoder decodeBoolForKey:@"UseUnsignedValues"]];
 	rois = [[decoder decodeObjectForKey:@"rois"] retain];
     [[self undoManager] enableUndoRegistration];
-	
-	dataLock = [[NSRecursiveLock alloc] init];
- 
+	 
     return self;
 }
 
@@ -237,6 +243,15 @@ static NSString *ORWaveformUnitSize 	= @"Waveform Data Unit Size";
 	*x = index;
 }
 
+//subclasses will override these
+- (unsigned long) mask
+{
+	return 0;
+}
+- (unsigned long) specialBitMask
+{
+	return 0;
+}
 
 @end
 

@@ -42,6 +42,7 @@
 - (BOOL) useUnsignedValues;
 - (void) setUseUnsignedValues:(BOOL)aState;
 - (NSMutableArray*) rois;
+- (NSData*) rawData;
 
 #pragma mark ¥¥¥Data Management
 - (void) clear;
@@ -53,6 +54,10 @@
 - (NSMutableArray*) rois;
 - (int) numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
+
+//subclasses will override these
+- (unsigned long) mask;
+- (unsigned long) specialBitMask;
 
 @end
 

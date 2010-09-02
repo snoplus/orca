@@ -153,11 +153,7 @@
 }
 
 #pragma mark ¥¥¥Actions
-- (void) makeDBAction:(id)sender
-{
-	[model makeDB];	
-}
-- (void) stealthModeAction:(id)sender
+- (IBAction) stealthModeAction:(id)sender
 {
 	[model setStealthMode:[sender intValue]];	
 }

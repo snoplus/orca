@@ -49,6 +49,5 @@
 - (IBAction) databaseNameAction:(id)sender;
 - (IBAction) sqlLockAction:(id)sender;
 - (IBAction) connectionAction:(id)sender;
-- (void) makeDBAction:(id)sender;
 
 @end

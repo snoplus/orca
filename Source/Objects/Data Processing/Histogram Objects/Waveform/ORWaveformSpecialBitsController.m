@@ -32,7 +32,7 @@
     [super awakeFromNib];
 	
 	int i;
-	NSArray* bitNames = [(ORMaskedIndexedWaveformWithSpecialBits*)model bitNames];
+	NSArray* bitNames = [[(ORMaskedIndexedWaveformWithSpecialBits*)model bitNames] retain];
 	for(i=0;i<[model numBits];i++){
 		ORBitStrip* aPlot = [[ORBitStrip alloc] initWithTag:1+i andDataSource:self];
 		if(i<[bitNames count]) [aPlot setBitName:[bitNames objectAtIndex:i]];
@@ -41,6 +41,8 @@
 		[plotView addPlot: aPlot];
 		[aPlot release];
 	}
+	[bitNames release];
+ 
 }
 
 #pragma mark ¥¥¥Data Source

@@ -23,7 +23,11 @@
 #import "ORAxis.h"
 
 @implementation ORBitStrip
-
+- (void) dealloc
+{
+	[bitName release];
+	[super dealloc];
+}
 - (void) setDataSource:(id)ds
 {
 	if( ![ds respondsToSelector:@selector(numberPointsInPlot:)] || 

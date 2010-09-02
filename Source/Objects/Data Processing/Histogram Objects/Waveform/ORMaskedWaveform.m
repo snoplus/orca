@@ -102,7 +102,11 @@
 @end
 
 @implementation ORMaskedIndexedWaveformWithSpecialBits
-
+- (void) dealloc
+{
+	[bitNames release];
+	[super dealloc];
+}
 - (void) makeMainController
 {
     [self linkToController:@"ORWaveformSpecialBitsController"];

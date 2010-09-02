@@ -22,6 +22,7 @@
 #import "ORSqlModel.h"
 #import "ORRunModel.h"
 #import "OR1DHisto.h"
+#import "ORMaskedWaveform.h"
 #import "ORSqlConnection.h"
 #import "ORSqlResult.h"
 #import "ORAlarm.h"
@@ -403,20 +404,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	sqlConnection = nil;
 }
 
-- (void) makeDB
-{
-	ORSqlConnection* newConnection = [[ORSqlConnection alloc] init];	
-	@try {
-		if([newConnection connectToHost:hostName userName:userName passWord:password]){
-			if([newConnection isConnected]){
-				[newConnection createDBWithName:@"ORCATest"];
-			}
-		}
-	}
-	@catch (NSException* e){
-	}
-}
-
 @end
 
 @implementation ORSqlModel (private)
@@ -604,7 +591,25 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
  | end        | int(11)     | YES  |     | NULL    |                |
  | data       | mediumblob  | YES  |     | NULL    |                |
  +------------+-------------+------+-----+---------+----------------+
- types:
+ 
+ Table: Waveforms
+ +------------+-------------+------+-----+---------+----------------+
+ | Field      | Type        | Null | Key | Default | Extra          |
+ +------------+-------------+------+-----+---------+----------------+
+ | dataset_id | int(11)     | NO   | PRI | NULL    | auto_increment |
+ | name       | varchar(64) | YES  |     | NULL    |                |
+ | counts     | int(11)     | YES  |     | NULL    |                |
+ | machine_id | int(11)     | NO   | MUL | NULL    |                |
+ | monitor_id | int(11)     | YES  |     | NULL    |                |
+ | type       | int(11)     | YES  |     | NULL    |                |
+ | unitsize   | int(11)     | YES  |     | NULL    |                |
+ | mask       | int(11)     | YES  |     | NULL    |                |
+ | bitmask    | int(11)     | YES  |     | NULL    |                |
+ | length     | int(11)     | YES  |     | NULL    |                |
+ | data       | mediumblob  | YES  |     | NULL    |                |
+ +------------+-------------+------+-----+---------+----------------+
+ 
+ type field is a double check that the data is the right type for the table:
  0 undefined
  1 1DHisto
  2 2DHisto
@@ -944,6 +949,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		id row				    = [theResult fetchRowAsDictionary];
 		id machine_id			= [row objectForKey:@"machine_id"];
 
+		//do 1D Histograms first
 		for(id aMonitor in dataMonitors){
 			NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
 			for(id aDataSet in objs1d){
@@ -977,6 +983,45 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 										  [sqlConnection quoteObject:[aDataSet fullName]],
 										  [aDataSet totalCounts],
 										  start,end,
+										  [aDataSet numberBins],
+										  convertedData];
+					[sqlConnection queryString:theQuery];
+				}
+			}
+		}
+		
+		//do Waveforms
+		for(id aMonitor in dataMonitors){
+			NSArray* objsWaveform = [aMonitor  collectObjectsOfClass:[ORWaveform class]];
+			for(id aDataSet in objsWaveform){
+				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Waveforms where (machine_id=%@ and name=%@ and monitor_id=%d)",
+																	   machine_id,
+																	   [sqlConnection quoteObject:[aDataSet fullName]],
+																	   [aMonitor uniqueIdNumber]]];
+				id dataSetEntry			 = [theResult fetchRowAsDictionary];
+				id dataset_id			 = [dataSetEntry objectForKey:@"dataset_id"];
+				unsigned long lastCounts = [[dataSetEntry objectForKey:@"counts"] longValue];
+				unsigned long countsNow  = [aDataSet totalCounts];
+				if(dataset_id) {
+					if(lastCounts != countsNow){
+						NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
+						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,data=%@ WHERE dataset_id=%@",
+											  [aDataSet totalCounts],
+											  convertedData,
+											  [sqlConnection quoteObject:dataset_id]];
+						[sqlConnection queryString:theQuery];
+					}
+				}
+				else {
+					NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
+					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Waveforms (monitor_id,machine_id,name,counts,unitsize,mask,bitmask,type,length,data) VALUES (%d,%@,%@,%d,%d,%d,%d,3,%d,%@)",
+										  [aMonitor uniqueIdNumber],
+										  [sqlConnection quoteObject:machine_id],
+										  [sqlConnection quoteObject:[aDataSet fullName]],
+										  [aDataSet totalCounts],
+										  [aDataSet unitSize],
+										  [aDataSet mask],
+										  [aDataSet specialBitMask],
 										  [aDataSet numberBins],
 										  convertedData];
 					[sqlConnection queryString:theQuery];
@@ -1167,6 +1212,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 }
 
 @end
+
+
 
 
 
