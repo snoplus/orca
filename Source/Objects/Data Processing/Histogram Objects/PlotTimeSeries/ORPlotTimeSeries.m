@@ -37,6 +37,7 @@ NSString* ORPlotTimeSeriesShowChanged = @"ORPlotTimeSeriesShowChanged";
 - (void) dealloc
 {
 	[timeSeries release];
+	[dataLock release];
     [super dealloc];
 }
 
