@@ -46,7 +46,7 @@
 	BOOL			autoReconnect;
 	BOOL			connectAtStart;
 	NSMutableArray* connectionHistory;
-	unsigned 		hostNameIndex;
+	NSUInteger 		hostNameIndex;
 }
 
 + (ORCARootService*) sharedORCARootService;
@@ -59,7 +59,7 @@
 - (void) clearHistory;
 - (NSArray*) connectionHistory;
 - (NSString*) hostName;
-- (unsigned) hostNameIndex;
+- (NSUInteger) hostNameIndex;
 - (void) setHostName:(NSString*)aName;
 - (BOOL) autoReconnect;
 - (void) setAutoReconnect:(BOOL)aAutoReconnect;
@@ -92,7 +92,7 @@
 - (void) requestNotification:(NSNotification*)aNote;
 - (void) sendRequest:(NSMutableDictionary*)request fromObject:(id)anObject;
 - (unsigned) connectionHistoryCount;
-- (id) connectionHistoryItem:(unsigned)index;
+- (id) connectionHistoryItem:(NSUInteger)index;
 
 #pragma mark ¥¥¥Delegate Methods
 - (void) netsocketDisconnected:(NetSocket*)insocket;

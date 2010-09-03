@@ -886,7 +886,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 
 - (BOOL) tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard
 {
-	unsigned current_index = [rowIndexes firstIndex];
+	NSUInteger current_index = [rowIndexes firstIndex];
 	NSString* s = @"";
     while (current_index != NSNotFound) {
 		NSDictionary* itemDictionary = [model requestCacheItem:current_index];

@@ -234,7 +234,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 
 - (void) hostNameChanged:(NSNotification*)aNotification
 {
-	unsigned index = [[self orcaRootService] hostNameIndex];
+	NSUInteger index = [[self orcaRootService] hostNameIndex];
 	if(index!=NSNotFound)[hostComboBox selectItemAtIndex: index];
 	[hostComboBox reloadData];
 }

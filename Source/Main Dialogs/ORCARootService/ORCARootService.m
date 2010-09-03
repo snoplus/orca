@@ -134,7 +134,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 
 }
 
-- (unsigned) hostNameIndex
+- (NSUInteger) hostNameIndex
 {
 	return hostNameIndex;
 }
@@ -191,12 +191,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	return connectionHistory;
 }
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;

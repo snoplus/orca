@@ -47,7 +47,7 @@
 - (void) setBackgroundColor:(NSColor*) color;
 - (NSColor*) backgroundColor;
 
-- (unsigned) lineNumberForLocation:(float)location;
+- (NSUInteger) lineNumberForLocation:(float)location;
 - (ORLineMarker*) markerAtLine:(unsigned)line;
 - (void) loadLineMarkers:(NSDictionary*)someLineMarkers;
 

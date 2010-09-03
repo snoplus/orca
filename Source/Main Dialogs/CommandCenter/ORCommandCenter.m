@@ -632,30 +632,33 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 		NSMutableArray* cmdItems = [NSMutableArray array];
 		
 		//parse a string of the form [obj method:var1 name:var2 ....]
-		NSString* objName;
-		[scanner scanUpToCharactersFromSet:whiteset intoString:&objName];                       //get the objName
-		
-		while(![scanner isAtEnd]) {
-			NSString*  result = [NSString string];
-			[scanner scanUpToCharactersFromSet:inverteddelimiterset intoString:nil];            //skip leading delimiters
-			if([scanner scanUpToCharactersFromSet:delimiterset intoString:&result]){            //store up to next delimiter
-				if([result length]){
-					[cmdItems addObject:result];
+		NSString* objName = nil;
+		id theObj = nil;
+		SEL theSelector = nil;
+		if([scanner scanUpToCharactersFromSet:whiteset intoString:&objName]){                       //get the objName
+			
+			while(![scanner isAtEnd]) {
+				NSString*  result = [NSString string];
+				[scanner scanUpToCharactersFromSet:inverteddelimiterset intoString:nil];            //skip leading delimiters
+				if([scanner scanUpToCharactersFromSet:delimiterset intoString:&result]){            //store up to next delimiter
+					if([result length]){
+						[cmdItems addObject:result];
+					}
 				}
 			}
-		}
-		
-		//turn the array into a selector
-		SEL theSelector = [NSInvocation makeSelectorFromArray:cmdItems];
-		id theObj = [destinationObjects objectForKey:objName];
-		if(!theObj){
-			if([objName isEqualToString:@"self"]){
-				theObj = self;
+			
+			//turn the array into a selector
+			theSelector = [NSInvocation makeSelectorFromArray:cmdItems];
+			theObj = [destinationObjects objectForKey:objName];
+			if(!theObj){
+				if([objName isEqualToString:@"self"]){
+					theObj = self;
+				}
+				else {
+					//OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
+					theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
+				}	
 			}
-			else {
-				//OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
-				theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
-			}	
 		}
 		if([theObj respondsToSelector:theSelector]){
 			NSMethodSignature* theSignature = [theObj methodSignatureForSelector:theSelector];

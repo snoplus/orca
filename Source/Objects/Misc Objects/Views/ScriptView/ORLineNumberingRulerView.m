@@ -123,7 +123,7 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
 	if(!showBreakpoints)return;
 	
 	NSPoint location = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	unsigned line = [self lineNumberForLocation:location.y];
+	NSInteger line = [self lineNumberForLocation:location.y];
 	if (line != NSNotFound) {
 		ORLineMarker* marker = [self markerAtLine:line];
 		if (marker != nil) [self removeMarker:marker];
@@ -259,7 +259,7 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
     [self setNeedsDisplay:YES];
 }
 
-- (unsigned) lineNumberForLocation:(float)location
+- (NSUInteger) lineNumberForLocation:(float)location
 {		
 	id view = [self clientView];
 	NSRect visibleRect = [[[self scrollView] contentView] bounds];

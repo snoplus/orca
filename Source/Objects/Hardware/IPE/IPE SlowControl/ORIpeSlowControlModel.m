@@ -538,7 +538,7 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 - (void) removeSet:(NSIndexSet*)aSetToRemove
 {
 	NSMutableArray* itemsToRemove = [NSMutableArray array];
-	unsigned current_index = [aSetToRemove firstIndex];
+	NSUInteger current_index = [aSetToRemove firstIndex];
     while (current_index != NSNotFound) {
 		if(current_index<[pollingLookUp count]){
 			NSString* itemKey = [self requestCacheItemKey:current_index];

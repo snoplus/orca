@@ -325,7 +325,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 - (void) removeFilesWithIndexes:(NSIndexSet*)indexSet;
 {
     NSMutableArray* filesToRemove = [NSMutableArray array];
-	unsigned current_index = [indexSet firstIndex];
+	NSUInteger current_index = [indexSet firstIndex];
     while (current_index != NSNotFound){
 		[filesToRemove addObject:[filesToReplay objectAtIndex:current_index]];
         current_index = [indexSet indexGreaterThanIndex: current_index];

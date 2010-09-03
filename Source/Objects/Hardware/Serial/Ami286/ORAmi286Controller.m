@@ -661,7 +661,7 @@
 	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
 	//to something a lot more complicated.
 	NSIndexSet* theSet = [addressList selectedRowIndexes];
-	unsigned current_index = [theSet firstIndex];
+	NSUInteger current_index = [theSet firstIndex];
     if(current_index != NSNotFound){
 		[model removeEMail:current_index];
 		[addressList reloadData];

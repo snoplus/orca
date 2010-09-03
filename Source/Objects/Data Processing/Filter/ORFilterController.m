@@ -299,8 +299,8 @@
 - (IBAction) removeInput:(id)sender
 {
 	NSIndexSet* indexSet = [inputVariablesTableView selectedRowIndexes];
-	int i;
-	int last = [indexSet lastIndex];
+	NSUInteger i;
+	NSUInteger last = [indexSet lastIndex];
 	for(i=last;i!=NSNotFound;i = [indexSet indexLessThanIndex:i]){
 		[model removeInputValue:i];
 	}

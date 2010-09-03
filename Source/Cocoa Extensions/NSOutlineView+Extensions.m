@@ -20,7 +20,7 @@
 - (NSArray*)allSelectedItems {
     NSMutableArray *items = [NSMutableArray array];
 	NSIndexSet* selectedSet = [self selectedRowIndexes];
-	unsigned current_index = [selectedSet firstIndex];
+	NSUInteger current_index = [selectedSet firstIndex];
 	while (current_index != NSNotFound){
         if ([self itemAtRow:current_index]) [items addObject: [self itemAtRow:current_index]];
 		current_index = [selectedSet indexGreaterThanIndex: current_index];

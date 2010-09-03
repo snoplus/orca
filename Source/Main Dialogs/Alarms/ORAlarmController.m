@@ -195,7 +195,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
         //from that array.
         NSMutableArray* theSelectedAlarms = [NSMutableArray array];
         NSIndexSet* selectedSet = [tableView selectedRowIndexes];
-		unsigned current_index = [selectedSet firstIndex];
+		NSUInteger current_index = [selectedSet firstIndex];
 		while (current_index != NSNotFound){
             [theSelectedAlarms addObject:[[self alarmCollection]objectAtIndex:current_index]];
 			current_index = [selectedSet indexGreaterThanIndex: current_index];
@@ -242,7 +242,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
 	//to something a lot more complicated.
 	NSIndexSet* theSet = [addressList selectedRowIndexes];
-	unsigned current_index = [theSet firstIndex];
+	NSUInteger current_index = [theSet firstIndex];
     if(current_index != NSNotFound){
 		[[self alarmCollection] removeAddressAtIndex:current_index];
 	}

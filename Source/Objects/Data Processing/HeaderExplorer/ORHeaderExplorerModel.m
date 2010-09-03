@@ -176,7 +176,7 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 - (void) removeSearchKeysWithIndexes:(NSIndexSet*)indexSet
 {
     NSMutableArray* keysToRemove = [NSMutableArray array];
-	unsigned current_index = [indexSet firstIndex];
+	NSUInteger current_index = [indexSet firstIndex];
     while (current_index != NSNotFound){
 		[keysToRemove addObject:[searchKeys objectAtIndex:current_index]];
         current_index = [indexSet indexGreaterThanIndex: current_index];
@@ -556,7 +556,7 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 - (void) removeFilesWithIndexes:(NSIndexSet*)indexSet;
 {
     NSMutableArray* filesToRemove = [NSMutableArray array];
-	unsigned current_index = [indexSet firstIndex];
+	NSUInteger current_index = [indexSet firstIndex];
     while (current_index != NSNotFound){
 		[filesToRemove addObject:[filesToProcess objectAtIndex:current_index]];
         current_index = [indexSet indexGreaterThanIndex: current_index];

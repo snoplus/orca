@@ -83,7 +83,7 @@
 {
 	NSIndexSet* selectedSet = [searchKeyTableView selectedRowIndexes];
 	if([selectedSet count]){
-		unsigned i = [selectedSet firstIndex];
+		NSUInteger i = [selectedSet firstIndex];
 		while (i != NSNotFound){
 			[model assembleDataForPlotting:i];
 			i = [selectedSet indexGreaterThanIndex: i];

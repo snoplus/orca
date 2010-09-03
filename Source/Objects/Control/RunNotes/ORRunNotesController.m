@@ -271,7 +271,7 @@
 - (IBAction) removeItemAction:(id)sender
 {
 	NSIndexSet* theSet = [notesListView selectedRowIndexes];
-	unsigned current_index = [theSet firstIndex];
+	NSUInteger current_index = [theSet firstIndex];
     if(current_index != NSNotFound){
 		[model removeItemAtIndex:current_index];
 	}
