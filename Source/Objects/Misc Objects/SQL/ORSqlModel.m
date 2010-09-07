@@ -210,7 +210,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 			[self postRunState:aNote];
 			[self postRunTime:aNote];
 			[self postRunOptions:aNote];
-
 			if(runState == eRunInProgress){
 				if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
 				NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
@@ -229,6 +228,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
 			}
+			[self collectAlarms];
 		}
 		@catch (NSException* e) {
 			//silently catch and continue
@@ -616,7 +616,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
 					
 					[aConnection queryString:s];
-					NSLog(@"Created Table Process in Database %@\n",aDataBase);
+					NSLog(@"Created Table Processes in Database %@\n",aDataBase);
 				}
 			}
 		}
