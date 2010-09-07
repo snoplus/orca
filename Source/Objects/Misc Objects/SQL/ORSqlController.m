@@ -189,5 +189,25 @@
 	[model testConnection];
 }
 
+- (IBAction) createAction:(id)sender
+{
+	[self endEditing];
+	NSString* s = [NSString stringWithFormat:@"Really try to create a database named %@ on %@?\n",[model dataBaseName],[model hostName]];
+	NSBeginAlertSheet(s,
+                      @"Cancel",
+                      @"Yes, Create Database",
+                      nil,[self window],
+                      self,
+                      @selector(createActionDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"If the database and tables already exist, this operation will do no harm.");
+	
+}
 
+- (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){		
+		[model createDatabase];
+	}
+}
 @end

@@ -67,6 +67,9 @@
 - (BOOL) connectionValid;
 - (void) disconnect;
 
+#pragma mark ***Database setup
+- (void) createDatabase;
+
 @end
 
 extern NSString* ORSqlModelStealthModeChanged;
@@ -163,6 +166,15 @@ extern NSString* ORSqlLock;
 }
 - (void) dealloc;
 - (void) setDataMonitorId:(int)anID;
+- (void) main;
+@end
+
+@interface ORProcessDataOp : ORSqlOperation
+{
+	NSArray* processes;
+}
+- (void) dealloc;
+- (void) setProcesses:(id)someProcesses;
 - (void) main;
 @end
 

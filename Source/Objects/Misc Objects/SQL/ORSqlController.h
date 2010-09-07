@@ -49,5 +49,8 @@
 - (IBAction) databaseNameAction:(id)sender;
 - (IBAction) sqlLockAction:(id)sender;
 - (IBAction) connectionAction:(id)sender;
+- (IBAction) createAction:(id)sender;
+
+- (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 @end

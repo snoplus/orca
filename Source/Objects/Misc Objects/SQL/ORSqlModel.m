@@ -29,6 +29,7 @@
 #import "ORAlarmCollection.h"
 #import "ORExperimentModel.h"
 #import "ORSegmentGroup.h"
+#import "ORProcessModel.h"
 
 NSString* ORSqlModelStealthModeChanged = @"ORSqlModelStealthModeChanged";
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
@@ -53,6 +54,15 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) collectAlarms;
 - (void) alarmPosted:(NSNotification*)aNote;
 - (void) alarmCleared:(NSNotification*)aNote;
+- (void) collectProcesses;
+- (void) createMachinesTableInDataBase:(NSString*)aDataBase;
+- (void) createAlarmsTableInDataBase:(NSString*)aDataBase;
+- (void) createProcessTableInDataBase:(NSString*)aDataBase;
+- (void) createExperimentTableInDataBase:(NSString*)aDataBase;
+- (void) createHistogram1DTableInDataBase:(NSString*)aDataBase;
+- (void) createRunsTableInDataBase:(NSString*)aDataBase;
+- (void) createSegmentMapTableInDataBase:(NSString*)aDataBase;
+- (void) createWaveformsTableInDataBase:(NSString*)aDataBase;
 @end
 
 @implementation ORSqlModel
@@ -102,6 +112,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 	[self addMachineName];
 	[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
+	[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
 	[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
 }
 
@@ -330,6 +341,24 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	return [[NSApp delegate] undoManager];
 }
 
+- (void) createDatabase
+{
+	//assumes that mysql is running on the host
+	//assumes that the user specified in the dialog exists and has the priveleges needed to create things. 
+	//You'd  run the following command from a mySQL command line to grant all privileges:
+	//GRANT ALL PRIVILEGES ON *.* TO userName @ hostName IDENTIFIED BY PASSWORD aPassword
+
+	@try{ [self createMachinesTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
+	@try{ [self createRunsTableInDataBase:dataBaseName]; }			@catch(NSException* e){}
+	@try{ [self createAlarmsTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
+	@try{ [self createProcessTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
+	@try{ [self createExperimentTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
+	@try{ [self createHistogram1DTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
+	@try{ [self createSegmentMapTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
+	@try{ [self createWaveformsTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
+}
+
+
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {    
@@ -407,6 +436,290 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @end
 
 @implementation ORSqlModel (private)
+- (void) createMachinesTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE machines (";
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"name varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"hw_address varchar(32) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"ip_address varchar(64) NOT NULL,"];
+					s = [s stringByAppendingString:@"password varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (machine_id),"];
+					s = [s stringByAppendingString:@"UNIQUE KEY hw_address (hw_address)"];
+					s = [s stringByAppendingString:@") ENGINE=InnoDB"];
+					[aConnection queryString:s];
+					NSLog(@"Created Table machines in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+- (void) createRunsTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE runs (";
+					s = [s stringByAppendingString:@"run_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"run int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"subrun int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"state int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"experiment varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"startTime varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"elapsedTime int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"timeToGo int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"elapsedSubRunTime int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"elapsedBetweenSubRunTime int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"timeLimit int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"quickStart tinyint(1) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"repeatRun tinyint(1) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"offline tinyint(1) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"timedRun tinyint(1) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (run_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					
+					[aConnection queryString:s];
+					NSLog(@"Created Table Runs in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+- (void) createAlarmsTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE alarms (";
+					s = [s stringByAppendingString:@"alarm_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"timePosted varchar(64) NOT NULL,"];
+					s = [s stringByAppendingString:@"severity int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"name varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"help varchar(1024) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (alarm_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					[aConnection queryString:s];
+					NSLog(@"Created Table Alarms in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+- (void) createExperimentTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE experiment (";
+					s = [s stringByAppendingString:@"experiment_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"experiment varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"numberSegments int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"rates mediumblob,"];
+					s = [s stringByAppendingString:@"totalRate mediumblob,"];
+					s = [s stringByAppendingString:@"thresholds mediumblob,"];
+					s = [s stringByAppendingString:@"gains mediumblob,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (experiment_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					[aConnection queryString:s];
+					NSLog(@"Created Table Experiment in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+
+- (void) createSegmentMapTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE segmentMap (";
+					s = [s stringByAppendingString:@"segment_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"monitor_id int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"segment int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"histogram1DName varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"crate int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"card int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"channel int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (segment_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					[aConnection queryString:s];
+					NSLog(@"Created Table SegmentMap in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+- (void) createProcessTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE Processes (";
+					s = [s stringByAppendingString:@"process_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"name varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"timeStamp varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"data mediumblob,"];
+					s = [s stringByAppendingString:@"title varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"state int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (process_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					
+					[aConnection queryString:s];
+					NSLog(@"Created Table Process in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+- (void) createWaveformsTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE waveforms (";
+					s = [s stringByAppendingString:@"dataset_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"name varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"counts int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"monitor_id int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"type int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"unitsize int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"mask int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"bitmask int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"length int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"data mediumblob,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (dataset_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					
+					[aConnection queryString:s];
+					NSLog(@"Created Table Waveforms in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+- (void) createHistogram1DTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE Histogram1Ds (";
+					s = [s stringByAppendingString:@"dataset_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"name varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"counts int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"monitor_id int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"type int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"length int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"start int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"end int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"data mediumblob,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (dataset_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					
+					[aConnection queryString:s];
+					NSLog(@"Created Table Histogram1Ds in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+
+
+/*
+ | Field      | Type        | Null | Key | Default | Extra          |
+ +------------+-------------+------+-----+---------+----------------+
+ | process_id | int(11)     | NO   | PRI | NULL    | auto_increment |
+ | machine_id | int(11)     | NO   | MUL | NULL    |                |
+ | name       | varchar(64) | YES  |     | NULL    |                |
+ | timeStamp  | varchar(64) | YES  |     | NULL    |                |
+ | data       | mediumblob  | YES  |     | NULL    |                |
+ | title      | varchar(64) | YES  |     | NULL    |                |
+ +------------+-------------+------+-----+---------+----------------+
+ */
+- (void) collectProcesses
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(collectProcesses) object:nil];
+	NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")];
+	ORProcessDataOp* anOp = [[ORProcessDataOp alloc] initWithSqlConnection:sqlConnection delegate:self];
+	[anOp setProcesses:objs];
+	[queue addOperation:anOp];
+	[anOp release];
+	[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:30];	
+}
+
 /*
  +------------+---------------+------+-----+---------+----------------+
  | Field      | Type          | Null | Key | Default | Extra          |
@@ -1176,7 +1489,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		id machine_id			= [row objectForKey:@"machine_id"];
 		
 		if(machine_id){
-			//since we only update this map on demand (i.e. if it changes we'll just delete and start over
+			//since we only update this map on demand (i.e. if it changes) we'll just delete and start over
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM segmentMap where machine_id=%@",
 										[sqlConnection quoteObject:machine_id]]];
 			
@@ -1213,6 +1526,88 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 @end
 
+@implementation ORProcessDataOp
+
+- (void) dealloc
+{
+	[processes release];
+	[super dealloc];
+}
+
+- (void) setProcesses:(id)someProcesses
+{
+	[someProcesses retain];
+	[processes release];
+	processes = someProcesses;
+}
+
+- (void) main
+{
+	@try {
+		//get our machine_id using our MAC Address
+		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+		id row				    = [theResult fetchRowAsDictionary];
+		id machine_id			= [row objectForKey:@"machine_id"];
+		
+		//collect the existing DB entries for a sweep of deleted objects
+		theResult				= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT name from Processes where machine_id=%@",machine_id]];	
+		NSMutableArray* allEntries = [NSMutableArray array];
+		id anEntry;
+		while((anEntry = [theResult fetchRowAsDictionary]))[allEntries addObject:anEntry];
+
+		//do 1D Histograms first
+		for(id aProcess in processes){
+			ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT process_id from Processes where (machine_id=%@ and name=%@)",
+																   machine_id,
+																   [sqlConnection quoteObject:[aProcess fullID]]
+																   ]];
+			id anEntry			= [theResult fetchRowAsDictionary];
+			id process_id		= [anEntry objectForKey:@"process_id"];
+			if(process_id) {
+				//already exists... just update
+				NSString* theQuery = [NSString stringWithFormat:@"UPDATE Processes SET name=%@,title=%@,timeStamp=%@,data=%@,state=%d WHERE process_id=%@",
+									  [sqlConnection quoteObject:[aProcess fullID]],
+									  [sqlConnection quoteObject:[aProcess shortName]],
+									  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+									  [sqlConnection quoteObject:[aProcess description]],
+									  [aProcess processRunning],
+									  [sqlConnection quoteObject:process_id]];
+				[sqlConnection queryString:theQuery];
+			}
+			else {
+				//have to add a new entry
+				NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Processes (machine_id,name,title,timeStamp,data,state) VALUES (%@,%@,%@,%@,%@,%d)",
+									  [sqlConnection quoteObject:machine_id],
+									  [sqlConnection quoteObject:[aProcess fullID]],
+									  [sqlConnection quoteObject:[aProcess shortName]],
+									  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+									  [sqlConnection quoteObject:[aProcess description]],
+									  [aProcess processRunning]];
+				[sqlConnection queryString:theQuery];
+			}
+			for(id anEntry in allEntries){
+				NSString* aName = [anEntry objectForKey:@"name"];
+				if([aName isEqualToString:[aProcess fullID]]){
+					[allEntries removeObject:anEntry];
+					break;
+				}
+			}
+		}
+		//clean out any deleted items
+		for(id anEntry in allEntries){
+			NSString* aName = [anEntry objectForKey:@"name"];
+			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Processes where (machine_id=%@ AND name=%@)",
+										[sqlConnection quoteObject:machine_id],
+										[sqlConnection quoteObject:aName]]];
+		}
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+	
+}
+
+@end
 
 
 
