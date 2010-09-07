@@ -491,9 +491,17 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	sampleGateOpen = NO;
 }
 
+- (NSDate*)	lastSampleTime
+{
+	return lastSampleTime;
+}
+
 - (id) description
 {
-	NSString* s =  [NSString stringWithFormat:@"\nProcess %@ ",[self shortName]];
+	NSString* theName;
+	if([[self shortName] length])theName = [self shortName];
+	else theName = [NSString stringWithFormat:@"%d",[self uniqueIdNumber]];
+	NSString* s =  [NSString stringWithFormat:@"\nProcess %@ ",theName];
 	if(processRunning){
 		s = [s stringByAppendingString:@"[Running]\n"];
 		s = [s stringByAppendingFormat:@"Sample Rate: %.1f\n",sampleRate];

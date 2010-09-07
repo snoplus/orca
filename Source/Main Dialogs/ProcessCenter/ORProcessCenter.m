@@ -342,8 +342,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",@"Shutdown",@"Shutdown",nil];
 		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
 	}
-	
-	
+}
+
+- (NSString*) description 
+{
+	NSString* theContent = @"";
+	for(id aProcess in processorList){
+		theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess description]];
+	}
+	return theContent;
 }
 
 - (void) sendHeartbeat
@@ -354,17 +361,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process Center\n"];
 	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at %@\n",nextHeartbeat];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
-	
-	for(id aProcess in processorList){
-		theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess description]];
-	}
-
+	theContent = [theContent stringByAppendingFormat:@"%@\n",[self description]];
 	theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
 	for(id address in eMailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 
-	
 	for(id address in eMailList){
 		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",nil];
@@ -410,14 +412,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	for(id address in eMailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	
-	
 	for(id address in eMailList){
 		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",nil];
 		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
 	}
 }
-
 
 #pragma mark ¥¥¥Actions
 - (IBAction) heartbeatTimeIndexAction:(id)sender
@@ -467,7 +467,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
 	//to something a lot more complicated.
 	NSIndexSet* theSet = [addressList selectedRowIndexes];
-	unsigned current_index = [theSet firstIndex];
+	NSUInteger current_index = [theSet firstIndex];
     if(current_index != NSNotFound){
 		[self removeAddressAtIndex:current_index];
 	}

@@ -62,6 +62,7 @@
 - (void) setShortName:(NSString*)aComment;
 - (void) putInTestMode;
 - (void) putInRunMode;
+- (NSDate*)	lastSampleTime;
 
 - (BOOL) inTestMode;
 - (void) setInTestMode:(BOOL)aState;
