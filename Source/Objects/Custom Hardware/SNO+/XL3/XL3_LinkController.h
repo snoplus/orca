@@ -62,6 +62,8 @@
 	IBOutlet NSTextField*		compositeSetPedestalField;	
 	IBOutlet NSButton*		compositeSetPedestalButton;	
 	IBOutlet NSProgressIndicator*	compositeSetPedestalRunningIndicator;
+	IBOutlet NSButton*		compositeBoardIDButton;	
+	IBOutlet NSProgressIndicator*	compositeBoardIDRunningIndicator;
 	//connection
 	IBOutlet NSButton*		toggleConnectButton;
 	IBOutlet NSPopUpButton*		errorTimeOutPU;

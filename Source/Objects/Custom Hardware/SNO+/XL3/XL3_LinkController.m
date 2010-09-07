@@ -49,7 +49,7 @@ static NSDictionary* xl3Ops;
 - (void) awakeFromNib
 {
 	basicSize	= NSMakeSize(452,290);
-	compositeSize	= NSMakeSize(452,452);
+	compositeSize	= NSMakeSize(452,510);
 	blankView = [[NSView alloc] init];
 	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
@@ -421,6 +421,10 @@ static NSDictionary* xl3Ops;
 									compositeSetPedestalRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(compositeSetPedestal)), @"selector",
 			 nil], @"compositeSetPedestal",
+			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeBoardIDButton, @"button",
+									compositeBoardIDRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(getBoardIDs)), @"selector",
+			 nil], @"compositeBoardID",
 		  nil];
 }
 

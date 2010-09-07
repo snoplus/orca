@@ -178,8 +178,14 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	return voltageStatus;
 }
 
-- (void) setAutoInit:(BOOL) aAutoInit {
-	autoInit = aAutoInit;
+- (BOOL) autoInit
+{
+	return autoInit;
+}
+
+- (void) setAutoInit:(BOOL)anAutoInit
+{
+	autoInit = anAutoInit;
 }
 	
 - (void) setVoltageStatus:(eFecMonitorState)aState
@@ -749,7 +755,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 
 - (void) initCrateUsingXL3:(BOOL) loadTheFEC32XilinxFile phase:(int) phase
 {
-	
+	[[self adapter] initCrateWithXilinx:loadTheFEC32XilinxFile autoInit:[self autoInit]];
 }
 
 @end

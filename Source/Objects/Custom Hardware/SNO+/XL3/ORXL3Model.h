@@ -20,6 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
+#import "XL3_Cmds.h"
 
 typedef struct  {
 	NSString*	regName;
@@ -119,6 +120,11 @@ enum {
 - (void) setSelectedRegister:(int)aSelectedRegister;
 - (NSString*) xl3LockName;
 
+#pragma mark •••DB Helpers
+- (void) synthesizeDefaultsIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot;
+- (void) byteSwapBundle:(mb_const_t*)aBundle;
+- (void) synthesizeFECIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot;
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
@@ -134,6 +140,8 @@ enum {
 - (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue;
 - (unsigned long) readXL3Register:(short)aRegister;
 
+- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag;
+
 #pragma mark •••Basic Ops
 - (void) readBasicOps;
 - (void) writeBasicOps;
@@ -146,6 +154,8 @@ enum {
 - (void) compositeXl3RW;
 - (void) compositeQuit;
 - (void) compositeSetPedestal;
+- (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip;
+- (void) getBoardIDs;
 - (void) reset;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;

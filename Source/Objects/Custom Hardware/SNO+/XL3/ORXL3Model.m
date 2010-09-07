@@ -403,6 +403,168 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	[[self guardian] setCrateNumber:crateNumber];
 }
 
+
+#pragma mark •••DB Helpers
+
+#define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
+#define swapShort(x) (((uint16_t)(x) <<  8) | ((uint16_t)(x)>>  8))
+
+- (void) synthesizeDefaultsIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot
+{
+	uint16_t s_mb_id[1] = {0x0000};
+	uint16_t s_dc_id[4] = {0x0000, 0x0000, 0x0000, 0x0000};
+
+	//vbals are gains per channel x: [0][x] high, [1][x] low
+	uint8_t s_vbal[2][32] = {{ 110, 110, 110, 110, 110, 110, 110, 110,
+		 		   110, 110, 110, 110, 110, 110, 110, 110,
+				   110, 110, 110, 110, 110, 110, 110, 100,
+				   110, 110, 110, 110, 110, 110, 110, 110 },
+				 { 110, 110, 110, 110, 110, 110, 110, 110,
+				   110, 110, 110, 110, 110, 110, 110, 110,
+				   110, 110, 110, 110, 110, 110, 110, 100,
+				   110, 110, 110, 110, 110, 110, 110, 110 }};
+
+	uint8_t s_vthr[32] = {	255, 255, 255, 255, 255, 255, 255, 255,
+				255, 255, 255, 255, 255, 255, 255, 255,
+				255, 255, 255, 255, 255, 255, 255, 255,
+				255, 255, 255, 255, 255, 255, 255, 255 };
+
+
+	//tdisc index definitions: 0=ch0-3, 1=ch4-7, 2=ch8-11, etc
+	uint8_t s_tdisc_rmp[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // back edge timing ramp
+	uint8_t s_tdisc_rmpup[8] = { 115, 115, 115, 115, 115, 115, 115, 115 }; // front edge timing ramp
+	uint8_t s_tdisc_vsi[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // short integrate voltage
+	uint8_t s_tdisc_vli[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // long integrate voltage
+	
+
+	//tcmos: the following are motherboard wide constants
+	aBundle->tcmos.vmax = 203; // upper TAC reference voltage
+	aBundle->tcmos.tacref = 72; // lower TAC reference voltage
+	aBundle->tcmos.isetm[0] = 200; // primary timing current (0=tac0,1=tac1)
+	aBundle->tcmos.isetm[1] = 200; // primary timing current (0=tac0,1=tac1)
+	aBundle->tcmos.iseta[0] = 0; // secondary timing current 
+	aBundle->tcmos.iseta[1] = 0; // secondary timing current 
+	// TAC shift register load bits channel 0 to 31, assume same bits for all channels
+	// bits go from right to left
+	// TAC0-adj0  0 (1=enable), TAC0-adj1  0 (1=enable), TAC0-adj2 0 (1=enable), TAC0-main 0 (0=enable)
+	// same for TAC1	
+	uint8_t s_tcmos_tac_shift[32] = { 0, 0, 0, 0, 0, 0, 0, 0,
+					  0, 0, 0, 0, 0, 0, 0, 0,
+					  0, 0, 0, 0, 0, 0, 0, 0,
+					  0, 0, 0, 0, 0, 0, 0, 0 };
+	// vint
+	aBundle->vint.vres = 205; //integrator output voltage
+
+	//chinj
+	aBundle->chinj.hv_id = 0x0000; // HV card id
+	aBundle->chinj.hvref = 0x00; // MB control voltage
+	aBundle->chinj.ped_time = 100; // MTCD pedestal width (DONT NEED THIS HERE)
+
+	//tr100 width, channel 0 to 31, only bits 0 to 6 defined
+	uint8_t s_tr100_twidth[32] = {  0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
+					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
+					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
+					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f };
+
+	//tr20 width, channel 0 to 31, only bits 0 to 6 defined
+	uint8_t s_tr20_twidth[32] = {	0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
+					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
+					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
+					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 };
+	//tr20 delay, channel 0 to 31, only bits 0 to 4 defined
+	uint8_t s_tr20_tdelay[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0 }; 
+
+	//scmos remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
+	uint16_t s_scmos_stuff[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0 }; 
+
+	//ch_disable bits 1 == disabled
+	aBundle->mb_chan_disable.disable_mask = 0;
+		
+	memcpy(&aBundle->vbal.mb_id, s_mb_id, 2);
+	memcpy(aBundle->vbal.dc_id, s_dc_id, 8);
+	memcpy(aBundle->vbal.vbal, s_vbal, 64);
+	memcpy(&aBundle->vthr.mb_id, s_mb_id, 2);
+	memcpy(aBundle->vthr.dc_id, s_dc_id, 8);
+	memcpy(aBundle->vthr.vthr, s_vthr, 32);
+	memcpy(&aBundle->tdisc.mb_id, s_mb_id, 2);
+	memcpy(aBundle->tdisc.dc_id, s_dc_id, 8);
+	memcpy(aBundle->tdisc.rmp, s_tdisc_rmp, 8);
+	memcpy(aBundle->tdisc.rmpup, s_tdisc_rmpup, 8);
+	memcpy(aBundle->tdisc.vsi, s_tdisc_vsi, 8);
+	memcpy(aBundle->tdisc.vli, s_tdisc_vli, 8);
+	memcpy(&aBundle->tcmos.mb_id, s_mb_id, 2);
+	memcpy(aBundle->tcmos.dc_id, s_dc_id, 8);
+	memcpy(aBundle->tcmos.tac_shift, s_tcmos_tac_shift, 32);
+	memcpy(&aBundle->vint.mb_id, s_mb_id, 2);
+	memcpy(&aBundle->chinj.mb_id, s_mb_id, 2);
+	memcpy(&aBundle->tr100.mb_id, s_mb_id, 2);
+	memcpy(aBundle->tr100.dc_id, s_dc_id, 8);
+	memcpy(aBundle->tr100.twidth, s_tr100_twidth, 32);
+	memcpy(&aBundle->tr20.mb_id, s_mb_id, 2);
+	memcpy(aBundle->tr20.dc_id, s_dc_id, 8);
+	memcpy(aBundle->tr20.twidth, s_tr20_twidth, 32);
+	memcpy(aBundle->tr20.tdelay, s_tr20_tdelay, 32);
+	memcpy(&aBundle->scmos.mb_id, s_mb_id, 2);
+	memcpy(aBundle->scmos.dc_id, s_dc_id, 8);
+	memcpy(aBundle->scmos.stuff, s_scmos_stuff, 32);
+	memcpy(&aBundle->hware.mb_id, s_mb_id, 2);
+	memcpy(aBundle->hware.dc_id, s_dc_id, 8);
+	memcpy(&aBundle->mb_chan_disable.mb_id, s_mb_id, 2);
+	memcpy(aBundle->mb_chan_disable.dc_id, s_dc_id, 8);
+}
+
+- (void) byteSwapBundle:(mb_const_t*)aBundle
+{
+	int i;
+	
+	//vbal_vals_t
+	aBundle->vbal.mb_id = swapShort(aBundle->vbal.mb_id);
+	for (i=0; i<4; i++) aBundle->vbal.dc_id[i] = swapShort(aBundle->vbal.dc_id[i]);
+	//vthr_vals_t
+	aBundle->vthr.mb_id = swapShort(aBundle->vthr.mb_id);
+	for (i=0; i<4; i++) aBundle->vthr.dc_id[i] = swapShort(aBundle->vthr.dc_id[i]);
+	//tdisc_vals_t
+	aBundle->tdisc.mb_id = swapShort(aBundle->tdisc.mb_id);
+	for (i=0; i<4; i++) aBundle->tdisc.dc_id[i] = swapShort(aBundle->tdisc.dc_id[i]);
+	//tcmos_vals_t
+	aBundle->tcmos.mb_id = swapShort(aBundle->tcmos.mb_id);
+	for (i=0; i<4; i++) aBundle->tcmos.dc_id[i] = swapShort(aBundle->tcmos.dc_id[i]);
+	//vint_vals_t
+	aBundle->vint.mb_id = swapShort(aBundle->vint.mb_id);
+	//chinj_vals_t
+	aBundle->chinj.mb_id = swapShort(aBundle->chinj.mb_id);
+	aBundle->chinj.hv_id = swapShort(aBundle->chinj.hv_id);
+	aBundle->chinj.ped_time = swapLong(aBundle->chinj.ped_time);
+	//tr100_vals_t
+	aBundle->tr100.mb_id = swapShort(aBundle->tr100.mb_id);
+	for (i=0; i<4; i++) aBundle->tr100.dc_id[i] = swapShort(aBundle->tr100.dc_id[i]);
+	//tr20_vals_t
+	aBundle->tr20.mb_id = swapShort(aBundle->tr20.mb_id);
+	for (i=0; i<4; i++) aBundle->tr20.dc_id[i] = swapShort(aBundle->tr20.dc_id[i]);
+	//scmos_vals_t
+	aBundle->scmos.mb_id = swapShort(aBundle->scmos.mb_id);
+	for (i=0; i<4; i++)  aBundle->scmos.dc_id[i] = swapShort(aBundle->scmos.dc_id[i]);
+	for (i=0; i<15; i++) aBundle->scmos.stuff[i] = swapShort(aBundle->scmos.stuff[i]);
+	//mb_hware_vals_t
+	aBundle->hware.mb_id = swapShort(aBundle->hware.mb_id);
+	for (i=0; i<4; i++)  aBundle->hware.dc_id[i] = swapShort(aBundle->hware.dc_id[i]);
+	//mb_chan_disable_vals_t
+	aBundle->hware.mb_id = swapShort(aBundle->mb_chan_disable.mb_id);
+	for (i=0; i<4; i++)  aBundle->mb_chan_disable.dc_id[i] = swapShort(aBundle->mb_chan_disable.dc_id[i]);
+	aBundle->mb_chan_disable.disable_mask = swapLong(aBundle->mb_chan_disable.disable_mask);	
+}
+
+- (void) synthesizeFECIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot
+{
+}
+
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -574,6 +736,64 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	//[[self xl1] executeCommandList:aList];		
 }
 
+- (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag
+{
+	XL3_PayloadStruct payload;
+	payload.numberBytesinPayload = sizeof(mb_const_t);
+	unsigned long* aMbId = (unsigned long*) payload.payload;
+	mb_const_t* aConfigBundle = (mb_const_t*) (payload.payload + 4);
+	
+	BOOL loadOk = YES;
+	unsigned short i;
+
+	NSLog(@"XL3 Init Crate...\n");
+
+	for (i=0; i<16; i++) {
+		*aMbId = i;
+		[self synthesizeDefaultsIntoBundle:aConfigBundle forSLot:i];
+		if ([xl3Link needToSwap]) {
+			*aMbId = swapLong(aMbId);
+			[self byteSwapBundle:aConfigBundle];
+		}
+		@try {
+			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
+			if (payload.payload != 0) {
+				NSLog(@"XL3 doesn't like the config bundle for slot %d, exiting.\n", i);
+				break;
+			}
+		}
+		@catch (NSException* e) {
+			NSLog(@"Init crate failed; error: %@ reason: %@\n", [e name], [e reason]);
+			loadOk = NO;
+			break;
+		}
+	}
+		
+	if (loadOk) {
+		aMbId[0] = 666;		// time to fly
+		aMbId[1] = 0;		// hv reset
+		aMbId[2] = 0xFFFF;	// slot mask
+		aMbId[3] = 0;		// ctc delay
+		
+		if ([xl3Link needToSwap]) {
+			for (i=0; i<4; i++) aMbId[i] = swapLong(aMbId[i]);
+		}
+		@try {
+			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
+			if (payload.payload != 0) {
+				NSLog(@"error during init.\n", i);
+			}
+		}
+		@catch (NSException* e) {
+			NSLog(@"Init crate failed; error: %@ reason: %@\n", [e name], [e reason]);
+		}
+		NSLog(@"init ok!\n");
+	}
+	else {
+		NSLog(@"error loading config, init skipped\n");
+	}
+}
+
 #pragma mark •••Basic Ops
 - (void) readBasicOps
 {
@@ -608,9 +828,6 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 
 
 #pragma mark •••Composite HW Functions
-
-#define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
-#define swapShort(x) (((uint16_t)(x) <<  8) | ((uint16_t)(x)>>  8))
 
 - (void) deselectComposite
 {
@@ -725,6 +942,56 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		NSLog(@"Send XL3 Quit failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
 	[self setXl3OpsRunning:NO forKey:@"compositeSetPedestal"];
+}
+
+- (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip
+{
+	XL3_PayloadStruct payload;
+	payload.numberBytesinPayload = 12;
+	unsigned long* data = (unsigned long*) payload.payload;
+	
+	data[0] = aSlot;
+	data[1] = aChip;
+	data[2] = 15;
+	
+	if ([xl3Link needToSwap]) {
+		data[0] = swapLong(data[0]);
+		data[1] = swapLong(data[1]);
+		data[2] = swapLong(data[2]);
+	}
+
+	@try {
+		[[self xl3Link] sendCommand:BOARD_ID_READ_ID withPayload:&payload expectResponse:YES];
+		if ([xl3Link needToSwap]) *data = swapLong(*data);
+	}
+	@catch (NSException* e) {
+		NSLog(@"Get Board ID failed; error: %@ reason: %@\n", [e name], [e reason]);
+		*data = 0;
+	}
+
+	return (unsigned short) *data;
+}
+
+- (void) getBoardIDs
+{
+	unsigned short i, j, val;
+	NSString* bID[6];
+	
+	[self setXl3OpsRunning:YES forKey:@"compositeBoardID"];
+	NSLog(@"Get Board IDs ...\n");
+
+	for (i=0; i < 16; i++) {
+		for (j = 0; j < 6; j++) {
+			val = [self getBoardIDForSlot:i chip:(j+1)];
+			if (val == 0x0) bID[j] = @"----";
+			else bID[j] = [NSString stringWithFormat:@"0x%04x", val];
+		}
+		
+		NSLog(@"slot: %02d: MB: %@ DB1: %@ DB2:%@ DB3: %@ DB4: %@ HV: %@\n",
+		      i+1, bID[0], bID[1], bID[2], bID[3], bID[4], bID[5]);
+	}
+
+	[self setXl3OpsRunning:NO forKey:@"compositeBoardID"];	
 }
 
 - (void) reset

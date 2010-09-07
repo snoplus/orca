@@ -18,9 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#ifndef _H_XL3CMDS_
-#define _H_XL3CMDS_
-
 #include <sys/types.h>
 #include <stdint.h>
 
@@ -51,23 +48,6 @@
 #define CMD_ACK_ID		(0x101)
 #define MESSAGE_ID		(0x099)
 #define STATUS_ID		(0x999)
-
-// possible packet types recieved by XL3 (from the DAQ)
-#define FEC_CMD_PACKET		(401)
-#define FEC_DATA_PACKET		(402)
-#define DAQ_QUIT		(404)
-#define XL3_TEST_CMD_PACKET	(405)
-#define XL3_TEST_DATA_PACKET	(406)
-#define CHANGE_MODE_PACKET	(407)
-#define CRATE_INIT		(408)
-#define FEC_TEST		(409)
-#define MEM_TEST		(410)
-#define VMON_START		(411)
-#define BOARD_ID_READ		(412)
-#define ZERO_DISCRIMINATOR	(413)
-#define FEC_LOAD_CRATE_ADD	(414)
-#define SET_CRATE_PEDESTALS	(415)
-#define DESELECT_ALL_FECS	(416)
 
 // global modes
 // some cmds are not compatible with sno crate readout loop
@@ -177,4 +157,164 @@ typedef
 	}
 XL3_PayloadStruct;
 
-#endif
+
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+} mb_hware_vals_t;
+
+// integrator voltage balance
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	uint8_t vbal[2][32]; // 0 = high gain, 1 = low gain, channel 0 to 31
+} vbal_vals_t;
+
+// discriminator thresholds
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	uint8_t vthr[32]; // channel 0 to 31
+} vthr_vals_t;
+
+// discriminator timing setup
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	// index definitions: 0=ch0-3, 1=ch4-7, 2=ch8-11, etc
+	uint8_t rmp[8]; // back edge timing ramp
+	uint8_t rmpup[8]; // front edge timing ramp
+	uint8_t vsi[8]; // short integrate voltage
+	uint8_t vli[8]; // long integrate voltage
+} tdisc_vals_t;
+
+// CMOS timing setup
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	// the following are motherboard wide constants
+	uint8_t vmax; // upper TAC reference voltage
+	uint8_t tacref; // lower TAC reference voltage
+	uint8_t isetm[2]; // primary timing current (0=tac0,1=tac1)
+	uint8_t iseta[2]; // secondary timing current 
+	// there is one byte of TAC bits for each channel
+	uint8_t tac_shift[32]; // TAC shift register load bits channel 0 to 31
+} tcmos_vals_t;
+
+// integrator nominal voltage level setup
+typedef struct
+{
+	uint16_t mb_id;
+	uint8_t vres; //integrator output voltage
+} vint_vals_t;
+
+// charge injection control voltages and timing
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t hv_id; // HV card id
+	uint8_t hvref; // MB control voltage
+	uint32_t ped_time; // MTCD pedestal width (DONT NEED THIS HERE)
+} chinj_vals_t;
+
+// CMOS shift register 100nsec trigger setup
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	uint8_t twidth[32]; // tr100 width, channel 0 to 31, only bits 0 to 6 defined
+} tr100_vals_t;
+
+// CMOS shift register 20nsec trigger setup
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	uint8_t twidth[32]; //tr20 width, channel 0 to 31, only bits 0 to 6 defined
+	uint8_t tdelay[32]; //tr20 delay, channel 0 to 31, only bits 0 to 4 defined
+} tr20_vals_t;
+
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	uint16_t stuff[32]; // remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
+} scmos_vals_t;
+
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+	uint32_t disable_mask;
+} mb_chan_disable_vals_t;
+
+typedef struct
+{
+	uint16_t mb_id;
+	uint16_t dc_id[4];
+} hware_vals_t;
+
+// struct that points to all motherboard constants
+typedef struct
+{
+	vbal_vals_t vbal;
+	vthr_vals_t vthr;
+	tdisc_vals_t tdisc;
+	tcmos_vals_t tcmos;
+	vint_vals_t vint;
+	chinj_vals_t chinj;
+	tr100_vals_t tr100;
+	tr20_vals_t tr20;
+	scmos_vals_t scmos;
+	mb_hware_vals_t hware;
+	mb_chan_disable_vals_t mb_chan_disable;
+} mb_const_t;
+
+// struct that points to all mb constants for a full crate
+typedef struct
+{
+	mb_const_t mb[16];
+	uint32_t ctcdelay;
+} crate_mb_const_t;
+
+
+// struct for fec voltages
+typedef struct
+{
+	uint16_t hvtst;
+	uint16_t vref1m;
+	uint16_t vref2m;
+	uint16_t vsup3_3m;
+	uint16_t vee;
+	uint16_t vsup2m;
+	uint16_t vsup15m;
+	uint16_t vsup24m;
+	uint16_t caldacv;
+	uint16_t tempmon;
+	uint16_t vref0_8p;
+	uint16_t vref1p;
+	uint16_t vsup3_3p;
+	uint16_t vref4p;
+	uint16_t vsup4p;
+	uint16_t vref5p;
+	uint16_t vsup8p;
+	uint16_t vsup15p;
+	uint16_t vsup24p;
+	uint16_t vcc;
+	uint16_t vsup6_5p;
+} fec_voltage_t;
+
+typedef struct
+{
+	char header1;
+	char header2;
+	char header3;
+	char header4;
+	vthr_vals_t vthr_vals_found[16];
+} disc_zero_response_t;
+

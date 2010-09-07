@@ -43,7 +43,8 @@
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian;
 - (void) setSlot:(int)aSlot;
 - (int)  slot;
-- (void) setAutoInit:(BOOL) autoInit;
+- (BOOL) autoInit;
+- (void) setAutoInit:(BOOL)anAutoInit;
 
 #pragma mark •••Accessors
 - (unsigned long) memoryBaseAddress;
