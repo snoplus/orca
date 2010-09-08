@@ -336,8 +336,8 @@
 	else if(theMode == 3){
 		s = [s stringByAppendingString:@"1->ext next pulse\n"];
 		s = [s stringByAppendingString:@"2->ext user bit 1\n"];
-		s = [s stringByAppendingString:@"2->ext user bit 2\n"];
-		s = [s stringByAppendingString:@"3->inhibit counting\n"];
+		s = [s stringByAppendingString:@"3->ext user bit 2\n"];
+		s = [s stringByAppendingString:@"4->inhibit counting\n"];
 	}	
 	else if(theMode == 4){
 		s = [s stringByAppendingString:@"1->inhibit cnt chan 1-8\n"];
