@@ -330,16 +330,22 @@
 	else if(theMode == 2){
 		s = [s stringByAppendingString:@"1->ext next pulse\n"];
 		s = [s stringByAppendingString:@"2->ext user bit 1\n"];
-		s = [s stringByAppendingString:@"3->ext user bit 2\n"];
-		s = [s stringByAppendingString:@"4->inhibite counting\n"];
+		s = [s stringByAppendingString:@"3->inhibit counting\n"];
+		s = [s stringByAppendingString:@"4->inhibite LNE\n"];
 	}	
 	else if(theMode == 3){
+		s = [s stringByAppendingString:@"1->ext next pulse\n"];
+		s = [s stringByAppendingString:@"2->ext user bit 1\n"];
+		s = [s stringByAppendingString:@"2->ext user bit 2\n"];
+		s = [s stringByAppendingString:@"3->inhibit counting\n"];
+	}	
+	else if(theMode == 4){
 		s = [s stringByAppendingString:@"1->inhibit cnt chan 1-8\n"];
 		s = [s stringByAppendingString:@"2->inhibit cnt chan 9-16\n"];
 		s = [s stringByAppendingString:@"3->inhibit cnt chan 17-24\n"];
 		s = [s stringByAppendingString:@"4->inhibit cnt chan 25-32\n"];
 	}
-	else if(theMode == 4){
+	else {
 		s = [s stringByAppendingString:@"1->no function\n"];
 		s = [s stringByAppendingString:@"2->no function\n"];
 		s = [s stringByAppendingString:@"3->no function\n"];
