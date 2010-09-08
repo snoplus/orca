@@ -431,8 +431,8 @@ static NSDictionary* xl3Ops;
 
 - (void) populatePullDown
 {
-	xl3RWModes = [[NSArray alloc] initWithObjects:@"0: REG_READ",@"1: REG_WRITE",
-		       @"2: MEM_READ",@"3: MEM_WRITE", nil];
+	xl3RWModes = [[NSArray alloc] initWithObjects:@"0: REG_WRITE",@"1: REG_READ",
+		       @"2: MEM_WRITE",@"3: MEM_READ", nil];
 
 	xl3RWSelects = [[NSDictionary alloc] initWithObjectsAndKeys:
 			[NSNumber numberWithInt:0x00], @"FEC 0", 
@@ -585,7 +585,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) writeValueAction:(id) sender;
 {
-	[model setWriteValue:[sender unsignedIntValue]];
+	[model setWriteValue:[sender intValue]];
 }
 
 

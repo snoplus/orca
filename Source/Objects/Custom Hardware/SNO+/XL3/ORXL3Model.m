@@ -752,12 +752,12 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		*aMbId = i;
 		[self synthesizeDefaultsIntoBundle:aConfigBundle forSLot:i];
 		if ([xl3Link needToSwap]) {
-			*aMbId = swapLong(aMbId);
+			*aMbId = swapLong(*aMbId);
 			[self byteSwapBundle:aConfigBundle];
 		}
 		@try {
 			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
-			if (payload.payload != 0) {
+			if (*(unsigned int*) payload.payload != 0) {
 				NSLog(@"XL3 doesn't like the config bundle for slot %d, exiting.\n", i);
 				break;
 			}
