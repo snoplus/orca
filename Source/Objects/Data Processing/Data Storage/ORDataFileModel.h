@@ -64,7 +64,8 @@
 		ORAlarm*		diskFullAlarm;
 		int				checkCount;
 		int				runMode;
-		NSTimeInterval lastFileCheckTime;
+		NSTimeInterval	lastFileCheckTime;
+		NSString*		openFilePath;
 }
 
 #pragma mark ¥¥¥Accessors
