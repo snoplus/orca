@@ -22,6 +22,7 @@
 @interface ORCaen260Controller : ORCaenCardController {
 
 	IBOutlet NSButton*		enableAllButton;
+	IBOutlet NSButton*		autoInhibitButton;
 	IBOutlet NSButton*		disableAllButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
 	IBOutlet NSMatrix*		channelLabelMatrix;
@@ -41,6 +42,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) autoInhibitChanged:(NSNotification*)aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) scalerValueChanged:(NSNotification*)aNote;
@@ -48,6 +50,7 @@
 - (void) pollingStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) autoInhibitAction:(id)sender;
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) enableAllAction:(id)sender;
 - (IBAction) disableAllAction:(id)sender;

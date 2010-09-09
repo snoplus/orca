@@ -74,6 +74,7 @@ enum {
 		NSTimeInterval	pollingState;
 		BOOL			shipRecords;
 		time_t			lastReadTime;
+		BOOL			autoInhibit;
 }
 
 #pragma mark •••Initialization
@@ -83,6 +84,8 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (BOOL) autoInhibit;
+- (void) setAutoInhibit:(BOOL)aAutoInhibit;
 - (BOOL) shipRecords;
 - (void) setShipRecords:(BOOL)aShipRecords;
 - (unsigned long) scalerValue:(int)index;
@@ -117,6 +120,7 @@ enum {
 @end
 
 #pragma mark •••External String Definitions
+extern NSString* ORCaen260ModelAutoInhibitChanged;
 extern NSString* ORCaen260ModelEnabledMaskChanged;
 extern NSString* ORCaen260ModelScalerValueChanged;
 extern NSString* ORCaen260ModelPollingStateChanged;

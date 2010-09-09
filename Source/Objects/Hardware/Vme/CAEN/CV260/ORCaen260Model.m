@@ -62,6 +62,7 @@ static RegisterNamesStruct reg[kNumberOfV260Registers] = {
 
 
 #pragma mark •••Notification Strings
+NSString* ORCaen260ModelAutoInhibitChanged = @"ORCaen260ModelAutoInhibitChanged";
 NSString* ORCaen260ModelEnabledMaskChanged	 = @"ORCaen260ModelEnabledMaskChanged";
 NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged";
 NSString* ORCaen260ModelPollingStateChanged	 = @"ORCaen260ModelPollingStateChanged";
@@ -131,6 +132,21 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 	return @"VME/V260.html";
 }
 #pragma mark •••Accessors
+
+- (BOOL) autoInhibit
+{
+    return autoInhibit;
+}
+
+- (void) setAutoInhibit:(BOOL)aAutoInhibit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoInhibit:autoInhibit];
+    
+    autoInhibit = aAutoInhibit;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelAutoInhibitChanged object:self];
+}
+
 #pragma mark ***Register - General routines
 - (short)          getNumberRegisters	{ return kNumberOfV260Registers; }
 
@@ -324,6 +340,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 	@try {
 		NSLog(@"clearing scaler values for CV260,%d,%d\n",[self crateNumber],[self slot]);
 		[self clearScalers];
+		if(autoInhibit)[self resetInhibit];
 	}
 	@catch(NSException* localException){
 		NSLogColor([NSColor redColor],@"unable to clear scaler values for CV260,%d,%d\n",[self crateNumber],[self slot]);
@@ -334,6 +351,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 - (void) runAboutToStop:(NSNotification*)aNote
 {
 	if(pollRunning){
+		if(autoInhibit)[self setInhibit];
 		[self _pollAllChannels];
 	}
 }
@@ -421,7 +439,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 								numToRead:1
 							   withAddMod:[self addressModifier]
 							usingAddSpace:0x01];
-			[self setScalerValue:aValue & 0x0fffffff index:i];
+			[self setScalerValue:aValue & 0x00ffffff index:i];
 		}
 		else [self setScalerValue:0 index:i];
 		
@@ -453,8 +471,9 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-	[self setPollingState:[decoder decodeIntForKey:@"pollingState"]];
-	[self setShipRecords:[decoder decodeBoolForKey:@"shipRecords"]];
+    [self setAutoInhibit:	[decoder decodeBoolForKey:@"autoInhibit"]];
+	[self setPollingState:	[decoder decodeIntForKey:@"pollingState"]];
+	[self setShipRecords:	[decoder decodeBoolForKey:@"shipRecords"]];
 	
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
@@ -466,6 +485,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:autoInhibit forKey:@"autoInhibit"];
     [encoder encodeInt:[self pollingState] forKey:@"pollingState"];
     [encoder encodeBool:[self pollingState] forKey:@"shipRecords"];
 	

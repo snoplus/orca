@@ -76,9 +76,20 @@
                      selector : @selector(shipRecordsChanged:)
                          name : ORCaen260ModelShipRecordsChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(autoInhibitChanged:)
+                         name : ORCaen260ModelAutoInhibitChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) autoInhibitChanged:(NSNotification*)aNote
+{
+	[autoInhibitButton setIntValue: [model autoInhibit]];
+}
 - (void) enabledMaskChanged:(NSNotification*)aNote
 {
 	int i;
@@ -94,6 +105,7 @@
 	[self scalerValueChanged:nil];
 	[self shipRecordsChanged:nil];
     [self pollingStateChanged:nil];
+	[self autoInhibitChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -179,6 +191,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) autoInhibitAction:(id)sender
+{
+	[model setAutoInhibit:[sender intValue]];	
+}
+
 - (void) enabledMaskAction:(id)sender
 {
 	int i;
