@@ -421,7 +421,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 								numToRead:1
 							   withAddMod:[self addressModifier]
 							usingAddSpace:0x01];
-			[self setScalerValue:aValue index:i];
+			[self setScalerValue:aValue & 0x0fffffff index:i];
 		}
 		else [self setScalerValue:0 index:i];
 		
