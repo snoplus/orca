@@ -353,9 +353,12 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 - (void) timeToPoll
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeToPoll) object:nil];
-	[self readCounts:NO];
-	[self shipData];
-	
+	@try {
+		[self readCounts:NO];
+		[self shipData];
+	}
+	@catch (NSException* e){
+	}
 	if(pollTime>0){
 		[self performSelector:@selector(timeToPoll) withObject:nil afterDelay:[self convertedPollTime]];
 	}
