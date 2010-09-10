@@ -153,8 +153,13 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     [someObjects makeObjectsPerformSelector:@selector(setGuardian:) withObject:self];
     [orcaObjects addObjectsFromArray:someObjects];
     [someObjects makeObjectsPerformSelector:@selector(askForUniqueIDNumber) withObject:nil];
-    [someObjects makeObjectsPerformSelector:@selector(wakeUp)];
-    
+	@try {
+		//some objects will try to make a hw access on a wakeUp. If that raises an exception it
+		//causes a failure of the config load, which is very bad....
+		[someObjects makeObjectsPerformSelector:@selector(wakeUp)];
+	}
+	@catch (NSException* e) {
+	}
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:someObjects forKey: ORGroupObjectList];
     
@@ -196,7 +201,13 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 - (void)wakeUp
 {
     [super wakeUp];
-    [orcaObjects makeObjectsPerformSelector:@selector(wakeUp)];
+	@try {
+		//some objects will try to make a hw access on a wakeUp. If that raises an exception it
+		//causes a failure of the config load, which is very bad....
+		[orcaObjects makeObjectsPerformSelector:@selector(wakeUp)];
+	}
+	@catch (NSException* e) {
+	}
 }
 
 - (void) awakeAfterDocumentLoaded
