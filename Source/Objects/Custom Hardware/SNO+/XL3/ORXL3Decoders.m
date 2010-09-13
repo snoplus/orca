@@ -19,13 +19,13 @@
 //-------------------------------------------------------------
 
 
-#import "ORSNOCrateDecoders.h"
+#import "ORXL3Decoders.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORSNOCrateModel.h"
 #import "ORDataTypeAssigner.h"
 
-@implementation ORXL3DecoderForPMTMegaBundle
+@implementation ORXL3DecoderForXL3MegaBundle
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
