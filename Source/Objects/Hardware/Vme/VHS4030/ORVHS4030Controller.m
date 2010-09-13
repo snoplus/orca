@@ -611,7 +611,9 @@
 	[self endEditing];
 	//******contextInfo is released when the sheet closes.
 	NSDecimalNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
-    NSBeginAlertSheet([NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":aChannel==0?@"A":@"B"],
+	NSString* n = [NSString stringWithFormat:@"%d",aChannel];
+	NSString* s = [NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":n];
+    NSBeginAlertSheet(s,
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -629,8 +631,10 @@
 	int channel = [theChannelNumber intValue] ;
 	if(returnCode == NSAlertDefaultReturn){
 		@try {
-			if(channel == 0xFFFF || channel == 0)[model panicToZero:0];
-			if(channel == 0xFFFF || channel == 1)[model panicToZero:1];
+			int i;
+			for(i=0;i<kNumVHS4030Channels;i++){
+				if(channel == 0xFFFF || channel == i)[model panicToZero:i];
+			}
 		}
 		@catch(NSException* e){
 			NSLog(@"vhW224L Panic failed because of exception\n");

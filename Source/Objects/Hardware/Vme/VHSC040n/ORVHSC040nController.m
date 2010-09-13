@@ -650,21 +650,13 @@
 	int channel = [theChannelNumber intValue] ;
 	if(returnCode == NSAlertDefaultReturn){
 		@try {
-			if(channel == 0xFFFF || channel == 0)[model panicToZero:0];
-			if(channel == 0xFFFF || channel == 1)[model panicToZero:1];
-			if(channel == 0xFFFF || channel == 2)[model panicToZero:2];
-			if(channel == 0xFFFF || channel == 3)[model panicToZero:3];
-			if(channel == 0xFFFF || channel == 4)[model panicToZero:4];
-			if(channel == 0xFFFF || channel == 5)[model panicToZero:5];
-			if(channel == 0xFFFF || channel == 6)[model panicToZero:6];
-			if(channel == 0xFFFF || channel == 7)[model panicToZero:7];
-			if(channel == 0xFFFF || channel == 8)[model panicToZero:8];
-			if(channel == 0xFFFF || channel == 9)[model panicToZero:9];
-			if(channel == 0xFFFF || channel == 10)[model panicToZero:10];
-			if(channel == 0xFFFF || channel == 11)[model panicToZero:11];
+			int i;
+			for(i=0;i<kNumVHSC040nChannels;i++){
+				if(channel == 0xFFFF || channel == i)[model panicToZero:i];
+			}
 		}
 		@catch(NSException* e){
-			NSLog(@"vhW224L Panic failed because of exception\n");
+			NSLog(@"vhs040n Panic failed because of exception\n");
 		}
 	}
 	[theChannelNumber release];
