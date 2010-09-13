@@ -50,11 +50,12 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) postRunState:(NSNotification*)aNote;
 - (void) postRunTime:(NSNotification*)aNote;
 - (void) postRunOptions:(NSNotification*)aNote;
+- (void) objectCountChanged:(NSNotification*)aNote;
+- (void) collectProcesses;
 - (void) collectSegmentMap;
 - (void) collectAlarms;
 - (void) alarmPosted:(NSNotification*)aNote;
 - (void) alarmCleared:(NSNotification*)aNote;
-- (void) collectProcesses;
 - (void) createMachinesTableInDataBase:(NSString*)aDataBase;
 - (void) createAlarmsTableInDataBase:(NSString*)aDataBase;
 - (void) createProcessTableInDataBase:(NSString*)aDataBase;
@@ -192,7 +193,22 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[notifyCenter addObserver : self
                      selector : @selector(postRunOptions:)
                          name : ORRunOfflineRunNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(collectProcesses)
+                         name : ORProcessRunningChangedNotification
                        object : nil];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(objectCountChanged:)
+                         name : ORGroupObjectsAdded
+                       object : nil];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(objectCountChanged:)
+                         name : ORGroupObjectsRemoved
+                       object : nil];		
 }
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
@@ -200,41 +216,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[self removeMachineName];
 }
 
-- (void) runStatusChanged:(NSNotification*)aNote
-{
-	id pausedKeyIncluded = [[aNote userInfo] objectForKey:@"ORRunPaused"];
-	if(!pausedKeyIncluded){
-		@try {
-			int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
-			
-			[self postRunState:aNote];
-			[self postRunTime:aNote];
-			[self postRunOptions:aNote];
-			if(runState == eRunInProgress){
-				if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
-				NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
-				for(ORDataChainObject* aDataMonitor in list){
-					if([aDataMonitor involvedInCurrentRun]){
-						[dataMonitors addObject:aDataMonitor];
-					}
-				}
-				[self updateExperiment];
-				[self updateDataSets];
-			}
-			else if(runState == eRunStopped){
-				//[self postRunTime:aNote];
-				[dataMonitors release];
-				dataMonitors = nil;
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
-			}
-			[self collectAlarms];
-		}
-		@catch (NSException* e) {
-			//silently catch and continue
-		}
-	}
-}
 
 #pragma mark ***Accessors
 - (id) nextObject
@@ -888,6 +869,52 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 
+- (void) objectCountChanged:(NSNotification*)aNote
+{
+	NSArray* objects = [[aNote userInfo] objectForKey:ORGroupObjectList];
+	for(NSObject* obj in objects){
+		if([obj isKindOfClass:NSClassFromString(@"ORProcessModel")]){
+			[self collectProcesses];
+			break;
+		}
+	}
+}
+
+- (void) runStatusChanged:(NSNotification*)aNote
+{
+	id pausedKeyIncluded = [[aNote userInfo] objectForKey:@"ORRunPaused"];
+	if(!pausedKeyIncluded){
+		@try {
+			int runState     = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+			
+			[self postRunState:aNote];
+			[self postRunTime:aNote];
+			[self postRunOptions:aNote];
+			if(runState == eRunInProgress){
+				if(!dataMonitors)dataMonitors = [[NSMutableArray array] retain];
+				NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+				for(ORDataChainObject* aDataMonitor in list){
+					if([aDataMonitor involvedInCurrentRun]){
+						[dataMonitors addObject:aDataMonitor];
+					}
+				}
+				[self updateExperiment];
+				[self updateDataSets];
+			}
+			else if(runState == eRunStopped){
+				//[self postRunTime:aNote];
+				[dataMonitors release];
+				dataMonitors = nil;
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
+			}
+			[self collectAlarms];
+		}
+		@catch (NSException* e) {
+			//silently catch and continue
+		}
+	}
+}
 
 /*Table: Histogram1Ds
  +------------+-------------+------+-----+---------+----------------+
