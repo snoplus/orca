@@ -56,6 +56,7 @@
 	IBOutlet NSPopUpButton*		compositeXl3RWSelectPU;
 	IBOutlet NSPopUpButton*		compositeXl3RWRegisterPU;
 	IBOutlet NSTextField*		compositeXl3RWDataValueField;	
+	IBOutlet NSButton*		compositeXl3RWButton;	
 	IBOutlet NSProgressIndicator*	compositeXl3RWRunningIndicator;
 	IBOutlet NSButton*		compositeQuitButton;	
 	IBOutlet NSProgressIndicator*	compositeQuitRunningIndicator;
@@ -100,7 +101,6 @@
 - (void) compositeSlotMaskChanged:(NSNotification*)aNote;
 - (void) compositeXl3RWAddressChanged:(NSNotification*)aNote;
 - (void) compositeXL3RWDataChanged:(NSNotification*)aNote;
-- (void) compositeXl3RWRunningChanged:(NSNotification*)aNote;
 - (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote;
 
 //ip connection

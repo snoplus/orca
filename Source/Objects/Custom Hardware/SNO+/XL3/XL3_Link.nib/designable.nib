@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3762"/>
+			<integer value="3669"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1985,7 +1985,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Get Board IDs</string>
+													<string key="NSContents">Get Board Ids (sel slots)</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="683681486"/>
 													<object class="NSColor" key="NSTextColor">
@@ -2888,14 +2888,6 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">compositeXl3RWSend:</string>
-						<reference key="source" ref="890317098"/>
-						<reference key="destination" ref="743777005"/>
-					</object>
-					<int key="connectionID">3722</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">compositeXl3RWSelectAction:</string>
 						<reference key="source" ref="890317098"/>
 						<reference key="destination" ref="807833097"/>
@@ -3069,6 +3061,22 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 						<reference key="destination" ref="31652726"/>
 					</object>
 					<int key="connectionID">3768</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">compositeXl3RWButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="743777005"/>
+					</object>
+					<int key="connectionID">3769</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="743777005"/>
+					</object>
+					<int key="connectionID">3770</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -5274,7 +5282,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3768</int>
+			<int key="maxID">3770</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -6353,6 +6361,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 							<string>compositeXl3ModePU</string>
 							<string>compositeXl3ModeRunningIndicator</string>
 							<string>compositeXl3RWAddressValueField</string>
+							<string>compositeXl3RWButton</string>
 							<string>compositeXl3RWDataValueField</string>
 							<string>compositeXl3RWModePU</string>
 							<string>compositeXl3RWRegisterPU</string>
@@ -6395,6 +6404,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 							<string>NSPopUpButton</string>
 							<string>NSProgressIndicator</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
@@ -6440,6 +6450,7 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 							<string>compositeXl3ModePU</string>
 							<string>compositeXl3ModeRunningIndicator</string>
 							<string>compositeXl3RWAddressValueField</string>
+							<string>compositeXl3RWButton</string>
 							<string>compositeXl3RWDataValueField</string>
 							<string>compositeXl3RWModePU</string>
 							<string>compositeXl3RWRegisterPU</string>
@@ -6547,6 +6558,10 @@ AAB0ZXh0AAAAAENvcHlyaWdodCBBcHBsZSwgSW5jLiwgMjAwOAA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">compositeXl3RWAddressValueField</string>
 								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">compositeXl3RWButton</string>
+								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">compositeXl3RWDataValueField</string>

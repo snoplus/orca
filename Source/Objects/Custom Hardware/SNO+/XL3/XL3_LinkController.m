@@ -144,11 +144,6 @@ static NSDictionary* xl3Ops;
 			   object : model];
 
 	[notifyCenter addObserver : self
-			 selector : @selector(compositeXl3RWRunningChanged:)
-			     name : ORXL3ModelXl3RWRunningChanged
-			   object : model];
-
-	[notifyCenter addObserver : self
 			 selector : @selector(compositeXl3PedestalMaskChanged:)
 			     name : ORXL3ModelXl3PedestalMaskChanged
 			   object : model];
@@ -355,12 +350,6 @@ static NSDictionary* xl3Ops;
 	[compositeXl3RWDataValueField setIntValue:[model xl3RWDataValue]];
 }
 
-- (void) compositeXl3RWRunningChanged:(NSNotification *)aNote
-{
-	if ([model xl3RWRunning]) [compositeXl3RWRunningIndicator startAnimation:model];
-	else [compositeXl3RWRunningIndicator stopAnimation:model];
-}
-
 - (void) compositeXl3PedestalMaskChanged:(NSNotification*)aNote
 {
 	[compositeSetPedestalField setIntValue:[model xl3PedestalMask]];
@@ -425,9 +414,12 @@ static NSDictionary* xl3Ops;
 									compositeBoardIDRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(getBoardIDs)), @"selector",
 			 nil], @"compositeBoardID",
+			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeXl3RWButton, @"button",
+									compositeXl3RWRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(compositeXl3RW)), @"selector",
+			 nil], @"compositeXl3RW",
 		  nil];
 }
-
 
 - (void) populatePullDown
 {
@@ -491,7 +483,7 @@ static NSDictionary* xl3Ops;
 			  [NSNumber numberWithInt:0x90], @"fec cmos chp dis",
 			  [NSNumber numberWithInt:0x90], @"fec cmos dat out",
 			  [NSNumber numberWithInt:0x9C], @"fec fifo read",
-			  [NSNumber numberWithInt:0x9D], @"fec fifo writ",
+			  [NSNumber numberWithInt:0x9D], @"fec fifo write",
 			  [NSNumber numberWithInt:0x9E], @"fec fifo diff",
 			  [NSNumber numberWithInt:0x101], @"fec cmos msd cnt",
 			  [NSNumber numberWithInt:0x102], @"fec cmos busy rg",
@@ -534,7 +526,7 @@ static NSDictionary* xl3Ops;
 	for (id key in xl3Ops) {
 		if ((id) [[xl3Ops objectForKey:key] objectForKey:@"button"] == sender) {
 			theKey = [NSString stringWithString: key];
-			NSLog(@"%@ found in keys\n", theKey);
+			//NSLog(@"%@ found in keys\n", theKey);
 			break;
 		}
 	}
@@ -621,7 +613,12 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) compositeSlotMaskPresentAction:(id) sender
 {
-	NSLog(@"not implemented\n");
+	NSArray* fecs = [[model guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+	unsigned int msk = 0UL;
+	for (id key in fecs) {
+		msk |= 1 << [key stationNumber];
+	}
+	[model setSlotMask:msk];
 }
 
 - (IBAction) compositeDeselectAction:(id) sender

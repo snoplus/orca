@@ -105,8 +105,6 @@ enum {
 - (void) setXl3Mode:(unsigned int)aXl3Mode;
 - (BOOL) xl3ModeRunning;
 - (void) setXl3ModeRunning:(BOOL)anXl3ModeRunning;
-- (BOOL) xl3RWRunning;
-- (void) setXl3RWRunning:(BOOL)anXl3RWRunning;
 - (unsigned long) xl3RWAddressValue;
 - (void) setXl3RWAddressValue:(unsigned long)anXl3RWAddressValue;
 - (unsigned long) xl3RWDataValue;
@@ -176,6 +174,5 @@ extern NSString* ORXL3ModelSlotMaskChanged;
 extern NSString* ORXL3ModelXl3ModeRunningChanged;
 extern NSString* ORXL3ModelXl3RWAddressValueChanged;
 extern NSString* ORXL3ModelXl3RWDataValueChanged;
-extern NSString* ORXL3ModelXl3RWRunningChanged;
 extern NSString* ORXL3ModelXl3OpsRunningChanged;
 extern NSString* ORXL3ModelXl3PedestalMaskChanged;

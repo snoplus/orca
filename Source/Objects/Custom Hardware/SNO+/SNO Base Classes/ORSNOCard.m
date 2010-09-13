@@ -58,6 +58,11 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 	return [[self crate] maxNumberOfObjects] - [self slot] - 1;
 }
 
+- (NSString*) fullID
+{
+	return [NSString stringWithFormat:@"%@,%d,%d",NSStringFromClass([self class]),[self crateNumber], [self stationNumber]];
+}
+
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
 {
 }

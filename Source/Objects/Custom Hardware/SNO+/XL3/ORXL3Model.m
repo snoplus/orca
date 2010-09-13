@@ -25,6 +25,7 @@
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
 #import "ORSNOConstants.h"
+#import "ORFec32Model.h"
 
 static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 	{ @"SelectReg",		RESET_REG },
@@ -57,7 +58,6 @@ NSString* ORXL3ModelSlotMaskChanged =			@"ORXL3ModelSlotMaskChanged";
 NSString* ORXL3ModelXl3ModeRunningChanged =		@"ORXL3ModelXl3ModeRunningChanged";
 NSString* ORXL3ModelXl3RWAddressValueChanged =		@"ORXL3ModelXl3RWAddressValueChanged";
 NSString* ORXL3ModelXl3RWDataValueChanged =		@"ORXL3ModelXl3RWDataValueChanged";
-NSString* ORXL3ModelXl3RWRunningChanged =		@"ORXL3ModelXl3RWRunningChanged";
 NSString* ORXL3ModelXl3OpsRunningChanged =		@"ORXL3ModelXl3OpsRunningChanged";
 NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged";
 
@@ -316,18 +316,6 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	[[[self undoManager] prepareWithInvocationTarget:self] setXl3ModeRunning:xl3ModeRunning];
 	xl3ModeRunning = anXl3ModeRunning;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeRunningChanged object:self];
-}
-
-- (BOOL) xl3RWRunning
-{
-	return xl3RWRunning;
-}
-
-- (void) setXl3RWRunning:(BOOL)anXl3RWRunning
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setXl3RWRunning:xl3RWRunning];
-	xl3RWRunning = anXl3RWRunning;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3RWRunningChanged object:self];
 }
 
 - (unsigned long) xl3RWAddressValue
@@ -770,24 +758,47 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	}
 		
 	if (loadOk) {
-		aMbId[0] = 666;		// time to fly
-		aMbId[1] = 0;		// hv reset
-		aMbId[2] = 0xFFFF;	// slot mask
-		aMbId[3] = 0;		// ctc delay
+		// time to fly
+		aMbId[0] = 666;
+		
+		// xil load
+		if (aXilinxFlag == YES) aMbId[1] = 1;
+		else aMbId[1] = 0;
+		
+		// hv reset, talk to Rob first
+		aMbId[1] = 0;
+		
+		// slot mask
+		if (anAutoInitFlag == YES) {
+			aMbId[2] = 0xFFFF;
+			NSLog(@"AutoInits not yet implemented, XL3 would freeze.\n");
+		}
+		else {
+			unsigned int msk = 0;
+			ORFec32Model* aFec;
+			NSArray* fecs = [[self guardian] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+			for (aFec in fecs) {
+				msk |= 1 << [aFec stationNumber];
+			}
+			aMbId[2] = msk;
+		}
+
+		// ctc delay
+		aMbId[3] = 0;
 		
 		if ([xl3Link needToSwap]) {
-			for (i=0; i<4; i++) aMbId[i] = swapLong(aMbId[i]);
+			for (i=0; i<5; i++) aMbId[i] = swapLong(aMbId[i]);
 		}
 		@try {
 			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
-			if (payload.payload != 0) {
+			if (*(unsigned int*)payload.payload != 0) {
 				NSLog(@"error during init.\n", i);
 			}
+			NSLog(@"init ok!\n");
 		}
 		@catch (NSException* e) {
 			NSLog(@"Init crate failed; error: %@ reason: %@\n", [e name], [e reason]);
 		}
-		NSLog(@"init ok!\n");
 	}
 	else {
 		NSLog(@"error loading config, init skipped\n");
@@ -875,7 +886,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 {
 	unsigned long aValue = [self xl3RWDataValue];
 	NSLog(@"XL3_rw to address: 0x%08x with data: 0x%08x\n", [self xl3RWAddressValue], aValue);
-	[self setXl3RWRunning: YES];
+	[self setXl3OpsRunning:YES forKey:@"compositeXl3RW"];
 	
 	@try {
 		[xl3Link sendFECCommand:0UL toAddress:[self xl3RWAddressValue] withData:&aValue];
@@ -884,8 +895,8 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	@catch (NSException* e) {
 		NSLog(@"XL3_rw failed; error: %@ reason: %@\n", [e name], [e reason]);
 	}
-		
-	[self setXl3RWRunning: NO];
+
+	[self setXl3OpsRunning:NO forKey:@"compositeXl3RW"];
 }
 
 - (void) compositeQuit
@@ -975,20 +986,28 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 - (void) getBoardIDs
 {
 	unsigned short i, j, val;
+	unsigned long msk;
 	NSString* bID[6];
 	
 	[self setXl3OpsRunning:YES forKey:@"compositeBoardID"];
 	NSLog(@"Get Board IDs ...\n");
 
+	msk = [self slotMask];
 	for (i=0; i < 16; i++) {
-		for (j = 0; j < 6; j++) {
-			val = [self getBoardIDForSlot:i chip:(j+1)];
-			if (val == 0x0) bID[j] = @"----";
-			else bID[j] = [NSString stringWithFormat:@"0x%04x", val];
+		if (1 << i && msk) {
+			//HV chip not yet available
+			//for (j = 0; j < 6; j++) {
+			for (j = 0; j < 5; j++) {
+				val = [self getBoardIDForSlot:i chip:(j+1)];
+				if (val == 0x0) bID[j] = @"----";
+				else bID[j] = [NSString stringWithFormat:@"0x%04x", val];
+			}
+			
+			//NSLog(@"slot: %02d: MB: %@ DB1: %@ DB2:%@ DB3: %@ DB4: %@ HV: %@\n",
+			//      i+1, bID[0], bID[1], bID[2], bID[3], bID[4], bID[5]);
+			NSLog(@"slot: %02d: MB: %@ DB1: %@ DB2:%@ DB3: %@ DB4: %@\n",
+			      i+1, bID[0], bID[1], bID[2], bID[3], bID[4]);
 		}
-		
-		NSLog(@"slot: %02d: MB: %@ DB1: %@ DB2:%@ DB3: %@ DB4: %@ HV: %@\n",
-		      i+1, bID[0], bID[1], bID[2], bID[3], bID[4], bID[5]);
 	}
 
 	[self setXl3OpsRunning:NO forKey:@"compositeBoardID"];	
