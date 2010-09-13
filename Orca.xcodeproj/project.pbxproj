@@ -1032,6 +1032,14 @@
 		84499CCB0F13E457004B855B /* ORCTITempDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499CC30F13E457004B855B /* ORCTITempDecoders.m */; };
 		84499CCC0F13E457004B855B /* ORCTITempModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499CC40F13E457004B855B /* ORCTITempModel.h */; };
 		84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499CC50F13E457004B855B /* ORCTITempModel.m */; };
+		8449CC83123E85DA009C8AA2 /* ORVHSC040nController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449CC7B123E85D9009C8AA2 /* ORVHSC040nController.h */; };
+		8449CC84123E85DA009C8AA2 /* ORVHSC040nController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449CC7C123E85D9009C8AA2 /* ORVHSC040nController.m */; };
+		8449CC85123E85DA009C8AA2 /* ORVHSC040nDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449CC7D123E85D9009C8AA2 /* ORVHSC040nDecoders.h */; };
+		8449CC86123E85DA009C8AA2 /* ORVHSC040nDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449CC7E123E85D9009C8AA2 /* ORVHSC040nDecoders.m */; };
+		8449CC87123E85DA009C8AA2 /* ORVHSC040nModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8449CC7F123E85D9009C8AA2 /* ORVHSC040nModel.h */; };
+		8449CC88123E85DA009C8AA2 /* ORVHSC040nModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449CC80123E85DA009C8AA2 /* ORVHSC040nModel.m */; };
+		8449CC89123E85DA009C8AA2 /* VHSC040n.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8449CC81123E85DA009C8AA2 /* VHSC040n.nib */; };
+		8449CC8A123E85DA009C8AA2 /* VHSC040n.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8449CC82123E85DA009C8AA2 /* VHSC040n.tif */; };
 		844B42BF0DE5D5680061AE80 /* ORSNORackController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B70DE5D5680061AE80 /* ORSNORackController.h */; };
 		844B42C00DE5D5680061AE80 /* ORSNORackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B42B80DE5D5680061AE80 /* ORSNORackController.m */; };
 		844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B90DE5D5680061AE80 /* ORSNORackModel.h */; };
@@ -3329,6 +3337,14 @@
 		84499CC30F13E457004B855B /* ORCTITempDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCTITempDecoders.m; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempDecoders.m; sourceTree = SOURCE_ROOT; };
 		84499CC40F13E457004B855B /* ORCTITempModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCTITempModel.h; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempModel.h; sourceTree = SOURCE_ROOT; };
 		84499CC50F13E457004B855B /* ORCTITempModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCTITempModel.m; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempModel.m; sourceTree = SOURCE_ROOT; };
+		8449CC7B123E85D9009C8AA2 /* ORVHSC040nController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHSC040nController.h; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nController.h; sourceTree = SOURCE_ROOT; };
+		8449CC7C123E85D9009C8AA2 /* ORVHSC040nController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHSC040nController.m; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nController.m; sourceTree = SOURCE_ROOT; };
+		8449CC7D123E85D9009C8AA2 /* ORVHSC040nDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHSC040nDecoders.h; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nDecoders.h; sourceTree = SOURCE_ROOT; };
+		8449CC7E123E85D9009C8AA2 /* ORVHSC040nDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHSC040nDecoders.m; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nDecoders.m; sourceTree = SOURCE_ROOT; };
+		8449CC7F123E85D9009C8AA2 /* ORVHSC040nModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVHSC040nModel.h; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nModel.h; sourceTree = SOURCE_ROOT; };
+		8449CC80123E85DA009C8AA2 /* ORVHSC040nModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHSC040nModel.m; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nModel.m; sourceTree = SOURCE_ROOT; };
+		8449CC81123E85DA009C8AA2 /* VHSC040n.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VHSC040n.nib; path = Source/Objects/Hardware/Vme/VHSC040n/VHSC040n.nib; sourceTree = SOURCE_ROOT; };
+		8449CC82123E85DA009C8AA2 /* VHSC040n.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VHSC040n.tif; path = Source/Objects/Hardware/Vme/VHSC040n/VHSC040n.tif; sourceTree = SOURCE_ROOT; };
 		844B42B70DE5D5680061AE80 /* ORSNORackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackController.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.h"; sourceTree = SOURCE_ROOT; };
 		844B42B80DE5D5680061AE80 /* ORSNORackController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNORackController.m; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.m"; sourceTree = SOURCE_ROOT; };
 		844B42B90DE5D5680061AE80 /* ORSNORackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.h"; sourceTree = SOURCE_ROOT; };
@@ -6796,6 +6812,22 @@
 			);
 			name = CTITemp;
 			path = Source/Objects/Hardware/Serial/CTITemp;
+			sourceTree = SOURCE_ROOT;
+		};
+		8449CC7A123E85D9009C8AA2 /* VHSC040n */ = {
+			isa = PBXGroup;
+			children = (
+				8449CC7B123E85D9009C8AA2 /* ORVHSC040nController.h */,
+				8449CC7C123E85D9009C8AA2 /* ORVHSC040nController.m */,
+				8449CC7D123E85D9009C8AA2 /* ORVHSC040nDecoders.h */,
+				8449CC7E123E85D9009C8AA2 /* ORVHSC040nDecoders.m */,
+				8449CC7F123E85D9009C8AA2 /* ORVHSC040nModel.h */,
+				8449CC80123E85DA009C8AA2 /* ORVHSC040nModel.m */,
+				8449CC81123E85DA009C8AA2 /* VHSC040n.nib */,
+				8449CC82123E85DA009C8AA2 /* VHSC040n.tif */,
+			);
+			name = VHSC040n;
+			path = Source/Objects/Hardware/Vme/VHSC040n;
 			sourceTree = SOURCE_ROOT;
 		};
 		844B42B60DE5D5680061AE80 /* SNORack */ = {
@@ -10327,6 +10359,7 @@
 				84FA6383102B041800B426A6 /* SIS3350 */,
 				848285A1112C5AD600BA30ED /* VHS4030 */,
 				84AFC23D1029F35E009F4139 /* VHQ224L */,
+				8449CC7A123E85D9009C8AA2 /* VHSC040n */,
 			);
 			path = Vme;
 			sourceTree = "<group>";
@@ -11361,6 +11394,9 @@
 				845B14081227E7DC0022F207 /* ORPxi6289Decoders.h in Headers */,
 				845B140A1227E7DC0022F207 /* ORPxi6289Model.h in Headers */,
 				EFCE3ADF123DD9A2009AEBA8 /* ORXL3Decoders.h in Headers */,
+				8449CC83123E85DA009C8AA2 /* ORVHSC040nController.h in Headers */,
+				8449CC85123E85DA009C8AA2 /* ORVHSC040nDecoders.h in Headers */,
+				8449CC87123E85DA009C8AA2 /* ORVHSC040nModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12080,6 +12116,8 @@
 				84065F751226EBDE004E8970 /* PxiCrate6Small.png in Resources */,
 				845B140C1227E7DC0022F207 /* Pxi6289.nib in Resources */,
 				845B140F1227E8B00022F207 /* Pxi6289Card.png in Resources */,
+				8449CC89123E85DA009C8AA2 /* VHSC040n.nib in Resources */,
+				8449CC8A123E85DA009C8AA2 /* VHSC040n.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12898,6 +12936,9 @@
 				845B14091227E7DC0022F207 /* ORPxi6289Decoders.m in Sources */,
 				845B140B1227E7DC0022F207 /* ORPxi6289Model.m in Sources */,
 				EFCE3AE0123DD9A2009AEBA8 /* ORXL3Decoders.m in Sources */,
+				8449CC84123E85DA009C8AA2 /* ORVHSC040nController.m in Sources */,
+				8449CC86123E85DA009C8AA2 /* ORVHSC040nDecoders.m in Sources */,
+				8449CC88123E85DA009C8AA2 /* ORVHSC040nModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
