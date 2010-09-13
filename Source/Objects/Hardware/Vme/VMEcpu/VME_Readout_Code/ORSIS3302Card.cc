@@ -41,6 +41,7 @@ uint32_t ORSIS3302Card::GetADCBufferRegisterOffset(size_t channel)
 
 bool ORSIS3302Card::Start()
 {
+	flushed = false;
 	fSetOfTempVectorIters.assign(fSetOfTempVectorIters.size(), 0);
 	DisarmAndArmBank(0);
 	return true;
@@ -65,6 +66,10 @@ bool ORSIS3302Card::IsEvent()
 
 bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/) 
 {
+	
+	if(!flushed){
+		flushBuffer();
+	}
     if (IsEvent()) {
 		// Try disarm current bank and arm the next one
 		if (! DisarmAndArmNextBank() ) return false;
@@ -117,8 +122,7 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 	
     // readout	   	
     if (end_sample_address != 0) {
-    	addr = GetBaseAddress() 
-		+ GetADCBufferRegisterOffset(channel);
+    	addr = GetBaseAddress() + GetADCBufferRegisterOffset(channel);
         uint32_t num_bytes_to_read = (end_sample_address & 0x3ffffc)*2;
 		uint32_t num_longs_to_read = num_bytes_to_read >> 2;
 		if (num_longs_to_read + fTempVectorIter > fTempVector.size()) {
@@ -184,6 +188,37 @@ bool ORSIS3302Card::DisarmAndArmBank(size_t bank)
     else fBankOneArmed = false;
     return (VMEWrite(addr, GetAddressModifier(), 
                      GetDataWidth(), (uint32_t) 0x0) == sizeof(uint32_t));
+}
+
+void ORSIS3302Card::flushBuffer(void)
+{
+	//at the start of a run we flush the buffers to get rid of any old data.
+	uint32_t channel;
+	uint32_t num_bytes_to_read = 4 * 1024 * 1024;
+	uint8_t* buffer = (uint8_t*)malloc(num_bytes_to_read);
+	for(channel=0;channel<GetNumberOfChannels();channel++){
+		uint32_t addr = GetBaseAddress() + GetADCBufferRegisterOffset(channel);
+		
+		// Do DMA Read in two parts
+		int32_t error = DMARead(addr, 
+								(uint32_t)0x08, // Address Modifier, request MBLT 
+								(uint32_t)8, // Read 64-bits at a time (redundant request)
+								buffer,  
+								num_bytes_to_read);
+		if (error != (int32_t) num_bytes_to_read) { // vme error
+			LogMessage("3302(%d,%d) Flush Error (%d)",GetSlot(),channel,error);
+		}
+		error = DMARead(addr + num_bytes_to_read, 
+								(uint32_t)0x08, // Address Modifier, request MBLT 
+								(uint32_t)8, // Read 64-bits at a time (redundant request)
+								buffer,  
+								num_bytes_to_read);
+		if (error != (int32_t) num_bytes_to_read) { // vme error
+			LogMessage("3302(%d,%d) Flush Error (%d)",GetSlot(),channel,error);
+		}
+	}
+	free(buffer);
+	flushed = true;
 }
 
 //non-DMA readout code that is slow but works

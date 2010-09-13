@@ -34,9 +34,11 @@ class ORSIS3302Card: public ORVVmeCard
        virtual bool DisarmAndArmNextBank()
            { return (fBankOneArmed) ? DisarmAndArmBank(1) : DisarmAndArmBank(0); }
        virtual size_t GetNumberOfChannels() { return kNumberOfChannels; }
+	   virtual void flushBuffer(void);
 
-       bool fBankOneArmed;
-	   std::vector<std::vector<uint32_t> > fSetOfTempVectors;
-	   std::vector<size_t> fSetOfTempVectorIters;
+		bool fBankOneArmed;
+		bool flushed;
+	    std::vector<std::vector<uint32_t> > fSetOfTempVectors;
+	    std::vector<size_t> fSetOfTempVectorIters;
 
 };
