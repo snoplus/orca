@@ -2394,6 +2394,8 @@
 		EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */ = {isa = PBXBuildFile; fileRef = EFAC074211E9ADB500336793 /* XL3_Link.nib */; };
 		EFCC4546117FD45E008DC12C /* ORSNOCrateDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */; };
 		EFCC4547117FD45E008DC12C /* ORSNOCrateDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */; };
+		EFCE3ADF123DD9A2009AEBA8 /* ORXL3Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = EFCE3ADD123DD9A2009AEBA8 /* ORXL3Decoders.h */; };
+		EFCE3AE0123DD9A2009AEBA8 /* ORXL3Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -4853,6 +4855,8 @@
 		EFAC074211E9ADB500336793 /* XL3_Link.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = XL3_Link.nib; sourceTree = "<group>"; };
 		EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNOCrateDecoders.h; sourceTree = "<group>"; };
 		EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSNOCrateDecoders.m; sourceTree = "<group>"; };
+		EFCE3ADD123DD9A2009AEBA8 /* ORXL3Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL3Decoders.h; sourceTree = "<group>"; };
+		EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXL3Decoders.m; sourceTree = "<group>"; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
 		F51E695503AE4775015F64B1 /* ORAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAppDelegate.h; sourceTree = "<group>"; };
 		F51E695603AE4775015F64B1 /* ORAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAppDelegate.m; sourceTree = "<group>"; };
@@ -10068,6 +10072,8 @@
 		EF7722B111E813120064A1CF /* XL3 */ = {
 			isa = PBXGroup;
 			children = (
+				EFCE3ADD123DD9A2009AEBA8 /* ORXL3Decoders.h */,
+				EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */,
 				EF7722B211E813120064A1CF /* ORXL3Model.h */,
 				EF7722B311E813120064A1CF /* ORXL3Model.m */,
 				EFAC072111E9856800336793 /* XL3_Cmds.h */,
@@ -11354,6 +11360,7 @@
 				845B14061227E7DC0022F207 /* ORPxi6289Controller.h in Headers */,
 				845B14081227E7DC0022F207 /* ORPxi6289Decoders.h in Headers */,
 				845B140A1227E7DC0022F207 /* ORPxi6289Model.h in Headers */,
+				EFCE3ADF123DD9A2009AEBA8 /* ORXL3Decoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12890,6 +12897,7 @@
 				845B14071227E7DC0022F207 /* ORPxi6289Controller.m in Sources */,
 				845B14091227E7DC0022F207 /* ORPxi6289Decoders.m in Sources */,
 				845B140B1227E7DC0022F207 /* ORPxi6289Model.m in Sources */,
+				EFCE3AE0123DD9A2009AEBA8 /* ORXL3Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
