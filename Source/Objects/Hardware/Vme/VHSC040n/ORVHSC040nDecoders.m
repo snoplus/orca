@@ -35,7 +35,7 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  EventStatusWord for channel 0
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage chan 0 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current chan 0 encoded as a float
-//channel 1,2,3 follow.
+//channel 1-11 follow.
 //-----------------------------------------------------------------------------------------------
 
 @implementation ORVHSC040nDecoderForHVStatus
@@ -62,7 +62,7 @@
 	
 	int i;
 	int index = 3;
-	for(i=0;i<4;i++){
+	for(i=0;i<12;i++){
 		theString = [theString stringByAppendingFormat:@"--------------------------\n"];
 		theString = [theString stringByAppendingFormat:@"Channel %d\n",i];
 		theString = [theString stringByAppendingFormat:@"Status Words 0x%02x  0x%02x\n",dataPtr[index],dataPtr[index+1]];
