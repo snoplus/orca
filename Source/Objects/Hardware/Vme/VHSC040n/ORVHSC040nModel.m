@@ -27,7 +27,7 @@
 
 #pragma mark •••Static Declarations
 //offsets from the base address (kDefaultBaseAddress)
-static unsigned long vhs4030ModuleRegOffsets[kNumberOfVHSC040nRegisters] = {
+static unsigned long vhsc040ModuleRegOffsets[kNumberOfVHSC040nRegisters] = {
 	0x00,	//kModuleStatus				[0] 	
 	0x02,	//kModuleControl			[1] 	
 	0x04,	//kModuleEventStatus		[2] 	
@@ -53,24 +53,32 @@ static unsigned long vhs4030ModuleRegOffsets[kNumberOfVHSC040nRegisters] = {
 	0x90,	//kChannel2StartOffset		[21]
 	0xC0,	//kChannel3StartOffset		[22]
 	0xF0,	//kChannel4StartOffset		[23]
-	0x120,	//kChannel5StartOffset		[23]
-	0x150,	//kChannel6StartOffset		[23]
-	0x180,	//kChannel7StartOffset		[23]
-	0x1B0,	//kChannel8StartOffset		[23]
-	0x1E0,	//kChannel9StartOffset		[23]
-	0x210,	//kChannel10StartOffset		[23]
-	0x240,	//kChannel11StartOffset		[23]
-	0x270,	//kChannel12StartOffset		[23]
+	0x120,	//kChannel5StartOffset		[24]
+	0x150,	//kChannel6StartOffset		[25]
+	0x180,	//kChannel7StartOffset		[26]
+	0x1B0,	//kChannel8StartOffset		[27]
+	0x1E0,	//kChannel9StartOffset		[28]
+	0x210,	//kChannel10StartOffset		[29]
+	0x240,	//kChannel11StartOffset		[30]
+	0x270,	//kChannel12StartOffset		[31]
 };
 
-static unsigned long vhs4030ChannelStartOffsets[4] = {
+static unsigned long vhsc040ChannelStartOffsets[kNumberOfVHSC040nChannelRegisters] = {
 	0x60,
 	0x90,
 	0xC0,
 	0xF0,
+	0x120,	
+	0x150,	
+	0x180,
+	0x1B0,	
+	0x1E0,	
+	0x210,	
+	0x240,	
+	0x270
 };
 
-static unsigned long vhs4030ChannelRegOffsets[kNumberOfVHSC040nChannelRegisters] = {
+static unsigned long vhsc040ChannelRegOffsets[kNumberOfVHSC040nChannelRegisters] = {
 	0x00,	//kChannelStatus,
 	0x02,	//kChannelControl,
 	0x04,	//kChannelEventStatus,
@@ -581,7 +589,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short aValue = 0;
 	 [[self adapter] readWordBlock:&aValue
-						atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[kModuleStatus]
+						atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[kModuleStatus]
 						numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -594,7 +602,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short aValue = 0;
     [[self adapter] readWordBlock:&aValue
-						atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[kModuleEventStatus]
+						atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[kModuleEventStatus]
 						numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -607,7 +615,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short aValue = 0;
 	[[self adapter] readWordBlock:&aValue
-						atAddress:[self baseAddress]+vhs4030ChannelStartOffsets[aChan] + vhs4030ChannelRegOffsets[kChannelStatus]
+						atAddress:[self baseAddress]+vhsc040ChannelStartOffsets[aChan] + vhsc040ChannelRegOffsets[kChannelStatus]
 						numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -625,7 +633,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
  
 	unsigned short firmware[4];
     [[self adapter] readWordBlock:firmware
-						atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[kFirmwareRelease]
+						atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[kFirmwareRelease]
 						numToRead:4
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -633,7 +641,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 	NSLogFont(f,@"Firmware: %d.%d.%d.%d\n", firmware[0]&0xff, firmware[1]&0xff, firmware[2]&0xff, firmware[3]&0xff);
 	
     [[self adapter] readWordBlock:aValue
-						atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[kSerialNumber]
+						atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[kSerialNumber]
 						numToRead:2
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -722,7 +730,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short theValues = 0x20;
 	[[self adapter] writeWordBlock:&theValues
-						 atAddress:[self baseAddress] + vhs4030ChannelStartOffsets[aChannel] + vhs4030ChannelRegOffsets[kChannelControl]
+						 atAddress:[self baseAddress] + vhsc040ChannelStartOffsets[aChannel] + vhsc040ChannelRegOffsets[kChannelControl]
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -732,7 +740,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short theValues = 0x00;
 	[[self adapter] writeWordBlock:&theValues
-						 atAddress:[self baseAddress] + vhs4030ChannelStartOffsets[aChannel] + vhs4030ChannelRegOffsets[kChannelControl]
+						 atAddress:[self baseAddress] + vhsc040ChannelStartOffsets[aChannel] + vhsc040ChannelRegOffsets[kChannelControl]
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -743,7 +751,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short theValues = 0x08;
 	[[self adapter] writeWordBlock:&theValues
-						atAddress:[self baseAddress] + vhs4030ChannelStartOffsets[aChannel] + vhs4030ChannelRegOffsets[kChannelControl]
+						atAddress:[self baseAddress] + vhsc040ChannelStartOffsets[aChannel] + vhsc040ChannelRegOffsets[kChannelControl]
 						numToWrite:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -753,7 +761,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short theValues = 0x00;
 	[[self adapter] writeWordBlock:&theValues
-						atAddress:[self baseAddress] + vhs4030ChannelStartOffsets[aChannel] + vhs4030ChannelRegOffsets[kChannelControl]
+						atAddress:[self baseAddress] + vhsc040ChannelStartOffsets[aChannel] + vhsc040ChannelRegOffsets[kChannelControl]
 						numToWrite:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -820,7 +828,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 	aValue |= kDoClear;
 		
 	[[self adapter] writeWordBlock:&aValue
-						 atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[kModuleControl]
+						 atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[kModuleControl]
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];		
@@ -830,7 +838,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short aValue = 0x40;
 	[[self adapter] writeWordBlock:&aValue
-						atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[kModuleControl]
+						atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[kModuleControl]
 						numToWrite:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];	
@@ -847,7 +855,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 {
 	unsigned short theValues[2];
 	[[self adapter] readWordBlock:theValues
-						atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[anIndex]
+						atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[anIndex]
 						numToRead:2
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -865,7 +873,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 	aValue[0] = (d.l & 0xffff0000) >> 16;
 	aValue[1] =  d.l & 0xffff;
 	[[self adapter] writeWordBlock:aValue
-						 atAddress:[self baseAddress]+vhs4030ModuleRegOffsets[anIndex]
+						 atAddress:[self baseAddress]+vhsc040ModuleRegOffsets[anIndex]
 						numToWrite:2
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -886,7 +894,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 	
 	NSLog(@"floatValue: %f\n",[self convertTwoShortsToFloat:aValue]);
 	[[self adapter] writeWordBlock:aValue
-						 atAddress:[self baseAddress]+vhs4030ChannelStartOffsets[aChannel] + vhs4030ChannelRegOffsets[anIndex]
+						 atAddress:[self baseAddress]+vhsc040ChannelStartOffsets[aChannel] + vhsc040ChannelRegOffsets[anIndex]
 						numToWrite:2
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -897,7 +905,7 @@ NSString* ORVHSC040nVoltageBoundsChanged				= @"ORVHSC040nVoltageBoundsChanged";
 	if(aChannel>kNumVHSC040nChannels)return 0;
 	unsigned short theValues[2];
     [[self adapter] readWordBlock:theValues
-						atAddress:[self baseAddress]+vhs4030ChannelStartOffsets[aChannel] + vhs4030ChannelRegOffsets[anIndex]
+						atAddress:[self baseAddress]+vhsc040ChannelStartOffsets[aChannel] + vhsc040ChannelRegOffsets[anIndex]
 						numToRead:2
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];

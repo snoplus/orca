@@ -630,7 +630,9 @@
 	[self endEditing];
 	//******contextInfo is released when the sheet closes.
 	NSDecimalNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
-    NSBeginAlertSheet([NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":aChannel==0?@"A":@"B"],
+	NSString* n = [NSString stringWithFormat:@"%d",aChannel];
+	NSString* s = [NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":n];
+    NSBeginAlertSheet(s,
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -650,6 +652,16 @@
 		@try {
 			if(channel == 0xFFFF || channel == 0)[model panicToZero:0];
 			if(channel == 0xFFFF || channel == 1)[model panicToZero:1];
+			if(channel == 0xFFFF || channel == 2)[model panicToZero:2];
+			if(channel == 0xFFFF || channel == 3)[model panicToZero:3];
+			if(channel == 0xFFFF || channel == 4)[model panicToZero:4];
+			if(channel == 0xFFFF || channel == 5)[model panicToZero:5];
+			if(channel == 0xFFFF || channel == 6)[model panicToZero:6];
+			if(channel == 0xFFFF || channel == 7)[model panicToZero:7];
+			if(channel == 0xFFFF || channel == 8)[model panicToZero:8];
+			if(channel == 0xFFFF || channel == 9)[model panicToZero:9];
+			if(channel == 0xFFFF || channel == 10)[model panicToZero:10];
+			if(channel == 0xFFFF || channel == 11)[model panicToZero:11];
 		}
 		@catch(NSException* e){
 			NSLog(@"vhW224L Panic failed because of exception\n");
