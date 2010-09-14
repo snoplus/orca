@@ -2178,6 +2178,14 @@
 		84E966D411848BEF008D9119 /* MajoranaDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */; };
 		84E966D511848BEF008D9119 /* MajoranaModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E966CD11848BEF008D9119 /* MajoranaModel.h */; };
 		84E966D611848BEF008D9119 /* MajoranaModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E966CE11848BEF008D9119 /* MajoranaModel.m */; };
+		84E9F69E123FE4D600116607 /* NHQ226L.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9F692123FE4D600116607 /* NHQ226L.nib */; };
+		84E9F69F123FE4D600116607 /* NHQ226L.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E9F693123FE4D600116607 /* NHQ226L.tif */; };
+		84E9F6A0123FE4D600116607 /* ORNHQ226LController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9F694123FE4D600116607 /* ORNHQ226LController.h */; };
+		84E9F6A1123FE4D600116607 /* ORNHQ226LController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9F695123FE4D600116607 /* ORNHQ226LController.m */; };
+		84E9F6A2123FE4D600116607 /* ORNHQ226LDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9F696123FE4D600116607 /* ORNHQ226LDecoders.h */; };
+		84E9F6A3123FE4D600116607 /* ORNHQ226LDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9F697123FE4D600116607 /* ORNHQ226LDecoders.m */; };
+		84E9F6A4123FE4D600116607 /* ORNHQ226LModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9F698123FE4D600116607 /* ORNHQ226LModel.h */; };
+		84E9F6A5123FE4D600116607 /* ORNHQ226LModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9F699123FE4D600116607 /* ORNHQ226LModel.m */; };
 		84EA6C9F0C73D11200083319 /* nTPC.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EA6C950C73D11200083319 /* nTPC.nib */; };
 		84EA6CA00C73D11200083319 /* nTPC.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EA6C960C73D11200083319 /* nTPC.tif */; };
 		84EA6CA10C73D11200083319 /* nTPCConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6C970C73D11200083319 /* nTPCConstants.h */; };
@@ -4642,6 +4650,14 @@
 		84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MajoranaDetectorView.m; path = Source/Experiments/Majorana/MajoranaDetectorView.m; sourceTree = SOURCE_ROOT; };
 		84E966CD11848BEF008D9119 /* MajoranaModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MajoranaModel.h; path = Source/Experiments/Majorana/MajoranaModel.h; sourceTree = SOURCE_ROOT; };
 		84E966CE11848BEF008D9119 /* MajoranaModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MajoranaModel.m; path = Source/Experiments/Majorana/MajoranaModel.m; sourceTree = SOURCE_ROOT; };
+		84E9F692123FE4D600116607 /* NHQ226L.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NHQ226L.nib; path = Source/Objects/Hardware/HV/NHQ226L/NHQ226L.nib; sourceTree = SOURCE_ROOT; };
+		84E9F693123FE4D600116607 /* NHQ226L.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NHQ226L.tif; path = Source/Objects/Hardware/HV/NHQ226L/NHQ226L.tif; sourceTree = SOURCE_ROOT; };
+		84E9F694123FE4D600116607 /* ORNHQ226LController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LController.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LController.h; sourceTree = SOURCE_ROOT; };
+		84E9F695123FE4D600116607 /* ORNHQ226LController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LController.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LController.m; sourceTree = SOURCE_ROOT; };
+		84E9F696123FE4D600116607 /* ORNHQ226LDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LDecoders.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LDecoders.h; sourceTree = SOURCE_ROOT; };
+		84E9F697123FE4D600116607 /* ORNHQ226LDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LDecoders.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LDecoders.m; sourceTree = SOURCE_ROOT; };
+		84E9F698123FE4D600116607 /* ORNHQ226LModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LModel.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.h; sourceTree = SOURCE_ROOT; };
+		84E9F699123FE4D600116607 /* ORNHQ226LModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LModel.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.m; sourceTree = SOURCE_ROOT; };
 		84EA6C950C73D11200083319 /* nTPC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nTPC.nib; path = Source/Experiments/nTPC/nTPC.nib; sourceTree = SOURCE_ROOT; };
 		84EA6C960C73D11200083319 /* nTPC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = nTPC.tif; path = Source/Experiments/nTPC/nTPC.tif; sourceTree = SOURCE_ROOT; };
 		84EA6C970C73D11200083319 /* nTPCConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = nTPCConstants.h; path = Source/Experiments/nTPC/nTPCConstants.h; sourceTree = SOURCE_ROOT; };
@@ -8626,6 +8642,7 @@
 				84B28DF50F4C718300E2B056 /* HVControl */,
 				84B28E050F4C718400E2B056 /* HV4032 */,
 				840E72E2103DA7BC0070AD70 /* AmrelHV */,
+				84E9F68E123FE4D600116607 /* NHQ226L */,
 			);
 			name = HV;
 			path = Source/Objects/Hardware/HV;
@@ -9697,6 +9714,22 @@
 			);
 			name = Majorana;
 			path = Source/Experiments/Majorana;
+			sourceTree = SOURCE_ROOT;
+		};
+		84E9F68E123FE4D600116607 /* NHQ226L */ = {
+			isa = PBXGroup;
+			children = (
+				84E9F692123FE4D600116607 /* NHQ226L.nib */,
+				84E9F693123FE4D600116607 /* NHQ226L.tif */,
+				84E9F694123FE4D600116607 /* ORNHQ226LController.h */,
+				84E9F695123FE4D600116607 /* ORNHQ226LController.m */,
+				84E9F696123FE4D600116607 /* ORNHQ226LDecoders.h */,
+				84E9F697123FE4D600116607 /* ORNHQ226LDecoders.m */,
+				84E9F698123FE4D600116607 /* ORNHQ226LModel.h */,
+				84E9F699123FE4D600116607 /* ORNHQ226LModel.m */,
+			);
+			name = NHQ226L;
+			path = Source/Objects/Hardware/HV/NHQ226L;
 			sourceTree = SOURCE_ROOT;
 		};
 		84EA6C940C73D11200083319 /* nTPC */ = {
@@ -11397,6 +11430,9 @@
 				8449CC83123E85DA009C8AA2 /* ORVHSC040nController.h in Headers */,
 				8449CC85123E85DA009C8AA2 /* ORVHSC040nDecoders.h in Headers */,
 				8449CC87123E85DA009C8AA2 /* ORVHSC040nModel.h in Headers */,
+				84E9F6A0123FE4D600116607 /* ORNHQ226LController.h in Headers */,
+				84E9F6A2123FE4D600116607 /* ORNHQ226LDecoders.h in Headers */,
+				84E9F6A4123FE4D600116607 /* ORNHQ226LModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12118,6 +12154,8 @@
 				845B140F1227E8B00022F207 /* Pxi6289Card.png in Resources */,
 				8449CC89123E85DA009C8AA2 /* VHSC040n.nib in Resources */,
 				8449CC8A123E85DA009C8AA2 /* VHSC040n.tif in Resources */,
+				84E9F69E123FE4D600116607 /* NHQ226L.nib in Resources */,
+				84E9F69F123FE4D600116607 /* NHQ226L.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12939,6 +12977,9 @@
 				8449CC84123E85DA009C8AA2 /* ORVHSC040nController.m in Sources */,
 				8449CC86123E85DA009C8AA2 /* ORVHSC040nDecoders.m in Sources */,
 				8449CC88123E85DA009C8AA2 /* ORVHSC040nModel.m in Sources */,
+				84E9F6A1123FE4D600116607 /* ORNHQ226LController.m in Sources */,
+				84E9F6A3123FE4D600116607 /* ORNHQ226LDecoders.m in Sources */,
+				84E9F6A5123FE4D600116607 /* ORNHQ226LModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13194,7 +13235,8 @@
 		84F201BD0B6531990084F4C3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -13230,14 +13272,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../../Downloads/capi\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/../../Downloads/MotionNodeAccelAPI\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
