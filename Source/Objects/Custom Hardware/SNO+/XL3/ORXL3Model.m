@@ -591,23 +591,25 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[xl3Link resetBundleBuffer];
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORXL3Model"];	
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	NSData* aBundle;
-	unsigned long placeHolder = 0;
-	unsigned long data[2];
-	
-	data[0] = xl3MegaBundleDataId | 362;
-	data[1] = 0; //packet count, maybe time, and crate ID in a meaningful way
 	//to be replaced with while...
 	if ([xl3Link bundleAvailable]) {
+		NSData* aBundle;
+		//unsigned long placeHolder = 0;
+		unsigned long data[362];
+		
+		data[0] = xl3MegaBundleDataId | 362;
+		data[1] = 0; //packet count, maybe time, and crate ID in a meaningful way
 		aBundle = [xl3Link readNextBundle]; //ORSafeCircularBuffer calls autorelease on the NSData
-		placeHolder = [aDataPacket reserveSpaceInFrameBuffer:362];
-		[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder withLongs:data length:2];
-		//add some checks to be on the safe side
-		[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder+2 withLongs:(unsigned long*)[aBundle bytes] length:360];
+		memcpy(&data[2], [aBundle bytes], 1440);
+		[aDataPacket addLongsToFrameBuffer:data length:362];
+		//placeHolder = [aDataPacket reserveSpaceInFrameBuffer:362];
+		//[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder withLongs:data length:2];
+		//[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder withLongs:(unsigned long*)[aBundle bytes] length:360];
 	}
 }
 

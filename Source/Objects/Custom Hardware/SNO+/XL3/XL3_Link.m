@@ -614,6 +614,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				[coreSocketLock unlock];
 				coreLocker = NO;
 
+				//if ((!needToSwap && aPacket[0] == 'A') ||
 				if ((needToSwap && ((XL3_Packet*) aPacket)->cmdHeader.cmdID == 0x00010000) ||
 				    (!needToSwap && ((XL3_Packet*) aPacket)->cmdHeader.cmdID == 0x00000100)) {
 					//PMT mega bundle
@@ -774,6 +775,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
 		if (n > 0) {
 			numBytesToGet -= n;
+			aPacket += n;
 			if (numBytesToGet == 0) break;
 		}
 		else if(n==0){
