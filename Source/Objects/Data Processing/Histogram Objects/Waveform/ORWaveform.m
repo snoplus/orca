@@ -33,7 +33,6 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 
 - (void) dealloc
 {
-	[dataSetLock release];
     [waveform release];
     waveform = nil;
  	[rois release];
