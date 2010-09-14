@@ -65,7 +65,8 @@
 	
 	
 	NSBezierPath* theDataPath = [NSBezierPath bezierPath];
-	float xl,yl;
+	float xl = 0;
+	float yl = 0;
 	double xValue,yValue;
 	long i;
 	for (i=0; i<numPoints;++i) {

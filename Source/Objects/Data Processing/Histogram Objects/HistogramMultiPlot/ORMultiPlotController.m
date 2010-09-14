@@ -266,6 +266,7 @@
 			case 7: theColor = [NSColor orangeColor]; break;
 			case 8: theColor = [NSColor magentaColor]; break;
 			case 9: theColor = [NSColor yellowColor]; break;
+			default: theColor = [NSColor redColor]; break;
 		}
 		if([[model cachedObjectAtIndex:i] isKindOfClass:NSClassFromString(@"OR1DHisto")]){
 			OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:i andDataSource:self];

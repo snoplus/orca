@@ -149,7 +149,7 @@ NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	int i;
-	if(i>=0 && i<32) [channelName[i] release];
+	for(i=0;i<32;i++)[channelName[i] release];
 	[super dealloc];
 }
 

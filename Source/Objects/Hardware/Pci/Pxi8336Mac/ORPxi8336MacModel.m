@@ -464,7 +464,7 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 
 - (kern_return_t) _openUserClient:(io_service_t) serviceObject withDataPort:(io_connect_t) aDataPort
 {
-	kern_return_t kernResult;
+	kern_return_t kernResult = 0;
 	//add PXI driver open code
 	return kernResult;
 }
@@ -472,7 +472,7 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 // call Close method in user client - but currently appears to do nothing
 - (kern_return_t) _closeUserClient:(io_connect_t) aDataPort
 {
-	kern_return_t kernResult;
+	kern_return_t kernResult = 0;
 	//add PXI driver close code
 	return kernResult;
 }

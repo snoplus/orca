@@ -237,8 +237,8 @@
 	//channel by channel histograms
 	unsigned long energy = ptr[6]/filterDiv;
 
-uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);//TODO: DEBUG -tb-
-uint32_t eventID        = ptr[5];
+	//uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);//TODO: DEBUG -tb- //commented out since unused MAH 9/14/10
+	//uint32_t eventID        = ptr[5];//commented out since unused MAH 9/14/10
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
 	

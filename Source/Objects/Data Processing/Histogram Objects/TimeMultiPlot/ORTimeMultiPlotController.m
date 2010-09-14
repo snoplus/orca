@@ -74,6 +74,7 @@
 			case 7: theColor = [NSColor orangeColor]; break;
 			case 8: theColor = [NSColor magentaColor]; break;
 			case 9: theColor = [NSColor yellowColor]; break;
+			default: theColor = [NSColor redColor]; break;
 		}
 		if([[model cachedObjectAtIndex:i] isKindOfClass:NSClassFromString(@"ORTimeSeriesPlot")]){
 			ORTimeSeriesPlot* aPlot = [[ORTimeSeriesPlot alloc] initWithTag:i andDataSource:self];

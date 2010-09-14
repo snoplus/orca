@@ -565,7 +565,7 @@
 		[[sumGMatrix cellWithTag:i]			setEnabled:!lockedOrRunningMaintenance && enableCondition];
 		[[peakingTimeMatrix cellWithTag:i] setEnabled:!lockedOrRunningMaintenance && enableCondition];
 	}
-	BOOL asynchronous_mode_flag;
+	BOOL asynchronous_mode_flag = NO;
 	switch([model operationMode]){
 		case kOperationRingBufferAsync:
 			[memoryTriggerDelayField	setEnabled:NO];

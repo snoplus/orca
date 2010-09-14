@@ -280,10 +280,10 @@ NSString* ORMITPulserLock = @"ORMITPulserLock";
 - (void) setPower:(BOOL)state
 {
 	//For the future...
-	NSString* powerCommand;
 	if(state == NO)  {
+		NSString* powerCommand = @"";
 		if([self pulserVersion] == 0) powerCommand = @"P000\rD000\r";
-		if([self pulserVersion] > 0) powerCommand = @"P0000\rD0000\r";
+		else						  powerCommand = @"P0000\rD0000\r";
 		[self sendCommand: powerCommand];
 	}
 }

@@ -1055,7 +1055,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		
 		NSString* name			 = computerName();
 		NSString* hw_address	 = macAddress();
-		NSString* thisHostAdress;
+		NSString* thisHostAdress = @"";
 		NSArray* names =  [[NSHost currentHost] addresses];
 		NSEnumerator* e = [names objectEnumerator];
 		id aName;

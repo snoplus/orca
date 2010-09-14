@@ -71,7 +71,7 @@
     
 	long length = ExtractLength(ptr[0]);
 	NSString* crateKey = [self getCrateKey:ShiftAndExtract(ptr[1],21,0xf)];
-	NSString* cardKey  = [self getCardKey: ShiftAndExtract(ptr[i],16,0x1f)];
+	NSString* cardKey  = [self getCardKey: ShiftAndExtract(ptr[1],16,0x1f)];
 	
     if( length == 0 ) NSLog( @"%@ Data Buffer is empty.\n", pName );
     else {

@@ -522,7 +522,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction) opsAction:(id)sender
 {
-	NSString* theKey;
+	NSString* theKey = @"";
 	for (id key in xl3Ops) {
 		if ((id) [[xl3Ops objectForKey:key] objectForKey:@"button"] == sender) {
 			theKey = [NSString stringWithString: key];
