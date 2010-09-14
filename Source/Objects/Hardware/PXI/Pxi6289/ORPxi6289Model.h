@@ -41,7 +41,6 @@ enum {
   @private
 	unsigned long   dataId;
 	unsigned long*  dataBuffer;
-	unsigned long   enabledMask;
     short			enabled[kNumPxi6289Channels];
     short			threshold[kNumPxi6289Channels];
  	

@@ -153,7 +153,6 @@ enum {
 		int pollTime;
 		unsigned long dataId;
 		BOOL timeOutError;
-		BOOL useStatusReg1Anyway[2];
 		BOOL statusChanged; 
 		BOOL pollingError;
 		BOOL killEnabled;
