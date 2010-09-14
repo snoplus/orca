@@ -19,13 +19,12 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-#import "XL3_Cmds.h"
 #import "XL3_Link.h"
 #import "ORXL3Model.h"
 #import "ORSNOCrateModel.h"
-#import "ORSNOCard.h"
 #import "ORSNOConstants.h"
 #import "ORFec32Model.h"
+#import "ORDataTypeAssigner.h"
 
 static Xl3RegNamesStruct reg[kXl3NumRegisters] = {
 	{ @"SelectReg",		RESET_REG },
@@ -552,6 +551,76 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 {
 }
 
+#pragma mark •••DataTaker
+- (void) setDataIds:(id)assigner
+{
+	xl3MegaBundleDataId	= [assigner assignDataIds:kLongForm];
+	cmosRateDataId		= [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+	[self setXl3MegaBundleDataId:[anotherObj xl3MegaBundleDataId]];
+	[self setCmosRateDataId:[anotherObj cmosRateDataId]];
+}	
+
+@synthesize xl3MegaBundleDataId, cmosRateDataId;
+
+- (NSDictionary*) dataRecordDescription
+{
+	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				     @"ORXL3DecoderForXL3MegaBundle",			@"decoder",
+				     [NSNumber numberWithLong:xl3MegaBundleDataId],	@"dataId",
+				     [NSNumber numberWithBool:NO],			@"variable",
+				     [NSNumber numberWithLong:362],			@"length",  //modified kLong header, 1440 bytes + 2 longs
+				     nil];
+	[dataDictionary setObject:aDictionary forKey:@"Xl3MegaBundle"];
+
+//	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+//				     @"ORXL3DecoderForCmosRate",	@"decoder",
+//				     [NSNumber numberWithLong:dataId],       @"dataId",
+//				     [NSNumber numberWithBool:YES],          @"variable",
+//				     [NSNumber numberWithLong:-1],			 @"length",
+//				     nil];
+//	[dataDictionary setObject:aDictionary forKey:@"Xl3CmosRate"];
+	
+	return dataDictionary;
+}
+
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[xl3Link resetBundleBuffer];
+}
+
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	NSData* aBundle;
+	unsigned long placeHolder = 0;
+	unsigned long data[2];
+	
+	data[0] = xl3MegaBundleDataId | 362;
+	data[1] = 0; //packet count, maybe time, and crate ID in a meaningful way
+	//to be replaced with while...
+	if ([xl3Link bundleAvailable]) {
+		aBundle = [xl3Link readNextBundle]; //ORSafeCircularBuffer calls autorelease on the NSData
+		placeHolder = [aDataPacket reserveSpaceInFrameBuffer:362];
+		[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder withLongs:data length:2];
+		//add some checks to be on the safe side
+		[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder+2 withLongs:(unsigned long*)[aBundle bytes] length:360];
+	}
+}
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+}
+
+//never used
+- (int) load_eCPU_HW_Config_Structure:(VME_crate_config*)configStruct index:(int)index
+{
+	return 0;
+}
+
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -766,11 +835,11 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		else aMbId[1] = 0;
 		
 		// hv reset, talk to Rob first
-		aMbId[1] = 0;
+		aMbId[2] = 0;
 		
 		// slot mask
 		if (anAutoInitFlag == YES) {
-			aMbId[2] = 0xFFFF;
+			aMbId[3] = 0xFFFF;
 			NSLog(@"AutoInits not yet implemented, XL3 would freeze.\n");
 		}
 		else {
@@ -780,11 +849,11 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 			for (aFec in fecs) {
 				msk |= 1 << [aFec stationNumber];
 			}
-			aMbId[2] = msk;
+			aMbId[3] = msk;
 		}
 
 		// ctc delay
-		aMbId[3] = 0;
+		aMbId[4] = 0;
 		
 		if ([xl3Link needToSwap]) {
 			for (i=0; i<5; i++) aMbId[i] = swapLong(aMbId[i]);
@@ -994,7 +1063,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 
 	msk = [self slotMask];
 	for (i=0; i < 16; i++) {
-		if (1 << i && msk) {
+		if (1 << i & msk) {
 			//HV chip not yet available
 			//for (j = 0; j < 6; j++) {
 			for (j = 0; j < 5; j++) {

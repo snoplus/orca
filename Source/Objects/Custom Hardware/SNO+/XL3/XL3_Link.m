@@ -21,6 +21,7 @@
 #pragma mark •••Imported Files
 #import "XL3_Cmds.h"
 #import "XL3_Link.h"
+#import "ORSafeCircularBuffer.h"
 
 #import <netdb.h>
 #import <sys/types.h>
@@ -36,10 +37,11 @@ NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
 #define kCmdArrayHighWater 100
+#define kBundleBufferSize 10000*1440
 
 @implementation XL3_Link
 
-- (id)   init
+- (id) init
 {
 	self = [super init];
 	commandSocketLock = [[NSLock alloc] init];
@@ -48,6 +50,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	[self setNeedToSwap];
 	connectState = kDisconnected;
 	cmdArray = [[NSMutableArray alloc] init];
+	bundleBuffer = [[ORSafeCircularBuffer alloc] initWithBufferSize:kBundleBufferSize];
 	//[self initConnectionHistory];
 	return self;
 }
@@ -66,7 +69,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		[cmdArray release];
 		cmdArray = nil;
 	}
-
+	[bundleBuffer autorelease];
 	[super dealloc];
 }
 
@@ -82,6 +85,21 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
+#pragma mark •••DataTaker Helpers
+- (BOOL) bundleAvailable
+{
+	return [bundleBuffer dataAvailable];
+}
+
+- (void) resetBundleBuffer
+{
+	return [bundleBuffer reset];
+}
+
+- (NSData*) readNextBundle
+{
+	return [bundleBuffer readNextBlock];
+}
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -95,6 +113,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	coreSocketLock = [[NSLock alloc] init];
 	cmdArrayLock = [[NSLock alloc] init];
 	cmdArray = [[NSMutableArray alloc] init];
+	bundleBuffer = [[ORSafeCircularBuffer alloc] initWithBufferSize:kBundleBufferSize];
 
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -596,9 +615,9 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				coreLocker = NO;
 
 				if ((needToSwap && ((XL3_Packet*) aPacket)->cmdHeader.cmdID == 0x00010000) ||
-				    (!needToSwap && *(uint32_t*) aPacket == 0x00000100)) {
+				    (!needToSwap && ((XL3_Packet*) aPacket)->cmdHeader.cmdID == 0x00000100)) {
 					//PMT mega bundle
-					//ORSafeCircBuffer
+					[bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:1440];
 				}
 				else {	//cmd response
 					if (needToSwap) {

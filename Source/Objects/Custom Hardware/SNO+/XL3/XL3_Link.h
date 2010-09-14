@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #import "XL3_Cmds.h"
-@class ORSafeQueue;
+@class ORSafeCircularBuffer;
 
 typedef enum eXL3_ConnectStates {
 	kDisconnected,
@@ -34,9 +34,9 @@ eXL3_CrateStates;
 {
 	int		serverSocket;
 	int		workingSocket;
-	NSLock*		commandSocketLock;
-	NSLock*		coreSocketLock;
-	NSLock*		cmdArrayLock;
+	NSLock*		commandSocketLock;	//only one command to XL3 at the moment, to be released later
+	NSLock*		coreSocketLock;		//to synchronize both the threads touching the socket, with additional lockers to be removed later
+	NSLock*		cmdArrayLock;		//to synchronize the threaded worker pushing XL3 responses and XL3Model pulling the responses
 	bool		needToSwap;
 	NSString*	IPNumber;
 	NSString*	crateName;
@@ -46,12 +46,18 @@ eXL3_CrateStates;
 	int		errorTimeOut;
 	NSCalendarDate*	timeConnected;
 	NSMutableArray*	cmdArray;
+	ORSafeCircularBuffer* bundleBuffer;
 }
 
 - (id)   init;
 - (void) dealloc;
 - (void) wakeUp; 
 - (void) sleep ;	
+
+#pragma mark •••DataTaker Helpers
+- (BOOL) bundleAvailable;
+- (void) resetBundleBuffer;
+- (NSData*) readNextBundle;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

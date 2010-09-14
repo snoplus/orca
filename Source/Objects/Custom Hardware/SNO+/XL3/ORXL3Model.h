@@ -21,6 +21,8 @@
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
 #import "XL3_Cmds.h"
+#import "ORDataTaker.h"
+#import "VME_eCPU_Config.h"
 
 typedef struct  {
 	NSString*	regName;
@@ -48,9 +50,11 @@ enum {
 @class XL3_Link;
 @class ORCommandList;
 
-@interface ORXL3Model : ORSNOCard 
+@interface ORXL3Model : ORSNOCard <ORDataTaker>
 {
 	XL3_Link*	xl3Link;
+	unsigned long	xl3MegaBundleDataId;
+	unsigned long	cmosRateDataId;
 	short		selectedRegister;
 	BOOL		basicOpsRunning;
 	BOOL		autoIncrement;	
@@ -64,7 +68,6 @@ enum {
 	BOOL		xl3ModeRunning;
 	unsigned long	xl3RWAddressValue;
 	unsigned long	xl3RWDataValue;
-	BOOL		xl3RWRunning;
 	NSMutableDictionary*	xl3OpsRunning;
 	unsigned long	xl3PedestalMask;
 }
@@ -122,6 +125,17 @@ enum {
 - (void) synthesizeDefaultsIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot;
 - (void) byteSwapBundle:(mb_const_t*)aBundle;
 - (void) synthesizeFECIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot;
+
+#pragma mark •••DataTaker
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObj;
+@property unsigned long xl3MegaBundleDataId;
+@property unsigned long cmosRateDataId;
+- (NSDictionary*) dataRecordDescription;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (int) load_eCPU_HW_Config_Structure:(VME_crate_config*)configStruct index:(int)index;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
