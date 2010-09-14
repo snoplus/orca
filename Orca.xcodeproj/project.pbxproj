@@ -2415,7 +2415,7 @@
 			outputFiles = (
 				"lex.${INPUT_FILE_BASE}.m",
 			);
-			script = "if [ ${MAC_OS_X_VERSION_MAJOR} -gt 1040 ] ; then /usr/bin/lex --prefix=${INPUT_FILE_BASE} --outfile=${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m \"${INPUT_FILE_PATH}\"; else /usr/bin/lex -P${INPUT_FILE_BASE} -o${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m \"${INPUT_FILE_PATH}\"; fi";
+			script = "if [ ${MAC_OS_X_VERSION_MAJOR} -gt 1040 ] ; then /usr/bin/lex --prefix=\"${INPUT_FILE_BASE}\" --outfile=\"${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m\" \"${INPUT_FILE_PATH}\"; else /usr/bin/lex -P\"${INPUT_FILE_BASE}\" -o\"${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m\" \"${INPUT_FILE_PATH}\"; fi\n";
 		};
 		9C2595AD0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -2426,7 +2426,7 @@
 				"${INPUT_FILE_BASE}.tab.m",
 				"${INPUT_FILE_BASE}.tab.h",
 			);
-			script = "if [ ${MAC_OS_X_VERSION_MAJOR} -gt 1040 ] ; then /usr/bin/yacc -d --file-prefix=${INPUT_FILE_BASE} --name-prefix=${INPUT_FILE_BASE} --output=${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c \"${INPUT_FILE_PATH}\" && cd ${DERIVED_FILES_DIR} && if [ -f ${INPUT_FILE_BASE}.tab.c ] ; then mv ${INPUT_FILE_BASE}.tab.c ${INPUT_FILE_BASE}.tab.m; fi; else /usr/bin/yacc -d -b ${INPUT_FILE_BASE} -p ${INPUT_FILE_BASE} -o ${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c \"${INPUT_FILE_PATH}\" && cd ${DERIVED_FILES_DIR} && if [ -f ${INPUT_FILE_BASE}.tab.c ] ; then mv ${INPUT_FILE_BASE}.tab.c ${INPUT_FILE_BASE}.tab.m; fi; fi;";
+			script = "if [ ${MAC_OS_X_VERSION_MAJOR} -gt 1040 ] ; then /usr/bin/yacc -d --file-prefix=\"${INPUT_FILE_BASE}\" --name-prefix=\"${INPUT_FILE_BASE}\" --output=\"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c\" \"${INPUT_FILE_PATH}\" && cd \"${DERIVED_FILES_DIR}\" && if [ -f \"${INPUT_FILE_BASE}.tab.c\" ] ; then mv \"${INPUT_FILE_BASE}.tab.c\" \"${INPUT_FILE_BASE}.tab.m\"; fi; else /usr/bin/yacc -d -b \"${INPUT_FILE_BASE}\" -p \"${INPUT_FILE_BASE}\" -o \"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c\" \"${INPUT_FILE_PATH}\" && cd \"${DERIVED_FILES_DIR}\" && if [ -f \"${INPUT_FILE_BASE}.tab.c\" ] ; then mv \"${INPUT_FILE_BASE}.tab.c\" \"${INPUT_FILE_BASE}.tab.m\"; fi; fi;\n";
 		};
 /* End PBXBuildRule section */
 
@@ -13131,7 +13131,8 @@
 		84F201BC0B6531990084F4C3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				CFBundleHelpBookName = OrcaHelp;
 				CFBundlerHelpBookFolder = OrcaHelp;
 				COPY_PHASE_STRIP = YES;
@@ -13160,23 +13161,15 @@
 					Libraries,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_6)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_4)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_5)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_6)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../../Downloads/capi\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/../../Downloads/MotionNodeAccelAPI\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
-				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
