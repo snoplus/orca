@@ -243,7 +243,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 - (void) setMaxCurrent:(unsigned short) aChan withValue:(float) aCurrent
 {
 	if(aChan>=kNumVHQ224LChannels)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setVoltage:aChan withValue:voltage[aChan]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxCurrent:aChan withValue:maxCurrent[aChan]];
 	maxCurrent[aChan] = aCurrent;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVHQ224LMaxCurrentChanged object:self userInfo: nil];
 }
@@ -261,7 +261,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 	if(aRampRate<2)aRampRate = 2;
 	else if(aRampRate>255)aRampRate = 255;
 	
-	[[[self undoManager] prepareWithInvocationTarget:self] setVoltage:aChan withValue:[self voltage:aChan]];
+	[[[self undoManager] prepareWithInvocationTarget:self] setRampRate:aChan withValue:[self rampRate:aChan]];
 	rampRate[aChan] = aRampRate;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVHQ224LRampRateChanged object:self userInfo: nil];
 }
