@@ -318,25 +318,25 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 
 - (void) readStatusWord:(unsigned short)aChan
 {
-	NSString* cmd = [NSString stringWithFormat:@"S%d",aChan];
+	NSString* cmd = [NSString stringWithFormat:@"S%d",aChan+1];
 	[self sendCmd:cmd];
 }
 
 - (void) readModuleStatus:(unsigned short)aChan
 {
-	NSString* cmd = [NSString stringWithFormat:@"T%d",aChan];
+	NSString* cmd = [NSString stringWithFormat:@"T%d",aChan+1];
 	[self sendCmd:cmd];
 }
 
 - (void) readActVoltage:(unsigned short)aChan
 {
-	NSString* cmd = [NSString stringWithFormat:@"U%d",aChan];
+	NSString* cmd = [NSString stringWithFormat:@"U%d",aChan+1];
 	[self sendCmd:cmd];
 }
 
 - (void) readActCurrent:(unsigned short)aChan
 {
-	NSString* cmd = [NSString stringWithFormat:@"I%d",aChan];
+	NSString* cmd = [NSString stringWithFormat:@"I%d",aChan+1];
 	[self sendCmd:cmd];
 }
 
@@ -659,19 +659,7 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 		NSString* theResponse = [[[[NSString alloc] initWithData: inComingData 
 														encoding: NSASCIIStringEncoding] autorelease] uppercaseString];
 		if(theResponse){
-			if([theResponse hasPrefix:@"?"]){
-				done = YES;
-				//handle error
-				NSLog(@"Got Error.\n");
-			}
-			else {
-				NSArray* parts = [theResponse componentsSeparatedByString:@"\r\n"];
-				if([parts count] == 3){
-					NSLog(@"Got good response.\n");
-					NSLog(@"%@\n",parts);
-					done = YES;
-				}
-			}
+            done = YES;
 		}
 	}
 	if(done){
