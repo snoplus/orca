@@ -39,6 +39,7 @@ NSString* ORNHQ226LPollTimeChanged			= @"ORNHQ226LPollTimeChanged";
 NSString* ORNHQ226LModelTimeOutErrorChanged	= @"ORNHQ226LModelTimeOutErrorChanged";
 NSString* ORNHQ226LActCurrentChanged		= @"ORNHQ226LActCurrentChanged";
 NSString* ORNHQ226LMaxCurrentChanged		= @"ORNHQ226LMaxCurrentChanged";
+NSString* ORNHQ226LMaxVoltageChanged		= @"ORNHQ226LMaxVoltageChanged";
 NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 
 @implementation ORNHQ226LModel
@@ -226,9 +227,23 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 - (void) setMaxCurrent:(unsigned short) aChan withValue:(float) aCurrent
 {
 	if(aChan>=kNumNHQ226LChannels)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setVoltage:aChan withValue:voltage[aChan]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxCurrent:aChan withValue:voltage[aChan]];
 	maxCurrent[aChan] = aCurrent;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNHQ226LMaxCurrentChanged object:self userInfo: nil];
+}
+
+- (float) maxVoltage:(unsigned short) aChan
+{
+	if(aChan>=kNumNHQ226LChannels)return 2;
+	return maxVoltage[aChan];
+}
+
+- (void) setMaxVoltage:(unsigned short) aChan withValue:(float) aValue
+{
+	if(aChan>=kNumNHQ226LChannels)return;
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxVoltage:aChan withValue:maxVoltage[aChan]];
+	maxVoltage[aChan] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNHQ226LMaxVoltageChanged object:self userInfo: nil];
 }
 
 - (unsigned short) rampRate:(unsigned short) aChan
@@ -322,7 +337,6 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 {
 	NSString* cmd = [NSString stringWithFormat:@"S%d",aChan+1];
 	[self sendCmd:cmd];
-	[self sendCmd:@"W"];
 }
 
 - (void) readModuleStatus:(unsigned short)aChan
@@ -733,25 +747,84 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 		[self readActCurrent:i];
 		if(statusChanged)[self shipVoltageRecords];
 	}
-	
     [[self undoManager] enableUndoRegistration];
 }
 
 - (void) decode:(NSArray*)parts
 {
+	//assumes that parts has a count of 3
     NSString* p1 = [parts objectAtIndex:0];
     NSString* cmd = [p1 substringToIndex:1];
     NSString* p2 = [parts objectAtIndex:1];
-    NSString* p3 = [parts objectAtIndex:2];
+    //NSString* p3 = [parts objectAtIndex:2];
     if([cmd isEqualToString:@"I"]){
         int chan = [[p1 substringFromIndex:1] intValue]-1;
         float mantisse = [[p2 substringToIndex:4] floatValue];
         float exponent = [[p2 substringFromIndex:4] floatValue];
-        float curr = mantisse * pow(10,exponent);
-        NSLog(@"Current for chan %d = %f\n",chan, curr);
-        
+		[self setActCurrent:chan withValue:mantisse * pow(10,exponent)];
     }
-    
+    else if([cmd isEqualToString:@"U"]){
+		//Ux * {polarity/mantisse/exp} * 
+        int chan = [[p1 substringFromIndex:1] intValue]-1;
+        float mantisse = [[p2 substringToIndex:5] floatValue];
+        float exponent = [[p2 substringFromIndex:5] floatValue];
+		[self setActVoltage:chan withValue:mantisse * pow(10,exponent)];
+    }
+	else if([cmd isEqualToString:@"M"]){
+		//Mx * nnn * //percent of Vout Max
+        int chan = [[p1 substringFromIndex:1] intValue]-1;
+		[self setMaxVoltage:chan withValue:[p2 floatValue]];
+    }
+  	else if([cmd isEqualToString:@"N"]){
+		//Nx * nnn * //percent of Vout Max
+        int chan = [[p1 substringFromIndex:1] intValue]-1;
+		[self setMaxCurrent:chan withValue:[p2 floatValue]];
+    }
+	else if([cmd isEqualToString:@"D"]){
+		int chan = [[p1 substringFromIndex:1] intValue]-1;
+		NSRange r = [p2 rangeOfString:@"="];
+		if(r.location == NSNotFound){
+			//Dx * {mantisse/exp} * //read Voltage
+			float mantisse = [[p2 substringToIndex:4] floatValue];
+			float exponent = [[p2 substringFromIndex:4] floatValue];
+			[self setVoltage:chan withValue:mantisse * pow(10,exponent)];
+		}
+		else {
+			//Dx * Dx=nnnn.nn * //set Voltage
+			[self setVoltage:chan withValue:[[p2 substringFromIndex:3] floatValue]];
+		}
+    }
+	else if([cmd isEqualToString:@"V"]){
+		int chan = [[p1 substringFromIndex:1] intValue]-1;
+		NSRange r = [p2 rangeOfString:@"="];
+		if(r.location == NSNotFound){
+			//Vx * nnn * //read Ramp Speed
+			[self setRampRate:chan withValue:[p2 intValue]];
+		}
+		else {
+			//Vx * Vx=nnn * //set Ramp Speed
+			[self setRampRate:chan withValue:[[p2 substringFromIndex:3] intValue]];
+		}
+    }
+	else if([cmd isEqualToString:@"G"]){
+		//Gx * Sx=nnn * //start voltage change Sx = status info
+		//int chan = [[p1 substringFromIndex:1] intValue]-1;
+		//NSString* status = [p2 substringFromIndex:3];
+		//process status info
+    }
+	else if([cmd isEqualToString:@"S"]){
+		//Sx *Sx=xxx * //status
+		int chan = [[p1 substringFromIndex:1] intValue]-1;
+		NSString* status = [p2 substringFromIndex:3];
+		NSLog(@"S%d status = %@\n",chan,status);
+    }
+	else if([cmd isEqualToString:@"T"]){
+		//Tx * nnn * //module status
+		int chan = [[p1 substringFromIndex:1] intValue]-1;
+		[self setStatusReg2Chan:chan withValue:[p2 intValue]];
+    }
+	
+	
 }
 
 @end

@@ -85,6 +85,7 @@ typedef enum eNHQ226LRampingState {
 		float actVoltage[2];
 		float actCurrent[2];
 		float maxCurrent[2];
+		float maxVoltage[2];
 		unsigned short rampRate[2];
 		unsigned short statusReg1Chan[2];
 		unsigned short statusReg2Chan[2];
@@ -114,7 +115,9 @@ typedef enum eNHQ226LRampingState {
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (float) maxCurrent:(unsigned short) aChan;
-- (void)  setMaxCurrent:(unsigned short) aChan withValue:(float) aCurrent;
+- (void)  setMaxCurrent:(unsigned short) aChan withValue:(float) aValue;
+- (float) maxVoltage:(unsigned short) aChan;
+- (void)  setMaxVoltage:(unsigned short) aChan withValue:(float) aValue;
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
@@ -186,4 +189,5 @@ extern NSString* ORNHQ226LModelSerialPortChanged;
 extern NSString* ORNHQ226LModelPortNameChanged;
 extern NSString* ORNHQ226LModelPortStateChanged;
 extern NSString* ORNHQ226LModelTimeout;
+extern NSString* ORNHQ226LMaxVoltageChanged;
 
