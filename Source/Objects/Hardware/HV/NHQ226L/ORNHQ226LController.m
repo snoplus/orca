@@ -470,13 +470,13 @@
 		NSLogFont(f,@"Control       : %@\t%@\n", (status1A & kHVControl)	  ? @"Manual  ":@"DAC     ",(status1B & kHVControl)		? @"Manual  ":@"DAC     ");
 		NSLogFont(f,@"V Out         : %@\t%@\n", (status1A & kVZOut)		  ? @"Vout==0 ":@"Vout!=0 ",(status1B & kVZOut)			? @"Vout==0 ":@"Vout!=0 ");
 
-		NSLogFont(f,@"Current Trip  : %@\t%@\n", (status2A & kCurrentTripBit) ? @"YES     ":@"NO     ",(status2B & kCurrentTripBit) ? @"YES     ":@"NO      ");
-		NSLogFont(f,@"Ramping       : %@\t%@\n", (status2A & kRunningRamp)    ? @"YES     ":@"NO     ",(status2B & kRunningRamp)    ? @"YES     ":@"NO      ");
-		NSLogFont(f,@"Switch Changed: %@\t%@\n", (status2A & kSwitchChanged)  ? @"YES     ":@"NO     ",(status2B & kSwitchChanged)  ? @"YES     ":@"NO      ");
-		NSLogFont(f,@"Voltage > Max : %@\t%@\n", (status2A & kVMaxExceeded)   ? @"YES     ":@"NO     ",(status2B & kVMaxExceeded)   ? @"YES     ":@"NO      ");
-		NSLogFont(f,@"Inibit Active : %@\t%@\n", (status2A & kInibitActive)   ? @"YES     ":@"NO     ",(status2B & kInibitActive)   ? @"YES     ":@"NO      ");
-		NSLogFont(f,@"Current > Max : %@\t%@\n", (status2A & kCurrentExceeded)? @"YES     ":@"NO     ",(status2B & kCurrentExceeded)? @"YES     ":@"NO      ");
-		NSLogFont(f,@"Output Quality: %@\t%@\n", (status2A & kQualityNotGiven)? @"NO      ":@"YES    ",(status2B & kQualityNotGiven)? @"YES     ":@"NO      ");
+		///NSLogFont(f,@"Current Trip  : %@\t%@\n", (status2A & kCurrentTripBit) ? @"YES     ":@"NO     ",(status2B & kCurrentTripBit) ? @"YES     ":@"NO      ");
+		//NSLogFont(f,@"Ramping       : %@\t%@\n", (status2A & kRunningRamp)    ? @"YES     ":@"NO     ",(status2B & kRunningRamp)    ? @"YES     ":@"NO      ");
+		//NSLogFont(f,@"Switch Changed: %@\t%@\n", (status2A & kSwitchChanged)  ? @"YES     ":@"NO     ",(status2B & kSwitchChanged)  ? @"YES     ":@"NO      ");
+		//NSLogFont(f,@"Voltage > Max : %@\t%@\n", (status2A & kVMaxExceeded)   ? @"YES     ":@"NO     ",(status2B & kVMaxExceeded)   ? @"YES     ":@"NO      ");
+		//NSLogFont(f,@"Inibit Active : %@\t%@\n", (status2A & kInibitActive)   ? @"YES     ":@"NO     ",(status2B & kInibitActive)   ? @"YES     ":@"NO      ");
+		//NSLogFont(f,@"Current > Max : %@\t%@\n", (status2A & kCurrentExceeded)? @"YES     ":@"NO     ",(status2B & kCurrentExceeded)? @"YES     ":@"NO      ");
+		//NSLogFont(f,@"Output Quality: %@\t%@\n", (status2A & kQualityNotGiven)? @"NO      ":@"YES    ",(status2B & kQualityNotGiven)? @"YES     ":@"NO      ");
 		NSLogFont(f,@"-------------------------------\n");
 	}
 	@catch(NSException* localException) {

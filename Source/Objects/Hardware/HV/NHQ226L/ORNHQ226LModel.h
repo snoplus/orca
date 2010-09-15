@@ -52,14 +52,11 @@ enum {
 #define kHVControl	0x02
 #define kVZOut		0x01
 
-//status 2 word bits
-#define kCurrentTripBit  0x1
-#define kRunningRamp	 0x2
-#define kSwitchChanged	 0x4
-#define kVMaxExceeded	 0x8
-#define kInibitActive	 0x10
-#define kCurrentExceeded 0x20
-#define kQualityNotGiven 0x40
+//status 2 word values
+#define kHVIsOn       0x1
+#define kHVIsOff      0x2
+#define kLowToHigh  0x3
+#define kHighToLow  0x4
 
 typedef enum eNHQ226LRampingState {
 	kHVOff,     
@@ -140,6 +137,7 @@ typedef enum eNHQ226LRampingState {
 - (void) getAllValues;
 - (void) sendCmd:(NSString*)aCommand;
 - (void) decode:(NSArray*)parts;
+- (void) decodeStatus:(NSString*)s channel:(int)aChan;
 
 #pragma mark •••HW Access
 - (void) initBoard;
