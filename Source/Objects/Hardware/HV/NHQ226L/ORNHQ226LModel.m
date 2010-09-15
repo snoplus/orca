@@ -654,13 +654,24 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
     else if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
         [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-		
 		//NSString* theLastCommand = [lastRequest uppercaseString];
 		
 		NSString* theResponse = [[[[NSString alloc] initWithData: inComingData 
 														encoding: NSASCIIStringEncoding] autorelease] uppercaseString];
-		
 		if(theResponse){
+			if([theResponse hasPrefix:@"?"]){
+				done = YES;
+				//handle error
+				NSLog(@"Got Error.\n");
+			}
+			else {
+				NSArray* parts = [theResponse componentsSeparatedByString:@"\r\n"];
+				if([parts count] == 3){
+					NSLog(@"Got good response.\n");
+					NSLog(@"%@\n",parts);
+					done = YES;
+				}
+			}
 		}
 	}
 	if(done){
@@ -678,10 +689,12 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 	doSync[1] = NO;
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"ZUP",@"command timeout",nil);
+	NSLogError(@"NHQ226L",@"command timeout",nil);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNHQ226LModelTimeout object:self];
 	[self setLastRequest:nil];
 	[cmdQueue removeAllObjects];
+	[inComingData release];
+	inComingData = nil;
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
