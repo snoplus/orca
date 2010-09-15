@@ -262,16 +262,18 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 	if(pollTime == 0 )return;
     [[self undoManager] disableUndoRegistration];
 	@try {
-		[self readStatusWord:0];
-		[self readStatusWord:1];
-		[self readModuleStatus:0];
-		[self readModuleStatus:1];
-		[self readActVoltage:0];
-		[self readActVoltage:1];
-		[self readActCurrent:0];
-		[self readActCurrent:1];
-		if(statusChanged)[self shipVoltageRecords];
-		[self setPollingError:NO];
+        if([cmdQueue count]==0){
+            [self readStatusWord:0];
+            [self readStatusWord:1];
+            [self readModuleStatus:0];
+            [self readModuleStatus:1];
+            [self readActVoltage:0];
+            [self readActVoltage:1];
+            [self readActCurrent:0];
+            [self readActCurrent:1];
+            if(statusChanged)[self shipVoltageRecords];
+            [self setPollingError:NO];
+        }
 	}
 	@catch(NSException* e){
 		[self setPollingError:YES];
@@ -320,6 +322,7 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 {
 	NSString* cmd = [NSString stringWithFormat:@"S%d",aChan+1];
 	[self sendCmd:cmd];
+	[self sendCmd:@"W"];
 }
 
 - (void) readModuleStatus:(unsigned short)aChan
@@ -654,8 +657,7 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
     else if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
         [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-		//NSString* theLastCommand = [lastRequest uppercaseString];
-		
+		NSString* theLastCommand = [lastRequest uppercaseString];
 		NSString* theResponse = [[[[NSString alloc] initWithData: inComingData 
 														encoding: NSASCIIStringEncoding] autorelease] uppercaseString];
 		if(theResponse){
@@ -667,8 +669,8 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 			else {
 				NSArray* parts = [theResponse componentsSeparatedByString:@"\r\n"];
 				if([parts count] == 3){
-					NSLog(@"Got good response.\n");
-					NSLog(@"%@\n",parts);
+                    [self decode:parts];
+                    NSLog(@"%@\n",parts);
 					done = YES;
 				}
 				
@@ -733,6 +735,23 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 	}
 	
     [[self undoManager] enableUndoRegistration];
+}
+
+- (void) decode:(NSArray*)parts
+{
+    NSString* p1 = [parts objectAtIndex:0];
+    NSString* cmd = [p1 substringToIndex:1];
+    NSString* p2 = [parts objectAtIndex:1];
+    NSString* p3 = [parts objectAtIndex:2];
+    if([cmd isEqualToString:@"I"]){
+        int chan = [[p1 substringFromIndex:1] intValue]-1;
+        float mantisse = [[p2 substringToIndex:4] floatValue];
+        float exponent = [[p2 substringFromIndex:4] floatValue];
+        float curr = mantisse * pow(10,exponent);
+        NSLog(@"Current for chan %d = %f\n",chan, curr);
+        
+    }
+    
 }
 
 @end

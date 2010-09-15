@@ -136,6 +136,7 @@ typedef enum eNHQ226LRampingState {
 - (void) syncDialog;
 - (void) getAllValues;
 - (void) sendCmd:(NSString*)aCommand;
+- (void) decode:(NSArray*)parts;
 
 #pragma mark •••HW Access
 - (void) initBoard;
