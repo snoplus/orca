@@ -659,7 +659,20 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 		NSString* theResponse = [[[[NSString alloc] initWithData: inComingData 
 														encoding: NSASCIIStringEncoding] autorelease] uppercaseString];
 		if(theResponse){
-            done = YES;
+			if([theResponse hasPrefix:@"?"]){
+				done = YES;
+				//handle error
+				NSLog(@"Got Error.\n");
+			}
+			else {
+				NSArray* parts = [theResponse componentsSeparatedByString:@"\r\n"];
+				if([parts count] == 3){
+					NSLog(@"Got good response.\n");
+					NSLog(@"%@\n",parts);
+					done = YES;
+				}
+				
+			}
 		}
 	}
 	if(done){
