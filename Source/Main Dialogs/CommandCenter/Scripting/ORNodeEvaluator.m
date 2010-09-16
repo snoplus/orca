@@ -1275,6 +1275,10 @@
 	else if(([b class] != [NSDecimalNumber class]) && ([a class] == [NSDecimalNumber class])){
 		return [[NSDecimalNumber numberWithLong:(unsigned long)b] compare:a];
 	}
+	else if([[a className] isEqualToString:@"NSCFString"] && [[b className] isEqualToString:@"NSCFString"]){
+		if([a isEqualToString:b])return NSOrderedSame;
+		else return NSOrderedDescending;
+	}
 	else if([a class] != [NSDecimalNumber class] && [b class] != [NSDecimalNumber class]){
 		return [[NSDecimalNumber numberWithLong:(unsigned long)a] compare:[NSDecimalNumber numberWithLong:(unsigned long)b]];
 	}
