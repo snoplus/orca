@@ -1,5 +1,4 @@
 #include "ORVVmeCard.hh"
-#include <vector>
 
 class ORSIS3302Card: public ORVVmeCard
 {
@@ -31,14 +30,13 @@ class ORSIS3302Card: public ORVVmeCard
        virtual bool ReadOutChannel(size_t channel);
 
        virtual bool DisarmAndArmBank(size_t bank);
-       virtual bool DisarmAndArmNextBank()
-           { return (fBankOneArmed) ? DisarmAndArmBank(1) : DisarmAndArmBank(0); }
+	   virtual bool DisarmAndArmNextBank();
        virtual size_t GetNumberOfChannels() { return kNumberOfChannels; }
 	   virtual void flushBuffer(void);
 
+		bool kWaitForBankSwitch;
 		bool fBankOneArmed;
 		bool flushed;
-	    std::vector<std::vector<uint32_t> > fSetOfTempVectors;
-	    std::vector<size_t> fSetOfTempVectorIters;
-
+		uint32_t end_sample_address[kNumberOfChannels];
+		uint32_t dmaBuffer[0x200000]; //2M Longs (8MB)
 };
