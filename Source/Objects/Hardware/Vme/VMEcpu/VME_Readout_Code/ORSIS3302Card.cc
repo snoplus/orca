@@ -3,8 +3,11 @@
 
 ORSIS3302Card::ORSIS3302Card(SBC_card_info* ci) :
 	ORVVmeCard(ci), 
-	kWaitForBankSwitch(false),
-	fBankOneArmed(false)
+	fWaitForBankSwitch(false),
+	fBankOneArmed(false),
+	fFlushed(false),
+	fWaitCount(0)
+
 {
 }
 
@@ -40,7 +43,7 @@ uint32_t ORSIS3302Card::GetADCBufferRegisterOffset(size_t channel)
 
 bool ORSIS3302Card::Start()
 {
-	flushed = false;
+	fFlushed = false;
 	//fSetOfTempVectorIters.assign(fSetOfTempVectorIters.size(), 0);
 	DisarmAndArmBank(1);
 	return true;
@@ -65,9 +68,9 @@ bool ORSIS3302Card::IsEvent()
 
 bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/) 
 {
-	if(!flushed) flushBuffer();
+	if(!fFlushed) flushBuffer();
 	
-	if (!kWaitForBankSwitch){
+	if (!fWaitForBankSwitch){
 		if (!IsEvent())				 return false;
 		if (!DisarmAndArmNextBank()) return false;
 		
@@ -76,9 +79,15 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 		else				data_wr = 0x0;	// Bank 2 is armed and bank one must be read
 		uint32_t addr = GetBaseAddress() + GetADCMemoryPageRegister() ;
 		if (VMEWrite(addr,GetAddressModifier(), GetDataWidth(),data_wr ) != sizeof(data_wr)) return false;
+		fWaitCount = 0;
 	}
-	
-	kWaitForBankSwitch = false;
+	else {
+		fWaitCount++;
+		if(fWaitCount>1000){
+			LogError("Switch Delay: SIS3302 0x%04x %d", GetBaseAddress(),fWaitCount); 
+		}
+	}
+	fWaitForBankSwitch = false;
 	
 	for( size_t i=0;i<GetNumberOfChannels();i++) {
 		uint32_t addr = GetBaseAddress() + GetPreviousBankSampleRegisterOffset(i) ; 
@@ -91,11 +100,10 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 		if (((end_sample_address[i] >> 24) & 0x1) ==  (fBankOneArmed ? 0:1)) { 
 			//bit 24 is the bank bit. It must match the bank that we are reading out or chaos will result. 
 			//The bit doesn't match so we set a flag and we will try again the next time thru the readout loop.
-			kWaitForBankSwitch = true;
+			fWaitForBankSwitch = true;
 			return false;
 		}
 	}
-	
 	for( size_t i=0;i<GetNumberOfChannels();i++) {
 		ReadOutChannel(i);
 	}
@@ -194,6 +202,6 @@ void ORSIS3302Card::flushBuffer(void)
 		}
 	}
 	free(buffer);
-	flushed = true;
+	fFlushed = true;
 }
 

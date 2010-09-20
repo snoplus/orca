@@ -13,18 +13,16 @@ class ORSIS3302Card: public ORVVmeCard
            kNumberOfChannels	= 8,
 	       kOrcaHeaderInLongs	= 4,
 	       kHeaderSizeInLongs	= 2,
-	       kTrailerSizeInLongs	= 4};
+	       kTrailerSizeInLongs	= 4
+	   };
 
 
    protected:
        virtual uint32_t GetPreviousBankSampleRegisterOffset(size_t channel);
        virtual uint32_t GetADCBufferRegisterOffset(size_t channel);
-       virtual inline uint32_t GetAcquisitionControl()
-           { return 0x10; }
-       virtual inline uint32_t GetADCMemoryPageRegister()
-           { return 0x34; }
-
-       virtual inline uint32_t GetDataWidth() { return 0x4; }
+       virtual inline uint32_t GetAcquisitionControl()		{ return 0x10; }
+       virtual inline uint32_t GetADCMemoryPageRegister()	{ return 0x34; }
+       virtual inline uint32_t GetDataWidth()				{ return 0x4; }
 
 	   virtual bool IsEvent();
        virtual bool ReadOutChannel(size_t channel);
@@ -34,9 +32,10 @@ class ORSIS3302Card: public ORVVmeCard
        virtual size_t GetNumberOfChannels() { return kNumberOfChannels; }
 	   virtual void flushBuffer(void);
 
-		bool kWaitForBankSwitch;
+		bool fWaitForBankSwitch;
 		bool fBankOneArmed;
-		bool flushed;
+		bool fFlushed;
+		uint32_t fWaitCount;
 		uint32_t end_sample_address[kNumberOfChannels];
 		uint32_t dmaBuffer[0x200000]; //2M Longs (8MB)
 };
