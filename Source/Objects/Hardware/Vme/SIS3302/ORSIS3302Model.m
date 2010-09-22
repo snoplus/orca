@@ -2634,6 +2634,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 //**************************************************************************************
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	//reading events from the mac is very, very slow. If the buffer is filling up, it can take a long time to readout all events.
+	//Because of this we limit the number of events from any one buffer read. The SBC should be used if possible.
     @try {
 		if(runMode == kMcaRunMode){
 			//do nothing.. read out mca spectrum at end
@@ -2650,55 +2652,74 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				[self disarmAndArmBank:0];
 			}
 			else {
-				if([self isEvent]) {
+				
+				if(!isRunning) return;
+				
+				if (!waitForBankSwitch){
+
+					if(![self isEvent]) return;
+					
 					[self disarmAndArmNextBank];
+					
 					if(bankOneArmed)[self writePageRegister:0x4]; //bank one is armed, so bank2 (page 4) has to be readout
 					else			[self writePageRegister:0x0]; //Bank2 is armed and Bank1 (page 0) has to be readout
-					int channel;
-					for( channel=0;channel<kNumSIS3302Channels;channel++) {
-						unsigned long endSampleAddress = 0;
-						[[self adapter] readLongBlock:&endSampleAddress
-											atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
-											numToRead:1
-										   withAddMod:[self addressModifier]
-										usingAddSpace:0x01];
-					
-						endSampleAddress &= 0xffffff ; // mask bank2 address bit (bit 24)
-					
-						if (endSampleAddress > 0x3fffff) {   // more than 1 page memory buffer is used
-							// count up as Warnings?
-						}
-					
-						if (endSampleAddress != 0) {
-							unsigned long addrOffset = 0;
-							int group = channel/2;
-							do {
-								BOOL goodRecord = NO;
+				}
+				waitForBankSwitch = NO;
+				int channel;
+				unsigned long endSampleAddress[kNumSIS3302Channels];
+				for( channel=0;channel<kNumSIS3302Channels;channel++) {
+					endSampleAddress[channel]= 0;
+					[[self adapter] readLongBlock:&endSampleAddress[channel]
+										atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
+										numToRead:1
+									   withAddMod:[self addressModifier]
+									usingAddSpace:0x01];
+					if (((endSampleAddress[channel] >> 24) & 0x1) ==  (bankOneArmed ? 0:1)) { 
+						waitForBankSwitch = YES;
+						return;
+					}
 
-								int index = 0;
-								dataRecord[group][index++] =   dataId | dataRecordlength[group];
-								dataRecord[group][index++] =   (([self crateNumber]&0x0000000f)<<21) | 
-															   (([self slot] & 0x0000001f)<<16)      |
-														       ((channel & 0x000000ff)<<8);
-								dataRecord[group][index++] = [self sampleLength:group]/2;
-								dataRecord[group][index++] = energySampleLength;
-								unsigned long* p = &dataRecord[group][index];
-								[[self adapter] readLongBlock: p
-													atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + addrOffset
-													numToRead: dataRecordlength[group]-4
-												   withAddMod: [self addressModifier]
-												usingAddSpace: 0x01];
-		
-								if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
-									[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
-									goodRecord = YES;
-								}
-																
-								addrOffset += (dataRecordlength[group]-4)*4;
-							}while (addrOffset < endSampleAddress);
-						}
+				}
+				
+				for( channel=0;channel<kNumSIS3302Channels;channel++) {
+					if(!isRunning) return;
+
+					endSampleAddress[channel] &= 0x7fffff ; // mask bank2 address bit (bit 24)
+									
+					if (endSampleAddress[channel] != 0) {
+						unsigned long addrOffset = 0;
+						int group = channel/2;
+						int eventCount = 0;
+						do {
+							if(!isRunning) return;
+
+							BOOL goodRecord = NO;
+
+							int index = 0;
+							dataRecord[group][index++] =   dataId | dataRecordlength[group];
+							dataRecord[group][index++] =   (([self crateNumber]&0x0000000f)<<21) | 
+														   (([self slot] & 0x0000001f)<<16)      |
+														   ((channel & 0x000000ff)<<8);
+							dataRecord[group][index++] = [self sampleLength:group]/2;
+							dataRecord[group][index++] = energySampleLength;
+							unsigned long* p = &dataRecord[group][index];
+							[[self adapter] readLongBlock: p
+												atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + addrOffset
+												numToRead: dataRecordlength[group]-4
+											   withAddMod: [self addressModifier]
+											usingAddSpace: 0x01];
+	
+							if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
+								[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
+								goodRecord = YES;
+							}
+															
+							addrOffset += (dataRecordlength[group]-4)*4;
+							if(++eventCount > 25)break;
+						}while (addrOffset < endSampleAddress[channel]);
 					}
 				}
+				
 			}
 		}
 	}
@@ -2710,6 +2731,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	isRunning = NO;
+
 	if(runMode == kMcaRunMode){
 		unsigned long mcaLength;
 		switch (mcaHistoSize) {
@@ -2764,6 +2787,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMcaStatus) object:nil];
 
+	[self disarmSampleLogic];
+    [waveFormRateGroup stop];
+	[self setLed:NO];
+	
 	int group;
 	for(group=0;group<4;group++){
 		if(dataRecord){
@@ -2771,10 +2798,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 			dataRecord[group] = nil;
 		}
 	}
-	[self disarmSampleLogic];
-    isRunning = NO;
-    [waveFormRateGroup stop];
-	[self setLed:NO];
+	
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)

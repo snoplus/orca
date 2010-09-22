@@ -53,6 +53,7 @@
 	short			triggerOutEnabledMask;
 	short			adc50KTriggerEnabledMask;
 	short			gtMask;
+	bool			waitForBankSwitch;
 	
 	NSMutableArray* thresholds;
     NSMutableArray* dacOffsets;
