@@ -1345,8 +1345,12 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				if(dataset_id) {
 					if(lastCounts != countsNow){
 						NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,data=%@ WHERE dataset_id=%@",
+						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,unitsize=%d,mask=%d,bitmask=%d,length=%d,data=%@ WHERE dataset_id=%@",
 											  [aDataSet totalCounts],
+											  [aDataSet unitSize],
+											  [aDataSet mask],
+											  [aDataSet specialBitMask],
+											  [aDataSet numberBins],
 											  convertedData,
 											  [sqlConnection quoteObject:dataset_id]];
 						[sqlConnection queryString:theQuery];
