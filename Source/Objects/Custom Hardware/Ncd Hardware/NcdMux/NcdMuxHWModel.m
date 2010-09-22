@@ -58,6 +58,9 @@
 	[super dealloc];
 }
 
+- (void) connectionChanged
+{
+}
 
 #pragma mark •••Accessors
 - (ORConnector*) connectorTo408

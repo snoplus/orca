@@ -128,6 +128,7 @@ typedef char mux_result;
 - (void) setScopeSelection:(int)newScopeSelection;
 - (void) setDoNotWaitForCSBLow:(BOOL)aState;
 - (BOOL) doNotWaitForCSBLow;
+- (void) connectionChanged;
 
 #pragma mark •••Hardware Access
 - (mux_result) writeChannel:(unsigned char) aChannel mux:(unsigned short) muxBox;
