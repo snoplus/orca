@@ -297,11 +297,11 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 {
     
     NSFileManager* fileManager = [NSFileManager defaultManager];
-    NSArray* files = [fileManager contentsOfDirectoryAtPath:[[self directoryName]stringByExpandingTildeInPath] error:nil];
+    NSArray* files = [fileManager contentsOfDirectoryAtPath:[[self finalDirectoryName]stringByExpandingTildeInPath] error:nil];
     NSEnumerator* e = [files objectEnumerator];
     NSString* aFile;
     while(aFile = [e nextObject]){
-        NSString* fullName = [[[self directoryName] stringByAppendingPathComponent:aFile] stringByExpandingTildeInPath];
+        NSString* fullName = [[[self finalDirectoryName] stringByAppendingPathComponent:aFile] stringByExpandingTildeInPath];
         BOOL isDir;
         if ([fileManager fileExistsAtPath:fullName isDirectory:&isDir] && !isDir){
             NSRange range = [fullName rangeOfString:@".DS_Store"];
@@ -319,7 +319,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 {
     if(!fileQueue){
         ORFileMover* mover = [[ORFileMover alloc] init];
-        [mover cleanSentFolder:[[self directoryName]stringByExpandingTildeInPath]];
+        [mover cleanSentFolder:[[self finalDirectoryName]stringByExpandingTildeInPath]];
         [mover release];
     }
 }
@@ -771,7 +771,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
                       nil,
                       nil,
                       queueIsRunning?@"You can always send them later.":
-                      [NSString stringWithFormat:@"Push 'Send' to send ALL files in:\n<%@>",directoryName]);
+                      [NSString stringWithFormat:@"Push 'Send' to send ALL files in:\n<%@>",[self finalDirectoryName]]);
 }
 
 - (IBAction) deleteButtonAction:(id)sender
@@ -784,7 +784,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
                       @selector(_deleteAllSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,
-                      [NSString stringWithFormat:@"Push 'Delete' to delete files that are in:\n<%@/sentFiles>",directoryName]);
+                      [NSString stringWithFormat:@"Push 'Delete' to delete files that are in:\n<%@/sentFiles>",[self finalDirectoryName]]);
     
 }
 
