@@ -82,6 +82,7 @@ typedef enum _eFileTransferType {
 - (void) moveToSentFolder;
 - (void) cleanSentFolder:(NSString*)dirPath;
 - (void) stop;
+- (void) tasksCompleted:(id)sender;
 @end
 
 extern NSString* ORFileMoverIsDoneNotification;

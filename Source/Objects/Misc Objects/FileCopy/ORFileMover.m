@@ -351,6 +351,9 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     }
 }
 
+- (void) tasksCompleted:(id)sender;
+{
+}
 
 - (void) taskCompleted: (NSNotification*)aNote
 {
