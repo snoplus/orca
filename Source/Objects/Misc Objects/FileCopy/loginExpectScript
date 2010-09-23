@@ -25,6 +25,6 @@ expect "*?assword:*"
 #expect "* (yes/no)?" {send "yes\r"; expect "*assword:"} "*assword:" 
 
 send -- "$password\r"
-send -- "$password\r"
+#send -- "$password\r"
 send -- "\r"
 expect eof
