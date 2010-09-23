@@ -386,12 +386,7 @@ enum {
 {    
     ORSmartFolder* theDataFolder = [model dataFolder];
     if(note==nil || [note object] == theDataFolder || [note object] == model){
-		//if([model useFolderStructure]){
-			if([theDataFolder finalDirectoryName]!=nil)[dirTextField setStringValue: [theDataFolder finalDirectoryName]];
-		//}
-		//else {
-		//	if([theDataFolder directoryName]!=nil)[dirTextField setStringValue: [theDataFolder directoryName]];
-		//}
+		if([theDataFolder finalDirectoryName]!=nil)[dirTextField setStringValue: [theDataFolder finalDirectoryName]];
     }
 }
 
