@@ -71,6 +71,11 @@ enum {
 }
 
 #pragma mark ***Accessors
+- (NSTimeInterval) accurateUptime
+{
+	return [[NSDate date] timeIntervalSinceDate:launchTime]; 
+}
+
 
 - (NSTimeInterval) upTime
 {

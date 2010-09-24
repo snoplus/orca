@@ -43,6 +43,7 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
+- (NSTimeInterval) accurateUptime;
 - (NSTimeInterval) upTime;
 - (void) setUpTime:(NSTimeInterval)aUpTime;
 - (NSDate*) launchTime;

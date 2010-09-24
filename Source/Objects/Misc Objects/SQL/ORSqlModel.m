@@ -30,6 +30,7 @@
 #import "ORExperimentModel.h"
 #import "ORSegmentGroup.h"
 #import "ORProcessModel.h"
+#import "MemoryWatcher.h"
 
 NSString* ORSqlModelStealthModeChanged = @"ORSqlModelStealthModeChanged";
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
@@ -47,6 +48,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) updateExperiment;
 - (void) addMachineName;
 - (void) removeMachineName;
+- (void) updateUptime;
 - (void) postRunState:(NSNotification*)aNote;
 - (void) postRunTime:(NSNotification*)aNote;
 - (void) postRunOptions:(NSNotification*)aNote;
@@ -115,6 +117,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
 	[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
 	[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
+	[self performSelector:@selector(updateUptime) withObject:nil afterDelay:2];
 }
 
 - (void) setUpImage
@@ -208,6 +211,11 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[notifyCenter addObserver : self
                      selector : @selector(objectCountChanged:)
                          name : ORGroupObjectsRemoved
+                       object : nil];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(collectSegmentMap)
+                         name : ORSegmentGroupMapReadNotification
                        object : nil];		
 }
 
@@ -430,6 +438,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					s = [s stringByAppendingString:@"hw_address varchar(32) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"ip_address varchar(64) NOT NULL,"];
 					s = [s stringByAppendingString:@"password varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"uptime varchar(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"PRIMARY KEY (machine_id),"];
 					s = [s stringByAppendingString:@"UNIQUE KEY hw_address (hw_address)"];
 					s = [s stringByAppendingString:@") ENGINE=InnoDB"];
@@ -527,7 +536,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					s = [s stringByAppendingString:@"experiment varchar(64) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"numberSegments int(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"rates mediumblob,"];
-					s = [s stringByAppendingString:@"totalRate mediumblob,"];
+					s = [s stringByAppendingString:@"totalCounts mediumblob,"];
 					s = [s stringByAppendingString:@"thresholds mediumblob,"];
 					s = [s stringByAppendingString:@"gains mediumblob,"];
 					s = [s stringByAppendingString:@"PRIMARY KEY (experiment_id),"];
@@ -677,9 +686,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 
-
-
 /*
+ +------------+-------------+------+-----+---------+----------------+
  | Field      | Type        | Null | Key | Default | Extra          |
  +------------+-------------+------+-----+---------+----------------+
  | process_id | int(11)     | NO   | PRI | NULL    | auto_increment |
@@ -776,14 +784,17 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 
 /* Table: machines
-+------------+-------------+------+-----+---------+----------------+
-| Field      | Type        | Null | Key | Default | Extra          |
-+------------+-------------+------+-----+---------+----------------+
-| machine_id | int(11)     | NO   | PRI | NULL    | auto_increment |
-| name       | varchar(64) | YES  |     | NULL    |                |
-| hw_address | varchar(32) | YES  | UNI | NULL    |                |
-+------------+-------------+------+-----+---------+----------------+
-*/
+ +------------+-------------+------+-----+---------+----------------+
+ | Field      | Type        | Null | Key | Default | Extra          |
+ +------------+-------------+------+-----+---------+----------------+
+ | machine_id | int(11)     | NO   | PRI | NULL    | auto_increment |
+ | name       | varchar(64) | YES  |     | NULL    |                |
+ | hw_address | varchar(32) | YES  | UNI | NULL    |                |
+ | ip_address | varchar(64) | NO   |     | NULL    |                |
+ | password   | varchar(64) | YES  |     | NULL    |                |
+ | uptime     | int(11)     | YES  |     | NULL    |                |
+ +------------+-------------+------+-----+---------+----------------+
+ */
 - (void) addMachineName
 {
 	if([self validateConnection]){
@@ -800,6 +811,17 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	ORDeleteMachineNameOp* anOp = [[ORDeleteMachineNameOp alloc] initWithSqlConnection:sqlConnection delegate:self];
 	[queue addOperation:anOp];
 	[anOp release];	
+}
+
+- (void) updateUptime
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateUptime) object:nil];
+	if([self validateConnection]){
+		ORUpdateUptime* anOp = [[ORUpdateUptime alloc] initWithSqlConnection:sqlConnection delegate:self];
+		[queue addOperation:anOp];
+		[anOp release];
+	}
+	[self performSelector:@selector(updateUptime) withObject:nil afterDelay:5];	
 }
 
 /* Table: runs
@@ -963,24 +985,23 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[anOp setDataMonitors:dataMonitors];
 		[queue addOperation:anOp];
 		[anOp release];
-		
 	}
 	[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
 }
 
 /*Table: Experiment
- +----------------+-------------+------+-----+---------+-------+
- | Field          | Type        | Null | Key | Default | Extra |
- +----------------+-------------+------+-----+---------+-------+
- | experiment_id  | int(11)     | NO   |     | NULL    |       |
- | machine_id     | int(11)     | NO   | MUL | NULL    |       |
- | experiment     | varchar(64) | YES  |     | NULL    |       |
- | numberSegments | int(11)     | YES  |     | NULL    |       |
- | rates          | mediumblob  | YES  |     | NULL    |       |
- | totalRate      | mediumblob  | YES  |     | NULL    |       |
- | thresholds     | mediumblob  | YES  |     | NULL    |       |
- | gains          | mediumblob  | YES  |     | NULL    |       |
- +----------------+-------------+------+-----+---------+-------+
+ +----------------+-------------+------+-----+---------+----------------+
+ | Field          | Type        | Null | Key | Default | Extra          |
+ +----------------+-------------+------+-----+---------+----------------+
+ | experiment_id  | int(11)     | NO   | PRI | NULL    | auto_increment |
+ | machine_id     | int(11)     | NO   | MUL | NULL    |                |
+ | experiment     | varchar(64) | YES  |     | NULL    |                |
+ | numberSegments | int(11)     | YES  |     | NULL    |                |
+ | rates          | mediumblob  | YES  |     | NULL    |                |
+ | totalCounts    | mediumblob  | YES  |     | NULL    |                |
+ | thresholds     | mediumblob  | YES  |     | NULL    |                |
+ | gains          | mediumblob  | YES  |     | NULL    |                |
+ +----------------+-------------+------+-----+---------+----------------+
  */ 
 - (void) updateExperiment
 {
@@ -1110,6 +1131,25 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 @end
+
+@implementation ORUpdateUptime
+- (void) main
+{
+	@try {	
+		unsigned long uptime = (unsigned long)[[[NSApp delegate] memoryWatcher] accurateUptime];
+		NSString* hw_address = macAddress();
+		
+		NSString* theQuery = [NSString stringWithFormat:@"UPDATE machines SET uptime=%d WHERE hw_address=%@",
+							  uptime,																	  
+							  [sqlConnection quoteObject:hw_address]];
+		[sqlConnection queryString:theQuery];
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+}
+@end
+
 
 
 @implementation ORPostRunStateOp
@@ -1287,14 +1327,14 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		//get our machine_id using our MAC Address
 		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 		id row				    = [theResult fetchRowAsDictionary];
-		id machine_id			= [row objectForKey:@"machine_id"];
-
+		id machine_id			= [row objectForKey:@"machine_id"];		
+		
 		//do 1D Histograms first
 		for(id aMonitor in dataMonitors){
 			NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
 			for(id aDataSet in objs1d){
 				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram1Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
-																	   machine_id,
+																	   [sqlConnection quoteObject:machine_id],
 																	   [sqlConnection quoteObject:[aDataSet fullName]],
 																	   [aMonitor uniqueIdNumber]]];
 				id dataSetEntry			 = [theResult fetchRowAsDictionary];

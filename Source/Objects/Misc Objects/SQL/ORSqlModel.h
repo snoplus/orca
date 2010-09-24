@@ -99,6 +99,10 @@ extern NSString* ORSqlLock;
 - (void) main;
 @end
 
+@interface ORUpdateUptime : ORSqlOperation
+- (void) main;
+@end
+
 @interface ORPostRunStateOp : ORSqlOperation
 {
 	ORRunModel* runModel;

@@ -749,7 +749,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	int i;
 	unsigned long* p = (unsigned long*)[theData bytes];
 	for(i = 0;i<numSegments;i++){
-		p[i] = [segmentGroup getRate:i];
+		p[i] = [segmentGroup getTotalCounts:i];
 	}
 	return theData;
 }
