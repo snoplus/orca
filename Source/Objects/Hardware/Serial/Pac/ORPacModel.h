@@ -78,6 +78,7 @@
 		NSString*			logFile;
 		NSMutableArray*		logBuffer;
 		unsigned long		readCount;
+		int					rdacDisplayType;
 }
 
 #pragma mark •••Initialization
@@ -89,6 +90,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (int) rdacDisplayType;
+- (void) setRdacDisplayType:(int)aRdacDisplayType;
 - (ORTimeRate*)timeRate:(int)index;
 - (void) setPollingState:(NSTimeInterval)aState;
 - (NSTimeInterval) pollingState;
@@ -159,6 +162,7 @@
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
+extern NSString* ORPacModelRdacDisplayTypeChanged;
 extern NSString* ORPacModelSetAllRDacsChanged;
 extern NSString* ORPacModelRdacChannelChanged;
 extern NSString* ORPacModelLcmEnabledChanged;

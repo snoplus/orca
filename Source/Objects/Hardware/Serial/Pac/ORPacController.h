@@ -23,6 +23,7 @@
 @interface ORPacController : OrcaObjectController
 {
 	IBOutlet NSTabView*		tabView;
+	IBOutlet NSMatrix*		rdacDisplayTypeMatrix;
 	IBOutlet NSTableView*	rdacTableView;
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSButton*		setAllRDacsButton;
@@ -69,6 +70,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) rdacDisplayTypeChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
@@ -90,6 +92,7 @@
 - (void) queCountChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) rdacDisplayTypeAction:(id)sender;
 - (IBAction) setAllRDacsAction:(id)sender;
 - (IBAction) rdacChannelAction:(id)sender;
 - (IBAction) writeLcmEnabledAction:(id)sender;

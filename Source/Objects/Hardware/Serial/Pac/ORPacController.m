@@ -27,6 +27,7 @@
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
+#import "OHexFormatter.h"
 
 @interface ORPacController (private)
 - (void) populatePortListPopup;
@@ -198,6 +199,12 @@
 					 selector : @selector(queCountChanged:)
 						 name : ORPacModelQueCountChanged
 					   object : model];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(rdacDisplayTypeChanged:)
+                         name : ORPacModelRdacDisplayTypeChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -226,6 +233,24 @@
     [self pollingStateChanged:nil];
     [self miscAttributesChanged:nil];
 	[self queCountChanged:nil];
+	[self rdacDisplayTypeChanged:nil];
+}
+
+- (void) rdacDisplayTypeChanged:(NSNotification*)aNote
+{
+	[rdacDisplayTypeMatrix selectCellWithTag : [model rdacDisplayType]];
+	NSFormatter* aFormatter = nil;
+	if([model rdacDisplayType] == 0){
+		aFormatter = [[OHexFormatter alloc] init];
+	}
+
+	[[[rdacTableView tableColumnWithIdentifier:@"Board0"] dataCell] setFormatter:aFormatter];
+	[[[rdacTableView tableColumnWithIdentifier:@"Board1"] dataCell] setFormatter:aFormatter];
+	[[[rdacTableView tableColumnWithIdentifier:@"Board2"] dataCell] setFormatter:aFormatter];
+	[[[rdacTableView tableColumnWithIdentifier:@"Board3"] dataCell] setFormatter:aFormatter];
+
+	[aFormatter release];
+	[rdacTableView reloadData];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -320,7 +345,6 @@
 {
 	[rdacTableView reloadData];
 }
-
 
 - (void) setAllRDacsChanged:(NSNotification*)aNote
 {
@@ -465,6 +489,11 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) rdacDisplayTypeAction:(id)sender
+{
+	[model setRdacDisplayType:[[sender selectedCell] tag]];	
+}
 
 - (IBAction) setAllRDacsAction:(id)sender
 {

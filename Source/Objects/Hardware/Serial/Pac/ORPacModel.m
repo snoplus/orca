@@ -29,6 +29,7 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
+NSString* ORPacModelRdacDisplayTypeChanged = @"ORPacModelRdacDisplayTypeChanged";
 NSString* ORPacModelSetAllRDacsChanged  = @"ORPacModelSetAllRDacsChanged";
 NSString* ORPacModelRdacChannelChanged  = @"ORPacModelRdacChannelChanged";
 NSString* ORPacModelLcmEnabledChanged	= @"ORPacModelLcmEnabledChanged";
@@ -130,6 +131,19 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 }
 
 #pragma mark •••Accessors
+
+- (int) rdacDisplayType
+{
+    return rdacDisplayType;
+}
+
+- (void) setRdacDisplayType:(int)aRdacDisplayType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRdacDisplayType:rdacDisplayType];
+    rdacDisplayType = aRdacDisplayType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRdacDisplayTypeChanged object:self];
+}
+
 - (int) queCount
 {
 	return [cmdQueue count];
@@ -413,6 +427,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setRdacDisplayType:[decoder decodeIntForKey:@"rdacDisplayType"]];
 	[self setSetAllRDacs:[decoder decodeBoolForKey:		 @"ORPacModelSetAllRDacs"]];
 	[self setRdacChannel:	[decoder decodeIntForKey:	 @"ORPacModelRdacChannel"]];
 	[self setLcmEnabled:	[decoder decodeBoolForKey:	 @"ORPacModelLcmEnabled"]];
@@ -442,6 +457,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:rdacDisplayType forKey:@"rdacDisplayType"];
     [encoder encodeBool:setAllRDacs		forKey:@"ORPacModelSetAllRDacs"];
     [encoder encodeInt:rdacChannel		forKey:@"ORPacModelRdacChannel"];
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
