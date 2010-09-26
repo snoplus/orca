@@ -5,6 +5,7 @@
 
 bool ORCAEN1785Readout::Readout(SBC_LAM_Data* lamData)
 {
+    int16_t leaf_index;
 	uint32_t dataId               = GetHardwareMask()[0];
 	uint32_t locationMask         = ((GetCrate() & 0x01e)<<21) | 
                                     ((GetSlot() & 0x0000001f)<<16);
@@ -45,6 +46,19 @@ bool ORCAEN1785Readout::Readout(SBC_LAM_Data* lamData)
 					LogBusError("Rd Err: CAEN 965 0x%04x %s", GetBaseAddress(),strerror(errno)); 
 					dataIndex = savedDataIndex;
 					FlushDataBuffer();
+				}
+				
+				//read out the children
+				leaf_index = GetNextTriggerIndex()[0];
+				while(leaf_index >= 0) {
+					ORVCard* card = peek_at_card(leaf_index);
+					if (!card) {
+						// means we couldn't find the card.
+						// Shouldn't happen but...
+						LogError("Readout Err: Card at index %i not found",leaf_index);
+						break;
+					}
+					leaf_index = readout_card(leaf_index,lamData);
 				}
 			}
 		}

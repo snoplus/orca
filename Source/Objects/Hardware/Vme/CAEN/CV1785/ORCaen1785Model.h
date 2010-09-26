@@ -25,6 +25,7 @@
 #import "ORHWWizard.h"
 
 @class ORRateGroup;
+@class ORReadOutList;
 
 // Declaration of constants for module.
 enum {
@@ -77,7 +78,6 @@ enum {
 // Class definition
 @interface ORCaen1785Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
-	unsigned long dataId;
 	ORRateGroup*	adcRateGroup;
 	unsigned long 	adcCount[kCV1785NumberChannels];
 	BOOL			isRunning;
@@ -87,7 +87,11 @@ enum {
 	unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
     unsigned long   writeValue;
-	
+
+	unsigned long dataId;
+	ORReadOutList*  trigger1Group;
+	NSArray*	dataTakers1;       //cache of data takers.
+
 	//cached values for speed.
 	unsigned long statusAddress;
 	unsigned long dataBufferAddress;
@@ -164,6 +168,11 @@ enum {
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (NSString*) identifier;
+- (ORReadOutList*) trigger1Group;
+- (void) setTrigger1Group:(ORReadOutList*)newTrigger1Group;
+- (void) saveReadOutList:(NSFileHandle*)aFile;
+- (void) loadReadOutList:(NSFileHandle*)aFile;
+- (void) readOutChildren:(NSArray*)children dataPacket:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
 #pragma mark ***HWWizard Support
 - (BOOL)      hasParmetersToRamp;

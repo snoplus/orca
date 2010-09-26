@@ -24,6 +24,7 @@
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORRateGroup.h"
+#import "ORReadOutList.h"
 
 // Address information for this unit.
 #define k1785DefaultBaseAddress 		0xee000000
@@ -89,10 +90,21 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
     [self setBaseAddress:k1785DefaultBaseAddress];
     [self setAddressModifier:k1785DefaultAddressModifier];
 	[self setOnlineMask:0xffff];
+
+	ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"Trigger1"];
+    [self setTrigger1Group:r1];
+    [r1 release];
+	
 	
     [[self undoManager] enableUndoRegistration];
 	
     return self;
+}
+- (void) dealloc
+{
+    
+    [trigger1Group release];    
+    [super dealloc];
 }
 
 - (NSString*) helpURL
@@ -101,6 +113,16 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 }
 
 #pragma mark ***Accessors
+- (ORReadOutList*) trigger1Group
+{
+    return trigger1Group;
+}
+
+- (void) setTrigger1Group:(ORReadOutList*)newTrigger1Group
+{
+    [trigger1Group autorelease];
+    trigger1Group=[newTrigger1Group retain];
+}
 
 - (unsigned short) selectedRegIndex
 {
@@ -614,6 +636,12 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
     // Set thresholds in unit
     [self initBoard];
 	
+	NSEnumerator* e = [dataTakers1 objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj runTaskStarted:aDataPacket userInfo:userInfo];
+    }
+	
 	isRunning = NO;
 	
     [self startRates];
@@ -709,6 +737,9 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 					}
 				}
 			}
+			else {
+				[self readOutChildren:dataTakers1 dataPacket:aDataPacket userInfo:userInfo];
+			}
 		}
 	}
 	@catch(NSException* localException) {
@@ -720,10 +751,42 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+	NSEnumerator* e = [dataTakers1 objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj runTaskStopped:aDataPacket userInfo:userInfo];
+    }
 	[adcRateGroup stop];
     controller = nil;
 	isRunning = NO;
 }
+
+- (void) readOutChildren:(NSArray*)children dataPacket:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    NSEnumerator* e = [children objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+		[obj takeData:aDataPacket userInfo:userInfo];
+    }
+}
+
+
+- (NSMutableArray*) children {
+    //methods exists to give common interface across all objects for display in lists
+    return [NSMutableArray arrayWithObjects:trigger1Group,nil];
+}
+
+- (void) saveReadOutList:(NSFileHandle*)aFile
+{
+    [trigger1Group saveUsingFile:aFile];
+}
+
+- (void) loadReadOutList:(NSFileHandle*)aFile
+{
+    [self setTrigger1Group:[[[ORReadOutList alloc] initWithIdentifier:@"Trigger 1"]autorelease]];
+    [trigger1Group loadUsingFile:aFile];
+}
+
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
@@ -738,9 +801,27 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
-	
-	return index+1;
+	configStruct->card_info[index].num_Trigger_Indexes = 2;
+    int nextIndex = index+1;
+    
+	configStruct->card_info[index].next_Trigger_Index[0] = -1;
+	NSEnumerator* e = [dataTakers1 objectEnumerator];
+	id obj;
+	while(obj = [e nextObject]){
+		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
+			if(configStruct->card_info[index].next_Trigger_Index[0] == -1){
+				configStruct->card_info[index].next_Trigger_Index[0] = nextIndex;
+			}
+			int savedIndex = nextIndex;
+			nextIndex = [obj load_HW_Config_Structure:configStruct index:nextIndex];
+			if(obj == [dataTakers1 lastObject]){
+				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
+			}
+		}
+	}
+	configStruct->card_info[index].next_Card_Index 	 = nextIndex;
+
+	return nextIndex;
 }
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
@@ -889,6 +970,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
     [self setSelectedRegIndex:[aDecoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannel:[aDecoder decodeIntForKey:@"selectedChannel"]];
     [self setWriteValue:[aDecoder decodeInt32ForKey:@"writeValue"]];
+    [self setTrigger1Group:[aDecoder decodeObjectForKey:@"trigger1Group"]];
 	
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -906,9 +988,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	[anEncoder encodeInt:selectedRegIndex forKey:@"selectedRegIndex"];
     [anEncoder encodeInt:selectedChannel forKey:@"selectedChannel"];
     [anEncoder encodeInt32:writeValue forKey:@"writeValue"];
-	
+    [anEncoder encodeObject:[self trigger1Group] forKey:@"trigger1Group"];
 }
 
 @end
-
-
