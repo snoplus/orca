@@ -530,6 +530,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     [self setAutoInhibit:	[decoder decodeBoolForKey:@"autoInhibit"]];
 	[self setPollingState:	[decoder decodeIntForKey:@"pollingState"]];
 	[self setShipRecords:	[decoder decodeBoolForKey:@"shipRecords"]];
+	[self setEnabledMask:	[decoder decodeIntForKey:@"enabledMask"]];
 	
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
@@ -544,7 +545,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     [encoder encodeBool:autoInhibit forKey:@"autoInhibit"];
     [encoder encodeInt:[self pollingState] forKey:@"pollingState"];
     [encoder encodeBool:[self pollingState] forKey:@"shipRecords"];
-	
+	[encoder encodeInt:[self enabledMask] forKey:@"enabledMask"];
 }
 
 @end

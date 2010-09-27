@@ -635,12 +635,11 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	
     // Set thresholds in unit
     [self initBoard];
-	
-	NSEnumerator* e = [dataTakers1 objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-        [obj runTaskStarted:aDataPacket userInfo:userInfo];
-    }
+
+	dataTakers1 = [[trigger1Group allObjects] retain];	//cache of data takers.
+	for (id obj in dataTakers1){
+		[obj runTaskStarted:aDataPacket userInfo:userInfo];
+	}
 	
 	isRunning = NO;
 	
@@ -661,7 +660,6 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 					usingAddSpace:0x01];
 		
 		if(statusValue & 0x1){
-			
 			//OK, at least one data value is ready
 			unsigned long dataValue;
 			[controller readLongBlock:&dataValue
@@ -751,13 +749,13 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
-	NSEnumerator* e = [dataTakers1 objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-        [obj runTaskStopped:aDataPacket userInfo:userInfo];
-    }
+	for (id obj in dataTakers1){
+		[obj runTaskStopped:aDataPacket userInfo:userInfo];
+	}
+	[dataTakers1 release];
+	
 	[adcRateGroup stop];
-    controller = nil;
+	controller = nil;
 	isRunning = NO;
 }
 

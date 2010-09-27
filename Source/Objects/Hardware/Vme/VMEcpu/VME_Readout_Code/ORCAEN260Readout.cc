@@ -23,14 +23,14 @@ bool ORCAEN260Readout::Readout(SBC_LAM_Data* lamData)
 	for(i=0;i<16;i++){
 		uint32_t dataValue = 0;
 		if(enabledMask & (0x1<<i)){
-			int32_t result = VMERead(GetBaseAddress()+dataBufferOffset, 0x39, sizeof(dataValue), dataValue);
+			int32_t result = VMERead(GetBaseAddress()+dataBufferOffset+(i*0x04), 0x39, sizeof(dataValue), dataValue);
 			if(result != sizeof(dataValue)){
                 LogBusError("Error for V260: %s", strerror(errno));
 				dataIndex = savedDataIndex;
 				break;
 			}
 		}
-		data[dataIndex++] = dataValue;
+		data[dataIndex++] = dataValue & 0x00ffffff;
 	}
 			   
     return true; 
