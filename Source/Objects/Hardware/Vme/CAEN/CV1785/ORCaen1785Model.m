@@ -91,7 +91,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
     [self setAddressModifier:k1785DefaultAddressModifier];
 	[self setOnlineMask:0xffff];
 
-	ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"Trigger1"];
+	ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"NestedRead"];
     [self setTrigger1Group:r1];
     [r1 release];
 	
@@ -783,7 +783,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 
 - (void) loadReadOutList:(NSFileHandle*)aFile
 {
-    [self setTrigger1Group:[[[ORReadOutList alloc] initWithIdentifier:@"Trigger 1"]autorelease]];
+    [self setTrigger1Group:[[[ORReadOutList alloc] initWithIdentifier:@"NestedRead"]autorelease]];
     [trigger1Group loadUsingFile:aFile];
 }
 
