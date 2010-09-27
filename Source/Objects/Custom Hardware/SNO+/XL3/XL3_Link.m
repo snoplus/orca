@@ -128,7 +128,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
 #pragma mark •••Accessors
 
-- (bool) needToSwap
+- (BOOL) needToSwap
 {
 	return needToSwap;
 }
@@ -136,9 +136,8 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 - (void) setNeedToSwap
 {
 	//VME bus & ML403 are big-endian, ethernet as well
-	uint32_t test = 0x0000ABCD;
-	if (test == htonl(test)) needToSwap = false;
-	else needToSwap = true;
+	if (0x0000ABCD == htonl(0x0000ABCD)) needToSwap = NO;
+	else needToSwap = YES;
 	//NSLog(@"XL3_Link %@ swapping.\n", needToSwap?@"is":@"is not");
 }
 

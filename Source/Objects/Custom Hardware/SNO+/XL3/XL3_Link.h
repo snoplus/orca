@@ -37,7 +37,7 @@ eXL3_CrateStates;
 	NSLock*		commandSocketLock;	//only one command to XL3 at the moment, to be released later
 	NSLock*		coreSocketLock;		//to synchronize both the threads touching the socket, with additional lockers to be removed later
 	NSLock*		cmdArrayLock;		//to synchronize the threaded worker pushing XL3 responses and XL3Model pulling the responses
-	bool		needToSwap;
+	BOOL		needToSwap;
 	NSString*	IPNumber;
 	NSString*	crateName;
 	int		portNumber;
@@ -68,7 +68,7 @@ eXL3_CrateStates;
 - (void) setServerSocket:(int) aSocket;
 - (int)  workingSocket;
 - (void) setWorkingSocket:(int) aSocket;
-- (bool) needToSwap;
+- (BOOL) needToSwap;
 - (void) setNeedToSwap;
 - (int)  connectState;
 - (BOOL) isConnected;

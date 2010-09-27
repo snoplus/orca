@@ -24,7 +24,8 @@
 @class ORDataSet;
 
 @interface ORXL3DecoderForXL3MegaBundle : ORVmeCardDecoder {
-    @private 
+    @private
+	BOOL indexerSwaps;
 }
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;

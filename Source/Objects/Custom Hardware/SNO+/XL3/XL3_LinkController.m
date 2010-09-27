@@ -62,6 +62,7 @@ static NSDictionary* xl3Ops;
 	[tabView selectTabViewItemAtIndex: index];
 	[self populateOps];
 	[self populatePullDown];
+	[self updateWindow];
 }	
 
 - (void) setModel:(id)aModel
@@ -182,6 +183,8 @@ static NSDictionary* xl3Ops;
 	[self compositeXl3ModeChanged:nil];
 	[self compositeXl3ModeRunningChanged:nil];
 	[self compositeXl3PedestalMaskChanged:nil];
+	[self compositeXl3RWAddressChanged:nil];
+	[self compositeXL3RWDataChanged:nil];
 	//ip connection
 	[self errorTimeOutChanged:nil];
 
