@@ -1,4 +1,5 @@
 #include "ORCAEN1785Readout.hh"
+#include "readout_code.h"
 #include <errno.h>
 
 #define ShiftAndExtract(aValue,aShift,aMask) (((aValue)>>(aShift)) & (aMask))

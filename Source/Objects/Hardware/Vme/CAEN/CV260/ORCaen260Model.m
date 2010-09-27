@@ -218,15 +218,17 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 
 - (void) _pollAllChannels
 {
-    @try { 
-        [self readScalers]; 
-    }
-	@catch(NSException* localException) { 
-		NSLogError(@"CV260",@"Polling Error",nil);
-	}
-	
-	if(shipRecords){
-		[self _shipValues]; 
+	if(!isRunning){
+		@try { 
+			[self readScalers]; 
+		}
+		@catch(NSException* localException) { 
+			NSLogError(@"CV260",@"Polling Error",nil);
+		}
+		
+		if(shipRecords){
+			[self _shipValues]; 
+		}
 	}
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
@@ -275,22 +277,6 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelEnabledMaskChanged object:self];
 }
 
-- (unsigned long) dataId { return dataId; }
-
-- (void) setDataId: (unsigned long) DataId
-{
-    dataId = DataId;
-}
-
-- (void) setDataIds:(id)assigner
-{
-    dataId = [assigner assignDataIds:kLongForm]; //short form preferred
-}
-
-- (void) syncDataIdsWith:(id)anotherCaen260
-{
-    [self setDataId:[anotherCaen260 dataId]];
-}
 - (void) _stopPolling
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
@@ -446,6 +432,23 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 	}
 }
 
+#pragma mark ***DataTaker
+- (void) setDataIds:(id)assigner
+{
+    dataId = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId:[anotherObj dataId]];
+}
+
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
@@ -463,6 +466,59 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
+}
+
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
+{
+	NSDictionary* aDictionary;
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"Scaler",							@"name",
+				   [NSNumber numberWithLong:dataId],    @"dataId",
+				   [NSNumber numberWithLong:16],		@"maxChannels",
+				   nil];
+	
+	[anEventDictionary setObject:aDictionary forKey:@"Caen260"];
+}
+- (void) reset
+{	
+}
+
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+{  
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
+    [self clearScalers];
+	isRunning = NO;
+}
+
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	isRunning = YES;
+	[self readScalers];
+	[self _shipValues];
+}
+
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+{
+    controller = nil;
+	isRunning = NO;
+}
+
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id   = kCaen260; //should be unique
+	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
+	configStruct->card_info[index].slot			= [self slot];
+	configStruct->card_info[index].crate		= [self crateNumber];
+	configStruct->card_info[index].add_mod		= [self addressModifier];
+	configStruct->card_info[index].base_add		= [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0] = enabledMask;
+	configStruct->card_info[index].deviceSpecificData[1] = [self getAddressOffset:kCounter0];
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	    
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	
+	return index+1;
 }
 
 #pragma mark •••Archival

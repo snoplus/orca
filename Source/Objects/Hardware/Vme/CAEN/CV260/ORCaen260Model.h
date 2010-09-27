@@ -25,6 +25,7 @@
 #import "ORCaenCardModel.h"
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
+#import "ORDataTaker.h"
 
 #define 	kNumCaen260Channels 		16
 
@@ -65,7 +66,7 @@ enum {
 #pragma mark •••Forward Declarations
 @class ORRateGroup;
 
-@interface ORCaen260Model :  ORCaenCardModel
+@interface ORCaen260Model :  ORCaenCardModel <ORDataTaker>
 {
     @private
 		BOOL			pollRunning;
@@ -75,6 +76,7 @@ enum {
 		BOOL			shipRecords;
 		time_t			lastReadTime;
 		BOOL			autoInhibit;
+		BOOL			isRunning;
 }
 
 #pragma mark •••Initialization
@@ -92,10 +94,6 @@ enum {
 - (void) setScalerValue:(unsigned long)aValue index:(int)index;
 - (unsigned short) enabledMask;
 - (void) setEnabledMask:(unsigned short)aEnabledMask;
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherCaen260;
 - (void) setPollingState:(NSTimeInterval)aState;
 - (NSTimeInterval) pollingState;
 - (void) registerNotificationObservers;
@@ -113,6 +111,18 @@ enum {
 
 #pragma mark •••Data Header
 - (NSDictionary*) dataRecordDescription;
+
+#pragma mark ***DataTaker
+- (int)  load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObj;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
+- (void) reset;
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;

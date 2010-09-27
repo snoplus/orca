@@ -799,9 +799,8 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	configStruct->card_info[index].base_add  = [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0] = reg[kStatusRegister1].addressOffset;
 	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
-	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	
-	configStruct->card_info[index].num_Trigger_Indexes = 2;
+	configStruct->card_info[index].num_Trigger_Indexes = 1;
     int nextIndex = index+1;
     
 	configStruct->card_info[index].next_Trigger_Index[0] = -1;

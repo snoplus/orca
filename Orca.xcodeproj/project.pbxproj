@@ -1182,6 +1182,9 @@
 		846F4D4209900F2B00BF0031 /* RunVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4D4109900F2B00BF0031 /* RunVetoed.tif */; };
 		84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AC90E0342F200195E3E /* ORCARoot.tif */; };
 		84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AD30E0344CF00195E3E /* ORCARootService.tif */; };
+		8471C2F41250CF0C003A8DFB /* ORCAEN260Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */; };
+		8471C30F1250D456003A8DFB /* ORCAEN260Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */; };
+		8471C3101250D456003A8DFB /* ORCAEN260Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */; };
 		8472AD6E0A82BD8E0069A069 /* BiRa3251O.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8472AD680A82BD8E0069A069 /* BiRa3251O.nib */; };
 		8472AD6F0A82BD8F0069A069 /* BiRa3251OCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8472AD690A82BD8E0069A069 /* BiRa3251OCard.gif */; };
 		8472AD700A82BD8F0069A069 /* ORBiRa3251OController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AD6A0A82BD8E0069A069 /* ORBiRa3251OController.h */; };
@@ -2491,6 +2494,8 @@
 				EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */,
 				EF69C483116E6526008ABADC /* ORSNOCrateReadout.hh in VME_Copy */,
 				43ADFEBA10B6E2090044617C /* HWMakefile.mk in VME_Copy */,
+				8471C30F1250D456003A8DFB /* ORCAEN260Readout.cc in VME_Copy */,
+				8471C3101250D456003A8DFB /* ORCAEN260Readout.hh in VME_Copy */,
 				84AF17521188C88500449ACE /* ORCAEN1785Readout.cc in VME_Copy */,
 				84AF17531188C88500449ACE /* ORCAEN1785Readout.hh in VME_Copy */,
 				84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */,
@@ -3525,6 +3530,8 @@
 		846F4D4109900F2B00BF0031 /* RunVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunVetoed.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/RunVetoed.tif; sourceTree = SOURCE_ROOT; };
 		84701AC90E0342F200195E3E /* ORCARoot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARoot.tif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.tif"; sourceTree = SOURCE_ROOT; };
 		84701AD30E0344CF00195E3E /* ORCARootService.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARootService.tif; path = "Source/Main Document/ORCARootService.tif"; sourceTree = SOURCE_ROOT; };
+		8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN260Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN260Readout.cc; sourceTree = SOURCE_ROOT; };
+		8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN260Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN260Readout.hh; sourceTree = SOURCE_ROOT; };
 		8472AD680A82BD8E0069A069 /* BiRa3251O.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BiRa3251O.nib; path = Source/Objects/Hardware/Camac/BiRa3251/BiRa3251O.nib; sourceTree = SOURCE_ROOT; };
 		8472AD690A82BD8E0069A069 /* BiRa3251OCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = BiRa3251OCard.gif; path = Source/Objects/Hardware/Camac/BiRa3251/BiRa3251OCard.gif; sourceTree = SOURCE_ROOT; };
 		8472AD6A0A82BD8E0069A069 /* ORBiRa3251OController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBiRa3251OController.h; path = Source/Objects/Hardware/Camac/BiRa3251/ORBiRa3251OController.h; sourceTree = SOURCE_ROOT; };
@@ -4658,6 +4665,7 @@
 		84E9F697123FE4D600116607 /* ORNHQ226LDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LDecoders.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LDecoders.m; sourceTree = SOURCE_ROOT; };
 		84E9F698123FE4D600116607 /* ORNHQ226LModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LModel.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.h; sourceTree = SOURCE_ROOT; };
 		84E9F699123FE4D600116607 /* ORNHQ226LModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LModel.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.m; sourceTree = SOURCE_ROOT; };
+		84E9F8331242504C00116607 /* sis3302readout */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sis3302readout; path = ../../sis3302readout; sourceTree = SOURCE_ROOT; };
 		84EA6C950C73D11200083319 /* nTPC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nTPC.nib; path = Source/Experiments/nTPC/nTPC.nib; sourceTree = SOURCE_ROOT; };
 		84EA6C960C73D11200083319 /* nTPC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = nTPC.tif; path = Source/Experiments/nTPC/nTPC.tif; sourceTree = SOURCE_ROOT; };
 		84EA6C970C73D11200083319 /* nTPCConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = nTPCConstants.h; path = Source/Experiments/nTPC/nTPCConstants.h; sourceTree = SOURCE_ROOT; };
@@ -5067,6 +5075,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
+				84E9F8331242504C00116607 /* sis3302readout */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -7756,6 +7765,8 @@
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
 				840B00721206F556009095A4 /* goScript */,
+				8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */,
+				8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */,
 				84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */,
 				84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */,
 				84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */,
@@ -11433,6 +11444,7 @@
 				84E9F6A0123FE4D600116607 /* ORNHQ226LController.h in Headers */,
 				84E9F6A2123FE4D600116607 /* ORNHQ226LDecoders.h in Headers */,
 				84E9F6A4123FE4D600116607 /* ORNHQ226LModel.h in Headers */,
+				8471C2F41250CF0C003A8DFB /* ORCAEN260Readout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
