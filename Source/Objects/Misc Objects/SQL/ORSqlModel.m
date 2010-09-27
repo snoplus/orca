@@ -634,6 +634,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					s = [s stringByAppendingString:@"unitsize int(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"mask int(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"bitmask int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"offset int(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"length int(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"data mediumblob,"];
 					s = [s stringByAppendingString:@"PRIMARY KEY (dataset_id),"];
@@ -967,6 +968,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
  | unitsize   | int(11)     | YES  |     | NULL    |                |
  | mask       | int(11)     | YES  |     | NULL    |                |
  | bitmask    | int(11)     | YES  |     | NULL    |                |
+ | offset     | int(11)     | YES  |     | NULL    |                |
  | length     | int(11)     | YES  |     | NULL    |                |
  | data       | mediumblob  | YES  |     | NULL    |                |
  +------------+-------------+------+-----+---------+----------------+
@@ -1385,11 +1387,12 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				if(dataset_id) {
 					if(lastCounts != countsNow){
 						NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,unitsize=%d,mask=%d,bitmask=%d,length=%d,data=%@ WHERE dataset_id=%@",
+						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,unitsize=%d,mask=%d,bitmask=%d,offset=%d,length=%d,data=%@ WHERE dataset_id=%@",
 											  [aDataSet totalCounts],
 											  [aDataSet unitSize],
 											  [aDataSet mask],
 											  [aDataSet specialBitMask],
+											  [aDataSet dataOffset],
 											  [aDataSet numberBins],
 											  convertedData,
 											  [sqlConnection quoteObject:dataset_id]];
@@ -1398,7 +1401,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 				}
 				else {
 					NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Waveforms (monitor_id,machine_id,name,counts,unitsize,mask,bitmask,type,length,data) VALUES (%d,%@,%@,%d,%d,%d,%d,3,%d,%@)",
+					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Waveforms (monitor_id,machine_id,name,counts,unitsize,mask,bitmask,offset,type,length,data) VALUES (%d,%@,%@,%d,%d,%d,%d,%d,3,%d,%@)",
 										  [aMonitor uniqueIdNumber],
 										  [sqlConnection quoteObject:machine_id],
 										  [sqlConnection quoteObject:[aDataSet fullName]],
@@ -1406,6 +1409,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 										  [aDataSet unitSize],
 										  [aDataSet mask],
 										  [aDataSet specialBitMask],
+										  [aDataSet dataOffset],
 										  [aDataSet numberBins],
 										  convertedData];
 					[sqlConnection queryString:theQuery];
