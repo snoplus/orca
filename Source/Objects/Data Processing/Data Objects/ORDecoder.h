@@ -51,5 +51,6 @@
 - (void) loadHeader:(unsigned long*)p;
 - (id) headerObject:(NSString*) firstKey,...;
 - (BOOL) needToSwap;
+- (void) setNeedToSwap:(BOOL)aNeedToSwap;
 
 @end

@@ -591,6 +591,7 @@ NSString* ORHeaderExplorerProgressChanged		= @"ORHeaderExplorerProgressChanged";
 				postNotificationName:ORHeaderExplorerProcessing
                               object: self];
 		amountDoneSoFar = 0;
+		totalToBeProcessed = 0;
 		for(id aPath in filesToProcess){
 			if([[NSFileManager defaultManager] fileExistsAtPath:aPath]){
 				NSDictionary *fattrs = [[NSFileManager defaultManager] attributesOfItemAtPath:aPath error:nil];

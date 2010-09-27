@@ -41,7 +41,11 @@
 
 + (id) decoderWithFile:(NSFileHandle*)fp
 {
-	return [[[ORDecoder alloc] initWithHeader:[ORDecoder readHeader:fp]] autorelease];
+	ORDecoder* aWorker =  [[[ORDecoder alloc] init] autorelease];
+	[aWorker readHeader:fp];
+	ORDecoder* aDecoder = [[[ORDecoder alloc] initWithHeader:[aWorker fileHeader]] autorelease];
+	[aDecoder setNeedToSwap:[aWorker needToSwap]];
+	return aDecoder;
 }
 
 - (id) initWithHeader:(NSMutableDictionary*)aHeader
@@ -62,6 +66,11 @@
 	return needToSwap;
 }
 
+- (void) setNeedToSwap:(BOOL)aNeedToSwap
+{
+	needToSwap = aNeedToSwap;
+}
+	 
 - (NSMutableDictionary*) readHeader:(NSFileHandle*)fp
 {
 	if(fp && [self legalDataFile:fp]){

@@ -49,6 +49,7 @@
 	[aDecoder retain];
 	[currentDecoder release];
 	currentDecoder = aDecoder;
+	needToSwap = [currentDecoder needToSwap];
 }
 
 - (void) setFilePath:(NSString*)aPath

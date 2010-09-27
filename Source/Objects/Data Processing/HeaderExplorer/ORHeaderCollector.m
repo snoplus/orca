@@ -66,15 +66,15 @@
 				if([delegate cancelAndStop]) break;
 			}
 			if([dataToProcess length]!=0){
+				if([delegate respondsToSelector:@selector(updateProgress:)]){
+					[delegate performSelectorOnMainThread:@selector(updateProgress:)
+								   withObject:[NSNumber numberWithDouble:[dataToProcess length]]
+								waitUntilDone:NO];
+				}
 				[self processData];
 				NSData* newData = [fh readDataOfLength:kAmountToRead];
 				if([newData length] == 0) break;
 				[dataToProcess appendData:newData];
-				if([delegate respondsToSelector:@selector(updateProgress:)]){
-					[delegate performSelectorOnMainThread:@selector(updateProgress:)
-											   withObject:[NSNumber numberWithDouble:[newData length]]
-											waitUntilDone:NO];
-				}
 			}
 			else break;
 		}		
@@ -84,7 +84,7 @@
 
 - (void) processData
 {
-	unsigned long* p			= (unsigned long*)[dataToProcess bytes];
+	unsigned long* p		= (unsigned long*)[dataToProcess bytes];
 	unsigned long* endPtr		= p + [dataToProcess length]/sizeof(long);
 	unsigned long bytesProcessed	= 0;
 	while(p<endPtr){
@@ -94,15 +94,17 @@
 		unsigned long recordLength	= ExtractLength(firstWord);
 		if(p+recordLength <= endPtr){
 			if(dataId == 0x0){
-				[currentDecoder loadHeader:p];
+				//[currentDecoder loadHeader:p];
 				runDataID = [[currentDecoder headerObject:@"dataDescription",@"ORRunModel",@"Run",@"dataId",nil] longValue];
 			}
 			else if(dataId == runDataID){
 				[self processRunRecord:p];
 			}
+			/*
 			if(needToSwap){
 				[currentDecoder byteSwapData:p forKey:[NSNumber numberWithLong:dataId]];
 			}
+			*/
 			p += recordLength;
 			bytesProcessed += recordLength*sizeof(long);
 			if(p>=endPtr)break;
@@ -115,7 +117,8 @@
 - (void) processRunRecord:(unsigned long*)p
 {
 	if(needToSwap){
-		NSNumber* aKey = [NSNumber numberWithInt:ExtractLength(CFSwapInt32(p[0]))];
+		//NSNumber* aKey = [NSNumber numberWithInt:ExtractLength(CFSwapInt32(p[0]))];
+		NSNumber* aKey = [NSNumber numberWithUnsignedLong:runDataID];
 		[currentDecoder byteSwapOneRecord:p forKey:aKey];
 	}
 	if((p[1] & 0x8)){
