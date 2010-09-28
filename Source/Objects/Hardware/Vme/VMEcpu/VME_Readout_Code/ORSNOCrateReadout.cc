@@ -37,7 +37,7 @@ bool ORSNOCrateReadout::Readout(SBC_LAM_Data* lamData)
 		LogBusError("BusError: mem_access at: 0x%08x", data_avail_reg);
 		return true; 
 	}
-	data_avail = data_avail & 0xffffUL ^ 0xffffUL;
+	data_avail = (data_avail & 0xffffUL) ^ 0xffffUL;
 		
 	if (data_avail != 0) {
 		//loop over the slots
