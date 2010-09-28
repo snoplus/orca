@@ -506,6 +506,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 {  
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
     [self clearScalers];
+	scheduledForUpdate = NO;
 	isRunning = NO;
 }
 
