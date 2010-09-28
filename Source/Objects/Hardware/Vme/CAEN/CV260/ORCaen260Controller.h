@@ -45,6 +45,7 @@
 - (void) autoInhibitChanged:(NSNotification*)aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
+- (void) allScalerValuesChanged:(NSNotification*)aNote;
 - (void) scalerValueChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) pollingStateChanged:(NSNotification*)aNote;

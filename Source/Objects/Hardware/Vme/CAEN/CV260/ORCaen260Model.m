@@ -24,7 +24,8 @@
 
 #import "ORVmeCrateModel.h"
 #import "ORDataTypeAssigner.h"
-#include "VME_HW_Definitions.h"
+#import "VME_HW_Definitions.h"
+#import "NSNotifications+Extensions.h"
 
 #pragma mark •••Static Declarations
 static RegisterNamesStruct reg[kNumberOfV260Registers] = {
@@ -62,11 +63,12 @@ static RegisterNamesStruct reg[kNumberOfV260Registers] = {
 
 
 #pragma mark •••Notification Strings
-NSString* ORCaen260ModelAutoInhibitChanged = @"ORCaen260ModelAutoInhibitChanged";
+NSString* ORCaen260ModelAutoInhibitChanged	 = @"ORCaen260ModelAutoInhibitChanged";
 NSString* ORCaen260ModelEnabledMaskChanged	 = @"ORCaen260ModelEnabledMaskChanged";
 NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged";
 NSString* ORCaen260ModelPollingStateChanged	 = @"ORCaen260ModelPollingStateChanged";
 NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged";
+NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesChanged";
 
 @interface ORCaen260Model (private)
 - (void) _setUpPolling:(BOOL)verbose;
@@ -74,6 +76,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 - (void) _startPolling;
 - (void) _pollAllChannels;
 - (void) _shipValues;
+- (void) _postAllScalersUpdateOnMainThread;
 @end
 
 @implementation ORCaen260Model
@@ -85,16 +88,16 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     [[self undoManager] disableUndoRegistration];
 	
     [[self undoManager] enableUndoRegistration];
-    
     [self setAddressModifier:0x39];
+	scheduledForUpdate = NO;
 	
     return self;
 }
 
 - (void) dealloc
 {    
-	[self _stopPolling];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
@@ -192,11 +195,27 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 	if(index<0)return;
 	else if(index>kNumCaen260Channels)return;
 	scalerValue[index] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelScalerValueChanged 
-														object:self
-													  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
-	
+	if([NSThread isMainThread]){
+		//we must be polling, so we can just post from this thread
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelScalerValueChanged 
+															object:self
+														  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
+	}
+	else {
+		if(!scheduledForUpdate){
+			scheduledForUpdate = YES;
+			[self performSelector:@selector(_postAllScalersUpdateOnMainThread) withObject:nil afterDelay:1];
+		}
+	}
 }
+
+- (void) _postAllScalersUpdateOnMainThread
+{
+	//update all channels
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCaen260ModelAllScalerValuesChanged object:self];
+	scheduledForUpdate = NO;
+}
+
 - (BOOL) shipRecords
 {
     return shipRecords;
@@ -535,6 +554,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
     [self setAddressModifier:0x39];
+	scheduledForUpdate = NO;
 	
     return self;
 }

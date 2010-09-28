@@ -81,6 +81,11 @@
                      selector : @selector(autoInhibitChanged:)
                          name : ORCaen260ModelAutoInhibitChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(allScalerValuesChanged:)
+                         name : ORCaen260ModelAllScalerValuesChanged
+						object: model];	
 
 }
 
@@ -172,6 +177,11 @@
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"Caen260 Card (Slot %d)",[model slot]]];
+}
+
+- (void) allScalerValuesChanged:(NSNotification*)aNotification
+{
+	[self scalerValueChanged:nil];
 }
 
 - (void) scalerValueChanged:(NSNotification*)aNotification
