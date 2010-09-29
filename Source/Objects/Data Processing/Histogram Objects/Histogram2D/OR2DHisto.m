@@ -339,6 +339,14 @@
     
 }
 
+- (NSData*) rawData
+{
+	NSData* theRawData;
+	[dataSetLock lock];
+	theRawData =  [NSData dataWithBytes:histogram length:sizeof(long)*numberBinsPerSide*numberBinsPerSide];
+	[dataSetLock unlock];
+	return theRawData;
+}
 
 #pragma  mark ¥¥¥Actions
 - (void) makeMainController

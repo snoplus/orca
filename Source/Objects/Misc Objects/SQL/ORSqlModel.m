@@ -22,6 +22,7 @@
 #import "ORSqlModel.h"
 #import "ORRunModel.h"
 #import "OR1DHisto.h"
+#import "OR2DHisto.h"
 #import "ORMaskedWaveform.h"
 #import "ORSqlConnection.h"
 #import "ORSqlResult.h"
@@ -63,6 +64,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) createProcessTableInDataBase:(NSString*)aDataBase;
 - (void) createExperimentTableInDataBase:(NSString*)aDataBase;
 - (void) createHistogram1DTableInDataBase:(NSString*)aDataBase;
+- (void) createHistogram2DTableInDataBase:(NSString*)aDataBase;
 - (void) createRunsTableInDataBase:(NSString*)aDataBase;
 - (void) createSegmentMapTableInDataBase:(NSString*)aDataBase;
 - (void) createWaveformsTableInDataBase:(NSString*)aDataBase;
@@ -343,6 +345,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	@try{ [self createProcessTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
 	@try{ [self createExperimentTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
 	@try{ [self createHistogram1DTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
+	@try{ [self createHistogram2DTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
 	@try{ [self createSegmentMapTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
 	@try{ [self createWaveformsTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
 }
@@ -687,6 +690,44 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 
+- (void) createHistogram2DTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE Histogram2Ds (";
+					s = [s stringByAppendingString:@"dataset_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"name varchar(64) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"counts int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"monitor_id int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"type int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"length int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"binsperside int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"minX int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"minY int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"maxX int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"maxY int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"data mediumblob,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (dataset_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					
+					[aConnection queryString:s];
+					NSLog(@"Created Table Histogram2Ds in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+
 /*
  +------------+-------------+------+-----+---------+----------------+
  | Field      | Type        | Null | Key | Default | Extra          |
@@ -972,6 +1013,25 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
  | length     | int(11)     | YES  |     | NULL    |                |
  | data       | mediumblob  | YES  |     | NULL    |                |
  +------------+-------------+------+-----+---------+----------------+
+ 
+Table: Histogram2Ds
+ +-------------+-------------+------+-----+---------+----------------+
+ | Field       | Type        | Null | Key | Default | Extra          |
+ +-------------+-------------+------+-----+---------+----------------+
+ | dataset_id  | int(11)     | NO   | PRI | NULL    | auto_increment |
+ | name        | varchar(64) | YES  |     | NULL    |                |
+ | counts      | int(11)     | YES  |     | NULL    |                |
+ | machine_id  | int(11)     | NO   | MUL | NULL    |                |
+ | monitor_id  | int(11)     | YES  |     | NULL    |                |
+ | type        | int(11)     | YES  |     | NULL    |                |
+ | length      | int(11)     | YES  |     | NULL    |                |
+ | binsperside | int(11)     | YES  |     | NULL    |                |
+ | minX        | int(11)     | YES  |     | NULL    |                |
+ | minY        | int(11)     | YES  |     | NULL    |                |
+ | maxX        | int(11)     | YES  |     | NULL    |                |
+ | maxY        | int(11)     | YES  |     | NULL    |                |
+ | data        | mediumblob  | YES  |     | NULL    |                |
+ +-------------+-------------+------+-----+---------+----------------+
  
  type field is a double check that the data is the right type for the table:
  0 undefined
@@ -1365,6 +1425,48 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 										  [sqlConnection quoteObject:[aDataSet fullName]],
 										  [aDataSet totalCounts],
 										  start,end,
+										  [aDataSet numberBins],
+										  convertedData];
+					[sqlConnection queryString:theQuery];
+				}
+			}
+		}
+		//do 2D Histograms
+		for(id aMonitor in dataMonitors){
+			NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR2DHisto class]];
+			for(id aDataSet in objs1d){
+				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram2Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
+																	   [sqlConnection quoteObject:machine_id],
+																	   [sqlConnection quoteObject:[aDataSet fullName]],
+																	   [aMonitor uniqueIdNumber]]];
+				id dataSetEntry			  = [theResult fetchRowAsDictionary];
+				id dataset_id			  = [dataSetEntry objectForKey:@"dataset_id"];
+				unsigned long lastCounts  = [[dataSetEntry objectForKey:@"counts"] longValue];
+				unsigned long countsNow   = [aDataSet totalCounts];
+				unsigned long binsPerSide = [aDataSet numberBinsPerSide];
+				unsigned short minX,maxX,minY,maxY;
+				[aDataSet getXMin:&minX xMax:&maxX yMin:&minY yMax:&maxY];
+				if(dataset_id) {
+					if(lastCounts != countsNow){
+						NSData* theData = [aDataSet rawData];
+						NSString* convertedData = [sqlConnection quoteObject:theData];
+						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram2Ds SET counts=%d,data=%@ WHERE dataset_id=%@",
+											  [aDataSet totalCounts],
+											  convertedData,
+											  [sqlConnection quoteObject:dataset_id]];
+						[sqlConnection queryString:theQuery];
+					}
+				}
+				else {
+					NSData* theData = [aDataSet rawData];
+					NSString* convertedData = [sqlConnection quoteObject:theData];
+					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram2Ds (monitor_id,machine_id,name,counts,type,binsperside,minX,maxX,minY,maxY,length,data) VALUES (%d,%@,%@,%d,2,%d,%d,%d,%d,%d,%d,%@)",
+										  [aMonitor uniqueIdNumber],
+										  [sqlConnection quoteObject:machine_id],
+										  [sqlConnection quoteObject:[aDataSet fullName]],
+										  [aDataSet totalCounts],
+										  binsPerSide,
+										  minX,maxX,minY,maxY,
 										  [aDataSet numberBins],
 										  convertedData];
 					[sqlConnection queryString:theQuery];
