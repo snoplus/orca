@@ -25,7 +25,6 @@
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSButton*      openPortButton;
 	IBOutlet NSTextField*	pollingErrorTextField;
-	IBOutlet NSTextField*	statusWordTextField;
 	IBOutlet NSButton*		settingLockButton;
 	IBOutlet NSTextField*	settingLockDocField;
 	IBOutlet NSTextField*	setVoltageAField;
@@ -58,10 +57,8 @@
 	IBOutlet NSTextField*	hvPowerBField;
 	IBOutlet NSTextField*	killSwitchAField;
 	IBOutlet NSTextField*	killSwitchBField;
-	IBOutlet NSTextField*	currentTripAField;
-	IBOutlet NSTextField*	currentTripBField;
-	IBOutlet NSTextField*	extInhibitAField;
-	IBOutlet NSTextField*	extInhibitBField;
+	IBOutlet NSTextField*	statusAField;
+	IBOutlet NSTextField*	statusBField;
 	IBOutlet NSProgressIndicator*	pollingProgress;
 	IBOutlet ORTimedTextField*	timeoutField;
 }

@@ -424,13 +424,6 @@ return NO; /////////ToDo
 	return !(statusReg1Chan[aChannel] & kHVControl);
 }
 
-- (BOOL) extInhibitActive:(unsigned short)aChannel
-{
-	//if(aChannel>=kNumNHQ226LChannels)return NO;
-	//return (statusReg2Chan[aChannel] & kInibitActive);
-return NO; /////////ToDo
-}
-
 
 #pragma mark •••Header Stuff
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -832,6 +825,20 @@ return NO; /////////ToDo
     }
 	
 }
+- (NSString*) status2String:(unsigned short)aChan
+{
+    switch(statusReg2Chan[aChan]){
+        case kHVIsOn:       return @"ON";
+        case kHVIsOff:      return @"OFF";
+        case kLowToHigh:    return @"Going Low To High";
+        case kHighToLow:    return @"Going High To Low";
+        case kManual:       return @"Manual";
+        case kErr:          return @"V or I Exceeded";
+        case kInh:          return @"Inhibit Was Active";
+        case kTrip:         return @"I Trip Was Active";
+        default:            return @"--";
+    }
+}
 
 - (void) decodeStatus:(NSString*)s channel:(int)aChan
 {
@@ -847,7 +854,18 @@ return NO; /////////ToDo
     else if([s hasPrefix:@"H2L"]){
         [self setStatusReg2Chan:aChan withValue:kHighToLow];
     }
-
+    else if([s hasPrefix:@"MAN"]){
+        [self setStatusReg2Chan:aChan withValue:kManual];
+    }
+    else if([s hasPrefix:@"ERR"]){
+        [self setStatusReg2Chan:aChan withValue:kErr];
+    }
+    else if([s hasPrefix:@"INH"]){
+        [self setStatusReg2Chan:aChan withValue:kInh];
+    }
+    else if([s hasPrefix:@"TRP"]){
+        [self setStatusReg2Chan:aChan withValue:kTrip];
+    }
 }
 
 @end

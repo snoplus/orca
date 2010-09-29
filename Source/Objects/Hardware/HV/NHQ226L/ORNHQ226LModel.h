@@ -43,20 +43,24 @@ enum {
 #define kNumNHQ226LChannels 2
 
 //status 1 word bits
-#define kError		0x80
-#define kStatV		0x40
-#define kTrendV		0x20
+#define kQuality 	0x80
+#define kError		0x40
+#define kInhibit	0x20
 #define kKillSwitch 0x10
 #define kHVSwitch	0x08
 #define kHVPolarity	0x04
 #define kHVControl	0x02
-#define kVZOut		0x01
+#define kDailed		0x01
 
 //status 2 word values
-#define kHVIsOn       0x1
-#define kHVIsOff      0x2
+#define kHVIsOn     0x1
+#define kHVIsOff    0x2
 #define kLowToHigh  0x3
 #define kHighToLow  0x4
+#define kManual     0x5
+#define kErr        0x6
+#define kInh        0x7
+#define kTrip       0x8
 
 typedef enum eNHQ226LRampingState {
 	kHVOff,     
@@ -115,7 +119,7 @@ typedef enum eNHQ226LRampingState {
 - (void)  setMaxCurrent:(unsigned short) aChan withValue:(float) aValue;
 - (float) maxVoltage:(unsigned short) aChan;
 - (void)  setMaxVoltage:(unsigned short) aChan withValue:(float) aValue;
-
+- (NSString*) status2String:(unsigned short)aChan;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 
@@ -163,7 +167,6 @@ typedef enum eNHQ226LRampingState {
 - (void) panicToZero:(unsigned short)aChannel;
 - (BOOL) killSwitch:(unsigned short)aChannel;
 - (BOOL) currentTripped:(unsigned short)aChannel;
-- (BOOL) extInhibitActive:(unsigned short)aChannel;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

@@ -283,22 +283,8 @@
 - (void) statusReg2Changed:(NSNotification*)aNote
 {
 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-	//update the Current Trip Field
-	NSTextField* theTextField = (chan==0?currentTripAField:currentTripBField);
-	if([model currentTripped:chan]){
-		[theTextField setTextColor:[NSColor redColor]];
-		[theTextField setStringValue:@"Current Trip"];
-		NSLogColor([NSColor redColor], @"%@: Current Tripped on channel %d\n",[model fullID],chan );
-	}
-	else {
-		[theTextField setTextColor:[NSColor blackColor]];
-		[theTextField setStringValue:@"Max Current:"];
-	}
-
-	//update the Ext Inhibit Field
-	theTextField = (chan==0?extInhibitAField:extInhibitBField);
-	if([model extInhibitActive:chan])[theTextField setStringValue:@"Active"];
-	else [theTextField setStringValue:@"No"];
+	NSTextField* theTextField = (chan==0?statusAField:statusBField);
+    [theTextField setStringValue:[model status2String:chan]];
 }
 
 - (void) setModel:(id)aModel
@@ -449,34 +435,22 @@
 		
 		unsigned short status1A = [model statusReg1Chan:0];
 		unsigned short status1B = [model statusReg1Chan:1];
-		
-		unsigned short status2A = [model statusReg2Chan:0];
-		unsigned short status2B = [model statusReg2Chan:1];
-		
+				
 		NSFont* f = [NSFont fontWithName:@"Monaco" size:12];
 		NSLogFont(f,@"-------------------------------\n");
-		NSLogFont(f,@"Channel           A\t  B\n");
+		NSLogFont(f,@"Channel           A\t     B\n");
 		NSLogFont(f,@"-------------------------------\n");
-		NSLogFont(f,@"Status1 word  : 0x%02x\t    0x%02x\n",status2A,status2B);
-		NSLogFont(f,@"Status2 word  : 0x%02x\t    0x%02x\n",status2A,status2B);
+		NSLogFont(f,@"Status         : %@\t    %@\n",[model status2String:0],[model status2String:1]);
 		NSLogFont(f,@"-------------------------------\n");
 		
-		NSLogFont(f,@"Status        : %@\t%@\n", (status1A & kError)		  ? @"Err     ":@"OK      ",(status1B & kError)			? @"Err     ":@"OK      ");
-		NSLogFont(f,@"Voltage Status: %@\t%@\n", (status1A & kStatV)		  ? @"Changing":@"Stable  ",(status1B & kStatV)			? @"Changing":@"Stable  ");
-		NSLogFont(f,@"Ramping       : %@\t%@\n", [model rampStateString:0],[model rampStateString:1]);
-		NSLogFont(f,@"Kill Switch   : %@\t%@\n", (status1A & kKillSwitch)	  ? @"Enabled ":@"Disabled",(status1B & kKillSwitch)	? @"Enabled ":@"Disabled");
-		NSLogFont(f,@"HV Switch     : %@\t%@\n", (status1A & kHVSwitch)		  ? @"Off     ":@"On      ",(status1B & kHVSwitch)		? @"Off     ":@"On      ");
-		NSLogFont(f,@"HV Polarity   : %@\t%@\n", (status1A & kHVPolarity)	  ? @"Positive":@"Negative",(status1B & kHVPolarity)	? @"Positive":@"Negative");
-		NSLogFont(f,@"Control       : %@\t%@\n", (status1A & kHVControl)	  ? @"Manual  ":@"DAC     ",(status1B & kHVControl)		? @"Manual  ":@"DAC     ");
-		NSLogFont(f,@"V Out         : %@\t%@\n", (status1A & kVZOut)		  ? @"Vout==0 ":@"Vout!=0 ",(status1B & kVZOut)			? @"Vout==0 ":@"Vout!=0 ");
+		NSLogFont(f,@"Quality Given  : %@\t%@\n", (status1A & kQuality)		  ? @"YES     ":@"NO      ", (status1B & kError)			? @"Err     ":@"OK      ");
+		NSLogFont(f,@"V or I exceeded: %@\t%@\n", (status1A & kError)		  ? @"YES     ":@"NO      ", (status1B & kError)			? @"Err     ":@"OK      ");
+		NSLogFont(f,@"Inh was active : %@\t%@\n", (status1A & kInhibit)       ? @"YES     ":@"NO      ", (status1B & kKillSwitch)	? @"Enabled ":@"Disabled");
+		NSLogFont(f,@"Kill Switch    : %@\t%@\n", (status1A & kKillSwitch)	  ? @"Enabled ":@"Disabled", (status1B & kKillSwitch)	? @"Enabled ":@"Disabled");
+		NSLogFont(f,@"HV Switch      : %@\t%@\n", (status1A & kHVSwitch)      ? @"Off     ":@"On      ", (status1B & kHVSwitch)		? @"Off     ":@"On      ");
+		NSLogFont(f,@"HV Polarity    : %@\t%@\n", (status1A & kHVPolarity)	  ? @"Positive":@"Negative", (status1B & kHVPolarity)	? @"Positive":@"Negative");
+		NSLogFont(f,@"Control        : %@\t%@\n", (status1A & kHVControl)	  ? @"Manual  ":@"DAC     ", (status1B & kHVControl)		? @"Manual  ":@"DAC     ");
 
-		///NSLogFont(f,@"Current Trip  : %@\t%@\n", (status2A & kCurrentTripBit) ? @"YES     ":@"NO     ",(status2B & kCurrentTripBit) ? @"YES     ":@"NO      ");
-		//NSLogFont(f,@"Ramping       : %@\t%@\n", (status2A & kRunningRamp)    ? @"YES     ":@"NO     ",(status2B & kRunningRamp)    ? @"YES     ":@"NO      ");
-		//NSLogFont(f,@"Switch Changed: %@\t%@\n", (status2A & kSwitchChanged)  ? @"YES     ":@"NO     ",(status2B & kSwitchChanged)  ? @"YES     ":@"NO      ");
-		//NSLogFont(f,@"Voltage > Max : %@\t%@\n", (status2A & kVMaxExceeded)   ? @"YES     ":@"NO     ",(status2B & kVMaxExceeded)   ? @"YES     ":@"NO      ");
-		//NSLogFont(f,@"Inibit Active : %@\t%@\n", (status2A & kInibitActive)   ? @"YES     ":@"NO     ",(status2B & kInibitActive)   ? @"YES     ":@"NO      ");
-		//NSLogFont(f,@"Current > Max : %@\t%@\n", (status2A & kCurrentExceeded)? @"YES     ":@"NO     ",(status2B & kCurrentExceeded)? @"YES     ":@"NO      ");
-		//NSLogFont(f,@"Output Quality: %@\t%@\n", (status2A & kQualityNotGiven)? @"NO      ":@"YES    ",(status2B & kQualityNotGiven)? @"YES     ":@"NO      ");
 		NSLogFont(f,@"-------------------------------\n");
 	}
 	@catch(NSException* localException) {
