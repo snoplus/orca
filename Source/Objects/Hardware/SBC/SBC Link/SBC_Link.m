@@ -1510,7 +1510,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		
 		unsigned long* rp = (unsigned long*)aPacket.payload;
 		long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
-		if(numLongs){
+		if(numLongs>0){
 			[aDataPacket addLongsToFrameBuffer:rp length:numLongs];
 		}
 	}

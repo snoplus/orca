@@ -250,17 +250,20 @@
 - (unsigned long) addLongsToFrameBuffer:(unsigned long*)someData length:(unsigned long)length
 {
 	[theDataLock lock];   //-----begin critical section
-    if(!frameBuffer){
-		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
+	if(someData!=0){
+		if(!frameBuffer){
+			[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
+		}
+		if((frameIndex+length)*sizeof(long)>=[frameBuffer length]){
+			[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinSize];
+			lastFrameBufferSize = [frameBuffer length];
+		}
+		if(frameBuffer){
+			memcpy(((unsigned long*)[frameBuffer bytes])+frameIndex,someData,length*sizeof(long));
+			frameIndex += length;
+			addedData = YES;
+		}
 	}
-	if((frameIndex+length)*sizeof(long)>=[frameBuffer length]){
-		[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinSize];
-        lastFrameBufferSize = [frameBuffer length];
-	}
-    memcpy(((unsigned long*)[frameBuffer bytes])+frameIndex,someData,length*sizeof(long));
-	
-	frameIndex += length;
-    addedData = YES;
 	[theDataLock unlock];   //-----end critical section
 	return  frameIndex;
 }
@@ -325,8 +328,8 @@
 
 - (void) addFrameBuffer:(BOOL)forceAdd
 {
+	[theDataLock lock];   //-----begin critical section
 	if(frameBuffer && (forceAdd || (oldFrameCounter!=frameCounter) || dataAvailable || dataInCache)){
-		[theDataLock lock];   //-----begin critical section
 		oldFrameCounter = frameCounter;
 		[frameBuffer setLength:(frameIndex*sizeof(long))];
 		
@@ -339,8 +342,8 @@
 		[frameBuffer release];
         frameBuffer = nil;
 		frameIndex = 0;
-		[theDataLock unlock];   //-----end critical section
 	}
+	[theDataLock unlock];   //-----end critical section
 	reserveIndex = 0;
 }
 
