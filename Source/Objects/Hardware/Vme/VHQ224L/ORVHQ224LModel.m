@@ -87,6 +87,19 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
     [super dealloc];
 }
 
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super sleep];
+}
+
+- (void) wakeUp
+{
+	[super wakeUp];
+	if(pollTime){
+		[self pollHardware];
+	}
+}
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"VHQ224L"]];	
