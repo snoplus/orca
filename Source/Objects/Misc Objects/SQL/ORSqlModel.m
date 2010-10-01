@@ -1324,6 +1324,7 @@ Table: Histogram2Ds
 	
 }
 @end
+
 @implementation ORPostRunOptions
 - (void) dealloc
 {
@@ -1363,13 +1364,11 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
-	
 }
 @end
 
 
 @implementation ORPostDataOp
-
 - (void) dealloc
 {
 	[dataMonitors release];
@@ -1479,7 +1478,7 @@ Table: Histogram2Ds
 			NSArray* objsWaveform = [aMonitor  collectObjectsOfClass:[ORWaveform class]];
 			for(id aDataSet in objsWaveform){
 				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Waveforms where (machine_id=%@ and name=%@ and monitor_id=%d)",
-																	   machine_id,
+																	   [sqlConnection quoteObject:machine_id],
 																	   [sqlConnection quoteObject:[aDataSet fullName]],
 																	   [aMonitor uniqueIdNumber]]];
 				id dataSetEntry			 = [theResult fetchRowAsDictionary];
@@ -1522,9 +1521,7 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
-
 }
-
 @end
 
 @implementation ORPostExperimentOp
@@ -1582,9 +1579,7 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
-	
 }
-
 @end
 
 @implementation ORPostAlarmOp
@@ -1642,9 +1637,7 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
-	
 }
-
 @end
 
 @implementation ORPostSegmentMapOp
@@ -1652,10 +1645,12 @@ Table: Histogram2Ds
 {
 	[super dealloc];
 }
+
 - (void) setDataMonitorId:(int)anID
 {
 	monitor_id = anID;
 }
+
 - (void) main
 {
 	ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
@@ -1688,8 +1683,6 @@ Table: Histogram2Ds
 											[sqlConnection quoteObject:chanName]]];
 				segmentNumber++;
 			}
-			
-			
 		}		
 	}
 	@catch(NSException* e){
@@ -1698,13 +1691,10 @@ Table: Histogram2Ds
 	@finally {
 		[experiment release];
 	}
-	
 }
-
 @end
 
 @implementation ORProcessDataOp
-
 - (void) dealloc
 {
 	[processes release];
@@ -1734,39 +1724,42 @@ Table: Histogram2Ds
 
 		//do 1D Histograms first
 		for(id aProcess in processes){
-			ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT process_id from Processes where (machine_id=%@ and name=%@)",
-																   machine_id,
-																   [sqlConnection quoteObject:[aProcess fullID]]
-																   ]];
-			id anEntry			= [theResult fetchRowAsDictionary];
-			id process_id		= [anEntry objectForKey:@"process_id"];
-			if(process_id) {
-				//already exists... just update
-				NSString* theQuery = [NSString stringWithFormat:@"UPDATE Processes SET name=%@,title=%@,timeStamp=%@,data=%@,state=%d WHERE process_id=%@",
-									  [sqlConnection quoteObject:[aProcess fullID]],
-									  [sqlConnection quoteObject:[aProcess shortName]],
-									  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-									  [sqlConnection quoteObject:[aProcess description]],
-									  [aProcess processRunning],
-									  [sqlConnection quoteObject:process_id]];
-				[sqlConnection queryString:theQuery];
-			}
-			else {
-				//have to add a new entry
-				NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Processes (machine_id,name,title,timeStamp,data,state) VALUES (%@,%@,%@,%@,%@,%d)",
-									  [sqlConnection quoteObject:machine_id],
-									  [sqlConnection quoteObject:[aProcess fullID]],
-									  [sqlConnection quoteObject:[aProcess shortName]],
-									  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-									  [sqlConnection quoteObject:[aProcess description]],
-									  [aProcess processRunning]];
-				[sqlConnection queryString:theQuery];
-			}
-			for(id anEntry in allEntries){
-				NSString* aName = [anEntry objectForKey:@"name"];
-				if([aName isEqualToString:[aProcess fullID]]){
-					[allEntries removeObject:anEntry];
-					break;
+			@synchronized(aProcess){
+
+				ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT process_id from Processes where (machine_id=%@ and name=%@)",
+																	   machine_id,
+																	   [sqlConnection quoteObject:[aProcess fullID]]
+																	   ]];
+				id anEntry			= [theResult fetchRowAsDictionary];
+				id process_id		= [anEntry objectForKey:@"process_id"];
+				if(process_id) {
+					//already exists... just update
+					NSString* theQuery = [NSString stringWithFormat:@"UPDATE Processes SET name=%@,title=%@,timeStamp=%@,data=%@,state=%d WHERE process_id=%@",
+										  [sqlConnection quoteObject:[aProcess fullID]],
+										  [sqlConnection quoteObject:[aProcess shortName]],
+										  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+										  [sqlConnection quoteObject:[aProcess description]],
+										  [aProcess processRunning],
+										  [sqlConnection quoteObject:process_id]];
+					[sqlConnection queryString:theQuery];
+				}
+				else {
+					//have to add a new entry
+					NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Processes (machine_id,name,title,timeStamp,data,state) VALUES (%@,%@,%@,%@,%@,%d)",
+										  [sqlConnection quoteObject:machine_id],
+										  [sqlConnection quoteObject:[aProcess fullID]],
+										  [sqlConnection quoteObject:[aProcess shortName]],
+										  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+										  [sqlConnection quoteObject:[aProcess description]],
+										  [aProcess processRunning]];
+					[sqlConnection queryString:theQuery];
+				}
+				for(id anEntry in allEntries){
+					NSString* aName = [anEntry objectForKey:@"name"];
+					if([aName isEqualToString:[aProcess fullID]]){
+						[allEntries removeObject:anEntry];
+						break;
+					}
 				}
 			}
 		}
@@ -1781,9 +1774,7 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
-	
 }
-
 @end
 
 
