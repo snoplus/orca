@@ -498,23 +498,26 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (id) description
 {
-	NSString* theName;
-	if([[self shortName] length])theName = [self shortName];
-	else theName = [NSString stringWithFormat:@"%d",[self uniqueIdNumber]];
-	NSString* s =  [NSString stringWithFormat:@"\nProcess %@ ",theName];
-	if(processRunning){
-		s = [s stringByAppendingString:@"[Running]\n"];
-		s = [s stringByAppendingFormat:@"Sample Rate: %.1f\n",sampleRate];
-		for(id anObj in [self orcaObjects]){
-			if([anObj isKindOfClass:NSClassFromString(@"ORProcessHWAccessor")]){
-				s = [s stringByAppendingFormat:@"%@\n",anObj];
+	NSString* s = @"";
+	@synchronized(self){
+		NSString* theName;
+		if([[self shortName] length])theName = [self shortName];
+		else theName = [NSString stringWithFormat:@"%d",[self uniqueIdNumber]];
+		s =  [NSString stringWithFormat:@"\nProcess %@ ",theName];
+		if(processRunning){
+			s = [s stringByAppendingString:@"[Running]\n"];
+			s = [s stringByAppendingFormat:@"Sample Rate: %.1f\n",sampleRate];
+			for(id anObj in [self orcaObjects]){
+				if([anObj isKindOfClass:NSClassFromString(@"ORProcessHWAccessor")]){
+					s = [s stringByAppendingFormat:@"%@\n",anObj];
+				}
 			}
 		}
+		else {
+			s = [s stringByAppendingString:@"[NOT RUNNING]\n"];
+		}
+		s = [s stringByAppendingString:@"\n"];
 	}
-	else {
-		s = [s stringByAppendingString:@"[NOT RUNNING]\n"];
-	}
-	s = [s stringByAppendingString:@"\n"];
 	return s;
 }
 
