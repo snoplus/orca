@@ -36,7 +36,7 @@ NSString* XL3_LinkIPNumberChanged	= @"XL3_LinkIPNumberChanged";
 NSString* XL3_LinkConnectStateChanged	= @"XL3_LinkConnectStateChanged";
 NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 
-#define kCmdArrayHighWater 100
+#define kCmdArrayHighWater 1000
 #define kBundleBufferSize 10000*1440
 
 @implementation XL3_Link
@@ -587,6 +587,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	char aPacket[XL3_PACKET_SIZE];
 	BOOL coreLocker = NO;
 	BOOL cmdLocker = NO;
+	unsigned long bundle_count = 0;
 	
 	while(1) {
 		if (!workingSocket) {
@@ -618,11 +619,14 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				    (!needToSwap && ((XL3_Packet*) aPacket)->cmdHeader.cmdID == 0x00000100)) {
 					//PMT mega bundle
 					[bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:1440];
+					bundle_count++;
 				}
 				else {	//cmd response
 					if (needToSwap) {
 						((XL3_Packet*) aPacket)->cmdHeader.cmdID = swapLong(((XL3_Packet*) aPacket)->cmdHeader.cmdID);
 					}
+					
+					NSLog(@"XL3 Packet ID: %d, xl3 megabundle count: %d\n", ((XL3_Packet*) aPacket)->cmdHeader.cmdID, bundle_count);
 					
 					NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 									[NSNumber numberWithLong:((XL3_Packet*) aPacket)->cmdHeader.cmdID],	@"cmdID",
@@ -634,6 +638,9 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 					[cmdArray addObject:aDictionary];
 					[cmdArrayLock unlock];
 					cmdLocker = NO;
+					
+					NSLog(@"cmdArray includes %d cmd responses\n", [cmdArray count]);
+					
 					if ([cmdArray count] > kCmdArrayHighWater) {
 						//todo: post alarm
 						NSLog(@"Xl3 command array close to full for XL3 crate %@\n", [self crateName]);
@@ -776,6 +783,12 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 			numBytesToGet -= n;
 			aPacket += n;
 			if (numBytesToGet == 0) break;
+			//TODO!!! remove the following lines for deployment
+			NSLog(@"XL3 packet read incomplete??? numBytesToGet: %d n: %d\n", numBytesToGet, n);
+			aPacket[n] = '\0';
+			NSLog(@"Dumping the partial packet as a string: %s\n", aPacket);
+			numBytesToGet = 0;
+			break;
 		}
 		else if(n==0){
 			//[self disconnect];

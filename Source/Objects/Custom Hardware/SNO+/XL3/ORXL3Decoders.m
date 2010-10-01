@@ -53,7 +53,7 @@
 	
 	ptr += 2;
 	unsigned short i = 0;
-	NSMutableString* dsc = [[NSMutableString alloc] init];
+	NSMutableString* dsc = [NSMutableString string];
 	
 	for (i=0; i<120; i++) {
 		if (swapBundle) {
