@@ -1558,20 +1558,22 @@ Table: Histogram2Ds
 		
 			//if we have a run entry, update it. Otherwise create it.
 			if(experiment_id){
-				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE experiment SET thresholds=%@,gains=%@,rates=%@ WHERE machine_id=%@",
+				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE experiment SET thresholds=%@,gains=%@,totalCounts=%@,rates=%@ WHERE machine_id=%@",
 											[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
 											[sqlConnection quoteObject:[experiment gainDataForSet:0]],
+											[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
 											[sqlConnection quoteObject:[experiment rateDataForSet:0]],
 											[sqlConnection quoteObject:machine_id]]];
 			}
 			else  {
 				int numberSegments = [experiment maxNumSegments];
-				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO experiment (machine_id,experiment,numberSegments,thresholds,gains,rates) VALUES (%@,%@,%d,%@,%@,%@)",
+				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO experiment (machine_id,experiment,numberSegments,thresholds,gains,totalCounts,rates) VALUES (%@,%@,%d,%@,%@,%@,%@)",
 											[sqlConnection quoteObject:machine_id],
 											[sqlConnection quoteObject:experimentName],
 											numberSegments,
 											[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
 											[sqlConnection quoteObject:[experiment gainDataForSet:0]],
+											[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
 											[sqlConnection quoteObject:[experiment rateDataForSet:0]]]];
 			}
 		}
