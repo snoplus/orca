@@ -175,7 +175,11 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (NSString*) shortName
 {
-	return shortName;
+	NSString* s;
+	@synchronized(self){
+		s = [[shortName retain] autorelease];
+	}
+	return s;
 }
 - (void) setShortName:(NSString*)aComment
 {
@@ -493,7 +497,11 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (NSDate*)	lastSampleTime
 {
-	return lastSampleTime;
+	NSDate* d;
+	@synchronized(self){
+		d =  [[lastSampleTime retain] autorelease];
+	}
+	return d;
 }
 
 - (id) description
