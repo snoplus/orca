@@ -67,6 +67,7 @@
 - (void) objectsAdded:(NSNotification*)aNote;
 - (void) objectsRemoved:(NSNotification*)aNote;
 - (void) awakeAfterDocumentLoaded;
+- (void) stopAllAndNotify;
 
 #pragma mark ¥¥¥Accessors
 - (BOOL) emailEnabled;

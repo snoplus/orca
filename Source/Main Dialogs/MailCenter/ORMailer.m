@@ -133,7 +133,8 @@
 {
 	@synchronized([NSApp delegate]){
 		delegate = aDelegate;
-		[self performSelectorOnMainThread:@selector(sendMailEmail) withObject:nil waitUntilDone:NO];
+		if([NSThread isMainThread])	 [self sendMailEmail];
+		else						 [self performSelectorOnMainThread:@selector(sendMailEmail) withObject:nil waitUntilDone:NO];
 	}
 }
 

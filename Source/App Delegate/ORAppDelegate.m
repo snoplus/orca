@@ -295,7 +295,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	}
 	if(okToQuit){
 		[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
-		[[ORProcessCenter sharedProcessCenter] stopAll:nil];
+		[[ORProcessCenter sharedProcessCenter] stopAllAndNotify];
 		[ORTimer delay:1];
 		
 		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];    

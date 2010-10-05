@@ -326,6 +326,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessEmailOptionsChangedNotification object:self userInfo:nil]; 
 }
 
+
+
 - (void) sendHeartbeatShutOffWarning
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -391,6 +393,27 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 {
 	if(sendAtStart){
 		[self sendStartStopNotice:aProcess started:YES];
+	}
+}
+
+- (void) stopAllAndNotify
+{
+	[self stopAll:nil];
+	if(sendAtStop){
+		NSString* theContent = @"";
+		
+		theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+		theContent = [theContent stringByAppendingString:@"All processes stopped because ORCA was stopped\n"];
+		theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
+		theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
+		for(id address in eMailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
+		theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+		
+		for(id address in eMailList){
+			if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
+			NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",nil];
+			[self eMailThread:userInfo];
+		}
 	}
 }
 
