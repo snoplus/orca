@@ -2339,6 +2339,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[[self undoManager] disableUndoRegistration];
 	int i;
 	BOOL atLeastOne;
+	unsigned long maxThreshold = 0xfffff;
     @try {
 		switch(noiseFloorState){
 			case 0:
@@ -2346,15 +2347,15 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				for(i=0;i<kNumV4FLTChannels;i++){
 					oldEnabled[i]   = [self hitRateEnabled:i];
 					oldThreshold[i] = [self threshold:i];
-					[self setThreshold:i withValue:0x7fff];
-					newThreshold[i] = 0x7fff;
+					[self setThreshold:i withValue:maxThreshold];
+					newThreshold[i] = maxThreshold;
 				}
 				atLeastOne = NO;
 				for(i=0;i<kNumV4FLTChannels;i++){
 					if(oldEnabled[i]){
 						noiseFloorLow[i]			= 0;
-						noiseFloorHigh[i]		= 0x7FFF;
-						noiseFloorTestValue[i]	= 0x7FFF/2;              //Initial probe position
+						noiseFloorHigh[i]		= maxThreshold;
+						noiseFloorTestValue[i]	= maxThreshold/2;              //Initial probe position
 						[self setThreshold:i withValue:noiseFloorHigh[i]];
 						atLeastOne = YES;
 					}
@@ -2376,7 +2377,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 						}
 						else {
 							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset);
-							[self setThreshold:i withValue:0x7fff];
+							[self setThreshold:i withValue:maxThreshold];
 							hitRateEnabledMask &= ~(1L<<i);
 						}
 					}
@@ -2396,7 +2397,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 					if([self hitRateEnabled:i]){
 						if([self hitRate:i] > targetRate){
 							//the rate is too high, bump the threshold up
-							[self setThreshold:i withValue:0x7fff];
+							[self setThreshold:i withValue:maxThreshold];
 							noiseFloorLow[i] = noiseFloorTestValue[i] + 1;
 						}
 						else noiseFloorHigh[i] = noiseFloorTestValue[i] - 1;									//no data so continue lowering threshold
