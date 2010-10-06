@@ -398,8 +398,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (void) stopAllAndNotify
 {
+	int n = [self numberRunningProcesses];
 	[self stopAll:nil];
-	if(sendAtStop){
+	if(sendAtStop && n>0){
 		NSString* theContent = @"";
 		
 		theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
