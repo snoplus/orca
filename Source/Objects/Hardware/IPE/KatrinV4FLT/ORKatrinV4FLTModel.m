@@ -670,6 +670,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) enableAllTriggers:(BOOL)aState
 {
 	[self setTriggerEnabledMask:aState?0xffffff:0x0];
+	[self postAdcInfoProvidingValueChanged];
 }
 
 - (void) setHitRateTotal:(float)newTotalValue
