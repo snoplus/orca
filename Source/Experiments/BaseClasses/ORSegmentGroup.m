@@ -395,6 +395,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	int index = -1;
 	for(ORDetectorSegment* aSegment in segments){
 		[aSegment setHwPresent:NO];
+		[aSegment setParams:nil];
 	}
     while(aLine = [e nextObject]){
         aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
