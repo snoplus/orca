@@ -28,11 +28,14 @@
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //^^^^ ^---------------------------------- Geo
 //------^^^------------------------------- data type 0x2=header, 0x0=valid data,  0x4=end of block, 0x6=invalid
-//-------------^-^^^---------------------- channel
+//-------------^-^^----------------------- channel
+//-----------------^---------------------- range 0x1=low, 0x0=high
 //-----------------------^---------------- under flow
 //------------------------^--------------- over flow
 //-------------------------^^^^ ^^^^ ^^^^- qdc value
 //.... may be followed by more qdc words
+//the hw sequence to store the data is as follows:
+//ch0 high range, ch4 hi, ch0 lo, ch4 lo, ch1 hi, ch5 hi, ch1 lo, ..., ch3 lo, ch7 lo
 
 @interface ORCaen1785DecoderForAdc : ORVmeCardDecoder {
 }

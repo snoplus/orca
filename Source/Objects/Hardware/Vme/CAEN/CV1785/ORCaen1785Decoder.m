@@ -56,8 +56,10 @@
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
-			int channel  = ShiftAndExtract(ptr[i],16,0xf);
-			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
+			int channel  = ShiftAndExtract(ptr[i],18,0x7);
+			int range    = ShiftAndExtract(ptr[i],17,0x1);
+			restOfString = [restOfString stringByAppendingFormat:@"chn: %d, adc: %d, rng: %@\n",
+					channel,qdcValue,range?@"lo":@"hi"];
         }
     }
 
@@ -78,10 +80,11 @@
         NSLog(@"Data Buffer for %@ %@\n",crateKey,cardKey);        
         for( i = 2; i < length; i++ ){
             if( ShiftAndExtract(ptr[i],24,0x7) == 0x0){ //is valid data?
-                NSLogFont([NSFont fontWithName:@"Monaco" size:12],  @"Chan: %2d  (un:%d ov:%d) adc: 0x%x\n", 
-													ShiftAndExtract(ptr[i],17,0xf),
+                NSLogFont([NSFont fontWithName:@"Monaco" size:12],  @"Chan: %2d  (un:%d ov:%d range: %@) adc: 0x%x\n", 
+													ShiftAndExtract(ptr[i],18,0x7),
 													ShiftAndExtract(ptr[i],13,0x1),
 													ShiftAndExtract(ptr[i],12,0x1),
+													ShiftAndExtract(ptr[i],17,0x1)?@"lo":@"hi",
 													ShiftAndExtract(ptr[i],0,0xfff));
             }
         }
