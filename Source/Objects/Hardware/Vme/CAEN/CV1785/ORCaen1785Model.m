@@ -612,6 +612,13 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 				   nil];
 	
 	[anEventDictionary setObject:aDictionary forKey:@"Caen1785"];
+
+	NSMutableArray* eventGroup1 = [NSMutableArray array];
+	NSMutableDictionary* aNestedDictionary = [NSMutableDictionary dictionary];
+	[trigger1Group appendEventDictionary:aNestedDictionary topLevel:topLevel];
+	if([aNestedDictionary count])[eventGroup1 addObject:aNestedDictionary];
+	
+	[anEventDictionary setObject:eventGroup1 forKey:@"ORCaen1785 Trigger1"];
 }
 
 - (void) reset
