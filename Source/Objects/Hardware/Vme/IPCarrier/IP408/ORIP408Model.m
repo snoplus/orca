@@ -25,6 +25,9 @@
 #import "ORVmeCrateModel.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
+#import "ObjectFactory.h"
+#import "ORLogicInBitModel.h"
+#import "ORLogicOutBitModel.h"
 
 #define kORIP408RecordLength 7
 
@@ -61,8 +64,8 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     
     [[self undoManager] disableUndoRegistration];
     hwLock = [[NSLock alloc] init];
-    [self registerNotificationObservers];
     [[self undoManager] enableUndoRegistration];
+	[self registerNotificationObservers];
     return self;
 }
 
@@ -100,7 +103,14 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	[ [self connector] addRestrictedConnectionType: 'IP1 ' ]; //can only connect to IP inputs
     
 }
-
+- (NSString*)backgroundImagePath 
+{
+    return nil;
+}
+- (int)scaleFactor 
+{
+    return 100;
+}
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
@@ -119,6 +129,7 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 
 - (void) runStarting:(NSNotification*)aNote
 {
+	//here to make things work for the process bit protocol
 	[hwLock lock];	
 	cachedController = [[guardian crate] controllerCard];
 	[hwLock unlock];	
@@ -126,9 +137,80 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 
 - (void) runStopping:(NSNotification*)aNote
 {
+	//here to make things work for the process bit protocol
 	[hwLock lock];	
 	cachedController = nil;
 	[hwLock unlock];	
+}
+
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	outputLogicElements = [[self collectOutputLogic] retain];
+	inputLogicElements = [[self collectInputLogic] retain];
+}
+
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	if([outputLogicElements count]){
+		outputLogicValue = 0x0;
+		//inputLogicValue = [self getInputWithMask:0xffffffff];
+		inputLogicValue = 0x2;
+		for(id anInputElement in inputLogicElements){
+			[anInputElement setInputValueFrom:self];
+		}
+		for(id anOutputElement in outputLogicElements){
+			if([anOutputElement eval]){
+				outputLogicValue &= (0x1L << [anOutputElement bit]);
+			}
+		}
+		//[self setOutputWithMask:0xffffffff value:outputLogicValue];
+	}
+}
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[outputLogicElements release];
+	[inputLogicElements release];
+}
+
+- (void) reset
+{
+	//for the protocol
+}
+
+- (NSArray*) collectOutputLogic
+{
+	NSMutableArray* array = [NSMutableArray array];
+	for(id anObj in [self orcaObjects]){
+		if([anObj isKindOfClass:NSClassFromString(@"ORLogicOutBitModel")]){
+			[array addObject:anObj];
+		}
+	}
+	return array;
+}
+
+- (NSArray*) collectInputLogic
+{
+	NSMutableArray* array = [NSMutableArray array];
+	for(id anObj in [self orcaObjects]){
+		if([anObj isKindOfClass:NSClassFromString(@"ORLogicInBitModel")]){
+			if([anObj respondsToSelector:@selector(setInputValueFrom:)]){
+				[array addObject:anObj];
+			}
+		}
+	}
+	return array;
+}
+
+- (BOOL) inputBitValue:(short)index
+{
+	if(index>=0 && index<32)return (inputLogicValue & (1<<index)) != 0;
+	else return 0;
+}
+
+- (id) children
+{
+	return nil;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -334,7 +416,7 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
     
     hwLock = [[NSLock alloc] init];
     [self registerNotificationObservers];
-    
+    	
     return self;
 }
 

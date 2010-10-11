@@ -22,11 +22,12 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORVmeIPCard.h"
 #import "ORBitProcessing.h"
+#import "ORDataTaker.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
 
-@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing>
+@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker>
 {
 	@private
 		unsigned long   dataId;
@@ -42,6 +43,11 @@
 		unsigned long processOutputValue; //outputs to be written at end of process cycle
 		unsigned long processOutputMask;  //controlls which bits are written
 		
+		//trigger logic
+		unsigned long inputLogicValue;
+		unsigned long outputLogicValue;
+		NSArray* inputLogicElements;
+		NSArray* outputLogicElements;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -79,6 +85,10 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 
+#pragma mark ¥¥¥Triger Logic Protocol
+- (NSArray*) collectOutputLogic;
+- (NSArray*) collectInputLogic;
+- (BOOL) inputBitValue:(short)index;
 @end
 
 #pragma mark ¥¥¥External String Definitions

@@ -22,6 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORIP408Controller.h"
 #import "ORIP408Model.h"
+#import "ORTriggerLogicView.h"
 
 
 #pragma mark ¥¥¥Definitions
@@ -36,6 +37,24 @@
     return self;
 }
 
+
+- (void) awakeFromNib
+{
+	[logicView setGroup:model];
+    [super awakeFromNib];
+}
+
+- (ORTriggerLogicView *)logicView
+{
+    return logicView;
+}
+
+
+- (void) setModel:(OrcaObject*)aModel
+{
+    [super setModel:aModel];
+    [logicView setGroup:(ORGroup*)model];
+}
 
 
 #pragma mark ¥¥¥Notifications
@@ -81,6 +100,7 @@
     [self readMaskChanged:nil];
     [self readValueChanged:nil];
     [self slotChanged:nil];
+    [logicView setNeedsDisplay:YES];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification

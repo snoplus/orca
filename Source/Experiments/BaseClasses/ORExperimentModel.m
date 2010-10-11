@@ -493,9 +493,14 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [self setCaptureDate:	[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
 	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
 	if([segmentGroups count] == 1)[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
-	if([segmentGroups count] == 2){
+	else if([segmentGroups count] == 2){
 		[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
 		[[segmentGroups objectAtIndex:1] setMapEntries:[self initMapEntries:1]];
+	}
+	else if([segmentGroups count] == 3){
+		[[segmentGroups objectAtIndex:0] setMapEntries:[self initMapEntries:0]];
+		[[segmentGroups objectAtIndex:1] setMapEntries:[self initMapEntries:1]];
+		[[segmentGroups objectAtIndex:2] setMapEntries:[self initMapEntries:2]];
 	}
     [[self undoManager] enableUndoRegistration];
     

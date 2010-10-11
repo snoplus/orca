@@ -282,6 +282,23 @@
 		84098F5C0F964F0100036BE8 /* PDcu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84098F540F964F0100036BE8 /* PDcu.nib */; };
 		84098F5D0F964F0100036BE8 /* PDcu.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84098F550F964F0100036BE8 /* PDcu.tif */; };
 		84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84098F6E0F96589B00036BE8 /* Turbo.gif */; };
+		840AC2EE12635082007B6CAF /* LogicInBit.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2E812635081007B6CAF /* LogicInBit.nib */; };
+		840AC2EF12635082007B6CAF /* LogicInBit.png in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2E912635081007B6CAF /* LogicInBit.png */; };
+		840AC2F012635082007B6CAF /* ORLogicInBitController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2EA12635081007B6CAF /* ORLogicInBitController.h */; };
+		840AC2F112635082007B6CAF /* ORLogicInBitController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2EB12635081007B6CAF /* ORLogicInBitController.m */; };
+		840AC2F212635082007B6CAF /* ORLogicInBitModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2EC12635081007B6CAF /* ORLogicInBitModel.h */; };
+		840AC2F312635082007B6CAF /* ORLogicInBitModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2ED12635081007B6CAF /* ORLogicInBitModel.m */; };
+		840AC2FB12635089007B6CAF /* LogicOutBit.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2F512635089007B6CAF /* LogicOutBit.nib */; };
+		840AC2FC12635089007B6CAF /* LogicOutBit.png in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2F612635089007B6CAF /* LogicOutBit.png */; };
+		840AC2FD12635089007B6CAF /* ORLogicOutBitController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2F712635089007B6CAF /* ORLogicOutBitController.h */; };
+		840AC2FE12635089007B6CAF /* ORLogicOutBitController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2F812635089007B6CAF /* ORLogicOutBitController.m */; };
+		840AC2FF12635089007B6CAF /* ORLogicOutBitModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2F912635089007B6CAF /* ORLogicOutBitModel.h */; };
+		840AC30012635089007B6CAF /* ORLogicOutBitModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2FA12635089007B6CAF /* ORLogicOutBitModel.m */; };
+		840AC4A112635F15007B6CAF /* ORTGates.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC49F12635F15007B6CAF /* ORTGates.h */; };
+		840AC4A212635F15007B6CAF /* ORTGates.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC4A012635F15007B6CAF /* ORTGates.m */; };
+		840AC59812638B5D007B6CAF /* nTPCPadPlaneView.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC59612638B5D007B6CAF /* nTPCPadPlaneView.h */; };
+		840AC59912638B5D007B6CAF /* nTPCPadPlaneView.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC59712638B5D007B6CAF /* nTPCPadPlaneView.m */; };
+		840AC63712639B92007B6CAF /* nTPCPadPositions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 840AC63612639B92007B6CAF /* nTPCPadPositions.txt */; };
 		840AF86D0819924D005B750D /* SourceMask.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AF86B0819924D005B750D /* SourceMask.h */; };
 		840AF86E0819924D005B750D /* SourceMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AF86C0819924D005B750D /* SourceMask.m */; };
 		840B00AA1206F70B009095A4 /* goScript in VME_Copy */ = {isa = PBXBuildFile; fileRef = 840B00721206F556009095A4 /* goScript */; };
@@ -2088,6 +2105,8 @@
 		84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */; };
 		84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */; };
 		84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D435B60798851B003D089F /* NoCamacDriverHelp.plist */; };
+		84D5DE99125CB1BE00003496 /* ORTriggerLogicView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D5DE97125CB1BE00003496 /* ORTriggerLogicView.h */; };
+		84D5DE9A125CB1BE00003496 /* ORTriggerLogicView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D5DE98125CB1BE00003496 /* ORTriggerLogicView.m */; };
 		84D60BCB07428C7D0061F795 /* OrcaObjectController.m in Sources */ = {isa = PBXBuildFile; fileRef = F51E69EE03AE4776015F64B1 /* OrcaObjectController.m */; };
 		84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D791330FFA4CD000DC81D2 /* Keithley6487.gif */; };
 		84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D791340FFA4CD000DC81D2 /* Keithley6487.nib */; };
@@ -2196,8 +2215,6 @@
 		84EA6CA30C73D11200083319 /* nTPCController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6C990C73D11200083319 /* nTPCController.m */; };
 		84EA6CA40C73D11200083319 /* nTPCModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6C9A0C73D11200083319 /* nTPCModel.h */; };
 		84EA6CA50C73D11200083319 /* nTPCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6C9B0C73D11200083319 /* nTPCModel.m */; };
-		84EA6CA60C73D11200083319 /* nTPCView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6C9C0C73D11200083319 /* nTPCView.h */; };
-		84EA6CA70C73D11200083319 /* nTPCView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6C9D0C73D11200083319 /* nTPCView.m */; };
 		84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */; };
 		84EA6CAD0C73D15B00083319 /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */; };
 		84EBBEE50F52D9A700F57BDD /* Caen419.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EBBEDF0F52D9A700F57BDD /* Caen419.nib */; };
@@ -2846,6 +2863,23 @@
 		84098F540F964F0100036BE8 /* PDcu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PDcu.nib; path = Source/Objects/Hardware/Serial/PDcu/PDcu.nib; sourceTree = SOURCE_ROOT; };
 		84098F550F964F0100036BE8 /* PDcu.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = PDcu.tif; path = Source/Objects/Hardware/Serial/PDcu/PDcu.tif; sourceTree = SOURCE_ROOT; };
 		84098F6E0F96589B00036BE8 /* Turbo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Turbo.gif; path = Source/Objects/Hardware/Serial/PDcu/Turbo.gif; sourceTree = SOURCE_ROOT; };
+		840AC2E812635081007B6CAF /* LogicInBit.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LogicInBit.nib; path = Source/Objects/TriggerSystem/Logic/LogicInBit/LogicInBit.nib; sourceTree = SOURCE_ROOT; };
+		840AC2E912635081007B6CAF /* LogicInBit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicInBit.png; path = Source/Objects/TriggerSystem/Logic/LogicInBit/LogicInBit.png; sourceTree = SOURCE_ROOT; };
+		840AC2EA12635081007B6CAF /* ORLogicInBitController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInBitController.h; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitController.h; sourceTree = SOURCE_ROOT; };
+		840AC2EB12635081007B6CAF /* ORLogicInBitController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInBitController.m; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitController.m; sourceTree = SOURCE_ROOT; };
+		840AC2EC12635081007B6CAF /* ORLogicInBitModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInBitModel.h; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitModel.h; sourceTree = SOURCE_ROOT; };
+		840AC2ED12635081007B6CAF /* ORLogicInBitModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInBitModel.m; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitModel.m; sourceTree = SOURCE_ROOT; };
+		840AC2F512635089007B6CAF /* LogicOutBit.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LogicOutBit.nib; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/LogicOutBit.nib; sourceTree = SOURCE_ROOT; };
+		840AC2F612635089007B6CAF /* LogicOutBit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicOutBit.png; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/LogicOutBit.png; sourceTree = SOURCE_ROOT; };
+		840AC2F712635089007B6CAF /* ORLogicOutBitController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicOutBitController.h; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitController.h; sourceTree = SOURCE_ROOT; };
+		840AC2F812635089007B6CAF /* ORLogicOutBitController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicOutBitController.m; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitController.m; sourceTree = SOURCE_ROOT; };
+		840AC2F912635089007B6CAF /* ORLogicOutBitModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicOutBitModel.h; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitModel.h; sourceTree = SOURCE_ROOT; };
+		840AC2FA12635089007B6CAF /* ORLogicOutBitModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicOutBitModel.m; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitModel.m; sourceTree = SOURCE_ROOT; };
+		840AC49F12635F15007B6CAF /* ORTGates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTGates.h; sourceTree = "<group>"; };
+		840AC4A012635F15007B6CAF /* ORTGates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTGates.m; sourceTree = "<group>"; };
+		840AC59612638B5D007B6CAF /* nTPCPadPlaneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nTPCPadPlaneView.h; path = Source/Experiments/nTPC/nTPCPadPlaneView.h; sourceTree = SOURCE_ROOT; };
+		840AC59712638B5D007B6CAF /* nTPCPadPlaneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = nTPCPadPlaneView.m; path = Source/Experiments/nTPC/nTPCPadPlaneView.m; sourceTree = SOURCE_ROOT; };
+		840AC63612639B92007B6CAF /* nTPCPadPositions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nTPCPadPositions.txt; sourceTree = "<group>"; };
 		840AF86B0819924D005B750D /* SourceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceMask.h; sourceTree = "<group>"; };
 		840AF86C0819924D005B750D /* SourceMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceMask.m; sourceTree = "<group>"; };
 		840B00721206F556009095A4 /* goScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = goScript; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/goScript; sourceTree = SOURCE_ROOT; };
@@ -4531,6 +4565,8 @@
 		84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Decoders.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.h; sourceTree = SOURCE_ROOT; };
 		84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Decoders.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D435B60798851B003D089F /* NoCamacDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacDriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoCamacDriverHelp.plist"; sourceTree = SOURCE_ROOT; };
+		84D5DE97125CB1BE00003496 /* ORTriggerLogicView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTriggerLogicView.h; sourceTree = "<group>"; };
+		84D5DE98125CB1BE00003496 /* ORTriggerLogicView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTriggerLogicView.m; sourceTree = "<group>"; };
 		84D791330FFA4CD000DC81D2 /* Keithley6487.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Keithley6487.gif; path = Source/Objects/Hardware/Serial/Keithley6487/Keithley6487.gif; sourceTree = SOURCE_ROOT; };
 		84D791340FFA4CD000DC81D2 /* Keithley6487.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Keithley6487.nib; path = Source/Objects/Hardware/Serial/Keithley6487/Keithley6487.nib; sourceTree = SOURCE_ROOT; };
 		84D791350FFA4CD000DC81D2 /* ORKeithley6487Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKeithley6487Controller.h; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Controller.h; sourceTree = SOURCE_ROOT; };
@@ -4665,7 +4701,6 @@
 		84E9F697123FE4D600116607 /* ORNHQ226LDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LDecoders.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LDecoders.m; sourceTree = SOURCE_ROOT; };
 		84E9F698123FE4D600116607 /* ORNHQ226LModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LModel.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.h; sourceTree = SOURCE_ROOT; };
 		84E9F699123FE4D600116607 /* ORNHQ226LModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LModel.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.m; sourceTree = SOURCE_ROOT; };
-		84E9F8331242504C00116607 /* sis3302readout */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sis3302readout; path = ../../sis3302readout; sourceTree = SOURCE_ROOT; };
 		84EA6C950C73D11200083319 /* nTPC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nTPC.nib; path = Source/Experiments/nTPC/nTPC.nib; sourceTree = SOURCE_ROOT; };
 		84EA6C960C73D11200083319 /* nTPC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = nTPC.tif; path = Source/Experiments/nTPC/nTPC.tif; sourceTree = SOURCE_ROOT; };
 		84EA6C970C73D11200083319 /* nTPCConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = nTPCConstants.h; path = Source/Experiments/nTPC/nTPCConstants.h; sourceTree = SOURCE_ROOT; };
@@ -4673,8 +4708,6 @@
 		84EA6C990C73D11200083319 /* nTPCController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = nTPCController.m; path = Source/Experiments/nTPC/nTPCController.m; sourceTree = SOURCE_ROOT; };
 		84EA6C9A0C73D11200083319 /* nTPCModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = nTPCModel.h; path = Source/Experiments/nTPC/nTPCModel.h; sourceTree = SOURCE_ROOT; };
 		84EA6C9B0C73D11200083319 /* nTPCModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = nTPCModel.m; path = Source/Experiments/nTPC/nTPCModel.m; sourceTree = SOURCE_ROOT; };
-		84EA6C9C0C73D11200083319 /* nTPCView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = nTPCView.h; path = Source/Experiments/nTPC/nTPCView.h; sourceTree = SOURCE_ROOT; };
-		84EA6C9D0C73D11200083319 /* nTPCView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = nTPCView.m; path = Source/Experiments/nTPC/nTPCView.m; sourceTree = SOURCE_ROOT; };
 		84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAcqirisDC440Decoders.h; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.h; sourceTree = SOURCE_ROOT; };
 		84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAcqirisDC440Decoders.m; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.m; sourceTree = SOURCE_ROOT; };
 		84EBBEDF0F52D9A700F57BDD /* Caen419.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen419.nib; path = Source/Objects/Hardware/Vme/CAEN/CV419/Caen419.nib; sourceTree = SOURCE_ROOT; };
@@ -5075,7 +5108,6 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
-				84E9F8331242504C00116607 /* sis3302readout */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -5519,6 +5551,34 @@
 			);
 			name = PDcu;
 			path = Source/Objects/Hardware/Serial/PDcu;
+			sourceTree = SOURCE_ROOT;
+		};
+		840AC2E712635081007B6CAF /* LogicInBit */ = {
+			isa = PBXGroup;
+			children = (
+				840AC2E812635081007B6CAF /* LogicInBit.nib */,
+				840AC2E912635081007B6CAF /* LogicInBit.png */,
+				840AC2EA12635081007B6CAF /* ORLogicInBitController.h */,
+				840AC2EB12635081007B6CAF /* ORLogicInBitController.m */,
+				840AC2EC12635081007B6CAF /* ORLogicInBitModel.h */,
+				840AC2ED12635081007B6CAF /* ORLogicInBitModel.m */,
+			);
+			name = LogicInBit;
+			path = Source/Objects/TriggerSystem/Logic/LogicInBit;
+			sourceTree = SOURCE_ROOT;
+		};
+		840AC2F412635089007B6CAF /* LogicOutBit */ = {
+			isa = PBXGroup;
+			children = (
+				840AC2F512635089007B6CAF /* LogicOutBit.nib */,
+				840AC2F612635089007B6CAF /* LogicOutBit.png */,
+				840AC2F712635089007B6CAF /* ORLogicOutBitController.h */,
+				840AC2F812635089007B6CAF /* ORLogicOutBitController.m */,
+				840AC2F912635089007B6CAF /* ORLogicOutBitModel.h */,
+				840AC2FA12635089007B6CAF /* ORLogicOutBitModel.m */,
+			);
+			name = LogicOutBit;
+			path = Source/Objects/TriggerSystem/Logic/LogicOutBit;
 			sourceTree = SOURCE_ROOT;
 		};
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
@@ -8305,6 +8365,16 @@
 			path = Source/Objects/Hardware/SBC/SBC_LAM;
 			sourceTree = SOURCE_ROOT;
 		};
+		84A8CA0E125F1E2600D7C9AF /* Gates */ = {
+			isa = PBXGroup;
+			children = (
+				840AC49F12635F15007B6CAF /* ORTGates.h */,
+				840AC4A012635F15007B6CAF /* ORTGates.m */,
+			);
+			name = Gates;
+			path = Source/Objects/TriggerSystem/Logic/Gates;
+			sourceTree = SOURCE_ROOT;
+		};
 		84AB0F331056DA4E0069D5E2 /* ModBus */ = {
 			isa = PBXGroup;
 			children = (
@@ -9506,6 +9576,28 @@
 			path = Source/Objects/Hardware/Vme/SIS3302;
 			sourceTree = SOURCE_ROOT;
 		};
+		84D5DE94125CB18C00003496 /* TriggerSystem */ = {
+			isa = PBXGroup;
+			children = (
+				84D5DE97125CB1BE00003496 /* ORTriggerLogicView.h */,
+				84D5DE98125CB1BE00003496 /* ORTriggerLogicView.m */,
+				84D5DECB125CC2F400003496 /* Logic */,
+			);
+			name = TriggerSystem;
+			path = Source/Objects/TriggerSystem;
+			sourceTree = SOURCE_ROOT;
+		};
+		84D5DECB125CC2F400003496 /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				84A8CA0E125F1E2600D7C9AF /* Gates */,
+				840AC2E712635081007B6CAF /* LogicInBit */,
+				840AC2F412635089007B6CAF /* LogicOutBit */,
+			);
+			name = Logic;
+			path = Source/Objects/TriggerSystem/Logic;
+			sourceTree = SOURCE_ROOT;
+		};
 		84D791320FFA4CD000DC81D2 /* Keithley6487 */ = {
 			isa = PBXGroup;
 			children = (
@@ -9753,8 +9845,9 @@
 				84EA6C990C73D11200083319 /* nTPCController.m */,
 				84EA6C9A0C73D11200083319 /* nTPCModel.h */,
 				84EA6C9B0C73D11200083319 /* nTPCModel.m */,
-				84EA6C9C0C73D11200083319 /* nTPCView.h */,
-				84EA6C9D0C73D11200083319 /* nTPCView.m */,
+				840AC59612638B5D007B6CAF /* nTPCPadPlaneView.h */,
+				840AC59712638B5D007B6CAF /* nTPCPadPlaneView.m */,
+				840AC63612639B92007B6CAF /* nTPCPadPositions.txt */,
 			);
 			name = nTPC;
 			path = Source/Experiments/nTPC;
@@ -10322,6 +10415,7 @@
 				842162EE043E6317005F64B1 /* Misc Objects */,
 				84AD1EE003C2476F005F64B1 /* Data Processing */,
 				840EFFA30944B28F00049827 /* ProcessLogic */,
+				84D5DE94125CB18C00003496 /* TriggerSystem */,
 				842F19A603B8EAF3005F64B1 /* Control */,
 				84C4948A0405A0C0005F64B1 /* Custom Hardware */,
 				F51E698503AE4775015F64B1 /* Hardware */,
@@ -11032,7 +11126,6 @@
 				84EA6CA10C73D11200083319 /* nTPCConstants.h in Headers */,
 				84EA6CA20C73D11200083319 /* nTPCController.h in Headers */,
 				84EA6CA40C73D11200083319 /* nTPCModel.h in Headers */,
-				84EA6CA60C73D11200083319 /* nTPCView.h in Headers */,
 				84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */,
 				9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */,
 				8493CC420C99FA0700B46CD4 /* SBC_Linking.h in Headers */,
@@ -11445,6 +11538,13 @@
 				84E9F6A2123FE4D600116607 /* ORNHQ226LDecoders.h in Headers */,
 				84E9F6A4123FE4D600116607 /* ORNHQ226LModel.h in Headers */,
 				8471C2F41250CF0C003A8DFB /* ORCAEN260Readout.hh in Headers */,
+				84D5DE99125CB1BE00003496 /* ORTriggerLogicView.h in Headers */,
+				840AC2F012635082007B6CAF /* ORLogicInBitController.h in Headers */,
+				840AC2F212635082007B6CAF /* ORLogicInBitModel.h in Headers */,
+				840AC2FD12635089007B6CAF /* ORLogicOutBitController.h in Headers */,
+				840AC2FF12635089007B6CAF /* ORLogicOutBitModel.h in Headers */,
+				840AC4A112635F15007B6CAF /* ORTGates.h in Headers */,
+				840AC59812638B5D007B6CAF /* nTPCPadPlaneView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12168,6 +12268,11 @@
 				8449CC8A123E85DA009C8AA2 /* VHSC040n.tif in Resources */,
 				84E9F69E123FE4D600116607 /* NHQ226L.nib in Resources */,
 				84E9F69F123FE4D600116607 /* NHQ226L.tif in Resources */,
+				840AC2EE12635082007B6CAF /* LogicInBit.nib in Resources */,
+				840AC2EF12635082007B6CAF /* LogicInBit.png in Resources */,
+				840AC2FB12635089007B6CAF /* LogicOutBit.nib in Resources */,
+				840AC2FC12635089007B6CAF /* LogicOutBit.png in Resources */,
+				840AC63712639B92007B6CAF /* nTPCPadPositions.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12628,7 +12733,6 @@
 				844DF9060C6A836700BEB215 /* ORMaskedWaveform.m in Sources */,
 				84EA6CA30C73D11200083319 /* nTPCController.m in Sources */,
 				84EA6CA50C73D11200083319 /* nTPCModel.m in Sources */,
-				84EA6CA70C73D11200083319 /* nTPCView.m in Sources */,
 				84EA6CAD0C73D15B00083319 /* ORAcqirisDC440Decoders.m in Sources */,
 				9C38E5580C775F2A00255848 /* ORcPCICardDecoder.m in Sources */,
 				2A7685BA0C7B3A9C000C942F /* ORUSBtoGPIBController.m in Sources */,
@@ -12992,6 +13096,13 @@
 				84E9F6A1123FE4D600116607 /* ORNHQ226LController.m in Sources */,
 				84E9F6A3123FE4D600116607 /* ORNHQ226LDecoders.m in Sources */,
 				84E9F6A5123FE4D600116607 /* ORNHQ226LModel.m in Sources */,
+				84D5DE9A125CB1BE00003496 /* ORTriggerLogicView.m in Sources */,
+				840AC2F112635082007B6CAF /* ORLogicInBitController.m in Sources */,
+				840AC2F312635082007B6CAF /* ORLogicInBitModel.m in Sources */,
+				840AC2FE12635089007B6CAF /* ORLogicOutBitController.m in Sources */,
+				840AC30012635089007B6CAF /* ORLogicOutBitModel.m in Sources */,
+				840AC4A212635F15007B6CAF /* ORTGates.m in Sources */,
+				840AC59912638B5D007B6CAF /* nTPCPadPlaneView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
