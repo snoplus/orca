@@ -32,6 +32,8 @@
 @interface nTPCController (private)
 - (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) readTertiaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveTertiaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 
 @implementation nTPCController
@@ -44,39 +46,48 @@
 
 - (void) loadSegmentGroups
 {
-	//primary group are the anode wires
+	//primary group 
 	if(!segmentGroups)segmentGroups = [[NSMutableArray array] retain];
 	ORSegmentGroup* aGroup = [model segmentGroup:0];
 	if(![segmentGroups containsObject:aGroup]){
 		[segmentGroups addObject:aGroup];
 	}
-	//secondary group cathod wires
+	//secondary group 
 	aGroup = [model segmentGroup:1];
 	if(![segmentGroups containsObject:aGroup]){
 		[segmentGroups addObject:aGroup];
 		secondaryGroup = aGroup;
 	}
-
+	//tertiary group 
+	aGroup = [model segmentGroup:2];
+	if(![segmentGroups containsObject:aGroup]){
+		[segmentGroups addObject:aGroup];
+		tertiaryGroup = aGroup;
+	}
 }
 
 - (NSString*) defaultPrimaryMapFilePath
 {
-	return @"~/AnodeWireMap";
+	return @"~/PadPlane0WireMap";
 }
 - (NSString*) defaultSecondaryMapFilePath
 {
-	return @"~/CathodWireMap";
+	return @"~/PadPlane1WireMap";
+}
+- (NSString*) defaultTertiaryMapFilePath
+{
+	return @"~/PadPlane2WireMap";
 }
 
 
 -(void) awakeFromNib
 {
 	
-	[anodeScale setRngLimitsLow:0 withHigh:127 withMinRng:127];
-    [anodeScale setRngDefaultsLow:0 withHigh:127];
+	[anodeScale setRngLimitsLow:-150 withHigh:150 withMinRng:300];
+    [anodeScale setRngDefaultsLow:-150 withHigh:150];
 
-	[cathodeScale setRngLimitsLow:0 withHigh:63 withMinRng:63];
-    [cathodeScale setRngDefaultsLow:0 withHigh:63];
+	[cathodeScale setRngLimitsLow:-150 withHigh:150 withMinRng:300];
+    [cathodeScale setRngDefaultsLow:-150 withHigh:150];
 
 	[self populateClassNamePopup:secondaryAdcClassNamePopup];
     [super awakeFromNib];
@@ -102,6 +113,18 @@
                      selector : @selector(secondaryMapFileChanged:)
                          name : ORSegmentGroupMapFileChanged
 						object: secondaryGroup];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(tertiaryAdcClassNameChanged:)
+                         name : ORSegmentGroupAdcClassNameChanged
+						object: tertiaryGroup];
+	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(tertiaryMapFileChanged:)
+                         name : ORSegmentGroupMapFileChanged
+						object: tertiaryGroup];
+	
 }
 
 - (void) updateWindow
@@ -112,8 +135,12 @@
 	[self secondaryMapFileChanged:nil];
 	[self secondaryAdcClassNameChanged:nil];
 
+	[self tertiaryMapFileChanged:nil];
+	[self tertiaryAdcClassNameChanged:nil];
+
 	//details
 	[secondaryValuesView reloadData];
+	[tertiaryValuesView reloadData];
 }
 
 #pragma mark ¥¥¥HW Map Actions
@@ -184,11 +211,69 @@
                           contextInfo:NULL];
 }
 
+- (IBAction) tertiaryAdcClassNameAction:(id)sender
+{
+	[tertiaryGroup setAdcClassName:[sender titleOfSelectedItem]];	
+}
+
+- (IBAction) readTertiaryMapFileAction:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+	NSString* fullPath = [[tertiaryGroup mapFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+    }
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(readTertiaryMapFilePanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+}
+
+- (IBAction) saveTertiaryMapFileAction:(id)sender
+{
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save As"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[tertiaryGroup mapFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = [self defaultTertiaryMapFilePath];
+        
+    }
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveTertiaryMapFilePanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+}
+
+
 #pragma mark ¥¥¥Interface Management
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[super specialUpdate:aNote];
 	[secondaryValuesView reloadData];
+	[tertiaryValuesView reloadData];
 }
 
 - (void) setDetectorTitle
@@ -206,6 +291,7 @@
 {
 	[super newTotalRateAvailable:aNotification];
 	[secondaryRateField setFloatValue:[secondaryGroup rate]];
+	[tertiaryRateField setFloatValue:[tertiaryGroup rate]];
 }
 
 #pragma mark ¥¥¥HW Map Interface Management
@@ -231,12 +317,27 @@
 	[secondaryMapFileTextField setStringValue: s];
 }
 
+- (void) tertiaryAdcClassNameChanged:(NSNotification*)aNote
+{
+	[tertiaryAdcClassNamePopup selectItemWithTitle: [tertiaryGroup adcClassName]];
+}
+
+- (void) tertiaryMapFileChanged:(NSNotification*)aNote
+{
+	NSString* s = [tertiaryGroup mapFile];
+	if(!s) s = @"--";
+	[tertiaryMapFileTextField setStringValue: s];
+}
+
+
 - (void) mapFileRead:(NSNotification*)aNote
 {
 	[super mapFileRead:aNote];
     if(aNote == nil || [aNote object] == model){
         [secondaryTableView reloadData];
         [secondaryValuesView reloadData];
+        [tertiaryTableView reloadData];
+        [tertiaryValuesView reloadData];
     }
 }
 
@@ -250,10 +351,14 @@
     
     if(locked){
 		[secondaryTableView deselectAll:self];
+		[tertiaryTableView deselectAll:self];
 	}
     [readSecondaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
     [saveSecondaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
 	[secondaryAdcClassNamePopup setEnabled:!lockedOrRunningMaintenance]; 
+    [readTertiaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
+    [saveTertiaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
+	[tertiaryAdcClassNamePopup setEnabled:!lockedOrRunningMaintenance]; 
 }
 
 #pragma mark ¥¥¥Details Interface Management
@@ -268,6 +373,7 @@
 
 	if(locked){
 		[secondaryValuesView deselectAll:self];
+		[tertiaryValuesView deselectAll:self];
 	}
 
 }
@@ -281,6 +387,12 @@
 	else if(tableView == secondaryValuesView){
 		return ![gSecurity isLocked:[model experimentDetailsLock]];
 	}
+	else if(tableView == tertiaryTableView){
+		return ![gSecurity isLocked:[model experimentMapLock]];
+	}
+	else if(tableView == tertiaryValuesView){
+		return ![gSecurity isLocked:[model experimentDetailsLock]];
+	}
 	else return [super tableView:tableView shouldSelectRow:row];
 }
 
@@ -288,6 +400,9 @@
 {
 	if(aTableView == secondaryTableView || aTableView == secondaryValuesView){
 		return [secondaryGroup segment:rowIndex objectForKey:[aTableColumn identifier]];
+	}
+	else if(aTableView == tertiaryTableView || aTableView == tertiaryValuesView){
+		return [tertiaryGroup segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else return  [super tableView:aTableView objectValueForTableColumn:aTableColumn row:rowIndex];
 }
@@ -297,6 +412,8 @@
 {
 	if( aTableView == secondaryTableView || 
 		aTableView == secondaryValuesView)	return [secondaryGroup numSegments];
+	else if( aTableView == tertiaryTableView || 
+	   aTableView == tertiaryValuesView)	return [tertiaryGroup numSegments];
 	else								return [super numberOfRowsInTableView:aTableView];
 }
 
@@ -310,6 +427,20 @@
 	}
 	else if(aTableView == secondaryValuesView){
 		aSegment = [secondaryGroup segment:rowIndex];
+		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
+			[aSegment setThreshold:anObject];
+		}
+		else if([[aTableColumn identifier] isEqualToString:@"gain"]){
+			[aSegment setGain:anObject];
+		}
+	}
+	else if(aTableView == tertiaryTableView){
+		aSegment = [tertiaryGroup segment:rowIndex];
+		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
+		[tertiaryGroup configurationChanged:nil];
+	}
+	else if(aTableView == tertiaryValuesView){
+		aSegment = [tertiaryGroup segment:rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -384,4 +515,20 @@
         [secondaryGroup saveMapFileAs:[sheet filename]];
     }
 }
+- (void)readTertiaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [tertiaryGroup setMapFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
+		[tertiaryGroup readMap];
+		[tertiaryTableView reloadData];
+    }
+}
+
+- (void)saveTertiaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [tertiaryGroup saveMapFileAs:[sheet filename]];
+    }
+}
+
 @end

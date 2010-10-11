@@ -27,6 +27,7 @@
 @interface nTPCController : ORExperimentController {
 
     IBOutlet NSTextField*	secondaryRateField;
+    IBOutlet NSTextField*	tertiaryRateField;
     IBOutlet NSTextField*	detectorTitle;
     IBOutlet ORAxis*		anodeScale;
     IBOutlet ORAxis*		cathodeScale;
@@ -36,15 +37,25 @@
 	IBOutlet NSTextField*	secondaryMapFileTextField;
     IBOutlet NSButton*		readSecondaryMapFileButton;
     IBOutlet NSButton*		saveSecondaryMapFileButton;
-    IBOutlet NSTableView*	secondaryTableView;
-
+    IBOutlet NSTableView*	secondaryTableView;	
+	
+	//items in the  HW map tab view
+	IBOutlet NSPopUpButton* tertiaryAdcClassNamePopup;
+	IBOutlet NSTextField*	tertiaryMapFileTextField;
+    IBOutlet NSButton*		readTertiaryMapFileButton;
+    IBOutlet NSButton*		saveTertiaryMapFileButton;
+    IBOutlet NSTableView*	tertiaryTableView;
+	
+	
     IBOutlet NSButton*		clrSelectionButton;
     IBOutlet NSButton*		showDialogButton;
 
 	//items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
+    IBOutlet NSTableView*	tertiaryValuesView;
 
 	ORSegmentGroup* secondaryGroup;
+	ORSegmentGroup* tertiaryGroup;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -56,12 +67,18 @@
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
+- (IBAction) tertiaryAdcClassNameAction:(id)sender;
+- (IBAction) readTertiaryMapFileAction:(id)sender;
+- (IBAction) saveTertiaryMapFileAction:(id)sender;
 - (IBAction) clrSelectionAction:(id)sender;
 - (IBAction) viewDialogAction:(id)sender;
 
 #pragma mark ¥¥¥HW Map Interface Management
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
+- (void) selectionChanged:(NSNotification*)aNote;
+- (void) tertiaryAdcClassNameChanged:(NSNotification*)aNote;
+- (void) tertiaryMapFileChanged:(NSNotification*)aNote;
 - (void) selectionChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Details Interface Management

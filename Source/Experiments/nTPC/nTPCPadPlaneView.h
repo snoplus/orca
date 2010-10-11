@@ -1,9 +1,3 @@
-//
-//  nTPCConstants.h
-//  Orca
-//
-//  Created by Mark Howe on Wed Aug 15 2007.
-//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -17,11 +11,17 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORDetectorView.h"
+#import "nTPCConstants.h"
 
-//old AnodeCathode Mapping
-#define kNumAnodeWires			128
-#define kNumCathodeWires		64
+@class ORColorScale;
 
-//new Pad Plane Mapping
-#define kNumPadPlaneWires	55
-
+@interface nTPCPadPlaneView : ORDetectorView
+{	
+    IBOutlet ORColorScale* colorScale;
+	BOOL coordsLoaded;
+	NSPoint pixel[3][kNumPadPlaneWires][kNumPadPlaneWires];
+}
+- (void) loadPixelCoords;
+- (void) makeAllSegments;
+@end

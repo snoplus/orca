@@ -38,24 +38,28 @@
     [self linkToController:@"nTPCController"];
 }
 
-
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
 	NSMutableArray* mapEntries = [self initMapEntries:0]; //the default set is good for both
 	
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Anode Plane" numSegments:kNumAnodeWires mapEntries:mapEntries];
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Pad Plane 0" numSegments:kNumPadPlaneWires mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];
 	
-    group = [[ORSegmentGroup alloc] initWithName:@"Cathode Plane" numSegments:kNumCathodeWires mapEntries:mapEntries];
+    group = [[ORSegmentGroup alloc] initWithName:@"Pad Plane 1" numSegments:kNumPadPlaneWires mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];
+	
+	group = [[ORSegmentGroup alloc] initWithName:@"Pad Plane 2" numSegments:kNumPadPlaneWires mapEntries:mapEntries];
+	[self addGroup:group];
+	[group release];
+	
 }
 
 - (int)  maxNumSegments
 {
-	return kNumAnodeWires;
+	return kNumPadPlaneWires;
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
