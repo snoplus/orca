@@ -27,10 +27,9 @@
 @interface nTPCController : ORExperimentController {
 
     IBOutlet NSTextField*	secondaryRateField;
+	IBOutlet NSMatrix*		planeMaskMatrix;
     IBOutlet NSTextField*	tertiaryRateField;
     IBOutlet NSTextField*	detectorTitle;
-    IBOutlet ORAxis*		anodeScale;
-    IBOutlet ORAxis*		cathodeScale;
    
 	//items in the  HW map tab view
 	IBOutlet NSPopUpButton* secondaryAdcClassNamePopup;
@@ -64,6 +63,7 @@
 - (void) loadSegmentGroups;
 
 #pragma mark ¥¥¥HW Map Actions
+- (IBAction) planeMaskAction:(id)sender;
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
@@ -74,6 +74,7 @@
 - (IBAction) viewDialogAction:(id)sender;
 
 #pragma mark ¥¥¥HW Map Interface Management
+- (void) planeMaskChanged:(NSNotification*)aNote;
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
 - (void) selectionChanged:(NSNotification*)aNote;

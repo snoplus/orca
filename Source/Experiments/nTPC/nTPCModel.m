@@ -25,12 +25,31 @@
 #import "ORSegmentGroup.h"
 #import "nTPCConstants.h"
 
+
+NSString* nTPCModelPlaneMaskChanged = @"nTPCModelPlaneMaskChanged";
+
 @implementation nTPCModel
 
 #pragma mark ¥¥¥Initialization
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"nTPC"]];
+}
+
+#pragma mark ***Accessors
+
+- (unsigned short) planeMask
+{
+    return planeMask;
+}
+
+- (void) setPlaneMask:(unsigned short)aPlaneMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPlaneMask:planeMask];
+    
+    planeMask = aPlaneMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:nTPCModelPlaneMaskChanged object:self];
 }
 
 - (void) makeMainController
@@ -107,5 +126,23 @@
 {
 	return @"nTPCDetailsLock";
 }
+#pragma mark ***Archival
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
+    [self setPlaneMask:[decoder decodeIntForKey:@"planeMask"]];
+    [[self undoManager] enableUndoRegistration];    
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt:planeMask forKey:@"planeMask"];
+}
+
 @end
 

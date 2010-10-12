@@ -15,13 +15,18 @@
 #import "nTPCConstants.h"
 
 @class ORColorScale;
+@class ORAxis;
 
 @interface nTPCPadPlaneView : ORDetectorView
 {	
     IBOutlet ORColorScale* colorScale;
+    IBOutlet ORAxis* xScale;
+    IBOutlet ORAxis* yScale;
+	
 	BOOL coordsLoaded;
-	NSPoint pixel[3][kNumPadPlaneWires][kNumPadPlaneWires];
+	NSPoint pixel[3][kNumPadPlaneWires][100];
 }
 - (void) loadPixelCoords;
-- (void) makeAllSegments;
+- (void) makeAllSegmentsLocal;
+- (void) delayedSetup;
 @end

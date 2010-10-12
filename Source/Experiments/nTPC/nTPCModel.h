@@ -24,7 +24,12 @@
 
 @interface nTPCModel :  ORExperimentModel
 {
+    unsigned short planeMask;
 }
+
+#pragma mark ***Accessors
+- (unsigned short) planeMask;
+- (void) setPlaneMask:(unsigned short)aPlaneMask;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -34,5 +39,10 @@
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
 
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
+
+extern NSString* nTPCModelPlaneMaskChanged;
 

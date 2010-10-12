@@ -28,6 +28,8 @@
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
 #import "ORDetectorView.h"
+#import "OR1DHistoPlot.h"
+#import "ORPlotView.h"
 
 @interface nTPCController (private)
 - (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -82,14 +84,12 @@
 
 -(void) awakeFromNib
 {
+	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:12 andDataSource:self];
+	[valueHistogramsPlot addPlot: aPlot1];
+	[aPlot1 release];
 	
-	[anodeScale setRngLimitsLow:-150 withHigh:150 withMinRng:300];
-    [anodeScale setRngDefaultsLow:-150 withHigh:150];
-
-	[cathodeScale setRngLimitsLow:-150 withHigh:150 withMinRng:300];
-    [cathodeScale setRngDefaultsLow:-150 withHigh:150];
-
 	[self populateClassNamePopup:secondaryAdcClassNamePopup];
+	[self populateClassNamePopup:tertiaryAdcClassNamePopup];
     [super awakeFromNib];
 		
 }
@@ -125,6 +125,11 @@
                          name : ORSegmentGroupMapFileChanged
 						object: tertiaryGroup];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(planeMaskChanged:)
+                         name : nTPCModelPlaneMaskChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -141,9 +146,22 @@
 	//details
 	[secondaryValuesView reloadData];
 	[tertiaryValuesView reloadData];
+	[self planeMaskChanged:nil];
 }
 
 #pragma mark ¥¥¥HW Map Actions
+
+- (IBAction) planeMaskAction:(id)sender
+{
+
+	unsigned short aMask = [model planeMask];
+	int i = [[sender selectedCell] tag];
+	int value = [sender intValue];
+	if(value)aMask |= (1<<i);
+	else aMask &= ~(1<<i);
+	[model setPlaneMask:aMask];	
+}
+
 - (IBAction) clrSelectionAction:(id)sender
 {
 	[detectorView clrSelection];
@@ -269,6 +287,19 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) planeMaskChanged:(NSNotification*)aNote
+{
+	short i;
+	unsigned char theMask = [model planeMask];
+	for(i=0;i<3;i++){
+		BOOL bitSet = (theMask&(1<<i))>0;
+		if(bitSet != [[planeMaskMatrix cellWithTag:i] intValue]){
+			[[planeMaskMatrix cellWithTag:i] setState:bitSet];
+		}
+	}
+}
+
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[super specialUpdate:aNote];
@@ -404,7 +435,7 @@
 	else if(aTableView == tertiaryTableView || aTableView == tertiaryValuesView){
 		return [tertiaryGroup segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
-	else return  [super tableView:aTableView objectValueForTableColumn:aTableColumn row:rowIndex];
+	else return [[segmentGroups objectAtIndex:0] segment:rowIndex objectForKey:[aTableColumn identifier]];
 }
 
 // just returns the number of items we have.
