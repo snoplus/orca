@@ -18,16 +18,16 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORVmeIPCard.h"
 #import "ORBitProcessing.h"
 #import "ORDataTaker.h"
+#import "ORTriggerProtocols.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
 
-@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker>
+@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker,TriggerLogicIn,TriggerLogicOut>
 {
 	@private
 		unsigned long   dataId;
@@ -85,10 +85,12 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 
-#pragma mark ¥¥¥Triger Logic Protocol
+#pragma mark ¥¥¥Triger Logic
 - (NSArray*) collectOutputLogic;
 - (NSArray*) collectInputLogic;
-- (BOOL) inputBitValue:(short)index;
+
+#pragma mark ¥¥¥Triger Logic Protocol
+- (int) inputValue:(short)index;
 @end
 
 #pragma mark ¥¥¥External String Definitions

@@ -6,14 +6,14 @@
 //  Copyright  © 2009 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
+//North Carolina Physics and 
+//Astrophysics Department sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
@@ -34,10 +34,10 @@ NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
 	[i lockFocus];
 	[aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
 	NSAttributedString* n = [[NSAttributedString alloc] 
-							 initWithString:[NSString stringWithFormat:@"%d",[self bit]] 
+							 initWithString:[NSString stringWithFormat:@"%2d",[self bit]] 
 							 attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
 	
-	[n drawAtPoint:NSMakePoint(2,5)];
+	[n drawAtPoint:NSMakePoint(17,4)];
 	[n release];
 	[i unlockFocus];		
 	[self setImage:i];
@@ -50,8 +50,9 @@ NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
 
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-    return  [aGuardian isMemberOfClass:NSClassFromString(@"ORIP408Model")];
+    return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerLogicOut")];
 }
+
 - (void) makeMainController
 {
     [self linkToController:@"ORLogicOutBitController"];
@@ -59,16 +60,13 @@ NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
 
 -(void) makeConnectors
 {	
-	NSPoint loc = NSMakePoint(0,[self frame].size.height - kConnectorSize );
+	NSPoint loc = NSMakePoint(0,[self frame].size.height/2 - kConnectorSize/2 );
 	ORConnector* aConnector = [[ORConnector alloc] initAt:loc withGuardian:self withObjectLink:self];
 	[[self connectors] setObject:aConnector forKey:@"Bit"];
 	[ aConnector setConnectorType: 'TLI ' ];
 	[ aConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to processor inputs
 	[aConnector release];
 }
-
-- (Class) guardianClass   { return NSClassFromString(@"ORIP408Model"); }
-
 
 - (NSString*) identifier
 {
@@ -87,27 +85,17 @@ NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLogicOutBitChanged object:self];
 }	
 
-- (BOOL) value
+- (BOOL) evalWithDelegate:(id)anObj
 {
-	return value;
-}
-
-- (BOOL) eval
-{
-	value = [[self objectConnectedTo:@"Bit"] eval];
-	return value;
+	return [[self objectConnectedTo:@"Bit"] evalWithDelegate:anObj];
 }
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    
     [[self undoManager] disableUndoRegistration];
-    
     [self setBit:[decoder decodeIntForKey:@"Bit"]];
-    
     [[self undoManager] enableUndoRegistration];
-    
     return self;
 }
 
@@ -115,10 +103,7 @@ NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:bit forKey:@"Bit"];
-    
 }
-
-
 @end
 
 

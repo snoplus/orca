@@ -6,14 +6,14 @@
 //  Copyright  © 2009 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
+//North Carolina Physics and 
+//Astrophysics Department sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
@@ -25,9 +25,15 @@
 @implementation ORTGate
 
 #pragma mark ¥¥¥Initialization
+
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
     return  [aGuardian isMemberOfClass:NSClassFromString(@"ORIP408Model")];
+}
+
+- (NSString*) identifier
+{ 
+	return [NSString stringWithFormat:@"%@ %d",[[self className] substringFromIndex:3], [self uniqueIdNumber]]; 
 }
 
 -(void) makeConnectors
@@ -48,51 +54,39 @@
     [[self connectors] setObject:outConnector forKey:@"Output"];
     [ outConnector setConnectorType: 'TLO ' ];
     [ outConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
-    [outConnector release];}
-
-- (Class) guardianClass   { return NSClassFromString(@"ORIP408Model"); }
-
-- (BOOL) hasDialog
-{
-	return NO;
+    [outConnector release];
 }
 
-- (BOOL) eval
-{
-	return NO;
-}
+- (BOOL) hasDialog					{ return NO; }
+- (BOOL) evalWithDelegate:(id)anObj { return NO; }
 
 @end
 
 //-------------------------------------------------------------
 @implementation ORTAndGate
 - (void) setUpImage			{ [self setImage:[NSImage imageNamed:@"AndGate"]]; }
-- (NSString*) identifier	{ return [NSString stringWithFormat:@"And %d",[self uniqueIdNumber]]; }
-- (BOOL) eval
+- (BOOL) evalWithDelegate:(id)anObj
 {
-	BOOL value1 = [[self objectConnectedTo:@"Input1"] bitValue];
-	BOOL value2 = [[self objectConnectedTo:@"Input2"] bitValue];
+	BOOL value1 = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+	BOOL value2 = [[self objectConnectedTo:@"Input2"] evalWithDelegate:anObj];
 	return value1 & value2;
 }
 @end
 
 //-------------------------------------------------------------
 @implementation ORTNandGate
-- (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"NandGate"]]; }
-- (NSString*) identifier { return [NSString stringWithFormat:@"Nand %d",[self uniqueIdNumber]]; }
-- (BOOL) eval			 { return ![super eval]; }
+- (void) setUpImage					{ [self setImage:[NSImage imageNamed:@"NandGate"]]; }
+- (BOOL) evalWithDelegate:(id)anObj	{ return ![super evalWithDelegate:anObj]; }
 @end
 
 //-------------------------------------------------------------
 @implementation ORTOrGate
 #pragma mark ¥¥¥Initialization
 - (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"ORGate"]]; }
-- (NSString*) identifier { return [NSString stringWithFormat:@"Or %d",[self uniqueIdNumber]]; }
-
-- (BOOL) eval
+- (BOOL) evalWithDelegate:(id)anObj
 {
-	BOOL value1 = [[self objectConnectedTo:@"Input1"] bitValue];
-	BOOL value2 = [[self objectConnectedTo:@"Input2"] bitValue];
+	BOOL value1 = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+	BOOL value2 = [[self objectConnectedTo:@"Input2"] evalWithDelegate:anObj];
 	return value1 | value2;
 }
 @end
@@ -100,20 +94,17 @@
 //-------------------------------------------------------------
 @implementation ORTXorGate
 - (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"XorGate"]]; }
-- (NSString*) identifier { return [NSString stringWithFormat:@"XOrGate %d",[self uniqueIdNumber]]; }
-
-- (BOOL) eval
+- (BOOL) evalWithDelegate:(id)anObj
 {
-	BOOL value1 = [[self objectConnectedTo:@"Input1"] bitValue];
-	BOOL value2 = [[self objectConnectedTo:@"Input2"] bitValue];
+	BOOL value1 = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+	BOOL value2 = [[self objectConnectedTo:@"Input2"] evalWithDelegate:anObj];
 	return value1 ^ value2;
 }
 @end
 
 //-------------------------------------------------------------
 @implementation ORTNorGate
-- (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"NorGate"]]; }
-- (NSString*) identifier { return [NSString stringWithFormat:@"NorGate %d",[self uniqueIdNumber]]; }
-- (BOOL) eval			 { return ![self eval]; }
+- (void) setUpImage					{ [self setImage:[NSImage imageNamed:@"NorGate"]]; }
+- (BOOL) evalWithDelegate:(id)anObj	{ return ![self evalWithDelegate:anObj]; }
 @end
 

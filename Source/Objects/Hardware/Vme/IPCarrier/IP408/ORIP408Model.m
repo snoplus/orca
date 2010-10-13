@@ -155,11 +155,8 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 		outputLogicValue = 0x0;
 		//inputLogicValue = [self getInputWithMask:0xffffffff];
 		inputLogicValue = 0x2;
-		for(id anInputElement in inputLogicElements){
-			[anInputElement setInputValueFrom:self];
-		}
 		for(id anOutputElement in outputLogicElements){
-			if([anOutputElement eval]){
+			if([anOutputElement evalWithDelegate:self]){
 				outputLogicValue &= (0x1L << [anOutputElement bit]);
 			}
 		}
@@ -178,6 +175,13 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	//for the protocol
 }
 
+- (id) children
+{
+	return nil;
+}
+
+
+#pragma mark ¥¥¥Triger Logic
 - (NSArray*) collectOutputLogic
 {
 	NSMutableArray* array = [NSMutableArray array];
@@ -194,23 +198,17 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	NSMutableArray* array = [NSMutableArray array];
 	for(id anObj in [self orcaObjects]){
 		if([anObj isKindOfClass:NSClassFromString(@"ORLogicInBitModel")]){
-			if([anObj respondsToSelector:@selector(setInputValueFrom:)]){
-				[array addObject:anObj];
-			}
+			[array addObject:anObj];
 		}
 	}
 	return array;
 }
 
-- (BOOL) inputBitValue:(short)index
+#pragma mark ¥¥¥Triger Logic Protocol
+- (int) inputValue:(short)index
 {
 	if(index>=0 && index<32)return (inputLogicValue & (1<<index)) != 0;
 	else return 0;
-}
-
-- (id) children
-{
-	return nil;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -219,6 +217,7 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 {
     dataId = aDataId;
 }
+
 - (void) setDataIds:(id)assigner
 {
     dataId			= [assigner assignDataIds:kLongForm];
