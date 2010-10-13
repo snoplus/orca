@@ -1736,6 +1736,7 @@
 		84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AD4C2D0BA21B7A003C7ABE /* ORWindowListController.h */; };
 		84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */; };
 		84AD4CD70BA23300003C7ABE /* WindowList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */; };
+		84AE7BA412662D34003F7194 /* ORTriggerProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AE7BA312662D34003F7194 /* ORTriggerProtocols.h */; };
 		84AF17521188C88500449ACE /* ORCAEN1785Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */; };
 		84AF17531188C88500449ACE /* ORCAEN1785Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
 		84AFC24A1029F35E009F4139 /* downRamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC23E1029F35E009F4139 /* downRamp.png */; };
@@ -4119,6 +4120,7 @@
 		84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORWindowListController.m; path = "Source/Main Dialogs/WindowList/ORWindowListController.m"; sourceTree = SOURCE_ROOT; };
 		84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowList.nib; path = "Source/Main Dialogs/WindowList/WindowList.nib"; sourceTree = SOURCE_ROOT; };
 		84ADA288040ADF2D005F64B1 /* NcdMux.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdMux.nib; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.nib"; sourceTree = SOURCE_ROOT; };
+		84AE7BA312662D34003F7194 /* ORTriggerProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTriggerProtocols.h; sourceTree = "<group>"; };
 		84AFC23E1029F35E009F4139 /* downRamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = downRamp.png; path = Source/Objects/Hardware/Vme/VHQ224L/downRamp.png; sourceTree = SOURCE_ROOT; };
 		84AFC23F1029F35E009F4139 /* highVoltage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = highVoltage.png; path = Source/Objects/Hardware/Vme/VHQ224L/highVoltage.png; sourceTree = SOURCE_ROOT; };
 		84AFC2401029F35E009F4139 /* lowVoltage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lowVoltage.png; path = Source/Objects/Hardware/Vme/VHQ224L/lowVoltage.png; sourceTree = SOURCE_ROOT; };
@@ -9579,6 +9581,7 @@
 		84D5DE94125CB18C00003496 /* TriggerSystem */ = {
 			isa = PBXGroup;
 			children = (
+				84AE7BA312662D34003F7194 /* ORTriggerProtocols.h */,
 				84D5DE97125CB1BE00003496 /* ORTriggerLogicView.h */,
 				84D5DE98125CB1BE00003496 /* ORTriggerLogicView.m */,
 				84D5DECB125CC2F400003496 /* Logic */,
@@ -11545,6 +11548,7 @@
 				840AC2FF12635089007B6CAF /* ORLogicOutBitModel.h in Headers */,
 				840AC4A112635F15007B6CAF /* ORTGates.h in Headers */,
 				840AC59812638B5D007B6CAF /* nTPCPadPlaneView.h in Headers */,
+				84AE7BA412662D34003F7194 /* ORTriggerProtocols.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
