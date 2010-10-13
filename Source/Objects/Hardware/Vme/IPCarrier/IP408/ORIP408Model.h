@@ -46,6 +46,8 @@
 		//trigger logic
 		unsigned long inputLogicValue;
 		unsigned long outputLogicValue;
+		unsigned long inputLogicMask;
+		unsigned long outputLogicMask;
 		NSArray* inputLogicElements;
 		NSArray* outputLogicElements;
 }

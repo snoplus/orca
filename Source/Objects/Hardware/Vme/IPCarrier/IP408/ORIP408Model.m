@@ -147,20 +147,27 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 {
 	outputLogicElements = [[self collectOutputLogic] retain];
 	inputLogicElements = [[self collectInputLogic] retain];
+	inputLogicMask = 0x0;
+	outputLogicMask = 0x0;
+	for(id anElement in inputLogicElements)  inputLogicMask  |= (0x1L<<[anElement bit]);
+	for(id anElement in outputLogicElements) {
+		outputLogicMask  |= (0x1L<<[anElement bit]);
+		[anElement reset];
+	}
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if([outputLogicElements count]){
 		outputLogicValue = 0x0;
-		//inputLogicValue = [self getInputWithMask:0xffffffff];
-		inputLogicValue = 0x2;
+		//inputLogicValue = [self getInputWithMask:inputLogicMask];
+		inputLogicValue = 0xf;
 		for(id anOutputElement in outputLogicElements){
 			if([anOutputElement evalWithDelegate:self]){
-				outputLogicValue &= (0x1L << [anOutputElement bit]);
+				outputLogicValue |= (0x1L << [anOutputElement bit]);
 			}
 		}
-		//[self setOutputWithMask:0xffffffff value:outputLogicValue];
+		//[self setOutputWithMask:outputLogicMask value:outputLogicValue];
 	}
 }
 
@@ -179,7 +186,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 {
 	return nil;
 }
-
 
 #pragma mark ¥¥¥Triger Logic
 - (NSArray*) collectOutputLogic

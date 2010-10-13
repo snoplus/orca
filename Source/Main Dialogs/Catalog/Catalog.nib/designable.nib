@@ -9000,6 +9000,54 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSPeriodicInterval">75</int>
 												</object>
 											</object>
+											<object class="NSButton" id="593438835">
+												<reference key="NSNextResponder" ref="91046632"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{106, 52}, {58, 45}}</string>
+												<reference key="NSSuperview" ref="91046632"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="223591286">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">134217728</int>
+													<string key="NSContents"/>
+													<reference key="NSSupport" ref="25"/>
+													<reference key="NSControlView" ref="593438835"/>
+													<int key="NSButtonFlags">-2042347265</int>
+													<int key="NSButtonFlags2">2</int>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">LogicSplit</string>
+													</object>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">400</int>
+													<int key="NSPeriodicInterval">75</int>
+												</object>
+											</object>
+											<object class="NSButton" id="94420672">
+												<reference key="NSNextResponder" ref="91046632"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{176, 52}, {58, 45}}</string>
+												<reference key="NSSuperview" ref="91046632"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="1036682264">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">134217728</int>
+													<string key="NSContents"/>
+													<reference key="NSSupport" ref="25"/>
+													<reference key="NSControlView" ref="94420672"/>
+													<int key="NSButtonFlags">-2042347265</int>
+													<int key="NSButtonFlags2">2</int>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">LogicJoin</string>
+													</object>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">400</int>
+													<int key="NSPeriodicInterval">75</int>
+												</object>
+											</object>
 											<object class="NSButton" id="321643727">
 												<reference key="NSNextResponder" ref="91046632"/>
 												<int key="NSvFlags">256</int>
@@ -15946,6 +15994,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="256343319"/>
 							<reference ref="86307301"/>
 							<reference ref="695559450"/>
+							<reference ref="94420672"/>
+							<reference ref="593438835"/>
 						</object>
 						<reference key="parent" ref="805222537"/>
 					</object>
@@ -16074,6 +16124,34 @@ ZSBjb250cm9sbGVyLg</string>
 						<int key="objectID">26278</int>
 						<reference key="object" ref="67953667"/>
 						<reference key="parent" ref="86307301"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26279</int>
+						<reference key="object" ref="593438835"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="223591286"/>
+						</object>
+						<reference key="parent" ref="91046632"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26280</int>
+						<reference key="object" ref="223591286"/>
+						<reference key="parent" ref="593438835"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26281</int>
+						<reference key="object" ref="94420672"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="1036682264"/>
+						</object>
+						<reference key="parent" ref="91046632"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26282</int>
+						<reference key="object" ref="1036682264"/>
+						<reference key="parent" ref="94420672"/>
 					</object>
 				</object>
 			</object>
@@ -17157,6 +17235,18 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26277.ImportedFromIB2</string>
 					<string>26278.IBAttributePlaceholdersKey</string>
 					<string>26278.IBPluginDependency</string>
+					<string>26279.CustomClassName</string>
+					<string>26279.IBAttributePlaceholdersKey</string>
+					<string>26279.IBPluginDependency</string>
+					<string>26279.ImportedFromIB2</string>
+					<string>26280.IBAttributePlaceholdersKey</string>
+					<string>26280.IBPluginDependency</string>
+					<string>26281.CustomClassName</string>
+					<string>26281.IBAttributePlaceholdersKey</string>
+					<string>26281.IBPluginDependency</string>
+					<string>26281.ImportedFromIB2</string>
+					<string>26282.IBAttributePlaceholdersKey</string>
+					<string>26282.IBPluginDependency</string>
 					<string>267.IBPluginDependency</string>
 					<string>267.ImportedFromIB2</string>
 					<string>2709.IBPluginDependency</string>
@@ -19739,6 +19829,46 @@ ZSBjb250cm9sbGVyLg</string>
 						</object>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ObjectFactory</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="593438835"/>
+							<string key="toolTip">ORTSplitter</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="223591286"/>
+							<string key="toolTip">ORIOBitStripModel</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ObjectFactory</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="94420672"/>
+							<string key="toolTip">ORTJoiner</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="1036682264"/>
+							<string key="toolTip">ORIOBitStripModel</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -20062,9 +20192,9 @@ ZSBjb250cm9sbGVyLg</string>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{53, 540}, {863, 265}}</string>
+					<string>{{54, 540}, {863, 265}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{53, 540}, {863, 265}}</string>
+					<string>{{54, 540}, {863, 265}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
@@ -21420,7 +21550,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26278</int>
+			<int key="maxID">26282</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -23106,7 +23236,9 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>LakeShore210</string>
 				<string>Listener</string>
 				<string>LogicInBit</string>
+				<string>LogicJoin</string>
 				<string>LogicOutBit</string>
+				<string>LogicSplit</string>
 				<string>M321</string>
 				<string>MCA927</string>
 				<string>MCarrierCard</string>
@@ -23307,7 +23439,9 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{118, 58}</string>
 				<string>{44, 25}</string>
 				<string>{39, 21}</string>
+				<string>{33, 24}</string>
 				<string>{39, 21}</string>
+				<string>{33, 24}</string>
 				<string>{60, 177}</string>
 				<string>{26.25, 70.5}</string>
 				<string>{16, 128}</string>

@@ -87,6 +87,10 @@ NSString* ORLogicInBitChanged = @"ORLogicInBitChanged";
 	return [anObj inputValue:bit]!=0;
 }
 
+- (void) reset
+{
+}
+
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];

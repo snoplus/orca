@@ -25,6 +25,12 @@
 @implementation ORTGate
 
 #pragma mark ¥¥¥Initialization
+- (void) reset
+{
+	alreadyEvaluated = NO;
+	[[self objectConnectedTo:@"Input1"] reset];
+	[[self objectConnectedTo:@"Input2"] reset];
+}
 
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
@@ -108,3 +114,66 @@
 - (BOOL) evalWithDelegate:(id)anObj	{ return ![self evalWithDelegate:anObj]; }
 @end
 
+//-------------------------------------------------------------
+@implementation ORTJoiner
+#pragma mark ¥¥¥Initialization
+- (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"LogicJoin"]]; }
+- (void) makeConnectors
+{	
+	ORConnector* inConnector = [[ORConnector alloc] initAt:NSMakePoint(0,0) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Input1"];
+    [ inConnector setConnectorType: 'TLI ' ];
+    [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
+    [inConnector release];
+	
+    inConnector = [[ORConnector alloc] initAt:NSMakePoint(0,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Input2"];
+    [ inConnector setConnectorType: 'TLI ' ];
+    [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
+    [inConnector release];
+	
+    ORConnector* outConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height/2 - kConnectorSize/2+1) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:outConnector forKey:@"Output"];
+    [ outConnector setConnectorType: 'TLO ' ];
+    [ outConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
+    [outConnector release];
+}
+
+@end
+
+//-------------------------------------------------------------
+@implementation ORTSplitter
+#pragma mark ¥¥¥Initialization
+- (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"LogicSplit"]]; }
+- (void) makeConnectors
+{	
+	ORConnector* inConnector = [[ORConnector alloc] initAt:NSMakePoint(0,[self frame].size.height/2-kConnectorSize/2+1) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Input1"];
+    [ inConnector setConnectorType: 'TLI ' ];
+    [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
+    [inConnector release];
+	
+    inConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Output1"];
+    [ inConnector setConnectorType: 'TLO ' ];
+    [ inConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
+    [inConnector release];
+	
+    ORConnector* outConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,0) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:outConnector forKey:@"Output2"];
+    [ outConnector setConnectorType: 'TLO ' ];
+    [ outConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
+    [outConnector release];
+}
+- (BOOL) evalWithDelegate:(id)anObj
+{
+	//no sense in evaluating twice, so do some logic
+	if(alreadyEvaluated)	alreadyEvaluated = NO;
+	else {
+		state = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+		alreadyEvaluated = YES;
+	}
+	return state;
+}
+	
+@end

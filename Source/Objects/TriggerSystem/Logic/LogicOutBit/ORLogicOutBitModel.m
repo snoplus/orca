@@ -89,6 +89,10 @@ NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
 {
 	return [[self objectConnectedTo:@"Bit"] evalWithDelegate:anObj];
 }
+- (void) reset
+{
+	[[self objectConnectedTo:@"Bit"] reset];
+}
 
 - (id)initWithCoder:(NSCoder*)decoder
 {

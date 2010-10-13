@@ -20,7 +20,9 @@
 
 @interface ORTGate :  OrcaObject
 {
+	BOOL alreadyEvaluated;
 }
+- (void) reset;
 - (BOOL) evalWithDelegate:(id)anObj;
 @end
 
@@ -51,6 +53,19 @@
 //-------------------------------------------------------------
 @interface ORTXorGate :  ORTGate
 {
+}
+@end
+
+//-------------------------------------------------------------
+@interface ORTJoiner :  ORTAndGate
+{
+}
+@end
+
+//-------------------------------------------------------------
+@interface ORTSplitter :  ORTGate
+{
+	BOOL state;
 }
 @end
 
