@@ -27,7 +27,7 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
 
-@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker,TriggerLogicIn,TriggerLogicOut>
+@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker,TriggerLogicIn,TriggerLogicOut,TriggerChildReading>
 {
 	@private
 		unsigned long   dataId;
@@ -94,6 +94,7 @@
 #pragma mark ¥¥¥Triger Logic Protocol
 - (unsigned long) inputValue:(short)index;
 - (unsigned long) inputLogicValue;
+- (void) readChild:(int)anIndex;
 @end
 
 #pragma mark ¥¥¥External String Definitions

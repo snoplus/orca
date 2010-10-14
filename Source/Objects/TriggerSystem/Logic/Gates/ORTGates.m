@@ -195,11 +195,11 @@
     [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
     [inConnector release];
 	
-    inConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height/2-kConnectorSize/2) withGuardian:self withObjectLink:self];
-    [[self connectors] setObject:inConnector forKey:@"Output1"];
-    [ inConnector setConnectorType: 'TLO ' ];
-    [ inConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
-    [inConnector release];	
+    ORConnector* outConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height/2-kConnectorSize/2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:outConnector forKey:@"Output1"];
+    [ outConnector setConnectorType: 'TLO ' ];
+    [ outConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
+    [outConnector release];	
 }
 
 - (BOOL) evalWithDelegate:(id)anObj
@@ -214,4 +214,31 @@
 }
 
 @end
+
+//-------------------------------------------------------------
+@implementation ORTInverter
+#pragma mark ¥¥¥Initialization
+- (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"Inverter"]]; }
+- (void) makeConnectors
+{	
+	ORConnector* inConnector = [[ORConnector alloc] initAt:NSMakePoint(0,[self frame].size.height/2-kConnectorSize/2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Input1"];
+    [ inConnector setConnectorType: 'TLI ' ];
+    [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
+    [inConnector release];
+	
+    ORConnector* outConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height/2-kConnectorSize/2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:outConnector forKey:@"Output1"];
+    [ outConnector setConnectorType: 'TLO ' ];
+    [ outConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
+    [outConnector release];	
+}
+
+- (BOOL) evalWithDelegate:(id)anObj
+{
+	return ![[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+}
+
+@end
+
 

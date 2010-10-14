@@ -151,7 +151,7 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	outputLogicMask = 0x0;
 	for(id anElement in inputLogicElements)  inputLogicMask  |= (0x1L<<[anElement bit]);
 	for(id anElement in outputLogicElements) {
-		outputLogicMask  |= (0x1L<<[anElement bit]);
+		if([anElement respondsToSelector:@selector(bit)])outputLogicMask  |= (0x1L<<[anElement bit]);
 		[anElement reset];
 	}
 }
@@ -192,7 +192,9 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 {
 	NSMutableArray* array = [NSMutableArray array];
 	for(id anObj in [self orcaObjects]){
-		if([anObj isKindOfClass:NSClassFromString(@"ORLogicOutBitModel")]){
+		if([anObj conformsToProtocol:NSProtocolFromString(@"TriggerBitSetting")] ||
+		   [anObj conformsToProtocol:NSProtocolFromString(@"TriggerChildReadingEndNode")]){
+
 			[array addObject:anObj];
 		}
 	}
@@ -203,7 +205,7 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 {
 	NSMutableArray* array = [NSMutableArray array];
 	for(id anObj in [self orcaObjects]){
-		if([anObj isKindOfClass:NSClassFromString(@"ORLogicInBitModel")]){
+		if([anObj conformsToProtocol:NSProtocolFromString(@"TriggerBitReading")]){
 			[array addObject:anObj];
 		}
 	}
@@ -220,6 +222,11 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 - (unsigned long) inputLogicValue
 {
 	return inputLogicValue;
+}
+
+- (void) readChild:(int)index
+{
+	NSLog(@"read %d\n",index);
 }
 
 #pragma mark ¥¥¥Accessors

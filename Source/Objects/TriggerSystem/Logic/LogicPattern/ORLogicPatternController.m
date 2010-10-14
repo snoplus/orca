@@ -66,17 +66,18 @@
 - (void) updateWindow
 {
     [self logicPatternChanged:nil];
+    [self logicPatternMaskChanged:nil];
 }
 
 - (void) logicPatternChanged:(NSNotification*)aNotification
 {
-	[logicPatternTextField setDoubleValue: [model pattern]];
+	[logicPatternTextField setIntValue: [model pattern]];
 	[model setUpImage];
 }
 
 - (void) logicPatternMaskChanged:(NSNotification*)aNotification
 {
-	[logicPatternMaskTextField setDoubleValue: [model patternMask]];
+	[logicPatternMaskTextField setIntValue: [model patternMask]];
 }
 
 

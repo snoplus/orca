@@ -17,8 +17,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORTriggerProtocols.h"
 
-@interface ORLogicOutBitModel :  OrcaObject
+@interface ORLogicOutBitModel :  OrcaObject <TriggerBitSetting>
 {
 	unsigned long bit;
 }

@@ -29,3 +29,19 @@
 @protocol TriggerLogicOut
 @end
 
+@protocol TriggerChildReading
+- (void) readChild:(int)index;
+@end
+
+@protocol TriggerBitReading
+@end
+
+@protocol TriggerBitSetting
+@end
+
+@protocol TriggerPatternReading
+@end
+
+@protocol TriggerChildReadingEndNode
+@end
+
