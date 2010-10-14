@@ -96,7 +96,7 @@ NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 - (BOOL) evalWithDelegate:(id)anObj
 {
 	BOOL state = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
-	if(state)[anObj readChild:childIndex];
+	if(state)[anObj scheduleChildForRead:childIndex];
 	return state;
 }
 
@@ -141,7 +141,7 @@ NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 - (BOOL) evalWithDelegate:(id)anObj
 {
 	BOOL state = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
-	if(state)[anObj readChild:[self childIndex]];
+	if(state)[anObj scheduleChildForRead:[self childIndex]];
 	return NO;
 }
 

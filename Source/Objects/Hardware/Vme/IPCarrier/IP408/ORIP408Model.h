@@ -26,6 +26,7 @@
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
+@class ORReadOutList;
 
 @interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker,TriggerLogicIn,TriggerLogicOut,TriggerChildReading>
 {
@@ -50,6 +51,11 @@
 		unsigned long outputLogicMask;
 		NSArray* inputLogicElements;
 		NSArray* outputLogicElements;
+
+		ORReadOutList*  trigger1Group;
+		NSArray*		dataTakers1;       //cache of data takers.
+		NSMutableArray* triggeredChildren; //children readon trigger.
+
 }
 
 #pragma mark ¥¥¥Initialization
@@ -87,14 +93,21 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 
-#pragma mark ¥¥¥Triger Logic
+#pragma mark ¥¥¥Trigger Logic
 - (NSArray*) collectOutputLogic;
 - (NSArray*) collectInputLogic;
 
-#pragma mark ¥¥¥Triger Logic Protocol
+#pragma mark ¥¥¥Trigger Logic Protocol
 - (unsigned long) inputValue:(short)index;
 - (unsigned long) inputLogicValue;
-- (void) readChild:(int)anIndex;
+- (void) scheduleChildForRead:(int)index;
+
+#pragma mark ¥¥¥The Trigger Childen
+- (ORReadOutList*) trigger1Group;
+- (void) setTrigger1Group:(ORReadOutList*)newTrigger1Group;
+- (void) saveReadOutList:(NSFileHandle*)aFile;
+- (void) loadReadOutList:(NSFileHandle*)aFile;
+
 @end
 
 #pragma mark ¥¥¥External String Definitions

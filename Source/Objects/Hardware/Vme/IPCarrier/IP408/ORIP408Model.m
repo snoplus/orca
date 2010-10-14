@@ -28,6 +28,7 @@
 #import "ObjectFactory.h"
 #import "ORLogicInBitModel.h"
 #import "ORLogicOutBitModel.h"
+#import "ORReadOutList.h"
 
 #define kORIP408RecordLength 7
 
@@ -66,12 +67,18 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     hwLock = [[NSLock alloc] init];
     [[self undoManager] enableUndoRegistration];
 	[self registerNotificationObservers];
+	
+	ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"Trigger Group"];
+    [self setTrigger1Group:r1];
+    [r1 release];
+	
     return self;
 }
 
 -(void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [trigger1Group release];    
     [hwLock release];
     [super dealloc];
 }
@@ -90,6 +97,17 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 {
 	return @"VME/IP408.html";
 }
+- (ORReadOutList*) trigger1Group
+{
+    return trigger1Group;
+}
+
+- (void) setTrigger1Group:(ORReadOutList*)newTrigger1Group
+{
+    [trigger1Group autorelease];
+    trigger1Group=[newTrigger1Group retain];
+}
+
 
 - (void) makeConnectors
 {
@@ -154,6 +172,12 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 		if([anElement respondsToSelector:@selector(bit)])outputLogicMask  |= (0x1L<<[anElement bit]);
 		[anElement reset];
 	}
+	
+	dataTakers1 = [[trigger1Group allObjects] retain];	//cache of data takers.
+	for (id obj in dataTakers1){
+		[obj runTaskStarted:aDataPacket userInfo:userInfo];
+	}
+	triggeredChildren = [[NSMutableArray array] retain];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -167,14 +191,25 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 				outputLogicValue |= (0x1L << [anOutputElement bit]);
 			}
 		}
+		for(id obj in triggeredChildren){
+			[obj takeData:aDataPacket userInfo:userInfo];
+		}
+		[triggeredChildren removeAllObjects];
 		//[self setOutputWithMask:outputLogicMask value:outputLogicValue];
 	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	for (id obj in dataTakers1){
+		[obj runTaskStopped:aDataPacket userInfo:userInfo];
+	}
+	
 	[outputLogicElements release];
 	[inputLogicElements release];
+	[dataTakers1 release];
+	[triggeredChildren release];
+	triggeredChildren = nil;
 }
 
 - (void) reset
@@ -182,10 +217,21 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	//for the protocol
 }
 
-- (id) children
-{
-	return nil;
+- (NSMutableArray*) children {
+    //methods exists to give common interface across all objects for display in lists
+    return [NSMutableArray arrayWithObjects:trigger1Group,nil];
 }
+- (void) saveReadOutList:(NSFileHandle*)aFile
+{
+    [trigger1Group saveUsingFile:aFile];
+}
+
+- (void) loadReadOutList:(NSFileHandle*)aFile
+{
+    [self setTrigger1Group:[[[ORReadOutList alloc] initWithIdentifier:@"NestedRead"]autorelease]];
+    [trigger1Group loadUsingFile:aFile];
+}
+
 
 #pragma mark ¥¥¥Triger Logic
 - (NSArray*) collectOutputLogic
@@ -224,9 +270,11 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	return inputLogicValue;
 }
 
-- (void) readChild:(int)index
+- (void) scheduleChildForRead:(int)index
 {
-	NSLog(@"read %d\n",index);
+	if(index<[dataTakers1 count]){
+		[triggeredChildren addObject:[dataTakers1 objectAtIndex:index]];
+	}
 }
 
 #pragma mark ¥¥¥Accessors
@@ -264,6 +312,15 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	
 
     return dataDictionary;
+}
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
+{	
+	NSMutableArray* eventGroup1 = [NSMutableArray array];
+	NSMutableDictionary* aNestedDictionary = [NSMutableDictionary dictionary];
+	[trigger1Group appendEventDictionary:aNestedDictionary topLevel:topLevel];
+	if([aNestedDictionary count])[eventGroup1 addObject:aNestedDictionary];
+	
+	[anEventDictionary setObject:eventGroup1 forKey:@"ORIP408 Trigger1"];
 }
 
 
@@ -317,7 +374,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 - (unsigned long) readValue
 {
     return readValue;
-    
 }
 
 - (void) setReadValue:(unsigned long)aValue
@@ -428,7 +484,8 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
     [self setWriteMask:[decoder decodeIntForKey:ORIP408WriteMask]];
     [self setReadMask:[decoder decodeIntForKey:ORIP408ReadMask]];
     [self setWriteValue:[decoder decodeIntForKey:ORIP408WriteValue]];
-    
+	[self setTrigger1Group:[decoder decodeObjectForKey:@"trigger1Group"]];
+   
     [[self undoManager] enableUndoRegistration];
     
     hwLock = [[NSLock alloc] init];
@@ -444,6 +501,7 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
     [encoder encodeInt:[self writeMask] forKey:ORIP408WriteMask];
     [encoder encodeInt:[self readMask] forKey:ORIP408ReadMask];
     [encoder encodeInt:[self writeValue] forKey:ORIP408WriteValue];
+    [encoder encodeObject:[self trigger1Group] forKey:@"trigger1Group"];
 }
 
 #pragma mark ¥¥¥Bit Processing Protocol

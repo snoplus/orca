@@ -30,7 +30,7 @@
 @end
 
 @protocol TriggerChildReading
-- (void) readChild:(int)index;
+- (void) scheduleChildForRead:(int)index;
 @end
 
 @protocol TriggerBitReading
