@@ -23,118 +23,33 @@
 
 NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 
-@implementation ORLogicChildReadModel
-
-#pragma mark ¥¥¥Initialization
-- (void) setUpImage
-{
-	NSImage* aCachedImage = [NSImage imageNamed:@"LogicChildRead"];
-	NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
-	[i lockFocus];
-	[aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-	NSAttributedString* n = [[NSAttributedString alloc] 
-							 initWithString:[NSString stringWithFormat:@"Read %d",[self childIndex]] 
-							 attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
-
-	[n drawAtPoint:NSMakePoint(17,4)];
-	[n release];
-	[i unlockFocus];		
-	[self setImage:i];
-	[i release];
-
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:OROrcaObjectImageChanged
-	 object:self];
-}
-- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
-{
-    return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerChildReading")];
-}
-
-- (void) makeMainController
-{
-    [self linkToController:@"ORLogicChildReadController"];
-}
-
--(void) makeConnectors
-{	
-	NSPoint loc = NSMakePoint(0,[self frame].size.height/2 - kConnectorSize/2 );
-	ORConnector* aConnector = [[ORConnector alloc] initAt:loc withGuardian:self withObjectLink:self];
-	[[self connectors] setObject:aConnector forKey:@"Input1"];
-	[ aConnector setConnectorType: 'TLI ' ];
-	[ aConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to processor inputs
-	[aConnector release];
-}
-
-- (NSString*) identifier
-{
-    return [NSString stringWithFormat:@"Child Read %d",[self uniqueIdNumber]];
-}
-
-- (unsigned short) childIndex
-{
-	return childIndex;
-}
-
-- (void) setChildIndex:(unsigned short)anIndex
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setChildIndex:childIndex];
-    childIndex = anIndex;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLogicChildReadChanged object:self];
-}	
-
-- (BOOL) evalWithDelegate:(id)anObj
-{
-	BOOL state = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
-	if(state)[anObj readChild:childIndex];
-	return NO;
-}
-
-- (void) reset
-{
-	[[self objectConnectedTo:@"Input1"] reset];
-}
-
-- (id)initWithCoder:(NSCoder*)decoder
-{
-    self = [super initWithCoder:decoder];
-    [[self undoManager] disableUndoRegistration];
-    [self setChildIndex:[decoder decodeIntForKey:@"ChildIndex"]];
-    [[self undoManager] enableUndoRegistration];
-    return self;
-}
-
-- (void)encodeWithCoder:(NSCoder*)encoder
-{
-    [super encodeWithCoder:encoder];
-    [encoder encodeInt:childIndex forKey:@"ChildIndex"];
-}
-@end
-
 @implementation ORLogicChildRead2Model
 
 #pragma mark ¥¥¥Initialization
 - (void) setUpImage
 {
-	NSImage* aCachedImage = [NSImage imageNamed:@"LogicChildRead2"];
+	[self useImage:[NSImage imageNamed:@"LogicChildRead2"]];
+}
+	 
+- (void) useImage:(NSImage*)aCachedImage
+{
 	NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
 	[i lockFocus];
 	[aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
 	NSAttributedString* n = [[NSAttributedString alloc] 
 							 initWithString:[NSString stringWithFormat:@"Read %d",[self childIndex]] 
 							 attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
-	
+
 	[n drawAtPoint:NSMakePoint(17,4)];
 	[n release];
 	[i unlockFocus];		
 	[self setImage:i];
 	[i release];
-	
+
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName:OROrcaObjectImageChanged
 	 object:self];
 }
-
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
     return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerChildReading")];
@@ -162,7 +77,8 @@ NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"Child Read2 %d",[self uniqueIdNumber]];
+	NSString* s = [[self className] substringFromIndex:2];
+    return [NSString stringWithFormat:@"%@ %d",s,[self uniqueIdNumber]];
 }
 
 - (unsigned short) childIndex
@@ -203,4 +119,30 @@ NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
     [super encodeWithCoder:encoder];
     [encoder encodeInt:childIndex forKey:@"ChildIndex"];
 }
+@end
+
+@implementation ORLogicChildReadModel
+
+#pragma mark ¥¥¥Initialization
+- (void) setUpImage
+{
+	[self useImage:[NSImage imageNamed:@"LogicChildRead"]];
+}
+
+-(void) makeConnectors
+{	
+	ORConnector* inConnector = [[ORConnector alloc] initAt:NSMakePoint(0,[self frame].size.height/2-kConnectorSize/2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Input1"];
+    [ inConnector setConnectorType: 'TLI ' ];
+    [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
+    [inConnector release];
+}
+
+- (BOOL) evalWithDelegate:(id)anObj
+{
+	BOOL state = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+	if(state)[anObj readChild:[self childIndex]];
+	return NO;
+}
+
 @end

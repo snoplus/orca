@@ -19,24 +19,21 @@
 //-------------------------------------------------------------
 #import "ORTriggerProtocols.h"
 
-@interface ORLogicChildReadModel :  OrcaObject <TriggerChildReadingEndNode>
+@interface ORLogicChildRead2Model :  OrcaObject 
 {
 	unsigned long childIndex;
 }
 - (unsigned short) childIndex;
+- (void) useImage:(NSImage*)aCachedImage;
 - (void) setChildIndex:(unsigned short)aBit;
 - (BOOL) evalWithDelegate:(id)anObj;
 @end
 
 extern NSString* ORLogicChildReadChanged;
 
-@interface ORLogicChildRead2Model :  OrcaObject
+@interface ORLogicChildReadModel :  ORLogicChildRead2Model <TriggerChildReadingEndNode>
 {
-	unsigned long childIndex;
 }
-- (unsigned short) childIndex;
-- (void) setChildIndex:(unsigned short)aBit;
-- (void) useImage:(NSImage*) aCachedImage;
 - (BOOL) evalWithDelegate:(id)anObj;
 @end
 

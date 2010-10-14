@@ -21,7 +21,7 @@
 
 @interface ORLogicInBitModel :  OrcaObject <TriggerBitReading>
 {
-	unsigned long bit;
+	unsigned short bit;
 }
 - (unsigned short) bit;
 - (void) setBit:(unsigned short)aBit;
