@@ -69,4 +69,11 @@
 }
 @end
 
+//-------------------------------------------------------------
+@interface ORTHiLatch :  ORTGate
+{
+	BOOL lastState;
+}
+@end
+
 

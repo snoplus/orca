@@ -95,6 +95,8 @@
 - (void) setEnablePageWrap:(BOOL)aEnablePageWrap;
 - (int) pageWrapSize;
 - (void) setPageWrapSize:(int)aPageWrapSize;
+- (int) pageSize;
+
 - (unsigned long) stopDelay;
 - (void) setStopDelay:(unsigned long)aStopDelay;
 - (unsigned long) startDelay;
@@ -174,6 +176,7 @@
 - (void) writeDacOffsets;
 - (void) writeAdcTestMode;
 - (void) writeGainControlRegister;
+- (void) writeTriggerClearCounter;
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId;

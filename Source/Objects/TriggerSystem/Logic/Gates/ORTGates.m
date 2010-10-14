@@ -153,13 +153,13 @@
     [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
     [inConnector release];
 	
-    inConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
-    [[self connectors] setObject:inConnector forKey:@"Output1"];
-    [ inConnector setConnectorType: 'TLO ' ];
-    [ inConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
-    [inConnector release];
+    ORConnector*  outConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:outConnector forKey:@"Output1"];
+    [ outConnector setConnectorType: 'TLO ' ];
+    [ outConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
+    [outConnector release];
 	
-    ORConnector* outConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,0) withGuardian:self withObjectLink:self];
+    outConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,0) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:outConnector forKey:@"Output2"];
     [ outConnector setConnectorType: 'TLO ' ];
     [ outConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
@@ -177,3 +177,41 @@
 }
 	
 @end
+
+//-------------------------------------------------------------
+@implementation ORTHiLatch
+#pragma mark ¥¥¥Initialization
+- (void) setUpImage		 { [self setImage:[NSImage imageNamed:@"HighLatch"]]; }
+- (void) reset
+{
+	lastState = NO;
+	[super reset];
+}
+- (void) makeConnectors
+{	
+	ORConnector* inConnector = [[ORConnector alloc] initAt:NSMakePoint(0,[self frame].size.height/2-kConnectorSize/2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Input1"];
+    [ inConnector setConnectorType: 'TLI ' ];
+    [ inConnector addRestrictedConnectionType: 'TLO ' ]; //can only connect to logic outputs
+    [inConnector release];
+	
+    inConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,[self frame].size.height/2-kConnectorSize/2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:@"Output1"];
+    [ inConnector setConnectorType: 'TLO ' ];
+    [ inConnector addRestrictedConnectionType: 'TLI ' ]; //can only connect to logic inputs
+    [inConnector release];	
+}
+
+- (BOOL) evalWithDelegate:(id)anObj
+{
+	BOOL lowToHiTransition = NO;
+	BOOL state = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+	if(state != lastState){
+		if(lastState == NO && state == YES)lowToHiTransition = YES;
+	}
+	lastState = state;
+	return lowToHiTransition;
+}
+
+@end
+

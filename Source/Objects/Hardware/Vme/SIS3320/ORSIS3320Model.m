@@ -138,6 +138,18 @@ static unsigned long triggerSetupRegOffsets[48] = { //read/write
 	0x03800038
 };
 
+
+static unsigned long triggerFlagClearCounter[8] = { //read/write
+	0x0200002C,
+	0x0200002C,
+	0x0280002C,
+	0x0280002C,
+	0x0300002C,
+	0x0300002C,
+	0x0380002C,
+	0x0380002C
+};
+
 static unsigned long triggerThresholdRegOffsets[8] = { //read/write
 	0x02000034,
 	0x0200003C,
@@ -310,6 +322,24 @@ unsigned long rblt_data[kMaxNumberWords];
     [[[self undoManager] prepareWithInvocationTarget:self] setPageWrapSize:pageWrapSize];
     pageWrapSize = aPageWrapSize;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3320ModelPageWrapSizeChanged object:self];
+}
+
+- (int) pageSize
+{
+	switch(pageWrapSize){
+		case 0:  return 16*1024*1024;
+		case 1:  return 4*1024*1024;
+		case 2:  return 1024*1024;
+		case 3:  return 256*1024;
+		case 4:  return 64*1024;
+		case 5:  return 16*1024;
+		case 6:  return 4*1024;
+		case 7:  return 1024;
+		case 8:  return 256;
+		case 9:  return 128;
+		case 10: return 64;
+	}
+	return 0;
 }
 
 - (unsigned long) stopDelay
@@ -698,6 +728,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	
 	[self writeStartDelay:startDelay];
 	[self writeStopDelay:stopDelay];
+	[self writeTriggerClearCounter];
 	
 	[self writeValue:maxNumEvents offset:kMaxNumEventsReg];
 	[self writeEventConfigRegister];
@@ -848,6 +879,19 @@ unsigned long rblt_data[kMaxNumberWords];
 					 usingAddSpace:0x01];
 }
 
+
+- (void) writeTriggerClearCounter
+{
+	unsigned long aValue = [self pageSize];
+	int i;
+	for(i=0;i<8;i++){
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:baseAddress + triggerFlagClearCounter[i]
+							numToWrite:1
+							withAddMod:addressModifier
+						 usingAddSpace:0x01];
+	}
+}
 
 - (void) writeDacOffsets
 {
@@ -1185,11 +1229,12 @@ unsigned long rblt_data[kMaxNumberWords];
 		if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
 			int i;
 			
-			for(i=0;i<kNumSIS3320Channels;i++){
+		//for(i=0;i<kNumSIS3320Channels;i++){
+			for(i=0;i<4;i++){
 				unsigned long nextSampleAddress = [self readEventDir:i];
-//				BOOL wrap = (nextSampleAddress >> 28) & 0x1;
-				nextSampleAddress &= 0xFFFFFF;
-				if(nextSampleAddress != sampleStartAddress){
+				BOOL trig = (nextSampleAddress >> 28) & 0x1;
+				if(trig){
+					nextSampleAddress &= 0x1FFFFFc;
 					[self readAdcChannel:aDataPacket channel:i];
 				}
 			}
@@ -1300,12 +1345,16 @@ unsigned long rblt_data[kMaxNumberWords];
 
 - (unsigned long) readEventDir:(int)aChannel
 {
-	unsigned long aValue = 1;
+	unsigned long aValue = 0;
+	int i;
+	for(i=0;i<10;i++){
 	[[self adapter] readLongBlock: &aValue
-						 atAddress: baseAddress + eventDirectoryRegOffsets[aChannel]
+						atAddress: baseAddress + eventDirectoryRegOffsets[aChannel]// + i*4
 						numToRead: 1
 						withAddMod: addressModifier
 					 usingAddSpace: 0x01];
+		NSLog(@"%d: 0x%08x\n",i,aValue);
+	}
 	return aValue;
 }
 

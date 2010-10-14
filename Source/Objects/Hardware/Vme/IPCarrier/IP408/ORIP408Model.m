@@ -161,7 +161,7 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	if([outputLogicElements count]){
 		outputLogicValue = 0x0;
 		//inputLogicValue = [self getInputWithMask:inputLogicMask];
-		inputLogicValue = 0xf;
+		inputLogicValue = 0x5;
 		for(id anOutputElement in outputLogicElements){
 			if([anOutputElement evalWithDelegate:self]){
 				outputLogicValue |= (0x1L << [anOutputElement bit]);
@@ -211,10 +211,15 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 }
 
 #pragma mark ¥¥¥Triger Logic Protocol
-- (int) inputValue:(short)index
+- (unsigned long) inputValue:(short)index
 {
 	if(index>=0 && index<32)return (inputLogicValue & (1<<index)) != 0;
 	else return 0;
+}
+
+- (unsigned long) inputLogicValue
+{
+	return inputLogicValue;
 }
 
 #pragma mark ¥¥¥Accessors

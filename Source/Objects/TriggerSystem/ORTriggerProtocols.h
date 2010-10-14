@@ -22,6 +22,8 @@
 //logic window the devices can be placed into.
 
 @protocol TriggerLogicIn
+- (unsigned long) inputValue:(short)index;
+- (unsigned long) inputLogicValue;
 @end
 
 @protocol TriggerLogicOut

@@ -92,7 +92,8 @@
 - (NSArray*) collectInputLogic;
 
 #pragma mark ¥¥¥Triger Logic Protocol
-- (int) inputValue:(short)index;
+- (unsigned long) inputValue:(short)index;
+- (unsigned long) inputLogicValue;
 @end
 
 #pragma mark ¥¥¥External String Definitions
