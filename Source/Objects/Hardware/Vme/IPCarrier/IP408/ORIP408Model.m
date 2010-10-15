@@ -26,9 +26,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ObjectFactory.h"
-#import "ORLogicInBitModel.h"
-#import "ORLogicOutBitModel.h"
 #import "ORReadOutList.h"
+#import "ORTriggerLogic.h"
 
 #define kORIP408RecordLength 7
 
@@ -163,53 +162,36 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	outputLogicElements = [[self collectOutputLogic] retain];
-	inputLogicElements = [[self collectInputLogic] retain];
-	inputLogicMask = 0x0;
-	outputLogicMask = 0x0;
-	for(id anElement in inputLogicElements)  inputLogicMask  |= (0x1L<<[anElement bit]);
-	for(id anElement in outputLogicElements) {
-		if([anElement respondsToSelector:@selector(bit)])outputLogicMask  |= (0x1L<<[anElement bit]);
-		[anElement reset];
-	}
+	triggerLogic = [[ORTriggerLogicIO alloc] initWithDelegate:self];
 	
 	dataTakers1 = [[trigger1Group allObjects] retain];	//cache of data takers.
 	for (id obj in dataTakers1){
 		[obj runTaskStarted:aDataPacket userInfo:userInfo];
 	}
-	triggeredChildren = [[NSMutableArray array] retain];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	if([outputLogicElements count]){
-		outputLogicValue = 0x0;
-		//inputLogicValue = [self getInputWithMask:inputLogicMask];
-		inputLogicValue = 0x5;
-		for(id anOutputElement in outputLogicElements){
-			if([anOutputElement evalWithDelegate:self]){
-				outputLogicValue |= (0x1L << [anOutputElement bit]);
-			}
-		}
-		for(id obj in triggeredChildren){
-			[obj takeData:aDataPacket userInfo:userInfo];
-		}
-		[triggeredChildren removeAllObjects];
-		//[self setOutputWithMask:outputLogicMask value:outputLogicValue];
-	}
+	[triggerLogic evaluate:aDataPacket userInfo:userInfo];	 
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+
 	for (id obj in dataTakers1){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
 	}
-	
-	[outputLogicElements release];
-	[inputLogicElements release];
 	[dataTakers1 release];
-	[triggeredChildren release];
-	triggeredChildren = nil;
+	[triggerLogic release];
+	triggerLogic = nil;
+}
+
+- (id) triggerChild:(int)anIndex
+{
+	if(anIndex<[dataTakers1 count]) {
+		return [dataTakers1 objectAtIndex:anIndex];
+	}
+	else return nil;
 }
 
 - (void) reset
@@ -230,51 +212,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 {
     [self setTrigger1Group:[[[ORReadOutList alloc] initWithIdentifier:@"NestedRead"]autorelease]];
     [trigger1Group loadUsingFile:aFile];
-}
-
-
-#pragma mark ¥¥¥Triger Logic
-- (NSArray*) collectOutputLogic
-{
-	NSMutableArray* array = [NSMutableArray array];
-	for(id anObj in [self orcaObjects]){
-		if([anObj conformsToProtocol:NSProtocolFromString(@"TriggerBitSetting")] ||
-		   [anObj conformsToProtocol:NSProtocolFromString(@"TriggerChildReadingEndNode")]){
-
-			[array addObject:anObj];
-		}
-	}
-	return array;
-}
-
-- (NSArray*) collectInputLogic
-{
-	NSMutableArray* array = [NSMutableArray array];
-	for(id anObj in [self orcaObjects]){
-		if([anObj conformsToProtocol:NSProtocolFromString(@"TriggerBitReading")]){
-			[array addObject:anObj];
-		}
-	}
-	return array;
-}
-
-#pragma mark ¥¥¥Triger Logic Protocol
-- (unsigned long) inputValue:(short)index
-{
-	if(index>=0 && index<32)return (inputLogicValue & (1<<index)) != 0;
-	else return 0;
-}
-
-- (unsigned long) inputLogicValue
-{
-	return inputLogicValue;
-}
-
-- (void) scheduleChildForRead:(int)index
-{
-	if(index<[dataTakers1 count]){
-		[triggeredChildren addObject:[dataTakers1 objectAtIndex:index]];
-	}
 }
 
 #pragma mark ¥¥¥Accessors

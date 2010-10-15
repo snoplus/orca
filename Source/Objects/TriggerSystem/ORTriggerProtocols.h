@@ -22,15 +22,9 @@
 //logic window the devices can be placed into.
 
 @protocol TriggerLogicIn
-- (unsigned long) inputValue:(short)index;
-- (unsigned long) inputLogicValue;
 @end
 
 @protocol TriggerLogicOut
-@end
-
-@protocol TriggerChildReading
-- (void) scheduleChildForRead:(int)index;
 @end
 
 @protocol TriggerBitReading
@@ -43,5 +37,11 @@
 @end
 
 @protocol TriggerChildReadingEndNode
+@end
+
+@protocol TriggerControllingIO
+- (id) triggerChild:(int)anIndex;
+- (unsigned long) getInputWithMask:(unsigned long) aChannelMask;
+- (void) setOutputWithMask:(unsigned long) aChannelMask value:(unsigned long) aMaskValue;
 @end
 

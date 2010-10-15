@@ -27,8 +27,9 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
 @class ORReadOutList;
+@class ORTriggerLogic;
 
-@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker,TriggerLogicIn,TriggerLogicOut,TriggerChildReading>
+@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker,TriggerControllingIO,TriggerLogicIn,TriggerLogicOut>
 {
 	@private
 		unsigned long   dataId;
@@ -43,19 +44,12 @@
 		unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
 		unsigned long processOutputValue; //outputs to be written at end of process cycle
 		unsigned long processOutputMask;  //controlls which bits are written
-		
-		//trigger logic
-		unsigned long inputLogicValue;
-		unsigned long outputLogicValue;
-		unsigned long inputLogicMask;
-		unsigned long outputLogicMask;
-		NSArray* inputLogicElements;
-		NSArray* outputLogicElements;
-
+	
 		ORReadOutList*  trigger1Group;
 		NSArray*		dataTakers1;       //cache of data takers.
-		NSMutableArray* triggeredChildren; //children readon trigger.
-
+		
+		//trigger Logic
+		ORTriggerLogic* triggerLogic;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -93,20 +87,15 @@
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
 
-#pragma mark ¥¥¥Trigger Logic
-- (NSArray*) collectOutputLogic;
-- (NSArray*) collectInputLogic;
-
-#pragma mark ¥¥¥Trigger Logic Protocol
-- (unsigned long) inputValue:(short)index;
-- (unsigned long) inputLogicValue;
-- (void) scheduleChildForRead:(int)index;
-
 #pragma mark ¥¥¥The Trigger Childen
 - (ORReadOutList*) trigger1Group;
 - (void) setTrigger1Group:(ORReadOutList*)newTrigger1Group;
 - (void) saveReadOutList:(NSFileHandle*)aFile;
 - (void) loadReadOutList:(NSFileHandle*)aFile;
+
+#pragma mark ¥¥¥Trigger Controlling Protocol
+- (id) triggerChild:(int)anIndex;
+
 
 @end
 

@@ -1,0 +1,61 @@
+//
+//  ORTriggerLogic.h
+//  Orca
+//
+//  Created by Mark Howe on 10/15/10.
+//  Copyright 2010 __MyCompanyName__. All rights reserved.
+
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//North Carolina Physics and 
+//Astrophysics Department sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+#import <Cocoa/Cocoa.h>
+
+@class ORDataPacket;
+
+@interface ORTriggerLogic : NSObject {
+	@protected
+		id				delegate;
+		NSArray*		inputLogicElements;
+		NSArray*		outputLogicElements;
+		NSMutableArray* triggeredChildren;		//children read on trigger.
+}
+
+- (id) initWithDelegate:(id)aDelegate;
+- (void) dealloc;
+
+- (NSArray*) collectOutputLogic;
+- (NSArray*) collectInputLogic;
+
+- (void) scheduleChildForRead:(int)index;
+
+- (void) evaluate:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+
+@end
+
+@interface ORTriggerLogicIO : ORTriggerLogic {
+	unsigned long	inputLogicValue;
+	unsigned long	outputLogicValue;
+	unsigned long	inputLogicMask;
+	unsigned long	outputLogicMask;
+}
+- (unsigned long) inputValue:(short)index;
+- (unsigned long) inputLogicValue;
+- (void) setOutputLogicBit:(int)aBit;
+
+@end
+
+@interface ORTriggerLogicScaler : NSObject {
+}
+@end
+

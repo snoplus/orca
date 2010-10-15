@@ -20,6 +20,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORLogicOutBitModel.h"
+#import "ORTriggerLogic.h"
 
 NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
 
@@ -87,8 +88,11 @@ NSString* ORLogicOutBitChanged = @"ORLogicOutBitChanged";
 
 - (BOOL) evalWithDelegate:(id)anObj
 {
-	return [[self objectConnectedTo:@"Bit"] evalWithDelegate:anObj];
+	BOOL theResult = [[self objectConnectedTo:@"Bit"] evalWithDelegate:anObj];
+	if(theResult)[anObj setOutputLogicBit:bit];
+	return theResult;
 }
+
 - (void) reset
 {
 	[[self objectConnectedTo:@"Bit"] reset];

@@ -20,6 +20,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORLogicChildReadModel.h"
+#import "ORTriggerLogic.h"
 
 NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 
@@ -52,7 +53,7 @@ NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 }
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-    return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerChildReading")];
+    return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerControllingIO")];
 }
 
 - (void) makeMainController
@@ -140,8 +141,8 @@ NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 
 - (BOOL) evalWithDelegate:(id)anObj
 {
-	BOOL state = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
-	if(state)[anObj scheduleChildForRead:[self childIndex]];
+	BOOL theResult = [[self objectConnectedTo:@"Input1"] evalWithDelegate:anObj];
+	if(theResult)[anObj scheduleChildForRead:[self childIndex]];
 	return NO;
 }
 
