@@ -121,37 +121,50 @@
 	[self setSelectedRange: selectionRange];
 	[self scrollRangeToVisible: selectionRange];
 }
+
 - (void) processEditing: (NSNotification*)notification
 {
-    NSTextStorage				*textStorage = [notification object];
-    NSRange						range = [textStorage editedRange];
+    NSTextStorage*	textStorage   = [notification object];
+/*
+	NSRange			range		  = [textStorage editedRange];
+	int				changeInLen   = [textStorage changeInLength];
+	BOOL			wasInUndoRedo = [[self undoManager] isUndoing] || [[self undoManager] isRedoing];
+	BOOL			textLengthMayHaveChanged = NO;
 	
-	// Was delete op? Try to get chars around this to recolor any identifier we're in:
-	if( range.length == 0 ){
-		if( range.location > 0 )									range.location--;
-		if( (NSMaxRange(range) +2) < [textStorage length]-3 )		range.length += 2;
-		else if( (NSMaxRange(range) +1) < [textStorage length]-2 )	range.length += 1;
+	// Was delete op or undo that could have changed text length?
+	if( wasInUndoRedo ){
+		textLengthMayHaveChanged = YES;
+		range = [self selectedRange];
 	}
-	if(range.length>[textStorage length])range.length = [textStorage length];
+	
+	if( changeInLen <= 0 ){
+		textLengthMayHaveChanged = YES;
+	}
+	
+	//	Try to get chars around this to recolor any identifier we're in:
+	if( textLengthMayHaveChanged ){
+		if( range.location > 0 ) range.location--;
+		if( (range.location +range.length +2) < [textStorage length] )		range.length += 2;
+		else if( (range.location +range.length +1) < [textStorage length] ) range.length += 1;
+	}
+	
+	NSString* stringInRange = [[textStorage string] substringWithRange:range];
+	if([stringInRange rangeOfString:@"*"].location != NSNotFound ||
+	   [stringInRange rangeOfString:@"/"].location != NSNotFound ||
+	   [stringInRange rangeOfString:@"\""].location != NSNotFound)range = NSMakeRange(0,[textStorage length]);
+	
 	NSRange	currRange = range;
     
 	// Perform the syntax coloring:
 	if( autoSyntaxColoring && range.length > 0 ) {
-		NSRange			effectiveRange;
-		NSString*		rangeMode;
+		NSRange	effectiveRange;		
 		
+		NSString* rangeMode = [textStorage attribute: TD_SYNTAX_COLORING_MODE_ATTR
+											 atIndex: currRange.location
+									  effectiveRange: &effectiveRange];
 		
-		rangeMode = [textStorage attribute: TD_SYNTAX_COLORING_MODE_ATTR
-								   atIndex: currRange.location
-							effectiveRange: &effectiveRange];
-		
-		unsigned int		x = range.location;
-		
-		/* TODO: If we're in a multi-line comment and we're typing a comment-end
-		 character, or we're in a string and we're typing a quote character,
-		 this should include the rest of the text up to the next comment/string
-		 end character in the recalc. */
-		
+		unsigned int x = range.location;
+				
 		// Scan up to prev line break:
 		while( x > 0 ){
 			unichar theCh = [[textStorage string] characterAtIndex: x];
@@ -162,7 +175,7 @@
 		currRange.location = x;
 		
 		// Scan up to next line break:
-		x = range.location +range.length;
+		x = range.location + range.length;
 		
 		while( x < [textStorage length] ){
 			unichar theCh = [[textStorage string] characterAtIndex: x];
@@ -170,14 +183,17 @@
 			++x;
 		}
 		
-		currRange.length = x -currRange.location;
+		currRange.length = x - currRange.location;
 		
 		// Open identifier, comment etc.? Make sure we include the whole range.
-		if( rangeMode != nil ) currRange = NSUnionRange( currRange, effectiveRange );
+		if( rangeMode != nil ) currRange = NSMakeRange(0,[textStorage length]);
 		
 		// Actually recolor the changed part:
-		[self recolorRange: currRange];
+		[self recolorRange: NSMakeRange(0,[textStorage length])];
 	}
+ */
+	//just recolor everytime. This fixes a problem with coloring when in multicomment blocks and multiline strings
+	[self recolorRange: NSMakeRange(0,[textStorage length])];	
 }
 
 - (BOOL) textView:(NSTextView *)tv shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString
