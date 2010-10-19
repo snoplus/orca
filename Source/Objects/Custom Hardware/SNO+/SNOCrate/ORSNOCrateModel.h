@@ -50,6 +50,7 @@
 - (unsigned long) memoryBaseAddress;
 - (unsigned long) registerBaseAddress;
 - (NSString*) iPAddress;
+- (unsigned long) portNumber;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;

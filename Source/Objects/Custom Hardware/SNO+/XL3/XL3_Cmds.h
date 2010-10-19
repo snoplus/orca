@@ -42,31 +42,37 @@
 #define CALD_TEST_ID		(0x12)
 #define STATE_MACHINE_RESET_ID	(0x13)
 #define MULTI_CMD_ID		(0x14)
+#define DEBUGGING_MODE_ID	(0x15)
+#define READ_PEDESTALS_ID	(0x16)
+#define PONG_ID			(0x17)
+#define MULTI_LOADSDAC_ID	(0x18)
+#define CGT_TEST_ID		(0x19)
+#define LOADTACBITS_ID		(0x1A)
+#define CMOSGTVALID_ID		(0x1B)
+#define RESET_FIFOS_ID		(0x1C)
 
 // possible cmdID's for packets sent by XL3 (to the DAQ)
-#define MEGA_BUNDLE_ID		(0x100)
-#define CMD_ACK_ID		(0x101)
-#define MESSAGE_ID		(0x099)
-#define STATUS_ID		(0x999)
+#define CGT_UPDATE_ID		(0xAA)
+#define PING_ID			(0xBB)
+#define MEGA_BUNDLE_ID		(0xCC)
+#define CMD_ACK_ID		(0xDD)
+#define MESSAGE_ID		(0xEE)
+#define STATUS_ID		(0xFF)
 
 // global modes
 // some cmds are not compatible with sno crate readout loop
 #define INIT_MODE		(1) // readout loop not running
 #define NORMAL_MODE		(2) // readout loop running
-#define OTHER_MODE		(3)
-#define CHANGE_MODE		(4)
+#define CGT_MODE		(3)
 
 //xl3_code/include/main.h
-//xl3 terminal is 10.0.0.1
-//sbc in mtc crate is 10.0.0.2
-//xl3 connects to 10.0.0.3 at the moment (ORCA box)
+//sbc in mtc crate is 10.0.0.2 (sudbury) 10.0.0.20 (penn)
+//xl3 connects to 10.0.0.3 (sudbury) 10.0.0.21 (penn)
 #define XL3_MAX_BUNDLES		100000
 #define XL3_MAX_FEC_COMMANDS	10000
 #define XL3_SEND_BUFSIZE	(1444)	// fixed buffer size of a mega bundle
 #define XL3_MEGA_SIZE		(120)	// packet payload size in PMT bundles (12 B) "a mega bundle"
 #define CMD_ID_BYTES		(4)	// packet header size in Bytes
-#define PORT			(6012)	// XL3 connects to PORT, ... PORT + 9
-#define PORT2			(5002)	// ?
 
 //xl3_code/include/registers.h
 // XL3 registers
@@ -123,9 +129,9 @@
 //xl3_code/include/lwip_functions.h
 typedef
 	struct {
-		//uint32_t destination;
-		uint32_t cmdID;
-		//uint32_t numberBytesinPayload;
+		uint16_t packet_num;
+		uint8_t packet_type;
+		uint8_t num_bundles;
 	}
 XL3_CommandHeader;
 

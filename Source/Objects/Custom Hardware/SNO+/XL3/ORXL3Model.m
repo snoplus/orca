@@ -139,7 +139,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		}
 		[xl3Link setCrateName:[NSString stringWithFormat:@"XL3 crate %d", [self uniqueIdNumber] + 1]];
 		[xl3Link setIPNumber:[guardian iPAddress]];
-		[xl3Link setPortNumber: PORT];	
+		[xl3Link setPortNumber:[guardian portNumber]];	
 	}
 	
 	if(oldGuardian != aGuardian){
@@ -818,6 +818,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
 			if (*(unsigned int*) payload.payload != 0) {
 				NSLog(@"XL3 doesn't like the config bundle for slot %d, exiting.\n", i);
+				loadOk = NO;
 				break;
 			}
 		}
@@ -829,7 +830,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	}
 		
 	if (loadOk) {
-		// time to fly
+		// time to fly (never say 16 here!)
 		aMbId[0] = 666;
 		
 		// xil load
@@ -842,7 +843,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		// slot mask
 		if (anAutoInitFlag == YES) {
 			aMbId[3] = 0xFFFF;
-			NSLog(@"AutoInits not yet implemented, XL3 would freeze.\n");
+			NSLog(@"AutoInits not yet implemented, XL3 will freeze probably.\n");
 		}
 		else {
 			unsigned int msk = 0;
@@ -865,7 +866,15 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 			if (*(unsigned int*)payload.payload != 0) {
 				NSLog(@"error during init.\n", i);
 			}
-			NSLog(@"init ok!\n");
+			
+			//todo look into the hw params returned
+			/* xl3 does the following on successfull init, or returns zeros here if things go wrong
+			 for (i=0;i<16;i++){
+			 response_hware_vals = (mb_hware_vals_t *) (payload+4+i*sizeof(mb_hware_vals_t));
+			 *response_hware_vals = hware_vals[i];
+			*/
+			
+			NSLog(@"init ok! (for the moment)\n");
 		}
 		@catch (NSException* e) {
 			NSLog(@"Init crate failed; error: %@ reason: %@\n", [e name], [e reason]);

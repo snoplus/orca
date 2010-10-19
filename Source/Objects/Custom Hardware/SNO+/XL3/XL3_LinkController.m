@@ -400,24 +400,24 @@ static NSDictionary* xl3Ops;
 - (void) populateOps
 {
 	
-	xl3Ops = [[NSDictionary alloc] initWithObjectsAndKeys:
-			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeDeselectButton, @"button",
+	xl3Ops = [NSDictionary dictionaryWithObjectsAndKeys:
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeDeselectButton, @"button",
 									deselectCompositeRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(deselectComposite)), @"selector",
 			 nil], @"compositeDeselect",
-			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeQuitButton, @"button",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeQuitButton, @"button",
 									compositeQuitRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(compositeQuit)), @"selector",
 			 nil], @"compositeQuit",
-			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeSetPedestalButton, @"button",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeSetPedestalButton, @"button",
 									compositeSetPedestalRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(compositeSetPedestal)), @"selector",
 			 nil], @"compositeSetPedestal",
-			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeBoardIDButton, @"button",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeBoardIDButton, @"button",
 									compositeBoardIDRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(getBoardIDs)), @"selector",
 			 nil], @"compositeBoardID",
-			[[NSDictionary alloc] initWithObjectsAndKeys:	compositeXl3RWButton, @"button",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeXl3RWButton, @"button",
 									compositeXl3RWRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(compositeXl3RW)), @"selector",
 			 nil], @"compositeXl3RW",
@@ -426,10 +426,10 @@ static NSDictionary* xl3Ops;
 
 - (void) populatePullDown
 {
-	xl3RWModes = [[NSArray alloc] initWithObjects:@"0: REG_WRITE",@"1: REG_READ",
+	xl3RWModes = [NSArray arrayWithObjects:@"0: REG_WRITE",@"1: REG_READ",
 		       @"2: MEM_WRITE",@"3: MEM_READ", nil];
 
-	xl3RWSelects = [[NSDictionary alloc] initWithObjectsAndKeys:
+	xl3RWSelects = [NSDictionary dictionaryWithObjectsAndKeys:
 			[NSNumber numberWithInt:0x00], @"FEC 0", 
 			[NSNumber numberWithInt:0x01], @"FEC 1",
 			[NSNumber numberWithInt:0x02], @"FEC 2",
@@ -450,7 +450,7 @@ static NSDictionary* xl3Ops;
 			[NSNumber numberWithInt:0x20], @"XL3",
 			nil];
 
-	xl3RWAddresses = [[NSDictionary alloc] initWithObjectsAndKeys:
+	xl3RWAddresses = [NSDictionary dictionaryWithObjectsAndKeys:
 			  [NSNumber numberWithInt:0x00], @"xl3 select",
 			  [NSNumber numberWithInt:0x01], @"xl3 data avail",
 			  [NSNumber numberWithInt:0x02], @"xl3 ctrl&stat",

@@ -40,13 +40,15 @@ eXL3_CrateStates;
 	BOOL		needToSwap;
 	NSString*	IPNumber;
 	NSString*	crateName;
-	int		portNumber;
+	unsigned long	portNumber;
 	BOOL		isConnected;
 	int		connectState;
 	int		errorTimeOut;
 	NSCalendarDate*	timeConnected;
 	NSMutableArray*	cmdArray;
 	ORSafeCircularBuffer* bundleBuffer;
+	unsigned long long num_cmd_packets;
+	unsigned long long num_dat_packets;
 }
 
 - (id)   init;
@@ -81,8 +83,8 @@ eXL3_CrateStates;
 - (void) setTimeConnected:(NSCalendarDate*)newTimeConnected;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;
-- (int)  portNumber;
-- (void) setPortNumber:(int)aPortNumber;
+- (unsigned long)  portNumber;
+- (void) setPortNumber:(unsigned long)aPortNumber;
 - (NSString*) crateName;
 - (void) setCrateName:(NSString*)aCrateName;
 
@@ -90,7 +92,7 @@ eXL3_CrateStates;
 - (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse;
 - (void) sendCommand:(long)aCmd expectResponse:(BOOL)askForResponse;
 - (void) sendFECCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value;
-- (void) readXL3Packet:(XL3_Packet*)aPacket withCmdID:(int)cmdID;
+- (void) readXL3Packet:(XL3_Packet*)aPacket withPacketType:(unsigned char)packetType andPacketNum:(unsigned short)packetNum;
 
 - (void) connectSocket;
 - (void) disconnectSocket;
