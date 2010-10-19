@@ -621,6 +621,7 @@ static const int currentVersion = 1;           // Current version
 
 - (void) checkDiskStatus
 {
+	return;//temp disable for Florian
 	NSDictionary* diskInfo = [[NSFileManager defaultManager] attributesOfFileSystemForPath:openFilePath error:nil];
 	long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
 	if(freeSpace < kMinDiskSpace * 1024 * 1024){
