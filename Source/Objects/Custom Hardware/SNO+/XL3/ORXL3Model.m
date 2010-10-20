@@ -815,12 +815,14 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 			[self byteSwapBundle:aConfigBundle];
 		}
 		@try {
-			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
+			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:NO];
+			/*
 			if (*(unsigned int*) payload.payload != 0) {
 				NSLog(@"XL3 doesn't like the config bundle for slot %d, exiting.\n", i);
 				loadOk = NO;
 				break;
 			}
+			*/
 		}
 		@catch (NSException* e) {
 			NSLog(@"Init crate failed; error: %@ reason: %@\n", [e name], [e reason]);

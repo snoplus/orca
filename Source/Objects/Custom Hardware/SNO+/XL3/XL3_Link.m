@@ -372,13 +372,16 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	XL3_PayloadStruct payload;
 	FECCommand* command = (FECCommand*) &payload.payload;
 		
-	command->cmdID = (uint16_t) aCmd;
+//	command->cmdID = (uint16_t) aCmd;
+	command->cmd_num = aCmd;
+	command->packet_num = 0; // todo: figure out what are these two good for...
 	command->flags = 0;
 	command->address = (uint32_t) address;
 	command->data = *(uint32_t*) value;
 
 	if (needToSwap) {
-		command->cmdID = swapShort(command->cmdID);
+		command->cmd_num = swapLong(command->packet_num);
+		command->packet_num = swapShort(command->packet_num);
 		command->address = swapLong(command->address);
 		command->data = swapLong(command->data);
 	}	
@@ -632,6 +635,9 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 					//packet_num, num_bundles???
 					[bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:1440];
 					bundle_count++;
+				}
+				else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xEE) {
+					NSLog(@"XL3: %s\n", ((XL3_Packet*) aPacket)->payload);
 				}
 				else {	//cmd response
 					unsigned short packetNum = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;

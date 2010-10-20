@@ -127,25 +127,33 @@
 
 
 //xl3_code/include/lwip_functions.h
-typedef
-	struct {
-		uint16_t packet_num;
-		uint8_t packet_type;
-		uint8_t num_bundles;
-	}
+typedef struct {
+	uint16_t packet_num;
+	uint8_t packet_type;
+	uint8_t num_bundles;
+}
 XL3_CommandHeader;
 
 #define XL3_MAXPAYLOADSIZE_BYTES	(1440)
 #define XL3_HEADER_SIZE			(4)
 #define XL3_PACKET_SIZE			(1444)
 
-typedef
-	struct {
-		XL3_CommandHeader cmdHeader;
-		char payload[XL3_MAXPAYLOADSIZE_BYTES];
-	}
+typedef struct {
+	XL3_CommandHeader cmdHeader;
+	char payload[XL3_MAXPAYLOADSIZE_BYTES];
+}
 XL3_Packet;
 
+typedef struct {
+	uint32_t cmd_num;	// id number unique for the packet it came from
+	uint16_t packet_num;    // number of the packet that created this command
+	uint8_t flags;		// 0 = ok, 1 = there was a bus error
+	uint32_t address;	// address = spare MEMREG WRITE* SPARE Board_select<5..0> Address<19..0> 
+	uint32_t data;
+	}
+FECCommand;
+
+/*
 typedef
 	struct {
 		uint16_t cmdID;
@@ -154,7 +162,8 @@ typedef
 		uint32_t data;
 }
 FECCommand;
-
+*/
+ 
 // orca specific anonymous
 typedef
 	struct {
