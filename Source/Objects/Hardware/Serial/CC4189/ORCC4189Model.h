@@ -41,6 +41,10 @@
 		BOOL			shipValues;
 		ORTimeRate*		timeRates[2];
 		BOOL            readOnce;
+		double			lowLimit0;
+		double			lowLimit1;
+		double			highLimit0;
+		double			highLimit1;
 }
 
 #pragma mark ***Initialization
@@ -52,6 +56,14 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (double) highLimit1;
+- (void) setHighLimit1:(double)aHighLimit1;
+- (double) highLimit0;
+- (void) setHighLimit0:(double)aHighLimit0;
+- (double) lowLimit1;
+- (void) setLowLimit1:(double)aLowLimit1;
+- (double) lowLimit0;
+- (void) setLowLimit0:(double)aLowLimit0;
 - (ORTimeRate*)timeRate:(int)index;
 - (BOOL) shipValues;
 - (void) setShipValues:(BOOL)aFlag;
@@ -95,6 +107,10 @@
 @end
 
 
+extern NSString* ORCC4189ModelHighLimit1Changed;
+extern NSString* ORCC4189ModelHighLimit0Changed;
+extern NSString* ORCC4189ModelLowLimit1Changed;
+extern NSString* ORCC4189ModelLowLimit0Changed;
 extern NSString* ORCC4189ModelShipValuesChanged;
 extern NSString* ORCC4189ModelPollTimeChanged;
 extern NSString* ORCC4189ModelSerialPortChanged;

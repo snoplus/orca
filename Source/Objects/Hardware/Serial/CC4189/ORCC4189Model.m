@@ -29,6 +29,10 @@
 #import "ORTimeRate.h"
 
 #pragma mark ***External Strings
+NSString* ORCC4189ModelHighLimit1Changed = @"ORCC4189ModelHighLimit1Changed";
+NSString* ORCC4189ModelHighLimit0Changed = @"ORCC4189ModelHighLimit0Changed";
+NSString* ORCC4189ModelLowLimit1Changed = @"ORCC4189ModelLowLimit1Changed";
+NSString* ORCC4189ModelLowLimit0Changed = @"ORCC4189ModelLowLimit0Changed";
 NSString* ORCC4189ModelShipValuesChanged = @"ORCC4189ModelShipValuesChanged";
 NSString* ORCC4189ModelSerialPortChanged= @"ORCC4189ModelSerialPortChanged";
 NSString* ORCC4189ModelPortNameChanged	= @"ORCC4189ModelPortNameChanged";
@@ -43,6 +47,11 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 {
 	self = [super init];
     [self registerNotificationObservers];
+	lowLimit0 = 0;
+	highLimit0 = 100;
+	lowLimit1 = 0;
+	highLimit1 = 100;
+	
 	return self;
 }
 
@@ -154,6 +163,62 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 
 
 #pragma mark ***Accessors
+
+- (double) highLimit1
+{
+    return highLimit1;
+}
+
+- (void) setHighLimit1:(double)aHighLimit1
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit1:highLimit1];
+    
+    highLimit1 = aHighLimit1;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelHighLimit1Changed object:self];
+}
+
+- (double) highLimit0
+{
+    return highLimit0;
+}
+
+- (void) setHighLimit0:(double)aHighLimit0
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit0:highLimit0];
+    
+    highLimit0 = aHighLimit0;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelHighLimit0Changed object:self];
+}
+
+- (double) lowLimit1
+{
+    return lowLimit1;
+}
+
+- (void) setLowLimit1:(double)aLowLimit1
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowLimit1:lowLimit1];
+    
+    lowLimit1 = aLowLimit1;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelLowLimit1Changed object:self];
+}
+
+- (double) lowLimit0
+{
+    return lowLimit0;
+}
+
+- (void) setLowLimit0:(double)aLowLimit0
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowLimit0:lowLimit0];
+    
+    lowLimit0 = aLowLimit0;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCC4189ModelLowLimit0Changed object:self];
+}
 - (ORTimeRate*)timeRate:(int)index
 {
 	return timeRates[index];
@@ -299,6 +364,10 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setHighLimit1:[decoder decodeDoubleForKey:@"highLimit1"]];
+	[self setHighLimit0:[decoder decodeDoubleForKey:@"highLimit0"]];
+	[self setLowLimit1:[decoder decodeDoubleForKey:@"lowLimit1"]];
+	[self setLowLimit0:[decoder decodeDoubleForKey:@"lowLimit0"]];
 	[self setShipValues:	[decoder decodeBoolForKey:@"shipValues"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:@"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
@@ -313,6 +382,10 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeDouble:highLimit1 forKey:@"highLimit1"];
+    [encoder encodeDouble:highLimit0 forKey:@"highLimit0"];
+    [encoder encodeDouble:lowLimit1 forKey:@"lowLimit1"];
+    [encoder encodeDouble:lowLimit0 forKey:@"lowLimit0"];
     [encoder encodeBool:shipValues forKey:@"shipValues"];
     [encoder encodeBool:portWasOpen forKey:@"portWasOpen"];
     [encoder encodeObject:portName	forKey: @"portName"];
@@ -410,26 +483,29 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 
 - (double) maxValueForChan:(int)channel
 {
-	if(channel==0)return 212;
-	else return 100;
+	if(channel==0)	return 100;
+	else			return 100;
 }
+
 - (double) minValueForChan:(int)channel
 {
 	return 0;
 }
+
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
 {
 	@synchronized(self){
 		if(channel==0){
-			*theLowLimit = 0;
-			*theHighLimit = 212;
+			*theLowLimit  = lowLimit0;
+			*theHighLimit = highLimit0;
 		}
 		else {
-			*theLowLimit = 0;
-			*theHighLimit = 100;
+			*theLowLimit  = lowLimit1;
+			*theHighLimit = highLimit1;
 		}
 	}		
 }
+
 - (NSString*) identifier
 {
     return [NSString stringWithFormat:@"CC4189 %d",[self uniqueIdNumber]];

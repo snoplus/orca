@@ -23,6 +23,10 @@
 @interface ORCC4189Controller : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSTextField*	highLimit1Field;
+	IBOutlet NSTextField*	highLimit0Field;
+	IBOutlet NSTextField*	lowLimit1Field;
+	IBOutlet NSTextField*	lowLimit0Field;
 	IBOutlet NSButton*		shipValuesButton;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
@@ -44,6 +48,10 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) highLimit1Changed:(NSNotification*)aNote;
+- (void) highLimit0Changed:(NSNotification*)aNote;
+- (void) lowLimit1Changed:(NSNotification*)aNote;
+- (void) lowLimit0Changed:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) shipValuesChanged:(NSNotification*)aNotification;
@@ -56,6 +64,10 @@
 - (void) scaleAction:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
+- (IBAction) highLimit1Action:(id)sender;
+- (IBAction) highLimit0Action:(id)sender;
+- (IBAction) lowLimit1Action:(id)sender;
+- (IBAction) lowLimit0Action:(id)sender;
 - (IBAction) shipValuesAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;

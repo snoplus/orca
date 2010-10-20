@@ -80,6 +80,7 @@
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
+	
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
@@ -129,6 +130,27 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(lowLimit0Changed:)
+                         name : ORCC4189ModelLowLimit0Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lowLimit1Changed:)
+                         name : ORCC4189ModelLowLimit1Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(highLimit0Changed:)
+                         name : ORCC4189ModelHighLimit0Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(highLimit1Changed:)
+                         name : ORCC4189ModelHighLimit1Changed
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -142,6 +164,30 @@
 	[self shipValuesChanged:nil];
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
+	[self lowLimit0Changed:nil];
+	[self lowLimit1Changed:nil];
+	[self highLimit0Changed:nil];
+	[self highLimit1Changed:nil];
+}
+
+- (void) highLimit1Changed:(NSNotification*)aNote
+{
+	[highLimit1Field setDoubleValue: [model highLimit1]];
+}
+
+- (void) highLimit0Changed:(NSNotification*)aNote
+{
+	[highLimit0Field setDoubleValue: [model highLimit0]];
+}
+
+- (void) lowLimit1Changed:(NSNotification*)aNote
+{
+	[lowLimit1Field setDoubleValue: [model lowLimit1]];
+}
+
+- (void) lowLimit0Changed:(NSNotification*)aNote
+{
+	[lowLimit0Field setDoubleValue: [model lowLimit0]];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -228,7 +274,11 @@
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [shipValuesButton setEnabled:!locked];
-    
+    [lowLimit0Field setEnabled:!locked];
+    [lowLimit1Field setEnabled:!locked];
+	[highLimit0Field setEnabled:!locked];
+    [highLimit1Field setEnabled:!locked];
+   
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORCC4189Lock])s = @"Not in Maintenance Run.";
@@ -282,6 +332,26 @@
 
 
 #pragma mark ***Actions
+
+- (void) highLimit1Action:(id)sender
+{
+	[model setHighLimit1:[sender doubleValue]];	
+}
+
+- (void) highLimit0Action:(id)sender
+{
+	[model setHighLimit0:[sender doubleValue]];	
+}
+
+- (void) lowLimit1Action:(id)sender
+{
+	[model setLowLimit1:[sender doubleValue]];	
+}
+
+- (void) lowLimit0Action:(id)sender
+{
+	[model setLowLimit0:[sender doubleValue]];	
+}
 
 - (void) shipValuesAction:(id)sender
 {
