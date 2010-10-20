@@ -1667,6 +1667,38 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					</object>
 					<int key="connectionID">1463</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">highLimit0Action:</string>
+						<reference key="source" ref="737315545"/>
+						<reference key="destination" ref="755749509"/>
+					</object>
+					<int key="connectionID">1464</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">highLimit1Action:</string>
+						<reference key="source" ref="737315545"/>
+						<reference key="destination" ref="829304642"/>
+					</object>
+					<int key="connectionID">1465</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">lowLimit0Action:</string>
+						<reference key="source" ref="737315545"/>
+						<reference key="destination" ref="663691061"/>
+					</object>
+					<int key="connectionID">1466</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">lowLimit1Action:</string>
+						<reference key="source" ref="737315545"/>
+						<reference key="destination" ref="318145193"/>
+					</object>
+					<int key="connectionID">1467</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -2888,7 +2920,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1463</int>
+			<int key="maxID">1467</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
