@@ -19,10 +19,12 @@
 
 #pragma mark ***Imported Files
 
+#import "ORAdcProcessing.h"
+
 @class ORSerialPort;
 @class ORTimeRate;
 
-@interface ORCC4189Model : OrcaObject
+@interface ORCC4189Model : OrcaObject <ORAdcProcessing>
 {
     @private
         NSString*       portName;
@@ -38,6 +40,7 @@
         NSMutableString*  buffer;
 		BOOL			shipValues;
 		ORTimeRate*		timeRates[2];
+		BOOL            readOnce;
 }
 
 #pragma mark ***Initialization
@@ -78,6 +81,17 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+#pragma mark •••Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
 @end
 
 

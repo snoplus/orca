@@ -120,6 +120,8 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 				}
             }
         } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
+		
+		if(temperature!=0 && humidity!=0) readOnce = YES;
 	}
 }
 
@@ -353,4 +355,83 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
     return dataDictionary;
 }
 
+
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting
+{
+    readOnce = NO;
+}
+
+- (void) processIsStopping
+{
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{
+    if(!readOnce){
+        @try { 
+            if(shipValues){
+                [self shipAllValues]; 
+            }
+        }
+		@catch(NSException* localException) { 
+			//catch this here to prevent it from falling thru, but nothing to do.
+        }
+    }
+}
+
+- (void) endProcessCycle
+{
+	readOnce = NO;
+}
+
+- (BOOL) processValue:(int)channel
+{
+	if(channel==0)return temperature!=0;
+	else return humidity!=0;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do
+}
+
+- (NSString*) processingTitle
+{
+    return [NSString stringWithFormat:@"%@",[self identifier]];
+}
+
+- (double) convertedValue:(int)channel
+{
+	if(channel==0)return temperature;
+	else return humidity;
+}
+
+- (double) maxValueForChan:(int)channel
+{
+	if(channel==0)return 212;
+	else return 100;
+}
+- (double) minValueForChan:(int)channel
+{
+	return 0;
+}
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		if(channel==0){
+			*theLowLimit = 0;
+			*theHighLimit = 212;
+		}
+		else {
+			*theLowLimit = 0;
+			*theHighLimit = 100;
+		}
+	}		
+}
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"CC4189 %d",[self uniqueIdNumber]];
+}
 @end
