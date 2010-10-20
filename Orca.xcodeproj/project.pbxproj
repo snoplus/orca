@@ -83,6 +83,17 @@
 		2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */; };
 		2D1AB81E0F1B9F2400E6B850 /* ORIpeSlowControlModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */; };
 		2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */; };
+		2D24A8D0126F516D00BA2E2E /* IpeSimulation.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8C6126F516D00BA2E2E /* IpeSimulation.nib */; };
+		2D24A8D1126F516D00BA2E2E /* IpeSimulation.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8C7126F516D00BA2E2E /* IpeSimulation.tif */; };
+		2D24A8D2126F516D00BA2E2E /* ORIpeSimulationController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D24A8C8126F516D00BA2E2E /* ORIpeSimulationController.h */; };
+		2D24A8D3126F516D00BA2E2E /* ORIpeSimulationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D24A8C9126F516D00BA2E2E /* ORIpeSimulationController.m */; };
+		2D24A8D4126F516D00BA2E2E /* ORIpeSimulationDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D24A8CA126F516D00BA2E2E /* ORIpeSimulationDecoder.h */; };
+		2D24A8D5126F516D00BA2E2E /* ORIpeSimulationDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D24A8CB126F516D00BA2E2E /* ORIpeSimulationDecoder.m */; };
+		2D24A8D6126F516D00BA2E2E /* ORIpeSimulationModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D24A8CC126F516D00BA2E2E /* ORIpeSimulationModel.h */; };
+		2D24A8D7126F516D00BA2E2E /* ORIpeSimulationModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D24A8CD126F516D00BA2E2E /* ORIpeSimulationModel.m */; };
+		2D24A8D8126F516D00BA2E2E /* SimStart.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8CE126F516D00BA2E2E /* SimStart.tif */; };
+		2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8CF126F516D00BA2E2E /* SimStop.tif */; };
+		2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8DE126F543400BA2E2E /* Fieldline.gif */; };
 		2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */; };
 		2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */; };
 		2D556352109F4CBE00A65E6C /* Needle in Resources */ = {isa = PBXBuildFile; fileRef = 2D556351109F4CBE00A65E6C /* Needle */; };
@@ -2699,6 +2710,17 @@
 		2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlController.m; path = "IPE SlowControl/ORIpeSlowControlController.m"; sourceTree = "<group>"; };
 		2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlModel.h; path = "IPE SlowControl/ORIpeSlowControlModel.h"; sourceTree = "<group>"; };
 		2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlModel.m; path = "IPE SlowControl/ORIpeSlowControlModel.m"; sourceTree = "<group>"; };
+		2D24A8C6126F516D00BA2E2E /* IpeSimulation.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = IpeSimulation.nib; sourceTree = "<group>"; };
+		2D24A8C7126F516D00BA2E2E /* IpeSimulation.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = IpeSimulation.tif; sourceTree = "<group>"; };
+		2D24A8C8126F516D00BA2E2E /* ORIpeSimulationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeSimulationController.h; sourceTree = "<group>"; };
+		2D24A8C9126F516D00BA2E2E /* ORIpeSimulationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORIpeSimulationController.m; sourceTree = "<group>"; };
+		2D24A8CA126F516D00BA2E2E /* ORIpeSimulationDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeSimulationDecoder.h; sourceTree = "<group>"; };
+		2D24A8CB126F516D00BA2E2E /* ORIpeSimulationDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORIpeSimulationDecoder.m; sourceTree = "<group>"; };
+		2D24A8CC126F516D00BA2E2E /* ORIpeSimulationModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeSimulationModel.h; sourceTree = "<group>"; };
+		2D24A8CD126F516D00BA2E2E /* ORIpeSimulationModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORIpeSimulationModel.m; sourceTree = "<group>"; };
+		2D24A8CE126F516D00BA2E2E /* SimStart.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimStart.tif; sourceTree = "<group>"; };
+		2D24A8CF126F516D00BA2E2E /* SimStop.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimStop.tif; sourceTree = "<group>"; };
+		2D24A8DE126F543400BA2E2E /* Fieldline.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Fieldline.gif; sourceTree = "<group>"; };
 		2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDecoder.h; path = "IPE SlowControl/ORIpeSlowControlDecoder.h"; sourceTree = "<group>"; };
 		2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlDecoder.m; path = "IPE SlowControl/ORIpeSlowControlDecoder.m"; sourceTree = "<group>"; };
 		2D556351109F4CBE00A65E6C /* Needle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Needle; sourceTree = "<group>"; };
@@ -5297,6 +5319,24 @@
 				2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */,
 			);
 			name = "IPE SlowControl";
+			sourceTree = "<group>";
+		};
+		2D24A8C5126F516D00BA2E2E /* IpeSimulation */ = {
+			isa = PBXGroup;
+			children = (
+				2D24A8DE126F543400BA2E2E /* Fieldline.gif */,
+				2D24A8C6126F516D00BA2E2E /* IpeSimulation.nib */,
+				2D24A8C7126F516D00BA2E2E /* IpeSimulation.tif */,
+				2D24A8C8126F516D00BA2E2E /* ORIpeSimulationController.h */,
+				2D24A8C9126F516D00BA2E2E /* ORIpeSimulationController.m */,
+				2D24A8CA126F516D00BA2E2E /* ORIpeSimulationDecoder.h */,
+				2D24A8CB126F516D00BA2E2E /* ORIpeSimulationDecoder.m */,
+				2D24A8CC126F516D00BA2E2E /* ORIpeSimulationModel.h */,
+				2D24A8CD126F516D00BA2E2E /* ORIpeSimulationModel.m */,
+				2D24A8CE126F516D00BA2E2E /* SimStart.tif */,
+				2D24A8CF126F516D00BA2E2E /* SimStop.tif */,
+			);
+			path = IpeSimulation;
 			sourceTree = "<group>";
 		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
@@ -9969,6 +10009,7 @@
 				84F46F2D0CA44255007EFADA /* Katrin FLT */,
 				84FDF5220D7E1EAE003AE119 /* Katrin SLT */,
 				2D158EAB11359F5800EA1552 /* KatrinV4FLT */,
+				2D24A8C5126F516D00BA2E2E /* IpeSimulation */,
 			);
 			name = IPE;
 			path = Source/Objects/Hardware/IPE;
@@ -11626,6 +11667,9 @@
 				84AE7E3C12676531003F7194 /* ORLogicChildReadController.h in Headers */,
 				84AE7E3E12676531003F7194 /* ORLogicChildReadModel.h in Headers */,
 				84E583D5126882B700157240 /* ORTriggerLogic.h in Headers */,
+				2D24A8D2126F516D00BA2E2E /* ORIpeSimulationController.h in Headers */,
+				2D24A8D4126F516D00BA2E2E /* ORIpeSimulationDecoder.h in Headers */,
+				2D24A8D6126F516D00BA2E2E /* ORIpeSimulationModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12362,6 +12406,11 @@
 				84AE7E3A12676531003F7194 /* LogicChildRead.nib in Resources */,
 				84AE7E3B12676531003F7194 /* LogicChildRead.png in Resources */,
 				84AE803212677D0B003F7194 /* LogicChildRead2.png in Resources */,
+				2D24A8D0126F516D00BA2E2E /* IpeSimulation.nib in Resources */,
+				2D24A8D1126F516D00BA2E2E /* IpeSimulation.tif in Resources */,
+				2D24A8D8126F516D00BA2E2E /* SimStart.tif in Resources */,
+				2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */,
+				2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13197,6 +13246,9 @@
 				84AE7E3D12676531003F7194 /* ORLogicChildReadController.m in Sources */,
 				84AE7E3F12676531003F7194 /* ORLogicChildReadModel.m in Sources */,
 				84E583D6126882B700157240 /* ORTriggerLogic.m in Sources */,
+				2D24A8D3126F516D00BA2E2E /* ORIpeSimulationController.m in Sources */,
+				2D24A8D5126F516D00BA2E2E /* ORIpeSimulationDecoder.m in Sources */,
+				2D24A8D7126F516D00BA2E2E /* ORIpeSimulationModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
