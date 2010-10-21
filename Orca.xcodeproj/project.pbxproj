@@ -927,6 +927,14 @@
 		8435AAD410C6D0EF00E03F7F /* VarianTPS.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8435AACA10C6D0EF00E03F7F /* VarianTPS.nib */; };
 		8435AAD510C6D0EF00E03F7F /* VarianTPS.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8435AACB10C6D0EF00E03F7F /* VarianTPS.tif */; };
 		8435AD2610C6F0F400E03F7F /* Varian.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8435AD2510C6F0F400E03F7F /* Varian.gif */; };
+		8437495A1270B2AD0027B507 /* LogicInScaler.nib in Resources */ = {isa = PBXBuildFile; fileRef = 843749541270B2AD0027B507 /* LogicInScaler.nib */; };
+		8437495B1270B2AD0027B507 /* LogicInScaler.png in Resources */ = {isa = PBXBuildFile; fileRef = 843749551270B2AD0027B507 /* LogicInScaler.png */; };
+		8437495C1270B2AD0027B507 /* ORLogicInScalerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843749561270B2AD0027B507 /* ORLogicInScalerController.h */; };
+		8437495D1270B2AD0027B507 /* ORLogicInScalerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 843749571270B2AD0027B507 /* ORLogicInScalerController.m */; };
+		8437495E1270B2AD0027B507 /* ORLogicInScalerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843749581270B2AD0027B507 /* ORLogicInScalerModel.h */; };
+		8437495F1270B2AD0027B507 /* ORLogicInScalerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843749591270B2AD0027B507 /* ORLogicInScalerModel.m */; };
+		843749631270B2C00027B507 /* ORLogicScalerShipModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843749611270B2C00027B507 /* ORLogicScalerShipModel.h */; };
+		843749641270B2C00027B507 /* ORLogicScalerShipModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843749621270B2C00027B507 /* ORLogicScalerShipModel.m */; };
 		8438002F0AB23EC20069C0BA /* ORRangeTimerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843800290AB23EC20069C0BA /* ORRangeTimerController.h */; };
 		843800300AB23EC20069C0BA /* ORRangeTimerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438002A0AB23EC20069C0BA /* ORRangeTimerController.m */; };
 		843800310AB23EC20069C0BA /* ORRangeTimerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8438002B0AB23EC20069C0BA /* ORRangeTimerModel.h */; };
@@ -3284,6 +3292,14 @@
 		8435AACB10C6D0EF00E03F7F /* VarianTPS.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VarianTPS.tif; path = Source/Objects/Hardware/Serial/VarianTPS/VarianTPS.tif; sourceTree = SOURCE_ROOT; };
 		8435AD2510C6F0F400E03F7F /* Varian.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Varian.gif; path = Source/Objects/Hardware/Serial/VarianTPS/Varian.gif; sourceTree = SOURCE_ROOT; };
 		84368AD10471AACA005F64B1 /* HPPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser.nib; path = Source/Objects/Hardware/GPIB/HPPulser/HPPulser.nib; sourceTree = SOURCE_ROOT; };
+		843749541270B2AD0027B507 /* LogicInScaler.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LogicInScaler.nib; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/LogicInScaler.nib; sourceTree = SOURCE_ROOT; };
+		843749551270B2AD0027B507 /* LogicInScaler.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicInScaler.png; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/LogicInScaler.png; sourceTree = SOURCE_ROOT; };
+		843749561270B2AD0027B507 /* ORLogicInScalerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInScalerController.h; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerController.h; sourceTree = SOURCE_ROOT; };
+		843749571270B2AD0027B507 /* ORLogicInScalerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInScalerController.m; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerController.m; sourceTree = SOURCE_ROOT; };
+		843749581270B2AD0027B507 /* ORLogicInScalerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInScalerModel.h; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerModel.h; sourceTree = SOURCE_ROOT; };
+		843749591270B2AD0027B507 /* ORLogicInScalerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInScalerModel.m; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerModel.m; sourceTree = SOURCE_ROOT; };
+		843749611270B2C00027B507 /* ORLogicScalerShipModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicScalerShipModel.h; path = Source/Objects/TriggerSystem/Logic/LogicScalerShip/ORLogicScalerShipModel.h; sourceTree = SOURCE_ROOT; };
+		843749621270B2C00027B507 /* ORLogicScalerShipModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicScalerShipModel.m; path = Source/Objects/TriggerSystem/Logic/LogicScalerShip/ORLogicScalerShipModel.m; sourceTree = SOURCE_ROOT; };
 		843800290AB23EC20069C0BA /* ORRangeTimerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRangeTimerController.h; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerController.h; sourceTree = SOURCE_ROOT; };
 		8438002A0AB23EC20069C0BA /* ORRangeTimerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRangeTimerController.m; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerController.m; sourceTree = SOURCE_ROOT; };
 		8438002B0AB23EC20069C0BA /* ORRangeTimerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRangeTimerModel.h; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerModel.h; sourceTree = SOURCE_ROOT; };
@@ -6649,6 +6665,30 @@
 			path = Source/Objects/Hardware/Serial/VarianTPS;
 			sourceTree = SOURCE_ROOT;
 		};
+		843749531270B2AD0027B507 /* LogicInScaler */ = {
+			isa = PBXGroup;
+			children = (
+				843749541270B2AD0027B507 /* LogicInScaler.nib */,
+				843749551270B2AD0027B507 /* LogicInScaler.png */,
+				843749561270B2AD0027B507 /* ORLogicInScalerController.h */,
+				843749571270B2AD0027B507 /* ORLogicInScalerController.m */,
+				843749581270B2AD0027B507 /* ORLogicInScalerModel.h */,
+				843749591270B2AD0027B507 /* ORLogicInScalerModel.m */,
+			);
+			name = LogicInScaler;
+			path = Source/Objects/TriggerSystem/Logic/LogicInScaler;
+			sourceTree = SOURCE_ROOT;
+		};
+		843749601270B2C00027B507 /* LogicScalerShip */ = {
+			isa = PBXGroup;
+			children = (
+				843749611270B2C00027B507 /* ORLogicScalerShipModel.h */,
+				843749621270B2C00027B507 /* ORLogicScalerShipModel.m */,
+			);
+			name = LogicScalerShip;
+			path = Source/Objects/TriggerSystem/Logic/LogicScalerShip;
+			sourceTree = SOURCE_ROOT;
+		};
 		843800280AB23EC20069C0BA /* rangeTimer */ = {
 			isa = PBXGroup;
 			children = (
@@ -9705,6 +9745,8 @@
 			children = (
 				84A8CA0E125F1E2600D7C9AF /* Gates */,
 				84AE7D1212673332003F7194 /* LogicPattern */,
+				843749531270B2AD0027B507 /* LogicInScaler */,
+				843749601270B2C00027B507 /* LogicScalerShip */,
 				840AC2E712635081007B6CAF /* LogicInBit */,
 				840AC2F412635089007B6CAF /* LogicOutBit */,
 				84AE7E3312676531003F7194 /* LogicChildRead */,
@@ -11670,6 +11712,9 @@
 				2D24A8D2126F516D00BA2E2E /* ORIpeSimulationController.h in Headers */,
 				2D24A8D4126F516D00BA2E2E /* ORIpeSimulationDecoder.h in Headers */,
 				2D24A8D6126F516D00BA2E2E /* ORIpeSimulationModel.h in Headers */,
+				8437495C1270B2AD0027B507 /* ORLogicInScalerController.h in Headers */,
+				8437495E1270B2AD0027B507 /* ORLogicInScalerModel.h in Headers */,
+				843749631270B2C00027B507 /* ORLogicScalerShipModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12411,6 +12456,8 @@
 				2D24A8D8126F516D00BA2E2E /* SimStart.tif in Resources */,
 				2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */,
 				2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */,
+				8437495A1270B2AD0027B507 /* LogicInScaler.nib in Resources */,
+				8437495B1270B2AD0027B507 /* LogicInScaler.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13249,6 +13296,9 @@
 				2D24A8D3126F516D00BA2E2E /* ORIpeSimulationController.m in Sources */,
 				2D24A8D5126F516D00BA2E2E /* ORIpeSimulationDecoder.m in Sources */,
 				2D24A8D7126F516D00BA2E2E /* ORIpeSimulationModel.m in Sources */,
+				8437495D1270B2AD0027B507 /* ORLogicInScalerController.m in Sources */,
+				8437495F1270B2AD0027B507 /* ORLogicInScalerModel.m in Sources */,
+				843749641270B2C00027B507 /* ORLogicScalerShipModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
