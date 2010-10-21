@@ -270,11 +270,19 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 
                                 srack->theSlt->pageSelect->write(0x100 | pagenr);
                                 
-                                uint32_t adccount;
 								//read raw trace
-								for(adccount=0; adccount<1024;adccount++){
+                                uint32_t adccount, trigSlot;
+								trigSlot = adcoffset/2;
+								for(adccount=trigSlot; adccount<1024;adccount++){
 									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
 								}
+								for(adccount=0; adccount<trigSlot;adccount++){
+									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+								}
+								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
+								for(adccount=0; adccount<1024;adccount++){
+									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
+								}*/
                                 if(wfRecordVersion == 0x2){
                                     traceStart16 = (adcoffset + postTriggerTime + 1) % 2048;
 								}
