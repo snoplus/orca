@@ -55,7 +55,10 @@
 
 @end
 
-@interface ORTriggerLogicScaler : NSObject {
+@interface ORTriggerLogicScaler : ORTriggerLogic {
 }
+- (unsigned long) counts:(int)index;
+- (void) shipData:(BOOL)forceShip;
+
 @end
 

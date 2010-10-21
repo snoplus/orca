@@ -34,7 +34,8 @@
 
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-    return  [aGuardian isMemberOfClass:NSClassFromString(@"ORIP408Model")];
+ return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerControllingIO")] |
+		 [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerControllingScaler")];
 }
 
 - (NSString*) identifier

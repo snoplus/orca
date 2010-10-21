@@ -45,3 +45,8 @@
 - (void) setOutputWithMask:(unsigned long) aChannelMask value:(unsigned long) aMaskValue;
 @end
 
+@protocol TriggerControllingScaler
+- (id) triggerChild:(int)anIndex;
+- (unsigned long) counts:(int)aChannel;
+@end
+

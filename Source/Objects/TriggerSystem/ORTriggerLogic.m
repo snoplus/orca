@@ -150,3 +150,42 @@
 	outputLogicValue |= (0x1L << aBit);
 }
 @end
+
+@implementation ORTriggerLogicScaler
+
+- (id) initWithDelegate:(id)aDelegate
+{
+	self = [super initWithDelegate:aDelegate];
+		
+	for(id anElement in outputLogicElements) {
+		//if([anElement respondsToSelector:@selector(bit)])outputLogicMask  |= (0x1L<<[anElement bit]);
+	}
+	
+	return self;
+}
+
+- (void) evaluate:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	if([outputLogicElements count]){
+				
+		for(id anOutputElement in outputLogicElements){
+			[anOutputElement evalWithDelegate:self];
+		}
+				
+		for(id obj in triggeredChildren){
+			[obj takeData:aDataPacket userInfo:userInfo];
+		}
+		[triggeredChildren removeAllObjects];
+	}
+}
+- (unsigned long) counts:(int)index
+{
+	return [delegate counts:index];
+}
+- (void) shipData:(BOOL)forceShip
+{
+	return [delegate shipData:forceShip];
+}
+
+@end
+
