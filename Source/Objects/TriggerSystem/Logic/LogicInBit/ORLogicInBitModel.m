@@ -26,8 +26,6 @@ NSString* ORLogicInBitChanged = @"ORLogicInBitChanged";
 @implementation ORLogicInBitModel
 
 #pragma mark ¥¥¥Initialization
-- (BOOL) isInputObject  {return YES;}
-- (BOOL) isOutputObject {return NO;}
 - (void) setUpImage
 {
 	NSImage* aCachedImage = [NSImage imageNamed:@"LogicInBit"];

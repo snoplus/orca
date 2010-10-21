@@ -53,7 +53,8 @@ NSString* ORLogicChildReadChanged = @"ORLogicChildReadChanged";
 }
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-    return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerControllingIO")];
+    return  [aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerControllingIO")] ||
+			[aGuardian conformsToProtocol:NSProtocolFromString(@"TriggerControllingScaler")];
 }
 
 - (void) makeMainController
