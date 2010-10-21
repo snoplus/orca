@@ -60,7 +60,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 	if (triggered) {
 		if (VMERead(GetBaseAddress() + mem_write_reg, GetAddressModifier(),
 				sizeof(mem_write_ptr), mem_write_ptr) < (int32_t) sizeof(mem_write_ptr)) {
-			LogBusError("BusError: mem_write at: 0x%08x %s", mem_write_reg);
+			LogBusError("BusError: mem_write at: 0x%08x\n", mem_write_reg);
 			return true; 
 		}
 		mem_write_ptr &= k_fifo_valid_mask;
@@ -74,25 +74,25 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 		
 		if (!triggered) {
 			//can we recover?
-			LogError("MTC readout broken, reseting...");
+			LogError("MTC readout broken, reseting\n");
 			value = 0UL;
 			if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
 					sizeof(value), value) < (int32_t) sizeof(value)){
-				LogBusError("BusError: reset read ptr, %s\n", strerror(errno));
+				LogBusError("BusError: reset read ptr\n");
 				return true; 
 			}        
 			
 			//todo: replace reset of the write pointer with full fifo reset
 			if (VMEWrite(GetBaseAddress() + mem_write_reg, GetAddressModifier(), 
 					sizeof(value), value) < (int32_t) sizeof(value)){
-				LogBusError("BusError: reset write ptr, %s\n", strerror(errno));
+				LogBusError("BusError: reset write ptr\n");
 				return true; 
 			}        
 			
 			//todo: maybe...
 			last_mem_read_ptr = 0UL;
 			mem_read_ptr = 0UL;
-			LogMessage("MTC readout reset done.");
+			LogMessage("MTC readout reset done.\n");
 			
 			return true;
 		}
@@ -106,7 +106,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 		for (int i = 0; i < 6; i++) {
 			if (VMERead(mem_base_address, mem_address_modifier, 
 					 sizeof(value), value) < (int32_t) sizeof(value)){
-				LogBusError("BusError: reading mtc word %d, %s\n", i, strerror(errno));
+				LogBusError("BusError: reading mtc word %d\n", i);
 				dataIndex = savedIndex;
 				// can we recover?
 				// we have to 1. reset the controller, and 2. make sure we start from scratch
@@ -121,7 +121,7 @@ bool ORMTCReadout::Readout(SBC_LAM_Data* /*lamData*/)
 		if (mem_read_ptr > k_fifo_valid_mask) mem_read_ptr = 0UL;
 		if (VMEWrite(GetBaseAddress() + mem_read_reg, GetAddressModifier(), 
 			     sizeof(mem_read_ptr), mem_read_ptr) < (int32_t) sizeof(mem_read_ptr)){
-			LogBusError("BusError: rd ptr inc to 0x%08x", mem_read_ptr);
+			LogBusError("BusError: rd ptr inc to 0x%08x\n", mem_read_ptr);
 			return true; 
 		}        
 		
