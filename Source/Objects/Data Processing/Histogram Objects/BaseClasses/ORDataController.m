@@ -131,13 +131,16 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 					 selector : @selector(calibrationChanged:)
 						 name : ORDataSetCalibrationChanged
 					   object : model];
-	
 
     [notifyCenter addObserver : self
 					 selector : @selector(serviceResponse:)
 						 name : ORCARootServiceReponseNotification
 					   object : nil];
-	
+
+	[notifyCenter addObserver : self
+					 selector : @selector(runStatusChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
 }
 
 - (void) updateWindow
@@ -159,6 +162,11 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 	NSMutableDictionary* reponseInfo = [[aNotification userInfo] objectForKey:ORCARootServiceResponseKey];
 	[reponseInfo setObject:[[self window] title] forKey:ORCARootServiceTitleKey];
 	[model processResponse:reponseInfo];
+}
+
+- (void) runStatusChanged:(NSNotification*)aNote
+{
+	[titleField setStringValue:[model fullNameWithRunNumber]];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -255,7 +263,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
     [super setModel:aModel];
     if([aModel fullName]){
         [[self window] setTitle:[aModel fullName]];
-        [titleField setStringValue:[aModel fullNameWithRunNumber]];
+		[self runStatusChanged:nil];
     }
 }
 
