@@ -197,18 +197,22 @@ int32_t main(int32_t argc, char *argv[])
             numRead = readBuffer(&aPacket);
             if(numRead == 0) break;
             if (numRead > 0) {
-                processBuffer(&aPacket,kReply);
-            } else {
+ 				pthread_mutex_lock (&runInfoMutex);                            //begin critical section
+				processBuffer(&aPacket,kReply);
+				pthread_mutex_unlock (&runInfoMutex);                        //end critical section
+           } else {
               /* if numRead is less than 0, then an error occurred.  We'll try to continue. */
-                LogError("Error reading buffer: %s", strerror(errno));
+			   pthread_mutex_lock (&runInfoMutex);                            //begin critical section
+               LogError("Error reading buffer: %s", strerror(errno));
+			   pthread_mutex_unlock (&runInfoMutex);                        //end critical section
             }
-        }
+       }
         
         if(run_info.statusBits & kSBC_RunningMask) {
             /* The data process is still running, we need to stop it. */
             /* This generally happens if an error occurs on the Orca side and
                 the socket is broken. */
-            stopRun();
+			stopRun();
             /* We should exit, too, as who knows what kind of failures exist. */
             timeToExit=1;
         }
@@ -259,15 +263,11 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 {
     switch(aPacket->cmdHeader.cmdID){
         case kSBC_WriteBlock:        
-            pthread_mutex_lock (&runInfoMutex);                            //begin critical section
             doWriteBlock(aPacket,reply); 
-            pthread_mutex_unlock (&runInfoMutex);                        //end critical section
         break;
         
         case kSBC_ReadBlock:
-            pthread_mutex_lock (&runInfoMutex);                            //begin critical section
             doReadBlock(aPacket,reply);  
-            pthread_mutex_unlock (&runInfoMutex);                        //end critical section
         break;
             
         case kSBC_LoadConfig:
@@ -429,9 +429,7 @@ void sendRunInfo(void)
     
     SBC_info_struct* runInfoPtr = (SBC_info_struct*)aPacket.payload;
 
-    pthread_mutex_lock (&runInfoMutex);                        //begin critical section
     memcpy(runInfoPtr, &run_info, sizeof(SBC_info_struct));    //make copy
-    pthread_mutex_unlock (&runInfoMutex);                     //end critical section
 
     BufferInfo cbInfo;
     CB_getBufferInfo(&cbInfo);
@@ -485,9 +483,7 @@ void sendCBRecord(void)
         else break;
     } while (1);
     
-    pthread_mutex_lock (&runInfoMutex);  //begin critical section
     run_info.recordsTransfered        += recordCount;
-    pthread_mutex_unlock (&runInfoMutex);  //end critical section
 
     if (writeBuffer(&aPacket) < 0) {
         LogError("sendCBRecord Error: %s", strerror(errno));   
@@ -613,7 +609,6 @@ char startRun (void)
     CB_initialize(kCBBufferSize);
     time(&lastTime); 
     
-    pthread_mutex_lock (&runInfoMutex);  //begin critical section
     run_info.bufferSize        = kCBBufferSize;
     run_info.readCycles        = 0;
     run_info.recordsTransfered = 0;
@@ -623,7 +618,6 @@ char startRun (void)
     run_info.msg_count         = 0;
     run_info.err_buf_index     = 0;
     run_info.msg_buf_index     = 0;
-    pthread_mutex_unlock (&runInfoMutex);  //end critical section
     
     if(run_info.statusBits | kSBC_ConfigLoadedMask){
 
@@ -641,11 +635,9 @@ char startRun (void)
 
 void stopRun()
 {
-    pthread_mutex_lock (&runInfoMutex);  //begin critical section
     run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
     run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
     run_info.readCycles        = 0;
-    pthread_mutex_unlock (&runInfoMutex);  //end critical section
 
     stopHWRun(&crate_config);
     // block until return
@@ -791,10 +783,8 @@ void LogMessage (const char *format,...)
     if(strlen(format) > kSBC_MaxStrSize*.75) return; //not a perfect check, but it will have to do....
     va_list ap;
     va_start (ap, format);
-    pthread_mutex_lock (&runInfoMutex);  //begin critical section
     vsprintf (run_info.messageStrings[run_info.msg_buf_index], format, ap);
     run_info.msg_buf_index = (run_info.msg_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
-    pthread_mutex_unlock (&runInfoMutex);//end critical section
     run_info.msg_count++;
     va_end (ap);
 }
@@ -810,11 +800,9 @@ void LogError (const char *format,...)
 	char finalStr[kSBC_MaxStrSize];
 	strncpy(finalStr,format,len);
 	finalStr[len] = '\0';
-    pthread_mutex_lock (&runInfoMutex);  //begin critical section
     vsprintf (run_info.errorStrings[run_info.err_buf_index], finalStr, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     run_info.err_count++;
-    pthread_mutex_unlock (&runInfoMutex);//end critical section
     va_end (ap);
 }
 
@@ -829,12 +817,10 @@ void LogBusError (const char *format,...)
 	char finalStr[kSBC_MaxStrSize];
 	strncpy(finalStr,format,len);
 	finalStr[len] = '\0';
-    pthread_mutex_lock (&runInfoMutex);  //begin critical section
     vsprintf (run_info.errorStrings[run_info.err_buf_index], finalStr, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     run_info.err_count++;
     run_info.busErrorCount++;
-    pthread_mutex_unlock (&runInfoMutex);//end critical section
     va_end (ap);
 }
 

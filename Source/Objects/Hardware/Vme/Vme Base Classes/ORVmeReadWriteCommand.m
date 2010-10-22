@@ -27,7 +27,7 @@
 }
 
 + (id) writeLongBlock:(unsigned long *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
+			 atAddress:(unsigned long) vmeAddress
 			numToWrite:(unsigned int) numberLongs
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
@@ -42,7 +42,7 @@
 	
 }
 
-+ (id) readLongBlockAtAddress:(unsigned int) vmeAddress
++ (id) readLongBlockAtAddress:(unsigned long) vmeAddress
 		   numToRead:(unsigned int) numberLongs
 		   withAddMod:(unsigned short) anAddressModifier
 		usingAddSpace:(unsigned short) anAddressSpace
@@ -57,7 +57,23 @@
 	
 }
 
-+ (id) readShortBlockAtAddress:(unsigned int) vmeAddress
++ (id) writeShortBlock:(unsigned long *) writeAddress
+			atAddress:(unsigned long) vmeAddress
+		   numToWrite:(unsigned int) numberShorts
+		   withAddMod:(unsigned short) anAddressModifier
+		usingAddSpace:(unsigned short) anAddressSpace
+{
+	return [[[ORVmeReadWriteCommand alloc] initWithOp: kWriteOp
+										   dataAdress: writeAddress
+										   vmeAddress: vmeAddress
+										  numberItems: numberShorts
+											 itemSize: sizeof(short)
+										   withAddMod: anAddressModifier
+										usingAddSpace: anAddressSpace] autorelease];
+	
+}
+
++ (id) readShortBlockAtAddress:(unsigned long) vmeAddress
 					numToRead:(unsigned int) numberShorts
 				   withAddMod:(unsigned short) anAddressModifier
 				usingAddSpace:(unsigned short) anAddressSpace
@@ -83,7 +99,7 @@
 
 - (id) initWithOp: (int) anOpType
 	   dataAdress: (unsigned long*) dataAddress
-	   vmeAddress: (unsigned int) aVmeAddress
+	   vmeAddress: (unsigned long) aVmeAddress
 	  numberItems: (unsigned int) aNumberItems
 		 itemSize: (unsigned int) anItemSize
 	   withAddMod: (unsigned short) anAddressModifier
@@ -115,7 +131,7 @@
 - (int) itemSize			 { return itemSize; }
 - (int)	addressModifier		 { return addressModifier; }
 - (int)	addressSpace		 { return addressSpace; }
-- (unsigned int) vmeAddress  { return vmeAddress; }
+- (unsigned long) vmeAddress { return vmeAddress; }
 - (int) returnCode			 { return returnCode; }
 - (void) setReturnCode:(int)aCode {  returnCode = aCode; }
 - (NSMutableData*) data		 { return data; }
@@ -123,7 +139,7 @@
 
 - (SBC_Packet) SBCPacket
 {
-	SBC_Packet aPacket;
+	SBC_Packet aPacket;	
 	aPacket.cmdHeader.destination		= kSBC_Process;
 	if(opType == kWriteOp){
 		aPacket.cmdHeader.cmdID			= kSBC_WriteBlock;

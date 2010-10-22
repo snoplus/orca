@@ -31,24 +31,30 @@ for the use of this software.
 	int				addressSpace;		//vme address space
 	int				itemSize;
 	int				numberItems;
-	unsigned int	vmeAddress;			//hw Address
+	unsigned long	vmeAddress;			//hw Address
 	int				returnCode;			//should be 1 for success, 0 for failure
 	NSMutableData*	data;			//if read theData == returned data, if write theData = writeData
 }
 + (id) delayCmd:(unsigned long) milliSeconds;
 	
-+ (id) writeLongBlock:(unsigned long *) writeAddress
-			atAddress:(unsigned int) vmeAddress
++ (id) writeLongBlock:(unsigned long*) writeAddress
+			atAddress:(unsigned long) vmeAddress
 		   numToWrite:(unsigned int) numberLongs
 		   withAddMod:(unsigned short) anAddressModifier
 		usingAddSpace:(unsigned short) anAddressSpace;
 
-+ (id) readLongBlockAtAddress:(unsigned int) vmeAddress
++ (id) readLongBlockAtAddress:(unsigned long) vmeAddress
 				   numToRead:(unsigned int) numberLongs
 				   withAddMod:(unsigned short) anAddressModifier
 				usingAddSpace:(unsigned short) anAddressSpace;
 
-+ (id) readShortBlockAtAddress:(unsigned int) vmeAddress
++ (id) writeShortBlock:(unsigned long*) writeAddress
+			atAddress:(unsigned long)  vmeAddress
+		   numToWrite:(unsigned int)   numberShorts
+		   withAddMod:(unsigned short) anAddressModifier
+		usingAddSpace:(unsigned short) anAddressSpace;
+
++ (id) readShortBlockAtAddress:(unsigned long) vmeAddress
 					 numToRead:(unsigned int) numberShorts
 					withAddMod:(unsigned short) anAddressModifier
 				 usingAddSpace:(unsigned short) anAddressSpace;
@@ -57,7 +63,7 @@ for the use of this software.
 	
 - (id) initWithOp: (int) aOpType
 	   dataAdress: (unsigned long*) dataAddress
-	   vmeAddress: (unsigned int) vmeAddress
+	   vmeAddress: (unsigned long) vmeAddress
 	  numberItems: (unsigned int) aNumberItems
 		 itemSize: (unsigned int) anItemSize
 	   withAddMod: (unsigned short) anAddressModifier
@@ -71,7 +77,7 @@ for the use of this software.
 - (int) itemSize;
 - (int)	returnCode;
 - (void) setReturnCode:(int)aCode;
-- (unsigned int)	vmeAddress;
+- (unsigned long)	vmeAddress;
 - (unsigned char*) bytes;
 - (NSMutableData*)	data;
 

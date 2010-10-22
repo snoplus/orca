@@ -77,9 +77,7 @@
 	blockPacket.cmdHeader.numberBytesinPayload	= 0; //fill in as we go
 	char* blockPayloadPtr				= (char*)blockPacket.payload;
 	
-	id aCmd; //TBD ..make generic
-	NSEnumerator* e = [commands objectEnumerator];
-	while(aCmd = [e nextObject]){
+	for(id aCmd in commands){
 		SBC_Packet cmdPacket = [aCmd SBCPacket];
 		memcpy(blockPayloadPtr,&cmdPacket,cmdPacket.numBytes);
 		blockPacket.cmdHeader.numberBytesinPayload += cmdPacket.numBytes;
@@ -92,9 +90,7 @@
 {
 	unsigned long totalBytesToProcess = aPacket->cmdHeader.numberBytesinPayload;
 	char* dataToProcess = (char*) aPacket->payload;
-	NSEnumerator* e = [commands objectEnumerator];
-	id aCmd; //TBD ..make generic
-	while(aCmd = [e nextObject]){
+	for(id aCmd in commands){
 		SBC_Packet* packetToProcess = (SBC_Packet*)dataToProcess;
 		[aCmd extractData:packetToProcess];
 		dataToProcess += packetToProcess->numBytes;
