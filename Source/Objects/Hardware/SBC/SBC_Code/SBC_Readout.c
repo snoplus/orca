@@ -212,7 +212,9 @@ int32_t main(int32_t argc, char *argv[])
             /* The data process is still running, we need to stop it. */
             /* This generally happens if an error occurs on the Orca side and
                 the socket is broken. */
+			pthread_mutex_lock (&runInfoMutex);                            //begin critical section
 			stopRun();
+			pthread_mutex_unlock (&runInfoMutex);                        //end critical section
             /* We should exit, too, as who knows what kind of failures exist. */
             timeToExit=1;
         }
