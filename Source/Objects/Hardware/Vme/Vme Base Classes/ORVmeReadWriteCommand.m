@@ -33,12 +33,12 @@
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
 	return [[[ORVmeReadWriteCommand alloc] initWithOp: kWriteOp
-									  dataAdress: writeAddress
-									  vmeAddress: vmeAddress
-									 numberItems: numberLongs
-										itemSize: sizeof(long)
-									  withAddMod: anAddressModifier
-								   usingAddSpace: anAddressSpace] autorelease];
+										   dataAdress: writeAddress
+										   vmeAddress: vmeAddress
+										  numberItems: numberLongs
+											 itemSize: sizeof(long)
+										   withAddMod: anAddressModifier
+										usingAddSpace: anAddressSpace] autorelease];
 	
 }
 
@@ -48,12 +48,12 @@
 		usingAddSpace:(unsigned short) anAddressSpace
 {
 	return [[[ORVmeReadWriteCommand alloc] initWithOp: kReadOp
-									  dataAdress: 0		
-									  vmeAddress: vmeAddress
-									 numberItems: numberLongs
-										itemSize: sizeof(long)
-									  withAddMod: anAddressModifier
-								   usingAddSpace: anAddressSpace] autorelease];
+										   dataAdress: 0		
+										   vmeAddress: vmeAddress
+										  numberItems: numberLongs
+											 itemSize: sizeof(long)
+										   withAddMod: anAddressModifier
+										usingAddSpace: anAddressSpace] autorelease];
 	
 }
 
