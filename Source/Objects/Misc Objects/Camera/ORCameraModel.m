@@ -45,6 +45,7 @@ NSString* ORCameraModelMovieChanged				= @"ORCameraModelMovieChanged";
 - (void) saveMovieToHistory;
 - (void) cleanupHistory;
 - (void) cleanupThread:(long)keepTime;
+- (void) addFrame;
 @end
 
 
@@ -345,7 +346,7 @@ NSString* ORCameraModelMovieChanged				= @"ORCameraModelMovieChanged";
 - (void) addFrameNow
 {
     @synchronized(self){
-		[self addFrameNow];
+		[self addFrame];
 	}
 }
 @end
