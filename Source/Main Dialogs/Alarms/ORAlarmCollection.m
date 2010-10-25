@@ -177,14 +177,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 - (void) drawBadge
 {
 	return; 
-//crashes sometimes..... Don't know why
-//    if([alarms count]) [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat:@"%d",[alarms count]]];
+//  crashes sometimes..... Don't know why... just remove it for now
+//  if([alarms count]) [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat:@"%d",[alarms count]]];
 //	else			   [[NSApp dockTile] setBadgeLabel: nil];
 }
 
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification
 {
-    
     [self setBeepTimer:nil];
     NSEnumerator* e = [alarms objectEnumerator];
     ORAlarm* alarm;
@@ -194,7 +193,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
             break;
         }
     }
-    
 }
 
 - (void) beep:(NSTimer*)aTimer
