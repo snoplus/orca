@@ -89,6 +89,7 @@
 		NSString* shutDownScriptState;
 		int subRunNumber;
 		BOOL runModeCache;
+		NSThread* readoutThread;
 }
 
 

@@ -954,9 +954,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         }
 		
 		timeToStopTakingData = NO;
-		[NSThread detachNewThreadSelector:@selector(takeData) toTarget:self withObject:nil];
-		[NSThread setThreadPriority:.7];
-        
+		
+		//now declare the thread directly so we can set the stack size.
+		//[NSThread detachNewThreadSelector:@selector(takeData) toTarget:self withObject:nil];
+        readoutThread = [[NSThread alloc] initWithTarget:self selector:@selector(takeData) object:nil];
+		[readoutThread setStackSize:4*1024*1024];
+		[readoutThread start];
+		 
         [self setStartTime:[NSCalendarDate date]];
 		[self setSubRunStartTime:[NSCalendarDate date]];
 		[self setElapsedRunTime:0];
@@ -1070,6 +1074,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     heartBeatTimer = nil;
     
 	totalWaitTime = 0;
+	
 	[self waitForRunToStop];
 	
 }
@@ -1436,6 +1441,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	NSLog(@"DataTaking Thread Exited\n");
 	dataTakingThreadRunning = NO;
 	[outerpool release];
+	
+	[readoutThread release];
+	readoutThread = nil;
 }
 
 #pragma mark ¥¥¥Notifications
