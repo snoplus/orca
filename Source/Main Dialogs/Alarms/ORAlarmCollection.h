@@ -46,7 +46,7 @@
 - (void) setBeepTimer:(NSTimer*)aTimer;
 - (NSEnumerator*) alarmEnumerator;
 - (ORAlarm*) objectAtIndex:(int)index;
-- (void) drawBadge:(int)n;
+- (void) drawBadge;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;

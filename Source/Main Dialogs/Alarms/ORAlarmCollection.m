@@ -151,31 +151,35 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 #pragma mark •••Alarm Management
 - (void) alarmWasPosted:(NSNotification*)aNotification
 {
-    [self addAlarm:[aNotification object]];
+	ORAlarm* anAlarm = [aNotification object];
+    [self addAlarm:anAlarm];
     [self setBeepTimer:[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(beep:) userInfo:nil repeats:YES]];
     [self beep:nil];
-    [[aNotification object] setIsPosted:YES];
+    [anAlarm setIsPosted:YES];
     [[[ORAlarmController sharedAlarmController] window]orderFront:self];
-	[self drawBadge:[alarms count]];
+	[self drawBadge];
 }
 
 - (void) alarmWasCleared:(NSNotification*)aNotification
 {
-    [[aNotification object] setIsPosted:NO];
-    [self removeAlarm:[aNotification object]];
+	ORAlarm* anAlarm = [[aNotification object] retain];
+    [anAlarm setIsPosted:NO];
+    [self removeAlarm:anAlarm];
     if([alarms count] == 0){
         [self setBeepTimer:nil];
 		RestoreApplicationDockTileImage();
 		[[[ORAlarmController sharedAlarmController] window]orderOut:self];
     }
-	[self drawBadge:[alarms count]];
+	else [self drawBadge];
+	[anAlarm release];
 }
 
-- (void) drawBadge:(int)n
+- (void) drawBadge
 {
-    NSDockTile *myTile = [NSApp dockTile];
-    if(n)[myTile setBadgeLabel:[NSString stringWithFormat:@"%d",n]];
-	else [myTile setBadgeLabel:nil];
+	return; 
+//crashes sometimes..... Don't know why
+//    if([alarms count]) [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat:@"%d",[alarms count]]];
+//	else			   [[NSApp dockTile] setBadgeLabel: nil];
 }
 
 - (void) alarmWasAcknowledged:(NSNotification*)aNotification
