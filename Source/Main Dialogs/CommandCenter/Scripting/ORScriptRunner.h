@@ -53,6 +53,7 @@
 	NSMutableIndexSet*	breakpoints;
 	int					debugMode;
 	NSMutableDictionary*    displayDictionary;
+	NSThread*			scriptThread;
 } 
 
 #pragma mark ¥¥¥Accessors

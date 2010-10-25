@@ -303,7 +303,10 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		NSArray* mainNodes = [functionTable objectForKey:@"main"];
 		if(mainNodes){
 			[eval setDelegate:self];
-			[NSThread detachNewThreadSelector:@selector(_evalMain:) toTarget:self withObject:mainNodes];
+			//[NSThread detachNewThreadSelector:@selector(_evalMain:) toTarget:self withObject:mainNodes];
+			scriptThread = [[NSThread alloc] initWithTarget:self selector:@selector(_evalMain:) object:mainNodes];
+			[scriptThread setStackSize:4*1024*1024];
+			[scriptThread start];
 		}
 		else NSLog(@"%@ has NO main function\n",scriptName);
 	}
@@ -483,6 +486,8 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	running = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerRunningChanged object:self userInfo:nil waitUntilDone:YES];
 	[pool release];
+	[scriptThread release];
+	scriptThread = nil;
 }
 
 
