@@ -69,7 +69,7 @@
 
 	aPlot = [[ORXYPlot alloc] initWithTag:2 andDataSource:self];
 	[aPlot setRoi: [[model rois:2] objectAtIndex:0]];
-	[aPlot setLineColor:[NSColor blueColor]];
+	[aPlot setLineColor:[NSColor colorWithCalibratedRed:0 green:.6 blue:0 alpha:1]];
 	[aPlot setShowLine:YES];
 	[plotView addPlot: aPlot];
 	[aPlot release];
@@ -265,6 +265,7 @@
 	int col3Key = [model col3Key];
 	[y1LengendField setStringValue:@""];
 	[y2LengendField setStringValue:@""];
+	[y3LengendField setStringValue:@""];
 	if(col1Key <= 2) {
 		NSString* s = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col1Key]] headerCell] title];
 		title = [title stringByAppendingString:s];
@@ -280,7 +281,7 @@
 		if([title length])title = [title stringByAppendingString:@" , "];
 		NSString* s = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col3Key]] headerCell] title];
 		title = [title stringByAppendingString:s];
-		[y2LengendField setStringValue:s];
+		[y3LengendField setStringValue:s];
 	}
 	if([title length]==0)title = @"Index";
 	
@@ -364,13 +365,9 @@
 		if(aPlot != [aPlotView topPlot])theColor = [[aPlot lineColor] highlightWithLevel:.5];
 		else							theColor = [aPlot lineColor];
 
-		if(tag == 1) [y1LengendField setTextColor:theColor];
-		else if(tag == 2) [y2LengendField setTextColor:theColor];
-		else [y3LengendField setTextColor:theColor];
-
-		if(tag == 0) [y2LengendField setTextColor:theColor];
+		if(tag == 0)	  [y1LengendField setTextColor:theColor];
 		else if(tag == 1) [y2LengendField setTextColor:theColor];
-		else [y3LengendField setTextColor:theColor];
+		else              [y3LengendField setTextColor:theColor];
 	}
 }
 
