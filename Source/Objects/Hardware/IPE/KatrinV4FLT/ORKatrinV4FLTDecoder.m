@@ -243,7 +243,7 @@
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
 	
 //TODO: DEBUG -tb- NSLog(@"energy on chan %i is %i (%i), subsec %i , page# %i, traceStart16 %i\n", chan, ptr[6] ,energy, subsec, ShiftAndExtract(eventID,10,0x3f),traceStart16);//TODO: DEBUG -tb-
-	
+
 	//channel by channel histograms  NSScanner
 	[aDataSet histogram:energy 
 				numBins:histoLen sender:self  
@@ -262,7 +262,6 @@
 	
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
-	
 	#if 0
 	//-----------------------------------------------
 	//temp.. to lock the waveform to the highest value
@@ -289,7 +288,7 @@ startIndex=traceStart16;
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0x0FFF							// when displayed all values will be masked with this value
 			   specialBits:0xF000						
-				  bitNames: [NSArray arrayWithObjects:@"trig",@"over",@"under", @"extern",nil]
+				  bitNames: [NSArray arrayWithObjects:@"---",@"appPg",@"inhibit", @"trigger",nil]
 					sender: self 
 				  withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
 

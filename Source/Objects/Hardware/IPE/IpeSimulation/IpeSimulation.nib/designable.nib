@@ -23,10 +23,10 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1633"/>
-			<integer value="1596"/>
+			<integer value="1640"/>
 			<integer value="441"/>
 			<integer value="448"/>
+			<integer value="1596"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -81,7 +81,7 @@
 								<object class="NSTabViewItem" id="583001795">
 									<string key="NSIdentifier">Item 2</string>
 									<object class="NSView" key="NSView" id="378201856">
-										<reference key="NSNextResponder" ref="902941054"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -130,30 +130,7 @@
 															<object class="NSTextView" id="362317866">
 																<reference key="NSNextResponder" ref="546913054"/>
 																<int key="NSvFlags">2322</int>
-																<object class="NSMutableSet" key="NSDragTypes">
-																	<bool key="EncodedWithXMLCoder">YES</bool>
-																	<object class="NSArray" key="set.sortedObjects">
-																		<bool key="EncodedWithXMLCoder">YES</bool>
-																		<string>Apple HTML pasteboard type</string>
-																		<string>Apple PDF pasteboard type</string>
-																		<string>Apple PICT pasteboard type</string>
-																		<string>Apple PNG pasteboard type</string>
-																		<string>Apple URL pasteboard type</string>
-																		<string>CorePasteboardFlavorType 0x6D6F6F76</string>
-																		<string>NSColor pasteboard type</string>
-																		<string>NSFilenamesPboardType</string>
-																		<string>NSStringPboardType</string>
-																		<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
-																		<string>NeXT RTFD pasteboard type</string>
-																		<string>NeXT Rich Text Format v1.0 pasteboard type</string>
-																		<string>NeXT TIFF v4.0 pasteboard type</string>
-																		<string>NeXT font pasteboard type</string>
-																		<string>NeXT ruler pasteboard type</string>
-																		<string>WebURLsWithTitlesPboardType</string>
-																		<string>public.url</string>
-																	</object>
-																</object>
-																<string key="NSFrameSize">{583, 0}</string>
+																<string key="NSFrame">{{0, -14}, {583, 14}}</string>
 																<reference key="NSSuperview" ref="546913054"/>
 																<object class="NSTextContainer" key="NSTextContainer" id="447522093">
 																	<object class="NSLayoutManager" key="NSLayoutManager">
@@ -700,7 +677,6 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {634, 457}}</string>
-										<reference key="NSSuperview" ref="902941054"/>
 									</object>
 									<string key="NSLabel">SimConfig</string>
 									<reference key="NSColor" ref="615095443"/>
@@ -709,7 +685,7 @@
 								<object class="NSTabViewItem" id="837883699">
 									<string key="NSIdentifier">Item 3</string>
 									<object class="NSView" key="NSView" id="620959993">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="902941054"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -802,6 +778,7 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {634, 457}}</string>
+										<reference key="NSSuperview" ref="902941054"/>
 									</object>
 									<string key="NSLabel">SimOutput</string>
 									<reference key="NSColor" ref="615095443"/>
@@ -1370,7 +1347,6 @@
 												<reference key="NSHScroller" ref="147948386"/>
 												<reference key="NSContentView" ref="944981882"/>
 												<reference key="NSHeaderClipView" ref="746217727"/>
-												<reference key="NSCornerView" ref="189005722"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 											</object>
 											<object class="NSMatrix" id="409293112">
@@ -2435,14 +2411,14 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 									<reference key="NSTabView" ref="902941054"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="583001795"/>
+							<reference key="NSSelectedTabViewItem" ref="837883699"/>
 							<reference key="NSFont" ref="26"/>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="378201856"/>
+								<reference ref="620959993"/>
 							</object>
 						</object>
 					</object>
@@ -6265,7 +6241,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{522, 57}, {700, 790}}</string>
+					<string>{{630, 82}, {700, 790}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6288,9 +6264,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{496, 207}, {638, 511}}</string>
+					<string>{{495, 211}, {638, 511}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{496, 207}, {638, 511}}</string>
+					<string>{{495, 211}, {638, 511}}</string>
 					<integer value="1"/>
 					<string>{{89, 322}, {638, 461}}</string>
 					<boolean value="NO"/>
@@ -6856,6 +6832,27 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/TriggerSystem/Logic/LogicChildRead/ORLogicChildReadModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/TriggerSystem/Logic/LogicPattern/ORLogicPatternModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
