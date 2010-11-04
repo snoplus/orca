@@ -206,8 +206,6 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 - (IBAction) printDocument:(id)sender
 {
-	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
-		
     NSRect cRect = [[self window] contentRectForFrameRect: [[self window] frame]];
     cRect.origin = NSZeroPoint;
     NSView*     borderView   = [[[self window] contentView] superview];
@@ -215,10 +213,9 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
     NSImage*    tempImage = [[NSImage alloc] initWithData: pdfData];
 	[tempImage setScalesWhenResized:YES];
 	
+	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 	NSSize imageSize = [tempImage size];
-	float iw = imageSize.width;
-	float ih = imageSize.height;
-	if(iw>ih){
+	if(imageSize.width>imageSize.height){
 		[printInfo setOrientation:NSLandscapeOrientation];
 		[printInfo setHorizontalPagination: NSFitPagination];
 	}
@@ -226,15 +223,15 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 		[printInfo setOrientation:NSPortraitOrientation];
 		[printInfo setVerticalPagination: NSFitPagination];
 	}
-	[printInfo setLeftMargin:25];
-	[printInfo setRightMargin:25];
-	[printInfo setTopMargin:25];
-	[printInfo setBottomMargin:25];
+
+	[printInfo setHorizontallyCentered:NO];
+	[printInfo setVerticallyCentered:NO];
+	[printInfo setLeftMargin:72.0];
+	[printInfo setRightMargin:72.0];
+	[printInfo setTopMargin:72.0];
+	[printInfo setBottomMargin:90.0];
 	
-	NSRect pageBounds = [printInfo imageablePageBounds];
-	float pw = pageBounds.size.width - 100;
-	float ph = pageBounds.size.height - 75;
-	NSImageView* tempView = [[[NSImageView alloc] initWithFrame: NSMakeRect(0,0,pw,ph)] autorelease];
+	NSImageView* tempView = [[[NSImageView alloc] initWithFrame: NSMakeRect(0.0, 0.0, 8.5 * 72, 11.0 * 72)] autorelease];
 	[tempView setImageAlignment:NSImageAlignTopLeft];
 	[tempView setImage: tempImage];
 
