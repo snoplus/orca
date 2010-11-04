@@ -57,6 +57,7 @@
 - (void) showTemplates:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) openArchive:(NSToolbarItem*)item;
 - (IBAction) statusLog:(NSToolbarItem*)item;
 - (IBAction) printDocument:(id)sender;
 - (IBAction) alarmMaster:(NSToolbarItem*)item;

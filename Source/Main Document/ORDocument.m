@@ -704,6 +704,9 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 	if (![windowController isKindOfClass:NSClassFromString(@"ORDocumentController")]){
 		return YES;
 	}
+	else if([[ORGlobal sharedGlobal] forcedHalt]){
+		return YES;
+	}
     else if([[ORGlobal sharedGlobal] runInProgress]){
         NSRunAlertPanel(@"Run In Progess", @"Experiment can NOT be closed.", nil, nil,nil);
         return NO;

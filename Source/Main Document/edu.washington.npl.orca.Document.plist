@@ -25,6 +25,15 @@
 			<key>ToolTip</key>
 			<string>Open AutoTester</string>
 		</dict>
+		<key>Archive</key>
+		<dict>
+			<key>Action</key>
+			<string>showArchive:</string>
+			<key>Label</key>
+			<string>Archive</string>
+			<key>ToolTip</key>
+			<string>Open Archival</string>
+		</dict>
 		<key>statusWindow</key>
 		<dict>
 			<key>Action</key>

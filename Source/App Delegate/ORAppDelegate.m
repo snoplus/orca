@@ -41,6 +41,7 @@
 #import "ORMailer.h"
 #import "OrcaObjectController.h"
 #import "ORWindowSaveSet.h"
+#import "ORArchive.h"
 
 #import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
@@ -111,7 +112,17 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	self = [super init];
 	theSplashController = [[ORSplashWindowController alloc] init];
 	[theSplashController showWindow:self];
-	
+	NSString* myName = [[NSProcessInfo processInfo] processName];
+	int myPid        = [[NSProcessInfo processInfo] processIdentifier];
+	NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
+	for(id anApp in launchedApps){
+		NSString* otherProcessName = [anApp objectForKey:@"NSApplicationName"];
+		int otherProcessPid = [[anApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
+		
+		if([otherProcessName isEqualToString:myName] && otherProcessPid != myPid){
+			[NSApp terminate:self];
+		}
+	}
 	return self;
 }
 
@@ -182,6 +193,10 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) showArchive:(id)sender
+{
+    [[ORArchive sharedArchive] showWindow:self];
+}
 
 - (IBAction) restoreToCmdOneSet:(id)sender
 {
@@ -329,40 +344,24 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 #pragma mark ¥¥¥Notification Methods
 -(void)applicationDidFinishLaunching:(NSNotification*)aNotification
 {
-    CFBundleRef localInfoBundle = CFBundleGetMainBundle();
-    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-    
-    CFBundleGetLocalInfoDictionary( localInfoBundle );
-    
-    NSString* versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
-    
     
 	[self showStatusLog:self];
-	
-	NSFileManager* fm = [NSFileManager defaultManager];
-	NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
-	NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
-	if([fm fileExistsAtPath:svnVersionPath]){
-		svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
-		if([svnVersion hasSuffix:@"\n"]){
-			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
-		}
-	}
+
     NSLog(@"-------------------------------------------------\n");
-    NSLog(@"   Orca (v%@%@%@) Has Started                    \n",versionString,[svnVersion length]?@":":@"",[svnVersion length]?svnVersion:@"");
+    NSLog(@"   Orca (v%@) Has Started                    \n",fullVersion());
     NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag]; 
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
 		NSLog(@"   (After crash or hard debugger stop)           \n");
     }
     NSLog(@"-------------------------------------------------\n");
-	if(![fm fileExistsAtPath:svnVersionPath]){
-		NSLogColor([NSColor redColor], @"Warning: The svn revision number is not available");
-		NSLogColor([NSColor redColor], @"It appears svn is NOT installed.");
-	}
+
 	unsigned major, minor, bugFix;
     [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
     NSLog(@"Running MacOS %u.%u.%u %@\n", major, minor, bugFix,minor>=5?@"":@"(Note: some ORCA features require 10.5. Please update)");
     NSLog(@"Mac Address: %@\n",[self ethernetHardwareAddress]);
+	NSString* theAppPath = appPath();
+	if(theAppPath)	NSLog(@"Launch Path: %@\n",theAppPath);
+
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
         [self mailCrashLogs];
     }
