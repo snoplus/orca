@@ -58,7 +58,7 @@
 						<object class="NSTextField" id="771739584">
 							<reference key="NSNextResponder" ref="44552334"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{10, 145}, {82, 14}}</string>
+							<string key="NSFrame">{{13, 145}, {82, 14}}</string>
 							<reference key="NSSuperview" ref="44552334"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="1008528585">
@@ -94,7 +94,7 @@
 						<object class="NSTextField" id="782619684">
 							<reference key="NSNextResponder" ref="44552334"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{94, 145}, {232, 14}}</string>
+							<string key="NSFrame">{{107, 145}, {232, 14}}</string>
 							<reference key="NSSuperview" ref="44552334"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="162889307">
@@ -110,7 +110,7 @@
 						<object class="NSTextField" id="100854119">
 							<reference key="NSNextResponder" ref="44552334"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{331, 145}, {134, 14}}</string>
+							<string key="NSFrame">{{348, 145}, {117, 14}}</string>
 							<reference key="NSSuperview" ref="44552334"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="1067101421">
@@ -296,7 +296,7 @@
 								</object>
 							</object>
 						</object>
-						<object class="NSBox" id="928642948">
+						<object class="NSBox" id="936886600">
 							<reference key="NSNextResponder" ref="44552334"/>
 							<int key="NSvFlags">12</int>
 							<string key="NSFrame">{{318, 88}, {25, 5}}</string>
@@ -477,17 +477,17 @@
 						<reference key="object" ref="44552334"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="771739584"/>
 							<reference ref="581798354"/>
-							<reference ref="782619684"/>
 							<reference ref="78764740"/>
 							<reference ref="160277583"/>
-							<reference ref="928642948"/>
+							<reference ref="936886600"/>
 							<reference ref="230236972"/>
 							<reference ref="100854119"/>
 							<reference ref="1006796638"/>
 							<reference ref="588678284"/>
 							<reference ref="46661642"/>
+							<reference ref="782619684"/>
+							<reference ref="771739584"/>
 						</object>
 						<reference key="parent" ref="578503872"/>
 					</object>
@@ -633,7 +633,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">26367</int>
-						<reference key="object" ref="928642948"/>
+						<reference key="object" ref="936886600"/>
 						<reference key="parent" ref="44552334"/>
 					</object>
 				</object>
@@ -703,9 +703,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{483, 737}, {482, 169}}</string>
+					<string>{{457, 1093}, {482, 169}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{483, 737}, {482, 169}}</string>
+					<string>{{457, 1093}, {482, 169}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
