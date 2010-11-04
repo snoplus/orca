@@ -62,7 +62,6 @@
 - (BOOL) analysisDrawerIsOpen;
 - (NSTextField*) titleField;
 
-- (IBAction) printDocument:(id)sender;
 - (IBAction) toggleRaw:(NSToolbarItem*)item;
 - (IBAction) clear:(NSToolbarItem*)item;
 - (IBAction) hideShowControls:(id)sender;

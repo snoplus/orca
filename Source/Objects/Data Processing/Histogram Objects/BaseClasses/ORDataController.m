@@ -327,16 +327,6 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 	[rawDataTabView selectTabViewItemAtIndex:index];
 }
 
-- (IBAction) printDocument:(id)sender
-{
-	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
-	NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:plotterGroupView printInfo:printInfo];
-#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
-    [printOp setShowPanels:YES];
-#endif
-	[printOp runOperation];
-}
-
 - (IBAction) hideShowControls:(id)sender
 {
 	

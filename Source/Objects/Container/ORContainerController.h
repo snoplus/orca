@@ -47,7 +47,6 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) openHelp:(NSToolbarItem*)item;
 - (IBAction) statusLog:(NSToolbarItem*)item;
-- (IBAction) printDocument:(id)sender;
 - (IBAction) alarmMaster:(NSToolbarItem*)item;
 - (IBAction) openCatalog:(NSToolbarItem*)item;
 - (IBAction) openHWWizard:(NSToolbarItem*)item;

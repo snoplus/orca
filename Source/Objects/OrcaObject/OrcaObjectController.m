@@ -109,7 +109,6 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 	//do nothing... subclassed can override
 }
 
-
 - (void) endAllEditing:(NSNotification*)aNotification
 {
 	[self endEditing];
@@ -159,10 +158,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 					 selector : @selector(warningPosted:)
 						 name : ORWarningPosted
 					   object : model];
-	
-	
 }
-
 
 - (void)flagsChanged:(NSEvent*)inEvent
 {
@@ -208,6 +204,46 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 	return [[[NSApp delegate] document] collectObjectsConformingTo:aProtocol];
 }
 
+- (IBAction) printDocument:(id)sender
+{
+	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
+		
+    NSRect cRect = [[self window] contentRectForFrameRect: [[self window] frame]];
+    cRect.origin = NSZeroPoint;
+    NSView*     borderView   = [[[self window] contentView] superview];
+    NSData*     pdfData		 = [borderView dataWithPDFInsideRect: cRect];
+    NSImage*    tempImage = [[NSImage alloc] initWithData: pdfData];
+	[tempImage setScalesWhenResized:YES];
+	
+	NSSize imageSize = [tempImage size];
+	float iw = imageSize.width;
+	float ih = imageSize.height;
+	if(iw>ih){
+		[printInfo setOrientation:NSLandscapeOrientation];
+		[printInfo setHorizontalPagination: NSFitPagination];
+	}
+	else {
+		[printInfo setOrientation:NSPortraitOrientation];
+		[printInfo setVerticalPagination: NSFitPagination];
+	}
+	[printInfo setLeftMargin:25];
+	[printInfo setRightMargin:25];
+	[printInfo setTopMargin:25];
+	[printInfo setBottomMargin:25];
+	
+	NSRect pageBounds = [printInfo imageablePageBounds];
+	float pw = pageBounds.size.width - 100;
+	float ph = pageBounds.size.height - 75;
+	NSImageView* tempView = [[[NSImageView alloc] initWithFrame: NSMakeRect(0,0,pw,ph)] autorelease];
+	[tempView setImageAlignment:NSImageAlignTopLeft];
+	[tempView setImage: tempImage];
+
+	NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:tempView printInfo:printInfo];
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
+    [printOp setShowPanels:YES];
+#endif
+	[printOp runOperation];
+}
 
 #pragma mark INTERFACE MANAGEMENT - Generic updaters
 

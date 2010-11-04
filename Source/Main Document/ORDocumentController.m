@@ -310,12 +310,43 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 
 - (IBAction) printDocument:(id)sender
 {
-    NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
-    NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:[[self window]contentView] printInfo:printInfo];
+	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
+	
+    NSRect cRect = [[self window] contentRectForFrameRect: [[self window] frame]];
+    cRect.origin = NSZeroPoint;
+    NSView*     borderView   = [[[self window] contentView] superview];
+    NSData*     pdfData		 = [borderView dataWithPDFInsideRect: cRect];
+    NSImage*    tempImage = [[NSImage alloc] initWithData: pdfData];
+	[tempImage setScalesWhenResized:YES];
+	
+	NSSize imageSize = [tempImage size];
+	float iw = imageSize.width;
+	float ih = imageSize.height;
+	if(iw>ih){
+		[printInfo setOrientation:NSLandscapeOrientation];
+		[printInfo setHorizontalPagination: NSFitPagination];
+	}
+	else {
+		[printInfo setOrientation:NSPortraitOrientation];
+		[printInfo setVerticalPagination: NSFitPagination];
+	}
+	[printInfo setLeftMargin:25];
+	[printInfo setRightMargin:25];
+	[printInfo setTopMargin:25];
+	[printInfo setBottomMargin:25];
+	
+	NSRect pageBounds = [printInfo imageablePageBounds];
+	float pw = pageBounds.size.width - 100;
+	float ph = pageBounds.size.height - 75;
+	NSImageView* tempView = [[[NSImageView alloc] initWithFrame: NSMakeRect(0,0,pw,ph)] autorelease];
+	[tempView setImageAlignment:NSImageAlignTopLeft];
+	[tempView setImage: tempImage];
+	
+	NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:tempView printInfo:printInfo];
 #if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
     [printOp setShowPanels:YES];
 #endif
-    [printOp runOperation];
+	[printOp runOperation];
 }
 
 - (IBAction) scaleFactorAction:(id)sender

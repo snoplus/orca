@@ -69,6 +69,7 @@
 - (IBAction) decDialog:(id)sender;
 - (IBAction) saveDocument:(id)sender;
 - (IBAction) saveDocumentAs:(id)sender;
+- (IBAction) printDocument:(id)sender;
 
 - (IBAction) copy:(id)sender;
 

@@ -110,7 +110,6 @@
 - (IBAction) openHWWizard:(NSToolbarItem*)item; 
 - (IBAction) openCommandCenter:(NSToolbarItem*)item; 
 - (IBAction) openTaskMaster:(NSToolbarItem*)item; 
-- (IBAction) printDocument:(id)sender;
 
 #pragma mark •••Details Actions
 - (IBAction) detailsLockAction:(id)sender;
