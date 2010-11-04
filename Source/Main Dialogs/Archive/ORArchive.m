@@ -401,6 +401,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
     return self;
 }
 
+- (void) dealloc
+{
+	[srcPath release];
+	[super dealloc];
+}
+
 - (void) main
 {
 	@try {
