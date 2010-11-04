@@ -209,6 +209,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 	}
 }
 
+- (void) prepareForForcedHalt
+{
+	forcedHalt = YES;
+}
+
+- (BOOL) forcedHalt
+{
+	return forcedHalt;
+}
+
 - (BOOL) runInProgress
 {
     return runInProgress >= eRunInProgress;

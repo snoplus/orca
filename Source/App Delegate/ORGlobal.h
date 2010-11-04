@@ -63,6 +63,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
     unsigned long runType;
 	NSMutableDictionary* runVetos;
 	int cpuCount;
+	BOOL    forcedHalt;
 }
 
 + (ORGlobal*) sharedGlobal;
@@ -81,6 +82,8 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 - (BOOL) runStopped;
 - (BOOL) runRunning;
 - (BOOL) testInProgress;
+- (BOOL) forcedHalt;
+- (void) prepareForForcedHalt;
 - (void) setTestInProgress:(BOOL)state;
 - (void) setRunInProgress:(BOOL)state;
 - (unsigned long)runType;

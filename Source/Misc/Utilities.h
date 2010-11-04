@@ -39,6 +39,9 @@ NSString* hexToString(unsigned long aHexValue);
 const char* decodeType(const char* aType);
 NSString* macAddress();
 NSString* computerName();
+NSString* appPath();
+NSString* launchPath();
+NSString* fullVersion();
 
 #pragma mark ***private
 kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices);

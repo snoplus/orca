@@ -23,6 +23,48 @@
 #include <IOKit/network/IOEthernetInterface.h>
 #include <IOKit/network/IONetworkInterface.h>
 #include <IOKit/network/IOEthernetController.h>
+NSString* fullVersion()
+{
+	CFBundleRef localInfoBundle = CFBundleGetMainBundle();
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    
+    CFBundleGetLocalInfoDictionary( localInfoBundle );
+	
+	NSString* versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
+	NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
+	if([fm fileExistsAtPath:svnVersionPath]){
+		svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
+		if([svnVersion hasSuffix:@"\n"]){
+			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
+		}
+	}
+	return [NSString stringWithFormat:@"%@%@%@",versionString,[svnVersion length]?@":":@"",[svnVersion length]?svnVersion:@""];
+}
+
+NSString* appPath()
+{
+	NSArray* args = [[NSProcessInfo processInfo] arguments];
+	if([args count]){
+		NSString* appPath = [args objectAtIndex:0];
+		NSRange r = [appPath rangeOfString:@".app"];
+		if(r.location != NSNotFound){
+			return [appPath substringToIndex:r.location];
+		}
+		else return nil;
+	}
+	else return nil;
+}
+
+NSString* launchPath()
+{
+	NSArray* args = [[NSProcessInfo processInfo] arguments];
+	if([args count]){
+		return [args objectAtIndex:0];
+	}
+	else return nil;
+}
 
 //-----------------------------------------------------------------------------
 /*!\func	convertTimeCharToLong
