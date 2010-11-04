@@ -112,6 +112,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	self = [super init];
 	theSplashController = [[ORSplashWindowController alloc] init];
 	[theSplashController showWindow:self];
+	/*
 	NSString* myName = [[NSProcessInfo processInfo] processName];
 	int myPid        = [[NSProcessInfo processInfo] processIdentifier];
 	NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
@@ -123,6 +124,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 			[NSApp terminate:self];
 		}
 	}
+	 */
 	return self;
 }
 

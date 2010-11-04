@@ -377,7 +377,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		
 		[delegate updateStatus:@"Relaunching"];
 		[task launch];
-		
 		[task release];
 		[NSApp terminate:self]; 
 		
