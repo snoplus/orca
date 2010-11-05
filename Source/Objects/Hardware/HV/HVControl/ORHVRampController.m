@@ -68,7 +68,7 @@
 		}
 		aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[aPlot setUseConstantColor:YES];
-		[aPlot setLineColor: [NSColor redColor]];
+		[aPlot setLineColor: aColor];
 		[currentPlotter addPlot: aPlot];
 		[aPlot release];
 	}

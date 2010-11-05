@@ -668,6 +668,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 	else {
 		NSString* s = [[NSString alloc] initWithData:someData encoding:NSASCIIStringEncoding];
 		NSArray* theNumbers = [s componentsSeparatedByString:@","];
+		[s release];
 		for(id aNumber in theNumbers){
 			double val = [aNumber doubleValue];
 			[trace1 addObject:[NSNumber numberWithDouble:val]];

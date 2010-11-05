@@ -441,9 +441,9 @@ NSCalendarDate		*MCPYear0000;
 
 - (unsigned int) fetchFlagsForKey:(NSString *) key
 {
-   unsigned int      theRet;
-   unsigned int		theNumFields, index;
-   MYSQL_FIELD			*theField;
+   unsigned int     theRet;
+   unsigned int		index;
+   MYSQL_FIELD*		theField;
 
    if (mResult == NULL) {
       return (0);
@@ -453,7 +453,6 @@ NSCalendarDate		*MCPYear0000;
       [self fetchFieldsName];
    }
 
-   theNumFields = [self numOfFields];
    theField = mysql_fetch_fields(mResult);
    if ((index = [mNames indexOfObject:key]) == NSNotFound) {
       theRet = 0;
@@ -499,8 +498,8 @@ NSCalendarDate		*MCPYear0000;
 - (BOOL) isBlobForKey:(NSString *) key
 {
     BOOL			theRet;
-    unsigned int		theNumFields, index;
-    MYSQL_FIELD			*theField;
+    unsigned int	index;
+    MYSQL_FIELD*	theField;
 
     if (mResult == NULL) {
         return (NO);
@@ -510,7 +509,6 @@ NSCalendarDate		*MCPYear0000;
         [self fetchFieldsName];
     }
 
-    theNumFields = [self numOfFields];
     theField = mysql_fetch_fields(mResult);
     if ((index = [mNames indexOfObject:key]) == NSNotFound) {
         theRet = NO;

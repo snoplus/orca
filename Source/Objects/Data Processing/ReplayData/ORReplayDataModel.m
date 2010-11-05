@@ -302,6 +302,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 		ORFileReader* fileReader = [[ORFileReader alloc] initWithPath:aFileName delegate:self];
 		if(![[NSFileManager defaultManager] fileExistsAtPath:aFileName]){
 			[self setHeader:nil];
+			[fileReader release];
 			return;
 		}
 		if([fileReader currentHeader]){

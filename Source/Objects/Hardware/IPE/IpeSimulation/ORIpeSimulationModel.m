@@ -456,6 +456,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
     [aTask setArguments:args];
     [aTask launch];
 	NSLog(@"task isRunning is: %i, \n",[aTask isRunning]);
+	[aTask release]; //fix leak -- MAH 11/05/11
 }
 	
 - (void) startPlotter
@@ -492,6 +493,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
     [aTask setArguments:args];
     [aTask launch];
 	NSLog(@"task isRunning is: %i, \n",[aTask isRunning]);
+	[aTask release]; //fix leak -- MAH 11/05/11
 }
 	
 - (void) reloadFieldlineImage

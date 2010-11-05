@@ -120,9 +120,7 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
             sep  *= 10;
 			break;
         case 2:
-            if (suffix) {			// a- (void) extra trailing zeros if suffix
-                suffix= symbols[(power-FIRST_POW)/3+1];		// next suffix
-            } else {
+            if (!suffix) {
                 ival *= 100;
                 sep  *= 100;
             }

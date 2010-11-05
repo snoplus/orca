@@ -135,12 +135,11 @@
 		
 		double xValue;
 		double yValue;
-		double y=0;
 		double x=0;
 		if(cursorPosition.x < numPoints){
 			[dataSource plotter:self index:cursorPosition.x x:&xValue y:&yValue];
 			x = [[plotView xScale] getPixAbs:xValue];
-			y = [[plotView yScale] getPixAbs:yValue];
+			//y = [[plotView yScale] getPixAbs:yValue];
 		}
 		
 		[[NSColor blackColor] set];

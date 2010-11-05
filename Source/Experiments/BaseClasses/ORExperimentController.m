@@ -888,10 +888,9 @@
 		int count = [[[segmentGroups objectAtIndex:set] totalRate] count];
 		int index = count-i-1;
 		if(count==0) aValue = 0;
-		else {
-			*yValue = [[[segmentGroups objectAtIndex:set] totalRate] valueAtIndex:index];
-			*xValue = [[[segmentGroups objectAtIndex:set] totalRate] timeSampledAtIndex:index];
-		}
+		else		 aValue = [[[segmentGroups objectAtIndex:set] totalRate] valueAtIndex:index];
+		*xValue = [[[segmentGroups objectAtIndex:set] totalRate] timeSampledAtIndex:index];
+		*yValue = aValue;
 	}
 	else if(tag >= 10){ //value plots
 		int set = tag-10;

@@ -277,6 +277,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 		NSData* headerAsData = [fh readDataOfLength:headerLenInBytes];
 		NSString* theHeaderAsString = [[NSString alloc] initWithBytes:[headerAsData bytes] length:headerLenInBytes encoding:NSASCIIStringEncoding];
 		NSDictionary* theHeader = [theHeaderAsString propertyList];
+		[theHeaderAsString release];
 		if(theHeader){
 			ORHeaderItem* d = [ORHeaderItem headerFromObject:theHeader named:@"Root"];
 			if(d)[self setHeader:d ];

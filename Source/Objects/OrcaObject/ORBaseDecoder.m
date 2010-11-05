@@ -152,16 +152,14 @@ static NSString* kCrateKey[16] = {
 	int count = 0;
 	va_start(myArgs,firstKey);
 	
-	NSString* s;
-	while(s = va_arg(myArgs, NSString *)) count++;
+	while(va_arg(myArgs, NSString *)) count++;
 
 
 	//now loop over the args. The last one is special....
 	int argIndex = 0;
     va_start(myArgs,firstKey);
-	s = firstKey;
+	NSString* s = firstKey;
 	if(count>1){
-		NSString* lastKey = s;
 		NSMutableDictionary* lastDictionary = [cachedObjects objectForKey:s];
 		if(!lastDictionary) {
 			lastDictionary = [NSMutableDictionary dictionary];
@@ -179,7 +177,6 @@ static NSString* kCrateKey[16] = {
 					[lastDictionary setObject:aDictionary forKey:s];
 				}
 				lastDictionary = aDictionary;
-				lastKey = s;	//maybe this is the last one.
 			}
 		}
 	}

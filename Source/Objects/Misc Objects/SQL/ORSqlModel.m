@@ -800,8 +800,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		//assume first one in the data chain
 		[anOp setDataMonitorId:[histoObj uniqueIdNumber]];
 		[queue addOperation:anOp];
-		[anOp release];
 	}
+	[anOp release];
 }
 
 - (BOOL) validateConnection

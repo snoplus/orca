@@ -445,6 +445,7 @@
 	//NSSound *trefferSound = [[NSSound alloc] initWithContentsOfFile: @"/Users/bergmann/sounds/osx2/Glass.aiff" byReference: YES];
 	if(trefferSound == nil) NSLog(@"Sound not found!\n");
 	[trefferSound play];
+	[trefferSound release]; //fix leak -- MAH 11/05/11
 }
 
 

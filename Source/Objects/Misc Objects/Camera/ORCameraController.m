@@ -311,6 +311,7 @@
 		if (newMovie) {
 			[mMovieView setMovie:newMovie];
 		}
+		[newMovie release];
     }	
 }
 
