@@ -112,19 +112,23 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	self = [super init];
 	theSplashController = [[ORSplashWindowController alloc] init];
 	[theSplashController showWindow:self];
-	/*
-	NSString* myName = [[NSProcessInfo processInfo] processName];
-	int myPid        = [[NSProcessInfo processInfo] processIdentifier];
-	NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
-	for(id anApp in launchedApps){
-		NSString* otherProcessName = [anApp objectForKey:@"NSApplicationName"];
-		int otherProcessPid = [[anApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
-		
-		if([otherProcessName isEqualToString:myName] && otherProcessPid != myPid){
-			[NSApp terminate:self];
+	
+	NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
+	NSString* noKill				 = [standardDefaults stringForKey:@"startup"];
+	if(![noKill isEqualToString:@"NoKill"]){
+		NSString* myName = [[NSProcessInfo processInfo] processName];
+		int myPid        = [[NSProcessInfo processInfo] processIdentifier];
+		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
+		for(id anApp in launchedApps){
+			NSString* otherProcessName = [anApp objectForKey:@"NSApplicationName"];
+			int otherProcessPid = [[anApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
+			
+			if([otherProcessName isEqualToString:myName] && otherProcessPid != myPid){
+				[NSApp terminate:self];
+			}
 		}
 	}
-	 */
+	 
 	return self;
 }
 
@@ -346,7 +350,6 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 #pragma mark ¥¥¥Notification Methods
 -(void)applicationDidFinishLaunching:(NSNotification*)aNotification
 {
-    
 	[self showStatusLog:self];
 
     NSLog(@"-------------------------------------------------\n");

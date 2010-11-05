@@ -374,6 +374,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		NSString* binPath = launchPath();
 		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
 		[task setLaunchPath: binPath];
+		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"NoKill", 
+							  nil];
+		
+		[task setArguments: arguments];
 		
 		[delegate updateStatus:@"Relaunching"];
 		[task launch];
