@@ -370,6 +370,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
 	@try {
 		[[ORGlobal sharedGlobal] prepareForForcedHalt];
+		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];    
+		[[NSUserDefaults standardUserDefaults] synchronize];
+
 		NSTask* task = [[NSTask alloc] init];
 		NSString* binPath = launchPath();
 		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
