@@ -277,31 +277,39 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		NSString* dir = [kOldBinaryPath stringByExpandingTildeInPath];
 		if(binPath){
 			NSString* archivePath = [dir stringByAppendingPathComponent:[@"Orca" stringByAppendingFormat:@"%@.tar",fullVersion()]];
-			NSTask* task = [[NSTask alloc] init];
-			[task setCurrentDirectoryPath:[binPath stringByDeletingLastPathComponent]];
-			[task setLaunchPath: @"/usr/bin/tar"];
-			NSArray* arguments = [NSArray arrayWithObjects: @"czf", 
-								  archivePath, 
-								  [[binPath lastPathComponent] stringByAppendingPathExtension:@"app"],
-								  nil];
 			
-			[task setArguments: arguments];
-			
-			NSPipe* pipe = [NSPipe pipe];
-			[task setStandardOutput: pipe];
-			
-			NSFileHandle* file = [pipe fileHandleForReading];
-			[delegate updateStatus:@"Archiving this ORCA"];
-			[task launch];
+			//check if already archived. if so, then skip this
+			NSFileManager* fm = [NSFileManager defaultManager];
+			if(![fm fileExistsAtPath:archivePath]){
+				NSTask* task = [[NSTask alloc] init];
+				[task setCurrentDirectoryPath:[binPath stringByDeletingLastPathComponent]];
+				[task setLaunchPath: @"/usr/bin/tar"];
+				NSArray* arguments = [NSArray arrayWithObjects: @"czf", 
+									  archivePath, 
+									  [[binPath lastPathComponent] stringByAppendingPathExtension:@"app"],
+									  nil];
+				
+				[task setArguments: arguments];
+				
+				NSPipe* pipe = [NSPipe pipe];
+				[task setStandardOutput: pipe];
+				
+				NSFileHandle* file = [pipe fileHandleForReading];
+				[delegate updateStatus:@"Archiving this ORCA"];
+				[task launch];
 
-			NSData* data = [file readDataToEndOfFile];
-			if(data){
-				NSString* result = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-				if([result length]) NSLog(@"tar returned:\n%@", result);
+				NSData* data = [file readDataToEndOfFile];
+				if(data){
+					NSString* result = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+					if([result length]) NSLog(@"tar returned:\n%@", result);
+				}
+				[delegate updateStatus:@"Archiving Done"];
+				NSLog(@"Archived ORCA to: %@\n",archivePath);
+				[task release];
 			}
-			[delegate updateStatus:@"Archiving Done"];
-			NSLog(@"Archived ORCA to: %@\n",archivePath);
-			[task release];
+			else {
+				[delegate updateStatus:[NSString stringWithFormat:@"Archive exists: %@\n",[archivePath lastPathComponent]]];
+			}
 		}
 	}
 	@catch(NSException* e){
