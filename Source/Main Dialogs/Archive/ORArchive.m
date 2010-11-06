@@ -35,7 +35,7 @@ NSString*  ArchiveLock = @"ArchiveLock";
 
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
--(id)init
+-(id) init
 {
     self = [super initWithWindowNibName:@"Archive"];
     if (self) {
@@ -56,11 +56,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
     [self registerNotificationObservers];
 	[self securityStateChanged:nil];
 	[self lockChanged:nil];
-	[archivePathField setStringValue:[kOldBinaryPath stringByAbbreviatingWithTildeInPath]];
 	if(!queue){
 		queue = [[NSOperationQueue alloc] init];
 		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
 	}
+}
+
+- (NSOperationQueue*) queue
+{
+	return queue;
 }
 
 - (void) registerNotificationObservers
@@ -112,7 +116,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) updateWithSvn:(id)sender
 {
-	
+	[operationStatusField setTimeOut:1000];
+
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString* dir = [kDefaultSrcPath stringByExpandingTildeInPath];
 	if([fm fileExistsAtPath:dir]){
@@ -147,9 +152,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 	}
+	
 	ORUpdateOrcaWithSvnOp* anOp = [[ORUpdateOrcaWithSvnOp alloc] initAtPath:anUpdatePath delegate:self];
 	[queue addOperation:anOp];
 	[anOp release];
+
+	ORBuildOrcaOp* aBuildOp = [[ORBuildOrcaOp alloc] initAtPath:anUpdatePath delegate:self];
+	[queue addOperation:aBuildOp];
+	[aBuildOp release];
+	
+	NSString* aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
+	[self restart:aPath];
+	
 	[self checkQueueBusy];
 }
 
@@ -170,6 +184,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) archiveThisOrca:(id)sender
 {
+	[operationStatusField setTimeOut:1000];
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 	}
@@ -178,6 +193,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) startOldOrca:(id)sender
 {
+	[operationStatusField setTimeOut:1000];
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
 	[openPanel setCanChooseDirectories:NO];
 	[openPanel setCanChooseFiles:YES];
@@ -211,7 +227,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 		[self unArchiveBinary:anOldOrcaPath];
-		[self restart];
+		[self restart:launchPath()];
 	}		
 	[self checkQueueBusy];
 }
@@ -222,6 +238,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkQueueBusy) object:nil];
 	if([queue operationCount]){
 		[self performSelector:@selector(checkQueueBusy) withObject:nil afterDelay:.1];
+	}
+	else {
+		[operationStatusField setTimeOut:3];
+		[operationStatusField setStringValue: [operationStatusField stringValue]];
 	}
 }
 
@@ -254,9 +274,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[anOp release];
 }
 
-- (void) restart
+- (void) restart:(NSString*)binPath
 {
-	ORRestartOrcaOp* anOp = [[ORRestartOrcaOp alloc] initWithDelegate:self];
+	ORRestartOrcaOp* anOp = [[ORRestartOrcaOp alloc] initWithPath:binPath delegate:self];
 	[queue addOperation:anOp];
 	[anOp release];
 }
@@ -367,13 +387,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 @end
 
 @implementation ORRestartOrcaOp
-- (id) initWithDelegate:(id)aDelegate
+- (id) initWithPath:(NSString*)aPath delegate:(id)aDelegate
 {
 	self = [super init];
+	[binPath autorelease];
+	binPath = [aPath copy];
 	delegate = aDelegate;
     return self;
 }
-
+- (void) dealloc
+{
+	[binPath release];
+	[super dealloc];
+}
 - (void) main
 {
 	@try {
@@ -382,11 +408,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		[[NSUserDefaults standardUserDefaults] synchronize];
 
 		NSTask* task = [[NSTask alloc] init];
-		NSString* binPath = launchPath();
 		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
 		[task setLaunchPath: binPath];
-		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"NoKill", 
-							  nil];
+		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"NoKill", nil];
 		
 		[task setArguments: arguments];
 		
@@ -454,5 +478,73 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 }
 @end
+
+@implementation ORBuildOrcaOp
+- (id) initAtPath:(NSString*)aPath delegate:(id)aDelegate
+{
+	self = [super init];
+	delegate = aDelegate;
+	[srcPath autorelease];
+	srcPath = [[aPath stringByDeletingLastPathComponent] copy];
+    return self;
+}
+
+- (void) dealloc
+{
+	[srcPath release];
+	[super dealloc];
+}
+
+- (void) main
+{
+	@try {
+		if(srcPath){
+			NSTask* task = [[NSTask alloc] init];
+			NSString* thePath = [[srcPath stringByExpandingTildeInPath] stringByAppendingPathComponent:@"Orca"]; 
+			[task setCurrentDirectoryPath:thePath];
+			[task setLaunchPath: @"/usr/bin/xcodebuild"];
+			NSArray* arguments = [NSArray arrayWithObjects: @"-configuration", 
+								  @"Development",
+								  nil];
+			
+			[task setArguments: arguments];
+			
+			NSPipe* pipe = [NSPipe pipe];
+			[task setStandardOutput: pipe];
+			
+			NSFileHandle* file = [pipe fileHandleForReading];
+			[delegate updateStatus:[NSString stringWithFormat:@"Building: %@",thePath]];
+			[task launch];
+			
+			NSData* data = [file readDataToEndOfFile];
+			if(data){
+				NSString* result = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+				NSRange r = [result rangeOfString:@"**"];
+				if(r.location != NSNotFound){
+					result = [result substringFromIndex:r.location];
+					[delegate updateStatus:@"Build Finished"];
+				}	
+				else {
+					NSRange r = [result rangeOfString:@"error:"];
+					if(r.location != NSNotFound){
+						result = @"Build Failed";
+						NSLogColor([NSColor redColor],@"Errors detected during build. You will have to do a manual build.\n");
+						[delegate updateStatus:@"Build Failed"];
+						[[delegate queue] cancelAllOperations];
+					}	
+					else [delegate updateStatus:@"Build Finished"];
+				}
+
+				if([result length]) NSLog(@"build returned:\n%@", result);
+			}
+			[task release];
+		}
+	}
+	@catch(NSException* e){
+	}
+}
+@end
+
+
 
 

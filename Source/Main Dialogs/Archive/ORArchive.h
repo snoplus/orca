@@ -23,7 +23,6 @@
 
 @interface ORArchive : NSWindowController {
 	IBOutlet ORTimedTextField* operationStatusField;
-	IBOutlet NSTextField* archivePathField;
 	IBOutlet NSTextField* runStatusField;
 	IBOutlet NSButton* archiveOrcaButton;
 	IBOutlet NSButton* unarchiveRestartButton;
@@ -34,7 +33,7 @@
 }
 
 + (ORArchive*) sharedArchive;
-
+- (NSOperationQueue*) queue;
 - (void) registerNotificationObservers;
 - (void) securityStateChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
@@ -49,14 +48,17 @@
 
 - (void) archiveCurrentBinary;
 - (void) unArchiveBinary:(NSString*)fileToUnarchive;
-- (void) restart;
-
+- (void) restart:(NSString*)aPath;
 - (void) startOldOrcaPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath;
 - (void) deferedStartOldOrca:(NSString*)anOldOrcaPath;
 - (void) checkQueueBusy;
 
+@end
+
+@interface NSObject (ORArchive)
+- (NSOperationQueue*) queue;
 @end
 
 extern NSString*  ArchiveLock;
@@ -82,12 +84,23 @@ extern NSString*  ArchiveLock;
 @interface ORRestartOrcaOp : NSOperation
 {
 	id		  delegate;
+	NSString* binPath;
 }
-- (id) initWithDelegate:(id)aDelegate;
+- (id) initWithPath:(NSString*)aPath delegate:(id)aDelegate;
 - (void) main;
 @end
 
 @interface ORUpdateOrcaWithSvnOp : NSOperation
+{
+	id		  delegate;
+	NSString* srcPath;
+}
+
+- (id) initAtPath:(NSString*)aPath delegate:(id)aDelegate;
+- (void) main;
+@end
+
+@interface ORBuildOrcaOp : NSOperation
 {
 	id		  delegate;
 	NSString* srcPath;
