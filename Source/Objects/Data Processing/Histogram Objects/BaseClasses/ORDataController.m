@@ -372,16 +372,39 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 			[plots addObject:aWindow];
 		}
 	}
-	
-	//get screen size
-	NSRect screenRect = [[NSScreen mainScreen] visibleFrame];
-	float width = screenRect.size.width;
-	float height = screenRect.size.height;
 	int numWindows = [plots count];
-	width = width/numWindows;
-	height = height/numWindows;
-	//resize and position windows
+	NSRect screenRect = [[NSScreen mainScreen] frame];
 	
+	if(numWindows>1){
+		float width = screenRect.size.width;
+		float height = screenRect.size.height - 75;
+		int n = ceil(sqrtf((float)numWindows));
+		int m = ceil(numWindows/(float)n);
+		
+		//get screen size
+		float dx = width/n;
+		float dy = height/m;
+		if(dy == height) dy = height - 150;
+		float x = 0;
+		float y= height - dy + 75;
+		for(id aWindow in plots){
+			[aWindow  setFrame:NSMakeRect(x,y,dx,dy) display:YES animate:YES];
+			[aWindow orderFront:self];
+			x += dx;
+			if(x+dx > width){
+				x = 0;
+				y -= dy;
+			}
+		}
+	}
+	else {
+		float width = screenRect.size.width;
+		float height = screenRect.size.height;
+		for(id aWindow in plots){
+			[aWindow  setFrame:NSMakeRect(0,150,width,height-150) display:YES animate:YES];
+			[aWindow orderFront:self];
+		}
+	}
 }
 
 @end
