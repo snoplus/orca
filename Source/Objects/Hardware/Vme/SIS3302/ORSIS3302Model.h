@@ -80,7 +80,6 @@
 	unsigned long location;
 	id theController;
 	int currentBank;
-	unsigned long dataWord[4][16*1024];					
 	long count;
     short lemoOutMode;
     short lemoInMode;
