@@ -184,13 +184,11 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 	double sumY		= 0.0;
 	double sumXY	= 0.0;
 	double sumX2Y	= 0.0;
-	double sumValX	= 0;
 	double maxX		= 0;
 	double minY		= 3.402e+38;
 	double maxY		= -3.402e+38;
 	long xStart		= [self minChannel];
 	long xEnd		= [self maxChannel];
-	long totalNum	= xEnd - xStart+1;
 	
 	long x = xStart;
 	do {
@@ -199,7 +197,6 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 		sumY	+= y;
 		sumXY	+= (double)x*y;
 		sumX2Y	+= (double)x*x*y;
-		sumValX += (double)y*x;
 		
 		if (y < minY) minY = y;
 		if (y > maxY) {
@@ -210,23 +207,21 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 	} while(x<=xEnd);
 	
 	
-	if(totalNum){
+	if(sumY){
 		double theXAverage = sumXY / sumY;
-		average = theXAverage;
-		sigma	= sqrt((sumX2Y/sumY) - (theXAverage*theXAverage));
+		average  = theXAverage;
+		sigma	 = sqrt((sumX2Y/sumY) - (theXAverage*theXAverage));
+		centroid = theXAverage;
 	}
 	else {
 		average = 0;
 		sigma   = 0;
+		centroid = 0;
 	}
 	
-	peakx = maxX;
-	peaky = maxY;
-	
-	if(sumY) centroid = sumValX/sumY;
-	else	 centroid = 0;
-	
-	totalSum=sumY;
+	peakx	 = maxX;
+	peaky	 = maxY;
+	totalSum = sumY;
 	
 	if(useRoiRate){
 		if(!rateValid){

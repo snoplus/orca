@@ -130,7 +130,6 @@
 		[roiMaxField setStringValue:@"---"];	
 		[roiWidthField setStringValue:@"---"];	
 	}
-
 }
 
 - (void) analysisChanged:(NSNotification*)aNotification
@@ -138,7 +137,6 @@
 	if(model){
 		[labelField		setStringValue:	[model label]];
 		[totalSumField	setIntValue:	[model totalSum]];
-		[averageField	setFloatValue:	[model average]];
 		[centroidField	setFloatValue:	[model centroid]];
 		[sigmaField		setFloatValue:	[model sigma]];
 		[roiPeakXField	setIntValue:	(int)[model peakx]];
@@ -155,7 +153,6 @@
 		[rateField		setStringValue:@"--"];
 		[labelField		setStringValue:@"--"];
 		[totalSumField	setIntValue:0];
-		[averageField	setFloatValue:0];
 		[centroidField	setFloatValue:0];
 		[sigmaField		setFloatValue:0];
 		[roiPeakXField	setIntValue:0];

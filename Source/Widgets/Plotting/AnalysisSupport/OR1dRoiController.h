@@ -39,7 +39,6 @@
     IBOutlet NSTextField*       roiPeakXField;
     IBOutlet NSTextField*       roiPeakYField;
     IBOutlet NSTextField*       totalSumField;
-    IBOutlet NSTextField*       averageField;
     IBOutlet NSTextField*       centroidField;
     IBOutlet NSTextField*       sigmaField;
     IBOutlet NSTextField*       rateField;
