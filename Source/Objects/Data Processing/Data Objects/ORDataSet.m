@@ -559,6 +559,10 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			 object:self
 			 userInfo: nil];
 		}
+		else if([histo numberBins] != numBins) {
+			[histo setNumberBins:numBins];
+			[histo histogram:aValue];
+		}
 		else [histo histogram:aValue];
 		
 		va_end(myArgs);
