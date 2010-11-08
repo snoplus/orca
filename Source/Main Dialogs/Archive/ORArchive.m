@@ -149,6 +149,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath
 {
+	[[[NSApp delegate] document] saveDocument:self];
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 	}
