@@ -39,7 +39,6 @@ enum {
     id			dataSource;
 	long		minChannel;
 	long		maxChannel;
-	double		average;
 	double		centroid;
 	double		sigma;
 	double		totalSum;
@@ -85,7 +84,6 @@ enum {
 - (double)   peaky;	
 - (double)   peakx;	
 - (double)	roiRate;
-- (void)	setAverage:(double)aValue; 
 - (void)	setCentroid:(double)aValue;
 - (void)	setSigma:(double)aValue;   
 - (void)	setTotalSum:(double)aValue; 

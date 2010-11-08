@@ -140,13 +140,12 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 
 //these we just set in the anaysis and put out a general notification. 
 //Interested objects can just grab the values with the following accessors
-- (double)	average		{return average; }
+- (double)	average		{return centroid; }
 - (double)	centroid	{return centroid; }
 - (double)	sigma		{return sigma; }
 - (double)	totalSum	{return totalSum; }
 - (double)  peaky		{return peaky; }
 - (double)  peakx		{return peakx; }
-- (void)	setAverage:(double)aValue  { average = aValue; }
 - (void)	setCentroid:(double)aValue { centroid = aValue; }
 - (void)	setSigma:(double)aValue    { sigma = aValue; }
 - (void)	setTotalSum:(double)aValue { totalSum = aValue; }
@@ -195,8 +194,8 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 		double xDummy,y;
 		[dataSource plotter:aPlot index:x x:&xDummy y:&y];
 		sumY	+= y;
-		sumXY	+= (double)x*y;
-		sumX2Y	+= (double)x*x*y;
+		sumXY	+= x*y;
+		sumX2Y	+= x*x*y;
 		
 		if (y < minY) minY = y;
 		if (y > maxY) {
@@ -209,12 +208,10 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 	
 	if(sumY){
 		double theXAverage = sumXY / sumY;
-		average  = theXAverage;
 		sigma	 = sqrt((sumX2Y/sumY) - (theXAverage*theXAverage));
 		centroid = theXAverage;
 	}
 	else {
-		average = 0;
 		sigma   = 0;
 		centroid = 0;
 	}

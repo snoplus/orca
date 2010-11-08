@@ -51,7 +51,6 @@
 	double sumY		= 0.0;
 	double sumXY	= 0.0;
 	double sumX2Y	= 0.0;
-	double sumValX	= 0;
 	float maxX		= 0;
 	float minY		= 3.402e+38;
 	float maxY		= -3.402e+38;
@@ -66,9 +65,8 @@
 		[dataSource plotter:aPlot index:i x:&x y:&y];
 		if(x>=xStart && x<xEnd){
 			sumY	+= y;
-			sumXY	+= (double)x*y;
-			sumX2Y	+= (double)x*x*y;
-			sumValX += (double)y*x;
+			sumXY	+= x*y;
+			sumX2Y	+= x*x*y;
 
 			if (y < minY) minY = y;
 			if (y > maxY) {
@@ -78,24 +76,19 @@
 		}
 	}
 	
-	
 	if(totalNum){
 		double theXAverage = sumXY / sumY;
-		average = theXAverage;
 		sigma	= sqrt((sumX2Y/sumY) - (theXAverage*theXAverage));
+		centroid = sumXY/sumY;	
 	}
 	else {
-		average = 0;
+		centroid = 0;
 		sigma   = 0;
 	}
 	
-	peakx = maxX;
-	peaky = maxY;
-	
-	if(sumY) centroid = sumValX/sumY;
-	else	 centroid = 0;
-	
-	totalSum=sumY;
+	peakx    = maxX;
+	peaky    = maxY;
+	totalSum = sumY;
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:OR1dRoiAnalysisChanged object:self];
 }
