@@ -338,7 +338,7 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 	NSImageView* tempView = [[[NSImageView alloc] initWithFrame: NSMakeRect(0.0, 0.0, 8.5 * 72, 11.0 * 72)] autorelease];
 	[tempView setImageAlignment:NSImageAlignTopLeft];
 	[tempView setImage: tempImage];
-	
+	[tempImage release];
 	NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:tempView printInfo:printInfo];
 #if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MIN_ALLOWED
     [printOp setShowPanels:YES];
