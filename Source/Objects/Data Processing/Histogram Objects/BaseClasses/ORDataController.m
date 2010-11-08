@@ -385,10 +385,14 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 		float dx = width/n;
 		float dy = height/m;
 		if(dy == height) dy = height - 150;
+		
+		
 		float x = 0;
 		float y= height - dy + 75;
-		for(id aWindow in plots){
-			[aWindow  setFrame:NSMakeRect(x,y,dx,dy) display:YES animate:YES];
+		for(id aWindow in [plots reverseObjectEnumerator]){
+			NSSize minSize = [aWindow minSize];
+			NSSize maxSize = [aWindow maxSize];
+			[aWindow  setFrame:NSMakeRect(x,y,MAX(MIN(dx,maxSize.width),minSize.width),MAX(MIN(dy,maxSize.height),minSize.height)) display:YES animate:YES];
 			[aWindow orderFront:self];
 			x += dx;
 			if(x+dx > width){
@@ -401,6 +405,10 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 		float width = screenRect.size.width;
 		float height = screenRect.size.height;
 		for(id aWindow in plots){
+			NSSize minSize = [aWindow minSize];
+			NSSize maxSize = [aWindow maxSize];
+			width = MAX(MIN(width,maxSize.width),minSize.width);
+			height = MAX(MIN(height,maxSize.height),minSize.height);
 			[aWindow  setFrame:NSMakeRect(0,150,width,height-150) display:YES animate:YES];
 			[aWindow orderFront:self];
 		}
