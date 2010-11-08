@@ -65,7 +65,7 @@
     float tweakX[4] = {1,-1,1,-1};
     NSRect aFrame = [aConnector localFrame];
     int ip = [aCard slotConv];
-    float x =  20 + [self slot] * 16*.62 + (ip%2)*6 + tweakX[ip];
+    float x =  15 + [self slot] * 16*.62 + (ip%2)*6 + tweakX[ip];
     float y;
     if(ip>=2)y=35;
     else y =  75;
