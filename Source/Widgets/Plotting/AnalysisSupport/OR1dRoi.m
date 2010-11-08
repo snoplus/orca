@@ -197,9 +197,9 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 		double xDummy,y;
 		[dataSource plotter:aPlot index:x x:&xDummy y:&y];
 		sumY	+= y;
-		sumXY	+= x*y;
-		sumX2Y	+= x*x*y;
-		sumValX += y*x;
+		sumXY	+= (double)x*y;
+		sumX2Y	+= (double)x*x*y;
+		sumValX += (double)y*x;
 		
 		if (y < minY) minY = y;
 		if (y > maxY) {
@@ -211,9 +211,9 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 	
 	
 	if(totalNum){
-		double theXAverage = sumXY / (double)sumY;
+		double theXAverage = sumXY / sumY;
 		average = theXAverage;
-		sigma	= sqrt((sumX2Y/(double)sumY) - (theXAverage*theXAverage));
+		sigma	= sqrt((sumX2Y/sumY) - (theXAverage*theXAverage));
 	}
 	else {
 		average = 0;
