@@ -161,6 +161,7 @@
 #endif
     int shipSumHistogram;
     int vetoOverlapTime;
+    int nfoldCoincidence;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -171,6 +172,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) nfoldCoincidence;
+- (void) setNfoldCoincidence:(int)aNfoldCoincidence;
 - (int) vetoOverlapTime;
 - (void) setVetoOverlapTime:(int)aVetoOverlapTime;
 - (int) shipSumHistogram;
@@ -412,6 +415,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
 extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
 extern NSString* ORKatrinV4FLTModelShipSumHistogramChanged;
 extern NSString* ORKatrinV4FLTModelTargetRateChanged;

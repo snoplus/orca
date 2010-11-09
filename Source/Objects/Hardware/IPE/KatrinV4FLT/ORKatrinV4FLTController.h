@@ -29,6 +29,7 @@
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+		IBOutlet NSPopUpButton* nfoldCoincidencePU;
         IBOutlet NSButton*		vetoActiveButton;
 		IBOutlet NSPopUpButton* vetoOverlapTimePU;
 		IBOutlet NSPopUpButton* shipSumHistogramPU;
@@ -124,6 +125,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) nfoldCoincidenceChanged:(NSNotification*)aNote;
 - (void) vetoOverlapTimeChanged:(NSNotification*)aNote;
 - (void) shipSumHistogramChanged:(NSNotification*)aNote;
 - (void) targetRateChanged:(NSNotification*)aNote;
@@ -175,6 +177,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) nfoldCoincidencePUAction:(id)sender;
 - (IBAction) vetoOverlapTimePUAction:(id)sender;
 - (IBAction) shipSumHistogramPUAction:(id)sender;
 - (IBAction) targetRateAction:(id)sender;

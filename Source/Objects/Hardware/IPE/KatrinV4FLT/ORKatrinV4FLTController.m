@@ -323,9 +323,19 @@
                          name : ORKatrinV4FLTModelVetoOverlapTimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(nfoldCoincidenceChanged:)
+                         name : ORKatrinV4FLTModelNfoldCoincidenceChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) nfoldCoincidenceChanged:(NSNotification*)aNote
+{
+	[nfoldCoincidencePU selectItemAtIndex: [model nfoldCoincidence]];
+}
 
 - (void) vetoOverlapTimeChanged:(NSNotification*)aNote
 {
@@ -507,6 +517,7 @@
 	[self targetRateChanged:nil];
 	[self shipSumHistogramChanged:nil];
 	[self vetoOverlapTimeChanged:nil];
+	[self nfoldCoincidenceChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -847,6 +858,13 @@
 }
 
 #pragma mark •••Actions
+
+- (void) nfoldCoincidencePUAction:(id)sender
+{
+	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[model setNfoldCoincidence:[sender indexOfSelectedItem]];	
+}
+
 
 - (void) vetoOverlapTimePUAction:(id)sender
 {

@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
 NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
 NSString* ORKatrinV4FLTModelShipSumHistogramChanged = @"ORKatrinV4FLTModelShipSumHistogramChanged";
 NSString* ORKatrinV4FLTModelTargetRateChanged			= @"ORKatrinV4FLTModelTargetRateChanged";
@@ -237,6 +238,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
+- (int) nfoldCoincidence
+{
+    return nfoldCoincidence;
+}
+
+- (void) setNfoldCoincidence:(int)aNfoldCoincidence
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNfoldCoincidence:nfoldCoincidence];
+    nfoldCoincidence = aNfoldCoincidence;
+	if(nfoldCoincidence<0) nfoldCoincidence=0;
+	if(nfoldCoincidence>6) nfoldCoincidence=6;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelNfoldCoincidenceChanged object:self];
+}
+
 - (int) vetoOverlapTime
 {
     return vetoOverlapTime;
@@ -248,7 +263,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     
     vetoOverlapTime = aVetoOverlapTime;
 	if(vetoOverlapTime<0) vetoOverlapTime = 0;
-	if(vetoOverlapTime>4) vetoOverlapTime = 4;
+	if(vetoOverlapTime>5) vetoOverlapTime = 5;//changed from 4 to 5 since FLTv4 FPGA 2.1.1.4 -tb-
         
 	//NSLog(@"%@::%@: set vetoOverlapTime to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),vetoOverlapTime);//-tb-NSLog-tb-
 
@@ -797,7 +812,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return [self writeReg: kFLTV4SecondCounterReg value:aValue];
 }
 
-- (void) setTimeToMacClock
+- (void) setTimeToMacClock //TODO: for the database UTC should be used -tb-
 {
 	NSTimeInterval theTimeSince1970 = [NSDate timeIntervalSinceReferenceDate];
 	[self writeSeconds:(unsigned long)theTimeSince1970];
@@ -932,6 +947,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
+	(((nfoldCoincidence) & 0xf)<<20)|		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
 	(((vetoOverlapTime) & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
 	(((filterLength+2) & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6 [Note: in fact it is (((.+2) & 0x3f)<<8) but higher bits are unused -tb-]
 	((gapLength & 0xf)<<4)			| 
@@ -1291,6 +1307,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setNfoldCoincidence:[decoder decodeIntForKey:@"nfoldCoincidence"]];
     [self setVetoOverlapTime:[decoder decodeIntForKey:@"vetoOverlapTime"]];
     [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
 	
@@ -1360,6 +1377,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:nfoldCoincidence forKey:@"nfoldCoincidence"];
     [encoder encodeInt:vetoOverlapTime forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram forKey:@"shipSumHistogram"];
 	
@@ -1664,6 +1682,20 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     //the daq mode (should replace the flt mode)
     configStruct->card_info[index].deviceSpecificData[5] = runMode;			//the daqRunMode
 	configStruct->card_info[index].deviceSpecificData[6] = [self filterLength];		//packed into the records for normalization (MAH/May5,2010)
+	//for handling of different firmware versions
+    uint32_t versionCFPGA = [self readVersion];
+    uint32_t versionFPGA8 = [self readpVersion];
+	if(versionCFPGA==0x1f000000){//card not readable; assume simulation mode and assume KATRIN card -tb-
+		versionCFPGA=0x20010104; versionFPGA8=0x20010101;
+	}
+	if((versionCFPGA>0x20010100 && versionCFPGA<0x20010104) || (versionFPGA8>0x20010100  && versionFPGA8<0x20010104) ){
+		NSLog(@"WARNING: you use a old firmware (version CFPGA,FPGA8:0x%8x,0x%8x). Update! (Contact: Till.Bergmann@KIT.EDU)\n",versionCFPGA,versionFPGA8);	
+	}else{
+		NSLog(@"MESSAGE: firmware version check: CFPGA,FPGA8:0x%8x,0x%8x: OK.\n",versionCFPGA,versionFPGA8);
+	}
+	configStruct->card_info[index].deviceSpecificData[7] = versionCFPGA;		//CFPGA version 0xPDDDVVRR //P=project, D=doc revision
+	configStruct->card_info[index].deviceSpecificData[8] = versionFPGA8;		//FPGA8 version 0xPDDDVVRR //V=version, R=revision
+	  //history: 2.1.1.4 added veto+redesign of FIFO
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -1976,15 +2008,19 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 - (void) printVersions
 {
 	unsigned long data;
+    uint32_t versionCFPGA;
+    uint32_t versionFPGA8;
 	data = [self readVersion];
 	if(0x1f000000 == data){
 		NSLogColor([NSColor redColor],@"FLTv4: Could not access hardware, no version register read!\n");
 		return;
 	}
+	versionCFPGA=data;
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"CFPGA Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
 	data = [self readpVersion];
 	NSLogFont(aFont,@"FPGA8 Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
+	versionFPGA8=data;
 
 
 	switch ( ((data>>28)&0xf) ) {
@@ -1998,6 +2034,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 			NSLogFont(aFont,@"    This is a Unknown FLTv4 firmware configuration!\n");
 			break;
 	}
+	//NSLog(@"CFPGA,FPGA8:%8x,%8x\n",versionCFPGA,versionFPGA8);
 }
 
 - (void) printStatusReg
