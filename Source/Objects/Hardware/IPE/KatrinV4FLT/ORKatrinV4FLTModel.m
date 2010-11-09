@@ -235,7 +235,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
 
 - (int) vetoOverlapTime
 {
@@ -759,7 +759,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self setHistMeasTime:	5];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Access
+#pragma mark •••HW Access
 - (unsigned long) readBoardIDLow
 {
 	unsigned long value = [self readReg:kFLTV4BoardIDLsbReg];
@@ -1284,7 +1284,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	return ORKatrinV4FLTModelHitRateChanged;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢archival
+#pragma mark •••archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -1508,6 +1508,17 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
     [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]		forKey:@"filterLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
+	
+	//------------------
+	//added MAH 11/09/11
+	[objDictionary setObject:[NSNumber numberWithInt:histMeasTime]			forKey:@"histMeasTime"];
+	[objDictionary setObject:[NSNumber numberWithInt:histEMin]				forKey:@"histEMin"];
+	[objDictionary setObject:[NSNumber numberWithInt:shipSumHistogram]		forKey:@"shipSumHistogram"];
+	[objDictionary setObject:[NSNumber numberWithInt:histMode]				forKey:@"histMode"];
+	[objDictionary setObject:[NSNumber numberWithInt:histClrMode]			forKey:@"histClrMode"];
+	[objDictionary setObject:[NSNumber numberWithInt:histEBin]				forKey:@"histEBin"];
+	//------------------
+		
 	return objDictionary;
 }
 
@@ -1619,7 +1630,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢SBC readout control structure... Till, fill out as needed
+#pragma mark •••SBC readout control structure... Till, fill out as needed
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
@@ -1661,7 +1672,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	return index+1;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Wizard
+#pragma mark •••HW Wizard
 -(BOOL) hasParmetersToRamp
 {
 	return YES;
@@ -1744,6 +1755,46 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [p setFormat:@"##0" upperLimit:6 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setFilterLength:) getMethod:@selector(filterLength)];
     [a addObject:p];			
+
+	//----------------
+	//added MAH 11/09/10
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Refresh Time"];
+    [p setFormat:@"##0" upperLimit:60 lowerLimit:1 stepSize:1 units:@"s"];
+    [p setSetMethod:@selector(setHistMeasTime:) getMethod:@selector(histMeasTime)];
+    [a addObject:p];			
+
+	//wasn't sure about the max value in this one....
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Energy Offset"];
+    [p setFormat:@"##0" upperLimit:16777215. lowerLimit:0 stepSize:1 units:@"2^n"];
+    [p setSetMethod:@selector(setHistEMin:) getMethod:@selector(histEMin)];
+    [a addObject:p];			
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Bin Width"];
+    [p setFormat:@"##0" upperLimit:15 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHistEBin:) getMethod:@selector(histEBin)];
+    [a addObject:p];			
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Ship Sum Histo"];
+    [p setFormat:@"##0" upperLimit:2 lowerLimit:0 stepSize:1 units:@"index"];
+    [p setSetMethod:@selector(setShipSumHistogram:) getMethod:@selector(shipSumHistogram)];
+    [a addObject:p];			
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Histo Mode"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"index"];
+    [p setSetMethod:@selector(setHistMode:) getMethod:@selector(histMode)];
+    [a addObject:p];			
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Histo Clr Mode"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"index"];
+    [p setSetMethod:@selector(setHistClrMode:) getMethod:@selector(histClrMode)];
+    [a addObject:p];			
+	//----------------
 	
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
@@ -1778,10 +1829,21 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     else if([param isEqualToString:@"Hit Rate Length"])		return [cardDictionary objectForKey:@"hitRateLength"];
     else if([param isEqualToString:@"Gap Length"])			return [cardDictionary objectForKey:@"gapLength"];
     else if([param isEqualToString:@"Filter Length"])		return [cardDictionary objectForKey:@"filterLength"];
-    else return nil;
+	
+	//------------------
+	//added MAH 11/09/11
+    else if([param isEqualToString:@"Refresh Time"])		return [cardDictionary objectForKey:@"histMeasTime"];
+    else if([param isEqualToString:@"Energy Offset"])		return [cardDictionary objectForKey:@"histEMin"];
+    else if([param isEqualToString:@"Bin Width"])			return [cardDictionary objectForKey:@"histEBin"];
+    else if([param isEqualToString:@"Ship Sum Histo"])		return [cardDictionary objectForKey:@"sumHistogram"];
+    else if([param isEqualToString:@"Histo Mode"])			return [cardDictionary objectForKey:@"histMode"];
+    else if([param isEqualToString:@"Histo Clr Mode"])		return [cardDictionary objectForKey:@"histClrMode"];
+	//------------------
+	
+	else return nil;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢AdcInfo Providing
+#pragma mark •••AdcInfo Providing
 - (void) postAdcInfoProvidingValueChanged
 {
 	//this notification is be picked up by high-level objects like the 
@@ -1794,7 +1856,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	return [self triggerEnabled:bit];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Reporting
+#pragma mark •••Reporting
 - (void) testReadHisto
 {
 	unsigned long hControl = [self readReg:kFLTV4HistgrSettingsReg];
@@ -2023,7 +2085,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 @end
 
 @implementation ORKatrinV4FLTModel (tests)
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
 - (BOOL) testsRunning { return testsRunning; }
 - (void) setTestsRunning:(BOOL)aTestsRunning
 {
@@ -2105,7 +2167,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 }
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Tests
+#pragma mark •••Tests
 - (void) modeTest
 {
 	int testNumber = 0;
