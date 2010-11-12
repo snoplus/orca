@@ -59,9 +59,28 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	if(!queue){
 		queue = [[NSOperationQueue alloc] init];
 		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+		[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
 	}
 }
 
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
+                         change:(NSDictionary *)change context:(void *)context
+{
+    if (object == queue && [keyPath isEqual:@"operations"]) {
+        if ([[queue operations] count] == 0) {
+			[self performSelectorOnMainThread:@selector(resetStatusTimer) withObject:nil waitUntilDone:YES];
+        }
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object 
+                               change:change context:context];
+    }
+}
+- (void) resetStatusTimer
+{
+	[operationStatusField setTimeOut:3];
+	[operationStatusField setStringValue: [operationStatusField stringValue]];
+}
 - (NSOperationQueue*) queue
 {
 	return queue;
@@ -164,8 +183,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	
 	NSString* aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
 	[self restart:aPath];
-	
-	[self checkQueueBusy];
 }
 
 - (IBAction) lockAction:(id)sender
@@ -189,7 +206,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 	}
-	[self checkQueueBusy];
 }
 
 - (IBAction) startOldOrca:(id)sender
@@ -230,21 +246,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		[self unArchiveBinary:anOldOrcaPath];
 		[self restart:launchPath()];
 	}		
-	[self checkQueueBusy];
 }
 
-- (void) checkQueueBusy
-{
-	[self lockChanged:nil];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkQueueBusy) object:nil];
-	if([queue operationCount]){
-		[self performSelector:@selector(checkQueueBusy) withObject:nil afterDelay:.1];
-	}
-	else {
-		[operationStatusField setTimeOut:3];
-		[operationStatusField setStringValue: [operationStatusField stringValue]];
-	}
-}
 
 - (BOOL) checkOldBinariesFolder
 {

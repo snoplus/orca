@@ -45,6 +45,7 @@
 
 - (BOOL) checkOldBinariesFolder;
 - (void) updateStatus:(NSString*)aString;
+- (void) resetStatusTimer;
 
 - (void) archiveCurrentBinary;
 - (void) unArchiveBinary:(NSString*)fileToUnarchive;
@@ -53,8 +54,6 @@
 - (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath;
 - (void) deferedStartOldOrca:(NSString*)anOldOrcaPath;
-- (void) checkQueueBusy;
-
 @end
 
 @interface NSObject (ORArchive)
