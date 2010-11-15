@@ -33,6 +33,7 @@ void _interruptRecieved(void *refCon, IOReturn result, int len)
 }
 
 
+
 NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 
 @implementation ORUSBInterface
@@ -196,6 +197,27 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 		//	(void) (*interface)->USBInterfaceClose(interface);
 		//	(void) (*interface)->Release(interface);
 		//}
+	}
+}
+
+- (void) startReadingInterruptPipe
+{
+	UInt8 pipe = inPipes[0];
+	if(transferType == kUSBBulk)		 pipe = inPipes[0];
+	else if(transferType == kUSBInterrupt) pipe = interruptInPipes[0];
+	
+	IOReturn kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
+	kr = (*interface)->ResetPipe(interface,pipe);
+
+	//startUp Interrupt handling
+	UInt32 numBytesRead = 1024; // leave one byte at the end for NUL termination
+	bzero(receiveBuffer, numBytesRead);
+	kr = (*interface)->ReadPipeAsync(interface,pipe, receiveBuffer, numBytesRead, (IOAsyncCallback1)_interruptRecieved, self);
+	
+	if (kIOReturnSuccess != kr) {
+		NSLog(@"unable to do async interrupt read (%08x)\n", kr);
+		//(void) (*interface)->USBInterfaceClose(interface);
+		//(void) (*interface)->Release(interface);
 	}
 }
 
@@ -414,17 +436,48 @@ readon:
 				kr = (*interface)->ReadPipe(interface, pipe, bytes, &actualRead);
 				if(kr){
 					[usbLock unlock];
-					[NSException raise:@"USB Write" format:@"ORUSBInterface.m %u: WritePipe failed on second try <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+					[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe failed on second try <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
 				}
 			}
 		}
 		else {
 			[usbLock unlock];
-			[NSException raise:@"USB Write" format:@"ORUSBInterface.m %u: ReadPipe failed for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+			[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe failed for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
 		}
 	}
 	result = actualRead;
 	[usbLock unlock];
+	
+	return result;
+}
+- (int) readBytesOnInterruptPipeNoLock:(void*)bytes length:(int)amountRead
+{
+	int result;
+	unsigned long actualRead = amountRead;
+	UInt8 pipe = inPipes[0];
+	if(transferType == kUSBBulk)		 pipe = inPipes[0];
+	else if(transferType == kUSBInterrupt) pipe = interruptInPipes[0];
+	
+	IOReturn kr = (*interface)->ReadPipe(interface, pipe, bytes, &actualRead);
+	if(kr)	{
+		kr = (*interface)->GetPipeStatus(interface, pipe);
+		if(kr == kIOUSBPipeStalled){
+			kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
+			if(kr){
+				[NSException raise:@"USB Write" format:@"ORUSBInterface.m %u: ReadPipe stalled and unable to clear for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+			}
+			else {
+				kr = (*interface)->ReadPipe(interface, pipe, bytes, &actualRead);
+				if(kr){
+					[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe failed on second try <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+				}
+			}
+		}
+		else {
+			[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe failed for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+		}
+	}
+	result = actualRead;
 	
 	return result;
 }

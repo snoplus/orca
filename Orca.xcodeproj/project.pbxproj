@@ -2267,6 +2267,13 @@
 		84EBBEEA0F52D9A700F57BDD /* ORCaen419Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBBEE40F52D9A700F57BDD /* ORCaen419Model.m */; };
 		84EBC2130F530E4A00F57BDD /* ORCaen419Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC2110F530E4A00F57BDD /* ORCaen419Decoders.m */; };
 		84EBC2140F530E4A00F57BDD /* ORCaen419Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EBC2120F530E4A00F57BDD /* ORCaen419Decoders.h */; };
+		84EBC521128887C800234313 /* LabJack.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EBC51A128887C800234313 /* LabJack.nib */; };
+		84EBC522128887C800234313 /* LabJack.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EBC51B128887C800234313 /* LabJack.tif */; };
+		84EBC524128887C800234313 /* ORLabJackController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EBC51D128887C800234313 /* ORLabJackController.h */; };
+		84EBC525128887C800234313 /* ORLabJackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC51E128887C800234313 /* ORLabJackController.m */; };
+		84EBC526128887C800234313 /* ORLabJackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EBC51F128887C800234313 /* ORLabJackModel.h */; };
+		84EBC527128887C800234313 /* ORLabJackModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC520128887C800234313 /* ORLabJackModel.m */; };
+		84EBC8931289DCB600234313 /* NoLabJackDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EBC8921289DCB600234313 /* NoLabJackDriverHelp.plist */; };
 		84EC2C38079D95D800188ED3 /* No620DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC2C37079D95D800188ED3 /* No620DriverHelp.plist */; };
 		84EC3461079D973300188ED3 /* No617DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3460079D973300188ED3 /* No617DriverHelp.plist */; };
 		84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */; };
@@ -4802,6 +4809,13 @@
 		84EBBEE40F52D9A700F57BDD /* ORCaen419Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen419Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Model.m; sourceTree = SOURCE_ROOT; };
 		84EBC2110F530E4A00F57BDD /* ORCaen419Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen419Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Decoders.m; sourceTree = SOURCE_ROOT; };
 		84EBC2120F530E4A00F57BDD /* ORCaen419Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen419Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Decoders.h; sourceTree = SOURCE_ROOT; };
+		84EBC51A128887C800234313 /* LabJack.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LabJack.nib; path = Source/Objects/Hardware/USB/LabJack/LabJack.nib; sourceTree = SOURCE_ROOT; };
+		84EBC51B128887C800234313 /* LabJack.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = LabJack.tif; sourceTree = "<group>"; };
+		84EBC51D128887C800234313 /* ORLabJackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLabJackController.h; path = Source/Objects/Hardware/USB/LabJack/ORLabJackController.h; sourceTree = SOURCE_ROOT; };
+		84EBC51E128887C800234313 /* ORLabJackController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackController.m; path = Source/Objects/Hardware/USB/LabJack/ORLabJackController.m; sourceTree = SOURCE_ROOT; };
+		84EBC51F128887C800234313 /* ORLabJackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLabJackModel.h; path = Source/Objects/Hardware/USB/LabJack/ORLabJackModel.h; sourceTree = SOURCE_ROOT; };
+		84EBC520128887C800234313 /* ORLabJackModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackModel.m; path = Source/Objects/Hardware/USB/LabJack/ORLabJackModel.m; sourceTree = SOURCE_ROOT; };
+		84EBC8921289DCB600234313 /* NoLabJackDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NoLabJackDriverHelp.plist; sourceTree = "<group>"; };
 		84EC2C37079D95D800188ED3 /* No620DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = No620DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/No620DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC3460079D973300188ED3 /* No617DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = No617DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/No617DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoBit3DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoBit3DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
@@ -8301,6 +8315,7 @@
 				84CC16C50FAF157000CEE642 /* MCA927 */,
 				849E7C910B6956C800353D50 /* ADU200 */,
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
+				84EBC519128887C800234313 /* LabJack */,
 				84B28E2A0F4C7FD400E2B056 /* LDA102 */,
 			);
 			path = USB;
@@ -10045,6 +10060,21 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV419;
 			sourceTree = SOURCE_ROOT;
 		};
+		84EBC519128887C800234313 /* LabJack */ = {
+			isa = PBXGroup;
+			children = (
+				84EBC51A128887C800234313 /* LabJack.nib */,
+				84EBC51B128887C800234313 /* LabJack.tif */,
+				84EBC8921289DCB600234313 /* NoLabJackDriverHelp.plist */,
+				84EBC51D128887C800234313 /* ORLabJackController.h */,
+				84EBC51E128887C800234313 /* ORLabJackController.m */,
+				84EBC51F128887C800234313 /* ORLabJackModel.h */,
+				84EBC520128887C800234313 /* ORLabJackModel.m */,
+			);
+			name = LabJack;
+			path = Source/Objects/Hardware/USB/LabJack;
+			sourceTree = SOURCE_ROOT;
+		};
 		84F18E6405AF49A8001799E6 /* HeartBeat */ = {
 			isa = PBXGroup;
 			children = (
@@ -11737,6 +11767,8 @@
 				8437495E1270B2AD0027B507 /* ORLogicInScalerModel.h in Headers */,
 				843749631270B2C00027B507 /* ORLogicScalerShipModel.h in Headers */,
 				84EBBE6A1282E2B700234313 /* ORArchive.h in Headers */,
+				84EBC524128887C800234313 /* ORLabJackController.h in Headers */,
+				84EBC526128887C800234313 /* ORLabJackModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12482,6 +12514,9 @@
 				8437495B1270B2AD0027B507 /* LogicInScaler.png in Resources */,
 				84EBBE681282E2B700234313 /* Archive.nib in Resources */,
 				84EBBE7F1282E5D500234313 /* Archive.tif in Resources */,
+				84EBC521128887C800234313 /* LabJack.nib in Resources */,
+				84EBC522128887C800234313 /* LabJack.tif in Resources */,
+				84EBC8931289DCB600234313 /* NoLabJackDriverHelp.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13324,6 +13359,8 @@
 				8437495F1270B2AD0027B507 /* ORLogicInScalerModel.m in Sources */,
 				843749641270B2C00027B507 /* ORLogicScalerShipModel.m in Sources */,
 				84EBBE6B1282E2B700234313 /* ORArchive.m in Sources */,
+				84EBC525128887C800234313 /* ORLabJackController.m in Sources */,
+				84EBC527128887C800234313 /* ORLabJackModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -75,8 +75,8 @@ typedef struct  {
 - (void)		writeBytes:(void*)bytes length:(int)length pipe:(int)aPipeIndex;
 - (int)			readBytes:(void*)bytes length:(int)length pipe:(int)aPipeIndex;
 - (void)		writeBytes:(void*)bytes length:(int)length;
-- (int)			readBytes:(void*)bytes length:(int)amountRead;
-- (int)			readBytesFastNoThrow:(void*)bytes length:(int)amountRead;
+- (int)			readBytes:(void*)bytes length:(int)amountToRead;
+- (int)			readBytesFastNoThrow:(void*)bytes length:(int)amountToRead;
 - (void)		setRegisteredObject:(id)anObj;
 - (id)			registeredObject;
 - (UInt16)		product;
@@ -100,7 +100,9 @@ typedef struct  {
 - (void)		setInterruptOutPipes:(unsigned char*)aPipeRef numberPipes:(int)n;
 - (NSString*)   connectionState;
 - (void)		setConnectionState:(NSString*)aState;
-- (void)			interruptRecieved:(IOReturn) result length:(int) len;
+- (void)		interruptRecieved:(IOReturn) result length:(int) len;
+- (void)		startReadingInterruptPipe;
+- (int)			readBytesOnInterruptPipeNoLock:(void*)bytes length:(int)amountRead;
 
 - (int) readBytesOnInterruptPipe:(void*)bytes length:(int)amountRead;
 - (void) writeBytesOnInterruptPipe:(void*)bytes length:(int)amountRead;

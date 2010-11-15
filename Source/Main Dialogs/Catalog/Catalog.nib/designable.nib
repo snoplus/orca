@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="70"/>
+			<integer value="979"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -74,7 +74,7 @@
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="844307588">
 									<object class="NSView" key="NSView" id="519345359">
-										<reference key="NSNextResponder" ref="108659793"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -640,7 +640,6 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {857, 235}}</string>
-										<reference key="NSSuperview" ref="108659793"/>
 									</object>
 									<string key="NSLabel">Data Flow</string>
 									<reference key="NSColor" ref="421922390"/>
@@ -5461,7 +5460,7 @@
 								</object>
 								<object class="NSTabViewItem" id="754433881">
 									<object class="NSView" key="NSView" id="326285063">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="108659793"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -5538,6 +5537,46 @@
 													<string key="NSContents">ADU200</string>
 													<reference key="NSSupport" ref="625969386"/>
 													<reference key="NSControlView" ref="664541310"/>
+													<reference key="NSBackgroundColor" ref="421922390"/>
+													<reference key="NSTextColor" ref="688154912"/>
+												</object>
+											</object>
+											<object class="NSButton" id="1008232855">
+												<reference key="NSNextResponder" ref="326285063"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{409, 121}, {75, 110}}</string>
+												<reference key="NSSuperview" ref="326285063"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="688772980">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">134217728</int>
+													<string key="NSContents"/>
+													<reference key="NSSupport" ref="625969386"/>
+													<reference key="NSControlView" ref="1008232855"/>
+													<int key="NSButtonFlags">-2042347265</int>
+													<int key="NSButtonFlags2">2</int>
+													<object class="NSCustomResource" key="NSNormalImage">
+														<string key="NSClassName">NSImage</string>
+														<string key="NSResourceName">LabJack</string>
+													</object>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">400</int>
+													<int key="NSPeriodicInterval">75</int>
+												</object>
+											</object>
+											<object class="NSTextField" id="135778223">
+												<reference key="NSNextResponder" ref="326285063"/>
+												<int key="NSvFlags">256</int>
+												<string key="NSFrame">{{408, 100}, {66, 17}}</string>
+												<reference key="NSSuperview" ref="326285063"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSTextFieldCell" key="NSCell" id="894650209">
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">138412032</int>
+													<string key="NSContents">LabJack</string>
+													<reference key="NSSupport" ref="625969386"/>
+													<reference key="NSControlView" ref="135778223"/>
 													<reference key="NSBackgroundColor" ref="421922390"/>
 													<reference key="NSTextColor" ref="688154912"/>
 												</object>
@@ -5701,6 +5740,7 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {857, 235}}</string>
+										<reference key="NSSuperview" ref="108659793"/>
 									</object>
 									<string key="NSLabel">USB</string>
 									<reference key="NSColor" ref="421922390"/>
@@ -9540,14 +9580,14 @@ ZSBjb250cm9sbGVyLg</string>
 									<reference key="NSTabView" ref="108659793"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="844307588"/>
+							<reference key="NSSelectedTabViewItem" ref="754433881"/>
 							<reference key="NSFont" ref="26"/>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="519345359"/>
+								<reference ref="326285063"/>
 							</object>
 						</object>
 					</object>
@@ -13248,6 +13288,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="1048080012"/>
 							<reference ref="194183198"/>
 							<reference ref="846538407"/>
+							<reference ref="1008232855"/>
+							<reference ref="135778223"/>
 						</object>
 						<reference key="parent" ref="754433881"/>
 					</object>
@@ -16826,6 +16868,34 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="object" ref="851737073"/>
 						<reference key="parent" ref="481439645"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26322</int>
+						<reference key="object" ref="1008232855"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="688772980"/>
+						</object>
+						<reference key="parent" ref="326285063"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26323</int>
+						<reference key="object" ref="135778223"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="894650209"/>
+						</object>
+						<reference key="parent" ref="326285063"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26324</int>
+						<reference key="object" ref="894650209"/>
+						<reference key="parent" ref="135778223"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">26325</int>
+						<reference key="object" ref="688772980"/>
+						<reference key="parent" ref="1008232855"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -17997,6 +18067,14 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>26320.IBAttributePlaceholdersKey</string>
 					<string>26320.IBPluginDependency</string>
 					<string>26321.IBPluginDependency</string>
+					<string>26322.CustomClassName</string>
+					<string>26322.IBAttributePlaceholdersKey</string>
+					<string>26322.IBPluginDependency</string>
+					<string>26322.ImportedFromIB2</string>
+					<string>26323.IBPluginDependency</string>
+					<string>26323.ImportedFromIB2</string>
+					<string>26324.IBPluginDependency</string>
+					<string>26325.IBPluginDependency</string>
 					<string>267.IBPluginDependency</string>
 					<string>267.ImportedFromIB2</string>
 					<string>2709.IBPluginDependency</string>
@@ -20809,6 +20887,21 @@ ZSBjb250cm9sbGVyLg</string>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>ObjectFactory</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="1008232855"/>
+							<string key="toolTip">ORLabJackModel</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -22490,7 +22583,7 @@ ZSBjb250cm9sbGVyLg</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26321</int>
+			<int key="maxID">26325</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -22541,6 +22634,13 @@ ZSBjb250cm9sbGVyLg</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Experiments/Ncd/Detector/NcdDetector.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Main Dialogs/Archive/ORArchive.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -23197,14 +23297,6 @@ ZSBjb250cm9sbGVyLg</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Main Dialogs/Catalog/ORCatalogController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORCatalogController</string>
-					<string key="superclassName">NSWindowController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Main Dialogs/UpdateCenter/ORUpdateCenterController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -23963,6 +24055,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>L8013CrateSmall</string>
 				<string>LC950Oscilloscope</string>
 				<string>LDA102</string>
+				<string>LabJack</string>
 				<string>Label</string>
 				<string>LakeShore210</string>
 				<string>Listener</string>
@@ -24172,6 +24265,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{167, 107}</string>
 				<string>{100, 66}</string>
 				<string>{75, 48}</string>
+				<string>{75, 100}</string>
 				<string>{74, 14}</string>
 				<string>{118, 58}</string>
 				<string>{44, 25}</string>
