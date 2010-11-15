@@ -28,7 +28,10 @@
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //^^^^ ^---------------------------------- Geo
 //------^^^------------------------------- data type 0x2=header, 0x0=valid data,  0x4=end of block, 0x6=invalid
-//-------------^-^^^---------------------- channel
+//-------------^-^^^---------------------- channel (V965)
+//------------------^--------------------- RG (V965)
+//-------------^-^^----------------------- channel (V965A)
+//-----------------^---------------------- RG (V965A)
 //-----------------------^---------------- under flow
 //------------------------^--------------- over flow
 //-------------------------^^^^ ^^^^ ^^^^- qdc value
@@ -40,9 +43,11 @@
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 - (void) printData: (NSString*) pName data:(void*) theData;
 - (unsigned short) 	channel: (unsigned long) pDataValue;
+- (unsigned short) rg: (unsigned long) pDataValue;
 @end
 
 @interface ORCaen965ADecoderForQdc : ORCaen965DecoderForQdc {
 }
 - (unsigned short) 	channel: (unsigned long) pDataValue;
+- (unsigned short) rg: (unsigned long) pDataValue;
 @end

@@ -34,8 +34,10 @@
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
 			int chan     = [self channel:ptr[i]];
+			int rg		 = [self rg:ptr[i]];
 			NSString* channelKey  = [self getChannelKey: chan];
-			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN965 QDC",crateKey,cardKey,channelKey,nil];
+			if(rg)[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN965 QDC (H)",crateKey,cardKey,channelKey,nil];
+			else  [aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN965 QDC (L)",crateKey,cardKey,channelKey,nil];
         }
     }
     return length;
@@ -92,7 +94,10 @@
 {
     return	ShiftAndExtract(pDataValue,17,0xf);
 }
-
+- (unsigned short) rg: (unsigned long) pDataValue
+{
+    return	ShiftAndExtract(pDataValue,16,0x1);
+}
 @end
 
 @implementation ORCaen965ADecoderForQdc
@@ -100,6 +105,10 @@
 - (unsigned short) channel: (unsigned long) pDataValue
 {
     return	ShiftAndExtract(pDataValue,18,0x7);
+}
+- (unsigned short) rg: (unsigned long) pDataValue
+{
+    return	ShiftAndExtract(pDataValue,17,0x1);
 }
 
 @end
