@@ -166,6 +166,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
     return runMode;
 }
 
+- (void) setDocumentWasEdited:(BOOL)state
+{
+	documentWasEdited = state;
+}
+- (BOOL) documentWasEdited
+{
+	return documentWasEdited;
+}
+
 - (NSString*) runModeString
 {
 	if(runInProgress == eRunStopped)		return  @"";

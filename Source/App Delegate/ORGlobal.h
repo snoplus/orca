@@ -64,6 +64,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 	NSMutableDictionary* runVetos;
 	int cpuCount;
 	BOOL    forcedHalt;
+	BOOL	documentWasEdited;
 }
 
 + (ORGlobal*) sharedGlobal;
@@ -92,6 +93,8 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 - (eRunMode) runMode;
 - (NSString*) runModeString;
 - (void) checkRunMode;
+- (BOOL) documentWasEdited;
+- (void) setDocumentWasEdited:(BOOL)state;
 
 #pragma mark •••Helpers
 - (NSUndoManager*) undoManager;

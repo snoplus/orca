@@ -520,6 +520,12 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     [orcaControllers removeObjectsInArray:badObjs];
 }
 
+- (void) saveDocument:(id)sender
+{
+	[[ORGlobal sharedGlobal] setDocumentWasEdited:[self isDocumentEdited]];
+	[super saveDocument:sender];
+}
+
 
 - (void) saveDefaultFileName
 {

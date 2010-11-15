@@ -161,12 +161,15 @@ static const int currentVersion = 1;           // Current version
 
 - (void) runAboutToStart:(NSNotification*)aNotification
 {
-    if(saveConfiguration && [[self document] isDocumentEdited]){
-        [[self document] saveDocument:nil];
-        unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"RunNumber"] longValue];
-        [configFolder ensureExists:[configFolder finalDirectoryName]]; 
-        [[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%d",runNumber]];
-    }
+	if([[self document] isDocumentEdited])[[self document] saveDocument:nil];
+    if(saveConfiguration){
+		[configFolder ensureExists:[configFolder finalDirectoryName]]; 
+		if([[ORGlobal sharedGlobal] documentWasEdited] || !savedFirstTime){
+			unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"kRunNumber"] longValue];
+			[[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%d",runNumber]];
+			savedFirstTime = YES;
+		}
+	}
 }
 
 

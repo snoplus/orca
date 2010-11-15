@@ -66,6 +66,7 @@
 		int				runMode;
 		NSTimeInterval	lastFileCheckTime;
 		NSString*		openFilePath;
+		BOOL			savedFirstTime; //use to force a config save
 }
 
 #pragma mark ¥¥¥Accessors
