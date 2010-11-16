@@ -364,24 +364,17 @@ static const int currentVersion = 1;           // Current version
     return [dataFolder ensureSubFolder:@"openFiles" inFolder:[dataFolder finalDirectoryName]];
 }
 
-// ===========================================================
-// - saveConfiguration:
-// ===========================================================
 - (BOOL)saveConfiguration
 {
     return saveConfiguration;
 }
 
-// ===========================================================
-// - setSaveConfiguration:
-// ===========================================================
 - (void)setSaveConfiguration:(BOOL)flag
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSaveConfiguration:saveConfiguration];
     saveConfiguration = flag;
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORDataSaveConfigurationChangedNotification
-	 object: self];
+	if(saveConfiguration)savedFirstTime = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSaveConfigurationChangedNotification object: self];
 }
 
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
