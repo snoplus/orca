@@ -22,35 +22,64 @@
 
 #import "ORHPPulserModel.h"
 #import "ORUSB.h"
+#import "ORAdcProcessing.h"
+#import "ORBitProcessing.h"
 
 @class ORUSBInterface;
 @class ORAlarm;
 
 
-@interface ORLabJackModel : OrcaObject <USBDevice> {
+@interface ORLabJackModel : OrcaObject <USBDevice,ORAdcProcessing,ORBitProcessing> {
 	NSLock* localLock;
 	ORUSBInterface* usbInterface;
     NSString* serialNumber;
 	ORAlarm*  noUSBAlarm;
 	ORAlarm*  noDriverAlarm;
 	int adc[8];
+	int gain[4];
+	int lowLimit[8];
+	int hiLimit[8];
 	NSString* channelName[8];   //adc names
+	unsigned long timeMeasured;
 	NSString* doName[16];		//the D connector on the side
 	NSString* ioName[4];		//on top
+	unsigned short adcDiff;
 	unsigned short doDirection;
 	unsigned short ioDirection;
 	unsigned short ioValueOut;
 	unsigned short doValueOut;
 	unsigned short ioValueIn;
 	unsigned short doValueIn;
+    unsigned short aOut0;
+    unsigned short aOut1;
 	BOOL	led;
 	BOOL	doResetOfCounter;
-	//int		count;
     unsigned long counter;
     BOOL digitalOutputEnabled;
+    int pollTime;
+	unsigned long	dataId;
+    BOOL shipData;
+    BOOL readOnce;
+	NSTimeInterval lastTime;
+	NSOperationQueue* queue;
+	
+	//bit processing variables
+	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
+	unsigned long processOutputValue; //outputs to be written at end of process cycle
+	unsigned long processOutputMask;  //controlls which bits are written
 }
 
 #pragma mark ***Accessors
+- (void) setAOut0Voltage:(float)aValue;
+- (void) setAOut1Voltage:(float)aValue;
+- (unsigned short) aOut1;
+- (void) setAOut1:(unsigned short)aAOut1;
+- (unsigned short) aOut0;
+- (void) setAOut0:(unsigned short)aAOut0;
+- (BOOL) shipData;
+- (void) setShipData:(BOOL)aShipData;
+- (int) pollTime;
+- (void) setPollTime:(int)aPollTime;
 - (BOOL) digitalOutputEnabled;
 - (void) setDigitalOutputEnabled:(BOOL)aDigitalOutputEnabled;
 - (unsigned long) counter;
@@ -63,6 +92,16 @@
 - (void) setIo:(int)i name:(NSString*)aName;
 - (int) adc:(int)i;
 - (void) setAdc:(int)i withValue:(int)aValue;
+- (int) gain:(int)i;
+- (void) setGain:(int)i withValue:(int)aValue;
+- (float) lowLimit:(int)i;
+- (void) setLowLimit:(int)i withValue:(float)aValue;
+- (float) hiLimit:(int)i;
+- (void) setHiLimit:(int)i withValue:(float)aValue;
+
+- (unsigned short) adcDiff;
+- (void) setAdcDiff:(unsigned short)aMask;
+- (void) setAdcDiffBit:(int)bit withValue:(BOOL)aValue;
 
 - (unsigned short) doDirection;
 - (void) setDoDirection:(unsigned short)aMask;
@@ -91,12 +130,15 @@
 - (void) setIoValueInBit:(int)bit withValue:(BOOL)aValue;
 - (NSString*) ioInString:(int)bit;
 - (NSColor*) ioInColor:(int)i;
+- (unsigned long) timeMeasured;
 
-- (void) resetCounter;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherLakeShore210;
 
+#pragma mark ***USB Stuff
 - (id) getUSBController;
-
-#pragma mark ***Accessors
 - (ORUSBInterface*) usbInterface;
 - (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) serialNumber;
@@ -108,11 +150,21 @@
 - (void) interfaceRemoved:(NSNotification*)aNote;
 - (void) checkUSBAlarm;
 
+#pragma mark •••Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
 
 #pragma mark ***HW Access
-- (void) updateAll;
-- (void) readAdcValues:(int) group;
-- (void) sendIoControl;
+- (void) resetCounter;
+- (void) queryAll;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -120,20 +172,37 @@
 
 @end
 
-extern NSString* ORLabJackModelDigitalOutputEnabledChanged;
-extern NSString* ORLabJackModelCounterChanged;
-extern NSString* ORLabJackModelSerialNumberChanged;
-extern NSString* ORLabJackModelUSBInterfaceChanged;
-extern NSString* ORLabJackModelRelayChanged;
-extern NSString* ORLabJackModelLock;
+extern NSString* ORLabJackModelAOut1Changed;
+extern NSString* ORLabJackModelAOut0Changed;
+extern NSString* ORLabJackShipDataChanged;
+extern NSString* ORLabJackPollTimeChanged;
+extern NSString* ORLabJackDigitalOutputEnabledChanged;
+extern NSString* ORLabJackCounterChanged;
+extern NSString* ORLabJackSerialNumberChanged;
+extern NSString* ORLabJackUSBInterfaceChanged;
+extern NSString* ORLabJackRelayChanged;
+extern NSString* ORLabJackLock;
 extern NSString* ORLabJackChannelNameChanged;
 extern NSString* ORLabJackAdcChanged;
 extern NSString* ORLabJackDoNameChanged;
 extern NSString* ORLabJackIoNameChanged;
-extern NSString* ORLabJackDoDirectionChangedNotification;
-extern NSString* ORLabJackIoDirectionChangedNotification;
-extern NSString* ORLabJackDoValueOutChangedNotification;
-extern NSString* ORLabJackIoValueOutChangedNotification;
-extern NSString* ORLabJackDoValueInChangedNotification;
-extern NSString* ORLabJackIoValueInChangedNotification;
+extern NSString* ORLabJackDoDirectionChanged;
+extern NSString* ORLabJackIoDirectionChanged;
+extern NSString* ORLabJackDoValueOutChanged;
+extern NSString* ORLabJackIoValueOutChanged;
+extern NSString* ORLabJackDoValueInChanged;
+extern NSString* ORLabJackIoValueInChanged;
+extern NSString* ORLabJackHiLimitChanged;
+extern NSString* ORLabJackLowLimitChanged;
+extern NSString* ORLabJackAdcDiffChanged;
+extern NSString* ORLabJackGainChanged;
+
+
+@interface ORLabJackQuery : NSOperation
+{
+	id delegate;
+}
+- (id) initWithDelegate:(id)aDelegate;
+- (void) main;
+@end
 

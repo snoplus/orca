@@ -47,12 +47,12 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(serialNumberChanged:)
-                         name : ORLabJackModelSerialNumberChanged
+                         name : ORLabJackSerialNumberChanged
 						object: nil];
 	
     [notifyCenter addObserver : self
                      selector : @selector(serialNumberChanged:)
-                         name : ORLabJackModelUSBInterfaceChanged
+                         name : ORLabJackUSBInterfaceChanged
 						object: nil];
 		
 	[notifyCenter addObserver : self
@@ -62,7 +62,7 @@
 	
     [notifyCenter addObserver : self
 					 selector : @selector(lockChanged:)
-						 name : ORLabJackModelLock
+						 name : ORLabJackLock
 						object: nil];
 	
 	[notifyCenter addObserver : self
@@ -73,6 +73,11 @@
 	[notifyCenter addObserver : self
                      selector : @selector(adcChanged:)
                          name : ORLabJackAdcChanged
+						object: model];	
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(gainChanged:)
+                         name : ORLabJackGainChanged
 						object: model];		
 	
 	[notifyCenter addObserver : self
@@ -87,42 +92,76 @@
 	
 	[notifyCenter addObserver : self
                      selector : @selector(doDirectionChanged:)
-                         name : ORLabJackDoDirectionChangedNotification
+                         name : ORLabJackDoDirectionChanged
                        object : model];
 
 	[notifyCenter addObserver : self
                      selector : @selector(ioDirectionChanged:)
-                         name : ORLabJackIoDirectionChangedNotification
+                         name : ORLabJackIoDirectionChanged
                        object : model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(doValueOutChanged:)
-                         name : ORLabJackDoValueOutChangedNotification
+                         name : ORLabJackDoValueOutChanged
                        object : model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(ioValueOutChanged:)
-                         name : ORLabJackIoValueOutChangedNotification
+                         name : ORLabJackIoValueOutChanged
                        object : model];
 
 	[notifyCenter addObserver : self
                      selector : @selector(doValueInChanged:)
-                         name : ORLabJackDoValueInChangedNotification
+                         name : ORLabJackDoValueInChanged
                        object : model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(ioValueInChanged:)
-                         name : ORLabJackIoValueInChangedNotification
+                         name : ORLabJackIoValueInChanged
                        object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(counterChanged:)
-                         name : ORLabJackModelCounterChanged
+                         name : ORLabJackCounterChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(digitalOutputEnabledChanged:)
-                         name : ORLabJackModelDigitalOutputEnabledChanged
+                         name : ORLabJackDigitalOutputEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pollTimeChanged:)
+                         name : ORLabJackPollTimeChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(shipDataChanged:)
+                         name : ORLabJackShipDataChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lowLimitChanged:)
+                         name : ORLabJackLowLimitChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(hiLimitChanged:)
+                         name : ORLabJackHiLimitChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(adcDiffChanged:)
+                         name : ORLabJackAdcDiffChanged
+						object: model];	
+    [notifyCenter addObserver : self
+                     selector : @selector(aOut0Changed:)
+                         name : ORLabJackModelAOut0Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(aOut1Changed:)
+                         name : ORLabJackModelAOut1Changed
 						object: model];
 
 }
@@ -166,9 +205,82 @@
 	[self doValueInChanged:nil];
 	[self ioValueInChanged:nil];
 	[self adcChanged:nil];
+	[self gainChanged:nil];
     [self lockChanged:nil];
 	[self counterChanged:nil];
 	[self digitalOutputEnabledChanged:nil];
+	[self pollTimeChanged:nil];
+	[self shipDataChanged:nil];
+	[self lowLimitChanged:nil];
+	[self hiLimitChanged:nil];
+	[self adcDiffChanged:nil];
+	[self aOut0Changed:nil];
+	[self aOut1Changed:nil];
+}
+
+- (void) aOut1Changed:(NSNotification*)aNote
+{
+	[aOut1Field setFloatValue: [model aOut1] * 5.1/255.];
+	[aOut1Slider setFloatValue:[model aOut1] * 5.1/255.];
+}
+
+- (void) aOut0Changed:(NSNotification*)aNote
+{
+	[aOut0Field setFloatValue: [model aOut0] * 5.1/255.];
+	[aOut0Slider setFloatValue:[model aOut0] * 5.1/255.];
+}
+
+- (void) adcDiffChanged:(NSNotification*)aNotification
+{
+	int value = [model adcDiff];
+	short i;
+	for(i=0;i<4;i++){
+		[[adcDiffMatrix cellWithTag:i] setState:(value & 1L<<i)>0];
+	}
+	[self lockChanged:nil];
+	[self adcChanged:nil];
+}
+
+- (void) lowLimitChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<8;i++){
+			[[lowLimitMatrix cellWithTag:i] setFloatValue:[model lowLimit:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<8){
+			[[lowLimitMatrix cellWithTag:chan] setFloatValue:[model lowLimit:chan]];
+		}
+	}
+}
+
+- (void) hiLimitChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<8;i++){
+			[[hiLimitMatrix cellWithTag:i] setFloatValue:[model hiLimit:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<8){
+			[[hiLimitMatrix cellWithTag:chan] setFloatValue:[model hiLimit:chan]];
+		}
+	}
+}
+
+- (void) shipDataChanged:(NSNotification*)aNote
+{
+	[shipDataCB setIntValue: [model shipData]];
+}
+
+- (void) pollTimeChanged:(NSNotification*)aNote
+{
+	[pollTimePopup selectItemWithTag: [model pollTime]];
 }
 
 - (void) digitalOutputEnabledChanged:(NSNotification*)aNote
@@ -184,7 +296,7 @@
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORLabJackModelLock to:secure];
+    [gSecurity setLock:ORLabJackLock to:secure];
     [lockButton setEnabled:secure];
 }
 
@@ -284,20 +396,29 @@
 
 - (void) adcChanged:(NSNotification*)aNotification
 {
+	unsigned short diffMask = [model adcDiff];
 	if(!aNotification){
 		int i;
 		for(i=0;i<8;i++){
-			float theValue = 20./4095. * [model adc:i] -10;
-			[[adcMatrix cellWithTag:i] setFloatValue:theValue];
+			if((diffMask & (1<<i/2)) && ((i%2)!=0))[[adcMatrix cellWithTag:i] setStringValue:@"----"];
+			else [[adcMatrix cellWithTag:i] setFloatValue:[model convertedValue:i]];
 		}
 	}
 	else {
 		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		if(chan<8){
-			float theValue = 20./4095. * [model adc:chan] -10;
-			[[adcMatrix cellWithTag:chan] setFloatValue:theValue];
+			if((diffMask & (1<<chan/2)) && ((chan%2)!=0))[[adcMatrix cellWithTag:chan] setStringValue:@"----"];
+			else [[adcMatrix cellWithTag:chan] setFloatValue:[model convertedValue:chan]];
 		}
 	}
+}
+
+- (void) gainChanged:(NSNotification*)aNotification
+{
+	[gainPU0 selectItemAtIndex:[model gain:0]];
+	[gainPU1 selectItemAtIndex:[model gain:1]];
+	[gainPU2 selectItemAtIndex:[model gain:2]];
+	[gainPU3 selectItemAtIndex:[model gain:3]];
 }
 
 - (void) ioNameChanged:(NSNotification*)aNotification
@@ -338,10 +459,30 @@
 
 - (void) lockChanged:(NSNotification*)aNote
 {
-	//BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORLabJackModelLock];
-    BOOL locked = [gSecurity isLocked:ORLabJackModelLock];
+	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORLabJackLock];
+    BOOL locked = [gSecurity isLocked:ORLabJackLock];
     [lockButton setState: locked];
-	[serialNumberPopup setEnabled:!locked];
+	[serialNumberPopup	setEnabled:!locked];
+	[doNameMatrix		setEnabled:!locked];
+	[ioNameMatrix		setEnabled:!locked];
+	[doDirectionMatrix	setEnabled:!locked];
+	[ioDirectionMatrix	setEnabled:!locked];
+	[doValueOutMatrix	setEnabled:!locked];
+	[ioValueOutMatrix	setEnabled:!locked];
+	[resetCounterButton setEnabled:!locked];
+	
+	int adcDiff = [model adcDiff];
+	[gainPU0			setEnabled:!lockedOrRunningMaintenance && (adcDiff&0x01)] ;
+	[gainPU1			setEnabled:!lockedOrRunningMaintenance && (adcDiff&0x02)];
+	[gainPU2			setEnabled:!lockedOrRunningMaintenance && (adcDiff&0x04)];
+	[gainPU3			setEnabled:!lockedOrRunningMaintenance && (adcDiff&0x08)];
+	[pollTimePopup		setEnabled:!lockedOrRunningMaintenance];
+	
+	[aOut0Slider		setEnabled:!lockedOrRunningMaintenance];
+	[aOut1Slider		setEnabled:!lockedOrRunningMaintenance];
+
+	[aOut0Field		setEnabled:!lockedOrRunningMaintenance];
+	[aOut1Field		setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) serialNumberChanged:(NSNotification*)aNote
@@ -352,6 +493,25 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) aOut1Action:(id)sender
+{
+	[model setAOut1:[sender floatValue] * 255./5.1];	
+}
+
+- (IBAction) aOut0Action:(id)sender
+{
+	[model setAOut0:[sender floatValue]* 255./5.1];	
+}
+
+- (IBAction) shipDataAction:(id)sender
+{
+	[model setShipData:[sender intValue]];	
+}
+
+- (IBAction) pollTimeAction:(id)sender
+{
+	[model setPollTime:[[sender selectedItem] tag]];	
+}
 
 - (void) digitalOutputEnabledAction:(id)sender
 {
@@ -360,7 +520,7 @@
 
 - (IBAction) settingLockAction:(id) sender
 {
-    [gSecurity tryToSetLock:ORLabJackModelLock to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:ORLabJackLock to:[sender intValue] forWindow:[self window]];
 }
 
 - (void) populateInterfacePopup:(ORUSB*)usb
@@ -422,7 +582,12 @@
 
 - (IBAction) updateAllAction:(id)sender
 {
-	[model updateAll];
+	[model queryAll];
+}
+
+- (IBAction) adcDiffBitAction:(id)sender
+{
+	[model setAdcDiffBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) ioDirectionBitAction:(id)sender
@@ -453,4 +618,18 @@
 	[model resetCounter];
 }
 
+- (IBAction) lowLimitAction:(id)sender
+{
+	[model setLowLimit:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) hiLimitAction:(id)sender
+{
+	[model setHiLimit:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+}
+	 
+- (IBAction) gainAction:(id)sender
+{
+	[model setGain:[sender tag] withValue:[sender indexOfSelectedItem]];
+}
 @end

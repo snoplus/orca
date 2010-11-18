@@ -21,33 +21,59 @@
 #import "ORLabJackModel.h"
 #import "ORUSBInterface.h"
 #import "NSNotifications+Extensions.h"
+#import "ORDataTypeAssigner.h"
 
-NSString* ORLabJackModelDigitalOutputEnabledChanged = @"ORLabJackModelDigitalOutputEnabledChanged";
-NSString* ORLabJackModelCounterChanged		= @"ORLabJackModelCounterChanged";
-NSString* ORLabJackModelSerialNumberChanged	= @"ORLabJackModelSerialNumberChanged";
-NSString* ORLabJackModelUSBInterfaceChanged	= @"ORLabJackModelUSBInterfaceChanged";
-NSString* ORLabJackUSBInConnection			= @"ORLabJackUSBInConnection";
-NSString* ORLabJackUSBNextConnection		= @"ORLabJackUSBNextConnection";
-NSString* ORLabJackModelLock				= @"ORLabJackModelLock";
-NSString* ORLabJackChannelNameChanged		= @"ORLabJackChannelNameChanged";
-NSString* ORLabJackAdcChanged				= @"ORLabJackAdcChanged";
-NSString* ORLabJackDoNameChanged			= @"ORLabJackDoNameChanged";
-NSString* ORLabJackIoNameChanged			= @"ORLabJackIoNameChanged";
-NSString* ORLabJackDoDirectionChangedNotification	= @"ORLabJackDoDirectionChangedNotification";
-NSString* ORLabJackIoDirectionChangedNotification	= @"ORLabJackIoDirectionChangedNotification";
-NSString* ORLabJackDoValueOutChangedNotification	= @"ORLabJackDoValueOutChangedNotification";
-NSString* ORLabJackIoValueOutChangedNotification	= @"ORLabJackIoValueOutChangedNotification";
-NSString* ORLabJackDoValueInChangedNotification		= @"ORLabJackDoValueInChangedNotification";
-NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNotification";
+NSString* ORLabJackModelAOut1Changed			= @"ORLabJackModelAOut1Changed";
+NSString* ORLabJackModelAOut0Changed			= @"ORLabJackModelAOut0Changed";
+NSString* ORLabJackShipDataChanged				= @"ORLabJackShipDataChanged";
+NSString* ORLabJackDigitalOutputEnabledChanged	= @"ORLabJackDigitalOutputEnabledChanged";
+NSString* ORLabJackCounterChanged				= @"ORLabJackCounterChanged";
+NSString* ORLabJackSerialNumberChanged			= @"ORLabJackSerialNumberChanged";
+NSString* ORLabJackUSBInterfaceChanged			= @"ORLabJackUSBInterfaceChanged";
+NSString* ORLabJackUSBInConnection				= @"ORLabJackUSBInConnection";
+NSString* ORLabJackUSBNextConnection			= @"ORLabJackUSBNextConnection";
+NSString* ORLabJackLock							= @"ORLabJackLock";
+NSString* ORLabJackChannelNameChanged			= @"ORLabJackChannelNameChanged";
+NSString* ORLabJackAdcChanged					= @"ORLabJackAdcChanged";
+NSString* ORLabJackGainChanged					= @"ORLabJackGainChanged";
+NSString* ORLabJackDoNameChanged				= @"ORLabJackDoNameChanged";
+NSString* ORLabJackIoNameChanged				= @"ORLabJackIoNameChanged";
+NSString* ORLabJackDoDirectionChanged			= @"ORLabJackDoDirectionChanged";
+NSString* ORLabJackIoDirectionChanged			= @"ORLabJackIoDirectionChanged";
+NSString* ORLabJackDoValueOutChanged			= @"ORLabJackDoValueOutChanged";
+NSString* ORLabJackIoValueOutChanged			= @"ORLabJackIoValueOutChanged";
+NSString* ORLabJackDoValueInChanged				= @"ORLabJackDoValueInChanged";
+NSString* ORLabJackIoValueInChanged				= @"ORLabJackIoValueInChanged";
+NSString* ORLabJackPollTimeChanged				= @"ORLabJackPollTimeChanged";
+NSString* ORLabJackHiLimitChanged				= @"ORLabJackHiLimitChanged";
+NSString* ORLabJackLowLimitChanged				= @"ORLabJackLowLimitChanged";
+NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
 
 #define kLabJackU12DriverPath @"/System/Library/Extensions/LabJackU12.kext"
 @interface ORLabJackModel (private)
-- (void) readPipe;
+- (void) readPipeThread;
 - (void) firstWrite;
 - (void) writeData:(unsigned char*) data;
+- (void) pollHardware;
+- (void) sendIoControl;
+- (void) readAdcValues;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(int*)anArray forKey:(NSString*)aKey;
 @end
 
+#define kLabJackDataSize 17
+
 @implementation ORLabJackModel
+- (id)init
+{
+	self = [super init];
+	int i;
+	for(i=0;i<8;i++){
+		lowLimit[i] = -10;
+		hiLimit[i] = 10;
+	}
+		
+	return self;	
+}
 
 - (void) dealloc 
 {
@@ -80,6 +106,10 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 			[noDriverAlarm setAcknowledged:NO];
 			[noDriverAlarm postAlarm];
 		}
+		if(!queue){
+			queue = [[NSOperationQueue alloc] init];
+			[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+		}	
 	}
 	@catch(NSException* localException) {
 	}
@@ -116,8 +146,6 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 {
 	return @"USB/LDA120.html";
 }
-
-
 
 - (void) connectionChanged
 {
@@ -200,6 +228,109 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 
 #pragma mark ***Accessors
 
+- (unsigned short) aOut1
+{
+    return aOut1;
+}
+
+- (void) setAOut1:(unsigned short)aValue
+{
+	if(aValue>1023)aValue=1023;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAOut1:aOut1];
+    aOut1 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelAOut1Changed object:self];
+}
+
+- (void) setAOut0Voltage:(float)aValue
+{
+	[self setAOut0:aValue*255./5.1];
+}
+
+- (void) setAOut1Voltage:(float)aValue
+{
+	[self setAOut1:aValue*255./5.1];
+}
+		 
+- (unsigned short) aOut0
+{
+    return aOut0;
+}
+
+- (void) setAOut0:(unsigned short)aValue
+{
+	if(aValue>1023)aValue=1023;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAOut0:aOut0];
+    aOut0 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelAOut0Changed object:self];
+}
+
+- (float) lowLimit:(int)i
+{
+	if(i>=0 && i<8)return lowLimit[i];
+	else return 0;
+}
+
+- (void) setLowLimit:(int)i withValue:(float)aValue
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:i withValue:lowLimit[i]];
+		
+		lowLimit[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackLowLimitChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) hiLimit:(int)i
+{
+	if(i>=0 && i<8)return hiLimit[i];
+	else return 0;
+}
+
+- (void) setHiLimit:(int)i withValue:(float)aValue
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setHiLimit:i withValue:lowLimit[i]];
+		
+		hiLimit[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackHiLimitChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (BOOL) shipData
+{
+    return shipData;
+}
+
+- (void) setShipData:(BOOL)aShipData
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipData:shipData];
+    shipData = aShipData;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackShipDataChanged object:self];
+}
+
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
+    pollTime = aPollTime;
+	[self pollHardware];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackPollTimeChanged object:self];
+}
+
 - (BOOL) digitalOutputEnabled
 {
     return digitalOutputEnabled;
@@ -208,10 +339,8 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 - (void) setDigitalOutputEnabled:(BOOL)aDigitalOutputEnabled
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDigitalOutputEnabled:digitalOutputEnabled];
-    
     digitalOutputEnabled = aDigitalOutputEnabled;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelDigitalOutputEnabledChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackDigitalOutputEnabledChanged object:self];
 }
 
 - (unsigned long) counter
@@ -222,7 +351,7 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 - (void) setCounter:(unsigned long)aCounter
 {
     counter = aCounter;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelCounterChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackCounterChanged object:self];
 }
 
 - (NSString*) channelName:(int)i
@@ -315,7 +444,6 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 {
 	@synchronized(self){
 		if(i>=0 && i<8){
-			[[[self undoManager] prepareWithInvocationTarget:self] setAdc:i withValue:adc[i]];
 			adc[i] = aValue; 
 			
 			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -324,6 +452,52 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackAdcChanged object:self userInfo:userInfo];
 		}	
 	}
+}
+- (int) gain:(int)i
+{
+	unsigned short result = 0;
+	@synchronized(self){
+		if(i>=0 && i<4){
+			result =  gain[i];
+		}
+	}
+	return result;
+}
+
+- (void) setGain:(int)i withValue:(int)aValue
+{
+	@synchronized(self){
+		if(i>=0 && i<4){
+			[[[self undoManager] prepareWithInvocationTarget:self] setGain:i withValue:gain[i]];
+			gain[i] = aValue; 
+			
+			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+			[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+			
+			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackGainChanged object:self userInfo:userInfo];
+		}	
+	}
+}
+
+- (unsigned short) adcDiff
+{
+	return adcDiff;
+}
+
+- (void) setAdcDiff:(unsigned short)aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcDiff:adcDiff];
+    adcDiff = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackAdcDiffChanged object:self];
+	
+}
+
+- (void) setAdcDiffBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned short aMask = adcDiff;
+	if(aValue)aMask |= (1<<bit);
+	else aMask &= ~(1<<bit);
+	[self setAdcDiff:aMask];
 }
 
 - (unsigned short) doDirection
@@ -335,7 +509,7 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDoDirection:doDirection];
     doDirection = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackDoDirectionChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackDoDirectionChanged object:self];
 }
 
 
@@ -358,7 +532,7 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setIoDirection:ioDirection];
     ioDirection = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackIoDirectionChangedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackIoDirectionChanged object:self];
 }
 
 - (void) setIoDirectionBit:(int)bit withValue:(BOOL)aValue
@@ -382,7 +556,7 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 	@synchronized(self){
 		[[[self undoManager] prepareWithInvocationTarget:self] setDoValueOut:doValueOut];
 		doValueOut = aMask;
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackDoValueOutChangedNotification object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackDoValueOutChanged object:self];
 	}
 }
 
@@ -396,7 +570,6 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 	//[self postAdcInfoProvidingValueChanged];
 }
 
-
 - (unsigned short) ioValueOut
 {
     return ioValueOut;
@@ -407,8 +580,7 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 	@synchronized(self){
 		[[[self undoManager] prepareWithInvocationTarget:self] setIoValueOut:ioValueOut];
 		ioValueOut = aMask;
-		NSLog(@"IO 0x%0x\n",aMask);
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackIoValueOutChangedNotification object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackIoValueOutChanged object:self];
 	}
 }
 
@@ -430,9 +602,8 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 - (void) setIoValueIn:(unsigned short)aMask
 {
 	@synchronized(self){
-		[[[self undoManager] prepareWithInvocationTarget:self] setIoValueIn:ioValueIn];
 		ioValueIn = aMask;
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackIoValueInChangedNotification object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackIoValueInChanged object:self];
 	}
 }
 
@@ -476,9 +647,8 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 - (void) setDoValueIn:(unsigned short)aMask
 {
 	@synchronized(self){
-		[[[self undoManager] prepareWithInvocationTarget:self] setDoValueIn:doValueIn];
 		doValueIn = aMask;
-		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackDoValueInChangedNotification object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORLabJackDoValueInChanged object:self];
 	}
 }
 
@@ -517,7 +687,7 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 	else {
 		[[self getUSBController] claimInterfaceWithSerialNumber:serialNumber for:self];
 	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelSerialNumberChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackSerialNumberChanged object:self];
 }
 
 - (ORUSBInterface*) usbInterface
@@ -532,10 +702,9 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 	usbInterface = anInterface;
 	[usbInterface retain];
 	[usbInterface setUsePipeType:kUSBInterrupt];
-	//[usbInterface setUsePipeType:kUSBBulk];
 	
 	[[NSNotificationCenter defaultCenter]
-	 postNotificationName: ORLabJackModelUSBInterfaceChanged
+	 postNotificationName: ORLabJackUSBInterfaceChanged
 	 object: self];
 	[self checkUSBAlarm];
 	[self firstWrite];
@@ -604,27 +773,313 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 
 
 #pragma mark ***HW Access
-- (void) updateAll
+- (void) queryAll
 {
-	[self readAdcValues:0];
-	[self readAdcValues:1];
-	[self sendIoControl];
+	if ([[queue operations] count] == 0) {
+		ORLabJackQuery* anOp = [[ORLabJackQuery alloc] initWithDelegate:self];
+		[queue addOperation:anOp];
+		[anOp release];
+		led = !led;
+	}
 }
 
-- (void) readAdcValues:(int) group
+#pragma mark ***Data Records
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
 {
-	if(usbInterface && [self getUSBController] && group >=0 && group <=1){
+    dataId = DataId;
+}
+- (void) setDataIds:(id)assigner
+{
+    dataId   = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anOtherDevice
+{
+    [self setDataId:[anOtherDevice dataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"LabJack"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORLabJackDecoderForIOData",@"decoder",
+								 [NSNumber numberWithLong:dataId],   @"dataId",
+								 [NSNumber numberWithBool:NO],       @"variable",
+								 [NSNumber numberWithLong:kLabJackDataSize],       @"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"Temperatures"];
+    
+    return dataDictionary;
+}
+
+- (unsigned long) timeMeasured
+{
+	return timeMeasured;
+}
+
+
+- (void) shipIOData
+{
+    if([[ORGlobal sharedGlobal] runInProgress]){
+		
+		unsigned long data[kLabJackDataSize];
+		data[0] = dataId | kLabJackDataSize;
+		data[1] = ((adcDiff & 0xf) << 16) | ([self uniqueIdNumber] & 0x0000fffff);
+		
+		union {
+			float asFloat;
+			unsigned long asLong;
+		} theData;
+		
+		int index = 2;
+		int i;
+		for(i=0;i<8;i++){
+			theData.asFloat = [self convertedValue:i];
+			data[index] = theData.asLong;
+			index++;
+		}
+		data[index++] = counter;
+		data[index++] = ((ioDirection & 0xF) << 16) | (doDirection & 0xFFFF);
+		data[index++] = ((ioValueOut  & 0xF) << 16) | (doValueOut & 0xFFFF);
+		data[index++] = ((ioValueIn   & 0xF) << 16) | (doValueIn & 0xFFFF);
+	
+		data[index++] = timeMeasured;
+		data[index++] = 0; //spares
+		data[index++] = 0;
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:data length:sizeof(long)*kLabJackDataSize]];
+	}
+}
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting
+{
+	//we will control the polling loop
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+    readOnce = NO;
+}
+
+- (void) processIsStopping
+{
+	//return control to the normal loop
+	[self setPollTime:pollTime];
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{
+    if(!readOnce){
+        @try { 
+            [self queryAll]; 
+            if(shipData){
+                [self shipIOData]; 
+            }
+            readOnce = YES;
+        }
+		@catch(NSException* localException) { 
+			//catch this here to prevent it from falling thru, but nothing to do.
+        }
+		
+		//grab the bit pattern at the start of the cycle. it
+		//will not be changed during the cycle.
+		processInputValue = (doValueIn | (ioValueIn & 0xf)<<16) & (~doDirection | (~ioDirection & 0xf)<<16);
+		processOutputMask = (doDirection | (ioDirection & 0xf)<<16);
+		
+    }
+}
+
+- (void) endProcessCycle
+{
+	readOnce = NO;
+	//don't use the setter so the undo manager is bypassed
+	doValueOut = processOutputValue & 0xFFFF;
+	ioValueOut = (processOutputValue >> 16) & 0xF;
+}
+
+- (BOOL) processValue:(int)channel
+{
+	return (processInputValue & (1L<<channel)) > 0;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+	processOutputMask |= (1L<<channel);
+	if(value)	processOutputValue |= (1L<<channel);
+	else		processOutputValue &= ~(1L<<channel);
+}
+
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"LabJack,%d",[self uniqueIdNumber]];
+}
+
+- (NSString*) processingTitle
+{
+    return [self identifier];
+}
+
+- (double) convertedValue:(int)aChan
+{
+	if(aChan>=0 && aChan<8)return 20./4095. * adc[aChan] -10;
+	else return 0;
+}
+
+- (double) maxValueForChan:(int)channel
+{
+	return 10;
+}
+- (double) minValueForChan:(int)channel
+{
+	return -10;
+}
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		if(channel>=0 && channel<8){
+			*theLowLimit = lowLimit[channel];
+			*theHighLimit = hiLimit[channel];
+		}
+		else {
+			*theLowLimit = -10;
+			*theHighLimit = 10;
+		}
+	}		
+}
+
+#pragma mark ***Archival
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
+    [self setAOut1:[decoder decodeIntForKey:@"aOut1"]];
+    [self setAOut0:[decoder decodeIntForKey:@"aOut0"]];
+    [self setShipData:[decoder decodeBoolForKey:@"shipData"]];
+    [self setDigitalOutputEnabled:[decoder decodeBoolForKey:@"digitalOutputEnabled"]];
+    [self setSerialNumber:	[decoder decodeObjectForKey:@"serialNumber"]];
+	int i;
+	for(i=0;i<8;i++) {
+		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelName%d",i]];
+		if(aName)[self setChannel:i name:aName];
+		else [self setChannel:i name:[NSString stringWithFormat:@"Chan %d",i]];
+		[self setLowLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
+		[self setHiLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
+	}
+	
+	for(i=0;i<16;i++) {
+		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"DO%d",i]];
+		if(aName)[self setDo:i name:aName];
+		else [self setDo:i name:[NSString stringWithFormat:@"DO%d",i]];
+	}
+	
+	for(i=0;i<4;i++) {
+		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"IO%d",i]];
+		if(aName)[self setIo:i name:aName];
+		else [self setIo:i name:[NSString stringWithFormat:@"IO%d",i]];
+		[self setGain:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"gain%d",i]]];
+	}
+	[self setAdcDiff:	[decoder decodeIntForKey:@"adcDiff"]];
+	[self setDoDirection:	[decoder decodeIntForKey:@"doDirection"]];
+	[self setIoDirection:	[decoder decodeIntForKey:@"ioDirection"]];
+    [self setPollTime:		[decoder decodeIntForKey:@"pollTime"]];
+
+    [[self undoManager] enableUndoRegistration];    
+	
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt:aOut1 forKey:@"aOut1"];
+    [encoder encodeInt:aOut0 forKey:@"aOut0"];
+    [encoder encodeBool:shipData forKey:@"shipData"];
+    [encoder encodeInt:pollTime forKey:@"pollTime"];
+    [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
+    [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
+	int i;
+	for(i=0;i<8;i++) {
+		[encoder encodeObject:channelName[i] forKey:[NSString stringWithFormat:@"channelName%d",i]];
+		[encoder encodeFloat:lowLimit[i] forKey:[NSString stringWithFormat:@"lowLimit%d",i]];
+		[encoder encodeFloat:hiLimit[i] forKey:[NSString stringWithFormat:@"hiLimit%d",i]];
+	}
+	
+	for(i=0;i<16;i++) {
+		[encoder encodeObject:doName[i] forKey:[NSString stringWithFormat:@"DO%d",i]];
+	}
+	for(i=0;i<4;i++) {
+		[encoder encodeObject:ioName[i] forKey:[NSString stringWithFormat:@"IO%d",i]];
+		[encoder encodeInt:gain[i] forKey:[NSString stringWithFormat:@"gain%d",i]];
+	}
+
+    [encoder encodeInt:adcDiff		forKey:@"adcDiff"];
+    [encoder encodeInt:doDirection	forKey:@"doDirection"];
+    [encoder encodeInt:ioDirection	forKey:@"ioDirection"];
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+	
+	[self addCurrentState:objDictionary cArray:gain forKey:@"Gain"];
+    [objDictionary setObject:[NSNumber numberWithInt:adcDiff] forKey:@"AdcDiffMask"];
+	
+    return objDictionary;
+}
+
+@end
+
+@implementation ORLabJackModel (private)
+- (void) pollHardware
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if(pollTime == 0 )return;
+    [[self undoManager] disableUndoRegistration];
+	[self queryAll];
+    [[self undoManager] enableUndoRegistration];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+}
+
+- (void) readAdcValues
+{
+	if(usbInterface && [self getUSBController]){
 		unsigned char data[8];
-		data[0] = 0x08 + 0 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX first Channel
-		data[1] = 0x08 + 1 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX second Channel
-		data[2] = 0x08 + 2 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX third Channel
-		data[3] = 0x08 + 3 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX fourth Channel
-		data[4] = led;					//led state	
-		data[5] = 0xC0;
-		data[6] = 0x00;					//Don't care
-		data[7] = 0xFE | group;			// --- put in a unique label here.
-		led = !led;
-		[self writeData:data];
+		int group;
+		for(group=0;group<2;group++){
+			if(adcDiff & (group==0?0x1:0x4)){
+				int chan = (group==0?0:2);
+				data[0] = ((gain[chan] & 0x7)<<4) | (group==0?0x0:0x2);  //Bits 6-4 PGA, Bits 3-0 MUX 0-1/4-5Diff
+				data[1] = ((gain[chan] & 0x7)<<4) | (group==0?0x0:0x2);  //Bits 6-4 PGA, Bits 3-0 MUX Dup
+			}
+			else {
+				data[0] = 0x08 + 0 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX first Channel
+				data[1] = 0x08 + 1 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX second Channel
+			}
+
+			if(adcDiff & (group==0?0x2:0x8)){
+				int chan = (group==0?1:3);
+				data[2] = ((gain[chan] & 0x7)<<4) |(group==0?0x1:0x3);  //Bits 6-4 PGA, Bits 3-0 MUX 2-3/6-7 Diff
+				data[3] = ((gain[chan] & 0x7)<<4) |(group==0?0x1:0x3);  //Bits 6-4 PGA, Bits 3-0 MUX Dup
+			}
+			else {
+				data[2] = 0x08 + 2 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX third Channel
+				data[3] = 0x08 + 3 + (4*group);  //Bits 6-4 PGA, Bits 3-0 MUX four Channel
+			}
+			
+			data[4] = led;			//led state	
+			data[5] = 0xC0;
+			data[6] = 0x00;			//Don't care
+			data[7] = group;		// --- this echos back so we can tell which group to decode.
+			[self writeData:data];
+		}
 	}
 }
 
@@ -639,77 +1094,22 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 		data[3] =  (doValueOut & ~doDirection) & 0xFF;		//D15-D8 State
 		data[4] = (ioDirection<<4) | ((ioValueOut & ~ioDirection) & 0x0F); //I0-I3 Direction and state
 		
-		//updateDigital, resetCounter
-		if(digitalOutputEnabled) data[5] = 0x10 | (doResetOfCounter<<5);
-		else					 data[5] =  doResetOfCounter<<5;
-		
-		data[6] = 0x00;
-		data[7] = 0x00;
+		//updateDigital, resetCounter,analog out
+		unsigned short out0 = [self aOut0];
+		unsigned short out1 = [self aOut1];
+		data[5] = 0;
+		if(digitalOutputEnabled) data[5] |= 0x10;
+		data[5] |= (doResetOfCounter&0x1)<<5;
+		//apparently the documentation is wrong and this is an 8-bit dac. 255 = 5V.
+		//data[5] |= (((out1>>8) & 0x3) | (((out0>>8) & 0x3)<<2));
+		data[6] = out0 & 0xFF;
+		data[7] = out1 & 0xFF;
 		[self writeData:data];
 	}
 	doResetOfCounter = NO;
 }
 
-
-#pragma mark ***Archival
-- (id)initWithCoder:(NSCoder*)decoder
-{
-    self = [super initWithCoder:decoder];
-    
-    [[self undoManager] disableUndoRegistration];
-    [self setDigitalOutputEnabled:[decoder decodeBoolForKey:@"digitalOutputEnabled"]];
-    [self setSerialNumber:	[decoder decodeObjectForKey:@"serialNumber"]];
-	int i;
-	for(i=0;i<8;i++) {
-		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelName%d",i]];
-		if(aName)[self setChannel:i name:aName];
-		else [self setChannel:i name:[NSString stringWithFormat:@"Chan %d",i]];
-	}
-	
-	for(i=0;i<16;i++) {
-		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"DO%d",i]];
-		if(aName)[self setDo:i name:aName];
-		else [self setDo:i name:[NSString stringWithFormat:@"DO%d",i]];
-	}
-	
-	for(i=0;i<4;i++) {
-		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"IO%d",i]];
-		if(aName)[self setIo:i name:aName];
-		else [self setIo:i name:[NSString stringWithFormat:@"IO%d",i]];
-	}
-	[self setDoDirection:	[decoder decodeIntForKey:@"doDirection"]];
-	[self setIoDirection:	[decoder decodeIntForKey:@"ioDirection"]];
-
-    [[self undoManager] enableUndoRegistration];    
-	
-    return self;
-}
-
-- (void)encodeWithCoder:(NSCoder*)encoder
-{
-    [super encodeWithCoder:encoder];
-    [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
-    [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
-	int i;
-	for(i=0;i<8;i++) {
-		[encoder encodeObject:channelName[i] forKey:[NSString stringWithFormat:@"channelName%d",i]];
-	}
-	
-	for(i=0;i<16;i++) {
-		[encoder encodeObject:doName[i] forKey:[NSString stringWithFormat:@"DO%d",i]];
-	}
-	for(i=0;i<4;i++) {
-		[encoder encodeObject:ioName[i] forKey:[NSString stringWithFormat:@"IO%d",i]];
-	}
-
-    [encoder encodeInt:doDirection		forKey:@"doDirection"];
-    [encoder encodeInt:ioDirection		forKey:@"ioDirection"];
-}
-
-@end
-
-@implementation ORLabJackModel (private)
-- (void) readPipe
+- (void) readPipeThread
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	@try {
@@ -729,8 +1129,14 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 				[self setDoValueIn:data[1]<<8 | data[2]];
 				[self setIoValueIn:data[3]>>4];
 				[self setCounter:(data[4]<<24) | (data[5]<<16) | (data[6]<<8) | data[7] ];
+				
+				//always this is the last query so timestamp here
+				time_t	ut_Time;
+				time(&ut_Time);
+				timeMeasured = ut_Time;
+				
+				if(shipData) [self performSelectorOnMainThread:@selector(shipIOData) withObject:nil waitUntilDone:NO];
 			}
-
 		}
 	}
 	@catch(NSException* e){
@@ -752,13 +1158,45 @@ NSString* ORLabJackIoValueInChangedNotification		= @"ORLabJackIoValueInChangedNo
 	data[6] = 0x00;			
 	data[7] = 0x00;
 	[usbInterface writeBytesOnInterruptPipe:data length:8];
-	[NSThread detachNewThreadSelector: @selector(readPipe) toTarget:self withObject: nil];
+	[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
 }
 
 - (void) writeData:(unsigned char*) data
 {
 	[usbInterface writeBytesOnInterruptPipe:data length:8];
-	[NSThread detachNewThreadSelector: @selector(readPipe) toTarget:self withObject: nil];
-	[ORTimer delay:0.02];
+	[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
+	[ORTimer delay:0.03];
+}
+
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(int*)anArray forKey:(NSString*)aKey
+{
+	NSMutableArray* ar = [NSMutableArray array];
+	int i;
+	for(i=0;i<4;i++){
+		[ar addObject:[NSNumber numberWithShort:*anArray]];
+		anArray++;
+	}
+	[dictionary setObject:ar forKey:aKey];
+}
+
+@end
+
+@implementation ORLabJackQuery
+- (id) initWithDelegate:(id)aDelegate
+{
+	self = [super init];
+	delegate = aDelegate;
+    return self;
+}
+
+- (void) main
+{
+	@try {
+		[delegate readAdcValues];
+		[delegate sendIoControl];
+	}
+	@catch(NSException* e){
+	}
 }
 @end
+
