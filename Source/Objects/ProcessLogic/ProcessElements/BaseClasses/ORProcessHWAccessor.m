@@ -239,7 +239,6 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
 - (void) processIsStarting
 {
     [super processIsStarting];
-	[hwObject processIsStarting];
 	if(!startOnce){
 		stopOnce = NO;
 		[hwObject processIsStarting];
