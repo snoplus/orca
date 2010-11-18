@@ -104,13 +104,22 @@ NSString* historyConnectors[4] = {
 	[lastEval release];
 	lastEval = nil;
 	
-    [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORHistoryElementDataChanged
-					  object:self];
-
-	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHistoryElementDataChanged object:self];
 }
 
+- (void) processIsStopping
+{
+    [super processIsStopping];
+	int i;
+	for(i=0;i<4;i++){
+		id obj = [self objectConnectedTo:historyConnectors[i]];
+		[obj processIsStopping];
+	}
+	[lastEval release];
+	lastEval = nil;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHistoryElementDataChanged object:self];
+}
 
 //--------------------------------
 //runs in the process logic thread
