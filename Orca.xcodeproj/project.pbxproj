@@ -1112,6 +1112,8 @@
 		84519C6C0B5C0B0900B08915 /* GoToLine.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84519C690B5C0B0900B08915 /* GoToLine.nib */; };
 		84519C6D0B5C0B0900B08915 /* GoToLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 84519C6A0B5C0B0900B08915 /* GoToLine.h */; };
 		84519C6E0B5C0B0900B08915 /* GoToLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84519C6B0B5C0B0900B08915 /* GoToLine.m */; };
+		84519D0212944F8300BDB2AE /* ORLabJackDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84519D0012944F8200BDB2AE /* ORLabJackDecoders.h */; };
+		84519D0312944F8300BDB2AE /* ORLabJackDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84519D0112944F8200BDB2AE /* ORLabJackDecoders.m */; };
 		84522B9610CD723E0077DDFF /* adcMeter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84522B9510CD723E0077DDFF /* adcMeter.tif */; };
 		84522D4910CD90600077DDFF /* adcHorizontalBar.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84522D4810CD90600077DDFF /* adcHorizontalBar.tif */; };
 		84538DF40803462500615B6D /* OR1DHistoDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84538DF20803462500615B6D /* OR1DHistoDecoders.m */; };
@@ -3525,6 +3527,8 @@
 		84519C690B5C0B0900B08915 /* GoToLine.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = GoToLine.nib; path = "Source/Objects/Misc Objects/Views/TextFinder/GoToLine.nib"; sourceTree = SOURCE_ROOT; };
 		84519C6A0B5C0B0900B08915 /* GoToLine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GoToLine.h; path = "Source/Objects/Misc Objects/Views/TextFinder/GoToLine.h"; sourceTree = SOURCE_ROOT; };
 		84519C6B0B5C0B0900B08915 /* GoToLine.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = GoToLine.m; path = "Source/Objects/Misc Objects/Views/TextFinder/GoToLine.m"; sourceTree = SOURCE_ROOT; };
+		84519D0012944F8200BDB2AE /* ORLabJackDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLabJackDecoders.h; path = Source/Objects/Hardware/USB/LabJack/ORLabJackDecoders.h; sourceTree = SOURCE_ROOT; };
+		84519D0112944F8200BDB2AE /* ORLabJackDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLabJackDecoders.m; path = Source/Objects/Hardware/USB/LabJack/ORLabJackDecoders.m; sourceTree = SOURCE_ROOT; };
 		84522B9510CD723E0077DDFF /* adcMeter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = adcMeter.tif; sourceTree = "<group>"; };
 		84522D4810CD90600077DDFF /* adcHorizontalBar.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = adcHorizontalBar.tif; sourceTree = "<group>"; };
 		84538DF20803462500615B6D /* OR1DHistoDecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = OR1DHistoDecoders.m; path = "Source/Objects/Data Processing/Histogram Objects/Histogram1D/OR1DHistoDecoders.m"; sourceTree = SOURCE_ROOT; };
@@ -10070,6 +10074,8 @@
 				84EBC51E128887C800234313 /* ORLabJackController.m */,
 				84EBC51F128887C800234313 /* ORLabJackModel.h */,
 				84EBC520128887C800234313 /* ORLabJackModel.m */,
+				84519D0012944F8200BDB2AE /* ORLabJackDecoders.h */,
+				84519D0112944F8200BDB2AE /* ORLabJackDecoders.m */,
 			);
 			name = LabJack;
 			path = Source/Objects/Hardware/USB/LabJack;
@@ -11769,6 +11775,7 @@
 				84EBBE6A1282E2B700234313 /* ORArchive.h in Headers */,
 				84EBC524128887C800234313 /* ORLabJackController.h in Headers */,
 				84EBC526128887C800234313 /* ORLabJackModel.h in Headers */,
+				84519D0212944F8300BDB2AE /* ORLabJackDecoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13361,6 +13368,7 @@
 				84EBBE6B1282E2B700234313 /* ORArchive.m in Sources */,
 				84EBC525128887C800234313 /* ORLabJackController.m in Sources */,
 				84EBC527128887C800234313 /* ORLabJackModel.m in Sources */,
+				84519D0312944F8300BDB2AE /* ORLabJackDecoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
