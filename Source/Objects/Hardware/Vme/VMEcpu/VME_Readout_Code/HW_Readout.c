@@ -3,7 +3,7 @@
 //  Orca
 //
 //  Created by Mark Howe on Mon Sept 10, 2007
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright ï¿½ 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -48,10 +48,8 @@ extern char needToSwap;
 extern int32_t  dataIndex;
 extern int32_t* data;
 
-TUVMEDevice* vmeAM29Handle = NULL;
+TUVMEDevice* fDevice = NULL;
 TUVMEDevice* controlHandle = NULL;
-TUVMEDevice* vmeAM39Handle = NULL;
-TUVMEDevice* vmeAM9Handle = NULL;
 
 void processHWCommand(SBC_Packet* aPacket)
 {
@@ -64,31 +62,20 @@ void processHWCommand(SBC_Packet* aPacket)
 }
 
 void FindHardware(void)
-{
-    vmeAM29Handle = get_new_device(0x0, 0x29, 2, 0x10000); 
-    if (vmeAM29Handle == NULL) LogBusError("Device vmeAM29Handle: %s",strerror(errno));
-    
+{  
     controlHandle = get_ctl_device(); 
     if (controlHandle == NULL) LogBusError("Device controlHandle: %s",strerror(errno));
-    
-    vmeAM39Handle = get_new_device(0x0, 0x39, 4, 0x1000000);
-    if (vmeAM39Handle == NULL) LogBusError("Device vmeAM39Handle: %s",strerror(errno));
-    
-    vmeAM9Handle = get_new_device(0x0, 0x9, 4, 0x2000000);
-    if (vmeAM9Handle == NULL) LogBusError("Device vmeAM9Handle: %s",strerror(errno));
-    /* The entire A16 (D16), A24 (D16), space is mapped. */
-    /* The bottom of A32 (D32) is mapped up to 0x2000000. */
-    /* We need to be careful!*/
-  
+
+	fDevice = get_new_device(0x0, 0x9, 4, 0x0); 
+    if (fDevice == NULL) LogBusError("fDevice: %s",strerror(errno));
+
     /* The following is particular to the concurrent boards. */
     set_hw_byte_swap(true);
 }
 
 void ReleaseHardware(void)
 {
-    if (vmeAM29Handle) close_device(vmeAM29Handle);    
-    if (vmeAM39Handle) close_device(vmeAM39Handle);    
-    if (vmeAM9Handle)  close_device(vmeAM9Handle);    
+    if (fDevice) close_device(fDevice);    
 }
 
 
@@ -104,7 +91,6 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     int32_t unitSize        = p->unitSize;
     int32_t numItems        = p->numItems;
     TUVMEDevice* memMapHandle;
-    bool deleteHandle = false;
     bool useDMADevice = false;
     // Quick sanity checks, this is to ensure we are actually requesting
     // a valid address
@@ -125,41 +111,27 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
             if(reply)writeBuffer(aPacket);
             return;
         }
-    } else if(unitSize*numItems >= kDMALowerLimit) {
-	useDMADevice = true;
+    } 
+	else if(unitSize*numItems >= kDMALowerLimit) {
+		useDMADevice = true;
         if (addressSpace == kPollSameAddress) { 
           memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, false);
-        } else {
+        } 
+		else {
           memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
         }
         addressSpace=0x1;
         startAddress = 0x0;
-    } else if(addressModifier == 0x29 && unitSize == 2) {
-        memMapHandle = vmeAM29Handle;
-    } else if(addressModifier == 0x39 && unitSize == 4) {
-        memMapHandle = vmeAM39Handle;
-    } else if(addressModifier == 0x9 && unitSize == 4 && startAddress < 0x2000000) {
-        memMapHandle = vmeAM9Handle;
-    } else {
-        /* The address must be byte-aligned */ 
-        startAddress = p->address & 0xFFFF;
-        p->address = p->address & 0xFFFF0000;
-        memMapHandle = get_new_device(p->address, addressModifier, unitSize, 0); 
-        if (memMapHandle == NULL) {
-            sprintf(aPacket->message,"error: %d : %s\n",(int32_t)errno,strerror(errno));
-            p->errorCode = errno;
-            if(reply)writeBuffer(aPacket);
-            return;
-        }
-        deleteHandle = true;
-    }
+    } 
+	else {
+        memMapHandle = fDevice;
+	}
     
     p++; /*point to the data*/
     int16_t *sptr;
     int32_t  *lptr;
     switch(unitSize){
         case 1: /*bytes*/
-            /*no need to swap*/
         break;
         
         case 2: /*shorts*/
@@ -173,26 +145,27 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
         break;
     }
     
-    int32_t result = 0;
-    if (!deleteHandle && !useDMADevice) lock_device(memMapHandle);
-    if (addressSpace == kPollSameAddress) {
+    if (!useDMADevice) lock_device(memMapHandle);
+	
+	if(memMapHandle==fDevice){	
+		setup_device(fDevice,oldAddress,addressModifier,unitSize);
+	}
+	
+	int32_t result = 0;
+	if (addressSpace == kPollSameAddress) {
         /* We have to poll the same address. */
         uint32_t i = 0;
         for (i=0;i<numItems;i++) {
-            result = 
-                write_device(memMapHandle,
-                    (char*)p + i*unitSize,unitSize,startAddress);
+            result = write_device(memMapHandle,(char*)p + i*unitSize,unitSize,startAddress&0xffff);
             if (result != unitSize) break;
         }
         if (result == unitSize) result = unitSize*numItems; 
-    } else {
-        result = write_device(memMapHandle,(char*)p,
-                              numItems*unitSize,startAddress);
+    } 
+	else {
+        result = write_device(memMapHandle,(char*)p,numItems*unitSize,startAddress&0xffff);
     }
-    if (!deleteHandle && !useDMADevice) unlock_device(memMapHandle);
-    if (useDMADevice) {
-        release_dma_device();
-    }
+    if (!useDMADevice) unlock_device(memMapHandle);
+    if (useDMADevice)  release_dma_device();
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
@@ -217,11 +190,6 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     if(needToSwap) SwapLongBlock(lptr,numItems);
 
     if(reply)writeBuffer(aPacket);    
-
-    if (deleteHandle) {
-        close_device(memMapHandle);
-    } 
-
 }
 
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
@@ -237,7 +205,6 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     int32_t unitSize        = p->unitSize;
     int32_t numItems        = p->numItems;
     TUVMEDevice* memMapHandle;
-    bool deleteHandle = false;
     bool useDMADevice = false;
 
     if (numItems*unitSize > kSBC_MaxPayloadSizeBytes) {
@@ -257,68 +224,50 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     } 
     else if(unitSize*numItems >= kDMALowerLimit) {
         // Use DMA access which is normally faster.
-	useDMADevice = true;
+		useDMADevice = true;
         if (addressSpace == kPollSameAddress) {
             memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, false);
-         } else {
+		} 
+		else {
             memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
          }
         addressSpace =0x1; // reset this for the later call.
         startAddress = 0x0;
     }
-    else if(addressModifier == 0x29 && unitSize == 2) {
-        memMapHandle = vmeAM29Handle;
-    } 
-    else if(addressModifier == 0x39 && unitSize == 4) {
-        memMapHandle = vmeAM39Handle;
-    } 
-    else if(addressModifier == 0x9 && unitSize == 4 && startAddress < 0x2000000) {
-        memMapHandle = vmeAM9Handle;
-    } 
     else {
-        /* The address must be byte-aligned */ 
-        startAddress = p->address & 0xFFFF;
-        p->address   = p->address & 0xFFFF0000;
-        
-        memMapHandle = get_new_device(p->address, addressModifier, unitSize, 0); 
-        if (memMapHandle == NULL) {
-            sprintf(aPacket->message,"error: %d : %s\n",
-                (int32_t)errno,strerror(errno));
-            p->errorCode = errno;
-            if(reply)writeBuffer(aPacket);
-            return;
-        }
-        deleteHandle = true;
-    }
+        memMapHandle = fDevice;
+    } 
 
     /*OK, got address and # to read, set up the response and go get the data*/
-    aPacket->cmdHeader.destination = kSBC_Process;
-    aPacket->cmdHeader.cmdID       = kSBC_ReadBlock;
-    aPacket->cmdHeader.numberBytesinPayload    
-        = sizeof(SBC_VmeReadBlockStruct) + numItems*unitSize;
+    aPacket->cmdHeader.destination			= kSBC_Process;
+    aPacket->cmdHeader.cmdID				= kSBC_ReadBlock;
+    aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_VmeReadBlockStruct) + numItems*unitSize;
 
-    SBC_VmeReadBlockStruct* returnDataPtr = 
-        (SBC_VmeReadBlockStruct*)aPacket->payload;
+    SBC_VmeReadBlockStruct* returnDataPtr = (SBC_VmeReadBlockStruct*)aPacket->payload;
     char* returnPayload = (char*)(returnDataPtr+1);
 
     int32_t result = 0;
     
-    if (!deleteHandle && !useDMADevice) lock_device(memMapHandle);
+    if (!useDMADevice) lock_device(memMapHandle);
+	
+	if(memMapHandle==fDevice){	
+		setup_device(fDevice,oldAddress,addressModifier,unitSize);
+	}
+	
     if (addressSpace == kPollSameAddress) {
         /* We have to poll the same address. */
         uint32_t i = 0;
         for (i=0;i<numItems;i++) {
-            result = read_device(memMapHandle, returnPayload + i*unitSize,unitSize,startAddress);
+            result = read_device(memMapHandle, returnPayload + i*unitSize,unitSize,startAddress&0xffff);
             if (result != unitSize) break;
         }
         if (result == unitSize) result = unitSize*numItems; 
-    } else {
-        result = read_device(memMapHandle,returnPayload,numItems*unitSize,startAddress);
+    } 
+	else {
+        result = read_device(memMapHandle,returnPayload,numItems*unitSize,startAddress&0xffff);
     }
-    if (!deleteHandle && !useDMADevice) unlock_device(memMapHandle);
-    if (useDMADevice) {
-        release_dma_device();
-    }
+    if (!useDMADevice) unlock_device(memMapHandle);
+    if (useDMADevice)  release_dma_device();
     
     returnDataPtr->address         = oldAddress;
     returnDataPtr->addressModifier = addressModifier;
@@ -329,8 +278,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
         returnDataPtr->errorCode = 0;
         switch(unitSize){
             case 1: /*bytes*/
-                /*no need to swap*/
-                break;
+			break;
             case 2: /*shorts*/
                 if(needToSwap) SwapShortBlock((int16_t*)returnPayload,numItems);
                 break;
@@ -338,24 +286,18 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
                 if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
                 break;
         }
-    } else {
-        sprintf(aPacket->message,"error: %d %d : %s\n",
-           (int32_t)result,(int32_t)errno,strerror(errno));
-        aPacket->cmdHeader.numberBytesinPayload    
-            = sizeof(SBC_VmeReadBlockStruct);
-        returnDataPtr->numItems  = 0;
-        returnDataPtr->errorCode = errno;        
+    } 
+	else {
+        sprintf(aPacket->message,"error: %d %d : %s\n",(int32_t)result,(int32_t)errno,strerror(errno));
+        aPacket->cmdHeader.numberBytesinPayload  = sizeof(SBC_VmeReadBlockStruct);
+        returnDataPtr->numItems					 = 0;
+        returnDataPtr->errorCode				 = errno;        
     }
 
     if(needToSwap) {
-        SwapLongBlock(returnDataPtr,
-            sizeof(SBC_VmeReadBlockStruct)/sizeof(int32_t));
+        SwapLongBlock(returnDataPtr, sizeof(SBC_VmeReadBlockStruct)/sizeof(int32_t));
     }
     if(reply)writeBuffer(aPacket);
-    if (deleteHandle) {
-        close_device(memMapHandle);
-    } 
-
 }
 
 /*************************************************************/
