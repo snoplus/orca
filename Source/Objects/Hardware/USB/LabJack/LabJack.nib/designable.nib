@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1458"/>
+			<integer value="1457"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3928,7 +3928,8 @@
 													<reference key="NSBackgroundColor" ref="439072004"/>
 													<reference key="NSTextColor" ref="207533449"/>
 												</object>
-												<reference key="NSSelectedCell" ref="1011538583"/>
+												<int key="NSSelectedRow">-1</int>
+												<int key="NSSelectedCol">-1</int>
 												<reference key="NSBackgroundColor" ref="464542227"/>
 												<reference key="NSCellBackgroundColor" ref="464542227"/>
 											</object>
@@ -4442,7 +4443,8 @@
 													<reference key="NSBackgroundColor" ref="439072004"/>
 													<reference key="NSTextColor" ref="207533449"/>
 												</object>
-												<reference key="NSSelectedCell" ref="505921920"/>
+												<int key="NSSelectedRow">-1</int>
+												<int key="NSSelectedCol">-1</int>
 												<reference key="NSBackgroundColor" ref="464542227"/>
 												<reference key="NSCellBackgroundColor" ref="464542227"/>
 											</object>
@@ -4956,7 +4958,8 @@
 													<reference key="NSBackgroundColor" ref="439072004"/>
 													<reference key="NSTextColor" ref="207533449"/>
 												</object>
-												<reference key="NSSelectedCell" ref="578559404"/>
+												<int key="NSSelectedRow">-1</int>
+												<int key="NSSelectedCol">-1</int>
 												<reference key="NSBackgroundColor" ref="464542227"/>
 												<reference key="NSCellBackgroundColor" ref="464542227"/>
 											</object>
@@ -5834,6 +5837,7 @@
 														<string key="NSKeyEquiv"/>
 														<int key="NSKeyEquivModMask">1048576</int>
 														<int key="NSMnemonicLoc">2147483647</int>
+														<int key="NSState">1</int>
 														<reference key="NSOnImage" ref="315430887"/>
 														<reference key="NSMixedImage" ref="330195196"/>
 														<string key="NSAction">_popUpItemAction:</string>
@@ -5923,13 +5927,13 @@
 											<object class="NSTextField" id="410766539">
 												<reference key="NSNextResponder" ref="475072478"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{136, 112}, {255, 56}}</string>
+												<string key="NSFrame">{{122, 112}, {269, 56}}</string>
 												<reference key="NSSuperview" ref="475072478"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="950669198">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">272760832</int>
-													<string key="NSContents">The raw ADC range is 0 - 4095 which normally represents a displayed value of -10V to +10V. You can change the displayed value by changing the slope and intercept.</string>
+													<string key="NSContents">The raw ADC range is 0 - 4095 which represents an input value of -10V to +10V. You can change the displayed value by changing the slope and intercept.</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="410766539"/>
 													<reference key="NSBackgroundColor" ref="464542227"/>
