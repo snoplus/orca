@@ -71,6 +71,11 @@
 						object: model];	
 	
 	[notifyCenter addObserver : self
+                     selector : @selector(channelUnitChanged:)
+                         name : ORLabJackChannelUnitChanged
+						object: model];	
+	
+	[notifyCenter addObserver : self
                      selector : @selector(adcChanged:)
                          name : ORLabJackAdcChanged
 						object: model];	
@@ -164,6 +169,16 @@
                          name : ORLabJackModelAOut1Changed
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(slopeChanged:)
+                         name : ORLabJackSlopeChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(interceptChanged:)
+                         name : ORLabJackInterceptChanged
+						object: model];
+	
 }
 
 - (void) awakeFromNib
@@ -173,7 +188,11 @@
 	for(i=0;i<8;i++){	
 		[[nameMatrix cellAtRow:i column:0] setEditable:YES];
 		[[nameMatrix cellAtRow:i column:0] setTag:i];
+		[[unitMatrix cellAtRow:i column:0] setEditable:YES];
+		[[unitMatrix cellAtRow:i column:0] setTag:i];
 		[[adcMatrix cellAtRow:i column:0] setTag:i];
+		[[slopeMatrix cellAtRow:i column:0] setTag:i];
+		[[interceptMatrix cellAtRow:i column:0] setTag:i];
 	}
 	
 	for(i=0;i<16;i++){	
@@ -196,6 +215,7 @@
     [ super updateWindow ];
 	[self serialNumberChanged:nil];
 	[self channelNameChanged:nil];
+	[self channelUnitChanged:nil];
 	[self ioNameChanged:nil];
 	[self doNameChanged:nil];
 	[self doDirectionChanged:nil];
@@ -216,6 +236,8 @@
 	[self adcDiffChanged:nil];
 	[self aOut0Changed:nil];
 	[self aOut1Changed:nil];
+	[self slopeChanged:nil];
+	[self interceptChanged:nil];
 }
 
 - (void) aOut1Changed:(NSNotification*)aNote
@@ -272,6 +294,39 @@
 		}
 	}
 }
+
+- (void) slopeChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<8;i++){
+			[[slopeMatrix cellWithTag:i] setFloatValue:[model slope:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<8){
+			[[slopeMatrix cellWithTag:chan] setFloatValue:[model slope:chan]];
+		}
+	}
+}
+
+- (void) interceptChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<8;i++){
+			[[interceptMatrix cellWithTag:i] setFloatValue:[model intercept:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<8){
+			[[interceptMatrix cellWithTag:chan] setFloatValue:[model intercept:chan]];
+		}
+	}
+}
+
 
 - (void) shipDataChanged:(NSNotification*)aNote
 {
@@ -332,6 +387,22 @@
 		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 		if(chan<8){
 			[[nameMatrix cellWithTag:chan] setStringValue:[model channelName:chan]];
+		}
+	}
+}
+
+- (void) channelUnitChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<8;i++){
+			[[unitMatrix cellWithTag:i] setStringValue:[model channelUnit:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
+		if(chan<8){
+			[[unitMatrix cellWithTag:chan] setStringValue:[model channelUnit:chan]];
 		}
 	}
 }
@@ -463,6 +534,8 @@
     BOOL locked = [gSecurity isLocked:ORLabJackLock];
     [lockButton setState: locked];
 	[serialNumberPopup	setEnabled:!locked];
+	[nameMatrix			setEnabled:!locked];
+	[unitMatrix			setEnabled:!locked];
 	[doNameMatrix		setEnabled:!locked];
 	[ioNameMatrix		setEnabled:!locked];
 	[doDirectionMatrix	setEnabled:!locked];
@@ -570,6 +643,11 @@
 	[model setChannel:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
 }
 
+- (IBAction) channelUnitAction:(id)sender
+{
+	[model setChannel:[[sender selectedCell] tag] unit:[[sender selectedCell] stringValue]];
+}
+
 - (IBAction) ioNameAction:(id)sender
 {
 	[model setIo:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
@@ -632,4 +710,15 @@
 {
 	[model setGain:[sender tag] withValue:[sender indexOfSelectedItem]];
 }
+
+- (IBAction) slopeAction:(id)sender
+{
+	[model setSlope:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) interceptAction:(id)sender
+{
+	[model setIntercept:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+}
+
 @end

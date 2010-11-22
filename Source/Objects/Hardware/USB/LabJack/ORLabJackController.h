@@ -22,14 +22,15 @@
 @interface ORLabJackController : OrcaObjectController 
 {
 	IBOutlet NSPopUpButton* serialNumberPopup;
-	IBOutlet   NSTextField* aOut1Field;
-	IBOutlet   NSTextField* aOut0Field;
+	IBOutlet NSTextField*	aOut1Field;
+	IBOutlet NSTextField*	aOut0Field;
 	IBOutlet NSButton*		shipDataCB;
 	IBOutlet NSButton*		resetCounterButton;
 	IBOutlet NSButton*		digitalOutputEnabledButton;
 	IBOutlet NSTextField*	counterField;
 	IBOutlet NSButton*		lockButton;
 	IBOutlet NSMatrix*		nameMatrix;
+	IBOutlet NSMatrix*		unitMatrix;
 	IBOutlet NSMatrix*		adcMatrix;
 	IBOutlet NSMatrix*		doNameMatrix;
 	IBOutlet NSMatrix*		ioNameMatrix;
@@ -42,6 +43,8 @@
 	IBOutlet NSPopUpButton* pollTimePopup;
 	IBOutlet NSMatrix*		lowLimitMatrix;
 	IBOutlet NSMatrix*		hiLimitMatrix;
+	IBOutlet NSMatrix*		slopeMatrix;
+	IBOutlet NSMatrix*		interceptMatrix;
 	IBOutlet NSMatrix*		adcDiffMatrix;
 	IBOutlet NSPopUpButton* gainPU0;
 	IBOutlet NSPopUpButton* gainPU1;
@@ -70,6 +73,7 @@
 - (void) populateInterfacePopup:(ORUSB*)usb;
 - (void) validateInterfacePopup;
 - (void) channelNameChanged:(NSNotification*)aNote;
+- (void) channelUnitChanged:(NSNotification*)aNote;
 - (void) doNameChanged:(NSNotification*)aNote;
 - (void) ioNameChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
@@ -81,6 +85,8 @@
 - (void) ioValueOutChanged:(NSNotification*)aNote;
 - (void) doValueInChanged:(NSNotification*)aNote;
 - (void) ioValueInChanged:(NSNotification*)aNote;
+- (void) slopeChanged:(NSNotification*)aNote;
+- (void) interceptChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) aOut1Action:(id)sender;
@@ -92,6 +98,7 @@
 - (IBAction) serialNumberAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) channelNameAction:(id)sender;
+- (IBAction) channelUnitAction:(id)sender;
 
 - (IBAction) doNameAction:(id)sender;
 - (IBAction) doDirectionBitAction:(id)sender;
@@ -107,6 +114,8 @@
 - (IBAction) lowLimitAction:(id)sender;
 - (IBAction) hiLimitAction:(id)sender;
 - (IBAction) gainAction:(id)sender;
+- (IBAction) slopeAction:(id)sender;
+- (IBAction) interceptAction:(id)sender;
 
 @end
 

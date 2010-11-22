@@ -34,6 +34,7 @@ NSString* ORLabJackUSBInConnection				= @"ORLabJackUSBInConnection";
 NSString* ORLabJackUSBNextConnection			= @"ORLabJackUSBNextConnection";
 NSString* ORLabJackLock							= @"ORLabJackLock";
 NSString* ORLabJackChannelNameChanged			= @"ORLabJackChannelNameChanged";
+NSString* ORLabJackChannelUnitChanged			= @"ORLabJackChannelUnitChanged";
 NSString* ORLabJackAdcChanged					= @"ORLabJackAdcChanged";
 NSString* ORLabJackGainChanged					= @"ORLabJackGainChanged";
 NSString* ORLabJackDoNameChanged				= @"ORLabJackDoNameChanged";
@@ -48,6 +49,8 @@ NSString* ORLabJackPollTimeChanged				= @"ORLabJackPollTimeChanged";
 NSString* ORLabJackHiLimitChanged				= @"ORLabJackHiLimitChanged";
 NSString* ORLabJackLowLimitChanged				= @"ORLabJackLowLimitChanged";
 NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
+NSString* ORLabJackSlopeChanged					= @"ORLabJackSlopeChanged";
+NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 
 #define kLabJackU12DriverPath @"/System/Library/Extensions/LabJackU12.kext"
 @interface ORLabJackModel (private)
@@ -69,7 +72,10 @@ NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
 	int i;
 	for(i=0;i<8;i++){
 		lowLimit[i] = -10;
-		hiLimit[i] = 10;
+		hiLimit[i]  = 10;
+		//default to range from -10 to +10 over adc range of 0 to 4095
+		slope[i] = 20./4095.;
+		intercept[i] = -10;
 	}
 		
 	return self;	
@@ -80,6 +86,7 @@ NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	int i;
 	for(i=0;i<8;i++)	[channelName[i] release];
+	for(i=0;i<8;i++)	[channelUnit[i] release];
 	for(i=0;i<16;i++)	[ioName[i] release];
 	for(i=0;i<4;i++)	[doName[i] release];
 	[noUSBAlarm clearAlarm];
@@ -264,6 +271,48 @@ NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelAOut0Changed object:self];
 }
 
+- (float) slope:(int)i
+{
+	if(i>=0 && i<8)return slope[i];
+	else return 20./4095.;
+}
+
+- (void) setSlope:(int)i withValue:(float)aValue
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setSlope:i withValue:slope[i]];
+		
+		slope[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackSlopeChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+- (float) intercept:(int)i
+{
+	if(i>=0 && i<8)return intercept[i];
+	else return -10;
+}
+
+- (void) setIntercept:(int)i withValue:(float)aValue
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setIntercept:i withValue:intercept[i]];
+		
+		intercept[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackInterceptChanged object:self userInfo:userInfo];
+		
+	}
+}
+
 - (float) lowLimit:(int)i
 {
 	if(i>=0 && i<8)return lowLimit[i];
@@ -378,6 +427,33 @@ NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
 		
 	}
 }
+
+- (NSString*) channelUnit:(int)i
+{
+	if(i>=0 && i<8){
+		if([channelUnit[i] length])return channelUnit[i];
+		else return @"V";
+	}
+	else return @"";
+}
+
+- (void) setChannel:(int)i unit:(NSString*)aName
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setChannel:i unit:channelUnit[i]];
+		
+		[channelUnit[i] autorelease];
+		channelUnit[i] = [aName copy]; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackChannelUnitChanged object:self userInfo:userInfo];
+		
+	}
+}
+
+
 
 - (NSString*) ioName:(int)i
 {
@@ -928,7 +1004,7 @@ NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
 
 - (double) convertedValue:(int)aChan
 {
-	if(aChan>=0 && aChan<8)return 20./4095. * adc[aChan] -10;
+	if(aChan>=0 && aChan<8)return slope[aChan] * adc[aChan] + intercept[aChan];
 	else return 0;
 }
 
@@ -967,11 +1043,19 @@ NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
     [self setSerialNumber:	[decoder decodeObjectForKey:@"serialNumber"]];
 	int i;
 	for(i=0;i<8;i++) {
+		
 		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelName%d",i]];
 		if(aName)[self setChannel:i name:aName];
-		else [self setChannel:i name:[NSString stringWithFormat:@"Chan %d",i]];
+		else	 [self setChannel:i name:[NSString stringWithFormat:@"Chan %d",i]];
+		
+		NSString* aUnit = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelUnit%d",i]];
+		if(aUnit)[self setChannel:i unit:aName];
+		else	 [self setChannel:i unit:@"V"];
+		
 		[self setLowLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
 		[self setHiLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
+		[self setSlope:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"slope%d",i]]];
+		[self setIntercept:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"intercept%d",i]]];
 	}
 	
 	for(i=0;i<16;i++) {
@@ -1007,9 +1091,12 @@ NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
     [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
 	int i;
 	for(i=0;i<8;i++) {
+		[encoder encodeObject:channelUnit[i] forKey:[NSString stringWithFormat:@"unitName%d",i]];
 		[encoder encodeObject:channelName[i] forKey:[NSString stringWithFormat:@"channelName%d",i]];
 		[encoder encodeFloat:lowLimit[i] forKey:[NSString stringWithFormat:@"lowLimit%d",i]];
 		[encoder encodeFloat:hiLimit[i] forKey:[NSString stringWithFormat:@"hiLimit%d",i]];
+		[encoder encodeFloat:slope[i] forKey:[NSString stringWithFormat:@"slope%d",i]];
+		[encoder encodeFloat:intercept[i] forKey:[NSString stringWithFormat:@"intercept%d",i]];
 	}
 	
 	for(i=0;i<16;i++) {

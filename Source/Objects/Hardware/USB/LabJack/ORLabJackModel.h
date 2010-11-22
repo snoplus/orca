@@ -37,9 +37,12 @@
 	ORAlarm*  noDriverAlarm;
 	int adc[8];
 	int gain[4];
-	int lowLimit[8];
-	int hiLimit[8];
+	float lowLimit[8];
+	float hiLimit[8];
+	float slope[8];
+	float intercept[8];
 	NSString* channelName[8];   //adc names
+	NSString* channelUnit[8];   //adc names
 	unsigned long timeMeasured;
 	NSString* doName[16];		//the D connector on the side
 	NSString* ioName[4];		//on top
@@ -86,6 +89,8 @@
 - (void) setCounter:(unsigned long)aCounter;
 - (NSString*) channelName:(int)i;
 - (void) setChannel:(int)i name:(NSString*)aName;
+- (NSString*) channelUnit:(int)i;
+- (void) setChannel:(int)i unit:(NSString*)aName;
 - (NSString*) doName:(int)i;
 - (void) setDo:(int)i name:(NSString*)aName;
 - (NSString*) ioName:(int)i;
@@ -98,6 +103,10 @@
 - (void) setLowLimit:(int)i withValue:(float)aValue;
 - (float) hiLimit:(int)i;
 - (void) setHiLimit:(int)i withValue:(float)aValue;
+- (float) slope:(int)i;
+- (void) setSlope:(int)i withValue:(float)aValue;
+- (float) intercept:(int)i;
+- (void) setIntercept:(int)i withValue:(float)aValue;
 
 - (unsigned short) adcDiff;
 - (void) setAdcDiff:(unsigned short)aMask;
@@ -183,6 +192,7 @@ extern NSString* ORLabJackUSBInterfaceChanged;
 extern NSString* ORLabJackRelayChanged;
 extern NSString* ORLabJackLock;
 extern NSString* ORLabJackChannelNameChanged;
+extern NSString* ORLabJackChannelUnitChanged;
 extern NSString* ORLabJackAdcChanged;
 extern NSString* ORLabJackDoNameChanged;
 extern NSString* ORLabJackIoNameChanged;
@@ -196,7 +206,8 @@ extern NSString* ORLabJackHiLimitChanged;
 extern NSString* ORLabJackLowLimitChanged;
 extern NSString* ORLabJackAdcDiffChanged;
 extern NSString* ORLabJackGainChanged;
-
+extern NSString* ORLabJackSlopeChanged;
+extern NSString* ORLabJackInterceptChanged;
 
 @interface ORLabJackQuery : NSOperation
 {
