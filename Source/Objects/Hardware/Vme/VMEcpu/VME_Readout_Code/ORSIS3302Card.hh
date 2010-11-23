@@ -11,10 +11,11 @@ class ORSIS3302Card: public ORVVmeCard
 		virtual bool Stop();
 
 		enum EORSIS3302Consts {
-		   kNumberOfChannels	= 8,
-		   kOrcaHeaderInLongs	= 4,
-		   kHeaderSizeInLongs	= 2,
-		   kTrailerSizeInLongs	= 4
+		    kNumberOfChannels		 = 8,
+		    kOrcaHeaderInLongs		 = 4,
+			kHeaderSizeInLongsNoWrap = 2,
+			kHeaderSizeInLongsWrap	 = 4,
+		    kTrailerSizeInLongs		 = 4
 		};
 
 

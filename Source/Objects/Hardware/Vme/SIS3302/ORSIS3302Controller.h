@@ -28,6 +28,8 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet   NSTextField* firmwareVersionTextField;
+	IBOutlet NSMatrix*		bufferWrapEnabledMatrix;
 	IBOutlet NSButton*		shipTimeRecordAlsoCB;
 	IBOutlet NSButton*		mcaUseEnergyCalculationButton;
 	IBOutlet NSTextField*	mcaEnergyOffsetField;
@@ -65,7 +67,8 @@
 	IBOutlet NSPopUpButton* lemoOutModePU;
 	IBOutlet NSTextField*	lemoOutAssignmentsField;
 	IBOutlet NSTextField*	runSummaryField;
-	
+	IBOutlet NSTextField*   wrapOrStartIndexField;
+
 	//base address
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
@@ -102,6 +105,15 @@
 	IBOutlet NSPopUpButton*	energyDecimation2;
 	IBOutlet NSPopUpButton*	energyDecimation3;
 	
+	IBOutlet NSPopUpButton* cfdControl0;
+	IBOutlet NSPopUpButton* cfdControl1;
+	IBOutlet NSPopUpButton* cfdControl2;
+	IBOutlet NSPopUpButton* cfdControl3;
+	IBOutlet NSPopUpButton* cfdControl4;
+	IBOutlet NSPopUpButton* cfdControl5;
+	IBOutlet NSPopUpButton* cfdControl6;
+	IBOutlet NSPopUpButton* cfdControl7;
+	
     IBOutlet NSTextField*	mcaBusyField;
 	
     IBOutlet NSTextField*   mcaScanHistogramCounterField;
@@ -123,7 +135,7 @@
     IBOutlet NSButton*      totalRateLogCB;
     IBOutlet ORPlotView*    timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
-	
+		
     NSView *blankView;
     NSSize settingSize;
     NSSize rateSize;
@@ -134,6 +146,9 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) firmwareVersionChanged:(NSNotification*)aNote;
+- (void) bufferWrapEnabledChanged:(NSNotification*)aNote;
+- (void) cfdControlChanged:(NSNotification*)aNote;
 - (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote;
 - (void) mcaEnergyCalculationValues;
 - (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote;
@@ -202,6 +217,8 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) bufferWrapEnabledAction:(id)sender;
+- (IBAction) cfdControlAction:(id)sender;
 - (IBAction) shipTimeRecordAlsoAction:(id)sender;
 - (IBAction) mcaUseEnergyCalculationAction:(id)sender;
 - (IBAction) mcaEnergyOffsetAction:(id)sender;

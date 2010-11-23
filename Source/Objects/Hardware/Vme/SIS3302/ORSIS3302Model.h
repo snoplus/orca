@@ -54,7 +54,9 @@
 	short			adc50KTriggerEnabledMask;
 	short			gtMask;
 	bool			waitForBankSwitch;
+    short			bufferWrapEnabledMask;
 	
+	NSMutableArray*	cfdControls;
 	NSMutableArray* thresholds;
     NSMutableArray* dacOffsets;
 	NSMutableArray* gateLengths;
@@ -76,8 +78,8 @@
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3302Channels];
 
-	//cach to speed takedata
 	unsigned long location;
+	short wrapMaskForRun;
 	id theController;
 	int currentBank;
 	long count;
@@ -120,6 +122,7 @@
     int				mcaEnergyOffset;
     BOOL			mcaUseEnergyCalculation;
     BOOL			shipTimeRecordAlso;
+    float firmwareVersion;
 }
 
 - (id) init;
@@ -128,6 +131,8 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (float) firmwareVersion;
+- (void) setFirmwareVersion:(float)aFirmwareVersion;
 - (BOOL) shipTimeRecordAlso;
 - (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso;
 - (BOOL) mcaUseEnergyCalculation;
@@ -193,6 +198,7 @@
 - (unsigned long) getEnergyTauFactorOffset:(int) channel;
 - (unsigned long) getEnergySetupGPOffset:(int)group;
 - (unsigned long) getPreTriggerDelayTriggerGateLengthOffset:(int) aGroup; 
+- (unsigned long) getBufferControlOffset:(int) aGroup; 
 
 - (int) energyGateLength:(short)aGroup;
 - (void) setEnergyGateLength:(short)aGroup withValue:(int)aEnergyGateLength;
@@ -219,6 +225,11 @@
 
 - (int) clockSource;
 - (void) setClockSource:(int)aClockSource;
+
+- (short) bufferWrapEnabledMask;
+- (void) setBufferWrapEnabledMask:(short)aMask;
+- (BOOL) bufferWrapEnabled:(short)chan;
+- (void) setBufferWrapEnabled:(short)chan withValue:(BOOL)aValue;
 
 - (short) internalTriggerEnabledMask;
 - (void) setInternalTriggerEnabledMask:(short)aMask;
@@ -276,6 +287,8 @@
 - (void) setTriggerDecimation:(short)aGroup withValue:(short)aValue;
 - (short) energyDecimation:(short)aGroup;
 - (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue;
+- (short) cfdControl:(short)aChannel;
+- (void) setCfdControl:(short)aChannel withValue:(short)aValue;
 
 - (int) threshold:(short)chan;
 - (void) setThreshold:(short)chan withValue:(int)aValue;
@@ -322,6 +335,7 @@
 - (void) writeEnergyTauFactor;
 - (void) writeEnergySampleLength;
 - (void) writeEnergySampleStartIndexes;
+- (void) writeBufferControl;
 
 - (void) disarmSampleLogic;
 - (void) clearTimeStamp;
@@ -387,6 +401,9 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelFirmwareVersionChanged;
+extern NSString* ORSIS3302ModelBufferWrapEnabledChanged;
+extern NSString* ORSIS3302ModelCfdControlChanged;
 extern NSString* ORSIS3302ModelShipTimeRecordAlsoChanged;
 extern NSString* ORSIS3302ModelMcaUseEnergyCalculationChanged;
 extern NSString* ORSIS3302ModelMcaEnergyOffsetChanged;

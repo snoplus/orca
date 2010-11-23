@@ -134,7 +134,15 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 		// Put the data into the data stream
 		size_t numberLongsInRawData	   = GetDeviceSpecificData()[channel/2];
 		size_t numberLongsInEnergyData = GetDeviceSpecificData()[4];
-		size_t sizeOfRecord			   = kHeaderSizeInLongs	   + 
+		size_t bufferWrapMask		   = GetDeviceSpecificData()[5];
+		
+		//the header size changes if the wrap mode is selected for a group
+		size_t sisHeaderSize;
+		bool bufferWrap = (bufferWrapMask & (1L<<channel/2) != 0);
+		if(bufferWrap) sisHeaderSize = kHeaderSizeInLongsWrap;
+		else		   sisHeaderSize = kHeaderSizeInLongsNoWrap;
+
+		size_t sizeOfRecord			   = sisHeaderSize		   + 
 									     kTrailerSizeInLongs   + 
 									     numberLongsInRawData  + 
 									     numberLongsInEnergyData;
@@ -147,7 +155,8 @@ bool ORSIS3302Card::ReadOutChannel(size_t channel)
 			data[dataIndex++] = GetHardwareMask()[0] | (sizeOfRecord+4); 
 			data[dataIndex++] = ((GetCrate() & 0x0000000f)<<21) | 
 								((GetSlot()  & 0x0000001f)<<16) | 
-								((channel & 0x000000ff)<<8);
+								((channel & 0x000000ff)<<8) |
+								bufferWrap;
 			data[dataIndex++] = numberLongsInRawData;
 			data[dataIndex++] = numberLongsInEnergyData;
 			

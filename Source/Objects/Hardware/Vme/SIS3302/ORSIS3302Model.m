@@ -30,6 +30,9 @@
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
 
+NSString* ORSIS3302ModelFirmwareVersionChanged = @"ORSIS3302ModelFirmwareVersionChanged";
+NSString* ORSIS3302ModelBufferWrapEnabledChanged		= @"ORSIS3302ModelBufferWrapEnabledChanged";
+NSString* ORSIS3302ModelCfdControlChanged				= @"ORSIS3302ModelCfdControlChanged";
 NSString* ORSIS3302ModelShipTimeRecordAlsoChanged		= @"ORSIS3302ModelShipTimeRecordAlsoChanged";
 NSString* ORSIS3302ModelMcaUseEnergyCalculationChanged  = @"ORSIS3302ModelMcaUseEnergyCalculationChanged";
 NSString* ORSIS3302ModelMcaEnergyOffsetChanged			= @"ORSIS3302ModelMcaEnergyOffsetChanged";
@@ -110,7 +113,7 @@ typedef struct {
 	NSString* name;
 } SIS3302GammaRegisterInformation;
 
-#define kNumSIS3302ReadRegs 173
+#define kNumSIS3302ReadRegs 177
 
 static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs] = {
 	{0x00000000,  @"Control/Status"},                         
@@ -135,7 +138,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x02000000,  @"Event configuration (ADC1, ADC2)"},    
 	{0x02000004,  @"End Address Threshold (ADC1, ADC2)"},    
 	{0x02000008,  @"Pretrigger Delay and Trigger Gate Length (ADC1, ADC2)"},    
-	{0x0200000C,  @"Raw Data Buffer Configuration (ADC1, ADC2)"},    
+	{0x0200000C,  @"Raw Data Buffer Configuration (ADC1, ADC2)"},   //function changed with v15xx 
 	{0x02000010,  @"Actual Sample address ADC1"},    
 	{0x02000014,  @"Actual Next Sample address ADC2"},    
 	{0x02000018,  @"Pretrigger Delay and Trigger Gate Length (ADC1, ADC2)"},    
@@ -143,10 +146,11 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x02000020,  @"Actual Sample Value (ADC1, ADC2)"},    
 	{0x02000024,  @"internal Test"},    
 	{0x02000028,  @"DDR2 Memory Logic Verification (ADC1, ADC2)"},    
+	{0x0200002C,  @"Raw Buffer Wrap Mode (ADC1, ADC2)"},	//new with v15xx
 	{0x02000030,  @"Trigger Setup ADC1"},    
-	{0x02000034,  @"Trigger Threshold ADC1"},    
+	{0x02000034,  @"Trigger Threshold ADC1"},    //function changed with v15xx
 	{0x02000038,  @"Trigger Setup ADC2"},    
-	{0x0200003C,  @"Trigger Threshold ADC2"},    
+	{0x0200003C,  @"Trigger Threshold ADC2"},   //function changed with v15xx 
 	{0x02000040,  @"Energy Setup GP (ADC1, ADC2)"},    
 	{0x02000044,  @"Energy Gate Length (ADC1, ADC2)"},    
 	{0x02000048,  @"Energy Sample Length (ADC1, ADC2)"},    
@@ -176,7 +180,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x02800000,  @"Event configuration (ADC3, ADC4)"},    
 	{0x02800004,  @"End Address Threshold (ADC13, ADC4)"},    
 	{0x02800008,  @"Pretrigger Delay and Trigger Gate Length (ADC3, ADC4)"},    
-	{0x0280000C,  @"Raw Data Buffer Configuration (ADC3, ADC4)"},    
+	{0x0280000C,  @"Raw Data Buffer Configuration (ADC3, ADC4)"},  //function changed with v15xx  
 	{0x02800010,  @"Actual Sample address ADC3"},    
 	{0x02800014,  @"Actual Next Sample address ADC4"},    
 	{0x02800018,  @"Pretrigger Delay and Trigger Gate Length (ADC3, ADC4)"},    
@@ -184,10 +188,11 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x02800020,  @"Actual Sample Value (ADC3, ADC4)"},    
 	{0x02800024,  @"internal Test"},    
 	{0x02800028,  @"DDR2 Memory Logic Verification (ADC3, ADC4)"},    
+	{0x0200003C,  @"Raw Buffer Wrap Mode (ADC3, ADC4)" },		//new with v15xx
 	{0x02800030,  @"Trigger Setup ADC3"},    
-	{0x02800034,  @"Trigger Threshold ADC3"},    
+	{0x02800034,  @"Trigger Threshold ADC3"},    //function changed with v15xx
 	{0x02800038,  @"Trigger Setup ADC4"},    
-	{0x0280003C,  @"Trigger Threshold ADC4"},    
+	{0x0280003C,  @"Trigger Threshold ADC4"},    //function changed with v15xx
 	{0x02800040,  @"Energy Setup GP (ADC3, ADC4)"},    
 	{0x02800044,  @"Energy Gate Length (ADC3, ADC4)"},    
 	{0x02800048,  @"Energy Sample Length (ADC3, ADC4)"},    
@@ -214,86 +219,88 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x028000A4,  @"Trigger Extended Threshold ADC4"},    
 	
 	//group 3
-	{0x3000000,  @"Event configuration (ADC5, ADC6)"},    
-	{0x3000004,  @"End Address Threshold (ADC5, ADC6)"},    
-	{0x3000008,  @"Pretrigger Delay and Trigger Gate Length (ADC5, ADC6)"},    
-	{0x300000C,  @"Raw Data Buffer Configuration (ADC5, ADC6)"},    
-	{0x3000010,  @"Actual Sample address ADC5"},    
-	{0x3000014,  @"Actual Next Sample address ADC6"},    
-	{0x3000018,  @"Pretrigger Delay and Trigger Gate Length (ADC5, ADC6)"},    
-	{0x300001C,  @"Previous Bank Sample address ADC6"},    
-	{0x3000020,  @"Actual Sample Value (ADC5, ADC6)"},    
-	{0x3000024,  @"internal Test"},    
-	{0x3000028,  @"DDR2 Memory Logic Verification (ADC5, ADC6)"},    
-	{0x3000030,  @"Trigger Setup ADC5"},    
-	{0x3000034,  @"Trigger Threshold ADC5"},    
-	{0x3000038,  @"Trigger Setup ADC6"},    
-	{0x300003C,  @"Trigger Threshold ADC6"},    
-	{0x3000040,  @"Energy Setup GP (ADC5, ADC6)"},    
-	{0x3000044,  @"Energy Gate Length (ADC5, ADC6)"},    
-	{0x3000048,  @"Energy Sample Length (ADC5, ADC6)"},    
-	{0x300004C,  @"Energy Sample Start Index1 (ADC5, ADC6)"},    
-	{0x3000050,  @"Energy Sample Start Index2 (ADC5, ADC6)"},    
-	{0x3000054,  @"Energy Sample Start Index3 (ADC5, ADC6)"},    
-	{0x3000058,  @"Energy Tau Factor ADC5"},    
-	{0x300005C,  @"Energy Tau Factor ADC6"},    
-	{0x3000060,  @"MCA Energy to Histogram Calculation Parameter ADC5"},    
-	{0x3000064,  @"MCA Energy to Histogram Calculation Parameter ADC6"},    
-	{0x3000068,  @"MCA Histogram Parameters (ADC5, ADC6)"},   
-	{0x3000070,  @"Event Extended configuration (ADC5, ADC6)"},    
-	{0x3000078,  @"Trigger Extended Setup ADC5"},    
-	{0x300007C,  @"Trigger Extended Setup ADC6"},    
-	{0x3000080,  @"MCA Trigger Start Counter ADC5"},    
-	{0x3000084,  @"MCA Pileup Counter ADC5"},    
-	{0x3000088,  @"MCA 'Energy to high' counter ADC5"},    
-	{0x300008C,  @"MCA 'Energy to low' counter ADC5"},    
-	{0x3000090,  @"MCA Trigger Start Counter ADC6"},    
-	{0x3000094,  @"MCA Pileup Counter ADC6"},    
-	{0x3000098,  @"MCA 'Energy to high' counter ADC6"},    
-	{0x300009C,  @"MCA 'Energy to low' counter ADC6"},    
-	{0x30000A0,  @"Trigger Extended Threshold ADC5"},    
-	{0x30000A4,  @"Trigger Extended Threshold ADC6"},    
+	{0x03000000,  @"Event configuration (ADC5, ADC6)"},    
+	{0x03000004,  @"End Address Threshold (ADC5, ADC6)"},    
+	{0x03000008,  @"Pretrigger Delay and Trigger Gate Length (ADC5, ADC6)"},    
+	{0x0300000C,  @"Raw Data Buffer Configuration (ADC5, ADC6)"},   //function changed with v15xx 
+	{0x03000010,  @"Actual Sample address ADC5"},    
+	{0x03000014,  @"Actual Next Sample address ADC6"},    
+	{0x03000018,  @"Pretrigger Delay and Trigger Gate Length (ADC5, ADC6)"},    
+	{0x0300001C,  @"Previous Bank Sample address ADC6"},    
+	{0x03000020,  @"Actual Sample Value (ADC5, ADC6)"},    
+	{0x03000024,  @"internal Test"},    
+	{0x03000028,  @"DDR2 Memory Logic Verification (ADC5, ADC6)"},    
+	{0x0300002C,  @"Raw Buffer Wrap Mode (ADC5, ADC6)"},	//new with v15xx
+	{0x03000030,  @"Trigger Setup ADC5"},    
+	{0x03000034,  @"Trigger Threshold ADC5"},    //function changed with v15xx
+	{0x03000038,  @"Trigger Setup ADC6"},    
+	{0x0300003C,  @"Trigger Threshold ADC6"},    //function changed with v15xx
+	{0x03000040,  @"Energy Setup GP (ADC5, ADC6)"},    
+	{0x03000044,  @"Energy Gate Length (ADC5, ADC6)"},    
+	{0x03000048,  @"Energy Sample Length (ADC5, ADC6)"},    
+	{0x0300004C,  @"Energy Sample Start Index1 (ADC5, ADC6)"},    
+	{0x03000050,  @"Energy Sample Start Index2 (ADC5, ADC6)"},    
+	{0x03000054,  @"Energy Sample Start Index3 (ADC5, ADC6)"},    
+	{0x03000058,  @"Energy Tau Factor ADC5"},    
+	{0x0300005C,  @"Energy Tau Factor ADC6"},    
+	{0x03000060,  @"MCA Energy to Histogram Calculation Parameter ADC5"},    
+	{0x03000064,  @"MCA Energy to Histogram Calculation Parameter ADC6"},    
+	{0x03000068,  @"MCA Histogram Parameters (ADC5, ADC6)"},   
+	{0x03000070,  @"Event Extended configuration (ADC5, ADC6)"},    
+	{0x03000078,  @"Trigger Extended Setup ADC5"},    
+	{0x0300007C,  @"Trigger Extended Setup ADC6"},    
+	{0x03000080,  @"MCA Trigger Start Counter ADC5"},    
+	{0x03000084,  @"MCA Pileup Counter ADC5"},    
+	{0x03000088,  @"MCA 'Energy to high' counter ADC5"},    
+	{0x0300008C,  @"MCA 'Energy to low' counter ADC5"},    
+	{0x03000090,  @"MCA Trigger Start Counter ADC6"},    
+	{0x03000094,  @"MCA Pileup Counter ADC6"},    
+	{0x03000098,  @"MCA 'Energy to high' counter ADC6"},    
+	{0x0300009C,  @"MCA 'Energy to low' counter ADC6"},    
+	{0x030000A0,  @"Trigger Extended Threshold ADC5"},    
+	{0x030000A4,  @"Trigger Extended Threshold ADC6"},    
 	
 	//group 4
-	{0x3800000,  @"Event configuration (ADC7, ADC8)"},    
-	{0x3800004,  @"End Address Threshold (ADC7, ADC8)"},    
-	{0x3800008,  @"Pretrigger Delay and Trigger Gate Length (ADC7, ADC8)"},    
-	{0x380000C,  @"Raw Data Buffer Configuration (ADC7, ADC8)"},    
-	{0x3800010,  @"Actual Sample address ADC7"},    
-	{0x3800014,  @"Actual Next Sample address ADC8"},    
-	{0x3800018,  @"Pretrigger Delay and Trigger Gate Length (ADC7, ADC8)"},    
-	{0x380001C,  @"Previous Bank Sample address ADC8"},    
-	{0x3800020,  @"Actual Sample Value (ADC7, ADC8)"},    
-	{0x3800024,  @"internal Test"},    
-	{0x3800028,  @"DDR2 Memory Logic Verification (ADC7, ADC8)"},    
-	{0x3800030,  @"Trigger Setup ADC7"},    
-	{0x3800034,  @"Trigger Threshold ADC7"},    
-	{0x3800038,  @"Trigger Setup ADC8"},    
-	{0x380003C,  @"Trigger Threshold ADC8"},    
-	{0x3800040,  @"Energy Setup GP (ADC7, ADC8)"},    
-	{0x3800044,  @"Energy Gate Length (ADC7, ADC8)"},    
-	{0x3800048,  @"Energy Sample Length (ADC7, ADC8)"},    
-	{0x380004C,  @"Energy Sample Start Index1 (ADC7, ADC8)"},    
-	{0x3800050,  @"Energy Sample Start Index2 (ADC7, ADC8)"},    
-	{0x3800054,  @"Energy Sample Start Index3 (ADC7, ADC8)"},    
-	{0x3800058,  @"Energy Tau Factor ADC7"},    
-	{0x380005C,  @"Energy Tau Factor ADC8"},    
-	{0x3800060,  @"MCA Energy to Histogram Calculation Parameter ADC7"},    
-	{0x3800064,  @"MCA Energy to Histogram Calculation Parameter ADC8"},    
-	{0x3800068,  @"MCA Histogram Parameters (ADC7, ADC8)"},   
-	{0x3800070,  @"Event Extended configuration (ADC7, ADC8)"},    
-	{0x3800078,  @"Trigger Extended Setup ADC7"},    
-	{0x380007C,  @"Trigger Extended Setup ADC8"},    
-	{0x3800080,  @"MCA Trigger Start Counter ADC7"},    
-	{0x3800084,  @"MCA Pileup Counter ADC7"},    
-	{0x3800088,  @"MCA 'Energy to high' counter ADC7"},    
-	{0x380008C,  @"MCA 'Energy to low' counter ADC7"},    
-	{0x3800090,  @"MCA Trigger Start Counter ADC8"},    
-	{0x3800094,  @"MCA Pileup Counter ADC8"},    
-	{0x3800098,  @"MCA 'Energy to high' counter ADC8"},    
-	{0x380009C,  @"MCA 'Energy to low' counter ADC8"},    
-	{0x38000A0,  @"Trigger Extended Threshold ADC7"},    
-	{0x38000A4,  @"Trigger Extended Threshold ADC8"}
+	{0x03800000,  @"Event configuration (ADC7, ADC8)"},    
+	{0x03800004,  @"End Address Threshold (ADC7, ADC8)"},    
+	{0x03800008,  @"Pretrigger Delay and Trigger Gate Length (ADC7, ADC8)"},    
+	{0x0380000C,  @"Raw Data Buffer Configuration (ADC7, ADC8)"},    //function changed with v15xx
+	{0x03800010,  @"Actual Sample address ADC7"},    
+	{0x03800014,  @"Actual Next Sample address ADC8"},    
+	{0x03800018,  @"Pretrigger Delay and Trigger Gate Length (ADC7, ADC8)"},    
+	{0x0380001C,  @"Previous Bank Sample address ADC8"},    
+	{0x03800020,  @"Actual Sample Value (ADC7, ADC8)"},    
+	{0x03800024,  @"internal Test"},    
+	{0x03800028,  @"DDR2 Memory Logic Verification (ADC7, ADC8)"},    
+	{0x0380002C,  @"Raw Buffer Wrap Mode (ADC7, ADC8)"},	//new with v15xx
+	{0x03800030,  @"Trigger Setup ADC7"},    
+	{0x03800034,  @"Trigger Threshold ADC7"},    //function changed with v15xx
+	{0x03800038,  @"Trigger Setup ADC8"},    
+	{0x0380003C,  @"Trigger Threshold ADC8"},    //function changed with v15xx
+	{0x03800040,  @"Energy Setup GP (ADC7, ADC8)"},    
+	{0x03800044,  @"Energy Gate Length (ADC7, ADC8)"},    
+	{0x03800048,  @"Energy Sample Length (ADC7, ADC8)"},    
+	{0x0380004C,  @"Energy Sample Start Index1 (ADC7, ADC8)"},    
+	{0x03800050,  @"Energy Sample Start Index2 (ADC7, ADC8)"},    
+	{0x03800054,  @"Energy Sample Start Index3 (ADC7, ADC8)"},    
+	{0x03800058,  @"Energy Tau Factor ADC7"},    
+	{0x0380005C,  @"Energy Tau Factor ADC8"},    
+	{0x03800060,  @"MCA Energy to Histogram Calculation Parameter ADC7"},    
+	{0x03800064,  @"MCA Energy to Histogram Calculation Parameter ADC8"},    
+	{0x03800068,  @"MCA Histogram Parameters (ADC7, ADC8)"},   
+	{0x03800070,  @"Event Extended configuration (ADC7, ADC8)"},    
+	{0x03800078,  @"Trigger Extended Setup ADC7"},    
+	{0x0380007C,  @"Trigger Extended Setup ADC8"},    
+	{0x03800080,  @"MCA Trigger Start Counter ADC7"},    
+	{0x03800084,  @"MCA Pileup Counter ADC7"},    
+	{0x03800088,  @"MCA 'Energy to high' counter ADC7"},    
+	{0x0380008C,  @"MCA 'Energy to low' counter ADC7"},    
+	{0x03800090,  @"MCA Trigger Start Counter ADC8"},    
+	{0x03800094,  @"MCA Pileup Counter ADC8"},    
+	{0x03800098,  @"MCA 'Energy to high' counter ADC8"},    
+	{0x0380009C,  @"MCA 'Energy to low' counter ADC8"},    
+	{0x038000A0,  @"Trigger Extended Threshold ADC7"},    
+	{0x038000A4,  @"Trigger Extended Threshold ADC8"}
 };
 
 #pragma mark ***Initialization
@@ -345,6 +352,20 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 }
 
 #pragma mark ***Accessors
+
+- (float) firmwareVersion
+{
+    return firmwareVersion;
+}
+
+- (void) setFirmwareVersion:(float)aFirmwareVersion
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFirmwareVersion:firmwareVersion];
+    
+    firmwareVersion = aFirmwareVersion;
+	if(firmwareVersion >= 15.0  && runMode == kMcaRunMode)[self setRunMode:kEnergyRunMode];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelFirmwareVersionChanged object:self];
+}
 
 - (BOOL) shipTimeRecordAlso
 {
@@ -589,6 +610,14 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
 	if(aGroup>=4)return; 
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGateLength:aGroup withValue:[self energyGateLength:aGroup]];
+	
+	if([self bufferWrapEnabled:aGroup]){
+		unsigned long checkValue = [self sampleLength:aGroup] - [self sampleStartIndex:aGroup];
+		unsigned long maxValue = firmwareVersion>=15?255:63;
+		if(aEnergyGateLength < checkValue)	aEnergyGateLength = checkValue;
+		if(aEnergyGateLength > maxValue)	aEnergyGateLength = maxValue;
+	}
+	
 	[energyGateLengths replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aEnergyGateLength]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergyGateLengthChanged object:self];
 }
@@ -728,6 +757,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self setExternalGateEnabledMask:0x00];
 	[self setExtendedThresholdEnabledMask:0x00];
 	
+	[self setBufferWrapEnabledMask:0x0];
 	[self setInternalTriggerEnabledMask:0xff];
 	[self setExternalTriggerEnabledMask:0x0];
 	
@@ -741,7 +771,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) setClockSource:(int)aClockSource
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setClockSource:clockSource];
-    clockSource = aClockSource;
+    clockSource = [self limitIntValue:aClockSource min:0 max:7];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ClockSourceChanged object:self];
 }
 
@@ -791,6 +821,22 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	else return 0;
 }
 
+- (short) bufferWrapEnabledMask { return bufferWrapEnabledMask; }
+- (void) setBufferWrapEnabledMask:(short)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setBufferWrapEnabledMask:bufferWrapEnabledMask];
+	bufferWrapEnabledMask = aMask;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelBufferWrapEnabledChanged object:self];
+}
+
+- (BOOL) bufferWrapEnabled:(short)chan { return bufferWrapEnabledMask & (1<<chan); }
+- (void) setBufferWrapEnabled:(short)chan withValue:(BOOL)aValue
+{
+	unsigned char aMask = bufferWrapEnabledMask;
+	if(aValue)aMask |= (1<<chan);
+	else aMask &= ~(1<<chan);
+	[self setBufferWrapEnabledMask:aMask];
+}
 
 - (short) internalTriggerEnabledMask { return internalTriggerEnabledMask; }
 - (void) setInternalTriggerEnabledMask:(short)aMask
@@ -1066,10 +1112,25 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (short) internalTriggerDelay:(short)aChan { return [[internalTriggerDelays objectAtIndex:aChan] shortValue]; }
 - (void) setInternalTriggerDelay:(short)aChan withValue:(short)aValue 
 { 
-	aValue = [self limitIntValue:aValue min:0 max:0x1f];
+	aValue = [self limitIntValue:aValue min:0 max:firmwareVersion<15?63:255];
     [[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerDelay:aChan withValue:[self internalTriggerDelay:aChan]];
     [internalTriggerDelays replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalTriggerDelayChanged object:self];
+}
+
+
+- (short) cfdControl:(short)aChannel 
+{ 
+	if(aChannel>=8)return 0; 
+	return [[cfdControls objectAtIndex:aChannel] intValue]; 
+}
+- (void) setCfdControl:(short)aChannel withValue:(short)aValue 
+{ 
+ 	if(aChannel>=8)return; 
+	[[[self undoManager] prepareWithInvocationTarget:self] setCfdControl:aChannel withValue:[self cfdControl:aChannel]];
+    int cfd = [self limitIntValue:aValue min:0 max:0x3];
+	[cfdControls replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:cfd]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelCfdControlChanged object:self];
 }
 
 - (short) energyDecimation:(short)aGroup 
@@ -1226,8 +1287,12 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	unsigned long moduleID = result >> 16;
 	unsigned short majorRev = (result >> 8) & 0xff;
 	unsigned short minorRev = result & 0xff;
-	if(verbose)NSLog(@"SIS3302 ID: %x  Firmware:%x.%x\n",moduleID,majorRev,minorRev);
-	
+	NSString* s = [NSString stringWithFormat:@"%x.%x",majorRev,minorRev];
+	[self setFirmwareVersion:[s floatValue]];
+	if(verbose){
+		NSLog(@"SIS3302 ID: %x  Firmware:%.2f\n",moduleID,firmwareVersion);
+		if(moduleID != 3302)NSLogColor([NSColor redColor], @"Warning: HW mismatch. 3302 object is %d HW\n",moduleID);
+	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302IDChanged object:self];
 }
 
@@ -1304,9 +1369,16 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		thresholdMask = 0;
 		BOOL enabled   = [self triggerOutEnabled:i];
 		BOOL gtEnabled = [self gt:i];
-		if(!enabled)	thresholdMask |= (1<<26); //logic is inverted on the hw
-		if(gtEnabled)	thresholdMask |= (1<<25);
-		if([self extendedThresholdEnabled:i])	thresholdMask |= (1<<23);
+		if(!enabled)						  thresholdMask |= (1<<26); //logic is inverted on the hw
+		if(gtEnabled)						  thresholdMask |= (1<<25);
+		if([self extendedThresholdEnabled:i]) thresholdMask |= (1<<23);
+		
+		//------------------------------------------------
+		//only firmware version >= 15xx
+		if([self cfdControl:i] == 0)      thresholdMask |= (0x0 & 0x3) << 20;
+		else if([self cfdControl:i] == 1) thresholdMask |= (0x2 & 0x3) << 20;
+		else if([self cfdControl:i] == 2) thresholdMask |= (0x3 & 0x3) << 20;
+		//------------------------------------------------
 		
 		thresholdMask |= ([self threshold:i] & 0xffff)+ 0x10000;
 		
@@ -1385,6 +1457,19 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 							withAddMod:[self addressModifier]
 						usingAddSpace:0x01];
 	}	
+}
+- (void) writeBufferControl
+{
+	int i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		unsigned long aValueMask = 0;
+		if(bufferWrapEnabledMask & (1<<i))aValueMask = 0x80000000;
+		[[self adapter] writeLongBlock:&aValueMask
+							 atAddress:[self baseAddress] + [self getBufferControlOffset:i]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
 }
 
 - (void) writeEnergyGP
@@ -1521,6 +1606,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	for(group=0;group<4;group++){
 		unsigned long sampleLength	   = [self sampleLength:group];
 		unsigned long sampleStartIndex = [self sampleStartIndex:group];
+		
+		
 		unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
 	
 		[[self adapter] writeLongBlock:&aValueMask
@@ -1963,6 +2050,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 - (void) initBoard
 {  
+	[self readModuleID:NO];
 	[self writeEventConfiguration];
 	[self writeEndAddressThreshold];
 	[self writePreTriggerDelayAndTriggerGateDelay];
@@ -1976,6 +2064,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self writeThresholds];
 	[self writeDacOffsets];
 	[self resetSamplingLogic];
+	[self writeBufferControl];
 	
 	if(runMode == kMcaRunMode){
 		[self writeHistogramParams];
@@ -2027,6 +2116,17 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
         case 5: return kSIS3302EnergyTauFactorAdc6;
         case 6: return kSIS3302EnergyTauFactorAdc7;
         case 7: return kSIS3302EnergyTauFactorAdc8;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getBufferControlOffset:(int) aGroup 
+{
+    switch (aGroup) {
+        case 0: return kSIS3302BufferControlModeAdc12;
+        case 1: return kSIS3302BufferControlModeAdc34;
+        case 2: return kSIS3302BufferControlModeAdc56;
+        case 3: return kSIS3302BufferControlModeAdc78;
     }
     return (unsigned long)-1;
 }
@@ -2087,9 +2187,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     }
     return (unsigned long) -1;
 }
-
-
-
 
 - (unsigned long) getTriggerSetupRegOffsets:(int) channel 
 {
@@ -2393,6 +2490,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [a addObject:p];
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Buffer Wrap Enable"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setBufferWrapEnabled:withValue:) getMethod:@selector(bufferWrapEnabled:)];
+    [a addObject:p];
+	
+	
+	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Internal Trigger Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setInternalTriggerEnabled:withValue:) getMethod:@selector(internalTriggerEnabled:)];
@@ -2436,7 +2540,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
- 
+	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"CFD"];
+    [p setFormat:@"##0" upperLimit:0x2 lowerLimit:0 stepSize:1 units:@"Index"];
+    [p setSetMethod:@selector(setCfdControl:withValue:) getMethod:@selector(cfdControl:)];
+    [a addObject:p];
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gate Length"];
     [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:@""];
@@ -2469,7 +2579,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"InternalTriggerDelay"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:(firmwareVersion<15?63:255) lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setInternalTriggerDelay:withValue:) getMethod:@selector(internalTriggerDelay:)];
     [a addObject:p];
 
@@ -2556,6 +2666,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
 	if([param isEqualToString:@"Threshold"])						return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+	else if([param isEqualToString:@"CFD"])							return [[cardDictionary objectForKey:@"cfdControls"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"GateLength"])					return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"PulseLength"])					return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"SumG"])						return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
@@ -2570,6 +2681,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     else if([param isEqualToString:@"GT"])							return [cardDictionary objectForKey:@"gtMask"];
     else if([param isEqualToString:@"ADC50K Trigger"])				return [cardDictionary objectForKey:@"adc50KtriggerEnabledMask"];
     else if([param isEqualToString:@"Input Inverted"])				return [cardDictionary objectForKey:@"inputInvertedMask"];
+    else if([param isEqualToString:@"Buffer Wrap Enabled"])			return [cardDictionary objectForKey:@"bufferWrapEnabledMask"];
     else if([param isEqualToString:@"Internal Trigger Enabled"])	return [cardDictionary objectForKey:@"internalTriggerEnabledMask"];
     else if([param isEqualToString:@"External Trigger Enabled"])	return [cardDictionary objectForKey:@"externalTriggerEnabledMask"];
     else if([param isEqualToString:@"Internal Gate Enabled"])		return [cardDictionary objectForKey:@"internalGateEnabledMask"];
@@ -2589,6 +2701,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	else return nil;
 }
 
+#pragma mark •••DataTaking
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     if(![[self adapter] controllerCard]){
@@ -2613,7 +2726,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	currentBank = 0;
 	isRunning	= NO;
 	count=0;
-	
+	wrapMaskForRun = bufferWrapEnabledMask;
     [self startRates];
 	
 	int group;
@@ -2628,10 +2741,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 }
 
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card
-//**************************************************************************************
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	//reading events from the mac is very, very slow. If the buffer is filling up, it can take a long time to readout all events.
@@ -2644,7 +2753,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 			if(firstTime){
 				int group;
 				for(group=0;group<4;group++){
-					dataRecordlength[group] = 4+2+[self sampleLength:group]/2+energySampleLength+4; //Orca header+sisheader+samples+energy+sistrailer
+					long sisHeaderLength = 2;
+					if(wrapMaskForRun & (1L<<group))	sisHeaderLength = 4;
+					dataRecordlength[group] = 4+sisHeaderLength+[self sampleLength:group]/2+energySampleLength+4; //Orca header+sisheader+samples+energy+sistrailer
 					dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(long));
 				}
 				isRunning = YES;
@@ -2688,18 +2799,17 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 									
 					if (endSampleAddress[channel] != 0) {
 						unsigned long addrOffset = 0;
-						int group = channel/2;
-						int eventCount = 0;
+						int group				 = channel/2;
+						int eventCount			 = 0;
 						do {
 							if(!isRunning) return;
-
-							BOOL goodRecord = NO;
-
+							BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
 							int index = 0;
 							dataRecord[group][index++] =   dataId | dataRecordlength[group];
 							dataRecord[group][index++] =   (([self crateNumber]&0x0000000f)<<21) | 
 														   (([self slot] & 0x0000001f)<<16)      |
-														   ((channel & 0x000000ff)<<8);
+														   ((channel & 0x000000ff)<<8)			 |
+															wrapMode;
 							dataRecord[group][index++] = [self sampleLength:group]/2;
 							dataRecord[group][index++] = energySampleLength;
 							unsigned long* p = &dataRecord[group][index];
@@ -2711,7 +2821,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 							if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
 								[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
-								goodRecord = YES;
 							}
 															
 							addrOffset += (dataRecordlength[group]-4)*4;
@@ -2821,6 +2930,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		configStruct->card_info[index].deviceSpecificData[2]	= [self sampleLength:2]/2;
 		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
 		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
+		configStruct->card_info[index].deviceSpecificData[5]	= [self bufferWrapEnabledMask];
 		
 		configStruct->card_info[index].num_Trigger_Indexes		= 0;
 		
@@ -2883,6 +2993,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
+    [self setFirmwareVersion:[decoder decodeFloatForKey:@"firmwareVersion"]];
     [self setShipTimeRecordAlso:		[decoder decodeBoolForKey:@"shipTimeRecordAlso"]];
     [self setMcaUseEnergyCalculation:	[decoder decodeBoolForKey:@"mcaUseEnergyCalculation"]];
     [self setMcaEnergyOffset:			[decoder decodeIntForKey:@"mcaEnergyOffset"]];
@@ -2937,6 +3048,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	energyGapTimes = 			[[decoder decodeObjectForKey:@"energyGapTimes"]retain];
     energyPeakingTimes =		[[decoder decodeObjectForKey:@"energyPeakingTimes"]retain];
 
+	//firmware 15xx
+    cfdControls =					[[decoder decodeObjectForKey:@"cfdControls"] retain];
+    [self setBufferWrapEnabledMask:	[decoder decodeInt32ForKey:@"bufferWrapEnabledMask"]];
+
 	if(!waveFormRateGroup){
 		[self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
 	    [waveFormRateGroup setIntegrationTime:5];
@@ -2957,6 +3072,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeFloat:firmwareVersion forKey:@"firmwareVersion"];
 	[encoder encodeBool:shipTimeRecordAlso		forKey:@"shipTimeRecordAlso"];
 	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];
 	[encoder encodeInt:mcaEnergyOffset			forKey:@"mcaEnergyOffset"];
@@ -3010,7 +3126,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[encoder encodeObject:sampleStartIndexes	forKey:@"sampleStartIndexes"];
 	[encoder encodeObject:triggerDecimations	forKey:@"triggerDecimations"];
 	[encoder encodeObject:energyTauFactors		forKey:@"energyTauFactors"];
-	
+	//firmware 15xx
+	[encoder encodeObject:cfdControls			forKey:@"cfdControls"];
+	[encoder encodeInt32:bufferWrapEnabledMask	forKey:@"bufferWrapEnabledMask"];
+
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -3027,9 +3146,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject: [NSNumber numberWithLong:internalGateEnabledMask]		forKey:@"internalGateEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:externalGateEnabledMask]		forKey:@"externalGateEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:extendedThresholdEnabledMask]	forKey:@"extendedThresholdEnabledMask"];
-    [objDictionary setObject: internalTriggerDelays									forKey:@"internalTriggerDelays"];	
-    [objDictionary setObject: energyDecimations										forKey:@"energyDecimations"];	
-	
+ 	
 	[objDictionary setObject:[NSNumber numberWithInt:runMode]						forKey:@"runMode"];
 	[objDictionary setObject:[NSNumber numberWithInt:shipTimeRecordAlso]			forKey:@"shipTimeRecordAlso"];
 
@@ -3043,6 +3160,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject:[NSNumber numberWithBool:shipEnergyWaveform]			forKey:@"shipEnergyWaveform"];
 	[objDictionary setObject:[NSNumber numberWithBool:internalExternalTriggersOred]	forKey:@"internalExternalTriggersOred"];
 	
+	[objDictionary setObject: internalTriggerDelays	forKey:@"internalTriggerDelays"];	
+    [objDictionary setObject: energyDecimations	forKey:@"energyDecimations"];	
 	[objDictionary setObject:energyTauFactors	forKey:@"energyTauFactors"];
 	[objDictionary setObject:energyGapTimes		forKey:@"energyGapTimes"];
 	[objDictionary setObject:energyPeakingTimes	forKey:@"energyPeakingTimes"];
@@ -3058,6 +3177,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject: sampleStartIndexes	forKey:@"sampleStartIndexes"];
     [objDictionary setObject: triggerDecimations	forKey:@"triggerDecimations"];	
 	[objDictionary setObject: energyGateLengths		forKey:@"energyGateLengths"];
+
+	//firmware 15xx
+	[objDictionary setObject: cfdControls		forKey:@"cfdControls"];	
+	[objDictionary setObject: [NSNumber numberWithLong:bufferWrapEnabledMask]		forKey:@"bufferWrapEnabledMask"];
 	
     return objDictionary;
 }
@@ -3121,7 +3244,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	if(!peakingTimes)			peakingTimes		  = [[self arrayOfLength:kNumSIS3302Channels] retain];
 	if(!internalTriggerDelays)	internalTriggerDelays = [[self arrayOfLength:kNumSIS3302Channels] retain];
 	if(!energyTauFactors)		energyTauFactors	  = [[self arrayOfLength:kNumSIS3302Channels] retain];
-		
+	if(!cfdControls)			cfdControls		      = [[self arrayOfLength:kNumSIS3302Channels] retain];
+	
 	if(!sampleLengths)		sampleLengths		= [[self arrayOfLength:kNumSIS3302Groups] retain];
 	if(!preTriggerDelays)	preTriggerDelays	= [[self arrayOfLength:kNumSIS3302Groups] retain];
 	if(!triggerGateLengths)	triggerGateLengths	= [[self arrayOfLength:kNumSIS3302Groups] retain];

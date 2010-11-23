@@ -27,21 +27,22 @@
 
 @implementation ORSIS3302DecoderForEnergy
 
+
 //------------------------------------------------------------------
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //^^^^ ^^^^ ^^^^ ^^-----------------------data id
 //                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
-
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^--------------------------------spare
+//^^^^ ^^^----------------------^^^^-^^^--spare
 //        ^ ^^^---------------------------crate
 //             ^ ^^^^---------------------card
 //                    ^^^^ ^^^^-----------channel
-//								^^^^ ^^^--spare
+//                                      ^--buffer wrap mode
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-length of waveform (longs)
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-length of energy   (longs)
 // ---- followed by the data record as read 
-//from hardware. see the manual.
+//from hardware. see the manual. Be careful-- the new 15xx firmware data structure 
+//is slightly diff (two extra words -- if the buffer wrap bit is set)
 // ---- should end in 0xdeadbeef
 //------------------------------------------------------------------
 #define kPageLength (65*1024)
@@ -85,16 +86,20 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(ptr[0]);
-	int crate	= ShiftAndExtract(ptr[1],21,0xf);
-	int card	= ShiftAndExtract(ptr[1],16,0x1f);
-	int channel = ShiftAndExtract(ptr[1],8,0xff);
+    unsigned long* ptr	= (unsigned long*)someData;
+	unsigned long length= ExtractLength(ptr[0]);
+	int crate			= ShiftAndExtract(ptr[1],21,0xf);
+	int card			= ShiftAndExtract(ptr[1],16,0x1f);
+	int channel			= ShiftAndExtract(ptr[1],8,0xff);
+	BOOL wrapMode		= ShiftAndExtract(ptr[1],0,0x1);
 	
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
-	
+
+	long sisHeaderLength;
+	if(wrapMode)sisHeaderLength = 4;
+	else		sisHeaderLength = 2;
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kFilterLengthKey fromHeader:[aDecoder fileHeader]];
 	}	
@@ -102,10 +107,6 @@
 	unsigned long lastWord = ptr[length-1];
 	if(lastWord == 0xdeadbeef){
 		unsigned long energy = ptr[length - 4]; 
-		//int page = energy/kPageLength;
-		//int startPage = page*kPageLength;
-		//int endPage = (page+1)*kPageLength;
-		//[aDataSet histogram:energy - page*kPageLength numBins:kPageLength sender:self  withKeys:@"SIS3302", [NSString stringWithFormat:@"Energy (%d - %d)",startPage,endPage], crateKey,cardKey,channelKey,nil];
 
         NSArray* theFilterLengths = nil;
         @synchronized (self){
@@ -116,16 +117,30 @@
             if(filterLength)energy = energy/filterLength;
         }
         
-        if(energy< 65535){
-            [aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
-		}
+		[aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
 		
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
 		long energyLength   = ptr[3]; //each energy value is a sum of two 
-		
+	
 		if(waveformLength){
-			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2]; //ORCA header + SIS header
-			NSData* recordAsData = [NSData dataWithBytes:bPtr length:waveformLength*sizeof(long)];
+			NSData* recordAsData;
+			if(wrapMode){
+				unsigned long nof_wrap_samples = ptr[6] ; 
+				unsigned long wrap_start_index = ptr[7] ;
+				recordAsData = [NSMutableData dataWithLength:waveformLength*sizeof(long)];
+				unsigned short* dataPtr			  = (unsigned short*)[recordAsData bytes];
+				unsigned short* ushort_buffer_ptr = (unsigned short*) &ptr[8];
+				int i;
+				unsigned long j	=	wrap_start_index; 
+				for (i=0;i<nof_wrap_samples;i++) { 
+					if(j >= nof_wrap_samples ) j=0;
+					dataPtr[i] = ushort_buffer_ptr[j++];
+				}			
+			}
+			else {
+				unsigned char* bPtr = (unsigned char*)&ptr[4 + sisHeaderLength]; //ORCA header + SIS header
+				recordAsData = [NSData dataWithBytes:bPtr length:waveformLength*sizeof(long)];
+			}
 			[aDataSet loadWaveform:recordAsData 
 							offset: 0 //bytes!
 						  unitSize: 2 //unit size in bytes!
@@ -134,7 +149,7 @@
 		}
 		
 		if(energyLength){
-			unsigned char* bPtr = (unsigned char*)&ptr[4 + 2 + waveformLength];//ORCA header + SIS header + possible waveform
+			unsigned char* bPtr = (unsigned char*)&ptr[4 + sisHeaderLength + waveformLength];//ORCA header + SIS header + possible waveform
 			NSData* recordAsData = [NSData dataWithBytes:bPtr length:energyLength*sizeof(long)];
 			[aDataSet loadWaveform:recordAsData 
 							offset: 0

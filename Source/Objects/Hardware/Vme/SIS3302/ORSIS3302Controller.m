@@ -48,7 +48,7 @@
 - (void) awakeFromNib
 {
 	
-    settingSize     = NSMakeSize(1060,620);
+    settingSize     = NSMakeSize(1190,620);
     rateSize		= NSMakeSize(790,300);
     
     blankView = [[NSView alloc] init];
@@ -74,7 +74,7 @@
 		NSCell* theCell = [rateTextFields cellAtRow:i column:0];
 		[theCell setFormatter:rateFormatter];
 	}
-	
+		
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
 	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
@@ -404,6 +404,21 @@
                          name : ORSIS3302ModelShipTimeRecordAlsoChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(cfdControlChanged:)
+                         name : ORSIS3302ModelCfdControlChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(bufferWrapEnabledChanged:)
+                         name : ORSIS3302ModelBufferWrapEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(firmwareVersionChanged:)
+                         name : ORSIS3302ModelFirmwareVersionChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -451,7 +466,6 @@
     [self totalRateChanged:nil];
     [self updateTimePlot:nil];
     [self waveFormRateChanged:nil];
-	[self clockSourceChanged:nil];
 	
 	[self lemoOutModeChanged:nil];
 	[self lemoInModeChanged:nil];
@@ -494,9 +508,18 @@
 	[self mcaEnergyOffsetChanged:nil];
 	[self mcaUseEnergyCalculationChanged:nil];
 	[self shipTimeRecordAlsoChanged:nil];
+	[self cfdControlChanged:nil];
+	[self bufferWrapEnabledChanged:nil];
+	[self firmwareVersionChanged:nil];
+	[self clockSourceChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) firmwareVersionChanged:(NSNotification*)aNote
+{
+	[firmwareVersionTextField setFloatValue: [model firmwareVersion]];
+	[self settingsLockChanged:nil];
+}
 
 - (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote
 {
@@ -526,7 +549,6 @@
 		[mcaEnergyOffsetField setIntValue: [model mcaEnergyOffset]];
 	}
 }
-
 
 - (void) mcaEnergyOffsetChanged:(NSNotification*)aNote
 {
@@ -627,7 +649,6 @@
 {
 	[internalExternalTriggersOredCB setIntValue: [model internalExternalTriggersOred]];
 }
-
 
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote
 {
@@ -746,7 +767,6 @@
 	}
 	
 	[runSummaryField setStringValue: [model runSummary]];
-
 }
 
 - (void) lemoInModeChanged:(NSNotification*)aNote
@@ -789,6 +809,20 @@
 	}
 }
 
+- (void) bufferWrapEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumSIS3302Groups;i++){
+		[[bufferWrapEnabledMatrix cellWithTag:i] setState:[model bufferWrapEnabled:i]];
+	}
+	if([model bufferWrapEnabledMask]){
+		[wrapOrStartIndexField setStringValue:@"PreTrig Delay"];
+	}
+	else {
+		[wrapOrStartIndexField setStringValue:@"Start Index"];
+	}
+}
+
 - (void) gtChanged:(NSNotification*)aNote
 {
 	short i;
@@ -804,6 +838,18 @@
 		//float volts = (0.0003*[model threshold:i])-5.0;
 		[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
 	}
+}
+
+- (void) cfdControlChanged:(NSNotification*)aNote
+{
+	[cfdControl0 selectItemAtIndex:[model cfdControl:0]];
+	[cfdControl1 selectItemAtIndex:[model cfdControl:1]];
+	[cfdControl2 selectItemAtIndex:[model cfdControl:2]];
+	[cfdControl3 selectItemAtIndex:[model cfdControl:3]];
+	[cfdControl4 selectItemAtIndex:[model cfdControl:4]];
+	[cfdControl5 selectItemAtIndex:[model cfdControl:5]];
+	[cfdControl6 selectItemAtIndex:[model cfdControl:6]];
+	[cfdControl7 selectItemAtIndex:[model cfdControl:7]];
 }
 
 - (void) sampleLengthChanged:(NSNotification*)aNote
@@ -940,16 +986,31 @@
     [settingLockButton setEnabled:secure];
 }
 
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem 
+{
+	if ([menuItem action] == @selector(runModeAction:)) {
+		if([menuItem tag] == 0  && [model firmwareVersion] >= 15) return NO;
+		else return YES;
+    }
+	else if ([menuItem action] == @selector(clockSourceAction:)) {
+		if([menuItem tag] == 0) return NO;
+		else return YES;
+    }
+    return YES;
+}
+
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3302SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3302SettingsLock];
-    BOOL mcaMode = ([model runMode] == kMcaRunMode);
-
+	BOOL firmwareGEV15xx = [model firmwareVersion] >= 15;
+    BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
+	
 	[settingLockButton			setState: locked];
 
     [runModePU					setEnabled:!locked && !runInProgress];
+	
     [addressText				setEnabled:!locked && !runInProgress];
     [initButton					setEnabled:!lockedOrRunningMaintenance];
 	[briefReportButton			setEnabled:!lockedOrRunningMaintenance];
@@ -1016,6 +1077,16 @@
 	[energySampleStartIndex3Field	setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
+	
+	[bufferWrapEnabledMatrix		setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl2					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl3					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl4					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl5					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl6					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	[cfdControl7					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	
 	
 }
@@ -1118,6 +1189,7 @@
 }
 
 #pragma mark •••Actions
+
 - (void) shipTimeRecordAlsoAction:(id)sender
 {
 	[model setShipTimeRecordAlso:[sender intValue]];	
@@ -1303,6 +1375,11 @@
 	[model setGtBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
+- (IBAction) bufferWrapEnabledAction:(id)sender
+{
+	[model setBufferWrapEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
 - (IBAction) triggerDecimationAction:(id)sender
 {
 	if([sender indexOfSelectedItem] != [model triggerDecimation:[sender tag]]){
@@ -1321,6 +1398,13 @@
 {
     if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
 		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) cfdControlAction:(id)sender
+{
+    if([sender intValue] != [model cfdControl:[sender tag]]){
+		[model setCfdControl:[sender tag] withValue:[sender indexOfSelectedItem]];
 	}
 }
 
