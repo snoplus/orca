@@ -1291,7 +1291,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self setFirmwareVersion:[s floatValue]];
 	if(verbose){
 		NSLog(@"SIS3302 ID: %x  Firmware:%.2f\n",moduleID,firmwareVersion);
-		if(moduleID != 3302)NSLogColor([NSColor redColor], @"Warning: HW mismatch. 3302 object is %d HW\n",moduleID);
+		if(moduleID != 0x3302)NSLogColor([NSColor redColor], @"Warning: HW mismatch. 3302 object is %x HW\n",moduleID);
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302IDChanged object:self];
 }
