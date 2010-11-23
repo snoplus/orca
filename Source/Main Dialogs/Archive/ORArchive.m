@@ -70,6 +70,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
         if ([[queue operations] count] == 0) {
 			[self performSelectorOnMainThread:@selector(resetStatusTimer) withObject:nil waitUntilDone:YES];
         }
+		[self performSelectorOnMainThread:@selector(lockChanged:) withObject:nil waitUntilDone:NO];
+
     }
     else {
         [super observeValueForKeyPath:keyPath ofObject:object 
