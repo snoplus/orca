@@ -83,7 +83,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 		[dataSetLock unlock];
 		return temp;
 	}
-    else return 1;
+    else return 64*1024;
 }
 
 -(long) value:(unsigned short)aChan

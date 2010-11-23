@@ -143,7 +143,11 @@
 
 - (int) numberPointsInPlot:(id)aPlot
 {
-	return [model numberBins];
+	int numBins = [model numberBins];
+	if(numBins != [[plotView xScale] maxLimit]){
+	   [[plotView xScale] setRngLimitsLow:0 withHigh:numBins withMinRng:25];
+	}
+	return numBins;
 }
 
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y
