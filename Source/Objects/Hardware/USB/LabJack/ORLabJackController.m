@@ -257,7 +257,7 @@
 	int value = [model adcDiff];
 	short i;
 	for(i=0;i<4;i++){
-		[[adcDiffMatrix cellWithTag:i] setState:(value & 1L<<i)>0];
+		[[adcDiffMatrix cellWithTag:i] setState:(value & (1L<<i))>0];
 	}
 	[self lockChanged:nil];
 	[self adcChanged:nil];
@@ -412,7 +412,7 @@
 	int value = [model doDirection];
 	short i;
 	for(i=0;i<16;i++){
-		[[doDirectionMatrix cellWithTag:i] setState:(value & 1L<<i)>0];
+		[[doDirectionMatrix cellWithTag:i] setState:(value & (1L<<i))>0];
 	}
 	[self setDoEnabledState];
 	[self doValueInChanged:nil];
@@ -423,7 +423,7 @@
 	int value = [model ioDirection];
 	short i;
 	for(i=0;i<4;i++){
-		[[ioDirectionMatrix cellWithTag:i] setState:(value & 1L<<i)>0];
+		[[ioDirectionMatrix cellWithTag:i] setState:(value & (1L<<i))>0];
 	}
 	[self setIoEnabledState];
 	[self ioValueInChanged:nil];
@@ -434,7 +434,7 @@
 	int value = [model doValueOut];
 	short i;
 	for(i=0;i<16;i++){
-		[[doValueOutMatrix cellWithTag:i] setState:(value & 1L<<i)>0];
+		[[doValueOutMatrix cellWithTag:i] setState:(value & (1L<<i))>0];
 	}
 }
 
@@ -443,7 +443,7 @@
 	int value = [model ioValueOut];
 	short i;
 	for(i=0;i<4;i++){
-		[[ioValueOutMatrix cellWithTag:i] setState:(value & 1L<<i)>0];
+		[[ioValueOutMatrix cellWithTag:i] setState:(value & (1L<<i))>0];
 	}
 }
 
