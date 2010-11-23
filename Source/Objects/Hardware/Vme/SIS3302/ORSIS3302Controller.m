@@ -816,7 +816,7 @@
 		[[bufferWrapEnabledMatrix cellWithTag:i] setState:[model bufferWrapEnabled:i]];
 	}
 	if([model bufferWrapEnabledMask]){
-		[wrapOrStartIndexField setStringValue:@"PreTrig Delay"];
+		[wrapOrStartIndexField setStringValue:@"Wrap Delay"];
 	}
 	else {
 		[wrapOrStartIndexField setStringValue:@"Start Index"];
