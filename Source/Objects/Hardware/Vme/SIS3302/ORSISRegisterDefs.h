@@ -92,6 +92,7 @@
 
 #define kSIS3302ActualSampleValueAdc12           			0x02000020	  
 #define kSIS3302DDR2TestRegisterAdc12						0x02000028      
+#define kSIS3302BufferControlModeAdc12           			0x0200002C  
 
 #define kSIS3302TriggerSetupAdc1                  			0x02000030	  
 #define kSIS3302TriggerThresholdAdc1              			0x02000034	  
@@ -129,6 +130,7 @@
 
 #define kSIS3302ActualSampleValueAdc34           			0x02800020	  
 #define kSIS3302DDR2TestRegisterAdc34						0x02800028      
+#define kSIS3302BufferControlModeAdc34          			0x0280002C  
 
 #define kSIS3302TriggerSetupAdc3                  			0x02800030	  
 #define kSIS3302TriggerThresholdAdc3              			0x02800034	  
@@ -166,6 +168,7 @@
 
 #define kSIS3302ActualSampleValueAdc56           			0x03000020	  
 #define kSIS3302DDR2TestRegisterAdc56						0x03000028      
+#define kSIS3302BufferControlModeAdc56           			0x0300002C  
 
 #define kSIS3302TriggerSetupAdc5                  			0x03000030	  
 #define kSIS3302TriggerThresholdAdc5              			0x03000034	  
@@ -203,6 +206,7 @@
 
 #define kSIS3302ActualSampleValueAdc78           			0x03800020	  
 #define kSIS3302DDR2TestRegisterAdc78						0x03800028      
+#define kSIS3302BufferControlModeAdc78           			0x0380002C  
 
 #define kSIS3302TriggerSetupAdc7                  			0x03800030	  
 #define kSIS3302TriggerThresholdAdc7              			0x03800034	  
