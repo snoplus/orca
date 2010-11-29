@@ -278,11 +278,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(endAddressThresholdChanged:)
-                         name : ORSIS3302ModelEndAddressThresholdChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(runModeChanged:)
                          name : ORSIS3302ModelRunModeChanged
 						object: model];
@@ -481,7 +476,6 @@
 	[self energyTauFactorChanged:nil];
 	[self energySampleStartIndex3Changed:nil];
 	[self energySetShipWaveformChanged:nil];
-	[self endAddressThresholdChanged:nil];
 	[self energyGateLengthChanged:nil];
 	[self lemoInEnabledMaskChanged:nil];
 	[self internalExternalTriggersOredChanged:nil];
@@ -728,11 +722,6 @@
 	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
 	[runSummaryField setStringValue: [model runSummary]];
 	[self settingsLockChanged:nil];
-}
-
-- (void) endAddressThresholdChanged:(NSNotification*)aNote
-{
-	[endAddressThresholdField setIntValue: [model endAddressThreshold]];
 }
 
 - (void) energySampleStartIndex3Changed:(NSNotification*)aNote

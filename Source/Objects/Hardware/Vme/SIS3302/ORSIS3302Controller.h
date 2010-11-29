@@ -57,7 +57,6 @@
 	IBOutlet NSMatrix*		lemoInEnabledMatrix;
 	IBOutlet NSMatrix*		energyGateLengthMatrix;
 	IBOutlet NSPopUpButton* runModePU;
-	IBOutlet NSTextField*	endAddressThresholdField;
 	IBOutlet NSTextField*	energySampleStartIndex3Field;
 	IBOutlet NSTextField*	energySampleStartIndex2Field;
 	IBOutlet NSTextField*	energySampleStartIndex1Field;
@@ -173,7 +172,6 @@
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote;
 - (void) energyGateLengthChanged:(NSNotification*)aNote;
 - (void) runModeChanged:(NSNotification*)aNote;
-- (void) endAddressThresholdChanged:(NSNotification*)aNote;
 - (void) energyTauFactorChanged:(NSNotification*)aNote;
 - (void) energySampleStartIndex3Changed:(NSNotification*)aNote;
 - (void) energySampleStartIndex2Changed:(NSNotification*)aNote;

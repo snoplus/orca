@@ -30,7 +30,7 @@
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
 
-NSString* ORSIS3302ModelFirmwareVersionChanged = @"ORSIS3302ModelFirmwareVersionChanged";
+NSString* ORSIS3302ModelFirmwareVersionChanged			= @"ORSIS3302ModelFirmwareVersionChanged";
 NSString* ORSIS3302ModelBufferWrapEnabledChanged		= @"ORSIS3302ModelBufferWrapEnabledChanged";
 NSString* ORSIS3302ModelCfdControlChanged				= @"ORSIS3302ModelCfdControlChanged";
 NSString* ORSIS3302ModelShipTimeRecordAlsoChanged		= @"ORSIS3302ModelShipTimeRecordAlsoChanged";
@@ -1054,7 +1054,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) setSampleLength:(short)aChan withValue:(int)aValue 
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:aChan withValue:[self sampleLength:aChan]];
-    [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue & 0xfffc]];
+	aValue = [self limitIntValue:aValue min:0 max:0xfffc];
+    [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
 	[self calculateSampleValues];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleLengthChanged object:self];
 }
@@ -1162,6 +1163,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302TriggerDecimationChanged object:self];
 }
 
+
 - (void) calculateSampleValues
 {
 	unsigned long aValue = 0;
@@ -1189,6 +1191,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 			energyMaxIndex = 2 + numEnergyValues + numRawDataLongWords ;
 			
 			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
+			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header 
 			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords/2  ;  
 			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 
@@ -1291,7 +1294,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self setFirmwareVersion:[s floatValue]];
 	if(verbose){
 		NSLog(@"SIS3302 ID: %x  Firmware:%.2f\n",moduleID,firmwareVersion);
-		if(moduleID != 0x3302)NSLogColor([NSColor redColor], @"Warning: HW mismatch. 3302 object is %x HW\n",moduleID);
+		if(moduleID != 0x3302)NSLogColor([NSColor redColor], @"Warning: HW mismatch. 3302 object is 0x%x HW\n",moduleID);
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302IDChanged object:self];
 }
@@ -2993,7 +2996,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setFirmwareVersion:[decoder decodeFloatForKey:@"firmwareVersion"]];
+    [self setFirmwareVersion:			[decoder decodeFloatForKey:@"firmwareVersion"]];
     [self setShipTimeRecordAlso:		[decoder decodeBoolForKey:@"shipTimeRecordAlso"]];
     [self setMcaUseEnergyCalculation:	[decoder decodeBoolForKey:@"mcaUseEnergyCalculation"]];
     [self setMcaEnergyOffset:			[decoder decodeIntForKey:@"mcaEnergyOffset"]];
@@ -3072,7 +3075,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
     [super encodeWithCoder:encoder];
 	
-	[encoder encodeFloat:firmwareVersion forKey:@"firmwareVersion"];
+	[encoder encodeFloat:firmwareVersion		forKey:@"firmwareVersion"];
 	[encoder encodeBool:shipTimeRecordAlso		forKey:@"shipTimeRecordAlso"];
 	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];
 	[encoder encodeInt:mcaEnergyOffset			forKey:@"mcaEnergyOffset"];
