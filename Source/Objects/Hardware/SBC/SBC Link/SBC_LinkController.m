@@ -387,6 +387,7 @@
 	[cbTestButton setTitle:isRunning?@"Stop":@"Test CB"];
 	[numTestPointsField setEnabled:!isRunning];
 	[killCrateButton setEnabled:!isRunning];
+	[shutdownRebootButton setEnabled:!isRunning];
 	
 	[plotter setNeedsDisplay:YES];
 	[cbTestButton setNeedsDisplay:YES];
@@ -512,6 +513,7 @@
     [loadModeMatrix setEnabled:!locked && !runInProgress];
     [forceReloadButton setEnabled:!locked && !runInProgress];
     [verboseButton setEnabled:!locked && !runInProgress];
+	[shutdownRebootButton setEnabled:!locked && !runInProgress];
     [errorTimeOutPU setEnabled:!locked];
 	[self setToggleCrateButtonState];
 }

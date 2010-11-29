@@ -50,6 +50,7 @@
 	IBOutlet NSTextField*   shutdown1Field;
 	IBOutlet NSTextField*   shutdown2Field;
 	IBOutlet NSButton*		shutdownButton;
+	IBOutlet NSButton*		shutdownRebootButton;
 
 	//Monitoring
 	IBOutlet NSTextField*   runInfoField;
