@@ -171,8 +171,12 @@
 - (void) restoreSaveSetWithName:(NSString*) theSaveSetName
 {
 	if([theSaveSetName length]){
-		[[self document] closeAllWindows];
-		
+		@try {
+			[[self document] closeAllWindows];
+		}
+		@catch(NSException* e)
+		{
+		}
 		NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"WindowSets"];
 		
 		NSString* windowSetFile = [tempFolder stringByAppendingPathComponent:theSaveSetName];
