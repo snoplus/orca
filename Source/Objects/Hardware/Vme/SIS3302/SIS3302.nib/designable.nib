@@ -10889,14 +10889,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">endAddressThresholdField</string>
-						<reference key="source" ref="614878284"/>
-						<reference key="destination" ref="1065063238"/>
-					</object>
-					<int key="connectionID">4544</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">wrapOrStartIndexField</string>
 						<reference key="source" ref="614878284"/>
 						<reference key="destination" ref="1065063238"/>
@@ -17194,9 +17186,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{-95, 400}, {1172, 604}}</string>
+					<string>{{0, 400}, {1172, 604}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{-95, 400}, {1172, 604}}</string>
+					<string>{{0, 400}, {1172, 604}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<string>{213, 107}</string>
@@ -19072,7 +19064,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>cfdControl7</string>
 							<string>clockSourcePU</string>
 							<string>dacOffsetMatrix</string>
-							<string>endAddressThresholdField</string>
 							<string>energyDecimation0</string>
 							<string>energyDecimation1</string>
 							<string>energyDecimation2</string>
@@ -19170,7 +19161,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSMatrix</string>
-							<string>NSTextField</string>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
