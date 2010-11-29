@@ -23,6 +23,7 @@
 #import "NSNotifications+Extensions.h"
 #import "ORDataTypeAssigner.h"
 
+NSString* ORLabJackModelInvolvedInProcessChanged = @"ORLabJackModelInvolvedInProcessChanged";
 NSString* ORLabJackModelAOut1Changed			= @"ORLabJackModelAOut1Changed";
 NSString* ORLabJackModelAOut0Changed			= @"ORLabJackModelAOut0Changed";
 NSString* ORLabJackShipDataChanged				= @"ORLabJackShipDataChanged";
@@ -234,6 +235,18 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) involvedInProcess
+{
+    return involvedInProcess;
+}
+
+- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess
+{
+    involvedInProcess = aInvolvedInProcess;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelInvolvedInProcessChanged object:self];
+}
 
 - (unsigned short) aOut1
 {
@@ -941,12 +954,14 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 	//we will control the polling loop
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
     readOnce = NO;
+	[self setInvolvedInProcess:YES];
 }
 
 - (void) processIsStopping
 {
 	//return control to the normal loop
 	[self setPollTime:pollTime];
+	[self setInvolvedInProcess:NO];
 }
 
 //note that everything called by these routines MUST be threadsafe

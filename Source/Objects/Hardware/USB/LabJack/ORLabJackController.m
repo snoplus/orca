@@ -179,6 +179,11 @@
                          name : ORLabJackInterceptChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(involvedInProcessChanged:)
+                         name : ORLabJackModelInvolvedInProcessChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -238,6 +243,12 @@
 	[self aOut1Changed:nil];
 	[self slopeChanged:nil];
 	[self interceptChanged:nil];
+	[self involvedInProcessChanged:nil];
+}
+
+- (void) involvedInProcessChanged:(NSNotification*)aNote
+{
+	[self lockChanged:nil];
 }
 
 - (void) aOut1Changed:(NSNotification*)aNote
@@ -532,16 +543,20 @@
 {
 	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORLabJackLock];
     BOOL locked = [gSecurity isLocked:ORLabJackLock];
+	BOOL inProcess = [model involvedInProcess];
     [lockButton setState: locked];
 	[serialNumberPopup	setEnabled:!locked];
 	[nameMatrix			setEnabled:!locked];
 	[unitMatrix			setEnabled:!locked];
 	[doNameMatrix		setEnabled:!locked];
 	[ioNameMatrix		setEnabled:!locked];
-	[doDirectionMatrix	setEnabled:!locked];
-	[ioDirectionMatrix	setEnabled:!locked];
-	[doValueOutMatrix	setEnabled:!locked];
-	[ioValueOutMatrix	setEnabled:!locked];
+	[doDirectionMatrix	setEnabled:!locked && !inProcess];
+	[ioDirectionMatrix	setEnabled:!locked && !inProcess];
+	[doValueOutMatrix	setEnabled:!locked && !inProcess];
+	[ioValueOutMatrix	setEnabled:!locked && !inProcess];
+	[adcDiffMatrix		setEnabled:!locked && !inProcess];
+	[digitalOutputEnabledButton		setEnabled:!locked && !inProcess];
+	
 	[resetCounterButton setEnabled:!locked];
 	
 	int adcDiff = [model adcDiff];

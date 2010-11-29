@@ -60,6 +60,7 @@
 - (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
+- (void) involvedInProcessChanged:(NSNotification*)aNote;
 - (void) aOut1Changed:(NSNotification*)aNote;
 - (void) aOut0Changed:(NSNotification*)aNote;
 - (void) gainChanged:(NSNotification*)aNote;
