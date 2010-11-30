@@ -67,6 +67,7 @@
 - (id) init;
 
 #pragma mark ***Interface Management
+- (void) setpointRequestQueueChanged:(NSNotification*)aNote;
 - (void) showDebugOutputChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) totalRequestCountChanged:(NSNotification*)aNote;

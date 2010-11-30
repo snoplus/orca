@@ -177,6 +177,11 @@
                          name : ORIpeSlowControlModelShowDebugOutputChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(setpointRequestQueueChanged:)
+                         name : ORIpeSlowControlSetpointRequestQueueChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -201,6 +206,14 @@
 	[self totalRequestCountChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self showDebugOutputChanged:nil];
+//	[self setpointRequestQueueChanged:nil];
+}
+
+- (void) setpointRequestQueueChanged:(NSNotification*)aNote
+{
+	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+    //[setpointRequestsQueueTableView reloadData];
+    //[setpointRequestsQueueTableView setNeedsDisplay: YES];
 }
 
 - (void) showDebugOutputChanged:(NSNotification*)aNote

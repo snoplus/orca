@@ -43,6 +43,7 @@ NSString* ORIpeSlowControlIPNumberChanged			= @"ORIpeSlowControlIPNumberChanged"
 NSString* ORIpeSlowItemTreeChanged					= @"ORIpeSlowItemTreeChanged";
 NSString* ORIpeSlowControlModelHistogramChanged		= @"ORIpeSlowControlModelHistogramChanged";
 NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequestsChanged";
+NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpointRequestQueueChanged";
 
 //Removed connector MAH May 18,2010
 //NSString* ORADEIInConnection						= @"ORADEIInConnection";
@@ -220,7 +221,10 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 - (void) clearSetpointRequestQueue
 {
 	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
-	[setpointRequestsQueue removeAllObjects];
+	//[setpointRequestsQueue removeAllObjects];//TODO: seems to me I missed a retain somewhere -tb-
+	NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
+    //[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetpointRequestQueueChanged object:self];
+	NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
 }
 
 

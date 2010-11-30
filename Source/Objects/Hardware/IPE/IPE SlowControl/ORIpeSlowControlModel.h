@@ -245,6 +245,7 @@ extern NSString* ORIpeSlowControlIPNumberChanged;
 extern NSString* ORIpeSlowItemTreeChanged;
 extern NSString* ORIpeSlowControlModelHistogramChanged;
 extern NSString* ORIpeSlowControlPendingRequestsChanged;
+extern NSString* ORIpeSlowControlSetpointRequestQueueChanged;
 
 // this is for testing and debugging the  code -tb- 2008-12-08
 //#define __ORCA_DEVELOPMENT__CONFIGURATION__
