@@ -46,9 +46,12 @@
 	IBOutlet NSPopUpButton*		pollTimePopup;	
 	IBOutlet NSTextField*		setPointField;
 	IBOutlet NSButton*			setPointButton;
+	IBOutlet NSButton*			sendSetpointButton;
+	IBOutlet NSButton*			queueSetpointButton;
 	IBOutlet id					editChannelNumberView;
 	IBOutlet NSPopUpButton*		newChannelNumberPopup;	
-    
+	IBOutlet NSTableView*		setpointRequestsQueueTableView; 
+
 	//Drawers
     IBOutlet NSDrawer*	treeDrawer;
     IBOutlet NSDrawer*	webDrawer;
@@ -91,8 +94,12 @@
 - (IBAction) showDebugOutputAction:(id)sender;
 - (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) fastGenSetupAction:(id)sender;
-- (IBAction) writeSetPointAction:(id) sender;
 - (IBAction) setPointAction:(id) sender;
+- (IBAction) writeSetPointAction:(id) sender;
+- (IBAction) sendSetpointAction:(id) sender;
+- (IBAction) queueSetpointAction:(id) sender;
+- (IBAction) sendSetpointRequestsQueueAction:(id) sender;
+- (IBAction) clearSetpointRequestsQueueAction:(id) sender;
 - (IBAction) itemTypeAction:(id)sender;
 - (IBAction) viewItemNameAction:(id)sender;
 - (IBAction) viewItemInWebAction:(id)sender;

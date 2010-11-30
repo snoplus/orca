@@ -80,6 +80,7 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 
 - (void) dealloc
 {
+    [setpointRequestsQueue release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[connectionHistory release];
 	[itemTreeRoot release];
@@ -144,6 +145,85 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
 
 
 #pragma mark ***Accessors
+
+- (NSMutableArray*) setpointRequestsQueue
+{
+    return setpointRequestsQueue;
+}
+
+- (void) setSetpointRequestsQueue:(NSMutableArray*)aSetpointRequestsQueue
+{
+	
+    [aSetpointRequestsQueue retain];
+    [setpointRequestsQueue release];
+    setpointRequestsQueue = aSetpointRequestsQueue;
+}
+
+- (int) setpointRequestsQueueCount
+{	return [setpointRequestsQueue count];   }
+
+- (void) sendControlSetpointForChan:(int)aChan value:(double)aValue
+{
+}
+
+- (void) queueControlSetpointForChan:(int)aChan value:(double)aValue
+{
+	if(!setpointRequestsQueue) setpointRequestsQueue = [[NSMutableArray array] retain];
+	int count = [self setpointRequestsQueueCount];
+	//check whether this chan is already in queue, if yes, remove it
+	int i;
+	for(i=0; i<count; i++){
+		NSMutableDictionary *aDict = [setpointRequestsQueue objectAtIndex:i];
+		NSLog(@"aDict is %@\n",aDict);
+		if([[aDict objectForKey:@"Chan"] intValue]==aChan){
+			[setpointRequestsQueue removeObjectAtIndex:i];
+			NSLog(@"WARNING: The item with chan %i is already in the list: will be overwritten ...\n",aChan);
+			break;
+		}
+	}
+	NSLog(@"%@::%@  count %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),count);
+	
+	//
+    NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+	if(itemKey){
+		if([self requestIsPending:itemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending item: %@\n",itemKey);
+            //TODO: XXX return;//TODO: allow it anyway? -tb-
+        }
+		id topLevelDictionary = [requestCache objectForKey:itemKey];
+		id anItem = [topLevelDictionary objectForKey:itemKey];
+        NSString* aUrl  = [anItem objectForKey:@"URL"];
+        NSString* aPath = [anItem objectForKey:@"Path"];
+        NSString* aName = [anItem objectForKey:@"name"];
+		NSMutableDictionary* aDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+											[NSNumber numberWithInt:aChan],@"Chan",
+											//[self ipNumberToURL],@"URL",
+											aUrl,@"URL",
+											aPath,@"Path",
+											aName,@"Name",
+											[NSNumber numberWithDouble:aValue],@"Setpoint",
+											//aNode,@"Children",
+											nil];
+		[setpointRequestsQueue addObject:aDictionary];
+		NSLog(@"%@\n",setpointRequestsQueue);
+		
+	}
+		
+}
+
+
+- (void) sendSetpointRequestQueue
+{
+	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+}
+
+- (void) clearSetpointRequestQueue
+{
+	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	[setpointRequestsQueue removeAllObjects];
+}
+
+
 
 - (BOOL) showDebugOutput
 {
@@ -897,7 +977,7 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
         }
     ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
     [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
-    [aLoader writeControl:aPath value:aValue];
+    [aLoader setControlSetpoint:aPath value:aValue];
 	[self setPendingRequest:anItemKey];
     [self setTotalRequestCount:totalRequestCount+1];
 }
@@ -1063,12 +1143,20 @@ NSString* ORIpeSlowControlPendingRequestsChanged	= @"ORIpeSlowControlPendingRequ
             #else
             //TODO: remove from source file -tb-
 			ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:nil];
-			[aLoader writeControl:aPath value:aValue];
+			[aLoader setControlSetpoint:aPath value:aValue];
 			[self setTotalRequestCount:totalRequestCount+1];
             #endif
 		}
 	}
 }
+
+
+- (void) queueControlSetpointForIndex:(int)anIndex value:(double)aValue
+{
+	int chan = [self findChanOfIndex: anIndex];
+	[self queueControlSetpointForChan:chan value:aValue];
+}
+
 
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath
 {

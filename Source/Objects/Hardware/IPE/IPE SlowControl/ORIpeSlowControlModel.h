@@ -93,6 +93,7 @@
     int totalRequestCount;
     BOOL shipRecords;
     BOOL showDebugOutput;
+    NSMutableArray* setpointRequestsQueue;
 }
 
 #pragma mark ***Initialization
@@ -110,6 +111,9 @@
 - (void) setChannelDataId:(int) aValue;
 
 #pragma mark ***Accessors
+- (NSMutableArray*) setpointRequestsQueue;
+- (void) setSetpointRequestsQueue:(NSMutableArray*)aSetpointRequestsQueue;
+- (int) setpointRequestsQueueCount;
 - (BOOL) showDebugOutput;
 - (void) setShowDebugOutput:(BOOL)aShowDebugOutput;
 - (BOOL) shipRecords;
@@ -195,6 +199,12 @@
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath;
 - (int) findChanOfControl:(NSString*)aUrl path:(NSString*)aPath;
 
+- (void) sendControlSetpointForChan:(int)aChan value:(double)aValue;
+- (void) queueControlSetpointForChan:(int)aChan value:(double)aValue;
+- (void) sendSetpointRequestQueue;
+- (void) clearSetpointRequestQueue;
+
+
 - (void) postRequestForChan:(int)aChan;
 - (void) postControlSetpointForChan:(int)aChan value:(double)aValue;
 - (BOOL) requestIsPendingForChan:(int)aChan;
@@ -213,6 +223,7 @@
 
 //dont use in scripts:
 - (void) writeSetPoint:(int)anIndex value:(double)aValue;
+- (void) queueControlSetpointForIndex:(int)anIndex value:(double)aValue;
 
 @end
 

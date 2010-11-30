@@ -59,7 +59,7 @@
 	[super dealloc];
 }
 
-- (void) writeControl:(NSString*)aPath value:(double)aValue
+- (void) setControlSetpoint:(NSString*)aPath value:(double)aValue
 {
 	//example: @"http://ipepdvadei.ka.fzk.de/test/services/control.php?db_server=test_zeus&db_name=cfp_test&control_group=3&control_mask=2&target=set&control_values=%f",aValue];
 
@@ -218,7 +218,7 @@
 {
     if(showDebugOutput){//debug timeouts
         NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-        NSLogFont(aFont,@"Received data/string after URL request: >>>%@<<<\n",[receivedData description]);
+        NSLogFont(aFont,@"Received data/string after URL request: BEGIN-%@-END\n",[receivedData description]);
     }
     //handle the request
 	if(dataFormat == kxmlFormat){

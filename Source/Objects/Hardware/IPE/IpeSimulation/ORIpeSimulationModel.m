@@ -1083,6 +1083,8 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
 {
+	
+#if 0
     NSString* anItemKey = [self itemKey:aUrl :aPath];
 		if([self requestIsPending:anItemKey]){//request is still pending
             NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
@@ -1093,6 +1095,8 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
     [aLoader writeControl:aPath value:aValue];
 	[self setPendingRequest:anItemKey];
     [self setTotalRequestCount:totalRequestCount+1];
+	
+#endif
 }
 
 

@@ -57,7 +57,7 @@
 - (void) requestItem:(NSString*)aPath;
 - (void) requestSensorItem:(NSString*)aPath;
 - (void) requestControlItem:(NSString*)aPath;
-- (void) writeControl:(NSString*)aPath value:(double)aValue;
+- (void) setControlSetpoint:(NSString*)aPath value:(double)aValue;
 - (void) setShowDebugOutput:(BOOL) aOption;
 - (BOOL) showDebugOutput;
 

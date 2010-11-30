@@ -45,6 +45,8 @@
 	[viewItemInWebButton setEnabled:NO];
 	[setPointField setEnabled:NO];
 	[setPointButton setEnabled:NO];
+	[sendSetpointButton setEnabled:NO];
+	[queueSetpointButton setEnabled:NO];
 	[webViewButton setTitle:@"See Web View"];
 	[treeViewButton setTitle:@"See ADEI Tree"];
 	[treeDetailsView setAlignment:NSLeftTextAlignment];
@@ -310,10 +312,14 @@
 				if([model isControlItem:index]){
 					[setPointField setEnabled:YES];
 					[setPointButton setEnabled:YES];
+					[sendSetpointButton setEnabled:YES];
+					[queueSetpointButton setEnabled:YES];
 				}
 				else {
 					[setPointField setEnabled:NO];
 					[setPointButton setEnabled:NO];
+					[sendSetpointButton setEnabled:NO];
+					[queueSetpointButton setEnabled:NO];
 				}
 			}
 			else {
@@ -321,12 +327,16 @@
 				[viewItemInWebButton setEnabled:NO];
 				[setPointField setEnabled:NO];
 				[setPointButton setEnabled:NO];
+				[sendSetpointButton setEnabled:NO];
+				[queueSetpointButton setEnabled:NO];
 			}
 		}
 		else {
 			[viewItemInWebButton setEnabled:NO];
 			[setPointField setEnabled:NO];
 			[setPointButton setEnabled:NO];
+			[sendSetpointButton setEnabled:NO];
+			[queueSetpointButton setEnabled:NO];
 			[itemDetailsView setString: @"<Nothing Selected>"]; 
 		}
 	}
@@ -385,7 +395,7 @@
 	 [model setSetPoint:[sender doubleValue]];	
 }
 
-- (IBAction) writeSetPointAction:(id) sender
+- (IBAction) writeSetPointAction:(id) sender  //TODO: rename to setSetpointAction: according to the used ADEI command -tb-
 {
 	[self endEditing];
 	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
@@ -394,6 +404,37 @@
 		[model writeSetPoint:index value:[model setPoint]];
 	}
 }
+
+- (IBAction) sendSetpointAction:(id) sender
+{
+	[self endEditing];
+	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+}
+
+- (IBAction) queueSetpointAction:(id) sender
+{
+	[self endEditing];
+	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
+	if([selectedSet count] == 1){
+		unsigned index = [selectedSet firstIndex];
+		[model queueControlSetpointForIndex:index value:[model setPoint]];
+	}
+}
+
+- (IBAction) sendSetpointRequestsQueueAction:(id) sender
+{
+	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	[model sendSetpointRequestQueue];
+}
+
+- (IBAction) clearSetpointRequestsQueueAction:(id) sender
+{
+	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	[model clearSetpointRequestQueue];
+}
+
+
 
 - (IBAction) itemTypeAction:(id)sender
 {
@@ -754,6 +795,9 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 	else if(tableView == pendingRequestsTable){
 		return [model pendingRequestsCount];
 	}
+	else if(tableView == setpointRequestsQueueTableView){
+		return [model setpointRequestsQueueCount];
+	}
 	return 0;
 }
 
@@ -817,6 +861,15 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 	else if(tableView == pendingRequestsTable){
 		return [model pendingRequest:[tableColumn identifier] forIndex:row];
 	}
+	else if(tableView == setpointRequestsQueueTableView){
+        NSString* theIdentifier				= [tableColumn identifier];
+		NSMutableDictionary* aDictionary = [[model setpointRequestsQueue] objectAtIndex:row];
+		NSString* name = [aDictionary objectForKey: theIdentifier];
+		if(name) return name;
+		//return @"setpointRequestsQueueTableView";//[model pendingRequest:[tableColumn identifier] forIndex:row];
+		NSLog(@"%@::%@: ERROR: bad list view item!\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
+		return @"--";
+	}
     return @"-";
 }
 
@@ -877,7 +930,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 {
     if(aTableView==itemTableView){
 		if(row<[model pollingLookUpCount]){
-			if([model isControlItem:row]) return [NSColor colorWithCalibratedRed:1.0 green:.5 blue:.5 alpha:.3];
+			if([model isControlItem:row]) return [NSColor colorWithCalibratedRed:1.0 green:.2 blue:.2 alpha:.3];
 			else return nil;
 		}
     }
