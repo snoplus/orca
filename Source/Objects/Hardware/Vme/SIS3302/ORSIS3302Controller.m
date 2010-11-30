@@ -1014,7 +1014,6 @@
 	[preTriggerDelayMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[lemoInModePU					setEnabled:!lockedOrRunningMaintenance];
 	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
-	[sampleStartIndexMatrix			setEnabled:!lockedOrRunningMaintenance];
 
 	[clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
 	[triggerDecimation0				setEnabled:!lockedOrRunningMaintenance];
@@ -1060,14 +1059,15 @@
     [mcaEnergyMultiplierField	setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
     [mcaEnergyDividerField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
 
-	//can't be changed during a run or the sbc will be hosed.
+	//can't be changed during a run or the card and probably the sbc will be hosed.
 	[sampleLengthMatrix				setEnabled:!locked && !runInProgress];
 	[energyShipWaveformButton		setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex3Field	setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
+	[bufferWrapEnabledMatrix		setEnabled:!locked && !runInProgress && firmwareGEV15xx];
+	[sampleStartIndexMatrix			setEnabled:!locked && !runInProgress];
 	
-	[bufferWrapEnabledMatrix		setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl2					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
