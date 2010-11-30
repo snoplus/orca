@@ -70,9 +70,12 @@
 	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
 	unsigned long processOutputValue; //outputs to be written at end of process cycle
 	unsigned long processOutputMask;  //controlls which bits are written
+    BOOL involvedInProcess;
 }
 
 #pragma mark ***Accessors
+- (BOOL) involvedInProcess;
+- (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (void) setAOut0Voltage:(float)aValue;
 - (void) setAOut1Voltage:(float)aValue;
 - (unsigned short) aOut1;
@@ -181,6 +184,7 @@
 
 @end
 
+extern NSString* ORLabJackModelInvolvedInProcessChanged;
 extern NSString* ORLabJackModelAOut1Changed;
 extern NSString* ORLabJackModelAOut0Changed;
 extern NSString* ORLabJackShipDataChanged;
