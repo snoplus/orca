@@ -804,12 +804,7 @@
 	for(i=0;i<kNumSIS3302Groups;i++){
 		[[bufferWrapEnabledMatrix cellWithTag:i] setState:[model bufferWrapEnabled:i]];
 	}
-	if([model bufferWrapEnabledMask]){
-		[wrapOrStartIndexField setStringValue:@"Wrap Delay"];
-	}
-	else {
-		[wrapOrStartIndexField setStringValue:@"Start Index"];
-	}
+	[self settingsLockChanged:nil];
 }
 
 - (void) gtChanged:(NSNotification*)aNote
@@ -1066,7 +1061,12 @@
 	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
 	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
 	[bufferWrapEnabledMatrix		setEnabled:!locked && !runInProgress && firmwareGEV15xx];
-	[sampleStartIndexMatrix			setEnabled:!locked && !runInProgress];
+	
+	int i;
+	for(i=0;i<kNumSIS3302Groups;i++){
+		if([model bufferWrapEnabled:i])[[sampleStartIndexMatrix	cellWithTag:i]setEnabled:!locked && !runInProgress];
+		else [[sampleStartIndexMatrix cellWithTag:i]	setEnabled:NO];
+	}
 	
 	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
 	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];

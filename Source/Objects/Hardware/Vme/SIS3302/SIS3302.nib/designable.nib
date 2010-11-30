@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10F569</string>
+		<string key="IBDocument.SystemVersion">10H574</string>
 		<string key="IBDocument.InterfaceBuilderVersion">762</string>
-		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -6144,7 +6144,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSTextField" id="551649672">
 																<reference key="NSNextResponder" ref="728117372"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{44, 178}, {43, 26}}</string>
+																<string key="NSFrame">{{13, 178}, {43, 26}}</string>
 																<reference key="NSSuperview" ref="728117372"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="967216226">
@@ -6160,7 +6160,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSTextField" id="862173091">
 																<reference key="NSNextResponder" ref="728117372"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{5, 178}, {43, 26}}</string>
+																<string key="NSFrame">{{53, 178}, {43, 26}}</string>
 																<reference key="NSSuperview" ref="728117372"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="307656629">
@@ -6176,13 +6176,13 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSTextField" id="1065063238">
 																<reference key="NSNextResponder" ref="728117372"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{81, 178}, {44, 26}}</string>
+																<string key="NSFrame">{{85, 178}, {44, 26}}</string>
 																<reference key="NSSuperview" ref="728117372"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="17279633">
 																	<int key="NSCellFlags">67239424</int>
 																	<int key="NSCellFlags2">138412032</int>
-																	<string key="NSContents">Start Index</string>
+																	<string key="NSContents">Wrap Delay</string>
 																	<reference key="NSSupport" ref="298115673"/>
 																	<reference key="NSControlView" ref="1065063238"/>
 																	<reference key="NSBackgroundColor" ref="252786761"/>
@@ -6192,7 +6192,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSMatrix" id="485882807">
 																<reference key="NSNextResponder" ref="728117372"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{87, 21}, {35, 145}}</string>
+																<string key="NSFrame">{{88, 21}, {35, 145}}</string>
 																<reference key="NSSuperview" ref="728117372"/>
 																<bool key="NSEnabled">YES</bool>
 																<int key="NSNumRows">4</int>
@@ -6265,7 +6265,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSMatrix" id="157439025">
 																<reference key="NSNextResponder" ref="728117372"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{44, 21}, {35, 145}}</string>
+																<string key="NSFrame">{{18, 20}, {35, 145}}</string>
 																<reference key="NSSuperview" ref="728117372"/>
 																<bool key="NSEnabled">YES</bool>
 																<int key="NSNumRows">4</int>
@@ -6338,7 +6338,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSMatrix" id="281136570">
 																<reference key="NSNextResponder" ref="728117372"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{18, 20}, {17, 147}}</string>
+																<string key="NSFrame">{{64, 20}, {17, 147}}</string>
 																<reference key="NSSuperview" ref="728117372"/>
 																<bool key="NSEnabled">YES</bool>
 																<int key="NSNumRows">4</int>
@@ -6473,11 +6473,11 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<reference key="NSCellBackgroundColor" ref="252786761"/>
 															</object>
 														</object>
-														<string key="NSFrame">{{1, 1}, {135, 214}}</string>
+														<string key="NSFrame">{{1, 1}, {136, 214}}</string>
 														<reference key="NSSuperview" ref="226222013"/>
 													</object>
 												</object>
-												<string key="NSFrame">{{1017, 263}, {137, 230}}</string>
+												<string key="NSFrame">{{1016, 263}, {138, 230}}</string>
 												<reference key="NSSuperview" ref="189780115"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
@@ -10978,13 +10978,13 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="265086870"/>
 							<reference ref="728146851"/>
 							<reference ref="637777392"/>
-							<reference ref="1021825403"/>
 							<reference ref="896708201"/>
 							<reference ref="633549651"/>
 							<reference ref="144646592"/>
 							<reference ref="226222013"/>
 							<reference ref="1016528023"/>
 							<reference ref="166041624"/>
+							<reference ref="1021825403"/>
 						</object>
 						<reference key="parent" ref="201506703"/>
 					</object>
@@ -14307,12 +14307,12 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="226222013"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="551649672"/>
-							<reference ref="1065063238"/>
-							<reference ref="157439025"/>
-							<reference ref="862173091"/>
-							<reference ref="281136570"/>
 							<reference ref="485882807"/>
+							<reference ref="862173091"/>
+							<reference ref="1065063238"/>
+							<reference ref="281136570"/>
+							<reference ref="157439025"/>
+							<reference ref="551649672"/>
 						</object>
 						<reference key="parent" ref="189780115"/>
 					</object>

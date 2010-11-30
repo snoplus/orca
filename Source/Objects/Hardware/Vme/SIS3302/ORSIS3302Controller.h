@@ -66,7 +66,6 @@
 	IBOutlet NSPopUpButton* lemoOutModePU;
 	IBOutlet NSTextField*	lemoOutAssignmentsField;
 	IBOutlet NSTextField*	runSummaryField;
-	IBOutlet NSTextField*   wrapOrStartIndexField;
 
 	//base address
     IBOutlet NSTextField*   slotField;

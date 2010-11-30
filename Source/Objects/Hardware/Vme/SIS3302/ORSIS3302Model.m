@@ -829,13 +829,19 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelBufferWrapEnabledChanged object:self];
 }
 
-- (BOOL) bufferWrapEnabled:(short)chan { return bufferWrapEnabledMask & (1<<chan); }
-- (void) setBufferWrapEnabled:(short)chan withValue:(BOOL)aValue
+- (BOOL) bufferWrapEnabled:(short)group 
+{ 
+	if(group>=0 && group<kNumSIS3302Groups) return bufferWrapEnabledMask & (1<<group); 
+	else return NO;
+}
+- (void) setBufferWrapEnabled:(short)group withValue:(BOOL)aValue
 {
-	unsigned char aMask = bufferWrapEnabledMask;
-	if(aValue)aMask |= (1<<chan);
-	else aMask &= ~(1<<chan);
-	[self setBufferWrapEnabledMask:aMask];
+	if(group>=0 && group<kNumSIS3302Groups){
+		unsigned char aMask = bufferWrapEnabledMask;
+		if(aValue)aMask |= (1<<group);
+		else aMask &= ~(1<<group);
+		[self setBufferWrapEnabledMask:aMask];
+	}
 }
 
 - (short) internalTriggerEnabledMask { return internalTriggerEnabledMask; }
@@ -1609,7 +1615,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	for(group=0;group<4;group++){
 		unsigned long sampleLength	   = [self sampleLength:group];
 		unsigned long sampleStartIndex = [self sampleStartIndex:group];
-		
+		if([self bufferWrapEnabled:group])sampleStartIndex = 0;
 		
 		unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
 	
