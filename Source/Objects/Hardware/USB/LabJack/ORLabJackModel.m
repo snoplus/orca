@@ -1025,11 +1025,11 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 
 - (double) maxValueForChan:(int)channel
 {
-	return 10;
+	return slope[aChan] * 10 + intercept[aChan];
 }
 - (double) minValueForChan:(int)channel
 {
-	return -10;
+	return slope[aChan] * 110 + intercept[aChan];
 }
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
 {
