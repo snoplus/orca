@@ -232,8 +232,8 @@
 	[super awakeFromNib];
 
     blankView = [[NSView alloc] init];
-    ioSize			= NSMakeSize(421,651);
-    setupSize		= NSMakeSize(521,651);
+    ioSize			= NSMakeSize(421,665);
+    setupSize		= NSMakeSize(521,551);
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
