@@ -30,6 +30,12 @@
     return self;
 }
 
+- (void) dealloc
+{
+	[blankView release];
+    [super dealloc];
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
@@ -184,6 +190,15 @@
                          name : ORLabJackModelInvolvedInProcessChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(minValueChanged:)
+                         name : ORLabJackMinValueChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(maxValueChanged:)
+                         name : ORLabJackMaxValueChanged
+						object: model];
 }
 
 - (void) awakeFromNib
@@ -196,6 +211,8 @@
 		[[unitMatrix cellAtRow:i column:0] setEditable:YES];
 		[[unitMatrix cellAtRow:i column:0] setTag:i];
 		[[adcMatrix cellAtRow:i column:0] setTag:i];
+		[[minValueMatrix cellAtRow:i column:0] setTag:i];
+		[[maxValueMatrix cellAtRow:i column:0] setTag:i];
 		[[slopeMatrix cellAtRow:i column:0] setTag:i];
 		[[interceptMatrix cellAtRow:i column:0] setTag:i];
 	}
@@ -213,6 +230,15 @@
 		[[ioValueInMatrix cellAtRow:i column:0] setTag:i];
 	}
 	[super awakeFromNib];
+
+    blankView = [[NSView alloc] init];
+    ioSize			= NSMakeSize(421,651);
+    setupSize		= NSMakeSize(521,651);
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
 }
 
 - (void) updateWindow
@@ -238,12 +264,29 @@
 	[self shipDataChanged:nil];
 	[self lowLimitChanged:nil];
 	[self hiLimitChanged:nil];
+	[self minValueChanged:nil];
+	[self maxValueChanged:nil];
 	[self adcDiffChanged:nil];
 	[self aOut0Changed:nil];
 	[self aOut1Changed:nil];
 	[self slopeChanged:nil];
 	[self interceptChanged:nil];
 	[self involvedInProcessChanged:nil];
+}
+
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    [[self window] setContentView:blankView];
+    switch([tabView indexOfTabViewItem:tabViewItem]){
+        case  0: [self resizeWindowToSize:ioSize];     break;
+		default: [self resizeWindowToSize:setupSize];	    break;
+    }
+    [[self window] setContentView:totalView];
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+    
 }
 
 - (void) involvedInProcessChanged:(NSNotification*)aNote
@@ -302,6 +345,38 @@
 		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
 		if(chan<8){
 			[[hiLimitMatrix cellWithTag:chan] setFloatValue:[model hiLimit:chan]];
+		}
+	}
+}
+
+- (void) minValueChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<8;i++){
+			[[minValueMatrix cellWithTag:i] setFloatValue:[model minValue:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<8){
+			[[minValueMatrix cellWithTag:chan] setFloatValue:[model minValue:chan]];
+		}
+	}
+}
+
+- (void) maxValueChanged:(NSNotification*)aNotification
+{
+	if(!aNotification){
+		int i;
+		for(i=0;i<8;i++){
+			[[maxValueMatrix cellWithTag:i] setFloatValue:[model maxValue:i]];
+		}
+	}
+	else {
+		int chan = [[[aNotification userInfo] objectForKey:@"Channel"] floatValue];
+		if(chan<8){
+			[[maxValueMatrix cellWithTag:chan] setFloatValue:[model maxValue:chan]];
 		}
 	}
 }
@@ -720,7 +795,17 @@
 {
 	[model setHiLimit:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
 }
-	 
+
+- (IBAction) minValueAction:(id)sender
+{
+	[model setMinValue:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+}
+
+- (IBAction) maxValueAction:(id)sender
+{
+	[model setMaxValue:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+}
+
 - (IBAction) gainAction:(id)sender
 {
 	[model setGain:[sender tag] withValue:[sender indexOfSelectedItem]];

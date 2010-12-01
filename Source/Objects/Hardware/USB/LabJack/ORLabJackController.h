@@ -21,6 +21,8 @@
 
 @interface ORLabJackController : OrcaObjectController 
 {
+	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSView*		totalView;
 	IBOutlet NSPopUpButton* serialNumberPopup;
 	IBOutlet NSTextField*	aOut1Field;
 	IBOutlet NSTextField*	aOut0Field;
@@ -52,6 +54,12 @@
 	IBOutlet NSPopUpButton* gainPU3;
 	IBOutlet NSSlider*		aOut0Slider;
 	IBOutlet NSSlider*		aOut1Slider;
+	IBOutlet NSMatrix*		minValueMatrix;
+	IBOutlet NSMatrix*		maxValueMatrix;
+
+	NSSize					ioSize;
+	NSSize					setupSize;
+	NSView*					blankView;
 }
 
 #pragma mark •••Notifications
@@ -88,6 +96,8 @@
 - (void) ioValueInChanged:(NSNotification*)aNote;
 - (void) slopeChanged:(NSNotification*)aNote;
 - (void) interceptChanged:(NSNotification*)aNote;
+- (void) minValueChanged:(NSNotification*)aNote;
+- (void) maxValueChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) aOut1Action:(id)sender;
@@ -112,6 +122,8 @@
 - (IBAction) updateAllAction:(id)sender;
 - (IBAction) resetCounter:(id)sender;
 
+- (IBAction) minValueAction:(id)sender;
+- (IBAction) maxValueAction:(id)sender;
 - (IBAction) lowLimitAction:(id)sender;
 - (IBAction) hiLimitAction:(id)sender;
 - (IBAction) gainAction:(id)sender;

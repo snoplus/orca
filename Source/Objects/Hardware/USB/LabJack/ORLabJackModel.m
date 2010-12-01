@@ -52,6 +52,8 @@ NSString* ORLabJackLowLimitChanged				= @"ORLabJackLowLimitChanged";
 NSString* ORLabJackAdcDiffChanged				= @"ORLabJackAdcDiffChanged";
 NSString* ORLabJackSlopeChanged					= @"ORLabJackSlopeChanged";
 NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
+NSString* ORLabJackMinValueChanged				= @"ORLabJackMinValueChanged";
+NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 
 #define kLabJackU12DriverPath @"/System/Library/Extensions/LabJackU12.kext"
 @interface ORLabJackModel (private)
@@ -74,6 +76,8 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 	for(i=0;i<8;i++){
 		lowLimit[i] = -10;
 		hiLimit[i]  = 10;
+		minValue[i] = -10;
+		maxValue[i]  = 10;
 		//default to range from -10 to +10 over adc range of 0 to 4095
 		slope[i] = 20./4095.;
 		intercept[i] = -10;
@@ -367,6 +371,48 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 		
 	}
 }
+
+- (float) minValue:(int)i
+{
+	if(i>=0 && i<8)return minValue[i];
+	else return 0;
+}
+
+- (void) setMinValue:(int)i withValue:(float)aValue
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMinValue:i withValue:minValue[i]];
+		
+		minValue[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackMinValueChanged object:self userInfo:userInfo];
+		
+	}
+}
+- (float) maxValue:(int)i
+{
+	if(i>=0 && i<8)return maxValue[i];
+	else return 0;
+}
+
+- (void) setMaxValue:(int)i withValue:(float)aValue
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setMaxValue:i withValue:maxValue[i]];
+		
+		maxValue[i] = aValue; 
+		
+		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+		[userInfo setObject:[NSNumber numberWithInt:i] forKey: @"Channel"];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackMaxValueChanged object:self userInfo:userInfo];
+		
+	}
+}
+
 
 - (BOOL) shipData
 {
@@ -1019,24 +1065,25 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 
 - (double) convertedValue:(int)aChan
 {
-	if(aChan>=0 && aChan<8)return slope[aChan] * adc[aChan] + intercept[aChan];
+	double volts = 20.0/4095.*adc[aChan] - 10.;
+	if(aChan>=0 && aChan<8)return slope[aChan] * volts + intercept[aChan];
 	else return 0;
 }
 
-- (double) maxValueForChan:(int)channel
+- (double) maxValueForChan:(int)aChan
 {
-	return slope[aChan] * 10 + intercept[aChan];
+	return maxValue[aChan];
 }
-- (double) minValueForChan:(int)channel
+- (double) minValueForChan:(int)aChan
 {
-	return slope[aChan] * 110 + intercept[aChan];
+	return minValue[aChan];
 }
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
 {
 	@synchronized(self){
 		if(channel>=0 && channel<8){
 			*theLowLimit = lowLimit[channel];
-			*theHighLimit = hiLimit[channel];
+			*theHighLimit =  hiLimit[channel];
 		}
 		else {
 			*theLowLimit = -10;
@@ -1067,6 +1114,8 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 		if(aUnit)[self setChannel:i unit:aName];
 		else	 [self setChannel:i unit:@"V"];
 		
+		[self setMinValue:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"minValue%d",i]]];
+		[self setMaxValue:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxValue%d",i]]];
 		[self setLowLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"lowLimit%d",i]]];
 		[self setHiLimit:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"hiLimit%d",i]]];
 		[self setSlope:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"slope%d",i]]];
@@ -1112,6 +1161,8 @@ NSString* ORLabJackInterceptChanged				= @"ORLabJackInterceptChanged";
 		[encoder encodeFloat:hiLimit[i] forKey:[NSString stringWithFormat:@"hiLimit%d",i]];
 		[encoder encodeFloat:slope[i] forKey:[NSString stringWithFormat:@"slope%d",i]];
 		[encoder encodeFloat:intercept[i] forKey:[NSString stringWithFormat:@"intercept%d",i]];
+		[encoder encodeFloat:minValue[i] forKey:[NSString stringWithFormat:@"minValue%d",i]];
+		[encoder encodeFloat:maxValue[i] forKey:[NSString stringWithFormat:@"maxValue%d",i]];
 	}
 	
 	for(i=0;i<16;i++) {

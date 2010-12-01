@@ -39,6 +39,8 @@
 	int gain[4];
 	float lowLimit[8];
 	float hiLimit[8];
+	float minValue[8];
+	float maxValue[8];
 	float slope[8];
 	float intercept[8];
 	NSString* channelName[8];   //adc names
@@ -110,6 +112,10 @@
 - (void) setSlope:(int)i withValue:(float)aValue;
 - (float) intercept:(int)i;
 - (void) setIntercept:(int)i withValue:(float)aValue;
+- (float) minValue:(int)i;
+- (void) setMinValue:(int)i withValue:(float)aValue;
+- (float) maxValue:(int)i;
+- (void) setMaxValue:(int)i withValue:(float)aValue;
 
 - (unsigned short) adcDiff;
 - (void) setAdcDiff:(unsigned short)aMask;
@@ -212,6 +218,8 @@ extern NSString* ORLabJackAdcDiffChanged;
 extern NSString* ORLabJackGainChanged;
 extern NSString* ORLabJackSlopeChanged;
 extern NSString* ORLabJackInterceptChanged;
+extern NSString* ORLabJackMinValueChanged;
+extern NSString* ORLabJackMaxValueChanged;
 
 @interface ORLabJackQuery : NSOperation
 {
