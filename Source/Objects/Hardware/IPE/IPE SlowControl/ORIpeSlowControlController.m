@@ -206,14 +206,14 @@
 	[self totalRequestCountChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self showDebugOutputChanged:nil];
-//	[self setpointRequestQueueChanged:nil];
+	[self setpointRequestQueueChanged:nil];
 }
 
 - (void) setpointRequestQueueChanged:(NSNotification*)aNote
 {
 	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
-    //[setpointRequestsQueueTableView reloadData];
-    //[setpointRequestsQueueTableView setNeedsDisplay: YES];
+    [setpointRequestsQueueTableView reloadData];
+    [setpointRequestsQueueTableView setNeedsDisplay: YES];
 }
 
 - (void) showDebugOutputChanged:(NSNotification*)aNote
@@ -875,6 +875,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 		return [model pendingRequest:[tableColumn identifier] forIndex:row];
 	}
 	else if(tableView == setpointRequestsQueueTableView){
+		if([model setpointRequestsQueueCount]==0) return @"00";
         NSString* theIdentifier				= [tableColumn identifier];
 		NSMutableDictionary* aDictionary = [[model setpointRequestsQueue] objectAtIndex:row];
 		NSString* name = [aDictionary objectForKey: theIdentifier];

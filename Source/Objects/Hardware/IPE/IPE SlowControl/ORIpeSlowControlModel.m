@@ -154,14 +154,19 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (void) setSetpointRequestsQueue:(NSMutableArray*)aSetpointRequestsQueue
 {
-	
+	//never used
+#if 0
     [aSetpointRequestsQueue retain];
     [setpointRequestsQueue release];
     setpointRequestsQueue = aSetpointRequestsQueue;
+#endif
 }
 
 - (int) setpointRequestsQueueCount
-{	return [setpointRequestsQueue count];   }
+{	
+	if(!setpointRequestsQueue) return 0;
+	return [setpointRequestsQueue count];  
+}
 
 - (void) sendControlSetpointForChan:(int)aChan value:(double)aValue
 {
@@ -169,7 +174,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (void) queueControlSetpointForChan:(int)aChan value:(double)aValue
 {
-	if(!setpointRequestsQueue) setpointRequestsQueue = [[NSMutableArray array] retain];
+	if(!setpointRequestsQueue) setpointRequestsQueue = [[NSMutableArray arrayWithCapacity:32] retain];//[[NSMutableArray array] retain];
 	int count = [self setpointRequestsQueueCount];
 	//check whether this chan is already in queue, if yes, remove it
 	int i;
@@ -187,10 +192,6 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	//
     NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
 	if(itemKey){
-		if([self requestIsPending:itemKey]){//request is still pending
-            NSLog( @"You posted a request for a still pending item: %@\n",itemKey);
-            //TODO: XXX return;//TODO: allow it anyway? -tb-
-        }
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
 		id anItem = [topLevelDictionary objectForKey:itemKey];
         NSString* aUrl  = [anItem objectForKey:@"URL"];
@@ -221,9 +222,9 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) clearSetpointRequestQueue
 {
 	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
-	//[setpointRequestsQueue removeAllObjects];//TODO: seems to me I missed a retain somewhere -tb-
+	[setpointRequestsQueue removeAllObjects];//TODO: seems to me I missed a retain somewhere -tb-
 	NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
-    //[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetpointRequestQueueChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetpointRequestQueueChanged object:self];
 	NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
 }
 
