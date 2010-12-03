@@ -325,8 +325,23 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[sumGs release];
 	[peakingTimes release];
 	[internalTriggerDelays release];
-	
+	[endAddressThresholds release];
  	[thresholds release];
+	
+	[cfdControls release];
+    [dacOffsets release];
+	[sumGs release];
+	[sampleLengths release];
+    [sampleStartIndexes release];
+    [preTriggerDelays release];
+    [triggerGateLengths release];
+	[triggerDecimations release];
+    [energyGateLengths release];
+	[energyPeakingTimes release];
+    [energyGapTimes release];
+    [energyTauFactors release];
+	[energyDecimations release];
+	
 	[waveFormRateGroup release];
     [super dealloc];
 }
@@ -508,14 +523,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     runMode = aRunMode;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelRunModeChanged object:self];
 	[self calculateSampleValues];
-}
-
-- (int) endAddressThreshold { return endAddressThreshold; }
-- (void) setEndAddressThreshold:(int)aEndAddressThreshold
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:endAddressThreshold];
-    endAddressThreshold = aEndAddressThreshold;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEndAddressThresholdChanged object:self];
 }
 
 - (int) energySampleStartIndex3 { return energySampleStartIndex3; }
@@ -1155,6 +1162,19 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self calculateEnergyGateLength];
 }
 
+- (int) endAddressThreshold:(short)aGroup  
+{ 
+	if(aGroup>=4)return 0; 
+	return [[endAddressThresholds objectAtIndex:aGroup] intValue]; 
+}
+- (void) setEndAddressThreshold:(short)aGroup withValue:(short)aValue 
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:aGroup withValue:[self endAddressThreshold:aGroup]];
+    int endAddressThreshold = [self limitIntValue:aValue min:0 max:65535];
+	[endAddressThresholds replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:endAddressThreshold]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEndAddressThresholdChanged object:self];
+}
+
 - (int) triggerDecimation:(short)aGroup 
 { 
 	if(aGroup>=4)return 0; 
@@ -1201,7 +1221,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords/2  ;  
 			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 
-			[self setEndAddressThreshold:eventLengthLongWords];
+			int maxEvents = 0x200000 / eventLengthLongWords;
+			[self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
 			// Check the sample indices
 			// Don't call setEnergy* from in here!  Cause stack overflow...
 			if (numEnergyValues == 0) {
@@ -1503,14 +1524,24 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self resetSamplingLogic];
 }
 
-- (void) writeEndAddressThreshold
+- (void) writeEndAddressThresholds
 {
-	unsigned long aValue = 0x1c0;//endAddressThreshold;
-	[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302EndAddressThresholdAllAdc
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+	int i;
+	for(i=0;i<kNumSIS3302Channels/2;i++){
+		[self writeEndAddressThreshold:i];
+	}
+}
+
+- (void) writeEndAddressThreshold:(int)aGroup
+{
+	if(aGroup>=0 && aGroup<4){
+		unsigned long aValue = [self endAddressThreshold:aGroup];
+		[[self adapter] writeLongBlock:&aValue
+							 atAddress:[self baseAddress] + [self getEndThresholdRegOffsets:aGroup]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+	}
 }
 
 - (void) writeEnergyGateLength
@@ -1615,7 +1646,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	for(group=0;group<4;group++){
 		unsigned long sampleLength	   = [self sampleLength:group];
 		unsigned long sampleStartIndex = [self sampleStartIndex:group];
-		if([self bufferWrapEnabled:group])sampleStartIndex = 0;
+		if(![self bufferWrapEnabled:group])sampleStartIndex = 0;
 		
 		unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
 	
@@ -2059,9 +2090,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 - (void) initBoard
 {  
+	[self calculateSampleValues];
 	[self readModuleID:NO];
 	[self writeEventConfiguration];
-	[self writeEndAddressThreshold];
+	[self writeEndAddressThresholds];
 	[self writePreTriggerDelayAndTriggerGateDelay];
 	[self writeEnergyGateLength];
 	[self writeEnergyGP];
@@ -2335,6 +2367,12 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 
 	if ((data_rd & 0x80000) != 0x80000)return NO;
 	else return YES;
+}
+
+- (void) setUpPageReg
+{
+	if(bankOneArmed)[self writePageRegister:0x4]; //bank one is armed, so bank2 (page 4) has to be readout
+	else			[self writePageRegister:0x0]; //Bank2 is armed and Bank1 (page 0) has to be readout
 }
 
 - (void) disarmSampleLogic
@@ -2769,22 +2807,31 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				}
 				isRunning = YES;
 				firstTime = NO;
+				waitForBankSwitch = NO;
 				[self disarmAndArmBank:0];
 			}
 			else {
-				
-				if(!isRunning) return;
-				
-				if (!waitForBankSwitch){
+				//check for valid event and valid bank switch
+				unsigned long data_rd = 0;
+				[[self adapter] readLongBlock:&data_rd
+									atAddress:[self baseAddress] + kSIS3302AcquisitionControl
+									numToRead:1
+								   withAddMod:[self addressModifier]
+								usingAddSpace:0x01];
+				if (bankOneArmed) {
+					if ((data_rd & 0x10000) != 0x10000) return;
+				} 
+				else {
+					if ((data_rd & 0x20000) != 0x20000) return;
+				}		
+				if ((data_rd & 0x80000) != 0x80000)	return;
 
-					if(![self isEvent]) return;
-					
+				if (!waitForBankSwitch){
 					[self disarmAndArmNextBank];
-					
-					if(bankOneArmed)[self writePageRegister:0x4]; //bank one is armed, so bank2 (page 4) has to be readout
-					else			[self writePageRegister:0x0]; //Bank2 is armed and Bank1 (page 0) has to be readout
+					[self setUpPageReg];
 				}
 				waitForBankSwitch = NO;
+				
 				int channel;
 				unsigned long endSampleAddress[kNumSIS3302Channels];
 				for( channel=0;channel<kNumSIS3302Channels;channel++) {
@@ -2802,7 +2849,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				}
 				
 				for( channel=0;channel<kNumSIS3302Channels;channel++) {
-					if(!isRunning) return;
 
 					endSampleAddress[channel] &= 0x7fffff ; // mask bank2 address bit (bit 24)
 									
@@ -3264,6 +3310,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	if(!energyDecimations)	energyDecimations	= [[self arrayOfLength:kNumSIS3302Groups] retain];
 	if(!energyGapTimes)		energyGapTimes		= [[self arrayOfLength:kNumSIS3302Groups] retain];
 	if(!sampleStartIndexes)	sampleStartIndexes	= [[self arrayOfLength:kNumSIS3302Groups] retain];
+	if(!endAddressThresholds)endAddressThresholds	= [[self arrayOfLength:kNumSIS3302Groups] retain];
 
 	if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];

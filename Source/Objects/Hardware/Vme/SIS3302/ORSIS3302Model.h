@@ -74,6 +74,7 @@
     NSMutableArray* energyGapTimes;
     NSMutableArray* energyTauFactors;
 	NSMutableArray* energyDecimations;
+	NSMutableArray* endAddressThresholds;
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3302Channels];
@@ -93,7 +94,6 @@
     int energySampleStartIndex1;
     int energySampleStartIndex2;
     int energySampleStartIndex3;
-    int endAddressThreshold;
     int runMode;
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
@@ -122,7 +122,7 @@
     int				mcaEnergyOffset;
     BOOL			mcaUseEnergyCalculation;
     BOOL			shipTimeRecordAlso;
-    float firmwareVersion;
+    float			firmwareVersion;
 }
 
 - (id) init;
@@ -168,8 +168,8 @@
 - (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
 - (int)  runMode;
 - (void) setRunMode:(int)aRunMode;
-- (int)  endAddressThreshold;
-- (void) setEndAddressThreshold:(int)aEndAddressThreshold;
+- (int) endAddressThreshold:(short)aGroup; 
+- (void) setEndAddressThreshold:(short)aGroup withValue:(short)aValue;
 - (int) energyTauFactor:(short)aChannel;
 - (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue;
 - (int)  energySampleStartIndex3;
@@ -330,7 +330,8 @@
 - (void) writePreTriggerDelayAndTriggerGateDelay;
 - (void) writeEnergyGP;
 - (void) writeRawDataBufferConfiguration;
-- (void) writeEndAddressThreshold;
+- (void) writeEndAddressThresholds;
+- (void) writeEndAddressThreshold:(int)aGroup;
 - (void) writeEnergyGateLength;
 - (void) writeEnergyTauFactor;
 - (void) writeEnergySampleLength;
@@ -384,6 +385,7 @@
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) isEvent;
+- (void) setUpPageReg;
 
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;

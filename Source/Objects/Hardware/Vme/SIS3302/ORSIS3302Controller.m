@@ -1392,9 +1392,9 @@
 
 - (IBAction) cfdControlAction:(id)sender
 {
-    if([sender intValue] != [model cfdControl:[sender tag]]){
+    //if([sender intValue] != [model cfdControl:[sender tag]]){
 		[model setCfdControl:[sender tag] withValue:[sender indexOfSelectedItem]];
-	}
+	//}
 }
 
 - (IBAction) triggerGateLengthAction:(id)sender

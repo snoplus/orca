@@ -31,12 +31,13 @@ class ORSIS3302Card: public ORVVmeCard
 		virtual bool DisarmAndArmBank(size_t bank);
 		virtual bool DisarmAndArmNextBank();
 		virtual bool IsEvent();
-		virtual bool ReadOutChannel(size_t channel);
+		virtual void ReadOutChannel(size_t channel);
+		virtual bool SetupPageReg();
 
 
 		bool fWaitForBankSwitch;
 		bool fBankOneArmed;
 		uint32_t fWaitCount;
-		uint32_t end_sample_address[kNumberOfChannels];
+		uint32_t endSampleAddress[kNumberOfChannels];
 		uint32_t dmaBuffer[0x200000]; //2M Longs (8MB)
 };
