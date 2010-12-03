@@ -163,6 +163,7 @@
 	[sysCallTable setObject: [ORSysCall sysCall:&expf	name:@"exp"		numArgs:1] forKey:@"exp"];
 	[sysCallTable setObject: [ORSysCall sysCall:&logf	name:@"log"		numArgs:1] forKey:@"log"];
 	[sysCallTable setObject: [ORSysCall sysCall:&log10f	name:@"log10"	numArgs:1] forKey:@"log10"];
+	[sysCallTable setObject: [ORSysCall sysCall:&fmod	name:@"fmod"	numArgs:2] forKey:@"fmod"];
 }
 
 - (void) setArgs:(id)someArgs
