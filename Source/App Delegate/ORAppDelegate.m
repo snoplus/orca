@@ -346,7 +346,10 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	document = aDocument;
 }
 
-
+- (BOOL) configLoadedOK
+{
+	return configLoadedOK;
+}
 #pragma mark ¥¥¥Notification Methods
 -(void)applicationDidFinishLaunching:(NSNotification*)aNotification
 {
@@ -377,10 +380,14 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
    
     NSError* fileOpenError = nil;
+	configLoadedOK = NO;
 	@try {
 		if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
-			NSString* lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
-			if(lastFile){
+			
+			NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"config"];
+			if(![lastFile length])lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
+			
+			if([lastFile length]){
 				NSLog(@"Trying to open: %@\n",lastFile);
 				NSURL* asURL = [NSURL fileURLWithPath:lastFile];
 				if(![[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:asURL display:YES error:&fileOpenError]){
@@ -401,6 +408,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 			}
 			
 		}
+		configLoadedOK = YES;
 	}
 	@catch(NSException* localException) {
 		NSLogColor([NSColor redColor],@"There was an exception thrown during load... configuration may not be complete!\n");

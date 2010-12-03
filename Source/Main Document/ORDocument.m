@@ -353,7 +353,11 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (NSData *)dataRepresentationOfType:(NSString *)type
 {
-	[self performSelector:@selector(saveDefaultFileName) withObject:nil afterDelay:0];
+	//special case -- if the config file came from a fall back config, then we won't store it as the last file
+	NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"config"];
+	if(![lastFile length]){
+		[self performSelector:@selector(saveDefaultFileName) withObject:nil afterDelay:0];
+	}
 	if ([type isEqualToString:ORDocumentType]) {
 		
 		NSMutableData *data = [NSMutableData data];
@@ -416,8 +420,12 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 														object:self
 													  userInfo:[NSDictionary dictionaryWithObject:@"Loading Configuration..." forKey:@"Message"]];
 	if ([type isEqualToString:ORDocumentType]) {
-		[self performSelector:@selector(saveDefaultFileName) withObject:nil afterDelay:0];
 		
+		//special case -- if the config file came from a fall back config, then we won't store it as the last file
+		NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"config"];
+		if(![lastFile length]){
+			[self performSelector:@selector(saveDefaultFileName) withObject:nil afterDelay:0];
+		}
 		
 		[[self undoManager] disableUndoRegistration];
 		

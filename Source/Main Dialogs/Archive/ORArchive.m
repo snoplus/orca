@@ -25,6 +25,8 @@
 #import "ORTimedTextField.h"
 
 #define kOldBinaryPath @"~/OldOrcaBinaries"
+#define kFallBackDir @"FallBackConfigs"
+#define kFallBackDirNew @"FallBacksModified"
 #define kDefaultSrcPath @"~/Dev/Orca"
 
 NSString*  ArchiveLock = @"ArchiveLock";
@@ -43,6 +45,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
     }
     return self;
 }
+
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -56,6 +59,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
     [self registerNotificationObservers];
 	[self securityStateChanged:nil];
 	[self lockChanged:nil];
+	[fallBackMatrix selectCellWithTag:useFallBackConfig];
+	
 	if(!queue){
 		queue = [[NSOperationQueue alloc] init];
 		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
@@ -133,6 +138,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[archiveOrcaButton setEnabled: !locked & !runInProgress & !busy];
 	[unarchiveRestartButton setEnabled:!locked & !runInProgress & !busy];
 	[updateButton setEnabled:!locked & !runInProgress & !busy];
+	[fallBackMatrix setEnabled:!locked & !runInProgress & !busy];
 }
 
 - (IBAction) updateWithSvn:(id)sender
@@ -210,6 +216,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 }
 
+- (IBAction) fallBackAction:(id)sender
+{
+	useFallBackConfig = [[sender selectedCell] tag];
+}
+
 - (IBAction) startOldOrca:(id)sender
 {
 	[operationStatusField setTimeOut:1000];
@@ -246,31 +257,67 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 		[self unArchiveBinary:anOldOrcaPath];
-		[self restart:launchPath()];
+		NSString* configFile = nil;
+		if(useFallBackConfig){
+			NSString* lastPart = [anOldOrcaPath lastPathComponent];
+			NSString* firstPart = [anOldOrcaPath stringByDeletingLastPathComponent];
+			if([lastPart hasPrefix:@"Orca"]){
+				NSString* s = [lastPart stringByReplacingCharactersInRange:NSMakeRange(0,4) withString:@"Config"];
+				s = [kFallBackDir stringByAppendingPathComponent:s];
+				configFile = [firstPart stringByAppendingPathComponent:s];
+				configFile = [configFile stringByDeletingPathExtension];
+				configFile = [configFile stringByAppendingPathExtension:@"Orca"];
+				NSFileManager* fm = [NSFileManager defaultManager];
+				if(![fm fileExistsAtPath:configFile]){
+					configFile = nil;
+				}
+			}
+		}
+		[self restart:launchPath() config:configFile];
 	}		
 }
 
 
 - (BOOL) checkOldBinariesFolder
 {
+	NSError* error;
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString* dir = [kOldBinaryPath stringByExpandingTildeInPath];
 	if(![fm fileExistsAtPath:dir]){
-		NSError* error;
 		if(![fm createDirectoryAtPath:dir withIntermediateDirectories:NO attributes:nil error:&error]){
 			NSLogColor([NSColor redColor],@"Unable to access/create %@\n",dir);
 			NSLogColor([NSColor redColor],@"%@\n",error);
 			return NO;
-		}
+		}		
 	}
+	NSString* fallBackDir = [dir stringByAppendingPathComponent:kFallBackDir];
+	if(![fm fileExistsAtPath:fallBackDir]){
+		if(![fm createDirectoryAtPath:fallBackDir withIntermediateDirectories:NO attributes:nil error:&error]){
+			NSLogColor([NSColor redColor],@"Unable to access/create %@\n",fallBackDir);
+			NSLogColor([NSColor redColor],@"%@\n",error);
+			return NO;
+		}
+	}	
+	NSString* fallBackDirNew = [dir stringByAppendingPathComponent:kFallBackDirNew];
+	if(![fm fileExistsAtPath:fallBackDirNew]){
+		if(![fm createDirectoryAtPath:fallBackDirNew withIntermediateDirectories:NO attributes:nil error:&error]){
+			NSLogColor([NSColor redColor],@"Unable to access/create %@\n",fallBackDirNew);
+			NSLogColor([NSColor redColor],@"%@\n",error);
+			return NO;
+		}
+	}	
 	return YES;
 }
 
 - (void) archiveCurrentBinary
 {
-	ORArchiveOrcaOp* anOp = [[ORArchiveOrcaOp alloc] initWithDelegate:self];
-	[queue addOperation:anOp];
-	[anOp release];
+	ORArchiveOrcaOp* anOp1 = [[ORArchiveOrcaOp alloc] initWithDelegate:self];
+	[queue addOperation:anOp1];
+	[anOp1 release];
+	
+	ORArchiveConfigurationOp* anOp2 = [[ORArchiveConfigurationOp alloc] initWithDelegate:self];
+	[queue addOperation:anOp2];
+	[anOp2 release];
 }
 
 - (void) unArchiveBinary:(NSString*)fileToUnarchive
@@ -280,12 +327,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[anOp release];
 }
 
-- (void) restart:(NSString*)binPath
+- (void) restart:(NSString*)binPath config:(NSString*)aConfigPath
 {
-	ORRestartOrcaOp* anOp = [[ORRestartOrcaOp alloc] initWithPath:binPath delegate:self];
+	ORRestartOrcaOp* anOp = [[ORRestartOrcaOp alloc] initWithPath:binPath config:aConfigPath delegate:self];
 	[queue addOperation:anOp];
 	[anOp release];
 }
+
+- (void) restart:(NSString*)binPath
+{
+	[self restart:binPath config:nil];
+}
+
 @end
 
 @implementation ORArchiveOrcaOp
@@ -327,7 +380,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				NSData* data = [file readDataToEndOfFile];
 				if(data){
 					NSString* result = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-					if([result length]) NSLog(@"tar returned:\n%@", result);
+					if([result length]) NSLog(@"tar returned:\n%@\n", result);
 				}
 				[delegate updateStatus:@"Archiving Done"];
 				NSLog(@"Archived ORCA to: %@\n",archivePath);
@@ -343,11 +396,50 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 }
 @end
 
+@implementation ORArchiveConfigurationOp
+- (id) initWithDelegate:(id)aDelegate
+{
+	self = [super init];
+	delegate = aDelegate;
+    return self;
+}
+
+- (void) main
+{
+	if(![[NSApp delegate] configLoadedOK]){
+		NSLog(@"You currently do not have a valid config. It was NOT archived.\n");
+		return;
+	}
+	@try {	
+		NSError* error;
+		NSString* dir		  = [[kOldBinaryPath stringByAppendingPathComponent:kFallBackDir] stringByExpandingTildeInPath];
+		NSString* archivePath = [[dir stringByAppendingPathComponent:[@"Config" stringByAppendingString:fullVersion()]]stringByAppendingPathExtension:@"Orca"];;
+		NSFileManager* fm	  = [NSFileManager defaultManager];
+		if([fm fileExistsAtPath:archivePath]){
+			if(![fm removeItemAtPath:archivePath error:&error]){
+				NSLogColor([NSColor redColor], @"Problem deleting %@\n",archivePath);
+				NSLogColor([NSColor redColor], @"%@\n",error);
+			}
+		}
+		NSString* currentConfigPath = [[[[NSApp delegate] document] fileURL] path];
+		if([fm copyItemAtPath:currentConfigPath toPath:archivePath error:&error]){
+			NSLog(@"Copied %@ to %@\n", currentConfigPath,archivePath);
+		}
+		else {
+			NSLogColor([NSColor redColor], @"Problem copying %@ to %@\n", currentConfigPath,archivePath);
+			NSLogColor([NSColor redColor], @"%@\n",error);
+		}
+	}
+	@catch(NSException* e){
+	}
+}
+@end
+
+
 @implementation ORUnarchiveOrcaOp
 - (id) initWithFile:(NSString*)aFile delegate:(id)aDelegate
 {
 	self = [super init];
-	[fileToUnarchive autorelease];
 	fileToUnarchive = [aFile copy];
 	delegate = aDelegate;
     return self;
@@ -393,12 +485,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 @end
 
 @implementation ORRestartOrcaOp
-- (id) initWithPath:(NSString*)aPath delegate:(id)aDelegate
+- (id) initWithPath:(NSString*)aPath config:(NSString*)aConfig delegate:(id)aDelegate
 {
 	self = [super init];
-	[binPath autorelease];
-	binPath = [aPath copy];
-	delegate = aDelegate;
+	binPath		= [aPath copy];
+	configFile	= [aConfig copy];
+	delegate	= aDelegate;
     return self;
 }
 - (void) dealloc
@@ -413,11 +505,23 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];    
 		[[NSUserDefaults standardUserDefaults] synchronize];
 
+		NSString* newLocation = nil;
+		if(configFile){
+			newLocation = [configFile stringByReplacingOccurrencesOfString:kFallBackDir withString:kFallBackDirNew];
+			NSFileManager* fm = [NSFileManager defaultManager];
+			if([fm fileExistsAtPath:newLocation])[fm removeItemAtPath:newLocation error:nil];
+			if(![fm copyItemAtPath:configFile toPath:newLocation error:nil]){
+				newLocation = nil;
+			}
+		}
+		
 		NSTask* task = [[NSTask alloc] init];
 		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
 		[task setLaunchPath: binPath];
 		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"NoKill", nil];
-		
+		if(configFile){
+			arguments = [arguments arrayByAddingObjectsFromArray:[NSArray arrayWithObjects: @"-config",newLocation, nil]];
+		}
 		[task setArguments: arguments];
 		
 		[delegate updateStatus:@"Relaunching"];
@@ -440,7 +544,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
 	self = [super init];
 	delegate = aDelegate;
-	[srcPath autorelease];
 	srcPath = [[aPath stringByDeletingLastPathComponent] copy];
     return self;
 }
@@ -490,7 +593,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
 	self = [super init];
 	delegate = aDelegate;
-	[srcPath autorelease];
 	srcPath = [[aPath stringByDeletingLastPathComponent] copy];
     return self;
 }

@@ -27,9 +27,11 @@
 	IBOutlet NSButton* archiveOrcaButton;
 	IBOutlet NSButton* unarchiveRestartButton;
     IBOutlet NSButton* updateButton;
+    IBOutlet NSMatrix* fallBackMatrix;
     IBOutlet NSButton* lockButton;
 	int opState;
 	NSOperationQueue* queue;
+	BOOL useFallBackConfig;
 }
 
 + (ORArchive*) sharedArchive;
@@ -42,6 +44,7 @@
 - (IBAction) startOldOrca:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) updateWithSvn:(id)sender;
+- (IBAction) fallBackAction:(id)sender;
 
 - (BOOL) checkOldBinariesFolder;
 - (void) updateStatus:(NSString*)aString;
@@ -50,6 +53,7 @@
 - (void) archiveCurrentBinary;
 - (void) unArchiveBinary:(NSString*)fileToUnarchive;
 - (void) restart:(NSString*)aPath;
+- (void) restart:(NSString*)binPath config:(NSString*)aConfigPath;
 - (void) startOldOrcaPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath;
@@ -66,7 +70,15 @@ extern NSString*  ArchiveLock;
 {
 	id delegate;
 }
-- (id) initWithDelegate:(id)aDelegate;
+- (id)   initWithDelegate:(id)aDelegate;
+- (void) main;
+@end
+
+@interface ORArchiveConfigurationOp : NSOperation
+{
+	id delegate;
+}
+- (id)   initWithDelegate:(id)aDelegate;
 - (void) main;
 @end
 
@@ -76,16 +88,17 @@ extern NSString*  ArchiveLock;
 	NSString* fileToUnarchive;
 }
 
-- (id) initWithFile:(NSString*)aFile delegate:(id)aDelegate;
+- (id)   initWithFile:(NSString*)aFile delegate:(id)aDelegate;
 - (void) main;
 @end
 
 @interface ORRestartOrcaOp : NSOperation
 {
-	id		  delegate;
-	NSString* binPath;
+	id			delegate;
+	NSString*	binPath;
+	NSString*	configFile;
 }
-- (id) initWithPath:(NSString*)aPath delegate:(id)aDelegate;
+- (id)   initWithPath:(NSString*)aPath config:(NSString*)aConfig delegate:(id)aDelegate;
 - (void) main;
 @end
 
@@ -95,7 +108,7 @@ extern NSString*  ArchiveLock;
 	NSString* srcPath;
 }
 
-- (id) initAtPath:(NSString*)aPath delegate:(id)aDelegate;
+- (id)   initAtPath:(NSString*)aPath delegate:(id)aDelegate;
 - (void) main;
 @end
 
@@ -105,7 +118,7 @@ extern NSString*  ArchiveLock;
 	NSString* srcPath;
 }
 
-- (id) initAtPath:(NSString*)aPath delegate:(id)aDelegate;
+- (id)   initAtPath:(NSString*)aPath delegate:(id)aDelegate;
 - (void) main;
 @end
 

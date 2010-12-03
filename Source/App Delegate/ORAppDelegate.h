@@ -27,13 +27,15 @@
 @class ORWindowSaveSet;
 
 @interface ORAppDelegate : NSObject {
-    id   document;
-    ORAlarmCollection* alarmCollection;
-    MemoryWatcher*     memoryWatcher;
+    id					document;
+    ORAlarmCollection*	alarmCollection;
+    MemoryWatcher*		memoryWatcher;
     ORSplashWindowController* theSplashController;
-	IBOutlet ORHelpCenter* helpCenter;
+	IBOutlet ORHelpCenter*	  helpCenter;
 	IBOutlet ORWindowSaveSet* windowSaveSet;
 	NSString* ethernetHardwareAddress;
+	BOOL configLoadedOK;
+	
 }
 + (BOOL)isMacOSX10_5;
 + (BOOL)isMacOSX10_4;
@@ -48,6 +50,7 @@
 - (ORHelpCenter*) helpCenter;
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender;
 - (NSString*) ethernetHardwareAddress;
+- (BOOL) configLoadedOK;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
