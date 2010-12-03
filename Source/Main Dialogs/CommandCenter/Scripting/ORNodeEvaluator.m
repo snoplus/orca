@@ -149,6 +149,7 @@
 	sysCallTable = [[NSMutableDictionary dictionary] retain];
 	
 	[sysCallTable setObject: [ORSysCall sysCall:&powf	name:@"pow"		numArgs:2] forKey:@"pow"];
+	[sysCallTable setObject: [ORSysCall sysCall:&fmodf	name:@"fmod"	numArgs:2] forKey:@"fmod"];
 	[sysCallTable setObject: [ORSysCall sysCall:&sqrtf	name:@"sqrt"	numArgs:1] forKey:@"sqrt"];
 	[sysCallTable setObject: [ORSysCall sysCall:&ceilf	name:@"ceil"	numArgs:1] forKey:@"ceil"];
 	[sysCallTable setObject: [ORSysCall sysCall:&floorf	name:@"floor"	numArgs:1] forKey:@"floor"];
@@ -163,7 +164,6 @@
 	[sysCallTable setObject: [ORSysCall sysCall:&expf	name:@"exp"		numArgs:1] forKey:@"exp"];
 	[sysCallTable setObject: [ORSysCall sysCall:&logf	name:@"log"		numArgs:1] forKey:@"log"];
 	[sysCallTable setObject: [ORSysCall sysCall:&log10f	name:@"log10"	numArgs:1] forKey:@"log10"];
-	[sysCallTable setObject: [ORSysCall sysCall:&fmod	name:@"fmod"	numArgs:2] forKey:@"fmod"];
 }
 
 - (void) setArgs:(id)someArgs
