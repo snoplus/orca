@@ -38,9 +38,12 @@
 	id				calibration;
 	ORDataSet*		fftDataSet;
 	NSMutableArray* roiSet;
+    NSString*		comment;
 }
 
 #pragma mark ***Accessors
+- (NSString*) comment;
+- (void) setComment:(NSString*)aComment;
 - (void) postUpdate;
 - (NSString*) col3Title;
 - (void) setCol3Title:(NSString*)aCol3Title;
@@ -61,13 +64,13 @@
 - (void) addValue1:(float)v1 value2:(float)v2;
 - (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3;
 - (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3 value4:(float)v4;
-- (id) dataAtRow:(int)r column:(int)c;
+- (id)   dataAtRow:(int)r column:(int)c;
 - (void) clearData;
 - (NSString*) fullName;
 
 #pragma mark •••Archival
-- (id)initWithCoder:(NSCoder*)decoder;
-- (void)encodeWithCoder:(NSCoder*)encoder;
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 - (void) writeDataToFile:(NSString*)aFileName;
 
 #pragma mark •••Data Source Methods
@@ -77,6 +80,7 @@
 - (BOOL) dataSet:(int)set index:(unsigned long)index x:(double*)xValue y:(double*)yValue;
 @end
 
+extern NSString* ORManualPlotModelCommentChanged;
 extern NSString* ORManualPlotModelCol3TitleChanged;
 extern NSString* ORManualPlotModelCol2TitleChanged;
 extern NSString* ORManualPlotModelCol1TitleChanged;

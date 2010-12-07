@@ -50,6 +50,7 @@
 - (id) init;
 
 #pragma mark •••Interface Management
+- (void) commentChanged:(NSNotification*)aNote;
 - (void) col0TitleChanged:(NSNotification*)aNote;
 - (void) col1TitleChanged:(NSNotification*)aNote;
 - (void) col2TitleChanged:(NSNotification*)aNote;

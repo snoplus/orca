@@ -140,6 +140,11 @@
                          name : NSDrawerDidOpenNotification
 						object: nil];	
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(commentChanged:)
+                         name : ORManualPlotModelCommentChanged
+						object: model];
+
 }
 
 
@@ -154,9 +159,15 @@
 	[self colKey1Changed:nil];
 	[self colKey2Changed:nil];
 	[self colKey3Changed:nil];
+	[self commentChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) commentChanged:(NSNotification*)aNote
+{
+	[self refreshPlot:nil];
+}
 
 - (void) drawDidOpen:(NSNotification*)aNote
 {
@@ -284,7 +295,7 @@
 		[y3LengendField setStringValue:s];
 	}
 	if([title length]==0)title = @"Index";
-	
+	[plotView setComment:[model comment]];
 	[[plotView yScale] setLabel:title];
 	[plotView setNeedsDisplay:YES];
 }

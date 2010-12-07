@@ -41,19 +41,19 @@
 		BOOL					controlKeyIsDown;
 		NSImage*				backgroundImage;
 	
-		BOOL	dragInProgress;
-		float	startDragXValue;
-		float	startDragYValue;
-		float	currentDragXValue;
-		float	currentDragYValue;
-	
-		IBOutlet id		 delegate;
-		IBOutlet id		 xScale;
-		IBOutlet id		 yScale;
-		IBOutlet id		 zScale;
-		IBOutlet id		 colorScale;
-		IBOutlet NSView* viewForPDF;
-		IBOutlet NSTextField* titleField;
+		BOOL					dragInProgress;
+		float					startDragXValue;
+		float					startDragYValue;
+		float					currentDragXValue;
+		float					currentDragYValue;
+		NSString*				comment;
+		IBOutlet id				delegate;
+		IBOutlet id				xScale;
+		IBOutlet id				yScale;
+		IBOutlet id				zScale;
+		IBOutlet id				colorScale;
+		IBOutlet NSView*		viewForPDF;
+		IBOutlet NSTextField*	titleField;
 }
 
 #pragma mark ***Initialization
@@ -71,6 +71,7 @@
 - (NSMutableDictionary*) attributes;
 - (void) setAttributes:(NSMutableDictionary *)anAttributes;
 - (id) dataSource; //temp until conversion complete
+- (void) setComment:(NSString*)aComment;
 
 #pragma mark ***Parts
 - (NSTextField*) titleField;
@@ -104,6 +105,7 @@
 - (void) drawBackground;
 - (void) drawRect:(NSRect)rect; 
 - (NSData*) plotAsPDFData;
+- (void) drawComment;
 
 #pragma mark ***Component Switching
 - (void) orderChanged;

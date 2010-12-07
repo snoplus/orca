@@ -105,8 +105,6 @@
 	unsigned long numEnergyValues;
 	unsigned long numRawDataLongWords;
 	unsigned long rawDataIndex;
-	unsigned long energyIndex;
-	unsigned long energyMaxIndex;
 	unsigned long eventLengthLongWords;
     unsigned long mcaNofHistoPreset;
     BOOL			mcaLNESetup;
@@ -168,8 +166,8 @@
 - (void) setLemoInEnabled:(unsigned short)aBit withValue:(BOOL)aState;
 - (int)  runMode;
 - (void) setRunMode:(int)aRunMode;
-- (int) endAddressThreshold:(short)aGroup; 
-- (void) setEndAddressThreshold:(short)aGroup withValue:(short)aValue;
+- (unsigned long) endAddressThreshold:(short)aGroup; 
+- (void) setEndAddressThreshold:(short)aGroup withValue:(unsigned long)aValue;
 - (int) energyTauFactor:(short)aChannel;
 - (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue;
 - (int)  energySampleStartIndex3;

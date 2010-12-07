@@ -471,8 +471,10 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 - (void)processIsStarting
 {
 	//force first sample at start
-	[lastSampleTime release];
-	lastSampleTime = [[NSDate date] retain];
+	@synchronized(self){
+		[lastSampleTime release];
+		lastSampleTime = [[NSDate date] retain];
+	}
 	sampleGateOpen = YES;
 }
 
@@ -489,10 +491,13 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 - (void) endProcessCycle
 {
 	if(sampleGateOpen){
-		[lastSampleTime release];
-		lastSampleTime = [[NSDate date] retain];
+		@synchronized(self){
+			[lastSampleTime release];
+			lastSampleTime = [[NSDate date] retain];
+		}
 	}
 	sampleGateOpen = NO;
+	
 }
 
 - (NSDate*)	lastSampleTime

@@ -1067,7 +1067,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) setSampleLength:(short)aChan withValue:(int)aValue 
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:aChan withValue:[self sampleLength:aChan]];
-	aValue = [self limitIntValue:aValue min:0 max:0xfffc];
+	aValue = [self limitIntValue:aValue min:128 max:0xfffc];
+	aValue = (aValue/4)*4;
     [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
 	[self calculateSampleValues];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SampleLengthChanged object:self];
@@ -1162,16 +1163,15 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self calculateEnergyGateLength];
 }
 
-- (int) endAddressThreshold:(short)aGroup  
+- (unsigned long) endAddressThreshold:(short)aGroup  
 { 
 	if(aGroup>=4)return 0; 
 	return [[endAddressThresholds objectAtIndex:aGroup] intValue]; 
 }
-- (void) setEndAddressThreshold:(short)aGroup withValue:(short)aValue 
+- (void) setEndAddressThreshold:(short)aGroup withValue:(unsigned long)aValue 
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setEndAddressThreshold:aGroup withValue:[self endAddressThreshold:aGroup]];
-    int endAddressThreshold = [self limitIntValue:aValue min:0 max:65535];
-	[endAddressThresholds replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:endAddressThreshold]];
+	[endAddressThresholds replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aValue]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEndAddressThresholdChanged object:self];
 }
 
@@ -1210,18 +1210,16 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 
 		int group;
 		for(group=0;group<4;group++){
-			numRawDataLongWords = ([self sampleLength:group]>>1);
+			numRawDataLongWords = [self sampleLength:group]/2;
 			rawDataIndex  = 2 ;
-			
-			energyIndex    = 2 + numRawDataLongWords ;
-			energyMaxIndex = 2 + numEnergyValues + numRawDataLongWords ;
-			
+						
 			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
 			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header 
-			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords/2  ;  
+			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
 			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 
-			int maxEvents = 0x200000 / eventLengthLongWords;
+			//unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
+			unsigned long maxEvents = 1;
 			[self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
 			// Check the sample indices
 			// Don't call setEnergy* from in here!  Cause stack overflow...
@@ -2644,7 +2642,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Sample Length"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:128 stepSize:1 units:@""];
     [p setSetMethod:@selector(setSampleLength:withValue:) getMethod:@selector(sampleLength:)];
     [a addObject:p];
 

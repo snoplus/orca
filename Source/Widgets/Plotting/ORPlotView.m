@@ -97,6 +97,12 @@
 	return commandKeyIsDown;
 }
 
+- (void) setComment:(NSString*)aComment
+{
+	[comment autorelease];
+	comment = [aComment copy];
+}
+
 #pragma mark ***Parts
 - (id) xScale
 {
@@ -295,12 +301,38 @@
 	}
 	
 	[[self topPlot] drawExtras];
+	[self drawComment];
 	if(dragInProgress){
 		[NSBezierPath setDefaultLineWidth:.5];
 		[[NSColor colorWithCalibratedRed:1 green:0 blue:0 alpha:0.05] set];
 		[NSBezierPath fillRect:NSMakeRect(MIN(startDragXValue,currentDragXValue),MIN(startDragYValue,currentDragYValue),fabs(currentDragXValue-startDragXValue),fabs(currentDragYValue-startDragYValue))];
 		[[NSColor redColor] set];
 		[NSBezierPath strokeRect:NSMakeRect(MIN(startDragXValue,currentDragXValue),MIN(startDragYValue,currentDragYValue),fabs(currentDragXValue-startDragXValue),fabs(currentDragYValue-startDragYValue))];
+	}
+}
+
+- (void) drawComment
+{
+	if([comment length]){
+		float height = [self bounds].size.height;
+		float width  = [self bounds].size.width;
+		NSFont* font = [NSFont systemFontOfSize:12.0];
+		NSArray* lines = [comment componentsSeparatedByString:@"\\n"];
+		int longest = 0;
+		NSDictionary* attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:font,NSFontAttributeName,[NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:.8],NSBackgroundColorAttributeName,nil];
+		for(id aLine in lines){
+			NSAttributedString* s = [[NSAttributedString alloc] initWithString:aLine attributes:attrsDictionary];
+			NSSize labelSize = [s size];
+			if(labelSize.width > longest)longest = labelSize.width;
+		}
+		float starty = height;
+		for(id aLine in lines){
+			NSAttributedString* s = [[NSAttributedString alloc] initWithString:aLine attributes:attrsDictionary];
+			NSSize labelSize = [s size];
+			[s drawAtPoint:NSMakePoint(width - longest - 10,starty-labelSize.height-5)];
+			starty -= labelSize.height;
+			[s release];
+		}
 	}
 }
 

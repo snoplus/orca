@@ -55,6 +55,7 @@
 		<string>postAlarm</string>
 		<string>clearalarm</string>
 		<string>clearAlarm</string>
+		<string>time</string>
 	</array>
 	<key>Constants</key>
 	<array>
