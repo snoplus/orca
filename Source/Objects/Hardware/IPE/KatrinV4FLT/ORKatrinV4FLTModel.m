@@ -1200,7 +1200,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 			if(hitRateEnabledMask & (1L<<chan)){
 				unsigned long aValue = [aList longValueForCmd:dataIndex];
 				BOOL overflow = (aValue >> 31) & 0x1;
-				aValue = aValue & 0xffff;
+				aValue = aValue & 0x7fffffff;
 				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
 					if (hitRateLengthSec!=0)	hitRate[chan] = aValue * freq;
 					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
