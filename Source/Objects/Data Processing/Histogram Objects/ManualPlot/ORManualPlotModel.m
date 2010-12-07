@@ -25,6 +25,7 @@
 #import "ORCARootServiceDefs.h"
 #import "ORXYRoi.h"
 
+NSString* ORManualPlotModelCommentChanged = @"ORManualPlotModelCommentChanged";
 NSString* ORManualPlotModelCol3TitleChanged = @"ORManualPlotModelCol3TitleChanged";
 NSString* ORManualPlotModelCol2TitleChanged = @"ORManualPlotModelCol2TitleChanged";
 NSString* ORManualPlotModelCol1TitleChanged = @"ORManualPlotModelCol1TitleChanged";
@@ -49,6 +50,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 
 - (void) dealloc
 {
+    [comment release];
 	[fftDataSet release];
     [col3Title release];
     [col2Title release];
@@ -113,6 +115,19 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 
 
 #pragma mark ***Accessors
+
+- (NSString*) comment
+{
+    return comment;
+}
+
+- (void) setComment:(NSString*)aComment
+{
+    [comment autorelease];
+    comment = [aComment copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelCommentChanged object:self];
+}
 - (void) postUpdate
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotDataChanged object:self];    
@@ -248,6 +263,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setComment:[decoder decodeObjectForKey:@"comment"]];
     [self setCol3Key:[decoder decodeIntForKey:@"ORManualPlotModelCol3Key"]];
     [self setCol2Key:[decoder decodeIntForKey:@"ORManualPlotModelCol2Key"]];
     [self setCol1Key:[decoder decodeIntForKey:@"ORManualPlotModelCol1Key"]];
@@ -268,6 +284,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:comment forKey:@"comment"];
     [encoder encodeInt:col3Key forKey:@"ORManualPlotModelCol3Key"];
     [encoder encodeInt:col2Key forKey:@"ORManualPlotModelCol2Key"];
     [encoder encodeInt:col1Key forKey:@"ORManualPlotModelCol1Key"];
