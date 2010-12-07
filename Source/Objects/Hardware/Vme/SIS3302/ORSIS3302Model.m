@@ -1487,7 +1487,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		int triggerGateToWrite = [self triggerGateLength:i];
 		triggerGateToWrite -= 1;
 		
-		unsigned long aValue = ((triggerValueToWrite&0xffff)<<16) | triggerGateToWrite;
+		unsigned long aValue = ((triggerValueToWrite&0x3ff)<<16) | triggerGateToWrite;
 		[[self adapter] writeLongBlock:&aValue
 							 atAddress:[self baseAddress] + [self getPreTriggerDelayTriggerGateLengthOffset:i]
 							numToWrite:1
