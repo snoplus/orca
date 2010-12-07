@@ -747,7 +747,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	for(i=0;i<4;i++){
 		[self setSampleLength:i withValue:2048];
 		[self setPreTriggerDelay:i withValue:0];
-		[self setTriggerGateLength:i withValue:50000];
+		[self setTriggerGateLength:i withValue:2048];
 		[self setTriggerDecimation:i withValue:0];
 		[self setEnergyDecimation:i withValue:0];
 		[self setSampleStartIndex:i withValue:0];
@@ -1485,7 +1485,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		else if(triggerValueToWrite == 0x1023)triggerValueToWrite = 1;
 
 		int triggerGateToWrite = [self triggerGateLength:i];
-		triggerGateToWrite -= 1;
+		//triggerGateToWrite -= 1;
 		
 		unsigned long aValue = ((triggerValueToWrite&0x3ff)<<16) | triggerGateToWrite;
 		[[self adapter] writeLongBlock:&aValue
