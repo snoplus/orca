@@ -1478,7 +1478,16 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
 	int i;
 	for(i=0;i<kNumSIS3302Channels/2;i++){
-		unsigned long aValue = (([self preTriggerDelay:i]&0x01ff)<<16) | [self triggerGateLength:i];
+		
+		int triggerValueToWrite = [self preTriggerDelay:i];
+		triggerValueToWrite += 2;
+		if(triggerValueToWrite == 0x1022)	  triggerValueToWrite = 0;
+		else if(triggerValueToWrite == 0x1023)triggerValueToWrite = 1;
+
+		int triggerGateToWrite = [self triggerGateLength:i];
+		triggerGateToWrite -= 1;
+		
+		unsigned long aValue = ((triggerValueToWrite&0xffff)<<16) | triggerGateToWrite;
 		[[self adapter] writeLongBlock:&aValue
 							 atAddress:[self baseAddress] + [self getPreTriggerDelayTriggerGateLengthOffset:i]
 							numToWrite:1
