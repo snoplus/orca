@@ -72,7 +72,7 @@
 											[NSNumber numberWithFloat:theRect.origin.y+3],@"Y",nil]];
 		
 
-		theRect = NSInsetRect(theRect,segSize/10.,segSize/10.);
+		theRect = NSInsetRect(theRect,40,40);
 		[errorPaths addObject:[NSBezierPath bezierPathWithOvalInRect:theRect]];
 	}
 	[segmentPathSet addObject:segmentPaths];
