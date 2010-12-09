@@ -27,7 +27,7 @@
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"prespectrometer"]];
+    [self setImage:[NSImage imageNamed:@"monspectrometer"]];
 }
 
 - (void) makeMainController
