@@ -1588,7 +1588,7 @@
 		8499FFE50DC9102700E82DB4 /* ORXL2Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FFE20DC9102700E82DB4 /* ORXL2Model.m */; };
 		8499FFE60DC9102700E82DB4 /* XL2Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8499FFE30DC9102700E82DB4 /* XL2Card.gif */; };
 		849A6F2F12AFC3DF004C36B8 /* edu.washington.npl.orca.Monspectrometer.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849A6F2612AFC3DF004C36B8 /* edu.washington.npl.orca.Monspectrometer.plist */; };
-		849A6F3012AFC3DF004C36B8 /* monpectrometer.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849A6F2712AFC3DF004C36B8 /* monpectrometer.tif */; };
+		849A6F3012AFC3DF004C36B8 /* monspectrometer.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849A6F2712AFC3DF004C36B8 /* monspectrometer.tif */; };
 		849A6F3112AFC3DF004C36B8 /* Monspectrometer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849A6F2812AFC3DF004C36B8 /* Monspectrometer.nib */; };
 		849A6F3212AFC3DF004C36B8 /* MonspectrometerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849A6F2912AFC3DF004C36B8 /* MonspectrometerController.h */; };
 		849A6F3312AFC3DF004C36B8 /* MonspectrometerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849A6F2A12AFC3DF004C36B8 /* MonspectrometerController.m */; };
@@ -4026,7 +4026,7 @@
 		8499FFE20DC9102700E82DB4 /* ORXL2Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXL2Model.m; path = "Source/Objects/Custom Hardware/SNO+/XL2/ORXL2Model.m"; sourceTree = SOURCE_ROOT; };
 		8499FFE30DC9102700E82DB4 /* XL2Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XL2Card.gif; path = "Source/Objects/Custom Hardware/SNO+/XL2/XL2Card.gif"; sourceTree = SOURCE_ROOT; };
 		849A6F2612AFC3DF004C36B8 /* edu.washington.npl.orca.Monspectrometer.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Monspectrometer.plist; path = Source/Experiments/MonSpectrometer/edu.washington.npl.orca.Monspectrometer.plist; sourceTree = SOURCE_ROOT; };
-		849A6F2712AFC3DF004C36B8 /* monpectrometer.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = monpectrometer.tif; path = Source/Experiments/MonSpectrometer/monpectrometer.tif; sourceTree = SOURCE_ROOT; };
+		849A6F2712AFC3DF004C36B8 /* monspectrometer.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = monspectrometer.tif; sourceTree = "<group>"; };
 		849A6F2812AFC3DF004C36B8 /* Monspectrometer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Monspectrometer.nib; path = Source/Experiments/MonSpectrometer/Monspectrometer.nib; sourceTree = SOURCE_ROOT; };
 		849A6F2912AFC3DF004C36B8 /* MonspectrometerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MonspectrometerController.h; path = Source/Experiments/MonSpectrometer/MonspectrometerController.h; sourceTree = SOURCE_ROOT; };
 		849A6F2A12AFC3DF004C36B8 /* MonspectrometerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MonspectrometerController.m; path = Source/Experiments/MonSpectrometer/MonspectrometerController.m; sourceTree = SOURCE_ROOT; };
@@ -8234,7 +8234,7 @@
 				849A6F2E12AFC3DF004C36B8 /* MonspectrometerView.m */,
 				849A6F2612AFC3DF004C36B8 /* edu.washington.npl.orca.Monspectrometer.plist */,
 				849A6F4412AFCE1B004C36B8 /* monSpecHolder.tif */,
-				849A6F2712AFC3DF004C36B8 /* monpectrometer.tif */,
+				849A6F2712AFC3DF004C36B8 /* monspectrometer.tif */,
 				849A6F2812AFC3DF004C36B8 /* Monspectrometer.nib */,
 			);
 			name = MonSpectrometer;
@@ -12567,7 +12567,7 @@
 				84EBC522128887C800234313 /* LabJack.tif in Resources */,
 				84EBC8931289DCB600234313 /* NoLabJackDriverHelp.plist in Resources */,
 				849A6F2F12AFC3DF004C36B8 /* edu.washington.npl.orca.Monspectrometer.plist in Resources */,
-				849A6F3012AFC3DF004C36B8 /* monpectrometer.tif in Resources */,
+				849A6F3012AFC3DF004C36B8 /* monspectrometer.tif in Resources */,
 				849A6F3112AFC3DF004C36B8 /* Monspectrometer.nib in Resources */,
 				849A6F4512AFCE1B004C36B8 /* monSpecHolder.tif in Resources */,
 			);
