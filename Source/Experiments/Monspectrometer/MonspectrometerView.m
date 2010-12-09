@@ -52,11 +52,11 @@
 	struct  {
 		float x,y;
 	} position[5] = {
-		{xc - segSize/2. + 1  , yc - segSize/2. + 1 },	//center
-		{xc - segSize/2. + 1  , h - segSize - offset -1 }, //top
-		{w - offset - segSize , yc - segSize/2. + 1 },	//right
+		{w - offset - segSize , yc - segSize/2. + 1 },		//right
 		{xc - segSize/2. + 1  , offset + 2 },				//bottom
-		{offset + 3			  , yc - segSize/2. + 1 }	//left
+		{offset + 3			  , yc - segSize/2. + 1 },		//left
+		{xc - segSize/2. + 1  , yc - segSize/2. + 1 },		//center
+		{xc - segSize/2. + 1  , h - segSize - offset -1 }	//top
 	};
 	
 	NSRect segRect = NSMakeRect(0,0,segSize,segSize);
