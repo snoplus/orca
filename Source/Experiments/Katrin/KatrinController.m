@@ -74,7 +74,7 @@
 -(void) awakeFromNib
 {
 	
-	detectorSize		= NSMakeSize(675,600);
+	detectorSize		= NSMakeSize(800,750);
 	slowControlsSize    = NSMakeSize(525,157);
 	detailsSize			= NSMakeSize(655,589);
 	focalPlaneSize		= NSMakeSize(827,589);

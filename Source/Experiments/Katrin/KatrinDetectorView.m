@@ -132,13 +132,14 @@
 {
 	float pi = 3.1415927;
 	float xc = [self bounds].size.width/2;
-	float yc = [self bounds].size.height/2;
-	float r = MIN(xc,yc)*.14;	//radius of the center focalPlaneSegment NOTE: sets the scale of the whole thing
+	float h  = [self bounds].size.height;
+	
+	float r = xc*.14;	//radius of the center focalPlaneSegment NOTE: sets the scale of the whole thing
 	float area = 2*pi*r*r;		//area of the center focalPlaneSegment
 	
 	[super makeAllSegments];
 	
-	NSPoint centerPoint = NSMakePoint(xc,yc);
+	NSPoint centerPoint = NSMakePoint(xc,h-xc);
 
 	if(viewType == kUseCrateView){
 		float dx = [self bounds].size.width/21.;
@@ -176,7 +177,7 @@
 		
 		for(i=0;i<4;i++){
 			NSAffineTransform *transform = [NSAffineTransform transform];
-			[transform translateXBy: xc yBy: yc];
+			[transform translateXBy: xc yBy: h-xc];
 			[transform rotateByDegrees:i*360/4. + 2*360/24.];
 			NSRect segRect = NSMakeRect(5,-3,15,6);
 			NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
@@ -192,7 +193,7 @@
 			float deltaAngle = 360/12.;
 			for(i=0;i<24;i++){
 				NSAffineTransform *transform = [NSAffineTransform transform];
-				[transform translateXBy: xc yBy: yc];
+				[transform translateXBy: xc yBy: h-xc];
 				[transform rotateByDegrees:angle];
 				NSRect segRect = NSMakeRect(20+j*18,-3,18,6);
 				NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
@@ -245,7 +246,7 @@
 			float errorAngle1 = deltaAngle/5.;
 			float errorAngle2 = 2*errorAngle1;
 			
-			//calculate the next radius, where the area of each 1/12 of the ring is equal to the center area.
+			//calculate the next radius.
 			float r2 = sqrtf(numSeqPerRings*area/(pi*2) + r*r);
 			float midR1 = (r2+r)/2. - 2.;
 			float midR2 = midR1 + 4.;
@@ -284,20 +285,20 @@
 {
 	//========the Veto part==========
 	float xc = [self bounds].size.width/2;
-	float yc = [self bounds].size.height/2;
-	NSPoint centerPoint = NSMakePoint(xc,yc);
+	float h  = [self bounds].size.height;
+	NSPoint centerPoint = NSMakePoint(xc,h-xc);
 	NSMutableArray* segment1Paths = [NSMutableArray arrayWithCapacity:64];
 	NSMutableArray* error1Paths = [NSMutableArray arrayWithCapacity:64];
 	float startAngle	= 0;
-	float r1	= MIN(xc,yc)-15;
-	float r2	= MIN(xc,yc)-5;
+	float r1	= xc-20;
+	float r2	= xc;
 	float midR1 = (r2+r1)/2. - 2;
 	float midR2 = midR1 + 4;
-	float deltaAngle  = 360./(float)kNumVetoSegments;
+	float deltaAngle  = 360./(float)4;
 	float errorAngle1 = deltaAngle/5.;
 	float errorAngle2 = 2*errorAngle1;
 	int i;
-	for(i=0;i<kNumVetoSegments;i++){
+	for(i=0;i<4;i++){
 		NSBezierPath* aPath = [NSBezierPath bezierPath];
 		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:r1 startAngle:startAngle endAngle:startAngle+deltaAngle clockwise:NO];
 		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:r2 startAngle:startAngle+deltaAngle endAngle:startAngle clockwise:YES];
