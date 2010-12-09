@@ -1067,7 +1067,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) setSampleLength:(short)aChan withValue:(int)aValue 
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:aChan withValue:[self sampleLength:aChan]];
-	aValue = [self limitIntValue:aValue min:128 max:0xfffc];
+	aValue = [self limitIntValue:aValue min:4 max:0xfffc];
 	aValue = (aValue/4)*4;
     [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
 	[self calculateSampleValues];
@@ -2651,7 +2651,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Sample Length"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:128 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:4 stepSize:1 units:@""];
     [p setSetMethod:@selector(setSampleLength:withValue:) getMethod:@selector(sampleLength:)];
     [a addObject:p];
 
