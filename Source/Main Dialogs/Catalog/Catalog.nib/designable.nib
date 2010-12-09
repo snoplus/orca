@@ -6717,7 +6717,7 @@
 																		<reference key="NSControlView" ref="970031703"/>
 																		<int key="NSButtonFlags">-2042347265</int>
 																		<int key="NSButtonFlags2">2</int>
-																		<object class="NSCustomResource" key="NSNormalImage" id="929064449">
+																		<object class="NSCustomResource" key="NSNormalImage">
 																			<string key="NSClassName">NSImage</string>
 																			<string key="NSResourceName">prespectrometer</string>
 																		</object>
@@ -6746,7 +6746,7 @@
 																<object class="NSButton" id="523939327">
 																	<reference key="NSNextResponder" ref="555695817"/>
 																	<int key="NSvFlags">256</int>
-																	<string key="NSFrame">{{632, 86}, {72, 48}}</string>
+																	<string key="NSFrame">{{609, 80}, {110, 60}}</string>
 																	<reference key="NSSuperview" ref="555695817"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="811090984">
@@ -6757,7 +6757,10 @@
 																		<reference key="NSControlView" ref="523939327"/>
 																		<int key="NSButtonFlags">-2042347265</int>
 																		<int key="NSButtonFlags2">2</int>
-																		<reference key="NSNormalImage" ref="929064449"/>
+																		<object class="NSCustomResource" key="NSNormalImage">
+																			<string key="NSClassName">NSImage</string>
+																			<string key="NSResourceName">monspectrometer</string>
+																		</object>
 																		<string key="NSAlternateContents"/>
 																		<string key="NSKeyEquivalent"/>
 																		<int key="NSPeriodicDelay">400</int>
@@ -11584,12 +11587,12 @@ ZSBjb250cm9sbGVyLg</string>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="479141232"/>
 							<reference ref="907894030"/>
-							<reference ref="523939327"/>
 							<reference ref="970031703"/>
 							<reference ref="57049877"/>
 							<reference ref="978639205"/>
 							<reference ref="679451697"/>
 							<reference ref="662516430"/>
+							<reference ref="523939327"/>
 						</object>
 						<reference key="parent" ref="74048890"/>
 					</object>
@@ -24213,6 +24216,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>eCPU147</string>
 				<string>eGun</string>
 				<string>katrin</string>
+				<string>monspectrometer</string>
 				<string>nTPC</string>
 				<string>prespectrometer</string>
 				<string>rangeTimer</string>
@@ -24423,6 +24427,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{16, 128}</string>
 				<string>{100, 86}</string>
 				<string>{250, 71}</string>
+				<string>{79.5789, 40.8722}</string>
 				<string>{100, 84}</string>
 				<string>{72, 48}</string>
 				<string>{67, 66}</string>
