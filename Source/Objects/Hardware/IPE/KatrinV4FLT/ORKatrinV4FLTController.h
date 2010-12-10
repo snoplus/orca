@@ -28,7 +28,9 @@
 
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
-        IBOutlet NSButton*		settingLockButton;
+		IBOutlet NSTabView*		tabView;	
+		IBOutlet NSTabView*		modeTabView;	
+		IBOutlet NSButton*		settingLockButton;
 		IBOutlet NSPopUpButton* nfoldCoincidencePU;
         IBOutlet NSButton*		vetoActiveButton;
 		IBOutlet NSPopUpButton* vetoOverlapTimePU;
@@ -63,6 +65,8 @@
 		IBOutlet NSButton*		resetButton;
 		IBOutlet NSMatrix*		gainTextFields;
 		IBOutlet NSMatrix*		thresholdTextFields;
+		IBOutlet NSMatrix*		vetoGainMatrix;
+		IBOutlet NSMatrix*		vetoThresholdMatrix;
 		IBOutlet NSMatrix*		triggerEnabledCBs;
 		IBOutlet NSMatrix*		hitRateEnabledCBs;
 		IBOutlet NSPopUpButton*	hitRateLengthPU;
@@ -82,7 +86,6 @@
 		IBOutlet NSButton*		timeRateLogCB;
 		IBOutlet NSButton*		totalRateLogCB;
 		IBOutlet NSTextField*	totalHitRateField;
-		IBOutlet NSTabView*		tabView;	
 		IBOutlet NSView*		totalView;
 		
 		//test page
@@ -92,6 +95,7 @@
 		
 		NSNumberFormatter*		rateFormatter;
 		NSSize					settingSize;
+		NSSize					vetoSettingSize;
 		NSSize					rateSize;
 		NSSize					testSize;
 		NSSize					lowlevelSize;

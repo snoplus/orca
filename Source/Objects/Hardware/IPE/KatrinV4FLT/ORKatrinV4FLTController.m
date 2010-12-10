@@ -52,7 +52,8 @@
 {
 	[super awakeFromNib];
 	
-    settingSize			= NSMakeSize(670,720);
+    settingSize			= NSMakeSize(650,700);
+    vetoSettingSize		= NSMakeSize(650,600); //the setting tab in veto mode
     rateSize			= NSMakeSize(490,690);
     testSize			= NSMakeSize(400,350);
     lowlevelSize		= NSMakeSize(400,350);
@@ -535,11 +536,14 @@
 - (void) updateButtons
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORKatrinV4FLTSettingsLock];
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL locked = [gSecurity isLocked:ORKatrinV4FLTSettingsLock];
-	BOOL testsAreRunning = [model testsRunning];
+    BOOL runInProgress    = [gOrcaGlobals runInProgress];
+    BOOL locked           = [gSecurity isLocked:ORKatrinV4FLTSettingsLock];
+	BOOL testsAreRunning  = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
     
+	if([model runMode] < 3)	[modeTabView selectTabViewItemAtIndex:0];
+	else					[modeTabView selectTabViewItemAtIndex:1];
+	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
 	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
@@ -550,6 +554,8 @@
     [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];
     [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
+    [vetoGainMatrix setEnabled:!lockedOrRunningMaintenance];
+    [vetoThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
 	
 	[versionButton setEnabled:!runInProgress];
 	[testButton setEnabled:!runInProgress];
@@ -586,7 +592,6 @@
 	BOOL readAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegReadable)>0;
 	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegWriteable)>0;
 	BOOL needsChannel = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegNeedsChannel)>0;
-
 	
 	[regWriteButton setEnabled:writeAllowed];
 	[regReadButton setEnabled:readAllowed];
@@ -710,6 +715,7 @@
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
 	[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
+	[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
 }
 
 - (void) triggerEnabledChanged:(NSNotification*)aNotification
@@ -732,6 +738,7 @@
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
 	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
+	[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
 }
 
 
@@ -748,6 +755,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
+		[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
 		
 	}	
 }
@@ -757,6 +765,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
+		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
 	}
 }
 
@@ -782,6 +791,12 @@
 {
 	[modeButton selectItemAtIndex:[model runMode]];
 	[self updateButtons];
+	
+	[[self window] setContentView:blankView];
+	if([model runMode]<3) [self resizeWindowToSize:settingSize];   
+	else				  [self resizeWindowToSize:vetoSettingSize];   
+    
+    [[self window] setContentView:totalView];
 }
 
 - (void) hitRateLengthChanged:(NSNotification*)aNote
@@ -839,11 +854,14 @@
 	[self enableRegControls];
 }
 
-- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:tabViewItem]){
-        case  0: [self resizeWindowToSize:settingSize];     break;
+        case  0: 
+			if([model runMode]<3) [self resizeWindowToSize:settingSize];   
+			else				  [self resizeWindowToSize:vetoSettingSize];   
+			break;
 		case  1: [self resizeWindowToSize:rateSize];	    break;
 		case  2: [self resizeWindowToSize:testSize];        break;
 		case  3: [self resizeWindowToSize:lowlevelSize];	break;
