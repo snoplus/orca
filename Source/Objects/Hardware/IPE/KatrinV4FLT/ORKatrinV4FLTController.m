@@ -53,7 +53,6 @@
 	[super awakeFromNib];
 	
     settingSize			= NSMakeSize(650,700);
-    vetoSettingSize		= NSMakeSize(650,600); //the setting tab in veto mode
     rateSize			= NSMakeSize(490,690);
     testSize			= NSMakeSize(400,350);
     lowlevelSize		= NSMakeSize(400,350);
@@ -336,6 +335,10 @@
 - (void) nfoldCoincidenceChanged:(NSNotification*)aNote
 {
 	[nfoldCoincidencePU selectItemAtIndex: [model nfoldCoincidence]];
+	NSString* s = [NSString stringWithFormat:@">=%d",[model nfoldCoincidence]];
+	[group1NFoldField setStringValue:s];
+	[group2NFoldField setStringValue:s];
+	[group3NFoldField setStringValue:s];
 }
 
 - (void) vetoOverlapTimeChanged:(NSNotification*)aNote
@@ -791,12 +794,6 @@
 {
 	[modeButton selectItemAtIndex:[model runMode]];
 	[self updateButtons];
-	
-	[[self window] setContentView:blankView];
-	if([model runMode]<3) [self resizeWindowToSize:settingSize];   
-	else				  [self resizeWindowToSize:vetoSettingSize];   
-    
-    [[self window] setContentView:totalView];
 }
 
 - (void) hitRateLengthChanged:(NSNotification*)aNote
@@ -858,10 +855,7 @@
 {
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:tabViewItem]){
-        case  0: 
-			if([model runMode]<3) [self resizeWindowToSize:settingSize];   
-			else				  [self resizeWindowToSize:vetoSettingSize];   
-			break;
+        case  0: [self resizeWindowToSize:settingSize];		break;
 		case  1: [self resizeWindowToSize:rateSize];	    break;
 		case  2: [self resizeWindowToSize:testSize];        break;
 		case  3: [self resizeWindowToSize:lowlevelSize];	break;

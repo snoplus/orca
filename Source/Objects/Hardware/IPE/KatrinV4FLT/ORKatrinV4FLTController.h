@@ -75,7 +75,10 @@
 		IBOutlet NSButton*		triggersAllButton;
 		IBOutlet NSButton*		triggersNoneButton;
 		IBOutlet NSButton*		defaultsButton;
-	
+		IBOutlet NSTextField*	group1NFoldField;
+		IBOutlet NSTextField*	group2NFoldField;
+		IBOutlet NSTextField*	group3NFoldField;
+
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
 		
@@ -95,7 +98,6 @@
 		
 		NSNumberFormatter*		rateFormatter;
 		NSSize					settingSize;
-		NSSize					vetoSettingSize;
 		NSSize					rateSize;
 		NSSize					testSize;
 		NSSize					lowlevelSize;
