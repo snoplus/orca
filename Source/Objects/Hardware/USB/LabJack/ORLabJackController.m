@@ -199,6 +199,12 @@
                      selector : @selector(maxValueChanged:)
                          name : ORLabJackMaxValueChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(deviceSerialNumberChanged:)
+                         name : ORLabJackModelDeviceSerialNumberChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -272,6 +278,12 @@
 	[self slopeChanged:nil];
 	[self interceptChanged:nil];
 	[self involvedInProcessChanged:nil];
+	[self deviceSerialNumberChanged:nil];
+}
+
+- (void) deviceSerialNumberChanged:(NSNotification*)aNote
+{
+	[deviceSerialNumberField setIntValue: [model deviceSerialNumber]];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -656,6 +668,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) probeAction:(id)sender
+{
+	[model readSerialNumber];
+}
+
 - (IBAction) aOut1Action:(id)sender
 {
 	[model setAOut1:[sender floatValue] * 255./5.1];	

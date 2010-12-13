@@ -22,6 +22,7 @@
 @interface ORLabJackController : OrcaObjectController 
 {
 	IBOutlet NSTabView*		tabView;	
+	IBOutlet NSTextField* deviceSerialNumberField;
 	IBOutlet NSView*		totalView;
 	IBOutlet NSPopUpButton* serialNumberPopup;
 	IBOutlet NSTextField*	aOut1Field;
@@ -68,6 +69,7 @@
 - (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
+- (void) deviceSerialNumberChanged:(NSNotification*)aNote;
 - (void) involvedInProcessChanged:(NSNotification*)aNote;
 - (void) aOut1Changed:(NSNotification*)aNote;
 - (void) aOut0Changed:(NSNotification*)aNote;
@@ -100,6 +102,7 @@
 - (void) maxValueChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) probeAction:(id)sender;
 - (IBAction) aOut1Action:(id)sender;
 - (IBAction) aOut0Action:(id)sender;
 - (IBAction) adcDiffBitAction:(id)sender;

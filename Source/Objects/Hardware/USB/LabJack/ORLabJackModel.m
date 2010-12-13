@@ -23,6 +23,7 @@
 #import "NSNotifications+Extensions.h"
 #import "ORDataTypeAssigner.h"
 
+NSString* ORLabJackModelDeviceSerialNumberChanged = @"ORLabJackModelDeviceSerialNumberChanged";
 NSString* ORLabJackModelInvolvedInProcessChanged = @"ORLabJackModelInvolvedInProcessChanged";
 NSString* ORLabJackModelAOut1Changed			= @"ORLabJackModelAOut1Changed";
 NSString* ORLabJackModelAOut0Changed			= @"ORLabJackModelAOut0Changed";
@@ -63,6 +64,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 - (void) pollHardware;
 - (void) sendIoControl;
 - (void) readAdcValues;
+- (void) readSerialNumber;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(int*)anArray forKey:(NSString*)aKey;
 @end
 
@@ -239,6 +241,18 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 }
 
 #pragma mark ***Accessors
+
+- (unsigned long) deviceSerialNumber
+{
+    return deviceSerialNumber;
+}
+
+- (void) setDeviceSerialNumber:(unsigned long)aDeviceSerialNumber
+{
+    deviceSerialNumber = aDeviceSerialNumber;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackModelDeviceSerialNumberChanged object:self];
+}
 
 - (BOOL) involvedInProcess
 {
@@ -1201,6 +1215,22 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 }
 
+- (void) readSerialNumber
+{
+	if(usbInterface && [self getUSBController]){
+		unsigned char data[8];
+		data[0] = 0;
+		data[1] = 0;
+		data[2] = 0;
+		data[3] = 0;
+		data[4] = 0;
+		data[5] = 0x50; // 0b01010000 = (read ram)
+		data[6] = 0;    // most sig
+		data[7] = 0;    // least sig 
+		[self writeData:data];
+	}
+}
+		
 - (void) readAdcValues
 {
 	if(usbInterface && [self getUSBController]){
@@ -1290,6 +1320,10 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 				
 				if(shipData) [self performSelectorOnMainThread:@selector(shipIOData) withObject:nil waitUntilDone:NO];
 			}
+			else if((data[0] & 0x50) == 0x50){
+				unsigned long n = (data[1]<<1) + (data[2]<<8) + (data[3]<<4) + data[4];
+				[self setDeviceSerialNumber:n];
+			}
 		}
 	}
 	@catch(NSException* e){
@@ -1312,6 +1346,8 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 	data[7] = 0x00;
 	[usbInterface writeBytesOnInterruptPipe:data length:8];
 	[NSThread detachNewThreadSelector: @selector(readPipeThread) toTarget:self withObject: nil];
+	[ORTimer delay:.02];
+	[self readSerialNumber];
 }
 
 - (void) writeData:(unsigned char*) data
