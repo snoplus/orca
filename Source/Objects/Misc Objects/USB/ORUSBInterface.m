@@ -104,7 +104,8 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 
 - (NSString*) serialNumber
 {
-    return serialNumber;
+	if([serialNumber length] == 0 || [serialNumber intValue] == 0)return [NSString stringWithFormat:@"0x%8x", locationID];
+    else return serialNumber;
 }
 
 - (void) setSerialNumber:(NSString*)aSerialString

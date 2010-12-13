@@ -391,6 +391,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 				}
 			}
 			else {
+				NSString* s = [NSString stringWithFormat:@"0x%8x", locationID];
+				[usbCallbackData setSerialNumber:s];
+				/*
 				UInt8 psi;
 				kr = (*deviceInterface)->USBGetProductStringIndex(deviceInterface, &psi);
 				if(psi){
@@ -409,6 +412,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 						// mybuf now contains the string descriptor
 					}
 				}
+				 */
 			}
 			
 			//load up the private data that will be passed to the feneral interest notification
