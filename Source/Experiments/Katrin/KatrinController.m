@@ -83,6 +83,7 @@
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
+	[self populateClassNamePopup:secondaryAdcClassNamePopup];
 	
     [super awakeFromNib];
 	
@@ -103,7 +104,6 @@
 	[aPlot1 release];
 	
 	
-	[self populateClassNamePopup:secondaryAdcClassNamePopup];
 		
 }
 

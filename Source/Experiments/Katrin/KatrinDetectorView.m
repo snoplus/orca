@@ -54,16 +54,16 @@
 		[thePath stroke];
 	}
 	else if(viewType == kUsePreampView){
-		float xc = [self bounds].size.width/2;
-		float yc = [self bounds].size.height/2;
-		NSBezierPath* aPath = [NSBezierPath bezierPath];
-		NSPoint centerPoint = NSMakePoint(xc,yc);
-		float r = MIN(xc,yc)-5;
-		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:r startAngle:360 endAngle:0 clockwise:YES];
-		[aPath closePath];
+		//float xc = [self bounds].size.width/2;
+		//float yc = [self bounds].size.height/2;
+		//NSBezierPath* aPath = [NSBezierPath bezierPath];
+		//NSPoint centerPoint = NSMakePoint(xc,yc);
+		//float r = MIN(xc,yc)-5;
+		//[aPath appendBezierPathWithArcWithCenter:centerPoint radius:r startAngle:360 endAngle:0 clockwise:YES];
+		//[aPath closePath];
 				
-		[[NSColor blackColor] set];
-		[aPath stroke];
+		//[[NSColor blackColor] set];
+		//[aPath stroke];
 	}
 	[super drawRect:rect];
 }
@@ -134,12 +134,12 @@
 	float xc = [self bounds].size.width/2;
 	float h  = [self bounds].size.height;
 	
-	float r = xc*.14;	//radius of the center focalPlaneSegment NOTE: sets the scale of the whole thing
+	float r = xc*.14;			//radius of the center focalPlaneSegment NOTE: sets the scale of the whole thing
 	float area = 2*pi*r*r;		//area of the center focalPlaneSegment
 	
 	[super makeAllSegments];
 	
-	NSPoint centerPoint = NSMakePoint(xc,h-xc);
+	NSPoint centerPoint = NSMakePoint(xc,h-xc - 1);
 
 	if(viewType == kUseCrateView){
 		float dx = [self bounds].size.width/21.;
@@ -177,9 +177,9 @@
 		
 		for(i=0;i<4;i++){
 			NSAffineTransform *transform = [NSAffineTransform transform];
-			[transform translateXBy: xc yBy: h-xc];
+			[transform translateXBy: xc yBy: h-xc-1];
 			[transform rotateByDegrees:i*360/4. + 2*360/24.];
-			NSRect segRect = NSMakeRect(5,-3,15,6);
+			NSRect segRect = NSMakeRect(5,-3,20,6);
 			NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
 			[segPath transformUsingAffineTransform: transform];
 			[segmentPaths addObject:segPath];
@@ -193,9 +193,9 @@
 			float deltaAngle = 360/12.;
 			for(i=0;i<24;i++){
 				NSAffineTransform *transform = [NSAffineTransform transform];
-				[transform translateXBy: xc yBy: h-xc];
+				[transform translateXBy: xc yBy: h-xc-1];
 				[transform rotateByDegrees:angle];
-				NSRect segRect = NSMakeRect(20+j*18,-3,18,6);
+				NSRect segRect = NSMakeRect(25+j*25,-3,25,6);
 				NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
 				[segPath transformUsingAffineTransform: transform];
 				[segmentPaths addObject:segPath];
@@ -206,7 +206,6 @@
 				if(i==11)angle = deltaAngle/2.;
 			}
 		}
-		
 
 		[segmentPathSet addObject:segmentPaths];
 		[errorPathSet addObject:errorPaths];
@@ -275,9 +274,7 @@
 		[segmentPathSet addObject:segmentPaths];
 		[errorPathSet addObject:errorPaths];
 		
-		[self makeVetoSegments];
-		
-		[self setNeedsDisplay:YES];
+		[self makeVetoSegments];		
 	}
 }
 
@@ -286,7 +283,7 @@
 	//========the Veto part==========
 	float xc = [self bounds].size.width/2;
 	float h  = [self bounds].size.height;
-	NSPoint centerPoint = NSMakePoint(xc,h-xc);
+	NSPoint centerPoint = NSMakePoint(xc,h-xc-1);
 	NSMutableArray* segment1Paths = [NSMutableArray arrayWithCapacity:64];
 	NSMutableArray* error1Paths = [NSMutableArray arrayWithCapacity:64];
 	float startAngle	= 0;
@@ -295,8 +292,8 @@
 	float midR1 = (r2+r1)/2. - 2;
 	float midR2 = midR1 + 4;
 	float deltaAngle  = 360./(float)4;
-	float errorAngle1 = deltaAngle/5.;
-	float errorAngle2 = 2*errorAngle1;
+	float midVetoR = r1 + (r2 - r1)/2.;
+	float fiberGroupDelta = 90/4.;
 	int i;
 	for(i=0;i<4;i++){
 		NSBezierPath* aPath = [NSBezierPath bezierPath];
@@ -304,18 +301,104 @@
 		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:r2 startAngle:startAngle+deltaAngle endAngle:startAngle clockwise:YES];
 		[aPath closePath];
 		[segment1Paths addObject:aPath];
-		
-		float midAngleStart = (startAngle+startAngle+deltaAngle)/2 - errorAngle1;
-		float midAngleEnd   = midAngleStart + errorAngle2;
-		
+				
 		aPath = [NSBezierPath bezierPath];
-		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:midR1 startAngle:midAngleStart endAngle:midAngleEnd clockwise:NO];
-		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:midR2 startAngle:midAngleEnd endAngle:midAngleStart clockwise:YES];
+		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:midR1 startAngle:startAngle+10 endAngle:startAngle+deltaAngle-10 clockwise:NO];
+		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:midR2 startAngle:startAngle+deltaAngle-10 endAngle:startAngle+10 clockwise:YES];
 		[aPath closePath];
 		[error1Paths addObject:aPath];
 		
+		float fiberGroupAngle = startAngle + fiberGroupDelta;
+		int j;
+		NSPoint c1;
+		for(j=0;j<3;j++){
+			float a = fiberGroupAngle * 3.1415927/180.;
+			float d = 2* 3.1415927/180.;
+			c1 = NSMakePoint(centerPoint.x + midVetoR*cosf(a-d), centerPoint.y + midVetoR*sinf(a-d) - 1);
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:5 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[segment1Paths addObject:aPath];
+
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:2 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[error1Paths addObject:aPath];
+			
+			c1 = NSMakePoint(centerPoint.x + midVetoR*cosf(a+d), centerPoint.y + midVetoR*sinf(a+d) - 1);
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:5 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[segment1Paths addObject:aPath];
+			
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:2 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[error1Paths addObject:aPath];
+			
+			fiberGroupAngle += fiberGroupDelta;
+		}
 		startAngle += deltaAngle;
 	}
+	
+	//now the half moon end caps
+	//top
+	r1 = 25;
+	r2 = 65;
+	midR1 = (r2+r1)/2. - 2;
+	midR2 = midR1 + 4;
+	midVetoR = r1 + (r2 - r1)/2.;
+	startAngle = 0;
+	deltaAngle = 180;
+	centerPoint = NSMakePoint([self bounds].size.width-r2-1,r2+1);
+	fiberGroupDelta = 180/3.;
+	for(i=0;i<2;i++){
+		NSBezierPath* aPath = [NSBezierPath bezierPath];
+		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:r1 startAngle:startAngle endAngle:startAngle+deltaAngle clockwise:NO];
+		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:r2 startAngle:startAngle+deltaAngle endAngle:startAngle clockwise:YES];
+		[aPath closePath];
+		[segment1Paths addObject:aPath];
+		
+		
+		aPath = [NSBezierPath bezierPath];
+		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:midR1 startAngle:startAngle+30 endAngle:startAngle+deltaAngle-30 clockwise:NO];
+		[aPath appendBezierPathWithArcWithCenter:centerPoint radius:midR2 startAngle:startAngle+deltaAngle-30 endAngle:startAngle+30 clockwise:YES];
+		[aPath closePath];
+		[error1Paths addObject:aPath];
+		
+		float fiberGroupAngle = startAngle + fiberGroupDelta;
+		int j;
+		NSPoint c1;
+		for(j=0;j<2;j++){
+			float a = fiberGroupAngle * 3.1415927/180.;
+			float d = 10 * 3.1415927/180.;
+			c1 = NSMakePoint(centerPoint.x + midVetoR*cosf(a-d), centerPoint.y + midVetoR*sinf(a-d) - 1);
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:5 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[segment1Paths addObject:aPath];
+			
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:2 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[error1Paths addObject:aPath];
+			
+			c1 = NSMakePoint(centerPoint.x + midVetoR*cosf(a+d), centerPoint.y + midVetoR*sinf(a+d) - 1);
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:5 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[segment1Paths addObject:aPath];
+			
+			aPath = [NSBezierPath bezierPath];
+			[aPath appendBezierPathWithArcWithCenter:c1 radius:2 startAngle:0 endAngle:360 clockwise:NO];
+			[aPath closePath];
+			[error1Paths addObject:aPath];
+			
+			fiberGroupAngle += fiberGroupDelta;
+		}
+		startAngle += deltaAngle;
+	}
+	
 	//store into the whole set
 	[segmentPathSet addObject:segment1Paths];
 	[errorPathSet addObject:error1Paths];

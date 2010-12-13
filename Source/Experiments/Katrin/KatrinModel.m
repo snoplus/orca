@@ -197,7 +197,17 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	}
 	else {
 		//the veto
-		return aString;
+		//the focal plane
+		NSString* finalString = @"";
+		NSArray* parts = [aString componentsSeparatedByString:@"\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment" parts:parts]];
+		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];
+		finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain" parts:parts]];
+		finalString = [finalString stringByAppendingString:@"-----------------------\n"];
+		return finalString;
 	}
 }
 
