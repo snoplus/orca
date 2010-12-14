@@ -157,6 +157,7 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherLakeShore210;
+- (void) readSerialNumber;
 
 #pragma mark ***USB Stuff
 - (id) getUSBController;
