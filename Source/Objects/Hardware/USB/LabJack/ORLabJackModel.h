@@ -73,9 +73,12 @@
 	unsigned long processOutputValue; //outputs to be written at end of process cycle
 	unsigned long processOutputMask;  //controlls which bits are written
     BOOL involvedInProcess;
+    unsigned long deviceSerialNumber;
 }
 
 #pragma mark ***Accessors
+- (unsigned long) deviceSerialNumber;
+- (void) setDeviceSerialNumber:(unsigned long)aDeviceSerialNumber;
 - (BOOL) involvedInProcess;
 - (void) setInvolvedInProcess:(BOOL)aInvolvedInProcess;
 - (void) setAOut0Voltage:(float)aValue;
@@ -190,6 +193,7 @@
 
 @end
 
+extern NSString* ORLabJackModelDeviceSerialNumberChanged;
 extern NSString* ORLabJackModelInvolvedInProcessChanged;
 extern NSString* ORLabJackModelAOut1Changed;
 extern NSString* ORLabJackModelAOut0Changed;
