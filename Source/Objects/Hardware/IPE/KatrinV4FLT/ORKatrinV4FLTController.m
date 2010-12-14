@@ -547,6 +547,9 @@
 	if([model runMode] < 3)	[modeTabView selectTabViewItemAtIndex:0];
 	else					[modeTabView selectTabViewItemAtIndex:1];
 	
+	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && ([model runMode]<3)];
+	[filterLengthPU setEnabled:!lockedOrRunningMaintenance];
+	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
 	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
