@@ -64,7 +64,6 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 - (void) pollHardware;
 - (void) sendIoControl;
 - (void) readAdcValues;
-- (void) readSerialNumber;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(int*)anArray forKey:(NSString*)aKey;
 @end
 
@@ -1201,20 +1200,6 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 	
     return objDictionary;
 }
-
-@end
-
-@implementation ORLabJackModel (private)
-- (void) pollHardware
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	if(pollTime == 0 )return;
-    [[self undoManager] disableUndoRegistration];
-	[self queryAll];
-    [[self undoManager] enableUndoRegistration];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-}
-
 - (void) readSerialNumber
 {
 	if(usbInterface && [self getUSBController]){
@@ -1230,6 +1215,20 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 		[self writeData:data];
 	}
 }
+@end
+
+@implementation ORLabJackModel (private)
+- (void) pollHardware
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if(pollTime == 0 )return;
+    [[self undoManager] disableUndoRegistration];
+	[self queryAll];
+    [[self undoManager] enableUndoRegistration];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+}
+
+
 		
 - (void) readAdcValues
 {
