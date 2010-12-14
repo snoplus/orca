@@ -557,6 +557,8 @@
     [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];
     [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
+    [vetoTriggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
+    [vetoHitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [vetoGainMatrix setEnabled:!lockedOrRunningMaintenance];
     [vetoThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
 	
@@ -726,6 +728,7 @@
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[triggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
+		[[vetoTriggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
 	}
 }
 
@@ -734,6 +737,7 @@
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[hitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
+		[[vetoHitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
 	}
 }
 
@@ -777,6 +781,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
+		[[vetoTriggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
 		
 	}
 }
@@ -786,6 +791,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[hitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
+		[[vetoHitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
 		
 	}
 }

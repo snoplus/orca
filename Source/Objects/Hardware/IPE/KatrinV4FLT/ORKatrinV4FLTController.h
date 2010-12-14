@@ -78,6 +78,9 @@
 		IBOutlet NSTextField*	group1NFoldField;
 		IBOutlet NSTextField*	group2NFoldField;
 		IBOutlet NSTextField*	group3NFoldField;
+	
+		IBOutlet NSMatrix*		vetoHitRateEnabledCBs;
+		IBOutlet NSMatrix*		vetoTriggerEnabledCBs;
 
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
