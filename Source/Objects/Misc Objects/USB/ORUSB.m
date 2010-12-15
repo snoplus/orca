@@ -391,8 +391,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 				}
 			}
 			else {
-				NSString* s = [NSString stringWithFormat:@"0x%8x", locationID];
-				[usbCallbackData setSerialNumber:s];
+				//NSString* s = [NSString stringWithFormat:@"0x%8x", locationID];
+				[usbCallbackData setSerialNumber:@"0"];
 				/*
 				UInt8 psi;
 				kr = (*deviceInterface)->USBGetProductStringIndex(deviceInterface, &psi);
