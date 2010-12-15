@@ -242,7 +242,7 @@ typedef struct
 {
 	uint16_t mb_id;
 	uint16_t dc_id[4];
-	uint8_t twidth[32]; // tr100 width, channel 0 to 31, only bits 0 to 6 defined
+	uint8_t twidth[32]; // tr100 width, channel 0 to 31, bit0-5 width/res delay, bit6 enable,
 } tr100_vals_t;
 
 // CMOS shift register 20nsec trigger setup
@@ -250,8 +250,8 @@ typedef struct
 {
 	uint16_t mb_id;
 	uint16_t dc_id[4];
-	uint8_t twidth[32]; //tr20 width, channel 0 to 31, only bits 0 to 6 defined
-	uint8_t tdelay[32]; //tr20 delay, channel 0 to 31, only bits 0 to 4 defined
+	uint8_t twidth[32]; //tr20 width, channel 0 to 31, bit0-4 width, bit5 enable
+	uint8_t tdelay[32]; //tr20 delay, channel 0 to 31, bit0-3 delay
 } tr20_vals_t;
 
 typedef struct

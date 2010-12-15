@@ -404,11 +404,11 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	//vbals are gains per channel x: [0][x] high, [1][x] low
 	uint8_t s_vbal[2][32] = {{ 110, 110, 110, 110, 110, 110, 110, 110,
 		 		   110, 110, 110, 110, 110, 110, 110, 110,
-				   110, 110, 110, 110, 110, 110, 110, 100,
+				   110, 110, 110, 110, 110, 110, 110, 110,
 				   110, 110, 110, 110, 110, 110, 110, 110 },
 				 { 110, 110, 110, 110, 110, 110, 110, 110,
 				   110, 110, 110, 110, 110, 110, 110, 110,
-				   110, 110, 110, 110, 110, 110, 110, 100,
+				   110, 110, 110, 110, 110, 110, 110, 110,
 				   110, 110, 110, 110, 110, 110, 110, 110 }};
 
 	uint8_t s_vthr[32] = {	255, 255, 255, 255, 255, 255, 255, 255,
@@ -447,22 +447,22 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	aBundle->chinj.hvref = 0x00; // MB control voltage
 	aBundle->chinj.ped_time = 100; // MTCD pedestal width (DONT NEED THIS HERE)
 
-	//tr100 width, channel 0 to 31, only bits 0 to 6 defined
+	//tr100 width, channel 0 to 31, only bits 0 to 6 defined, bit0-5 delay, bit6 enable
 	uint8_t s_tr100_twidth[32] = {  0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f };
 
-	//tr20 width, channel 0 to 31, only bits 0 to 6 defined
-	uint8_t s_tr20_twidth[32] = {	0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
-					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
-					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
-					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 };
-	//tr20 delay, channel 0 to 31, only bits 0 to 4 defined
-	uint8_t s_tr20_tdelay[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0, 0, 0 }; 
+	//tr20 width, channel 0 to 31, only bits 0 to 5 defined, bit0-4 width, bit5 enable
+	uint8_t s_tr20_twidth[32] = {	0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
+					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+	//tr20 delay, channel 0 to 31, only bits 0 to 3 defined
+	uint8_t s_tr20_tdelay[32] = {	2, 2, 2, 2, 2, 2, 2, 2,
+					2, 2, 2, 2, 2, 2, 2, 2,
+					2, 2, 2, 2, 2, 2, 2, 2,
+					2, 2, 2, 2, 2, 2, 2, 2 }; 
 
 	//scmos remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
 	uint16_t s_scmos_stuff[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
@@ -859,9 +859,11 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 
 		// ctc delay
 		aMbId[4] = 0;
+		// cmos shift regs only if != 0
+		aMbId[5] = 0;
 		
 		if ([xl3Link needToSwap]) {
-			for (i=0; i<5; i++) aMbId[i] = swapLong(aMbId[i]);
+			for (i=0; i<6; i++) aMbId[i] = swapLong(aMbId[i]);
 		}
 		@try {
 			[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
