@@ -40,7 +40,15 @@ int32_t ORVVmeCard::DMARead(uint32_t vme_address,
                                                             address_modifier,
                                                             data_width, 
                                                             auto_increment);
-    if (!dma_device) return -1; 
+    if (!dma_device) {
+		//try one more time after a very short delay
+		usleep(1);
+		dma_device = TUVMEDeviceManager::GetDeviceManager()->GetDMADevice(vme_address,
+															 address_modifier,
+															 data_width, 
+															 auto_increment);		
+		if (!dma_device) return -1; 
+	}
     int32_t bytes_read = dma_device->Read((char*)buffer, 
 										  number_of_bytes, 
 										  0x0);
