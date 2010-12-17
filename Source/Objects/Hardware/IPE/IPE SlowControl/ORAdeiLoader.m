@@ -59,6 +59,9 @@
 	[super dealloc];
 }
 
+/** Similar to sendControlSetpoint: but is blocking/waiting for the result. Not recommended - use sendControlSetpoint: instead.
+  *
+  */
 - (void) setControlSetpoint:(NSString*)aPath value:(double)aValue
 {
 	//example: @"http://ipepdvadei.ka.fzk.de/test/services/control.php?db_server=test_zeus&db_name=cfp_test&control_group=3&control_mask=2&target=set&control_values=%f",aValue];
@@ -76,6 +79,37 @@
 								   aValue];
 		if(requestString){
 			dataFormat = kxmlFormat;
+			path = [aPath copy];
+			recursive  = NO;
+			NSURL* furl = [NSURL URLWithString: requestString];
+            if(showDebugOutput) NSLog(@"Sending out sensor request string: >>>%@<<<\n",requestString);//debugging
+			NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
+			theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
+		}
+	}
+}
+
+
+/** Similar to setControlSetpoint: but is not blocking/waiting for the result. Recommended.
+  *
+  */
+- (void) sendControlSetpoint:(NSString*)aPath value:(double)aValue
+{
+	//example: @"http://ipepdvadei.ka.fzk.de/test/services/control.php?db_server=test_zeus&db_name=cfp_test&control_group=3&control_mask=2&target=set&control_values=%f",aValue];
+
+	if([aPath hasPrefix:@"/"])aPath = [aPath substringFromIndex:1];
+	NSArray* components = [aPath componentsSeparatedByString:@"/"];
+	if([components count] == 4){
+		NSString* requestString = [NSMutableString stringWithFormat:
+								   @"%@/services/control.php?db_server=%@&db_name=%@&control_group=%@&control_mask=%@&target=send&control_values=%f",
+								   host,
+								   [components objectAtIndex:0],
+								   [components objectAtIndex:1],
+								   [components objectAtIndex:2],
+								   [components objectAtIndex:3],
+								   aValue];
+		if(requestString){
+			dataFormat = kmsgFormat;
 			path = [aPath copy];
 			recursive  = NO;
 			NSURL* furl = [NSURL URLWithString: requestString];
@@ -229,8 +263,17 @@
 			[dictionary setObject:path	forKey:@"Path"];
 		}
 	}
-	else {
+	else if(dataFormat == kcsvFormat){
 		[self parseCSVData:receivedData];
+	}
+	else if(dataFormat == kmsgFormat){
+		if(!resultArray)resultArray = [[NSMutableArray array] retain];//resultArray will be shipped to delegate
+		NSMutableDictionary* dictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys: host, @"URL", path, @"Path", nil];
+		[resultArray addObject: dictionary];
+		[resultArray addObject: [receivedData description]];
+	}
+	else {
+		NSLog(@"ADEI Loader: ERROR: unknown dataFormat %i!\n",dataFormat);
 	}
 	[receivedData release];
 	receivedData = nil;

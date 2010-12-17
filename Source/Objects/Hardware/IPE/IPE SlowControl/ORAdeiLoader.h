@@ -21,6 +21,7 @@
 #define kControlType	1
 #define kcsvFormat 0
 #define kxmlFormat 1
+#define kmsgFormat 2  //this is for messages like <result>Ok</result> or <result>Error</result>
 
 #define kTimeoutInterval 10.0
 // #define kTimeoutInterval 15.0
@@ -58,6 +59,7 @@
 - (void) requestSensorItem:(NSString*)aPath;
 - (void) requestControlItem:(NSString*)aPath;
 - (void) setControlSetpoint:(NSString*)aPath value:(double)aValue;
+- (void) sendControlSetpoint:(NSString*)aPath value:(double)aValue;
 - (void) setShowDebugOutput:(BOOL) aOption;
 - (BOOL) showDebugOutput;
 

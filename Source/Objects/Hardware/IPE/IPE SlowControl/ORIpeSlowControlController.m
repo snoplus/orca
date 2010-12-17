@@ -420,8 +420,13 @@
 
 - (IBAction) sendSetpointAction:(id) sender
 {
-	[self endEditing];
 	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	[self endEditing];
+	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
+	if([selectedSet count] == 1){
+		unsigned index = [selectedSet firstIndex];
+		[model sendControlSetpointForChan: [model findChanOfIndex: index] value:[model setPoint]];
+	}
 }
 
 - (IBAction) queueSetpointAction:(id) sender

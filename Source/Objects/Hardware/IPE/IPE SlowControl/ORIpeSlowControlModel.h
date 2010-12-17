@@ -217,6 +217,7 @@
 - (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath;
 - (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath;
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
+- (void) sendControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
 - (BOOL) requestIsPending:(NSString*)itemKey;
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;

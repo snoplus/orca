@@ -54,6 +54,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (NSMutableArray*) insertNode:(id)aNode intoArray:(NSMutableArray*)anArray path:(NSString*)aPath nodeName:(NSString*)nodeName isLeaf:(BOOL)isLeaf;
 - (void) itemTreeResults:(id)result path:(NSString*)aPath;
 - (void) polledItemResult:(id)result path:(NSString*)aPath;
+- (void) handleSilentItemResult:(id)result path:(NSString*)aPath;
 - (void) clearPendingRequest:(NSString*)anItemKey;
 - (void) setPendingRequest:(NSString*)anItemKey;
 - (void) checkForTimeOuts;
@@ -170,6 +171,23 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (void) sendControlSetpointForChan:(int)aChan value:(double)aValue
 {
+	NSLog(@"%@::%@ - for chan %i send setpoint %Lg\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),aChan, aValue);//DEBUG OUTPUT -tb-  
+    NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
+    if(itemKey){
+		id topLevelDictionary = [requestCache objectForKey:itemKey];
+		id anItem = [topLevelDictionary objectForKey:itemKey];
+		if([anItem objectForKey:@"Control"]){
+			NSString* aUrl  = [anItem objectForKey:@"URL"];
+			NSString* aPath = [anItem objectForKey:@"Path"];
+			[self sendControlSetpoint:aUrl path:aPath value:aValue ];
+		}else{
+            NSLog(@"%@: you tried to write to a non-Control channel!\n",NSStringFromClass([self class]));//-tb- warning output
+            return;
+        }
+    }else{
+        NSLog(@"%@: you tried to use a undefined channel!\n",NSStringFromClass([self class]));
+        return;
+    }
 }
 
 - (void) queueControlSetpointForChan:(int)aChan value:(double)aValue
@@ -987,6 +1005,20 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
     [self setTotalRequestCount:totalRequestCount+1];
 }
 
+- (void) sendControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
+{
+    NSString* anItemKey = [self itemKey:aUrl :aPath];
+		if([self requestIsPending:anItemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
+            //TODO: XXX return;
+        }
+    ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:kControlType delegate:self didFinishSelector:@selector(handleSilentItemResult:path:)];
+    [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
+    [aLoader sendControlSetpoint:aPath value:aValue];
+	[self setPendingRequest:anItemKey];
+    [self setTotalRequestCount:totalRequestCount+1];
+}
+
 
 - (int) findChanOfSensor:(NSString*)aUrl path:(NSString*)aPath
 {
@@ -1041,7 +1073,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 		}
         // post request
         ORAdeiLoader* aLoader;
-        aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:aType delegate:self didFinishSelector:@selector(polledItemResult:path:)];
+        aLoader = [ORAdeiLoader loaderWithAdeiHost:aUrl adeiType:aType delegate:self didFinishSelector:@selector(polledItemResult:path:)]; //TODO: maybe I should add setupOptions: -tb-
         [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
         [aLoader requestItem:aPath];
         [self setPendingRequest:itemKey];
@@ -1336,6 +1368,23 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 		[self clearPendingRequest:itemKey];
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
+}
+
+- (void) handleSilentItemResult:(id)result path:(NSString*)aPath
+{
+	//just remove from pending list and check for errors
+    NSLog(@"handleSilentItemResult: ... result is %@ \n",result);
+    NSLog(@"handleSilentItemResult: ... aPath is %@ \n",aPath);
+	{
+		NSMutableDictionary* dictionary = [result objectAtIndex:0];
+		NSString* itemKey = [self itemKey:[dictionary objectForKey:@"URL"]:[dictionary objectForKey:@"Path"]];
+    NSLog(@"handleSilentItemResult: ... itemKey is %@ \n",itemKey);
+        //if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
+        
+        //housekeeping
+		[self clearPendingRequest:itemKey];
+	}
+    //[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlItemListChanged object:self];
 }
 
 - (void) clearPendingRequest:(NSString*) anItemKey
