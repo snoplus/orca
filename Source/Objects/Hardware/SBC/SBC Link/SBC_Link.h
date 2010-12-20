@@ -39,7 +39,7 @@ typedef  enum eSBC_CrateStates{
 
 typedef enum eSBC_ThrottleConsts{
     kShrinkThrottleBy = 50,           // We shrink the throttle by this much
-    kAmountInBufferThreshold = 0x1000 // if the amount in the buffer exceeds this
+    kAmountInBufferThreshold = 20 // if the amount in the buffer exceeds this percent
 }eSBC_ThrottleConsts;
 
 @class  ORFileMover;
@@ -51,7 +51,9 @@ typedef enum eSBC_ThrottleConsts{
 	id				delegate;
 	ORAlarm*        eCpuDeadAlarm;
 	ORAlarm*        eRunFailedAlarm;
-
+	ORAlarm*        eCpuCBFillingAlarm;
+	ORAlarm*		eCpuCBLostDataAlarm;
+	
 	//setttings
 	NSString*		IPNumber;
     NSString*		passWord;

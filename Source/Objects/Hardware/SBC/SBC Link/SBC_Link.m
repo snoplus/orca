@@ -105,7 +105,13 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	[eCpuDeadAlarm release];
 	[eRunFailedAlarm clearAlarm];
 	[eRunFailedAlarm release];
-    [timeConnected release];
+	[eCpuCBFillingAlarm clearAlarm];
+	[eCpuCBFillingAlarm release];
+	[eCpuCBLostDataAlarm clearAlarm];
+	[eCpuCBLostDataAlarm release];
+
+    
+	[timeConnected release];
 	[connectionHistory release];
     [filePath release];
     [userName release];
@@ -1467,12 +1473,41 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		}
 		else {
 			oldCycleCount = runInfo.readCycles;
-		}	
+		}
+		
+		
+		float percentBufferFilled = 100.*runInfo.amountInBuffer/runInfo.bufferSize;
+
+		if(percentBufferFilled > 30){
+			if(!eCpuCBFillingAlarm){
+				eCpuCBFillingAlarm = [[ORAlarm alloc] initWithName:@"Data Rate Too High" severity:kDataFlowAlarm];
+				[eCpuCBFillingAlarm setSticky:NO];
+				[eCpuCBFillingAlarm setHelpString:@"The SBC circular buffer is filling because the data rate is too high. If the buffer fills completely, data will be lost. Reduce the data rate."];
+			}
+			if(![eCpuCBFillingAlarm isPosted]){
+				[eCpuCBFillingAlarm setAcknowledged:NO];
+				[eCpuCBFillingAlarm postAlarm];
+			}
+			
+			if (throttle > kShrinkThrottleBy && percentBufferFilled > kAmountInBufferThreshold) {
+				/* Let's try diminishing the throttle */
+				throttle -= kShrinkThrottleBy;
+			 }
+		}
+		if(runInfo.lostByteCount > 0 ){
+			if(!eCpuCBLostDataAlarm){
+				eCpuCBLostDataAlarm = [[ORAlarm alloc] initWithName:@"Data Rate Too High" severity:kDataFlowAlarm];
+				[eCpuCBLostDataAlarm setSticky:YES];
+				[eCpuCBLostDataAlarm setHelpString:@"The SBC circular buffer is full and data is being lost. Reduce the data rate."];
+			}
+			if(![eCpuCBLostDataAlarm isPosted]){
+				[eCpuCBLostDataAlarm setAcknowledged:NO];
+				[eCpuCBLostDataAlarm postAlarm];
+			}
+		}
+		
 	}
-    /*if (throttle > kShrinkThrottleBy && runInfo.amountInBuffer > kAmountInBufferThreshold) {
-	 *//* Let's try diminishing the throttle */
-	/*throttle -= kShrinkThrottleBy;
-	 }*/
+ 
 	if(isRunning){
 		[self performSelector:@selector(update) withObject:nil afterDelay:.5];
 	}
@@ -1489,6 +1524,9 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	
 	[eCpuDeadAlarm clearAlarm];
 	[eRunFailedAlarm clearAlarm];
+	[eCpuCBFillingAlarm clearAlarm];
+	[eCpuCBLostDataAlarm clearAlarm];
+
 	throttleCount = 0;
 	missedHeartBeat = 0;
 	throttle = 1000;
@@ -1553,6 +1591,8 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
 	[self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
+	[eCpuCBFillingAlarm clearAlarm];
+	[eCpuCBLostDataAlarm clearAlarm];
 }
 
 
