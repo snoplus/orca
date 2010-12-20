@@ -642,6 +642,7 @@ void stopRun()
     run_info.readCycles        = 0;
 
     stopHWRun(&crate_config);
+	commitData();
     // block until return
     pthread_join(readoutThreadId, NULL);
     cleanupHWRun(&crate_config);
