@@ -29,10 +29,14 @@
 @private 
 	BOOL getRatesFromDecodeStage;
 	NSMutableDictionary* actualSIS3302Cards;
+	BOOL dumpedOneNormal;
+	BOOL dumpedOneBad[8];
+	int recordCount[8];
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 - (void) filterLengthChanged:(NSNotification*)aNote;
+- (void) dumpRecord:(void*)someData bad:(BOOL)wasBad;
 @end
 
 @interface ORSIS3302DecoderForMca : ORVmeCardDecoder {
@@ -51,13 +55,17 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
-@interface ORSIS3302TimeDecoder: ORVmeCardDecoder
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)ptr;
-@end
 
 @interface ORSIS3302McaDecoder : ORVmeCardDecoder {
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
+
+@interface ORSIS3302DecoderForLostData : ORVmeCardDecoder {
+	unsigned long totalLost[8];
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+

@@ -40,6 +40,7 @@
 	//clocks and delays (Acquistion control reg)
 	int	 clockSource;
 	
+	unsigned long   lostDataId;
 	unsigned long   dataId;
 	unsigned long   mcaId;
 	
@@ -197,6 +198,7 @@
 - (unsigned long) getEnergySetupGPOffset:(int)group;
 - (unsigned long) getPreTriggerDelayTriggerGateLengthOffset:(int) aGroup; 
 - (unsigned long) getBufferControlOffset:(int) aGroup; 
+- (unsigned long) getPreviousBankSampleRegister:(int)channel;
 
 - (int) energyGateLength:(short)aGroup;
 - (void) setEnergyGateLength:(short)aGroup withValue:(int)aEnergyGateLength;
@@ -367,6 +369,8 @@
 - (NSString*) runSummary;
 
 #pragma mark •••Data Taker
+- (unsigned long) lostDataId;
+- (void) setLostDataId: (unsigned long) anId;
 - (unsigned long) mcaId;
 - (void) setMcaId: (unsigned long) anId;
 - (unsigned long) dataId;

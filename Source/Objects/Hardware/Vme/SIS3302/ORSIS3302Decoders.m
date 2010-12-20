@@ -26,14 +26,13 @@
 
 
 @implementation ORSIS3302DecoderForEnergy
-
-
 //------------------------------------------------------------------
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //^^^^ ^^^^ ^^^^ ^^-----------------------data id
 //                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^----------------------^^^^-^^^--spare
+//^^^^ ^^^--------------------------------most  sig bits of num records lost
+//------------------------------^^^^-^^^--least sig bits of num records lost
 //        ^ ^^^---------------------------crate
 //             ^ ^^^^---------------------card
 //                    ^^^^ ^^^^-----------channel
@@ -49,10 +48,15 @@
 #define kFilterLengthKey @"energyPeakingTimes"
 
 - (id) init
-
 {
     self = [super init];
     getRatesFromDecodeStage = YES;
+	dumpedOneNormal = NO;
+	int i;
+	for(i=0;i<8;i++){
+		recordCount[i]=0;
+		dumpedOneBad[i]=NO;
+	}
     return self;
 }
 
@@ -103,9 +107,12 @@
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kFilterLengthKey fromHeader:[aDecoder fileHeader]];
 	}	
-	
 	unsigned long lastWord = ptr[length-1];
 	if(lastWord == 0xdeadbeef){
+		recordCount[channel]++;
+		//if(!dumpedOneNormal){
+		//	[self dumpRecord:someData bad:NO];
+		//}
 		unsigned long energy = ptr[length - 4]; 
 
         NSArray* theFilterLengths = nil;
@@ -178,6 +185,14 @@
 			getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
 		}
 	}
+	else {
+		if(!dumpedOneBad[channel]){
+			dumpedOneBad[channel] = YES;
+			NSLog(@"Bad Record for channel: %d  total: %d\n",channel,recordCount[channel]);
+			//[self dumpRecord:someData bad:YES];
+		}
+		
+	}
 	
     return length; //must return number of longs
 }
@@ -201,6 +216,55 @@
 	 return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];       
 	 */
 	return @"Description not implemented yet";
+}
+- (void) dumpRecord:(void*)someData bad:(BOOL)wasBad 
+{
+	//if(wasBad)dumpedOneBad = YES;
+	//else dumpedOneNormal = YES;
+	
+    unsigned long* ptr	= (unsigned long*)someData;
+	unsigned long length= ExtractLength(ptr[0]);
+	int crate			= ShiftAndExtract(ptr[1],21,0xf);
+	int card			= ShiftAndExtract(ptr[1],16,0x1f);
+	int channel			= ShiftAndExtract(ptr[1],8,0xff);
+	BOOL wrapMode		= ShiftAndExtract(ptr[1],0,0x1);
+	
+	
+	long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
+	long energyLength   = ptr[3]; //each energy value is a sum of two 
+	
+	long sisHeaderLength;
+	if(wrapMode)sisHeaderLength = 4;
+	else		sisHeaderLength = 2;
+	NSFont* afont = [NSFont fontWithName:@"Monaco" size:12];
+	NSLogFont(afont,@"-----------------------------------\n");
+	NSLogFont(afont,@"%@\n",wasBad?@"Bad Record":@"NormalRecord");
+	NSLogFont(afont,@"Length: %d longs\n",length);
+	NSLogFont(afont,@"Crate: %d Card: %d Channel: %d\n",crate,card,channel);
+	NSLogFont(afont,@"Wrap Mode: %@\n",wrapMode?@"YES":@"NO");
+	NSLogFont(afont,@"WaveForm Length: %d longs\n",waveformLength);
+	NSLogFont(afont,@"EnergyLength Length: %d longs\n",energyLength);
+	NSLogFont(afont,@"  0: 0x%08x 0x%08x 0x%08x 0x%08x\n",ptr[0],ptr[1],ptr[2],ptr[3]);
+	
+	int i;
+	int index = 4;
+	for(i=0;i<sisHeaderLength;i++){
+		NSLogFont(afont,@"%3d: 0x%08x\n",index,ptr[index]);
+		index++;
+	}
+	NSLogFont(afont,@"\n");
+	for(i=0;i<waveformLength;i+=8){
+		NSLogFont(afont,@"%3d: 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x\n",index,ptr[index],ptr[index+1],ptr[index+2],ptr[index+3],ptr[index+4],ptr[index+5],ptr[index+6],ptr[index+7]);
+		index += 8;
+	}
+	NSLog(@"\n");
+	for(i=0;i<energyLength;i+=8){
+		NSLogFont(afont,@"%3d: 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x\n",index,ptr[index],ptr[index+1],ptr[index+2],ptr[index+3],ptr[index+4],ptr[index+5],ptr[index+6],ptr[index+7]);
+		index += 8;
+	}
+	NSLogFont(afont,@"%3d: 0x%08x 0x%08x 0x%08x 0x%08x\n",index,ptr[index],ptr[index+1],ptr[index+2],ptr[index+3]);
+
+	NSLogFont(afont,@"-----------------------------------\n");
 }
 @end
 
@@ -480,3 +544,83 @@
 }
 
 @end
+
+
+@implementation ORSIS3302DecoderForLostData
+
+//------------------------------------------------------------------
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^^ ^^^^ ^^-----------------------data id
+//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^--------------------------------spare
+//        ^ ^^^---------------------------crate
+//             ^ ^^^^---------------------card
+//                    ^^^^ ^^^^-----------channel
+//								^^^^ ^^^^-data type
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-data
+//data type:
+//0 -> number of lost events
+//1 -> reset due to timeout on one or more channels
+//------------------------------------------------------------------
+
+- (id) init
+{
+    self = [super init];
+	int i;
+	for(i=0;i<8;i++){
+		totalLost[i]=0;
+	}
+    return self;
+}
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length = ExtractLength(ptr[0]);
+	int crate	 = ShiftAndExtract(ptr[1],21,0xf);
+	int card	 = ShiftAndExtract(ptr[1],16,0x1f);
+	int channel  = ShiftAndExtract(ptr[1],8,0xff);
+	int dataType = ShiftAndExtract(ptr[1],0,0xff);
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* cardKey		= [self getCardKey: card];
+	NSString* channelKey	= [self getChannelKey: channel];
+	if(dataType == 0){
+		if(channel>=0 && channel<8){
+			totalLost[channel] += ptr[2];
+			NSString* numLostRecords = [NSString stringWithFormat:@"%u",totalLost[channel]];
+			[aDataSet loadGenericData:numLostRecords sender:self withKeys:@"SIS3302", @"Lost Records", crateKey,cardKey,channelKey,nil];
+		}
+	}
+	else if(dataType == 1){
+		[aDataSet loadGenericData:[NSString stringWithFormat:@"0x%02x",ptr[2]>>16] sender:self withKeys:@"SIS3302", @"Reset Event", crateKey,cardKey,nil];
+	}
+    return length; //must return number of longs
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+	int crate	 = ShiftAndExtract(ptr[1],21,0xf);
+	int card	 = ShiftAndExtract(ptr[1],16,0x1f);
+	int channel  = ShiftAndExtract(ptr[1],8,0xff);
+	int dataType = ShiftAndExtract(ptr[1],0,0xff);
+		
+	NSString* title= @"SIS3302 Lost Records\n\n";
+    
+	NSString* data;
+	NSString* crateString   = [NSString stringWithFormat:@"Crate = %d\n",crate];
+    NSString* cardString    = [NSString stringWithFormat:@"Card  = %d\n",card];    
+    NSString* channelString = [NSString stringWithFormat:@"Card  = %d\n",channel];  
+	if(dataType == 0){
+		data = [NSString stringWithFormat:@"Num Records Lost = %d\n",ptr[2]];
+	}
+	else if(dataType == 1){
+		data = [NSString stringWithFormat:@"Reset Event Mask = 0x%02x\n",ptr[2]];
+	}
+
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crateString,cardString,channelString,data];               
+}
+
+@end
+

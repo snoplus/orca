@@ -1218,8 +1218,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
 			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 
-			//unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
-			unsigned long maxEvents = 1;
+			unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
+			//unsigned long maxEvents = 10;
 			[self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
 			// Check the sample indices
 			// Don't call setEnergy* from in here!  Cause stack overflow...
@@ -2013,6 +2013,16 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
 }
 
+- (unsigned long) getPreviousBankSampleRegister:(int)channel
+{
+	unsigned long aValue = 0;
+	[[self adapter] readLongBlock:&aValue
+						atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	return aValue;
+}
 
 - (void) readMcaStatus
 {
@@ -2111,7 +2121,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self writeTriggerSetups];
 	[self writeThresholds];
 	[self writeDacOffsets];
-	[self resetSamplingLogic];
 	[self writeBufferControl];
 	
 	if(runMode == kMcaRunMode){
@@ -2458,6 +2467,11 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
     mcaId = anId;
 }
+- (unsigned long) lostDataId { return lostDataId; }
+- (void) setLostDataId: (unsigned long) anId
+{
+    lostDataId = anId;
+}
 
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
@@ -2468,12 +2482,14 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
     dataId   = [assigner assignDataIds:kLongForm];
     mcaId    = [assigner assignDataIds:kLongForm]; 
+    lostDataId  = [assigner assignDataIds:kLongForm]; 
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
     [self setMcaId:[anotherCard mcaId]];
+    [self setLostDataId:[anotherCard lostDataId]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -2495,6 +2511,15 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 						   [NSNumber numberWithLong:-1],	@"length",
 						   nil];
     [dataDictionary setObject:aDictionary forKey:@"MCA"];
+
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORSIS3302DecoderForLostData",			@"decoder",
+				   [NSNumber numberWithLong:lostDataId],	@"dataId",
+				   [NSNumber numberWithBool:NO],			@"variable",
+				   [NSNumber numberWithLong:3],				@"length",
+				   nil];
+    [dataDictionary setObject:aDictionary forKey:@"LostData"];
+	
 	
     return dataDictionary;
 }
@@ -2842,12 +2867,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				int channel;
 				unsigned long endSampleAddress[kNumSIS3302Channels];
 				for( channel=0;channel<kNumSIS3302Channels;channel++) {
-					endSampleAddress[channel]= 0;
-					[[self adapter] readLongBlock:&endSampleAddress[channel]
-										atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
-										numToRead:1
-									   withAddMod:[self addressModifier]
-									usingAddSpace:0x01];
+					endSampleAddress[channel]= [self getPreviousBankSampleRegister:channel];
 					if (((endSampleAddress[channel] >> 24) & 0x1) ==  (bankOneArmed ? 0:1)) { 
 						waitForBankSwitch = YES;
 						return;
@@ -2864,7 +2884,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 						int group				 = channel/2;
 						int eventCount			 = 0;
 						do {
-							if(!isRunning) return;
 							BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
 							int index = 0;
 							dataRecord[group][index++] =   dataId | dataRecordlength[group];
@@ -2903,7 +2922,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	isRunning = NO;
-
+	
 	if(runMode == kMcaRunMode){
 		unsigned long mcaLength;
 		switch (mcaHistoSize) {
@@ -2964,7 +2983,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	int group;
 	for(group=0;group<4;group++){
-		if(dataRecord){
+		if(dataRecord[group]){
 			free(dataRecord[group]);
 			dataRecord[group] = nil;
 		}
@@ -2981,8 +3000,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 	else {
 		configStruct->total_cards++;
-		configStruct->card_info[index].hw_type_id				= kSIS3302; //should be unique
-		configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
+		configStruct->card_info[index].hw_type_id				= kSIS3302;		//should be unique
+		configStruct->card_info[index].hw_mask[0]				= dataId;		//better be unique
+		configStruct->card_info[index].hw_mask[1]				= lostDataId;	//better be unique
 		configStruct->card_info[index].slot						= [self slot];
 		configStruct->card_info[index].crate					= [self crateNumber];
 		configStruct->card_info[index].add_mod					= [self addressModifier];
