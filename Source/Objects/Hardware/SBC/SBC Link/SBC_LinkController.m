@@ -583,7 +583,7 @@
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 			
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9d   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9d   Err Count   : %d\n",aReadMark,theRunInfo.msg_count]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9d   Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d   Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
 		break;
 			
