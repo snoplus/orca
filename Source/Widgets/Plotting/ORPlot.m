@@ -273,7 +273,7 @@
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(x,0) toPoint:NSMakePoint(x,height)];
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(0,y) toPoint:NSMakePoint(width,y)];
 
-		NSString* cursorPositionString = [NSString stringWithFormat:@"x:%.0f y:%.0f",cursorPosition.x,cursorPosition.x<numPoints?y:0.0];
+		NSString* cursorPositionString = [NSString stringWithFormat:@"x:%.0f y:%.0f",cursorPosition.x,cursorPosition.y];
 		s = [[NSAttributedString alloc] initWithString:cursorPositionString attributes:attrsDictionary];
 		labelSize = [s size];
 		[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-labelSize.height-5)];
