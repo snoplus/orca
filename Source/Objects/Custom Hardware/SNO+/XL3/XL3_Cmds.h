@@ -23,25 +23,25 @@
 
 // xl3_code/include/xl3_functions.h
 // possible cmdID's for packets recieved by XL3 (from the DAQ)
-#define CHANGE_MODE_ID		(0x01)	// change mode
-#define XL3_TEST_CMD_ID 	(0x02)	// do any of the test functions (check test_function.h)
-#define SINGLE_CMD_ID		(0x04)	// execute one cmd and get result
-#define DAQ_QUIT_ID		(0x05)	// quit
-#define FEC_CMD_ID		(0x06)	// put one or many cmds in cmd queue
-#define FEC_TEST_ID		(0x07)	// DAQ functions below ...
-#define MEM_TEST_ID		(0x08)
-#define CRATE_INIT_ID		(0x09)
-#define VMON_START_ID		(0x0A)
-#define BOARD_ID_READ_ID	(0x0B)
-#define ZERO_DISCRIMINATOR_ID	(0x0C)
-#define FEC_LOAD_CRATE_ADD_ID	(0x0D)
-#define SET_CRATE_PEDESTALS_ID	(0x0E)
-#define DESELECT_FECS_ID	(0x0F)
-#define BUILD_CRATE_CONFIG_ID	(0x10)
-#define LOADSDAC_ID		(0x11)
-#define CALD_TEST_ID		(0x12)
+#define CHANGE_MODE_ID		(0x01)	// done. change mode
+#define XL3_TEST_CMD_ID 	(0x02)	// not yet. do any of the test functions (check test_function.h)
+#define SINGLE_CMD_ID		(0x04)	// done. execute one cmd and get result
+#define DAQ_QUIT_ID		(0x05)	// done. quit
+#define FEC_CMD_ID		(0x06)	// done. put one or many cmds in cmd queue
+#define FEC_TEST_ID		(0x07)	// not yet. DAQ functions below ...
+#define MEM_TEST_ID		(0x08)	// not yet.
+#define CRATE_INIT_ID		(0x09)	// done.
+#define VMON_START_ID		(0x0A)  // not yet.
+#define BOARD_ID_READ_ID	(0x0B)	// done. to check if pmtic id is correct
+#define ZERO_DISCRIMINATOR_ID	(0x0C)	// not yet.
+#define FEC_LOAD_CRATE_ADD_ID	(0x0D)	// not yet.
+#define SET_CRATE_PEDESTALS_ID	(0x0E)	// done. doesn't work, ORCA is the buggy one
+#define DESELECT_FECS_ID	(0x0F)	// done.
+#define BUILD_CRATE_CONFIG_ID	(0x10)	// not yet.
+#define LOADSDAC_ID		(0x11)	// not yet.
+#define CALD_TEST_ID		(0x12)	// not yet.
 #define STATE_MACHINE_RESET_ID	(0x13)
-#define MULTI_CMD_ID		(0x14)
+#define MULTI_CMD_ID		(0x14)	// execute multiple commands are get result
 #define DEBUGGING_MODE_ID	(0x15)
 #define READ_PEDESTALS_ID	(0x16)
 #define PONG_ID			(0x17)
@@ -163,7 +163,15 @@ typedef
 }
 FECCommand;
 */
- 
+
+#define MAX_ACKS_SIZE (80)
+typedef struct
+{
+        uint32_t howmany;
+        FECCommand cmd[MAX_ACKS_SIZE];
+} MultiFC;
+
+
 // orca specific anonymous
 typedef
 	struct {

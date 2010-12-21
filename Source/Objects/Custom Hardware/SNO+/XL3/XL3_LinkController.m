@@ -421,6 +421,10 @@ static NSDictionary* xl3Ops;
 									compositeXl3RWRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(compositeXl3RW)), @"selector",
 			 nil], @"compositeXl3RW",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeResetCrateButton, @"button",
+									compositeResetCrateRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(compositeResetCrate)), @"selector",
+			 nil], @"compositeResetCrate",
 		  nil];
 }
 

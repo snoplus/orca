@@ -65,6 +65,8 @@
 	IBOutlet NSProgressIndicator*	compositeSetPedestalRunningIndicator;
 	IBOutlet NSButton*		compositeBoardIDButton;	
 	IBOutlet NSProgressIndicator*	compositeBoardIDRunningIndicator;
+	IBOutlet NSButton*		compositeResetCrateButton;	
+	IBOutlet NSProgressIndicator*	compositeResetCrateRunningIndicator;
 	//connection
 	IBOutlet NSButton*		toggleConnectButton;
 	IBOutlet NSPopUpButton*		errorTimeOutPU;

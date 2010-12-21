@@ -49,6 +49,7 @@ eXL3_CrateStates;
 	ORSafeCircularBuffer* bundleBuffer;
 	unsigned long long num_cmd_packets;
 	unsigned long long num_dat_packets;
+	XL3_Packet	aMultiCmdPacket;
 }
 
 - (id)   init;
@@ -87,6 +88,11 @@ eXL3_CrateStates;
 - (void) setPortNumber:(unsigned long)aPortNumber;
 - (NSString*) crateName;
 - (void) setCrateName:(NSString*)aCrateName;
+
+- (void) newMultiCmd;
+- (void) addMultiCmdToAddress:(long)anAddress withValue:(long)aValue;
+- (XL3_Packet*) executeMultiCmd;
+- (BOOL) multiCmdFailed;
 
 - (void) sendXL3Packet:(XL3_Packet*)aSendPacket;
 - (void) sendCommand:(long)aCmd withPayload:(XL3_PayloadStruct*)payloadBlock expectResponse:(BOOL)askForResponse;

@@ -304,6 +304,82 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	}
 }	
 
+- (void) newMultiCmd
+{
+	aMultiCmdPacket.cmdHeader.packet_type = MULTI_CMD_ID;
+	aMultiCmdPacket.cmdHeader.packet_num = (unsigned short) ++num_cmd_packets;
+	aMultiCmdPacket.cmdHeader.num_bundles = 0;
+	memset(aMultiCmdPacket.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+}
+
+- (void) addMultiCmdToAddress:(long)anAddress withValue:(long)aValue
+{
+	MultiFC* theMultiFC = (MultiFC*) aMultiCmdPacket.payload;
+	FECCommand* aFECCommand = &(theMultiFC->cmd[theMultiFC->howmany]);
+
+	aFECCommand->cmd_num = theMultiFC->howmany;
+	aFECCommand->packet_num = aMultiCmdPacket.cmdHeader.packet_num;
+	aFECCommand->flags = 0;
+	aFECCommand->address = anAddress;
+	aFECCommand->data = aValue;
+	
+	theMultiFC->howmany++;
+}
+
+- (XL3_Packet*) executeMultiCmd
+{
+	MultiFC* theMultiFC = (MultiFC*) aMultiCmdPacket.payload;
+	if (needToSwap) {
+		unsigned int i = 0;
+		for (i = 0; i < theMultiFC->howmany; i++) {
+			FECCommand* command = &(theMultiFC->cmd[i]);
+			command->cmd_num = swapLong(command->packet_num);
+			command->packet_num = swapShort(command->packet_num);
+			command->address = swapLong(command->address);
+			command->data = swapLong(command->data);
+		}
+		theMultiFC->howmany = swapLong(theMultiFC->howmany);
+		aMultiCmdPacket.cmdHeader.packet_type = swapShort(aMultiCmdPacket.cmdHeader.packet_type);
+	}
+
+	@try {
+		[self sendXL3Packet:&aMultiCmdPacket];
+	}
+	@catch (NSException* localException) {
+		NSLog(@"MultiCmd failed.\n");
+		//@throw localException;
+	}
+		
+	if (needToSwap) {
+		aMultiCmdPacket.cmdHeader.packet_type = swapShort(aMultiCmdPacket.cmdHeader.packet_type);
+		theMultiFC->howmany = swapLong(theMultiFC->howmany);
+		unsigned int i = 0;
+		for (i = 0; i < theMultiFC->howmany; i++) {
+			FECCommand* command = &(theMultiFC->cmd[i]);
+			command->cmd_num = swapLong(command->packet_num);
+			command->packet_num = swapShort(command->packet_num);
+			command->address = swapLong(command->address);
+			command->data = swapLong(command->data);
+		}
+	}
+	
+	return &aMultiCmdPacket;
+}
+
+- (BOOL) multiCmdFailed
+{
+	BOOL error = NO;
+	MultiFC* theMultiFC = (MultiFC*) aMultiCmdPacket.payload;
+
+	unsigned int i = 0;
+	for (i = 0; i < theMultiFC->howmany; i++) {
+		FECCommand* command = &theMultiFC->cmd[i];
+		error |= command->flags;
+	}
+			
+	return error;
+}
+
 - (void) sendXL3Packet:(XL3_Packet*)aPacket
 {
 	//expects the packet is swapped correctly (both header and payload)
@@ -630,10 +706,12 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				coreLocker = NO;
 
 				//if ((!needToSwap && aPacket[0] == 'A') ||
-				if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xCC) {
-					//PMT mega bundle
-					//packet_num, num_bundles???
-					[bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:1440];
+				if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xCC) { //PMT mega bundle
+					//packet_num?
+					[bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
+					if (((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 != 1440) { //TODO: remove before deploynment
+						NSLog(@"XL3 Mega bundle num: %d with %d bundles\n", bundle_count, ((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12);
+					}
 					bundle_count++;
 				}
 				else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xEE) {

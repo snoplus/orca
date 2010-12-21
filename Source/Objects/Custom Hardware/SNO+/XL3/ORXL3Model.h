@@ -168,6 +168,7 @@ enum {
 - (void) compositeSetPedestal;
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip;
 - (void) getBoardIDs;
+- (void) compositeResetCrate;
 - (void) reset;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;

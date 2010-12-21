@@ -453,17 +453,33 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f };
 
-	//tr20 width, channel 0 to 31, only bits 0 to 5 defined, bit0-4 width, bit5 enable
+	//tr20 width, channel 0 to 31, only bits 0 to 5 defined, bit0-4 width, bit5 enable from PennDB
+	uint8_t s_tr20_twidth[32] = {	0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
+					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
+					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
+					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 };
+
+	// sane defaults from the DB spec
+	/*
 	uint8_t s_tr20_twidth[32] = {	0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
 					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
 					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
 					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
-	//tr20 delay, channel 0 to 31, only bits 0 to 3 defined
+	*/
+	
+	//tr20 delay, channel 0 to 31, only bits 0 to 3 defined from PennDB
+	uint8_t s_tr20_tdelay[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, 0, 0, 0, 0, 0, 0 }; 
+	//sane defaults from DB spec
+	/*
 	uint8_t s_tr20_tdelay[32] = {	2, 2, 2, 2, 2, 2, 2, 2,
 					2, 2, 2, 2, 2, 2, 2, 2,
 					2, 2, 2, 2, 2, 2, 2, 2,
 					2, 2, 2, 2, 2, 2, 2, 2 }; 
-
+	*/
+	
 	//scmos remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
 	uint16_t s_scmos_stuff[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
@@ -598,18 +614,13 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 {
 	//to be replaced with while...
 	if ([xl3Link bundleAvailable]) {
-		NSData* aBundle;
-		//unsigned long placeHolder = 0;
-		unsigned long data[362];
-		
-		data[0] = xl3MegaBundleDataId | 362;
+		NSData* aBundle = [xl3Link readNextBundle]; //ORSafeCircularBuffer calls autorelease on the NSData
+		unsigned long data_length = 2 + [aBundle length] / 4;
+		unsigned long data[data_length];
+		data[0] = xl3MegaBundleDataId | data_length;
 		data[1] = 0; //packet count, maybe time, and crate ID in a meaningful way
-		aBundle = [xl3Link readNextBundle]; //ORSafeCircularBuffer calls autorelease on the NSData
-		memcpy(&data[2], [aBundle bytes], 1440);
-		[aDataPacket addLongsToFrameBuffer:data length:362];
-		//placeHolder = [aDataPacket reserveSpaceInFrameBuffer:362];
-		//[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder withLongs:data length:2];
-		//[aDataPacket replaceReservedDataInFrameBufferAtIndex:placeHolder withLongs:(unsigned long*)[aBundle bytes] length:360];
+		memcpy(&data[2], [aBundle bytes], [aBundle length]);
+		[aDataPacket addLongsToFrameBuffer:data length:data_length];
 	}
 }
 
@@ -1095,6 +1106,38 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	}
 
 	[self setXl3OpsRunning:NO forKey:@"compositeBoardID"];	
+}
+
+- (void) compositeResetCrate
+{
+	//XL2_CONTROL_CRATE_RESET	0x80
+	//XL2_CONTROL_DONE_PROG		0x100
+
+	[self setXl3OpsRunning:YES forKey:@"compositResetCrate"];
+	NSLog(@"Reset crate keep Xilinx code.\n");
+
+	@try {
+		[self deselectCards];
+		//read XL3 select register
+		unsigned long aValue = [self readXL3Register:kXl3CsReg];
+		if (aValue & 0x100UL == 0) { 
+			NSLog(@"Xilinx doesn't seem to be loaded, keeping it anyway!\n");
+		}
+		
+		[[self xl3Link] newMultiCmd];
+		[[self xl3Link] addMultiCmdToAddress:(XL3_SEL | [self getRegisterAddress:kXl3CsReg] | WRITE_REG) withValue:0x100UL]; //prog done
+		[[self xl3Link] addMultiCmdToAddress:(XL3_SEL | [self getRegisterAddress:kXl3CsReg] | WRITE_REG) withValue:0x180UL]; //prog done | reset
+		[[self xl3Link] addMultiCmdToAddress:(XL3_SEL | [self getRegisterAddress:kXl3CsReg] | WRITE_REG) withValue:0x100UL]; //prog done
+		[[self xl3Link] executeMultiCmd];
+		[self deselectCards];
+		
+		if ([[self xl3Link] multiCmdFailed]) NSLog(@"reset failed: XL3 bus error.\n");
+	}
+	@catch (NSException* e) {
+		NSLog(@"reset failed; error: %@ reason: %@\n", [e name], [e reason]);
+	}
+	
+	[self setXl3OpsRunning:NO forKey:@"compositeResetCrate"];
 }
 
 - (void) reset
