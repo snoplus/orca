@@ -20,6 +20,7 @@
     IBOutlet ORColorScale* focalPlaneColorScale;
     IBOutlet ORColorScale* vetoColorScale;
 	BOOL viewType;
+	NSImage* theBackground;
 }
 - (void) setViewType:(int)aViewType;
 

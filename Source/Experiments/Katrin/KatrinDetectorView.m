@@ -18,6 +18,10 @@
 #import "ORSegmentGroup.h"
 #import "ORDetectorSegment.h"
 
+#define crateX 48.
+#define crateY 265.
+#define crateW 313.
+#define crateH 188.
 
 @interface KatrinDetectorView (private)
 - (void) makeAllSegments;
@@ -25,6 +29,19 @@
 @end
 
 @implementation KatrinDetectorView
+
+- (void) dealloc
+{
+	[theBackground release];
+	[super dealloc];
+}
+
+- (void) awakeFromNib
+{	
+	[theBackground release];
+	theBackground = [[NSImage imageNamed:@"IpeV4CrateBig"] retain];
+}
+
 - (void) setViewType:(int)aViewType
 {
 	viewType = aViewType;
@@ -33,25 +50,31 @@
 - (void) drawRect:(NSRect)rect
 {
 	if(viewType == kUseCrateView){
-		float x;
-		float y;
-		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/24.;
+		float h = [self bounds].size.height;
+		//float w = [self bounds].size.width;
+		float extra = 75;
+		float imageHeight = [theBackground size].height;
+		float imageWidth = [theBackground size].width;
+		NSRect destRect = NSMakeRect(25,h-imageHeight-extra-40,imageWidth+extra,imageHeight+extra);
+		NSRect srcRect = NSMakeRect(0,0,imageWidth,imageHeight);
+		
+		[theBackground drawInRect:destRect fromRect:srcRect operation:NSCompositeSourceOver fraction:1.0];
 		[[NSColor blackColor] set];
-		[NSBezierPath fillRect:[self bounds]];
+		[NSBezierPath fillRect:NSMakeRect(crateX,crateY, crateW,crateH)];
 		[[NSColor whiteColor] set];
-		NSBezierPath* thePath = [NSBezierPath bezierPath];
-		for(x=0;x<[self bounds].size.width;x+=dx){
-			[thePath moveToPoint:NSMakePoint(x,0)];
-			[thePath lineToPoint:NSMakePoint(x,[self bounds].size.height)];
+		float dx = crateW/21.;
+		int i;
+		NSFont* font = [NSFont systemFontOfSize:9.0];
+		NSDictionary* attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:font,NSFontAttributeName,[NSColor whiteColor],NSForegroundColorAttributeName,nil];
+		for(i=0;i<21;i++){
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(crateX + i*dx,crateY) toPoint:NSMakePoint(crateX + i*dx,crateY+crateH )];
+			if(i%2 != 1){
+				NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d",i+1] attributes:attrsDictionary];
+				float sw = [s size].width;
+				float sh = [s size].height;
+				[s drawAtPoint:NSMakePoint(crateX + i*dx + (dx/2.- sw/2.),crateY-sh)];
+			}
 		}
-		for(y=0;y<=[self bounds].size.height;y+=dy){
-			[thePath moveToPoint:NSMakePoint(0,y)];
-			[thePath lineToPoint:NSMakePoint([self bounds].size.width,y)];
-		}
-		[thePath moveToPoint:NSMakePoint([self bounds].size.width,0)];
-		[thePath lineToPoint:NSMakePoint([self bounds].size.width,[self bounds].size.height)];
-		[thePath stroke];
 	}
 	else if(viewType == kUsePreampView){
 		//float xc = [self bounds].size.width/2;
@@ -142,8 +165,9 @@
 	NSPoint centerPoint = NSMakePoint(xc,h-xc - 1);
 
 	if(viewType == kUseCrateView){
-		float dx = [self bounds].size.width/21.;
-		float dy = [self bounds].size.height/24.;
+				
+		float dx = crateW/21.;
+		float dy = crateH/24.;
 		int set;
 		int numSets = [delegate numberOfSegmentGroups];
 		for(set=0;set<numSets;set++){
@@ -159,7 +183,7 @@
 				if(channel < 0){
 					cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
 				}
-				NSRect channelRect = NSMakeRect(cardSlot*dx,channel*dy,dx,dy);
+				NSRect channelRect = NSMakeRect(crateX + cardSlot*dx,crateY + channel*dy,dx,dy);
 				[segmentPaths addObject:[NSBezierPath bezierPathWithRect:channelRect]];
 				[errorPaths addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(channelRect, 4, 4)]];
 			}
