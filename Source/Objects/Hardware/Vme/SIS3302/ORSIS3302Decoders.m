@@ -109,7 +109,6 @@
 	}	
 	unsigned long lastWord = ptr[length-1];
 	if(lastWord == 0xdeadbeef){
-		recordCount[channel]++;
 		//if(!dumpedOneNormal){
 		//	[self dumpRecord:someData bad:NO];
 		//}
@@ -129,26 +128,28 @@
 		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
 		long energyLength   = ptr[3]; //each energy value is a sum of two 
 	
-		if(waveformLength){
-			NSData* recordAsData;
+		if((waveformLength>0) && (waveformLength == (length - 4 - sisHeaderLength - energyLength - 4))){
+			NSData* recordAsData = nil;
 			if(wrapMode){
-				unsigned long nof_wrap_samples = ptr[6] ; 
-				unsigned long wrap_start_index = ptr[7] ;
-				recordAsData = [NSMutableData dataWithLength:waveformLength*sizeof(long)];
-				unsigned short* dataPtr			  = (unsigned short*)[recordAsData bytes];
-				unsigned short* ushort_buffer_ptr = (unsigned short*) &ptr[8];
-				int i;
-				unsigned long j	=	wrap_start_index; 
-				for (i=0;i<nof_wrap_samples;i++) { 
-					if(j >= nof_wrap_samples ) j=0;
-					dataPtr[i] = ushort_buffer_ptr[j++];
-				}			
+				unsigned long nof_wrap_samples = ptr[6] ;
+				if(nof_wrap_samples <= waveformLength*2){
+					unsigned long wrap_start_index = ptr[7] ;
+					recordAsData = [NSMutableData dataWithLength:waveformLength*sizeof(long)];
+					unsigned short* dataPtr			  = (unsigned short*)[recordAsData bytes];
+					unsigned short* ushort_buffer_ptr = (unsigned short*) &ptr[8];
+					int i;
+					unsigned long j	=	wrap_start_index; 
+					for (i=0;i<nof_wrap_samples;i++) { 
+						if(j >= nof_wrap_samples ) j=0;
+						dataPtr[i] = ushort_buffer_ptr[j++];
+					}
+				}
 			}
 			else {
 				unsigned char* bPtr = (unsigned char*)&ptr[4 + sisHeaderLength]; //ORCA header + SIS header
 				recordAsData = [NSData dataWithBytes:bPtr length:waveformLength*sizeof(long)];
 			}
-			[aDataSet loadWaveform:recordAsData 
+			if(recordAsData)[aDataSet loadWaveform:recordAsData 
 							offset: 0 //bytes!
 						  unitSize: 2 //unit size in bytes!
 							sender: self  
@@ -186,6 +187,7 @@
 		}
 	}
 	else {
+		recordCount[channel]++;
 		if(!dumpedOneBad[channel]){
 			dumpedOneBad[channel] = YES;
 			NSLog(@"Bad Record for channel: %d  total: %d\n",channel,recordCount[channel]);

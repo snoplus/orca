@@ -54,7 +54,7 @@
 	short			triggerOutEnabledMask;
 	short			adc50KTriggerEnabledMask;
 	short			gtMask;
-	bool			waitForBankSwitch;
+	bool			waitingForSomeChannels;
     short			bufferWrapEnabledMask;
 	
 	NSMutableArray*	cfdControls;
@@ -122,6 +122,9 @@
     BOOL			mcaUseEnergyCalculation;
     BOOL			shipTimeRecordAlso;
     float			firmwareVersion;
+	time_t			lastBankSwitchTime;
+	unsigned long	waitCount;
+	unsigned long	channelsToReadMask;
 }
 
 - (id) init;

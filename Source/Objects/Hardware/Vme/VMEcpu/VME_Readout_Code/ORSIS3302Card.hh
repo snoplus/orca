@@ -40,7 +40,6 @@ protected:
 	bool	 fBankOneArmed;
 	uint32_t fWaitCount;
 	time_t	 fLastBankSwitchTime;
-	uint32_t endSampleAddress[kNumberOfChannels];
 	uint32_t fChannelsToReadMask;
 	uint32_t dmaBuffer[0x200000]; //2M Longs (8MB)
 };

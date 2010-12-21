@@ -133,7 +133,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x00000090,  @"MCA Multiscan Nof Scans prese"},    
 	{0x00000094,  @"MCA Multiscan Scan counter"},    
 	{0x00000098,  @"MCA Multiscan last Scan Histogram count"},    
-
+	
 	//group 1
 	{0x02000000,  @"Event configuration (ADC1, ADC2)"},    
 	{0x02000004,  @"End Address Threshold (ADC1, ADC2)"},    
@@ -311,7 +311,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [self setAddressModifier:0x09];
     [self setBaseAddress:0x08000000];
     [self initParams];
-
+	
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -392,7 +392,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setShipTimeRecordAlso:shipTimeRecordAlso];
     
     shipTimeRecordAlso = aShipTimeRecordAlso;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelShipTimeRecordAlsoChanged object:self];
 }
 - (BOOL) mcaUseEnergyCalculation { return mcaUseEnergyCalculation; }
@@ -531,8 +531,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex3:energySampleStartIndex3];
     energySampleStartIndex3 = aEnergySampleStartIndex3;
 	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
 	[self calculateEnergyGateLength];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
 }
 
 - (int) energySampleStartIndex2 { return energySampleStartIndex2; }
@@ -541,8 +541,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex2:energySampleStartIndex2];
     energySampleStartIndex2 = aEnergySampleStartIndex2;
 	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
 	[self calculateEnergyGateLength];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
 }
 
 - (int) energySampleStartIndex1 { return energySampleStartIndex1; }
@@ -551,8 +551,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex1:energySampleStartIndex1];
     energySampleStartIndex1 = aEnergySampleStartIndex1;
 	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
 	[self calculateEnergyGateLength];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
 }
 
 - (int) energySampleLength { return energySampleLength; }
@@ -561,8 +561,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
     energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:kSIS3302MaxEnergyWaveform];
 	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
 	[self calculateEnergyGateLength];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
 }
 
 - (int) energyTauFactor:(short)aChannel 
@@ -655,7 +655,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
     int preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:1023];
 	[preTriggerDelays replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:preTriggerDelay]];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelPreTriggerDelayChanged object:self];
 	[self calculateEnergyGateLength];
 }
@@ -1007,7 +1007,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		// in calculateSampleValues.)
 		[self setEnergySampleStartIndex2:1];
 	}
-
 }
 
 - (short) gtMask { return gtMask; }
@@ -1196,7 +1195,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	if(runMode == kMcaRunMode)   return;
 	else {
 		numEnergyValues = energySampleLength;   
-
+		
 		if(numEnergyValues > kSIS3302MaxEnergyWaveform){
 			// This should never be happen in the current implementation since we 
 			// handle this value internally, but checking nonetheless in case 
@@ -1207,19 +1206,19 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 			numEnergyValues = kSIS3302MaxEnergyWaveform;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleLengthChanged object:self];
 		}
-
+		
 		int group;
 		for(group=0;group<4;group++){
 			numRawDataLongWords = [self sampleLength:group]/2;
 			rawDataIndex  = 2 ;
-						
+			
 			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
 			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header 
 			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
 			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
-
-			unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
-			//unsigned long maxEvents = 10;
+			
+			//unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
+			unsigned long maxEvents = 1;
 			[self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
 			// Check the sample indices
 			// Don't call setEnergy* from in here!  Cause stack overflow...
@@ -1249,7 +1248,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 					energySampleStartIndex3 = 0;
 				} 
 				else if (energySampleStartIndex2 != 0 && 
-						   energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
+						 energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
 					aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
 					energySampleStartIndex3 = aValue;
 					[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
@@ -1287,11 +1286,11 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		else {
 			// We are shipping an energy waveform, we require the waveform to be at least:
 			temp = delayInDecimationClockTicks + 
-				   energySampleStartIndex3 + 
-				   energySampleLength/3 + 20;
+			energySampleStartIndex3 + 
+			energySampleLength/3 + 20;
 			temptwo = delayInDecimationClockTicks +
-					  2*[self energyPeakingTime:group] +
-						[self energyGapTime:group] + 20;
+			2*[self energyPeakingTime:group] +
+			[self energyGapTime:group] + 20;
 			// Take the larger of the two.
 			if (temp > temptwo ) {
 				[self setEnergyGateLength:group withValue:temp];
@@ -1308,10 +1307,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {	
 	unsigned long result = 0;
 	[[self adapter] readLongBlock:&result
-                         atAddress:[self baseAddress] + kSIS3302ModID
+						atAddress:[self baseAddress] + kSIS3302ModID
                         numToRead:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
 	unsigned long moduleID = result >> 16;
 	unsigned short majorRev = (result >> 8) & 0xff;
 	unsigned short minorRev = result & 0xff;
@@ -1412,7 +1411,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
 													   atAddress: [self baseAddress] + [self getThresholdRegOffsets:i]
-													   numToWrite: 1
+													  numToWrite: 1
 													  withAddMod: [self addressModifier]
 												   usingAddSpace: 0x01]];
 		if([self extendedThresholdEnabled:i]){
@@ -1443,7 +1442,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		
 		aValueMask |= ((externalTriggerEnabledMask & (1<<(i*2)))!=0)     << 3;
 		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 11;
-	
+		
 		aValueMask |= ((tempIntGateMask & (1<<(i*2)))!=0)       << 4;
 		aValueMask |= ((tempIntGateMask & (1<<((i*2)+1)))!=0)   << 12;
 		
@@ -1452,7 +1451,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		
 		aValueMask |= ((inputInvertedMask & (1<<(i*2)))!=0)       << 0;
 		aValueMask |= ((inputInvertedMask & (1<<((i*2)+1)))!=0)   << 8;
-				
+		
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
 													   atAddress: [self baseAddress] + [self getEventConfigOffsets:i]
 													  numToWrite: 1
@@ -1483,7 +1482,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		triggerValueToWrite += 2;
 		if(triggerValueToWrite == 0x1022)	  triggerValueToWrite = 0;
 		else if(triggerValueToWrite == 0x1023)triggerValueToWrite = 1;
-
+		
 		int triggerGateToWrite = [self triggerGateLength:i];
 		//triggerGateToWrite -= 1;
 		
@@ -1492,7 +1491,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 							 atAddress:[self baseAddress] + [self getPreTriggerDelayTriggerGateLengthOffset:i]
 							numToWrite:1
 							withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
+						 usingAddSpace:0x01];
 	}	
 }
 - (void) writeBufferControl
@@ -1517,9 +1516,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		unsigned long peakingTimeLo = [self energyPeakingTime:i] & 0xff; 
 		
 		unsigned long aValueMask = (([self energyDecimation:i]  & 0x3)<<28) | 
-									(peakingTimeHi <<16)				   | 
-									(([self energyGapTime:i]     & 0xff)<<8) | 
-									peakingTimeLo;
+		(peakingTimeHi <<16)				   | 
+		(([self energyGapTime:i]     & 0xff)<<8) | 
+		peakingTimeLo;
 		
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getEnergySetupGPOffset:i]
@@ -1574,7 +1573,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];
-	
+		
 	}
 }
 
@@ -1616,7 +1615,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 					 usingAddSpace:0x01];
 	
 }
-	
+
 - (void) writeTriggerSetups
 {
 	int i;
@@ -1624,9 +1623,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	for(i = 0; i < 8; i++) {
 		group = i/2;
 		unsigned long aExtValueMask = (([self internalTriggerDelay:i] & 0x00ffL) << 24) | 
-									  (([self triggerDecimation:group]      & 0x0003L) << 16) | 
-									  (([self sumG:i]                 & 0x0F00L)) | 
-									  (([self peakingTime:i]          & 0x0F00L) >> 8);
+		(([self triggerDecimation:group]      & 0x0003L) << 16) | 
+		(([self sumG:i]                 & 0x0F00L)) | 
+		(([self peakingTime:i]          & 0x0F00L) >> 8);
 		
 		[[self adapter] writeLongBlock:&aExtValueMask
 							 atAddress:[self baseAddress] + [self getTriggerExtSetupRegOffsets:i]
@@ -1635,9 +1634,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 						 usingAddSpace:0x01];
 		
 		unsigned long aTriggerMask =(([self gateLength:i]  & 0xffL) << 24) | 
-									(([self pulseLength:i] & 0xffL) << 16) | 
-									(([self sumG:i]        & 0xffL) <<  8) | 
-									 ([self peakingTime:i] & 0xffL);
+		(([self pulseLength:i] & 0xffL) << 16) | 
+		(([self sumG:i]        & 0xffL) <<  8) | 
+		([self peakingTime:i] & 0xffL);
 		
 		[[self adapter] writeLongBlock:&aTriggerMask
 							 atAddress:[self baseAddress] + [self getTriggerSetupRegOffsets:i]
@@ -1656,7 +1655,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		if(![self bufferWrapEnabled:group])sampleStartIndex = 0;
 		
 		unsigned long aValueMask = ((sampleLength & 0xfffc)<<16) | (sampleStartIndex & 0xfffe);
-	
+		
 		[[self adapter] writeLongBlock:&aValueMask
 							 atAddress:[self baseAddress] + [self getRawDataBufferConfigOffsets:group]
 							numToWrite:1
@@ -1883,7 +1882,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		for(i=0;i<kNumSIS3302ReadRegs;i++){
 			NSLogFont(font, @"[0x%08x] 0x%08x    %@\n",register_information[i].offset,[aList longValueForCmd:i],register_information[i].name);
 		}
-
+		
 	}
 	@catch(NSException* localException) {
         NSLog(@"SIS3302 Reg Dump FAILED.\n");
@@ -2013,16 +2012,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
 }
 
-- (unsigned long) getPreviousBankSampleRegister:(int)channel
-{
-	unsigned long aValue = 0;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	return aValue;
-}
 
 - (void) readMcaStatus
 {
@@ -2046,7 +2035,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		kSIS3302McaPileupCounterAdc3,
 		kSIS3302McaEnergy2LowCounterAdc3,
 		kSIS3302McaEnergy2HighCounterAdc3,
-
+		
 		kSIS3302McaTriggerStartCounterAdc4,
 		kSIS3302McaPileupCounterAdc4,
 		kSIS3302McaEnergy2LowCounterAdc4,
@@ -2104,7 +2093,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
 	[[self adapter] executeCommandList:aList];
 }
-	
+
 - (void) initBoard
 {  
 	[self calculateSampleValues];
@@ -2121,6 +2110,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self writeTriggerSetups];
 	[self writeThresholds];
 	[self writeDacOffsets];
+	[self resetSamplingLogic];
 	[self writeBufferControl];
 	
 	if(runMode == kMcaRunMode){
@@ -2144,7 +2134,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		//}
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302CardInited object:self];
-
+	
 }
 
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
@@ -2312,18 +2302,18 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
  	}
 	return (unsigned long) -1;	 
 }
-		 
+
 - (unsigned long) getEventConfigOffsets:(int)group
 {
-	 switch (group) {
-		 case 0: return kSIS3302EventConfigAdc12;
-		 case 1: return kSIS3302EventConfigAdc34;
-		 case 2: return kSIS3302EventConfigAdc56;
-		 case 3: return kSIS3302EventConfigAdc78;
-	 }
+	switch (group) {
+		case 0: return kSIS3302EventConfigAdc12;
+		case 1: return kSIS3302EventConfigAdc34;
+		case 2: return kSIS3302EventConfigAdc56;
+		case 3: return kSIS3302EventConfigAdc78;
+	}
 	return (unsigned long) -1;	 
 }
-	
+
 - (unsigned long) getEnergyGateLengthOffsets:(int)group
 {
 	switch (group) {
@@ -2345,7 +2335,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 	return (unsigned long) -1;	 
 }
-		 
+
 - (unsigned long) getAdcMemory:(int)channel
 {
     switch (channel) {			
@@ -2358,7 +2348,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		case 6: return 	kSIS3302Adc7Offset;
 		case 7: return 	kSIS3302Adc8Offset;
  	}
-   return (unsigned long) -1;	 
+	return (unsigned long) -1;	 
 }
 
 - (unsigned long) getEnergySetupGPOffset:(int)group
@@ -2380,9 +2370,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 						numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-
-	if ((data_rd & 0x80000) != 0x80000)return NO;
-	else return YES;
+	
+	uint32_t bankMask = bankOneArmed?0x10000:0x20000;
+	return ((data_rd & 0x80000) == 0x80000) && ((data_rd & bankMask) == bankMask);
 }
 
 - (void) setUpPageReg
@@ -2409,10 +2399,14 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     unsigned long addr = [self baseAddress] + ((bank == 0) ? kSIS3302KeyDisarmAndArmBank1 : kSIS3302KeyDisarmAndArmBank2);
 	unsigned long aValue= 0;
 	[[self adapter] writeLongBlock:&aValue
-						atAddress:addr
+						 atAddress:addr
 						numToWrite:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	time(&lastBankSwitchTime);
+	waitingForSomeChannels = YES;
+	channelsToReadMask = 0xff;
+	
 }
 
 - (void) disarmAndArmNextBank
@@ -2428,6 +2422,16 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];	
+}
+- (unsigned long) getPreviousBankSampleRegister:(int)channel
+{
+	unsigned long aValue = 0;
+	[[self adapter] readLongBlock:&aValue
+						atAddress:[self baseAddress] +  [self getPreviousBankSampleRegisterOffset:channel]
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	return aValue;
 }
 
 - (NSString*) runSummary
@@ -2497,21 +2501,21 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	NSDictionary* aDictionary;
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-						   @"ORSIS3302DecoderForEnergy",				@"decoder",
-						   [NSNumber numberWithLong:dataId],@"dataId",
-						   [NSNumber numberWithBool:YES],   @"variable",
-						   [NSNumber numberWithLong:-1],	@"length",
-						   nil];
+				   @"ORSIS3302DecoderForEnergy",				@"decoder",
+				   [NSNumber numberWithLong:dataId],@"dataId",
+				   [NSNumber numberWithBool:YES],   @"variable",
+				   [NSNumber numberWithLong:-1],	@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"Energy"];
 	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-						   @"ORSIS3302DecoderForMca",			@"decoder",
-						   [NSNumber numberWithLong:mcaId], @"dataId",
-						   [NSNumber numberWithBool:YES],   @"variable",
-						   [NSNumber numberWithLong:-1],	@"length",
-						   nil];
+				   @"ORSIS3302DecoderForMca",			@"decoder",
+				   [NSNumber numberWithLong:mcaId], @"dataId",
+				   [NSNumber numberWithBool:YES],   @"variable",
+				   [NSNumber numberWithLong:-1],	@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"MCA"];
-
+	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   @"ORSIS3302DecoderForLostData",			@"decoder",
 				   [NSNumber numberWithLong:lostDataId],	@"dataId",
@@ -2519,7 +2523,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				   [NSNumber numberWithLong:3],				@"length",
 				   nil];
     [dataDictionary setObject:aDictionary forKey:@"LostData"];
-	
 	
     return dataDictionary;
 }
@@ -2555,19 +2558,19 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setGtBit:withValue:) getMethod:@selector(gt:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"ADC50K Trigger"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setAdc50KTriggerEnabled:withValue:) getMethod:@selector(adc50KTriggerEnabled:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Input Inverted"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setInputInverted:withValue:) getMethod:@selector(inputInverted:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Buffer Wrap Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
@@ -2580,7 +2583,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setInternalTriggerEnabled:withValue:) getMethod:@selector(internalTriggerEnabled:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"External Trigger Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
@@ -2598,7 +2601,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setExternalGateEnabled:withValue:) getMethod:@selector(externalGateEnabled:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Extended Threshold Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
@@ -2612,7 +2615,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-		
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
@@ -2643,13 +2646,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setSumG:withValue:) getMethod:@selector(sumG:)];
     [a addObject:p];
-		
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Peaking Time"];
     [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Dac Offset"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
@@ -2661,7 +2664,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setFormat:@"##0" upperLimit:(firmwareVersion<15?63:255) lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setInternalTriggerDelay:withValue:) getMethod:@selector(internalTriggerDelay:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Decimation"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
@@ -2679,19 +2682,19 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:4 stepSize:1 units:@""];
     [p setSetMethod:@selector(setSampleLength:withValue:) getMethod:@selector(sampleLength:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Pretrigger Delay"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPreTriggerDelay:withValue:) getMethod:@selector(preTriggerDelay:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trigger Gate Length"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setTriggerGateLength:withValue:) getMethod:@selector(triggerGateLength:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Gate Length"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
@@ -2703,13 +2706,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setEnergyGapTime:withValue:) getMethod:@selector(energyGapTime:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Peaking Time"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setEnergyPeakingTime:withValue:) getMethod:@selector(energyPeakingTime:)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Sample Length"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
@@ -2839,77 +2842,80 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				}
 				isRunning = YES;
 				firstTime = NO;
-				waitForBankSwitch = NO;
 				[self disarmAndArmBank:0];
+				[self disarmAndArmBank:1];
+				waitingForSomeChannels = NO;
 			}
 			else {
-				//check for valid event and valid bank switch
-				unsigned long data_rd = 0;
-				[[self adapter] readLongBlock:&data_rd
-									atAddress:[self baseAddress] + kSIS3302AcquisitionControl
-									numToRead:1
-								   withAddMod:[self addressModifier]
-								usingAddSpace:0x01];
-				if (bankOneArmed) {
-					if ((data_rd & 0x10000) != 0x10000) return;
-				} 
-				else {
-					if ((data_rd & 0x20000) != 0x20000) return;
-				}		
-				if ((data_rd & 0x80000) != 0x80000)	return;
-
-				if (!waitForBankSwitch){
+				
+				if(!waitingForSomeChannels){
+					time_t theTime;
+					time(&theTime);
+					if(((theTime - lastBankSwitchTime) < 2) && ![self isEvent])	return; //not going to readout so return
 					[self disarmAndArmNextBank];
 					[self setUpPageReg];
-				}
-				waitForBankSwitch = NO;
-				
-				int channel;
-				unsigned long endSampleAddress[kNumSIS3302Channels];
-				for( channel=0;channel<kNumSIS3302Channels;channel++) {
-					endSampleAddress[channel]= [self getPreviousBankSampleRegister:channel];
-					if (((endSampleAddress[channel] >> 24) & 0x1) ==  (bankOneArmed ? 0:1)) { 
-						waitForBankSwitch = YES;
-						return;
-					}
-
+					waitCount = 0;
 				}
 				
-				for( channel=0;channel<kNumSIS3302Channels;channel++) {
-
-					endSampleAddress[channel] &= 0x7fffff ; // mask bank2 address bit (bit 24)
+				//if we get here, there may be something to read out
+				int i;
+				for(i=0;i<8;i++) {
+					if ( channelsToReadMask & (1<<i)){
+						
+						unsigned long endSampleAddress = [self getPreviousBankSampleRegister:i];
+						if (((endSampleAddress >> 24) & 0x1) ==  (bankOneArmed ? 1:0)) { 
+							channelsToReadMask &= ~(1<<i);
+							
+							unsigned long numberBytesToRead	= (endSampleAddress & 0xffffff) * 2;
+							
+							if(numberBytesToRead){
+								unsigned long addrOffset = 0;
+								int group				 = i/2;
+								int eventCount			 = 0;
+								do {
+									BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
+									int index = 0;
+									dataRecord[group][index++] =   dataId | dataRecordlength[group];
+									dataRecord[group][index++] =	(([self crateNumber]&0x0000000f)<<21) | 
+									(([self slot] & 0x0000001f)<<16)      |
+									((i & 0x000000ff)<<8)			 |
+									wrapMode;
+									dataRecord[group][index++] = [self sampleLength:group]/2;
+									dataRecord[group][index++] = energySampleLength;
+									unsigned long* p = &dataRecord[group][index];
+									[[self adapter] readLongBlock: p
+														atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:i] + addrOffset
+														numToRead: dataRecordlength[group]-4
+													   withAddMod: [self addressModifier]
+													usingAddSpace: 0x01];
 									
-					if (endSampleAddress[channel] != 0) {
-						unsigned long addrOffset = 0;
-						int group				 = channel/2;
-						int eventCount			 = 0;
-						do {
-							BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
-							int index = 0;
-							dataRecord[group][index++] =   dataId | dataRecordlength[group];
-							dataRecord[group][index++] =   (([self crateNumber]&0x0000000f)<<21) | 
-														   (([self slot] & 0x0000001f)<<16)      |
-														   ((channel & 0x000000ff)<<8)			 |
-															wrapMode;
-							dataRecord[group][index++] = [self sampleLength:group]/2;
-							dataRecord[group][index++] = energySampleLength;
-							unsigned long* p = &dataRecord[group][index];
-							[[self adapter] readLongBlock: p
-												atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + addrOffset
-												numToRead: dataRecordlength[group]-4
-											   withAddMod: [self addressModifier]
-											usingAddSpace: 0x01];
-	
-							if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
-								[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
+									if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
+										[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
+									}
+									
+									addrOffset += (dataRecordlength[group]-4)*4;
+									if(++eventCount > 25)break;
+								}while (addrOffset < endSampleAddress);
 							}
-															
-							addrOffset += (dataRecordlength[group]-4)*4;
-							if(++eventCount > 25)break;
-						}while (addrOffset < endSampleAddress[channel]);
+						}
 					}
 				}
 				
+				waitingForSomeChannels = (channelsToReadMask!=0);
+				
+				if(waitingForSomeChannels){
+					//if we wait too long, do a logic reset
+					waitCount++;
+					if(waitCount > 10){						
+						int index = 0;
+						dataRecord[0][index++] = lostDataId | 3; 
+						dataRecord[0][index++] = (([self crateNumber] & 0x0000000f) << 21) | 
+						(([self slot]        & 0x0000001f) << 16)  | 1; //1 == reset event
+						dataRecord[0][index++] = channelsToReadMask<<16;
+						[aDataPacket addLongsToFrameBuffer:dataRecord[0] length:3];
+						[self resetSamplingLogic];
+					}
+				}
 			}
 		}
 	}
@@ -2918,6 +2924,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		[localException raise];
 	}
 }
+
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -2942,8 +2949,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				unsigned long* mcaBytes = (unsigned long*)[mcaData bytes];
 				mcaBytes[0] = mcaId | (mcaLength+2);
 				mcaBytes[1] =	(([self crateNumber]&0x0000000f)<<21) | 
-								(([self slot] & 0x0000001f)<<16)      |
-								((channel & 0x000000ff)<<8);
+				(([self slot] & 0x0000001f)<<16)      |
+				((channel & 0x000000ff)<<8);
 				
 				[[self adapter] readLongBlock: &mcaBytes[2]
 									atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + pageOffset
@@ -2965,25 +2972,25 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];	
-
+		
 		[[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + kSIS3302KeyMcaScanStop
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];	
+							 atAddress:[self baseAddress] + kSIS3302KeyMcaScanStop
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];	
 		
 		[self readMcaStatus];
 	}
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMcaStatus) object:nil];
-
+	
 	[self disarmSampleLogic];
     [waveFormRateGroup stop];
 	[self setLed:NO];
 	
 	int group;
 	for(group=0;group<4;group++){
-		if(dataRecord[group]){
+		if(dataRecord){
 			free(dataRecord[group]);
 			dataRecord[group] = nil;
 		}
@@ -3000,9 +3007,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 	else {
 		configStruct->total_cards++;
-		configStruct->card_info[index].hw_type_id				= kSIS3302;		//should be unique
-		configStruct->card_info[index].hw_mask[0]				= dataId;		//better be unique
-		configStruct->card_info[index].hw_mask[1]				= lostDataId;	//better be unique
+		configStruct->card_info[index].hw_type_id				= kSIS3302; //should be unique
+		configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
 		configStruct->card_info[index].slot						= [self slot];
 		configStruct->card_info[index].crate					= [self crateNumber];
 		configStruct->card_info[index].add_mod					= [self addressModifier];
@@ -3112,7 +3118,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[self setGtMask:					[decoder decodeIntForKey:@"gtMask"]];
 	[self setShipEnergyWaveform:		[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
     [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
-		
+	
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
 	thresholds  =				[[decoder decodeObjectForKey:@"thresholds"] retain];
     dacOffsets  =				[[decoder decodeObjectForKey:@"dacOffsets"] retain];
@@ -3129,11 +3135,11 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	energyDecimations=			[[decoder decodeObjectForKey:@"energyDecimations"]retain];
 	energyGapTimes = 			[[decoder decodeObjectForKey:@"energyGapTimes"]retain];
     energyPeakingTimes =		[[decoder decodeObjectForKey:@"energyPeakingTimes"]retain];
-
+	
 	//firmware 15xx
     cfdControls =					[[decoder decodeObjectForKey:@"cfdControls"] retain];
     [self setBufferWrapEnabledMask:	[decoder decodeInt32ForKey:@"bufferWrapEnabledMask"]];
-
+	
 	if(!waveFormRateGroup){
 		[self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
 	    [waveFormRateGroup setIntegrationTime:5];
@@ -3142,7 +3148,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [waveFormRateGroup calcRates];
 	
 	[self setUpArrays];
-
+	
 	[self calculateEnergyGateLength];
 	
     [[self undoManager] enableUndoRegistration];
@@ -3180,7 +3186,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
 	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
 	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
-
+	
 	[encoder encodeBool:internalExternalTriggersOred	forKey:@"internalExternalTriggersOred"];
 	[encoder encodeInt32:triggerOutEnabledMask			forKey:@"triggerOutEnabledMask"];
 	[encoder encodeInt32:inputInvertedMask				forKey:@"inputInvertedMask"];
@@ -3211,13 +3217,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	//firmware 15xx
 	[encoder encodeObject:cfdControls			forKey:@"cfdControls"];
 	[encoder encodeInt32:bufferWrapEnabledMask	forKey:@"bufferWrapEnabledMask"];
-
+	
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-
+	
     [objDictionary setObject: [NSNumber numberWithLong:gtMask]						forKey:@"gtMask"];	
 	[objDictionary setObject: [NSNumber numberWithInt:clockSource]					forKey:@"clockSource"];
 	[objDictionary setObject: [NSNumber numberWithLong:adc50KTriggerEnabledMask]	forKey:@"adc50KtriggerEnabledMask"];
@@ -3231,7 +3237,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
  	
 	[objDictionary setObject:[NSNumber numberWithInt:runMode]						forKey:@"runMode"];
 	[objDictionary setObject:[NSNumber numberWithInt:shipTimeRecordAlso]			forKey:@"shipTimeRecordAlso"];
-
+	
 	[objDictionary setObject:[NSNumber numberWithInt:lemoInEnabledMask]				forKey:@"lemoInEnabledMask"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex3]		forKey:@"energySampleStartIndex3"];
 	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex2]		forKey:@"energySampleStartIndex2"];
@@ -3259,7 +3265,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject: sampleStartIndexes	forKey:@"sampleStartIndexes"];
     [objDictionary setObject: triggerDecimations	forKey:@"triggerDecimations"];	
 	[objDictionary setObject: energyGateLengths		forKey:@"energyGateLengths"];
-
+	
 	//firmware 15xx
 	[objDictionary setObject: cfdControls		forKey:@"cfdControls"];	
 	[objDictionary setObject: [NSNumber numberWithLong:bufferWrapEnabledMask]		forKey:@"bufferWrapEnabledMask"];
@@ -3338,7 +3344,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	if(!energyGapTimes)		energyGapTimes		= [[self arrayOfLength:kNumSIS3302Groups] retain];
 	if(!sampleStartIndexes)	sampleStartIndexes	= [[self arrayOfLength:kNumSIS3302Groups] retain];
 	if(!endAddressThresholds)endAddressThresholds	= [[self arrayOfLength:kNumSIS3302Groups] retain];
-
+	
 	if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumSIS3302Channels groupTag:0] autorelease]];
         [waveFormRateGroup setIntegrationTime:5];
@@ -3362,7 +3368,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 							numToWrite:1
 							withAddMod:addressModifier
 						 usingAddSpace:0x01];
-	
+		
 		
 		data =  1 + (i << 4); // write to DAC Register
 		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
@@ -3379,10 +3385,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		// Wait until done.
 		do {
 			[[self adapter] readLongBlock:&data
-								 atAddress:addr
+								atAddress:addr
 								numToRead:1
-								withAddMod:addressModifier
-							 usingAddSpace:0x01];
+							   withAddMod:addressModifier
+							usingAddSpace:0x01];
 			
 			timeout_cnt++;
 		} while ( ((data & 0x8000) == 0x8000) && (timeout_cnt <  max_timeout) )    ;
@@ -3393,10 +3399,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		}
 		
 		[[self adapter] writeLongBlock:&data
-							atAddress:addr
+							 atAddress:addr
 							numToWrite:1
-						   withAddMod:addressModifier
-						usingAddSpace:0x01];
+							withAddMod:addressModifier
+						 usingAddSpace:0x01];
 		
 		
 		data =  2 + (i << 4); // Load DACs 
@@ -3406,7 +3412,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 							numToWrite:1
 							withAddMod:addressModifier
 						 usingAddSpace:0x01];
-
+		
 		timeout_cnt = 0 ;
 		addr = [self baseAddress] + kSIS3302DacControlStatus  ;
 		do {
