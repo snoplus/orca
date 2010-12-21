@@ -145,7 +145,7 @@ typedef struct {
 XL3_Packet;
 
 typedef struct {
-	uint32_t cmd_num;	// id number unique for the packet it came from
+	uint32_t cmd_num;	// id number unique in the packet it came from
 	uint16_t packet_num;    // number of the packet that created this command
 	uint8_t flags;		// 0 = ok, 1 = there was a bus error
 	uint32_t address;	// address = spare MEMREG WRITE* SPARE Board_select<5..0> Address<19..0> 

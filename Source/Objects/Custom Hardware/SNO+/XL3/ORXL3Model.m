@@ -809,7 +809,8 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 - (void) initCrateWithXilinx:(BOOL)aXilinxFlag autoInit:(BOOL)anAutoInitFlag
 {
 	XL3_PayloadStruct payload;
-	payload.numberBytesinPayload = sizeof(mb_const_t);
+	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
+	payload.numberBytesinPayload = sizeof(mb_const_t) + 4;
 	unsigned long* aMbId = (unsigned long*) payload.payload;
 	mb_const_t* aConfigBundle = (mb_const_t*) (payload.payload + 4);
 	
@@ -819,6 +820,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	NSLog(@"XL3 Init Crate...\n");
 
 	for (i=0; i<16; i++) {
+		memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
 		*aMbId = i;
 		[self synthesizeDefaultsIntoBundle:aConfigBundle forSLot:i];
 		if ([xl3Link needToSwap]) {
@@ -843,6 +845,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	}
 		
 	if (loadOk) {
+		memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
 		// time to fly (never say 16 here!)
 		aMbId[0] = 666;
 		

@@ -404,13 +404,14 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 {
 	//client is responsible for payload swapping, we take care of the header
 	XL3_Packet aPacket;
+	memset(aPacket.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
 	unsigned char packetType = (unsigned char) aCmd;
 	unsigned short packetNum = (unsigned short) ++num_cmd_packets;
 	aPacket.cmdHeader.packet_num = (uint16_t) packetNum;
 	aPacket.cmdHeader.packet_type = (uint8_t) packetType;
 	aPacket.cmdHeader.num_bundles = 0;
-	if (needToSwap) aPacket.cmdHeader.packet_type = swapShort(aPacket.cmdHeader.packet_type);
-	memcpy(&aPacket.payload, &payloadBlock->payload, payloadBlock->numberBytesinPayload);
+	if (needToSwap) aPacket.cmdHeader.packet_num = swapShort(aPacket.cmdHeader.packet_num);
+	memcpy(aPacket.payload, payloadBlock->payload, payloadBlock->numberBytesinPayload);
 	
 	@try {
 		[commandSocketLock lock]; //begin critical section
@@ -419,7 +420,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 		if(askForResponse){
 			[self readXL3Packet:&aPacket withPacketType:packetType andPacketNum:packetNum];
 			XL3_PayloadStruct* payloadPtr = (XL3_PayloadStruct*) aPacket.payload;
-			memcpy(&payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
+			memcpy(payloadBlock->payload, payloadPtr, payloadBlock->numberBytesinPayload);
 		}
 		[commandSocketLock unlock]; //end critical section
 	}
@@ -446,7 +447,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 - (void) sendFECCommand:(long)aCmd toAddress:(unsigned long)address withData:(unsigned long*)value
 {
 	XL3_PayloadStruct payload;
-	FECCommand* command = (FECCommand*) &payload.payload;
+	FECCommand* command = (FECCommand*) payload.payload;
 		
 //	command->cmdID = (uint16_t) aCmd;
 	command->cmd_num = aCmd;
