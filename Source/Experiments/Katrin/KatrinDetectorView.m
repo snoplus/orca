@@ -310,7 +310,7 @@
 	NSPoint centerPoint = NSMakePoint(xc,h-xc-1);
 	NSMutableArray* segment1Paths = [NSMutableArray arrayWithCapacity:64];
 	NSMutableArray* error1Paths = [NSMutableArray arrayWithCapacity:64];
-	float startAngle	= 0;
+	float startAngle	= 45;
 	float r1	= xc-20;
 	float r2	= xc;
 	float midR1 = (r2+r1)/2. - 2;
