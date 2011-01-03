@@ -78,10 +78,10 @@ NSString* ORCameraModelMovieChanged				= @"ORCameraModelMovieChanged";
 	[super sleep];
 }
 
-- (BOOL) solitaryObject
-{
-    return YES;
-}
+//- (BOOL) solitaryObject
+//{
+//    return YES;
+//}
 
 - (void) awakeAfterDocumentLoaded
 {
