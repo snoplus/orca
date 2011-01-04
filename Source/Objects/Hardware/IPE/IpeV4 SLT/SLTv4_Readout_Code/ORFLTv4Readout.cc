@@ -42,10 +42,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t dataId     = GetHardwareMask()[0];//this is energy record
     uint32_t waveformId = GetHardwareMask()[1];
     uint32_t histogramId = GetHardwareMask()[2];
-    uint32_t filterIndex = GetDeviceSpecificData()[6];
     uint32_t col        = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
     uint32_t crate      = GetCrate();
-	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndex<<4);
     
     uint32_t postTriggerTime = GetDeviceSpecificData()[0];
     uint32_t eventType  = GetDeviceSpecificData()[1];
@@ -53,8 +51,11 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
     uint32_t daqRunMode = GetDeviceSpecificData()[5];
-    uint32_t versionCFPGA = GetDeviceSpecificData()[6];
-    uint32_t versionFPGA8 = GetDeviceSpecificData()[7];
+    uint32_t filterIndex = GetDeviceSpecificData()[6];
+    uint32_t versionCFPGA = GetDeviceSpecificData()[7];
+    uint32_t versionFPGA8 = GetDeviceSpecificData()[8];
+	
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndex<<4);
 
 	//for backward compatibility (before FLT versions2.1.1.4); shall be removed Jan. 2011 -tb-
 	//===========================================================================================
