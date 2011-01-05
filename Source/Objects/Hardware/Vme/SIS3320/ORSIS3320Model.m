@@ -994,7 +994,7 @@ unsigned long rblt_data[kMaxNumberWords];
 		unsigned long writeValue =	((triggerModeMask	& (1L<<i)) << 26) | 
 									((gtMask			& (1L<<i)) << 25) | 
 									((ltMask			& (1L<<i)) << 24) | 
-									(theThresholdValue  & 0xffff);
+									(theThresholdValue  & 0xffff) ;
 		
 		[[self adapter] writeLongBlock:&writeValue
 							 atAddress:baseAddress + triggerThresholdRegOffsets[i]
@@ -1216,7 +1216,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	
 	[self armSamplingLogic];
 	NSLog(@"3 arm flag: 0x%x\n",[self readAcqRegister] & kAcqStatusArmedFlag);
-	//[self startSampling];
+	[self startSampling];
 	
 	isRunning		= NO;
 }
@@ -1353,7 +1353,7 @@ unsigned long rblt_data[kMaxNumberWords];
 						numToRead: 1
 						withAddMod: addressModifier
 					 usingAddSpace: 0x01];
-		NSLog(@"%d: 0x%08x\n",i,aValue);
+		//NSLog(@"%d: 0x%08x\n",i,aValue);
 	}
 	return aValue;
 }

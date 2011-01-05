@@ -51,12 +51,13 @@
 {
     self = [super init];
     getRatesFromDecodeStage = YES;
-	dumpedOneNormal = NO;
+	/*dumpedOneNormal = NO;
 	int i;
 	for(i=0;i<8;i++){
 		recordCount[i]=0;
 		dumpedOneBad[i]=NO;
 	}
+	 */
     return self;
 }
 
@@ -100,6 +101,10 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* cardKey		= [self getCardKey: card];
 	NSString* channelKey	= [self getChannelKey: channel];
+	
+	//int waveformLength1	 = ptr[2];
+	//int energyLength1	 = ptr[3];
+	//int waveformLength2	 = ptr[6];
 
 	long sisHeaderLength;
 	if(wrapMode)sisHeaderLength = 4;
@@ -108,9 +113,11 @@
 		[self cacheCardLevelObject:kFilterLengthKey fromHeader:[aDecoder fileHeader]];
 	}	
 	unsigned long lastWord = ptr[length-1];
+	//if(channel == 0 && !dumpedOneNormal)[self dumpRecord:ptr];
+
 	if(lastWord == 0xdeadbeef){
 		//if(!dumpedOneNormal){
-		//	[self dumpRecord:someData bad:NO];
+		//	[self dumpRecord:someData];
 		//}
 		unsigned long energy = ptr[length - 4]; 
 
@@ -125,10 +132,10 @@
         
 		[aDataSet histogram:energy numBins:65536 sender:self  withKeys:@"SIS3302", @"Energy", crateKey,cardKey,channelKey,nil];
 		
-		long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
-		long energyLength   = ptr[3]; //each energy value is a sum of two 
+		unsigned long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
+		unsigned long energyLength   = ptr[3];  
 	
-		if((waveformLength>0) && (waveformLength == (length - 4 - sisHeaderLength - energyLength - 4))){
+		if(waveformLength && (waveformLength == (length - 4 - sisHeaderLength - energyLength - 4))){
 			NSData* recordAsData = nil;
 			if(wrapMode){
 				unsigned long nof_wrap_samples = ptr[6] ;
@@ -156,7 +163,7 @@
 						  withKeys: @"SIS3302", @"ADC Trace",crateKey,cardKey,channelKey,nil];
 		}
 		
-		if(energyLength){
+		if(energyLength && (energyLength == (length - 4 - sisHeaderLength - waveformLength - 4))){
 			unsigned char* bPtr = (unsigned char*)&ptr[4 + sisHeaderLength + waveformLength];//ORCA header + SIS header + possible waveform
 			NSData* recordAsData = [NSData dataWithBytes:bPtr length:energyLength*sizeof(long)];
 			[aDataSet loadWaveform:recordAsData 
@@ -187,13 +194,25 @@
 		}
 	}
 	else {
+		/*
 		recordCount[channel]++;
 		if(!dumpedOneBad[channel]){
+			NSLog(@"-----------------------------------\n");
+			int i;
+			for(i=0;i<length+100;i++){
+				if(ptr[i] == 0xdeadbeef){
+					NSLog(@"length: %d deadbeef at: %d\n",length,i);
+					break;
+				}
+			}
 			dumpedOneBad[channel] = YES;
 			NSLog(@"Bad Record for channel: %d  total: %d\n",channel,recordCount[channel]);
-			//[self dumpRecord:someData bad:YES];
+			NSLog(@"Orca waveformLength: %d energyLength: %d\n",waveformLength1,energyLength1);
+			NSLog(@"sis waveformLength: %d\n",waveformLength2);
+			[self dumpRecord:ptr];
+			NSLog(@"-----------------------------------\n");
 		}
-		
+		*/
 	}
 	
     return length; //must return number of longs
@@ -219,10 +238,10 @@
 	 */
 	return @"Description not implemented yet";
 }
-- (void) dumpRecord:(void*)someData bad:(BOOL)wasBad 
+/*
+- (void) dumpRecord:(void*)someData 
 {
-	//if(wasBad)dumpedOneBad = YES;
-	//else dumpedOneNormal = YES;
+	dumpedOneNormal = YES;
 	
     unsigned long* ptr	= (unsigned long*)someData;
 	unsigned long length= ExtractLength(ptr[0]);
@@ -233,41 +252,76 @@
 	
 	
 	long waveformLength = ptr[2]; //each long word is two 16 bit adc samples
-	long energyLength   = ptr[3]; //each energy value is a sum of two 
+	long energyLength   = ptr[3];  
 	
 	long sisHeaderLength;
 	if(wrapMode)sisHeaderLength = 4;
 	else		sisHeaderLength = 2;
 	NSFont* afont = [NSFont fontWithName:@"Monaco" size:12];
 	NSLogFont(afont,@"-----------------------------------\n");
-	NSLogFont(afont,@"%@\n",wasBad?@"Bad Record":@"NormalRecord");
 	NSLogFont(afont,@"Length: %d longs\n",length);
 	NSLogFont(afont,@"Crate: %d Card: %d Channel: %d\n",crate,card,channel);
 	NSLogFont(afont,@"Wrap Mode: %@\n",wrapMode?@"YES":@"NO");
 	NSLogFont(afont,@"WaveForm Length: %d longs\n",waveformLength);
 	NSLogFont(afont,@"EnergyLength Length: %d longs\n",energyLength);
-	NSLogFont(afont,@"  0: 0x%08x 0x%08x 0x%08x 0x%08x\n",ptr[0],ptr[1],ptr[2],ptr[3]);
+	NSLogFont(afont,@"ORCA Header:: 0x%08x 0x%08x 0x%08x 0x%08x\n",ptr[0],ptr[1],ptr[2],ptr[3]);
 	
 	int i;
 	int index = 4;
 	for(i=0;i<sisHeaderLength;i++){
-		NSLogFont(afont,@"%3d: 0x%08x\n",index,ptr[index]);
+		NSLogFont(afont,@"SIS Header %3d: 0x%08x\n",i,ptr[index]);
 		index++;
 	}
 	NSLogFont(afont,@"\n");
-	for(i=0;i<waveformLength;i+=8){
-		NSLogFont(afont,@"%3d: 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x\n",index,ptr[index],ptr[index+1],ptr[index+2],ptr[index+3],ptr[index+4],ptr[index+5],ptr[index+6],ptr[index+7]);
-		index += 8;
+	NSLogFont(afont,@"Waveform (unpacked)\n");
+	NSLogFont(afont,@"\n");
+	BOOL once = NO;
+	for(i=0;i<waveformLength;i+=10){
+		if(i<20 || i>waveformLength-30){
+			if(i<waveformLength){
+				NSLogFont(afont,@"%3d: 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x 0x%04x\n",i,
+						ptr[index]  & 0xFFFF, (ptr[index]>>16)     & 0xFFFF,
+						ptr[index+1]& 0xFFFF, (ptr[index+1]>>16) & 0xFFFF,
+						ptr[index+2]& 0xFFFF, (ptr[index+2]>>16) & 0xFFFF,
+						ptr[index+3]& 0xFFFF, (ptr[index+3]>>16) & 0xFFFF,
+						ptr[index+4]& 0xFFFF, (ptr[index+4]>>16) & 0xFFFF,
+						ptr[index+5]& 0xFFFF, (ptr[index+5]>>16) & 0xFFFF,
+						ptr[index+6]& 0xFFFF, (ptr[index+6]>>16) & 0xFFFF,
+						ptr[index+8]& 0xFFFF, (ptr[index+8]>>16) & 0xFFFF,
+						ptr[index+8]& 0xFFFF, (ptr[index+8]>>16) & 0xFFFF,
+						ptr[index+9]& 0xFFFF, (ptr[index+9]>>16) & 0xFFFF);
+			}
+			else break;
+		}
+		else {
+			if(!once){
+				NSLogFont(afont,@"....\n");
+				NSLogFont(afont,@"....\n");
+				once = YES;
+			}
+		}
+		index += 10;
 	}
-	NSLog(@"\n");
-	for(i=0;i<energyLength;i+=8){
-		NSLogFont(afont,@"%3d: 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x\n",index,ptr[index],ptr[index+1],ptr[index+2],ptr[index+3],ptr[index+4],ptr[index+5],ptr[index+6],ptr[index+7]);
-		index += 8;
+	NSLogFont(afont,@"\n");
+	if(energyLength)	{
+		NSLogFont(afont,@"Energy Waveform\n");
+		NSLogFont(afont,@"\n");
 	}
+
+	//in case the waveform wasn't a multiple of ten
+	index = 4 + sisHeaderLength + waveformLength;
+	for(i=0;i<energyLength;i+=10){
+		NSLogFont(afont,@"%3d: 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x\n",i,
+				  ptr[index],ptr[index+1],ptr[index+2],ptr[index+3],ptr[index+4],ptr[index+5],ptr[index+6],ptr[index+7],ptr[index+8],ptr[index+9]);
+		index += 10;
+	}
+	NSLogFont(afont,@"\n");
+	NSLog(@"Trailer\n");
 	NSLogFont(afont,@"%3d: 0x%08x 0x%08x 0x%08x 0x%08x\n",index,ptr[index],ptr[index+1],ptr[index+2],ptr[index+3]);
 
 	NSLogFont(afont,@"-----------------------------------\n");
 }
+ */
 @end
 
 

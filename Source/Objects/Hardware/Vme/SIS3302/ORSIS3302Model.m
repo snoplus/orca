@@ -816,7 +816,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     [waveFormRateGroup setIntegrationTime:newIntegrationTime];
 }
 
-#pragma mark •••Rates
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
@@ -998,7 +997,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302SetShipWaveformChanged object:self];
 	if (!shipEnergyWaveform) {
 		[self setEnergySampleLength:0];		
-	} else {
+	} 
+	else {
 		[self setEnergySampleLength:kSIS3302MaxEnergyWaveform];
 		// The following forces the start indices to calculate automatically.
 		// This could avoid some confusion about the special cases of 
@@ -1191,7 +1191,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 
 - (void) calculateSampleValues
 {
-	unsigned long aValue = 0;
 	if(runMode == kMcaRunMode)   return;
 	else {
 		numEnergyValues = energySampleLength;   
@@ -1217,8 +1216,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
 			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
 			
-			//unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
-			unsigned long maxEvents = 1;
+			unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
+			//unsigned long maxEvents = 1;
 			[self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
 			// Check the sample indices
 			// Don't call setEnergy* from in here!  Cause stack overflow...
@@ -1227,17 +1226,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				energySampleStartIndex1 = 1;
 				energySampleStartIndex2 = 0;
 				energySampleStartIndex3 = 0;
-				[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
-				[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
-				[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
 			} 
 			else if (energySampleStartIndex2 != 0 || energySampleStartIndex3 != 0) {
 				// Means we are requesting different pieces of the waveform.
 				// Make sure they are correct.
 				if (energySampleStartIndex2 < energySampleStartIndex1 + energySampleLength/3 + 1) {
-					aValue = energySampleLength/3 + energySampleStartIndex1 + 1;
+					int aValue = energySampleLength/3 + energySampleStartIndex1 + 1;
 					energySampleStartIndex2 = aValue;
-					[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
 					if (energySampleStartIndex3 == 0) {
 						// This forces us to also reset the third index if it is set to 0.
 						energySampleStartIndex3 = 0;
@@ -1249,11 +1244,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				} 
 				else if (energySampleStartIndex2 != 0 && 
 						 energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
-					aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
+					int aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
 					energySampleStartIndex3 = aValue;
-					[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
 				}
-			}
+			}			
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex1Changed object:self];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex2Changed object:self];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelEnergySampleStartIndex3Changed object:self];
 			
 			// Finally check the trigger gate length to make sure it is big enough
 			if ([self triggerGateLength:group] < [self sampleLength:group]) {
@@ -1274,8 +1271,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	for(group=0;group<4;group++){
 		int preTriggerDelay = [self preTriggerDelay:group];
 		unsigned int delayInDecimationClockTicks = preTriggerDelay >> [self energyDecimation:group];
-		unsigned int temp = 0;
-		unsigned int temptwo = 0;
 		if (energySampleLength == 0) {
 			// Means that we are not shipping an energy waveform.
 			// Make sure the gate length is long enough
@@ -1285,21 +1280,245 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		} 
 		else {
 			// We are shipping an energy waveform, we require the waveform to be at least:
-			temp = delayInDecimationClockTicks + 
-			energySampleStartIndex3 + 
-			energySampleLength/3 + 20;
-			temptwo = delayInDecimationClockTicks +
-			2*[self energyPeakingTime:group] +
-			[self energyGapTime:group] + 20;
-			// Take the larger of the two.
-			if (temp > temptwo ) {
-				[self setEnergyGateLength:group withValue:temp];
-			} 
-			else {
-				[self setEnergyGateLength:group withValue:temptwo];			
-			}
+			unsigned int temp =	delayInDecimationClockTicks + 
+					energySampleStartIndex3     + 
+					energySampleLength          + 
+					20;
+			
+			unsigned int temptwo = delayInDecimationClockTicks	+
+						2*[self energyPeakingTime:group]		+
+						[self energyGapTime:group]				+ 
+						20;
+			
+			//use the larger one
+			[self setEnergyGateLength:group withValue:MAX(temp,temptwo)];
+
 		}
 	}
+}
+#pragma mark •••Reg Declarations
+- (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
+{
+    switch (channel) {
+        case 0: return kSIS3302PreviousBankSampleAddressAdc1;
+        case 1: return kSIS3302PreviousBankSampleAddressAdc2;
+        case 2: return kSIS3302PreviousBankSampleAddressAdc3;
+        case 3: return kSIS3302PreviousBankSampleAddressAdc4;
+        case 4: return kSIS3302PreviousBankSampleAddressAdc5;
+        case 5: return kSIS3302PreviousBankSampleAddressAdc6;
+        case 6: return kSIS3302PreviousBankSampleAddressAdc7;
+        case 7: return kSIS3302PreviousBankSampleAddressAdc8;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getEnergyTauFactorOffset:(int) channel 
+{
+    switch (channel) {
+        case 0: return kSIS3302EnergyTauFactorAdc1;
+        case 1: return kSIS3302EnergyTauFactorAdc2;
+        case 2: return kSIS3302EnergyTauFactorAdc3;
+        case 3: return kSIS3302EnergyTauFactorAdc4;
+        case 4: return kSIS3302EnergyTauFactorAdc5;
+        case 5: return kSIS3302EnergyTauFactorAdc6;
+        case 6: return kSIS3302EnergyTauFactorAdc7;
+        case 7: return kSIS3302EnergyTauFactorAdc8;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getBufferControlOffset:(int) aGroup 
+{
+    switch (aGroup) {
+        case 0: return kSIS3302BufferControlModeAdc12;
+        case 1: return kSIS3302BufferControlModeAdc34;
+        case 2: return kSIS3302BufferControlModeAdc56;
+        case 3: return kSIS3302BufferControlModeAdc78;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getPreTriggerDelayTriggerGateLengthOffset:(int) aGroup 
+{
+    switch (aGroup) {
+        case 0: return kSIS3302PreTriggerDelayTriggerGateLengthAdc12;
+        case 1: return kSIS3302PreTriggerDelayTriggerGateLengthAdc34;
+        case 2: return kSIS3302PreTriggerDelayTriggerGateLengthAdc56;
+        case 3: return kSIS3302PreTriggerDelayTriggerGateLengthAdc78;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getADCBufferRegisterOffset:(int) channel 
+{
+    switch (channel) {
+        case 0: return kSIS3302Adc1Offset;
+        case 1: return kSIS3302Adc2Offset;
+        case 2: return kSIS3302Adc3Offset;
+        case 3: return kSIS3302Adc4Offset;
+        case 4: return kSIS3302Adc5Offset;
+        case 5: return kSIS3302Adc6Offset;
+        case 6: return kSIS3302Adc7Offset;
+        case 7: return kSIS3302Adc8Offset;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getThresholdRegOffsets:(int) channel 
+{
+    switch (channel) {
+        case 0: return 	kSIS3302TriggerThresholdAdc1;
+		case 1: return 	kSIS3302TriggerThresholdAdc2;
+		case 2: return 	kSIS3302TriggerThresholdAdc3;
+		case 3: return 	kSIS3302TriggerThresholdAdc4;
+		case 4:	return 	kSIS3302TriggerThresholdAdc5;
+		case 5: return 	kSIS3302TriggerThresholdAdc6;
+		case 6: return 	kSIS3302TriggerThresholdAdc7;
+		case 7: return 	kSIS3302TriggerThresholdAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getExtendedThresholdRegOffsets:(int) channel 
+{
+    switch (channel) {
+        case 0: return 	kSIS3302TriggerExtendedThresholdAdc1;
+		case 1: return 	kSIS3302TriggerExtendedThresholdAdc2;
+		case 2: return 	kSIS3302TriggerExtendedThresholdAdc3;
+		case 3: return 	kSIS3302TriggerExtendedThresholdAdc4;
+		case 4:	return 	kSIS3302TriggerExtendedThresholdAdc5;
+		case 5: return 	kSIS3302TriggerExtendedThresholdAdc6;
+		case 6: return 	kSIS3302TriggerExtendedThresholdAdc7;
+		case 7: return 	kSIS3302TriggerExtendedThresholdAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getTriggerSetupRegOffsets:(int) channel 
+{
+    switch (channel) {
+		case 0: return 	kSIS3302TriggerSetupAdc1;
+		case 1: return 	kSIS3302TriggerSetupAdc2;
+		case 2: return 	kSIS3302TriggerSetupAdc3;
+		case 3: return 	kSIS3302TriggerSetupAdc4;
+		case 4: return 	kSIS3302TriggerSetupAdc5;
+		case 5: return 	kSIS3302TriggerSetupAdc6;
+		case 6: return 	kSIS3302TriggerSetupAdc7;
+		case 7: return 	kSIS3302TriggerSetupAdc8;
+    }
+    return (unsigned long) -1;
+}
+
+- (unsigned long) getTriggerExtSetupRegOffsets:(int)channel
+{
+    switch (channel) {	
+		case 0: return 	kSIS3302TriggerExtendedSetupAdc1;
+		case 1: return 	kSIS3302TriggerExtendedSetupAdc2;
+		case 2: return 	kSIS3302TriggerExtendedSetupAdc3;
+		case 3: return 	kSIS3302TriggerExtendedSetupAdc4;
+		case 4: return 	kSIS3302TriggerExtendedSetupAdc5;
+		case 5: return 	kSIS3302TriggerExtendedSetupAdc6;
+		case 6: return 	kSIS3302TriggerExtendedSetupAdc7;
+		case 7: return 	kSIS3302TriggerExtendedSetupAdc8;
+	}
+    return (unsigned long) -1;	
+}
+
+
+- (unsigned long) getEndThresholdRegOffsets:(int)group
+{
+	switch (group) {	
+		case 0: return 	 kSIS3302EndAddressThresholdAdc12;
+		case 1: return 	 kSIS3302EndAddressThresholdAdc34;
+		case 2: return 	 kSIS3302EndAddressThresholdAdc56;
+		case 3: return 	 kSIS3302EndAddressThresholdAdc78;
+	}
+	return (unsigned long) -1;	 
+}
+
+- (unsigned long) getRawDataBufferConfigOffsets:(int) channel 
+{
+    switch (channel) {
+        case 0: return kSIS3302RawDataBufferConfigAdc12;
+        case 1: return kSIS3302RawDataBufferConfigAdc34;
+        case 2: return kSIS3302RawDataBufferConfigAdc56;
+        case 3: return kSIS3302RawDataBufferConfigAdc78;
+    }
+    return (unsigned long)-1;
+}
+
+- (unsigned long) getSampleAddress:(int)channel
+{
+    switch (channel) {
+		case 0: return 	kSIS3302ActualSampleAddressAdc1;
+		case 1: return 	kSIS3302ActualSampleAddressAdc2;
+		case 2: return 	kSIS3302ActualSampleAddressAdc3;
+		case 3: return 	kSIS3302ActualSampleAddressAdc4;
+		case 4: return 	kSIS3302ActualSampleAddressAdc5;
+		case 5: return 	kSIS3302ActualSampleAddressAdc6;
+		case 6: return 	kSIS3302ActualSampleAddressAdc7;
+		case 7: return 	kSIS3302ActualSampleAddressAdc8;
+ 	}
+	return (unsigned long) -1;	 
+}
+
+- (unsigned long) getEventConfigOffsets:(int)group
+{
+	switch (group) {
+		case 0: return kSIS3302EventConfigAdc12;
+		case 1: return kSIS3302EventConfigAdc34;
+		case 2: return kSIS3302EventConfigAdc56;
+		case 3: return kSIS3302EventConfigAdc78;
+	}
+	return (unsigned long) -1;	 
+}
+
+- (unsigned long) getEnergyGateLengthOffsets:(int)group
+{
+	switch (group) {
+		case 0: return kSIS3302EnergyGateLengthAdc12;
+		case 1: return kSIS3302EnergyGateLengthAdc34;
+		case 2: return kSIS3302EnergyGateLengthAdc56;
+		case 3: return kSIS3302EnergyGateLengthAdc78;
+	}
+	return (unsigned long) -1;	 
+}
+
+- (unsigned long) getExtendedEventConfigOffsets:(int)group
+{
+	switch (group) {
+		case 0: return kSIS3302EventExtendedConfigAdc12;
+		case 1: return kSIS3302EventExtendedConfigAdc34;
+		case 2: return kSIS3302EventExtendedConfigAdc56;
+		case 3: return kSIS3302EventExtendedConfigAdc78;
+	}
+	return (unsigned long) -1;	 
+}
+
+- (unsigned long) getAdcMemory:(int)channel
+{
+    switch (channel) {			
+		case 0: return 	kSIS3302Adc1Offset;
+		case 1: return 	kSIS3302Adc2Offset;
+		case 2: return 	kSIS3302Adc3Offset;
+		case 3: return 	kSIS3302Adc4Offset;
+		case 4: return 	kSIS3302Adc5Offset;
+		case 5: return 	kSIS3302Adc6Offset;
+		case 6: return 	kSIS3302Adc7Offset;
+		case 7: return 	kSIS3302Adc8Offset;
+ 	}
+	return (unsigned long) -1;	 
+}
+
+- (unsigned long) getEnergySetupGPOffset:(int)group
+{
+	switch (group) {
+		case 0: return kSIS3302EnergySetupGPAdc12;
+		case 1: return kSIS3302EnergySetupGPAdc34;
+		case 2: return kSIS3302EnergySetupGPAdc56;
+		case 3: return kSIS3302EnergySetupGPAdc78;
+	}
+	return (unsigned long) -1;	 
 }
 
 #pragma mark •••Hardware Access
@@ -2137,231 +2356,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 }
 
-- (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel 
-{
-    switch (channel) {
-        case 0: return kSIS3302PreviousBankSampleAddressAdc1;
-        case 1: return kSIS3302PreviousBankSampleAddressAdc2;
-        case 2: return kSIS3302PreviousBankSampleAddressAdc3;
-        case 3: return kSIS3302PreviousBankSampleAddressAdc4;
-        case 4: return kSIS3302PreviousBankSampleAddressAdc5;
-        case 5: return kSIS3302PreviousBankSampleAddressAdc6;
-        case 6: return kSIS3302PreviousBankSampleAddressAdc7;
-        case 7: return kSIS3302PreviousBankSampleAddressAdc8;
-    }
-    return (unsigned long)-1;
-}
-
-- (unsigned long) getEnergyTauFactorOffset:(int) channel 
-{
-    switch (channel) {
-        case 0: return kSIS3302EnergyTauFactorAdc1;
-        case 1: return kSIS3302EnergyTauFactorAdc2;
-        case 2: return kSIS3302EnergyTauFactorAdc3;
-        case 3: return kSIS3302EnergyTauFactorAdc4;
-        case 4: return kSIS3302EnergyTauFactorAdc5;
-        case 5: return kSIS3302EnergyTauFactorAdc6;
-        case 6: return kSIS3302EnergyTauFactorAdc7;
-        case 7: return kSIS3302EnergyTauFactorAdc8;
-    }
-    return (unsigned long)-1;
-}
-
-- (unsigned long) getBufferControlOffset:(int) aGroup 
-{
-    switch (aGroup) {
-        case 0: return kSIS3302BufferControlModeAdc12;
-        case 1: return kSIS3302BufferControlModeAdc34;
-        case 2: return kSIS3302BufferControlModeAdc56;
-        case 3: return kSIS3302BufferControlModeAdc78;
-    }
-    return (unsigned long)-1;
-}
-
-- (unsigned long) getPreTriggerDelayTriggerGateLengthOffset:(int) aGroup 
-{
-    switch (aGroup) {
-        case 0: return kSIS3302PreTriggerDelayTriggerGateLengthAdc12;
-        case 1: return kSIS3302PreTriggerDelayTriggerGateLengthAdc34;
-        case 2: return kSIS3302PreTriggerDelayTriggerGateLengthAdc56;
-        case 3: return kSIS3302PreTriggerDelayTriggerGateLengthAdc78;
-    }
-    return (unsigned long)-1;
-}
-
-- (unsigned long) getADCBufferRegisterOffset:(int) channel 
-{
-    switch (channel) {
-        case 0: return kSIS3302Adc1Offset;
-        case 1: return kSIS3302Adc2Offset;
-        case 2: return kSIS3302Adc3Offset;
-        case 3: return kSIS3302Adc4Offset;
-        case 4: return kSIS3302Adc5Offset;
-        case 5: return kSIS3302Adc6Offset;
-        case 6: return kSIS3302Adc7Offset;
-        case 7: return kSIS3302Adc8Offset;
-    }
-    return (unsigned long) -1;
-}
-
-#pragma mark •••Static Declarations
-- (unsigned long) getThresholdRegOffsets:(int) channel 
-{
-    switch (channel) {
-        case 0: return 	kSIS3302TriggerThresholdAdc1;
-		case 1: return 	kSIS3302TriggerThresholdAdc2;
-		case 2: return 	kSIS3302TriggerThresholdAdc3;
-		case 3: return 	kSIS3302TriggerThresholdAdc4;
-		case 4:	return 	kSIS3302TriggerThresholdAdc5;
-		case 5: return 	kSIS3302TriggerThresholdAdc6;
-		case 6: return 	kSIS3302TriggerThresholdAdc7;
-		case 7: return 	kSIS3302TriggerThresholdAdc8;
-    }
-    return (unsigned long) -1;
-}
-
-- (unsigned long) getExtendedThresholdRegOffsets:(int) channel 
-{
-    switch (channel) {
-        case 0: return 	kSIS3302TriggerExtendedThresholdAdc1;
-		case 1: return 	kSIS3302TriggerExtendedThresholdAdc2;
-		case 2: return 	kSIS3302TriggerExtendedThresholdAdc3;
-		case 3: return 	kSIS3302TriggerExtendedThresholdAdc4;
-		case 4:	return 	kSIS3302TriggerExtendedThresholdAdc5;
-		case 5: return 	kSIS3302TriggerExtendedThresholdAdc6;
-		case 6: return 	kSIS3302TriggerExtendedThresholdAdc7;
-		case 7: return 	kSIS3302TriggerExtendedThresholdAdc8;
-    }
-    return (unsigned long) -1;
-}
-
-- (unsigned long) getTriggerSetupRegOffsets:(int) channel 
-{
-    switch (channel) {
-		case 0: return 	kSIS3302TriggerSetupAdc1;
-		case 1: return 	kSIS3302TriggerSetupAdc2;
-		case 2: return 	kSIS3302TriggerSetupAdc3;
-		case 3: return 	kSIS3302TriggerSetupAdc4;
-		case 4: return 	kSIS3302TriggerSetupAdc5;
-		case 5: return 	kSIS3302TriggerSetupAdc6;
-		case 6: return 	kSIS3302TriggerSetupAdc7;
-		case 7: return 	kSIS3302TriggerSetupAdc8;
-    }
-    return (unsigned long) -1;
-}
-
-- (unsigned long) getTriggerExtSetupRegOffsets:(int)channel
-{
-    switch (channel) {	
-		case 0: return 	kSIS3302TriggerExtendedSetupAdc1;
-		case 1: return 	kSIS3302TriggerExtendedSetupAdc2;
-		case 2: return 	kSIS3302TriggerExtendedSetupAdc3;
-		case 3: return 	kSIS3302TriggerExtendedSetupAdc4;
-		case 4: return 	kSIS3302TriggerExtendedSetupAdc5;
-		case 5: return 	kSIS3302TriggerExtendedSetupAdc6;
-		case 6: return 	kSIS3302TriggerExtendedSetupAdc7;
-		case 7: return 	kSIS3302TriggerExtendedSetupAdc8;
-	}
-    return (unsigned long) -1;	
-}
-
-
-- (unsigned long) getEndThresholdRegOffsets:(int)group
-{
-	switch (group) {	
-		case 0: return 	 kSIS3302EndAddressThresholdAdc12;
-		case 1: return 	 kSIS3302EndAddressThresholdAdc34;
-		case 2: return 	 kSIS3302EndAddressThresholdAdc56;
-		case 3: return 	 kSIS3302EndAddressThresholdAdc78;
-	}
-	return (unsigned long) -1;	 
-}
-
-- (unsigned long) getRawDataBufferConfigOffsets:(int) channel 
-{
-    switch (channel) {
-        case 0: return kSIS3302RawDataBufferConfigAdc12;
-        case 1: return kSIS3302RawDataBufferConfigAdc34;
-        case 2: return kSIS3302RawDataBufferConfigAdc56;
-        case 3: return kSIS3302RawDataBufferConfigAdc78;
-    }
-    return (unsigned long)-1;
-}
-
-- (unsigned long) getSampleAddress:(int)channel
-{
-    switch (channel) {
-		case 0: return 	kSIS3302ActualSampleAddressAdc1;
-		case 1: return 	kSIS3302ActualSampleAddressAdc2;
-		case 2: return 	kSIS3302ActualSampleAddressAdc3;
-		case 3: return 	kSIS3302ActualSampleAddressAdc4;
-		case 4: return 	kSIS3302ActualSampleAddressAdc5;
-		case 5: return 	kSIS3302ActualSampleAddressAdc6;
-		case 6: return 	kSIS3302ActualSampleAddressAdc7;
-		case 7: return 	kSIS3302ActualSampleAddressAdc8;
- 	}
-	return (unsigned long) -1;	 
-}
-
-- (unsigned long) getEventConfigOffsets:(int)group
-{
-	switch (group) {
-		case 0: return kSIS3302EventConfigAdc12;
-		case 1: return kSIS3302EventConfigAdc34;
-		case 2: return kSIS3302EventConfigAdc56;
-		case 3: return kSIS3302EventConfigAdc78;
-	}
-	return (unsigned long) -1;	 
-}
-
-- (unsigned long) getEnergyGateLengthOffsets:(int)group
-{
-	switch (group) {
-		case 0: return kSIS3302EnergyGateLengthAdc12;
-		case 1: return kSIS3302EnergyGateLengthAdc34;
-		case 2: return kSIS3302EnergyGateLengthAdc56;
-		case 3: return kSIS3302EnergyGateLengthAdc78;
-	}
-	return (unsigned long) -1;	 
-}
-
-- (unsigned long) getExtendedEventConfigOffsets:(int)group
-{
-	switch (group) {
-		case 0: return kSIS3302EventExtendedConfigAdc12;
-		case 1: return kSIS3302EventExtendedConfigAdc34;
-		case 2: return kSIS3302EventExtendedConfigAdc56;
-		case 3: return kSIS3302EventExtendedConfigAdc78;
-	}
-	return (unsigned long) -1;	 
-}
-
-- (unsigned long) getAdcMemory:(int)channel
-{
-    switch (channel) {			
-		case 0: return 	kSIS3302Adc1Offset;
-		case 1: return 	kSIS3302Adc2Offset;
-		case 2: return 	kSIS3302Adc3Offset;
-		case 3: return 	kSIS3302Adc4Offset;
-		case 4: return 	kSIS3302Adc5Offset;
-		case 5: return 	kSIS3302Adc6Offset;
-		case 6: return 	kSIS3302Adc7Offset;
-		case 7: return 	kSIS3302Adc8Offset;
- 	}
-	return (unsigned long) -1;	 
-}
-
-- (unsigned long) getEnergySetupGPOffset:(int)group
-{
-	switch (group) {
-		case 0: return kSIS3302EnergySetupGPAdc12;
-		case 1: return kSIS3302EnergySetupGPAdc34;
-		case 2: return kSIS3302EnergySetupGPAdc56;
-		case 3: return kSIS3302EnergySetupGPAdc78;
-	}
-	return (unsigned long) -1;	 
-}
-
 - (BOOL) isEvent
 {
 	unsigned long data_rd = 0;
@@ -2463,7 +2457,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];	
 }
-
 
 #pragma mark •••Data Taker
 - (unsigned long) mcaId { return mcaId; }
@@ -2837,8 +2830,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				for(group=0;group<4;group++){
 					long sisHeaderLength = 2;
 					if(wrapMaskForRun & (1L<<group))	sisHeaderLength = 4;
-					dataRecordlength[group] = 4+sisHeaderLength+[self sampleLength:group]/2+energySampleLength+4; //Orca header+sisheader+samples+energy+sistrailer
-					dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(long));
+					dataRecordlength[group] = 4+sisHeaderLength+[self sampleLength:group]/2+energySampleLength/2+4; //Orca header+sisheader+samples+energy+sistrailer
+					dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(long)+100);
 				}
 				isRunning = YES;
 				firstTime = NO;
@@ -2877,25 +2870,25 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 									int index = 0;
 									dataRecord[group][index++] =   dataId | dataRecordlength[group];
 									dataRecord[group][index++] =	(([self crateNumber]&0x0000000f)<<21) | 
-									(([self slot] & 0x0000001f)<<16)      |
-									((i & 0x000000ff)<<8)			 |
-									wrapMode;
+																	(([self slot] & 0x0000001f)<<16)      |
+																	((i & 0x000000ff)<<8)			      |
+																	wrapMode;
 									dataRecord[group][index++] = [self sampleLength:group]/2;
 									dataRecord[group][index++] = energySampleLength;
 									unsigned long* p = &dataRecord[group][index];
 									[[self adapter] readLongBlock: p
 														atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:i] + addrOffset
-														numToRead: dataRecordlength[group]-4
+														numToRead: dataRecordlength[group]
 													   withAddMod: [self addressModifier]
 													usingAddSpace: 0x01];
 									
-									if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
+									//if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
 										[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
-									}
+									//}
 									
 									addrOffset += (dataRecordlength[group]-4)*4;
 									if(++eventCount > 25)break;
-								}while (addrOffset < endSampleAddress);
+								} while (addrOffset < endSampleAddress);
 							}
 						}
 					}
@@ -2909,8 +2902,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 					if(waitCount > 10){						
 						int index = 0;
 						dataRecord[0][index++] = lostDataId | 3; 
-						dataRecord[0][index++] = (([self crateNumber] & 0x0000000f) << 21) | 
-						(([self slot]        & 0x0000001f) << 16)  | 1; //1 == reset event
+						dataRecord[0][index++] = (([self crateNumber] & 0x0000000f) << 21)  | 
+												 (([self slot]        & 0x0000001f) << 16)  | 1; //1 == reset event
 						dataRecord[0][index++] = channelsToReadMask<<16;
 						[aDataPacket addLongsToFrameBuffer:dataRecord[0] length:3];
 						[self resetSamplingLogic];
@@ -2949,8 +2942,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 				unsigned long* mcaBytes = (unsigned long*)[mcaData bytes];
 				mcaBytes[0] = mcaId | (mcaLength+2);
 				mcaBytes[1] =	(([self crateNumber]&0x0000000f)<<21) | 
-				(([self slot] & 0x0000001f)<<16)      |
-				((channel & 0x000000ff)<<8);
+								(([self slot] & 0x0000001f)<<16)      |
+								((channel & 0x000000ff)<<8);
 				
 				[[self adapter] readLongBlock: &mcaBytes[2]
 									atAddress: [self baseAddress] + [self getADCBufferRegisterOffset:channel] + pageOffset
@@ -3009,6 +3002,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		configStruct->total_cards++;
 		configStruct->card_info[index].hw_type_id				= kSIS3302; //should be unique
 		configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
+		configStruct->card_info[index].hw_mask[1]				= lostDataId;	//better be unique
 		configStruct->card_info[index].slot						= [self slot];
 		configStruct->card_info[index].crate					= [self crateNumber];
 		configStruct->card_info[index].add_mod					= [self addressModifier];

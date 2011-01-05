@@ -40,7 +40,8 @@ uint32_t ORSIS3302Card::GetADCBufferRegisterOffset(size_t channel)
 
 bool ORSIS3302Card::Start()
 {
-	DisarmAndArmNextBank();
+	DisarmAndArmBank(2);
+	DisarmAndArmBank(1);
 	return true;
 }
 
@@ -64,7 +65,8 @@ bool ORSIS3302Card::IsEvent()
     	return false;
     }
 	uint32_t bankMask = fBankOneArmed?0x10000:0x20000;
-	return ((data_rd & 0x80000) == 0x80000) && ((data_rd & bankMask) == bankMask);
+	return  ((data_rd & 0x80000) == 0x80000) &&  
+			((data_rd & bankMask) == bankMask);
 }
 
 bool ORSIS3302Card::SetupPageReg()
@@ -113,13 +115,13 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 	if(fWaitingForSomeChannels){
 		//if we wait too long, do a logic reset
 		fWaitCount++;
-		if(fWaitCount > 10){
+		if(fWaitCount > 1000){
 			LogError("SIS3302 0x%x Rd delay reset:  0x%02x", GetBaseAddress(),fChannelsToReadMask); 
 			
 			ensureDataCanHold(3);
 			data[dataIndex++] = GetHardwareMask()[1] | 3; 
 			data[dataIndex++] = ((GetCrate()     & 0x0000000f) << 21) | 
-			((GetSlot()      & 0x0000001f) << 16) | 1; //1 == reset event
+								((GetSlot()      & 0x0000001f) << 16) | 1; //1 == reset event
 			data[dataIndex++] = fChannelsToReadMask<<16;
 			resetSampleLogic();
 		}
@@ -137,7 +139,7 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 		LogBusError("Rd NextSpl Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno)); 
 		return;
 	}
-	
+	usleep(1);
 	//bit 24 is the bank bit. It must match the bank that we are reading out or chaos will result. 
 	if (((endSampleAddress >> 24) & 0x1) ==  (fBankOneArmed ? 1:0)) { 
 		//The bit matches, we will flag this channel as having been read out.
@@ -160,11 +162,10 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 			if(bufferWrap) sisHeaderSize = kHeaderSizeInLongsWrap;
 			else		   sisHeaderSize = kHeaderSizeInLongsNoWrap;
 			
-			uint32_t sizeOfRecord	= sisHeaderSize		    + 
-			kTrailerSizeInLongs   + 
-			numberLongsInRawData  + 
-			numberLongsInEnergyData;
-			
+			uint32_t sizeOfRecord	=	sisHeaderSize		 + 
+										kTrailerSizeInLongs  + 
+										numberLongsInRawData + 
+										numberLongsInEnergyData;
 			//the card may write past the 8MB page boundary. If it does, we flag those as lost
 			uint32_t numRecordsLost = 0;
 			uint32_t sizeOfRecordBytes = sizeOfRecord*sizeof(uint32_t);
@@ -177,8 +178,8 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 				ensureDataCanHold(3);
 				data[dataIndex++] = GetHardwareMask()[1] | 3; 
 				data[dataIndex++] = ((GetCrate()     & 0x0000000f) << 21) | 
-				((GetSlot()      & 0x0000001f) << 16) | 
-				((channel        & 0x000000ff) << 8)  ;
+									((GetSlot()      & 0x0000001f) << 16) | 
+									((channel        & 0x000000ff) << 8)  ;
 				data[dataIndex++] = numRecordsLost;
 			}
 			
@@ -201,14 +202,13 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 				ensureDataCanHold(sizeOfRecord + 4);
 				data[dataIndex++] = GetHardwareMask()[0] | (sizeOfRecord+4); 
 				data[dataIndex++] = ((GetCrate()     & 0x0000000f) << 21) | 
-				((GetSlot()      & 0x0000001f) << 16) | 
-				((channel        & 0x000000ff) << 8)  |
-				bufferWrap;
+									((GetSlot()      & 0x0000001f) << 16) | 
+									((channel        & 0x000000ff) << 8)  |
+									bufferWrap;
 				data[dataIndex++] = numberLongsInRawData;
 				data[dataIndex++] = numberLongsInEnergyData;
-				
 				memcpy(data + dataIndex, &dmaBuffer[i], sizeOfRecord*sizeof(uint32_t));
-				
+					
 				dataIndex += sizeOfRecord;
 			}
 		}

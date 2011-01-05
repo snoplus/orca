@@ -29,14 +29,14 @@
 @private 
 	BOOL getRatesFromDecodeStage;
 	NSMutableDictionary* actualSIS3302Cards;
-	BOOL dumpedOneNormal;
-	BOOL dumpedOneBad[8];
-	int recordCount[8];
+	//BOOL dumpedOneNormal;
+	//BOOL dumpedOneBad[8];
+	//int recordCount[8];
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 - (void) filterLengthChanged:(NSNotification*)aNote;
-- (void) dumpRecord:(void*)someData bad:(BOOL)wasBad;
+//- (void) dumpRecord:(void*)someData;
 @end
 
 @interface ORSIS3302DecoderForMca : ORVmeCardDecoder {
