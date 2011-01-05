@@ -192,6 +192,11 @@
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(commentChanged:)
+                         name : ORMCA927ModelCommentChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -224,6 +229,12 @@
 	[self runningStatusChanged:nil];
 	[self runOptionsChanged:nil];
     [self miscAttributesChanged:nil];
+	[self commentChanged:nil];
+}
+
+- (void) commentChanged:(NSNotification*)aNote
+{
+	[commentField setStringValue: [model comment]];
 }
 
 - (void) updateChannelParams
@@ -482,6 +493,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) commentAction:(id)sender
+{
+	[model setComment:[sender stringValue]];	
+}
 
 - (IBAction) viewSpectrum0Action:(id)sender
 {

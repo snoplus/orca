@@ -27,6 +27,7 @@
 @interface ORMCA927Controller : OrcaObjectController 
 {
 	IBOutlet ORTimedTextField* noDataWarningField;
+	IBOutlet   NSTextField* commentField;
 	IBOutlet ORTimedTextField* checkFPGAField;
 	IBOutlet NSPopUpButton* serialNumberPopup;
 	IBOutlet NSMatrix*		runOptionsMatrix;
@@ -78,6 +79,7 @@
 - (void) updateChannelParams;
 
 #pragma mark ***Interface Management
+- (void) commentChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) autoClearChanged:(NSNotification*)aNote;
@@ -105,6 +107,7 @@
 - (void) zdtModeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) commentAction:(id)sender;
 - (IBAction) viewSpectrum0Action:(id)sender;
 - (IBAction) viewSpectrum1Action:(id)sender;
 - (IBAction) viewZDT0Action:(id)sender;

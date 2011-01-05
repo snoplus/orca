@@ -27,6 +27,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataSet.h"
 
+NSString* ORMCA927ModelCommentChanged	    = @"ORMCA927ModelCommentChanged";
 NSString* ORMCA927ModelRunOptionsChanged	= @"ORMCA927ModelRunOptionsChanged";
 NSString* ORMCA927ModelSelectedChannelChanged = @"ORMCA927ModelSelectedChannelChanged";
 NSString* ORMCA927ModelLiveTimeStatusChanged= @"ORMCA927ModelLiveTimeStatusChanged";
@@ -132,6 +133,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) dealloc
 {
+    [comment release];
     [lastFile release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
  	[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -230,6 +232,23 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) comment
+{
+	if(!comment)return @"";
+    else return comment;
+}
+
+- (void) setComment:(NSString*)aComment
+{
+	if(!aComment)aComment = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setComment:comment];
+    
+    [comment autorelease];
+    comment = [aComment copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelCommentChanged object:self];
+}
 
 - (NSString*) lastFile
 {
@@ -836,7 +855,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 {
 /*
  $SPEC_ID:
- No sample description was entered.
+ Comment from user
  $SPEC_REM:
  DET# 1
  DETDESC# MCB 25
@@ -848,22 +867,32 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
  $DATA:
  0 8191
  ...data....
+ $ROI
+ 123
+ $PRESETS:
+ Live Time
+ 180
+ 0
  */
 	int n = [self numChannels:index];
 	aFilePath = [aFilePath stringByExpandingTildeInPath];
 	[self setLastFile:aFilePath];
 	
+	int realTimeValue = [self realTimeStatus:index];
+	int liveTimeValue = [self liveTimeStatus:index];
+
 	NSMutableString* s = [NSMutableString string];
-	[s appendFormat:@"$SPEC_ID:\nNo Comment for now\n"];
-	[s appendFormat:@"$SPEC_REM:\nDET# 1\nDETDESC# MCB 25\nAP# ORCA\n"];
+	[s appendFormat:@"$SPEC_ID:\n%@\n",comment];
+	[s appendFormat:@"$SPEC_REM:\nDET# 1\nDETDESC# MCB 25\nAP# Maestro Version 6.03\n"];
 	[s appendFormat:@"$DATE_MEA:\n%@\n",[NSDate date]];
-	[s appendFormat:@"$MEAS_TIM:\n%d %d\n",liveTime[index],realTime[index]];
+	[s appendFormat:@"$MEAS_TIM:\n%d %d\n",liveTimeValue,realTimeValue];
 	[s appendFormat:@"$Data:\n%d %d\n",index,n];
 	int i;
 	for(i=0;i<n;i++){
 		[s appendFormat:@"%d\n",spectrum[index][i]];
 	}
-	
+	[s appendFormat:@"$ROI:\n%d\n%d\n",roiPeakPreset[index], roiPreset[index]];
+	[s appendFormat:@"$PRESETS:\nLive Time\n%d\n%d\n",liveTime[index],realTime[index]];
 	[s writeToFile:aFilePath atomically:NO encoding:NSASCIIStringEncoding error:nil];
 }
 
@@ -1081,6 +1110,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setComment:		  [decoder decodeObjectForKey:@"comment"]];
     [self setLastFile:		  [decoder decodeObjectForKey:@"lastFile"]];
 	[self setSelectedChannel: [decoder decodeIntForKey:   @"selectedChannel"]];
 	[self setUseCustomFile:	  [decoder decodeBoolForKey:  @"useCustomFile"]];
@@ -1111,6 +1141,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeObject:comment		forKey:@"comment"];
 	[encoder encodeObject:lastFile		forKey:@"lastFile"];
 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
     [encoder encodeBool:useCustomFile	forKey:@"useCustomFile"];

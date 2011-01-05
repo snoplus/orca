@@ -105,9 +105,12 @@ typedef struct MCA927Registers {
 	BOOL		  mainRunIsStopping;
 	ORDataSet*    dataSet;
 	NSString*	  lastFile;
+    NSString*	  comment;
 }
 
 #pragma mark ***Accessors
+- (NSString*) comment;
+- (void) setComment:(NSString*)aComment;
 - (NSString*) lastFile;
 - (void) setLastFile:(NSString*)aLastFile;
 - (BOOL) startedFromMainRunControl:(int)index;
@@ -216,6 +219,7 @@ typedef struct MCA927Registers {
 
 @end
 
+extern NSString* ORMCA927ModelCommentChanged;
 extern NSString* ORMCA927ModelRunOptionsChanged;
 extern NSString* ORMCA927ModelSelectedChannelChanged;
 extern NSString* ORMCA927ModelLowerDiscriminatorChanged;
