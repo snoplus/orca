@@ -40,6 +40,7 @@
     NSImage* ascendingSortingImage;
     NSString *_sortColumn;
     BOOL _sortIsDescending;
+	BOOL scheduledForUpdate;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -59,6 +60,7 @@
 - (void) useAltViewChanged:(NSNotification*)aNote;
 - (void) objectsChanged:(NSNotification*)aNote;
 - (void) eMailOptionsChanged:(NSNotification*)aNote;
+- (void) doUpdate:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) useAltViewAction:(id)sender;

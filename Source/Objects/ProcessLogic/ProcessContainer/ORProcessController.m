@@ -43,6 +43,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 {
 	[ascendingSortingImage release];
 	[descendingSortingImage release];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
 
@@ -60,7 +61,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	
 	[tableView setAutosaveTableColumns:YES];
 	[tableView setAutosaveName:@"ORProcessControllerTableView"];    
-    
+    scheduledForUpdate = NO;
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -183,16 +184,23 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 - (void) elementStateChanged:(NSNotification*)aNote
 {
     if([[model orcaObjects] containsObject:[aNote object]]){
-		NSRect objRect = [[aNote object] frame];
-		//add in all the bounds of the lines
-		NSEnumerator* e = [[[aNote object] connectors] objectEnumerator];
-		id aConnector;
-		while(aConnector = [e nextObject]){
-			if([aConnector connector]) objRect = NSUnionRect(objRect,[aConnector lineBounds]);
+		if(!scheduledForUpdate){
+			scheduledForUpdate = YES;
+			[self performSelector:@selector(doUpdate:) withObject:aNote afterDelay:.5];
 		}
-		[groupView setNeedsDisplayInRect:objRect];
-		[tableView reloadData];
-    }
+	}
+}
+
+- (void) doUpdate:(NSNotification*)aNote
+{
+	scheduledForUpdate = NO;
+	//NSRect objRect = [[aNote object] frame];
+	//add in all the bounds of the lines
+	//for(id aConnector in [[aNote object] connectors]){
+	//	if([aConnector connector]) objRect = NSUnionRect(objRect,[aConnector lineBounds]);
+	//}
+	[groupView setNeedsDisplay:YES];
+	[tableView reloadData];
 }
 
 - (void) detailsChanged:(NSNotification*)aNote
