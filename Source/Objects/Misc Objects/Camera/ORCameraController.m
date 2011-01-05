@@ -179,9 +179,9 @@
     BOOL locked = [gSecurity isLocked:ORCameraLock];
 	BOOL isRunning = [model running];
 	BOOL validCamera = [[deviceIndexPU titleOfSelectedItem] length]>0;
-	[startStopButton setEnabled:validCamera & !locked];
+	[startStopButton setEnabled:validCamera && !locked];
     [updateIntervalPU setEnabled: !locked ];
-    [deviceIndexPU setEnabled: !locked ];
+    [deviceIndexPU setEnabled: !locked && !isRunning];
     [updateIntervalPU setEnabled: !locked ];
     [setHistoryFolderButton setEnabled: !locked ];
     [saveFileIntervalPU setEnabled: !locked ];
