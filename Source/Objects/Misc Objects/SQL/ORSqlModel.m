@@ -350,6 +350,27 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	@try{ [self createWaveformsTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
 }
 
+- (void) removeEntry
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection selectDB:dataBaseName]){
+				NSString* hw_address	 = macAddress();
+				NSString*	s = [NSString stringWithFormat:@"Delete from machines where hw_address=%@",
+												[sqlConnection quoteObject:hw_address]];
+				[aConnection queryString:s];
+				[self addMachineName];
+				NSLog(@"Removed and reloaded this machine's entry in the SQL DB\n");
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+	
+}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder

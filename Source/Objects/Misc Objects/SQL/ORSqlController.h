@@ -50,6 +50,7 @@
 - (IBAction) sqlLockAction:(id)sender;
 - (IBAction) connectionAction:(id)sender;
 - (IBAction) createAction:(id)sender;
+- (IBAction) removeEntryAction:(id)sender;
 
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 

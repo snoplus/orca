@@ -189,6 +189,11 @@
 	[model testConnection];
 }
 
+- (IBAction) removeEntryAction:(id)sender
+{
+	[model removeEntry];
+}
+
 - (IBAction) createAction:(id)sender
 {
 	[self endEditing];
