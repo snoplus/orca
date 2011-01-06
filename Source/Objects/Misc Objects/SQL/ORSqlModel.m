@@ -1290,36 +1290,38 @@ Table: Histogram2Ds
 			
 			//get the entry for our run state using our machine_id
 			id machine_id	= [row objectForKey:@"machine_id"];
-			theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id,state,experiment from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
-			id ourRunEntry	= [theResult fetchRowAsDictionary];
-			id oldExperiment = [ourRunEntry objectForKey:@"experiment"];
-			
-			//if we have a run entry, update it. Otherwise create it.
-			if(ourRunEntry){
-				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d  WHERE machine_id=%@",
-											[runModel runNumber],
-											[runModel subRunNumber],
-											[runModel runningState],
-											[sqlConnection quoteObject:machine_id]
-											]];
+			if(machine_id){
+				theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id,state,experiment from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
+				id ourRunEntry	= [theResult fetchRowAsDictionary];
+				id oldExperiment = [ourRunEntry objectForKey:@"experiment"];
+				
+				//if we have a run entry, update it. Otherwise create it.
+				if(ourRunEntry){
+					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET run=%d, subrun=%d, state=%d  WHERE machine_id=%@",
+												[runModel runNumber],
+												[runModel subRunNumber],
+												[runModel runningState],
+												[sqlConnection quoteObject:machine_id]
+												]];
 
-			}
-			else {
-				[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",
-											[runModel runNumber],
-											[runModel subRunNumber],
-											[runModel runningState],
-											[sqlConnection quoteObject:machine_id]
-											]];
-			}
-			
-			if([runModel runningState] == eRunInProgress){
-				[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Histogram1Ds WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
-			}
-			if( ![oldExperiment isEqual:experimentName]){
-				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment=%@ WHERE machine_id=%@",
-											[sqlConnection quoteObject:experimentName], 
-											[sqlConnection quoteObject:machine_id]]];
+				}
+				else {
+					[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO runs (run,subrun,state,machine_id) VALUES (%d,%d,%d,%@)",
+												[runModel runNumber],
+												[runModel subRunNumber],
+												[runModel runningState],
+												[sqlConnection quoteObject:machine_id]
+												]];
+				}
+				
+				if([runModel runningState] == eRunInProgress){
+					[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Histogram1Ds WHERE machine_id=%@",[sqlConnection quoteObject:machine_id]]];
+				}
+				if( ![oldExperiment isEqual:experimentName]){
+					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET experiment=%@ WHERE machine_id=%@",
+												[sqlConnection quoteObject:experimentName], 
+												[sqlConnection quoteObject:machine_id]]];
+				}
 			}
 			[sqlConnection release];
 		}
@@ -1354,20 +1356,22 @@ Table: Histogram2Ds
 			
 			//get the entry for our run state using our machine_id
 			id machine_id	= [row objectForKey:@"machine_id"];
-			theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
-			id ourRunEntry	= [theResult fetchRowAsDictionary];
-			
-			//if we have a run entry, update it. Otherwise ignore it.
-			if(ourRunEntry){
-				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET startTime=%@,elapsedTime=%d,elapsedSubRunTime=%d,elapsedBetweenSubRunTime=%d,timeToGo=%d  WHERE machine_id=%@",
-											[sqlConnection quoteObject:[runModel startTimeAsString]],
-											(int)[runModel elapsedRunTime],
-											(int)[runModel elapsedSubRunTime],
-											(int)[runModel elapsedBetweenSubRunTime],
-											(int)[runModel timeToGo],
-											[sqlConnection quoteObject:machine_id]
-											]];
-			}		
+			if(machine_id){
+				theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
+				id ourRunEntry	= [theResult fetchRowAsDictionary];
+				
+				//if we have a run entry, update it. Otherwise ignore it.
+				if(ourRunEntry){
+					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET startTime=%@,elapsedTime=%d,elapsedSubRunTime=%d,elapsedBetweenSubRunTime=%d,timeToGo=%d  WHERE machine_id=%@",
+												[sqlConnection quoteObject:[runModel startTimeAsString]],
+												(int)[runModel elapsedRunTime],
+												(int)[runModel elapsedSubRunTime],
+												(int)[runModel elapsedBetweenSubRunTime],
+												(int)[runModel timeToGo],
+												[sqlConnection quoteObject:machine_id]
+												]];
+				}		
+			}
 			[sqlConnection release];
 		}
 	}
@@ -1401,19 +1405,21 @@ Table: Histogram2Ds
 			
 			//get the entry for our run state using our machine_id
 			id machine_id	= [row objectForKey:@"machine_id"];
-			theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
-			id ourRunEntry	= [theResult fetchRowAsDictionary];
-			
-			//if we have a run entry, update it. Otherwise ignore it.
-			if(ourRunEntry){
-				[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET quickStart=%d,repeatRun=%d,offline=%d,timedRun=%d,timeLimit=%d  WHERE machine_id=%@",
-											(int)[runModel quickStart],
-											(int)[runModel repeatRun],
-											(int)[runModel offlineRun],
-											(int)[runModel timedRun],
-											(int)[runModel timeLimit],
-											[sqlConnection quoteObject:machine_id]
-											]];
+			if(machine_id){
+				theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT run_id from runs where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
+				id ourRunEntry	= [theResult fetchRowAsDictionary];
+				
+				//if we have a run entry, update it. Otherwise ignore it.
+				if(ourRunEntry){
+					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE runs SET quickStart=%d,repeatRun=%d,offline=%d,timedRun=%d,timeLimit=%d  WHERE machine_id=%@",
+												(int)[runModel quickStart],
+												(int)[runModel repeatRun],
+												(int)[runModel offlineRun],
+												(int)[runModel timedRun],
+												(int)[runModel timeLimit],
+												[sqlConnection quoteObject:machine_id]
+												]];
+				}
 			}
 			[sqlConnection release];
 		}
@@ -1448,131 +1454,132 @@ Table: Histogram2Ds
 			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row				    = [theResult fetchRowAsDictionary];
 			id machine_id			= [row objectForKey:@"machine_id"];		
-			
-			//do 1D Histograms first
-			for(id aMonitor in dataMonitors){
-				NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
-				for(id aDataSet in objs1d){
-					ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram1Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
-																		   [sqlConnection quoteObject:machine_id],
-																		   [sqlConnection quoteObject:[aDataSet fullName]],
-																		   [aMonitor uniqueIdNumber]]];
-					id dataSetEntry			 = [theResult fetchRowAsDictionary];
-					id dataset_id			 = [dataSetEntry objectForKey:@"dataset_id"];
-					unsigned long lastCounts = [[dataSetEntry objectForKey:@"counts"] longValue];
-					unsigned long countsNow  = [aDataSet totalCounts];
-					unsigned long start,end;
-					if(dataset_id) {
-						if(lastCounts != countsNow){
+			if(machine_id){
+				//do 1D Histograms first
+				for(id aMonitor in dataMonitors){
+					NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR1DHisto class]];
+					for(id aDataSet in objs1d){
+						ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram1Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
+																			   [sqlConnection quoteObject:machine_id],
+																			   [sqlConnection quoteObject:[aDataSet fullName]],
+																			   [aMonitor uniqueIdNumber]]];
+						id dataSetEntry			 = [theResult fetchRowAsDictionary];
+						id dataset_id			 = [dataSetEntry objectForKey:@"dataset_id"];
+						unsigned long lastCounts = [[dataSetEntry objectForKey:@"counts"] longValue];
+						unsigned long countsNow  = [aDataSet totalCounts];
+						unsigned long start,end;
+						if(dataset_id) {
+							if(lastCounts != countsNow){
+								NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
+								NSString* convertedData = [sqlConnection quoteObject:theData];
+								NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram1Ds SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
+													  [aDataSet totalCounts],
+													  start,end,
+													  convertedData,
+													  [sqlConnection quoteObject:dataset_id]];
+													  [sqlConnection queryString:theQuery];
+							}
+						}
+						else {
 							NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
 							NSString* convertedData = [sqlConnection quoteObject:theData];
-							NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram1Ds SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
+							NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram1Ds (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
+												  [aMonitor uniqueIdNumber],
+												  [sqlConnection quoteObject:machine_id],
+												  [sqlConnection quoteObject:[aDataSet fullName]],
 												  [aDataSet totalCounts],
 												  start,end,
-												  convertedData,
-												  [sqlConnection quoteObject:dataset_id]];
-												  [sqlConnection queryString:theQuery];
-						}
-					}
-					else {
-						NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
-						NSString* convertedData = [sqlConnection quoteObject:theData];
-						NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram1Ds (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
-											  [aMonitor uniqueIdNumber],
-											  [sqlConnection quoteObject:machine_id],
-											  [sqlConnection quoteObject:[aDataSet fullName]],
-											  [aDataSet totalCounts],
-											  start,end,
-											  [aDataSet numberBins],
-											  convertedData];
-						[sqlConnection queryString:theQuery];
-					}
-				}
-			}
-			//do 2D Histograms
-			for(id aMonitor in dataMonitors){
-				NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR2DHisto class]];
-				for(id aDataSet in objs1d){
-					ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram2Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
-																		   [sqlConnection quoteObject:machine_id],
-																		   [sqlConnection quoteObject:[aDataSet fullName]],
-																		   [aMonitor uniqueIdNumber]]];
-					id dataSetEntry			  = [theResult fetchRowAsDictionary];
-					id dataset_id			  = [dataSetEntry objectForKey:@"dataset_id"];
-					unsigned long lastCounts  = [[dataSetEntry objectForKey:@"counts"] longValue];
-					unsigned long countsNow   = [aDataSet totalCounts];
-					unsigned long binsPerSide = [aDataSet numberBinsPerSide];
-					unsigned short minX,maxX,minY,maxY;
-					[aDataSet getXMin:&minX xMax:&maxX yMin:&minY yMax:&maxY];
-					if(dataset_id) {
-						if(lastCounts != countsNow){
-							NSData* theData = [aDataSet rawData];
-							NSString* convertedData = [sqlConnection quoteObject:theData];
-							NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram2Ds SET counts=%d,data=%@ WHERE dataset_id=%@",
-												  [aDataSet totalCounts],
-												  convertedData,
-												  [sqlConnection quoteObject:dataset_id]];
+												  [aDataSet numberBins],
+												  convertedData];
 							[sqlConnection queryString:theQuery];
 						}
 					}
-					else {
-						NSData* theData = [aDataSet rawData];
-						NSString* convertedData = [sqlConnection quoteObject:theData];
-						NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram2Ds (monitor_id,machine_id,name,counts,type,binsperside,minX,maxX,minY,maxY,length,data) VALUES (%d,%@,%@,%d,2,%d,%d,%d,%d,%d,%d,%@)",
-											  [aMonitor uniqueIdNumber],
-											  [sqlConnection quoteObject:machine_id],
-											  [sqlConnection quoteObject:[aDataSet fullName]],
-											  [aDataSet totalCounts],
-											  binsPerSide,
-											  minX,maxX,minY,maxY,
-											  [aDataSet numberBins],
-											  convertedData];
-						[sqlConnection queryString:theQuery];
+				}
+				//do 2D Histograms
+				for(id aMonitor in dataMonitors){
+					NSArray* objs1d = [aMonitor  collectObjectsOfClass:[OR2DHisto class]];
+					for(id aDataSet in objs1d){
+						ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram2Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
+																			   [sqlConnection quoteObject:machine_id],
+																			   [sqlConnection quoteObject:[aDataSet fullName]],
+																			   [aMonitor uniqueIdNumber]]];
+						id dataSetEntry			  = [theResult fetchRowAsDictionary];
+						id dataset_id			  = [dataSetEntry objectForKey:@"dataset_id"];
+						unsigned long lastCounts  = [[dataSetEntry objectForKey:@"counts"] longValue];
+						unsigned long countsNow   = [aDataSet totalCounts];
+						unsigned long binsPerSide = [aDataSet numberBinsPerSide];
+						unsigned short minX,maxX,minY,maxY;
+						[aDataSet getXMin:&minX xMax:&maxX yMin:&minY yMax:&maxY];
+						if(dataset_id) {
+							if(lastCounts != countsNow){
+								NSData* theData = [aDataSet rawData];
+								NSString* convertedData = [sqlConnection quoteObject:theData];
+								NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram2Ds SET counts=%d,data=%@ WHERE dataset_id=%@",
+													  [aDataSet totalCounts],
+													  convertedData,
+													  [sqlConnection quoteObject:dataset_id]];
+								[sqlConnection queryString:theQuery];
+							}
+						}
+						else {
+							NSData* theData = [aDataSet rawData];
+							NSString* convertedData = [sqlConnection quoteObject:theData];
+							NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram2Ds (monitor_id,machine_id,name,counts,type,binsperside,minX,maxX,minY,maxY,length,data) VALUES (%d,%@,%@,%d,2,%d,%d,%d,%d,%d,%d,%@)",
+												  [aMonitor uniqueIdNumber],
+												  [sqlConnection quoteObject:machine_id],
+												  [sqlConnection quoteObject:[aDataSet fullName]],
+												  [aDataSet totalCounts],
+												  binsPerSide,
+												  minX,maxX,minY,maxY,
+												  [aDataSet numberBins],
+												  convertedData];
+							[sqlConnection queryString:theQuery];
+						}
 					}
 				}
-			}
-			
-			//do Waveforms
-			for(id aMonitor in dataMonitors){
-				NSArray* objsWaveform = [aMonitor  collectObjectsOfClass:[ORWaveform class]];
-				for(id aDataSet in objsWaveform){
-					ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Waveforms where (machine_id=%@ and name=%@ and monitor_id=%d)",
-																		   [sqlConnection quoteObject:machine_id],
-																		   [sqlConnection quoteObject:[aDataSet fullName]],
-																		   [aMonitor uniqueIdNumber]]];
-					id dataSetEntry			 = [theResult fetchRowAsDictionary];
-					id dataset_id			 = [dataSetEntry objectForKey:@"dataset_id"];
-					unsigned long lastCounts = [[dataSetEntry objectForKey:@"counts"] longValue];
-					unsigned long countsNow  = [aDataSet totalCounts];
-					if(dataset_id) {
-						if(lastCounts != countsNow){
+				
+				//do Waveforms
+				for(id aMonitor in dataMonitors){
+					NSArray* objsWaveform = [aMonitor  collectObjectsOfClass:[ORWaveform class]];
+					for(id aDataSet in objsWaveform){
+						ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Waveforms where (machine_id=%@ and name=%@ and monitor_id=%d)",
+																			   [sqlConnection quoteObject:machine_id],
+																			   [sqlConnection quoteObject:[aDataSet fullName]],
+																			   [aMonitor uniqueIdNumber]]];
+						id dataSetEntry			 = [theResult fetchRowAsDictionary];
+						id dataset_id			 = [dataSetEntry objectForKey:@"dataset_id"];
+						unsigned long lastCounts = [[dataSetEntry objectForKey:@"counts"] longValue];
+						unsigned long countsNow  = [aDataSet totalCounts];
+						if(dataset_id) {
+							if(lastCounts != countsNow){
+								NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
+								NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,unitsize=%d,mask=%d,bitmask=%d,offset=%d,length=%d,data=%@ WHERE dataset_id=%@",
+													  [aDataSet totalCounts],
+													  [aDataSet unitSize],
+													  [aDataSet mask],
+													  [aDataSet specialBitMask],
+													  [aDataSet dataOffset],
+													  [aDataSet numberBins],
+													  convertedData,
+													  [sqlConnection quoteObject:dataset_id]];
+								[sqlConnection queryString:theQuery];
+							}
+						}
+						else {
 							NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-							NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,unitsize=%d,mask=%d,bitmask=%d,offset=%d,length=%d,data=%@ WHERE dataset_id=%@",
+							NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Waveforms (monitor_id,machine_id,name,counts,unitsize,mask,bitmask,offset,type,length,data) VALUES (%d,%@,%@,%d,%d,%d,%d,%d,3,%d,%@)",
+												  [aMonitor uniqueIdNumber],
+												  [sqlConnection quoteObject:machine_id],
+												  [sqlConnection quoteObject:[aDataSet fullName]],
 												  [aDataSet totalCounts],
 												  [aDataSet unitSize],
 												  [aDataSet mask],
 												  [aDataSet specialBitMask],
 												  [aDataSet dataOffset],
 												  [aDataSet numberBins],
-												  convertedData,
-												  [sqlConnection quoteObject:dataset_id]];
+												  convertedData];
 							[sqlConnection queryString:theQuery];
 						}
-					}
-					else {
-						NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-						NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Waveforms (monitor_id,machine_id,name,counts,unitsize,mask,bitmask,offset,type,length,data) VALUES (%d,%@,%@,%d,%d,%d,%d,%d,3,%d,%@)",
-											  [aMonitor uniqueIdNumber],
-											  [sqlConnection quoteObject:machine_id],
-											  [sqlConnection quoteObject:[aDataSet fullName]],
-											  [aDataSet totalCounts],
-											  [aDataSet unitSize],
-											  [aDataSet mask],
-											  [aDataSet specialBitMask],
-											  [aDataSet dataOffset],
-											  [aDataSet numberBins],
-											  convertedData];
-						[sqlConnection queryString:theQuery];
 					}
 				}
 			}
@@ -1613,31 +1620,32 @@ Table: Histogram2Ds
 				ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 				id row				    = [theResult fetchRowAsDictionary];
 				id machine_id			= [row objectForKey:@"machine_id"];
+				if(machine_id){
+					theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT experiment_id from experiment where (machine_id = %@ and experiment = %@)",[sqlConnection quoteObject:machine_id],[sqlConnection quoteObject:experimentName]]];
+					row				    = [theResult fetchRowAsDictionary];
+					id experiment_id		= [row objectForKey:@"experiment_id"];
 
-				theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT experiment_id from experiment where (machine_id = %@ and experiment = %@)",[sqlConnection quoteObject:machine_id],[sqlConnection quoteObject:experimentName]]];
-				row				    = [theResult fetchRowAsDictionary];
-				id experiment_id		= [row objectForKey:@"experiment_id"];
-
-			
-				//if we have a run entry, update it. Otherwise create it.
-				if(experiment_id){
-					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE experiment SET thresholds=%@,gains=%@,totalCounts=%@,rates=%@ WHERE machine_id=%@",
-												[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
-												[sqlConnection quoteObject:[experiment gainDataForSet:0]],
-												[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
-												[sqlConnection quoteObject:[experiment rateDataForSet:0]],
-												[sqlConnection quoteObject:machine_id]]];
-				}
-				else  {
-					int numberSegments = [experiment maxNumSegments];
-					[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO experiment (machine_id,experiment,numberSegments,thresholds,gains,totalCounts,rates) VALUES (%@,%@,%d,%@,%@,%@,%@)",
-												[sqlConnection quoteObject:machine_id],
-												[sqlConnection quoteObject:experimentName],
-												numberSegments,
-												[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
-												[sqlConnection quoteObject:[experiment gainDataForSet:0]],
-												[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
-												[sqlConnection quoteObject:[experiment rateDataForSet:0]]]];
+				
+					//if we have a run entry, update it. Otherwise create it.
+					if(experiment_id){
+						[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE experiment SET thresholds=%@,gains=%@,totalCounts=%@,rates=%@ WHERE machine_id=%@",
+													[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
+													[sqlConnection quoteObject:[experiment gainDataForSet:0]],
+													[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
+													[sqlConnection quoteObject:[experiment rateDataForSet:0]],
+													[sqlConnection quoteObject:machine_id]]];
+					}
+					else  {
+						int numberSegments = [experiment maxNumSegments];
+						[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO experiment (machine_id,experiment,numberSegments,thresholds,gains,totalCounts,rates) VALUES (%@,%@,%d,%@,%@,%@,%@)",
+													[sqlConnection quoteObject:machine_id],
+													[sqlConnection quoteObject:experimentName],
+													numberSegments,
+													[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
+													[sqlConnection quoteObject:[experiment gainDataForSet:0]],
+													[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
+													[sqlConnection quoteObject:[experiment rateDataForSet:0]]]];
+					}
 				}
 			}
 			[sqlConnection release];
@@ -1789,62 +1797,63 @@ Table: Histogram2Ds
 		//get our machine_id using our MAC Address
 		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
 		if(sqlConnection){		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-			id row				    = [theResult fetchRowAsDictionary];
-			id machine_id			= [row objectForKey:@"machine_id"];
-			
-			//collect the existing DB entries for a sweep of deleted objects
-			theResult				= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT name from Processes where machine_id=%@",machine_id]];	
-			NSMutableArray* allEntries = [NSMutableArray array];
-			id anEntry;
-			while((anEntry = [theResult fetchRowAsDictionary]))[allEntries addObject:anEntry];
+			id row			= [theResult fetchRowAsDictionary];
+			id machine_id	= [row objectForKey:@"machine_id"];
+			if(machine_id) {
+				//collect the existing DB entries for a sweep of deleted objects
+				theResult				= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT name from Processes where machine_id=%@",machine_id]];	
+				NSMutableArray* allEntries = [NSMutableArray array];
+				id anEntry;
+				while((anEntry = [theResult fetchRowAsDictionary]))[allEntries addObject:anEntry];
 
-			//do 1D Histograms first
-			for(id aProcess in processes){
-				@synchronized(aProcess){
+				//do 1D Histograms first
+				for(id aProcess in processes){
+					@synchronized(aProcess){
 
-					ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT process_id from Processes where (machine_id=%@ and name=%@)",
-																		   machine_id,
-																		   [sqlConnection quoteObject:[aProcess fullID]]
-																		   ]];
-					id anEntry			= [theResult fetchRowAsDictionary];
-					id process_id		= [anEntry objectForKey:@"process_id"];
-					if(process_id) {
-						//already exists... just update
-						NSString* theQuery = [NSString stringWithFormat:@"UPDATE Processes SET name=%@,title=%@,timeStamp=%@,data=%@,state=%d WHERE process_id=%@",
-											  [sqlConnection quoteObject:[aProcess fullID]],
-											  [sqlConnection quoteObject:[aProcess shortName]],
-											  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-											  [sqlConnection quoteObject:[aProcess description]],
-											  [aProcess processRunning],
-											  [sqlConnection quoteObject:process_id]];
-						[sqlConnection queryString:theQuery];
-					}
-					else {
-						//have to add a new entry
-						NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Processes (machine_id,name,title,timeStamp,data,state) VALUES (%@,%@,%@,%@,%@,%d)",
-											  [sqlConnection quoteObject:machine_id],
-											  [sqlConnection quoteObject:[aProcess fullID]],
-											  [sqlConnection quoteObject:[aProcess shortName]],
-											  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-											  [sqlConnection quoteObject:[aProcess description]],
-											  [aProcess processRunning]];
-						[sqlConnection queryString:theQuery];
-					}
-					for(id anEntry in allEntries){
-						NSString* aName = [anEntry objectForKey:@"name"];
-						if([aName isEqualToString:[aProcess fullID]]){
-							[allEntries removeObject:anEntry];
-							break;
+						ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT process_id from Processes where (machine_id=%@ and name=%@)",
+																			   machine_id,
+																			   [sqlConnection quoteObject:[aProcess fullID]]
+																			   ]];
+						id anEntry			= [theResult fetchRowAsDictionary];
+						id process_id		= [anEntry objectForKey:@"process_id"];
+						if(process_id) {
+							//already exists... just update
+							NSString* theQuery = [NSString stringWithFormat:@"UPDATE Processes SET name=%@,title=%@,timeStamp=%@,data=%@,state=%d WHERE process_id=%@",
+												  [sqlConnection quoteObject:[aProcess fullID]],
+												  [sqlConnection quoteObject:[aProcess shortName]],
+												  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+												  [sqlConnection quoteObject:[aProcess description]],
+												  [aProcess processRunning],
+												  [sqlConnection quoteObject:process_id]];
+							[sqlConnection queryString:theQuery];
+						}
+						else {
+							//have to add a new entry
+							NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Processes (machine_id,name,title,timeStamp,data,state) VALUES (%@,%@,%@,%@,%@,%d)",
+												  [sqlConnection quoteObject:machine_id],
+												  [sqlConnection quoteObject:[aProcess fullID]],
+												  [sqlConnection quoteObject:[aProcess shortName]],
+												  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+												  [sqlConnection quoteObject:[aProcess description]],
+												  [aProcess processRunning]];
+							[sqlConnection queryString:theQuery];
+						}
+						for(id anEntry in allEntries){
+							NSString* aName = [anEntry objectForKey:@"name"];
+							if([aName isEqualToString:[aProcess fullID]]){
+								[allEntries removeObject:anEntry];
+								break;
+							}
 						}
 					}
 				}
-			}
-			//clean out any deleted items
-			for(id anEntry in allEntries){
-				NSString* aName = [anEntry objectForKey:@"name"];
-				[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Processes where (machine_id=%@ AND name=%@)",
-											[sqlConnection quoteObject:machine_id],
-											[sqlConnection quoteObject:aName]]];
+				//clean out any deleted items
+				for(id anEntry in allEntries){
+					NSString* aName = [anEntry objectForKey:@"name"];
+					[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Processes where (machine_id=%@ AND name=%@)",
+												[sqlConnection quoteObject:machine_id],
+												[sqlConnection quoteObject:aName]]];
+				}
 			}
 			[sqlConnection release];
 		}
