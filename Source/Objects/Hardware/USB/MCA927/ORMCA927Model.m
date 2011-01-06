@@ -886,7 +886,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[s appendFormat:@"$SPEC_REM:\nDET# 1\nDETDESC# MCB 25\nAP# Maestro Version 6.03\n"];
 	[s appendFormat:@"$DATE_MEA:\n%@\n",[NSDate date]];
 	[s appendFormat:@"$MEAS_TIM:\n%d %d\n",liveTimeValue,realTimeValue];
-	[s appendFormat:@"$Data:\n%d %d\n",index,n];
+	[s appendFormat:@"$Data:\n%d %d\n",index,n-1];
 	int i;
 	for(i=0;i<n;i++){
 		[s appendFormat:@"%d\n",spectrum[index][i]];
