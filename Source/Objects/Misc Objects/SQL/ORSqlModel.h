@@ -83,11 +83,10 @@ extern NSString* ORSqlLock;
 
 @interface ORSqlOperation : NSOperation
 {
-	ORSqlConnection* sqlConnection;
 	id delegate;
 }
 
-- (id)	 initWithSqlConnection:(ORSqlConnection*)aSqlConnection delegate:(id)aDelegate;
+- (id)	 initWithDelegate:(id)aDelegate;
 - (void) dealloc;
 @end
 
