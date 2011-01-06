@@ -878,12 +878,12 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	aFilePath = [aFilePath stringByExpandingTildeInPath];
 	[self setLastFile:aFilePath];
 	
-	int realTimeValue = [self realTimeStatus:index];
-	int liveTimeValue = [self liveTimeStatus:index];
+	float realTimeValue = [self realTimeStatus:index]*0.02;
+	float liveTimeValue = [self liveTimeStatus:index]*0.02;
 
 	NSMutableString* s = [NSMutableString string];
 	[s appendFormat:@"$SPEC_ID:\n%@\n",comment];
-	[s appendFormat:@"$SPEC_REM:\nDET# 1\nDETDESC# MCB 25\nAP# Maestro Version 6.03\n"];
+	[s appendFormat:@"$SPEC_REM:\nDET# 1\nDETDESC# MCB 25\nAP# ORCA (%@)\n",fullVersion()];
 	[s appendFormat:@"$DATE_MEA:\n%@\n",[NSDate date]];
 	[s appendFormat:@"$MEAS_TIM:\n%d %d\n",liveTimeValue,realTimeValue];
 	[s appendFormat:@"$Data:\n%d %d\n",index,n-1];
