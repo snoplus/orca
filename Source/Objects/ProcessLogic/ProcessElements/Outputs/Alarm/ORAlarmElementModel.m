@@ -27,6 +27,12 @@ NSString* ORAlarmElementNameChangedNotification     = @"ORAlarmElementNameChange
 NSString* ORAlarmElementHelpChangedNotification     = @"ORAlarmElementHelpChangedNotification";
 NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityChangedNotification";
 
+@interface ORAlarmElementModel (private)
+- (NSImage*) composeIcon;
+- (NSImage*) composeLowLevelIcon;
+- (NSImage*) composeHighLevelIcon;
+@end
+
 @implementation ORAlarmElementModel
 
 #pragma mark ¥¥¥Initialization
@@ -38,6 +44,11 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
     [alarmName release];
     [alarmHelp release];
     [super dealloc];
+}
+
+- (BOOL) canBeInAltView
+{
+	return YES;
 }
 
 -(void) makeConnectors
@@ -68,21 +79,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 
 - (void) setUpImage
 {
-    if([self state]) {
-        [self setImage:[NSImage imageNamed:@"AlarmElementOn"]];
-        if(!alarm){
-            alarm = [[ORAlarm alloc] initWithName:alarmName severity:alarmSeverity];
-            [alarm setSticky:YES];
-        }
-        [alarm setHelpString:alarmHelp];
-        [alarm postAlarm];
-    }
-    else {
-        [alarm clearAlarm];
-        [alarm release];
-        alarm = nil;
-        [self setImage:[NSImage imageNamed:@"AlarmElementOff"]];
-    }
+	[self setImage:[self composeIcon]];
 }
 
 - (void) makeMainController
@@ -121,7 +118,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
             [alarm postAlarm];
         }
     }
-	
+	[self setUpImage];
     [[NSNotificationCenter defaultCenter]
 		postNotificationName:ORAlarmElementNameChangedNotification
 					  object:self];
@@ -218,4 +215,68 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
     
 }
 
+@end
+@implementation ORAlarmElementModel (private)
+- (NSImage*) composeIcon
+{
+	if(![self useAltView])	return [self composeLowLevelIcon];
+	else					return [self composeHighLevelIcon];
+}
+
+- (NSImage*) composeLowLevelIcon
+{
+	NSImage* anImage;
+
+	if([self state]) {
+        anImage = [NSImage imageNamed:@"AlarmElementOn"];
+        if(!alarm){
+            alarm = [[ORAlarm alloc] initWithName:alarmName severity:alarmSeverity];
+            [alarm setSticky:YES];
+        }
+        [alarm setHelpString:alarmHelp];
+        [alarm postAlarm];
+    }
+    else {
+        [alarm clearAlarm];
+        [alarm release];
+        alarm = nil;
+        anImage = [NSImage imageNamed:@"AlarmElementOff"];
+    }
+	return anImage;
+}
+
+- (NSImage*) composeHighLevelIcon
+{		
+	NSImage* anImage;
+	NSColor* theColor;
+	if([self state]) {
+		anImage = [NSImage imageNamed:@"BlankRed"];
+		theColor = [NSColor blackColor];
+	}
+	else {
+		anImage = [NSImage imageNamed:@"BlankGreen"];
+		theColor = [NSColor colorWithCalibratedWhite:.2 alpha:1];		
+	}
+	
+	NSFont* theFont = [NSFont fontWithName:@"Geneva" size:10];
+	NSAttributedString* s = [[NSAttributedString alloc] 
+							   initWithString:alarmName
+							   attributes:	[NSDictionary dictionaryWithObjectsAndKeys:
+											 theFont,NSFontAttributeName,
+											 theColor,NSForegroundColorAttributeName,nil]];
+	NSSize textSize = [s size];
+	NSSize theIconSize = [anImage size];
+
+	NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+
+	[finalImage lockFocus];
+    [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	float x = theIconSize.width/2 - textSize.width/2;
+	float y = theIconSize.height/2 - textSize.height/2;
+	[s drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+	[finalImage unlockFocus];
+	[s release];
+	
+	return [finalImage autorelease];
+}
 @end

@@ -1101,6 +1101,8 @@
 		844E49F3057538B1005F11A0 /* ORTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 844E49F1057538B1005F11A0 /* ORTask.m */; };
 		844E5CD706236ACD0051849B /* CommandCenter.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844E5CD506236ACD0051849B /* CommandCenter.gif */; };
 		844E5CD806236ACD0051849B /* TaskMaster.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844E5CD606236ACD0051849B /* TaskMaster.gif */; };
+		844EAEED12D8B4FB00B550FB /* BlankGreen.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844EAEEC12D8B4FB00B550FB /* BlankGreen.tif */; };
+		844EAEEF12D8B7BF00B550FB /* BlankRed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844EAEEE12D8B7BF00B550FB /* BlankRed.tif */; };
 		844FD9DC1180E89B00FD5A46 /* KJL2200IonGauge.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844FD9D31180E89B00FD5A46 /* KJL2200IonGauge.nib */; };
 		844FD9DD1180E89B00FD5A46 /* KJL2200IonGauge.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844FD9D41180E89B00FD5A46 /* KJL2200IonGauge.tif */; };
 		844FD9DF1180E89B00FD5A46 /* ORKJL2200IonGaugeController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844FD9D61180E89B00FD5A46 /* ORKJL2200IonGaugeController.h */; };
@@ -3504,6 +3506,8 @@
 		844E6B6503C27544005F64B1 /* ORHistoController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHistoController.m; path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer/ORHistoController.m"; sourceTree = SOURCE_ROOT; };
 		844E6B6603C27544005F64B1 /* ORHistoController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHistoController.h; path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer/ORHistoController.h"; sourceTree = SOURCE_ROOT; };
 		844E6B7003C27B28005F64B1 /* Histo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Histo.gif; path = "Source/Objects/Data Processing/Histogram Objects/Histogrammer/Histo.gif"; sourceTree = SOURCE_ROOT; };
+		844EAEEC12D8B4FB00B550FB /* BlankGreen.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BlankGreen.tif; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/BlankGreen.tif; sourceTree = SOURCE_ROOT; };
+		844EAEEE12D8B7BF00B550FB /* BlankRed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BlankRed.tif; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/BlankRed.tif; sourceTree = SOURCE_ROOT; };
 		844FD9D31180E89B00FD5A46 /* KJL2200IonGauge.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = KJL2200IonGauge.nib; path = Source/Objects/Hardware/Serial/KJL220IonGauge/KJL2200IonGauge.nib; sourceTree = SOURCE_ROOT; };
 		844FD9D41180E89B00FD5A46 /* KJL2200IonGauge.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = KJL2200IonGauge.tif; path = Source/Objects/Hardware/Serial/KJL220IonGauge/KJL2200IonGauge.tif; sourceTree = SOURCE_ROOT; };
 		844FD9D61180E89B00FD5A46 /* ORKJL2200IonGaugeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKJL2200IonGaugeController.h; path = Source/Objects/Hardware/Serial/KJL220IonGauge/ORKJL2200IonGaugeController.h; sourceTree = SOURCE_ROOT; };
@@ -5996,6 +6000,8 @@
 				84539D1910E137AD0066A797 /* greenled.png */,
 				84539E7D10E1693F0066A797 /* OnText.tif */,
 				84539E7E10E1693F0066A797 /* OffText.tif */,
+				844EAEEE12D8B7BF00B550FB /* BlankRed.tif */,
+				844EAEEC12D8B4FB00B550FB /* BlankGreen.tif */,
 			);
 			name = BaseClasses;
 			path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses;
@@ -11859,6 +11865,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -12570,6 +12577,8 @@
 				84D8565D12B1702400660530 /* monSpecHolder.tif in Resources */,
 				84D8565F12B1702400660530 /* Monspectrometer.nib in Resources */,
 				84D8566012B1702400660530 /* monspectrometer.tif in Resources */,
+				844EAEED12D8B4FB00B550FB /* BlankGreen.tif in Resources */,
+				844EAEEF12D8B7BF00B550FB /* BlankRed.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13778,7 +13787,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = "";
 			};
 			name = Deployment;
 		};
