@@ -17,20 +17,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-
 #pragma mark ***Imported Files
-#import <Cocoa/Cocoa.h>
 #import "OREHQ8060nController.h"
-#import "ORRateGroup.h"
-#import "ORRate.h"
-#import "ORValueBar.h"
-#import "ORPlotView.h"
-#import "ORTimeLinePlot.h"
-#import "ORTimeAxis.h"
-#import "ORAxis.h"
-#import "ORTimeRate.h"
-#import "ORRate.h"
+#import "OREHQ8060nModel.h"
 
 @implementation OREHQ8060nController
 
@@ -43,50 +32,16 @@
 
 - (void) dealloc
 {
-	[blankView release];
 	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(837,617);
-    rateSize		= NSMakeSize(837,617);
-    
-    blankView = [[NSView alloc] init];
-    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-	
-    NSString* key = [NSString stringWithFormat: @"orca.EHQ8060n%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
-    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
-    [tabView selectTabViewItemAtIndex: index];
-
-	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
-	[timeRatePlot addPlot: aPlot];
-	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
-	[aPlot release];
-	
-	NSNumberFormatter* aFormatter = [[NSNumberFormatter alloc] init];
-	[aFormatter setFormat:@"0.00;0;-0.00"];
-
 	int i;
-	for(i=0;i<16;i++){
-		//settings Page
-		[[enabled01Matrix cellAtRow:i column:0] setTag:i];
-		[[threshold01Matrix cellAtRow:i column:0]  setTag:i];
-		[[rate1TextFields cellAtRow:i column:0]  setTag:i];
-		[[rate1TextFields cellAtRow:i column:0] setFormatter:aFormatter];
-		
-		[[enabled02Matrix cellAtRow:i column:0]  setTag:i+16];
-		[[threshold02Matrix cellAtRow:i column:0]  setTag:i+16];
-		[[rate2TextFields cellAtRow:i column:0]  setTag:i+16];
-		[[rate2TextFields cellAtRow:i column:0] setFormatter:aFormatter];
-
-		//settings Page
-		[[enabled1Matrix cellAtRow:i column:0]  setTag:i];
-		[[enabled2Matrix cellAtRow:i column:0]  setTag:i+16];
-	}
-	[aFormatter release];
-	
+	for(i=0;i<8;i++){
+		[[voltageMatrix cellAtRow:i column:0]  setTag:i];
+		[[currentMatrix cellAtRow:i column:0]  setTag:i];
+	}	
 	
 	[super awakeFromNib];
 }
@@ -99,14 +54,9 @@
 	
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
-						 name : ORPxiCardSlotChangedNotification
+						 name : ORMPodCardSlotChangedNotification
 					   object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(baseAddressChanged:)
-                         name : ORPxiIOCardBaseAddressChanged
-                       object : model];
-    
+	    
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
                          name : ORRunStatusChangedNotification
@@ -116,136 +66,44 @@
                      selector : @selector(settingsLockChanged:)
                          name : OREHQ8060nSettingsLock
                         object: nil];
-        
-    [notifyCenter addObserver : self
-                     selector : @selector(rateGroupChanged:)
-                         name : OREHQ8060nRateGroupChangedNotification
-                       object : model];
 	
-    [notifyCenter addObserver : self
-					 selector : @selector(totalRateChanged:)
-						 name : ORRateGroupTotalRateChangedNotification
-					   object : nil];
-	
-    //a fake action for the scale objects
-    [notifyCenter addObserver : self
-                     selector : @selector(scaleAction:)
-                         name : ORAxisRangeChangedNotification
-                       object : nil];
-	
-    [notifyCenter addObserver : self
-					 selector : @selector(miscAttributesChanged:)
-						 name : ORMiscAttributesChanged
-					   object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(updateTimePlot:)
-                         name : ORRateAverageChangedNotification
-                       object : [[model waveFormRateGroup]timeRate]];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(integrationChanged:)
-                         name : ORRateGroupIntegrationChangedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(enabledChanged:)
-                         name : OREHQ8060nModelEnabledChanged
+	[notifyCenter addObserver : self
+                     selector : @selector(voltageChanged:)
+                         name : OREHQ8060nModelVoltageChanged
                        object : model];
 	
 	[notifyCenter addObserver : self
-                     selector : @selector(thresholdChanged:)
-                         name : OREHQ8060nModelThresholdChanged
+                     selector : @selector(currentChanged:)
+                         name : OREHQ8060nModelCurrentChanged
                        object : model];
 	
-    [self registerRates];
 }
-
-- (void) registerRates
-{
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
-    [notifyCenter removeObserver:self name:ORRateChangedNotification object:nil];
-    
-    NSEnumerator* e = [[[model waveFormRateGroup] rates] objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-		
-        [notifyCenter removeObserver:self name:ORRateChangedNotification object:obj];
-		
-        [notifyCenter addObserver : self
-                         selector : @selector(waveFormRateChanged:)
-                             name : ORRateChangedNotification
-                           object : obj];
-    }
-}
-
 
 - (void) updateWindow
 {
     [super updateWindow];
-    [self baseAddressChanged:nil];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self enabledChanged:nil];
-	[self thresholdChanged:nil];
+	[self voltageChanged:nil];
+	[self currentChanged:nil];
 	
-    [self rateGroupChanged:nil];
-    [self integrationChanged:nil];
-    [self miscAttributesChanged:nil];
-    [self totalRateChanged:nil];
-    [self updateTimePlot:nil];
-    [self waveFormRateChanged:nil];
 }
 
 #pragma mark •••Interface Management
-- (void) enabledChanged:(NSNotification*)aNote
+- (void) voltageChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<kNumEHQ8060nChannels/2;i++){
-		[[enabled1Matrix cellWithTag:i] setState:[model enabled:i]];
-		[[enabled2Matrix cellWithTag:i+16] setState:[model enabled:i+16]];
-		[[enabled01Matrix cellWithTag:i] setState:[model enabled:i]];
-		[[enabled02Matrix cellWithTag:i+16] setState:[model enabled:i+16]];
+	for(i=0;i<8;i++){
+		[[voltageMatrix cellWithTag:i] setIntValue:[model voltage:i]];
 	}
 }
 
-- (void) thresholdChanged:(NSNotification*)aNote
+- (void) currentChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<kNumEHQ8060nChannels/2;i++){
-		[[threshold01Matrix cellWithTag:i] setIntValue:[model threshold:i]];
-		[[threshold02Matrix cellWithTag:i+16] setIntValue:[model threshold:i+16]];
+	for(i=0;i<8;i++){
+		[[currentMatrix cellWithTag:i] setFloatValue:[model current:i]];
 	}
-}
-
-- (void) waveFormRateChanged:(NSNotification*)aNote
-{
-    ORRate* theRateObj = [aNote object];	
-	int channel = [theRateObj tag];
-	if(channel<16){
-		[[rate1TextFields cellWithTag:channel] setFloatValue: [theRateObj rate]];
-		[rate1 setNeedsDisplay:YES];
-	}
-	else {
-		[[rate2TextFields cellWithTag:channel] setFloatValue: [theRateObj rate]];
-		[rate2 setNeedsDisplay:YES];
-	}
-}
-
-- (void) totalRateChanged:(NSNotification*)aNotification
-{
-	ORRateGroup* theRateObj = [aNotification object];
-	if(aNotification == nil || [model waveFormRateGroup] == theRateObj){
-		
-		[totalRateText setFloatValue: [theRateObj totalRate]];
-		[totalRate setNeedsDisplay:YES];
-	}
-}
-
-- (void) rateGroupChanged:(NSNotification*)aNote
-{
-    [self registerRates];
 }
 
 - (void) checkGlobalSecurity
@@ -258,21 +116,14 @@
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
     
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+   // BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:OREHQ8060nSettingsLock];
     BOOL locked = [gSecurity isLocked:OREHQ8060nSettingsLock];
     	
     [settingLockButton setState: locked];
-    [addressText setEnabled:!locked && !runInProgress];
-    [initButton setEnabled:!lockedOrRunningMaintenance];
 	
-	[enabled1Matrix setEnabled:!lockedOrRunningMaintenance];
-	[enabled01Matrix setEnabled:!lockedOrRunningMaintenance];
-	[threshold01Matrix setEnabled:!lockedOrRunningMaintenance];
+	[voltageMatrix setEnabled:!lockedOrRunningMaintenance];
 	
-	[enabled2Matrix setEnabled:!lockedOrRunningMaintenance];
-	[enabled02Matrix setEnabled:!lockedOrRunningMaintenance];
-	[threshold02Matrix setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) setModel:(id)aModel
@@ -283,127 +134,24 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-    [slotField setIntValue: [model slot]];
     [[self window] setTitle:[NSString stringWithFormat:@"EHQ8060n Card (Slot %d)",[model slot]]];
 }
 
-- (void) baseAddressChanged:(NSNotification*)aNote
-{
-    [addressText setIntValue: [model baseAddress]];
-}
 
-- (void) integrationChanged:(NSNotification*)aNotification
-{
-    ORRateGroup* theRateGroup = [aNotification object];
-    if(aNotification == nil || [model waveFormRateGroup] == theRateGroup || [aNotification object] == model){
-        double dValue = [[model waveFormRateGroup] integrationTime];
-        [integrationStepper setDoubleValue:dValue];
-        [integrationText setDoubleValue: dValue];
-    }
-}
-
-- (void) scaleAction:(NSNotification*)aNotification
-{
-	if(aNotification == nil || [aNotification object] == [rate1 xScale]){
-		[model setMiscAttributes:[[rate1 xScale]attributes] forKey:@"Rate1XAttributes"];
-	};
-	
-	if(aNotification == nil || [aNotification object] == [rate2 xScale]){
-		[model setMiscAttributes:[[rate2 xScale]attributes] forKey:@"Rate2XAttributes"];
-	};
-	
-	if(aNotification == nil || [aNotification object] == [totalRate xScale]){
-		[model setMiscAttributes:[[totalRate xScale]attributes] forKey:@"TotalRateXAttributes"];
-	};
-	
-	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
-	};
-	
-	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
-	};
-}
-
-- (void) miscAttributesChanged:(NSNotification*)aNote
-{
-	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
-	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
-	
-	if(aNote == nil || [key isEqualToString:@"Rate1XAttributes"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"Rate1XAttributes"];
-		if(attrib){
-			[[rate1 xScale] setAttributes:attrib];
-			[rate1 setNeedsDisplay:YES];
-			[[rate1 xScale] setNeedsDisplay:YES];
-			[rate1LogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"Rate2XAttributes"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"Rate2XAttributes"];
-		if(attrib){
-			[[rate2 xScale] setAttributes:attrib];
-			[rate2 setNeedsDisplay:YES];
-			[[rate2 xScale] setNeedsDisplay:YES];
-			[rate2LogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"TotalRateXAttributes"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"TotalRateXAttributes"];
-		if(attrib){
-			[[totalRate xScale] setAttributes:attrib];
-			[totalRate setNeedsDisplay:YES];
-			[[totalRate xScale] setNeedsDisplay:YES];
-			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
-		if(attrib){
-			[(ORAxis*)[timeRatePlot xScale] setAttributes:attrib];
-			[timeRatePlot setNeedsDisplay:YES];
-			[[timeRatePlot xScale] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
-		if(attrib){
-			[(ORAxis*)[timeRatePlot yScale] setAttributes:attrib];
-			[timeRatePlot setNeedsDisplay:YES];
-			[[timeRatePlot yScale] setNeedsDisplay:YES];
-			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
-		}
-	}
-}
-
-- (void) updateTimePlot:(NSNotification*)aNote
-{
-    if(!aNote || ([aNote object] == [[model waveFormRateGroup]timeRate])){
-        [timeRatePlot setNeedsDisplay:YES];
-    }
-}
 
 #pragma mark •••Actions
-- (IBAction) enabledAction:(id)sender
+- (IBAction) voltageAction:(id)sender
 {
-	if([sender intValue] != [model enabled:[[sender selectedCell] tag]]){
-		[model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+	if([sender intValue] != [model voltage:[[sender selectedCell] tag]]){
+		[model setVoltage:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 
-
-- (IBAction) thresholdAction:(id)sender
+- (IBAction) currentAction:(id)sender
 {
-	if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
-		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+	if([sender intValue] != [model current:[[sender selectedCell] tag]]){
+		[model setCurrent:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
-}
-
--(IBAction) baseAddressAction:(id)sender
-{
-    if([sender intValue] != [model baseAddress]){
-        [model setBaseAddress:[sender intValue]];
-    }
 }
 
 - (IBAction) settingLockAction:(id) sender
@@ -412,64 +160,5 @@
 }
 
 
--(IBAction)initBoard:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model initBoard];		//initialize and load hardward
-        NSLog(@"Initialized EHQ8060n (Slot %d <%p>)\n",[model slot],[model baseAddress]);
-        
-    }
-	@catch(NSException* localException) {
-        NSLog(@"Reset and Init of EHQ8060n FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed EHQ8060n Reset and Init", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) integrationAction:(id)sender
-{
-    [self endEditing];
-    if([sender doubleValue] != [[model waveFormRateGroup]integrationTime]){
-        [model setRateIntegrationTime:[sender doubleValue]];		
-    }
-}
-
-- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-    if([tabView indexOfTabViewItem:tabViewItem] == 0){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:settingSize];
-		[[self window] setContentView:tabView];
-    }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:rateSize];
-		[[self window] setContentView:tabView];
-    }
-	
-    NSString* key = [NSString stringWithFormat: @"orca.OREHQ8060n%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-}
-
-#pragma mark •••Data Source
-- (double) getBarValue:(int)tag
-{
-	return [[[[model waveFormRateGroup]rates] objectAtIndex:tag] rate];
-}
-
-- (int) numberPointsInPlot:(id)aPlotter
-{
-	return [[[model waveFormRateGroup]timeRate]count];
-}
-
-- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
-{
-	int count = [[[model waveFormRateGroup]timeRate] count];
-	int index = count-i-1;
-	*yValue = [[[model waveFormRateGroup] timeRate] valueAtIndex:index];
-	*xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];
-}
 
 @end

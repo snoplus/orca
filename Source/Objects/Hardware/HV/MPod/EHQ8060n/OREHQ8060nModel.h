@@ -19,40 +19,19 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORPxiIOCard.h";
-#import "ORDataTaker.h";
-#import "ORHWWizard.h";
+#import "ORMPodCard.h";
 #import "SBC_Config.h"
 
-@class ORRateGroup;
 @class ORAlarm;
 
-#define kNumEHQ8060nChannels			32 
+#define kNumEHQ8060nChannels 8
 
-#pragma mark •••Register Definitions
-enum {
-	kBoardID,					//[0] 
-	kThreshold,					//[1] 
-	kNumberOfEHQ8060nRegisters	//must be last
-};
-
-@interface OREHQ8060nModel : ORPxiIOCard <ORDataTaker,ORHWWizard>
+@interface OREHQ8060nModel : ORMPodCard
 {
   @private
 	unsigned long   dataId;
-	unsigned long*  dataBuffer;
-    short			enabled[kNumEHQ8060nChannels];
-    short			threshold[kNumEHQ8060nChannels];
- 	
-	ORRateGroup*	waveFormRateGroup;
-	unsigned long 	waveFormCount[kNumEHQ8060nChannels];
-	BOOL isRunning;
-
-	//cach to speed takedata
-	unsigned long location;
-	
-	//for testing
-	unsigned long delay;
+    short			voltage[kNumEHQ8060nChannels];
+    float			current[kNumEHQ8060nChannels];
 }
 
 - (id) init;
@@ -61,52 +40,29 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••specific accessors
-- (int) enabled:(short)chan;		
-- (void) setEnabled:(short)chan withValue:(short)aValue;		
-- (int) threshold:(short)chan;	
-- (void) setThreshold:(short)chan withValue:(int)aValue;
+- (int) voltage:(short)chan;	
+- (void) setVoltage:(short)chan withValue:(int)aValue;
+- (float) current:(short)chan;	
+- (void) setCurrent:(short)chan withValue:(float)aValue;
 
 #pragma mark •••Hardware Access
-- (void) initBoard;
-- (void) setDefaults;
-- (void) writeThreshold:(int)channel;
+- (void) writeVoltage:(int)channel;
 
-#pragma mark •••Rates
-- (ORRateGroup*)    waveFormRateGroup;
-- (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
-- (id)              rateObject:(int)channel;
-- (void)            setRateIntegrationTime:(double)newIntegrationTime;
-- (BOOL)			bumpRateFromDecodeStage:(short)channel;
-
-#pragma mark •••Data Taker
+#pragma mark •••Data Records
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
 - (NSDictionary*) dataRecordDescription;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (unsigned long) waveFormCount:(int)aChannel;
-- (void)   startRates;
-- (void) clearWaveFormCounts;
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
-
-#pragma mark •••HW Wizard
-- (int) numberOfChannels;
-- (NSArray*) wizardParameters;
-- (NSArray*) wizardSelections;
-- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
-
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cIntArray:(short*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cFloatArray:(float*)anArray forKey:(NSString*)aKey;
 @end
 
-extern NSString* OREHQ8060nModelEnabledChanged;
-extern NSString* OREHQ8060nModelThresholdChanged;
+extern NSString* OREHQ8060nModelVoltageChanged;
+extern NSString* OREHQ8060nModelCurrentChanged;
 extern NSString* OREHQ8060nSettingsLock;
-extern NSString* OREHQ8060nRateGroupChangedNotification;
