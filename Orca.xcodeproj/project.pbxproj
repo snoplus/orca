@@ -13760,7 +13760,7 @@
 					"-lcrypto",
 					"-lssl",
 					"-lz",
-					"-netsnmp",
+					"-lnetsnmp",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Orca;
