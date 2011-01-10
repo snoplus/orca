@@ -80,6 +80,20 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 - (void) setUpImage
 {
 	[self setImage:[self composeIcon]];
+	
+	if([self state]) {
+        if(!alarm){
+            alarm = [[ORAlarm alloc] initWithName:alarmName severity:alarmSeverity];
+            [alarm setSticky:YES];
+        }
+        [alarm setHelpString:alarmHelp];
+        [alarm postAlarm];
+	}
+	else {
+		[alarm clearAlarm];
+        [alarm release];
+        alarm = nil;		
+	}
 }
 
 - (void) makeMainController
@@ -229,18 +243,9 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 
 	if([self state]) {
         anImage = [NSImage imageNamed:@"AlarmElementOn"];
-        if(!alarm){
-            alarm = [[ORAlarm alloc] initWithName:alarmName severity:alarmSeverity];
-            [alarm setSticky:YES];
-        }
-        [alarm setHelpString:alarmHelp];
-        [alarm postAlarm];
     }
     else {
-        [alarm clearAlarm];
-        [alarm release];
-        alarm = nil;
-        anImage = [NSImage imageNamed:@"AlarmElementOff"];
+         anImage = [NSImage imageNamed:@"AlarmElementOff"];
     }
 	return anImage;
 }
