@@ -94,6 +94,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (void)assignProcessID:(id)objToGetID
 {
+	if(![objToGetID respondsToSelector:@selector(processID)])return;
 	if(![objToGetID processID]){
 		unsigned long anId = 1;
 		do {
