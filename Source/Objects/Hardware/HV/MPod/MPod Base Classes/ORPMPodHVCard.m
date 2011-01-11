@@ -29,32 +29,6 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 @implementation ORMPodHVCard
 
 #pragma mark ¥¥¥Accessors
-- (void) setBaseAddress:(unsigned long) address
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setBaseAddress:[self baseAddress]];
-    baseAddress = address;
-    
-	[[NSNotificationCenter defaultCenter]
-         postNotificationName:ORMPodHVCardBaseAddressChanged
-					   object:self]; 
-}
-
-- (unsigned long) baseAddress
-{
-    return baseAddress;
-}
-
-- (NSRange)	memoryFootprint
-{
-	//subclasses should overide to provide an accurate memory range
-	return NSMakeRange(baseAddress,1*sizeof(long));
-}
-
-- (BOOL) memoryConflictsWith:(NSRange)aRange
-{
-	return NSIntersectionRange(aRange,[self memoryFootprint]).length != 0;
-}
-
 - (id)	adapter
 {
 	id anAdapter = [guardian adapter];
@@ -93,7 +67,6 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 {
     self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setBaseAddress:[decoder decodeInt32ForKey:@"baseAddress"]];
 	[[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -101,13 +74,11 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeInt32:baseAddress forKey:@"baseAddress"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [objDictionary setObject:[NSNumber numberWithLong:baseAddress] forKey:@"baseAddress"];
     return objDictionary;
 }
 

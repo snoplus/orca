@@ -45,9 +45,11 @@
 - (void) openSession;
 - (void) closeSession;
 - (id) controllerCard;
+- (void) writeParam:(NSString*)aParam slot:(int)aSlot channel:(int)aChannel floatValue:(float)aValue;
 
 - (void) ping;
 - (BOOL) pingTaskRunning;
+- (void) testGet;
 
 @end
 

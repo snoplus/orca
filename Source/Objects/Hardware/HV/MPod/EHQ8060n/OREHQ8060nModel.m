@@ -74,9 +74,7 @@ NSString* OREHQ8060nModelCurrentChanged	= @"OREHQ8060nModelCurrentChanged";
 #pragma mark •••Hardware Access
 - (void) writeVoltage:(int)channel
 {    
-//    [[self adapter] writeWordBlock:(unsigned short*)&targetVoltage[channel]
-//                         atAddress:[self baseAddress] + register_offsets[kTargetVoltage] + 2*channel
-//                        numToWrite:1];
+	[[self adapter] writeParam:@"outputVoltage" slot:[self slot] channel:channel floatValue:voltage[channel]];
 }
 
 #pragma mark •••Data Taker

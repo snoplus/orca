@@ -1,6 +1,6 @@
 
 //
-//  ORPxiAdapterModel.h
+//  ORMPodAdapterModel.h
 //  Orca
 //
 //  Created by Mark Howe on Thurs Jan 6,2011
@@ -35,7 +35,7 @@
 
 - (void) setCrateTitle
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"PXI crate %d",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MPod Minicrate %d",[model uniqueIdNumber]]];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -48,12 +48,12 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(powerFailed:)
-                         name : @"PxiPowerFailedNotification"
+                         name : @"MPodPowerFailedNotification"
                        object : nil];
 
     [notifyCenter addObserver : self
                      selector : @selector(powerRestored:)
-                         name : @"PxiPowerRestoredNotification"
+                         name : @"MPodPowerRestoredNotification"
                        object : nil];
 
 }

@@ -19,9 +19,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ¥¥¥Imported Files
-#import "ORPxiCrate.h"
+#import "ORCrate.h"
 
-@interface ORMPodMiniCrateModel : ORPxiCrate   {
+@interface ORMPodMiniCrateModel : ORCrate   {
 }
 
 - (void) makeConnectors;

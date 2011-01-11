@@ -1,5 +1,5 @@
 //
-//  ORPxiAdapterModel.h
+//  ORMPodAdapterModel.h
 //  Orca
 //
 //  Created by Mark Howe on Thurs Jan 6,2011

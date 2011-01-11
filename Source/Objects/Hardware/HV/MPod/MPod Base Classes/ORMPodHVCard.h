@@ -19,29 +19,22 @@
 //-------------------------------------------------------------
 
 #pragma mark ¥¥¥Imported Files
-#import "ORPxiCard.h"
-#import "ORPxiAdapterModel.h"
+#import "ORCard.h"
 
-@interface ORMPodHVCard : ORPxiCard {
+@interface ORMPodHVCard : ORCard {
 
 	@protected
 	id	controller; //use to cache the controller for abit more speed. use with care!
-    unsigned long 	baseAddress;
     unsigned long	exceptionCount;
 }
 
 #pragma mark ¥¥¥Accessors
-- (void) 			setBaseAddress:(unsigned long) anAddress;
-- (unsigned long) 	baseAddress;
 - (id)				adapter;
 - (unsigned long)   exceptionCount;
 - (void)			incExceptionCount;
 - (void)			clearExceptionCount;
-- (NSRange)			memoryFootprint;
-- (BOOL)			memoryConflictsWith:(NSRange)aRange;
 
 @end
 
 #pragma mark ¥¥¥External String Definitions
-extern NSString* ORMPodHVCardBaseAddressChanged;
 extern NSString* ORMPodHVCardExceptionCountChanged;

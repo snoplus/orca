@@ -130,7 +130,7 @@ NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
 - (void) openSession
 {
 	init_snmp("APC Check");
-	u_char* community = (u_char*)"public";
+	u_char* community = (u_char*)"guru";
 	struct snmp_session session; 
 	snmp_sess_init( &session );
 	session.version			= SNMP_VERSION_1;
@@ -168,8 +168,55 @@ NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
 		snprint_value(buffer,64,vars->name, vars->name_length, vars);
 		NSLog(@"%s\n",buffer);
 	}
+	[self writeParam:@"outputVoltage" slot:1 channel:1 floatValue:-1];
+	
 	[self closeSession];
 }
+
+- (void) writeParam:(NSString*)aParam slot:(int)aSlot channel:(int)aChannel floatValue:(float)aValue
+{
+	if (sessionHandle){
+		struct snmp_pdu *response;
+		
+		oid anOID[MAX_OID_LEN];
+		size_t anOID_len = MAX_OID_LEN;
+								
+		char type = 'f';
+		struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_SET);
+		
+		// create set request and add object names and values 
+		char val[64];
+		sprintf(val,"%f",aValue);
+		NSString* s = [NSString stringWithFormat:@"WIENER-CRATE-MIB::%@.u%d%02d",aParam,aSlot,aChannel];
+		const char* intoid = [s cStringUsingEncoding:NSASCIIStringEncoding];
+		if (snmp_parse_oid(intoid, anOID, &anOID_len) == NULL){
+			snmp_perror(intoid);
+			//exit(EXIT_SNMP_SET_ERROR);
+		}
+		if (snmp_add_var(pdu, anOID, anOID_len, type, val)){
+			snmp_perror(intoid);
+			//exit(EXIT_SNMP_SET_ERROR);
+		}
+		
+		int status = snmp_synch_response(sessionHandle, pdu, &response);
+		
+		if (status == STAT_SUCCESS){
+			if (response->errstat != SNMP_ERR_NOERROR){
+				NSLog(@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat));
+				//exit(EXIT_SNMP_SET_ERROR);
+			}
+		}
+		else if (status == STAT_TIMEOUT){
+			NSLog(@"SNMP SetTimeout: No Response from %s\n",sessionHandle->peername);
+			//exit(EXIT_SNMP_SET_ERROR);
+		}
+		else { /* status == STAT_ERROR */
+			snmp_sess_perror("snmpset", sessionHandle);
+			//exit(EXIT_SNMP_SET_ERROR);
+		}
+	}
+}
+
 
 - (void) closeSession
 {

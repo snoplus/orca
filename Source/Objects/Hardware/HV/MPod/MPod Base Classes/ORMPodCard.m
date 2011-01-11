@@ -21,7 +21,6 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORMPodCard.h"
 
-
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMPodCardSlotChangedNotification 	= @"ORMPodCardSlotChangedNotification";
 
@@ -30,7 +29,7 @@ NSString* ORMPodCardSlotChangedNotification 	= @"ORMPodCardSlotChangedNotificati
 #pragma mark ¥¥¥Accessors
 - (Class) guardianClass 
 {
-	return NSClassFromString(@"ORPxiCrate");
+	return NSClassFromString(@"ORMPodCrate");
 }
 
 - (NSString*) cardSlotChangedNotification

@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 #pragma mark ¥¥¥Imported Files
 #import "ORMPodMiniCrateModel.h"
-#import "ORPxiAdapterModel.h"
+#import "ORMPodCard.h"
 
 @implementation ORMPodMiniCrateModel
 
@@ -115,7 +115,7 @@
 	   
     [notifyCenter addObserver : self
                      selector : @selector(viewChanged:)
-                         name : ORPxiCardSlotChangedNotification
+                         name : ORMPodCardSlotChangedNotification
                        object : nil];
 
     [notifyCenter addObserver : self
