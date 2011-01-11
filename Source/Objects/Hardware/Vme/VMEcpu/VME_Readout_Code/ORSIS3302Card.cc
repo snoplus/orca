@@ -1,5 +1,6 @@
 #include "ORSIS3302Card.hh"
 #include <errno.h>
+#include <unistd.h>
 
 ORSIS3302Card::ORSIS3302Card(SBC_card_info* ci) :
 ORVVmeCard(ci), 

@@ -1,4 +1,5 @@
 #include "ORVVmeCard.hh"
+#include <time.h>
 
 class ORSIS3302Card: public ORVVmeCard
 {
