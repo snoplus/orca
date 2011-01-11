@@ -19,9 +19,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ¥¥¥Imported Files
-#import "ORCard.h"
+#import "ORMPodCard.h"
 
-@interface ORMPodHVCard : ORCard {
+@interface ORMPodHVCard : ORMPodCard {
 
 	@protected
 	id	controller; //use to cache the controller for abit more speed. use with care!

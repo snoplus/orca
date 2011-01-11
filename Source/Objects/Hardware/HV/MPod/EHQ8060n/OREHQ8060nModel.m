@@ -119,7 +119,7 @@ NSString* OREHQ8060nModelCurrentChanged	= @"OREHQ8060nModelCurrentChanged";
 	int i;
 	for(i=0;i<kNumEHQ8060nChannels;i++){
 		[self setVoltage:i withValue:[decoder decodeIntForKey:[@"voltage" stringByAppendingFormat:@"%d",i]]];
-		[self setCurrent:i withValue:[decoder decodeIntForKey:[@"current" stringByAppendingFormat:@"%d",i]]];
+		[self setCurrent:i withValue:[decoder decodeFloatForKey:[@"current" stringByAppendingFormat:@"%d",i]]];
 	}
 	
     [[self undoManager] enableUndoRegistration];
