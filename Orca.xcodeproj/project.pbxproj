@@ -2067,6 +2067,8 @@
 		84BC89130F9CDDAC00336DF1 /* ORSerialPortModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC89120F9CDDAC00336DF1 /* ORSerialPortModel.m */; };
 		84BC89C20F9CE75F00336DF1 /* SerialPortControls.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BC89C10F9CE75F00336DF1 /* SerialPortControls.nib */; };
 		84BC8DF40F9DF76500336DF1 /* NoOilHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84BC8DF30F9DF76500336DF1 /* NoOilHelp.plist */; };
+		84BDF04312DC943700B974F8 /* ORSNMP.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BDF04112DC943700B974F8 /* ORSNMP.h */; };
+		84BDF04412DC943700B974F8 /* ORSNMP.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BDF04212DC943700B974F8 /* ORSNMP.m */; };
 		84BF43CC118793FA00F55216 /* Caen1785.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BF43C4118793FA00F55216 /* Caen1785.gif */; };
 		84BF43CD118793FA00F55216 /* Caen1785.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BF43C5118793FA00F55216 /* Caen1785.nib */; };
 		84BF43CE118793FA00F55216 /* ORCaen1785Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BF43C6118793FA00F55216 /* ORCaen1785Controller.h */; };
@@ -4584,6 +4586,8 @@
 		84BC89120F9CDDAC00336DF1 /* ORSerialPortModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSerialPortModel.m; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPortModel.m"; sourceTree = SOURCE_ROOT; };
 		84BC89C10F9CE75F00336DF1 /* SerialPortControls.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SerialPortControls.nib; path = "Source/Objects/Misc Objects/SerialPorts/SerialPortControls.nib"; sourceTree = SOURCE_ROOT; };
 		84BC8DF30F9DF76500336DF1 /* NoOilHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoOilHelp.plist; path = Source/Objects/Hardware/Serial/PDcu/NoOilHelp.plist; sourceTree = SOURCE_ROOT; };
+		84BDF04112DC943700B974F8 /* ORSNMP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNMP.h; sourceTree = "<group>"; };
+		84BDF04212DC943700B974F8 /* ORSNMP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSNMP.m; sourceTree = "<group>"; };
 		84BF43C4118793FA00F55216 /* Caen1785.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Caen1785.gif; path = Source/Objects/Hardware/Vme/CAEN/CV1785/Caen1785.gif; sourceTree = SOURCE_ROOT; };
 		84BF43C5118793FA00F55216 /* Caen1785.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen1785.nib; path = Source/Objects/Hardware/Vme/CAEN/CV1785/Caen1785.nib; sourceTree = SOURCE_ROOT; };
 		84BF43C6118793FA00F55216 /* ORCaen1785Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1785Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV1785/ORCaen1785Controller.h; sourceTree = SOURCE_ROOT; };
@@ -6486,6 +6490,7 @@
 				842162F3043E6317005F64B1 /* Mouse Tasks */,
 				842162F8043E6317005F64B1 /* NetSocket */,
 				843DCF2D058E546A000C5219 /* DataGenerator */,
+				84BDF03E12DC93EB00B974F8 /* SNMP */,
 				843A48510A0AC2F4003DF248 /* USB */,
 				2A178EB608DB3F66001D78BC /* FireWire */,
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
@@ -9472,6 +9477,16 @@
 			path = Source/Objects/Hardware/Vme/eCPU/CircularBuffer;
 			sourceTree = SOURCE_ROOT;
 		};
+		84BDF03E12DC93EB00B974F8 /* SNMP */ = {
+			isa = PBXGroup;
+			children = (
+				84BDF04112DC943700B974F8 /* ORSNMP.h */,
+				84BDF04212DC943700B974F8 /* ORSNMP.m */,
+			);
+			name = SNMP;
+			path = "Source/Objects/Misc Objects/SNMP";
+			sourceTree = SOURCE_ROOT;
+		};
 		84BF43C3118793FA00F55216 /* CV1785 */ = {
 			isa = PBXGroup;
 			children = (
@@ -11964,6 +11979,7 @@
 				8472AA7E12DB44B400DEEB02 /* ORMPodCModel.h in Headers */,
 				8472AA8312DB44B400DEEB02 /* ORMPodMiniCrateController.h in Headers */,
 				8472AA8512DB44B400DEEB02 /* ORMPodMiniCrateModel.h in Headers */,
+				84BDF04312DC943700B974F8 /* ORSNMP.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13584,6 +13600,7 @@
 				8472AA7F12DB44B400DEEB02 /* ORMPodCModel.m in Sources */,
 				8472AA8412DB44B400DEEB02 /* ORMPodMiniCrateController.m in Sources */,
 				8472AA8612DB44B400DEEB02 /* ORMPodMiniCrateModel.m in Sources */,
+				84BDF04412DC943700B974F8 /* ORSNMP.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
