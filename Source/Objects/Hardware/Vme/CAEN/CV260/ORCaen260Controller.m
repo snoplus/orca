@@ -87,9 +87,29 @@
                          name : ORCaen260ModelAllScalerValuesChanged
 						object: model];	
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipOnChangeChanged:)
+                         name : ORCaen260ModelShipOnChangeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(channelForTriggeredShipChanged:)
+                         name : ORCaen260ModelChannelForTriggeredShipChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) channelForTriggeredShipChanged:(NSNotification*)aNote
+{
+	[channelForTriggeredShipField setIntValue: [model channelForTriggeredShip]];
+}
+
+- (void) shipOnChangeChanged:(NSNotification*)aNote
+{
+	[shipOnChangeCB setIntValue: [model shipOnChange]];
+}
 
 - (void) autoInhibitChanged:(NSNotification*)aNote
 {
@@ -111,6 +131,8 @@
 	[self shipRecordsChanged:nil];
     [self pollingStateChanged:nil];
 	[self autoInhibitChanged:nil];
+	[self shipOnChangeChanged:nil];
+	[self channelForTriggeredShipChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -155,6 +177,9 @@
     [readScalersButton setEnabled:!lockedOrRunningMaintenance];
     [pollingButton setEnabled:!lockedOrRunningMaintenance];
     [shipRecordsButton setEnabled:!lockedOrRunningMaintenance];
+	
+    [channelForTriggeredShipField setEnabled:!lockedOrRunningMaintenance];
+    [shipOnChangeCB setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) shipRecordsChanged:(NSNotification*)aNote
@@ -201,6 +226,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) channelForTriggeredShipAction:(id)sender
+{
+	[model setChannelForTriggeredShip:[sender intValue]];	
+}
+
+- (void) shipOnChangeAction:(id)sender
+{
+	[model setShipOnChange:[sender intValue]];	
+}
 
 - (void) autoInhibitAction:(id)sender
 {

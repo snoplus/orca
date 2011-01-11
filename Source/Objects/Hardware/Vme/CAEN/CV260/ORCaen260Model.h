@@ -78,6 +78,9 @@ enum {
 		BOOL			autoInhibit;
 		BOOL			isRunning;
 		BOOL			scheduledForUpdate;
+		BOOL			shipOnChange;
+		int				channelForTriggeredShip;
+		unsigned long	lastScalerValue;
 }
 
 #pragma mark •••Initialization
@@ -87,6 +90,10 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (int) channelForTriggeredShip;
+- (void) setChannelForTriggeredShip:(int)aChannelForTriggeredShip;
+- (BOOL) shipOnChange;
+- (void) setShipOnChange:(BOOL)aShipOnChange;
 - (BOOL) autoInhibit;
 - (void) setAutoInhibit:(BOOL)aAutoInhibit;
 - (BOOL) shipRecords;
@@ -131,6 +138,8 @@ enum {
 @end
 
 #pragma mark •••External String Definitions
+extern NSString* ORCaen260ModelChannelForTriggeredShipChanged;
+extern NSString* ORCaen260ModelShipOnChangeChanged;
 extern NSString* ORCaen260ModelAutoInhibitChanged;
 extern NSString* ORCaen260ModelEnabledMaskChanged;
 extern NSString* ORCaen260ModelScalerValueChanged;

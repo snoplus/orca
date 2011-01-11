@@ -22,6 +22,8 @@
 @interface ORCaen260Controller : ORCaenCardController {
 
 	IBOutlet NSButton*		enableAllButton;
+	IBOutlet NSTextField*	channelForTriggeredShipField;
+	IBOutlet NSButton*		shipOnChangeCB;
 	IBOutlet NSButton*		autoInhibitButton;
 	IBOutlet NSButton*		disableAllButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
@@ -36,12 +38,13 @@
 	IBOutlet NSButton*		readScalersButton;
 	IBOutlet NSPopUpButton* pollingButton;
 	IBOutlet NSButton*		shipRecordsButton;
-
 }
 
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) channelForTriggeredShipChanged:(NSNotification*)aNote;
+- (void) shipOnChangeChanged:(NSNotification*)aNote;
 - (void) autoInhibitChanged:(NSNotification*)aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -51,6 +54,8 @@
 - (void) pollingStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) channelForTriggeredShipAction:(id)sender;
+- (IBAction) shipOnChangeAction:(id)sender;
 - (IBAction) autoInhibitAction:(id)sender;
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) enableAllAction:(id)sender;

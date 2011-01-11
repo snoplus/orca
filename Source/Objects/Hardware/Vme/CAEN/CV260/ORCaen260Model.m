@@ -63,6 +63,8 @@ static RegisterNamesStruct reg[kNumberOfV260Registers] = {
 
 
 #pragma mark •••Notification Strings
+NSString* ORCaen260ModelChannelForTriggeredShipChanged = @"ORCaen260ModelChannelForTriggeredShipChanged";
+NSString* ORCaen260ModelShipOnChangeChanged = @"ORCaen260ModelShipOnChangeChanged";
 NSString* ORCaen260ModelAutoInhibitChanged	 = @"ORCaen260ModelAutoInhibitChanged";
 NSString* ORCaen260ModelEnabledMaskChanged	 = @"ORCaen260ModelEnabledMaskChanged";
 NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged";
@@ -76,6 +78,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 - (void) _startPolling;
 - (void) _pollAllChannels;
 - (void) _shipValues;
+- (void) _shipAllVaues;
 - (void) _postAllScalersUpdateOnMainThread;
 @end
 
@@ -135,6 +138,37 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 	return @"VME/V260.html";
 }
 #pragma mark •••Accessors
+
+- (int) channelForTriggeredShip
+{
+    return channelForTriggeredShip;
+}
+
+- (void) setChannelForTriggeredShip:(int)aChannelForTriggeredShip
+{
+	if(aChannelForTriggeredShip < 0)		aChannelForTriggeredShip = 0;
+	else if(aChannelForTriggeredShip > 15)	aChannelForTriggeredShip = 15;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setChannelForTriggeredShip:channelForTriggeredShip];
+    
+    channelForTriggeredShip = aChannelForTriggeredShip;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelChannelForTriggeredShipChanged object:self];
+}
+
+- (BOOL) shipOnChange
+{
+    return shipOnChange;
+}
+
+- (void) setShipOnChange:(BOOL)aShipOnChange
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipOnChange:shipOnChange];
+    
+    shipOnChange = aShipOnChange;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelShipOnChangeChanged object:self];
+}
 
 - (BOOL) autoInhibit
 {
@@ -257,6 +291,17 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 }
 
 - (void) _shipValues
+{
+	if(!shipOnChange)[self _shipAllVaues];
+	else {
+		if(scalerValue[channelForTriggeredShip] != lastScalerValue){
+			lastScalerValue = scalerValue[channelForTriggeredShip];
+			[self _shipAllVaues];
+		}
+	}
+}
+
+- (void) _shipAllVaues
 {
 	BOOL runInProgress = [gOrcaGlobals runInProgress];
 	
@@ -498,6 +543,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 	
 	[anEventDictionary setObject:aDictionary forKey:@"Caen260"];
 }
+
 - (void) reset
 {	
 }
@@ -508,6 +554,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
     [self clearScalers];
 	scheduledForUpdate = NO;
 	isRunning = NO;
+	lastScalerValue = 0xFFFFFFFF;
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -534,6 +581,8 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 	configStruct->card_info[index].base_add		= [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0] = enabledMask;
 	configStruct->card_info[index].deviceSpecificData[1] = [self getAddressOffset:kCounter0];
+	configStruct->card_info[index].deviceSpecificData[2] = [self shipOnChange];
+	configStruct->card_info[index].deviceSpecificData[3] = [self channelForTriggeredShip];
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	    
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -547,6 +596,8 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setChannelForTriggeredShip:[decoder decodeIntForKey:@"channelForTriggeredShip"]];
+    [self setShipOnChange:[decoder decodeBoolForKey:@"shipOnChange"]];
     [self setAutoInhibit:	[decoder decodeBoolForKey:@"autoInhibit"]];
 	[self setPollingState:	[decoder decodeIntForKey:@"pollingState"]];
 	[self setShipRecords:	[decoder decodeBoolForKey:@"shipRecords"]];
@@ -563,6 +614,8 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:channelForTriggeredShip forKey:@"channelForTriggeredShip"];
+    [encoder encodeBool:shipOnChange forKey:@"shipOnChange"];
     [encoder encodeBool:autoInhibit forKey:@"autoInhibit"];
     [encoder encodeInt:[self pollingState] forKey:@"pollingState"];
     [encoder encodeBool:[self pollingState] forKey:@"shipRecords"];

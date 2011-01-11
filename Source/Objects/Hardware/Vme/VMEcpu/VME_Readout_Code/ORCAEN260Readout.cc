@@ -1,6 +1,12 @@
 #include "ORCAEN260Readout.hh"
 #include <errno.h>
 
+bool ORCAEN260Readout::Start()
+{
+	lastScalerValue = 0xFFFFFFFF;
+	return true;
+}
+
 bool ORCAEN260Readout::Readout(SBC_LAM_Data* lamData)
 {
 	uint32_t dataId					= GetHardwareMask()[0];
@@ -8,12 +14,14 @@ bool ORCAEN260Readout::Readout(SBC_LAM_Data* lamData)
 									  ((GetSlot() & 0x0000001f)<<16);
 	uint32_t enabledMask			= GetDeviceSpecificData()[0];
  	uint32_t dataBufferOffset		= GetDeviceSpecificData()[1];
-
+	bool     shipOnlyOnlyOnChange   = GetDeviceSpecificData()[2];
+	uint32_t channelToWatch			= GetDeviceSpecificData()[3];
+	
 	time_t	ut_Time;
 	time(&ut_Time);
 	
 	ensureDataCanHold(19);
-	int32_t savedDataIndex = dataIndex;
+	int32_t savedDataIndex = dataIndex; //in case we have to dump the record
 	
 	data[dataIndex++] = dataId | 19;
 	data[dataIndex++] = locationMask  | (enabledMask & 0x0000ffff);
@@ -30,8 +38,21 @@ bool ORCAEN260Readout::Readout(SBC_LAM_Data* lamData)
 				break;
 			}
 		}
-		data[dataIndex++] = dataValue & 0x00ffffff;
+		uint32_t theScalerValue = dataValue & 0x00ffffff;
+		data[dataIndex++] = theScalerValue;
+		
+		if(shipOnlyOnlyOnChange){
+			if(i == channelToWatch){
+				if(lastScalerValue == theScalerValue){
+					dataIndex = savedDataIndex; //dump the record
+					break;						//no need to continue;
+				}
+				else lastScalerValue = theScalerValue;
+			}
+		}
 	}
+	
+	
 			   
     return true; 
 }
