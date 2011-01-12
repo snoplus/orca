@@ -398,6 +398,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 #pragma mark ***SQL Access
 - (BOOL) testConnection
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[queue cancelAllOperations];
+	[queue waitUntilAllOperationsAreFinished];
+	
 	if(!sqlConnection) sqlConnection = [[ORSqlConnection alloc] init];
 	if([sqlConnection isConnected]){
 		[sqlConnection disconnect];
