@@ -8,6 +8,7 @@ class ORCAEN260Readout : public ORVVmeCard
   public:
     ORCAEN260Readout(SBC_card_info* ci) : ORVVmeCard(ci) {} 
     virtual ~ORCAEN260Readout() {} 
+	virtual bool Start();
     virtual bool Readout(SBC_LAM_Data*);
 	
 	unsigned long lastScalerValue;
