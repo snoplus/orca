@@ -184,6 +184,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[readList release];
 	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 	[self setSecondsSetInitWithHost: YES];
+	[self registerNotificationObservers];
     return self;
 }
 
@@ -250,7 +251,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
+	[notifyCenter removeObserver:self];
+
     [notifyCenter addObserver : self
                      selector : @selector(runIsAboutToStart:)
                          name : ORRunAboutToStartNotification

@@ -322,6 +322,8 @@ static NSString *kFanOutConnectorKey[10]  = {
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+	[notifyCenter removeObserver:self];
     
     [notifyCenter addObserver : self
                      selector : @selector(lineColorChanged:)

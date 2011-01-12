@@ -220,6 +220,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	[self setReadOutGroup:readList];
     [self makePoller:0];
 	[readList release];
+    [self registerNotificationObservers];
     return self;
 }
 
@@ -281,6 +282,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	[notifyCenter removeObserver:self];
 	
     [notifyCenter addObserver : self
                      selector : @selector(serviceChanged:)

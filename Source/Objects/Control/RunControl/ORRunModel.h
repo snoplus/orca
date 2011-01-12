@@ -95,6 +95,7 @@
 
 #pragma mark ¥¥¥Initialization
 - (void) makeConnectors;
+- (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Accessors
 - (NSDictionary*)runInfo;

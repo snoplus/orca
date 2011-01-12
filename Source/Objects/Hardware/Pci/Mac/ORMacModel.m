@@ -56,6 +56,7 @@ void registryChanged(
 	self = [super init];
 	[self scanForSerialPorts];
 	usb = [ORUSB sharedUSB];
+	[self registerNotifications];
 	return self;
 }
 
@@ -86,6 +87,7 @@ void registryChanged(
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[[NSNotificationCenter defaultCenter] addObserver : self
 											 selector : @selector(objectsAdded:)
 												 name : ORGroupObjectsAdded

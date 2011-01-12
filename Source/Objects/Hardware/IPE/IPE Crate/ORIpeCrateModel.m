@@ -33,7 +33,12 @@ static NSString* ORIpeCrateFireWireOut 	= @"ORIpeCrateFireWireOut";
 @implementation ORIpeCrateModel
 
 #pragma mark ¥¥¥initialization
-
+- (id)init //designated initializer
+{
+    self = [super init];
+	[self registerNotificationObservers];
+    return self;
+}
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -115,7 +120,8 @@ static NSString* ORIpeCrateFireWireOut 	= @"ORIpeCrateFireWireOut";
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+ 	[notifyCenter removeObserver:self];
+   
     [notifyCenter addObserver : self
                      selector : @selector(viewChanged:)
                          name : ORIpeCardSlotChangedNotification

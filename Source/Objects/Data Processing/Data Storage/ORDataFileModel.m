@@ -72,6 +72,9 @@ static const int currentVersion = 1;           // Current version
     [self setConfigFolder:[[[ORSmartFolder alloc]init]autorelease]];
     
     [[self undoManager] enableUndoRegistration];
+	
+	[self registerNotificationObservers];
+
     return self;
 }
 
@@ -145,6 +148,8 @@ static const int currentVersion = 1;           // Current version
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+	[notifyCenter removeObserver:self];
     
     [notifyCenter addObserver : self
                      selector : @selector(statusLogFlushed:)

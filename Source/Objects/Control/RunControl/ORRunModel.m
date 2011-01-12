@@ -73,6 +73,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     [self setTimeLimit:3600];
     [self setDirName:@"~"];
+	[self registerNotificationObservers];
+
     [[self undoManager] enableUndoRegistration];
     
     _ignoreMode = YES;
@@ -1450,7 +1452,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+	
+	[notifyCenter removeObserver:self];
+   
     [notifyCenter addObserver: self
                      selector: @selector(runModeChanged:)
                          name: ORRunModeChangedNotification

@@ -72,6 +72,8 @@
     int refreshRate;
 }
 
+-(void)registerNotificationObservers;
+
 #pragma mark ¥¥¥Accessors
 - (int) refreshRate;
 - (void) setRefreshRate:(int)aRefreshRate;

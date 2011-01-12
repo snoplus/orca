@@ -20,6 +20,16 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 @implementation ORCrate
 
 #pragma mark ¥¥¥initialization
+- (id)init //designated initializer
+{
+    self = [super init];
+    
+    [[self undoManager] disableUndoRegistration];
+	[self registerNotificationObservers];
+    [[self undoManager] enableUndoRegistration];
+    	
+    return self;
+}
 
 - (void) dealloc
 {
@@ -136,7 +146,8 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+
+ 	[notifyCenter removeObserver:self];
     
     [notifyCenter addObserver : self
                      selector : @selector(viewChanged:)

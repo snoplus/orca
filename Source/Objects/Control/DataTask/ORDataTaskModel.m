@@ -59,8 +59,9 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     self = [super init];
     [[self undoManager] disableUndoRegistration];
     [self setReadOutList:[[[ORReadOutList alloc] initWithIdentifier:@"Data Task ReadOut"]autorelease]];
-	timerLock = [[NSLock alloc] init];
     [[self undoManager] enableUndoRegistration];
+	timerLock = [[NSLock alloc] init];
+    [self registerNotificationObservers];
     return self;
 }
 
@@ -133,6 +134,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 -(void)registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+	[notifyCenter removeObserver:self];
     
     [notifyCenter addObserver: self
                      selector: @selector(queueRecordForShipping:)
