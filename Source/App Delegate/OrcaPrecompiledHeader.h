@@ -12,6 +12,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#ifdef __OBJC__
+
 #import <Cocoa/Cocoa.h>
 #include <IOKit/IOMessage.h>
 #import "ORGroupView.h"
@@ -49,3 +51,5 @@
 #import <sys/time.h>
 #include <sys/types.h>
 #include <sys/times.h>
+
+#endif //__OBJC__
