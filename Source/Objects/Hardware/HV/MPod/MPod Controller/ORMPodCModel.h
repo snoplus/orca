@@ -20,19 +20,20 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORMPodCard.h"
-#include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>
+#import "ORMPodProtocol.h"
 
-@interface ORMPodCModel :  ORMPodCard 
+@interface ORMPodCModel :  ORMPodCard <ORMPodProtocol>
 {
 	NSMutableArray*	connectionHistory;
 	unsigned		ipNumberIndex;
 	NSString*		IPNumber;
 	NSTask*			pingTask;
 	
-	struct snmp_session* sessionHandle;
+	NSMutableDictionary* systemParams;
 }
 
+#pragma mark ***Accessors
+- (int) systemParamAsInt:(NSString*)name;
 - (void) initConnectionHistory;
 - (void) clearHistory;
 - (unsigned) connectionHistoryCount;
@@ -40,19 +41,31 @@
 - (unsigned) ipNumberIndex;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;
+- (void) updateAllValues;
+- (NSArray*) systemUpdateList;
+- (void) processSystemResponseArray:(NSArray*)response;
 
 #pragma mark ¥¥¥Hardware Access
-- (void) openSession;
-- (void) closeSession;
 - (id) controllerCard;
-- (void) writeParam:(NSString*)aParam slot:(int)aSlot channel:(int)aChannel floatValue:(float)aValue;
 
 - (void) ping;
 - (BOOL) pingTaskRunning;
-- (void) testGet;
+- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
+- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
+- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
+- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
 
 @end
 
+extern NSString* ORMPodCModelCrateStatusChanged;
+extern NSString* ORMPodCModelCratePowerStateChanged;
 extern NSString* ORMPodCModelLock;
 extern NSString* ORMPodCPingTask;
 extern NSString* MPodCIPNumberChanged;
+extern NSString* ORMPodCModelSystemParamsChanged;
+
+@interface NSObject (ORMpodCModel)
+- (void) processRWResponseArray:(NSArray*)response;
+- (void) processSystemResponseArray:(NSArray*)response;
+
+@end

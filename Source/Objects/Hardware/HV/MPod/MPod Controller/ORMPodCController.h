@@ -24,6 +24,8 @@
 @interface ORMPodCController : OrcaObjectController 
 {
 	IBOutlet NSButton*			  lockButton;
+	IBOutlet NSTextField*		  crateStatusField;
+	IBOutlet NSTextField*		  cratePowerStateField;
 	IBOutlet NSComboBox*		  ipNumberComboBox;
 	IBOutlet NSButton*			  pingButton;
 	IBOutlet NSProgressIndicator* pingTaskProgress;
@@ -36,6 +38,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) systemStateChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) pingTaskChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
@@ -44,6 +47,6 @@
 - (IBAction) ping:(id)sender;
 - (IBAction) ipNumberAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) testAction:(id)sender;
+- (IBAction) updateAction:(id)sender;
 
 @end

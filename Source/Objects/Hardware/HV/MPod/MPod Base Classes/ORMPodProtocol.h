@@ -20,7 +20,7 @@
 
 @protocol ORMPodProtocol <NSObject>
 
-- (void) resetContrl;
-- (void) checkStatusErrors;
+- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
+- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
 
 @end

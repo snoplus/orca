@@ -22,18 +22,30 @@
 #import "ORMPodCModel.h"
 #import "ORMPodCrate.h"
 #import "ORTaskSequence.h"
+#import "ORSNMP.h"
 
+NSString* ORMPodCModelCrateStatusChanged = @"ORMPodCModelCrateStatusChanged";
+NSString* ORMPodCModelCratePowerStateChanged = @"ORMPodCModelCratePowerStateChanged";
 NSString* ORMPodCModelLock		= @"ORMPodCModelLock";
 NSString* ORMPodCPingTask		= @"ORMPodCPingTask";
 NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
+NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 
 @implementation ORMPodCModel
 
 - (void) dealloc
 {
+	[systemParams release];
 	[connectionHistory release];
     [IPNumber release];
 	[super dealloc];
+}
+
+- (void) wakeUp
+{
+    if([self aWake])return;
+    [super wakeUp];
+	[self updateAllValues];
 }
 
 #pragma mark ¥¥¥Initialization
@@ -69,6 +81,12 @@ NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
 	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
 }
 #pragma mark ***Accessors
+
+- (int) systemParamAsInt:(NSString*)name
+{
+	return [[[systemParams objectForKey:name] objectForKey:@"Value"] intValue];
+}
+
 - (void) clearHistory
 {
 	[connectionHistory release];
@@ -76,7 +94,6 @@ NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
 	
 	[self setIPNumber:[self IPNumber]];
 }
-
 
 - (unsigned) connectionHistoryCount
 {
@@ -121,109 +138,61 @@ NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
 	}
 }
 
+- (void) updateAllValues
+{
+	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:)];
+}
+
+- (NSArray*) systemUpdateList
+{
+	NSArray* systemReadParams = [NSArray arrayWithObjects:
+								 @"sysMainSwitch.0",
+								 @"sysStatus.0",	
+								 nil];
+	return systemReadParams;
+}
+
+- (void) processSystemResponseArray:(NSArray*)response
+{
+	for(id anEntry in response){
+		if(!systemParams)systemParams = [[NSMutableDictionary dictionary] retain];
+		NSString* name = [anEntry objectForKey:@"Name"];
+		if(name)[systemParams setObject:anEntry forKey:name];
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
+}
+
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard
 {
 	return [[self crate] controllerCard];
 }
 
-- (void) openSession
+- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
 {
-	init_snmp("APC Check");
-	u_char* community = (u_char*)"guru";
-	struct snmp_session session; 
-	snmp_sess_init( &session );
-	session.version			= SNMP_VERSION_1;
-	session.community		= community;
-	session.community_len	= strlen((const char *)session.community);
-	session.peername		= (char*)[IPNumber cStringUsingEncoding:NSASCIIStringEncoding];
-	sessionHandle = snmp_open(&session);
-
-	//add_mibdir("."); 
-	//struct tree* mib_tree = read_mib("/usr/share/snmp/mibs/WIENER-CRATE-MIB.txt"); 
-	[self testGet];
+	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector];
 }
 
-- (void) testGet
+- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
 {
-	struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_GET);
-	
-	size_t id_len = MAX_OID_LEN;
-	oid id_oid[MAX_OID_LEN];
-	NSLog(@"Test Read: Temp Chan 0 and Serial Number\n");
-	read_objid("WIENER-CRATE-MIB::outputMeasurementTemperature.u0", id_oid, &id_len);
-	snmp_add_null_var(pdu, id_oid, id_len);
-	
-	size_t serial_len = MAX_OID_LEN;
-	oid serial_oid[MAX_OID_LEN];
-	read_objid("WIENER-CRATE-MIB::psSerialNumber.0", serial_oid, &serial_len);
-	snmp_add_null_var(pdu, serial_oid, serial_len);
-	
-	struct snmp_pdu* response;
-	int status = snmp_synch_response(sessionHandle, pdu, &response);
-	NSLog(@"%d\n",status);
-	struct variable_list* vars;            
-	for(vars = response->variables; vars; vars = vars->next_variable){
-		char buffer[64];
-		snprint_value(buffer,64,vars->name, vars->name_length, vars);
-		NSLog(@"%s\n",buffer);
-	}
-	[self writeParam:@"outputVoltage" slot:1 channel:1 floatValue:-1];
-	
-	[self closeSession];
+	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"WIENER-CRATE-MIB"];
+	[ss openPublicSession:IPNumber];
+	[aTarget performSelector:aSelector withObject:[ss readValues:cmds]];
+	[ss release];
 }
 
-- (void) writeParam:(NSString*)aParam slot:(int)aSlot channel:(int)aChannel floatValue:(float)aValue
+- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
 {
-	if (sessionHandle){
-		struct snmp_pdu *response;
-		
-		oid anOID[MAX_OID_LEN];
-		size_t anOID_len = MAX_OID_LEN;
-								
-		char type = 'f';
-		struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_SET);
-		
-		// create set request and add object names and values 
-		char val[64];
-		sprintf(val,"%f",aValue);
-		NSString* s = [NSString stringWithFormat:@"WIENER-CRATE-MIB::%@.u%d%02d",aParam,aSlot,aChannel];
-		const char* intoid = [s cStringUsingEncoding:NSASCIIStringEncoding];
-		if (snmp_parse_oid(intoid, anOID, &anOID_len) == NULL){
-			snmp_perror(intoid);
-			//exit(EXIT_SNMP_SET_ERROR);
-		}
-		if (snmp_add_var(pdu, anOID, anOID_len, type, val)){
-			snmp_perror(intoid);
-			//exit(EXIT_SNMP_SET_ERROR);
-		}
-		
-		int status = snmp_synch_response(sessionHandle, pdu, &response);
-		
-		if (status == STAT_SUCCESS){
-			if (response->errstat != SNMP_ERR_NOERROR){
-				NSLog(@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat));
-				//exit(EXIT_SNMP_SET_ERROR);
-			}
-		}
-		else if (status == STAT_TIMEOUT){
-			NSLog(@"SNMP SetTimeout: No Response from %s\n",sessionHandle->peername);
-			//exit(EXIT_SNMP_SET_ERROR);
-		}
-		else { /* status == STAT_ERROR */
-			snmp_sess_perror("snmpset", sessionHandle);
-			//exit(EXIT_SNMP_SET_ERROR);
-		}
-	}
+	[self writeValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector];
 }
 
-
-- (void) closeSession
+- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
 {
-	if(sessionHandle) {
-		snmp_close(sessionHandle);
-		sessionHandle = nil;
-	}
+	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"WIENER-CRATE-MIB"];
+	[ss openGuruSession:IPNumber];
+	[ss writeValues:cmds];
+	//[aTarget performSelector:aSelector withObject:[ss readValues:cmds]];
+	[ss release];
 }
 
 #pragma mark ¥¥¥Tasks
@@ -260,7 +229,9 @@ NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
 {
 	return pingTask != nil;
 }
-
+- (void) tasksCompleted:(id)sender
+{
+}
 
 - (void) taskData:(NSString*)text
 {

@@ -53,6 +53,11 @@
 						 name : MPodCIPNumberChanged
 					   object : model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(systemStateChanged:)
+                         name : ORMPodCModelSystemParamsChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -67,6 +72,12 @@
 	[self ipNumberChanged:nil];
     [self lockChanged:nil];
     [self pingTaskChanged:nil];
+	[self systemStateChanged:nil];
+}
+
+- (void) systemStateChanged:(NSNotification*)aNote
+{
+	[cratePowerStateField setStringValue: [model systemParamAsInt:@"sysMainSwitch"]?@"ON":@"OFF"];
 }
 
 - (void) checkGlobalSecurity
@@ -121,9 +132,9 @@
 	[model setIPNumber:[sender stringValue]];
 }
 
-- (IBAction) testAction:(id)sender
+- (IBAction) updateAction:(id)sender
 {
-	[model openSession];
+	[model updateAllValues];
 }
 
 #pragma mark •••Data Source

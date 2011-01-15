@@ -36,4 +36,12 @@ NSString* ORMPodCardSlotChangedNotification 	= @"ORMPodCardSlotChangedNotificati
 {
     return ORMPodCardSlotChangedNotification;
 }
+
+- (id)	adapter
+{
+	id anAdapter = [guardian adapter];
+	if(anAdapter)return anAdapter;
+	else [NSException raise:@"No adapter" format:@"You must place a MPod adaptor card into the crate."];
+	return nil;
+}
 @end

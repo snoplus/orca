@@ -31,8 +31,13 @@
 #pragma mark ¥¥¥Accessors
 - (NSString*) cardSlotChangedNotification;
 - (Class)	guardianClass;
+- (id)	adapter;
 
 @end
 
 #pragma mark ¥¥¥Extern Definitions
 extern NSString* ORMPodCardSlotChangedNotification;
+
+@interface NSObject (ORMPodCard)
+- (void) postUpdateList:(NSArray*)cmds;
+@end

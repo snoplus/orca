@@ -24,7 +24,6 @@
 @interface ORMPodHVCard : ORMPodCard {
 
 	@protected
-	id	controller; //use to cache the controller for abit more speed. use with care!
     unsigned long	exceptionCount;
 }
 
@@ -33,7 +32,8 @@
 - (unsigned long)   exceptionCount;
 - (void)			incExceptionCount;
 - (void)			clearExceptionCount;
-
+- (void)			processRWResponseArray:(NSArray*)reponse;
+- (void)			processSystemResponseArray:(NSArray*)reponse;
 @end
 
 #pragma mark ¥¥¥External String Definitions
