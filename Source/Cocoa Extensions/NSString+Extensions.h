@@ -30,6 +30,7 @@ typedef enum {
 } LineEndingType;
 
 @interface NSString (OR_NSStringWithExtensions)
+- (NSString*) trimSpacesFromEnds;
 - (NSString*) removeExtraSpaces;
 - (NSString*) removeNLandCRs; 
 - (NSArray*)  getValuesSeparatedByString:(NSString*)aDelimiter;

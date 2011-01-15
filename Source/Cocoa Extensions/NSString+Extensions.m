@@ -22,6 +22,10 @@
 #pragma mark ¥¥¥Imported Files
 
 @implementation NSString (OR_NSStringWithExtensions)
+- (NSString*) trimSpacesFromEnds
+{
+	return [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+}
 
 -(NSString*) removeExtraSpaces
 {
