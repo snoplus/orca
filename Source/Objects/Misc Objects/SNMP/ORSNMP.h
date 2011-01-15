@@ -22,17 +22,26 @@
 #include <net-snmp/net-snmp-includes.h>
 
 @interface ORSNMP : NSObject {
+	struct snmp_session session; 
 	struct snmp_session* sessionHandle;
+	NSString* mibName;
 }
-
+- (id) initWithMib:(NSString*)aMibName;
 - (void) dealloc;
 - (void) openGuruSession:(NSString*)ip;  
 - (void) openPublicSession:(NSString*)ip;  
 - (void) openSession:(NSString*)ip community:(NSString*)aCommunity;
 - (NSArray*) readValue:(NSString*)anObjId;
 - (NSArray*) readValues:(NSArray*)someObjIds;
-- (void) setValue:(NSString*)anObjId floatValue:(float)aValue;
-
+- (NSArray*) writeValue:(NSString*)anObjId;
+- (void) writeValues:(NSArray*)someObjIds;
 - (void) closeSession;
+
+- (void) topLevelParse:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary;
+- (void) parseParmAndMibName:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary;
+- (void) parseParameterName:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary;
+- (void) parseParamTypeAndValue:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary;
+- (void) parseParamValue:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary;
+- (void) parseNumberWithUnits:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary;
 
 @end
