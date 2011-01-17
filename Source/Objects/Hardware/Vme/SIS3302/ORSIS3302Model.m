@@ -620,9 +620,9 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	if([self bufferWrapEnabled:aGroup]){
 		unsigned long checkValue = [self sampleLength:aGroup] - [self sampleStartIndex:aGroup];
-		unsigned long maxValue = firmwareVersion>=15?255:63;
+		//unsigned long maxValue = firmwareVersion>=15?255:63;
 		if(aEnergyGateLength < checkValue)	aEnergyGateLength = checkValue;
-		if(aEnergyGateLength > maxValue)	aEnergyGateLength = maxValue;
+		//if(aEnergyGateLength > maxValue)	aEnergyGateLength = maxValue;
 	}
 	
 	[energyGateLengths replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aEnergyGateLength]];
