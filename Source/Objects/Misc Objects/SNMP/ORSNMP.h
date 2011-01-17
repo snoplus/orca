@@ -34,7 +34,7 @@
 - (NSArray*) readValue:(NSString*)anObjId;
 - (NSArray*) readValues:(NSArray*)someObjIds;
 - (NSArray*) writeValue:(NSString*)anObjId;
-- (void) writeValues:(NSArray*)someObjIds;
+- (NSArray*) writeValues:(NSArray*)someObjIds;
 - (void) closeSession;
 
 - (void) topLevelParse:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary;

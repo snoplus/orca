@@ -48,6 +48,7 @@
 - (void) makeMainController;
 
 #pragma mark •••specific accessors
+- (int) slotChannelValue:(int)aChannel;
 - (int)   channel:(int)i readParamAsInt:(NSString*)name;
 - (float) channel:(int)i readParamAsFloat:(NSString*)name;
 - (id) channel:(int)i readParamAsObject:(NSString*)name;
@@ -85,8 +86,9 @@
 - (NSArray*) commonChannelUpdateList;
 - (NSArray*) addChannelNumbersToParams:(NSArray*)someChannelParams;
 - (NSArray*) addChannel:(int)i toParams:(NSArray*)someChannelParams;
-- (void) processRWResponseArray:(NSArray*)response;
+- (void) precessReadResponseArray:(NSArray*)response;
 - (void) processSyncResponseArray:(NSArray*)response;
+- (void) precessWriteResponseArray:(NSArray*)response;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

@@ -91,14 +91,24 @@
 						[self topLevelParse:s intoDictionary:responseDictionary];
 					}
 				}
-				else NSLog(@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat));
+				else {
+					[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat)] forKey:@"Error"];
+					[resultArray addObject:responseDictionary];
+					break;
+				}
 			}
-			else if (status == STAT_TIMEOUT) NSLog(@"SNMP SetTimeout: No Response from %s\n",sessionHandle->peername);
+			else if (status == STAT_TIMEOUT){
+				[responseDictionary setObject:[NSString stringWithFormat:@"SNMP Timeout: No Response from %s\n",sessionHandle->peername] forKey:@"Error"];
+				[resultArray addObject:responseDictionary];
+				break;
+			}
 			else {
 				[responseDictionary setObject:@"SNMP response error" forKey:@"Error"];
+				[resultArray addObject:responseDictionary];
+				break;
 			}
 			
-			[resultArray addObject:responseDictionary];
+			if(responseDictionary)[resultArray addObject:responseDictionary];
 			
 			if (response)snmp_free_pdu(response);				
 		}
@@ -108,13 +118,14 @@
 
 - (NSArray*) writeValue:(NSString*)anObjId
 {
-	return [self readValues:[NSArray arrayWithObject:anObjId]];
+	return [self writeValues:[NSArray arrayWithObject:anObjId]];
 }
 
-- (void) writeValues:(NSArray*)someObjIds
+- (NSArray*) writeValues:(NSArray*)someObjIds
 {
 	//the objID must have the form param.i t val
 	//example: outputSwitch.u7 i 1
+	NSMutableArray* resultArray = [NSMutableArray array];
 	if (sessionHandle){
 		struct snmp_pdu *response;
 				
@@ -122,6 +133,7 @@
 		size_t anOID_len = MAX_OID_LEN;
 		
 		for(id anObjID in someObjIds){
+			NSMutableDictionary* responseDictionary = [NSMutableDictionary dictionary];
 			anObjID = [mibName stringByAppendingFormat:@"::%@",anObjID];
 			struct snmp_pdu* pdu = snmp_pdu_create(SNMP_MSG_SET);
 			NSArray* parts = [anObjID tokensSeparatedByCharactersFromSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -131,11 +143,13 @@
 				const char* val    = [[parts objectAtIndex:2] cStringUsingEncoding:NSASCIIStringEncoding];
 
 				if (snmp_parse_oid(intoid, anOID, &anOID_len) == NULL){
-					snmp_perror(intoid);
+					[responseDictionary setObject:@"snmp_parse_oid reports bad parameter" forKey:@"Error"];
+					[resultArray addObject:responseDictionary];
 					break;
 				}
 				if (snmp_add_var(pdu, anOID, anOID_len, type, val)){
-					snmp_perror(intoid);
+					[responseDictionary setObject:@"snmp_add_var reports error" forKey:@"Error"];
+					[resultArray addObject:responseDictionary];
 					break;
 				}
 				
@@ -143,56 +157,27 @@
 				
 				if (status == STAT_SUCCESS){
 					if (response->errstat != SNMP_ERR_NOERROR){
-						NSLog(@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat));
+						[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet: %s",snmp_errstring(response->errstat)] forKey:@"Error"];
+						[resultArray addObject:responseDictionary];
 						break;
 					}
 				}
 				else if (status == STAT_TIMEOUT){
-					NSLog(@"SNMP SetTimeout: No Response from %s\n",sessionHandle->peername);
+					[responseDictionary setObject:[NSString stringWithFormat:@"SNMP Timeout: No Response from %s\n",sessionHandle->peername] forKey:@"Error"];
+					[resultArray addObject:responseDictionary];
 					break;
 				}
-				else { /* status == STAT_ERROR */
-					snmp_sess_perror("snmpset", sessionHandle);
+				else {
+					[responseDictionary setObject:@"SNMP response error" forKey:@"Error"];
+					[resultArray addObject:responseDictionary];
 					break;
 				}
 			}
+			if(responseDictionary)[resultArray addObject:responseDictionary];
+			if (response)snmp_free_pdu(response);				
 		}
 	}
-		/*	
-		// create set request and add object names and values 
-		char val[64];
-		sprintf(val,"%f",aValue);
-		
-		oid    anOID[MAX_OID_LEN];
-		size_t anOID_len = MAX_OID_LEN;
-		const char* intoid = [anObjId cStringUsingEncoding:NSASCIIStringEncoding];
-		if (snmp_parse_oid(intoid, anOID, &anOID_len) == NULL){
-			snmp_perror(intoid);
-			return;
-		}
-		if (snmp_add_var(pdu, anOID, anOID_len, 'f', val)){
-			snmp_perror(intoid);
-			return;
-		}
-		
-		int status = snmp_synch_response(sessionHandle, pdu, &response);
-		
-		if (status == STAT_SUCCESS){
-			if (response->errstat != SNMP_ERR_NOERROR){
-				NSLog(@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat));
-				return;
-			}
-		}
-		else if (status == STAT_TIMEOUT){
-			NSLog(@"SNMP SetTimeout: No Response from %s\n",sessionHandle->peername);
-			return;
-		}
-		else { 
-			snmp_sess_perror("snmpset", sessionHandle);
-			return;
-		}
-	}
-*/
+	return resultArray;
 }	
 
 - (void) closeSession

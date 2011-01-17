@@ -190,8 +190,7 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 {
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"WIENER-CRATE-MIB"];
 	[ss openGuruSession:IPNumber];
-	[ss writeValues:cmds];
-	//[aTarget performSelector:aSelector withObject:[ss readValues:cmds]];
+	[aTarget performSelector:aSelector withObject:[ss writeValues:cmds]];
 	[ss release];
 }
 

@@ -65,7 +65,7 @@ extern NSString* MPodCIPNumberChanged;
 extern NSString* ORMPodCModelSystemParamsChanged;
 
 @interface NSObject (ORMpodCModel)
-- (void) processRWResponseArray:(NSArray*)response;
+- (void) precessReadResponseArray:(NSArray*)response;
 - (void) processSystemResponseArray:(NSArray*)response;
 
 @end

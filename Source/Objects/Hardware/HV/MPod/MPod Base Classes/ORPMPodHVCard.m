@@ -61,7 +61,7 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 					   object:self]; 
 }
 
-- (void) processRWResponseArray:(NSArray*)reponse
+- (void) precessReadResponseArray:(NSArray*)reponse
 {
 	//nothing to do. subclasses should override and call this in case something is aded
 }

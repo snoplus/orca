@@ -181,40 +181,49 @@ NSString* OREHQ8060nModelChannelReadParamsChanged		= @"OREHQ8060nModelChannelRea
 	for(id aParam in someChannelParams){
 		int i;
 		for(i=0;i<8;i++){
-			[convertedArray addObject:[aParam stringByAppendingFormat:@".u%d",([self slot]-1) * 100 + i]];
+			[convertedArray addObject:[aParam stringByAppendingFormat:@".u%d",[self slotChannelValue:i]]];
 		}
 	}
 	return convertedArray;
 }
 
+- (int) slotChannelValue:(int)aChannel
+{
+	return ([self slot]-1) * 100 + aChannel;
+}
 
 - (NSArray*) addChannel:(int)i toParams:(NSArray*)someChannelParams
 {
 	NSMutableArray* convertedArray = [NSMutableArray array];
 	for(id aParam in someChannelParams){
-		[convertedArray addObject:[aParam stringByAppendingFormat:@".u%d",([self slot]-1) * 100 + i]];
+		[convertedArray addObject:[aParam stringByAppendingFormat:@".u%d",[self slotChannelValue:i]]];
 	}
 	return convertedArray;
 }
 
 - (void) updateAllValues
 {
-	[[self adapter] getValues: [self channelUpdateList]  target:self selector:@selector(processRWResponseArray:)];
+	[[self adapter] getValues: [self channelUpdateList]  target:self selector:@selector(precessReadResponseArray:)];
 	[self writeVoltage:0]; ///test  remove!!!!!
 }
 
-- (void) processRWResponseArray:(NSArray*)response
+- (void) precessReadResponseArray:(NSArray*)response
 {
 	for(id anEntry in response){
-		//make sure the slot matches: if not then ignore this Entry
-		int theSlot = [[anEntry objectForKey:@"Slot"] intValue];
-		if(theSlot == [self slot]){
-			if([anEntry objectForKey:@"Channel"]){
-				int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
-				NSString* name = [anEntry objectForKey:@"Name"];
-				if(theChannel>=0 && theChannel<kNumEHQ8060nChannels){
-					if(!rwParams[theChannel])rwParams[theChannel] = [[NSMutableDictionary dictionary] retain];
-					if(name)[rwParams[theChannel] setObject:anEntry forKey:name];
+		NSString* anError = [anEntry objectForKey:@"Error"];
+		if([anError length]){
+		}
+		else {
+			//make sure the slot matches: if not then ignore this Entry
+			int theSlot = [[anEntry objectForKey:@"Slot"] intValue];
+			if(theSlot == [self slot]){
+				if([anEntry objectForKey:@"Channel"]){
+					int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
+					NSString* name = [anEntry objectForKey:@"Name"];
+					if(theChannel>=0 && theChannel<kNumEHQ8060nChannels){
+						if(!rwParams[theChannel])rwParams[theChannel] = [[NSMutableDictionary dictionary] retain];
+						if(name)[rwParams[theChannel] setObject:anEntry forKey:name];
+					}
 				}
 			}
 		}
@@ -222,9 +231,22 @@ NSString* OREHQ8060nModelChannelReadParamsChanged		= @"OREHQ8060nModelChannelRea
 	[[NSNotificationCenter defaultCenter] postNotificationName:OREHQ8060nModelChannelReadParamsChanged object:self];
 }
 
+- (void) precessWriteResponseArray:(NSArray*)response
+{
+	for(id anEntry in response){
+		NSString* anError = [anEntry objectForKey:@"Error"];
+		if([anError length]){
+		}
+		else {
+		}
+	}
+}
 - (void) writeVoltage:(int)channel
 {    
-	[[self adapter] writeValue:@"outputVoltageRiseRate.u0 F 5.4" target:nil selector:@selector(processRWResponseArray:)];
+	if(channel>=0 && channel<kNumEHQ8060nChannels){
+		NSString* cmd = [NSString stringWithFormat:@"outputVoltage.u%d F %f",[self slotChannelValue:channel],voltage[channel]];
+		[[self adapter] writeValue:cmd target:nil selector:@selector(precessReadResponseArray:)];
+	}
 }
 
 - (void) processSyncResponseArray:(NSArray*)response

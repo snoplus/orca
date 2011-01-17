@@ -32,7 +32,7 @@
 - (unsigned long)   exceptionCount;
 - (void)			incExceptionCount;
 - (void)			clearExceptionCount;
-- (void)			processRWResponseArray:(NSArray*)reponse;
+- (void)			precessReadResponseArray:(NSArray*)reponse;
 - (void)			processSystemResponseArray:(NSArray*)reponse;
 @end
 
