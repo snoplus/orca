@@ -99,7 +99,7 @@ NSString* ORProcessPulseLock					= @"ORProcessPulseLock";
     [self setState:0];
 }
 
-- (int) eval
+- (id) eval
 {
 
     NSTimeInterval t1 = [NSDate timeIntervalSinceReferenceDate];
@@ -115,7 +115,7 @@ NSString* ORProcessPulseLock					= @"ORProcessPulseLock";
     }
     else				[self setState:timerState]; //nothing connected..return timerState
 	[self setEvaluatedState:[self state]];
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState] ;
 }
 
 - (id)initWithCoder:(NSCoder*)decoder

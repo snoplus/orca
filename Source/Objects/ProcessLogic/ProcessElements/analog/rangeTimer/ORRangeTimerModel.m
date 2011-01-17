@@ -220,7 +220,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 }
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
 	if(!alreadyEvaluated){
 		alreadyEvaluated = YES;
@@ -304,7 +304,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 		[self setState: newState];
 		[self setEvaluatedState: newState];
 	}
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 //--------------------------------
 

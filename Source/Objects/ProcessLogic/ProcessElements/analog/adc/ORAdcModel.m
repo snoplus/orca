@@ -174,7 +174,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
 	if(!alreadyEvaluated){
 		alreadyEvaluated = YES;
@@ -209,14 +209,9 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		[self setState: newState];
 		[self setEvaluatedState: newState];
 	}
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:hwValue];
 }
 
-- (float) evalAndReturnAnalogValue
-{
-	[self eval];
-	return hwValue;
-}
 
 //--------------------------------
 - (NSString*) iconValue 
@@ -569,10 +564,11 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 //the 'Low' nub
 @implementation ORAdcLowLimitNub
-- (int) eval
+- (id) eval
 {
 	[guardian eval];
-	return [guardian valueTooLow];
+	BOOL aValue = [guardian valueTooLow];
+	return [ORProcessResult processState:aValue value:aValue];
 }
 
 - (int) evaluatedState
@@ -584,10 +580,12 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 //the 'High' nub
 @implementation ORAdcHighLimitNub
-- (int) eval
+- (id) eval
 {
 	[guardian eval];
-	return [guardian valueTooHigh];
+	BOOL aValue = [guardian valueTooHigh];
+	return [ORProcessResult processState:aValue value:aValue];
+
 }
 - (int) evaluatedState
 {

@@ -45,12 +45,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     [[ORProcessThread sharedProcessThread] registerOutputObject:anOutputObject];
 }
 
-+ (void) setCR:(int)aBit value:(BOOL)aValue
++ (void) setCR:(int)aBit value:(id)aValue
 {
     [[ORProcessThread sharedProcessThread] setCR:aBit value:aValue];
 }
 
-+ (BOOL) getCR:(int)aBit
++ (id) getCR:(int)aBit
 {
     return [[ORProcessThread sharedProcessThread] getCR:aBit];
 }
@@ -61,12 +61,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     self = [super init];
     [self registerNotificationObservers];
     processLock = [[NSRecursiveLock alloc] init];
+	int i;
+	for(i=0;i<256;i++){
+		crBits[i] = nil;;
+	}
+	
     return self;
 }
 
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+	int i;
+	for(i=0;i<256;i++){
+		[crBits[i] release];
+	}
     [processLock release];
     [endNodes release];
     [_cancelled release];
@@ -102,25 +111,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     return running;
 }
 
-- (void) setCR:(int)aBit value:(BOOL)aValue
+- (void) setCR:(int)aBit value:(id)aValue
 {
-	if(aBit>=0 && aBit<256){
-		int subBit   = aBit%32;
-		int bitGroup = aBit/32;
-		
-		if(aValue)	crBits[bitGroup] |= (0x1L<<subBit);
-		else		crBits[bitGroup] &= ~(0x1L<<subBit);
+	if(aBit>=0 && aBit<256){	
+		[aValue retain];
+		[crBits[aBit] release];
+		crBits[aBit] = aValue;
 	}
 }
 
-- (BOOL) getCR:(int)aBit
+- (id) getCR:(int)aBit
 {
 	if(aBit>=0 && aBit<256){
-		int subBit   = aBit%32;
-		int bitGroup = aBit/32;
-		return (crBits[bitGroup] & (0x1L<<subBit))>0;
+		return crBits[aBit];
 	}
-	else return 0;
+	else return nil;
 }
 
 - (void) startNodes:(NSArray*) someNodes

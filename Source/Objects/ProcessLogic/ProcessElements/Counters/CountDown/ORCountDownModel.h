@@ -41,7 +41,7 @@
 - (void) setUpNubs;
 - (int) startCount;
 - (void) setStartCount:(int)value;
-- (int) eval;
+- (id) eval;
 
 @end
 

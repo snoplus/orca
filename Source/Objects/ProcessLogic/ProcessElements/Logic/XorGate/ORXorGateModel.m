@@ -38,14 +38,14 @@
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
     if(!alreadyEvaluated){
         alreadyEvaluated = YES;
-        [self setState:[self evalInput1] ^ [self evalInput2]];
+        [self setState:[[self evalInput1] boolValue] ^ [[self evalInput2] boolValue]];
     }
     [self setEvaluatedState:[self state]];
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 //--------------------------------
 

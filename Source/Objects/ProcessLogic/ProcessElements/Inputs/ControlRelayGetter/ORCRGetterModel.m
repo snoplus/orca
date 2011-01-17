@@ -97,20 +97,11 @@
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
-	id obj = [self objectConnectedTo:ORInputElementInConnection];
-	if(!alreadyEvaluated){
-		[self setState:[ORProcessThread getCR:bit]];
-		if(obj) connectedObjState =  [obj eval];
-	}
-	int theState = [self state];
-	if(!obj)[self setEvaluatedState: theState];
-	else {
-		if(!theState)[self setEvaluatedState: theState];
-		else [self setEvaluatedState: connectedObjState];
-	}
-	return evaluatedState;
+	ORProcessResult* theResult =  [ORProcessThread getCR:bit];
+	[self setState:[theResult boolValue]];
+	return theResult;
 }
 //--------------------------------
 

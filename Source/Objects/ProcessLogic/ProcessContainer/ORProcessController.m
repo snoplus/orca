@@ -79,7 +79,12 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                      selector : @selector(elementStateChanged:)
                          name : ORProcessElementStateChangedNotification
                        object : nil];
-    
+
+	[notifyCenter addObserver : self
+                     selector : @selector(doUpdate:)
+                         name : ORProcessElementForceUpdateNotification
+                       object : nil];
+	
     [notifyCenter addObserver : self
                      selector : @selector(testModeChanged:)
                          name : ORProcessTestModeChangedNotification

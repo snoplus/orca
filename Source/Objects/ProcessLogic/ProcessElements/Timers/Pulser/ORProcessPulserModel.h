@@ -33,7 +33,7 @@
 - (void) setUpImage;
 - (void) makeMainController;
 - (void) processIsStarting;
-- (int) eval;
+- (id) eval;
 
 #pragma mark ¥¥¥Accessors
 - (NSTimeInterval) cycleTime;

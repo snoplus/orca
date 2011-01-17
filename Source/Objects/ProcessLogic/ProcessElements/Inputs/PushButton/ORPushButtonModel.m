@@ -70,7 +70,7 @@
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
 	id obj = [self objectConnectedTo:ORInputElementInConnection];
 	if(!alreadyEvaluated){
@@ -78,10 +78,10 @@
 		if(!obj)		  [self setEvaluatedState:theState];
 		else {
 			if(!theState) [self setEvaluatedState: theState];
-			else		  [self setEvaluatedState: [obj eval]];
+			else		  [self setEvaluatedState: [[obj eval] boolValue]];
 		}
 	}
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 //--------------------------------
 

@@ -55,8 +55,6 @@
 - (double) maxValue;
 - (void) viewSource;
 
-- (float) evalAndReturnAnalogValue;
-
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
@@ -66,11 +64,11 @@
 extern NSString* ORAdcModelMinChangeChanged;
 
 @interface ORAdcLowLimitNub : ORProcessNub
-- (int) eval;
+- (id) eval;
 - (int) evaluatedState;
 @end
 
 @interface ORAdcHighLimitNub : ORProcessNub
-- (int) eval;
+- (id) eval;
 - (int) evaluatedState;
 @end

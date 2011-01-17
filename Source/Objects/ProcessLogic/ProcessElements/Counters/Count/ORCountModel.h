@@ -33,7 +33,7 @@
 - (void) setUpImage;
 - (void) addOverLay;
 - (void) makeConnectors;
-- (int) eval;
+- (id) eval;
 
 @end
 

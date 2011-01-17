@@ -123,7 +123,7 @@ NSString* historyConnectors[4] = {
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
 	NSDate* now = [NSDate date];
 	if(lastEval == nil || [now timeIntervalSinceDate:lastEval] >= 1){
@@ -132,16 +132,13 @@ NSString* historyConnectors[4] = {
 		int i;
 		for(i=0;i<4;i++){
 			id obj = [self objectConnectedTo:historyConnectors[i]];
-			if([obj respondsToSelector:@selector(evalAndReturnAnalogValue)]){
-				[inputValue[i] addDataToTimeAverage:[obj evalAndReturnAnalogValue]];
-			}
-			else {
-				[inputValue[i] addDataToTimeAverage:[obj eval]];
-			}
+			ORProcessResult* theResult = [obj eval];
+			float valueToPlot = [theResult analogValue];
+			[inputValue[i] addDataToTimeAverage:valueToPlot];
 		}	
 		[self performSelectorOnMainThread:@selector(postUpdate) withObject:nil waitUntilDone:NO];
 	}
-	return 0;
+	return nil;
 }
 
 

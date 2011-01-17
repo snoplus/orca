@@ -140,15 +140,15 @@ NSString* ORCountInputConnection				= @"ORCountInputConnection";
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
     if(!alreadyEvaluated){
         alreadyEvaluated = YES;
         int oldSetState   = setState;
         int oldResetState = resetState;
         
-        int newResetState = [[self objectConnectedTo:ORCountResetConnection] eval];
-        int newSetState   = [[self objectConnectedTo:ORCountInputConnection] eval];
+        int newResetState = [[[self objectConnectedTo:ORCountResetConnection] eval] boolValue];
+        int newSetState   = [[[self objectConnectedTo:ORCountInputConnection] eval] boolValue];
         
         BOOL setStateTransition = NO;
         BOOL resetTransition    = NO;
@@ -176,7 +176,7 @@ NSString* ORCountInputConnection				= @"ORCountInputConnection";
         }
         
     }
-	return 0; //nothing can connect to this object so just return 0
+	return nil; //nothing can connect to this object so just return 0
 }
 
 //--------------------------------

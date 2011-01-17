@@ -85,10 +85,10 @@ NSString* OROutputElementOutConnection  = @"OROutputElementOutConnection";
 }
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
     id obj = [self objectConnectedTo:OROutputElementInConnection];
-    int value = [obj eval];
+    int value = [[obj eval] boolValue];
     [self setState:value];
 	
 	if(![guardian inTestMode] && hwObject!=nil){
@@ -96,7 +96,7 @@ NSString* OROutputElementOutConnection  = @"OROutputElementOutConnection";
 	} 
 
     [self setEvaluatedState:value];
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 //--------------------------------
 

@@ -26,8 +26,8 @@
 {
 }
 - (void) makeConnectors;
-- (int) evalInput1;
-- (int) evalInput2;
+- (id) evalInput1;
+- (id) evalInput2;
 - (void) processIsStopping;
 - (void) processIsStarting;
 

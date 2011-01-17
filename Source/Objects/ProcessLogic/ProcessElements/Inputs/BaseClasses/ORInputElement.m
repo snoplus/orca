@@ -57,6 +57,7 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
     if([guardian inTestMode]){
         int currentState = [self state];
         [self setState:!currentState];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessElementForceUpdateNotification object:self userInfo:nil]; 
     }
 }
 
@@ -102,14 +103,16 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
 	id obj = [self objectConnectedTo:ORInputElementInConnection];
 	if(!alreadyEvaluated){
 		if(![guardian inTestMode] && hwObject!=nil){
 			[self setState:[hwObject processValue:bit]];
 		}
-		if(obj) connectedObjState =  [obj eval];
+		if(obj) {
+			connectedObjState =  [[obj eval] boolValue];
+		}
 	}
 	int theState = [self state];
 	if(!obj)		  [self setEvaluatedState:theState];
@@ -117,7 +120,7 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 		if(!theState) [self setEvaluatedState: theState];
 		else		  [self setEvaluatedState: connectedObjState];
 	}
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 //--------------------------------
 - (NSString*) iconLabel

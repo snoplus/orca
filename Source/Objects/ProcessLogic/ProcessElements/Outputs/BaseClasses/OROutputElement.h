@@ -24,7 +24,7 @@
 
 @interface OROutputElement : ORProcessEndNode {
 }
-- (int) eval;
+- (id) eval;
 - (void) makeConnectors;
 - (BOOL) isTrueEndNode;
 

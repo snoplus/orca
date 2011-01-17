@@ -35,6 +35,6 @@
 - (void) setUpImage;
 -(void)makeConnectors;
 - (void) setUpNubs;
-- (int) eval;
+- (id) eval;
 
 @end

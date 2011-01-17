@@ -17,9 +17,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
 #import <OrcaObject.h>
+
+@class ORProcessResult;
 
 @interface ORProcessElementModel : OrcaObject {
     @protected
@@ -80,7 +80,7 @@
 - (void) postStateChange;
 - (void) processIsStarting;
 - (void) processIsStopping;
-- (int) eval;
+- (id) eval;
 
 #pragma mark ¥¥¥Archiving
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -90,3 +90,16 @@
 
 extern NSString* ORProcessElementStateChangedNotification;
 extern NSString* ORProcessCommentChangedNotification;
+extern NSString* ORProcessElementForceUpdateNotification;
+
+@interface ORProcessResult : NSObject
+{
+	BOOL boolValue;
+	float  analogValue;
+}
+
++ (id) processState:(BOOL)aState value:(float)aValue;
+@property (assign) BOOL boolValue;
+@property (assign) float analogValue;
+
+@end

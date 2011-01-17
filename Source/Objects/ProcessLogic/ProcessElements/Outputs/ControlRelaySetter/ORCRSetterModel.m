@@ -27,6 +27,12 @@
 @implementation ORCRSetterModel
 
 #pragma mark ¥¥¥Initialization
+- (void) dealloc
+{
+	[processResult release];
+	processResult = nil;
+	[super dealloc];
+}
 
 - (void) setUpImage
 {
@@ -95,17 +101,32 @@
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+
+- (void) processIsStarting
+{
+    [super processIsStarting];
+	[processResult release];
+	processResult = nil;
+}
+
+- (id) eval
 {
 	if(!alreadyEvaluated){
 		id obj = [self objectConnectedTo:OROutputElementInConnection];
-		[self setState:[obj eval]];
+		processResult = [obj eval];
+		[self setState:[processResult boolValue]];
 	}
-	[ORProcessThread setCR:bit value:[self state]];
+	[ORProcessThread setCR:bit value:processResult];
 	
-    [self setEvaluatedState:[self state]];
-	return evaluatedState;
+    [self setEvaluatedState:processResult != nil];
+	return processResult;
 }
 //--------------------------------
+- (void) processIsStopping
+{
+    [super processIsStopping];
+	[processResult release];
+	processResult = nil;
+}
 
 @end

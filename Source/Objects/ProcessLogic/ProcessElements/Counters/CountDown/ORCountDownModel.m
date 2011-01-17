@@ -173,15 +173,15 @@ NSString* ORCountDownLock							= @"ORCountDownLock";
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
     if(!alreadyEvaluated){
         alreadyEvaluated = YES;
         int oldSetState   = setState;
         int oldResetState = resetState;
         
-        int newResetState = [self evalInput2];
-        int newSetState   = [self evalInput1];
+        int newResetState = [[self evalInput2] boolValue];
+        int newSetState   = [[self evalInput1] boolValue];
         
         BOOL setStateTransition = NO;
         BOOL resetTransition    = NO;
@@ -216,7 +216,7 @@ NSString* ORCountDownLock							= @"ORCountDownLock";
         
     }
     [self setEvaluatedState:[self state]];
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 
 //--------------------------------

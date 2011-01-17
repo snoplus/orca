@@ -91,12 +91,12 @@ NSString* ORSimpleLogicOutConnection  = @"ORSimpleLogicOutConnection";
 
 //--------------------------------
 //runs in the process logic thread
-- (int) evalInput1
+- (id) evalInput1
 {
     id obj = [self objectConnectedTo:ORSimpleLogicIn1Connection];
 	return [obj eval];
 }
-- (int) evalInput2
+- (id) evalInput2
 {
     id obj = [self objectConnectedTo:ORSimpleLogicIn2Connection];
 	return [obj eval];

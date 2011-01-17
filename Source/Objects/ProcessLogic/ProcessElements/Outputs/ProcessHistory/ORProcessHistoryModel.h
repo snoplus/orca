@@ -37,7 +37,7 @@
 - (void) makeMainController;
 - (NSString*) elementName;
 - (void) processIsStarting;
-- (int) eval;
+- (id) eval;
 - (void) postUpdate;
 
 #pragma mark ¥¥¥Plot Data Source

@@ -24,6 +24,7 @@
 
 NSString* ORProcessElementStateChangedNotification  = @"ORProcessElementStateChangedNotification";
 NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedNotification";
+NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpdateNotification";
 
 @implementation ORProcessElementModel
 
@@ -404,7 +405,7 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 - (void) processIsStarting			{ partOfRun = YES; }
 - (void) processIsStopping			{ partOfRun = NO; }
 - (BOOL) partOfRun					{ return partOfRun; }
-- (int) eval						{ return 0; }
+- (id) eval							{ return nil; }
 
 - (void) postStateChange
 {
@@ -491,3 +492,17 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 }
 
 @end
+
+@implementation ORProcessResult
+
+@synthesize boolValue,analogValue;
+
++ (id) processState:(BOOL)aState value:(float)aValue
+{
+	ORProcessResult* aResult = [[ORProcessResult alloc] init];
+	aResult.boolValue = aState;
+	aResult.analogValue = aValue;
+	return [aResult autorelease];
+}
+@end
+ 

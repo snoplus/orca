@@ -24,6 +24,7 @@
 
 @interface ORCRSetterModel :  OROutputElement 
 {
+	id processResult;
 }
 - (void) setUpImage;
 - (void) makeMainController;
@@ -31,7 +32,7 @@
 - (NSString*) fullHwName;
 - (void) setBit:(int)aBit;
 - (void) addOverLay;
-- (int) eval;
+- (id) eval;
 
 
 @end

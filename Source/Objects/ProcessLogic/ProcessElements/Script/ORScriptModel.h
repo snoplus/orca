@@ -37,7 +37,7 @@
 - (NSString*) scriptPath;
 - (void) addOverLay;
 - (void) makeConnectors;
-- (int)	 eval;
+- (id)	 eval;
 
 @end
 

@@ -38,9 +38,9 @@
 - (void) setUpImage;
 - (void) makeMainController;
 - (void) processIsStarting;
-- (int) eval;
-- (int) evalInput1;
-- (int) evalInput2;
+- (id) eval;
+- (id) evalInput1;
+- (id) evalInput2;
 
 #pragma mark ¥¥¥Accessors
 - (NSTimeInterval) oneShotTime;

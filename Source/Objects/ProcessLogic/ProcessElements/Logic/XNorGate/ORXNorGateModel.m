@@ -38,11 +38,11 @@
 }
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
-    [self setState:![super eval]];
+    [self setState:![[super eval] boolValue]];
     [self setEvaluatedState:[self state]];
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 //--------------------------------
 

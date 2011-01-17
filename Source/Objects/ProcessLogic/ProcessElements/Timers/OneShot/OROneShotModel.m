@@ -133,15 +133,15 @@ NSString* OROneShotLock					= @"OROneShotLock";
     [self setState:0];
 }
 
-- (int) eval
+- (id) eval
 {
     if(!alreadyEvaluated){
         alreadyEvaluated = YES;
         int oldSetState   = setState;
         int oldResetState = resetState;
         
-        int newResetState = [self evalInput2];
-        int newSetState   = [self evalInput1];
+        int newResetState = [[self evalInput2] boolValue];
+        int newSetState   = [[self evalInput1] boolValue];
         
         BOOL setStateTransition = NO;
         BOOL resetTransition    = NO;
@@ -173,16 +173,16 @@ NSString* OROneShotLock					= @"OROneShotLock";
         alreadyEvaluated = YES;
 		[self setEvaluatedState:[self state]];
     }
-	return evaluatedState;
+	return [ORProcessResult processState: evaluatedState value:evaluatedState];
 }
 
-- (int) evalInput1
+- (id) evalInput1
 {
     id obj1 = [self objectConnectedTo:OROneShotInConnection];
     return [obj1 eval];
 }
 
-- (int) evalInput2
+- (id) evalInput2
 {
     id obj1 = [self objectConnectedTo:OROneShotResetConnection];
     return [obj1 eval];

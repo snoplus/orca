@@ -34,15 +34,15 @@
     NSArray*         allProcesses;
     ProcessElementSet*  inputs;
     ProcessElementSet*  outputs;
-	unsigned long    crBits[8];
+	id    crBits[256];
 }
 
 #pragma mark ¥¥¥Inialization
 + (ORProcessThread*) sharedProcessThread;
 + (void) registerInputObject:(id)anObject;
 + (void) registerOutputObject:(id)anObject;
-+ (void) setCR:(int)aBit value:(BOOL)aValue;
-+ (BOOL) getCR:(int)aBit;
++ (void) setCR:(int)aBit value:(id)aValue;
++ (id) getCR:(int)aBit;
 + (BOOL) isRunning;
 
 - (id) init;
@@ -59,8 +59,8 @@
 - (BOOL) nodesRunning:(NSArray*)someNodes;
 - (void) registerInputObject:(id)anObject;
 - (void) registerOutputObject:(id)anObject;
-- (void) setCR:(int)aBit value:(BOOL)aValue;
-- (BOOL) getCR:(int)aBit;
+- (void) setCR:(int)aBit value:(id)aValue;
+- (id) getCR:(int)aBit;
 
 #pragma mark ¥¥¥Thread
 - (void) start;

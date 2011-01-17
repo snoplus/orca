@@ -141,13 +141,13 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
 
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
     if(!alreadyEvaluated){
         alreadyEvaluated = YES;
         int oldSetState   = setState;
         
-        int newSetState   = [[self objectConnectedTo:ORScriptInputConnection] eval];
+        int newSetState   = [[[self objectConnectedTo:ORScriptInputConnection] eval] boolValue];
                 
         setState = newSetState;
 			
@@ -168,7 +168,7 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
         }
         
     }
-	return 0; //nothing can connect to this object so just return 0
+	return nil; //nothing can connect to this object so just return 0
 }
 
 //--------------------------------

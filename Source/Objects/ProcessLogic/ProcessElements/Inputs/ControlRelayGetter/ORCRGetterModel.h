@@ -24,6 +24,7 @@
 
 @interface ORCRGetterModel :  ORInputElement 
 {
+	float analogValue;
 }
 
 - (void) setUpImage;
@@ -32,7 +33,7 @@
 - (NSString*) fullHwName;
 - (void) setBit:(int)aBit;
 - (void) addOverLay;
-- (int) eval;
+- (id) eval;
 
 
 @end
