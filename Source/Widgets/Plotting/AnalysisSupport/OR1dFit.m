@@ -280,34 +280,27 @@ NSString* OR1dFitFunctionChanged = @"OR1dFitFunctionChanged";
 			[requestInputs setObject:[NSNumber numberWithInt:minChannel] forKey:@"FitLowerBound"];
 			[requestInputs setObject:[NSNumber numberWithInt:maxChannel] forKey:@"FitUpperBound"];	
 			
-			NSString* 	theFitFunction = kORCARootFitShortNames[fitType];
-			NSMutableArray* fitParameters = [NSMutableArray array];
+			NSString* 	theFitFunction = [[kORCARootFitShortNames[fitType] copy] autorelease];
+			NSArray* fitParameters = [NSArray array];
 			if([theFitFunction hasPrefix:@"arb"]){
-				//theFitFunction = [[fitFunction copy] autorelease];
-                                NSArray* arbInput = [fitFunction componentsSeparatedByString:@"; "];
-				theFitFunction = [[[arbInput objectAtIndex:0] copy] autorelease];
-			        NSLog(@"Sending fit function: %@\n", theFitFunction);
-                                if([arbInput count] > 1) {
-                                    fitParameters = [[arbInput objectAtIndex:1] componentsSeparatedByString:@", "];
-                                    NSNumberFormatter * formatter = [[NSNumberFormatter alloc] init];
-                                    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
-                                    int i;
-                                    for(i=0; i<[fitParameters count]; i++) {
-                                      [fitParameters replaceObjectAtIndex:i withObject:[formatter numberFromString:[fitParameters objectAtIndex:i]]];
-                                    }
-                                    [formatter release];
-			            NSLog(@"Sending fit parameters: %@\n", fitParameters);
-                                }
+				NSArray* arbInput = [fitFunction componentsSeparatedByString:@";"];
+				theFitFunction = [arbInput objectAtIndex:0];
+				NSLog(@"Sending fit function: %@\n", theFitFunction);
+				if([arbInput count] > 1) {
+					fitParameters = [[[arbInput objectAtIndex:1] trimSpacesFromEnds] componentsSeparatedByString:@","];
+					NSLog(@"Initial fit parameters:\n");
+					int i = 0;
+					for(id aParam in fitParameters)NSLog(@"[%d] : %@\n", i++,aParam);
+				}
 			}
 			else if([theFitFunction hasPrefix:@"pol"]){
 				theFitFunction = [theFitFunction stringByAppendingFormat:@"%d",fitOrder];
 			}
 
-			[requestInputs setObject:theFitFunction	 forKey:@"FitFunction"];
-			//[requestInputs setObject:[NSArray array] forKey:@"FitParameters"];
-			[requestInputs setObject:fitParameters     forKey:@"FitParameters"];
-			[requestInputs setObject:@""			 forKey:@"FitOptions"];
-			[requestInputs setObject:dataArray		 forKey:@"FitYValues"];
+			[requestInputs setObject:theFitFunction		forKey:@"FitFunction"];
+			[requestInputs setObject:fitParameters		forKey:@"FitParameters"];
+			[requestInputs setObject:@""				forKey:@"FitOptions"];
+			[requestInputs setObject:dataArray			forKey:@"FitYValues"];
 			
 			[serviceRequest setObject:requestInputs	forKey:@"Request Inputs"];
 			
