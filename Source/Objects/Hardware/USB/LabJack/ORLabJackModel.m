@@ -119,10 +119,6 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 			[noDriverAlarm setAcknowledged:NO];
 			[noDriverAlarm postAlarm];
 		}
-		if(!queue){
-			queue = [[NSOperationQueue alloc] init];
-			[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-		}	
 	}
 	@catch(NSException* localException) {
 	}
@@ -923,6 +919,10 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 #pragma mark ***HW Access
 - (void) queryAll
 {
+	if(!queue){
+		queue = [[NSOperationQueue alloc] init];
+		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+	}	
 	if ([[queue operations] count] == 0) {
 		ORLabJackQuery* anOp = [[ORLabJackQuery alloc] initWithDelegate:self];
 		[queue addOperation:anOp];
