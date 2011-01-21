@@ -57,7 +57,6 @@
                      selector : @selector(systemStateChanged:)
                          name : ORMPodCModelSystemParamsChanged
 						object: model];
-
 }
 
 - (void) awakeFromNib
@@ -77,7 +76,10 @@
 
 - (void) systemStateChanged:(NSNotification*)aNote
 {
-	[cratePowerStateField setStringValue: [model systemParamAsInt:@"sysMainSwitch"]?@"ON":@"OFF"];
+	[cratePowerStateField setStringValue:	[model systemParamAsInt:@"sysMainSwitch"]?@"ON":@"OFF"];
+	[opTimeField setIntValue:				[model systemParamAsInt:@"psOperatingTime"]];
+	[serialNumberField setStringValue:		[model systemParam:@"psSerialNumber"]];
+	[crateStatusField setStringValue:		[model systemParam:@"sysStatus"]];
 }
 
 - (void) checkGlobalSecurity
@@ -135,6 +137,11 @@
 - (IBAction) updateAction:(id)sender
 {
 	[model updateAllValues];
+}
+
+- (IBAction) clearHistoryAction:(id)sender
+{
+	[model clearHistory];
 }
 
 #pragma mark •••Data Source

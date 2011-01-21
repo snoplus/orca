@@ -129,6 +129,24 @@
                        object : nil];
 }
 
+- (id) controllerCard
+{
+	return adapter;
+}
+
+
+- (void) pollCratePower
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCratePower) object:nil];
+    @try {
+        //if(![[ORGlobal sharedInstance] runInProgress]){
+        [[self controllerCard] checkCratePower];
+        //}
+    }
+	@catch(NSException* localException) {
+    }
+    [self performSelector:@selector(pollCratePower) withObject:nil afterDelay:1];
+}
 
 - (void) powerFailed:(NSNotification*)aNotification
 {

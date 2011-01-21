@@ -27,11 +27,10 @@
 {
 }
 
+#pragma mark ¥¥¥Initialization
 - (id) init;
+- (void) updateWindow;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
-
-#pragma mark ¥¥¥Actions
-
 @end

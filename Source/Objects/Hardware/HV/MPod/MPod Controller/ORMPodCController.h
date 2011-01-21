@@ -24,6 +24,8 @@
 @interface ORMPodCController : OrcaObjectController 
 {
 	IBOutlet NSButton*			  lockButton;
+	IBOutlet NSTextField*		  opTimeField;
+	IBOutlet NSTextField*		  serialNumberField;
 	IBOutlet NSTextField*		  crateStatusField;
 	IBOutlet NSTextField*		  cratePowerStateField;
 	IBOutlet NSComboBox*		  ipNumberComboBox;
@@ -48,5 +50,6 @@
 - (IBAction) ipNumberAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) updateAction:(id)sender;
+- (IBAction) clearHistoryAction:(id)sender;
 
 @end

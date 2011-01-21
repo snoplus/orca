@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10H574</string>
+		<string key="IBDocument.SystemVersion">10J567</string>
 		<string key="IBDocument.InterfaceBuilderVersion">762</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">461.00</string>
+		<string key="IBDocument.HIToolboxVersion">462.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">762</string>
@@ -129,7 +129,7 @@
 						<object class="NSTextField" id="307987623">
 							<reference key="NSNextResponder" ref="672222250"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{191, 138}, {58, 17}}</string>
+							<string key="NSFrame">{{39, 69}, {67, 17}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="443776322">
@@ -145,7 +145,7 @@
 								<reference key="NSBackgroundColor" ref="959903181"/>
 								<object class="NSColor" key="NSTextColor">
 									<int key="NSColorSpace">1</int>
-									<bytes key="NSRGB">MSAwLjAyNDM3ODgzNiAwLjA0Nzk1OTUwNwA</bytes>
+									<bytes key="NSRGB">MC43NDQ4OTc5NTkyIDAuMDI0OTQ2MjU0MjggMC4wNDkyMDEwMDY1MwA</bytes>
 								</object>
 							</object>
 						</object>
@@ -244,10 +244,10 @@
 						<reference key="object" ref="672222250"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="307987623"/>
 							<reference ref="679016295"/>
-							<reference ref="644564861"/>
 							<reference ref="962082114"/>
+							<reference ref="644564861"/>
+							<reference ref="307987623"/>
 						</object>
 						<reference key="parent" ref="887694496"/>
 					</object>
@@ -367,7 +367,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">49</int>
+			<int key="maxID">51</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -617,6 +617,20 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/HV/HVControl/ORHVSupply.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCard.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Controller/ORMPodCModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1765,6 +1779,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">WebKit.framework/Headers/WebUIDelegate.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">YAJL.framework/Headers/NSObject+YAJL.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

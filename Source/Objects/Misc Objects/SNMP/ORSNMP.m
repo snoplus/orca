@@ -239,6 +239,7 @@
 	}
 	else [aDictionary removeAllObjects];
 }
+
 - (void) parseParamValue:(NSString*)s intoDictionary:(NSMutableDictionary*)aDictionary
 {
 	NSString* type = [aDictionary objectForKey:@"Type"];
@@ -263,11 +264,8 @@
 				else [onBitNames addObject:aPart];
 			}
 		}
-		if([theValue length]){
-			NSScanner* scanner = [NSScanner scannerWithString:theValue];
-			unsigned x;
-			[scanner scanHexInt:&x];
-			[aDictionary setObject:[NSNumber numberWithUnsignedLong:x] forKey:@"Value"];
+		if([theValue length]){			
+			[aDictionary setObject:[NSNumber numberWithUnsignedLong:[self convertBitString:theValue]] forKey:@"Value"];
 			if([onBitNames count])[aDictionary setObject:onBitNames forKey:@"OnBits"];
 		}
 	}
@@ -291,15 +289,38 @@
 {
 	//Example: "1600 RPM"     --has units
 	//Example: "64"  --no units
+	//Example: "xxxx(100)  -no units but has a string prefix
 	NSArray* parts = [s componentsSeparatedByString:@" "];
 	if([parts count] == 2){
 		[aDictionary setObject:[NSNumber numberWithFloat:[s floatValue]] forKey:@"Value"];
 		[aDictionary setObject:[parts objectAtIndex:1] forKey:@"Units"];
 	}
 	else {
-		if([s hasPrefix:@"on"])		  [aDictionary setObject:[NSNumber numberWithFloat:1] forKey:@"Value"];
-		else if([s hasPrefix:@"off"]) [aDictionary setObject:[NSNumber numberWithFloat:0] forKey:@"Value"];
+		NSArray* parts = [s componentsSeparatedByString:@"("];
+		if([parts count] == 2){
+			[aDictionary setObject:[NSNumber numberWithFloat:[[parts objectAtIndex:1] floatValue]] forKey:@"Value"];
+		}
 		else [aDictionary setObject:[NSNumber numberWithFloat:[s floatValue]] forKey:@"Value"];
 	}
+}
+- (unsigned long) convertBitString:(NSString*)s
+{
+	unsigned long finalReversedValue = 0;
+	int n = [s length];
+	int i;
+	for(i=n-1 ; i>=0 ; i--){
+		NSScanner* scanner = [NSScanner scannerWithString:[s substringWithRange:NSMakeRange(i,1)]];
+		unsigned unreversedHexByte;
+		[scanner scanHexInt:&unreversedHexByte];
+		int j;
+		//flip the bits
+		unsigned long reversedHexByte = 0;
+		for(j=0;j<4;j++){
+			if(unreversedHexByte & 0x1) reversedHexByte |= (0x8>>j);
+			unreversedHexByte >>= 1;
+		}
+		finalReversedValue += reversedHexByte << (i*4);
+	}
+	return finalReversedValue;
 }
 @end

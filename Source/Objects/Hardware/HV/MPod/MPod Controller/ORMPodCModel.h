@@ -28,12 +28,12 @@
 	unsigned		ipNumberIndex;
 	NSString*		IPNumber;
 	NSTask*			pingTask;
-	
 	NSMutableDictionary* systemParams;
+	NSOperationQueue* queue;
 }
 
 #pragma mark ***Accessors
-- (int) systemParamAsInt:(NSString*)name;
+- (BOOL) power;
 - (void) initConnectionHistory;
 - (void) clearHistory;
 - (unsigned) connectionHistoryCount;
@@ -44,28 +44,40 @@
 - (void) updateAllValues;
 - (NSArray*) systemUpdateList;
 - (void) processSystemResponseArray:(NSArray*)response;
+- (int) systemParamAsInt:(NSString*)name;
+- (id) systemParam:(NSString*)name;
 
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard;
-
 - (void) ping;
 - (BOOL) pingTaskRunning;
 - (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
 - (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
-
+- (void) pollHardware;
+- (void) pollHardwareAfterDelay;
 @end
 
 extern NSString* ORMPodCModelCrateStatusChanged;
-extern NSString* ORMPodCModelCratePowerStateChanged;
 extern NSString* ORMPodCModelLock;
 extern NSString* ORMPodCPingTask;
 extern NSString* MPodCIPNumberChanged;
 extern NSString* ORMPodCModelSystemParamsChanged;
+extern NSString* MPodPowerFailedNotification;
+extern NSString* MPodPowerRestoredNotification;
 
 @interface NSObject (ORMpodCModel)
 - (void) precessReadResponseArray:(NSArray*)response;
 - (void) processSystemResponseArray:(NSArray*)response;
 
+@end
+
+@interface ORMPodCUpdateOp : NSOperation
+{
+	id delegate;
+}
+- (id) initWithDelegate:(id)aDelegate;
+- (void) dealloc;
+- (void) main;
 @end

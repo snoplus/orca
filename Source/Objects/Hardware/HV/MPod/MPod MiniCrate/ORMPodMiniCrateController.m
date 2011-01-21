@@ -19,11 +19,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORMPodMiniCrateController.h"
 #import "ORMPodMiniCrateModel.h"
-
 
 @implementation ORMPodMiniCrateController
 
@@ -38,24 +36,27 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"MPod Minicrate %d",[model uniqueIdNumber]]];
 }
 
-#pragma mark ¥¥¥Accessors
-
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
 	[super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
 
+	
     [notifyCenter addObserver : self
                      selector : @selector(powerFailed:)
                          name : @"MPodPowerFailedNotification"
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(powerRestored:)
                          name : @"MPodPowerRestoredNotification"
                        object : nil];
+}
 
+- (void) updateWindow
+{
+	[super updateWindow];
 }
 
 @end

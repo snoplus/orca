@@ -24,20 +24,24 @@
 #import "ORTaskSequence.h"
 #import "ORSNMP.h"
 
-NSString* ORMPodCModelCrateStatusChanged = @"ORMPodCModelCrateStatusChanged";
-NSString* ORMPodCModelCratePowerStateChanged = @"ORMPodCModelCratePowerStateChanged";
-NSString* ORMPodCModelLock		= @"ORMPodCModelLock";
-NSString* ORMPodCPingTask		= @"ORMPodCPingTask";
-NSString* MPodCIPNumberChanged	= @"MPodCIPNumberChanged";
-NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
+NSString* ORMPodCModelCrateStatusChanged	 = @"ORMPodCModelCrateStatusChanged";
+NSString* ORMPodCModelLock					 = @"ORMPodCModelLock";
+NSString* ORMPodCPingTask					 = @"ORMPodCPingTask";
+NSString* MPodCIPNumberChanged				 = @"MPodCIPNumberChanged";
+NSString* ORMPodCModelSystemParamsChanged	 = @"ORMPodCModelSystemParamsChanged";
+NSString* MPodPowerFailedNotification		 = @"MPodPowerFailedNotification";
+NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 
 @implementation ORMPodCModel
 
 - (void) dealloc
 {
+	[queue cancelAllOperations];
+	[queue release];
 	[systemParams release];
 	[connectionHistory release];
     [IPNumber release];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
 
@@ -45,7 +49,21 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 {
     if([self aWake])return;
     [super wakeUp];
-	[self updateAllValues];
+	if(!queue){
+		queue = [[NSOperationQueue alloc] init];
+		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+		[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+	}
+	[self pollHardwareAfterDelay];
+}
+
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[queue cancelAllOperations];
+	[queue release];
+	queue = nil;
+	[super sleep];
 }
 
 #pragma mark ¥¥¥Initialization
@@ -80,7 +98,19 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 	}
 	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
 }
+
 #pragma mark ***Accessors
+
+- (BOOL) power
+{
+    return [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
+}
+- (id) systemParam:(NSString*)name
+{
+	id result =  [[systemParams objectForKey:name] objectForKey:@"Value"];
+	if(result)return result;
+	else return @"";
+}
 
 - (int) systemParamAsInt:(NSString*)name
 {
@@ -110,6 +140,7 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 {
 	return ipNumberIndex;
 }
+
 - (NSString*) IPNumber
 {
 	if(!IPNumber)return @"";
@@ -138,6 +169,35 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 	}
 }
 
+- (void) pollHardware
+{
+	for(id aCard in [[self crate] orcaObjects]){
+		ORMPodCUpdateOp* anUpdateOp = [[ORMPodCUpdateOp alloc] initWithDelegate:aCard];
+		[queue addOperation:anUpdateOp];
+		[anUpdateOp release];
+	}
+}
+
+- (void) pollHardwareAfterDelay
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:2];
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
+                         change:(NSDictionary *)change context:(void *)context
+{
+    if (object == queue && [keyPath isEqual:@"operations"]) {
+        if ([[queue operations] count] == 0) {
+			[self performSelectorOnMainThread:@selector(pollHardwareAfterDelay) withObject:nil waitUntilDone:NO];
+        }
+		
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object 
+                               change:change context:context];
+    }
+}
 - (void) updateAllValues
 {
 	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:)];
@@ -146,26 +206,57 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 - (NSArray*) systemUpdateList
 {
 	NSArray* systemReadParams = [NSArray arrayWithObjects:
-								 @"sysMainSwitch.0",
-								 @"sysStatus.0",	
+								 @"sysMainSwitch",
+								 @"sysStatus",	
+								 @"psSerialNumber",
+								 @"psOperatingTime",
 								 nil];
-	return systemReadParams;
+	NSMutableArray* convertedArray = [NSMutableArray array];
+	for(id aParam in systemReadParams){
+		[convertedArray addObject:[aParam stringByAppendingString:@".0"]];
+	}
+	return convertedArray;
 }
 
 - (void) processSystemResponseArray:(NSArray*)response
 {
 	for(id anEntry in response){
 		if(!systemParams)systemParams = [[NSMutableDictionary dictionary] retain];
-		NSString* name = [anEntry objectForKey:@"Name"];
-		if(name)[systemParams setObject:anEntry forKey:name];
+		NSString* error = [anEntry objectForKey:@"Error"];
+		if([error length]){
+			if([error rangeOfString:@"Timeout"].location != NSNotFound){
+				[systemParams release];
+				systemParams = nil; 
+				//time so flush the queue
+				[queue cancelAllOperations];
+			}
+		}
+		else {
+			NSString* name  = [anEntry objectForKey:@"Name"];
+			if(name)[systemParams setObject:anEntry forKey:name];
+		}
 	}
+	
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
 }
+
 
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard
 {
 	return [[self crate] controllerCard];
+}
+
+
+
+- (void)  checkCratePower
+{
+	NSString* noteName;
+	if([self power]) noteName = MPodPowerRestoredNotification;
+	else			 noteName = MPodPowerFailedNotification;
+	[[NSNotificationCenter defaultCenter] postNotificationName:noteName object:self];
+	
 }
 
 - (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
@@ -177,7 +268,8 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 {
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"WIENER-CRATE-MIB"];
 	[ss openPublicSession:IPNumber];
-	[aTarget performSelector:aSelector withObject:[ss readValues:cmds]];
+	NSArray* response = [ss readValues:cmds];
+	[aTarget performSelectorOnMainThread:aSelector withObject:response waitUntilDone:YES];
 	[ss release];
 }
 
@@ -190,7 +282,8 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
 {
 	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"WIENER-CRATE-MIB"];
 	[ss openGuruSession:IPNumber];
-	[aTarget performSelector:aSelector withObject:[ss writeValues:cmds]];
+	NSArray* response = [ss writeValues:cmds];
+	[aTarget performSelectorOnMainThread:aSelector withObject:response waitUntilDone:YES];
 	[ss release];
 }
 
@@ -255,4 +348,27 @@ NSString* ORMPodCModelSystemParamsChanged	= @"ORMPodCModelSystemParamsChanged";
  	[encoder encodeObject:IPNumber		forKey:@"IPNumber"];
 }
 
+@end
+
+@implementation ORMPodCUpdateOp
+- (id) initWithDelegate:(id)aDelegate
+{
+	self = [super init];
+	delegate = aDelegate;
+    return self;
+}
+
+- (void) dealloc
+{
+	[super dealloc];
+}
+
+- (void) main
+{
+	@try {
+		[delegate updateAllValues];
+	}
+	@catch(NSException* e){
+	}
+}
 @end
