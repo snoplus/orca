@@ -324,6 +324,7 @@
 			NSAttributedString* s = [[NSAttributedString alloc] initWithString:aLine attributes:attrsDictionary];
 			NSSize labelSize = [s size];
 			if(labelSize.width > longest)longest = labelSize.width;
+			[s release];
 		}
 		float starty = height;
 		for(id aLine in lines){
