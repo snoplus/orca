@@ -612,9 +612,9 @@
         }
         else if([[tableColumn identifier] isEqualToString:@"Value"]){
             if(item==0){
-                return [[NSAttributedString alloc] 
+                return [[[NSAttributedString alloc] 
                         initWithString:[NSString stringWithFormat:@"%d key/value pairs",[[model header] count]] 
-                            attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]];
+                            attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]]autorelease];
             }
             else {
 				if([item respondsToSelector:@selector(isLeafNode)]){
@@ -622,9 +622,9 @@
 						return [NSString stringWithFormat:@"%@",[item object]];
 					}
 					else {
-						return [[NSAttributedString alloc] 
+						return [[[NSAttributedString alloc] 
 							initWithString:[NSString stringWithFormat:@"%d key/value pairs",[item count]] 
-								attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]];            
+								attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]] autorelease];            
 					}
 				}
 				else return item;
