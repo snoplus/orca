@@ -102,7 +102,7 @@
 	unsigned char edgeDection	= (*ptr& 0x06000000)>>25; 
 	int i;
 	for(i=0;i<length-2;i++) {
-		if((ptr[i]>>27) & 0x1f == 0) {
+		if(((ptr[i]>>27) & 0x1f) == 0) {
 			short chan = (ptr[i]>>19) & 0x7f;
 			BOOL  type = (ptr[i]>>26) & 0x1;
 
