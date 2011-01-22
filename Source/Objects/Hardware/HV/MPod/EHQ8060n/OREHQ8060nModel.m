@@ -656,10 +656,9 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-	int i;
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-	[self addCurrentState:objDictionary cIntArray:target forKey:[@"target" stringByAppendingFormat:@"%d",i]];
-	[self addCurrentState:objDictionary cFloatArray:maxCurrent forKey:[@"maxCurrent" stringByAppendingFormat:@"%d",i]];
+	[self addCurrentState:objDictionary cIntArray:target forKey:@"target"];
+	[self addCurrentState:objDictionary cFloatArray:maxCurrent forKey:@"maxCurrent"];
     [objDictionary setObject:[NSNumber numberWithFloat:riseRate] forKey:@"riseRate"];
 	
     return objDictionary;
