@@ -664,7 +664,7 @@
 		
 	NSString* title= @"SIS3302 Lost Records\n\n";
     
-	NSString* data;
+	NSString* data = @"";
 	NSString* crateString   = [NSString stringWithFormat:@"Crate = %d\n",crate];
     NSString* cardString    = [NSString stringWithFormat:@"Card  = %d\n",card];    
     NSString* channelString = [NSString stringWithFormat:@"Card  = %d\n",channel];  

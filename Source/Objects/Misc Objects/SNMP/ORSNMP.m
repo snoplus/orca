@@ -127,7 +127,7 @@
 	//example: outputSwitch.u7 i 1
 	NSMutableArray* resultArray = [NSMutableArray array];
 	if (sessionHandle){
-		struct snmp_pdu *response;
+		struct snmp_pdu* response = nil;
 				
 		oid    anOID[MAX_OID_LEN];
 		size_t anOID_len = MAX_OID_LEN;
