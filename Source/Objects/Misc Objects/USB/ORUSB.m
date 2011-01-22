@@ -293,7 +293,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	UInt16			release;
 	UInt32			locationID;
 	
-    while (usbDevice = IOIteratorNext(iterator)){
+    while ((usbDevice = IOIteratorNext(iterator))){
 		IOCFPlugInInterface**	plugInInterface=NULL;
 		NSString*				deviceNameAsString;  
 		io_name_t				deviceName;
@@ -540,7 +540,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     IOReturn kr = (*dev)->CreateInterfaceIterator(dev, &request, &iterator);
 	
     io_service_t  usbInterface;
-    while (usbInterface = IOIteratorNext(iterator)) {
+    while ((usbInterface = IOIteratorNext(iterator))) {
 		IOUSBInterfaceInterface197** intf = NULL;
 		IOCFPlugInInterface** plugInInterface = NULL;
 		SInt32  score;

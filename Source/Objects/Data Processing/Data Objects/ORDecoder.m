@@ -122,7 +122,7 @@
     
     NSString* s = firstKey;
 	id result = [fileHeader objectForKey:s];
-	while(s = va_arg(myArgs, NSString *)) {
+	while((s = va_arg(myArgs, NSString *))) {
 		result = [result objectForKey:s];
     }
     va_end(myArgs);

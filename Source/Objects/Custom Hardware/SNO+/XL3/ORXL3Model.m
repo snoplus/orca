@@ -1123,7 +1123,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		[self deselectCards];
 		//read XL3 select register
 		unsigned long aValue = [self readXL3Register:kXl3CsReg];
-		if (aValue & 0x100UL == 0) { 
+		if ((aValue & 0x100UL) == 0) { 
 			NSLog(@"Xilinx doesn't seem to be loaded, keeping it anyway!\n");
 		}
 		

@@ -62,7 +62,7 @@
 {
 	NSString* s = firstKey;
 	id result = [self objectForKey:s];
-	while(s = va_arg(keyList, NSString *)) {
+	while((s = va_arg(keyList, NSString *))) {
 		result = [result objectForKey:s];
     }
 	return result;
@@ -75,7 +75,7 @@
     
     NSString* s = firstKey;
 	id result = [self objectForKey:s];
-	while(s = va_arg(myArgs, NSString *)) {
+	while((s = va_arg(myArgs, NSString *))) {
 		result = [result objectForKey:s];
     }
     va_end(myArgs);

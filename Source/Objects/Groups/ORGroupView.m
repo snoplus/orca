@@ -944,14 +944,14 @@
     //get connector at pt1
     NSEnumerator* e  = [[group orcaObjects] reverseObjectEnumerator];
     OrcaObject* anObject;
-    while (anObject = [e nextObject]) {
-        if(c1 = [anObject connectorAt:pt1])break;
+    while ((anObject = [e nextObject])) {
+        if((c1 = [anObject connectorAt:pt1]))break;
     }
     
     if(c1!= nil){
         e  = [[group orcaObjects] reverseObjectEnumerator];
-        while (anObject = [e nextObject]) {
-            if(c2 = [anObject connectorAt:pt2])break;
+        while ((anObject = [e nextObject])) {
+            if((c2 = [anObject connectorAt:pt2]))break;
         }
     }
     

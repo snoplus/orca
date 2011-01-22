@@ -390,7 +390,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 			[self removeObjects:[removedObject orcaObjects]];
 		}
 		id item;
-		while(item = [self itemHolding:removedObject]){
+		while((item = [self itemHolding:removedObject])){
 			[self removeObject:item];
 		}
 	}

@@ -60,9 +60,9 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     NSBundle* gpibEnetBundle = [NSBundle bundleWithPath:
 								[NSString stringWithFormat:@"%@/%@",plugInDirectory,[ self pluginName ]]];
     
-    Class gpibEnetClass;
+    Class gpibEnetClass = [gpibEnetBundle principalClass];
     
-    if (gpibEnetClass = [gpibEnetBundle principalClass]) {
+    if (gpibEnetClass) {
         gpibEnetInstance = [[gpibEnetClass alloc] init];
         if ( ! [gpibEnetInstance isLoaded] ) {
             /* The class failed to load, no NI488 framework exists. */

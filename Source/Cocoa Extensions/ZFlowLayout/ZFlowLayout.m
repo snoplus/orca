@@ -85,7 +85,7 @@ NSColor *_backgroundColor, *_gridColor;
 - (void) awakeFromNib
 {
     NSScrollView *sv;
-    if ( sv = [self enclosingScrollView] ) {
+    if (( sv = [self enclosingScrollView]) ) {
          
         /*
         Resize self to fit scrollview

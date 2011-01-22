@@ -293,7 +293,7 @@
         
         [data getBytes:localBuffer range:NSMakeRange(pos, bufferLen)];
         written = write(fileDescriptor, localBuffer, bufferLen);
-        if (error = (written == 0)) // error condition
+        if ((error = (written == 0))) // error condition
             break;
         pos += written;
         

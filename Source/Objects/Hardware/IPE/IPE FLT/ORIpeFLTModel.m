@@ -1380,7 +1380,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		
 		int aChan;
 		for(aChan=0;aChan<kNumFLTChannels;aChan++){	
-		    if (( (pixelList >> aChan) & 0x1 == 0x1)) {	
+		    if ((((pixelList >> aChan) & 0x1) == 0x1)) {	
 			    //NSLog(@"Reading channel (%d,%d)\n", [self slot], aChan);
 				
 				locationWord &= 0xffff0000;

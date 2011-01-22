@@ -100,7 +100,7 @@
 		// Create a list of the matched devices
 		io_object_t			newDevice;			// Matched device
 		NSMutableArray* deviceList = [NSMutableArray array];
-		while( newDevice = IOIteratorNext( enumerator ) ) {
+		while( (newDevice = IOIteratorNext( enumerator )) ) {
 			[deviceList addObject:[NSNumber numberWithLong:newDevice]];
 		}
 		if([deviceList count]){

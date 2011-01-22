@@ -1225,13 +1225,13 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 - (BOOL)  readHasData
 {
  	unsigned long data = [self readControlStatus];
-	return ((data >> kKatrinFlt_Cntrl_BufState_Shift) & 0x3 == 0x1);
+	return (((data >> kKatrinFlt_Cntrl_BufState_Shift) & 0x3) == 0x1);
 }
 
 - (BOOL)  readIsOverflow
 {
  	unsigned long data = [self readControlStatus];
-	return ((data >> kKatrinFlt_Cntrl_BufState_Shift) & 0x3 == 0x3);
+	return (((data >> kKatrinFlt_Cntrl_BufState_Shift) & 0x3) == 0x3);
 }
 
 
@@ -1339,8 +1339,8 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 	NSLog(@"FLT %d status Reg: 0x%08x\n",[self stationNumber],status);
 	NSLog(@"Revision: %d\n",(status>>kKatrinFlt_Cntl_Version_Shift) & kKatrinFlt_Cntl_Version_Mask);
 	NSLog(@"SlotID  : %d\n",(status>>kKatrinFlt_Cntrl_CardID_Shift) & kKatrinFlt_Cntrl_CardID_Mask);
-	NSLog(@"Has Data: %@\n",((status>>kKatrinFlt_Cntrl_BufState_Shift) & kKatrinFlt_Cntrl_BufState_Mask == 0x1)?@"YES":@"NO");
-	NSLog(@"OverFlow: %@\n",((status>>kKatrinFlt_Cntrl_BufState_Shift) & kKatrinFlt_Cntrl_BufState_Mask == 0x3)?@"YES":@"NO");
+	NSLog(@"Has Data: %@\n",(((status>>kKatrinFlt_Cntrl_BufState_Shift) & kKatrinFlt_Cntrl_BufState_Mask) == 0x1)?@"YES":@"NO");
+	NSLog(@"OverFlow: %@\n",(((status>>kKatrinFlt_Cntrl_BufState_Shift) & kKatrinFlt_Cntrl_BufState_Mask) == 0x3)?@"YES":@"NO");
 	NSLog(@"Mode    : %d\n",((status>>kKatrinFlt_Cntrl_Mode_Shift) & kKatrinFlt_Cntrl_Mode_Mask));
 	NSLog(@"WritePtr: %d\n",((status>>kKatrinFlt_Cntrl_Write_Shift) & kKatrinFlt_Cntrl_Write_Mask));
 	NSLog(@"ReadPtr : %d\n",((status>>kKatrinFlt_Cntrl_ReadPtr_Shift) & kKatrinFlt_Cntrl_ReadPtr_Mask));

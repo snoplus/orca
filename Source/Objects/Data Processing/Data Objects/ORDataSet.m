@@ -541,7 +541,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		
 		OR1DHisto* histo = [nextLevel data];
@@ -595,7 +595,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		
 		OR1DHisto* histo = [nextLevel data];
@@ -698,7 +698,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCountsBy: counts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		OR1DHisto* histo = [nextLevel data];
 		if(!histo){
@@ -753,7 +753,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		
 		OR2DHisto* histo = [nextLevel data];
@@ -849,7 +849,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		
 		OR2DHisto* histo = [nextLevel data];
@@ -902,7 +902,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		
 		OR2DHisto* histo = [nextLevel data];
@@ -953,7 +953,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		[nextLevel clearWithUpdate:update];
 		
@@ -987,7 +987,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		ORWaveform* waveform = [nextLevel data];
 		if(!waveform){
@@ -1038,7 +1038,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			}
 			[currentLevel incrementTotalCounts];
 			
-		} while(s = va_arg(myArgs, NSString *));
+		} while((s = va_arg(myArgs, NSString *)));
 		
 		[[aSpectrum retain] autorelease];
 		OR1DHisto* histo = [nextLevel data];
@@ -1088,7 +1088,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         }
         [currentLevel incrementTotalCounts];
         
-    } while(s = va_arg(myArgs, NSString *));
+    } while((s = va_arg(myArgs, NSString *)));
     
     va_end(myArgs);
     
@@ -1120,7 +1120,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         }
         [currentLevel incrementTotalCounts];
         
-    } while(s = va_arg(myArgs, NSString *));
+    } while((s = va_arg(myArgs, NSString *)));
     
     ORMaskedWaveform* waveform = [nextLevel data];
     if(!waveform){
@@ -1170,7 +1170,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         }
         [currentLevel incrementTotalCounts];
         
-    } while(s = va_arg(myArgs, NSString *));
+    } while((s = va_arg(myArgs, NSString *)));
     
     ORMaskedIndexedWaveform* waveform = [nextLevel data];
     if(!waveform){
@@ -1229,7 +1229,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         }
         [currentLevel incrementTotalCounts];
         
-    } while(s = va_arg(myArgs, NSString *));
+    } while((s = va_arg(myArgs, NSString *)));
     
     ORMaskedIndexedWaveformWithSpecialBits* waveform = [nextLevel data];
     if(!waveform){
@@ -1285,7 +1285,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         }
         [currentLevel incrementTotalCounts];
         
-    } while(s = va_arg(myArgs, NSString *));
+    } while((s = va_arg(myArgs, NSString *)));
 	
     ORGenericData* genericData = [nextLevel data];
     if(!genericData){
@@ -1372,7 +1372,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
             [nextLevel release];
         }
         
-    } while(s = va_arg(myArgs, NSString *));
+    } while((s = va_arg(myArgs, NSString *)));
 	
     ORScalerSum* scalerSumData = [nextLevel data];
     if(!scalerSumData){
@@ -1415,7 +1415,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         }
         [currentLevel incrementTotalCounts];
         
-    } while(s = va_arg(myArgs, NSString *));
+    } while((s = va_arg(myArgs, NSString *)));
 	
     ORPlotTimeSeries* timeSeries = [nextLevel data];
     if(!timeSeries){

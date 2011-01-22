@@ -611,7 +611,7 @@ static const int currentVersion = 1;           // Current version
     NSFileManager* fm = [NSFileManager defaultManager];
     NSString* fullFileName = openFilePath;
     NSDictionary *fattrs = [fm attributesOfItemAtPath:fullFileName error:nil];
-    if (fsize = [fattrs objectForKey:NSFileSize]){
+    if ((fsize = [fattrs objectForKey:NSFileSize])){
         [self setDataFileSize:[fsize intValue]];
     }
 	checkCount++;

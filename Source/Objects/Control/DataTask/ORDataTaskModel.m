@@ -409,7 +409,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	//ship pending records.
 	if(areRecordsPending){
 		id rec;
-		while(rec = [recordsPending dequeue]){
+		while((rec = [recordsPending dequeue])){
 			[aDataPacket addData:rec];
 		}
 		areRecordsPending = NO;
@@ -587,7 +587,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
     [self setLastFile:[decoder decodeObjectForKey:ORDataTaskLastFile]];
     [self setTimeScaler:[decoder decodeIntForKey:ORDataTaskTimeScaler]];
     [[self undoManager] enableUndoRegistration];
-  	if(timeScaler=0)timeScaler = 1;
+  	if(timeScaler==0)timeScaler = 1;
     
     timerLock = [[NSLock alloc] init];
     [self registerNotificationObservers];
@@ -736,7 +736,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 {
 	if(areRecordsPending){
 		id rec;
-		while(rec = [recordsPending dequeue]){
+		while((rec = [recordsPending dequeue])){
 			[aDataPacket addData:rec];
 		}
 		areRecordsPending = NO;

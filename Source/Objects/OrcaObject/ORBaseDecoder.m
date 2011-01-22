@@ -165,7 +165,7 @@ static NSString* kCrateKey[16] = {
 			lastDictionary = [NSMutableDictionary dictionary];
 			[cachedObjects setObject:lastDictionary forKey:s];
 		}
-		while(s = va_arg(myArgs, NSString *)) {
+		while((s = va_arg(myArgs, NSString *))) {
 			argIndex++;
 			if(argIndex>=count){
 				[lastDictionary setObject: obj forKey:s];
