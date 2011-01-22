@@ -19,9 +19,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORPxiIOCard.h";
-#import "ORDataTaker.h";
-#import "ORHWWizard.h";
+#import "ORPxiIOCard.h"
+#import "ORDataTaker.h"
+#import "ORHWWizard.h"
 #import "SBC_Config.h"
 
 @class ORRateGroup;

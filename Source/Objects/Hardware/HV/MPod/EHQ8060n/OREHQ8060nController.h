@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "OrcaObjectController.h";
+#import "OrcaObjectController.h"
 
 @class ORPlotView;
 

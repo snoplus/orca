@@ -20,7 +20,7 @@
 
 #pragma mark ***Imported Files
 
-#import "ORMPodCard.h";
+#import "ORMPodCard.h"
 #import "SBC_Config.h"
 
 @class ORAlarm;
