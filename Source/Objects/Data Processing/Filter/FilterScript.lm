@@ -135,7 +135,7 @@ void fsSingleLineComment()
 {
 	//just eat comments, carefully counting lines as needed
 	char c;
-	while (c = input()){
+	while ((c = input())){
 		if(c=='\n'){
 			numFilterLines++;
 			break;
