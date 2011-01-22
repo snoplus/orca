@@ -264,9 +264,9 @@ NSString* ORCameraModelMovieChanged				= @"ORCameraModelMovieChanged";
 			[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow: 0.1]];
 		}
 		else {
-			captureSession ? [captureSession release]:0;
-			captureDeviceInput ? [captureDeviceInput release]:0;
-			captureDecompressedVideoOutput ? [captureDecompressedVideoOutput release]:0;
+			[captureSession release];
+			[captureDeviceInput release];
+			[captureDecompressedVideoOutput release];
 			
 			captureSession = nil;
 			captureDeviceInput = nil;
