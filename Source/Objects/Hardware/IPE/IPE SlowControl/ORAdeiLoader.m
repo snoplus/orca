@@ -271,6 +271,8 @@
 		NSMutableDictionary* dictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys: host, @"URL", path, @"Path", nil];
 		[resultArray addObject: dictionary];
 		[resultArray addObject: [receivedData description]];
+		[dictionary release];
+		
 	}
 	else {
 		NSLog(@"ADEI Loader: ERROR: unknown dataFormat %i!\n",dataFormat);
