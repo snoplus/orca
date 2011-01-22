@@ -645,7 +645,7 @@
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	if(aTableView == aTableView)return 37;
+	if(rdacTableView == aTableView)return 37;
 	else return 8;
 }
 
