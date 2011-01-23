@@ -32,8 +32,10 @@
 - (unsigned long)   exceptionCount;
 - (void)			incExceptionCount;
 - (void)			clearExceptionCount;
-- (void)			precessReadResponseArray:(NSArray*)reponse;
+- (void)			processReadResponseArray:(NSArray*)reponse;
 - (void)			processSystemResponseArray:(NSArray*)reponse;
+- (void)			processSyncResponseArray:(NSArray*)response;
+- (void)			processWriteResponseArray:(NSArray*)response;
 @end
 
 #pragma mark ¥¥¥External String Definitions

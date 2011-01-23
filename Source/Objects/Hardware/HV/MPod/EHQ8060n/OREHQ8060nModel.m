@@ -205,6 +205,9 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 
 - (void) processReadResponseArray:(NSArray*)response
 {
+	
+	[super processReadResponseArray:response];
+	
 	for(id anEntry in response){
 		NSString* anError = [anEntry objectForKey:@"Error"];
 		if([anError length]){
@@ -236,8 +239,9 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 
 }
 
-- (void) precessWriteResponseArray:(NSArray*)response
+- (void) processWriteResponseArray:(NSArray*)response
 {
+	[super processWriteResponseArray:response];
 	for(id anEntry in response){
 		NSString* anError = [anEntry objectForKey:@"Error"];
 		if([anError length]){
@@ -334,14 +338,14 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 {    
 	int channel = 0; //in this firmware version all the risetimes and falltimes get set to this value. So no need to send for all channels.
 	NSString* cmd = [NSString stringWithFormat:@"outputVoltageRiseRate.u%d F %f",[self slotChannelValue:channel],aValue];
-	[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
 - (void) writeVoltage:(int)channel
 {    
 	if(channel>=0 && channel<kNumEHQ8060nChannels){
 		NSString* cmd = [NSString stringWithFormat:@"outputVoltage.u%d F %f",[self slotChannelValue:channel],(float)hwGoal[channel]];
-		[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
 }
 
@@ -349,7 +353,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 {    
 	if(channel>=0 && channel<kNumEHQ8060nChannels){
 		NSString* cmd = [NSString stringWithFormat:@"outputSupervisionBehavior.u%d i %f",[self slotChannelValue:channel],aValue];
-		[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
 }
 
@@ -357,38 +361,38 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 {    
 	if(channel>=0 && channel<kNumEHQ8060nChannels){
 		NSString* cmd = [NSString stringWithFormat:@"outputCurrent.u%d F %f",[self slotChannelValue:channel],maxCurrent[channel]/1000.];
-		[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
 }
 
 - (void) turnChannelOn:(int)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kEHQ8060nOutputOn];
-	[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
 - (void) turnChannelOff:(int)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kEHQ8060nOutputOff];
-	[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
 - (void) panicChannel:(int)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kEHQ8060nOutputSetEmergencyOff];
-	[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
 - (void) clearPanicChannel:(int)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kEHQ8060nOutputResetEmergencyOff];
-	[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
 - (void) clearEventsChannel:(int)channel
 {    
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kEHQ8060nOutputClearEvents];
-	[[self adapter] writeValue:cmd target:self selector:@selector(precessWriteResponseArray:)];
+	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
 
 - (void) stopRamping:(int)channel
@@ -502,6 +506,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 
 - (void) processSyncResponseArray:(NSArray*)response
 {
+	[super processSyncResponseArray:response];
 	for(id anEntry in response){
 		int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
 		if(theChannel>=0 && theChannel<kNumEHQ8060nChannels){
@@ -509,11 +514,6 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 			if([name isEqualToString:@"outputMeasurementSenseVoltage"])	[self setTarget:theChannel withValue:[[anEntry objectForKey:@"Value"] intValue]];
 		}
 	}
-}
-
-- (void) processWriteResponseArray:(NSArray*)response
-{
-
 }
 
 - (float) riseRate{ return riseRate; }

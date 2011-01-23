@@ -20,7 +20,7 @@
 
 #pragma mark ***Imported Files
 
-#import "ORMPodCard.h"
+#import "ORMPodHVCard.h"
 #import "SBC_Config.h"
 
 @class ORAlarm;
@@ -58,7 +58,7 @@ enum {
 	outputEmergencyOffMask				= (0x1<<14)
 };
 
-@interface OREHQ8060nModel : ORMPodCard
+@interface OREHQ8060nModel : ORMPodHVCard
 {
   @private
 	unsigned long   dataId;
@@ -125,7 +125,7 @@ enum {
 - (NSArray*) addChannel:(int)i toParams:(NSArray*)someChannelParams;
 - (void) processReadResponseArray:(NSArray*)response;
 - (void) processSyncResponseArray:(NSArray*)response;
-- (void) precessWriteResponseArray:(NSArray*)response;
+- (void) processWriteResponseArray:(NSArray*)response;
 
 #pragma mark •••Hardware Access
 - (void) loadValues:(int)channel;
