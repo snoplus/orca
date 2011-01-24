@@ -281,16 +281,23 @@ NSString* OR1dFitFunctionChanged = @"OR1dFitFunctionChanged";
 			[requestInputs setObject:[NSNumber numberWithInt:maxChannel] forKey:@"FitUpperBound"];	
 			
 			NSString* 	theFitFunction = [[kORCARootFitShortNames[fitType] copy] autorelease];
-			NSArray* fitParameters = [NSArray array];
+			NSMutableArray* fitParameters = [NSMutableArray array];
 			if([theFitFunction hasPrefix:@"arb"]){
 				NSArray* arbInput = [fitFunction componentsSeparatedByString:@";"];
 				theFitFunction = [arbInput objectAtIndex:0];
 				NSLog(@"Sending fit function: %@\n", theFitFunction);
 				if([arbInput count] > 1) {
-					fitParameters = [[[arbInput objectAtIndex:1] trimSpacesFromEnds] componentsSeparatedByString:@","];
+					fitParameters = [[[[[arbInput objectAtIndex:1] trimSpacesFromEnds] componentsSeparatedByString:@","] mutableCopy] autorelease];
+					NSNumberFormatter * formatter = [[NSNumberFormatter alloc] init];
+					[formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+					int i;
+					for(i=0; i<[fitParameters count]; i++) {
+						[fitParameters replaceObjectAtIndex:i withObject:[formatter numberFromString:[[fitParameters objectAtIndex:i] trimSpacesFromEnds]]];
+					}
+					[formatter release];
 					NSLog(@"Initial fit parameters:\n");
-					int i = 0;
-					for(id aParam in fitParameters)NSLog(@"[%d] : %@\n", i++,aParam);
+					i = 0;
+					for(id aParam in fitParameters)NSLog(@"[%d] : %@\n", i++,aParam);					
 				}
 			}
 			else if([theFitFunction hasPrefix:@"pol"]){
