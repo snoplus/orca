@@ -316,6 +316,8 @@
 			[panicButton setEnabled:NO];
 			[targetField setEnabled:!lockedOrRunningMaintenance];
 			[riseRateField setEnabled:!lockedOrRunningMaintenance];
+			[maxCurrentField setEnabled:!lockedOrRunningMaintenance];
+
 		}
 		else if([model failureEvents:selectedChannel] || (state == kEHQ8060nOutputSetEmergencyOff)){
 			//channel is off
@@ -329,6 +331,7 @@
 			[panicButton setEnabled:NO];
 			[targetField setEnabled:NO];
 			[riseRateField setEnabled:NO];
+			[maxCurrentField setEnabled:NO];
 		}
 		else {
 			//channel is on
@@ -342,6 +345,7 @@
 			[panicButton setEnabled:voltage > 0];
 			[targetField setEnabled:!lockedOrRunningMaintenance];
 			[riseRateField setEnabled:!lockedOrRunningMaintenance];
+			[maxCurrentField setEnabled:!lockedOrRunningMaintenance];
 		}
 		
 		if([model failureEvents:selectedChannel] || (state == kEHQ8060nOutputSetEmergencyOff)){
@@ -412,7 +416,8 @@
 		[clearPanicButton setEnabled:NO];
 		[targetField setEnabled:NO];
 		[riseRateField setEnabled:NO];
-		
+		[maxCurrentField setEnabled:NO];
+	
 		[powerAllOnButton setEnabled:NO];
 		[powerAllOffButton setEnabled:NO];
 		[panicAllButton setEnabled:NO];
@@ -435,8 +440,8 @@
 		if(state & outputRampUpMask)		[hvStatusImage setImage:[NSImage imageNamed:@"upRamp"]];
 		else if(state & outputRampDownMask)	[hvStatusImage setImage:[NSImage imageNamed:@"downRamp"]];
 		else {
-			if(voltage < 50){
-				if(voltage > 10)[hvStatusImage setImage:[NSImage imageNamed:@"lowVoltage"]];
+			if(voltage < 100){
+				if(voltage > 5)[hvStatusImage setImage:[NSImage imageNamed:@"lowVoltage"]];
 				else			[hvStatusImage setImage:nil];
 			}
 			else [hvStatusImage setImage:[NSImage imageNamed:@"highVoltage"]];

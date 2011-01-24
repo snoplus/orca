@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3729"/>
+			<integer value="3609"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -529,7 +529,7 @@
 															<object class="NSTextField" id="418980760">
 																<reference key="NSNextResponder" ref="64413853"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{135, 184}, {73, 18}}</string>
+																<string key="NSFrame">{{135, 183}, {73, 18}}</string>
 																<reference key="NSSuperview" ref="64413853"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="816480127">
@@ -545,7 +545,7 @@
 															<object class="NSTextField" id="409638039">
 																<reference key="NSNextResponder" ref="64413853"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{210, 184}, {76, 18}}</string>
+																<string key="NSFrame">{{210, 183}, {76, 18}}</string>
 																<reference key="NSSuperview" ref="64413853"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="784318746">
@@ -823,7 +823,7 @@
 																	<int key="NSCellFlags2">33685504</int>
 																	<reference key="NSSupport" ref="26"/>
 																	<int key="NSAlign">0</int>
-																	<int key="NSScale">2</int>
+																	<int key="NSScale">3</int>
 																	<int key="NSStyle">3</int>
 																	<bool key="NSAnimates">NO</bool>
 																</object>
@@ -2912,9 +2912,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="881867548"/>
 							<reference ref="373855446"/>
 							<reference ref="228544378"/>
-							<reference ref="201502512"/>
-							<reference ref="740769753"/>
-							<reference ref="418980760"/>
 							<reference ref="722190459"/>
 							<reference ref="381045384"/>
 							<reference ref="62542943"/>
@@ -2924,7 +2921,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="386858874"/>
 							<reference ref="769793196"/>
 							<reference ref="409112771"/>
-							<reference ref="409638039"/>
 							<reference ref="371984990"/>
 							<reference ref="372045264"/>
 							<reference ref="283360824"/>
@@ -2936,6 +2932,10 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="228748013"/>
 							<reference ref="886752113"/>
 							<reference ref="361592219"/>
+							<reference ref="740769753"/>
+							<reference ref="201502512"/>
+							<reference ref="418980760"/>
+							<reference ref="409638039"/>
 						</object>
 						<reference key="parent" ref="784919653"/>
 					</object>
@@ -4076,9 +4076,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{481, 637}, {716, 481}}</string>
+					<string>{{199, 812}, {716, 481}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{481, 637}, {716, 481}}</string>
+					<string>{{199, 812}, {716, 481}}</string>
 					<boolean value="YES"/>
 					<boolean value="NO"/>
 					<string>{837, 617}</string>

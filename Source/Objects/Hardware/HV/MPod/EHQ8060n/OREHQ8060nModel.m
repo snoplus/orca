@@ -495,6 +495,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 			   outputEmergencyOffMask);
 	return events;
 }
+
 - (unsigned long) failureEvents
 {
 	unsigned long failEvents = 0;
@@ -507,14 +508,23 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 
 - (NSString*) channelState:(int)channel
 { 
-	int theState = [self channel:channel readParamAsInt:@"outputSwitch"];
-	switch(theState){
-		case kEHQ8060nOutputOff:				return @"OFF";
-		case kEHQ8060nOutputOn:					return @"ON";
-		case kEHQ8060nOutputResetEmergencyOff:  return @"PANIC CLR";
-		case kEHQ8060nOutputSetEmergencyOff:	return @"PANICKED";
-		case kEHQ8060nOutputClearEvents:		return @"EVENT CLR";
-		default: return @"?";
+	int outputSwitch = [self channel:channel readParamAsInt:@"outputSwitch"];
+	int outputStatus = [self channel:channel readParamAsInt:@"outputStatus"];
+	if(outputSwitch == kEHQ8060nOutputSetEmergencyOff)	return @"PANICKED";
+	else {
+		if(outputStatus & kEHQ8060nProblemMask)			return @"PROBLEM";
+		else if(outputStatus & outputRampUpMask)		return @"RAMP UP";
+		else if(outputStatus & outputRampDownMask)		return @"RAMP DN";
+		else {
+			switch(outputSwitch){
+				case kEHQ8060nOutputOff:				return @"OFF";
+				case kEHQ8060nOutputOn:					return @"ON";
+				case kEHQ8060nOutputResetEmergencyOff:  return @"PANIC CLR";
+				case kEHQ8060nOutputSetEmergencyOff:	return @"PANICKED";
+				case kEHQ8060nOutputClearEvents:		return @"EVENT CLR";
+				default: return @"?";
+			}
+		}
 	}
 }
 

@@ -80,7 +80,7 @@
 
 - (void) systemStateChanged:(NSNotification*)aNote
 {
-	[cratePowerStateField setStringValue:	[model systemParamAsInt:@"sysMainSwitch"]?@"ON...":@"OFF..."];
+	[cratePowerStateField setStringValue:	[model systemParamAsInt:@"sysMainSwitch"]?@"ON":@"OFF"];
 	[opTimeField setIntValue:				[model systemParamAsInt:@"psOperatingTime"]];
 	[serialNumberField setStringValue:		[model systemParam:@"psSerialNumber"]];
 	[crateStatusField setStringValue:		[model systemParam:@"sysStatus"]];
@@ -99,7 +99,7 @@
 	int pwr = [model systemParamAsInt:@"sysStatus"];
 	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMPodCModelLock];
 	
-	[cratePowerButton setTitle:pwr?@"Turn Power Off":@"Turn Power On"];
+	[cratePowerButton setTitle:pwr?@"Turn Power Off...":@"Turn Power On..."];
 	[cratePowerButton setEnabled:!lockedOrRunningMaintenance];
 }
 

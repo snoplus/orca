@@ -58,6 +58,8 @@ enum {
 	outputEmergencyOffMask				= (0x1<<14)
 };
 
+#define kEHQ8060nProblemMask (outputFailureMaxTerminalVoltageMask | outputFailureMaxCurrentMask | outputFailureMaxTemperatureMask | outputFailureMaxPowerMask | outputFailureTimeoutMask | outputCurrentLimitedMask)
+
 @interface OREHQ8060nModel : ORMPodHVCard
 {
   @private
