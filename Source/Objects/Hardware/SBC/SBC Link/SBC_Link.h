@@ -239,6 +239,8 @@ typedef enum eSBC_ThrottleConsts{
 
 - (void) tellClientToStartRun;
 - (void) tellClientToStopRun;
+- (void) pauseRun;
+- (void) resumeRun;
 
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse;
 - (void) sendPayloadSize:(long)aSize;

@@ -53,6 +53,8 @@ void* jobThread (void* p);
 void* irqAckThread (void* p);
 char startRun (void);
 void stopRun (void);
+char pauseRun(void);
+char resumeRun(void);
 void sendRunInfo(void);
 void sendCBRecord(void);
 void runCBTest(SBC_Packet* aPacket);
@@ -166,6 +168,7 @@ int32_t main(int32_t argc, char *argv[])
         pthread_mutex_lock (&runInfoMutex);  //begin critical section
         run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
         run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
+        run_info.statusBits        &= ~kSBC_PausedMask;        //clr bit
         run_info.readCycles            = 0;
         run_info.busErrorCount        = 0;
         run_info.err_count            = 0;
@@ -286,6 +289,8 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 			processTimeDelay(aPacket,reply);
 		break;
 			
+        case kSBC_PauseRun:			doRunCommand(aPacket);		break;
+        case kSBC_ResumeRun:		doRunCommand(aPacket);		break;
         case kSBC_StartRun:			doRunCommand(aPacket);		break;
         case kSBC_StopRun:          doRunCommand(aPacket);		break;
         case kSBC_RunInfoRequest:   sendRunInfo();				break;
@@ -307,9 +312,10 @@ void doRunCommand(SBC_Packet* aPacket)
     // option2 = p->option[1];
     //....
     int32_t result = 0;
-    if(aPacket->cmdHeader.cmdID == kSBC_StartRun)  result = startRun();
-    else if(aPacket->cmdHeader.cmdID == kSBC_StopRun) stopRun();
-
+    if(aPacket->cmdHeader.cmdID == kSBC_StartRun)		result = startRun();
+    else if(aPacket->cmdHeader.cmdID == kSBC_StopRun)	stopRun();
+	else if(aPacket->cmdHeader.cmdID == kSBC_PauseRun)	result = pauseRun();
+	else if(aPacket->cmdHeader.cmdID == kSBC_ResumeRun) result = resumeRun();
     SBC_CmdOptionStruct* op = (SBC_CmdOptionStruct*)aPacket->payload;
     op->option[0] = result;
 //    if(needToSwap)SwapLongBlock(op,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
@@ -326,9 +332,7 @@ void killJob(SBC_Packet* aPacket)
 	
     pthread_join(sbc_job.jobThreadId, NULL);		//block until job exits -- would be better to have some timout here
 													//but if the thread doesn't exit the whole thing is screwed anyway.
-
 	jobStatus(aPacket);
-
 }
 
 void jobStatus(SBC_Packet* aPacket)
@@ -638,7 +642,8 @@ char startRun (void)
 void stopRun()
 {
     run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
-    run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
+    run_info.statusBits        &= ~kSBC_PausedMask;			//clr bit
+    run_info.statusBits        &= ~kSBC_ConfigLoadedMask;	//clr bit
     run_info.readCycles        = 0;
 
     stopHWRun(&crate_config);
@@ -649,6 +654,19 @@ void stopRun()
     memset(&crate_config,0,sizeof(SBC_crate_config));
     //CB_cleanup();
 }
+
+char pauseRun()
+{
+    run_info.statusBits |= kSBC_PausedMask; 
+	return 0; //could return something in the future
+}
+
+char resumeRun()
+{
+    run_info.statusBits &= ~kSBC_PausedMask; 
+	return 0; //could return something in the future
+}
+
 
 void postLAM(SBC_Packet* lamPacket)
 {
@@ -692,21 +710,22 @@ void* readoutThread (void* p)
     dataIndex = 0;
     int32_t index      = 0;
     while(run_info.statusBits & kSBC_RunningMask) {
-        if (cycles % 10000 == 0 ) {
-          pthread_mutex_lock (&runInfoMutex);  //begin critical section
-          run_info.readCycles = cycles;
-          pthread_mutex_unlock (&runInfoMutex);  //end critical section
-        }
-		
-		index = readHW(&crate_config,index,0); //nil for the lam data
-		cycles++;
-		
-		commitData();
-		
-		if(index>=crate_config.total_cards || index<0){
-			index = 0;
+		if((run_info.statusBits & kSBC_PausedMask) != kSBC_PausedMask){
+			if (cycles % 10000 == 0 ) {
+			  pthread_mutex_lock (&runInfoMutex);  //begin critical section
+			  run_info.readCycles = cycles;
+			  pthread_mutex_unlock (&runInfoMutex);  //end critical section
+			}
+			
+			index = readHW(&crate_config,index,0); //nil for the lam data
+			cycles++;
+			
+			commitData();
+			
+			if(index>=crate_config.total_cards || index<0){
+				index = 0;
+			}
 		}
-
    }
 
     pthread_exit((void *) 0);

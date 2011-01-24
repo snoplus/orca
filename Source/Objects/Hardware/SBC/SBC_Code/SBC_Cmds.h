@@ -57,6 +57,8 @@
 #define kSBC_JobStatus		   0x14
 #define kSBC_CmdBlock		   0x15
 #define kSBC_TimeDelay		   0x16
+#define kSBC_PauseRun          0x17
+#define kSBC_ResumeRun         0x18
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
 typedef 

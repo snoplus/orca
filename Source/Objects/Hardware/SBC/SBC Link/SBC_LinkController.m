@@ -567,18 +567,25 @@
 
 - (void) statusInfoChanged:(NSNotification*)aNote
 {
-	SBC_info_struct theRunInfo		 =  [[model sbcLink] runInfo];
+	SBC_info_struct theRunInfo	  =  [[model sbcLink] runInfo];
 	ORSBCLinkJobStatus* jobStatus =  [[model sbcLink] jobStatus];
-	NSString* theInfoString = @"";
+	NSString* theInfoString       = @"";
 	int i,num;
 	
 	unsigned long aMinValue,aMaxValue,aWriteMark,aReadMark;
 	[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aWriteMark tail:&aReadMark];
+	NSString* runState = @"?";
+	if((theRunInfo.statusBits & kSBC_RunningMask)){
+		if((theRunInfo.statusBits & kSBC_PausedMask)) runState = @"Paused";
+		else runState = @"YES";
+	}
+	else runState = @"NO ";
+	
 	switch([[model sbcLink] infoType]){
 		case 0:
-			theInfoString =                                 [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
+			theInfoString =                                        [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",(theRunInfo.statusBits & kSBC_RunningMask) ? @"YES":@"NO ",[[model sbcLink] throttle]]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",runState,[[model sbcLink] throttle]]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 			

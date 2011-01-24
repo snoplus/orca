@@ -1089,6 +1089,42 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	}
 }
 
+- (void) pauseRun
+{
+	SBC_CmdOptionStruct optionBlock;
+	int i;
+	for(i=0;i<kMaxOptions;i++){
+		//future pause options could be added here.
+		optionBlock.option[i]	= 0;
+	}
+	
+	[self sendCommand:kSBC_PauseRun withOptions:&optionBlock expectResponse:YES];
+	
+	if(optionBlock.option[0] == 0){
+	}
+	else {
+		[NSException raise:@"Run Didn't Pause" format:@"%@ failed to pause run",[self crateName]];	
+	}
+}
+
+- (void) resumeRun
+{
+	SBC_CmdOptionStruct optionBlock;
+	int i;
+	for(i=0;i<kMaxOptions;i++){
+		//future pause options could be added here.
+		optionBlock.option[i]	= 0;
+	}
+	
+	[self sendCommand:kSBC_ResumeRun withOptions:&optionBlock expectResponse:YES];
+	
+	if(optionBlock.option[0] == 0){
+	}
+	else {
+		[NSException raise:@"Run Didn't Resume" format:@"%@ failed to resume run",[self crateName]];	
+	}
+}
+
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse
 {
 	SBC_Packet aPacket;

@@ -76,8 +76,9 @@ typedef struct {
 	
 } SBC_info_struct;
 
-#define kSBC_ConfigLoadedMask    (0x1 << 0)
-#define kSBC_RunningMask        (0x1 << 1)
+#define kSBC_ConfigLoadedMask  (0x1 << 0)
+#define kSBC_RunningMask       (0x1 << 1)
+#define kSBC_PausedMask        (0x1 << 2)
 
 #define kSBC_InfoStructSizeLongs sizeof(SBC_info_struct)/sizeof(uint32_t)
 #define kSBC_InfoStructSizeBytes sizeof(SBC_info_struct)
