@@ -31,61 +31,60 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 --------^-^^^--------------------------- Crate number
 -------------^-^^^^--------------------- Card number
-				    ^^^^ ^^^^------------Channel
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
---------------------^^^^ ^^^^ ^^^^ ^^^^- Data Length
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
---------------------^^^^ ^^^^ ^^^^ ^^^^- Raw data point0
-^^^^ ^^^^ ^^^^ ^^^^--------------------- Raw data point1
-Raw data points continue until the Data length is used up....
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Spare
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Spare
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time in seconds since Jan 1, 1970
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 0)
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 0)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 1)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 1)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 2)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 2)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 3)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 3)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 4)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 4)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 5)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 5)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 6)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 6)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 7)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan 7)
 */
 
-@implementation OREHQ8060nDecoderForWaveform
+@implementation OREHQ8060nDecoderForHV
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(ptr[0]);
-	int crate	= ShiftAndExtract(ptr[1],21,0xf);
-	int card	= ShiftAndExtract(ptr[1],16,0x1f);
-	int channel = ShiftAndExtract(ptr[1],8,0xff);
-
-	NSString* crateKey		= [self getCrateKey: crate];
-	NSString* cardKey		= [self getCardKey: card];
-	NSString* channelKey	= [self getChannelKey: channel];
-	
-	int dataLength = ptr[2] & 0x0000ffff; //datalength in longs
-		
-    NSMutableData* tmpData = [NSMutableData dataWithCapacity:dataLength*sizeof(long)]; 	   
-	[tmpData setLength:dataLength*sizeof(long)];
-	unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-	int i;
-	int wordCount = 0;
-	for(i=0;i<dataLength;i++){
-		dPtr[wordCount++] =	 0x0000ffff & ptr[3 + i];		
-		dPtr[wordCount++] =	(0xffff0000 & ptr[3 + i]) >> 16;		
-		ptr++;
-	}
-	
-    [aDataSet loadWaveform:tmpData 
-					offset:0 //bytes!
-				  unitSize:2 //unit size in bytes!
-					sender:self  
-				  withKeys:@"EHQ8060n", @"Waveforms",crateKey,cardKey,channelKey,nil];
-
-    return length; //must return number of longs
+    return  ExtractLength(ptr[0]);; //must return number of longs
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-	
-    NSString* title= @"EHQ8060n Waveform Record\n\n";
-    
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",ShiftAndExtract(ptr[1],21,0xf)];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",ShiftAndExtract(ptr[1],16,0x1f)];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",ShiftAndExtract(ptr[1],8,0xff)];
-	
-    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];               
+    NSString* theString =  @"EHQ8060n HV\n\n";               
+	int crate	= ShiftAndExtract(ptr[1],21,0xF);
+	int card	= ShiftAndExtract(ptr[1],16,0xF);
+	theString = [theString stringByAppendingFormat:@"%@\n",[self getCrateKey:crate]];
+	theString = [theString stringByAppendingFormat:@"%@\n",[self getCardKey:card]];
+
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[4]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	theString = [theString stringByAppendingFormat:@"%@\n",date];
+	union {
+		float asFloat;
+		unsigned long asLong;
+	}theData;
+	theString = [theString stringByAppendingFormat:@"--------------------------\n"];
+	int theChan;
+	for(theChan=0;theChan<8;theChan++){
+		theString = [theString stringByAppendingFormat:@"Channel %d\n",theChan];
+		theData.asLong = ptr[5+theChan]; //act Voltage
+		theString = [theString stringByAppendingFormat:@"Act Voltage (%d): %.2f V\n",theChan,theData.asFloat];
+		theData.asLong = ptr[6+theChan]; //act Current
+		theString = [theString stringByAppendingFormat:@"Act Current (%d): %.3f mA\n",theChan,theData.asFloat*1000.];
+	}
+	return theString;
 }
 
 @end

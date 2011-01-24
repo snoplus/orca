@@ -21,6 +21,10 @@
 #import "ORMPodCController.h"
 #import "ORMPodCModel.h"
 
+@interface ORMPodCController (private)
+- (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+@end
+
 @implementation ORMPodCController
 - (id) init
 {
@@ -76,10 +80,11 @@
 
 - (void) systemStateChanged:(NSNotification*)aNote
 {
-	[cratePowerStateField setStringValue:	[model systemParamAsInt:@"sysMainSwitch"]?@"ON":@"OFF"];
+	[cratePowerStateField setStringValue:	[model systemParamAsInt:@"sysMainSwitch"]?@"ON...":@"OFF..."];
 	[opTimeField setIntValue:				[model systemParamAsInt:@"psOperatingTime"]];
 	[serialNumberField setStringValue:		[model systemParam:@"psSerialNumber"]];
 	[crateStatusField setStringValue:		[model systemParam:@"sysStatus"]];
+	[self updateButtons];
 }
 
 - (void) checkGlobalSecurity
@@ -87,6 +92,15 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORMPodCModelLock to:secure];
     [lockButton setEnabled:secure];
+}
+
+- (void) updateButtons
+{
+	int pwr = [model systemParamAsInt:@"sysStatus"];
+	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMPodCModelLock];
+	
+	[cratePowerButton setTitle:pwr?@"Turn Power Off":@"Turn Power On"];
+	[cratePowerButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 #pragma mark •••Notifications
@@ -98,8 +112,9 @@
     [lockButton setState: locked];
 	[pingButton setEnabled:!locked && !runInProgress];
     [ipNumberComboBox setEnabled:!locked];
-
+	[self updateButtons];
 }
+
 - (void) pingTaskChanged:(NSNotification*)aNote
 {
 	BOOL pingRunning = [model pingTaskRunning];
@@ -155,4 +170,30 @@
 	return [model connectionHistoryItem:index];
 }
 
+
+- (IBAction) powerAction:(id)sender
+{
+	BOOL pwr = [model power];
+
+	NSBeginAlertSheet([NSString stringWithFormat:@"Turn MPod HV Crate %@",pwr?@"OFF":@"ON"],
+					  @"YES/Do it NOW",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(_powerSheetDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really turn MPod HV Crate Power %@?",pwr?@"OFF":@"ON");
+}
+
+@end
+
+@implementation ORMPodCController (private)
+- (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	if(returnCode == NSAlertDefaultReturn){
+		[model togglePower];
+	}
+}
 @end

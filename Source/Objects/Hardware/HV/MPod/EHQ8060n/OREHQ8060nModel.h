@@ -64,7 +64,6 @@ enum {
 	unsigned long   dataId;
     short			hwGoal[kNumEHQ8060nChannels];		//value to send to hw
     short			target[kNumEHQ8060nChannels];	//input by user
-    float			current[kNumEHQ8060nChannels];
     float			riseRate;
 	NSMutableDictionary* rdParams[kNumEHQ8060nChannels];
     int				selectedChannel;
@@ -72,6 +71,7 @@ enum {
 	
 	ORTimeRate*		voltageHistory[kNumEHQ8060nChannels];
 	ORTimeRate*		currentHistory[kNumEHQ8060nChannels];
+    BOOL			shipRecords;
 }
 
 #pragma mark ***Initialization
@@ -81,6 +81,8 @@ enum {
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (BOOL)	shipRecords;
+- (void)	setShipRecords:(BOOL)aShipRecords;
 - (float)	maxCurrent:(short)chan;
 - (void)	setMaxCurrent:(short)chan withValue:(float)aMaxCurrent;
 - (int)		selectedChannel;
@@ -96,8 +98,6 @@ enum {
 - (void)	setHwGoal:(short)chan withValue:(int)aValue;
 - (int)		target:(short)chan;	
 - (void)	setTarget:(short)chan withValue:(int)aValue;
-- (float)	current:(short)chan;	
-- (void)	setCurrent:(short)chan withValue:(float)aValue;
 - (void)	syncDialog;
 - (void)	commitTargetsToHwGoals;
 - (void)	commitTargetToHwGoal:(int)channel;
@@ -158,6 +158,7 @@ enum {
 #pragma mark •••Trends
 - (ORTimeRate*) voltageHistory:(int)index;
 - (ORTimeRate*) currentHistory:(int)index;
+- (void) shipDataRecords;
 
 
 #pragma mark •••Archival
@@ -169,6 +170,7 @@ enum {
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cBoolArray:(BOOL*)anArray forKey:(NSString*)aKey;
 @end
 
+extern NSString* OREHQ8060nModelShipRecordsChanged;
 extern NSString* OREHQ8060nModelMaxCurrentChanged;
 extern NSString* OREHQ8060nModelSelectedChannelChanged;
 extern NSString* OREHQ8060nModelRiseRateChanged;

@@ -25,11 +25,12 @@
 #import "ORMPodProtocol.h"
 #import "ORTimeRate.h"
 
-NSString* OREHQ8060nModelMaxCurrentChanged = @"OREHQ8060nModelMaxCurrentChanged";
+NSString* OREHQ8060nModelShipRecordsChanged		= @"OREHQ8060nModelShipRecordsChanged";
+NSString* OREHQ8060nModelMaxCurrentChanged		= @"OREHQ8060nModelMaxCurrentChanged";
 NSString* OREHQ8060nModelSelectedChannelChanged = @"OREHQ8060nModelSelectedChannelChanged";
 NSString* OREHQ8060nSettingsLock				= @"OREHQ8060nSettingsLock";
 NSString* OREHQ8060nModelHwGoalChanged			= @"OREHQ8060nModelHwGoalChanged";
-NSString* OREHQ8060nModelTargetChanged		= @"OREHQ8060nModelTargetChanged";
+NSString* OREHQ8060nModelTargetChanged			= @"OREHQ8060nModelTargetChanged";
 NSString* OREHQ8060nModelCurrentChanged			= @"OREHQ8060nModelCurrentChanged";
 NSString* OREHQ8060nModelOutputSwitchChanged	= @"OREHQ8060nModelOutputSwitchChanged";
 NSString* OREHQ8060nModelRiseRateChanged		= @"OREHQ8060nModelRiseRateChanged";
@@ -79,6 +80,18 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) shipRecords
+{
+    return shipRecords;
+}
+
+- (void) setShipRecords:(BOOL)aShipRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
+    shipRecords = aShipRecords;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREHQ8060nModelShipRecordsChanged object:self];
+}
 
 - (int) selectedChannel
 {
@@ -201,6 +214,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 - (void) updateAllValues
 {
 	[[self adapter] getValues: [self channelUpdateList]  target:self selector:@selector(processReadResponseArray:)];
+	if(shipRecords) [self shipDataRecords];
 }
 
 - (void) processReadResponseArray:(NSArray*)response
@@ -555,14 +569,6 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 	[[NSNotificationCenter defaultCenter] postNotificationName:OREHQ8060nModelTargetChanged object:self];
 }
 
-- (float) current:(short)chan	{ return current[chan]; }
-- (void) setCurrent:(short)chan withValue:(float)aValue 
-{ 
-	if(aValue<0)aValue=0;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCurrent:chan withValue:current[chan]];
-	current[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:OREHQ8060nModelCurrentChanged object:self];
-}
 
 #pragma mark •••Hardware Access
 - (void) loadAllValues
@@ -610,10 +616,10 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"OREHQ8060nDecoderForWaveform",          @"decoder",
+								 @"OREHQ8060nDecoderForHV",          @"decoder",
 								 [NSNumber numberWithLong:dataId],        @"dataId",
-								 [NSNumber numberWithBool:YES],           @"variable",
-								 [NSNumber numberWithLong:-1],			  @"length",
+								 [NSNumber numberWithBool:NO],           @"variable",
+								 [NSNumber numberWithLong:21],			  @"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Waveform"];
     
@@ -627,6 +633,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
     
     [[self undoManager] disableUndoRegistration];
 		
+    [self setShipRecords:		[decoder decodeBoolForKey:@"shipRecords"]];
     [self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
 	[self setRiseRate:			[decoder decodeFloatForKey:	@"riseRate"]];
 	int i;
@@ -644,6 +651,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 {
     [super encodeWithCoder:encoder];
 
+	[encoder encodeBool:shipRecords		forKey:@"shipRecords"];
 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
 	[encoder encodeFloat:riseRate		forKey:@"riseRate"];
 	int i;
@@ -709,5 +717,36 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 }
 
 
+- (void) shipDataRecords;
+{
+	if([[ORGlobal sharedGlobal] runInProgress]){
+		//get the time(UT!)
+		time_t	ut_Time;
+		time(&ut_Time);
+		
+		int i;
+		unsigned long data[21];
+		data[0] = dataId | 21;
+		data[1] = (([self crateNumber] & 0xf) << 21) | ((i&0xf)<<16);
+		data[2] = 0x0; //spare
+		data[3] = 0x0; //spare
+		data[4] = ut_Time;
+		
+		union {
+			float asFloat;
+			unsigned long asLong;
+		}theData;
+			
+		for(i=0;i<kNumEHQ8060nChannels;i++){
+			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
+			data[5+i] = theData.asLong;
+			
+			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementCurrent"];
+			data[6+i] = theData.asLong;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																object:[NSData dataWithBytes:data length:sizeof(long)*21]];
+		}
+	}	
+}
 
 @end

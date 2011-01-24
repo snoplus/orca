@@ -31,6 +31,7 @@
 	IBOutlet NSComboBox*		  ipNumberComboBox;
 	IBOutlet NSButton*			  pingButton;
 	IBOutlet NSProgressIndicator* pingTaskProgress;
+	IBOutlet NSButton*			  cratePowerButton;
 }
 
 #pragma mark •••Initialization
@@ -44,6 +45,7 @@
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) pingTaskChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
+- (void) updateButtons;
 
 #pragma mark •••Actions
 - (IBAction) ping:(id)sender;
@@ -51,5 +53,6 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) updateAction:(id)sender;
 - (IBAction) clearHistoryAction:(id)sender;
+- (IBAction) powerAction:(id)sender;
 
 @end

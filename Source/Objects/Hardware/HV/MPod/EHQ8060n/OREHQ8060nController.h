@@ -25,6 +25,7 @@
 @interface OREHQ8060nController : OrcaObjectController 
 {
 	IBOutlet NSTextField*	selectedChannelField;
+	IBOutlet NSButton*		shipRecordsButton;
 	IBOutlet NSTextField*	maxCurrentField;
 	IBOutlet NSTextField*	eventField;
 	IBOutlet NSTextField*	riseRateField;
@@ -65,6 +66,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) maxCurrentChanged:(NSNotification*)aNote;
 - (void) selectedChannelChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -78,11 +80,11 @@
 - (void) outputStatusChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) maxCurrentAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) riseRateAction:(id)sender;
 - (IBAction) targetAction:(id)sender;
-- (IBAction) currentAction:(id)sender;
 - (IBAction) syncAction:(id)sender;
 - (IBAction) loadAction:(id)sender;
 - (IBAction) powerOnAction:(id)sender;

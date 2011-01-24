@@ -241,14 +241,17 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
 }
 
+- (void) togglePower
+{
+	NSString* cmd = [NSString stringWithFormat:@"sysMainSwitch.0 i %d",![self power]];
+	[[self adapter] writeValue:cmd target:self selector:@selector(processSystemResponseArray:)];
+}
 
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard
 {
 	return [[self crate] controllerCard];
 }
-
-
 
 - (void)  checkCratePower
 {

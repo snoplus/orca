@@ -46,6 +46,7 @@
 - (void) processSystemResponseArray:(NSArray*)response;
 - (int) systemParamAsInt:(NSString*)name;
 - (id) systemParam:(NSString*)name;
+- (void) togglePower;
 
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard;

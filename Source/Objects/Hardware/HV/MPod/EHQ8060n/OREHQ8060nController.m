@@ -150,6 +150,11 @@
                          name : OREHQ8060nModelMaxCurrentChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipRecordsChanged:)
+                         name : OREHQ8060nModelShipRecordsChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -164,9 +169,15 @@
 	
 	[self selectedChannelChanged:nil];
 	[self maxCurrentChanged:nil];
+	[self shipRecordsChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) shipRecordsChanged:(NSNotification*)aNote
+{
+	[shipRecordsButton setIntValue: [model shipRecords]];
+}
 
 - (void) maxCurrentChanged:(NSNotification*)aNote
 {
@@ -448,6 +459,11 @@
 
 #pragma mark •••Actions
 
+- (void) shipRecordsAction:(id)sender
+{
+	[model setShipRecords:[sender intValue]];	
+}
+
 - (void) maxCurrentAction:(id)sender
 {
 	int selectedChannel = [model selectedChannel];
@@ -470,12 +486,6 @@
 	}
 }
 
-- (IBAction) currentAction:(id)sender
-{
-	if([sender intValue] != [model current:[[sender selectedCell] tag]]){
-		[model setMaxCurrent:[[sender selectedCell] tag] withValue:[sender floatValue]];
-	}
-}
 
 - (IBAction) settingLockAction:(id) sender
 {
