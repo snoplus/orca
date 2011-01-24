@@ -516,7 +516,6 @@
 {
 	[self endEditing];
 	int selectedChannel = [model selectedChannel];
-	[model commitTargetToHwGoal:selectedChannel];
 	[model loadValues:selectedChannel];
 }
 
@@ -545,6 +544,7 @@
 				NSDictionary* theEntry = [model channel:rowIndex readParamAsObject:[aTableColumn identifier]];
 				NSString* theValue = [theEntry objectForKey:@"Value"];
 				if(theValue)return theValue;
+				else return @"0";
 			}
 		}
 		return @"--";
@@ -623,7 +623,6 @@
 - (IBAction) loadAllAction:(id)sender
 {
 	[self endEditing];
-	[model commitTargetsToHwGoals];
 	[model loadAllValues];
 }
 

@@ -241,6 +241,15 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 			}
 		}
 	}
+	if([[self adapter] respondsToSelector:@selector(power)]){
+		if(![[self adapter] power]){
+			int i;
+			for(i=0;i<	kNumEHQ8060nChannels;i++){
+				[rdParams[i] removeAllObjects];
+			}
+		}
+	}
+	
 	int i;
 	for(i=0;i<kNumEHQ8060nChannels;i++){
 		if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
@@ -337,6 +346,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 - (void) loadValues:(int)channel
 {
 	if(channel>=0 && channel<kNumEHQ8060nChannels){
+		[self commitTargetToHwGoal:selectedChannel];
 		[self writeRiseTime];
 		[self writeVoltage:channel];
 		[self writeMaxCurrent:channel];
@@ -435,6 +445,15 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 		[self setHwGoal:channel withValue:0];
 		[self panicChannel:channel];
 	}
+}
+
+- (BOOL) isOn:(int)aChannel
+{
+	if(aChannel>=0 && aChannel<8){
+		int outputSwitch = [self channel:aChannel readParamAsInt:@"outputSwitch"];
+		return outputSwitch==kEHQ8060nOutputOn;
+	}
+	else return NO;
 }
 
 - (void) turnAllChannelsOn
@@ -583,6 +602,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 #pragma mark •••Hardware Access
 - (void) loadAllValues
 {
+	[self commitTargetsToHwGoals];
 	[self writeRiseTime];
 	[self writeVoltages];
 	[self writeMaxCurrents];
@@ -758,5 +778,20 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 		}
 	}	
 }
+#pragma mark •••Convenience Methods
+- (float) voltage:(int)aChannel
+{
+	if(aChannel>-0 && aChannel<8){
+		return [self channel:aChannel readParamAsFloat:@"outputMeasurementSenseVoltage"];
+	}
+	else return 0;
+}
 
+- (float) current:(int)aChannel
+{
+	if(aChannel>-0 && aChannel<8){
+		return [self channel:aChannel readParamAsFloat:@"outputMeasurementCurrent"];
+	}
+	else return 0;
+}
 @end

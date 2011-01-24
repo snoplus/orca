@@ -162,6 +162,9 @@ enum {
 - (ORTimeRate*) currentHistory:(int)index;
 - (void) shipDataRecords;
 
+#pragma mark •••Convenience Methods
+- (float) voltage:(int)aChannel;
+- (float) current:(int)aChannel;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -171,6 +174,11 @@ enum {
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cFloatArray:(float*)anArray forKey:(NSString*)aKey;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cBoolArray:(BOOL*)anArray forKey:(NSString*)aKey;
 @end
+
+@interface NSObject (OREHQ8060nModel)
+- (BOOL) power;
+@end
+
 
 extern NSString* OREHQ8060nModelShipRecordsChanged;
 extern NSString* OREHQ8060nModelMaxCurrentChanged;
