@@ -141,7 +141,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0200000C,  @"Raw Data Buffer Configuration (ADC1, ADC2)"},   //function changed with v15xx 
 	{0x02000010,  @"Actual Sample address ADC1"},    
 	{0x02000014,  @"Actual Next Sample address ADC2"},    
-	{0x02000018,  @"Pretrigger Delay and Trigger Gate Length (ADC1, ADC2)"},    
+	{0x02000018,  @"Previous Bank Sample address ADC1"},    
 	{0x0200001C,  @"Previous Bank Sample address ADC2"},    
 	{0x02000020,  @"Actual Sample Value (ADC1, ADC2)"},    
 	{0x02000024,  @"internal Test"},    
@@ -183,7 +183,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0280000C,  @"Raw Data Buffer Configuration (ADC3, ADC4)"},  //function changed with v15xx  
 	{0x02800010,  @"Actual Sample address ADC3"},    
 	{0x02800014,  @"Actual Next Sample address ADC4"},    
-	{0x02800018,  @"Pretrigger Delay and Trigger Gate Length (ADC3, ADC4)"},    
+	{0x02800018,  @"Previous Bank Sample address ADC3"},    
 	{0x0280001C,  @"Previous Bank Sample address ADC4"},    
 	{0x02800020,  @"Actual Sample Value (ADC3, ADC4)"},    
 	{0x02800024,  @"internal Test"},    
@@ -225,7 +225,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0300000C,  @"Raw Data Buffer Configuration (ADC5, ADC6)"},   //function changed with v15xx 
 	{0x03000010,  @"Actual Sample address ADC5"},    
 	{0x03000014,  @"Actual Next Sample address ADC6"},    
-	{0x03000018,  @"Pretrigger Delay and Trigger Gate Length (ADC5, ADC6)"},    
+	{0x03000018,  @"Previous Bank Sample address ADC5"},    
 	{0x0300001C,  @"Previous Bank Sample address ADC6"},    
 	{0x03000020,  @"Actual Sample Value (ADC5, ADC6)"},    
 	{0x03000024,  @"internal Test"},    
@@ -267,7 +267,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	{0x0380000C,  @"Raw Data Buffer Configuration (ADC7, ADC8)"},    //function changed with v15xx
 	{0x03800010,  @"Actual Sample address ADC7"},    
 	{0x03800014,  @"Actual Next Sample address ADC8"},    
-	{0x03800018,  @"Pretrigger Delay and Trigger Gate Length (ADC7, ADC8)"},    
+	{0x03800018,  @"Previous Bank Sample address ADC7"},    
 	{0x0380001C,  @"Previous Bank Sample address ADC8"},    
 	{0x03800020,  @"Actual Sample Value (ADC7, ADC8)"},    
 	{0x03800024,  @"internal Test"},    
