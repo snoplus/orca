@@ -48,6 +48,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) dealloc
 {
+	[queue removeObserver:self forKeyPath:@"operations"];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[queue cancelAllOperations];
 	[queue release];

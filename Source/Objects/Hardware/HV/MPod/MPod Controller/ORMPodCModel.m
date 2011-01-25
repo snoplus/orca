@@ -60,6 +60,7 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 - (void) sleep
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[queue removeObserver:self forKeyPath:@"operations"];
 	[queue cancelAllOperations];
 	[queue release];
 	queue = nil;
