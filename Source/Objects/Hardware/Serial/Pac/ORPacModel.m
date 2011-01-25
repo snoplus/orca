@@ -69,6 +69,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 
 - (void) dealloc
 {
+    [lastRdacFile release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
@@ -131,6 +132,17 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 }
 
 #pragma mark •••Accessors
+
+- (NSString*) lastRdacFile
+{
+    return lastRdacFile;
+}
+
+- (void) setLastRdacFile:(NSString*)aLastRdacFile
+{
+    [lastRdacFile autorelease];
+    lastRdacFile = [aLastRdacFile copy];    
+}
 
 - (int) rdacDisplayType
 {
@@ -427,8 +439,9 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setLastRdacFile:	[decoder decodeObjectForKey:@"lastRdacFile"]];
 	[self setRdacDisplayType:[decoder decodeIntForKey:@"rdacDisplayType"]];
-	[self setSetAllRDacs:[decoder decodeBoolForKey:		 @"ORPacModelSetAllRDacs"]];
+	[self setSetAllRDacs:	[decoder decodeBoolForKey:		 @"ORPacModelSetAllRDacs"]];
 	[self setRdacChannel:	[decoder decodeIntForKey:	 @"ORPacModelRdacChannel"]];
 	[self setLcmEnabled:	[decoder decodeBoolForKey:	 @"ORPacModelLcmEnabled"]];
 	[self setPreAmp:		[decoder decodeIntForKey:	 @"ORPacModelPreAmp"]];
@@ -457,6 +470,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:lastRdacFile forKey:@"lastRdacFile"];
     [encoder encodeInt:rdacDisplayType forKey:@"rdacDisplayType"];
     [encoder encodeBool:setAllRDacs		forKey:@"ORPacModelSetAllRDacs"];
     [encoder encodeInt:rdacChannel		forKey:@"ORPacModelRdacChannel"];
@@ -746,6 +760,7 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
+    if([lastRdacFile length])[objDictionary setObject:lastRdacFile forKey:@"RDAC File"];
 
 	NSMutableArray* rdacArray = [NSMutableArray array];
 	int i;
@@ -774,6 +789,40 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 - (NSTimeInterval)	pollingState
 {
     return pollingState;
+}
+- (void) readRdacFile:(NSString*) aPath
+{
+	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+	contents = [contents stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];
+	NSArray* lines = [contents componentsSeparatedByString:@"\n"];
+	for(id aLine in lines){
+		aLine = [aLine stringByReplacingOccurrencesOfString:@" " withString:@""];
+		NSArray* parts = [aLine componentsSeparatedByString:@","];
+		if([parts count] == 5){
+			int index = [[parts objectAtIndex:0] intValue];
+			if(index < 38){
+				rdac[index]			= [[parts objectAtIndex:1] intValue]; 
+				rdac[index+37]		= [[parts objectAtIndex:2] intValue]; 
+				rdac[index+2*37]	= [[parts objectAtIndex:3] intValue]; 
+				rdac[index+3*37]	= [[parts objectAtIndex:4] intValue]; 
+			}
+		}
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRDacsChanged object:self];
+}
+
+- (void) saveRdacFile:(NSString*) aPath
+{
+	NSString* fullFileName = [aPath stringByExpandingTildeInPath];
+	[self setLastRdacFile:aPath];
+	int i;
+	NSString* s = @"";
+	for(i=0;i<37;i++){
+		s = [s stringByAppendingFormat:@"%d,%d,%d,%d,%d\n",i,rdac[i],rdac[i+37],rdac[i+2*37],rdac[i+3*37]];
+	}
+	
+	[s writeToFile:fullFileName atomically:NO encoding:NSASCIIStringEncoding error:nil];
+
 }
 
 @end
@@ -886,6 +935,5 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:nextTry];
 	}
 }
-
 
 @end

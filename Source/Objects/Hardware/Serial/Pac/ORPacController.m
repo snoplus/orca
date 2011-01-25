@@ -31,7 +31,9 @@
 
 @interface ORPacController (private)
 - (void) populatePortListPopup;
-- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
+- (void) readRdacFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
+- (void) saveRdacFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
 @end
 
 @implementation ORPacController
@@ -436,6 +438,10 @@
     [loadButton2 setEnabled:!locked];
     [loadButton3 setEnabled:!locked];
     [rdacTableView setEnabled:!locked];
+    [readRdacButton setEnabled:!locked];
+    [writeRdacButton setEnabled:!locked];
+	
+	
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -646,7 +652,7 @@
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(rdacTableView == aTableView)return 37;
-	else return 8;
+	else return 0;
 }
 
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
@@ -693,10 +699,74 @@
 {
 	return YES;
 }
+
+- (IBAction) readRdacFileAction:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+	NSString* fullPath = [[model lastRdacFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+    }
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(readRdacFilePanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+}
+
+- (IBAction) saveRdacFileAction:(id)sender
+{
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save As"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[model lastRdacFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = [model lastRdacFile];
+        
+    }
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveRdacFilePanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+}
+
 @end
 
 @implementation ORPacController (private)
-
+- (void) readRdacFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[model readRdacFile:[[sheet filenames] objectAtIndex:0]];
+		
+    }
+}
+- (void) saveRdacFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model saveRdacFile:[sheet filename]];
+    }
+}
 - (void) populatePortListPopup
 {
 	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];

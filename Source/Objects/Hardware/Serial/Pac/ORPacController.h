@@ -58,6 +58,9 @@
 	IBOutlet ORPlotView*   plotter0;
 	IBOutlet ORPlotView*   plotter1;
 	
+	IBOutlet NSButton*		readRdacButton;
+	IBOutlet NSButton*		writeRdacButton;
+
 }
 
 #pragma mark •••Initialization
@@ -112,6 +115,8 @@
 - (IBAction) selectFileAction:(id)sender;
 - (IBAction) setPollingAction:(id)sender;
 - (IBAction) logToFileAction:(id)sender;
+- (IBAction) readRdacFileAction:(id)sender;
+- (IBAction) saveRdacFileAction:(id)sender;
 
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row;

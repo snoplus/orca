@@ -79,6 +79,7 @@
 		NSMutableArray*		logBuffer;
 		unsigned long		readCount;
 		int					rdacDisplayType;
+		NSString*			lastRdacFile;
 }
 
 #pragma mark •••Initialization
@@ -90,6 +91,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (NSString*) lastRdacFile;
+- (void) setLastRdacFile:(NSString*)aLastRdacFile;
 - (int) rdacDisplayType;
 - (void) setRdacDisplayType:(int)aRdacDisplayType;
 - (ORTimeRate*)timeRate:(int)index;
@@ -155,6 +158,8 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
+- (void) readRdacFile:(NSString*) aPath;
+- (void) saveRdacFile:(NSString*) aPath;
 
 @end
 
