@@ -45,7 +45,7 @@
 	unsigned long   mcaId;
 	
 	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
-	short			internalTriggerEnabledMask;
+	short			internalTriggerEnabledMask; 
 	short			externalTriggerEnabledMask;
 	short			extendedThresholdEnabledMask;
 	short			internalGateEnabledMask;
@@ -282,8 +282,6 @@
 - (void) setGtMask:(long)aMask;
 - (BOOL) gt:(short)chan;
 - (void) setGtBit:(short)chan withValue:(BOOL)aValue;
-- (short) peakingTime:(short)chan;
-- (void) setPeakingTime:(short)chan withValue:(short)aValue;
 - (short) internalTriggerDelay:(short)chan;
 - (void) setInternalTriggerDelay:(short)chan withValue:(short)aValue;
 - (int) triggerDecimation:(short)aGroup;

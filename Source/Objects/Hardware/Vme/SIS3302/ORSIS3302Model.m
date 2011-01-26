@@ -1274,24 +1274,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		if (energySampleLength == 0) {
 			// Means that we are not shipping an energy waveform.
 			// Make sure the gate length is long enough
-			[self setEnergyGateLength:group withValue:(delayInDecimationClockTicks +
-													   2*[self energyPeakingTime:group] +
-													   [self energyGapTime:group] + 20)]; // Add the 20 ticks for safety
+			[self setEnergyGateLength:group withValue:delayInDecimationClockTicks + 600];
 		} 
 		else {
-			// We are shipping an energy waveform, we require the waveform to be at least:
-			unsigned int temp =	delayInDecimationClockTicks + 
-					energySampleStartIndex3     + 
-					energySampleLength          + 
-					20;
-			
-			unsigned int temptwo = delayInDecimationClockTicks	+
-						2*[self energyPeakingTime:group]		+
-						[self energyGapTime:group]				+ 
-						20;
-			
-			//use the larger one
-			[self setEnergyGateLength:group withValue:MAX(temp,temptwo)];
+			[self setEnergyGateLength:group withValue:(delayInDecimationClockTicks +
+												   2*[self energyPeakingTime:group] +
+												   [self energyGapTime:group] + 120)]; // Add the 20 ticks for safety
+
 
 		}
 	}
