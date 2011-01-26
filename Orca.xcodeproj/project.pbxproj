@@ -541,6 +541,12 @@
 		842539FC0BCD7BFE004C8065 /* ORCARootService.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842539F70BCD7BFE004C8065 /* ORCARootService.nib */; };
 		842539FD0BCD7BFE004C8065 /* ORCARootServiceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842539F80BCD7BFE004C8065 /* ORCARootServiceController.h */; };
 		842539FE0BCD7BFE004C8065 /* ORCARootServiceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */; };
+		84253F8712F073C300472314 /* VmeSBCGeneralOperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */; };
+		84253FC412F0751A00472314 /* VmeSBCGeneralOperations.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */; };
+		8425401A12F0770B00472314 /* PciSBCGeneralOperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 8425401912F0770B00472314 /* PciSBCGeneralOperations.h */; };
+		8425401B12F0772800472314 /* PciSBCGeneralOperations.h in cPCI_Code Copy */ = {isa = PBXBuildFile; fileRef = 8425401912F0770B00472314 /* PciSBCGeneralOperations.h */; };
+		8425402D12F0779700472314 /* SLTv4GeneralOperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 8425402C12F0779700472314 /* SLTv4GeneralOperations.h */; };
+		8425402E12F077EE00472314 /* SLTv4GeneralOperations.h in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 8425402C12F0779700472314 /* SLTv4GeneralOperations.h */; };
 		842702810B5EE938009176B4 /* katrin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842702800B5EE937009176B4 /* katrin.gif */; };
 		84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */; };
 		84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */; };
@@ -2560,6 +2566,7 @@
 			dstPath = SLTv4_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				8425402E12F077EE00472314 /* SLTv4GeneralOperations.h in SLTv4_Copy */,
 				43ADFEA410B6E1600044617C /* HW_Readout.cc in SLTv4_Copy */,
 				842251400D8845500048D331 /* HW_Readout.h in SLTv4_Copy */,
 				43ADFEA510B6E1600044617C /* HW_Specific.icc in SLTv4_Copy */,
@@ -2581,6 +2588,7 @@
 			dstPath = cPCI_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				8425401B12F0772800472314 /* PciSBCGeneralOperations.h in cPCI_Code Copy */,
 				43ADFEB310B6E1DF0044617C /* HW_Specific.icc in cPCI_Code Copy */,
 				43ADFEB410B6E1DF0044617C /* HWMakefile.mk in cPCI_Code Copy */,
 				840B00AB1206F754009095A4 /* goScript in cPCI_Code Copy */,
@@ -2601,6 +2609,7 @@
 			dstPath = VME_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				84253FC412F0751A00472314 /* VmeSBCGeneralOperations.h in VME_Copy */,
 				43ADFEB910B6E2090044617C /* HW_Specific.icc in VME_Copy */,
 				840B00AA1206F70B009095A4 /* goScript in VME_Copy */,
 				EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */,
@@ -3250,6 +3259,9 @@
 		842539F70BCD7BFE004C8065 /* ORCARootService.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ORCARootService.nib; path = "Source/Main Dialogs/ORCARootService/ORCARootService.nib"; sourceTree = SOURCE_ROOT; };
 		842539F80BCD7BFE004C8065 /* ORCARootServiceController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceController.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceController.h"; sourceTree = SOURCE_ROOT; };
 		842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCARootServiceController.m; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceController.m"; sourceTree = SOURCE_ROOT; };
+		84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VmeSBCGeneralOperations.h; sourceTree = "<group>"; };
+		8425401912F0770B00472314 /* PciSBCGeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PciSBCGeneralOperations.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/PciSBCGeneralOperations.h; sourceTree = SOURCE_ROOT; };
+		8425402C12F0779700472314 /* SLTv4GeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLTv4GeneralOperations.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/SLTv4GeneralOperations.h"; sourceTree = SOURCE_ROOT; };
 		842702800B5EE937009176B4 /* katrin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = katrin.gif; path = Source/Experiments/Katrin/katrin.gif; sourceTree = SOURCE_ROOT; };
 		84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP320Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.h; sourceTree = SOURCE_ROOT; };
 		84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIP320Decoders.m; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.m; sourceTree = SOURCE_ROOT; };
@@ -6581,6 +6593,7 @@
 		8422512D0D8845390048D331 /* SLTv4_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				8425402C12F0779700472314 /* SLTv4GeneralOperations.h */,
 				43ADFE9410B6DF8A0044617C /* HW_Readout.cc */,
 				8422512F0D8845390048D331 /* HW_Readout.h */,
 				43ADFE9610B6DF980044617C /* HW_Specific.icc */,
@@ -8114,6 +8127,7 @@
 				43ADFEAB10B6E1C80044617C /* HW_Specific.icc */,
 				43ADFEAC10B6E1C80044617C /* HWMakefile.mk */,
 				840B00761206F57B009095A4 /* goScript */,
+				8425401912F0770B00472314 /* PciSBCGeneralOperations.h */,
 				43ADFEAD10B6E1C80044617C /* ORAcqirisDC440Readout.cc */,
 				43ADFEAE10B6E1C80044617C /* ORAcqirisDC440Readout.hh */,
 				8493CC6A0C99FA3100B46CD4 /* AcqirisDC440Cmds.h */,
@@ -8141,6 +8155,7 @@
 		8493CC7D0C99FA4B00B46CD4 /* VME_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */,
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
 				840B00721206F556009095A4 /* goScript */,
@@ -11996,6 +12011,9 @@
 				8472AA8312DB44B400DEEB02 /* ORMPodMiniCrateController.h in Headers */,
 				8472AA8512DB44B400DEEB02 /* ORMPodMiniCrateModel.h in Headers */,
 				84BDF04312DC943700B974F8 /* ORSNMP.h in Headers */,
+				84253F8712F073C300472314 /* VmeSBCGeneralOperations.h in Headers */,
+				8425401A12F0770B00472314 /* PciSBCGeneralOperations.h in Headers */,
+				8425402D12F0779700472314 /* SLTv4GeneralOperations.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12038,7 +12056,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,

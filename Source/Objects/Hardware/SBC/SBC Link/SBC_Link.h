@@ -350,6 +350,14 @@ typedef enum eSBC_ThrottleConsts{
 - (void) monitorJobFor:(id)aDelegate statusSelector:(SEL)aSelector;
 - (void) monitorJob;
 
+- (void) writeGeneral:(long*) buffer
+			operation:(unsigned long) anOperationID
+			numToWrite:(unsigned int) numberLongs;
+			
+- (void) readGeneral:(long*) buffer
+		   operation:(unsigned long) anOperationID
+		   numToRead:(unsigned int) numberLongs;
+
 @end
 
 @interface ORSBCLinkJobStatus : NSObject

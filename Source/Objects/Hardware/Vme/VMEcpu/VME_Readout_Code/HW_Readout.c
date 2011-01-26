@@ -33,6 +33,9 @@
 #include "VME_HW_Definitions.h"
 #include "SNO.h"
 #include "universe_api.h"
+#include "VmeSBCGeneralOperations.h"
+
+#define kCodeVersion 1
 
 #define kDMALowerLimit   0x100 //require 256 bytes
 #define kControlSpace    0xFFFF
@@ -298,6 +301,60 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
         SwapLongBlock(returnDataPtr, sizeof(SBC_VmeReadBlockStruct)/sizeof(int32_t));
     }
     if(reply)writeBuffer(aPacket);
+}
+
+
+void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
+{
+	SBC_WriteBlockStruct* p = (SBC_WriteBlockStruct*)aPacket->payload;
+	if(needToSwap)SwapLongBlock(p,sizeof(SBC_WriteBlockStruct)/sizeof(int32_t));
+	int32_t operation = p->address;
+	int32_t num = p->numLongs;
+	p++;
+	int32_t* dataToWrite = (int32_t*)p;
+	if(needToSwap)SwapLongBlock(dataToWrite,num);
+	switch(operation){
+		//nothing defined yet
+		default:
+		break;
+	}
+	//just return the packet for now...	
+	if(reply)writeBuffer(aPacket);
+}
+
+void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
+{
+	//what to read?
+	SBC_ReadBlockStruct* p = (SBC_ReadBlockStruct*)aPacket->payload;
+	if(needToSwap)SwapLongBlock(p,sizeof(SBC_ReadBlockStruct)/sizeof(int32_t));
+	int32_t numLongs = p->numLongs;
+	int32_t operation  = p->address;
+
+	//OK, got address and # to read, set up the response and go get the data
+	aPacket->cmdHeader.destination	= kSBC_Process;
+	aPacket->cmdHeader.cmdID		= kSBC_GeneralRead;
+	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct) + numLongs*sizeof(int32_t);
+	
+	SBC_ReadBlockStruct* dataPtr = (SBC_ReadBlockStruct*)aPacket->payload;
+	dataPtr->numLongs = numLongs;
+	dataPtr->address  = operation;
+	if(needToSwap)SwapLongBlock(dataPtr,sizeof(SBC_ReadBlockStruct)/sizeof(int32_t));
+	dataPtr++;
+	
+	int32_t* lPtr		= (int32_t*)dataPtr;
+	int32_t* startPtr	= lPtr;
+	int32_t i;
+	switch(operation){
+		case kGetSoftwareVersion:
+			if(numLongs == 1) *lPtr = kCodeVersion;
+		break;
+		default:
+			for(i=0;i<numLongs;i++)*lPtr++ = 0; //yndefined operation so just return zeros
+		break;
+	}
+	if(needToSwap)SwapLongBlock(startPtr,numLongs/sizeof(int32_t));
+
+	if(reply)writeBuffer(aPacket);
 }
 
 /*************************************************************/

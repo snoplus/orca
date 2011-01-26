@@ -25,6 +25,7 @@
 #import "SBC_Link.h"
 #import "SBC_config.h"
 #import "ORCommandList.h"
+#import "VmeSBCGeneralOperations.h"
 
 #pragma mark ¥¥¥External Strings
 NSString* ORVmecpuLock = @"ORVmecpuLock";	
@@ -297,6 +298,18 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	
 	[sbcLink load_HW_Config:&configStruct];
 	
+}
+
+- (long) getSBCCodeVersion
+{
+	long theVersion = 0;
+	if(![sbcLink isConnected]){
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[sbcLink readGeneral:&theVersion operation:kGetSoftwareVersion numToRead:1];
+	}
+	return theVersion;
 }
 
 -(void) readLongBlock:(unsigned long *) readAddress

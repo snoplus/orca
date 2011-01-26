@@ -42,7 +42,8 @@ void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply);
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
-
+void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply);
+void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply);
 
 #ifdef __cplusplus
 }

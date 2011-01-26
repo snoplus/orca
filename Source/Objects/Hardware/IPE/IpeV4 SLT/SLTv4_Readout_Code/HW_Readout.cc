@@ -25,6 +25,10 @@
 #include <time.h>
 #include <errno.h>
 
+#define kGetSoftwareVersion 1
+#define kFdhwLibVersion     1 
+
+
 #define USE_PBUS 0
 //Define USE_PBUS for usage of the pbusaccess library (obsolete, will be removed/changed in the future) -tb- 2010-04-09
 
@@ -37,6 +41,7 @@ extern "C" {
 #include "SBC_Readout.h"
 #include "CircularBuffer.h"
 #include "SLTv4_HW_Definitions.h"
+#include "SLTv4GeneralOperations.h"
 #ifdef __cplusplus
 }
 #endif
@@ -375,4 +380,59 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb
 #endif //of #if !PMC_COMPILE_IN_SIMULATION_MODE ... #else ...
 //----------------------------------------------------------------
 
+void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
+{
+	SBC_WriteBlockStruct* p = (SBC_WriteBlockStruct*)aPacket->payload;
+	if(needToSwap)SwapLongBlock(p,sizeof(SBC_WriteBlockStruct)/sizeof(int32_t));
+	int32_t operation = p->address;
+	int32_t num = p->numLongs;
+	p++;
+	int32_t* dataToWrite = (int32_t*)p;
+	if(needToSwap)SwapLongBlock(dataToWrite,num);
+	switch(operation){
+		//nothing defined yet
+		default:
+		break;
+	}
+	//just return the packet for now...	
+	if(reply)writeBuffer(aPacket);
+}
+
+void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
+{
+	//what to read?
+	SBC_ReadBlockStruct* p = (SBC_ReadBlockStruct*)aPacket->payload;
+	if(needToSwap)SwapLongBlock(p,sizeof(SBC_ReadBlockStruct)/sizeof(int32_t));
+	int32_t numLongs = p->numLongs;
+	int32_t operation  = p->address;
+
+	//OK, got address and # to read, set up the response and go get the data
+	aPacket->cmdHeader.destination	= kSBC_Process;
+	aPacket->cmdHeader.cmdID		= kSBC_GeneralRead;
+	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct) + numLongs*sizeof(int32_t);
+	
+	SBC_ReadBlockStruct* dataPtr = (SBC_ReadBlockStruct*)aPacket->payload;
+	dataPtr->numLongs = numLongs;
+	dataPtr->address  = operation;
+	if(needToSwap)SwapLongBlock(dataPtr,sizeof(SBC_ReadBlockStruct)/sizeof(int32_t));
+	dataPtr++;
+	
+	int32_t* lPtr		= (int32_t*)dataPtr;
+	int32_t* startPtr	= lPtr;
+	int32_t i;
+	switch(operation){
+		case kGetSoftwareVersion:
+			if(numLongs == 1) *lPtr = kCodeVersion;
+		break;
+		case kGetFdhwLibVersion:
+			if(numLongs == 1) *lPtr = kFdhwLibVersion; 
+		break;
+		default:
+			for(i=0;i<numLongs;i++)*lPtr++ = 0; //yndefined operation so just return zeros
+		break;
+	}
+	if(needToSwap)SwapLongBlock(startPtr,numLongs/sizeof(int32_t));
+
+	if(reply)writeBuffer(aPacket);
+}
 

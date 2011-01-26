@@ -274,7 +274,15 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
         case kSBC_ReadBlock:
             doReadBlock(aPacket,reply);  
         break;
-            
+		
+		case kSBC_GeneralWrite:        
+            doGeneralWriteOp(aPacket,reply); 
+        break;
+        
+        case kSBC_GeneralRead:
+            doGeneralReadOp(aPacket,reply);  
+        break;
+          
         case kSBC_LoadConfig:
             if(needToSwap)SwapLongBlock(aPacket->payload,sizeof(SBC_crate_config)/sizeof(int32_t));
             memcpy(&crate_config, aPacket->payload, sizeof(SBC_crate_config));

@@ -2504,6 +2504,68 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	@catch(NSException* localException) {
 	}
 }
+
+- (void) writeGeneral:(long*) buffer
+			  operation:(unsigned long) anOperationID
+			 numToWrite:(unsigned int)  numberLongs
+{
+	@try {
+		[socketLock lock]; //begin critical section
+		SBC_Packet aPacket;
+		aPacket.cmdHeader.destination			= kSBC_Process;
+		aPacket.cmdHeader.cmdID					= kSBC_GeneralWrite;
+		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_WriteBlockStruct) + numberLongs*sizeof(long);
+		
+		SBC_WriteBlockStruct* dataPtr = (SBC_WriteBlockStruct*)aPacket.payload;
+		dataPtr->address		= anOperationID;
+		dataPtr->numLongs		= numberLongs;
+		dataPtr++;
+		memcpy(dataPtr,buffer,numberLongs*sizeof(long));
+		
+		[self write:socketfd buffer:&aPacket];
+		[socketLock unlock]; //end critical section
+	}
+	@catch (NSException* localException) {
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	}
+}
+
+
+- (void) readGeneral:(long*) buffer
+		   operation:(unsigned long) anOperationID
+		   numToRead:(unsigned int) numberLongs
+{
+	@try {
+		[socketLock lock]; //begin critical section
+		SBC_Packet aPacket;
+		aPacket.cmdHeader.destination			= kSBC_Process;
+		aPacket.cmdHeader.cmdID					= kSBC_GeneralRead;
+		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
+		
+		SBC_ReadBlockStruct* readBlockPtr = (SBC_ReadBlockStruct*)aPacket.payload;
+		readBlockPtr->address		= anOperationID;
+		readBlockPtr->numLongs		= numberLongs;
+		
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket]; //write the packet
+		[self read:socketfd buffer:&aPacket]; //read the response
+		
+		SBC_ReadBlockStruct* rp = (SBC_ReadBlockStruct*)aPacket.payload;
+		int numLongs = rp->numLongs;
+		rp++;
+		long* dp = (long*)rp;
+		int i;
+		for(i=0;i<numLongs;i++){
+			buffer[i] = dp[i];
+		}
+		[socketLock unlock]; //end critical section
+	}
+	@catch (NSException* localException) {
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	}
+}
 @end
 
 //a quicky wrapper so we can pass the job status around as an object.
