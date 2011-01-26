@@ -12056,6 +12056,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -13880,6 +13881,7 @@
 				OTHER_CFLAGS = "-falign-loops=32";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
+					"-lnetsnmp",
 					"-lcrypto",
 					"-lssl",
 					"-lz",
