@@ -33,6 +33,7 @@
 #import "PMC_Link.h"
 #import "SLTv4_HW_Definitions.h"
 #import "ORPMCReadWriteCommand.h"
+#import "SLTv4GeneralOperations.h"
 
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
@@ -417,6 +418,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	hwVersion = aVersion;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelHwVersionChanged object:self];	
 }
+
 - (void) writePageSelect:(unsigned long)aPageNum		{ [self writeReg:kSltV4PageSelectReg value:aPageNum]; }
 - (void) writeSetInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdSetInh]; }
 - (void) writeClrInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdClrInh]; }
@@ -1003,6 +1005,31 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	NSLogFont(aFont,@"GPSError      : %@\n",IsBitSet(data,kStatusGpsErr)?@"YES":@"NO");
 	NSLogFont(aFont,@"FanError      : %@\n",IsBitSet(data,kStatusFanErr)?@"YES":@"NO");
 }
+
+- (long) getPMCCodeVersion
+{
+	long theVersion = 0;
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink readGeneral:&theVersion operation:kGetSoftwareVersion numToRead:1];
+	}
+	return theVersion;
+}
+
+- (long) getFdhwlibVersion
+{
+	long theVersion = 0;
+	if(![pmcLink isConnected]){
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[pmcLink readGeneral:&theVersion operation:kGetFdhwLibVersion numToRead:1];
+	}
+	return theVersion;
+}
+
 
 - (void) readEventStatus:(unsigned long*)eventStatusBuffer
 {
