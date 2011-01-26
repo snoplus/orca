@@ -29,8 +29,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
 -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
---------^-^^^--------------------------- Crate number
--------------^-^^^^--------------------- Card number
+----------^^^^-------------------------- Crate number
+---------------^^^^--------------------- Card number
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Spare
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Spare
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time in seconds since Jan 1, 1970
@@ -63,7 +63,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Current encoded as a float (chan
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* theString =  @"EHQ8060n HV\n\n";               
-	int crate	= ShiftAndExtract(ptr[1],21,0xF);
+	int crate	= ShiftAndExtract(ptr[1],20,0xF);
 	int card	= ShiftAndExtract(ptr[1],16,0xF);
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCrateKey:crate]];
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCardKey:card]];

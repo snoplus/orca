@@ -757,7 +757,7 @@ NSString* OREHQ8060nModelChannelReadParamsChanged = @"OREHQ8060nModelChannelRead
 		int i;
 		unsigned long data[21];
 		data[0] = dataId | 21;
-		data[1] = (([self crateNumber] & 0xf) << 21) | ((i&0xf)<<16);
+		data[1] = (([self crateNumber] & 0xf) << 20) | (([self slot]&0xf)<<16);
 		data[2] = 0x0; //spare
 		data[3] = 0x0; //spare
 		data[4] = ut_Time;
