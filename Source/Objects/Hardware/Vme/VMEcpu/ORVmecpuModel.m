@@ -309,6 +309,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	else {
 		[sbcLink readGeneral:&theVersion operation:kGetSoftwareVersion numToRead:1];
 	}
+	[sbcLink setSbcCodeVersion:theVersion];
 	return theVersion;
 }
 

@@ -136,6 +136,7 @@ typedef enum eSBC_ThrottleConsts{
 	NSMutableArray* connectionHistory;
 	unsigned 		ipNumberIndex;
 	NSString*		mainStagingFolder;
+	long			sbcCodeVersion;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -146,6 +147,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) clearHistory;
 
 #pragma mark ¥¥¥Accessors
+- (long) sbcCodeVersion;
+- (void) setSbcCodeVersion:(long)aVersion;
 - (unsigned) ipNumberIndex;
 - (int) slot;
 - (NSUndoManager*) undoManager;
@@ -413,4 +416,5 @@ extern NSString* ORSBC_LinkNumCBTextPointsChanged;
 extern NSString* ORSBC_LinkNumPayloadSizeChanged;
 extern NSString* ORSBC_LinkJobStatus;
 extern NSString* ORSBC_LinkErrorTimeOutChanged;
+extern NSString* ORSBC_CodeVersionChanged;
 

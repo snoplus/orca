@@ -192,6 +192,11 @@
 					 selector : @selector(statusInfoChanged:)
 						 name :  SBC_LinkConnectionChanged
 						object: [model sbcLink]];
+
+	[notifyCenter addObserver : self
+					 selector : @selector(sbcLockChanged:)
+						 name :  SBC_LinkConnectionChanged
+						object: [model sbcLink]];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(ipNumberChanged:)
@@ -299,6 +304,11 @@
                      selector : @selector(errorTimeOutChanged:)
                          name : ORSBC_LinkErrorTimeOutChanged
                        object : [model sbcLink]];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(codeVersionChanged:)
+                         name : ORSBC_CodeVersionChanged
+                       object : [model sbcLink]];
 	
 }
 
@@ -335,6 +345,15 @@
 	
 	[self lamSlotChanged:nil];
 	[self errorTimeOutChanged:nil];
+	[self codeVersionChanged:nil];
+	
+}
+
+- (void) codeVersionChanged:(NSNotification*)aNote
+{
+	int theVersion = [[model sbcLink] sbcCodeVersion];
+	if(theVersion)	[codeVersionField setIntValue:theVersion];
+	else			[codeVersionField setObjectValue:@"?"];
 }
 
 - (void) errorTimeOutChanged:(NSNotification*)aNote
@@ -515,6 +534,8 @@
     [verboseButton setEnabled:!locked && !runInProgress];
 	[shutdownRebootButton setEnabled:!locked && !runInProgress];
     [errorTimeOutPU setEnabled:!locked];
+	[checkVersionButton setEnabled:connected];
+
 	[self setToggleCrateButtonState];
 }
 
@@ -1062,6 +1083,12 @@
 - (IBAction) payloadSizeAction:(id)sender
 {
 	[[model sbcLink] setPayloadSize:[sender intValue]*1000];
+}
+
+- (IBAction) getSbcCodeVersion:(id)sender
+{
+	long theVersion = [model getSBCCodeVersion];
+	[[model sbcLink] setSbcCodeVersion:theVersion];
 }
 
 - (int)	numberPointsInPlot:(id)aPlotter

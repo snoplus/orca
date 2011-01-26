@@ -310,7 +310,7 @@
 //- (void)		swTrigger;
 - (void)		initBoard;
 - (void)		autoCalibrate;
-- (long)		getPMCCodeVersion;
+- (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;
 
 - (id)   initWithCoder:(NSCoder*)decoder;

@@ -78,6 +78,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
+NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 @implementation SBC_Link
 - (id)   initWithDelegate:(ORCard*)aDelegate
@@ -148,6 +149,17 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 }
 
 #pragma mark ***Accessors
+- (long) sbcCodeVersion
+{
+	return sbcCodeVersion;
+}
+
+- (void) setSbcCodeVersion:(long)aVersion
+{
+    sbcCodeVersion = aVersion;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_CodeVersionChanged object:self];
+}
+
 - (void) clearHistory
 {
 	[connectionHistory release];

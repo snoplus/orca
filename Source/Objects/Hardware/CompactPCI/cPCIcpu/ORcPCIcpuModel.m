@@ -22,7 +22,7 @@
 #import "ORcPCIcpuModel.h"
 #import "ORReadOutList.h"
 #import "SBC_Link.h"
-
+#import "PciSBCGeneralOperations.h"
 
 #pragma mark ¥¥¥External Strings
 NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
@@ -143,6 +143,19 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 - (NSString*) codeResourcePath
 {
 	return [[self sbcLocalCodePath] lastPathComponent];
+}
+
+- (long) getSBCCodeVersion
+{
+	long theVersion = 0;
+	if(![sbcLink isConnected]){
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
+	}
+	else {
+		[sbcLink readGeneral:&theVersion operation:kGetSoftwareVersion numToRead:1];
+	}
+	[sbcLink setSbcCodeVersion:theVersion];
+	return theVersion;
 }
 
 

@@ -1006,7 +1006,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	NSLogFont(aFont,@"FanError      : %@\n",IsBitSet(data,kStatusFanErr)?@"YES":@"NO");
 }
 
-- (long) getPMCCodeVersion
+- (long) getSBCCodeVersion
 {
 	long theVersion = 0;
 	if(![pmcLink isConnected]){
@@ -1015,6 +1015,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	else {
 		[pmcLink readGeneral:&theVersion operation:kGetSoftwareVersion numToRead:1];
 	}
+	[pmcLink setSbcCodeVersion:theVersion];
 	return theVersion;
 }
 

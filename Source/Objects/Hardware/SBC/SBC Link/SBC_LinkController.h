@@ -51,6 +51,7 @@
 	IBOutlet NSTextField*   shutdown2Field;
 	IBOutlet NSButton*		shutdownButton;
 	IBOutlet NSButton*		shutdownRebootButton;
+	IBOutlet NSButton*		checkVersionButton;
 
 	//Monitoring
 	IBOutlet NSTextField*   runInfoField;
@@ -90,6 +91,7 @@
 	IBOutlet NSButton*		doRangeButton;
 	IBOutlet NSMatrix*      readWriteTypeMatrix;
 	IBOutlet NSPopUpButton* addressModifierPU;
+	IBOutlet NSTextField*	codeVersionField;
 
 	//TCP/IP Tuning
 	IBOutlet NSButton*		pingButton;
@@ -115,6 +117,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) codeVersionChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) numTestPointsChanged:(NSNotification*)aNote;
 - (void) filePathChanged:(NSNotification*)aNote;
@@ -192,6 +195,7 @@
 - (IBAction) payloadSizeAction:(id)sender;
 - (IBAction) downloadDriverAction:(id)sender;
 - (IBAction) closeDriverInstallPanel:(id)sender;
+- (IBAction) getSbcCodeVersion:(id)sender;
 
 #pragma mark ¥¥¥DataSource
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
