@@ -41,6 +41,7 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 	[systemParams release];
 	[connectionHistory release];
     [IPNumber release];
+	[queue removeObserver:self forKeyPath:@"operations"];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
