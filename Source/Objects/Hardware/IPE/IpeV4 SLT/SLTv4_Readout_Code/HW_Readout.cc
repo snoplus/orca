@@ -25,8 +25,8 @@
 #include <time.h>
 #include <errno.h>
 
-#define kGetSoftwareVersion 1
-#define kFdhwLibVersion     1 
+#define kCodeVersion     1
+#define kFdhwLibVersion  2
 
 
 #define USE_PBUS 0
