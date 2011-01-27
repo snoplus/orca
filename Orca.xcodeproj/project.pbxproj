@@ -549,7 +549,6 @@
 		8425402E12F077EE00472314 /* SLTv4GeneralOperations.h in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 8425402C12F0779700472314 /* SLTv4GeneralOperations.h */; };
 		842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842544E012F1FF9E00472314 /* BamDetector.nib */; };
 		842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842544E112F1FF9E00472314 /* BamDetector.tif */; };
-		842544EC12F1FF9F00472314 /* BamDetectorBackground.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842544E212F1FF9E00472314 /* BamDetectorBackground.tif */; };
 		842544ED12F1FF9F00472314 /* BamDetectorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842544E312F1FF9E00472314 /* BamDetectorController.h */; };
 		842544EE12F1FF9F00472314 /* BamDetectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842544E412F1FF9E00472314 /* BamDetectorController.m */; };
 		842544EF12F1FF9F00472314 /* BamDetectorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 842544E512F1FF9E00472314 /* BamDetectorModel.h */; };
@@ -3274,7 +3273,6 @@
 		8425402C12F0779700472314 /* SLTv4GeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLTv4GeneralOperations.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/SLTv4GeneralOperations.h"; sourceTree = SOURCE_ROOT; };
 		842544E012F1FF9E00472314 /* BamDetector.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BamDetector.nib; path = Source/Experiments/BamDectector/BamDetector.nib; sourceTree = SOURCE_ROOT; };
 		842544E112F1FF9E00472314 /* BamDetector.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BamDetector.tif; path = Source/Experiments/BamDectector/BamDetector.tif; sourceTree = SOURCE_ROOT; };
-		842544E212F1FF9E00472314 /* BamDetectorBackground.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BamDetectorBackground.tif; path = Source/Experiments/BamDectector/BamDetectorBackground.tif; sourceTree = SOURCE_ROOT; };
 		842544E312F1FF9E00472314 /* BamDetectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BamDetectorController.h; path = Source/Experiments/BamDectector/BamDetectorController.h; sourceTree = SOURCE_ROOT; };
 		842544E412F1FF9E00472314 /* BamDetectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BamDetectorController.m; path = Source/Experiments/BamDectector/BamDetectorController.m; sourceTree = SOURCE_ROOT; };
 		842544E512F1FF9E00472314 /* BamDetectorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BamDetectorModel.h; path = Source/Experiments/BamDectector/BamDetectorModel.h; sourceTree = SOURCE_ROOT; };
@@ -6664,7 +6662,6 @@
 			children = (
 				842544E012F1FF9E00472314 /* BamDetector.nib */,
 				842544E112F1FF9E00472314 /* BamDetector.tif */,
-				842544E212F1FF9E00472314 /* BamDetectorBackground.tif */,
 				842544E312F1FF9E00472314 /* BamDetectorController.h */,
 				842544E412F1FF9E00472314 /* BamDetectorController.m */,
 				842544E512F1FF9E00472314 /* BamDetectorModel.h */,
@@ -12820,7 +12817,6 @@
 				8472AA8212DB44B400DEEB02 /* MPodMiniCrateSmall.tif in Resources */,
 				842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */,
 				842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */,
-				842544EC12F1FF9F00472314 /* BamDetectorBackground.tif in Resources */,
 				842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

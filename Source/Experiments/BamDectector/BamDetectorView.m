@@ -1,5 +1,5 @@
 //
-//  BamDetectorModel.m
+//  BamDetectorView.m
 //  Orca
 //
 //  Created by Mark Howe on Wed Dec 8 2010
@@ -22,18 +22,6 @@
 #import "ORColorScale.h"
 
 @implementation BamDetectorView
-
-- (void) awakeFromNib
-{	
-	[theBackground release];
-	theBackground = [[NSImage imageNamed:@"BamDetectorBackground"] retain];
-}
-
-- (void) dealloc
-{
-	[theBackground release];
-	[super dealloc];
-}
 
 - (void) makeAllSegments
 {
@@ -66,14 +54,14 @@
 		angle += deltaAngle;
 	}
 	//the center one on the right
-	NSRect segRect = NSMakeRect(xc+2,yc-15,26,26);
+	NSRect segRect = NSMakeRect(xc+2,yc-13,26,26);
 	NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
 	[segmentPaths addObject:segPath];
 	NSBezierPath* errorPath = [NSBezierPath bezierPathWithRect:NSInsetRect(segRect, 4, 2)];
 	[errorPaths addObject:errorPath];
 
 	//the center one on the left
-	segRect = NSMakeRect(xc-37,yc-11,26,26);
+	segRect = NSMakeRect(xc-37,yc-13,26,26);
 	segPath = [NSBezierPath bezierPathWithRect:segRect];
 	[segmentPaths addObject:segPath];
 	errorPath = [NSBezierPath bezierPathWithRect:NSInsetRect(segRect, 4, 2)];
@@ -86,11 +74,10 @@
 
 - (void)drawRect:(NSRect)rect
 {
-	[theBackground compositeToPoint:NSMakePoint(7,7) operation:NSCompositeSourceOver];
-	[[NSColor redColor] set];
-
 	[super drawRect:rect];
-	
+	NSBezierPath* path = [NSBezierPath bezierPathWithOvalInRect:[self bounds]];
+	[[NSColor blackColor] set];
+	[path stroke];
 }
 
 - (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue

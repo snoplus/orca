@@ -24,7 +24,6 @@
 @interface BamDetectorView : ORDetectorView
 {
     IBOutlet ORColorScale* prespecColorScale;
-	NSImage* theBackground;
 }
 - (void) makeAllSegments;
 @end
