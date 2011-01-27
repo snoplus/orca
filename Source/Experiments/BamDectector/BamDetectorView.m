@@ -51,11 +51,12 @@
 	//float deltaAngle = 360/12.;
 	float deltaAngle = 360/12.;
 	float angleTweak[12] = {0,1,1,1,.5,1,1,0,0,0,0,0};
+	float radiusTweak[12] = {0,0,-2,-2,-1,0,0,0,0,0,0,-2};
 	for(i=0;i<12;i++){
 		NSAffineTransform *transform = [NSAffineTransform transform];
 		[transform translateXBy: xc yBy: h-xc];
 		[transform rotateByDegrees:angle+angleTweak[i]];
-		NSRect segRect = NSMakeRect(r,-14,29,26);
+		NSRect segRect = NSMakeRect(r+radiusTweak[i],-14,29,26);
 		NSBezierPath* segPath = [NSBezierPath bezierPathWithRect:segRect];
 		[segPath transformUsingAffineTransform: transform];
 		[segmentPaths addObject:segPath];
