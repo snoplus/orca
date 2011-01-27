@@ -547,6 +547,16 @@
 		8425401B12F0772800472314 /* PciSBCGeneralOperations.h in cPCI_Code Copy */ = {isa = PBXBuildFile; fileRef = 8425401912F0770B00472314 /* PciSBCGeneralOperations.h */; };
 		8425402D12F0779700472314 /* SLTv4GeneralOperations.h in Headers */ = {isa = PBXBuildFile; fileRef = 8425402C12F0779700472314 /* SLTv4GeneralOperations.h */; };
 		8425402E12F077EE00472314 /* SLTv4GeneralOperations.h in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 8425402C12F0779700472314 /* SLTv4GeneralOperations.h */; };
+		842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842544E012F1FF9E00472314 /* BamDetector.nib */; };
+		842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842544E112F1FF9E00472314 /* BamDetector.tif */; };
+		842544EC12F1FF9F00472314 /* BamDetectorBackground.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842544E212F1FF9E00472314 /* BamDetectorBackground.tif */; };
+		842544ED12F1FF9F00472314 /* BamDetectorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842544E312F1FF9E00472314 /* BamDetectorController.h */; };
+		842544EE12F1FF9F00472314 /* BamDetectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842544E412F1FF9E00472314 /* BamDetectorController.m */; };
+		842544EF12F1FF9F00472314 /* BamDetectorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 842544E512F1FF9E00472314 /* BamDetectorModel.h */; };
+		842544F012F1FF9F00472314 /* BamDetectorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 842544E612F1FF9E00472314 /* BamDetectorModel.m */; };
+		842544F112F1FF9F00472314 /* BamDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 842544E712F1FF9E00472314 /* BamDetectorView.h */; };
+		842544F212F1FF9F00472314 /* BamDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 842544E812F1FF9E00472314 /* BamDetectorView.m */; };
+		842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842544E912F1FF9E00472314 /* edu.washington.npl.orca.BamDetector.plist */; };
 		842702810B5EE938009176B4 /* katrin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842702800B5EE937009176B4 /* katrin.gif */; };
 		84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */; };
 		84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */; };
@@ -3262,6 +3272,16 @@
 		84253F8612F073C300472314 /* VmeSBCGeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VmeSBCGeneralOperations.h; sourceTree = "<group>"; };
 		8425401912F0770B00472314 /* PciSBCGeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PciSBCGeneralOperations.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/PciSBCGeneralOperations.h; sourceTree = SOURCE_ROOT; };
 		8425402C12F0779700472314 /* SLTv4GeneralOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLTv4GeneralOperations.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/SLTv4GeneralOperations.h"; sourceTree = SOURCE_ROOT; };
+		842544E012F1FF9E00472314 /* BamDetector.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BamDetector.nib; path = Source/Experiments/BamDectector/BamDetector.nib; sourceTree = SOURCE_ROOT; };
+		842544E112F1FF9E00472314 /* BamDetector.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BamDetector.tif; path = Source/Experiments/BamDectector/BamDetector.tif; sourceTree = SOURCE_ROOT; };
+		842544E212F1FF9E00472314 /* BamDetectorBackground.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BamDetectorBackground.tif; path = Source/Experiments/BamDectector/BamDetectorBackground.tif; sourceTree = SOURCE_ROOT; };
+		842544E312F1FF9E00472314 /* BamDetectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BamDetectorController.h; path = Source/Experiments/BamDectector/BamDetectorController.h; sourceTree = SOURCE_ROOT; };
+		842544E412F1FF9E00472314 /* BamDetectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BamDetectorController.m; path = Source/Experiments/BamDectector/BamDetectorController.m; sourceTree = SOURCE_ROOT; };
+		842544E512F1FF9E00472314 /* BamDetectorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BamDetectorModel.h; path = Source/Experiments/BamDectector/BamDetectorModel.h; sourceTree = SOURCE_ROOT; };
+		842544E612F1FF9E00472314 /* BamDetectorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BamDetectorModel.m; path = Source/Experiments/BamDectector/BamDetectorModel.m; sourceTree = SOURCE_ROOT; };
+		842544E712F1FF9E00472314 /* BamDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BamDetectorView.h; path = Source/Experiments/BamDectector/BamDetectorView.h; sourceTree = SOURCE_ROOT; };
+		842544E812F1FF9E00472314 /* BamDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BamDetectorView.m; path = Source/Experiments/BamDectector/BamDetectorView.m; sourceTree = SOURCE_ROOT; };
+		842544E912F1FF9E00472314 /* edu.washington.npl.orca.BamDetector.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.BamDetector.plist; path = Source/Experiments/BamDectector/edu.washington.npl.orca.BamDetector.plist; sourceTree = SOURCE_ROOT; };
 		842702800B5EE937009176B4 /* katrin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = katrin.gif; path = Source/Experiments/Katrin/katrin.gif; sourceTree = SOURCE_ROOT; };
 		84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP320Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.h; sourceTree = SOURCE_ROOT; };
 		84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIP320Decoders.m; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.m; sourceTree = SOURCE_ROOT; };
@@ -6639,6 +6659,24 @@
 			path = "Source/Main Dialogs/ORCARootService";
 			sourceTree = SOURCE_ROOT;
 		};
+		842544DF12F1FF9E00472314 /* BamDectector */ = {
+			isa = PBXGroup;
+			children = (
+				842544E012F1FF9E00472314 /* BamDetector.nib */,
+				842544E112F1FF9E00472314 /* BamDetector.tif */,
+				842544E212F1FF9E00472314 /* BamDetectorBackground.tif */,
+				842544E312F1FF9E00472314 /* BamDetectorController.h */,
+				842544E412F1FF9E00472314 /* BamDetectorController.m */,
+				842544E512F1FF9E00472314 /* BamDetectorModel.h */,
+				842544E612F1FF9E00472314 /* BamDetectorModel.m */,
+				842544E712F1FF9E00472314 /* BamDetectorView.h */,
+				842544E812F1FF9E00472314 /* BamDetectorView.m */,
+				842544E912F1FF9E00472314 /* edu.washington.npl.orca.BamDetector.plist */,
+			);
+			name = BamDectector;
+			path = Source/Experiments/BamDectector;
+			sourceTree = SOURCE_ROOT;
+		};
 		8428ADD30D7CACD00093D35E /* HeaderExplorer */ = {
 			isa = PBXGroup;
 			children = (
@@ -9360,6 +9398,7 @@
 			isa = PBXGroup;
 			children = (
 				849B26D60B2F48490007484F /* BaseClasses */,
+				842544DF12F1FF9E00472314 /* BamDectector */,
 				84E966C611848BEF008D9119 /* Majorana */,
 				843175C31152766E005643AB /* Halo */,
 				54F5B6F9087206D9003AC228 /* Katrin */,
@@ -12014,6 +12053,9 @@
 				84253F8712F073C300472314 /* VmeSBCGeneralOperations.h in Headers */,
 				8425401A12F0770B00472314 /* PciSBCGeneralOperations.h in Headers */,
 				8425402D12F0779700472314 /* SLTv4GeneralOperations.h in Headers */,
+				842544ED12F1FF9F00472314 /* BamDetectorController.h in Headers */,
+				842544EF12F1FF9F00472314 /* BamDetectorModel.h in Headers */,
+				842544F112F1FF9F00472314 /* BamDetectorView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12056,7 +12098,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -12777,6 +12818,10 @@
 				8472AA8012DB44B400DEEB02 /* MPodMiniCrate.nib in Resources */,
 				8472AA8112DB44B400DEEB02 /* MPodMiniCrate.tif in Resources */,
 				8472AA8212DB44B400DEEB02 /* MPodMiniCrateSmall.tif in Resources */,
+				842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */,
+				842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */,
+				842544EC12F1FF9F00472314 /* BamDetectorBackground.tif in Resources */,
+				842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13636,6 +13681,9 @@
 				8472AA8412DB44B400DEEB02 /* ORMPodMiniCrateController.m in Sources */,
 				8472AA8612DB44B400DEEB02 /* ORMPodMiniCrateModel.m in Sources */,
 				84BDF04412DC943700B974F8 /* ORSNMP.m in Sources */,
+				842544EE12F1FF9F00472314 /* BamDetectorController.m in Sources */,
+				842544F012F1FF9F00472314 /* BamDetectorModel.m in Sources */,
+				842544F212F1FF9F00472314 /* BamDetectorView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
