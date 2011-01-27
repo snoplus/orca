@@ -2,8 +2,8 @@
 //  BamDetectorController.m
 //  Orca
 //
-//  Created by Mark Howe on Wed Dec 8 2010
-//  Copyright (c) 2010 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Thur Jan,27 2011
+//  Copyright (c) 2011 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //North Carolina  sponsored in part by the United States 
@@ -17,33 +17,18 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "BamDetectorController.h"
-#import "BamDetectorModel.h"
-#import "ORSegmentGroup.h"
 
 @implementation BamDetectorController
-
 #pragma mark ¥¥¥Initialization
-
--(id)init
+- (id) init
 {
     self = [super initWithWindowNibName:@"BamDetector"];
     return self;
 }
 
-
 #pragma mark ¥¥¥Subclass responsibility
-- (void) loadSegmentGroups
-{
-	if(!segmentGroups)segmentGroups = [[NSMutableArray array] retain];
-	ORSegmentGroup* aGroup = [model segmentGroup:0];
-	if(![segmentGroups containsObject:aGroup]){
-		[segmentGroups addObject:aGroup];
-	}
-}
-
 - (NSString*) defaultPrimaryMapFilePath
 {
 	return @"~/BamDetector";

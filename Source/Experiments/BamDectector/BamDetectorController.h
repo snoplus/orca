@@ -2,8 +2,8 @@
 //  BamDetectorController.h
 //  Orca
 //
-//  Created by Mark Howe on Wed Dec 8 2010
-//  Copyright (c) 2010 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Thur Jan,27 2011
+//  Copyright (c) 2011 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //North Carolina  sponsored in part by the United States 
@@ -17,12 +17,11 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORExperimentController.h"
+#import "MonspectrometerController.h"
 
-@interface BamDetectorController : ORExperimentController {	
+@interface BamDetectorController : MonspectrometerController {	
 }
 
 #pragma mark ¥¥¥Subclass responsibility
-- (void) loadSegmentGroups;
 - (NSString*) defaultPrimaryMapFilePath;
 @end

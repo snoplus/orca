@@ -2,8 +2,8 @@
 //  BamDetectorModel.h
 //  Orca
 //
-//  Created by Mark Howe on Wed Dec 8 2010
-//  Copyright (c) 2010 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Thur Jan,27 2011
+//  Copyright (c) 2011 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //North Carolina  sponsored in part by the United States 
@@ -19,9 +19,9 @@
 
 
 #pragma mark ¥¥¥Imported Files
-#import "ORExperimentModel.h"
+#import "MonspectrometerModel.h"
 
-@interface BamDetectorModel :  ORExperimentModel
+@interface BamDetectorModel :  MonspectrometerModel
 {
 }
 

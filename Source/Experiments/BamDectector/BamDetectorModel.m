@@ -2,8 +2,8 @@
 //  BamDetectorModel.m
 //  Orca
 //
-//  Created by Mark Howe on Wed Dec 8 2010
-//  Copyright (c) 2010 University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Thur Jan,27 2011
+//  Copyright (c) 2011 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //North Carolina  sponsored in part by the United States 
@@ -21,7 +21,6 @@
 #pragma mark ¥¥¥Imported Files
 #import "BamDetectorModel.h"
 #import "ORSegmentGroup.h"
-#import "ORDataSet.h"
 
 @implementation BamDetectorModel
 
@@ -44,55 +43,14 @@
 - (void) makeSegmentGroups
 {
 	NSMutableArray* mapEntries = [self initMapEntries:0];//default set	
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"BamDetector" numSegments:64 mapEntries:mapEntries];
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"BamDetector" numSegments:14 mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];
 }
 
-- (float) getTotalRate
-{
-	float rate=0;
-	if([segmentGroups count]!=0) rate = [[segmentGroups objectAtIndex:0] rate];
-	return rate;
-}
-
-- (void) showDataSetForSet:(int)aSet segment:(int)index
-{ 
-	if(aSet>=0 && aSet < [segmentGroups count]){
-		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
-		NSString* cardName = [aGroup segment:index objectForKey:@"kCardSlot"];
-		NSString* chanName = [aGroup segment:index objectForKey:@"kChannel"];
-		if(cardName && chanName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"]){
-			ORDataSet* aDataSet = nil;
-			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
-			NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-			if([objs count]){
-				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
-				if([arrayOfHistos count]){
-					id histoObj = [arrayOfHistos objectAtIndex:0];
-					if([[aGroup adcClassName] isEqualToString:@"ORShaperModel"]){
-						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
-																[NSString stringWithFormat:@"Card %2d",[cardName intValue]], 
-																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-																nil]];
-					}
-					else if([[aGroup adcClassName] isEqualToString:@"ORKatrinFLTModel"]){
-						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
-																[NSString stringWithFormat:@"Station %2d",[cardName intValue]], 
-																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-																nil]];
-					}
-					
-					[aDataSet doDoubleClick:nil];
-				}
-			}
-		}
-	}
-}
-
 - (int)  maxNumSegments
 {
-	return 64;
+	return 14;
 }
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
