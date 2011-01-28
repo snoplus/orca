@@ -25,5 +25,5 @@
 @interface ORNandGateModel :  ORAndGateModel
 {
 }
-- (int) eval;
+- (id) eval;
 @end

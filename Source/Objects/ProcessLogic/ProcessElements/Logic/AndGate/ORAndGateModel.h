@@ -26,5 +26,5 @@
 {
 }
 - (void) setUpImage;
-- (int) eval;
+- (id) eval;
 @end

@@ -37,15 +37,14 @@
 }
 //--------------------------------
 //runs in the process logic thread
-- (int) eval
+- (id) eval
 {
     if(!alreadyEvaluated){
         [self setState:![super eval]];
         alreadyEvaluated = YES;
     }
     [self setEvaluatedState: [self state]];
-	return evaluatedState;
-}
+	return [ORProcessResult processState:evaluatedState value:evaluatedState] ;}
 //--------------------------------
 
 @end
