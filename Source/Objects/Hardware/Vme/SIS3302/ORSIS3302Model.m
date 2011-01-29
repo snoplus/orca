@@ -322,7 +322,6 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	[gateLengths release];
 	[pulseLengths release];
-	[sumGs release];
 	[peakingTimes release];
 	[internalTriggerDelays release];
 	[endAddressThresholds release];
