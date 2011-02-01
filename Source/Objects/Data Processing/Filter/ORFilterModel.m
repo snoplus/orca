@@ -543,9 +543,11 @@ int filterGraph(nodeType*);
 	
 	[thePassThruObject runTaskStarted:userInfo];
 	
-	[userInfo setObject:@"Filtered" forKey:kFileSuffix];
+	NSMutableDictionary* infoCopy = [userInfo mutableCopy];
+	[infoCopy setObject:@"Filtered" forKey:kFileSuffix];
 	
-	[theFilteredObject runTaskStarted:userInfo];
+	[theFilteredObject runTaskStarted:infoCopy];
+	[infoCopy release];
 	
 	runTimer = [[ORTimer alloc] init];
 	[runTimer start];
