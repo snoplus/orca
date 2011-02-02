@@ -1371,12 +1371,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     else {
         int valueArg;
         if(numSetArgs==1){
-            //methods of form 'setvalue:value'
-            valueArg = 0;
-            //set up for undo
-            [invocationForUndo setArgument:0  to:returnValue];
-            [[self hwUndoManager] addToUndo:invocationForUndo withRedo:invocationForSetter];
-        }
+			if(![paramObj useValue]){
+				//methods of form 'function:channel'
+				aValue = theChan;
+			}
+			// else methods of form 'setvalue:value'
+
+			//set up for undo
+			valueArg = 0;
+			[invocationForUndo setArgument:0  to:returnValue];
+			[[self hwUndoManager] addToUndo:invocationForUndo withRedo:invocationForSetter];
+		}
         else {
             //methods of form 'setvaluefor:chan value:value'
             [invocationForSetter setArgument:0  to:theChan];
@@ -1501,16 +1506,33 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 					continue;
 				}
 				
-				if(numberOfSettableArguments <=1){
-					//no channels to deal with, just do the action
-					unsigned long chanMask = [wizObject wizMask];
-					if(chanMask & 0xffffffff){									
-						
-						[self doAction:actionSelection 
-								target: target
-							 parameter:paramObj 
-							   channel:0 
-								 value:parameterValue];
+				if(numberOfSettableArguments <= 1){
+					if([paramObj useValue]){
+						//no channels to deal with, just do the action
+						unsigned long chanMask = [wizObject wizMask];
+						if(chanMask & 0xffffffff){									
+							
+							[self doAction:actionSelection 
+									target: target
+								 parameter:paramObj 
+								   channel:0 
+									 value:parameterValue];
+						}
+					}
+					else {
+							//loop over the channels, doing the action for each channel in the mask.
+						int chan;
+						int numChan = [wizObject numberOfChannels];
+						unsigned long chanMask = [wizObject wizMask];
+						for(chan=0;chan<numChan;chan++){
+							if(chanMask & (1<<chan)){									
+								[self doAction:actionSelection 
+										target: target
+									 parameter:paramObj 
+									   channel:chan 
+										 value:parameterValue];
+							}
+						}
 					}
 				}
 				else {
