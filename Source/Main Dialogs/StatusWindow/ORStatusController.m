@@ -192,6 +192,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     }
 }
 
+- (NSString*) contents
+{
+	return [statusView string];
+}
+
 - (void) updateErrorDisplay
 {
     scheduledToUpdate = NO;

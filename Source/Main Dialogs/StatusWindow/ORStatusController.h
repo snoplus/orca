@@ -56,6 +56,7 @@
 - (void) handleInvocation:(NSInvocation*) anInvocation;
 - (void) removeDataSet:(ORDataSet*)item;
 - (void) setLogBookFile:(NSString*)aFilePath;
+- (NSString*) contents;
 
 #pragma mark ¥¥¥Updating
 - (void) updateErrorDisplay;

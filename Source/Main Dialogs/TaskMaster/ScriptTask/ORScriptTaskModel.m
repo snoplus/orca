@@ -24,6 +24,7 @@
 #import "ORScriptInterface.h"
 #import "ORScriptRunner.h"
 #import "ORMailer.h"
+#import "ORStatusController.h"
 
 NSString*  ORScriptTaskInConnector			= @"ORScriptTaskInConnector";
 NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
@@ -149,6 +150,12 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 {
 	[task setMessage:aMessage];
 }
+
+- (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject
+{
+	[self sendMailTo:receipients cc:cc subject:subject content:[[ORStatusController sharedStatusController] contents]];
+}
+
 
 - (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent
 {

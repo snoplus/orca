@@ -46,6 +46,7 @@
 - (void) setMessage:(NSString*)aMessage;
 - (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent;
 - (void) mailSent:(NSString*)to;
+- (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
