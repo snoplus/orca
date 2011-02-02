@@ -1171,6 +1171,18 @@
 		8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8457BE3411B0183500C4082D /* SIS3820Card.gif */; };
 		8457C2DE11B59DEC00C4082D /* ORCaen785Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */; };
 		8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */; };
+		8457D11E12F8816900D3E3B4 /* EHS8260p.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8457D11612F8816900D3E3B4 /* EHS8260p.nib */; };
+		8457D11F12F8816900D3E3B4 /* EHS8260p.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8457D11712F8816900D3E3B4 /* EHS8260p.tif */; };
+		8457D12012F8816900D3E3B4 /* OREHS8260pController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D11812F8816900D3E3B4 /* OREHS8260pController.h */; };
+		8457D12112F8816900D3E3B4 /* OREHS8260pController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D11912F8816900D3E3B4 /* OREHS8260pController.m */; };
+		8457D12412F8816900D3E3B4 /* OREHS8260pModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D11C12F8816900D3E3B4 /* OREHS8260pModel.h */; };
+		8457D12512F8816900D3E3B4 /* OREHS8260pModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D11D12F8816900D3E3B4 /* OREHS8260pModel.m */; };
+		8457D23912F9933400D3E3B4 /* ORiSeg8ChanHV.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D23712F9933400D3E3B4 /* ORiSeg8ChanHV.h */; };
+		8457D23A12F9933400D3E3B4 /* ORiSeg8ChanHV.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D23812F9933400D3E3B4 /* ORiSeg8ChanHV.m */; };
+		8457D25512F9986E00D3E3B4 /* ORiSeg8ChanHVController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D25312F9986E00D3E3B4 /* ORiSeg8ChanHVController.h */; };
+		8457D25612F9986E00D3E3B4 /* ORiSeg8ChanHVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */; };
+		8457D37712F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */; };
+		8457D37812F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */; };
 		845B13F71227E5D40022F207 /* ORPxiIOCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13F51227E5D40022F207 /* ORPxiIOCard.h */; };
 		845B13F81227E5D40022F207 /* ORPxiIOCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B13F61227E5D40022F207 /* ORPxiIOCard.m */; };
 		845B14061227E7DC0022F207 /* ORPxi6289Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */; };
@@ -1244,8 +1256,6 @@
 		8472AA6C12DB44B400DEEB02 /* EHQ8060n.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8472AA4D12DB44B300DEEB02 /* EHQ8060n.tif */; };
 		8472AA6D12DB44B400DEEB02 /* OREHQ8060nController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA4E12DB44B300DEEB02 /* OREHQ8060nController.h */; };
 		8472AA6E12DB44B400DEEB02 /* OREHQ8060nController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA4F12DB44B400DEEB02 /* OREHQ8060nController.m */; };
-		8472AA6F12DB44B400DEEB02 /* OREHQ8060nDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5012DB44B400DEEB02 /* OREHQ8060nDecoders.h */; };
-		8472AA7012DB44B400DEEB02 /* OREHQ8060nDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5112DB44B400DEEB02 /* OREHQ8060nDecoders.m */; };
 		8472AA7112DB44B400DEEB02 /* OREHQ8060nModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5212DB44B400DEEB02 /* OREHQ8060nModel.h */; };
 		8472AA7212DB44B400DEEB02 /* OREHQ8060nModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5312DB44B400DEEB02 /* OREHQ8060nModel.m */; };
 		8472AA7312DB44B400DEEB02 /* ORMPodCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5512DB44B400DEEB02 /* ORMPodCard.h */; };
@@ -1254,7 +1264,7 @@
 		8472AA7612DB44B400DEEB02 /* ORMPodCrate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5812DB44B400DEEB02 /* ORMPodCrate.m */; };
 		8472AA7712DB44B400DEEB02 /* ORMPodHVCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */; };
 		8472AA7812DB44B400DEEB02 /* ORMPodProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5A12DB44B400DEEB02 /* ORMPodProtocol.h */; };
-		8472AA7912DB44B400DEEB02 /* ORPMPodHVCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5B12DB44B400DEEB02 /* ORPMPodHVCard.m */; };
+		8472AA7912DB44B400DEEB02 /* ORMPodHVCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5B12DB44B400DEEB02 /* ORMPodHVCard.m */; };
 		8472AA7A12DB44B400DEEB02 /* MPodC.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8472AA5D12DB44B400DEEB02 /* MPodC.nib */; };
 		8472AA7B12DB44B400DEEB02 /* MPodC.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8472AA5E12DB44B400DEEB02 /* MPodC.tif */; };
 		8472AA7C12DB44B400DEEB02 /* ORMPodCController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5F12DB44B400DEEB02 /* ORMPodCController.h */; };
@@ -3654,6 +3664,18 @@
 		8457BE3411B0183500C4082D /* SIS3820Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SIS3820Card.gif; path = Source/Objects/Hardware/Vme/SIS3820/SIS3820Card.gif; sourceTree = SOURCE_ROOT; };
 		8457C2DC11B59DEC00C4082D /* ORCaen785Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen785Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.h; sourceTree = SOURCE_ROOT; };
 		8457C2DD11B59DEC00C4082D /* ORCaen785Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen785Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV785/ORCaen785Decoders.m; sourceTree = SOURCE_ROOT; };
+		8457D11612F8816900D3E3B4 /* EHS8260p.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EHS8260p.nib; path = Source/Objects/Hardware/HV/MPod/EHS8260p/EHS8260p.nib; sourceTree = SOURCE_ROOT; };
+		8457D11712F8816900D3E3B4 /* EHS8260p.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = EHS8260p.tif; path = Source/Objects/Hardware/HV/MPod/EHS8260p/EHS8260p.tif; sourceTree = SOURCE_ROOT; };
+		8457D11812F8816900D3E3B4 /* OREHS8260pController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREHS8260pController.h; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pController.h; sourceTree = SOURCE_ROOT; };
+		8457D11912F8816900D3E3B4 /* OREHS8260pController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHS8260pController.m; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pController.m; sourceTree = SOURCE_ROOT; };
+		8457D11C12F8816900D3E3B4 /* OREHS8260pModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREHS8260pModel.h; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pModel.h; sourceTree = SOURCE_ROOT; };
+		8457D11D12F8816900D3E3B4 /* OREHS8260pModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHS8260pModel.m; path = Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pModel.m; sourceTree = SOURCE_ROOT; };
+		8457D23712F9933400D3E3B4 /* ORiSeg8ChanHV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORiSeg8ChanHV.h; sourceTree = "<group>"; };
+		8457D23812F9933400D3E3B4 /* ORiSeg8ChanHV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORiSeg8ChanHV.m; sourceTree = "<group>"; };
+		8457D25312F9986E00D3E3B4 /* ORiSeg8ChanHVController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSeg8ChanHVController.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.h"; sourceTree = SOURCE_ROOT; };
+		8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVController.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.m"; sourceTree = SOURCE_ROOT; };
+		8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSeg8ChanHVDecoders.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.h"; sourceTree = SOURCE_ROOT; };
+		8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVDecoders.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.m"; sourceTree = SOURCE_ROOT; };
 		845B13F51227E5D40022F207 /* ORPxiIOCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiIOCard.h; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.h"; sourceTree = SOURCE_ROOT; };
 		845B13F61227E5D40022F207 /* ORPxiIOCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiIOCard.m; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.m"; sourceTree = SOURCE_ROOT; };
 		845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi6289Controller.h; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Controller.h; sourceTree = SOURCE_ROOT; };
@@ -3729,8 +3751,6 @@
 		8472AA4D12DB44B300DEEB02 /* EHQ8060n.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = EHQ8060n.tif; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/EHQ8060n.tif; sourceTree = SOURCE_ROOT; };
 		8472AA4E12DB44B300DEEB02 /* OREHQ8060nController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREHQ8060nController.h; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nController.h; sourceTree = SOURCE_ROOT; };
 		8472AA4F12DB44B400DEEB02 /* OREHQ8060nController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHQ8060nController.m; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nController.m; sourceTree = SOURCE_ROOT; };
-		8472AA5012DB44B400DEEB02 /* OREHQ8060nDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREHQ8060nDecoders.h; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nDecoders.h; sourceTree = SOURCE_ROOT; };
-		8472AA5112DB44B400DEEB02 /* OREHQ8060nDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHQ8060nDecoders.m; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nDecoders.m; sourceTree = SOURCE_ROOT; };
 		8472AA5212DB44B400DEEB02 /* OREHQ8060nModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OREHQ8060nModel.h; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nModel.h; sourceTree = SOURCE_ROOT; };
 		8472AA5312DB44B400DEEB02 /* OREHQ8060nModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OREHQ8060nModel.m; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nModel.m; sourceTree = SOURCE_ROOT; };
 		8472AA5512DB44B400DEEB02 /* ORMPodCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodCard.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCard.h"; sourceTree = SOURCE_ROOT; };
@@ -3739,7 +3759,7 @@
 		8472AA5812DB44B400DEEB02 /* ORMPodCrate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMPodCrate.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCrate.m"; sourceTree = SOURCE_ROOT; };
 		8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodHVCard.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodHVCard.h"; sourceTree = SOURCE_ROOT; };
 		8472AA5A12DB44B400DEEB02 /* ORMPodProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodProtocol.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodProtocol.h"; sourceTree = SOURCE_ROOT; };
-		8472AA5B12DB44B400DEEB02 /* ORPMPodHVCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMPodHVCard.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORPMPodHVCard.m"; sourceTree = SOURCE_ROOT; };
+		8472AA5B12DB44B400DEEB02 /* ORMPodHVCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMPodHVCard.m; sourceTree = "<group>"; };
 		8472AA5D12DB44B400DEEB02 /* MPodC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MPodC.nib; path = "Source/Objects/Hardware/HV/MPod/MPod Controller/MPodC.nib"; sourceTree = SOURCE_ROOT; };
 		8472AA5E12DB44B400DEEB02 /* MPodC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MPodC.tif; path = "Source/Objects/Hardware/HV/MPod/MPod Controller/MPodC.tif"; sourceTree = SOURCE_ROOT; };
 		8472AA5F12DB44B400DEEB02 /* ORMPodCController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodCController.h; path = "Source/Objects/Hardware/HV/MPod/MPod Controller/ORMPodCController.h"; sourceTree = SOURCE_ROOT; };
@@ -7415,6 +7435,20 @@
 			path = Source/Objects/Hardware/Vme/SIS3820;
 			sourceTree = SOURCE_ROOT;
 		};
+		8457D11512F8816900D3E3B4 /* EHS8260p */ = {
+			isa = PBXGroup;
+			children = (
+				8457D11612F8816900D3E3B4 /* EHS8260p.nib */,
+				8457D11712F8816900D3E3B4 /* EHS8260p.tif */,
+				8457D11812F8816900D3E3B4 /* OREHS8260pController.h */,
+				8457D11912F8816900D3E3B4 /* OREHS8260pController.m */,
+				8457D11C12F8816900D3E3B4 /* OREHS8260pModel.h */,
+				8457D11D12F8816900D3E3B4 /* OREHS8260pModel.m */,
+			);
+			name = EHS8260p;
+			path = Source/Objects/Hardware/HV/MPod/EHS8260p;
+			sourceTree = SOURCE_ROOT;
+		};
 		845B13FD1227E7DC0022F207 /* Pxi6289 */ = {
 			isa = PBXGroup;
 			children = (
@@ -7562,8 +7596,9 @@
 		8472AA4A12DB44B300DEEB02 /* MPod */ = {
 			isa = PBXGroup;
 			children = (
-				8472AA4B12DB44B300DEEB02 /* EHQ8060n */,
 				8472AA5412DB44B400DEEB02 /* MPod Base Classes */,
+				8472AA4B12DB44B300DEEB02 /* EHQ8060n */,
+				8457D11512F8816900D3E3B4 /* EHS8260p */,
 				8472AA5C12DB44B400DEEB02 /* MPod Controller */,
 				8472AA6312DB44B400DEEB02 /* MPod MiniCrate */,
 			);
@@ -7578,8 +7613,6 @@
 				8472AA4D12DB44B300DEEB02 /* EHQ8060n.tif */,
 				8472AA4E12DB44B300DEEB02 /* OREHQ8060nController.h */,
 				8472AA4F12DB44B400DEEB02 /* OREHQ8060nController.m */,
-				8472AA5012DB44B400DEEB02 /* OREHQ8060nDecoders.h */,
-				8472AA5112DB44B400DEEB02 /* OREHQ8060nDecoders.m */,
 				8472AA5212DB44B400DEEB02 /* OREHQ8060nModel.h */,
 				8472AA5312DB44B400DEEB02 /* OREHQ8060nModel.m */,
 			);
@@ -7594,9 +7627,15 @@
 				8472AA5612DB44B400DEEB02 /* ORMPodCard.m */,
 				8472AA5712DB44B400DEEB02 /* ORMPodCrate.h */,
 				8472AA5812DB44B400DEEB02 /* ORMPodCrate.m */,
-				8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */,
 				8472AA5A12DB44B400DEEB02 /* ORMPodProtocol.h */,
-				8472AA5B12DB44B400DEEB02 /* ORPMPodHVCard.m */,
+				8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */,
+				8472AA5B12DB44B400DEEB02 /* ORMPodHVCard.m */,
+				8457D23712F9933400D3E3B4 /* ORiSeg8ChanHV.h */,
+				8457D23812F9933400D3E3B4 /* ORiSeg8ChanHV.m */,
+				8457D25312F9986E00D3E3B4 /* ORiSeg8ChanHVController.h */,
+				8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */,
+				8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */,
+				8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */,
 			);
 			name = "MPod Base Classes";
 			path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes";
@@ -12036,7 +12075,6 @@
 				84D8566312B1702400660530 /* MonspectrometerModel.h in Headers */,
 				84D8566512B1702400660530 /* MonspectrometerView.h in Headers */,
 				8472AA6D12DB44B400DEEB02 /* OREHQ8060nController.h in Headers */,
-				8472AA6F12DB44B400DEEB02 /* OREHQ8060nDecoders.h in Headers */,
 				8472AA7112DB44B400DEEB02 /* OREHQ8060nModel.h in Headers */,
 				8472AA7312DB44B400DEEB02 /* ORMPodCard.h in Headers */,
 				8472AA7512DB44B400DEEB02 /* ORMPodCrate.h in Headers */,
@@ -12053,6 +12091,11 @@
 				842544ED12F1FF9F00472314 /* BamDetectorController.h in Headers */,
 				842544EF12F1FF9F00472314 /* BamDetectorModel.h in Headers */,
 				842544F112F1FF9F00472314 /* BamDetectorView.h in Headers */,
+				8457D12012F8816900D3E3B4 /* OREHS8260pController.h in Headers */,
+				8457D12412F8816900D3E3B4 /* OREHS8260pModel.h in Headers */,
+				8457D23912F9933400D3E3B4 /* ORiSeg8ChanHV.h in Headers */,
+				8457D25512F9986E00D3E3B4 /* ORiSeg8ChanHVController.h in Headers */,
+				8457D37712F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12818,6 +12861,8 @@
 				842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */,
 				842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */,
 				842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */,
+				8457D11E12F8816900D3E3B4 /* EHS8260p.nib in Resources */,
+				8457D11F12F8816900D3E3B4 /* EHS8260p.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13667,11 +13712,10 @@
 				84D8566412B1702400660530 /* MonspectrometerModel.m in Sources */,
 				84D8566612B1702400660530 /* MonspectrometerView.m in Sources */,
 				8472AA6E12DB44B400DEEB02 /* OREHQ8060nController.m in Sources */,
-				8472AA7012DB44B400DEEB02 /* OREHQ8060nDecoders.m in Sources */,
 				8472AA7212DB44B400DEEB02 /* OREHQ8060nModel.m in Sources */,
 				8472AA7412DB44B400DEEB02 /* ORMPodCard.m in Sources */,
 				8472AA7612DB44B400DEEB02 /* ORMPodCrate.m in Sources */,
-				8472AA7912DB44B400DEEB02 /* ORPMPodHVCard.m in Sources */,
+				8472AA7912DB44B400DEEB02 /* ORMPodHVCard.m in Sources */,
 				8472AA7D12DB44B400DEEB02 /* ORMPodCController.m in Sources */,
 				8472AA7F12DB44B400DEEB02 /* ORMPodCModel.m in Sources */,
 				8472AA8412DB44B400DEEB02 /* ORMPodMiniCrateController.m in Sources */,
@@ -13680,6 +13724,11 @@
 				842544EE12F1FF9F00472314 /* BamDetectorController.m in Sources */,
 				842544F012F1FF9F00472314 /* BamDetectorModel.m in Sources */,
 				842544F212F1FF9F00472314 /* BamDetectorView.m in Sources */,
+				8457D12112F8816900D3E3B4 /* OREHS8260pController.m in Sources */,
+				8457D12512F8816900D3E3B4 /* OREHS8260pModel.m in Sources */,
+				8457D23A12F9933400D3E3B4 /* ORiSeg8ChanHV.m in Sources */,
+				8457D25612F9986E00D3E3B4 /* ORiSeg8ChanHVController.m in Sources */,
+				8457D37812F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
