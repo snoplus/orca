@@ -52,7 +52,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 - (void) dealloc 
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		[voltageHistory[i] release];
 		[currentHistory[i] release];
 	}
@@ -100,6 +100,12 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVShipRecordsChanged object:self];
 }
 
+- (BOOL) channelInBounds:(int)aChan
+{
+	if(aChan>=0 && aChan<8)return YES;
+	else return NO;
+}
+
 - (int) selectedChannel
 {
     return selectedChannel;
@@ -114,7 +120,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (int) channel:(int)i readParamAsInt:(NSString*)name
 {
-	if(i>=0 && i<kNumiSeg8ChanHVChannels) {
+	if([self channelInBounds:i]){
 		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
 	}
 	else return 0;
@@ -122,7 +128,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (float) channel:(int)i readParamAsFloat:(NSString*)name
 {
-	if(i>=0 && i<kNumiSeg8ChanHVChannels) {
+	if([self channelInBounds:i]){
 		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
 	}
 	else return 0;
@@ -130,7 +136,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (id) channel:(int)i readParamAsValue:(NSString*)name
 {
-	if(i>=0 && i<kNumiSeg8ChanHVChannels) {
+	if([self channelInBounds:i]){
 		return [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
 	}
 	else return nil;
@@ -138,7 +144,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (id) channel:(int)i readParamAsObject:(NSString*)name
 {
-	if(i>=0 && i<kNumiSeg8ChanHVChannels) {
+	if([self channelInBounds:i]){
 		return [rdParams[i] objectForKey:name];
 	}
 	else return @"";
@@ -187,7 +193,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	NSMutableArray* convertedArray = [NSMutableArray array];
 	for(id aParam in someChannelParams){
 		int i;
-		for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+		for(i=0;i<8;i++){
 			[convertedArray addObject:[aParam stringByAppendingFormat:@".u%d",[self slotChannelValue:i]]];
 		}
 	}
@@ -230,7 +236,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 				if([anEntry objectForKey:@"Channel"]){
 					int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
 					NSString* name = [anEntry objectForKey:@"Name"];
-					if(theChannel>=0 && theChannel<kNumiSeg8ChanHVChannels){
+					if([self channelInBounds:theChannel]){
 						if(!rdParams[theChannel])rdParams[theChannel] = [[NSMutableDictionary dictionary] retain];
 						if(name)[rdParams[theChannel] setObject:anEntry forKey:name];
 					}
@@ -241,14 +247,14 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	if([[self adapter] respondsToSelector:@selector(power)]){
 		if(![[self adapter] power]){
 			int i;
-			for(i=0;i<	kNumiSeg8ChanHVChannels;i++){
+			for(i=0;i<	8;i++){
 				[rdParams[i] removeAllObjects];
 			}
 		}
 	}
 	
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
 		if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
 		[voltageHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"]];
@@ -275,7 +281,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	int count = 0;
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		int state = [self channel:i readParamAsInt:@"outputSwitch"];
 		if(state == kiSeg8ChanHVOutputOn)count++;
 	}
@@ -285,7 +291,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	unsigned long mask = 0x0;
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		int state = [self channel:i readParamAsInt:@"outputSwitch"];
 		mask |= (1L<<state);
 	}
@@ -296,7 +302,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	int count = 0;
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		float voltage = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
 		float voltDiff = fabs(voltage - hwGoal[i]);
 		if(voltDiff > 5)count++;
@@ -308,7 +314,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	int count = 0;
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		float voltage	= [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
 		if(voltage > 0)count++;
 	}
@@ -319,7 +325,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	int count = 0;
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		if(hwGoal[i] > 0)count++;
 	}
 	return count;
@@ -328,21 +334,21 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 - (void)  commitTargetsToHwGoals
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		[self commitTargetToHwGoal:i];
 	}
 }
 
 - (void) commitTargetToHwGoal:(int)channel
 {
-	if(channel>=0 && channel<kNumiSeg8ChanHVChannels){
+	if([self channelInBounds:channel]){
 		hwGoal[channel] = target[channel];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVChannelReadParamsChanged object:self];
 	}
 }
 - (void) loadValues:(int)channel
 {
-	if(channel>=0 && channel<kNumiSeg8ChanHVChannels){
+	if([self channelInBounds:channel]){
 		[self commitTargetToHwGoal:selectedChannel];
 		[self writeRiseTime];
 		[self writeVoltage:channel];
@@ -364,7 +370,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) writeVoltage:(int)channel
 {    
-	if(channel>=0 && channel<kNumiSeg8ChanHVChannels){
+	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputVoltage.u%d F %f",[self slotChannelValue:channel],(float)hwGoal[channel]];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
@@ -372,7 +378,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) writeMaxCurrent:(int)channel
 {    
-	if(channel>=0 && channel<kNumiSeg8ChanHVChannels){
+	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputCurrent.u%d F %f",[self slotChannelValue:channel],maxCurrent[channel]/1000.];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
@@ -416,7 +422,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) stopRamping:(int)channel
 {
-	if(channel>=0 && channel<kNumiSeg8ChanHVChannels){
+	if([self channelInBounds:channel]){
 		//the only way to stop a ramp is to change the hwGoal to be the actual voltage
 		float voltageNow = [self channel:channel readParamAsFloat:@"outputMeasurementSenseVoltage"];
 		if(fabs(voltageNow-(float)hwGoal[channel])>5){
@@ -428,7 +434,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) rampToZero:(int)channel
 {
-	if(channel>=0 && channel<kNumiSeg8ChanHVChannels){
+	if([self channelInBounds:channel]){
 		[self setHwGoal:channel withValue:0];
 		[self writeVoltage:channel];
 	}
@@ -436,7 +442,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) panic:(int)channel
 {
-	if(channel>=0 && channel<kNumiSeg8ChanHVChannels){
+	if([self channelInBounds:channel]){
 		[self setHwGoal:channel withValue:0];
 		[self panicChannel:channel];
 	}
@@ -444,7 +450,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (BOOL) isOn:(int)aChannel
 {
-	if(aChannel>=0 && aChannel<8){
+	if([self channelInBounds:aChannel]){
 		int outputSwitch = [self channel:aChannel readParamAsInt:@"outputSwitch"];
 		return outputSwitch==kiSeg8ChanHVOutputOn;
 	}
@@ -454,49 +460,49 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 - (void) turnAllChannelsOn
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self turnChannelOn:i];
+	for(i=0;i<8;i++)[self turnChannelOn:i];
 }
 
 - (void) turnAllChannelsOff
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self turnChannelOff:i];
+	for(i=0;i<8;i++)[self turnChannelOff:i];
 }
 
 - (void) panicAllChannels
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self panic:i];
+	for(i=0;i<8;i++)[self panic:i];
 }
 
 - (void) clearAllPanicChannels
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self clearPanicChannel:i];
+	for(i=0;i<8;i++)[self clearPanicChannel:i];
 }
 
 - (void) clearAllEventsChannels
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self clearEventsChannel:i];	
+	for(i=0;i<8;i++)[self clearEventsChannel:i];	
 }
 
 - (void) stopAllRamping
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self stopRamping:i];
+	for(i=0;i<8;i++)[self stopRamping:i];
 }
 
 - (void) rampAllToZero
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self rampToZero:i];
+	for(i=0;i<8;i++)[self rampToZero:i];
 }
 
 - (void) panicAll
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++)[self panic:i];
+	for(i=0;i<8;i++)[self panic:i];
 }
 
 - (unsigned long) failureEvents:(int)channel
@@ -514,7 +520,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	unsigned long failEvents = 0;
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		failEvents |= [self failureEvents:i];
 	}
 	return failEvents;
@@ -547,7 +553,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[super processSyncResponseArray:response];
 	for(id anEntry in response){
 		int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
-		if(theChannel>=0 && theChannel<kNumiSeg8ChanHVChannels){
+		if(theChannel>=0 && theChannel<8){
 			NSString* name = [anEntry objectForKey:@"Name"];
 			if([name isEqualToString:@"outputMeasurementSenseVoltage"])	[self setTarget:theChannel withValue:[[anEntry objectForKey:@"Value"] intValue]];
 		}
@@ -564,33 +570,51 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVRiseRateChanged object:self];
 }
 
-- (int) hwGoal:(short)chan	{ return hwGoal[chan]; }
+- (int) hwGoal:(short)chan	
+{ 
+	if([self channelInBounds:chan])return hwGoal[chan]; 
+	else return 0;
+}
 - (void) setHwGoal:(short)chan withValue:(int)aValue 
 { 
-	if(aValue<0)aValue=0;
-	else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
-	hwGoal[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVHwGoalChanged object:self];
+	if([self channelInBounds:chan]){
+		if(aValue<0)aValue=0;
+		else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
+		hwGoal[chan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVHwGoalChanged object:self];
+	}
 }
-- (float) maxCurrent:(short)chan { return maxCurrent[chan]; }
+- (float) maxCurrent:(short)chan 
+{ 
+	if([self channelInBounds:chan])return maxCurrent[chan]; 
+	else return 0;
+}
 
 - (void) setMaxCurrent:(short)chan withValue:(float)aValue
 {
- 	if(aValue<1)aValue=1;
-	else if(aValue>kMaxCurrent)aValue = kMaxCurrent;
-	[[[self undoManager] prepareWithInvocationTarget:self] setMaxCurrent:chan withValue:maxCurrent[chan]];
-    maxCurrent[chan] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVMaxCurrentChanged object:self];
+	if([self channelInBounds:chan]){
+		if(aValue<1)aValue=1;
+		else if(aValue>kMaxCurrent)aValue = kMaxCurrent;
+		[[[self undoManager] prepareWithInvocationTarget:self] setMaxCurrent:chan withValue:maxCurrent[chan]];
+		maxCurrent[chan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVMaxCurrentChanged object:self];
+	}
 }
 
-- (int) target:(short)chan	{ return target[chan]; }
+- (int) target:(short)chan	
+{ 
+	if([self channelInBounds:chan])return target[chan]; 
+	else return 0;
+}
 - (void) setTarget:(short)chan withValue:(int)aValue 
 { 
-	if(aValue<0)aValue=0;
-	else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
-    [[[self undoManager] prepareWithInvocationTarget:self] setTarget:chan withValue:target[chan]];
-	target[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVTargetChanged object:self];
+	if([self channelInBounds:chan]){
+		if(aValue<0)aValue=0;
+		else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
+		[[[self undoManager] prepareWithInvocationTarget:self] setTarget:chan withValue:target[chan]];
+		target[chan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVTargetChanged object:self];
+	}
 }
 
 
@@ -606,7 +630,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 - (void) writeVoltages
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		[self writeVoltage:i];
 	}
 }
@@ -614,7 +638,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 - (void) writeMaxCurrents
 {
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		[self writeMaxCurrent:i];
 	}
 }
@@ -662,7 +686,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
     [self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
 	[self setRiseRate:			[decoder decodeFloatForKey:	@"riseRate"]];
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		//[self setHwGoal:i withValue: [decoder decodeIntForKey:   [@"hwGoal" stringByAppendingFormat:@"%d",i]]];
 		[self setTarget:i withValue: [decoder decodeIntForKey:   [@"target" stringByAppendingFormat:@"%d",i]]];
 		[self setMaxCurrent:i withValue:[decoder decodeFloatForKey: [@"maxCurrent" stringByAppendingFormat:@"%d",i]]];
@@ -680,7 +704,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
 	[encoder encodeFloat:riseRate		forKey:@"riseRate"];
 	int i;
- 	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+ 	for(i=0;i<8;i++){
 		//[encoder encodeInt:hwGoal[i] forKey:[@"hwGoal" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:target[i] forKey:[@"target" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeFloat:maxCurrent[i] forKey:[@"maxCurrent" stringByAppendingFormat:@"%d",i]];
@@ -701,7 +725,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	NSMutableArray* ar = [NSMutableArray array];
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		[ar addObject:[NSNumber numberWithInt:*anArray]];
 		anArray++;
 	}
@@ -712,7 +736,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	NSMutableArray* ar = [NSMutableArray array];
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		[ar addObject:[NSNumber numberWithBool:*anArray]];
 		anArray++;
 	}
@@ -723,7 +747,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	NSMutableArray* ar = [NSMutableArray array];
 	int i;
-	for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+	for(i=0;i<8;i++){
 		[ar addObject:[NSNumber numberWithFloat:*anArray]];
 		anArray++;
 	}
@@ -761,7 +785,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 			unsigned long asLong;
 		}theData;
 			
-		for(i=0;i<kNumiSeg8ChanHVChannels;i++){
+		for(i=0;i<8;i++){
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
 			data[5+i] = theData.asLong;
 			
@@ -775,7 +799,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 #pragma mark ¥¥¥Convenience Methods
 - (float) voltage:(int)aChannel
 {
-	if(aChannel>-0 && aChannel<8){
+	if([self channelInBounds:aChannel]){
 		return [self channel:aChannel readParamAsFloat:@"outputMeasurementSenseVoltage"];
 	}
 	else return 0;
@@ -783,7 +807,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (float) current:(int)aChannel
 {
-	if(aChannel>-0 && aChannel<8){
+	if([self channelInBounds:aChannel]){
 		return [self channel:aChannel readParamAsFloat:@"outputMeasurementCurrent"];
 	}
 	else return 0;

@@ -24,7 +24,6 @@
 
 @class ORTimeRate;
 
-#define kNumiSeg8ChanHVChannels   8
 #define kPositivePolarity 1
 #define kNegativePolarity 0
 
@@ -62,15 +61,15 @@ enum {
 {
   @protected
 	unsigned long   dataId;
-    short			hwGoal[kNumiSeg8ChanHVChannels];		//value to send to hw
-    short			target[kNumiSeg8ChanHVChannels];		//input by user
+    short			hwGoal[8];		//value to send to hw
+    short			target[8];		//input by user
     float			riseRate;
-	NSMutableDictionary* rdParams[kNumiSeg8ChanHVChannels];
+	NSMutableDictionary* rdParams[8];
     int				selectedChannel;
-    float			maxCurrent[kNumiSeg8ChanHVChannels];
+    float			maxCurrent[8];
 	
-	ORTimeRate*		voltageHistory[kNumiSeg8ChanHVChannels];
-	ORTimeRate*		currentHistory[kNumiSeg8ChanHVChannels];
+	ORTimeRate*		voltageHistory[8];
+	ORTimeRate*		currentHistory[8];
     BOOL			shipRecords;
 }
 
@@ -112,6 +111,7 @@ enum {
 - (int)		numberChannelsWithNonZeroHwGoal;
 - (unsigned long) failureEvents:(int)channel;
 - (unsigned long) failureEvents;
+- (BOOL) channelInBounds:(int)aChan;
 
 #pragma mark ¥¥¥Data Records
 - (unsigned long) dataId;
