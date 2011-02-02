@@ -20,8 +20,6 @@
 
 #pragma mark ***Imported Files
 #import "OREHS8260pModel.h"
-#import "ORDataTypeAssigner.h"
-#import "TimedWorker.h"
 #import "ORMPodProtocol.h"
 #import "ORTimeRate.h"
 #import "ORHWWizSelection.h"
@@ -114,7 +112,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
 - (void) writeTripTime:(int)channel
 {    
-	if(channel>=0 && channel<8){
+	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputTripTimeMaxCurrent.u%d i %d",[self slotChannelValue:channel],tripTime[channel]];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
@@ -122,20 +120,28 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
 - (void) writeSupervisorBehaviour:(int)channel value:(int)aValue
 {    
-	if(channel>=0 && channel<8){
+	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputSupervisionBehavior.u%d i %f",[self slotChannelValue:channel],aValue];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
 }
 
-- (short) tripTime:(short)chan	{ return tripTime[chan]; }
+- (short) tripTime:(short)chan	
+{ 
+	if([self channelInBounds:chan])return tripTime[chan]; 
+	else return 0;
+}
 - (void) setTripTime:(short)chan withValue:(short)aValue 
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setTripTime:chan withValue:tripTime[chan]];
-    tripTime[chan] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:OREHS8260pModelTripTimeChanged object:self];
+	if([self channelInBounds:chan]){
+		if(aValue<16)		 aValue = 16;
+		else if(aValue>4000) aValue = 4000;
+	
+		[[[self undoManager] prepareWithInvocationTarget:self] setTripTime:chan withValue:tripTime[chan]];
+		tripTime[chan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:OREHS8260pModelTripTimeChanged object:self];
+	}
 }
-
 
 #pragma mark •••Hardware Access
 - (void) loadAllValues
@@ -154,9 +160,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    
     [[self undoManager] disableUndoRegistration];
-		
     [self setSupervisorMask:	[decoder decodeIntForKey:@"supervisorMask"]];
 	int i;
 	for(i=0;i<8;i++){
@@ -170,7 +174,6 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-
 	[encoder encodeInt:supervisorMask	forKey:@"supervisorMask"];
 	int i;
  	for(i=0;i<8;i++){
@@ -204,7 +207,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trip Time"];
-    [p setFormat:@"##0" upperLimit:1000 lowerLimit:1 stepSize:1 units:@"mA"];
+    [p setFormat:@"##0" upperLimit:4000 lowerLimit:16 stepSize:1 units:@"mA"];
     [p setSetMethod:@selector(setTripTime:withValue:) getMethod:@selector(tripTime:)];
 	[p setInitMethodSelector:@selector(loadAllValues)];
     [a addObject:p];
