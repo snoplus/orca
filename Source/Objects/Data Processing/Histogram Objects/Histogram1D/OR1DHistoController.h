@@ -42,6 +42,7 @@
 
 #pragma mark ¥¥¥Alarms
 - (IBAction) calibrate:(id)sender;
+- (IBAction) logLin:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (BOOL) plotterShouldShowRoi:(id)aPlot;
