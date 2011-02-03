@@ -454,9 +454,14 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
     [aTask setLaunchPath:executableFileName];
 	NSLog(@"setLaunchPath: %@, \n",[aTask launchPath] );
     [aTask setArguments:args];
+	NSLog(@"Going to launch task executable: \n");
     [aTask launch];
+	sleep(5);
+    //[aTask interrupt];
+	NSLog(@"Tast e. interrupt \n");
 	NSLog(@"task isRunning is: %i, \n",[aTask isRunning]);
 	[aTask release]; //fix leak -- MAH 11/05/11
+	NSLog(@"Tast e. released \n");
 }
 	
 - (void) startPlotter
@@ -504,12 +509,13 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 	theImagePath = [theImagePath  stringByAppendingPathComponent:@"../Data/fieldlines.root_PreSpec.gif"];
 	NSLog(@"theImagePath is: %@ \n",theImagePath);
 	theImagePath = [theImagePath  stringByStandardizingPath];
-	NSLog(@"theImagePath is: %@ \n",theImagePath);
+	NSLog(@"theImagePath (standardized) is: %@ \n",theImagePath);
 	[self setFieldlineImageFileName: theImagePath];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSimulationModelFieldlineImageChanged object:self];
 }
 
 - (void)checkATaskStatus:(NSNotification *)aNotification {
+	NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
     int status = [[aNotification object] terminationStatus];
     if (status == 0)
         NSLog(@"Task succeeded. (status %i)",status);
@@ -811,7 +817,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 	[self setExecutableFileName:[decoder decodeObjectForKey:@"executableFileName"]];
 	if(executableFileName == nil) {[self setExecutableFileName: @"-"];}
 	[self setConfigFileName:	[decoder decodeObjectForKey:  @"configFileName"]];
-	if(configFileName == nil) {[self setConfigFileName: @"fieldline_config2.txt"];NSLog( @"Use default filename: %@\n",configFileName);}
+	if(configFileName == nil) {[self setConfigFileName: @"fieldline_config.txt"];NSLog( @"Use default filename: %@\n",configFileName);}
 
 	[self setShowDebugOutput:	[decoder decodeBoolForKey:    @"showDebugOutput"]];
 	[self setShipRecords:		[decoder decodeBoolForKey:	  @"shipRecords"]];

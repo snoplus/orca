@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelFifoLengthChanged = @"ORKatrinV4FLTModelFifoLengthChanged";
 NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
 NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
 NSString* ORKatrinV4FLTModelShipSumHistogramChanged = @"ORKatrinV4FLTModelShipSumHistogramChanged";
@@ -238,6 +239,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 #pragma mark •••Accessors
 
+- (int) fifoLength
+{
+    return fifoLength;
+}
+
+- (void) setFifoLength:(int)aFifoLength
+{
+	if(aFifoLength != kFifoLength512 && aFifoLength != kFifoLength64) aFifoLength = kFifoLength512;
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoLength:fifoLength];
+    fifoLength = aFifoLength;
+	//NSLog(@"%@::%@: set setFifoLength to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aFifoLength);//-tb-NSLog-tb-
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFifoLengthChanged object:self];
+}
+
 - (int) nfoldCoincidence
 {
     return nfoldCoincidence;
@@ -315,10 +330,19 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
 {
+	if(aRunMode <0 || aRunMode >= kIpeFltV4_NumberOfDaqModes){
+		NSLog(@"ORKatrinV4FLTModel message: unknown DAQ run mode %i, switched to fallback mode!\n", aRunMode);//TODO: fix it -tb-
+		aRunMode = 0;
+	}
+	//NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//debug output -tb-
+	//NSLog(@"Called %@::%@ Num DaqModes is %i, set daq mode to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), kIpeFltV4_NumberOfDaqModes,aRunMode);//debug output -tb-
+
     [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
     runMode = aRunMode;
 	
 	readWaveforms = NO;
+	
+	int fifoLengthSetting = kFifoLength512;
 	
 	switch (runMode) {
 		case kIpeFltV4_EnergyDaqMode:
@@ -349,10 +373,25 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			readWaveforms = YES;
 			break;
 			
+		// new modes after mode redesign 2011-01 -tb-
+		case kIpeFltV4_EnergyTraceSyncDaqMode:
+			[self setFltRunMode:kIpeFltV4Katrin_Run_Mode];
+			if(fifoBehaviour == kFifoEnableOverFlow){
+				NSLog(@"ORKatrinV4FLTModel message: switched FIFO behaviour to kFifoStopOnFull (required for sync'd energy+trace mode)\n");//TODO: fix it -tb-
+				[self setFifoBehaviour: kFifoStopOnFull];
+				//TODO: remember the state and restore it after a run -tb-
+			}
+			readWaveforms = YES;
+			fifoLengthSetting = kFifoLength64;
+			break;
+			
 		default:
-			NSLog(@"ORKatrinV4FLTModel WARNING: setRunMode: received a unknown DAQ run mode!\n");
+			NSLog(@"ORKatrinV4FLTModel WARNING: setRunMode: received a unknown DAQ run mode (%i)!\n",aRunMode);
 			break;
 	}
+	[self setFifoLength: fifoLengthSetting];
+
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelRunModeChanged object:self];
 }
 
@@ -427,11 +466,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistNofMeasChanged object:self];
 }
 
-//! This is the time after which a intermediate histogram will be read out.
+//! This is the time after which a intermediate histogram will be read out - in the GUI called "Refresh time".
 - (unsigned long) histMeasTime { return histMeasTime; }
 - (void) setHistMeasTime:(unsigned long)aHistMeasTime
 {
-	if(aHistMeasTime==0) aHistMeasTime=5;
+	if(aHistMeasTime<2){
+		NSLog(@"%@:: Warning: tried to set refresh time to %i (minimum is 2)\n",NSStringFromClass([self class]),aHistMeasTime); 
+		aHistMeasTime=2;
+	}
     histMeasTime = aHistMeasTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistMeasTimeChanged object:self];
 }
@@ -767,9 +809,9 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 	[self setRunBoxCarFilter:YES];
 	[self setGapLength:0];
-	[self setFilterLength:6];
+	[self setFilterLength:5];
 	[self setFifoBehaviour:kFifoEnableOverFlow];// kFifoEnableOverFlow or kFifoStopOnFull
-	[self setPostTriggerTime:300]; // max. filter length should fit into the range -tb-
+	[self setPostTriggerTime:1024]; // max. filter length should fit into the range -tb-
 	
 	[self setHistMeasTime:	5];
 }
@@ -962,7 +1004,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) writeControl
 {
+	
+	//TODO: add fifo length -tb- <---------------------------------------------
 	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
+	((fifoLength & 0x1)<<25) |
 	((fifoBehaviour & 0x1)<<24) |
 	((ledOff & 0x1)<<1 );
 	[self writeReg: kFLTV4ControlReg value:aValue];
@@ -976,7 +1021,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
   */
 - (void) writeControlWithFltRunMode:(int)aMode
 {
+	
+	//TODO: add fifo length -tb- <---------------------------------------------
 	unsigned long aValue =  ((aMode & 0xf)<<16) | 
+	((fifoLength & 0x1)<<25) |
 	((fifoBehaviour & 0x1)<<24) |
 	((ledOff & 0x1)<<1 );
 	[self writeReg: kFLTV4ControlReg value:aValue];
@@ -1307,6 +1355,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     [[self undoManager] disableUndoRegistration];
 	
+    [self setFifoLength:[decoder decodeIntForKey:@"fifoLength"]];
     [self setNfoldCoincidence:[decoder decodeIntForKey:@"nfoldCoincidence"]];
     [self setVetoOverlapTime:[decoder decodeIntForKey:@"vetoOverlapTime"]];
     [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
@@ -1377,6 +1426,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt:fifoLength forKey:@"fifoLength"];
     [encoder encodeInt:nfoldCoincidence forKey:@"nfoldCoincidence"];
     [encoder encodeInt:vetoOverlapTime forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram forKey:@"shipSumHistogram"];
@@ -1438,12 +1488,21 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     histogramId = aDataId;
 }
 
+- (unsigned long) energyTraceId { return energyTraceId; }
+- (void) setEnergyTraceId: (unsigned long) aDataId
+{
+    energyTraceId = aDataId;
+}
+
+
+
 - (void) setDataIds:(id)assigner
 {
     dataId      = [assigner assignDataIds:kLongForm];
     hitRateId   = [assigner assignDataIds:kLongForm];
     waveFormId  = [assigner assignDataIds:kLongForm];
     histogramId  = [assigner assignDataIds:kLongForm];
+    energyTraceId  = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
@@ -1452,6 +1511,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [self setHitRateId:[anotherCard hitRateId]];
     [self setWaveFormId:[anotherCard waveFormId]];
     [self setHistogramId:[anotherCard histogramId]];
+    [self setEnergyTraceId:[anotherCard energyTraceId]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -1493,6 +1553,15 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				   nil];
 	
     [dataDictionary setObject:aDictionary forKey:@"KatrinV4FLTHistogram"];
+	
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORKatrinV4FLTDecoderForEnergyTrace",	@"decoder",
+				   [NSNumber numberWithLong:energyTraceId],	@"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"KatrinV4FLTEnergyTrace"];
 	
     return dataDictionary;
 }
@@ -1613,8 +1682,15 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	}
 	
 	[self writeRunControl:YES];//TODO: still necessary?? -tb-
+	if(runMode == kIpeFltV4_EnergyTraceSyncDaqMode){
+		if((fifoLength != kFifoLength64) || (fifoBehaviour != kFifoStopOnFull)){
+			[self setRunMode: runMode];// this sets all necessary settings
+			[self setFifoBehaviour: kFifoStopOnFull];
+			[self setFifoLength: kFifoLength64];
+		}
+	}
 	[self writeControl];
-	[self writeSeconds:0];
+	[self writeSeconds:0];//TODO: write UTC/UNIX time would be better -tb-
 
 }
 
@@ -1656,6 +1732,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].hw_mask[0] 	= dataId;					//record id for energies
 	configStruct->card_info[index].hw_mask[1] 	= waveFormId;				//record id for the waveforms
 	configStruct->card_info[index].hw_mask[2] 	= histogramId;				//record id for the histograms
+	configStruct->card_info[index].hw_mask[3] 	= energyTraceId;			//record id for the energy+trace event records (new from 2011-01 -tb-)
 	configStruct->card_info[index].slot			= [self stationNumber];		//the PMC readout (fdhwlib) uses col 0 thru n-1; stationNumber is from 1 to n (and FLT register entry SlotID too)
 	configStruct->card_info[index].crate		= [self crateNumber];
 	
@@ -1915,6 +1992,10 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 		unsigned long last = (firstLast >>16) & 0xffff;
 		NSLog(@"%d: 0x%08x 0x%08x\n",i,first, last);
 	}
+
+	//TEST: send a software trigger
+	//[self writeReg:kFLTV4CommandReg value:kIpeFlt_SW_Trigger];
+
 }
 
 - (void) printEventFIFOs

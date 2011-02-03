@@ -31,6 +31,19 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
+
+
+@interface ORKatrinV4FLTDecoderForEnergyTrace : ORIpeCardDecoder {
+	@private 
+		BOOL getRatesFromDecodeStage;
+		NSMutableDictionary* actualFlts;
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+
 @interface ORKatrinV4FLTDecoderForEnergy : ORIpeCardDecoder {
 	@private 
 		BOOL getRatesFromDecodeStage;

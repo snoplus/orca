@@ -44,7 +44,12 @@
 #define kIpeFlt_Cntl_InterruptSources_Shift	0
 #define kIpeFlt_Cntl_InterruptSources_Mask	0xff
 
+
+//Command register (kFLTV4CommandReg) pattern
 #define kIpeFlt_Cmd_LoadGains	            0x100
+#define kIpeFlt_SW_Trigger					0x80000000
+//#define kIpeFlt_Reset_All			0x18010 I added the resetPage flag -tb-
+#define kIpeFlt_Reset_All			0x38010
 
 #define kIpeFlt_Periph_CoinTme_Shift		0
 #define kIpeFlt_Periph_CoinTme_Mask			0x1ff
@@ -66,6 +71,7 @@
 #define kIpeFlt_EnergyMode		0
 #define kIpeFlt_EnergyTrace		1
 #define kIpeFlt_Histogram_Mode	2
+...
 #endif
 
 #define kIpeFlt_Intack				0x40000000
@@ -77,14 +83,15 @@
 #define kIpeFlt_PatternMask			0xffffffff // 22bit + Multiplicity
 #define kIpeFlt_TestPattern_Reset	0x00000010
 
-//#define kIpeFlt_Reset_All			0x18010 I added the resetPage flag -tb-
-#define kIpeFlt_Reset_All			0x38010
 
 #define kSetStandBy		1
 #define kReleaseStandBy 0
 
 #define kFifoEnableOverFlow 0
 #define kFifoStopOnFull     1
+
+#define kFifoLength512		0
+#define kFifoLength64		1
 
 #define SELECT_ALL_CHANNELS ( 0x1F <<16) // ak, 7.10.07
 

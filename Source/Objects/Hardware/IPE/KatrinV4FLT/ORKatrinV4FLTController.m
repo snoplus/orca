@@ -328,9 +328,20 @@
                          name : ORKatrinV4FLTModelNfoldCoincidenceChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(fifoLengthChanged:)
+                         name : ORKatrinV4FLTModelFifoLengthChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) fifoLengthChanged:(NSNotification*)aNote
+{
+	//NSLog(@"%@::%@: fifoLength is %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fifoLength]);//-tb-NSLog-tb-
+	[fifoLengthPU selectItemAtIndex: [model fifoLength]];
+}
 
 - (void) nfoldCoincidenceChanged:(NSNotification*)aNote
 {
@@ -522,6 +533,7 @@
 	[self shipSumHistogramChanged:nil];
 	[self vetoOverlapTimeChanged:nil];
 	[self nfoldCoincidenceChanged:nil];
+	[self fifoLengthChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -544,10 +556,10 @@
 	BOOL testsAreRunning  = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
     
-	if([model runMode] < 3)	[modeTabView selectTabViewItemAtIndex:0];
-	else					[modeTabView selectTabViewItemAtIndex:1];
+	if([model runMode] < 3 || [model runMode] > 6)	[modeTabView selectTabViewItemAtIndex:0];
+	else											[modeTabView selectTabViewItemAtIndex:1];
 	
-	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && ([model runMode]<3)];
+	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([model runMode]<3) || ([model runMode]>6))];
 	[filterLengthPU setEnabled:!lockedOrRunningMaintenance];
 	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
@@ -801,7 +813,9 @@
 
 - (void) modeChanged:(NSNotification*)aNote
 {
-	[modeButton selectItemAtIndex:[model runMode]];
+	//[modeButton selectItemAtIndex:[model runMode]];
+	// index is not the daq mode number any more -tb-
+	[modeButton selectItemWithTag:[model runMode]];
 	[self updateButtons];
 }
 
@@ -880,9 +894,14 @@
 
 #pragma mark •••Actions
 
+- (void) fifoLengthPUAction:(id)sender
+{
+	[model setFifoLength:[fifoLengthPU indexOfSelectedItem]];	
+}
+
 - (void) nfoldCoincidencePUAction:(id)sender
 {
-	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model setNfoldCoincidence:[sender indexOfSelectedItem]];	
 }
 
@@ -1172,7 +1191,9 @@
 
 - (IBAction) modeAction: (id) sender
 {
-	[model setRunMode:[modeButton indexOfSelectedItem]];
+	//[model setRunMode:[modeButton indexOfSelectedItem]];
+	// index is not equal to daq mode any more, use tag instead -tb-
+	[model setRunMode:[[modeButton selectedItem] tag]];
 }
 
 - (IBAction) versionAction: (id) sender

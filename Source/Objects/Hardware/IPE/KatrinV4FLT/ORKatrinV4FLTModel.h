@@ -85,7 +85,7 @@
 @interface ORKatrinV4FLTModel : ORIpeV4FLTModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     // Hardware configuration
-#if 0
+#if 0  //the following members are already defined for IpeV4FLT, we add only new members of KatrinV4FLT (see at the end) -tb-
     int				fltRunMode;		//!< Run modes: 0=standby, 1=standard, 2=histogram, 3=test
     NSMutableArray* thresholds;     //!< Array to keep the threshold of all 24 channel
     NSMutableArray* gains;			//!< Aarry to keep the gains
@@ -159,9 +159,12 @@
 	
 	unsigned long eventCount[kNumV4FLTChannels];
 #endif
+	unsigned long	energyTraceId;		//!< Id used to identify energy+trace data set (general data set - for sync, skipped trace readout etc. - FLT rev. xxxx,2121)
+
     int shipSumHistogram;
     int vetoOverlapTime;
     int nfoldCoincidence;
+    int fifoLength;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -172,6 +175,8 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) fifoLength;
+- (void) setFifoLength:(int)aFifoLength;
 - (int) nfoldCoincidence;
 - (void) setNfoldCoincidence:(int)aNfoldCoincidence;
 - (int) vetoOverlapTime;
@@ -415,6 +420,7 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelFifoLengthChanged;
 extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
 extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
 extern NSString* ORKatrinV4FLTModelShipSumHistogramChanged;

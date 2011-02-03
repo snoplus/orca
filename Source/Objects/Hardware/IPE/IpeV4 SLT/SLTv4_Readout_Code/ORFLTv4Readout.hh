@@ -5,6 +5,10 @@
 
 
 /** For every card in the Orca configuration one instance of ORFLTv4Readout is constructed.
+  *
+  * Short firmware history (Firmware is CFPGA,FPGA8=X.X.X.X,X.X.X.X version):
+  * - 2.1.1.4., 2.1.2.1: Filter redesign (timing problems), k-offset of energy fixed, FIFO redesign, 6+SUM channel veto
+  * - 2.1.1.1., 2.1.1.1 and smaller: first version(s)
   */
 class ORFLTv4Readout : public ORVCard
 {
@@ -18,7 +22,7 @@ class ORFLTv4Readout : public ORVCard
     enum EORFLTv4Consts {
         kFifoEmpty = 0x01,
         kNumChan   = 24,
-        kNumFLTs   = 24,
+        kNumFLTs   = 20,
 		kMaxHistoLength   = 2048
     };
 	

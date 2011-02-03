@@ -29,6 +29,7 @@
 @interface ORKatrinV4FLTController : OrcaObjectController {
 	@private
 		IBOutlet NSTabView*		tabView;	
+		IBOutlet NSPopUpButton* fifoLengthPU;
 		IBOutlet NSTabView*		modeTabView;	
 		IBOutlet NSButton*		settingLockButton;
 		IBOutlet NSPopUpButton* nfoldCoincidencePU;
@@ -134,6 +135,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) fifoLengthChanged:(NSNotification*)aNote;
 - (void) nfoldCoincidenceChanged:(NSNotification*)aNote;
 - (void) vetoOverlapTimeChanged:(NSNotification*)aNote;
 - (void) shipSumHistogramChanged:(NSNotification*)aNote;
@@ -186,6 +188,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) fifoLengthPUAction:(id)sender;
 - (IBAction) nfoldCoincidencePUAction:(id)sender;
 - (IBAction) vetoOverlapTimePUAction:(id)sender;
 - (IBAction) shipSumHistogramPUAction:(id)sender;
