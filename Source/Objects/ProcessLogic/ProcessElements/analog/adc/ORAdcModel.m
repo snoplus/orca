@@ -373,7 +373,20 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	NSAttributedString* iconValue = [self iconValueWithSize:12 color:[NSColor whiteColor]];
 	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor whiteColor]];
 	
+	NSAttributedString* iconValueMin =  [[[NSAttributedString alloc] 
+			 initWithString:[NSString stringWithFormat:@"%.1f", minValue]
+			 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+						 [NSFont messageFontOfSize:9],NSFontAttributeName,
+						 [NSColor whiteColor],NSForegroundColorAttributeName,nil]]autorelease];
+	
+	NSAttributedString* iconValueMax =  [[[NSAttributedString alloc] 
+			initWithString:[NSString stringWithFormat:@"%.1f", maxValue]
+			attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+						 [NSFont messageFontOfSize:9],NSFontAttributeName,
+						 [NSColor whiteColor],NSForegroundColorAttributeName,nil]]autorelease];
+	
 	NSSize theIconSize = [anImage size];
+	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
     [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
@@ -427,6 +440,17 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		[NSBezierPath strokeLineFromPoint:theCenter toPoint:NSMakePoint(theCenter.x + 60.*cosf(nA),theCenter.y + 60.*sinf(nA))];
 	}
 	
+	if(iconValueMin){		
+		NSSize textSize = [iconValueMin size];
+		[iconValueMin drawInRect:NSMakeRect(16,16,textSize.width,textSize.height)];
+	}
+	
+	if(iconValueMax){		
+		NSSize textSize = [iconValueMax size];
+		float x = theIconSize.width - textSize.width - 16;
+		[iconValueMax drawInRect:NSMakeRect(x,16,textSize.width,textSize.height)];
+	}
+	
 	if(iconValue){		
 		NSSize textSize = [iconValue size];
 		float x = theIconSize.width/2 - textSize.width/2- 4;
@@ -436,7 +460,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	if(iconLabel){		
 		NSSize textSize = [iconLabel size];
 		float x = theIconSize.width/2 - textSize.width/2;
-		[iconLabel drawInRect:NSMakeRect(x,5,textSize.width,textSize.height)];
+		[iconLabel drawInRect:NSMakeRect(x,3,textSize.width,textSize.height)];
 	}
 	
 	if(idLabel){		
