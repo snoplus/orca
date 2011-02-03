@@ -41,7 +41,7 @@
 			<object class="NSWindowTemplate" id="887694496">
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{426, 317}, {213, 369}}</string>
+				<string key="NSWindowRect">{{426, 299}, {213, 387}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle">MPod Mini Crate</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -70,7 +70,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{-5, 49}, {218, 310}}</string>
+							<string key="NSFrame">{{-5, 44}, {218, 334}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="292112285">
@@ -90,7 +90,7 @@
 						<object class="NSCustomView" id="679016295">
 							<reference key="NSNextResponder" ref="672222250"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{35, 178}, {135, 175}}</string>
+							<string key="NSFrame">{{35, 180}, {135, 175}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
 							<string key="NSClassName">ORCardContainerView</string>
 							<string key="NSExtension">NSView</string>
@@ -98,7 +98,7 @@
 						<object class="NSTextField" id="962082114">
 							<reference key="NSNextResponder" ref="672222250"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{21, 20}, {125, 13}}</string>
+							<string key="NSFrame">{{21, 23}, {125, 13}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="507674570">
@@ -129,7 +129,7 @@
 						<object class="NSTextField" id="307987623">
 							<reference key="NSNextResponder" ref="672222250"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{39, 69}, {67, 17}}</string>
+							<string key="NSFrame">{{39, 87}, {67, 17}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="443776322">
@@ -150,7 +150,7 @@
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{213, 369}</string>
+					<string key="NSFrameSize">{213, 387}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 938}}</string>
@@ -341,9 +341,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{554, 456}, {213, 369}}</string>
+					<string>{{554, 438}, {213, 387}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{554, 456}, {213, 369}}</string>
+					<string>{{554, 438}, {213, 387}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
@@ -624,6 +624,20 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCard.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHV.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1896,7 +1910,7 @@
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="NS.key.0">MPodMiniCrate</string>
-			<string key="NS.object.0">{150, 322}</string>
+			<string key="NS.object.0">{150, 326}</string>
 		</object>
 	</data>
 </archive>

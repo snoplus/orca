@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="70"/>
+			<integer value="24993"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -74,7 +74,7 @@
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="844307588">
 									<object class="NSView" key="NSView" id="519345359">
-										<reference key="NSNextResponder" ref="108659793"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -640,7 +640,6 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {857, 235}}</string>
-										<reference key="NSSuperview" ref="108659793"/>
 									</object>
 									<string key="NSLabel">Data Flow</string>
 									<reference key="NSColor" ref="421922390"/>
@@ -4683,7 +4682,7 @@
 								<object class="NSTabViewItem" id="120935403">
 									<string key="NSIdentifier">Item 13</string>
 									<object class="NSView" key="NSView" id="510579321">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="108659793"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4890,7 +4889,7 @@
 											<object class="NSButton" id="427367523">
 												<reference key="NSNextResponder" ref="510579321"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{725, 48}, {85, 156}}</string>
+												<string key="NSFrame">{{725, 48}, {85, 166}}</string>
 												<reference key="NSSuperview" ref="510579321"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="1213">
@@ -5189,6 +5188,7 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {857, 235}}</string>
+										<reference key="NSSuperview" ref="108659793"/>
 									</object>
 									<string key="NSLabel">HV</string>
 									<reference key="NSColor" ref="421922390"/>
@@ -9848,14 +9848,14 @@ ZSBjb250cm9sbGVyLg</string>
 									<reference key="NSTabView" ref="108659793"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="844307588"/>
+							<reference key="NSSelectedTabViewItem" ref="120935403"/>
 							<reference key="NSFont" ref="26"/>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="519345359"/>
+								<reference ref="510579321"/>
 							</object>
 						</object>
 					</object>
@@ -13971,10 +13971,10 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="83185868"/>
 							<reference ref="675789124"/>
 							<reference ref="395047933"/>
-							<reference ref="427367523"/>
 							<reference ref="541824615"/>
 							<reference ref="829496324"/>
 							<reference ref="1014026479"/>
+							<reference ref="427367523"/>
 						</object>
 						<reference key="parent" ref="120935403"/>
 					</object>
@@ -23424,35 +23424,21 @@ ZSBjb250cm9sbGVyLg</string>
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Hardware/HV/MPod/EHQ8060n/OREHQ8060nModel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/Hardware/HV/MPod/EHS8260p/OREHS8260pModel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCard.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHV.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -24921,7 +24907,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<string>{16, 128}</string>
 				<string>{100, 54}</string>
 				<string>{15, 175}</string>
-				<string>{70, 150}</string>
+				<string>{70, 154}</string>
 				<string>{75, 86}</string>
 				<string>{200, 106}</string>
 				<string>{50, 42}</string>
