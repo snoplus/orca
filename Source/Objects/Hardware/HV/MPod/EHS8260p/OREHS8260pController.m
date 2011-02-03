@@ -41,8 +41,13 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(supervisorMaskChanged:)
-                         name : OREHS8260pModelSupervisorMaskChanged
+                     selector : @selector(currentTripBehaviorChanged:)
+                         name : OREHS8260pModelCurrentTripBehaviorChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(outputFailureBehaviorChanged:)
+                         name : OREHS8260pModelOutputFailureBehaviorChanged
 						object: model];
 
 }
@@ -51,13 +56,23 @@
 {
     [super updateWindow];
  	[self tripTimeChanged:nil];
-	[self supervisorMaskChanged:nil];
+	[self currentTripBehaviorChanged:nil];
+	[self outputFailureBehaviorChanged:nil];
 }
 
 #pragma mark •••Interface Management
-- (void) supervisorMaskChanged:(NSNotification*)aNote
+- (void) outputFailureBehaviorChanged:(NSNotification*)aNote
 {
-//	[supervisorMask<custom> setIntValue: [model supervisorMask]];
+	int chan = [model selectedChannel];
+	[outputFailureBehaviorPU selectItemAtIndex: [model outputFailureBehavior:chan]];
+    [self channelReadParamsChanged:nil]; //force reload of table
+}
+
+- (void) currentTripBehaviorChanged:(NSNotification*)aNote
+{
+	int chan = [model selectedChannel];
+	[currentTripBehaviorPU selectItemAtIndex: [model currentTripBehavior:chan]];
+    [self channelReadParamsChanged:nil]; //force reload of table
 }
 
 - (void) tripTimeChanged:(NSNotification*)aNote
@@ -67,15 +82,33 @@
     [self channelReadParamsChanged:nil]; //force reload of table
 }
 
+- (void) channelReadParamsChanged:(NSNotification*)aNote
+{
+	[super channelReadParamsChanged:aNote];
+	int chan = [model selectedChannel];
+	[tripTimeTextField setIntValue: [model tripTime:chan]];
+	[currentTripBehaviorPU selectItemAtIndex: [model currentTripBehavior:chan]];
+	[outputFailureBehaviorPU selectItemAtIndex: [model outputFailureBehavior:chan]];
+}
+
 #pragma mark •••Actions
+- (void) outputFailureBehaviorAction:(id)sender
+{
+	int chan = [model selectedChannel];
+	[model setOutputFailureBehavior:chan withValue:[sender indexOfSelectedItem]];	
+}
+
+- (void) currentTripBehaviorAction:(id)sender
+{
+	int chan = [model selectedChannel];
+	[model setCurrentTripBehavior:chan withValue:[sender indexOfSelectedItem]];	
+}
 
 - (IBAction) tripTimeAction:(id)sender
 {
 	int chan = [model selectedChannel];
-
 	[model setTripTime:chan withValue:[sender intValue]];
 }
-
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
@@ -99,6 +132,10 @@
 			else if([[aTableColumn identifier] isEqualToString:@"outputMeasurementCurrent"]){
 				float theCurrent = [model channel:rowIndex readParamAsFloat:[aTableColumn identifier]] *1000000.;
 				return [NSNumber numberWithFloat:theCurrent];
+			}
+			
+			else if([[aTableColumn identifier] isEqualToString:@"outputSupervisionBehavior"]){
+				return [model behaviourString:rowIndex];
 			}
 			else {
 					//for now return value as object

@@ -22,18 +22,21 @@
 
 @interface OREHS8260pController : ORiSeg8ChanHVController 
 {
-	//IBOutlet   <custom>* supervisorMask<custom>;
+	IBOutlet   NSPopUpButton* outputFailureBehaviorPU;
+	IBOutlet   NSPopUpButton* currentTripBehaviorPU;
 	IBOutlet   NSTextField* tripTimeTextField;
 }
 
 - (id)   init;
 
 #pragma mark •••Interface Management
-- (void) supervisorMaskChanged:(NSNotification*)aNote;
+- (void) outputFailureBehaviorChanged:(NSNotification*)aNote;
+- (void) currentTripBehaviorChanged:(NSNotification*)aNote;
 - (void) tripTimeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-//- (IBAction) supervisorMask<custom>Action:(id)sender;
+- (IBAction) outputFailureBehaviorAction:(id)sender;
+- (IBAction) currentTripBehaviorAction:(id)sender;
 - (IBAction) tripTimeAction:(id)sender;
 
 #pragma mark •••Data Source

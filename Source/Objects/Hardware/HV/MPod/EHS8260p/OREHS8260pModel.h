@@ -26,7 +26,8 @@
 {
   @private
     short		tripTime[8];
-	int			supervisorMask;
+    short		currentTripBehavior[8];
+    short		outputFailureBehavior[8];
 }
 
 #pragma mark ***Initialization
@@ -34,17 +35,21 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
-- (NSString*) settingsLock;
-- (NSString*) name;
-- (int)		supervisorMask;
-- (void)	setSupervisorMask:(int)aSupervisorMask;
+- (short)		outputFailureBehavior:(short)chan;
+- (void)	setOutputFailureBehavior:(short)chan withValue:(short)aValue;
+- (short)		currentTripBehavior:(short)chan;
+- (void)	setCurrentTripBehavior:(short)chan withValue:(short)aValue;
 - (short)	tripTime:(short)chan;
 - (void)	setTripTime:(short)chan withValue:(short)aValue;
+- (NSString*) settingsLock;
+- (NSString*) name;
+- (NSString*) behaviourString:(int)channel;
 
 #pragma mark •••Hardware Access
 - (void) writeTripTime:(int)channel;
 - (void) writeTripTimes;
-- (void) writeSupervisorBehaviour:(int)channel value:(int)aValue; //test
+- (void) writeSupervisorBehaviours;
+- (void) writeSupervisorBehaviour:(int)channel;
 - (void) loadAllValues;
 
 #pragma mark •••Hardware Wizard
@@ -56,6 +61,8 @@
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 @end
 
+extern NSString* OREHS8260pModelOutputFailureBehaviorChanged;
+extern NSString* OREHS8260pModelCurrentTripBehaviorChanged;
 extern NSString* OREHS8260pModelSupervisorMaskChanged;
 extern NSString* OREHS8260pModelTripTimeChanged;
 extern NSString* OREHS8260pSettingsLock;

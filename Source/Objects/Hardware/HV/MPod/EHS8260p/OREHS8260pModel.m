@@ -25,6 +25,8 @@
 #import "ORHWWizSelection.h"
 #import "ORHWWizParam.h"
 
+NSString* OREHS8260pModelOutputFailureBehaviorChanged = @"OREHS8260pModelOutputFailureBehaviorChanged";
+NSString* OREHS8260pModelCurrentTripBehaviorChanged = @"OREHS8260pModelCurrentTripBehaviorChanged";
 NSString* OREHS8260pModelSupervisorMaskChanged	= @"OREHS8260pModelSupervisorMaskChanged";
 NSString* OREHS8260pModelTripTimeChanged		= @"OREHS8260pModelTripTimeChanged";
 NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
@@ -53,18 +55,34 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
 #pragma mark ***Accessors
 
-- (int) supervisorMask
+- (short) outputFailureBehavior:(short)chan
 {
-    return supervisorMask;
+	if([self channelInBounds:chan]){
+		return outputFailureBehavior[chan];
+	}
+	else return 0;
 }
 
-- (void) setSupervisorMask:(int)aSupervisorMask
+- (void) setOutputFailureBehavior:(short)chan withValue:(short)aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setSupervisorMask:supervisorMask];
-    
-    supervisorMask = aSupervisorMask;
+    [[[self undoManager] prepareWithInvocationTarget:self] setOutputFailureBehavior:chan withValue: outputFailureBehavior[chan]];
+    outputFailureBehavior[chan] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREHS8260pModelOutputFailureBehaviorChanged object:self];
+}
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:OREHS8260pModelSupervisorMaskChanged object:self];
+- (short) currentTripBehavior:(short)chan
+{
+	if([self channelInBounds:chan]) {
+		return currentTripBehavior[chan];
+	}
+	else return 0;
+}
+
+- (void) setCurrentTripBehavior:(short)chan withValue:(short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCurrentTripBehavior:chan withValue:currentTripBehavior[chan]];
+    currentTripBehavior[chan] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREHS8260pModelCurrentTripBehaviorChanged object:self];
 }
 
 - (NSArray*) channelUpdateList
@@ -117,11 +135,19 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
 }
+- (void) writeSupervisorBehaviours
+{  
+	int i;
+	for(i=0;i<8;i++){
+		[self writeSupervisorBehaviour:i];
+	}
+}
 
-- (void) writeSupervisorBehaviour:(int)channel value:(int)aValue
+- (void) writeSupervisorBehaviour:(int)channel
 {    
 	if([self channelInBounds:channel]){
-		NSString* cmd = [NSString stringWithFormat:@"outputSupervisionBehavior.u%d i %f",[self slotChannelValue:channel],aValue];
+		short aValue = ((currentTripBehavior[channel] & 0x3)<<6) | ((outputFailureBehavior[channel] & 0x3)<<12);
+		NSString* cmd = [NSString stringWithFormat:@"outputSupervisionBehavior.u%d i %d",[self slotChannelValue:channel],aValue];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 	}
 }
@@ -143,17 +169,43 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	}
 }
 
+- (NSString*) behaviourString:(int)channel
+{
+	if([self channelInBounds:channel]){
+		NSString* options[4] = {
+			@"Ig",		//0
+			@"RDn",		//1
+			@"SwOff",	//2
+			@"BdOff"	//3
+		};
+		
+		short i = currentTripBehavior[channel];
+		NSString* s1;
+		if(i<4)s1 = options[i];
+		else   s1 = @"?";
+		
+		i = outputFailureBehavior[channel];
+		NSString* s2;
+		if(i<4)s2 = options[i];
+		else   s2 = @"?";
+		return [NSString stringWithFormat:@"%@:%@",s1,s2];
+	}
+	else return @"--";
+}
+
 #pragma mark •••Hardware Access
 - (void) loadAllValues
 {
 	[super loadAllValues];
 	[self writeTripTimes];
+	[self writeSupervisorBehaviours];
 }
 
 - (void) loadValues:(int)channel
 {
 	[super loadValues:channel];
-	[self writeTripTimes];
+	[self writeTripTime:channel];
+	[self writeSupervisorBehaviour:channel];
 }
 
 #pragma mark •••Archival
@@ -161,10 +213,11 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setSupervisorMask:	[decoder decodeIntForKey:@"supervisorMask"]];
 	int i;
 	for(i=0;i<8;i++){
 		[self setTripTime:i withValue:[decoder decodeIntForKey: [@"tripTime" stringByAppendingFormat:@"%d",i]]];
+		[self setOutputFailureBehavior:i withValue:[decoder decodeIntForKey: [@"outputFailureBehavior" stringByAppendingFormat:@"%d",i]]];
+		[self setCurrentTripBehavior:i withValue:[decoder decodeIntForKey: [@"currentTripBehavior" stringByAppendingFormat:@"%d",i]]];
 	}
 	[[self undoManager] enableUndoRegistration];
     
@@ -174,10 +227,11 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeInt:supervisorMask	forKey:@"supervisorMask"];
 	int i;
  	for(i=0;i<8;i++){
 		[encoder encodeInt:tripTime[i]		forKey:[@"tripTime" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:outputFailureBehavior[i]		forKey:[@"outputFailureBehavior" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:currentTripBehavior[i]		forKey:[@"currentTripBehavior" stringByAppendingFormat:@"%d",i]];
 	}
 }
 
@@ -186,7 +240,8 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	[super addParametersToDictionary:dictionary];
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	[self addCurrentState:objDictionary cIntArray:tripTime forKey:@"tripTime"];
-    [objDictionary setObject:[NSNumber numberWithInt:supervisorMask] forKey:@"supervisorMask"];
+	[self addCurrentState:objDictionary cIntArray:outputFailureBehavior forKey:@"outputFailureBehavior"];
+	[self addCurrentState:objDictionary cIntArray:currentTripBehavior forKey:@"currentTripBehavior"];
 	
     return objDictionary;
 }
@@ -211,8 +266,34 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
     [p setSetMethod:@selector(setTripTime:withValue:) getMethod:@selector(tripTime:)];
 	[p setInitMethodSelector:@selector(loadAllValues)];
     [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"I Trip Behavior"];
+    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@"mA"];
+    [p setSetMethod:@selector(setCurrentTripBehavior:withValue:) getMethod:@selector(currentTripBehavior:)];
+	[p setInitMethodSelector:@selector(loadAllValues)];
+    [a addObject:p];
 	
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Failure Behavior"];
+    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@"mA"];
+    [p setSetMethod:@selector(setOutputFailureBehavior:withValue:) getMethod:@selector(outputFailureBehavior:)];
+	[p setInitMethodSelector:@selector(loadAllValues)];
+    [a addObject:p];
+
     return [a autorelease];
 }
 
+- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
+{
+	NSNumber* value= [super extractParam:param from:fileHeader forChannel:aChannel];
+	if(value)return value;
+	else {
+		NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
+		if([param isEqualToString:@"Trip Time"])			return [[cardDictionary objectForKey:@"tripTime"] objectAtIndex:aChannel];
+		else if([param isEqualToString:@"I Trip Behavior"]) return [[cardDictionary objectForKey:@"currentTripBehavior"] objectAtIndex:aChannel];
+		else if([param isEqualToString:@"Failure Behavior"])return [[cardDictionary objectForKey:@"outputFailureBehavior"] objectAtIndex:aChannel];
+		else return nil;
+	}
+}
 @end

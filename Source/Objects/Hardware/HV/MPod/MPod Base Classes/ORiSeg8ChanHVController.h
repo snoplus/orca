@@ -34,6 +34,9 @@
 	IBOutlet NSTextField*	powerField;
 	IBOutlet NSTableView*	hvTableView;
 	IBOutlet NSImageView*	hvStatusImage;
+	IBOutlet NSTextField*   temperatureField;
+	IBOutlet NSTextField*   slotField;
+
 	//details 
 	IBOutlet NSTextField*	targetField;
 	IBOutlet NSTextField*	voltageField;

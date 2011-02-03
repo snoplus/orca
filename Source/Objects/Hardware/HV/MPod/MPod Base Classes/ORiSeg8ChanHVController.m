@@ -29,6 +29,8 @@
 @interface ORiSeg8ChanHVController (private)
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _panicAllRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+- (void) _allOnSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+- (void) _allOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
 
@@ -216,7 +218,6 @@
 	[hvTableView reloadData];
 	[self updateButtons];
 	int selectedChannel = [model selectedChannel];
-	//[stateField setStringValue:[model channelState:selectedChannel]];
 	float voltage	= [model channel:selectedChannel readParamAsFloat:@"outputMeasurementSenseVoltage"];
 	[voltageField setStringValue:[NSString stringWithFormat:@"%.2f V",voltage]];
 	int numberOnChannels = [model numberChannelsOn];
@@ -224,7 +225,8 @@
 	[self outputStatusChanged:aNote];
 	int events = [model failureEvents:selectedChannel];
 	int state  = [model channel:selectedChannel readParamAsInt:@"outputSwitch"];
-	
+	[temperatureField setIntValue:[model channel:0 readParamAsInt:@"outputMeasurementTemperature"]];
+
 	NSString* eventString = @"";
 	
 	if(!events && (state != kiSeg8ChanHVOutputSetEmergencyOff))eventString = @"No Events";
@@ -438,11 +440,13 @@
 {
     [super setModel:aModel];
     [[self window] setTitle:[NSString stringWithFormat:@"%@ Card (Slot %d)",[model name],[model slot]]];
+	[slotField setIntValue:[model slot]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
     [[self window] setTitle:[NSString stringWithFormat:@"%@ Card (Slot %d)",[model name],[model slot]]];
+	[slotField setIntValue:[model slot]];
 }
 
 #pragma mark •••Actions
@@ -586,12 +590,32 @@
 #pragma mark •••Actions for All
 - (IBAction) powerAllOnAction:(id)sender
 {
-	[model turnAllChannelsOn];
+	[self endEditing];
+    NSBeginAlertSheet(@"Turn ON ALL Channels",
+					  @"YES/Do it NOW",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(_allOnSheetDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really Turn ALL Channels ON?");
 }
 
 - (IBAction) powerAllOffAction:(id)sender
 {
-	[model turnAllChannelsOff];
+	[self endEditing];
+    NSBeginAlertSheet(@"Turn OFF ALL Channels",
+					  @"YES/Do it NOW",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(_allOffSheetDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really Turn ALL Channels OFF?");
 }
 
 - (IBAction) stopAllRampAction:(id)sender
@@ -690,6 +714,19 @@
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model syncDialog];
+	}
+}
+- (void) _allOnSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	if(returnCode == NSAlertDefaultReturn){
+		[model turnAllChannelsOn];
+	}
+}
+
+- (void) _allOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	if(returnCode == NSAlertDefaultReturn){
+		[model turnAllChannelsOff];
 	}
 }
 

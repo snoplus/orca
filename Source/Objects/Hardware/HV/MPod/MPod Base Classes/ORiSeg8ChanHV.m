@@ -153,28 +153,13 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (NSArray*) channelUpdateList
 {
-	NSArray* channelReadParams = [NSArray arrayWithObjects:
-		@"outputStatus",
-		@"outputMeasurementSenseVoltage",	
-		@"outputMeasurementCurrent",	
-		@"outputSwitch",
-		@"outputVoltage",
-		@"outputCurrent",
-		nil];
-	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
-	return cmds;
+	return nil; //subclasses should override
 }
 
 - (NSArray*) commonChannelUpdateList
 {
-	NSArray* channelReadParams = [NSArray arrayWithObjects:
-								  @"outputVoltageRiseRate",
-								  @"outputMeasurementTemperature",	
-								  nil];
-	NSArray* cmds = [self addChannel:0 toParams:channelReadParams];
-	return cmds;
+	return nil; //subclasses should override
 }
-
 
 - (void) syncDialog
 {
@@ -216,7 +201,9 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) updateAllValues
 {
-	[[self adapter] getValues: [self channelUpdateList]  target:self selector:@selector(processReadResponseArray:)];
+	NSArray* updateRequests = [self channelUpdateList];
+	updateRequests = [updateRequests arrayByAddingObjectsFromArray:[self commonChannelUpdateList]];
+	[[self adapter] getValues: updateRequests  target:self selector:@selector(processReadResponseArray:)];
 	if(shipRecords) [self shipDataRecords];
 }
 
@@ -247,7 +234,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	if([[self adapter] respondsToSelector:@selector(power)]){
 		if(![[self adapter] power]){
 			int i;
-			for(i=0;i<	8;i++){
+			for(i=0;i<8;i++){
 				[rdParams[i] removeAllObjects];
 			}
 		}
