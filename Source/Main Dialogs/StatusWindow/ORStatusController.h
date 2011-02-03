@@ -57,6 +57,7 @@
 - (void) removeDataSet:(ORDataSet*)item;
 - (void) setLogBookFile:(NSString*)aFilePath;
 - (NSString*) contents;
+- (NSString*) contentsTail:(unsigned long)aDuration;
 
 #pragma mark ¥¥¥Updating
 - (void) updateErrorDisplay;

@@ -47,6 +47,7 @@
 - (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent;
 - (void) mailSent:(NSString*)to;
 - (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject;
+- (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject lastSeconds:(unsigned long)aDuration;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

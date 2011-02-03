@@ -194,8 +194,43 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (NSString*) contents
 {
-	return [statusView string];
+	NSString* contents;
+	@synchronized(self){
+		contents =  [[statusView string] copy];
+	}
+	return [contents autorelease];
 }
+
+- (NSString*) contentsTail:(unsigned long)aDuration
+{
+	NSString* tailContents = @"";
+	@synchronized(self){
+		NSString*	 contents			= [[[statusView string] copy] autorelease];
+		NSArray*	 lines				= [contents componentsSeparatedByString:@"\n"];
+		NSDate*		 theReferenceDate	= nil;
+		for(NSString* aLine in [lines reverseObjectEnumerator]){
+			if([aLine length] < 15)	tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+			else {
+				NSString* theDateAsString = [NSString stringWithFormat:@"20%02d-%02d-%02d %@ +0000",
+											 [[aLine substringWithRange:NSMakeRange(4,2)] intValue],   //year part
+											 [[aLine substringWithRange:NSMakeRange(0,2)] intValue],	//month part
+											 [[aLine substringWithRange:NSMakeRange(2,2)] intValue],	//day part
+											 [aLine substringWithRange:NSMakeRange(7,8)]];  //time part
+				
+				
+				NSDate* theDate = [NSDate dateWithString:theDateAsString];
+				if(!theReferenceDate)theReferenceDate = theDate;
+				if([theReferenceDate timeIntervalSinceDate:theDate] <= aDuration){
+					tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+				}
+				else break;
+			}
+		}
+	}
+	return [NSString stringWithFormat:@"Last %d seconds of ORCA Status log\n\n%@",aDuration,tailContents];
+}
+
+
 
 - (void) updateErrorDisplay
 {

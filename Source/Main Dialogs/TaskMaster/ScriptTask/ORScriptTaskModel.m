@@ -156,6 +156,10 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[self sendMailTo:receipients cc:cc subject:subject content:[[ORStatusController sharedStatusController] contents]];
 }
 
+- (void) sendStatusLogTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject lastSeconds:(unsigned long)aDuration
+{
+	[self sendMailTo:receipients cc:cc subject:subject content:[[ORStatusController sharedStatusController] contentsTail:aDuration]];
+}
 
 - (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent
 {
