@@ -2536,6 +2536,10 @@
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
 		EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; };
 		EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; };
+		EF62A44312FBE1CA0029D36B /* SNODetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = EF62A43F12FBE1CA0029D36B /* SNODetectorView.h */; };
+		EF62A44412FBE1CA0029D36B /* SNODetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF62A44012FBE1CA0029D36B /* SNODetectorView.m */; };
+		EF62A44512FBE1CA0029D36B /* SNOMonitoringView.h in Headers */ = {isa = PBXBuildFile; fileRef = EF62A44112FBE1CA0029D36B /* SNOMonitoringView.h */; };
+		EF62A44612FBE1CA0029D36B /* SNOMonitoringView.m in Sources */ = {isa = PBXBuildFile; fileRef = EF62A44212FBE1CA0029D36B /* SNOMonitoringView.m */; };
 		EF69C433116E5DC3008ABADC /* ORSNOCrateReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */; };
 		EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */; };
 		EF69C483116E6526008ABADC /* ORSNOCrateReadout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */; };
@@ -5165,6 +5169,10 @@
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
 		EF37879112DFFF81003C814E /* YAJL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YAJL.framework; path = Frameworks/YAJL.framework; sourceTree = "<group>"; };
+		EF62A43F12FBE1CA0029D36B /* SNODetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNODetectorView.h; sourceTree = "<group>"; };
+		EF62A44012FBE1CA0029D36B /* SNODetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNODetectorView.m; sourceTree = "<group>"; };
+		EF62A44112FBE1CA0029D36B /* SNOMonitoringView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOMonitoringView.h; sourceTree = "<group>"; };
+		EF62A44212FBE1CA0029D36B /* SNOMonitoringView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOMonitoringView.m; sourceTree = "<group>"; };
 		EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSNOCrateReadout.cc; sourceTree = "<group>"; };
 		EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSNOCrateReadout.hh; sourceTree = "<group>"; };
 		EF7722B211E813120064A1CF /* ORXL3Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL3Model.h; sourceTree = "<group>"; };
@@ -9686,8 +9694,12 @@
 				84C37D260EF834DD00E77E09 /* SNO.nib */,
 				84C37D270EF834DD00E77E09 /* SNOController.h */,
 				84C37D280EF834DD00E77E09 /* SNOController.m */,
+				EF62A43F12FBE1CA0029D36B /* SNODetectorView.h */,
+				EF62A44012FBE1CA0029D36B /* SNODetectorView.m */,
 				84C37D290EF834DD00E77E09 /* SNOModel.h */,
 				84C37D2A0EF834DD00E77E09 /* SNOModel.m */,
+				EF62A44112FBE1CA0029D36B /* SNOMonitoringView.h */,
+				EF62A44212FBE1CA0029D36B /* SNOMonitoringView.m */,
 			);
 			name = SNO;
 			path = Source/Experiments/SNO;
@@ -12096,6 +12108,8 @@
 				8457D23912F9933400D3E3B4 /* ORiSeg8ChanHV.h in Headers */,
 				8457D25512F9986E00D3E3B4 /* ORiSeg8ChanHVController.h in Headers */,
 				8457D37712F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h in Headers */,
+				EF62A44312FBE1CA0029D36B /* SNODetectorView.h in Headers */,
+				EF62A44512FBE1CA0029D36B /* SNOMonitoringView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12138,6 +12152,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -13729,6 +13744,8 @@
 				8457D23A12F9933400D3E3B4 /* ORiSeg8ChanHV.m in Sources */,
 				8457D25612F9986E00D3E3B4 /* ORiSeg8ChanHVController.m in Sources */,
 				8457D37812F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m in Sources */,
+				EF62A44412FBE1CA0029D36B /* SNODetectorView.m in Sources */,
+				EF62A44612FBE1CA0029D36B /* SNOMonitoringView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
