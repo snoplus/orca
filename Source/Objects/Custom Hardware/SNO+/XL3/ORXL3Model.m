@@ -1143,6 +1143,46 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	[self setXl3OpsRunning:NO forKey:@"compositeResetCrate"];
 }
 
+- (void) compositeResetCrateAndXilinX
+{
+	[self setXl3OpsRunning:YES forKey:@"compositResetCrateAndXilinX"];
+	NSLog(@"Reset crate and XilinX code.\n");
+	
+	@try {
+		[self deselectCards];
+		[[self xl3Link] newMultiCmd];
+		[[self xl3Link] addMultiCmdToAddress:(XL3_SEL | [self getRegisterAddress:kXl3CsReg] | WRITE_REG) withValue:0x00UL];
+		[[self xl3Link] addMultiCmdToAddress:(XL3_SEL | [self getRegisterAddress:kXl3CsReg] | WRITE_REG) withValue:0x80UL]; //reset
+		[[self xl3Link] addMultiCmdToAddress:(XL3_SEL | [self getRegisterAddress:kXl3CsReg] | WRITE_REG) withValue:0x00UL]; //done
+		[[self xl3Link] executeMultiCmd];
+		[self deselectCards];
+		
+		if ([[self xl3Link] multiCmdFailed]) NSLog(@"reset failed: XL3 bus error.\n");
+	}
+	@catch (NSException* e) {
+		NSLog(@"reset failed; error: %@ reason: %@\n", [e name], [e reason]);
+	}
+	
+	[self setXl3OpsRunning:NO forKey:@"compositeResetCrateAndXilinX"];
+}
+
+- (void) compositeResetFIFOAndSequencer
+{
+	[self setXl3OpsRunning:YES forKey:@"compositResetFIFOAndSeuencer"];
+	NSLog(@"Reset FIFO and Sequencer.\n");
+	//slot mask?
+	
+	[self setXl3OpsRunning:NO forKey:@"compositeResetFIFOAndSequencer"];
+}
+
+- (void) compositeResetXL3StateMachine
+{
+	[self setXl3OpsRunning:YES forKey:@"compositResetXL3StateMachine"];
+	NSLog(@"Reset XL3 State Machine.\n");
+
+	[self setXl3OpsRunning:NO forKey:@"compositeResetXL3StateMachine"];
+}
+
 - (void) reset
 {
 	@try {

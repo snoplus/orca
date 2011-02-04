@@ -427,7 +427,10 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	@catch (NSException* localException) {
 		[commandSocketLock unlock]; //end critical section
 		@throw localException;
-	}	
+	}
+	if (! askForResponse) {
+		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
+	}
 }
 
 

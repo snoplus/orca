@@ -169,6 +169,9 @@ enum {
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip;
 - (void) getBoardIDs;
 - (void) compositeResetCrate;
+- (void) compositeResetCrateAndXilinX;
+- (void) compositeResetFIFOAndSequencer;
+- (void) compositeResetXL3StateMachine;
 - (void) reset;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;

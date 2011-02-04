@@ -67,6 +67,12 @@
 	IBOutlet NSProgressIndicator*	compositeBoardIDRunningIndicator;
 	IBOutlet NSButton*		compositeResetCrateButton;	
 	IBOutlet NSProgressIndicator*	compositeResetCrateRunningIndicator;
+	IBOutlet NSButton*		compositeResetCrateAndXilinXButton;	
+	IBOutlet NSProgressIndicator*	compositeResetCrateAndXilinXRunningIndicator;
+	IBOutlet NSButton*		compositeResetFIFOAndSequencerButton;	
+	IBOutlet NSProgressIndicator*	compositeResetFIFOAndSequencerRunningIndicator;
+	IBOutlet NSButton*		compositeResetXL3StateMachineButton;	
+	IBOutlet NSProgressIndicator*	compositeResetXL3StateMachineRunningIndicator;
 	//connection
 	IBOutlet NSButton*		toggleConnectButton;
 	IBOutlet NSPopUpButton*		errorTimeOutPU;

@@ -399,7 +399,6 @@ static NSDictionary* xl3Ops;
 #pragma mark •••Helper
 - (void) populateOps
 {
-	
 	xl3Ops = [[NSDictionary alloc] initWithObjectsAndKeys:
 			[NSDictionary dictionaryWithObjectsAndKeys:	compositeDeselectButton, @"button",
 									deselectCompositeRunningIndicator, @"spinner",
@@ -425,6 +424,18 @@ static NSDictionary* xl3Ops;
 									compositeResetCrateRunningIndicator, @"spinner",
 									NSStringFromSelector(@selector(compositeResetCrate)), @"selector",
 			 nil], @"compositeResetCrate",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeResetCrateAndXilinXButton, @"button",
+									compositeResetCrateAndXilinXRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(compositeResetCrateAndXilinX)), @"selector",
+			 nil], @"compositeResetCrateAndXilinX",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeResetFIFOAndSequencerButton, @"button",
+									compositeResetFIFOAndSequencerRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(compositeResetFIFOAndSequencer)), @"selector",
+			 nil], @"compositeResetFIFOAndSequencer",
+			[NSDictionary dictionaryWithObjectsAndKeys:	compositeResetXL3StateMachineButton, @"button",
+									compositeResetXL3StateMachineRunningIndicator, @"spinner",
+									NSStringFromSelector(@selector(compositeResetXL3StateMachine)), @"selector",
+			 nil], @"compositeResetXL3StateMachine",
 		  nil];
 }
 
