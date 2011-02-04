@@ -27,7 +27,7 @@
 NSString* ORSNOModelViewTypeChanged	= @"ORSNOModelViewTypeChanged";
 static NSString* SNODbConnector		= @"SNODbConnector";
 
-@implementation Model
+@implementation SNOModel
 
 #pragma mark ¥¥¥Initialization
 

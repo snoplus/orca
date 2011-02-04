@@ -124,7 +124,7 @@
 
 	[detailsLockButton setState: locked];
 	[initButton setEnabled: !lockedOrRunningMaintenance];
-
+}
 
 #pragma mark ¥¥¥Table Data Source
 

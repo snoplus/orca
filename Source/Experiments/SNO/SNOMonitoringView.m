@@ -84,7 +84,7 @@
 }
 
 @end
-@implementation MajoranaDetectorView (private)
+@implementation SNOMonitoringView (private)
 - (void) makeAllSegments
 {
 	//float xc = [self bounds].size.width/2;
