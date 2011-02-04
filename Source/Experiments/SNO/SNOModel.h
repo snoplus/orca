@@ -2,8 +2,8 @@
 //  SNOModel.h
 //  Orca
 //
-//  Created by Mark Howe on Mon Nov 18 2002.
-//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Tue Apr 20, 2010.
+//  Copyright (c) 2010  University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -20,41 +20,29 @@
 
 
 #pragma mark ¥¥¥Imported Files
-#import "ORDataTaker.h"
+#import "ORExperimentModel.h"
 
-@class ORDataPacket;
+#define kUseTubeView	0
+#define kUseCrateView	1
+#define kUsePSUPView	2
+#define kNumTubes	20 //XL3s
 
-@interface SNOModel :  OrcaObject
+@interface SNOModel :  ORExperimentModel
 {
-    @private
-        NSMutableDictionary* colorBarAttributes;
-        NSDictionary*       xAttributes;
-        NSDictionary*       yAttributes;
+	int		  viewType;
 }
-
-
-#pragma mark ¥¥¥Notifications
-- (void) runStatusChanged:(NSNotification*)aNote;
-
 #pragma mark ¥¥¥Accessors
+- (void) setViewType:(int)aViewType;
+- (int) viewType;
 
-- (NSMutableDictionary*) colorBarAttributes;
-- (NSDictionary*)   xAttributes;
-- (void) setYAttributes:(NSDictionary*)someAttributes;
-- (NSDictionary*)   yAttributes;
-- (void) setXAttributes:(NSDictionary*)someAttributes;
-- (void) setColorBarAttributes:(NSMutableDictionary*)newColorBarAttributes;
+#pragma mark ¥¥¥Segment Group Methods
+- (void) makeSegmentGroups;
 
-
-
-
-- (void) runAboutToStart:(NSNotification*)aNote;
-- (void) runEnded:(NSNotification*)aNote;
-
+#pragma mark ¥¥¥Specific Dialog Lock Methods
+- (NSString*) experimentMapLock;
+- (NSString*) experimentDetectorLock;
+- (NSString*) experimentDetailsLock;
 @end
 
-extern NSString* ORSNORateColorBarChangedNotification;
-extern NSString* ORSNOChartXChangedNotification;
-extern NSString* ORSNOChartYChangedNotification;
-extern NSString* ORSNODisplayOptionMaskChangedNotification;
+extern NSString* ORSNOModelViewTypeChanged;
 

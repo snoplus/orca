@@ -1,5 +1,5 @@
 //
-//  SNOController.h
+//  SNOMonitoringView.h
 //  Orca
 //
 //  Created by Mark Howe on Tue Apr 20, 2010.
@@ -17,38 +17,15 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-#import "ORExperimentController.h"
-#import "SNODetectorView.h"
-#import "SNOMonitoringView.h"
+#import "ORDetectorView.h"
 
 @class ORColorScale;
-@class ORSegmentGroup;
 
-@interface SNOController : ORExperimentController {
- 
-    IBOutlet NSTextField*	detectorTitle;
-    IBOutlet NSPopUpButton*	viewTypePU;
-
-	NSView *blankView;
-    NSSize detectorSize;
-    NSSize detailsSize;
-    NSSize focalPlaneSize;
+@interface SNOMonitoringView : ORDetectorView
+{	
+    IBOutlet ORColorScale* focalPlaneColorScale;
+	BOOL viewType;
 }
+- (void) setViewType:(int)aViewType;
 
-#pragma mark ¥¥¥Initialization
-- (void) registerNotificationObservers;
-- (void) updateWindow;
-- (void) loadSegmentGroups;
-
-- (IBAction) viewTypeAction:(id)sender;
-
-#pragma mark ¥¥¥Details Interface Management
-- (void) setDetectorTitle;
-- (void) viewTypeChanged:(NSNotification*)aNote;
-- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
-
-@end
-@interface ORDetectorView (SNO)
-- (void) setViewType:(int)aState;
 @end

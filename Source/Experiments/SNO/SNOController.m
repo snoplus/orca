@@ -2,8 +2,8 @@
 //  SNOController.m
 //  Orca
 //
-//  Created by Mark Howe on Wed Nov 20 2002.
-//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Tue Apr 20, 2010.
+//  Copyright (c) 2010  University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -19,130 +19,135 @@
 //-------------------------------------------------------------
 
 
-#pragma mark â€¢â€¢â€¢Imported Files
+#pragma mark ¥¥¥Imported Files
 #import "SNOController.h"
 #import "SNOModel.h"
 #import "ORColorScale.h"
 #import "ORAxis.h"
-#import "ORSNOConstants.h"
-#import "ORPSUPTubePosition.h"
-#import "ORSNOCableDB.h"
+#import "ORDetectorSegment.h"
+#import "ORSegmentGroup.h"
+
+
 
 @implementation SNOController
-#pragma mark â€¢â€¢â€¢Initialization
+#pragma mark ¥¥¥Initialization
 -(id)init
 {
-    self = [super initWithWindowNibName:@"SNO"];
+    self = [super initWithWindowNibName:@"SNO+"];
     return self;
 }
 
-- (void) dealloc
+- (void) loadSegmentGroups
 {
-    
-    [super dealloc];
+	if(!segmentGroups)segmentGroups = [[NSMutableArray array] retain];
+	ORSegmentGroup* aGroup = [model segmentGroup:0];
+	if(![segmentGroups containsObject:aGroup]){
+		[segmentGroups addObject:aGroup];
+	}
 }
+
+- (NSString*) defaultPrimaryMapFilePath
+{
+	return @"~/SNO";
+}
+
 
 -(void) awakeFromNib
 {
-	[[self window] setAspectRatio:NSMakeSize(5,3)];
-	[[self window] setMinSize:NSMakeSize(600,360)];
+	detectorSize		= NSMakeSize(620,595);
+	detailsSize		= NSMakeSize(450,589);
+	focalPlaneSize		= NSMakeSize(350,589);
+	
+    blankView = [[NSView alloc] init];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+
     [super awakeFromNib];
 }
 
-#pragma mark â€¢â€¢â€¢Accessors
 
-#pragma mark â€¢â€¢â€¢Notifications
+#pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
-    
+
     [notifyCenter addObserver : self
-                     selector : @selector(colorAttributesChanged:)
-                         name : ORSNORateColorBarChangedNotification
-                       object : model];
-    
-
-    
-    //a fake action for the scale objects
-    [notifyCenter addObserver : self
-                     selector : @selector(scaleAction:)
-                         name : ORAxisRangeChangedNotification
-                       object : nil];
+                     selector : @selector(viewTypeChanged:)
+                         name : ORSNOModelViewTypeChanged
+			object: model];
 }
 
-- (void) drawView:(NSView*)aView inRect:(NSRect)aRect
-{
-	int crate,card,pmt;
-	float scaleFactor = (aRect.size.width-20)/kPSUP_width;
-	float tubeSize = 4.*aRect.size.width/kPSUP_width;
-	ORSNOCableDB* db = [ORSNOCableDB sharedSNOCableDB];
-	int i;
-	float xoffset = 25;
-	float yoffset = 17;
-	for(i=0;i<kCMPSUPSTRUT;i++){
-		float x1 = (PSUPstrut[i].x1+xoffset) * scaleFactor;
-		float y1 = (PSUPstrut[i].y1+yoffset) * scaleFactor;
-		float x2 = (PSUPstrut[i].x2+xoffset) * scaleFactor;
-		float y2 = (PSUPstrut[i].y2+yoffset) * scaleFactor;
-		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,y1) toPoint:NSMakePoint(x2,y2)];
-	}
-	
-	for(crate=0;crate<kMaxSNOCrates+2;crate++){
-		for(card=0;card<kNumSNOCards;card++){
-			for(pmt=0;pmt<kNumSNOPmts;pmt++){
-				int tubeType = [db tubeTypeCrate:crate card:card channel:pmt];
-				if(tubeType >= kTubeTypeNormal && tubeType<=kTubeTypeLowGain){
-					int tubeIndex = kChannelsPerCrate * crate + kChannelsPerBoard* card + pmt;
-					NSColor* tubeColor = [db pmtColor:crate card:card channel:pmt];
-					[tubeColor set];
-					float x = psupTubePosition[tubeIndex].x * scaleFactor;
-					float y = (psupTubePosition[tubeIndex].y-22) * scaleFactor;
-					NSBezierPath* tube = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(x-tubeSize/2.,y-tubeSize/2.,tubeSize,tubeSize)];
-					[tube fill];
-				}
-			}
-		}
-	}
-	
-}
-
-#pragma mark â€¢â€¢â€¢Actions
-//a fake action from the scale object
-- (void) scaleAction:(NSNotification*)aNotification
-{
-    if(aNotification == nil || [aNotification object] == [detectorColorBar colorAxis]){
-        [[self undoManager] setActionName: @"Set Color Bar Attributes"];
-        [model setColorBarAttributes:[[detectorColorBar colorAxis]attributes]];
-    }
-}
-
-
-#pragma mark â€¢â€¢â€¢Interface Management
 - (void) updateWindow
 {
-    [super updateWindow];
-    [self colorAttributesChanged:nil];
+	[super updateWindow];
+	[self viewTypeChanged:nil];
 }
 
-- (void) colorAttributesChanged:(NSNotification*)aNote
-{        
-	[[detectorColorBar colorAxis] setAttributes:[model colorBarAttributes]];
-	[detectorColorBar setNeedsDisplay:YES];
-	[[detectorColorBar colorAxis]setNeedsDisplay:YES];
-	
-	BOOL state = [[[model colorBarAttributes] objectForKey:ORAxisUseLog] boolValue];
-	[colorBarLogCB setState:state];
-}
-
-
-@end
-
-@implementation ORPSUPView
-- (BOOL)isFlipped
+- (void) viewTypeChanged:(NSNotification*)aNote
 {
-	return YES;
+	[viewTypePU selectItemAtIndex:[model viewType]];
+	[detectorView setViewType:[model viewType]];
+	[detectorView makeAllSegments];	
 }
-@end
 
+#pragma mark ¥¥¥Interface Management
+
+- (IBAction) viewTypeAction:(id)sender
+{
+	[model setViewType:[sender indexOfSelectedItem]];
+}
+
+
+- (void) specialUpdate:(NSNotification*)aNote
+{
+	[super specialUpdate:aNote];
+	[detectorView makeAllSegments];
+}
+
+- (void) setDetectorTitle
+{	
+	switch([model displayType]){
+		case kDisplayRates:		[detectorTitle setStringValue:@"Detector Rate"];	break;
+		case kDisplayThresholds:	[detectorTitle setStringValue:@"Thresholds"];		break;
+		case kDisplayTotalCounts:	[detectorTitle setStringValue:@"Total Counts"];		break;
+		default: break;
+	}
+}
+
+#pragma mark ¥¥¥Details Interface Management
+- (void) detailsLockChanged:(NSNotification*)aNotification
+{
+	[super detailsLockChanged:aNotification];
+	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model experimentDetailsLock]];
+	BOOL locked = [gSecurity isLocked:[model experimentDetailsLock]];
+
+	[detailsLockButton setState: locked];
+	[initButton setEnabled: !lockedOrRunningMaintenance];
+
+
+#pragma mark ¥¥¥Table Data Source
+
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
+{
+	
+    if([tabView indexOfTabViewItem:tabViewItem] == 0){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:detectorSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:detailsSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:focalPlaneSize];
+		[[self window] setContentView:tabView];
+    }
+	int index = [tabView indexOfTabViewItem:tabViewItem];
+	[[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOController.selectedtab"];
+}
+
+@end
