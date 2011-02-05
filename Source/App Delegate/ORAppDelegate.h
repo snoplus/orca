@@ -35,6 +35,7 @@
 	IBOutlet ORWindowSaveSet* windowSaveSet;
 	NSString* ethernetHardwareAddress;
 	BOOL configLoadedOK;
+	NSOperationQueue* queue;
 	
 }
 + (BOOL)isMacOSX10_5;
@@ -82,6 +83,12 @@
 - (id) document;
 - (void) setDocument:(id)aDocument;
 - (NSUndoManager*) undoManager;
+
+- (void) doHeartBeatAfterDelay;
+- (void) doHeartBeat;
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
+                         change:(NSDictionary *)change context:(void *)context;
+
 @end
 
 
@@ -93,3 +100,10 @@
                        bugFix:(unsigned *)bugFix;
 
 @end
+
+@interface ORHeartBeatOp : NSOperation
+{
+}
+- (void) main;
+@end
+

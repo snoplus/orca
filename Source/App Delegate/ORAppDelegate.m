@@ -138,6 +138,9 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     [alarmCollection release];
     [memoryWatcher release];
 	[ethernetHardwareAddress release];
+	[queue removeObserver:self forKeyPath:@"operations"];
+	[queue cancelAllOperations];
+	[queue release];
     [super dealloc];
 }    
 
@@ -569,6 +572,41 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 		}
 	}	
 }
+
+- (void) doHeartBeatAfterDelay
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doHeartBeat) object:nil];
+	[self performSelector:@selector(doHeartBeat) withObject:nil afterDelay:30];
+}
+
+- (void) doHeartBeat
+{
+	if(!queue){
+		queue = [[NSOperationQueue alloc] init];
+		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+		[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+	}
+	//if(enabled){ //get enabled from preferences
+		ORHeartBeatOp* anOp = [[ORHeartBeatOp alloc] init];
+		[queue addOperation:anOp];
+		[anOp release];	
+	//}
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
+                         change:(NSDictionary *)change context:(void *)context
+{
+    if (object == queue && [keyPath isEqual:@"operations"]) {
+        if ([[queue operations] count] == 0) {
+			[self performSelectorOnMainThread:@selector(doHeartBeatAfterDelay) withObject:nil waitUntilDone:NO];
+        }
+		
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object 
+                               change:change context:context];
+    }
+}
 @end
 
 @implementation NSApplication (SystemVersion)
@@ -607,3 +645,22 @@ fail:
 }
 
 @end
+
+@implementation ORHeartBeatOp
+- (void) main
+{
+	@try {
+	
+		//get options from preferences
+		//path from preferences, actual file from machine name
+		//if(enabled){
+		//	if(!fileExistsAtPath) MakeFile
+		//		writeTime to file;
+		//}
+	}
+	@catch(NSException* e){
+	}
+}
+@end
+
+
