@@ -36,6 +36,7 @@
 	NSString* ethernetHardwareAddress;
 	BOOL configLoadedOK;
 	NSOperationQueue* queue;
+	unsigned long heartbeatCount;
 	
 }
 + (BOOL)isMacOSX10_5;
@@ -104,7 +105,9 @@
 
 @interface ORHeartBeatOp : NSOperation
 {
+	unsigned long heartbeatCount;
 }
+- (id) init:(unsigned long)aCount;
 - (void) main;
 @end
 

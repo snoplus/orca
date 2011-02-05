@@ -221,6 +221,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
     enabled		   |= [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]; 
     NSString* path = [[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]; 
 	if(enabled && [path length]){
+		heartbeatCount = 0;
 		[self doHeartBeat];
 	}
 	else {
@@ -485,6 +486,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	}
 	else NSLog(@"Number Processors: %d\n",count);
 	
+	heartbeatCount = 0;
 	[self doHeartBeat];
 	
 	if(getenv("NSZombieEnabled") || getenv("NSAutoreleaseFreedObjectCheckEnabled")) {
@@ -626,9 +628,10 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 			[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
 			[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
 		}
-		ORHeartBeatOp* anOp = [[ORHeartBeatOp alloc] init];
+		ORHeartBeatOp* anOp = [[ORHeartBeatOp alloc] init:heartbeatCount];
 		[queue addOperation:anOp];
 		[anOp release];	
+		heartbeatCount++;
 	}
 }
 
@@ -685,6 +688,13 @@ fail:
 @end
 
 @implementation ORHeartBeatOp
+- (id) init:(unsigned long)aCount
+{
+	self = [super init];
+	heartbeatCount = aCount;
+	return self;
+}
+
 - (void) main
 {
 	@try {
@@ -694,10 +704,12 @@ fail:
 			NSString* contents = [NSString stringWithFormat:@"Time:%d\nNext:%d",now,now+kHeartbeatPeriod];
 			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 		}
-		if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
-			NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"StatusLog"]; 
-			NSString* contents = [[ORStatusController sharedStatusController] contents];
-			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+		if(heartbeatCount%10 == 0){
+			if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
+				NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"StatusLog"]; 
+				NSString* contents = [[ORStatusController sharedStatusController] contents];
+				[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+			}
 		}
 	}
 	@catch(NSException* e){
