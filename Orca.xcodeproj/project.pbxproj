@@ -556,6 +556,7 @@
 		842544F112F1FF9F00472314 /* BamDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 842544E712F1FF9E00472314 /* BamDetectorView.h */; };
 		842544F212F1FF9F00472314 /* BamDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 842544E812F1FF9E00472314 /* BamDetectorView.m */; };
 		842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */ = {isa = PBXBuildFile; fileRef = 842544E912F1FF9E00472314 /* edu.washington.npl.orca.BamDetector.plist */; };
+		84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84258D8C12FDAA0E00A15D82 /* Heartbeat.tif */; };
 		842702810B5EE938009176B4 /* katrin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842702800B5EE937009176B4 /* katrin.gif */; };
 		84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */; };
 		84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */; };
@@ -1228,7 +1229,6 @@
 		84693F771121BB4C008B5DB2 /* RunNotes.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84693F701121BB4C008B5DB2 /* RunNotes.nib */; };
 		84693F781121BB4C008B5DB2 /* RunNotes.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84693F711121BB4C008B5DB2 /* RunNotes.tif */; };
 		846A08F20B77BAAA00B811F4 /* NoADUDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */; };
-		846A5EB30FF126B2001CBD54 /* WebServer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 846A5EB20FF126B2001CBD54 /* WebServer.gif */; };
 		846B8F0F0E15972A00C41F9D /* ICS8065Box.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F080E15972A00C41F9D /* ICS8065Box.tif */; };
 		846B8F100E15972A00C41F9D /* m8065Service.x in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F090E15972A00C41F9D /* m8065Service.x */; };
 		846B8F110E15972A00C41F9D /* ORICS8065.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F0A0E15972A00C41F9D /* ORICS8065.nib */; };
@@ -1406,7 +1406,6 @@
 		847BC83B05E2940D0054841E /* ORHWUndoManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 847BC83705E2940D0054841E /* ORHWUndoManager.h */; };
 		847BC83E05E2941D0054841E /* preferences.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83C05E2941D0054841E /* preferences.tif */; };
 		847BC83F05E2941D0054841E /* PasswordLock.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83D05E2941D0054841E /* PasswordLock.tif */; };
-		847BF76707A588B700F91E05 /* GateKeeper.gif in Resources */ = {isa = PBXBuildFile; fileRef = 847BF76607A588B700F91E05 /* GateKeeper.gif */; };
 		847CCA66058E8C75003522C8 /* ORLinkedList.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA60058E8C75003522C8 /* ORLinkedList.h */; };
 		847CCA68058E8C75003522C8 /* ORQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 847CCA62058E8C75003522C8 /* ORQueue.h */; };
 		847CCA69058E8C75003522C8 /* ORQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 847CCA63058E8C75003522C8 /* ORQueue.m */; };
@@ -3294,6 +3293,7 @@
 		842544E712F1FF9E00472314 /* BamDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BamDetectorView.h; path = Source/Experiments/BamDectector/BamDetectorView.h; sourceTree = SOURCE_ROOT; };
 		842544E812F1FF9E00472314 /* BamDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BamDetectorView.m; path = Source/Experiments/BamDectector/BamDetectorView.m; sourceTree = SOURCE_ROOT; };
 		842544E912F1FF9E00472314 /* edu.washington.npl.orca.BamDetector.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.BamDetector.plist; path = Source/Experiments/BamDectector/edu.washington.npl.orca.BamDetector.plist; sourceTree = SOURCE_ROOT; };
+		84258D8C12FDAA0E00A15D82 /* Heartbeat.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Heartbeat.tif; path = Source/Preferences/Heartbeat.tif; sourceTree = SOURCE_ROOT; };
 		842702800B5EE937009176B4 /* katrin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = katrin.gif; path = Source/Experiments/Katrin/katrin.gif; sourceTree = SOURCE_ROOT; };
 		84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP320Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.h; sourceTree = SOURCE_ROOT; };
 		84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIP320Decoders.m; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.m; sourceTree = SOURCE_ROOT; };
@@ -3727,7 +3727,6 @@
 		84693F701121BB4C008B5DB2 /* RunNotes.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RunNotes.nib; path = Source/Objects/Control/RunNotes/RunNotes.nib; sourceTree = SOURCE_ROOT; };
 		84693F711121BB4C008B5DB2 /* RunNotes.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunNotes.tif; path = Source/Objects/Control/RunNotes/RunNotes.tif; sourceTree = SOURCE_ROOT; };
 		846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoADUDriverHelp.plist; path = Source/Objects/Hardware/USB/ADU200/NoADUDriverHelp.plist; sourceTree = SOURCE_ROOT; };
-		846A5EB20FF126B2001CBD54 /* WebServer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = WebServer.gif; path = "Source/Main Document/WebServer.gif"; sourceTree = SOURCE_ROOT; };
 		846B8F080E15972A00C41F9D /* ICS8065Box.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ICS8065Box.tif; path = Source/Objects/Hardware/GPIB/ICS8065/ICS8065Box.tif; sourceTree = SOURCE_ROOT; };
 		846B8F090E15972A00C41F9D /* m8065Service.x */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = m8065Service.x; path = Source/Objects/Hardware/GPIB/ICS8065/m8065Service.x; sourceTree = SOURCE_ROOT; };
 		846B8F0A0E15972A00C41F9D /* ORICS8065.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ORICS8065.nib; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065.nib; sourceTree = SOURCE_ROOT; };
@@ -3910,7 +3909,6 @@
 		847BC83705E2940D0054841E /* ORHWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHWUndoManager.h; path = "Source/Main Dialogs/HardwareWizard/ORHWUndoManager.h"; sourceTree = SOURCE_ROOT; };
 		847BC83C05E2941D0054841E /* preferences.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = preferences.tif; path = Source/Preferences/preferences.tif; sourceTree = SOURCE_ROOT; };
 		847BC83D05E2941D0054841E /* PasswordLock.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = PasswordLock.tif; path = Source/Preferences/PasswordLock.tif; sourceTree = SOURCE_ROOT; };
-		847BF76607A588B700F91E05 /* GateKeeper.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = GateKeeper.gif; path = "Source/Main Document/GateKeeper.gif"; sourceTree = SOURCE_ROOT; };
 		847CCA60058E8C75003522C8 /* ORLinkedList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLinkedList.h; path = "Source/Objects/Misc Objects/DataStructures/ORLinkedList.h"; sourceTree = SOURCE_ROOT; };
 		847CCA62058E8C75003522C8 /* ORQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.h"; sourceTree = SOURCE_ROOT; };
 		847CCA63058E8C75003522C8 /* ORQueue.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORQueue.m; path = "Source/Objects/Misc Objects/DataStructures/ORQueue.m"; sourceTree = SOURCE_ROOT; };
@@ -6972,6 +6970,7 @@
 				847BC83C05E2941D0054841E /* preferences.tif */,
 				84CF3B2505E6B85800C5C320 /* Startup.tif */,
 				847BC83D05E2941D0054841E /* PasswordLock.tif */,
+				84258D8C12FDAA0E00A15D82 /* Heartbeat.tif */,
 				84CF3B2305E6B60700C5C320 /* Appearance.tif */,
 				84C859040665624C00FBAF9C /* Bugs.tif */,
 				840B20C50B4D7CE80021220C /* Editing.tif */,
@@ -10916,10 +10915,8 @@
 				848E20690592891800B6708F /* alarmMaster.gif */,
 				844E5CD506236ACD0051849B /* CommandCenter.gif */,
 				844E5CD606236ACD0051849B /* TaskMaster.gif */,
-				847BF76607A588B700F91E05 /* GateKeeper.gif */,
 				840B7DAF094DFBCB00B1B135 /* ProcessCenter.tif */,
 				84701AD30E0344CF00195E3E /* ORCARootService.tif */,
-				846A5EB20FF126B2001CBD54 /* WebServer.gif */,
 				84D8CB4D10447A57005585C5 /* AutoTester.gif */,
 				84EBBE7E1282E5D500234313 /* Archive.tif */,
 				F51E697203AE4775015F64B1 /* Document.nib */,
@@ -12329,7 +12326,6 @@
 				84EC2C38079D95D800188ED3 /* No620DriverHelp.plist in Resources */,
 				84EC3461079D973300188ED3 /* No617DriverHelp.plist in Resources */,
 				84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */,
-				847BF76707A588B700F91E05 /* GateKeeper.gif in Resources */,
 				8446CE1F07B847B8006CD9C4 /* AD413A.nib in Resources */,
 				8446CE2007B847B8006CD9C4 /* AD413ACard.gif in Resources */,
 				843A54D807BBE7A500534C27 /* 4ChanTriggerCard.gif in Resources */,
@@ -12723,7 +12719,6 @@
 				84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */,
 				84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */,
 				84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */,
-				846A5EB30FF126B2001CBD54 /* WebServer.gif in Resources */,
 				84A1ACAC0FF3A4EE00D7F946 /* PlotPublisher.nib in Resources */,
 				84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */,
 				84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */,
@@ -12878,6 +12873,7 @@
 				842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */,
 				8457D11E12F8816900D3E3B4 /* EHS8260p.nib in Resources */,
 				8457D11F12F8816900D3E3B4 /* EHS8260p.tif in Resources */,
+				84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

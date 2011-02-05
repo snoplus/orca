@@ -61,6 +61,9 @@
     IBOutlet NSMatrix*		helpFileLocationMatrix;
     IBOutlet NSTextField*	helpFileLocationPathField;
 
+	IBOutlet NSTextField*	heartbeatPathField;
+    IBOutlet NSButton*      activateHeartbeatCB;
+    IBOutlet NSButton*      activatePostLogCB;
 
     BOOL disallowStateChange;
 }
@@ -96,14 +99,13 @@
 - (IBAction) changeScriptIndentifier2Color:(id)sender;
 - (IBAction) changeScriptConstantsColor:(id)sender;
 
-
 - (void) textDidChange:(NSNotification*)aNote;
-
 
 - (IBAction) helpFileLocationPrefAction:(id)sender;
 - (IBAction) helpFilePathAction:(id)sender;
 
+- (IBAction) activateHeatbeatAction:(id)sender;
+- (IBAction) activatePostLogAction:(id)sender;
+- (IBAction) selectHeartbeatPathAction:(id)sender;
+
 @end
-
-
-

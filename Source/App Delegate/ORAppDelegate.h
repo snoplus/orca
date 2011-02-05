@@ -56,6 +56,7 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) applicationDidFinishLaunching:(NSNotification*)aNotification;
+- (void) heartbeatEnabledChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) showProcessCenter:(id)sender;

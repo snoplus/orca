@@ -52,6 +52,7 @@ NSString* kCrashLogDir  = @"~/Library/Logs/CrashReporter";
 NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
 #define kORSplashScreenDelay 1
+#define kHeartbeatPeriod 30
 
 @implementation ORAppDelegate
 + (BOOL)isMacOSX10_5
@@ -97,6 +98,11 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
         
 		[initialUserDefaults setObject:[NSNumber numberWithBool:YES]  forKey:ORHelpFilesUseDefault];
 		[initialUserDefaults setObject:@"" forKey:ORHelpFilesPath];
+
+		[initialUserDefaults setObject:[NSNumber numberWithInt:0] forKey:ORPrefHeartBeatEnabled];
+		[initialUserDefaults setObject:[NSNumber numberWithInt:0] forKey:ORPrefPostLogEnabled];
+		[initialUserDefaults setObject:@"" forKey:ORPrefHeartBeatPath];
+
 		
         [defaults registerDefaults:initialUserDefaults];
         initialized = YES;
@@ -191,6 +197,35 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter addObserver : self
+                     selector : @selector(heartbeatEnabledChanged:)
+                         name : ORPrefHeartBeatEnabledChanged
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(heartbeatEnabledChanged:)
+                         name : ORPrefPostLogEnabledChanged
+                       object : nil];
+	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(heartbeatEnabledChanged:)
+                         name : ORPrefHeartBeatPathChanged
+                       object : nil];
+}
+
+- (void) heartbeatEnabledChanged:(NSNotification *)aNotification
+{
+    BOOL enabled   = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]; 
+    enabled		   |= [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]; 
+    NSString* path = [[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]; 
+	if(enabled && [path length]){
+		[self doHeartBeat];
+	}
+	else {
+		[queue cancelAllOperations];
+	}
 }
 
 - (void) applicationWillTerminate:(NSNotification *)aNotification
@@ -409,7 +444,6 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 			else {
 				NSLog(@"Orca global security is disabled.\n");
 			}
-			
 		}
 		configLoadedOK = YES;
 	}
@@ -450,6 +484,8 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 		}
 	}
 	else NSLog(@"Number Processors: %d\n",count);
+	
+	[self doHeartBeat];
 	
 	if(getenv("NSZombieEnabled") || getenv("NSAutoreleaseFreedObjectCheckEnabled")) {
 		NSLogColor([NSColor redColor],@"==============================================================================\n");
@@ -576,21 +612,24 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 - (void) doHeartBeatAfterDelay
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doHeartBeat) object:nil];
-	[self performSelector:@selector(doHeartBeat) withObject:nil afterDelay:30];
+	[self performSelector:@selector(doHeartBeat) withObject:nil afterDelay:kHeartbeatPeriod];
 }
 
 - (void) doHeartBeat
 {
-	if(!queue){
-		queue = [[NSOperationQueue alloc] init];
-		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-		[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
-	}
-	//if(enabled){ //get enabled from preferences
+    BOOL enabled   = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]; 
+    enabled       |= [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]; 
+    NSString* path = [[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]; 
+	if(enabled && [path length]){
+		if(!queue){
+			queue = [[NSOperationQueue alloc] init];
+			[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
+			[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+		}
 		ORHeartBeatOp* anOp = [[ORHeartBeatOp alloc] init];
 		[queue addOperation:anOp];
 		[anOp release];	
-	//}
+	}
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
@@ -600,7 +639,6 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
         if ([[queue operations] count] == 0) {
 			[self performSelectorOnMainThread:@selector(doHeartBeatAfterDelay) withObject:nil waitUntilDone:NO];
         }
-		
     }
     else {
         [super observeValueForKeyPath:keyPath ofObject:object 
@@ -650,13 +688,17 @@ fail:
 - (void) main
 {
 	@try {
-	
-		//get options from preferences
-		//path from preferences, actual file from machine name
-		//if(enabled){
-		//	if(!fileExistsAtPath) MakeFile
-		//		writeTime to file;
-		//}
+		if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]){
+			NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"Heartbeat"]; 
+			unsigned long now = (unsigned long)[NSDate timeIntervalSinceReferenceDate];
+			NSString* contents = [NSString stringWithFormat:@"Time:%d\nNext:%d",now,now+kHeartbeatPeriod];
+			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+		}
+		if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
+			NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"StatusLog"]; 
+			NSString* contents = [[ORStatusController sharedStatusController] contents];
+			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+		}
 	}
 	@catch(NSException* e){
 	}

@@ -44,6 +44,10 @@
 #define  ORScriptIdentifier2Color   @"ORScriptIdentifier2Color"
 #define  ORScriptConstantsColor		@"ORScriptConstantsColor"
 
+#define  ORPrefHeartBeatEnabled		@"ORPrefHeartBeatEnabled"
+#define  ORPrefHeartBeatPath		@"ORPrefHeartBeatPath"
+#define  ORPrefPostLogEnabled		@"ORPrefPostLogEnabled"
+
 enum {
     straightLines,
     squareLines,
@@ -56,6 +60,10 @@ enum {
 #define  ORLineColorChangedNotification         @"ORLineColorChangedNotification"
 #define  ORLineTypeChangedNotification          @"ORLineTypeChangedNotification"
 #define  ORSyntaxColorChangedNotification		@"ORSyntaxColorChangedNotification"
+#define  ORPrefHeartBeatEnabledChanged			@"ORPrefHeartBeatEnabledChanged"
+#define  ORPrefHeartBeatEnabledChanged			@"ORPrefHeartBeatEnabledChanged"
+#define  ORPrefHeartBeatPathChanged				@"ORPrefHeartBeatPathChanged"
+#define  ORPrefPostLogEnabledChanged			@"ORPrefPostLogEnabledChanged"
 
 #pragma mark •••Other Definiations
 #define  ORLastDocumentName                     @"OR Last Document Name"
