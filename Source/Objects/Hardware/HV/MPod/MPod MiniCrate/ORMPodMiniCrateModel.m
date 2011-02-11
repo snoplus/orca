@@ -139,9 +139,8 @@
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCratePower) object:nil];
     @try {
-        //if(![[ORGlobal sharedInstance] runInProgress]){
-        [[self controllerCard] checkCratePower];
-        //}
+        if(polledOnce)[[self controllerCard] checkCratePower];
+		polledOnce = YES;
     }
 	@catch(NSException* localException) {
     }

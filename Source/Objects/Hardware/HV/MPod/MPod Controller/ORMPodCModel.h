@@ -30,6 +30,7 @@
 	NSTask*			pingTask;
 	NSMutableDictionary* systemParams;
 	NSOperationQueue* queue;
+	BOOL			oldPower;
 }
 
 #pragma mark ***Accessors

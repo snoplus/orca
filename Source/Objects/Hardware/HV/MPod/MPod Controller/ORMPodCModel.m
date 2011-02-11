@@ -102,11 +102,11 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 }
 
 #pragma mark ***Accessors
-
 - (BOOL) power
 {
     return [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
 }
+
 - (id) systemParam:(NSString*)name
 {
 	id result =  [[systemParams objectForKey:name] objectForKey:@"Value"];
@@ -231,6 +231,7 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 				systemParams = nil; 
 				//time so flush the queue
 				[queue cancelAllOperations];
+				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],@"HV Controller",nil);
 			}
 		}
 		else {
@@ -241,6 +242,7 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 	
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
+	
 }
 
 - (void) togglePower
@@ -258,10 +260,13 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 - (void)  checkCratePower
 {
 	NSString* noteName;
-	if([self power]) noteName = MPodPowerRestoredNotification;
-	else			 noteName = MPodPowerFailedNotification;
-	[[NSNotificationCenter defaultCenter] postNotificationName:noteName object:self];
-	
+	BOOL currentPower = [self power];
+	if(currentPower != oldPower){
+		if([self power]) noteName = MPodPowerRestoredNotification;
+		else			 noteName = MPodPowerFailedNotification;
+		[[NSNotificationCenter defaultCenter] postNotificationName:noteName object:self];
+	}
+	oldPower = currentPower;
 }
 
 - (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector

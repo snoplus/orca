@@ -22,6 +22,7 @@
 #import "ORMPodCrate.h"
 
 @interface ORMPodMiniCrateModel : ORMPodCrate   {
+	BOOL polledOnce;
 }
 
 - (void) makeConnectors;
