@@ -26,14 +26,16 @@
 @class ORSegmentGroup;
 
 @interface SNOController : ORExperimentController {
- 
-    IBOutlet NSTextField*	detectorTitle;
-    IBOutlet NSPopUpButton*	viewTypePU;
+	IBOutlet NSTextField*	detectorTitle;
+	IBOutlet NSPopUpButton*	viewTypePU;
 
 	NSView *blankView;
-    NSSize detectorSize;
-    NSSize detailsSize;
-    NSSize focalPlaneSize;
+	NSSize detectorSize;
+	NSSize detailsSize;
+	NSSize focalPlaneSize;
+	NSSize couchDBSize;
+	NSSize monitoringSize;
+	NSSize slowControlSize;
 }
 
 #pragma mark ¥¥¥Initialization

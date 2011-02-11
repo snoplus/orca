@@ -33,7 +33,7 @@
 #pragma mark ¥¥¥Initialization
 -(id)init
 {
-    self = [super initWithWindowNibName:@"SNO+"];
+    self = [super initWithWindowNibName:@"SNO"];
     return self;
 }
 
@@ -56,12 +56,15 @@
 {
 	detectorSize		= NSMakeSize(620,595);
 	detailsSize		= NSMakeSize(450,589);
-	focalPlaneSize		= NSMakeSize(350,589);
+	focalPlaneSize		= NSMakeSize(450,589);
+	couchDBSize		= NSMakeSize(620,595);
+	monitoringSize		= NSMakeSize(620,595);
+	slowControlSize		= NSMakeSize(620,595);
 	
-    blankView = [[NSView alloc] init];
-    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+	blankView = [[NSView alloc] init];
+	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
-    [super awakeFromNib];
+	[super awakeFromNib];
 }
 
 
@@ -146,6 +149,22 @@
 		[self resizeWindowToSize:focalPlaneSize];
 		[[self window] setContentView:tabView];
     }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+	    [[self window] setContentView:blankView];
+	    [self resizeWindowToSize:couchDBSize];
+	    [[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 4){
+	    [[self window] setContentView:blankView];
+	    [self resizeWindowToSize:monitoringSize];
+	    [[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 5){
+	    [[self window] setContentView:blankView];
+	    [self resizeWindowToSize:slowControlSize];
+	    [[self window] setContentView:tabView];
+    }
+	
 	int index = [tabView indexOfTabViewItem:tabViewItem];
 	[[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOController.selectedtab"];
 }
