@@ -215,6 +215,10 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	for(id anEntry in response){
 		NSString* anError = [anEntry objectForKey:@"Error"];
 		if([anError length]){
+			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
+				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
+				break;
+			}
 		}
 		else {
 			//make sure the slot matches: if not then ignore this Entry
@@ -258,6 +262,10 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	for(id anEntry in response){
 		NSString* anError = [anEntry objectForKey:@"Error"];
 		if([anError length]){
+			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
+				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
+				break;
+			}
 		}
 		else {
 		}
@@ -285,14 +293,22 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	return mask;
 }
 
+- (BOOL) channelIsRamping:(int)chan
+{
+	int state = [self channel:chan readParamAsInt:@"outputStatus"];
+	if(state & outputOnMask){
+		if(state & outputRampUpMask)return YES;
+		else if(state & outputRampDownMask)return YES;
+	}
+	return NO;
+}
+
 - (int) numberChannelsRamping
 {
 	int count = 0;
 	int i;
 	for(i=0;i<8;i++){
-		float voltage = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
-		float voltDiff = fabs(voltage - hwGoal[i]);
-		if(voltDiff > 5)count++;
+		if([self channelIsRamping:i])count++;
 	}
 	return count;
 }
@@ -539,10 +555,19 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	[super processSyncResponseArray:response];
 	for(id anEntry in response){
-		int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
-		if(theChannel>=0 && theChannel<8){
-			NSString* name = [anEntry objectForKey:@"Name"];
-			if([name isEqualToString:@"outputMeasurementSenseVoltage"])	[self setTarget:theChannel withValue:[[anEntry objectForKey:@"Value"] intValue]];
+		NSString* anError = [anEntry objectForKey:@"Error"];
+		if([anError length]){
+			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
+				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
+				break;
+			}
+		}
+		else {			
+			int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
+			if(theChannel>=0 && theChannel<8){
+				NSString* name = [anEntry objectForKey:@"Name"];
+				if([name isEqualToString:@"outputMeasurementSenseVoltage"])	[self setTarget:theChannel withValue:[[anEntry objectForKey:@"Value"] intValue]];
+			}
 		}
 	}
 }

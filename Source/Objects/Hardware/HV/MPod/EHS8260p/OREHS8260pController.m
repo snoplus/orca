@@ -96,12 +96,15 @@
 {
 	int chan = [model selectedChannel];
 	[model setOutputFailureBehavior:chan withValue:[sender indexOfSelectedItem]];	
+	[model writeSupervisorBehaviour:chan];
+
 }
 
 - (void) currentTripBehaviorAction:(id)sender
 {
 	int chan = [model selectedChannel];
 	[model setCurrentTripBehavior:chan withValue:[sender indexOfSelectedItem]];	
+	[model writeSupervisorBehaviour:chan];
 }
 
 - (IBAction) tripTimeAction:(id)sender

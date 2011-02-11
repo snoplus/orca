@@ -109,6 +109,7 @@ enum {
 - (int)		numberChannelsRamping;
 - (int)		numberChannelsWithNonZeroVoltage;
 - (int)		numberChannelsWithNonZeroHwGoal;
+- (BOOL)	channelIsRamping:(int)chan;
 - (unsigned long) failureEvents:(int)channel;
 - (unsigned long) failureEvents;
 - (BOOL) channelInBounds:(int)aChan;

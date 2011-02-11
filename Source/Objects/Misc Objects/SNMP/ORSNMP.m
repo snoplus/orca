@@ -48,20 +48,26 @@
 
 - (void) openSession:(NSString*)ip community:(NSString*)aCommunity
 {
-	if(!sessionHandle){
-		init_snmp("APC Check");
-		snmp_sess_init(&session);
-		session.version			= SNMP_VERSION_1;
-		session.community		= (unsigned char*)[aCommunity cStringUsingEncoding:NSASCIIStringEncoding];
-		session.community_len	= strlen((const char *)session.community);
-		session.peername		= (char*)[ip cStringUsingEncoding:NSASCIIStringEncoding];
-		sessionHandle			= snmp_open(&session);
+	@synchronized(self){
+		if(!sessionHandle){
+			init_snmp("APC Check");
+			snmp_sess_init(&session);
+			session.version			= SNMP_VERSION_1;
+			session.community		= (unsigned char*)[aCommunity cStringUsingEncoding:NSASCIIStringEncoding];
+			session.community_len	= strlen((const char *)session.community);
+			session.peername		= (char*)[ip cStringUsingEncoding:NSASCIIStringEncoding];
+			sessionHandle			= snmp_open(&session);
+		}
 	}
 }
 
 - (NSArray*) readValue:(NSString*)anObjId
 {
-	return [self readValues:[NSArray arrayWithObject:anObjId]];
+	NSArray* result;
+	@synchronized(self){
+		result =  [self readValues:[NSArray arrayWithObject:anObjId]];
+	}
+	return result;
 }
 
 - (NSArray*) readValues:(NSArray*)someObjIds
@@ -118,7 +124,11 @@
 
 - (NSArray*) writeValue:(NSString*)anObjId
 {
-	return [self writeValues:[NSArray arrayWithObject:anObjId]];
+	NSArray* result;
+	@synchronized(self){
+		result =  [self writeValues:[NSArray arrayWithObject:anObjId]];
+	}
+	return result;
 }
 
 - (NSArray*) writeValues:(NSArray*)someObjIds
@@ -183,8 +193,10 @@
 - (void) closeSession
 {
 	if(sessionHandle) {
-		snmp_close(sessionHandle);
-		sessionHandle = nil;
+		@synchronized(self){
+			snmp_close(sessionHandle);
+			sessionHandle = nil;
+		}
 	}	
 }
 

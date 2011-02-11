@@ -32,6 +32,7 @@
 - (void) _allOnSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _allOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+- (void) _allRampToZeroSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
 
 @implementation ORiSeg8ChanHVController
@@ -201,7 +202,7 @@
 {
     if([aNotification object] == [model adapter]){
 		[powerField setStringValue:@"Crate Power OFF"];
-		[self updateButtons];
+		//[self updateButtons];
 	}
 }
 
@@ -209,7 +210,7 @@
 {
     if([aNotification object] == [model adapter]){
 		[powerField setStringValue:@""];
-		[self updateButtons];
+		//[self updateButtons];
 	}
 }
 
@@ -283,8 +284,8 @@
 	int selectedChannel = [model selectedChannel];
 	int state		= [model channel:selectedChannel readParamAsInt:@"outputSwitch"];
 	float voltage	= [model channel:selectedChannel readParamAsFloat:@"outputMeasurementSenseVoltage"];
-	float hwGoal	= [model hwGoal:selectedChannel];
-	float voltDiff  = fabs(voltage - hwGoal);
+	//float hwGoal	= [model hwGoal:selectedChannel];
+	//float voltDiff  = fabs(voltage - hwGoal);
 	BOOL cratePower = YES;
 	if([[model adapter] respondsToSelector:@selector(power)])cratePower = [[model adapter] power];
 	if(cratePower){
@@ -324,8 +325,8 @@
 			[powerOffButton setEnabled:YES];
 			[panicButton setEnabled:YES];
 			[loadButton setEnabled:YES];
-			[stopRampButton setEnabled:voltDiff > 5];
-			[rampToZeroButton setEnabled:voltage > 0 && hwGoal!=0];
+			[stopRampButton setEnabled:[model channelIsRamping:selectedChannel]];
+			[rampToZeroButton setEnabled:voltage > 0];
 			[stateField setStringValue:@"ON"];
 			[panicButton setEnabled:voltage > 0];
 			[targetField setEnabled:!lockedOrRunningMaintenance];
@@ -347,18 +348,7 @@
 		int numChannelsNonZeroHwGoal	= [model numberChannelsWithNonZeroHwGoal];
 		
 		//the ALL buttons
-		if(numberOnChannels == 0){
-			//channel is off
-			[powerAllOnButton setEnabled:YES];
-			[powerAllOffButton setEnabled:YES];
-			[panicAllButton setEnabled:NO];
-			[rampAllToZeroButton setEnabled:NO];
-			[loadAllButton setEnabled:NO];
-			[stopAllRampButton setEnabled:NO];
-			[panicAllButton setEnabled:NO];
-			[panicAllButton setTitle:@"All HV OFF"];
-		}
-		else if(channelStateMask & (1L << kiSeg8ChanHVOutputSetEmergencyOff)){
+		if(channelStateMask & (1L << kiSeg8ChanHVOutputSetEmergencyOff)){
 			//channel is off
 			[powerAllOnButton setEnabled:NO];
 			[powerAllOffButton setEnabled:NO];
@@ -369,10 +359,27 @@
 			[panicAllButton setEnabled:NO];
 			[panicAllButton setTitle:@"All HV OFF"];
 		}
-		else {
-			//channel is on
+		else if(numberOnChannels == 0){
+			//none on
 			[powerAllOnButton setEnabled:YES];
-			[powerAllOffButton setEnabled:YES];
+			[powerAllOffButton setEnabled:NO];
+			[panicAllButton setEnabled:NO];
+			[rampAllToZeroButton setEnabled:NO];
+			[loadAllButton setEnabled:NO];
+			[stopAllRampButton setEnabled:NO];
+			[panicAllButton setEnabled:NO];
+			[panicAllButton setTitle:@"All HV OFF"];
+		}
+		else {
+			if(numberOnChannels == 8){
+				//all on 
+				[powerAllOnButton setEnabled:NO];
+				[powerAllOffButton setEnabled:YES];
+			}
+			else {
+				[powerAllOnButton setEnabled:YES];
+				[powerAllOffButton setEnabled:YES];
+			}
 			[panicAllButton setEnabled:YES];
 			[loadAllButton setEnabled:YES];
 			[stopAllRampButton setEnabled:numChannelsRamping>0];
@@ -431,7 +438,6 @@
 			}
 			else [hvStatusImage setImage:[NSImage imageNamed:@"highVoltage"]];
 		}
-		
 	}
 	else [hvStatusImage setImage:nil];	
 }
@@ -590,8 +596,23 @@
 #pragma mark •••Actions for All
 - (IBAction) powerAllOnAction:(id)sender
 {
+	int numberOffChannels = 8-[model numberChannelsOn];
 	[self endEditing];
-    NSBeginAlertSheet(@"Turn ON ALL Channels",
+	NSString* s1;
+	NSString* s2; 
+	if(numberOffChannels == 8){
+		s1 = @"Turn ON ALL Channels";
+		s2 = @"Really Turn ON ALL Channels?";
+	}
+	else {
+		s1 = [NSString stringWithFormat:@"Turn ON %d Channel%@",numberOffChannels,numberOffChannels>1?@"s":@""];
+		s2 = [NSString stringWithFormat:@"Really Turn ON %d Channel%@ (%d Channel%@ already ON)",
+			  numberOffChannels,
+			  numberOffChannels>1?@"s":@"",
+			  8-numberOffChannels,
+			  8-numberOffChannels>1?@"s are":@" is"];
+	}
+    NSBeginAlertSheet(s1,
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -600,13 +621,28 @@
 					  @selector(_allOnSheetDidEnd:returnCode:contextInfo:),
 					  nil,
 					  nil,
-					  @"Really Turn ALL Channels ON?");
+					  s2);
 }
 
 - (IBAction) powerAllOffAction:(id)sender
 {
 	[self endEditing];
-    NSBeginAlertSheet(@"Turn OFF ALL Channels",
+	int numberOnChannels = [model numberChannelsOn];
+	NSString* s1;
+	NSString* s2; 
+	if(numberOnChannels == 8){
+		s1 = @"Turn OFF ALL Channels";
+		s2 = @"Really Turn OFF ALL Channels?";
+	}
+	else {
+		s1 = [NSString stringWithFormat:@"Turn ON %d Channel%@",numberOnChannels,numberOnChannels>1?@"s":@""];
+		s2 = [NSString stringWithFormat:@"Really Turn OFF %d Channel%@ (%d Channel%@ already OFF)",
+			  numberOnChannels,
+			  numberOnChannels>1?@"s":@"",
+			  8-numberOnChannels,
+			  8-numberOnChannels>1?@"s are":@" is"];
+	}
+	NSBeginAlertSheet(s1,
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -615,7 +651,7 @@
 					  @selector(_allOffSheetDidEnd:returnCode:contextInfo:),
 					  nil,
 					  nil,
-					  @"Really Turn ALL Channels OFF?");
+					  s2);
 }
 
 - (IBAction) stopAllRampAction:(id)sender
@@ -625,7 +661,17 @@
 
 - (IBAction) rampAllToZeroAction:(id)sender
 {	
-	[model rampAllToZero];
+	NSBeginAlertSheet(@"Ramp All Channels to Zero",
+					  @"YES/Do it NOW",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(_allRampToZeroSheetDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really Ramp ALL Channels to Zero?");
+	
 }
 - (IBAction) loadAllAction:(id)sender
 {
@@ -656,7 +702,7 @@
 
 - (IBAction) syncAction:(id)sender
 {
-	NSBeginAlertSheet(@"Sync gs to Readback Voltages",
+	NSBeginAlertSheet(@"Sync targets to Readback Voltages",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -697,6 +743,14 @@
 @end
 
 @implementation ORiSeg8ChanHVController (private)
+
+- (void) _allRampToZeroSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	if(returnCode == NSAlertDefaultReturn){
+		[model rampAllToZero];
+	}
+}
+
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
 	if(returnCode == NSAlertDefaultReturn){
