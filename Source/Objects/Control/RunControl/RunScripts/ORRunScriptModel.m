@@ -111,7 +111,7 @@
 		else					 [target performSelector:selectorBAD withObject:nil];
 	}
 	else {
-		[target performSelector:selectorBAD withObject:nil];
+		if(selectorBAD)[target performSelector:selectorBAD withObject:nil];
 	}
 	[anArg release];
 	anArg = nil;

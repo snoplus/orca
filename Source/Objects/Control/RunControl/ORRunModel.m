@@ -59,6 +59,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) startRun1:(NSNumber*)doInit;
 - (void) waitForRunToStop;
 - (void) finishRunStop;
+- (void) finishRunStop:(id)dummy;
 
 @end
 
@@ -845,72 +846,81 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) prepareForNewSubRun
 {
-	[self setRunningState:eRunBetweenSubRuns];
-	[self setSubRunEndTime:[NSCalendarDate date]];
-	[self setElapsedBetweenSubRunTime:0];
-	//ship between sub run record
-	//get the time(UT!)
-	time_t	ut_time;
-	time(&ut_time);
-	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	//time_t ut_time = mktime(theTimeGMTAsStruct);
-	
-	unsigned long data[4];
-	data[0] = dataId | 4;
-	data[1] = 0x10 | ([self subRunNumber]&0xffff)<<16;
-	data[2] = lastRunNumberShipped;
-	data[3] = ut_time;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-														object:[NSData dataWithBytes:data length:4*sizeof(long)]];
+	if(![self isRunning]){
+		NSLog(@"Prepare for new subrun ignored -- no run in progress\n");
+	}
+	else {
+		[self setRunningState:eRunBetweenSubRuns];
+		[self setSubRunEndTime:[NSCalendarDate date]];
+		[self setElapsedBetweenSubRunTime:0];
+		//ship between sub run record
+		//get the time(UT!)
+		time_t	ut_time;
+		time(&ut_time);
+		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		//time_t ut_time = mktime(theTimeGMTAsStruct);
+		
+		unsigned long data[4];
+		data[0] = dataId | 4;
+		data[1] = 0x10 | ([self subRunNumber]&0xffff)<<16;
+		data[2] = lastRunNumberShipped;
+		data[3] = ut_time;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:data length:4*sizeof(long)]];
 
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORRunBetweenSubRunsNotification
-                                                        object: self
-                                                      userInfo: nil];
-	
-	
-	NSLog(@"Run %@ preparing for a new sub-run\n",[self fullRunNumberString]);
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunBetweenSubRunsNotification
+															object: self
+														  userInfo: nil];
+		
+		
+		NSLog(@"Run %@ preparing for a new sub-run\n",[self fullRunNumberString]);
+	}
 }
 
 - (void) startNewSubRun
 {
-	[self setSubRunNumber:[self subRunNumber]+1];
-	[self setRunningState:eRunInProgress];
-	[self setSubRunStartTime:[NSCalendarDate date]];
-	[self setElapsedSubRunTime:0];
-	//ship new sub run record
-	//get the time(UT!)
-	time_t	ut_time;
-	time(&ut_time);
-	
-	//insert a header before the start of sub-run record
-	[[self dataPacket] updateHeader];
-	
-	NSData* headerAsData = [ORDecoder convertHeaderToData:[[self dataPacket] fileHeader]];
-	NSMutableData* dataToBeInserted = [NSMutableData dataWithData:headerAsData];
-	
-	unsigned long data[4];
-	data[0] = dataId | 4;
-	data[1] = 0x20 | ([self subRunNumber]&0xffff)<<16;
-	data[2] = lastRunNumberShipped;
-	data[3] = ut_time;
-	
-	[dataToBeInserted appendData:[NSMutableData dataWithBytes:data length:4*sizeof(long)]];
-	
-	[dataPacket addData:dataToBeInserted];
-	
-	[runInfo setObject:[[self dataPacket]fileHeader]		  forKey:kHeader];
-	[runInfo setObject:[NSNumber numberWithLong:runNumber]	  forKey:kRunNumber];
-	[runInfo setObject:[NSNumber numberWithLong:subRunNumber] forKey:kSubRunNumber];
-	
-	id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
-	[nextObject subRunTaskStarted:runInfo];
+	if([self runningState]!=eRunBetweenSubRuns){
+		NSLog(@"New subrun Ignored -- no run in progress\n");
+	}
+	else {
+		[self setSubRunNumber:[self subRunNumber]+1];
+		[self setRunningState:eRunInProgress];
+		[self setSubRunStartTime:[NSCalendarDate date]];
+		[self setElapsedSubRunTime:0];
+		//ship new sub run record
+		//get the time(UT!)
+		time_t	ut_time;
+		time(&ut_time);
+		
+		//insert a header before the start of sub-run record
+		[[self dataPacket] updateHeader];
+		
+		NSData* headerAsData = [ORDecoder convertHeaderToData:[[self dataPacket] fileHeader]];
+		NSMutableData* dataToBeInserted = [NSMutableData dataWithData:headerAsData];
+		
+		unsigned long data[4];
+		data[0] = dataId | 4;
+		data[1] = 0x20 | ([self subRunNumber]&0xffff)<<16;
+		data[2] = lastRunNumberShipped;
+		data[3] = ut_time;
+		
+		[dataToBeInserted appendData:[NSMutableData dataWithBytes:data length:4*sizeof(long)]];
+		
+		[dataPacket addData:dataToBeInserted];
+		
+		[runInfo setObject:[[self dataPacket]fileHeader]		  forKey:kHeader];
+		[runInfo setObject:[NSNumber numberWithLong:runNumber]	  forKey:kRunNumber];
+		[runInfo setObject:[NSNumber numberWithLong:subRunNumber] forKey:kSubRunNumber];
+		
+		id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
+		[nextObject subRunTaskStarted:runInfo];
 
-	NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartSubRunNotification
-                                                        object: self
-                                                      userInfo: nil];
-	
+		NSLog(@"Staring Run %@ (sub-run)\n",[self fullRunNumberString]);
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartSubRunNotification
+															object: self
+														  userInfo: nil];
+	}
 }
 
 - (void) startRun:(BOOL)doInit
@@ -1056,8 +1066,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	if([self runningState] == eRunStopping){
 		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
 	}
-	else if([self runningState] == eRunStarting){
+	else if([self runningState] == eRunStarting && !startScript){
 		NSLog(@"Stop Run message received and ignored because run is starting.\n");
+	}
+	else if([self runningState] == eRunStopped){
+		NSLog(@"Stop Run message received and ignored because no run in progress.\n");
 	}
 	else {
 		[self setShutDownScriptState:@"---"];
@@ -1113,11 +1126,15 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	else {
 		if(shutDownScript){
 			[self setShutDownScriptState:@"Running"];
-			[shutDownScript setSelectorOK:@selector(finishRunStop) bad:nil withObject:nil target:self];
+			[shutDownScript setSelectorOK:@selector(finishRunStop:) bad:@selector(finishRunStop) withObject:nil target:self];
 			[shutDownScript runScript];
 		}
 		else [self finishRunStop];
 	}
+}
+- (void) finishRunStop:(id)dummy
+{
+	[self finishRunStop];
 }
 
 - (void) finishRunStop
