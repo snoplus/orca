@@ -1,5 +1,5 @@
 //
-//  SNODetectorView.h
+//  SNOPModel.h
 //  Orca
 //
 //  Created by Mark Howe on Tue Apr 20, 2010.
@@ -17,15 +17,32 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#import "ORDetectorView.h"
 
-@class ORColorScale;
 
-@interface SNODetectorView : ORDetectorView
-{	
-	IBOutlet ORColorScale* focalPlaneColorScale;
-	BOOL viewType;
+#pragma mark ¥¥¥Imported Files
+#import "ORExperimentModel.h"
+
+#define kUseTubeView	0
+#define kUseCrateView	1
+#define kUsePSUPView	2
+#define kNumTubes	20 //XL3s
+
+@interface SNOPModel :  ORExperimentModel
+{
+	int		  viewType;
 }
+#pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
+- (int) viewType;
 
+#pragma mark ¥¥¥Segment Group Methods
+- (void) makeSegmentGroups;
+
+#pragma mark ¥¥¥Specific Dialog Lock Methods
+- (NSString*) experimentMapLock;
+- (NSString*) experimentDetectorLock;
+- (NSString*) experimentDetailsLock;
 @end
+
+extern NSString* ORSNOPModelViewTypeChanged;
+

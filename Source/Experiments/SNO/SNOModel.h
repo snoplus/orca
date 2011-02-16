@@ -2,8 +2,8 @@
 //  SNOModel.h
 //  Orca
 //
-//  Created by Mark Howe on Tue Apr 20, 2010.
-//  Copyright (c) 2010  University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Mon Nov 18 2002.
+//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -20,29 +20,41 @@
 
 
 #pragma mark ¥¥¥Imported Files
-#import "ORExperimentModel.h"
+#import "ORDataTaker.h"
 
-#define kUseTubeView	0
-#define kUseCrateView	1
-#define kUsePSUPView	2
-#define kNumTubes	20 //XL3s
+@class ORDataPacket;
 
-@interface SNOModel :  ORExperimentModel
+@interface SNOModel :  OrcaObject
 {
-	int		  viewType;
+    @private
+        NSMutableDictionary* colorBarAttributes;
+        NSDictionary*       xAttributes;
+        NSDictionary*       yAttributes;
 }
+
+
+#pragma mark ¥¥¥Notifications
+- (void) runStatusChanged:(NSNotification*)aNote;
+
 #pragma mark ¥¥¥Accessors
-- (void) setViewType:(int)aViewType;
-- (int) viewType;
 
-#pragma mark ¥¥¥Segment Group Methods
-- (void) makeSegmentGroups;
+- (NSMutableDictionary*) colorBarAttributes;
+- (NSDictionary*)   xAttributes;
+- (void) setYAttributes:(NSDictionary*)someAttributes;
+- (NSDictionary*)   yAttributes;
+- (void) setXAttributes:(NSDictionary*)someAttributes;
+- (void) setColorBarAttributes:(NSMutableDictionary*)newColorBarAttributes;
 
-#pragma mark ¥¥¥Specific Dialog Lock Methods
-- (NSString*) experimentMapLock;
-- (NSString*) experimentDetectorLock;
-- (NSString*) experimentDetailsLock;
+
+
+
+- (void) runAboutToStart:(NSNotification*)aNote;
+- (void) runEnded:(NSNotification*)aNote;
+
 @end
 
-extern NSString* ORSNOModelViewTypeChanged;
+extern NSString* ORSNORateColorBarChangedNotification;
+extern NSString* ORSNOChartXChangedNotification;
+extern NSString* ORSNOChartYChangedNotification;
+extern NSString* ORSNODisplayOptionMaskChangedNotification;
 

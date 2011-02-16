@@ -1,9 +1,9 @@
 //
-//  SNOController.h
+//  SNODetectorView.h
 //  Orca
 //
-//  Created by Mark Howe on Wed Nov 20 2002.
-//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Tue Apr 20, 2010.
+//  Copyright (c) 2010  University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -17,29 +17,15 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORDetectorView.h"
+
 @class ORColorScale;
-#import "ORGenericView.h"
 
-@interface SNOController : OrcaObjectController {
-	IBOutlet ORColorScale*  detectorColorBar;
-    IBOutlet NSButton*	  colorBarLogCB;
+@interface SNOPDetectorView : ORDetectorView
+{	
+	IBOutlet ORColorScale* focalPlaneColorScale;
+	BOOL viewType;
 }
+- (void) setViewType:(int)aViewType;
 
-#pragma mark •••Initialization
-- (void) registerNotificationObservers;
-
-#pragma mark •••Accessors
-
-#pragma mark •••Actions
-
-#pragma mark •••Interface Management
-- (void) scaleAction:(NSNotification*)aNotification;
-- (void) colorAttributesChanged:(NSNotification*)aNote;
-- (void) drawView:(NSView*)aView inRect:(NSRect)aRect;
-
-@end
-
-@interface ORPSUPView : ORGenericView
-{
-}
 @end

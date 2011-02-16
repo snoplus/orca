@@ -1,5 +1,5 @@
 //
-//  SNOMonitoringView.h
+//  SNOPDetectorView.m
 //  Orca
 //
 //  Created by Mark Howe on Tue Apr 20, 2010.
@@ -18,18 +18,18 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "SNOModel.h"
-#import "SNOMonitoringView.h"
+#import "SNOPModel.h"
+#import "SNOPDetectorView.h"
 #import "ORColorScale.h"
 #import "ORSegmentGroup.h"
 #import "ORDetectorSegment.h"
 
 
-@interface SNOMonitoringView (private)
+@interface SNOPDetectorView (private)
 - (void) makeAllSegments;
 @end
 
-@implementation SNOMonitoringView
+@implementation SNOPDetectorView
 - (void) setViewType:(int)aViewType
 {
 	viewType = aViewType;
@@ -84,7 +84,7 @@
 }
 
 @end
-@implementation SNOMonitoringView (private)
+@implementation SNOPDetectorView (private)
 - (void) makeAllSegments
 {
 	//float xc = [self bounds].size.width/2;
@@ -117,7 +117,7 @@
  
 	}
 	
-	else if(viewType == kUsePSUPView) {		
+	else if(viewType == kUseTubeView) {		
 		
 		NSMutableArray* segmentPaths = [NSMutableArray arrayWithCapacity:kNumTubes];
 		NSMutableArray* errorPaths   = [NSMutableArray arrayWithCapacity:kNumTubes];
@@ -166,4 +166,5 @@
 	}
 	
 }
+
 @end

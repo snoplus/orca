@@ -2,8 +2,8 @@
 //  SNOModel.m
 //  Orca
 //
-//  Created by Mark Howe on Tue Apr 20, 2010.
-//  Copyright (c) 2010  University of North Carolina. All rights reserved.
+//  Created by Mark Howe on Mon Nov 18 2002.
+//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -19,17 +19,54 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 #import "SNOModel.h"
 #import "SNOController.h"
-#import "ORSegmentGroup.h"
+#import "ORAxis.h"
+#import "ORDataPacket.h"
+#import "ORRunModel.h"
 
-NSString* ORSNOModelViewTypeChanged	= @"ORSNOModelViewTypeChanged";
-static NSString* SNODbConnector		= @"SNODbConnector";
+NSString* ORSNORateColorBarChangedNotification      = @"ORSNORateColorBarChangedNotification";
+NSString* ORSNOChartXChangedNotification            = @"ORSNOChartXChangedNotification";
+NSString* ORSNOChartYChangedNotification            = @"ORSNOChartYChangedNotification";
 
 @implementation SNOModel
 
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
+
+- (id) init //designated initializer
+{
+    self = [super init];
+    
+    colorBarAttributes = [[NSMutableDictionary dictionary] retain];
+    [colorBarAttributes setObject:[NSNumber numberWithDouble:0] forKey:ORAxisMinValue];
+    [colorBarAttributes setObject:[NSNumber numberWithDouble:10000] forKey:ORAxisMaxValue];
+    [colorBarAttributes setObject:[NSNumber numberWithBool:NO] forKey:ORAxisUseLog];
+    
+    return self;
+}
+
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+    [colorBarAttributes release];
+    [xAttributes release];
+    [yAttributes release];
+          
+    [super dealloc];
+}
+
+- (void) wakeUp
+{
+    if([self aWake])return;
+    [super wakeUp];
+}
+
+- (void) sleep
+{
+    [super sleep];
+}
 
 - (void) setUpImage
 {
@@ -41,141 +78,123 @@ static NSString* SNODbConnector		= @"SNODbConnector";
     [self linkToController:@"SNOController"];
 }
 
-- (void) makeConnectors
+#pragma mark â€¢â€¢â€¢Notifications
+- (void) registerNotificationObservers
 {
-    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,2) withGuardian:self withObjectLink:self];
-    [[self connectors] setObject:aConnector forKey:SNODbConnector];
-    [aConnector setOffColor:[NSColor brownColor]];
-    [aConnector setOnColor:[NSColor magentaColor]];
-	[ aConnector setConnectorType: 'DB O' ];
-	[ aConnector addRestrictedConnectionType: 'DB I' ]; //can only connect to DB outputs
-    [aConnector release];
-}
-
-//- (NSString*) helpURL
-//{
-//	return @"SNO/Index.html";
-//}
-
-#pragma mark ¥¥¥Accessors
-
-#pragma mark ¥¥¥Segment Group Methods
-- (void) makeSegmentGroups
-{
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"SNO+ Detector" numSegments:kNumTubes mapEntries:[self initMapEntries:0]];
-	[self addGroup:group];
-	[group release];
-}
-
-- (int)  maxNumSegments
-{
-	return kNumTubes;
-}
-
-- (void) showDataSetForSet:(int)aSet segment:(int)index
-{ 
-	if(aSet>=0 && aSet < [segmentGroups count]){
-		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
-		NSString* cardName = [aGroup segment:index objectForKey:@"kCardSlot"];
-		NSString* chanName = [aGroup segment:index objectForKey:@"kChannel"];
-		if(cardName && chanName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"]){
-			ORDataSet* aDataSet = nil;
-			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
-			NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-			if([objs count]){
-				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
-				if([arrayOfHistos count]){
-					id histoObj = [arrayOfHistos objectAtIndex:0];
-					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"SIS3302", @"Crate  0",
-															[NSString stringWithFormat:@"Card %2d",[cardName intValue]], 
-															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-															nil]];
-					
-					[aDataSet doDoubleClick:nil];
-				}
-			}
-		}
-	}
-}
-- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
-{
-	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runEnded:)
+                         name : ORRunStoppedNotification
+                       object : nil];
 	
-	NSString* crateName = [theGroup segment:index objectForKey:@"kCrate"];
-	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
-	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
-	
-	return [NSString stringWithFormat:@"SIS3302,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
-}
-#pragma mark ¥¥¥Specific Dialog Lock Methods
-- (NSString*) experimentMapLock
-{
-	return @"SNOMapLock";
 }
 
-- (NSString*) experimentDetectorLock
+
+
+- (void) runStatusChanged:(NSNotification*)aNote
 {
-	return @"SNODetectorLock";
+    int running = [[[aNote userInfo] objectForKey:ORRunStatusValue] intValue];
+    if(running == eRunStopped){
+        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(collectRates) object:nil];
+        //[[self detector] unregisterRates];
+    }
+    else {
+    }
 }
 
-- (NSString*) experimentDetailsLock	
+
+#pragma mark â€¢â€¢â€¢Accessors
+- (NSMutableDictionary*) colorBarAttributes
 {
-	return @"SNODetailsLock";
+    return colorBarAttributes;
+}
+- (void) setColorBarAttributes:(NSMutableDictionary*)newColorBarAttributes
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setColorBarAttributes:colorBarAttributes];
+    
+    [newColorBarAttributes retain];
+    [colorBarAttributes release];
+    colorBarAttributes=newColorBarAttributes;
+    
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORSNORateColorBarChangedNotification
+	 object:self];
+    
 }
 
-- (void) setViewType:(int)aViewType
+- (NSDictionary*)   xAttributes
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] setViewType:aViewType];
-	viewType = aViewType;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOModelViewTypeChanged object:self userInfo:nil];
+    return xAttributes;
 }
 
-- (int) viewType
+- (NSDictionary*)   yAttributes
 {
-	return viewType;
+    return yAttributes;
 }
 
+- (void) setYAttributes:(NSDictionary*)someAttributes
+{
+    [yAttributes release];
+    yAttributes = [someAttributes copy];
+}
+
+- (void) setXAttributes:(NSDictionary*)someAttributes
+{
+    [xAttributes release];
+    xAttributes = [someAttributes copy];
+}
+
+#pragma mark â€¢â€¢â€¢Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setViewType:[decoder decodeIntForKey:@"viewType"]];
-	[[self undoManager] enableUndoRegistration];
+    
+    [self setColorBarAttributes:[decoder decodeObjectForKey:@"colorBarAttributes"]];
+    [self setXAttributes:[decoder decodeObjectForKey:@"xAttributes"]];
+    [self setYAttributes:[decoder decodeObjectForKey:@"yAttributes"]];
+    
 
+	
+    [[self undoManager] enableUndoRegistration];
+    
+    [self registerNotificationObservers];
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:viewType forKey:@"viewType"];
+    
+    [encoder encodeObject:colorBarAttributes forKey:@"colorBarAttributes"];
+    [encoder encodeObject:xAttributes forKey:@"xAttributes"];
+    [encoder encodeObject:yAttributes forKey:@"yAttributes"];
+    
 }
 
-- (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
+
+
+- (void) runAboutToStart:(NSNotification*)aNote
 {
-	if([aString length] == 0)return @"Not Mapped";
-	
-	NSString* finalString = @"";
-	NSArray* parts = [aString componentsSeparatedByString:@"\n"];
-	finalString = [finalString stringByAppendingString:@"\n-----------------------\n"];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Detector" parts:parts]];
-	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot" parts:parts]];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel" parts:parts]];
-	finalString = [finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold" parts:parts]];
-	finalString = [finalString stringByAppendingString:@"-----------------------\n"];
-	return finalString;
 }
 
-- (NSString*) getPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts
-{
-	for(id aLine in parts){
-		if([aLine rangeOfString:aLabel].location != NSNotFound) return aLine;
-	}
-	return @"";
+- (void) runEnded:(NSNotification*)aNote
+{		
 }
 
 @end
+
 
