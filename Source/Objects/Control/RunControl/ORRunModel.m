@@ -762,7 +762,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 #pragma mark ¥¥¥Run Modifiers
 - (void) startRun
 {
-    if(![self isRunning]){
+	if([self runningState] == eRunStarting){
+		NSLog(@"Start Run message received and ignored because run is already staring.\n");
+	}
+ 	else if([self runningState] == eRunStopping){
+		NSLog(@"Start Run message received and ignored because run is stopping.\n");
+	}
+	else if(![self isRunning]){
 		[self setNextRunWillQuickStart:quickStart];
 		id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
 		if([nextObject runModals]){
@@ -1049,6 +1055,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	if([self runningState] == eRunStopping){
 		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
+	}
+	else if([self runningState] == eRunStarting){
+		NSLog(@"Stop Run message received and ignored because run is starting.\n");
 	}
 	else {
 		[self setShutDownScriptState:@"---"];
