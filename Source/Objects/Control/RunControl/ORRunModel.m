@@ -762,12 +762,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 #pragma mark ¥¥¥Run Modifiers
 - (void) startRun
 {
-    [self setNextRunWillQuickStart:quickStart];
-    if([self isRunning]){
-        _forceRestart = YES;
-        [self stopRun];
-    }
-    else {
+    if(![self isRunning]){
+		[self setNextRunWillQuickStart:quickStart];
 		id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
 		if([nextObject runModals]){
 			[self startRun:!quickStart];
@@ -776,6 +772,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 			if([self isRunning])[self stopRun];
 			else [self setRunningState:eRunStopped];
 		}
+	}
+	else {
+		NSLog(@"Start Run message received and ignored because run is not stopped.\n");
 	}
 }
 
@@ -1042,43 +1041,45 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) haltRun
 {
     ignoreRepeat = YES;
-    if([self runningState] != eRunStopping){
-		[self stopRun];
-	}
+	[self stopRun];
 }
 
 
 - (void) stopRun
 {
-	[self setShutDownScriptState:@"---"];
-	[self setStartScriptState:@"---"];
-	
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    
-    if(!dataTakingThreadRunning && !startScript){
-        NSLog(@"Stop Run message received and ignored because no run in progress.\n");
-        return;
-    }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
-                                                        object: self
-                                                      userInfo: nil];
-    
-    [self setRunningState:eRunStopping];
-    
-    [timer invalidate];
-    [heartBeatTimer invalidate];
-    
-    [timer release];
-    timer = nil;
-    
-    [heartBeatTimer release];
-    heartBeatTimer = nil;
-    
-	totalWaitTime = 0;
-	
-	[self waitForRunToStop];
-	
+	if([self runningState] == eRunStopping){
+		NSLog(@"Stop Run message received and ignored because run is already stopping.\n");
+	}
+	else {
+		[self setShutDownScriptState:@"---"];
+		[self setStartScriptState:@"---"];
+		
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		
+		if(!dataTakingThreadRunning && !startScript){
+			NSLog(@"Stop Run message received and ignored because no run in progress.\n");
+			return;
+		}
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
+															object: self
+														  userInfo: nil];
+		
+		[self setRunningState:eRunStopping];
+		
+		[timer invalidate];
+		[heartBeatTimer invalidate];
+		
+		[timer release];
+		timer = nil;
+		
+		[heartBeatTimer release];
+		heartBeatTimer = nil;
+		
+		totalWaitTime = 0;
+		
+		[self waitForRunToStop];
+	}	
 }
 
 - (void) needMoreTimeToStopRun:(NSNotification*)aNote
