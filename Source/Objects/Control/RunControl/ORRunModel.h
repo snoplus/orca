@@ -84,7 +84,8 @@
 	
 		ORRunScriptModel* startScript;
 		ORRunScriptModel* shutDownScript;
-
+		BOOL skipShutDownScript;
+	
 		NSString* startScriptState;
 		NSString* shutDownScriptState;
 		int subRunNumber;

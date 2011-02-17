@@ -59,8 +59,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) startRun1:(NSNumber*)doInit;
 - (void) waitForRunToStop;
 - (void) finishRunStop;
-- (void) finishRunStop:(id)dummy;
-
 @end
 
 @implementation ORRunModel
@@ -846,7 +844,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) prepareForNewSubRun
 {
-	if(![self isRunning]){
+	if([self runningState] == eRunStarting){
+		NSLog(@"Prepare for new subrun ignored because run is already staring.\n");
+	}
+ 	else if([self runningState] == eRunStopping){
+		NSLog(@"Prepare for new subrun ignored because run is stopping.\n");
+	}
+	else if(![self isRunning]){
 		NSLog(@"Prepare for new subrun ignored -- no run in progress\n");
 	}
 	else {
@@ -879,8 +883,14 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) startNewSubRun
 {
-	if([self runningState]!=eRunBetweenSubRuns){
-		NSLog(@"New subrun Ignored -- no run in progress\n");
+	if([self runningState] == eRunStarting){
+		NSLog(@"Start new subrun ignored because run is still staring.\n");
+	}
+ 	else if([self runningState] == eRunStopping){
+		NSLog(@"Start for new subrun ignored because run is stopping.\n");
+	}
+	else if([self runningState]!=eRunBetweenSubRuns){
+		NSLog(@"Start new subrun Ignored -- not between subruns\n");
 	}
 	else {
 		[self setSubRunNumber:[self subRunNumber]+1];
@@ -925,7 +935,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) startRun:(BOOL)doInit
 {
-    _forceRestart = NO;
+	skipShutDownScript = NO;
+    _forceRestart      = NO;
     if([self isRunning]){
         NSLogColor([NSColor redColor],@"Warning...Programming error..should not be able to\n");
         NSLogColor([NSColor redColor],@"Start a run while one is already in progress.\n");
@@ -1051,6 +1062,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) runAbortFromScript
 {
 	NSLogColor([NSColor redColor], @"Run startup aborted by script!\n");
+	if(shutDownScript){
+		NSLogColor([NSColor redColor], @"Shutdown script will NOT be run!\n");
+		skipShutDownScript = YES;
+	}
 	[self haltRun];
 }
 
@@ -1078,10 +1093,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
 		
-		if(!dataTakingThreadRunning && !startScript){
-			NSLog(@"Stop Run message received and ignored because no run in progress.\n");
-			return;
-		}
+		//if(!startScript){
+		////NSLog(@"Stop Run message received and ignored because no run in progress.\n");
+		//return;
+		//}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
 															object: self
@@ -1124,18 +1139,15 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[self performSelector:@selector(waitForRunToStop) withObject:nil afterDelay:.1];
 	}
 	else {
-		if(shutDownScript){
+		if(shutDownScript && !skipShutDownScript){
 			[self setShutDownScriptState:@"Running"];
-			[shutDownScript setSelectorOK:@selector(finishRunStop:) bad:@selector(finishRunStop) withObject:nil target:self];
+			[shutDownScript setSelectorOK:nil bad:nil withObject:nil target:self];
 			[shutDownScript runScript];
 		}
-		else [self finishRunStop];
+		[self finishRunStop];
 	}
 }
-- (void) finishRunStop:(id)dummy
-{
-	[self finishRunStop];
-}
+
 
 - (void) finishRunStop
 {
