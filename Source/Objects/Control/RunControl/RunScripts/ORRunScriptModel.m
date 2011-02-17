@@ -107,11 +107,15 @@
 {
 	[super scriptRunnerDidFinish:normalFinish returnValue:aValue];
 	if(normalFinish){
-		if([aValue intValue]!=0) [target performSelector:selectorOK withObject:anArg];
-		else					 [target performSelector:selectorBAD withObject:nil];
+		if([aValue intValue]!=0) {
+			if(selectorOK)[target performSelector:selectorOK withObject:anArg];
+		}
+		else {
+			if(selectorBAD)[target performSelector:selectorBAD withObject:anArg];
+		}
 	}
 	else {
-		if(selectorBAD)[target performSelector:selectorBAD withObject:nil];
+		if(selectorBAD)[target performSelector:selectorBAD withObject:anArg];
 	}
 	[anArg release];
 	anArg = nil;
