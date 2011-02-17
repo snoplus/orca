@@ -364,12 +364,13 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 - (id) initWithDelegate:(id)aDelegate
 {
 	self = [super init];
-	delegate = aDelegate;
+	delegate = [aDelegate retain];
     return self;
 }
 
 - (void) dealloc
 {
+	[delegate release];
 	[super dealloc];
 }
 
