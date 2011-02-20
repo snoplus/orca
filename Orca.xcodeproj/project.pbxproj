@@ -194,6 +194,14 @@
 		8402797407397B8700972B07 /* ORBit3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8402796E07397B8700972B07 /* ORBit3Model.h */; };
 		8402797507397B8700972B07 /* ORBit3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8402796F07397B8700972B07 /* ORBit3Model.m */; };
 		84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */ = {isa = PBXBuildFile; fileRef = 84028032073BF49D00972B07 /* ORLAMhosting.h */; };
+		8405284413102CFB007607A4 /* ORCouchDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 8405284213102CFB007607A4 /* ORCouchDB.h */; };
+		8405284513102CFB007607A4 /* ORCouchDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 8405284313102CFB007607A4 /* ORCouchDB.m */; };
+		84052A2C13106B65007607A4 /* CouchDB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2613106B65007607A4 /* CouchDB.nib */; };
+		84052A2D13106B65007607A4 /* CouchDB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2713106B65007607A4 /* CouchDB.tif */; };
+		84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84052A2813106B65007607A4 /* ORCouchDBController.h */; };
+		84052A2F13106B65007607A4 /* ORCouchDBController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84052A2913106B65007607A4 /* ORCouchDBController.m */; };
+		84052A3013106B65007607A4 /* ORCouchDBModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84052A2A13106B65007607A4 /* ORCouchDBModel.h */; };
+		84052A3113106B65007607A4 /* ORCouchDBModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84052A2B13106B65007607A4 /* ORCouchDBModel.m */; };
 		840590EB0CCE5E9C0000DBF3 /* ORLevelMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */; };
 		840590EC0CCE5E9C0000DBF3 /* ORLevelMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */; };
 		8405A459108C99A8001F43F1 /* ORDetectorSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 8405A458108C99A8001F43F1 /* ORDetectorSegment.m */; };
@@ -2916,6 +2924,14 @@
 		840340270427CEEA005F64B1 /* ORDataSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataSet.m; sourceTree = "<group>"; };
 		8403F4A50508F1BE005F64B1 /* ORGenericView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGenericView.h; path = Source/Misc/ORGenericView.h; sourceTree = SOURCE_ROOT; };
 		8403F4A60508F1BE005F64B1 /* ORGenericView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGenericView.m; path = Source/Misc/ORGenericView.m; sourceTree = SOURCE_ROOT; };
+		8405284213102CFB007607A4 /* ORCouchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCouchDB.h; sourceTree = "<group>"; };
+		8405284313102CFB007607A4 /* ORCouchDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCouchDB.m; sourceTree = "<group>"; };
+		84052A2613106B65007607A4 /* CouchDB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CouchDB.nib; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.nib"; sourceTree = SOURCE_ROOT; };
+		84052A2713106B65007607A4 /* CouchDB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CouchDB.tif; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.tif"; sourceTree = SOURCE_ROOT; };
+		84052A2813106B65007607A4 /* ORCouchDBController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDBController.h; path = "Source/Objects/Misc Objects/CouchDB/ORCouchDBController.h"; sourceTree = SOURCE_ROOT; };
+		84052A2913106B65007607A4 /* ORCouchDBController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCouchDBController.m; path = "Source/Objects/Misc Objects/CouchDB/ORCouchDBController.m"; sourceTree = SOURCE_ROOT; };
+		84052A2A13106B65007607A4 /* ORCouchDBModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDBModel.h; path = "Source/Objects/Misc Objects/CouchDB/ORCouchDBModel.h"; sourceTree = SOURCE_ROOT; };
+		84052A2B13106B65007607A4 /* ORCouchDBModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCouchDBModel.m; path = "Source/Objects/Misc Objects/CouchDB/ORCouchDBModel.m"; sourceTree = SOURCE_ROOT; };
 		840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLevelMonitor.h; path = "Source/Widgets/Bar Graph/ORLevelMonitor.h"; sourceTree = SOURCE_ROOT; };
 		840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLevelMonitor.m; path = "Source/Widgets/Bar Graph/ORLevelMonitor.m"; sourceTree = SOURCE_ROOT; };
 		8405A458108C99A8001F43F1 /* ORDetectorSegment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDetectorSegment.m; path = Source/Experiments/BaseClasses/ORDetectorSegment.m; sourceTree = SOURCE_ROOT; };
@@ -5593,6 +5609,22 @@
 			path = "Source/Objects/Hardware/Vme/Bit3 Adaptor";
 			sourceTree = SOURCE_ROOT;
 		};
+		8405283D13102C96007607A4 /* CouchDB */ = {
+			isa = PBXGroup;
+			children = (
+				8405284213102CFB007607A4 /* ORCouchDB.h */,
+				8405284313102CFB007607A4 /* ORCouchDB.m */,
+				84052A2613106B65007607A4 /* CouchDB.nib */,
+				84052A2713106B65007607A4 /* CouchDB.tif */,
+				84052A2813106B65007607A4 /* ORCouchDBController.h */,
+				84052A2913106B65007607A4 /* ORCouchDBController.m */,
+				84052A2A13106B65007607A4 /* ORCouchDBModel.h */,
+				84052A2B13106B65007607A4 /* ORCouchDBModel.m */,
+			);
+			name = CouchDB;
+			path = "Source/Objects/Misc Objects/CouchDB";
+			sourceTree = SOURCE_ROOT;
+		};
 		84065D8B1226B600004E8970 /* Pxi8336Mac */ = {
 			isa = PBXGroup;
 			children = (
@@ -6578,6 +6610,7 @@
 				84F50A25116B7151000275F2 /* CmdLabel */,
 				849516AF10C95382001C8112 /* StateLabel */,
 				840B8135094E4D8D00B1B135 /* Label */,
+				8405283D13102C96007607A4 /* CouchDB */,
 				847597450B5EF26500123411 /* SQL */,
 				840F5ABD1222C03800D49A75 /* Camera */,
 			);
@@ -12128,6 +12161,9 @@
 				EFB39FD0130BA1C5001220AC /* SNOPController.h in Headers */,
 				EFB39FD2130BA1C5001220AC /* SNOPDetectorView.h in Headers */,
 				EFB39FD4130BA1C5001220AC /* SNOPModel.h in Headers */,
+				8405284413102CFB007607A4 /* ORCouchDB.h in Headers */,
+				84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */,
+				84052A3013106B65007607A4 /* ORCouchDBModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12897,6 +12933,8 @@
 				84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */,
 				EFB39FCE130BA1C5001220AC /* SNOP.gif in Resources */,
 				EFB39FCF130BA1C5001220AC /* SNOP.nib in Resources */,
+				84052A2C13106B65007607A4 /* CouchDB.nib in Resources */,
+				84052A2D13106B65007607A4 /* CouchDB.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13766,6 +13804,9 @@
 				EFB39FD1130BA1C5001220AC /* SNOPController.m in Sources */,
 				EFB39FD3130BA1C5001220AC /* SNOPDetectorView.m in Sources */,
 				EFB39FD5130BA1C5001220AC /* SNOPModel.m in Sources */,
+				8405284513102CFB007607A4 /* ORCouchDB.m in Sources */,
+				84052A2F13106B65007607A4 /* ORCouchDBController.m in Sources */,
+				84052A3113106B65007607A4 /* ORCouchDBModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
