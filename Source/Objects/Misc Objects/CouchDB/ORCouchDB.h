@@ -18,22 +18,25 @@
 //-------------------------------------------------------------
 
 @interface ORCouchDB : NSObject {
-	NSOperationQueue* queue;
-	NSString* host;
-	NSString* database;
-	NSUInteger port;
+	id					delegate;
+	NSOperationQueue*	queue;
+	NSString*			host;
+	NSString*			database;
+	NSUInteger			port;
 }
-+ (id) couchHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase;
-- (id) initWithHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase;
++ (id) couchHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate;
+- (id) initWithHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate;
 - (void) dealloc;
 - (void) version:(id)aDelegate tag:(NSString*)aTag;
 - (void) listDatabases:(id)aDelegate tag:(NSString*)aTag;
-- (void) createDatabase:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
-- (void) deleteDatabase:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
-- (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId database:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
-- (void) getDocumentId:(NSString*)anId database:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
-- (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId database:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
+- (void) databaseInfo:(id)aDelegate tag:(NSString*)aTag;
+- (void) createDatabase:(NSString*)aTag;
+- (void) deleteDatabase:(NSString*)aTag;
+- (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
+- (void) getDocumentId:(NSString*)anId tag:(NSString*)aTag;
+- (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 
+@property (assign)	id					delegate;
 @property (retain)	NSOperationQueue*	queue;
 @property (copy)	NSString*			host;
 @property (copy)	NSString*			database;
@@ -42,41 +45,45 @@
 
 @interface ORCouchDBOperation : NSOperation
 {
-	id delegate;
-	NSString* database;
-	NSString* host;
-	NSUInteger port;
-	id tag;
+	id					delegate;
+	NSString*			database;
+	NSString*			host;
+	NSUInteger			port;
+	id					tag;
+	NSHTTPURLResponse*	response;
 }
 - (id) initWithHost:(NSString*)aHost port:(NSInteger)aPort database:(NSString*)database delegate:(id)aDelegate tag:(NSString*)aTag;
-- (void) send:(NSURL*)url type:(NSString*)type;
-- (BOOL) responseCodeOK:(int)aCode;
+- (id) send:(NSString*)httpString;
+- (id) send:(NSString*)httpString type:(NSString*)aType;
+- (id) send:(NSString*)httpString type:(NSString*)aType body:(NSDictionary*)aBody;
 - (void) dealloc;
 @end
 
+#pragma mark •••Database API
 @interface ORCouchDBCreateDBOp : ORCouchDBOperation
-{}
 -(void) main;
 @end
 
 @interface ORCouchDBDeleteDBOp : ORCouchDBOperation
-{}
 -(void) main;
 @end
 
 @interface ORCouchDBVersionOp :ORCouchDBOperation
-{}
 - (void) main;
 @end
 
 @interface ORCouchDBListDBOp :ORCouchDBOperation
-{}
 - (void) main;
 @end
 
+@interface ORCouchDBInfoDBOp : ORCouchDBOperation
+-(void) main;
+@end
+
+#pragma mark •••Document API
 @interface ORCouchDBPutDocumentOp :ORCouchDBOperation
 {
-	NSString* documentId;
+	NSString*     documentId;
 	NSDictionary* document;
 }
 - (void) setDocument:(NSDictionary*)aDocument documentID:(NSString*)anID;
@@ -84,8 +91,6 @@
 @end
 
 @interface ORCouchDBUpdateDocumentOp :ORCouchDBPutDocumentOp
-{
-}
 - (void) main;
 @end
 
@@ -97,15 +102,12 @@
 	NSString* revision;
 	
 }
-- (void) setDocumentId:(NSString*)anID withRevisionCount:(BOOL)withCount andInfo:(BOOL)andInfo revision:(NSString*)revisionOrNil;
-- (void) setDocumentId:(NSString*)anID withRevisionCount:(BOOL)withCount andInfo:(BOOL)andInfo;
-- (void) setDocumentId:(NSString*)anID withRevisionCount:(BOOL)withCount;
 - (void) setDocumentId:(NSString*)anID;
 - (void) main;
 @end
 
 
-//a thin wrapper around NSOperationQueue to make a 
+//a thin wrapper around NSOperationQueue to make a shared queue for couch access
 @interface ORCouchDBQueue : NSObject {
     NSOperationQueue* queue;
 }

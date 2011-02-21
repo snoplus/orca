@@ -24,6 +24,8 @@
 #import "MemoryWatcher.h"
 #import "NSNotifications+Extensions.h"
 #import "Utilities.h"
+#import "ORRunModel.h"
+#import "ORExperimentModel.h"
 
 NSString* ORCouchDBModelStealthModeChanged	= @"ORCouchDBModelStealthModeChanged";
 NSString* ORCouchDBDataBaseNameChanged		= @"ORCouchDBDataBaseNameChanged";
@@ -33,13 +35,24 @@ NSString* ORCouchDBHostNameChanged			= @"ORCouchDBHostNameChanged";
 NSString* ORCouchDBConnectionValidChanged	= @"ORCouchDBConnectionValidChanged";
 NSString* ORCouchDBLock						= @"ORCouchDBLock";
 
-#define kCreateDB	@"kCreateDB"
-#define kListDB		@"kListDB"
+#define kCreateDB		 @"kCreateDB"
+#define kDeleteDB		 @"kDeleteDB"
+#define kListDB			 @"kListDB"
+#define kDocument		 @"kDocument"
+#define kInfoDB			 @"kInfoDB"
 #define kDocumentUpdated @"kDocumentUpdated"
-#define kDocument	@"kDocument"
 
+#define kCouchDBPort 5984
 
 static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
+
+@interface ORCouchDBModel (private)
+- (void) updateMachineRecord;
+- (void) postRunState:(NSNotification*)aNote;
+- (void) postRunTime:(NSNotification*)aNote;
+- (void) postRunOptions:(NSNotification*)aNote;
+- (void) updateRunState:(ORRunModel*)rc;
+@end
 
 @implementation ORCouchDBModel
 
@@ -53,12 +66,30 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) dealloc
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [dataBaseName release];
     [password release];
     [userName release];
     [hostName release];
 	[super dealloc];
+}
+
+- (void) wakeUp
+{
+    if(![self aWake]){
+		[self createDatabase];
+		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:1];
+    }
+    [super wakeUp];
+}
+
+
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[self deleteDatabase];
+	[super sleep];
 }
 
 - (void) setUpImage
@@ -94,6 +125,40 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                          name : @"ORAppTerminating"
                        object : [NSApp delegate]];
 	
+	[notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunElapsedTimesChangedNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunQuickStartChangedNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunTimedRunChangedNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunRepeatRunChangedNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunTimeLimitChangedNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(runStatusChanged:)
+                         name : ORRunOfflineRunNotification
+                       object : nil];
 }
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
@@ -102,6 +167,32 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 
 #pragma mark ***Accessors
+- (BOOL) stealthMode
+{
+    return stealthMode;
+}
+
+- (void) setStealthMode:(BOOL)aStealthMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setStealthMode:stealthMode];
+    stealthMode = aStealthMode;
+	if(stealthMode){
+		[self deleteDatabase];
+	}
+	else {
+		[self createDatabase];
+		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+		if([runObjects count]){
+			//ORRunModel* rc = [runObjects objectAtIndex:0];
+			//NSDictionary* runInfo = [rc runInfo];
+			//if(runInfo){
+				//				[self postRunState:[NSNotification notificationWithName:@"DoesNotMatter" object:rc userInfo:runInfo]];
+				//}
+		}
+	}
+	//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSqlModelStealthModeChanged object:self];
+}
+
 - (id) nextObject
 {
 	return [self objectConnectedTo:ORCouchDBModelInConnector];
@@ -180,53 +271,159 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	return [[NSApp delegate] undoManager];
 }
 
+- (NSString*) machineName
+{		
+	NSString* machineName = [NSString stringWithFormat:@"machine_%@",[macAddress() stringByReplacingOccurrencesOfString:@":" withString:@"_"]];
+	return [machineName lowercaseString];
+}
 
 - (void) createDatabase
 {
-	ORCouchDB* db = [ORCouchDB couchHost:hostName port:5984 database:dataBaseName];
-	//[db version:self tag:@"Version"];
+	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
 	if([dataBaseName length]){
-		[db createDatabase:dataBaseName delegate:self tag:kCreateDB];
+		[db createDatabase:kCreateDB];
 	}
-	//[db listDatabases:self tag:@"List"];
-	//NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:@"123",@"Run",@"12:00",@"Time",nil];
-	//[db addDocument:aDictionary documentId:@"idtest" database:self name:dataBaseName tag:@"addedDoc"];
-	//[db getDocumentId:@"idtest" database:dataBaseName delegate:self tag:@"returnedDoc"];
 }
 
+- (void) deleteDatabase
+{
+	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
+	if([dataBaseName length]){
+		[db deleteDatabase:kDeleteDB];
+	}
+}
+
+- (void) updateMachineRecord
+{
+	if(!stealthMode){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateMachineRecord) object:nil];
+		
+		ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
+		
+		NSString* thisHostAdress = @"";
+		NSArray* names =  [[NSHost currentHost] addresses];
+		NSEnumerator* e = [names objectEnumerator];
+		id aName;
+		while(aName = [e nextObject]){
+			if([aName rangeOfString:@"::"].location == NSNotFound){
+				if([aName rangeOfString:@".0.0."].location == NSNotFound){
+					thisHostAdress = aName;
+					break;
+				}
+			}
+		}
+		NSDictionary* machineInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+									 [NSNumber numberWithLong:[[[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
+									  computerName(),@"name",
+									  macAddress(),@"hw_address",
+									  thisHostAdress,@"ip_address",
+									  fullVersion(),@"version",nil];	
+			
+		[db updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
+		
+		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:5];	
+	}
+}
+								 								 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag
 {
 	@synchronized(self){
-		if([aTag isEqualToString:kCreateDB]){
-			int value = [[aResult objectForKey:@"ok"] intValue];
-			if(value)NSLog(@"Created counchDB: %@\n",dataBaseName);
-			else	 NSLog(@"Failed to create couchdB: %@\n",dataBaseName);
-		}
-		else if([aTag isEqualToString:kListDB]){
-			NSLog(@"Database List: %@\n",aResult);
-		}
-		else if([aTag isEqualToString:@"Message"]){
-			NSLog(@"CouchDB Message: %@\n",[aResult objectForKey:@"Message"]);
+		if([aResult isKindOfClass:[NSDictionary class]]){
+			NSString* message = [aResult objectForKey:@"Message"];
+			if(message){
+				NSLog(@"%@\n",message);
+				NSString* reason = [aResult objectForKey:@"Reason"];
+				if(reason)NSLog(@"Reason: %@\n",reason);
+			}
+			else {
+				if([aTag isEqualToString:kListDB]){
+					NSLog(@"Database List: %@\n",aResult);
+				}
+				if([aTag isEqualToString:kInfoDB]){
+					NSLog(@"----------------------------\n");
+					NSLog(@"Database %@ Info\n",dataBaseName);
+					NSArray* allKeys = [aResult allKeys];
+					for(id aKey in allKeys){
+						NSLog(@"%@ : %@\n",aKey,[aResult objectForKey:aKey]);
+					}
+					NSLog(@"----------------------------\n");
+				}
+				else if([aTag isEqualToString:@"Message"]){
+					NSLog(@"CouchDB Message: %@\n",[aResult objectForKey:@"Message"]);
+				}
+				else {
+					NSLog(@"Tag: %@\n",aTag);
+					NSLog(@"%@\n",aResult);
+				}
+			}
 		}
 		else {
-			NSLog(@"Tag: %@\n",aTag);
 			NSLog(@"%@\n",aResult);
 		}
 	}
 }
 - (void) updateFunction
 {
-	ORCouchDB* db = [ORCouchDB couchHost:hostName port:5984 database:dataBaseName];
+	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
 	NSString* theTime = [NSString stringWithFormat:@"%@",[NSDate date]];
 	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:@"123",@"Run",theTime,@"Time",nil];
-	[db updateDocument:aDictionary documentId:@"idtest" database:dataBaseName delegate:self tag:kDocumentUpdated];
-	[db getDocumentId:@"idtest" database:dataBaseName delegate:self tag:kDocument];
+	[db updateDocument:aDictionary documentId:@"idtest" tag:kDocumentUpdated];
+	[db getDocumentId:@"idtest" tag:kDocument];
 }
 
-- (void) listFunction
+- (void) listDatabases
 {
-	ORCouchDB* db = [ORCouchDB couchHost:hostName port:5984 database:dataBaseName];
+	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
 	[db listDatabases:self tag:kListDB];
+}
+
+- (void) databaseInfo
+{
+	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
+	[db databaseInfo:self tag:kInfoDB];
+}
+
+- (void) runStatusChanged:(NSNotification*)aNote
+{
+	[self updateRunState:[aNote object]];
+}
+
+- (void) updateRunState:(ORRunModel*)rc
+{
+	if(!stealthMode){
+		@try {
+			
+			id nextObject = [self nextObject];
+			NSString* experimentName;
+			if(!nextObject)	experimentName = @"TestStand";
+			else {
+				experimentName = [nextObject className];
+				if([experimentName hasPrefix:@"OR"])experimentName = [experimentName substringFromIndex:2];
+				if([experimentName hasSuffix:@"Model"])experimentName = [experimentName substringToIndex:[experimentName length] - 5];
+			}
+			NSDictionary* runInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+									 [NSNumber numberWithUnsignedLong:[rc runNumber]],		@"run",
+									 [NSNumber numberWithUnsignedLong:[rc subRunNumber]],	@"subrun",
+									 [NSNumber numberWithUnsignedLong:[rc runningState]],	@"state",
+									 [NSNumber numberWithUnsignedLong:[rc elapsedRunTime]],	@"elapsedTime",
+									 [NSNumber numberWithUnsignedLong:[rc elapsedSubRunTime]],@"elapsedSubRunTime",
+									 [NSNumber numberWithUnsignedLong:[rc elapsedBetweenSubRunTime]],@"elapsedBetweenSubRunTime",
+									 [NSNumber numberWithBool:[rc timeToGo]],				@"timeToGo",
+									 [NSNumber numberWithBool:[rc quickStart]],				@"quickStart",
+									 [NSNumber numberWithBool:[rc repeatRun]],				@"repeatRun",
+									 [NSNumber numberWithBool:[rc offlineRun]],				@"offlineRun",
+									 [NSNumber numberWithBool:[rc timedRun]],				@"timedRun",
+									 [NSNumber numberWithUnsignedLong:[rc timeLimit]],		@"timeLimit",
+									 experimentName,										@"experiment",
+									 nil];	
+			
+			ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
+			[db updateDocument:runInfo documentId:@"runinfo" tag:kDocumentUpdated];
+		}
+		@catch (NSException* e) {
+			//silently catch and continue
+		}
+	}
 }
 
 #pragma mark ***Archival

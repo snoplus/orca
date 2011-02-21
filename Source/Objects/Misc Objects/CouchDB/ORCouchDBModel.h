@@ -26,6 +26,7 @@
     NSString*	userName;
     NSString*	password;
     NSString*	dataBaseName;
+	BOOL		stealthMode;
 }
 
 #pragma mark ***Initialization
@@ -35,8 +36,11 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) applicationIsTerminating:(NSNotification*)aNote;
+- (void) runStatusChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL) stealthMode;
+- (void) setStealthMode:(BOOL)aStealthMode;
 - (NSString*) dataBaseName;
 - (void) setDataBaseName:(NSString*)aDataBaseName;
 - (NSString*) password;
@@ -46,12 +50,15 @@
 - (NSString*) hostName;
 - (void) setHostName:(NSString*)aHostName;
 - (id) nextObject;
+- (NSString*) machineName;
 
 #pragma mark ***DB Access
 - (void) createDatabase;
+- (void) deleteDatabase;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag;
 //test functions
-- (void) listFunction;
+- (void) databaseInfo;
+- (void) listDatabases;
 - (void) updateFunction;
 
 #pragma mark ***Archival
@@ -64,6 +71,7 @@ extern NSString* ORCouchDBDataBaseNameChanged;
 extern NSString* ORCouchDBPasswordChanged;
 extern NSString* ORCouchDBUserNameChanged;
 extern NSString* ORCouchDBHostNameChanged;
+extern NSString* ORCouchDBModelStealthModeChanged;
 extern NSString* ORCouchDBLock;
 
 

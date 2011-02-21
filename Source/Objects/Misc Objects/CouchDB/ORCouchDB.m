@@ -22,17 +22,19 @@
 #import <YAJL/YAJLDocument.h>
 #import "SynthesizeSingleton.h"
 
-@implementation ORCouchDB
-@synthesize database,host,port,queue;
 
-+ (id) couchHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase
+@implementation ORCouchDB
+@synthesize database,host,port,queue,delegate;
+
++ (id) couchHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate
 {
-	return [[[ORCouchDB alloc] initWithHost:aHost port:aPort database:aDatabase] autorelease];
+	return [[[ORCouchDB alloc] initWithHost:aHost port:aPort database:aDatabase delegate:aDelegate] autorelease];
 }
 
-- (id) initWithHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase
+- (id) initWithHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate
 {
 	self = [super init];
+	self.delegate = aDelegate;
 	self.database = aDatabase;
 	self.host = aHost;
 	self.port = aPort;
@@ -52,47 +54,55 @@
 	[[ORCouchDBQueue queue] addOperation:anOp];
 	[anOp release];
 }
+#pragma mark •••DataBase API
+- (void) databaseInfo:(id)aDelegate tag:(NSString*)aTag
+{
+	ORCouchDBInfoDBOp* anOp = [[ORCouchDBInfoDBOp alloc] initWithHost:host port:port database:database delegate:aDelegate tag:aTag];
+	[[ORCouchDBQueue queue] addOperation:anOp];
+	[anOp release];
+}
 
 - (void) listDatabases:(id)aDelegate tag:(NSString*)aTag
 {
-	ORCouchDBListDBOp* anOp = [[ORCouchDBListDBOp alloc] initWithHost:host port:port database:nil delegate:aDelegate tag:aTag];
+	ORCouchDBListDBOp* anOp = [[ORCouchDBListDBOp alloc] initWithHost:host port:port database:nil delegate:delegate tag:aTag];
 	[[ORCouchDBQueue queue] addOperation:anOp];
 	[anOp release];
 }
 
-- (void) createDatabase:(id)aName delegate:(NSString*)aDelegate tag:(NSString*)aTag
+- (void) createDatabase:(NSString*)aTag
 {
-	ORCouchDBCreateDBOp* anOp = [[ORCouchDBCreateDBOp alloc] initWithHost:host port:port database:aName delegate:aDelegate tag:aTag];
+	ORCouchDBCreateDBOp* anOp = [[ORCouchDBCreateDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[[ORCouchDBQueue queue] addOperation:anOp];
 	[anOp release];
 }
 
-- (void) deleteDatabase:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
+- (void) deleteDatabase:(NSString*)aTag;
 {
-	ORCouchDBDeleteDBOp* anOp = [[ORCouchDBDeleteDBOp alloc] initWithHost:host port:port database:aName delegate:aDelegate tag:aTag];
+	ORCouchDBDeleteDBOp* anOp = [[ORCouchDBDeleteDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[[ORCouchDBQueue queue] addOperation:anOp];
 	[anOp release];
 }
 
-- (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId database:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
+#pragma mark •••Document API
+- (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 {
-	ORCouchDBPutDocumentOp* anOp = [[ORCouchDBPutDocumentOp alloc] initWithHost:host port:port database:aName delegate:aDelegate tag:aTag];
+	ORCouchDBPutDocumentOp* anOp = [[ORCouchDBPutDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
 	[[ORCouchDBQueue queue] addOperation:anOp];
 	[anOp release];
 }
 
-- (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId database:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag;
+- (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 {
-	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:aName delegate:aDelegate tag:aTag];
+	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
 	[[ORCouchDBQueue queue] addOperation:anOp];
 	[anOp release];
 }
 
-- (void) getDocumentId:(NSString*)anId database:(NSString*)aName delegate:(id)aDelegate tag:(NSString*)aTag
+- (void) getDocumentId:(NSString*)anId  tag:(NSString*)aTag
 {
-	ORCouchDBGetDocumentOp* anOp = [[ORCouchDBGetDocumentOp alloc] initWithHost:host port:port database:aName delegate:aDelegate tag:aTag];
+	ORCouchDBGetDocumentOp* anOp = [[ORCouchDBGetDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocumentId:anId];
 	[[ORCouchDBQueue queue] addOperation:anOp];
 	[anOp release];
@@ -100,6 +110,7 @@
 
 @end
 
+#pragma mark •••Threaded Ops
 @implementation ORCouchDBOperation
 - (id) initWithHost:(NSString*)aHost port:(NSInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate tag:(NSString*)aTag;
 {
@@ -124,65 +135,90 @@
 	[super dealloc];
 }
 
-- (void) send:(NSURL*)url type:(NSString*)type
+- (id) send:(NSString*)httpString
 {
-	NSError *error;
-	NSHTTPURLResponse *response;
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
-    if(type)[request setHTTPMethod:type];
-	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+	return [self send:httpString type:nil body:nil];
+}
 
+- (id) send:(NSString*)httpString type:(NSString*)aType
+{
+	return [self send:httpString type:aType body:nil];
+}
+
+- (id) send:(NSString*)httpString type:(NSString*)aType body:(NSDictionary*)aBody
+{
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+    if(aType)[request setHTTPMethod:aType];
+	if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
+	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+	
 	if (data) {
 		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
-		if([delegate respondsToSelector:@selector(couchDBResult:tag:)]){
-			[delegate couchDBResult:[document root] tag:tag];
-		}
+		return [document root];
 	}
-}
-- (BOOL) responseCodeOK:(int)aCode
-{
-	return (aCode <= 202);
+	else return nil;
 }
 
+- (void) sendToDelegate:(id)obj
+{
+	if([delegate respondsToSelector:@selector(couchDBResult:tag:)]){
+		[delegate couchDBResult:obj tag:tag];
+	}
+}	
+
+@end
+
+
+#pragma mark •••Database API
+@implementation ORCouchDBListDBOp
+-(void) main
+{
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
+	[self sendToDelegate:result];
+}
 @end
 
 @implementation ORCouchDBVersionOp
 - (void) main
 {
-    NSString *server = [NSString stringWithFormat:@"http://%@:%u", host, port];
-	[self send:[NSURL URLWithString:server] type:nil];
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u", host, port]];
+	[self sendToDelegate:result];
 }
 
+@end
+
+@implementation ORCouchDBInfoDBOp
+-(void) main
+{
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/", host, port,database]];
+	[self sendToDelegate:result];
+}
 @end
 
 @implementation ORCouchDBCreateDBOp
 -(void) main
 {
-	NSError *error;
-	NSHTTPURLResponse *response;
-	//first get the list of existing databases
-	NSString *server = [NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port];
-    NSURL *url = [NSURL URLWithString:server];   
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
-	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-	if([self responseCodeOK:[response statusCode]]){
-		if (data) {
-			YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
-			if(![[document root] containsObject:database]){
-				NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-				NSString *server = [NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped];
-				[self send:[NSURL URLWithString:server] type:@"PUT"];
-			}
-			else {
-				NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%@ already exists",database],@"Message",nil];
-				[delegate couchDBResult:dict tag:@"Message"];	
-			}
-		}
+	NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
+	if(![result containsObject:database]){
+		[self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"PUT"];
+		if([response statusCode] == 201) result = [NSDictionary dictionaryWithObjectsAndKeys:
+												   [NSString stringWithFormat:@"CouchDB: [%@] created",
+													database],@"Message",nil];
+		else							 result = [NSDictionary dictionaryWithObjectsAndKeys:
+												   [NSString stringWithFormat:@"CouchDB: [%@] creation FAILED",database],
+												   @"Message",
+												   [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
+												   @"Reason",
+												   nil];
 	}
 	else {
-		NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:[response statusCode]],@"Error",nil];
-		[delegate couchDBResult:dict tag:@"Message"];	
+		result = [NSDictionary dictionaryWithObjectsAndKeys:
+				  @"Did not create new database", @"Message",
+				  [NSString stringWithFormat:@"CouchDB: [%@] already exists",database],
+				  @"Reason",nil];
 	}
+	[self sendToDelegate:result];
 }
 		
 @end
@@ -190,34 +226,28 @@
 @implementation ORCouchDBDeleteDBOp
 -(void) main
 {
-	NSError *error;
-	NSHTTPURLResponse *response;
-	//first get the list of existing databases
-	NSString *server = [NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port];
-    NSURL *url = [NSURL URLWithString:server];   
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
-	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-	if (data) {
-		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
-		if([[document root] containsObject:database]){
-			NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-			NSString *server = [NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped];
-			[self send:[NSURL URLWithString:server] type:@"DELETE"];
-		}
+	
+	NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
+	if([result containsObject:database]){
+		result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"DELETE"];
+		if([response statusCode] == 200) result = [NSDictionary dictionaryWithObjectsAndKeys:
+												   [NSString stringWithFormat:@"[%@] deleted",
+													database],@"Message",nil];
+		else							 result = [NSDictionary dictionaryWithObjectsAndKeys:
+												   [NSString stringWithFormat:@"[%@] deletion FAILED",database],
+												   @"Message",
+												   [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
+												   @"Reason",
+												   nil];
 	}
+	else result = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"[%@] didn't exist",database],@"Message",nil];
+	[self sendToDelegate:result];
 }
 @end
 
 
-@implementation ORCouchDBListDBOp
--(void) main
-{
-	NSString *server = [NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port];
-    NSURL *url = [NSURL URLWithString:server];   
-	[self send:url type:nil];
-}
-@end
-
+#pragma mark •••Document API
 @implementation ORCouchDBPutDocumentOp
 - (void) dealloc 
 {
@@ -234,67 +264,29 @@
 
 - (void) main
 {
-	NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-    NSURL *url = [NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];        
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];    
-    [request setHTTPBody:[[document yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
-    [request setHTTPMethod:@"PUT"];
-    
-    NSHTTPURLResponse *response;
-    /*NSData* data = */[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
-	if(![self responseCodeOK:[response statusCode]]){
-    }
+	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+	id result = [self send:httpString type:@"PUT" body:document];
+	[self sendToDelegate:result];
 }
+
 @end
 
 @implementation ORCouchDBUpdateDocumentOp
 - (void) main
 {
-	NSError *error;
-	NSHTTPURLResponse *response;
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-    NSURL *url = [NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];        
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
-	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-	if (data) {
-		YAJLDocument *returnedDoc = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
-		NSDictionary* asDict = [returnedDoc root];
-		if([asDict objectForKey:@"error"]){
-			//document doesn't exist. So just add it.
-			NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-			NSURL *url = [NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];        
-			
-			NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];    
-			[request setHTTPBody:[[document yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
-			[request setHTTPMethod:@"PUT"];
-			
-			NSHTTPURLResponse *response;
-			/*NSData* data = */[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
-			if(![self responseCodeOK:[response statusCode]]){
-			}
-		}
-		else {
-			//it exists. Include the rev number into it and PUT it back
-			id rev = [asDict objectForKey:@"_rev"];
-			NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-			NSURL *url = [NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];        
-			
-			NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url]; 
-			NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
-			
-			[newDocument setObject:rev forKey:@"_rev"];
-			[document release];
-			document   = [newDocument retain];
-
-			[request setHTTPBody:[[document yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
-			[request setHTTPMethod:@"PUT"];
-			
-			NSHTTPURLResponse *response;
-			/*NSData* data = */ [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
-			if(![self responseCodeOK:[response statusCode]]){
-			}
-		}
+	//check for an existing document
+	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+	id result = [self send:httpString];
+	if([result objectForKey:@"error"]){
+		//document doesn't exist. So just add it.
+		result = [self send:httpString type:@"PUT" body:document];
+	}
+	else {
+		//it already exists. insert the rev number into the document and put it back
+		id rev = [result objectForKey:@"_rev"];
+		NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
+		[newDocument setObject:rev forKey:@"_rev"];
+		[self send:httpString type:@"PUT" body:newDocument];
 	}
 }
 @end
@@ -304,41 +296,19 @@
 - (void) dealloc 
 {
 	[documentId release];
-	[revision release];
 	[super dealloc];
 }
 
-- (void) setDocumentId:(NSString*)anID withRevisionCount:(BOOL)withCount andInfo:(BOOL)andInfo
-{
-	[self setDocumentId:anID withRevisionCount:withCount andInfo:andInfo revision:nil];
-}
-- (void) setDocumentId:(NSString*)anID withRevisionCount:(BOOL)withCount
-{
-	[self setDocumentId:anID withRevisionCount:withCount andInfo:NO revision:nil];
-}
 - (void) setDocumentId:(NSString*)anID
 {
-	[self setDocumentId:anID withRevisionCount:NO andInfo:NO revision:nil];
-}
-
-- (void) setDocumentId:(NSString*)anID withRevisionCount:(BOOL)withCount andInfo:(BOOL)andInfo revision:(NSString*)revisionOrNil
-{
 	documentId = [anID copy];
-	getRevisionCount = withCount;
-	getInfo	= andInfo;
-	revision = [revisionOrNil copy];
 }
 
 - (void) main
 {
-    NSString *args;
-    if(getInfo)		  args = [NSString stringWithFormat:@"%@?revs=true&revs_info=true", documentId];
-	else			  args = [NSString stringWithFormat:@"%@", documentId];
-    if(revision)	  args = [NSString stringWithFormat:@"%@&rev=%@",args,revision];
-	
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, args];
-    NSURL *url = [NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];        
-	[self send:url type:nil];	
+	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+	id result = [self send:httpString];
+	[self sendToDelegate:result];
 }
 @end
 

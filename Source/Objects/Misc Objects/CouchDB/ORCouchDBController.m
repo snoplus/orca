@@ -25,6 +25,7 @@
 
 @interface ORCouchDBController (private)
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 @implementation ORCouchDBController
@@ -109,6 +110,10 @@
                          name : ORRunStatusChangedNotification
                        object : nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(stealthModeChanged:)
+                         name : ORCouchDBModelStealthModeChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -119,6 +124,12 @@
 	[self passwordChanged:nil];
 	[self dataBaseNameChanged:nil];
     [self couchDBLockChanged:nil];
+	[self stealthModeChanged:nil];
+}
+
+- (void) stealthModeChanged:(NSNotification*)aNote
+{
+	[stealthModeButton setIntValue: [model stealthMode]];
 }
 
 - (void) hostNameChanged:(NSNotification*)aNote
@@ -160,6 +171,12 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) stealthModeAction:(id)sender
+{
+	[model setStealthMode:[sender intValue]];	
+}
+
 - (IBAction) couchDBLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORCouchDBLock to:[sender intValue] forWindow:[self window]];
@@ -201,10 +218,32 @@
                       self,
                       @selector(createActionDidEnd:returnCode:contextInfo:),
                       nil,
-                      nil,@"If the database and tables already exist, this operation will do no harm.");
+                      nil,@"If the database already exists, this operation will do no harm.");
 	
 }
+- (IBAction) deleteAction:(id)sender
+{
+	[self endEditing];
+	NSString* s = [NSString stringWithFormat:@"Really delete a database named %@ on %@?\n",[model dataBaseName],[model hostName]];
+	NSBeginAlertSheet(s,
+                      @"Cancel",
+                      @"Yes, Delete Database",
+                      nil,[self window],
+                      self,
+                      @selector(deleteActionDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"If the database doesn't exist, this operation will do no harm.");
+	
+}
+- (IBAction) listAction:(id)sender
+{
+	[model listDatabases];
+}
 
+- (IBAction) infoAction:(id)sender
+{
+	[model databaseInfo];
+}
 
 @end
 
@@ -215,5 +254,13 @@
 		[model createDatabase];
 	}
 }
+
+- (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){		
+		[model deleteDatabase];
+	}
+}
+
 @end
 

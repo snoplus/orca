@@ -28,11 +28,13 @@
 	IBOutlet NSTextField* connectionValidField;
     IBOutlet NSButton*    couchDBLockButton;
     IBOutlet ORValueBar*  queueValueBar;
+	IBOutlet NSButton*	  stealthModeButton;
 	double queueCount;
 }
 
 #pragma mark ***Interface Management
 - (void) registerNotificationObservers;
+- (void) stealthModeChanged:(NSNotification*)aNote;
 - (void) hostNameChanged:(NSNotification*)aNote;
 - (void) userNameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
@@ -41,12 +43,17 @@
 - (void) setQueCount:(NSNumber*)n;
 
 #pragma mark •••Actions
+- (IBAction) stealthModeAction:(id)sender;
 - (IBAction) hostNameAction:(id)sender;
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) passwordAction:(id)sender;
 - (IBAction) databaseNameAction:(id)sender;
 - (IBAction) couchDBLockAction:(id)sender;
 - (IBAction) createAction:(id)sender;
+- (IBAction) deleteAction:(id)sender;
+- (IBAction) listAction:(id)sender;
+- (IBAction) infoAction:(id)sender;
+
 - (IBAction) testAction:(id)sender;
 
 
