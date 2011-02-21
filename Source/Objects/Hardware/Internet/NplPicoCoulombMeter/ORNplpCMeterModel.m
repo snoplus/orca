@@ -252,7 +252,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 {
 	
 	unsigned int numBytes = [meterData length];
-	if((numBytes>0) && (numBytes%4 == 0)) {											//OK, we know we got a integer number of long words
+	if((numBytes>23) /*&& (numBytes%4 == 0)*/) {											//OK, we know we got a integer number of long words
 		if([self validateMeterData]){
 			unsigned long data[1003];									//max buffer size is 1000 data words + ORCA header
 			unsigned int numLongsToShip = numBytes/sizeof(long);		//convert size to longs
@@ -288,8 +288,23 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 		}
 		
 		else {
-			[self stop];
-			[self performSelector:@selector(restart) withObject:nil afterDelay:2];
+			unsigned char* p = (unsigned char*)[meterData bytes];
+			unsigned int ctmax = [meterData length] - 4;
+			
+			unsigned int ctgood = 0;
+			for (; ctgood<ctmax && (p[ctgood]+1)%256 == p[ctgood+4]; ctgood+=4); // ctgood is now the first bad data entry
+			
+			unsigned int ctbad = ctgood;
+			for (;ctbad<ctmax && (p[ctbad]+1)%256 != p[ctbad+4]; ++ctbad); // ctbad is now the first good data entry
+			
+			[meterData replaceBytesInRange:NSMakeRange(ctgood,(ctbad-ctgood)) withBytes:nil length:0]; 
+			
+			// if still bad, restart the connection. validatateMeterData will allow for 1 missing entry
+			if (![self validateMeterData]){ 
+				[self stop];
+				[self performSelector:@selector(restart) withObject:nil afterDelay:2];
+			}	
+			
 			[self setFrameError:frameError+1];
 		}
 	}
@@ -306,7 +321,13 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 		[dataStack[i] release];
 		dataStack[i] = [[ORQueue alloc] init];
 	}
-	[self performSelector:@selector(start) withObject:nil afterDelay:2];
+	if (isConnected) {
+		[self performSelector:@selector(connect) withObject:nil afterDelay:2];		
+		[self performSelector:@selector(start) withObject:nil afterDelay:2];		
+		[self performSelector:@selector(connect) withObject:nil afterDelay:2];
+	}
+	else 
+		[self performSelector:@selector(start) withObject:nil afterDelay:2];
 	
 }
 
@@ -340,20 +361,18 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 	int i;
 	short lastCount = 0;
 	short count;
-	BOOL seemsOK = YES;
-	//NSLog(@"len: %d\n",len);
+	short missing = 0;
 	for(i=0;i<len;i++){
-		count = p[i]>>24;
-		//NSLog(@"count: %d %d\n",lastCount,count);
-		if(i!=0){
-			short currentCount = p[i]>>24; 
-			if(currentCount != (lastCount+1)%256){
-				seemsOK = NO;
+		count = CFSwapInt32BigToHost(p[i])>>24;
+		if(i!=0)
+			if(count != (lastCount+1)%256){
+				missing+=(count-lastCount+255)%256;
+				if (missing>1) // allow for up to one missing event
+					return NO;
 			}
-		}
 		lastCount = count;
 	}
-	return seemsOK;
+	return YES;
 }
 
 #pragma mark ***Archival
