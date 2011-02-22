@@ -410,7 +410,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 									 [NSNumber numberWithUnsignedLong:[rc elapsedRunTime]],	@"elapsedTime",
 									 [NSNumber numberWithUnsignedLong:[rc elapsedSubRunTime]],@"elapsedSubRunTime",
 									 [NSNumber numberWithUnsignedLong:[rc elapsedBetweenSubRunTime]],@"elapsedBetweenSubRunTime",
-									 [NSNumber numberWithBool:[rc timeToGo]],				@"timeToGo",
+									 [NSNumber numberWithUnsignedLong:[rc timeToGo]],		@"timeToGo",
 									 [NSNumber numberWithBool:[rc quickStart]],				@"quickStart",
 									 [NSNumber numberWithBool:[rc repeatRun]],				@"repeatRun",
 									 [NSNumber numberWithBool:[rc offlineRun]],				@"offlineRun",
