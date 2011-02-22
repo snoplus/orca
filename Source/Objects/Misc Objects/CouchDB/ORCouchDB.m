@@ -161,7 +161,7 @@
 
 - (void) sendToDelegate:(id)obj
 {
-	if([delegate respondsToSelector:@selector(couchDBResult:tag:)]){
+	if(obj && [delegate respondsToSelector:@selector(couchDBResult:tag:)]){
 		[delegate couchDBResult:obj tag:tag];
 	}
 }	
@@ -284,9 +284,11 @@
 	else {
 		//it already exists. insert the rev number into the document and put it back
 		id rev = [result objectForKey:@"_rev"];
-		NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
-		[newDocument setObject:rev forKey:@"_rev"];
-		[self send:httpString type:@"PUT" body:newDocument];
+		if(rev){
+			NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
+			[newDocument setObject:rev forKey:@"_rev"];
+			[self send:httpString type:@"PUT" body:newDocument];
+		}
 	}
 }
 @end
