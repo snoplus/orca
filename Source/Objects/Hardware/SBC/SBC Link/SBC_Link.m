@@ -1983,7 +1983,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 			
 		case kTryToStartCode:
 			@try {
-				NSLog(@"Staring SBC code\n");
+				NSLog(@"Starting SBC code\n");
 				[self startCrateCode];
 				[ORTimer delay:.3];
 				startCrateState = kWaitingForStart;
