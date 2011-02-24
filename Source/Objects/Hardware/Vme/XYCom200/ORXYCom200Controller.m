@@ -154,6 +154,8 @@
 - (void) selectedPLTChanged:(NSNotification*)aNote
 {
 	[selectedPLTPU selectItemAtIndex: [model selectedPLT]];
+    short index = [model selectedRegIndex];
+    [self updateRegisterDescription:index];
 }
 
 - (void) checkGlobalSecurity
@@ -239,7 +241,7 @@
 
 - (void) selectedPLTPUAction:(id)sender
 {
-	[model setSelectedPLT:[sender intValue]];	
+	[model setSelectedPLT:[sender indexOfSelectedItem]];	
 }
 
 -(IBAction) baseAddressAction:(id)sender
@@ -324,8 +326,7 @@
 - (void) updateRegisterDescription:(short) aRegisterIndex
 {
     [registerOffsetField setStringValue:
-	 [NSString stringWithFormat:@"0x%04x",
-	  [model getAddressOffset:aRegisterIndex]]];
+	 [NSString stringWithFormat:@"0x%04x",[model getAddressOffset:aRegisterIndex] + (0x40 * [model selectedPLT])]];
 	
     [regNameField setStringValue:[model getRegisterName:aRegisterIndex]];
 	
