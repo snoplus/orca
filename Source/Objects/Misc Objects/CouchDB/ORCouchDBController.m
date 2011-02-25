@@ -154,7 +154,7 @@
 
 - (void) dataBaseNameChanged:(NSNotification*)aNote
 {
-	if([model dataBaseName])[dataBaseNameField setStringValue:[model machineName]];
+	if([model dataBaseName])[dataBaseNameField setStringValue:[model dataBaseName]];
 }
 
 - (void) couchDBLockChanged:(NSNotification*)aNote

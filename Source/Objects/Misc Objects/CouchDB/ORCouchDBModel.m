@@ -270,11 +270,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	}
 }
 
-///- (NSUndoManager*) undoManager
-//{
-//	return [[NSApp delegate] undoManager];
-//}
-
 - (NSString*) machineName
 {		
 	NSString* machineName = [NSString stringWithFormat:@"%@_%@",computerName(),[macAddress() stringByReplacingOccurrencesOfString:@":" withString:@"_"]];
@@ -285,19 +280,15 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) createDatabase
 {
 	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
-	if([dataBaseName length]){
-		[db createDatabase:kCreateDB];
-		[self updateMachineRecord];
-		[self updateDatabaseStats];
-	}
+	[db createDatabase:kCreateDB];
+	[self updateMachineRecord];
+	[self updateDatabaseStats];
 }
 
 - (void) deleteDatabase
 {
 	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
-	if([dataBaseName length]){
-		[db deleteDatabase:kDeleteDB];
-	}
+	[db deleteDatabase:kDeleteDB];
 }
 
 - (void) updateMachineRecord
@@ -372,6 +363,14 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				if([aTag isEqualToString:kInfoDB]){
 					[aResult prettyPrint:@"CouchDB Info:"];
 				}
+				
+				else if([aTag isEqualToString:kCreateDB]){
+					[self setDataBaseName:[self machineName]];
+				}
+				else if([aTag isEqualToString:kDeleteDB]){
+					[self setDataBaseName:@"---"];
+				}
+				
 				else if([aTag isEqualToString:kInfoInternalDB]){
 					[self performSelectorOnMainThread:@selector(setDBInfo:) withObject:aResult waitUntilDone:NO];
 				}

@@ -279,11 +279,8 @@
 	NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
 	if(![result containsObject:database]){
-		[self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"PUT"];
-		if([response statusCode] == 201) result = [NSDictionary dictionaryWithObjectsAndKeys:
-												   [NSString stringWithFormat:@"[%@] created",
-													database],@"Message",nil];
-		else							 result = [NSDictionary dictionaryWithObjectsAndKeys:
+		result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"PUT"];
+		if([response statusCode] != 201)  result = [NSDictionary dictionaryWithObjectsAndKeys:
 												   [NSString stringWithFormat:@"[%@] creation FAILED",database],
 												   @"Message",
 												   [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
@@ -310,10 +307,7 @@
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
 	if([result containsObject:database]){
 		result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"DELETE"];
-		if([response statusCode] == 200) result = [NSDictionary dictionaryWithObjectsAndKeys:
-												   [NSString stringWithFormat:@"[%@] deleted",
-													database],@"Message",nil];
-		else							 result = [NSDictionary dictionaryWithObjectsAndKeys:
+		if([response statusCode] != 200) result = [NSDictionary dictionaryWithObjectsAndKeys:
 												   [NSString stringWithFormat:@"[%@] deletion FAILED",database],
 												   @"Message",
 												   [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],

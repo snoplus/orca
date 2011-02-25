@@ -321,11 +321,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 
-//- (NSUndoManager*) undoManager
-//{
-//	return [[NSApp delegate] undoManager];
-//}
-
 - (void) createDatabase
 {
 	//assumes that mysql is running on the host
