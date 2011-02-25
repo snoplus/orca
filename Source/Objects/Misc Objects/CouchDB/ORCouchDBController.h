@@ -25,7 +25,6 @@
 	IBOutlet NSTextField* userNameField;
 	IBOutlet NSTextField* passwordField;
 	IBOutlet NSTextField* dataBaseNameField;
-	IBOutlet NSTextField* connectionValidField;
     IBOutlet NSButton*    couchDBLockButton;
     IBOutlet ORValueBar*  queueValueBar;
 	IBOutlet NSButton*	  stealthModeButton;
@@ -47,12 +46,12 @@
 - (IBAction) hostNameAction:(id)sender;
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) passwordAction:(id)sender;
-- (IBAction) databaseNameAction:(id)sender;
 - (IBAction) couchDBLockAction:(id)sender;
 - (IBAction) createAction:(id)sender;
 - (IBAction) deleteAction:(id)sender;
 - (IBAction) listAction:(id)sender;
 - (IBAction) infoAction:(id)sender;
+- (IBAction) compactAction:(id)sender;
 
 - (IBAction) testAction:(id)sender;
 

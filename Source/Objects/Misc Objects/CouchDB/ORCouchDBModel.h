@@ -27,6 +27,7 @@
     NSString*	password;
     NSString*	dataBaseName;
 	BOOL		stealthMode;
+	NSDictionary* dBInfo;
 }
 
 #pragma mark ***Initialization
@@ -37,6 +38,7 @@
 - (void) registerNotificationObservers;
 - (void) applicationIsTerminating:(NSNotification*)aNote;
 - (void) runStatusChanged:(NSNotification*)aNote;
+- (void) alarmsChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (BOOL) stealthMode;
@@ -51,6 +53,8 @@
 - (void) setHostName:(NSString*)aHostName;
 - (id) nextObject;
 - (NSString*) machineName;
+- (void) setDBInfo:(NSDictionary*)someInfo;
+- (NSDictionary*) dBInfo;
 
 #pragma mark ***DB Access
 - (void) createDatabase;
@@ -60,6 +64,8 @@
 - (void) databaseInfo;
 - (void) listDatabases;
 - (void) updateFunction;
+- (void) compactDatabase;
+- (void) updateDatabaseStats;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -72,6 +78,7 @@ extern NSString* ORCouchDBPasswordChanged;
 extern NSString* ORCouchDBUserNameChanged;
 extern NSString* ORCouchDBHostNameChanged;
 extern NSString* ORCouchDBModelStealthModeChanged;
+extern NSString* ORCouchDBModelDBInfoChanged;
 extern NSString* ORCouchDBLock;
 
 

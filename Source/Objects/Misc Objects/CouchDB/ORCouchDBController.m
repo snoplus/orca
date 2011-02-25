@@ -149,7 +149,7 @@
 
 - (void) dataBaseNameChanged:(NSNotification*)aNote
 {
-	if([model dataBaseName])[dataBaseNameField setStringValue:[model dataBaseName]];
+	if([model dataBaseName])[dataBaseNameField setStringValue:[model machineName]];
 }
 - 
 (void) couchDBLockChanged:(NSNotification*)aNote
@@ -197,15 +197,10 @@
 	[model setPassword:[sender stringValue]];
 }
 
-- (IBAction) databaseNameAction:(id)sender
-{
-	[model setDataBaseName:[sender stringValue]];
-}
 - (IBAction) testAction:(id)sender
 {
 	[model updateFunction];
 }
-
 
 - (IBAction) createAction:(id)sender
 {
@@ -244,6 +239,12 @@
 {
 	[model databaseInfo];
 }
+
+- (IBAction) compactAction:(id)sender
+{
+	[model compactDatabase];
+}
+
 
 @end
 
