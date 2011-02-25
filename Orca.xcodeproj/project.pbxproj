@@ -194,8 +194,6 @@
 		8402797407397B8700972B07 /* ORBit3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8402796E07397B8700972B07 /* ORBit3Model.h */; };
 		8402797507397B8700972B07 /* ORBit3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8402796F07397B8700972B07 /* ORBit3Model.m */; };
 		84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */ = {isa = PBXBuildFile; fileRef = 84028032073BF49D00972B07 /* ORLAMhosting.h */; };
-		8405284413102CFB007607A4 /* ORCouchDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 8405284213102CFB007607A4 /* ORCouchDB.h */; };
-		8405284513102CFB007607A4 /* ORCouchDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 8405284313102CFB007607A4 /* ORCouchDB.m */; };
 		84052A2C13106B65007607A4 /* CouchDB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2613106B65007607A4 /* CouchDB.nib */; };
 		84052A2D13106B65007607A4 /* CouchDB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2713106B65007607A4 /* CouchDB.tif */; };
 		84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84052A2813106B65007607A4 /* ORCouchDBController.h */; };
@@ -1168,8 +1166,6 @@
 		84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
 		84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */; };
 		84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
-		8457BDF511B001F600C4082D /* ORSqlConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BDF311B001F600C4082D /* ORSqlConnection.h */; };
-		8457BDF611B001F600C4082D /* ORSqlConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BDF411B001F600C4082D /* ORSqlConnection.m */; };
 		8457BE3511B0183500C4082D /* ORSIS3820Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */; };
 		8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */; };
 		8457BE3711B0183500C4082D /* ORSIS3820Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */; };
@@ -1596,6 +1592,19 @@
 		8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6B80F21315300BCD331 /* ORCMC203Decoders.m */; };
 		8493D6C10F21315300BCD331 /* ORCMC203Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493D6B90F21315300BCD331 /* ORCMC203Model.h */; };
 		8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6BA0F21315300BCD331 /* ORCMC203Model.m */; };
+		8494C0231316CEBA00151E7B /* BootBar.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8494C01D1316CEBA00151E7B /* BootBar.nib */; };
+		8494C0241316CEBA00151E7B /* BootBar.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494C01E1316CEBA00151E7B /* BootBar.tif */; };
+		8494C0251316CEBA00151E7B /* ORBootBarController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494C01F1316CEBA00151E7B /* ORBootBarController.h */; };
+		8494C0261316CEBA00151E7B /* ORBootBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494C0201316CEBA00151E7B /* ORBootBarController.m */; };
+		8494C0271316CEBA00151E7B /* ORBootBarModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494C0211316CEBA00151E7B /* ORBootBarModel.h */; };
+		8494C0281316CEBA00151E7B /* ORBootBarModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494C0221316CEBA00151E7B /* ORBootBarModel.m */; };
+		8494C0751316D3C400151E7B /* BootBarBig.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494C0741316D3C400151E7B /* BootBarBig.tif */; };
+		8494C1371317E2E200151E7B /* ORCouchDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494C1301317E2E200151E7B /* ORCouchDB.h */; };
+		8494C1381317E2E200151E7B /* ORCouchDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494C1311317E2E200151E7B /* ORCouchDB.m */; };
+		8494C1391317E2E200151E7B /* ORSqlConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494C1331317E2E200151E7B /* ORSqlConnection.h */; };
+		8494C13A1317E2E200151E7B /* ORSqlConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494C1341317E2E200151E7B /* ORSqlConnection.m */; };
+		8494C13B1317E2E200151E7B /* ORSqlResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494C1351317E2E200151E7B /* ORSqlResult.h */; };
+		8494C13C1317E2E200151E7B /* ORSqlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494C1361317E2E200151E7B /* ORSqlResult.m */; };
 		849516B610C95382001C8112 /* ORStateLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849516B010C95382001C8112 /* ORStateLabelController.h */; };
 		849516B710C95382001C8112 /* ORStateLabelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849516B110C95382001C8112 /* ORStateLabelController.m */; };
 		849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849516B210C95382001C8112 /* ORStateLabelModel.h */; };
@@ -1604,8 +1613,6 @@
 		849516BB10C95382001C8112 /* StateLabel.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849516B510C95382001C8112 /* StateLabel.tif */; };
 		84954B8305C87518004EBD3D /* ORHWWizParam.h in Headers */ = {isa = PBXBuildFile; fileRef = 84954B8105C87518004EBD3D /* ORHWWizParam.h */; };
 		84954B8405C87518004EBD3D /* ORHWWizParam.m in Sources */ = {isa = PBXBuildFile; fileRef = 84954B8205C87518004EBD3D /* ORHWWizParam.m */; };
-		8496AF2A11AF39A100A89F1C /* ORSqlResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 8496AF2811AF39A100A89F1C /* ORSqlResult.h */; };
-		8496AF2B11AF39A100A89F1C /* ORSqlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8496AF2911AF39A100A89F1C /* ORSqlResult.m */; };
 		84978A290701F02000B7887E /* ORDataGenDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978A270701F02000B7887E /* ORDataGenDecoders.h */; };
 		84978A2A0701F02000B7887E /* ORDataGenDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84978A280701F02000B7887E /* ORDataGenDecoders.m */; };
 		84978B4C0702190100B7887E /* ORDataTypeAssigner.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978B4A0702190100B7887E /* ORDataTypeAssigner.h */; };
@@ -2924,8 +2931,6 @@
 		840340270427CEEA005F64B1 /* ORDataSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataSet.m; sourceTree = "<group>"; };
 		8403F4A50508F1BE005F64B1 /* ORGenericView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGenericView.h; path = Source/Misc/ORGenericView.h; sourceTree = SOURCE_ROOT; };
 		8403F4A60508F1BE005F64B1 /* ORGenericView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGenericView.m; path = Source/Misc/ORGenericView.m; sourceTree = SOURCE_ROOT; };
-		8405284213102CFB007607A4 /* ORCouchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCouchDB.h; sourceTree = "<group>"; };
-		8405284313102CFB007607A4 /* ORCouchDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCouchDB.m; sourceTree = "<group>"; };
 		84052A2613106B65007607A4 /* CouchDB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CouchDB.nib; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.nib"; sourceTree = SOURCE_ROOT; };
 		84052A2713106B65007607A4 /* CouchDB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CouchDB.tif; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.tif"; sourceTree = SOURCE_ROOT; };
 		84052A2813106B65007607A4 /* ORCouchDBController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDBController.h; path = "Source/Objects/Misc Objects/CouchDB/ORCouchDBController.h"; sourceTree = SOURCE_ROOT; };
@@ -3676,8 +3681,6 @@
 		8455097910CEF7DD008A019C /* ORCaen965Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen965Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Decoder.m; sourceTree = SOURCE_ROOT; };
 		84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN965Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.cc; sourceTree = SOURCE_ROOT; };
 		84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN965Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.hh; sourceTree = SOURCE_ROOT; };
-		8457BDF311B001F600C4082D /* ORSqlConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSqlConnection.h; path = "Source/Objects/Misc Objects/SQL/ORSqlConnection.h"; sourceTree = SOURCE_ROOT; };
-		8457BDF411B001F600C4082D /* ORSqlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSqlConnection.m; path = "Source/Objects/Misc Objects/SQL/ORSqlConnection.m"; sourceTree = SOURCE_ROOT; };
 		8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Controller.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.h; sourceTree = SOURCE_ROOT; };
 		8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3820Controller.m; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.m; sourceTree = SOURCE_ROOT; };
 		8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Decoders.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Decoders.h; sourceTree = SOURCE_ROOT; };
@@ -4114,6 +4117,19 @@
 		8493D6BA0F21315300BCD331 /* ORCMC203Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCMC203Model.m; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Model.m; sourceTree = SOURCE_ROOT; };
 		84940B3E04E07FA6005F64B1 /* ORRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRate.h; sourceTree = "<group>"; };
 		84940B3F04E07FA6005F64B1 /* ORRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRate.m; sourceTree = "<group>"; };
+		8494C01D1316CEBA00151E7B /* BootBar.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BootBar.nib; path = Source/Objects/Hardware/Internet/BootBar/BootBar.nib; sourceTree = SOURCE_ROOT; };
+		8494C01E1316CEBA00151E7B /* BootBar.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BootBar.tif; path = Source/Objects/Hardware/Internet/BootBar/BootBar.tif; sourceTree = SOURCE_ROOT; };
+		8494C01F1316CEBA00151E7B /* ORBootBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBootBarController.h; path = Source/Objects/Hardware/Internet/BootBar/ORBootBarController.h; sourceTree = SOURCE_ROOT; };
+		8494C0201316CEBA00151E7B /* ORBootBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBootBarController.m; path = Source/Objects/Hardware/Internet/BootBar/ORBootBarController.m; sourceTree = SOURCE_ROOT; };
+		8494C0211316CEBA00151E7B /* ORBootBarModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBootBarModel.h; path = Source/Objects/Hardware/Internet/BootBar/ORBootBarModel.h; sourceTree = SOURCE_ROOT; };
+		8494C0221316CEBA00151E7B /* ORBootBarModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBootBarModel.m; path = Source/Objects/Hardware/Internet/BootBar/ORBootBarModel.m; sourceTree = SOURCE_ROOT; };
+		8494C0741316D3C400151E7B /* BootBarBig.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BootBarBig.tif; path = Source/Objects/Hardware/Internet/BootBar/BootBarBig.tif; sourceTree = SOURCE_ROOT; };
+		8494C1301317E2E200151E7B /* ORCouchDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDB.h; path = "Source/Objects/Misc Objects/DatabaseSupport/CouchDB/ORCouchDB.h"; sourceTree = SOURCE_ROOT; };
+		8494C1311317E2E200151E7B /* ORCouchDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCouchDB.m; path = "Source/Objects/Misc Objects/DatabaseSupport/CouchDB/ORCouchDB.m"; sourceTree = SOURCE_ROOT; };
+		8494C1331317E2E200151E7B /* ORSqlConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSqlConnection.h; path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL/ORSqlConnection.h"; sourceTree = SOURCE_ROOT; };
+		8494C1341317E2E200151E7B /* ORSqlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSqlConnection.m; path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL/ORSqlConnection.m"; sourceTree = SOURCE_ROOT; };
+		8494C1351317E2E200151E7B /* ORSqlResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSqlResult.h; path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL/ORSqlResult.h"; sourceTree = SOURCE_ROOT; };
+		8494C1361317E2E200151E7B /* ORSqlResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSqlResult.m; path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL/ORSqlResult.m"; sourceTree = SOURCE_ROOT; };
 		849516B010C95382001C8112 /* ORStateLabelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORStateLabelController.h; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelController.h"; sourceTree = SOURCE_ROOT; };
 		849516B110C95382001C8112 /* ORStateLabelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORStateLabelController.m; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelController.m"; sourceTree = SOURCE_ROOT; };
 		849516B210C95382001C8112 /* ORStateLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORStateLabelModel.h; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelModel.h"; sourceTree = SOURCE_ROOT; };
@@ -4122,8 +4138,6 @@
 		849516B510C95382001C8112 /* StateLabel.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StateLabel.tif; path = "Source/Objects/Misc Objects/StateLabel/StateLabel.tif"; sourceTree = SOURCE_ROOT; };
 		84954B8105C87518004EBD3D /* ORHWWizParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizParam.h; sourceTree = "<group>"; };
 		84954B8205C87518004EBD3D /* ORHWWizParam.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizParam.m; sourceTree = "<group>"; };
-		8496AF2811AF39A100A89F1C /* ORSqlResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSqlResult.h; sourceTree = "<group>"; };
-		8496AF2911AF39A100A89F1C /* ORSqlResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSqlResult.m; sourceTree = "<group>"; };
 		84978A270701F02000B7887E /* ORDataGenDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataGenDecoders.h; sourceTree = "<group>"; };
 		84978A280701F02000B7887E /* ORDataGenDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataGenDecoders.m; sourceTree = "<group>"; };
 		84978B4A0702190100B7887E /* ORDataTypeAssigner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataTypeAssigner.h; sourceTree = "<group>"; };
@@ -5612,8 +5626,6 @@
 		8405283D13102C96007607A4 /* CouchDB */ = {
 			isa = PBXGroup;
 			children = (
-				8405284213102CFB007607A4 /* ORCouchDB.h */,
-				8405284313102CFB007607A4 /* ORCouchDB.m */,
 				84052A2613106B65007607A4 /* CouchDB.nib */,
 				84052A2713106B65007607A4 /* CouchDB.tif */,
 				84052A2813106B65007607A4 /* ORCouchDBController.h */,
@@ -6606,6 +6618,7 @@
 				843A48510A0AC2F4003DF248 /* USB */,
 				2A178EB608DB3F66001D78BC /* FireWire */,
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
+				8494C12E1317E2E200151E7B /* DatabaseSupport */,
 				849013BD10E27B13007591B5 /* PlotLink */,
 				84F50A25116B7151000275F2 /* CmdLabel */,
 				849516AF10C95382001C8112 /* StateLabel */,
@@ -7771,10 +7784,6 @@
 				847597490B5EF26500123411 /* ORSqlModel.m */,
 				84B3D12211BFCB8300C17CD6 /* Sql.tif */,
 				8475974B0B5EF26500123411 /* Sql.nib */,
-				8496AF2811AF39A100A89F1C /* ORSqlResult.h */,
-				8496AF2911AF39A100A89F1C /* ORSqlResult.m */,
-				8457BDF311B001F600C4082D /* ORSqlConnection.h */,
-				8457BDF411B001F600C4082D /* ORSqlConnection.m */,
 			);
 			name = SQL;
 			path = "Source/Objects/Misc Objects/SQL";
@@ -8364,6 +8373,53 @@
 			);
 			name = Rates;
 			path = "Source/Objects/Misc Objects/Rates";
+			sourceTree = SOURCE_ROOT;
+		};
+		8494C01C1316CEBA00151E7B /* BootBar */ = {
+			isa = PBXGroup;
+			children = (
+				8494C01D1316CEBA00151E7B /* BootBar.nib */,
+				8494C01E1316CEBA00151E7B /* BootBar.tif */,
+				8494C0741316D3C400151E7B /* BootBarBig.tif */,
+				8494C01F1316CEBA00151E7B /* ORBootBarController.h */,
+				8494C0201316CEBA00151E7B /* ORBootBarController.m */,
+				8494C0211316CEBA00151E7B /* ORBootBarModel.h */,
+				8494C0221316CEBA00151E7B /* ORBootBarModel.m */,
+			);
+			name = BootBar;
+			path = Source/Objects/Hardware/Internet/BootBar;
+			sourceTree = SOURCE_ROOT;
+		};
+		8494C12E1317E2E200151E7B /* DatabaseSupport */ = {
+			isa = PBXGroup;
+			children = (
+				8494C12F1317E2E200151E7B /* CouchDB */,
+				8494C1321317E2E200151E7B /* mySQL */,
+			);
+			name = DatabaseSupport;
+			path = "Source/Objects/Misc Objects/DatabaseSupport";
+			sourceTree = SOURCE_ROOT;
+		};
+		8494C12F1317E2E200151E7B /* CouchDB */ = {
+			isa = PBXGroup;
+			children = (
+				8494C1301317E2E200151E7B /* ORCouchDB.h */,
+				8494C1311317E2E200151E7B /* ORCouchDB.m */,
+			);
+			name = CouchDB;
+			path = "Source/Objects/Misc Objects/DatabaseSupport/CouchDB";
+			sourceTree = SOURCE_ROOT;
+		};
+		8494C1321317E2E200151E7B /* mySQL */ = {
+			isa = PBXGroup;
+			children = (
+				8494C1331317E2E200151E7B /* ORSqlConnection.h */,
+				8494C1341317E2E200151E7B /* ORSqlConnection.m */,
+				8494C1351317E2E200151E7B /* ORSqlResult.h */,
+				8494C1361317E2E200151E7B /* ORSqlResult.m */,
+			);
+			name = mySQL;
+			path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL";
 			sourceTree = SOURCE_ROOT;
 		};
 		849516AF10C95382001C8112 /* StateLabel */ = {
@@ -9091,6 +9147,7 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
+				8494C01C1316CEBA00151E7B /* BootBar */,
 				84BA5F240F70388C00CF92D6 /* ZupSupply */,
 				84B28D4D0F4C658400E2B056 /* NplHV */,
 				84B28D590F4C658400E2B056 /* NPLCommBoard */,
@@ -12071,8 +12128,6 @@
 				84E2064511AD7841007D757F /* ORSIS3800Controller.h in Headers */,
 				84E2064711AD7841007D757F /* ORSIS3800Decoders.h in Headers */,
 				84E2064911AD7841007D757F /* ORSIS3800Model.h in Headers */,
-				8496AF2A11AF39A100A89F1C /* ORSqlResult.h in Headers */,
-				8457BDF511B001F600C4082D /* ORSqlConnection.h in Headers */,
 				8457BE3511B0183500C4082D /* ORSIS3820Controller.h in Headers */,
 				8457BE3711B0183500C4082D /* ORSIS3820Decoders.h in Headers */,
 				8457BE3911B0183500C4082D /* ORSIS3820Model.h in Headers */,
@@ -12161,9 +12216,13 @@
 				EFB39FD0130BA1C5001220AC /* SNOPController.h in Headers */,
 				EFB39FD2130BA1C5001220AC /* SNOPDetectorView.h in Headers */,
 				EFB39FD4130BA1C5001220AC /* SNOPModel.h in Headers */,
-				8405284413102CFB007607A4 /* ORCouchDB.h in Headers */,
 				84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */,
 				84052A3013106B65007607A4 /* ORCouchDBModel.h in Headers */,
+				8494C0251316CEBA00151E7B /* ORBootBarController.h in Headers */,
+				8494C0271316CEBA00151E7B /* ORBootBarModel.h in Headers */,
+				8494C1371317E2E200151E7B /* ORCouchDB.h in Headers */,
+				8494C1391317E2E200151E7B /* ORSqlConnection.h in Headers */,
+				8494C13B1317E2E200151E7B /* ORSqlResult.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12206,7 +12265,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -12935,6 +12993,9 @@
 				EFB39FCF130BA1C5001220AC /* SNOP.nib in Resources */,
 				84052A2C13106B65007607A4 /* CouchDB.nib in Resources */,
 				84052A2D13106B65007607A4 /* CouchDB.tif in Resources */,
+				8494C0231316CEBA00151E7B /* BootBar.nib in Resources */,
+				8494C0241316CEBA00151E7B /* BootBar.tif in Resources */,
+				8494C0751316D3C400151E7B /* BootBarBig.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13723,8 +13784,6 @@
 				84E2064611AD7841007D757F /* ORSIS3800Controller.m in Sources */,
 				84E2064811AD7841007D757F /* ORSIS3800Decoders.m in Sources */,
 				84E2064A11AD7841007D757F /* ORSIS3800Model.m in Sources */,
-				8496AF2B11AF39A100A89F1C /* ORSqlResult.m in Sources */,
-				8457BDF611B001F600C4082D /* ORSqlConnection.m in Sources */,
 				8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */,
 				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
 				8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */,
@@ -13804,9 +13863,13 @@
 				EFB39FD1130BA1C5001220AC /* SNOPController.m in Sources */,
 				EFB39FD3130BA1C5001220AC /* SNOPDetectorView.m in Sources */,
 				EFB39FD5130BA1C5001220AC /* SNOPModel.m in Sources */,
-				8405284513102CFB007607A4 /* ORCouchDB.m in Sources */,
 				84052A2F13106B65007607A4 /* ORCouchDBController.m in Sources */,
 				84052A3113106B65007607A4 /* ORCouchDBModel.m in Sources */,
+				8494C0261316CEBA00151E7B /* ORBootBarController.m in Sources */,
+				8494C0281316CEBA00151E7B /* ORBootBarModel.m in Sources */,
+				8494C1381317E2E200151E7B /* ORCouchDB.m in Sources */,
+				8494C13A1317E2E200151E7B /* ORSqlConnection.m in Sources */,
+				8494C13C1317E2E200151E7B /* ORSqlResult.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
