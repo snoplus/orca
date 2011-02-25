@@ -30,6 +30,11 @@
 	return [[[ORAdeiLoader alloc] initWithAdeiHost:aHost adeiType:aType delegate:aDelegate didFinishSelector:aSelector  setupOptions:setupOptions] autorelease];
 }
 
++ (id) loaderWithAdeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector;
+{
+	return [[[ORAdeiLoader alloc] initWithAdeiHost:nil adeiType:aType delegate:aDelegate didFinishSelector:aSelector] autorelease];
+}
+
 - (id) initWithAdeiHost:(NSString*)aHost adeiType:(int)aType  delegate:(id)aDelegate didFinishSelector:(SEL)aSelector
 {
 	return [self initWithAdeiHost:aHost adeiType:aType delegate:aDelegate didFinishSelector:aSelector setupOptions:nil];
@@ -119,6 +124,26 @@
 		}
 	}
 }
+
+/** Similar to sendControlSetpoint: not blocking/waiting for the result. 
+  * Sends the "requestString" and waits just for a message OK or NOT OK.
+  */
+- (void) sendRequestString:(NSString*)requestString
+{
+	//example: @"http://ipepdvadei.ka.fzk.de/test//services/control.php?target=send&db_server=test_zeus&db_name=cfp_test&control_group=4&control_mask=3,1,2,0&control_values=10.0303,10.02828,10.029,10.02727"];
+
+		if(requestString){
+			dataFormat = kmsgFormat;
+			host = [@"requestString" mutableCopy];//[aPath copy];
+			path = [requestString copy];//[aPath copy];
+			recursive  = NO;
+			NSURL* furl = [NSURL URLWithString: requestString];
+            if(showDebugOutput) NSLog(@"Sending out request string: >>>%@<<<\n",requestString);//debugging
+			NSURLRequest* theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:kTimeoutInterval];// make it configurable
+			theAdeiConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
+		}
+}
+
 
 - (void) requestItem:(NSString*)aPath
 {

@@ -19,6 +19,7 @@
 
 #define kSensorType	0
 #define kControlType	1
+#define kRequestStringType	2
 #define kcsvFormat 0
 #define kxmlFormat 1
 #define kmsgFormat 2  //this is for messages like <result>Ok</result> or <result>Error</result>
@@ -49,6 +50,7 @@
 
 + (id)	 loaderWithAdeiHost:(NSString*)aHost adeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector setupOptions:(NSArray*)setupOptions;
 + (id)	 loaderWithAdeiHost:(NSString*)aHost adeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector;
++ (id)	 loaderWithAdeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector;
 - (id)	 initWithAdeiHost:(NSString*)aHost adeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector;
 - (id)	 initWithAdeiHost:(NSString*)aHost adeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector setupOptions:(NSArray*)setupOptions;
 - (void) dealloc;
@@ -60,6 +62,7 @@
 - (void) requestControlItem:(NSString*)aPath;
 - (void) setControlSetpoint:(NSString*)aPath value:(double)aValue;
 - (void) sendControlSetpoint:(NSString*)aPath value:(double)aValue;
+- (void) sendRequestString:(NSString*)requestString;
 - (void) setShowDebugOutput:(BOOL) aOption;
 - (BOOL) showDebugOutput;
 
