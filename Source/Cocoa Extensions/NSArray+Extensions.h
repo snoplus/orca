@@ -23,7 +23,7 @@
 - (NSString *)joinAsLinesOfEndingType:(LineEndingType)type;
 - (NSData *)dataWithLineEndingType:(LineEndingType)lineEndingType;
 - (id) objectForKeyArray:(NSMutableArray*)anArray;
-
+- (void) prettyPrint:(NSString*)aTitle;
 @end
 
 @interface NSMutableArray (OrcaExtensions)

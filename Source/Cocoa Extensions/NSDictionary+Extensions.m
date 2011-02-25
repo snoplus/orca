@@ -35,7 +35,6 @@
     return result;
 }
 
-
 - (id) objectForNestedKey:(NSString*)aStringList
 {
 	return [self objectForKeyArray:[NSMutableArray arrayWithArray:[aStringList componentsSeparatedByString:@","]]];
@@ -143,7 +142,16 @@
 	free(tmpName);
 	return theResponse;
 }
-
+- (void) prettyPrint:(NSString*)aTitle
+{
+	NSLog(@"----------------------------\n");
+	NSLog(@"%@\n",aTitle);
+	NSArray* allKeys = [self allKeys];
+	for(id aKey in allKeys){
+		NSLog(@"%@ : %@\n",aKey,[self objectForKey:aKey]);
+	}
+	NSLog(@"----------------------------\n");
+}
 @end
 
 @implementation NSMutableDictionary (OrcaExtensions)

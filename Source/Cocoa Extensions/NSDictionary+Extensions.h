@@ -33,6 +33,7 @@
 - (unsigned int) uIntForKey:(NSString*)aKey;
 - (int) intForKey:(NSString*)aKey;
 - (BOOL) boolForKey:(NSString*)aKey;
+- (void) prettyPrint:(NSString*)aTitle;
 @end
 
 @interface NSMutableDictionary (OrcaExtensions)

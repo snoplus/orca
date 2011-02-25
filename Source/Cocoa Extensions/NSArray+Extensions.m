@@ -81,7 +81,16 @@
 		else return self;
 	}
 }
-
+- (void) prettyPrint:(NSString*)aTitle
+{
+	NSLog(@"----------------------------\n");
+	NSLog(@"%@\n",aTitle);
+	int i;
+	for(i=0;i<[self count];i++){
+		NSLog(@"%d : %@\n",i,[self objectAtIndex:i]);
+	}
+	NSLog(@"----------------------------\n");
+}
 @end
 
 @implementation NSMutableArray (OrcaExtensions)
