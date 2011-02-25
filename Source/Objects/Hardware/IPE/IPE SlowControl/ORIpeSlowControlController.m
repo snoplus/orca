@@ -211,7 +211,7 @@
 
 - (void) setpointRequestQueueChanged:(NSNotification*)aNote
 {
-	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
     [setpointRequestsQueueTableView reloadData];
     [setpointRequestsQueueTableView setNeedsDisplay: YES];
 }
@@ -420,7 +420,7 @@
 
 - (IBAction) sendSetpointAction:(id) sender
 {
-	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
 	[self endEditing];
 	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
 	if([selectedSet count] == 1){
@@ -432,7 +432,7 @@
 - (IBAction) queueSetpointAction:(id) sender
 {
 	[self endEditing];
-	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
 	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
 	if([selectedSet count] == 1){
 		unsigned index = [selectedSet firstIndex];
@@ -442,13 +442,13 @@
 
 - (IBAction) sendSetpointRequestsQueueAction:(id) sender
 {
-	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
 	[model sendSetpointRequestQueue];
 }
 
 - (IBAction) clearSetpointRequestsQueueAction:(id) sender
 {
-	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
 	[model clearSetpointRequestQueue];
 }
 

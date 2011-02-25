@@ -201,6 +201,9 @@
 
 - (void) sendControlSetpointForChan:(int)aChan value:(double)aValue;
 - (void) queueControlSetpointForChan:(int)aChan value:(double)aValue;
+- (void) fillRequest:(NSDictionary*)unusedobj intoTree:(NSMutableDictionary*)requestTree accordingTo:(NSArray*)pathThroughTree level:(int)level;//don't call in scripts, helper for sendSetpointRequestQueue
+- (void) traverseTree:(NSMutableDictionary*)theTree level:(int)level requestString:(NSMutableString*)aString requestStringList:(NSMutableArray*)requestStringList;//don't call in scripts, helper for sendSetpointRequestQueue
+
 - (void) sendSetpointRequestQueue;
 - (void) clearSetpointRequestQueue;
 
@@ -218,6 +221,7 @@
 - (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath;
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
 - (void) sendControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
+- (void) sendRequestString:(NSString*)requestString;
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
 - (BOOL) requestIsPending:(NSString*)itemKey;
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;

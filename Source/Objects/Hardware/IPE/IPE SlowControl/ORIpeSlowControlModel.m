@@ -171,7 +171,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (void) sendControlSetpointForChan:(int)aChan value:(double)aValue
 {
-	NSLog(@"%@::%@ - for chan %i send setpoint %Lg\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),aChan, aValue);//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@ - for chan %i send setpoint %Lg\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),aChan, aValue);//DEBUG OUTPUT -tb-  
     NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
     if(itemKey){
 		id topLevelDictionary = [requestCache objectForKey:itemKey];
@@ -190,6 +190,13 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
     }
 }
 
+
+
+//to see the debug output for the request list handling uncomment this line (-tb- 2011-01),
+//TODO: to switch off debug output comment out this line: ------------------------------------->
+//#define SHOW_REQUEST_LIST_DEBUG_OUTPUT
+
+//fills a setpoint request into the request queue
 - (void) queueControlSetpointForChan:(int)aChan value:(double)aValue
 {
 	if(!setpointRequestsQueue) setpointRequestsQueue = [[NSMutableArray arrayWithCapacity:32] retain];//[[NSMutableArray array] retain];
@@ -198,14 +205,18 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	int i;
 	for(i=0; i<count; i++){
 		NSMutableDictionary *aDict = [setpointRequestsQueue objectAtIndex:i];
+		#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
 		NSLog(@"aDict is %@\n",aDict);
+		#endif
 		if([[aDict objectForKey:@"Chan"] intValue]==aChan){
 			[setpointRequestsQueue removeObjectAtIndex:i];
 			NSLog(@"WARNING: The item with chan %i is already in the list: will be overwritten ...\n",aChan);
 			break;
 		}
 	}
+	#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
 	NSLog(@"%@::%@  count %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),count);
+	#endif
 	
 	//
     NSString* itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:aChan]];
@@ -225,26 +236,178 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 											//aNode,@"Children",
 											nil];
 		[setpointRequestsQueue addObject:aDictionary];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetpointRequestQueueChanged object:self];
+		#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
 		NSLog(@"%@\n",setpointRequestsQueue);
+		#endif
 		
 	}
 		
 }
 
+//is private but left here because it belongs to 'sendSetpointRequestQueue'
+//sort requests into a tree ...
+- (void) fillRequest:(NSDictionary*)unusedobj intoTree:(NSMutableDictionary*)requestTree accordingTo:(NSArray*)pathThroughTree level:(int)level
+{
+	NSString *currLevelString = [pathThroughTree objectAtIndex:level];
+	id obj=[requestTree objectForKey:currLevelString];
+	if(!obj){//item not in tree: create it ...
+		obj=[NSMutableDictionary dictionary];
+		[requestTree setObject: obj forKey: currLevelString];
+	}
+	
+	//level == 0: URL; 1:db_server; 2:database; 3: group; 4: (control) item
+	if(level<4){
+		[self fillRequest: unusedobj intoTree: obj accordingTo: pathThroughTree level: level+1];
+	}
+	
+	if(level==4){
+		[obj setObject:[unusedobj objectForKey:@"Setpoint"] forKey:@"Setpoint"];
+	}
+}
+
+//is private but left here because it belongs to 'sendSetpointRequestQueue'
+//generate a request list of sensor groups out of the tree created with fillRequest:intoTree:...
+- (void) traverseTree:(NSMutableDictionary*)theTree level:(int)level requestString:(NSMutableString*)aString requestStringList:(NSMutableArray*)requestStringList
+{
+	if(level>=5) return;
+	
+	if(aString==nil) aString=[NSMutableString stringWithCapacity:1000];
+	
+	NSInteger count = [theTree count];
+	id objects[count];
+	id keys[count];
+	[theTree getObjects:objects andKeys:keys];
+	
+	int i;
+	for (i = 0; i < count; i++) {
+		id obj = objects[i];
+		id key = keys[i];
+		#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
+		//NSLog(@"%@ -> %@", obj, key);
+		if(level<=3){
+			NSLog(@"level %i -> %@  \n", level, key);
+		}else if(level==4){
+			NSLog(@"level %i -> %@ (setpoint %@) \n", level, key,[obj objectForKey: @"Setpoint"]);
+		}
+		#endif
+		NSMutableString *nextLevelString=[aString mutableCopy];
+		switch(level){
+		    case 0: //URL
+				[nextLevelString appendString:[NSString stringWithFormat:@"%@services/control.php?target=send",key]];
+		    break;
+		    case 1: //db_server
+				[nextLevelString appendString:[NSString stringWithFormat:@"&db_server=%@",key]];
+		    break;
+			case 2: //db_name
+				[nextLevelString appendString:[NSString stringWithFormat:@"&db_name=%@",key]];
+			break;
+			case 3: //group
+				[nextLevelString appendString:[NSString stringWithFormat:@"&control_group=%@",key]];
+			break;
+			case 4: break;//handle below - this is the item list + setpoint list
+			default: NSLog(@" traverseTree:level:requestString:requestStringList: bad level value:%@   \n", level); break;
+		}
+
+		if(level<=3){
+			[self traverseTree:obj level:level+1 requestString:nextLevelString requestStringList:requestStringList];
+		}else{
+			//NSLog(@" Setpoint:%@   \n", [obj objectForKey: @"Setpoint"]);
+		}
+		
+	}
+	
+	if(level==4){
+		NSMutableString *nextLevelString=[aString mutableCopy];
+		[nextLevelString appendString:[NSString stringWithFormat:@"&control_mask="]];
+		for (i = 0; i < count; i++) {
+			id key = keys[i];
+			[nextLevelString appendString:[NSString stringWithFormat:@"%@",key]];
+			if(i<count-1) [nextLevelString appendString:@","]; // omit last comma
+		}
+		[nextLevelString appendString:[NSString stringWithFormat:@"&control_values="]];
+		for (i = 0; i < count; i++) {
+			id obj = objects[i];
+			[nextLevelString appendString:[NSString stringWithFormat:@"%@",[obj objectForKey: @"Setpoint"]]];
+			if(i<count-1) [nextLevelString appendString:@","]; // omit last comma
+		}
+		[requestStringList addObject:nextLevelString];
+	}
+	
+}
 
 - (void) sendSetpointRequestQueue
 {
+	#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
 	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	NSLog(@"The queue: %@\n",setpointRequestsQueue);
+	#endif
+	
+	//sort the list/queue according to url and path -> build a tree
+	NSMutableDictionary *requestTree = [NSMutableDictionary dictionary];
+	id objx;
+	for(objx in setpointRequestsQueue){
+		NSDictionary *obj= objx;
+		int count;
+		NSString *path = [obj objectForKey:@"Path"];
+		NSArray* components;
+		if([path isEqual:@"/"] || ([path length]==0)) count = 0;
+		else {
+			components = [path componentsSeparatedByString:@"/"];
+			count = [components count];
+		}
+//		NSMutableArray *pathThroughTree = [[NSMutableArray alloc] initWithObject: [obj objectForKey:@"URL"]];
+		NSMutableArray *pathThroughTree = [NSMutableArray arrayWithCapacity:5];
+		[pathThroughTree addObject: [obj objectForKey:@"URL"]];
+		[pathThroughTree addObjectsFromArray:components];										   
+		#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
+		NSLog(@"pathThroughTree: %@\n",pathThroughTree);//debug output: the path through the request tree <----------
+		#endif
+		[self fillRequest: obj intoTree: requestTree accordingTo: pathThroughTree level: 0];
+	}
+								 
+	#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
+	NSLog(@"requestTree:%@\n",requestTree);//debug output: the request tree <----------
+	#endif
+	
+	NSMutableArray *requestStringList = [NSMutableArray arrayWithCapacity:5];
+
+	[self traverseTree:requestTree level:0 requestString:nil requestStringList:requestStringList];
+	#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
+	NSLog(@"requestStringList:%@\n",requestStringList);//debug output: the request list <----------
+	#endif
+
+	// now send the request(s) to ADEI
+	int count = [requestStringList count];
+	//check whether this chan is already in queue, if yes, remove it
+	int i;
+	for(i=0; i<count; i++){
+		NSMutableString *requestString = [requestStringList objectAtIndex:i];
+		//NSLog(@"Request %i is: %@\n",i,requestString);
+		[self sendRequestString:requestString];
+	}
+	
+	
+	[self clearSetpointRequestQueue];	
 }
 
 - (void) clearSetpointRequestQueue
 {
-	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
 	[setpointRequestsQueue removeAllObjects];//TODO: seems to me I missed a retain somewhere -tb-
-	NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetpointRequestQueueChanged object:self];
-	NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
+	//NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
+
 }
+
+	#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
+	   #undef SHOW_REQUEST_LIST_DEBUG_OUTPUT
+	#endif
+
+
+
 
 
 
@@ -958,6 +1121,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 #pragma mark •••Methods Useful For Scripting
 //-------------should use only these methods in scripts---------------------------------
+
+//Send the request,  wait for response.
 - (void) postSensorRequest:(NSString*)aUrl path:(NSString*)aPath
 {
 //NSLog( @"postSensorRequest: \n");//TODO: debug1
@@ -975,6 +1140,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	[self setTotalRequestCount:totalRequestCount+1];
 }
 
+//Send the request,  wait for response.
 - (void) postControlRequest:(NSString*)aUrl path:(NSString*)aPath
 {
 //NSLog( @"postControlRequest: \n");//TODO: debug1
@@ -991,6 +1157,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	[self setTotalRequestCount:totalRequestCount+1];
 }
 
+//Send the request,  wait for response.
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
 {
     NSString* anItemKey = [self itemKey:aUrl :aPath];
@@ -1005,6 +1172,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
     [self setTotalRequestCount:totalRequestCount+1];
 }
 
+//Just send the request, don't wait for response.
 - (void) sendControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue
 {
     NSString* anItemKey = [self itemKey:aUrl :aPath];
@@ -1017,6 +1185,24 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
     [aLoader sendControlSetpoint:aPath value:aValue];
 	[self setPendingRequest:anItemKey];
     [self setTotalRequestCount:totalRequestCount+1];
+}
+
+//Just send the request string, don't wait for response.
+- (void) sendRequestString:(NSString*)requestString
+{
+	//NSLog(@"%@::%@: requestString:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),requestString);//TODO: debug output -tb-
+
+    NSString* anItemKey = [self itemKey:@"requestString" :requestString];
+		if([self requestIsPending:anItemKey]){//request is still pending
+            NSLog( @"You posted a request for a still pending item: %@\n",anItemKey);
+            //TODO: XXX return;  post anyway -tb-
+        }
+    ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiType:kRequestStringType delegate:self didFinishSelector:@selector(handleSilentItemResult:path:)];
+    [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
+    [aLoader sendRequestString:requestString];
+	[self setPendingRequest:anItemKey];
+    [self setTotalRequestCount:totalRequestCount+1];
+
 }
 
 
@@ -1373,12 +1559,12 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) handleSilentItemResult:(id)result path:(NSString*)aPath
 {
 	//just remove from pending list and check for errors
-    NSLog(@"handleSilentItemResult: ... result is %@ \n",result);
-    NSLog(@"handleSilentItemResult: ... aPath is %@ \n",aPath);
+    //NSLog(@"handleSilentItemResult: ... result is %@ \n",result);//DEBUG OUTPUT -tb-
+    //NSLog(@"handleSilentItemResult: ... aPath is %@ \n",aPath);//DEBUG OUTPUT -tb-
 	{
 		NSMutableDictionary* dictionary = [result objectAtIndex:0];
 		NSString* itemKey = [self itemKey:[dictionary objectForKey:@"URL"]:[dictionary objectForKey:@"Path"]];
-    NSLog(@"handleSilentItemResult: ... itemKey is %@ \n",itemKey);
+		//NSLog(@"handleSilentItemResult: ... itemKey is %@ \n",itemKey);//DEBUG OUTPUT -tb-
         //if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
         
         //housekeeping
