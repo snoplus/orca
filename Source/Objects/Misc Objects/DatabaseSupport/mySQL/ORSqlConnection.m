@@ -21,6 +21,7 @@
 
 #import "ORSqlConnection.h"
 #import "ORSqlResult.h"
+#import "SynthesizeSingleton.h"
 
 @interface ORSqlConnection (private)
 - (NSString*) prepareBinaryData:(NSData *) theData;
@@ -415,5 +416,41 @@
     theReturn = [NSString stringWithCString:theCEscBuffer encoding:NSISOLatin1StringEncoding];
     free (theCEscBuffer);
     return theReturn;    
+}
+@end
+
+//-----------------------------------------------------------
+//ORSqlQueue: A shared queue for Sqldb access. You should 
+//never have to use this object directly. It will be created
+//on demand when a SqlDB op is called.
+//-----------------------------------------------------------
+@implementation ORSqlDBQueue
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(SqlDBQueue);
++ (NSOperationQueue*) queue
+{
+	return [[ORSqlDBQueue sharedSqlDBQueue] queue];
+}
+
++ (void) addOperation:(NSOperation*)anOp
+{
+	return [[ORSqlDBQueue sharedSqlDBQueue] addOperation:anOp];
+}
+
+//don't call this unless you're using this class in a special, non-global way.
+- (id) init
+{
+	self = [super init];
+	queue = [[NSOperationQueue alloc] init];
+	[queue setMaxConcurrentOperationCount:1];
+	
+    return self;
+}
+- (NSOperationQueue*) queue
+{
+	return queue;
+}
+- (void) addOperation:(NSOperation*)anOp
+{
+	[queue addOperation:anOp];
 }
 @end

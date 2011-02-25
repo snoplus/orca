@@ -39,21 +39,21 @@
 
 - (void) dealloc
 {
-	[[ORCouchDBQueue sharedCouchDBQueue] removeObserver:self forKeyPath:@"operations"];
+	[[[ORCouchDBQueue sharedCouchDBQueue] queue] removeObserver:self forKeyPath:@"operationCount"];
 	[super dealloc];
 }
 
 -(void) awakeFromNib
 {
 	[super awakeFromNib];
-	[[ORCouchDBQueue queue] addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+	[[[ORCouchDBQueue sharedCouchDBQueue]queue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
                          change:(NSDictionary *)change context:(void *)context
 {
-	NSOperationQueue* queue = [ORCouchDBQueue queue];
-    if (object == queue && [keyPath isEqual:@"operations"]) {
+	NSOperationQueue* queue = [[ORCouchDBQueue sharedCouchDBQueue] queue];
+    if (object == queue && [keyPath isEqual:@"operationCount"]) {
 		NSNumber* n = [NSNumber numberWithInt:[[[ORCouchDBQueue queue] operations] count]];
 		[self performSelectorOnMainThread:@selector(setQueCount:) withObject:n waitUntilDone:NO];
     }
@@ -114,6 +114,11 @@
                      selector : @selector(stealthModeChanged:)
                          name : ORCouchDBModelStealthModeChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(dataBaseInfoChanged:)
+                         name : ORCouchDBModelDBInfoChanged
+						object: model];	
 }
 
 - (void) updateWindow
@@ -151,8 +156,8 @@
 {
 	if([model dataBaseName])[dataBaseNameField setStringValue:[model machineName]];
 }
-- 
-(void) couchDBLockChanged:(NSNotification*)aNote
+
+- (void) couchDBLockChanged:(NSNotification*)aNote
 {
     BOOL locked = [gSecurity isLocked:ORCouchDBLock];
     [couchDBLockButton setState: locked];
@@ -163,11 +168,22 @@
     [dataBaseNameField setEnabled:!locked];
     
 }
+
 - (void) checkGlobalSecurity
 {
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:ORCouchDBLock to:secure];
     [couchDBLockButton setEnabled: secure];
+}
+
+- (void) dataBaseInfoChanged:(NSNotification*)aNote
+{
+	NSDictionary* dbInfo = [model dBInfo];
+	unsigned long dbSize = [[dbInfo objectForKey:@"disk_size"] unsignedLongValue];
+	if(dbSize > 1000000000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.2f GB",dbSize/1000000000.]];
+	else if(dbSize > 1000000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.2f MB",dbSize/1000000.]];
+	else if(dbSize > 1000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.1f KB",dbSize/1000.]];
+	else [dbSizeField setStringValue:[NSString stringWithFormat:@"%d Bytes",dbSize]];
 }
 
 #pragma mark •••Actions
@@ -230,6 +246,7 @@
                       nil,@"If the database doesn't exist, this operation will do no harm.");
 	
 }
+
 - (IBAction) listAction:(id)sender
 {
 	[model listDatabases];
@@ -237,14 +254,13 @@
 
 - (IBAction) infoAction:(id)sender
 {
-	[model databaseInfo];
+	[model databaseInfo:YES];
 }
 
 - (IBAction) compactAction:(id)sender
 {
 	[model compactDatabase];
 }
-
 
 @end
 

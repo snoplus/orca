@@ -183,6 +183,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [[[self undoManager] prepareWithInvocationTarget:self] setStealthMode:stealthMode];
     stealthMode = aStealthMode;
 	if(stealthMode){
+		if([ORCouchDBQueue operationCount]) [ORCouchDBQueue cancelAllOperations];
 		[self deleteDatabase];
 	}
 	else {
@@ -351,7 +352,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[dBInfo release];
 		dBInfo = someInfo;
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBHostNameChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelDBInfoChanged object:self];
 }
 
 - (NSDictionary*) dBInfo
@@ -371,7 +372,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				if([aTag isEqualToString:kInfoDB]){
 					[aResult prettyPrint:@"CouchDB Info:"];
 				}
-				if([aTag isEqualToString:kInfoInternalDB]){
+				else if([aTag isEqualToString:kInfoInternalDB]){
 					[self performSelectorOnMainThread:@selector(setDBInfo:) withObject:aResult waitUntilDone:NO];
 				}
 				
@@ -410,6 +411,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
 	[db compactDatabase:self tag:kCompactDB];
+	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 }
 
 - (void) listDatabases
@@ -418,10 +420,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[db listDatabases:self tag:kListDB];
 }
 
-- (void) databaseInfo
+- (void) databaseInfo:(BOOL)toStatusWindow
 {
 	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort database:[self machineName] delegate:self];
-	[db databaseInfo:self tag:kInfoInternalDB];
+	if(toStatusWindow)	[db databaseInfo:self tag:kInfoDB];
+	else				[db databaseInfo:self tag:kInfoInternalDB];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNote

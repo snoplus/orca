@@ -58,3 +58,14 @@
 - (BOOL) killProcess:(unsigned long) pid;
 @end
 
+//a thin wrapper around NSOperationQueue to make a shared queue for Sql access
+@interface ORSqlDBQueue : NSObject {
+    NSOperationQueue* queue;
+}
++ (ORSqlDBQueue*) sharedSqlDBQueue;
++ (void) addOperation:(NSOperation*)anOp;
++ (NSOperationQueue*) queue;
+- (void) addOperation:(NSOperation*)anOp;
+- (NSOperationQueue*) queue;
+@end
+

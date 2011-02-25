@@ -25,7 +25,6 @@
 @interface ORSqlModel : OrcaObject
 {
 @private
-	NSOperationQueue* queue;
 	ORSqlConnection* sqlConnection;
 	BOOL		connectionValid;
 	NSString*	hostName;
@@ -65,7 +64,7 @@
 #pragma mark ***SQL Access
 - (BOOL) testConnection;
 - (BOOL) connectionValid;
-- (void) disconnect;
+- (void) disconnectSql;
 
 #pragma mark ***Database setup
 - (void) createDatabase;

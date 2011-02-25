@@ -227,6 +227,7 @@
 @implementation ORCouchDBCompactDBOp
 -(void) main
 {	
+	if([self isCancelled])return;
 	NSString* httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_compact", host, port,database];
 	if(username && pwd){
 		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
@@ -246,6 +247,7 @@
 @implementation ORCouchDBListDBOp
 -(void) main
 {
+	if([self isCancelled])return;
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
 	[self sendToDelegate:result];
 }
@@ -254,6 +256,7 @@
 @implementation ORCouchDBVersionOp
 - (void) main
 {
+	if([self isCancelled])return;
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u", host, port]];
 	[self sendToDelegate:result];
 }
@@ -263,6 +266,7 @@
 @implementation ORCouchDBInfoDBOp
 -(void) main
 {
+	if([self isCancelled])return;
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/", host, port,database]];
 	[self sendToDelegate:result];
 }
@@ -271,6 +275,7 @@
 @implementation ORCouchDBCreateDBOp
 -(void) main
 {
+	if([self isCancelled])return;
 	NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
 	if(![result containsObject:database]){
@@ -299,6 +304,7 @@
 @implementation ORCouchDBDeleteDBOp
 -(void) main
 {
+	if([self isCancelled])return;
 	
 	NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
@@ -337,6 +343,7 @@
 
 - (void) main
 {
+	if([self isCancelled])return;
 	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
 	id result = [self send:httpString type:@"PUT" body:document];
 	[self sendToDelegate:result];
@@ -347,10 +354,17 @@
 @implementation ORCouchDBUpdateDocumentOp
 - (void) main
 {
+	if([self isCancelled])return;
 	//check for an existing document
 	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
 	id result = [self send:httpString];
-	if([result objectForKey:@"error"]){
+	if(!result){
+		result = [NSDictionary dictionaryWithObjectsAndKeys:
+				  [NSString stringWithFormat:@"[%@] timeout",
+				   database],@"Message",nil];
+		[self sendToDelegate:result];
+	}
+	else if([result objectForKey:@"error"]){
 		//document doesn't exist. So just add it.
 		result = [self send:httpString type:@"PUT" body:document];
 	}
@@ -369,6 +383,7 @@
 @implementation ORCouchDBDeleteDocumentOp
 - (void) main
 {
+	if([self isCancelled])return;
 	//check for an existing document
 	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
 	id result = [self send:httpString];
@@ -395,6 +410,7 @@
 
 - (void) main
 {
+	if([self isCancelled])return;
 	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
 	id result = [self send:httpString];
 	[self sendToDelegate:result];
@@ -416,7 +432,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
 
 + (void) addOperation:(NSOperation*)anOp
 {
-	return [[ORCouchDBQueue sharedCouchDBQueue] addOperation:anOp];
+	[[ORCouchDBQueue sharedCouchDBQueue] addOperation:anOp];
+}
++ (NSUInteger) operationCount
+{
+	return 	[[ORCouchDBQueue sharedCouchDBQueue] operationCount];
+}
++ (void) cancelAllOperations
+{
+	[[ORCouchDBQueue sharedCouchDBQueue] cancelAllOperations];
 }
 
 //don't call this unless you're using this class in a special, non-global way.
@@ -427,12 +451,25 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
 	[queue setMaxConcurrentOperationCount:1];
     return self;
 }
+
 - (NSOperationQueue*) queue
 {
 	return queue;
 }
+
 - (void) addOperation:(NSOperation*)anOp
 {
 	[queue addOperation:anOp];
 }
+
+- (void) cancelAllOperations
+{
+	[queue cancelAllOperations];
+}
+			 
+- (NSInteger) operationCount
+{
+	return [[queue operations]count];
+}
+			 
 @end

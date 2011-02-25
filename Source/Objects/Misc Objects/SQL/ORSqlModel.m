@@ -78,7 +78,9 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (id) init
 {
 	[super init];
+    [[self undoManager] enableUndoRegistration];
 	[self registerNotificationObservers];
+    [[self undoManager] disableUndoRegistration];
 	return self;
 }
 
@@ -86,9 +88,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[queue cancelAllOperations];
-	[queue release];
-	[sqlConnection release];
     [dataBaseName release];
     [password release];
     [userName release];
@@ -107,16 +106,13 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 - (void) sleep
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[self removeMachineName];
 	[super sleep];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
-	if(!queue){
-		queue = [[NSOperationQueue alloc] init];
-		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-	}
 	[self addMachineName];
 }
 
@@ -325,10 +321,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 
-- (NSUndoManager*) undoManager
-{
-	return [[NSApp delegate] undoManager];
-}
+//- (NSUndoManager*) undoManager
+//{
+//	return [[NSApp delegate] undoManager];
+//}
 
 - (void) createDatabase
 {
@@ -399,8 +395,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (BOOL) testConnection
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[queue cancelAllOperations];
-	[queue waitUntilAllOperationsAreFinished];
 	
 	if(!sqlConnection) sqlConnection = [[ORSqlConnection alloc] init];
 	if([sqlConnection isConnected]){
@@ -423,7 +417,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	return connectionValid;
 }
 
--(void) disconnect
+-(void) disconnectSql
 {
 	if(sqlConnection){
 		[sqlConnection release];
@@ -771,7 +765,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")];
 		ORProcessDataOp* anOp = [[ORProcessDataOp alloc] initWithDelegate:self];
 		[anOp setProcesses:objs];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 		[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:30];	
 	}
@@ -796,7 +790,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		for(id anAlarm in alarms){
 			ORPostAlarmOp* anOp = [[ORPostAlarmOp alloc] initWithDelegate:self];
 			[anOp postAlarm:anAlarm];
-			[queue addOperation:anOp];
+			[ORSqlDBQueue addOperation:anOp];
 			[anOp release];
 		}
 	}
@@ -827,7 +821,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 			id histoObj = [arrayOfHistos objectAtIndex:0];
 			//assume first one in the data chain
 			[anOp setDataMonitorId:[histoObj uniqueIdNumber]];
-			[queue addOperation:anOp];
+			[ORSqlDBQueue addOperation:anOp];
 		}
 		[anOp release];
 	}
@@ -872,7 +866,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
 	if(!stealthMode){
 		ORPostMachineNameOp* anOp = [[ORPostMachineNameOp alloc] initWithDelegate:self];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 
 		[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
@@ -886,7 +880,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) removeMachineName
 {
 	ORDeleteMachineNameOp* anOp = [[ORDeleteMachineNameOp alloc] initWithDelegate:self];
-	[queue addOperation:anOp];
+	[ORSqlDBQueue addOperation:anOp];
 	[anOp release];	
 }
 
@@ -895,7 +889,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateUptime) object:nil];
 		ORUpdateUptime* anOp = [[ORUpdateUptime alloc] initWithDelegate:self];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 		[self performSelector:@selector(updateUptime) withObject:nil afterDelay:5];	
 	}
@@ -943,7 +937,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		ORPostRunStateOp* anOp = [[ORPostRunStateOp alloc] initWithDelegate:self];
 		[anOp setRunModel:[aNote object]];
 		[anOp setExperimentName:experimentName];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 	}
 }
@@ -953,7 +947,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if(!stealthMode){
 		ORPostRunTimesOp* anOp = [[ORPostRunTimesOp alloc] initWithDelegate:self];
 		[anOp setRunModel:[aNote object]];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 	}
 }
@@ -963,7 +957,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	if(!stealthMode){
 		ORPostRunOptions* anOp = [[ORPostRunOptions alloc] initWithDelegate:self];
 		[anOp setRunModel:[aNote object]];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 	}
 }
@@ -1084,7 +1078,7 @@ Table: Histogram2Ds
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
 		ORPostDataOp* anOp = [[ORPostDataOp alloc] initWithDelegate:self];
 		[anOp setDataMonitors:[[dataMonitors copy]autorelease]];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
 	}
@@ -1112,7 +1106,7 @@ Table: Histogram2Ds
 		if(nextObject){
 			ORPostExperimentOp* anOp = [[ORPostExperimentOp alloc] initWithDelegate:self];
 			[anOp setExperiment:nextObject];
-			[queue addOperation:anOp];
+			[ORSqlDBQueue addOperation:anOp];
 			[anOp release];
 		}
 		
@@ -1137,7 +1131,7 @@ Table: Histogram2Ds
 	if(!stealthMode){
 		ORPostAlarmOp* anOp = [[ORPostAlarmOp alloc] initWithDelegate:self];
 		[anOp postAlarm:[aNote object]];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 	}
 }
@@ -1147,7 +1141,7 @@ Table: Histogram2Ds
 	if(!stealthMode){
 		ORPostAlarmOp* anOp = [[ORPostAlarmOp alloc] initWithDelegate:self];
 		[anOp clearAlarm:[aNote object]];
-		[queue addOperation:anOp];
+		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 	}
 }
@@ -1230,7 +1224,7 @@ Table: Histogram2Ds
 		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
 		if(sqlConnection){
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-			[delegate disconnect];
+			[delegate disconnectSql];
 			[sqlConnection release];
 		}
 	}

@@ -61,7 +61,7 @@
 - (void) deleteDatabase;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag;
 //test functions
-- (void) databaseInfo;
+- (void) databaseInfo:(BOOL)toStatusWindow;
 - (void) listDatabases;
 - (void) updateFunction;
 - (void) compactDatabase;

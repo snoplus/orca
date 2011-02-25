@@ -28,6 +28,7 @@
     IBOutlet NSButton*    couchDBLockButton;
     IBOutlet ORValueBar*  queueValueBar;
 	IBOutlet NSButton*	  stealthModeButton;
+	IBOutlet NSTextField* dbSizeField;
 	double queueCount;
 }
 
@@ -40,6 +41,7 @@
 - (void) dataBaseNameChanged:(NSNotification*)aNote;
 - (void) couchDBLockChanged:(NSNotification*)aNote;
 - (void) setQueCount:(NSNumber*)n;
+- (void) dataBaseInfoChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) stealthModeAction:(id)sender;

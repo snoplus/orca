@@ -140,8 +140,12 @@
 + (ORCouchDBQueue*) sharedCouchDBQueue;
 + (void) addOperation:(NSOperation*)anOp;
 + (NSOperationQueue*) queue;
++ (NSUInteger) operationCount;
++ (void) cancelAllOperations;
 - (void) addOperation:(NSOperation*)anOp;
 - (NSOperationQueue*) queue;
+- (void) cancelAllOperations;
+- (NSInteger) operationCount;
 @end
 
 @interface NSObject (ORCouchDB)
