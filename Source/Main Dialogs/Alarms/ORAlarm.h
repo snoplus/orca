@@ -73,6 +73,7 @@ typedef enum {
 - (NSString*) alarmWasAcknowledged;
 
 - (void) setHelpStringFromFile:(NSString*)fileName;
+- (NSDictionary*) alarmInfo;
 
 #pragma mark •••Alarm Management
 - (void) postAlarm;

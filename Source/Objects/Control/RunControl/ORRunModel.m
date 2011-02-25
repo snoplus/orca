@@ -1637,6 +1637,25 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [self setUpImage];
 }
 
+- (NSDictionary*) fullRunInfo
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+							 [NSNumber numberWithUnsignedLong:[self runNumber]],		@"run",
+							 [NSNumber numberWithUnsignedLong:[self subRunNumber]],		@"subrun",
+							 [NSNumber numberWithUnsignedLong:[self runningState]],		@"state",
+							 [[self startTime] description],							@"startTime",
+							 [[self subRunStartTime]description],						@"subRunStartTime",
+							 [NSNumber numberWithUnsignedLong:[self elapsedRunTime]],	@"elapsedTime",
+							 [NSNumber numberWithUnsignedLong:[self elapsedSubRunTime]],@"elapsedSubRunTime",
+							 [NSNumber numberWithUnsignedLong:[self elapsedBetweenSubRunTime]],@"elapsedBetweenSubRunTime",
+							 [NSNumber numberWithUnsignedLong:[self timeToGo]],			@"timeToGo",
+							 [NSNumber numberWithBool:[self quickStart]],				@"quickStart",
+							 [NSNumber numberWithBool:[self repeatRun]],				@"repeatRun",
+							 [NSNumber numberWithBool:[self offlineRun]],				@"offlineRun",
+							 [NSNumber numberWithBool:[self timedRun]],					@"timedRun",
+							 [NSNumber numberWithUnsignedLong:[self timeLimit]],		@"timeLimit",
+							 nil];	
+}
 
 #pragma mark ¥¥¥Archival
 static NSString *ORRunTimeLimit		= @"Run Time Limit";

@@ -100,6 +100,7 @@
 
 #pragma mark ¥¥¥Accessors
 - (NSDictionary*)runInfo;
+- (NSDictionary*) fullRunInfo;
 
 - (NSString*) elapsedRunTimeString;
 - (int) subRunNumber;
