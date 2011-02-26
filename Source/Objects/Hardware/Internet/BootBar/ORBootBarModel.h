@@ -1,0 +1,81 @@
+//
+//  ORBootBarModel.h
+//  Orca
+//
+//  Created by Mark Howe on Thurs Jan 6,2011
+//  Copyright (c) 2011 University of North Carolina. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//North Carolina Department of Physics and Astrophysics 
+//sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+#pragma mark •••Imported Files
+#import "ORMPodProtocol.h"
+
+@interface ORBootBarModel :  OrcaObject <ORMPodProtocol>
+{
+	NSMutableArray*	connectionHistory;
+	unsigned		ipNumberIndex;
+	NSString*		IPNumber;
+	NSTask*			pingTask;
+	NSMutableDictionary* systemParams;
+	NSOperationQueue* queue;
+	BOOL			oldPower;
+}
+
+#pragma mark ***Accessors
+- (BOOL) power;
+- (void) initConnectionHistory;
+- (void) clearHistory;
+- (unsigned) connectionHistoryCount;
+- (id) connectionHistoryItem:(unsigned)index;
+- (unsigned) ipNumberIndex;
+- (NSString*) IPNumber;
+- (void) setIPNumber:(NSString*)aIPNumber;
+- (void) updateAllValues;
+- (NSArray*) systemUpdateList;
+- (void) processSystemResponseArray:(NSArray*)response;
+- (int) systemParamAsInt:(NSString*)name;
+- (id) systemParam:(NSString*)name;
+- (void) togglePower;
+
+#pragma mark •••Hardware Access
+- (void) ping;
+- (BOOL) pingTaskRunning;
+- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
+- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
+- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
+- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
+- (void) pollHardware;
+- (void) pollHardwareAfterDelay;
+@end
+
+extern NSString* ORBootBarModelCrateStatusChanged;
+extern NSString* ORBootBarModelLock;
+extern NSString* ORBootBarPingTask;
+extern NSString* BootBarIPNumberChanged;
+extern NSString* ORBootBarModelSystemParamsChanged;
+
+@interface NSObject (ORMpodCModel)
+- (void) precessReadResponseArray:(NSArray*)response;
+- (void) processSystemResponseArray:(NSArray*)response;
+
+@end
+
+@interface ORBootBarUpdateOp : NSOperation
+{
+	id delegate;
+}
+- (id) initWithDelegate:(id)aDelegate;
+- (void) dealloc;
+- (void) main;
+@end
