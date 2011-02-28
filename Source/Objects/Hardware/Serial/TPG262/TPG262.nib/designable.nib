@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1149"/>
+			<integer value="1199"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -257,7 +257,7 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{33, 198}, {58, 62}}</string>
+							<string key="NSFrame">{{7, 188}, {68, 77}}</string>
 							<reference key="NSSuperview" ref="724346688"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="403820264">
@@ -265,10 +265,10 @@
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
 									<string key="NSClassName">NSImage</string>
-									<string key="NSResourceName">BocTIC3</string>
+									<string key="NSResourceName">TPG262</string>
 								</object>
 								<int key="NSAlign">0</int>
-								<int key="NSScale">2</int>
+								<int key="NSScale">3</int>
 								<int key="NSStyle">0</int>
 								<bool key="NSAnimates">NO</bool>
 							</object>
@@ -2108,8 +2108,8 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="787226493"/>
 							<reference ref="262441600"/>
 							<reference ref="141049926"/>
-							<reference ref="146137267"/>
 							<reference ref="554904749"/>
+							<reference ref="146137267"/>
 						</object>
 						<reference key="parent" ref="509370149"/>
 					</object>
@@ -5115,18 +5115,18 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSArray" key="dict.sortedKeys">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>BocTIC3</string>
 				<string>Locked</string>
 				<string>NSMenuCheckmark</string>
 				<string>NSMenuMixedState</string>
+				<string>TPG262</string>
 				<string>Unlocked</string>
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>{40, 73}</string>
 				<string>{33, 36}</string>
 				<string>{9, 8}</string>
 				<string>{7, 2}</string>
+				<string>{40, 64}</string>
 				<string>{33, 36}</string>
 			</object>
 		</object>
