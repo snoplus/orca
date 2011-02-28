@@ -168,8 +168,8 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[8];
-		data[0] = dataId | 8;
+		unsigned long data[6];
+		data[0] = dataId | 6;
 		data[1] = [self uniqueIdNumber]&0xfff;
 		
 		union {
@@ -460,7 +460,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
         @"ORTPG262DecoderForPressure",     @"decoder",
         [NSNumber numberWithLong:dataId],   @"dataId",
         [NSNumber numberWithBool:NO],       @"variable",
-        [NSNumber numberWithLong:8],        @"length",
+        [NSNumber numberWithLong:6],        @"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"Pressures"];
     
