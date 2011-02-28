@@ -36,8 +36,8 @@
 			int chan     = [self channel:ptr[i]];
 			int rg		 = [self rg:ptr[i]];
 			NSString* channelKey  = [self getChannelKey: chan];
-			if(rg)[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN965 QDC (H)",crateKey,cardKey,channelKey,nil];
-			else  [aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN965 QDC (L)",crateKey,cardKey,channelKey,nil];
+			if(rg)[aDataSet histogram:qdcValue numBins:4096 sender:self withKeys:@"CAEN965 QDC (H)",crateKey,cardKey,channelKey,nil];
+			else  [aDataSet histogram:qdcValue numBins:4096 sender:self withKeys:@"CAEN965 QDC (L)",crateKey,cardKey,channelKey,nil];
         }
     }
     return length;
