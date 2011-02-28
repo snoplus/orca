@@ -53,7 +53,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{221, 840}, {399, 271}}</string>
 				<int key="NSWTFlags">1886912512</int>
-				<string key="NSWindowTitle">BOC TIC 3 Head Controller</string>
+				<string key="NSWindowTitle">TPG262 Gauge</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
