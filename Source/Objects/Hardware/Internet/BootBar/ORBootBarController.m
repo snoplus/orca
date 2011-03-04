@@ -20,10 +20,7 @@
 
 #import "ORBootBarController.h"
 #import "ORBootBarModel.h"
-
-@interface ORBootBarController (private)
-- (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
-@end
+#import "ORDotImage.h"
 
 @implementation ORBootBarController
 - (id) init
@@ -48,18 +45,33 @@
 						object: nil];
 	
 	[notifyCenter addObserver : self
-					 selector : @selector(pingTaskChanged:)
-						 name : ORBootBarPingTask
-					   object : model];
-
-	[notifyCenter addObserver : self
 					 selector : @selector(ipNumberChanged:)
 						 name : BootBarIPNumberChanged
 					   object : model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(systemStateChanged:)
-                         name : ORBootBarModelSystemParamsChanged
+                     selector : @selector(outletStatusChanged:)
+                         name : ORBootBarModelStatusChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(passwordChanged:)
+                         name : ORBootBarModelPasswordChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(selectedChannelChanged:)
+                         name : ORBootBarModelSelectedChannelChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(selectedStateChanged:)
+                         name : ORBootBarModelSelectedStateChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(busyStateChanged:)
+                         name : ORBootBarModelBusyChanged
 						object: model];
 }
 
@@ -74,17 +86,33 @@
     [ super updateWindow ];
 	[self ipNumberChanged:nil];
     [self lockChanged:nil];
-    [self pingTaskChanged:nil];
-	[self systemStateChanged:nil];
+	[self outletStatusChanged:nil];
+	[self passwordChanged:nil];
+	[self selectedChannelChanged:nil];
+	[self selectedStateChanged:nil];
+	[self busyStateChanged:nil];
 }
 
-- (void) systemStateChanged:(NSNotification*)aNote
+- (void) busyStateChanged:(NSNotification*)aNote
 {
-	[cratePowerStateField setStringValue:	[model systemParamAsInt:@"sysMainSwitch"]?@"ON":@"OFF"];
-	[opTimeField setIntValue:				[model systemParamAsInt:@"psOperatingTime"]];
-	[serialNumberField setStringValue:		[model systemParam:@"psSerialNumber"]];
-	[crateStatusField setStringValue:		[model systemParam:@"sysStatus"]];
 	[self updateButtons];
+	[busyField setStringValue: [model isBusy]?@"Busy":@""];
+}
+
+- (void) selectedStateChanged:(NSNotification*)aNote
+{
+	[selectedStatePU selectItemAtIndex: [model selectedState]];
+}
+
+
+- (void) selectedChannelChanged:(NSNotification*)aNote
+{
+	[selectedChannelPU selectItemAtIndex: [model selectedChannel]];
+}
+
+- (void) passwordChanged:(NSNotification*)aNote
+{
+	[passwordField setStringValue: [model password]];
 }
 
 - (void) checkGlobalSecurity
@@ -92,35 +120,38 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORBootBarModelLock to:secure];
     [lockButton setEnabled:secure];
+	[self updateButtons];
+}
+
+- (void) outletStatusChanged:(NSNotification*)aNote
+{
+	unsigned char aMask = 0x0;
+	int i;
+	for(i=0;i<8;i++){
+		if([model outletStatus:i])aMask |= (1<<i);
+	}
+	[stateView setStateMask:aMask];
 }
 
 - (void) updateButtons
 {
-	int pwr = [model systemParamAsInt:@"sysStatus"];
-	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORBootBarModelLock];
-	
-	[cratePowerButton setTitle:pwr?@"Turn Power Off...":@"Turn Power On..."];
-	[cratePowerButton setEnabled:!lockedOrRunningMaintenance];
+    BOOL locked	= [gSecurity isLocked:ORBootBarModelLock];
+	BOOL busy	= [model isBusy];
+	[sendButton setEnabled: !locked && !busy];
+	[selectedStatePU setEnabled: !locked && !busy];
+	[selectedChannelPU setEnabled: !locked && !busy];
+	[passwordField setEnabled: !locked];
+	[ipNumberComboBox setEnabled: !locked];
+	[clrHistoryButton setEnabled: !locked];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
-
+#pragma mark •••Notifications
 - (void) lockChanged:(NSNotification*)aNote
 {   
-	BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL locked = [gSecurity isLocked:ORBootBarModelLock];
     [lockButton setState: locked];
-	[pingButton setEnabled:!locked && !runInProgress];
     [ipNumberComboBox setEnabled:!locked];
 	[self updateButtons];
-}
-
-- (void) pingTaskChanged:(NSNotification*)aNote
-{
-	BOOL pingRunning = [model pingTaskRunning];
-	if(pingRunning)[pingTaskProgress startAnimation:self];
-	else [pingTaskProgress stopAnimation:self];
-	[pingButton setTitle:pingRunning?@"Stop":@"Send Ping"];
 }
 
 - (void) ipNumberChanged:(NSNotification*)aNote
@@ -128,20 +159,26 @@
 	[ipNumberComboBox setStringValue:[model IPNumber]];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+#pragma mark •••Actions
+
+- (void) selectedStateAction:(id)sender
+{
+	[model setSelectedState:[sender indexOfSelectedItem]];	
+}
+
+- (void) selectedChannelAction:(id)sender
+{
+	[model setSelectedChannel:[sender indexOfSelectedItem]];	
+}
+
+- (void) passwordFieldAction:(id)sender
+{
+	[model setPassword:[sender stringValue]];	
+}
 
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORBootBarModelLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) ping:(id)sender
-{
-	@try {
-		[model ping];
-	}
-	@catch (NSException* localException) {
-	}
 }
 
 - (IBAction) ipNumberAction:(id)sender
@@ -149,17 +186,18 @@
 	[model setIPNumber:[sender stringValue]];
 }
 
-- (IBAction) updateAction:(id)sender
-{
-	[model updateAllValues];
-}
-
 - (IBAction) clearHistoryAction:(id)sender
 {
 	[model clearHistory];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
+- (IBAction) sendNewStateAction:(id)sender
+{
+	if([model selectedState])[model turnOnOutlet:[model selectedChannel]];
+	else [model turnOffOutlet:[model selectedChannel]];
+}
+
+#pragma mark •••Data Source
 - (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
 	return  [model connectionHistoryCount];
@@ -170,30 +208,54 @@
 	return [model connectionHistoryItem:index];
 }
 
-
-- (IBAction) powerAction:(id)sender
-{
-	BOOL pwr = [model power];
-
-	NSBeginAlertSheet([NSString stringWithFormat:@"Turn MPod HV Crate %@",pwr?@"OFF":@"ON"],
-					  @"YES/Do it NOW",
-					  @"Cancel",
-					  nil,
-					  [self window],
-					  self,
-					  @selector(_powerSheetDidEnd:returnCode:contextInfo:),
-					  nil,
-					  nil,
-					  @"Really turn MPod HV Crate Power %@?",pwr?@"OFF":@"ON");
-}
-
 @end
 
-@implementation ORBootBarController (private)
-- (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+@implementation BootBarStateView
+- (id) initWithFrame:(NSRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+		onLight = [[ORDotImage bigDotWithColor:[NSColor greenColor]] retain];
+		[onLight setScalesWhenResized:YES];
+		[onLight setSize:NSMakeSize(15,15)];
+		offLight = [[ORDotImage bigDotWithColor:[NSColor redColor]] retain];
+		 [offLight setScalesWhenResized:YES];
+		 [offLight setSize:NSMakeSize(15,15)];
+   }
+    return self;
+}
+
+- (void) dealloc
 {
-	if(returnCode == NSAlertDefaultReturn){
-		[model togglePower];
+    [offLight release];
+    [onLight release];
+    [super dealloc];
+}
+
+- (void) setStateMask:(unsigned char)aMask
+{
+    stateMask = aMask;
+    [self setNeedsDisplay:YES];
+}
+
+- (void)drawRect:(NSRect)rect 
+{    
+    [super drawRect:rect];
+    NSRect frame = [self bounds];
+    NSRect sourceRect = NSMakeRect(0,0,[onLight size].width,[onLight size].height);
+	int i;
+	for(i=0;i<8;i++){
+		BOOL state = stateMask & (1<<i);
+		if(state){
+			[onLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+		}
+		else {
+			[offLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+		}
+		if(i<5)frame.origin.x += 22;
+		else frame.origin.x += 21;
+		if(i == 3)frame.origin.x += 64;
 	}
 }
+
 @end
+

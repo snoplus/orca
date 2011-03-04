@@ -21,19 +21,33 @@
 #pragma mark •••Imported Files
 #import "ORMPodProtocol.h"
 
-@interface ORBootBarModel :  OrcaObject <ORMPodProtocol>
+@class NetSocket;
+
+@interface ORBootBarModel :  OrcaObject
 {
 	NSMutableArray*	connectionHistory;
 	unsigned		ipNumberIndex;
 	NSString*		IPNumber;
 	NSTask*			pingTask;
 	NSMutableDictionary* systemParams;
-	NSOperationQueue* queue;
 	BOOL			oldPower;
+    BOOL			isConnected;
+	NetSocket*		socket;
+	NSMutableArray* cmdQueue;
+	BOOL			outletStatus[8];
+    NSString*		password;
+    NSString*		pendingCmd;
+    int				selectedChannel;
+    int				selectedState;
 }
 
 #pragma mark ***Accessors
-- (BOOL) power;
+- (int) selectedState;
+- (void) setSelectedState:(int)aSelectedState;
+- (int) selectedChannel;
+- (void) setSelectedChannel:(int)aSelectedChannel;
+- (NSString*) password;
+- (void) setPassword:(NSString*)aPassword;
 - (void) initConnectionHistory;
 - (void) clearHistory;
 - (unsigned) connectionHistoryCount;
@@ -41,41 +55,33 @@
 - (unsigned) ipNumberIndex;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;
-- (void) updateAllValues;
-- (NSArray*) systemUpdateList;
-- (void) processSystemResponseArray:(NSArray*)response;
-- (int) systemParamAsInt:(NSString*)name;
-- (id) systemParam:(NSString*)name;
-- (void) togglePower;
+- (NetSocket*) socket;
+- (void) setSocket:(NetSocket*)aSocket;
+- (BOOL) isConnected;
+- (void) setIsConnected:(BOOL)aFlag;
+- (void) connect;
+- (BOOL) outletStatus:(int)i;
+- (void) setOutlet:(int)i status:(BOOL)aValue;
+- (BOOL) isBusy;
 
 #pragma mark •••Hardware Access
-- (void) ping;
-- (BOOL) pingTaskRunning;
-- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
-- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
-- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
 - (void) pollHardware;
-- (void) pollHardwareAfterDelay;
+- (void) turnOnOutlet:(int)i;
+- (void) turnOffOutlet:(int)i;
+- (void) getStatus;
+
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
-extern NSString* ORBootBarModelCrateStatusChanged;
+
+extern NSString* ORBootBarModelSelectedStateChanged;
+extern NSString* ORBootBarModelSelectedChannelChanged;
+extern NSString* ORBootBarModelPasswordChanged;
 extern NSString* ORBootBarModelLock;
-extern NSString* ORBootBarPingTask;
 extern NSString* BootBarIPNumberChanged;
-extern NSString* ORBootBarModelSystemParamsChanged;
+extern NSString* ORBootBarModelIsConnectedChanged;
+extern NSString* ORBootBarModelStatusChanged;
+extern NSString* ORBootBarModelBusyChanged;
 
-@interface NSObject (ORMpodCModel)
-- (void) precessReadResponseArray:(NSArray*)response;
-- (void) processSystemResponseArray:(NSArray*)response;
-
-@end
-
-@interface ORBootBarUpdateOp : NSOperation
-{
-	id delegate;
-}
-- (id) initWithDelegate:(id)aDelegate;
-- (void) dealloc;
-- (void) main;
-@end

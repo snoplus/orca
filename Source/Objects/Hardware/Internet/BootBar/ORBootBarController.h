@@ -21,38 +21,58 @@
 #import "OrcaObjectController.h"
 #import "ORBootBarController.h"
 
+@class BootBarStateView;
+@class ORDotImage;
+
 @interface ORBootBarController : OrcaObjectController 
 {
-	IBOutlet NSButton*			  lockButton;
-	IBOutlet NSTextField*		  opTimeField;
-	IBOutlet NSTextField*		  serialNumberField;
-	IBOutlet NSTextField*		  crateStatusField;
-	IBOutlet NSTextField*		  cratePowerStateField;
-	IBOutlet NSComboBox*		  ipNumberComboBox;
-	IBOutlet NSButton*			  pingButton;
-	IBOutlet NSProgressIndicator* pingTaskProgress;
-	IBOutlet NSButton*			  cratePowerButton;
+	IBOutlet NSButton*		lockButton;
+	IBOutlet NSButton*		sendButton;
+	IBOutlet NSButton*		clrHistoryButton;
+	IBOutlet NSPopUpButton* selectedStatePU;
+	IBOutlet NSPopUpButton* selectedChannelPU;
+	IBOutlet NSSecureTextField* passwordField;
+	IBOutlet NSComboBox*	ipNumberComboBox;
+	IBOutlet BootBarStateView* stateView;
+	IBOutlet NSTextField*   busyField;
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (id)	 init;
 - (void) registerNotificationObservers;
 - (void) awakeFromNib;
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
-- (void) systemStateChanged:(NSNotification*)aNote;
+- (void) selectedStateChanged:(NSNotification*)aNote;
+- (void) selectedChannelChanged:(NSNotification*)aNote;
+- (void) passwordChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) pingTaskChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
 - (void) updateButtons;
+- (void) outletStatusChanged:(NSNotification*)aNote;
+- (void) busyStateChanged:(NSNotification*)aNote;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
-- (IBAction) ping:(id)sender;
+#pragma mark •••Actions
+- (IBAction) selectedStateAction:(id)sender;
+- (IBAction) selectedChannelAction:(id)sender;
+- (IBAction) passwordFieldAction:(id)sender;
 - (IBAction) ipNumberAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) updateAction:(id)sender;
 - (IBAction) clearHistoryAction:(id)sender;
-- (IBAction) powerAction:(id)sender;
+- (IBAction) sendNewStateAction:(id)sender;
 
+@end
+
+
+@interface BootBarStateView : NSView {
+    ORDotImage* onLight;
+    ORDotImage* offLight;
+    unsigned char stateMask;
+}
+
+- (id)   initWithFrame:(NSRect)frame;
+- (void) dealloc;
+- (void) setStateMask:(unsigned char)aState;
+- (void) drawRect:(NSRect)rect;
 @end

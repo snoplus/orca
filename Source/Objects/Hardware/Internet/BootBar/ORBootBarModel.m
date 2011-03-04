@@ -20,25 +20,36 @@
 
 #pragma mark •••Imported Files
 #import "ORBootBarModel.h"
-#import "ORTaskSequence.h"
-#import "ORSNMP.h"
+#import "NetSocket.h"
 
-NSString* ORBootBarModelCrateStatusChanged	 = @"ORBootBarModelCrateStatusChanged";
+#define kBootBarPort 9100
+
+NSString* ORBootBarModelSelectedStateChanged = @"ORBootBarModelSelectedStateChanged";
+NSString* ORBootBarModelSelectedChannelChanged = @"ORBootBarModelSelectedChannelChanged";
+NSString* ORBootBarModelPasswordChanged		 = @"ORBootBarModelPasswordChanged";
 NSString* ORBootBarModelLock				 = @"ORBootBarModelLock";
-NSString* ORBootBarPingTask					 = @"ORBootBarPingTask";
 NSString* BootBarIPNumberChanged			 = @"BootBarIPNumberChanged";
-NSString* ORBootBarModelSystemParamsChanged	 = @"ORBootBarModelSystemParamsChanged";
+NSString* ORBootBarModelIsConnectedChanged	 = @"ORBootBarModelIsConnectedChanged";
+NSString* ORBootBarModelStatusChanged		 = @"ORBootBarModelStatusChanged";
+NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
+
+@interface ORBootBarModel (private)
+- (void) sendCmd;
+- (void) setPendingCmd:(NSString*)aCmd;
+- (void) timeout;
+@end
 
 @implementation ORBootBarModel
 
 - (void) dealloc
 {
-	[queue cancelAllOperations];
-	[queue release];
-	[systemParams release];
-	[connectionHistory release];
+	[pendingCmd release];
+    [password release];
+	[socket close];
+    [socket setDelegate:nil];
+	[socket release];
+ 	[connectionHistory release];
     [IPNumber release];
-	[queue removeObserver:self forKeyPath:@"operations"];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[super dealloc];
 }
@@ -47,23 +58,15 @@ NSString* ORBootBarModelSystemParamsChanged	 = @"ORBootBarModelSystemParamsChang
 {
     if([self aWake])return;
     [super wakeUp];
-	if(!queue){
-		queue = [[NSOperationQueue alloc] init];
-		[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-		[queue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
-	}
-	[self pollHardwareAfterDelay];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
 }
 
 - (void) sleep
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[queue removeObserver:self forKeyPath:@"operations"];
-	[queue cancelAllOperations];
-	[queue release];
-	queue = nil;
 	[super sleep];
 }
+
 
 #pragma mark •••Initialization
 - (void) makeMainController
@@ -76,7 +79,6 @@ NSString* ORBootBarModelSystemParamsChanged	 = @"ORBootBarModelSystemParamsChang
     [self setImage:[NSImage imageNamed:@"BootBar"]];
 }
 
-
 - (void) initConnectionHistory
 {
 	ipNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.IPNumberIndex",[self className]]];
@@ -88,21 +90,43 @@ NSString* ORBootBarModelSystemParamsChanged	 = @"ORBootBarModelSystemParamsChang
 }
 
 #pragma mark ***Accessors
-- (BOOL) power
+- (int) selectedState
 {
-    return [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
+    return selectedState;
 }
 
-- (id) systemParam:(NSString*)name
+- (void) setSelectedState:(int)aSelectedState
 {
-	id result =  [[systemParams objectForKey:name] objectForKey:@"Value"];
-	if(result)return result;
-	else return @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedState:selectedState];
+    selectedState = aSelectedState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelSelectedStateChanged object:self];
 }
 
-- (int) systemParamAsInt:(NSString*)name
+- (int) selectedChannel
 {
-	return [[[systemParams objectForKey:name] objectForKey:@"Value"] intValue];
+    return selectedChannel;
+}
+
+- (void) setSelectedChannel:(int)aSelectedChannel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:selectedChannel];
+    selectedChannel = aSelectedChannel;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelSelectedChannelChanged object:self];
+}
+
+- (NSString*) password
+{
+    return password;
+}
+
+- (void) setPassword:(NSString*)aPassword
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPassword:password];
+    
+    [password autorelease];
+    password = [aPassword copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelPasswordChanged object:self];
 }
 
 - (void) clearHistory
@@ -159,151 +183,137 @@ NSString* ORBootBarModelSystemParamsChanged	 = @"ORBootBarModelSystemParamsChang
 
 - (void) pollHardware
 {
-	//	ORMPodCUpdateOp* anUpdateOp = [[ORMPodCUpdateOp alloc] initWithDelegate:self];
-	//	[queue addOperation:anUpdateOp];
-	//	[anUpdateOp release];
-}
-
-- (void) pollHardwareAfterDelay
-{
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:2];
+	if(![self isBusy])[self getStatus];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:30];
 }
 
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
-                         change:(NSDictionary *)change context:(void *)context
+- (NetSocket*) socket
 {
-    if (object == queue && [keyPath isEqual:@"operations"]) {
-        if ([[queue operations] count] == 0) {
-			[self performSelectorOnMainThread:@selector(pollHardwareAfterDelay) withObject:nil waitUntilDone:NO];
-        }
-		
-    }
-    else {
-        [super observeValueForKeyPath:keyPath ofObject:object 
-                               change:change context:context];
-    }
-}
-- (void) updateAllValues
-{
-	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:)];
+	return socket;
 }
 
-- (NSArray*) systemUpdateList
+- (void) setSocket:(NetSocket*)aSocket
 {
-	NSArray* systemReadParams = [NSArray arrayWithObjects:
-								 @"sysMainSwitch",
-								 @"sysStatus",	
-								 @"psSerialNumber",
-								 @"psOperatingTime",
-								 nil];
-	NSMutableArray* convertedArray = [NSMutableArray array];
-	for(id aParam in systemReadParams){
-		[convertedArray addObject:[aParam stringByAppendingString:@".0"]];
-	}
-	return convertedArray;
+	if(aSocket != socket)[socket close];
+	[aSocket retain];
+	[socket release];
+	socket = aSocket;
+    [socket setDelegate:self];
 }
 
-- (void) processSystemResponseArray:(NSArray*)response
+- (void) setIsConnected:(BOOL)aFlag
 {
-	for(id anEntry in response){
-		if(!systemParams)systemParams = [[NSMutableDictionary dictionary] retain];
-		NSString* error = [anEntry objectForKey:@"Error"];
-		if([error length]){
-			if([error rangeOfString:@"Timeout"].location != NSNotFound){
-				[systemParams release];
-				systemParams = nil; 
-				//time so flush the queue
-				[queue cancelAllOperations];
-				NSLogError(@"TimeOut",[NSString stringWithFormat:@"BootBar %d\n",[self uniqueIdNumber]],nil);
-			}
-		}
-		else {
-			NSString* name  = [anEntry objectForKey:@"Name"];
-			if(name)[systemParams setObject:anEntry forKey:name];
-		}
-	}
+    isConnected = aFlag;
 	
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelSystemParamsChanged object:self];
-	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelIsConnectedChanged object:self];
 }
 
-- (void) togglePower
+- (void) connect
 {
-	//NSString* cmd = [NSString stringWithFormat:@"sysMainSwitch.0 i %d",![self power]];
-	//	[[self adapter] writeValue:cmd target:self selector:@selector(processSystemResponseArray:)];
-}
-
-#pragma mark •••Hardware Access
-- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
-{
-	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector];
-}
-
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
-{
-	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"BOOT-BAR-MIB"];
-	[ss openPublicSession:IPNumber];
-	NSArray* response = [ss readValues:cmds];
-	[aTarget performSelectorOnMainThread:aSelector withObject:response waitUntilDone:YES];
-	[ss release];
-}
-
-- (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
-{
-	[self writeValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector];
-}
-
-- (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
-{
-	ORSNMP* ss = [[ORSNMP alloc] initWithMib:@"BOOT-BAR-MIB"];
-	[ss openGuruSession:IPNumber];
-	NSArray* response = [ss writeValues:cmds];
-	[aTarget performSelectorOnMainThread:aSelector withObject:response waitUntilDone:YES];
-	[ss release];
-}
-
-#pragma mark •••Tasks
-- (void) taskFinished:(NSTask*)aTask
-{
-	if(aTask == pingTask){
-		[pingTask release];
-		pingTask = nil;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarPingTask object:self];
-	}
-}
-
-- (void) ping
-{
-	if(!pingTask){
-		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		pingTask = [[NSTask alloc] init];
-		
-		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil]];
-		
-		[aSequence addTaskObj:pingTask];
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-		[aSequence launch];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarPingTask object:self];
+	if(!isConnected && [IPNumber length]){
+		[self setSocket:[NetSocket netsocketConnectedToHost:IPNumber port:kBootBarPort]];	
+        [self setIsConnected:[socket isConnected]];
 	}
 	else {
-		[pingTask terminate];
+		[self setSocket:nil];	
+        [self setIsConnected:[socket isConnected]];
 	}
 }
 
-- (BOOL) pingTaskRunning
+- (BOOL) isConnected
 {
-	return pingTask != nil;
-}
-- (void) tasksCompleted:(id)sender
-{
+	return isConnected;
 }
 
-- (void) taskData:(NSString*)text
+- (void) turnOnOutlet:(int) i
 {
+	if([password length]){
+		NSString* cmd = [NSString stringWithFormat:@"%c%@%dON\r",0x1B,password,i+1];
+		[self setPendingCmd:cmd];
+	}
+}
+
+- (void) turnOffOutlet:(int) i
+{
+	if([password length]){
+		NSString* cmd = [NSString stringWithFormat:@"%c%@%dOFF\r",0x1B,password,i+1];
+		[self setPendingCmd:cmd];
+	}
+}
+
+- (void) getStatus
+{
+	if([password length]){
+		NSString* cmd = [NSString stringWithFormat:@"%c%@?\r",0x1B,password];
+		[self setPendingCmd:cmd];
+	}
+}
+
+- (BOOL) outletStatus:(int)i
+{
+	if(i>=0 && i<8)return outletStatus[i];
+	else return NO;
+}
+
+- (void) setOutlet:(int)i status:(BOOL)aValue
+{
+	if(i>=0 && i<8){
+		[[[self undoManager] prepareWithInvocationTarget:self] setOutlet:i status:outletStatus[i]];
+		outletStatus[i] = aValue;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelStatusChanged object:self userInfo:userInfo];
+	}
+}
+
+#pragma mark ***Delegate Methods
+- (void) netsocketConnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIsConnected:[socket isConnected]];
+		[self sendCmd];
+    }
+}
+
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+{
+    if(inNetSocket == socket){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(connect) object:nil];
+		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
+		NSArray* lines = [theString componentsSeparatedByString:@"\n\r"];
+		for(NSString* anOutlet in lines){
+			if([anOutlet length] >= 4){
+				NSArray* parts = [anOutlet componentsSeparatedByString:@" "];
+				if([parts count]>=2){
+					int index = [[parts objectAtIndex:0] intValue];
+					if([[parts objectAtIndex:1] isEqualToString:@"ON"]){
+						[self setOutlet:index-1 status:YES];
+					}
+					else if([[parts objectAtIndex:1] isEqualToString:@"OFF"]){
+						[self setOutlet:index-1 status:NO];
+					}
+				}
+			}
+		}
+		[self disconnect];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	}
+}
+
+- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+		
+		[self setIsConnected:NO];
+		[socket autorelease];
+		socket = nil;
+		[self setPendingCmd:nil];
+    }
+}
+
+- (BOOL) isBusy
+{
+	return pendingCmd != nil;
 }
 
 #pragma mark ***Archival
@@ -314,7 +324,10 @@ NSString* ORBootBarModelSystemParamsChanged	 = @"ORBootBarModelSystemParamsChang
 	
 	[self initConnectionHistory];
 	
-	[self setIPNumber:		[decoder decodeObjectForKey:@"IPNumber"]];
+	[self setSelectedState:[decoder decodeIntForKey:@"selectedState"]];
+	[self setSelectedChannel:[decoder decodeIntForKey:@"selectedChannel"]];
+	[self setPassword:	[decoder decodeObjectForKey:@"password"]];
+	[self setIPNumber:	[decoder decodeObjectForKey:@"IPNumber"]];
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
@@ -322,31 +335,43 @@ NSString* ORBootBarModelSystemParamsChanged	 = @"ORBootBarModelSystemParamsChang
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
+ 	[encoder encodeInt:selectedState forKey:@"selectedState"];
+ 	[encoder encodeInt:selectedChannel forKey:@"selectedChannel"];
+ 	[encoder encodeObject:password		forKey:@"password"];
  	[encoder encodeObject:IPNumber		forKey:@"IPNumber"];
 }
-
 @end
 
-@implementation ORBootBarUpdateOp
-- (id) initWithDelegate:(id)aDelegate
+@implementation ORBootBarModel (private)
+- (void) sendCmd
 {
-	self = [super init];
-	delegate = [aDelegate retain];
-    return self;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	const char* bytes = [pendingCmd cStringUsingEncoding:NSASCIIStringEncoding];
+	[socket write:bytes length:[pendingCmd length]];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];	
 }
-
-- (void) dealloc
+		 
+- (void) timeout
 {
-	[delegate release];
-	[super dealloc];
+	if([self isConnected]){
+		[self disconnect];
+	}
+	else [self setPendingCmd:nil];
 }
-
-- (void) main
+		 
+- (void) setPendingCmd:(NSString*)aCmd
 {
-	@try {
-		[delegate updateAllValues];
+	if(!aCmd){
+		[pendingCmd release];
+		pendingCmd = nil;
 	}
-	@catch(NSException* e){
+	else if(![self isBusy]){
+		[pendingCmd release];
+		pendingCmd = [aCmd copy];
+		[self connect];
 	}
+	else NSLog(@"Boot Bar cmd ignored -- busy\n");
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelBusyChanged object:self];
 }
 @end
+
