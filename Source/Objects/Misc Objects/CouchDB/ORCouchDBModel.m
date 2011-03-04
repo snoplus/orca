@@ -59,6 +59,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) postRunTime:(NSNotification*)aNote;
 - (void) postRunOptions:(NSNotification*)aNote;
 - (void) updateRunState:(ORRunModel*)rc;
+- (void) periodicCompact;
 @end
 
 @implementation ORCouchDBModel
@@ -90,6 +91,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[self createDatabase];
 		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:1];
 		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:2];
+		[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
     }
     [super wakeUp];
 }
@@ -379,7 +381,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 					[aResult prettyPrint:@"CouchDB Message:"];
 				}
 				else if([aTag isEqualToString:kCompactDB]){
-					[aResult prettyPrint:@"CouchDB Compacted:"];
+					//[aResult prettyPrint:@"CouchDB Compacted:"];
 				}
 				else {
 					[aResult prettyPrint:@"CouchDB"];
@@ -404,6 +406,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	NSString* theTime = [NSString stringWithFormat:@"%@",[NSDate date]];
 	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:@"123",@"Run",theTime,@"Time",nil];
 	[db updateDocument:aDictionary documentId:@"idtest" tag:kDocumentUpdated];
+}
+
+- (void) periodicCompact
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(periodicCompact) object:nil];
+	[self compactDatabase];
+	[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:600];
 }
 
 - (void) compactDatabase
