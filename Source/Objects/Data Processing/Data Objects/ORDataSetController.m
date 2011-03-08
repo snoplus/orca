@@ -57,7 +57,9 @@
     [super setModel:aModel];
     if(inited){
 		[self removeSubPlotViews];
-		[[self window] setTitle:[model shortName]];
+        NSString* windowTitle = [model shortName];
+        if(windowTitle)[[self window] setTitle:windowTitle];
+        else [[self window] setTitle:@"---"];
 		[self modelChanged:nil];
 		[self setUpViews];
     }
