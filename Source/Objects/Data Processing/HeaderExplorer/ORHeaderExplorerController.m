@@ -102,7 +102,9 @@
 			NSArray* objects = [[model document] collectObjectsOfClass:NSClassFromString(@"ORDataExplorerModel")];
 			if([objects count]){
 				ORDataExplorerModel* explorer = [objects objectAtIndex:0]; //just use the first one
+                [[self undoManager] disableUndoRegistration];
 				[explorer setFileToExplore:selectedObj];
+                [[self undoManager] enableUndoRegistration];
 				[explorer makeMainController];
 				[explorer parseFile];
 			}
