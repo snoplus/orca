@@ -2574,6 +2574,12 @@
 		EFCC4547117FD45E008DC12C /* ORSNOCrateDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */; };
 		EFCE3ADF123DD9A2009AEBA8 /* ORXL3Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = EFCE3ADD123DD9A2009AEBA8 /* ORXL3Decoders.h */; };
 		EFCE3AE0123DD9A2009AEBA8 /* ORXL3Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */; };
+		EFEBD8921327588F00C96C86 /* ORXLGPSController.h in Headers */ = {isa = PBXBuildFile; fileRef = EFEBD88C1327588F00C96C86 /* ORXLGPSController.h */; };
+		EFEBD8931327588F00C96C86 /* ORXLGPSController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFEBD88D1327588F00C96C86 /* ORXLGPSController.m */; };
+		EFEBD8941327588F00C96C86 /* ORXLGPSModel.h in Headers */ = {isa = PBXBuildFile; fileRef = EFEBD88E1327588F00C96C86 /* ORXLGPSModel.h */; };
+		EFEBD8951327588F00C96C86 /* ORXLGPSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = EFEBD88F1327588F00C96C86 /* ORXLGPSModel.m */; };
+		EFEBD8961327588F00C96C86 /* XLGPS.nib in Resources */ = {isa = PBXBuildFile; fileRef = EFEBD8901327588F00C96C86 /* XLGPS.nib */; };
+		EFEBD8971327588F00C96C86 /* XLGPSIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = EFEBD8911327588F00C96C86 /* XLGPSIcon.tif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -5224,6 +5230,12 @@
 		EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSNOCrateDecoders.m; sourceTree = "<group>"; };
 		EFCE3ADD123DD9A2009AEBA8 /* ORXL3Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL3Decoders.h; sourceTree = "<group>"; };
 		EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXL3Decoders.m; sourceTree = "<group>"; };
+		EFEBD88C1327588F00C96C86 /* ORXLGPSController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXLGPSController.h; sourceTree = "<group>"; };
+		EFEBD88D1327588F00C96C86 /* ORXLGPSController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXLGPSController.m; sourceTree = "<group>"; };
+		EFEBD88E1327588F00C96C86 /* ORXLGPSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXLGPSModel.h; sourceTree = "<group>"; };
+		EFEBD88F1327588F00C96C86 /* ORXLGPSModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXLGPSModel.m; sourceTree = "<group>"; };
+		EFEBD8901327588F00C96C86 /* XLGPS.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = XLGPS.nib; sourceTree = "<group>"; };
+		EFEBD8911327588F00C96C86 /* XLGPSIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = XLGPSIcon.tif; sourceTree = "<group>"; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
 		F51E695503AE4775015F64B1 /* ORAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAppDelegate.h; sourceTree = "<group>"; };
 		F51E695603AE4775015F64B1 /* ORAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAppDelegate.m; sourceTree = "<group>"; };
@@ -9152,6 +9164,7 @@
 				84B28D4D0F4C658400E2B056 /* NplHV */,
 				84B28D590F4C658400E2B056 /* NPLCommBoard */,
 				84B28D600F4C658400E2B056 /* NplPicoCoulombMeter */,
+				EFEBD88B1327588F00C96C86 /* SymmetricomXLGPS */,
 			);
 			name = Internet;
 			path = Source/Objects/Hardware/Internet;
@@ -10885,6 +10898,19 @@
 			path = SNOP;
 			sourceTree = "<group>";
 		};
+		EFEBD88B1327588F00C96C86 /* SymmetricomXLGPS */ = {
+			isa = PBXGroup;
+			children = (
+				EFEBD88C1327588F00C96C86 /* ORXLGPSController.h */,
+				EFEBD88D1327588F00C96C86 /* ORXLGPSController.m */,
+				EFEBD88E1327588F00C96C86 /* ORXLGPSModel.h */,
+				EFEBD88F1327588F00C96C86 /* ORXLGPSModel.m */,
+				EFEBD8901327588F00C96C86 /* XLGPS.nib */,
+				EFEBD8911327588F00C96C86 /* XLGPSIcon.tif */,
+			);
+			path = SymmetricomXLGPS;
+			sourceTree = "<group>";
+		};
 		F51E693F03AE4775015F64B1 /* Source */ = {
 			isa = PBXGroup;
 			children = (
@@ -12223,6 +12249,8 @@
 				8494C1371317E2E200151E7B /* ORCouchDB.h in Headers */,
 				8494C1391317E2E200151E7B /* ORSqlConnection.h in Headers */,
 				8494C13B1317E2E200151E7B /* ORSqlResult.h in Headers */,
+				EFEBD8921327588F00C96C86 /* ORXLGPSController.h in Headers */,
+				EFEBD8941327588F00C96C86 /* ORXLGPSModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12265,6 +12293,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -12996,6 +13025,8 @@
 				8494C0231316CEBA00151E7B /* BootBar.nib in Resources */,
 				8494C0241316CEBA00151E7B /* BootBar.tif in Resources */,
 				8494C0751316D3C400151E7B /* BootBarBig.tif in Resources */,
+				EFEBD8961327588F00C96C86 /* XLGPS.nib in Resources */,
+				EFEBD8971327588F00C96C86 /* XLGPSIcon.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13870,6 +13901,8 @@
 				8494C1381317E2E200151E7B /* ORCouchDB.m in Sources */,
 				8494C13A1317E2E200151E7B /* ORSqlConnection.m in Sources */,
 				8494C13C1317E2E200151E7B /* ORSqlResult.m in Sources */,
+				EFEBD8931327588F00C96C86 /* ORXLGPSController.m in Sources */,
+				EFEBD8951327588F00C96C86 /* ORXLGPSModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
