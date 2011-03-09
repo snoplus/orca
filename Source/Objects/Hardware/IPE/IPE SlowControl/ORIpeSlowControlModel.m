@@ -292,7 +292,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 			NSLog(@"level %i -> %@ (setpoint %@) \n", level, key,[obj objectForKey: @"Setpoint"]);
 		}
 		#endif
-		NSMutableString *nextLevelString=[aString mutableCopy];
+		NSMutableString *nextLevelString=[[aString mutableCopy] autorelease];
 		switch(level){
 		    case 0: //URL
 				[nextLevelString appendString:[NSString stringWithFormat:@"%@services/control.php?target=send",key]];
@@ -314,12 +314,11 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 			[self traverseTree:obj level:level+1 requestString:nextLevelString requestStringList:requestStringList];
 		}else{
 			//NSLog(@" Setpoint:%@   \n", [obj objectForKey: @"Setpoint"]);
-		}
-		
+		}		
 	}
 	
 	if(level==4){
-		NSMutableString *nextLevelString=[aString mutableCopy];
+		NSMutableString *nextLevelString=[[aString mutableCopy]autorelease];
 		[nextLevelString appendString:[NSString stringWithFormat:@"&control_mask="]];
 		for (i = 0; i < count; i++) {
 			id key = keys[i];
@@ -351,7 +350,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 		NSDictionary *obj= objx;
 		int count;
 		NSString *path = [obj objectForKey:@"Path"];
-		NSArray* components;
+		NSArray* components = nil;
 		if([path isEqual:@"/"] || ([path length]==0)) count = 0;
 		else {
 			components = [path componentsSeparatedByString:@"/"];
@@ -512,7 +511,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (id) connectionHistoryItem:(unsigned)index
 {
-	if(connectionHistory && index>=0 && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
+	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
