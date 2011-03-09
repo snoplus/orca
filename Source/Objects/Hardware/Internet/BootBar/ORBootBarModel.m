@@ -144,7 +144,7 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 
 - (id) connectionHistoryItem:(unsigned)index
 {
-	if(connectionHistory && index>=0 && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
+	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
@@ -267,6 +267,19 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 }
 
 #pragma mark ***Delegate Methods
+/*
+ The boot bar communication sequence is rather strange. Once a connection is made a command must be sent before some short timeout has expired. Once a command is sent, no other commands will be accepted and the socket will close after a timeout. If two commands are sent while the socket is open, the device will hang and have to be rebooted via telenet. To prevent this from happening, we close the socket immediatelhy after receiving a command response. While the socke is open we do not allow any other commands from being sent. 
+ 
+ The sequence is:
+ - set pending command
+ - open socket
+ - sent the command
+ - receive the response
+ - clear the pending command
+ - close the socket.
+ 
+ If a pending command exists the system is assumed to be 'busy' and new commands are ignored.
+ */
 - (void) netsocketConnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
