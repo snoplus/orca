@@ -130,6 +130,7 @@
 		if(getFifoFlagsFromDecodeStage)  {
 			if(fifoFlags != oldFifoFlags[chan]){
 				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+				fifoFlags = oldFifoFlags[chan];
 			}
 	}	
 }
@@ -305,6 +306,7 @@ startIndex=traceStart16;
 		if(getFifoFlagsFromDecodeStage){
 			if(fifoFlags != oldFifoFlags[chan]){
 				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+				fifoFlags = oldFifoFlags[chan];
 			}
 		}
 	}
