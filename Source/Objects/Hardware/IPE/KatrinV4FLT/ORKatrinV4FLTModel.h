@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark •••Imported Files
 #import "ORIpeCard.h"
 #import "ORIpeV4FLTModel.h"
 #import "ORIpeV4SLTModel.h"
@@ -29,7 +29,7 @@
 #import "ORAdcInfoProviding.h"
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Forward Definitions
+#pragma mark •••Forward Definitions
 @class ORDataPacket;
 @class ORTimeRate;
 @class ORTestSuit;
@@ -85,96 +85,27 @@
 @interface ORKatrinV4FLTModel : ORIpeV4FLTModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     // Hardware configuration
-#if 0  //the following members are already defined for IpeV4FLT, we add only new members of KatrinV4FLT (see at the end) -tb-
-    int				fltRunMode;		//!< Run modes: 0=standby, 1=standard, 2=histogram, 3=test
-    NSMutableArray* thresholds;     //!< Array to keep the threshold of all 24 channel
-    NSMutableArray* gains;			//!< Aarry to keep the gains
-    unsigned long	triggerEnabledMask;	//!< mask to keep the activated channel for the trigger
-	unsigned long	hitRateEnabledMask;	//!< mask to store the activated trigger rate measurement
-    unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
-	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
-	unsigned long	hitRateId;
-	unsigned long	histogramId;
-	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (1..32 seconds)
-	float			hitRate[kNumV4FLTChannels];	//!< Actual value of the trigger rate measurement
-	BOOL			hitRateOverFlow[kNumV4FLTChannels];	//!< Overflow of hardware trigger rate register
-	float			hitRateTotal;	//!< Sum trigger rate of all channels 
-	
-	BOOL			firstTime;		//!< Event loop: Flag to identify the first readout loop for initialization purpose
-	
-	ORTimeRate*		totalRate;
-    int				analogOffset;
-	unsigned long   statisticOffset; //!< Offset guess used with by the hardware statistical evaluation
-	unsigned long   statisticN;		 //!< Number of samples used for statistical evaluation
-	unsigned long   eventMask;		 //!<Bits set for last channels hit.
-	
-	//testing
-	NSMutableArray* testStatusArray;
-	NSMutableArray* testEnabledArray;
-	BOOL testsRunning;
-	ORTestSuit* testSuit;
-	int savedMode;
-	int savedLed;
-	BOOL usingPBusSimulation;
-    BOOL ledOff;
-    unsigned long interruptMask;
-	    
-	// Register information (low level tab)
-    unsigned short  selectedRegIndex;
-    unsigned long   writeValue;
-    unsigned long   selectedChannelValue;
-    // fields for event readout
-    int fifoBehaviour;
-    unsigned long postTriggerTime;
-    int gapLength;
-    int filterLength;
-    BOOL storeDataInRam;
-    BOOL runBoxCarFilter;
-    BOOL readWaveforms;
-    int runMode;        //!< This is the daqRunMode (not the fltRunMode on the hardware).
-    
-    // fields for histogram readout
-    unsigned long histRecTime;  //!<the histogram refresh time
-    unsigned long histMeasTime; //!<the per-cycle second counter
-    unsigned long histNofMeas;  //!<number of histo measurement cycles (0..63)
-    unsigned long histEMin;     //!< the energy offset of the histogram
-    unsigned long histEBin;     //!<the bin size setting (histBinWidth = 2^histEBin)
-    int histMaxEnergy;
-    int histMode;
-    int histClrMode;
-    unsigned long histFirstEntry;
-    unsigned long histLastEntry;
-    int histPageAB;
-	
-	BOOL noiseFloorRunning;
-	int noiseFloorState;
-	long noiseFloorOffset;
-    int targetRate;
-	long noiseFloorLow[kNumV4FLTChannels];
-	long noiseFloorHigh[kNumV4FLTChannels];
-	long noiseFloorTestValue[kNumV4FLTChannels];
-	BOOL oldEnabled[kNumV4FLTChannels];
-	long oldThreshold[kNumV4FLTChannels];
-	long newThreshold[kNumV4FLTChannels];
-	
-	unsigned long eventCount[kNumV4FLTChannels];
-#endif
 	unsigned long	energyTraceId;		//!< Id used to identify energy+trace data set (general data set - for sync, skipped trace readout etc. - FLT rev. xxxx,2121)
 
     int shipSumHistogram;
     int vetoOverlapTime;
     int nfoldCoincidence;
     int fifoLength;
+	
+	BOOL activateDebuggingDisplays;
+	unsigned char fifoFlags[kNumV4FLTChannels];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
+#pragma mark •••Initialization
 - (id) init;
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
 - (short) getNumberRegisters;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark •••Accessors
+- (BOOL) activateDebuggingDisplays;
+- (void) setActivateDebuggingDisplays:(BOOL)aState;
 - (int) fifoLength;
 - (void) setFifoLength:(int)aFifoLength;
 - (int) nfoldCoincidence;
@@ -293,8 +224,7 @@
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
 - (float) restrictFloatValue:(int)aValue min:(float)aMinValue max:(float)aMaxValue;
 
-
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Access
+#pragma mark •••HW Access
 //all can raise exceptions
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel;
 - (unsigned long) regAddress:(int)aReg;
@@ -359,6 +289,9 @@
 - (void) eventMask:(unsigned long)aMask;
 - (NSString*) boardTypeName:(int)aType;
 - (NSString*) fifoStatusString:(int)aType;
+- (unsigned char) fifoFlags:(short)aChan;
+- (void) setFifoFlags:(short)aChan withValue:(unsigned char)aChan;
+- (NSString*) fifoFlagString:(short)aChan;
 
 /** Enable the statistic evaluation of sum and sum square of the 
  * ADC signals in all channels.  */
@@ -374,20 +307,21 @@
 - (unsigned long) eventCount:(int)aChannel;
 - (void)		  clearEventCounts;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
+- (BOOL) setFromDecodeStage:(short)aChan fifoFlags:(unsigned char)flags;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Archival
+#pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (NSDictionary*) dataRecordDescription;
 - (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
+#pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Wizard
+#pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
@@ -463,9 +397,11 @@ extern NSString* ORKatrinV4FLTSettingsLock;
 extern NSString* ORKatrinV4FLTModelEventMaskChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorOffsetChanged;
+extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 
 extern NSString* ORIpeSLTModelName;
 
 extern NSString* ORKatrinV4FLTSelectedRegIndexChanged;
 extern NSString* ORKatrinV4FLTWriteValueChanged;
 extern NSString* ORKatrinV4FLTSelectedChannelValueChanged;
+extern NSString* ORKatrinV4FLTModeFifoFlagsChanged;

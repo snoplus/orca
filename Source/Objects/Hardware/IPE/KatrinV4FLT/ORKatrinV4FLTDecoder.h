@@ -18,36 +18,30 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORIpeCardDecoder.h"
+#import "ORKatrinV4FLTDefs.h"
 
 @class ORDataSet;
-
-@interface ORKatrinV4FLTDecoderForWaveForm : ORIpeCardDecoder {
-	@private 
-		BOOL getRatesFromDecodeStage;
-		NSMutableDictionary* actualFlts;
-}
-// Documentation in m-file
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
-
-
-@interface ORKatrinV4FLTDecoderForEnergyTrace : ORIpeCardDecoder {
-	@private 
-		BOOL getRatesFromDecodeStage;
-		NSMutableDictionary* actualFlts;
-}
-// Documentation in m-file
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
-
 @interface ORKatrinV4FLTDecoderForEnergy : ORIpeCardDecoder {
-	@private 
-		BOOL getRatesFromDecodeStage;
-		NSMutableDictionary* actualFlts;
+@protected
+	BOOL getRatesFromDecodeStage;
+    BOOL getFifoFlagsFromDecodeStage;
+    unsigned char oldFifoFlags[kNumV4FLTChannels];
+	NSMutableDictionary* actualFlts;
+}
+
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORKatrinV4FLTDecoderForWaveForm : ORKatrinV4FLTDecoderForEnergy {
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORKatrinV4FLTDecoderForEnergyTrace : ORKatrinV4FLTDecoderForEnergy {
 }
 // Documentation in m-file
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;

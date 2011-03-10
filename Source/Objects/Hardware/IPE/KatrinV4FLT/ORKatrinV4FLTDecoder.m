@@ -22,7 +22,6 @@
 #import "ORKatrinV4FLTModel.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
-#import "ORKatrinV4FLTDefs.h"
 #import "SLTv4_HW_Definitions.h"
 
 @implementation ORKatrinV4FLTDecoderForEnergy
@@ -61,6 +60,7 @@
 {
     self = [super init];
     getRatesFromDecodeStage = YES;
+    getFifoFlagsFromDecodeStage = YES;
     return self;
 }
 
@@ -77,6 +77,7 @@
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
+	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
 	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
 	unsigned short filterDiv;
 	unsigned long histoLen;
@@ -111,7 +112,7 @@
 			   withKeys:@"FLT", @"Total Crate Energy", crateKey,nil];
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage || getFifoFlagsFromDecodeStage){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
@@ -125,7 +126,10 @@
 				}
 			}
 		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan];
+		if(getRatesFromDecodeStage)    getRatesFromDecodeStage     = [obj bumpRateFromDecodeStage:chan];
+		if(fifoFlags != oldFifoFlags[chan]){
+			getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+		}
 	}
     return length; //must return number of longs processed.
 }
@@ -195,19 +199,6 @@
  <pre>  
  */ 
 //-------------------------------------------------------------
-- (id) init
-{
-    self = [super init];
-    getRatesFromDecodeStage = YES;
-    return self;
-}
-
-- (void) dealloc
-{
-	[actualFlts release];
-    [super dealloc];
-}
-
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
@@ -217,6 +208,7 @@
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
+	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
@@ -293,7 +285,7 @@ startIndex=traceStart16;
 				  withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage || getFifoFlagsFromDecodeStage){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
@@ -307,7 +299,12 @@ startIndex=traceStart16;
 				}
 			}
 		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan];
+		if(getRatesFromDecodeStage)    getRatesFromDecodeStage     = [obj bumpRateFromDecodeStage:chan];
+		if(getFifoFlagsFromDecodeStage){
+			if(fifoFlags != oldFifoFlags[chan]){
+				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+			}
+		}
 	}
 	
 										
@@ -396,20 +393,6 @@ startIndex=traceStart16;
  <pre>  
  */ 
 //-------------------------------------------------------------
-- (id) init
-{
-    self = [super init];
-    getRatesFromDecodeStage = YES;
-    return self;
-}
-
-- (void) dealloc
-{
-	[actualFlts release];
-    [super dealloc];
-}
-
-
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 
@@ -418,6 +401,7 @@ startIndex=traceStart16;
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
+	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
@@ -494,7 +478,7 @@ startIndex=traceStart16;
 				  withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
 
 	//get the actual object
-	if(getRatesFromDecodeStage){
+	if(getRatesFromDecodeStage || getFifoFlagsFromDecodeStage){
 		NSString* fltKey = [crateKey stringByAppendingString:stationKey];
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
@@ -508,7 +492,10 @@ startIndex=traceStart16;
 				}
 			}
 		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan];
+		if(getRatesFromDecodeStage)    getRatesFromDecodeStage     = [obj bumpRateFromDecodeStage:chan];
+		if(fifoFlags != oldFifoFlags[chan]){
+			getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+		}
 	}
 	
 										

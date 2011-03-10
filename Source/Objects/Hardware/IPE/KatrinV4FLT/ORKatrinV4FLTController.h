@@ -82,6 +82,7 @@
 	
 		IBOutlet NSMatrix*		vetoHitRateEnabledCBs;
 		IBOutlet NSMatrix*		vetoTriggerEnabledCBs;
+		IBOutlet NSButton*		activateDebuggerCB;
 
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
@@ -123,8 +124,10 @@
 		IBOutlet NSButton*				startNoiseFloorButton;
 		IBOutlet NSProgressIndicator*	noiseFloorProgress;
 		IBOutlet NSTextField*			noiseFloorStateField2;
-		
+	
+		IBOutlet NSMatrix*				fifoDisplayMatrix;		
 };
+
 #pragma mark •••Initialization
 - (id)   init;
 - (void) dealloc;
@@ -135,6 +138,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) activateDebuggerDisplaysChanged:(NSNotification*)aNote;
 - (void) fifoLengthChanged:(NSNotification*)aNote;
 - (void) nfoldCoincidenceChanged:(NSNotification*)aNote;
 - (void) vetoOverlapTimeChanged:(NSNotification*)aNote;
@@ -186,8 +190,10 @@
 - (void) selectedRegIndexChanged:(NSNotification*) aNote;
 - (void) writeValueChanged:(NSNotification*) aNote;
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
+- (void) fifoFlagsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) activateDebuggingDisplayAction:(id)sender;
 - (IBAction) fifoLengthPUAction:(id)sender;
 - (IBAction) nfoldCoincidencePUAction:(id)sender;
 - (IBAction) vetoOverlapTimePUAction:(id)sender;

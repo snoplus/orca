@@ -83,7 +83,10 @@
 	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
-	
+	int i;
+	for(i=0;i<kNumV4FLTChannels;i++){
+		[[fifoDisplayMatrix cellAtRow:i column:0] setTag:i];
+	}
 	[self populatePullDown];
 	[self updateWindow];
 
@@ -333,10 +336,24 @@
                          name : ORKatrinV4FLTModelFifoLengthChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(activateDebuggerDisplaysChanged:)
+                         name : ORKatrinV4FLTModelActivateDebuggingDisplaysChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(fifoFlagsChanged:)
+                         name : ORKatrinV4FLTModeFifoFlagsChanged
+						object: model];
+	
 }
 
 #pragma mark •••Interface Management
-
+- (void) activateDebuggerDisplaysChanged:(NSNotification*)aNote
+{
+	[activateDebuggerCB setIntValue: [model activateDebuggingDisplays]];
+	[fifoDisplayMatrix setHidden: ![model activateDebuggingDisplays]];
+}
 - (void) fifoLengthChanged:(NSNotification*)aNote
 {
 	//NSLog(@"%@::%@: fifoLength is %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fifoLength]);//-tb-NSLog-tb-
@@ -479,7 +496,7 @@
     [channelPopUp removeAllItems];
     
 	// Populate the register popup
-    for (i = 0; i < 24; i++) {
+	for(i=0;i<kNumV4FLTChannels;i++){
         [channelPopUp insertItemWithTitle: [NSString stringWithFormat: @"%i",i+1 ] atIndex:i];
         [[channelPopUp itemAtIndex:i] setTag: i];
     }
@@ -534,6 +551,8 @@
 	[self vetoOverlapTimeChanged:nil];
 	[self nfoldCoincidenceChanged:nil];
 	[self fifoLengthChanged:nil];
+	[self activateDebuggerDisplaysChanged:nil];
+	[self fifoFlagsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -621,6 +640,20 @@
     
     //TODO: extend the accesstype to "channel" and "block64" -tb-
     [channelPopUp setEnabled: needsChannel];
+}
+
+- (void) fifoFlagsChanged:(NSNotification*)aNote
+{
+	if(!aNote){
+		int i;
+		for(i=0;i<kNumV4FLTChannels;i++){
+			[[fifoDisplayMatrix cellWithTag:i] setStringValue:[model fifoFlagString:i]];
+		}
+	}
+	else {
+		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+		[[fifoDisplayMatrix cellWithTag:chan] setStringValue:[model fifoFlagString:chan]];
+	}
 }
 
 - (void) noiseFloorChanged:(NSNotification*)aNote
@@ -894,33 +927,39 @@
 
 #pragma mark •••Actions
 
-- (void) fifoLengthPUAction:(id)sender
+- (IBAction) fifoLengthPUAction:(id)sender
 {
 	[model setFifoLength:[fifoLengthPU indexOfSelectedItem]];	
 }
 
-- (void) nfoldCoincidencePUAction:(id)sender
+- (IBAction) nfoldCoincidencePUAction:(id)sender
 {
 	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model setNfoldCoincidence:[sender indexOfSelectedItem]];	
 }
 
 
-- (void) vetoOverlapTimePUAction:(id)sender
+- (IBAction) vetoOverlapTimePUAction:(id)sender
 {
 	[model setVetoOverlapTime:[vetoOverlapTimePU indexOfSelectedItem]];	
 }
 
-- (void) shipSumHistogramPUAction:(id)sender
+- (IBAction) shipSumHistogramPUAction:(id)sender
 {
 	//[model setShipSumHistogram:[sender intValue]];	
 	[model setShipSumHistogram:[[shipSumHistogramPU selectedItem] tag]];
 }
 
-- (void) targetRateAction:(id)sender
+- (IBAction) targetRateAction:(id)sender
 {
 	[model setTargetRate:[sender intValue]];	
 }
+
+- (IBAction) activateDebuggingDisplayAction:(id)sender
+{
+    [model setActivateDebuggingDisplays:[sender intValue]];
+}
+
 
 - (IBAction) openNoiseFloorPanel:(id)sender
 {

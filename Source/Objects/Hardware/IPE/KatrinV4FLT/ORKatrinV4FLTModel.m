@@ -81,6 +81,8 @@ NSString* ORKatrinV4FLTWriteValueChanged				= @"ORKatrinV4FLTWriteValueChanged";
 NSString* ORKatrinV4FLTSelectedChannelValueChanged		= @"ORKatrinV4FLTSelectedChannelValueChanged";
 NSString* ORKatrinV4FLTNoiseFloorChanged				= @"ORKatrinV4FLTNoiseFloorChanged";
 NSString* ORKatrinV4FLTNoiseFloorOffsetChanged			= @"ORKatrinV4FLTNoiseFloorOffsetChanged";
+NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged = @"ORKatrinV4FLTModelActivateDebuggingDisplaysChanged";
+NSString* ORKatrinV4FLTModeFifoFlagsChanged				= @"ORKatrinV4FLTModeFifoFlagsChanged";
 
 static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 	@"Run Mode",
@@ -238,6 +240,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark •••Accessors
+- (BOOL) activateDebuggingDisplays {return activateDebuggingDisplays;}
+- (void) setActivateDebuggingDisplays:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setActivateDebuggingDisplays:activateDebuggingDisplays];
+    activateDebuggingDisplays = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelActivateDebuggingDisplaysChanged object:self];
+}
 
 - (int) fifoLength
 {
@@ -1359,63 +1368,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [self setNfoldCoincidence:[decoder decodeIntForKey:@"nfoldCoincidence"]];
     [self setVetoOverlapTime:[decoder decodeIntForKey:@"vetoOverlapTime"]];
     [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
+    [self setActivateDebuggingDisplays:[decoder decodeBoolForKey:@"activateDebuggingDisplays"]];
 	
-#if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
-    [self setTargetRate:[decoder decodeIntForKey:@"targetRate"]];
-    [self setHistClrMode:		[decoder decodeIntForKey:@"histClrMode"]];
-    [self setHistMode:			[decoder decodeIntForKey:@"histMode"]];
-    [self setHistEBin:			[decoder decodeInt32ForKey:@"histEBin"]];
-    [self setHistEMin:			[decoder decodeInt32ForKey:@"histEMin"]];
-	[self setRunMode:			[decoder decodeIntForKey:@"runMode"]];
-    [self setRunBoxCarFilter:	[decoder decodeBoolForKey:@"runBoxCarFilter"]];
-    [self setStoreDataInRam:	[decoder decodeBoolForKey:@"storeDataInRam"]];
-    [self setFilterLength:		[decoder decodeIntForKey:@"filterLength"]];
-    [self setGapLength:			[decoder decodeIntForKey:@"gapLength"]];
-    [self setHistNofMeas:		[decoder decodeInt32ForKey:@"histNofMeas"]];
-    [self setHistMeasTime:		[decoder decodeInt32ForKey:@"histMeasTime"]];
-    [self setPostTriggerTime:	[decoder decodeInt32ForKey:@"postTriggerTime"]];
-    [self setFifoBehaviour:		[decoder decodeIntForKey:@"fifoBehaviour"]];
-    [self setAnalogOffset:		[decoder decodeIntForKey:@"analogOffset"]];
-    [self setInterruptMask:		[decoder decodeInt32ForKey:@"interruptMask"]];
-    [self setHitRateEnabledMask:[decoder decodeInt32ForKey:@"hitRateEnabledMask"]];
-    [self setTriggerEnabledMask:[decoder decodeInt32ForKey:@"triggerEnabledMask"]];
-    [self setHitRateLength:		[decoder decodeIntForKey:@"ORKatrinV4FLTModelHitRateLength"]];
-    [self setGains:				[decoder decodeObjectForKey:@"gains"]];
-    [self setThresholds:		[decoder decodeObjectForKey:@"thresholds"]];
-    [self setTotalRate:			[decoder decodeObjectForKey:@"totalRate"]];
-	[self setTestEnabledArray:	[decoder decodeObjectForKey:@"testsEnabledArray"]];
-	[self setTestStatusArray:	[decoder decodeObjectForKey:@"testsStatusArray"]];
-    [self setWriteValue:		[decoder decodeIntForKey:@"writeValue"]];
-    [self setSelectedRegIndex:  [decoder decodeIntForKey:@"selectedRegIndex"]];
-    [self setSelectedChannelValue:  [decoder decodeIntForKey:@"selectedChannelValue"]];
-	
-	int i;
-	if(!thresholds){
-		[self setThresholds: [NSMutableArray array]];
-		for(i=0;i<kNumV4FLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
-	}
-	if([thresholds count]<kNumV4FLTChannels){
-		for(i=[thresholds count];i<kNumV4FLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
-	}
-	
-	if(!gains){
-		[self setGains: [NSMutableArray array]];
-		for(i=0;i<kNumV4FLTChannels;i++) [gains addObject:[NSNumber numberWithInt:100]];
-	}
-	if([gains count]<kNumV4FLTChannels){
-		for(i=[gains count];i<kNumV4FLTChannels;i++) [gains addObject:[NSNumber numberWithInt:50]];
-	}
-	
-	if(!testStatusArray){
-		[self setTestStatusArray: [NSMutableArray array]];
-		for(i=0;i<kNumKatrinV4FLTTests;i++) [testStatusArray addObject:@"--"];
-	}
-	
-	if(!testEnabledArray){
-		[self setTestEnabledArray: [NSMutableArray array]];
-		for(i=0;i<kNumKatrinV4FLTTests;i++) [testEnabledArray addObject:[NSNumber numberWithBool:YES]];
-	}
-#endif
 	
     [[self undoManager] enableUndoRegistration];
 	
@@ -1430,37 +1384,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [encoder encodeInt:nfoldCoincidence forKey:@"nfoldCoincidence"];
     [encoder encodeInt:vetoOverlapTime forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram forKey:@"shipSumHistogram"];
-	
-#if 0  //this is still in super class ORIpeV4FLTModel, some should move here -tb-	
-    [encoder encodeInt:targetRate			forKey:@"targetRate"];
-    [encoder encodeInt:histClrMode			forKey:@"histClrMode"];
-    [encoder encodeInt:histMode				forKey:@"histMode"];
-    [encoder encodeInt32:histEBin			forKey:@"histEBin"];
-    [encoder encodeInt32:histEMin			forKey:@"histEMin"];
-    [encoder encodeInt:runMode				forKey:@"runMode"];
-    [encoder encodeBool:runBoxCarFilter		forKey:@"runBoxCarFilter"];
-    [encoder encodeBool:storeDataInRam		forKey:@"storeDataInRam"];
-    [encoder encodeInt:filterLength			forKey:@"filterLength"];
-    [encoder encodeInt:gapLength			forKey:@"gapLength"];
-    [encoder encodeInt32:histNofMeas		forKey:@"histNofMeas"];
-    [encoder encodeInt32:histMeasTime		forKey:@"histMeasTime"];
-    [encoder encodeInt32:histRecTime		forKey:@"histRecTime"];
-    [encoder encodeInt32:postTriggerTime	forKey:@"postTriggerTime"];
-    [encoder encodeInt:fifoBehaviour		forKey:@"fifoBehaviour"];
-    [encoder encodeInt:analogOffset			forKey:@"analogOffset"];
-    [encoder encodeInt32:interruptMask		forKey:@"interruptMask"];
-    [encoder encodeInt32:hitRateEnabledMask	forKey:@"hitRateEnabledMask"];
-    [encoder encodeInt32:triggerEnabledMask	forKey:@"triggerEnabledMask"];
-    [encoder encodeInt:hitRateLength		forKey:@"ORKatrinV4FLTModelHitRateLength"];
-    [encoder encodeObject:gains				forKey:@"gains"];
-    [encoder encodeObject:thresholds		forKey:@"thresholds"];
-    [encoder encodeObject:totalRate			forKey:@"totalRate"];
-    [encoder encodeObject:testEnabledArray	forKey:@"testEnabledArray"];
-    [encoder encodeObject:testStatusArray	forKey:@"testStatusArray"];
-    [encoder encodeInt:writeValue           forKey:@"writeValue"];	
-    [encoder encodeInt:selectedRegIndex  	forKey:@"selectedRegIndex"];	
-    [encoder encodeInt:selectedChannelValue	forKey:@"selectedChannelValue"];	
-#endif
+    [encoder encodeBool:activateDebuggingDisplays forKey:@"activateDebuggingDisplays"];
 }
 
 #pragma mark Data Taking
@@ -1616,6 +1540,47 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	}
     return YES;
 }
+- (BOOL) setFromDecodeStage:(short)aChan fifoFlags:(unsigned char)flags
+{
+    if(!activateDebuggingDisplays)return NO;
+    
+    if(aChan>=0 && aChan<kNumV4FLTChannels){
+        [self setFifoFlags:aChan withValue:flags];
+    }
+    return YES;
+}
+
+- (unsigned char) fifoFlags:(short)aChan
+{
+    if(aChan>=0 && aChan<kNumV4FLTChannels){
+        return fifoFlags[aChan];
+    }
+    else return 0;
+}
+
+- (NSString*) fifoFlagString:(short)aChan
+{
+	if(aChan>=0 && aChan<kNumV4FLTChannels){
+		switch (fifoFlags[aChan]){
+			case 0x8: return @"FF";
+			case 0x4: return @"AF";
+			case 0x2: return @"AE";
+			case 0x1: return @"EF";
+			default: return @" ";
+		}
+	}
+	else return @" ";
+}
+
+- (void) setFifoFlags:(short)aChan withValue:(unsigned char)aValue
+{
+    if(aChan>=0 && aChan<kNumV4FLTChannels){
+        fifoFlags[aChan] = aValue;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModeFifoFlagsChanged object:self userInfo:userInfo];
+    }    
+}
+
 
 - (unsigned long) eventCount:(int)aChannel
 {
