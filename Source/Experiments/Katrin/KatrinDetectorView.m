@@ -73,6 +73,7 @@
 				float sw = [s size].width;
 				float sh = [s size].height;
 				[s drawAtPoint:NSMakePoint(crateX + i*dx + (dx/2.- sw/2.),crateY-sh)];
+                [s release];
 			}
 		}
 	}
