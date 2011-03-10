@@ -127,10 +127,12 @@
 			}
 		}
 		if(getRatesFromDecodeStage)    getRatesFromDecodeStage     = [obj bumpRateFromDecodeStage:chan];
-		if(fifoFlags != oldFifoFlags[chan]){
-			getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
-		}
-	}
+		if(getFifoFlagsFromDecodeStage)  {
+			if(fifoFlags != oldFifoFlags[chan]){
+				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+			}
+	}	
+}
     return length; //must return number of longs processed.
 }
 
@@ -493,9 +495,11 @@ startIndex=traceStart16;
 			}
 		}
 		if(getRatesFromDecodeStage)    getRatesFromDecodeStage     = [obj bumpRateFromDecodeStage:chan];
-		if(fifoFlags != oldFifoFlags[chan]){
-			getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
-		}
+		if(getFifoFlagsFromDecodeStage)  {
+			if(fifoFlags != oldFifoFlags[chan]){
+				getFifoFlagsFromDecodeStage = [obj setFromDecodeStage:chan fifoFlags:fifoFlags];
+			}
+		}	
 	}
 	
 										
