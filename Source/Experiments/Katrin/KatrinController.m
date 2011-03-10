@@ -95,7 +95,7 @@
 	[[secondaryColorScale colorAxis] setNeedsDisplay:YES];
 
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
-	[aPlot setUseConstantColor:YES];
+	[aPlot setLineColor:[NSColor blueColor]];
 	[ratePlot addPlot: aPlot];
 	[aPlot release];
 	
