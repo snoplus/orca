@@ -19,10 +19,18 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+@class NetSocket;
 
 @interface ORXLGPSModel : OrcaObject
 {
-
+	NSMutableArray*		connectionHistory;
+	NSUInteger		IPNumberIndex;
+	NSString*		IPNumber;
+	NSString*		userName;
+	NSString*		password;
+	NSUInteger		timeOut;
+	NSTask*			pingTask;
+	NetSocket*		socket;
 }
 
 #pragma mark •••Initialization
@@ -32,15 +40,36 @@
 - (void) makeMainController;
 - (void) wakeUp;
 - (void) sleep;
+- (void) initConnectionHistory;
 
 #pragma mark •••Accessors
+@property (copy)	NSString*	IPNumber;
+@property (assign)	NSUInteger	IPNumberIndex;
+@property (copy)	NSString*	userName;
+@property (copy)	NSString*	password;
+@property (assign)	NSUInteger	timeOut;
+
+- (void) clearConnectionHistory;
+- (unsigned) connectionHistoryCount;
+- (id) connectionHistoryItem:(unsigned)index;
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Hardware Access
+//connect
+//disconnect
+//disconnectDate
+
 #pragma mark •••Basic Ops
 #pragma mark •••Composite
 
+
 @end
 
+extern NSString* ORXLGPSModelLock;
+extern NSString* ORXLGPSIPNumberChanged;
+extern NSString* ORXLGPSModelUserNameChanged;
+extern NSString* ORXLGPSModelPasswordChanged;
+extern NSString* ORXLGPSModelTimeOutChanged;

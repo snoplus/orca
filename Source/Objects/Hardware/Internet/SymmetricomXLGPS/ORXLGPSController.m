@@ -20,6 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "ORXLGPSController.h"
+#import "ORXLGPSModel.h"
 
 @implementation ORXLGPSController
 
@@ -39,89 +40,153 @@
 
 - (void) awakeFromNib
 {
-/*
-	basicSize	= NSMakeSize(452,290);
-	compositeSize	= NSMakeSize(452,510);
-	blankView = [[NSView alloc] init];
-	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-*/
 	[super awakeFromNib];
-
-/*
-	NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]]; //uniqueIdNumber?
-	int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
-	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
-
-	[tabView selectTabViewItemAtIndex: index];
-	[self populateOps];
-	[self populatePullDown];
-*/
+	[ipNumberComboBox reloadData];
 	[self updateWindow];
 }	
 
-- (void) setModel:(id)aModel
-{
-	[super setModel:aModel];
-//	if(aModel) [[self window] setTitle:[model shortName]];
-	//[self setDriverInfo];
-}
-
-
-#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
-//	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[super registerNotificationObservers];
 
-/*
 	[notifyCenter addObserver : self
-			 selector : @selector(linkConnectionChanged:)
-			     name : XL3_LinkConnectionChanged
-			    object: [model xl3Link]];
-*/
+			 selector : @selector(lockChanged:)
+			     name : ORRunStatusChangedNotification
+			   object : nil];
+	
+	[notifyCenter addObserver : self
+			 selector : @selector(lockChanged:)
+			     name : ORXLGPSModelLock
+			    object: nil];
+	
+	[notifyCenter addObserver : self
+			 selector : @selector(ipNumberChanged:)
+			     name : ORXLGPSIPNumberChanged
+			   object : model];
+	
+	[notifyCenter addObserver : self
+			 selector : @selector(userChanged:)
+			     name : ORXLGPSModelUserNameChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(passwordChanged:)
+			     name : ORXLGPSModelPasswordChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(timeOutChanged:)
+			     name : ORXLGPSModelTimeOutChanged
+			   object : model];
 }
 
+
+#pragma mark •••Interface Management
 - (void) updateWindow
 {
 	[super updateWindow];
+	
+	[self lockChanged:nil];
+	[self ipNumberChanged:nil];
+	[self userChanged:nil];
+	[self passwordChanged:nil];
+	[self timeOutChanged:nil];
 }
 
 - (void) checkGlobalSecurity
 {
-//	BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-//	[gSecurity setLock:[model gpsLockName] to:secure];
-//	[lockButton setEnabled:secure];
+	BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+	[gSecurity setLock:ORXLGPSModelLock to:secure];
+	[lockButton setEnabled:secure];
+	[self updateButtons];
 }
 
-/*
-- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
+- (void) lockChanged:(NSNotification*)aNote
+{   
+	BOOL locked = [gSecurity isLocked:ORXLGPSModelLock];
+	[lockButton setState: locked];
+	[self updateButtons];
+}
+
+- (void) updateButtons
 {
-	if([tabView indexOfTabViewItem:item] == 0){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:tabView];
-	}
-	else if([tabView indexOfTabViewItem:item] == 1){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:compositeSize];
-		[[self window] setContentView:tabView];
-	}
-	else if([tabView indexOfTabViewItem:item] == 2){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:tabView];
-	}
-	else if([tabView indexOfTabViewItem:item] == 3){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:basicSize];
-		[[self window] setContentView:tabView];
-	}
+	BOOL locked	= [gSecurity isLocked:ORXLGPSModelLock];
+	//BOOL busy	= NO; //[model isBusy];
 
- NSString* key = [NSString stringWithFormat: @"orca.ORXL3%d.selectedtab",[model crateNumber]];
-	int index = [tabView indexOfTabViewItem:item];
-	[[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+	[ipNumberComboBox setEnabled: !locked];
+	[clrHistoryButton setEnabled: !locked];
+	[userField setEnabled: !locked];
+	[passwordField setEnabled: !locked];
+	[timeOutPU setEnabled: !locked];
+	//[sendButton setEnabled: !locked && !busy];
 }
-*/
 
-#pragma mark •••Interface Management
+- (void) ipNumberChanged:(NSNotification*)aNote
+{
+	[ipNumberComboBox setStringValue:[model IPNumber]];
+}
+
+- (void) userChanged:(NSNotification*)aNote
+{
+	[userField setStringValue: [model userName]];
+}
+
+- (void) passwordChanged:(NSNotification*)aNote
+{
+	[passwordField setStringValue: [model password]];
+}
+
+- (void) timeOutChanged:(NSNotification*)aNote
+{
+	[timeOutPU selectItemWithTag:[model timeOut]];
+}
+
+
+#pragma mark •••Actions
+- (IBAction) lockAction:(id) sender
+{
+	[gSecurity tryToSetLock:ORXLGPSModelLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) opsAction:(id) sender
+{
+}
+
+- (IBAction) ipNumberAction:(id)sender
+{
+	[model setIPNumber:[sender stringValue]];
+}
+
+- (IBAction) clearHistoryAction:(id)sender
+{
+	[model clearConnectionHistory];
+}
+
+- (IBAction) userFieldAction:(id)sender
+{
+	[model setUserName:[sender stringValue]];	
+}
+
+- (IBAction) passwordFieldAction:(id)sender
+{
+	[model setPassword:[sender stringValue]];	
+}
+
+- (IBAction) timeOutAction:(id)sender
+{
+	[model setTimeOut:[[sender selectedItem] tag]];
+}
+
+#pragma mark •••Data Source
+- (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+{
+	return  [model connectionHistoryCount];
+}
+
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
+{
+	return [model connectionHistoryItem:index];
+}
+
 @end

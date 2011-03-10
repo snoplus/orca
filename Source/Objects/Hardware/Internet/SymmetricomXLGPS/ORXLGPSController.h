@@ -23,23 +23,47 @@
 @interface ORXLGPSController : OrcaObjectController
 {
 	IBOutlet NSButton*		lockButton;
+	//telnet
+	IBOutlet NSComboBox*		ipNumberComboBox;
+	IBOutlet NSButton*		clrHistoryButton;
+	IBOutlet NSTextField*		userField;
+	IBOutlet NSSecureTextField*	passwordField;
+	IBOutlet NSButton*		telnetPingButton;	
+	IBOutlet NSProgressIndicator*	telnetPingPI;
+	IBOutlet NSButton*		telnetTestButton;	
+	IBOutlet NSProgressIndicator*	telnetTestPI;
+	IBOutlet NSPopUpButton*		timeOutPU;
 	//basic
-	
+	//ppo	
 }	
 
 #pragma mark •••Initialization
 - (id) init;
 - (void) dealloc;
 - (void) awakeFromNib;
-- (void) setModel:(id)aModel;
-
-#pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) updateWindow;
-- (void) checkGlobalSecurity;
 
 #pragma mark •••Interface Management
+- (void) updateWindow;
+- (void) checkGlobalSecurity;
+- (void) lockChanged:(NSNotification*)aNote;
+- (void) updateButtons;
+- (void) ipNumberChanged:(NSNotification*)aNote;
+- (void) userChanged:(NSNotification*)aNote;
+- (void) passwordChanged:(NSNotification*)aNote;
+- (void) timeOutChanged:(NSNotification*)aNote;
+
 #pragma mark •••Helper
 
 #pragma mark •••Actions
+- (IBAction) lockAction:(id) sender;
+- (IBAction) opsAction:(id) sender;
+//telnet
+- (IBAction) ipNumberAction:(id)sender;
+- (IBAction) clearHistoryAction:(id)sender;
+- (IBAction) userFieldAction:(id)sender;
+- (IBAction) passwordFieldAction:(id)sender;
+- (IBAction) timeOutAction:(id)sender;
+//basic
+//ppo
 @end
