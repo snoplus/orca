@@ -21,7 +21,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="875"/>
+			<integer value="1187"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -4685,8 +4685,8 @@ Z2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</bytes>
 																						<reference key="NSBackgroundColor" ref="279876502"/>
 																						<reference key="NSTextColor" ref="257064742"/>
 																					</object>
-																					<int key="NSSelectedRow">3</int>
-																					<reference key="NSSelectedCell" ref="313956562"/>
+																					<int key="NSSelectedRow">-1</int>
+																					<int key="NSSelectedCol">-1</int>
 																					<reference key="NSBackgroundColor" ref="279876502"/>
 																					<reference key="NSCellBackgroundColor" ref="279876502"/>
 																				</object>
@@ -8018,11 +8018,11 @@ Z2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</bytes>
 																</object>
 															</object>
 														</object>
-														<string key="NSFrame">{{1, 1}, {126, 38}}</string>
+														<string key="NSFrame">{{1, 1}, {123, 38}}</string>
 														<reference key="NSSuperview" ref="266083385"/>
 													</object>
 												</object>
-												<string key="NSFrame">{{445, 101}, {128, 54}}</string>
+												<string key="NSFrame">{{440, 102}, {125, 54}}</string>
 												<reference key="NSSuperview" ref="1072289978"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
@@ -19368,6 +19368,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<string>3898.IBPluginDependency</string>
 					<string>3898.IBViewBoundsToFrameTransform</string>
 					<string>3899.IBPluginDependency</string>
+					<string>3901.IBViewBoundsToFrameTransform</string>
 					<string>3903.IBPluginDependency</string>
 					<string>3930.IBViewBoundsToFrameTransform</string>
 					<string>565.IBPluginDependency</string>
@@ -21205,6 +21206,9 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 						<bytes key="NSTransformStruct">P4AAAL+AAABD54AAwwIAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUPQgABCygAAA</bytes>
+					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABDbQAAw/aAAA</bytes>
