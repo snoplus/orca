@@ -108,6 +108,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[self removeMachineName];
+	[[ORSqlDBQueue queue] waitUntilAllOperationsAreFinished];
 	[super sleep];
 }
 
