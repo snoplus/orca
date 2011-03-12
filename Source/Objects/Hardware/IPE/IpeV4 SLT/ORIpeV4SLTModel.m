@@ -469,9 +469,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runIsAboutToStart:(NSNotification*)aNote
 {
-	if([readOutGroup count] == 0){//TODO: I don't understand this -tb-
-		[self initBoard];
-	}	
 }
 
 - (void) runIsStopped:(NSNotification*)aNote
