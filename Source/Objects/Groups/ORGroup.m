@@ -112,9 +112,15 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     [[self undoManager] disableUndoRegistration];
     
     [self setOrcaObjects:[[[NSMutableArray alloc]init] autorelease]];
-    NSMutableArray* someObjects = [decoder decodeObjectForKey:ORGroupObjects];
-    if(someObjects)[self addObjects:someObjects];
-    
+	NSMutableArray* someObjects;
+	@try {
+		someObjects = [decoder decodeObjectForKey:ORGroupObjects];
+		if(someObjects)[self addObjects:someObjects];
+    }
+	@catch (NSException* e) {
+		NSLogColor([NSColor redColor],@"%@\n",e);
+		[e raise];
+	}
     [[self undoManager] enableUndoRegistration];
     return self;
 }
