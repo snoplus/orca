@@ -28,7 +28,6 @@
 #import "ORProcessCenter.h"
 #import "ORUSB.h"
 
-//#import "NKDPostgreSQLConnection.h"
 #import "ORTaskMaster.h"
 #import "ORHWWizardController.h"
 #import "ORCommandCenter.h"
@@ -168,23 +167,6 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	 object:self];
     
 }
-
-/*- (NKDPostgreSQLConnection*) dbConnection
- {
- return dbConnection;
- }
- 
- - (void) setDbConnection:(NKDPostgreSQLConnection*)aConnection
- {
- [aConnection retain];
- [dbConnection release];
- dbConnection = aConnection;
- }
- */
-
-
-
-
 
 - (void) assignUniqueIDNumber:(id)objToGetID
 {

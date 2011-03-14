@@ -30,15 +30,12 @@
 @class OrcaObjectController;
 @class OrcaObject;
 
-//@class NKDPostgreSQLConnection;
-
 
 @interface ORDocument : NSDocument
 {
     @private
         ORGroup*	    group;
         NSString*	    statusText;
-        //NKDPostgreSQLConnection* dbConnection;
         NSMutableArray* orcaControllers;
         int				scaleFactor;
 		SEL				afterSaveSelector;
@@ -60,9 +57,6 @@
 - (NSMutableArray*) orcaControllers;
 - (void) setOrcaControllers:(NSMutableArray*)newOrcaControllers;
 - (BOOL) documentCanBeChanged;
-
-//- (NKDPostgreSQLConnection*) dbConnection;
-//- (void) :(NKDPostgreSQLConnection*)aConnection;
 
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol;
