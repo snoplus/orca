@@ -1712,6 +1712,9 @@
 		849DE73808F6F1FA0052AFC6 /* ORMacController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DE72D08F6F1FA0052AFC6 /* ORMacController.m */; };
 		849DE73908F6F1FA0052AFC6 /* ORMacModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DE72E08F6F1FA0052AFC6 /* ORMacModel.h */; };
 		849DE73A08F6F1FA0052AFC6 /* ORMacModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DE72F08F6F1FA0052AFC6 /* ORMacModel.m */; };
+		849E7495132E5466001BF64C /* ORCAEN1724Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 849E7493132E5466001BF64C /* ORCAEN1724Readout.hh */; };
+		849E7497132E5500001BF64C /* ORCAEN1724Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 849E7492132E5466001BF64C /* ORCAEN1724Readout.cc */; };
+		849E7498132E5500001BF64C /* ORCAEN1724Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 849E7493132E5466001BF64C /* ORCAEN1724Readout.hh */; };
 		849E7C930B69570700353D50 /* ADU200.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849E7C920B69570700353D50 /* ADU200.tif */; };
 		849E7C990B6957BF00353D50 /* ADU200.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849E7C940B6957BF00353D50 /* ADU200.nib */; };
 		849E7C9A0B6957BF00353D50 /* ORADU200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 849E7C950B6957BF00353D50 /* ORADU200Controller.h */; };
@@ -2682,6 +2685,8 @@
 				43ADFEBC10B6E2090044617C /* ORCAEN419Readout.hh in VME_Copy */,
 				43ADFEBD10B6E2090044617C /* ORCAEN1720Readout.cc in VME_Copy */,
 				43ADFEBE10B6E2090044617C /* ORCAEN1720Readout.hh in VME_Copy */,
+				849E7497132E5500001BF64C /* ORCAEN1724Readout.cc in VME_Copy */,
+				849E7498132E5500001BF64C /* ORCAEN1724Readout.hh in VME_Copy */,
 				4342D59411ECB8AD007EFFB1 /* ORCAEN775Readout.cc in VME_Copy */,
 				4342D5F311ECC4D0007EFFB1 /* ORCAEN775Readout.hh in VME_Copy */,
 				43ADFEBF10B6E2090044617C /* ORCAENReadout.cc in VME_Copy */,
@@ -4256,6 +4261,8 @@
 		849DE72D08F6F1FA0052AFC6 /* ORMacController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMacController.m; path = Source/Objects/Hardware/Pci/Mac/ORMacController.m; sourceTree = SOURCE_ROOT; };
 		849DE72E08F6F1FA0052AFC6 /* ORMacModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMacModel.h; path = Source/Objects/Hardware/Pci/Mac/ORMacModel.h; sourceTree = SOURCE_ROOT; };
 		849DE72F08F6F1FA0052AFC6 /* ORMacModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMacModel.m; path = Source/Objects/Hardware/Pci/Mac/ORMacModel.m; sourceTree = SOURCE_ROOT; };
+		849E7492132E5466001BF64C /* ORCAEN1724Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN1724Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1724Readout.cc; sourceTree = SOURCE_ROOT; };
+		849E7493132E5466001BF64C /* ORCAEN1724Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN1724Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN1724Readout.hh; sourceTree = SOURCE_ROOT; };
 		849E7C920B69570700353D50 /* ADU200.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ADU200.tif; path = Source/Objects/Hardware/USB/ADU200/ADU200.tif; sourceTree = SOURCE_ROOT; };
 		849E7C940B6957BF00353D50 /* ADU200.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ADU200.nib; path = Source/Objects/Hardware/USB/ADU200/ADU200.nib; sourceTree = SOURCE_ROOT; };
 		849E7C950B6957BF00353D50 /* ORADU200Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORADU200Controller.h; path = Source/Objects/Hardware/USB/ADU200/ORADU200Controller.h; sourceTree = SOURCE_ROOT; };
@@ -8346,6 +8353,8 @@
 				43ADFE5910B6DBCF0044617C /* ORCAEN419Readout.hh */,
 				43ADFE5A10B6DBCF0044617C /* ORCAEN1720Readout.cc */,
 				43ADFE5B10B6DBCF0044617C /* ORCAEN1720Readout.hh */,
+				849E7492132E5466001BF64C /* ORCAEN1724Readout.cc */,
+				849E7493132E5466001BF64C /* ORCAEN1724Readout.hh */,
 				4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */,
 				4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */,
 				43ADFE5C10B6DBCF0044617C /* ORCAENReadout.cc */,
@@ -12287,6 +12296,7 @@
 				844B9BEF132E527700FEDA6B /* ORCaen1724Controller.h in Headers */,
 				844B9BF1132E527700FEDA6B /* ORCaen1724Decoder.h in Headers */,
 				844B9BF3132E527700FEDA6B /* ORCaen1724Model.h in Headers */,
+				849E7495132E5466001BF64C /* ORCAEN1724Readout.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
