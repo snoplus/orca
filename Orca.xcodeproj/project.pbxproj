@@ -1104,6 +1104,14 @@
 		844B42C20DE5D5680061AE80 /* ORSNORackModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B42BA0DE5D5680061AE80 /* ORSNORackModel.m */; };
 		844B42C50DE5D5680061AE80 /* SNORack.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844B42BD0DE5D5680061AE80 /* SNORack.gif */; };
 		844B42C60DE5D5680061AE80 /* SNORack.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844B42BE0DE5D5680061AE80 /* SNORack.nib */; };
+		844B9BED132E527700FEDA6B /* Caen1724.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844B9BE5132E527700FEDA6B /* Caen1724.nib */; };
+		844B9BEE132E527700FEDA6B /* Caen1724Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844B9BE6132E527700FEDA6B /* Caen1724Card.gif */; };
+		844B9BEF132E527700FEDA6B /* ORCaen1724Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B9BE7132E527700FEDA6B /* ORCaen1724Controller.h */; };
+		844B9BF0132E527700FEDA6B /* ORCaen1724Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B9BE8132E527700FEDA6B /* ORCaen1724Controller.m */; };
+		844B9BF1132E527700FEDA6B /* ORCaen1724Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B9BE9132E527700FEDA6B /* ORCaen1724Decoder.h */; };
+		844B9BF2132E527700FEDA6B /* ORCaen1724Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B9BEA132E527700FEDA6B /* ORCaen1724Decoder.m */; };
+		844B9BF3132E527700FEDA6B /* ORCaen1724Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B9BEB132E527700FEDA6B /* ORCaen1724Model.h */; };
+		844B9BF4132E527700FEDA6B /* ORCaen1724Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B9BEC132E527700FEDA6B /* ORCaen1724Model.m */; };
 		844BF49A0B1B85560047C9BF /* KatrinDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 844BF4980B1B85560047C9BF /* KatrinDetectorView.h */; };
 		844BF49B0B1B85560047C9BF /* KatrinDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 844BF4990B1B85560047C9BF /* KatrinDetectorView.m */; };
 		844BF9E90B1E2FC20047C9BF /* smalldottopmask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844BF9E60B1E2FC20047C9BF /* smalldottopmask.tif */; };
@@ -3598,6 +3606,14 @@
 		844B42BA0DE5D5680061AE80 /* ORSNORackModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNORackModel.m; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.m"; sourceTree = SOURCE_ROOT; };
 		844B42BD0DE5D5680061AE80 /* SNORack.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SNORack.gif; path = "Source/Objects/Custom Hardware/SNO+/SNORack/SNORack.gif"; sourceTree = SOURCE_ROOT; };
 		844B42BE0DE5D5680061AE80 /* SNORack.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SNORack.nib; path = "Source/Objects/Custom Hardware/SNO+/SNORack/SNORack.nib"; sourceTree = SOURCE_ROOT; };
+		844B9BE5132E527700FEDA6B /* Caen1724.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen1724.nib; path = Source/Objects/Hardware/Vme/CAEN/CV1724/Caen1724.nib; sourceTree = SOURCE_ROOT; };
+		844B9BE6132E527700FEDA6B /* Caen1724Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Caen1724Card.gif; path = Source/Objects/Hardware/Vme/CAEN/CV1724/Caen1724Card.gif; sourceTree = SOURCE_ROOT; };
+		844B9BE7132E527700FEDA6B /* ORCaen1724Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1724Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV1724/ORCaen1724Controller.h; sourceTree = SOURCE_ROOT; };
+		844B9BE8132E527700FEDA6B /* ORCaen1724Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1724Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV1724/ORCaen1724Controller.m; sourceTree = SOURCE_ROOT; };
+		844B9BE9132E527700FEDA6B /* ORCaen1724Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1724Decoder.h; path = Source/Objects/Hardware/Vme/CAEN/CV1724/ORCaen1724Decoder.h; sourceTree = SOURCE_ROOT; };
+		844B9BEA132E527700FEDA6B /* ORCaen1724Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1724Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV1724/ORCaen1724Decoder.m; sourceTree = SOURCE_ROOT; };
+		844B9BEB132E527700FEDA6B /* ORCaen1724Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1724Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV1724/ORCaen1724Model.h; sourceTree = SOURCE_ROOT; };
+		844B9BEC132E527700FEDA6B /* ORCaen1724Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1724Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1724/ORCaen1724Model.m; sourceTree = SOURCE_ROOT; };
 		844BF4980B1B85560047C9BF /* KatrinDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = KatrinDetectorView.h; path = Source/Experiments/Katrin/KatrinDetectorView.h; sourceTree = SOURCE_ROOT; };
 		844BF4990B1B85560047C9BF /* KatrinDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = KatrinDetectorView.m; path = Source/Experiments/Katrin/KatrinDetectorView.m; sourceTree = SOURCE_ROOT; };
 		844BF9E60B1E2FC20047C9BF /* smalldottopmask.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = smalldottopmask.tif; path = "Source/Objects/Misc Objects/Dots/DotImages/smalldottopmask.tif"; sourceTree = SOURCE_ROOT; };
@@ -7315,6 +7331,22 @@
 			);
 			name = SNORack;
 			path = "Source/Objects/Custom Hardware/SNO+/SNORack";
+			sourceTree = SOURCE_ROOT;
+		};
+		844B9BE4132E527700FEDA6B /* CV1724 */ = {
+			isa = PBXGroup;
+			children = (
+				844B9BE5132E527700FEDA6B /* Caen1724.nib */,
+				844B9BE6132E527700FEDA6B /* Caen1724Card.gif */,
+				844B9BE7132E527700FEDA6B /* ORCaen1724Controller.h */,
+				844B9BE8132E527700FEDA6B /* ORCaen1724Controller.m */,
+				844B9BE9132E527700FEDA6B /* ORCaen1724Decoder.h */,
+				844B9BEA132E527700FEDA6B /* ORCaen1724Decoder.m */,
+				844B9BEB132E527700FEDA6B /* ORCaen1724Model.h */,
+				844B9BEC132E527700FEDA6B /* ORCaen1724Model.m */,
+			);
+			name = CV1724;
+			path = Source/Objects/Hardware/Vme/CAEN/CV1724;
 			sourceTree = SOURCE_ROOT;
 		};
 		844D2B0E0455BFD7005F64B1 /* Generic */ = {
@@ -11288,6 +11320,7 @@
 				9C1363BE0D0A7921006C550D /* CV265 */,
 				848D8B230DE23D2400D44B81 /* CV1190 */,
 				84BC164D0DA14F3600D3935C /* CV1720 */,
+				844B9BE4132E527700FEDA6B /* CV1724 */,
 				84B74CE00FEBE9B90033E658 /* CV965 */,
 			);
 			name = CAEN;
@@ -12251,6 +12284,9 @@
 				8494C13B1317E2E200151E7B /* ORSqlResult.h in Headers */,
 				EFEBD8921327588F00C96C86 /* ORXLGPSController.h in Headers */,
 				EFEBD8941327588F00C96C86 /* ORXLGPSModel.h in Headers */,
+				844B9BEF132E527700FEDA6B /* ORCaen1724Controller.h in Headers */,
+				844B9BF1132E527700FEDA6B /* ORCaen1724Decoder.h in Headers */,
+				844B9BF3132E527700FEDA6B /* ORCaen1724Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12293,7 +12329,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -13027,6 +13062,8 @@
 				8494C0751316D3C400151E7B /* BootBarBig.tif in Resources */,
 				EFEBD8961327588F00C96C86 /* XLGPS.nib in Resources */,
 				EFEBD8971327588F00C96C86 /* XLGPSIcon.tif in Resources */,
+				844B9BED132E527700FEDA6B /* Caen1724.nib in Resources */,
+				844B9BEE132E527700FEDA6B /* Caen1724Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13903,6 +13940,9 @@
 				8494C13C1317E2E200151E7B /* ORSqlResult.m in Sources */,
 				EFEBD8931327588F00C96C86 /* ORXLGPSController.m in Sources */,
 				EFEBD8951327588F00C96C86 /* ORXLGPSModel.m in Sources */,
+				844B9BF0132E527700FEDA6B /* ORCaen1724Controller.m in Sources */,
+				844B9BF2132E527700FEDA6B /* ORCaen1724Decoder.m in Sources */,
+				844B9BF4132E527700FEDA6B /* ORCaen1724Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
