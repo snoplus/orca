@@ -648,11 +648,20 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	if(aGroup>=4)return 0; 
 	return [[preTriggerDelays objectAtIndex:aGroup]intValue]; 
 }
+
 - (void) setPreTriggerDelay:(short)aGroup withValue:(int)aPreTriggerDelay
 {
 	if(aGroup>=4)return; 
     [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
-    int preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:0 max:1023];
+    int preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:1 max:1023];
+	
+	short maxInternalTrigDelay = MAX([self internalTriggerDelay:aGroup*2],[self internalTriggerDelay:aGroup*2+1]);
+	short decimation = powf(2.,(float)[self triggerDecimation:aGroup]);
+	if(preTriggerDelay< (decimation + maxInternalTrigDelay)){
+		preTriggerDelay = decimation + maxInternalTrigDelay;
+		NSLogColor([NSColor redColor], @"SIS3302: Increased the pretrigger delay (group %d) to be >= decimation+triggerDelay\n",aGroup);
+	}
+	
 	[preTriggerDelays replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:preTriggerDelay]];
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelPreTriggerDelayChanged object:self];
@@ -745,7 +754,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 	for(i=0;i<4;i++){
 		[self setSampleLength:i withValue:2048];
-		[self setPreTriggerDelay:i withValue:0];
+		[self setPreTriggerDelay:i withValue:1];
 		[self setTriggerGateLength:i withValue:2048];
 		[self setTriggerDecimation:i withValue:0];
 		[self setEnergyDecimation:i withValue:0];
@@ -1127,8 +1136,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 { 
 	aValue = [self limitIntValue:aValue min:0 max:firmwareVersion<15?63:255];
     [[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerDelay:aChan withValue:[self internalTriggerDelay:aChan]];
+	
+
     [internalTriggerDelays replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302InternalTriggerDelayChanged object:self];
+
+	//force a constraint check by reloading the pretrigger delay
+	[self setPreTriggerDelay:aChan/2 withValue:[self preTriggerDelay:aChan/2]];
 }
 
 
@@ -1183,8 +1197,13 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	if(aGroup>=4)return; 
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerDecimation:aGroup withValue:[self triggerDecimation:aGroup]];
     int triggerDecimation = [self limitIntValue:aValue min:0 max:0x3];
+		
 	[triggerDecimations replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:triggerDecimation]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302TriggerDecimationChanged object:self];
+	
+	//force a constraint check by reloading the pretrigger delay
+	[self setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
+
 }
 
 
@@ -2666,7 +2685,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Pretrigger Delay"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:1 stepSize:1 units:@""];
     [p setSetMethod:@selector(setPreTriggerDelay:withValue:) getMethod:@selector(preTriggerDelay:)];
     [a addObject:p];
 	
@@ -3111,12 +3130,18 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	internalTriggerDelays =		[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
 	triggerDecimations = 		[[decoder decodeObjectForKey:@"triggerDecimations"] retain];
     triggerGateLengths =		[[decoder decodeObjectForKey:@"triggerGateLengths"] retain];
-    preTriggerDelays =			[[decoder decodeObjectForKey:@"preTriggerDelays"] retain];
     sampleStartIndexes =		[[decoder decodeObjectForKey:@"sampleStartIndexes"] retain];
     energyTauFactors =			[[decoder decodeObjectForKey:@"energyTauFactors"] retain];
 	energyDecimations=			[[decoder decodeObjectForKey:@"energyDecimations"]retain];
 	energyGapTimes = 			[[decoder decodeObjectForKey:@"energyGapTimes"]retain];
     energyPeakingTimes =		[[decoder decodeObjectForKey:@"energyPeakingTimes"]retain];
+    preTriggerDelays =			[[decoder decodeObjectForKey:@"preTriggerDelays"] retain];
+	
+	//force a constraint check by reloading the pretrigger delays
+	int aGroup;
+	for(aGroup=0;aGroup<4;aGroup++){
+		[self setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
+	}
 	
 	//firmware 15xx
     cfdControls =					[[decoder decodeObjectForKey:@"cfdControls"] retain];
