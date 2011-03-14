@@ -450,6 +450,14 @@
 		8411A1DC10F6848100CD9544 /* NSWindow+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */; };
 		8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8411A93011063ACC00CD9544 /* ORUsbDeviceModel.h */; };
 		8411A93311063ACC00CD9544 /* ORUsbDeviceModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8411A93111063ACC00CD9544 /* ORUsbDeviceModel.m */; };
+		841224D7132E6638001AC05B /* ORTPG262Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 841224CF132E6638001AC05B /* ORTPG262Controller.h */; };
+		841224D8132E6638001AC05B /* ORTPG262Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 841224D0132E6638001AC05B /* ORTPG262Controller.m */; };
+		841224D9132E6638001AC05B /* ORTPG262Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 841224D1132E6638001AC05B /* ORTPG262Decoders.h */; };
+		841224DA132E6638001AC05B /* ORTPG262Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 841224D2132E6638001AC05B /* ORTPG262Decoders.m */; };
+		841224DB132E6638001AC05B /* ORTPG262Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 841224D3132E6638001AC05B /* ORTPG262Model.h */; };
+		841224DC132E6638001AC05B /* ORTPG262Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841224D4132E6638001AC05B /* ORTPG262Model.m */; };
+		841224DD132E6638001AC05B /* TPG262.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841224D5132E6638001AC05B /* TPG262.nib */; };
+		841224DE132E6638001AC05B /* TPG262.tif in Resources */ = {isa = PBXBuildFile; fileRef = 841224D6132E6638001AC05B /* TPG262.tif */; };
 		84167116104C04D400E47227 /* ORAutoTestUnit.h in Headers */ = {isa = PBXBuildFile; fileRef = 84167114104C04D400E47227 /* ORAutoTestUnit.h */; };
 		84167117104C04D400E47227 /* ORAutoTestUnit.m in Sources */ = {isa = PBXBuildFile; fileRef = 84167115104C04D400E47227 /* ORAutoTestUnit.m */; };
 		84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84178D4E0923C4B100C15D2B /* ORSocketClient.h */; };
@@ -3217,6 +3225,14 @@
 		8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSWindow+Extensions.m"; path = "Source/Cocoa Extensions/NSWindow+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		8411A93011063ACC00CD9544 /* ORUsbDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUsbDeviceModel.h; path = "Source/Objects/Hardware/USB/USB Base Classes/ORUsbDeviceModel.h"; sourceTree = SOURCE_ROOT; };
 		8411A93111063ACC00CD9544 /* ORUsbDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUsbDeviceModel.m; path = "Source/Objects/Hardware/USB/USB Base Classes/ORUsbDeviceModel.m"; sourceTree = SOURCE_ROOT; };
+		841224CF132E6638001AC05B /* ORTPG262Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTPG262Controller.h; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Controller.h; sourceTree = SOURCE_ROOT; };
+		841224D0132E6638001AC05B /* ORTPG262Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG262Controller.m; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Controller.m; sourceTree = SOURCE_ROOT; };
+		841224D1132E6638001AC05B /* ORTPG262Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTPG262Decoders.h; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Decoders.h; sourceTree = SOURCE_ROOT; };
+		841224D2132E6638001AC05B /* ORTPG262Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG262Decoders.m; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Decoders.m; sourceTree = SOURCE_ROOT; };
+		841224D3132E6638001AC05B /* ORTPG262Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTPG262Model.h; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Model.h; sourceTree = SOURCE_ROOT; };
+		841224D4132E6638001AC05B /* ORTPG262Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG262Model.m; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Model.m; sourceTree = SOURCE_ROOT; };
+		841224D5132E6638001AC05B /* TPG262.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TPG262.nib; path = Source/Objects/Hardware/Serial/TPG262/TPG262.nib; sourceTree = SOURCE_ROOT; };
+		841224D6132E6638001AC05B /* TPG262.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TPG262.tif; path = Source/Objects/Hardware/Serial/TPG262/TPG262.tif; sourceTree = SOURCE_ROOT; };
 		84167114104C04D400E47227 /* ORAutoTestUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAutoTestUnit.h; sourceTree = "<group>"; };
 		84167115104C04D400E47227 /* ORAutoTestUnit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAutoTestUnit.m; sourceTree = "<group>"; };
 		84178D4E0923C4B100C15D2B /* ORSocketClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSocketClient.h; sourceTree = "<group>"; };
@@ -6443,6 +6459,22 @@
 			path = "Source/Objects/Hardware/USB/USB Base Classes";
 			sourceTree = SOURCE_ROOT;
 		};
+		841224CE132E6638001AC05B /* TPG262 */ = {
+			isa = PBXGroup;
+			children = (
+				841224CF132E6638001AC05B /* ORTPG262Controller.h */,
+				841224D0132E6638001AC05B /* ORTPG262Controller.m */,
+				841224D1132E6638001AC05B /* ORTPG262Decoders.h */,
+				841224D2132E6638001AC05B /* ORTPG262Decoders.m */,
+				841224D3132E6638001AC05B /* ORTPG262Model.h */,
+				841224D4132E6638001AC05B /* ORTPG262Model.m */,
+				841224D5132E6638001AC05B /* TPG262.nib */,
+				841224D6132E6638001AC05B /* TPG262.tif */,
+			);
+			name = TPG262;
+			path = Source/Objects/Hardware/Serial/TPG262;
+			sourceTree = SOURCE_ROOT;
+		};
 		8418DC4C0531EF7A005F64B1 /* PulserDistrib */ = {
 			isa = PBXGroup;
 			children = (
@@ -7272,6 +7304,7 @@
 				84B28D830F4C66BE00E2B056 /* VXM */,
 				84D258590FA7340B00626276 /* MotionNode */,
 				84A240521032ED28002AFA0B /* MITPulser */,
+				841224CE132E6638001AC05B /* TPG262 */,
 				84AB0F331056DA4E0069D5E2 /* ModBus */,
 			);
 			name = Serial;
@@ -12297,6 +12330,9 @@
 				844B9BF1132E527700FEDA6B /* ORCaen1724Decoder.h in Headers */,
 				844B9BF3132E527700FEDA6B /* ORCaen1724Model.h in Headers */,
 				849E7495132E5466001BF64C /* ORCAEN1724Readout.hh in Headers */,
+				841224D7132E6638001AC05B /* ORTPG262Controller.h in Headers */,
+				841224D9132E6638001AC05B /* ORTPG262Decoders.h in Headers */,
+				841224DB132E6638001AC05B /* ORTPG262Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13074,6 +13110,8 @@
 				EFEBD8971327588F00C96C86 /* XLGPSIcon.tif in Resources */,
 				844B9BED132E527700FEDA6B /* Caen1724.nib in Resources */,
 				844B9BEE132E527700FEDA6B /* Caen1724Card.gif in Resources */,
+				841224DD132E6638001AC05B /* TPG262.nib in Resources */,
+				841224DE132E6638001AC05B /* TPG262.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13953,6 +13991,9 @@
 				844B9BF0132E527700FEDA6B /* ORCaen1724Controller.m in Sources */,
 				844B9BF2132E527700FEDA6B /* ORCaen1724Decoder.m in Sources */,
 				844B9BF4132E527700FEDA6B /* ORCaen1724Model.m in Sources */,
+				841224D8132E6638001AC05B /* ORTPG262Controller.m in Sources */,
+				841224DA132E6638001AC05B /* ORTPG262Decoders.m in Sources */,
+				841224DC132E6638001AC05B /* ORTPG262Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
