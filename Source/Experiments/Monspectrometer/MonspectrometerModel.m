@@ -23,6 +23,9 @@
 #import "ORSegmentGroup.h"
 #import "ORDataSet.h"
 
+static NSString* MonSpecDbConnector		= @"MonSpecDbConnector";
+
+
 @implementation MonspectrometerModel
 
 - (void) setUpImage
@@ -40,11 +43,22 @@
 	return @"KATRIN/Monspectrometer.html";
 }
 
+- (void) makeConnectors
+{
+    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,2) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:aConnector forKey:MonSpecDbConnector];
+    [aConnector setOffColor:[NSColor brownColor]];
+    [aConnector setOnColor:[NSColor magentaColor]];
+	[ aConnector setConnectorType: 'DB O' ];
+	[ aConnector addRestrictedConnectionType: 'DB I' ]; //can only connect to DB outputs
+    [aConnector release];
+}
+
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
 	NSMutableArray* mapEntries = [self initMapEntries:0];//default set	
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Monspectrometer" numSegments:64 mapEntries:mapEntries];
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Monspectrometer" numSegments:5 mapEntries:mapEntries];
 	[self addGroup:group];
 	[group release];
 }
@@ -92,7 +106,7 @@
 
 - (int)  maxNumSegments
 {
-	return 64;
+	return 5;
 }
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
