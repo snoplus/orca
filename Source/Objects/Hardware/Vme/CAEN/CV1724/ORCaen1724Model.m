@@ -548,7 +548,8 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 
 - (void) setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
 {
-    
+    if(aValue>16384)aValue = 16384; //14 bit.
+	
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl withValue:[self threshold:aChnl]];
     
@@ -1286,7 +1287,7 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:1200 lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:16384 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
 	[p setInitMethodSelector:@selector(writeThresholds)];
