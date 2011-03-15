@@ -1156,6 +1156,17 @@ Table: Histogram2Ds
 	[super dealloc];
 }
 
+- (NSString*) manglePw
+{
+	NSString* pw =  [[NSUserDefaults standardUserDefaults] objectForKey:OROrcaPassword];
+	int i;
+	for(i=0;i<[pw length];i++){
+		char c = [pw characterAtIndex:i];
+		pw = [pw stringByReplacingCharactersInRange:NSMakeRange(i,1) withString:[NSString stringWithFormat:@"%c",c+1]];
+	}
+	return pw;
+}
+
 @end
 
 @implementation ORPostMachineNameOp
@@ -1201,16 +1212,7 @@ Table: Histogram2Ds
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
 }
-- (NSString*) manglePw
-{
-	NSString* pw =  [[NSUserDefaults standardUserDefaults] objectForKey:OROrcaPassword];
-	int i;
-	for(i=0;i<[pw length];i++){
-		char c = [pw characterAtIndex:i];
-		pw = [pw stringByReplacingCharactersInRange:NSMakeRange(i,1) withString:[NSString stringWithFormat:@"%c",c+1]];
-	}
-	return pw;
-}
+
 @end
 
 @implementation ORDeleteMachineNameOp
@@ -1239,9 +1241,12 @@ Table: Histogram2Ds
 			unsigned long uptime = (unsigned long)[[[NSApp delegate] memoryWatcher] accurateUptime];
 			NSString* hw_address = macAddress();
 		
-			NSString* theQuery = [NSString stringWithFormat:@"UPDATE machines SET uptime=%d WHERE hw_address=%@",
-								uptime,																	  
-								  [sqlConnection quoteObject:hw_address]];
+			NSString* mangledPw = [self manglePw];
+			NSString* theQuery = [NSString stringWithFormat:@"UPDATE machines SET uptime=%d,password=%@ WHERE hw_address=%@",
+								uptime,	
+								[sqlConnection quoteObject:mangledPw],
+								[sqlConnection quoteObject:hw_address]];
+						
 			[sqlConnection queryString:theQuery];
 			[sqlConnection release];
 		}
