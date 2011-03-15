@@ -84,24 +84,29 @@ static NSString* MonSpecDbConnector		= @"MonSpecDbConnector";
 				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 				if([arrayOfHistos count]){
 					id histoObj = [arrayOfHistos objectAtIndex:0];
-					if([[aGroup adcClassName] isEqualToString:@"ORShaperModel"]){
-						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
-																[NSString stringWithFormat:@"Card %2d",[cardName intValue]], 
-																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-																nil]];
-					}
-					else if([[aGroup adcClassName] isEqualToString:@"ORKatrinFLTModel"]){
-						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
-																[NSString stringWithFormat:@"Station %2d",[cardName intValue]], 
-																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
-																nil]];
-					}
+						
+					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"FLT", @"Energy", @"Crate  0",
+															[NSString stringWithFormat:@"Station %2d",[cardName intValue]], 
+															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
+															nil]];
+					
 					
 					[aDataSet doDoubleClick:nil];
 				}
 			}
 		}
 	}
+}
+
+- (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
+{
+	ORSegmentGroup* theGroup = [segmentGroups objectAtIndex:aGroup];
+	
+	NSString* crateName = [theGroup segment:index objectForKey:@"kCrate"];
+	NSString* cardName  = [theGroup segment:index objectForKey:@"kCardSlot"];
+	NSString* chanName  = [theGroup segment:index objectForKey:@"kChannel"];
+	
+	return [NSString stringWithFormat:@"FLT,Energy Histogram (HW),Crate %2d,Station %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
 
 - (int)  maxNumSegments
