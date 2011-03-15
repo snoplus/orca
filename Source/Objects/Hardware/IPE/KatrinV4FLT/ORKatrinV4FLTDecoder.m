@@ -412,14 +412,8 @@ startIndex=traceStart16;
 	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
 	unsigned short filterDiv;
 	unsigned long histoLen;
-	if(filterIndex==0)	{
-		histoLen = 16*1024;
-		filterDiv = 64;
-	}
-	else {
-		histoLen = 4096;
-		filterDiv = 1L << (filterIndex+2);
-	}
+	histoLen = 4096;
+	filterDiv = 1L << (filterIndex+2);
 	
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
