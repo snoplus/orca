@@ -87,11 +87,11 @@ extern NSString* ORSqlLock;
 
 - (id)	 initWithDelegate:(id)aDelegate;
 - (void) dealloc;
+- (NSString*) manglePw;
 @end
 
 @interface ORPostMachineNameOp : ORSqlOperation
 - (void) main;
-- (NSString*) manglePw;
 @end
 
 @interface ORDeleteMachineNameOp : ORSqlOperation
