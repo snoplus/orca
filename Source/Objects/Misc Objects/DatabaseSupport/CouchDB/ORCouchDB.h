@@ -42,6 +42,7 @@
 - (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) getDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
+- (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 
 @property (assign)	id					delegate;
@@ -69,6 +70,7 @@
 - (id) send:(NSString*)httpString;
 - (id) send:(NSString*)httpString type:(NSString*)aType;
 - (id) send:(NSString*)httpString type:(NSString*)aType body:(NSDictionary*)aBody;
+- (NSString*) revision:(NSString*)anID;
 
 @property (copy)	NSString*			username;
 @property (copy)	NSString*			pwd;
@@ -103,17 +105,21 @@
 #pragma mark •••Document API
 @interface ORCouchDBPutDocumentOp :ORCouchDBOperation
 {
-	NSString*     documentId;
-	NSDictionary* document;
+	NSString*		documentId;
+	NSDictionary*	document;
+	NSData*			attachmentData;
+	NSString*		attachmentName;
 }
 - (void) setDocument:(NSDictionary*)aDocument documentID:(NSString*)anID;
+- (void) setAttachment:(NSData*)someData;
+- (void) setAttachmentName:(NSString*)aName;
 - (void) main;
+- (id) addAttachement;
 @end
 
 @interface ORCouchDBUpdateDocumentOp :ORCouchDBPutDocumentOp
 - (void) main;
 @end
-
 
 @interface ORCouchDBGetDocumentOp :ORCouchDBOperation
 {

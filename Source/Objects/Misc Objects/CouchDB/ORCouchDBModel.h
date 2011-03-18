@@ -28,6 +28,7 @@
     NSString*	dataBaseName;
 	BOOL		stealthMode;
 	NSDictionary* dBInfo;
+	NSMutableArray* dataMonitors;
 }
 
 #pragma mark ***Initialization
@@ -37,6 +38,7 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) applicationIsTerminating:(NSNotification*)aNote;
+- (void) runOptionsOrTimeChanged:(NSNotification*)aNote;
 - (void) runStatusChanged:(NSNotification*)aNote;
 - (void) alarmsChanged:(NSNotification*)aNote;
 

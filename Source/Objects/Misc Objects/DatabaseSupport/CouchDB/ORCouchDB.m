@@ -142,6 +142,18 @@
 	[anOp release];
 }
 
+- (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
+{
+	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	[anOp setDocument:aDict documentID:anId];
+	[anOp setAttachment:someData];
+	[anOp setAttachmentName:aName];
+	[anOp setUsername:username];
+	[anOp setPwd:pwd];
+	[ORCouchDBQueue addOperation:anOp];
+	[anOp release];
+}
+
 - (void) getDocumentId:(NSString*)anId  tag:(NSString*)aTag
 {
 	ORCouchDBGetDocumentOp* anOp = [[ORCouchDBGetDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
@@ -217,6 +229,14 @@
 		[delegate couchDBResult:obj tag:tag];
 	}
 }	
+
+- (NSString*) revision:(NSString*)anID
+{
+	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, anID];
+	id result = [self send:httpString];
+	return [result objectForKey:@"_rev"];
+
+}
 
 @end
 
@@ -326,6 +346,8 @@
 {
 	[document release];
 	[documentId release];
+	[attachmentData release];
+	[attachmentName release];
 	[super dealloc];
 }
 
@@ -335,12 +357,65 @@
 	documentId = [anID copy];
 }
 
+- (void) setAttachmentName:(NSString*)aName
+{
+	attachmentName = [aName copy];
+}
+- (void) setAttachment:(NSData*)someData
+{
+	[someData retain];
+	[attachmentData release]; 
+	attachmentData = someData;
+}
+
 - (void) main
 {
 	if([self isCancelled])return;
 	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
 	id result = [self send:httpString type:@"PUT" body:document];
+	if(!result){
+		result = [NSDictionary dictionaryWithObjectsAndKeys:
+				  [NSString stringWithFormat:@"[%@] timeout",
+				   database],@"Message",nil];
+		[self sendToDelegate:result];
+	}	
+	else {
+		if(attachmentData){
+			[self addAttachement];
+		}
+	}
+	
 	[self sendToDelegate:result];
+	
+}
+
+- (id) addAttachement
+{
+	NSString* rev = [self revision:documentId];
+	if(rev){
+		NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+		if(username && pwd){
+			httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
+		}
+		httpString = [httpString stringByAppendingFormat:@"/%@?rev=%@",attachmentName,rev];
+		NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+		[request setHTTPMethod:@"PUT"];
+		[request setHTTPBody:attachmentData];
+		
+		NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+		
+		if (data) {
+			YAJLDocument *result = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
+			return [result root];
+		}
+		else {
+			return [NSDictionary dictionaryWithObjectsAndKeys:
+					[NSString stringWithFormat:@"[%@] timeout",
+					 database],@"Message",nil];
+		}
+		
+	}
+	return nil;
 }
 
 @end
@@ -361,6 +436,9 @@
 	else if([result objectForKey:@"error"]){
 		//document doesn't exist. So just add it.
 		result = [self send:httpString type:@"PUT" body:document];
+		if(![result objectForKey:@"error"] && attachmentData){
+			[self addAttachement];
+		}
 	}
 	else {
 		//it already exists. insert the rev number into the document and put it back
@@ -368,11 +446,17 @@
 		if(rev){
 			NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
 			[newDocument setObject:rev forKey:@"_rev"];
-			[self send:httpString type:@"PUT" body:newDocument];
+			result = [self send:httpString type:@"PUT" body:newDocument];
+			if(![result objectForKey:@"error"] && attachmentData){
+				[self addAttachement];
+			}
 		}
 	}
+
 }
 @end
+
+
 
 @implementation ORCouchDBDeleteDocumentOp
 - (void) main
@@ -442,7 +526,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
 {
     self = [super init];
 	queue = [[NSOperationQueue alloc] init];
-	[queue setMaxConcurrentOperationCount:1];
+	[queue setMaxConcurrentOperationCount:4];
     return self;
 }
 

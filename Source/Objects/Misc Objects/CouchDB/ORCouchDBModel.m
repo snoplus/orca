@@ -28,6 +28,7 @@
 #import "ORExperimentModel.h"
 #import "ORAlarmCollection.h"
 #import "ORAlarm.h"
+#import "OR1DHisto.h"
 
 NSString* ORCouchDBModelStealthModeChanged	= @"ORCouchDBModelStealthModeChanged";
 NSString* ORCouchDBDataBaseNameChanged		= @"ORCouchDBDataBaseNameChanged";
@@ -47,7 +48,8 @@ NSString* ORCouchDBLock						= @"ORCouchDBLock";
 #define kDocumentUpdated @"kDocumentUpdated"
 #define kDocumentDeleted @"kDocumentDeleted"
 #define kCompactDB		 @"kCompactDB"
-#define kInfoInternalDB   @"kInfoInternalDB"
+#define kInfoInternalDB  @"kInfoInternalDB"
+#define kAttachmentAdded @"kAttachmentAdded"
 
 #define kCouchDBPort 5984
 
@@ -60,6 +62,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) postRunOptions:(NSNotification*)aNote;
 - (void) updateRunState:(ORRunModel*)rc;
 - (void) periodicCompact;
+- (void) updateDataSets;
 @end
 
 @implementation ORCouchDBModel
@@ -143,12 +146,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                        object : nil];
 	
 	[notifyCenter addObserver : self
-                     selector : @selector(runStatusChanged:)
+                     selector : @selector(runOptionsOrTimeChanged:)
                          name : ORRunElapsedTimesChangedNotification
                        object : nil];
 	
 	[notifyCenter addObserver : self
-                     selector : @selector(runStatusChanged:)
+                     selector : @selector(runOptionsOrTimeChanged:)
                          name : ORRunRepeatRunChangedNotification
                        object : nil];
 	
@@ -274,7 +277,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (NSString*) machineName
 {		
-	NSString* machineName = [NSString stringWithFormat:@"%@_%@",computerName(),[macAddress() stringByReplacingOccurrencesOfString:@":" withString:@"_"]];
+	NSString* machineName = [NSString stringWithFormat:@"%@",computerName()];
 	machineName = [machineName stringByReplacingOccurrencesOfString:@" " withString:@"_"];
 	return [machineName lowercaseString];
 }
@@ -438,6 +441,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) runStatusChanged:(NSNotification*)aNote
 {
 	[self updateRunState:[aNote object]];
+	[self updateDataSets];
+}
+
+- (void) runOptionsOrTimeChanged:(NSNotification*)aNote
+{
+	[self updateRunState:[aNote object]];
 }
 
 - (void) updateRunState:(ORRunModel*)rc
@@ -460,6 +469,24 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 			
 			ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
 			[db updateDocument:runInfo documentId:@"runinfo" tag:kDocumentUpdated];
+			
+			int runState = [[runInfo objectForKey:@"state"] intValue];
+			if(runState == eRunInProgress){
+				if(!dataMonitors){
+					dataMonitors = [[NSMutableArray array] retain];
+					NSArray* list = [[self document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+					for(ORDataChainObject* aDataMonitor in list){
+						if([aDataMonitor involvedInCurrentRun]){
+							[dataMonitors addObject:aDataMonitor];
+						}
+					}
+				}
+			}
+			else {
+				[dataMonitors release];
+				dataMonitors = nil;
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+			}
 		}
 		@catch (NSException* e) {
 			//silently catch and continue
@@ -473,18 +500,56 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
 		ORAlarmCollection* alarmCollection = [ORAlarmCollection sharedAlarmCollection];
 		NSArray* theAlarms = [[[alarmCollection alarms] retain] autorelease];
+		NSMutableArray* arrayForDoc = [NSMutableArray array];
 		if([theAlarms count]){
-			NSMutableArray* arrayForDoc = [NSMutableArray array];
 			for(id anAlarm in theAlarms)[arrayForDoc addObject:[anAlarm alarmInfo]];
-			NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
-			[db updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentAdded];
 		}
-		else {
-			[db deleteDocumentId:@"alarms" tag:kDocumentDeleted];
-		}
+		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
+		[db updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentAdded];
 	}
 }
 
+- (void) updateDataSets
+{
+	if(!stealthMode){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
+		
+		NSUInteger n = [ORCouchDBQueue operationCount];
+		if(n<10){
+				
+			ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
+			for(id aMonitor in dataMonitors){
+				NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
+				@try {
+					for(id aDataSet in objs1d){
+						unsigned long start,end;
+
+						NSData* plotData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
+						NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+													[aDataSet fullName],										@"name",
+													[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
+													[NSNumber numberWithUnsignedLong:start],					@"start",
+													[NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
+													@"Histogram1D",												@"type",
+													 nil];
+						NSString* dataName = [[[aDataSet fullName] lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
+
+						[db updateDocument:dataInfo documentId:dataName attachmentData:plotData attachmentName:@"PlotData" tag:kDocumentAdded];
+						
+		 
+					}
+				}
+				@catch(NSException* e){
+				}
+				@finally {
+					[objs1d release];
+				}
+			}
+		}
+
+		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
+	}
+}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
