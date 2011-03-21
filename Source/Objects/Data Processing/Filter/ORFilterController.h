@@ -47,6 +47,8 @@
 	IBOutlet NSButton*			addInputButton;
 	IBOutlet NSButton*			removeInputButton;
 	IBOutlet NSButton*			parseButton;
+	IBOutlet NSPopUpButton*		codeHelperPU;
+	IBOutlet NSButton*			insertCodeButton;
 }
 
 #pragma mark •••Initialization
@@ -66,6 +68,7 @@
 - (void) inputValuesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) insertCode:(id) sender;
 - (IBAction) listDecoders:(id)sender;
 - (IBAction) usePluginAction:(id)sender;
 - (IBAction) enableTimer:(id)sender;

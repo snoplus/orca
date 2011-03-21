@@ -154,6 +154,7 @@
 	[self pluginValidChanged:nil];
 	[self usePluginChanged:nil];
 	[self inputValuesChanged:nil];
+	[codeHelperPU selectItemAtIndex:0];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
@@ -214,6 +215,14 @@
     BOOL locked = [gSecurity isLocked:ORFilterLock];
     [lockButton setState: locked];
 	[parseButton setEnabled:!locked && !runInProgress];
+	if(runInProgress){
+		[codeHelperPU setEnabled:NO];
+		[insertCodeButton setEnabled:NO];
+	}
+	else {
+		[codeHelperPU setEnabled:YES];
+		[insertCodeButton setEnabled:YES];
+	}
 }
 
 - (void) updateTiming:(NSNotification*)aNote
@@ -253,6 +262,26 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) insertCode:(id) sender
+{
+	NSString* stringToInsert = @"";
+	switch ([codeHelperPU indexOfSelectedItem]) {
+		case 0: stringToInsert = @"start {\n}\nfilter {\n}\nfinish {\n}";	break;
+		case 1: stringToInsert = @"for(<var> = <start> ; <var> < <end> ; <var>++) {\n}";	break;
+		case 2: stringToInsert = @"while (<condition>) {\n}";	break;
+		case 3: stringToInsert = @"do {\n}while(<condition>);";	break;
+		case 4: stringToInsert = @"if (<condition>) {\n}";	break;
+		case 5: stringToInsert = @"if (<condition>) {\n}\nelse {\n}";	break;
+		case 6: stringToInsert = @"switch (<condition>) {\n\t case <item>:\n\t\t<statement>\n\tbreak;\n\tdefault:\n\t\t<statement>\n\tbreak;\n}";	break;
+		case 7: stringToInsert = @"case <item>:\n\t\t<statement>\n\tbreak;";	break;
+		default:break;
+	}
+	if([stringToInsert length]){
+		[scriptView insertText:stringToInsert];
+	}
+}
+
 - (IBAction) listDecoders:(id)sender
 {
     NSArray* objectList = [NSArray arrayWithArray:[[model document]collectObjectsRespondingTo:@selector(dataRecordDescription)]];
