@@ -542,12 +542,16 @@ int filterGraph(nodeType*);
 	theFilteredObject = [self objectConnectedTo:ORFilterFilteredConnector];
 	
 	[thePassThruObject runTaskStarted:userInfo];
+
+	[thePassThruObject setInvolvedInCurrentRun:YES];
+
 	
 	NSMutableDictionary* infoCopy = [userInfo mutableCopy];
 	[infoCopy setObject:@"Filtered" forKey:kFileSuffix];
 	
 	[theFilteredObject runTaskStarted:infoCopy];
 	[infoCopy release];
+	[theFilteredObject setInvolvedInCurrentRun:YES];
 	
 	runTimer = [[ORTimer alloc] init];
 	[runTimer start];
@@ -555,7 +559,7 @@ int filterGraph(nodeType*);
 	
 	int i;
 	for(i=0;i<kNumFilterStacks;i++) stacks[i] = nil;
-	
+
 }
 
 - (void) subRunTaskStarted:(id)userInfo
@@ -569,7 +573,9 @@ int filterGraph(nodeType*);
 	
 	[thePassThruObject runTaskStopped:userInfo];
 	[theFilteredObject runTaskStopped:userInfo];
-	
+	[thePassThruObject setInvolvedInCurrentRun:NO];
+	[theFilteredObject setInvolvedInCurrentRun:NO];
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
 	
