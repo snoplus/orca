@@ -1623,6 +1623,12 @@
 		8494C13A1317E2E200151E7B /* ORSqlConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494C1341317E2E200151E7B /* ORSqlConnection.m */; };
 		8494C13B1317E2E200151E7B /* ORSqlResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494C1351317E2E200151E7B /* ORSqlResult.h */; };
 		8494C13C1317E2E200151E7B /* ORSqlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494C1361317E2E200151E7B /* ORSqlResult.m */; };
+		8494D85913393D8A00DD5F9E /* ORRunListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494D85313393D8A00DD5F9E /* ORRunListController.h */; };
+		8494D85A13393D8A00DD5F9E /* ORRunListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494D85413393D8A00DD5F9E /* ORRunListController.m */; };
+		8494D85B13393D8A00DD5F9E /* ORRunListModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494D85513393D8A00DD5F9E /* ORRunListModel.h */; };
+		8494D85C13393D8A00DD5F9E /* ORRunListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494D85613393D8A00DD5F9E /* ORRunListModel.m */; };
+		8494D85D13393D8A00DD5F9E /* RunList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8494D85713393D8A00DD5F9E /* RunList.nib */; };
+		8494D85E13393D8A00DD5F9E /* RunList.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494D85813393D8A00DD5F9E /* RunList.tif */; };
 		849516B610C95382001C8112 /* ORStateLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849516B010C95382001C8112 /* ORStateLabelController.h */; };
 		849516B710C95382001C8112 /* ORStateLabelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849516B110C95382001C8112 /* ORStateLabelController.m */; };
 		849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849516B210C95382001C8112 /* ORStateLabelModel.h */; };
@@ -4177,6 +4183,12 @@
 		8494C1341317E2E200151E7B /* ORSqlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSqlConnection.m; path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL/ORSqlConnection.m"; sourceTree = SOURCE_ROOT; };
 		8494C1351317E2E200151E7B /* ORSqlResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSqlResult.h; path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL/ORSqlResult.h"; sourceTree = SOURCE_ROOT; };
 		8494C1361317E2E200151E7B /* ORSqlResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSqlResult.m; path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL/ORSqlResult.m"; sourceTree = SOURCE_ROOT; };
+		8494D85313393D8A00DD5F9E /* ORRunListController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunListController.h; path = Source/Objects/Control/RunList/ORRunListController.h; sourceTree = SOURCE_ROOT; };
+		8494D85413393D8A00DD5F9E /* ORRunListController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunListController.m; path = Source/Objects/Control/RunList/ORRunListController.m; sourceTree = SOURCE_ROOT; };
+		8494D85513393D8A00DD5F9E /* ORRunListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunListModel.h; path = Source/Objects/Control/RunList/ORRunListModel.h; sourceTree = SOURCE_ROOT; };
+		8494D85613393D8A00DD5F9E /* ORRunListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunListModel.m; path = Source/Objects/Control/RunList/ORRunListModel.m; sourceTree = SOURCE_ROOT; };
+		8494D85713393D8A00DD5F9E /* RunList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RunList.nib; path = Source/Objects/Control/RunList/RunList.nib; sourceTree = SOURCE_ROOT; };
+		8494D85813393D8A00DD5F9E /* RunList.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunList.tif; path = Source/Objects/Control/RunList/RunList.tif; sourceTree = SOURCE_ROOT; };
 		849516B010C95382001C8112 /* ORStateLabelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORStateLabelController.h; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelController.h"; sourceTree = SOURCE_ROOT; };
 		849516B110C95382001C8112 /* ORStateLabelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORStateLabelController.m; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelController.m"; sourceTree = SOURCE_ROOT; };
 		849516B210C95382001C8112 /* ORStateLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORStateLabelModel.h; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelModel.h"; sourceTree = SOURCE_ROOT; };
@@ -6888,6 +6900,7 @@
 				84E22AAA0417F26A005F64B1 /* DataTask */,
 				84539C470807247A00615B6D /* RemoteRunControl */,
 				842F19A703B8EAF3005F64B1 /* RunControl */,
+				8494D85213393D8A00DD5F9E /* RunList */,
 				84B28DCE0F4C6FED00E2B056 /* Ramper */,
 				84693F6A1121BB4C008B5DB2 /* RunNotes */,
 			);
@@ -8512,6 +8525,20 @@
 			);
 			name = mySQL;
 			path = "Source/Objects/Misc Objects/DatabaseSupport/mySQL";
+			sourceTree = SOURCE_ROOT;
+		};
+		8494D85213393D8A00DD5F9E /* RunList */ = {
+			isa = PBXGroup;
+			children = (
+				8494D85313393D8A00DD5F9E /* ORRunListController.h */,
+				8494D85413393D8A00DD5F9E /* ORRunListController.m */,
+				8494D85513393D8A00DD5F9E /* ORRunListModel.h */,
+				8494D85613393D8A00DD5F9E /* ORRunListModel.m */,
+				8494D85713393D8A00DD5F9E /* RunList.nib */,
+				8494D85813393D8A00DD5F9E /* RunList.tif */,
+			);
+			name = RunList;
+			path = Source/Objects/Control/RunList;
 			sourceTree = SOURCE_ROOT;
 		};
 		849516AF10C95382001C8112 /* StateLabel */ = {
@@ -12340,6 +12367,8 @@
 				841224D9132E6638001AC05B /* ORTPG262Decoders.h in Headers */,
 				841224DB132E6638001AC05B /* ORTPG262Model.h in Headers */,
 				43E9ED461339044100888F93 /* ORAuxHw.h in Headers */,
+				8494D85913393D8A00DD5F9E /* ORRunListController.h in Headers */,
+				8494D85B13393D8A00DD5F9E /* ORRunListModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13119,6 +13148,8 @@
 				844B9BEE132E527700FEDA6B /* Caen1724Card.gif in Resources */,
 				841224DD132E6638001AC05B /* TPG262.nib in Resources */,
 				841224DE132E6638001AC05B /* TPG262.tif in Resources */,
+				8494D85D13393D8A00DD5F9E /* RunList.nib in Resources */,
+				8494D85E13393D8A00DD5F9E /* RunList.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14002,6 +14033,8 @@
 				841224DA132E6638001AC05B /* ORTPG262Decoders.m in Sources */,
 				841224DC132E6638001AC05B /* ORTPG262Model.m in Sources */,
 				43E9ED471339044100888F93 /* ORAuxHw.m in Sources */,
+				8494D85A13393D8A00DD5F9E /* ORRunListController.m in Sources */,
+				8494D85C13393D8A00DD5F9E /* ORRunListModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
