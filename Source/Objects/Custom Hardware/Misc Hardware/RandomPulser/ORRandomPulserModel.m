@@ -61,6 +61,20 @@ NSString* ORRandomPulserSettingsLock						= @"ORRandomPulserSettingsLock";
 	return @"NCD/Random_Pulser.html";
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    //get the time(UT!)
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+    [objDictionary setObject:NSStringFromClass([self class])            forKey:@"Class Name"];
+    [objDictionary setObject:[NSNumber numberWithInt:pulserRate]       forKey:@"pulserRate"];
+    [objDictionary setObject:[NSNumber numberWithInt:pulserAmp]        forKey:@"pulserAmp"];
+    [objDictionary setObject:[NSNumber numberWithBool:ttlPulserState]   forKey:@"ttlPulserState"];
+    [objDictionary setObject:[NSNumber numberWithBool:negPulserState]   forKey:@"negPulserState"];    
+    [dictionary setObject:objDictionary forKey:@"Random Pulser"];
+    
+    return objDictionary;
+}
+
 -(void)makeConnectors
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(40, [self frame].size.height - kConnectorSize+2) withGuardian:self withObjectLink:self];

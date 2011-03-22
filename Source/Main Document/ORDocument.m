@@ -267,6 +267,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	NSMutableArray* dataChain		= [NSMutableArray array];
 	NSMutableArray* gpib			= [NSMutableArray array];
 	NSMutableArray* usb				= [NSMutableArray array];
+	NSMutableArray* auxHw			= [NSMutableArray array];
 	NSMutableDictionary* exp		= [NSMutableDictionary dictionary];
 	NSEnumerator* e					= [allObjects objectEnumerator];
 	id anObj;
@@ -296,6 +297,13 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 				[anObj addParametersToDictionary:objectInfoDictionary];
 			}
 		}
+		else if([anObj isKindOfClass:NSClassFromString(@"ORAuxHw")]){
+			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
+				[anObj addObjectInfoToArray:auxHw];
+			}
+		}
+        
+        
 	}
 	
 	
@@ -310,6 +318,9 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	}
 	if([usb count]){
 		[objectInfoDictionary setObject:usb forKey:@"USB"];
+	}
+	if([auxHw count]){
+		[objectInfoDictionary setObject:auxHw forKey:@"AuxHw"];
 	}
 	if([exp count]){
 		[objectInfoDictionary setObject:exp forKey:@"Experiments"];

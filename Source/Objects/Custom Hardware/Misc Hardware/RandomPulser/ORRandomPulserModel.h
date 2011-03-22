@@ -16,8 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORAuxHw.h"
 
-@interface ORRandomPulserModel : OrcaObject
+@interface ORRandomPulserModel : ORAuxHw
 {
 	int pulserRate;
 	int pulserAmp;
@@ -32,6 +33,7 @@
 -(void)registerNotificationObservers;
 -(void)vmePowerFailed:(NSNotification*)aNotification;
 -(void)loadHardware:(NSNotification*)aNotification;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ***Accessors
 - (BOOL)    ttlPulserState;
