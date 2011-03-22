@@ -172,6 +172,8 @@
 		43ADFED510B6E2090044617C /* ORVVmeCard.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 43ADFE7210B6DBCF0044617C /* ORVVmeCard.cc */; };
 		43ADFED610B6E2090044617C /* ORVVmeCard.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 43ADFE7310B6DBCF0044617C /* ORVVmeCard.hh */; };
 		43ADFED710B6E2090044617C /* UniverseDriverInstall in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84D351C210B5822F0013473E /* UniverseDriverInstall */; };
+		43E9ED461339044100888F93 /* ORAuxHw.h in Headers */ = {isa = PBXBuildFile; fileRef = 43E9ED441339044100888F93 /* ORAuxHw.h */; };
+		43E9ED471339044100888F93 /* ORAuxHw.m in Sources */ = {isa = PBXBuildFile; fileRef = 43E9ED451339044100888F93 /* ORAuxHw.m */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
 		546D9DB10874BDD60072A274 /* OR2228AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 546D9DA90874BDD60072A274 /* OR2228AController.h */; };
@@ -2931,6 +2933,8 @@
 		43ADFEAC10B6E1C80044617C /* HWMakefile.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HWMakefile.mk; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/HWMakefile.mk; sourceTree = SOURCE_ROOT; };
 		43ADFEAD10B6E1C80044617C /* ORAcqirisDC440Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORAcqirisDC440Readout.cc; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/ORAcqirisDC440Readout.cc; sourceTree = SOURCE_ROOT; };
 		43ADFEAE10B6E1C80044617C /* ORAcqirisDC440Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORAcqirisDC440Readout.hh; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/ORAcqirisDC440Readout.hh; sourceTree = SOURCE_ROOT; };
+		43E9ED441339044100888F93 /* ORAuxHw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAuxHw.h; path = "Source/Objects/Hardware/Hardware Base Classes/ORAuxHw.h"; sourceTree = SOURCE_ROOT; };
+		43E9ED451339044100888F93 /* ORAuxHw.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAuxHw.m; path = "Source/Objects/Hardware/Hardware Base Classes/ORAuxHw.m"; sourceTree = SOURCE_ROOT; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -5412,6 +5416,8 @@
 		2A178E9908DB3D91001D78BC /* Hardware Base Classes */ = {
 			isa = PBXGroup;
 			children = (
+				43E9ED441339044100888F93 /* ORAuxHw.h */,
+				43E9ED451339044100888F93 /* ORAuxHw.m */,
 				2A178E9A08DB3D91001D78BC /* ORCard.h */,
 				2A178E9B08DB3D91001D78BC /* ORCard.m */,
 				2A178E9C08DB3D91001D78BC /* ORCrate.h */,
@@ -12333,6 +12339,7 @@
 				841224D7132E6638001AC05B /* ORTPG262Controller.h in Headers */,
 				841224D9132E6638001AC05B /* ORTPG262Decoders.h in Headers */,
 				841224DB132E6638001AC05B /* ORTPG262Model.h in Headers */,
+				43E9ED461339044100888F93 /* ORAuxHw.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13994,6 +14001,7 @@
 				841224D8132E6638001AC05B /* ORTPG262Controller.m in Sources */,
 				841224DA132E6638001AC05B /* ORTPG262Decoders.m in Sources */,
 				841224DC132E6638001AC05B /* ORTPG262Model.m in Sources */,
+				43E9ED471339044100888F93 /* ORAuxHw.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
