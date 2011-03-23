@@ -78,10 +78,10 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
     [aConnector release];
 }
 
-- (BOOL) solitaryObject
-{
-    return YES;
-}
+//- (BOOL) solitaryObject
+//{
+//    return YES;
+//}
 
 - (void) setUpImage
 {
@@ -95,8 +95,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 
 - (NSString*) helpURL
 {
-	return nil;
-	//return @"Data_Chain/Run_Notes.html";
+	return @"Data_Chain/RunList.html";
 }
 
 #pragma mark ***Accessors
