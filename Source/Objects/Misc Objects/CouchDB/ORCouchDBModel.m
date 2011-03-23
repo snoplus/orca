@@ -284,8 +284,19 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) createDatabase
 {
-	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
-	[db createDatabase:kCreateDB];
+	
+	NSString* aMap = @"function(doc) { if(doc.type == 'Histogram1D') { emit(doc.name, { 'name': doc.name, 'counts': doc.counts }); } }";
+	NSDictionary* aMapDictionary = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
+	NSDictionary* aViewDictionary = [NSDictionary dictionaryWithObject:aMapDictionary forKey:@"counts"]; 
+	
+	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
+				  @"javascript",@"language",
+				  aViewDictionary,@"views",
+				  nil];	
+	
+	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort username:userName pwd:password database:[self machineName] delegate:self];
+	
+	[db createDatabase:kCreateDB views:theViews];
 	[self updateMachineRecord];
 	[self updateDatabaseStats];
 }
@@ -523,18 +534,27 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				@try {
 					for(id aDataSet in objs1d){
 						unsigned long start,end;
-
-						NSData* plotData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
+						NSData* pd = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
+						unsigned long* plotData = (unsigned long*)[pd bytes];
+						int n = [pd length]/4;
+						int i;
+						NSMutableString* s = [NSMutableString stringWithCapacity:n*64];
+						for(i=0;i<n;i++){
+							[s appendFormat:@"%d,",plotData[i]];
+						}
+						[s deleteCharactersInRange:NSMakeRange([s length]-1,1)];
+						
 						NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 													[aDataSet fullName],										@"name",
 													[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
 													[NSNumber numberWithUnsignedLong:start],					@"start",
 													[NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
+													s,															@"PlotData",
 													@"Histogram1D",												@"type",
 													 nil];
 						NSString* dataName = [[[aDataSet fullName] lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
 
-						[db updateDocument:dataInfo documentId:dataName attachmentData:plotData attachmentName:@"PlotData" tag:kDocumentAdded];
+						[db updateDocument:dataInfo documentId:dataName tag:kDocumentAdded];
 						
 		 
 					}

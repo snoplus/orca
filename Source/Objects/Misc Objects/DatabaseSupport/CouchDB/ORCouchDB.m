@@ -93,11 +93,12 @@
 	[anOp release];
 }
 
-- (void) createDatabase:(NSString*)aTag
+- (void) createDatabase:(NSString*)aTag views:(NSDictionary*)theViews
 {
 	ORCouchDBCreateDBOp* anOp = [[ORCouchDBCreateDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setUsername:username];
 	[anOp setPwd:pwd];
+	[anOp setViews:theViews];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
@@ -293,6 +294,13 @@
 @end
 
 @implementation ORCouchDBCreateDBOp
+@synthesize views;
+- (void) dealloc
+{
+	self.views = nil;
+	[super dealloc];
+}
+
 -(void) main
 {
 	if([self isCancelled])return;
@@ -306,6 +314,14 @@
 												   [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
 												   @"Reason",
 												   nil];
+		else {
+			if(views){
+				NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, database];
+				id result = [self send:httpString type:@"PUT" body:views];
+			}
+
+		}
+		
 	}
 	else {
 		result = [NSDictionary dictionaryWithObjectsAndKeys:

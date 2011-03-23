@@ -37,7 +37,7 @@
 - (void) version:(id)aDelegate tag:(NSString*)aTag;
 - (void) listDatabases:(id)aDelegate tag:(NSString*)aTag;
 - (void) databaseInfo:(id)aDelegate tag:(NSString*)aTag;
-- (void) createDatabase:(NSString*)aTag;
+- (void) createDatabase:(NSString*)aTag views:(NSDictionary*)theViews;
 - (void) deleteDatabase:(NSString*)aTag;
 - (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) getDocumentId:(NSString*)anId tag:(NSString*)aTag;
@@ -83,7 +83,11 @@
 @end
 
 @interface ORCouchDBCreateDBOp : ORCouchDBOperation
+{
+	NSDictionary* views;
+}
 -(void) main;
+@property (retain)	NSDictionary*	views;
 @end
 
 @interface ORCouchDBDeleteDBOp : ORCouchDBOperation
