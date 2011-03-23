@@ -129,7 +129,7 @@ NSString* TimedWorkerIsRunningChangedNotification       = @"TimedWorkerIsRunning
 - (void) execute 
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    
+    if(!isRunning)return;
     if(timeInterval < .001) {
         [self setIsRunning:NO];
         return;
