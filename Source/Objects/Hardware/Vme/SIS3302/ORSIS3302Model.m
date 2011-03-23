@@ -2889,9 +2889,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 													   withAddMod: [self addressModifier]
 													usingAddSpace: 0x01];
 									
-									//if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
+									if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
 										[aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
-									//}
+									}
+									else continue;
 									
 									addrOffset += (dataRecordlength[group]-4)*4;
 									if(++eventCount > 25)break;

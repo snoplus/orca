@@ -200,17 +200,22 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 			
 			// Put the data into the data stream
 			for (size_t i = 0; i < numLongsToRead; i += sizeOfRecord) {
-				ensureDataCanHold(sizeOfRecord + 4);
-				data[dataIndex++] = GetHardwareMask()[0] | (sizeOfRecord+4); 
-				data[dataIndex++] = ((GetCrate()     & 0x0000000f) << 21) | 
-									((GetSlot()      & 0x0000001f) << 16) | 
-									((channel        & 0x000000ff) << 8)  |
-									bufferWrap;
-				data[dataIndex++] = numberLongsInRawData;
-				data[dataIndex++] = numberLongsInEnergyData;
-				memcpy(data + dataIndex, &dmaBuffer[i], sizeOfRecord*sizeof(uint32_t));
-					
-				dataIndex += sizeOfRecord;
+				if(dmaBuffer[i+sizeOfRecord-1] == 0xdeadbeef){
+					ensureDataCanHold(sizeOfRecord + 4);
+					data[dataIndex++] = GetHardwareMask()[0] | (sizeOfRecord+4); 
+					data[dataIndex++] = ((GetCrate()     & 0x0000000f) << 21) | 
+										((GetSlot()      & 0x0000001f) << 16) | 
+										((channel        & 0x000000ff) << 8)  |
+										bufferWrap;
+					data[dataIndex++] = numberLongsInRawData;
+					data[dataIndex++] = numberLongsInEnergyData;
+					memcpy(data + dataIndex, &dmaBuffer[i], sizeOfRecord*sizeof(uint32_t));
+						
+					dataIndex += sizeOfRecord;
+				}
+				else {
+					break;
+				}
 			}
 		}
 	}
