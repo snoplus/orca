@@ -201,7 +201,7 @@
 			//no decoder defined for this object
 			numLong = ExtractLength(*dPtr); //new form--just skip it by getting the length from the header.
 			if(numLong == 0){
-				NSLogError(@"Data Decoder",@"Zero Packet Length",nil);
+				NSLogError(@" ",@"Data Decoder",@"Zero Packet Length",nil);
 				break;
 			}
 			
@@ -213,7 +213,7 @@
 		
 		if(numLong > length){
 			//really bad... the length or the nuLongs processed was incorrect for some reason. We can not continue.
-			NSLogError(@"Data Decoder",@"Bad Record:Incorrect Length",nil);
+			NSLogError(@" ",@"Data Decoder",@"Bad Record:Incorrect Length",nil);
 			break;
 		}
 		
