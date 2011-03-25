@@ -75,6 +75,11 @@
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) accumulateChanged:(NSNotification*)aNote
+{
+	[accumulateCB setIntValue: [model accumulate]];
+}
+
 - (void) shipFinalHistogramsChanged:(NSNotification*)aNote
 {
 	[shipFinalHistogramsButton setIntValue: [model shipFinalHistograms]];
@@ -135,6 +140,11 @@
                          name : ORDataChainObjectInvolvedInCurrentRun
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(accumulateChanged:)
+                         name : ORHistoModelAccumulateChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -147,6 +157,7 @@
     [self writeFileChanged:nil];
 	[self shipFinalHistogramsChanged:nil];
 	[self involvedInCurrentRunChanged:nil];
+	[self accumulateChanged:nil];
 }
 
 
@@ -246,6 +257,10 @@
 }
 
 #pragma  mark ¥¥¥Actions
+- (void) accumulateAction:(id)sender
+{
+	[model setAccumulate:[sender intValue]];	
+}
 - (IBAction) getInfo:(id)sender
 {
     if([[self window] firstResponder] == outlineView){

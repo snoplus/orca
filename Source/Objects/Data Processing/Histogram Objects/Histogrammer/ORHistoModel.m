@@ -31,10 +31,11 @@
 #import "ORDecoder.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORHistoModelShipFinalHistogramsChanged = @"ORHistoModelShipFinalHistogramsChanged";
-NSString* ORHistoModelChangedNotification		= @"The Histogram Model Object Has Changed";
-NSString* ORHistoModelDirChangedNotification	= @"The Histogram Model Dir Changed";
-NSString* ORHistoModelFileChangedNotification	= @"The Histogram Model File Has Changed";
+NSString* ORHistoModelAccumulateChanged				= @"ORHistoModelAccumulateChanged";
+NSString* ORHistoModelShipFinalHistogramsChanged	= @"ORHistoModelShipFinalHistogramsChanged";
+NSString* ORHistoModelChangedNotification			= @"The Histogram Model Object Has Changed";
+NSString* ORHistoModelDirChangedNotification		= @"The Histogram Model Dir Changed";
+NSString* ORHistoModelFileChangedNotification		= @"The Histogram Model File Has Changed";
 NSString* ORHistoModelWriteFileChangedNotification	= @"The Histogram Model WriteFile Has Changed";
 NSString* ORHistoModelMultiPlotsChangedNotification = @"ORHistoModelMultiPlotsChangedNotification";
 
@@ -199,6 +200,20 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) accumulate
+{
+    return accumulate;
+}
+
+- (void) setAccumulate:(BOOL)aAccumulate
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAccumulate:accumulate];
+    
+    accumulate = aAccumulate;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHistoModelAccumulateChanged object:self];
+}
 
 - (BOOL) shipFinalHistograms
 {
@@ -399,8 +414,11 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 		runNumber = [[runControlEntry objectForKey:@"RunNumber"] longValue];
 	}	  
 	[dataSet setRunNumber:runNumber];
-    [dataSet clear];
-
+	
+	if(!accumulate){
+		[dataSet clear];
+	}
+	
  	id nextObject =  [self objectConnectedTo: ORHistoPassThruConnection];
 	[nextObject runTaskStarted:userInfo];
 	[nextObject setInvolvedInCurrentRun:YES];
@@ -420,9 +438,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	[dataSet runTaskStopped];
 }
 
-- (void) endOfRunCleanup:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) endOfRunCleanup:(id)userInfo
 {
  	if(shipFinalHistograms){
+		ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
 		[self shipTheFinalHistograms:aDataPacket];
 	}
 }
@@ -553,6 +572,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 	mLock = [[NSLock alloc] init];
     
     [[self undoManager] disableUndoRegistration];
+    [self setAccumulate:[decoder decodeBoolForKey:@"accumulate"]];
     [self setShipFinalHistograms:[decoder decodeBoolForKey:@"shipFinalHistograms"]];
     [self setDirectoryName:[decoder decodeObjectForKey:ORHistoDirName]];
     [self setWriteFile:[decoder decodeIntForKey:ORHistoWriteFile]];
@@ -568,6 +588,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:accumulate forKey:@"accumulate"];
     [encoder encodeBool:shipFinalHistograms forKey:@"shipFinalHistograms"];
     [encoder encodeObject:[self directoryName] forKey:ORHistoDirName];
     [encoder encodeInt:[self writeFile] forKey:ORHistoWriteFile];
