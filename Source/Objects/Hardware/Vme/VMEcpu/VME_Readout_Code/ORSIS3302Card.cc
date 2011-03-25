@@ -49,11 +49,11 @@ bool ORSIS3302Card::Start()
 bool ORSIS3302Card::Stop()
 {
 	//read out the last buffer, if there's a problem, just continue
-	if (!DisarmAndArmNextBank())return true;
-	usleep(5);
-	for( size_t i=0;i<GetNumberOfChannels();i++) {
-		ReadOutChannel(i);
-	}	
+	//if (!DisarmAndArmNextBank())return true;
+	//usleep(50);
+	//for( size_t i=0;i<GetNumberOfChannels();i++) {
+	//	ReadOutChannel(i);
+	//}	
 	return true;
 }
 
