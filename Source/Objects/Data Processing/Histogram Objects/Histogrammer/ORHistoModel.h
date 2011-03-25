@@ -45,6 +45,7 @@
 		OR1DHisto*  dummy1DHisto;
 		OR2DHisto*  dummy2DHisto;
 	
+    BOOL accumulate;
 }
 
 
@@ -52,6 +53,8 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) accumulate;
+- (void) setAccumulate:(BOOL)aAccumulate;
 - (BOOL)		shipFinalHistograms;
 - (void)		setShipFinalHistograms:(BOOL)aShipFinalHistograms;
 - (id)			objectForKeyArray:(NSMutableArray*)anArray;
@@ -98,6 +101,7 @@
 @end
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORHistoModelAccumulateChanged;
 extern NSString* ORHistoModelShipFinalHistogramsChanged;
 extern NSString* ORHistoModelDirChangedNotification;
 extern NSString* ORHistoModelFileChangedNotification;
