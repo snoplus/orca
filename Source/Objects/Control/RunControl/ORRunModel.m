@@ -1313,11 +1313,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (NSDictionary*)runInfo
 {
-	return [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+	return [NSMutableDictionary dictionaryWithObjectsAndKeys:
 				[NSNumber numberWithLong:runNumber],kRunNumber,
 				[NSNumber numberWithLong:subRunNumber],kSubRunNumber,
 				[NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
-				nil] retain];
+				nil];
 }
 
 
