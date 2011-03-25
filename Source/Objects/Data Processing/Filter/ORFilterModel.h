@@ -120,6 +120,7 @@
 - (void) closeOutRun:(id)userInfo;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 - (void) setRunMode:(int)aMode;
+- (void) cleanUpFilter;
 
 #pragma mark ***Script Methods
 - (void) parseScript;

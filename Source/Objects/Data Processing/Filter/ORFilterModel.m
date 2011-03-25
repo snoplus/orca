@@ -345,9 +345,10 @@ int filterGraph(nodeType*);
 	
 	//pass it on
 	[thePassThruObject processData:dataArray decoder:aDecoder];
-	
+	[dataArray retain];
 	//each block of data is an array of NSData objects, each potentially containing many records..
 	for(id data in dataArray){
+		[data retain];
 		//each record must be filtered by the filter code. 
 		long totalLen = [data length]/sizeof(long);
 		if(totalLen>0){
@@ -355,6 +356,12 @@ int filterGraph(nodeType*);
 			while(totalLen>0){
 				
 				long recordLen = ExtractLength(*ptr);
+				if(recordLen > totalLen){
+					NSLog(@"Bad Record Length\n");
+					NSLogError(@" ",@"Filter",@"Bad Record:Incorrect Length",nil);
+					printf("Bad Record Length\n");
+					break;
+				}
 				
 				filterData tempData;
 				unsigned long t = [runTimer microseconds]/1000;
@@ -396,7 +403,9 @@ int filterGraph(nodeType*);
 			[symbolTable removeKey:"CurrentRecordPtr"];
 			[symbolTable removeKey:"CurrentRecordLen"];
 		}
+		[data release];
 	}
+	[dataArray release];
 }
 
 - (unsigned long) dataId1D { return dataId1D; }
@@ -514,6 +523,14 @@ int filterGraph(nodeType*);
 
 - (void) verifyFilterIsReady
 {
+	
+	runTimer = [[ORTimer alloc] init];
+	[runTimer start];
+	lastRunTimeValue = 0;
+	
+	int i;
+	for(i=0;i<kNumFilterStacks;i++) stacks[i] = nil;
+	
 	if(usePlugin){
 		if(!pluginValid){
 			NSLog(@"Filter Plugin <%@> is not Valid. Run Not Allowed.\n",pluginPath);
@@ -529,6 +546,26 @@ int filterGraph(nodeType*);
 		}
 	}
 }
+
+- (void) cleanUpFilter
+{
+	
+	[self freeNodes];
+	
+	int i;
+	for(i=0;i<kNumFilterStacks;i++){
+		[self dumpStack:i];
+	}
+	
+	[runTimer release];
+	runTimer = nil;
+	[currentDecoder release];
+	currentDecoder = nil;
+	[symbolTable release];
+	symbolTable = nil;
+
+}
+
 - (void) runTaskStarted:(id)userInfo
 {		
 	[self clearTimeHistogram];
@@ -553,12 +590,6 @@ int filterGraph(nodeType*);
 	[infoCopy release];
 	[theFilteredObject setInvolvedInCurrentRun:YES];
 	
-	runTimer = [[ORTimer alloc] init];
-	[runTimer start];
-	lastRunTimeValue = 0;
-	
-	int i;
-	for(i=0;i<kNumFilterStacks;i++) stacks[i] = nil;
 
 }
 
@@ -583,32 +614,19 @@ int filterGraph(nodeType*);
 
 - (void) closeOutRun:(id)userInfo
 {
-	[thePassThruObject closeOutRun:userInfo];
-	[theFilteredObject closeOutRun:userInfo];
 		
-	if(usePlugin){
-		[pluginInstance finish];
-	}
-	else {
-		finishFilterScript(self);
-	}
+	if(usePlugin) [pluginInstance finish];
+	else		  finishFilterScript(self);
 	
-	[symbolTable release];
-	symbolTable = nil;
 	
-	[self freeNodes];
-	
-	int i;
-	for(i=0;i<kNumFilterStacks;i++){
-		[self dumpStack:i];
-	}
-	
-	[runTimer release];
-	runTimer = nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
-	[currentDecoder release];
-	currentDecoder = nil;
+
 	
+	[theFilteredObject closeOutRun:userInfo];
+	[thePassThruObject closeOutRun:userInfo];
+	
+	[self cleanUpFilter];
+
 }
 
 - (void) setRunMode:(int)aMode
@@ -822,11 +840,11 @@ int filterGraph(nodeType*);
 
 - (void) shipRecord:(unsigned long*)p length:(long)length
 {
-	//if(ExtractDataId(p[0]) != 0){
+	if(p && length){
 		//pass it on
 		NSArray* dataArray = [NSArray arrayWithObject:[NSData dataWithBytes:p length:length*sizeof(long)]];
 		[theFilteredObject processData:dataArray decoder:currentDecoder];
-	//}
+	}
 }
 
 - (void) pushOntoStack:(int)i record:(unsigned long*)p

@@ -72,12 +72,14 @@ void finishFilterScript(id delegate)
 
 void runFilterScript(id delegate)
 {
-	unsigned node;
-	for(node=0;node<filterNodeCount;node++){
-		@try {
-			ex(filterNodes[node],delegate);
-		}
-		@catch(NSException* localException) {
+	if(symbolTable){
+		unsigned node;
+		for(node=0;node<filterNodeCount;node++){
+			@try {
+				ex(filterNodes[node],delegate);
+			}
+			@catch(NSException* localException) {
+			}
 		}
 	}
 }

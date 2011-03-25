@@ -479,9 +479,9 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	//wait for the processing queu to clear.
 	float totalTime = 0;
     while([transferQueue count]){
-		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
-		totalTime += .01;
-		if(totalTime > 200){
+		[ORTimer delay:1];
+		totalTime += 1;
+		if(totalTime > 2){
 			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 2 seconds.\n");
 			break;
 		}
@@ -513,23 +513,26 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
                                                       userInfo: statusInfo];
 	
  	//wait for the processing queu to clear.
+	NSLog(@"Clearing processing queue\n");
 	float totalTime = 0;
     while([transferQueue count]){
-		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
-		totalTime += .01;
-		if(totalTime > 200){
+		[ORTimer delay:.1];
+		totalTime += .1;
+		if(totalTime > 2){
 			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 2 seconds.\n");
 			break;
 		}
 	}	
+	if([transferQueue count]==0)NSLog(@"Processing queue clear\n");
 	
 	//wait for the processing thread to exit.
+	NSLog(@"Waiting on processing thread\n");
 	totalTime = 0;
     while(processThreadRunning){
 		timeToStopProcessThread = YES;
-		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.1]];
+		[ORTimer delay:.1];
 		totalTime += .1;
-		if(totalTime > 20){
+		if(totalTime > 2){
 			NSLogColor([NSColor redColor], @"Processing Thread Failed to stop.....You should stop and restart ORCA!\n");
 			break;
 		}
