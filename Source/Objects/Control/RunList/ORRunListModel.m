@@ -235,7 +235,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 - (void) restoreFromFile:(NSString*)aPath
 {
 	[self setLastFile:aPath];
-	NSStringEncoding* encoding;
+	NSStringEncoding* encoding = nil;
 	NSString* s = [NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath] usedEncoding:encoding error:nil];
 	[items release];
 	items = [[NSMutableArray array] retain];
