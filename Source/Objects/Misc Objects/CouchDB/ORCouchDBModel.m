@@ -284,10 +284,27 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) createDatabase
 {
+	//set up the views
+	NSString* aMap;
+	NSDictionary* aMapDictionary;
+	NSMutableDictionary* aViewDictionary = [NSMutableDictionary dictionary];
 	
-	NSString* aMap = @"function(doc) { if(doc.type == 'Histogram1D') { emit(doc.name, { 'name': doc.name, 'counts': doc.counts }); } }";
-	NSDictionary* aMapDictionary = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	NSDictionary* aViewDictionary = [NSDictionary dictionaryWithObject:aMapDictionary forKey:@"counts"]; 
+	aMap            = @"function(doc) { if(doc.type == 'Histogram1D') { emit(doc.name, { 'name': doc.name, 'counts': doc.counts }); } }";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"counts"]; 
+
+	aMap            = @"function(doc) { if(doc.type == 'alarms') { emit(doc.type, {'alarmlist': doc.alarmlist}); } }";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"alarms"]; 
+	
+	aMap            = @"function(doc) { if(doc.type == 'machineinfo') { emit(doc.type, doc); } }";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"machineinfo"]; 
+
+	aMap            = @"function(doc) { if(doc.type == 'runinfo') { emit(doc._id, doc); } }";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"runinfo"]; 
+	
 	
 	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
 				  @"javascript",@"language",
@@ -515,7 +532,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		if([theAlarms count]){
 			for(id anAlarm in theAlarms)[arrayForDoc addObject:[anAlarm alarmInfo]];
 		}
-		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
+		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"alarms",@"name",arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
 		[db updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentAdded];
 	}
 }
