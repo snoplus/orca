@@ -3,16 +3,16 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">10J567</string>
-		<string key="IBDocument.InterfaceBuilderVersion">823</string>
+		<string key="IBDocument.InterfaceBuilderVersion">851</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">462.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">823</string>
+			<string key="NS.object.0">851</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3848"/>
+			<integer value="3778"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -60,7 +60,7 @@
 								<object class="NSTabViewItem" id="1065090162">
 									<string key="NSIdentifier">BasicOps</string>
 									<object class="NSView" key="NSView" id="804083207">
-										<reference key="NSNextResponder" ref="27153167"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">4352</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -490,7 +490,6 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 19}, {311, 259}}</string>
-										<reference key="NSSuperview" ref="27153167"/>
 									</object>
 									<string key="NSLabel">Telnet</string>
 									<reference key="NSColor" ref="864569477"/>
@@ -638,13 +637,13 @@
 											<object class="NSTextField" id="22453199">
 												<reference key="NSNextResponder" ref="943315490"/>
 												<int key="NSvFlags">256</int>
-												<string key="NSFrame">{{158, 163}, {54, 15}}</string>
+												<string key="NSFrame">{{158, 161}, {54, 17}}</string>
 												<reference key="NSSuperview" ref="943315490"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="598757585">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">71303168</int>
-													<string key="NSContents">Lockout:</string>
+													<string key="NSContents">isLocked</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="22453199"/>
 													<reference key="NSBackgroundColor" ref="864569477"/>
@@ -844,7 +843,7 @@
 								</object>
 								<object class="NSTabViewItem" id="530862363">
 									<object class="NSView" key="NSView" id="548190179">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="27153167"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1175,9 +1174,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<object class="NSMenuItem" key="NSMenuItem" id="842778002">
+																	<object class="NSMenuItem" key="NSMenuItem" id="529869430">
 																		<reference key="NSMenu" ref="427651930"/>
-																		<string key="NSTitle">Default (2s)</string>
+																		<string key="NSTitle">10KPPS</string>
 																		<string key="NSKeyEquiv"/>
 																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
@@ -1185,6 +1184,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																		<reference key="NSOnImage" ref="2317050"/>
 																		<reference key="NSMixedImage" ref="420785207"/>
 																		<string key="NSAction">_popUpItemAction:</string>
+																		<int key="NSTag">4</int>
 																		<reference key="NSTarget" ref="894689418"/>
 																	</object>
 																	<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -1192,34 +1192,87 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																		<string key="NSTitle">OtherViews</string>
 																		<object class="NSMutableArray" key="NSMenuItems">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
-																			<reference ref="842778002"/>
-																			<object class="NSMenuItem" id="770515">
+																			<object class="NSMenuItem" id="592512738">
 																				<reference key="NSMenu" ref="427651930"/>
-																				<string key="NSTitle">10 seconds</string>
+																				<string key="NSTitle">1PPS</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="2317050"/>
+																				<reference key="NSMixedImage" ref="420785207"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<reference key="NSTarget" ref="894689418"/>
+																			</object>
+																			<object class="NSMenuItem" id="842778002">
+																				<reference key="NSMenu" ref="427651930"/>
+																				<string key="NSTitle">10PPS</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="2317050"/>
 																				<reference key="NSMixedImage" ref="420785207"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">1</int>
+																				<reference key="NSTarget" ref="894689418"/>
+																			</object>
+																			<object class="NSMenuItem" id="770515">
+																				<reference key="NSMenu" ref="427651930"/>
+																				<string key="NSTitle">100PPS</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSKeyEquivModMask">1048576</int>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="2317050"/>
+																				<reference key="NSMixedImage" ref="420785207"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">2</int>
 																				<reference key="NSTarget" ref="894689418"/>
 																			</object>
 																			<object class="NSMenuItem" id="96541147">
 																				<reference key="NSMenu" ref="427651930"/>
-																				<string key="NSTitle">60 seconds</string>
+																				<string key="NSTitle">1KPPS</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="2317050"/>
 																				<reference key="NSMixedImage" ref="420785207"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">3</int>
 																				<reference key="NSTarget" ref="894689418"/>
 																			</object>
-																			<object class="NSMenuItem" id="529869430">
+																			<reference ref="529869430"/>
+																			<object class="NSMenuItem" id="754830691">
 																				<reference key="NSMenu" ref="427651930"/>
-																				<string key="NSTitle">No TimeOut</string>
+																				<string key="NSTitle">100KPPS</string>
 																				<string key="NSKeyEquiv"/>
-																				<int key="NSKeyEquivModMask">1048576</int>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="2317050"/>
+																				<reference key="NSMixedImage" ref="420785207"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<reference key="NSTarget" ref="894689418"/>
+																			</object>
+																			<object class="NSMenuItem" id="71352227">
+																				<reference key="NSMenu" ref="427651930"/>
+																				<string key="NSTitle">1MPPS</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="2317050"/>
+																				<reference key="NSMixedImage" ref="420785207"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<reference key="NSTarget" ref="894689418"/>
+																			</object>
+																			<object class="NSMenuItem" id="915576272">
+																				<reference key="NSMenu" ref="427651930"/>
+																				<string key="NSTitle">5MPPS</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="2317050"/>
+																				<reference key="NSMixedImage" ref="420785207"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<reference key="NSTarget" ref="894689418"/>
+																			</object>
+																			<object class="NSMenuItem" id="969526080">
+																				<reference key="NSMenu" ref="427651930"/>
+																				<string key="NSTitle">10MPPS</string>
+																				<string key="NSKeyEquiv"/>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="2317050"/>
 																				<reference key="NSMixedImage" ref="420785207"/>
@@ -1228,6 +1281,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																			</object>
 																		</object>
 																	</object>
+																	<int key="NSSelectedIndex">4</int>
 																	<int key="NSPreferredEdge">1</int>
 																	<bool key="NSUsesItemFromMenu">YES</bool>
 																	<bool key="NSAltersState">YES</bool>
@@ -1251,16 +1305,16 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<object class="NSMenuItem" key="NSMenuItem" id="245310032">
+																	<object class="NSMenuItem" key="NSMenuItem" id="774819885">
 																		<reference key="NSMenu" ref="835061890"/>
-																		<string key="NSTitle">Default (2s)</string>
+																		<string key="NSTitle">1 day</string>
 																		<string key="NSKeyEquiv"/>
-																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
 																		<int key="NSState">1</int>
 																		<reference key="NSOnImage" ref="2317050"/>
 																		<reference key="NSMixedImage" ref="420785207"/>
 																		<string key="NSAction">_popUpItemAction:</string>
+																		<int key="NSTag">86400</int>
 																		<reference key="NSTarget" ref="384562074"/>
 																	</object>
 																	<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -1268,7 +1322,18 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																		<string key="NSTitle">OtherViews</string>
 																		<object class="NSMutableArray" key="NSMenuItems">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
-																			<reference ref="245310032"/>
+																			<object class="NSMenuItem" id="245310032">
+																				<reference key="NSMenu" ref="835061890"/>
+																				<string key="NSTitle">1 second</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSKeyEquivModMask">1048576</int>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="2317050"/>
+																				<reference key="NSMixedImage" ref="420785207"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">1</int>
+																				<reference key="NSTarget" ref="384562074"/>
+																			</object>
 																			<object class="NSMenuItem" id="517298721">
 																				<reference key="NSMenu" ref="835061890"/>
 																				<string key="NSTitle">10 seconds</string>
@@ -1278,33 +1343,48 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																				<reference key="NSOnImage" ref="2317050"/>
 																				<reference key="NSMixedImage" ref="420785207"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">10</int>
 																				<reference key="NSTarget" ref="384562074"/>
 																			</object>
 																			<object class="NSMenuItem" id="158647161">
 																				<reference key="NSMenu" ref="835061890"/>
-																				<string key="NSTitle">60 seconds</string>
+																				<string key="NSTitle">1 minute</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="2317050"/>
 																				<reference key="NSMixedImage" ref="420785207"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">60</int>
 																				<reference key="NSTarget" ref="384562074"/>
 																			</object>
 																			<object class="NSMenuItem" id="643333632">
 																				<reference key="NSMenu" ref="835061890"/>
-																				<string key="NSTitle">No TimeOut</string>
+																				<string key="NSTitle">10 minutes</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="2317050"/>
 																				<reference key="NSMixedImage" ref="420785207"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">600</int>
 																				<reference key="NSTarget" ref="384562074"/>
 																			</object>
+																			<object class="NSMenuItem" id="937807468">
+																				<reference key="NSMenu" ref="835061890"/>
+																				<string key="NSTitle">1 hour</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="2317050"/>
+																				<reference key="NSMixedImage" ref="420785207"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">3600</int>
+																				<reference key="NSTarget" ref="384562074"/>
+																			</object>
+																			<reference ref="774819885"/>
 																		</object>
 																	</object>
-																	<int key="NSSelectedIndex">2</int>
+																	<int key="NSSelectedIndex">5</int>
 																	<int key="NSPreferredEdge">1</int>
 																	<bool key="NSUsesItemFromMenu">YES</bool>
 																	<bool key="NSAltersState">YES</bool>
@@ -2100,16 +2180,16 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 															<object class="NSButton" id="792726902">
 																<reference key="NSNextResponder" ref="1034638365"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{69, 49}, {66, 18}}</string>
+																<string key="NSFrame">{{69, 49}, {76, 18}}</string>
 																<reference key="NSSuperview" ref="1034638365"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="462178827">
 																	<int key="NSCellFlags">-2080244224</int>
 																	<int key="NSCellFlags2">131072</int>
-																	<string key="NSContents">Repeat: </string>
+																	<string key="NSContents">Repeat in:</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="792726902"/>
-																	<int key="NSButtonFlags">1210864127</int>
+																	<int key="NSButtonFlags">1211912703</int>
 																	<int key="NSButtonFlags2">2</int>
 																	<object class="NSCustomResource" key="NSNormalImage">
 																		<string key="NSClassName">NSImage</string>
@@ -2127,13 +2207,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 															<object class="NSTextField" id="7762574">
 																<reference key="NSNextResponder" ref="1034638365"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{18, 20}, {261, 19}}</string>
+																<string key="NSFrame">{{12, 19}, {271, 19}}</string>
 																<reference key="NSSuperview" ref="1034638365"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="934387347">
 																	<int key="NSCellFlags">-1804468671</int>
 																	<int key="NSCellFlags2">71435264</int>
-																	<string key="NSContents">XXX:XX:XX:XX.XXXXXX XXX:XX:XX:XX.XXXXXX</string>
+																	<string key="NSContents">PPO XXX:XX:XX:XX.XXXXXX XXX:XX:XX:XX.XXXXXX</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="7762574"/>
 																	<bool key="NSDrawsBackground">YES</bool>
@@ -2168,13 +2248,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 19}, {311, 259}}</string>
+										<reference key="NSSuperview" ref="27153167"/>
 									</object>
 									<string key="NSLabel">PPO</string>
 									<reference key="NSColor" ref="864569477"/>
 									<reference key="NSTabView" ref="27153167"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="1065090162"/>
+							<reference key="NSSelectedTabViewItem" ref="530862363"/>
 							<object class="NSFont" key="NSFont">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">9</double>
@@ -2185,7 +2266,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="804083207"/>
+								<reference ref="548190179"/>
 							</object>
 						</object>
 						<object class="NSButton" id="424136628">
@@ -2320,6 +2401,518 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="439902864"/>
 					</object>
 					<int key="connectionID">3906</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">telnetPingButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="404490084"/>
+					</object>
+					<int key="connectionID">3916</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">telnetPingPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="838130404"/>
+					</object>
+					<int key="connectionID">3917</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">telnetTestButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="396697977"/>
+					</object>
+					<int key="connectionID">3918</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">telnetTestPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="1051980707"/>
+					</object>
+					<int key="connectionID">3919</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">passwordField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="651170690"/>
+					</object>
+					<int key="connectionID">3920</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">userField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="246484770"/>
+					</object>
+					<int key="connectionID">3921</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="404490084"/>
+					</object>
+					<int key="connectionID">3922</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="396697977"/>
+					</object>
+					<int key="connectionID">3923</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicSendButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="691973871"/>
+					</object>
+					<int key="connectionID">3924</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicSendPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="264091166"/>
+					</object>
+					<int key="connectionID">3925</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">commandField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="789758771"/>
+					</object>
+					<int key="connectionID">3926</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">userFieldAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="246484770"/>
+					</object>
+					<int key="connectionID">3927</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="691973871"/>
+					</object>
+					<int key="connectionID">3928</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicLockedButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="115415562"/>
+					</object>
+					<int key="connectionID">3929</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicLockedPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="422529281"/>
+					</object>
+					<int key="connectionID">3930</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicReportButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="597894736"/>
+					</object>
+					<int key="connectionID">3931</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicReportPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="183847348"/>
+					</object>
+					<int key="connectionID">3932</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicSatellitesButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="1033127173"/>
+					</object>
+					<int key="connectionID">3933</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicSatellitesPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="157528012"/>
+					</object>
+					<int key="connectionID">3934</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicTimeButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="778811732"/>
+					</object>
+					<int key="connectionID">3935</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicTimePI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="806673673"/>
+					</object>
+					<int key="connectionID">3936</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicSelfTestButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="593500644"/>
+					</object>
+					<int key="connectionID">3937</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">basicSelfTestPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="542089086"/>
+					</object>
+					<int key="connectionID">3938</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="778811732"/>
+					</object>
+					<int key="connectionID">3939</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="115415562"/>
+					</object>
+					<int key="connectionID">3940</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="597894736"/>
+					</object>
+					<int key="connectionID">3941</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="1033127173"/>
+					</object>
+					<int key="connectionID">3942</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="593500644"/>
+					</object>
+					<int key="connectionID">3943</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoCommandAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="7762574"/>
+					</object>
+					<int key="connectionID">3944</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="719243207"/>
+					</object>
+					<int key="connectionID">3945</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="968977399"/>
+					</object>
+					<int key="connectionID">3946</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">opsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="1029724413"/>
+					</object>
+					<int key="connectionID">3947</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoCommandField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="7762574"/>
+					</object>
+					<int key="connectionID">3948</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoGetButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="1029724413"/>
+					</object>
+					<int key="connectionID">3949</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoGetPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="59950041"/>
+					</object>
+					<int key="connectionID">3950</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoSetButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="968977399"/>
+					</object>
+					<int key="connectionID">3951</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoSetPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="385067279"/>
+					</object>
+					<int key="connectionID">3952</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoTurnOffButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="719243207"/>
+					</object>
+					<int key="connectionID">3953</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoTurnOffPI</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="511743247"/>
+					</object>
+					<int key="connectionID">3954</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">isPpoMatrix</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="960287090"/>
+					</object>
+					<int key="connectionID">3955</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppsCommandPU</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="994398718"/>
+					</object>
+					<int key="connectionID">3956</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppsCommandAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="994398718"/>
+					</object>
+					<int key="connectionID">3958</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">commandAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="789758771"/>
+					</object>
+					<int key="connectionID">3959</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoDayField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="362538951"/>
+					</object>
+					<int key="connectionID">3960</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoHourField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="137215610"/>
+					</object>
+					<int key="connectionID">3961</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoMinuteField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="176249392"/>
+					</object>
+					<int key="connectionID">3962</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoSecondField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="769747038"/>
+					</object>
+					<int key="connectionID">3963</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoNowButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="537593361"/>
+					</object>
+					<int key="connectionID">3964</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoTimeOffsetField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="513227141"/>
+					</object>
+					<int key="connectionID">3965</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoTodayButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="46868032"/>
+					</object>
+					<int key="connectionID">3966</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoNowAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="537593361"/>
+					</object>
+					<int key="connectionID">3967</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoTodayAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="46868032"/>
+					</object>
+					<int key="connectionID">3968</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoTimeOffsetAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="513227141"/>
+					</object>
+					<int key="connectionID">3969</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoTimeAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="769747038"/>
+					</object>
+					<int key="connectionID">3970</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoTimeAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="176249392"/>
+					</object>
+					<int key="connectionID">3971</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoTimeAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="137215610"/>
+					</object>
+					<int key="connectionID">3972</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoTimeAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="362538951"/>
+					</object>
+					<int key="connectionID">3973</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoPulseWidthAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="76882011"/>
+					</object>
+					<int key="connectionID">3974</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoPulseWidthField</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="76882011"/>
+					</object>
+					<int key="connectionID">3975</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoPulsePeriodPU</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="1072567086"/>
+					</object>
+					<int key="connectionID">3976</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ppoRepeatsButton</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="792726902"/>
+					</object>
+					<int key="connectionID">3977</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoPulsePeriodAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="1072567086"/>
+					</object>
+					<int key="connectionID">3978</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ppoRepeatsAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="792726902"/>
+					</object>
+					<int key="connectionID">3979</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">isPpoAction:</string>
+						<reference key="source" ref="890317098"/>
+						<reference key="destination" ref="960287090"/>
+					</object>
+					<int key="connectionID">3981</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2671,6 +3264,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="770515"/>
 							<reference ref="96541147"/>
 							<reference ref="529869430"/>
+							<reference ref="592512738"/>
+							<reference ref="754830691"/>
+							<reference ref="71352227"/>
+							<reference ref="915576272"/>
+							<reference ref="969526080"/>
 						</object>
 						<reference key="parent" ref="894689418"/>
 					</object>
@@ -3069,6 +3667,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="158647161"/>
 							<reference ref="517298721"/>
 							<reference ref="245310032"/>
+							<reference ref="937807468"/>
+							<reference ref="774819885"/>
 						</object>
 						<reference key="parent" ref="384562074"/>
 					</object>
@@ -3504,6 +4104,41 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="object" ref="971624567"/>
 						<reference key="parent" ref="593500644"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3907</int>
+						<reference key="object" ref="592512738"/>
+						<reference key="parent" ref="427651930"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3908</int>
+						<reference key="object" ref="754830691"/>
+						<reference key="parent" ref="427651930"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3909</int>
+						<reference key="object" ref="71352227"/>
+						<reference key="parent" ref="427651930"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3910</int>
+						<reference key="object" ref="915576272"/>
+						<reference key="parent" ref="427651930"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3911</int>
+						<reference key="object" ref="969526080"/>
+						<reference key="parent" ref="427651930"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3912</int>
+						<reference key="object" ref="937807468"/>
+						<reference key="parent" ref="835061890"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3913</int>
+						<reference key="object" ref="774819885"/>
+						<reference key="parent" ref="835061890"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -3665,6 +4300,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>3829.IBViewBoundsToFrameTransform</string>
 					<string>3829.ImportedFromIB2</string>
 					<string>3830.IBPluginDependency</string>
+					<string>3831.IBEditorWindowLastContentRect</string>
 					<string>3831.IBPluginDependency</string>
 					<string>3831.ImportedFromIB2</string>
 					<string>3832.IBPluginDependency</string>
@@ -3785,6 +4421,13 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>3894.ImportedFromIB2</string>
 					<string>3895.IBPluginDependency</string>
 					<string>3896.IBPluginDependency</string>
+					<string>3907.IBPluginDependency</string>
+					<string>3908.IBPluginDependency</string>
+					<string>3909.IBPluginDependency</string>
+					<string>3910.IBPluginDependency</string>
+					<string>3911.IBPluginDependency</string>
+					<string>3912.IBPluginDependency</string>
+					<string>3913.IBPluginDependency</string>
 					<string>839.IBEditorWindowLastContentRect</string>
 					<string>839.IBPluginDependency</string>
 					<string>839.IBWindowTemplateEditedContentRect</string>
@@ -3835,7 +4478,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<bytes key="NSTransformStruct">P4AAAL+AAABCigAAw0kAAA</bytes>
 					</object>
 					<boolean value="YES"/>
-					<string>{{343, 637}, {125, 71}}</string>
+					<string>{{380, 533}, {109, 156}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4044,6 +4687,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{455, 450}, {121, 105}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4217,9 +4861,16 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{264, 425}, {342, 330}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{264, 425}, {342, 330}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{301, 411}, {342, 330}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{301, 411}, {342, 330}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
@@ -4264,7 +4915,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3906</int>
+			<int key="maxID">3981</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5080,15 +5731,37 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>clearHistoryAction:</string>
+							<string>commandAction:</string>
 							<string>ipNumberAction:</string>
+							<string>isPpoAction:</string>
 							<string>lockAction:</string>
 							<string>opsAction:</string>
 							<string>passwordFieldAction:</string>
+							<string>ppoCommandAction:</string>
+							<string>ppoNowAction:</string>
+							<string>ppoPulsePeriodAction:</string>
+							<string>ppoPulseWidthAction:</string>
+							<string>ppoRepeatsAction:</string>
+							<string>ppoTimeAction:</string>
+							<string>ppoTimeOffsetAction:</string>
+							<string>ppoTodayAction:</string>
+							<string>ppsCommandAction:</string>
 							<string>timeOutAction:</string>
 							<string>userFieldAction:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -5103,10 +5776,21 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>clearHistoryAction:</string>
+							<string>commandAction:</string>
 							<string>ipNumberAction:</string>
+							<string>isPpoAction:</string>
 							<string>lockAction:</string>
 							<string>opsAction:</string>
 							<string>passwordFieldAction:</string>
+							<string>ppoCommandAction:</string>
+							<string>ppoNowAction:</string>
+							<string>ppoPulsePeriodAction:</string>
+							<string>ppoPulseWidthAction:</string>
+							<string>ppoRepeatsAction:</string>
+							<string>ppoTimeAction:</string>
+							<string>ppoTimeOffsetAction:</string>
+							<string>ppoTodayAction:</string>
+							<string>ppsCommandAction:</string>
 							<string>timeOutAction:</string>
 							<string>userFieldAction:</string>
 						</object>
@@ -5117,7 +5801,15 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">commandAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">ipNumberAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">isPpoAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -5130,6 +5822,42 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">passwordFieldAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoCommandAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoNowAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoPulsePeriodAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoPulseWidthAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoRepeatsAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoTimeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoTimeOffsetAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppoTodayAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ppsCommandAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -5146,10 +5874,42 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>basicLockedButton</string>
+							<string>basicLockedPI</string>
+							<string>basicReportButton</string>
+							<string>basicReportPI</string>
+							<string>basicSatellitesButton</string>
+							<string>basicSatellitesPI</string>
+							<string>basicSelfTestButton</string>
+							<string>basicSelfTestPI</string>
+							<string>basicSendButton</string>
+							<string>basicSendPI</string>
+							<string>basicTimeButton</string>
+							<string>basicTimePI</string>
 							<string>clrHistoryButton</string>
+							<string>commandField</string>
 							<string>ipNumberComboBox</string>
+							<string>isPpoMatrix</string>
 							<string>lockButton</string>
 							<string>passwordField</string>
+							<string>ppoCommandField</string>
+							<string>ppoDayField</string>
+							<string>ppoGetButton</string>
+							<string>ppoGetPI</string>
+							<string>ppoHourField</string>
+							<string>ppoMinuteField</string>
+							<string>ppoNowButton</string>
+							<string>ppoPulsePeriodPU</string>
+							<string>ppoPulseWidthField</string>
+							<string>ppoRepeatsButton</string>
+							<string>ppoSecondField</string>
+							<string>ppoSetButton</string>
+							<string>ppoSetPI</string>
+							<string>ppoTimeOffsetField</string>
+							<string>ppoTodayButton</string>
+							<string>ppoTurnOffButton</string>
+							<string>ppoTurnOffPI</string>
+							<string>ppsCommandPU</string>
 							<string>telnetPingButton</string>
 							<string>telnetPingPI</string>
 							<string>telnetTestButton</string>
@@ -5160,9 +5920,41 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
 							<string>NSComboBox</string>
+							<string>NSMatrix</string>
 							<string>NSButton</string>
 							<string>NSSecureTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSProgressIndicator</string>
+							<string>NSPopUpButton</string>
 							<string>NSButton</string>
 							<string>NSProgressIndicator</string>
 							<string>NSButton</string>
@@ -5175,10 +5967,42 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>basicLockedButton</string>
+							<string>basicLockedPI</string>
+							<string>basicReportButton</string>
+							<string>basicReportPI</string>
+							<string>basicSatellitesButton</string>
+							<string>basicSatellitesPI</string>
+							<string>basicSelfTestButton</string>
+							<string>basicSelfTestPI</string>
+							<string>basicSendButton</string>
+							<string>basicSendPI</string>
+							<string>basicTimeButton</string>
+							<string>basicTimePI</string>
 							<string>clrHistoryButton</string>
+							<string>commandField</string>
 							<string>ipNumberComboBox</string>
+							<string>isPpoMatrix</string>
 							<string>lockButton</string>
 							<string>passwordField</string>
+							<string>ppoCommandField</string>
+							<string>ppoDayField</string>
+							<string>ppoGetButton</string>
+							<string>ppoGetPI</string>
+							<string>ppoHourField</string>
+							<string>ppoMinuteField</string>
+							<string>ppoNowButton</string>
+							<string>ppoPulsePeriodPU</string>
+							<string>ppoPulseWidthField</string>
+							<string>ppoRepeatsButton</string>
+							<string>ppoSecondField</string>
+							<string>ppoSetButton</string>
+							<string>ppoSetPI</string>
+							<string>ppoTimeOffsetField</string>
+							<string>ppoTodayButton</string>
+							<string>ppoTurnOffButton</string>
+							<string>ppoTurnOffPI</string>
+							<string>ppsCommandPU</string>
 							<string>telnetPingButton</string>
 							<string>telnetPingPI</string>
 							<string>telnetTestButton</string>
@@ -5189,12 +6013,68 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
+								<string key="name">basicLockedButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicLockedPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicReportButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicReportPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicSatellitesButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicSatellitesPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicSelfTestButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicSelfTestPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicSendButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicSendPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicTimeButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicTimePI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">clrHistoryButton</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">commandField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">ipNumberComboBox</string>
 								<string key="candidateClassName">NSComboBox</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">isPpoMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">lockButton</string>
@@ -5203,6 +6083,78 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">passwordField</string>
 								<string key="candidateClassName">NSSecureTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoCommandField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoDayField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoGetButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoGetPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoHourField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoMinuteField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoNowButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoPulsePeriodPU</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoPulseWidthField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoRepeatsButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoSecondField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoSetButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoSetPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoTimeOffsetField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoTodayButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoTurnOffButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppoTurnOffPI</string>
+								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ppsCommandPU</string>
+								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">telnetPingButton</string>
