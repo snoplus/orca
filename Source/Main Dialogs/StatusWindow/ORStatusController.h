@@ -123,6 +123,7 @@
 - (oneway void) printString: (NSString*)s1 withFont:(NSFont*)aFont;
 @end
 
+extern NSString* ORStatusLogUpdatedNotification;
 extern NSString* ORStatusFlushedNotification;
 extern NSString* ORStatusFlushSize;
 

@@ -25,8 +25,9 @@
 #import "ORMailCenter.h"
 #import "SynthesizeSingleton.h"
 
-NSString* ORStatusFlushedNotification = @"ORStatusFlushedNotification";
-NSString* ORStatusFlushSize	      = @"ORStatusFlushSize";
+NSString* ORStatusFlushedNotification	 = @"ORStatusFlushedNotification";
+NSString* ORStatusLogUpdatedNotification = @"ORStatusLogUpdatedNotification";
+NSString* ORStatusFlushSize				 = @"ORStatusFlushSize";
 
 ORStatusController* theLogger = nil;
 
@@ -140,6 +141,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 		 userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
 					[NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
     }
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORStatusLogUpdatedNotification object:self];
+	
     [s1 release];
 }
 
