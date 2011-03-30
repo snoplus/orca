@@ -29,6 +29,7 @@
 #import "ORAlarmCollection.h"
 #import "ORAlarm.h"
 #import "OR1DHisto.h"
+#import "ORStatusController.h"
 
 NSString* ORCouchDBModelStealthModeChanged	= @"ORCouchDBModelStealthModeChanged";
 NSString* ORCouchDBDataBaseNameChanged		= @"ORCouchDBDataBaseNameChanged";
@@ -63,6 +64,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) updateRunState:(ORRunModel*)rc;
 - (void) periodicCompact;
 - (void) updateDataSets;
+- (void) updateStatus;
 @end
 
 @implementation ORCouchDBModel
@@ -164,6 +166,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                      selector : @selector(alarmsChanged:)
                          name : ORAlarmWasClearedNotification
                        object : nil];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(statusLogChanged:)
+                         name : ORStatusLogUpdatedNotification
+                       object : nil];	
 }
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
@@ -175,6 +182,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	[self runStatusChanged:nil];
 	[self alarmsChanged:nil];
+	[self statusLogChanged:nil];
 }
 
 #pragma mark ***Accessors
@@ -304,6 +312,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	aMap            = @"function(doc) { if(doc.type == 'runinfo') { emit(doc._id, doc); } }";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
 	[aViewDictionary setObject:aMapDictionary forKey:@"runinfo"]; 
+
+	aMap            = @"function(doc) { if(doc.type == 'StatusLog') { emit(doc._id, doc); } }";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"statuslog"]; 
 	
 	
 	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -520,6 +532,30 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 			//silently catch and continue
 		}
 	}
+}
+
+- (void) statusLogChanged:(NSNotification*)aNote
+{
+	if(!statusUpdateScheduled){
+		[self performSelector:@selector(updateStatus) withObject:nil afterDelay:10];
+		statusUpdateScheduled = YES;
+	}
+}
+
+- (void) updateStatus
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateStatus) object:nil];
+	statusUpdateScheduled = NO;
+	NSString* s = [[ORStatusController sharedStatusController] contents];
+	s = [s stringByReplacingOccurrencesOfString:@"\n" withString:@"<br/>"];
+	NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+							  s,				@"statuslog",
+							  @"StatusLog",		@"type",
+							  nil];
+	
+	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
+	[db updateDocument:dataInfo documentId:@"statuslog" tag:kDocumentAdded];
+	
 }
 
 - (void) alarmsChanged:(NSNotification*)aNote

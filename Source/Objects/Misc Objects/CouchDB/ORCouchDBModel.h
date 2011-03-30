@@ -29,6 +29,7 @@
 	BOOL		stealthMode;
 	NSDictionary* dBInfo;
 	NSMutableArray* dataMonitors;
+	BOOL statusUpdateScheduled;
 }
 
 #pragma mark ***Initialization
@@ -41,6 +42,7 @@
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote;
 - (void) runStatusChanged:(NSNotification*)aNote;
 - (void) alarmsChanged:(NSNotification*)aNote;
+- (void) statusLogChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (BOOL) stealthMode;
