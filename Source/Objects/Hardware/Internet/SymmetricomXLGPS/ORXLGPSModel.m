@@ -324,7 +324,7 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 {
 	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 	NSDateFormatter* frmt = [[[NSDateFormatter alloc] init] autorelease];
-	NSDate* ppoDate = [NSDate dateWithTimeInterval:(ppoTimeOffset - [[NSTimeZone systemTimeZone] secondsFromGMT]) sinceDate:ppoTime];
+	NSDate* ppoDate = [[[NSDate alloc] initWithTimeInterval:(ppoTimeOffset - [[NSTimeZone systemTimeZone] secondsFromGMT]) sinceDate:ppoTime] autorelease];
 	[frmt setDateFormat:@"D"];
 	int day = [[frmt stringFromDate:ppoDate] intValue];
 
