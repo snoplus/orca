@@ -371,7 +371,13 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
     channelConfigMask = aChannelConfigMask;
 	
 	//can't get the packed form to work so just make sure that bit is cleared.
-	channelConfigMask &= ~(1L<<11);
+	//channelConfigMask &= ~(1L<<11);
+	
+	//no packed mode exists, no zero suppresion so far, do not step into the reserved area, make sure these are 0
+	channelConfigMask &= 0x000000FFUL;
+	
+	//random memory access freezes the card, make sure we do the sequential one
+	channelConfigMask |= (1L<<4);
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1724ModelChannelConfigMaskChanged object:self];
 }
@@ -854,8 +860,8 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 } 
 
 - (void) initBoard
-{
-    [self writeAcquistionControl:NO]; // Make sure it's off.
+{	
+	[self writeAcquistionControl:NO]; // Make sure it's off.
 	[self clearAllMemory];
 	[self softwareReset];
 	[self writeThresholds];
@@ -867,20 +873,16 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 	[self writeOverUnderThresholds];
 	[self writeDacs];
 	[self writePostTriggerSetting];
-    
-	
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
 { 
-	return 2*aDacValue/65535. - 0.9999;  
-    //return 2*((short)aDacValue)/65535.;  
+	return 2.25*aDacValue/65535. - 1.1249;  
 }
 
 - (unsigned short) convertVoltsToDac:(float)aVoltage  
 { 
-	return 65535. * (aVoltage+1)/2.; 
-    //return (unsigned short)((short) (65535. * (aVoltage)/2.)); 
+	return 65535. * (aVoltage+1.125)/2.25; 
 }
 
 - (void) writeThresholds
@@ -1130,26 +1132,44 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 		bufferState = (status & 0x10) >> 4;						
 		if(status & kEventReadyMask){
 			//OK, at least one event is ready
+			
+			unsigned long theFirst;
+			[controller readLongBlock:&theFirst
+					atAddress:dataReg
+					numToRead:1
+				       withAddMod:addressModifier 
+				    usingAddSpace:0x01]; //we set it to not increment the address.
+			
 			unsigned long theEventSize;
+			//the event size is reported incorrectly by CAEN 1724
+			//the first event is OK, all the others are 0 size
+			//extract the event size from the first word as suggested in the user guide
+			//it seems the event size is correctly reported only in the BLT mode
+			/*
 			[controller readLongBlock:&theEventSize
 							atAddress:eventSizeReg
 							numToRead:1
 						   withAddMod:addressModifier 
 						usingAddSpace:0x01];
+			 */
+			theEventSize = theFirst&0x0FFFFFFF;
+			
             if ( theEventSize == 0 ) return;
 			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
 			[theData setLength:(2+theEventSize)*sizeof(long)];
 			unsigned long* p = (unsigned long*)[theData bytes];
 			*p++ = dataId | (2 + theEventSize);
-			*p++ = location; 
+			*p++ = location;
+
+			*p++ = theFirst;
 			[controller readLongBlock:p
 							atAddress:dataReg
-							numToRead:theEventSize
+							numToRead:theEventSize - 1
 						   withAddMod:addressModifier 
 						usingAddSpace:0xFF]; //we set it to not increment the address.
 			
 			[aDataPacket addData:theData];
-			unsigned short chanMask = p[1]; //remember, the point was already inc'ed to the start of data
+			unsigned short chanMask = p[0]; //remember, the point was already inc'ed to the start of data + 1
 			int i;
 			for(i=0;i<8;i++){
 				if(chanMask & (1<<i)) ++waveFormCount[i]; 
@@ -1183,7 +1203,7 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 1720 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 1724 (Slot %d) ",[self slot]];
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
