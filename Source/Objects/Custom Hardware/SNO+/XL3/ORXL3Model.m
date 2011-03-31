@@ -621,6 +621,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 		data[1] = 0; //packet count, maybe time, and crate ID in a meaningful way
 		memcpy(&data[2], [aBundle bytes], [aBundle length]);
 		[aDataPacket addLongsToFrameBuffer:data length:data_length];
+		[aBundle release]; aBundle = nil;
 	}
 }
 

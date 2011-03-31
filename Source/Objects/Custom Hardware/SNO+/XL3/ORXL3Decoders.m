@@ -50,12 +50,14 @@
 	BOOL swapBundle = YES;
 	if (0x0000ABCD != htonl(0x0000ABCD) && indexerSwaps) swapBundle = NO;
 	if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
+
+	unsigned long length = ExtractLength(*ptr);
 	
 	ptr += 2;
 	unsigned short i = 0;
 	NSMutableString* dsc = [NSMutableString string];
 	
-	for (i=0; i<120; i++) {
+	for (i=0; i<length/3; i++) {
 		if (swapBundle) {
 			ptr[0] = swapLong(ptr[0]);
 			ptr[1] = swapLong(ptr[1]);

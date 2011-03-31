@@ -713,9 +713,9 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 				if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xCC) { //PMT mega bundle
 					//packet_num?
 					[bundleBuffer writeBlock:((XL3_Packet*) aPacket)->payload length:((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12];
-					if (((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 != 1440) { //TODO: remove before deploynment
-						NSLog(@"XL3 Mega bundle num: %d with %d bundles\n", bundle_count, ((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12);
-					}
+					//if (((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12 != 1440) { //TODO: remove before deploynment
+					//	NSLog(@"XL3 Mega bundle num: %d with %d bundles\n", bundle_count, ((XL3_Packet*) aPacket)->cmdHeader.num_bundles * 12);
+					//}
 					bundle_count++;
 				}
 				else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == 0xEE) {
