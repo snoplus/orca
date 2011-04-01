@@ -120,6 +120,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
     [IPNumber release];
 	[lastQueUpdate release];
 
+	[[NSNotificationCenter defaultCenter] removeObserver : self];
 	NSString* folder = [mainStagingFolder stringByExpandingTildeInPath];
 	[[NSFileManager defaultManager] removeItemAtPath:folder error:nil];
 	[mainStagingFolder release];
@@ -284,25 +285,19 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[driverScriptFileMover doNotMoveFilesToSentFolder];
 		[driverScriptFileMover setTransferType:eUseSCP];
 		[aSequence addTaskObj:driverScriptFileMover];
+
+		//since we made the task sequence the filemover's delegate, 
+		//we have to use the notification to know when the mover is done		
+		[[NSNotificationCenter defaultCenter] addObserver : self
+												 selector : @selector(fileMoverIsDone:)
+													 name : ORFileMoverIsDoneNotification
+												   object : driverScriptFileMover];
 		
 		NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",userName,[delegate driverScriptName]];
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
 				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,scriptRunPath,nil]];
 		
 		[aSequence launch];
-	/*
-		ORTaskSequence* aSequence;	
-		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
-		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		NSString* scriptPath = 
-		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:@"root",rootPwd,IPNumber,scriptPath,@"upgrade",nil]];
-		
-		[aSequence setVerbose:YES];
-		[aSequence setTextToDelegate:YES];
-
-		[aSequence launch];
-*/
 	}
 }
 
@@ -779,6 +774,10 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 - (void) fileMoverIsDone:(NSNotification*)aNote
 {
 	if([aNote object] == SBCFileMover){
+		[[NSNotificationCenter defaultCenter] removeObserver : self
+													 name : ORFileMoverIsDoneNotification
+												   object : SBCFileMover];
+		
 		NSLog(@"Transfered Core SBC Code: %@ to %@\n",[SBCFileMover fileName],[SBCFileMover remoteHost]);
 		[SBCFileMover release];
 		SBCFileMover  = nil;
@@ -789,6 +788,9 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 	}
 	
 	else if([aNote object] == driverScriptFileMover){
+		[[NSNotificationCenter defaultCenter] removeObserver : self
+														name : ORFileMoverIsDoneNotification
+													  object : driverScriptFileMover];
 		NSLog(@"Transfered Driver Update Script: %@ to %@\n",[driverScriptFileMover fileName],[driverScriptFileMover remoteHost]);
 		[driverScriptFileMover release];
 		driverScriptFileMover  = nil;
@@ -915,6 +917,13 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 		[SBCFileMover doNotMoveFilesToSentFolder];
 		[SBCFileMover setTransferType:eUseSCP];
 		[aSequence addTaskObj:SBCFileMover];
+
+		//since we made the task sequence the filemover's delegate, 
+		//we have to use the notification to know when the mover is done
+		[[NSNotificationCenter defaultCenter] addObserver : self
+						 selector : @selector(fileMoverIsDone:)
+							 name : ORFileMoverIsDoneNotification
+						   object : SBCFileMover];
 		
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
 				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/makeScript",nil]];
