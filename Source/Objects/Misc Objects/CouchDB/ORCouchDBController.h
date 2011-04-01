@@ -55,7 +55,5 @@
 - (IBAction) infoAction:(id)sender;
 - (IBAction) compactAction:(id)sender;
 
-- (IBAction) testAction:(id)sender;
-
 
 @end

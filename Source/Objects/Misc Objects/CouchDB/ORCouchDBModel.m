@@ -30,6 +30,7 @@
 #import "ORAlarm.h"
 #import "OR1DHisto.h"
 #import "ORStatusController.h"
+#import "ORProcessModel.h"
 
 NSString* ORCouchDBModelStealthModeChanged	= @"ORCouchDBModelStealthModeChanged";
 NSString* ORCouchDBDataBaseNameChanged		= @"ORCouchDBDataBaseNameChanged";
@@ -57,6 +58,7 @@ NSString* ORCouchDBLock						= @"ORCouchDBLock";
 static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 @interface ORCouchDBModel (private)
+- (void) updateProcesses;
 - (void) updateMachineRecord;
 - (void) postRunState:(NSNotification*)aNote;
 - (void) postRunTime:(NSNotification*)aNote;
@@ -93,9 +95,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) wakeUp
 {
     if(![self aWake]){
-		[self createDatabase];
-		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:1];
-		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:2];
+		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
+		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:3];
 		[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
     }
     [super wakeUp];
@@ -170,7 +171,14 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [notifyCenter addObserver : self
                      selector : @selector(statusLogChanged:)
                          name : ORStatusLogUpdatedNotification
-                       object : nil];	
+                       object : nil];    
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(updateProcesses)
+						 name : ORProcessRunningChangedNotification
+					   object : nil];	
+	
+	
 }
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
@@ -201,11 +209,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	}
 	else {
 		[self createDatabase];
-		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-		if([runObjects count]){
-			ORRunModel* rc = [runObjects objectAtIndex:0];
-			[self updateRunState:rc];
-		}
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelStealthModeChanged object:self];
 }
@@ -304,6 +307,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	aMap            = @"function(doc) { if(doc.type == 'alarms') { emit(doc.type, {'alarmlist': doc.alarmlist}); } }";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
 	[aViewDictionary setObject:aMapDictionary forKey:@"alarms"]; 
+
+	aMap            = @"function(doc) { if(doc.type == 'processes') { emit(doc.type, {'processlist': doc.processlist}); } }";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
+	[aViewDictionary setObject:aMapDictionary forKey:@"processes"]; 
+	
 	
 	aMap            = @"function(doc) { if(doc.type == 'machineinfo') { emit(doc.type, doc); } }";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
@@ -326,14 +334,62 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort username:userName pwd:password database:[self machineName] delegate:self];
 	
 	[db createDatabase:kCreateDB views:theViews];
+	
+	NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+	if([runObjects count]){
+		ORRunModel* rc = [runObjects objectAtIndex:0];
+		[self updateRunState:rc];
+	}
+	
 	[self updateMachineRecord];
 	[self updateDatabaseStats];
+	[self alarmsChanged:nil];
+	[self statusLogChanged:nil];
+	[self updateProcesses];
 }
 
 - (void) deleteDatabase
 {
 	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
 	[db deleteDatabase:kDeleteDB];
+}
+
+- (void) updateProcesses
+{
+	if(!stealthMode){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProcesses) object:nil];
+		
+		ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort  username:userName pwd:password database:[self machineName] delegate:self];
+		
+		NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
+		
+		NSMutableArray* arrayForDoc = [NSMutableArray array];
+		if([theProcesses count]){
+			for(id aProcess in theProcesses){
+				NSString* shortName     = [aProcess shortName];
+				NSString* lastTimeStamp = [[aProcess lastSampleTime] description];
+				if(![lastTimeStamp length]) lastTimeStamp = @"0";
+				if(![shortName length]) shortName = @"Untitled";
+				
+				NSString* s = [aProcess description];
+				s = [s stringByReplacingOccurrencesOfString:@"\n" withString:@"<br/>"];
+				
+				NSDictionary* processInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+											 [aProcess fullID],@"name",
+											 shortName,@"title",
+											 lastTimeStamp,@"timestamp",
+											 s,@"data",
+											 [NSNumber numberWithUnsignedLong:[aProcess processRunning]] ,@"state",
+											 nil];
+				[arrayForDoc addObject:processInfo];
+			}
+		}
+		
+		NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
+		[db updateDocument:processInfo documentId:@"processinfo" tag:kDocumentUpdated];
+		
+		[self performSelector:@selector(updateProcesses) withObject:nil afterDelay:30];	
+	}
 }
 
 - (void) updateMachineRecord
@@ -441,14 +497,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 			NSLog(@"%@\n",aResult);
 		}
 	}
-}
-
-- (void) updateFunction
-{
-	ORCouchDB* db = [ORCouchDB couchHost:hostName port:kCouchDBPort   username:userName pwd:password database:[self machineName] delegate:self];
-	NSString* theTime = [NSString stringWithFormat:@"%@",[NSDate date]];
-	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:@"123",@"Run",theTime,@"Time",nil];
-	[db updateDocument:aDictionary documentId:@"idtest" tag:kDocumentUpdated];
 }
 
 - (void) periodicCompact

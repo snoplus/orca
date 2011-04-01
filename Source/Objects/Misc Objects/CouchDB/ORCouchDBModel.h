@@ -67,7 +67,6 @@
 //test functions
 - (void) databaseInfo:(BOOL)toStatusWindow;
 - (void) listDatabases;
-- (void) updateFunction;
 - (void) compactDatabase;
 - (void) updateDatabaseStats;
 

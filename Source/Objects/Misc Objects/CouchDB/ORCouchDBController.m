@@ -213,10 +213,6 @@
 	[model setPassword:[sender stringValue]];
 }
 
-- (IBAction) testAction:(id)sender
-{
-	[model updateFunction];
-}
 
 - (IBAction) createAction:(id)sender
 {
