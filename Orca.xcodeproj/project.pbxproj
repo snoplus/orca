@@ -1504,6 +1504,8 @@
 		848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = 848648AA0975CB2E001C459D /* ORProcessConnector.h */; };
 		848648AD0975CB2E001C459D /* ORProcessConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = 848648AB0975CB2E001C459D /* ORProcessConnector.m */; };
 		8486F4660CC6D02E00800B1E /* ORIpeDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */; };
+		848868ED1347470B0084D0CA /* NSObject+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 848868EB1347470B0084D0CA /* NSObject+Extensions.h */; };
+		848868EE1347470B0084D0CA /* NSObject+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 848868EC1347470B0084D0CA /* NSObject+Extensions.m */; };
 		848883CC10179CBA0043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		848A147B10BAE3D6002A80D0 /* ORFileReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 848A147910BAE3D6002A80D0 /* ORFileReader.h */; };
 		848A147C10BAE3D6002A80D0 /* ORFileReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 848A147A10BAE3D6002A80D0 /* ORFileReader.m */; };
@@ -4063,6 +4065,8 @@
 		848648AA0975CB2E001C459D /* ORProcessConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORProcessConnector.h; sourceTree = "<group>"; };
 		848648AB0975CB2E001C459D /* ORProcessConnector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORProcessConnector.m; sourceTree = "<group>"; };
 		8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIpeDefs.h; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeDefs.h"; sourceTree = SOURCE_ROOT; };
+		848868EB1347470B0084D0CA /* NSObject+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+Extensions.h"; path = "Source/Cocoa Extensions/NSObject+Extensions.h"; sourceTree = SOURCE_ROOT; };
+		848868EC1347470B0084D0CA /* NSObject+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+Extensions.m"; path = "Source/Cocoa Extensions/NSObject+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		84888394101796C10043E7D6 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Universal/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = SOURCE_ROOT; };
 		848A147910BAE3D6002A80D0 /* ORFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFileReader.h; path = "Source/Objects/Data Processing/ReplayData/ORFileReader.h"; sourceTree = SOURCE_ROOT; };
 		848A147A10BAE3D6002A80D0 /* ORFileReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFileReader.m; path = "Source/Objects/Data Processing/ReplayData/ORFileReader.m"; sourceTree = SOURCE_ROOT; };
@@ -11080,6 +11084,8 @@
 				8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */,
 				8411A1D910F6848100CD9544 /* NSWindow+Extensions.h */,
 				8411A1DA10F6848100CD9544 /* NSWindow+Extensions.m */,
+				848868EB1347470B0084D0CA /* NSObject+Extensions.h */,
+				848868EC1347470B0084D0CA /* NSObject+Extensions.m */,
 				844514940674E10D00A19654 /* ZFlowLayout */,
 			);
 			path = "Cocoa Extensions";
@@ -12369,6 +12375,7 @@
 				43E9ED461339044100888F93 /* ORAuxHw.h in Headers */,
 				8494D85913393D8A00DD5F9E /* ORRunListController.h in Headers */,
 				8494D85B13393D8A00DD5F9E /* ORRunListModel.h in Headers */,
+				848868ED1347470B0084D0CA /* NSObject+Extensions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12411,6 +12418,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				en,
@@ -14035,6 +14043,7 @@
 				43E9ED471339044100888F93 /* ORAuxHw.m in Sources */,
 				8494D85A13393D8A00DD5F9E /* ORRunListController.m in Sources */,
 				8494D85C13393D8A00DD5F9E /* ORRunListModel.m in Sources */,
+				848868EE1347470B0084D0CA /* NSObject+Extensions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
