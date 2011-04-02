@@ -226,6 +226,20 @@
 
 }
 
+- (NSString*) getnonZeroDataAsStringWithStart:(unsigned long*)start end:(unsigned long*)end
+{
+	NSData* pd = [self getNonZeroRawDataWithStart:start end:end];
+	unsigned long* plotData = (unsigned long*)[pd bytes];
+	int n = [pd length]/4;
+	int i;
+	NSMutableString* s = [NSMutableString stringWithCapacity:n*64];
+	for(i=0;i<n;i++){
+		[s appendFormat:@"%d,",plotData[i]];
+	}
+	[s deleteCharactersInRange:NSMakeRange([s length]-1,1)];
+	return s;
+}
+
 - (NSData*) getNonZeroRawDataWithStart:(unsigned long*)start end:(unsigned long*)end
 {
 	[dataSetLock lock];

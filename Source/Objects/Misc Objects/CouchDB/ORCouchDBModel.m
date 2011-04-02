@@ -635,16 +635,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				@try {
 					for(id aDataSet in objs1d){
 						unsigned long start,end;
-						NSData* pd = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
-						unsigned long* plotData = (unsigned long*)[pd bytes];
-						int n = [pd length]/4;
-						int i;
-						NSMutableString* s = [NSMutableString stringWithCapacity:n*64];
-						for(i=0;i<n;i++){
-							[s appendFormat:@"%d,",plotData[i]];
-						}
-						[s deleteCharactersInRange:NSMakeRange([s length]-1,1)];
-						
+						NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
 						NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 													[aDataSet fullName],										@"name",
 													[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",

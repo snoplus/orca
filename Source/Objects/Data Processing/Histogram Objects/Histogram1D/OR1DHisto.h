@@ -47,6 +47,7 @@
 - (unsigned long) overFlow;
 - (NSMutableArray*) rois;
 - (NSData*) getNonZeroRawDataWithStart:(unsigned long*)start end:(unsigned long*)end;
+- (NSString*) getnonZeroDataAsStringWithStart:(unsigned long*)start end:(unsigned long*)end;
 
 #pragma mark ¥¥¥Data Management
 - (void) histogram:(unsigned long)aValue;
