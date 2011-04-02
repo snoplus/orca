@@ -317,7 +317,7 @@
 		else {
 			if(views){
 				NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, database];
-				id result = [self send:httpString type:@"PUT" body:views];
+				/*id result = */[self send:httpString type:@"PUT" body:views];
 			}
 
 		}

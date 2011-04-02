@@ -614,7 +614,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		NSArray* theAlarms = [[[alarmCollection alarms] retain] autorelease];
 		NSMutableArray* arrayForDoc = [NSMutableArray array];
 		if([theAlarms count]){
-			for(id anAlarm in theAlarms)[arrayForDoc addObject:[anAlarm alarmInfo]];
+			for(id anAlarm in theAlarms)[arrayForDoc addObject:[[anAlarm alarmInfo] prepareForHTML]];
 		}
 		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"alarms",@"name",arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
 		[db updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentAdded];
