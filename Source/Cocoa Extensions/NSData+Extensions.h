@@ -18,9 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
-
 @interface NSData (OR_NSDataWithExtensions)
 
 + (NSData*) dataWithNSPoint:(NSPoint)aPoint;

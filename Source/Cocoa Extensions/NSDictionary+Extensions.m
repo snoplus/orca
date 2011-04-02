@@ -20,6 +20,16 @@
 #import "NSDictionary+Extensions.h"
 
 @implementation NSDictionary (OrcaExtensions)
+- (NSDictionary*) prepareForHTML
+{
+	NSMutableDictionary* processedDictionary = [NSMutableDictionary dictionary];;
+	NSArray* allKeys = [self allKeys];
+	for(id aKey in allKeys){
+		id anObject = [self objectForKey:aKey];
+		[processedDictionary setObject:[anObject prepareForHTML] forKey:aKey];
+	}
+	return processedDictionary;
+}
 
 - (NSArray*) allKeysStartingWith:(NSString*)aString
 {
