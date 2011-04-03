@@ -622,8 +622,12 @@ static const int currentVersion = 1;           // Current version
 
 - (void) checkDiskStatus
 {
-	NSDictionary* diskInfo = [[NSFileManager defaultManager] attributesOfFileSystemForPath:openFilePath error:nil];
-	long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];
+	NSError* diskError = nil;
+	NSDictionary* diskInfo = [[[[NSFileManager alloc] init] autorelease] attributesOfFileSystemForPath:openFilePath error:&diskError];
+	if (diskError) {
+		NSLogColor([NSColor redColor],@"failed to get file system free space\nerror: %@\n", [diskError localizedDescription]);
+	}
+	long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
 	if(freeSpace < kMinDiskSpace * 1024 * 1024){
 		if(!diskFullAlarm){
 			diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
