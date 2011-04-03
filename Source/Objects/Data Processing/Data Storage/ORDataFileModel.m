@@ -624,26 +624,32 @@ static const int currentVersion = 1;           // Current version
 {
 	NSError* diskError = nil;
 	NSDictionary* diskInfo = [[[[NSFileManager alloc] init] autorelease] attributesOfFileSystemForPath:openFilePath error:&diskError];
-	if (diskError) {
-		NSLogColor([NSColor redColor],@"failed to get file system free space\nerror: %@\n", [diskError localizedDescription]);
+	if (!diskError) {
+		if(diskInfo){
+			long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
+			if(freeSpace < kMinDiskSpace * 1024 * 1024){
+				if(!diskFullAlarm){
+					diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
+					[diskFullAlarm setSticky:YES];
+					[diskFullAlarm setHelpString:[NSString stringWithFormat:@"The data disk is dangerously full. Less than %d MB Left. Runs will not be possible until space is available.", kMinDiskSpace]];
+				}
+					
+				[diskFullAlarm setAcknowledged:NO];
+				[diskFullAlarm postAlarm];
+					
+				NSString* reason = [NSString stringWithFormat:@"Disk Space size less than %d MB",kMinDiskSpace];
+				[[NSNotificationCenter defaultCenter]
+					 postNotificationName:ORRequestRunHalt
+									object:self
+									userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+			}
+			
+		}
+		else {
+			NSLogColor([NSColor redColor],@"failed to get file system free space\nerror: %@\n", [diskError localizedDescription]);
+		}
 	}
-	long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
-	if(freeSpace < kMinDiskSpace * 1024 * 1024){
-		if(!diskFullAlarm){
-			diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
-			[diskFullAlarm setSticky:YES];
-			[diskFullAlarm setHelpString:[NSString stringWithFormat:@"The data disk is dangerously full. Less than %d MB Left. Runs will not be possible until space is available.", kMinDiskSpace]];
-		}
-			
-		[diskFullAlarm setAcknowledged:NO];
-		[diskFullAlarm postAlarm];
-			
-		NSString* reason = [NSString stringWithFormat:@"Disk Space size less than %d MB",kMinDiskSpace];
-		[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORRequestRunHalt
-							object:self
-							userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
-		}
+
 }
 
 #pragma mark ¥¥¥Archival
