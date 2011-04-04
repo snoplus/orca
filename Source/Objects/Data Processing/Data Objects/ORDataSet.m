@@ -387,7 +387,11 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (id) data
 {
-    return [[data retain] autorelease];
+	id d = nil;
+	@synchronized(self){  
+		d = [[data retain] autorelease];
+	}
+    return d;
 }
 
 
@@ -1097,103 +1101,106 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-	
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while((s = va_arg(myArgs, NSString *)));
-    
-    ORMaskedWaveform* waveform = [nextLevel data];
-    if(!waveform){
-        waveform = [[ORMaskedWaveform alloc] init];
-		[waveform setDataSet:self];
-		[waveform setMask:aMask];
-        [waveform setDataOffset:anOffset];
-        [waveform setKey:[nextLevel key]];
-        [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-		[waveform setUnitSize:aUnitSize];
-        [nextLevel setData:waveform];
-        [waveform setWaveform:aWaveForm];       
-        [waveform release];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while((s = va_arg(myArgs, NSString *)));
+		
+		ORMaskedWaveform* waveform = [nextLevel data];
+		if(!waveform){
+			waveform = [[ORMaskedWaveform alloc] init];
+			[waveform setDataSet:self];
+			[waveform setMask:aMask];
+			[waveform setDataOffset:anOffset];
+			[waveform setKey:[nextLevel key]];
+			[waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[waveform setUnitSize:aUnitSize];
+			[nextLevel setData:waveform];
+			[waveform setWaveform:aWaveForm];       
+			[waveform release];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+		}
+		else {
+			[waveform setWaveform:aWaveForm];
+		}
+		va_end(myArgs);
     }
-    else {
-		[waveform setWaveform:aWaveForm];
-    }
-    va_end(myArgs);
-    
 }
 
 
 
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize startIndex:(unsigned long)aStartIndex mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-	
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while((s = va_arg(myArgs, NSString *)));
-    
-    ORMaskedIndexedWaveform* waveform = [nextLevel data];
-    if(!waveform){
-        waveform = [[ORMaskedIndexedWaveform alloc] init];
-		[waveform setDataSet:self];
-		[waveform setMask:aMask];
-		[waveform setStartIndex:aStartIndex];
-        [waveform setDataOffset:anOffset];
-        [waveform setKey:[nextLevel key]];
-        [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-		[waveform setUnitSize:aUnitSize];
-        [nextLevel setData:waveform];
-        [waveform setWaveform:aWaveForm];       
-        [waveform release];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
-    }
-    
-    else {
-		[waveform setMask:aMask];
-		[waveform setStartIndex:aStartIndex];
-		[waveform setWaveform:aWaveForm];
-    }
-    va_end(myArgs);
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while((s = va_arg(myArgs, NSString *)));
+		
+		ORMaskedIndexedWaveform* waveform = [nextLevel data];
+		if(!waveform){
+			waveform = [[ORMaskedIndexedWaveform alloc] init];
+			[waveform setDataSet:self];
+			[waveform setMask:aMask];
+			[waveform setStartIndex:aStartIndex];
+			[waveform setDataOffset:anOffset];
+			[waveform setKey:[nextLevel key]];
+			[waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[waveform setUnitSize:aUnitSize];
+			[nextLevel setData:waveform];
+			[waveform setWaveform:aWaveForm];       
+			[waveform release];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+		}
+		
+		else {
+			[waveform setMask:aMask];
+			[waveform setStartIndex:aStartIndex];
+			[waveform setWaveform:aWaveForm];
+		}
+		va_end(myArgs);
+	}
 }
 
 - (void) loadWaveform:(NSData*)aWaveForm 
@@ -1206,103 +1213,107 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 			   sender:(id)obj  
 			 withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-	
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while((s = va_arg(myArgs, NSString *)));
-    
-    ORMaskedIndexedWaveformWithSpecialBits* waveform = [nextLevel data];
-    if(!waveform){
-        waveform = [[ORMaskedIndexedWaveformWithSpecialBits alloc] init];
-		[waveform setDataSet:self];
-		[waveform setMask:aMask];
-		[waveform setSpecialBitMask:aSpecialMask];
-		[waveform setBitNames:bitNames];
-		[waveform setStartIndex:aStartIndex];
-        [waveform setDataOffset:anOffset];
-        [waveform setKey:[nextLevel key]];
-        [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-		[waveform setUnitSize:aUnitSize];
-        [nextLevel setData:waveform];
-        [waveform setWaveform:aWaveForm];       
-        [waveform release];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
-    }
-    
-    else {
-		[waveform setMask:aMask];
-		[waveform setSpecialBitMask:aSpecialMask];
-		[waveform setBitNames:bitNames];
-		[waveform setStartIndex:aStartIndex];
-		[waveform setWaveform:aWaveForm];
-    }
-    va_end(myArgs);
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while((s = va_arg(myArgs, NSString *)));
+		
+		ORMaskedIndexedWaveformWithSpecialBits* waveform = [nextLevel data];
+		if(!waveform){
+			waveform = [[ORMaskedIndexedWaveformWithSpecialBits alloc] init];
+			[waveform setDataSet:self];
+			[waveform setMask:aMask];
+			[waveform setSpecialBitMask:aSpecialMask];
+			[waveform setBitNames:bitNames];
+			[waveform setStartIndex:aStartIndex];
+			[waveform setDataOffset:anOffset];
+			[waveform setKey:[nextLevel key]];
+			[waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[waveform setUnitSize:aUnitSize];
+			[nextLevel setData:waveform];
+			[waveform setWaveform:aWaveForm];       
+			[waveform release];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+		}
+		
+		else {
+			[waveform setMask:aMask];
+			[waveform setSpecialBitMask:aSpecialMask];
+			[waveform setBitNames:bitNames];
+			[waveform setStartIndex:aStartIndex];
+			[waveform setWaveform:aWaveForm];
+		}
+		va_end(myArgs);
+	}
 }
 
 
 
 - (void) loadGenericData:(NSString*)aString sender:(id)obj withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    
-    [currentLevel incrementTotalCounts];
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while((s = va_arg(myArgs, NSString *)));
-	
-    ORGenericData* genericData = [nextLevel data];
-    if(!genericData){
-        genericData = [[ORGenericData alloc] init];
-        [genericData setKey:[nextLevel key]];
-        [nextLevel setData:genericData];
-        [genericData release];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetAdded
-		 object:self
-		 userInfo: nil];
-    }
-    
-    [genericData setGenericData:aString];
-    
-    
-    va_end(myArgs);
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		
+		[currentLevel incrementTotalCounts];
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while((s = va_arg(myArgs, NSString *)));
+		
+		ORGenericData* genericData = [nextLevel data];
+		if(!genericData){
+			genericData = [[ORGenericData alloc] init];
+			[genericData setKey:[nextLevel key]];
+			[nextLevel setData:genericData];
+			[genericData release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		[genericData setGenericData:aString];
+		
+		
+		va_end(myArgs);
+	}
 }
 
 
@@ -1311,175 +1322,182 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 //exists only as a alternate calling method. i.e. used by NSLogError.
 - (void) loadGenericData:(NSString*)aString sender:(id)obj usingKeyArray:(NSArray*)myArgs
 {
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel = nil;
-    [currentLevel incrementTotalCounts];
-    NSEnumerator* e = [myArgs objectEnumerator];
-    if(myArgs){
-        id s;
-        while(s = [e nextObject]) {
-            nextLevel = [currentLevel objectForKey:s];
-            if(nextLevel == nil){
-                nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-                [currentLevel setObject:nextLevel forKey:s];
-                currentLevel = nextLevel;
-                [nextLevel release];
-            }
-            else {
-                if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-                currentLevel = nextLevel;
-            }
-            [currentLevel incrementTotalCounts];
-            
-        }
-    }
-    else nextLevel = self;
-    ORGenericData* genericData = [nextLevel data];
-    if(!genericData){
-        genericData = [[ORGenericData alloc] init];
-        [genericData setKey:[nextLevel key]];
-        [nextLevel setData:genericData];
-        [genericData setGenericData:aString];
-        [genericData release];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetAdded
-		 object:self
-		 userInfo: nil];
-    }
-    
-    else [genericData setGenericData:aString];
+	@synchronized(self){  
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel = nil;
+		[currentLevel incrementTotalCounts];
+		NSEnumerator* e = [myArgs objectEnumerator];
+		if(myArgs){
+			id s;
+			while(s = [e nextObject]) {
+				nextLevel = [currentLevel objectForKey:s];
+				if(nextLevel == nil){
+					nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+					[currentLevel setObject:nextLevel forKey:s];
+					currentLevel = nextLevel;
+					[nextLevel release];
+				}
+				else {
+					if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+					currentLevel = nextLevel;
+				}
+				[currentLevel incrementTotalCounts];
+				
+			}
+		}
+		else nextLevel = self;
+		ORGenericData* genericData = [nextLevel data];
+		if(!genericData){
+			genericData = [[ORGenericData alloc] init];
+			[genericData setKey:[nextLevel key]];
+			[nextLevel setData:genericData];
+			[genericData setGenericData:aString];
+			[genericData release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		else [genericData setGenericData:aString];
+	}
 }
 
 - (void) loadScalerSum:(unsigned long)aValue sender:(id)obj withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        
-    } while((s = va_arg(myArgs, NSString *)));
-	
-    ORScalerSum* scalerSumData = [nextLevel data];
-    if(!scalerSumData){
-        scalerSumData = [[ORScalerSum alloc] init];
-        [scalerSumData setKey:[nextLevel key]];
-        [nextLevel setData:scalerSumData];
-        [scalerSumData release];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetAdded
-		 object:self
-		 userInfo: nil];
-    }
-    
-    [scalerSumData loadScalerValue:aValue];
-    
-    va_end(myArgs);
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			
+		} while((s = va_arg(myArgs, NSString *)));
+		
+		ORScalerSum* scalerSumData = [nextLevel data];
+		if(!scalerSumData){
+			scalerSumData = [[ORScalerSum alloc] init];
+			[scalerSumData setKey:[nextLevel key]];
+			[nextLevel setData:scalerSumData];
+			[scalerSumData release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		[scalerSumData loadScalerValue:aValue];
+		
+		va_end(myArgs);
+	}
 }
 
 - (void) loadTimeSeries:(float)aValue atTime:(unsigned long)aTime sender:(id)obj withKeys:(NSString*)firstArg,...
 {
-    va_list myArgs;
-    va_start(myArgs,firstArg);
-    
-    NSString* s             = firstArg;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts]; // was missing -tb- 2008-02-07
-    
-    do {
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-        
-    } while((s = va_arg(myArgs, NSString *)));
-	
-    ORPlotTimeSeries* timeSeries = [nextLevel data];
-    if(!timeSeries){
-        timeSeries = [[ORPlotTimeSeries alloc] init];
-        [timeSeries setKey:[nextLevel key]];
-		[timeSeries setDataSet:self]; // was missing -tb- 2008-02-07
-        [nextLevel setData:timeSeries];
-        [timeSeries setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
-        [timeSeries release];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetAdded
-		 object:self
-		 userInfo: nil];
-    }
-    
-    [timeSeries addValue:aValue atTime:aTime];
-    
-    va_end(myArgs);
+	@synchronized(self){  
+		va_list myArgs;
+		va_start(myArgs,firstArg);
+		
+		NSString* s             = firstArg;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts]; // was missing -tb- 2008-02-07
+		
+		do {
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+			
+		} while((s = va_arg(myArgs, NSString *)));
+		
+		ORPlotTimeSeries* timeSeries = [nextLevel data];
+		if(!timeSeries){
+			timeSeries = [[ORPlotTimeSeries alloc] init];
+			[timeSeries setKey:[nextLevel key]];
+			[timeSeries setDataSet:self]; // was missing -tb- 2008-02-07
+			[nextLevel setData:timeSeries];
+			[timeSeries setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[timeSeries release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		
+		[timeSeries addValue:aValue atTime:aTime];
+		
+		va_end(myArgs);
+	}
 }
 
 
 - (void)loadFFTReal:(NSArray*)realArray imaginary:(NSArray*)imaginaryArray withKeyArray:(NSArray*)keyArray
 {
-    
-    int n = [keyArray count];
-    int i;
-    ORDataSet* currentLevel = self;
-    ORDataSet* nextLevel    = nil;
-    [currentLevel incrementTotalCounts];
-    
-    for(i=0;i<n;i++){
-        NSString* s = [keyArray objectAtIndex:i];
-        nextLevel = [currentLevel objectForKey:s];
-        if(nextLevel){
-            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
-            currentLevel = nextLevel;
-        }
-        else {
-            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
-            [currentLevel setObject:nextLevel forKey:s];
-            currentLevel = nextLevel;
-            [nextLevel release];
-        }
-        [currentLevel incrementTotalCounts];
-    }
-    
-    ORPlotFFT* fftPlot = [nextLevel data];
-    if(!fftPlot){
-        fftPlot = [[ORPlotFFT alloc] init];
-        [fftPlot setKey:[nextLevel key]];
-        [fftPlot setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
- 		[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];
-        [nextLevel setData:fftPlot];
-        [fftPlot release];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetAdded
-		 object:self
-		 userInfo: nil];
-    }
-    else {
-		[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];
- 	}
-	[[currentLevel data] askForUniqueIDNumber];
-	[[currentLevel data] makeMainController];
+ 	@synchronized(self){     
+		int n = [keyArray count];
+		int i;
+		ORDataSet* currentLevel = self;
+		ORDataSet* nextLevel    = nil;
+		[currentLevel incrementTotalCounts];
+		
+		for(i=0;i<n;i++){
+			NSString* s = [keyArray objectAtIndex:i];
+			nextLevel = [currentLevel objectForKey:s];
+			if(nextLevel){
+				if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+				currentLevel = nextLevel;
+			}
+			else {
+				nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+				[currentLevel setObject:nextLevel forKey:s];
+				currentLevel = nextLevel;
+				[nextLevel release];
+			}
+			[currentLevel incrementTotalCounts];
+		}
+		
+		ORPlotFFT* fftPlot = [nextLevel data];
+		if(!fftPlot){
+			fftPlot = [[ORPlotFFT alloc] init];
+			[fftPlot setKey:[nextLevel key]];
+			[fftPlot setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+			[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];
+			[nextLevel setData:fftPlot];
+			[fftPlot release];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ORDataSetAdded
+			 object:self
+			 userInfo: nil];
+		}
+		else {
+			[fftPlot setRealArray:realArray imaginaryArray:imaginaryArray];
+		}
+		[[currentLevel data] askForUniqueIDNumber];
+		[[currentLevel data] makeMainController];
+	}
 }
 
 

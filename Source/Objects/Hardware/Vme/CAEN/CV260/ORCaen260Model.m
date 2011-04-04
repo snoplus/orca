@@ -372,7 +372,8 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
+	[notifyCenter removeObserver:self];
+
     [notifyCenter addObserver: self
                      selector: @selector(runAboutToStart:)
                          name: ORRunAboutToStartNotification
