@@ -54,7 +54,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	
     basicSize      = NSMakeSize(280,400);
-    settingsSize   = NSMakeSize(630,450);
+    settingsSize   = NSMakeSize(780,450);
     monitoringSize = NSMakeSize(783,320);
     
     blankView = [[NSView alloc] init];
@@ -153,6 +153,15 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
                      selector : @selector(triggerSourceMaskChanged:)
                          name : ORCaen1720ModelTriggerSourceMaskChanged
 					   object : model];
+	[notifyCenter addObserver : self
+			 selector : @selector(triggerOutMaskChanged:)
+			     name : ORCaen1720ModelTriggerOutMaskChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(fpIOControlChanged:)
+			     name : ORCaen1720ModelFrontPanelControlMaskChanged
+			   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(postTriggerSettingChanged:)
@@ -260,6 +269,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self acquisitionModeChanged:nil];
 	[self coincidenceLevelChanged:nil];
 	[self triggerSourceMaskChanged:nil];
+	[self triggerOutMaskChanged:nil];
+	[self fpIOControlChanged:nil];
 	[self postTriggerSettingChanged:nil];
 	[self enabledMaskChanged:nil];
     [self waveFormRateChanged:nil];
@@ -407,6 +418,23 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[[otherTriggerMatrix cellWithTag:1] setIntValue:(mask & (1L << 31)) !=0];
 }
 
+- (void) triggerOutMaskChanged:(NSNotification*)aNote
+{
+	int i;
+	unsigned long mask = [model triggerOutMask];
+	for(i=0;i<8;i++){
+		[[chanTriggerOutMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
+	}
+	[[otherTriggerOutMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
+	[[otherTriggerOutMatrix cellWithTag:1] setIntValue:(mask & (1L << 31)) !=0];
+}
+
+- (void) fpIOControlChanged:(NSNotification*)aNote
+{
+
+	[fpIOModeMatrix selectCellWithTag:([model frontPanelControlMask] >> 6) & 0x3UL];
+}
+
 - (void) coincidenceLevelChanged:(NSNotification*)aNote
 {
 	[coincidenceLevelTextField setIntValue: [model coincidenceLevel]];
@@ -534,6 +562,9 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[softwareTriggerButton setEnabled:YES]; 
     [otherTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [chanTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[otherTriggerOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[chanTriggerOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOModeMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
     [triggerSourceMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [coincidenceLevelTextField setEnabled:!lockedOrRunningMaintenance]; 
@@ -706,6 +737,32 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	if([[otherTriggerMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
 	if([[otherTriggerMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
 	[model setTriggerSourceMask:mask];	
+}
+
+- (IBAction) triggerOutMaskAction:(id)sender
+{
+	int i;
+	unsigned long mask = 0;
+	for(i=0;i<8;i++){
+		if([[chanTriggerOutMatrix cellWithTag:i] intValue]) mask |= (1L << i);
+	}
+	if([[otherTriggerOutMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
+	if([[otherTriggerOutMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
+	[model setTriggerOutMask:mask];	
+}
+
+- (IBAction) fpIOControlAction:(id)sender
+{
+	
+	unsigned long mask = 0;
+	mask |= [[fpIOModeMatrix selectedCell] tag] << 6;
+
+	/*
+	if([[otherTriggerOutMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
+	if([[otherTriggerOutMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
+	 */
+	
+	[model setFrontPanelControlMask:mask];	
 }
 
 - (IBAction) coincidenceLevelTextFieldAction:(id)sender

@@ -94,6 +94,8 @@ static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 NSString* ORCaen1720ModelEnabledMaskChanged                 = @"ORCaen1720ModelEnabledMaskChanged";
 NSString* ORCaen1720ModelPostTriggerSettingChanged          = @"ORCaen1720ModelPostTriggerSettingChanged";
 NSString* ORCaen1720ModelTriggerSourceMaskChanged           = @"ORCaen1720ModelTriggerSourceMaskChanged";
+NSString* ORCaen1720ModelTriggerOutMaskChanged		    = @"ORCaen1720ModelTriggerOutMaskChanged";
+NSString* ORCaen1720ModelFrontPanelControlMaskChanged	    = @"ORCaen1720ModelFrontPanelControlMaskChanged";
 NSString* ORCaen1720ModelCoincidenceLevelChanged            = @"ORCaen1720ModelCoincidenceLevelChanged";
 NSString* ORCaen1720ModelAcquisitionModeChanged             = @"ORCaen1720ModelAcquisitionModeChanged";
 NSString* ORCaen1720ModelCountAllTriggersChanged            = @"ORCaen1720ModelCountAllTriggersChanged";
@@ -304,6 +306,35 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     triggerSourceMask = aTriggerSourceMask;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelTriggerSourceMaskChanged object:self];
+}
+
+- (unsigned long) triggerOutMask
+{
+	return triggerOutMask;
+}
+
+- (void) setTriggerOutMask:(unsigned long)aTriggerOutMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutMask:triggerOutMask];
+	
+	//do not step into the reserved area
+	triggerOutMask = aTriggerOutMask & 0xc00000ff;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelTriggerOutMaskChanged object:self];
+}
+
+- (unsigned long) frontPanelControlMask
+{
+	return frontPanelControlMask;
+}
+
+- (void) setFrontPanelControlMask:(unsigned long)aFrontPanelControlMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setFrontPanelControlMask:aFrontPanelControlMask];
+	
+	frontPanelControlMask = aFrontPanelControlMask;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelFrontPanelControlMaskChanged object:self];
 }
 
 - (unsigned short) coincidenceLevel
@@ -881,13 +912,13 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	[self writeChannelConfiguration];
 	[self writeCustomSize];
 	[self writeTriggerSource];
+	[self writeTriggerOut];
+	[self writeFrontPanelControl];
 	[self writeChannelEnabledMask];
 	[self writeBufferOrganization];
 	[self writeOverUnderThresholds];
 	[self writeDacs];
 	[self writePostTriggerSetting];
-    
-	
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
@@ -952,6 +983,26 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	
+}
+
+- (void) writeTriggerOut
+{
+	unsigned long aValue = triggerOutMask;
+	[[self adapter] writeLongBlock:&aValue
+			     atAddress:[self baseAddress] + reg[kFPTrigOutEnblMask].addressOffset
+			    numToWrite:1
+			    withAddMod:[self addressModifier]
+			 usingAddSpace:0x01];
+}
+
+- (void) writeFrontPanelControl
+{
+	unsigned long aValue = frontPanelControlMask;
+	[[self adapter] writeLongBlock:&aValue
+			     atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
+			    numToWrite:1
+			    withAddMod:[self addressModifier]
+			 usingAddSpace:0x01];
 }
 
 - (void) writeBufferOrganization
@@ -1248,6 +1299,8 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [self setEnabledMask:[aDecoder decodeIntForKey:@"ORCaen1720ModelEnabledMask"]];
     [self setPostTriggerSetting:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelPostTriggerSetting"]];
     [self setTriggerSourceMask:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelTriggerSourceMask"]];
+	[self setTriggerOutMask:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelTriggerOutMask"]];
+	[self setFrontPanelControlMask:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelFrontPanelControlMask"]];
     [self setCoincidenceLevel:[aDecoder decodeIntForKey:@"ORCaen1720ModelCoincidenceLevel"]];
     [self setAcquisitionMode:[aDecoder decodeIntForKey:@"acquisitionMode"]];
     [self setCountAllTriggers:[aDecoder decodeBoolForKey:@"countAllTriggers"]];
@@ -1282,6 +1335,8 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	[anEncoder encodeInt:enabledMask forKey:@"ORCaen1720ModelEnabledMask"];
 	[anEncoder encodeInt32:postTriggerSetting forKey:@"ORCaen1720ModelPostTriggerSetting"];
 	[anEncoder encodeInt32:triggerSourceMask forKey:@"ORCaen1720ModelTriggerSourceMask"];
+	[anEncoder encodeInt32:triggerOutMask forKey:@"ORCaen1720ModelTriggerOutMask"];
+	[anEncoder encodeInt32:frontPanelControlMask forKey:@"ORCaen1720ModelFrontPanelControlMask"];
 	[anEncoder encodeInt:coincidenceLevel forKey:@"ORCaen1720ModelCoincidenceLevel"];
 	[anEncoder encodeInt:acquisitionMode forKey:@"acquisitionMode"];
 	[anEncoder encodeBool:countAllTriggers forKey:@"countAllTriggers"];

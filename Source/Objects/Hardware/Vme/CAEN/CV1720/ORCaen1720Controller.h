@@ -49,6 +49,9 @@
 	IBOutlet NSMatrix*		enabledMaskMatrix;
 	IBOutlet NSMatrix*		chanTriggerMatrix;
 	IBOutlet NSMatrix*		otherTriggerMatrix;
+	IBOutlet NSMatrix*		chanTriggerOutMatrix;
+	IBOutlet NSMatrix*		otherTriggerOutMatrix;
+	IBOutlet NSMatrix*		fpIOModeMatrix;
 	IBOutlet NSTextField*	postTriggerSettingTextField;
 	IBOutlet NSMatrix*		triggerSourceMaskMatrix;
 	IBOutlet NSTextField*	coincidenceLevelTextField;
@@ -114,6 +117,8 @@
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) postTriggerSettingChanged:(NSNotification*)aNote;
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote;
+- (void) triggerOutMaskChanged:(NSNotification*)aNote;
+- (void) fpIOControlChanged:(NSNotification*)aNote;
 - (void) coincidenceLevelChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) acquisitionModeChanged:(NSNotification*)aNote;
@@ -150,6 +155,8 @@
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) postTriggerSettingTextFieldAction:(id)sender;
 - (IBAction) triggerSourceMaskAction:(id)sender;
+- (IBAction) triggerOutMaskAction:(id)sender;
+- (IBAction) fpIOControlAction:(id)sender;
 - (IBAction) coincidenceLevelTextFieldAction:(id)sender;
 - (IBAction) generateTriggerAction:(id)sender;
 - (IBAction) acquisitionModeAction:(id)sender;

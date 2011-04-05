@@ -113,6 +113,8 @@ enum {
     unsigned short	acquisitionMode;
     unsigned short  coincidenceLevel;
     unsigned long   triggerSourceMask;
+	unsigned long   triggerOutMask;
+	unsigned long   frontPanelControlMask;
     unsigned long	postTriggerSetting;
     unsigned short	enabledMask;
 	ORRateGroup*	waveFormRateGroup;
@@ -152,6 +154,10 @@ enum {
 - (void)			setPostTriggerSetting:(unsigned long)aPostTriggerSetting;
 - (unsigned long)	triggerSourceMask;
 - (void)			setTriggerSourceMask:(unsigned long)aTriggerSourceMask;
+- (unsigned long)	triggerOutMask;
+- (void)			setTriggerOutMask:(unsigned long)aTriggerOutMask;
+- (unsigned long)	frontPanelControlMask;
+- (void)			setFrontPanelControlMask:(unsigned long)aFrontPanelControlMask;
 - (unsigned short)	coincidenceLevel;
 - (void)			setCoincidenceLevel:(unsigned short)aCoincidenceLevel;
 - (unsigned short)	acquisitionMode;
@@ -189,6 +195,8 @@ enum {
 - (void)			writeCustomSize;
 - (void)			writeAcquistionControl:(BOOL)start;
 - (void)			writeTriggerSource;
+- (void)			writeTriggerOut;
+- (void)			writeFrontPanelControl;
 - (void)			writePostTriggerSetting;
 - (void)			writeChannelEnabledMask;
 - (void)            writeNumberBLTEvents:(BOOL)enable;
@@ -242,6 +250,8 @@ extern NSString* ORCaen1720WriteValueChanged;
 extern NSString* ORCaen1720ModelEnabledMaskChanged;
 extern NSString* ORCaen1720ModelPostTriggerSettingChanged;
 extern NSString* ORCaen1720ModelTriggerSourceMaskChanged;
+extern NSString* ORCaen1720ModelTriggerOutMaskChanged;
+extern NSString* ORCaen1720ModelFrontPanelControlMaskChanged;
 extern NSString* ORCaen1720ModelCoincidenceLevelChanged;
 extern NSString* ORCaen1720ModelAcquisitionModeChanged;
 extern NSString* ORCaen1720ModelCountAllTriggersChanged;
