@@ -588,8 +588,9 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				     @"ORXL3DecoderForXL3MegaBundle",			@"decoder",
 				     [NSNumber numberWithLong:xl3MegaBundleDataId],	@"dataId",
-				     [NSNumber numberWithBool:NO],			@"variable",
-				     [NSNumber numberWithLong:362],			@"length",  //modified kLong header, 1440 bytes + 2 longs
+				     [NSNumber numberWithBool:YES],			@"variable",
+				     [NSNumber numberWithLong:-1],			@"length",
+				     //[NSNumber numberWithLong:362],			@"length",  //modified kLong header, 1440 bytes + 2 longs
 				     nil];
 	[dataDictionary setObject:aDictionary forKey:@"Xl3MegaBundle"];
 
