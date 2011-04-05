@@ -500,7 +500,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     BOOL locked						= [gSecurity isLocked:ORCaen1720BasicLock];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720BasicLock];
 	
-	[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
+	//[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
     [basicLockButton setState: locked];
     
     [addressStepper setEnabled:!locked && !runInProgress];
@@ -737,7 +737,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) customSizeAction:(id)sender
 {
-	NSUInteger maxNumSamples = (NSUInteger) 1024./powf(2.,(float)[model eventSize]) / 2;
+	NSUInteger maxNumSamples = (NSUInteger) 1024 * 1024./powf(2.,(float)[model eventSize]) / 2;
 	if(maxNumSamples > [sender intValue]) {
 		//todo /2 in std mode /2.5 in packed mode (2 cnts here = 5 samples)
 		[model setCustomSize:([sender intValue] / 2)];
