@@ -991,15 +991,18 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 
 - (void) writeEnableBerr:(BOOL)enable
 {
-    unsigned long aValue;
+	unsigned long aValue;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-    if ( enable ) aValue |= 0x10;
-    else aValue &= 0xFFEF;
+			    atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
+                            numToRead:1
+			   withAddMod:[self addressModifier]
+			usingAddSpace:0x01];
+
+	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
+	if ( enable ) aValue |= 0x30;
+	else aValue &= 0xFFCF;
+	//if ( enable ) aValue |= 0x10;
+	//else aValue &= 0xFFEF;
     
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
@@ -1013,7 +1016,7 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 	if((bufferState == 1) && isRunning){
 		bufferEmptyCount = 0;
 		if(!bufferFullAlarm){
-			NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1720 (slot %d)",[self slot]];
+			NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1724 (slot %d)",[self slot]];
 			bufferFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
 			[bufferFullAlarm setSticky:YES];
 			[bufferFullAlarm setHelpString:@"The rate is too high. Adjust the Threshold accordingly."];
@@ -1151,7 +1154,7 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 							numToRead:1
 						   withAddMod:addressModifier 
 						usingAddSpace:0x01];
-			 */
+			*/
 			theEventSize = theFirst&0x0FFFFFFF;
 			
             if ( theEventSize == 0 ) return;
@@ -1344,7 +1347,7 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 @implementation ORCaen1724DecoderForCAEN : ORCaenDataDecoder
 - (NSString*) identifier
 {
-    return @"CAEN 1720 Digitizer";
+    return @"CAEN 1724 Digitizer";
 }
 @end
 

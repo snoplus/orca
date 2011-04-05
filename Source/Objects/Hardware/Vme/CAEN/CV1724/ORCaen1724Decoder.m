@@ -109,10 +109,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
                             offset:0 //bytes!
                           unitSize:2 //unit size in bytes!
                             sender:self  
-                          withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+                          withKeys:@"CAEN1724", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
         }
         else {
-            [aDataSet incrementCount:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+            [aDataSet incrementCount:@"CAEN1724", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
         }
 		if(getRatesFromDecodeStage){
 			NSString* aKey = [crateKey stringByAppendingString:cardKey];
@@ -140,8 +140,21 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-     
-    return @"";               
+	//unsigned long length = ExtractLength(*ptr);
+	//a single trigger event expected
+	
+	ptr += 2;
+	NSMutableString* dsc = [NSMutableString string];
+
+	NSString* eventSize = [NSString stringWithFormat:@"Event size = %d\n", *ptr & 0x0fffffffUL];
+	NSString* isZeroLengthEncoded = [NSString stringWithFormat:@"Zero length enc: %@\n", ((*ptr >> 24) & 0x1UL)?@"On":@"Off"];
+	NSString* lvioPattern = [NSString stringWithFormat:@"LVIO Pattern = 0x%04x\n", (ptr[1] >> 8) & 0xffffUL];
+	NSString* sChannelMask = [NSString stringWithFormat:@"Channel mask = 0x%02x\n", ptr[1] & 0xffUL];
+	NSString* eventCounter = [NSString stringWithFormat:@"Event counter = 0x%06x\n", ptr[2] & 0xffffffUL];
+	NSString* timeTag = [NSString stringWithFormat:@"Time tag = 0x%08x\n", ptr[3]];
+	
+	[dsc appendFormat:@"%@%@%@%@%@%@", eventSize, isZeroLengthEncoded, lvioPattern, sChannelMask, eventCounter, timeTag];
+	return dsc;               
 }
 
 @end
