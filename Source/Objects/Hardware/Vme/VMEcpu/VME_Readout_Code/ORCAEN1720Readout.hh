@@ -10,6 +10,8 @@ class ORCAEN1720Readout : public ORVVmeCard
     virtual ~ORCAEN1720Readout() {} 
 	virtual bool Start();
     virtual bool Readout(SBC_LAM_Data*);
+private:
+	uint32_t numEventsToReadout;
 };
 
 #endif /* _ORCAEN1720Readout_hh_*/
