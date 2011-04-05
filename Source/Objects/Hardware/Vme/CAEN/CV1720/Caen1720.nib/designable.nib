@@ -2466,7 +2466,7 @@ OAA</bytes>
 																<object class="NSTextFieldCell" key="NSCell" id="215896968">
 																	<int key="NSCellFlags">67239488</int>
 																	<int key="NSCellFlags2">4326400</int>
-																	<string key="NSContents">K</string>
+																	<string key="NSContents">S</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="339285968"/>
 																	<reference key="NSBackgroundColor" ref="646983205"/>

@@ -286,7 +286,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
 	[eventSizePopUp selectItemAtIndex:	[model eventSize]];
-	[eventSizeTextField setIntValue:	1024./powf(2.,(float)[model eventSize]) / 2]; //in KSamples
+	[eventSizeTextField setIntValue:	1024*1024./powf(2.,(float)[model eventSize]) / 2]; //in KSamples
 	
 }
 
@@ -424,13 +424,12 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) customSizeChanged:(NSNotification*)aNote
 {
-	//todo: *2 in std mode, *2.5 in packed mode
-	[customSizeTextField setIntValue:([model customSize] * 2)];
+	//todo: *4 in std mode, *5 in packed mode
+	[customSizeTextField setIntValue:([model customSize] * 4)];
 }
 
 - (void) isCustomSizeChanged:(NSNotification*)aNote
 {
-	//todo: *2 in std mode, *2.5 in packed mode
 	[customSizeButton setIntValue:[model isCustomSize]];
 	[customSizeTextField setEnabled:[model isCustomSize]];
 }
@@ -739,11 +738,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	NSUInteger maxNumSamples = (NSUInteger) 1024 * 1024./powf(2.,(float)[model eventSize]) / 2;
 	if(maxNumSamples > [sender intValue]) {
-		//todo /2 in std mode /2.5 in packed mode (2 cnts here = 5 samples)
-		[model setCustomSize:([sender intValue] / 2)];
+		//todo /4 in std mode /5 in packed mode
+		[model setCustomSize:([sender intValue] / 4)];
 	}
 	else {
-		[model setCustomSize:maxNumSamples / 2];
+		[model setCustomSize:maxNumSamples / 4];
 	}
 }
 
