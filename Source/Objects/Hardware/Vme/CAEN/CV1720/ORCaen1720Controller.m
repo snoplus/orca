@@ -129,6 +129,10 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
                      selector : @selector(customSizeChanged:)
                          name : ORCaen1720ModelCustomSizeChanged
 					   object : model];
+	[notifyCenter addObserver : self
+			 selector : @selector(isCustomSizeChanged:)
+			     name : ORCaen1720ModelIsCustomSizeChanged
+			   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(countAllTriggersChanged:)
@@ -251,6 +255,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self overUnderChanged:nil];
 	[self channelConfigMaskChanged:nil];
 	[self customSizeChanged:nil];
+	[self isCustomSizeChanged:nil];
 	[self countAllTriggersChanged:nil];
 	[self acquisitionModeChanged:nil];
 	[self coincidenceLevelChanged:nil];
@@ -281,7 +286,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
 	[eventSizePopUp selectItemAtIndex:	[model eventSize]];
-	[eventSizeTextField setIntValue:	1024./powf(2.,(float)[model eventSize])]; //in KB
+	[eventSizeTextField setIntValue:	1024./powf(2.,(float)[model eventSize]) / 2]; //in KSamples
 	
 }
 
@@ -387,7 +392,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) postTriggerSettingChanged:(NSNotification*)aNote
 {
-	[postTriggerSettingTextField setIntValue: [model postTriggerSetting]];
+	//todo *4 in std mode *5 in packed mode
+	[postTriggerSettingTextField setIntValue:([model postTriggerSetting] * 4)];
 }
 
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote
@@ -418,7 +424,15 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) customSizeChanged:(NSNotification*)aNote
 {
-	[customSizeTextField setIntValue: [model customSize]];
+	//todo: *2 in std mode, *2.5 in packed mode
+	[customSizeTextField setIntValue:([model customSize] * 2)];
+}
+
+- (void) isCustomSizeChanged:(NSNotification*)aNote
+{
+	//todo: *2 in std mode, *2.5 in packed mode
+	[customSizeButton setIntValue:[model isCustomSize]];
+	[customSizeTextField setEnabled:[model isCustomSize]];
 }
 
 - (void) channelConfigMaskChanged:(NSNotification*)aNote
@@ -428,8 +442,6 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	for(i=0;i<kNumChanConfigBits;i++){
 		[[channelConfigMaskMatrix cellWithTag:i] setIntValue:(mask & (1<<chanConfigToMaskBit[i])) !=0];
 	}
-	
-	
 }
 
 - (void) baseAddressChanged:(NSNotification*) aNotification
@@ -519,7 +531,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self setBufferStateLabel];
     [thresholdMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [overUnderMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
+    //[softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
+	[softwareTriggerButton setEnabled:YES]; 
     [otherTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [chanTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
@@ -534,7 +547,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [initButton setEnabled:!lockedOrRunningMaintenance]; 
 	
 	//these must NOT or can not be changed when run in progress
-    [customSizeTextField setEnabled:!locked && !runInProgress]; 
+    [customSizeTextField setEnabled:!locked && !runInProgress && [model isCustomSize]]; 
+	[customSizeButton setEnabled:!locked && !runInProgress]; 
     [eventSizePopUp setEnabled:!locked && !runInProgress]; 
     [enabledMaskMatrix setEnabled:!locked && !runInProgress]; 
 	
@@ -679,7 +693,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) postTriggerSettingTextFieldAction:(id)sender
 {
-	[model setPostTriggerSetting:[sender intValue]];	
+	//todo /4 in std mode /5 in packed mode
+	[model setPostTriggerSetting:([sender intValue] / 4)];	
 }
 
 - (IBAction) triggerSourceMaskAction:(id)sender
@@ -722,7 +737,19 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) customSizeAction:(id)sender
 {
-	[model setCustomSize:[sender intValue]];	
+	NSUInteger maxNumSamples = (NSUInteger) 1024./powf(2.,(float)[model eventSize]) / 2;
+	if(maxNumSamples > [sender intValue]) {
+		//todo /2 in std mode /2.5 in packed mode (2 cnts here = 5 samples)
+		[model setCustomSize:([sender intValue] / 2)];
+	}
+	else {
+		[model setCustomSize:maxNumSamples / 2];
+	}
+}
+
+- (IBAction) isCustomSizeAction:(id)sender
+{
+	[model setIsCustomSize:[sender intValue]];	
 }
 
 - (IBAction) channelConfigMaskAction:(id)sender

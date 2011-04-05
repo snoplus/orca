@@ -10,7 +10,7 @@ bool ORCAEN1724Readout::Start() {
 				 sizeof(numEventsToReadout),
 				 numEventsToReadout);
 	if ( result != sizeof(numEventsToReadout) ) { 
-		LogBusError("CAEN 0x%0x Couldn't read register", numBLTEventsReg);
+		LogBusError("V1724 0x%0x Couldn't read register", numBLTEventsReg);
 		return false; 
 	}
 	if ( numEventsToReadout == 0 ) {
@@ -98,11 +98,11 @@ bool ORCAEN1724Readout::Readout(SBC_LAM_Data* lamData)
 		dataIndex = startIndex + 2 + numEventsToReadout*eventSize;
         } else {
 		if (eventSize == 0) {
-			uint32_t resetSW = 1;
+			uint32_t clearMem = 1;
 			result = VMEWrite(GetBaseAddress()+0xEF28,
 					  GetAddressModifier(),
-					  sizeof(resetSW),
-					  resetSW);
+					  sizeof(clearMem),
+					  clearMem);
 			LogError("Rd Err: V1724 Buffer FULL, flushed."); 
 		}
 		else {

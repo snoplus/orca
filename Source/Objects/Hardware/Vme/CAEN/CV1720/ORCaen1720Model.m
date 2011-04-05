@@ -98,6 +98,7 @@ NSString* ORCaen1720ModelCoincidenceLevelChanged            = @"ORCaen1720ModelC
 NSString* ORCaen1720ModelAcquisitionModeChanged             = @"ORCaen1720ModelAcquisitionModeChanged";
 NSString* ORCaen1720ModelCountAllTriggersChanged            = @"ORCaen1720ModelCountAllTriggersChanged";
 NSString* ORCaen1720ModelCustomSizeChanged                  = @"ORCaen1720ModelCustomSizeChanged";
+NSString* ORCaen1720ModelIsCustomSizeChanged                = @"ORCaen1720ModelIsCustomSizeChanged";
 NSString* ORCaen1720ModelChannelConfigMaskChanged           = @"ORCaen1720ModelChannelConfigMaskChanged";
 NSString* ORCaen1720ModelNumberBLTEventsToReadoutChanged    = @"ORCaen1720ModelNumberBLTEventsToReadoutChanged";
 NSString* ORCaen1720ChnlDacChanged                          = @"ORCaen1720ChnlDacChanged";
@@ -361,6 +362,20 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelCustomSizeChanged object:self];
 }
 
+- (BOOL) isCustomSize
+{
+	return isCustomSize;
+}
+
+- (void) setIsCustomSize:(BOOL)aIsCustomSize
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setIsCustomSize:isCustomSize];
+	
+	isCustomSize = aIsCustomSize;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelIsCustomSizeChanged object:self];
+}
+
 - (unsigned short) channelConfigMask
 {
     return channelConfigMask;
@@ -374,7 +389,10 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	
 	//can't get the packed form to work so just make sure that bit is cleared.
 	channelConfigMask &= ~(1L<<11);
-	
+
+	//we do the sequential memory access only
+	channelConfigMask |= (1L<<4);
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelChannelConfigMaskChanged object:self];
 }
 
@@ -785,7 +803,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 
 - (void) writeCustomSize
 {
-	unsigned long aValue = [self customSize];
+	unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kCustomSize].addressOffset
                         numToWrite:1
@@ -996,9 +1014,12 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	
-    if ( enable ) aValue |= 0x10;
-    else aValue &= 0xFFEF;
+
+	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
+	if ( enable ) aValue |= 0x30;
+	else aValue &= 0xFFCF;
+	//if ( enable ) aValue |= 0x10;
+	//else aValue &= 0xFFEF;
     
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
@@ -1131,18 +1152,24 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 		bufferState = (status & 0x10) >> 4;						
 		if(status & kEventReadyMask){
 			//OK, at least one event is ready
+			unsigned long theFirst;
+			[controller readLongBlock:&theFirst
+					atAddress:dataReg
+					numToRead:1
+				       withAddMod:addressModifier 
+				    usingAddSpace:0x01]; //we set it to not increment the address.
+			
 			unsigned long theEventSize;
-			[controller readLongBlock:&theEventSize
-							atAddress:eventSizeReg
-							numToRead:1
-						   withAddMod:addressModifier 
-						usingAddSpace:0x01];
-            if ( theEventSize == 0 ) return;
+			theEventSize = theFirst&0x0FFFFFFF;
+			if ( theEventSize == 0 ) return;
+
 			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
 			[theData setLength:(2+theEventSize)*sizeof(long)];
 			unsigned long* p = (unsigned long*)[theData bytes];
 			*p++ = dataId | (2 + theEventSize);
 			*p++ = location; 
+			*p++ = theFirst;
+
 			[controller readLongBlock:p
 							atAddress:dataReg
 							numToRead:theEventSize
@@ -1150,18 +1177,15 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 						usingAddSpace:0xFF]; //we set it to not increment the address.
 			
 			[aDataPacket addData:theData];
-			unsigned short chanMask = p[1]; //remember, the point was already inc'ed to the start of data
+			unsigned short chanMask = p[0]; //remember, the point was already inc'ed to the start of data+1
 			int i;
 			for(i=0;i<8;i++){
 				if(chanMask & (1<<i)) ++waveFormCount[i]; 
 			}
 		}
-		
-		
 	}
 	@catch(NSException* localException) {
 	}
-	
 }
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
@@ -1228,6 +1252,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [self setAcquisitionMode:[aDecoder decodeIntForKey:@"acquisitionMode"]];
     [self setCountAllTriggers:[aDecoder decodeBoolForKey:@"countAllTriggers"]];
     [self setCustomSize:[aDecoder decodeInt32ForKey:@"customSize"]];
+	[self setIsCustomSize:[aDecoder decodeBoolForKey:@"isCustomSize"]];
     [self setChannelConfigMask:[aDecoder decodeIntForKey:@"channelConfigMask"]];
     [self setWaveFormRateGroup:[aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
     [self setNumberBLTEventsToReadout:[aDecoder decodeInt32ForKey:@"numberBLTEventsToReadout"]];
@@ -1261,6 +1286,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	[anEncoder encodeInt:acquisitionMode forKey:@"acquisitionMode"];
 	[anEncoder encodeBool:countAllTriggers forKey:@"countAllTriggers"];
 	[anEncoder encodeInt32:customSize forKey:@"customSize"];
+	[anEncoder encodeBool:isCustomSize forKey:@"isCustomSize"];
 	[anEncoder encodeInt:channelConfigMask forKey:@"channelConfigMask"];
     [anEncoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
     [anEncoder encodeInt32:numberBLTEventsToReadout forKey:@"numberBLTEventsToReadout"];
