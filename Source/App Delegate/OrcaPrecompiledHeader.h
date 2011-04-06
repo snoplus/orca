@@ -22,7 +22,6 @@
 #import "NSSplitView+Extensions.h"
 #import "NSColor+Extensions.h"
 #import "NSString+Extensions.h"
-#import "NSObject+Extensions.h"
 #import "NSDictionary+Extensions.h"
 #import "NSArray+Extensions.h"
 #import "NSOutlineView+Extensions.h"
