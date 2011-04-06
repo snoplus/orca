@@ -431,8 +431,15 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) fpIOControlChanged:(NSNotification*)aNote
 {
-
 	[fpIOModeMatrix selectCellWithTag:([model frontPanelControlMask] >> 6) & 0x3UL];
+	[fpIOPatternLatchMatrix selectCellWithTag:([model frontPanelControlMask] >> 9) & 0x1UL];
+	[fpIOTrgInMatrix selectCellWithTag:([model frontPanelControlMask] & 0x1UL)];
+	[fpIOTrgOutMatrix selectCellWithTag:([model frontPanelControlMask] >> 1) & 0x1UL];
+	[fpIOLVDS0Matrix selectCellWithTag:([model frontPanelControlMask] >> 2) & 0x1UL];
+	[fpIOLVDS1Matrix selectCellWithTag:([model frontPanelControlMask] >> 3) & 0x1UL];
+	[fpIOLVDS2Matrix selectCellWithTag:([model frontPanelControlMask] >> 4) & 0x1UL];
+	[fpIOLVDS3Matrix selectCellWithTag:([model frontPanelControlMask] >> 5) & 0x1UL];
+	[fpIOTrgOutModeMatrix selectCellWithTag:([model frontPanelControlMask] >> 14) & 0x3UL];
 }
 
 - (void) coincidenceLevelChanged:(NSNotification*)aNote
@@ -565,6 +572,15 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[otherTriggerOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
 	[chanTriggerOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
 	[fpIOModeMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOLVDS0Matrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOLVDS1Matrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOLVDS2Matrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOLVDS3Matrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOPatternLatchMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOTrgInMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOTrgOutMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOGetButton setEnabled:!lockedOrRunningMaintenance]; 
+	[fpIOSetButton setEnabled:!lockedOrRunningMaintenance]; 
     [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
     [triggerSourceMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [coincidenceLevelTextField setEnabled:!lockedOrRunningMaintenance]; 
@@ -756,13 +772,38 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	
 	unsigned long mask = 0;
 	mask |= [[fpIOModeMatrix selectedCell] tag] << 6;
-
-	/*
-	if([[otherTriggerOutMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
-	if([[otherTriggerOutMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
-	 */
+	mask |= [[fpIOPatternLatchMatrix selectedCell] tag] << 9;
+	mask |= [[fpIOTrgInMatrix selectedCell] tag];
+	mask |= [[fpIOTrgOutMatrix selectedCell] tag] << 1;
+	mask |= [[fpIOLVDS0Matrix selectedCell] tag] << 2;
+	mask |= [[fpIOLVDS1Matrix selectedCell] tag] << 3;
+	mask |= [[fpIOLVDS2Matrix selectedCell] tag] << 4;
+	mask |= [[fpIOLVDS3Matrix selectedCell] tag] << 5;
+	mask |= [[fpIOTrgOutModeMatrix selectedCell] tag] << 14;
 	
 	[model setFrontPanelControlMask:mask];	
+}
+
+- (IBAction) fpIOGetAction:(id)sender
+{
+	@try {
+		[model readFrontPanelControl];
+	}
+	@catch(NSException* localException) {
+		NSRunAlertPanel([localException name], @"%@\nGet Front Panel Failed", @"OK", nil, nil,
+				localException);
+	}
+}
+
+- (IBAction) fpIOSetAction:(id)sender
+{
+	@try {
+		[model writeFrontPanelControl];
+	}
+	@catch(NSException* localException) {
+		NSRunAlertPanel([localException name], @"%@\nSet Front Panel Failed", @"OK", nil, nil,
+				localException);
+	}
 }
 
 - (IBAction) coincidenceLevelTextFieldAction:(id)sender

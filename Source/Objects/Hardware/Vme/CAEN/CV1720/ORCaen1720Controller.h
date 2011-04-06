@@ -52,6 +52,16 @@
 	IBOutlet NSMatrix*		chanTriggerOutMatrix;
 	IBOutlet NSMatrix*		otherTriggerOutMatrix;
 	IBOutlet NSMatrix*		fpIOModeMatrix;
+	IBOutlet NSMatrix*		fpIOPatternLatchMatrix;
+	IBOutlet NSMatrix*		fpIOTrgInMatrix;
+	IBOutlet NSMatrix*		fpIOTrgOutMatrix;
+	IBOutlet NSMatrix*		fpIOTrgOutModeMatrix;
+	IBOutlet NSMatrix*		fpIOLVDS0Matrix;
+	IBOutlet NSMatrix*		fpIOLVDS1Matrix;
+	IBOutlet NSMatrix*		fpIOLVDS2Matrix;
+	IBOutlet NSMatrix*		fpIOLVDS3Matrix;
+	IBOutlet NSButton*		fpIOGetButton;
+	IBOutlet NSButton*		fpIOSetButton;
 	IBOutlet NSTextField*	postTriggerSettingTextField;
 	IBOutlet NSMatrix*		triggerSourceMaskMatrix;
 	IBOutlet NSTextField*	coincidenceLevelTextField;
@@ -157,6 +167,8 @@
 - (IBAction) triggerSourceMaskAction:(id)sender;
 - (IBAction) triggerOutMaskAction:(id)sender;
 - (IBAction) fpIOControlAction:(id)sender;
+- (IBAction) fpIOGetAction:(id)sender;
+- (IBAction) fpIOSetAction:(id)sender;
 - (IBAction) coincidenceLevelTextFieldAction:(id)sender;
 - (IBAction) generateTriggerAction:(id)sender;
 - (IBAction) acquisitionModeAction:(id)sender;

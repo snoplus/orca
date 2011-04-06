@@ -197,6 +197,7 @@ enum {
 - (void)			writeTriggerSource;
 - (void)			writeTriggerOut;
 - (void)			writeFrontPanelControl;
+- (void)			readFrontPanelControl;
 - (void)			writePostTriggerSetting;
 - (void)			writeChannelEnabledMask;
 - (void)            writeNumberBLTEvents:(BOOL)enable;

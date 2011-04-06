@@ -1005,6 +1005,19 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 			 usingAddSpace:0x01];
 }
 
+- (void) readFrontPanelControl
+{
+	unsigned long aValue = 0;
+	[[self adapter] readLongBlock:&aValue
+			     atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
+			    numToRead:1
+			    withAddMod:[self addressModifier]
+			 usingAddSpace:0x01];
+	
+	[self setFrontPanelControlMask:aValue];
+}
+
+
 - (void) writeBufferOrganization
 {
 	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);	
