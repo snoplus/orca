@@ -101,8 +101,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
             int k;
             int wordCount = 0;
             for(k=0;k<eventSize;k++){
-                dPtr[wordCount++] =	0x00000fff & *ptr;		
-                dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
+                dPtr[wordCount++] =	0x00003fff & *ptr;		
+                dPtr[wordCount++] =	(0x3fff0000 & *ptr) >> 16;		
                 ptr++;
             }
             [aDataSet loadWaveform:tmpData 
