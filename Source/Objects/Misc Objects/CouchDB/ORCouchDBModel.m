@@ -372,7 +372,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				if(![shortName length]) shortName = @"Untitled";
 				
 				NSString* s = [aProcess description];
-				s = [s stringByReplacingOccurrencesOfString:@"\n" withString:@"<br/>"];
 				
 				NSDictionary* processInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 											 [aProcess fullID],@"name",
@@ -584,9 +583,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) statusLogChanged:(NSNotification*)aNote
 {
-	if(!statusUpdateScheduled){
-		[self performSelector:@selector(updateStatus) withObject:nil afterDelay:10];
-		statusUpdateScheduled = YES;
+	if(!stealthMode){
+		if(!statusUpdateScheduled){
+			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:10];
+			statusUpdateScheduled = YES;
+		}
 	}
 }
 
@@ -595,7 +596,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateStatus) object:nil];
 	statusUpdateScheduled = NO;
 	NSString* s = [[ORStatusController sharedStatusController] contents];
-	s = [s stringByReplacingOccurrencesOfString:@"\n" withString:@"<br/>"];
 	NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 							  s,				@"statuslog",
 							  @"StatusLog",		@"type",
@@ -614,7 +614,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		NSArray* theAlarms = [[[alarmCollection alarms] retain] autorelease];
 		NSMutableArray* arrayForDoc = [NSMutableArray array];
 		if([theAlarms count]){
-			for(id anAlarm in theAlarms)[arrayForDoc addObject:[[anAlarm alarmInfo] prepareForHTML]];
+			for(id anAlarm in theAlarms)[arrayForDoc addObject:[anAlarm alarmInfo]];
 		}
 		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"alarms",@"name",arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
 		[db updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentAdded];

@@ -16,14 +16,6 @@
 //-------------------------------------------------------------
 
 @implementation NSArray (OrcaExtensions)
-- (id) prepareForHTML
-{
-	NSMutableArray* processedArray = [NSMutableArray array];
-	for(id anObj in self){
-		[processedArray addObject:[anObj prepareForHTML]];
-	}
-	return processedArray;
-}
 
 - (BOOL) containsObjectIdenticalTo: (id)obj 
 { 

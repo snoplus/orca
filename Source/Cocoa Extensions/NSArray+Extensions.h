@@ -18,7 +18,6 @@
 
 
 @interface NSArray (OrcaExtensions)
-- (id) prepareForHTML;
 - (BOOL)containsObjectIdenticalTo: (id)object;
 - (NSArray *)tabJoinedComponents;
 - (NSString *)joinAsLinesOfEndingType:(LineEndingType)type;

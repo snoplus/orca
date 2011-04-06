@@ -22,10 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 
 @implementation NSString (OR_NSStringWithExtensions)
-- (NSString*) prepareForHTML
-{
-	return [self stringByReplacingOccurrencesOfString:@"\n" withString:@"<br/>"];
-}
+
 
 - (NSString*) trimSpacesFromEnds
 {
