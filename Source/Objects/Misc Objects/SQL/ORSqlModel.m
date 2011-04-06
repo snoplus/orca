@@ -34,6 +34,7 @@
 #import "MemoryWatcher.h"
 #import "NSNotifications+Extensions.h"
 #import "Utilities.h"
+#import "ORStatusController.h"
 
 NSString* ORSqlModelStealthModeChanged = @"ORSqlModelStealthModeChanged";
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
@@ -56,6 +57,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) postRunTime:(NSNotification*)aNote;
 - (void) postRunOptions:(NSNotification*)aNote;
 - (void) objectCountChanged:(NSNotification*)aNote;
+- (void) statusLogChanged:(NSNotification*)aNote;
+- (void) updateStatus;
 - (void) collectProcesses;
 - (void) collectSegmentMap;
 - (void) collectAlarms;
@@ -70,6 +73,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) createRunsTableInDataBase:(NSString*)aDataBase;
 - (void) createSegmentMapTableInDataBase:(NSString*)aDataBase;
 - (void) createWaveformsTableInDataBase:(NSString*)aDataBase;
+- (void) createStatusLogTableInDataBase:(NSString*)aDataBase;
 @end
 
 @implementation ORSqlModel
@@ -115,6 +119,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) awakeAfterDocumentLoaded
 {
 	[self addMachineName];
+
 }
 
 - (void) setUpImage
@@ -213,7 +218,13 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[notifyCenter addObserver : self
                      selector : @selector(collectSegmentMap)
                          name : ORSegmentGroupMapReadNotification
+                       object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(statusLogChanged:)
+                         name : ORStatusLogUpdatedNotification
                        object : nil];		
+	
 }
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
@@ -338,6 +349,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	@try{ [self createHistogram2DTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
 	@try{ [self createSegmentMapTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
 	@try{ [self createWaveformsTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
+	@try{ [self createStatusLogTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
 }
 
 - (void) removeEntry
@@ -501,6 +513,32 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					
 					[aConnection queryString:s];
 					NSLog(@"Created Table Runs in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+- (void) createStatusLogTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE statuslog (";
+					s = [s stringByAppendingString:@"statuslog_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"machine_id int(11) NOT NULL,"];
+					s = [s stringByAppendingString:@"statuslog longblob DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (statuslog_id),"];
+					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
+					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
+					
+					[aConnection queryString:s];
+					NSLog(@"Created Table StatusLog in Database %@\n",aDataBase);
 				}
 			}
 		}
@@ -688,6 +726,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					s = [s stringByAppendingString:@"start int(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"end int(11) DEFAULT NULL,"];
 					s = [s stringByAppendingString:@"data mediumblob,"];
+					s = [s stringByAppendingString:@"datastr mediumblob,"];
 					s = [s stringByAppendingString:@"PRIMARY KEY (dataset_id),"];
 					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
 					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
@@ -869,6 +908,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
 		[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
 		[self performSelector:@selector(updateUptime) withObject:nil afterDelay:2];
+		[self performSelector:@selector(statusLogChanged:) withObject:nil afterDelay:2];
 		[self postRunState:nil];
 	}
 }
@@ -890,6 +930,38 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[self performSelector:@selector(updateUptime) withObject:nil afterDelay:5];	
 	}
 }
+
+- (void) statusLogChanged:(NSNotification*)aNote
+{
+	if(!stealthMode){
+		if(!statusUpdateScheduled){
+			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:10];
+			statusUpdateScheduled = YES;
+		}
+	}
+}
+
+/* Table: statuslog
+ +--------------------------+-------------+------+-----+---------+----------------+
+ | Field                    | Type        | Null | Key | Default | Extra          |
+ +--------------------------+-------------+------+-----+---------+----------------+
+ | statuslog_id             | int(11)     | NO   | PRI | NULL    | auto_increment |
+ | machine_id               | int(11)     | NO   | MUL | NULL    |                |
+ | statuslog                | longblob    | YES  |     | NULL    |                |
+ +--------------------------+-------------+------+-----+---------+----------------+
+*/
+- (void) updateStatus
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateStatus) object:nil];
+	statusUpdateScheduled = NO;
+	NSString* s = [[ORStatusController sharedStatusController] contents];	
+	ORPostStatusLogOp* anOp = [[ORPostStatusLogOp alloc] initWithDelegate:self];
+	[anOp setStatusLog:s];
+	[ORSqlDBQueue addOperation:anOp];
+	[anOp release];
+	
+}
+
 
 /* Table: runs
  +--------------------------+-------------+------+-----+---------+----------------+
@@ -1023,6 +1095,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
  | start      | int(11)     | YES  |     | NULL    |                |
  | end        | int(11)     | YES  |     | NULL    |                |
  | data       | mediumblob  | YES  |     | NULL    |                |
+ | datastr    | mediumblob  | YES  |     | NULL    |                |
  +------------+-------------+------+-----+---------+----------------+
  
  Table: Waveforms
@@ -1429,6 +1502,55 @@ Table: Histogram2Ds
 }
 @end
 
+@implementation ORPostStatusLogOp
+- (void) dealloc
+{
+	[statusLog release];
+	[super dealloc];
+}
+
+- (void) setStatusLog:(NSString*)s;
+{
+	[statusLog autorelease];
+    statusLog = [s copy];
+}
+
+- (void) main
+{
+	@try {
+		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		if(sqlConnection){
+			//get our machine id using our MAC Address
+			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+			id row				   = [theResult fetchRowAsDictionary];
+			
+			//get the entry for our run state using our machine_id
+			id machine_id	= [row objectForKey:@"machine_id"];
+			if(machine_id){
+				theResult		= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT statuslog_id from statuslog where machine_id = %@",[sqlConnection quoteObject:machine_id]]];
+				id ourStatusLogID	= [theResult fetchRowAsDictionary];
+				
+				//if we have a run entry, update it. Otherwise create an entry
+				if(ourStatusLogID){
+					[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE statuslog SET statuslog=%@  WHERE machine_id=%@",
+												[sqlConnection quoteObject:statusLog],
+												[sqlConnection quoteObject:machine_id]
+												]];
+				}
+				else {
+					[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO statuslog (machine_id,statuslog) VALUES (%@,%@)",
+												[sqlConnection quoteObject:machine_id],
+												[sqlConnection quoteObject:statusLog]]];
+				}
+			}
+			[sqlConnection release];
+		}
+	}
+	@catch(NSException* e){
+		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+	}
+}
+@end
 
 @implementation ORPostDataOp
 - (void) dealloc
@@ -1471,26 +1593,30 @@ Table: Histogram2Ds
 							if(dataset_id) {
 								if(lastCounts != countsNow){
 									NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
+									NSString* dataStr = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
 									NSString* convertedData = [sqlConnection quoteObject:theData];
-									NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram1Ds SET counts=%d,start=%d,end=%d,data=%@ WHERE dataset_id=%@",
+									NSString* theQuery = [NSString stringWithFormat:@"UPDATE Histogram1Ds SET counts=%d,start=%d,end=%d,data=%@,datastr=%@ WHERE dataset_id=%@",
 														  [aDataSet totalCounts],
 														  start,end,
 														  convertedData,
+														  [sqlConnection quoteObject:dataStr],
 														  [sqlConnection quoteObject:dataset_id]];
-														  [sqlConnection queryString:theQuery];
+									[sqlConnection queryString:theQuery];
 								}
 							}
 							else {
 								NSData* theData = [aDataSet getNonZeroRawDataWithStart:&start end:&end];
 								NSString* convertedData = [sqlConnection quoteObject:theData];
-								NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram1Ds (monitor_id,machine_id,name,counts,type,start,end,length,data) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@)",
+								NSString* dataStr = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
+								NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Histogram1Ds (monitor_id,machine_id,name,counts,type,start,end,length,data,datastr) VALUES (%d,%@,%@,%d,1,%d,%d,%d,%@,%@)",
 													  [aMonitor uniqueIdNumber],
 													  [sqlConnection quoteObject:machine_id],
 													  [sqlConnection quoteObject:[aDataSet fullName]],
 													  [aDataSet totalCounts],
 													  start,end,
 													  [aDataSet numberBins],
-													  convertedData];
+													  convertedData,
+													  [sqlConnection quoteObject:dataStr]];
 								[sqlConnection queryString:theQuery];
 							}
 						}

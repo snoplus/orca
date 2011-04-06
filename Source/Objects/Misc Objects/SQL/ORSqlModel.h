@@ -33,6 +33,7 @@
     NSString*	dataBaseName;
 	NSMutableArray* dataMonitors;
     BOOL		stealthMode;
+	BOOL		statusUpdateScheduled;
 }
 
 #pragma mark ***Initialization
@@ -131,6 +132,14 @@ extern NSString* ORSqlLock;
 - (void) main;
 @end
 
+@interface ORPostStatusLogOp : ORSqlOperation
+{
+	NSString* statusLog;
+}
+
+- (void) setStatusLog:(NSString*)s;
+- (void) main;
+@end
 
 @interface ORPostDataOp : ORSqlOperation
 {
