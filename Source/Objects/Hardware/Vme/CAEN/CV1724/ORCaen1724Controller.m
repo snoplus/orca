@@ -386,7 +386,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) postTriggerSettingChanged:(NSNotification*)aNote
 {
-	[postTriggerSettingTextField setIntValue: [model postTriggerSetting]];
+	[postTriggerSettingTextField setIntValue: [model postTriggerSetting]*2];
 }
 
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote
@@ -678,7 +678,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) postTriggerSettingTextFieldAction:(id)sender
 {
-	[model setPostTriggerSetting:[sender intValue]];	
+	[model setPostTriggerSetting:[sender intValue]/2];	
 }
 
 - (IBAction) triggerSourceMaskAction:(id)sender
