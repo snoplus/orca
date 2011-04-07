@@ -105,7 +105,8 @@ enum {
 	unsigned short	dac[8];
 	unsigned short	overUnderThreshold[8];
     unsigned short	channelConfigMask;
-    unsigned long	customSize;
+	unsigned long	customSize;
+	BOOL		isFixedSize;
     BOOL			countAllTriggers;
     unsigned short	acquisitionMode;
     unsigned short  coincidenceLevel;
@@ -157,6 +158,8 @@ enum {
 - (void)			setCountAllTriggers:(BOOL)aCountAllTriggers;
 - (unsigned long)	customSize;
 - (void)			setCustomSize:(unsigned long)aCustomSize;
+- (BOOL)		isFixedSize;
+- (void)		setIsFixedSize:(BOOL)aIsFixedSize;
 - (unsigned short)	channelConfigMask;
 - (void)			setChannelConfigMask:(unsigned short)aChannelConfigMask;
 - (unsigned short)	dac:(unsigned short) aChnl;
@@ -241,6 +244,7 @@ extern NSString* ORCaen1724ModelCoincidenceLevelChanged;
 extern NSString* ORCaen1724ModelAcquisitionModeChanged;
 extern NSString* ORCaen1724ModelCountAllTriggersChanged;
 extern NSString* ORCaen1724ModelCustomSizeChanged;
+extern NSString* ORCaen1724ModelIsFixedSizeChanged;
 extern NSString* ORCaen1724ModelChannelConfigMaskChanged;
 extern NSString* ORCaen1724ModelNumberBLTEventsToReadoutChanged;
 extern NSString* ORCaen1724ChnlDacChanged;

@@ -55,6 +55,7 @@
 	IBOutlet NSMatrix*		acquisitionModeMatrix;
 	IBOutlet NSMatrix*		countAllTriggersMatrix;
 	IBOutlet NSTextField*	customSizeTextField;
+	IBOutlet NSButton*	fixedSizeButton;
 	IBOutlet NSMatrix*		channelConfigMaskMatrix;
     IBOutlet NSMatrix*		overUnderMatrix;
 	IBOutlet NSPopUpButton* eventSizePopUp;
@@ -117,6 +118,7 @@
 - (void) acquisitionModeChanged:(NSNotification*)aNote;
 - (void) countAllTriggersChanged:(NSNotification*)aNote;
 - (void) customSizeChanged:(NSNotification*)aNote;
+- (void) isFixedSizeChanged:(NSNotification*)aNote;
 - (void) channelConfigMaskChanged:(NSNotification*)aNote;
 - (void) dacChanged: (NSNotification*) aNote;
 - (void) overUnderChanged: (NSNotification*) aNote;
@@ -152,6 +154,7 @@
 - (IBAction) acquisitionModeAction:(id)sender;
 - (IBAction) countAllTriggersAction:(id)sender;
 - (IBAction) customSizeAction:(id)sender;
+- (IBAction) isFixedSizeAction:(id)sender;
 - (IBAction) channelConfigMaskAction:(id)sender;
 - (IBAction) dacAction: (id) aSender;
 - (IBAction) thresholdAction: (id) aSender;

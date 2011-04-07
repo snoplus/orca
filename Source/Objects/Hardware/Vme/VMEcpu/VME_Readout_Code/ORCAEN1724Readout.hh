@@ -12,6 +12,7 @@ class ORCAEN1724Readout : public ORVVmeCard
     virtual bool Readout(SBC_LAM_Data*);
 private:
 	uint32_t numEventsToReadout;
+	uint32_t fixedEventSize;
 };
 
 #endif /* _ORCAEN1724Readout_hh_*/

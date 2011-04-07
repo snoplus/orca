@@ -128,6 +128,11 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
                      selector : @selector(customSizeChanged:)
                          name : ORCaen1724ModelCustomSizeChanged
 					   object : model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(isFixedSizeChanged:)
+			     name : ORCaen1724ModelIsFixedSizeChanged
+			   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(countAllTriggersChanged:)
@@ -420,6 +425,11 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[customSizeTextField setIntValue: [model customSize]];
 }
 
+- (void) isFixedSizeChanged:(NSNotification*)aNote
+{
+	[fixedSizeButton setIntValue:[model isFixedSize]];
+}
+
 - (void) channelConfigMaskChanged:(NSNotification*)aNote
 {
 	int i;
@@ -487,7 +497,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     BOOL locked						= [gSecurity isLocked:ORCaen1724BasicLock];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1724BasicLock];
 	
-	[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
+	//[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
     [basicLockButton setState: locked];
     
     [addressStepper setEnabled:!locked && !runInProgress];
@@ -518,7 +528,8 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self setBufferStateLabel];
     [thresholdMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [overUnderMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
+    //[softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
+	[softwareTriggerButton setEnabled:YES]; 
     [otherTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [chanTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
@@ -534,6 +545,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	
 	//these must NOT or can not be changed when run in progress
     [customSizeTextField setEnabled:!locked && !runInProgress]; 
+	[fixedSizeButton setEnabled:!locked && !runInProgress]; 
     [eventSizePopUp setEnabled:!locked && !runInProgress]; 
     [enabledMaskMatrix setEnabled:!locked && !runInProgress]; 
 	
@@ -722,6 +734,21 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (IBAction) customSizeAction:(id)sender
 {
 	[model setCustomSize:[sender intValue]];	
+}
+
+- (IBAction) isFixedSizeAction:(id)sender
+{
+	//incompatible with overlapping triggers, gate acq, and zero length encoding
+	//trigger overlap || sync-in gate
+	if (([model channelConfigMask] & 0x2UL) || ([model acquisitionMode] == 2)) {
+		NSRunCriticalAlertPanel(@"You will loose data! Fixed Event Size is not compatible with Trigger Overlap and Sync-In Gate acq mode",
+					@"Fixed event size doesn't poll the card to get the next event size, and doesn't flush CAEN buffer on memory full. It's faster and fits better heavy bursts. Disable trigger overlap and sync-in gate.",
+					@"OK", nil, nil);
+		[model setIsFixedSize:NO];
+	}
+	else {
+		[model setIsFixedSize:[sender intValue]];
+	}
 }
 
 - (IBAction) channelConfigMaskAction:(id)sender

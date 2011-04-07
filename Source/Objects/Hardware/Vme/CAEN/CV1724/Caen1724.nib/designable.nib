@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J567</string>
-		<string key="IBDocument.InterfaceBuilderVersion">762</string>
+		<string key="IBDocument.SystemVersion">10J869</string>
+		<string key="IBDocument.InterfaceBuilderVersion">851</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">462.00</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSArray" key="dict.sortedKeys">
@@ -15,13 +15,13 @@
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>762</string>
+				<string>851</string>
 				<string>1</string>
 			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="88"/>
+			<integer value="1710"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -29,13 +29,8 @@
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<object class="NSMutableArray" key="dict.values">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="334844816">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -75,7 +70,7 @@
 								<object class="NSTabViewItem" id="979130861">
 									<string key="NSIdentifier">1</string>
 									<object class="NSView" key="NSView" id="1018372989">
-										<reference key="NSNextResponder" ref="488279668"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -821,7 +816,6 @@
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {769, 472}}</string>
-										<reference key="NSSuperview" ref="488279668"/>
 									</object>
 									<string key="NSLabel">Basic</string>
 									<reference key="NSColor" ref="646983205"/>
@@ -830,7 +824,7 @@
 								<object class="NSTabViewItem" id="869775083">
 									<string key="NSIdentifier">2</string>
 									<object class="NSView" key="NSView" id="879068168">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="488279668"/>
 										<int key="NSvFlags">256</int>
 										<object class="NSMutableArray" key="NSSubviews">
 											<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1527,9 +1521,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																			<nil key="NS.nil"/>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<object class="NSDictionary" key="NSAttributes" id="34962935">
+																				<object class="NSDictionary" key="NSAttributes" id="353747585">
 																					<bool key="EncodedWithXMLCoder">YES</bool>
-																					<reference key="dict.sortedKeys" ref="0"/>
+																					<object class="NSArray" key="dict.sortedKeys" id="0">
+																						<bool key="EncodedWithXMLCoder">YES</bool>
+																					</object>
 																					<object class="NSMutableArray" key="dict.values">
 																						<bool key="EncodedWithXMLCoder">YES</bool>
 																					</object>
@@ -2212,7 +2208,7 @@ OAA</bytes>
 															<object class="NSTextField" id="784833597">
 																<reference key="NSNextResponder" ref="676366417"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{86, 83}, {66, 19}}</string>
+																<string key="NSFrame">{{86, 105}, {66, 19}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="743544905">
@@ -2229,7 +2225,7 @@ OAA</bytes>
 															<object class="NSPopUpButton" id="1005639084">
 																<reference key="NSNextResponder" ref="676366417"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{84, 45}, {71, 22}}</string>
+																<string key="NSFrame">{{84, 76}, {71, 22}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSPopUpButtonCell" key="NSCell" id="69742016">
@@ -2383,7 +2379,7 @@ OAA</bytes>
 															<object class="NSTextField" id="600383435">
 																<reference key="NSNextResponder" ref="676366417"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{8, 83}, {73, 17}}</string>
+																<string key="NSFrame">{{8, 105}, {73, 17}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="200529343">
@@ -2399,7 +2395,7 @@ OAA</bytes>
 															<object class="NSTextField" id="364548753">
 																<reference key="NSNextResponder" ref="676366417"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{8, 14}, {73, 17}}</string>
+																<string key="NSFrame">{{8, 55}, {73, 17}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="654419275">
@@ -2415,7 +2411,7 @@ OAA</bytes>
 															<object class="NSTextField" id="14642697">
 																<reference key="NSNextResponder" ref="676366417"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{8, 49}, {74, 17}}</string>
+																<string key="NSFrame">{{8, 80}, {74, 17}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="589940471">
@@ -2431,7 +2427,7 @@ OAA</bytes>
 															<object class="NSTextField" id="718550572">
 																<reference key="NSNextResponder" ref="676366417"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{91, 14}, {42, 17}}</string>
+																<string key="NSFrame">{{91, 55}, {42, 17}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="233560017">
@@ -2447,7 +2443,7 @@ OAA</bytes>
 															<object class="NSTextField" id="339285968">
 																<reference key="NSNextResponder" ref="676366417"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{135, 14}, {20, 17}}</string>
+																<string key="NSFrame">{{135, 55}, {20, 17}}</string>
 																<reference key="NSSuperview" ref="676366417"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="215896968">
@@ -2460,12 +2456,34 @@ OAA</bytes>
 																	<reference key="NSTextColor" ref="727780631"/>
 																</object>
 															</object>
+															<object class="NSButton" id="152860314">
+																<reference key="NSNextResponder" ref="676366417"/>
+																<int key="NSvFlags">268</int>
+																<string key="NSFrame">{{13, 31}, {100, 18}}</string>
+																<reference key="NSSuperview" ref="676366417"/>
+																<bool key="NSEnabled">YES</bool>
+																<object class="NSButtonCell" key="NSCell" id="257900555">
+																	<int key="NSCellFlags">67239424</int>
+																	<int key="NSCellFlags2">131072</int>
+																	<string key="NSContents">Fix event size</string>
+																	<reference key="NSSupport" ref="26"/>
+																	<reference key="NSControlView" ref="152860314"/>
+																	<int key="NSButtonFlags">1211912703</int>
+																	<int key="NSButtonFlags2">2</int>
+																	<reference key="NSNormalImage" ref="75022330"/>
+																	<reference key="NSAlternateImage" ref="1052656368"/>
+																	<string key="NSAlternateContents"/>
+																	<string key="NSKeyEquivalent"/>
+																	<int key="NSPeriodicDelay">200</int>
+																	<int key="NSPeriodicInterval">25</int>
+																</object>
+															</object>
 														</object>
-														<string key="NSFrame">{{1, 1}, {165, 112}}</string>
+														<string key="NSFrame">{{1, 1}, {165, 134}}</string>
 														<reference key="NSSuperview" ref="928352339"/>
 													</object>
 												</object>
-												<string key="NSFrame">{{428, 344}, {167, 128}}</string>
+												<string key="NSFrame">{{428, 322}, {167, 150}}</string>
 												<reference key="NSSuperview" ref="879068168"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
@@ -3504,6 +3522,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {769, 472}}</string>
+										<reference key="NSSuperview" ref="488279668"/>
 									</object>
 									<string key="NSLabel">Set Up</string>
 									<reference key="NSColor" ref="646983205"/>
@@ -3750,11 +3769,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="551677965">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="39005906">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -3822,11 +3841,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="696103665">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="951804915">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -3888,11 +3907,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="624739658">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="8411715">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -3954,11 +3973,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="407986165">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="251481642">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -4020,11 +4039,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="123125936">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="97174162">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -4086,11 +4105,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="391789172">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="727779591">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -4152,11 +4171,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="675094105">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="885026630">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -4218,11 +4237,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																					</object>
 																					<object class="NSAttributedString" id="565427535">
 																						<string key="NSString">NaN</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<object class="NSAttributedString" id="687082416">
 																						<string key="NSString">0.00</string>
-																						<reference key="NSAttributes" ref="34962935"/>
+																						<reference key="NSAttributes" ref="353747585"/>
 																					</object>
 																					<string>.</string>
 																					<integer value="1000"/>
@@ -4500,11 +4519,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																				</object>
 																				<object class="NSAttributedString" id="74757516">
 																					<string key="NSString">NaN</string>
-																					<reference key="NSAttributes" ref="34962935"/>
+																					<reference key="NSAttributes" ref="353747585"/>
 																				</object>
 																				<object class="NSAttributedString" id="876128248">
 																					<string key="NSString">0.00</string>
-																					<reference key="NSAttributes" ref="34962935"/>
+																					<reference key="NSAttributes" ref="353747585"/>
 																				</object>
 																				<string>.</string>
 																				<integer value="1000"/>
@@ -5171,14 +5190,14 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 									<reference key="NSTabView" ref="488279668"/>
 								</object>
 							</object>
-							<reference key="NSSelectedTabViewItem" ref="979130861"/>
+							<reference key="NSSelectedTabViewItem" ref="869775083"/>
 							<reference key="NSFont" ref="26"/>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSMutableArray" key="NSSubviews">
 								<bool key="EncodedWithXMLCoder">YES</bool>
-								<reference ref="1018372989"/>
+								<reference ref="879068168"/>
 							</object>
 						</object>
 					</object>
@@ -6308,6 +6327,22 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					</object>
 					<int key="connectionID">2184</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fixedSizeButton</string>
+						<reference key="source" ref="794521871"/>
+						<reference key="destination" ref="152860314"/>
+					</object>
+					<int key="connectionID">2187</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">isFixedSizeAction:</string>
+						<reference key="source" ref="794521871"/>
+						<reference key="destination" ref="152860314"/>
+					</object>
+					<int key="connectionID">2188</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -6492,6 +6527,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="14642697"/>
 							<reference ref="718550572"/>
 							<reference ref="339285968"/>
+							<reference ref="152860314"/>
 						</object>
 						<reference key="parent" ref="879068168"/>
 					</object>
@@ -8644,6 +8680,20 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="546379718"/>
 						<reference key="parent" ref="788883593"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2185</int>
+						<reference key="object" ref="152860314"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="257900555"/>
+						</object>
+						<reference key="parent" ref="928352339"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2186</int>
+						<reference key="object" ref="257900555"/>
+						<reference key="parent" ref="152860314"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -9076,6 +9126,8 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>2167.IBPluginDependency</string>
 					<string>2168.IBPluginDependency</string>
 					<string>2178.IBPluginDependency</string>
+					<string>2185.IBPluginDependency</string>
+					<string>2186.IBPluginDependency</string>
 					<string>225.IBPluginDependency</string>
 					<string>225.ImportedFromIB2</string>
 					<string>226.IBPluginDependency</string>
@@ -9757,14 +9809,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -9773,7 +9818,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -9813,9 +9857,19 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{20, 321}, {775, 504}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{20, 321}, {775, 504}}</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
+					<string>{{20, 252}, {775, 504}}</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>{{20, 252}, {775, 504}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{270, 204}</string>
@@ -9934,7 +9988,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2184</int>
+			<int key="maxID">2188</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -10409,6 +10463,13 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<string key="NS.key.0">sequenceCompleted:</string>
 						<string key="NS.object.0">id</string>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">sequenceCompleted:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">sequenceCompleted:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Misc Objects/Workers/ORSelectorSequence.h</string>
@@ -10427,6 +10488,25 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>taskFinished:</string>
+							<string>tasksCompleted:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">taskFinished:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">tasksCompleted:</string>
+								<string key="candidateClassName">id</string>
+							</object>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -10711,6 +10791,40 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>setLogScale:</string>
+							<string>shiftLeft:</string>
+							<string>shiftRight:</string>
+							<string>zoomIn:</string>
+							<string>zoomOut:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">setLogScale:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">shiftLeft:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">shiftRight:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">zoomIn:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">zoomOut:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -10722,6 +10836,25 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>NSView</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>preferenceController</string>
+							<string>viewToScale</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">preferenceController</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">viewToScale</string>
+								<string key="candidateClassName">NSView</string>
+							</object>
 						</object>
 					</object>
 					<reference key="sourceIdentifier" ref="458206237"/>
@@ -10756,6 +10889,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>generateTriggerAction:</string>
 							<string>initBoard:</string>
 							<string>integrationAction:</string>
+							<string>isFixedSizeAction:</string>
 							<string>loadThresholds:</string>
 							<string>overUnderAction:</string>
 							<string>postTriggerSettingTextFieldAction:</string>
@@ -10794,6 +10928,146 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>acquisitionModeAction:</string>
+							<string>baseAddressAction:</string>
+							<string>basicLockAction:</string>
+							<string>basicRead:</string>
+							<string>basicWrite:</string>
+							<string>channelConfigMaskAction:</string>
+							<string>coincidenceLevelTextFieldAction:</string>
+							<string>countAllTriggersAction:</string>
+							<string>customSizeAction:</string>
+							<string>dacAction:</string>
+							<string>enabledMaskAction:</string>
+							<string>eventSizeAction:</string>
+							<string>generateTriggerAction:</string>
+							<string>initBoard:</string>
+							<string>integrationAction:</string>
+							<string>isFixedSizeAction:</string>
+							<string>loadThresholds:</string>
+							<string>overUnderAction:</string>
+							<string>postTriggerSettingTextFieldAction:</string>
+							<string>report:</string>
+							<string>selectChannelAction:</string>
+							<string>selectRegisterAction:</string>
+							<string>settingsLockAction:</string>
+							<string>thresholdAction:</string>
+							<string>triggerSourceMaskAction:</string>
+							<string>writeValueAction:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">acquisitionModeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">baseAddressAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">basicLockAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">basicRead:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">basicWrite:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">channelConfigMaskAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">coincidenceLevelTextFieldAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">countAllTriggersAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">customSizeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">dacAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">enabledMaskAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">eventSizeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">generateTriggerAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">initBoard:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">integrationAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">isFixedSizeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">loadThresholds:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">overUnderAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">postTriggerSettingTextFieldAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">report:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">selectChannelAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">selectRegisterAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">settingsLockAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">thresholdAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">triggerSourceMaskAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">writeValueAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
@@ -10820,6 +11094,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>enabledMaskMatrix</string>
 							<string>eventSizePopUp</string>
 							<string>eventSizeTextField</string>
+							<string>fixedSizeButton</string>
 							<string>hrTextField</string>
 							<string>initButton</string>
 							<string>integrationStepper</string>
@@ -10875,6 +11150,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>NSMatrix</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSStepper</string>
@@ -10907,6 +11183,280 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>NSMatrix</string>
 							<string>NSStepper</string>
 							<string>NSTextField</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>acquisitionModeMatrix</string>
+							<string>addressStepper</string>
+							<string>addressTextField</string>
+							<string>basicLockButton</string>
+							<string>basicLockDocField</string>
+							<string>basicReadButton</string>
+							<string>basicWriteButton</string>
+							<string>bufferStateField</string>
+							<string>chanTriggerMatrix</string>
+							<string>channelConfigMaskMatrix</string>
+							<string>channelPopUp</string>
+							<string>coincidenceLevelTextField</string>
+							<string>countAllTriggersMatrix</string>
+							<string>customSizeTextField</string>
+							<string>dacMatrix</string>
+							<string>drTextField</string>
+							<string>enabled2MaskMatrix</string>
+							<string>enabledMaskMatrix</string>
+							<string>eventSizePopUp</string>
+							<string>eventSizeTextField</string>
+							<string>fixedSizeButton</string>
+							<string>hrTextField</string>
+							<string>initButton</string>
+							<string>integrationStepper</string>
+							<string>integrationText</string>
+							<string>loadThresholdsButton</string>
+							<string>otherTriggerMatrix</string>
+							<string>overUnderMatrix</string>
+							<string>postTriggerSettingTextField</string>
+							<string>rate0</string>
+							<string>rateLogCB</string>
+							<string>rateTextFields</string>
+							<string>regNameField</string>
+							<string>registerAddressPopUp</string>
+							<string>registerOffsetTextField</string>
+							<string>registerReadWriteTextField</string>
+							<string>reportButton</string>
+							<string>settingsLockButton</string>
+							<string>settingsLockDocField</string>
+							<string>slot1Field</string>
+							<string>slotField</string>
+							<string>softwareTriggerButton</string>
+							<string>srTextField</string>
+							<string>tabView</string>
+							<string>thresholdMatrix</string>
+							<string>timeRateLogCB</string>
+							<string>timeRatePlot</string>
+							<string>totalRate</string>
+							<string>totalRateLogCB</string>
+							<string>totalRateText</string>
+							<string>triggerSourceMaskMatrix</string>
+							<string>writeValueStepper</string>
+							<string>writeValueTextField</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">acquisitionModeMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">addressStepper</string>
+								<string key="candidateClassName">NSStepper</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">addressTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicLockButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicLockDocField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicReadButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">basicWriteButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">bufferStateField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">chanTriggerMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">channelConfigMaskMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">channelPopUp</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">coincidenceLevelTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">countAllTriggersMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">customSizeTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">dacMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">drTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">enabled2MaskMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">enabledMaskMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">eventSizePopUp</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">eventSizeTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">fixedSizeButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">hrTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">initButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">integrationStepper</string>
+								<string key="candidateClassName">NSStepper</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">integrationText</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">loadThresholdsButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">otherTriggerMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">overUnderMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">postTriggerSettingTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">rate0</string>
+								<string key="candidateClassName">ORValueBar</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">rateLogCB</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">rateTextFields</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">regNameField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">registerAddressPopUp</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">registerOffsetTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">registerReadWriteTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">reportButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">settingsLockButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">settingsLockDocField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">slot1Field</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">slotField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">softwareTriggerButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">srTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">tabView</string>
+								<string key="candidateClassName">NSTabView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">thresholdMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">timeRateLogCB</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">timeRatePlot</string>
+								<string key="candidateClassName">ORPlotView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">totalRate</string>
+								<string key="candidateClassName">ORValueBar</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">totalRateLogCB</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">totalRateText</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">triggerSourceMaskMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">writeValueStepper</string>
+								<string key="candidateClassName">NSStepper</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">writeValueTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -10954,6 +11504,85 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>autoScaleX:</string>
+							<string>autoScaleY:</string>
+							<string>autoScaleZ:</string>
+							<string>autoscaleAll:</string>
+							<string>centerOnPeak:</string>
+							<string>copy:</string>
+							<string>logLin:</string>
+							<string>publishToPDF:</string>
+							<string>refresh:</string>
+							<string>resetScales:</string>
+							<string>zoomIn:</string>
+							<string>zoomOut:</string>
+							<string>zoomXYIn:</string>
+							<string>zoomXYOut:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">autoScaleX:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">autoScaleY:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">autoScaleZ:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">autoscaleAll:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">centerOnPeak:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">copy:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">logLin:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">publishToPDF:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">refresh:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">resetScales:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">zoomIn:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">zoomOut:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">zoomXYIn:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">zoomXYOut:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -10975,6 +11604,50 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>colorScale</string>
+							<string>delegate</string>
+							<string>titleField</string>
+							<string>viewForPDF</string>
+							<string>xScale</string>
+							<string>yScale</string>
+							<string>zScale</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">colorScale</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">delegate</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">titleField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">viewForPDF</string>
+								<string key="candidateClassName">NSView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">xScale</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">yScale</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">zScale</string>
+								<string key="candidateClassName">id</string>
+							</object>
 						</object>
 					</object>
 					<reference key="sourceIdentifier" ref="796129748"/>
@@ -11021,6 +11694,30 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>chainedView</string>
+							<string>dataSource</string>
+							<string>mXScale</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">chainedView</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">dataSource</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">mXScale</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<reference key="sourceIdentifier" ref="794187862"/>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -11062,6 +11759,45 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>copy:</string>
+							<string>decDialog:</string>
+							<string>incDialog:</string>
+							<string>printDocument:</string>
+							<string>saveDocument:</string>
+							<string>saveDocumentAs:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">copy:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">decDialog:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">incDialog:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">printDocument:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">saveDocument:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">saveDocumentAs:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -11073,6 +11809,25 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>ORTimedTextField</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>model</string>
+							<string>warningField</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">model</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">warningField</string>
+								<string key="candidateClassName">ORTimedTextField</string>
+							</object>
 						</object>
 					</object>
 					<reference key="sourceIdentifier" ref="581496086"/>
@@ -11491,55 +12246,6 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedAudioOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedVideoOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureFileOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureVideoPreviewOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTMovie.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTMovieView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">QuartzCore.framework/Headers/CAAnimation.h</string>
 					</object>
 				</object>
@@ -11764,6 +12470,13 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">showWindow:</string>
 						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>

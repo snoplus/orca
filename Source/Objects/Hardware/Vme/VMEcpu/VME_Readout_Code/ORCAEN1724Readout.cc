@@ -20,6 +20,7 @@ bool ORCAEN1724Readout::Start() {
 		return false; 
 	}
 	
+	fixedEventSize = GetDeviceSpecificData()[8];
 	return true;
 }	
 
@@ -45,12 +46,19 @@ bool ORCAEN1724Readout::Readout(SBC_LAM_Data* lamData)
     if(result == sizeof(numEventsAvail) && (numEventsAvail > 0)){
         //if at least one event is ready
         uint32_t eventSize;
-        // Get the event size
-        result = VMERead(GetBaseAddress()+eventSizeReg,
-                         GetAddressModifier(),
-                         sizeof(eventSize),
-                         eventSize);
-
+	    //if the event size is fixed by user, use it, if not get it from the card
+	    if (fixedEventSize > 0) {
+		    eventSize = fixedEventSize;
+		    result = sizeof(eventSize);
+	    }
+	    else {
+		    result = VMERead(GetBaseAddress()+eventSizeReg,
+				     GetAddressModifier(),
+				     sizeof(eventSize),
+				     eventSize);
+	    }
+	    
+	    
 	    if(result == sizeof(eventSize) && eventSize>0){
 		    uint32_t startIndex = dataIndex;
 		    //eventSize in uint32_t words, fifoBuffSize in Bytes

@@ -96,6 +96,7 @@ NSString* ORCaen1724ModelCoincidenceLevelChanged            = @"ORCaen1724ModelC
 NSString* ORCaen1724ModelAcquisitionModeChanged             = @"ORCaen1724ModelAcquisitionModeChanged";
 NSString* ORCaen1724ModelCountAllTriggersChanged            = @"ORCaen1724ModelCountAllTriggersChanged";
 NSString* ORCaen1724ModelCustomSizeChanged                  = @"ORCaen1724ModelCustomSizeChanged";
+NSString* ORCaen1724ModelIsFixedSizeChanged		    = @"ORCaen1724ModelIsFixedSizeChanged";
 NSString* ORCaen1724ModelChannelConfigMaskChanged           = @"ORCaen1724ModelChannelConfigMaskChanged";
 NSString* ORCaen1724ModelNumberBLTEventsToReadoutChanged    = @"ORCaen1724ModelNumberBLTEventsToReadoutChanged";
 NSString* ORCaen1724ChnlDacChanged                          = @"ORCaen1724ChnlDacChanged";
@@ -357,6 +358,20 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
     customSize = aCustomSize;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1724ModelCustomSizeChanged object:self];
+}
+
+- (BOOL) isFixedSize
+{
+	return isFixedSize;
+}
+
+- (void) setIsFixedSize:(BOOL)aIsFixedSize
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setIsFixedSize:isFixedSize];
+	
+	isFixedSize = aIsFixedSize;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1724ModelIsFixedSizeChanged object:self];
 }
 
 - (unsigned short) channelConfigMask
@@ -1228,7 +1243,20 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
     configStruct->card_info[index].deviceSpecificData[6]	= reg[kVMEControl].addressOffset;	// VME Control address
     configStruct->card_info[index].deviceSpecificData[7]	= reg[kBLTEventNum].addressOffset;	// Num of BLT events address
     
-    
+	unsigned sizeOfEvent = 0; // number of uint32_t for DMA transfer
+	if (isFixedSize) {
+		unsigned long numChan = 0;
+		unsigned long chanMask = [self enabledMask];
+		for (; chanMask; numChan++) chanMask &= chanMask - 1;
+		//if (isCustomSize) {
+		//	sizeOfEvent = numChan * customSize * 2 + 4;
+		//}
+		//else {
+			sizeOfEvent = numChan * (1UL << 20 >> [self eventSize]) / 4 + 4; //(1MB / num of blocks)
+		//}
+	}
+	configStruct->card_info[index].deviceSpecificData[8]	= sizeOfEvent;
+	
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -1250,6 +1278,7 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
     [self setAcquisitionMode:[aDecoder decodeIntForKey:@"acquisitionMode"]];
     [self setCountAllTriggers:[aDecoder decodeBoolForKey:@"countAllTriggers"]];
     [self setCustomSize:[aDecoder decodeInt32ForKey:@"customSize"]];
+	[self setIsFixedSize:[aDecoder decodeBoolForKey:@"isFixedSize"]];
     [self setChannelConfigMask:[aDecoder decodeIntForKey:@"channelConfigMask"]];
     [self setWaveFormRateGroup:[aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
     [self setNumberBLTEventsToReadout:[aDecoder decodeInt32ForKey:@"numberBLTEventsToReadout"]];
@@ -1283,6 +1312,7 @@ NSString* ORCaen1724ModelBufferCheckChanged                 = @"ORCaen1724ModelB
 	[anEncoder encodeInt:acquisitionMode forKey:@"acquisitionMode"];
 	[anEncoder encodeBool:countAllTriggers forKey:@"countAllTriggers"];
 	[anEncoder encodeInt32:customSize forKey:@"customSize"];
+	[anEncoder encodeBool:isFixedSize forKey:@"isFixedSize"];
 	[anEncoder encodeInt:channelConfigMask forKey:@"channelConfigMask"];
     [anEncoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
     [anEncoder encodeInt32:numberBLTEventsToReadout forKey:@"numberBLTEventsToReadout"];
