@@ -540,7 +540,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:2047];//min 6 is found 'experimental' -tb-
+    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:2046];//min 6 is found 'experimental' -tb-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelPostTriggerTimeChanged object:self];
 }
 
@@ -1370,6 +1370,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
     [self setActivateDebuggingDisplays:[decoder decodeBoolForKey:@"activateDebuggingDisplays"]];
 	
+	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
 	
     [[self undoManager] enableUndoRegistration];
 	
@@ -1385,6 +1386,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [encoder encodeInt:vetoOverlapTime forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays forKey:@"activateDebuggingDisplays"];
+	
+	//see above: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::encodeWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
 }
 
 #pragma mark Data Taking
@@ -1796,7 +1799,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Post Trigger Delay"];
-    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:2047 units:@"x50ns"];
+    [p setFormat:@"##0" upperLimit:2046 lowerLimit:0 stepSize:1 units:@"x50ns"];
     [p setSetMethod:@selector(setPostTriggerTime:) getMethod:@selector(postTriggerTime)];
     [a addObject:p];
 	
@@ -1814,13 +1817,13 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Hit Rate Length"];
-    [p setFormat:@"##0" upperLimit:4095 lowerLimit:255 stepSize:1 units:@"index"];
+    [p setFormat:@"##0" upperLimit:6 lowerLimit:0 stepSize:1 units:@"index"];
     [p setSetMethod:@selector(setHitRateLength:) getMethod:@selector(hitRateLength)];
     [a addObject:p];			
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gap Length"];
-    [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@"index"];
+    [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@"index"];//TODO: change it/add new class field! -tb-
     [p setSetMethod:@selector(setGapLength:) getMethod:@selector(gapLength)];
     [a addObject:p];			
 

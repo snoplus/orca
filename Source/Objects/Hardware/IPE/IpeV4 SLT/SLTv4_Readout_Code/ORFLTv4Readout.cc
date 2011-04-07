@@ -39,11 +39,13 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 #define kNumV4FLTADCPageSize16 2048
 #define kNumV4FLTADCPageSize32 1024
 	static uint32_t adctrace32[kNumV4FLTs][kNumV4FLTChannels][kNumV4FLTADCPageSize32];//shall I use a 4th index for the page number? -tb-
+	//if sizeof(long unsigned int) != sizeof(uint32_t) we will come into troubles (64-bit-machines?) ... -tb-
 	static uint32_t FIFO1[kNumV4FLTs];
 	static uint32_t FIFO2[kNumV4FLTs];
 	static uint32_t FIFO3[kNumV4FLTs][kNumV4FLTChannels];
 	static uint32_t FIFO4[kNumV4FLTs];
 	static uint32_t FltStatusReg[kNumV4FLTs];
+	static uint32_t debugbuffer[kNumV4FLTs][kNumV4FLTChannels];//used for debugging -tb-
 
 
     //this data must be constant during a run
@@ -540,7 +542,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     }
 	}
 
-	//this handles FLT firmware starting from CFPGA-FPGA8 version 0x20010104-0x20010104 (both 2.1.1.4) 2010-11-08  -tb-
+	//this handles FLT firmware starting from CFPGA-FPGA8 version 0x20010104-0x20010104 (both 2.1.1.4) and newer 2010-11-08  -tb-
 	// (mainly from 2.1.1.4 - 2.1.2.1 -tb-)((but both 2.1.1.4 will work, too)
 	//===================================================================================================================
     if(srack->theFlt[col]->isPresent()){
@@ -769,6 +771,11 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                             eventchanmask = (0x1L << eventchan);
                             if((chmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
                                 uint32_t f3            = srack->theFlt[col]->eventFIFO3->read(eventchan);
+								//DEBUG:// for checking the peripheral page counters (debugging) -tb-
+								//DEBUG://test page#
+                                //DEBUG:uint32_t pageN            = (srack->theFlt[col]->eventFIFO3)->Pbus::read(0x20200c>>2); 
+								//DEBUG:debugbuffer[col][eventchan] = pageN;
+								//DEBUG:
 								FIFO3[col][eventchan] = f3;
                                 uint32_t pagenr        = (f3 >> 24) & 0x3f;
                                 uint32_t energy        = f3 & 0xfffff;
@@ -785,6 +792,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 srack->theSlt->pageSelect->write(0x100 | pagenr);
                                 
 								//read raw trace (use two loops as otherwise the FLT maybe has not yet written 'postTrigTIme' traces ... then we would read old data - see Elog XXX Florian)
+								#if 1
                                 uint32_t adccount, trigSlot;
 								trigSlot = adcoffset/2;
 								for(adccount=trigSlot; adccount<1024;adccount++){
@@ -795,6 +803,14 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 									adctrace32[col][eventchan][adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
 									//shipWaveformBuffer32[adccount]= adctrace32[col][eventchan][adccount]; //TODO: not necessary any more? -tb-
 								}
+								#else
+								//DMA: readBlock
+								#pragma message Using DMA mode!
+								;
+								//srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //memcopy w/o libPCIDMA
+								//srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //DMA with libPCIDMA
+								srack->theFlt[col]->histogramData->readBlock(eventchan,(long unsigned int*)adctrace32[col][eventchan],1024); //PCI burst  w/o libPCIDMA
+								#endif
 								/* old version; 2010-10-gap-in-trace-bug: PMC was reading too fast, so data was read faster than FLT could write -tb-
 								for(adccount=0; adccount<1024;adccount++){
 									shipWaveformBuffer32[adccount]= srack->theFlt[col]->ramData->read(eventchan,adccount);
@@ -829,6 +845,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = chmap;
                                 data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
                                 data[dataIndex++] = energy;
+                                //DEBUG:data[dataIndex++] = debugbuffer[col][eventchan];   //TODO: debug ... energy; for checking page counter I wrote out page counter instead of energy -tb-
                                 data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) |  (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record

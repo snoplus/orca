@@ -22,6 +22,7 @@
 #import "ORKatrinV4FLTModel.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
+#import "ORKatrinV4FLTDefs.h"
 #import "SLTv4_HW_Definitions.h"
 
 @implementation ORKatrinV4FLTDecoderForEnergy
@@ -362,12 +363,18 @@ startIndex=traceStart16;
 @implementation ORKatrinV4FLTDecoderForEnergyTrace
 
 //-------------------------------------------------------------
-/** Data format for energy+trace
- *
+/** Data format for energy+trace:
+ *  2011-02-01 Till Bergmann
+ *  This is the new general Erergy+Trace data structure. The main difference is: we use the same format for
+ *  energy and energy+trace events. The idea is to omit the trace at high rates and ship only the pure energy event data.
+ *  At low rates we try to read out as much traces as possible.
+ *  After the basic data record we append a variable length data block containing some ADC related data and the ADC data itself.
+ *  The first data block is designed to be as short as possible to allow high data rates.
+ *  
  <pre>  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
- -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs (energy event: length==9; trace event: length>=15 (6 additional words+trace))
  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^--------------------------------spare
@@ -379,6 +386,33 @@ startIndex=traceStart16;
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ----------^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+eventInfo:
+ -----^^^^-------------------------------    run mode
+ ------------^^-^^^^---------------------    page number
+ ----------------------^^----------------    precision (from FIFO2)
+ -------------------------^^^^-^^^^-^^^^-    event ID (from FIFO1+2)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx event FIFO status
+ --^^------------------^^----------------FIFO Flags: AE, EF, FF, AF
+ -------^^ ^^^^ ^^^^---------------------readPtr   (0..511, 10 bit!)
+ ---------------------------^^ ^^^^ ^^^^-writePtr  (0..511, 10 bit!)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
+ ------------------- ^^^^ ^^^^ ^^^^ ^^^^   energy 16bit  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
+
+
+Variable section: exists if trace length !=0
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx trace length, 11 bit  (last "trace length" words contain the ADC values)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx postTriggTime
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
+                 ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx status register
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
+
+ followed by waveform data (up to 2048 16-bit words)
+
+ 
+ OLD RECORD STRUCTURE
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+infos:
  -----^^^^-------------------------------flt run mode
  ----------^^^^--------------------------FIFO Flags: FF, AF, AE, EF
@@ -405,14 +439,14 @@ startIndex=traceStart16;
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
-	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
+	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);//TODO:  <=============== changed!!!!! -tb-
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
 	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
 	unsigned short filterDiv;
 	unsigned long histoLen;
-	histoLen = 4096;
+	histoLen = 4096;//TODO: make a configurable parameter whether we want see original energy value or "normalized" value -tb- ?
 	filterDiv = 1L << (filterIndex+2);
 	
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);

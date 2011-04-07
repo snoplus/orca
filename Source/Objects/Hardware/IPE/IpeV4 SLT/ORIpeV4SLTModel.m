@@ -469,6 +469,10 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) runIsAboutToStart:(NSNotification*)aNote
 {
+	//TODO: reset of timers probably should be done here -tb-2011-01
+	#if 0 
+		NSLog(@"%@::%@  called!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug -tb-
+	#endif
 }
 
 - (void) runIsStopped:(NSNotification*)aNote
