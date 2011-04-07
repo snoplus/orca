@@ -109,6 +109,7 @@ enum {
     unsigned short	channelConfigMask;
     unsigned long	customSize;
 	BOOL		isCustomSize;
+	BOOL		isFixedSize;
     BOOL			countAllTriggers;
     unsigned short	acquisitionMode;
     unsigned short  coincidenceLevel;
@@ -165,7 +166,9 @@ enum {
 - (BOOL)			countAllTriggers;
 - (void)			setCountAllTriggers:(BOOL)aCountAllTriggers;
 - (BOOL)		isCustomSize;
-- (void)			setIsCustomSize:(BOOL)aIsCustomSize;
+- (void)		setIsCustomSize:(BOOL)aIsCustomSize;
+- (BOOL)		isFixedSize;
+- (void)		setIsFixedSize:(BOOL)aIsFixedSize;
 - (unsigned long)	customSize;
 - (void)			setCustomSize:(unsigned long)aCustomSize;
 - (unsigned short)	channelConfigMask;
@@ -258,6 +261,7 @@ extern NSString* ORCaen1720ModelAcquisitionModeChanged;
 extern NSString* ORCaen1720ModelCountAllTriggersChanged;
 extern NSString* ORCaen1720ModelCustomSizeChanged;
 extern NSString* ORCaen1720ModelIsCustomSizeChanged;
+extern NSString* ORCaen1720ModelIsFixedSizeChanged;
 extern NSString* ORCaen1720ModelChannelConfigMaskChanged;
 extern NSString* ORCaen1720ModelNumberBLTEventsToReadoutChanged;
 extern NSString* ORCaen1720ChnlDacChanged;
