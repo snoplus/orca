@@ -34,7 +34,6 @@
 - (int) intForKey:(NSString*)aKey;
 - (BOOL) boolForKey:(NSString*)aKey;
 - (void) prettyPrint:(NSString*)aTitle;
-- (NSDictionary*) prepareForHTML;
 @end
 
 @interface NSMutableDictionary (OrcaExtensions)
