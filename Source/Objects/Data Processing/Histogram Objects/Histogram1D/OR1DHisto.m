@@ -236,7 +236,7 @@
 	for(i=0;i<n;i++){
 		[s appendFormat:@"%d,",plotData[i]];
 	}
-	[s deleteCharactersInRange:NSMakeRange([s length]-1,1)];
+	if([s length]>0)[s deleteCharactersInRange:NSMakeRange([s length]-1,1)];
 	return s;
 }
 
