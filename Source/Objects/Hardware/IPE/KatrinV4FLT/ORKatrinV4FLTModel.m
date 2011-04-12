@@ -47,7 +47,8 @@ NSString* ORKatrinV4FLTModelHistEMinChanged			= @"ORKatrinV4FLTModelHistEMinChan
 NSString* ORKatrinV4FLTModelRunModeChanged				= @"ORKatrinV4FLTModelRunModeChanged";
 NSString* ORKatrinV4FLTModelRunBoxCarFilterChanged		= @"ORKatrinV4FLTModelRunBoxCarFilterChanged";
 NSString* ORKatrinV4FLTModelStoreDataInRamChanged		= @"ORKatrinV4FLTModelStoreDataInRamChanged";
-NSString* ORKatrinV4FLTModelFilterLengthChanged		= @"ORKatrinV4FLTModelFilterLengthChanged";
+//NSString* ORKatrinV4FLTModelFilterLengthChanged		= @"ORKatrinV4FLTModelFilterLengthChanged";
+NSString* ORKatrinV4FLTModelFilterShapingLengthChanged		= @"ORKatrinV4FLTModelFilterShapingLengthChanged";
 NSString* ORKatrinV4FLTModelGapLengthChanged			= @"ORKatrinV4FLTModelGapLengthChanged";
 NSString* ORKatrinV4FLTModelHistNofMeasChanged			= @"ORKatrinV4FLTModelHistNofMeasChanged";
 NSString* ORKatrinV4FLTModelHistMeasTimeChanged		= @"ORKatrinV4FLTModelHistMeasTimeChanged";
@@ -512,22 +513,25 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelStoreDataInRamChanged object:self];
 }
 
-- (int) filterLength { return filterLength; }
-- (void) setFilterLength:(int)aFilterLength
+- (int) filterShapingLength { return filterShapingLength; }//was filterLength -tb-
+- (void) setFilterShapingLength:(int)aFilterShapingLength//was setFilterShapingLength -tb-
 {
-	if(aFilterLength == 6 && gapLength>0){
+	if(aFilterShapingLength == 8 && gapLength>0){
 		[self setGapLength:0];
-		NSLog(@"Warning: setFilterLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
-    [[[self undoManager] prepareWithInvocationTarget:self] setFilterLength:filterLength];
-    filterLength = [self restrictIntValue:aFilterLength min:0 max:6];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterLengthChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
+    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:2 max:8];//TODO: set to min:1 for releasing shaping length 100 nsec -tb-
+	filterLength = filterShapingLength - 2;//TODO: this line should be removed mid 2011, filterLength is obsolete; filterLength is int, may become -1! -tb-
+	//DEBUG -tb- 
+	//TODO: DEBUG-REMOVE - NSLog(@"%@::%@  filterLength: %i filterShapingLength:%i  filterLength: 0x%x filterShapingLength: 0x%x\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),filterLength,filterShapingLength, filterLength,filterShapingLength);
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterShapingLengthChanged object:self];
 }
 
 - (int) gapLength { return gapLength; }
 - (void) setGapLength:(int)aGapLength
 {
-	if(filterLength == 6 && aGapLength>0){
+	if(filterShapingLength == 8 && aGapLength>0){
 		aGapLength=0;
 		NSLog(@"Warning: setGapLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
@@ -818,7 +822,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 	[self setRunBoxCarFilter:YES];
 	[self setGapLength:0];
-	[self setFilterLength:5];
+	//[self setFilterLength:5];
+	[self setFilterShapingLength:7];
 	[self setFifoBehaviour:kFifoEnableOverFlow];// kFifoEnableOverFlow or kFifoStopOnFull
 	[self setPostTriggerTime:1024]; // max. filter length should fit into the range -tb-
 	
@@ -1000,7 +1005,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	unsigned long aValue = 
 	(((nfoldCoincidence) & 0xf)<<20)|		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
 	(((vetoOverlapTime) & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
-	(((filterLength+2) & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6 [Note: in fact it is (((.+2) & 0x3f)<<8) but higher bits are unused -tb-]
+	//(((filterLength+2) & 0xf)<<8)	|		//filterLength is stored as the popup index -- convert to 2 to 6 [Note: in fact it is (((.+2) & 0x3f)<<8) but higher bits are unused -tb-]
+	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
 	((gapLength & 0xf)<<4)			| 
 	// -tb- ((runBoxCarFilter & 0x1)<<2)	|
 	((startSampling & 0x1)<<3)		|		// run trigger unit
@@ -1369,6 +1375,21 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [self setVetoOverlapTime:[decoder decodeIntForKey:@"vetoOverlapTime"]];
     [self setShipSumHistogram:[decoder decodeIntForKey:@"shipSumHistogram"]];
     [self setActivateDebuggingDisplays:[decoder decodeBoolForKey:@"activateDebuggingDisplays"]];
+
+	if([decoder containsValueForKey:@"filterShapingLength"]){
+		//TODO: DEBUG-REMOVE - int tmpval=[decoder decodeIntForKey:@"filterShapingLength"];
+		[self setFilterShapingLength:[decoder decodeIntForKey:@"filterShapingLength"]];
+		//TODO: DEBUG-REMOVE - NSLog(@" ------------> filterShapingLength found: %i (%i)!!!\n",filterShapingLength,tmpval);
+	}else{
+		NSLog(@" ------------> filterShapingLength not found!!!\n");
+		if([decoder containsValueForKey:@"filterLength"]){
+			[self setFilterShapingLength:[decoder decodeIntForKey:@"filterLength"]];
+		    //TODO: DEBUG-REMOVE - NSLog(@" -----------------------------> filterLength found:%i!!!\n",filterShapingLength);
+		}else{
+			[self setFilterShapingLength:7];//use the default
+		    //TODO: DEBUG-REMOVE - NSLog(@"Could not load filterShapingLength! Using default!\n");
+		}
+	}
 	
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
 	
@@ -1386,6 +1407,9 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [encoder encodeInt:vetoOverlapTime forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays forKey:@"activateDebuggingDisplays"];
+
+    [encoder encodeInt:filterShapingLength forKey:@"filterShapingLength"];
+	if(filterShapingLength == 1) NSLog(@"filterShapingLength is 1. After saving ORCA configuration use ORCA 9.2.1, rev.5001 or higher to open again!\n");
 	
 	//see above: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::encodeWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
 }
@@ -1520,7 +1544,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
-    [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]		forKey:@"filterLength"];//this is the fpga register value -tb-
+    //[objDictionary setObject:[NSNumber numberWithLong:filterLength+2]		forKey:@"filterLength"];//this is the fpga register value -tb-
+    [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]		forKey:@"filterShapingLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
 	
 	//------------------
@@ -1726,7 +1751,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;	
     //the daq mode (should replace the flt mode)
     configStruct->card_info[index].deviceSpecificData[5] = runMode;			//the daqRunMode
-	configStruct->card_info[index].deviceSpecificData[6] = [self filterLength];		//packed into the records for normalization (MAH/May5,2010)
+	configStruct->card_info[index].deviceSpecificData[6] = [self filterLength];		//packed into the records for normalization (MAH/May5,2010) --//TODO: this two lines should be removed mid 2011, filterLength is obsolete -tb-
+																					//to avoid any conflicts I use deviceSpecificData[9] for the filterShapingLength -tb- 2011-04
 	//for handling of different firmware versions
     uint32_t versionCFPGA = [self readVersion];
     uint32_t versionFPGA8 = [self readpVersion];
@@ -1741,10 +1767,13 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	configStruct->card_info[index].deviceSpecificData[7] = versionCFPGA;		//CFPGA version 0xPDDDVVRR //P=project, D=doc revision
 	configStruct->card_info[index].deviceSpecificData[8] = versionFPGA8;		//FPGA8 version 0xPDDDVVRR //V=version, R=revision
 	  //history: 2.1.1.4 added veto+redesign of FIFO
+	configStruct->card_info[index].deviceSpecificData[9] = [self filterShapingLength];		////replaces filterShapingLength -tb- 2011-04
 
 	configStruct->card_info[index].num_Trigger_Indexes = 0;					//we can't have children
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 
+	//TODO: DEBUG-REMOVE - NSLog(@"%@::%@  i: %i l:%i  i: 0x%x l: 0x%x\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),
+	//TODO: DEBUG-REMOVE - [self filterLength],[self filterShapingLength], [self filterLength],[self filterShapingLength]);
 	
 	return index+1;
 }
@@ -1828,9 +1857,9 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [a addObject:p];			
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"FilterLength"];
-    [p setFormat:@"##0" upperLimit:6 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setFilterLength:) getMethod:@selector(filterLength)];
+    [p setName:@"Filter Shaping Length"];
+    [p setFormat:@"##0" upperLimit:8 lowerLimit:1 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setFilterShapingLength:) getMethod:@selector(filterShapingLength)];
     [a addObject:p];			
 
 	//----------------
@@ -1905,7 +1934,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     else if([param isEqualToString:@"Analog Offset"])		return [cardDictionary objectForKey:@"analogOffset"];
     else if([param isEqualToString:@"Hit Rate Length"])		return [cardDictionary objectForKey:@"hitRateLength"];
     else if([param isEqualToString:@"Gap Length"])			return [cardDictionary objectForKey:@"gapLength"];
-    else if([param isEqualToString:@"Filter Length"])		return [cardDictionary objectForKey:@"filterLength"];
+    else if([param isEqualToString:@"Filter Shaping Length"])		return [cardDictionary objectForKey:@"filterShapingLength"];
 	
 	//------------------
 	//added MAH 11/09/11

@@ -91,7 +91,9 @@
     int vetoOverlapTime;
     int nfoldCoincidence;
     int fifoLength;
-	
+    int filterShapingLength;  //for ORKatrinV4FLTModel we use filterShapingLength from 2011-04/Orca:svnrev5000 on (old: filterLength) -tb- 
+	                          //filterShapingLength is the register value and the popup item tag; 
+							  //Denis enabled filterShapingLengthReg 1, so filterLength would become -1 (negative), so I invented filterShapingLenght as new variable -tb-
 	BOOL activateDebuggingDisplays;
 	unsigned char fifoFlags[kNumV4FLTChannels];
 }
@@ -127,8 +129,8 @@
 - (void) setRunBoxCarFilter:(BOOL)aRunBoxCarFilter;
 - (BOOL) storeDataInRam;
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
-- (int) filterLength;
-- (void) setFilterLength:(int)aFilterLength;
+- (int) filterShapingLength;
+- (void) setFilterShapingLength:(int)aFilterShapingLength;
 - (int) gapLength;
 - (void) setGapLength:(int)aGapLength;
 - (unsigned long) postTriggerTime;
@@ -370,7 +372,7 @@ extern NSString* ORKatrinV4FLTModelHistEMinChanged;
 extern NSString* ORKatrinV4FLTModelRunModeChanged;
 extern NSString* ORKatrinV4FLTModelRunBoxCarFilterChanged;
 extern NSString* ORKatrinV4FLTModelStoreDataInRamChanged;
-extern NSString* ORKatrinV4FLTModelFilterLengthChanged;
+extern NSString* ORKatrinV4FLTModelFilterShapingLengthChanged;
 extern NSString* ORKatrinV4FLTModelGapLengthChanged;
 extern NSString* ORKatrinV4FLTModelHistNofMeasChanged;
 extern NSString* ORKatrinV4FLTModelHistMeasTimeChanged;

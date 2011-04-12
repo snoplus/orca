@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10J567</string>
-		<string key="IBDocument.InterfaceBuilderVersion">823</string>
+		<string key="IBDocument.SystemVersion">10J869</string>
+		<string key="IBDocument.InterfaceBuilderVersion">788</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">462.00</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSArray" key="dict.sortedKeys">
@@ -15,13 +15,13 @@
 			</object>
 			<object class="NSMutableArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>823</string>
+				<string>788</string>
 				<string>1</string>
 			</object>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1187"/>
+			<integer value="21"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1060,9 +1060,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<object class="NSMenuItem" key="NSMenuItem" id="831950996">
+																	<object class="NSMenuItem" key="NSMenuItem" id="388596760">
 																		<reference key="NSMenu" ref="71632649"/>
-																		<string key="NSTitle">200 ns</string>
+																		<string key="NSTitle">3.2 µs (6)</string>
 																		<string key="NSKeyEquiv"/>
 																		<int key="NSKeyEquivModMask">1048576</int>
 																		<int key="NSMnemonicLoc">2147483647</int>
@@ -1070,6 +1070,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																		<reference key="NSOnImage" ref="368628048"/>
 																		<reference key="NSMixedImage" ref="650833915"/>
 																		<string key="NSAction">_popUpItemAction:</string>
+																		<int key="NSTag">6</int>
 																		<reference key="NSTarget" ref="795027289"/>
 																	</object>
 																	<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -1077,76 +1078,94 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																		<string key="NSTitle">OtherViews</string>
 																		<object class="NSMutableArray" key="NSMenuItems">
 																			<bool key="EncodedWithXMLCoder">YES</bool>
-																			<reference ref="831950996"/>
-																			<object class="NSMenuItem" id="644176557">
+																			<object class="NSMenuItem" id="831950996">
 																				<reference key="NSMenu" ref="71632649"/>
-																				<string key="NSTitle">400 ns</string>
+																				<string key="NSTitle">100 ns (1)</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="368628048"/>
 																				<reference key="NSMixedImage" ref="650833915"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">1</int>
+																				<reference key="NSTarget" ref="795027289"/>
+																			</object>
+																			<object class="NSMenuItem" id="464405626">
+																				<reference key="NSMenu" ref="71632649"/>
+																				<string key="NSTitle">200 ns (2)</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSKeyEquivModMask">1048576</int>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="368628048"/>
+																				<reference key="NSMixedImage" ref="650833915"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">2</int>
+																				<reference key="NSTarget" ref="795027289"/>
+																			</object>
+																			<object class="NSMenuItem" id="644176557">
+																				<reference key="NSMenu" ref="71632649"/>
+																				<string key="NSTitle">400 ns (3)</string>
+																				<string key="NSKeyEquiv"/>
+																				<int key="NSKeyEquivModMask">1048576</int>
+																				<int key="NSMnemonicLoc">2147483647</int>
+																				<reference key="NSOnImage" ref="368628048"/>
+																				<reference key="NSMixedImage" ref="650833915"/>
+																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">3</int>
 																				<reference key="NSTarget" ref="795027289"/>
 																			</object>
 																			<object class="NSMenuItem" id="883027972">
 																				<reference key="NSMenu" ref="71632649"/>
-																				<string key="NSTitle">800 ns</string>
+																				<string key="NSTitle">800 ns (4)</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="368628048"/>
 																				<reference key="NSMixedImage" ref="650833915"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">4</int>
 																				<reference key="NSTarget" ref="795027289"/>
 																			</object>
 																			<object class="NSMenuItem" id="160246202">
 																				<reference key="NSMenu" ref="71632649"/>
-																				<string key="NSTitle">1.6 µs</string>
+																				<string key="NSTitle">1.6 µs (5)</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="368628048"/>
 																				<reference key="NSMixedImage" ref="650833915"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">5</int>
 																				<reference key="NSTarget" ref="795027289"/>
 																			</object>
-																			<object class="NSMenuItem" id="388596760">
-																				<reference key="NSMenu" ref="71632649"/>
-																				<string key="NSTitle">3.2 µs</string>
-																				<string key="NSKeyEquiv"/>
-																				<int key="NSKeyEquivModMask">1048576</int>
-																				<int key="NSMnemonicLoc">2147483647</int>
-																				<reference key="NSOnImage" ref="368628048"/>
-																				<reference key="NSMixedImage" ref="650833915"/>
-																				<string key="NSAction">_popUpItemAction:</string>
-																				<reference key="NSTarget" ref="795027289"/>
-																			</object>
+																			<reference ref="388596760"/>
 																			<object class="NSMenuItem" id="646951849">
 																				<reference key="NSMenu" ref="71632649"/>
-																				<string key="NSTitle">6.4 µs</string>
+																				<string key="NSTitle">6.4 µs (7)</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="368628048"/>
 																				<reference key="NSMixedImage" ref="650833915"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">7</int>
 																				<reference key="NSTarget" ref="795027289"/>
 																			</object>
 																			<object class="NSMenuItem" id="116263835">
 																				<reference key="NSMenu" ref="71632649"/>
-																				<string key="NSTitle">12.8 µs</string>
+																				<string key="NSTitle">12.8 µs (8)</string>
 																				<string key="NSKeyEquiv"/>
 																				<int key="NSKeyEquivModMask">1048576</int>
 																				<int key="NSMnemonicLoc">2147483647</int>
 																				<reference key="NSOnImage" ref="368628048"/>
 																				<reference key="NSMixedImage" ref="650833915"/>
 																				<string key="NSAction">_popUpItemAction:</string>
+																				<int key="NSTag">8</int>
 																				<reference key="NSTarget" ref="795027289"/>
 																			</object>
 																		</object>
 																	</object>
-																	<int key="NSSelectedIndex">6</int>
+																	<int key="NSSelectedIndex">5</int>
 																	<int key="NSPreferredEdge">1</int>
 																	<bool key="NSUsesItemFromMenu">YES</bool>
 																	<bool key="NSAltersState">YES</bool>
@@ -11726,27 +11745,11 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">filterLengthPU</string>
-						<reference key="source" ref="1066835274"/>
-						<reference key="destination" ref="106726182"/>
-					</object>
-					<int key="connectionID">3133</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">gapLengthPU</string>
 						<reference key="source" ref="1066835274"/>
 						<reference key="destination" ref="975430056"/>
 					</object>
 					<int key="connectionID">3134</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">filterLengthAction:</string>
-						<reference key="source" ref="1066835274"/>
-						<reference key="destination" ref="106726182"/>
-					</object>
-					<int key="connectionID">3135</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -12203,6 +12206,22 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 						<reference key="destination" ref="187762736"/>
 					</object>
 					<int key="connectionID">3958</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">filterShapingLengthAction:</string>
+						<reference key="source" ref="1066835274"/>
+						<reference key="destination" ref="106726182"/>
+					</object>
+					<int key="connectionID">3960</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">filterShapingLengthPU</string>
+						<reference key="source" ref="1066835274"/>
+						<reference key="destination" ref="106726182"/>
+					</object>
+					<int key="connectionID">3962</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -15404,6 +15423,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							<reference ref="388596760"/>
 							<reference ref="646951849"/>
 							<reference ref="116263835"/>
+							<reference ref="464405626"/>
 						</object>
 						<reference key="parent" ref="795027289"/>
 					</object>
@@ -18032,6 +18052,11 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 						<reference key="object" ref="251541949"/>
 						<reference key="parent" ref="881852038"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">3959</int>
+						<reference key="object" ref="464405626"/>
+						<reference key="parent" ref="71632649"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -19371,6 +19396,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<string>3901.IBViewBoundsToFrameTransform</string>
 					<string>3903.IBPluginDependency</string>
 					<string>3930.IBViewBoundsToFrameTransform</string>
+					<string>3959.IBPluginDependency</string>
 					<string>565.IBPluginDependency</string>
 					<string>565.IBViewBoundsToFrameTransform</string>
 					<string>565.ImportedFromIB2</string>
@@ -20120,9 +20146,9 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{184, 140}, {654, 704}}</string>
+					<string>{{404, 140}, {654, 704}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{184, 140}, {654, 704}}</string>
+					<string>{{404, 140}, {654, 704}}</string>
 					<integer value="1"/>
 					<string>{{28, 62}, {661, 717}}</string>
 					<boolean value="NO"/>
@@ -20480,7 +20506,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{804, 471}, {89, 108}}</string>
+					<string>{{959, 432}, {104, 123}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -21214,6 +21240,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 						<bytes key="NSTransformStruct">P4AAAL+AAABDbQAAw/aAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABBwAAAwgwAAA</bytes>
 					</object>
@@ -21326,7 +21353,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">3958</int>
+			<int key="maxID">3962</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -22230,7 +22257,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							<string>enableNoTriggersAction:</string>
 							<string>fifoBehaviourAction:</string>
 							<string>fifoLengthPUAction:</string>
-							<string>filterLengthAction:</string>
+							<string>filterShapingLengthAction:</string>
 							<string>findNoiseFloors:</string>
 							<string>gainAction:</string>
 							<string>gapLengthAction:</string>
@@ -22343,7 +22370,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							<string>enableNoTriggersAction:</string>
 							<string>fifoBehaviourAction:</string>
 							<string>fifoLengthPUAction:</string>
-							<string>filterLengthAction:</string>
+							<string>filterShapingLengthAction:</string>
 							<string>findNoiseFloors:</string>
 							<string>gainAction:</string>
 							<string>gapLengthAction:</string>
@@ -22420,7 +22447,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">filterLengthAction:</string>
+								<string key="name">filterShapingLengthAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -22614,6 +22641,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							<string>fifoDisplayMatrix</string>
 							<string>fifoLengthPU</string>
 							<string>filterLengthPU</string>
+							<string>filterShapingLengthPU</string>
 							<string>fltSlotNumTextField</string>
 							<string>gainTextFields</string>
 							<string>gapLengthPU</string>
@@ -22695,6 +22723,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							<string>NSMatrix</string>
 							<string>NSMatrix</string>
 							<string>NSMatrix</string>
+							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
@@ -22783,6 +22812,7 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							<string>fifoDisplayMatrix</string>
 							<string>fifoLengthPU</string>
 							<string>filterLengthPU</string>
+							<string>filterShapingLengthPU</string>
 							<string>fltSlotNumTextField</string>
 							<string>gainTextFields</string>
 							<string>gapLengthPU</string>
@@ -22891,6 +22921,10 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">filterLengthPU</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">filterShapingLengthPU</string>
 								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -23952,55 +23986,6 @@ AAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlIENvbXB1dGVyLCBJbmMuLCAyMDA1AAAAAA</
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">Foundation.framework/Headers/NSURLDownload.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedAudioOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureDecompressedVideoOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureFileOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureVideoPreviewOutput.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTCaptureView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTMovie.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">QTKit.framework/Headers/QTMovieView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

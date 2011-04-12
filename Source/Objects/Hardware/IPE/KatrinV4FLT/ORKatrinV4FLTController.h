@@ -50,6 +50,7 @@
 		IBOutlet NSButton*		runBoxCarFilterCB;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSPopUpButton*	filterLengthPU;
+		IBOutlet NSPopUpButton*	filterShapingLengthPU;//for ORKatrinV4FLTModel we use filterShapingLength from 2011-04/Orca:svnrev5000 on -tb-
 		IBOutlet NSPopUpButton*	gapLengthPU;
 		IBOutlet NSTextField*	histNofMeasField;
 		IBOutlet NSTextField*	histMeasTimeField;
@@ -156,7 +157,7 @@
 - (void) histEMinChanged:(NSNotification*)aNote;
 - (void) runBoxCarFilterChanged:(NSNotification*)aNote;
 - (void) storeDataInRamChanged:(NSNotification*)aNote;
-- (void) filterLengthChanged:(NSNotification*)aNote;
+- (void) filterShapingLengthChanged:(NSNotification*)aNote;
 - (void) gapLengthChanged:(NSNotification*)aNote;
 - (void) histNofMeasChanged:(NSNotification*)aNote;
 - (void) histMeasTimeChanged:(NSNotification*)aNote;
@@ -205,7 +206,7 @@
 - (IBAction) histEMinAction:(id)sender;
 - (IBAction) runBoxCarFilterAction:(id)sender;
 - (IBAction) storeDataInRamAction:(id)sender;
-- (IBAction) filterLengthAction:(id)sender;
+- (IBAction) filterShapingLengthAction:(id)sender;
 - (IBAction) gapLengthAction:(id)sender;
 - (IBAction) histNofMeasAction:(id)sender;
 - (IBAction) histMeasTimeAction:(id)sender;

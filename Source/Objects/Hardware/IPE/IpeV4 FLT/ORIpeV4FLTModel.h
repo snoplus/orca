@@ -110,7 +110,7 @@
     int fifoBehaviour;
     unsigned long postTriggerTime;
     int gapLength;
-    int filterLength;
+    int filterLength;  //for ORKatrinV4FLTModel we use filterShapingLength from 2011-04/Orca:svnrev5050 on -tb- 
     BOOL storeDataInRam;
     BOOL runBoxCarFilter;
     BOOL readWaveforms;

@@ -70,8 +70,9 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t filterIndex = GetDeviceSpecificData()[6];
     uint32_t versionCFPGA = GetDeviceSpecificData()[7];
     uint32_t versionFPGA8 = GetDeviceSpecificData()[8];
+    uint32_t filterShapingLength = GetDeviceSpecificData()[9];//TODO: need to change in the code below! -tb- 2011-04-01
 	
-	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | (filterIndex<<4);
+	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
 
 	//for backward compatibility (before FLT versions2.1.1.4); shall be removed Jan. 2011 -tb-
 	//===========================================================================================
@@ -690,7 +691,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) ){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
         //TODO: else if((daqRunMode == kIpeFltV4_EnergyTraceSyncDaqMode) || (daqRunMode == kIpeFltV4_VetoEnergyTraceSyncDaqMode)){  //then fltRunMode == kIpeFltV4Katrin_Run_Mode resp. kIpeFltV4Katrin_Veto_Mode
 			// this mode ensures to read out according energy and trace (but will not catch all events at high rates)
-			#if 1
+			#if 0
             {//TODO: remove debugging output -tb-
 			static int firsttimeflag=0;
 			if(firsttimeflag<5){fprintf(stdout,"ORFLTv4Readout.cc:   DAQ mode kIpeFltV4_EnergyTraceSyncDaqMode!\n"); fflush(stdout);}

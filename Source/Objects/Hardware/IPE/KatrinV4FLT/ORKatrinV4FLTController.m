@@ -52,6 +52,10 @@
 {
 	[super awakeFromNib];
 	
+	//TODO: DEBUG-REMOVE - 
+	[[filterShapingLengthPU itemAtIndex:0] setHidden: YES];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
+	[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
+	
     settingSize			= NSMakeSize(650,700);
     rateSize			= NSMakeSize(490,690);
     testSize			= NSMakeSize(400,350);
@@ -249,8 +253,8 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(filterLengthChanged:)
-                         name : ORKatrinV4FLTModelFilterLengthChanged
+                     selector : @selector(filterShapingLengthChanged:)
+                         name : ORKatrinV4FLTModelFilterShapingLengthChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -434,9 +438,10 @@
 	[storeDataInRamCB setIntValue: [model storeDataInRam]];
 }
 
-- (void) filterLengthChanged:(NSNotification*)aNote
+- (void) filterShapingLengthChanged:(NSNotification*)aNote
 {
-	[filterLengthPU selectItemAtIndex:[model filterLength]];
+	//[filterLengthPU selectItemAtIndex:[model filterLength]];
+	[filterShapingLengthPU selectItemWithTag:[model filterShapingLength]];
 }
 
 - (void) gapLengthChanged:(NSNotification*)aNote
@@ -533,7 +538,7 @@
 	[self histNofMeasChanged:nil];
     [self settingsLockChanged:nil];
 	[self gapLengthChanged:nil];
-	[self filterLengthChanged:nil];
+	[self filterShapingLengthChanged:nil];
 	[self storeDataInRamChanged:nil];
 	[self runBoxCarFilterChanged:nil];
 	[self histEMinChanged:nil];
@@ -579,7 +584,7 @@
 	else											[modeTabView selectTabViewItemAtIndex:1];
 	
 	[gapLengthPU setEnabled:!lockedOrRunningMaintenance && (([model runMode]<3) || ([model runMode]>6))];
-	[filterLengthPU setEnabled:!lockedOrRunningMaintenance];
+	[filterShapingLengthPU setEnabled:!lockedOrRunningMaintenance];
 	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
@@ -1024,9 +1029,10 @@
 	[model setStoreDataInRam:[sender intValue]];	
 }
 
-- (IBAction) filterLengthAction:(id)sender
+- (IBAction) filterShapingLengthAction:(id)sender
 {
-	[model setFilterLength:[sender indexOfSelectedItem]];
+	//[model setFilterLength:[sender indexOfSelectedItem]];
+	[model setFilterShapingLength:[[sender selectedCell] tag]];
 }
 
 - (IBAction) gapLengthAction:(id)sender

@@ -41,6 +41,7 @@
 			  ^ ^^^^---------------------card
                      ^^^^ ^^^^ ----------channel
                                ^^^^------filterIndex  
+                                    ^^^^-filterShapingLength  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
@@ -79,16 +80,21 @@
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
 	unsigned char fifoFlags = ShiftAndExtract(ptr[5],20,0xf);
-	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
+	int filterIndex = ShiftAndExtract(ptr[1],4,0xf); if(filterIndex == 0xf) filterIndex=-1;//TODO: replace by filterShapingLength in the future -tb-
+	int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
 	unsigned short filterDiv;
 	unsigned long histoLen;
-	if(filterIndex==0)	{
-		histoLen = 16*1024;
-		filterDiv = 64;
-	}
-	else {
-		histoLen = 4096;
-		filterDiv = 1L << (filterIndex+2);
+	histoLen = 4096;
+	filterDiv = 1L << filterShapingLength;
+	if(filterShapingLength==0){
+		if(filterIndex==0)	{
+			histoLen = 16*1024;
+			filterDiv = 64;
+		}
+		else {
+			histoLen = 4096;
+			filterDiv = 1L << (filterIndex+2);
+		}
 	}
 	
 	NSString* crateKey		= [self getCrateKey: crate];
@@ -181,6 +187,7 @@
  -------------^ ^^^^---------------------card
  --------------------^^^^ ^^^^-----------channel
  ------------------------------^^^^------filterIndex 
+                                    ^^^^-filterShapingLength  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
@@ -216,17 +223,23 @@
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
-	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
+	int filterIndex = ShiftAndExtract(ptr[1],4,0xf); if(filterIndex == 0xf) filterIndex=-1;//TODO: replace by filterShapingLength in the future -tb-
+	int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
 	unsigned short filterDiv;
 	unsigned long histoLen;
-	if(filterIndex==0)	{
-		histoLen = 16*1024;
-		filterDiv = 64;
+	histoLen = 4096;
+	filterDiv = 1L << filterShapingLength;
+	if(filterShapingLength==0){
+		if(filterIndex==0)	{
+			histoLen = 16*1024;
+			filterDiv = 64;
+		}
+		else {
+			histoLen = 4096;
+			filterDiv = 1L << (filterIndex+2);
+		}
 	}
-	else {
-		histoLen = 4096;
-		filterDiv = 1L << (filterIndex+2);
-	}
+	
 	
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
@@ -382,6 +395,7 @@ startIndex=traceStart16;
  -------------^ ^^^^---------------------card
  --------------------^^^^ ^^^^-----------channel
  ------------------------------^^^^------filterIndex 
+                                    ^^^^-filterShapingLength  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
@@ -443,11 +457,13 @@ Variable section: exists if trace length !=0
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
-	unsigned short filterIndex = ShiftAndExtract(ptr[1],4,0xf);
+	//int filterIndex = ShiftAndExtract(ptr[1],4,0xf); if(filterIndex == 0xf) filterIndex=-1;//TODO: replace by filterShapingLength in the future -tb-
+	int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
 	unsigned short filterDiv;
 	unsigned long histoLen;
 	histoLen = 4096;//TODO: make a configurable parameter whether we want see original energy value or "normalized" value -tb- ?
-	filterDiv = 1L << (filterIndex+2);
+	filterDiv = 1L << filterShapingLength;
+	
 	
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
