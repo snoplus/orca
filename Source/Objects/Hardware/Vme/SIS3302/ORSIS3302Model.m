@@ -2838,7 +2838,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 	
 	if(pulseMode){
-		NSLogColor([NSColor redColor], @"SIS3302 Slot %d is in special readout mode -- only one buffer will be read each time the SBC is unpaused",[self slot]);
+		NSLogColor([NSColor redColor], @"SIS3302 Slot %d is in special readout mode -- only one buffer will be read each time the SBC is unpaused\n",[self slot]);
 	}
 }
 
