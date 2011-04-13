@@ -30,7 +30,7 @@
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
 
-NSString* ORSIS3302ModelPulseModeChanged = @"ORSIS3302ModelPulseModeChanged";
+NSString* ORSIS3302ModelPulseModeChanged				= @"ORSIS3302ModelPulseModeChanged";
 NSString* ORSIS3302ModelFirmwareVersionChanged			= @"ORSIS3302ModelFirmwareVersionChanged";
 NSString* ORSIS3302ModelBufferWrapEnabledChanged		= @"ORSIS3302ModelBufferWrapEnabledChanged";
 NSString* ORSIS3302ModelCfdControlChanged				= @"ORSIS3302ModelCfdControlChanged";
@@ -3277,6 +3277,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	[objDictionary setObject:[NSNumber numberWithInt:lemoOutMode]					forKey:@"lemoOutMode"];
 	[objDictionary setObject:[NSNumber numberWithBool:shipEnergyWaveform]			forKey:@"shipEnergyWaveform"];
 	[objDictionary setObject:[NSNumber numberWithBool:internalExternalTriggersOred]	forKey:@"internalExternalTriggersOred"];
+	[objDictionary setObject:[NSNumber numberWithBool:pulseMode]					forKey:@"pulseMode"];
 	
 	[objDictionary setObject: internalTriggerDelays	forKey:@"internalTriggerDelays"];	
     [objDictionary setObject: energyDecimations	forKey:@"energyDecimations"];	
