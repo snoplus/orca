@@ -666,12 +666,14 @@ void stopRun()
 char pauseRun()
 {
     run_info.statusBits |= kSBC_PausedMask; 
+	pauseHWRun(&crate_config);
 	return 0; //could return something in the future
 }
 
 char resumeRun()
 {
     run_info.statusBits &= ~kSBC_PausedMask; 
+	resumeHWRun(&crate_config);
 	return 0; //could return something in the future
 }
 
@@ -982,11 +984,23 @@ void initializeHWRun(SBC_crate_config* config)
         index++;
     }
 }
+
 void startHWRun (SBC_crate_config* config)
 {    
     int32_t index = 0;
     while(index<config->total_cards){
         if (start_card(index) != 1) {
+            // Error
+        }
+        index++;
+    }
+}
+
+void pauseHWRun (SBC_crate_config* config)
+{    
+    int32_t index = 0;
+    while(index<config->total_cards){
+        if (pause_card(index) != 1) {
             // Error
         }
         index++;
@@ -1001,6 +1015,16 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
     return -1;
 }
 
+void resumeHWRun (SBC_crate_config* config)
+{    
+    int32_t index = 0;
+    while(index<config->total_cards){
+        if (resume_card(index) != 1) {
+            // Error
+        }
+        index++;
+    }
+}
 
 void stopHWRun (SBC_crate_config* config)
 {

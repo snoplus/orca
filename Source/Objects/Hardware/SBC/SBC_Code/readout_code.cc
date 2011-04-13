@@ -33,6 +33,23 @@ int32_t stop_card(int32_t index)
   return 1;
 }
 
+// Returns number of cards Paused.
+int32_t pause_card(int32_t index)
+{
+	gCardIterator = gSetOfCards.find(index); 
+	if (gCardIterator == gSetOfCards.end()) return 0;
+	gCardIterator->second->Pause();
+	return 1;
+}
+// Returns number of cards Paused.
+int32_t resume_card(int32_t index)
+{
+	gCardIterator = gSetOfCards.find(index); 
+	if (gCardIterator == gSetOfCards.end()) return 0;
+	gCardIterator->second->Resume();
+	return 1;
+}
+
 // Returns number of cards removed.
 int32_t remove_card(int32_t index)
 {

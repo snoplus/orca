@@ -41,8 +41,15 @@ uint32_t ORSIS3302Card::GetADCBufferRegisterOffset(size_t channel)
 
 bool ORSIS3302Card::Start()
 {
+	//---------------------------------------------------------------------------
+	//special mode. 
+	fProcessPulse = false;
+	fPulseMode = GetDeviceSpecificData()[6];
+	//---------------------------------------------------------------------------
+	
 	DisarmAndArmBank(2);
 	DisarmAndArmBank(1);
+	//bank one is armed are taking data
 	return true;
 }
 
@@ -54,6 +61,15 @@ bool ORSIS3302Card::Stop()
 	//for( size_t i=0;i<GetNumberOfChannels();i++) {
 	//	ReadOutChannel(i);
 	//}	
+	return true;
+}
+
+bool ORSIS3302Card::Resume()
+{
+	//---------------------------------------------------------------------------
+	//reset special mode. 
+	fProcessPulse = true;
+	//---------------------------------------------------------------------------
 	return true;
 }
 
@@ -96,6 +112,11 @@ bool ORSIS3302Card::resetSampleLogic()
 
 bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/) 
 {		
+	//---------------------------------------------------------------------------
+	//special run mode. If in the pulse mode we will only read one bank one time the SBC is unpaused.
+	if(fPulseMode && !fProcessPulse)return true;
+	//---------------------------------------------------------------------------
+	
 	if(!fWaitingForSomeChannels){
 		time_t theTime;
 		time(&theTime);
@@ -126,6 +147,16 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 			data[dataIndex++] = fChannelsToReadMask<<16;
 			resetSampleLogic();
 		}
+	}
+	else {
+		//---------------------------------------------------------------------------
+		//special run mode.
+		if(fPulseMode){
+			fProcessPulse = false;
+			//go back to bank 1
+			DisarmAndArmNextBank();
+		}
+		//---------------------------------------------------------------------------
 	}
 	
 	return true;

@@ -14,7 +14,9 @@ int32_t start_card(int32_t index);
 int32_t readout_card(int32_t index, SBC_LAM_Data* lam_data);
 int32_t stop_card(int32_t index);
 int32_t remove_card(int32_t index);
-// Returns the ORVCard* at the index
+int32_t pause_card(int32_t index);
+int32_t resume_card(int32_t index);
+	// Returns the ORVCard* at the index
 // NULL if cannot find
 #ifndef __cplusplus
 struct

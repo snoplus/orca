@@ -30,6 +30,7 @@
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
 
+NSString* ORSIS3302ModelPulseModeChanged = @"ORSIS3302ModelPulseModeChanged";
 NSString* ORSIS3302ModelFirmwareVersionChanged			= @"ORSIS3302ModelFirmwareVersionChanged";
 NSString* ORSIS3302ModelBufferWrapEnabledChanged		= @"ORSIS3302ModelBufferWrapEnabledChanged";
 NSString* ORSIS3302ModelCfdControlChanged				= @"ORSIS3302ModelCfdControlChanged";
@@ -366,6 +367,20 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) pulseMode
+{
+    return pulseMode;
+}
+
+- (void) setPulseMode:(BOOL)aPulseMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPulseMode:pulseMode];
+    
+    pulseMode = aPulseMode;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3302ModelPulseModeChanged object:self];
+}
 
 - (float) firmwareVersion
 {
@@ -2821,6 +2836,10 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		[self writeMcaArmMode];
 		[self pollMcaStatus];
 	}
+	
+	if(pulseMode){
+		NSLogColor([NSColor redColor], @"SIS3302 Slot %d is in special readout mode -- only one buffer will be read each time the SBC is unpaused",[self slot]);
+	}
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -3021,6 +3040,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
 		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
 		configStruct->card_info[index].deviceSpecificData[5]	= [self bufferWrapEnabledMask];
+		configStruct->card_info[index].deviceSpecificData[6]	= [self pulseMode];
 		
 		configStruct->card_info[index].num_Trigger_Indexes		= 0;
 		
@@ -3083,6 +3103,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
+    [self setPulseMode:[decoder decodeBoolForKey:@"pulseMode"]];
     [self setFirmwareVersion:			[decoder decodeFloatForKey:@"firmwareVersion"]];
     [self setShipTimeRecordAlso:		[decoder decodeBoolForKey:@"shipTimeRecordAlso"]];
     [self setMcaUseEnergyCalculation:	[decoder decodeBoolForKey:@"mcaUseEnergyCalculation"]];
@@ -3168,6 +3189,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 {
     [super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:pulseMode forKey:@"pulseMode"];
 	[encoder encodeFloat:firmwareVersion		forKey:@"firmwareVersion"];
 	[encoder encodeBool:shipTimeRecordAlso		forKey:@"shipTimeRecordAlso"];
 	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];

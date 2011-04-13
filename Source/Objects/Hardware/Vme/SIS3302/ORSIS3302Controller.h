@@ -28,7 +28,8 @@
 @interface ORSIS3302Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
-	IBOutlet   NSTextField* firmwareVersionTextField;
+	IBOutlet NSButton*		pulseModeButton;
+	IBOutlet NSTextField*	firmwareVersionTextField;
 	IBOutlet NSMatrix*		bufferWrapEnabledMatrix;
 	IBOutlet NSButton*		shipTimeRecordAlsoCB;
 	IBOutlet NSButton*		mcaUseEnergyCalculationButton;
@@ -144,6 +145,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) pulseModeChanged:(NSNotification*)aNote;
 - (void) firmwareVersionChanged:(NSNotification*)aNote;
 - (void) bufferWrapEnabledChanged:(NSNotification*)aNote;
 - (void) cfdControlChanged:(NSNotification*)aNote;
@@ -214,6 +216,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) pulseModeAction:(id)sender;
 - (IBAction) bufferWrapEnabledAction:(id)sender;
 - (IBAction) cfdControlAction:(id)sender;
 - (IBAction) shipTimeRecordAlsoAction:(id)sender;

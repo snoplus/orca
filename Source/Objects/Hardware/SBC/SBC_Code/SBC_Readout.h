@@ -44,6 +44,8 @@ void killJob(SBC_Packet* aPacket);
 // Hardware functions
 void initializeHWRun (SBC_crate_config* config);
 void stopHWRun (SBC_crate_config* config);
+void pauseHWRun (SBC_crate_config* config);
+void resumeHWRun (SBC_crate_config* config);
 int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data);
 void startHWRun (SBC_crate_config* config);
 void cleanupHWRun (SBC_crate_config* config);

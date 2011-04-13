@@ -414,6 +414,11 @@
                          name : ORSIS3302ModelFirmwareVersionChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(pulseModeChanged:)
+                         name : ORSIS3302ModelPulseModeChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -506,9 +511,15 @@
 	[self bufferWrapEnabledChanged:nil];
 	[self firmwareVersionChanged:nil];
 	[self clockSourceChanged:nil];
+	[self pulseModeChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) pulseModeChanged:(NSNotification*)aNote
+{
+	[pulseModeButton setIntValue: [model pulseMode]];
+}
 - (void) firmwareVersionChanged:(NSNotification*)aNote
 {
 	[firmwareVersionTextField setFloatValue: [model firmwareVersion]];
@@ -994,6 +1005,7 @@
 	[settingLockButton			setState: locked];
 
     [runModePU					setEnabled:!locked && !runInProgress];
+    [pulseModeButton			setEnabled:!locked && !runInProgress];
 	
     [addressText				setEnabled:!locked && !runInProgress];
     [initButton					setEnabled:!lockedOrRunningMaintenance];
@@ -1178,6 +1190,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) pulseModeAction:(id)sender
+{
+	[model setPulseMode:[sender intValue]];	
+}
 
 - (void) shipTimeRecordAlsoAction:(id)sender
 {

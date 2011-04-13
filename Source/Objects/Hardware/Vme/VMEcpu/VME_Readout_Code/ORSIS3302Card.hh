@@ -9,6 +9,7 @@ public:
 	
 	virtual bool Start();
 	virtual bool Readout(SBC_LAM_Data* /* lam_data*/);  
+	virtual bool Resume();
 	virtual bool Stop();
 	
 	enum EORSIS3302Consts {
@@ -36,7 +37,8 @@ protected:
 	virtual bool SetupPageReg();
 	virtual bool resetSampleLogic();
 	
-	
+	bool     fPulseMode;
+	bool     fProcessPulse;
 	bool	 fWaitingForSomeChannels;
 	bool	 fBankOneArmed;
 	uint32_t fWaitCount;
