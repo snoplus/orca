@@ -125,6 +125,7 @@
 	time_t			lastBankSwitchTime;
 	unsigned long	waitCount;
 	unsigned long	channelsToReadMask;
+    BOOL pulseMode;
 }
 
 - (id) init;
@@ -133,6 +134,8 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (BOOL) pulseMode;
+- (void) setPulseMode:(BOOL)aPulseMode;
 - (float) firmwareVersion;
 - (void) setFirmwareVersion:(float)aFirmwareVersion;
 - (BOOL) shipTimeRecordAlso;
@@ -406,6 +409,7 @@
 @end
 
 //CSRg
+extern NSString* ORSIS3302ModelPulseModeChanged;
 extern NSString* ORSIS3302ModelFirmwareVersionChanged;
 extern NSString* ORSIS3302ModelBufferWrapEnabledChanged;
 extern NSString* ORSIS3302ModelCfdControlChanged;
