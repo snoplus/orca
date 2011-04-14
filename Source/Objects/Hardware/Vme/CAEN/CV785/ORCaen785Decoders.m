@@ -36,7 +36,7 @@
 			int adcValue = ShiftAndExtract(ptr[i],0,0xfff);
 			int chan     = [self channel:ptr[i]];
 			NSString* channelKey  = [self getChannelKey: chan];
-			[aDataSet histogram:adcValue numBins:0xfff sender:self withKeys:@"CAEN785 ADC",crateKey,cardKey,channelKey,nil];
+			[aDataSet histogram:adcValue numBins:4096 sender:self withKeys:@"CAEN785 ADC",crateKey,cardKey,channelKey,nil];
         }
     }
     return length;
