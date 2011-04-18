@@ -36,11 +36,19 @@
 	BOOL		sampleGateOpen;
 	BOOL		useAltView;
 	BOOL		wasRunning;
+	BOOL		writeHeader;
+    BOOL		keepHistory;
+	time_t		lastHistorySample;
+    NSString*	historyFile;
 }
 
 - (void) registerNotificationObservers;
 
 #pragma mark ***Accessors
+- (NSString*) historyFile;
+- (void) setHistoryFile:(NSString*)aHistoryFile;
+- (BOOL) keepHistory;
+- (void) setKeepHistory:(BOOL)aKeepHistory;
 - (void) setProcessIDs;
 - (BOOL) useAltView;
 - (void) setUseAltView:(BOOL)aState;
@@ -50,6 +58,7 @@
 
 - (float) sampleRate;
 - (void) setSampleRate:(float)aSampleRate;
+- (void) checkForAchival;
 
 - (NSString*) elementName;
 - (id) stateValue;
@@ -89,6 +98,8 @@
 - (BOOL) isTrueEndNode;
 @end
 
+extern NSString* ORProcessModelHistoryFileChanged;
+extern NSString* ORProcessModelKeepHistoryChanged;
 extern NSString* ORProcessModelUseAltViewChanged;
 extern NSString* ORProcessModelSampleRateChanged;
 extern NSString* ORProcessModelShortNameChangedNotification;

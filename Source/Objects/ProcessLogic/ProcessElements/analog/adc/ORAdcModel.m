@@ -228,8 +228,9 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
 - (id) description
 {
-	NSString* s = [super description];
-	s =  [s stringByAppendingFormat:@"Value: %@ ",[self iconValue]];
+	NSString* s = [self iconLabel];
+	
+	s =  [s stringByAppendingFormat:@" Value: %@ ",[self iconValue]];
 	if(valueTooLow)		  s =  [s stringByAppendingString:@"[Low] "];
 	else if(valueTooHigh) s =  [s stringByAppendingString:@"[High] "];
 	else				  s =  [s stringByAppendingString:@"[In Range] "];
@@ -258,7 +259,10 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (NSString*) iconLabel
 {
 	if(![self useAltView]){
-		if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		if(hwName)	{
+			if(labelType ==2) return [self customLabel];
+			else              return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		}
 		else		return @""; 
 	}
 	else {

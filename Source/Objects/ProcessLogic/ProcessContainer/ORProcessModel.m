@@ -25,6 +25,8 @@
 #import "ORProcessThread.h"
 #import "ORProcessCenter.h"
 
+NSString* ORProcessModelHistoryFileChanged = @"ORProcessModelHistoryFileChanged";
+NSString* ORProcessModelKeepHistoryChanged = @"ORProcessModelKeepHistoryChanged";
 NSString* ORProcessModelSampleRateChanged			= @"ORProcessModelSampleRateChanged";
 NSString* ORProcessTestModeChangedNotification      = @"ORProcessTestModeChangedNotification";
 NSString* ORProcessRunningChangedNotification       = @"ORProcessRunningChangedNotification";
@@ -45,6 +47,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (void) dealloc
 {
+    [historyFile release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self stopRun];
 	[comment release];
@@ -85,6 +88,38 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) historyFile
+{
+	if([historyFile length])return historyFile;
+	else return @"";
+}
+
+- (void) setHistoryFile:(NSString*)aHistoryFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistoryFile:historyFile];
+    
+    [historyFile autorelease];
+    historyFile = [aHistoryFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelHistoryFileChanged object:self];
+}
+
+- (BOOL) keepHistory
+{
+    return keepHistory;
+}
+
+- (void) setKeepHistory:(BOOL)aKeepHistory
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setKeepHistory:keepHistory];
+    
+    keepHistory = aKeepHistory;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelKeepHistoryChanged object:self];
+    [self setUpImage];
+
+}
 - (void) setProcessIDs
 {
 	for(OrcaObject* obj in [self orcaObjects]){
@@ -314,6 +349,15 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
         
         [n drawInRect:NSMakeRect(10,[i size].height-18,[i size].width-20,16)];
         [n release];
+		
+		if(keepHistory && [historyFile length]){
+			NSAttributedString* n = [[NSAttributedString alloc] 
+									 initWithString:@"History" 
+									 attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
+			
+			[n drawInRect:NSMakeRect([i size].width-[n size].width-10,[i size].height-18,[i size].width-20,16)];
+			[n release];
+		}
 
     }
 
@@ -376,6 +420,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (void) startRun
 {
+	writeHeader = YES;
 	NSArray* outputNodes = [self collectObjectsRespondingTo:@selector(isTrueEndNode)];
     //NSArray* outputNodes = [self collectObjectsOfClass:NSClassFromString(@"ORProcessEndNode")];
 	if([outputNodes count] == 0){
@@ -499,6 +544,75 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	}
 	sampleGateOpen = NO;
 	
+	if(keepHistory && [historyFile length]){
+		NSString* header = @"#";
+		if(writeHeader){
+			for(id anObj in [self orcaObjects]){
+				if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
+					header = [header stringByAppendingFormat:@" SampleTime\t%@",[anObj iconLabel]];
+				}
+			}
+			header = [header stringByAppendingString:@"\n"];
+		}
+		
+		NSString* s = @"";
+		for(id anObj in [self orcaObjects]){
+			if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
+				s = [s stringByAppendingFormat:@"\t%@",[anObj iconValue] ];
+			}
+		}
+		if([s length]){
+			//get the time(UT!)
+			time_t	ut_Time;
+			time(&ut_Time);
+			if(ut_Time - lastHistorySample >= 10){
+				lastHistorySample = ut_Time;
+				NSString* finalString = [NSString stringWithFormat:@"%d%@\n",ut_Time,s];
+				if(writeHeader){
+					finalString = [header stringByAppendingString:finalString];
+					writeHeader = NO;
+				}
+				NSString* fullPath = [historyFile stringByExpandingTildeInPath];
+				NSFileManager* fm = [NSFileManager defaultManager];
+				if(![fm fileExistsAtPath: fullPath]){
+					[finalString writeToFile:fullPath atomically:NO encoding:NSASCIIStringEncoding error:nil];
+				}
+				else {
+					NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:fullPath];
+					[fh seekToEndOfFile];
+					[fh writeData:[finalString dataUsingEncoding:NSASCIIStringEncoding]];
+					[fh closeFile];
+					[self checkForAchival];
+				}
+			}
+		}
+	}
+}
+
+- (void) checkForAchival
+{
+	NSFileManager* fm = [NSFileManager defaultManager];
+	NSString* fullPath = [historyFile stringByExpandingTildeInPath];
+	NSDictionary* attrib = [fm attributesOfItemAtPath:fullPath error:nil];
+	if(attrib){
+		NSDate* creationDate = [attrib objectForKey:NSFileCreationDate];
+		NSTimeInterval fileAge = fabs([creationDate timeIntervalSinceNow]);	
+		if(fileAge >= 60*60*24*7){
+			NSDate* now = [NSCalendarDate date];
+			NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%Y_%m_%d_%H_%M_%S" allowNaturalLanguage:NO];
+			
+			NSFileManager* fm = [NSFileManager defaultManager];
+			NSString* folderPath = [[fullPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"History"];
+			if(![fm fileExistsAtPath: folderPath]){
+				[fm createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:nil];
+			}
+			
+			NSString* newPath = [folderPath stringByAppendingPathComponent:[fullPath lastPathComponent]];
+			newPath = [newPath stringByAppendingFormat:@"_%@",[dateFormatter stringFromDate:now]];
+			[fm moveItemAtPath:fullPath toPath:newPath error:nil];
+			writeHeader = YES;
+		}
+	}
 }
 
 - (NSDate*)	lastSampleTime
@@ -543,6 +657,8 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
     [[self undoManager] disableUndoRegistration];
 	
 	//after the document is loaded we use this flag to autostart
+    [self setHistoryFile:[decoder decodeObjectForKey:@"historyFile"]];
+    [self setKeepHistory:[decoder decodeBoolForKey:@"keepHistory"]];
 	wasRunning = [decoder decodeBoolForKey:@"wasRunning"];
 	
     float aSampleRate = [decoder decodeFloatForKey:@"ORProcessModelSampleRate"];\
@@ -562,6 +678,8 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:historyFile forKey:@"historyFile"];
+    [encoder encodeBool:keepHistory forKey:@"keepHistory"];
     [encoder encodeFloat:sampleRate forKey:@"ORProcessModelSampleRate"];
     [encoder encodeInt:inTestMode forKey:@"inTestMode"];
     [encoder encodeObject:comment forKey:@"comment"];

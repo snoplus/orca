@@ -30,6 +30,10 @@
 int sortUpFunction(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
 int sortDnFunction(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
 
+@interface ORProcessController (private)
+- (void) selectFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
+
 @implementation ORProcessController
 
 #pragma mark ¥¥¥Initialization
@@ -65,6 +69,16 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) historyFileChanged:(NSNotification*)aNote
+{
+	[historyFileTextField setStringValue: [[model historyFile] stringByAbbreviatingWithTildeInPath]];
+}
+
+- (void) keepHistoryChanged:(NSNotification*)aNote
+{
+	[keepHistoryCB setIntValue: [model keepHistory]];
+}
 
 - (void) sampleRateChanged:(NSNotification*)aNote
 {
@@ -134,6 +148,16 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                      selector : @selector(eMailOptionsChanged:)
                          name : ORProcessEmailOptionsChangedNotification
 						object: nil];	
+    [notifyCenter addObserver : self
+                     selector : @selector(keepHistoryChanged:)
+                         name : ORProcessModelKeepHistoryChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(historyFileChanged:)
+                         name : ORProcessModelHistoryFileChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -146,6 +170,8 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	[self sampleRateChanged:nil];
 	[self useAltViewChanged:nil];
 	[self eMailOptionsChanged:nil];
+	[self keepHistoryChanged:nil];
+	[self historyFileChanged:nil];
 }
 
 - (void) useAltViewChanged:(NSNotification*)aNote
@@ -240,6 +266,37 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) historyFileSelectionAction:(id)sender;
+{
+	NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save As"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[model historyFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = @"Untitled";
+    }
+	
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(selectFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+}
+
+- (IBAction) keepHistoryAction:(id)sender
+{
+	[model setKeepHistory:[sender intValue]];	
+}
 
 - (IBAction) viewProcessCenter:(id)sender
 {
@@ -251,7 +308,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	[model setUseAltView:![model useAltView]];
 }
 
-- (void) sampleRateAction:(id)sender
+- (IBAction) sampleRateAction:(id)sender
 {
 	[model setSampleRate:[sender floatValue]];	
 }
@@ -384,3 +441,14 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [selectedObj doDoubleClick:sender];
 }
 @end
+
+@implementation ORProcessController (private)
+- (void)selectFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[self endEditing];
+        [model setHistoryFile:[sheet filename]];
+    }
+}
+@end
+

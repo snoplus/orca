@@ -26,6 +26,8 @@
 @interface ORProcessController : ORContainerController
 {
     IBOutlet NSTabView* tabView;
+	IBOutlet NSTextField* historyFileTextField;
+	IBOutlet NSButton* keepHistoryCB;
 	IBOutlet NSTextField* sampleRateField;
     IBOutlet NSTableView* tableView;
     IBOutlet NSButton* testModeButton;
@@ -48,6 +50,8 @@
 -(void) awakeFromNib;
 
 #pragma mark ¥¥¥Interface Management
+- (void) historyFileChanged:(NSNotification*)aNote;
+- (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) sampleRateChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
@@ -63,6 +67,8 @@
 - (void) doUpdate:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) historyFileSelectionAction:(id)sender;
+- (IBAction) keepHistoryAction:(id)sender;
 - (IBAction) useAltViewAction:(id)sender;
 - (IBAction) sampleRateAction:(id)sender;
 - (IBAction) startProcess:(id)sender;
