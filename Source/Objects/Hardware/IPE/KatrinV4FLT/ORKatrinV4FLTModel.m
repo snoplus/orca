@@ -1547,6 +1547,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     //[objDictionary setObject:[NSNumber numberWithLong:filterLength+2]		forKey:@"filterLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]		forKey:@"filterShapingLength"];//this is the fpga register value -tb-
     [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
+    [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]		forKey:@"nfoldCoincidence"];
 	
 	//------------------
 	//added MAH 11/09/11
