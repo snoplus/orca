@@ -624,18 +624,20 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	return d;
 }
 
-- (NSMutableDictionary*) dictionary
+- (NSMutableDictionary*) processDictionary
 {
 	NSMutableDictionary* aDictionary = [NSMutableDictionary dictionary];
+	NSMutableArray* adcs = [NSMutableArray array];
 	@synchronized(self){
 		for(id anObj in [self orcaObjects]){
 			if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
-				NSDictionary* anObjDictionary = [anObj dictionary];
+				NSDictionary* anObjDictionary = [anObj valueDictionary];
 				if([anObjDictionary count]){
-					[aDictionary addEntriesFromDictionary:anObjDictionary];
+					[adcs addObject:anObjDictionary];
 				}
 			}
 		}
+		if([adcs count])[aDictionary setObject:adcs forKey:@"adcs"];
 	}
 	return aDictionary;
 }

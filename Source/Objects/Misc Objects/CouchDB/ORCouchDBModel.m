@@ -403,11 +403,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) createHistoryDatabase
 {			
+	NSString*     aMap;
+	NSDictionary* aMapDictionary;
 	NSMutableDictionary* aViewDictionary = [NSMutableDictionary dictionary];
-	NSString*     aMap            = @"function(doc) {if(doc.timestamp && doc.title){emit([doc.timestamp,doc.title],doc);}}";
-	NSDictionary* aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	
-	[aViewDictionary setObject:aMapDictionary forKey:@"history"]; 
+
+	aMap            = @"function(doc) {if(doc.title){emit([doc.timestamp,doc.title],doc);}}";
+	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
+	[aViewDictionary setObject:aMapDictionary forKey:@"adcs"]; 
 
 	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
 							  @"javascript",@"language",
@@ -445,7 +447,16 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		if([theProcesses count]){
 			for(id aProcess in theProcesses){
 				NSString* shortName     = [aProcess shortName];
-				NSString* lastTimeStamp = [[aProcess lastSampleTime] description];
+				
+				NSDate *localDate = [aProcess lastSampleTime];
+				
+				NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+				dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+				
+				NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+				[dateFormatter setTimeZone:gmt];
+				NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
+				[dateFormatter release];			
 				if(![lastTimeStamp length]) lastTimeStamp = @"0";
 				if(![shortName length]) shortName = @"Untitled";
 				
@@ -520,20 +531,26 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		for(id aProcess in theProcesses){
 			if([aProcess processRunning]){
 				NSString* shortName     = [aProcess shortName];
-				NSString* lastTimeStamp = [[aProcess lastSampleTime] description];
+				NSDate *localDate = [aProcess lastSampleTime];
+				
+				NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+				dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+				
+				NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+				[dateFormatter setTimeZone:gmt];
+				NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
+				[dateFormatter release];			
 				
 				if(![lastTimeStamp length]) lastTimeStamp = @"0";
 				if(![shortName length]) shortName = @"Untitled";
 				
-				NSMutableDictionary* processDictionary = [aProcess dictionary];
+				NSMutableDictionary* processDictionary = [aProcess processDictionary];
 				if([processDictionary count]){
 					
 					NSMutableDictionary* processInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 												[aProcess fullID],	@"name",
 												shortName,			@"title",
 												lastTimeStamp,		@"timestamp",
-												[NSNumber numberWithUnsignedLong:runNumber] ,@"run",
-												[NSNumber numberWithUnsignedLong:subRunNumber] ,@"subrun",
 												nil];
 					
 					[processInfo addEntriesFromDictionary:processDictionary];

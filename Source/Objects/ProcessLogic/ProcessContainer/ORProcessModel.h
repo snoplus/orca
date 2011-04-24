@@ -45,7 +45,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Accessors
-- (NSMutableDictionary*) dictionary;
+- (NSMutableDictionary*) processDictionary;
 - (NSString*) historyFile;
 - (void) setHistoryFile:(NSString*)aHistoryFile;
 - (BOOL) keepHistory;
@@ -96,6 +96,7 @@
 @interface OrcaObject (ProcessModel)
 - (void) setUseAltView:(BOOL)aState; 
 - (void) askForProcessID:(id)fromObj;
+- (id)valueDictionary;
 - (BOOL) isTrueEndNode;
 @end
 

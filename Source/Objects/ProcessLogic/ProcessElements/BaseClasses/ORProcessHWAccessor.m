@@ -55,7 +55,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     [self setUpImage];
 }
 
-- (NSDictionary*) dictionary
+- (NSDictionary*) valueDictionary
 {
 	return nil;
 }

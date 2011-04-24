@@ -274,7 +274,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 		}
 	}
 }
-- (NSDictionary*) dictionary
+- (NSDictionary*) valueDictionary
 {
 	return [NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:[self hwValue]] forKey:[self iconLabel]];
 }
