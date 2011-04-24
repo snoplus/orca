@@ -38,12 +38,18 @@
 - (void) listDatabases:(id)aDelegate tag:(NSString*)aTag;
 - (void) databaseInfo:(id)aDelegate tag:(NSString*)aTag;
 - (void) createDatabase:(NSString*)aTag views:(NSDictionary*)theViews;
+- (void) replicateLocalDatabase:(NSString*)aTag continous:(BOOL)continuous;
 - (void) deleteDatabase:(NSString*)aTag;
+- (void) addDocument:(NSDictionary*)aDict tag:(NSString*)aTag;
 - (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) getDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
+- (void) listTasks:(id)aDelegate tag:(NSString*)aTag;
+
+#pragma mark ***CouchDB Checks
+- (BOOL) couchDBRunning;
 
 @property (assign)	id					delegate;
 @property (retain)	NSOperationQueue*	queue;
@@ -94,11 +100,23 @@
 -(void) main;
 @end
 
+@interface ORCouchDBReplicateDBOp : ORCouchDBOperation
+{
+	BOOL	continuous;
+}
+-(void) main;
+@property (assign)	BOOL continuous;
+@end
+
 @interface ORCouchDBVersionOp :ORCouchDBOperation
 - (void) main;
 @end
 
 @interface ORCouchDBListDBOp :ORCouchDBOperation
+- (void) main;
+@end
+
+@interface ORCouchDBListTasksOp :ORCouchDBOperation
 - (void) main;
 @end
 

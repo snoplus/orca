@@ -21,21 +21,29 @@
 
 @interface ORCouchDBController : OrcaObjectController 
 {	
-	IBOutlet NSTextField* hostNameField;
+	IBOutlet NSTextField* remoteHostNameField;
+	IBOutlet NSTextField* replicationRunningTextField;
+	IBOutlet NSButton*	  keepHistoryCB;
 	IBOutlet NSTextField* userNameField;
 	IBOutlet NSTextField* passwordField;
 	IBOutlet NSTextField* dataBaseNameField;
+	IBOutlet NSTextField* historyDataBaseNameField;
     IBOutlet NSButton*    couchDBLockButton;
     IBOutlet ORValueBar*  queueValueBar;
 	IBOutlet NSButton*	  stealthModeButton;
 	IBOutlet NSTextField* dbSizeField;
+	IBOutlet NSTextField* dbHistorySizeField;
+	IBOutlet NSTextField* keepHistoryStatusField;
+	IBOutlet NSTextField* dbStatusField;
 	double queueCount;
 }
 
 #pragma mark ***Interface Management
+- (void) replicationRunningChanged:(NSNotification*)aNote;
+- (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) stealthModeChanged:(NSNotification*)aNote;
-- (void) hostNameChanged:(NSNotification*)aNote;
+- (void) remoteHostNameChanged:(NSNotification*)aNote;
 - (void) userNameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
 - (void) dataBaseNameChanged:(NSNotification*)aNote;
@@ -44,8 +52,11 @@
 - (void) dataBaseInfoChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) startReplicationAction:(id)sender;
+- (IBAction) createRemoteDBAction:(id)sender;
+- (IBAction) keepHistoryAction:(id)sender;
 - (IBAction) stealthModeAction:(id)sender;
-- (IBAction) hostNameAction:(id)sender;
+- (IBAction) remoteHostNameAction:(id)sender;
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) passwordAction:(id)sender;
 - (IBAction) couchDBLockAction:(id)sender;
@@ -54,6 +65,7 @@
 - (IBAction) listAction:(id)sender;
 - (IBAction) infoAction:(id)sender;
 - (IBAction) compactAction:(id)sender;
+- (IBAction) listTasks:(id)sender;
 
 
 @end

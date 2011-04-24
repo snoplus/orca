@@ -24,7 +24,9 @@
 
 
 @implementation ORCouchDB
+
 @synthesize database,host,port,queue,delegate,username,pwd;
+
 + (id) couchHost:(NSString*)aHost port:(NSUInteger)aPort username:(NSString*)aUsername pwd:(NSString*)aPwd database:(NSString*)aDatabase delegate:(id)aDelegate
 {
 	return [[[ORCouchDB alloc] initWithHost:aHost port:aPort username:aUsername pwd:aPwd database:aDatabase delegate:aDelegate] autorelease];
@@ -34,7 +36,6 @@
 {
 	return [[[ORCouchDB alloc] initWithHost:aHost port:aPort database:aDatabase delegate:aDelegate] autorelease];
 }
-
 
 - (id) initWithHost:(NSString*)aHost port:(NSUInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate
 {
@@ -93,12 +94,18 @@
 	[anOp release];
 }
 
+- (void) listTasks:(id)aDelegate tag:(NSString*)aTag
+{
+	ORCouchDBListTasksOp* anOp = [[ORCouchDBListTasksOp alloc] initWithHost:host port:port database:nil delegate:delegate tag:aTag];
+	[ORCouchDBQueue addOperation:anOp];
+	[anOp release];
+}
 - (void) createDatabase:(NSString*)aTag views:(NSDictionary*)theViews
 {
 	ORCouchDBCreateDBOp* anOp = [[ORCouchDBCreateDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setUsername:username];
 	[anOp setPwd:pwd];
-	[anOp setViews:theViews];
+	if(theViews)[anOp setViews:theViews];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
@@ -112,6 +119,17 @@
 	[anOp release];
 }
 
+- (void) replicateLocalDatabase:(NSString*)aTag continous:(BOOL)continuous
+{
+	ORCouchDBReplicateDBOp* anOp = [[ORCouchDBReplicateDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	[anOp setUsername:username];
+	[anOp setPwd:pwd];
+	[anOp setContinuous:continuous];
+	[ORCouchDBQueue addOperation:anOp];
+	[anOp release];
+}
+
+
 #pragma mark •••Document API
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 {
@@ -121,6 +139,11 @@
 	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
+}
+
+- (void) addDocument:(NSDictionary*)aDict tag:(NSString*)aTag;
+{
+	[self addDocument:aDict documentId:nil tag:aTag];
 }
 
 - (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
@@ -161,6 +184,35 @@
 	[anOp setDocumentId:anId];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
+}
+#pragma mark ***CouchDB Checks
+
+- (BOOL) couchDBRunning
+{
+	BOOL couchDBRunning = NO;
+	@try {
+		NSTask* task = [[[NSTask alloc] init] autorelease];
+		[task setLaunchPath: @"/bin/ps"];
+		[task setArguments: [NSArray arrayWithObjects:@"-ef",nil]];
+		
+		NSPipe* pipe = [NSPipe pipe];
+		[task setStandardOutput: pipe];
+		
+		NSFileHandle* file = [pipe fileHandleForReading];
+		
+		[task launch];
+		[task waitUntilExit];
+		
+		NSData* data = [file readDataToEndOfFile];
+		NSString* result = [[[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding] autorelease];
+		if([result rangeOfString:@"couchdb"].location != NSNotFound &&
+		   [result rangeOfString:@"erlang"].location != NSNotFound) {
+			couchDBRunning = YES;
+		}
+	}
+	@catch (NSException* e) {
+	}
+	return couchDBRunning;
 }
 
 @end
@@ -213,7 +265,12 @@
 		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
 	}
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
-    if(aType)[request setHTTPMethod:aType];
+    if(aType){
+		[request setHTTPMethod:aType];
+		if([aType isEqualToString:@"POST"]){
+			[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
+		}
+	}
 	if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
 	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
 	
@@ -236,7 +293,6 @@
 	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, anID];
 	id result = [self send:httpString];
 	return [result objectForKey:@"_rev"];
-
 }
 
 @end
@@ -273,7 +329,14 @@
 	[self sendToDelegate:result];
 }
 @end
-
+@implementation ORCouchDBListTasksOp
+-(void) main
+{
+	if([self isCancelled])return;
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_active_tasks", host, port]];
+	[self sendToDelegate:result];
+}
+@end
 @implementation ORCouchDBVersionOp
 - (void) main
 {
@@ -331,7 +394,8 @@
 	}
 	[self sendToDelegate:result];
 }
-		
+
+
 @end
 
 @implementation ORCouchDBDeleteDBOp
@@ -353,6 +417,40 @@
 	else result = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"[%@] didn't exist",database],@"Message",nil];
 	[self sendToDelegate:result];
 }
+@end
+
+@implementation ORCouchDBReplicateDBOp
+@synthesize continuous;
+- (void) main
+{
+	if([self isCancelled])return;
+	NSString* escaped   = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	NSString* httpString = [NSString stringWithFormat:@"http://127.0.0.1:%u/_replicate", port];
+	if(username && pwd){
+		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
+	}
+	
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+	[request setHTTPMethod:@"POST"];
+	[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
+	NSString* target = [NSString stringWithFormat:@"http://%@:%d/%@",host,port,escaped];
+	NSDictionary* aBody;
+	if(continuous) aBody= [NSDictionary dictionaryWithObjectsAndKeys:escaped,@"source",target,@"target",[NSNumber numberWithBool:1],@"continuous",nil];
+	else           aBody = [NSDictionary dictionaryWithObjectsAndKeys:escaped,@"source",target,@"target",nil];
+	NSString* s = [aBody yajl_JSONString];
+	NSData* asData = [s dataUsingEncoding:NSASCIIStringEncoding];
+	[request setHTTPBody:asData];
+	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
+	
+	id result;
+	if (data) {
+		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
+		result= [document root];
+	}
+	
+	[self sendToDelegate:result];
+}
+
 @end
 
 
@@ -387,8 +485,19 @@
 - (void) main
 {
 	if([self isCancelled])return;
-	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-	id result = [self send:httpString type:@"PUT" body:document];
+	NSString* httpString;
+	NSString* action;
+	if(documentId){
+		action = @"PUT";
+		httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+	}
+	else {
+		action = @"POST";
+		httpString = [NSString stringWithFormat:@"http://%@:%u/%@", host, port, database];
+	}	
+	
+	
+	id result = [self send:httpString type:action body:document];
 	if(!result){
 		result = [NSDictionary dictionaryWithObjectsAndKeys:
 				  [NSString stringWithFormat:@"[%@] timeout",
@@ -472,8 +581,6 @@
 }
 @end
 
-
-
 @implementation ORCouchDBDeleteDocumentOp
 - (void) main
 {
@@ -488,7 +595,6 @@
 	}
 }
 @end
-
 
 @implementation ORCouchDBGetDocumentOp
 - (void) dealloc 

@@ -81,8 +81,8 @@
     [super registerNotificationObservers];
     
     [notifyCenter addObserver : self
-                     selector : @selector(hostNameChanged:)
-                         name : ORCouchDBHostNameChanged
+                     selector : @selector(remoteHostNameChanged:)
+                         name : ORCouchDBRemoteHostNameChanged
                        object : model];
 	
     [notifyCenter addObserver : self
@@ -93,11 +93,6 @@
     [notifyCenter addObserver : self
                      selector : @selector(passwordChanged:)
                          name : ORCouchDBPasswordChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(dataBaseNameChanged:)
-                         name : ORCouchDBDataBaseNameChanged
                        object : model];
 	
     [notifyCenter addObserver : self
@@ -119,27 +114,53 @@
                      selector : @selector(dataBaseInfoChanged:)
                          name : ORCouchDBModelDBInfoChanged
 						object: model];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(keepHistoryChanged:)
+                         name : ORCouchDBModelKeepHistoryChanged
+						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(replicationRunningChanged:)
+                         name : ORCouchDBModelReplicationRunningChanged
+						object: model];
+
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
-	[self hostNameChanged:nil];
+	[self remoteHostNameChanged:nil];
 	[self userNameChanged:nil];
 	[self passwordChanged:nil];
 	[self dataBaseNameChanged:nil];
     [self couchDBLockChanged:nil];
 	[self stealthModeChanged:nil];
+	[self keepHistoryChanged:nil];
+	[self replicationRunningChanged:nil];
+}
+
+- (void) replicationRunningChanged:(NSNotification*)aNote
+{
+	[replicationRunningTextField setStringValue: [model replicationRunning]?@"Replicating":@"NOT Replicating"];
+}
+
+
+- (void) keepHistoryChanged:(NSNotification*)aNote
+{
+	[keepHistoryCB setIntValue: [model keepHistory]];
+	[keepHistoryStatusField setStringValue:([model keepHistory] & ![model stealthMode])?@"":@"Disabled"];
 }
 
 - (void) stealthModeChanged:(NSNotification*)aNote
 {
 	[stealthModeButton setIntValue: [model stealthMode]];
+	[dbStatusField setStringValue:![model stealthMode]?@"":@"Disabled"];
+	[keepHistoryStatusField setStringValue:([model keepHistory] & ![model stealthMode])?@"":@"Disabled"];
 }
 
-- (void) hostNameChanged:(NSNotification*)aNote
+- (void) remoteHostNameChanged:(NSNotification*)aNote
 {
-	if([model hostName])[hostNameField setStringValue:[model hostName]];
+	if([model remoteHostName])[remoteHostNameField setStringValue:[model remoteHostName]];
 }
 
 - (void) userNameChanged:(NSNotification*)aNote
@@ -154,7 +175,8 @@
 
 - (void) dataBaseNameChanged:(NSNotification*)aNote
 {
-	if([model dataBaseName])[dataBaseNameField setStringValue:[model dataBaseName]];
+	[dataBaseNameField setStringValue:[model databaseName]];
+	[historyDataBaseNameField setStringValue:[model historyDatabaseName]];
 }
 
 - (void) couchDBLockChanged:(NSNotification*)aNote
@@ -162,11 +184,9 @@
     BOOL locked = [gSecurity isLocked:ORCouchDBLock];
     [couchDBLockButton setState: locked];
     
-    [hostNameField setEnabled:!locked];
-    [userNameField setEnabled:!locked];
-    [passwordField setEnabled:!locked];
-    [dataBaseNameField setEnabled:!locked];
-    
+    [remoteHostNameField setEnabled:!locked];
+    [keepHistoryCB setEnabled:!locked];
+    [stealthModeButton setEnabled:!locked];
 }
 
 - (void) checkGlobalSecurity
@@ -184,9 +204,30 @@
 	else if(dbSize > 1000000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.2f MB",dbSize/1000000.]];
 	else if(dbSize > 1000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.1f KB",dbSize/1000.]];
 	else [dbSizeField setStringValue:[NSString stringWithFormat:@"%d Bytes",dbSize]];
+
+	dbInfo = [model dBHistoryInfo];
+	dbSize = [[dbInfo objectForKey:@"disk_size"] unsignedLongValue];
+	if(dbSize > 1000000000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.2f GB",dbSize/1000000000.]];
+	else if(dbSize > 1000000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.2f MB",dbSize/1000000.]];
+	else if(dbSize > 1000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.1f KB",dbSize/1000.]];
+	else [dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%d Bytes",dbSize]];
+	
 }
 
 #pragma mark •••Actions
+- (IBAction) startReplicationAction:(id)sender
+{
+	[model startReplication];
+}
+- (IBAction) createRemoteDBAction:(id)sender
+{
+	[model createRemoteDataBases];
+}
+
+- (IBAction) keepHistoryAction:(id)sender
+{
+	[model setKeepHistory:[sender intValue]];	
+}
 
 - (IBAction) stealthModeAction:(id)sender
 {
@@ -198,9 +239,9 @@
     [gSecurity tryToSetLock:ORCouchDBLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) hostNameAction:(id)sender
+- (IBAction) remoteHostNameAction:(id)sender
 {
-	[model setHostName:[sender stringValue]];
+	[model setRemoteHostName:[sender stringValue]];
 }
 
 - (IBAction) userNameAction:(id)sender
@@ -217,7 +258,7 @@
 - (IBAction) createAction:(id)sender
 {
 	[self endEditing];
-	NSString* s = [NSString stringWithFormat:@"Really try to create a database named %@ on %@?\n",[model dataBaseName],[model hostName]];
+	NSString* s = [NSString stringWithFormat:@"Really try to create a database named %@?\n",[model databaseName]];
 	NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Create Database",
@@ -231,7 +272,7 @@
 - (IBAction) deleteAction:(id)sender
 {
 	[self endEditing];
-	NSString* s = [NSString stringWithFormat:@"Really delete a database named %@ on %@?\n",[model dataBaseName],[model hostName]];
+	NSString* s = [NSString stringWithFormat:@"Really delete a database named %@?\n",[model databaseName]];
 	NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Delete Database",
@@ -246,6 +287,11 @@
 - (IBAction) listAction:(id)sender
 {
 	[model listDatabases];
+}
+
+- (IBAction) listTasks:(id)sender
+{
+	[model getRemoteInfo:YES];
 }
 
 - (IBAction) infoAction:(id)sender

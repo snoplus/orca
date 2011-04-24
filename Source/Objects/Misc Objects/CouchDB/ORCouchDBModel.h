@@ -18,18 +18,24 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-
+@class ORCouchDB;
 @interface ORCouchDBModel : OrcaObject
 {
 @private
-	NSString*	hostName;
+	NSString*	remoteHostName;
     NSString*	userName;
     NSString*	password;
-    NSString*	dataBaseName;
 	BOOL		stealthMode;
 	NSDictionary* dBInfo;
+	NSDictionary* dBHistoryInfo;
 	NSMutableArray* dataMonitors;
 	BOOL statusUpdateScheduled;
+	BOOL historyUpdateScheduled;
+    BOOL keepHistory;
+	//cache
+	unsigned long runNumber;
+	unsigned long subRunNumber;
+    BOOL replicationRunning;
 }
 
 #pragma mark ***Initialization
@@ -45,28 +51,44 @@
 - (void) statusLogChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL) replicationRunning;
+- (void) setReplicationRunning:(BOOL)aReplicationRunning;
+- (BOOL) couchRunning;
+- (BOOL) keepHistory;
+- (void) setKeepHistory:(BOOL)aKeepHistory;
 - (BOOL) stealthMode;
 - (void) setStealthMode:(BOOL)aStealthMode;
-- (NSString*) dataBaseName;
-- (void) setDataBaseName:(NSString*)aDataBaseName;
 - (NSString*) password;
 - (void) setPassword:(NSString*)aPassword;
 - (NSString*) userName;
 - (void) setUserName:(NSString*)aUserName;
-- (NSString*) hostName;
-- (void) setHostName:(NSString*)aHostName;
+- (NSString*) remoteHostName;
+- (void) setRemoteHostName:(NSString*)aHostName;
 - (id) nextObject;
+- (NSString*) databaseName;
+- (NSString*) historyDatabaseName;
 - (NSString*) machineName;
 - (void) setDBInfo:(NSDictionary*)someInfo;
+- (void) setDBHistoryInfo:(NSDictionary*)someInfo;
+- (NSDictionary*) dBHistoryInfo;
 - (NSDictionary*) dBInfo;
 
 #pragma mark ***DB Access
+- (ORCouchDB*) statusDBRef;
+- (ORCouchDB*) historyDBRef;
+- (ORCouchDB*) remoteHistoryDBRef;
 - (void) createDatabase;
+- (void) createHistoryDatabase;
+- (void) createRemoteDataBases;
+- (void) startReplication;
+- (void) replicate:(BOOL)continuously;
 - (void) deleteDatabase;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag;
 //test functions
 - (void) databaseInfo:(BOOL)toStatusWindow;
 - (void) listDatabases;
+- (void) getRemoteInfo:(BOOL)verbose;
+- (void) processRemoteTaskList:(NSArray*)aList verbose:(BOOL)verbose;
 - (void) compactDatabase;
 - (void) updateDatabaseStats;
 
@@ -74,12 +96,14 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+
 @end
 
-extern NSString* ORCouchDBDataBaseNameChanged;
+extern NSString* ORCouchDBModelReplicationRunningChanged;
+extern NSString* ORCouchDBModelKeepHistoryChanged;
 extern NSString* ORCouchDBPasswordChanged;
 extern NSString* ORCouchDBUserNameChanged;
-extern NSString* ORCouchDBHostNameChanged;
+extern NSString* ORCouchDBRemoteHostNameChanged;
 extern NSString* ORCouchDBModelStealthModeChanged;
 extern NSString* ORCouchDBModelDBInfoChanged;
 extern NSString* ORCouchDBLock;
