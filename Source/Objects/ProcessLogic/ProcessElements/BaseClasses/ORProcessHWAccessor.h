@@ -67,6 +67,7 @@
 - (void) setCustomLabel:(NSString*)aCustomLabel;
 - (NSString*) displayFormat;
 - (void) setDisplayFormat:(NSString*)aDisplayFormat;
+- (NSDictionary*) dictionary;
 @end
 
 extern NSString* ORProcessHWAccessorViewIconTypeChanged;

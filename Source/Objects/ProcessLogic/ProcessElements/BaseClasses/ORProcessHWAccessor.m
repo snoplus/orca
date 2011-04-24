@@ -55,6 +55,11 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     [self setUpImage];
 }
 
+- (NSDictionary*) dictionary
+{
+	return nil;
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];

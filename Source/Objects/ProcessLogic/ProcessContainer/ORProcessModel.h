@@ -45,6 +45,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Accessors
+- (NSMutableDictionary*) dictionary;
 - (NSString*) historyFile;
 - (void) setHistoryFile:(NSString*)aHistoryFile;
 - (BOOL) keepHistory;
