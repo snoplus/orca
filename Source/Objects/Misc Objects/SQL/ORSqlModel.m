@@ -594,6 +594,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					s = [s stringByAppendingString:@"totalCounts mediumblob,"];
 					s = [s stringByAppendingString:@"thresholds mediumblob,"];
 					s = [s stringByAppendingString:@"gains mediumblob,"];
+					s = [s stringByAppendingString:@"ratesstr mediumblob,"];
+					s = [s stringByAppendingString:@"totalCountsstr mediumblob,"];
+					s = [s stringByAppendingString:@"thresholdsstr mediumblob,"];
+					s = [s stringByAppendingString:@"gainsstr mediumblob,"];
 					s = [s stringByAppendingString:@"PRIMARY KEY (experiment_id),"];
 					s = [s stringByAppendingString:@"KEY machine_id (machine_id),"];
 					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
@@ -904,12 +908,12 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 
-		[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
-		[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
-		[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
+		//[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
+		//[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
+		//[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
 		[self performSelector:@selector(updateUptime) withObject:nil afterDelay:2];
-		[self performSelector:@selector(statusLogChanged:) withObject:nil afterDelay:2];
-		[self postRunState:nil];
+		//[self performSelector:@selector(statusLogChanged:) withObject:nil afterDelay:2];
+		//[self postRunState:nil];
 	}
 }
 
@@ -1165,6 +1169,10 @@ Table: Histogram2Ds
  | totalCounts    | mediumblob  | YES  |     | NULL    |                |
  | thresholds     | mediumblob  | YES  |     | NULL    |                |
  | gains          | mediumblob  | YES  |     | NULL    |                |
+ | ratesstr       | mediumblob  | YES  |     | NULL    |                |
+ | totalCountsstr | mediumblob  | YES  |     | NULL    |                |
+ | thresholdsstr  | mediumblob  | YES  |     | NULL    |                |
+ | gainsstr       | mediumblob  | YES  |     | NULL    |                |
  +----------------+-------------+------+-----+---------+----------------+
  */ 
 - (void) updateExperiment
@@ -1778,23 +1786,31 @@ Table: Histogram2Ds
 				
 					//if we have a run entry, update it. Otherwise create it.
 					if(experiment_id){
-						[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE experiment SET thresholds=%@,gains=%@,totalCounts=%@,rates=%@ WHERE machine_id=%@",
+						[sqlConnection queryString:[NSString stringWithFormat:@"UPDATE experiment SET thresholds=%@,gains=%@,totalCounts=%@,rates=%@,thresholdsstr=%@,gainsstr=%@,totalCountsstr=%@,ratesstr=%@ WHERE machine_id=%@",
 													[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
 													[sqlConnection quoteObject:[experiment gainDataForSet:0]],
 													[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
 													[sqlConnection quoteObject:[experiment rateDataForSet:0]],
+													[sqlConnection quoteObject:[experiment thresholdDataAsStringForSet:0]],
+													[sqlConnection quoteObject:[experiment gainDataAsStringForSet:0]],
+													[sqlConnection quoteObject:[experiment totalCountDataAsStringForSet:0]],
+													[sqlConnection quoteObject:[experiment rateDataAsStringForSet:0]],
 													[sqlConnection quoteObject:machine_id]]];
 					}
 					else  {
 						int numberSegments = [experiment maxNumSegments];
-						[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO experiment (machine_id,experiment,numberSegments,thresholds,gains,totalCounts,rates) VALUES (%@,%@,%d,%@,%@,%@,%@)",
+						[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO experiment (machine_id,experiment,numberSegments,thresholds,gains,totalCounts,rates,thresholdsstr,gainsstr,totalCountsstr,ratesstr) VALUES (%@,%@,%d,%@,%@,%@,%@,%@,%@,%@,%@)",
 													[sqlConnection quoteObject:machine_id],
 													[sqlConnection quoteObject:experimentName],
 													numberSegments,
 													[sqlConnection quoteObject:[experiment thresholdDataForSet:0]],
 													[sqlConnection quoteObject:[experiment gainDataForSet:0]],
 													[sqlConnection quoteObject:[experiment totalCountDataForSet:0]],
-													[sqlConnection quoteObject:[experiment rateDataForSet:0]]]];
+													[sqlConnection quoteObject:[experiment rateDataForSet:0]],
+													[sqlConnection quoteObject:[experiment thresholdDataAsStringForSet:0]],
+													[sqlConnection quoteObject:[experiment gainDataAsStringForSet:0]],
+													[sqlConnection quoteObject:[experiment totalCountDataAsStringForSet:0]],
+													[sqlConnection quoteObject:[experiment rateDataAsStringForSet:0]]]];
 					}
 				}
 			}
@@ -1972,7 +1988,7 @@ Table: Histogram2Ds
 												  [sqlConnection quoteObject:[aProcess fullID]],
 												  [sqlConnection quoteObject:[aProcess shortName]],
 												  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-												  [sqlConnection quoteObject:[aProcess description]],
+												  [sqlConnection quoteObject:[aProcess report]],
 												  [aProcess processRunning],
 												  [sqlConnection quoteObject:process_id]];
 							[sqlConnection queryString:theQuery];
@@ -1984,7 +2000,7 @@ Table: Histogram2Ds
 												  [sqlConnection quoteObject:[aProcess fullID]],
 												  [sqlConnection quoteObject:[aProcess shortName]],
 												  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-												  [sqlConnection quoteObject:[aProcess description]],
+												  [sqlConnection quoteObject:[aProcess report]],
 												  [aProcess processRunning]];
 							[sqlConnection queryString:theQuery];
 						}

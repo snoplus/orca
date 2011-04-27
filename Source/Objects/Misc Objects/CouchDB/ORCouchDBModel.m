@@ -460,7 +460,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				if(![lastTimeStamp length]) lastTimeStamp = @"0";
 				if(![shortName length]) shortName = @"Untitled";
 				
-				NSString* s = [aProcess description];
+				NSString* s = [aProcess report];
 				
 				NSDictionary* processInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 											 [aProcess fullID],@"name",
