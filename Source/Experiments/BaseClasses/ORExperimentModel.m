@@ -716,6 +716,21 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	return theData;
 }
 
+- (NSString*) thresholdDataAsStringForSet:(int)aSet
+{
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	NSString* s = @"";
+	for(i = 0;i<numSegments;i++){
+		s = [s stringByAppendingFormat:@"%.0f",[segmentGroup getThreshold:i]];
+		if(i<numSegments-1)s = [s stringByAppendingString:@","];
+	}
+	return s;
+}
+
+
+
 - (NSMutableData*) gainDataForSet:(int)aSet
 {
 	NSMutableData* theData;
@@ -729,6 +744,18 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	}
 	
 	return theData;
+}
+- (NSString*) gainDataAsStringForSet:(int)aSet
+{
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	NSString* s = @"";
+	for(i = 0;i<numSegments;i++){
+		s = [s stringByAppendingFormat:@"%.0f",[segmentGroup getGain:i]];
+		if(i<numSegments-1)s = [s stringByAppendingString:@","];
+	}
+	return s;
 }
 
 - (NSMutableData*) rateDataForSet:(int)aSet;
@@ -744,6 +771,18 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 	}
 	return theData;
 }
+- (NSString*) rateDataAsStringForSet:(int)aSet
+{
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	NSString* s = @"";
+	for(i = 0;i<numSegments;i++){
+		s = [s stringByAppendingFormat:@"%.0f",[segmentGroup getRate:i]];
+		if(i<numSegments-1)s = [s stringByAppendingString:@","];
+	}
+	return s;
+}
 
 - (NSMutableData*) totalCountDataForSet:(int)aSet;
 {
@@ -757,6 +796,18 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 		p[i] = [segmentGroup getTotalCounts:i];
 	}
 	return theData;
+}
+- (NSString*) totalCountDataAsStringForSet:(int)aSet
+{
+	int numSegments = [self numberSegmentsInGroup:aSet];
+	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+	int i;
+	NSString* s = @"";
+	for(i = 0;i<numSegments;i++){
+		s = [s stringByAppendingFormat:@"%.0f",[segmentGroup getTotalCounts:i]];
+		if(i<numSegments-1)s = [s stringByAppendingString:@","];
+	}
+	return s;
 }
 
 @end

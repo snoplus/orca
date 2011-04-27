@@ -75,6 +75,10 @@
 - (NSMutableData*) gainDataForSet:(int)aSet;
 - (NSMutableData*) rateDataForSet:(int)aSet;
 - (NSMutableData*) totalCountDataForSet:(int)aSet;
+- (NSString*) thresholdDataAsStringForSet:(int)aSet;
+- (NSString*) gainDataAsStringForSet:(int)aSet;
+- (NSString*) rateDataAsStringForSet:(int)aSet;
+- (NSString*) totalCountDataAsStringForSet:(int)aSet;
 
 #pragma mark •••Convience Methods
 - (void) clearAlarm:(NSString*)aName;
