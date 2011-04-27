@@ -27,6 +27,7 @@
 - (id) eval;
 - (void) makeConnectors;
 - (BOOL) isTrueEndNode;
+- (NSString*) report;
 
 @end
 

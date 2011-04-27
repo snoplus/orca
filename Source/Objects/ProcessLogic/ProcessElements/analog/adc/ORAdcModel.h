@@ -43,6 +43,7 @@
 
 #pragma mark ***Accessors
 - (void) dealloc;
+- (NSString*) report;
 
 - (float) minChange;
 - (void) setMinChange:(float)aMinChange;

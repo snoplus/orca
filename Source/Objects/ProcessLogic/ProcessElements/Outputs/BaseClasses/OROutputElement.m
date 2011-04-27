@@ -57,6 +57,12 @@ NSString* OROutputElementOutConnection  = @"OROutputElementOutConnection";
     return [NSString stringWithFormat:@"%@\n%@%@",s,prefix,obj?[obj description:nextPrefix]:noConnectionString];
 }
 
+- (NSString*) report
+{	
+	NSString* s =  [NSString stringWithFormat:@"%@: %@",[self iconLabel],[self state]?@"High":@"Low"];
+	return s;
+}
+
 - (id) description
 {
 	NSString* s =  [super description];

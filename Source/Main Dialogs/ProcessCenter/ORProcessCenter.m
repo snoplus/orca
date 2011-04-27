@@ -346,11 +346,22 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	}
 }
 
+//the full description mostly used for debugging
 - (NSString*) description 
 {
 	NSString* theContent = @"";
 	for(id aProcess in processorList){
 		theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess description]];
+	}
+	return theContent;
+}
+
+//a sort of summary report suitable for email or printing
+- (NSString*) report 
+{
+	NSString* theContent = @"";
+	for(id aProcess in processorList){
+		theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess report]];
 	}
 	return theContent;
 }
@@ -363,7 +374,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process Center\n"];
 	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at %@\n",nextHeartbeat];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
-	theContent = [theContent stringByAppendingFormat:@"%@\n",[self description]];
+	theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
 	theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
 	for(id address in eMailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
@@ -429,7 +440,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	}
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
 	
-	theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess description]];
+	theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess report]];
 	
 	theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];

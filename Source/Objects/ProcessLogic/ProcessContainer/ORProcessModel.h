@@ -43,6 +43,7 @@
 }
 
 - (void) registerNotificationObservers;
+- (NSString*) report;
 
 #pragma mark ***Accessors
 - (NSMutableDictionary*) processDictionary;

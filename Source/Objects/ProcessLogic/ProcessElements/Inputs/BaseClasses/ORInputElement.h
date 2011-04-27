@@ -28,6 +28,7 @@
 }
 - (void) doCmdClick:(id)sender;
 - (int) connectedObjState;
+- (NSString*) report;
 @end
 
 extern NSString* ORInputElementInConnection;

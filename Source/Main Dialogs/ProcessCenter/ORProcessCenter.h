@@ -94,6 +94,7 @@
 - (void) sendStartStopNotice:(ORProcessModel*)aProcess started:(BOOL)state;
 - (void) eMailThread:(id)userInfo;
 - (void) setNextHeartbeatString;
+- (NSString*) report;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) saveDocument:(id)sender;

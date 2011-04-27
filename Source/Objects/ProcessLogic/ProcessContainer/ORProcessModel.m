@@ -642,6 +642,67 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	return aDictionary;
 }
 
+- (NSString*) report
+{
+	NSString* s = @"";
+	@synchronized(self){
+		NSString* theName;
+		if([[self shortName] length])theName = [self shortName];
+		else theName = [NSString stringWithFormat:@"%d",[self uniqueIdNumber]];
+		s =  [NSString stringWithFormat:@"\nProcess Name: %@ ",theName];
+		if(processRunning){
+			s = [s stringByAppendingString:@"[Running]\n"];
+			s = [s stringByAppendingFormat:@"Sample Rate: %.1f Hz\n\n",sampleRate];
+			
+			//collect info from each type we want a report from...
+			int adcCount   = 0;
+			int inputCount = 0;
+			int outputCount = 0;
+			for(id anObj in [self orcaObjects]){
+				if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")])     adcCount++;
+				if([anObj isKindOfClass:NSClassFromString(@"ORInputElement")]) inputCount++;
+				if([anObj isKindOfClass:NSClassFromString(@"OROutputRelayModel")]) outputCount++;
+			}
+			if(adcCount) {
+				s = [s stringByAppendingFormat:@"--ADCs--\n"];
+				for(id anObj in [self orcaObjects]){
+					if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
+						s = [s stringByAppendingFormat:@"%@\n",[anObj report]];
+					}
+				}
+				s= [s stringByAppendingString:@"\n"];
+			}
+
+			if(inputCount) {
+				s = [s stringByAppendingFormat:@"--Binary Inputs--\n"];
+				for(id anObj in [self orcaObjects]){
+					if([anObj isKindOfClass:NSClassFromString(@"ORInputElement")]){
+						s = [s stringByAppendingFormat:@"%@\n",[anObj report]];
+					}
+				}
+				s= [s stringByAppendingString:@"\n"];
+			}
+			
+			if(outputCount) {
+				s = [s stringByAppendingFormat:@"--Binary Outputs--\n"];
+				for(id anObj in [self orcaObjects]){
+					if([anObj isKindOfClass:NSClassFromString(@"OROutputRelayModel")]){
+						s = [s stringByAppendingFormat:@"%@\n",[anObj report]];
+					}
+				}
+				s= [s stringByAppendingString:@"\n"];
+			}
+			
+		}
+		else {
+			s = [s stringByAppendingString:@"[NOT RUNNING]\n"];
+		}
+		s = [s stringByAppendingString:@"\n"];
+	}
+	return s;
+	
+}
+
 - (id) description
 {
 	NSString* s = @"";
@@ -652,7 +713,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 		s =  [NSString stringWithFormat:@"\nProcess %@ ",theName];
 		if(processRunning){
 			s = [s stringByAppendingString:@"[Running]\n"];
-			s = [s stringByAppendingFormat:@"Sample Rate: %.1f\n",sampleRate];
+			s = [s stringByAppendingFormat:@"Sample Rate: %.1f Hz\n",sampleRate];
 			for(id anObj in [self orcaObjects]){
 				if([anObj isKindOfClass:NSClassFromString(@"ORProcessHWAccessor")]){
 					s = [s stringByAppendingFormat:@"%@\n",anObj];

@@ -45,12 +45,19 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
     return [NSString stringWithFormat:@"%@\n%@%@",s,prefix,obj?[obj description:nextPrefix]:noConnectionString];
 }
 
+- (NSString*) report
+{	
+	NSString* s =  [NSString stringWithFormat:@"%@: %@",[self iconLabel],[self state]?@"High":@"Low"];
+	return s;
+}
+
 - (id) description
 {
 	NSString* s =  [super description];
 	s =  [s stringByAppendingFormat:@"[State: %d]",[self evaluatedState]];
 	return s;
 }
+
 
 - (void) doCmdClick:(id)sender
 {
@@ -123,21 +130,6 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 //--------------------------------
-- (NSString*) iconLabel
-{
-	if(![self useAltView]){
-		if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
-		else		return @""; 
-	}
-	else {
-		if(labelType == 1)return @"";
-		else if(labelType ==2)return [self customLabel];
-		else {
-			if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
-			else		return @""; 
-		}
-	}
-}
 
 @end
 
@@ -201,7 +193,10 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 - (NSString*) iconLabel
 {
 	if(![self useAltView]){
-		if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		if(hwName)	{
+			if(labelType ==2) return [self customLabel];
+			else return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		}
 		else		return @""; 
 	}
 	else {
@@ -213,6 +208,7 @@ NSString* ORInputElementOutConnection  = @"ORInputElementOutConnection";
 		}
 	}
 }
+
 
 @end
 

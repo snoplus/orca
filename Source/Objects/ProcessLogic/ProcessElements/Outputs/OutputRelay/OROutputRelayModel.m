@@ -137,8 +137,11 @@
 - (NSString*) iconLabel
 {
 	if(![self useAltView]){
-		if(hwName)	return [NSString stringWithFormat:@"%@,%d",hwName,bit];
-		else		return @""; 
+		if(hwName){
+			if(labelType ==2) return [self customLabel];
+			else return [NSString stringWithFormat:@"%@,%d",hwName,bit];
+		}
+		else return @""; 
 	}
 	else {
 		if(labelType == 1)return @"";

@@ -226,6 +226,15 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	else return @"";
 }
 
+- (NSString*) report
+{	
+	NSString* s =  [NSString stringWithFormat:@"%@: %@ ",[self iconLabel],[self iconValue]];
+	if(valueTooLow)		  s =  [s stringByAppendingString:@" [LOW ALARM POSTED] "];
+	else if(valueTooHigh) s =  [s stringByAppendingString:@" [HIGH ALARM POSTED]"];
+	return s;
+	
+}
+
 - (id) description
 {
 	NSString* s = [self iconLabel];
