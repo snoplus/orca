@@ -602,13 +602,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		docList = someInfo;
 		
 		//---------temp---- for a db repair
-		id theDocArray = [docList objectForKey:@"rows"];
-		for(id aDoc in theDocArray){
-			id docId = [aDoc objectForKey:@"id"];
-			if([docId rangeOfString:@"/"].location == NSNotFound){
-				[[self historyDBRef] fixDocument:docId tag:kDocumentUpdated];
-			}
-		}
+		//		id theDocArray = [docList objectForKey:@"rows"];
+		//for(id aDoc in theDocArray){
+		//	id docId = [aDoc objectForKey:@"id"];
+		//	if([docId rangeOfString:@"/"].location == NSNotFound){
+		//		[[self historyDBRef] fixDocument:docId tag:kDocumentUpdated];
+		//	}
+		//}
 		//------------------------------------
 		
 	}
