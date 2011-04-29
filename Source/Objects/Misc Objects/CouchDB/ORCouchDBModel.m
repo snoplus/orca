@@ -58,6 +58,7 @@ NSString* ORCouchDBLock						= @"ORCouchDBLock";
 #define kInfoInternalDB  @"kInfoInternalDB"
 #define kAttachmentAdded @"kAttachmentAdded"
 #define kInfoHistoryDB   @"kInfoHistoryDB"
+#define kListDocuments	 @"kListDocuments"
 
 #define kCouchDBPort 5984
 
@@ -96,6 +97,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [password release];
     [userName release];
     [remoteHostName release];
+	[docList release];
 	[super dealloc];
 }
 
@@ -407,10 +409,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	NSDictionary* aMapDictionary;
 	NSMutableDictionary* aViewDictionary = [NSMutableDictionary dictionary];
 
-	aMap            = @"function(doc) {if(doc.title){emit([doc.timestamp,doc.title],doc);}}";
+	aMap            = @"function(doc) {if(doc.title){emit([doc.time,doc.title],doc);}}";
 	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
 	[aViewDictionary setObject:aMapDictionary forKey:@"adcs"]; 
-
+	
 	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
 							  @"javascript",@"language",
 							  aViewDictionary,@"views",
@@ -451,12 +453,15 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				NSDate *localDate = [aProcess lastSampleTime];
 				
 				NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-				dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+				dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
 				
 				NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
 				[dateFormatter setTimeZone:gmt];
 				NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
-				[dateFormatter release];			
+				NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+				unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+				[dateFormatter release];
+				
 				if(![lastTimeStamp length]) lastTimeStamp = @"0";
 				if(![shortName length]) shortName = @"Untitled";
 				
@@ -466,6 +471,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 											 [aProcess fullID],@"name",
 											 shortName,@"title",
 											 lastTimeStamp,@"timestamp",
+											 [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
 											 s,@"data",
 											 [NSNumber numberWithUnsignedLong:[aProcess processRunning]] ,@"state",
 											 nil];
@@ -534,12 +540,15 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				NSDate *localDate = [aProcess lastSampleTime];
 				
 				NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-				dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+				dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
 				
 				NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
 				[dateFormatter setTimeZone:gmt];
 				NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
-				[dateFormatter release];			
+				NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+				unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+				[dateFormatter release];
+				
 				
 				if(![lastTimeStamp length]) lastTimeStamp = @"0";
 				if(![shortName length]) shortName = @"Untitled";
@@ -551,6 +560,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 												[aProcess fullID],	@"name",
 												shortName,			@"title",
 												lastTimeStamp,		@"timestamp",
+												[NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
 												nil];
 					
 					[processInfo addEntriesFromDictionary:processDictionary];
@@ -580,6 +590,27 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[someInfo retain];
 		[dBInfo release];
 		dBInfo = someInfo;
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelDBInfoChanged object:self];
+}
+
+- (void) setDocuments:(NSDictionary*)someInfo
+{
+	@synchronized(self){
+		[someInfo retain];
+		[docList release];
+		docList = someInfo;
+		
+		//---------temp---- for a db repair
+		id theDocArray = [docList objectForKey:@"rows"];
+		for(id aDoc in theDocArray){
+			id docId = [aDoc objectForKey:@"id"];
+			if([docId rangeOfString:@"/"].location == NSNotFound){
+				[[self historyDBRef] fixDocument:docId tag:kDocumentUpdated];
+			}
+		}
+		//------------------------------------
+		
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelDBInfoChanged object:self];
 }
@@ -637,7 +668,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				else if([aTag isEqualToString:kInfoHistoryDB]){
 					[self performSelectorOnMainThread:@selector(setDBHistoryInfo:) withObject:aResult waitUntilDone:NO];
 				}
-							
+				else if([aTag isEqualToString:kListDocuments]){
+					[self performSelectorOnMainThread:@selector(setDocuments:) withObject:aResult waitUntilDone:NO];
+				}
+				
 				else if([aTag isEqualToString:@"Message"]){
 					[aResult prettyPrint:@"CouchDB Message:"];
 				}
@@ -710,6 +744,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) listDatabases
 {
 	[[self statusDBRef] listDatabases:self tag:kListDB];
+}
+
+//temp......
+- (void) listDocuments
+{
+	[[self historyDBRef] listDocuments:self tag:kListDocuments];
 }
 
 - (void) getRemoteInfo:(BOOL)verbose

@@ -294,6 +294,11 @@
 	[model getRemoteInfo:YES];
 }
 
+- (IBAction) listDocumentsAction:(id)sender
+{
+	[model listDocuments];
+}
+
 - (IBAction) infoAction:(id)sender
 {
 	[model databaseInfo:YES];

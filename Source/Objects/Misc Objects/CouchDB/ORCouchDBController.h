@@ -66,6 +66,7 @@
 - (IBAction) infoAction:(id)sender;
 - (IBAction) compactAction:(id)sender;
 - (IBAction) listTasks:(id)sender;
+- (IBAction) listDocumentsAction:(id)sender;
 
 
 @end

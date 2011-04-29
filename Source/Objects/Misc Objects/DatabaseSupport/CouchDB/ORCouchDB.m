@@ -94,6 +94,13 @@
 	[anOp release];
 }
 
+- (void) listDocuments:(id)aDelegate tag:(NSString*)aTag
+{
+	ORCouchDBListDocsOp* anOp = [[ORCouchDBListDocsOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	[ORCouchDBQueue addOperation:anOp];
+	[anOp release];
+}
+
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag
 {
 	ORCouchDBListTasksOp* anOp = [[ORCouchDBListTasksOp alloc] initWithHost:host port:port database:nil delegate:delegate tag:aTag];
@@ -160,6 +167,16 @@
 {
 	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
+	[anOp setUsername:username];
+	[anOp setPwd:pwd];
+	[ORCouchDBQueue addOperation:anOp];
+	[anOp release];
+}
+
+- (void) fixDocument:(NSString*)anId tag:(NSString*)aTag;
+{
+	ORCouchDBFixDocumentOp* anOp = [[ORCouchDBFixDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	[anOp setDocument:nil documentID:anId];
 	[anOp setUsername:username];
 	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
@@ -329,6 +346,16 @@
 	[self sendToDelegate:result];
 }
 @end
+
+@implementation ORCouchDBListDocsOp
+-(void) main
+{
+	if([self isCancelled])return;
+	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/_all_docs", host, port,database]];
+	[self sendToDelegate:result];
+}
+@end
+
 @implementation ORCouchDBListTasksOp
 -(void) main
 {
@@ -544,6 +571,46 @@
 }
 
 @end
+
+//---------temp---- for a db repair
+@implementation ORCouchDBFixDocumentOp
+- (void) main
+{
+	if([self isCancelled])return;
+	//check for an existing document
+	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+	id result = [self send:httpString];
+	if(!result){
+		result = [NSDictionary dictionaryWithObjectsAndKeys:
+				  [NSString stringWithFormat:@"[%@] timeout",
+				   database],@"Message",nil];
+		[self sendToDelegate:result];
+	}
+	else if([result objectForKey:@"error"]){
+		//document doesn't exist. So just add it.
+		result = [self send:httpString type:@"PUT" body:document];
+		if(![result objectForKey:@"error"] && attachmentData){
+			[self addAttachement];
+		}
+	}
+	else {
+		NSString* timeStamp = [result objectForKey:@"timestamp"];
+		timeStamp = [timeStamp stringByReplacingOccurrencesOfString:@"-" withString:@"/"];
+		[result setObject:timeStamp forKey:@"timestamp"];
+		
+		//create unix time
+		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+		NSDate* gmtTime = [dateFormatter dateFromString:timeStamp];
+		unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+		[result setObject:[NSNumber numberWithUnsignedLong:secondsSince1970] forKey:@"time"];
+			
+		result = [self send:httpString type:@"PUT" body:result];
+
+	}
+}
+@end
+//-------------------------
 
 @implementation ORCouchDBUpdateDocumentOp
 - (void) main

@@ -36,6 +36,7 @@
 	unsigned long runNumber;
 	unsigned long subRunNumber;
     BOOL replicationRunning;
+	NSDictionary* docList;
 }
 
 #pragma mark ***Initialization
@@ -87,6 +88,7 @@
 //test functions
 - (void) databaseInfo:(BOOL)toStatusWindow;
 - (void) listDatabases;
+- (void) listDocuments;
 - (void) getRemoteInfo:(BOOL)verbose;
 - (void) processRemoteTaskList:(NSArray*)aList verbose:(BOOL)verbose;
 - (void) compactDatabase;

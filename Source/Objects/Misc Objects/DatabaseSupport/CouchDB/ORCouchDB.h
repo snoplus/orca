@@ -47,7 +47,10 @@
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag;
-
+- (void) listDocuments:(id)aDelegate tag:(NSString*)aTag;
+//---------temp---- for a db repair
+- (void) fixDocument:(NSString*)anId tag:(NSString*)aTag;
+//--------------------------------
 #pragma mark ***CouchDB Checks
 - (BOOL) couchDBRunning;
 
@@ -112,6 +115,10 @@
 - (void) main;
 @end
 
+@interface ORCouchDBListDocsOp:ORCouchDBOperation
+-(void) main;
+@end
+
 @interface ORCouchDBListDBOp :ORCouchDBOperation
 - (void) main;
 @end
@@ -138,6 +145,12 @@
 - (void) main;
 - (id) addAttachement;
 @end
+
+//---------temp---- for a db repair
+@interface ORCouchDBFixDocumentOp :ORCouchDBPutDocumentOp
+- (void) main;
+@end
+//---------------------------------
 
 @interface ORCouchDBUpdateDocumentOp :ORCouchDBPutDocumentOp
 - (void) main;
