@@ -196,6 +196,7 @@ static const int currentVersion = 1;           // Current version
 
 - (float) processLimitHigh
 {
+	if(processLimitHigh<50)processLimitHigh=50;
     return processLimitHigh;
 }
 
@@ -203,6 +204,7 @@ static const int currentVersion = 1;           // Current version
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setProcessLimitHigh:processLimitHigh];
     if(aProcessLimitHigh<50)aProcessLimitHigh=50;
+    if(aProcessLimitHigh>100)aProcessLimitHigh=100;
     processLimitHigh = aProcessLimitHigh;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelProcessLimitHighChanged object:self];
