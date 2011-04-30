@@ -68,6 +68,8 @@
 - (id)		extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray;
 - (id)		sleepFunc:(id)p;
 - (id)		timeFunc;
+- (id)		runShellCmd:(id)p;
+
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
 @end
@@ -553,6 +555,7 @@
 		case CATSTRING:		return [self catString:p];
 		case ALARM:			return [self postAlarm:p];
 		case CLEAR:			return [self clearAlarm:p];
+		case SHELL:			return [self runShellCmd:p];
 			
 			//printing
 		case PRINT:			return [self print:p];
@@ -779,6 +782,38 @@
 	
 	return nil;
 }	
+
+- (id) runShellCmd:(id)p
+{
+	//blocks
+	NSString* s = NodeValue(0);
+	s = [s trimSpacesFromEnds];
+	s = [s removeExtraSpaces];
+	NSLog(@"Shell: %@\n",s);
+	NSMutableArray* parts = [[[s componentsSeparatedByString:@" "] mutableCopy] autorelease];
+	if([parts count]){
+		NSString* command = [[[parts objectAtIndex:0] retain] autorelease];
+		NSArray* args = nil;
+		if([parts count] >=2){
+			[parts removeObjectAtIndex:0];
+			args = parts;
+		}
+		NSTask *task			 = [[NSTask alloc] init];
+		NSPipe *newPipe			 = [NSPipe pipe];
+		NSFileHandle *readHandle = [newPipe fileHandleForReading];
+		[task setLaunchPath:command];
+		if(args)[task setArguments:args];
+		[task setStandardOutput:newPipe];
+		[task setStandardError:newPipe];
+		[task launch];
+		NSData* inData = [readHandle readDataToEndOfFile];
+		NSString* tempString = [[NSString alloc] initWithData:inData encoding:NSASCIIStringEncoding];
+		[task release];
+		[tempString autorelease];
+		NSLog(@"%@\n", tempString);
+	}
+	return nil;
+}
 
 - (id) openLogFile:(id) p
 {

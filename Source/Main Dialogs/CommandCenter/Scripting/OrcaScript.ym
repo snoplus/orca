@@ -33,7 +33,7 @@
 %token <symKey> VARIABLE
 %token FUNCTION WHILE DO FOR IF PRINT LOGFILE PRINTFILE FIND MAKE BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN TIME FIXED SCI 
-%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT
+%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT SHELL
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSARRAY
 %nonassoc ELSE
 
@@ -47,7 +47,7 @@
 %type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object sci_statement fixed_statement
 %type <nPtr> case_statement case_list constant_expr point_str rect_str wait_statement alarm_statement
 %type <nPtr> primary_expr multiplicative_expr postfix_expr unary_expr  additive_expr time_statement
-%type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr
+%type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr shell_statement
 %type <nPtr> logical_and_expr logical_or_expr conditional_expr assignment_expr leftArrayElement objectPtr
 
 %start program
@@ -86,6 +86,7 @@ statement
 
 special_statement 
 : objC ';'							 { $$ = $1; }
+| shell_statement					 { $$ = $1; }
 | print_statement					 { $$ = $1; }
 | printfile_statement				 { $$ = $1; }
 | log_statement ';' 				 { $$ = $1; }
@@ -341,6 +342,14 @@ print_statement
 : PRINT '(' print_list ')' ';'	{ $$ = executionNode(PRINT, $3,nil); }
 | PRINT  print_list  ';'		{ $$ = executionNode(PRINT, $2,nil); }
 ;
+
+//---shell stuff-----------------------------------------------------------
+//ex: print "test:",i;
+//ex: print ("test:",i);
+shell_statement
+: SHELL  print_list  ';'		{ $$ = executionNode(SHELL, $2,nil); }
+;
+
 
 printfile_statement
 : PRINTFILE '(' print_list ')' ';'	{ $$ = executionNode(PRINTFILE, $3,nil); }

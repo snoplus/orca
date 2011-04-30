@@ -112,6 +112,7 @@ E			[Ee][+-]?{D}+
 "time"			return TIME;
 "sci"			return SCI;
 "fixed"			return FIXED;
+"shell"			return SHELL;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);
