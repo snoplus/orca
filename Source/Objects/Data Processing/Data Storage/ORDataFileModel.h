@@ -22,6 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDataChainObject.h"
 #import "ORDataProcessing.h"
+#import "ORAdcProcessing.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORQueue;
@@ -33,7 +34,7 @@
 #define kRestartOnLimit 1
 #define kMinDiskSpace   500 //MBytes
 
-@interface ORDataFileModel :  ORDataChainObject <ORDataProcessing>
+@interface ORDataFileModel :  ORDataChainObject <ORDataProcessing,ORAdcProcessing>
 {
     @private
         NSFileHandle*	filePointer;
@@ -67,9 +68,14 @@
 		NSTimeInterval	lastFileCheckTime;
 		NSString*		openFilePath;
 		BOOL			savedFirstTime; //use to force a config save
+		BOOL			processCheckedOnce;
+		float			percentFull;
+		float			processLimitHigh;
 }
 
 #pragma mark ¥¥¥Accessors
+- (float) processLimitHigh;
+- (void) setProcessLimitHigh:(float)aProcessLimitHigh;
 - (BOOL) useDatedFileNames;
 - (void) setUseDatedFileNames:(BOOL)aUseDatedFileNames;
 - (BOOL) useFolderStructure;
@@ -118,10 +124,22 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+#pragma mark ¥¥¥Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
 @end
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORDataFileModelProcessLimitHighChanged;
 extern NSString* ORDataFileModelUseDatedFileNamesChanged;
 extern NSString* ORDataFileModelUseFolderStructureChanged;
 extern NSString* ORDataFileModelFilePrefixChanged;

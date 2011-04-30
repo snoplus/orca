@@ -27,6 +27,7 @@
 #import "ORStatusController.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORDataFileModelProcessLimitHighChanged = @"ORDataFileModelProcessLimitHighChanged";
 NSString* ORDataFileModelUseDatedFileNamesChanged	= @"ORDataFileModelUseDatedFileNamesChanged";
 NSString* ORDataFileModelUseFolderStructureChanged	= @"ORDataFileModelUseFolderStructureChanged";
 NSString* ORDataFileModelFilePrefixChanged			= @"ORDataFileModelFilePrefixChanged";
@@ -192,6 +193,20 @@ static const int currentVersion = 1;           // Current version
 
 
 #pragma mark ¥¥¥Accessors
+
+- (float) processLimitHigh
+{
+    return processLimitHigh;
+}
+
+- (void) setProcessLimitHigh:(float)aProcessLimitHigh
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setProcessLimitHigh:processLimitHigh];
+    if(aProcessLimitHigh<50)aProcessLimitHigh=50;
+    processLimitHigh = aProcessLimitHigh;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelProcessLimitHighChanged object:self];
+}
 
 - (BOOL) useDatedFileNames
 {
@@ -433,7 +448,6 @@ static const int currentVersion = 1;           // Current version
     lastTime	 = [NSDate timeIntervalSinceReferenceDate];
     fileSegment = 1;
 	fileLimitExceeded = NO;
-	
     if(processedRunStart) return;
     else {
         processedRunStart = YES;
@@ -456,7 +470,9 @@ static const int currentVersion = 1;           // Current version
 			NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:fullFileName];
 			[fp seekToEndOfFile];
             [self setFilePointer:fp];
-        }
+			processCheckedOnce	= NO;
+
+		}
         
         [[NSNotificationCenter defaultCenter]
 		 postNotificationName:ORDataFileStatusChangedNotification
@@ -581,6 +597,7 @@ static const int currentVersion = 1;           // Current version
 	
 	[openFilePath release];
 	openFilePath = nil;
+	percentFull = 0;
 }
 
 - (void) runTaskBoundary
@@ -627,6 +644,9 @@ static const int currentVersion = 1;           // Current version
 	if (!diskError) {
 		if(diskInfo){
 			long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
+			long long totalSpace = [[diskInfo objectForKey:NSFileSystemSize] longLongValue]; 
+			percentFull = 100 - 100*freeSpace/(double)totalSpace;
+									
 			if(freeSpace < kMinDiskSpace * 1024 * 1024){
 				if(!diskFullAlarm){
 					diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
@@ -679,6 +699,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setProcessLimitHigh:[decoder decodeFloatForKey:@"processLimitHigh"]];
     [self setUseDatedFileNames:	[decoder decodeBoolForKey:@"ORDataFileModelUseDatedFileNames"]];
     [self setMaxFileSize:		[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
     [self setLimitSize:			[decoder decodeBoolForKey:@"ORDataFileModelLimitSize"]];
@@ -732,6 +753,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeFloat:processLimitHigh forKey:@"processLimitHigh"];
     [encoder encodeBool:useDatedFileNames	forKey:@"ORDataFileModelUseDatedFileNames"];
     [encoder encodeBool:useFolderStructure	forKey:@"ORDataFileModelUseFolderStructure"];
     [encoder encodeObject:filePrefix		forKey:@"ORDataFileModelFilePrefix"];
@@ -758,6 +780,83 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     return objDictionary;
 }
 
+
+#pragma mark ¥¥¥Bit Processing Protocol
+- (void) processIsStarting
+{
+    processCheckedOnce = NO;
+}
+
+- (void) processIsStopping
+{
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{
+    if(!processCheckedOnce){
+        @try { 
+			[self checkDiskStatus];
+            processCheckedOnce = YES;
+        }
+		@catch(NSException* localException) { 
+			//catch this here to prevent it from falling thru, but nothing to do.
+        }
+    }
+}
+
+- (void) endProcessCycle
+{
+}
+
+
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"DataStorage,%d",[self uniqueIdNumber]];
+}
+
+- (NSString*) processingTitle
+{
+    return [self identifier];
+}
+
+- (double) convertedValue:(int)aChan
+{
+	
+	NSTimeInterval thisTime = [NSDate timeIntervalSinceReferenceDate];
+	if(fabs(lastFileCheckTime - thisTime) > 30){
+		lastFileCheckTime = thisTime;
+		[self performSelectorOnMainThread:@selector(checkDiskStatus) withObject:nil waitUntilDone:NO];
+	}
+	return percentFull;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	return 100; //%
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return 0; //%
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		*theLowLimit = 0;
+		*theHighLimit =  [self processLimitHigh];
+	}		
+}
+
+- (BOOL) processValue:(int)channel
+{
+	return percentFull!=0;
+}
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do
+}
 @end
 
 @implementation ORDataFileModel (private)

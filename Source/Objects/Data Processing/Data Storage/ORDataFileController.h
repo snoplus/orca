@@ -22,6 +22,7 @@
 @interface ORDataFileController : OrcaObjectController  {
     @private
 	IBOutlet NSTextField* 	dirTextField;
+	IBOutlet NSTextField*   processLimitHighField;
 	IBOutlet NSButton*		useDatedFileNamesCB;
 	IBOutlet NSButton*		useFolderStructureCB;
 	IBOutlet NSTextField*	filePrefixTextField;
@@ -57,6 +58,7 @@
 #pragma mark ¥¥¥Accessors
 
 #pragma  mark ¥¥¥Actions
+- (IBAction) processLimitHighAction:(id)sender;
 - (IBAction) useDatedFileNamesAction:(id)sender;
 - (IBAction) useFolderStructureAction:(id)sender;
 - (IBAction) filePrefixTextFieldAction:(id)sender;
@@ -69,6 +71,7 @@
 - (IBAction) lockButtonAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
+- (void) processLimitHighChanged:(NSNotification*)aNote;
 - (void) useDatedFileNamesChanged:(NSNotification*)aNote;
 - (void) useFolderStructureChanged:(NSNotification*)aNote;
 - (void) filePrefixChanged:(NSNotification*)aNote;

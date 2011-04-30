@@ -70,7 +70,12 @@ enum {
 
 #pragma  mark ¥¥¥Actions
 
-- (void) useDatedFileNamesAction:(id)sender
+- (IBAction) processLimitHighAction:(id)sender
+{
+	[model setProcessLimitHigh:[sender floatValue]];	
+}
+
+- (IBAction) useDatedFileNamesAction:(id)sender
 {
 	[model setUseDatedFileNames:[sender intValue]];	
 }
@@ -138,6 +143,11 @@ enum {
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) processLimitHighChanged:(NSNotification*)aNote
+{
+	[processLimitHighField setFloatValue: [model processLimitHigh]];
+}
 
 - (void) useDatedFileNamesChanged:(NSNotification*)aNote
 {
@@ -268,6 +278,11 @@ enum {
                          name : ORDataFileModelSizeLimitReachedActionChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(processLimitHighChanged:)
+                         name : ORDataFileModelProcessLimitHighChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -287,6 +302,7 @@ enum {
 	[self useFolderStructureChanged:nil];
 	[self useDatedFileNamesChanged:nil];
 	[self sizeLimitReachedActionChanged:nil];
+	[self processLimitHighChanged:nil];
 }
 
 
