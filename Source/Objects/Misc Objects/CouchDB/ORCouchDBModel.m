@@ -560,6 +560,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 												[aProcess fullID],	@"name",
 												shortName,			@"title",
 												lastTimeStamp,		@"timestamp",
+												secondsSince1970,		@"time",
 												[NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
 												nil];
 					
