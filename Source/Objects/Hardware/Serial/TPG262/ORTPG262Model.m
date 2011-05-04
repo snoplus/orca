@@ -187,7 +187,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*8]];
+															object:[NSData dataWithBytes:data length:sizeof(long)*6]];
 	}
 }
 
