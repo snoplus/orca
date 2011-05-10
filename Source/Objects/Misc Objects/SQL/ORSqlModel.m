@@ -253,14 +253,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 	else {
 		[self addMachineName];
-		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-		if([runObjects count]){
-			ORRunModel* rc = [runObjects objectAtIndex:0];
-			NSDictionary* runInfo = [rc runInfo];
-			if(runInfo){
-				[self postRunState:[NSNotification notificationWithName:@"DoesNotMatter" object:rc userInfo:runInfo]];
-			}
-		}
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSqlModelStealthModeChanged object:self];
 }
@@ -908,12 +900,21 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[ORSqlDBQueue addOperation:anOp];
 		[anOp release];
 
-		//[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
-		//[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
-		//[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
-		[self performSelector:@selector(updateUptime) withObject:nil afterDelay:2];
-		//[self performSelector:@selector(statusLogChanged:) withObject:nil afterDelay:2];
 		//[self postRunState:nil];
+		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+		if([runObjects count]){
+			ORRunModel* rc = [runObjects objectAtIndex:0];
+			NSDictionary* runInfo = [rc runInfo];
+			if(runInfo){
+				[self postRunState:[NSNotification notificationWithName:@"DoesNotMatter" object:rc userInfo:runInfo]];
+			}
+		}
+		[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
+		[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
+		[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
+		[self performSelector:@selector(updateUptime) withObject:nil afterDelay:2];
+		[self performSelector:@selector(updateStatus) withObject:nil afterDelay:2];
+		
 	}
 }
 
