@@ -526,63 +526,67 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (void) startProcessCycle
 {
-	if(!sampleGateOpen){
-		NSDate* now = [NSDate date];
-		if([now timeIntervalSinceDate:lastSampleTime] >= 1.0/sampleRate){
-			sampleGateOpen  = YES;
+	if(processRunning){
+		if(!sampleGateOpen){
+			NSDate* now = [NSDate date];
+			if([now timeIntervalSinceDate:lastSampleTime] >= 1.0/sampleRate){
+				sampleGateOpen  = YES;
+			}
 		}
 	}
 }
 
 - (void) endProcessCycle
 {
-	if(sampleGateOpen){
-		@synchronized(self){
-			[lastSampleTime release];
-			lastSampleTime = [[NSDate date] retain];
+	if(processRunning){
+		if(sampleGateOpen){
+			@synchronized(self){
+				[lastSampleTime release];
+				lastSampleTime = [[NSDate date] retain];
+			}
 		}
-	}
-	sampleGateOpen = NO;
-	
-	if(keepHistory && [historyFile length]){
-		NSString* header = @"#";
-		if(writeHeader){
+		sampleGateOpen = NO;
+		
+		if(keepHistory && [historyFile length]){
+			NSString* header = @"#";
+			if(writeHeader){
+				for(id anObj in [self orcaObjects]){
+					if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
+						header = [header stringByAppendingFormat:@" SampleTime\t%@",[anObj iconLabel]];
+					}
+				}
+				header = [header stringByAppendingString:@"\n"];
+			}
+			
+			NSString* s = @"";
 			for(id anObj in [self orcaObjects]){
 				if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
-					header = [header stringByAppendingFormat:@" SampleTime\t%@",[anObj iconLabel]];
+					s = [s stringByAppendingFormat:@"\t%@",[anObj iconValue] ];
 				}
 			}
-			header = [header stringByAppendingString:@"\n"];
-		}
-		
-		NSString* s = @"";
-		for(id anObj in [self orcaObjects]){
-			if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
-				s = [s stringByAppendingFormat:@"\t%@",[anObj iconValue] ];
-			}
-		}
-		if([s length]){
-			//get the time(UT!)
-			time_t	ut_Time;
-			time(&ut_Time);
-			if(ut_Time - lastHistorySample >= 10){
-				lastHistorySample = ut_Time;
-				NSString* finalString = [NSString stringWithFormat:@"%d%@\n",ut_Time,s];
-				if(writeHeader){
-					finalString = [header stringByAppendingString:finalString];
-					writeHeader = NO;
-				}
-				NSString* fullPath = [historyFile stringByExpandingTildeInPath];
-				NSFileManager* fm = [NSFileManager defaultManager];
-				if(![fm fileExistsAtPath: fullPath]){
-					[finalString writeToFile:fullPath atomically:NO encoding:NSASCIIStringEncoding error:nil];
-				}
-				else {
-					NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:fullPath];
-					[fh seekToEndOfFile];
-					[fh writeData:[finalString dataUsingEncoding:NSASCIIStringEncoding]];
-					[fh closeFile];
-					[self checkForAchival];
+			if([s length]){
+				//get the time(UT!)
+				time_t	ut_Time;
+				time(&ut_Time);
+				if(ut_Time - lastHistorySample >= 10){
+					lastHistorySample = ut_Time;
+					NSString* finalString = [NSString stringWithFormat:@"%d%@\n",ut_Time,s];
+					if(writeHeader){
+						finalString = [header stringByAppendingString:finalString];
+						writeHeader = NO;
+					}
+					NSString* fullPath = [historyFile stringByExpandingTildeInPath];
+					NSFileManager* fm = [NSFileManager defaultManager];
+					if(![fm fileExistsAtPath: fullPath]){
+						[finalString writeToFile:fullPath atomically:NO encoding:NSASCIIStringEncoding error:nil];
+					}
+					else {
+						NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:fullPath];
+						[fh seekToEndOfFile];
+						[fh writeData:[finalString dataUsingEncoding:NSASCIIStringEncoding]];
+						[fh closeFile];
+						[self checkForAchival];
+					}
 				}
 			}
 		}
