@@ -1184,6 +1184,7 @@
 		84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
 		84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */; };
 		84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
+		845772F613674CAB007175C4 /* history.html in Resources */ = {isa = PBXBuildFile; fileRef = 845772F513674CAB007175C4 /* history.html */; };
 		8457BE3511B0183500C4082D /* ORSIS3820Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */; };
 		8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */; };
 		8457BE3711B0183500C4082D /* ORSIS3820Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */; };
@@ -1206,6 +1207,12 @@
 		8457D25612F9986E00D3E3B4 /* ORiSeg8ChanHVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */; };
 		8457D37712F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */; };
 		8457D37812F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */; };
+		8459A8D4137C1FEC0029C5B6 /* ORComparatorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8459A8D0137C1FEC0029C5B6 /* ORComparatorController.h */; };
+		8459A8D5137C1FEC0029C5B6 /* ORComparatorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8459A8D1137C1FEC0029C5B6 /* ORComparatorController.m */; };
+		8459A8D6137C1FEC0029C5B6 /* ORComparatorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8459A8D2137C1FEC0029C5B6 /* ORComparatorModel.h */; };
+		8459A8D7137C1FEC0029C5B6 /* ORComparatorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8459A8D3137C1FEC0029C5B6 /* ORComparatorModel.m */; };
+		8459A8DB137C2C6E0029C5B6 /* Comparator.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8459A8DA137C2C6E0029C5B6 /* Comparator.tif */; };
+		8459A8DD137C2C760029C5B6 /* Comparator.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8459A8DC137C2C760029C5B6 /* Comparator.nib */; };
 		845B13F71227E5D40022F207 /* ORPxiIOCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13F51227E5D40022F207 /* ORPxiIOCard.h */; };
 		845B13F81227E5D40022F207 /* ORPxiIOCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B13F61227E5D40022F207 /* ORPxiIOCard.m */; };
 		845B14061227E7DC0022F207 /* ORPxi6289Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */; };
@@ -3734,6 +3741,7 @@
 		8455097910CEF7DD008A019C /* ORCaen965Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen965Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Decoder.m; sourceTree = SOURCE_ROOT; };
 		84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN965Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.cc; sourceTree = SOURCE_ROOT; };
 		84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN965Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.hh; sourceTree = SOURCE_ROOT; };
+		845772F513674CAB007175C4 /* history.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = history.html; path = ../../Dropbox/CouchApps/orcas/_attachments/history.html; sourceTree = SOURCE_ROOT; };
 		8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Controller.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.h; sourceTree = SOURCE_ROOT; };
 		8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3820Controller.m; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.m; sourceTree = SOURCE_ROOT; };
 		8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Decoders.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Decoders.h; sourceTree = SOURCE_ROOT; };
@@ -3756,6 +3764,12 @@
 		8457D25412F9986E00D3E3B4 /* ORiSeg8ChanHVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVController.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.m"; sourceTree = SOURCE_ROOT; };
 		8457D37512F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORiSeg8ChanHVDecoders.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.h"; sourceTree = SOURCE_ROOT; };
 		8457D37612F9AB8A00D3E3B4 /* ORiSeg8ChanHVDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORiSeg8ChanHVDecoders.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVDecoders.m"; sourceTree = SOURCE_ROOT; };
+		8459A8D0137C1FEC0029C5B6 /* ORComparatorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORComparatorController.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorController.h; sourceTree = SOURCE_ROOT; };
+		8459A8D1137C1FEC0029C5B6 /* ORComparatorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORComparatorController.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorController.m; sourceTree = SOURCE_ROOT; };
+		8459A8D2137C1FEC0029C5B6 /* ORComparatorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORComparatorModel.h; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorModel.h; sourceTree = SOURCE_ROOT; };
+		8459A8D3137C1FEC0029C5B6 /* ORComparatorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORComparatorModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorModel.m; sourceTree = SOURCE_ROOT; };
+		8459A8DA137C2C6E0029C5B6 /* Comparator.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Comparator.tif; sourceTree = "<group>"; };
+		8459A8DC137C2C760029C5B6 /* Comparator.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Comparator.nib; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/Comparator.nib; sourceTree = SOURCE_ROOT; };
 		845B13F51227E5D40022F207 /* ORPxiIOCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiIOCard.h; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.h"; sourceTree = SOURCE_ROOT; };
 		845B13F61227E5D40022F207 /* ORPxiIOCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiIOCard.m; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.m"; sourceTree = SOURCE_ROOT; };
 		845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi6289Controller.h; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Controller.h; sourceTree = SOURCE_ROOT; };
@@ -5473,6 +5487,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
+				845772F513674CAB007175C4 /* history.html */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -6317,6 +6332,7 @@
 			isa = PBXGroup;
 			children = (
 				840EFFD60944B28F00049827 /* BaseClasses */,
+				8459A8CF137C1FEC0029C5B6 /* Comparator */,
 				840B7B99094A649D00B1B135 /* Joiner */,
 				840B7B9A094A64A600B1B135 /* Splitter */,
 				840EFFCF0944B28F00049827 /* AndGate */,
@@ -7611,6 +7627,20 @@
 			);
 			name = EHS8260p;
 			path = Source/Objects/Hardware/HV/MPod/EHS8260p;
+			sourceTree = SOURCE_ROOT;
+		};
+		8459A8CF137C1FEC0029C5B6 /* Comparator */ = {
+			isa = PBXGroup;
+			children = (
+				8459A8D2137C1FEC0029C5B6 /* ORComparatorModel.h */,
+				8459A8D3137C1FEC0029C5B6 /* ORComparatorModel.m */,
+				8459A8D0137C1FEC0029C5B6 /* ORComparatorController.h */,
+				8459A8D1137C1FEC0029C5B6 /* ORComparatorController.m */,
+				8459A8DA137C2C6E0029C5B6 /* Comparator.tif */,
+				8459A8DC137C2C760029C5B6 /* Comparator.nib */,
+			);
+			name = Comparator;
+			path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator;
 			sourceTree = SOURCE_ROOT;
 		};
 		845B13FD1227E7DC0022F207 /* Pxi6289 */ = {
@@ -12369,6 +12399,8 @@
 				43E9ED461339044100888F93 /* ORAuxHw.h in Headers */,
 				8494D85913393D8A00DD5F9E /* ORRunListController.h in Headers */,
 				8494D85B13393D8A00DD5F9E /* ORRunListModel.h in Headers */,
+				8459A8D4137C1FEC0029C5B6 /* ORComparatorController.h in Headers */,
+				8459A8D6137C1FEC0029C5B6 /* ORComparatorModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13151,6 +13183,9 @@
 				841224DE132E6638001AC05B /* TPG262.tif in Resources */,
 				8494D85D13393D8A00DD5F9E /* RunList.nib in Resources */,
 				8494D85E13393D8A00DD5F9E /* RunList.tif in Resources */,
+				845772F613674CAB007175C4 /* history.html in Resources */,
+				8459A8DB137C2C6E0029C5B6 /* Comparator.tif in Resources */,
+				8459A8DD137C2C760029C5B6 /* Comparator.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14036,6 +14071,8 @@
 				43E9ED471339044100888F93 /* ORAuxHw.m in Sources */,
 				8494D85A13393D8A00DD5F9E /* ORRunListController.m in Sources */,
 				8494D85C13393D8A00DD5F9E /* ORRunListModel.m in Sources */,
+				8459A8D5137C1FEC0029C5B6 /* ORComparatorController.m in Sources */,
+				8459A8D7137C1FEC0029C5B6 /* ORComparatorModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
