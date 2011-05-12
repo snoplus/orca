@@ -33,7 +33,10 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 {
 	id anAdapter = [guardian adapter];
 	if(anAdapter)return anAdapter;
-	else [NSException raise:@"No adapter" format:@"You must place a Pxi adaptor card into the crate."];
+	else {
+		NSLogColor([NSColor redColor],@"You must place a MPod adaptor card into the crate.");
+		[NSException raise:@"No adapter" format:@"You must place a MPod adaptor card into the crate."];
+	}
 	return nil;
 }
 
