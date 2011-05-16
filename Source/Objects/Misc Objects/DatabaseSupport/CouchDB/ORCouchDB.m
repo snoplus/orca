@@ -218,9 +218,10 @@
 		NSFileHandle* file = [pipe fileHandleForReading];
 		
 		[task launch];
+		NSData* data = [file readDataToEndOfFile];		
 		[task waitUntilExit];
 		
-		NSData* data = [file readDataToEndOfFile];
+
 		NSString* result = [[[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding] autorelease];
 		if([result rangeOfString:@"couchdb"].location != NSNotFound &&
 		   [result rangeOfString:@"erlang"].location != NSNotFound) {
