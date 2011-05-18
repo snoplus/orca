@@ -1184,7 +1184,6 @@
 		84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
 		84550CB210D03476008A019C /* ORCAEN965Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */; };
 		84550CB310D03476008A019C /* ORCAEN965Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */; };
-		845772F613674CAB007175C4 /* history.html in Resources */ = {isa = PBXBuildFile; fileRef = 845772F513674CAB007175C4 /* history.html */; };
 		8457BE3511B0183500C4082D /* ORSIS3820Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */; };
 		8457BE3611B0183500C4082D /* ORSIS3820Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */; };
 		8457BE3711B0183500C4082D /* ORSIS3820Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */; };
@@ -3172,7 +3171,7 @@
 		840EFFA90944B28F00049827 /* ORProcessModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessModel.m; path = Source/Objects/ProcessLogic/ProcessContainer/ORProcessModel.m; sourceTree = SOURCE_ROOT; };
 		840EFFAA0944B28F00049827 /* Process.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Process.nib; path = Source/Objects/ProcessLogic/ProcessContainer/Process.nib; sourceTree = SOURCE_ROOT; };
 		840EFFAB0944B28F00049827 /* Process.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Process.tif; path = Source/Objects/ProcessLogic/ProcessContainer/Process.tif; sourceTree = SOURCE_ROOT; };
-		840EFFAE0944B28F00049827 /* ORProcessElementController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessElementController.h; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/ORProcessElementController.h; sourceTree = SOURCE_ROOT; };
+		840EFFAE0944B28F00049827 /* ORProcessElementController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORProcessElementController.h; sourceTree = "<group>"; };
 		840EFFAF0944B28F00049827 /* ORProcessElementController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessElementController.m; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/ORProcessElementController.m; sourceTree = SOURCE_ROOT; };
 		840EFFB00944B28F00049827 /* ORProcessElementModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORProcessElementModel.h; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/ORProcessElementModel.h; sourceTree = SOURCE_ROOT; };
 		840EFFB10944B28F00049827 /* ORProcessElementModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORProcessElementModel.m; path = Source/Objects/ProcessLogic/ProcessElements/BaseClasses/ORProcessElementModel.m; sourceTree = SOURCE_ROOT; };
@@ -3741,7 +3740,6 @@
 		8455097910CEF7DD008A019C /* ORCaen965Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen965Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV965/ORCaen965Decoder.m; sourceTree = SOURCE_ROOT; };
 		84550CAE10D033F2008A019C /* ORCAEN965Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN965Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.cc; sourceTree = SOURCE_ROOT; };
 		84550CAF10D033F2008A019C /* ORCAEN965Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN965Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN965Readout.hh; sourceTree = SOURCE_ROOT; };
-		845772F513674CAB007175C4 /* history.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = history.html; path = ../../Dropbox/CouchApps/orcas/_attachments/history.html; sourceTree = SOURCE_ROOT; };
 		8457BE2D11B0183500C4082D /* ORSIS3820Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Controller.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.h; sourceTree = SOURCE_ROOT; };
 		8457BE2E11B0183500C4082D /* ORSIS3820Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3820Controller.m; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Controller.m; sourceTree = SOURCE_ROOT; };
 		8457BE2F11B0183500C4082D /* ORSIS3820Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3820Decoders.h; path = Source/Objects/Hardware/Vme/SIS3820/ORSIS3820Decoders.h; sourceTree = SOURCE_ROOT; };
@@ -5487,7 +5485,6 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
-				845772F513674CAB007175C4 /* history.html */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -13183,7 +13180,6 @@
 				841224DE132E6638001AC05B /* TPG262.tif in Resources */,
 				8494D85D13393D8A00DD5F9E /* RunList.nib in Resources */,
 				8494D85E13393D8A00DD5F9E /* RunList.tif in Resources */,
-				845772F613674CAB007175C4 /* history.html in Resources */,
 				8459A8DB137C2C6E0029C5B6 /* Comparator.tif in Resources */,
 				8459A8DD137C2C760029C5B6 /* Comparator.nib in Resources */,
 			);
