@@ -17,7 +17,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
     uint16_t sValue;
     //--------------------------------------------------------------------------//
 
-    if(index<0)return -1;
+    //if(index<0)return -1;
     
     //read the status register
     baseAddress = GetBaseAddress(); 

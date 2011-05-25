@@ -1,6 +1,6 @@
 #include "ORShaperReadout.hh"
 #include <errno.h>
-#import <sys/timeb.h>
+#include <sys/timeb.h>
 
 bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
 {
