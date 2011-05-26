@@ -14,7 +14,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t gtidShortForm;
     uint32_t result;
     uint32_t lValue;
-    uint16_t sValue;
+    uint16_t sValue = 0;
     //--------------------------------------------------------------------------//
 
     //if(index<0)return -1;
