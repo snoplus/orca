@@ -78,6 +78,7 @@
 - (ORCouchDB*) statusDBRef;
 - (ORCouchDB*) historyDBRef;
 - (ORCouchDB*) remoteHistoryDBRef;
+- (ORCouchDB*) remoteDBRef;
 - (void) createDatabase;
 - (void) createHistoryDatabase;
 - (void) createRemoteDataBases;

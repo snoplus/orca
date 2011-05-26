@@ -219,6 +219,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelReplicationRunningChanged object:self];
 }
+
 - (BOOL) keepHistory
 {
     return keepHistory;
@@ -232,7 +233,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		if(keepHistory){
 			[self createHistoryDatabase];
 		}
-
 	} 
 	else keepHistory=NO;
 
@@ -362,6 +362,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self historyDatabaseName] delegate:self];
 }
 
+- (ORCouchDB*) remoteDBRef
+{
+	return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:[self databaseName] delegate:self];
+}
+
 - (void) createDatabase
 {
 	//set up the views
@@ -406,13 +411,28 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) createHistoryDatabase
 {			
 	NSString*     aMap;
-	NSDictionary* aMapDictionary;
+	NSString*     aReduce;
+	NSDictionary* aDictionary;
 	NSMutableDictionary* aViewDictionary = [NSMutableDictionary dictionary];
 
 	aMap            = @"function(doc) {if(doc.title){emit([doc.time,doc.title],doc);}}";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
-	[aViewDictionary setObject:aMapDictionary forKey:@"adcs"]; 
+	aDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
+	[aViewDictionary setObject:aDictionary forKey:@"adcs"]; 
+
 	
+    NSBundle* mainBundle = [NSBundle mainBundle];
+	NSString*   mapPath = [mainBundle pathForResource: @"CouchHistoryAveMap" ofType: @"txt"];
+	NSString*   reducePath = [mainBundle pathForResource: @"CouchHistoryAveReduce" ofType: @"txt"];
+    if([[NSFileManager defaultManager] fileExistsAtPath:mapPath] && [[NSFileManager defaultManager] fileExistsAtPath:reducePath] ){
+		aMap         = [NSString stringWithContentsOfFile:mapPath encoding:NSASCIIStringEncoding error:nil];
+		aReduce      = [NSString stringWithContentsOfFile:reducePath encoding:NSASCIIStringEncoding error:nil];
+		NSMutableDictionary* aDictionary  = [NSMutableDictionary dictionary];
+		[aDictionary setObject:aMap forKey:@"map"];
+		[aDictionary setObject:aReduce forKey:@"reduce"];
+		[aViewDictionary setObject:aDictionary forKey:@"ave"]; 
+    }
+	
+
 	NSDictionary* theViews = [NSDictionary dictionaryWithObjectsAndKeys:
 							  @"javascript",@"language",
 							  aViewDictionary,@"views",
@@ -425,11 +445,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) createRemoteDataBases;
 {			
 	[[self remoteHistoryDBRef] createDatabase:kCreateRemoteDB views:nil];
+	[[self remoteDBRef] createDatabase:kCreateRemoteDB views:nil];
 }
 
 - (void) replicate:(BOOL)continuously
 {			
 	[[self remoteHistoryDBRef] replicateLocalDatabase:kReplicateDB continous:continuously];
+	[[self remoteDBRef] replicateLocalDatabase:kReplicateDB continous:continuously];
 }
 
 

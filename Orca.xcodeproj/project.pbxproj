@@ -1212,6 +1212,8 @@
 		8459A8D7137C1FEC0029C5B6 /* ORComparatorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8459A8D3137C1FEC0029C5B6 /* ORComparatorModel.m */; };
 		8459A8DB137C2C6E0029C5B6 /* Comparator.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8459A8DA137C2C6E0029C5B6 /* Comparator.tif */; };
 		8459A8DD137C2C760029C5B6 /* Comparator.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8459A8DC137C2C760029C5B6 /* Comparator.nib */; };
+		8459AD2C138D92F90029C5B6 /* CouchHistoryAveMap.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8459AD2B138D92F90029C5B6 /* CouchHistoryAveMap.txt */; };
+		8459AD30138D93240029C5B6 /* CouchHistoryAveReduce.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8459AD2F138D93240029C5B6 /* CouchHistoryAveReduce.txt */; };
 		845B13F71227E5D40022F207 /* ORPxiIOCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13F51227E5D40022F207 /* ORPxiIOCard.h */; };
 		845B13F81227E5D40022F207 /* ORPxiIOCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B13F61227E5D40022F207 /* ORPxiIOCard.m */; };
 		845B14061227E7DC0022F207 /* ORPxi6289Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */; };
@@ -3768,6 +3770,8 @@
 		8459A8D3137C1FEC0029C5B6 /* ORComparatorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORComparatorModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/ORComparatorModel.m; sourceTree = SOURCE_ROOT; };
 		8459A8DA137C2C6E0029C5B6 /* Comparator.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Comparator.tif; sourceTree = "<group>"; };
 		8459A8DC137C2C760029C5B6 /* Comparator.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Comparator.nib; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Comparator/Comparator.nib; sourceTree = SOURCE_ROOT; };
+		8459AD2B138D92F90029C5B6 /* CouchHistoryAveMap.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CouchHistoryAveMap.txt; sourceTree = "<group>"; };
+		8459AD2F138D93240029C5B6 /* CouchHistoryAveReduce.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CouchHistoryAveReduce.txt; sourceTree = "<group>"; };
 		845B13F51227E5D40022F207 /* ORPxiIOCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxiIOCard.h; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.h"; sourceTree = SOURCE_ROOT; };
 		845B13F61227E5D40022F207 /* ORPxiIOCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxiIOCard.m; path = "Source/Objects/Hardware/PXI/Pxi Base Classes/ORPxiIOCard.m"; sourceTree = SOURCE_ROOT; };
 		845B13FE1227E7DC0022F207 /* ORPxi6289Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPxi6289Controller.h; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Controller.h; sourceTree = SOURCE_ROOT; };
@@ -5713,6 +5717,8 @@
 				84052A2913106B65007607A4 /* ORCouchDBController.m */,
 				84052A2A13106B65007607A4 /* ORCouchDBModel.h */,
 				84052A2B13106B65007607A4 /* ORCouchDBModel.m */,
+				8459AD2B138D92F90029C5B6 /* CouchHistoryAveMap.txt */,
+				8459AD2F138D93240029C5B6 /* CouchHistoryAveReduce.txt */,
 			);
 			name = CouchDB;
 			path = "Source/Objects/Misc Objects/CouchDB";
@@ -13182,6 +13188,8 @@
 				8494D85E13393D8A00DD5F9E /* RunList.tif in Resources */,
 				8459A8DB137C2C6E0029C5B6 /* Comparator.tif in Resources */,
 				8459A8DD137C2C760029C5B6 /* Comparator.nib in Resources */,
+				8459AD2C138D92F90029C5B6 /* CouchHistoryAveMap.txt in Resources */,
+				8459AD30138D93240029C5B6 /* CouchHistoryAveReduce.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
