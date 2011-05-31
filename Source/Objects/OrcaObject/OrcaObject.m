@@ -914,6 +914,11 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 {
 	return 0;
 }
+
+- (BOOL) acceptsObject:(id) anObject
+{
+	return NO;
+}
 @end
 
 @implementation OrcaObject (scriptingAdditions)

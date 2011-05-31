@@ -193,6 +193,7 @@ extern NSString* ORObjArrayPtrPBType;
 //return default values
 @interface OrcaObject (cardSupport)
 - (short) numberSlotsUsed;
+- (BOOL) acceptsObject:(id) anObject;
 @end
 
 @interface OrcaObject (scriptingAdditions)
