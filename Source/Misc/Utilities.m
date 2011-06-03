@@ -296,7 +296,7 @@ NSString* computerName()
 #else																						// pre-10.6 fallback
 	computerName = [[NSHost currentHost] name];
 #endif	
-	
+	computerName = [computerName stringByReplacingOccurrencesOfString:@".local" withString:@""];
 	return computerName;
 }
 
