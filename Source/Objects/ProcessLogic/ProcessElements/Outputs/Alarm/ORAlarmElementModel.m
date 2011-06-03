@@ -23,6 +23,7 @@
 #import "ORAlarmElementModel.h"
 
 
+NSString* ORAlarmElementModelNoAlarmNameChanged     = @"ORAlarmElementModelNoAlarmNameChanged";
 NSString* ORAlarmElementNameChangedNotification     = @"ORAlarmElementNameChangedNotification";
 NSString* ORAlarmElementHelpChangedNotification     = @"ORAlarmElementHelpChangedNotification";
 NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityChangedNotification";
@@ -39,11 +40,36 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 
 - (void) dealloc
 {
+    [noAlarmName release];
     [alarm clearAlarm];
     [alarm release];
     [alarmName release];
     [alarmHelp release];
     [super dealloc];
+}
+
+#pragma mark ***Accessors
+
+- (NSString*) noAlarmName
+{
+	if(!noAlarmName)return @"";
+    else return noAlarmName;
+}
+
+- (void) setNoAlarmName:(NSString*)aNoAlarmName
+{
+	if(!aNoAlarmName)aNoAlarmName = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setNoAlarmName:noAlarmName];
+    
+    [noAlarmName autorelease];
+    noAlarmName = [aNoAlarmName copy];  
+	
+	[self setUpImage];
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORAlarmElementNameChangedNotification
+	 object:self];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmElementModelNoAlarmNameChanged object:self];
 }
 
 - (BOOL) canBeInAltView
@@ -211,6 +237,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setNoAlarmName:[decoder decodeObjectForKey:@"noAlarmName"]];
     [self setAlarmSeverity:[decoder decodeIntForKey:@"alarmSeverity"]];
     [self setAlarmName:[decoder decodeObjectForKey: @"alarmName"]];
     [self setAlarmHelp:[decoder decodeObjectForKey: @"alarmHelp"]];
@@ -223,6 +250,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:noAlarmName forKey:@"noAlarmName"];
     [encoder encodeInt:alarmSeverity forKey:@"alarmSeverity"];
     [encoder encodeObject:alarmName forKey:@"alarmName"];
     [encoder encodeObject:alarmHelp forKey:@"alarmHelp"];
@@ -254,18 +282,20 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 {		
 	NSImage* anImage;
 	NSColor* theColor;
+	NSString* theNameToUse = alarmName;
 	if([self state]) {
 		anImage = [NSImage imageNamed:@"BlankRed"];
 		theColor = [NSColor blackColor];
 	}
 	else {
 		anImage = [NSImage imageNamed:@"BlankGreen"];
-		theColor = [NSColor colorWithCalibratedWhite:.2 alpha:1];		
+		theColor = [NSColor colorWithCalibratedWhite:.2 alpha:1];
+		if([noAlarmName length])theNameToUse = noAlarmName;
 	}
 	
 	NSFont* theFont = [NSFont fontWithName:@"Geneva" size:10];
 	NSAttributedString* s = [[NSAttributedString alloc] 
-							   initWithString:alarmName
+							   initWithString:theNameToUse
 							   attributes:	[NSDictionary dictionaryWithObjectsAndKeys:
 											 theFont,NSFontAttributeName,
 											 theColor,NSForegroundColorAttributeName,nil]];
