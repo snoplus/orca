@@ -105,7 +105,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     if(![self aWake]){
 		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
-		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:3];
+		[self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
+		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 		[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
     }
     [super wakeUp];
@@ -118,6 +119,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[self deleteDatabase];
 	[super sleep];
 }
+
+
 
 - (void) setUpImage
 {
@@ -201,7 +204,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) awakeAfterDocumentLoaded
 {
-	[self runStatusChanged:nil];
+	[self updateRunInfo];
 	[self alarmsChanged:nil];
 	[self statusLogChanged:nil];
 }
@@ -797,6 +800,15 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[self updateRunState:[aNote object]];
 }
 
+- (void) updateRunInfo
+{
+	NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+	if([runObjects count]){
+		ORRunModel* rc = [runObjects objectAtIndex:0];
+		[self updateRunState:rc];
+		[self updateDataSets];
+	}
+}
 - (void) updateRunState:(ORRunModel*)rc
 {
 	if(!stealthMode){

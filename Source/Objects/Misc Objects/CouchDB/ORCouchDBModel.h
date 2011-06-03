@@ -94,6 +94,7 @@
 - (void) processRemoteTaskList:(NSArray*)aList verbose:(BOOL)verbose;
 - (void) compactDatabase;
 - (void) updateDatabaseStats;
+- (void) updateRunInfo;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
