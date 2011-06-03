@@ -24,6 +24,8 @@
 #import "ORRunModel.h"
 #import "ORMailCenter.h"
 #import "SynthesizeSingleton.h"
+#import "ORAlarm.h"
+#import "ORAlarmCollection.h"
 
 NSString* ORStatusFlushedNotification	 = @"ORStatusFlushedNotification";
 NSString* ORStatusLogUpdatedNotification = @"ORStatusLogUpdatedNotification";
@@ -34,6 +36,7 @@ ORStatusController* theLogger = nil;
 @interface ORStatusController (private)
 - (void) loadLogBookPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveAsLogBookDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 #define kStatusConnection @"StatusConnection"
@@ -66,7 +69,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [super dealloc];
 }
 
--(void)awakeFromNib
+-(void) awakeFromNib
 {
     [statusView setEditable:NO];
     [outlineView setDataSource:self];
@@ -74,9 +77,26 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     
 	logBookDirty = NO;
 	[saveLogBookButton setEnabled:NO];
+
+	//load the alarm history
+	NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
+	alarmHistoryPath = [alarmHistoryPath stringByAppendingPathComponent:@"Alarms"];
+	NSString* s = [NSString stringWithContentsOfFile:alarmHistoryPath encoding:NSASCIIStringEncoding error:nil];
+	NSArray* lines = [s componentsSeparatedByString:@"\n"];
+	for(id aLine in lines)	{
+		[self printAlarm:aLine];
+	}
+	NSCalendarDate* now  	= [NSCalendarDate calendarDate];
+	[now setCalendarFormat:@"%m%d%y %H:%M:%S"];
+	s = [NSString stringWithFormat:@"%@ ORCA started",now];
+	[self updateAlarmLog:s];
+	
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textDidChange:) name:NSControlTextDidChangeNotification object:logBookField];
-	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmPosted:) name:ORAlarmAddedToCollection object : nil];	
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmCleared:) name:ORAlarmRemovedFromCollection object : nil];	
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmAcknowledged:) name:ORAlarmWasAcknowledgedNotification object : nil];	
+
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
@@ -174,14 +194,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     
     [[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:aFont forKey:NSFontAttributeName ]
                                       range:NSMakeRange([self statusTextlength]-len+16,len-16)];
-    
-    
 }
-
 
 - (oneway void) logError: (NSString*)anError usingKeyArray:(NSArray*)keys
 {
-    
     if(!dataSet){
         [self setDataSet:[[[ORDataSet alloc]initWithKey:@"Errors" guardian:nil] autorelease] ];
     }
@@ -193,6 +209,24 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
         scheduledToUpdate = YES;
         [self performSelector:@selector(updateErrorDisplay) withObject:nil afterDelay:1.0];
     }
+}
+
+-(void) printAlarm: (NSString*)s1
+{
+	if([s1 length]){
+		s1 = [s1 stringByAppendingString:@"\n"];
+		if([self alarmLogTextlength]){
+			[alarmLogView replaceCharactersInRange:NSMakeRange([self alarmLogTextlength], 0) withString:s1];
+			[alarmLogView scrollRangeToVisible: NSMakeRange([self alarmLogTextlength], 0)];	
+		}
+		else {
+			[alarmLogView setString:s1];
+		}
+		int len = [s1 length];
+		
+		[[alarmLogView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
+										  range:NSMakeRange([self alarmLogTextlength]-len,16)];
+	}
 }
 
 - (NSString*) contents
@@ -245,6 +279,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (int) statusTextlength
 {
     return [[statusView textStorage] length];
+}
+
+- (int) alarmLogTextlength
+{
+    return [[alarmLogView textStorage] length];
 }
 
 - (NSString*) text
@@ -474,6 +513,68 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     else [dataSet removeObject:item];
 }
 
+- (void) alarmPosted:(NSNotification*)aNote
+{
+	ORAlarm* alarm = [aNote object];
+	NSCalendarDate* aDate = [NSCalendarDate dateWithNaturalLanguageString:[alarm timePosted]];
+	[aDate setCalendarFormat:@"%m%d%y %H:%M:%S"];
+	NSString* s = [NSString stringWithFormat:@"%@ Posted: %@ [%@]",aDate,[alarm name],[alarm severityName]];
+	[self updateAlarmLog:s];
+}
+
+- (void) alarmCleared:(NSNotification*)aNote
+{
+	ORAlarm* alarm = [aNote object];
+	NSCalendarDate* aDate = [NSCalendarDate dateWithNaturalLanguageString:[alarm timePosted]];
+	[aDate setCalendarFormat:@"%m%d%y %H:%M:%S"];
+	NSString* s = [NSString stringWithFormat:@"%@ Cleared: %@ [%@]",aDate,[alarm name],[alarm severityName]];
+	[self updateAlarmLog:s];
+}
+
+- (void) alarmAcknowledged:(NSNotification*)aNote
+{
+	ORAlarm* alarm = [aNote object];
+	
+	NSCalendarDate* aDate = [NSCalendarDate dateWithNaturalLanguageString:[alarm timePosted]];
+	[aDate setCalendarFormat:@"%m%d%y %H:%M:%S"];
+
+	NSString* s = [NSString stringWithFormat:@"%@ Acknowledged: %@ [%@]",aDate,[alarm name],[alarm severityName]];
+	[self updateAlarmLog:s];
+}
+
+- (void) updateAlarmLog:(NSString*)s
+{
+	if([s length]){
+		[self printAlarm:s];
+		
+		NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
+		alarmHistoryPath = [alarmHistoryPath stringByAppendingPathComponent:@"Alarms"];
+		NSFileManager* fm = [NSFileManager defaultManager];
+		if(![fm fileExistsAtPath:alarmHistoryPath]){
+			[fm createFileAtPath:alarmHistoryPath contents:nil attributes:nil];
+		}
+		NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:alarmHistoryPath];
+		[fh seekToEndOfFile];
+		s = [s stringByAppendingString:@"\n"];
+		[fh writeData:[s dataUsingEncoding:NSASCIIStringEncoding]];
+		[fh closeFile];
+	}
+}
+
+- (IBAction) clearAlarmHistoryAction:(id)sender
+{
+	NSBeginAlertSheet(@"Really delete the Alarm history?",
+                      @"Cancel",
+                      @"Yes, Delete It",
+                      nil,[self window],
+                      self,
+                      @selector(deleteHistoryActionDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Deletion of the history can not be undone.");
+	
+}
+
+
 #pragma  mark ¥¥¥Delegate Responsiblities
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
@@ -527,7 +628,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 }
 
 
-#pragma mark ¥¥¥Archival
+#pragma mark ¥¥¥Archivale
 - (void) decode:(NSCoder*) aDecoder
 {
 	[[[NSApp delegate] undoManager] disableUndoRegistration];
@@ -787,5 +888,17 @@ void NSLogError(NSString* aString,...)
 		[saveLogBookButton setEnabled:NO];
 		
     }
+}
+
+- (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){		
+		NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
+		alarmHistoryPath = [alarmHistoryPath stringByAppendingPathComponent:@"Alarms"];
+		NSFileManager* fm = [NSFileManager defaultManager];
+		[fm removeItemAtPath:alarmHistoryPath error:nil];
+		[alarmLogView setString:@""];
+		NSLog(@"Alarm history deleted\n");
+	}
 }
 @end

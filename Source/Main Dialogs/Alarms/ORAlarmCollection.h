@@ -114,4 +114,5 @@ extern NSString* ORAlarmCollectionAddressRemoved;
 
 extern NSString* ORAlarmSeveritySelectionChanged;
 extern NSString* ORAlarmAddressChanged;
-
+extern NSString* ORAlarmAddedToCollection;
+extern NSString* ORAlarmRemovedFromCollection;

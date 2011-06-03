@@ -49,6 +49,7 @@
 	NSArray* allWaveFormsInMemory;
     NSString* serialNumber;
 	ORAlarm*  noUSBAlarm;
+	BOOL okToCheckUSB;
 }
 
 - (void) makeUSBConnectors;

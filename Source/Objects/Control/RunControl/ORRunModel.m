@@ -128,7 +128,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) awakeAfterDocumentLoaded
 {
-	[self setOfflineRun:[[ORGlobal sharedGlobal] runMode]];
+	//[self setOfflineRun:[[ORGlobal sharedGlobal] runMode]];
 }
 
 - (void) makeConnectors

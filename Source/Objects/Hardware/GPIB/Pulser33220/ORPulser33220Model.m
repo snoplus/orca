@@ -142,6 +142,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 {
 	@try {
 		[self connect];
+		okToCheckUSB = YES;
 		[self connectionChanged];
 	}
 	@catch(NSException* localException) {
@@ -441,6 +442,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) checkNoUsbAlarm
 {
+	if(!okToCheckUSB) return;
 	if((connectionProtocol != kHPPulserUseUSB) || (usbInterface && [self getUSBController]) || !guardian){
 		[noUSBAlarm clearAlarm];
 		[noUSBAlarm release];

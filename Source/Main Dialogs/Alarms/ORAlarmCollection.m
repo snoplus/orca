@@ -28,8 +28,10 @@
 #import "ORMailer.h"
 
 NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabledChanged";
-NSString* ORAlarmCollectionAddressAdded   = @"ORAlarmCollectionAddressAdded";
-NSString* ORAlarmCollectionAddressRemoved = @"ORAlarmCollectionAddressRemoved";
+NSString* ORAlarmCollectionAddressAdded		= @"ORAlarmCollectionAddressAdded";
+NSString* ORAlarmCollectionAddressRemoved	= @"ORAlarmCollectionAddressRemoved";
+NSString* ORAlarmRemovedFromCollection		= @"ORAlarmRemovedFromCollection";
+NSString* ORAlarmAddedToCollection			= @"ORAlarmAddedToCollection";
 
 @implementation ORAlarmCollection
 
@@ -227,7 +229,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 		if(!added){
 			[alarms insertObject:anAlarm atIndex:[alarms count]];
 		}
-				
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmAddedToCollection object:anAlarm];
+		
 		NSLogColor([NSColor redColor],@" Alarm: [%@] Posted\n",[anAlarm name]);
 
     }
@@ -250,6 +253,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 		NSLog(@" Alarm: [%@] Cleared\n",[anAlarm name]);
 		[alarms removeObject:anAlarm];
 		[alarms removeObject:alarmToRemove];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmRemovedFromCollection object:alarmToRemove];
     }
 }
 

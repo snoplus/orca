@@ -29,11 +29,13 @@
 #endif
 {
 	IBOutlet NSTabView*     tabView;
-    IBOutlet NSTextView*    statusView;  //our view
-    IBOutlet NSTextField*   errorField;  //our error count
-    IBOutlet NSOutlineView* outlineView;  //our error view
+    IBOutlet NSTextView*    statusView;  
+    IBOutlet NSTextField*   errorField; 
+    IBOutlet NSOutlineView* outlineView;
+    IBOutlet NSTextView*    alarmLogView; 
 
     IBOutlet NSButton*      clearCountsButton;
+    IBOutlet NSButton*      clearAlarmHistoryButton;
     IBOutlet NSTextField*   errorTextField;
     IBOutlet NSTextView*    logBookField;
     IBOutlet NSTextField*   logBookPathField;
@@ -44,12 +46,12 @@
     BOOL                    scheduledToUpdate;
 	BOOL					logBookDirty;
 	NSString*				logBookFile;
-
 }
 
 #pragma mark ¥¥¥Accessors
 + (ORStatusController*) sharedStatusController;
 - (int) statusTextlength;
+- (int) alarmLogTextlength;
 - (NSString*) text;
 - (void) setDataSet: (ORDataSet *) aDataSet;
 - (NSString*) substringWithRange:(NSRange)aRange;
@@ -63,6 +65,7 @@
 - (void) updateErrorDisplay;
 - (NSString*) errorSummary;
 - (oneway void) logError:(NSString*)string usingKeyArray:(NSArray*)keys;
+- (void) printAlarm: (NSString*)s1;
 - (oneway void) printString: (NSString*)aComment;
 - (oneway void) printString: (NSString*)s1 withColor:(NSColor*)aColor;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
@@ -92,10 +95,15 @@
 - (IBAction) insertRunNumber:(id)sender;
 - (IBAction) insertConfigurationName:(id)sender;
 - (IBAction) mailContent:(id)sender;
+- (IBAction) clearAlarmHistoryAction:(id)sender;
 
 - (void) loadCurrentLogBook;
 
-- (void)textDidChange:(NSNotification *)notification;
+- (void) textDidChange:(NSNotification*)aNote;
+- (void) alarmPosted:(NSNotification*)aNote;
+- (void) alarmCleared:(NSNotification*)aNote;
+- (void) updateAlarmLog:(NSString*)s;
+- (void) alarmAcknowledged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Archival
 - (void) decode:(NSCoder*) aDecoder;
