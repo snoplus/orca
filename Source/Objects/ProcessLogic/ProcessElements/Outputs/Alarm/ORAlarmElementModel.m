@@ -312,9 +312,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 	float y = theIconSize.height/2 - textSize.height/2;
 	float x;
 	if([self state]) {
-		NSImage* alarmImage = [[NSImage imageNamed:@"AlarmElementOff"] copy];
-		[alarmImage setScalesWhenResized:YES];
-		[alarmImage setSize:NSMakeSize(53/2., 69/2.)];
+		NSImage* alarmImage = [[NSImage imageNamed:@"AlarmIcon"] copy];
 		[alarmImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
 		x = 53/2.+(theIconSize.width-53/2.)/2 - textSize.width/2;
 		[alarmImage release];
