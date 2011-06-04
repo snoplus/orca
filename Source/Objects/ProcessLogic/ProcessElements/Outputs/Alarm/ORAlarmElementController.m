@@ -55,15 +55,26 @@
                        object : model];
     
 
+    [notifyCenter addObserver : self
+                     selector : @selector(noAlarmNameChanged:)
+                         name : ORAlarmElementModelNoAlarmNameChanged
+						object: model];
+
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) noAlarmNameChanged:(NSNotification*)aNote
+{
+	[noAlarmNameTextField setStringValue: [model noAlarmName]];
+}
 - (void) updateWindow
 {
     [super updateWindow];
     [self nameFieldChanged:nil];
     [self helpFieldChanged:nil];
     [self severityChanged:nil];
+	[self noAlarmNameChanged:nil];
 }
 
 - (void) nameFieldChanged:(NSNotification*) aNote
@@ -82,6 +93,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) noAlarmNameTextFieldAction:(id)sender
+{
+	[model setNoAlarmName:[sender stringValue]];	
+}
 - (IBAction) nameAction:(id)sender
 {
     [model setAlarmName:[sender stringValue]];

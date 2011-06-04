@@ -30,7 +30,12 @@
     NSString* alarmName;
     NSString* alarmHelp;
     int alarmSeverity;
+    NSString* noAlarmName;
 }
+
+#pragma mark ***Accessors
+- (NSString*) noAlarmName;
+- (void) setNoAlarmName:(NSString*)aNoAlarmName;
 
 - (void) setUpImage;
 -(void) makeConnectors;
@@ -46,6 +51,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORAlarmElementModelNoAlarmNameChanged;
 extern NSString* ORAlarmElementNameChangedNotification;
 extern NSString* ORAlarmElementHelpChangedNotification;
 extern NSString* ORAlarmElementSeverityChangedNotification;

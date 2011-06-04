@@ -26,6 +26,7 @@
 @interface ORAlarmElementController : ORProcessElementController 
 {
     IBOutlet NSTextField*   nameField;
+	IBOutlet   NSTextField* noAlarmNameTextField;
     IBOutlet NSTextField*   helpField;
     IBOutlet NSMatrix*      severityMatrix;
 }
@@ -34,11 +35,13 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) noAlarmNameTextFieldAction:(id)sender;
 - (IBAction) nameAction:(id)sender;
 - (IBAction) helpAction:(id)sender;
 - (IBAction) severityAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
+- (void) noAlarmNameChanged:(NSNotification*)aNote;
 - (void) nameFieldChanged:(NSNotification*) aNote;
 - (void) helpFieldChanged:(NSNotification*) aNote;
 - (void) severityChanged:(NSNotification*) aNote;
