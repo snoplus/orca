@@ -1826,6 +1826,7 @@
 		84A95191077B6C8C00CAD99D /* Analyze.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518C077B6C8C00CAD99D /* Analyze.gif */; };
 		84A95192077B6C8C00CAD99D /* Clear.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518D077B6C8C00CAD99D /* Clear.gif */; };
 		84A95193077B6C8C00CAD99D /* LogLin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518E077B6C8C00CAD99D /* LogLin.gif */; };
+		84AAD80A139A87A600C88F71 /* AlarmIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AAD809139A87A600C88F71 /* AlarmIcon.tif */; };
 		84AB0F3D1056DA4E0069D5E2 /* ModBus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AB0F341056DA4E0069D5E2 /* ModBus.nib */; };
 		84AB0F401056DA4E0069D5E2 /* ORModBusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB0F371056DA4E0069D5E2 /* ORModBusController.h */; };
 		84AB0F411056DA4E0069D5E2 /* ORModBusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB0F381056DA4E0069D5E2 /* ORModBusController.m */; };
@@ -4403,6 +4404,7 @@
 		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		84AA7A540545B1B2005F64B1 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		84AAD809139A87A600C88F71 /* AlarmIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AlarmIcon.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/Alarm/AlarmIcon.tif; sourceTree = SOURCE_ROOT; };
 		84AB0F341056DA4E0069D5E2 /* ModBus.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ModBus.nib; sourceTree = "<group>"; };
 		84AB0F371056DA4E0069D5E2 /* ORModBusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORModBusController.h; sourceTree = "<group>"; };
 		84AB0F381056DA4E0069D5E2 /* ORModBusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORModBusController.m; sourceTree = "<group>"; };
@@ -6412,6 +6414,7 @@
 			isa = PBXGroup;
 			children = (
 				840EFFE60944B28F00049827 /* AlarmElement.nib */,
+				84AAD809139A87A600C88F71 /* AlarmIcon.tif */,
 				840EFFE70944B28F00049827 /* AlarmElementOff.tif */,
 				840EFFE80944B28F00049827 /* AlarmElementOn.tif */,
 				840EFFE90944B28F00049827 /* ORAlarmElementController.h */,
@@ -13190,6 +13193,7 @@
 				8459A8DD137C2C760029C5B6 /* Comparator.nib in Resources */,
 				8459AD2C138D92F90029C5B6 /* CouchHistoryAveMap.txt in Resources */,
 				8459AD30138D93240029C5B6 /* CouchHistoryAveReduce.txt in Resources */,
+				84AAD80A139A87A600C88F71 /* AlarmIcon.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
