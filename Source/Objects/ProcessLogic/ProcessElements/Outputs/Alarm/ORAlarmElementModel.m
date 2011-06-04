@@ -94,7 +94,8 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 }
 - (NSString*) fullHwName
 {
-	return alarmName;
+	if(!alarmName)return @"";
+	else return alarmName;
 }
 
 - (id) stateValue
@@ -109,10 +110,10 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 	
 	if([self state]) {
         if(!alarm){
-            alarm = [[ORAlarm alloc] initWithName:alarmName severity:alarmSeverity];
+            alarm = [[ORAlarm alloc] initWithName:[self alarmName] severity:alarmSeverity];
             [alarm setSticky:YES];
         }
-        [alarm setHelpString:alarmHelp];
+        [alarm setHelpString:[self alarmHelp]];
         [alarm postAlarm];
 	}
 	else {
@@ -129,12 +130,14 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 
 - (NSString*) alarmName
 {
-    return alarmName;
+	if(!alarmName)return @"";
+    else return alarmName;
 }
 
 - (NSString*) alarmHelp
 {
-    return alarmHelp;
+	if(!alarmHelp)return @"";
+   else return alarmHelp;
 }
 
 - (int) alarmSeverity
@@ -145,7 +148,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 - (void)setAlarmName:(NSString*)aName
 {
     if(aName == nil)aName = @"Process Alarm";
-    [[[self undoManager] prepareWithInvocationTarget:self] setAlarmName:alarmName];
+    [[[self undoManager] prepareWithInvocationTarget:self] setAlarmName:[self alarmName]];
 	
     [aName retain];
     [alarmName release];
@@ -214,7 +217,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 - (id) description
 {
 	NSString* s =  [super description];
-	s =  [s stringByAppendingFormat:@" Name: %@",alarmName];		
+	s =  [s stringByAppendingFormat:@" Name: %@",[self alarmName]];		
 	if([alarm isPosted]){
 		s =  [s stringByAppendingFormat:@" **ALARM IN PROGRESS**\n"];		
 		s =  [s stringByAppendingFormat:@"\tPosted: %@  [type: %@]\n",[alarm timePosted],[alarm severityName]];		
@@ -282,7 +285,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 {		
 	NSImage* anImage;
 	NSColor* theColor;
-	NSString* theNameToUse = alarmName;
+	NSString* theNameToUse = [self alarmName];
 	if([self state]) {
 		anImage = [NSImage imageNamed:@"BlankRed"];
 		theColor = [NSColor blackColor];
@@ -306,8 +309,20 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 
 	[finalImage lockFocus];
     [anImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
-	float x = theIconSize.width/2 - textSize.width/2;
 	float y = theIconSize.height/2 - textSize.height/2;
+	float x;
+	if([self state]) {
+		NSImage* alarmImage = [[NSImage imageNamed:@"AlarmElementOff"] copy];
+		[alarmImage setScalesWhenResized:YES];
+		[alarmImage setSize:NSMakeSize(53/2., 69/2.)];
+		[alarmImage compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
+		x = 53/2.+(theIconSize.width-53/2.)/2 - textSize.width/2;
+		[alarmImage release];
+	}
+	else {
+		x = theIconSize.width/2 - textSize.width/2;
+	}
+	
 	[s drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
 	[finalImage unlockFocus];
 	[s release];
