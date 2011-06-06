@@ -37,6 +37,11 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 
 
 @implementation ORAlarm
++ (NSString*) alarmSeverityName:(int) i
+{
+	if(i<0 || i>kNumAlarmSeverityTypes)return @"";
+	else return severityName[i];
+}
 
 #pragma mark •••Initialization
 - (id) initWithName:(NSString*)aName severity:(AlarmSeverityTypes)aSeverity

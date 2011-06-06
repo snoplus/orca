@@ -77,18 +77,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     
 	logBookDirty = NO;
 	[saveLogBookButton setEnabled:NO];
-
-	//load the alarm history
-	NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
-	alarmHistoryPath = [alarmHistoryPath stringByAppendingPathComponent:@"Alarms"];
-	NSString* s = [NSString stringWithContentsOfFile:alarmHistoryPath encoding:NSASCIIStringEncoding error:nil];
-	NSArray* lines = [s componentsSeparatedByString:@"\n"];
-	for(id aLine in lines)	{
-		[self printAlarm:aLine];
-	}
+	
+	[self populateFilterPopup];
+	
+	[self loadAlarmHistory];
+	
 	NSCalendarDate* now  	= [NSCalendarDate calendarDate];
 	[now setCalendarFormat:@"%m%d%y %H:%M:%S"];
-	s = [NSString stringWithFormat:@"%@ ORCA started",now];
+	NSString* s = [NSString stringWithFormat:@"%@ ORCA started",now]; //don't change this string
 	[self updateAlarmLog:s];
 	
 	
@@ -97,6 +93,29 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmCleared:) name:ORAlarmRemovedFromCollection object : nil];	
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmAcknowledged:) name:ORAlarmWasAcknowledgedNotification object : nil];	
 
+}
+
+- (void) loadAlarmHistory
+{
+	[alarmLogView setString:@""];
+	//load the alarm history
+	NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
+	alarmHistoryPath = [alarmHistoryPath stringByAppendingPathComponent:@"Alarms"];
+	NSString* s = [NSString stringWithContentsOfFile:alarmHistoryPath encoding:NSASCIIStringEncoding error:nil];
+	NSArray* lines = [s componentsSeparatedByString:@"\n"];
+	for(id aLine in lines)	{
+		[self printAlarm:aLine];
+	}
+}
+
+- (void) populateFilterPopup
+{
+	[alarmFilterPU removeAllItems];
+	int i;
+	[alarmFilterPU addItemWithTitle:@"Show All"];
+	for(i=0;i<kNumAlarmSeverityTypes;i++){
+		[alarmFilterPU addItemWithTitle:[ORAlarm alarmSeverityName:i]];
+	}
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
@@ -173,12 +192,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     int len = [s1 length];
  	[s1 release];
 	
-    [[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
-                                      range:NSMakeRange([self statusTextlength]-len,16)];
+	
+	[[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
+										  range:NSMakeRange([self statusTextlength]-len,16)];
     
-    [[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:aColor forKey:NSForegroundColorAttributeName ]
-                                      range:NSMakeRange([self statusTextlength]-len+16,len-16)];
-    
+	[[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:aColor forKey:NSForegroundColorAttributeName ]
+										  range:NSMakeRange([self statusTextlength]-len+16,len-16)];
     
 }
 
@@ -213,19 +232,31 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 -(void) printAlarm: (NSString*)s1
 {
+	int filterIndex = [alarmFilterPU indexOfSelectedItem];
+	NSString* filter = [[alarmFilterPU titleOfSelectedItem] stringByAppendingString:@"]"];
+	
 	if([s1 length]){
-		s1 = [s1 stringByAppendingString:@"\n"];
-		if([self alarmLogTextlength]){
-			[alarmLogView replaceCharactersInRange:NSMakeRange([self alarmLogTextlength], 0) withString:s1];
-			[alarmLogView scrollRangeToVisible: NSMakeRange([self alarmLogTextlength], 0)];	
+		if(filterIndex == 0 || ![s1 hasSuffix:@"]"] || [s1 hasSuffix:filter]){
+			s1 = [s1 stringByAppendingString:@"\n"];
+			if([self alarmLogTextlength]){
+				[alarmLogView replaceCharactersInRange:NSMakeRange([self alarmLogTextlength], 0) withString:s1];
+				[alarmLogView scrollRangeToVisible: NSMakeRange([self alarmLogTextlength], 0)];	
+			}
+			else {
+				[alarmLogView setString:s1];
+			}
+			int len = [s1 length];
+			
+			if([s1 hasSuffix:@"ORCA started\n"]){
+				[[alarmLogView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
+													range:NSMakeRange([self alarmLogTextlength]-len,len)];
+			}
+			else {
+				[[alarmLogView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
+													range:NSMakeRange([self alarmLogTextlength]-len,16)];
+
+			}
 		}
-		else {
-			[alarmLogView setString:s1];
-		}
-		int len = [s1 length];
-		
-		[[alarmLogView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
-										  range:NSMakeRange([self alarmLogTextlength]-len,16)];
 	}
 }
 
@@ -299,6 +330,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (IBAction) saveDocumentAs:(id)sender
 {
     [[[NSApp delegate]document] saveDocumentAs:sender];
+}
+
+- (IBAction) alarmFilterAction:(id)sender
+{
+	[self loadAlarmHistory];
 }
 
 

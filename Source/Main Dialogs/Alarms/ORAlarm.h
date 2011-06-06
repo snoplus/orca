@@ -48,6 +48,7 @@ typedef enum {
 }
 
 #pragma mark •••Initialization
++ (NSString*) alarmSeverityName:(int) i;
 - (id) initWithName:(NSString*)aName severity:(AlarmSeverityTypes)aSeverity;
 
 #pragma mark •••Accessors

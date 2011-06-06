@@ -33,7 +33,7 @@
     IBOutlet NSTextField*   errorField; 
     IBOutlet NSOutlineView* outlineView;
     IBOutlet NSTextView*    alarmLogView; 
-
+	IBOutlet NSPopUpButton* alarmFilterPU;
     IBOutlet NSButton*      clearCountsButton;
     IBOutlet NSButton*      clearAlarmHistoryButton;
     IBOutlet NSTextField*   errorTextField;
@@ -60,6 +60,8 @@
 - (void) setLogBookFile:(NSString*)aFilePath;
 - (NSString*) contents;
 - (NSString*) contentsTail:(unsigned long)aDuration;
+- (void) populateFilterPopup;
+- (void) loadAlarmHistory;
 
 #pragma mark ¥¥¥Updating
 - (void) updateErrorDisplay;
@@ -96,6 +98,7 @@
 - (IBAction) insertConfigurationName:(id)sender;
 - (IBAction) mailContent:(id)sender;
 - (IBAction) clearAlarmHistoryAction:(id)sender;
+- (IBAction) alarmFilterAction:(id)sender;
 
 - (void) loadCurrentLogBook;
 
