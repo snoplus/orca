@@ -1469,6 +1469,18 @@
 		848326EC06DA614B00172F1C /* ORDualPortLAMModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 848326E806DA614B00172F1C /* ORDualPortLAMModel.m */; };
 		8483270506DA623100172F1C /* DualPortLAM.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8483270406DA623100172F1C /* DualPortLAM.nib */; };
 		8483272206DA6CBF00172F1C /* DualPortLAM.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8483272106DA6CBF00172F1C /* DualPortLAM.gif */; };
+		8483D2E2139EAB8B000C8901 /* CV812.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8483D2DC139EAB8B000C8901 /* CV812.gif */; };
+		8483D2E3139EAB8B000C8901 /* CV812.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8483D2DD139EAB8B000C8901 /* CV812.nib */; };
+		8483D2E4139EAB8B000C8901 /* ORCV812Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8483D2DE139EAB8B000C8901 /* ORCV812Controller.h */; };
+		8483D2E5139EAB8B000C8901 /* ORCV812Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8483D2DF139EAB8B000C8901 /* ORCV812Controller.m */; };
+		8483D2E6139EAB8B000C8901 /* ORCV812Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8483D2E0139EAB8B000C8901 /* ORCV812Model.h */; };
+		8483D2E7139EAB8B000C8901 /* ORCV812Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8483D2E1139EAB8B000C8901 /* ORCV812Model.m */; };
+		8483D3B8139FAAB8000C8901 /* CV895.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8483D3B2139FAAB8000C8901 /* CV895.gif */; };
+		8483D3B9139FAAB8000C8901 /* CV895.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8483D3B3139FAAB8000C8901 /* CV895.nib */; };
+		8483D3BA139FAAB8000C8901 /* ORCV895Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8483D3B4139FAAB8000C8901 /* ORCV895Controller.h */; };
+		8483D3BB139FAAB8000C8901 /* ORCV895Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8483D3B5139FAAB8000C8901 /* ORCV895Controller.m */; };
+		8483D3BC139FAAB8000C8901 /* ORCV895Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8483D3B6139FAAB8000C8901 /* ORCV895Model.h */; };
+		8483D3BD139FAAB8000C8901 /* ORCV895Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8483D3B7139FAAB8000C8901 /* ORCV895Model.m */; };
 		8483E56D058652E400C28344 /* ORDataController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8483E56B058652E300C28344 /* ORDataController.h */; };
 		8483E56E058652E400C28344 /* ORDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8483E56C058652E400C28344 /* ORDataController.m */; };
 		848463AA0625D65F00128299 /* ORSmartFolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 848463A60625D65F00128299 /* ORSmartFolder.m */; };
@@ -4037,6 +4049,18 @@
 		848326E806DA614B00172F1C /* ORDualPortLAMModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDualPortLAMModel.m; sourceTree = "<group>"; };
 		8483270406DA623100172F1C /* DualPortLAM.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = DualPortLAM.nib; sourceTree = "<group>"; };
 		8483272106DA6CBF00172F1C /* DualPortLAM.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = DualPortLAM.gif; path = Source/Objects/Hardware/Pci/DualPortLAM/DualPortLAM.gif; sourceTree = SOURCE_ROOT; };
+		8483D2DC139EAB8B000C8901 /* CV812.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CV812.gif; sourceTree = "<group>"; };
+		8483D2DD139EAB8B000C8901 /* CV812.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CV812.nib; path = Source/Objects/Hardware/Vme/CAEN/CV812/CV812.nib; sourceTree = SOURCE_ROOT; };
+		8483D2DE139EAB8B000C8901 /* ORCV812Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCV812Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV812/ORCV812Controller.h; sourceTree = SOURCE_ROOT; };
+		8483D2DF139EAB8B000C8901 /* ORCV812Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCV812Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV812/ORCV812Controller.m; sourceTree = SOURCE_ROOT; };
+		8483D2E0139EAB8B000C8901 /* ORCV812Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCV812Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV812/ORCV812Model.h; sourceTree = SOURCE_ROOT; };
+		8483D2E1139EAB8B000C8901 /* ORCV812Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCV812Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV812/ORCV812Model.m; sourceTree = SOURCE_ROOT; };
+		8483D3B2139FAAB8000C8901 /* CV895.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = CV895.gif; path = Source/Objects/Hardware/Vme/CAEN/CV895/CV895.gif; sourceTree = SOURCE_ROOT; };
+		8483D3B3139FAAB8000C8901 /* CV895.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CV895.nib; path = Source/Objects/Hardware/Vme/CAEN/CV895/CV895.nib; sourceTree = SOURCE_ROOT; };
+		8483D3B4139FAAB8000C8901 /* ORCV895Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCV895Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV895/ORCV895Controller.h; sourceTree = SOURCE_ROOT; };
+		8483D3B5139FAAB8000C8901 /* ORCV895Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCV895Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV895/ORCV895Controller.m; sourceTree = SOURCE_ROOT; };
+		8483D3B6139FAAB8000C8901 /* ORCV895Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCV895Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV895/ORCV895Model.h; sourceTree = SOURCE_ROOT; };
+		8483D3B7139FAAB8000C8901 /* ORCV895Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCV895Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV895/ORCV895Model.m; sourceTree = SOURCE_ROOT; };
 		8483E56B058652E300C28344 /* ORDataController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataController.h; sourceTree = "<group>"; };
 		8483E56C058652E400C28344 /* ORDataController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataController.m; sourceTree = "<group>"; };
 		848463A60625D65F00128299 /* ORSmartFolder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSmartFolder.m; path = "Source/Objects/Misc Objects/FileCopy/ORSmartFolder.m"; sourceTree = SOURCE_ROOT; };
@@ -8155,6 +8179,34 @@
 			path = Source/Objects/Hardware/Pci/DualPortLAM;
 			sourceTree = SOURCE_ROOT;
 		};
+		8483D2DB139EAB8B000C8901 /* CV812 */ = {
+			isa = PBXGroup;
+			children = (
+				8483D2DC139EAB8B000C8901 /* CV812.gif */,
+				8483D2DD139EAB8B000C8901 /* CV812.nib */,
+				8483D2DE139EAB8B000C8901 /* ORCV812Controller.h */,
+				8483D2DF139EAB8B000C8901 /* ORCV812Controller.m */,
+				8483D2E0139EAB8B000C8901 /* ORCV812Model.h */,
+				8483D2E1139EAB8B000C8901 /* ORCV812Model.m */,
+			);
+			name = CV812;
+			path = Source/Objects/Hardware/Vme/CAEN/CV812;
+			sourceTree = SOURCE_ROOT;
+		};
+		8483D3B1139FAAB8000C8901 /* CV895 */ = {
+			isa = PBXGroup;
+			children = (
+				8483D3B2139FAAB8000C8901 /* CV895.gif */,
+				8483D3B3139FAAB8000C8901 /* CV895.nib */,
+				8483D3B4139FAAB8000C8901 /* ORCV895Controller.h */,
+				8483D3B5139FAAB8000C8901 /* ORCV895Controller.m */,
+				8483D3B6139FAAB8000C8901 /* ORCV895Model.h */,
+				8483D3B7139FAAB8000C8901 /* ORCV895Model.m */,
+			);
+			name = CV895;
+			path = Source/Objects/Hardware/Vme/CAEN/CV895;
+			sourceTree = SOURCE_ROOT;
+		};
 		8484811107288C26009EDCE2 /* Dots */ = {
 			isa = PBXGroup;
 			children = (
@@ -11426,6 +11478,8 @@
 				84FFCA9F0636D5B10069432F /* CV792 */,
 				9C7CE7DB0E2FC22500F63679 /* CV260 */,
 				84DE591F051F7AF9005F64B1 /* CV785 */,
+				8483D2DB139EAB8B000C8901 /* CV812 */,
+				8483D3B1139FAAB8000C8901 /* CV895 */,
 				8407F0DD0DEF66DB000F1441 /* CV862 */,
 				F5B1802703B297FD015F64B1 /* CV775 */,
 				9C1363BE0D0A7921006C550D /* CV265 */,
@@ -12407,6 +12461,10 @@
 				8494D85B13393D8A00DD5F9E /* ORRunListModel.h in Headers */,
 				8459A8D4137C1FEC0029C5B6 /* ORComparatorController.h in Headers */,
 				8459A8D6137C1FEC0029C5B6 /* ORComparatorModel.h in Headers */,
+				8483D2E4139EAB8B000C8901 /* ORCV812Controller.h in Headers */,
+				8483D2E6139EAB8B000C8901 /* ORCV812Model.h in Headers */,
+				8483D3BA139FAAB8000C8901 /* ORCV895Controller.h in Headers */,
+				8483D3BC139FAAB8000C8901 /* ORCV895Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13194,6 +13252,10 @@
 				8459AD2C138D92F90029C5B6 /* CouchHistoryAveMap.txt in Resources */,
 				8459AD30138D93240029C5B6 /* CouchHistoryAveReduce.txt in Resources */,
 				84AAD80A139A87A600C88F71 /* AlarmIcon.tif in Resources */,
+				8483D2E2139EAB8B000C8901 /* CV812.gif in Resources */,
+				8483D2E3139EAB8B000C8901 /* CV812.nib in Resources */,
+				8483D3B8139FAAB8000C8901 /* CV895.gif in Resources */,
+				8483D3B9139FAAB8000C8901 /* CV895.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14081,6 +14143,10 @@
 				8494D85C13393D8A00DD5F9E /* ORRunListModel.m in Sources */,
 				8459A8D5137C1FEC0029C5B6 /* ORComparatorController.m in Sources */,
 				8459A8D7137C1FEC0029C5B6 /* ORComparatorModel.m in Sources */,
+				8483D2E5139EAB8B000C8901 /* ORCV812Controller.m in Sources */,
+				8483D2E7139EAB8B000C8901 /* ORCV812Model.m in Sources */,
+				8483D3BB139FAAB8000C8901 /* ORCV895Controller.m in Sources */,
+				8483D3BD139FAAB8000C8901 /* ORCV895Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
