@@ -374,7 +374,6 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		[[ORAlarmCollection sharedAlarmCollection] encodeEMailList:archiver];
 		[[ORStatusController sharedStatusController] encode:archiver];
 		[[ORStatusController sharedStatusController] saveLogBook:nil];
-		[[ORProcessCenter sharedProcessCenter] encodeEMailList:archiver];
 
 		[archiver finishEncoding];
 		
@@ -429,7 +428,6 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[[ORAlarmCollection sharedAlarmCollection] decodeEMailList:unarchiver];
 		[[ORStatusController sharedStatusController] decode:unarchiver];
-		[[ORProcessCenter sharedProcessCenter] decodeEMailList:unarchiver];
 		
 		@try {
 			if((GetCurrentKeyModifiers() & shiftKey) == 0){
