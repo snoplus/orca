@@ -910,7 +910,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				@try {
 					for(id aDataSet in objs1d){
 						unsigned long start,end;
-						NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
+					    NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
 						NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 													[aDataSet fullName],										@"name",
 													[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
@@ -923,7 +923,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 						[[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentAdded];
 						
-		 
 					}
 				}
 				@catch(NSException* e){
