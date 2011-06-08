@@ -270,6 +270,13 @@
 			*end = theLastOne;
 			theData =  [NSData dataWithBytes:&histogram[theFirstOne] length:(theLastOne-theFirstOne+1)*sizeof(long)];
 		}
+		else {
+			*start = 0;
+			*end = 1;
+			unsigned long zero = 0;
+			theData =  [NSData dataWithBytes:&zero length:1*sizeof(long)];
+
+		}
 	}
 	[dataSetLock unlock];
 	return theData;
