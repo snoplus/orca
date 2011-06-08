@@ -26,6 +26,10 @@
 @interface ORProcessController : ORContainerController
 {
     IBOutlet NSTabView* tabView;
+	IBOutlet NSButton* sendOnStopCB;
+	IBOutlet NSButton* sendOnStartCB;
+	IBOutlet NSPopUpButton* heartBeatIndexPU;
+	IBOutlet NSTableView* emailListTable;
 	IBOutlet NSTextField* historyFileTextField;
 	IBOutlet NSButton* keepHistoryCB;
 	IBOutlet NSTextField* sampleRateField;
@@ -36,7 +40,9 @@
     IBOutlet NSTextView* detailsTextView;
     IBOutlet NSTextField* shortNameField;
     IBOutlet NSButton* altViewButton;
-    IBOutlet NSImageView* heartbeatImage;
+	IBOutlet NSButton* 	removeAddressButton;
+	IBOutlet NSTextField*   nextHeartbeatField;
+    IBOutlet NSImageView*	heartbeatImage;
 
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
@@ -50,6 +56,10 @@
 -(void) awakeFromNib;
 
 #pragma mark ¥¥¥Interface Management
+- (void) sendOnStopChanged:(NSNotification*)aNote;
+- (void) sendOnStartChanged:(NSNotification*)aNote;
+- (void) heartBeatIndexChanged:(NSNotification*)aNote;
+- (void) emailListChanged:(NSNotification*)aNote;
 - (void) historyFileChanged:(NSNotification*)aNote;
 - (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) sampleRateChanged:(NSNotification*)aNote;
@@ -63,10 +73,14 @@
 - (void) detailsChanged:(NSNotification*)aNote;
 - (void) useAltViewChanged:(NSNotification*)aNote;
 - (void) objectsChanged:(NSNotification*)aNote;
-- (void) eMailOptionsChanged:(NSNotification*)aNote;
 - (void) doUpdate:(NSNotification*)aNote;
+- (void) nextHeartBeatChanged:(NSNotification*)aNote;
+- (void) setHeartbeatImage;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) sendOnStopAction:(id)sender;
+- (IBAction) sendOnStartAction:(id)sender;
+- (IBAction) heartBeatIndexAction:(id)sender;
 - (IBAction) historyFileSelectionAction:(id)sender;
 - (IBAction) keepHistoryAction:(id)sender;
 - (IBAction) useAltViewAction:(id)sender;
@@ -76,15 +90,17 @@
 - (IBAction) shortNameAction:(id)sender;
 - (IBAction) doubleClick:(id)sender;
 - (IBAction) viewProcessCenter:(id)sender;
+- (IBAction) addAddress:(id)sender;
+- (IBAction) removeAddress:(id)sender;
 
 #pragma mark ¥¥¥Data Source
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (id)  tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
-- (void)setSortColumn:(NSString *)identifier;
+- (void) setSortColumn:(NSString *)identifier;
 - (NSString *)sortColumn;
-- (void)setSortIsDescending:(BOOL)whichWay;
-- (BOOL)sortIsDescending;
+- (void) setSortIsDescending:(BOOL)whichWay;
+- (BOOL) sortIsDescending;
 - (void) sort;
 - (void) updateTableHeaderToMatchCurrentSort;
 

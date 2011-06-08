@@ -60,7 +60,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [tabView selectTabViewItemAtIndex: index];	
     [tableView setDoubleAction:@selector(doubleClick:)];
     
-    ascendingSortingImage = [[NSImage imageNamed:@"NSAscendingSortIndicator"] retain];
+    ascendingSortingImage  = [[NSImage imageNamed:@"NSAscendingSortIndicator"] retain];
     descendingSortingImage = [[NSImage imageNamed:@"NSDescendingSortIndicator"] retain];
 	
 	[tableView setAutosaveTableColumns:YES];
@@ -69,6 +69,27 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) sendOnStopChanged:(NSNotification*)aNote
+{
+	[sendOnStopCB setIntValue: [model sendOnStop]];
+}
+
+- (void) sendOnStartChanged:(NSNotification*)aNote
+{
+	[sendOnStartCB setIntValue: [model sendOnStart]];
+}
+
+- (void) heartBeatIndexChanged:(NSNotification*)aNote
+{
+	[heartBeatIndexPU selectItemAtIndex: [model heartBeatIndex]];
+	[self setHeartbeatImage];
+}
+
+- (void) emailListChanged:(NSNotification*)aNote
+{
+	[emailListTable reloadData];
+}
 
 - (void) historyFileChanged:(NSNotification*)aNote
 {
@@ -144,10 +165,6 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                          name : ORGroupObjectsAdded
 						object: nil];	
 	
-	[notifyCenter addObserver : self
-                     selector : @selector(eMailOptionsChanged:)
-                         name : ORProcessEmailOptionsChangedNotification
-						object: nil];	
     [notifyCenter addObserver : self
                      selector : @selector(keepHistoryChanged:)
                          name : ORProcessModelKeepHistoryChanged
@@ -158,6 +175,30 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                          name : ORProcessModelHistoryFileChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(emailListChanged:)
+                         name : ORProcessModelEmailListChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(heartBeatIndexChanged:)
+                         name : ORProcessModelHeartBeatIndexChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sendOnStartChanged:)
+                         name : ORProcessModelSendOnStartChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sendOnStopChanged:)
+                         name : ORProcessModelSendOnStopChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nextHeartBeatChanged:)
+                         name : ORProcessModelNextHeartBeatChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -169,9 +210,30 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [self processRunningChanged:nil];
 	[self sampleRateChanged:nil];
 	[self useAltViewChanged:nil];
-	[self eMailOptionsChanged:nil];
 	[self keepHistoryChanged:nil];
 	[self historyFileChanged:nil];
+	[self emailListChanged:nil];
+	[self heartBeatIndexChanged:nil];
+	[self sendOnStartChanged:nil];
+	[self sendOnStopChanged:nil];
+	[self nextHeartBeatChanged:nil];
+}
+
+- (void) setHeartbeatImage
+{
+	if([model heartBeatIndex] == 0){
+		NSImage* noHeartbeatImage = [NSImage imageNamed:@"noHeartbeat"];
+		[heartbeatImage setImage:noHeartbeatImage];
+	}
+	else [heartbeatImage setImage:nil];
+}
+
+- (void) nextHeartBeatChanged:(NSNotification*)aNote
+{
+	if([model heartbeatSeconds]){
+		[nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[model nextHeartbeat]]];
+	}
+	else [nextHeartbeatField setStringValue:@"No Heartbeat Scheduled"];
 }
 
 - (void) useAltViewChanged:(NSNotification*)aNote
@@ -234,6 +296,14 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	[tableView reloadData];
 }
 
+- (void) updateButtons
+{
+	BOOL anyAddresses = ([[model emailList] count]>0);
+	[heartBeatIndexPU setEnabled:anyAddresses];
+	[sendOnStopCB setEnabled:anyAddresses];
+	[sendOnStartCB setEnabled:anyAddresses];
+}
+
 - (void) detailsChanged:(NSNotification*)aNote
 {
     if([aNote object] == tableView){
@@ -255,17 +325,49 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     [tableView reloadData];
 }
 
-- (void) eMailOptionsChanged:(NSNotification*)aNote
-{
-	if([[ORProcessCenter sharedProcessCenter] heartbeatTimeIndex] == 0){
-		NSImage* noHeartbeatImage = [NSImage imageNamed:@"noHeartbeat"];
-		[heartbeatImage setImage:noHeartbeatImage];
-	}
-	else [heartbeatImage setImage:nil];
-
-}
 
 #pragma mark ¥¥¥Actions
+- (IBAction) addAddress:(id)sender
+{
+	int index = [[model emailList] count];
+	[model addAddress:@"<eMail>" atIndex:index];
+	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
+	[emailListTable selectRowIndexes:indexSet byExtendingSelection:NO];
+	[self updateButtons];
+	[emailListTable reloadData];
+}
+
+- (IBAction) removeAddress:(id)sender
+{
+	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
+	//to something a lot more complicated.
+	NSIndexSet* theSet = [emailListTable selectedRowIndexes];
+	NSUInteger current_index = [theSet firstIndex];
+    if(current_index != NSNotFound){
+		[model removeAddressAtIndex:current_index];
+	}
+	[self updateButtons];
+	[emailListTable reloadData];
+}
+
+- (IBAction) sendOnStopAction:(id)sender
+{
+	[model setSendOnStop:[sender intValue]];	
+}
+
+- (IBAction) sendOnStartAction:(id)sender
+{
+	[model setSendOnStart:[sender intValue]];	
+}
+
+- (IBAction) heartBeatIndexAction:(id)sender
+{
+	[model setHeartBeatIndex:[sender indexOfSelectedItem]];	
+	if([model heartbeatSeconds] == 0){
+		[model sendHeartbeatShutOffWarning];
+	}
+}
+
 - (IBAction) historyFileSelectionAction:(id)sender;
 {
 	NSSavePanel *savePanel = [NSSavePanel savePanel];
@@ -334,33 +436,62 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 #pragma mark ¥¥¥Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-    NSParameterAssert(rowIndex >= 0 && rowIndex < [[model orcaObjects] count]);
-    NSString* columnID =  [aTableColumn identifier];
-    id item = @"--";
-    @try {
-        item =  [[[model orcaObjects]objectAtIndex:rowIndex] valueForKey:columnID];
+	if(aTableView == tableView){
+		NSParameterAssert(rowIndex >= 0 && rowIndex < [[model orcaObjects] count]);
+		NSString* columnID =  [aTableColumn identifier];
+		id item = @"--";
+		@try {
+			item =  [[[model orcaObjects]objectAtIndex:rowIndex] valueForKey:columnID];
+		}
+		@catch(NSException* localException) {
+		}
+		return item;
 	}
-	@catch(NSException* localException) {
+	else {
+		if(rowIndex < [[model emailList] count]){
+			id addressObj = [[model emailList] objectAtIndex:rowIndex];
+			return addressObj; 
+		}
+		else return @"";
 	}
-	return item;
 }
 - (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-    NSParameterAssert(rowIndex >= 0 && rowIndex < [[model orcaObjects] count]);
-    id item = [[model orcaObjects]objectAtIndex:rowIndex];
-    [item setValue:anObject forKey:[aTableColumn identifier]];
+	if(aTableView == tableView){
+		NSParameterAssert(rowIndex >= 0 && rowIndex < [[model orcaObjects] count]);
+		id item = [[model orcaObjects]objectAtIndex:rowIndex];
+		[item setValue:anObject forKey:[aTableColumn identifier]];
+	}
+	else {
+		if(rowIndex < [[model emailList] count]){
+			[[model emailList] replaceObjectAtIndex:rowIndex withObject:anObject];
+		}
+	}
 }
 
 // just returns the number of items we have.
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
-    return [[model orcaObjects] count];
+ 	if(aTableView == tableView){
+		return [[model orcaObjects] count];
+	}
+	else {
+		return [[model emailList] count];
+	}
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
     int index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.Process%d.selectedtab",[model uniqueIdNumber]]];
+}
+
+- (void) tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+	if([aNotification object] == emailListTable || aNotification == nil){
+		int selectedIndex = [emailListTable selectedRow];
+		[removeAddressButton setEnabled:selectedIndex>=0];
+	}
 }
 
 - (void) tableView:(NSTableView*)tv didClickTableColumn:(NSTableColumn *)tableColumn

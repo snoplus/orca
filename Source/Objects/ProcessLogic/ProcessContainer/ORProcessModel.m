@@ -24,7 +24,12 @@
 #import "ORProcessModel.h"
 #import "ORProcessThread.h"
 #import "ORProcessCenter.h"
+#import "ORMailer.h"
 
+NSString* ORProcessModelSendOnStopChanged = @"ORProcessModelSendOnStopChanged";
+NSString* ORProcessModelSendOnStartChanged = @"ORProcessModelSendOnStartChanged";
+NSString* ORProcessModelHeartBeatIndexChanged = @"ORProcessModelHeartBeatIndexChanged";
+NSString* ORProcessModelEmailListChanged = @"ORProcessModelEmailListChanged";
 NSString* ORProcessModelHistoryFileChanged = @"ORProcessModelHistoryFileChanged";
 NSString* ORProcessModelKeepHistoryChanged = @"ORProcessModelKeepHistoryChanged";
 NSString* ORProcessModelSampleRateChanged			= @"ORProcessModelSampleRateChanged";
@@ -33,6 +38,7 @@ NSString* ORProcessRunningChangedNotification       = @"ORProcessRunningChangedN
 NSString* ORProcessModelCommentChangedNotification  = @"ORProcessModelCommentChangedNotification";
 NSString* ORProcessModelShortNameChangedNotification= @"ORProcessModelShortNameChangedNotification";
 NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged";
+NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatChanged";
 
 @implementation ORProcessModel
 
@@ -41,16 +47,18 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 {
 	self = [super init];
 	sampleRate = 10;
-	[self registerNotificationObservers];
 	return self;
 }
 
 - (void) dealloc
 {
+    [emailList release];
     [historyFile release];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self stopRun];
 	[comment release];
+	[nextHeartbeat release];
 	[shortName release];
 	[testModeAlarm clearAlarm];
     [testModeAlarm release];
@@ -60,7 +68,15 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 - (void) sleep
 {
 	[self stopRun];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super sleep];
+}
+- (void) wakeUp
+{
+	[super wakeUp];
+	if([self heartbeatSeconds]){
+		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
+	}	
 }
 
 - (NSString*) helpURL
@@ -76,18 +92,84 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 	}
 }
 
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers
+#pragma mark ***Accessors
+- (BOOL) sendOnStop
 {
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    [notifyCenter addObserver : self
-                     selector : @selector(setUpImage)
-                         name : ORProcessEmailOptionsChangedNotification
-                       object : nil];
-    
+    return sendOnStop;
 }
 
-#pragma mark ***Accessors
+- (void) setSendOnStop:(BOOL)aSendOnStop
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSendOnStop:sendOnStop];
+    sendOnStop = aSendOnStop;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelSendOnStopChanged object:self];
+}
+
+- (BOOL) sendOnStart
+{
+    return sendOnStart;
+}
+
+- (void) setSendOnStart:(BOOL)aSendOnStart
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSendOnStart:sendOnStart];
+    sendOnStart = aSendOnStart;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelSendOnStartChanged object:self];
+}
+
+- (int) heartBeatIndex
+{
+    return heartBeatIndex;
+}
+
+- (void) setHeartBeatIndex:(int)aHeartBeatIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHeartBeatIndex:heartBeatIndex];
+    heartBeatIndex = aHeartBeatIndex;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelHeartBeatIndexChanged object:self];
+
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if([self heartbeatSeconds]){
+		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
+	}
+	[self setNextHeartbeatString];
+	[self setUpImage];
+}
+
+- (NSMutableArray*) emailList
+{
+    return emailList;
+}
+
+- (void) setEmailList:(NSMutableArray*)aEmailList
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEmailList:emailList];
+    
+    [aEmailList retain];
+    [emailList release];
+    emailList = aEmailList;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelEmailListChanged object:self];
+}
+
+- (void) addAddress:(id)anAddress atIndex:(int)anIndex
+{
+	if(!emailList) emailList= [[NSMutableArray array] retain];
+	if([emailList count] == 0)anIndex = 0;
+	anIndex = MIN(anIndex,[emailList count]);
+	
+	[[[self undoManager] prepareWithInvocationTarget:self] removeAddressAtIndex:anIndex];
+	[emailList insertObject:anAddress atIndex:anIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelEmailListChanged object:self];
+}
+
+- (void) removeAddressAtIndex:(int) anIndex
+{
+	id anAddress = [emailList objectAtIndex:anIndex];
+	[[[self undoManager] prepareWithInvocationTarget:self] addAddress:anAddress atIndex:anIndex];
+	[emailList removeObjectAtIndex:anIndex];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelEmailListChanged object:self];
+}
 
 - (NSString*) historyFile
 {
@@ -176,7 +258,6 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 
 - (void) setSampleRate:(float)aSampleRate
 {
-	
 	if(aSampleRate<=0.001)aSampleRate = 0.001;
 	else if(aSampleRate>10)  aSampleRate = 10;
 	
@@ -384,7 +465,7 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
         [aLockedImage compositeToPoint:NSMakePoint([self frame].size.width - [aLockedImage size].width,0)operation:NSCompositeSourceOver];
     }
 	
-	if([[ORProcessCenter sharedProcessCenter] heartbeatTimeIndex] == 0){
+	if([self heartBeatIndex] == 0){
         NSImage* noHeartbeatImage = [NSImage imageNamed:@"noHeartbeat"];
 		float x;
 		if(processRunning && inTestMode) x = 22;
@@ -439,7 +520,9 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 			[self postTestAlarm];
 		}
 		else {
-			[[ORProcessCenter sharedProcessCenter] performSelector:@selector(sendStartNotice:) withObject:self afterDelay:1];
+			if(sendOnStart){
+				[self sendStartStopNotice:YES];
+			}
 		}
 	}
 }
@@ -456,8 +539,8 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 		if([shortName length])NSLog(@"%@ Stopped %@\n",shortName,t);
 		else NSLog(@"Process %d Stopped %@\n",[self uniqueIdNumber],t);
 		
-		if(!inTestMode){
-			[[ORProcessCenter sharedProcessCenter] sendStopNotice:self];
+		if(!inTestMode && sendOnStop){
+			[self sendStartStopNotice:NO];
 		}
 	}
 }
@@ -650,10 +733,8 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 {
 	NSString* s = @"";
 	@synchronized(self){
-		NSString* theName;
-		if([[self shortName] length])theName = [self shortName];
-		else theName = [NSString stringWithFormat:@"%d",[self uniqueIdNumber]];
-		s =  [NSString stringWithFormat:@"\nProcess Name: %@ ",theName];
+
+		s =  [NSString stringWithFormat:@"\nProcess Name: %@ ",[self elementName]];
 		if(processRunning){
 			s = [s stringByAppendingString:@"[Running]\n"];
 			s = [s stringByAppendingFormat:@"Sample Rate: %.1f Hz\n\n",sampleRate];
@@ -711,10 +792,8 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 {
 	NSString* s = @"";
 	@synchronized(self){
-		NSString* theName;
-		if([[self shortName] length])theName = [self shortName];
-		else theName = [NSString stringWithFormat:@"%d",[self uniqueIdNumber]];
-		s =  [NSString stringWithFormat:@"\nProcess %@ ",theName];
+
+		s =  [NSString stringWithFormat:@"\nProcess %@ ",[self elementName]];
 		if(processRunning){
 			s = [s stringByAppendingString:@"[Running]\n"];
 			s = [s stringByAppendingFormat:@"Sample Rate: %.1f Hz\n",sampleRate];
@@ -740,6 +819,10 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
     [[self undoManager] disableUndoRegistration];
 	
 	//after the document is loaded we use this flag to autostart
+    [self setSendOnStop:[decoder decodeBoolForKey:@"sendOnStop"]];
+    [self setSendOnStart:[decoder decodeBoolForKey:@"sendOnStart"]];
+    [self setHeartBeatIndex:[decoder decodeIntForKey:@"heartBeatIndex"]];
+    [self setEmailList:[decoder decodeObjectForKey:@"emailList"]];
     [self setHistoryFile:[decoder decodeObjectForKey:@"historyFile"]];
     [self setKeepHistory:[decoder decodeBoolForKey:@"keepHistory"]];
 	wasRunning = [decoder decodeBoolForKey:@"wasRunning"];
@@ -753,7 +836,6 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
     [self setUseAltView:[decoder decodeBoolForKey:@"useAltView"]];
 	
     [[self undoManager] enableUndoRegistration];
-	[self registerNotificationObservers];
 	
     return self;
 }
@@ -761,6 +843,10 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:sendOnStop forKey:@"sendOnStop"];
+    [encoder encodeBool:sendOnStart forKey:@"sendOnStart"];
+    [encoder encodeInt:heartBeatIndex forKey:@"heartBeatIndex"];
+    [encoder encodeObject:emailList forKey:@"emailList"];
     [encoder encodeObject:historyFile forKey:@"historyFile"];
     [encoder encodeBool:keepHistory forKey:@"keepHistory"];
     [encoder encodeFloat:sampleRate forKey:@"ORProcessModelSampleRate"];
@@ -770,6 +856,160 @@ NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged"
     [encoder encodeBool:useAltView forKey:@"useAltView"];
 	//store the running flag so we can auto start next time
     [encoder encodeBool:processRunning forKey:@"wasRunning"];
+}
+
+- (void) sendHeartbeatShutOffWarning
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	NSString* theContent = @"";
+	
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+	theContent = [theContent stringByAppendingFormat:@"Process: %@.\n",shortName];
+	theContent = [theContent stringByAppendingFormat:@"The email heartbeat was shut off manually.\n"];
+	theContent = [theContent stringByAppendingFormat:@"If this is unexpected you should contact the operator.\n"];
+	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
+	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+	for(id address in emailList){
+		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",@"Shutdown",@"Shutdown",nil];
+		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
+	}
+}
+- (void) sendHeartbeat
+{
+	NSString* theContent = @"";
+	
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process\n"];
+	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at %@\n",nextHeartbeat];
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
+	theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
+	theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
+	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+	
+	for(id address in emailList){
+		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",nil];
+		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
+	}
+	
+	if([self heartbeatSeconds]){
+		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
+	}
+	
+	[self setNextHeartbeatString];
+}
+
+- (void) sendStartStopNotice:(BOOL)state
+{
+	NSString* theContent = @"";
+	
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+
+	theContent = [theContent stringByAppendingFormat:@"Process: %@ was %@\n",[self elementName], state?@"started":@"stopped"];
+	if(state){
+		theContent = [theContent stringByAppendingString:@"Some Values may not have had time to be updated\n"];	
+		theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
+		theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
+		theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];		
+	}
+					
+	theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
+	for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
+	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+	
+	for(id address in emailList){
+		if(	!address || [address length] == 0 || [address isEqualToString:@"<eMail>"])continue;
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:address,@"Address",theContent,@"Message",nil];
+		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
+	}
+}
+
+
+- (int) heartbeatSeconds
+{
+	switch(heartBeatIndex){
+		case 0: return 0;
+		case 1: return 30*60;
+		case 2: return 60*60;
+		case 3: return 2*60*60;
+		case 4: return 8*60*60;
+		case 5: return 12*60*60;
+		case 6: return 24*60*60;
+		default: return 0;
+	}
+	return 0;
+}
+
+- (void) setNextHeartbeatString
+{
+	if([self heartbeatSeconds]){
+		[nextHeartbeat release];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+		nextHeartbeat = [[[NSDate date] dateByAddingTimeInterval:[self heartbeatSeconds]] retain];
+#else
+		nextHeartbeat = [[[NSDate date] addTimeInterval:[self heartbeatSeconds]] retain];
+#endif
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelNextHeartBeatChanged object:self];
+	
+}
+
+- (NSDate*) nextHeartbeat
+{
+	return nextHeartbeat;
+}
+
+
+#pragma mark ¥¥¥EMail Thread
+- (void) mailSent:(NSString*)address
+{
+	NSLog(@"Process Center status was sent to:\n%@\n",address);
+}
+
+- (void) eMailThread:(id)userInfo
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSString* address =  [userInfo objectForKey:@"Address"];
+	NSString* content = [NSString string];
+	NSString* hostAddress = @"<Unable to get host address>";
+	NSArray* names =  [[NSHost currentHost] addresses];
+	for(id aName in names){
+		if([aName rangeOfString:@"::"].location == NSNotFound){
+			if([aName rangeOfString:@".0.0."].location == NSNotFound){
+				hostAddress = aName;
+				break;
+			}
+		}
+	}
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+	content = [content stringByAppendingFormat:@"ORCA Message From Host: %@\n",hostAddress];
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"];
+	NSString* theMessage = [userInfo objectForKey:@"Message"];
+	if(theMessage){
+		content = [content stringByAppendingString:theMessage];
+	}
+	NSString* shutDownWarning = [userInfo objectForKey:@"Shutdown"];
+	if(shutDownWarning){
+		//generated from a manual shutdown of the email system. 
+		//don't send out any other info.
+	}
+	@synchronized([NSApp delegate]){
+		
+		NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
+		ORMailer* mailer = [ORMailer mailer];
+		[mailer setTo:address];
+		[mailer setSubject:@"Orca Message"];
+		[mailer setBody:theContent];
+		[mailer send:self];
+		[theContent autorelease];
+	}
+	
+	[pool release];
+	
 }
 
 @end

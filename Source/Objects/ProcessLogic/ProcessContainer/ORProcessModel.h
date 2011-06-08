@@ -40,12 +40,26 @@
     BOOL		keepHistory;
 	time_t		lastHistorySample;
     NSString*	historyFile;
+    NSMutableArray* emailList;
+    int			heartBeatIndex;
+    BOOL		sendOnStart;
+    BOOL		sendOnStop;
+	NSDate*		nextHeartbeat;
 }
 
-- (void) registerNotificationObservers;
 - (NSString*) report;
 
 #pragma mark ***Accessors
+- (BOOL) sendOnStop;
+- (void) setSendOnStop:(BOOL)aSendOnStop;
+- (BOOL) sendOnStart;
+- (void) setSendOnStart:(BOOL)aSendOnStart;
+- (int) heartBeatIndex;
+- (void) setHeartBeatIndex:(int)aHeartBeatIndex;
+- (NSMutableArray*) emailList;
+- (void) setEmailList:(NSMutableArray*)aEmailList;
+- (void) addAddress:(id)anAddress atIndex:(int)anIndex;
+- (void) removeAddressAtIndex:(int) anIndex;
 - (NSMutableDictionary*) processDictionary;
 - (NSString*) historyFile;
 - (void) setHistoryFile:(NSString*)aHistoryFile;
@@ -88,6 +102,15 @@
 - (BOOL) changesAllowed;
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey;
 - (void)assignProcessID:(id)objToGetID;
+- (int) heartbeatSeconds;
+
+- (void) sendHeartbeatShutOffWarning;
+- (void) sendHeartbeat;
+- (void) mailSent:(NSString*)address;
+- (void) eMailThread:(id)userInfo;
+- (void) setNextHeartbeatString;
+- (NSDate*) nextHeartbeat;
+- (void) sendStartStopNotice:(BOOL)state;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -101,6 +124,11 @@
 - (BOOL) isTrueEndNode;
 @end
 
+extern NSString* ORProcessModelNextHeartBeatChanged;
+extern NSString* ORProcessModelSendOnStopChanged;
+extern NSString* ORProcessModelSendOnStartChanged;
+extern NSString* ORProcessModelHeartBeatIndexChanged;
+extern NSString* ORProcessModelEmailListChanged;
 extern NSString* ORProcessModelHistoryFileChanged;
 extern NSString* ORProcessModelKeepHistoryChanged;
 extern NSString* ORProcessModelUseAltViewChanged;
