@@ -11,6 +11,7 @@ function(doc) {
 		for(var key in doc.adcs[i]){
 			var k = key.replace('#','');
 		 	k = k.replace('.','');
+		 	k = k.replace(',',' ');
 		 	k = k.replace(/^\s+|\s+$/g, '') ;
 			var keys = [title,k];
 			emit(keys.concat(t), doc.adcs[i][key]);
