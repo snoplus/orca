@@ -165,7 +165,7 @@ NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
 
 - (NSString*) helpURL
 {
-	return @"VME/SIS3300.html";
+	return @"VME/SIS3801.html";
 }
 
 - (NSRange)	memoryFootprint
