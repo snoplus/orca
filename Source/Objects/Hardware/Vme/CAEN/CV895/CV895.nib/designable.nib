@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="90"/>
+			<integer value="87"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -38,7 +38,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{463, 331}, {287, 570}}</string>
 				<int key="NSWTFlags">1886912512</int>
-				<string key="NSWindowTitle">CAEN 812 CFD</string>
+				<string key="NSWindowTitle">CAEN 895 LED</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
@@ -79,7 +79,7 @@
 														<string>NeXT TIFF v4.0 pasteboard type</string>
 													</object>
 												</object>
-												<string key="NSFrame">{{13, 451}, {32, 70}}</string>
+												<string key="NSFrame">{{17, 433}, {18, 99}}</string>
 												<reference key="NSSuperview" ref="120168742"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSImageCell" key="NSCell" id="742955886">
@@ -87,7 +87,7 @@
 													<int key="NSCellFlags2">33554432</int>
 													<object class="NSCustomResource" key="NSContents">
 														<string key="NSClassName">NSImage</string>
-														<string key="NSResourceName">C785</string>
+														<string key="NSResourceName">CV895</string>
 													</object>
 													<int key="NSAlign">0</int>
 													<int key="NSScale">0</int>
@@ -2814,11 +2814,11 @@
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="873381737"/>
-							<reference ref="889324108"/>
 							<reference ref="951952319"/>
 							<reference ref="335995971"/>
 							<reference ref="316522690"/>
 							<reference ref="229658237"/>
+							<reference ref="889324108"/>
 						</object>
 						<reference key="parent" ref="407006050"/>
 					</object>
@@ -3477,6 +3477,7 @@
 					<string>136.IBPluginDependency</string>
 					<string>136.ImportedFromIB2</string>
 					<string>137.IBPluginDependency</string>
+					<string>137.IBViewBoundsToFrameTransform</string>
 					<string>137.ImportedFromIB2</string>
 					<string>138.IBPluginDependency</string>
 					<string>138.ImportedFromIB2</string>
@@ -3732,6 +3733,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUFQAABD2IAAA</bytes>
+					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
@@ -6090,7 +6094,7 @@
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSArray" key="dict.sortedKeys">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>C785</string>
+				<string>CV895</string>
 				<string>Locked</string>
 				<string>NSMenuCheckmark</string>
 				<string>NSMenuMixedState</string>
