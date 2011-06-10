@@ -70,6 +70,7 @@
 - (IBAction) outputWidth8_15Action:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) initHWAction:(id) aSender;
+- (IBAction) probeAction:(id) aSender;
 - (IBAction) dialogLockAction:(id)sender;
 
 @end
