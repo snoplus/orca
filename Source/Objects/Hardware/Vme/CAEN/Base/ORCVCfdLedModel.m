@@ -302,9 +302,9 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 	
-	NSLog(@"Version: 0x%01x   Serial Number: 0x%03x",(version>>12)&0xf,version%0xfff);
-	NSLog(@"Manufacturer Code: 0x%x",(moduleType>>10)&0x3F);
-	NSLog(@"Module Type: 0x%x",moduleType&0x3ff);
+	NSLog(@"Version: 0x%01x   Serial Number: 0x%03x\n",(version>>12)&0xf,version%0xfff);
+	NSLog(@"Manufacturer Code: 0x%x\n",(moduleType>>10)&0x3F);
+	NSLog(@"Module Type: 0x%\n",moduleType&0x3ff);
 }
 
 #pragma mark ***Register - Register specific routines
