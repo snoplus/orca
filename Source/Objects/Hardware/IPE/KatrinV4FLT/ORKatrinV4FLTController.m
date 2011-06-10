@@ -52,9 +52,9 @@
 {
 	[super awakeFromNib];
 	
-	//TODO: DEBUG-REMOVE - 
-	[[filterShapingLengthPU itemAtIndex:0] setHidden: YES];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
-	[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
+	//TODO: DEBUG-REMOVE - -tb-
+	//[[filterShapingLengthPU itemAtIndex:0] setHidden: YES];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
+	//[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	
     settingSize			= NSMakeSize(650,700);
     rateSize			= NSMakeSize(490,690);

@@ -521,7 +521,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
-    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:2 max:8];//TODO: set to min:1 for releasing shaping length 100 nsec -tb-
+    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:1 max:8];//TODO: MAY BE REMOVED AFTER TEST - set to min:1 for releasing shaping length 100 nsec -tb-
 	filterLength = filterShapingLength - 2;//TODO: this line should be removed mid 2011, filterLength is obsolete; filterLength is int, may become -1! -tb-
 	//DEBUG -tb- 
 	//TODO: DEBUG-REMOVE - NSLog(@"%@::%@  filterLength: %i filterShapingLength:%i  filterLength: 0x%x filterShapingLength: 0x%x\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),filterLength,filterShapingLength, filterLength,filterShapingLength);
@@ -1518,7 +1518,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 }
 
 
-//what is the event dictionary? -tb-
+//what is the event dictionary? Run header? -tb-
 - (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
 {
 	NSDictionary* aDictionary;
@@ -1530,6 +1530,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	[anEventDictionary setObject:aDictionary forKey:@"KatrinV4FLT"];
 }
 
+//this goes to the Run header ...
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //TO DO....other things need to be added here.....
