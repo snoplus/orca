@@ -1227,6 +1227,10 @@
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
+		8461653513A259BD00D8B852 /* ORCVCfdLedController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8461653113A259BD00D8B852 /* ORCVCfdLedController.h */; };
+		8461653613A259BD00D8B852 /* ORCVCfdLedController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8461653213A259BD00D8B852 /* ORCVCfdLedController.m */; };
+		8461653713A259BD00D8B852 /* ORCVCfdLedModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8461653313A259BD00D8B852 /* ORCVCfdLedModel.h */; };
+		8461653813A259BD00D8B852 /* ORCVCfdLedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8461653413A259BD00D8B852 /* ORCVCfdLedModel.m */; };
 		8465BE5A05DBCEFC00870151 /* NSInvocation+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8465BE5805DBCEFC00870151 /* NSInvocation+Extensions.h */; };
 		8465BE5B05DBCEFD00870151 /* NSInvocation+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8465BE5905DBCEFC00870151 /* NSInvocation+Extensions.m */; };
 		84662A68070A3249001CDA7E /* BiStateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84662A66070A3249001CDA7E /* BiStateView.h */; };
@@ -3798,6 +3802,10 @@
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
+		8461653113A259BD00D8B852 /* ORCVCfdLedController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCVCfdLedController.h; path = Source/Objects/Hardware/Vme/CAEN/Base/ORCVCfdLedController.h; sourceTree = SOURCE_ROOT; };
+		8461653213A259BD00D8B852 /* ORCVCfdLedController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCVCfdLedController.m; path = Source/Objects/Hardware/Vme/CAEN/Base/ORCVCfdLedController.m; sourceTree = SOURCE_ROOT; };
+		8461653313A259BD00D8B852 /* ORCVCfdLedModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCVCfdLedModel.h; path = Source/Objects/Hardware/Vme/CAEN/Base/ORCVCfdLedModel.h; sourceTree = SOURCE_ROOT; };
+		8461653413A259BD00D8B852 /* ORCVCfdLedModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCVCfdLedModel.m; path = Source/Objects/Hardware/Vme/CAEN/Base/ORCVCfdLedModel.m; sourceTree = SOURCE_ROOT; };
 		8465BE5805DBCEFC00870151 /* NSInvocation+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSInvocation+Extensions.h"; sourceTree = "<group>"; };
 		8465BE5905DBCEFC00870151 /* NSInvocation+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSInvocation+Extensions.m"; sourceTree = "<group>"; };
 		8465BF6605DC43B500870151 /* Wizard.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Wizard.tif; path = "Source/Main Dialogs/HardwareWizard/Wizard.tif"; sourceTree = SOURCE_ROOT; };
@@ -8186,8 +8194,8 @@
 				8483D2DD139EAB8B000C8901 /* CV812.nib */,
 				8483D2DE139EAB8B000C8901 /* ORCV812Controller.h */,
 				8483D2DF139EAB8B000C8901 /* ORCV812Controller.m */,
-				8483D2E0139EAB8B000C8901 /* ORCV812Model.h */,
 				8483D2E1139EAB8B000C8901 /* ORCV812Model.m */,
+				8483D2E0139EAB8B000C8901 /* ORCV812Model.h */,
 			);
 			name = CV812;
 			path = Source/Objects/Hardware/Vme/CAEN/CV812;
@@ -8203,9 +8211,8 @@
 				8483D3B6139FAAB8000C8901 /* ORCV895Model.h */,
 				8483D3B7139FAAB8000C8901 /* ORCV895Model.m */,
 			);
-			name = CV895;
-			path = Source/Objects/Hardware/Vme/CAEN/CV895;
-			sourceTree = SOURCE_ROOT;
+			path = CV895;
+			sourceTree = "<group>";
 		};
 		8484811107288C26009EDCE2 /* Dots */ = {
 			isa = PBXGroup;
@@ -11501,6 +11508,10 @@
 				84DE591A051F762E005F64B1 /* ORCaenCardController.m */,
 				F5B1802503B297FD015F64B1 /* ORCaenDataDecoder.h */,
 				F5B1802603B297FD015F64B1 /* ORCaenDataDecoder.m */,
+				8461653113A259BD00D8B852 /* ORCVCfdLedController.h */,
+				8461653213A259BD00D8B852 /* ORCVCfdLedController.m */,
+				8461653313A259BD00D8B852 /* ORCVCfdLedModel.h */,
+				8461653413A259BD00D8B852 /* ORCVCfdLedModel.m */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -12465,6 +12476,8 @@
 				8483D2E6139EAB8B000C8901 /* ORCV812Model.h in Headers */,
 				8483D3BA139FAAB8000C8901 /* ORCV895Controller.h in Headers */,
 				8483D3BC139FAAB8000C8901 /* ORCV895Model.h in Headers */,
+				8461653513A259BD00D8B852 /* ORCVCfdLedController.h in Headers */,
+				8461653713A259BD00D8B852 /* ORCVCfdLedModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14147,6 +14160,8 @@
 				8483D2E7139EAB8B000C8901 /* ORCV812Model.m in Sources */,
 				8483D3BB139FAAB8000C8901 /* ORCV895Controller.m in Sources */,
 				8483D3BD139FAAB8000C8901 /* ORCV895Model.m in Sources */,
+				8461653613A259BD00D8B852 /* ORCVCfdLedController.m in Sources */,
+				8461653813A259BD00D8B852 /* ORCVCfdLedModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
