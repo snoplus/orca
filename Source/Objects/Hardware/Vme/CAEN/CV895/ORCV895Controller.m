@@ -31,7 +31,6 @@
 }
 
 #pragma mark ***Interface Management - Module specific
-- (NSString*) thresholdLockName {return @"ORCV895ThresholdLock";}
-- (NSString*) basicLockName     {return @"ORCV895BasicLock";}
+- (NSString*) dialogLockName {return @"ORCV895ThresholdLock";}
 
 @end

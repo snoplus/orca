@@ -18,8 +18,8 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#import "ORCV812Model.h"
-@interface ORCV895Model : ORCV812Model
+#import "ORCVCfdLedModel.h"
+@interface ORCV895Model : ORCVCfdLedModel
 {
 }
 @end

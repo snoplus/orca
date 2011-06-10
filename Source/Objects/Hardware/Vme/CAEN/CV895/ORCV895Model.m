@@ -20,7 +20,7 @@
 //-------------------------------------------------------------
 #import "ORCV895Model.h"
 
-// Address information for this unit.
+// Address defaults for this unit.
 #define k895DefaultBaseAddress 		0xE0000000
 #define k895DefaultAddressModifier 	0x39
 

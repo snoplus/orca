@@ -20,10 +20,10 @@
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
 
-#import "ORCV812Controller.h"
+#import "ORCVCfdLedController.h"
 
 // Definition of class.
-@interface ORCV895Controller : ORCV812Controller {
+@interface ORCV895Controller : ORCVCfdLedController {
 }
 
 #pragma mark ***Initialization
