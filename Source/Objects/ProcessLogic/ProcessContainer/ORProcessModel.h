@@ -45,6 +45,7 @@
     BOOL		sendOnStart;
     BOOL		sendOnStop;
 	NSDate*		nextHeartbeat;
+	BOOL		sendStartNoticeNextRead;
 }
 
 - (NSString*) report;

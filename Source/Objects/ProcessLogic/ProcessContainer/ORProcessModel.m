@@ -128,7 +128,6 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
     heartBeatIndex = aHeartBeatIndex;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelHeartBeatIndexChanged object:self];
 
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if([self heartbeatSeconds]){
 		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
 	}
@@ -345,6 +344,9 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
     [[NSNotificationCenter defaultCenter]
 		postNotificationName:ORProcessRunningChangedNotification
 					  object:self];
+	
+	if(aState)sampleGateOpen = YES; //force the first sample
+
 }
 
 - (void) putInTestMode
@@ -521,7 +523,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		}
 		else {
 			if(sendOnStart){
-				[self sendStartStopNotice:YES];
+				sendStartNoticeNextRead = YES;
 			}
 		}
 	}
@@ -599,12 +601,10 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 
 - (void)processIsStarting
 {
-	//force first sample at start
 	@synchronized(self){
 		[lastSampleTime release];
 		lastSampleTime = [[NSDate date] retain];
 	}
-	sampleGateOpen = YES;
 }
 
 - (void) startProcessCycle
@@ -672,6 +672,10 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 					}
 				}
 			}
+		}
+		if(sendStartNoticeNextRead){
+			sendStartNoticeNextRead = NO;
+			[self sendStartStopNotice:YES];
 		}
 	}
 }
@@ -860,7 +864,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 
 - (void) sendHeartbeatShutOffWarning
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeatShutOffWarning) object:nil];
 	NSString* theContent = @"";
 	
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
@@ -876,10 +880,13 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
 	}
 }
+
 - (void) sendHeartbeat
 {
-	NSString* theContent = @"";
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
+	if([self heartbeatSeconds]==0)return;
 	
+	NSString* theContent = @"";
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 	theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process\n"];
 	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at %@\n",nextHeartbeat];
@@ -899,16 +906,16 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 	if([self heartbeatSeconds]){
 		[self performSelector:@selector(sendHeartbeat) withObject:nil afterDelay:[self heartbeatSeconds]];
 	}
-	
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
+	}
 	[self setNextHeartbeatString];
 }
 
 - (void) sendStartStopNotice:(BOOL)state
 {
 	NSString* theContent = @"";
-	
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
-
 	theContent = [theContent stringByAppendingFormat:@"Process: %@ was %@\n",[self elementName], state?@"started":@"stopped"];
 	if(state){
 		theContent = [theContent stringByAppendingString:@"Some Values may not have had time to be updated\n"];	
@@ -927,7 +934,6 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		[NSThread detachNewThreadSelector:@selector(eMailThread:) toTarget:self withObject:userInfo];
 	}
 }
-
 
 - (int) heartbeatSeconds
 {
