@@ -20,40 +20,13 @@
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
 
-#import "ORCaenCardController.h"
+#import "ORCVCfdLedController.h"
 
 // Definition of class.
-@interface ORCV812Controller : ORCaenCardController {
-	IBOutlet NSTextField* testPulseField;
-	IBOutlet NSTextField* patternInhibitField;
-	IBOutlet NSTextField* majorityThresholdField;
-	IBOutlet NSTextField* deadTime0_7Field;
-	IBOutlet NSTextField* deadTime8_15Field;
-	IBOutlet NSTextField* outputWidth0_7Field;
-	IBOutlet NSTextField* outputWidth8_15Field;
+@interface ORCV812Controller : ORCVCfdLedController {
 }
 
 #pragma mark ***Initialization
 - (id)		init;
- 	
-#pragma mark •••Notifications
-- (void) registerNotificationObservers;
-- (void) testPulseChanged:(NSNotification*)aNote;
-- (void) patternInhibitChanged:(NSNotification*)aNote;
-- (void) majorityThresholdChanged:(NSNotification*)aNote;
-- (void) deadTime0_7Changed:(NSNotification*)aNote;
-- (void) deadTime8_15Changed:(NSNotification*)aNote;
-- (void) outputWidth0_7Changed:(NSNotification*)aNote;
-- (void) outputWidth8_15Changed:(NSNotification*)aNote;
-
-#pragma mark ***Interface Management
-- (void) updateWindow;
-- (IBAction) testPulseAction:(id)sender;
-- (IBAction) patternInhibitAction:(id)sender;
-- (IBAction) majorityThresholdAction:(id)sender;
-- (IBAction) deadTime0_7Action:(id)sender;
-- (IBAction) deadTime8_15Action:(id)sender;
-- (IBAction) outputWidth0_7Action:(id)sender;
-- (IBAction) outputWidth8_15Action:(id)sender;
 
 @end
