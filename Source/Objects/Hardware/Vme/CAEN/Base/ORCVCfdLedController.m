@@ -29,6 +29,16 @@
     self = [ super initWithWindowNibName: @"CV812" ];
     return self;
 }
+- (void) awakeFromNib 
+{
+	int i;
+	for(i=0;i<16;i++){
+		[[inhibitMaskMatrix cellAtRow:i column:0] setTag:i];
+		[[thresholdMatrix cellAtRow:i column:0] setTag:i];
+	}
+	[super awakeFromNib];
+}
+
 - (NSString*) dialogLockName
 {
 	return @"CAENGenericLock"; //subclasses should override
@@ -40,7 +50,7 @@
     [ super registerNotificationObservers ];
 	
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
+
 	[notifyCenter addObserver:self
 					 selector:@selector(baseAddressChanged:)
 						 name:ORVmeIOCardBaseAddressChangedNotification
@@ -169,6 +179,11 @@
 - (void) patternInhibitChanged:(NSNotification*)aNote
 {
 	[patternInhibitField setIntValue:[model patternInhibit]];		
+	short i;
+	unsigned long theMask = [model patternInhibit];
+	for(i=0;i<16;i++){
+		[[inhibitMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
+	}
 }
 
 - (void) majorityThresholdChanged:(NSNotification*)aNote
@@ -206,6 +221,11 @@
 - (IBAction) patternInhibitAction:(id)sender
 {
 	[model setPatternInhibit:[sender intValue]];
+}
+
+- (IBAction) inhibitAction:(id)sender
+{
+	[model setInhibitMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) majorityThresholdAction:(id)sender
@@ -266,8 +286,10 @@
         NSRunAlertPanel([e name], @"%@\nProbe Failed", @"OK", nil, nil, e);	
 	}
 }
+
 - (IBAction) dialogLockAction:(id)sender
 {
     [gSecurity tryToSetLock:[self dialogLockName] to:[sender intValue] forWindow:[self window]];
 }
+
 @end

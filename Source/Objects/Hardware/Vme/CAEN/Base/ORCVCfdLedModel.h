@@ -86,6 +86,8 @@ typedef struct RegisterNamesStruct {
 - (void) setOutputWidth8_15:(unsigned short)aOutputWidth8_15;
 - (unsigned short) outputWidth0_7;
 - (void) setOutputWidth0_7:(unsigned short)aOutputWidth0_7;
+- (BOOL)inhibitMaskBit:(int)bit;
+- (void) setInhibitMaskBit:(int)bit withValue:(BOOL)aValue;
 
 #pragma mark ***HW Accesss
 - (void) writeThreshold:(unsigned short) pChan;

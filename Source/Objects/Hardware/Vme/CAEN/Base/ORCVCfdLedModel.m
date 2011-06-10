@@ -91,6 +91,8 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 }
 
 #pragma mark ***Accessors
+
+
 - (unsigned short) threshold:(unsigned short) aChnl
 {
     return(thresholds[aChnl]);
@@ -131,6 +133,19 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setPatternInhibit:patternInhibit];
     patternInhibit = aPatternInhibit;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCVCfdLedModelPatternInhibitChanged object:self];
+}
+
+- (BOOL)inhibitMaskBit:(int)bit
+{
+	return patternInhibit&(1<<bit);
+}
+
+- (void) setInhibitMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned long aMask = patternInhibit;
+	if(aValue)aMask |= (1<<bit);
+	else      aMask &= ~(1<<bit);
+	[self setPatternInhibit:aMask];
 }
 
 - (unsigned short) majorityThreshold

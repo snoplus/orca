@@ -36,7 +36,8 @@
     IBOutlet NSButton*	  dialogLockButton;
     IBOutlet NSButton*	  probeButton;
     IBOutlet NSTextField* dialogLockDocField;
- 	IBOutlet NSTextField*	baseAddressField;
+ 	IBOutlet NSTextField* baseAddressField;
+    IBOutlet NSMatrix*	  inhibitMaskMatrix;
 }
 
 #pragma mark ***Initialization
@@ -60,6 +61,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Actions
+- (IBAction) inhibitAction:(id)sender;
 - (IBAction) baseAddressAction: (id)aSender;
 - (IBAction) testPulseAction:(id)sender;
 - (IBAction) patternInhibitAction:(id)sender;
