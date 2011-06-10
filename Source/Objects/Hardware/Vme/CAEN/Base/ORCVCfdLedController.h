@@ -36,6 +36,7 @@
     IBOutlet NSButton*	  dialogLockButton;
     IBOutlet NSButton*	  probeButton;
     IBOutlet NSTextField* dialogLockDocField;
+ 	IBOutlet NSTextField*	baseAddressField;
 }
 
 #pragma mark ***Initialization
@@ -52,12 +53,14 @@
 - (void) outputWidth0_7Changed:(NSNotification*)aNote;
 - (void) outputWidth8_15Changed:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*) aNote;
+- (void) baseAddressChanged:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
 - (void) thresholdLockChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 
 #pragma mark ***Actions
+- (IBAction) baseAddressAction: (id)aSender;
 - (IBAction) testPulseAction:(id)sender;
 - (IBAction) patternInhibitAction:(id)sender;
 - (IBAction) majorityThresholdAction:(id)sender;

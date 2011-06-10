@@ -42,6 +42,11 @@
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	
 	[notifyCenter addObserver:self
+					 selector:@selector(baseAddressChanged:)
+						 name:ORVmeIOCardBaseAddressChangedNotification
+					   object:model];	
+	
+	[notifyCenter addObserver:self
 					 selector:@selector(thresholdChanged:)
 						 name:ORCVCfdLedModelThresholdChanged
 					   object:model];
@@ -98,6 +103,7 @@
 - (void) updateWindow
 {
 	[super updateWindow];
+    [self baseAddressChanged:nil];
 	[self testPulseChanged:nil];
 	[self patternInhibitChanged:nil];
 	[self majorityThresholdChanged:nil];
@@ -115,6 +121,11 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:[self dialogLockName] to:secure];
     [dialogLockButton setEnabled:secure];
+}
+
+- (void) baseAddressChanged:(NSNotification*)aNote
+{
+	[baseAddressField setIntValue: [model baseAddress]];
 }
 
 - (void) thresholdLockChanged:(NSNotification*)aNotification
@@ -238,6 +249,11 @@
         NSLog(@"Init of %@ FAILED.\n",[self className]);
         NSRunAlertPanel([e name], @"%@\nInit Failed", @"OK", nil, nil, e);	
 	}
+}
+
+- (IBAction) baseAddressAction: (id)aSender
+{
+	[model setBaseAddress:[aSender intValue]];
 }
 
 - (IBAction) probeAction:(id) aSender
