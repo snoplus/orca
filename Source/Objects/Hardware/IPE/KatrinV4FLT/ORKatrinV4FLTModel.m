@@ -1409,7 +1409,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     [encoder encodeBool:activateDebuggingDisplays forKey:@"activateDebuggingDisplays"];
 
     [encoder encodeInt:filterShapingLength forKey:@"filterShapingLength"];
-	if(filterShapingLength == 1) NSLog(@"filterShapingLength is 1. After saving ORCA configuration use ORCA 9.2.1, rev.5001 or higher to open again!\n");
+	if(filterShapingLength == 1) NSLog(@"filterShapingLength is 1. After saving ORCA configuration use ORCA 9.2.1, rev.5243 or higher to open again!\n");
 	
 	//see above: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::encodeWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
 }
@@ -1760,9 +1760,12 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     uint32_t versionFPGA8 = [self readpVersion];
 	if(versionCFPGA==0x1f000000){//card not readable; assume simulation mode and assume KATRIN card -tb-
 		versionCFPGA=0x20010104; versionFPGA8=0x20010101;
+		NSLog(@"MESSAGE: are you in simulation mode? Assume firmware CFPGA,FPGA8:0x%8x,0x%8x: OK.\n",versionCFPGA,versionFPGA8);
 	}
 	if((versionCFPGA>0x20010100 && versionCFPGA<0x20010104) || (versionFPGA8>0x20010100  && versionFPGA8<0x20010104) ){
-		NSLog(@"WARNING: you use a old firmware (version CFPGA,FPGA8:0x%8x,0x%8x). Update! (Contact: Till.Bergmann@KIT.EDU)\n",versionCFPGA,versionFPGA8);	
+		NSLog(@"WARNING: you use a old firmware (version CFPGA,FPGA8:0x%8x,0x%8x). Update! (See: http://fuzzy.fzk.de/ipedaq)\n",versionCFPGA,versionFPGA8);	
+	}else if((versionCFPGA>0x20010100 && versionCFPGA<=0x20010200) && (versionFPGA8>0x20010100  && versionFPGA8<0x20010204)){
+		NSLog(@"WARNING: your firmware does not support filter shaping length 100 nsec (your version is CFPGA,FPGA8:0x%8x,0x%8x). Update to 2.1.2.0,2.1.2.4! (See: http://fuzzy.fzk.de/ipedaq)\n",versionCFPGA,versionFPGA8);	
 	}else{
 		NSLog(@"MESSAGE: firmware version check: CFPGA,FPGA8:0x%8x,0x%8x: OK.\n",versionCFPGA,versionFPGA8);
 	}
