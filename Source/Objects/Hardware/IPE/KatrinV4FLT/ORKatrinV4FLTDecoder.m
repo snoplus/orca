@@ -52,7 +52,9 @@
  -----------------^^---------------------time precision(2 bit)
  --------------------^^^^ ^^-------------number of page in hardware buffer (0..63, 6 bit)
  ---------------------------^^ ^^^^ ^^^^-readPtr/eventID (0..511, 10 bit!)
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx fifoEventID + energy
+ ^^^^ ^^^^ ^^^^--------------------------fifoEventID
+                ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-energy
  </pre>
  *
  */
@@ -198,7 +200,9 @@
  -----------------^^---------------------time precision(2 bit)
  --------------------^^^^ ^^-------------number of page in hardware buffer (0..63, 6 bit)
  ---------------------------^^ ^^^^ ^^^^-readPtr/eventID (0..511, 10 bit!)
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx fifoEventID + energy
+ ^^^^ ^^^^ ^^^^--------------------------fifoEventID
+                ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-energy
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
                  ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
                                  ^-------append flag is in this record (append to previous record)
@@ -377,7 +381,7 @@ startIndex=traceStart16;
 
 //-------------------------------------------------------------
 /** Data format for energy+trace:
- *  2011-02-01 Till Bergmann
+ *  2011-02-01 Till Bergmann (STILL UNDER CONSTRUCTION, NOT YET USED)
  *  This is the new general Erergy+Trace data structure. The main difference is: we use the same format for
  *  energy and energy+trace events. The idea is to omit the trace at high rates and ship only the pure energy event data.
  *  At low rates we try to read out as much traces as possible.
