@@ -46,7 +46,7 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
            ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+infos:
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+infos (called now 'eventInfo' for OrcaROOT):
  -----^^^^-------------------------------flt run mode
  ----------^^^^--------------------------FIFO Flags: FF, AF, AE, EF
  -----------------^^---------------------time precision(2 bit)
@@ -197,7 +197,7 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
  ----------^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (24bit, 1 bit set denoting the channel number)  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+infos:
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventID+infos (called now 'eventInfo' for OrcaROOT):
  -----^^^^-------------------------------flt run mode
  ----------^^^^--------------------------FIFO Flags: FF, AF, AE, EF
  -----------------^^---------------------time precision(2 bit)
@@ -211,7 +211,7 @@
                                  ^-------append flag is in this record (append to previous record)
                                   ^------append next waveform record
                                     ^^^^-number which defines the content of the record (kind of version number)
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx not yet defined ... named eventInfo (started to store there postTriggTime -tb-)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx not yet defined ... (started to store there postTriggTime -tb-)
  
  followed by waveform data (up to 2048 16-bit words)
  <pre>  

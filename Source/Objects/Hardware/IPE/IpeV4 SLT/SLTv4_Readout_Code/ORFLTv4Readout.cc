@@ -679,7 +679,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = evsubsec;     //subsec
                                 data[dataIndex++] = chmap;
                                 data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit); fifoFlags (4 bit);flt mode (4 bit)
-                                data[dataIndex++] = energy;
+                                //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
+                                data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
                             }
                         }
                     }
@@ -845,7 +846,8 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = evsubsec;     //subsec
                                 data[dataIndex++] = chmap;
                                 data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
-                                data[dataIndex++] = energy;
+                                //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
+                                data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
                                 //DEBUG:data[dataIndex++] = debugbuffer[col][eventchan];   //TODO: debug ... energy; for checking page counter I wrote out page counter instead of energy -tb-
                                 data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) |  (wfRecordVersion & 0xf);
@@ -1049,7 +1051,8 @@ fprintf(stdout,"4x - readpr:%i, writeptr:%i\n",readptrx,writeptrx);fflush(stdout
                                 data[dataIndex++] = evsubsec;     //subsec
                                 data[dataIndex++] = chmap;
                                 data[dataIndex++] = (readptr & 0x3ff) | ((pagenr & 0x3f)<<10) | ((precision & 0x3)<<16)  | ((fifoFlags & 0xf)<<20) | ((fltRunMode & 0xf)<<24);        //event flags: event ID=read ptr (10 bit); pagenr (6 bit);; fifoFlags (4 bit);flt mode (4 bit)
-                                data[dataIndex++] = energy;
+                                //data[dataIndex++] = energy; changed 2011-06-14 to add fifoEventID -tb-
+                                data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
                                 data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) | eventFlags | (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
                                 data[dataIndex++] = postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
