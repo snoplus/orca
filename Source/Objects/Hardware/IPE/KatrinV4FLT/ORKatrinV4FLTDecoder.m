@@ -103,7 +103,9 @@
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];	
 
-	unsigned long energy = ptr[6]/filterDiv;
+	//note the ptr[6] shares the eventID and the energy
+	//the eventID must be masked off
+	unsigned long energy = (ptr[6] & 0xfffff)/filterDiv;
 		
 	//channel by channel histograms
 	[aDataSet histogram:energy
@@ -163,11 +165,12 @@
 	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ptr[4]];	
     NSString* nPages		= [NSString stringWithFormat:@"EventFlags = 0x%x\n",     ptr[5]];
 	
-	NSString* energy        = [NSString stringWithFormat:@"Energy     = %d\n",     ptr[6]];
+	NSString* fifoEventId   = [NSString stringWithFormat:@"FifoEventId = %d\n",     ShiftAndExtract(ptr[6],20,0xfff) ];
+	NSString* energy        = [NSString stringWithFormat:@"Energy      = %d\n",     ShiftAndExtract(ptr[6],0,0xffff)];
 
 	
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
-			energy,eventDate,eventTime,seconds,subSec,nPages,chMap];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
+			fifoEventId,energy,eventDate,eventTime,seconds,subSec,nPages,chMap];               
     	
 }
 
@@ -248,7 +251,9 @@
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
 	//channel by channel histograms
-	unsigned long energy = ptr[6]/filterDiv;
+	//note the ptr[6] shares the eventID and the energy
+	//the eventID must be masked off
+	unsigned long energy = (ptr[6] & 0xfffff)/filterDiv;
 
 	//uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);//TODO: DEBUG -tb- //commented out since unused MAH 9/14/10
 	//uint32_t eventID        = ptr[5];//commented out since unused MAH 9/14/10
@@ -344,7 +349,8 @@ startIndex=traceStart16;
     uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
     uint32_t chmap          = ptr[4];
     uint32_t eventID        = ptr[5];
-    uint32_t energy         = ptr[6];
+    uint32_t fifoEventID    = ShiftAndExtract(ptr[6],20,0xfff);
+    uint32_t energy         = ShiftAndExtract(ptr[6],0,0xfffff);
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     
@@ -352,25 +358,26 @@ startIndex=traceStart16;
 
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* crate     = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
-    NSString* card      = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
-    NSString* chan      = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
-    NSString* secStr    = [NSString stringWithFormat:@"Sec        = %d\n", sec];
-    NSString* subsecStr = [NSString stringWithFormat:@"SubSec     = %d\n", subsec];
-    NSString* energyStr = [NSString stringWithFormat:@"Energy     = %d\n", energy];
-    NSString* chmapStr  = [NSString stringWithFormat:@"ChannelMap = 0x%x\n", chmap];
-    NSString* eventIDStr= [NSString stringWithFormat:@"ReadPtr,Pg#= %d,%d\n", ShiftAndExtract(eventID,0,0x3ff),ShiftAndExtract(eventID,10,0x3f)];
-    NSString* offsetStr = [NSString stringWithFormat:@"Offset16   = %d\n", traceStart16];
-    NSString* versionStr= [NSString stringWithFormat:@"RecVersion = %d\n", ShiftAndExtract(eventFlags,0,0xf)];
+    NSString* crate			 = [NSString stringWithFormat:@"Crate       = %d\n",(*ptr>>21) & 0xf];
+    NSString* card			 = [NSString stringWithFormat:@"Station     = %d\n",(*ptr>>16) & 0x1f];
+    NSString* chan			 = [NSString stringWithFormat:@"Channel     = %d\n",(*ptr>>8) & 0xff];
+    NSString* secStr		 = [NSString stringWithFormat:@"Sec         = %d\n", sec];
+    NSString* subsecStr		 = [NSString stringWithFormat:@"SubSec      = %d\n", subsec];
+    NSString* fifoEventIdStr = [NSString stringWithFormat:@"FifoEventId = %d\n", fifoEventID];
+    NSString* energyStr		 = [NSString stringWithFormat:@"Energy      = %d\n", energy];
+    NSString* chmapStr		 = [NSString stringWithFormat:@"ChannelMap  = 0x%x\n", chmap];
+    NSString* eventIDStr	 = [NSString stringWithFormat:@"ReadPtr,Pg# = %d,%d\n", ShiftAndExtract(eventID,0,0x3ff),ShiftAndExtract(eventID,10,0x3f)];
+    NSString* offsetStr		 = [NSString stringWithFormat:@"Offset16    = %d\n", traceStart16];
+    NSString* versionStr	 = [NSString stringWithFormat:@"RecVersion  = %d\n", ShiftAndExtract(eventFlags,0,0xf)];
     NSString* eventFlagsStr
-                        = [NSString stringWithFormat:@"Flag(a,ap) = %d,%d\n", ShiftAndExtract(eventFlags,4,0x1),ShiftAndExtract(eventFlags,5,0x1)];
-    NSString* lengthStr = [NSString stringWithFormat:@"Length     = %d\n", length];
+							 = [NSString stringWithFormat:@"Flag(a,ap)  = %d,%d\n", ShiftAndExtract(eventFlags,4,0x1),ShiftAndExtract(eventFlags,5,0x1)];
+    NSString* lengthStr		 = [NSString stringWithFormat:@"Length      = %d\n", length];
     
     
-    NSString* evFlagsStr= [NSString stringWithFormat:@"EventFlags = 0x%x\n", eventFlags ];
+    NSString* evFlagsStr     = [NSString stringWithFormat:@"EventFlags = 0x%x\n", eventFlags ];
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
-                secStr, subsecStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr]; 
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
+                secStr, subsecStr, fifoEventIdStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr]; 
 }
 
 @end
@@ -472,7 +479,7 @@ Variable section: exists if trace length !=0
 	unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 
 	//channel by channel histograms
-	unsigned long energy = ptr[6]/filterDiv;
+	unsigned long energy = (ptr[6] & 0xfffff)/filterDiv;
 
 	//uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);//TODO: DEBUG -tb- //commented out since unused MAH 9/14/10
 	//uint32_t eventID        = ptr[5];//commented out since unused MAH 9/14/10
@@ -567,7 +574,8 @@ startIndex=traceStart16;
     uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
     uint32_t chmap          = ptr[4];
     uint32_t eventID        = ptr[5];
-    uint32_t energy         = ptr[6];
+    uint32_t fifoEventId    = ShiftAndExtract(ptr[6],20,0xfff);
+    uint32_t energy         = ShiftAndExtract(ptr[6],0,0xfffff);
     uint32_t eventFlags     = ptr[7];
     uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     
@@ -580,6 +588,8 @@ startIndex=traceStart16;
     NSString* chan      = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
     NSString* secStr    = [NSString stringWithFormat:@"Sec        = %d\n", sec];
     NSString* subsecStr = [NSString stringWithFormat:@"SubSec     = %d\n", subsec];
+    NSString* fifoEventIdStr 
+					    = [NSString stringWithFormat:@"FifoEventId= %d\n", fifoEventId];
     NSString* energyStr = [NSString stringWithFormat:@"Energy     = %d\n", energy];
     NSString* chmapStr  = [NSString stringWithFormat:@"ChannelMap = 0x%x\n", chmap];
     NSString* eventIDStr= [NSString stringWithFormat:@"ReadPtr,Pg#= %d,%d\n", ShiftAndExtract(eventID,0,0x3ff),ShiftAndExtract(eventID,10,0x3f)];
@@ -592,8 +602,8 @@ startIndex=traceStart16;
     
     NSString* evFlagsStr= [NSString stringWithFormat:@"EventFlags = 0x%x\n", eventFlags ];
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
-                secStr, subsecStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr]; 
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
+                secStr, subsecStr, fifoEventIdStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr]; 
 }
 
 @end
