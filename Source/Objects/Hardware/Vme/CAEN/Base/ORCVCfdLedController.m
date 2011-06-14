@@ -166,10 +166,17 @@
 }	
 - (void) thresholdChanged:(NSNotification*) aNotification
 {
-	// Get the channel that changed and then set the GUI value using the model value.
-	int chnl = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
-	[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
-	
+	if(!aNotification){
+		int i;
+		for(i=0;i<16;i++){
+			[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+		}
+	}
+	else {
+		// Get the channel that changed and then set the GUI value using the model value.
+		int chnl = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
+		[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
+	}
 }
 - (void) testPulseChanged:(NSNotification*)aNote
 {

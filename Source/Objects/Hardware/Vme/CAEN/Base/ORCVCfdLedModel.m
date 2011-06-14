@@ -328,8 +328,8 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     int i;
-    NSMutableArray* array = [NSMutableArray arrayWithCapacity:32];
-    for(i=0;i<32;i++){
+    NSMutableArray* array = [NSMutableArray arrayWithCapacity:16];
+    for(i=0;i<16;i++){
         [array addObject:[NSNumber numberWithShort:thresholds[i]]];
     }
     [objDictionary setObject:array forKey:@"thresholds"];
@@ -350,6 +350,10 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
+	int i;
+	for(i=0;i<16;i++){
+		[self setThreshold:i threshold:[aDecoder decodeIntForKey:[NSString stringWithFormat:@"threshold%d",i]]];
+	}
 	[self setTestPulse:[aDecoder decodeIntForKey:@"testPulse"]];
 	[self setPatternInhibit:[aDecoder decodeIntForKey:@"patternInhibit"]];
 	[self setMajorityThreshold:[aDecoder decodeIntForKey:@"majorityThreshold"]];
@@ -365,6 +369,10 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+	int i;
+	for(i=0;i<16;i++){
+		[anEncoder encodeInt:[self threshold:i] forKey:[NSString stringWithFormat:@"threshold%d",i]];
+	}
     [anEncoder encodeInt:testPulse forKey:@"testPulse"];
     [anEncoder encodeInt:patternInhibit forKey:@"patternInhibit"];
     [anEncoder encodeInt:majorityThreshold forKey:@"majorityThreshold"];
