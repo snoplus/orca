@@ -25,6 +25,7 @@
 // Definition of class.
 @interface ORCVCfdLedController : OrcaObjectController {
     IBOutlet NSMatrix*	  thresholdMatrix;
+	IBOutlet NSButton*	  autoInitWithRunCB;
 	IBOutlet NSTextField* testPulseField;
 	IBOutlet NSTextField* patternInhibitField;
 	IBOutlet NSTextField* majorityThresholdField;
@@ -51,12 +52,15 @@
 - (void) outputWidth8_15Changed:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*) aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
+- (void) runABoutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
+- (void) autoInitWithRunChanged:(NSNotification*)aNote;
 - (void) thresholdLockChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 
 #pragma mark ***Actions
+- (IBAction) autoInitWithRunAction:(id)sender;
 - (IBAction) inhibitAction:(id)sender;
 - (IBAction) baseAddressAction: (id)aSender;
 - (IBAction) testPulseAction:(id)sender;

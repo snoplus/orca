@@ -71,7 +71,6 @@
 						 name : ORRunStatusChangedNotification
 					   object : nil];
 	
-	
     [notifyCenter addObserver : self
                      selector : @selector(testPulseChanged:)
                          name : ORCVCfdLedModelTestPulseChanged
@@ -97,9 +96,24 @@
                          name : ORCVCfdLedModelOutputWidth8_15Changed
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(autoInitWithRunChanged:)
+                         name : ORCVCfdLedModelAutoInitWithRunChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(runABoutToStart:)
+						 name : ORRunAboutToStartNotification
+					   object : nil];
 }
 
 #pragma mark ***Interface Management
+
+- (void) autoInitWithRunChanged:(NSNotification*)aNote
+{
+	[autoInitWithRunCB setIntValue: [model autoInitWithRun]];
+}
+
 - (void) updateWindow
 {
 	[super updateWindow];
@@ -112,6 +126,7 @@
     [self thresholdLockChanged:nil];
     [self thresholdChanged:nil];
 
+	[self autoInitWithRunChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -119,6 +134,12 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:[self dialogLockName] to:secure];
     [dialogLockButton setEnabled:secure];
+}
+
+- (void) runABoutToStart:(NSNotification*)aNote
+{
+	[self endEditing];
+	[model initBoard];
 }
 
 - (void) baseAddressChanged:(NSNotification*)aNote
@@ -196,6 +217,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) autoInitWithRunAction:(id)sender
+{
+	[model setAutoInitWithRun:[sender intValue]];	
+}
+
 - (IBAction) testPulseAction:(id)sender
 {
 	[model setTestPulse:[sender intValue]];
@@ -236,6 +263,7 @@
 - (IBAction) initHWAction:(id) aSender
 {
 	@try {
+		[self endEditing];
 		[model initBoard];
 	}
 	@catch(NSException* e){

@@ -36,7 +36,12 @@ typedef struct RegisterNamesStruct {
 	unsigned short outputWidth0_7;
 	unsigned short outputWidth8_15;
     unsigned short  thresholds[16];
+    BOOL autoInitWithRun;
 }
+
+#pragma mark ***Accessors
+- (BOOL) autoInitWithRun;
+- (void) setAutoInitWithRun:(BOOL)aAutoInitWithRun;
 
 - (unsigned short)	threshold: (unsigned short) anIndex;
 - (void)		setThreshold: (unsigned short ) anIndex threshold: (unsigned short) aValue;
@@ -75,8 +80,14 @@ typedef struct RegisterNamesStruct {
 - (unsigned long) moduleTypeOffset; 
 - (unsigned long) versionOffset; 
 
+#pragma mark ***Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
+extern NSString* ORCVCfdLedModelAutoInitWithRunChanged;
 extern NSString* ORCVCfdLedModelSelectedRegIndexChanged;
 extern NSString* ORCVCfdLedModelThresholdChanged;
 extern NSString* ORCVCfdLedModelTestPulseChanged;

@@ -24,6 +24,7 @@
 #define k812DefaultBaseAddress 		0xF0000000
 #define k812DefaultAddressModifier 	0x39
 
+NSString* ORCVCfdLedModelAutoInitWithRunChanged = @"ORCVCfdLedModelAutoInitWithRunChanged";
 NSString* ORCVCfdLedModelTestPulseChanged			= @"ORCVCfdLedModelTestPulseChanged";
 NSString* ORCVCfdLedModelPatternInhibitChanged		= @"ORCVCfdLedModelPatternInhibitChanged";
 NSString* ORCVCfdLedModelMajorityThresholdChanged	= @"ORCVCfdLedModelMajorityThresholdChanged";
@@ -51,6 +52,20 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) autoInitWithRun
+{
+    return autoInitWithRun;
+}
+
+- (void) setAutoInitWithRun:(BOOL)aAutoInitWithRun
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoInitWithRun:autoInitWithRun];
+    
+    autoInitWithRun = aAutoInitWithRun;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCVCfdLedModelAutoInitWithRunChanged object:self];
+}
 - (unsigned short) threshold:(unsigned short) aChnl
 {
     return(thresholds[aChnl]);
@@ -152,13 +167,18 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 #pragma mark ***HW Access
 - (void) initBoard
 {
-	int i;
-	for(i=0;i<16;i++)[self writeThreshold:i];
-	[self writeOutputWidth0_7];
-	[self writeOutputWidth8_15];
-	[self writeTestPulse];
-	[self writePatternInhibit];
-	[self writeMajorityThreshold];
+	@try {
+		int i;
+		for(i=0;i<16;i++)[self writeThreshold:i];
+		[self writeOutputWidth0_7];
+		[self writeOutputWidth8_15];
+		[self writeTestPulse];
+		[self writePatternInhibit];
+		[self writeMajorityThreshold];
+	}
+	@catch (NSException* e) {
+		NSLogColor([NSColor redColor], @"%@ didn't initialize\n",[self identifier]);
+	}
 }
 
 - (unsigned short) numberOfRegisters
@@ -324,6 +344,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 	for(i=0;i<16;i++){
 		[self setThreshold:i threshold:[aDecoder decodeIntForKey:[NSString stringWithFormat:@"threshold%d",i]]];
 	}
+    [self setAutoInitWithRun:[aDecoder decodeBoolForKey:@"autoInitWithRun"]];
 	[self setTestPulse:[aDecoder decodeIntForKey:@"testPulse"]];
 	[self setPatternInhibit:[aDecoder decodeIntForKey:@"patternInhibit"]];
 	[self setMajorityThreshold:[aDecoder decodeIntForKey:@"majorityThreshold"]];
@@ -341,6 +362,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 	for(i=0;i<16;i++){
 		[anEncoder encodeInt:[self threshold:i] forKey:[NSString stringWithFormat:@"threshold%d",i]];
 	}
+	[anEncoder encodeBool:autoInitWithRun forKey:@"autoInitWithRun"];
     [anEncoder encodeInt:testPulse forKey:@"testPulse"];
     [anEncoder encodeInt:patternInhibit forKey:@"patternInhibit"];
     [anEncoder encodeInt:majorityThreshold forKey:@"majorityThreshold"];
