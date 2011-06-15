@@ -30,7 +30,62 @@
     return self;
 }
 
-#pragma mark ***Interface Management - Module specific
 - (NSString*) dialogLockName {return @"ORCV812ThresholdLock";}
+
+#pragma mark ***Interface Management
+- (void) registerNotificationObservers
+{
+    [super registerNotificationObservers];
+	
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(deadTime0_7Changed:)
+                         name : ORCV812ModelDeadTime0_7Changed
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(deadTime8_15Changed:)
+                         name : ORCV812ModelDeadTime8_15Changed
+						object: model];
+}
+
+#pragma mark ***Interface Management
+- (void) updateWindow
+{
+	[super updateWindow];
+	[self deadTime0_7Changed:nil];
+	[self deadTime8_15Changed:nil];
+}
+
+- (void) deadTime0_7Changed:(NSNotification*)aNote
+{
+	[deadTime0_7Field setIntValue:[model deadTime0_7]];			
+}
+
+- (void) deadTime8_15Changed:(NSNotification*)aNote
+{
+	[deadTime8_15Field setIntValue:[model deadTime8_15]];			
+}
+
+- (void) thresholdLockChanged:(NSNotification*)aNotification
+{
+	[super thresholdLockChanged:aNotification];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self dialogLockName]];
+	[deadTime0_7Field setEnabled:!lockedOrRunningMaintenance]; 
+    [deadTime8_15Field setEnabled:!lockedOrRunningMaintenance]; 
+}	
+
+
+#pragma mark ***Actions
+- (IBAction) deadTime0_7Action:(id)sender
+{
+	[model setDeadTime0_7:[sender intValue]];
+}
+
+- (IBAction) deadTime8_15Action:(id)sender
+{
+	[model setDeadTime8_15:[sender intValue]];
+}
 
 @end

@@ -24,9 +24,19 @@
 
 // Definition of class.
 @interface ORCV812Controller : ORCVCfdLedController {
+	IBOutlet NSTextField* deadTime0_7Field;
+	IBOutlet NSTextField* deadTime8_15Field;
 }
 
 #pragma mark ***Initialization
 - (id)		init;
+
+#pragma mark ***Interface
+- (void) deadTime0_7Changed:(NSNotification*)aNote;
+- (void) deadTime8_15Changed:(NSNotification*)aNote;
+
+#pragma mark ***Actions
+- (IBAction) deadTime0_7Action:(id)sender;
+- (IBAction) deadTime8_15Action:(id)sender;
 
 @end

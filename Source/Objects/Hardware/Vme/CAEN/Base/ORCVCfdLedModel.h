@@ -20,42 +20,10 @@
 //-------------------------------------------------------------
 #import "ORVmeIOCard.h"
 
-// Declaration of constants for module.
-enum {
-    kThreshold0,		//  0x00
-    kThreshold1,		//  0x02
-    kThreshold2,		//  0x04
-    kThreshold3,		//  0x06
-    kThreshold4,		//  0x08
-    kThreshold5,		//  0x0a
-    kThreshold6,		//  0x0c
-    kThreshold7,		//  0x0E
-    kThreshold8,		//  0x10
-    kThreshold9,		//  0x12
-    kThreshold10,		//  0x14
-    kThreshold11,		//  0x16
-    kThreshold12,		//  0x18
-    kThreshold13,		//  0x1A
-    kThreshold14,		//  0x1C
-    kThreshold15,		//  0x1E
-	kOutputWidt0_7,		//  0x40
-	kOutputWidth8_15,	//  0x42
-	kDeadTime0_7,		//  0x44
-	kDeadTime8_15,		//  0x46
-	kMajorityThreshold,	//  0x48
-	kPatternInhibit,	//  0x4A
-	kTestPulse,			//  0x4C
-	kFixedCode,			//  0xFA
-	kModuleType,		//  0xFC
-	kVersion,			//  0xFE
-    kNumRegisters
-};
-
 typedef struct RegisterNamesStruct {
 	NSString*       regName;
 	unsigned long 	addressOffset;
-	short		accessType;
-} CV812RegNamesStruct; 
+} CVCfcLedRegNamesStruct; 
 
 // Class definition
 @interface ORCVCfdLedModel : ORVmeIOCard
@@ -67,7 +35,7 @@ typedef struct RegisterNamesStruct {
 	unsigned short deadTime8_15;
 	unsigned short outputWidth0_7;
 	unsigned short outputWidth8_15;
-    unsigned short  thresholds[32];
+    unsigned short  thresholds[16];
 }
 
 - (unsigned short)	threshold: (unsigned short) anIndex;
@@ -78,10 +46,6 @@ typedef struct RegisterNamesStruct {
 - (void) setPatternInhibit:(unsigned short)aPatternInhibit;
 - (unsigned short) majorityThreshold;
 - (void) setMajorityThreshold:(unsigned short)aMajorityThreshold;
-- (unsigned short) deadTime0_7;
-- (void) setDeadTime0_7:(unsigned short)aDeadTime0_7;
-- (unsigned short) deadTime8_15;
-- (void) setDeadTime8_15:(unsigned short)aDeadTime8_15;
 - (unsigned short) outputWidth8_15;
 - (void) setOutputWidth8_15:(unsigned short)aOutputWidth8_15;
 - (unsigned short) outputWidth0_7;
@@ -91,8 +55,6 @@ typedef struct RegisterNamesStruct {
 
 #pragma mark ***HW Accesss
 - (void) writeThreshold:(unsigned short) pChan;
-- (void) writeDeadTime0_7;
-- (void) writeDeadTime8_15;
 - (void) writeOutputWidth0_7;
 - (void) writeOutputWidth8_15;
 - (void) writeTestPulse;
@@ -100,6 +62,19 @@ typedef struct RegisterNamesStruct {
 - (void) writeMajorityThreshold;
 - (void) initBoard;
 - (void) probeBoard;
+
+#pragma mark ***subclass responsibility
+- (unsigned short) numberOfRegisters;
+- (unsigned long) regOffset:(int)index;
+- (unsigned long) threshold0Offset;
+- (unsigned long) outputWidth0_7Offset;
+- (unsigned long) outputWidth8_15Offset; 
+- (unsigned long) testPulseOffset; 
+- (unsigned long) patternInibitOffset; 
+- (unsigned long) majorityThresholdOffset; 
+- (unsigned long) moduleTypeOffset; 
+- (unsigned long) versionOffset; 
+
 @end
 
 extern NSString* ORCVCfdLedModelSelectedRegIndexChanged;

@@ -86,16 +86,6 @@
                      selector : @selector(majorityThresholdChanged:)
                          name : ORCVCfdLedModelMajorityThresholdChanged
 						object: model];
-
-	[notifyCenter addObserver : self
-                     selector : @selector(deadTime0_7Changed:)
-                         name : ORCVCfdLedModelDeadTime0_7Changed
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(deadTime8_15Changed:)
-                         name : ORCVCfdLedModelDeadTime8_15Changed
-						object: model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(outputWidth0_7Changed:)
@@ -117,8 +107,6 @@
 	[self testPulseChanged:nil];
 	[self patternInhibitChanged:nil];
 	[self majorityThresholdChanged:nil];
-	[self deadTime0_7Changed:nil];
-	[self deadTime8_15Changed:nil];
 	[self outputWidth0_7Changed:nil];
 	[self outputWidth8_15Changed:nil];
     [self thresholdLockChanged:nil];
@@ -149,8 +137,6 @@
     [testPulseField setEnabled:!lockedOrRunningMaintenance]; 
     [patternInhibitField setEnabled:!lockedOrRunningMaintenance]; 
     [majorityThresholdField setEnabled:!lockedOrRunningMaintenance]; 
-    [deadTime0_7Field setEnabled:!lockedOrRunningMaintenance]; 
-    [deadTime8_15Field setEnabled:!lockedOrRunningMaintenance]; 
     [outputWidth0_7Field setEnabled:!lockedOrRunningMaintenance]; 
     [outputWidth8_15Field setEnabled:!lockedOrRunningMaintenance]; 
 
@@ -199,16 +185,6 @@
 
 }
 
-- (void) deadTime0_7Changed:(NSNotification*)aNote
-{
-	[deadTime0_7Field setIntValue:[model deadTime0_7]];			
-}
-
-- (void) deadTime8_15Changed:(NSNotification*)aNote
-{
-	[deadTime8_15Field setIntValue:[model deadTime8_15]];			
-}
-
 - (void) outputWidth0_7Changed:(NSNotification*)aNote
 {
 	[outputWidth0_7Field setIntValue:[model outputWidth0_7]];			
@@ -238,16 +214,6 @@
 - (IBAction) majorityThresholdAction:(id)sender
 {
 	[model setMajorityThreshold:[sender intValue]];
-}
-
-- (IBAction) deadTime0_7Action:(id)sender
-{
-	[model setDeadTime0_7:[sender intValue]];
-}
-
-- (IBAction) deadTime8_15Action:(id)sender
-{
-	[model setDeadTime8_15:[sender intValue]];
 }
 
 - (IBAction) outputWidth0_7Action:(id)sender

@@ -24,46 +24,6 @@
 #define k812DefaultBaseAddress 		0xF0000000
 #define k812DefaultAddressModifier 	0x39
 
-enum {
-	kReadOnly,
-	kWriteOnly,
-	kReadWrite
-};
-
-// Define all the registers available to this unit. Some of the values in the struct are not used.
-static CV812RegNamesStruct CV812Reg[kNumRegisters] = {
-	{@"Threshold 0",		0x00,		kWriteOnly},
-	{@"Threshold 1",		0x02,		kWriteOnly},
-	{@"Threshold 2",		0x04,		kWriteOnly},
-	{@"Threshold 3",		0x06,		kWriteOnly},
-	{@"Threshold 4",		0x08,		kWriteOnly},
-	{@"Threshold 5",		0x0A,		kWriteOnly},
-	{@"Threshold 6",    	0x0C,		kWriteOnly},
-	{@"Threshold 7",		0x0E,		kWriteOnly},
-	{@"Threshold 8",		0x10,		kWriteOnly},
-	{@"Threshold 9",		0x12,		kWriteOnly},
-	{@"Threshold 10",		0x14,		kWriteOnly},
-	{@"Threshold 11",		0x16,		kWriteOnly},
-	{@"Threshold 12",		0x18,		kWriteOnly},
-	{@"Threshold 13",    	0x1A,		kWriteOnly},
-	{@"Threshold 14",		0x1C,		kWriteOnly},
-	{@"Threshold 15",		0x1E,		kWriteOnly},
-	
-	{@"Output Width 0-7",	0x40,		kWriteOnly},
-	{@"Output Width 8-15",	0x42,		kWriteOnly},
-	{@"Dead Time 0-7",		0x44,		kWriteOnly},
-	{@"Dead Time 8-15",		0x46,		kWriteOnly},
-
-	{@"Majority Thres",		0x48,		kWriteOnly},
-	{@"Pattern Inhib",		0x4A,		kWriteOnly},
-	{@"Test Pulse",			0x4C,		kWriteOnly},
-
-	{@"Fixed Code",			0xFA,		kReadOnly},
-	{@"Module Type",		0xFC,		kReadOnly},
-	{@"Version",			0xFE,		kReadOnly},
-};
-
-
 NSString* ORCVCfdLedModelTestPulseChanged			= @"ORCVCfdLedModelTestPulseChanged";
 NSString* ORCVCfdLedModelPatternInhibitChanged		= @"ORCVCfdLedModelPatternInhibitChanged";
 NSString* ORCVCfdLedModelMajorityThresholdChanged	= @"ORCVCfdLedModelMajorityThresholdChanged";
@@ -91,8 +51,6 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 }
 
 #pragma mark ***Accessors
-
-
 - (unsigned short) threshold:(unsigned short) aChnl
 {
     return(thresholds[aChnl]);
@@ -160,29 +118,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCVCfdLedModelMajorityThresholdChanged object:self];
 }
 
-- (unsigned short) deadTime0_7
-{
-    return deadTime0_7;
-}
 
-- (void) setDeadTime0_7:(unsigned short)aDeadTime0_7
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setDeadTime0_7:deadTime0_7];
-    deadTime0_7 = aDeadTime0_7;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCVCfdLedModelDeadTime0_7Changed object:self];
-}
-
-- (unsigned short) deadTime8_15
-{
-    return deadTime8_15;
-}
-
-- (void) setDeadTime8_15:(unsigned short)aDeadTime8_15
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setDeadTime8_15:deadTime8_15];
-    deadTime8_15 = aDeadTime8_15;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCVCfdLedModelDeadTime8_15Changed object:self];
-}
 
 - (unsigned short) outputWidth8_15
 {
@@ -218,8 +154,6 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 {
 	int i;
 	for(i=0;i<16;i++)[self writeThreshold:i];
-	[self writeDeadTime0_7];
-	[self writeDeadTime8_15];
 	[self writeOutputWidth0_7];
 	[self writeOutputWidth8_15];
 	[self writeTestPulse];
@@ -227,39 +161,77 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 	[self writeMajorityThreshold];
 }
 
+- (unsigned short) numberOfRegisters
+{
+	//subclasses must override
+	return 0;
+}
+- (unsigned long) regOffset:(int)index
+{
+	NSAssert(NO, @"RegOffset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+
+- (unsigned long) threshold0Offset 
+{ 
+	NSAssert(NO, @"threshold0Offset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+
+- (unsigned long) outputWidth0_7Offset 
+{ 
+	NSAssert(NO, @"outputWidth0_7Offset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+- (unsigned long) outputWidth8_15Offset 
+{ 
+	NSAssert(NO, @"outputWidth8_15Offset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+- (unsigned long) testPulseOffset 
+{ 
+	NSAssert(NO, @"testPulseOffset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+- (unsigned long) patternInibitOffset 
+{ 
+	NSAssert(NO, @"patternInibitOffset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+- (unsigned long) majorityThresholdOffset 
+{ 
+	NSAssert(NO, @"majorityThresholdOffset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+- (unsigned long) moduleTypeOffset 
+{ 
+	NSAssert(NO, @"moduleTypeOffset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+- (unsigned long) versionOffset 
+{ 
+	NSAssert(NO, @"moduleTypeOffset in ORCVCfdLedModel must be subclassed\n");
+	return 0;
+}
+
+
+
 - (void) writeThreshold:(unsigned short) pChan
 {
     unsigned short 	threshold = [self threshold:pChan];
     
     [[self adapter] writeWordBlock:&threshold
-                         atAddress:[self baseAddress] +  CV812Reg[kThreshold0].addressOffset + (pChan * sizeof(short))
+                         atAddress:[self baseAddress] +  [self threshold0Offset] + (pChan * sizeof(short))
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
 
-- (void) writeDeadTime0_7
-{
-    [[self adapter] writeWordBlock:&deadTime0_7
-                         atAddress:[self baseAddress] +  CV812Reg[kDeadTime0_7].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-- (void) writeDeadTime8_15
-{
-    [[self adapter] writeWordBlock:&deadTime8_15
-                         atAddress:[self baseAddress] +  CV812Reg[kDeadTime8_15].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
 
 - (void) writeOutputWidth0_7
 {
     [[self adapter] writeWordBlock:&outputWidth0_7
-                         atAddress:[self baseAddress] +  CV812Reg[kOutputWidt0_7].addressOffset
+                         atAddress:[self baseAddress] +  [self outputWidth0_7Offset]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -268,7 +240,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 - (void) writeOutputWidth8_15
 {
     [[self adapter] writeWordBlock:&outputWidth8_15
-                         atAddress:[self baseAddress] +  CV812Reg[kOutputWidth8_15].addressOffset
+                         atAddress:[self baseAddress] +  [self outputWidth8_15Offset]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -277,7 +249,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 - (void) writeTestPulse
 {
     [[self adapter] writeWordBlock:&testPulse
-                         atAddress:[self baseAddress] +  CV812Reg[kTestPulse].addressOffset
+                         atAddress:[self baseAddress] +  [self testPulseOffset]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -286,7 +258,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 - (void) writePatternInhibit
 {
     [[self adapter] writeWordBlock:&patternInhibit
-                         atAddress:[self baseAddress] +  CV812Reg[kPatternInhibit].addressOffset
+                         atAddress:[self baseAddress] +  [self patternInibitOffset]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -295,7 +267,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 - (void) writeMajorityThreshold
 {
     [[self adapter] writeWordBlock:&majorityThreshold
-                         atAddress:[self baseAddress] +  CV812Reg[kMajorityThreshold].addressOffset
+                         atAddress:[self baseAddress] +  [self majorityThresholdOffset]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -305,14 +277,14 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 {
 	unsigned short moduleType;
     [[self adapter] readWordBlock:&moduleType
-                         atAddress:[self baseAddress] +  CV812Reg[kModuleType].addressOffset
+						atAddress:[self baseAddress] +  [self moduleTypeOffset]
                         numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	
 	unsigned short version;
     [[self adapter] readWordBlock:&version
-						atAddress:[self baseAddress] +  CV812Reg[kVersion].addressOffset
+						atAddress:[self baseAddress] +  [self versionOffset]
 					   numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -322,7 +294,6 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 	NSLog(@"Module Type: 0x%\n",moduleType&0x3ff);
 }
 
-#pragma mark ***Register - Register specific routines
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
@@ -336,13 +307,12 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
     [objDictionary setObject:[NSNumber numberWithInt:testPulse] forKey:@"testPulse"];
     [objDictionary setObject:[NSNumber numberWithInt:patternInhibit] forKey:@"patternInhibit"];
     [objDictionary setObject:[NSNumber numberWithInt:majorityThreshold] forKey:@"majorityThreshold"];
-    [objDictionary setObject:[NSNumber numberWithInt:deadTime0_7] forKey:@"deadTime0_7"];
-    [objDictionary setObject:[NSNumber numberWithInt:deadTime8_15] forKey:@"deadTime8_15"];
     [objDictionary setObject:[NSNumber numberWithInt:outputWidth0_7] forKey:@"outputWidth0_7"];
     [objDictionary setObject:[NSNumber numberWithInt:outputWidth8_15] forKey:@"outputWidth8_15"];
     
     return objDictionary;
 }
+
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*) aDecoder
@@ -357,8 +327,6 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 	[self setTestPulse:[aDecoder decodeIntForKey:@"testPulse"]];
 	[self setPatternInhibit:[aDecoder decodeIntForKey:@"patternInhibit"]];
 	[self setMajorityThreshold:[aDecoder decodeIntForKey:@"majorityThreshold"]];
-	[self setDeadTime0_7:[aDecoder decodeIntForKey:@"deadTime0_7"]];
-	[self setDeadTime8_15:[aDecoder decodeIntForKey:@"deadTime8_15"]];
 	[self setOutputWidth0_7:[aDecoder decodeIntForKey:@"outputWidth0_7"]];
 	[self setOutputWidth8_15:[aDecoder decodeIntForKey:@"outputWidth8_15"]];
 	
@@ -376,8 +344,6 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
     [anEncoder encodeInt:testPulse forKey:@"testPulse"];
     [anEncoder encodeInt:patternInhibit forKey:@"patternInhibit"];
     [anEncoder encodeInt:majorityThreshold forKey:@"majorityThreshold"];
-    [anEncoder encodeInt:deadTime0_7 forKey:@"deadTime0_7"];
-    [anEncoder encodeInt:deadTime8_15 forKey:@"deadTime8_15"];
     [anEncoder encodeInt:outputWidth0_7 forKey:@"outputWidth0_7"];
     [anEncoder encodeInt:outputWidth8_15 forKey:@"outputWidth8_15"];
 }

@@ -20,14 +20,46 @@
 //-------------------------------------------------------------
 #import "ORCV895Model.h"
 
-// Address defaults for this unit.
+//Address defaults for this unit.
 #define k895DefaultBaseAddress 		0xE0000000
 #define k895DefaultAddressModifier 	0x39
+
+//Define all the registers available to this unit.
+static CVCfcLedRegNamesStruct CV895Reg[kNum895Registers] = {
+	{@"Threshold 0",		0x00},
+	{@"Threshold 1",		0x02},
+	{@"Threshold 2",		0x04},
+	{@"Threshold 3",		0x06},
+	{@"Threshold 4",		0x08},
+	{@"Threshold 5",		0x0A},
+	{@"Threshold 6",    	0x0C},
+	{@"Threshold 7",		0x0E},
+	{@"Threshold 8",		0x10},
+	{@"Threshold 9",		0x12},
+	{@"Threshold 10",		0x14},
+	{@"Threshold 11",		0x16},
+	{@"Threshold 12",		0x18},
+	{@"Threshold 13",    	0x1A},
+	{@"Threshold 14",		0x1C},
+	{@"Threshold 15",		0x1E},
+	
+	{@"Output Width 0-7",	0x40},
+	{@"Output Width 8-15",	0x42},
+	
+	{@"Majority Thres",		0x48},
+	{@"Pattern Inhib",		0x4A},
+	{@"Test Pulse",			0x4C},
+	
+	{@"Fixed Code",			0xFA},
+	{@"Module Type",		0xFC},
+	{@"Version",			0xFE},
+};
+
 
 @implementation ORCV895Model
 
 #pragma mark ***Initialization
-- (id) init //designated initializer
+- (id) init
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
@@ -41,6 +73,14 @@
 }
 
 #pragma mark ***Accessors
+- (unsigned long) threshold0Offset			{ return [self regOffset:kThreshold0]; }
+- (unsigned long) outputWidth0_7Offset		{ return [self regOffset:kOutputWidt0_7]; }
+- (unsigned long) outputWidth8_15Offset		{ return [self regOffset:kOutputWidth8_15]; }
+- (unsigned long) testPulseOffset			{ return [self regOffset:kTestPulse]; }
+- (unsigned long) patternInibitOffset		{ return [self regOffset:kPatternInhibit]; }
+- (unsigned long) majorityThresholdOffset	{ return [self regOffset:kMajorityThreshold]; } 
+- (unsigned long) moduleTypeOffset			{ return [self regOffset:kModuleType]; }
+- (unsigned long) versionOffset				{ return [self regOffset:kVersion]; }
 
 - (void) setUpImage
 {
@@ -56,10 +96,25 @@
 {
 	return @"VME/V895.html";
 }
+
 - (NSString*) identifier
 {
     return [NSString stringWithFormat:@"CAEN 895 (Slot %d) ",[self slot]];
 }
+
+- (unsigned short) numberOfRegisters
+{
+	return kNum895Registers;
+}
+
+- (unsigned long) regOffset:(int)index
+{
+	if(index >=0 && index<kNum895Registers){
+		return CV895Reg[index].addressOffset;
+	}
+	else return 0;
+}
+
 @end
 
 

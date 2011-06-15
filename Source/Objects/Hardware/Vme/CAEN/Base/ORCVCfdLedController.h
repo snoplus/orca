@@ -28,8 +28,6 @@
 	IBOutlet NSTextField* testPulseField;
 	IBOutlet NSTextField* patternInhibitField;
 	IBOutlet NSTextField* majorityThresholdField;
-	IBOutlet NSTextField* deadTime0_7Field;
-	IBOutlet NSTextField* deadTime8_15Field;
 	IBOutlet NSTextField* outputWidth0_7Field;
 	IBOutlet NSTextField* outputWidth8_15Field;
     IBOutlet NSButton*	  initHWButton;
@@ -49,8 +47,6 @@
 - (void) testPulseChanged:(NSNotification*)aNote;
 - (void) patternInhibitChanged:(NSNotification*)aNote;
 - (void) majorityThresholdChanged:(NSNotification*)aNote;
-- (void) deadTime0_7Changed:(NSNotification*)aNote;
-- (void) deadTime8_15Changed:(NSNotification*)aNote;
 - (void) outputWidth0_7Changed:(NSNotification*)aNote;
 - (void) outputWidth8_15Changed:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*) aNote;
@@ -66,8 +62,6 @@
 - (IBAction) testPulseAction:(id)sender;
 - (IBAction) patternInhibitAction:(id)sender;
 - (IBAction) majorityThresholdAction:(id)sender;
-- (IBAction) deadTime0_7Action:(id)sender;
-- (IBAction) deadTime8_15Action:(id)sender;
 - (IBAction) outputWidth0_7Action:(id)sender;
 - (IBAction) outputWidth8_15Action:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
