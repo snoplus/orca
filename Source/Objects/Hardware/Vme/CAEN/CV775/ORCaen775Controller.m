@@ -192,6 +192,7 @@
 - (IBAction) initBoardAction:(id)sender
 {
 	@try {
+		[self endEditing];
 		[model initBoard];
 	}
 	@catch(NSException* localException) {
