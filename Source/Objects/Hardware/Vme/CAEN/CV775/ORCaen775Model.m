@@ -23,6 +23,7 @@
 
 #define kStartStop	0x400
 
+NSString* ORCaen775ModelFullScaleRangeChanged = @"ORCaen775ModelFullScaleRangeChanged";
 NSString* ORCaen775ModelCommonStopModeChanged = @"ORCaen775ModelCommonStopModeChanged";
 NSString* ORCaen775ModelModelTypeChanged = @"ORCaen775ModelModelTypeChanged";
 NSString* ORCaen775ModelOnlineMaskChanged = @"ORCaen775ModelOnlineMaskChanged";
@@ -72,14 +73,6 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 @implementation ORCaen775Model
 
 #pragma mark ¥¥¥Initialization
-//--------------------------------------------------------------------------------
-/*!\method  init
-* \brief	Called first time class is initialized.  Used to set basic
-*			default values first time object is created.
-* \param	aDocument			- The initialization document.
-* \note	
-*/
-//--------------------------------------------------------------------------------
 - (id) init //designated initializer
 {
     self = [super init];
@@ -94,6 +87,20 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 #pragma mark ***Accessors
+
+- (unsigned short) fullScaleRange
+{
+    return fullScaleRange;
+}
+
+- (void) setFullScaleRange:(unsigned short)aFullScaleRange
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFullScaleRange:fullScaleRange];
+    
+    fullScaleRange = aFullScaleRange;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen775ModelFullScaleRangeChanged object:self];
+}
 
 - (BOOL) commonStopMode
 {
@@ -122,6 +129,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen775ModelModelTypeChanged object:self];
 }
+
 - (unsigned long)onlineMask {
 	
     return onlineMask;
@@ -293,6 +301,26 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	}
 }
 
+- (void) writeFullScaleRange:(unsigned short)aValue
+{
+		[[self adapter] writeWordBlock:&aValue
+							 atAddress:[self baseAddress] + reg[kFullScaleRange].addressOffset
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+}
+
+- (unsigned short)   readFullScaleRange
+{
+	unsigned short aValue =0;
+	[[self adapter] readWordBlock:&aValue
+						 atAddress:[self baseAddress] + reg[kFullScaleRange].addressOffset
+						numToRead:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	return aValue;
+}
+
 - (void) writeThreshold:(unsigned short) pChan
 {
  	int kill = ((onlineMask & (1<<pChan))!=0)?0x0:0x100;
@@ -344,17 +372,28 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 		
     return dataDictionary;
 }
-#pragma mark ***DataTaker
-- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
+
+- (void) initBoard
 {
-    
-    // Clear unit
-    [self writeThresholds];
+	[self writeThresholds];
+	[self writeFullScaleRange: fullScaleRange];
     [self write: kBitSet2 sendValue: kClearData];			// Clear data, 
     [self write: kBitClear2 sendValue: kClearData];			// Clear "Clear data" bit of status reg.
     [self write: kEventCounterReset sendValue: 0x0000];		// Clear event counter
- 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+}
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    [objDictionary setObject:[NSNumber numberWithUnsignedShort:fullScaleRange] forKey:@"fullScaleRange"];
+    return objDictionary;
+}
+
+#pragma mark ***DataTaker
+- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
+{
+	[self initBoard];
+ 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
     [super runTaskStarted:aDataPacket userInfo:userInfo];
 }
 
@@ -474,6 +513,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     self = [super initWithCoder: aDecoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setFullScaleRange:[aDecoder decodeIntForKey:@"fullScaleRange"]];
     [self setCommonStopMode:	[aDecoder decodeBoolForKey:@"commonStopMode"]];
     [self setModelType:			[aDecoder decodeIntForKey:@"modelType"]];
    	[self setOnlineMask:		[aDecoder decodeInt32ForKey:@"onlineMask"]];
@@ -486,6 +526,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 - (void) encodeWithCoder: (NSCoder*) anEncoder
 {
     [super encodeWithCoder: anEncoder];
+	[anEncoder encodeInt:fullScaleRange forKey:@"fullScaleRange"];
 	[anEncoder encodeBool:commonStopMode	forKey:@"commonStopMode"];
 	[anEncoder encodeInt:modelType			forKey:@"modelType"];
 	[anEncoder encodeInt32:onlineMask		forKey:@"onlineMask"];

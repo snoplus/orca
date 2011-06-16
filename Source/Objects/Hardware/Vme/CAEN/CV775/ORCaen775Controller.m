@@ -70,9 +70,19 @@
                          name : ORCaen775ModelCommonStopModeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(fullScaleRangeChanged:)
+                         name : ORCaen775ModelFullScaleRangeChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
+
+- (void) fullScaleRangeChanged:(NSNotification*)aNote
+{
+	[fullScaleRangeTextField setIntValue: [model fullScaleRange]];
+}
 - (void) commonStopModeChanged:(NSNotification*)aNote
 {
 	[commonStopModeMatrix selectCellWithTag: [model commonStopMode]];
@@ -85,6 +95,7 @@
 	[self commonStopModeChanged:nil];
 	[self onlineMaskChanged:nil];
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+	[self fullScaleRangeChanged:nil];
 }
 
 - (void) modelTypeChanged:(NSNotification*)aNote
@@ -139,7 +150,9 @@
 	
     [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
     [thresholdReadButton setEnabled:!lockedOrRunningMaintenance]; 
-    
+    [initBoardButton setEnabled:!lockedOrRunningMaintenance]; 
+	[fullScaleRangeTextField setEnabled:!lockedOrRunningMaintenance]; 
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
 		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
@@ -149,13 +162,18 @@
 
 - (NSSize) thresholdDialogSize
 {
-	return NSMakeSize(286,607);
+	return NSMakeSize(310,640);
 }
 #pragma mark ***Interface Management - Module specific
 - (NSString*) thresholdLockName {return @"ORCaen775ThresholdLock";}
 - (NSString*) basicLockName     {return @"ORCaen775BasicLock";}
 
 #pragma mark •••Actions
+
+- (void) fullScaleRangeTextFieldAction:(id)sender
+{
+	[model setFullScaleRange:[sender intValue]];	
+}
 - (void) commonStopModeAction:(id)sender
 {
 	[model setCommonStopMode:[[sender selectedCell] tag]];	
@@ -170,4 +188,17 @@
 {
 	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
+
+- (IBAction) initBoardAction:(id)sender
+{
+	@try {
+		[model initBoard];
+	}
+	@catch(NSException* localException) {
+		NSRunAlertPanel([localException name], @"%@\nInit of %@ failed", @"OK", nil, nil,
+                        localException,[model identifier]);
+
+	}
+}
+
 @end

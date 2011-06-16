@@ -87,10 +87,13 @@ enum {
 	unsigned long location;
 	unsigned long dataIdN;
     BOOL commonStopMode;
+    unsigned long fullScaleRange;
 }
 
 
 #pragma mark ¥¥¥Accessors
+- (unsigned short) fullScaleRange;
+- (void) setFullScaleRange:(unsigned short)aFullScaleRange;
 - (BOOL) commonStopMode;
 - (void) setCommonStopMode:(BOOL)aCommonStopMode;
 - (int) modelType;
@@ -112,6 +115,9 @@ enum {
 - (short)			getOutputBufferIndex;
 
 #pragma mark ***Register - Register specific routines
+- (void)			initBoard;
+- (void)			writeFullScaleRange:(unsigned short)aValue;
+- (unsigned short)   readFullScaleRange;
 - (NSString*) 		getRegisterName: (short) anIndex;
 - (unsigned long) 	getAddressOffset: (short) anIndex;
 - (short)  			getAccessType: (short) anIndex;
@@ -125,6 +131,7 @@ enum {
 
 @end
 
+extern NSString* ORCaen775ModelFullScaleRangeChanged;
 extern NSString* ORCaen775ModelCommonStopModeChanged;
 extern NSString* ORCaen775ModelModelTypeChanged;
 extern NSString* ORCaen775ModelOnlineMaskChanged;
