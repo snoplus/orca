@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">10J869</string>
-		<string key="IBDocument.InterfaceBuilderVersion">851</string>
+		<string key="IBDocument.InterfaceBuilderVersion">823</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">851</string>
+			<string key="NS.object.0">823</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3416,12 +3416,20 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<int key="connectionID">502</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">writeThresholds:</string>
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">initBoardButton</string>
 						<reference key="source" ref="100753678"/>
 						<reference key="destination" ref="360258950"/>
 					</object>
-					<int key="connectionID">505</int>
+					<int key="connectionID">508</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">initBoardAction:</string>
+						<reference key="source" ref="100753678"/>
+						<reference key="destination" ref="360258950"/>
+					</object>
+					<int key="connectionID">509</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -5689,9 +5697,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<bytes key="NSTransformStruct">P4AAAL+AAABBIAAAwsYAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{533, 374}, {317, 652}}</string>
+					<string>{{533, 204}, {317, 652}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{533, 374}, {317, 652}}</string>
+					<string>{{533, 204}, {317, 652}}</string>
 					<integer value="1"/>
 					<integer value="0"/>
 					<string>{3.40282e+38, 3.40282e+38}</string>
@@ -5760,7 +5768,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">507</int>
+			<int key="maxID">509</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
