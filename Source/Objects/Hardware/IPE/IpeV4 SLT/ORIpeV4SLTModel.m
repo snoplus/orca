@@ -1015,6 +1015,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	}
 	else {
 		[pmcLink readGeneral:&theVersion operation:kGetSoftwareVersion numToRead:1];
+		//implementation is in HW_Readout.cc, void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)  ... -tb-
 	}
 	[pmcLink setSbcCodeVersion:theVersion];
 	return theVersion;

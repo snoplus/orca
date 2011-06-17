@@ -21,5 +21,11 @@
 
 #define kGetSoftwareVersion  0x01
 #define kGetFdhwLibVersion   0x02
+#define kGetPciDriverVersion 0x03  //TODO: not yet implemented 2011-06 -tb-
+// see: HW_Readout.cc
+// void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
+// and
+// void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
+// -tb-
 
 #endif

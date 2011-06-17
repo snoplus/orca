@@ -221,6 +221,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return (eventMask & (1L<<chan)) != 0;
 }
 
+//'stationNumber' returns the logical number of the FLT (FLT#) (1...20),
+//method 'slot' returns index (0...9,11-20) of the FLT, so it represents the position of the FLT in the crate. 
 - (int) stationNumber
 {
 	//is it a minicrate?
@@ -1759,15 +1761,16 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     uint32_t versionCFPGA = [self readVersion];
     uint32_t versionFPGA8 = [self readpVersion];
 	if(versionCFPGA==0x1f000000){//card not readable; assume simulation mode and assume KATRIN card -tb-
-		versionCFPGA=0x20010104; versionFPGA8=0x20010101;
+		versionCFPGA=0x20010200; versionFPGA8=0x20010203;
 		NSLog(@"MESSAGE: are you in simulation mode? Assume firmware CFPGA,FPGA8:0x%8x,0x%8x: OK.\n",versionCFPGA,versionFPGA8);
 	}
-	if((versionCFPGA>0x20010100 && versionCFPGA<0x20010104) || (versionFPGA8>0x20010100  && versionFPGA8<0x20010104) ){
+	if((versionCFPGA>0x20010100 && versionCFPGA<0x20010200) || (versionFPGA8>0x20010100  && versionFPGA8<0x20010103) ){
 		NSLog(@"WARNING: you use a old firmware (version CFPGA,FPGA8:0x%8x,0x%8x). Update! (See: http://fuzzy.fzk.de/ipedaq)\n",versionCFPGA,versionFPGA8);	
-	}else if((versionCFPGA>0x20010100 && versionCFPGA<=0x20010200) && (versionFPGA8>0x20010100  && versionFPGA8<0x20010204)){
-		NSLog(@"WARNING: your firmware does not support filter shaping length 100 nsec (your version is CFPGA,FPGA8:0x%8x,0x%8x). Update to 2.1.2.0,2.1.2.4! (See: http://fuzzy.fzk.de/ipedaq)\n",versionCFPGA,versionFPGA8);	
+//TODO:  Firmware 2120-2124 is buggy, Denis needs to fix it -tb-
+//	}else if((versionCFPGA>0x20010100 && versionCFPGA<=0x20010200) && (versionFPGA8>0x20010100  && versionFPGA8<0x20010204)){
+//		NSLog(@"WARNING: your firmware does not support filter shaping length 100 nsec (your version is CFPGA,FPGA8:0x%8x,0x%8x). Update to 2.1.2.0,2.1.2.4! (See: http://fuzzy.fzk.de/ipedaq)\n",versionCFPGA,versionFPGA8);	
 	}else{
-		NSLog(@"MESSAGE: firmware version check: CFPGA,FPGA8:0x%8x,0x%8x: OK.\n",versionCFPGA,versionFPGA8);
+		NSLog(@"FLTv4 %i: MESSAGE: firmware version check: CFPGA,FPGA8:0x%8x,0x%8x: OK.\n",[self stationNumber],versionCFPGA,versionFPGA8);
 	}
 	configStruct->card_info[index].deviceSpecificData[7] = versionCFPGA;		//CFPGA version 0xPDDDVVRR //P=project, D=doc revision
 	configStruct->card_info[index].deviceSpecificData[8] = versionFPGA8;		//FPGA8 version 0xPDDDVVRR //V=version, R=revision
@@ -2100,6 +2103,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	}
 	versionCFPGA=data;
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	NSLogFont(aFont,@"%@ versions:\n",[self fullID]);
 	NSLogFont(aFont,@"CFPGA Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
 	data = [self readpVersion];
 	NSLogFont(aFont,@"FPGA8 Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
@@ -2118,6 +2122,14 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 			break;
 	}
 	//NSLog(@"CFPGA,FPGA8:%8x,%8x\n",versionCFPGA,versionFPGA8);
+
+	//print fdhwlib and readout code versions
+	ORIpeV4SLTModel* slt = [[self crate] adapter];
+	long fdhwlibVersion = [slt getFdhwlibVersion];
+	int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
+	//NSLogFont(aFont,@"%@ fdhwlib Library version: 0x%08x / %i.%i.%i\n",[self fullID], fdhwlibVersion,ver,maj,min);
+	NSLogFont(aFont,@"SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",ver,maj,min, fdhwlibVersion);
+	NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [slt getSBCCodeVersion]);
 }
 
 - (void) printStatusReg

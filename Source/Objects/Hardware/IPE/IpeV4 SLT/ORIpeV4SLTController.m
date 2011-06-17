@@ -669,6 +669,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		NSLogFont(aFont,@"Seconds    : %d\n",  [model getSeconds]);
 		[model printInterruptMask];
 		[model printInterruptRequests];
+	    long fdhwlibVersion = [model getFdhwlibVersion];
+	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
+	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
+	    NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [model getSBCCodeVersion]);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT status\n");
@@ -736,6 +740,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		[model readHwVersion];
 		//NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
 		NSLog(@"%@ Project:%d Doc:0x%x Implementation:0x%x\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
+		long fdhwlibVersion = [model getFdhwlibVersion];
+		int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
+	    NSLog(@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT HW Model Version\n");

@@ -25,8 +25,31 @@
 #include <time.h>
 #include <errno.h>
 
-#define kCodeVersion     1
-#define kFdhwLibVersion  2
+// options of general read and write ops, history and description: see below
+#define kCodeVersion     2
+#define kFdhwLibVersion  2 //2011-06-16 currently not necessary as it is now fetched dirctly from fdhwlib -tb-
+
+//history and description
+//
+//The SBC protocol provides functions 
+// void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply)
+// and
+// void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
+//
+// option 'kGetSoftwareVersion' returns kCodeVersion as value of the code version, current value: see above.
+
+
+/*
+kCodeVersion history:
+after all major changes in HW_Readout.cc, FLTv4Readout.cc, FLTv4Readout.hh, SLTv4Readout.cc, SLTv4Readout.hh
+kCodeVersion should be increased!
+
+kCodeVersion 2:
+2011-06-16 readout code ships now new register value 'fifoEventID'
+
+kCodeVersion 1:
+January 2011,  implemented general read and write, new
+*/ //-tb-
 
 
 #define USE_PBUS 0
@@ -72,6 +95,7 @@ extern "C" {
     # warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 1
 #else
     //# warning MESSAGE: PMC_COMPILE_IN_SIMULATION_MODE is 0
+	#include "fdhwlib.h"
 	#include "hw4/baseregister.h"
 	#include "katrinhw4/subrackkatrin.h"
 	#include "katrinhw4/sltkatrin.h"
@@ -425,10 +449,15 @@ void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 			if(numLongs == 1) *lPtr = kCodeVersion;
 		break;
 		case kGetFdhwLibVersion:
-			if(numLongs == 1) *lPtr = kFdhwLibVersion; 
+			//first test: if(numLongs == 1) *lPtr = kFdhwLibVersion; 
+			#if defined FDHWLIB_VER
+			if(numLongs == 1) *lPtr = FDHWLIB_VER; //in fdhwlib.h -tb-
+			#else
+			if(numLongs == 1) *lPtr = 0xffffffff; //we are probably in simulation mode and not linking with fdhwlib -tb-
+			#endif
 		break;
 		default:
-			for(i=0;i<numLongs;i++)*lPtr++ = 0; //yndefined operation so just return zeros
+			for(i=0;i<numLongs;i++)*lPtr++ = 0; //undefined operation so just return zeros
 		break;
 	}
 	if(needToSwap)SwapLongBlock(startPtr,numLongs/sizeof(int32_t));
