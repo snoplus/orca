@@ -121,7 +121,8 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                     result = DMARead(GetBaseAddress()+
                                      bankMemory[group][fCurrentBank] +
                                      4*startOffset,
-                                     0x9, // MBLT 64 
+                                     //0x9, // MBLT 64 
+                                     0x8, // MBLT 64 
                                      (uint32_t) 8,
                                      (uint8_t*)&data[dataIndex],
                                      nLongsToRead*4);
@@ -138,7 +139,8 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                 if(startOffset>0) {
                     result = DMARead(GetBaseAddress()+
                                      bankMemory[group][fCurrentBank],
-                                     0x9, // MBLT 64 
+                                     //0x9, // MBLT 64 
+                                     0x8, // MBLT 64 
                                      (uint32_t) 8,
                                      (uint8_t*)&data[dataIndex],
                                      startOffset*4);
