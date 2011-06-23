@@ -122,9 +122,9 @@ enum {
 - (NSString*) xl3LockName;
 
 #pragma mark •••DB Helpers
-- (void) synthesizeDefaultsIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot;
-- (void) byteSwapBundle:(mb_const_t*)aBundle;
-- (void) synthesizeFECIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot;
+- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
+- (void) byteSwapBundle:(mb_t*)aBundle;
+- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot;
 
 #pragma mark •••DataTaker
 - (void) setDataIds:(id)assigner;

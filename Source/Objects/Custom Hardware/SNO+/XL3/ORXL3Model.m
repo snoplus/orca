@@ -396,7 +396,7 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 #define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
 #define swapShort(x) (((uint16_t)(x) <<  8) | ((uint16_t)(x)>>  8))
 
-- (void) synthesizeDefaultsIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot
+- (void) synthesizeDefaultsIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot
 {
 	uint16_t s_mb_id[1] = {0x0000};
 	uint16_t s_dc_id[4] = {0x0000, 0x0000, 0x0000, 0x0000};
@@ -440,32 +440,24 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 					  0, 0, 0, 0, 0, 0, 0, 0,
 					  0, 0, 0, 0, 0, 0, 0, 0 };
 	// vint
-	aBundle->vint.vres = 205; //integrator output voltage
+	aBundle->vint = 205; //integrator output voltage
 
 	//chinj
-	aBundle->chinj.hv_id = 0x0000; // HV card id
-	aBundle->chinj.hvref = 0x00; // MB control voltage
-	aBundle->chinj.ped_time = 100; // MTCD pedestal width (DONT NEED THIS HERE)
+	//aBundle->chinj.hv_id = 0x0000; // HV card id
+	aBundle->hvref = 0x00; // MB control voltage
+	//aBundle->chinj.ped_time = 100; // MTCD pedestal width (DONT NEED THIS HERE)
 
 	//tr100 width, channel 0 to 31, only bits 0 to 6 defined, bit0-5 delay, bit6 enable
-	uint8_t s_tr100_twidth[32] = {  0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
+	uint8_t s_tr100_tdelay[32] = {  0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,
 					0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f };
 
 	//tr20 width, channel 0 to 31, only bits 0 to 5 defined, bit0-4 width, bit5 enable from PennDB
-	uint8_t s_tr20_twidth[32] = {	0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
-					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
-					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60,
-					0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 };
-
-	// sane defaults from the DB spec
-	/*
-	uint8_t s_tr20_twidth[32] = {	0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
-					0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
-	*/
+	uint8_t s_tr20_twidth[32] = {	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+					0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 };
 	
 	//tr20 delay, channel 0 to 31, only bits 0 to 3 defined from PennDB
 	uint8_t s_tr20_tdelay[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
@@ -481,89 +473,43 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 	*/
 	
 	//scmos remaining 10 bits, channel 0 to 31, only bits 0 to 9 defined
-	uint16_t s_scmos_stuff[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
+	uint16_t s_scmos[32] = {	0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0, 0, 0 }; 
 
 	//ch_disable bits 1 == disabled
-	aBundle->mb_chan_disable.disable_mask = 0;
+	aBundle->disable_mask = 0;
 		
-	memcpy(&aBundle->vbal.mb_id, s_mb_id, 2);
-	memcpy(aBundle->vbal.dc_id, s_dc_id, 8);
-	memcpy(aBundle->vbal.vbal, s_vbal, 64);
-	memcpy(&aBundle->vthr.mb_id, s_mb_id, 2);
-	memcpy(aBundle->vthr.dc_id, s_dc_id, 8);
-	memcpy(aBundle->vthr.vthr, s_vthr, 32);
-	memcpy(&aBundle->tdisc.mb_id, s_mb_id, 2);
-	memcpy(aBundle->tdisc.dc_id, s_dc_id, 8);
+	memcpy(&aBundle->mb_id, s_mb_id, 2);
+	memcpy(aBundle->dc_id, s_dc_id, 8);
+	memcpy(aBundle->vbal, s_vbal, 64);
+	memcpy(aBundle->vthr, s_vthr, 32);
 	memcpy(aBundle->tdisc.rmp, s_tdisc_rmp, 8);
 	memcpy(aBundle->tdisc.rmpup, s_tdisc_rmpup, 8);
 	memcpy(aBundle->tdisc.vsi, s_tdisc_vsi, 8);
 	memcpy(aBundle->tdisc.vli, s_tdisc_vli, 8);
-	memcpy(&aBundle->tcmos.mb_id, s_mb_id, 2);
-	memcpy(aBundle->tcmos.dc_id, s_dc_id, 8);
 	memcpy(aBundle->tcmos.tac_shift, s_tcmos_tac_shift, 32);
-	memcpy(&aBundle->vint.mb_id, s_mb_id, 2);
-	memcpy(&aBundle->chinj.mb_id, s_mb_id, 2);
-	memcpy(&aBundle->tr100.mb_id, s_mb_id, 2);
-	memcpy(aBundle->tr100.dc_id, s_dc_id, 8);
-	memcpy(aBundle->tr100.twidth, s_tr100_twidth, 32);
-	memcpy(&aBundle->tr20.mb_id, s_mb_id, 2);
-	memcpy(aBundle->tr20.dc_id, s_dc_id, 8);
+	memcpy(aBundle->tr100.tdelay, s_tr100_tdelay, 32);
 	memcpy(aBundle->tr20.twidth, s_tr20_twidth, 32);
 	memcpy(aBundle->tr20.tdelay, s_tr20_tdelay, 32);
-	memcpy(&aBundle->scmos.mb_id, s_mb_id, 2);
-	memcpy(aBundle->scmos.dc_id, s_dc_id, 8);
-	memcpy(aBundle->scmos.stuff, s_scmos_stuff, 32);
-	memcpy(&aBundle->hware.mb_id, s_mb_id, 2);
-	memcpy(aBundle->hware.dc_id, s_dc_id, 8);
-	memcpy(&aBundle->mb_chan_disable.mb_id, s_mb_id, 2);
-	memcpy(aBundle->mb_chan_disable.dc_id, s_dc_id, 8);
+	memcpy(aBundle->scmos, s_scmos, 32);
 }
 
-- (void) byteSwapBundle:(mb_const_t*)aBundle
+- (void) byteSwapBundle:(mb_t*)aBundle
 {
 	int i;
 	
 	//vbal_vals_t
-	aBundle->vbal.mb_id = swapShort(aBundle->vbal.mb_id);
-	for (i=0; i<4; i++) aBundle->vbal.dc_id[i] = swapShort(aBundle->vbal.dc_id[i]);
-	//vthr_vals_t
-	aBundle->vthr.mb_id = swapShort(aBundle->vthr.mb_id);
-	for (i=0; i<4; i++) aBundle->vthr.dc_id[i] = swapShort(aBundle->vthr.dc_id[i]);
-	//tdisc_vals_t
-	aBundle->tdisc.mb_id = swapShort(aBundle->tdisc.mb_id);
-	for (i=0; i<4; i++) aBundle->tdisc.dc_id[i] = swapShort(aBundle->tdisc.dc_id[i]);
-	//tcmos_vals_t
-	aBundle->tcmos.mb_id = swapShort(aBundle->tcmos.mb_id);
-	for (i=0; i<4; i++) aBundle->tcmos.dc_id[i] = swapShort(aBundle->tcmos.dc_id[i]);
-	//vint_vals_t
-	aBundle->vint.mb_id = swapShort(aBundle->vint.mb_id);
-	//chinj_vals_t
-	aBundle->chinj.mb_id = swapShort(aBundle->chinj.mb_id);
-	aBundle->chinj.hv_id = swapShort(aBundle->chinj.hv_id);
-	aBundle->chinj.ped_time = swapLong(aBundle->chinj.ped_time);
-	//tr100_vals_t
-	aBundle->tr100.mb_id = swapShort(aBundle->tr100.mb_id);
-	for (i=0; i<4; i++) aBundle->tr100.dc_id[i] = swapShort(aBundle->tr100.dc_id[i]);
-	//tr20_vals_t
-	aBundle->tr20.mb_id = swapShort(aBundle->tr20.mb_id);
-	for (i=0; i<4; i++) aBundle->tr20.dc_id[i] = swapShort(aBundle->tr20.dc_id[i]);
+	aBundle->mb_id = swapShort(aBundle->mb_id);
+	for (i=0; i<4; i++) aBundle->dc_id[i] = swapShort(aBundle->dc_id[i]);
 	//scmos_vals_t
-	aBundle->scmos.mb_id = swapShort(aBundle->scmos.mb_id);
-	for (i=0; i<4; i++)  aBundle->scmos.dc_id[i] = swapShort(aBundle->scmos.dc_id[i]);
-	for (i=0; i<15; i++) aBundle->scmos.stuff[i] = swapShort(aBundle->scmos.stuff[i]);
-	//mb_hware_vals_t
-	aBundle->hware.mb_id = swapShort(aBundle->hware.mb_id);
-	for (i=0; i<4; i++)  aBundle->hware.dc_id[i] = swapShort(aBundle->hware.dc_id[i]);
+	for (i=0; i<15; i++) aBundle->scmos[i] = swapShort(aBundle->scmos[i]);
 	//mb_chan_disable_vals_t
-	aBundle->hware.mb_id = swapShort(aBundle->mb_chan_disable.mb_id);
-	for (i=0; i<4; i++)  aBundle->mb_chan_disable.dc_id[i] = swapShort(aBundle->mb_chan_disable.dc_id[i]);
-	aBundle->mb_chan_disable.disable_mask = swapLong(aBundle->mb_chan_disable.disable_mask);	
+	aBundle->disable_mask = swapLong(aBundle->disable_mask);	
 }
 
-- (void) synthesizeFECIntoBundle:(mb_const_t*)aBundle forSLot:(unsigned short)aSlot
+- (void) synthesizeFECIntoBundle:(mb_t*)aBundle forSLot:(unsigned short)aSlot
 {
 }
 
@@ -812,9 +758,9 @@ NSString* ORXL3ModelXl3PedestalMaskChanged =		@"ORXL3ModelXl3PedestalMaskChanged
 {
 	XL3_PayloadStruct payload;
 	memset(payload.payload, 0, XL3_MAXPAYLOADSIZE_BYTES);
-	payload.numberBytesinPayload = sizeof(mb_const_t) + 4;
+	payload.numberBytesinPayload = sizeof(mb_t) + 4;
 	unsigned long* aMbId = (unsigned long*) payload.payload;
-	mb_const_t* aConfigBundle = (mb_const_t*) (payload.payload + 4);
+	mb_t* aConfigBundle = (mb_t*) (payload.payload + 4);
 	
 	BOOL loadOk = YES;
 	unsigned short i;
