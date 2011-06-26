@@ -741,7 +741,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		s =  [NSString stringWithFormat:@"\nProcess Name: %@ ",[self elementName]];
 		if(processRunning){
 			s = [s stringByAppendingString:@"[Running]\n"];
-			s = [s stringByAppendingFormat:@"Sample Rate: %.1f Hz\n\n",sampleRate];
+			s = [s stringByAppendingFormat:@"Sample Rate: %.3f Hz\n\n",sampleRate];
 			
 			//collect info from each type we want a report from...
 			int adcCount   = 0;
