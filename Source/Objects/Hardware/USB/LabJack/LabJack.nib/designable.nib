@@ -2,30 +2,25 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10H574</string>
-		<string key="IBDocument.InterfaceBuilderVersion">762</string>
-		<string key="IBDocument.AppKitVersion">1038.35</string>
+		<string key="IBDocument.SystemVersion">10K540</string>
+		<string key="IBDocument.InterfaceBuilderVersion">851</string>
+		<string key="IBDocument.AppKitVersion">1038.36</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">762</string>
+			<string key="NS.object.0">851</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="382"/>
+			<integer value="1442"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<object class="NSMutableArray" key="dict.values">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="804693372">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -431,9 +426,9 @@
 												</object>
 												<int key="NSPeriodicDelay">400</int>
 												<int key="NSPeriodicInterval">75</int>
-												<object class="NSMenuItem" key="NSMenuItem" id="34161627">
+												<object class="NSMenuItem" key="NSMenuItem" id="1010786913">
 													<reference key="NSMenu" ref="717874214"/>
-													<string key="NSTitle">1/min</string>
+													<string key="NSTitle">Fast</string>
 													<string key="NSKeyEquiv"/>
 													<int key="NSKeyEquivModMask">1048576</int>
 													<int key="NSMnemonicLoc">2147483647</int>
@@ -441,7 +436,7 @@
 													<reference key="NSOnImage" ref="315430887"/>
 													<reference key="NSMixedImage" ref="330195196"/>
 													<string key="NSAction">_popUpItemAction:</string>
-													<int key="NSTag">60</int>
+													<int key="NSTag">-1</int>
 													<reference key="NSTarget" ref="62800535"/>
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -462,6 +457,7 @@
 															<string key="NSAction">_popUpItemAction:</string>
 															<reference key="NSTarget" ref="62800535"/>
 														</object>
+														<reference ref="1010786913"/>
 														<object class="NSMenuItem" id="461019357">
 															<reference key="NSMenu" ref="717874214"/>
 															<string key="NSTitle">1/s</string>
@@ -498,10 +494,21 @@
 															<int key="NSTag">10</int>
 															<reference key="NSTarget" ref="62800535"/>
 														</object>
-														<reference ref="34161627"/>
+														<object class="NSMenuItem" id="34161627">
+															<reference key="NSMenu" ref="717874214"/>
+															<string key="NSTitle">1/min</string>
+															<string key="NSKeyEquiv"/>
+															<int key="NSKeyEquivModMask">1048576</int>
+															<int key="NSMnemonicLoc">2147483647</int>
+															<reference key="NSOnImage" ref="315430887"/>
+															<reference key="NSMixedImage" ref="330195196"/>
+															<string key="NSAction">_popUpItemAction:</string>
+															<int key="NSTag">60</int>
+															<reference key="NSTarget" ref="62800535"/>
+														</object>
 													</object>
 												</object>
-												<int key="NSSelectedIndex">4</int>
+												<int key="NSSelectedIndex">1</int>
 												<int key="NSPreferredEdge">3</int>
 												<bool key="NSUsesItemFromMenu">YES</bool>
 												<bool key="NSAltersState">YES</bool>
@@ -728,9 +735,11 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<object class="NSDictionary" key="NSAttributes" id="808937239">
+																				<object class="NSDictionary" key="NSAttributes" id="617316210">
 																					<bool key="EncodedWithXMLCoder">YES</bool>
-																					<reference key="dict.sortedKeys" ref="0"/>
+																					<object class="NSArray" key="dict.sortedKeys" id="0">
+																						<bool key="EncodedWithXMLCoder">YES</bool>
+																					</object>
 																					<object class="NSMutableArray" key="dict.values">
 																						<bool key="EncodedWithXMLCoder">YES</bool>
 																					</object>
@@ -800,7 +809,7 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="808937239"/>
+																				<reference key="NSAttributes" ref="617316210"/>
 																			</object>
 																			<reference key="NS.min" ref="713202306"/>
 																			<reference key="NS.max" ref="713202306"/>
@@ -859,7 +868,7 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="808937239"/>
+																				<reference key="NSAttributes" ref="617316210"/>
 																			</object>
 																			<reference key="NS.min" ref="713202306"/>
 																			<reference key="NS.max" ref="713202306"/>
@@ -918,7 +927,7 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="808937239"/>
+																				<reference key="NSAttributes" ref="617316210"/>
 																			</object>
 																			<reference key="NS.min" ref="713202306"/>
 																			<reference key="NS.max" ref="713202306"/>
@@ -977,7 +986,7 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="808937239"/>
+																				<reference key="NSAttributes" ref="617316210"/>
 																			</object>
 																			<reference key="NS.min" ref="713202306"/>
 																			<reference key="NS.max" ref="713202306"/>
@@ -1036,7 +1045,7 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="808937239"/>
+																				<reference key="NSAttributes" ref="617316210"/>
 																			</object>
 																			<reference key="NS.min" ref="713202306"/>
 																			<reference key="NS.max" ref="713202306"/>
@@ -1095,7 +1104,7 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="808937239"/>
+																				<reference key="NSAttributes" ref="617316210"/>
 																			</object>
 																			<reference key="NS.min" ref="713202306"/>
 																			<reference key="NS.max" ref="713202306"/>
@@ -1154,7 +1163,7 @@
 																			</object>
 																			<object class="NSAttributedString" key="NS.nan">
 																				<string key="NSString">NaN</string>
-																				<reference key="NSAttributes" ref="808937239"/>
+																				<reference key="NSAttributes" ref="617316210"/>
 																			</object>
 																			<reference key="NS.min" ref="713202306"/>
 																			<reference key="NS.max" ref="713202306"/>
@@ -3030,7 +3039,7 @@
 																		</object>
 																		<object class="NSAttributedString" key="NS.nan">
 																			<string key="NSString">NaN</string>
-																			<reference key="NSAttributes" ref="808937239"/>
+																			<reference key="NSAttributes" ref="617316210"/>
 																		</object>
 																		<reference key="NS.min" ref="713202306"/>
 																		<reference key="NS.max" ref="713202306"/>
@@ -3139,7 +3148,7 @@
 																		</object>
 																		<object class="NSAttributedString" key="NS.nan">
 																			<string key="NSString">NaN</string>
-																			<reference key="NSAttributes" ref="808937239"/>
+																			<reference key="NSAttributes" ref="617316210"/>
 																		</object>
 																		<reference key="NS.min" ref="713202306"/>
 																		<reference key="NS.max" ref="713202306"/>
@@ -3567,7 +3576,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3626,7 +3635,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3687,7 +3696,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3748,7 +3757,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3809,7 +3818,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3870,7 +3879,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3931,7 +3940,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -3992,7 +4001,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4082,7 +4091,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4141,7 +4150,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4202,7 +4211,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4263,7 +4272,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4324,7 +4333,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4385,7 +4394,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4446,7 +4455,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4507,7 +4516,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4597,7 +4606,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4656,7 +4665,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4717,7 +4726,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4778,7 +4787,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4839,7 +4848,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4900,7 +4909,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -4961,7 +4970,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5022,7 +5031,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5112,7 +5121,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5171,7 +5180,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5232,7 +5241,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5293,7 +5302,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5354,7 +5363,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5415,7 +5424,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5476,7 +5485,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5537,7 +5546,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5627,7 +5636,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5686,7 +5695,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5747,7 +5756,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5808,7 +5817,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5869,7 +5878,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5930,7 +5939,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -5991,7 +6000,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6052,7 +6061,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6142,7 +6151,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6201,7 +6210,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6262,7 +6271,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6322,7 +6331,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6383,7 +6392,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6444,7 +6453,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6505,7 +6514,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -6566,7 +6575,7 @@
 															</object>
 															<object class="NSAttributedString" key="NS.nan">
 																<string key="NSString">NaN</string>
-																<reference key="NSAttributes" ref="808937239"/>
+																<reference key="NSAttributes" ref="617316210"/>
 															</object>
 															<reference key="NS.min" ref="713202306"/>
 															<reference key="NS.max" ref="713202306"/>
@@ -7365,7 +7374,7 @@
 							</object>
 							<object class="NSAttributedString" key="NS.nan">
 								<string key="NSString">NaN</string>
-								<reference key="NSAttributes" ref="808937239"/>
+								<reference key="NSAttributes" ref="617316210"/>
 							</object>
 							<reference key="NS.min" ref="713202306"/>
 							<reference key="NS.max" ref="713202306"/>
@@ -8121,6 +8130,7 @@
 							<reference ref="461019357"/>
 							<reference ref="194337135"/>
 							<reference ref="348943551"/>
+							<reference ref="1010786913"/>
 						</object>
 						<reference key="parent" ref="62800535"/>
 					</object>
@@ -10880,6 +10890,11 @@
 						<reference key="object" ref="637889442"/>
 						<reference key="parent" ref="488305454"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1803</int>
+						<reference key="object" ref="1010786913"/>
+						<reference key="parent" ref="717874214"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -11420,6 +11435,8 @@
 					<string>1797.IBPluginDependency</string>
 					<string>1799.IBPluginDependency</string>
 					<string>1800.IBPluginDependency</string>
+					<string>1803.IBPluginDependency</string>
+					<string>1803.ImportedFromIB2</string>
 					<string>341.IBPluginDependency</string>
 					<string>341.ImportedFromIB2</string>
 					<string>379.IBPluginDependency</string>
@@ -11650,7 +11667,7 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{836, 642}, {93, 88}}</string>
+					<string>{{835, 225}, {93, 105}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12004,6 +12021,8 @@
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<boolean value="YES"/>
 					<string>{{527, 253}, {416, 663}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{527, 253}, {416, 663}}</string>
@@ -12049,7 +12068,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1802</int>
+			<int key="maxID">1803</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -12305,6 +12324,34 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCard.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHV.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORiSeg8ChanHVController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Hardware/HV/MPod/MPod Controller/ORMPodCModel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/Hardware Base Classes/ORCrate.h</string>
 					</object>
 				</object>
@@ -12362,6 +12409,13 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/Vme/Vme Base Classes/VME_eCPU_Config.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Objects/Misc Objects/DatabaseSupport/CouchDB/ORCouchDB.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -12489,6 +12543,13 @@
 						<string key="NS.key.0">sequenceCompleted:</string>
 						<string key="NS.object.0">id</string>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">sequenceCompleted:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">sequenceCompleted:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Misc Objects/Workers/ORSelectorSequence.h</string>
@@ -12507,6 +12568,25 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>taskFinished:</string>
+							<string>tasksCompleted:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">taskFinished:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">tasksCompleted:</string>
+								<string key="candidateClassName">id</string>
+							</object>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -12817,6 +12897,145 @@
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>aOut0Action:</string>
+							<string>aOut1Action:</string>
+							<string>adcDiffBitAction:</string>
+							<string>channelNameAction:</string>
+							<string>channelUnitAction:</string>
+							<string>digitalOutputEnabledAction:</string>
+							<string>doDirectionBitAction:</string>
+							<string>doNameAction:</string>
+							<string>doValueOutBitAction:</string>
+							<string>gainAction:</string>
+							<string>hiLimitAction:</string>
+							<string>interceptAction:</string>
+							<string>ioDirectionBitAction:</string>
+							<string>ioNameAction:</string>
+							<string>ioValueOutBitAction:</string>
+							<string>lowLimitAction:</string>
+							<string>maxValueAction:</string>
+							<string>minValueAction:</string>
+							<string>pollTimeAction:</string>
+							<string>probeAction:</string>
+							<string>resetCounter:</string>
+							<string>serialNumberAction:</string>
+							<string>settingLockAction:</string>
+							<string>shipDataAction:</string>
+							<string>slopeAction:</string>
+							<string>updateAllAction:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">aOut0Action:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">aOut1Action:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">adcDiffBitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">channelNameAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">channelUnitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">digitalOutputEnabledAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">doDirectionBitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">doNameAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">doValueOutBitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">gainAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">hiLimitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">interceptAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ioDirectionBitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ioNameAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">ioValueOutBitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">lowLimitAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">maxValueAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">minValueAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">pollTimeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">probeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">resetCounter:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">serialNumberAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">settingLockAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">shipDataAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">slopeAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">updateAllAction:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -12898,6 +13117,195 @@
 							<string>NSMatrix</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>aOut0Field</string>
+							<string>aOut0Slider</string>
+							<string>aOut1Field</string>
+							<string>aOut1Slider</string>
+							<string>adcDiffMatrix</string>
+							<string>adcMatrix</string>
+							<string>counterField</string>
+							<string>deviceSerialNumberField</string>
+							<string>digitalOutputEnabledButton</string>
+							<string>doDirectionMatrix</string>
+							<string>doNameMatrix</string>
+							<string>doValueInMatrix</string>
+							<string>doValueOutMatrix</string>
+							<string>gainPU0</string>
+							<string>gainPU1</string>
+							<string>gainPU2</string>
+							<string>gainPU3</string>
+							<string>hiLimitMatrix</string>
+							<string>interceptMatrix</string>
+							<string>ioDirectionMatrix</string>
+							<string>ioNameMatrix</string>
+							<string>ioValueInMatrix</string>
+							<string>ioValueOutMatrix</string>
+							<string>lockButton</string>
+							<string>lowLimitMatrix</string>
+							<string>maxValueMatrix</string>
+							<string>minValueMatrix</string>
+							<string>nameMatrix</string>
+							<string>pollTimePopup</string>
+							<string>resetCounterButton</string>
+							<string>serialNumberPopup</string>
+							<string>shipDataCB</string>
+							<string>slopeMatrix</string>
+							<string>tabView</string>
+							<string>totalView</string>
+							<string>unitMatrix</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">aOut0Field</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">aOut0Slider</string>
+								<string key="candidateClassName">NSSlider</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">aOut1Field</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">aOut1Slider</string>
+								<string key="candidateClassName">NSSlider</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">adcDiffMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">adcMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">counterField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">deviceSerialNumberField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">digitalOutputEnabledButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">doDirectionMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">doNameMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">doValueInMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">doValueOutMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">gainPU0</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">gainPU1</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">gainPU2</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">gainPU3</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">hiLimitMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">interceptMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ioDirectionMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ioNameMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ioValueInMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">ioValueOutMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">lockButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">lowLimitMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">maxValueMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">minValueMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">nameMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">pollTimePopup</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">resetCounterButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">serialNumberPopup</string>
+								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">shipDataCB</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">slopeMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">tabView</string>
+								<string key="candidateClassName">NSTabView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">totalView</string>
+								<string key="candidateClassName">NSView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">unitMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
+							</object>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/USB/LabJack/ORLabJackController.h</string>
@@ -12950,6 +13358,45 @@
 							<string>id</string>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>copy:</string>
+							<string>decDialog:</string>
+							<string>incDialog:</string>
+							<string>printDocument:</string>
+							<string>saveDocument:</string>
+							<string>saveDocumentAs:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">copy:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">decDialog:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">incDialog:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">printDocument:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">saveDocument:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">saveDocumentAs:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -12961,6 +13408,25 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>ORTimedTextField</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>model</string>
+							<string>warningField</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">model</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">warningField</string>
+								<string key="candidateClassName">ORTimedTextField</string>
+							</object>
 						</object>
 					</object>
 					<reference key="sourceIdentifier" ref="409149442"/>
@@ -13516,6 +13982,13 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">YAJL.framework/Headers/NSObject+YAJL.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSPopUpButton</string>
 					<string key="superclassName">NSButton</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -13645,6 +14118,13 @@
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">showWindow:</string>
 						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>

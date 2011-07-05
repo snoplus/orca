@@ -1225,7 +1225,8 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
     [[self undoManager] disableUndoRegistration];
 	[self queryAll];
     [[self undoManager] enableUndoRegistration];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+	if(pollTime == -1)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:1/200.];
+	else [self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 }
 
 
