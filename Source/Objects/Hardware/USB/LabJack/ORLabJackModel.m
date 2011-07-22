@@ -153,7 +153,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 
 - (NSString*) helpURL
 {
-	return @"USB/LDA120.html";
+	return @"USB/LabJack.html";
 }
 
 - (void) connectionChanged
