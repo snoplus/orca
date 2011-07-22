@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORHVRampItem.h"
-#import "ORNplHVModel.h"
 
 @implementation ORHVRampItem
 - (NSString*) itemName
@@ -43,7 +42,9 @@
 {
 	//load to hardware
 	@try {
-		[owner loadDac:[self channelNumber]];
+		if([owner respondsToSelector:@selector(loadDac:)]){
+			[owner loadDac:[self channelNumber]];
+		}
 	}
 	@catch(NSException* localException) {
 		[self stopRamper];

@@ -24,4 +24,6 @@
 
 @end
 
-
+@interface NSObject (ORRampItem)
+- (void) loadDac:(int)dummy;
+@end
