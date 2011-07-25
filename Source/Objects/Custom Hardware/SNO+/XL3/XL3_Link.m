@@ -109,7 +109,8 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 
-	[self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];	
+	[self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];
+	[self setNeedToSwap];
 
 	commandSocketLock = [[NSLock alloc] init];
 	coreSocketLock = [[NSLock alloc] init];
@@ -127,7 +128,7 @@ NSString* XL3_LinkErrorTimeOutChanged	= @"XL3_LinkErrorTimeOutChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
-	[encoder encodeInt:errorTimeOut    forKey:@"errorTimeOut"];
+	[encoder encodeInt:errorTimeOut		forKey:@"errorTimeOut"];
 }
 
 

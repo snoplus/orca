@@ -200,17 +200,6 @@ typedef struct {
 	// [channel 0 to 31]      
 } tcmos;
 
-/* Integrator nominal voltage level setup */
-typedef struct {
-	uint8_t     vres;       // integrator output voltage 
-} vint;
-
-/* Charge injection control voltages and timing */
-typedef struct {
-	uint8_t      hvref;     // MB control voltage 
-	uint32_t   ped_time;  // MTCD pedestal width
-} chinj;
-
 /* CMOS shift register 100nsec trigger setup */
 typedef struct {
 	uint8_t      mask[32];   
@@ -226,16 +215,6 @@ typedef struct {
 	uint8_t      tdelay[32];    //tr20 delay (see loadcmosshift.c for details)
 	// [channel 0 to 31], only buts 0 to 4 defined
 } tr20;
-
-typedef struct {
-	uint16_t   stuff[32];     // remaining 10 bits (see loadcmosshift.c for 
-	// details)
-	// [channel 0 to 31], only bits 0 to 9 defined
-} scmos;
-
-typedef struct {
-	uint32_t  disable_mask;
-} mb_chan_disable;
 
 typedef struct {
 	uint16_t mb_id;
