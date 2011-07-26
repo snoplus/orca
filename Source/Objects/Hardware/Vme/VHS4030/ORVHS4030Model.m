@@ -149,6 +149,19 @@ NSString* ORVHS4030VoltageBoundsChanged				= @"ORVHS4030VoltageBoundsChanged";
     [super dealloc];
 }
 
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super sleep];
+}
+
+- (void) wakeUp
+{
+	[super wakeUp];
+	if(pollTime){
+		[self pollHardware];
+	}
+}
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"VHS4030"]];	
