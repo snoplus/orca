@@ -21,15 +21,17 @@
 
 #import "ORRad7Controller.h"
 #import "ORRad7Model.h"
-#import "ORTimeLinePlot.h"
+#import "ORTimeSeriesPlot.h"
 #import "ORPlotView.h"
 #import "ORTimeAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
-#import "ORTimeRate.h"
 
 @interface ORRad7Controller (private)
 - (void) populatePortListPopup;
+- (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+- (void) loadDialogFromHWPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+- (void) eraseAllDataPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
 
 @implementation ORRad7Controller
@@ -57,10 +59,9 @@
     [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 
-	ORTimeLinePlot* aPlot;
-	aPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	ORTimeSeriesPlot* aPlot;
+	aPlot= [[ORTimeSeriesPlot alloc] initWithTag:0 andDataSource:self];
 	[plotter0 addPlot: aPlot];
-	[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
 	[super awakeFromNib];
@@ -69,7 +70,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"CTI Temperature (Unit %d)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Rad7 (Unit %d)",[model uniqueIdNumber]]];
 }
 
 #pragma mark ***Notifications
@@ -117,11 +118,6 @@
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
 					   object : model];
-
-    [notifyCenter addObserver : self
-					 selector : @selector(updateTimePlot:)
-						 name : ORRateAverageChangedNotification
-					   object : nil];
 	
     [notifyCenter addObserver : self
                      selector : @selector(protocolChanged:)
@@ -179,6 +175,20 @@
                          name : ORRad7ModelOperationStateChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(statusChanged:)
+                         name : ORRad7ModelStatusChanged
+						object: model];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(runStateChanged:)
+                         name : ORRad7ModelRunStateChanged
+						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(updatePlot:)
+                         name : ORRad7ModelUpdatePlot
+						object: model];	
+
 }
 
 - (void) updateWindow
@@ -189,7 +199,6 @@
     [self portNameChanged:nil];
 	[self pollTimeChanged:nil];
 	[self shipTemperatureChanged:nil];
-	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
 	[self protocolChanged:nil];
 	[self cycleTimeChanged:nil];
@@ -201,8 +210,47 @@
 	[self formatChanged:nil];
 	[self tUnitsChanged:nil];
 	[self rUnitsChanged:nil];
+	[self statusChanged:nil];
 	[self operationStateChanged:nil];
+	[self runStateChanged:nil];
+	[self updatePlot:nil];
 }
+
+- (void) updatePlot:(NSNotification*)aNote
+{
+	[plotter0 setNeedsDisplay:YES];
+}
+
+- (void) runStateChanged:(NSNotification*)aNote
+{
+	[self updateButtons];
+}
+
+- (void) statusChanged:(NSNotification*)aNote
+{	
+	[stateField setObjectValue:      [model statusForKey:kRad7RunStatus]];
+	[runNumberField setObjectValue:  [model statusForKey:kRad7RunNumber]];
+	[cycleNumberField setObjectValue:[model statusForKey:kRad7CycleNumber]];
+	[pumpModeField setObjectValue:	 [model statusForKey:kRad7RunPumpStatus]];
+	[countDownField setObjectValue:	 [model statusForKey:kRad7RunCountDown]];
+	[countsField setObjectValue:	 [model statusForKey:kRad7NumberCounts]];
+	[freeCyclesField setObjectValue: [model statusForKey:kRad7FreeCycles]];
+	[lastRunNumberField setObjectValue:  [model statusForKey:kRad7LastRunNumber]];
+	[lastCycleNumberField setObjectValue:[model statusForKey:kRad7LastCycleNumber]];
+	[lastRadonField setObjectValue:[model statusForKey:kRad7LastRadon]];
+	[lastRadonUnitsField setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
+	[lastRadonUncertaintyFieldField setObjectValue:[model statusForKey:kRad7LastRadonUncertainty]];
+
+	
+	[temperatureField setObjectValue:[model statusForKey:kRad7Temp]];
+	[temperatureUnitsField setObjectValue:[model statusForKey:kRad7TempUnits]];
+	[rhField setObjectValue:[model statusForKey:kRad7RH]];
+	[batteryField setObjectValue:[model statusForKey:kRad7Battery]];
+	[pumpCurrentField setObjectValue:[model statusForKey:kRad7PumpCurrent]];
+	[hvField setObjectValue:[model statusForKey:kRad7HV]];
+	[signalField setObjectValue:[model statusForKey:kRad7SignalVoltage]];
+}
+
 
 - (void) operationStateChanged:(NSNotification*)aNote
 {
@@ -258,6 +306,10 @@
 - (void) protocolChanged:(NSNotification*)aNote
 {
 	[protocolPU selectItemAtIndex: [model protocol]];
+	if([model protocol] == kRad7ProtocolNone)		[protocolTabView selectTabViewItemAtIndex:0];
+	else if([model protocol] == kRad7ProtocolUser)	[protocolTabView selectTabViewItemAtIndex:1];
+	else											[protocolTabView selectTabViewItemAtIndex:2];
+	[self updateButtons];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -292,13 +344,6 @@
 			[plotter0 setNeedsDisplay:YES];
 			[[plotter0 yScale] setNeedsDisplay:YES];
 		}
-	}
-}
-
-- (void) updateTimePlot:(NSNotification*)aNote
-{
-	if(!aNote || ([aNote object] == [model timeRate])){
-		[plotter0 setNeedsDisplay:YES];
 	}
 }
 
@@ -339,19 +384,133 @@
     [lockDocField setStringValue:s];
 
 	int opState = [model operationState];
+	int runState = [model runState];
+	BOOL idle = (opState==kRad7Idle);
+	BOOL counting = runState == kRad7RunStateCounting;
+	if(!locked){
+		if(runState== kRad7RunStateUnKnown){
+			[startTestButton	setEnabled:	 NO];
+			[stopTestButton		setEnabled:  NO];
+			[eraseAllDataButton setEnabled:  NO];
+			[printDataButton	setEnabled:  NO];
+			[testComButton	setEnabled:  NO];
+		}
+		else if(runState== kRad7RunStateCounting){
+			[startTestButton	setEnabled:	 NO];
+			[stopTestButton		setEnabled:  YES];
+			[eraseAllDataButton setEnabled:  NO];
+			[printDataButton	setEnabled:  NO];
+			[testComButton		setEnabled:  YES];
+		}
+		else {
+			[startTestButton	setEnabled:	 YES];
+			[stopTestButton		setEnabled:  NO];
+			[eraseAllDataButton setEnabled:  YES];
+			[printDataButton	setEnabled:  YES];
+			[testComButton		setEnabled:  NO];
+		}
+	}
+	else {
+		[startTestButton	setEnabled:	 NO];
+		[stopTestButton		setEnabled:  NO];
+		[eraseAllDataButton setEnabled:  NO];
+		[printDataButton	setEnabled:  NO];
+		[testComButton		setEnabled:  NO];
+	}
 	
-	[rUnitsPU setEnabled:	opState==kRad7Idle];
-	[tUnitsPU setEnabled:	opState==kRad7Idle];
-	[formatPU setEnabled:	opState==kRad7Idle];
-	[tonePU setEnabled:		opState==kRad7Idle];
-	[pumpModePU setEnabled:	opState==kRad7Idle];
-	[thoronPU setEnabled:	opState==kRad7Idle];
-	[modePU setEnabled:		opState==kRad7Idle];
-	[protocolPU setEnabled:	opState==kRad7Idle];
-	[recycleTextField setEnabled: opState==kRad7Idle];
-	[cycleTimeTextField setEnabled: opState==kRad7Idle];
+	[initHWButton		setEnabled:  !counting && idle && !locked];
+	[loadDialogButton	setEnabled:  !counting && idle && !locked];
 	
+	[rUnitsPU setEnabled:	!counting && !locked];
+	[tUnitsPU setEnabled:	!counting && !locked];
+	[formatPU setEnabled:	!counting && !locked];
+	[tonePU setEnabled:		!counting && !locked];
+	[protocolPU setEnabled:	!counting && !locked];
 	
+	[saveUserProtocolButton setEnabled:[model protocol] == kRad7ProtocolNone];
+
+	
+	if([model protocol] == kRad7ProtocolUser || [model protocol] == kRad7ProtocolNone){
+		[pumpModePU setEnabled:	!counting && !locked];
+		[thoronPU setEnabled:	!counting && !locked];
+		[modePU setEnabled:		!counting && !locked];
+		[recycleTextField setEnabled: !counting && !locked];
+		[cycleTimeTextField setEnabled: !counting && !locked];
+		
+	}
+	else {
+		switch([model protocol]){
+			case kRad7ProtocolNone: 
+				break;
+				
+			case kRad7ProtocolSniff:
+				[useCycleField setObjectValue:		@"5"];
+				[userRecycleField setObjectValue:	@"0"];
+				[userModeField setObjectValue:		@"Sniff"];
+				[userThoronField setObjectValue:	@"Off"];
+				[userPumpModeField setObjectValue:	@"Auto"];
+				break;
+				
+			case kRad7Protocol1Day:
+				[useCycleField setObjectValue:		@"30"];
+				[userRecycleField setObjectValue:	@"48"];
+				[userModeField setObjectValue:		@"Auto"];
+				[userThoronField setObjectValue:	@"Off"];
+				[userPumpModeField setObjectValue:	@"Auto"];
+				break;
+				
+			case kRad7Protocol2Day:
+				[useCycleField setObjectValue:		@"60"];
+				[userRecycleField setObjectValue:	@"48"];
+				[userModeField setObjectValue:		@"Auto"];
+				[userThoronField setObjectValue:	@"Off"];
+				[userPumpModeField setObjectValue:	@"Auto"];
+				break;
+				
+			case kRad7ProtocolWeeks:
+				[useCycleField setObjectValue:		@"60"];
+				[userRecycleField setObjectValue:	@"48"];
+				[userModeField setObjectValue:		@"Auto"];
+				[userThoronField setObjectValue:	@"Off"];
+				[userPumpModeField setObjectValue:	@"Auto"];
+				break;
+				
+			case kRad7ProtocolUser:
+				break;
+				
+			case kRad7ProtocolGrab:
+				[useCycleField setObjectValue:		@"5"];
+				[userRecycleField setObjectValue:	@"4"];
+				[userModeField setObjectValue:		@"Sniff"];
+				[userThoronField setObjectValue:	@"Off"];
+				[userPumpModeField setObjectValue:	@"Grab"];
+				break;
+				
+			case kRad7ProtocolWat40:
+				[useCycleField setObjectValue:		@"5"];
+				[userRecycleField setObjectValue:	@"4"];
+				[userModeField setObjectValue:		@"Wat-40"];
+				[userThoronField setObjectValue:	@"Off"];
+				[userPumpModeField setObjectValue:	@"Grab"];
+				break;
+				
+			case kRad7ProtocolWat250:
+				[useCycleField setObjectValue:		@"5"];
+				[userRecycleField setObjectValue:	@"4"];
+				[userModeField setObjectValue:		@"Wat250"];
+				[userThoronField setObjectValue:	@"Off"];
+				[userPumpModeField setObjectValue:	@"Grab"];
+				break;
+				
+			case kRad7ProtocolThoron:
+				[useCycleField setObjectValue:		@"5"];
+				[userRecycleField setObjectValue:	@"0"];
+				[userModeField setObjectValue:		@"Sniff"];
+				[userThoronField setObjectValue:	@"On"];
+				[userPumpModeField setObjectValue:	@"Auto"];
+				break;
+		}
+	}
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -415,7 +574,6 @@
 	[model setRUnits:[sender indexOfSelectedItem]];	
 }
 
-
 - (void) formatAction:(id)sender
 {
 	[model setFormatSetting:[sender indexOfSelectedItem]];	
@@ -478,7 +636,34 @@
 
 - (IBAction) updateSettingsAction:(id)sender
 {
-	[model updateSettings];
+	
+	NSBeginAlertSheet(@"Load Dialog With Hardware Settings",
+					  @"YES/Do it NOW",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(loadDialogFromHWPanelDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really replace the settings in the dialog with the current HW settings?");
+	
+}
+
+- (IBAction) eraseAllDataAction:(id)sender
+{
+	
+	NSBeginAlertSheet(@"Erase All Data",
+					  @"YES/Do it NOW",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(eraseAllDataPanelDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really erase ALL data?");
+	
 }
 
 - (IBAction) pollTimeAction:(id)sender
@@ -486,28 +671,74 @@
 	[model setPollTime:[[sender selectedItem] tag]];
 }
 
-- (IBAction) yesAction:(id)sender
+- (IBAction) initAction:(id)sender
 {
-	[model sendYes];
+	[model initHardware];
 }
 
-- (IBAction) noAction:(id)sender
+- (IBAction) getStatusAction:(id)sender
 {
-	[model sendNo];
+	[model pollHardware];
 }
 
-#pragma mark •••Data Source
+- (IBAction) startAction:(id)sender
+{
+	[startTestButton setEnabled:NO];
+	[stopTestButton setEnabled:NO];
+	[model performSelector:@selector(specialStart) withObject:nil afterDelay:0];
+}
+
+- (IBAction) stopAction:(id)sender
+{
+	[startTestButton setEnabled:NO];
+	[stopTestButton setEnabled:NO];
+	[model performSelector:@selector(specialStop) withObject:nil afterDelay:0];
+}
+
+- (IBAction) saveUserSettings:(id)sender;
+{
+	NSBeginAlertSheet(@"Save Settings As New User Protocol",
+					  @"YES/Do it NOW",
+					  @"Cancel",
+					  nil,
+					  [self window],
+					  self,
+					  @selector(saveUserSettingPanelDidEnd:returnCode:contextInfo:),
+					  nil,
+					  nil,
+					  @"Really make the current settings the new user protocol?");
+}
+
+- (IBAction) dumpUserValuesAction:(id)sender
+{
+	[model dumpUserValues];
+}
+
+- (IBAction) printDataAction:(id)sender
+{
+	[model printData];
+}
+
+- (IBAction) testComAction:(id)sender
+{
+	[model testCmd];
+}
+
+#pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate] count];
+	return [model numPoints];
+}
+
+- (double) plotterStartTime:(id)aPlotter
+{
+	return [model radonTime:0];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model timeRate] count];
-	int index = count-i-1;
-	*xValue = [[model timeRate] timeSampledAtIndex:index];
-	*yValue = [[model timeRate] valueAtIndex:index];
+	*xValue = [model radonTime:i];
+	*yValue = [model radonValue:i];
 }
 
 @end
@@ -525,5 +756,21 @@
         [portListPopup addItemWithTitle:[aPort name]];
 	}    
 }
+
+- (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	[model saveUser];
+}
+
+- (void) loadDialogFromHWPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	[model loadDialogFromHardware];
+}
+
+- (void) eraseAllDataPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
+{
+	[model dataErase];
+}
+
 @end
 

@@ -24,17 +24,18 @@
 @interface ORRad7Controller : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
-	IBOutlet   NSTextField* operationStateField;
-	IBOutlet   NSPopUpButton* rUnitsPU;
-	IBOutlet   NSPopUpButton* tUnitsPU;
-	IBOutlet   NSPopUpButton* formatPU;
-	IBOutlet   NSPopUpButton* tonePU;
-	IBOutlet   NSPopUpButton* pumpModePU;
-	IBOutlet   NSPopUpButton* thoronPU;
-	IBOutlet   NSPopUpButton* modePU;
-	IBOutlet   NSPopUpButton* protocolPU;
-	IBOutlet   NSTextField* recycleTextField;
-	IBOutlet   NSTextField* cycleTimeTextField;
+	IBOutlet   NSTextField* runStateTextField;
+	IBOutlet NSTextField*   operationStateField;
+	IBOutlet NSPopUpButton* rUnitsPU;
+	IBOutlet NSPopUpButton* tUnitsPU;
+	IBOutlet NSPopUpButton* formatPU;
+	IBOutlet NSPopUpButton* tonePU;
+	IBOutlet NSPopUpButton* pumpModePU;
+	IBOutlet NSPopUpButton* thoronPU;
+	IBOutlet NSPopUpButton* modePU;
+	IBOutlet NSPopUpButton* protocolPU;
+	IBOutlet NSTextField*   recycleTextField;
+	IBOutlet NSTextField*   cycleTimeTextField;
 	IBOutlet NSButton*		shipTemperatureButton;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
@@ -42,9 +43,48 @@
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      updateSettingsButton;
-    IBOutlet NSTextField*   tempField;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotView*   plotter0;
+	IBOutlet ORPlotView*    plotter0;
+	
+	IBOutlet NSButton*		startTestButton;
+	IBOutlet NSButton*		stopTestButton;
+	IBOutlet NSButton*		initHWButton;
+	IBOutlet NSButton*		loadDialogButton;
+	IBOutlet NSButton*		saveUserProtocolButton;
+	IBOutlet NSButton*		eraseAllDataButton;
+	IBOutlet NSButton*		printDataButton;
+	IBOutlet NSButton*		testComButton;
+
+	//status fields
+	IBOutlet NSTextField*   freeCyclesField;
+	IBOutlet NSTextField*   stateField;
+	IBOutlet NSTextField*   runNumberField;
+	IBOutlet NSTextField*   cycleNumberField;
+	IBOutlet NSTextField*   pumpModeField;
+	IBOutlet NSTextField*   countDownField;
+	IBOutlet NSTextField*   countsField;
+	IBOutlet NSTextField*   lastRunNumberField;
+	IBOutlet NSTextField*   lastCycleNumberField;
+	IBOutlet NSTextField*   lastRadonField;
+	IBOutlet NSTextField*   lastRadonUnitsField;
+	IBOutlet NSTextField*   lastRadonUncertaintyFieldField;
+	IBOutlet NSTextField*   uncertaintyField;
+	IBOutlet NSTextField*   temperatureField;
+	IBOutlet NSTextField*   temperatureUnitsField;
+	IBOutlet NSTextField*   rhField;
+	IBOutlet NSTextField*   batteryField;
+	IBOutlet NSTextField*   pumpCurrentField;
+	IBOutlet NSTextField*   hvField;
+	IBOutlet NSTextField*   signalField;
+	
+	IBOutlet NSTabView*		protocolTabView;
+	IBOutlet NSTextField*   userModeField;
+	IBOutlet NSTextField*   userPumpModeField;
+	IBOutlet NSTextField*   userThoronField;
+	IBOutlet NSTextField*   useCycleField;
+	IBOutlet NSTextField*   userRecycleField;
+
+	
 }
 
 #pragma mark ***Initialization
@@ -57,6 +97,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) runStateChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) operationStateChanged:(NSNotification*)aNote;
 - (void) tUnitsChanged:(NSNotification*)aNote;
@@ -69,15 +110,16 @@
 - (void) recycleChanged:(NSNotification*)aNote;
 - (void) cycleTimeChanged:(NSNotification*)aNote;
 - (void) protocolChanged:(NSNotification*)aNote;
-- (void) updateTimePlot:(NSNotification*)aNotification;
-- (void) shipTemperatureChanged:(NSNotification*)aNotification;
-- (void) lockChanged:(NSNotification*)aNotification;
-- (void) portNameChanged:(NSNotification*)aNotification;
-- (void) portStateChanged:(NSNotification*)aNotification;
-- (void) pollTimeChanged:(NSNotification*)aNotification;
+- (void) shipTemperatureChanged:(NSNotification*)aNote;
+- (void) lockChanged:(NSNotification*)aNote;
+- (void) portNameChanged:(NSNotification*)aNote;
+- (void) portStateChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) statusChanged:(NSNotification*)aNote;
 
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
+- (void) updatePlot:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) rUnitsAction:(id)sender;
@@ -96,9 +138,18 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) updateSettingsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
-- (IBAction) yesAction:(id)sender;
-- (IBAction) noAction:(id)sender;
+- (IBAction) initAction:(id)sender;
+- (IBAction) getStatusAction:(id)sender;
+- (IBAction) startAction:(id)sender;
+- (IBAction) stopAction:(id)sender;
+- (IBAction) dumpUserValuesAction:(id)sender;
+- (IBAction) saveUserSettings:(id)sender;
+- (IBAction) eraseAllDataAction:(id)sender;
+- (IBAction) printDataAction:(id)sender;
+- (IBAction) testComAction:(id)sender;
 
+#pragma mark ***Data Source
+- (double) plotterStartTime:(id)aPlotter;
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 

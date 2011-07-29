@@ -20,55 +20,83 @@
 #pragma mark ***Imported Files
 
 @class ORSerialPort;
-@class ORTimeRate;
 
-#define  kRad7Unknown		0
 
-#define kRad7PumpModeAuto	1
-#define kRad7PumpModeOn		2
-#define kRad7PumpModeOff	3
-#define kRad7PumpModeGrab	4
+#define kRad7PumpModeAuto	0
+#define kRad7PumpModeOn		1
+#define kRad7PumpModeOff	2
+#define kRad7PumpModeGrab	3
 
-#define kRad7ThoronOn		1
-#define kRad7ThoronOff		2
+#define kRad7ThoronOn		0
+#define kRad7ThoronOff		1
 
-#define kRad7ModeSniff		1
-#define kRad7ModeAuto		2
-#define kRad7ModeWat40		3
-#define kRad7ModeWat250		4
-#define kRad7ModeNormal		5
+#define kRad7ModeSniff		0
+#define kRad7ModeAuto		1
+#define kRad7ModeWat40		2
+#define kRad7ModeWat250		3
+#define kRad7ModeNormal		4
 
-#define  kRad7ModeOFF		1
-#define  kRad7ToneChime		2
-#define  kRad7ToneGeiger	3
+#define  kRad7ModeOFF		0
+#define  kRad7ToneChime		1
+#define  kRad7ToneGeiger	2
 
-#define  kRad7FormatOff		1
-#define  kRad7FormatShort	2
-#define  kRad7FormatMedium	3
-#define  kRad7FormatLong	4
+#define  kRad7FormatOff		0
+#define  kRad7FormatShort	1
+#define  kRad7FormatMedium	2
+#define  kRad7FormatLong	3
 
-#define  kRad7PciL			1
-#define  kRad7bqm3			2
-#define  kRad7cpm			3
-#define  kRad7ncnts			4
+#define  kRad7PciL			0
+#define  kRad7bqm3			1
+#define  kRad7cpm			2
+#define  kRad7ncnts			3
 
-#define  kRad7Centigrade	1
-#define  kRad7Fahrenheit	2
+#define  kRad7Centigrade	0
+#define  kRad7Fahrenheit	1
 
-#define kRad7ProtocolNone	1
-#define kRad7ProtocolSniff	2
-#define kRad7Protocol1Day	3
-#define kRad7Protocol2Day	4
-#define kRad7ProtocolWeeks	5
-#define kRad7ProtocolUser	6
-#define kRad7ProtocolGrab	7
-#define kRad7ProtocolWat40	8
-#define kRad7ProtocolWat250	9
-#define kRad7ProtocolThoron	10
+#define kRad7ProtocolNone	0
+#define kRad7ProtocolSniff	1
+#define kRad7Protocol1Day	2
+#define kRad7Protocol2Day	3
+#define kRad7ProtocolWeeks	4
+#define kRad7ProtocolUser	5
+#define kRad7ProtocolGrab	6
+#define kRad7ProtocolWat40	7
+#define kRad7ProtocolWat250	8
+#define kRad7ProtocolThoron	9
 
 #define kRad7Idle			  0
 #define kRad7UpdatingSettings 1
+#define kRad7Initializing	  2
+#define kRad7ExecutingGroup   3
+#define kRad7StartingRun	  4
+#define kRad7StoppingRun	  5
+#define kRad7DumpingSettings  6
 
+#define kRad7RunStateUnKnown  0
+#define kRad7RunStateCounting 1 
+#define kRad7RunStateStopped  2
+
+#define kRad7FreeCycles			@"freeCycles"
+#define kRad7RunNumber			@"runNumber"
+#define kRad7CycleNumber		@"cycleNumber"
+#define kRad7RunStatus			@"runStatus"
+#define kRad7RunPumpStatus		@"runPumpStatus"
+#define kRad7RunCountDown		@"runCountDown"
+#define kRad7NumberCounts		@"numberCounts"
+#define kRad7LastRunNumber		@"lastRunNumber"
+#define kRad7LastCycleNumber	@"lastCycleNumber"
+#define kRad7LastRadon			@"lastRadon"
+#define kRad7LastRadonUnits		@"lastRadonUnits"
+#define kRad7LastRadonUncertainty		@"lastRadonUncertainty"
+#define kRad7Temp				@"temperature"
+#define kRad7TempUnits			@"temperatureUnits"
+#define kRad7RH					@"relativeHumidty"
+#define kRad7Battery			@"batteryVoltage"
+#define kRad7PumpCurrent		@"pumpCurrent"
+#define kRad7HV					@"highVoltage"
+#define kRad7DutyCycle			@"dutyCycle"
+#define kRad7LeakageCurrent		@"leakageCurrent"
+#define kRad7SignalVoltage		@"signalVoltage"
 
 @interface ORRad7Model : OrcaObject
 {
@@ -83,9 +111,8 @@
 		int				pollTime;
         NSMutableString* buffer;
 		BOOL			shipTemperature;
-		ORTimeRate*		timeRate;
 		unsigned int    currentRequest;
-		unsigned int    requestState;
+		unsigned int    waitTime;
 		unsigned int    expectedCount;
 		unsigned int    requestCount;
 		int				protocol;
@@ -99,6 +126,12 @@
 		int				rUnits;
 		int				tUnits;
 		int				operationState;
+		NSMutableDictionary*   statusDictionary;
+		int				runState;
+		int				dataRecordCount;
+		int				numPts;
+		float		    radonValue[100];
+		double		    radonTime[100];
 }
 
 #pragma mark ***Initialization
@@ -108,6 +141,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (int) runState;
+- (void) setRunState:(int)aRunState;
 - (int) operationState;
 - (void) setOperationState:(int)aOperationState;
 - (NSString*) operationStateString;
@@ -131,7 +166,6 @@
 - (void) setCycleTime:(int)aCycleTime;
 - (int) protocol;
 - (void) setProtocol:(int)aProtocol;
-- (ORTimeRate*)timeRate;
 - (BOOL) shipTemperature;
 - (void) setShipTemperature:(BOOL)aShipTemperature;
 - (int) pollTime;
@@ -146,6 +180,8 @@
 - (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured;
+- (NSDictionary*) statusDictionary;
+- (id) statusForKey:(id)aKey;
 
 - (int) convertPumpModeStringToIndex:(NSString*)aPumpMode;
 - (int) convertThoronStringToIndex:(NSString*)aMode;
@@ -164,16 +200,30 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherRad7;
 - (void) shipTemps;
+- (void) dumpUserValues;
+- (void) saveUser;
+- (void) pollHardware;
+- (void) dataErase;
+- (void) dataCom:(int) runNumber;
+- (void) printData;
+- (int) numPoints;
+- (float) radonValue:(int)index;
+- (double) radonTime:(int)index;
 
 #pragma mark ***Commands
 - (void) addCmdToQueue:(NSString*)aCmd;
 - (void) readData;
-- (void) updateSettings;
+- (void) loadDialogFromHardware;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
+- (void) initHardware;
+- (void) specialStatus;
+- (void) specialStart;
+- (void) specialStop;
+- (void) testCmd;
 @end
 
+extern NSString* ORRad7ModelRunStateChanged;
 extern NSString* ORRad7ModelOperationStateChanged;
 extern NSString* ORRad7ModelTUnitsChanged;
 extern NSString* ORRad7ModelRUnitsChanged;
@@ -191,3 +241,5 @@ extern NSString* ORRad7ModelSerialPortChanged;
 extern NSString* ORRad7Lock;
 extern NSString* ORRad7ModelPortNameChanged;
 extern NSString* ORRad7ModelPortStateChanged;
+extern NSString* ORRad7ModelStatusChanged;
+extern NSString* ORRad7ModelUpdatePlot;

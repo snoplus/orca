@@ -26,9 +26,9 @@
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
-#import "ORTimeRate.h"
 
 #pragma mark ***External Strings
+NSString* ORRad7ModelRunStateChanged = @"ORRad7ModelRunStateChanged";
 NSString* ORRad7ModelOperationStateChanged = @"ORRad7ModelOperationStateChanged";
 NSString* ORRad7ModelTUnitsChanged		= @"ORRad7ModelTUnitsChanged";
 NSString* ORRad7ModelRUnitsChanged		= @"ORRad7ModelRUnitsChanged";
@@ -45,6 +45,8 @@ NSString* ORRad7ModelPollTimeChanged	= @"ORRad7ModelPollTimeChanged";
 NSString* ORRad7ModelSerialPortChanged	= @"ORRad7ModelSerialPortChanged";
 NSString* ORRad7ModelPortNameChanged	= @"ORRad7ModelPortNameChanged";
 NSString* ORRad7ModelPortStateChanged	= @"ORRad7ModelPortStateChanged";
+NSString* ORRad7ModelStatusChanged		= @"ORRad7ModelStatusChanged";
+NSString* ORRad7ModelUpdatePlot			= @"ORRad7ModelUpdatePlot";
 
 NSString* ORRad7Lock = @"ORRad7Lock";
 
@@ -52,9 +54,18 @@ NSString* ORRad7Lock = @"ORRad7Lock";
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
-- (void) pollHardware;
 - (void) goToNextCommand;
 - (void) handleSetupReview:(NSString*)aLine lineNumber:(int) lineNumber;
+- (void) handleStatusInfo:(NSString*)aLine lineNumber:(int) lineNumber;
+- (void) handleSetupParam:(NSString*)aLine lineNumber:(int) lineNumber;
+- (void) handleDataFree:(NSString*)aLine lineNumber:(int) lineNumber;
+- (void) handleDataCom:(NSString*)aLine lineNumber:(int) lineNumber;
+- (void) handleDataRecord:(NSString*)aLine;
+- (void) handleTestCom:(NSString*)aLine lineNumber:(int) lineNumber;
+- (NSNumber*) getNumber:(NSString*)aString separator:(NSString*)aSeparator numberIndex:(int)anIndex;
+- (NSNumber*) getNumber:(NSString*)aString separator:(NSString*)aSeparator;
+- (void) startTimeOut;
+- (double) convertTime:(NSArray*)parts;
 @end
 
 @implementation ORRad7Model
@@ -62,69 +73,96 @@ NSString* ORRad7Lock = @"ORRad7Lock";
 enum {
 	kRad7PowerUp,
 	kSpecialStatus,
-	kSpecialBeep,
+	kSpecialStart,
+	kSpecialStop,
 	kSetupReview,
+	kSetupMode,
+	kSetupPump,
+	kSetupThoron,
+	kSetupTone,
+	kSetupFormat,
+	kSetupUnits,
+	kSetupProtocol,
+	kSetupRecycle,
+	kSetupCycle,
+	kSetupSave,
+	kDataFree,
+	kDataCom,
+	kTestCom,
+	kDumpValues,
 	kNumberRad7Cmds //must be last
 };
-
-enum {
-	kRad7CommandStart
-};
-
+#define kRad7CmdTimeout  10
+#define kRad7CommErr  -999
 
 static struct {
 	NSString* commandName;
 	unsigned int cmdId;
-	unsigned int commandInitialState;
+	float        waitTime;
 	unsigned int expectedReturnLines;
 } rad7Cmds[kNumberRad7Cmds] = {
-	{@"PowerUpSequence", kRad7PowerUp,	 kRad7PowerUp,     17},
-	{@"Special Status",  kSpecialStatus, kRad7CommandStart,	6},
-	{@"Special Beep",    kSpecialBeep,   kRad7CommandStart,	1},
-	{@"Setup Review",    kSetupReview,	 kRad7CommandStart, 13}
+	{@"PowerUpSequence", kRad7PowerUp,	 5,		17},
+	{@"SPECIAL STATUS",  kSpecialStatus, 0.5,	6},
+	{@"SPECIAL START",   kSpecialStart,  0.5,	3},
+	{@"SPECIAL STOP",    kSpecialStop,   0.5,	3},
+	{@"SETUP REVIEW",    kSetupReview,	 2,		13},
+	{@"SETUP MODE",      kSetupMode,	 .5,	3},
+	{@"SETUP PUMP",      kSetupPump,	 .5,	3},
+	{@"SETUP THORON",    kSetupThoron,   .5,	3},
+	{@"SETUP TONE",      kSetupTone,	 .5,	3},
+	{@"SETUP FORMAT",    kSetupFormat,	 .5,	3},
+	{@"SETUP UNITS",     kSetupUnits,	 .5,	3},
+	{@"SETUP PROTOCOL",  kSetupProtocol, .5,	3},
+	{@"SETUP RECYCLE",   kSetupRecycle,  .5,	3},
+	{@"SETUP CYCLE",     kSetupCycle,	 .5,	4},
+	{@"SETUP SAVUSER",   kSetupSave,	 .5,	3},
+	{@"DATA FREE",		 kDataFree,		 .5,	3},
+	{@"DATA COM",		 kDataCom,		  3,	3},
+	{@"TEST COM",		 kTestCom,		  3,	2},
+	{@"++DumpUser",      kDumpValues,	  3,	13},
 };
 
 #define kNumberRad7FormatNames 4
 static NSString* rad7FormatNames[kNumberRad7FormatNames] = {
-	@"OFF",
-	@"SHORT",
+	@"OFF   ",
+	@"SHORT ",
 	@"MEDIUM",
-	@"LONG"
+	@"LONG  "
 };
 
 #define kNumberRad7ToneNames 3
 static NSString* rad7ToneNames[kNumberRad7ToneNames] = {
-	@"OFF",
-	@"CHIME",
+	@"OFF   ",
+	@"CHIME ",
 	@"GEIGER"
 };
 
 #define kNumberRad7ModeNames 5
 static NSString* rad7ModeNames[kNumberRad7ModeNames] = {
-	@"SNIFF",
-	@"AUTO",
+	@"SNIFF ",
+	@"AUTO  ",
 	@"WAT-40",
-	@"WAT-250",
+	@"WAT250",
 	@"NORMAL"
 };
 
 #define kNumberRad7PumpModeNames 4
 static NSString* rad7PumpModeNames[kNumberRad7PumpModeNames] = {
 	@"AUTO",
-	@"ON",
-	@"OFF",
+	@"ON  ",
+	@"OFF ",
 	@"GRAB"
 };
 
 #define kNumberRad7ProtocolNames 10
 static NSString* rad7ProtocolNames[kNumberRad7ProtocolNames] = {
-	@"NONE",
-	@"SNIFF",
-	@"1_DAY",
-	@"2_DAY",
-	@"WEEKS",
-	@"USER",
-	@"GRAB",
+	@"NONE  ",
+	@"SNIFF ",
+	@"1-DAY ",
+	@"2-DAY ",
+	@"WEEKS ",
+	@"USER  ",
+	@"GRAB  ",
 	@"WAT-40",
 	@"WAT250",
 	@"THORON"
@@ -132,7 +170,7 @@ static NSString* rad7ProtocolNames[kNumberRad7ProtocolNames] = {
 
 #define kNumberRad7ThoronNames 2
 static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
-	@"ON",
+	@"ON ",
 	@"OFF"
 };
 - (id) init
@@ -154,9 +192,23 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
         [serialPort close];
     }
     [serialPort release];
-	[timeRate release];
+	[statusDictionary release];
 	
 	[super dealloc];
+}
+
+- (void) sleep
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super sleep];
+}
+
+- (void) wakeUp
+{
+	[super wakeUp];
+	if(pollTime){
+		[self pollHardware];
+	}
 }
 
 - (void) setUpImage
@@ -182,7 +234,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
@@ -238,6 +290,18 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 #pragma mark ***Accessors
 
+- (int) runState
+{
+    return runState;
+}
+
+- (void) setRunState:(int)aRunState
+{
+    runState = aRunState;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelRunStateChanged object:self];
+}
+
 - (int) operationState
 {
     return operationState;
@@ -255,10 +319,12 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	switch(operationState){
 		case kRad7Idle:				return @"Idle";
 		case kRad7UpdatingSettings: return @"Updating Settings";
+		case kRad7DumpingSettings:  return @"Dumping Settings";
+		case kRad7Initializing:		return @"Initialing HW";
+		case kRad7ExecutingGroup:	return @"Executing Cmd Group";
 		default: return @"Idle";
 	}
 }
-
 
 - (int) tUnits
 {
@@ -333,6 +399,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) convertUnitsString:(NSString*)aUnitsString
 {
 	//should be in format like "PCI/L  `C"
+	aUnitsString = [aUnitsString stringByReplacingOccurrencesOfString:@"`" withString:@""];
+	aUnitsString = [aUnitsString removeExtraSpaces];
+
 	NSArray* parts = [aUnitsString componentsSeparatedByString:@" "];
 	if([parts count]==2){
 		NSString* rU = [parts objectAtIndex:0];
@@ -341,70 +410,74 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		if([rU isEqualToString:@"PCI/L"])		[self setRUnits:kRad7PciL];
 		else if([rU isEqualToString:@"BQ/M3"])	[self setRUnits:kRad7bqm3];
 		else if([rU isEqualToString:@"CPM"])    [self setRUnits:kRad7cpm];
-		else if([rU isEqualToString:@"#CNTS"])	[self setRUnits:kRad7ncnts];
-		else [self setRUnits:kRad7Unknown];
+		else									[self setRUnits:kRad7ncnts];
 
-		if([tU isEqualToString:@"`C"])		[self setTUnits:kRad7Centigrade];
-		else if([tU isEqualToString:@"`F"])	[self setTUnits:kRad7Fahrenheit];
-		else [self setTUnits:kRad7Unknown];
+		if([tU isEqualToString:@"C"])	[self setTUnits:kRad7Centigrade];
+		else							[self setTUnits:kRad7Fahrenheit];
 		
 	}
 }
 
 - (int) convertFormatStringToIndex:(NSString*)aMode
 {
+	aMode = [aMode trimSpacesFromEnds];
 	int i;
 	for(i=0;i<kNumberRad7FormatNames;i++){
-		if([aMode isEqualToString:rad7FormatNames[i]])return i+1;
+		if([aMode isEqualToString:rad7FormatNames[i]])return i;
 	}
-	return kRad7Unknown;
+	return 0;
 }
 
 
 - (int) convertToneStringToIndex:(NSString*)aMode
 {
+	aMode = [aMode trimSpacesFromEnds];
 	int i;
 	for(i=0;i<kNumberRad7ToneNames;i++){
-		if([aMode isEqualToString:rad7ToneNames[i]])return i+1;
+		if([aMode isEqualToString:[rad7ToneNames[i] trimSpacesFromEnds]])return i;
 	}
-	return kRad7Unknown;
+	return 0;
 }
 
 - (int) convertModeStringToIndex:(NSString*)aMode
 {
+	aMode = [aMode trimSpacesFromEnds];
 	int i;
 	for(i=0;i<kNumberRad7ModeNames;i++){
-		if([aMode isEqualToString:rad7ModeNames[i]])return i+1;
+		if([aMode isEqualToString:[rad7ModeNames[i] trimSpacesFromEnds]])return i;
 	}
-	return kRad7Unknown;
+	return 0;
 }
 
 - (int) convertPumpModeStringToIndex:(NSString*)aPumpMode
 {
+	aPumpMode = [aPumpMode trimSpacesFromEnds];
 	int i;
 	for(i=0;i<kNumberRad7PumpModeNames;i++){
-		if([aPumpMode isEqualToString:rad7PumpModeNames[i]])return i+1;
+		if([aPumpMode isEqualToString:[rad7PumpModeNames[i] trimSpacesFromEnds]])return i;
 	}
-	return kRad7Unknown;
+	return 0;
 }
 
 - (int) convertProtocolStringToIndex:(NSString*)aProtocol
 {
+	aProtocol = [aProtocol trimSpacesFromEnds];
 	int i;
 	for(i=0;i<kNumberRad7ProtocolNames;i++){
-		if([aProtocol isEqualToString:rad7ProtocolNames[i]])return i+1;
+		if([aProtocol isEqualToString:[rad7ProtocolNames[i] trimSpacesFromEnds]])return i;
 	}
-	return kRad7Unknown;
+	return 0;
 	
 }
 
 - (int) convertThoronStringToIndex:(NSString*)aMode
 {
+	aMode = [aMode trimSpacesFromEnds];
 	int i;
 	for(i=0;i<kNumberRad7ThoronNames;i++){
-		if([aMode isEqualToString:rad7ThoronNames[i]])return i+1;
+		if([aMode isEqualToString:[rad7ThoronNames[i] trimSpacesFromEnds]])return i;
 	}
-	return kRad7Unknown;
+	return 0;
 }
 
 - (int) convertCycleHours:(NSString*)hourString minutes:(NSString*)minutesString
@@ -481,14 +554,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setProtocol:(int)aProtocol
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setProtocol:protocol];
-    
     protocol = aProtocol;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelProtocolChanged object:self];
-}
-- (ORTimeRate*)timeRate
-{
-	return timeRate;
 }
 
 - (BOOL) shipTemperature
@@ -542,15 +609,20 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(aRequest){
 		int i;
 		for(i=0;i<kNumberRad7Cmds;i++){
-			if([aRequest isEqualToString:rad7Cmds[i].commandName]){
+			if([aRequest hasPrefix:rad7Cmds[i].commandName]){
 				
 				currentRequest = rad7Cmds[i].cmdId;
-				requestState   = rad7Cmds[i].commandInitialState;
+				waitTime       = rad7Cmds[i].waitTime;
 				expectedCount  = rad7Cmds[i].expectedReturnLines;
 				
 				requestCount = 0;
 				[lastRequest autorelease];
 				lastRequest  = [aRequest copy];  
+			}
+			else if([aRequest hasPrefix:@"++"]){
+				waitTime       = 0;
+				expectedCount  = 0;
+
 			}
 		}
 	}
@@ -632,6 +704,11 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelPortStateChanged object:self];
 }
 
+- (NSDictionary*) statusDictionary
+{
+	return statusDictionary;
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -646,14 +723,13 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self setMode:				[decoder decodeIntForKey:	 @"mode"]];
 	[self setRecycle:			[decoder decodeIntForKey:	 @"recycle"]];
 	[self setCycleTime:			[decoder decodeIntForKey:	 @"cycleTime"]];
-	//[self setProtocol:			[decoder decodeIntForKey:	@"protocol"]];
+	[self setProtocol:			[decoder decodeIntForKey:	@"protocol"]];
 	[self setShipTemperature:	[decoder decodeBoolForKey:	 @"ORRad7ModelShipTemperature"]];
 	[self setPollTime:			[decoder decodeIntForKey:	 @"ORRad7ModelPollTime"]];
 	[self setPortWasOpen:		[decoder decodeBoolForKey:	 @"ORRad7ModelPortWasOpen"]];
     [self setPortName:			[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
 	
-	timeRate = [[ORTimeRate alloc] init];
     [self registerNotificationObservers];
 
 	return self;
@@ -683,177 +759,198 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     if([serialPort isOpen]){ 
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 		[cmdQueue addObject:aCmd];
-		NSLog(@"queue count: %d\n",[cmdQueue count]);
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
 		}
 	}
 }
 
-- (void) systemTest
+- (void) specialStart
 {
-	[self addCmdToQueue:@"System Test"];
+	NSLog(@"Starting Rad7\n");
+	[self setRunState:kRad7RunStateUnKnown];
+	[self initHardware];
+	[self addCmdToQueue:@"++StartGroup"];
+	[self addCmdToQueue:@"SPECIAL STATUS"];
+	[self addCmdToQueue:@"SPECIAL START"];
+	[self addCmdToQueue:@"SPECIAL STATUS"];
+	[self addCmdToQueue:@"++EndGroup"];
 }
 
-- (void) testStatus
+- (void) specialStop
 {
-	[self addCmdToQueue:@"Test Status"];
-}
-
-- (void) testStart
-{
-	[self addCmdToQueue:@"Test Start"];
-}
-
-- (void) testStop
-{
-	[self addCmdToQueue:@"Test Stop"];
-}
-
-- (void) testSave
-{
-	[self addCmdToQueue:@"Test Save"];
-}
-
-- (void) testClear
-{
-	[self addCmdToQueue:@"Test Clear"];
-}
-
-- (void) testPurge
-{
-	[self addCmdToQueue:@"Test Purge"];
-}
-
-- (void) sendYes
-{
-	[self addCmdToQueue:@"YES"];
-}
-
-- (void) sendNo
-{
-	[self addCmdToQueue:@"NO"];
-}
-
-- (void) testPrint
-{
-	[self addCmdToQueue:@"Test Print"];
+	NSLog(@"Stopping Rad7\n");
+	[self setRunState:kRad7RunStateUnKnown];
+	[self addCmdToQueue:@"++StartGroup"];
+	[self addCmdToQueue:@"SPECIAL STATUS"];
+	[self addCmdToQueue:@"SPECIAL STOP"];
+	[self addCmdToQueue:@"SPECIAL STATUS"];
+	[self addCmdToQueue:@"++EndGroup"];
 }
 
 - (void) testCom
 {
-	[self addCmdToQueue:@"Test Com"];
+	[self addCmdToQueue:@"TEST COM"];
 }
 
 - (void) dataFree
 {
-	[self addCmdToQueue:@"Data Free"];
-}
-
-- (void) dataRenumber
-{
-	[self addCmdToQueue:@"Data Renumber"];
-}
-
-- (void) specialBeep
-{
-	[self addCmdToQueue:@"Special Beep"];
+	[self addCmdToQueue:@"DATA FREE"];
 }
 
 - (void) specialStatus
 {
-	[self addCmdToQueue:@"Special Status"];
+	[self addCmdToQueue:@"++StartGroup"];
+	[self addCmdToQueue:@"SPECIAL STATUS"];
+	[self addCmdToQueue:@"DATA FREE"];
+	[self addCmdToQueue:@"++EndGroup"];
 }
 
 - (void) dataErase
 {
-	[self addCmdToQueue:@"Data Erase"];
+	[self addCmdToQueue:@"DATA ERASE YES"];
 }
 
 - (void) dataDelete:(int) runNumber
 {
 	if(runNumber>0 && runNumber < 99){
-		[self addCmdToQueue:[NSString stringWithFormat: @"Data Delete %02d",runNumber]];
-		[self addCmdToQueue:@"Yes"];
+		[self addCmdToQueue:[NSString stringWithFormat: @"DATA DELETE %02d",runNumber]];
+		[self addCmdToQueue:@"YES"];
+		[self addCmdToQueue:@"DATA RENUMBER"];
 	}
 	else NSLog(@"Rad7: runNumber for dataDelete must be between 0 and 99 inclusive\n");
 }
 
-- (void) dataRead:(int) runNumber
+- (void) printData
 {
-	if(runNumber>0 && runNumber < 99){
-		[self addCmdToQueue:[NSString stringWithFormat: @"Data Read %02d",runNumber]];
+	NSNumber* theRunNumber = [statusDictionary objectForKey:kRad7RunNumber];
+	if(theRunNumber){
+		[self dataCom:[theRunNumber intValue]];
 	}
-	else NSLog(@"Rad7: runNumber for dataRead must be between 0 and 99 inclusive\n");
-}
-
-- (void) dataPrint: (int)runNumber
-{
-	if(runNumber>0 && runNumber < 99){
-		[self addCmdToQueue:[NSString stringWithFormat: @"Data Print %02d",runNumber]];
-	}
-	else NSLog(@"Rad7: runNumber for dataPrint must be between 0 and 99 inclusive\n");
 }
 
 - (void) dataCom:(int) runNumber
 {
 	if(runNumber>0 && runNumber < 99){
-		[self addCmdToQueue:[NSString stringWithFormat: @"Data Com %02d",runNumber]];
+		[self addCmdToQueue:[NSString stringWithFormat: @"DATA COM %02d",runNumber]];
 	}
 	else NSLog(@"Rad7: runNumber for dataCom must be between 0 and 99 inclusive\n");
 }
 
-- (void) dataSummary:(int) runNumber
-{
-	if(runNumber>0 && runNumber < 99){
-		[self addCmdToQueue:[NSString stringWithFormat: @"Data Summary %02d",runNumber]];
-	}
-	else NSLog(@"Rad7: runNumber for dataSummary must be between 0 and 99 inclusive\n");
-}
-
 - (void) setupCycle
 {
-	[self addCmdToQueue:[NSString stringWithFormat: @"Setup Cycle"]];
-	[self addCmdToQueue:[NSString stringWithFormat: @"00:30"]];
+	int hours = cycleTime/60;
+	int minutes = cycleTime - hours*60;
+	NSString* cycleString = [NSString stringWithFormat:@"%02d:%02d",hours,minutes];
+	[self addCmdToQueue:[NSString stringWithFormat: @"SETUP CYCLE %@",cycleString]];
+}
+
+- (void) setupUnits
+{
+	NSString* unitString = @"";
+	switch (rUnits){
+		case 0: unitString = [unitString stringByAppendingString: @"PCI/L"]; break;
+		case 1: unitString = [unitString stringByAppendingString: @"BQ/M3"]; break;
+		case 2: unitString = [unitString stringByAppendingString: @"CPM  "]; break;
+		default: unitString = [unitString stringByAppendingString:@"#CNTS"]; break;
+	}
+	unitString = [unitString stringByAppendingString:@" "];
+	switch (tUnits){
+		case 0: unitString = [unitString stringByAppendingString: @"C"]; break;
+		default: unitString = [unitString stringByAppendingString:@"F"]; break;
+	}
+	
+	[self addCmdToQueue:[NSString stringWithFormat: @"SETUP UNITS %@",unitString]];
+}
+
+- (void) saveUser
+{
+	[self addCmdToQueue:[NSString stringWithFormat: @"SETUP SAVUSER YES"]];
 }
 
 - (void) setupRecycle
 {
-//	[self addCmdToQueue:[NSString stringWithFormat: @"Setup Recycle %02d",recycle]];
+	[self addCmdToQueue:[NSString stringWithFormat: @"SETUP RECYCLE %d",recycle]];
 }
 
 - (void) setupMode
 {
-//	[self addCmdToQueue:[NSString stringWithFormat: @"Setup Mode %02d",mode]];
+	if(mode >= 0 && mode <kNumberRad7ModeNames){
+		[self addCmdToQueue:[NSString stringWithFormat: @"SETUP MODE %@",rad7ModeNames[mode]]];
+	}
 }
-
+- (void) setupProtocol
+{
+	if(protocol >= 0 && protocol <kNumberRad7ProtocolNames){
+		NSString* paramString;
+		if(protocol == 0) paramString = @"(NONE)";
+		else paramString = rad7ProtocolNames[protocol];
+		[self addCmdToQueue:[NSString stringWithFormat: @"SETUP PROTOCOL %@",paramString]];
+	}
+}
 - (void) setupThoron
 {
-//	[self addCmdToQueue:[NSString stringWithFormat: @"Setup Thoron %02d",thoronMode]];
+	if(thoron >= 0 && thoron <kNumberRad7ThoronNames){
+		[self addCmdToQueue:[NSString stringWithFormat: @"SETUP THORON %@",rad7ThoronNames[thoron]]];
+	}
 }
-
 - (void) setupPumpMode
 {
-//	[self addCmdToQueue:[NSString stringWithFormat: @"Setup Pump %02d",pumpMode]];
+	if(pumpMode >= 0 && pumpMode <kNumberRad7PumpModeNames){
+		[self addCmdToQueue:[NSString stringWithFormat: @"SETUP PUMP %@",rad7PumpModeNames[pumpMode]]];
+	}
 }
 
 - (void) setupTone
 {
-//	[self addCmdToQueue:[NSString stringWithFormat: @"Setup Tone %02d",tone]];
+	if(tone >= 0 && tone <kNumberRad7ToneNames){
+		[self addCmdToQueue:[NSString stringWithFormat: @"SETUP TONE %@",rad7ToneNames[tone]]];
+	}
 }
 
 - (void) setupFormat
 {
-//	[self addCmdToQueue:[NSString stringWithFormat: @"Setup Format %@",[self formatString]];
+	if(formatSetting >= 0 && formatSetting <kNumberRad7FormatNames){
+		[self addCmdToQueue:[NSString stringWithFormat: @"SETUP FORMAT %@",rad7FormatNames[formatSetting]]];
+	}
 }
 
-- (void) updateSettings
+- (void) loadDialogFromHardware
 {
 	if(operationState == kRad7Idle){
-		[self addCmdToQueue:@"Setup Review"];
+		[self addCmdToQueue:@"SETUP REVIEW"];
+		[self addCmdToQueue:@"++HWReviewDone"];
 		[self setOperationState:kRad7UpdatingSettings];
+		NSLog(@"Getting settings from Rad7.... Takes a long time... Be Patient.\n");
 	}
 	else NSLog(@"Can not load Rad7 Dialog from HW -- some other operation is in progress\n");
+}
+
+- (void) dumpUserValues
+{
+	[self addCmdToQueue:@"++DumpUser"];
+	[self setOperationState:kRad7DumpingSettings];
+	[self addCmdToQueue:@"++HWReviewDone"];
+	NSLog(@"Getting settings from Rad7.... Takes a long time... Be Patient.\n");
+}
+
+- (void) initHardware
+{
+	[self addCmdToQueue:@"++StartHWInit"];
+	[self setupProtocol];
+	if(protocol == kRad7ProtocolNone){
+		[self setupMode];
+		[self setupPumpMode];
+		[self setupThoron];
+		[self setupRecycle];
+		[self setupCycle];
+	}
+	[self setupTone];
+	[self setupFormat];
+	[self setupUnits];
+	
+	[self addCmdToQueue:@"++HWInitDone"];
+	
 }
 
 - (void) readData
@@ -897,6 +994,46 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     
     return dataDictionary;
 }
+- (id) statusForKey:(id)aKey
+{
+	id aValue = [statusDictionary objectForKey:aKey];
+	if(!aValue) return @"-";
+	else return aValue;
+}
+
+- (void) pollHardware
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+	[self specialStatus];
+	if(pollTime){
+		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+	}
+}
+
+- (void) testCmd
+{
+	[self addCmdToQueue:@"TEST COM"];
+}
+- (int) numPoints
+{
+	return numPts;
+}
+
+- (float) radonValue:(int)index
+{
+	if(index<100){
+		return radonValue[index];
+	}
+	else return 0;
+}
+
+- (double) radonTime:(int)index
+{
+	if(index<100){
+		return radonTime[index];
+	}
+	else return 0;
+}
 
 @end
 
@@ -904,7 +1041,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) timeout
 {
 	NSLogError(@"Rad7",@"command timeout",nil);
-	[self goToNextCommand];
+	[cmdQueue removeAllObjects];
+	[self setOperationState:kRad7Idle];
+	[self setLastRequest:nil];
 }
 
 - (void) goToNextCommand
@@ -920,15 +1059,61 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[cmdQueue removeObjectAtIndex:0];
 	if([aCmd isEqualToString:@"++ShipRecords"]){
 		if(shipTemperature) [self shipTemps];
+		[self goToNextCommand];
+	}
+	else if([aCmd isEqualToString:@"++StartHWInit"]){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+		[self setOperationState:kRad7Initializing];
+		[self goToNextCommand];
+	}
+	else if([aCmd isEqualToString:@"++StartGroup"]){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+		[self setOperationState:kRad7ExecutingGroup];
+		[self goToNextCommand];
+	}
+	else if([aCmd isEqualToString:@"++HWInitDone"] || 
+			[aCmd isEqualToString:@"++HWReviewDone"]){
+		if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+		[self setOperationState:kRad7Idle];
+		[self goToNextCommand];
+	}
+	else if([aCmd isEqualToString:@"++EndGroup"]){
+		id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
+		
+		if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
+		else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
+		else											 [self setRunState:kRad7RunStateStopped];
+		[self setOperationState:kRad7Idle];
+		if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
+		[self goToNextCommand];
 	}
 	else {
 		[self setLastRequest:aCmd];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-		aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-		aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-		aCmd = [aCmd stringByAppendingString:@"\r\n"];
-		NSLog(@"writing: %@\n",aCmd);
-		[serialPort writeString:aCmd];
+		if([aCmd isEqualToString:@"++DumpUser"])aCmd = @"SETUP REVIEW";
+		else if(currentRequest == kSpecialStart){
+			id runStatus = [statusDictionary objectForKey:kRad7RunStatus];
+			if(!runStatus){
+				aCmd = nil;
+				[self setLastRequest:nil];
+				NSLog(@"Rad7 start command ignored -- status is unknown\n");
+			}
+			else if(![runStatus isEqualToString:@"IDLE"]){
+				aCmd = nil;
+				[self setLastRequest:nil];
+				NSLog(@"Rad7 start command ignored -- already counting\n");
+			}
+		}
+		if(aCmd){
+			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+			aCmd = [aCmd stringByAppendingString:@"\r\n"];
+			
+			//NSLog(@"writing: %@\n",aCmd);
+			[self startTimeOut];
+			[serialPort writeString:aCmd];
+		}
 		if(!lastRequest){
 			[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:1];
 		}
@@ -938,46 +1123,305 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) process_response:(NSString*)theResponse
 {	
 	theResponse = [theResponse removeExtraSpaces];
-
+	//NSLog(@"(%d) %@\n",requestCount,theResponse);
 	if([theResponse rangeOfString:@"DURRIDGE"].location != NSNotFound){
 		//special unsolidated response after power up
 		NSLog(@"Rad7 going thru power up -- all queued commands cleared\n");
 		[cmdQueue removeAllObjects];
 		[self setLastRequest:@"PowerUpSequence"]; //fake a command
 	}
+	else if([theResponse rangeOfString:@"?ERR"].location != NSNotFound){
+		[cmdQueue removeAllObjects];
+		requestCount = 0;
+		expectedCount= 1;
+		currentRequest = kRad7CommErr;
+		[self setOperationState:kRad7Idle];
+		NSLog(@"Rad7 Comm Error. Flushing Cmd Queue.\n");
+		id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
+		
+		if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
+		else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
+		else											 [self setRunState:kRad7RunStateStopped];
+		[self setOperationState:kRad7Idle];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
+	}
 	else {
-		NSLog(@"(%d) %@ \n",requestCount,theResponse);
-		
-		switch(currentRequest){
-				
-			case kRad7PowerUp:
-			case kSetupReview:
-				[self handleSetupReview:theResponse lineNumber:requestCount];
-			break;
-				
+		//check for data dump
+		NSArray* parts = [theResponse componentsSeparatedByString:@" "];
+		if([parts count] == 23){
+			[self handleDataRecord:theResponse];
 		}
-		
-		requestCount++;
-		
-		if(requestCount == expectedCount){
-			[self setOperationState:kRad7Idle];
-			NSLog(@"set up next command %d\n",[cmdQueue count]);
-			if(requestState == kRad7PowerUp || requestState == kSetupReview){
-				[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:5];
+		else {
+			switch(currentRequest){
+				
+				case kRad7PowerUp:
+				case kSetupReview:
+				case kDumpValues:
+					[self handleSetupReview:theResponse lineNumber:requestCount];
+				break;
+					
+				case kSetupMode:
+				case kSetupPump:
+				case kSetupThoron:
+				case kSetupTone:
+				case kSetupFormat:
+				case kSetupUnits:
+				case kSetupProtocol:
+				case kSetupRecycle:
+				case kSetupCycle:
+					[self handleSetupParam:theResponse lineNumber:requestCount];
+				break;
+					
+				case kDataFree:
+					[self handleDataFree:theResponse lineNumber:requestCount];
+				break;	
+					
+				case kDataCom:
+					[self handleDataCom:theResponse lineNumber:requestCount];
+				break;
+					
+				case kTestCom:
+					[self handleTestCom:theResponse lineNumber:requestCount];
+				break;	
+					
+				case kSpecialStatus:
+					[self handleStatusInfo:theResponse lineNumber:requestCount];
+				break;
 			}
-			else {
-				[self goToNextCommand];
+			
+			requestCount++;
+			
+			if(requestCount == expectedCount){
+				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+				[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:waitTime];
 			}
 		}
 	}
 }
 
-
-- (void) pollHardware
+- (void) handleDataRecord:(NSString*)aLine
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	[self readData];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+
+	NSArray* parts = [aLine componentsSeparatedByString:@" "];
+	if([parts count] >= 23){
+		if(dataRecordCount == 0){
+			numPts = 0;
+			unsigned int unitsWord = [[parts objectAtIndex:22] intValue] & 0x3; //Units
+			NSString* unitsString = @"";
+			if(unitsWord == 0x0)unitsString = @"CPM";
+			else if(unitsWord == 0x1)unitsString = @"#Counts";
+			else if(unitsWord == 0x2)unitsString = @"Bq/m^3";
+			else if(unitsWord == 0x3)unitsString = @"pCi/L";
+
+			NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"Cycle Date   Time  Counts  LT  A(%%)  B(%%)  C(%%)  D(%%)    Radon (%@)\n",unitsString);
+			NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"----------------------------------------------------------------------------\n");
+		}
+		NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"%3d %02d/%02d/%02d %02d:%02d %4d %5.1f %5.1f %5.1f %5.1f %5.1f %9.4f +- %9.4f\n",
+				  [[parts objectAtIndex:0] intValue], //test number
+				  [[parts objectAtIndex:3] intValue], //day
+				  [[parts objectAtIndex:2] intValue], //month
+				  [[parts objectAtIndex:1] intValue], //year
+				  [[parts objectAtIndex:4] intValue], //hour
+				  [[parts objectAtIndex:5] intValue], //minutes
+				  [[parts objectAtIndex:6] intValue], //Total Counts
+				  [[parts objectAtIndex:7] floatValue], //Live Time
+				  [[parts objectAtIndex:8] floatValue], //% in A
+				  [[parts objectAtIndex:9] floatValue], //% in B
+				  [[parts objectAtIndex:10] floatValue], //% in C
+				  [[parts objectAtIndex:11] floatValue], //% in C
+				  [[parts objectAtIndex:20] floatValue], //Radon
+				  [[parts objectAtIndex:21] floatValue] //UnCertainty
+				  );
+		
+		dataRecordCount++;
+		if(numPts<100){
+			radonTime[numPts] = [self convertTime:parts];
+			radonValue[numPts] = [[parts objectAtIndex:20] floatValue];
+			numPts++;
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
+															object:self];
+
+	}
+}
+
+- (double) convertTime:(NSArray*)parts
+{
+	int day = [[parts objectAtIndex:3] intValue]; //day
+	int month = [[parts objectAtIndex:2] intValue]; //month
+	int year = [[parts objectAtIndex:1] intValue]; //year
+	int hour = [[parts objectAtIndex:4] intValue]; //hour
+	int minute = [[parts objectAtIndex:5] intValue]; //minutes
+	NSString *dateStr = [NSString stringWithFormat:@"20%02d%02d%02d %02d:%02d",year,month,day,hour,minute];
+	
+	// Convert string to date object
+	NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+	[dateFormat setDateFormat:@"yyyyMMdd HH:mm"];
+	NSDate *date = [dateFormat dateFromString:dateStr];  
+	NSTimeInterval t1 = [date timeIntervalSince1970];
+	return (double)t1;
+}
+
+
+
+- (void) handleSetupParam:(NSString*)aLine lineNumber:(int) lineNumber
+{
+	// nothing to do for now
+}
+
+- (void) handleTestCom:(NSString*)aLine lineNumber:(int) lineNumber
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	if(lineNumber == 1){
+		NSLog(@"Rad7: Incomplete Test Data Follows\n");		
+		//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		dataRecordCount = 0;
+	}
+}
+
+- (void) handleDataCom:(NSString*)aLine lineNumber:(int) lineNumber
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	if(lineNumber == 2){
+		NSLog(@"Rad7: %@\n",aLine);		
+		//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		if([aLine rangeOfString:@"DATA TRANSFER"].location != NSNotFound){
+			dataRecordCount = 0;
+		}
+	}
+}
+
+- (void) handleDataFree:(NSString*)aLine lineNumber:(int) lineNumber
+{
+	if(!statusDictionary) statusDictionary = [[NSMutableDictionary dictionary] retain];
+	if(lineNumber == 2){
+		if([aLine rangeOfString:@"CYCLES FREE"].location != NSNotFound){
+			int freeCycles = [aLine intValue];
+			[statusDictionary setObject:[NSNumber numberWithInt:freeCycles] forKey:kRad7FreeCycles];
+		}
+	}
+}
+
+- (void) handleStatusInfo:(NSString*)aLine lineNumber:(int) lineNumber
+{
+	if(!statusDictionary) statusDictionary = [[NSMutableDictionary dictionary] retain];
+	if(lineNumber < 2)return; //don't care about these
+	else if(lineNumber == 2){
+		//arghhh -- some of the states don't have spaces between the fields
+		aLine = [aLine stringByReplacingOccurrencesOfString:@"WAT-40" withString:@"WAT40 "];
+		aLine = [aLine stringByReplacingOccurrencesOfString:@"WAT250" withString:@"WAT250 "];
+		aLine = [aLine stringByReplacingOccurrencesOfString:@"NORMAL" withString:@"NORMAL "];
+		aLine = [aLine removeExtraSpaces];
+		NSArray* parts = [aLine componentsSeparatedByString:@" "];
+		if([parts count] == 5){
+			[statusDictionary setObject:[[parts objectAtIndex:0] substringToIndex:2]    forKey:kRad7RunNumber];
+			[statusDictionary setObject:[[parts objectAtIndex:0] substringFromIndex:2]  forKey:kRad7CycleNumber];
+			[statusDictionary setObject:[parts objectAtIndex:1] forKey:kRad7RunStatus];
+			[statusDictionary setObject:[parts objectAtIndex:2] forKey:kRad7RunPumpStatus];
+			[statusDictionary setObject:[parts objectAtIndex:3] forKey:kRad7RunCountDown];
+			[statusDictionary setObject:[parts objectAtIndex:4] forKey:kRad7NumberCounts];
+		}
+		else {
+			[statusDictionary setObject:@"--" forKey:kRad7CycleNumber];
+			[statusDictionary setObject:@"--" forKey:kRad7RunStatus];
+			[statusDictionary setObject:@"--" forKey:kRad7RunPumpStatus];
+			[statusDictionary setObject:@"--" forKey:kRad7RunCountDown];
+			[statusDictionary setObject:@"--" forKey:kRad7NumberCounts];
+		}
+	}
+	
+	else if(lineNumber == 3){
+		if([aLine hasPrefix:@"LAST READING: "]){
+			aLine = [aLine substringFromIndex:14];
+			if([aLine rangeOfString:@"NO TESTS STORED"].location == NSNotFound){
+				aLine = [aLine stringByReplacingOccurrencesOfString:@"+- " withString:@"+-"];
+				aLine = [aLine stringByReplacingOccurrencesOfString:@" +-" withString:@"+-"];
+
+				NSArray* parts = [aLine componentsSeparatedByString:@" "];
+				if([parts count] >= 3){
+					int thisRunNum = [[[parts objectAtIndex:0] substringToIndex:2] intValue];
+					int thisCycleNum = [[[parts objectAtIndex:0] substringFromIndex:2] intValue];
+					int lastRunNum = [[statusDictionary objectForKey:kRad7LastRunNumber] intValue];
+					int lastCycleNum = [[statusDictionary objectForKey:kRad7LastCycleNumber] intValue];
+					
+					[statusDictionary setObject:[[parts objectAtIndex:0] substringToIndex:2]    forKey:kRad7LastRunNumber];
+					[statusDictionary setObject:[[parts objectAtIndex:0] substringFromIndex:2]  forKey:kRad7LastCycleNumber];
+					NSArray* readingParts = [[parts objectAtIndex:1] componentsSeparatedByString:@"+-"];
+					if([readingParts count] >= 2){
+						[statusDictionary setObject:[NSNumber numberWithFloat:[[readingParts objectAtIndex:0] floatValue]]  forKey:kRad7LastRadon];
+						[statusDictionary setObject:[NSNumber numberWithFloat:[[readingParts objectAtIndex:1] floatValue]]  forKey:kRad7LastRadonUncertainty];
+
+						if(thisRunNum!=lastRunNum || thisCycleNum!=lastCycleNum){
+							//NSLog(@"Run: %d Cycle: %d Radon: %@\n",thisRunNum,thisCycleNum,[statusDictionary objectForKey:kRad7LastRadon]);
+						}
+
+					}
+					[statusDictionary setObject:[parts objectAtIndex:2]  forKey:kRad7LastRadonUnits];
+				}
+			}
+			else {
+				[statusDictionary setObject:@"--"  forKey:kRad7LastRunNumber];
+				[statusDictionary setObject:@"--"  forKey:kRad7LastCycleNumber];
+				[statusDictionary setObject:@"--"  forKey:kRad7LastRadon];
+				[statusDictionary setObject:@"--"  forKey:kRad7LastRadonUncertainty];
+				[statusDictionary setObject:@"-"  forKey:kRad7LastRadonUnits];
+			}
+		}
+	}
+	
+	else if(lineNumber == 4){
+		aLine = [aLine stringByReplacingOccurrencesOfString:@": " withString:@":"];
+		NSArray* parts = [aLine componentsSeparatedByString:@" "];
+		if([parts count] == 4){
+			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:0] separator:@"`"] forKey:kRad7Temp];
+			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:1] separator:@":" numberIndex:1] forKey:kRad7RH];
+			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:2] separator:@":" numberIndex:1] forKey:kRad7Battery];
+			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:3] separator:@":" numberIndex:1] forKey:kRad7PumpCurrent];
+			NSArray* temperatureParts = [[parts objectAtIndex:0] componentsSeparatedByString:@"`"];
+			if([temperatureParts count]==2)[statusDictionary setObject:[temperatureParts objectAtIndex:1] forKey:kRad7TempUnits];
+			else [statusDictionary setObject:@"" forKey:kRad7TempUnits];
+		}
+		else {
+			[statusDictionary setObject:@"--" forKey:kRad7Temp];
+			[statusDictionary setObject:@"--" forKey:kRad7RH];
+			[statusDictionary setObject:@"--" forKey:kRad7Battery];
+			[statusDictionary setObject:@"--" forKey:kRad7PumpCurrent];
+		}
+	}
+		
+	else if(lineNumber == 5){
+		aLine = [aLine stringByReplacingOccurrencesOfString:@": " withString:@":"];
+		NSArray* parts = [aLine componentsSeparatedByString:@" "];
+		if([parts count] == 4){
+			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:0] separator:@":" numberIndex:1] forKey:kRad7HV];
+			[statusDictionary setObject:[NSNumber numberWithInt:[[parts objectAtIndex:1] intValue]] forKey:kRad7DutyCycle];
+			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:2] separator:@":" numberIndex:1] forKey:kRad7LeakageCurrent];
+			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:3] separator:@":" numberIndex:1] forKey:kRad7SignalVoltage];
+		}
+		else {
+			[statusDictionary setObject:@"--" forKey:kRad7Temp];
+			[statusDictionary setObject:@"--" forKey:kRad7RH];
+			[statusDictionary setObject:@"--" forKey:kRad7Battery];
+			[statusDictionary setObject:@"--" forKey:kRad7PumpCurrent];
+		}
+	}
+}
+
+- (NSNumber*) getNumber:(NSString*)aString separator:(NSString*)aSeparator
+{
+	return [self getNumber:aString separator:aSeparator numberIndex:0];
+}
+
+- (NSNumber*) getNumber:(NSString*)aString separator:(NSString*)aSeparator numberIndex:(int)anIndex
+{
+	NSArray* parts = [aString componentsSeparatedByString:aSeparator];
+	if([parts count] >= anIndex){
+		return [NSNumber numberWithFloat:[[parts objectAtIndex:anIndex] floatValue]];
+	}
+	else return [NSNumber numberWithInt:0];
+
 }
 
 - (void) handleSetupReview:(NSString*)aLine lineNumber:(int) lineNumber
@@ -990,17 +1434,32 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			NSString* value = [[parts objectAtIndex:1] trimSpacesFromEnds];
 			NSString* value1 = @"";
 			if([parts count]>=3)value1 = [[parts objectAtIndex:2] trimSpacesFromEnds];
-
-			if([tag isEqualToString:@"PUMP"])[self setPumpMode:[self convertPumpModeStringToIndex:value]];
-			else if([tag isEqualToString:@"MODE"])[self setMode:[self convertModeStringToIndex:value]];
-			else if([tag isEqualToString:@"THORON"])[self setThoron:[self convertThoronStringToIndex:value]];
-			else if([tag isEqualToString:@"RECYCLE"])[self setRecycle:[value intValue]];
-			else if([tag isEqualToString:@"CYCLE"])[self setCycleTime:[self convertCycleHours:value minutes:value1]];
-			else if([tag isEqualToString:@"TONE"])[self setTone:[self convertToneStringToIndex:value]];
-			else if([tag isEqualToString:@"FORMAT"])[self setFormatSetting:[self convertFormatStringToIndex:value]];
-			else if([tag isEqualToString:@"PROTOCOL"])[self setProtocol:[self convertProtocolStringToIndex:value]];
-			else if([tag isEqualToString:@"UNITS"])[self convertUnitsString:value];
+			if(currentRequest == kDumpValues){
+				if([tag isEqualToString:@"CYCLE"])			NSLog(@"Cycle: %@:%@\n",value,value1);
+				else if([tag isEqualToString:@"RECYCLE"])	NSLog(@"Recycle: %@\n",value);
+				else if([tag isEqualToString:@"MODE"])		NSLog(@"Mode: %@\n",value);
+				else if([tag isEqualToString:@"THORON"])	NSLog(@"Thoron: %@\n",value);
+				else if([tag isEqualToString:@"PUMP"])		NSLog(@"Pump Mode: %@\n",value);
+			}
+			else {
+				if([tag isEqualToString:@"PUMP"])[self setPumpMode:[self convertPumpModeStringToIndex:value]];
+				else if([tag isEqualToString:@"MODE"])[self setMode:[self convertModeStringToIndex:value]];
+				else if([tag isEqualToString:@"THORON"])[self setThoron:[self convertThoronStringToIndex:value]];
+				else if([tag isEqualToString:@"RECYCLE"])[self setRecycle:[value intValue]];
+				else if([tag isEqualToString:@"CYCLE"])[self setCycleTime:[self convertCycleHours:value minutes:value1]];
+				else if([tag isEqualToString:@"TONE"])[self setTone:[self convertToneStringToIndex:value]];
+				else if([tag isEqualToString:@"FORMAT"])[self setFormatSetting:[self convertFormatStringToIndex:value]];
+				else if([tag isEqualToString:@"PROTOCOL"])[self setProtocol:[self convertProtocolStringToIndex:value]];
+				else if([tag isEqualToString:@"UNITS"])[self convertUnitsString:value];
+			}
 		}
+		
 	}
+}
+
+- (void) startTimeOut
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:kRad7CmdTimeout];
 }
 @end
