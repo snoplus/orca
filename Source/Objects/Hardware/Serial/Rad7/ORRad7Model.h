@@ -19,6 +19,7 @@
 
 #pragma mark ***Imported Files
 
+@class ORRad7DataPt;
 @class ORSerialPort;
 
 
@@ -98,6 +99,8 @@
 #define kRad7LeakageCurrent		@"leakageCurrent"
 #define kRad7SignalVoltage		@"signalVoltage"
 
+@class ORRad7DataPt;
+
 @interface ORRad7Model : OrcaObject
 {
     @private
@@ -129,9 +132,7 @@
 		NSMutableDictionary*   statusDictionary;
 		int				runState;
 		int				dataRecordCount;
-		int				numPts;
-		float		    radonValue[100];
-		double		    radonTime[100];
+		NSMutableArray*	dataPointArray;
 }
 
 #pragma mark ***Initialization
@@ -141,6 +142,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (NSMutableArray*) dataPointArray;
+- (void) setDataPointArray:(NSMutableArray*)aDataPt;
 - (int) runState;
 - (void) setRunState:(int)aRunState;
 - (int) operationState;
@@ -207,8 +210,9 @@
 - (void) dataCom:(int) runNumber;
 - (void) printData;
 - (int) numPoints;
-- (float) radonValue:(int)index;
+- (double) radonValue:(int)index;
 - (double) radonTime:(int)index;
+- (double) radonCounts:(int)index;
 
 #pragma mark ***Commands
 - (void) addCmdToQueue:(NSString*)aCmd;
@@ -223,6 +227,7 @@
 - (void) testCmd;
 @end
 
+extern NSString* ORRad7ModelDataPointArrayChanged;
 extern NSString* ORRad7ModelRunStateChanged;
 extern NSString* ORRad7ModelOperationStateChanged;
 extern NSString* ORRad7ModelTUnitsChanged;
@@ -243,3 +248,14 @@ extern NSString* ORRad7ModelPortNameChanged;
 extern NSString* ORRad7ModelPortStateChanged;
 extern NSString* ORRad7ModelStatusChanged;
 extern NSString* ORRad7ModelUpdatePlot;
+
+@interface ORRad7DataPt : NSObject
+{
+	NSTimeInterval time;
+	double value;
+	double counts;
+}
+@property (assign) NSTimeInterval time;
+@property (assign) double value;
+@property (assign) double counts;
+@end

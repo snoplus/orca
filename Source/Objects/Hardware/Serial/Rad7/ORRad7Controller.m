@@ -63,6 +63,13 @@
 	aPlot= [[ORTimeSeriesPlot alloc] initWithTag:0 andDataSource:self];
 	[plotter0 addPlot: aPlot];
 	[aPlot release];
+
+	ORTimeSeriesPlot* aPlot1;
+	aPlot1= [[ORTimeSeriesPlot alloc] initWithTag:1 andDataSource:self];
+	[aPlot1 setLineColor:[NSColor blueColor]];
+	[plotter0 addPlot: aPlot1];
+	[aPlot1 release];
+	
 	
 	[super awakeFromNib];
 }
@@ -188,6 +195,11 @@
                      selector : @selector(updatePlot:)
                          name : ORRad7ModelUpdatePlot
 						object: model];	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(updatePlot:)
+                         name : ORRad7ModelDataPointArrayChanged
+						object: model];
 
 }
 
@@ -725,20 +737,22 @@
 }
 
 #pragma mark ***Data Source
-- (int) numberPointsInPlot:(id)aPlotter
+- (int) numberPointsInPlot:(id)aPlot
 {
 	return [model numPoints];
 }
 
-- (double) plotterStartTime:(id)aPlotter
+- (double) plotterStartTime:(id)aPlot
 {
 	return [model radonTime:0];
 }
 
-- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
+- (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue
 {
+	int theTag = [aPlot tag];
 	*xValue = [model radonTime:i];
-	*yValue = [model radonValue:i];
+	if(theTag == 0)	*yValue = [model radonValue:i];
+	else			*yValue = [model radonCounts:i];
 }
 
 @end

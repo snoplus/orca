@@ -28,7 +28,8 @@
 #import "ORDataPacket.h"
 
 #pragma mark ***External Strings
-NSString* ORRad7ModelRunStateChanged = @"ORRad7ModelRunStateChanged";
+NSString* ORRad7ModelDataPointArrayChanged = @"ORRad7ModelDataPointArrayChanged";
+NSString* ORRad7ModelRunStateChanged	= @"ORRad7ModelRunStateChanged";
 NSString* ORRad7ModelOperationStateChanged = @"ORRad7ModelOperationStateChanged";
 NSString* ORRad7ModelTUnitsChanged		= @"ORRad7ModelTUnitsChanged";
 NSString* ORRad7ModelRUnitsChanged		= @"ORRad7ModelRUnitsChanged";
@@ -182,6 +183,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) dealloc
 {
+    [dataPointArray release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
@@ -289,6 +291,20 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 
 #pragma mark ***Accessors
+
+- (NSMutableArray*) dataPointArray
+{
+    return dataPointArray;
+}
+
+- (void) setDataPointArray:(NSMutableArray*)anArray
+{
+    [anArray retain];
+    [dataPointArray release];
+    dataPointArray = anArray;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelDataPointArrayChanged object:self];
+}
 
 - (int) runState
 {
@@ -825,7 +841,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	NSNumber* theRunNumber = [statusDictionary objectForKey:kRad7RunNumber];
 	if(theRunNumber){
-		[self dataCom:[theRunNumber intValue]];
+		//[self dataCom:[theRunNumber intValue]];
+		[self dataCom:1];
 	}
 }
 
@@ -1014,23 +1031,33 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	[self addCmdToQueue:@"TEST COM"];
 }
+
 - (int) numPoints
 {
-	return numPts;
+	return [dataPointArray count];
 }
 
-- (float) radonValue:(int)index
+- (double) radonValue:(int)index
 {
-	if(index<100){
-		return radonValue[index];
+	if(index<[dataPointArray count]){
+		return [(ORRad7DataPt*)[dataPointArray objectAtIndex:index] value];
 	}
 	else return 0;
 }
 
+- (double) radonCounts:(int)index
+{
+	if(index<[dataPointArray count]){
+		return [(ORRad7DataPt*)[dataPointArray objectAtIndex:index] counts];
+	}
+	else return 0;
+}
+
+
 - (double) radonTime:(int)index
 {
-	if(index<100){
-		return radonTime[index];
+	if(index<[dataPointArray count]){
+		return (double)[[dataPointArray objectAtIndex:index] time];
 	}
 	else return 0;
 }
@@ -1207,7 +1234,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	NSArray* parts = [aLine componentsSeparatedByString:@" "];
 	if([parts count] >= 23){
 		if(dataRecordCount == 0){
-			numPts = 0;
+			[self setDataPointArray:[NSMutableArray array]];
 			unsigned int unitsWord = [[parts objectAtIndex:22] intValue] & 0x3; //Units
 			NSString* unitsString = @"";
 			if(unitsWord == 0x0)unitsString = @"CPM";
@@ -1236,14 +1263,13 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 				  );
 		
 		dataRecordCount++;
-		if(numPts<100){
-			radonTime[numPts] = [self convertTime:parts];
-			radonValue[numPts] = [[parts objectAtIndex:20] floatValue];
-			numPts++;
-		}
+		ORRad7DataPt* aPt = [[[ORRad7DataPt alloc] init] autorelease];
+		[aPt setTime:[self convertTime:parts]];
+		[aPt setValue:[[parts objectAtIndex:20] doubleValue]];
+		[aPt setCounts:[[parts objectAtIndex:6] doubleValue]];
+		[dataPointArray addObject:aPt];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
 															object:self];
-
 	}
 }
 
@@ -1462,4 +1488,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:kRad7CmdTimeout];
 }
+@end
+
+@implementation ORRad7DataPt
+@synthesize value,time,counts;
 @end
