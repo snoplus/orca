@@ -45,6 +45,7 @@ typedef enum {
 	BOOL 			acknowledged;
 	BOOL			sticky;
 	BOOL			isPosted;
+	NSString*		additionalInfoString;
 }
 
 #pragma mark •••Initialization
@@ -55,6 +56,9 @@ typedef enum {
 - (void) setIsPosted:(BOOL)state;
 - (BOOL) isPosted;
 - (NSString*) genericHelpString;
+
+- (NSString*) additionalInfoString;
+- (void) setAdditionalInfoString:(NSString*)aName;
 
 - (NSString*) timePosted;
 - (void) setTimePosted:(NSCalendarDate*)aDate;

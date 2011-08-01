@@ -114,6 +114,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
             [alarm setSticky:YES];
         }
         [alarm setHelpString:[self alarmHelp]];
+		[alarm setAdditionalInfoString:[self alarmContentString]];
         [alarm postAlarm];
 	}
 	else {
@@ -158,6 +159,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
         [alarm setName:aName];
         if([alarm isPosted]){
             [alarm clearAlarm];
+			[alarm setAdditionalInfoString:[self alarmContentString]];
             [alarm postAlarm];
         }
     }
@@ -185,6 +187,13 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 					  object:self];
 }
 
+- (NSString*) alarmContentString
+{
+	NSString* s = @"Alarm was generated from a Slow Controls Process.\n";
+	s = [s stringByAppendingString:[[self guardian] report]];
+	return s;
+}
+
 - (void)setAlarmSeverity:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setAlarmSeverity:alarmSeverity];
@@ -195,6 +204,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
         [alarm setSeverity:aValue];
         if([alarm isPosted]){
             [alarm clearAlarm];
+			[alarm setAdditionalInfoString:[self alarmContentString]];
             [alarm postAlarm];
         }
     }

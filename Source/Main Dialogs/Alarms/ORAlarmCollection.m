@@ -543,6 +543,9 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 			while(anAlarm = [alarmEnummy nextObject]){
 				if([anAlarm timeSincePosted] > 60 && [self wantsAlarmSeverity:[anAlarm severity]]){
 					content = [content stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++\n%@",[anAlarm helpString]];
+					if([[anAlarm additionalInfoString] length]){
+						content = [content stringByAppendingFormat:@"\n+++++++++++++++++++++++++++++++++++\n%@",[anAlarm additionalInfoString]];
+					}
 					[alarmsSent addObject:anAlarm];
 				}
 			}

@@ -36,6 +36,7 @@
 #pragma mark ***Accessors
 - (NSString*) noAlarmName;
 - (void) setNoAlarmName:(NSString*)aNoAlarmName;
+- (NSString*) alarmContentString;
 
 - (void) setUpImage;
 -(void) makeConnectors;

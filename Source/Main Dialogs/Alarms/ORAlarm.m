@@ -58,6 +58,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 {
     [timePosted release];
     [name release];
+	[additionalInfoString release];
     [self setSeverity:kInformationAlarm];
     [helpString release];
     [super dealloc];
@@ -110,6 +111,17 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
     severity = aValue;
 }
 
+- (NSString*) additionalInfoString
+{
+	return additionalInfoString;
+}
+
+- (void) setAdditionalInfoString:(NSString*)aString
+{
+    [additionalInfoString autorelease];
+    additionalInfoString = [aString copy];    
+}
+
 - (void) setHelpString:(NSString*)aString
 {
     [helpString autorelease];
@@ -157,6 +169,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 {
 	return [NSString stringWithFormat:@"Name:%@  Severity:%@ Posted:%@\n",[self name],[self severityName],[self timePosted]];
 }
+
 
 #pragma mark •••Alarm Management
 - (void) postAlarm
