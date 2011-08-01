@@ -116,11 +116,13 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 
 - (NSString*) password
 {
-    return password;
+	if(!password)return @"";
+    else return password;
 }
 
 - (void) setPassword:(NSString*)aPassword
 {
+	if(!aPassword)aPassword= @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setPassword:password];
     
     [password autorelease];
