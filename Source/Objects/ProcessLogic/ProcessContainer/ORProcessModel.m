@@ -40,6 +40,10 @@ NSString* ORProcessModelShortNameChangedNotification= @"ORProcessModelShortNameC
 NSString* ORProcessModelUseAltViewChanged			= @"ORProcessModelUseAltViewChanged";
 NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatChanged";
 
+@interface ORProcessModel (private)
+- (void) setSendStartNoticeNextReadAfterDelay;
+@end
+
 @implementation ORProcessModel
 
 #pragma mark ¥¥¥initialization
@@ -523,7 +527,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		}
 		else {
 			if(sendOnStart){
-				sendStartNoticeNextRead = YES;
+				[self performSelector:@selector(setSendStartNoticeNextReadAfterDelay) withObject:nil afterDelay:20];
 			}
 		}
 	}
@@ -626,6 +630,11 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 			@synchronized(self){
 				[lastSampleTime release];
 				lastSampleTime = [[NSDate date] retain];
+				
+				if(sendStartNoticeNextRead){
+					sendStartNoticeNextRead = NO;
+					[self sendStartStopNotice:YES];
+				}
 			}
 		}
 		sampleGateOpen = NO;
@@ -673,10 +682,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 				}
 			}
 		}
-		if(sendStartNoticeNextRead){
-			sendStartNoticeNextRead = NO;
-			[self sendStartStopNotice:YES];
-		}
+
 	}
 }
 
@@ -1019,3 +1025,13 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 }
 
 @end
+
+@implementation ORProcessModel (private)
+- (void) setSendStartNoticeNextReadAfterDelay
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setSendStartNoticeNextReadAfterDelay) object:nil];
+
+	sendStartNoticeNextRead = YES;
+}
+@end
+
