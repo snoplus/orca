@@ -28,6 +28,10 @@
 #import "ORDataPacket.h"
 
 #pragma mark ***External Strings
+NSString* ORRad7ModelMakeFileChanged = @"ORRad7ModelMakeFileChanged";
+NSString* ORRad7ModelVerboseChanged = @"ORRad7ModelVerboseChanged";
+NSString* ORRad7ModelDeleteDataOnStartChanged = @"ORRad7ModelDeleteDataOnStartChanged";
+NSString* ORRad7ModelRunToPrintChanged	= @"ORRad7ModelRunToPrintChanged";
 NSString* ORRad7ModelDataPointArrayChanged = @"ORRad7ModelDataPointArrayChanged";
 NSString* ORRad7ModelRunStateChanged	= @"ORRad7ModelRunStateChanged";
 NSString* ORRad7ModelOperationStateChanged = @"ORRad7ModelOperationStateChanged";
@@ -67,6 +71,7 @@ NSString* ORRad7Lock = @"ORRad7Lock";
 - (NSNumber*) getNumber:(NSString*)aString separator:(NSString*)aSeparator;
 - (void) startTimeOut;
 - (double) convertTime:(NSArray*)parts;
+- (void) resetDataSet;
 @end
 
 @implementation ORRad7Model
@@ -118,8 +123,8 @@ static struct {
 	{@"SETUP CYCLE",     kSetupCycle,	 .5,	4},
 	{@"SETUP SAVUSER",   kSetupSave,	 .5,	3},
 	{@"DATA FREE",		 kDataFree,		 .5,	3},
-	{@"DATA COM",		 kDataCom,		  3,	3},
-	{@"TEST COM",		 kTestCom,		  3,	2},
+	{@"DATA COM",		 kDataCom,		  10,	3}, //prints whole run
+	{@"TEST COM",		 kTestCom,		  3,	2}, //prints current cycle
 	{@"++DumpUser",      kDumpValues,	  3,	13},
 };
 
@@ -190,6 +195,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[cmdQueue release];
 	[lastRequest release];
     [portName release];
+	[stopRunFilePath release];
     if([serialPort isOpen]){
         [serialPort close];
     }
@@ -292,6 +298,56 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 #pragma mark ***Accessors
 
+- (BOOL) makeFile
+{
+    return makeFile;
+}
+
+- (void) setMakeFile:(BOOL)aMakeFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMakeFile:makeFile];
+    makeFile = aMakeFile;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelMakeFileChanged object:self];
+}
+
+- (BOOL) verbose
+{
+    return verbose;
+}
+
+- (void) setVerbose:(BOOL)aVerbose
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVerbose:verbose];
+    verbose = aVerbose;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelVerboseChanged object:self];
+}
+
+- (BOOL) deleteDataOnStart
+{
+    return deleteDataOnStart;
+}
+
+- (void) setDeleteDataOnStart:(BOOL)aDeleteDataOnStart
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDeleteDataOnStart:deleteDataOnStart];
+    deleteDataOnStart = aDeleteDataOnStart;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelDeleteDataOnStartChanged object:self];
+}
+
+- (int) runToPrint
+{
+    return runToPrint;
+}
+
+- (void) setRunToPrint:(int)aRunToPrint
+{
+	if(aRunToPrint<1)aRunToPrint = 1;
+	else if(aRunToPrint>99)aRunToPrint = 99;
+    [[[self undoManager] prepareWithInvocationTarget:self] setRunToPrint:runToPrint];
+    runToPrint = aRunToPrint;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelRunToPrintChanged object:self];
+}
+
 - (NSMutableArray*) dataPointArray
 {
     return dataPointArray;
@@ -314,7 +370,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setRunState:(int)aRunState
 {
     runState = aRunState;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelRunStateChanged object:self];
 }
 
@@ -326,7 +381,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setOperationState:(int)aOperationState
 {
     operationState = aOperationState;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelOperationStateChanged object:self];
 }
 
@@ -350,9 +404,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setTUnits:(int)aUnits
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTUnits:tUnits];
-    
     tUnits = aUnits;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelTUnitsChanged object:self];
 }
 
@@ -364,9 +416,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setRUnits:(int)aUnits
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRUnits:rUnits];
-    
     rUnits = aUnits;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelRUnitsChanged object:self];
 }
 
@@ -378,9 +428,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setFormatSetting:(int)aFormat
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFormatSetting:formatSetting];
-    
     formatSetting = aFormat;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelFormatChanged object:self];
 }
 
@@ -392,9 +440,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setTone:(int)aTone
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTone:tone];
-    
     tone = aTone;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelToneChanged object:self];
 }
 
@@ -406,9 +452,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) setPumpMode:(int)aPumpMode
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPumpMode:pumpMode];
-    
     pumpMode = aPumpMode;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelPumpModeChanged object:self];
 }
 
@@ -730,6 +774,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setMakeFile:			[decoder decodeBoolForKey:@"makeFile"]];
+	[self setVerbose:			[decoder decodeBoolForKey:@"verbose"]];
+	[self setDeleteDataOnStart:	[decoder decodeBoolForKey:@"deleteDataOnStart"]];
+	[self setRunToPrint:		[decoder decodeIntForKey:@"runToPrint"]];
 	[self setTUnits:			[decoder decodeIntForKey: @"tUnits"]];
 	[self setRUnits:			[decoder decodeIntForKey: @"rUnits"]];
 	[self setFormatSetting:		[decoder decodeIntForKey:	 @"formatSetting"]];
@@ -753,6 +801,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:	makeFile		forKey:@"makeFile"];
+    [encoder encodeBool:	verbose			forKey:@"verbose"];
+    [encoder encodeBool:	deleteDataOnStart forKey:@"deleteDataOnStart"];
+    [encoder encodeInt:		runToPrint		forKey:@"runToPrint"];
     [encoder encodeInt:		rUnits			forKey: @"rUnits"];
     [encoder encodeInt:		tUnits			forKey: @"tUnits"];
     [encoder encodeInt:		formatSetting	forKey: @"formatSetting"];
@@ -785,6 +837,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	NSLog(@"Starting Rad7\n");
 	[self setRunState:kRad7RunStateUnKnown];
+	if(deleteDataOnStart)	{
+		[self resetDataSet];
+		[self addCmdToQueue:@"DATA ERASE YES"];
+	}
 	[self initHardware];
 	[self addCmdToQueue:@"++StartGroup"];
 	[self addCmdToQueue:@"SPECIAL STATUS"];
@@ -801,17 +857,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self addCmdToQueue:@"SPECIAL STATUS"];
 	[self addCmdToQueue:@"SPECIAL STOP"];
 	[self addCmdToQueue:@"SPECIAL STATUS"];
+	if(verbose || makeFile){
+		[self printRun:[[self statusForKey:kRad7LastRunNumber] intValue]];
+	}
 	[self addCmdToQueue:@"++EndGroup"];
-}
-
-- (void) testCom
-{
-	[self addCmdToQueue:@"TEST COM"];
-}
-
-- (void) dataFree
-{
-	[self addCmdToQueue:@"DATA FREE"];
 }
 
 - (void) specialStatus
@@ -837,16 +886,17 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	else NSLog(@"Rad7: runNumber for dataDelete must be between 0 and 99 inclusive\n");
 }
 
-- (void) printData
+- (void) printDataInProgress
 {
-	NSNumber* theRunNumber = [statusDictionary objectForKey:kRad7RunNumber];
-	if(theRunNumber){
-		//[self dataCom:[theRunNumber intValue]];
-		[self dataCom:1];
-	}
+	[self addCmdToQueue:@"TEST COM"];	
 }
 
-- (void) dataCom:(int) runNumber
+- (void) printRun
+{
+	[self printRun:runToPrint];
+}
+
+- (void) printRun:(int) runNumber
 {
 	if(runNumber>0 && runNumber < 99){
 		[self addCmdToQueue:[NSString stringWithFormat: @"DATA COM %02d",runNumber]];
@@ -1027,11 +1077,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	}
 }
 
-- (void) testCmd
-{
-	[self addCmdToQueue:@"TEST COM"];
-}
-
 - (int) numPoints
 {
 	return [dataPointArray count];
@@ -1045,15 +1090,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	else return 0;
 }
 
-- (double) radonCounts:(int)index
-{
-	if(index<[dataPointArray count]){
-		return [(ORRad7DataPt*)[dataPointArray objectAtIndex:index] counts];
-	}
-	else return 0;
-}
-
-
 - (double) radonTime:(int)index
 {
 	if(index<[dataPointArray count]){
@@ -1062,9 +1098,25 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	else return 0;
 }
 
+- (double) rhValue:(int)index
+{
+	if(index<[dataPointArray count]){
+		return (double)[[dataPointArray objectAtIndex:index] rh];
+	}
+	else return 0;
+}
+
+
 @end
 
 @implementation ORRad7Model (private)
+- (void) resetDataSet
+{
+	[self setDataPointArray:nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
+														object:self];
+}
+
 - (void) timeout
 {
 	NSLogError(@"Rad7",@"command timeout",nil);
@@ -1178,6 +1230,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		NSArray* parts = [theResponse componentsSeparatedByString:@" "];
 		if([parts count] == 23){
 			[self handleDataRecord:theResponse];
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(goToNextCommand) object:nil];
+			[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
 		}
 		else {
 			switch(currentRequest){
@@ -1230,43 +1284,80 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) handleDataRecord:(NSString*)aLine
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-
 	NSArray* parts = [aLine componentsSeparatedByString:@" "];
 	if([parts count] >= 23){
 		if(dataRecordCount == 0){
 			[self setDataPointArray:[NSMutableArray array]];
-			unsigned int unitsWord = [[parts objectAtIndex:22] intValue] & 0x3; //Units
-			NSString* unitsString = @"";
-			if(unitsWord == 0x0)unitsString = @"CPM";
-			else if(unitsWord == 0x1)unitsString = @"#Counts";
-			else if(unitsWord == 0x2)unitsString = @"Bq/m^3";
-			else if(unitsWord == 0x3)unitsString = @"pCi/L";
+			if(makeFile){
+				[stopRunFilePath release];
+				stopRunFilePath = [NSString stringWithFormat:@"~/Desktop/Rad7/Rad7_%d_%@",[self uniqueIdNumber],[NSDate date]];
+				stopRunFilePath = [stopRunFilePath stringByExpandingTildeInPath];
+				stopRunFilePath = [stopRunFilePath stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+				stopRunFilePath = [stopRunFilePath stringByReplacingOccurrencesOfString:@"-" withString:@"_"];
+				stopRunFilePath = [stopRunFilePath stringByReplacingOccurrencesOfString:@":" withString:@"_"];
+				NSRange r = [stopRunFilePath rangeOfString:@"__"];
+				if(r.location!=NSNotFound)stopRunFilePath = [stopRunFilePath substringToIndex:r.location];
+				[stopRunFilePath retain];
+				NSLog(@"Rad 7 data logged to file: %@\n",stopRunFilePath);
+			}
+			if(verbose){
+				unsigned int unitsWord = [[parts objectAtIndex:22] intValue] & 0x3; //Units
+				NSString* unitsString = @"";
+				if(unitsWord == 0x0)unitsString = @"CPM";
+				else if(unitsWord == 0x1)unitsString = @"#Counts";
+				else if(unitsWord == 0x2)unitsString = @"Bq/m^3";
+				else if(unitsWord == 0x3)unitsString = @"pCi/L";
 
-			NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"Cycle Date   Time  Counts  LT  A(%%)  B(%%)  C(%%)  D(%%)    Radon (%@)\n",unitsString);
-			NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"----------------------------------------------------------------------------\n");
+				NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"Cycle Date   Time  Counts  LT  A(%%)  B(%%)  C(%%)  D(%%)    Radon (%@)\n",unitsString);
+				NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"----------------------------------------------------------------------------\n");
+			}
 		}
-		NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"%3d %02d/%02d/%02d %02d:%02d %4d %5.1f %5.1f %5.1f %5.1f %5.1f %9.4f +- %9.4f\n",
-				  [[parts objectAtIndex:0] intValue], //test number
-				  [[parts objectAtIndex:3] intValue], //day
-				  [[parts objectAtIndex:2] intValue], //month
-				  [[parts objectAtIndex:1] intValue], //year
-				  [[parts objectAtIndex:4] intValue], //hour
-				  [[parts objectAtIndex:5] intValue], //minutes
-				  [[parts objectAtIndex:6] intValue], //Total Counts
-				  [[parts objectAtIndex:7] floatValue], //Live Time
-				  [[parts objectAtIndex:8] floatValue], //% in A
-				  [[parts objectAtIndex:9] floatValue], //% in B
-				  [[parts objectAtIndex:10] floatValue], //% in C
-				  [[parts objectAtIndex:11] floatValue], //% in C
-				  [[parts objectAtIndex:20] floatValue], //Radon
-				  [[parts objectAtIndex:21] floatValue] //UnCertainty
-				  );
+		NSString* s = [NSString stringWithFormat:@"%3d %02d/%02d/%02d %02d:%02d %4d %5.1f %5.1f %5.1f %5.1f %5.1f %9.4f +- %9.4f",
+					   [[parts objectAtIndex:0] intValue], //test number
+					   [[parts objectAtIndex:3] intValue], //day
+					   [[parts objectAtIndex:2] intValue], //month
+					   [[parts objectAtIndex:1] intValue], //year
+					   [[parts objectAtIndex:4] intValue], //hour
+					   [[parts objectAtIndex:5] intValue], //minutes
+					   [[parts objectAtIndex:6] intValue], //Total Counts
+					   [[parts objectAtIndex:7] floatValue], //Live Time
+					   [[parts objectAtIndex:8] floatValue], //% in A
+					   [[parts objectAtIndex:9] floatValue], //% in B
+					   [[parts objectAtIndex:10] floatValue], //% in C
+					   [[parts objectAtIndex:11] floatValue], //% in C
+					   [[parts objectAtIndex:20] floatValue], //Radon
+					   [[parts objectAtIndex:21] floatValue] //UnCertainty
+					   ];
+		if(verbose){			
+			NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"%@\n",s);
+		}
+		
+		if(makeFile){
+			//reformat for file
+			s = [s removeExtraSpaces];
+			s = [s stringByReplacingOccurrencesOfString:@" " withString:@","];
+			s = [s stringByReplacingOccurrencesOfString:@",+-," withString:@","];
+			
+			NSFileManager* fm = [NSFileManager defaultManager];
+			
+			if(![fm fileExistsAtPath:stopRunFilePath]){
+				NSString* dirPath = [stopRunFilePath stringByDeletingLastPathComponent];
+				[fm createDirectoryAtPath:dirPath withIntermediateDirectories:YES attributes:nil error:nil];        
+				[fm createFileAtPath:stopRunFilePath contents:nil attributes:nil];
+			}
+			NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:stopRunFilePath];
+			[fh seekToEndOfFile];
+			s = [s stringByAppendingString:@"\n"];
+			[fh writeData:[s dataUsingEncoding:NSASCIIStringEncoding]];
+			[fh closeFile];
+		}
 		
 		dataRecordCount++;
 		ORRad7DataPt* aPt = [[[ORRad7DataPt alloc] init] autorelease];
 		[aPt setTime:[self convertTime:parts]];
 		[aPt setValue:[[parts objectAtIndex:20] doubleValue]];
-		[aPt setCounts:[[parts objectAtIndex:6] doubleValue]];
+		//[aPt setCounts:[[parts objectAtIndex:6] doubleValue]];
+		[aPt setRh:[[parts objectAtIndex:15] doubleValue]];
 		[dataPointArray addObject:aPt];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
 															object:self];
@@ -1342,8 +1433,11 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		aLine = [aLine removeExtraSpaces];
 		NSArray* parts = [aLine componentsSeparatedByString:@" "];
 		if([parts count] == 5){
-			[statusDictionary setObject:[[parts objectAtIndex:0] substringToIndex:2]    forKey:kRad7RunNumber];
-			[statusDictionary setObject:[[parts objectAtIndex:0] substringFromIndex:2]  forKey:kRad7CycleNumber];
+			int thisRunNum = [[[parts objectAtIndex:0] substringToIndex:2] intValue];
+			int thisCycleNum = [[[parts objectAtIndex:0] substringFromIndex:2] intValue];
+
+			[statusDictionary setObject:[NSNumber numberWithInt:thisRunNum]    forKey:kRad7RunNumber];
+			[statusDictionary setObject:[NSNumber numberWithInt:thisCycleNum]  forKey:kRad7CycleNumber];
 			[statusDictionary setObject:[parts objectAtIndex:1] forKey:kRad7RunStatus];
 			[statusDictionary setObject:[parts objectAtIndex:2] forKey:kRad7RunPumpStatus];
 			[statusDictionary setObject:[parts objectAtIndex:3] forKey:kRad7RunCountDown];
@@ -1376,13 +1470,28 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 					[statusDictionary setObject:[[parts objectAtIndex:0] substringFromIndex:2]  forKey:kRad7LastCycleNumber];
 					NSArray* readingParts = [[parts objectAtIndex:1] componentsSeparatedByString:@"+-"];
 					if([readingParts count] >= 2){
-						[statusDictionary setObject:[NSNumber numberWithFloat:[[readingParts objectAtIndex:0] floatValue]]  forKey:kRad7LastRadon];
-						[statusDictionary setObject:[NSNumber numberWithFloat:[[readingParts objectAtIndex:1] floatValue]]  forKey:kRad7LastRadonUncertainty];
+						float lastRadon        = [[readingParts objectAtIndex:0] floatValue];
+						float lastUncertainty  = [[readingParts objectAtIndex:1] floatValue];
+						[statusDictionary setObject:[NSNumber numberWithFloat:lastRadon]  forKey:kRad7LastRadon];
+						[statusDictionary setObject:[NSNumber numberWithFloat:lastUncertainty]  forKey:kRad7LastRadonUncertainty];
 
 						if(thisRunNum!=lastRunNum || thisCycleNum!=lastCycleNum){
+							if(!dataPointArray){
+								[self setDataPointArray:[NSMutableArray array]];
+							}
+							ORRad7DataPt* aPt = [[[ORRad7DataPt alloc] init] autorelease];
+							NSDate *date = [NSDate date];  
+							NSTimeInterval t1 = [date timeIntervalSince1970];
+
+							[aPt setTime:t1];
+							[aPt setValue:lastRadon];
+							[aPt setRh:    [[self statusForKey:kRad7RH] floatValue]];
+							[dataPointArray addObject:aPt];
+							[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
+																				object:self];
+							
 							//NSLog(@"Run: %d Cycle: %d Radon: %@\n",thisRunNum,thisCycleNum,[statusDictionary objectForKey:kRad7LastRadon]);
 						}
-
 					}
 					[statusDictionary setObject:[parts objectAtIndex:2]  forKey:kRad7LastRadonUnits];
 				}
@@ -1491,5 +1600,5 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 @end
 
 @implementation ORRad7DataPt
-@synthesize value,time,counts;
+@synthesize value,time,rh;
 @end

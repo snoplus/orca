@@ -24,7 +24,11 @@
 @interface ORRad7Controller : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
-	IBOutlet   NSTextField* runStateTextField;
+	IBOutlet NSButton*		makeFileCB;
+	IBOutlet NSButton*		verboseCB;
+	IBOutlet NSButton*		deleteDataOnStartCB;
+	IBOutlet NSTextField*	runToPrintTextField;
+	IBOutlet NSTextField*	runStateTextField;
 	IBOutlet NSTextField*   operationStateField;
 	IBOutlet NSPopUpButton* rUnitsPU;
 	IBOutlet NSPopUpButton* tUnitsPU;
@@ -52,8 +56,8 @@
 	IBOutlet NSButton*		loadDialogButton;
 	IBOutlet NSButton*		saveUserProtocolButton;
 	IBOutlet NSButton*		eraseAllDataButton;
-	IBOutlet NSButton*		printDataButton;
-	IBOutlet NSButton*		testComButton;
+	IBOutlet NSButton*		printRunButton;
+	IBOutlet NSButton*		printCycleButton;
 
 	//status fields
 	IBOutlet NSTextField*   freeCyclesField;
@@ -97,6 +101,10 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) makeFileChanged:(NSNotification*)aNote;
+- (void) verboseChanged:(NSNotification*)aNote;
+- (void) deleteDataOnStartChanged:(NSNotification*)aNote;
+- (void) runToPrintChanged:(NSNotification*)aNote;
 - (void) runStateChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) operationStateChanged:(NSNotification*)aNote;
@@ -122,6 +130,10 @@
 - (void) updatePlot:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) makeFileAction:(id)sender;
+- (IBAction) verboseAction:(id)sender;
+- (IBAction) deleteDataOnStartAction:(id)sender;
+- (IBAction) runToPrintTextFieldAction:(id)sender;
 - (IBAction) rUnitsAction:(id)sender;
 - (IBAction) tUnitsAction:(id)sender;
 - (IBAction) formatAction:(id)sender;
@@ -145,8 +157,8 @@
 - (IBAction) dumpUserValuesAction:(id)sender;
 - (IBAction) saveUserSettings:(id)sender;
 - (IBAction) eraseAllDataAction:(id)sender;
-- (IBAction) printDataAction:(id)sender;
-- (IBAction) testComAction:(id)sender;
+- (IBAction) printRunAction:(id)sender;
+- (IBAction) printDataInProgress:(id)sender;
 
 #pragma mark ***Data Source
 - (double) plotterStartTime:(id)aPlotter;

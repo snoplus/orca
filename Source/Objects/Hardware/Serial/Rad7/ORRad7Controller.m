@@ -69,8 +69,7 @@
 	[aPlot1 setLineColor:[NSColor blueColor]];
 	[plotter0 addPlot: aPlot1];
 	[aPlot1 release];
-	
-	
+
 	[super awakeFromNib];
 }
 
@@ -201,6 +200,26 @@
                          name : ORRad7ModelDataPointArrayChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(runToPrintChanged:)
+                         name : ORRad7ModelRunToPrintChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(deleteDataOnStartChanged:)
+                         name : ORRad7ModelDeleteDataOnStartChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseChanged:)
+                         name : ORRad7ModelVerboseChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(makeFileChanged:)
+                         name : ORRad7ModelMakeFileChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -226,6 +245,30 @@
 	[self operationStateChanged:nil];
 	[self runStateChanged:nil];
 	[self updatePlot:nil];
+	[self runToPrintChanged:nil];
+	[self deleteDataOnStartChanged:nil];
+	[self verboseChanged:nil];
+	[self makeFileChanged:nil];
+}
+
+- (void) makeFileChanged:(NSNotification*)aNote
+{
+	[makeFileCB setIntValue: [model makeFile]];
+}
+
+- (void) verboseChanged:(NSNotification*)aNote
+{
+	[verboseCB setIntValue: [model verbose]];
+}
+
+- (void) deleteDataOnStartChanged:(NSNotification*)aNote
+{
+	[deleteDataOnStartCB setIntValue: [model deleteDataOnStart]];
+}
+
+- (void) runToPrintChanged:(NSNotification*)aNote
+{
+	[runToPrintTextField setIntValue: [model runToPrint]];
 }
 
 - (void) updatePlot:(NSNotification*)aNote
@@ -404,30 +447,47 @@
 			[startTestButton	setEnabled:	 NO];
 			[stopTestButton		setEnabled:  NO];
 			[eraseAllDataButton setEnabled:  NO];
-			[printDataButton	setEnabled:  NO];
-			[testComButton	setEnabled:  NO];
+			[printRunButton		setEnabled:  NO];
+			[printCycleButton	setEnabled:  NO];
+			[runToPrintTextField setEnabled:  NO];
+			[deleteDataOnStartCB setEnabled:  NO];
+			[verboseCB			 setEnabled:  NO];
+			[makeFileCB			 setEnabled:  NO];
+			
 		}
 		else if(runState== kRad7RunStateCounting){
 			[startTestButton	setEnabled:	 NO];
 			[stopTestButton		setEnabled:  YES];
 			[eraseAllDataButton setEnabled:  NO];
-			[printDataButton	setEnabled:  NO];
-			[testComButton		setEnabled:  YES];
+			[printRunButton		setEnabled:  NO];
+			[printCycleButton	setEnabled:  YES];
+			[runToPrintTextField setEnabled:  NO];
+			[deleteDataOnStartCB setEnabled:  NO];
+			[verboseCB			 setEnabled:  YES];
+			[makeFileCB			 setEnabled:  YES];
 		}
 		else {
 			[startTestButton	setEnabled:	 YES];
 			[stopTestButton		setEnabled:  NO];
 			[eraseAllDataButton setEnabled:  YES];
-			[printDataButton	setEnabled:  YES];
-			[testComButton		setEnabled:  NO];
+			[printRunButton		setEnabled:  YES];
+			[printCycleButton	setEnabled:  NO];
+			[runToPrintTextField setEnabled: YES];
+			[deleteDataOnStartCB setEnabled: YES];
+			[verboseCB			 setEnabled:  NO];
+			[makeFileCB			 setEnabled:  NO];
 		}
 	}
 	else {
 		[startTestButton	setEnabled:	 NO];
 		[stopTestButton		setEnabled:  NO];
 		[eraseAllDataButton setEnabled:  NO];
-		[printDataButton	setEnabled:  NO];
-		[testComButton		setEnabled:  NO];
+		[printRunButton		setEnabled:  NO];
+		[printCycleButton	setEnabled:  NO];
+		[runToPrintTextField setEnabled:  NO];
+		[deleteDataOnStartCB setEnabled:  NO];
+		[verboseCB			 setEnabled:  NO];
+		[makeFileCB			 setEnabled:  NO];
 	}
 	
 	[initHWButton		setEnabled:  !counting && idle && !locked];
@@ -575,6 +635,26 @@
 
 
 #pragma mark ***Actions
+
+- (void) makeFileAction:(id)sender
+{
+	[model setMakeFile:[sender intValue]];	
+}
+
+- (void) verboseAction:(id)sender
+{
+	[model setVerbose:[sender intValue]];	
+}
+
+- (void) deleteDataOnStartAction:(id)sender
+{
+	[model setDeleteDataOnStart:[sender intValue]];	
+}
+
+- (void) runToPrintTextFieldAction:(id)sender
+{
+	[model setRunToPrint:[sender intValue]];	
+}
 
 - (void) tUnitsAction:(id)sender
 {
@@ -726,14 +806,15 @@
 	[model dumpUserValues];
 }
 
-- (IBAction) printDataAction:(id)sender
+- (IBAction) printRunAction:(id)sender
 {
-	[model printData];
+	[self endEditing];
+	[model printRun];
 }
 
-- (IBAction) testComAction:(id)sender
+- (IBAction) printDataInProgress:(id)sender
 {
-	[model testCmd];
+	[model printDataInProgress];
 }
 
 #pragma mark ***Data Source
@@ -751,8 +832,8 @@
 {
 	int theTag = [aPlot tag];
 	*xValue = [model radonTime:i];
-	if(theTag == 0)	*yValue = [model radonValue:i];
-	else			*yValue = [model radonCounts:i];
+	if(theTag == 0)		 *yValue = [model radonValue:i];
+	else                 *yValue = [model rhValue:i];
 }
 
 @end

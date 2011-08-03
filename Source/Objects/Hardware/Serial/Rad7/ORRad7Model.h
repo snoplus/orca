@@ -133,6 +133,12 @@
 		int				runState;
 		int				dataRecordCount;
 		NSMutableArray*	dataPointArray;
+		int				runToPrint;
+		BOOL			deleteDataOnStart;
+		BOOL			verbose;
+		BOOL			makeFile;
+	
+		NSString*		stopRunFilePath;
 }
 
 #pragma mark ***Initialization
@@ -142,6 +148,16 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (BOOL) makeFile;
+- (void) setMakeFile:(BOOL)aMakeFile;
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerbose;
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerbose;
+- (BOOL) deleteDataOnStart;
+- (void) setDeleteDataOnStart:(BOOL)aDeleteDataOnStart;
+- (int) runToPrint;
+- (void) setRunToPrint:(int)aRunToPrint;
 - (NSMutableArray*) dataPointArray;
 - (void) setDataPointArray:(NSMutableArray*)aDataPt;
 - (int) runState;
@@ -207,12 +223,10 @@
 - (void) saveUser;
 - (void) pollHardware;
 - (void) dataErase;
-- (void) dataCom:(int) runNumber;
-- (void) printData;
 - (int) numPoints;
 - (double) radonValue:(int)index;
 - (double) radonTime:(int)index;
-- (double) radonCounts:(int)index;
+- (double) rhValue:(int)index;
 
 #pragma mark ***Commands
 - (void) addCmdToQueue:(NSString*)aCmd;
@@ -224,9 +238,16 @@
 - (void) specialStatus;
 - (void) specialStart;
 - (void) specialStop;
-- (void) testCmd;
+- (void) printRun;
+- (void) printDataInProgress;
+- (void) printRun:(int) runNumber;
+
 @end
 
+extern NSString* ORRad7ModelMakeFileChanged;
+extern NSString* ORRad7ModelVerboseChanged;
+extern NSString* ORRad7ModelDeleteDataOnStartChanged;
+extern NSString* ORRad7ModelRunToPrintChanged;
 extern NSString* ORRad7ModelDataPointArrayChanged;
 extern NSString* ORRad7ModelRunStateChanged;
 extern NSString* ORRad7ModelOperationStateChanged;
@@ -253,9 +274,9 @@ extern NSString* ORRad7ModelUpdatePlot;
 {
 	NSTimeInterval time;
 	double value;
-	double counts;
+	double rh;
 }
 @property (assign) NSTimeInterval time;
 @property (assign) double value;
-@property (assign) double counts;
+@property (assign) double rh;
 @end
