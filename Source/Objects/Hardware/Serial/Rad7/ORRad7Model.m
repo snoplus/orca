@@ -93,6 +93,7 @@ enum {
 	kSetupCycle,
 	kSetupSave,
 	kDataFree,
+	kDataErase,
 	kDataCom,
 	kTestCom,
 	kDumpValues,
@@ -123,7 +124,8 @@ static struct {
 	{@"SETUP CYCLE",     kSetupCycle,	 .5,	4},
 	{@"SETUP SAVUSER",   kSetupSave,	 .5,	3},
 	{@"DATA FREE",		 kDataFree,		 .5,	3},
-	{@"DATA COM",		 kDataCom,		  10,	3}, //prints whole run
+	{@"DATA ERASE",		 kDataErase,	 .5,	3},
+	{@"DATA COM",		 kDataCom,		 10,	3}, //prints whole run
 	{@"TEST COM",		 kTestCom,		  3,	2}, //prints current cycle
 	{@"++DumpUser",      kDumpValues,	  3,	13},
 };
@@ -857,9 +859,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self addCmdToQueue:@"SPECIAL STATUS"];
 	[self addCmdToQueue:@"SPECIAL STOP"];
 	[self addCmdToQueue:@"SPECIAL STATUS"];
-	if(verbose || makeFile){
-		[self printRun:[[self statusForKey:kRad7LastRunNumber] intValue]];
-	}
 	[self addCmdToQueue:@"++EndGroup"];
 }
 
@@ -1254,6 +1253,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 					[self handleSetupParam:theResponse lineNumber:requestCount];
 				break;
 					
+				case kDataErase:
+				break;	
+					
 				case kDataFree:
 					[self handleDataFree:theResponse lineNumber:requestCount];
 				break;	
@@ -1435,7 +1437,15 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		if([parts count] == 5){
 			int thisRunNum = [[[parts objectAtIndex:0] substringToIndex:2] intValue];
 			int thisCycleNum = [[[parts objectAtIndex:0] substringFromIndex:2] intValue];
-
+			id lastRunStatus = [self statusForKey:kRad7RunStatus];
+			id newRunStatus  = [parts objectAtIndex:1];
+			if(![lastRunStatus isEqualToString:newRunStatus]){
+				if([lastRunStatus length] && [newRunStatus isEqualToString:@"IDLE"]){
+					if(verbose || makeFile){
+						[self printRun:[[self statusForKey:kRad7LastRunNumber] intValue]];
+					}
+				}
+			}
 			[statusDictionary setObject:[NSNumber numberWithInt:thisRunNum]    forKey:kRad7RunNumber];
 			[statusDictionary setObject:[NSNumber numberWithInt:thisCycleNum]  forKey:kRad7CycleNumber];
 			[statusDictionary setObject:[parts objectAtIndex:1] forKey:kRad7RunStatus];
@@ -1489,8 +1499,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 							[dataPointArray addObject:aPt];
 							[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
 																				object:self];
-							
-							//NSLog(@"Run: %d Cycle: %d Radon: %@\n",thisRunNum,thisCycleNum,[statusDictionary objectForKey:kRad7LastRadon]);
 						}
 					}
 					[statusDictionary setObject:[parts objectAtIndex:2]  forKey:kRad7LastRadonUnits];
