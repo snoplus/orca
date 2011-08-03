@@ -36,7 +36,8 @@
 	IBOutlet NSImageView*	hvStatusImage;
 	IBOutlet NSTextField*   temperatureField;
 	IBOutlet NSTextField*   slotField;
-
+	IBOutlet NSTextField*	hwGoalField;
+	
 	//details 
 	IBOutlet NSTextField*	targetField;
 	IBOutlet NSTextField*	voltageField;

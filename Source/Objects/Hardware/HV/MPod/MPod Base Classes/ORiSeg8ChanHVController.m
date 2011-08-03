@@ -258,7 +258,6 @@
 	[targetField setIntValue:[model target:selectedChannel]];
 }
 
-
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
@@ -429,6 +428,10 @@
 	
 	int state = [model channel:selectedChannel readParamAsInt:@"outputStatus"];
 	if(state & outputOnMask){
+		
+		int selectedChannel = [model selectedChannel];
+		[hwGoalField setStringValue:[NSString stringWithFormat:@"Goal: %d",[model hwGoal:selectedChannel]]];
+
 		if(state & outputRampUpMask)		[hvStatusImage setImage:[NSImage imageNamed:@"upRamp"]];
 		else if(state & outputRampDownMask)	[hvStatusImage setImage:[NSImage imageNamed:@"downRamp"]];
 		else {
@@ -439,7 +442,11 @@
 			else [hvStatusImage setImage:[NSImage imageNamed:@"highVoltage"]];
 		}
 	}
-	else [hvStatusImage setImage:nil];	
+	else {
+		[hvStatusImage setImage:nil];	
+		[hwGoalField setStringValue:@""];
+
+	}
 }
 
 - (void) setModel:(id)aModel

@@ -347,6 +347,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 	if([self channelInBounds:channel]){
 		hwGoal[channel] = target[channel];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVChannelReadParamsChanged object:self];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSeg8ChanHVHwGoalChanged object:self];
 	}
 }
 - (void) loadValues:(int)channel
@@ -401,6 +402,8 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 
 - (void) turnChannelOff:(int)channel
 {    
+	[self setHwGoal:channel withValue:0];
+	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSeg8ChanHVOutputOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:)];
 }
@@ -447,6 +450,7 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 {
 	if([self channelInBounds:channel]){
 		[self setHwGoal:channel withValue:0];
+		[self writeVoltage:channel];
 		[self panicChannel:channel];
 	}
 }
@@ -469,7 +473,9 @@ NSString* ORiSeg8ChanHVChannelReadParamsChanged = @"ORiSeg8ChanHVChannelReadPara
 - (void) turnAllChannelsOff
 {
 	int i;
-	for(i=0;i<8;i++)[self turnChannelOff:i];
+	for(i=0;i<8;i++){
+		[self turnChannelOff:i];
+	}
 }
 
 - (void) panicAllChannels
