@@ -438,9 +438,9 @@
     }
     [lockDocField setStringValue:s];
 
-	int opState = [model operationState];
+	//int opState = [model operationState];
 	int runState = [model runState];
-	BOOL idle = (opState==kRad7Idle);
+	//BOOL idle = (opState==kRad7Idle);
 	BOOL counting = runState == kRad7RunStateCounting;
 	if(!locked){
 		if(runState== kRad7RunStateUnKnown){
@@ -453,7 +453,7 @@
 			[deleteDataOnStartCB setEnabled:  NO];
 			[verboseCB			 setEnabled:  NO];
 			[makeFileCB			 setEnabled:  NO];
-			
+			[loadDialogButton	setEnabled:  NO];
 		}
 		else if(runState== kRad7RunStateCounting){
 			[startTestButton	setEnabled:	 NO];
@@ -465,6 +465,7 @@
 			[deleteDataOnStartCB setEnabled:  NO];
 			[verboseCB			 setEnabled:  YES];
 			[makeFileCB			 setEnabled:  YES];
+			[loadDialogButton	setEnabled:  NO];
 		}
 		else {
 			[startTestButton	setEnabled:	 YES];
@@ -476,6 +477,7 @@
 			[deleteDataOnStartCB setEnabled: YES];
 			[verboseCB			 setEnabled:  NO];
 			[makeFileCB			 setEnabled:  NO];
+			[loadDialogButton	setEnabled:  YES];
 		}
 	}
 	else {
@@ -488,10 +490,10 @@
 		[deleteDataOnStartCB setEnabled:  NO];
 		[verboseCB			 setEnabled:  NO];
 		[makeFileCB			 setEnabled:  NO];
+		[loadDialogButton	setEnabled:  NO];
 	}
 	
-	[initHWButton		setEnabled:  !counting && idle && !locked];
-	[loadDialogButton	setEnabled:  !counting && idle && !locked];
+	//[initHWButton		setEnabled:  !counting && idle && !locked];
 	
 	[rUnitsPU setEnabled:	!counting && !locked];
 	[tUnitsPU setEnabled:	!counting && !locked];

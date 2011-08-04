@@ -72,6 +72,7 @@ NSString* ORRad7Lock = @"ORRad7Lock";
 - (void) startTimeOut;
 - (double) convertTime:(NSArray*)parts;
 - (void) resetDataSet;
+- (void) clearTempVerbose;
 @end
 
 @implementation ORRad7Model
@@ -776,24 +777,24 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setMakeFile:			[decoder decodeBoolForKey:@"makeFile"]];
-	[self setVerbose:			[decoder decodeBoolForKey:@"verbose"]];
-	[self setDeleteDataOnStart:	[decoder decodeBoolForKey:@"deleteDataOnStart"]];
-	[self setRunToPrint:		[decoder decodeIntForKey:@"runToPrint"]];
-	[self setTUnits:			[decoder decodeIntForKey: @"tUnits"]];
-	[self setRUnits:			[decoder decodeIntForKey: @"rUnits"]];
-	[self setFormatSetting:		[decoder decodeIntForKey:	 @"formatSetting"]];
-	[self setTone:				[decoder decodeIntForKey:	 @"tone"]];
-	[self setPumpMode:			[decoder decodeIntForKey:	 @"pumpMode"]];
-	[self setThoron:			[decoder decodeBoolForKey:	 @"thoron"]];
-	[self setMode:				[decoder decodeIntForKey:	 @"mode"]];
-	[self setRecycle:			[decoder decodeIntForKey:	 @"recycle"]];
-	[self setCycleTime:			[decoder decodeIntForKey:	 @"cycleTime"]];
+	[self setMakeFile:			[decoder decodeBoolForKey:	@"makeFile"]];
+	[self setVerbose:			[decoder decodeBoolForKey:	@"verbose"]];
+	[self setDeleteDataOnStart:	[decoder decodeBoolForKey:	@"deleteDataOnStart"]];
+	[self setRunToPrint:		[decoder decodeIntForKey:	@"runToPrint"]];
+	[self setTUnits:			[decoder decodeIntForKey:	@"tUnits"]];
+	[self setRUnits:			[decoder decodeIntForKey:	@"rUnits"]];
+	[self setFormatSetting:		[decoder decodeIntForKey:	@"formatSetting"]];
+	[self setTone:				[decoder decodeIntForKey:	@"tone"]];
+	[self setPumpMode:			[decoder decodeIntForKey:	@"pumpMode"]];
+	[self setThoron:			[decoder decodeBoolForKey:	@"thoron"]];
+	[self setMode:				[decoder decodeIntForKey:	@"mode"]];
+	[self setRecycle:			[decoder decodeIntForKey:	@"recycle"]];
+	[self setCycleTime:			[decoder decodeIntForKey:	@"cycleTime"]];
 	[self setProtocol:			[decoder decodeIntForKey:	@"protocol"]];
-	[self setShipTemperature:	[decoder decodeBoolForKey:	 @"ORRad7ModelShipTemperature"]];
-	[self setPollTime:			[decoder decodeIntForKey:	 @"ORRad7ModelPollTime"]];
-	[self setPortWasOpen:		[decoder decodeBoolForKey:	 @"ORRad7ModelPortWasOpen"]];
-    [self setPortName:			[decoder decodeObjectForKey: @"portName"]];
+	[self setShipTemperature:	[decoder decodeBoolForKey:	@"ORRad7ModelShipTemperature"]];
+	[self setPollTime:			[decoder decodeIntForKey:	@"ORRad7ModelPollTime"]];
+	[self setPortWasOpen:		[decoder decodeBoolForKey:	@"ORRad7ModelPortWasOpen"]];
+    [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
 	[[self undoManager] enableUndoRegistration];
 	
     [self registerNotificationObservers];
@@ -892,6 +893,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) printRun
 {
+	tempVerbose = YES;
 	[self printRun:runToPrint];
 }
 
@@ -1123,6 +1125,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self setOperationState:kRad7Idle];
 	[self setLastRequest:nil];
 }
+- (void) clearTempVerbose
+{
+	tempVerbose = NO;
+}
 
 - (void) goToNextCommand
 {
@@ -1203,12 +1209,14 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	theResponse = [theResponse removeExtraSpaces];
 	//NSLog(@"(%d) %@\n",requestCount,theResponse);
 	if([theResponse rangeOfString:@"DURRIDGE"].location != NSNotFound){
+		tempVerbose = NO;
 		//special unsolidated response after power up
 		NSLog(@"Rad7 going thru power up -- all queued commands cleared\n");
 		[cmdQueue removeAllObjects];
 		[self setLastRequest:@"PowerUpSequence"]; //fake a command
 	}
 	else if([theResponse rangeOfString:@"?ERR"].location != NSNotFound){
+		tempVerbose = NO;
 		[cmdQueue removeAllObjects];
 		requestCount = 0;
 		expectedCount= 1;
@@ -1231,6 +1239,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			[self handleDataRecord:theResponse];
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(goToNextCommand) object:nil];
 			[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearTempVerbose) object:nil];
+			[self performSelector:@selector(clearTempVerbose) withObject:nil afterDelay:1];
 		}
 		else {
 			switch(currentRequest){
@@ -1302,7 +1312,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 				[stopRunFilePath retain];
 				NSLog(@"Rad 7 data logged to file: %@\n",stopRunFilePath);
 			}
-			if(verbose){
+			if(verbose  || tempVerbose){
 				unsigned int unitsWord = [[parts objectAtIndex:22] intValue] & 0x3; //Units
 				NSString* unitsString = @"";
 				if(unitsWord == 0x0)unitsString = @"CPM";
@@ -1330,7 +1340,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 					   [[parts objectAtIndex:20] floatValue], //Radon
 					   [[parts objectAtIndex:21] floatValue] //UnCertainty
 					   ];
-		if(verbose){			
+		if(verbose || tempVerbose){			
 			NSLogFont([NSFont fontWithName:@"Monaco" size:11], @"%@\n",s);
 		}
 		
@@ -1441,7 +1451,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			id newRunStatus  = [parts objectAtIndex:1];
 			if(![lastRunStatus isEqualToString:newRunStatus]){
 				if([lastRunStatus length] && [newRunStatus isEqualToString:@"IDLE"]){
-					if(verbose || makeFile){
+					if(verbose || makeFile  || tempVerbose){
 						[self printRun:[[self statusForKey:kRad7LastRunNumber] intValue]];
 					}
 				}

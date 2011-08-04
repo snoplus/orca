@@ -139,6 +139,7 @@
 		BOOL			makeFile;
 	
 		NSString*		stopRunFilePath;
+		BOOL			tempVerbose;
 }
 
 #pragma mark ***Initialization
