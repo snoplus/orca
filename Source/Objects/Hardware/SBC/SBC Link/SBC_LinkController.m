@@ -65,7 +65,7 @@
     [tabView selectTabViewItemAtIndex: index];
 	
     [[plotter xScale] setRngLimitsLow:0 withHigh:300 withMinRng:300];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
+    [[plotter yScale] setRngLimitsLow:0 withHigh:300 withMinRng:10];
 	
 	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
     [[histogram yScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
