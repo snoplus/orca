@@ -50,7 +50,11 @@ void processSNOCommand(SBC_Packet* aPacket)
 	switch(aPacket->cmdHeader.cmdID){		
 		case kSNOMtcLoadXilinx: loadMtcXilinx(aPacket);				break;
 		case kSNOXL2LoadClocks: loadXL2Clocks(aPacket);				break;
-		case kSNOXL2LoadXilinx: startJob(&loadXL2Xilinx,aPacket);	break;
+		case kSNOXL2LoadXilinx: startJob(&loadXL2Xilinx,aPacket);		break;
+		case kSNOMtcFirePedestalJobFixedTime: firePedestalJobFixedTime(aPacket);break;
+		case kSNOMtcEnablePedestalsFixedTime: enablePedestalsFixedTime(aPacket);break;			
+		case kSNOMtcFirePedestalsFixedTime: firePedestalsFixedTime(aPacket);	break;			
+		case kSNOMtcLoadMTCADacs: loadMTCADacs(aPacket);			break;
 	}
 }
 
@@ -813,3 +817,311 @@ void loadXL2Xilinx_sharc(SBC_Packet* aPacket)
 	pthread_mutex_unlock (&jobInfoMutex);   //end critical section
 	
 }
+
+void firePedestalJobFixedTime(SBC_Packet* aPacket)
+{
+        uint32_t* p = (uint32_t*) aPacket->payload;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+	
+        //uint32_t pedestal_count = p[0];
+        //uint32_t pedestal_delay = p[1];
+        uint32_t error_code = 0;
+	
+	
+        p[0] = error_code;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+        writeBuffer(aPacket);
+}
+
+#define kMtcControlReg		0x00007000
+#define kMtcSerialReg		0x00007004
+#define kMtcSoftGtReg		0x0000700c
+#define kMtcOcGtReg		0x00007080
+#define MTC_SERIAL_REG_SEN	0x00000001
+#define MTC_SERIAL_SHFTCLKPS	0x00000020
+#define MTC_CSR_LOAD_ENPS	0x00000008
+
+static double nsec_to_ticks = 0;
+
+void enablePedestalsFixedTime(SBC_Packet* aPacket)
+{
+        uint32_t* p = (uint32_t*) aPacket->payload;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+	
+        uint32_t error_code = 0;
+	uint32_t aValue = 0;
+	short j;
+
+	//calibrate the fineSleep delay loop
+	nsec_to_ticks = parse_cpu_freq() / 1000;
+	
+	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
+	if(device != 0){
+		for (j = 23; j >= 0; j--){							
+			aValue = 0UL | MTC_SERIAL_REG_SEN;
+			if (write_device(device, (char*)(&aValue), 4, kMtcSerialReg) != sizeof(aValue)) {
+				LogBusError("Error setting MTC serial register.\n");
+				error_code = 2;
+				goto earlyExit;
+			}
+			aValue = 0UL | MTC_SERIAL_SHFTCLKPS;
+			if (write_device(device, (char*)(&aValue), 4, kMtcSerialReg) != sizeof(aValue)) {
+				LogBusError("Error setting pulser in the MTC serial register.\n");
+				error_code = 3;
+				goto earlyExit;
+			}
+		}
+
+		//load enable pulser
+		aValue = 0UL;
+		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
+			LogBusError("Error loading pulser.\n");
+			error_code = 4;
+			goto earlyExit;
+		}
+		aValue = MTC_CSR_LOAD_ENPS;
+		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
+			LogBusError("Error loading pulser.\n");
+			error_code = 6;
+			goto earlyExit;
+		}
+		aValue = 0UL;
+		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
+			LogBusError("Error loading pulser.\n");
+			error_code = 6;
+			goto earlyExit;
+		}
+	earlyExit:
+		;
+		//todo: get back into a well defined state
+	}
+	else {
+		error_code = 1;
+	}
+	
+	close_device(device);		
+	
+        p[0] = error_code;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+        writeBuffer(aPacket);
+}
+
+void firePedestalsFixedTime(SBC_Packet* aPacket)
+{
+        uint32_t* p = (uint32_t*) aPacket->payload;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+	
+        uint32_t pedestal_count = p[0];
+        uint32_t pedestal_delay = p[1] * 1000 * nsec_to_ticks; //p[1] is the delay in [usec]
+        uint32_t error_code = 0;
+	uint32_t gtidDiff = 0;
+	uint32_t aValue = 0;
+	uint32_t beforeGTId, afterGTId;
+	short i = 0;
+	
+	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
+	if(device != 0){
+		//enable pedestals and pulser
+		aValue = 0x3;
+		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
+			LogBusError("Error enabling pedestals and pulser.\n");
+			error_code = 2;
+			goto earlyExit;
+		}
+
+		//read GTId
+		if (read_device(device, (char*)(&aValue), 4, kMtcOcGtReg) != sizeof(aValue)) {
+			LogBusError("Error reading GTID.\n");
+			error_code = 3;
+			goto earlyExit;
+		}
+		beforeGTId = aValue & 0x00ffffff;
+
+		aValue = 0; //doesn't matter
+		for (i = 0; i < pedestal_count; i++){
+			fineSleep(pedestal_delay);
+			if (write_device(device, (char*)(&aValue), 4, kMtcSoftGtReg) != sizeof(aValue)) {
+				LogBusError("Error firing pedestal.\n");
+				error_code = 4;
+				goto earlyExit;
+			}
+		}
+
+		//read GTId
+		if (read_device(device, (char*)(&aValue), 4, kMtcOcGtReg) != sizeof(aValue)) {
+			LogBusError("Error reading GTID.\n");
+			error_code = 5;
+			goto earlyExit;
+		}
+		afterGTId = aValue & 0x00ffffff;
+		
+		//disable pedestals and pulser
+		aValue = 0;
+		if (write_device(device, (char*)(&aValue), 4, kMtcControlReg) != sizeof(aValue)) {
+			LogBusError("Error disabling pedestals and pulser.\n");
+			error_code = 6;
+			goto earlyExit;
+		}
+		
+		//calculate diff (24 bit rollover)
+		if (beforeGTId < afterGTId) gtidDiff = afterGTId - beforeGTId;
+		else gtidDiff = 0x01000000 + afterGTId - beforeGTId;
+		
+	earlyExit:
+		;
+		//todo: get back into a well defined state
+	}
+	else {
+		error_code = 1;
+	}
+	
+	close_device(device);		
+	
+        p[0] = error_code;
+	p[1] = gtidDiff;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+        writeBuffer(aPacket);
+}
+
+#define kMtcDacCntReg		0x00007008
+#define kMtcMaskReg		0x00007034
+#define MTC_DAC_CNT_DACSEL	0x00004000
+#define MTC_DAC_CNT_DACCLK	0x00008000
+
+void loadMTCADacs(SBC_Packet* aPacket)
+{
+        uint32_t* p = (uint32_t*) aPacket->payload;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+	
+        uint32_t error_code = 0;
+	uint16_t index, dacIndex;
+	int16_t bitIndex = 0;
+	uint16_t dacValues[14];
+	uint32_t aValue = 0;
+	uint32_t dacValue;
+	uint32_t triggerMask = 0;
+
+	// STEP 3: load the DAC values from the database into dacValues[14]
+	for (index = 0; index < 14 ; index++){
+		dacValues[index] = (uint16_t) p[index];
+	}
+	
+	TUVMEDevice* device = get_new_device(0x0, 0x29, 4, 0x10000);
+	if(device != 0){
+		//clocking in MTCA DACs may generate triggers, so unset the trigger mask
+		//read trigger mask
+		if (read_device(device, (char*)(&aValue), 4, kMtcMaskReg) != sizeof(aValue)) {
+			LogBusError("Error reading trigger mask.\n");
+			error_code = 2;
+			goto earlyExit;
+		}
+		triggerMask = aValue & 0x03ffffff; //26 bits valid only
+		
+		//unset trigger mask
+		aValue = 0;
+		if (write_device(device, (char*)(&aValue), 4, kMtcMaskReg) != sizeof(aValue)) {
+			LogBusError("Error unsetting trigger mask.\n");
+			error_code = 3;
+			goto earlyExit;
+		}
+		
+		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
+		aValue = MTC_DAC_CNT_DACSEL;
+		if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+			LogBusError("Error setting DACSEL high.\n");
+			error_code = 4;
+			goto earlyExit;
+		}
+		
+		// STEP 5: now parallel load the 16bit word into the serial shift register
+		// STEP 5a: the first 4 bits are loaded zeros 
+		for (index = 0; index < 4 ; index++){
+			// data bit, with DACSEL high, clock low
+			aValue = 0UL | MTC_DAC_CNT_DACSEL;
+			if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+				LogBusError("Error clocking in leading zeros.\n");
+				error_code = 5;
+				goto earlyExit;
+			}
+			
+			// clock high
+			aValue = 0UL | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK;
+			if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+				LogBusError("Error clocking in leading zeros.\n");
+				error_code = 6;
+				goto earlyExit;
+			}
+			
+			// clock low
+			aValue = 0UL | MTC_DAC_CNT_DACSEL;
+			if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+				LogBusError("Error clocking in leading zeros.\n");
+				error_code = 7;
+				goto earlyExit;
+			}
+		}
+		
+		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
+		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
+			dacValue = 0UL;
+			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
+				if ( dacValues[dacIndex] & (1UL << bitIndex) )
+					dacValue |= (1UL << dacIndex);
+			}
+			
+			// data bit, with DACSEL high, clock low
+			aValue = dacValue | MTC_DAC_CNT_DACSEL;
+			if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+				LogBusError("Error clocking in DAC bit: %d.\n", bitIndex);
+				error_code = 8;
+				goto earlyExit;
+			}
+			
+			// clock high
+			aValue = dacValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK;
+			if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+				LogBusError("Error clocking in DAC bit: %d.\n", bitIndex);
+				error_code = 9;
+				goto earlyExit;
+			}
+			
+			// clock low
+			aValue = dacValue | MTC_DAC_CNT_DACSEL;
+			if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+				LogBusError("Error clocking in DAC bit: %d.\n", bitIndex);
+				error_code = 10;
+				goto earlyExit;
+			}
+		}
+		
+		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
+		aValue = 0UL;
+		if (write_device(device, (char*)(&aValue), 4, kMtcDacCntReg) != sizeof(aValue)) {
+			LogBusError("Error setting DACSEL low.\n");
+			error_code = 11;
+			goto earlyExit;
+		}
+
+		//set trigger mask back
+		aValue = triggerMask;
+		if (write_device(device, (char*)(&aValue), 4, kMtcMaskReg) != sizeof(aValue)) {
+			LogBusError("Error setting trigger mask back.\n");
+			error_code = 12;
+			goto earlyExit;
+		}
+		
+	earlyExit:
+		;
+		//todo: get back into a well defined state
+	}
+	else {
+		error_code = 1;
+	}
+
+	close_device(device);
+	
+        p[0] = error_code;
+        if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+        writeBuffer(aPacket);
+}
+

@@ -57,9 +57,10 @@
 - (void) awakeFromNib
 {
     basicOpsSize    = NSMakeSize(400,350);
-	standardOpsSize	= NSMakeSize(390,530);
+    //standardOpsSize	= NSMakeSize(390,530);
+	standardOpsSize	= NSMakeSize(560,500);
     settingsSize	= NSMakeSize(790,610);
-    triggerSize		= NSMakeSize(790,630);
+    triggerSize		= NSMakeSize(780,630);
   
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -171,7 +172,22 @@
                      selector : @selector(eSumViewTypeChanged:)
                          name : ORMTCModelESumViewTypeChanged
 						object: model];
-						
+
+	[notifyCenter addObserver : self
+			 selector : @selector(isPulserFixedRateChanged:)
+			     name : ORMTCModelIsPulserFixedRateChanged
+			    object: model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(fixedPulserRateCountChanged:)
+			     name : ORMTCModelFixedPulserRateCountChanged
+			    object: model];
+
+	[notifyCenter addObserver : self
+			 selector : @selector(fixedPulserRateDelayChanged:)
+			     name : ORMTCModelFixedPulserRateDelayChanged
+			    object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(sequenceRunning:)
                          name : ORSequenceRunning
@@ -209,6 +225,9 @@
 	[self mtcDataBaseChanged:nil];
 	[self lastFileLoadedChanged:nil];
 	[self eSumViewTypeChanged:nil];
+	[self isPulserFixedRateChanged:nil];
+	[self fixedPulserRateCountChanged:nil];
+	[self fixedPulserRateDelayChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -245,6 +264,15 @@
 	[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
 	[passiveOnlyButton			setEnabled: !lockedOrRunningMaintenance];
 	[setCoarseDelayButton		setEnabled: !lockedOrRunningMaintenance];
+	
+	//we want to fire pedestals during runs
+	[firePedestalsButton		setEnabled: !sequenceRunning && [model isPulserFixedRate]];
+	[stopPedestalsButton		setEnabled: !sequenceRunning && [model isPulserFixedRate]];
+	[continuePedestalsButton	setEnabled: !sequenceRunning && [model isPulserFixedRate]];
+	[fireFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
+	[stopFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
+	[fixedTimePedestalsCountField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
+	[fixedTimePedestalsDelayField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];	
 }
 
 - (void) sequenceRunning:(NSNotification*)aNote
@@ -379,12 +407,12 @@
 		[[globalTriggerMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
 	maskValue = [model dbIntByIndex: kGtCrateMask];
-	for(i=0;i<22;i++){
+	for(i=0;i<25;i++){
 		[[globalTriggerCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 		[[globalTriggerCrateMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
 	maskValue = [model dbIntByIndex: kPEDCrateMask];
-	for(i=0;i<22;i++){
+	for(i=0;i<25;i++){
 		[[pedCrateMaskMatrix cellWithTag:i]  setIntValue: maskValue & (1<<i)];
 		[[pedCrateMaskMatrix2 cellWithTag:i] setIntValue: maskValue & (1<<i)];
 	}
@@ -449,6 +477,23 @@
 - (void) loadXilinxPathChanged:(NSNotification*)aNote
 {
 	[xilinxFilePathField setStringValue: [[model xilinxFilePath] stringByAbbreviatingWithTildeInPath]];
+}
+
+- (void) isPulserFixedRateChanged:(NSNotification*)aNote
+{
+	[[isPulserFixedRateMatrix cellWithTag:1] setIntValue:[model isPulserFixedRate]];
+	[[isPulserFixedRateMatrix cellWithTag:0] setIntValue:![model isPulserFixedRate]];
+	[self updateButtons];
+}
+
+- (void) fixedPulserRateCountChanged:(NSNotification*)aNote
+{
+	[fixedTimePedestalsCountField setIntValue:[model fixedPulserRateCount]];
+}
+
+- (void) fixedPulserRateDelayChanged:(NSNotification*)aNote
+{
+	[fixedTimePedestalsDelayField setFloatValue:[model fixedPulserRateDelay]];
 }
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
@@ -631,7 +676,7 @@
 {
 	[model setGlobalTriggerWordMask];
 }
-
+	
 - (IBAction) standardLoadMTCADacs:(id) sender 
 {
 	[model loadTheMTCADacs];
@@ -642,9 +687,51 @@
 	[model setupGTCorseDelay];
 }
 
+- (IBAction) standardIsPulserFixedRate:(id) sender
+{
+	[self endEditing];
+	[model setIsPulserFixedRate:[[sender selectedCell] tag]];
+}
+
 - (IBAction) standardFirePedestals:(id) sender 
 {
 	[model fireMTCPedestalsFixedRate];
+}
+
+- (IBAction) standardStopPedestals:(id) sender 
+{
+	[model stopMTCPedestalsFixedRate];
+}
+
+- (IBAction) standardContinuePedestals:(id) sender 
+{
+	[model continueMTCPedestalsFixedRate];
+}
+
+- (IBAction) standardFirePedestalsFixedTime:(id) sender
+{
+	[model fireMTCPedestalsFixedTime];
+}
+
+- (IBAction) standardStopPedestalsFixedTime:(id) sender
+{
+	[model stopMTCPedestalsFixedTime];
+}
+
+- (IBAction) standardSetPedestalsCount:(id) sender
+{
+	unsigned long aValue = [sender intValue];
+	if (aValue < 1) aValue = 1;
+	if (aValue > 10000) aValue = 10000;
+	[model setFixedPulserRateCount:aValue];
+}
+
+- (IBAction) standardSetPedestalsDelay:(id) sender
+{
+	float aValue = [sender floatValue];
+	if (aValue < 0.1) aValue = 0.1;
+	if (aValue > 1000) aValue = 1000;
+	[model setFixedPulserRateDelay:aValue];
 }
 
 - (IBAction) standardFindTriggerZeroes:(id) sender 
@@ -790,7 +877,7 @@
 {
 	unsigned long mask = 0;
 	int i;
-	for(i=0;i<22;i++){
+	for(i=0;i<25;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}
@@ -814,7 +901,7 @@
 {
 	unsigned long mask = 0;
 	int i;
-	for(i=0;i<22;i++){
+	for(i=0;i<25;i++){
 		if([[sender cellWithTag:i] intValue]){	
 			mask |= (1L << i);
 		}

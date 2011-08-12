@@ -27,7 +27,7 @@
 #define XL3_TEST_CMD_ID 	(0x02)	// not yet. do any of the test functions (check test_function.h)
 #define SINGLE_CMD_ID		(0x04)	// done. execute one cmd and get result
 #define DAQ_QUIT_ID		(0x05)	// done. quit
-#define FEC_CMD_ID		(0x06)	// done. put one or many cmds in cmd queue
+#define FEC_CMD_ID		(0x06)	// done. put one or many cmds in cmd queue, doesn't interrupt 
 #define FEC_TEST_ID		(0x07)	// not yet. DAQ functions below ...
 #define MEM_TEST_ID		(0x08)	// not yet.
 #define CRATE_INIT_ID		(0x09)	// done.
@@ -41,7 +41,7 @@
 #define LOADSDAC_ID		(0x11)	// not yet.
 #define CALD_TEST_ID		(0x12)	// not yet.
 #define STATE_MACHINE_RESET_ID	(0x13)
-#define MULTI_CMD_ID		(0x14)	// execute multiple commands are get result
+#define MULTI_CMD_ID		(0x14)	// execute multiple commands and get result in message queue, it interrupts readout
 #define DEBUGGING_MODE_ID	(0x15)
 #define READ_PEDESTALS_ID	(0x16)
 #define PONG_ID			(0x17)

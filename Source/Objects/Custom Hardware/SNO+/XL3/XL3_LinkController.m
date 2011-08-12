@@ -68,10 +68,9 @@ static NSDictionary* xl3Ops;
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	if(aModel) [[self window] setTitle:[model shortName]];
+	if(aModel) [[self window] setTitle: [NSString stringWithFormat:@"XL3 Crate %d",[model crateNumber]]];
 	//[self setDriverInfo];
 }
-
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers

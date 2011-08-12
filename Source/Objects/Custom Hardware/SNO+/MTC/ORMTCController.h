@@ -54,6 +54,12 @@
 	IBOutlet NSButton*		setCoarseDelayButton;
 	IBOutlet NSButton*		loadDacsButton;
 	IBOutlet NSButton*		firePedestalsButton;
+	IBOutlet NSButton*		stopPedestalsButton;
+	IBOutlet NSButton*		continuePedestalsButton;
+	IBOutlet NSButton*		fireFixedTimePedestalsButton;
+	IBOutlet NSButton*		stopFixedTimePedestalsButton;
+	IBOutlet NSTextField*		fixedTimePedestalsCountField;
+	IBOutlet NSTextField*		fixedTimePedestalsDelayField;
 	IBOutlet NSMatrix*		triggerZeroMatrix;
 	IBOutlet NSButton*		findTriggerZerosButton;
 	IBOutlet NSButton*		continuousButton;
@@ -61,6 +67,7 @@
 	IBOutlet NSButton*		passiveOnlyButton;
 	IBOutlet NSProgressIndicator* initProgressBar;
 	IBOutlet NSTextField*	initProgressField;
+	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
 	
 	//settings
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
@@ -122,6 +129,9 @@
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) regBaseAddressChanged:(NSNotification*)aNote;
 - (void) memBaseAddressChanged:(NSNotification*)aNote;
+- (void) isPulserFixedRateChanged:(NSNotification*)aNote;
+- (void) fixedPulserRateCountChanged:(NSNotification*)aNote;
+- (void) fixedPulserRateDelayChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) displayMasks;
 - (void) lastFileLoadedChanged:(NSNotification*)aNote;
@@ -162,7 +172,14 @@
 - (IBAction) standardLoadOnlineGTMasks:(id) sender;
 - (IBAction) standardLoadMTCADacs:(id) sender;
 - (IBAction) standardSetCoarseDelay:(id) sender;
+- (IBAction) standardIsPulserFixedRate:(id) sender;
 - (IBAction) standardFirePedestals:(id) sender;
+- (IBAction) standardStopPedestals:(id) sender;
+- (IBAction) standardContinuePedestals:(id) sender;
+- (IBAction) standardFirePedestalsFixedTime:(id) sender;
+- (IBAction) standardStopPedestalsFixedTime:(id) sender;
+- (IBAction) standardSetPedestalsCount:(id) sender;
+- (IBAction) standardSetPedestalsDelay:(id) sender;
 - (IBAction) standardFindTriggerZeroes:(id) sender;
 - (IBAction) standardStopFindTriggerZeroes:(id) sender;
 - (IBAction) standardPeriodicReadout:(id) sender;

@@ -48,9 +48,12 @@
 		int						useMemory;
 		unsigned long			workingOffset;
 		unsigned long			workingCount;
-		BOOL					doReadOp;
-		BOOL					autoIncrement;
-		BOOL					basicOpsRunning;
+		BOOL				doReadOp;
+		BOOL				autoIncrement;
+		BOOL				basicOpsRunning;
+		BOOL				isPulserFixedRate;
+		unsigned long			fixedPulserRateCount;
+		float				fixedPulserRateDelay;
 		
 		//settings
 		NSString*				lastFileLoaded;
@@ -65,6 +68,10 @@
 		NSString*		triggerName;
 		NSArray*		dataTakers;       //cache of data takers.
 }
+
+@property (assign)	BOOL			isPulserFixedRate;
+@property (assign)	unsigned long		fixedPulserRateCount;
+@property (assign)	float			fixedPulserRateDelay;
 
 #pragma mark •••Initialization
 - (id) init;
@@ -199,11 +206,18 @@
 - (void) loadEnablePulser;
 - (void) enablePulser;
 - (void) disablePulser;
-- (void)  enablePedestal;
-- (void)  disablePedestal;
+- (void) enablePedestal;
+- (void) disablePedestal;
+- (void) stopMTCPedestalsFixedRate;
+- (void) continueMTCPedestalsFixedRate;
 - (void) fireMTCPedestalsFixedRate;
 - (void) basicMTCPedestalGTrigSetup;
-- (void) setupPulserRateAndEnable:(double) pulserPeriodVal;
+- (void) setupPulserRateAndEnable:(float) pulserPeriodVal;
+- (void) fireMTCPedestalsFixedTime;
+- (void) stopMTCPedestalsFixedTime;
+- (void) enableSingleShotMTCPedestalsFixedTime;
+- (void) singleShotMTCPedestalsFixedTime;
+- (unsigned long) singleShotMTCPedestalsFixedTime:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
 - (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals;
 - (void) basicMTCReset;
 - (void) loadTheMTCADacs;
@@ -239,6 +253,8 @@ extern NSString* ORMTCModelMemoryOffsetChanged;
 extern NSString* ORMTCModelSelectedRegisterChanged;
 extern NSString* ORMTCModelXlinixPathChanged;
 extern NSString* ORMTCModelMtcDataBaseChanged;
+extern NSString* ORMTCModelIsPulserFixedRateChanged;
+extern NSString* ORMTCModelFixedPulserRateCountChanged;
+extern NSString* ORMTCModelFixedPulserRateDelayChanged;
 extern NSString* ORMtcTriggerNameChanged;
 extern NSString* ORMTCLock;
-

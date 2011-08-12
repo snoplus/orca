@@ -25,4 +25,10 @@
 void loadMtcXilinx(SBC_Packet* aPacket);
 void loadXL2Clocks(SBC_Packet* aPacket);
 void loadXL2Xilinx(SBC_Packet* aPacket);
+void firePedestalsFixedTime(SBC_Packet* aPacket);
+void stopPedestalsFixedTime(SBC_Packet* aPacket);
 void processSNOCommand(SBC_Packet* aPacket);
+void firePedestalJobFixedTime(SBC_Packet* aPacket);
+void enablePedestalsFixedTime(SBC_Packet* aPacket);
+void firePedestalsFixedTime(SBC_Packet* aPacket);
+void loadMTCADacs(SBC_Packet* aPacket);

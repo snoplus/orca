@@ -173,6 +173,7 @@ enum {
 - (void) compositeResetFIFOAndSequencer;
 - (void) compositeResetXL3StateMachine;
 - (void) reset;
+- (void) enableChargeInjectionForSlot:(unsigned short) aSlot slotMask:(unsigned long) aSlotMask withDACValue:(unsigned short) aDACValue;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress;

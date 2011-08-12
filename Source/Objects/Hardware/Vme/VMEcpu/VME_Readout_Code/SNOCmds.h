@@ -24,9 +24,13 @@
 #include <stdint.h>
 #include "SBC_Cmds.h"
 
-#define kSNOMtcLoadXilinx  0x01
-#define kSNOXL2LoadClocks  0x02
-#define kSNOXL2LoadXilinx  0x03
+#define kSNOMtcLoadXilinx		0x01
+#define kSNOXL2LoadClocks		0x02
+#define kSNOXL2LoadXilinx		0x03
+#define kSNOMtcFirePedestalJobFixedTime	0x04
+#define kSNOMtcEnablePedestalsFixedTime	0x05
+#define kSNOMtcFirePedestalsFixedTime	0x06
+#define kSNOMtcLoadMTCADacs		0x07
 
 typedef struct {
 	int32_t baseAddress;
