@@ -278,7 +278,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
-
 - (BOOL) secondsSetInitWithHost
 {
     return secondsSetInitWithHost;
@@ -1738,6 +1737,10 @@ NSLog(@"  arguments: %@ \n" , arguments);
 	}
 }
 
+- (void) tasksCompleted: (NSNotification*)aNote
+{
+	//nothing to do... this just removes a run-time exception
+}
 
 #pragma mark •••SBC_Linking protocol
 - (NSString*) driverScriptName {return nil;} //no driver
