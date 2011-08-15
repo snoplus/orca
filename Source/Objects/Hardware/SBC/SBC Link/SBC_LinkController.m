@@ -65,13 +65,17 @@
     [tabView selectTabViewItemAtIndex: index];
 	
     [[plotter xScale] setRngLimitsLow:0 withHigh:300 withMinRng:300];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:300 withMinRng:10];
+    [[plotter yScale] setRngLimitsLow:0 withHigh:1000 withMinRng:10];
 	
 	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
-    [[histogram yScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
+    [[histogram yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
 
     [plotter setUseGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
+
+	[histogram setUseGradient:YES];
+    [histogram setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
+
 	
 	ORVectorPlot* aPlot = [[ORVectorPlot alloc] initWithTag:0 andDataSource:self];
 	[plotter addPlot: aPlot];
