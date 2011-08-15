@@ -260,7 +260,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
     [task setEnvironment: environment];
     NSString* tmpRemotePath;
-	if(useTempFile) tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
+	if(useTempFile && [remotePath length]) tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
 	else			tmpRemotePath = remotePath;
     if([self transferType] == eUseCURL){
 		
