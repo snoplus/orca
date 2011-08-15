@@ -1712,7 +1712,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																				<boolean value="YES"/>
 																				<object class="NSAttributedString" id="857474170">
 																					<string key="NSString">0</string>
-																					<object class="NSDictionary" key="NSAttributes" id="655553198">
+																					<object class="NSDictionary" key="NSAttributes" id="364582107">
 																						<bool key="EncodedWithXMLCoder">YES</bool>
 																						<object class="NSArray" key="dict.sortedKeys" id="0">
 																							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1740,7 +1740,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																		</object>
 																		<object class="NSAttributedString" key="NS.nan">
 																			<string key="NSString">NaN</string>
-																			<reference key="NSAttributes" ref="655553198"/>
+																			<reference key="NSAttributes" ref="364582107"/>
 																		</object>
 																		<object class="NSDecimalNumberPlaceholder" key="NS.min" id="127837671">
 																			<int key="NS.exponent">0</int>
@@ -3276,11 +3276,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																</object>
 																<object class="NSAttributedString" id="596775071">
 																	<string key="NSString">NaN</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<object class="NSAttributedString" id="516969559">
 																	<string key="NSString">0.0</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<string>.</string>
 																<integer value="1000"/>
@@ -3380,11 +3380,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 																</object>
 																<object class="NSAttributedString" id="865986038">
 																	<string key="NSString">NaN</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<object class="NSAttributedString" id="323714840">
 																	<string key="NSString">0.0</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<string>.</string>
 																<integer value="1000"/>
@@ -3804,7 +3804,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 														<nil key="NS.nil"/>
 														<object class="NSAttributedString" key="NS.nan">
 															<string key="NSString">NaN</string>
-															<reference key="NSAttributes" ref="655553198"/>
+															<reference key="NSAttributes" ref="364582107"/>
 														</object>
 														<reference key="NS.min" ref="127837671"/>
 														<reference key="NS.max" ref="127837671"/>
@@ -3861,11 +3861,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																</object>
 																<object class="NSAttributedString" id="478896845">
 																	<string key="NSString">NaN</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<object class="NSAttributedString" id="683309963">
 																	<string key="NSString">0.0</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<string>.</string>
 																<integer value="1000"/>
@@ -3933,11 +3933,11 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 																</object>
 																<object class="NSAttributedString" id="156360364">
 																	<string key="NSString">NaN</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<object class="NSAttributedString" id="649897550">
 																	<string key="NSString">0.0</string>
-																	<reference key="NSAttributes" ref="655553198"/>
+																	<reference key="NSAttributes" ref="364582107"/>
 																</object>
 																<string>.</string>
 																<integer value="1000"/>
@@ -6131,7 +6131,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 											<object class="ORAxis" id="761630081">
 												<reference key="NSNextResponder" ref="443199963"/>
 												<int key="NSvFlags">264</int>
-												<string key="NSFrame">{{30, 249}, {56, 94}}</string>
+												<string key="NSFrame">{{35, 249}, {51, 94}}</string>
 												<reference key="NSSuperview" ref="443199963"/>
 												<object class="NSMutableDictionary" key="ORAxisAttributes">
 													<bool key="EncodedWithXMLCoder">YES</bool>
@@ -6168,7 +6168,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 														</object>
 														<boolean value="NO"/>
 														<boolean value="YES"/>
-														<string>Throughput (MB)</string>
+														<string>Rate (MB/Sec)</string>
 														<real value="70000"/>
 														<real value="70000"/>
 														<real value="70000"/>
