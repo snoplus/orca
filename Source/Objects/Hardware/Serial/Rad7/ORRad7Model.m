@@ -1431,7 +1431,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			int thisCycleNum = [[[parts objectAtIndex:0] substringFromIndex:2] intValue];
 			id lastRunStatus = [self statusForKey:kRad7RunStatus];
 			id newRunStatus  = [parts objectAtIndex:1];
-			if(![lastRunStatus isEqualToString:newRunStatus]){
+			if(lastRunStatus && newRunStatus && ![lastRunStatus isEqualToString:newRunStatus] && ![lastRunStatus isEqualToString:@"-"]){
 				if([lastRunStatus length] && [newRunStatus isEqualToString:@"IDLE"]){
 					runEnded = YES;
 				}
