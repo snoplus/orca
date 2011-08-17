@@ -729,7 +729,7 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 {
 	[self setGpsOpsRunning:YES forKey:@"ppoTurnOff"];
 
-	NSDateFormatter* frmt = [[NSDateFormatter alloc] init];
+	NSDateFormatter* frmt = [[[NSDateFormatter alloc] init] autorelease];
 	[frmt setDateFormat:@"D"];
 	int day = [[frmt stringFromDate:[NSDate dateWithTimeIntervalSinceNow:-24*3600]] intValue];
 

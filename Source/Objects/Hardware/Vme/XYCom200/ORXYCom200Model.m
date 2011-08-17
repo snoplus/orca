@@ -623,7 +623,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 - (id) initChip:(int)aChipIndex
 {
 	self = [super init];
-	chipIndex = chipIndex;
+	chipIndex = aChipIndex;
 	[self setPortATransceiverDir:1];
 	[self setPortBTransceiverDir:1];
 	[self setPortCData:0x3];
