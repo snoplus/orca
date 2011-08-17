@@ -34,7 +34,7 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 	id anAdapter = [guardian adapter];
 	if(anAdapter)return anAdapter;
 	else {
-		NSLogColor([NSColor redColor],@"You must place a MPod adaptor card into the crate.");
+		NSLogColor([NSColor redColor],@"You must place a MPod adaptor card into the crate.\n");
 		[NSException raise:@"No adapter" format:@"You must place a MPod adaptor card into the crate."];
 	}
 	return nil;
@@ -66,20 +66,20 @@ NSString* ORMPodHVCardExceptionCountChanged 		= @"ORMPodHVCardExceptionCountChan
 
 - (void) processReadResponseArray:(NSArray*)reponse
 {
-	//nothing to do. subclasses should override and call this in case something is aded
+	//nothing to do. subclasses should override and call this in case something is added
 }
 
 - (void) processSystemResponseArray:(NSArray*)reponse
 {
-	//nothing to do. subclasses should override and call this in case something is aded
+	//nothing to do. subclasses should override and call this in case something is added
 }
 - (void) processSyncResponseArray:(NSArray*)response
 {
-	//nothing to do. subclasses should override and call this in case something is aded
+	//nothing to do. subclasses should override and call this in case something is added
 }
 - (void) processWriteResponseArray:(NSArray*)response
 {
-	//nothing to do. subclasses should override and call this in case something is aded
+	//nothing to do. subclasses should override and call this in case something is added
 }
 
 
