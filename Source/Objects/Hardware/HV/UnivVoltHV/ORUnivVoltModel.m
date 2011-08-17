@@ -148,12 +148,20 @@ NSString* UVkWrite = @"W";
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 	[mHVValueLmtsAlarm clearAlarm];	
 	[mHVValueLmtsAlarm release];
+
+	[mHVCurrentLmtsAlarm clearAlarm];	
+	[mHVCurrentLmtsAlarm release];
+
+	
+	[mChannelArray release];	// Stores dictionary objects (one for each channel) of the parameter values for that channel.
+	[mPollTimeMins release]; 
+	[mPlotterPoints release];		// number of points in histogram displays.
+	
     [super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
-	NSLog( @"ORUnivVoltModel - awakeAfterDocumentLoaded\n" );
 	@try {
 		mParams = [NSMutableDictionary dictionaryWithCapacity: UVkChnlNumParameters];
 
@@ -278,14 +286,13 @@ NSString* UVkWrite = @"W";
 - (void) setUpImage
 {
 	NSImage* aCachedImage = [NSImage imageNamed: @"UnivVoltHVIcon"];
+	NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+	
+    [i lockFocus];
+	
+	[aCachedImage compositeToPoint: NSZeroPoint operation: NSCompositeCopy];
+	
 	if (mHVValueLmtsAlarm) {
-		NSPoint theOffset = NSZeroPoint;
-		NSSize theIconSize = [aCachedImage size];
-		
-		NSImage* i = [[NSImage alloc] initWithSize: theIconSize];
-		[i lockFocus];
-		
-		[aCachedImage compositeToPoint: theOffset operation: NSCompositeCopy];
 		
 		if(!mHVValueLmtsAlarm){
 			NSBezierPath* path = [NSBezierPath bezierPath];
@@ -297,16 +304,13 @@ NSString* UVkWrite = @"W";
 			[[NSColor redColor] set];
 			[path stroke];
 		}    
-		
-		[i unlockFocus];
-		
-		[self setImage: i];
-		[i release];
     }
-	else
-	{	
-		[self setImage: [NSImage imageNamed: @"UnivVoltHVIcon"]];
-	}
+	
+	[i unlockFocus];
+	[self setImage: i];
+	[i release];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
 }
 
 #pragma mark •••Notifications
@@ -388,8 +392,7 @@ NSString* UVkWrite = @"W";
 		if ( [writableDict isEqualTo: UVkWrite] )		
 		{
 			
-			if ( aCurrentChnl > -1 )
-			{
+			if ( aCurrentChnl > -1 ){
 				command = [self createCommand: aCurrentChnl          
 								 dictParamObj: dictParamObj
 								      command: command
@@ -400,17 +403,15 @@ NSString* UVkWrite = @"W";
 				writeCmdCtr++;
 			}
 			
-			else
-			{
+			else {
 				// Loop through all channels to load all values for specified parameter for all channels with one command.
-				for ( iChnl = 0; iChnl < HVkNumChannels; iChnl++ )
-				{					
+				for ( iChnl = 0; iChnl < HVkNumChannels; iChnl++ ) {					
 					command = [self createCommand: iChnl
 									 dictParamObj: dictParamObj
 									      command: command
 										  loadAll: YES];
 				
-				    [command retain];
+				    //[command retain]; //mah comment out -- memory leak
 				} // Loop through channels
 				
 				// Single command has been assembled for one param - now queue it.
@@ -806,7 +807,7 @@ NSString* UVkWrite = @"W";
 		// Get data for this channel from crate - in ORCA place data in NOTIFICATION Object.
 //		NSDictionary* returnData = [[self crate] returnDataToHVUnit];
 //		NSLog ( @" '%@'\n", [returnData objectForKey: UVkCommand]);
-		[returnData retain];
+//[returnData retain]; MAJ commented out -- memory leak;
 			
 		NSNumber* slotNum = [returnData objectForKey: UVkSlot];
 		slotThisUnit = [self stationNumber];
@@ -1305,9 +1306,7 @@ NSString* UVkWrite = @"W";
 - (NSDictionary*) createChnlRetDict: (int) aCurrentChnl
 {
 	NSNumber* curChannel = [NSNumber numberWithInt: aCurrentChnl];
-	[curChannel retain];
 	NSDictionary* retDict = [NSDictionary dictionaryWithObject: curChannel forKey: HVkChannel];
-	[curChannel release];
 	return( retDict );
 }
 

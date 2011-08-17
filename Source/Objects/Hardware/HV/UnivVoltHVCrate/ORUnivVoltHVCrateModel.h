@@ -112,10 +112,6 @@ typedef enum hveCommands hveCommands;
 
 @end
 
-@interface ORUnivVoltHVCrateModel (OROrderedObjHolding)
-- (int) maxNumberOfObjects;
-- (int) objWidth;
-@end
 
 
 #pragma mark •••Notification string definitions.

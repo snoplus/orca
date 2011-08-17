@@ -151,16 +151,16 @@ NSString* HVkErrorMsg = @"ErrorMsg";
     
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
-        [transform translateXBy: 5 yBy: 10];
-        [transform scaleXBy: 0.45 yBy: 0.45];
-        [transform concat];
+		[transform translateXBy:5 yBy:15];
+        [transform scaleXBy:.56 yBy:.62];
+		[transform concat];
         NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
         OrcaObject* anObject;
         while(anObject = [e nextObject])
 		{
             BOOL oldHighlightState = [anObject highlighted];
             [anObject setHighlighted: NO];
-            [anObject drawSelf: NSMakeRect(0, 0, 500, [[self image] size].height)];
+            [anObject drawSelf: NSMakeRect(0, 0, 900, [[self image] size].height)];
             [anObject setHighlighted:oldHighlightState];
         }
     }
@@ -1233,12 +1233,7 @@ static NSString*	ORUnivVoltHVCrateIPAddress		= @"ORUnivVoltHVCrateIPAddress";
 	return;
 	*/
 
-
-
-@end
-
-
-@implementation ORUnivVoltHVCrateModel (OROrderedObjHolding)
 - (int) maxNumberOfObjects { return 16; }
-- (int) objWidth		 { return 20; }
+- (int) objWidth		 { return 16; }
+
 @end
