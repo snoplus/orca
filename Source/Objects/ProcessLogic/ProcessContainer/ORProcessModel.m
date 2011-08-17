@@ -696,7 +696,7 @@ NSString* ORProcessModelNextHeartBeatChanged			= @"ORProcessModelNextHeartBeatCh
 		NSTimeInterval fileAge = fabs([creationDate timeIntervalSinceNow]);	
 		if(fileAge >= 60*60*24*7){
 			NSDate* now = [NSCalendarDate date];
-			NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%Y_%m_%d_%H_%M_%S" allowNaturalLanguage:NO];
+			NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:@"%Y_%m_%d_%H_%M_%S" allowNaturalLanguage:NO] autorelease];
 			
 			NSFileManager* fm = [NSFileManager defaultManager];
 			NSString* folderPath = [[fullPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"History"];

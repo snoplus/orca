@@ -46,7 +46,7 @@
     return [guardian evaluatedState];
 }
 
-- (int) eval
+- (id) eval
 {
     return [guardian eval];
 }

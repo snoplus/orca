@@ -28,7 +28,7 @@
 }
 
 - (void) setGuardian:(id)aGuardian;
-- (int) eval;
+- (id) eval;
 - (void) processIsStopping;
 - (void) processIsStarting;
 - (BOOL) partOfRun;
