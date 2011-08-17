@@ -470,7 +470,7 @@
 	[request setHTTPBody:asData];
 	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil];
 	
-	id result;
+	id result = nil;
 	if (data) {
 		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
 		result= [document root];
@@ -600,7 +600,7 @@
 		[result setObject:timeStamp forKey:@"timestamp"];
 		
 		//create unix time
-		NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 		dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
 		NSDate* gmtTime = [dateFormatter dateFromString:timeStamp];
 		unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
