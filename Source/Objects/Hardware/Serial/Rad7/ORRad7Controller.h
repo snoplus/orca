@@ -40,7 +40,6 @@
 	IBOutlet NSPopUpButton* protocolPU;
 	IBOutlet NSTextField*   recycleTextField;
 	IBOutlet NSTextField*   cycleTimeTextField;
-	IBOutlet NSButton*		shipTemperatureButton;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
@@ -118,7 +117,6 @@
 - (void) recycleChanged:(NSNotification*)aNote;
 - (void) cycleTimeChanged:(NSNotification*)aNote;
 - (void) protocolChanged:(NSNotification*)aNote;
-- (void) shipTemperatureChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
@@ -144,7 +142,6 @@
 - (IBAction) recycleTextFieldAction:(id)sender;
 - (IBAction) cycleTimeTextFieldAction:(id)sender;
 - (IBAction) protocolAction:(id)sender;
-- (IBAction) shipTemperatureAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;

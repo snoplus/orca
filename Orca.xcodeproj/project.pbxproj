@@ -1459,8 +1459,6 @@
 		847F8B36063DB29E00A8597A /* ORTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F8B34063DB29E00A8597A /* ORTimer.m */; };
 		847F947B13D4AA31006B06B4 /* ORRad7Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 847F947313D4AA31006B06B4 /* ORRad7Controller.h */; };
 		847F947C13D4AA31006B06B4 /* ORRad7Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F947413D4AA31006B06B4 /* ORRad7Controller.m */; };
-		847F947D13D4AA31006B06B4 /* ORRad7Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 847F947513D4AA31006B06B4 /* ORRad7Decoders.h */; };
-		847F947E13D4AA31006B06B4 /* ORRad7Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F947613D4AA31006B06B4 /* ORRad7Decoders.m */; };
 		847F947F13D4AA31006B06B4 /* ORRad7Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 847F947713D4AA31006B06B4 /* ORRad7Model.h */; };
 		847F948013D4AA31006B06B4 /* ORRad7Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F947813D4AA31006B06B4 /* ORRad7Model.m */; };
 		847F948113D4AA31006B06B4 /* Rad7.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847F947913D4AA31006B06B4 /* Rad7.nib */; };
@@ -4031,8 +4029,6 @@
 		847F8B34063DB29E00A8597A /* ORTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimer.m; sourceTree = "<group>"; };
 		847F947313D4AA31006B06B4 /* ORRad7Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRad7Controller.h; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Controller.h; sourceTree = SOURCE_ROOT; };
 		847F947413D4AA31006B06B4 /* ORRad7Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRad7Controller.m; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Controller.m; sourceTree = SOURCE_ROOT; };
-		847F947513D4AA31006B06B4 /* ORRad7Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRad7Decoders.h; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Decoders.h; sourceTree = SOURCE_ROOT; };
-		847F947613D4AA31006B06B4 /* ORRad7Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRad7Decoders.m; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Decoders.m; sourceTree = SOURCE_ROOT; };
 		847F947713D4AA31006B06B4 /* ORRad7Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRad7Model.h; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Model.h; sourceTree = SOURCE_ROOT; };
 		847F947813D4AA31006B06B4 /* ORRad7Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRad7Model.m; path = Source/Objects/Hardware/Serial/Rad7/ORRad7Model.m; sourceTree = SOURCE_ROOT; };
 		847F947913D4AA31006B06B4 /* Rad7.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Rad7.nib; path = Source/Objects/Hardware/Serial/Rad7/Rad7.nib; sourceTree = SOURCE_ROOT; };
@@ -8139,8 +8135,6 @@
 			children = (
 				847F947313D4AA31006B06B4 /* ORRad7Controller.h */,
 				847F947413D4AA31006B06B4 /* ORRad7Controller.m */,
-				847F947513D4AA31006B06B4 /* ORRad7Decoders.h */,
-				847F947613D4AA31006B06B4 /* ORRad7Decoders.m */,
 				847F947713D4AA31006B06B4 /* ORRad7Model.h */,
 				847F947813D4AA31006B06B4 /* ORRad7Model.m */,
 				847F947913D4AA31006B06B4 /* Rad7.nib */,
@@ -12418,7 +12412,6 @@
 				8461653513A259BD00D8B852 /* ORCVCfdLedController.h in Headers */,
 				8461653713A259BD00D8B852 /* ORCVCfdLedModel.h in Headers */,
 				847F947B13D4AA31006B06B4 /* ORRad7Controller.h in Headers */,
-				847F947D13D4AA31006B06B4 /* ORRad7Decoders.h in Headers */,
 				847F947F13D4AA31006B06B4 /* ORRad7Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -14094,7 +14087,6 @@
 				8461653613A259BD00D8B852 /* ORCVCfdLedController.m in Sources */,
 				8461653813A259BD00D8B852 /* ORCVCfdLedModel.m in Sources */,
 				847F947C13D4AA31006B06B4 /* ORRad7Controller.m in Sources */,
-				847F947E13D4AA31006B06B4 /* ORRad7Decoders.m in Sources */,
 				847F948013D4AA31006B06B4 /* ORRad7Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

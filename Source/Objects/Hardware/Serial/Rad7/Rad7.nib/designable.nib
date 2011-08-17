@@ -2434,17 +2434,15 @@
 												</object>
 												<int key="NSPeriodicDelay">400</int>
 												<int key="NSPeriodicInterval">75</int>
-												<object class="NSMenuItem" key="NSMenuItem" id="549608532">
+												<object class="NSMenuItem" key="NSMenuItem" id="141021563">
 													<reference key="NSMenu" ref="343920865"/>
-													<string key="NSTitle">10 sec</string>
+													<string key="NSTitle">Never</string>
 													<string key="NSKeyEquiv"/>
 													<int key="NSKeyEquivModMask">1048576</int>
 													<int key="NSMnemonicLoc">2147483647</int>
-													<int key="NSState">1</int>
 													<reference key="NSOnImage" ref="790370152"/>
 													<reference key="NSMixedImage" ref="385678996"/>
 													<string key="NSAction">_popUpItemAction:</string>
-													<int key="NSTag">10</int>
 													<reference key="NSTarget" ref="21566487"/>
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -2454,18 +2452,19 @@
 													</object>
 													<object class="NSMutableArray" key="NSMenuItems">
 														<bool key="EncodedWithXMLCoder">YES</bool>
-														<object class="NSMenuItem" id="141021563">
+														<reference ref="141021563"/>
+														<object class="NSMenuItem" id="549608532">
 															<reference key="NSMenu" ref="343920865"/>
-															<string key="NSTitle">Never</string>
+															<string key="NSTitle">10 sec</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
 															<reference key="NSOnImage" ref="790370152"/>
 															<reference key="NSMixedImage" ref="385678996"/>
 															<string key="NSAction">_popUpItemAction:</string>
+															<int key="NSTag">10</int>
 															<reference key="NSTarget" ref="21566487"/>
 														</object>
-														<reference ref="549608532"/>
 														<object class="NSMenuItem" id="910495826">
 															<reference key="NSMenu" ref="343920865"/>
 															<string key="NSTitle">30 sec</string>
@@ -2490,21 +2489,8 @@
 															<int key="NSTag">60</int>
 															<reference key="NSTarget" ref="21566487"/>
 														</object>
-														<object class="NSMenuItem" id="277511789">
-															<reference key="NSMenu" ref="343920865"/>
-															<string key="NSTitle">5 min</string>
-															<string key="NSKeyEquiv"/>
-															<int key="NSKeyEquivModMask">1048576</int>
-															<int key="NSMnemonicLoc">2147483647</int>
-															<reference key="NSOnImage" ref="790370152"/>
-															<reference key="NSMixedImage" ref="385678996"/>
-															<string key="NSAction">_popUpItemAction:</string>
-															<int key="NSTag">300</int>
-															<reference key="NSTarget" ref="21566487"/>
-														</object>
 													</object>
 												</object>
-												<int key="NSSelectedIndex">1</int>
 												<int key="NSPreferredEdge">3</int>
 												<bool key="NSUsesItemFromMenu">YES</bool>
 												<bool key="NSAltersState">YES</bool>
@@ -5621,18 +5607,12 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="object" ref="343920865"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="277511789"/>
 							<reference ref="415465948"/>
 							<reference ref="910495826"/>
 							<reference ref="549608532"/>
 							<reference ref="141021563"/>
 						</object>
 						<reference key="parent" ref="21566487"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1520</int>
-						<reference key="object" ref="277511789"/>
-						<reference key="parent" ref="343920865"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1519</int>
@@ -6090,6 +6070,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>1509.IBPluginDependency</string>
 					<string>1513.IBPluginDependency</string>
 					<string>1514.IBPluginDependency</string>
+					<string>1515.IBEditorWindowLastContentRect</string>
 					<string>1515.IBPluginDependency</string>
 					<string>1515.ImportedFromIB2</string>
 					<string>1516.IBPluginDependency</string>
@@ -6100,8 +6081,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>1518.ImportedFromIB2</string>
 					<string>1519.IBPluginDependency</string>
 					<string>1519.ImportedFromIB2</string>
-					<string>1520.IBPluginDependency</string>
-					<string>1520.ImportedFromIB2</string>
 					<string>1524.IBPluginDependency</string>
 					<string>1525.IBPluginDependency</string>
 					<string>1526.IBPluginDependency</string>
@@ -6588,8 +6567,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
+					<string>{{747, 708}, {95, 71}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -8275,7 +8253,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>recycleTextFieldAction:</string>
 							<string>runToPrintTextFieldAction:</string>
 							<string>saveUserSettings:</string>
-							<string>shipTemperatureAction:</string>
 							<string>startAction:</string>
 							<string>stopAction:</string>
 							<string>tUnitsAction:</string>
@@ -8286,7 +8263,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -8342,7 +8318,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>recycleTextFieldAction:</string>
 							<string>runToPrintTextFieldAction:</string>
 							<string>saveUserSettings:</string>
-							<string>shipTemperatureAction:</string>
 							<string>startAction:</string>
 							<string>stopAction:</string>
 							<string>tUnitsAction:</string>
@@ -8438,10 +8413,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">shipTemperatureAction:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">startAction:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -8516,7 +8487,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>runStateTextField</string>
 							<string>runToPrintTextField</string>
 							<string>saveUserProtocolButton</string>
-							<string>shipTemperatureButton</string>
 							<string>signalField</string>
 							<string>startTestButton</string>
 							<string>stateField</string>
@@ -8578,7 +8548,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
-							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSButton</string>
@@ -8645,7 +8614,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>runStateTextField</string>
 							<string>runToPrintTextField</string>
 							<string>saveUserProtocolButton</string>
-							<string>shipTemperatureButton</string>
 							<string>signalField</string>
 							<string>startTestButton</string>
 							<string>stateField</string>
@@ -8829,10 +8797,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">saveUserProtocolButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">shipTemperatureButton</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">

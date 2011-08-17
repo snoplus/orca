@@ -45,7 +45,6 @@ NSString* ORRad7ModelModeChanged		= @"ORRad7ModelModeChanged";
 NSString* ORRad7ModelRecycleChanged		= @"ORRad7ModelRecycleChanged";
 NSString* ORRad7ModelCycleTimeChanged	= @"ORRad7ModelCycleTimeChanged";
 NSString* ORRad7ModelProtocolChanged	= @"ORRad7ModelProtocolChanged";
-NSString* ORRad7ModelShipTemperatureChanged = @"ORRad7ModelShipTemperatureChanged";
 NSString* ORRad7ModelPollTimeChanged	= @"ORRad7ModelPollTimeChanged";
 NSString* ORRad7ModelSerialPortChanged	= @"ORRad7ModelSerialPortChanged";
 NSString* ORRad7ModelPortNameChanged	= @"ORRad7ModelPortNameChanged";
@@ -621,20 +620,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelProtocolChanged object:self];
 }
 
-- (BOOL) shipTemperature
-{
-    return shipTemperature;
-}
-
-- (void) setShipTemperature:(BOOL)aShipTemperature
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setShipTemperature:shipTemperature];
-    
-    shipTemperature = aShipTemperature;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelShipTemperatureChanged object:self];
-}
-
 - (int) pollTime
 {
     return pollTime;
@@ -791,7 +776,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self setRecycle:			[decoder decodeIntForKey:	@"recycle"]];
 	[self setCycleTime:			[decoder decodeIntForKey:	@"cycleTime"]];
 	[self setProtocol:			[decoder decodeIntForKey:	@"protocol"]];
-	[self setShipTemperature:	[decoder decodeBoolForKey:	@"ORRad7ModelShipTemperature"]];
 	[self setPollTime:			[decoder decodeIntForKey:	@"ORRad7ModelPollTime"]];
 	[self setPortWasOpen:		[decoder decodeBoolForKey:	@"ORRad7ModelPortWasOpen"]];
     [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
@@ -818,7 +802,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [encoder encodeInt:     recycle			forKey: @"recycle"];
     [encoder encodeInt:     cycleTime		forKey: @"cycleTime"];
     [encoder encodeInt:		protocol		forKey: @"protocol"];
-    [encoder encodeBool:	shipTemperature forKey:	@"ORRad7ModelShipTemperature"];
     [encoder encodeInt:		pollTime		forKey:	@"ORRad7ModelPollTime"];
     [encoder encodeBool:	portWasOpen		forKey:	@"ORRad7ModelPortWasOpen"];
     [encoder encodeObject:	portName		forKey: @"portName"];
@@ -1120,6 +1103,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) timeout
 {
+	//NSLog(@"Rad7 timeout: %@\n",lastRequest);
 	NSLogError(@"Rad7",@"command timeout",nil);
 	[cmdQueue removeAllObjects];
 	[self setOperationState:kRad7Idle];
@@ -1141,11 +1125,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if([cmdQueue count] == 0) return;
 	NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
-	if([aCmd isEqualToString:@"++ShipRecords"]){
-		if(shipTemperature) [self shipTemps];
-		[self goToNextCommand];
-	}
-	else if([aCmd isEqualToString:@"++StartHWInit"]){
+	if([aCmd isEqualToString:@"++StartHWInit"]){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 		[self setOperationState:kRad7Initializing];
 		[self goToNextCommand];
@@ -1194,7 +1174,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
 			aCmd = [aCmd stringByAppendingString:@"\r\n"];
 			
-			//NSLog(@"writing: %@\n",aCmd);
+			//NSLog(@"Rad7: writing: %@\n",aCmd);
 			[self startTimeOut];
 			[serialPort writeString:aCmd];
 		}
@@ -1236,11 +1216,12 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		//check for data dump
 		NSArray* parts = [theResponse componentsSeparatedByString:@" "];
 		if([parts count] == 23){
+			
 			[self handleDataRecord:theResponse];
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(goToNextCommand) object:nil];
-			[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+			[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:2];
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearTempVerbose) object:nil];
-			[self performSelector:@selector(clearTempVerbose) withObject:nil afterDelay:1];
+			[self performSelector:@selector(clearTempVerbose) withObject:nil afterDelay:2];
 		}
 		else {
 			switch(currentRequest){
@@ -1390,6 +1371,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[dateFormat setDateFormat:@"yyyyMMdd HH:mm"];
 	NSDate *date = [dateFormat dateFromString:dateStr];  
 	NSTimeInterval t1 = [date timeIntervalSince1970];
+	[dateFormat release];
 	return (double)t1;
 }
 
@@ -1451,9 +1433,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			id newRunStatus  = [parts objectAtIndex:1];
 			if(![lastRunStatus isEqualToString:newRunStatus]){
 				if([lastRunStatus length] && [newRunStatus isEqualToString:@"IDLE"]){
-					if(verbose || makeFile  || tempVerbose){
-						[self printRun:[[self statusForKey:kRad7LastRunNumber] intValue]];
-					}
+					runEnded = YES;
 				}
 			}
 			[statusDictionary setObject:[NSNumber numberWithInt:thisRunNum]    forKey:kRad7RunNumber];
@@ -1552,6 +1532,18 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			[statusDictionary setObject:[NSNumber numberWithInt:[[parts objectAtIndex:1] intValue]] forKey:kRad7DutyCycle];
 			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:2] separator:@":" numberIndex:1] forKey:kRad7LeakageCurrent];
 			[statusDictionary setObject:[self getNumber:[parts objectAtIndex:3] separator:@":" numberIndex:1] forKey:kRad7SignalVoltage];
+			if(runEnded){
+				if(verbose || makeFile  || tempVerbose){
+					int theRunNumber = [[self statusForKey:kRad7LastRunNumber] intValue];
+					if(theRunNumber>=1){
+						[self printRun:theRunNumber];
+					}
+					else {
+						NSLog(@"Rad7: No data available\n");
+					}
+				}
+				runEnded = NO;
+			}
 		}
 		else {
 			[statusDictionary setObject:@"--" forKey:kRad7Temp];

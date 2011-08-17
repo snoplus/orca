@@ -110,10 +110,6 @@
                          name : ORRad7ModelPollTimeChanged
                        object : nil];
 
-	[notifyCenter addObserver : self
-                     selector : @selector(shipTemperatureChanged:)
-                         name : ORRad7ModelShipTemperatureChanged
-						object: model];
 
     [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
@@ -229,7 +225,6 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self pollTimeChanged:nil];
-	[self shipTemperatureChanged:nil];
     [self miscAttributesChanged:nil];
 	[self protocolChanged:nil];
 	[self cycleTimeChanged:nil];
@@ -402,11 +397,6 @@
 	}
 }
 
-- (void) shipTemperatureChanged:(NSNotification*)aNote
-{
-	[shipTemperatureButton setIntValue: [model shipTemperature]];
-}
-
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
@@ -430,7 +420,6 @@
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
-    [shipTemperatureButton setEnabled:!locked];
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -708,10 +697,6 @@
 	[model setProtocol:[sender indexOfSelectedItem]];	
 }
 
-- (void) shipTemperatureAction:(id)sender
-{
-	[model setShipTemperature:[sender intValue]];	
-}
 
 - (IBAction) lockAction:(id) sender
 {
@@ -777,6 +762,7 @@
 
 - (IBAction) startAction:(id)sender
 {
+	[self endEditing];
 	[startTestButton setEnabled:NO];
 	[stopTestButton setEnabled:NO];
 	[model performSelector:@selector(specialStart) withObject:nil afterDelay:0];

@@ -113,7 +113,6 @@
 		unsigned long	timeMeasured;
 		int				pollTime;
         NSMutableString* buffer;
-		BOOL			shipTemperature;
 		unsigned int    currentRequest;
 		unsigned int    waitTime;
 		unsigned int    expectedCount;
@@ -140,6 +139,7 @@
 	
 		NSString*		stopRunFilePath;
 		BOOL			tempVerbose;
+		BOOL			runEnded;
 }
 
 #pragma mark ***Initialization
@@ -186,8 +186,6 @@
 - (void) setCycleTime:(int)aCycleTime;
 - (int) protocol;
 - (void) setProtocol:(int)aProtocol;
-- (BOOL) shipTemperature;
-- (void) setShipTemperature:(BOOL)aShipTemperature;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (ORSerialPort*) serialPort;
@@ -262,7 +260,6 @@ extern NSString* ORRad7ModelModeChanged;
 extern NSString* ORRad7ModelRecycleChanged;
 extern NSString* ORRad7ModelCycleTimeChanged;
 extern NSString* ORRad7ModelProtocolChanged;
-extern NSString* ORRad7ModelShipTemperatureChanged;
 extern NSString* ORRad7ModelPollTimeChanged;
 extern NSString* ORRad7ModelSerialPortChanged;
 extern NSString* ORRad7Lock;
