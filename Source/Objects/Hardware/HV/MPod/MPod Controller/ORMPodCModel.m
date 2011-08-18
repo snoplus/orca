@@ -67,7 +67,10 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 	queue = nil;
 	[super sleep];
 }
-
+- (NSString*) helpURL
+{
+	return @"MPod/MPodC.html";
+}
 #pragma mark ¥¥¥Initialization
 - (void) makeMainController
 {

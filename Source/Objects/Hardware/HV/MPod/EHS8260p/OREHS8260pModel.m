@@ -52,7 +52,10 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 {
 	 return @"EHS8260p";
 }
-
+- (NSString*) helpURL
+{
+	return @"MPod/EHS8260p.html";
+}
 #pragma mark ***Accessors
 
 - (short) outputFailureBehavior:(short)chan

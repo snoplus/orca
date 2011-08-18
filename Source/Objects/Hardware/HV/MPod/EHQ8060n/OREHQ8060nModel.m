@@ -52,7 +52,10 @@ NSString*  OREHQ8060nSettingsLock = @"OREHQ8060nSettingsLock";
 {
 	return kNegativePolarity;
 }
-
+- (NSString*) helpURL
+{
+	return @"MPod/EHQ8060n.html";
+}
 #pragma mark ***Accessors
 
 - (NSArray*) channelUpdateList

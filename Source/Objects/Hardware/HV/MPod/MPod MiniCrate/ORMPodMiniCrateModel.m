@@ -75,10 +75,10 @@
     [self linkToController:@"ORMPodMiniCrateController"];
 }
 
-//- (NSString*) helpURL
-//{
-//	return @"Pxi/Crates.html";
-//}
+- (NSString*) helpURL
+{
+	return @"MPod/MiniCrate.html";
+}
 
 - (void) connected
 {
