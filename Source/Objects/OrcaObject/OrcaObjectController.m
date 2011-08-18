@@ -70,22 +70,20 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 - (void) setModel:(id)aModel
 {
-    
-    if(aModel!=model){
-        id oldModel = model;
+    if(aModel != model){
+		
+		NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+		[nc removeObserver:self];
+		
         model =  aModel;
-        if(oldModel!=nil){
-            // [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:self];
-            [[NSNotificationCenter defaultCenter] removeObserver:self name:nil object:oldModel];
-            if(model){
-				[self registerNotificationObservers];
-				[self updateWindow];
-            }
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORModelChangedNotification
-			 object: self 
-			 userInfo: nil];
-        }
+		
+		if(model){
+			[self registerNotificationObservers];
+			[self updateWindow];
+		}
+		[nc postNotificationName:ORModelChangedNotification
+						  object: self 
+						userInfo: nil];
     }
 }
 
