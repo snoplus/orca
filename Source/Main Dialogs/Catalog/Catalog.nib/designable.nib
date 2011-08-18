@@ -2671,7 +2671,7 @@
 																<object class="ObjectFactory" id="960377520">
 																	<reference key="NSNextResponder" ref="543308063"/>
 																	<int key="NSvFlags">256</int>
-																	<string key="NSFrame">{{411, 47}, {16, 127}}</string>
+																	<string key="NSFrame">{{400, 47}, {38, 127}}</string>
 																	<reference key="NSSuperview" ref="543308063"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="522299692">
@@ -11432,7 +11432,6 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="361298566"/>
 							<reference ref="923102256"/>
 							<reference ref="447292781"/>
-							<reference ref="960377520"/>
 							<reference ref="1072143995"/>
 							<reference ref="1072695849"/>
 							<reference ref="109872201"/>
@@ -11442,6 +11441,7 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="637828729"/>
 							<reference ref="1047221201"/>
 							<reference ref="481715941"/>
+							<reference ref="960377520"/>
 						</object>
 						<reference key="parent" ref="761815348"/>
 					</object>
@@ -18260,6 +18260,7 @@ ZSBjb250cm9sbGVyLg</string>
 					<string>23354.ImportedFromIB2</string>
 					<string>23355.IBAttributePlaceholdersKey</string>
 					<string>23355.IBPluginDependency</string>
+					<string>23355.IBViewBoundsToFrameTransform</string>
 					<string>23355.ImportedFromIB2</string>
 					<string>23897.IBAttributePlaceholdersKey</string>
 					<string>23897.IBPluginDependency</string>
@@ -20808,6 +20809,9 @@ ZSBjb250cm9sbGVyLg</string>
 						</object>
 					</object>
 					<string>com.yourcompany.OrcaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDwoAAwywAAA</bytes>
+					</object>
 					<boolean value="YES"/>
 					<object class="NSMutableDictionary">
 						<string key="NS.key.0">ToolTip</string>
