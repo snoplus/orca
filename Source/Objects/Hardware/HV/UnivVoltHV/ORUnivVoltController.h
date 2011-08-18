@@ -42,7 +42,6 @@
 	IBOutlet NSTextField*			mCmdStatus;			// Status of executed command.
 	IBOutlet NSTextField*			mPollingTimeMinsField;	// Number of minutes between refresh of data.
 	IBOutlet NSTextField*			mLastPoll;			// Time when last poll conducted.
-	IBOutlet NSTextField*			mPointsXAxis;		// Number of points in x-axis for HV (y) vs time (x)
 	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.
 	IBOutlet ORPlotView*			mPlottingObj1;
 	IBOutlet ORPlotView*			mPlottingObj2;
@@ -68,7 +67,6 @@
 - (void) pollingTimeChanged: (NSNotification*) aNote;
 - (void) pollingStatusChanged: (NSNotification*) aNote;
 - (void) lastPollTimeChanged: (NSNotification*) aNote;
-- (void) numPlotterPointsChanged: (NSNotification*) aNote;
 - (void) alarmChanged: (NSNotification*) aNote;
 - (void) plotterDataChanged: (NSNotification*) aNotes;
 - (void) miscAttributesChanged: (NSNotification* ) aNotes;
@@ -95,7 +93,6 @@
 - (IBAction) hardwareValues: (id) aSender;
 - (IBAction) pollTimeAction: (id) aSender;
 - (IBAction) startStopPolling: (id ) aSender;
-- (IBAction) setPlotterChannels: (id) aSender;
 //- (IBAction) updateTable: (id) aSender;
 
 #pragma mark ***Getters

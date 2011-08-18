@@ -132,11 +132,6 @@ const int MAXcCHNLS_PER_PLOT = 6;
 					   object : model];
 						
 	[notifyCenter addObserver : self
-	                 selector : @selector( numPlotterPointsChanged: )
-					     name : UVNumPlotterPointsChanged
-					   object : model]; 
-
-	[notifyCenter addObserver : self
 	                 selector : @selector( plotterDataChanged: )
 					     name : UVPlotterDataChanged
 					   object : model]; 
@@ -196,7 +191,6 @@ const int MAXcCHNLS_PER_PLOT = 6;
 		[(ORTimeAxis*)[mPlottingObj2 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
-//	[mPointsXAxis setIntValue: [model plotterPoints]];
 	
 	[mChnlTable reloadData];
 
@@ -237,7 +231,6 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	[self hvLimitChanged: nil];
 	[self pollingTimeChanged: nil];
 	[self pollingStatusChanged: nil];
-	[self numPlotterPointsChanged: nil];
 	[self miscAttributesChanged: nil];
 	
 	
@@ -366,11 +359,6 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	[mLastPoll setObjectValue: lastPollTime];
 }
 
-- (void) numPlotterPointsChanged: (NSNotification*) aNote
-{
-	int numPlotterPoints = [model plotterPoints];
-	[mPointsXAxis setIntValue: numPlotterPoints];
-}
 
 - (void) plotterDataChanged: (NSNotification*) aNote
 {
@@ -534,12 +522,6 @@ const int MAXcCHNLS_PER_PLOT = 6;
 		[model startPolling];
 	}
 }
-
-- (IBAction) setPlotterChannels: (id) aSender
-{
-	[model setPlotterPoints: [mPointsXAxis intValue]];
-}
-
 
 #pragma mark •••Code for plotter
 - (int)	numberPointsInPlot: (id) aPlotter

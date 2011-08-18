@@ -34,17 +34,17 @@ typedef enum hveStatus hveStatus;
 @interface ORUnivVoltModel : ORCard 
 {
 	id						adapter;
-	NSMutableArray*			mChannelArray;	// Stores dictionary objects (one for each channel) of the parameter values for that channel.
-	NSDate*					mTimeStamp;		// Time of last reading.
-	NSMutableDictionary*	mParams;	//Dictionary of HV unit parameters indicating type of parameter and whether it is R or R/W. 
-	NSMutableArray*			mCommands;  //Crate commands for HV Unit
+	NSMutableArray*			mChannelArray;		// Stores dictionary objects (one for each channel) of the parameter values for that channel.
+	NSDate*					mTimeStamp;			// Time of last reading.
+	NSMutableDictionary*	mParams;			//Dictionary of HV unit parameters indicating type of parameter and whether it is R or R/W. 
+	NSMutableArray*			mCommands;			//Crate commands for HV Unit
 	NSMutableArray*			mCircularBuffers;	// Array holding circular buffers of data one for each channel.  Used for
 												// plotting.
 	long					mPoints;			// number of points in each channel-data circular buffer.
 	NSNumber*				mPollTimeMins; 
 	NSNumber*				mPlotterPoints;		// number of points in histogram displays.
 	ORAlarm*				mHVValueLmtsAlarm;	// If set have exceeded MVDZ window around demand voltage
-	ORAlarm*				mHVCurrentLmtsAlarm;	// If set have exceeded MCDZ window around current.
+	ORAlarm*				mHVCurrentLmtsAlarm;// If set have exceeded MCDZ window around current.
 	int						mWParams;
 	bool					mPollTaskIsRunning;
 	bool					mAlarmsEnabled;
@@ -97,8 +97,6 @@ typedef enum hveStatus hveStatus;
 - (float) MCDZ: (int) aCurrentChnl;
 - (void)  setMCDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
 - (float)  HVLimit: (int) aCurrentChnl;
-- (int) plotterPoints;
-- (void) setPlotterPoints: (int) aNumPoints;
 - (bool) areAlarmsEnabled;
 - (void) enableAlarms: (bool) aFlag;
 - (int) stationNumber;
@@ -140,7 +138,6 @@ extern NSString* UVChnlHVValuesChanged;
 
 extern NSString* UVPollTimeMinsChanged;
 extern NSString* UVLastPollTimeChanged;
-extern NSString* UVNumPlotterPointsChanged;
 extern NSString* UVPlotterDataChanged;
 extern NSString* UVStatusPollTaskChanged;
 
