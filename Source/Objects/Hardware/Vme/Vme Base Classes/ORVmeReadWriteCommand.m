@@ -139,6 +139,7 @@
 
 - (SBC_Packet) SBCPacket
 {
+	BOOL validOp = YES;
 	SBC_Packet aPacket;	
 	aPacket.cmdHeader.destination		= kSBC_Process;
 	if(opType == kWriteOp){
@@ -173,8 +174,8 @@
 		SBC_TimeDelay* delayStructPtr = (SBC_TimeDelay*)aPacket.payload;
 		delayStructPtr->milliSecondDelay			= milliSecondDelay;
 	}
-	
-	aPacket.numBytes = sizeof(unsigned long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSizeBytes + aPacket.cmdHeader.numberBytesinPayload;
+	else validOp = NO;
+	if(validOp) aPacket.numBytes = sizeof(unsigned long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSizeBytes + aPacket.cmdHeader.numberBytesinPayload;
 	return aPacket;
 }
 
