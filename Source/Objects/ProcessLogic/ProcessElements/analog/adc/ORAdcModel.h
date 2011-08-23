@@ -39,9 +39,18 @@
     float minChange;
 	NSGradient* normalGradient;
 	NSGradient* alarmGradient;
+    NSString* lowText;
+    NSString* inRangeText;
+    NSString* highText;
 }
 
 #pragma mark ***Accessors
+- (NSString*) highText;
+- (void) setHighText:(NSString*)aHighText;
+- (NSString*) inRangeText;
+- (void) setInRangeText:(NSString*)aInRangeText;
+- (NSString*) lowText;
+- (void) setLowText:(NSString*)aLowText;
 - (void) dealloc;
 - (NSString*) report;
 
@@ -62,6 +71,9 @@
 @end
 
 
+extern NSString* ORAdcModelHighTextChanged;
+extern NSString* ORAdcModelInRangeTextChanged;
+extern NSString* ORAdcModelLowTextChanged;
 extern NSString* ORAdcModelMinChangeChanged;
 
 @interface ORAdcLowLimitNub : ORProcessNub

@@ -43,12 +43,45 @@
                          name : ORAdcModelMinChangeChanged
                        object : model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(lowTextChanged:)
+                         name : ORAdcModelLowTextChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(inRangeTextChanged:)
+                         name : ORAdcModelInRangeTextChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(highTextChanged:)
+                         name : ORAdcModelHighTextChanged
+						object: model];
+
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
     [self minChangeChanged:nil];
+	[self lowTextChanged:nil];
+	[self inRangeTextChanged:nil];
+	[self highTextChanged:nil];
+}
+
+- (void) highTextChanged:(NSNotification*)aNote
+{
+	[highTextField setStringValue: [model highText]];
+}
+
+- (void) inRangeTextChanged:(NSNotification*)aNote
+{
+	[inRangeTextField setStringValue: [model inRangeText]];
+}
+
+- (void) lowTextChanged:(NSNotification*)aNote
+{
+	[lowTextField setStringValue: [model lowText]];
 }
 
 
@@ -64,7 +97,18 @@
 	[minChangeField setFloatValue:[model minChange]];
 }
 
-
+- (void) highTextAction:(id)sender
+{
+	[model setHighText:[sender stringValue]];	
+}
+- (void) inRangeTextAction:(id)sender
+{
+	[model setInRangeText:[sender stringValue]];	
+}
+- (void) lowTextAction:(id)sender
+{
+	[model setLowText:[sender stringValue]];	
+}
 - (IBAction) minChangeAction:(id)sender
 {
 	[model setMinChange:[sender floatValue]];

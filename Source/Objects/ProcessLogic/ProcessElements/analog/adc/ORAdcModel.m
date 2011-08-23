@@ -25,6 +25,9 @@
 #import "ORProcessThread.h"
 #import "ORAdcProcessing.h"
 
+NSString* ORAdcModelHighTextChanged		= @"ORAdcModelHighTextChanged";
+NSString* ORAdcModelInRangeTextChanged	= @"ORAdcModelInRangeTextChanged";
+NSString* ORAdcModelLowTextChanged		= @"ORAdcModelLowTextChanged";
 NSString* ORAdcModelMinChangeChanged = @"ORAdcModelMinChangeChanged";
 NSString* ORAdcModelOKConnection     = @"ORAdcModelOKConnection";
 NSString* ORAdcModelLowConnection    = @"ORAdcModelLowConnection";
@@ -37,12 +40,16 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (NSImage*) composeHighLevelIconAsMeter;
 - (NSImage*) composeHighLevelIconAsText;
 - (NSImage*) composeHighLevelIconAsBar;
+- (NSImage*) composeHighLevelIconAsWordBar;
 @end
 
 @implementation ORAdcModel
 
 - (void) dealloc
 {
+    [highText release];
+    [inRangeText release];
+    [lowText release];
 	[lowLimitNub release];
 	[highLimitNub release];
 	[normalGradient release];
@@ -51,6 +58,54 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) highText
+{
+	if(!highText)return @"High";
+    return highText;
+}
+
+- (void) setHighText:(NSString*)aHighText
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighText:highText];
+    
+    [highText autorelease];
+    highText = [aHighText copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelHighTextChanged object:self];
+}
+
+- (NSString*) inRangeText
+{
+	if(!inRangeText)return @"In Range";
+    return inRangeText;
+}
+
+- (void) setInRangeText:(NSString*)aInRangeText
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setInRangeText:inRangeText];
+    
+    [inRangeText autorelease];
+    inRangeText = [aInRangeText copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelInRangeTextChanged object:self];
+}
+
+- (NSString*) lowText;
+{
+	if(!lowText)return @"Low";
+    return lowText;
+}
+
+- (void) setLowText:(NSString*)aLowText;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowText:lowText];
+    
+    [lowText autorelease];
+    lowText = [aLowText copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelLowTextChanged object:self];
+}
 
 - (float) minChange
 {
@@ -253,6 +308,9 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setHighText:		[decoder decodeObjectForKey:@"highText"]];
+    [self setInRangeText:	[decoder decodeObjectForKey:@"inRangeText"]];
+    [self setLowText:		[decoder decodeObjectForKey:@"lowText;"]];
     [self setMinChange:		[decoder decodeFloatForKey:@"minChange"]];
     [[self undoManager] enableUndoRegistration];    
 
@@ -262,6 +320,9 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:highText		forKey:@"highText"];
+    [encoder encodeObject:inRangeText	forKey:@"inRangeText"];
+    [encoder encodeObject:lowText		forKey:@"lowText;"];
     [encoder encodeFloat: minChange		forKey:@"minChange"];
 }
 
@@ -375,11 +436,20 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	return [finalImage autorelease];
 }
 
+- (void) setViewIconType:(int)aViewIconType
+{
+	[alarmGradient release];
+	alarmGradient = nil;
+	[super setViewIconType:aViewIconType];
+}
+
 - (NSImage*) composeHighLevelIcon
 {
 	if(viewIconType == 0)		return [self composeHighLevelIconAsMeter];
 	else if(viewIconType == 1)	return [self composeHighLevelIconAsText];
 	else if(viewIconType == 2)	return [self composeHighLevelIconAsBar];
+	else if(viewIconType == 3)	return [self composeHighLevelIconAsWordBar];
+	else if(viewIconType == 4)	return nil;
 	else						return nil;
 }
 
@@ -489,6 +559,94 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	return [finalImage autorelease];
 }
 
+- (NSImage*) composeHighLevelIconAsWordBar
+{
+	NSImage* anImage = [NSImage imageNamed:@"adcHorizontalBar"];
+	NSAttributedString* idLabel   = [self idLabelWithSize:12 color:[NSColor blackColor]];
+	NSAttributedString* iconLabel = [self iconLabelWithSize:12 color:[NSColor blackColor]];
+	
+	NSSize theIconSize	= [anImage size];
+	float iconStart		= MAX([iconLabel size].width,[idLabel size].width) + 1;
+	theIconSize.width += iconStart;
+	
+    NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
+    [finalImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(iconStart,0) operation:NSCompositeCopy];
+	if(!normalGradient){
+		float red   = 1.0; 
+		float green = 1.0; 
+		float blue  = 1.0;
+		
+		normalGradient = [[NSGradient alloc] 
+						  initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
+						  endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]];
+	}
+	
+	if(!alarmGradient){
+		float red   = 1.0; 
+		float green = 1.0; 
+		float blue  = 1.0;
+		
+		alarmGradient = [[NSGradient alloc]
+						 initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
+						 endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]];
+	}
+	
+	float w = 231;
+	float h = theIconSize.height;
+	float startx = iconStart+6;
+		
+	float theValue = [self hwValue];
+	float theSize = 14;
+	NSColor* textColor = [NSColor blackColor];
+	NSAttributedString* iconString = nil;
+	if(theValue<lowLimit){
+		[alarmGradient drawInRect:NSMakeRect(startx,4,w,24) angle:270];
+
+		iconString = [[[NSAttributedString alloc] 
+					   initWithString:[self lowText]
+					       attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+									   [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+									   textColor,NSForegroundColorAttributeName,nil]]autorelease];	
+	}
+		
+	else if(theValue>highLimit){
+		[alarmGradient drawInRect:NSMakeRect(startx,4,w,24) angle:270];
+		iconString = [[[NSAttributedString alloc] 
+					   initWithString:[self highText]
+					   attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+								   [NSFont messageFontOfSize:theSize],NSFontAttributeName,
+								   textColor,NSForegroundColorAttributeName,nil]]autorelease];	
+	}
+	else {
+		[normalGradient drawInRect:NSMakeRect(startx,4,w,24) angle:270];
+		iconString = [[[NSAttributedString alloc] 
+					   initWithString:[self inRangeText]
+					   attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+								   [NSFont messageFontOfSize:theSize],NSFontAttributeName,
+								   textColor,NSForegroundColorAttributeName,nil]]autorelease];	
+	}
+				
+	if([iconLabel length]){		
+		NSSize textSize = [iconLabel size];
+		[iconLabel drawInRect:NSMakeRect(iconStart-textSize.width-1,3,textSize.width,textSize.height)];
+	}
+	
+	if([idLabel length]){		
+		NSSize textSize = [idLabel size];
+		[idLabel drawInRect:NSMakeRect(iconStart-textSize.width-1,theIconSize.height-textSize.height,textSize.width,textSize.height)];
+	}
+	
+	if(iconString){		
+		NSSize textSize = [iconString size];
+		float x = iconStart + 10 + w/2 - textSize.width/2;
+		float y = h/2 - textSize.height/2;
+		[iconString drawInRect:NSMakeRect(x,y,textSize.width,textSize.height)];
+	}
+	
+    [finalImage unlockFocus];
+	return [finalImage autorelease];
+}
 
 - (NSImage*) composeHighLevelIconAsText
 {
