@@ -47,10 +47,19 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
     [self setAddressModifier:k812DefaultAddressModifier];
 	
     [[self undoManager] enableUndoRegistration];
+	[self registerNotificationObservers];
    
     return self;
 }
-
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runABoutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];    
+}
 #pragma mark ***Accessors
 
 - (BOOL) autoInitWithRun
@@ -162,6 +171,11 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0xFF);
+}
+
+- (void) runABoutToStart:(NSNotification*)aNote
+{
+	[self initBoard];
 }
 
 #pragma mark ***HW Access
@@ -350,6 +364,7 @@ NSString* ORCVCfdLedModelThresholdLock				= @"ORCVCfdLedModelThresholdLock";
 	[self setMajorityThreshold:[aDecoder decodeIntForKey:@"majorityThreshold"]];
 	[self setOutputWidth0_7:[aDecoder decodeIntForKey:@"outputWidth0_7"]];
 	[self setOutputWidth8_15:[aDecoder decodeIntForKey:@"outputWidth8_15"]];
+    [self registerNotificationObservers];
 	
     [[self undoManager] enableUndoRegistration];
     return self;

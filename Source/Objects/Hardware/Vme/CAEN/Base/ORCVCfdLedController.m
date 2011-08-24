@@ -101,10 +101,6 @@
                          name : ORCVCfdLedModelAutoInitWithRunChanged
 						object: model];
 	
-	[notifyCenter addObserver : self
-					 selector : @selector(runABoutToStart:)
-						 name : ORRunAboutToStartNotification
-					   object : nil];
 }
 
 #pragma mark ***Interface Management
@@ -136,11 +132,7 @@
     [dialogLockButton setEnabled:secure];
 }
 
-- (void) runABoutToStart:(NSNotification*)aNote
-{
-	[self endEditing];
-	[model initBoard];
-}
+
 
 - (void) baseAddressChanged:(NSNotification*)aNote
 {

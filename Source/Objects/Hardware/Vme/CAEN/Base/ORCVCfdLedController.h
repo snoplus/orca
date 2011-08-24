@@ -52,7 +52,6 @@
 - (void) outputWidth8_15Changed:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*) aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
-- (void) runABoutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Interface Management
 - (void) autoInitWithRunChanged:(NSNotification*)aNote;

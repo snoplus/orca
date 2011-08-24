@@ -42,6 +42,7 @@ typedef struct RegisterNamesStruct {
 #pragma mark ***Accessors
 - (BOOL) autoInitWithRun;
 - (void) setAutoInitWithRun:(BOOL)aAutoInitWithRun;
+- (void) registerNotificationObservers;
 
 - (unsigned short)	threshold: (unsigned short) anIndex;
 - (void)		setThreshold: (unsigned short ) anIndex threshold: (unsigned short) aValue;
@@ -57,6 +58,7 @@ typedef struct RegisterNamesStruct {
 - (void) setOutputWidth0_7:(unsigned short)aOutputWidth0_7;
 - (BOOL)inhibitMaskBit:(int)bit;
 - (void) setInhibitMaskBit:(int)bit withValue:(BOOL)aValue;
+- (void) runABoutToStart:(NSNotification*)aNote;
 
 #pragma mark ***HW Accesss
 - (void) writeThreshold:(unsigned short) pChan;
