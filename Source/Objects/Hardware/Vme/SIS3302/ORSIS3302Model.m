@@ -1302,18 +1302,24 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	// decimation.
 	int group;
 	for(group=0;group<4;group++){
-		int preTriggerDelay = [self preTriggerDelay:group];
-		unsigned int delayInDecimationClockTicks = preTriggerDelay >> [self energyDecimation:group];
+		//int preTriggerDelay = [self preTriggerDelay:group];
+		//unsigned int delayInDecimationClockTicks = preTriggerDelay >> [self energyDecimation:group];
 		if (energySampleLength == 0) {
 			// Means that we are not shipping an energy waveform.
 			// Make sure the gate length is long enough
-			[self setEnergyGateLength:group withValue:delayInDecimationClockTicks + 600];
+			//[self setEnergyGateLength:group withValue:delayInDecimationClockTicks + 600];
+			int theValue = 2 * [self energyPeakingTime:group] + [self energyGapTime:group] + 10; //perhaps the '10' should be user setable
+			[self setEnergyGateLength:group withValue:theValue];
 		} 
 		else {
-			[self setEnergyGateLength:group withValue:(delayInDecimationClockTicks +
-												   2*[self energyPeakingTime:group] +
-												   [self energyGapTime:group] + 120)]; // Add the 20 ticks for safety
+			//[self setEnergyGateLength:group withValue:(delayInDecimationClockTicks +
+			//									   2*[self energyPeakingTime:group] +
+			//									   [self energyGapTime:group] + 120)]; // Add the 20 ticks for safety
 
+			int value1 = [self energySampleStartIndex3];
+			int value2 = 2 * [self energyPeakingTime:group] + [self energyGapTime:group] + 10; //perhaps the '10' should be user setable
+			int theValue = MAX(value1,value2);
+			[self setEnergyGateLength:group withValue:theValue];
 
 		}
 	}
