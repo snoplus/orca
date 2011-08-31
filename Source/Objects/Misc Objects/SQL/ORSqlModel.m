@@ -35,6 +35,7 @@
 #import "NSNotifications+Extensions.h"
 #import "Utilities.h"
 #import "ORStatusController.h"
+#import "ORDataProcessing.h"
 
 NSString* ORSqlModelStealthModeChanged = @"ORSqlModelStealthModeChanged";
 NSString* ORSqlDataBaseNameChanged	= @"ORSqlDataBaseNameChanged";
@@ -74,6 +75,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) createSegmentMapTableInDataBase:(NSString*)aDataBase;
 - (void) createWaveformsTableInDataBase:(NSString*)aDataBase;
 - (void) createStatusLogTableInDataBase:(NSString*)aDataBase;
+- (void) createPushTableInDataBase:(NSString*)aDataBase;
 @end
 
 @implementation ORSqlModel
@@ -342,6 +344,8 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	@try{ [self createSegmentMapTableInDataBase:dataBaseName]; }	@catch(NSException* e){}
 	@try{ [self createWaveformsTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
 	@try{ [self createStatusLogTableInDataBase:dataBaseName]; }		@catch(NSException* e){}
+	
+	@try{ [self createPushTableInDataBase:dataBaseName]; }		    @catch(NSException* e){}
 }
 
 - (void) removeEntry
@@ -445,6 +449,36 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 @end
 
 @implementation ORSqlModel (private)
+
+- (void) createPushTableInDataBase:(NSString*)aDataBase
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection createDBWithName:aDataBase]){
+				if([aConnection selectDB:aDataBase]){
+					NSString*	s = @"CREATE TABLE pushInfo (";
+					s = [s stringByAppendingString:@"push_id int(11) NOT NULL AUTO_INCREMENT,"];
+					s = [s stringByAppendingString:@"hw_address varchar(32) NOT NULL,"];
+					s = [s stringByAppendingString:@"deviceName varchar(100) NOT NULL,"];	 
+					s = [s stringByAppendingString:@"deviceToken varchar(100) NOT NULL,"]; //apns token for this mobile device
+					s = [s stringByAppendingString:@"alarmMask int(11) DEFAULT NULL,"];
+					s = [s stringByAppendingString:@"PRIMARY KEY (push_id)"];
+					s = [s stringByAppendingString:@") ENGINE=InnoDB"];
+					
+					[aConnection queryString:s];
+					NSLog(@"Created Table PushInfo in Database %@\n",aDataBase);
+				}
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+}
+
+
 - (void) createMachinesTableInDataBase:(NSString*)aDataBase
 {
 	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
@@ -901,13 +935,22 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[anOp release];
 
 		//[self postRunState:nil];
+		NSDictionary* runInfo = nil;
 		NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 		if([runObjects count]){
 			ORRunModel* rc = [runObjects objectAtIndex:0];
-			NSDictionary* runInfo = [rc runInfo];
-			if(runInfo){
-				[self postRunState:[NSNotification notificationWithName:@"DoesNotMatter" object:rc userInfo:runInfo]];
-			}
+			runInfo = [rc runInfo];
+		}
+		else {
+			runInfo =  [NSMutableDictionary dictionaryWithObjectsAndKeys:
+									  [NSNumber numberWithLong:0],kRunNumber,
+									  [NSNumber numberWithLong:0],kSubRunNumber,
+									  [NSNumber numberWithLong:eRunStopped],  kRunMode,
+									  nil];
+			
+		}
+		if(runInfo){
+		  [self postRunState:[NSNotification notificationWithName:@"DoesNotMatter" object:nil userInfo:runInfo]];
 		}
 		[self performSelector:@selector(collectAlarms) withObject:nil afterDelay:2];
 		[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:2];
