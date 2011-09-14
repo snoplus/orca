@@ -211,7 +211,17 @@ enum {
 						 name : ORFolderDirectoryNameChangedNotification
 						object: [model dataFolder]];
  
-	   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
+					 selector : @selector(dirChanged:)
+						 name : ORFolderDirectoryNameChangedNotification
+						object: [model statusFolder]];
+
+	[notifyCenter addObserver : self
+					 selector : @selector(dirChanged:)
+						 name : ORFolderDirectoryNameChangedNotification
+						object: [model configFolder]];
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(dirChanged:)
 						 name : ORDataFileModelUseFolderStructureChanged
 						object: model];
@@ -235,6 +245,11 @@ enum {
     [notifyCenter addObserver : self
                      selector : @selector(drawerDidOpen:)
                          name : NSDrawerDidOpenNotification
+						object: copyDrawer];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(drawerDidClose:)
+                         name : NSDrawerDidCloseNotification
 						object: copyDrawer];
 	
     [notifyCenter addObserver : self
@@ -312,6 +327,13 @@ enum {
 	[[model dataFolder]	updateButtons];
 	[[model statusFolder] updateButtons];
 	[[model configFolder] updateButtons];
+	[openLocationDrawerButton setTitle:@"Close Drawer"];
+}
+
+- (void) drawerDidClose:(NSNotification *)note
+{
+	[openLocationDrawerButton setTitle:@" Set File Locations and Send Options..."];
+	
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
@@ -400,9 +422,20 @@ enum {
 
 - (void) dirChanged:(NSNotification*)note
 {    
-    ORSmartFolder* theDataFolder = [model dataFolder];
+    ORSmartFolder* theDataFolder   = [model dataFolder];
     if(note==nil || [note object] == theDataFolder || [note object] == model){
 		if([theDataFolder finalDirectoryName]!=nil)[dirTextField setStringValue: [theDataFolder finalDirectoryName]];
+    }
+	
+	ORSmartFolder* theStatusFolder = [model statusFolder];
+    if(note==nil || [note object] == theStatusFolder || [note object] == model){
+		if([theStatusFolder finalDirectoryName]!=nil)[logTextField setStringValue: [theStatusFolder finalDirectoryName]];
+    }
+	
+	ORSmartFolder* theConfigFolder = [model configFolder];
+	if(note==nil || [note object] == theConfigFolder || [note object] == model){
+		if(![model saveConfiguration])[configTextField setStringValue:@"No Config Snap Shot (option above)"];
+		else if([theConfigFolder finalDirectoryName]!=nil)[configTextField setStringValue: [theConfigFolder finalDirectoryName]];
     }
 }
 
@@ -428,6 +461,7 @@ enum {
 - (void) saveConfigurationChanged:(NSNotification*)note
 {
 	[saveConfigurationCB setState:[model saveConfiguration]];
+	[self dirChanged:note];
 }
 
 

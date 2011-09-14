@@ -22,6 +22,8 @@
 @interface ORDataFileController : OrcaObjectController  {
     @private
 	IBOutlet NSTextField* 	dirTextField;
+	IBOutlet NSTextField* 	logTextField;
+	IBOutlet NSTextField* 	configTextField;
 	IBOutlet NSTextField*   processLimitHighField;
 	IBOutlet NSButton*		useDatedFileNamesCB;
 	IBOutlet NSButton*		useFolderStructureCB;
@@ -49,6 +51,7 @@
 	IBOutlet NSTextField* 	queueStatusField;
 	IBOutlet NSTextField* 	queueConfigField;
 
+	IBOutlet NSButton*      openLocationDrawerButton;
 	IBOutlet NSButton*      lockButton;
 	IBOutlet NSTabView*     tabView;
 	
@@ -82,6 +85,7 @@
 
 #pragma mark ¥¥¥Interface Management
 - (void) drawerDidOpen:(NSNotification *)note;
+- (void) drawerDidClose:(NSNotification *)note;
 - (void) fileChanged:(NSNotification*)note;
 - (void) fileStatusChanged:(NSNotification*)note;
 - (void) fileSizeChanged:(NSNotification*)note;
