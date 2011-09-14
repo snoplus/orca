@@ -180,7 +180,10 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
                                                  name : @"ORShowTemplates"
                                                 object: nil];
 	
-	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(postLogChanged:)
+                                                 name : ORPrefPostLogEnabledChanged
+                                                object: nil];
 }
 
 - (void) updateWindow
@@ -188,6 +191,7 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     [groupView setNeedsDisplay:YES];
     [self statusTextChanged:nil];
     [self numberLockedPagesChanged:nil];
+	[self postLogChanged:nil];
     [outlineView reloadData];
 }
 
@@ -228,6 +232,13 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 	if([[self group] count] == 0){
 		[templates showPanel];
 	}
+}
+
+- (void) postLogChanged:(NSNotification*)aNotification
+{
+    BOOL state = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] boolValue];
+	if(state)	[logStatusField setStringValue:@""];
+	else		[logStatusField setStringValue:@"NO Log Snapshots"];
 }
 
 - (void) windowOrderChanged:(NSNotification*)aNotification

@@ -27,6 +27,7 @@
     IBOutlet NSButton*    lockAllButton;
     IBOutlet NSOutlineView*    outlineView;
     IBOutlet NSTextField* scaleFactorField;
+    IBOutlet NSTextField* logStatusField;
     IBOutlet NSButton* documentLockButton;    
 	IBOutlet id	templates;
 	
@@ -55,6 +56,7 @@
 - (void) numberLockedPagesChanged:(NSNotification*)aNotification;
 - (void) windowOrderChanged:(NSNotification*)aNotification;
 - (void) showTemplates:(NSNotification*)aNotification;
+- (void) postLogChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) openArchive:(NSToolbarItem*)item;

@@ -1690,9 +1690,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="159073813">
 													<int key="NSCellFlags">67239424</int>
-													<int key="NSCellFlags2">0</int>
+													<int key="NSCellFlags2">131072</int>
 													<string key="NSContents">Post Heartbeat</string>
-													<reference key="NSSupport" ref="969784827"/>
+													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="409344512"/>
 													<int key="NSButtonFlags">1211912703</int>
 													<int key="NSButtonFlags2">2</int>
@@ -1710,14 +1710,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<object class="NSButton" id="228016021">
 												<reference key="NSNextResponder" ref="1040678378"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{11, 107}, {138, 18}}</string>
+												<string key="NSFrame">{{11, 105}, {237, 18}}</string>
 												<reference key="NSSuperview" ref="1040678378"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="1033346569">
-													<int key="NSCellFlags">-2080244224</int>
-													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Post Status Log </string>
-													<reference key="NSSupport" ref="969784827"/>
+													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags2">131072</int>
+													<string key="NSContents">Snapshot Status Log (every 15 minutes) </string>
+													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="228016021"/>
 													<int key="NSButtonFlags">1211912703</int>
 													<int key="NSButtonFlags2">2</int>
@@ -1737,13 +1737,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="905825813">
 													<int key="NSCellFlags">67239424</int>
-													<int key="NSCellFlags2">272629760</int>
+													<int key="NSCellFlags2">272760832</int>
 													<string key="NSContents">You can have the status log and/or a heart beat periodically posted to a folder. </string>
-													<object class="NSFont" key="NSSupport" id="818942359">
-														<string key="NSName">LucidaGrande</string>
-														<double key="NSSize">13</double>
-														<int key="NSfFlags">16</int>
-													</object>
+													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="598398511"/>
 													<reference key="NSBackgroundColor" ref="590752419"/>
 													<reference key="NSTextColor" ref="136034969"/>
@@ -1752,14 +1748,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 											<object class="NSTextField" id="427790196">
 												<reference key="NSNextResponder" ref="1040678378"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{10, 38}, {322, 51}}</string>
+												<string key="NSFrame">{{10, 41}, {322, 48}}</string>
 												<reference key="NSSuperview" ref="1040678378"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="15234468">
 													<int key="NSCellFlags">67239424</int>
-													<int key="NSCellFlags2">272629760</int>
+													<int key="NSCellFlags2">272760832</int>
 													<string key="NSContents">Note that the status log is also saved at the end of every run, possibly in a different location. See the Disk object for the location.</string>
-													<reference key="NSSupport" ref="818942359"/>
+													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="427790196"/>
 													<reference key="NSBackgroundColor" ref="590752419"/>
 													<reference key="NSTextColor" ref="443733848"/>
@@ -4096,10 +4092,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="1039535224"/>
 							<reference ref="409344512"/>
-							<reference ref="228016021"/>
 							<reference ref="598398511"/>
 							<reference ref="427790196"/>
 							<reference ref="75501113"/>
+							<reference ref="228016021"/>
 						</object>
 						<reference key="parent" ref="124134473"/>
 					</object>
@@ -4787,7 +4783,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABCAAAAwoAAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABBMAAAwvwAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
