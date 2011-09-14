@@ -702,7 +702,7 @@ fail:
 			NSString* contents = [NSString stringWithFormat:@"Time:%d\nNext:%d",now,now+kHeartbeatPeriod];
 			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 		}
-		if(heartbeatCount%10 == 0){
+		if(heartbeatCount%30 == 0){
 			if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
 				[[ORStatusController sharedStatusController] doPeriodicSnapShotToPath:[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]];
 			}
