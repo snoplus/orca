@@ -99,8 +99,8 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 		[initialUserDefaults setObject:[NSNumber numberWithBool:YES]  forKey:ORHelpFilesUseDefault];
 		[initialUserDefaults setObject:@"" forKey:ORHelpFilesPath];
 
-		[initialUserDefaults setObject:[NSNumber numberWithInt:0] forKey:ORPrefHeartBeatEnabled];
-		[initialUserDefaults setObject:[NSNumber numberWithInt:0] forKey:ORPrefPostLogEnabled];
+		[initialUserDefaults setObject:[NSNumber numberWithInt:1] forKey:ORPrefHeartBeatEnabled];
+		[initialUserDefaults setObject:[NSNumber numberWithInt:1] forKey:ORPrefPostLogEnabled];
 		[initialUserDefaults setObject:@"" forKey:ORPrefHeartBeatPath];
 
 		
