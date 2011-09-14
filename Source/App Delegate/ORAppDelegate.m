@@ -219,8 +219,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 {
     BOOL enabled   = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]; 
     enabled		   |= [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]; 
-    NSString* path = [[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]; 
-	if(enabled && [path length]){
+	if(enabled){
 		heartbeatCount = 0;
 		[self doHeartBeat];
 	}
@@ -621,8 +620,7 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 {
     BOOL enabled   = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]; 
     enabled       |= [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]; 
-    NSString* path = [[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]; 
-	if(enabled && [path length]){
+	if(enabled){
 		if(!queue){
 			queue = [[NSOperationQueue alloc] init];
 			[queue setMaxConcurrentOperationCount:1]; //can only do one at a time
@@ -706,9 +704,7 @@ fail:
 		}
 		if(heartbeatCount%10 == 0){
 			if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
-				NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"StatusLog"]; 
-				NSString* contents = [[ORStatusController sharedStatusController] contents];
-				[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+				[[ORStatusController sharedStatusController] doPeriodicSnapShotToPath:[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]];
 			}
 		}
 	}

@@ -40,7 +40,7 @@ ORStatusController* theLogger = nil;
 @end
 
 #define kStatusConnection @"StatusConnection"
-#define kMaxTextSize 40000
+#define kMaxTextSize 500000
 
 @implementation ORStatusController
 
@@ -66,6 +66,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [dataSet release];
+	[lastSnapShot release];
     [super dealloc];
 }
 
@@ -269,7 +270,46 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	return [contents autorelease];
 }
 
+- (void) doPeriodicSnapShotToPath:(NSString*) aPath
+{
+	if([aPath length] == 0) return;
+	if(![[NSFileManager defaultManager] fileExistsAtPath:aPath]){
+		[[NSFileManager defaultManager] createDirectoryAtPath:aPath withIntermediateDirectories:YES attributes:nil error:nil];
+	}
+	
+	//get the current date
+	NSCalendarDate* now = [NSCalendarDate date];
+	NSString* theFileName = [NSString stringWithFormat:@"StatusLog_%04d_%02d_%02d",[now yearOfCommonEra],[now monthOfYear],[now dayOfMonth]];
+	aPath = [aPath stringByAppendingPathComponent:theFileName];
+	BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:aPath];	
+	NSString* contents = nil;
+	if(!lastSnapShot || !fileExists){
+		contents = [[ORStatusController sharedStatusController] contents];
+	}
+	else {
+		NSTimeInterval timeSinceLastSnapShot = [now timeIntervalSinceDate:lastSnapShot];
+		contents = [self contentsTail:(unsigned long)timeSinceLastSnapShot includeDurationHeader:NO];
+	}
+	if([contents length]){
+		[lastSnapShot release];
+		lastSnapShot = [now retain];
+		if(!fileExists){
+			[contents writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+		}
+		else {
+			NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:aPath];
+			[fp seekToEndOfFile];
+			[fp writeData:[contents dataUsingEncoding:NSASCIIStringEncoding]];
+		}
+	}
+}
+
 - (NSString*) contentsTail:(unsigned long)aDuration
+{
+	return [self contentsTail:aDuration includeDurationHeader:YES];
+}
+
+- (NSString*) contentsTail:(unsigned long)aDuration includeDurationHeader:(BOOL)header
 {
 	NSString* tailContents = @"";
 	@synchronized(self){
@@ -295,7 +335,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 			}
 		}
 	}
-	return [NSString stringWithFormat:@"Last %d seconds of ORCA Status log\n\n%@",aDuration,tailContents];
+	if(header)return [NSString stringWithFormat:@"Last %d seconds of ORCA Status log\n\n%@",aDuration,tailContents];
+	else return tailContents;
 }
 
 

@@ -46,6 +46,7 @@
     BOOL                    scheduledToUpdate;
 	BOOL					logBookDirty;
 	NSString*				logBookFile;
+	NSDate*					lastSnapShot;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -59,9 +60,11 @@
 - (void) removeDataSet:(ORDataSet*)item;
 - (void) setLogBookFile:(NSString*)aFilePath;
 - (NSString*) contents;
+- (NSString*) contentsTail:(unsigned long)aDuration includeDurationHeader:(BOOL)header;
 - (NSString*) contentsTail:(unsigned long)aDuration;
 - (void) populateFilterPopup;
 - (void) loadAlarmHistory;
+- (void) doPeriodicSnapShotToPath:(NSString*) aPath;
 
 #pragma mark ¥¥¥Updating
 - (void) updateErrorDisplay;

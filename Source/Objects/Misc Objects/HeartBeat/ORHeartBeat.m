@@ -31,7 +31,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
 - (void)dealloc
 {
     [self setClients: nil];
-
+	
     [super dealloc];
 }
 
@@ -59,16 +59,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
     if(!aClient)return;
     
     if(!clients){
-	[self setClients:[NSMutableDictionary dictionary]];
+		[self setClients:[NSMutableDictionary dictionary]];
     }
     aNextTime = aNextTime+(aNextTime*1.90);
     ORHeartBeatClient* theClient = [clients objectForKey:aClient];
     if(theClient){
-	[theClient pulse:aNextTime];
-	if(aNextTime == 0)[clients removeObjectForKey:aClient];
+		[theClient pulse:aNextTime];
+		if(aNextTime == 0)[clients removeObjectForKey:aClient];
     }
     else {
-	if(aNextTime != 0)[clients setObject:[[[ORHeartBeatClient alloc] initWithTimeOut:aNextTime name:aClient]autorelease] forKey:aClient];
+		if(aNextTime != 0)[clients setObject:[[[ORHeartBeatClient alloc] initWithTimeOut:aNextTime name:aClient]autorelease] forKey:aClient];
     }
     
 }
@@ -86,21 +86,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
     self = [super init];
     [self setWatchTimer: [NSTimer scheduledTimerWithTimeInterval:(float)aTime target:self selector:@selector(timeOut:) userInfo:nil repeats:NO]];
     if(!aName || ![aName length]){
-	[self setName:@"Unknown client"];
+		[self setName:@"Unknown client"];
     }
     else [self setName:aName];
-
+	
     [[NSNotificationCenter defaultCenter] addObserver : self
-		    selector : @selector(runStatusChanged:)
-		    name : ORRunStatusChangedNotification
-		    object : nil];
-
-
+											 selector : @selector(runStatusChanged:)
+												 name : ORRunStatusChangedNotification
+											   object : nil];
+	
+	
     [[NSNotificationCenter defaultCenter] addObserver : self
-		    selector : @selector(documentClosed:)
-		    name : ORDocumentClosedNotification
-		    object : nil];
-
+											 selector : @selector(documentClosed:)
+												 name : ORDocumentClosedNotification
+											   object : nil];
+	
     return self;
 }
 
@@ -112,10 +112,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
     
     [watchTimer invalidate];
     [watchTimer release];
-
+	
     [timeOutAlarm clearAlarm];
     [timeOutAlarm release];
-
+	
     [super dealloc];
 }
 
@@ -161,26 +161,25 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
     watchTimer = nil;
     
     if(aNextTime){
-	[self setWatchTimer: [NSTimer scheduledTimerWithTimeInterval:(float)aNextTime target:self selector:@selector(timeOut:) userInfo:nil repeats:NO]];
+		[self setWatchTimer: [NSTimer scheduledTimerWithTimeInterval:(float)aNextTime target:self selector:@selector(timeOut:) userInfo:nil repeats:NO]];
     }
     if(timeOutAlarm){
-	[timeOutAlarm clearAlarm];
-	[timeOutAlarm release];
-	timeOutAlarm = nil;
-	NSLog(@"%@ alive again!\n",name);
+		[timeOutAlarm clearAlarm];
+		[timeOutAlarm release];
+		timeOutAlarm = nil;
+		NSLog(@"%@ alive again!\n",name);
     }
 }
 
 - (void) timeOut:(NSTimer*)aTimer
 {
     if(!timeOutAlarm && [[ORGlobal sharedGlobal] runInProgress]){
-	timeOutAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ dead!",name] severity:kInformationAlarm];
-	[timeOutAlarm setSticky:YES];
-	[timeOutAlarm setAcknowledged:NO];
-	[timeOutAlarm postAlarm];
-	NSLog(@"%@ not sending heartbeat, assumed dead!\n",name);
-   } 
-
+		timeOutAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ dead!",name] severity:kInformationAlarm];
+		[timeOutAlarm setSticky:YES];
+		[timeOutAlarm setAcknowledged:NO];
+		[timeOutAlarm postAlarm];
+		NSLog(@"%@ not sending heartbeat, assumed dead!\n",name);
+	} 
 }
 
 - (void) documentClosed:(NSNotification*)aNotification
@@ -188,7 +187,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
     [watchTimer invalidate];
     [watchTimer release];
     watchTimer = nil;
-
+	
     [timeOutAlarm clearAlarm];
     [timeOutAlarm release];
     timeOutAlarm = nil;
@@ -197,15 +196,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
     if(![[ORGlobal sharedGlobal] runInProgress]){
-	[watchTimer invalidate];
-	[watchTimer release];
-	watchTimer = nil;
-
-	if(timeOutAlarm){
-	    [timeOutAlarm clearAlarm];
-	    [timeOutAlarm release];
-	    timeOutAlarm = nil;
-	}
+		[watchTimer invalidate];
+		[watchTimer release];
+		watchTimer = nil;
+		
+		if(timeOutAlarm){
+			[timeOutAlarm clearAlarm];
+			[timeOutAlarm release];
+			timeOutAlarm = nil;
+		}
     }
 }
 
