@@ -33,7 +33,7 @@
 - (id) init
 {   
 	self = [super init];
-	connected = NO;
+	mConnection = nil;
 	return self;
 }
 
@@ -54,10 +54,8 @@
 		if(!mConnection){
 			mConnection = mysql_init (NULL);
 			if(mConnection){
-			
-				if (mysql_real_connect (mConnection,			[aHostName UTF8String], 
-										[aUserName UTF8String], [aPassWord UTF8String],
-										[aDataBase UTF8String], 0, nil, 0) == nil){
+				MYSQL* result = mysql_real_connect (mConnection, [aHostName UTF8String], [aUserName UTF8String], [aPassWord UTF8String],[aDataBase UTF8String], 0, nil, 0);
+				if ( result != mConnection){
 					if(verbose){
 						NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (mConnection));
 						NSLog(@"Error: (%s)\n",mysql_error (mConnection));
@@ -65,7 +63,6 @@
 					[self disconnect];
 					return NO;
 				}
-				connected = YES;
 				if([aDataBase length]){
 					[self selectDB:aDataBase];
 				}
@@ -74,7 +71,6 @@
 				if(verbose){
 					NSLog(@"ORSql: mysql_init() failed\n");
 				}
-				connected = NO;				
 			}
 		}
 	}
@@ -87,21 +83,16 @@
 		if(!mConnection){
 			mConnection = mysql_init (NULL);
 			if(mConnection){
-				
-				if (mysql_real_connect (mConnection,			[aHostName UTF8String], 
-										[aUserName UTF8String], [aPassWord UTF8String],
-										NULL, 0, NULL, 0) == nil){
-					NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (mConnection));
-					NSLog(@"Error: (%s)\n",mysql_error (mConnection));
-					
+				MYSQL* result = mysql_real_connect (mConnection,[aHostName UTF8String], [aUserName UTF8String], [aPassWord UTF8String],NULL, 0, NULL, 0);
+				if ( result != mConnection){
+					NSLog(@"mysql_real_connect() failed: %u\n",mysql_errno (result));
+					NSLog(@"Error: (%s)\n",mysql_error (result));
 					[self disconnect];
 					return NO;
 				}
-				connected = YES;
 			}
 			else {
 				NSLog(@"ORSql: mysql_init() failed\n");
-				connected = NO;				
 			}
 		}
 	}
@@ -111,10 +102,9 @@
 - (void) disconnect
 {
 	@synchronized(self){
-		if (connected) {
+		if (mConnection) {
 			mysql_close(mConnection);
-			mConnection = NULL;
-			connected = NO;
+			mConnection = nil;
 		}
 	}
 }
@@ -123,7 +113,7 @@
 {
 	BOOL result = NO;
 	@synchronized(self){
-		if(connected){
+		if(mConnection){
 			if ([dbName length]) {
 				if (mysql_select_db(mConnection, [dbName UTF8String]) == 0) {
 					result =  YES;
@@ -157,7 +147,7 @@
 
 - (BOOL) isConnected
 {
-    return connected;
+    return mConnection != nil;
 }
 
 - (BOOL) checkConnection
@@ -233,7 +223,7 @@
 {
 	unsigned long long num = 0;
 	@synchronized(self){
-		if (connected) {
+		if (mConnection) {
 			num = mysql_affected_rows(mConnection);
 		}
 	}
@@ -248,7 +238,7 @@
 {
 	unsigned long long num = 0;
 	@synchronized(self){
-		if (connected) {
+		if (mConnection) {
 			num = mysql_insert_id(mConnection);
 		}
 	}
@@ -321,7 +311,7 @@
 {
 	NSString* result = nil;
 	@synchronized(self){
-		if (connected) {
+		if (mConnection) {
 			result = [NSString stringWithCString:mysql_get_host_info(mConnection) encoding:NSISOLatin1StringEncoding];
 		}
 	}
@@ -333,7 +323,7 @@
 {
  	NSString* result = nil;
 	@synchronized(self){
-		if (connected) {
+		if (mConnection) {
 			result = [NSString stringWithCString: mysql_get_server_info(mConnection) encoding:NSISOLatin1StringEncoding];
 		}
 	}
@@ -344,7 +334,7 @@
 {
 	NSNumber* result = nil;
  	@synchronized(self){
-		if (connected) {
+		if (mConnection) {
 			result= [NSNumber numberWithUnsignedInt:mysql_get_proto_info(mConnection) ];
 		}
 	}
@@ -368,7 +358,7 @@
 - (BOOL)createDBWithName:(NSString *)dbName
 {
 	
-	if ((connected) && (![self queryString: [NSString stringWithFormat:@"create database if not exists %@",dbName]])) {
+	if ((mConnection) && (![self queryString: [NSString stringWithFormat:@"create database if not exists %@",dbName]])) {
 		return YES;
 	}
 	return NO;
@@ -377,7 +367,7 @@
  - (BOOL)dropDBWithName:(NSString *)dbName
  {
  const char	*theDBName = [dbName UTF8String];
- if ((connected) && (! mysql_drop_db(mConnection, theDBName))) {
+ if ((mConnection) && (! mysql_drop_db(mConnection, theDBName))) {
  return YES;
  }
  return NO;

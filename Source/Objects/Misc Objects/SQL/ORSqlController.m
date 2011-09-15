@@ -106,11 +106,17 @@
 - (void) stealthModeChanged:(NSNotification*)aNote
 {
 	[stealthModeButton setIntValue: [model stealthMode]];
+	[self updateConnectionValidField];
 }
 
 - (void) connectionValidChanged:(NSNotification*)aNote
 {
-	[connectionValidField setStringValue:[model connectionValid]?@"Valid":@"?"];
+	[self updateConnectionValidField];
+}
+
+- (void) updateConnectionValidField
+{
+	[connectionValidField setStringValue:[model stealthMode]?@"Disabled":[model connectioned]?@"Connected":@"NOT Connected"];
 }
 
 - (void) hostNameChanged:(NSNotification*)aNote

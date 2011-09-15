@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORSqlModel.h"
 #import "ORRunModel.h"
 #import "OR1DHisto.h"
@@ -48,7 +47,7 @@ NSString* ORSqlLock					= @"ORSqlLock";
 static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 @interface ORSqlModel (private)
-- (ORSqlConnection*) validateConnection;
+- (ORSqlConnection*) sqlConnection;
 - (void) updateDataSets;
 - (void) updateExperiment;
 - (void) addMachineName;
@@ -406,36 +405,32 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	} 
 	
 	if([sqlConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName]){
-		connectionValid = YES;
 		[self addMachineName];
 	}
 	else {
-		connectionValid = NO;
-		[sqlConnection release];
-		sqlConnection = nil;
+		[self disconnectSql];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionValidChanged object:self];
 	
 
-	return connectionValid;
+	return [sqlConnection isConnected];
 }
 
--(void) disconnectSql
+- (void) disconnectSql
 {
 	if(sqlConnection){
+		[sqlConnection disconnect];
 		[sqlConnection release];
 		sqlConnection = nil;
-		if(connectionValid){
-			NSLog(@"Disconnected from DataBase %@ on %@\n",dataBaseName,hostName);
-			connectionValid = NO;
-		}
+		NSLog(@"Disconnected from DataBase %@ on %@\n",dataBaseName,hostName);
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSqlConnectionValidChanged object:self];
 	}
 }
-- (BOOL) connectionValid
+
+- (BOOL) connectioned
 {
-	return connectionValid;
+	return [sqlConnection isConnected];
 }
 
 - (void) logQueryException:(NSException*)e
@@ -892,25 +887,21 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	}
 }
 
-- (ORSqlConnection*) validateConnection
+- (ORSqlConnection*) sqlConnection
 {
 	@synchronized(self){
-		BOOL oldConnectionValid = connectionValid;
+		BOOL oldConnectionValid = [sqlConnection isConnected];
+		BOOL newConnectionValid = oldConnectionValid;
 		if(!sqlConnection) sqlConnection = [[ORSqlConnection alloc] init];
 		if(![sqlConnection isConnected]){
-			if([sqlConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName verbose:NO]){
-				connectionValid = YES;
-			}	
-			else {
-				connectionValid = NO;
-			}
+			newConnectionValid = [sqlConnection connectToHost:hostName userName:userName passWord:password dataBase:dataBaseName verbose:NO];
 		}
 	
-		if(connectionValid != oldConnectionValid){
+		if(newConnectionValid != oldConnectionValid){
 			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSqlConnectionValidChanged object:self];
 		}
 	}
-	return connectionValid ? sqlConnection : nil;
+	return [sqlConnection isConnected]?sqlConnection:nil;
 }
 
 
@@ -957,7 +948,6 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		[self performSelector:@selector(collectSegmentMap) withObject:nil afterDelay:2];
 		[self performSelector:@selector(updateUptime) withObject:nil afterDelay:2];
 		[self performSelector:@selector(updateStatus) withObject:nil afterDelay:2];
-		
 	}
 }
 
@@ -1298,7 +1288,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			NSString* name			 = computerName();
 			NSString* hw_address	 = macAddress();
@@ -1344,10 +1334,9 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {	
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-			[delegate disconnectSql];
 			[sqlConnection release];
 		}
 	}
@@ -1361,7 +1350,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {	
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			unsigned long uptime = (unsigned long)[[[NSApp delegate] memoryWatcher] accurateUptime];
 			NSString* hw_address = macAddress();
@@ -1406,7 +1395,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1472,7 +1461,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1521,7 +1510,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1570,7 +1559,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			//get our machine id using our MAC Address
 			ORSqlResult* theResult = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1621,7 +1610,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			//get our machine_id using our MAC Address
 			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1811,7 +1800,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			if([experiment isKindOfClass:NSClassFromString(@"ORExperimentModel")]) {
 				NSString* experimentName = [experiment className];
@@ -1893,7 +1882,7 @@ Table: Histogram2Ds
 - (void) main
 {
 	@try {			
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			//get our machine_id using our MAC Address
 			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1944,7 +1933,7 @@ Table: Histogram2Ds
 {
 	ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
 	@try {			
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){
 			//get our machine_id using our MAC Address
 			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -2005,7 +1994,7 @@ Table: Histogram2Ds
 {
 	@try {
 		//get our machine_id using our MAC Address
-		ORSqlConnection* sqlConnection = [[delegate validateConnection] retain];
+		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if(sqlConnection){		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
 			id row			= [theResult fetchRowAsDictionary];
 			id machine_id	= [row objectForKey:@"machine_id"];

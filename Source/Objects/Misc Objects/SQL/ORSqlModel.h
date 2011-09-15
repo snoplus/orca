@@ -26,7 +26,6 @@
 {
 @private
 	ORSqlConnection* sqlConnection;
-	BOOL		connectionValid;
 	NSString*	hostName;
     NSString*	userName;
     NSString*	password;
@@ -64,7 +63,7 @@
 
 #pragma mark ***SQL Access
 - (BOOL) testConnection;
-- (BOOL) connectionValid;
+- (BOOL) connectioned;
 - (void) disconnectSql;
 
 #pragma mark ***Database setup
@@ -200,5 +199,3 @@ extern NSString* ORSqlLock;
 - (NSString*) rateDataAsStringForSet:(int)aSet;
 - (NSString*) totalCountDataAsStringForSet:(int)aSet;
 @end
-
-

@@ -26,7 +26,6 @@
 @interface ORSqlConnection : NSObject {
 	@protected
 		MYSQL* mConnection;
-		BOOL   connected;	
 }
 
 - (id) init;
