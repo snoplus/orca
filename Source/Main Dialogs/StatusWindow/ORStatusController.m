@@ -290,9 +290,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 		NSTimeInterval timeSinceLastSnapShot = [now timeIntervalSinceDate:lastSnapShot];
 		contents = [self contentsTail:(unsigned long)timeSinceLastSnapShot includeDurationHeader:NO];
 	}
+	
 	if([contents length]){
+		
 		[lastSnapShot release];
 		lastSnapShot = [now retain];
+		
 		if(!fileExists){
 			[contents writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
 		}
@@ -311,32 +314,49 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (NSString*) contentsTail:(unsigned long)aDuration includeDurationHeader:(BOOL)header
 {
-	NSString* tailContents = @"";
+	NSString* tailContents	= @"";
+	BOOL	  valid			= NO;
 	@synchronized(self){
-		NSString*	 contents			= [[[statusView string] copy] autorelease];
-		NSArray*	 lines				= [contents componentsSeparatedByString:@"\n"];
-		NSDate*		 theReferenceDate	= nil;
+		NSString*	    contents			= [[[statusView string] copy] autorelease];
+		NSArray*	    lines				= [contents componentsSeparatedByString:@"\n"];
+		NSCalendarDate*	theReferenceDate	= [NSCalendarDate date];
 		for(NSString* aLine in [lines reverseObjectEnumerator]){
-			if([aLine length] < 15)	tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+			//get first character
+			int datePart = [aLine intValue];
+			if(datePart == 0){
+				if([aLine length]){
+					tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+				}
+				continue;
+			}
 			else {
-				NSString* theDateAsString = [NSString stringWithFormat:@"20%02d-%02d-%02d %@ +0000",
+				NSString* theDateAsString = [NSString stringWithFormat:@"20%02d-%02d-%02d %@",
 											 [[aLine substringWithRange:NSMakeRange(4,2)] intValue],   //year part
 											 [[aLine substringWithRange:NSMakeRange(0,2)] intValue],	//month part
 											 [[aLine substringWithRange:NSMakeRange(2,2)] intValue],	//day part
 											 [aLine substringWithRange:NSMakeRange(7,8)]];  //time part
 				
-				
-				NSDate* theDate = [NSDate dateWithString:theDateAsString];
-				if(!theReferenceDate)theReferenceDate = theDate;
-				if([theReferenceDate timeIntervalSinceDate:theDate] <= aDuration){
-					tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+				NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+				[dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+
+				NSDate* theDate = [dateFormatter dateFromString:theDateAsString];
+				[dateFormatter release];
+				if(theDate){
+					NSTimeInterval deltaTimeForLine = [theReferenceDate timeIntervalSinceDate:theDate];
+					if(deltaTimeForLine <= aDuration){
+						tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+						valid = YES;
+					}
+					else break;
 				}
-				else break;
 			}
 		}
 	}
-	if(header)return [NSString stringWithFormat:@"Last %d seconds of ORCA Status log\n\n%@",aDuration,tailContents];
-	else return tailContents;
+	if(valid){
+		if(header)return [NSString stringWithFormat:@"Last %d seconds of ORCA Status log\n\n%@",aDuration,tailContents];
+		else return tailContents;
+	}
+	else return nil;
 }
 
 
