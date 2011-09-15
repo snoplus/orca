@@ -272,34 +272,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	}
 }
 
-
-- (void) shipTemps
-{
-    if([[ORGlobal sharedGlobal] runInProgress]){
-		
-		unsigned long data[4];
-		data[0] = dataId | 4;
-		data[1] = ([self uniqueIdNumber]&0x0000fffff);
-		
-		union {
-			float asFloat;
-			unsigned long asLong;
-		}theData;
-		
-		int index = 2;
-		theData.asFloat = 0; //put in the actual value.....................
-		data[index] = theData.asLong;
-		index++;
-		data[index] = timeMeasured;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
-	}
-}
-
-
 #pragma mark ***Accessors
-
 - (BOOL) makeFile
 {
     return makeFile;

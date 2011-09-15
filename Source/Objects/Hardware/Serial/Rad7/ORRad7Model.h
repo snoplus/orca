@@ -217,7 +217,6 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherRad7;
-- (void) shipTemps;
 - (void) dumpUserValues;
 - (void) saveUser;
 - (void) pollHardware;
