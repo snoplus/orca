@@ -426,6 +426,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SqlDBQueue);
 	return [[ORSqlDBQueue sharedSqlDBQueue] addOperation:anOp];
 }
 
++ (NSUInteger) operationCount
+{
+	return 	[[ORSqlDBQueue sharedSqlDBQueue] operationCount];
+}
+
 //don't call this unless you're using this class in a special, non-global way.
 - (id) init
 {
@@ -442,5 +447,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SqlDBQueue);
 - (void) addOperation:(NSOperation*)anOp
 {
 	[queue addOperation:anOp];
+}
+- (NSInteger) operationCount
+{
+	return [[queue operations]count];
 }
 @end

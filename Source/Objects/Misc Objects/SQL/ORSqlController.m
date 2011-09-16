@@ -21,6 +21,7 @@
 
 #import "ORSqlController.h"
 #import "ORSqlModel.h"
+#import "ORSqlConnection.h"
 
 @implementation ORSqlController
 
@@ -34,11 +35,13 @@
 - (void) dealloc
 {
     [super dealloc];
+	[[[ORSqlDBQueue sharedSqlDBQueue] queue] removeObserver:self forKeyPath:@"operationCount"];
 }
 
 -(void) awakeFromNib
 {
 	[super awakeFromNib];
+	[[[ORSqlDBQueue sharedSqlDBQueue]queue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
 }
 
 
@@ -101,6 +104,30 @@
 	[self connectionValidChanged:nil];
     [self sqlLockChanged:nil];
 	[self stealthModeChanged:nil];
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
+                         change:(NSDictionary *)change context:(void *)context
+{
+	NSOperationQueue* queue = [[ORSqlDBQueue sharedSqlDBQueue] queue];
+    if (object == queue && [keyPath isEqual:@"operationCount"]) {
+		NSNumber* n = [NSNumber numberWithInt:[[[ORSqlDBQueue queue] operations] count]];
+		[self performSelectorOnMainThread:@selector(setQueCount:) withObject:n waitUntilDone:NO];
+    }
+    else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+- (void) setQueCount:(NSNumber*)n
+{
+	queueCount = [n intValue];
+	[queueValueBar setNeedsDisplay:YES];
+}
+
+- (double) doubleValue
+{
+	return queueCount;
 }
 
 - (void) stealthModeChanged:(NSNotification*)aNote

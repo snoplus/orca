@@ -64,7 +64,10 @@
 + (ORSqlDBQueue*) sharedSqlDBQueue;
 + (void) addOperation:(NSOperation*)anOp;
 + (NSOperationQueue*) queue;
++ (NSUInteger) operationCount;
 - (void) addOperation:(NSOperation*)anOp;
 - (NSOperationQueue*) queue;
+- (NSInteger) operationCount;
+
 @end
 
