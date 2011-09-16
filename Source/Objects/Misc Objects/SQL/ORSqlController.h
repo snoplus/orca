@@ -45,6 +45,7 @@
 - (void) sqlLockChanged:(NSNotification*)aNote;
 - (void) connectionValidChanged:(NSNotification*)aNote;
 - (void) updateConnectionValidField;
+- (void) setQueCount:(NSNumber*)n;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) stealthModeAction:(id)sender;
