@@ -2211,7 +2211,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 			  shift:(int) shift
 				  n:(int) n 
 {
-	int i, j;
+	unsigned int i, j;
 	
 	// Check for errors
 	for (i=0;i<n;i++) {
