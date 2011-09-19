@@ -20,6 +20,9 @@
 #pragma mark ***Imported Files
 
 @class ORSerialPort;
+#define kMet237Counting  0
+#define kMet237Holding   1
+#define kMet237Stopped   2
 
 @interface ORMet237Model : OrcaObject
 {
@@ -36,7 +39,17 @@
 		unsigned int    currentRequest;
 		unsigned int    waitTime;
 		unsigned int    expectedCount;
-	int count; //temp
+		NSString* measurementDate;
+		float size1;
+		float size2;
+		int count1;
+		int count2;
+		int countingMode;
+		int cycleDuration;
+		BOOL running;
+		NSCalendarDate* cycleStarted;
+		NSCalendarDate* cycleWillEnd;
+		int cycleNumber;
 }
 
 #pragma mark ***Initialization
@@ -46,6 +59,28 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (int) cycleNumber;
+- (void) setCycleNumber:(int)aCycleNumber;
+- (NSCalendarDate*) cycleWillEnd;
+- (void) setCycleWillEnd:(NSCalendarDate*)aCycleWillEnd;
+- (NSCalendarDate*) cycleStarted;
+- (void) setCycleStarted:(NSCalendarDate*)aCycleStarted;
+- (BOOL) running;
+- (void) setRunning:(BOOL)aRunning;
+- (int) cycleDuration;
+- (void) setCycleDuration:(int)aCycleDuration;
+- (int) countingMode;
+- (void) setCountingMode:(int)aCountingMode;
+- (int) count2;
+- (void) setCount2:(int)aCount2;
+- (int) count1;
+- (void) setCount1:(int)aCount1;
+- (float) size2;
+- (void) setSize2:(float)aSize2;
+- (float) size1;
+- (void) setSize1:(float)aSize1;
+- (NSString*) measurementDate;
+- (void) setMeasurementDate:(NSString*)aMeasurementDate;
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (ORSerialPort*) serialPort;
@@ -58,9 +93,12 @@
 - (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured;
+- (NSString*) countingModeString;
 
-#pragma mark ***Data Records
+#pragma mark ***Polling
 - (void) pollHardware;
+- (void) startCycle;
+- (void) stopCycle;
 
 #pragma mark ***Commands
 - (void) addCmdToQueue:(NSString*)aCmd;
@@ -85,6 +123,17 @@
 - (void) universalSelect;			
 @end
 
+extern NSString* ORMet237ModelCycleNumberChanged;
+extern NSString* ORMet237ModelCycleWillEndChanged;
+extern NSString* ORMet237ModelCycleStartedChanged;
+extern NSString* ORMet237ModelRunningChanged;
+extern NSString* ORMet237ModelCycleDurationChanged;
+extern NSString* ORMet237ModelCountingModeChanged;
+extern NSString* ORMet237ModelCount2Changed;
+extern NSString* ORMet237ModelCount1Changed;
+extern NSString* ORMet237ModelSize2Changed;
+extern NSString* ORMet237ModelSize1Changed;
+extern NSString* ORMet237ModelMeasurementDateChanged;
 extern NSString* ORMet237ModelPollTimeChanged;
 extern NSString* ORMet237ModelSerialPortChanged;
 extern NSString* ORMet237Lock;

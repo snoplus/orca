@@ -84,9 +84,60 @@
                        object : nil];
                                               
     [notifyCenter addObserver : self
-                     selector : @selector(pollTimeChanged:)
-                         name : ORMet237ModelPollTimeChanged
-                       object : nil];
+                     selector : @selector(measurementDateChanged:)
+                         name : ORMet237ModelMeasurementDateChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(size1Changed:)
+                         name : ORMet237ModelSize1Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(size2Changed:)
+                         name : ORMet237ModelSize2Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(count1Changed:)
+                         name : ORMet237ModelCount1Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(count2Changed:)
+                         name : ORMet237ModelCount2Changed
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(countingModeChanged:)
+                         name : ORMet237ModelCountingModeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cycleDurationChanged:)
+                         name : ORMet237ModelCycleDurationChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runningChanged:)
+                         name : ORMet237ModelRunningChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cycleStartedChanged:)
+                         name : ORMet237ModelCycleStartedChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cycleWillEndChanged:)
+                         name : ORMet237ModelCycleWillEndChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cycleNumberChanged:)
+                         name : ORMet237ModelCycleNumberChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -95,16 +146,82 @@
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
-	[self pollTimeChanged:nil];
+	[self measurementDateChanged:nil];
+	[self size1Changed:nil];
+	[self size2Changed:nil];
+	[self count1Changed:nil];
+	[self count2Changed:nil];
+	[self countingModeChanged:nil];
+	[self cycleDurationChanged:nil];
+	[self runningChanged:nil];
+	[self cycleStartedChanged:nil];
+	[self cycleWillEndChanged:nil];
+	[self cycleNumberChanged:nil];
 }
 
-
-
-- (void) statusChanged:(NSNotification*)aNote
-{	
-
+- (void) cycleStartedChanged:(NSNotification*)aNote
+{
+	
+	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+	NSString* dateString = [dateFormatter stringFromDate:[model cycleStarted]];
+	
+	[dateFormatter release];
+	[cycleStartedField setStringValue:dateString];
+	
 }
 
+- (void) cycleWillEndChanged:(NSNotification*)aNote
+{
+	NSDate* now = [NSDate date];
+	NSDate* timeCycleWillEnd = [model cycleWillEnd];
+	NSTimeInterval  timeLeft = [timeCycleWillEnd timeIntervalSinceDate:now];
+	[timeLeftInCycleField setIntValue:(int)ceil(timeLeft)];
+}
+
+- (void) cycleNumberChanged:(NSNotification*)aNote
+{
+	[cycleNumberField setIntValue: [model cycleNumber]];
+}
+
+- (void) runningChanged:(NSNotification*)aNote
+{
+	[self updateButtons];
+}
+
+- (void) cycleDurationChanged:(NSNotification*)aNote
+{
+	[cycleDurationPU selectItemWithTag: [model cycleDuration]];
+}
+
+- (void) countingModeChanged:(NSNotification*)aNote
+{
+	[countingModeTextField setStringValue: [model countingModeString]];
+}
+
+- (void) count2Changed:(NSNotification*)aNote
+{
+	[count2TextField setIntValue: [model count2]];
+}
+
+- (void) count1Changed:(NSNotification*)aNote
+{
+	[count1TextField setIntValue: [model count1]];
+}
+
+- (void) size2Changed:(NSNotification*)aNote
+{
+	[size2TextField setFloatValue: [model size2]];
+}
+
+- (void) size1Changed:(NSNotification*)aNote
+{
+	[size1TextField setFloatValue: [model size1]];
+}
+
+- (void) measurementDateChanged:(NSNotification*)aNote
+{
+	[measurementDateTextField setStringValue: [model measurementDate]];
+}
 
 - (void) checkGlobalSecurity
 {
@@ -120,22 +237,32 @@
 
 - (void) updateButtons
 {
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMet237Lock];
     BOOL locked = [gSecurity isLocked:ORMet237Lock];
 
     [lockButton setState: locked];
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
-    [pollTimePopup setEnabled:!locked];
     
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORMet237Lock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
-
+	if(!locked){
+		[startCycleButton setEnabled:![model running]];
+		[stopCycleButton setEnabled:[model running]];
+	}
+	else {
+		[startCycleButton setEnabled:NO];
+		[stopCycleButton setEnabled:NO];
+	}
+	if([model running]){
+		NSDate* now = [NSDate date];
+		NSDate* timeCycleWillEnd = [model cycleWillEnd];
+		NSTimeInterval  timeLeft = [timeCycleWillEnd timeIntervalSinceDate:now];
+		[timeLeftInCycleField setIntValue:(int)ceil(timeLeft)];
+		
+	}
+	else {
+		[timeLeftInCycleField setStringValue:@"---"];
+		[cycleStartedField setStringValue:@"---"];
+	}
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -164,11 +291,6 @@
     }
 }
 
-- (void) pollTimeChanged:(NSNotification*)aNotification
-{
-	[pollTimePopup selectItemWithTag:[model pollTime]];
-}
-
 - (void) portNameChanged:(NSNotification*)aNotification
 {
     NSString* portName = [model portName];
@@ -188,6 +310,20 @@
 
 
 #pragma mark ***Actions
+- (IBAction) startCycleAction:(id)sender
+{
+	[model startCycle];	
+}
+
+- (IBAction) stopCycleAction:(id)sender
+{
+	[model stopCycle];	
+}
+
+- (IBAction) cycleDurationAction:(id)sender
+{
+	[model setCycleDuration:[[sender selectedItem]tag]];	
+}
 
 - (IBAction) lockAction:(id) sender
 {
@@ -202,11 +338,6 @@
 - (IBAction) openPortAction:(id)sender
 {
     [model openPort:![[model serialPort] isOpen]];
-}
-
-- (IBAction) pollTimeAction:(id)sender
-{
-	[model setPollTime:[[sender selectedItem] tag]];
 }
 
 - (IBAction) initAction:(id)sender
@@ -247,7 +378,7 @@
 	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
 	ORSerialPort *aPort;
     [portListPopup removeAllItems];
-    [portListPopup addItemWithTitle:@"--"];
+    [portListPopup addItemWithTitle:@"---"];
 
 	while (aPort = [enumerator nextObject]) {
         [portListPopup addItemWithTitle:[aPort name]];

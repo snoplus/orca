@@ -23,14 +23,28 @@
 @interface ORMet237Controller : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
+	IBOutlet   NSTextField* countingModeTextField;
+	IBOutlet   NSTextField* count2TextField;
+	IBOutlet   NSTextField* count1TextField;
+	IBOutlet   NSTextField* size2TextField;
+	IBOutlet   NSTextField* size1TextField;
+	IBOutlet   NSTextField* measurementDateTextField;
 
     IBOutlet NSButton*      lockButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSTextField*   timeField;
 	IBOutlet NSButton*		initHWButton;
+
+	IBOutlet NSPopUpButton* cycleDurationPU;
+    IBOutlet NSButton*      startCycleButton;
+    IBOutlet NSButton*      stopCycleButton;
+    IBOutlet NSTextField*   timeLeftInCycleField;
+    IBOutlet NSTextField*   cycleNumberField;
+	IBOutlet NSTextField*	cycleWillEndField;
+	IBOutlet NSTextField*	cycleStartedField;
+	IBOutlet NSTextField*	runningTextField;
 }
 
 #pragma mark ***Initialization
@@ -43,24 +57,35 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) cycleNumberChanged:(NSNotification*)aNote;
+- (void) cycleWillEndChanged:(NSNotification*)aNote;
+- (void) cycleStartedChanged:(NSNotification*)aNote;
+- (void) runningChanged:(NSNotification*)aNote;
+- (void) cycleDurationChanged:(NSNotification*)aNote;
+- (void) countingModeChanged:(NSNotification*)aNote;
+- (void) count2Changed:(NSNotification*)aNote;
+- (void) count1Changed:(NSNotification*)aNote;
+- (void) size2Changed:(NSNotification*)aNote;
+- (void) size1Changed:(NSNotification*)aNote;
+- (void) measurementDateChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
-- (void) pollTimeChanged:(NSNotification*)aNote;
-- (void) statusChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
-- (IBAction) pollTimeAction:(id)sender;
 - (IBAction) initAction:(id)sender;
 - (IBAction) startCountingAction:(id)sender;
 - (IBAction) stopCountingAction:(id)sender;
 - (IBAction) readRecordAction:(id)sender;
 - (IBAction) clearBufferAction:(id)sender;
 - (IBAction) getNumberRecordsAction:(id)sender;
+- (IBAction) cycleDurationAction:(id)sender;
+- (IBAction) startCycleAction:(id)sender;
+- (IBAction) stopCycleAction:(id)sender;
 @end
 
 
