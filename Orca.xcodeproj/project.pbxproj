@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -472,6 +472,12 @@
 		841922810F0BC1E300EF1C1C /* ScriptIDE.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841922800F0BC1E300EF1C1C /* ScriptIDE.nib */; };
 		841924490F0BD91A00EF1C1C /* ScriptRunning.tif in Resources */ = {isa = PBXBuildFile; fileRef = 841924480F0BD91A00EF1C1C /* ScriptRunning.tif */; };
 		841B061B0EC4837000B6F77C /* SupportedUSBDevices.h in Headers */ = {isa = PBXBuildFile; fileRef = 841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */; };
+		841C4DF5141FA72800F95B50 /* Met237.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841C4DEF141FA72800F95B50 /* Met237.nib */; };
+		841C4DF6141FA72800F95B50 /* Met237.tif in Resources */ = {isa = PBXBuildFile; fileRef = 841C4DF0141FA72800F95B50 /* Met237.tif */; };
+		841C4DF7141FA72800F95B50 /* ORMet237Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 841C4DF1141FA72800F95B50 /* ORMet237Controller.h */; };
+		841C4DF8141FA72800F95B50 /* ORMet237Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C4DF2141FA72800F95B50 /* ORMet237Controller.m */; };
+		841C4DF9141FA72800F95B50 /* ORMet237Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 841C4DF3141FA72800F95B50 /* ORMet237Model.h */; };
+		841C4DFA141FA72800F95B50 /* ORMet237Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C4DF4141FA72800F95B50 /* ORMet237Model.m */; };
 		841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */; };
 		841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */; };
 		841DA00A0780D7CA0099BBF6 /* ORTRS1Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 841DA0080780D7CA0099BBF6 /* ORTRS1Model.h */; };
@@ -3269,6 +3275,12 @@
 		841922800F0BC1E300EF1C1C /* ScriptIDE.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ScriptIDE.nib; path = "Source/Main Dialogs/CommandCenter/Scripting/ScriptIDE.nib"; sourceTree = SOURCE_ROOT; };
 		841924480F0BD91A00EF1C1C /* ScriptRunning.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ScriptRunning.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/ScriptRunning.tif"; sourceTree = SOURCE_ROOT; };
 		841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedUSBDevices.h; sourceTree = "<group>"; };
+		841C4DEF141FA72800F95B50 /* Met237.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Met237.nib; path = Source/Objects/Hardware/Serial/Met237/Met237.nib; sourceTree = SOURCE_ROOT; };
+		841C4DF0141FA72800F95B50 /* Met237.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Met237.tif; path = Source/Objects/Hardware/Serial/Met237/Met237.tif; sourceTree = SOURCE_ROOT; };
+		841C4DF1141FA72800F95B50 /* ORMet237Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMet237Controller.h; path = Source/Objects/Hardware/Serial/Met237/ORMet237Controller.h; sourceTree = SOURCE_ROOT; };
+		841C4DF2141FA72800F95B50 /* ORMet237Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMet237Controller.m; path = Source/Objects/Hardware/Serial/Met237/ORMet237Controller.m; sourceTree = SOURCE_ROOT; };
+		841C4DF3141FA72800F95B50 /* ORMet237Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMet237Model.h; path = Source/Objects/Hardware/Serial/Met237/ORMet237Model.h; sourceTree = SOURCE_ROOT; };
+		841C4DF4141FA72800F95B50 /* ORMet237Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMet237Model.m; path = Source/Objects/Hardware/Serial/Met237/ORMet237Model.m; sourceTree = SOURCE_ROOT; };
 		841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Controller.m; sourceTree = SOURCE_ROOT; };
 		841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Model.m; sourceTree = SOURCE_ROOT; };
 		841DA0080780D7CA0099BBF6 /* ORTRS1Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTRS1Model.h; sourceTree = "<group>"; };
@@ -6529,6 +6541,20 @@
 			path = "Source/Objects/Custom Hardware/Ncd Hardware/PulserDistrib";
 			sourceTree = SOURCE_ROOT;
 		};
+		841C4DEE141FA72800F95B50 /* Met237 */ = {
+			isa = PBXGroup;
+			children = (
+				841C4DEF141FA72800F95B50 /* Met237.nib */,
+				841C4DF0141FA72800F95B50 /* Met237.tif */,
+				841C4DF1141FA72800F95B50 /* ORMet237Controller.h */,
+				841C4DF2141FA72800F95B50 /* ORMet237Controller.m */,
+				841C4DF3141FA72800F95B50 /* ORMet237Model.h */,
+				841C4DF4141FA72800F95B50 /* ORMet237Model.m */,
+			);
+			name = Met237;
+			path = Source/Objects/Hardware/Serial/Met237;
+			sourceTree = SOURCE_ROOT;
+		};
 		841DA0050780D7CA0099BBF6 /* Camac */ = {
 			isa = PBXGroup;
 			children = (
@@ -7330,6 +7356,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				841C4DEE141FA72800F95B50 /* Met237 */,
 				847F947213D4AA31006B06B4 /* Rad7 */,
 				8435AAC110C6D0EF00E03F7F /* VarianTPS */,
 				84B28CEF0F4C5DBB00E2B056 /* Ami286 */,
@@ -12407,6 +12434,8 @@
 				8461653713A259BD00D8B852 /* ORCVCfdLedModel.h in Headers */,
 				847F947B13D4AA31006B06B4 /* ORRad7Controller.h in Headers */,
 				847F947F13D4AA31006B06B4 /* ORRad7Model.h in Headers */,
+				841C4DF7141FA72800F95B50 /* ORMet237Controller.h in Headers */,
+				841C4DF9141FA72800F95B50 /* ORMet237Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13192,6 +13221,8 @@
 				8483D3B9139FAAB8000C8901 /* CV895.nib in Resources */,
 				847F948113D4AA31006B06B4 /* Rad7.nib in Resources */,
 				847F948213D4AA31006B06B4 /* Rad7.tif in Resources */,
+				841C4DF5141FA72800F95B50 /* Met237.nib in Resources */,
+				841C4DF6141FA72800F95B50 /* Met237.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14080,6 +14111,8 @@
 				8461653813A259BD00D8B852 /* ORCVCfdLedModel.m in Sources */,
 				847F947C13D4AA31006B06B4 /* ORRad7Controller.m in Sources */,
 				847F948013D4AA31006B06B4 /* ORRad7Model.m in Sources */,
+				841C4DF8141FA72800F95B50 /* ORMet237Controller.m in Sources */,
+				841C4DFA141FA72800F95B50 /* ORMet237Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14207,6 +14240,7 @@
 				" CFBundlerHelpBookFolder" = OrcaHelp;
 				ARCHS = "$(NATIVE_ARCH)";
 				CFBundleHelpBookName = OrcaHelp;
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "";
 				DEAD_CODE_STRIPPING = NO;
@@ -14276,8 +14310,7 @@
 		84F201BC0B6531990084F4C3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
 				CFBundlerHelpBookFolder = OrcaHelp;
 				COPY_PHASE_STRIP = NO;
@@ -14343,8 +14376,7 @@
 		84F201BD0B6531990084F4C3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -14409,6 +14441,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
 				GCC_VERSION = "";
@@ -14435,6 +14468,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = "";
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				SDKROOT = "";
@@ -14444,12 +14478,10 @@
 		84F201C00B6531990084F4C3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = "";
 			};
@@ -14462,7 +14494,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx10.5;
 			};
 			name = Default;
 		};
