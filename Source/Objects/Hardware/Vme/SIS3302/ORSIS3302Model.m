@@ -2821,11 +2821,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     theController   = [self adapter];
     
 	[self reset];
-	
-    if([[userInfo objectForKey:@"doinit"]intValue]){
-		[self initBoard];
-	}
-	
+	[self initBoard];
+
 	[self setLed:YES];
 	[self clearTimeStamp];
 	
