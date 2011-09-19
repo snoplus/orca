@@ -34,7 +34,6 @@
 		NSString*		lastRequest;
 		NSMutableArray* cmdQueue;
 		unsigned long	timeMeasured;
-		int				pollTime;
         NSMutableString* buffer;
 		unsigned int    currentRequest;
 		unsigned int    waitTime;
@@ -81,8 +80,6 @@
 - (void) setSize1:(float)aSize1;
 - (NSString*) measurementDate;
 - (void) setMeasurementDate:(NSString*)aMeasurementDate;
-- (int) pollTime;
-- (void) setPollTime:(int)aPollTime;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
@@ -96,7 +93,6 @@
 - (NSString*) countingModeString;
 
 #pragma mark ***Polling
-- (void) pollHardware;
 - (void) startCycle;
 - (void) stopCycle;
 

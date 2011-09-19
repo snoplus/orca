@@ -322,7 +322,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 
 - (NSString*) portName
 {
-    return portName;
+	if(!portName)return @"";
+    else return portName;
 }
 
 - (void) setPortName:(NSString*)aPortName
@@ -438,15 +439,6 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) universalSelect			{ [self addCmdToQueue:@"U"]; }
 
 #pragma mark ***Polling and Cycles
-- (void) pollHardware
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	if(pollTime){
-		[self getMode];
-		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-	}
-}
-
 - (void) startCycle
 {
 	if(![self running]){
@@ -488,7 +480,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 			[self setCycleNumber:theCount+1];
 			[self stopCounting];
 			[self getRecord];
-			[self startCounting];
+			[self startCountingByComputer];
 			[self setCycleWillEnd:[now dateByAddingTimeInterval:[self cycleDuration]*60]]; 
 		}
 	}
