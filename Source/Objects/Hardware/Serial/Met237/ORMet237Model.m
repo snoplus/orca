@@ -455,8 +455,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		NSCalendarDate* now = [NSCalendarDate date];
 		[self setCycleStarted:now];
 		[self setCycleWillEnd:[now dateByAddingTimeInterval:[self cycleDuration]*60]]; 
-		//[self clearBuffer];
-		//[self startCountingByComputer];
+		[self clearBuffer];
+		[self startCountingByComputer];
 		[self checkCycle];
 	}
 }
@@ -467,10 +467,9 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCycle) object:nil];
 		[self setRunning:NO];
 		[self setCycleNumber:0];
-		//[self stopCounting];
+		[self stopCounting];
 	}
 }
-
 @end
 
 @implementation ORMet237Model (private)
@@ -481,15 +480,15 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		NSDate* now = [NSDate date];
 		if([cycleWillEnd timeIntervalSinceDate:now] >= 0){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCycleWillEndChanged object:self];
-			//[self getMode];
+			[self getMode];
 			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:1];
 		}
 		else {
 			int theCount = [self cycleNumber];
 			[self setCycleNumber:theCount+1];
-			//[self stopCounting];
-			//[self getRecord];
-			//[self startCounting];
+			[self stopCounting];
+			[self getRecord];
+			[self startCounting];
 			[self setCycleWillEnd:[now dateByAddingTimeInterval:[self cycleDuration]*60]]; 
 		}
 	}
