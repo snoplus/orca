@@ -166,7 +166,8 @@
 	NSString* dateString = [dateFormatter stringFromDate:[model cycleStarted]];
 	
 	[dateFormatter release];
-	[cycleStartedField setStringValue:dateString];
+	if(dateString) [cycleStartedField setStringValue:dateString];
+	else [cycleStartedField setStringValue:@"---"];
 	
 }
 
