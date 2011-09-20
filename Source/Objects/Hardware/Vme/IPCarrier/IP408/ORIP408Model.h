@@ -21,18 +21,13 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORVmeIPCard.h"
 #import "ORBitProcessing.h"
-#import "ORDataTaker.h"
-#import "ORTriggerProtocols.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
-@class ORReadOutList;
-@class ORTriggerLogic;
 
-@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing,ORDataTaker,TriggerControllingIO,TriggerLogicIn,TriggerLogicOut>
+@interface ORIP408Model :  ORVmeIPCard <ORBitProcessing>
 {
 	@private
-		unsigned long   dataId;
 		unsigned long writeMask;
 		unsigned long readMask;
 		unsigned long writeValue;
@@ -44,12 +39,6 @@
 		unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
 		unsigned long processOutputValue; //outputs to be written at end of process cycle
 		unsigned long processOutputMask;  //controlls which bits are written
-	
-		ORReadOutList*  trigger1Group;
-		NSArray*		dataTakers1;       //cache of data takers.
-		
-		//trigger Logic
-		ORTriggerLogic* triggerLogic;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -58,7 +47,6 @@
 - (void) runStopping:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
-- (NSDictionary*) dataRecordDescription;
 - (unsigned long) writeMask;
 - (void) setWriteMask:(unsigned long)aMask;
 - (unsigned long) writeValue;
@@ -67,14 +55,6 @@
 - (void) setReadMask:(unsigned long)aMask;
 - (unsigned long) readValue;
 - (void) setReadValue:(unsigned long)aValue;
-
-#pragma mark ¥¥¥Hardware Records
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) aDataId;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherCard;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) shipRecord;
 
 #pragma mark ¥¥¥Hardware Access
 - (unsigned long) getInputWithMask:(unsigned long) aChannelMask;
@@ -86,16 +66,6 @@
 - (BOOL) processValue:(int)channel;
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
-
-#pragma mark ¥¥¥The Trigger Childen
-- (ORReadOutList*) trigger1Group;
-- (void) setTrigger1Group:(ORReadOutList*)newTrigger1Group;
-- (void) saveReadOutList:(NSFileHandle*)aFile;
-- (void) loadReadOutList:(NSFileHandle*)aFile;
-
-#pragma mark ¥¥¥Trigger Controlling Protocol
-- (id) triggerChild:(int)anIndex;
-
 
 @end
 

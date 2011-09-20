@@ -22,7 +22,6 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORIP408Controller.h"
 #import "ORIP408Model.h"
-#import "ORTriggerLogicView.h"
 
 
 #pragma mark ¥¥¥Definitions

@@ -23,11 +23,8 @@
 #import "ORIP408Model.h"
 #import "ORIPCarrierModel.h"
 #import "ORVmeCrateModel.h"
-#import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ObjectFactory.h"
-#import "ORReadOutList.h"
-#import "ORTriggerLogic.h"
 
 #define kORIP408RecordLength 7
 
@@ -67,9 +64,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     [[self undoManager] enableUndoRegistration];
 	[self registerNotificationObservers];
 	
-	ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"Trigger Group"];
-    [self setTrigger1Group:r1];
-    [r1 release];
 	
     return self;
 }
@@ -77,7 +71,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 -(void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    [trigger1Group release];    
     [hwLock release];
     [super dealloc];
 }
@@ -95,16 +88,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 - (NSString*) helpURL
 {
 	return @"VME/IP408.html";
-}
-- (ORReadOutList*) trigger1Group
-{
-    return trigger1Group;
-}
-
-- (void) setTrigger1Group:(ORReadOutList*)newTrigger1Group
-{
-    [trigger1Group autorelease];
-    trigger1Group=[newTrigger1Group retain];
 }
 
 
@@ -160,105 +143,8 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	[hwLock unlock];	
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	triggerLogic = [[ORTriggerLogicIO alloc] initWithDelegate:self];
-	
-	dataTakers1 = [[trigger1Group allObjects] retain];	//cache of data takers.
-	for (id obj in dataTakers1){
-		[obj runTaskStarted:aDataPacket userInfo:userInfo];
-	}
-}
-
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	[triggerLogic evaluate:aDataPacket userInfo:userInfo];	 
-}
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-
-	for (id obj in dataTakers1){
-		[obj runTaskStopped:aDataPacket userInfo:userInfo];
-	}
-	[dataTakers1 release];
-	[triggerLogic release];
-	triggerLogic = nil;
-}
-
-- (id) triggerChild:(int)anIndex
-{
-	if(anIndex<[dataTakers1 count]) {
-		return [dataTakers1 objectAtIndex:anIndex];
-	}
-	else return nil;
-}
-
-- (void) reset
-{
-	//for the protocol
-}
-
-- (NSMutableArray*) children {
-    //methods exists to give common interface across all objects for display in lists
-    return [NSMutableArray arrayWithObjects:trigger1Group,nil];
-}
-- (void) saveReadOutList:(NSFileHandle*)aFile
-{
-    [trigger1Group saveUsingFile:aFile];
-}
-
-- (void) loadReadOutList:(NSFileHandle*)aFile
-{
-    [self setTrigger1Group:[[[ORReadOutList alloc] initWithIdentifier:@"NestedRead"]autorelease]];
-    [trigger1Group loadUsingFile:aFile];
-}
 
 #pragma mark ¥¥¥Accessors
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) aDataId
-{
-    dataId = aDataId;
-}
-
-- (void) setDataIds:(id)assigner
-{
-    dataId			= [assigner assignDataIds:kLongForm];
-}
-
-- (void) syncDataIdsWith:(id)anotherCard
-{
-    [self setDataId:[anotherCard dataId]];
-}
-
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP408"];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORIP408DecoderForValues",					@"decoder",
-								 [NSNumber numberWithLong:dataId],              @"dataId",
-								 [NSNumber numberWithBool:NO],                  @"variable",
-								 [NSNumber numberWithLong:kORIP408RecordLength],@"length",
-								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"IP408Values"];
-	
-
-    return dataDictionary;
-}
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
-{	
-	NSMutableArray* eventGroup1 = [NSMutableArray array];
-	NSMutableDictionary* aNestedDictionary = [NSMutableDictionary dictionary];
-	[trigger1Group appendEventDictionary:aNestedDictionary topLevel:topLevel];
-	if([aNestedDictionary count])[eventGroup1 addObject:aNestedDictionary];
-	
-	[anEventDictionary setObject:eventGroup1 forKey:@"ORIP408 Trigger1"];
-}
 
 
 - (unsigned long) writeMask
@@ -380,32 +266,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	[hwLock unlock];
 }
 
-- (void) shipRecord
-{
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-	
-	if(runInProgress){
-		unsigned long data[kORIP408RecordLength];
-		
-		data[0] = dataId | kORIP408RecordLength;
-		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
-		
-		//get the time(UT!)
-		time_t	ut_time;
-		time(&ut_time);
-		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		//time_t ut_time = mktime(theTimeGMTAsStruct);
-		data[2] = ut_time;	//seconds since 1970
-		data[3]	= writeMask;	
-		data[4]	= readMask;	
-		data[5]	= writeValue;	
-		data[6]	= readValue;	
-		
-		//the full record goes into the data stream via a notification
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:kORIP408RecordLength*sizeof(long)]];
-	}
-}
 
 #pragma mark ¥¥¥Archival
 static NSString *ORIP408WriteMask 		= @"IP408 WriteMask";
@@ -421,7 +281,6 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
     [self setWriteMask:[decoder decodeIntForKey:ORIP408WriteMask]];
     [self setReadMask:[decoder decodeIntForKey:ORIP408ReadMask]];
     [self setWriteValue:[decoder decodeIntForKey:ORIP408WriteValue]];
-	[self setTrigger1Group:[decoder decodeObjectForKey:@"trigger1Group"]];
    
     [[self undoManager] enableUndoRegistration];
     
@@ -438,7 +297,6 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
     [encoder encodeInt:[self writeMask] forKey:ORIP408WriteMask];
     [encoder encodeInt:[self readMask] forKey:ORIP408ReadMask];
     [encoder encodeInt:[self writeValue] forKey:ORIP408WriteValue];
-    [encoder encodeObject:[self trigger1Group] forKey:@"trigger1Group"];
 }
 
 #pragma mark ¥¥¥Bit Processing Protocol

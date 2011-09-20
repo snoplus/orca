@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -301,20 +301,6 @@
 		84098F5C0F964F0100036BE8 /* PDcu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84098F540F964F0100036BE8 /* PDcu.nib */; };
 		84098F5D0F964F0100036BE8 /* PDcu.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84098F550F964F0100036BE8 /* PDcu.tif */; };
 		84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84098F6E0F96589B00036BE8 /* Turbo.gif */; };
-		840AC2EE12635082007B6CAF /* LogicInBit.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2E812635081007B6CAF /* LogicInBit.nib */; };
-		840AC2EF12635082007B6CAF /* LogicInBit.png in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2E912635081007B6CAF /* LogicInBit.png */; };
-		840AC2F012635082007B6CAF /* ORLogicInBitController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2EA12635081007B6CAF /* ORLogicInBitController.h */; };
-		840AC2F112635082007B6CAF /* ORLogicInBitController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2EB12635081007B6CAF /* ORLogicInBitController.m */; };
-		840AC2F212635082007B6CAF /* ORLogicInBitModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2EC12635081007B6CAF /* ORLogicInBitModel.h */; };
-		840AC2F312635082007B6CAF /* ORLogicInBitModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2ED12635081007B6CAF /* ORLogicInBitModel.m */; };
-		840AC2FB12635089007B6CAF /* LogicOutBit.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2F512635089007B6CAF /* LogicOutBit.nib */; };
-		840AC2FC12635089007B6CAF /* LogicOutBit.png in Resources */ = {isa = PBXBuildFile; fileRef = 840AC2F612635089007B6CAF /* LogicOutBit.png */; };
-		840AC2FD12635089007B6CAF /* ORLogicOutBitController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2F712635089007B6CAF /* ORLogicOutBitController.h */; };
-		840AC2FE12635089007B6CAF /* ORLogicOutBitController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2F812635089007B6CAF /* ORLogicOutBitController.m */; };
-		840AC2FF12635089007B6CAF /* ORLogicOutBitModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC2F912635089007B6CAF /* ORLogicOutBitModel.h */; };
-		840AC30012635089007B6CAF /* ORLogicOutBitModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC2FA12635089007B6CAF /* ORLogicOutBitModel.m */; };
-		840AC4A112635F15007B6CAF /* ORTGates.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC49F12635F15007B6CAF /* ORTGates.h */; };
-		840AC4A212635F15007B6CAF /* ORTGates.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC4A012635F15007B6CAF /* ORTGates.m */; };
 		840AC59812638B5D007B6CAF /* nTPCPadPlaneView.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AC59612638B5D007B6CAF /* nTPCPadPlaneView.h */; };
 		840AC59912638B5D007B6CAF /* nTPCPadPlaneView.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AC59712638B5D007B6CAF /* nTPCPadPlaneView.m */; };
 		840AC63712639B92007B6CAF /* nTPCPadPositions.txt in Resources */ = {isa = PBXBuildFile; fileRef = 840AC63612639B92007B6CAF /* nTPCPadPositions.txt */; };
@@ -965,14 +951,6 @@
 		8435AAD410C6D0EF00E03F7F /* VarianTPS.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8435AACA10C6D0EF00E03F7F /* VarianTPS.nib */; };
 		8435AAD510C6D0EF00E03F7F /* VarianTPS.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8435AACB10C6D0EF00E03F7F /* VarianTPS.tif */; };
 		8435AD2610C6F0F400E03F7F /* Varian.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8435AD2510C6F0F400E03F7F /* Varian.gif */; };
-		8437495A1270B2AD0027B507 /* LogicInScaler.nib in Resources */ = {isa = PBXBuildFile; fileRef = 843749541270B2AD0027B507 /* LogicInScaler.nib */; };
-		8437495B1270B2AD0027B507 /* LogicInScaler.png in Resources */ = {isa = PBXBuildFile; fileRef = 843749551270B2AD0027B507 /* LogicInScaler.png */; };
-		8437495C1270B2AD0027B507 /* ORLogicInScalerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843749561270B2AD0027B507 /* ORLogicInScalerController.h */; };
-		8437495D1270B2AD0027B507 /* ORLogicInScalerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 843749571270B2AD0027B507 /* ORLogicInScalerController.m */; };
-		8437495E1270B2AD0027B507 /* ORLogicInScalerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843749581270B2AD0027B507 /* ORLogicInScalerModel.h */; };
-		8437495F1270B2AD0027B507 /* ORLogicInScalerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843749591270B2AD0027B507 /* ORLogicInScalerModel.m */; };
-		843749631270B2C00027B507 /* ORLogicScalerShipModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843749611270B2C00027B507 /* ORLogicScalerShipModel.h */; };
-		843749641270B2C00027B507 /* ORLogicScalerShipModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843749621270B2C00027B507 /* ORLogicScalerShipModel.m */; };
 		8438002F0AB23EC20069C0BA /* ORRangeTimerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843800290AB23EC20069C0BA /* ORRangeTimerController.h */; };
 		843800300AB23EC20069C0BA /* ORRangeTimerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438002A0AB23EC20069C0BA /* ORRangeTimerController.m */; };
 		843800310AB23EC20069C0BA /* ORRangeTimerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8438002B0AB23EC20069C0BA /* ORRangeTimerModel.h */; };
@@ -1881,23 +1859,6 @@
 		84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AD4C2D0BA21B7A003C7ABE /* ORWindowListController.h */; };
 		84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */; };
 		84AD4CD70BA23300003C7ABE /* WindowList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */; };
-		84AE7BA412662D34003F7194 /* ORTriggerProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AE7BA312662D34003F7194 /* ORTriggerProtocols.h */; };
-		84AE7C6D12664142003F7194 /* LogicSplit.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE7C6C12664142003F7194 /* LogicSplit.png */; };
-		84AE7C6F12664166003F7194 /* LogicJoin.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE7C6E12664166003F7194 /* LogicJoin.png */; };
-		84AE7D1A12673332003F7194 /* LogicPattern.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AE7D1312673332003F7194 /* LogicPattern.nib */; };
-		84AE7D1B12673332003F7194 /* LogicPattern.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE7D1412673332003F7194 /* LogicPattern.png */; };
-		84AE7D1D12673332003F7194 /* ORLogicPatternController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AE7D1612673332003F7194 /* ORLogicPatternController.h */; };
-		84AE7D1E12673332003F7194 /* ORLogicPatternController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AE7D1712673332003F7194 /* ORLogicPatternController.m */; };
-		84AE7D1F12673332003F7194 /* ORLogicPatternModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AE7D1812673332003F7194 /* ORLogicPatternModel.h */; };
-		84AE7D2012673332003F7194 /* ORLogicPatternModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AE7D1912673332003F7194 /* ORLogicPatternModel.m */; };
-		84AE7E0212674656003F7194 /* HighLatch.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE7E0112674656003F7194 /* HighLatch.png */; };
-		84AE7E3A12676531003F7194 /* LogicChildRead.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AE7E3412676531003F7194 /* LogicChildRead.nib */; };
-		84AE7E3B12676531003F7194 /* LogicChildRead.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE7E3512676531003F7194 /* LogicChildRead.png */; };
-		84AE7E3C12676531003F7194 /* ORLogicChildReadController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AE7E3612676531003F7194 /* ORLogicChildReadController.h */; };
-		84AE7E3D12676531003F7194 /* ORLogicChildReadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AE7E3712676531003F7194 /* ORLogicChildReadController.m */; };
-		84AE7E3E12676531003F7194 /* ORLogicChildReadModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AE7E3812676531003F7194 /* ORLogicChildReadModel.h */; };
-		84AE7E3F12676531003F7194 /* ORLogicChildReadModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AE7E3912676531003F7194 /* ORLogicChildReadModel.m */; };
-		84AE803212677D0B003F7194 /* LogicChildRead2.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE803112677D0B003F7194 /* LogicChildRead2.png */; };
 		84AF17521188C88500449ACE /* ORCAEN1785Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445C1187ACEE00F55216 /* ORCAEN1785Readout.cc */; };
 		84AF17531188C88500449ACE /* ORCAEN1785Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BF445D1187ACEE00F55216 /* ORCAEN1785Readout.hh */; };
 		84AFC24A1029F35E009F4139 /* downRamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AFC23E1029F35E009F4139 /* downRamp.png */; };
@@ -2256,8 +2217,6 @@
 		84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */; };
 		84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */; };
 		84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D435B60798851B003D089F /* NoCamacDriverHelp.plist */; };
-		84D5DE99125CB1BE00003496 /* ORTriggerLogicView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D5DE97125CB1BE00003496 /* ORTriggerLogicView.h */; };
-		84D5DE9A125CB1BE00003496 /* ORTriggerLogicView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D5DE98125CB1BE00003496 /* ORTriggerLogicView.m */; };
 		84D60BCB07428C7D0061F795 /* OrcaObjectController.m in Sources */ = {isa = PBXBuildFile; fileRef = F51E69EE03AE4776015F64B1 /* OrcaObjectController.m */; };
 		84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D791330FFA4CD000DC81D2 /* Keithley6487.gif */; };
 		84D7913C0FFA4CD000DC81D2 /* Keithley6487.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D791340FFA4CD000DC81D2 /* Keithley6487.nib */; };
@@ -2345,8 +2304,6 @@
 		84E2064B11AD7841007D757F /* SIS3800.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E2064311AD7841007D757F /* SIS3800.nib */; };
 		84E2064C11AD7841007D757F /* SIS3800Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84E2064411AD7841007D757F /* SIS3800Card.gif */; };
 		84E24F42093E703100E963DF /* ORBitProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E24F41093E703000E963DF /* ORBitProcessing.h */; };
-		84E583D5126882B700157240 /* ORTriggerLogic.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E583D3126882B700157240 /* ORTriggerLogic.h */; };
-		84E583D6126882B700157240 /* ORTriggerLogic.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E583D4126882B700157240 /* ORTriggerLogic.m */; };
 		84E5B23A0715C65500C7B798 /* NcdCableCheckTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */; };
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
@@ -3088,20 +3045,6 @@
 		84098F540F964F0100036BE8 /* PDcu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PDcu.nib; path = Source/Objects/Hardware/Serial/PDcu/PDcu.nib; sourceTree = SOURCE_ROOT; };
 		84098F550F964F0100036BE8 /* PDcu.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = PDcu.tif; path = Source/Objects/Hardware/Serial/PDcu/PDcu.tif; sourceTree = SOURCE_ROOT; };
 		84098F6E0F96589B00036BE8 /* Turbo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Turbo.gif; path = Source/Objects/Hardware/Serial/PDcu/Turbo.gif; sourceTree = SOURCE_ROOT; };
-		840AC2E812635081007B6CAF /* LogicInBit.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LogicInBit.nib; path = Source/Objects/TriggerSystem/Logic/LogicInBit/LogicInBit.nib; sourceTree = SOURCE_ROOT; };
-		840AC2E912635081007B6CAF /* LogicInBit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicInBit.png; path = Source/Objects/TriggerSystem/Logic/LogicInBit/LogicInBit.png; sourceTree = SOURCE_ROOT; };
-		840AC2EA12635081007B6CAF /* ORLogicInBitController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInBitController.h; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitController.h; sourceTree = SOURCE_ROOT; };
-		840AC2EB12635081007B6CAF /* ORLogicInBitController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInBitController.m; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitController.m; sourceTree = SOURCE_ROOT; };
-		840AC2EC12635081007B6CAF /* ORLogicInBitModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInBitModel.h; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitModel.h; sourceTree = SOURCE_ROOT; };
-		840AC2ED12635081007B6CAF /* ORLogicInBitModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInBitModel.m; path = Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitModel.m; sourceTree = SOURCE_ROOT; };
-		840AC2F512635089007B6CAF /* LogicOutBit.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LogicOutBit.nib; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/LogicOutBit.nib; sourceTree = SOURCE_ROOT; };
-		840AC2F612635089007B6CAF /* LogicOutBit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicOutBit.png; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/LogicOutBit.png; sourceTree = SOURCE_ROOT; };
-		840AC2F712635089007B6CAF /* ORLogicOutBitController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicOutBitController.h; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitController.h; sourceTree = SOURCE_ROOT; };
-		840AC2F812635089007B6CAF /* ORLogicOutBitController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicOutBitController.m; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitController.m; sourceTree = SOURCE_ROOT; };
-		840AC2F912635089007B6CAF /* ORLogicOutBitModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicOutBitModel.h; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitModel.h; sourceTree = SOURCE_ROOT; };
-		840AC2FA12635089007B6CAF /* ORLogicOutBitModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicOutBitModel.m; path = Source/Objects/TriggerSystem/Logic/LogicOutBit/ORLogicOutBitModel.m; sourceTree = SOURCE_ROOT; };
-		840AC49F12635F15007B6CAF /* ORTGates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTGates.h; sourceTree = "<group>"; };
-		840AC4A012635F15007B6CAF /* ORTGates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTGates.m; sourceTree = "<group>"; };
 		840AC59612638B5D007B6CAF /* nTPCPadPlaneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nTPCPadPlaneView.h; path = Source/Experiments/nTPC/nTPCPadPlaneView.h; sourceTree = SOURCE_ROOT; };
 		840AC59712638B5D007B6CAF /* nTPCPadPlaneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = nTPCPadPlaneView.m; path = Source/Experiments/nTPC/nTPCPadPlaneView.m; sourceTree = SOURCE_ROOT; };
 		840AC63612639B92007B6CAF /* nTPCPadPositions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nTPCPadPositions.txt; sourceTree = "<group>"; };
@@ -3495,14 +3438,6 @@
 		8435AACB10C6D0EF00E03F7F /* VarianTPS.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VarianTPS.tif; path = Source/Objects/Hardware/Serial/VarianTPS/VarianTPS.tif; sourceTree = SOURCE_ROOT; };
 		8435AD2510C6F0F400E03F7F /* Varian.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Varian.gif; path = Source/Objects/Hardware/Serial/VarianTPS/Varian.gif; sourceTree = SOURCE_ROOT; };
 		84368AD10471AACA005F64B1 /* HPPulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser.nib; path = Source/Objects/Hardware/GPIB/HPPulser/HPPulser.nib; sourceTree = SOURCE_ROOT; };
-		843749541270B2AD0027B507 /* LogicInScaler.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LogicInScaler.nib; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/LogicInScaler.nib; sourceTree = SOURCE_ROOT; };
-		843749551270B2AD0027B507 /* LogicInScaler.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicInScaler.png; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/LogicInScaler.png; sourceTree = SOURCE_ROOT; };
-		843749561270B2AD0027B507 /* ORLogicInScalerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInScalerController.h; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerController.h; sourceTree = SOURCE_ROOT; };
-		843749571270B2AD0027B507 /* ORLogicInScalerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInScalerController.m; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerController.m; sourceTree = SOURCE_ROOT; };
-		843749581270B2AD0027B507 /* ORLogicInScalerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicInScalerModel.h; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerModel.h; sourceTree = SOURCE_ROOT; };
-		843749591270B2AD0027B507 /* ORLogicInScalerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicInScalerModel.m; path = Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerModel.m; sourceTree = SOURCE_ROOT; };
-		843749611270B2C00027B507 /* ORLogicScalerShipModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicScalerShipModel.h; path = Source/Objects/TriggerSystem/Logic/LogicScalerShip/ORLogicScalerShipModel.h; sourceTree = SOURCE_ROOT; };
-		843749621270B2C00027B507 /* ORLogicScalerShipModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicScalerShipModel.m; path = Source/Objects/TriggerSystem/Logic/LogicScalerShip/ORLogicScalerShipModel.m; sourceTree = SOURCE_ROOT; };
 		843800290AB23EC20069C0BA /* ORRangeTimerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRangeTimerController.h; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerController.h; sourceTree = SOURCE_ROOT; };
 		8438002A0AB23EC20069C0BA /* ORRangeTimerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRangeTimerController.m; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerController.m; sourceTree = SOURCE_ROOT; };
 		8438002B0AB23EC20069C0BA /* ORRangeTimerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRangeTimerModel.h; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerModel.h; sourceTree = SOURCE_ROOT; };
@@ -4466,23 +4401,6 @@
 		84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORWindowListController.m; path = "Source/Main Dialogs/WindowList/ORWindowListController.m"; sourceTree = SOURCE_ROOT; };
 		84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowList.nib; path = "Source/Main Dialogs/WindowList/WindowList.nib"; sourceTree = SOURCE_ROOT; };
 		84ADA288040ADF2D005F64B1 /* NcdMux.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdMux.nib; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.nib"; sourceTree = SOURCE_ROOT; };
-		84AE7BA312662D34003F7194 /* ORTriggerProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTriggerProtocols.h; sourceTree = "<group>"; };
-		84AE7C6C12664142003F7194 /* LogicSplit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LogicSplit.png; sourceTree = "<group>"; };
-		84AE7C6E12664166003F7194 /* LogicJoin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LogicJoin.png; sourceTree = "<group>"; };
-		84AE7D1312673332003F7194 /* LogicPattern.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = LogicPattern.nib; sourceTree = "<group>"; };
-		84AE7D1412673332003F7194 /* LogicPattern.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LogicPattern.png; sourceTree = "<group>"; };
-		84AE7D1612673332003F7194 /* ORLogicPatternController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLogicPatternController.h; sourceTree = "<group>"; };
-		84AE7D1712673332003F7194 /* ORLogicPatternController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLogicPatternController.m; sourceTree = "<group>"; };
-		84AE7D1812673332003F7194 /* ORLogicPatternModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLogicPatternModel.h; sourceTree = "<group>"; };
-		84AE7D1912673332003F7194 /* ORLogicPatternModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLogicPatternModel.m; sourceTree = "<group>"; };
-		84AE7E0112674656003F7194 /* HighLatch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = HighLatch.png; path = Source/Objects/TriggerSystem/Logic/Gates/HighLatch.png; sourceTree = SOURCE_ROOT; };
-		84AE7E3412676531003F7194 /* LogicChildRead.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LogicChildRead.nib; path = Source/Objects/TriggerSystem/Logic/LogicChildRead/LogicChildRead.nib; sourceTree = SOURCE_ROOT; };
-		84AE7E3512676531003F7194 /* LogicChildRead.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicChildRead.png; path = Source/Objects/TriggerSystem/Logic/LogicChildRead/LogicChildRead.png; sourceTree = SOURCE_ROOT; };
-		84AE7E3612676531003F7194 /* ORLogicChildReadController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicChildReadController.h; path = Source/Objects/TriggerSystem/Logic/LogicChildRead/ORLogicChildReadController.h; sourceTree = SOURCE_ROOT; };
-		84AE7E3712676531003F7194 /* ORLogicChildReadController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicChildReadController.m; path = Source/Objects/TriggerSystem/Logic/LogicChildRead/ORLogicChildReadController.m; sourceTree = SOURCE_ROOT; };
-		84AE7E3812676531003F7194 /* ORLogicChildReadModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLogicChildReadModel.h; path = Source/Objects/TriggerSystem/Logic/LogicChildRead/ORLogicChildReadModel.h; sourceTree = SOURCE_ROOT; };
-		84AE7E3912676531003F7194 /* ORLogicChildReadModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLogicChildReadModel.m; path = Source/Objects/TriggerSystem/Logic/LogicChildRead/ORLogicChildReadModel.m; sourceTree = SOURCE_ROOT; };
-		84AE803112677D0B003F7194 /* LogicChildRead2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogicChildRead2.png; path = Source/Objects/TriggerSystem/Logic/LogicChildRead/LogicChildRead2.png; sourceTree = SOURCE_ROOT; };
 		84AFC23E1029F35E009F4139 /* downRamp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = downRamp.png; path = Source/Objects/Hardware/Vme/VHQ224L/downRamp.png; sourceTree = SOURCE_ROOT; };
 		84AFC23F1029F35E009F4139 /* highVoltage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = highVoltage.png; path = Source/Objects/Hardware/Vme/VHQ224L/highVoltage.png; sourceTree = SOURCE_ROOT; };
 		84AFC2401029F35E009F4139 /* lowVoltage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = lowVoltage.png; path = Source/Objects/Hardware/Vme/VHQ224L/lowVoltage.png; sourceTree = SOURCE_ROOT; };
@@ -4918,8 +4836,6 @@
 		84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Decoders.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.h; sourceTree = SOURCE_ROOT; };
 		84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Decoders.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D435B60798851B003D089F /* NoCamacDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacDriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoCamacDriverHelp.plist"; sourceTree = SOURCE_ROOT; };
-		84D5DE97125CB1BE00003496 /* ORTriggerLogicView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTriggerLogicView.h; sourceTree = "<group>"; };
-		84D5DE98125CB1BE00003496 /* ORTriggerLogicView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTriggerLogicView.m; sourceTree = "<group>"; };
 		84D791330FFA4CD000DC81D2 /* Keithley6487.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Keithley6487.gif; path = Source/Objects/Hardware/Serial/Keithley6487/Keithley6487.gif; sourceTree = SOURCE_ROOT; };
 		84D791340FFA4CD000DC81D2 /* Keithley6487.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Keithley6487.nib; path = Source/Objects/Hardware/Serial/Keithley6487/Keithley6487.nib; sourceTree = SOURCE_ROOT; };
 		84D791350FFA4CD000DC81D2 /* ORKeithley6487Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKeithley6487Controller.h; path = Source/Objects/Hardware/Serial/Keithley6487/ORKeithley6487Controller.h; sourceTree = SOURCE_ROOT; };
@@ -5033,8 +4949,6 @@
 		84E427DC054EFFCA0057208F /* ORReplayDataModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORReplayDataModel.m; sourceTree = "<group>"; };
 		84E427DD054EFFCA0057208F /* ReplayData.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ReplayData.gif; sourceTree = "<group>"; };
 		84E427DE054EFFCA0057208F /* ReplayData.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ReplayData.nib; sourceTree = "<group>"; };
-		84E583D3126882B700157240 /* ORTriggerLogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTriggerLogic.h; sourceTree = "<group>"; };
-		84E583D4126882B700157240 /* ORTriggerLogic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTriggerLogic.m; sourceTree = "<group>"; };
 		84E583FB04DB1772005F64B1 /* PCICamac.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PCICamac.nib; sourceTree = "<group>"; };
 		84E583FC04DB1772005F64B1 /* PCICamacCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PCICamacCard.gif; sourceTree = "<group>"; };
 		84E583FE04DB1772005F64B1 /* ORPCICamacCommands.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPCICamacCommands.h; sourceTree = "<group>"; };
@@ -5980,34 +5894,6 @@
 			);
 			name = PDcu;
 			path = Source/Objects/Hardware/Serial/PDcu;
-			sourceTree = SOURCE_ROOT;
-		};
-		840AC2E712635081007B6CAF /* LogicInBit */ = {
-			isa = PBXGroup;
-			children = (
-				840AC2E812635081007B6CAF /* LogicInBit.nib */,
-				840AC2E912635081007B6CAF /* LogicInBit.png */,
-				840AC2EA12635081007B6CAF /* ORLogicInBitController.h */,
-				840AC2EB12635081007B6CAF /* ORLogicInBitController.m */,
-				840AC2EC12635081007B6CAF /* ORLogicInBitModel.h */,
-				840AC2ED12635081007B6CAF /* ORLogicInBitModel.m */,
-			);
-			name = LogicInBit;
-			path = Source/Objects/TriggerSystem/Logic/LogicInBit;
-			sourceTree = SOURCE_ROOT;
-		};
-		840AC2F412635089007B6CAF /* LogicOutBit */ = {
-			isa = PBXGroup;
-			children = (
-				840AC2F512635089007B6CAF /* LogicOutBit.nib */,
-				840AC2F612635089007B6CAF /* LogicOutBit.png */,
-				840AC2F712635089007B6CAF /* ORLogicOutBitController.h */,
-				840AC2F812635089007B6CAF /* ORLogicOutBitController.m */,
-				840AC2F912635089007B6CAF /* ORLogicOutBitModel.h */,
-				840AC2FA12635089007B6CAF /* ORLogicOutBitModel.m */,
-			);
-			name = LogicOutBit;
-			path = Source/Objects/TriggerSystem/Logic/LogicOutBit;
 			sourceTree = SOURCE_ROOT;
 		};
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
@@ -7054,30 +6940,6 @@
 			);
 			name = VarianTPS;
 			path = Source/Objects/Hardware/Serial/VarianTPS;
-			sourceTree = SOURCE_ROOT;
-		};
-		843749531270B2AD0027B507 /* LogicInScaler */ = {
-			isa = PBXGroup;
-			children = (
-				843749541270B2AD0027B507 /* LogicInScaler.nib */,
-				843749551270B2AD0027B507 /* LogicInScaler.png */,
-				843749561270B2AD0027B507 /* ORLogicInScalerController.h */,
-				843749571270B2AD0027B507 /* ORLogicInScalerController.m */,
-				843749581270B2AD0027B507 /* ORLogicInScalerModel.h */,
-				843749591270B2AD0027B507 /* ORLogicInScalerModel.m */,
-			);
-			name = LogicInScaler;
-			path = Source/Objects/TriggerSystem/Logic/LogicInScaler;
-			sourceTree = SOURCE_ROOT;
-		};
-		843749601270B2C00027B507 /* LogicScalerShip */ = {
-			isa = PBXGroup;
-			children = (
-				843749611270B2C00027B507 /* ORLogicScalerShipModel.h */,
-				843749621270B2C00027B507 /* ORLogicScalerShipModel.m */,
-			);
-			name = LogicScalerShip;
-			path = Source/Objects/TriggerSystem/Logic/LogicScalerShip;
 			sourceTree = SOURCE_ROOT;
 		};
 		843800280AB23EC20069C0BA /* rangeTimer */ = {
@@ -9086,19 +8948,6 @@
 			path = Source/Objects/Hardware/SBC/SBC_LAM;
 			sourceTree = SOURCE_ROOT;
 		};
-		84A8CA0E125F1E2600D7C9AF /* Gates */ = {
-			isa = PBXGroup;
-			children = (
-				840AC49F12635F15007B6CAF /* ORTGates.h */,
-				840AC4A012635F15007B6CAF /* ORTGates.m */,
-				84AE7C6C12664142003F7194 /* LogicSplit.png */,
-				84AE7C6E12664166003F7194 /* LogicJoin.png */,
-				84AE7E0112674656003F7194 /* HighLatch.png */,
-			);
-			name = Gates;
-			path = Source/Objects/TriggerSystem/Logic/Gates;
-			sourceTree = SOURCE_ROOT;
-		};
 		84AB0F331056DA4E0069D5E2 /* ModBus */ = {
 			isa = PBXGroup;
 			children = (
@@ -9211,35 +9060,6 @@
 			);
 			name = WindowList;
 			path = "Source/Main Dialogs/WindowList";
-			sourceTree = SOURCE_ROOT;
-		};
-		84AE7D1212673332003F7194 /* LogicPattern */ = {
-			isa = PBXGroup;
-			children = (
-				84AE7D1312673332003F7194 /* LogicPattern.nib */,
-				84AE7D1412673332003F7194 /* LogicPattern.png */,
-				84AE7D1612673332003F7194 /* ORLogicPatternController.h */,
-				84AE7D1712673332003F7194 /* ORLogicPatternController.m */,
-				84AE7D1812673332003F7194 /* ORLogicPatternModel.h */,
-				84AE7D1912673332003F7194 /* ORLogicPatternModel.m */,
-			);
-			name = LogicPattern;
-			path = Source/Objects/TriggerSystem/Logic/LogicPattern;
-			sourceTree = SOURCE_ROOT;
-		};
-		84AE7E3312676531003F7194 /* LogicChildRead */ = {
-			isa = PBXGroup;
-			children = (
-				84AE7E3412676531003F7194 /* LogicChildRead.nib */,
-				84AE7E3512676531003F7194 /* LogicChildRead.png */,
-				84AE803112677D0B003F7194 /* LogicChildRead2.png */,
-				84AE7E3612676531003F7194 /* ORLogicChildReadController.h */,
-				84AE7E3712676531003F7194 /* ORLogicChildReadController.m */,
-				84AE7E3812676531003F7194 /* ORLogicChildReadModel.h */,
-				84AE7E3912676531003F7194 /* ORLogicChildReadModel.m */,
-			);
-			name = LogicChildRead;
-			path = Source/Objects/TriggerSystem/Logic/LogicChildRead;
 			sourceTree = SOURCE_ROOT;
 		};
 		84AFC23D1029F35E009F4139 /* VHQ224L */ = {
@@ -10313,35 +10133,6 @@
 			path = Source/Objects/Hardware/Vme/SIS3302;
 			sourceTree = SOURCE_ROOT;
 		};
-		84D5DE94125CB18C00003496 /* TriggerSystem */ = {
-			isa = PBXGroup;
-			children = (
-				84AE7BA312662D34003F7194 /* ORTriggerProtocols.h */,
-				84D5DE97125CB1BE00003496 /* ORTriggerLogicView.h */,
-				84D5DE98125CB1BE00003496 /* ORTriggerLogicView.m */,
-				84E583D3126882B700157240 /* ORTriggerLogic.h */,
-				84E583D4126882B700157240 /* ORTriggerLogic.m */,
-				84D5DECB125CC2F400003496 /* Logic */,
-			);
-			name = TriggerSystem;
-			path = Source/Objects/TriggerSystem;
-			sourceTree = SOURCE_ROOT;
-		};
-		84D5DECB125CC2F400003496 /* Logic */ = {
-			isa = PBXGroup;
-			children = (
-				84A8CA0E125F1E2600D7C9AF /* Gates */,
-				84AE7D1212673332003F7194 /* LogicPattern */,
-				843749531270B2AD0027B507 /* LogicInScaler */,
-				843749601270B2C00027B507 /* LogicScalerShip */,
-				840AC2E712635081007B6CAF /* LogicInBit */,
-				840AC2F412635089007B6CAF /* LogicOutBit */,
-				84AE7E3312676531003F7194 /* LogicChildRead */,
-			);
-			name = Logic;
-			path = Source/Objects/TriggerSystem/Logic;
-			sourceTree = SOURCE_ROOT;
-		};
 		84D791320FFA4CD000DC81D2 /* Keithley6487 */ = {
 			isa = PBXGroup;
 			children = (
@@ -11234,7 +11025,6 @@
 				842162EE043E6317005F64B1 /* Misc Objects */,
 				84AD1EE003C2476F005F64B1 /* Data Processing */,
 				840EFFA30944B28F00049827 /* ProcessLogic */,
-				84D5DE94125CB18C00003496 /* TriggerSystem */,
 				842F19A603B8EAF3005F64B1 /* Control */,
 				84C4948A0405A0C0005F64B1 /* Custom Hardware */,
 				F51E698503AE4775015F64B1 /* Hardware */,
@@ -12354,25 +12144,10 @@
 				84E9F6A2123FE4D600116607 /* ORNHQ226LDecoders.h in Headers */,
 				84E9F6A4123FE4D600116607 /* ORNHQ226LModel.h in Headers */,
 				8471C2F41250CF0C003A8DFB /* ORCAEN260Readout.hh in Headers */,
-				84D5DE99125CB1BE00003496 /* ORTriggerLogicView.h in Headers */,
-				840AC2F012635082007B6CAF /* ORLogicInBitController.h in Headers */,
-				840AC2F212635082007B6CAF /* ORLogicInBitModel.h in Headers */,
-				840AC2FD12635089007B6CAF /* ORLogicOutBitController.h in Headers */,
-				840AC2FF12635089007B6CAF /* ORLogicOutBitModel.h in Headers */,
-				840AC4A112635F15007B6CAF /* ORTGates.h in Headers */,
 				840AC59812638B5D007B6CAF /* nTPCPadPlaneView.h in Headers */,
-				84AE7BA412662D34003F7194 /* ORTriggerProtocols.h in Headers */,
-				84AE7D1D12673332003F7194 /* ORLogicPatternController.h in Headers */,
-				84AE7D1F12673332003F7194 /* ORLogicPatternModel.h in Headers */,
-				84AE7E3C12676531003F7194 /* ORLogicChildReadController.h in Headers */,
-				84AE7E3E12676531003F7194 /* ORLogicChildReadModel.h in Headers */,
-				84E583D5126882B700157240 /* ORTriggerLogic.h in Headers */,
 				2D24A8D2126F516D00BA2E2E /* ORIpeSimulationController.h in Headers */,
 				2D24A8D4126F516D00BA2E2E /* ORIpeSimulationDecoder.h in Headers */,
 				2D24A8D6126F516D00BA2E2E /* ORIpeSimulationModel.h in Headers */,
-				8437495C1270B2AD0027B507 /* ORLogicInScalerController.h in Headers */,
-				8437495E1270B2AD0027B507 /* ORLogicInScalerModel.h in Headers */,
-				843749631270B2C00027B507 /* ORLogicScalerShipModel.h in Headers */,
 				84EBBE6A1282E2B700234313 /* ORArchive.h in Headers */,
 				84EBC524128887C800234313 /* ORLabJackController.h in Headers */,
 				84EBC526128887C800234313 /* ORLabJackModel.h in Headers */,
@@ -12477,7 +12252,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -13151,26 +12926,12 @@
 				8449CC8A123E85DA009C8AA2 /* VHSC040n.tif in Resources */,
 				84E9F69E123FE4D600116607 /* NHQ226L.nib in Resources */,
 				84E9F69F123FE4D600116607 /* NHQ226L.tif in Resources */,
-				840AC2EE12635082007B6CAF /* LogicInBit.nib in Resources */,
-				840AC2EF12635082007B6CAF /* LogicInBit.png in Resources */,
-				840AC2FB12635089007B6CAF /* LogicOutBit.nib in Resources */,
-				840AC2FC12635089007B6CAF /* LogicOutBit.png in Resources */,
 				840AC63712639B92007B6CAF /* nTPCPadPositions.txt in Resources */,
-				84AE7C6D12664142003F7194 /* LogicSplit.png in Resources */,
-				84AE7C6F12664166003F7194 /* LogicJoin.png in Resources */,
-				84AE7D1A12673332003F7194 /* LogicPattern.nib in Resources */,
-				84AE7D1B12673332003F7194 /* LogicPattern.png in Resources */,
-				84AE7E0212674656003F7194 /* HighLatch.png in Resources */,
-				84AE7E3A12676531003F7194 /* LogicChildRead.nib in Resources */,
-				84AE7E3B12676531003F7194 /* LogicChildRead.png in Resources */,
-				84AE803212677D0B003F7194 /* LogicChildRead2.png in Resources */,
 				2D24A8D0126F516D00BA2E2E /* IpeSimulation.nib in Resources */,
 				2D24A8D1126F516D00BA2E2E /* IpeSimulation.tif in Resources */,
 				2D24A8D8126F516D00BA2E2E /* SimStart.tif in Resources */,
 				2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */,
 				2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */,
-				8437495A1270B2AD0027B507 /* LogicInScaler.nib in Resources */,
-				8437495B1270B2AD0027B507 /* LogicInScaler.png in Resources */,
 				84EBBE681282E2B700234313 /* Archive.nib in Resources */,
 				84EBBE7F1282E5D500234313 /* Archive.tif in Resources */,
 				84EBC521128887C800234313 /* LabJack.nib in Resources */,
@@ -14037,24 +13798,10 @@
 				84E9F6A1123FE4D600116607 /* ORNHQ226LController.m in Sources */,
 				84E9F6A3123FE4D600116607 /* ORNHQ226LDecoders.m in Sources */,
 				84E9F6A5123FE4D600116607 /* ORNHQ226LModel.m in Sources */,
-				84D5DE9A125CB1BE00003496 /* ORTriggerLogicView.m in Sources */,
-				840AC2F112635082007B6CAF /* ORLogicInBitController.m in Sources */,
-				840AC2F312635082007B6CAF /* ORLogicInBitModel.m in Sources */,
-				840AC2FE12635089007B6CAF /* ORLogicOutBitController.m in Sources */,
-				840AC30012635089007B6CAF /* ORLogicOutBitModel.m in Sources */,
-				840AC4A212635F15007B6CAF /* ORTGates.m in Sources */,
 				840AC59912638B5D007B6CAF /* nTPCPadPlaneView.m in Sources */,
-				84AE7D1E12673332003F7194 /* ORLogicPatternController.m in Sources */,
-				84AE7D2012673332003F7194 /* ORLogicPatternModel.m in Sources */,
-				84AE7E3D12676531003F7194 /* ORLogicChildReadController.m in Sources */,
-				84AE7E3F12676531003F7194 /* ORLogicChildReadModel.m in Sources */,
-				84E583D6126882B700157240 /* ORTriggerLogic.m in Sources */,
 				2D24A8D3126F516D00BA2E2E /* ORIpeSimulationController.m in Sources */,
 				2D24A8D5126F516D00BA2E2E /* ORIpeSimulationDecoder.m in Sources */,
 				2D24A8D7126F516D00BA2E2E /* ORIpeSimulationModel.m in Sources */,
-				8437495D1270B2AD0027B507 /* ORLogicInScalerController.m in Sources */,
-				8437495F1270B2AD0027B507 /* ORLogicInScalerModel.m in Sources */,
-				843749641270B2C00027B507 /* ORLogicScalerShipModel.m in Sources */,
 				84EBBE6B1282E2B700234313 /* ORArchive.m in Sources */,
 				84EBC525128887C800234313 /* ORLabJackController.m in Sources */,
 				84EBC527128887C800234313 /* ORLabJackModel.m in Sources */,
@@ -14313,6 +14060,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
 				CFBundlerHelpBookFolder = OrcaHelp;
+				CODE_SIGN_IDENTITY = "Don't Code Sign";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -14441,7 +14189,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
-				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
 				GCC_VERSION = "";
