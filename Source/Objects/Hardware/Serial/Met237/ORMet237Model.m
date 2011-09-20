@@ -408,7 +408,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 #pragma mark *** Commands
 - (void) addCmdToQueue:(NSString*)aCmd
 {
-    if([serialPort isOpen]){ 
+   if([serialPort isOpen]){ 
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 		[cmdQueue addObject:aCmd];
 		if(!lastRequest){
@@ -591,6 +591,9 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 												//do nothing
 	}
 	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+
 	//NSLog(@"%@\n",theResponse);
 }
 
