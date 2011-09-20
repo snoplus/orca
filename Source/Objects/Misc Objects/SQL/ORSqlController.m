@@ -248,4 +248,10 @@
 		[model createDatabase];
 	}
 }
+
+- (IBAction) dropWaveformTable:(id)sender
+{
+	[model dropTable:@"Waveforms"];
+}
+
 @end

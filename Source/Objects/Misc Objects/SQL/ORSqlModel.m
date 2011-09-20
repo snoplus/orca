@@ -347,6 +347,26 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	@try{ [self createPushTableInDataBase:dataBaseName]; }		    @catch(NSException* e){}
 }
 
+- (void) dropTable:(NSString*) aTableName
+{
+	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
+	@try {
+		if([aConnection connectToHost:hostName userName:userName passWord:password]){
+			if([aConnection selectDB:dataBaseName]){
+				NSString*	s = [NSString stringWithFormat:@"Drop table %@",aTableName];
+				[aConnection queryString:s];
+				NSLog(@"Dropped Table %@ from the SQL database\n",aTableName);
+			}
+		}
+	}
+	@finally {
+		[aConnection disconnect];
+		[aConnection release];
+	}
+	
+	
+}
+
 - (void) removeEntry
 {
 	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
@@ -722,7 +742,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 					s = [s stringByAppendingString:@"FOREIGN KEY (machine_id) REFERENCES machines (machine_id) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB"];
 					
 					[aConnection queryString:s];
-					NSLog(@"Created Table Waveforms in Database %@\n",aDataBase);
+					NSLog(@"Created Table waveforms in Database %@\n",aDataBase);
 				}
 			}
 		}
@@ -1136,7 +1156,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
  | datastr    | mediumblob  | YES  |     | NULL    |                |
  +------------+-------------+------+-----+---------+----------------+
  
- Table: Waveforms
+ Table: waveforms
  +------------+-------------+------+-----+---------+----------------+
  | Field      | Type        | Null | Key | Default | Extra          |
  +------------+-------------+------+-----+---------+----------------+
@@ -1720,12 +1740,12 @@ Table: Histogram2Ds
 					}
 	
 				}
-				//do Waveforms
+				//do waveforms
 				for(id aMonitor in dataMonitors){
 					NSArray* objsWaveform = [[aMonitor  collectObjectsOfClass:[ORWaveform class]] retain];
 					@try {
 						for(id aDataSet in objsWaveform){
-							ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Waveforms where (machine_id=%@ and name=%@ and monitor_id=%d)",
+							ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from waveforms where (machine_id=%@ and name=%@ and monitor_id=%d)",
 																				   [sqlConnection quoteObject:machine_id],
 																				   [sqlConnection quoteObject:[aDataSet fullName]],
 																				   [aMonitor uniqueIdNumber]]];
@@ -1736,7 +1756,7 @@ Table: Histogram2Ds
 							if(dataset_id) {
 								if(lastCounts != countsNow){
 									NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-									NSString* theQuery = [NSString stringWithFormat:@"UPDATE Waveforms SET counts=%d,unitsize=%d,mask=%d,bitmask=%d,offset=%d,length=%d,data=%@ WHERE dataset_id=%@",
+									NSString* theQuery = [NSString stringWithFormat:@"UPDATE waveforms SET counts=%d,unitsize=%d,mask=%d,bitmask=%d,offset=%d,length=%d,data=%@ WHERE dataset_id=%@",
 														  [aDataSet totalCounts],
 														  [aDataSet unitSize],
 														  [aDataSet mask],
@@ -1750,7 +1770,7 @@ Table: Histogram2Ds
 							}
 							else {
 								NSString* convertedData = [sqlConnection quoteObject:[aDataSet rawData]];
-								NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Waveforms (monitor_id,machine_id,name,counts,unitsize,mask,bitmask,offset,type,length,data) VALUES (%d,%@,%@,%d,%d,%d,%d,%d,3,%d,%@)",
+								NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO waveforms (monitor_id,machine_id,name,counts,unitsize,mask,bitmask,offset,type,length,data) VALUES (%d,%@,%@,%d,%d,%d,%d,%d,3,%d,%@)",
 													  [aMonitor uniqueIdNumber],
 													  [sqlConnection quoteObject:machine_id],
 													  [sqlConnection quoteObject:[aDataSet fullName]],

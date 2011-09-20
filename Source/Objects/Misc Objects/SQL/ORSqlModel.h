@@ -69,6 +69,7 @@
 #pragma mark ***Database setup
 - (void) createDatabase;
 - (void) removeEntry;
+- (void) dropTable:(NSString*) aTableName;
 
 @end
 

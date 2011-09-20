@@ -57,6 +57,7 @@
 - (IBAction) connectionAction:(id)sender;
 - (IBAction) createAction:(id)sender;
 - (IBAction) removeEntryAction:(id)sender;
+- (IBAction) dropWaveformTable:(id)sender;
 
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
