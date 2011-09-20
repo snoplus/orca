@@ -31,7 +31,8 @@
     IBOutlet NSButton*    sqlLockButton;
     IBOutlet NSButton*    connectionButton;
     IBOutlet ORValueBar*  queueValueBar;
-	
+	IBOutlet NSButton*    dropAllTablesButton;
+
 	double queueCount;
 }
 
@@ -57,8 +58,9 @@
 - (IBAction) connectionAction:(id)sender;
 - (IBAction) createAction:(id)sender;
 - (IBAction) removeEntryAction:(id)sender;
-- (IBAction) dropWaveformTable:(id)sender;
+- (IBAction) dropAllTablesAction:(id)sender;
 
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) dropActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 @end

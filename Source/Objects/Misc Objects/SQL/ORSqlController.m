@@ -189,6 +189,7 @@
 - (IBAction) stealthModeAction:(id)sender
 {
 	[model setStealthMode:[sender intValue]];	
+	[dropAllTablesButton setEnabled:[sender intValue]];
 }
 
 - (IBAction) sqlLockAction:(id)sender
@@ -242,6 +243,22 @@
 	
 }
 
+- (IBAction) dropAllTablesAction:(id)sender
+{
+	[self endEditing];
+	NSString* s = [NSString stringWithFormat:@"Really drop all tables in %@ on %@?\n",[model dataBaseName],[model hostName]];
+	NSBeginAlertSheet(s,
+                      @"Cancel",
+                      @"Yes, Drop All",
+                      nil,[self window],
+                      self,
+                      @selector(dropActionDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"You can recreate the database with the 'Create Database' button");
+	
+}
+
+
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
@@ -249,9 +266,11 @@
 	}
 }
 
-- (IBAction) dropWaveformTable:(id)sender
+- (void) dropActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[model dropTable:@"Waveforms"];
+	if(returnCode == NSAlertAlternateReturn){		
+		[model dropAllTables];
+	}
 }
 
 @end

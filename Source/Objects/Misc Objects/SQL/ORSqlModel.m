@@ -347,6 +347,21 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	@try{ [self createPushTableInDataBase:dataBaseName]; }		    @catch(NSException* e){}
 }
 
+- (void) dropAllTables
+{
+	@try{[self dropTable:@"Histogram1Ds"]; }	@catch(NSException* e){}
+	@try{[self dropTable:@"Histogram2Ds"]; }	@catch(NSException* e){}
+	@try{[self dropTable:@"Processes"]; }		@catch(NSException* e){}
+	@try{[self dropTable:@"alarms"]; }			@catch(NSException* e){}
+	@try{[self dropTable:@"experiment"]; }		@catch(NSException* e){}
+	//@try{[self dropTable:@"pushInfo"]; }		@catch(NSException* e){}
+	@try{[self dropTable:@"runs"]; }			@catch(NSException* e){}
+	@try{[self dropTable:@"segmentMap"]; }		@catch(NSException* e){}
+	@try{[self dropTable:@"statuslog"]; }		@catch(NSException* e){}
+	@try{[self dropTable:@"waveforms"]; }		@catch(NSException* e){}
+	@try{[self dropTable:@"machines"]; }		@catch(NSException* e){}
+}
+
 - (void) dropTable:(NSString*) aTableName
 {
 	ORSqlConnection* aConnection = [[ORSqlConnection alloc] init];
