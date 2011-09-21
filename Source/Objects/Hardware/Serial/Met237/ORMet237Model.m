@@ -121,8 +121,11 @@ NSString* ORMet237Lock = @"ORMet237Lock";
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
+		[self process_response:theString];
+
 		//the serial port may break the data up into small chunks, so we have to accumulate the chunks until
 		//we get a full piece.
+		/*
 		theString = [[theString componentsSeparatedByString:@"\n"] componentsJoinedByString:@""];
 		theString = [[theString componentsSeparatedByString:@">"] componentsJoinedByString:@""];
 		
@@ -142,6 +145,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 				}
             }
         } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
+		*/
 	}
 }
 
