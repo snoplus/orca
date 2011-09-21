@@ -63,7 +63,7 @@
 						<object class="NSPopUpButton" id="456106280">
 							<reference key="NSNextResponder" ref="18859626"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{182, 771}, {128, 22}}</string>
+							<string key="NSFrame">{{182, 771}, {167, 22}}</string>
 							<reference key="NSSuperview" ref="18859626"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="558680236">
@@ -183,7 +183,7 @@
 						<object class="NSButton" id="574125602">
 							<reference key="NSNextResponder" ref="18859626"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{257, 747}, {50, 20}}</string>
+							<string key="NSFrame">{{296, 747}, {50, 20}}</string>
 							<reference key="NSSuperview" ref="18859626"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="91413644">
@@ -2440,6 +2440,7 @@
 													<string key="NSKeyEquiv"/>
 													<int key="NSKeyEquivModMask">1048576</int>
 													<int key="NSMnemonicLoc">2147483647</int>
+													<int key="NSState">1</int>
 													<reference key="NSOnImage" ref="790370152"/>
 													<reference key="NSMixedImage" ref="385678996"/>
 													<string key="NSAction">_popUpItemAction:</string>
@@ -3851,12 +3852,10 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="460610198"/>
 							<reference ref="347198575"/>
 							<reference ref="305385501"/>
-							<reference ref="574125602"/>
 							<reference ref="459748679"/>
 							<reference ref="1071149905"/>
 							<reference ref="276622997"/>
 							<reference ref="1040384161"/>
-							<reference ref="456106280"/>
 							<reference ref="885819985"/>
 							<reference ref="513768321"/>
 							<reference ref="160387937"/>
@@ -3865,7 +3864,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="1867332"/>
 							<reference ref="531674729"/>
 							<reference ref="764507297"/>
-							<reference ref="127167770"/>
 							<reference ref="349119044"/>
 							<reference ref="59046764"/>
 							<reference ref="112186824"/>
@@ -3874,6 +3872,9 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="617148905"/>
 							<reference ref="990604155"/>
 							<reference ref="60865802"/>
+							<reference ref="456106280"/>
+							<reference ref="574125602"/>
+							<reference ref="127167770"/>
 						</object>
 						<reference key="parent" ref="242372686"/>
 					</object>
@@ -6972,7 +6973,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">AUDAAABDwYAAA</bytes>
+						<bytes key="NSTransformStruct">AUDAAABDxwAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
@@ -7125,7 +7126,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABDNgAAxD7AAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDNgAAxEXAAA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>{{446, 1034}, {126, 48}}</string>
@@ -7144,7 +7145,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABDagAAxA1AAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDgIAAxD9AAA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -7755,34 +7756,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/ProcessLogic/ProcessElements/Outputs/ProcessHistory/ORProcessHistoryModel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/TriggerSystem/Logic/LogicChildRead/ORLogicChildReadModel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/TriggerSystem/Logic/LogicInBit/ORLogicInBitModel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/TriggerSystem/Logic/LogicInScaler/ORLogicInScalerModel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Objects/TriggerSystem/Logic/LogicPattern/ORLogicPatternModel.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
