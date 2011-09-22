@@ -154,7 +154,7 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 		if(fPulseMode){
 			fProcessPulse = false;
 			//go back to bank 1
-			DisarmAndArmNextBank();
+			//DisarmAndArmNextBank(); //commented out to test reading out both banks even in the pulse mode
 		}
 		//---------------------------------------------------------------------------
 	}
@@ -237,7 +237,8 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 					data[dataIndex++] = ((GetCrate()     & 0x0000000f) << 21) | 
 										((GetSlot()      & 0x0000001f) << 16) | 
 										((channel        & 0x000000ff) << 8)  |
-										bufferWrap;
+										((fProcessPulse	 & 0x1) << 1) | //temp
+										((bufferWrap     & 0x1) << 0);
 					data[dataIndex++] = numberLongsInRawData;
 					data[dataIndex++] = numberLongsInEnergyData;
 					memcpy(data + dataIndex, &dmaBuffer[i], sizeOfRecord*sizeof(uint32_t));
