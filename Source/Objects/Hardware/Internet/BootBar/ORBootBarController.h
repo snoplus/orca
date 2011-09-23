@@ -35,6 +35,8 @@
 	IBOutlet NSComboBox*	ipNumberComboBox;
 	IBOutlet BootBarStateView* stateView;
 	IBOutlet NSTextField*   busyField;
+    IBOutlet NSMatrix*		outletNameMatrix;
+    IBOutlet NSMatrix*		stateMatrix;
 }
 
 #pragma mark •••Initialization
@@ -52,6 +54,7 @@
 - (void) updateButtons;
 - (void) outletStatusChanged:(NSNotification*)aNote;
 - (void) busyStateChanged:(NSNotification*)aNote;
+- (void) outletNameChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Actions
 - (IBAction) selectedStateAction:(id)sender;
@@ -61,6 +64,7 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) clearHistoryAction:(id)sender;
 - (IBAction) sendNewStateAction:(id)sender;
+- (IBAction) outletNameAction:(id)sender;
 
 @end
 
@@ -68,7 +72,7 @@
 @interface BootBarStateView : NSView {
     ORDotImage* onLight;
     ORDotImage* offLight;
-    unsigned char stateMask;
+    int stateMask;
 }
 
 - (id)   initWithFrame:(NSRect)frame;

@@ -73,6 +73,11 @@
                      selector : @selector(busyStateChanged:)
                          name : ORBootBarModelBusyChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(outletNameChanged:)
+                         name : ORBootBarModelOutletNameChanged
+						object: model];	
 }
 
 - (void) awakeFromNib
@@ -91,6 +96,16 @@
 	[self selectedChannelChanged:nil];
 	[self selectedStateChanged:nil];
 	[self busyStateChanged:nil];
+	[self outletNameChanged:nil];
+}
+
+#pragma mark •••Notifications
+- (void) outletNameChanged:(NSNotification*)aNotification
+{
+	short i;
+	for(i=0;i<9;i++){
+		[[outletNameMatrix cellWithTag:i] setStringValue: [model outletName:i]];
+	}	
 }
 
 - (void) busyStateChanged:(NSNotification*)aNote
@@ -104,10 +119,9 @@
 	[selectedStatePU selectItemAtIndex: [model selectedState]];
 }
 
-
 - (void) selectedChannelChanged:(NSNotification*)aNote
 {
-	[selectedChannelPU selectItemAtIndex: [model selectedChannel]];
+	[selectedChannelPU selectItemAtIndex: [model selectedChannel]-1];
 }
 
 - (void) passwordChanged:(NSNotification*)aNote
@@ -128,7 +142,15 @@
 	unsigned char aMask = 0x0;
 	int i;
 	for(i=0;i<8;i++){
-		if([model outletStatus:i])aMask |= (1<<i);
+		BOOL theState = [model outletStatus:i+1];
+		if(theState) aMask |= (1<<i);
+		[[stateMatrix cellWithTag:i+1] setStringValue:theState?@" ON":@"OFF"];
+		if(theState){
+			[[stateMatrix cellWithTag:i+1] setTextColor:[NSColor colorWithCalibratedRed:0. green:.7 blue:0. alpha:1.0]];
+		}
+		else {
+			[[stateMatrix cellWithTag:i+1] setTextColor:[NSColor colorWithCalibratedRed:.7 green:0. blue:0. alpha:1.0]];
+		}
 	}
 	[stateView setStateMask:aMask];
 }
@@ -145,11 +167,11 @@
 	[clrHistoryButton setEnabled: !locked];
 }
 
-#pragma mark •••Notifications
 - (void) lockChanged:(NSNotification*)aNote
 {   
     BOOL locked = [gSecurity isLocked:ORBootBarModelLock];
     [lockButton setState: locked];
+    [outletNameMatrix setEnabled:!locked];
     [ipNumberComboBox setEnabled:!locked];
 	[self updateButtons];
 }
@@ -160,18 +182,23 @@
 }
 
 #pragma mark •••Actions
+-(IBAction) outletNameAction:(id)sender
+{
+	int tag = [[sender selectedCell] tag];
+	[model setOutlet:tag name:[[sender selectedCell]stringValue]];
+}
 
-- (void) selectedStateAction:(id)sender
+- (IBAction) selectedStateAction:(id)sender
 {
 	[model setSelectedState:[sender indexOfSelectedItem]];	
 }
 
-- (void) selectedChannelAction:(id)sender
+- (IBAction) selectedChannelAction:(id)sender
 {
-	[model setSelectedChannel:[sender indexOfSelectedItem]];	
+	[model setSelectedChannel:[sender indexOfSelectedItem]+1];	
 }
 
-- (void) passwordFieldAction:(id)sender
+- (IBAction) passwordFieldAction:(id)sender
 {
 	[model setPassword:[sender stringValue]];	
 }

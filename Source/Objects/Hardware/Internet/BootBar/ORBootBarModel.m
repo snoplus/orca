@@ -32,11 +32,13 @@ NSString* BootBarIPNumberChanged			 = @"BootBarIPNumberChanged";
 NSString* ORBootBarModelIsConnectedChanged	 = @"ORBootBarModelIsConnectedChanged";
 NSString* ORBootBarModelStatusChanged		 = @"ORBootBarModelStatusChanged";
 NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
+NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 
 @interface ORBootBarModel (private)
 - (void) sendCmd;
 - (void) setPendingCmd:(NSString*)aCmd;
 - (void) timeout;
+- (void) setupOutletNames;
 @end
 
 @implementation ORBootBarModel
@@ -76,7 +78,31 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"BootBar"]];
+	//---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so that each crate can have its own version for drawing into.
+    //---------------------------------------------------------------------------------------------------
+    NSImage* aCachedImage = [NSImage imageNamed:@"BootBar"];
+    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    [i lockFocus];
+    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+	
+    int chan;
+	int xOffset = 0;
+    for(chan=1;chan<9;chan++){
+		if(chan>4)xOffset = 24;
+		NSBezierPath* circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(xOffset+26+chan*9, 5,7,7)];
+		if(outletStatus[chan]) [[NSColor colorWithCalibratedRed:0. green:1.0 blue:0. alpha:1.0] set];
+		else			       [[NSColor colorWithCalibratedRed:1.0 green:0. blue:0. alpha:.8] set];
+		[circle fill];
+    }
+	
+    [i unlockFocus];		
+    [self setImage:i];
+    [i release];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
+	
 }
 
 - (void) initConnectionHistory
@@ -90,6 +116,23 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) outletName:(int)index
+{
+	if(index<1)index = 1;
+	else if(index>=8)index=8;
+	if(!outletNames)[self setupOutletNames];
+	return [outletNames objectAtIndex:index];
+}
+
+- (void) setOutlet:(int)index name:(NSString*)aName
+{
+	if(!outletNames)[self setupOutletNames];
+	[[[self undoManager] prepareWithInvocationTarget:self] setOutlet:index name:[self outletName:index]];
+	[outletNames replaceObjectAtIndex:index withObject:aName];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelOutletNameChanged object:self];
+}
+
 - (int) selectedState
 {
     return selectedState;
@@ -109,6 +152,9 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 
 - (void) setSelectedChannel:(int)aSelectedChannel
 {
+	if(aSelectedChannel<1)aSelectedChannel=1;
+	else if(aSelectedChannel>8)aSelectedChannel=8;
+	
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:selectedChannel];
     selectedChannel = aSelectedChannel;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelSelectedChannelChanged object:self];
@@ -231,7 +277,7 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 - (void) turnOnOutlet:(int) i
 {
 	if([password length]){
-		NSString* cmd = [NSString stringWithFormat:@"%c%@%dON\r",0x1B,password,i+1];
+		NSString* cmd = [NSString stringWithFormat:@"%c%@%dON\r",0x1B,password,i];
 		[self setPendingCmd:cmd];
 	}
 }
@@ -239,7 +285,7 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 - (void) turnOffOutlet:(int) i
 {
 	if([password length]){
-		NSString* cmd = [NSString stringWithFormat:@"%c%@%dOFF\r",0x1B,password,i+1];
+		NSString* cmd = [NSString stringWithFormat:@"%c%@%dOFF\r",0x1B,password,i];
 		[self setPendingCmd:cmd];
 	}
 }
@@ -254,15 +300,17 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 
 - (BOOL) outletStatus:(int)i
 {
-	if(i>=0 && i<8)return outletStatus[i];
+	if(i>=1 && i<=8)return outletStatus[i];
 	else return NO;
 }
 
 - (void) setOutlet:(int)i status:(BOOL)aValue
 {
-	if(i>=0 && i<8){
-		[[[self undoManager] prepareWithInvocationTarget:self] setOutlet:i status:outletStatus[i]];
+	if(i>=1 && i<=8){
+		BOOL changed = NO;
+		if(aValue != outletStatus[i])changed = YES;
 		outletStatus[i] = aValue;
+		if(changed)[self setUpImage];
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelStatusChanged object:self userInfo:userInfo];
 	}
@@ -302,10 +350,10 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 				if([parts count]>=2){
 					int index = [[parts objectAtIndex:0] intValue];
 					if([[parts objectAtIndex:1] isEqualToString:@"ON"]){
-						[self setOutlet:index-1 status:YES];
+						[self setOutlet:index status:YES];
 					}
 					else if([[parts objectAtIndex:1] isEqualToString:@"OFF"]){
-						[self setOutlet:index-1 status:NO];
+						[self setOutlet:index status:NO];
 					}
 				}
 			}
@@ -337,12 +385,14 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
-	[self initConnectionHistory];
 	
-	[self setSelectedState:[decoder decodeIntForKey:@"selectedState"]];
-	[self setSelectedChannel:[decoder decodeIntForKey:@"selectedChannel"]];
-	[self setPassword:	[decoder decodeObjectForKey:@"password"]];
-	[self setIPNumber:	[decoder decodeObjectForKey:@"IPNumber"]];
+	[self setSelectedState:		[decoder decodeIntForKey:	@"selectedState"]];
+	[self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
+	[self setPassword:			[decoder decodeObjectForKey:@"password"]];
+	[self setIPNumber:			[decoder decodeObjectForKey:@"IPNumber"]];
+	outletNames = [[decoder decodeObjectForKey:@"outletNames"]retain];
+	[self initConnectionHistory];
+
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
@@ -350,10 +400,11 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
- 	[encoder encodeInt:selectedState forKey:@"selectedState"];
- 	[encoder encodeInt:selectedChannel forKey:@"selectedChannel"];
+ 	[encoder encodeInt:selectedState	forKey:@"selectedState"];
+ 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
  	[encoder encodeObject:password		forKey:@"password"];
  	[encoder encodeObject:IPNumber		forKey:@"IPNumber"];
+	[encoder encodeObject:outletNames  forKey:@"outletNames"];
 }
 @end
 
@@ -388,5 +439,13 @@ NSString* ORBootBarModelBusyChanged			 = @"ORBootBarModelBusyChanged";
 	else NSLog(@"Boot Bar cmd ignored -- busy\n");
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelBusyChanged object:self];
 }
+
+- (void) setupOutletNames
+{
+	outletNames = [[NSMutableArray array] retain];
+	int i;
+	for(i=0;i<9;i++)[outletNames addObject:[NSString stringWithFormat:@"Outlet %d",i]];	
+}
+
 @end
 

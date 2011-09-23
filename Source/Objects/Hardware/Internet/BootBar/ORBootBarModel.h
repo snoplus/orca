@@ -34,11 +34,12 @@
     BOOL			isConnected;
 	NetSocket*		socket;
 	NSMutableArray* cmdQueue;
-	BOOL			outletStatus[8];
+	BOOL			outletStatus[9];
     NSString*		password;
     NSString*		pendingCmd;
     int				selectedChannel;
     int				selectedState;
+	NSMutableArray* outletNames;
 }
 
 #pragma mark ***Accessors
@@ -63,6 +64,8 @@
 - (BOOL) outletStatus:(int)i;
 - (void) setOutlet:(int)i status:(BOOL)aValue;
 - (BOOL) isBusy;
+- (NSString*) outletName:(int)index;
+- (void) setOutlet:(int)index name:(NSString*)aName;
 
 #pragma mark •••Hardware Access
 - (void) pollHardware;
@@ -84,4 +87,5 @@ extern NSString* BootBarIPNumberChanged;
 extern NSString* ORBootBarModelIsConnectedChanged;
 extern NSString* ORBootBarModelStatusChanged;
 extern NSString* ORBootBarModelBusyChanged;
+extern NSString* ORBootBarModelOutletNameChanged;
 
