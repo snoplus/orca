@@ -27,16 +27,14 @@
 @interface ORBootBarController : OrcaObjectController 
 {
 	IBOutlet NSButton*		lockButton;
-	IBOutlet NSButton*		sendButton;
 	IBOutlet NSButton*		clrHistoryButton;
-	IBOutlet NSPopUpButton* selectedStatePU;
-	IBOutlet NSPopUpButton* selectedChannelPU;
 	IBOutlet NSSecureTextField* passwordField;
 	IBOutlet NSComboBox*	ipNumberComboBox;
 	IBOutlet BootBarStateView* stateView;
 	IBOutlet NSTextField*   busyField;
     IBOutlet NSMatrix*		outletNameMatrix;
     IBOutlet NSMatrix*		stateMatrix;
+    IBOutlet NSMatrix*		turnOnOffMatrix;
 }
 
 #pragma mark •••Initialization
@@ -46,8 +44,6 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
-- (void) selectedStateChanged:(NSNotification*)aNote;
-- (void) selectedChannelChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
@@ -57,14 +53,12 @@
 - (void) outletNameChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Actions
-- (IBAction) selectedStateAction:(id)sender;
-- (IBAction) selectedChannelAction:(id)sender;
 - (IBAction) passwordFieldAction:(id)sender;
 - (IBAction) ipNumberAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) clearHistoryAction:(id)sender;
-- (IBAction) sendNewStateAction:(id)sender;
 - (IBAction) outletNameAction:(id)sender;
+- (IBAction) turnOnOffAction:(id)sender;
 
 @end
 

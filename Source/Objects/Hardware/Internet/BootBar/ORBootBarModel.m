@@ -24,8 +24,6 @@
 
 #define kBootBarPort 9100
 
-NSString* ORBootBarModelSelectedStateChanged = @"ORBootBarModelSelectedStateChanged";
-NSString* ORBootBarModelSelectedChannelChanged = @"ORBootBarModelSelectedChannelChanged";
 NSString* ORBootBarModelPasswordChanged		 = @"ORBootBarModelPasswordChanged";
 NSString* ORBootBarModelLock				 = @"ORBootBarModelLock";
 NSString* BootBarIPNumberChanged			 = @"BootBarIPNumberChanged";
@@ -131,33 +129,6 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	[[[self undoManager] prepareWithInvocationTarget:self] setOutlet:index name:[self outletName:index]];
 	[outletNames replaceObjectAtIndex:index withObject:aName];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelOutletNameChanged object:self];
-}
-
-- (int) selectedState
-{
-    return selectedState;
-}
-
-- (void) setSelectedState:(int)aSelectedState
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedState:selectedState];
-    selectedState = aSelectedState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelSelectedStateChanged object:self];
-}
-
-- (int) selectedChannel
-{
-    return selectedChannel;
-}
-
-- (void) setSelectedChannel:(int)aSelectedChannel
-{
-	if(aSelectedChannel<1)aSelectedChannel=1;
-	else if(aSelectedChannel>8)aSelectedChannel=8;
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:selectedChannel];
-    selectedChannel = aSelectedChannel;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelSelectedChannelChanged object:self];
 }
 
 - (NSString*) password
@@ -310,9 +281,11 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 		BOOL changed = NO;
 		if(aValue != outletStatus[i])changed = YES;
 		outletStatus[i] = aValue;
-		if(changed)[self setUpImage];
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelStatusChanged object:self userInfo:userInfo];
+		if(changed){
+			[self setUpImage];
+			NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORBootBarModelStatusChanged object:self userInfo:userInfo];
+		}
 	}
 }
 
@@ -385,9 +358,6 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
-	
-	[self setSelectedState:		[decoder decodeIntForKey:	@"selectedState"]];
-	[self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
 	[self setPassword:			[decoder decodeObjectForKey:@"password"]];
 	[self setIPNumber:			[decoder decodeObjectForKey:@"IPNumber"]];
 	outletNames = [[decoder decodeObjectForKey:@"outletNames"]retain];
@@ -400,12 +370,11 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
- 	[encoder encodeInt:selectedState	forKey:@"selectedState"];
- 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
  	[encoder encodeObject:password		forKey:@"password"];
  	[encoder encodeObject:IPNumber		forKey:@"IPNumber"];
 	[encoder encodeObject:outletNames  forKey:@"outletNames"];
 }
+
 @end
 
 @implementation ORBootBarModel (private)
@@ -446,6 +415,8 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	int i;
 	for(i=0;i<9;i++)[outletNames addObject:[NSString stringWithFormat:@"Outlet %d",i]];	
 }
+
+
 
 @end
 

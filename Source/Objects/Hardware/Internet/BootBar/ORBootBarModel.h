@@ -19,8 +19,6 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-#import "ORMPodProtocol.h"
-
 @class NetSocket;
 
 @interface ORBootBarModel :  OrcaObject
@@ -28,25 +26,16 @@
 	NSMutableArray*	connectionHistory;
 	unsigned		ipNumberIndex;
 	NSString*		IPNumber;
-	NSTask*			pingTask;
-	NSMutableDictionary* systemParams;
-	BOOL			oldPower;
     BOOL			isConnected;
 	NetSocket*		socket;
 	NSMutableArray* cmdQueue;
 	BOOL			outletStatus[9];
     NSString*		password;
     NSString*		pendingCmd;
-    int				selectedChannel;
-    int				selectedState;
 	NSMutableArray* outletNames;
 }
 
 #pragma mark ***Accessors
-- (int) selectedState;
-- (void) setSelectedState:(int)aSelectedState;
-- (int) selectedChannel;
-- (void) setSelectedChannel:(int)aSelectedChannel;
 - (NSString*) password;
 - (void) setPassword:(NSString*)aPassword;
 - (void) initConnectionHistory;
@@ -79,8 +68,6 @@
 @end
 
 
-extern NSString* ORBootBarModelSelectedStateChanged;
-extern NSString* ORBootBarModelSelectedChannelChanged;
 extern NSString* ORBootBarModelPasswordChanged;
 extern NSString* ORBootBarModelLock;
 extern NSString* BootBarIPNumberChanged;

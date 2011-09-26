@@ -58,16 +58,6 @@
                      selector : @selector(passwordChanged:)
                          name : ORBootBarModelPasswordChanged
 						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(selectedChannelChanged:)
-                         name : ORBootBarModelSelectedChannelChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(selectedStateChanged:)
-                         name : ORBootBarModelSelectedStateChanged
-						object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(busyStateChanged:)
@@ -93,8 +83,6 @@
     [self lockChanged:nil];
 	[self outletStatusChanged:nil];
 	[self passwordChanged:nil];
-	[self selectedChannelChanged:nil];
-	[self selectedStateChanged:nil];
 	[self busyStateChanged:nil];
 	[self outletNameChanged:nil];
 }
@@ -112,16 +100,6 @@
 {
 	[self updateButtons];
 	[busyField setStringValue: [model isBusy]?@"Busy":@""];
-}
-
-- (void) selectedStateChanged:(NSNotification*)aNote
-{
-	[selectedStatePU selectItemAtIndex: [model selectedState]];
-}
-
-- (void) selectedChannelChanged:(NSNotification*)aNote
-{
-	[selectedChannelPU selectItemAtIndex: [model selectedChannel]-1];
 }
 
 - (void) passwordChanged:(NSNotification*)aNote
@@ -147,10 +125,13 @@
 		[[stateMatrix cellWithTag:i+1] setStringValue:theState?@" ON":@"OFF"];
 		if(theState){
 			[[stateMatrix cellWithTag:i+1] setTextColor:[NSColor colorWithCalibratedRed:0. green:.7 blue:0. alpha:1.0]];
+			[[turnOnOffMatrix cellWithTag:i+1] setTitle:[NSString stringWithFormat:@"Turn %d OFF",i+1]];
 		}
 		else {
 			[[stateMatrix cellWithTag:i+1] setTextColor:[NSColor colorWithCalibratedRed:.7 green:0. blue:0. alpha:1.0]];
+			[[turnOnOffMatrix cellWithTag:i+1] setTitle:[NSString stringWithFormat:@"Turn %d ON",i+1]];
 		}
+		
 	}
 	[stateView setStateMask:aMask];
 }
@@ -159,12 +140,10 @@
 {
     BOOL locked	= [gSecurity isLocked:ORBootBarModelLock];
 	BOOL busy	= [model isBusy];
-	[sendButton setEnabled: !locked && !busy];
-	[selectedStatePU setEnabled: !locked && !busy];
-	[selectedChannelPU setEnabled: !locked && !busy];
 	[passwordField setEnabled: !locked];
 	[ipNumberComboBox setEnabled: !locked];
 	[clrHistoryButton setEnabled: !locked];
+	[turnOnOffMatrix setEnabled: !locked && !busy];
 }
 
 - (void) lockChanged:(NSNotification*)aNote
@@ -188,16 +167,6 @@
 	[model setOutlet:tag name:[[sender selectedCell]stringValue]];
 }
 
-- (IBAction) selectedStateAction:(id)sender
-{
-	[model setSelectedState:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) selectedChannelAction:(id)sender
-{
-	[model setSelectedChannel:[sender indexOfSelectedItem]+1];	
-}
-
 - (IBAction) passwordFieldAction:(id)sender
 {
 	[model setPassword:[sender stringValue]];	
@@ -218,11 +187,14 @@
 	[model clearHistory];
 }
 
-- (IBAction) sendNewStateAction:(id)sender
+- (IBAction) turnOnOffAction:(id)sender
 {
-	if([model selectedState])[model turnOnOutlet:[model selectedChannel]];
-	else [model turnOffOutlet:[model selectedChannel]];
+	int chan = [[turnOnOffMatrix selectedCell] tag];
+	int state = [model outletStatus:chan];
+	if(state)[model turnOffOutlet:chan];
+	else [model turnOnOutlet:chan];
 }
+
 
 #pragma mark •••Data Source
 - (NSInteger ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
@@ -264,7 +236,7 @@
     [self setNeedsDisplay:YES];
 }
 
-- (void)drawRect:(NSRect)rect 
+- (void) drawRect:(NSRect)rect 
 {    
     [super drawRect:rect];
     NSRect frame = [self bounds];
