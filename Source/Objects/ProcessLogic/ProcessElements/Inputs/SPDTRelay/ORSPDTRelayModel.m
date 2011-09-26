@@ -103,7 +103,7 @@ NSString* ORSPDTRelayOutOffConnection  = @"ORSPDTRelayOutOffConnection";
 //the 'OFF' nub
 @implementation ORSPDTRelayOff
 
-- (int) eval
+- (id) eval
 {
 	[guardian eval];
 	int theState = [guardian state];
@@ -112,7 +112,7 @@ NSString* ORSPDTRelayOutOffConnection  = @"ORSPDTRelayOutOffConnection";
 		if(theState) [self setEvaluatedState:0];
 		else		 [self setEvaluatedState:[guardian connectedObjState]];
 	}
-	return evaluatedState;
+	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }
 
 - (int) evaluatedState

@@ -42,7 +42,7 @@
 {
 	int evaluatedState;
 }
-- (int) eval;
+- (id) eval;
 - (int) evaluatedState;
 - (void) setEvaluatedState:(int)value;
 
