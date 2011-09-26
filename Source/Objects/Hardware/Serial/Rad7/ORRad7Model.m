@@ -28,8 +28,10 @@
 #import "ORDataPacket.h"
 
 #pragma mark ***External Strings
-NSString* ORRad7ModelMakeFileChanged = @"ORRad7ModelMakeFileChanged";
-NSString* ORRad7ModelVerboseChanged = @"ORRad7ModelVerboseChanged";
+NSString* ORRad7ModelMaxRadonChanged	= @"ORRad7ModelMaxRadonChanged";
+NSString* ORRad7ModelAlarmLimitChanged	= @"ORRad7ModelAlarmLimitChanged";
+NSString* ORRad7ModelMakeFileChanged	= @"ORRad7ModelMakeFileChanged";
+NSString* ORRad7ModelVerboseChanged		= @"ORRad7ModelVerboseChanged";
 NSString* ORRad7ModelDeleteDataOnStartChanged = @"ORRad7ModelDeleteDataOnStartChanged";
 NSString* ORRad7ModelRunToPrintChanged	= @"ORRad7ModelRunToPrintChanged";
 NSString* ORRad7ModelDataPointArrayChanged = @"ORRad7ModelDataPointArrayChanged";
@@ -273,6 +275,34 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 }
 
 #pragma mark ***Accessors
+
+- (unsigned long) maxRadon
+{
+    return maxRadon;
+}
+
+- (void) setMaxRadon:(unsigned long)aMaxRadon
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxRadon:maxRadon];
+    
+    maxRadon = aMaxRadon;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelMaxRadonChanged object:self];
+}
+
+- (unsigned long) alarmLimit
+{
+    return alarmLimit;
+}
+
+- (void) setAlarmLimit:(unsigned long)aAlarmLimit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAlarmLimit:alarmLimit];
+    
+    alarmLimit = aAlarmLimit;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelAlarmLimitChanged object:self];
+}
 - (BOOL) makeFile
 {
     return makeFile;
@@ -735,6 +765,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setMaxRadon:			[decoder decodeInt32ForKey:@"maxRadon"]];
+	[self setAlarmLimit:		[decoder decodeInt32ForKey:@"alarmLimit"]];
 	[self setMakeFile:			[decoder decodeBoolForKey:	@"makeFile"]];
 	[self setVerbose:			[decoder decodeBoolForKey:	@"verbose"]];
 	[self setDeleteDataOnStart:	[decoder decodeBoolForKey:	@"deleteDataOnStart"]];
@@ -761,6 +793,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt32:	maxRadon		forKey:@"maxRadon"];
+    [encoder encodeInt32:	alarmLimit		forKey:@"alarmLimit"];
     [encoder encodeBool:	makeFile		forKey:@"makeFile"];
     [encoder encodeBool:	verbose			forKey:@"verbose"];
     [encoder encodeBool:	deleteDataOnStart forKey:@"deleteDataOnStart"];
@@ -1063,6 +1097,86 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	else return 0;
 }
 
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting
+{
+}
+
+- (void) processIsStopping
+{
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{    
+}
+
+- (void) endProcessCycle
+{
+}
+
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"Rad7,%d",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+		theValue = 	[[statusDictionary objectForKey:kRad7LastRadon] doubleValue];
+	}
+	return theValue;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+		theValue = (double)[self maxRadon];
+	}
+	return theValue;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return 0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		*theLowLimit = -.001;
+		*theHighLimit =  [self alarmLimit];
+	}		
+}
+
+- (BOOL) processValue:(int)channel
+{
+	BOOL r;
+	@synchronized(self){
+		r = [[statusDictionary objectForKey:kRad7RunStatus] boolValue];
+	}
+	return r;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do
+}
 
 @end
 

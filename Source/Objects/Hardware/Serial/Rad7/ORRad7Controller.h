@@ -23,7 +23,8 @@
 
 @interface ORRad7Controller : OrcaObjectController
 {
-    IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSTextField*	alarmLimitTextField;
+	IBOutlet NSTextField*	maxRadonTextField;
 	IBOutlet NSButton*		makeFileCB;
 	IBOutlet NSButton*		verboseCB;
 	IBOutlet NSButton*		deleteDataOnStartCB;
@@ -70,6 +71,7 @@
 	IBOutlet NSTextField*   lastCycleNumberField;
 	IBOutlet NSTextField*   lastRadonField;
 	IBOutlet NSTextField*   lastRadonUnitsField;
+	IBOutlet NSTextField*	processUnitsField;
 	IBOutlet NSTextField*   lastRadonUncertaintyFieldField;
 	IBOutlet NSTextField*   uncertaintyField;
 	IBOutlet NSTextField*   temperatureField;
@@ -100,6 +102,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) alarmLimitChanged:(NSNotification*)aNote;
+- (void) maxRadonChanged:(NSNotification*)aNote;
 - (void) makeFileChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
 - (void) deleteDataOnStartChanged:(NSNotification*)aNote;
@@ -128,6 +132,8 @@
 - (void) updatePlot:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) alarmLimitTextFieldAction:(id)sender;
+- (IBAction) maxRadonTextFieldAction:(id)sender;
 - (IBAction) makeFileAction:(id)sender;
 - (IBAction) verboseAction:(id)sender;
 - (IBAction) deleteDataOnStartAction:(id)sender;

@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ORAdcProcessing.h"
 
 @class ORRad7DataPt;
 @class ORSerialPort;
@@ -101,7 +102,7 @@
 
 @class ORRad7DataPt;
 
-@interface ORRad7Model : OrcaObject
+@interface ORRad7Model : OrcaObject <ORAdcProcessing>
 {
     @private
         NSString*       portName;
@@ -140,6 +141,8 @@
 		NSString*		stopRunFilePath;
 		BOOL			tempVerbose;
 		BOOL			runEnded;
+		unsigned long	maxRadon;
+		unsigned long	alarmLimit;
 }
 
 #pragma mark ***Initialization
@@ -149,6 +152,10 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (unsigned long) alarmLimit;
+- (void) setAlarmLimit:(unsigned long)aAlarmLimit;
+- (unsigned long) maxRadon;
+- (void) setMaxRadon:(unsigned long)aMaxRadon;
 - (BOOL) makeFile;
 - (void) setMakeFile:(BOOL)aMakeFile;
 - (BOOL) verbose;
@@ -240,8 +247,21 @@
 - (void) printDataInProgress;
 - (void) printRun:(int) runNumber;
 
+#pragma mark •••Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
 @end
 
+extern NSString* ORRad7ModelAlarmLimitChanged;
+extern NSString* ORRad7ModelMaxRadonChanged;
 extern NSString* ORRad7ModelMakeFileChanged;
 extern NSString* ORRad7ModelVerboseChanged;
 extern NSString* ORRad7ModelDeleteDataOnStartChanged;

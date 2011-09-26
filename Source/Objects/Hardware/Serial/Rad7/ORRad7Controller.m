@@ -216,6 +216,16 @@
                          name : ORRad7ModelMakeFileChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(maxRadonChanged:)
+                         name : ORRad7ModelMaxRadonChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(alarmLimitChanged:)
+                         name : ORRad7ModelAlarmLimitChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -244,6 +254,18 @@
 	[self deleteDataOnStartChanged:nil];
 	[self verboseChanged:nil];
 	[self makeFileChanged:nil];
+	[self maxRadonChanged:nil];
+	[self alarmLimitChanged:nil];
+}
+
+- (void) alarmLimitChanged:(NSNotification*)aNote
+{
+	[alarmLimitTextField setIntValue: [model alarmLimit]];
+}
+
+- (void) maxRadonChanged:(NSNotification*)aNote
+{
+	[maxRadonTextField setIntValue: [model maxRadon]];
 }
 
 - (void) makeFileChanged:(NSNotification*)aNote
@@ -289,6 +311,7 @@
 	[lastCycleNumberField setObjectValue:[model statusForKey:kRad7LastCycleNumber]];
 	[lastRadonField setObjectValue:[model statusForKey:kRad7LastRadon]];
 	[lastRadonUnitsField setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
+	[processUnitsField setObjectValue:[model statusForKey:kRad7LastRadonUnits]];
 	[lastRadonUncertaintyFieldField setObjectValue:[model statusForKey:kRad7LastRadonUncertainty]];
 
 	
@@ -411,8 +434,6 @@
 
 - (void) updateButtons
 {
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORRad7Lock];
     BOOL locked = [gSecurity isLocked:ORRad7Lock];
 
     [lockButton setState: locked];
@@ -421,11 +442,6 @@
     [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORRad7Lock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
 
 	//int opState = [model operationState];
 	int runState = [model runState];
@@ -491,6 +507,9 @@
 	[protocolPU setEnabled:	!counting && !locked];
 	
 	[saveUserProtocolButton setEnabled:[model protocol] == kRad7ProtocolNone];
+
+	[alarmLimitTextField setEnabled:!locked];
+	[maxRadonTextField setEnabled:	!locked];
 
 	
 	if([model protocol] == kRad7ProtocolUser || [model protocol] == kRad7ProtocolNone){
@@ -626,6 +645,16 @@
 
 
 #pragma mark ***Actions
+
+- (void) alarmLimitTextFieldAction:(id)sender
+{
+	[model setAlarmLimit:[sender intValue]];	
+}
+
+- (void) maxRadonTextFieldAction:(id)sender
+{
+	[model setMaxRadon:[sender intValue]];	
+}
 
 - (void) makeFileAction:(id)sender
 {
