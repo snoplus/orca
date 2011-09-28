@@ -103,6 +103,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 - (void) wakeUp
 {
     if(![self aWake]){
+		[self registerNotificationObservers];
 		[self addMachineName];
     }
     [super wakeUp];
@@ -111,6 +112,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 - (void) sleep
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(!stealthMode)[self removeMachineName];
 	[[ORSqlDBQueue queue] waitUntilAllOperationsAreFinished];
@@ -1109,7 +1111,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 		NSArray* objects = [[aNote userInfo] objectForKey:ORGroupObjectList];
 		for(NSObject* obj in objects){
 			if([obj isKindOfClass:NSClassFromString(@"ORProcessModel")]){
-				[self collectProcesses];
+				[self performSelector:@selector(collectProcesses) withObject:nil afterDelay:3];
 				break;
 			}
 		}
