@@ -95,7 +95,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 
 - (NSString*) helpURL
 {
-	return @"Data_Chain/RunList.html";
+	return @"Data_Chain/Run_List.html";
 }
 
 #pragma mark ***Accessors
