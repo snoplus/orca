@@ -95,6 +95,15 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 		[circle fill];
     }
 	
+	NSDictionary* attDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:12],NSFontAttributeName, [NSColor whiteColor],NSForegroundColorAttributeName,nil];
+	NSAttributedString* n = [[NSAttributedString alloc] 
+							 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]]
+							 attributes:attDict];
+	
+
+	[n drawInRect:NSMakeRect(3,-8,[i size].width,[i size].height)];
+	[n release];
+	
     [i unlockFocus];		
     [self setImage:i];
     [i release];

@@ -29,6 +29,12 @@
     return self;
 }
 
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"Boot Bar %d",[model uniqueIdNumber]]];
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
