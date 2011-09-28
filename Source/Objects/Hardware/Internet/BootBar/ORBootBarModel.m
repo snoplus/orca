@@ -250,6 +250,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	if([password length]){
 		NSString* cmd = [NSString stringWithFormat:@"%c%@%dON\r",0x1B,password,i];
 		[self setPendingCmd:cmd];
+		NSLog(@"BootBar %d: %@ turned ON\n",[self uniqueIdNumber],[self outletName:i]);
 	}
 }
 
@@ -258,6 +259,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	if([password length]){
 		NSString* cmd = [NSString stringWithFormat:@"%c%@%dOFF\r",0x1B,password,i];
 		[self setPendingCmd:cmd];
+		NSLog(@"BootBar %d: %@ turned OFF\n",[self uniqueIdNumber],[self outletName:i]);
 	}
 }
 
