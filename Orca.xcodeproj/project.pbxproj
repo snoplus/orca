@@ -14085,6 +14085,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Orca;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -14154,6 +14155,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Orca;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -14218,6 +14220,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Orca;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
