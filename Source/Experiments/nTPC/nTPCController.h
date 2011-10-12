@@ -30,6 +30,8 @@
 	IBOutlet NSMatrix*		planeMaskMatrix;
     IBOutlet NSTextField*	tertiaryRateField;
     IBOutlet NSTextField*	detectorTitle;
+    IBOutlet ORAxis*		xAxis;
+    IBOutlet ORAxis*		colorAxis;
    
 	//items in the  HW map tab view
 	IBOutlet NSPopUpButton* secondaryAdcClassNamePopup;

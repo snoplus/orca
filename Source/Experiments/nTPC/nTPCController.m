@@ -91,7 +91,8 @@
 	[self populateClassNamePopup:secondaryAdcClassNamePopup];
 	[self populateClassNamePopup:tertiaryAdcClassNamePopup];
     [super awakeFromNib];
-		
+	[xAxis setOppositePosition:YES];
+	[colorAxis setOppositePosition:YES];
 }
 
 
