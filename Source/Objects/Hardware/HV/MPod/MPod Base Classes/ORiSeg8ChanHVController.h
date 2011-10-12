@@ -20,7 +20,7 @@
 #pragma mark ***Imported Files
 #import "OrcaObjectController.h"
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORiSeg8ChanHVController : OrcaObjectController 
 {
@@ -60,8 +60,8 @@
     IBOutlet NSButton*      panicAllButton;
     IBOutlet NSButton*      clearAllPanicButton;
 	
-	IBOutlet ORPlotView*   currentPlotter;
-	IBOutlet ORPlotView*   voltagePlotter;
+	IBOutlet ORCompositeTimeLineView*   currentPlotter;
+	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
 }
 
 - (void) registerNotificationObservers;

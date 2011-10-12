@@ -385,7 +385,6 @@ NSString* OReGunLock = @"OReGunLock";
 	x220Object = [[decoder decodeObjectForKey: @"x220Object"] retain];
 	y220Object = [[decoder decodeObjectForKey: @"y220Object"] retain];
 	[[self undoManager] enableUndoRegistration];
-	
 	return self;
 }
 - (void) encodeWithCoder:(NSCoder*)encoder

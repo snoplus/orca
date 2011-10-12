@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositePlotView;
 
 @interface OReGunController : OrcaObjectController
 {
@@ -34,7 +34,7 @@
 	IBOutlet NSTextField*	millimetersPerVoltTextField;
     IBOutlet NSPopUpButton* interfaceObjPUy;
 	IBOutlet NSForm*		channelMatrix;
-	IBOutlet ORPlotView*    xyPlot;
+	IBOutlet ORCompositePlotView*    xyPlot;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      getPositionButton;
     IBOutlet NSTextField*   xPositionField;

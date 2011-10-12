@@ -19,11 +19,11 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositePlotView;
 
 @interface ORXYScannerController : OrcaObjectController
 {
-    IBOutlet ORPlotView*    xyPlot;
+    IBOutlet ORCompositePlotView*    xyPlot;
     IBOutlet NSTextField*   lockDocField;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSButton*      lockButton;

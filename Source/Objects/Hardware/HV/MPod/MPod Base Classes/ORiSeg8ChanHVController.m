@@ -20,7 +20,7 @@
 #pragma mark ***Imported Files
 #import "ORiSeg8ChanHVController.h"
 #import "ORiSeg8ChanHV.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORAxis.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
@@ -41,10 +41,10 @@
 {	
 	[super awakeFromNib];
 	
-	[[currentPlotter yScale] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
-	[[voltagePlotter yScale] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
-	[[currentPlotter yScale] setLabel:@"Current (uA)"];
-	[[voltagePlotter yScale] setLabel:@"Voltage (V)"];
+	[[currentPlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
+	[[voltagePlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
+	[[currentPlotter yAxis] setLabel:@"Current (uA)"];
+	[[voltagePlotter yAxis] setLabel:@"Voltage (V)"];
 	ORTimeLinePlot* aPlot;
 	
 	int i;

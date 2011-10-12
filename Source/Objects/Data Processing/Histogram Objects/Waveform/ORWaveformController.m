@@ -27,6 +27,7 @@
 #import "ORAxis.h"
 #import "ORPlotView.h"
 #import "ORPlotWithROI.h"
+#import "ORCompositePlotView.h"
 
 @implementation ORWaveformController
 
@@ -48,8 +49,8 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-	[[plotView yScale] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
-    [[plotView xScale] setRngLimitsLow:0 withHigh:[model numberBins] withMinRng:25];
+	[[plotView yAxis] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
+    [[plotView xAxis] setRngLimitsLow:0 withHigh:[model numberBins] withMinRng:25];
 
 	ORPlotWithROI* aPlot = [[ORPlotWithROI alloc] initWithTag:0 andDataSource:self];
 	[plotView addPlot: aPlot];
@@ -144,8 +145,8 @@
 - (int) numberPointsInPlot:(id)aPlot
 {
 	int numBins = [model numberBins];
-	if(numBins != [[plotView xScale] maxLimit]){
-	   [[plotView xScale] setRngLimitsLow:0 withHigh:numBins withMinRng:25];
+	if(numBins != [[plotView xAxis] maxLimit]){
+	   [[plotView xAxis] setRngLimitsLow:0 withHigh:numBins withMinRng:25];
 	}
 	return numBins;
 }

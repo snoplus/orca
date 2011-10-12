@@ -26,6 +26,7 @@
 #import "ORAxis.h"
 #import "ORIP220Model.h"
 #import "ORObjectProxy.h"
+#import "ORCompositePlotView.h"
 #define __CARBONSOUND__ //temp until undated to >10.3
 #import <Carbon/Carbon.h>
 
@@ -47,7 +48,7 @@
 
 - (void) awakeFromNib
 {
-	[[xyPlot xScale] setInteger:YES];
+	[[xyPlot xAxis] setInteger:YES];
 	[xyPlot setUseGradient:NO];
     [xyPlot setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
 	[xyPlot setShowGrid:NO];
@@ -57,6 +58,8 @@
 	[xyPlot addPlot: aPlot];
 	[aPlot release];
 	
+	[xyPlot setXLabel:@"X Position (mm)"];
+	[xyPlot setYLabel:@"Y Position (mm)"];
 	[super awakeFromNib];
 }
 
@@ -228,10 +231,10 @@
 		[xyPlot setBackgroundImage:nil];
 		r = 200;
 	}
-	[[xyPlot xScale] setRngDefaultsLow:-r withHigh:r];
-    [[xyPlot xScale] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
-	[[xyPlot yScale] setRngDefaultsLow:-r withHigh:r];
-    [[xyPlot yScale] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
+	[[xyPlot xAxis] setRngDefaultsLow:-r withHigh:r];
+    [[xyPlot xAxis] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
+	[[xyPlot yAxis] setRngDefaultsLow:-r withHigh:r];
+    [[xyPlot yAxis] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
 	[xyPlot setNeedsDisplay:YES];
 	
 }

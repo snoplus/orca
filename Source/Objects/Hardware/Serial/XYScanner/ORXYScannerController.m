@@ -21,7 +21,7 @@
 
 #import "ORXYScannerController.h"
 #import "ORXYScannerModel.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORVectorPlot.h"
 #import "ORAxis.h"
 #import "ORSerialPortList.h"
@@ -54,8 +54,8 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];
-    [[xyPlot xScale] setRngLimitsLow:0 withHigh:110 withMinRng:110];
-    [[xyPlot yScale] setRngLimitsLow:0 withHigh:110 withMinRng:110];
+    [[xyPlot xAxis] setRngLimitsLow:0 withHigh:110 withMinRng:110];
+    [[xyPlot yAxis] setRngLimitsLow:0 withHigh:110 withMinRng:110];
 	
 	[xyPlot setUseGradient:NO];
     [xyPlot setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
@@ -63,6 +63,8 @@
 	ORVectorPlot* aPlot;
 	aPlot = [[ORVectorPlot alloc] initWithTag:0 andDataSource:self];
 	[xyPlot addPlot: aPlot];
+	[xyPlot setXLabel:@"X Position (mm)"];
+	[xyPlot setYLabel:@"Y Position (mm)"];
 	[aPlot release];
 	
     [super awakeFromNib];
