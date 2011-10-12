@@ -33,7 +33,7 @@ for the use of this software.
 #pragma mark ¥¥¥Imported Files
 #import "ORPciBit3Model.h"
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 @class ORGroupView;
  
 @interface ORPciBit3Controller : OrcaObjectController {
@@ -54,7 +54,7 @@ for the use of this software.
 	IBOutlet NSPopUpButton* readWriteIOSpacePopUp;
 	IBOutlet NSPopUpButton* readWriteAddressModifierPopUp;	
 	IBOutlet NSButton*      lockButton;
-	IBOutlet ORPlotView*	errorRatePlot;
+	IBOutlet ORCompositeTimeLineView*	errorRatePlot;
 	IBOutlet NSButton*      errorRateLogCB;
 	IBOutlet NSStepper* 	integrationStepper;
 	IBOutlet NSTextField* 	integrationText;

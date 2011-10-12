@@ -31,6 +31,8 @@
 #import "ORPlotWithROI.h"
 #import "OR1dRoiController.h"
 #import "OR1dFitController.h"
+#import "ORPlot.h"
+#import "ORCompositePlotView.h"
 
 @interface ORMultiPlotController (private)
 - (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -60,8 +62,7 @@
     [self plotNameChanged:nil];
 	
 	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:230/255. green:1 blue:253/255. alpha:1]];
-	
-    [[plotView yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+    [[plotView yAxis] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
 	[self setUpPlots];
 	
 	roiController = [[OR1dRoiController panel] retain];
@@ -71,7 +72,7 @@
 	[fitView addSubview:[fitController view]];
 	
 	[self plotOrderDidChange:plotView];
-	
+	[plotView setShowLegend:YES];
 }
 
 - (void) registerNotificationObservers
@@ -101,10 +102,7 @@
                              name : ORDataSetDataChanged
                             object: [model cachedObjectAtIndex:i]];
     }
-        
 }
-
-
 
 - (void) setModel:(id)aModel
 {
@@ -117,25 +115,14 @@
 
 - (void) setLegend
 {
-    int n = [plotView numberOfPlots];
-    int maxn = [legendMatrix numberOfRows];
-    int i;
-    
-    for(i=0;i<maxn;i++){
-        [[legendMatrix cellWithTag:i] setStringValue:@""];
-    }
-    
-    for(i=0;i<MIN(n,maxn);i++){
-        if(i< [model count] && model && plotView){
+	int i;
+    for(i=0;i<[model count];i++){
+        if(model && plotView){
             NSString* s = [NSString stringWithFormat:@"%@%@",i==[[plotView topPlot] tag]?@"+ ":@"  ",[model objectAtIndex:i]];
-            [[legendMatrix cellWithTag:i] setStringValue:s];
-			[[legendMatrix cellWithTag:i]setTextColor:[[plotView plotWithTag:i] lineColor]];
+			[(ORPlot*)[plotView plotWithTag:i] setName:s];
         }
-        else {
-            [[legendMatrix cellWithTag:i] setStringValue:@""];
-        }
-    }
-    
+     }
+	[plotView setShowLegend:YES];
 }
 
 - (void) plotNameChanged:(NSNotification*)aNote
@@ -193,7 +180,6 @@
 										   modalDelegate:self 
 										  didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
 											 contextInfo:aContextInfo] retain];
-
 }
 
 - (IBAction) copy:(id)sender
@@ -229,6 +215,7 @@
 {
 	int tag = [aPlot tag];
 	id aDataSet = [model cachedObjectAtIndex:tag];
+	*xValue = (double)i;
 	*yValue =  [aDataSet value:i];
 }
 
@@ -236,7 +223,6 @@
 {
 	return [model rois:[aPlot tag]];
 }
-
 @end
 
 @implementation ORMultiPlotController (private)

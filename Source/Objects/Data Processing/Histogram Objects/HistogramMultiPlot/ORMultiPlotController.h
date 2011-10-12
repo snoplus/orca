@@ -27,7 +27,6 @@
 
 @interface ORMultiPlotController : ORDataController {
 	@protected
-		IBOutlet NSMatrix* legendMatrix;
 		IBOutlet NSTextField* plotNameField;
 		IBOutlet NSView*		roiView;
 		IBOutlet NSView*		fitView;

@@ -22,7 +22,7 @@
 #import "ORPDcuController.h"
 #import "ORPDcuModel.h"
 #import "ORTimeLinePlot.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORSerialPort.h"
 #import "ORTimeRate.h"
@@ -52,16 +52,16 @@
 
 - (void) awakeFromNib
 {	
-    [[plotter yScale] setRngLow:0.0 withHigh:1000.];
-	[[plotter yScale] setRngLimitsLow:0.0 withHigh:1000000000 withMinRng:10];
+    [[plotter yAxis] setRngLow:0.0 withHigh:1000.];
+	[[plotter yAxis] setRngLimitsLow:0.0 withHigh:1000000000 withMinRng:10];
 	[plotter setUseGradient:YES];
 	
-    [[plotter xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[plotter addPlot: aPlot];
-	[(ORTimeAxis*)[plotter xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[(ORTimeAxis*)[plotter xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 	
 	[super awakeFromNib];	
@@ -216,20 +216,20 @@
 	[pressureScalePU selectItemAtIndex: [model pressureScale]];
 	[plotter setNeedsDisplay:YES];
 	if([model pressureScale]>0){
-		[[plotter yScale] setLabel:[NSString stringWithFormat:@"xE-%02d mbar",[model pressureScale]]];
+		[[plotter yAxis] setLabel:[NSString stringWithFormat:@"xE-%02d mbar",[model pressureScale]]];
 	}
 	else {
-		[[plotter yScale] setLabel:@"mbar"];
+		[[plotter yAxis] setLabel:@"mbar"];
 	}
 }
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotter xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter xScale]attributes] forKey:@"XAttributes0"];
+	if(aNotification == nil || [aNotification object] == [plotter xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter xAxis]attributes] forKey:@"XAttributes0"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter yScale]attributes] forKey:@"YAttributes0"];
+	if(aNotification == nil || [aNotification object] == [plotter yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter yAxis]attributes] forKey:@"YAttributes0"];
 	};
 	
 }
@@ -243,17 +243,17 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter xAxis] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
-			[[plotter xScale] setNeedsDisplay:YES];
+			[[plotter xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter yAxis] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
-			[[plotter yScale] setNeedsDisplay:YES];
+			[[plotter yAxis] setNeedsDisplay:YES];
 		}
 	}
 	

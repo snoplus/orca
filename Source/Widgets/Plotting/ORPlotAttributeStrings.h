@@ -29,5 +29,6 @@ extern NSString* ORPlotLineWidth;
 extern NSString* ORPlotShowGrid;
 extern NSString* ORPlotShowSymbols;
 extern NSString* ORPlotShowLine;
+extern NSString* ORPlotName;
 
 extern NSString* ORPlotViewRedrawEvent;

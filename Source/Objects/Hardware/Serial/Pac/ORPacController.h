@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORPacController : OrcaObjectController
 {
@@ -55,8 +55,8 @@
 	IBOutlet NSTextField*	logFileTextField;
 	IBOutlet NSButton*		logToFileButton;
 	
-	IBOutlet ORPlotView*   plotter0;
-	IBOutlet ORPlotView*   plotter1;
+	IBOutlet ORCompositeTimeLineView*   plotter0;
+	IBOutlet ORCompositeTimeLineView*   plotter1;
 	
 	IBOutlet NSButton*		readRdacButton;
 	IBOutlet NSButton*		writeRdacButton;

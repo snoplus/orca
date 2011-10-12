@@ -43,6 +43,7 @@
 #import "ORRateGroup.h"
 #import "ORTimeRate.h"
 #import "ORPciBit3Commands.h"
+#import "ORCompositePlotView.h"
 
 #pragma mark ¥¥¥Macros
 // swap 16 bit quantities in 32 bit value ( |2| |1| -> |1| |2| )
@@ -66,7 +67,7 @@
 
 - (void) awakeFromNib
 {
-    [[errorRatePlot yScale] setLog:YES];
+    [[errorRatePlot yAxis] setLog:YES];
     [addressStepper setMaxValue:(double)0x7fffffff];
 	[groupView setGroup:model];
  
@@ -75,7 +76,7 @@
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 		[aPlot setLineColor:[self colorForDataSet:i]];
 		[errorRatePlot addPlot: aPlot];
-		[(ORTimeAxis*)[errorRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[errorRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release]; 
 	}
 	[super awakeFromNib];
@@ -123,12 +124,12 @@
     [notifyCenter addObserver : self
                      selector : @selector(errorRateXAttributesChanged:)
                          name : ORAxisRangeChangedNotification
-                       object : [errorRatePlot xScale]];
+                       object : [errorRatePlot xAxis]];
     
     [notifyCenter addObserver : self
                      selector : @selector(errorRateYAttributesChanged:)
                          name : ORAxisRangeChangedNotification
-                       object : [errorRatePlot yScale]];
+                       object : [errorRatePlot yAxis]];
     
     [notifyCenter addObserver : self
                      selector : @selector(updateErrorPlot:)
@@ -324,16 +325,16 @@
 
 - (void) errorRateXAttributesChanged:(NSNotification*)aNote
 {
-	[model setErrorRateXAttributes:[(ORAxis*)[errorRatePlot xScale] attributes]];
+	[model setErrorRateXAttributes:[(ORAxis*)[errorRatePlot xAxis] attributes]];
 }
 
 
 
 - (void) errorRateYAttributesChanged:(NSNotification*)aNote
 {
-	BOOL isLog = [[errorRatePlot yScale] isLog];
+	BOOL isLog = [[errorRatePlot yAxis] isLog];
 	[errorRateLogCB setState:isLog];
-	[model setErrorRateYAttributes:[(ORAxis*)[errorRatePlot yScale] attributes]];
+	[model setErrorRateYAttributes:[(ORAxis*)[errorRatePlot yAxis] attributes]];
 }
 
 

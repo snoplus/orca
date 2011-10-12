@@ -29,5 +29,6 @@ NSString* ORPlotShowLine		= @"ORPlotShowLine";
 NSString* ORPlotLineColor		= @"ORPlotLineColor";
 NSString* ORPlotLineWidth		= @"ORPlotLineWidth";
 NSString* ORPlotUseConstantColor= @"ORPlotUseConstantColor";
+NSString* ORPlotName			= @"ORPlotName";
 
 NSString* ORPlotViewRedrawEvent	    = @"ORPlotViewRedrawEvent";

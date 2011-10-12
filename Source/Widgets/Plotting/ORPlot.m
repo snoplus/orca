@@ -112,6 +112,16 @@
 }
 
 #pragma mark ***Attributes
+- (NSString*) name
+{
+	return [attributes objectForKey:ORPlotName];
+}
+
+- (void) setName:(NSString*)aName
+{
+	[attributes setObject:aName forKey:ORPlotName];
+}
+
 - (void) setUseConstantColor:(BOOL)aState
 {
     [attributes setObject:[NSNumber numberWithBool:aState] forKey:ORPlotUseConstantColor];
@@ -232,10 +242,11 @@
 	
 	NSBezierPath* theDataPath = [NSBezierPath bezierPath];
 	[theDataPath moveToPoint:NSMakePoint(x,y)];
-	
+	float maxXValue = [mXScale maxValue];
 	long ix;
 	for (ix=minX+1; ix<maxX;++ix) {	
 		[dataSource plotter:self index:ix x:&xValue y:&yValue];
+		if(xValue>maxXValue)break;
 		x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx];
 		y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
 		[theDataPath lineToPoint:NSMakePoint(x,y)];

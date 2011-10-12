@@ -46,8 +46,8 @@
 		int countingMode;
 		int cycleDuration;
 		BOOL running;
-		NSCalendarDate* cycleStarted;
-		NSCalendarDate* cycleWillEnd;
+		NSDate* cycleStarted;
+		NSDate* cycleWillEnd;
 		int cycleNumber;
 }
 
@@ -60,10 +60,10 @@
 #pragma mark ***Accessors
 - (int) cycleNumber;
 - (void) setCycleNumber:(int)aCycleNumber;
-- (NSCalendarDate*) cycleWillEnd;
-- (void) setCycleWillEnd:(NSCalendarDate*)aCycleWillEnd;
-- (NSCalendarDate*) cycleStarted;
-- (void) setCycleStarted:(NSCalendarDate*)aCycleStarted;
+- (NSDate*) cycleWillEnd;
+- (void) setCycleWillEnd:(NSDate*)aCycleWillEnd;
+- (NSDate*) cycleStarted;
+- (void) setCycleStarted:(NSDate*)aCycleStarted;
 - (BOOL) running;
 - (void) setRunning:(BOOL)aRunning;
 - (int) cycleDuration;

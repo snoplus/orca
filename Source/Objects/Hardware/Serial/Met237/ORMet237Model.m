@@ -163,7 +163,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCycleNumberChanged object:self];
 }
 
-- (NSCalendarDate*) cycleWillEnd
+- (NSDate*) cycleWillEnd
 {
     return cycleWillEnd;
 }
@@ -177,12 +177,12 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCycleWillEndChanged object:self];
 }
 
-- (NSCalendarDate*) cycleStarted
+- (NSDate*) cycleStarted
 {
     return cycleStarted;
 }
 
-- (void) setCycleStarted:(NSCalendarDate*)aCycleStarted
+- (void) setCycleStarted:(NSDate*)aCycleStarted
 {
     [aCycleStarted retain];
     [cycleStarted release];
@@ -448,9 +448,9 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	if(![self running]){
 		[self setRunning:YES];
 		[self setCycleNumber:1];
-		NSCalendarDate* now = [NSCalendarDate date];
+		NSDate* now = [NSDate date];
 		[self setCycleStarted:now];
-		[self setCycleWillEnd:[now dateByAddingTimeInterval:[self cycleDuration]*60]]; 
+		[self setCycleWillEnd:[now addTimeInterval:[self cycleDuration]*60]]; 
 		[self clearBuffer];
 		[self startCountingByComputer];
 		[self checkCycle];
@@ -485,7 +485,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 			[self stopCounting];
 			[self getRecord];
 			[self startCountingByComputer];
-			[self setCycleWillEnd:[now dateByAddingTimeInterval:[self cycleDuration]*60]]; 
+			[self setCycleWillEnd:[now addTimeInterval:[self cycleDuration]*60]]; 
 		}
 	}
 }

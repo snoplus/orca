@@ -64,6 +64,7 @@ enum {
 	else {
 		[xAxis setRngLimitsLow:[model patternEndCount] withHigh:[model patternStartCount] withMinRng:abs([model patternEndCount] - [model patternStartCount])];
 	}
+	[xAxis setLabel:@"Motor Position (Pattern Range)"];
     [queueView setUseSignedValues:YES];
     [queueView setNeedsDisplay:YES];
     [super awakeFromNib];

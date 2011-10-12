@@ -20,7 +20,7 @@
 #pragma mark •••Imported Files
 
 @class StopLightView;
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 @class ORSerialPortController;
 
 @interface ORPDcuController : OrcaObjectController
@@ -44,7 +44,7 @@
     IBOutlet NSButton*		updateButton;
     IBOutlet NSButton*		initButton;
     IBOutlet StopLightView* lightBoardView;
-    IBOutlet ORPlotView*	plotter;
+    IBOutlet ORCompositeTimeLineView*	plotter;
 	IBOutlet NSPopUpButton*	pressureScalePU;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;

@@ -39,6 +39,7 @@
 	NSImage*				symbolNormal;
 	NSImage*				symbolLight;
 	NSColor*				savedColor;
+	NSString*				name;
 }
 
 - (id) initWithTag:(int)aTag andDataSource:(id)dataSource;
@@ -51,6 +52,8 @@
 
 - (void) setTag:(int)aTag;
 - (int) tag;
+- (NSString*) name;
+- (void) setName:(NSString*)aName;
 
 - (void) setDataSource:(id)ds;
 - (id)	 dataSource;
