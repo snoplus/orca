@@ -20,6 +20,7 @@
 #import "ORHP4405AModel.h"
 #import "ORPlot.h"
 #import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORAxis.h"
 
 @implementation ORHP4405AController
@@ -36,8 +37,8 @@
 	ORPlot* aPlot= [[ORPlot alloc] initWithTag:0 andDataSource:self];
 	[plotter addPlot: aPlot];
 	[aPlot release];
-	[xScale setRngLimitsLow:0 withHigh:401 withMinRng:10];
-	[xScale setRngDefaultsLow:0 withHigh:401];
+	[[plotter yAxis] setRngLimitsLow:0 withHigh:401 withMinRng:10];
+	[[plotter yAxis] setRngDefaultsLow:0 withHigh:401];
 }
 
 #pragma mark ***Notifications
@@ -467,7 +468,7 @@
 - (void) unitsChanged:(NSNotification*)aNote
 {
 	[unitsPU selectItemAtIndex: [model units]];
-	[yScale setLabel:[model unitFullName:[model units]]];
+	[[plotter yAxis] setLabel:[model unitFullName:[model units]]];
 }
 
 - (void) stopFreqChanged:(NSNotification*)aNote

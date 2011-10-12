@@ -27,6 +27,7 @@
 #import "ORPlotView.h"
 #import "ORAxis.h"
 #import "ORTimedTextField.h"
+#import "ORCompositePlotView.h"
 
 @interface ORDGF4cController (private)
 - (void) doUpdate;
@@ -58,11 +59,11 @@
 - (void) awakeFromNib
 {
 	[plotter setUseGradient:YES];
-	[xScale setRngLimitsLow:0 withHigh:8192 withMinRng:25];
-	[xScale setRngDefaultsLow:0 withHigh:8192];
-	[yScale setRngLimitsLow:-65535 withHigh:65535 withMinRng:10];
-	[yScale setRngDefaultsLow:-65535 withHigh:65535];
-	[yScale setRngLow:-65535 withHigh:65535];
+	[[plotter xAxis] setRngLimitsLow:0 withHigh:8192 withMinRng:25];
+	[[plotter xAxis] setRngDefaultsLow:0 withHigh:8192];
+	[[plotter yAxis] setRngLimitsLow:-65535 withHigh:65535 withMinRng:10];
+	[[plotter yAxis] setRngDefaultsLow:-65535 withHigh:65535];
+	[[plotter yAxis] setRngLow:-65535 withHigh:65535];
 	
 	NSColor* theColors[4] =
 	{
@@ -886,7 +887,7 @@
 	}
 	//[plotter autoScale:nil];
 	[plotter setNeedsDisplay:YES];
-	//[yScale setRngLimitsLow:-65535 withHigh:65535 withMinRng:10];
+	//[[plotter yAxis] setRngLimitsLow:-65535 withHigh:65535 withMinRng:10];
 	
 	if(sampling){
 		[self performSelector:@selector(takeSample) withObject:nil afterDelay:.5];

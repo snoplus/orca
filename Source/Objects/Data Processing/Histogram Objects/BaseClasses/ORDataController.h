@@ -18,14 +18,13 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-@class ORPlotView;
 
 @interface ORDataController : OrcaObjectController {
 	    
     IBOutlet NSDrawer*		analysisDrawer;
 
+    IBOutlet NSTextField*   positionField;
     IBOutlet NSTextField*   titleField;
-    IBOutlet NSView*		plotterGroupView;
     IBOutlet NSButton*		hideShowButton;
     IBOutlet NSView*        containingView;
     IBOutlet NSTextField*   pausedField;
@@ -34,7 +33,7 @@
     IBOutlet NSPopUpButton*	refreshModePU;
 	IBOutlet NSButton*		pauseButton;
     IBOutlet NSButton*		refreshButton;
-	IBOutlet ORPlotView*	plotView;
+	IBOutlet id	plotView;
 }
 
 #pragma mark •••Accessors

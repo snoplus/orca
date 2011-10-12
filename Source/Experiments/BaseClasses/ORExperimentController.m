@@ -22,7 +22,7 @@
 #import "ORExperimentController.h"
 #import "ORExperimentModel.h"
 #import "ORColorScale.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeRate.h"
 #import "BiStateView.h"
 #import "ORReplayDataModel.h"
@@ -69,7 +69,7 @@
    
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[ratePlot addPlot: aPlot];
-	[(ORTimeAxis*)[ratePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[(ORTimeAxis*)[ratePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 
 	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:10 andDataSource:self];
@@ -77,7 +77,7 @@
 	[valueHistogramsPlot addPlot: aPlot1];
 	[aPlot1 release];
 	
-	[[ratePlot yScale] setRngLimitsLow:0 withHigh:5000000 withMinRng:1];
+	[[ratePlot yAxis] setRngLimitsLow:0 withHigh:5000000 withMinRng:1];
 
     [[primaryColorScale colorAxis] setNeedsDisplay:YES];
     [selectionStringTextView setFont:[NSFont fontWithName:@"Monaco" size:9]];
@@ -621,15 +621,15 @@
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [ratePlot xScale]){
-		ORAxis* xScale = [ratePlot xScale];
-		NSMutableDictionary* attrib = [xScale attributes];
+	if(aNotification == nil || [aNotification object] == [ratePlot xAxis]){
+		ORAxis* xAxis = [ratePlot xAxis];
+		NSMutableDictionary* attrib = [xAxis attributes];
 		[model setMiscAttributes:attrib forKey:@"XAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [ratePlot yScale]){
-		ORAxis* yScale = [ratePlot yScale];
-		NSMutableDictionary* attrib = [yScale attributes];
+	if(aNotification == nil || [aNotification object] == [ratePlot yAxis]){
+		ORAxis* yAxis = [ratePlot yAxis];
+		NSMutableDictionary* attrib = [yAxis attributes];
 		[model setMiscAttributes:attrib forKey:@"YAttributes"];
 	};
 }
@@ -642,20 +642,20 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes"];
 		if(attrib){
-			ORAxis* xScale = [ratePlot xScale];
-			[xScale setAttributes:attrib];
+			ORAxis* xAxis = [ratePlot xAxis];
+			[xAxis setAttributes:attrib];
 			[ratePlot setNeedsDisplay:YES];
-			[[ratePlot xScale] setNeedsDisplay:YES];
+			[[ratePlot xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes"];
 		if(attrib){
-			ORAxis* yScale = [ratePlot yScale];
-			[yScale setAttributes:attrib];
+			ORAxis* yAxis = [ratePlot yAxis];
+			[yAxis setAttributes:attrib];
 			[ratePlot setNeedsDisplay:YES];
-			[[ratePlot yScale] setNeedsDisplay:YES];
-			[rateLogCB setState:[[ratePlot yScale] isLog]];
+			[[ratePlot yAxis] setNeedsDisplay:YES];
+			[rateLogCB setState:[[ratePlot yAxis] isLog]];
 		}
 	}
 }
@@ -798,9 +798,9 @@
 - (void) scaleValueHistogram
 {
 
-    [[valueHistogramsPlot xScale] setRngLow:0 withHigh:64];
+    [[valueHistogramsPlot xAxis] setRngLow:0 withHigh:64];
 	switch([model displayType]){
-		case kDisplayRates:		[[valueHistogramsPlot xScale] setRngLow:0 withHigh:64]; break;
+		case kDisplayRates:		[[valueHistogramsPlot xAxis] setRngLow:0 withHigh:64]; break;
 		case kDisplayThresholds:
 		case kDisplayGains:		
 		case kDisplayTotalCounts:		
@@ -836,23 +836,23 @@
 	switch([model displayType]){
 		case kDisplayRates:			
 			[histogramTitle setStringValue:@"Channel Rates"];
-			[[valueHistogramsPlot xScale ] setLabel:@"Channel"];	
-			[[valueHistogramsPlot yScale ] setLabel:@"Counts/Sec"];	
+			[valueHistogramsPlot setXLabel:@"Channel"];	
+			[valueHistogramsPlot setYLabel:@"Counts/Sec"];	
 		break;
 		case kDisplayTotalCounts:			
 			[histogramTitle setStringValue:@"Total Counts Distribution"];		
-			[[valueHistogramsPlot xScale] setLabel:@"Channel"];	
-			[[valueHistogramsPlot yScale] setLabel:@"Total Counts"];	
+			[valueHistogramsPlot setXLabel:@"Channel"];	
+			[valueHistogramsPlot setYLabel:@"Total Counts"];	
 		break;
 		case kDisplayThresholds:	
 			[histogramTitle setStringValue:@"Threshold Distribution"];	
-			[[valueHistogramsPlot xScale] setLabel:@"Raw Threshold Value"];	
-			[[valueHistogramsPlot yScale] setLabel:@"# Channels"];	
+			[valueHistogramsPlot setXLabel:@"Raw Threshold Value"];	
+			[valueHistogramsPlot setYLabel:@"# Channels"];	
 		break;
 		case kDisplayGains:			
 			[histogramTitle setStringValue:@"Gain Distribution"];		
-			[[valueHistogramsPlot xScale] setLabel:@"Gain Value"];	
-			[[valueHistogramsPlot yScale] setLabel:@"# Channels"];	
+			[valueHistogramsPlot setXLabel:@"Gain Value"];	
+			[valueHistogramsPlot setYLabel:@"# Channels"];	
 		break;
 		default: break;
 	}
@@ -965,8 +965,8 @@
 - (void) scaleValueHistogram
 {
 	switch([model displayType]){
-		case kDisplayRates:			[[valueHistogramsPlot xScale] setRngLow:0 withHigh:[model maxNumSegments]]; break;
-		case kDisplayTotalCounts:	[[valueHistogramsPlot xScale] setRngLow:0 withHigh:[model maxNumSegments]]; break;
+		case kDisplayRates:			[[valueHistogramsPlot xAxis] setRngLow:0 withHigh:[model maxNumSegments]]; break;
+		case kDisplayTotalCounts:	[[valueHistogramsPlot xAxis] setRngLow:0 withHigh:[model maxNumSegments]]; break;
 		case kDisplayThresholds:
 		case kDisplayGains:		
 			[valueHistogramsPlot autoScaleX:self];

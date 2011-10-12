@@ -25,6 +25,8 @@
 #import "ORDataTaker.h"
 #import "ORReadOutList.h"
 #import "ORValueBar.h"
+#import "ORCompositePlotView.h"
+#import "ORValueBarGroupView.h"
 #import "ORPlotView.h"
 #import "OR1DHistoPlot.h"
 #import "ORAxis.h"
@@ -75,15 +77,15 @@
     [readoutListView setDoubleAction:@selector(tableDoubleClick:)];
     [readoutListView setAction:@selector(tableClick:)];
     
-    [[queueBarGraph xScale] setRngLow:0 withHigh:(double)[model queueMaxSize]];
-    [[queueBarGraph xScale] setLog:YES];
+    [[queueBarGraph xAxis] setRngLow:0 withHigh:(double)[model queueMaxSize]];
+    [[queueBarGraph xAxis] setLog:YES];
     
-    [[plotter yScale] setRngLimitsLow:0 withHigh:1e10 withMinRng:10];
-    [[plotter yScale] setRngLow:0 withHigh:2000];
-    [[plotter yScale] setLog:NO];
-    [[plotter xScale] setRngLimitsLow:0 withHigh:kTimeHistoSize withMinRng:10];
-    [[plotter xScale] setRngLow:0 withHigh:kTimeHistoSize];
-    [[plotter xScale] setLog:NO];
+    [[plotter yAxis] setRngLimitsLow:0 withHigh:1e10 withMinRng:10];
+    [[plotter yAxis] setRngLow:0 withHigh:2000];
+    [[plotter yAxis] setLog:NO];
+    [[plotter xAxis] setRngLimitsLow:0 withHigh:kTimeHistoSize withMinRng:10];
+    [[plotter xAxis] setRngLow:0 withHigh:kTimeHistoSize];
+    [[plotter xAxis] setLog:NO];
 
     [totalListView setVerticalMotionCanBeginDrag:YES];
     [readoutListView setVerticalMotionCanBeginDrag:YES];

@@ -23,14 +23,11 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDGF4cModel.h"
 
-@class ORPlotView;
-@class ORAxis;
+@class ORCompositePlotView;
 
 @interface ORDGF4cController : OrcaObjectController {
 	@private
-		IBOutlet ORPlotView*   plotter;
-		IBOutlet ORAxis*		xScale;
-		IBOutlet ORAxis*		yScale;
+		IBOutlet ORCompositePlotView*   plotter;
 		IBOutlet NSButton*		sampleContinousButton;
         IBOutlet NSMatrix*		ocsChanEnableMatrix;
 		IBOutlet NSButton*		sampleWaveformsButton;

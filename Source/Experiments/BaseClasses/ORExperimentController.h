@@ -19,7 +19,8 @@
 //-------------------------------------------------------------
 
 @class ORDetectorView;
-@class ORPlotView;
+@class ORCompositeTimeLineView;
+@class ORCompositePlotView;
 @class ORColorScale;
 @class BiStateView;
 @class ORRunModel;
@@ -35,7 +36,7 @@
     IBOutlet ORDetectorView* detectorView;
     IBOutlet ORColorScale*	primaryColorScale;
     IBOutlet NSButton*		primaryColorAxisLogCB;
-    IBOutlet ORPlotView*	ratePlot;
+    IBOutlet ORCompositeTimeLineView*	ratePlot;
     IBOutlet NSButton*		rateLogCB;
     IBOutlet NSTableView*	primaryTableView;
     IBOutlet NSButton*		detectorLockButton;
@@ -59,7 +60,7 @@
 
 	//items in the  details tab view
 	IBOutlet NSPopUpButton*	displayTypePU1;
-    IBOutlet ORPlotView*	valueHistogramsPlot;
+    IBOutlet ORCompositePlotView*	valueHistogramsPlot;
 	IBOutlet NSTextField*	histogramTitle;
     IBOutlet NSTableView*	primaryValuesView;
     IBOutlet NSButton*		initButton;

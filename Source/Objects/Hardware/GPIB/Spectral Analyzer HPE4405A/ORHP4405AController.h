@@ -20,7 +20,7 @@
 
 #import "ORGpibDeviceController.h"
 
-@class ORPlotView;
+@class ORCompositePlotView;
 @class ORAxis;
 
 @interface ORHP4405AController : ORGpibDeviceController {    
@@ -58,10 +58,7 @@
 	IBOutlet   NSButton*		frequencySettingsLoadButton;
 	IBOutlet   NSButton*		triggerSettingsLoadButton;
 
-	IBOutlet ORPlotView*	plotter;
-    IBOutlet ORAxis*		yScale;
-    IBOutlet ORAxis*		xScale;
-	
+	IBOutlet ORCompositePlotView*	plotter;	
 }
 
 #pragma mark ***Initialization

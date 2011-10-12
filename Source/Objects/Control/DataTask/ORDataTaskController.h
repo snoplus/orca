@@ -21,8 +21,8 @@
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORValueBar;
-@class ORScale;
-@class ORPlotView;
+@class ORCompositePlotView;
+@class ORValueBarGroupView;
 
 @interface ORDataTaskController : OrcaObjectController {
     IBOutlet NSDrawer*      totalListViewDrawer;
@@ -31,18 +31,18 @@
     IBOutlet NSButton*      removeButton;
     IBOutlet NSButton*      removeAllButton;
     IBOutlet NSTabView*     tabView;
-    IBOutlet ORValueBar*    queueBarGraph;
 	IBOutlet NSTextField*   cycleRateField;
     IBOutlet NSButton*      listLockButton;
     IBOutlet NSButton*      viewListButton;
     IBOutlet NSButton*      saveAsButton;
     IBOutlet NSButton*      loadListButton;
-	IBOutlet ORPlotView*    plotter;
 	IBOutlet NSMatrix*		timeScaleMatrix;
 	IBOutlet NSPopUpButton* refreshRatePU;
     IBOutlet NSButton*      refreshButton;
     IBOutlet NSButton*      clearButton;
 	IBOutlet NSTextField*	timerEnabledWarningField;
+	IBOutlet ORCompositePlotView*		plotter;
+    IBOutlet ORValueBarGroupView*    queueBarGraph;
     NSMutableArray*         draggedNodes;
 	float					refreshDelay;
 }

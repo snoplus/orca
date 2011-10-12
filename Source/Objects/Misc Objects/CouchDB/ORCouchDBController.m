@@ -22,6 +22,7 @@
 #import "ORCouchDBController.h"
 #import "ORCouchDBModel.h"
 #import "ORCouchDB.h"
+#import "ORValueBarGroupView.h"
 
 @interface ORCouchDBController (private)
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;

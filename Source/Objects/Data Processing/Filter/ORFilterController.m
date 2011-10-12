@@ -27,6 +27,7 @@
 #import "ORScriptRunner.h"
 #import "ORDataPacket.h"
 #import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "OR1DHistoPlot.h"
 
 @interface ORFilterController (private)
@@ -54,6 +55,7 @@
 	[scriptView setSyntaxDefinitionFilename:@"FilterSyntaxDefinition"];
 	[scriptView recolorCompleteFile:self];
 	
+	[timePlot setXLabel:@"Record Process Time (µS)"];
 	OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
 	[timePlot addPlot: aPlot];
 	[aPlot release];

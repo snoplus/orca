@@ -17,7 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#import "ORValueBar.h"
+@class ORValueBarGroupView;
 
 @interface ORCouchDBController : OrcaObjectController 
 {	
@@ -29,7 +29,7 @@
 	IBOutlet NSTextField* dataBaseNameField;
 	IBOutlet NSTextField* historyDataBaseNameField;
     IBOutlet NSButton*    couchDBLockButton;
-    IBOutlet ORValueBar*  queueValueBar;
+    IBOutlet ORValueBarGroupView*  queueValueBar;
 	IBOutlet NSButton*	  stealthModeButton;
 	IBOutlet NSTextField* dbSizeField;
 	IBOutlet NSTextField* dbHistorySizeField;

@@ -20,6 +20,7 @@
 
 #import "ORDataController.h"
 #import "ORDataSetModel.h"
+#import "ORCompositePlotView.h"
 #import "ORPlotView.h"
 #import "ORAxis.h"
 #import "ORCARootServiceDefs.h"
@@ -171,13 +172,13 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotView xScale]){
-		ORAxis* axis = [plotView xScale];
+	if(aNotification == nil || [aNotification object] == [plotView xAxis]){
+		ORAxis* axis = [plotView xAxis];
 		[model setMiscAttributes:[axis attributes] forKey:@"XAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotView yScale]){
-		ORAxis* axis = [plotView yScale];
+	if(aNotification == nil || [aNotification object] == [plotView yAxis]){
+		ORAxis* axis = [plotView yAxis];
 		[model setMiscAttributes:[axis attributes] forKey:@"YAttributes"];
 	};
 }
@@ -190,26 +191,26 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 	if(aNote == nil || [key isEqualToString:@"XAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes"];
 		if(attrib){
-			ORAxis* axis = [plotView xScale];
+			ORAxis* axis = [plotView xAxis];
 			[axis setAttributes:attrib];
 			[plotView setNeedsDisplay:YES];
-			[[plotView xScale] setNeedsDisplay:YES];
+			[[plotView xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes"];
 		if(attrib){
-			ORAxis* axis = [plotView yScale];
+			ORAxis* axis = [plotView yAxis];
 			[axis setAttributes:attrib];
 			[plotView setNeedsDisplay:YES];
-			[[plotView yScale] setNeedsDisplay:YES];
+			[[plotView yAxis] setNeedsDisplay:YES];
 		}
 	}
 }
 
 - (void) calibrationChanged:(NSNotification*)aNotification
 {
-	[[plotView xScale] setNeedsDisplay:YES];
+	[[plotView xAxis] setNeedsDisplay:YES];
 }
 
 - (void) dataSetChanged:(NSNotification*)aNotification

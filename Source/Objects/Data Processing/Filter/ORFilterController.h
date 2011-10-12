@@ -20,7 +20,7 @@
 
 @class ORTimedTextField;
 @class ORScriptView;
-@class ORPlotView;
+@class ORCompositePlotView;
 
 @interface ORFilterController : OrcaObjectController {
 
@@ -43,7 +43,7 @@
 	IBOutlet NSButton*			runButton;
 	IBOutlet NSButton*			loadSaveButton;
 	IBOutlet NSButton*			timerEnabledCB;
-	IBOutlet ORPlotView*		timePlot;
+	IBOutlet ORCompositePlotView*		timePlot;
 	IBOutlet NSButton*			addInputButton;
 	IBOutlet NSButton*			removeInputButton;
 	IBOutlet NSButton*			parseButton;
