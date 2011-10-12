@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORValueBar.h"
+@class ORValueBarGroupView;
 
 @interface ORSqlController : OrcaObjectController 
 {	
@@ -30,7 +30,7 @@
 	IBOutlet NSTextField* connectionValidField;
     IBOutlet NSButton*    sqlLockButton;
     IBOutlet NSButton*    connectionButton;
-    IBOutlet ORValueBar*  queueValueBar;
+    IBOutlet ORValueBarGroupView*  queueValueBar;
 	IBOutlet NSButton*    dropAllTablesButton;
 
 	double queueCount;

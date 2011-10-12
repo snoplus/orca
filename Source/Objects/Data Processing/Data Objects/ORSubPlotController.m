@@ -26,6 +26,7 @@
 #import "ORWaveform.h"
 #import "ORAxis.h"
 #import "ORDataSetModel.h"
+#import "ORCompositePlotView.h"
 
 @implementation ORSubPlotController
 
@@ -57,7 +58,7 @@
 
 - (ORPlotView*) plotView
 {
-    return plotView;
+    return [plotView plotView];
 }
 
 - (void) setModel:(id)aModel
@@ -124,7 +125,7 @@
 
 - (IBAction) toggleLog:(id)sender
 {
-    [[plotView yScale] setLog:![[plotView yScale] isLog]];
+    [[plotView yAxis] setLog:![[plotView yAxis] isLog]];
 }
 
 @end

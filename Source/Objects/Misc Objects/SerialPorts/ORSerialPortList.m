@@ -47,18 +47,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 	return [[[ORStandardEnumerator alloc] initWithCollection:[ORSerialPortList sharedSerialPortList] countSelector:@selector(count) objectAtIndexSelector:@selector(objectAtIndex:)] autorelease];
 }
 
-
-// ---------------------------------------------------------
-// - oldPortList:
-// ---------------------------------------------------------
 - (NSArray*) oldPortList
 {
     return oldPortList;
 }
 
-// ---------------------------------------------------------
-// - setOldPortList:
-// ---------------------------------------------------------
 - (void)setOldPortList:(NSArray*) newOldPortList
 {
     id old = nil;
@@ -216,5 +209,25 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 	return result;
 }
 
+#pragma mark ¥¥¥Port Aliases
+- (NSString*) aliaseForPort:(ORSerialPort*)aPort
+{
+	return [self aliaseForPortName:[aPort name]];
+}
+
+- (NSString*) aliaseForPortName:(NSString*)aPortName
+{
+	if(!aliaseDictionary)return aPortName;
+	NSString* theAliase = [aliaseDictionary objectForKey:aPortName];
+	if(!theAliase)return aPortName;
+	else return theAliase;
+}
+
+- (void) assignAliase:(NSString*)anAliase forPort:(ORSerialPort*)aPort
+{
+	if(!aliaseDictionary)aliaseDictionary = [[NSMutableDictionary dictionary] retain];
+	NSString* thePortName = [aPort name];
+	[aliaseDictionary setObject:anAliase forKey:thePortName];
+}
 
 @end

@@ -112,10 +112,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 
 - (void) sleep
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(!stealthMode)[self removeMachineName];
 	[[ORSqlDBQueue queue] waitUntilAllOperationsAreFinished];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super sleep];
 }
 

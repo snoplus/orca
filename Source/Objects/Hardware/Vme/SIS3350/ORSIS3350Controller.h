@@ -22,8 +22,9 @@
 #pragma mark ***Imported Files
 #import "OrcaObjectController.h"
 #import "ORSIS3350Model.h"
-@class ORValueBar;
-@class ORPlotView;
+
+@class ORValueBarGroupView;
+@class ORCompositeTimeLineView;
 
 @interface ORSIS3350Controller : OrcaObjectController 
 {
@@ -74,13 +75,13 @@
     IBOutlet NSTextField*   integrationText;
     IBOutlet NSTextField*   totalRateText;
 
-    IBOutlet ORValueBar*    rate0;
-    IBOutlet ORValueBar*    totalRate;
-    IBOutlet NSButton*      rateLogCB;
-    IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotView*    timeRatePlot;
-    IBOutlet NSButton*      timeRateLogCB;
-	IBOutlet NSTextField*	moduleIDField;
+    IBOutlet ORValueBarGroupView*		rate0;
+    IBOutlet ORValueBarGroupView*		totalRate;
+    IBOutlet NSButton*					rateLogCB;
+    IBOutlet NSButton*					totalRateLogCB;
+    IBOutlet ORCompositeTimeLineView*   timeRatePlot;
+    IBOutlet NSButton*					timeRateLogCB;
+	IBOutlet NSTextField*				moduleIDField;
 
 	//labels
 	IBOutlet NSTextField*	thresholdOnLabel;

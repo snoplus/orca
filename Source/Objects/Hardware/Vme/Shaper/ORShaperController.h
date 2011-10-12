@@ -19,8 +19,8 @@
 //-------------------------------------------------------------
 
 
-@class ORValueBar;
-@class ORPlotView;
+@class ORValueBarGroupView;
+@class ORCompositeTimeLineView;
 
 @interface ORShaperController : OrcaObjectController {
 
@@ -57,11 +57,11 @@
     IBOutlet NSMatrix*		online2MaskMatrix;
 
     //tdb... fix the bar graph so it can be automatically put into a matrix
-    IBOutlet ORValueBar*	rate0;
-    IBOutlet ORValueBar*	totalRate;
+    IBOutlet ORValueBarGroupView*	rate0;
+    IBOutlet ORValueBarGroupView*	totalRate;
     IBOutlet NSButton*		rateLogCB;
     IBOutlet NSButton*		totalRateLogCB;
-    IBOutlet ORPlotView*	timeRatePlot;
+    IBOutlet ORCompositeTimeLineView*	timeRatePlot;
     IBOutlet NSButton*		timeRateLogCB;
 }
 

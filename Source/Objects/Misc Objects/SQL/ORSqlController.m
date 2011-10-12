@@ -22,6 +22,7 @@
 #import "ORSqlController.h"
 #import "ORSqlModel.h"
 #import "ORSqlConnection.h"
+#import "ORValueBarGroupView.h"
 
 @implementation ORSqlController
 

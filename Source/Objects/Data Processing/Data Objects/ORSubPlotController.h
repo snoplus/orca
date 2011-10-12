@@ -18,13 +18,14 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class ORCompositePlotView;
 @class ORPlotView;
 
 @interface ORSubPlotController : NSObject 
 {
     @private
         IBOutlet NSView*		view;
-        IBOutlet ORPlotView*	plotView;
+        IBOutlet ORCompositePlotView*	plotView;
         IBOutlet NSTextField*	title;
 }
 

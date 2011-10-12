@@ -22,8 +22,8 @@
 #pragma mark ***Imported Files
 #import "OrcaObjectController.h"
 #import "ORSIS3302Model.h"
-@class ORValueBar;
-@class ORPlotView;
+@class ORValueBarGroupView;
+@class ORCompositeTimeLineView;
 
 @interface ORSIS3302Controller : OrcaObjectController 
 {
@@ -128,12 +128,12 @@
     IBOutlet NSTextField*   integrationText;
     IBOutlet NSTextField*   totalRateText;
 
-    IBOutlet ORValueBar*    rate0;
-    IBOutlet ORValueBar*    totalRate;
-    IBOutlet NSButton*      rateLogCB;
-    IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotView*    timeRatePlot;
-    IBOutlet NSButton*      timeRateLogCB;
+    IBOutlet ORValueBarGroupView*       rate0;
+    IBOutlet ORValueBarGroupView*       totalRate;
+    IBOutlet NSButton*				    rateLogCB;
+    IBOutlet NSButton*				    totalRateLogCB;
+    IBOutlet ORCompositeTimeLineView*   timeRatePlot;
+    IBOutlet NSButton*					timeRateLogCB;
 		
     NSView *blankView;
     NSSize settingSize;

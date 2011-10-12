@@ -25,8 +25,9 @@
 @interface ORSerialPortList : NSObject
 {
 	@private
-        NSMutableArray *portList;
-        NSArray *oldPortList;
+        NSMutableArray*		 portList;
+        NSArray*			 oldPortList;
+		NSMutableDictionary* aliaseDictionary;
 }
 
 + (ORSerialPortList*) sharedSerialPortList;
@@ -36,6 +37,10 @@
 - (ORSerialPort*) objectAtIndex:(unsigned)index;
 - (ORSerialPort*) objectWithName:(NSString*) name;
 - (NSArray*) getPortList;
+
+- (NSString*) aliaseForPort:(ORSerialPort*)aPort;
+- (NSString*) aliaseForPortName:(NSString*)aPortName;
+- (void) assignAliase:(NSString*)anAliase forPort:(ORSerialPort*)aPort;
 
 
 @end
