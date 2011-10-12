@@ -1208,6 +1208,16 @@
 		845B140B1227E7DC0022F207 /* ORPxi6289Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 845B14031227E7DC0022F207 /* ORPxi6289Model.m */; };
 		845B140C1227E7DC0022F207 /* Pxi6289.nib in Resources */ = {isa = PBXBuildFile; fileRef = 845B14041227E7DC0022F207 /* Pxi6289.nib */; };
 		845B140F1227E8B00022F207 /* Pxi6289Card.png in Resources */ = {isa = PBXBuildFile; fileRef = 845B140E1227E8B00022F207 /* Pxi6289Card.png */; };
+		845CD0D01439F55A009FE5B9 /* ORLegend.h in Headers */ = {isa = PBXBuildFile; fileRef = 845CD0CE1439F55A009FE5B9 /* ORLegend.h */; };
+		845CD0D11439F55A009FE5B9 /* ORLegend.m in Sources */ = {isa = PBXBuildFile; fileRef = 845CD0CF1439F55A009FE5B9 /* ORLegend.m */; };
+		845CD451143B33C8009FE5B9 /* ORCompositePlotView.h in Headers */ = {isa = PBXBuildFile; fileRef = 845CD44F143B33C8009FE5B9 /* ORCompositePlotView.h */; };
+		845CD452143B33C8009FE5B9 /* ORCompositePlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 845CD450143B33C8009FE5B9 /* ORCompositePlotView.m */; };
+		845CDF7B143DE531009FE5B9 /* ORComposite2DPlotView.h in Headers */ = {isa = PBXBuildFile; fileRef = 845CDF79143DE531009FE5B9 /* ORComposite2DPlotView.h */; };
+		845CDF7C143DE531009FE5B9 /* ORComposite2DPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 845CDF7A143DE531009FE5B9 /* ORComposite2DPlotView.m */; };
+		845CE4D6143F2EF7009FE5B9 /* ORRamperView.h in Headers */ = {isa = PBXBuildFile; fileRef = 845CE4D4143F2EF7009FE5B9 /* ORRamperView.h */; };
+		845CE4D7143F2EF7009FE5B9 /* ORRamperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 845CE4D5143F2EF7009FE5B9 /* ORRamperView.m */; };
+		845CE953143F550C009FE5B9 /* ORValueBarGroupView.h in Headers */ = {isa = PBXBuildFile; fileRef = 845CE951143F550C009FE5B9 /* ORValueBarGroupView.h */; };
+		845CE954143F550C009FE5B9 /* ORValueBarGroupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 845CE952143F550C009FE5B9 /* ORValueBarGroupView.m */; };
 		845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 845F745609296E1000A2F593 /* madeWithCocoa.tiff */; };
 		84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84607293079F015300C9F572 /* ORCamacCardDecoder.h */; };
 		84607296079F015300C9F572 /* ORCamacCardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84607294079F015300C9F572 /* ORCamacCardDecoder.m */; };
@@ -1947,8 +1957,6 @@
 		84B28DE40F4C6FED00E2B056 /* ORRamperController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD20F4C6FED00E2B056 /* ORRamperController.m */; };
 		84B28DE50F4C6FED00E2B056 /* ORRamperModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD30F4C6FED00E2B056 /* ORRamperModel.h */; };
 		84B28DE60F4C6FED00E2B056 /* ORRamperModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD40F4C6FED00E2B056 /* ORRamperModel.m */; };
-		84B28DE70F4C6FED00E2B056 /* ORRamperView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD50F4C6FED00E2B056 /* ORRamperView.h */; };
-		84B28DE80F4C6FED00E2B056 /* ORRamperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD60F4C6FED00E2B056 /* ORRamperView.m */; };
 		84B28DE90F4C6FED00E2B056 /* ORRampItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD70F4C6FED00E2B056 /* ORRampItem.h */; };
 		84B28DEA0F4C6FED00E2B056 /* ORRampItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD80F4C6FED00E2B056 /* ORRampItem.m */; };
 		84B28DEB0F4C6FED00E2B056 /* ORRampItemController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD90F4C6FED00E2B056 /* ORRampItemController.h */; };
@@ -3730,6 +3738,16 @@
 		845B14031227E7DC0022F207 /* ORPxi6289Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPxi6289Model.m; path = Source/Objects/Hardware/PXI/Pxi6289/ORPxi6289Model.m; sourceTree = SOURCE_ROOT; };
 		845B14041227E7DC0022F207 /* Pxi6289.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Pxi6289.nib; path = Source/Objects/Hardware/PXI/Pxi6289/Pxi6289.nib; sourceTree = SOURCE_ROOT; };
 		845B140E1227E8B00022F207 /* Pxi6289Card.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Pxi6289Card.png; path = Source/Objects/Hardware/PXI/Pxi6289/Pxi6289Card.png; sourceTree = SOURCE_ROOT; };
+		845CD0CE1439F55A009FE5B9 /* ORLegend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLegend.h; sourceTree = "<group>"; };
+		845CD0CF1439F55A009FE5B9 /* ORLegend.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLegend.m; sourceTree = "<group>"; };
+		845CD44F143B33C8009FE5B9 /* ORCompositePlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCompositePlotView.h; path = Source/Widgets/CompositeObjects/ORCompositePlotView.h; sourceTree = SOURCE_ROOT; };
+		845CD450143B33C8009FE5B9 /* ORCompositePlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCompositePlotView.m; path = Source/Widgets/CompositeObjects/ORCompositePlotView.m; sourceTree = SOURCE_ROOT; };
+		845CDF79143DE531009FE5B9 /* ORComposite2DPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORComposite2DPlotView.h; path = Source/Widgets/CompositeObjects/ORComposite2DPlotView.h; sourceTree = SOURCE_ROOT; };
+		845CDF7A143DE531009FE5B9 /* ORComposite2DPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORComposite2DPlotView.m; path = Source/Widgets/CompositeObjects/ORComposite2DPlotView.m; sourceTree = SOURCE_ROOT; };
+		845CE4D4143F2EF7009FE5B9 /* ORRamperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRamperView.h; path = Source/Widgets/Plotting/ORRamperView.h; sourceTree = SOURCE_ROOT; };
+		845CE4D5143F2EF7009FE5B9 /* ORRamperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRamperView.m; path = Source/Widgets/Plotting/ORRamperView.m; sourceTree = SOURCE_ROOT; };
+		845CE951143F550C009FE5B9 /* ORValueBarGroupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORValueBarGroupView.h; sourceTree = "<group>"; };
+		845CE952143F550C009FE5B9 /* ORValueBarGroupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORValueBarGroupView.m; sourceTree = "<group>"; };
 		845F745609296E1000A2F593 /* madeWithCocoa.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = madeWithCocoa.tiff; path = "Source/Main Dialogs/SplashScreen/madeWithCocoa.tiff"; sourceTree = SOURCE_ROOT; };
 		84607293079F015300C9F572 /* ORCamacCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacCardDecoder.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		84607294079F015300C9F572 /* ORCamacCardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacCardDecoder.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacCardDecoder.m"; sourceTree = SOURCE_ROOT; };
@@ -4490,8 +4508,6 @@
 		84B28DD20F4C6FED00E2B056 /* ORRamperController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRamperController.m; path = Source/Objects/Control/Ramper/ORRamperController.m; sourceTree = SOURCE_ROOT; };
 		84B28DD30F4C6FED00E2B056 /* ORRamperModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRamperModel.h; path = Source/Objects/Control/Ramper/ORRamperModel.h; sourceTree = SOURCE_ROOT; };
 		84B28DD40F4C6FED00E2B056 /* ORRamperModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRamperModel.m; path = Source/Objects/Control/Ramper/ORRamperModel.m; sourceTree = SOURCE_ROOT; };
-		84B28DD50F4C6FED00E2B056 /* ORRamperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRamperView.h; path = Source/Objects/Control/Ramper/ORRamperView.h; sourceTree = SOURCE_ROOT; };
-		84B28DD60F4C6FED00E2B056 /* ORRamperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRamperView.m; path = Source/Objects/Control/Ramper/ORRamperView.m; sourceTree = SOURCE_ROOT; };
 		84B28DD70F4C6FED00E2B056 /* ORRampItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRampItem.h; path = Source/Objects/Control/Ramper/ORRampItem.h; sourceTree = SOURCE_ROOT; };
 		84B28DD80F4C6FED00E2B056 /* ORRampItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRampItem.m; path = Source/Objects/Control/Ramper/ORRampItem.m; sourceTree = SOURCE_ROOT; };
 		84B28DD90F4C6FED00E2B056 /* ORRampItemController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRampItemController.h; path = Source/Objects/Control/Ramper/ORRampItemController.h; sourceTree = SOURCE_ROOT; };
@@ -7555,6 +7571,20 @@
 			path = Source/Objects/Hardware/PXI/Pxi6289;
 			sourceTree = SOURCE_ROOT;
 		};
+		845CD44E143B33C8009FE5B9 /* CompositeObjects */ = {
+			isa = PBXGroup;
+			children = (
+				845CD44F143B33C8009FE5B9 /* ORCompositePlotView.h */,
+				845CD450143B33C8009FE5B9 /* ORCompositePlotView.m */,
+				845CDF79143DE531009FE5B9 /* ORComposite2DPlotView.h */,
+				845CDF7A143DE531009FE5B9 /* ORComposite2DPlotView.m */,
+				845CE951143F550C009FE5B9 /* ORValueBarGroupView.h */,
+				845CE952143F550C009FE5B9 /* ORValueBarGroupView.m */,
+			);
+			name = CompositeObjects;
+			path = Source/Widgets/CompositeObjects;
+			sourceTree = SOURCE_ROOT;
+		};
 		84662A63070A3231001CDA7E /* BiStateView */ = {
 			isa = PBXGroup;
 			children = (
@@ -7834,6 +7864,10 @@
 				84761FF5118CD53C00016A8D /* ORPlot.m */,
 				84761FF6118CD53C00016A8D /* ORPlotAttributeStrings.h */,
 				84761FF7118CD53C00016A8D /* ORPlotAttributeStrings.m */,
+				845CD0CE1439F55A009FE5B9 /* ORLegend.h */,
+				845CD0CF1439F55A009FE5B9 /* ORLegend.m */,
+				845CE4D4143F2EF7009FE5B9 /* ORRamperView.h */,
+				845CE4D5143F2EF7009FE5B9 /* ORRamperView.m */,
 				84761FF8118CD53C00016A8D /* ORPlotView.h */,
 				84761FF9118CD53C00016A8D /* ORPlotView.m */,
 				84761FFA118CD53C00016A8D /* ORPlotWithROI.h */,
@@ -9242,8 +9276,6 @@
 				84B28DD20F4C6FED00E2B056 /* ORRamperController.m */,
 				84B28DD30F4C6FED00E2B056 /* ORRamperModel.h */,
 				84B28DD40F4C6FED00E2B056 /* ORRamperModel.m */,
-				84B28DD50F4C6FED00E2B056 /* ORRamperView.h */,
-				84B28DD60F4C6FED00E2B056 /* ORRamperView.m */,
 				84B28DD70F4C6FED00E2B056 /* ORRampItem.h */,
 				84B28DD80F4C6FED00E2B056 /* ORRampItem.m */,
 				84B28DD90F4C6FED00E2B056 /* ORRampItemController.h */,
@@ -9614,12 +9646,12 @@
 		84BAA29A0E92A81A00E19946 /* SIS3300 */ = {
 			isa = PBXGroup;
 			children = (
-				84BAA29C0E92A81A00E19946 /* ORSIS3300Controller.m */,
 				84BAA29D0E92A81A00E19946 /* ORSIS3300Decoders.h */,
 				84BAA29E0E92A81A00E19946 /* ORSIS3300Decoders.m */,
 				84BAA29F0E92A81A00E19946 /* ORSIS3300Model.h */,
 				84BAA2A00E92A81A00E19946 /* ORSIS3300Model.m */,
 				84BAA29B0E92A81A00E19946 /* ORSIS3300Controller.h */,
+				84BAA29C0E92A81A00E19946 /* ORSIS3300Controller.m */,
 				84BAA2A10E92A81A00E19946 /* SIS3300.nib */,
 				84BAA2A20E92A81A00E19946 /* SIS3300Card.gif */,
 			);
@@ -9773,6 +9805,7 @@
 		84C2F03F041FB12C005F64B1 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				845CD44E143B33C8009FE5B9 /* CompositeObjects */,
 				84662A63070A3231001CDA7E /* BiStateView */,
 				84B7DF9C04E1C53D005F64B1 /* Bar Graph */,
 				84761FCF118CD53C00016A8D /* Plotting */,
@@ -11935,7 +11968,6 @@
 				84B28DA50F4C684200E2B056 /* ORMotorModel.h in Headers */,
 				84B28DE30F4C6FED00E2B056 /* ORRamperController.h in Headers */,
 				84B28DE50F4C6FED00E2B056 /* ORRamperModel.h in Headers */,
-				84B28DE70F4C6FED00E2B056 /* ORRamperView.h in Headers */,
 				84B28DE90F4C6FED00E2B056 /* ORRampItem.h in Headers */,
 				84B28DEB0F4C6FED00E2B056 /* ORRampItemController.h in Headers */,
 				84B28E190F4C718400E2B056 /* ORHVRampController.h in Headers */,
@@ -12211,6 +12243,11 @@
 				847F947F13D4AA31006B06B4 /* ORRad7Model.h in Headers */,
 				841C4DF7141FA72800F95B50 /* ORMet237Controller.h in Headers */,
 				841C4DF9141FA72800F95B50 /* ORMet237Model.h in Headers */,
+				845CD0D01439F55A009FE5B9 /* ORLegend.h in Headers */,
+				845CD451143B33C8009FE5B9 /* ORCompositePlotView.h in Headers */,
+				845CDF7B143DE531009FE5B9 /* ORComposite2DPlotView.h in Headers */,
+				845CE4D6143F2EF7009FE5B9 /* ORRamperView.h in Headers */,
+				845CE953143F550C009FE5B9 /* ORValueBarGroupView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13617,7 +13654,6 @@
 				84B28DA60F4C684200E2B056 /* ORMotorModel.m in Sources */,
 				84B28DE40F4C6FED00E2B056 /* ORRamperController.m in Sources */,
 				84B28DE60F4C6FED00E2B056 /* ORRamperModel.m in Sources */,
-				84B28DE80F4C6FED00E2B056 /* ORRamperView.m in Sources */,
 				84B28DEA0F4C6FED00E2B056 /* ORRampItem.m in Sources */,
 				84B28DEC0F4C6FED00E2B056 /* ORRampItemController.m in Sources */,
 				84B28E1A0F4C718400E2B056 /* ORHVRampController.m in Sources */,
@@ -13860,6 +13896,11 @@
 				847F948013D4AA31006B06B4 /* ORRad7Model.m in Sources */,
 				841C4DF8141FA72800F95B50 /* ORMet237Controller.m in Sources */,
 				841C4DFA141FA72800F95B50 /* ORMet237Model.m in Sources */,
+				845CD0D11439F55A009FE5B9 /* ORLegend.m in Sources */,
+				845CD452143B33C8009FE5B9 /* ORCompositePlotView.m in Sources */,
+				845CDF7C143DE531009FE5B9 /* ORComposite2DPlotView.m in Sources */,
+				845CE4D7143F2EF7009FE5B9 /* ORRamperView.m in Sources */,
+				845CE954143F550C009FE5B9 /* ORValueBarGroupView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14191,7 +14232,7 @@
 				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
-				GCC_VERSION = "";
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				GCC_WARN_ABOUT_GLOBAL_CONSTRUCTORS = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -14210,7 +14251,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
@@ -14226,11 +14267,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				GCC_VERSION = 4.2;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				SDKROOT = "";
+				SDKROOT = macosx;
 			};
 			name = Deployment;
 		};
@@ -14238,6 +14280,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = ppc;
+				GCC_VERSION = 4.2;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;

@@ -7,25 +7,15 @@
 		<string key="IBDocument.AppKitVersion">1038.36</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string>com.yourcompany.OrcaPlugin</string>
-			</object>
-			<object class="NSMutableArray" key="dict.values">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>851</string>
-				<string>1</string>
-			</object>
+			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
+			<string key="NS.object.0">851</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1868"/>
+			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<string>com.yourcompany.OrcaPlugin</string>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
@@ -3019,121 +3009,9 @@
 						<object class="NSCustomView" id="349119044">
 							<reference key="NSNextResponder" ref="18859626"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{60, 66}, {342, 96}}</string>
+							<string key="NSFrame">{{0, 33}, {428, 141}}</string>
 							<reference key="NSSuperview" ref="18859626"/>
-							<string key="NSClassName">ORPlotView</string>
-						</object>
-						<object class="ORAxis" id="390930432">
-							<reference key="NSNextResponder" ref="18859626"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{20, 65}, {40, 102}}</string>
-							<reference key="NSSuperview" ref="18859626"/>
-							<object class="NSMutableDictionary" key="ORAxisAttributes">
-								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSArray" key="dict.sortedKeys">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>ORAxisAllowShifts</string>
-									<string>ORAxisColor</string>
-									<string>ORAxisDefaultRangeHigh</string>
-									<string>ORAxisDefaultRangeLow</string>
-									<string>ORAxisFont</string>
-									<string>ORAxisIgnoreMouse</string>
-									<string>ORAxisInteger</string>
-									<string>ORAxisMaxLimit</string>
-									<string>ORAxisMaxPad</string>
-									<string>ORAxisMaxValue</string>
-									<string>ORAxisMinLimit</string>
-									<string>ORAxisMinPad</string>
-									<string>ORAxisMinValue</string>
-									<string>ORAxisMinimumRange</string>
-									<string>ORAxisPadding</string>
-								</object>
-								<object class="NSMutableArray" key="dict.values">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<boolean value="YES"/>
-									<object class="NSMutableData">
-										<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMDhAJmZgABhg</bytes>
-									</object>
-									<real value="1000"/>
-									<real value="0.0"/>
-									<object class="NSMutableData">
-										<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAZOU0ZvbnQehIQITlNPYmplY3QAhYQBaRyEBVsyOGNdBgAAABQA
-AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
-									</object>
-									<boolean value="NO"/>
-									<boolean value="YES"/>
-									<real value="70000"/>
-									<real value="1000"/>
-									<real value="1000"/>
-									<real value="0.0"/>
-									<real value="0.0"/>
-									<real value="0.0"/>
-									<real value="10"/>
-									<real value="0.0"/>
-								</object>
-							</object>
-							<object class="NSMutableDictionary" key="ORAxisLabelAttributes">
-								<string key="NS.key.0">NSFont</string>
-								<object class="NSFont" key="NS.object.0" id="861727209">
-									<string key="NSName">Helvetica</string>
-									<double key="NSSize">12</double>
-									<int key="NSfFlags">16</int>
-								</object>
-							</object>
-						</object>
-						<object class="ORAxis" id="1867332">
-							<reference key="NSNextResponder" ref="18859626"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{45, 35}, {374, 31}}</string>
-							<reference key="NSSuperview" ref="18859626"/>
-							<object class="NSMutableDictionary" key="ORAxisAttributes">
-								<bool key="EncodedWithXMLCoder">YES</bool>
-								<object class="NSArray" key="dict.sortedKeys">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<string>ORAxisAllowShifts</string>
-									<string>ORAxisColor</string>
-									<string>ORAxisDefaultRangeHigh</string>
-									<string>ORAxisDefaultRangeLow</string>
-									<string>ORAxisFont</string>
-									<string>ORAxisIgnoreMouse</string>
-									<string>ORAxisInteger</string>
-									<string>ORAxisMaxLimit</string>
-									<string>ORAxisMaxPad</string>
-									<string>ORAxisMaxValue</string>
-									<string>ORAxisMinLimit</string>
-									<string>ORAxisMinPad</string>
-									<string>ORAxisMinValue</string>
-									<string>ORAxisMinimumRange</string>
-									<string>ORAxisPadding</string>
-								</object>
-								<object class="NSMutableArray" key="dict.values">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<boolean value="YES"/>
-									<object class="NSMutableData">
-										<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAdOU0NvbG9yAISECE5TT2JqZWN0AIWEAWMDhAJmZgABhg</bytes>
-									</object>
-									<real value="1000"/>
-									<real value="0.0"/>
-									<object class="NSMutableData">
-										<bytes key="NS.bytes">BAtzdHJlYW10eXBlZIHoA4QBQISEhAZOU0ZvbnQehIQITlNPYmplY3QAhYQBaRyEBVsyOGNdBgAAABQA
-AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
-									</object>
-									<boolean value="NO"/>
-									<boolean value="YES"/>
-									<real value="70000"/>
-									<real value="1000"/>
-									<real value="1000"/>
-									<real value="0.0"/>
-									<real value="0.0"/>
-									<real value="0.0"/>
-									<real value="10"/>
-									<real value="0.0"/>
-								</object>
-							</object>
-							<object class="NSMutableDictionary" key="ORAxisLabelAttributes">
-								<string key="NS.key.0">NSFont</string>
-								<reference key="NS.object.0" ref="861727209"/>
-							</object>
+							<string key="NSClassName">ORCompositePlotView</string>
 						</object>
 						<object class="NSTextField" id="990604155">
 							<reference key="NSNextResponder" ref="18859626"/>
@@ -3755,38 +3633,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">xScale</string>
-						<reference key="source" ref="349119044"/>
-						<reference key="destination" ref="1867332"/>
-					</object>
-					<int key="connectionID">1824</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">yScale</string>
-						<reference key="source" ref="349119044"/>
-						<reference key="destination" ref="390930432"/>
-					</object>
-					<int key="connectionID">1825</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">viewToScale</string>
-						<reference key="source" ref="390930432"/>
-						<reference key="destination" ref="349119044"/>
-					</object>
-					<int key="connectionID">1826</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">viewToScale</string>
-						<reference key="source" ref="1867332"/>
-						<reference key="destination" ref="349119044"/>
-					</object>
-					<int key="connectionID">1827</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="349119044"/>
 						<reference key="destination" ref="898754966"/>
@@ -4002,8 +3848,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="574125602"/>
 							<reference ref="127167770"/>
 							<reference ref="349119044"/>
-							<reference ref="390930432"/>
-							<reference ref="1867332"/>
 							<reference ref="990604155"/>
 							<reference ref="60865802"/>
 							<reference ref="1051123762"/>
@@ -5951,16 +5795,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 						<reference key="parent" ref="18859626"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1821</int>
-						<reference key="object" ref="390930432"/>
-						<reference key="parent" ref="18859626"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1823</int>
-						<reference key="object" ref="1867332"/>
-						<reference key="parent" ref="18859626"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">1830</int>
 						<reference key="object" ref="834441222"/>
 						<object class="NSMutableArray" key="children">
@@ -6542,11 +6376,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>1815.IBPluginDependency</string>
 					<string>1820.IBPluginDependency</string>
 					<string>1820.IBViewBoundsToFrameTransform</string>
-					<string>1821.IBPluginDependency</string>
-					<string>1821.IBViewBoundsToFrameTransform</string>
-					<string>1823.CustomClassName</string>
-					<string>1823.IBPluginDependency</string>
-					<string>1823.IBViewBoundsToFrameTransform</string>
 					<string>1830.IBPluginDependency</string>
 					<string>1830.IBViewBoundsToFrameTransform</string>
 					<string>1831.IBPluginDependency</string>
@@ -7270,15 +7099,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">AUJoAABC4gAAA</bytes>
-					</object>
-					<string>com.yourcompany.OrcaPlugin</string>
-					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">AUGQAABC4AAAA</bytes>
-					</object>
-					<string>ORTimeLine</string>
-					<string>com.yourcompany.OrcaPlugin</string>
-					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">AUIsAABCpAAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
@@ -8087,7 +7907,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="750427064">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Widgets/Plotting/ORPlotView.h</string>
 					</object>
@@ -8136,7 +7956,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="718237198">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Widgets/Plotting/ORAxis.h</string>
 					</object>
@@ -8157,97 +7977,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ORAxis</string>
-					<string key="superclassName">NSView</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>setLogScale:</string>
-							<string>shiftLeft:</string>
-							<string>shiftRight:</string>
-							<string>zoomIn:</string>
-							<string>zoomOut:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>setLogScale:</string>
-							<string>shiftLeft:</string>
-							<string>shiftRight:</string>
-							<string>zoomIn:</string>
-							<string>zoomOut:</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">setLogScale:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">shiftLeft:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">shiftRight:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">zoomIn:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">zoomOut:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>preferenceController</string>
-							<string>viewToScale</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>NSView</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>preferenceController</string>
-							<string>viewToScale</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">preferenceController</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">viewToScale</string>
-								<string key="candidateClassName">NSView</string>
-							</object>
-						</object>
-					</object>
-					<reference key="sourceIdentifier" ref="718237198"/>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORPlotView</string>
+					<string key="className">ORCompositePlotView</string>
 					<string key="superclassName">NSView</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -8255,7 +7985,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>autoScaleX:</string>
 							<string>autoScaleY:</string>
-							<string>autoScaleZ:</string>
 							<string>autoscaleAll:</string>
 							<string>centerOnPeak:</string>
 							<string>copy:</string>
@@ -8263,6 +7992,10 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>publishToPDF:</string>
 							<string>refresh:</string>
 							<string>resetScales:</string>
+							<string>setLogX:</string>
+							<string>setLogY:</string>
+							<string>shiftXLeft:</string>
+							<string>shiftXRight:</string>
 							<string>zoomIn:</string>
 							<string>zoomOut:</string>
 							<string>zoomXYIn:</string>
@@ -8284,6 +8017,9 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -8292,7 +8028,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>autoScaleX:</string>
 							<string>autoScaleY:</string>
-							<string>autoScaleZ:</string>
 							<string>autoscaleAll:</string>
 							<string>centerOnPeak:</string>
 							<string>copy:</string>
@@ -8300,6 +8035,10 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>publishToPDF:</string>
 							<string>refresh:</string>
 							<string>resetScales:</string>
+							<string>setLogX:</string>
+							<string>setLogY:</string>
+							<string>shiftXLeft:</string>
+							<string>shiftXRight:</string>
 							<string>zoomIn:</string>
 							<string>zoomOut:</string>
 							<string>zoomXYIn:</string>
@@ -8313,10 +8052,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">autoScaleY:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">autoScaleZ:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -8348,6 +8083,22 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">setLogX:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">setLogY:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">shiftXLeft:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">shiftXRight:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">zoomIn:</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -8369,21 +8120,11 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>colorScale</string>
 							<string>delegate</string>
-							<string>titleField</string>
-							<string>viewForPDF</string>
-							<string>xScale</string>
-							<string>yScale</string>
-							<string>zScale</string>
+							<string>plotView</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>NSTextField</string>
-							<string>NSView</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -8392,47 +8133,25 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>colorScale</string>
 							<string>delegate</string>
-							<string>titleField</string>
-							<string>viewForPDF</string>
-							<string>xScale</string>
-							<string>yScale</string>
-							<string>zScale</string>
+							<string>plotView</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">colorScale</string>
-								<string key="candidateClassName">id</string>
-							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">delegate</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">titleField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">viewForPDF</string>
-								<string key="candidateClassName">NSView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">xScale</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">yScale</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">zScale</string>
+								<string key="name">plotView</string>
 								<string key="candidateClassName">id</string>
 							</object>
 						</object>
 					</object>
-					<reference key="sourceIdentifier" ref="750427064"/>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">Source/Widgets/CompositeObjects/ORCompositePlotView.h</string>
+					</object>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORRad7Controller</string>
@@ -8757,7 +8476,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
-							<string>ORPlotView</string>
+							<string>ORCompositePlotView</string>
 							<string>NSPopUpButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
@@ -8962,7 +8681,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">plotter0</string>
-								<string key="candidateClassName">ORPlotView</string>
+								<string key="candidateClassName">ORCompositePlotView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">pollTimePopup</string>
@@ -9113,14 +8832,6 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">Source/Objects/Hardware/Serial/Rad7/ORRad7Controller.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORTimeLine</string>
-					<string key="superclassName">ORAxis</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">Source/Widgets/Plotting/ORTimeLine.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
