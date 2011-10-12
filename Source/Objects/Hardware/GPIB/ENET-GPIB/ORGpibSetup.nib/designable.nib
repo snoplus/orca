@@ -866,7 +866,7 @@
 																			<reference key="NSColor" ref="573887211"/>
 																		</object>
 																		<object class="NSCursor" key="NSCursor">
-																			<string key="NSHotSpot">{4, 4}</string>
+																			<string key="NSHotSpot">{1, -1}</string>
 																			<int key="NSCursorType">0</int>
 																		</object>
 																		<int key="NScvFlags">4</int>
@@ -1534,7 +1534,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 900}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
