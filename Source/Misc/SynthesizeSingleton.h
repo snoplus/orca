@@ -41,7 +41,7 @@ return self; \
 return 0xffffffff; \
 } \
 \
-- (void)release \
+- (oneway void)release \
 { \
 } \
 \
@@ -87,7 +87,7 @@ return self; \
 return self; \
 } \
 \
-- (NSUInteger)retainCount \
+- (NSUInteger)retainCount NS_AUTOMATED_REFCOUNT_UNAVAILABLE\
 { \
 return 0xffffffff; \
 } \
