@@ -26,7 +26,7 @@
 #import "ORCamacExceptions.h"
 #import "ORCamacExceptions.h"
 #import "TimedWorker.h"
-#import "ORValueBar.h"
+#import "ORValueBarGroupView.h"
 #import "ORAxis.h"
 
 #pragma mark ¥¥¥Macros
@@ -46,7 +46,8 @@
 {
     [super awakeFromNib];
 	
-    [[rate0 xScale] setRngLimitsLow:0 withHigh:100000000 withMinRng:50];
+    [[rate0 xAxis] setRngLimitsLow:0 withHigh:100000000 withMinRng:50];
+	[rate0 setNumber:12 height:10 spacing:8];
 }
 
 #pragma mark ¥¥¥Notifications

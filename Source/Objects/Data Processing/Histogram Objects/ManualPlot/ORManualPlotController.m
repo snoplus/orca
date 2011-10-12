@@ -27,6 +27,8 @@
 #import "ORCalibration.h"
 #import "OR1dRoiController.h"
 #import "OR1dFitController.h"
+#import "ORCompositePlotView.h"
+#import "ORAxis.h"
 
 @interface ORManualPlotController (private)
 - (void) selectWriteFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -57,6 +59,7 @@
 	aPlot = [[ORXYPlot alloc] initWithTag:0 andDataSource:self];
 	[aPlot setRoi: [[model rois:0] objectAtIndex:0]];
 	[aPlot setLineColor:[NSColor redColor]];
+	[aPlot setName:@"Col1"];
 	[plotView addPlot: aPlot];
 	[aPlot release];
 	
@@ -64,6 +67,7 @@
 	[aPlot setRoi: [[model rois:1] objectAtIndex:0]];
 	[aPlot setLineColor:[NSColor blueColor]];
 	[aPlot setShowLine:YES];
+	[aPlot setName:@"Col2"];
 	[plotView addPlot: aPlot];
 	[aPlot release];
 
@@ -71,8 +75,11 @@
 	[aPlot setRoi: [[model rois:2] objectAtIndex:0]];
 	[aPlot setLineColor:[NSColor colorWithCalibratedRed:0 green:.6 blue:0 alpha:1]];
 	[aPlot setShowLine:YES];
+	[aPlot setName:@"Col3"];
 	[plotView addPlot: aPlot];
 	[aPlot release];
+	
+	[plotView setShowLegend:YES];
 	
 	
 	roiController = [[OR1dRoiController panel] retain];
@@ -215,6 +222,7 @@
 	if(!title)title = @"Col 1";
 	[[[dataTableView tableColumnWithIdentifier:@"1"] headerCell] setTitle:title];
 	[col1LabelField setStringValue:title];
+	[plotView setPlot:0 name:title];
 	[dataTableView reloadData];
 	[self refreshPlot:nil];
 }
@@ -225,7 +233,7 @@
 	if(!title)title = @"Col 2";
 	[[[dataTableView tableColumnWithIdentifier:@"2"] headerCell] setTitle:title];
 	[col2LabelField setStringValue:title];
-		
+	[plotView setPlot:1 name:title];
 	[dataTableView reloadData];
 	[self refreshPlot:nil];
 }
@@ -236,6 +244,7 @@
 	if(!title)title = @"Col 3";
 	[[[dataTableView tableColumnWithIdentifier:@"3"] headerCell] setTitle:title];
 	[col3LabelField setStringValue:title];
+	[plotView setPlot:2 name:title];
 	
 	[dataTableView reloadData];
 	[self refreshPlot:nil];
@@ -268,35 +277,32 @@
 	NSString* title;
 	if(col0Key > 3) title = @"Index";
 	else title = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col0Key]] headerCell] title];
-	[[plotView xScale] setLabel:title];
+	[[plotView xAxis] setLabel:title];
 	
 	title = @"";
 	int col1Key = [model col1Key];
 	int col2Key = [model col2Key];
 	int col3Key = [model col3Key];
-	[y1LengendField setStringValue:@""];
-	[y2LengendField setStringValue:@""];
-	[y3LengendField setStringValue:@""];
 	if(col1Key <= 2) {
 		NSString* s = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col1Key]] headerCell] title];
 		title = [title stringByAppendingString:s];
-		[y1LengendField setStringValue:s];
+		[plotView setPlot:0 name:s];
 	}
 	if(col2Key <= 2) {
 		if([title length])title = [title stringByAppendingString:@" , "];
 		NSString* s = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col2Key]] headerCell] title];
 		title = [title stringByAppendingString:s];
-		[y2LengendField setStringValue:s];
+		[plotView setPlot:1 name:s];
 	}
 	if(col3Key <= 3) {
 		if([title length])title = [title stringByAppendingString:@" , "];
 		NSString* s = [[[dataTableView tableColumnWithIdentifier:[NSString stringWithFormat:@"%d",col3Key]] headerCell] title];
 		title = [title stringByAppendingString:s];
-		[y3LengendField setStringValue:s];
+		[plotView setPlot:2 name:s];
 	}
 	if([title length]==0)title = @"Index";
 	[plotView setComment:[model comment]];
-	[[plotView yScale] setLabel:title];
+	[[plotView yAxis] setLabel:title];
 	[plotView setNeedsDisplay:YES];
 }
 
@@ -370,15 +376,11 @@
 	[fitController setModel:[topRoi fit]];
 	int i;
 	for(i=0;i<3;i++){
-		int tag = [[aPlotView plot:i] tag];
 		id aPlot = [aPlotView plot:i];
 		NSColor* theColor;
 		if(aPlot != [aPlotView topPlot])theColor = [[aPlot lineColor] highlightWithLevel:.5];
 		else							theColor = [aPlot lineColor];
 
-		if(tag == 0)	  [y1LengendField setTextColor:theColor];
-		else if(tag == 1) [y2LengendField setTextColor:theColor];
-		else              [y3LengendField setTextColor:theColor];
 	}
 }
 

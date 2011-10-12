@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORKeithley6487Controller : OrcaObjectController
 {
@@ -32,7 +32,7 @@
     IBOutlet NSButton*      readCurrentButton;
     IBOutlet NSTextField*   currentField;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotView*    plotter0;
+	IBOutlet ORCompositeTimeLineView*    plotter0;
 }
 
 #pragma mark ***Initialization

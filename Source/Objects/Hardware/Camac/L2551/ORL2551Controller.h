@@ -24,7 +24,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORL2551Model.h"
 
-@class ORValueBar;
+@class ORValueBarGroupView;
 
 @interface ORL2551Controller : OrcaObjectController {
 	@private
@@ -33,7 +33,7 @@
         IBOutlet NSMatrix*		rateMatrix;
         IBOutlet NSButton*		settingLockButton;
         IBOutlet NSTextField*   settingLockDocField;
-        IBOutlet ORValueBar*	rate0;
+        IBOutlet ORValueBarGroupView*	rate0;
         
         IBOutlet NSButton*		readNoResetButton;
         IBOutlet NSButton*		readResetButton;

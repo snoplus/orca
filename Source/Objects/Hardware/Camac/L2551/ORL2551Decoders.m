@@ -24,6 +24,7 @@
 #import "ORDataSet.h"
 #import "ORL2551Model.h"
 #import "ORDataTypeAssigner.h"
+#import "ORValueBarGroupView.h"
 
 @implementation ORL2551DecoderForScalers
 

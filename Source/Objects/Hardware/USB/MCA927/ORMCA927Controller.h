@@ -22,7 +22,7 @@
 #import "ORHPPulserController.h"
 
 @class ORUSB;
-@class ORPlotView;
+@class ORCompositePlotView;
 
 @interface ORMCA927Controller : OrcaObjectController 
 {
@@ -33,7 +33,7 @@
 	IBOutlet NSMatrix*		runOptionsMatrix;
 	IBOutlet NSMatrix*		selectedChannelMatrix;
 	IBOutlet NSTabView*		tabView;
-	IBOutlet ORPlotView*    plotter;
+	IBOutlet ORCompositePlotView*    plotter;
 	IBOutlet NSTextField*	liveTimeField;
 	IBOutlet NSMatrix*		controlRegMatrix;
 	IBOutlet NSMatrix*		presetCtrlRegMatrix;

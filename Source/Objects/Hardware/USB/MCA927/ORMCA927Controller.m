@@ -24,7 +24,7 @@
 #import "ORUSB.h"
 #import "ORUSBInterface.h"
 #import "ORAxis.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "OR1DHistoPlot.h"
 
 @interface ORMCA927Controller (private)
@@ -203,7 +203,7 @@
 {
 	[self populateInterfacePopup:[model getUSBController]];
 	[super awakeFromNib];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+    [[plotter yAxis] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
 	
 	int i;
 	for(i=0;i<4;i++){
@@ -255,11 +255,11 @@
 //a fake action from the scale object
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotter yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter yScale]attributes] forKey:@"PlotterYAttributes"];
+	if(aNotification == nil || [aNotification object] == [plotter yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter yAxis]attributes] forKey:@"PlotterYAttributes"];
 	}
-	else if(aNotification == nil || [aNotification object] == [plotter xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter xScale]attributes] forKey:@"PlotterXAttributes"];
+	else if(aNotification == nil || [aNotification object] == [plotter xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter xAxis]attributes] forKey:@"PlotterXAttributes"];
 	}
 	
 }
@@ -272,18 +272,18 @@
 	if(aNote == nil || [key isEqualToString:@"PlotterYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"PlotterYAttributes"];
 		if(attrib){
-			[(ORAxis*)[plotter yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter yAxis] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
-			[[plotter yScale] setNeedsDisplay:YES];
+			[[plotter yAxis] setNeedsDisplay:YES];
 			[logCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
 	else if(aNote == nil || [key isEqualToString:@"PlotterXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"PlotterXAttributes"];
 		if(attrib){
-			[(ORAxis*)[plotter xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter xAxis] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
-			[[plotter xScale] setNeedsDisplay:YES];
+			[[plotter xAxis] setNeedsDisplay:YES];
 		}
 	}
 }

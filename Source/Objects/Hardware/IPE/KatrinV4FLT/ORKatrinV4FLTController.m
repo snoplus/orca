@@ -25,7 +25,8 @@
 #import "SLTv4_HW_Definitions.h"
 #import "ORFireWireInterface.h"
 #import "ORPlotView.h"
-#import "ORValueBar.h"
+#import "ORValueBarGroupView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 #import "ORTimeLinePlot.h"
@@ -72,21 +73,13 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-	ORValueBar* bar = rate0;
-	do {
-		[bar setBackgroundColor:[NSColor whiteColor]];
-		[bar setBarColor:[NSColor greenColor]];
-		bar = [bar chainedView];
-	}while(bar!=nil);
-	
-	[totalRate setBackgroundColor:[NSColor whiteColor]];
-	[totalRate setBarColor:[NSColor greenColor]];
-
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
-	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
-	
+
+	[rate0 setNumber:22 height:10 spacing:7.5];
+
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[fifoDisplayMatrix cellAtRow:i column:0] setTag:i];
@@ -700,20 +693,20 @@
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [rate0 xScale]){
-		[model setMiscAttributes:[[rate0 xScale]attributes] forKey:@"RateXAttributes"];
+	if(aNotification == nil || [aNotification object] == [rate0 xAxis]){
+		[model setMiscAttributes:[[rate0 xAxis]attributes] forKey:@"RateXAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [totalRate xScale]){
-		[model setMiscAttributes:[[totalRate xScale]attributes] forKey:@"TotalRateXAttributes"];
+	if(aNotification == nil || [aNotification object] == [totalRate xAxis]){
+		[model setMiscAttributes:[[totalRate xAxis]attributes] forKey:@"TotalRateXAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+	if(aNotification == nil || [aNotification object] == [timeRatePlot xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xAxis]attributes] forKey:@"TimeRateXAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+	if(aNotification == nil || [aNotification object] == [timeRatePlot yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yAxis]attributes] forKey:@"TimeRateYAttributes"];
 	};
 	
 }
@@ -726,35 +719,35 @@
 	if(aNote == nil || [key isEqualToString:@"RateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"RateXAttributes"];
 		if(attrib){
-			[[rate0 xScale] setAttributes:attrib];
+			[[rate0 xAxis] setAttributes:attrib];
 			[rate0 setNeedsDisplay:YES];
-			[[rate0 xScale] setNeedsDisplay:YES];
+			[[rate0 xAxis] setNeedsDisplay:YES];
 			[rateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"TotalRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TotalRateXAttributes"];
 		if(attrib){
-			[[totalRate xScale] setAttributes:attrib];
+			[[totalRate xAxis] setAttributes:attrib];
 			[totalRate setNeedsDisplay:YES];
-			[[totalRate xScale] setNeedsDisplay:YES];
+			[[totalRate xAxis] setNeedsDisplay:YES];
 			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
 		if(attrib){
-			[(ORAxis*)[timeRatePlot xScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot xAxis] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
-			[[timeRatePlot xScale] setNeedsDisplay:YES];
+			[[timeRatePlot xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
 		if(attrib){
-			[(ORAxis*)[timeRatePlot yScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot yAxis] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
-			[[timeRatePlot yScale] setNeedsDisplay:YES];
+			[[timeRatePlot yAxis] setNeedsDisplay:YES];
 			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}

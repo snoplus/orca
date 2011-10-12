@@ -34,9 +34,6 @@
 	IBOutlet NSTextField*   col1LabelField;
 	IBOutlet NSTextField*   col2LabelField;
 	IBOutlet NSTextField*   col3LabelField;
-	IBOutlet NSTextField*   y1LengendField;
-	IBOutlet NSTextField*   y2LengendField;
-	IBOutlet NSTextField*   y3LengendField;
 	id						calibrationPanel;
     IBOutlet NSDrawer*		dataDrawer;
 	IBOutlet NSView*		roiView;

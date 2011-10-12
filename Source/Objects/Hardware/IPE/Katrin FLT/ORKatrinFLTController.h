@@ -23,8 +23,9 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORKatrinFLTModel.h"
 
-@class ORPlotView;
-@class ORValueBar;
+@class ORCompositeTimeLineView;
+@class ORCompositePlotView;
+@class ORValueBarGroupView;
 
 @interface ORKatrinFLTController : OrcaObjectController {
 	@private
@@ -94,7 +95,7 @@
         // TRun buttons missing - up to now not necessary -tb-
         IBOutlet NSTextField*	firstBinField;
         IBOutlet NSTextField*	lastBinField;
-        IBOutlet ORPlotView*    histogramPlotterId;
+        IBOutlet ORCompositePlotView*    histogramPlotterId;
         IBOutlet NSPopUpButton* eSamplePopUpButton;////eSample=BW TODO: rename to binWidth -tb-
         IBOutlet NSProgressIndicator* histoProgressIndicator;
         IBOutlet NSTextField*	histoElapsedTimeField;
@@ -112,15 +113,14 @@
         IBOutlet NSButton*		readEnableVetoButton;
         IBOutlet NSButton*		writeEnableVetoButton;
         IBOutlet NSButton*		readVetoDataButton;
-        
-
+        	
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
 		
-		IBOutlet ORValueBar*	rate0;
-		IBOutlet ORValueBar*	totalRate;
+		IBOutlet ORValueBarGroupView*	rate0;
+		IBOutlet ORValueBarGroupView*	totalRate;
 		IBOutlet NSButton*		rateLogCB;
-		IBOutlet ORPlotView*	timeRatePlot;
+		IBOutlet ORCompositeTimeLineView*	timeRatePlot;
 		IBOutlet NSButton*		timeRateLogCB;
 		IBOutlet NSButton*		totalRateLogCB;
 		IBOutlet NSTextField*	totalHitRateField;
