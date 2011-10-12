@@ -29,6 +29,7 @@
 #import "OR1DHistoPlot.h"
 #import "ORVectorPlot.h"
 #import "ORAxis.h"
+#import "ORCompositePlotView.h"
 
 @interface SBC_LinkController (private)
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -64,17 +65,21 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-    [[plotter xScale] setRngLimitsLow:0 withHigh:300 withMinRng:300];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:1000 withMinRng:10];
+    [[plotter xAxis] setRngLimitsLow:0 withHigh:300 withMinRng:300];
+    [[plotter yAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:10];
 	
-	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
-    [[histogram yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
+	[[histogram xAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
+    [[histogram yAxis] setRngLimitsLow:0 withHigh:100 withMinRng:10];
 
     [plotter setUseGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
-
+	[plotter setXLabel:@"Payload Size (KB)"];
+	[plotter setYLabel:@"Rate(MB/sec"];
+	 
 	[histogram setUseGradient:YES];
     [histogram setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
+	[histogram setXLabel:@" "]; //just so the plots are the same size
+	[histogram setYLabel:@" "]; //just so the plots are the same size
 
 	
 	ORVectorPlot* aPlot = [[ORVectorPlot alloc] initWithTag:0 andDataSource:self];
@@ -92,6 +97,7 @@
 	if([[model driverScriptName] length] == 0){
 		[downloadDriverButton setEnabled:NO];
 	}
+	[bytesReceivedRateAxis setLabel:@"KBytes/Second"];
 }
 
 - (void) setModel:(id)aModel

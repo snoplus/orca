@@ -22,7 +22,8 @@
 @class ORQueueView;
 @class ORTimedTextField;
 @class ORValueBar;
-@class ORPlotView;
+@class ORCompositePlotView;
+@class ORAxis;
 
 @interface SBC_LinkController : OrcaObjectController
 {
@@ -58,6 +59,7 @@
 	IBOutlet ORQueueView*   queView;
 	IBOutlet ORValueBar*    bytesSentRateBar;
 	IBOutlet ORValueBar*    bytesReceivedRateBar;	
+	IBOutlet ORAxis*		bytesReceivedRateAxis;	
 	IBOutlet NSTextField*   byteRateSentField;
 	IBOutlet NSTextField*   byteRateReceivedField;
 	IBOutlet NSMatrix*      infoTypeMatrix;
@@ -98,8 +100,8 @@
 	IBOutlet NSProgressIndicator* pingTaskProgress;
 	IBOutlet NSButton*		cbTestButton;
 	IBOutlet NSProgressIndicator* cbTestProgress;
-	IBOutlet ORPlotView*	plotter;
-	IBOutlet ORPlotView*	histogram;
+	IBOutlet ORCompositePlotView*	plotter;
+	IBOutlet ORCompositePlotView*	histogram;
 	IBOutlet NSTextField*	numTestPointsField;
 	IBOutlet NSTextField*	numRecordsField;
 	IBOutlet NSTextField*	numErrorsField;
