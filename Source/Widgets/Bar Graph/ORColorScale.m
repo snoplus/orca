@@ -91,6 +91,12 @@
 {	
 	return colorAxis;
 }
+
+- (void) setColorAxis:(ORAxis*)anAxis
+{
+	colorAxis = anAxis; //don't retain
+}
+
 - (BOOL) useRainBow
 {
 

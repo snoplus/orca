@@ -20,7 +20,7 @@
 #import "ORCaenCardController.h"
 
 @class ORValueBar;
-@class ORValueBarGroup;
+@class ORValueBarGroupView;
 
 @interface ORCaen1190Controller : ORCaenCardController 
 {
@@ -41,8 +41,7 @@
 	IBOutlet NSMatrix*		rateMatrix0;
 	IBOutlet NSButton*		allButton0;
 	IBOutlet NSButton*		noneButton0;
-	IBOutlet ORValueBar*	valueBar0;
-	IBOutlet ORValueBarGroup* valueBarGroup0;
+	IBOutlet ORValueBarGroupView*	valueBar0;
  
 	NSSize setupSize;
 	NSSize ratesSize;

@@ -29,6 +29,8 @@
 #import "ORTimeLinePlot.h"
 #import "ORPlotView.h"
 #import "ORTimeAxis.h"
+#import "ORCompositePlotView.h"
+#import "ORValueBarGroupView.h"
 
 #define kNumChanConfigBits 5
 #define kNumTrigSourceBits 10
@@ -67,7 +69,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
    
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
-	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];	
 	
     [super awakeFromNib];
@@ -77,6 +79,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
+	[rate0 setNumber:8 height:10 spacing:5];
 }
 
 #pragma mark •••Notifications

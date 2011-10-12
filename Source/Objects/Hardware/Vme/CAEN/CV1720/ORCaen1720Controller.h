@@ -21,8 +21,8 @@
 #pragma mark •••Imported Files
 #import "OrcaObjectController.h"
 
-@class ORValueBar;
-@class ORPlotView;
+@class ORValueBarGroupView;
+@class ORCompositeTimeLineView;
 
 @interface ORCaen1720Controller : OrcaObjectController {
     IBOutlet NSTabView* 	tabView;
@@ -89,11 +89,11 @@
     IBOutlet NSTextField*   totalRateText;
     IBOutlet NSMatrix*      enabled2MaskMatrix;
 
-    IBOutlet ORValueBar*    rate0;
-    IBOutlet ORValueBar*    totalRate;
+    IBOutlet ORValueBarGroupView*    rate0;
+    IBOutlet ORValueBarGroupView*    totalRate;
     IBOutlet NSButton*      rateLogCB;
     IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotView*    timeRatePlot;
+    IBOutlet ORCompositeTimeLineView*    timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
     IBOutlet NSTextField*   bufferStateField;
 

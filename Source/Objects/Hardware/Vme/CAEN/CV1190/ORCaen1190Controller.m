@@ -19,9 +19,9 @@
 #import "ORCaen1190Controller.h"
 #import "ORCaenDataDecoder.h"
 #import "ORCaen1190Model.h"
-#import "ORValueBarGroup.h"
 #import "ORRate.h"
 #import "ORRateGroup.h"
+#import "ORValueBarGroupView.h"
 
 @implementation ORCaen1190Controller
 #pragma mark ***Initialization
@@ -35,15 +35,14 @@
 {
     setupSize     = NSMakeSize(230,550);
     ratesSize     = NSMakeSize(300,630);
-	[valueBarGroup0 setTotalBars:32];
 
 	int i;
 	for(i=0;i<32;i++){
 		[[enabledMatrix0 cellAtRow:i column:0] setTag:i];
 		[[rateMatrix0 cellAtRow:i column:0] setTag:i];
-		
 	}
 	[super awakeFromNib];
+	[valueBar0 setNumber:32 height:10 spacing:5];
 }
 
 - (void) setChannelLabels

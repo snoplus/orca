@@ -41,6 +41,7 @@
 - (void) dealloc;
 
 #pragma mark ¥¥¥Accessors
+- (void) setColorAxis:(ORAxis*)anAxis;
 - (ORAxis*) colorAxis;
 - (NSMutableArray*) colors;
 - (void) setColors:(NSMutableArray*)newColors;
