@@ -87,7 +87,7 @@ return self; \
 return self; \
 } \
 \
-- (NSUInteger)retainCount NS_AUTOMATED_REFCOUNT_UNAVAILABLE\
+- (NSUInteger)retainCount\
 { \
 return 0xffffffff; \
 } \
