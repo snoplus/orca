@@ -26,7 +26,7 @@
 #import "ORCC32Controller.h"
 
 #pragma mark •••Forward Declarations
-@class ORPlotView;
+@class ORCompositePlotView;
 
 @interface ORC111CController : ORCC32Controller {
 	@private
@@ -37,7 +37,7 @@
 		IBOutlet NSButton*		ipConnectButton;
 		IBOutlet NSButton*		sendAsciiCmdButton;
 		IBOutlet NSTextField*	asciiCmdTextField;
-		IBOutlet ORPlotView*	plotter;
+		IBOutlet ORCompositePlotView*	plotter;
 };
 
 #pragma mark •••Initialization

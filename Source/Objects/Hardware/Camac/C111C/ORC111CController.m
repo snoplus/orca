@@ -27,6 +27,7 @@
 #import "ORPlot.h"
 #import "ORC111CModel.h"
 #import "ORCmdHistory.h"
+#import "ORCompositePlotView.h"
 
 @implementation ORC111CController
 
@@ -49,7 +50,7 @@
 	ORPlot* aPlot = [[ORPlot alloc] initWithTag:0 andDataSource:self];
 	[plotter addPlot: aPlot];
 	[aPlot release];
-	
+	[plotter setXLabel:@"Transactions/second"];
 	[super awakeFromNib];
 	
 	if([model trackTransactions]){

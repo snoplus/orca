@@ -27,19 +27,19 @@ long roundToLong(double x);
 	IBOutlet NSView*	    viewToScale;
 	int						gridCount;
 	float					gridArray[kMaxLongTicks];	// array for storing long tick locations
-	int						lowOffset;		// pixel position of scale start
-	int						highOffset;		// pixel position of scale end
+	int						lowOffset;					// pixel position of scale start
+	int						highOffset;					// pixel position of scale end
 	NSMutableDictionary*    attributes;
 	NSMutableDictionary*    labelAttributes;
 	id      preferenceController;
 	double  fscl;			// scaling factor
 	double  pinVal;			// scale value at pin point
 	double  pinPix;			// pixel position of pointpoint during grab
-	int   dpos;			// highOffset - lowOffset
+	int		dpos;			// highOffset - lowOffset
 	BOOL	xaxis;			// flag for x scale (1=x, 0=y)
 	BOOL	pinned;			// flag for scale pinned
 	BOOL	invertPin;		// flag to invert the sense of pinned flag
-	int   nearPinFlag;		// -1/0/1 = below/at/above pin point for cursor
+	int		nearPinFlag;	// -1/0/1 = below/at/above pin point for cursor
 	BOOL	dragFlag;		// flag pressed if option is down during drag
 	BOOL	saveRng;
 	double  mGrabValue;
@@ -83,7 +83,8 @@ long roundToLong(double x);
 - (BOOL) setRngLow:(double)low withHigh:(double) high;
 - (int) setDefaultRng;
 - (int) setFullRng;
-
+- (float) lowOffset;
+- (float) highOffset;
 - (NSFont*) textFont;
 - (void) setTextFont:(NSFont*) font;
 - (NSColor*) color;
@@ -125,12 +126,12 @@ long roundToLong(double x);
 - (void) setMaxPad:(double)aValue;
 - (void) setLabel:(NSString*)aString;
 - (NSString*) label;
-
+- (void) setViewToScale:(id)aView;
 - (double) minSave;
 - (void) setMinSave:(double)aValue;
 - (double) maxSave;
 - (void) setMaxSave:(double)aValue;
-
+- (void) checkForCalibrationAdjustment;
 
 - (float) getPixAbsFast:(double)val log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad;
 - (float) getPixAbs:(double) val;		// convert absolute value to pixel position
@@ -161,7 +162,6 @@ long roundToLong(double x);
 - (IBAction) shiftRight:(id)sender;
 - (IBAction) zoomIn:(id)sender;
 - (IBAction) zoomOut:(id)sender;
-
 @end
 
 @interface NSView (dataSource)
@@ -195,4 +195,5 @@ extern NSString* ORAxisIsOpposite;
 
 //notifications
 extern NSString* ORAxisRangeChangedNotification;
+extern NSString* ORAxisLabelChangedNotification;
 

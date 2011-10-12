@@ -18,7 +18,7 @@
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORCC4189Controller : OrcaObjectController
 {
@@ -35,7 +35,7 @@
     IBOutlet NSTextField*   temperatureField;
     IBOutlet NSTextField*   humidityField;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotView*    plotter0;
+	IBOutlet ORCompositeTimeLineView*    plotter0;
 }
 
 #pragma mark ***Initialization

@@ -29,6 +29,8 @@
 #import "OR1DHistoPlot.h"
 #import "ORTimeLinePlot.h"
 #import "ORTimeRate.h"
+#import "ORCompositePlotView.h"
+#import "ORValueBarGroupView.h"
 
 @interface ORCMC203Controller (private)
 - (void) updateButtons;
@@ -52,11 +54,11 @@
 
 - (void) awakeFromNib
 {
-	[[totalRate xScale] setRngLimitsLow:0 withHigh:100E6 withMinRng:10000];
+	[[totalRate xAxis] setRngLimitsLow:0 withHigh:100E6 withMinRng:10000];
 	
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
-	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];
 
 	OR1DHistoPlot* aPlot1 = [[OR1DHistoPlot alloc] initWithTag:1 andDataSource:self];
@@ -260,23 +262,23 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	
-	if(aNotification == nil || [aNotification object] == [totalRate xScale]){
-		[model setMiscAttributes:[[totalRate xScale]attributes] forKey:@"TotalRateXAttributes"];
+	if(aNotification == nil || [aNotification object] == [totalRate xAxis]){
+		[model setMiscAttributes:[[totalRate xAxis]attributes] forKey:@"TotalRateXAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+	if(aNotification == nil || [aNotification object] == [timeRatePlot xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot xAxis]attributes] forKey:@"TimeRateXAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+	if(aNotification == nil || [aNotification object] == [timeRatePlot yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[timeRatePlot yAxis]attributes] forKey:@"TimeRateYAttributes"];
 	};
 
-	if(aNotification == nil || [aNotification object] == [histoPlot yScale]){
-		[model setMiscAttributes:[(ORAxis*)[histoPlot yScale]attributes] forKey:@"histoYAttributes"];
+	if(aNotification == nil || [aNotification object] == [histoPlot yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[histoPlot yAxis]attributes] forKey:@"histoYAttributes"];
 	};
-	if(aNotification == nil || [aNotification object] == [histoPlot xScale]){
-		[model setMiscAttributes:[(ORAxis*)[histoPlot xScale]attributes] forKey:@"histoXAttributes"];
+	if(aNotification == nil || [aNotification object] == [histoPlot xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[histoPlot xAxis]attributes] forKey:@"histoXAttributes"];
 	};
 	
 	
@@ -290,26 +292,26 @@
 	if(aNote == nil || [key isEqualToString:@"TotalRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TotalRateXAttributes"];
 		if(attrib){
-			[[totalRate xScale] setAttributes:attrib];
+			[[totalRate xAxis] setAttributes:attrib];
 			[totalRate setNeedsDisplay:YES];
-			[[totalRate xScale] setNeedsDisplay:YES];
+			[[totalRate xAxis] setNeedsDisplay:YES];
 			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
 		if(attrib){
-			[(ORAxis*)[timeRatePlot xScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot xAxis] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
-			[[timeRatePlot xScale] setNeedsDisplay:YES];
+			[[timeRatePlot xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
 		if(attrib){
-			[(ORAxis*)[timeRatePlot yScale] setAttributes:attrib];
+			[(ORAxis*)[timeRatePlot yAxis] setAttributes:attrib];
 			[timeRatePlot setNeedsDisplay:YES];
-			[[timeRatePlot yScale] setNeedsDisplay:YES];
+			[[timeRatePlot yAxis] setNeedsDisplay:YES];
 			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
@@ -317,18 +319,18 @@
 	if(aNote == nil || [key isEqualToString:@"HistoYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"HistoYAttributes"];
 		if(attrib){
-			[(ORAxis*)[histoPlot yScale] setAttributes:attrib];
+			[(ORAxis*)[histoPlot yAxis] setAttributes:attrib];
 			[histoPlot setNeedsDisplay:YES];
-			[[histoPlot yScale] setNeedsDisplay:YES];
+			[[histoPlot yAxis] setNeedsDisplay:YES];
 		}
 	}
 	
 	if(aNote == nil || [key isEqualToString:@"HistoXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"HistoXAttributes"];
 		if(attrib){
-			[(ORAxis*)[histoPlot xScale] setAttributes:attrib];
+			[(ORAxis*)[histoPlot xAxis] setAttributes:attrib];
 			[histoPlot setNeedsDisplay:YES];
-			[[histoPlot xScale] setNeedsDisplay:YES];
+			[[histoPlot xAxis] setNeedsDisplay:YES];
 		}
 	}
 }

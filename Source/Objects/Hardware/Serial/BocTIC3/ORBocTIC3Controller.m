@@ -22,7 +22,7 @@
 #import "ORBocTIC3Controller.h"
 #import "ORBocTIC3Model.h"
 #import "ORTimeLinePlot.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
@@ -53,11 +53,11 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];
-    [[plotter0 yScale] setRngLow:0.0 withHigh:1000.];
-	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100000 withMinRng:10];
+    [[plotter0 yAxis] setRngLow:0.0 withHigh:1000.];
+	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:100000 withMinRng:10];
 
-    [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 
 	int i;
 	for(i=0;i<3;i++){
@@ -66,7 +66,7 @@
 		[plotter0 addPlot: aPlot];
 		[aPlot setLineColor:[self colorForDataSet:i]];
 
-		[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
 	[super awakeFromNib];
@@ -163,12 +163,12 @@
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 xScale]attributes] forKey:@"XAttributes0"];
+	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 yScale]attributes] forKey:@"YAttributes0"];
+	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
 	};
 
 }
@@ -182,17 +182,17 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter0 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 xAxis] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 xScale] setNeedsDisplay:YES];
+			[[plotter0 xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter0 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 yAxis] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 yScale] setNeedsDisplay:YES];
+			[[plotter0 yAxis] setNeedsDisplay:YES];
 		}
 	}
 

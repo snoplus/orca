@@ -16,8 +16,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-@class ORValueBar;
-@class ORPlotView;
+@class ORCompositePlotView;
+@class ORCompositeTimeLineView;
+@class ORValueBarGroupView;
 
 @interface ORCMC203Controller : OrcaObjectController
 {
@@ -40,13 +41,13 @@
     IBOutlet NSTextField* 	integrationText;
     IBOutlet NSTextField* 	totalRateText;
 	
-    IBOutlet ORValueBar*	totalRate;
+    IBOutlet ORValueBarGroupView*	totalRate;
     IBOutlet NSButton*		totalRateLogCB;
-    IBOutlet ORPlotView*	timeRatePlot;
+    IBOutlet ORCompositeTimeLineView*	timeRatePlot;
     IBOutlet NSButton*		timeRateLogCB;
 	
 	//histograms (histo mode)
-    IBOutlet ORPlotView*	histoPlot;
+    IBOutlet ORCompositePlotView*	histoPlot;
 }
 
 #pragma mark ***Initialization

@@ -78,7 +78,8 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 static char	powers[]	= {-15,-12,-9,-6,-3,0,3,6,9};		        // powers for exponents
 
 //notifications
-NSString* ORAxisRangeChangedNotification    = @"ORAxis Range Changed";
+NSString* ORAxisRangeChangedNotification    = @"ORAxisRangeChangedNotification";
+NSString* ORAxisLabelChangedNotification    = @"ORAxisLabelChangedNotification";
 
 //attributes
 NSString* ORAxisMinValue			= @"ORAxisMinValue";
@@ -146,6 +147,17 @@ enum {
     
     [self setDefaults];
 	[self setNeedsDisplay:YES];
+	
+}
+
+- (void) checkForCalibrationAdjustment
+{
+	[self adjustSize:labelAttributes];
+}
+
+- (void) setViewToScale:(id)aView
+{
+	viewToScale = aView; //don't retain
 }
 
 - (void) setPreferenceController:(id)aController
@@ -230,6 +242,7 @@ enum {
 {
     return [NSUnarchiver unarchiveObjectWithData:[attributes objectForKey:ORAxisFont]];
 }
+
 - (void) setTextFont:(NSFont*)font
 {
     [attributes setObject:[NSArchiver archivedDataWithRootObject:font] forKey:ORAxisFont];
@@ -248,7 +261,6 @@ enum {
     if ([self isLog]) [self drawLogScale];
     else			  [self drawLinScale];
 }
-
 
 - (BOOL) integer
 {
@@ -301,15 +313,11 @@ enum {
     [self calcSci];
 }
 
-
-
 /* clearPin - set pin point for scale */
 - (void) clearPin
 {
     pinned = NO;
 }
-
-
 
 /* setRngLimits - set the extreme limits for the scale */
 /* Note: for non-integer log scales min_rng is a ratio, not a difference */
@@ -321,7 +329,6 @@ enum {
     [self setRngLow:[self minValue] withHigh:[self maxValue]];
 }
 
-
 /* setRngDefaultsLow:High - set the default range for this scale */
 - (void) setRngDefaultsLow:(double)aLow withHigh:(double)aHigh
 {
@@ -330,23 +337,17 @@ enum {
     [self setDefaultRangeHigh:aHigh];
 }
 
-
-
 /* setDefaultRng - reset range to default limits and save current range */
 - (int) setDefaultRng
 {
     return [self setRngLow:[self defaultRangeLow] withHigh:[self defaultRangeHigh]];
 }
 
-
-
 /* setFullRng - set range to its full scale */
 - (int) setFullRng
 {
     return [self setRngLow:[self minLimit] withHigh:[self maxLimit]];
 }
-
-
 
 /* saveRngOnChange() - cause current range to be saved if next setRngLow changes the scale */
 - (void) saveRngOnChange
@@ -371,15 +372,11 @@ enum {
     return [self setRngLow:[self minSave] withHigh:[self maxSave]];
 }
 
-
-
 /* setOrigin - set origin of scale (keeping the same range) */
 - (int) setOrigin:(double) low
 {
     return [self setRngLow:low withHigh:low+[self valueRange]];
 }
-
-
 
 /* shiftOrigin - shift the scale origin */
 - (int) shiftOrigin:(double) delta
@@ -681,13 +678,25 @@ enum {
     [attributes setObject:aString forKey:ORAxisLabel];
 	[self adjustSize:labelAttributes];
 	[self setNeedsDisplay:YES]; 
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAxisLabelChangedNotification object:self userInfo: nil];
 }
 
 - (NSString*) label
 {
-	NSString* theLabel = [attributes objectForKey:ORAxisLabel];
-	if(!theLabel)return @"";
-	else return theLabel;
+	NSString* label = [attributes objectForKey:ORAxisLabel];
+	if([self isXAxis]){
+		//there may be a calibration in place, it might have units
+		id theCalibration = [self calibration];
+		if([theCalibration useCalibration]){
+			NSString* calibrationUnits = [theCalibration units];
+			if([calibrationUnits length]){
+				if ([label length]) label = [label stringByAppendingFormat:@"(%@)",calibrationUnits];
+				else				label = [NSString stringWithFormat:@"Energy (%@)",calibrationUnits];
+			}
+		}
+	}
+	if(!label)return @"";
+	else return label;
 }
 
 - (long) axisMinLimit
@@ -1278,20 +1287,14 @@ enum {
 {
 	[[NSColor blackColor] set];
 	NSString* label = [self label];
+	
 	BOOL isOpposite = [self oppositePosition];
 	if([self isXAxis]){
-		id theCalibration = [self calibration];
-		if([theCalibration useCalibration]){
-			NSString* calibrationUnits = [theCalibration units];
-			if([calibrationUnits length]){
-				if ([label length]) label = [label stringByAppendingFormat:@"(%@)",calibrationUnits];
-				else				label = [NSString stringWithFormat:@"Energy (%@)",calibrationUnits];
-			}
-		}
+		NSString* label = [self label];
 		NSSize labelSize = [label sizeWithAttributes:labelAttributes];
 		float xc = [self frame].size.width/2;
 		if(isOpposite) [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,[self frame].size.height - labelSize.height) withAttributes:labelAttributes];
-		else [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,0) withAttributes:labelAttributes];
+		else	       [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,0) withAttributes:labelAttributes];
 	}
 	else {
 		NSSize labelSize = [label sizeWithAttributes:labelAttributes];
@@ -1314,6 +1317,9 @@ enum {
 		[context restoreGraphicsState];
 	}
 }
+
+- (float) lowOffset  { return lowOffset;  }
+- (float) highOffset { return highOffset; }
 
 @end
 
@@ -1514,7 +1520,6 @@ enum {
 /* calcFrameOffsets - Set Scale size parameters according to size of CPane */
 - (void) calcFrameOffsets
 {
-    
     if ([self isXAxis]) {
         lowOffset = kXAxisRoomLeft;
         highOffset = [self frame].size.width - kXAxisRoomRight - 1;
@@ -1988,17 +1993,19 @@ enum {
     [theAxis stroke];
 }
 
-
 - (void) adjustSize:(NSDictionary*)oldLabelAttributes
 {
     NSPoint newOrigin;
     NSSize	newSize;
     NSRect  oldFrame = [self frame];
-    
-	int titleHeight		= [[self label] sizeWithAttributes:oldLabelAttributes].height;
+	NSString* label = [self label];
+	
+    int titleHeight = 0;
+	if([label length]) titleHeight		= [label sizeWithAttributes:oldLabelAttributes].height;
+	
     int oldLabelHeight	= [kLongestNumber sizeWithAttributes:oldLabelAttributes].height;
     int oldLabelWidth	= [kLongestNumber sizeWithAttributes:oldLabelAttributes].width;
-	BOOL isOpposite = [self oppositePosition];
+	BOOL isOpposite		= [self oppositePosition];
 
     /* size the pane to fit the new text */
     if ([self isXAxis]) {
@@ -2028,13 +2035,10 @@ enum {
 		}
 		newSize.height = oldFrame.size.height + dh;
 		newSize.width = totalWidth;
-
     }
-    
     [self setFrameOrigin:newOrigin];
     [self setFrameSize:newSize];
     [self calcFrameOffsets];
-    
 }
 
 

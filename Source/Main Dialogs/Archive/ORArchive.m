@@ -133,7 +133,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
     BOOL locked			= [gSecurity isLocked:ArchiveLock];
 	BOOL runInProgress	= [gOrcaGlobals runInProgress];
-	int busy			= [queue operationCount]!=0;
+	int busy			= [[queue operations]count]!=0;
 	[lockButton setState: locked];
 	[runStatusField setStringValue:runInProgress?@"Run In Progress":@""];
 	[archiveOrcaButton setEnabled: !locked & !runInProgress & !busy];

@@ -80,8 +80,10 @@
 	double yValue;  
 	float height = [plotView bounds].size.height;
 	float bitOffset = height - 5 - (11*bitNum);
+	float maxX = [mXScale maxValue];
 	for (i=0; i<numPoints;++i) {
 		[dataSource plotter:self index:i x:&xValue y:&yValue];
+		if(xValue > maxX) break;
 		float x = [mXScale getPixAbs:xValue];
 		int bitValue = yValue>.5;
 		float y = bitOffset - (6 - (bitValue * 6));
