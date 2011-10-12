@@ -25,6 +25,7 @@
 #import "ORTimeMultiPlot.h"
 #import "ORTimeSeriesPlot.h"
 #import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORAxis.h"
 
 
@@ -42,8 +43,8 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-	[[plotView yScale] setInteger:NO];
-    [[plotView yScale] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:2];
+	[[plotView yAxis] setInteger:NO];
+    [[plotView yAxis] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:2];
 
 }
 

@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORTPG262Controller : OrcaObjectController
 {
@@ -35,7 +35,7 @@
     IBOutlet NSMatrix*      pressureMatrix;
     IBOutlet NSMatrix*      pressure1Matrix;
     IBOutlet NSMatrix*      timeMatrix;
-	IBOutlet ORPlotView*   plotter0;
+	IBOutlet ORCompositeTimeLineView*   plotter0;
 }
 
 #pragma mark ***Initialization

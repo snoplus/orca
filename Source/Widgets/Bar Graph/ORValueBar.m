@@ -153,7 +153,11 @@
 	[NSBezierPath strokeRect:b];
 	[barColor set];
 	if(dataSource){
-		float x = [mXScale getPixAbs:[dataSource doubleValue]];
+		double theValue;
+		if([dataSource isKindOfClass:[NSMatrix class]]) theValue = [[dataSource cellWithTag:[self tag]] doubleValue];
+		else theValue = [dataSource doubleValue];
+		
+		float x = [mXScale getPixAbs:theValue];
 		[gradient drawInRect:NSMakeRect(1,1,x,b.size.height-2) angle:180.];
 
 	}

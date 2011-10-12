@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #import "OrcaObjectController.h"
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 @class ORCircularBufferUV;
 
 @interface ORUnivVoltController : OrcaObjectController {
@@ -43,8 +43,8 @@
 	IBOutlet NSTextField*			mPollingTimeMinsField;	// Number of minutes between refresh of data.
 	IBOutlet NSTextField*			mLastPoll;			// Time when last poll conducted.
 	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.
-	IBOutlet ORPlotView*			mPlottingObj1;
-	IBOutlet ORPlotView*			mPlottingObj2;
+	IBOutlet ORCompositeTimeLineView*			mPlottingObj1;
+	IBOutlet ORCompositeTimeLineView*			mPlottingObj2;
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
 	int								mOrigChnl;			// Channel last displayed in channel view.

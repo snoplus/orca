@@ -21,7 +21,7 @@
 #import "ORUnivVoltModel.h"
 #import "ORUnivVoltHVCrateModel.h"
 #import "ORCircularBufferUV.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeLinePlot.h"
 #import "ORTimeAxis.h"
 
@@ -182,13 +182,13 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[mPlottingObj1 addPlot: aPlot];
-		[(ORTimeAxis*)[mPlottingObj1 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[mPlottingObj1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
 		[mPlottingObj2 addPlot: aPlot];
-		[(ORTimeAxis*)[mPlottingObj2 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[mPlottingObj2 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
 	
@@ -557,12 +557,12 @@ const int MAXcCHNLS_PER_PLOT = 6;
 //a fake action from the scale object
 - (void) scaleAction: (NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [mPlottingObj1 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[mPlottingObj1 yScale]attributes] forKey: @"HVPlot1YAttributes"];
+	if(aNotification == nil || [aNotification object] == [mPlottingObj1 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[mPlottingObj1 yAxis]attributes] forKey: @"HVPlot1YAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [mPlottingObj2 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[mPlottingObj2 yScale]attributes] forKey: @"HVPlot2YAttributes"];
+	if(aNotification == nil || [aNotification object] == [mPlottingObj2 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[mPlottingObj2 yAxis]attributes] forKey: @"HVPlot2YAttributes"];
 	};	
 }
 
@@ -575,18 +575,18 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	if(aNote == nil || [key isEqualToString: @"HVPlot1YAttributes"]){
 		if( aNote == nil ) attrib = [model miscAttributesForKey: @"HVPlot1YAttributes"];
 		if( attrib ){
-			[(ORAxis*)[mPlottingObj1 yScale] setAttributes: attrib];
+			[(ORAxis*)[mPlottingObj1 yAxis] setAttributes: attrib];
 			[mPlottingObj1 setNeedsDisplay: YES]; // Probably not needed.
-			[[mPlottingObj1 yScale] setNeedsDisplay: YES];
+			[[mPlottingObj1 yAxis] setNeedsDisplay: YES];
 //			[rateLogCB setState: [[attrib objectForKey: ORAxisUseLog] boolValue]];
 		}
 	}
 	if( aNote == nil || [key isEqualToString: @"HVPlot2YAttributes"]){
 		if( aNote == nil ) attrib = [model miscAttributesForKey: @"HVPlot2YAttributes"];
 		if( attrib ){
-			[(ORAxis*)[mPlottingObj2 yScale] setAttributes: attrib];
+			[(ORAxis*)[mPlottingObj2 yAxis] setAttributes: attrib];
 			[mPlottingObj2 setNeedsDisplay: YES];
-			[[mPlottingObj2 yScale] setNeedsDisplay: YES];
+			[[mPlottingObj2 yAxis] setNeedsDisplay: YES];
 //			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
