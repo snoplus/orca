@@ -23,8 +23,8 @@
 #pragma mark •••Imported Files
 #import "ORIpeV4FLTModel.h"
 
-@class ORPlotView;
-@class ORValueBar;
+@class ORValueBarGroupView;
+@class ORCompositeTimeLineView;
 
 @interface ORIpeV4FLTController : OrcaObjectController {
 	@private
@@ -71,15 +71,15 @@
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
 		
-		IBOutlet ORValueBar*	rate0;
-		IBOutlet ORValueBar*	totalRate;
-		IBOutlet NSButton*		rateLogCB;
-		IBOutlet ORPlotView*	timeRatePlot;
-		IBOutlet NSButton*		timeRateLogCB;
-		IBOutlet NSButton*		totalRateLogCB;
-		IBOutlet NSTextField*	totalHitRateField;
-		IBOutlet NSTabView*		tabView;	
-		IBOutlet NSView*		totalView;
+		IBOutlet ORValueBarGroupView*		rate0;
+		IBOutlet ORValueBarGroupView*		totalRate;
+		IBOutlet NSButton*					rateLogCB;
+		IBOutlet ORCompositeTimeLineView*	timeRatePlot;
+		IBOutlet NSButton*					timeRateLogCB;
+		IBOutlet NSButton*					totalRateLogCB;
+		IBOutlet NSTextField*				totalHitRateField;
+		IBOutlet NSTabView*					tabView;	
+		IBOutlet NSView*					totalView;
 		
 		//test page
 		IBOutlet NSButton*		testButton;

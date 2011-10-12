@@ -22,8 +22,7 @@
 
 #import "ORGpibDeviceController.h"
 
-@class ORPlotView;
-@class ORAxis;
+@class ORCompositePlotView;
 
 @interface ORHPPulserController : ORGpibDeviceController {
     IBOutlet NSButton* 		readIdButton;	
@@ -60,9 +59,7 @@
     IBOutlet NSTextField* 	burstRateDisplay;
     IBOutlet NSButton*		loadParamsButton;	
 
-    IBOutlet ORPlotView*	plotter;
-    IBOutlet ORAxis*		yScale;
-    IBOutlet ORAxis*		xScale;
+    IBOutlet ORCompositePlotView*	plotter;
 
     IBOutlet NSTextField* 	downloadTypeField;
     IBOutlet NSProgressIndicator* progress;

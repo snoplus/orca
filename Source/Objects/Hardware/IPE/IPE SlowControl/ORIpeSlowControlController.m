@@ -21,10 +21,10 @@
 #import "ORIpeSlowControlController.h"
 #import "ORIpeSlowControlModel.h"
 #import "ORTimedTextField.h"
-#import "ORPlotView.h"
 #import "OR1DHistoPlot.h"
 #import "ORAxis.h"
 #import "ORAdeiLoader.h"
+#import "ORCompositePlotView.h"
 
 @implementation ORIpeSlowControlController
 
@@ -52,12 +52,13 @@
 	[treeDetailsView setAlignment:NSLeftTextAlignment];
 	[itemDetailsView setAlignment:NSLeftTextAlignment];
 	
-	[[timingPlotter yScale] setRngLimitsLow:0 withHigh:1e10 withMinRng:5];
-    [[timingPlotter yScale] setRngLow:0 withHigh:200];
-    [[timingPlotter yScale] setLog:NO];
-    [[timingPlotter xScale] setRngLimitsLow:0 withHigh:kResponseTimeHistogramSize withMinRng:100];
-    [[timingPlotter xScale] setRngLow:0 withHigh:kResponseTimeHistogramSize];
-    [[timingPlotter xScale] setLog:NO];
+	[[timingPlotter yAxis] setRngLimitsLow:0 withHigh:1e10 withMinRng:5];
+    [[timingPlotter yAxis] setRngLow:0 withHigh:200];
+    [[timingPlotter yAxis] setLog:NO];
+    [[timingPlotter xAxis] setRngLimitsLow:0 withHigh:kResponseTimeHistogramSize withMinRng:100];
+    [[timingPlotter xAxis] setRngLow:0 withHigh:kResponseTimeHistogramSize];
+    [[timingPlotter xAxis] setLog:NO];
+	[timingPlotter setXLabel:@"Response Time (ms)"];
 	
 	[timingPlotter setUseGradient:YES];
 	OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];

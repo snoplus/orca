@@ -16,7 +16,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-@class ORPlotView;
+@class ORCompositePlotView;
 @class WebView;
 
 @interface ORIpeSimulationController : OrcaObjectController
@@ -26,7 +26,7 @@
 #endif
 
 {
-	IBOutlet ORPlotView*		timingPlotter;   
+	IBOutlet ORCompositePlotView*		timingPlotter;   
 	
 	
 	IBOutlet   NSImageView*		fieldlineImageView;

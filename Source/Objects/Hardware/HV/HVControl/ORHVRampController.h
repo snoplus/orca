@@ -21,7 +21,7 @@
 
 
 @class ORHVSupply;
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORHVRampController : OrcaObjectController {
 
@@ -57,7 +57,7 @@
     IBOutlet NSButton*		setCurrentToFileButton;
     IBOutlet NSButton*		saveCurrentToFileButton;
     IBOutlet NSTextField*	currentFileField;
-	IBOutlet ORPlotView*   currentPlotter;
+	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 }
 
 #pragma mark ¥¥¥Notifications

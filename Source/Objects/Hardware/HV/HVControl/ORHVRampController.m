@@ -23,7 +23,7 @@
 #import "ORHVRampController.h"
 #import "ORHVRampModel.h"
 #import "ORHVSupply.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeLinePlot.h"
 #import "ORAxis.h"
 
@@ -49,7 +49,7 @@
     [super awakeFromNib];
     [model pollHardware:model];
     [self performSelector:@selector(updateButtons) withObject:nil afterDelay:2];
-	[[currentPlotter yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
+	[[currentPlotter yAxis] setRngLimitsLow:0 withHigh:100 withMinRng:10];
 	
 	ORTimeLinePlot* aPlot;
 	

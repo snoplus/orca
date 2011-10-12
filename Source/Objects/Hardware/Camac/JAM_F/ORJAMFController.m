@@ -28,6 +28,7 @@
 #import "ORTimeLinePlot.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
+#import "ORCompositePlotView.h"
 
 // methods
 @implementation ORJAMFController
@@ -44,24 +45,24 @@
 {
 	[super awakeFromNib];
 	
-    [[plotter0 yScale] setRngLow:-12.0 withHigh:12.];
-	[[plotter0 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
-    [[plotter1 yScale] setRngLow:-12.0 withHigh:12.];
-	[[plotter1 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
-    [[plotter2 yScale] setRngLow:-12.0 withHigh:12.];
-	[[plotter2 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
-    [[plotter3 yScale] setRngLow:-12.0 withHigh:12.];
-	[[plotter3 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
+    [[plotter0 yAxis] setRngLow:-12.0 withHigh:12.];
+	[[plotter0 yAxis] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
+    [[plotter1 yAxis] setRngLow:-12.0 withHigh:12.];
+	[[plotter1 yAxis] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
+    [[plotter2 yAxis] setRngLow:-12.0 withHigh:12.];
+	[[plotter2 yAxis] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
+    [[plotter3 yAxis] setRngLow:-12.0 withHigh:12.];
+	[[plotter3 yAxis] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
 	
 	
-    [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter1 xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter1 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter2 xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter2 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[plotter3 xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter3 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter1 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter2 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter2 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[plotter3 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter3 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 	
 	NSColor* theColors[4] =
 	{
@@ -76,32 +77,39 @@
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[plotter0 addPlot: aPlot];
 		[aPlot setLineColor:theColors[i]];
-		[(ORTimeAxis*)[plotter0 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[aPlot setName:[NSString stringWithFormat:@"chan %d",i]];
+		[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+4 andDataSource:self];
 		[plotter1 addPlot: aPlot];
+		[aPlot setName:[NSString stringWithFormat:@"chan %d",i+4]];
 		[aPlot setLineColor:theColors[i]];
-		[(ORTimeAxis*)[plotter1 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[plotter1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
 
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+8 andDataSource:self];
 		[plotter2 addPlot: aPlot];
+		[aPlot setName:[NSString stringWithFormat:@"chan %d",i+8]];
 		[aPlot setLineColor:theColors[i]];
-		[(ORTimeAxis*)[plotter2 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[plotter2 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i+12 andDataSource:self];
 		[plotter3 addPlot: aPlot];
+		[aPlot setName:[NSString stringWithFormat:@"chan %d",i+12]];
 		[aPlot setLineColor:theColors[i]];
-		[(ORTimeAxis*)[plotter3 xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[plotter3 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
-	
+	[plotter0 setShowLegend:YES];
+	[plotter1 setShowLegend:YES];
+	[plotter2 setShowLegend:YES];
+	[plotter3 setShowLegend:YES];
 }
 
 
@@ -239,36 +247,36 @@
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 xScale]attributes] forKey:@"XAttributes0"];
+	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter0 yScale]attributes] forKey:@"YAttributes0"];
+	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter1 xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter1 xScale]attributes] forKey:@"XAttributes1"];
+	if(aNotification == nil || [aNotification object] == [plotter1 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter1 xAxis]attributes] forKey:@"XAttributes1"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter1 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter1 yScale]attributes] forKey:@"YAttributes1"];
+	if(aNotification == nil || [aNotification object] == [plotter1 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter1 yAxis]attributes] forKey:@"YAttributes1"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter2 xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter2 xScale]attributes] forKey:@"XAttributes2"];
+	if(aNotification == nil || [aNotification object] == [plotter2 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter2 xAxis]attributes] forKey:@"XAttributes2"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter2 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter2 yScale]attributes] forKey:@"YAttributes2"];
+	if(aNotification == nil || [aNotification object] == [plotter2 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter2 yAxis]attributes] forKey:@"YAttributes2"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter3 xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter3 xScale]attributes] forKey:@"XAttributes3"];
+	if(aNotification == nil || [aNotification object] == [plotter3 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter3 xAxis]attributes] forKey:@"XAttributes3"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter3 yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter3 yScale]attributes] forKey:@"YAttributes3"];
+	if(aNotification == nil || [aNotification object] == [plotter3 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter3 yAxis]attributes] forKey:@"YAttributes3"];
 	};
 	
 }
@@ -282,66 +290,66 @@
 	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter0 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 xAxis] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 xScale] setNeedsDisplay:YES];
+			[[plotter0 xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
 		if(attrib){
-			[(ORAxis*)[plotter0 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter0 yAxis] setAttributes:attrib];
 			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 yScale] setNeedsDisplay:YES];
+			[[plotter0 yAxis] setNeedsDisplay:YES];
 		}
 	}
 	
 	if(aNote == nil || [key isEqualToString:@"XAttributes1"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes1"];
 		if(attrib){
-			[(ORAxis*)[plotter1 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter1 xAxis] setAttributes:attrib];
 			[plotter1 setNeedsDisplay:YES];
-			[[plotter1 xScale] setNeedsDisplay:YES];
+			[[plotter1 xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes1"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes1"];
 		if(attrib){
-			[(ORAxis*)[plotter1 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter1 yAxis] setAttributes:attrib];
 			[plotter1 setNeedsDisplay:YES];
-			[[plotter1 yScale] setNeedsDisplay:YES];
+			[[plotter1 yAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"XAttributes2"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes2"];
 		if(attrib){
-			[(ORAxis*)[plotter2 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter2 xAxis] setAttributes:attrib];
 			[plotter2 setNeedsDisplay:YES];
-			[[plotter2 xScale] setNeedsDisplay:YES];
+			[[plotter2 xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes2"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes2"];
 		if(attrib){
-			[(ORAxis*)[plotter2 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter2 yAxis] setAttributes:attrib];
 			[plotter2 setNeedsDisplay:YES];
-			[[plotter2 yScale] setNeedsDisplay:YES];
+			[[plotter2 yAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"XAttributes3"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes3"];
 		if(attrib){
-			[(ORAxis*)[plotter3 xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter3 xAxis] setAttributes:attrib];
 			[plotter3 setNeedsDisplay:YES];
-			[[plotter3 xScale] setNeedsDisplay:YES];
+			[[plotter3 xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"YAttributes3"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes3"];
 		if(attrib){
-			[(ORAxis*)[plotter3 yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter3 yAxis] setAttributes:attrib];
 			[plotter3 setNeedsDisplay:YES];
-			[[plotter3 yScale] setNeedsDisplay:YES];
+			[[plotter3 yAxis] setNeedsDisplay:YES];
 		}
 	}
 }

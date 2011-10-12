@@ -21,10 +21,9 @@
 
 #import "ORHPPulserController.h"
 #import "ORHPPulserModel.h"
-#import "ORPlotView.h"
 #import "ORPlot.h"
 #import "ORAxis.h"
-
+#import "ORCompositePlotView.h"
 
 @interface ORHPPulserController (private)
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -42,7 +41,7 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[yScale setRngLimitsLow:-1 withHigh:1 withMinRng:2];
+	[[plotter yAxis] setRngLimitsLow:-1 withHigh:1 withMinRng:2];
 	[plotter setShowGrid:NO];
 	ORPlot* aPlot;
 	aPlot= [[ORPlot alloc] initWithTag:0 andDataSource:self];
@@ -664,17 +663,17 @@
 	
 	int mx = [model numPoints];
 	
-	[yScale setRngLimitsLow:-1 withHigh:1 withMinRng:2];
-	[yScale setRngLow:-1 withHigh:1];
-	//[yScale setFullRng];
+	[[plotter yAxis] setRngLimitsLow:-1 withHigh:1 withMinRng:2];
+	[[plotter yAxis] setRngLow:-1 withHigh:1];
+	//[[plotter yAxis] setFullRng];
 	
-	[xScale setRngLimitsLow:0 withHigh:mx withMinRng:mx];
-	[xScale setRngLow:0 withHigh:mx];
-	//[xScale setFullRng];
+	[[plotter xAxis] setRngLimitsLow:0 withHigh:mx withMinRng:mx];
+	[[plotter xAxis] setRngLow:0 withHigh:mx];
+	//[[plotter xAxis] setFullRng];
 	
 	
-	[yScale setNeedsDisplay:YES];
-	[xScale setNeedsDisplay:YES];
+	[[plotter yAxis] setNeedsDisplay:YES];
+	[[plotter xAxis] setNeedsDisplay:YES];
 	[plotter setNeedsDisplay:YES];
 }
 
@@ -717,8 +716,8 @@
 	
     [downloadButton setTitle: loading ? @"Stop":@"Load"];
 	
-	[yScale setNeedsDisplay:YES];
-	[xScale setNeedsDisplay:YES];
+	[[plotter yAxis] setNeedsDisplay:YES];
+	[[plotter xAxis] setNeedsDisplay:YES];
 	[plotter setNeedsDisplay:YES];
 	[downloadButton setEnabled:![model loading] && ![model lockGUI]];
 	

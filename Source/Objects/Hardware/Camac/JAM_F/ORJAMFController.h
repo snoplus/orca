@@ -24,7 +24,7 @@
 #pragma mark •••Imported Files
 #import "ORJAMFModel.h"
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 
 @interface ORJAMFController : OrcaObjectController {
 	@private
@@ -58,10 +58,10 @@
         IBOutlet NSButton*		initButton;
         IBOutlet NSButton*		readIdButton;
         IBOutlet NSTextField*   settingLockDocField;
-        IBOutlet ORPlotView*	plotter0;
-        IBOutlet ORPlotView*	plotter1;
-        IBOutlet ORPlotView*	plotter2;
-        IBOutlet ORPlotView*	plotter3;
+        IBOutlet ORCompositeTimeLineView*	plotter0;
+        IBOutlet ORCompositeTimeLineView*	plotter1;
+        IBOutlet ORCompositeTimeLineView*	plotter2;
+        IBOutlet ORCompositeTimeLineView*	plotter3;
  };
 
 - (void) registerNotificationObservers;

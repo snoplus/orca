@@ -25,6 +25,7 @@
 #import "OR1DHistoPlot.h"
 #import "ORAxis.h"
 #import "ORAdeiLoader.h"
+#import "ORCompositePlotView.h"
 
 @implementation ORIpeSimulationController
 
@@ -50,17 +51,19 @@
 	[treeDetailsView setAlignment:NSLeftTextAlignment];
 	[itemDetailsView setAlignment:NSLeftTextAlignment];
 	
-	[[timingPlotter yScale] setRngLimitsLow:0 withHigh:1e10 withMinRng:5];
-    [[timingPlotter yScale] setRngLow:0 withHigh:200];
-    [[timingPlotter yScale] setLog:NO];
-    [[timingPlotter xScale] setRngLimitsLow:0 withHigh:kResponseTimeHistogramSize withMinRng:100];
-    [[timingPlotter xScale] setRngLow:0 withHigh:kResponseTimeHistogramSize];
-    [[timingPlotter xScale] setLog:NO];
+	[[timingPlotter yAxis] setRngLimitsLow:0 withHigh:1e10 withMinRng:5];
+    [[timingPlotter yAxis] setRngLow:0 withHigh:200];
+    [[timingPlotter yAxis] setLog:NO];
+    [[timingPlotter xAxis] setRngLimitsLow:0 withHigh:kResponseTimeHistogramSize withMinRng:100];
+    [[timingPlotter xAxis] setRngLow:0 withHigh:kResponseTimeHistogramSize];
+    [[timingPlotter xAxis] setLog:NO];
 	
 	[timingPlotter setUseGradient:YES];
 	OR1DHistoPlot* aPlot = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
 	[timingPlotter addPlot: aPlot];
 	[aPlot release];
+	
+	[timingPlotter setXLabel:@"ResponseTime(ms)"];
 	
     [itemTreeOutlineView setVerticalMotionCanBeginDrag:YES];
     [itemTableView registerForDraggedTypes:[NSArray arrayWithObjects:@"ORItemType",NSStringPboardType, nil]];
@@ -551,7 +554,7 @@
 	//[op setMessage: @"Save the Config File ..."];
 	[op setNameFieldLabel: @"Save as:"];
 	//[op setNameFieldStringValue: @"config.txt"];
-	[op setNameFieldStringValue: [[model configFileName] lastPathComponent]];
+	[op setNameFieldLabel: [[model configFileName] lastPathComponent]];
 	[op setTitle: @"Save Config File"];
 	[op setAllowedFileTypes: nil];
 	[op setAllowsOtherFileTypes: YES];
@@ -564,8 +567,8 @@
     {
         NSString *filename = [op filename];
         NSLog( @"You selected the filename: %@\n",filename);
-        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[op nameFieldStringValue]);
-        NSLog( @"You selected [op directoryURL]: %@\n",[op directoryURL]);
+        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[op nameFieldLabel]);
+        NSLog( @"You selected [op directoryURL]: %@\n",[op URL]);
         //if (![textData writeToFile:[sp filename] atomically:YES])
 		BOOL saveOK;  
 		saveOK = [[configFileTextView string] writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding error: NULL];

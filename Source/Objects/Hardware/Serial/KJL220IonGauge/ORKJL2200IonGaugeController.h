@@ -17,7 +17,7 @@
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 @class BiStateView;
 
 @interface ORKJL2200IonGaugeController : OrcaObjectController
@@ -47,7 +47,7 @@
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      resetButton;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotView*   plotter0;
+	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet NSTextField*	cmdQueCountField;
 	
     IBOutlet BiStateView*	setPoint1State;
