@@ -20,7 +20,7 @@
 
 #import "MemoryWatcherController.h"
 #import "MemoryWatcher.h"
-#import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "ORPlot.h"
 #import "ORAxis.h"
 #import "SynthesizeSingleton.h"
@@ -49,11 +49,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
     [self upTimeChanged:nil];
 	[self taskIntervalChanged:nil];
 	
-    [xScale setRngLow:0.0 withHigh:200.];
-    [yScale setRngLow:0.0 withHigh:300.];
+    [[plotView xAxis] setRngLow:0.0 withHigh:200.];
+    [[plotView yAxis] setRngLow:0.0 withHigh:300.];
 
-	[xScale setRngLimitsLow:0.0 withHigh:4096. withMinRng:50.];
-	[yScale setRngLimitsLow:0.0 withHigh:10000. withMinRng:50.];
+	[[plotView xAxis] setRngLimitsLow:0.0 withHigh:4096. withMinRng:50.];
+	[[plotView yAxis] setRngLimitsLow:0.0 withHigh:10000. withMinRng:50.];
+	
 	
 	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1]];
 	
@@ -63,6 +64,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor colorWithCalibratedRed:0 green:.5 blue:0 alpha:1]];
 	[thePlot setUseConstantColor:YES];
+	[thePlot setName:@"CPU (%)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
 	
@@ -70,6 +72,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor redColor]];
 	[thePlot setUseConstantColor:YES];
+	[thePlot setName:@"RSize (MB)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
 	
@@ -77,8 +80,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	[thePlot setLineWidth:1];
 	[thePlot setLineColor:[NSColor blueColor]];
 	[thePlot setUseConstantColor:YES];
+	[thePlot setName:@"VSize (MB)"];
 	[plotView addPlot: thePlot];
 	[thePlot release];
+	
+	[plotView setShowLegend:YES];
 	
     [plotView setNeedsDisplay:YES];
 
@@ -119,7 +125,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 		NSString* s;
 		if(interval == 1.0) s = @"Max 4096 Samples @ 1 Hz";
 		else s = [NSString stringWithFormat:@"Max 4096 Samples @ 1/%.0f Hz",[watcher taskInterval]];
-		[taskIntervalField setStringValue:s];
+		[plotView setXLabel:s];
     }
 }
 

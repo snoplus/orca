@@ -27,6 +27,7 @@
 #import "OR1dRoiController.h"
 #import "OR1dFitController.h"
 #import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 #import "OR1DHistoPlot.h"
 
 @interface OR1DHistoController (private)
@@ -53,8 +54,8 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [[plotView yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
-    [[plotView xScale] setRngLimitsLow:0 withHigh:[model numberBins] withMinRng:25];
+    [[plotView yAxis] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+    [[plotView xAxis] setRngLimitsLow:0 withHigh:[model numberBins] withMinRng:25];
 
 	OR1DHistoPlot* histo1 = [[OR1DHistoPlot alloc] initWithTag:0 andDataSource:self];
 	[histo1 setRoi: [[model rois] objectAtIndex:0]];
@@ -93,7 +94,7 @@
 }
 - (IBAction) logLin:(id)sender 
 {
-	[[plotView yScale] setLog:![[plotView yScale] isLog]];
+	[[plotView yAxis] setLog:![[plotView yAxis] isLog]];
 }
 
 - (IBAction) copy:(id)sender

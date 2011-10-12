@@ -17,6 +17,7 @@
 #import "KatrinConstants.h"
 #import "ORSegmentGroup.h"
 #import "ORDetectorSegment.h"
+#import "ORAxis.h"
 
 #define crateX 48.
 #define crateY 265.
@@ -40,6 +41,9 @@
 {	
 	[theBackground release];
 	theBackground = [[NSImage imageNamed:@"IpeV4CrateBig"] retain];
+	[[focalPlaneColorScale colorAxis] setLabel:@"Main Focal Plane"];
+	[[vetoColorScale colorAxis] setLabel:@"Veto"];
+	[[vetoColorScale colorAxis] setOppositePosition:YES];
 }
 
 - (void) setViewType:(int)aViewType

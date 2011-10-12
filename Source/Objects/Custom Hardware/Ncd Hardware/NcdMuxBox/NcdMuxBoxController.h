@@ -21,7 +21,8 @@
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORValueBar;
-@class ORPlotView;
+@class ORCompositeValueBarView;
+@class ORValueBarGroupView;
 
 @interface NcdMuxBoxController : OrcaObjectController
 {
@@ -72,11 +73,11 @@
 		IBOutlet NSButton*      testLockButton;
 
 		//tdb... fix the bar graph so it can be automatically put into a matrix
-		IBOutlet ORValueBar*	rate0;
-		IBOutlet ORValueBar*	totalRate;
+		IBOutlet ORValueBarGroupView*	rate0;
+		IBOutlet ORValueBarGroupView*	totalRate;
 		IBOutlet NSButton*      rateLogCB;
 		IBOutlet NSButton*      totalRateLogCB;
-		IBOutlet ORPlotView*    timeRatePlot;
+		IBOutlet id				timeRatePlot;
 		IBOutlet NSButton*      timeRateLogCB;
 
 		IBOutlet NSTextField*   busNumberField;

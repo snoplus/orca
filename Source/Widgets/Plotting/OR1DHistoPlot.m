@@ -93,8 +93,8 @@
 	}
 	
 	//draw the data 
-	int minX = MAX(0,roundToLong([mXScale minLimit]));
-	int maxX = MIN(roundToLong([mXScale maxLimit]+1),numPoints);
+	int minX = MAX(0,roundToLong([mXScale minValue]));
+	int maxX = MIN(roundToLong([mXScale maxValue]+1),numPoints);
 	x  = [mXScale getPixAbs:minX]-chanWidth/2.;
 	xl = x;
 	double xValue,yValue;

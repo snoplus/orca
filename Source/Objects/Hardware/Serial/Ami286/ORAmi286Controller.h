@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositeTimeLineView;
 @class ORLevelMonitor;
 
 @interface ORAmi286Controller : OrcaObjectController
@@ -48,7 +48,7 @@
     IBOutlet NSMatrix*			hiFillPointMatrix;
     IBOutlet NSMatrix*			lowFillPointMatrix;
     IBOutlet NSMatrix*			timeMatrix;
-	IBOutlet ORPlotView*		plotter0;
+	IBOutlet ORCompositeTimeLineView*		plotter0;
 	IBOutlet NSPopUpButton*		fillStatePU0;
 	IBOutlet NSPopUpButton*		fillStatePU1;
 	IBOutlet NSTextField*		alarmStatus0;

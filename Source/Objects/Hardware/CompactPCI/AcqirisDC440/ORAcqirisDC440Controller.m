@@ -28,6 +28,8 @@
 #import "ORRate.h"
 #import "ORRateGroup.h"
 #import "ORValueBar.h"
+#import "ORCompositePlotView.h"
+#import "ORValueBarGroupView.h"
 
 @interface ORAcqirisDC440Controller (private)
 - (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -52,7 +54,7 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[[plotter yScale] setRngLimitsLow:-32768 withHigh:32768 withMinRng:128];
+	[[plotter yAxis] setRngLimitsLow:-32768 withHigh:32768 withMinRng:128];
 
 	ORPlot* aPlot;
 	aPlot = [[ORPlot alloc] initWithTag:0 andDataSource:self];
@@ -64,6 +66,9 @@
 	[plotter addPlot: aPlot];
 	[aPlot setLineColor:[NSColor blueColor]];
 	[aPlot release];
+	
+	[rate0 setNumber:2 height:10 spacing:10];
+	[[rate0 xAxis] setLog:YES];
 }
 
 #pragma mark ¥¥¥Notifications
@@ -272,8 +277,8 @@
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
-	if(aNotification == nil || [aNotification object] == [rate0 xScale]){
-		[model setMiscAttributes:[[rate0 xScale]attributes] forKey:@"RateXAttributes"];
+	if(aNotification == nil || [aNotification object] == [rate0 xAxis]){
+		[model setMiscAttributes:[[rate0 xAxis]attributes] forKey:@"RateXAttributes"];
 	};
 }
 
@@ -285,9 +290,9 @@
 	if(aNote == nil || [key isEqualToString:@"RateXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"RateXAttributes"];
 		if(attrib){
-			[[rate0 xScale] setAttributes:attrib];
+			[[rate0 xAxis] setAttributes:attrib];
 			[rate0 setNeedsDisplay:YES];
-			[[rate0 xScale] setNeedsDisplay:YES];
+			[[rate0 xAxis] setNeedsDisplay:YES];
 			//[rateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}

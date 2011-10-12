@@ -22,8 +22,8 @@
 #import <Cocoa/Cocoa.h>
 #import "OrcaObjectController.h"
 
-@class ORPlotView;
-@class ORValueBar;
+@class ORCompositePlotView;
+@class ORValueBarGroupView;
 
 @interface ORAcqirisDC440Controller : OrcaObjectController
 {
@@ -42,14 +42,14 @@
 	IBOutlet NSTextField*	sampleIntervalField;
 	IBOutlet NSTextField*	triggerLablel1Field;
 	IBOutlet NSTextField*	triggerLablel2Field;
-	IBOutlet ORPlotView*	plotter;
+	IBOutlet ORCompositePlotView*	plotter;
 	IBOutlet NSTextField*	baseAddressField;
 	IBOutlet NSButton*		loadDialogButton;
 	IBOutlet NSButton*		readOneButton;
 	IBOutlet NSButton*		reportButton;
 	IBOutlet NSButton*		initButton;
     IBOutlet NSMatrix*		sampleRateTextFields;
-    IBOutlet ORValueBar*	rate0;
+    IBOutlet ORValueBarGroupView*	rate0;
     IBOutlet NSButton*		settingLockButton;
     IBOutlet NSButton*		probeButton;
 	IBOutlet NSTextField*	boardIdField;

@@ -93,6 +93,8 @@
             unsigned long z = data[ix + iy*numBinsPerSide];
             if(z){
                 int colorIndex = [colorScale getFastColorIndexForValue:z log:aLog integer:aInt minPad:aMinPad];
+				if(colorIndex<0)colorIndex = 0;
+				else if(colorIndex>255)colorIndex=255;
                 rectList[colorIndex][rectCount[colorIndex]] = NSMakeRect(x-.5,y-.5,xinc+1,yinc+1);
                 ++rectCount[colorIndex];
 				if(rectCount[colorIndex]>=kMaxNumRects){

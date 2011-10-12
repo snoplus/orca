@@ -26,6 +26,7 @@
 #import "ORAxis.h"
 #import "ORPlotView.h"
 #import "OR2DRoiController.h"
+#import "ORComposite2DPlotView.h"
 
 @implementation OR2DHistoController
 
@@ -46,10 +47,10 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [[plotView xScale] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
-    [[plotView yScale] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
-    [[plotView zScale] setRngLimitsLow:0 withHigh:0xffffffff withMinRng:16];
-    [[plotView yScale] setLog:NO];
+    [[plotView xAxis] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
+    [[plotView yAxis] setRngLimitsLow:0 withHigh:1024 withMinRng:16];
+    [[plotView zAxis] setRngLimitsLow:0 withHigh:0xffffffff withMinRng:16];
+    [[plotView yAxis] setLog:NO];
 	
 	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:1. green:1. blue:1. alpha:1]];
 	
@@ -95,19 +96,19 @@
 
 - (IBAction) logLin:(id)sender 
 {
-	[[plotView zScale] setLog:![[plotView zScale] isLog]];
+	[[plotView zAxis] setLog:![[plotView zAxis] isLog]];
 }
 
 - (IBAction) zoomIn:(id)sender      
 { 
-    [[plotView xScale] zoomIn:sender];
-    [[plotView yScale] zoomIn:sender];
+    [[plotView xAxis] zoomIn:sender];
+    [[plotView yAxis] zoomIn:sender];
 }
 
 - (IBAction) zoomOut:(id)sender     
 { 
-    [[plotView xScale] zoomOut:sender];
-    [[plotView yScale] zoomOut:sender];
+    [[plotView xAxis] zoomOut:sender];
+    [[plotView yAxis] zoomOut:sender];
 }
 
 - (IBAction) hideShowControls:(id)sender

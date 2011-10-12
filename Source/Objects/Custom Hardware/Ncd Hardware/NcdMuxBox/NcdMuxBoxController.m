@@ -26,11 +26,14 @@
 #import "ORRate.h"
 #import "ORRateGroup.h"
 #import "ORValueBar.h"
+#import "ORValueBarGroupView.h"
+#import "ORCompositePlotView.h"
 #import "ORTimeLinePlot.h"
 #import "ORPlotView.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
 #import "ThresholdCalibrationTask.h"
+#import "ORValueBarGroupView.h"
 
 @implementation NcdMuxBoxController
 
@@ -63,9 +66,9 @@
     
  	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
-	[(ORTimeAxis*)[timeRatePlot xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release]; 
-	
+	[rate0 setNumber:13 height:10 spacing:5];
     //[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     [super  awakeFromNib];
 }
@@ -568,9 +571,9 @@
 {
     //do we care?
 	
-	[[rate0 xScale] setAttributes:[model rateAttributes]];
+	[[rate0 xAxis] setAttributes:[model rateAttributes]];
 	[rate0 setNeedsDisplay:YES];
-	[[rate0 xScale]setNeedsDisplay:YES];
+	[[rate0 xAxis]setNeedsDisplay:YES];
 	
 	BOOL state = [[[model rateAttributes] objectForKey:ORAxisUseLog] boolValue];
 	[rateLogCB setState:state];
@@ -580,9 +583,9 @@
 - (void) totalRateAttributesChanged:(NSNotification*)aNote
 {
 	
-	[[totalRate xScale] setAttributes:[model totalRateAttributes]];
+	[[totalRate xAxis] setAttributes:[model totalRateAttributes]];
 	[totalRate setNeedsDisplay:YES];
-	[[totalRate xScale]setNeedsDisplay:YES];
+	[[totalRate xAxis]setNeedsDisplay:YES];
 	
 	BOOL state = [[[model totalRateAttributes] objectForKey:ORAxisUseLog] boolValue];
 	[totalRateLogCB setState:state];
@@ -592,18 +595,18 @@
 
 - (void) timeRateXAttributesChanged:(NSNotification*)aNote
 {
-	[(ORAxis*)[timeRatePlot xScale] setAttributes:[model timeRateXAttributes]];
+	[(ORAxis*)[timeRatePlot xAxis] setAttributes:[model timeRateXAttributes]];
 	[timeRatePlot setNeedsDisplay:YES];
-	[[timeRatePlot xScale]setNeedsDisplay:YES];
+	[[timeRatePlot xAxis]setNeedsDisplay:YES];
 }
 
 
 
 - (void) timeRateYAttributesChanged:(NSNotification*)aNote
 {	
-	[(ORAxis*)[timeRatePlot yScale] setAttributes:[model timeRateYAttributes]];
+	[(ORAxis*)[timeRatePlot yAxis] setAttributes:[model timeRateYAttributes]];
 	[timeRatePlot setNeedsDisplay:YES];
-	[[timeRatePlot yScale]setNeedsDisplay:YES];
+	[[timeRatePlot yAxis]setNeedsDisplay:YES];
 	
 	BOOL state = [[[model timeRateYAttributes] objectForKey:ORAxisUseLog] boolValue];
 	[timeRateLogCB setState:state];
@@ -635,23 +638,23 @@
 //a fake action from the scale object
 - (void) scaleAction:(NSNotification*)aNotification
 {
-    if(aNotification == nil || [aNotification object] == [rate0 xScale]){
+    if(aNotification == nil || [aNotification object] == [rate0 xAxis]){
 		[[self undoManager] setActionName: @"Set Mux Rate Attributes"];
-		[model setRateAttributes:[[rate0 xScale]attributes]];
+		[model setRateAttributes:[[rate0 xAxis]attributes]];
     };
-    if(aNotification == nil || [aNotification object] == [totalRate xScale]){
+    if(aNotification == nil || [aNotification object] == [totalRate xAxis]){
 		[[self undoManager] setActionName: @"Set Mux Total Rate Attributes"];
-		[model setTotalRateAttributes:[[totalRate xScale]attributes]];
+		[model setTotalRateAttributes:[[totalRate xAxis]attributes]];
     };
     
     
-    if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
+    if(aNotification == nil || [aNotification object] == [timeRatePlot xAxis]){
 		[[self undoManager] setActionName: @"Set Mux Time Rate X Attributes"];
-		[model setTimeRateXAttributes:[(ORAxis*)[timeRatePlot xScale]attributes]];
+		[model setTimeRateXAttributes:[(ORAxis*)[timeRatePlot xAxis]attributes]];
     };
-    if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
+    if(aNotification == nil || [aNotification object] == [timeRatePlot yAxis]){
 		[[self undoManager] setActionName: @"Set Mux Time Rate Y Attributes"];
-		[model setTimeRateYAttributes:[(ORAxis*)[timeRatePlot yScale]attributes]];
+		[model setTimeRateYAttributes:[(ORAxis*)[timeRatePlot yAxis]attributes]];
     };
     
 }
@@ -668,8 +671,8 @@
 
 - (IBAction) rateUsesLogAction:(id)sender
 {
-    if([sender state] != [[rate0 xScale] isLog]){
-		NSMutableDictionary* attributes = [[rate0 xScale]attributes];
+    if([sender state] != [[rate0 xAxis] isLog]){
+		NSMutableDictionary* attributes = [[rate0 xAxis]attributes];
 		[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
 		[model setRateAttributes:attributes];
     }
@@ -677,8 +680,9 @@
 }
 - (IBAction) totalRateUsesLogAction:(id)sender
 {
-    if([sender state] != [[totalRate xScale] isLog]){
-		NSMutableDictionary* attributes = [[totalRate xScale]attributes];
+    if([sender state] != [[totalRate xAxis] isLog]){
+		[totalRate setLogX:sender];
+		NSMutableDictionary* attributes = [[totalRate xAxis]attributes];
 		[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
 		[model setTotalRateAttributes:attributes];
     }
@@ -686,8 +690,9 @@
 
 - (IBAction) timeRateUsesLogAction:(id)sender
 {
-    if([sender state] != [[timeRatePlot yScale] isLog]){
-		NSMutableDictionary* attributes = [(ORAxis*)[timeRatePlot yScale]attributes];
+    if([sender state] != [[timeRatePlot yAxis] isLog]){
+		[timeRatePlot setLogY:sender];
+		NSMutableDictionary* attributes = [(ORAxis*)[timeRatePlot yAxis]attributes];
 		[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
 		[model setTimeRateYAttributes:attributes];
     }

@@ -21,16 +21,13 @@
 
 
 @class MemoryWatcher;
-@class ORPlotView;
+@class ORCompositePlotView;
 @class ORAxis;
 
 @interface MemoryWatcherController : NSWindowController {
     MemoryWatcher* watcher;
-    IBOutlet ORPlotView* plotView;
+    IBOutlet ORCompositePlotView* plotView;
     IBOutlet NSTextField* upTimeField;
-    IBOutlet NSTextField* taskIntervalField;
-    IBOutlet ORAxis* xScale;
-    IBOutlet ORAxis* yScale;
 }
 
 + (MemoryWatcherController*) sharedMemoryWatcherController;
