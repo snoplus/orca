@@ -212,7 +212,7 @@
 	}
 	short i;
 	for (i=0; i<numColors; i++){
-		[[colors objectAtIndex:i] set];
+		[(NSColor*)[colors objectAtIndex:i] set];
 		if(w>h){
 			[NSBezierPath fillRect:NSMakeRect(x,y,delta+1,h)];
 			x+=delta;
