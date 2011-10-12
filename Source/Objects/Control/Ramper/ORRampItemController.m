@@ -25,6 +25,7 @@
 #import "ORRamperModel.h"
 #import "ORAxis.h"
 #import "ORHWWizard.h"
+#import "ORCompositePlotView.h"
 
 @interface ORRamperController (private)
 - (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -291,7 +292,7 @@
 	if(aNotification == nil || [aNotification object] == [owner xAxis]){
 		[model setMiscAttributes:[[owner xAxis] attributes] forKey:@"xAxis"];
 		[model  scaleToMaxTime:[[owner xAxis] maxValue]];
-		[[owner xAxis] setLabel:@"Time (sec)"];
+		[[owner ramperView] setXLabel:@"Time (sec)"];
 	}
 	
 	if(aNotification == nil || [aNotification object] == [owner yAxis]){

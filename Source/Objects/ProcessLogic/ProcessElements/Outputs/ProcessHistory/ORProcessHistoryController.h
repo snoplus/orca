@@ -22,11 +22,11 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORProcessHwAccessorController.h"
 
-@class ORPlotView;
+@class ORCompositePlotView;
 
 @interface ORProcessHistoryController : ORProcessHwAccessorController 
 {
-	IBOutlet ORPlotView* plotter;
+	IBOutlet ORCompositePlotView* plotter;
     BOOL scheduledToUpdate;
 }
 

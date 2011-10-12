@@ -108,7 +108,6 @@
         NSString*       portName;
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
-        unsigned long	dataId;
 		NSString*		lastRequest;
 		NSMutableArray* cmdQueue;
 		unsigned long	timeMeasured;
@@ -217,13 +216,7 @@
 - (void) convertUnitsString:(NSString*)aUnitsString;
 - (int) convertProtocolStringToIndex:(NSString*)aProtocol;
 
-#pragma mark ***Data Records
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (NSDictionary*) dataRecordDescription;
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherRad7;
+#pragma mark ***Data
 - (void) dumpUserValues;
 - (void) saveUser;
 - (void) pollHardware;

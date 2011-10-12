@@ -132,8 +132,11 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 - (void) addRampItem:(ORRampItem*)anItem afterItem:(ORRampItem*)anotherItem
 {
 	int index = [rampItems indexOfObject:anotherItem];
-	[rampItems insertObject:anItem atIndex:index];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORRamperItemAdded object:self userInfo:[NSDictionary dictionaryWithObject:anItem forKey:@"RampItem"]];
+	if(![rampItems containsObject:anItem]){
+		[rampItems insertObject:anItem atIndex:index];
+		NSLog(@"posted\n");
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORRamperItemAdded object:self userInfo:[NSDictionary dictionaryWithObject:anItem forKey:@"RampItem"]];
+	}
 }
 
 - (void) removeRampItem:(ORRampItem*)anItem

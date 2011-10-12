@@ -22,8 +22,8 @@
 #pragma mark ***Imported Files
 #import "OrcaObjectController.h"
 #import "ORPxi6289Model.h"
-@class ORValueBar;
-@class ORPlotView;
+@class ORValueBarGroupView;
+@class ORCompositeTimeLineView;
 
 @interface ORPxi6289Controller : OrcaObjectController 
 {
@@ -44,12 +44,12 @@
 	//fist one in the 0-15 group
     IBOutlet NSMatrix*      rate1TextFields;
     IBOutlet NSMatrix*      enabled1Matrix;	
-    IBOutlet ORValueBar*    rate1;
+    IBOutlet ORValueBarGroupView*    rate1;
     IBOutlet NSButton*      rate1LogCB;
 
 	//fist one in the 16-31 group
 	IBOutlet NSMatrix*      rate2TextFields;	
-    IBOutlet ORValueBar*    rate2;				
+    IBOutlet ORValueBarGroupView*    rate2;				
     IBOutlet NSMatrix*      enabled2Matrix;	
     IBOutlet NSButton*      rate2LogCB;
 	
@@ -57,9 +57,9 @@
     IBOutlet NSTextField*   integrationText;
     IBOutlet NSTextField*   totalRateText;
 
-    IBOutlet ORValueBar*    totalRate;
+    IBOutlet ORValueBarGroupView*    totalRate;
     IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotView*    timeRatePlot;
+    IBOutlet ORCompositeTimeLineView*    timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
 
     NSView *blankView;

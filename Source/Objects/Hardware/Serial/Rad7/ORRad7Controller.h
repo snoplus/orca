@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 
-@class ORPlotView;
+@class ORCompositePlotView;
 
 @interface ORRad7Controller : OrcaObjectController
 {
@@ -48,7 +48,7 @@
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      updateSettingsButton;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORPlotView*    plotter0;
+	IBOutlet ORCompositePlotView*    plotter0;
 	
 	IBOutlet NSButton*		startTestButton;
 	IBOutlet NSButton*		stopTestButton;

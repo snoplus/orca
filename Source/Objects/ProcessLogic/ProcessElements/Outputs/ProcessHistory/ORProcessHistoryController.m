@@ -26,6 +26,7 @@
 #import "ORTimeLinePlot.h"
 #import "ORTimeAxis.h"
 #import "ORProcessThread.h"
+#import "ORCompositePlotView.h"
 
 @implementation ORProcessHistoryController
 
@@ -49,11 +50,11 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[[plotter yScale] setRngLimitsLow:-1000 withHigh:1000 withMinRng:5];
-	[[plotter yScale] setRngDefaultsLow:0 withHigh:20];
+	[[plotter yAxis] setRngLimitsLow:-1000 withHigh:1000 withMinRng:5];
+	[[plotter yAxis] setRngDefaultsLow:0 withHigh:20];
 
-	[[plotter xScale] setRngLimitsLow:0 withHigh:50000 withMinRng:3];
-	[[plotter xScale] setRngDefaultsLow:0 withHigh:50000];
+	[[plotter xAxis] setRngLimitsLow:0 withHigh:50000 withMinRng:3];
+	[[plotter xAxis] setRngDefaultsLow:0 withHigh:50000];
 	
 	NSColor* theColors[4] = {
 		[NSColor redColor],
@@ -61,14 +62,18 @@
 		[NSColor blackColor],
 		[NSColor greenColor],
 	};
+	[plotter setShowLegend:YES];
 	int i;
 	for(i=0;i<4;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[aPlot setLineColor:theColors[i]];
 		[plotter addPlot: aPlot];
-		[(ORTimeAxis*)[plotter xScale] setStartTime: [[NSDate date] timeIntervalSince1970]];
+		[(ORTimeAxis*)[plotter xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release]; 
+		[plotter setPlot:i name:[NSString stringWithFormat:@"#%d",i+1]];
 	}
+	
+	
 	//normally we would not retain an IB object. But we are doing some delayed calls to it and
 	//need to make sure it sticks around if the controller window is closed.
 	[plotter retain];
@@ -106,12 +111,12 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	
-	if(aNotification == nil || [aNotification object] == [plotter xScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter xScale]attributes] forKey:@"plotterXAttributes"];
+	if(aNotification == nil || [aNotification object] == [plotter xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter xAxis]attributes] forKey:@"plotterXAttributes"];
 	};
 	
-	if(aNotification == nil || [aNotification object] == [plotter yScale]){
-		[model setMiscAttributes:[(ORAxis*)[plotter yScale]attributes] forKey:@"plotterYAttributes"];
+	if(aNotification == nil || [aNotification object] == [plotter yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter yAxis]attributes] forKey:@"plotterYAttributes"];
 	};
 	
 }
@@ -124,17 +129,17 @@
 	if(aNote == nil || [key isEqualToString:@"plotterXAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"plotterXAttributes"];
 		if(attrib){
-			[(ORAxis*)[plotter xScale] setAttributes:attrib];
+			[(ORAxis*)[plotter xAxis] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
-			[[plotter xScale] setNeedsDisplay:YES];
+			[[plotter xAxis] setNeedsDisplay:YES];
 		}
 	}
 	if(aNote == nil || [key isEqualToString:@"plotterYAttributes"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"plotterYAttributes"];
 		if(attrib){
-			[(ORAxis*)[plotter yScale] setAttributes:attrib];
+			[(ORAxis*)[plotter yAxis] setAttributes:attrib];
 			[plotter setNeedsDisplay:YES];
-			[[plotter yScale] setNeedsDisplay:YES];
+			[[plotter yAxis] setNeedsDisplay:YES];
 		}
 	}
 }
@@ -151,7 +156,7 @@
 {
     scheduledToUpdate = NO;
 	[plotter setNeedsDisplay:YES];
-	[[plotter xScale] setNeedsDisplay:YES];
+	[[plotter xAxis] setNeedsDisplay:YES];
 }
 
 #pragma mark ¥¥¥Plot Data Source

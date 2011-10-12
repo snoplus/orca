@@ -77,6 +77,11 @@
 }
 
 #pragma mark ***Accessors
+- (void) setViewForPDF:(NSView*)aView
+{
+	viewForPDF = aView; //don't retain
+}
+
 - (void) setDelegate:(id)aDelegate
 {
     delegate = aDelegate;
@@ -104,6 +109,20 @@
 }
 
 #pragma mark ***Parts
+- (void) setZScale:(id)anAxis
+{
+	zScale = anAxis; //don't retain
+}
+- (void) setXScale:(id)anAxis
+{
+	xScale = anAxis; //don't retain
+}
+
+- (void) setYScale:(id)anAxis
+{
+	yScale = anAxis; //don't retain
+}
+
 - (id) xScale
 {
 	return xScale; 
@@ -123,6 +142,11 @@
 {
 	return colorScale;
 }
+- (void) setColorScale:(id)aColorScale
+{
+	colorScale = aColorScale; //don't retain
+}
+
 
 - (NSTextField*) titleField
 {
@@ -157,6 +181,7 @@
     [plotArray removeAllObjects];
     [self setNeedsDisplay:YES];
 }
+
 - (int) numberOfPlots
 {
 	return [plotArray count];
@@ -281,7 +306,7 @@
 	// Draw components in order
 	[self drawBackground];
 	if(backgroundImage){
-		[backgroundImage compositeToPoint:NSMakePoint(0,-1) operation:NSCompositeSourceOver];
+		[backgroundImage compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
 	}
 	if([self showGrid]){
 		[NSBezierPath setDefaultLineWidth:.2];

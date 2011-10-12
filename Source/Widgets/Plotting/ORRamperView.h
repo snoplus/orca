@@ -22,10 +22,11 @@
 @class ORRamperController;
 
 @interface ORRamperView : NSView {
-	IBOutlet id xAxis;
-	IBOutlet id yAxis;
-	IBOutlet ORRamperController* dataSource;
-
+	IBOutlet id xScale;
+	IBOutlet id yScale;
+	IBOutlet id delegate;
+	IBOutlet NSView*		viewForPDF;
+	
 	NSGradient*			gradient;
 	ORWayPoint* selectedWayPoint;	//x in non-converted time, y in y-axis coords
 	NSImage* rightTargetBug;
@@ -35,6 +36,14 @@
 	float yHighConstraint;
 	BOOL mouseIsDown;
 }
+- (void) setDelegate:(id)aDelegate;
+- (id) delegate;
+
+- (void) setViewForPDF:(NSView*)aView;
+- (id) xScale;
+- (id) yScale;
+- (void) setXScale:(id)anAxis;
+- (void) setYScale:(id)anAxis;
 
 @end
 

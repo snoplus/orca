@@ -72,13 +72,18 @@
 - (void) setAttributes:(NSMutableDictionary *)anAttributes;
 - (id) dataSource; //temp until conversion complete
 - (void) setComment:(NSString*)aComment;
-
+- (void) setViewForPDF:(NSView*)aView;
+ 
 #pragma mark ***Parts
 - (NSTextField*) titleField;
 - (id) xScale;
 - (id) yScale;
 - (id) zScale;
 - (id) colorScale;
+- (void) setXScale:(id)anAxis;
+- (void) setYScale:(id)anAxis;
+- (void) setZScale:(id)anAxis;
+- (void) setColorScale:(id)colorScale;
 
 #pragma mark ***Plots
 - (ORPlot*) topPlot;

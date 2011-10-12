@@ -1016,42 +1016,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	//[self addCmdToQueue:@"++ShipRecords"];
 }
 
-#pragma mark ***Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
-{
-    dataId = DataId;
-}
-- (void) setDataIds:(id)assigner
-{
-    dataId       = [assigner assignDataIds:kLongForm];
-}
-
-- (void) syncDataIdsWith:(id)anotherRad7
-{
-    [self setDataId:[anotherRad7 dataId]];
-}
-
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"Rad7Model"];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORRad7DecoderForTemperature",     @"decoder",
-        [NSNumber numberWithLong:dataId],   @"dataId",
-        [NSNumber numberWithBool:NO],       @"variable",
-        [NSNumber numberWithLong:4],        @"length",
-        nil];
-    [dataDictionary setObject:aDictionary forKey:@"Temperatures"];
-    
-    return dataDictionary;
-}
 - (id) statusForKey:(id)aKey
 {
 	id aValue = [statusDictionary objectForKey:aKey];

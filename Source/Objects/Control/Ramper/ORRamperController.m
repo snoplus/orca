@@ -26,6 +26,7 @@
 #import "ORReadOutList.h"
 #import "ORRampItem.h"
 #import "ZFlowLayout.h"
+#import "ORCompositePlotView.h"
 
 #define ORHardwareWizardItem @"ORHardwareWizardItem"
 
@@ -114,8 +115,8 @@
 - (void) registerNotificationObservers
 {
     [super registerNotificationObservers];
+	
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-		
     [notifyCenter addObserver : self
                      selector : @selector(listLockChanged:)
                          name : ORRamperObjectListLock
@@ -263,8 +264,12 @@
 
 - (void) rampItemAdded:(NSNotification*)aNote
 {
+	NSLog(@"received\n");
+
 	ORRampItem* aRampItem = [[aNote userInfo] objectForKey:@"RampItem"];
 	[self addRampItem:aRampItem];
+	NSLog(@"processed\n");
+
 }
 
 - (void) rampItemRemoved:(NSNotification*)aNote
@@ -288,7 +293,7 @@
 		NSEnumerator* e = [rampItems objectEnumerator];
 		ORRampItem* anItem;
 		while(anItem = [e nextObject]){
-			[anItem scaleToMaxTime:[xAxis maxValue]];
+			[anItem scaleToMaxTime:[[ramperView xAxis] maxValue]];
 		}
 	}
 }
@@ -333,12 +338,17 @@
 
 - (ORAxis*) xAxis
 {
-	return xAxis;
+	return [ramperView xAxis];
 }
 
 - (ORAxis*) yAxis
 {
-	return yAxis;
+	return [ramperView yAxis];
+}
+
+- (ORCompositeRamperView*) ramperView
+{
+	return ramperView;
 }
 
 - (IBAction) startGlobalAction:(id)sender

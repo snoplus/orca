@@ -26,6 +26,7 @@
 #import "ORTimeSeries.h"
 #import "ORPlotView.h"
 #import "ORTimeSeriesPlot.h"
+#import "ORCompositePlotView.h"
 
 @implementation ORPlotTimeSeriesController
 
@@ -40,8 +41,8 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-	[[plotView yScale]  setInteger:NO];
-	[[plotView yScale] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
+	[[plotView yAxis]  setInteger:NO];
+	[[plotView yAxis] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
 	
 	ORTimeSeriesPlot* aPlot = [[ORTimeSeriesPlot alloc] initWithTag:0 andDataSource:self];
 	[plotView addPlot: aPlot];

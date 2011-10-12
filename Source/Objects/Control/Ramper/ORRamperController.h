@@ -21,10 +21,11 @@
 @class ORAxis;
 @class ORRampItem;
 @class ZFlowLayout;
+@class ORCompositeRamperView;
 
 @interface ORRamperController : OrcaObjectController {
 	IBOutlet ZFlowLayout*		rampItemContentView;
-	IBOutlet NSView*			ramperView;
+	IBOutlet ORCompositeRamperView*			ramperView;
 	IBOutlet NSMatrix*			downRampPathMatrix;
 	IBOutlet NSTextField*		downRateTextField;
 	IBOutlet NSTextField*		numberRunningField;
@@ -36,8 +37,6 @@
 	IBOutlet NSButton*			logButton;
 	IBOutlet NSButton*			scaleToMaxButton;
 	IBOutlet NSButton*			scaleToTargetButton;
-	IBOutlet ORAxis*			xAxis;
-	IBOutlet ORAxis*			yAxis;
 	NSMutableArray*				rampItemControllers;
 }
 - (NSString*) windowNibName;
@@ -58,6 +57,7 @@
 - (void) currentValueChanged:(NSNotification*)aNote;
 - (ORAxis*) xAxis;
 - (ORAxis*) yAxis;
+- (ORCompositeRamperView*) ramperView;
 
 #pragma mark ***Actions
 - (IBAction) startGlobalAction:(id)sender;
