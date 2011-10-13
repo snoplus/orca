@@ -34,8 +34,10 @@ NSString* ORStatusFlushSize				 = @"ORStatusFlushSize";
 ORStatusController* theLogger = nil;
 
 @interface ORStatusController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
 - (void) loadLogBookPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveAsLogBookDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
@@ -561,12 +563,30 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
             startDir = NSHomeDirectory();
         }
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* newPath = [[savePanel URL] path ];
+            
+            if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
+                newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
+            }
+            [logBookField writeRTFDToFile:newPath atomically:YES];
+            [self setLogBookFile:newPath];
+            
+            logBookDirty = NO;
+            [saveLogBookButton setEnabled:NO];
+        }
+    }];
+#else
     [savePanel beginSheetForDirectory:startDir
 								 file:nil
 					   modalForWindow:[self window]
 						modalDelegate:self
 					   didEndSelector:@selector(saveAsLogBookDidEnd:returnCode:contextInfo:)
 						  contextInfo:nil];
+#endif
 }
 
 - (IBAction) loadLogBook:(id)sender
@@ -583,6 +603,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Load Log Book"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* fileName = [[[openPanel URLs] objectAtIndex:0]path];
+            [self setLogBookFile:fileName];
+        }
+    }];
+#else    
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -590,6 +620,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
                         modalDelegate:self
                        didEndSelector:@selector(loadLogBookPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 	
 }
 
@@ -962,6 +993,7 @@ void NSLogError(NSString* aString,...)
 }
 
 @implementation ORStatusController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
 -(void)loadLogBookPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -986,7 +1018,7 @@ void NSLogError(NSString* aString,...)
 		
     }
 }
-
+#endif
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
