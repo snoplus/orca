@@ -27,8 +27,10 @@
 
 @interface ORRunController (private)
 - (void) populatePopups;
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 @end
 
 @implementation ORRunController
@@ -674,6 +676,16 @@
     [openPanel setCanChooseFiles:NO];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* dirName = [[[[openPanel URLs] objectAtIndex:0] path] stringByAbbreviatingWithTildeInPath];
+            [model setDirName:dirName];
+        }
+    }];
+#else
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -681,6 +693,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) definitionsFileAction:(id)sender
@@ -700,6 +713,23 @@
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setDefinitionsFilePath:[[[openPanel URLs] objectAtIndex:0]path]];
+            if(![model readRunTypeNames]){
+                NSLogColor([NSColor redColor],@"Unable to parse <%@> as a run type def file.\n",[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath]);
+                NSLogColor([NSColor redColor],@"File must be list of items of the form: itemNumber,itemName\n");	
+                [model setDefinitionsFilePath:nil];
+            }
+            else {
+                [self definitionsFileChanged:nil];
+            }
+        }
+    }];
+#else
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -707,6 +737,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(definitionsPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) runTypeAction:(id)sender
@@ -854,6 +885,8 @@
 
 	[[model undoManager] enableUndoRegistration];
 }
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -861,6 +894,7 @@
         [model setDirName:dirName];
     }
 }
+
 - (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -875,6 +909,8 @@
         }
     }
 }
+#endif
+
 
 @end
 
