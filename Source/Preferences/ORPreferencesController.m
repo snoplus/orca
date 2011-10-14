@@ -32,9 +32,11 @@
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _changePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _selectHeartbeatPathDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) _shakeIt;
 - (void) _setPassWordButtonText;
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
+- (void) _selectHeartbeatPathDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 @end;
 
 @implementation ORPreferencesController
@@ -370,6 +372,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 	[openPanel setPrompt:@"Choose Heartbeat Location"];
 	NSString* startPath = [[NSUserDefaults standardUserDefaults] objectForKey: ORPrefHeartBeatPath];
 	if(![startPath length])startPath = [@"~" stringByExpandingTildeInPath];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startPath]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* path = [[[openPanel URLs] objectAtIndex:0] path];
+            [[NSUserDefaults standardUserDefaults] setObject:path forKey:ORPrefHeartBeatPath];
+            [heartbeatPathField setStringValue:[path stringByAbbreviatingWithTildeInPath]];
+            
+            [[NSNotificationCenter defaultCenter]postNotificationName:ORPrefHeartBeatPathChanged object:nil];
+        }
+    }];
+
+#else
 	[openPanel beginSheetForDirectory: startPath
 								 file: nil
 								types: nil
@@ -377,22 +392,25 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 						modalDelegate: self
 					   didEndSelector: @selector(_selectHeartbeatPathDidEnd:returnCode:contextInfo:)
 						  contextInfo: NULL];
+#endif
 	
 }
 
 @end
 
 @implementation ORPreferencesController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
 - (void) _selectHeartbeatPathDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
 		NSString* path = [[sheet filenames] objectAtIndex:0];
 		[[NSUserDefaults standardUserDefaults] setObject:path forKey:ORPrefHeartBeatPath];
-		[heartbeatPathField setStringValue:path];
+		[heartbeatPathField setStringValue:[path stringByAbbreviatingWithTildeInPath]];
 
 		[[NSNotificationCenter defaultCenter]postNotificationName:ORPrefHeartBeatPathChanged object:nil];
     }
 }
+#endif
 
 - (void)  _openSetNewPassWordPanel     
 {
@@ -404,7 +422,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
             didEndSelector: @selector(_setNewPasswordPanelDidEnd:returnCode:contextInfo:)
             contextInfo: nil];
 }
-
 
 - (void)  _openValidatePassWordPanel     
 {
