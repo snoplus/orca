@@ -35,10 +35,12 @@
 #define ORDataTakerItem @"ORDataTaker Drag Item"
 #define kManualRefresh 1E10
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 @interface ORDataTaskController (Private)
 - (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
+#endif
 
 @implementation ORDataTaskController
 - (id) init
@@ -320,6 +322,16 @@
     else {
         startingDir = NSHomeDirectory();
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setLastFile:[[openPanel URL]path]];
+            [model loadReadOutListFrom:[[openPanel URL]path]];
+            [self reloadObjects:nil];
+        }
+    }];
+#else
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -327,6 +339,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(_loadListPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) saveAsAction:(id)sender
@@ -336,15 +349,25 @@
     // [savePanel setCanCreateDirectories:YES];
     
     NSString* startingDir;
-    
     if([model lastFile])startingDir = [[model lastFile] stringByDeletingLastPathComponent];
     else startingDir = NSHomeDirectory();
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setLastFile:[[savePanel URL]path]];
+            [model saveReadOutListTo:[[savePanel URL]path]];
+        }
+    }];
+#else
     [savePanel beginSheetForDirectory:startingDir
                                  file:nil
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(_saveListPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 #pragma mark ¥¥¥Data Source Methods
@@ -668,6 +691,7 @@ else {\
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 @implementation ORDataTaskController (Private)
 
 - (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
@@ -686,6 +710,5 @@ else {\
         [self reloadObjects:nil];
     }
 }
-
-
 @end
+#endif

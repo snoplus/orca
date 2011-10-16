@@ -26,10 +26,11 @@
 #import "ORMultiPlot.h"
 #import "ORDataSet.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
 @interface ORHistoController (private)
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
-
+#endif
 
 @implementation ORHistoController
 
@@ -331,6 +332,14 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setCanCreateDirectories:YES];
     [openPanel setPrompt:@"Choose"];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* directoryName = [[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath];
+            [model setDirectoryName:directoryName];
+       }
+    }];
+#else
     [openPanel beginSheetForDirectory:NSHomeDirectory()
                                  file:nil
                                 types:nil
@@ -338,6 +347,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
     
 }
 
@@ -490,6 +500,7 @@
 }
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
 @implementation ORHistoController (private)
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -499,4 +510,5 @@
     }
 }
 @end
+#endif
 
