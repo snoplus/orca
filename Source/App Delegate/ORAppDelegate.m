@@ -124,11 +124,11 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	if(![noKill isEqualToString:@"NoKill"]){
 		NSString* myName = [[NSProcessInfo processInfo] processName];
 		int myPid        = [[NSProcessInfo processInfo] processIdentifier];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] runningApplications];
-#else
+//#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+//		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] runningApplications];
+//#else
 		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
-#endif
+//#endif
 		for(id anApp in launchedApps){
 			NSString* otherProcessName = [anApp objectForKey:@"NSApplicationName"];
 			int otherProcessPid = [[anApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
