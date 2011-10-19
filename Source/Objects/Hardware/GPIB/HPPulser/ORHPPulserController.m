@@ -27,8 +27,10 @@
 
 @interface ORHPPulserController (private)
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) systemTest;
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
+- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 @end
 
 @implementation ORHPPulserController
@@ -356,6 +358,14 @@
         [openPanel setCanChooseFiles:YES];
         [openPanel setAllowsMultipleSelection:NO];
         [openPanel setPrompt:@"Download"];
+        
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+        [openPanel setDirectoryURL:[NSURL URLWithString:NSHomeDirectory()]];
+        [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+            if (result == NSFileHandlingPanelOKButton) {
+            }
+        }];
+#else	
         [openPanel beginSheetForDirectory:NSHomeDirectory()
                                      file:nil
                                     types:nil
@@ -363,6 +373,7 @@
                             modalDelegate:self
                            didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                               contextInfo:NULL];
+#endif
     }
     else {
 		[self downloadWaveform];
@@ -769,6 +780,7 @@
 @end
 
 @implementation ORHPPulserController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -779,6 +791,7 @@
 		
     }
 }
+#endif
 
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
