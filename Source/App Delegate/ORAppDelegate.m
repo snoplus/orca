@@ -122,13 +122,14 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 	NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
 	NSString* noKill				 = [standardDefaults stringForKey:@"startup"];
 	if(![noKill isEqualToString:@"NoKill"]){
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+        NSString* bundleID = [[NSRunningApplication currentApplication] bundleIdentifier];
+		NSArray* launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+        if([launchedApps count]>1)[NSApp terminate:self];
+#else
 		NSString* myName = [[NSProcessInfo processInfo] processName];
 		int myPid        = [[NSProcessInfo processInfo] processIdentifier];
-//#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-//		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] runningApplications];
-//#else
 		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
-//#endif
 		for(id anApp in launchedApps){
 			NSString* otherProcessName = [anApp objectForKey:@"NSApplicationName"];
 			int otherProcessPid = [[anApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
@@ -137,8 +138,9 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 				[NSApp terminate:self];
 			}
 		}
+#endif
 	}
-	 
+ 
 	return self;
 }
 
