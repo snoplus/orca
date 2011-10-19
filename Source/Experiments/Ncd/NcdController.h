@@ -112,8 +112,6 @@
 - (IBAction) setDisplayOptionAction:(id)sender;
 - (IBAction) saveMapFileAction:(id)sender;
 - (IBAction) readMapFileAction:(id)sender;
-- (void) readMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (IBAction) delete:(id)sender;
 - (IBAction) cut:(id)sender;
 - (IBAction) addTubeAction:(id)sender;
@@ -129,14 +127,18 @@
 - (IBAction) setMuxEfficiencyAction:(id)sender;
 - (IBAction) restoreEfficiencyAction:(id)sender;
 - (IBAction) captureNominalSettingsAction:(id)sender;
-- (void) saveNominalFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (IBAction) selectDifferentNominalSettingsFileAction:(id)sender;
-- (void) openDiffNominalFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (IBAction) restoreAllToNominal:(id)sender;
 - (IBAction) restoreMuxesToNominal:(id)sender;
 - (IBAction) restoreShapersToNominal:(id)sender;
 - (IBAction) restoreShaperGainsToNominal:(id)sender;
 - (IBAction) restoreShaperThresoldsToNominal:(id)sender;
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void) readMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveNominalFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) openDiffNominalFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 
 #pragma mark ¥¥¥Interface Management
 - (void) tubeSelectionChanged:(NSNotification*)aNote;

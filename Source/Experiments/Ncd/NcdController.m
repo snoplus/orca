@@ -427,6 +427,15 @@
     else {
         startingDir = NSHomeDirectory();
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            [[NcdDetector sharedInstance] setMapFileName:[[[openPanel URLs] objectAtIndex:0] path]];
+            [[NcdDetector sharedInstance] readMap];
+        }
+    }];
+#else	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -434,15 +443,9 @@
                         modalDelegate:self
                        didEndSelector:@selector(readMapFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
-- (void)readMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [[NcdDetector sharedInstance] setMapFileName:[[sheet filenames] objectAtIndex:0]];
-		[[NcdDetector sharedInstance] readMap];
-    }
-}
 
 - (IBAction) saveMapFileAction:(id)sender
 {
@@ -462,12 +465,29 @@
         defaultFile = @"TubeMapData";
         
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            [[NcdDetector sharedInstance] saveMapFileAs:[[savePanel URL]path]];
+        }
+    }];
+#else	
     [savePanel beginSheetForDirectory:startingDir
                                  file:defaultFile
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(saveMapFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
+}
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void)readMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [[NcdDetector sharedInstance] setMapFileName:[[sheet filenames] objectAtIndex:0]];
+		[[NcdDetector sharedInstance] readMap];
+    }
 }
 
 - (void)saveMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
@@ -476,6 +496,19 @@
         [[NcdDetector sharedInstance] saveMapFileAs:[sheet filename]];
     }
 }
+- (void)saveNominalFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[model saveNominalSettingsTo:[sheet filename]];
+    }
+}
+- (void)openDiffNominalFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[model setNominalSettingsFile: [[sheet filenames] objectAtIndex:0] ];
+    }
+}
+#endif
 
 - (IBAction) delete:(id)sender
 {
@@ -554,21 +587,28 @@
 			if([startingDir length] == 0)startingDir = NSHomeDirectory();
 			defaultFileName = [[model nominalSettingsFile] lastPathComponent];
 		}
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+        NSSavePanel* savePanel = [NSSavePanel savePanel];
+        [savePanel setNameFieldStringValue:defaultFileName];
+        [savePanel setDirectoryURL:[NSURL URLWithString:startingDir]];
+        [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+            if (result == NSFileHandlingPanelOKButton) {
+                [model saveNominalSettingsTo:[[savePanel URL]path]];
+            }
+        }];
+#else	
+
 		[[NSSavePanel savePanel] beginSheetForDirectory:startingDir
 												   file:defaultFileName
 										 modalForWindow:[self window]
 										  modalDelegate:self
 										 didEndSelector:@selector(saveNominalFilePanelDidEnd:returnCode:contextInfo:)
 											contextInfo:NULL];
+#endif
 	}
 }
 
-- (void)saveNominalFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model saveNominalSettingsTo:[sheet filename]];
-    }
-}
+
 
 - (IBAction) selectDifferentNominalSettingsFileAction:(id)sender
 {
@@ -593,6 +633,14 @@
 		[openPanel setCanChooseFiles:YES];
 		[openPanel setAllowsMultipleSelection:NO];
 		[openPanel setPrompt:@"Choose"];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+        [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+        [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+            if (result == NSFileHandlingPanelOKButton) {
+                [model setNominalSettingsFile: [[[openPanel URLs] objectAtIndex:0]path]];
+            }
+        }];
+#else	
 		[openPanel beginSheetForDirectory:startDir
 									 file:nil
 									types:nil
@@ -600,14 +648,8 @@
 							modalDelegate:self
 						   didEndSelector:@selector(openDiffNominalFilePanelDidEnd:returnCode:contextInfo:)
 							  contextInfo:NULL];
+#endif
 	}
-}
-
-- (void)openDiffNominalFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model setNominalSettingsFile: [[sheet filenames] objectAtIndex:0] ];
-    }
 }
 
 - (IBAction) restoreAllToNominal:(id)sender
