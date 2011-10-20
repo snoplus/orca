@@ -359,7 +359,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 - (NSString*) addressAtIndex:(unsigned)anIndex
 {
-	if(anIndex>=0 && anIndex<[eMailList count])return [eMailList objectAtIndex:anIndex];
+	if(anIndex<[eMailList count])return [eMailList objectAtIndex:anIndex];
 	else return nil;
 }
 

@@ -144,7 +144,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 			unsigned long asLong;
 		}theData;
 		
-		unsigned long data[4];
+		unsigned long data[5];
 		data[0] = dataId | 4;
 		data[1] =  ([self uniqueIdNumber]&0x0000fffff);
 		

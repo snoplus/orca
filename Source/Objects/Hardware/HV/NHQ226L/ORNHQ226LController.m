@@ -466,7 +466,7 @@
 {
 	[self endEditing];
 	//******contextInfo is released when the sheet closes.
-	NSDecimalNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
+	NSNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
     NSBeginAlertSheet([NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":aChannel==0?@"A":@"B"],
 					  @"YES/Do it NOW",
 					  @"Cancel",
