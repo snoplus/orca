@@ -168,7 +168,7 @@
     }
     // Release the last storage area used for the last event.
     [ mGtid release ];
-    mGtid = [[ NSData allocWithZone: NULL ] initWithBytes:mHeaderBaseGtidInfo length:len*sizeof(long) ];
+    mGtid = [[ NSMutableData allocWithZone: NULL ] initWithBytes:mHeaderBaseGtidInfo length:len*sizeof(long) ];
 }
 
 //--------------------------------------------------------------------------------
