@@ -700,8 +700,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 	[[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
 	
-    if (aPageSize < 0) pageSize = 0;
-	else if (aPageSize > 100) pageSize = 100;
+    if (aPageSize > 100) pageSize = 100;
 	else pageSize = aPageSize;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTModelPageSizeChanged object:self];

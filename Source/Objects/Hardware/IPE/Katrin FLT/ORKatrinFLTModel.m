@@ -1812,9 +1812,8 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHistoMinEnergy:histoMinEnergy];
     //if(aValue>=0 && aValue<=histoMaxEnergy ){    // for now histoMaxEnergy is unused -tb- 2008-03-06
-    if(aValue>=0){
-        histoMinEnergy = aValue;
-    }
+    histoMinEnergy = aValue;
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoMinEnergyChanged object:self];
 	
     //adjust max histo energy

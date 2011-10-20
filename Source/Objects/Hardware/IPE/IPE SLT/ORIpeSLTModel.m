@@ -928,8 +928,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	
 	[[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
 	
-    if (aPageSize < 0) pageSize = 0;
-	else if (aPageSize > 100) pageSize = 100;
+    if (aPageSize > 100) pageSize = 100;
 	else pageSize = aPageSize;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelPageSizeChanged object:self];
