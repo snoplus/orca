@@ -378,9 +378,9 @@
 
 - (void) protocolChanged:(NSNotification*)aNote
 {
-	[protocolPU selectItemAtIndex: [model protocol]];
-	if([model protocol] == kRad7ProtocolNone)		[protocolTabView selectTabViewItemAtIndex:0];
-	else if([model protocol] == kRad7ProtocolUser)	[protocolTabView selectTabViewItemAtIndex:1];
+	[protocolPU selectItemAtIndex: [(ORRad7Model*)model protocol]];
+	if([(ORRad7Model*)model protocol] == kRad7ProtocolNone)		[protocolTabView selectTabViewItemAtIndex:0];
+	else if([(ORRad7Model*)model protocol] == kRad7ProtocolUser)	[protocolTabView selectTabViewItemAtIndex:1];
 	else											[protocolTabView selectTabViewItemAtIndex:2];
 	[self updateButtons];
 }
@@ -506,13 +506,13 @@
 	[tonePU setEnabled:		!counting && !locked];
 	[protocolPU setEnabled:	!counting && !locked];
 	
-	[saveUserProtocolButton setEnabled:[model protocol] == kRad7ProtocolNone];
+	[saveUserProtocolButton setEnabled:[(ORRad7Model*)model protocol] == kRad7ProtocolNone];
 
 	[alarmLimitTextField setEnabled:!locked];
 	[maxRadonTextField setEnabled:	!locked];
 
 	
-	if([model protocol] == kRad7ProtocolUser || [model protocol] == kRad7ProtocolNone){
+	if([(ORRad7Model*)model protocol] == kRad7ProtocolUser || [(ORRad7Model*)model protocol] == kRad7ProtocolNone){
 		[pumpModePU setEnabled:	!counting && !locked];
 		[thoronPU setEnabled:	!counting && !locked];
 		[modePU setEnabled:		!counting && !locked];
@@ -521,7 +521,7 @@
 		
 	}
 	else {
-		switch([model protocol]){
+		switch([(ORRad7Model*)model protocol]){
 			case kRad7ProtocolNone: 
 				break;
 				
