@@ -99,7 +99,7 @@
 	endDataPtr = dataPtr + bufNData;
 	
 	//make sure that there's an event and check the length, if problem flush the rest
-	if(totalWords-bufNData<0 || bufNData<=kBufferHeaderLength)return length; 
+	if((long)(totalWords-bufNData)<0 || bufNData<=kBufferHeaderLength)return length; 
 	
 	unsigned short task	 = bufferHeader[2]; //run task that generated this buffer, needed to determine chanheader length
 	task	 &= 0x0fff;						//take off the top bit to get the true 
@@ -211,7 +211,7 @@
 		endDataPtr = dataPtr + bufNData;
 		
 		//make sure that there's an event and check the length, if problem flush the rest
-		if(totalWords-bufNData<0 || bufNData<=kBufferHeaderLength)return [resultString stringByAppendingString:@"bad record length\n"]; 
+		if((long)(totalWords-bufNData)<0 || bufNData<=kBufferHeaderLength)return [resultString stringByAppendingString:@"bad record length\n"]; 
 		
 		unsigned short task	 = bufferHeader[2]; //run task that generated this buffer, needed to determine chanheader length
 		task	 &= 0x0fff;						//take off the top bit to get the true 

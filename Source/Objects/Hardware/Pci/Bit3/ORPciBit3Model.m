@@ -475,7 +475,7 @@ struct {
         kRemoteRAMAddressModifier,
         kRemoteDualPortAddressModifier
     };
-    if([self rwAddressModifier]>=0 && [self rwAddressModifier]<=3)return addressModTrans[rwAddressModifier];
+    if([self rwAddressModifier]<=3)return addressModTrans[rwAddressModifier];
     else return kRemoteIOAddressModifier;
 }
 
@@ -1715,8 +1715,6 @@ physicalBufferAddress: physicalAddress
 
 - (bool) checkDmaComplete:(unsigned long*) checkFlag;
 {
-	// make compiler happy
-	checkFlag = checkFlag;
 	
 	// check for dma complete
 #ifndef USE_INTERRUPT		// without dma done interupt

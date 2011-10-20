@@ -177,7 +177,7 @@ NSString* ORSBC_CodeVersionChanged			= @"ORSBC_CodeVersionChanged";
 
 - (id) connectionHistoryItem:(unsigned)index
 {
-	if(connectionHistory && index>=0 && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
+	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 

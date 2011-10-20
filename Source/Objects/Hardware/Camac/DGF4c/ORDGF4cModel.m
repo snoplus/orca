@@ -721,7 +721,7 @@ enum {
 - (void) set:(NSString*)arrayName index:(unsigned)index toObject:(id)anObject forKey:(NSString*)aKey
 {
     id array = [params objectForKey:arrayName];
-    if([array count] && index>=0 && index<[array count]){
+    if([array count] && index<[array count]){
         id item = [array objectAtIndex:index];
         id currentValue = [item objectForKey:aKey];
         [[[self undoManager] prepareWithInvocationTarget:self] set:arrayName index:index toObject:currentValue forKey:aKey];
@@ -742,7 +742,7 @@ enum {
 - (id) param:(NSString*)arrayName index:(unsigned)index forKey:(NSString*)aKey
 {
     id array = [params objectForKey:arrayName];
-    if([array count] && index>=0 && index<[array count]){
+    if([array count] && index<[array count]){
         id item = [array objectAtIndex:index];
         return [item objectForKey:aKey];
     }
