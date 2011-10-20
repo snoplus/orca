@@ -137,7 +137,7 @@ NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 
 - (id) connectionHistoryItem:(unsigned)index
 {
-	if(connectionHistory && index>=0 && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
+	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 

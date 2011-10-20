@@ -77,7 +77,7 @@
 - (IBAction) shiftXLeft:(id)sender;
 - (IBAction) shiftXRight:(id)sender;
 
-@property (assign) BOOL			showLegend;
+@property (nonatomic,assign) BOOL			showLegend;
 @property (retain) ORAxis*		xAxis;
 @property (retain) ORAxis*		yAxis;
 @property (retain) id			plotView;

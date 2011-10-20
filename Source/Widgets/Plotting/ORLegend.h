@@ -24,7 +24,7 @@
 	NSAttributedString*  legend;
 }
 - (void) setUpLegend;
-@property (assign) IBOutlet ORPlotView*  plotView;
+@property (nonatomic, assign) IBOutlet ORPlotView*  plotView;
 @property (retain) NSAttributedString*  legend;
 
 @end
