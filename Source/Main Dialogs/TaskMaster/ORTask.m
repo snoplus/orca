@@ -52,7 +52,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 {
     if( self = [super init] ){
         [NSBundle loadNibNamed: @"ORTask" owner: self];	
-		[self setTaskState:eRunStopped];
+		[self setTaskState:eTaskStopped];
     }
     return self;
 }
