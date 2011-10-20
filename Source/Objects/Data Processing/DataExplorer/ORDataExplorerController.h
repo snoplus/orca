@@ -85,7 +85,10 @@
 - (void) multiCatalogChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) fileNameChanged:(NSNotification*)note;
 - (void) fileParseStarted:(NSNotification*)note;
 - (void) fileParseEnded:(NSNotification*)note;

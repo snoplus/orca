@@ -234,7 +234,14 @@
             startDir = NSHomeDirectory();
         }
     }
-
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            [model setFileToExplore:[[[openPanel URLs] objectAtIndex:0]path]];
+        }
+    }];
+#else	
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -243,14 +250,17 @@
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         [model setFileToExplore:[[sheet filenames] objectAtIndex:0]];
     }
 }
+#endif
 
 
 - (IBAction) parseButtonAction:(id)sender
