@@ -27,10 +27,11 @@
 #import "ORHV2132Model.h"
 #import "ORTimedTextField.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORHV2132Controller (private)
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
-
+#endif
 // methods
 @implementation ORHV2132Controller
 
@@ -367,6 +368,17 @@
 	[openPanel setCanChooseFiles:NO];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* dirName = [[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath];
+            [model setDirName:dirName];
+        }
+    }];
+    
+#else 	
+
 	[openPanel beginSheetForDirectory:NSHomeDirectory()
 								 file:nil
 								types:nil
@@ -374,10 +386,10 @@
 						modalDelegate:self
 					   didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
 						  contextInfo:NULL];
-	
+#endif
 }
 @end
-
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation ORHV2132Controller (private)
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -387,4 +399,5 @@
 	}
 }
 @end
+#endif
 

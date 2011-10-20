@@ -12,10 +12,12 @@
 #import "ORCCUSBModel.h"
 #import "ORUSBInterface.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORCCUSBController (private)
 - (void)_readStackFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void)_saveStackFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
+#endif
 
 @implementation ORCCUSBController
 
@@ -816,6 +818,16 @@
     if([model lastStackFilePath]) startingDir = [[model lastStackFilePath] stringByDeletingLastPathComponent];
     else						  startingDir = NSHomeDirectory();
 	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setLastStackFilePath:[[[openPanel URLs] objectAtIndex:0]path]];
+            NSString* theContents = [NSString stringWithContentsOfFile:[model lastStackFilePath] encoding:NSASCIIStringEncoding error:nil];
+            [model setCustomStack:[[[theContents componentsSeparatedByString:@"\n"] mutableCopy] autorelease]];
+        }
+    }];
+#else 
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -823,7 +835,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(_readStackFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-	
+#endif	
 }
 
 - (IBAction) saveStackAction:(id)sender
@@ -844,12 +856,23 @@
         defaultFile = @"CCUSBStack";
         
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setLastStackFilePath:[[savePanel URL]path]];
+            NSString* theContents = [[model customStack] componentsJoinedByString:@"\n"];
+            [theContents writeToFile:[[savePanel URL]path] atomically:YES encoding:NSASCIIStringEncoding error:nil];
+        }
+    }];
+#else 
     [savePanel beginSheetForDirectory:startingDir
                                  file:defaultFile
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(_saveStackFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 
@@ -913,8 +936,8 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation ORCCUSBController (private)
-
 - (void)_readStackFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -933,6 +956,6 @@
 		
     }
 }
-
 @end
+#endif
 
