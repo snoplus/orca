@@ -64,13 +64,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
     [[[[NSApp delegate]document] undoManager] enableUndoRegistration];
 	
     [processView setDoubleAction:@selector(doubleClick:)];
-	
+	[self findObjects];
 }
 
 - (void) findObjects
 {
     [processorList release];
-    processorList = [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain];
+    processorList = [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] mutableCopy];
     [processView reloadData];
 }
 
@@ -83,6 +83,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter removeObserver:self];
+    
     [notifyCenter addObserver : self
                      selector : @selector(objectsAdded:)
                          name : ORGroupObjectsAdded
@@ -131,6 +133,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (void) awakeAfterDocumentLoaded
 {
+    [self registerNotificationObservers];
     [self findObjects];
 }
 

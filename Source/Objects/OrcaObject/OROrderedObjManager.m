@@ -74,7 +74,6 @@
 
 - (BOOL) slotRangeEmpty:(NSRange)slotRange
 {
-	if(slotRange.location < 0)return NO;
 	if(slotRange.location > [containerObj maxNumberOfObjects])return NO;
 	if(slotRange.location+slotRange.length > [containerObj maxNumberOfObjects])return NO;
     NSEnumerator* e = [containerObj objectEnumerator];
