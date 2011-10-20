@@ -77,7 +77,7 @@ NSCalendarDate		*MCPYear0000;
 
 - (void) dataSeek:(unsigned long long) row
 {
-    unsigned long long	theRow = (row < 0)? 0 : row;
+    unsigned long long	theRow = row;
     theRow = (theRow < [self numOfRows])? theRow : ([self numOfRows]-1);
     mysql_data_seek(mResult,theRow);
     return;

@@ -1658,7 +1658,7 @@ Table: Histogram2Ds
 				for(id aMonitor in dataMonitors){
 					NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
 					@try {
-						for(id aDataSet in objs1d){
+						for(OR1DHisto* aDataSet in objs1d){
 							ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from Histogram1Ds where (machine_id=%@ and name=%@ and monitor_id=%d)",
 																				   [sqlConnection quoteObject:machine_id],
 																				   [sqlConnection quoteObject:[aDataSet fullName]],
@@ -1761,7 +1761,7 @@ Table: Histogram2Ds
 				for(id aMonitor in dataMonitors){
 					NSArray* objsWaveform = [[aMonitor  collectObjectsOfClass:[ORWaveform class]] retain];
 					@try {
-						for(id aDataSet in objsWaveform){
+						for(ORWaveform* aDataSet in objsWaveform){
 							ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT dataset_id,counts from waveforms where (machine_id=%@ and name=%@ and monitor_id=%d)",
 																				   [sqlConnection quoteObject:machine_id],
 																				   [sqlConnection quoteObject:[aDataSet fullName]],
