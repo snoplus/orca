@@ -30,9 +30,11 @@
 int sortUpFunction(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
 int sortDnFunction(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORProcessController (private)
 - (void) selectFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
+#endif
 
 @implementation ORProcessController
 
@@ -386,13 +388,22 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
         startingDir = NSHomeDirectory();
         defaultFile = @"Untitled";
     }
-	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [self endEditing];
+            [model setHistoryFile:[[savePanel URL]path]];
+        }
+    }];
+#else 	
     [savePanel beginSheetForDirectory:startingDir
                                  file:defaultFile
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(selectFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
+                         contextInfo:NULL];
+#endif
 }
 
 - (IBAction) keepHistoryAction:(id)sender
@@ -573,6 +584,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation ORProcessController (private)
 - (void)selectFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -582,4 +594,5 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     }
 }
 @end
+#endif
 
