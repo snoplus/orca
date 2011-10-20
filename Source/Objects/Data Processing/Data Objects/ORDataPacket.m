@@ -311,17 +311,15 @@
 	[theDataLock lock];   //-----begin critical section
 	if(frameBuffer){
         unsigned long actualReservedLocation = reservePool[aRange.location];
-        if(actualReservedLocation>=0){
-			unsigned long* ptr = (unsigned long*)[frameBuffer bytes];
-			memmove(&ptr[actualReservedLocation],&ptr[actualReservedLocation+aRange.length],(frameIndex-actualReservedLocation-aRange.length)*sizeof(long));
-			frameIndex -= aRange.length;
-			
-			unsigned long i;
-			reservePool[aRange.location] = -1;
-			for(i=aRange.location+1;i<reserveIndex;i++){
-				reservePool[i] -= aRange.length;
-			}
-		}
+        unsigned long* ptr = (unsigned long*)[frameBuffer bytes];
+        memmove(&ptr[actualReservedLocation],&ptr[actualReservedLocation+aRange.length],(frameIndex-actualReservedLocation-aRange.length)*sizeof(long));
+        frameIndex -= aRange.length;
+        
+        unsigned long i;
+        reservePool[aRange.location] = -1;
+        for(i=aRange.location+1;i<reserveIndex;i++){
+            reservePool[i] -= aRange.length;
+        }
 	}	
 	[theDataLock unlock];   //-----end critical section
 }
