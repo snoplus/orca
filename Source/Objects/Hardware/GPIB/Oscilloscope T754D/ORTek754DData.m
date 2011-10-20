@@ -173,7 +173,7 @@
     }
     
     [ mGtid release ];
-    mGtid = [[ NSData allocWithZone: NULL ] initWithBytes:dataWord length: len*sizeof(long) ];
+    mGtid = [[ NSMutableData allocWithZone: NULL ] initWithBytes:dataWord length: len*sizeof(long) ];
     
 }
 
@@ -257,7 +257,7 @@
     dataWord[1] =  ((aChannel & 0x7 ) << 24) | (timeInSecs & 0x00ffffff00000000LL)>>32;
     dataWord[2] = timeInSecs & 0x00000000ffffffffLL;
     [mTime release];
-    mTime = [[NSData allocWithZone:nil] initWithBytes:dataWord length:len*sizeof(long)];
+    mTime = [[NSMutableData allocWithZone:nil] initWithBytes:dataWord length:len*sizeof(long)];
     
 	return mTime;
 }

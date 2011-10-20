@@ -296,7 +296,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
     
     // Store value internally.
     [ mIdentifier release ];
-    mIdentifier = [[ NSString alloc ] initWithCString: &tmpData[ 0 ]];                         
+    mIdentifier = [[ NSString alloc ] initWithCString: &tmpData[ 0 ] encoding:NSASCIIStringEncoding];                         
 }
 
 //--------------------------------------------------------------------------------
