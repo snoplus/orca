@@ -31,10 +31,12 @@
 #import "ORTimeLinePlot.h"
 #import "OR1DHistoPlot.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface KatrinController (private)
 - (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
+#endif
 
 @implementation KatrinController
 #pragma mark ¥¥¥Initialization
@@ -204,13 +206,25 @@
     else {
         startingDir = NSHomeDirectory();
     }
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [secondaryGroup setMapFile:[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath]];
+            [secondaryGroup readMap];
+            [secondaryTableView reloadData];
+        }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(readSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
+                         contextInfo:NULL];
+#endif
 }
 
 - (IBAction) saveSecondaryMapFileAction:(id)sender
@@ -232,12 +246,21 @@
         defaultFile = [self defaultSecondaryMapFilePath];
         
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [secondaryGroup saveMapFileAs:[[savePanel URL]path]];
+        }
+    }];
+#else 
     [savePanel beginSheetForDirectory:startingDir
                                  file:defaultFile
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(saveSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -496,6 +519,7 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation KatrinController (Private)
 - (void)readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -513,3 +537,4 @@
     }
 }
 @end
+#endif
