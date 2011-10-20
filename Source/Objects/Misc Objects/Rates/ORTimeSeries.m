@@ -81,7 +81,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 
 - (void) index:(unsigned)index time:(unsigned long*)theTime value:(double*)y
 {
-	if(index>=0 && index<kTimeSeriesBufferSize){
+	if(index<kTimeSeriesBufferSize){
 		int i = (readIndex+index)%kTimeSeriesBufferSize;
 		*y = value[i];
 		*theTime = time[i];
@@ -90,7 +90,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 
 - (unsigned long) timeAtIndex:(unsigned)index
 {
-	if(index>=0 && index<kTimeSeriesBufferSize){
+	if(index<kTimeSeriesBufferSize){
 		int i = (readIndex+index)%kTimeSeriesBufferSize;
 		return time[i];
 	}
@@ -99,7 +99,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 
 - (float) valueAtIndex:(unsigned)index
 {
-	if(index>=0 && index<kTimeSeriesBufferSize){
+	if(index<kTimeSeriesBufferSize){
 		int i = (readIndex+index)%kTimeSeriesBufferSize;
 		return value[i];
 	}
