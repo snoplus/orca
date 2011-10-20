@@ -42,10 +42,10 @@ NSString* ORHWWizardLock					= @"ORHWWizardLock";
 - (void) _delayedRestoreAllFileRequest;
 - (void) _executeActionController:(id) actionController;
 - (void) _executeController:(id)actionController container:(id)container;
-- (void) _restoreAllFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) _restoreAll;
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) _askForFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) _restoreAllFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 #endif
 @end
 
@@ -1606,6 +1606,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Restore All"];
+
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[[openPanel URLs] objectAtIndex:0]path]];
+            [self setFileHeader:[ORDecoder readHeader:theFile]];
+            [self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
+        }
+    }];
+#else	
     [openPanel beginSheetForDirectory:nil
                                  file:nil
                                 types:nil
@@ -1613,18 +1623,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                         modalDelegate:self
                        didEndSelector:@selector(_restoreAllFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
     
 }
-
-- (void)_restoreAllFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[sheet filenames] objectAtIndex:0]];\
-		[self setFileHeader:[ORDecoder readHeader:theFile]];
-		[self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
-    }
-}
-
 - (void) _restoreAll
 {
 	int n;
@@ -1697,6 +1698,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         [self executeControlStruct];   
     }
 }
+- (void)_restoreAllFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[sheet filenames] objectAtIndex:0]];\
+		[self setFileHeader:[ORDecoder readHeader:theFile]];
+		[self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
+    }
+}
+
 #endif
 @end
 
