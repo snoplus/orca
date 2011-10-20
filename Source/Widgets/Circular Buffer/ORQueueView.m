@@ -141,7 +141,7 @@
 	float queue_size = aMaxValue - aMinValue;
 	aHeadValue -= aMinValue;
 	aTailValue -= aMinValue;
-	if(queue_size > 0 && aHeadValue>=0 && aTailValue>=0) {	
+	if(queue_size > 0) {	
 		[barColor set];
 		float theWidth = b.size.width;
 		float theHeight = b.size.height;
@@ -186,7 +186,7 @@
 	float queue_size = aMaxValue - aMinValue;
 	aHeadValue -= aMinValue;
 	aTailValue -= aMinValue;
-	if(queue_size > 0 && aHeadValue>=0 && aTailValue>=0) {	
+	if(queue_size > 0) {	
 		[barColor set];
 		float theWidth = b.size.width;
 		float theHeight = b.size.height;
