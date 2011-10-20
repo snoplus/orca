@@ -357,7 +357,8 @@ free_statement
 
 %%
 
-#define SIZEOF_NODETYPE ((char *)&p->con - (char *)p)
+//#define SIZEOF_NODETYPE ((char *)&p->con - (char *)p)
+#define SIZEOF_NODETYPE (sizeof(nodeType))
 
 void addFilterNode(int type,nodeType* aNode)
 {

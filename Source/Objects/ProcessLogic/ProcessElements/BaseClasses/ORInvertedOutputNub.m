@@ -20,6 +20,7 @@
 
 
 #import "ORInvertedOutputNub.h"
+#import "ORProcessElementModel.h"
 
 //the 'OFF' nub
 @implementation ORInvertedOutputNub
@@ -36,8 +37,9 @@
 	return ![guardian evaluatedState];
 }
 
-- (int) eval
+- (id) eval
 {
-    return ![guardian eval];
+    ORProcessResult* result = [guardian eval];
+    return [ORProcessResult processState:!result.boolValue value:!result.boolValue];
 }
 @end

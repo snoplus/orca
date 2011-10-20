@@ -28,5 +28,5 @@
 
 - (int) state;
 - (int) evaluatedState;
-- (int) eval;
+- (id) eval;
 @end

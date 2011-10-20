@@ -61,7 +61,7 @@ typedef struct {
 typedef struct {
     int oper;                   /* operator */
     int nops;                   /* number of operands */
-    struct nodeTypeTag *op[1];  /* operands (expandable) */
+    struct nodeTypeTag *op[4];  /* operands (expandable) */
 } oprNodeType;
 
 typedef struct nodeTypeTag {

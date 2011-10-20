@@ -51,7 +51,7 @@ NSString* OROneShotLock					= @"OROneShotLock";
     [ inConnector addRestrictedConnectionType: 'LP2 ' ]; //can only connect to processor outputs
     [inConnector release];
     
-    inConnector = [[ORConnector alloc] initAt:NSMakePoint(0,5) withGuardian:self withObjectLink:self];
+    inConnector = [[ORProcessInConnector alloc] initAt:NSMakePoint(0,5) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:inConnector forKey:OROneShotInConnection];
     [ inConnector setConnectorType: 'LP1 ' ];
     [ inConnector addRestrictedConnectionType: 'LP2 ' ]; //can only connect to processor outputs

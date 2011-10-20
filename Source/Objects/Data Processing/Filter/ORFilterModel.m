@@ -904,7 +904,7 @@ int filterGraph(nodeType*);
 
 - (void) histo2D:(int)i x:(unsigned long)x y:(unsigned long)y
 {
-	unsigned long p[2];
+	unsigned long p[3];
 	p[0] = dataId2D | 3;
 	p[1] = (i & 0xff) << 24 | (x & 0xffff);
 	p[2] = (y & 0xffff);
@@ -916,7 +916,7 @@ int filterGraph(nodeType*);
 
 - (void) stripChart:(int)i time:(unsigned long)aTimeIndex value:(unsigned long)aValue
 {
-	unsigned long p[2];
+	unsigned long p[3];
 	p[0] = dataIdStrip | 3;
 	p[1] = (i & 0xffff) << 16 | (aValue & 0xffff); 
 	p[2] = aTimeIndex;

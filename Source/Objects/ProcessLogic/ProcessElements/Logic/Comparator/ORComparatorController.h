@@ -17,7 +17,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
-#import "ORProcessElementController.h";
+
+#import "ORProcessElementController.h"
 
 @interface ORComparatorController : ORProcessElementController {
 	@private

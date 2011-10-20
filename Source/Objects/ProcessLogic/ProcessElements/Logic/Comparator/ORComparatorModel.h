@@ -17,7 +17,7 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORSimpleLogic.h";
+#import "ORSimpleLogic.h"
 #import "ORProcessNub.h"
 
 @class ORComparatorGTNub;
