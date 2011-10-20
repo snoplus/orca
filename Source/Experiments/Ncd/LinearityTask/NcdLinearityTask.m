@@ -26,7 +26,9 @@
 #import "NcdPDSStepTask.h"
 
 @interface NcdLinearityTask (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) setPulserAmp:(float)amp width:(float)width;
 - (BOOL) advanceStep;
 - (BOOL) setPulserFromFileLine:(int)aLineNumber;
@@ -325,6 +327,16 @@
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
+    [openPanel beginSheetModalForWindow:[[self view]window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton) {
+            NSString* name = [[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath];
+            [self setFileName:name];
+        }
+    }];
+#else	
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -332,6 +344,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) startWidthAction:(id)sender
@@ -780,6 +793,7 @@ static NSString* NcdLinearitySelectedWaveform = @"NcdLinearitySelectedWaveform";
     return YES;
 }
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
 -(void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -787,6 +801,7 @@ static NSString* NcdLinearitySelectedWaveform = @"NcdLinearitySelectedWaveform";
         [self setFileName:name];
     }
 }
+#endif
 
 - (void) setPulserAmp:(float)anAmp width:(float)aWidth
 {
