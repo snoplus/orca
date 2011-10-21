@@ -157,7 +157,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		[openPanel setCanChooseFiles:NO];
 		[openPanel setAllowsMultipleSelection:NO];
 		[openPanel setPrompt:@"Choose ORCA Location"];
-		
+
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+        [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+            if (result == NSFileHandlingPanelOKButton){
+                [self performSelector:@selector(deferedSvnUpdate:) withObject:[[openPanel URL] path] afterDelay:0];
+            }
+        }];
+#else 	
 		[openPanel beginSheetForDirectory: [@"~" stringByExpandingTildeInPath]
 									 file: nil
 									types: nil
@@ -165,14 +172,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 							modalDelegate: self
 						   didEndSelector: @selector(updateWithSvnPanelDidEnd:returnCode:contextInfo:)
 							  contextInfo: NULL];
+#endif
 	}
-}
-		 
-- (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self performSelector:@selector(deferedSvnUpdate:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
-    }
 }
 
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath
@@ -231,6 +232,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
 	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [self performSelector:@selector(deferedStartOldOrca:) withObject:[[openPanel URL] path] afterDelay:0];
+        }
+    }];
+#else 	
 	[openPanel beginSheetForDirectory: [kOldBinaryPath stringByExpandingTildeInPath]
 								 file: nil
 								types: nil
@@ -238,18 +246,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 						modalDelegate: self
 					   didEndSelector: @selector(startOldOrcaPanelDidEnd:returnCode:contextInfo:)
 						  contextInfo: NULL];
+#endif
 }
 
 - (void) updateStatus:(NSString*)aString
 {
 	[operationStatusField performSelectorOnMainThread:@selector(setStringValue:) withObject:aString waitUntilDone:YES];
-}
-
-- (void) startOldOrcaPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self performSelector:@selector(deferedStartOldOrca:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
-    }
 }
 
 - (void) deferedStartOldOrca:(NSString*)anOldOrcaPath
@@ -339,6 +341,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
 	[self restart:binPath config:nil];
 }
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific 
+- (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[self performSelector:@selector(deferedSvnUpdate:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
+    }
+}
+- (void) startOldOrcaPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+		[self performSelector:@selector(deferedStartOldOrca:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
+    }
+}
+#endif
 
 @end
 
