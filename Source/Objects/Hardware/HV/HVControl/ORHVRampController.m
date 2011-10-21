@@ -27,14 +27,16 @@
 #import "ORTimeLinePlot.h"
 #import "ORAxis.h"
 
+
 @interface ORHVRampController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) _openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) _currentFileSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) _startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _currentFileSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-
 @end
 
 @implementation ORHVRampController
@@ -500,19 +502,6 @@
 }
 
 
-- (void)_startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-	if(returnCode == NSAlertAlternateReturn){
-		[model resolveActualVsSetValueProblem];
-		[model initializeStates];
-		[model resetAdcs];
-		[model startRamping];
-		[self updateButtons];
-    }
-	
-}
-
-
 - (IBAction) stopRampAction:(id)sender
 {
     [model stopRamping];
@@ -543,16 +532,6 @@
 	
 }
 
-- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-	if(returnCode == NSAlertDefaultReturn){
-        [model setStates:kHVRampPanic onlyControlled:YES];
-		[model startRamping];
-		[self updateButtons];
-    }
-	
-}
-
 - (IBAction) panicSystemAction:(id)sender
 {
     [self endEditing];
@@ -565,15 +544,6 @@
 					  nil,
 					  nil,
 					  @"Really Panic ALL High Voltage OFF?");
-}
-
-- (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-	if(returnCode == NSAlertDefaultReturn){
-        [model setStates:kHVRampPanic onlyControlled:NO];
-		[model startRamping];
-		[self updateButtons];
-    }
 }
 
 - (IBAction) syncAction:(id)sender;
@@ -590,13 +560,6 @@
 					  @"Really move ADC values into DAC fields?");
 }
 
-- (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-	if(returnCode == NSAlertDefaultReturn){
-		[model forceDacToAdc];
-		[self updateButtons];
-    }
-}
 
 - (IBAction) setPollingAction:(id)sender
 {
@@ -615,6 +578,15 @@
 	[openPanel setCanChooseFiles:NO];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* dirName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            [model setDirName:dirName];
+        }
+    }];
+#else 	
 	[openPanel beginSheetForDirectory:NSHomeDirectory()
 								 file:nil
 								types:nil
@@ -622,16 +594,9 @@
 						modalDelegate:self
 					   didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
 						  contextInfo:NULL];
-	
+#endif
 }
 
-- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-	if(returnCode){
-		NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-		[model setDirName:dirName];
-	}
-}
 
 
 - (IBAction) controllAction:(id)sender
@@ -710,6 +675,15 @@
     if([model currentFile])	startingDir = [[model currentFile] stringByDeletingLastPathComponent];
     else					startingDir = NSHomeDirectory();
 	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* theFolder = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            [model setCurrentFile:[theFolder stringByAppendingPathComponent:@"HVCurrents.txt"]];
+        }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startingDir
 								 file:nil
 								types:nil
@@ -717,15 +691,7 @@
 						modalDelegate:self
 					   didEndSelector:@selector(_currentFileSelectionDidEnd:returnCode:contextInfo:)
 						  contextInfo:NULL];
-	
-}
-
-- (void)_currentFileSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-	if(returnCode){
-		NSString* theFolder = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-		[model setCurrentFile:[theFolder stringByAppendingPathComponent:@"HVCurrents.txt"]];
-	}
+#endif
 }
 
 - (void) updateButtons
@@ -851,6 +817,62 @@
 	*xValue = (double)i;
 	*yValue = aValue;
 }
+@end
 
 
+@implementation ORHVRampController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+	if(returnCode){
+		NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
+		[model setDirName:dirName];
+	}
+}
+- (void)_currentFileSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+	if(returnCode){
+		NSString* theFolder = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
+		[model setCurrentFile:[theFolder stringByAppendingPathComponent:@"HVCurrents.txt"]];
+	}
+}
+
+#endif
+
+- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertDefaultReturn){
+        [model setStates:kHVRampPanic onlyControlled:YES];
+		[model startRamping];
+		[self updateButtons];
+    }
+	
+}
+- (void)_startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){
+		[model resolveActualVsSetValueProblem];
+		[model initializeStates];
+		[model resetAdcs];
+		[model startRamping];
+		[self updateButtons];
+    }
+	
+}
+
+- (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertDefaultReturn){
+        [model setStates:kHVRampPanic onlyControlled:NO];
+		[model startRamping];
+		[self updateButtons];
+    }
+}
+- (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertDefaultReturn){
+		[model forceDacToAdc];
+		[self updateButtons];
+    }
+}
 @end
