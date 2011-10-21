@@ -521,6 +521,7 @@
 	id anArray;
     id ident = [aCol identifier];
     if([ident isEqualToString:@"iValueHex"])ident = @"iValue"; //fixes an XCode 4 warning
+    else if([ident isEqualToString:@"valueHex"])ident = @"value"; //fixes an XCode 4 warning
 	if(aTable == inputVariablesTableView) anArray= [model inputValues];
 	else								  anArray= [model outputValues];
 	return [[anArray objectAtIndex:aRow] objectForKey:ident];
