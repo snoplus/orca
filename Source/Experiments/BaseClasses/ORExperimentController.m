@@ -516,7 +516,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [[segmentGroups objectAtIndex:0] setMapFile:[[[[openPanel URLs] objectAtIndex:0]path]stringByAbbreviatingWithTildeInPath]];
+            [[segmentGroups objectAtIndex:0] setMapFile:[[[openPanel URL] path]stringByAbbreviatingWithTildeInPath]];
             [[segmentGroups objectAtIndex:0] readMap];
             [primaryTableView reloadData];
         }

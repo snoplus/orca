@@ -433,7 +433,7 @@
     [openPanel setDirectoryURL:[NSURL URLWithString:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            [[NcdDetector sharedInstance] setMapFileName:[[[openPanel URLs] objectAtIndex:0] path]];
+            [[NcdDetector sharedInstance] setMapFileName:[[openPanel URL] path]];
             [[NcdDetector sharedInstance] readMap];
         }
     }];
@@ -639,7 +639,7 @@
         [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
         [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton) {
-                [model setNominalSettingsFile: [[[openPanel URLs] objectAtIndex:0]path]];
+                [model setNominalSettingsFile: [[openPanel URL]path]];
             }
         }];
 #else	
@@ -1121,7 +1121,7 @@
     [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            NSString* fileName = [[[[openPanel URLs] objectAtIndex:0] path] stringByAbbreviatingWithTildeInPath];
+            NSString* fileName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
             NSArray* selected = [altMuxThresholdsController selectedObjects];
             NSEnumerator* e = [selected objectEnumerator];
             id obj;

@@ -211,7 +211,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [secondaryGroup setMapFile:[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath]];
+            [secondaryGroup setMapFile:[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath]];
             [secondaryGroup readMap];
             [secondaryTableView reloadData];
         }

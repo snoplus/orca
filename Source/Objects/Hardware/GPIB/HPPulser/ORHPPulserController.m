@@ -363,7 +363,11 @@
         [openPanel setDirectoryURL:[NSURL URLWithString:NSHomeDirectory()]];
         [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton) {
-            }
+                NSString* fileName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
+                [model setFileName:fileName];
+                [self performSelector:@selector(downloadWaveform) withObject:self afterDelay:0.1];
+                NSLog(@"Downloading Waveform: %@\n",fileName);
+           }
         }];
 #else	
         [openPanel beginSheetForDirectory:NSHomeDirectory()
