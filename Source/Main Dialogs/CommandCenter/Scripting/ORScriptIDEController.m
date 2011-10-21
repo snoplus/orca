@@ -544,7 +544,7 @@
     [openPanel setDirectoryURL:[NSURL URLWithString:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            [model loadScriptFromFile:[[[openPanel URLs] objectAtIndex:0] path]];
+            [model loadScriptFromFile:[[openPanel URL]path]];
         }
     }];
 #else	
