@@ -22,12 +22,13 @@
 #import "ORXL1Controller.h"
 #import "ORXL1Model.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORXL1Controller (private)
 - (void) setClockFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) setCableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
-
+#endif
 
 @implementation ORXL1Controller
 
@@ -185,6 +186,15 @@
     if(fullPath)	startingDir = [[model xilinxFile] stringByDeletingLastPathComponent];
     else			startingDir = NSHomeDirectory();
 	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setXilinxFile:[[openPanel URL] path]];
+            NSLog(@"FEC Xilinx default file set to: %@\n",[[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+       }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -192,6 +202,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(setXilinxFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) clockFileAction:(id) sender
@@ -207,6 +218,15 @@
     if(fullPath)	startingDir = [[model clockFile] stringByDeletingLastPathComponent];
     else			startingDir = NSHomeDirectory();
 	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setClockFile:[[openPanel URL] path]];
+            NSLog(@"FEC Clock default file set to: %@\n",[[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+        }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -214,6 +234,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(setClockFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) cableFileAction:(id) sender
@@ -229,13 +250,23 @@
 	if(fullPath)	startingDir = [[model cableFile] stringByDeletingLastPathComponent];
 	else			startingDir = NSHomeDirectory();
 	
-	[openPanel beginSheetForDirectory:startingDir
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setCableFile:[[openPanel URL] path]];
+            NSLog(@"CableDB.h default file set to: %@\n",[[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+        }
+    }];
+#else 
+    [openPanel beginSheetForDirectory:startingDir
 				     file:nil
 				    types:nil
 			   modalForWindow:[self window]
 			    modalDelegate:self
 			   didEndSelector:@selector(setCableFileDidEnd:returnCode:contextInfo:)
 			      contextInfo:NULL];
+#endif
 }
 
 
@@ -256,6 +287,7 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation ORXL1Controller (private)
 - (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -283,3 +315,4 @@
 	}
 }
 @end
+#endif

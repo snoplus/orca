@@ -45,7 +45,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 };
 
 @interface ORIpeV4SLTController (private)
--(void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) do:(SEL)aSelector name:(NSString*)aName;
 @end
@@ -848,6 +850,16 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Load Pattern File"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* fileName = [[openPanel URL] path];
+            [model setPatternFilePath:fileName];
+        }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -855,7 +867,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                         modalDelegate:self
                        didEndSelector:@selector(loadPatternPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-	
+#endif
 }
 
 - (IBAction) loadPatternFile:(id)sender
@@ -879,6 +891,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 @end
 
 @implementation ORIpeV4SLTController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 -(void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -886,6 +899,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
         [model setPatternFilePath:fileName];
     }
 }
+#endif
 
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
