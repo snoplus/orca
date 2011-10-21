@@ -681,7 +681,7 @@
     [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            NSString* dirName = [[[[openPanel URLs] objectAtIndex:0] path] stringByAbbreviatingWithTildeInPath];
+            NSString* dirName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
             [model setDirName:dirName];
         }
     }];
@@ -718,7 +718,7 @@
     [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model setDefinitionsFilePath:[[[openPanel URLs] objectAtIndex:0]path]];
+            [model setDefinitionsFilePath:[[openPanel URL]path]];
             if(![model readRunTypeNames]){
                 NSLogColor([NSColor redColor],@"Unable to parse <%@> as a run type def file.\n",[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath]);
                 NSLogColor([NSColor redColor],@"File must be list of items of the form: itemNumber,itemName\n");	

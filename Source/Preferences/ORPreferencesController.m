@@ -376,7 +376,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
     [openPanel setDirectoryURL:[NSURL URLWithString:startPath]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            NSString* path = [[[openPanel URLs] objectAtIndex:0] path];
+            NSString* path = [[openPanel URL]path];
             [[NSUserDefaults standardUserDefaults] setObject:path forKey:ORPrefHeartBeatPath];
             [heartbeatPathField setStringValue:[path stringByAbbreviatingWithTildeInPath]];
             

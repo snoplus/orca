@@ -519,9 +519,11 @@
 - (id) tableView:(NSTableView *)aTable objectValueForTableColumn:(NSTableColumn *)aCol row:(int)aRow
 {
 	id anArray;
+    id ident = [aCol identifier];
+    if([ident isEqualToString:@"iValueHex"])ident = @"iValue"; //fixes an XCode 4 warning
 	if(aTable == inputVariablesTableView) anArray= [model inputValues];
 	else								  anArray= [model outputValues];
-	return [[anArray objectAtIndex:aRow] objectForKey:[aCol identifier]];
+	return [[anArray objectAtIndex:aRow] objectForKey:ident];
 }
 
 - (void) tableView:(NSTableView*)aTable setObjectValue:(id)aData forTableColumn:(NSTableColumn*)aCol row:(int)aRow

@@ -103,7 +103,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            NSString* fileName = [[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath];
+            NSString* fileName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
             [model setScriptPath:fileName];
         }
     }];

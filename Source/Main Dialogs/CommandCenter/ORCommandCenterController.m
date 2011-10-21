@@ -145,7 +145,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
     [openPanel setDirectoryURL:[NSURL URLWithString:[self lastPath]]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            NSString* path = [[[openPanel URLs] objectAtIndex:0]path];
+            NSString* path = [[openPanel URL] path];
             [self setLastPath:[path stringByDeletingLastPathComponent]];
             [self sendCommand:[NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:nil]];
         }

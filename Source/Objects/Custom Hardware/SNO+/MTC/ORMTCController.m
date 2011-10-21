@@ -795,7 +795,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model setXilinxFilePath:[[[openPanel URLs] objectAtIndex:0]path]];
+            [model setXilinxFilePath:[[openPanel URL]path]];
             NSLog(@"MTC Xilinx default file set to: %@\n",[[[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
         }
     }];
@@ -939,7 +939,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model setDefaultFile:[[[openPanel URLs] objectAtIndex:0] path]];
+            [model setDefaultFile:[[openPanel URL]path]];
             NSLog(@"MTC DataBase default file set to: %@\n",[[[[[openPanel URLs] objectAtIndex:0]path]stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
         }
     }];
@@ -1070,7 +1070,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model loadSet:[[[openPanel URLs] objectAtIndex:0]path]];
+            [model loadSet:[[openPanel URL]path]];
             NSLog(@"MTC DataBase loaded from: %@\n",[[[[[openPanel URLs] objectAtIndex:0] path]stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
         }
     }];

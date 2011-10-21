@@ -822,7 +822,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model setLastStackFilePath:[[[openPanel URLs] objectAtIndex:0]path]];
+            [model setLastStackFilePath:[[openPanel URL]path]];
             NSString* theContents = [NSString stringWithContentsOfFile:[model lastStackFilePath] encoding:NSASCIIStringEncoding error:nil];
             [model setCustomStack:[[[theContents componentsSeparatedByString:@"\n"] mutableCopy] autorelease]];
         }

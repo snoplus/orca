@@ -372,7 +372,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            NSString* dirName = [[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath];
+            NSString* dirName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
             [model setDirName:dirName];
         }
     }];

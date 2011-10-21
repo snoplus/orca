@@ -457,7 +457,7 @@
     [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            NSString* path = [[[[openPanel URLs] objectAtIndex:0] path]stringByAbbreviatingWithTildeInPath];
+            NSString* path = [[[openPanel URL]path]stringByAbbreviatingWithTildeInPath];
             if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
                 [group setBackgroundImagePath:path];
             }

@@ -608,7 +608,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            NSString* fileName = [[[openPanel URLs] objectAtIndex:0]path];
+            NSString* fileName = [[openPanel URL] path];
             [self setLogBookFile:fileName];
         }
     }];

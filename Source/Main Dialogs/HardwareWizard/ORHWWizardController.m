@@ -687,7 +687,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[[openPanel URLs] objectAtIndex:0]path]];
+            NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[openPanel URL]path]];
             [self setFileHeader:[ORDecoder readHeader:theFile]];
             [self executeControlStruct];   
         }
@@ -1610,7 +1610,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[[openPanel URLs] objectAtIndex:0]path]];
+            NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[openPanel URL]path]];
             [self setFileHeader:[ORDecoder readHeader:theFile]];
             [self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
         }

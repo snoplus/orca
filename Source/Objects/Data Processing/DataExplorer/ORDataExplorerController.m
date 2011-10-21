@@ -238,7 +238,7 @@
     [openPanel setDirectoryURL:[NSURL URLWithString:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            [model setFileToExplore:[[[openPanel URLs] objectAtIndex:0]path]];
+            [model setFileToExplore:[[openPanel URL] path]];
         }
     }];
 #else	

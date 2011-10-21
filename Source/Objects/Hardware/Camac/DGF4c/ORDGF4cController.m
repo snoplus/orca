@@ -721,7 +721,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model setFirmWarePath:[[[openPanel URLs] objectAtIndex:0] path]];
+            [model setFirmWarePath:[[openPanel URL]path]];
         }
     }];
 #else 		
@@ -755,7 +755,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model setDSPCodePath:[[[openPanel URLs] objectAtIndex:0]path]];
+            [model setDSPCodePath:[[openPanel URL]path]];
         }
     }];
 #else 		
@@ -789,7 +789,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model loadSetFromPath:[[[openPanel URLs] objectAtIndex:0]path]]; 
+            [model loadSetFromPath:[[openPanel URL]path]]; 
         }
     }];
 #else 		
@@ -853,7 +853,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-            [model createNewVarList:[[[openPanel URLs] objectAtIndex:0]path]]; 
+            [model createNewVarList:[[openPanel URL]path]]; 
         }
     }];
 #else 	    	
