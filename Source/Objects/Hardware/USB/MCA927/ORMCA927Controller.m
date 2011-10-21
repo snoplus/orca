@@ -28,18 +28,20 @@
 #import "OR1DHistoPlot.h"
 
 @interface ORMCA927Controller (private)
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) openPanelForFPGADidEnd:(NSOpenPanel*)sheet
 					 returnCode:(int)returnCode
 					contextInfo:(void*)contextInfo;
 
-- (void) clearSpectaSheetDidEnd:(id)sheet 
-				  returnCode:(int)returnCode 
-				 contextInfo:(id)userInfo;
-
 - (void) saveFileDidEnd:(NSSavePanel *)sheet 
 			 returnCode:(int)returnCode 
 			contextInfo:(void  *)contextInfo;
+#endif
 
+- (void) clearSpectaSheetDidEnd:(id)sheet 
+				  returnCode:(int)returnCode 
+				 contextInfo:(id)userInfo;
 
 - (void) populateInterfacePopup:(ORUSB*)usb;
 
@@ -589,7 +591,16 @@
         startingDir = NSHomeDirectory();
         defaultFile = @"Untitled";
     }
-	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            int i = [model selectedChannel];
+            [model writeSpectrum:i toFile:[[savePanel URL]path]];
+        }
+    }];
+    
+#else 		
     [savePanel beginSheetForDirectory:startingDir
                                  file:defaultFile
                        modalForWindow:[self window]
@@ -597,6 +608,7 @@
                        didEndSelector:@selector(saveFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 	
+#endif
 }
 
 - (IBAction) readSpectrumAction:(id)sender
@@ -813,13 +825,23 @@
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Select FPGA Binary File"];
-	[openPanel beginSheetForDirectory:startPath?startPath:NSHomeDirectory()
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startPath]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setFpgaFilePath:[[openPanel URL]path]]; 
+        }
+    }];
+#else 	
+	[openPanel beginSheetForDirectory:startPath?startPath:startPath
 								 file:nil
 								types:nil //[NSArray arrayWithObjects:@"bin",nil]
 					   modalForWindow:[self window]
 						modalDelegate:self
 					   didEndSelector:@selector(openPanelForFPGADidEnd:returnCode:contextInfo:)
 						  contextInfo:NULL];
+#endif
 }
 
 
@@ -889,6 +911,7 @@
 @end
 
 @implementation ORMCA927Controller (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) openPanelForFPGADidEnd:(NSOpenPanel*)sheet
 					 returnCode:(int)returnCode
 						contextInfo:(void*)contextInfo
@@ -905,6 +928,7 @@
 		[model writeSpectrum:i toFile:[sheet filename]];
     }
 }
+#endif
 
 - (void) clearSpectaSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {

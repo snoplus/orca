@@ -32,7 +32,9 @@
 
 @interface ORXYScannerController (private)
 - (void) populatePortListPopup;
--(void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 @end
 
 @implementation ORXYScannerController
@@ -394,6 +396,17 @@
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* fileName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            [model setCmdFile:fileName];
+
+        }
+    }];
+#else 		
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -401,6 +414,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 
@@ -467,6 +481,8 @@
 @end
 
 @implementation ORXYScannerController (private)
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 -(void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -474,6 +490,7 @@
         [model setCmdFile:fileName];
     }
 }
+#endif
 
 - (void) populatePortListPopup
 {

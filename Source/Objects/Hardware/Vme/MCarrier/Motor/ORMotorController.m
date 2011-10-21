@@ -41,10 +41,11 @@ enum {
     kPatternPositionTag   = 1
 };
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORMotorController (private)
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
-
+#endif
 
 @implementation ORMotorController
 
@@ -653,6 +654,16 @@ enum {
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* filename = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            [model setPatternFileName:filename];  
+        }
+    }];
+    
+#else 	
     [openPanel beginSheetForDirectory:NSHomeDirectory()
                                  file:nil
                                 types:nil
@@ -660,6 +671,7 @@ enum {
                         modalDelegate:self
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) startPatternRunAction:(id)sender
@@ -687,6 +699,7 @@ enum {
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation ORMotorController (private)
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -695,6 +708,5 @@ enum {
         [model setPatternFileName:filename];
     }
 }
-
-
 @end
+#endif

@@ -31,7 +31,9 @@
 #import "ORAxis.h"
 
 @interface ORManualPlotController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) selectWriteFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
@@ -332,13 +334,20 @@
     [savePanel setPrompt:@"Save As"];
     [savePanel setCanCreateDirectories:YES];
     
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model writeDataToFile:[[savePanel URL]path]];
+        }
+    }];
+#else 	   
     [savePanel beginSheetForDirectory:NSHomeDirectory()
                                  file:@"Untitled"
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(selectWriteFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-	
+#endif	
 }
 - (IBAction) calibrate:(id)sender
 {
@@ -402,13 +411,14 @@
 @end
 
 @implementation ORManualPlotController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) selectWriteFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         [model writeDataToFile:[[sheet filenames] objectAtIndex:0]];
     }
 }
-
+#endif
 - (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	[calibrationPanel release];

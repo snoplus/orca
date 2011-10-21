@@ -177,8 +177,8 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
     
 	// Have to separate the date and time plus modify format for oscilloscope.
 
-	dateString = [[[NSString alloc] initWithBytes:sDateTime length:10 encoding:NSASCIIStringEncoding] autorelease];
-	timeString = [[[NSString alloc] initWithBytes:&sDateTime[11] length:8 encoding:NSASCIIStringEncoding] autorelease];
+	dateString = [[[NSMutableString alloc] initWithBytes:sDateTime length:10 encoding:NSASCIIStringEncoding] autorelease];
+	timeString = [[[NSMutableString alloc] initWithBytes:&sDateTime[11] length:8 encoding:NSASCIIStringEncoding] autorelease];
 
 	//dateString = [NSMutableString stringWithCString:sDateTime length:10];
 	//timeString = [NSMutableString stringWithCString:&sDateTime[11] length:8];

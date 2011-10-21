@@ -27,6 +27,14 @@
 #import "ORAdeiLoader.h"
 #import "ORCompositePlotView.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@implementation ORIpeSimulationController (private) 
+- (void) openExecutableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) openConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;	
+- (void) saveConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
+@end
+#endif
+
 @implementation ORIpeSimulationController
 
 #pragma mark ***Initialization
@@ -465,32 +473,34 @@
 
 - (IBAction) openExecutableFileAction:(id)sender
 {
-	NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-	
-    NSOpenPanel *op = [NSOpenPanel openPanel];
-	[op setTitle: @"Open Executable File"];
-	
-	int retval;
-	retval = [op runModal];
-    if (retval == NSFileHandlingPanelOKButton)  //NSOKButton) NSFileWrapper
-    {
-        NSString *filename = [op filename];
-        //NSLog( @"You selected the filename: %@\n",filename);//TODO: deprecated, BUT: using [op URLs] is a mess (sorry, APPLE) -tb-
-		[model setExecutableFileName: filename];	
-		
-        //NSLog( @"You selected [op URLs]: %@\n",[op URLs]);
-        //NSLog( @"You selected [op nameFieldStringValue]: %@\n",[op nameFieldStringValue]);
-		//[model setConfigFileName: [NSString stringWithFormat:@"%@",[[op URLs]objectAtIndex:0]]];	
-		//[configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
-		//  !this does not work as URLs start with "file://localhost" ... see comment above: APPLE needs to provide more convesion functions -tb-
-		
-        NSLog( @"Setting the filename to: %@\n",[model executableFileName]);
-		[executableFileNameTextField setStringValue: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
-    }
-    if (retval == NSFileHandlingPanelCancelButton){
-        NSLog( @"You selected CANCEL\n");
-	}
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+	[openPanel setTitle: @"Open Executable File"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* filename = [[openPanel URL]path];
+            [model setExecutableFileName: filename];	
+            NSLog( @"Setting the filename to: %@\n",[model executableFileName]);
+            [executableFileNameTextField setStringValue: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
+        }
+    }];
+#else 	
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(openExecutableFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
 }
+
+
 
 - (void) configFileNameTextFieldAction:(id)sender
 {
@@ -500,31 +510,32 @@
 
 - (IBAction) openConfigFileAction:(id)sender
 {
-	NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-	
-    NSOpenPanel *op = [NSOpenPanel openPanel];
-	[op setTitle: @"Open Config File"];
-	
-	int retval;
-	retval = [op runModal];
-    if (retval == NSFileHandlingPanelOKButton)  //NSOKButton) NSFileWrapper
-    {
-        NSString *filename = [op filename];
-        //NSLog( @"You selected the filename: %@\n",filename);//TODO: deprecated, BUT: using [op URLs] is a mess (sorry, APPLE) -tb-
-		[model setConfigFileName: filename];	
-		
-        //NSLog( @"You selected [op URLs]: %@\n",[op URLs]);
-        //NSLog( @"You selected [op nameFieldStringValue]: %@\n",[op nameFieldStringValue]);
-		//[model setConfigFileName: [NSString stringWithFormat:@"%@",[[op URLs]objectAtIndex:0]]];	
-		//[configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
-		//  !this does not work as URLs start with "file://localhost" ... see comment above: APPLE needs to provide more convesion functions -tb-
-		
-        NSLog( @"Setting the filename to: %@\n",[model configFileName]);
-		[configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
-    }
-    if (retval == NSFileHandlingPanelCancelButton){
-        NSLog( @"You selected CANCEL\n");
-	}
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];   
+    [openPanel setTitle: @"Open Config File"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString *filename = [[openPanel URL]path];
+            [model setConfigFileName: filename];	
+
+            NSLog( @"Setting the filename to: %@\n",[model configFileName]);
+            [configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
+        }
+    }];
+#else 	
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(openConfigFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
 }
 
 - (IBAction) saveConfigFileAction:(id)sender
@@ -547,42 +558,43 @@
 }
 
 - (IBAction) saveAsConfigFileAction:(id)sender
-{
-	NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	
-    NSSavePanel *op = [NSSavePanel savePanel];
+{	
+    
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
 	//[op setMessage: @"Save the Config File ..."];
-	[op setNameFieldLabel: @"Save as:"];
+	[savePanel setNameFieldLabel: @"Save as:"];
 	//[op setNameFieldStringValue: @"config.txt"];
-	[op setNameFieldLabel: [[model configFileName] lastPathComponent]];
-	[op setTitle: @"Save Config File"];
-	[op setAllowedFileTypes: nil];
-	[op setAllowsOtherFileTypes: YES];
-	[op setCanSelectHiddenExtension: YES];
-	
-	
-	int retval;
-	retval = [op runModal];
-    if (retval == NSFileHandlingPanelOKButton)
-    {
-        NSString *filename = [op filename];
-        NSLog( @"You selected the filename: %@\n",filename);
-        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[op nameFieldLabel]);
-        NSLog( @"You selected [op directoryURL]: %@\n",[op URL]);
-        //if (![textData writeToFile:[sp filename] atomically:YES])
-		BOOL saveOK;  
-		saveOK = [[configFileTextView string] writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding error: NULL];
-		if (saveOK) {
-			[model setConfigFileName: filename];	
-			NSLog( @"Save file: %@\n",filename);
-		}else{
-			NSLog( @"ERROR: Could not save file: %@\n",filename);
-		}
+	[savePanel setTitle: @"Save Config File"];
+	[savePanel setAllowedFileTypes: nil];
+	[savePanel setAllowsOtherFileTypes: YES];
+	[savePanel setCanSelectHiddenExtension: YES];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString *filename = [[savePanel URL]path];
+            BOOL saveOK = [[configFileTextView string] writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding error: NULL];
+            if (saveOK) {
+                [model setConfigFileName: filename];	
+                NSLog( @"Save file: %@\n",filename);
+            }
+            else{
+                NSLog( @"ERROR: Could not save file: %@\n",filename);
+            }
+            
+        }
+    }];
+#else 	
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveConfigFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
 
-    }
-    if (retval == NSFileHandlingPanelCancelButton){
-        NSLog( @"You selected CANCEL\n");
-	}
+	
 }
 
 - (void) showDebugOutputAction:(id)sender
@@ -1175,5 +1187,58 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 	}
 	[super drawRow:row clipRect:clipRect];
 }
+
+@end
+
+@implementation ORIpeSimulationController (private)  
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+- (void)openExecutableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString *filename = [sheet filename];
+		[model setExecutableFileName: filename];	
+        NSLog( @"Setting the filename to: %@\n",[model executableFileName]);
+		[executableFileNameTextField setStringValue: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
+    }
+}
+- (void)openConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
+{
+	int retval;
+	retval = [op runModal];
+    if (retval == NSFileHandlingPanelOKButton)  //NSOKButton) NSFileWrapper
+    {
+        NSString *filename = [op filename];
+        
+		//  !this does not work as URLs start with "file://localhost" ... see comment above: APPLE needs to provide more convesion functions -tb-
+		
+        NSLog( @"Setting the filename to: %@\n",[model configFileName]);
+		[configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
+    }
+}
+
+- (void)saveConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
+{
+    if (returnCode == NSFileHandlingPanelOKButton) {
+        NSString *filename = [sheet filename];
+        NSLog( @"You selected the filename: %@\n",filename);
+        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[op nameFieldLabel]);
+        NSLog( @"You selected [op directoryURL]: %@\n",[op URL]);
+        //if (![textData writeToFile:[sp filename] atomically:YES])
+		BOOL saveOK;  
+		saveOK = [[configFileTextView string] writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding error: NULL];
+		if (saveOK) {
+			[model setConfigFileName: filename];	
+			NSLog( @"Save file: %@\n",filename);
+		}
+        else{
+			NSLog( @"ERROR: Could not save file: %@\n",filename);
+		}
+        
+    }
+
+}
+
+#endif
+
 @end
 

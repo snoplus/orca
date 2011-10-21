@@ -25,8 +25,10 @@
 #import "ORCameraModel.h"
 
 @interface ORCameraController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) setHistoryFolderDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) viewPastHistoryDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) populateDevicePU;
 @end
 
@@ -251,6 +253,20 @@
     else {
         startingDir = NSHomeDirectory();
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* fileName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            QTMovie *newMovie = [[QTMovie alloc] initWithFile:[fileName stringByExpandingTildeInPath] error:nil];
+            if (newMovie) {
+                [mMovieView setMovie:newMovie];
+            }
+            [newMovie release];
+        }
+    }];
+    
+#else 	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -258,7 +274,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(viewPastHistoryDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-	
+#endif
 }
 
 - (IBAction) viewCurrentAction:(id)sender
@@ -282,6 +298,15 @@
     else {
         startingDir = NSHomeDirectory();
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* folderName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            [model setHistoryFolder:folderName];
+        }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -289,12 +314,13 @@
                         modalDelegate:self
                        didEndSelector:@selector(setHistoryFolderDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-	
+#endif
 }
 
 @end
 
 @implementation ORCameraController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) setHistoryFolderDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -314,6 +340,7 @@
 		[newMovie release];
     }	
 }
+#endif
 
 - (void) populateDevicePU
 {
