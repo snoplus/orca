@@ -32,12 +32,13 @@
 #import "ORCompositePlotView.h"
 #import "ORValueBarGroupView.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORGretina4Controller (private)
-
 - (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
 						 returnCode:(int)returnCode
 						contextInfo:(void*)contextInfo;
 @end
+#endif
 
 @implementation ORGretina4Controller
 
@@ -1158,6 +1159,14 @@
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Select FPGA Binary File"];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setFpgaFilePath:[[openPanel URL]path]];
+            [model startDownLoadingMainFPGA];
+        }
+    }];
+#else 	
 	[openPanel beginSheetForDirectory:NSHomeDirectory()
 								 file:nil
 								types:nil //[NSArray arrayWithObjects:@"bin",nil]
@@ -1165,6 +1174,7 @@
 						modalDelegate:self
 					   didEndSelector:@selector(openPanelForMainFPGADidEnd:returnCode:contextInfo:)
 						  contextInfo:NULL];
+#endif
 }
 
 - (IBAction) stopLoadingMainFPGAAction:(id)sender
@@ -1192,6 +1202,7 @@
 }
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation ORGretina4Controller (private)
 - (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
 						 returnCode:(int)returnCode
@@ -1203,3 +1214,4 @@
     }
 }
 @end
+#endif

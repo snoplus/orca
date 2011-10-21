@@ -44,8 +44,10 @@
 #import "ORCommandCenterController.h"
 
 @interface ORExperimentController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) readPrimaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) savePrimaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) scaleValueHistogram;
 @end
 
@@ -510,6 +512,16 @@
     else {
         startingDir = NSHomeDirectory();
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [[segmentGroups objectAtIndex:0] setMapFile:[[[[openPanel URLs] objectAtIndex:0]path]stringByAbbreviatingWithTildeInPath]];
+            [[segmentGroups objectAtIndex:0] readMap];
+            [primaryTableView reloadData];
+        }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -517,6 +529,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(readPrimaryMapFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 
@@ -539,12 +552,21 @@
         defaultFile = [self defaultPrimaryMapFilePath];
         
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [[segmentGroups objectAtIndex:0] saveMapFileAs:[[savePanel URL]path]];
+        }
+    }];
+#else 	
     [savePanel beginSheetForDirectory:startingDir
                                  file:[defaultFile stringByExpandingTildeInPath]
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(savePrimaryMapFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) mapLockAction:(id)sender
@@ -976,7 +998,7 @@
 	}
 }
 
-
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void)readPrimaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -992,4 +1014,5 @@
         [[segmentGroups objectAtIndex:0] saveMapFileAs:[sheet filename]];
     }
 }
+#endif
 @end

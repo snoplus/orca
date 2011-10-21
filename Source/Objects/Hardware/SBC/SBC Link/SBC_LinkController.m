@@ -32,7 +32,9 @@
 #import "ORCompositePlotView.h"
 
 @interface SBC_LinkController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -748,6 +750,18 @@
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setCanCreateDirectories:NO];
 	[openPanel setPrompt:@"Choose"];
+    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startPath?startPath:NSHomeDirectory()]];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* path = [[[[openPanel URLs] objectAtIndex:0]path] stringByAbbreviatingWithTildeInPath];
+            [[model sbcLink] setFilePath:path];
+        }
+    }];
+    
+#else 	    
 	[openPanel beginSheetForDirectory:startPath?startPath:NSHomeDirectory()
                                  file:nil
                                 types:nil
@@ -755,6 +769,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) loadModeAction:(id)sender
@@ -1153,6 +1168,7 @@
 @end
 
 @implementation SBC_LinkController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -1160,6 +1176,7 @@
         [[model sbcLink] setFilePath:path];
     }
 }
+#endif
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		

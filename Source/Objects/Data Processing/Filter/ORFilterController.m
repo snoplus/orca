@@ -30,12 +30,13 @@
 #import "ORCompositePlotView.h"
 #import "OR1DHistoPlot.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORFilterController (private)
 - (void) pluginPathSelectDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
-
+#endif
 
 @implementation ORFilterController
 
@@ -350,6 +351,15 @@
     if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
     else		 startingDir = NSHomeDirectory();
 
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setPluginPath:[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath]];
+            [model loadPlugin]; 
+        }
+    }];
+#else 	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:[NSArray arrayWithObject:@"bundle"]
@@ -358,6 +368,7 @@
                        didEndSelector:@selector(pluginPathSelectDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 
+#endif
 }
 
 - (IBAction) enableTimer:(id)sender
@@ -420,6 +431,14 @@
     if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
     else		 startingDir = NSHomeDirectory();
 
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model loadScriptFromFile:[[[openPanel URL]path]stringByAbbreviatingWithTildeInPath]];
+        }
+    }];
+#else 
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:[NSArray arrayWithObjects:@"fs",@"ofs",nil]
@@ -427,6 +446,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(loadFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) saveAsFileAction:(id) sender
@@ -449,13 +469,23 @@
         startingDir = NSHomeDirectory();
         defaultFile = @"Untitled.ofs";
     }
-	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* path = [[[savePanel URL]path] stringByDeletingPathExtension];
+            path = [path stringByAppendingPathExtension:@"ofs"];
+            [model saveScriptToFile:path];
+        }
+    }];
+#else 	
     [savePanel beginSheetForDirectory:startingDir
                                  file:defaultFile
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(saveFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
+#endif
 }
 
 - (IBAction) saveFileAction:(id) sender
@@ -501,9 +531,9 @@
 	}
 }
 
-
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @implementation ORFilterController (private)
 
 - (void) pluginPathSelectDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
@@ -531,3 +561,4 @@
     }
 }
 @end
+#endif

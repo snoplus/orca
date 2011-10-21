@@ -27,9 +27,11 @@
 #import "ORDataExplorerModel.h"
 
 @interface ORHeaderExplorerController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) saveListDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) loadListDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#endif
 - (void) addDirectoryContents:(NSString*)path toArray:(NSMutableArray*)anArray;
 - (void) processFileList:(NSArray*)filenames;
 @end
@@ -133,7 +135,20 @@
             startDir = NSHomeDirectory();
         }
     }
-    
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* filePath = [[[openPanel URLs] objectAtIndex:0]path];
+            [model setLastFilePath:filePath];
+            NSMutableArray* array = [NSMutableArray array];
+            for(id aURL in [openPanel URLs]){
+                [array addObject:[aURL path]];
+            }
+            [self processFileList:array];
+       }
+    }];
+#else 	    
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -141,7 +156,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-    
+#endif   
 }
 
 - (IBAction) addSearchKeys:(id)sender
@@ -257,12 +272,23 @@
             startDir = NSHomeDirectory();
         }
     }
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* listPath = [[savePanel URL]path];
+            [model setLastListPath:listPath];
+            [[model filesToProcess] writeToFile:listPath atomically:YES];
+        }
+    }];
+#else 
     [savePanel beginSheetForDirectory:startDir
 								 file:nil
 					   modalForWindow:[self window]
 						modalDelegate:self
 					   didEndSelector:@selector(saveListDidEnd:returnCode:contextInfo:)
 						  contextInfo:nil];
+#endif
 }
 
 - (IBAction) loadListAction:(id)sender
@@ -281,6 +307,21 @@
         }
     }
     
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* listPath = [[[openPanel URLs] objectAtIndex:0]path];
+            NSMutableArray* theList = [NSMutableArray arrayWithContentsOfFile:listPath];
+            if(theList){
+                [model removeAll];
+                [model addFilesToProcess:theList];
+                [fileListView reloadData];
+            }
+            else NSLog(@"<%@> replay list is empty\n",listPath);
+        }
+    }];
+#else 
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -288,7 +329,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(loadListDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-	
+#endif	
 }
 
 - (IBAction) selectionDateAction:(id)sender
@@ -786,6 +827,7 @@
 @end
 
 @implementation ORHeaderExplorerController (private)
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
@@ -794,6 +836,29 @@
         [self processFileList:[sheet filenames]];
     }
 }
+- (void) saveListDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* listPath = [[sheet filenames] objectAtIndex:0];
+        [model setLastListPath:listPath];
+        [[model filesToProcess] writeToFile:listPath atomically:YES];
+    }
+}
+
+- (void) loadListDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* listPath = [[sheet filenames] objectAtIndex:0];
+        NSMutableArray* theList = [NSMutableArray arrayWithContentsOfFile:listPath];
+        if(theList){
+            [model removeAll];
+            [model addFilesToProcess:theList];
+            [fileListView reloadData];
+        }
+        else NSLog(@"<%@> replay list is empty\n",listPath);
+    }
+}
+#endif
 
 -(void) processFileList:(NSArray*)filenames
 {
@@ -847,28 +912,6 @@
 }
 
 
-- (void) saveListDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* listPath = [[sheet filenames] objectAtIndex:0];
-        [model setLastListPath:listPath];
-        [[model filesToProcess] writeToFile:listPath atomically:YES];
-    }
-}
-
-- (void) loadListDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* listPath = [[sheet filenames] objectAtIndex:0];
-        NSMutableArray* theList = [NSMutableArray arrayWithContentsOfFile:listPath];
-        if(theList){
-            [model removeAll];
-            [model addFilesToProcess:theList];
-            [fileListView reloadData];
-        }
-        else NSLog(@"<%@> replay list is empty\n",listPath);
-    }
-}
 @end
 
 @implementation ORRunTimeView
