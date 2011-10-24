@@ -1000,7 +1000,6 @@
 		843DCF35058E546A000C5219 /* DataGen.gif in Resources */ = {isa = PBXBuildFile; fileRef = 843DCF2E058E546A000C5219 /* DataGen.gif */; };
 		843DCF3A058E546A000C5219 /* ORDataGenModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843DCF33058E546A000C5219 /* ORDataGenModel.h */; };
 		843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843DCF34058E546A000C5219 /* ORDataGenModel.m */; };
-		843F28F911ECFEED0077E55B /* ORDataGenReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 843F28F811ECFEED0077E55B /* ORDataGenReadout.hh */; };
 		844048AE08350BEE000D03DB /* MemoryWatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = 844048AC08350BEE000D03DB /* MemoryWatcher.h */; };
 		844048AF08350BEE000D03DB /* MemoryWatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 844048AD08350BEE000D03DB /* MemoryWatcher.m */; };
 		844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844049C108353B65000D03DB /* MemoryWatcherController.h */; };
@@ -1861,6 +1860,7 @@
 		84AB8BD30D2314DD00EC39F2 /* ORJAMFController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BCD0D2314DD00EC39F2 /* ORJAMFController.m */; };
 		84AB8BD40D2314DD00EC39F2 /* ORJAMFModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */; };
 		84AB8BD50D2314DD00EC39F2 /* ORJAMFModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */; };
+		84AC47611454BE5F009D6F83 /* Bug.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AC47601454BE5F009D6F83 /* Bug.tif */; };
 		84AC6A510A34F9A800A0018E /* NcdPulseChannelsTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */; };
 		84AC6A520A34F9A900A0018E /* NcdPulseChannelsTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */; };
 		84AC6A530A34F9A900A0018E /* NcdPulseChannelsTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */; };
@@ -4410,6 +4410,7 @@
 		84AB8BCD0D2314DD00EC39F2 /* ORJAMFController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFController.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFController.m; sourceTree = SOURCE_ROOT; };
 		84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFModel.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.h; sourceTree = SOURCE_ROOT; };
 		84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFModel.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.m; sourceTree = SOURCE_ROOT; };
+		84AC47601454BE5F009D6F83 /* Bug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bug.tif; sourceTree = "<group>"; };
 		84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NcdPulseChannelsTask.h; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.h; sourceTree = SOURCE_ROOT; };
 		84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NcdPulseChannelsTask.m; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.m; sourceTree = SOURCE_ROOT; };
 		84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdPulseChannelsTask.nib; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.nib; sourceTree = SOURCE_ROOT; };
@@ -5802,6 +5803,7 @@
 				84080D270B3C7FBE009D3704 /* NodeTree.m */,
 				84080D280B3C7FBF009D3704 /* OrcaScript.h */,
 				84080D290B3C7FBF009D3704 /* OrcaScript.lm */,
+				84AC47601454BE5F009D6F83 /* Bug.tif */,
 				84759CF40B6036D600123411 /* OrcaScript.ym */,
 				844998630F1282E7004B855B /* SyntaxDefinition.plist */,
 				84759A990B6025E200123411 /* OrcaScriptGuide.rtf */,
@@ -7576,6 +7578,7 @@
 			children = (
 				845CD44F143B33C8009FE5B9 /* ORCompositePlotView.h */,
 				845CD450143B33C8009FE5B9 /* ORCompositePlotView.m */,
+				84E348F70438E8A9005F64B1 /* Circular Buffer */,
 				845CDF79143DE531009FE5B9 /* ORComposite2DPlotView.h */,
 				845CDF7A143DE531009FE5B9 /* ORComposite2DPlotView.m */,
 				845CE951143F550C009FE5B9 /* ORValueBarGroupView.h */,
@@ -9809,7 +9812,6 @@
 				84662A63070A3231001CDA7E /* BiStateView */,
 				84B7DF9C04E1C53D005F64B1 /* Bar Graph */,
 				84761FCF118CD53C00016A8D /* Plotting */,
-				84E348F70438E8A9005F64B1 /* Circular Buffer */,
 			);
 			name = Widgets;
 			path = Source/Widgets;
@@ -12153,7 +12155,6 @@
 				EFAC073111E9A6CB00336793 /* XL3_Link.h in Headers */,
 				EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */,
 				4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */,
-				843F28F911ECFEED0077E55B /* ORDataGenReadout.hh in Headers */,
 				840F5AC61222C03800D49A75 /* ORCameraController.h in Headers */,
 				840F5AC81222C03800D49A75 /* ORCameraModel.h in Headers */,
 				84065D961226B600004E8970 /* ORPxi8336MacController.h in Headers */,
@@ -12288,6 +12289,9 @@
 /* Begin PBXProject section */
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -13021,6 +13025,7 @@
 				847F948213D4AA31006B06B4 /* Rad7.tif in Resources */,
 				841C4DF5141FA72800F95B50 /* Met237.nib in Resources */,
 				841C4DF6141FA72800F95B50 /* Met237.tif in Resources */,
+				84AC47611454BE5F009D6F83 /* Bug.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14040,7 +14045,6 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DEBUGGING_SYMBOLS = default;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_CPU = "";
@@ -14048,6 +14052,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Source/App Delegate/OrcaPrecompiledHeader.h";
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
@@ -14083,7 +14088,6 @@
 					"-lz",
 					"-lnetsnmp",
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = Orca;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -14112,13 +14116,13 @@
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DEBUGGING_SYMBOLS = default;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Source/App Delegate/OrcaPrecompiledHeader.h";
+				GCC_VERSION = "";
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
@@ -14153,7 +14157,6 @@
 					"-lssl",
 					"-lz",
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = Orca;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -14184,6 +14187,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Source/App Delegate/OrcaPrecompiledHeader.h";
+				GCC_VERSION = "";
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
@@ -14218,7 +14222,6 @@
 					"-lssl",
 					"-lz",
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = Orca;
 				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
@@ -14232,10 +14235,10 @@
 		84F201BF0B6531990084F4C3 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				COPY_PHASE_STRIP = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				GCC_WARN_ABOUT_GLOBAL_CONSTRUCTORS = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
@@ -14258,11 +14261,10 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
-				MACOSX_DEPLOYMENT_TARGET = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				PREBINDING = NO;
-				SDKROOT = "";
+				SDKROOT = macosx;
 			};
 			name = Development;
 		};
@@ -14270,11 +14272,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				GCC_VERSION = 4.2;
+				GCC_VERSION = "";
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PREBINDING = NO;
 				SDKROOT = macosx;
 			};
 			name = Deployment;
@@ -14282,12 +14288,16 @@
 		84F201C10B6531990084F4C3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
-				GCC_VERSION = 4.2;
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				GCC_VERSION = "";
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				PREBINDING = NO;
-				SDKROOT = macosx10.5;
+				SDKROOT = macosx;
 			};
 			name = Default;
 		};
