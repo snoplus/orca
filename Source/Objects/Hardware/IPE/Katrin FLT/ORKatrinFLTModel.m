@@ -1120,7 +1120,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     // debug output -tb- NSLog(@"writeEMax: Pbus register is 0x%x, TRun is %i\n",
     // debug output -tb-    [self read:([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)], TRun  ); 	
 	
-	[self write:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0) value: postTriggerTime];
+	[self write:   ([self slot] << 24) | (func << 21) | (LAddr0) value: postTriggerTime];
 	//	[self write: 0x09c02000 value: EMin];
     Pixel = 1;
 	[self write:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0) value: postTriggerTime];
@@ -1142,7 +1142,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     // debug output -tb- NSLog(@"writeEMax: Pbus register is 0x%x, TRun is %i\n",
     // debug output -tb-    [self read:([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)], TRun  ); 	
 	
-	val = [self read:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0)];
+	val = [self read:   ([self slot] << 24) | (func << 21) | (LAddr0)];
     NSLog(@"reading in HW  postTriggTime  FPGA %i is %i\n",Pixel,val);
 	
 	//	[self write: 0x09c02000 value: EMin];
@@ -3213,7 +3213,9 @@ clean_up_mark:
         DebugHistoTB(  if(currVal) NSLogFont(aFont,@"    bin %4u: %6u \n",i , currVal); 	 )
         //[[histogramData objectAtIndex:i] setIntValue:currVal];
         // obsolete - if(histogramDataUI) histogramDataUI[i]= currVal;
-        if(histogramData) dataPtr[i]= currVal;
+        if(dataPtr!=0) {
+                dataPtr[i]= currVal;
+        }
         // obsolete - if(histogramMutableData){ ((unsigned int*)[histogramMutableData mutableBytes])[i]=currVal;}
     }
     DebugHistoTB(  NSLogFont(aFont,@"sum (of page %i): %4u \n",thepage,sum); 	)

@@ -44,16 +44,17 @@
         mAddress = [ aModel primaryAddress ];
         mChannel = aChannel;
         mData = nil;
+        
+        mHeaderBaseInfo[0] = [ aModel dataId ];
+        mHeaderBaseInfo[1] = ( [ aModel primaryAddress ] & 0xF ) << 23 | ( mChannel & 0xF ) << 19;
+        
+        mHeaderBaseGtidInfo[0] = [ aModel gtidDataId ];		// Gtid
+        
+        
+        mHeaderBaseTimeInfo = [ aModel clockDataId ];
+
     }
     
-    
-    mHeaderBaseInfo[0] = [ aModel dataId ];
-    mHeaderBaseInfo[1] = ( [ aModel primaryAddress ] & 0xF ) << 23 | ( mChannel & 0xF ) << 19;
-
-    mHeaderBaseGtidInfo[0] = [ aModel gtidDataId ];		// Gtid
-
-                      
-    mHeaderBaseTimeInfo = [ aModel clockDataId ];
                         
                               
     return self;
