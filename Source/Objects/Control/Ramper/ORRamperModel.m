@@ -34,7 +34,7 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 #pragma mark •••Initialization
 - (id) init
 {
-	[super init];
+	self=[super init];
 	[self ensureMinimumNumberOfRampItems];
 	return self;
 }

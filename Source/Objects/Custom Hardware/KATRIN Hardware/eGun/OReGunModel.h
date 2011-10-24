@@ -44,10 +44,9 @@
 		float			excursion;
 		float			decayRate;
 		float			decayTime;
-		int				state;
-    NSString* stateString;
-    float overshoot;
-    float stepTime;
+        NSString*       stateString;
+        float           overshoot;
+        float           stepTime;
  }
 
 #pragma mark ***Initialization

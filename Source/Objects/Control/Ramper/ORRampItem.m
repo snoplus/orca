@@ -1074,7 +1074,7 @@ NSString* ORWayPointChanged = @"ORWayPointChanged";
 
 - (id) initWithPosition:(NSPoint)aPoint
 {
-	[super init];
+	self=[super init];
 	[self setXyPosition:aPoint];
 	return self;
 }

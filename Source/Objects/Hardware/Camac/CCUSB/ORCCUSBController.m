@@ -242,10 +242,10 @@
 - (void) nafModBitsChanged:(NSNotification*)aNote
 {
 	short mask = [model nafModBits];
-	short i;
-	for(i=0;i<1;i++){
+	short i=0;
+	//for(i=0;i<1;i++){
 		[[nafModBitsMatrix cellWithTag:i] setState:mask&(1<<i)];
-	}
+	//}
 	[self setButtonStates];
 }
 
@@ -858,6 +858,7 @@
     }
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model setLastStackFilePath:[[savePanel URL]path]];
