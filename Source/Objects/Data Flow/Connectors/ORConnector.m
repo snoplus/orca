@@ -47,7 +47,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 
 - (id) initAt:(NSPoint)aPoint withGuardian:(id)aGuardian
 {
-    [self initAt:aPoint withGuardian:aGuardian withObjectLink:aGuardian];
+    self = [self initAt:aPoint withGuardian:aGuardian withObjectLink:aGuardian];
     return self;
 }
 
