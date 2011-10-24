@@ -337,11 +337,10 @@
 
 -(id) initWithOwner:(ORXYCom200Controller*)anOwner chipIndex:(int)anIndex 
 {
-    if ([super init]){	
-		owner = anOwner;
-		chipIndex = anIndex;
-        [NSBundle loadNibNamed:@"PISlashTChip" owner:self];
-	}
+    self=[super init];
+    owner = anOwner;
+    chipIndex = anIndex;
+    [NSBundle loadNibNamed:@"PISlashTChip" owner:self];
     return self;
 }
 
