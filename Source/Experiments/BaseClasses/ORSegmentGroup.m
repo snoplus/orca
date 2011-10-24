@@ -34,7 +34,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 #pragma mark •••Initialization
 - (id) initWithName:(NSString*)aName numSegments:(int)numSegments mapEntries:(NSArray*)someMapEntries;
 {
-	[super init];
+	self=[super init];
 	
     [[self undoManager] disableUndoRegistration];
 

@@ -22,7 +22,7 @@
 
 - (id)initWithFrame:(NSRect)frameRect
 {
-	[super initWithFrame:frameRect];
+	self=[super initWithFrame:frameRect];
 	[self makeAllSegments];
 	selectedSet		= -1;
 	selectedPath    = -1;
