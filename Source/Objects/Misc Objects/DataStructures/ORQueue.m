@@ -19,7 +19,7 @@
 
 -(id)init
 {
-    [super init];
+    self = [super init];
     list = [[ORLinkedList alloc] init];
     return self;
 }

@@ -42,7 +42,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 
 - (id)init
 {
-    if( ![super init] )
+    if( !(self = [super init]) )
 		return nil;
     
     // Initialize some values
@@ -60,8 +60,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 
 - (id)initWithNativeSocket:(int)inNativeSocket
 {
-    if( ![self init] )
-		return nil;
+    self = [self init];
     
     // Create CFSocketRef based on specified native socket
     [self _cfsocketCreateForNative:inNativeSocket];

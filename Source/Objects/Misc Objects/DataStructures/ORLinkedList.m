@@ -35,7 +35,7 @@
         withTail:(struct LLNode *)endMarker
         forward:(BOOL)dir
 {
-    [super init];
+    self=[super init];
     
     header = beginMarker;
     tail = endMarker;
@@ -122,7 +122,7 @@ instance vars of ORLinkedList:
 
 -(id)init
 {
-    [super init];
+    self=[super init];
     
     ///set up the markers pointing to each other    
     beginMarker = malloc(NODESIZE);

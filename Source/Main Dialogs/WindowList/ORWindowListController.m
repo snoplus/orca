@@ -33,7 +33,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(WindowListController);
 
 -(id)init
 {
-    [super initWithWindowNibName:@"WindowList"];
+    self=[super initWithWindowNibName:@"WindowList"];
 	[self setWindowFrameAutosaveName:@"WindowList"];
     return self;
 }

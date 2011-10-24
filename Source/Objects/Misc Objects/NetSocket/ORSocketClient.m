@@ -26,8 +26,7 @@
 @implementation ORSocketClient
 - (id)initWithNetSocket:(NetSocket*)insocket
 {
-	if( ![super init] )
-		return nil;
+	self=[super init];
 	
 	socket = [insocket retain];
 	

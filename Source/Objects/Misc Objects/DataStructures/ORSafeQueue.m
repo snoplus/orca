@@ -19,7 +19,7 @@
 
 -(id)init
 {
-    [super init];
+    self=[super init];
     queueLock = [[NSRecursiveLock alloc] init];
     return self;
 }

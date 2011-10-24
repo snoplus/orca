@@ -31,7 +31,7 @@
 #pragma mark ¥¥¥Initialization
 - (id) initWithFrame:(NSRect)frameRect
 {
-	[super initWithFrame:frameRect];
+	self=[super initWithFrame:frameRect];
 	[self setImagePosition:NSImageOnly];
 	[self setBordered:NO];
 	return self;

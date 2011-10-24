@@ -92,7 +92,7 @@ return self; \
 return 0xffffffff; \
 } \
 \
-- (void)release \
+- (oneway void)release \
 { \
 } \
 \
