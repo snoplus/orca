@@ -82,7 +82,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 #pragma mark ***Initialization
 - (id) init
 {
-	[super init];
+	self=[super init];
  //   [[self undoManager] disableUndoRegistration];
 //	[self registerNotificationObservers];
 //    [[self undoManager] enableUndoRegistration];

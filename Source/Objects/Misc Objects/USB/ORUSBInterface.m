@@ -40,7 +40,7 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 
 - (id) init
 {
-	[super init];
+	self=[super init];
 	interface = nil;
 	tag = 5;
 	usbLock = [[NSRecursiveLock alloc] init];
@@ -203,11 +203,13 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 
 - (void) startReadingInterruptPipe
 {
-	UInt8 pipe = inPipes[0];
+	UInt8 pipe;
 	if(transferType == kUSBBulk)		 pipe = inPipes[0];
 	else if(transferType == kUSBInterrupt) pipe = interruptInPipes[0];
-	
-	IOReturn kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
+	else pipe  = inPipes[0];
+    
+	IOReturn kr;
+    (*interface)->ClearPipeStallBothEnds(interface, pipe);
 	kr = (*interface)->ResetPipe(interface,pipe);
 
 	//startUp Interrupt handling
@@ -251,10 +253,11 @@ readon:
 - (void) writeString:(NSString*)aCommand
 {
 	[usbLock lock];
-	UInt8 pipe = outPipes[0];
+	UInt8 pipe;
 	if(transferType == kUSBBulk)		 pipe = outPipes[0];
 	else if(transferType == kUSBInterrupt) pipe = interruptOutPipes[0];
-	
+	else pipe  = outPipes[0];
+    
 	char* p = (char*)[aCommand cStringUsingEncoding:NSASCIIStringEncoding];
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, p, strlen(p));
 	if(kr)	{
@@ -420,10 +423,10 @@ readon:
 	int result;
     [usbLock lock];
 	unsigned long actualRead = amountRead;
-	UInt8 pipe = inPipes[0];
+	UInt8 pipe;
 	if(transferType == kUSBBulk)		 pipe = inPipes[0];
 	else if(transferType == kUSBInterrupt) pipe = interruptInPipes[0];
-	
+	else pipe = inPipes[0];
 	IOReturn kr = (*interface)->ReadPipe(interface, pipe, bytes, &actualRead);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
@@ -455,10 +458,10 @@ readon:
 {
 	int result;
 	unsigned long actualRead = amountRead;
-	UInt8 pipe = inPipes[0];
+	UInt8 pipe;
 	if(transferType == kUSBBulk)		 pipe = inPipes[0];
 	else if(transferType == kUSBInterrupt) pipe = interruptInPipes[0];
-	
+	else pipe = inPipes[0];
 	IOReturn kr = (*interface)->ReadPipe(interface, pipe, bytes, &actualRead);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
@@ -486,9 +489,11 @@ readon:
 - (void) writeBytesOnInterruptPipe:(void*)bytes length:(int)length
 {
 	[usbLock lock];
-	UInt8 pipe = outPipes[0];
+	UInt8 pipe;
 	if(transferType == kUSBBulk)		 pipe = outPipes[0];
 	else if(transferType == kUSBInterrupt) pipe = interruptOutPipes[0];	
+    else pipe = outPipes[0];
+    
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, bytes, length);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);

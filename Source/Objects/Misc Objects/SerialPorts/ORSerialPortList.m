@@ -161,7 +161,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 		[portList removeAllObjects];
 	} 
     else {
-		[super init];
+		self=[super init];
 		portList = [[NSMutableArray array] retain];
 	}
 		[self findSerialPorts:&serialPortIterator];
