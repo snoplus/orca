@@ -31,6 +31,7 @@
 	IBOutlet NSButton*		calibrateButton;
 	IBOutlet NSTableView*   calibrationTableView;
 	IBOutlet NSTextField*	unitsField;
+	IBOutlet NSTextField*	labelField;
 	IBOutlet NSTextField*	nameField;
 	IBOutlet NSButton*		cancelButton;
 	IBOutlet NSButton*		applyButton;
@@ -68,6 +69,7 @@
 	double			slope;
 	double			intercept;
 	NSString*		units;
+	NSString*		label;
 	BOOL			calibrationValid;
 	BOOL			ignoreCalibration;
 	int				type;
@@ -84,6 +86,8 @@
 - (BOOL) useCalibration;
 - (NSString*) units;
 - (void) setUnits:(NSString*)unitString;
+- (NSString*) label;
+- (void) setLabel:(NSString*)aString;
 - (void) setCalibrationName:(NSString*)nameString;
 - (NSString*) calibrationName;
 - (void) setType:(int)aType;

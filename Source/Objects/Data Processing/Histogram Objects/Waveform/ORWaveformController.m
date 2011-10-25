@@ -28,9 +28,13 @@
 #import "ORPlotView.h"
 #import "ORPlotWithROI.h"
 #import "ORCompositePlotView.h"
+#import "ORCalibration.h"
+
+@interface ORWaveformController (private)
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+@end
 
 @implementation ORWaveformController
-
 #pragma mark ¥¥¥Initialization
 -(id)init
 {
@@ -108,6 +112,17 @@
 	[plotView copy:sender];
 }
 
+- (IBAction) calibrate:(id)sender
+{
+	NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
+								  model , @"ObjectToUpdate",
+								  nil];
+	calibrationPanel = [[ORCalibrationPane calibrateForWindow:[self window] 
+												modalDelegate:self 
+											   didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
+												  contextInfo:aContextInfo] retain];
+}
+
 #pragma mark ¥¥¥Data Source
 
 - (void) plotOrderDidChange:(id)aPlotView
@@ -163,3 +178,15 @@
 }
 
 @end
+
+@implementation ORWaveformController (private)
+
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	[calibrationPanel release];
+	calibrationPanel = nil;
+	[plotView setNeedsDisplay:YES];
+}
+
+@end
+

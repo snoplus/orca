@@ -30,6 +30,7 @@
 	IBOutlet NSView*		fitView;
 	IBOutlet NSView*		fftView;
 	IBOutlet NSButton*		useUnsignedValuesButton;
+	id						calibrationPanel;				
     OR1dRoiController*		roiController;
 	OR1dFitController*		fitController;
 	ORFFTController*		fftController;
@@ -44,6 +45,7 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) useUnsignedValuesAction:(id)sender;
+- (IBAction) calibrate:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (BOOL) useUnsignedValues;

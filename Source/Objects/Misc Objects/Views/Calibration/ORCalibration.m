@@ -57,6 +57,7 @@
 		[calibrationTableView reloadData];
 		
 		[unitsField setStringValue:[aCalibration units]];
+		[labelField setStringValue:[aCalibration label]];
 		[nameField setStringValue:[aCalibration calibrationName]];
 		[ignoreButton setIntValue:[aCalibration ignoreCalibration]];
 		[catalogButton setIntValue:[aCalibration type]];
@@ -72,6 +73,7 @@
 	else {
 
 		[unitsField setStringValue:@"keV"];
+		[labelField setStringValue:@"Energy"];
 		[ignoreButton setIntValue:NO];
 		[nameField setStringValue:@""];
 		[catalogButton setIntValue:0];
@@ -102,6 +104,7 @@
 
 	ORCalibration* cal		= [[ORCalibration alloc] initCalibrationArray:calibrationArray];
 	[cal setUnits:[unitsField stringValue]];
+	[cal setLabel:[labelField stringValue]];
 	[cal setCalibrationName:[nameField stringValue]];
 	[cal setType:![customButton intValue]];
 	[cal setIgnoreCalibration:[ignoreButton intValue]];
@@ -149,6 +152,7 @@
 	[addPtButton	 setEnabled: [customButton intValue]  == 1];
 	[removePtButton  setEnabled: [customButton intValue]  == 1];
 	[unitsField   setEnabled: [customButton intValue]  == 1];
+	[labelField   setEnabled: [customButton intValue]  == 1];
 	[nameField    setEnabled: [customButton intValue]  == 1 && [storeButton intValue] == 1];
 	[storeButton  setEnabled: [customButton intValue]  == 1];
 	
@@ -369,6 +373,20 @@
 	units = [unitString copy];
 }
 
+
+- (NSString*) label
+{
+	if(!label)return @"Energy";
+	else return label;
+}
+
+- (void) setLabel:(NSString*)aString
+{
+	if(!aString) label = @"Energy";
+	[label autorelease];
+	label = [aString copy];
+}
+
 - (void) setCalibrationName:(NSString*)nameString
 {
 	if(!nameString) nameString = @"";
@@ -418,6 +436,7 @@
 	}
 	
 	[self setUnits:				[decoder decodeObjectForKey:@"units"]];
+	[self setLabel:				[decoder decodeObjectForKey:@"label"]];
 	[self setIgnoreCalibration:	[decoder decodeBoolForKey:@"ignoreCalibration"]];
 	[self setCalibrationName:	[decoder decodeObjectForKey:@"calibrationName"]];
 	[self setType:				[decoder decodeIntForKey:@"type"]];
@@ -429,6 +448,7 @@
 {
     [encoder encodeObject:calibrationArray	forKey: @"calibrationArray"];
 	[encoder encodeObject:units				forKey:@"units"];
+	[encoder encodeObject:label				forKey:@"label"];
 	[encoder encodeBool:ignoreCalibration	forKey:@"ignoreCalibration"];
 	[encoder encodeObject:calibrationName	forKey:@"calibrationName"];
 	[encoder encodeInt:type					forKey:@"type"];

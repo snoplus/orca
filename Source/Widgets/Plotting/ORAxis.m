@@ -53,7 +53,7 @@ NSString* kDefFont = @"Helvetica";
 #define	kYNumberRightEdge	    (-kLongTickLength - 3)	// y-label dx (right edge)
 #define	kYNumberCenter		    0						// y-label dy (center)
 #define	kXAxisRoomLeft		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2)		// room needed left of x axis
-#define	kXAxisRoomRight		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2)		// room needed right of x axis
+#define	kXAxisRoomRight		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2+5)		// room needed right of x axis
 #define	kYAxisRoomAbove		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room above y axis
 #define	kYAxisRoomBelow		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room below y axis
 #define	kXNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].width * 7/3)      // optimal x scale label sep
@@ -689,9 +689,10 @@ enum {
 		id theCalibration = [self calibration];
 		if([theCalibration useCalibration]){
 			NSString* calibrationUnits = [theCalibration units];
+			NSString* calibrationLabel = [theCalibration label];
 			if([calibrationUnits length]){
 				if ([label length]) label = [label stringByAppendingFormat:@"(%@)",calibrationUnits];
-				else				label = [NSString stringWithFormat:@"Energy (%@)",calibrationUnits];
+				else				label = [NSString stringWithFormat:@"%@ (%@)",calibrationLabel,calibrationUnits];
 			}
 		}
 	}
