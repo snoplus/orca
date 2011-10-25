@@ -29,7 +29,6 @@
 	IBOutlet NSButton*      readButton;
 	IBOutlet NSButton*      resetButton;
 	IBOutlet NSButton*      sysResetButton;
-	IBOutlet NSButton*      testButton;
 	IBOutlet NSStepper* 	addressStepper;
 	IBOutlet NSTextField* 	addressValueField;
 	IBOutlet NSStepper* 	writeValueStepper;
