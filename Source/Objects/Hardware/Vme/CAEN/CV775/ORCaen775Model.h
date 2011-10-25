@@ -28,6 +28,9 @@
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 
+// Bit Set 2 Register Masks
+#define kDefaultBitSet2	0x4888
+
 // Declaration of constants for module.
 enum {
 	kOutputBuffer,
