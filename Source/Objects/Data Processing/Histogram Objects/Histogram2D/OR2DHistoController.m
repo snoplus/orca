@@ -58,7 +58,7 @@
     minSize.width = 335;
     minSize.height = 335;
     [[self window] setMinSize:minSize];
-	[titleField setStringValue:[model fullNameWithRunNumber]];
+	[plotView setPlotTitle:[model fullNameWithRunNumber]];
 	
 	[plotView setShowGrid: NO];
 	OR2DHistoPlot* aPlot = [[OR2DHistoPlot alloc] initWithTag:0 andDataSource:self];

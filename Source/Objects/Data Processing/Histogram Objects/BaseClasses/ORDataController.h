@@ -24,7 +24,6 @@
     IBOutlet NSDrawer*		analysisDrawer;
 
     IBOutlet NSTextField*   positionField;
-    IBOutlet NSTextField*   titleField;
     IBOutlet NSButton*		hideShowButton;
     IBOutlet NSView*        containingView;
     IBOutlet NSTextField*   pausedField;
@@ -59,7 +58,6 @@
 - (void) openAnalysisDrawer;
 - (void) closeAnalysisDrawer;
 - (BOOL) analysisDrawerIsOpen;
-- (NSTextField*) titleField;
 
 - (IBAction) toggleRaw:(NSToolbarItem*)item;
 - (IBAction) clear:(NSToolbarItem*)item;

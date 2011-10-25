@@ -22,7 +22,6 @@
 #import "ORPlot.h"
 #import "ORAxis.h"
 #import "ORPlotAttributeStrings.h"
-#import "ORPlotPublisher.h"
 
 @implementation ORPlotView
 
@@ -571,13 +570,6 @@
 }
 
 #pragma mark ***Actions
-- (IBAction) publishToPDF:(id)sender
-{	
-	if(viewForPDF){
-		[ORPlotPublisher publishPlot:self];
-	}
-}
-
 - (IBAction)copy:(id)sender
 {	
 	//declare our custom type.

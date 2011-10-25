@@ -53,7 +53,7 @@ NSString* kDefFont = @"Helvetica";
 #define	kYNumberRightEdge	    (-kLongTickLength - 3)	// y-label dx (right edge)
 #define	kYNumberCenter		    0						// y-label dy (center)
 #define	kXAxisRoomLeft		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2)		// room needed left of x axis
-#define	kXAxisRoomRight		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2+5)		// room needed right of x axis
+#define	kXAxisRoomRight		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2+8)		// room needed right of x axis
 #define	kYAxisRoomAbove		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room above y axis
 #define	kYAxisRoomBelow		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room below y axis
 #define	kXNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].width * 7/3)      // optimal x scale label sep
@@ -103,6 +103,7 @@ NSString* ORAxisAllowShifts			= @"ORAxisAllowShifts";
 NSString* ORAxisFont				= @"ORAxisFont";
 NSString* ORAxisLabel				= @"ORAxisLabel";
 NSString* ORAxisMarker				= @"kMarker";
+NSString* ORAxisTempLabel			= @"ORAxisTempLabel";
 
 
 NSString* kDefaultXAxisPrefs		= @".xaxis";
@@ -672,6 +673,15 @@ enum {
     [attributes setObject:[NSNumber numberWithDouble:aValue] forKey:ORAxisMaxSave];
 }
 
+- (void) setTempLabel:(NSString*)aString
+{
+	if(!aString)[attributes removeObjectForKey:ORAxisTempLabel];
+    else [attributes setObject:aString forKey:ORAxisTempLabel];
+	[self adjustSize:labelAttributes];
+	[self setNeedsDisplay:YES]; 
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAxisLabelChangedNotification object:self userInfo: nil];
+}
+
 - (void) setLabel:(NSString*)aString
 {
 	if(!aString)aString = @"";
@@ -681,19 +691,31 @@ enum {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORAxisLabelChangedNotification object:self userInfo: nil];
 }
 
-- (NSString*) label
+- (NSString*) units
 {
-	NSString* label = [attributes objectForKey:ORAxisLabel];
 	if([self isXAxis]){
 		//there may be a calibration in place, it might have units
 		id theCalibration = [self calibration];
 		if([theCalibration useCalibration]){
 			NSString* calibrationUnits = [theCalibration units];
+			if([calibrationUnits length])return calibrationUnits;
+			else return @"";
+		}
+		else return @"";
+	}
+	else return @"";
+}
+
+- (NSString*) label
+{	
+	NSString* label = [attributes objectForKey:ORAxisLabel];
+	if([self isXAxis]){
+		//there may be a calibration in place
+		id theCalibration = [self calibration];
+		if([theCalibration useCalibration]){
 			NSString* calibrationLabel = [theCalibration label];
-			if([calibrationUnits length]){
-				if ([label length]) label = [label stringByAppendingFormat:@"(%@)",calibrationUnits];
-				else				label = [NSString stringWithFormat:@"%@ (%@)",calibrationLabel,calibrationUnits];
-			}
+			if([calibrationLabel length]) return calibrationLabel;
+			else return @"";
 		}
 	}
 	if(!label)return @"";
@@ -1287,11 +1309,16 @@ enum {
 - (void) drawTitle
 {
 	[[NSColor blackColor] set];
-	NSString* label = [self label];
-	
+	NSString* label;
+	NSString* tempLabel = [attributes objectForKey:ORAxisTempLabel];
+	if([tempLabel length])label = tempLabel;
+	else {
+		label = [self label];
+		NSString* units = [self units];
+		if([units length])label = [label stringByAppendingFormat:@"(%@)",units];
+	}
 	BOOL isOpposite = [self oppositePosition];
 	if([self isXAxis]){
-		NSString* label = [self label];
 		NSSize labelSize = [label sizeWithAttributes:labelAttributes];
 		float xc = [self frame].size.width/2;
 		if(isOpposite) [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,[self frame].size.height - labelSize.height) withAttributes:labelAttributes];
@@ -1999,8 +2026,14 @@ enum {
     NSPoint newOrigin;
     NSSize	newSize;
     NSRect  oldFrame = [self frame];
-	NSString* label = [self label];
-	
+	NSString* label;
+	NSString* tempLabel = [attributes objectForKey:ORAxisTempLabel];
+	if(tempLabel){
+		if([tempLabel length])label = tempLabel;
+		else label = @" ";
+	}
+	else label = [self label];
+	   
     int titleHeight = 0;
 	if([label length]) titleHeight		= [label sizeWithAttributes:oldLabelAttributes].height;
 	

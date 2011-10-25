@@ -21,6 +21,7 @@
 #import "ORPlotPublisher.h"
 #import "ORPlot.h"
 #import "ORPlotView.h"
+#import "ORCompositePlotView.h"
 
 #define kPlotPublisherDefaultFile @"orca.plotpublisher.defaultsavesetFile"
 
@@ -60,7 +61,7 @@
 - (id) initWithPlot:(id)aPlot 
 {
     self = [super initWithWindowNibName:@"PlotPublisher"];
-	plotView = aPlot;
+	compositePlotView= aPlot;
 	return self;
 }
 
@@ -86,31 +87,37 @@
 	if(!startingFile)startingFile = @"---";
 	[saveSetField setStringValue:startingFile];
 	
-//	if([plotter isKindOfClass:NSClassFromString(@"ORPlotter2D")]){
-//		[dataSetField setEnabled:NO];
-//		[colorWell setEnabled:NO];
-//		[[optionMatrix cellWithTag:kPlotPublisherUseGridOption] setEnabled:NO];
-//	}
-	[dataSetField setIntValue:0];
-	[colorWell setColor:[[plotView plot:0] lineColor]];
+	if([[[compositePlotView plotView] plot:0] isKindOfClass:NSClassFromString(@"OR2DHistoPlot")]){
+		[dataSetField setEnabled:NO];
+		[colorWell setEnabled:NO];
+		[[optionMatrix cellWithTag:kPlotPublisherUseGridOption] setEnabled:NO];
+	}
 
-	[previewImage setImage: [[[NSImage alloc] initWithData: [plotView plotAsPDFData]] autorelease]];
+	else if([compositePlotView isKindOfClass:NSClassFromString(@"ORCompositeMultiPlotView")]){
+		[[labelMatrix cellWithTag:2] setEnabled:NO];
+		[[optionMatrix cellWithTag:3] setEnabled:NO];
+	}
+	
+	[dataSetField setIntValue:0];
+	[colorWell setColor:[[compositePlotView plot:0] lineColor]];
+
+	[previewImage setImage: [[[NSImage alloc] initWithData: [compositePlotView plotAsPDFData]] autorelease]];
 }
 
 - (void) beginSheet
 {
 	[self retain];
-	oldAttributes	= [[plotView attributes] mutableCopy];
-	oldXLabel		= [[[plotView xScale] label] copy];
-	oldYLabel		= [[[plotView yScale] label] copy];
-	oldTitle		= [[[plotView titleField] stringValue] copy];
+	oldAttributes	= [[[compositePlotView plotView] attributes] mutableCopy];
+	oldXLabel		= [[[compositePlotView xAxis] label] copy];
+	oldYLabel		= [[[compositePlotView yAxis] label] copy];
+	oldTitle		= [[[compositePlotView titleField] stringValue] copy];
 	
-	[plotView setBackgroundColor:[NSColor whiteColor]];
-	[plotView setGridColor:[NSColor whiteColor]];
+	[compositePlotView setBackgroundColor:[NSColor whiteColor]];
+	[compositePlotView setGridColor:[NSColor whiteColor]];
 	
-	[plotView setUseGradient:NO];
+	[compositePlotView setUseGradient:NO];
 	
-    [NSApp beginSheet:[self window] modalForWindow:[plotView window] modalDelegate:self didEndSelector:@selector(_publishingDidEnd:returnCode:contextInfo:) contextInfo:nil];
+    [NSApp beginSheet:[self window] modalForWindow:[compositePlotView window] modalDelegate:self didEndSelector:@selector(_publishingDidEnd:returnCode:contextInfo:) contextInfo:nil];
 }
 
 - (IBAction) publish:(id)sender
@@ -128,46 +135,50 @@
 - (IBAction) labelingOptionsAction: (id) sender
 {
 	if([[optionMatrix cellWithTag:kPlotPublisherXLabelOption] intValue]) {
-		[[plotView xScale] setLabel:[[labelMatrix cellWithTag:kPlotPublisherXLabel] stringValue]];
+		NSString* s = [[labelMatrix cellWithTag:kPlotPublisherXLabel] stringValue];
+		if([s length]==0)[compositePlotView setXTempLabel:@" "];
+		else			 [compositePlotView setXTempLabel:s];
 	}
-	else [[plotView xScale] setLabel:@""];
+	else [compositePlotView setXTempLabel:nil];
 	
 	if([[optionMatrix cellWithTag:kPlotPublisherYLabelOption] intValue]) {
-		[[plotView yScale] setLabel:[[labelMatrix cellWithTag:kPlotPublisherYLabel] stringValue]];
+		NSString* s = [[labelMatrix cellWithTag:kPlotPublisherYLabel] stringValue];
+		if([s length]==0)[compositePlotView setYTempLabel:@" "];
+		else			 [compositePlotView setYTempLabel:s];
 	}
-	else [[plotView yScale] setLabel:@""];
+	else [compositePlotView setYTempLabel:nil];
 
 	if([[optionMatrix cellWithTag:kPlotPublisherUseTitleOption] intValue]) {
-		[[plotView titleField] setStringValue:[[labelMatrix cellWithTag:kPlotPublisherTitle] stringValue]];
+		[compositePlotView setPlotTitle:[[labelMatrix cellWithTag:kPlotPublisherTitle] stringValue]];
 	}
-	else [[plotView titleField] setStringValue:@""];
+	else [compositePlotView setPlotTitle:@""];
 	
 	
-	if([[optionMatrix cellWithTag:kPlotPublisherUseGridOption] intValue]) [plotView setGridColor:[NSColor grayColor]];
-	else [plotView setGridColor:[NSColor whiteColor]];
+	if([[optionMatrix cellWithTag:kPlotPublisherUseGridOption] intValue]) [compositePlotView setGridColor:[NSColor grayColor]];
+	else [compositePlotView setGridColor:[NSColor whiteColor]];
 	
-	[previewImage setImage: [[[NSImage alloc] initWithData: [plotView plotAsPDFData]] autorelease]];
+	[previewImage setImage: [[[NSImage alloc] initWithData: [compositePlotView plotAsPDFData]] autorelease]];
 
 }
 
 - (IBAction) dataSetAction: (id) sender
 {
 	int i = [dataSetField intValue];
-	int maxPlots = [plotView numberOfPlots];
+	int maxPlots = [compositePlotView numberOfPlots];
 	if(i < 0) i = 0;
 	else if(i>maxPlots-1)i = maxPlots-1;
 	
 	[dataSetField setIntValue:i];
-	[colorWell setColor:[[plotView plot:i] lineColor]];
+	[colorWell setColor:[[compositePlotView plot:i] lineColor]];
 }
 
 - (IBAction) colorOptionsAction: (id) sender
 {
 	int i = [dataSetField intValue];
-	[[plotView plot:i] saveColor];
-	[[plotView plot:i] setLineColor:[colorWell color]];
-	[plotView setNeedsDisplay:YES];
-	[previewImage setImage: [[[NSImage alloc] initWithData: [plotView plotAsPDFData]] autorelease]];
+	[[compositePlotView plot:i] saveColor];
+	[[compositePlotView plot:i] setLineColor:[colorWell color]];
+	[compositePlotView setNeedsDisplay:YES];
+	[previewImage setImage: [[[NSImage alloc] initWithData: [compositePlotView plotAsPDFData]] autorelease]];
 }
 
 - (IBAction) saveSetAction:(id) sender
@@ -270,8 +281,9 @@
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString* savePath = [[savePanel URL]path];
-            NSData* pdfData = [plotView plotAsPDFData];
+            NSData* pdfData = [compositePlotView plotAsPDFData];
             [pdfData writeToFile:[savePath stringByExpandingTildeInPath] atomically:NO];
+			[self finish];
        }
     }];
     
@@ -279,7 +291,7 @@
 
     [savePanel beginSheetForDirectory:NSHomeDirectory()
 								 file:@"Plot.pdf"
-					   modalForWindow:[plotView window]
+					   modalForWindow:[compositePlotView window]
 						modalDelegate:self
 					   didEndSelector:@selector(_saveFileDidEnd:returnCode:contextInfo:)
 						  contextInfo:nil];
@@ -292,10 +304,10 @@
 		[self dumpAndStore];
 	}
 	else [self finish];
-	int maxPlots = [plotView numberOfPlots];
+	int maxPlots = [compositePlotView numberOfPlots];
 	int i;
 	for(i=0;i<maxPlots;i++){
-		[[plotView plot:i] restoreColor];
+		[[compositePlotView plot:i] restoreColor];
 	}
 }
 
@@ -304,7 +316,7 @@
 {
     if(returnCode){
         NSString* savePath = [sheet filename];
-		NSData* pdfData = [plotView plotAsPDFData];
+		NSData* pdfData = [compositePlotView plotAsPDFData];
 		[pdfData writeToFile:[savePath stringByExpandingTildeInPath] atomically:NO];
     }
 	[self finish];
@@ -313,11 +325,11 @@
 
 - (void) finish
 {
-	[plotView setAttributes:oldAttributes];
-	[[plotView xScale] setLabel:oldXLabel];
-	[[plotView yScale] setLabel:oldYLabel];
-	[[plotView titleField] setStringValue:oldTitle];
-	[plotView setNeedsDisplay:YES];
+	[(ORPlotView*)[compositePlotView plotView] setAttributes: oldAttributes];
+	[compositePlotView setXTempLabel:nil];
+	[compositePlotView setYTempLabel:nil];
+	[compositePlotView setPlotTitle:oldTitle];
+	[compositePlotView setNeedsDisplay:YES];
 	if([NSColorPanel sharedColorPanelExists]){
 		[[NSColorPanel sharedColorPanel] orderOut:self];
 	}
@@ -372,7 +384,7 @@
 	[newAttributes setObject:[NSNumber numberWithInt:[dataSetField intValue]] forKey:@"colorIndex"];
 	
 	NSMutableArray* colorArray = [NSMutableArray array];
-	int n = [plotView numberOfPlots];
+	int n = [compositePlotView numberOfPlots];
 	int i;
 	for(i=0;i<n;i++){
 		//id aColor = [NSArchiver archivedDataWithRootObject: [plotter colorForDataSet:i]];

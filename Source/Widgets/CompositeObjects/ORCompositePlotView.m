@@ -28,10 +28,11 @@
 #import "ORDataSetModel.h"
 #import "ORColorBar.h"
 #import "ORRamperView.h"
+#import "ORPlotPublisher.h"
 
 @implementation ORCompositePlotView
 
-@synthesize showLegend,xAxis,yAxis,plotView,delegate,legend;
+@synthesize showLegend,xAxis,yAxis,plotView,delegate,legend,titleField;
 
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
@@ -47,6 +48,7 @@
 	[yAxis release];
 	[legend release];
 	[plotView release];
+	[titleField release];
 	[super dealloc];
 }
 
@@ -71,6 +73,7 @@
 - (void) setUpViews
 {
 	//set up the *rough* positions of the various parts
+	[self makeTitle];
 	[self makeYAxis];
 	[self makeXAxis];
 	[self makePlotView];
@@ -78,11 +81,28 @@
 	
 	[plotView setXScale:xAxis];
 	[plotView setYScale:yAxis];
+	
 	[legend setPlotView:plotView];
 	[yAxis setViewToScale:plotView];
 	[xAxis setViewToScale:plotView];
 	
 	[self adjustPositionsAndSizes];
+}
+
+- (void) makeTitle
+{
+	//do the title -- size will be fixed when we know more
+	NSRect plotRect = [self bounds];
+	NSTextField* aTitleField = [[NSTextField alloc] initWithFrame:NSMakeRect(0,plotRect.size.height,0,plotRect.size.width)];
+	[aTitleField setEditable:NO];
+	[aTitleField setSelectable:NO];
+	[aTitleField setBordered:NO];
+	[aTitleField setAlignment:NSCenterTextAlignment];
+	[aTitleField setBackgroundColor:[NSColor clearColor]];
+	[aTitleField setAutoresizingMask:NSViewMinXMargin | NSViewMaxXMargin];
+	[self addSubview:aTitleField];
+	self.titleField = aTitleField;
+	[aTitleField release];
 }
 
 - (void) makeXAxis
@@ -135,11 +155,21 @@
 - (void) adjustPositionsAndSizes
 {
 	[xAxis checkForCalibrationAdjustment];
+	[yAxis checkForCalibrationAdjustment];
 
 	NSRect xAxisRect = [xAxis bounds];
 	NSRect yAxisRect = [yAxis bounds];
 	NSRect legendRect= [legend bounds];
 	
+	float titleHeight;
+	if([[titleField stringValue]length]) {
+		titleHeight = [[titleField font] pointSize]+3; 
+		[titleField setFrame:NSMakeRect(0,[self bounds].size.height-titleHeight,[self bounds].size.width,titleHeight)];
+	}
+	else {
+		titleHeight = 0;
+		[titleField setFrame:NSMakeRect(0,[self bounds].size.height,[self bounds].size.width,0)];
+	}
 	float widthOfYAxis	= yAxisRect.size.width;
 	float heightOfXAxis = xAxisRect.size.height;
 		
@@ -147,7 +177,7 @@
 	[yAxis setFrame:NSMakeRect(0,
 							   heightOfXAxis,
 							   widthOfYAxis,
-							   [self bounds].size.height-heightOfXAxis) ];
+							   [self bounds].size.height-heightOfXAxis-titleHeight) ];
 	
 	//adjust position of xAxis to be on the right, against the bottom
 	float legendXDelta = 0;
@@ -174,10 +204,23 @@
 					
 }
 
+
 - (void) setShowLegend:(BOOL)state
 {
 	showLegend = state;
 	[legend setUpLegend];
+	[self adjustPositionsAndSizes];
+}
+
+- (void) setXTempLabel:(NSString*)aLabel
+{
+	[xAxis setTempLabel:aLabel];
+	[self adjustPositionsAndSizes];
+}
+
+- (void) setYTempLabel:(NSString*)aLabel
+{
+	[yAxis setTempLabel:aLabel];
 	[self adjustPositionsAndSizes];
 }
 
@@ -191,6 +234,12 @@
 {
 	[yAxis setLabel:aLabel];
 	[self adjustPositionsAndSizes];
+}
+
+- (void) setPlotTitle:(NSString*)aTitle
+{
+	[titleField setStringValue:aTitle];
+	[self adjustPositionsAndSizes];	
 }
 
 #pragma mark •••Pass-thru Methods
@@ -214,6 +263,7 @@
 }
 - (void) setShowGrid:(BOOL)aFlag				{ [plotView setShowGrid:aFlag];}
 - (void) setBackgroundImage:(NSImage*)anImage	{ [plotView setBackgroundImage:anImage];}
+- (void) setGridColor:(NSColor*)aColor			{ [plotView setGridColor:aColor];}
 
 - (IBAction) zoomIn:(id)sender		 { [xAxis zoomIn:self]; }
 - (IBAction) zoomOut:(id)sender		 { [xAxis zoomOut:self];}
@@ -228,13 +278,23 @@
 - (IBAction) resetScales:(id)sender	 { [plotView resetScales:sender]; } 
 - (IBAction) autoscaleAll:(id)sender { [plotView autoscaleAll:sender]; } 
 
-- (IBAction) publishToPDF:(id)sender { [plotView publishToPDF:sender]; } 
 - (IBAction) refresh:(id)sender		 { [plotView refresh:sender]; } 
 - (IBAction) logLin:(id)sender		 { [plotView logLin:sender]; } 
 - (IBAction) copy:(id)sender		 { [plotView copy:sender]; } 
 - (IBAction) shiftXLeft:(id)sender	 { [xAxis shiftLeft:self]; }
 - (IBAction) shiftXRight:(id)sender	 { [xAxis shiftRight:self]; }
+- (IBAction) publishToPDF:(id)sender
+{	
+	[ORPlotPublisher publishPlot:self];
+}
 
+@end
+
+@implementation ORCompositeMultiPlotView
+- (void) makeTitle
+{
+	//no title here... it's built into the dialog so the user can edit it.
+}
 @end
 
 @implementation ORCompositeTimeLineView

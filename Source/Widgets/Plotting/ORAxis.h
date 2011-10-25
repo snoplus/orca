@@ -124,8 +124,10 @@ long roundToLong(double x);
 - (void) setMinPad:(double)aValue;
 - (double) maxPad;
 - (void) setMaxPad:(double)aValue;
+- (void) setTempLabel:(NSString*)aString;
 - (void) setLabel:(NSString*)aString;
 - (NSString*) label;
+- (NSString*) units;
 - (void) setViewToScale:(id)aView;
 - (double) minSave;
 - (void) setMinSave:(double)aValue;
@@ -187,6 +189,7 @@ extern NSString* ORAxisPadding;
 extern NSString* ORAxisMinSave;
 extern NSString* ORAxisMaxSave;
 extern NSString* ORAxisLabel;
+extern NSString* ORAxisTempLabel;
 extern NSString* ORAxisMarker;
 
 extern NSString* ORAxisAllowShifts;

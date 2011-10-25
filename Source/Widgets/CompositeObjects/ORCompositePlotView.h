@@ -29,8 +29,10 @@
 	id				plotView;
 	id				delegate;
 	BOOL			showLegend;
+	NSTextField*	titleField;
 }
 
+- (void) makeTitle;
 - (void) setUpViews;
 - (void) makeXAxis;
 - (void) makeYAxis;
@@ -49,6 +51,7 @@
 - (void) addPlot:(id)aPlot;
 - (void) setXLabel:(NSString*)aLabel;
 - (void) setYLabel:(NSString*)aLabel;
+- (void) setPlotTitle:(NSString*)aTitle;
 - (ORPlot*) topPlot;
 - (void) removeAllPlots;
 - (void) setComment:(NSString*)aComment;
@@ -56,6 +59,9 @@
 - (void) setPlot:(int)aTag name:(NSString*)aName;
 - (void) setShowGrid:(BOOL)aFlag;
 - (void) setBackgroundImage:(NSImage*)anImage;
+- (void) setGridColor:(NSColor*)aColor;
+- (void) setXTempLabel:(NSString*)aLabel;
+- (void) setYTempLabel:(NSString*)aLabel;
 
 #pragma mark ***Actions
 - (IBAction) setLogX:(id)sender;
@@ -76,14 +82,21 @@
 - (IBAction) zoomXYOut:(id)sender;
 - (IBAction) shiftXLeft:(id)sender;
 - (IBAction) shiftXRight:(id)sender;
+- (IBAction) publishToPDF:(id)sender;
 
 @property (nonatomic,assign) BOOL			showLegend;
+@property (retain) NSTextField*	titleField;
 @property (retain) ORAxis*		xAxis;
 @property (retain) ORAxis*		yAxis;
 @property (retain) id			plotView;
 @property (retain) ORLegend*	legend;
 @property (assign) IBOutlet id  delegate;
 
+@end
+
+@interface ORCompositeMultiPlotView : ORCompositePlotView {
+}
+- (void) makeTitle;
 @end
 
 @interface ORCompositeTimeLineView : ORCompositePlotView {

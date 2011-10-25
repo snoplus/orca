@@ -138,7 +138,6 @@
 - (IBAction) autoScaleX:(id)sender;
 - (IBAction) autoScaleY:(id)sender;
 - (IBAction) autoScaleZ:(id)sender;
-- (IBAction) publishToPDF:(id)sender;
 - (IBAction) refresh:(id)sender;
 - (IBAction)logLin:(id)sender;
 - (IBAction) copy:(id)sender;

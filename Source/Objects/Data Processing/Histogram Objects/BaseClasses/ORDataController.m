@@ -153,11 +153,6 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
     [self miscAttributesChanged:nil];
 }
 
-- (NSTextField*) titleField
-{
-	return titleField;
-}
-
 - (void) serviceResponse:(NSNotification*)aNotification
 {
 	NSMutableDictionary* reponseInfo = [[aNotification userInfo] objectForKey:ORCARootServiceResponseKey];
@@ -167,7 +162,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 
 - (void) runStatusChanged:(NSNotification*)aNote
 {
-	[titleField setStringValue:[model fullNameWithRunNumber]];
+	[plotView setPlotTitle:[model fullNameWithRunNumber]];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -267,6 +262,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 		[self runStatusChanged:nil];
     }
 	[plotView adjustPositionsAndSizes];
+	[plotView setNeedsDisplay:YES];
 }
 
 #pragma mark •••Accessors

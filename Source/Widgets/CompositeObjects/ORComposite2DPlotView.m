@@ -37,6 +37,7 @@
 - (void) setUpViews
 {
 	//set up the *rough* positions of the various parts
+	[self makeTitle];
 	[self makeYAxis];
 	[self makeXAxis];
 	[self makeZAxis];
@@ -69,6 +70,17 @@
 	float widthOfZAxis		= zAxisRect.size.width;
 	float widthOfColorScale	= colorScaleRect.size.width;
 	float heightOfXAxis		= xAxisRect.size.height;
+
+	float titleHeight;
+	if([[titleField stringValue]length]) {
+		titleHeight = [[titleField font] pointSize]+3; 
+		[titleField setFrame:NSMakeRect(0,[self bounds].size.height-titleHeight,[self bounds].size.width,titleHeight)];
+	}
+	else {
+		titleHeight = 0;
+		[titleField setFrame:NSMakeRect(0,[self bounds].size.height,[self bounds].size.width,0)];
+	}
+	
 	
 	//adjust position of colorscale to be on the right, against the top and bottom, adjust again later
 	[colorScale setFrame:NSMakeRect([self bounds].size.width-[colorScale bounds].size.width,
@@ -88,7 +100,7 @@
 	[yAxis setFrame:NSMakeRect(0,
 							   heightOfXAxis,
 							   widthOfYAxis,
-							   [self bounds].size.height-heightOfXAxis) ];
+							   [self bounds].size.height-heightOfXAxis-titleHeight) ];
 	
 	//adjust position of xAxis to be on the right, against the bottom
 	[xAxis setFrame:NSMakeRect(widthOfYAxis-[xAxis lowOffset]+1 , 
