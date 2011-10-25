@@ -137,14 +137,21 @@
     else if(*theArg == '@'){
         [self setArgument:&aVal atIndex:argIndex];
     }
-	else if(!strncmp(theArg,"{_NSP",5)){
+	else if(!strncmp(theArg,"{_NSPo",6)){
 		aVal = [aVal substringFromIndex:2];
 		aVal = [aVal substringToIndex:[aVal length]-1];
 		NSArray* xy = [aVal componentsSeparatedByString:@","];
 		NSPoint thePoint = NSMakePoint([[xy objectAtIndex:0] floatValue], [[xy objectAtIndex:1] floatValue]);
 		[self setArgument:&thePoint atIndex:argIndex];
 	}
-	else if(!strncmp(theArg,"{_NSR",5)){
+	else if(!strncmp(theArg,"{_NSRa",6)){
+		aVal = [aVal substringFromIndex:2];
+		aVal = [aVal substringToIndex:[aVal length]-1];
+		NSArray* xy = [aVal componentsSeparatedByString:@","];
+		NSRange theRange = NSMakeRange([[xy objectAtIndex:0] floatValue], [[xy objectAtIndex:1] floatValue]);
+		[self setArgument:&theRange atIndex:argIndex];
+	}
+	else if(!strncmp(theArg,"{_NSRe",6)){
 		aVal = [aVal substringFromIndex:2];
 		aVal = [aVal substringToIndex:[aVal length]-1];
 		NSArray* xy = [aVal componentsSeparatedByString:@","];
@@ -169,57 +176,57 @@
     const char *theArg = [[self methodSignature] methodReturnType];
 
     if(*theArg == 'c'){
-	char buffer;
+		char buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithChar:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithChar:buffer] stringValue];
     }
     else if(*theArg == 'i'){
 	int buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithInt:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithInt:buffer] stringValue];
     }
     else if(*theArg == 's'){
 	short buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithShort:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithShort:buffer] stringValue];
     }
     else if(*theArg == 'l'){
-	long buffer;
+		long buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithLong:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithLong:buffer] stringValue];
     }
     else if(*theArg == 'C'){
-	unsigned char buffer;
+		unsigned char buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithUnsignedChar:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithUnsignedChar:buffer] stringValue];
     }
     else if(*theArg == 'I'){
-	unsigned int buffer;
+		unsigned int buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithUnsignedInt:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithUnsignedInt:buffer] stringValue];
     }
     else if(*theArg == 'S'){
- 	unsigned short buffer;
+		unsigned short buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithUnsignedShort:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithUnsignedShort:buffer] stringValue];
     }
     else if(*theArg == 'L'){
- 	unsigned long buffer;
+		unsigned long buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithUnsignedLong:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithUnsignedLong:buffer] stringValue];
     }
     else if(*theArg == 'f'){
- 	float buffer;
+		float buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithFloat:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithFloat:buffer] stringValue];
     }
     else if(*theArg == 'd'){
- 	double buffer;
+		double buffer;
         [self getReturnValue:&buffer]; 
-	returnValueAsString = [[NSNumber numberWithDouble:buffer] stringValue];
+		returnValueAsString = [[NSNumber numberWithDouble:buffer] stringValue];
     }
     else if(*theArg == 'B'){
- 	BOOL buffer;
+		BOOL buffer;
         [self getReturnValue:&buffer]; 
 		returnValueAsString = [[NSNumber numberWithBool:buffer] stringValue];
     }
@@ -228,12 +235,17 @@
         [self getReturnValue:&obj]; 
 		return obj;
     }
-	else if(!strncmp(theArg,"{_NSP",5)){
+	else if(!strncmp(theArg,"{_NSPo",6)){
 		NSPoint thePoint;
         [self getReturnValue:&thePoint]; 
 		return [NSString stringWithFormat:@"@(%f,%f)",thePoint.x,thePoint.y];
 	}
-	else if(!strncmp(theArg,"{_NSR",5)){
+	else if(!strncmp(theArg,"{_NSRa",6)){
+		NSRange theRange;
+        [self getReturnValue:&theRange]; 
+		return [NSString stringWithFormat:@"@(%f,%f)",theRange.location,theRange.length];
+	}
+	else if(!strncmp(theArg,"{_NSRe",6)){
 		NSRect theRect;
         [self getReturnValue:&theRect]; 
 		return [NSString stringWithFormat:@"@(%f,%f,%f,%f)",theRect.origin.x,theRect.origin.y,theRect.size.width,theRect.size.height];
