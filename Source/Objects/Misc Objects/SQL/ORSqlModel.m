@@ -124,7 +124,10 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
 	[self addMachineName];
 
 }
-
+- (BOOL) solitaryObject
+{
+    return YES;
+}
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"Sql"]];
