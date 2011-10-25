@@ -31,12 +31,9 @@
         BOOL            portWasOpen;
         ORSerialPort*   serialPort;
         unsigned long	dataId;
-		NSString*		lastRequest;
-		NSMutableArray* cmdQueue;
 		float		    temperature;
 		float		    humidity;
 		unsigned long	timeMeasured;
-		int				pollTime;
         NSMutableString*  buffer;
 		BOOL			shipValues;
 		ORTimeRate*		timeRates[2];
