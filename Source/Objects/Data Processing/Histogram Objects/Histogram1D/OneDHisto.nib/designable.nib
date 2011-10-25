@@ -694,7 +694,7 @@
 													<object class="NSCustomView" id="188514059">
 														<reference key="NSNextResponder" ref="740321932"/>
 														<int key="NSvFlags">274</int>
-														<string key="NSFrame">{{20, 130}, {450, 242}}</string>
+														<string key="NSFrame">{{20, 130}, {441, 242}}</string>
 														<reference key="NSSuperview" ref="740321932"/>
 														<string key="NSClassName">ORCompositePlotView</string>
 													</object>

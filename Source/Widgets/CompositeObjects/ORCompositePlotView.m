@@ -60,6 +60,7 @@
 	[legend awakeFromNib];
 	[plotView awakeFromNib];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(adjustPositionsAndSizes) name:ORDataSetCalibrationChanged object:nil];
+	[self adjustPositionsAndSizes];
 }
 
 - (BOOL) isFlipped
