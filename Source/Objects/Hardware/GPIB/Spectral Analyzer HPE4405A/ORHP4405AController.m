@@ -467,8 +467,9 @@
 
 - (void) unitsChanged:(NSNotification*)aNote
 {
-	[unitsPU selectItemAtIndex: [model units]];
-	[[plotter yAxis] setLabel:[model unitFullName:[model units]]];
+    ORHP4405AModel* theModel = (ORHP4405AModel*)model;
+	[unitsPU selectItemAtIndex: [theModel units]];
+	[[plotter yAxis] setLabel:[model unitFullName:[theModel units]]];
 }
 
 - (void) stopFreqChanged:(NSNotification*)aNote
