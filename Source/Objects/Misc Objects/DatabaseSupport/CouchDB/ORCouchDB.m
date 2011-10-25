@@ -495,12 +495,18 @@
 
 - (void) setDocument:(NSDictionary*)aDocument documentID:(NSString*)anID
 {
-	document   = [aDocument retain];
+	
+	[aDocument retain];
+	[document release];
+	document = aDocument;
+	
+	[documentId autorelease];
 	documentId = [anID copy];
 }
 
 - (void) setAttachmentName:(NSString*)aName
 {
+	[attachmentName autorelease];
 	attachmentName = [aName copy];
 }
 - (void) setAttachment:(NSData*)someData
@@ -673,6 +679,7 @@
 
 - (void) setDocumentId:(NSString*)anID
 {
+	[documentId autorelease];
 	documentId = [anID copy];
 }
 

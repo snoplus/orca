@@ -120,7 +120,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[super sleep];
 }
 
-
+- (BOOL) solitaryObject
+{
+    return YES;
+}
 
 - (void) setUpImage
 {
