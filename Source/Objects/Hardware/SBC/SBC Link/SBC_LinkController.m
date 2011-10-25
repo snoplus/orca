@@ -100,6 +100,7 @@
 		[downloadDriverButton setEnabled:NO];
 	}
 	[bytesReceivedRateAxis setLabel:@"KBytes/Second"];
+	[queView setBarColor:[NSColor redColor]];
 }
 
 - (void) setModel:(id)aModel
