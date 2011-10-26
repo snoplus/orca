@@ -92,10 +92,6 @@
 										  didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
 											 contextInfo:aContextInfo] retain];
 }
-- (IBAction) logLin:(id)sender 
-{
-	[[plotView yAxis] setLog:![[plotView yAxis] isLog]];
-}
 
 - (IBAction) copy:(id)sender
 {

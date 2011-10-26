@@ -316,6 +316,11 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 	[analysisDrawer toggle:self];
 }
 
+- (IBAction) logLin:(NSToolbarItem*)item
+{
+	[[plotView yAxis] setLog:![[plotView yAxis] isLog]];
+}
+
 - (IBAction) toggleRaw:(NSToolbarItem*)item
 {
 	int index = [rawDataTabView indexOfTabViewItem:[rawDataTabView selectedTabViewItem]];

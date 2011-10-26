@@ -81,20 +81,18 @@
 		[titleField setFrame:NSMakeRect(0,[self bounds].size.height,[self bounds].size.width,0)];
 	}
 	
+	//adjust position of zAxis to be on the right, against the top and bottom, adjust again later
+	[zAxis setFrame:NSMakeRect([self bounds].size.width-[zAxis bounds].size.width,
+									heightOfXAxis,
+									[zAxis bounds].size.width,
+									[self bounds].size.height-heightOfXAxis) ];
 	
-	//adjust position of colorscale to be on the right, against the top and bottom, adjust again later
-	[colorScale setFrame:NSMakeRect([self bounds].size.width-[colorScale bounds].size.width,
+	
+	//adjust position of colorScale to be on the right, against the zaxis
+	[colorScale setFrame:NSMakeRect([zAxis frame].origin.x-widthOfColorScale - 1,
 							   heightOfXAxis,
-							   [colorScale bounds].size.width,
+							   widthOfColorScale,
 							   [self bounds].size.height-heightOfXAxis) ];
-	
-
-	//adjust position of zAxis to be on the left, against the top
-	[zAxis setFrame:NSMakeRect([colorScale frame].origin.x-widthOfZAxis - 1,
-							   heightOfXAxis,
-							   widthOfZAxis,
-							   [self bounds].size.height-heightOfXAxis) ];
-	
 	
 	//adjust position of yAxis to be on the left, against the top
 	[yAxis setFrame:NSMakeRect(0,
@@ -105,7 +103,7 @@
 	//adjust position of xAxis to be on the right, against the bottom
 	[xAxis setFrame:NSMakeRect(widthOfYAxis-[xAxis lowOffset]+1 , 
 							   [yAxis lowOffset]-1 , 
-							   [self bounds].size.width-widthOfYAxis+[xAxis lowOffset]- widthOfColorScale -  widthOfZAxis, 
+							   [self bounds].size.width-widthOfYAxis+[xAxis lowOffset] -  widthOfZAxis, 
 							   heightOfXAxis) ];
 	
 	
@@ -115,6 +113,11 @@
 								  [yAxis highOffset]-[yAxis lowOffset]) ];
 
 	//final tweak to make the colorscale line up
+	[zAxis setFrame:NSMakeRect([zAxis frame].origin.x,
+							   heightOfXAxis,
+							   [zAxis bounds].size.width,
+							   [self bounds].size.height-heightOfXAxis-titleHeight) ];
+	
 	[colorScale setFrame:NSMakeRect([colorScale frame].origin.x,
 									[zAxis frame].origin.y + [zAxis lowOffset],
 									[colorScale bounds].size.width,
@@ -126,7 +129,7 @@
 {
 	//do the yAxis -- frame size will be fixed when we know more
 	NSRect plotRect = [self bounds];
-	ORColorScale* aColorScale = [[ORColorScale alloc] initWithFrame:NSMakeRect(0,0, 10, plotRect.size.height)];
+	ORColorScale* aColorScale = [[ORColorScale alloc] initWithFrame:NSMakeRect(0,0, 15, plotRect.size.height)];
 	[aColorScale setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
 	[self addSubview:aColorScale];
 	self.colorScale = aColorScale;
@@ -138,6 +141,7 @@
 	//do the yAxis -- frame size will be fixed when we know more
 	NSRect plotRect = [self bounds];
 	ORAxis* anAxis = [[ORAxis alloc] initWithFrame:NSMakeRect(0,0, 50, plotRect.size.height)];
+	[anAxis setOppositePosition:YES];
 	[anAxis setAutoresizingMask:NSViewHeightSizable | NSViewMinXMargin];
 	[self addSubview:anAxis];
 	self.zAxis = anAxis;

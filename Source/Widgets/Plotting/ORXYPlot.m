@@ -183,13 +183,8 @@
 		[s release];
 	}
 	else if([plotView commandKeyIsDown] && showCursorPosition){
-		int numPoints = [dataSource numberPointsInPlot:self];
-		NSString* cursorPositionString = [NSString stringWithFormat:@"x:%.0f y:%.0f",cursorPosition.x,cursorPosition.x<numPoints?cursorPosition.y:0.0];
-		s = [[NSAttributedString alloc] initWithString:cursorPositionString attributes:attrsDictionary];
-		labelSize = [s size];
-		[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-labelSize.height-5)];
-		[s release];
 		
+		int numPoints = [dataSource numberPointsInPlot:self];
 		double xValue;
 		double yValue;
 		double y = 0;
@@ -198,6 +193,13 @@
 			[dataSource plotter:self index:cursorPosition.x x:&xValue y:&yValue];
 			x = [[plotView xScale] getPixAbs:xValue];
 			y = [[plotView yScale] getPixAbs:yValue];
+			
+			NSString* cursorPositionString = [NSString stringWithFormat:@"x:%.0f y:%.0f",xValue,yValue];
+			s = [[NSAttributedString alloc] initWithString:cursorPositionString attributes:attrsDictionary];
+			labelSize = [s size];
+			[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-labelSize.height-5)];
+			[s release];
+			
 		}
 		
 		[[NSColor blackColor] set];

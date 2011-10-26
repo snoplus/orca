@@ -59,6 +59,8 @@
 - (void) closeAnalysisDrawer;
 - (BOOL) analysisDrawerIsOpen;
 
+- (IBAction) doAnalysis:(NSToolbarItem*)item;
+- (IBAction) logLin:(NSToolbarItem*)item;
 - (IBAction) toggleRaw:(NSToolbarItem*)item;
 - (IBAction) clear:(NSToolbarItem*)item;
 - (IBAction) hideShowControls:(id)sender;

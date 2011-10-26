@@ -94,7 +94,7 @@
 	else return NO;
 }
 
-- (IBAction) logLin:(id)sender 
+- (IBAction) logLin:(NSToolbarItem*)item
 {
 	[[plotView zAxis] setLog:![[plotView zAxis] isLog]];
 }

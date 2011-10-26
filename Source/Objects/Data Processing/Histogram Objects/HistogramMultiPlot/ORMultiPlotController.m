@@ -170,6 +170,7 @@
     [model setPlotName:[sender stringValue]];
 }
 
+
 #pragma mark ¥¥¥Actions
 - (IBAction) calibrate:(id)sender
 {

@@ -12,8 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="535"/>
 			<integer value="205"/>
+			<integer value="538"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -720,7 +720,7 @@
 					<object class="NSPopUpButton" id="696894096">
 						<reference key="NSNextResponder" ref="1059678157"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{100, 20}, {44, 15}}</string>
+						<string key="NSFrame">{{100, 20}, {70, 15}}</string>
 						<reference key="NSSuperview" ref="1059678157"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="262128197">
@@ -814,7 +814,7 @@
 					<object class="NSPopUpButton" id="115285632">
 						<reference key="NSNextResponder" ref="1059678157"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{100, 41}, {44, 15}}</string>
+						<string key="NSFrame">{{100, 41}, {70, 15}}</string>
 						<reference key="NSSuperview" ref="1059678157"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="688449511">
@@ -902,7 +902,7 @@
 					<object class="NSPopUpButton" id="431731065">
 						<reference key="NSNextResponder" ref="1059678157"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{100, 62}, {44, 15}}</string>
+						<string key="NSFrame">{{100, 62}, {70, 15}}</string>
 						<reference key="NSSuperview" ref="1059678157"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="131354512">
@@ -990,7 +990,7 @@
 					<object class="NSPopUpButton" id="872466014">
 						<reference key="NSNextResponder" ref="1059678157"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{100, 83}, {44, 15}}</string>
+						<string key="NSFrame">{{100, 83}, {70, 15}}</string>
 						<reference key="NSSuperview" ref="1059678157"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="505456005">
