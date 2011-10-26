@@ -320,6 +320,10 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 {
 	[[plotView yAxis] setLog:![[plotView yAxis] isLog]];
 }
+- (IBAction) autoScale:(NSToolbarItem*)sender	 
+{ 
+	[plotView autoscaleAll:sender];
+}
 
 - (IBAction) toggleRaw:(NSToolbarItem*)item
 {

@@ -612,6 +612,7 @@
 
 - (IBAction) refresh:(id)sender		 { [self setNeedsDisplay:YES]; }
 - (IBAction) logLin:(id)sender		 { [[self topPlot] logLin];  }
+- (IBAction) autoScale:(id)sender	 { [self autoscaleAll:sender];}
 
 - (IBAction) resetScales:(id)sender	 
 { 

@@ -280,6 +280,7 @@
 
 - (IBAction) refresh:(id)sender		 { [plotView refresh:sender]; } 
 - (IBAction) logLin:(id)sender		 { [plotView logLin:sender]; } 
+- (IBAction) autoScale:(id)sender	 { [plotView autoscaleAll:sender]; } 
 - (IBAction) copy:(id)sender		 { [plotView copy:sender]; } 
 - (IBAction) shiftXLeft:(id)sender	 { [xAxis shiftLeft:self]; }
 - (IBAction) shiftXRight:(id)sender	 { [xAxis shiftRight:self]; }

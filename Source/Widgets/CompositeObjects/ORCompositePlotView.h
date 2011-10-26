@@ -83,6 +83,7 @@
 - (IBAction) shiftXLeft:(id)sender;
 - (IBAction) shiftXRight:(id)sender;
 - (IBAction) publishToPDF:(id)sender;
+- (IBAction) autoScale:(id)sender;
 
 @property (nonatomic,assign) BOOL			showLegend;
 @property (retain) NSTextField*	titleField;

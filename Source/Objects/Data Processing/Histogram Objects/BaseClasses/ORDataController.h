@@ -67,6 +67,7 @@
 - (IBAction) refreshModeAction:(id)sender;
 - (IBAction) pauseAction:(id)sender;
 - (IBAction) tileWindows:(id)sender;
+- (IBAction) autoScale:(NSToolbarItem*)sender;	 
 //scripting helper
 - (void) savePlotToFile:(NSString*)aFile;
 - (id) curve:(int)c gate:(int)g; //for backward compatiblity with scripts
