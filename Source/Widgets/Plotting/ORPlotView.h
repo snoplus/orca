@@ -145,5 +145,6 @@
 - (IBAction) zoomOut:(id)sender;   
 - (IBAction) zoomXYIn:(id)sender;
 - (IBAction) zoomXYOut:(id)sender;
+- (IBAction) autoScale:(id)sender; 
 
 @end
