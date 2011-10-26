@@ -69,6 +69,9 @@
 - (id)		sleepFunc:(id)p;
 - (id)		timeFunc;
 - (id)		runShellCmd:(id)p;
+- (id)		writeLine:(id) p;
+- (id)		deleteFile:(id) p;
+- (id)		getStringFromFile:(id) p;
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -548,6 +551,10 @@
 		case TIME:			return [self timeFunc];
 		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
 		case NSARRAY:		return [NSMutableArray array];
+		case NSFILEMANAGER:		return [NSFileManager defaultManager];
+		case STRINGFROMFILE:	return [self getStringFromFile:p];
+		case WRITELINETOFILE:	return [self writeLine:p];
+		case DELETEFILE:		return [self deleteFile:p];
 		case DISPLAY:		return [delegate display:NodeValue(1) forKey:NodeValue(0)];
 		case WAITUNTIL:		return [self waitUntil:p];
 		case kWaitTimeOut:	return [self waitTimeOut:p];
@@ -566,6 +573,7 @@
 		case HEX:			return [NSString stringWithFormat:@"0x%x",[NodeValue(0) unsignedLongValue]];
 		case MAKEPOINT:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case MAKERECT:		return [NSString stringWithFormat:@"@(%@,%@,%@,%@)",NodeValue(0),NodeValue(1),NodeValue(2),NodeValue(3)];
+		case MAKERANGE:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case FIXED:			return [self fixedString:NodeValue(0) precision:NodeValue(1)];
 		case SCI:			return [self sciString:NodeValue(0) precision:NodeValue(1)];
 
@@ -848,6 +856,19 @@
 	//return [[s componentsSeparatedByString:@" "] componentsJoinedByString:@""]; 
 }	
 
+- (id) dataFromString:(id) p
+{
+	NSString* d = [NSString stringWithString:NodeValue(0)];
+	return [d dataUsingEncoding:NSASCIIStringEncoding];;
+}	
+
+- (id) getStringFromFile:(id) p
+{
+	NSString* s = NodeValue(0);
+	s = [s stringByExpandingTildeInPath];
+	return [NSString stringWithContentsOfFile:s encoding:NSASCIIStringEncoding error:nil];
+}
+
 - (id) arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
 {
 	NSMutableArray* theArray = [self execute:[[leftNode nodeData] objectAtIndex:0] container:nil];
@@ -925,6 +946,8 @@
 		else if([aFunctionName isEqualToString:@"recty"])    return [self extractValue:1			name:aFunctionName	args:argObject];
 		else if([aFunctionName isEqualToString:@"rectw"])    return [self extractValue:2			name:aFunctionName	args:argObject];
 		else if([aFunctionName isEqualToString:@"recth"])    return [self extractValue:3			name:aFunctionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"rangeloc"]) return [self extractValue:0			name:aFunctionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"rangelen"]) return [self extractValue:1			name:aFunctionName	args:argObject];
 		else {
 			NSLog(@"%@ has no function called %@ in its function table. Check the syntax.\n",[self scriptName],aFunctionName);
 			[NSException raise:@"Run time" format:@"Function not found"];
@@ -1266,6 +1289,37 @@
 	return nil; //never actually gets here.
 }
 
+- (id) writeLine:(id) p
+{
+	NSString* path = NodeValue(0);
+	NSString* s    = NodeValue(1);
+	s = [s stringByAppendingString:@"\n"];
+	path = [path stringByExpandingTildeInPath];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if(![fm fileExistsAtPath:path]){
+		[fm createDirectoryAtPath:[path stringByDeletingLastPathComponent]  withIntermediateDirectories:YES attributes:nil error:nil];
+		[fm createFileAtPath:path contents:nil attributes:nil];
+
+	}
+	NSFileHandle* fp = [NSFileHandle fileHandleForUpdatingAtPath:path];
+	[fp seekToEndOfFile];
+	[fp writeData:[s dataUsingEncoding:NSASCIIStringEncoding]];
+	return nil;
+}
+
+
+- (id) deleteFile:(id) p
+{
+	NSString* path = NodeValue(0);
+	path = [path stringByExpandingTildeInPath];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:path]){
+		[fm removeItemAtPath:path  error:nil];
+	}
+	return nil;
+}
+
+
 - (id) extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray
 {
 	id string = [valueArray objectAtIndex:0];
@@ -1396,8 +1450,12 @@
 				case RETURN:			line = [NSMutableString stringWithString:@"[return]"];		break;
 				case CONTINUE:			line = [NSMutableString stringWithString:@"[continue]"];	break;
 				case SLEEP:				line = [NSMutableString stringWithString:@"[sleep]"];		break;
-				case NSDICTIONARY:		line = [NSMutableString stringWithString:@"[nsdictionary]"];	break;
-				case NSARRAY:			line = [NSMutableString stringWithString:@"[nsarray]"];	break;
+				case NSDICTIONARY:		line = [NSMutableString stringWithString:@"[nsdictionary]"]; break;
+				case NSARRAY:			line = [NSMutableString stringWithString:@"[nsarray]"];		 break;
+				case NSFILEMANAGER:		line = [NSMutableString stringWithString:@"[NSFileManager]"];  break;
+				case WRITELINETOFILE:	line = [NSMutableString stringWithString:@"[writeLine]"]; break;
+				case DELETEFILE:		line = [NSMutableString stringWithString:@"[deleteFile]"]; break;
+				case STRINGFROMFILE:	line = [NSMutableString stringWithString:@"[stringFromFile]"]; break;
 				case HEX:				line = [NSMutableString stringWithString:@"[hex]"];			break;
 				case WAITUNTIL:			line = [NSMutableString stringWithString:@"[waituntil]"];	break;				
 				case ALARM:				line = [NSMutableString stringWithString:@"[alarm]"];		break;				
@@ -1416,6 +1474,7 @@
 				case kMakeArgList:		line = [NSMutableString stringWithString:@"[argList]"];		break;
 				case MAKEPOINT:			line = [NSMutableString stringWithString:@"[point]"];		break;
 				case MAKERECT:			line = [NSMutableString stringWithString:@"[rect]"];		break;
+				case MAKERANGE:			line = [NSMutableString stringWithString:@"[range]"];		break;
                 case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;
             }

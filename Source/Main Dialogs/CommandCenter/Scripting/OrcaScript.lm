@@ -102,6 +102,7 @@ E			[Ee][+-]?{D}+
 "strcat"		return CATSTRING;
 "point"			return MAKEPOINT;
 "rect"			return MAKERECT;
+"range"			return MAKERANGE;
 "postalarm"		return ALARM;
 "postAlarm"		return ALARM;
 "clearalarm"	return CLEAR;
@@ -113,6 +114,10 @@ E			[Ee][+-]?{D}+
 "sci"			return SCI;
 "fixed"			return FIXED;
 "shell"			return SHELL;
+"stringFromFile"	return STRINGFROMFILE;
+"writeLine"		return WRITELINETOFILE;
+"deleteFile"		return DELETEFILE;
+"nsfilemanager"		return NSFILEMANAGER;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

@@ -51,6 +51,13 @@
 		<string>recty</string>
 		<string>rectw</string>
 		<string>recth</string>
+		<string>rangeloc</string>
+		<string>rangelen</string>
+		<string>stringFromFile</string>
+		<string>stringfromfile</string>
+		<string>nsfilemanager</string>
+		<string>writeLine</string>
+		<string>deleteFile</string>
 		<string>postalarm</string>
 		<string>postAlarm</string>
 		<string>clearalarm</string>

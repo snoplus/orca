@@ -1,4 +1,4 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf350
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
@@ -122,6 +122,9 @@ obj = make(<className>);  //create an object (experts only)\
 rect(x,y,w,h) 		   
 \i //makes a NSRect object
 \i0 \
+range(loc,len) 		   
+\i //makes a NSRange object
+\i0 \
 pointx(<point structure>) 
 \i //returns x value
 \i0 \
@@ -139,6 +142,12 @@ recth(<rect structure>)
 \i0 \
 rectw(<rect structure>)  
 \i //returns w value
+\i0 \
+rangeloc(<range structure>)   
+\i //returns loc value
+\i0 \
+rangelen(<range structure>)  
+\i //returns len value
 \i0 \
 \
 
@@ -208,9 +217,20 @@ shell "cmd"
 \i0\b Blocks
 \i\b0  -- don't call anything like 'top'
 \i0 \
+nsfilemanager()                
+\i //makes an NSFileManager
+\i0 \
+stringFromFile(<path>)      
+\i //reads file at path and return a string with the contents
+\i0 \
+writeLine(<path>,<string>) 
+\i //append string to file at path
+\i0 \
+deleteFile(<path>)             
+\i //delete file at path
+\i0 \
 
 \b \
-\
 Array Declaration
 \b0 \
 array varName[<size>];\
