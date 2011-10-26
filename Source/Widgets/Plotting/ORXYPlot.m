@@ -227,7 +227,7 @@
 	[plotView setNeedsDisplay:YES];
 }
 
-- (void) logLin  { [[plotView zScale] setLog:![[plotView zScale] isLog]]; }
+- (void) logLin  { [[plotView yScale] setLog:![[plotView yScale] isLog]]; }
 
 #pragma mark ***Conversions
 - (NSPoint) convertFromWindowToPlot:(NSPoint)aWindowLocation
