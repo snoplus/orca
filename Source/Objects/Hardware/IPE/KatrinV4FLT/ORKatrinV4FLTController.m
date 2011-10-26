@@ -57,10 +57,10 @@
 	//[[filterShapingLengthPU itemAtIndex:0] setHidden: YES];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	//[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	
-    settingSize			= NSMakeSize(650,700);
+    settingSize			= NSMakeSize(670,720);
     rateSize			= NSMakeSize(490,690);
-    testSize			= NSMakeSize(400,350);
-    lowlevelSize		= NSMakeSize(400,350);
+    testSize			= NSMakeSize(400,310);
+    lowlevelSize		= NSMakeSize(400,310);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
