@@ -659,20 +659,25 @@
 {
 	id anArray;
 	if(aTable == inputVariablesTableView){
+        id ident = [aCol identifier];
+        if([ident isEqualToString:@"iValueHex"])ident = @"iValue"; //fixes an XCode 4 warning
 		anArray= [model inputValues];
-		return [[anArray objectAtIndex:aRow] objectForKey:[aCol identifier]];
+		return [[anArray objectAtIndex:aRow] objectForKey:ident];
 	}
 	else if(aTable == outputVariablesTableView){
 		anArray= [[model scriptRunner] displayDictionary];
 		NSArray* keyArray = [anArray allKeys];
-		if([[aCol identifier] isEqualToString:@"name"])		   return [keyArray objectAtIndex:aRow];
-		else if([[aCol identifier] isEqualToString:@"value"]){
+        
+        id ident = [aCol identifier];
+        
+		if([ident isEqualToString:@"name"])		   return [keyArray objectAtIndex:aRow];
+		else if([ident isEqualToString:@"value"]){
 			id theValue =  [anArray objectForKey:[keyArray objectAtIndex:aRow]];
 			return theValue;
 		}
-		else if([[aCol identifier] isEqualToString:@"iValueHex"]){
+		else if([ident isEqualToString:@"valueHex"]){
 			id aValue = [anArray objectForKey:[keyArray objectAtIndex:aRow]];
-			if([aValue isKindOfClass:[NSDecimalNumber class]]) return [NSString stringWithFormat:@"0x%08x",[aValue longValue]];
+			if([aValue isKindOfClass:[NSDecimalNumber class]]) return [NSString stringWithFormat:@"0x%X",[aValue longValue]];
 			else return @"Not Number";
 		}
 		else return nil;
