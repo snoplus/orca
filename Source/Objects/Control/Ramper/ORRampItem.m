@@ -710,7 +710,6 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		int i;
 		for(i=0;i<n;i++){
 			ORHWWizParam* aParam = [allParams objectAtIndex:i];
-			NSLog(@"%@\n",[aParam name]);
 			if([[aParam name] isEqualToString:@"Init"]){
 				targetIniter = [aParam setMethodSelector];
 				break;

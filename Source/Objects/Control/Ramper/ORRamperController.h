@@ -38,6 +38,7 @@
 	IBOutlet NSButton*			scaleToMaxButton;
 	IBOutlet NSButton*			scaleToTargetButton;
 	NSMutableArray*				rampItemControllers;
+    BOOL once;
 }
 - (NSString*) windowNibName;
 - (NSString*) rampItemNibFileName;

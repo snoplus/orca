@@ -63,6 +63,8 @@
 	while(anItem = [e nextObject]){
 		[self addRampItem:anItem];
 	}
+    [ramperView adjustPositionsAndSizes];
+    [self updateView:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -114,8 +116,10 @@
 
 - (void) registerNotificationObservers
 {
+    if(once)return;
+    once = YES;
     [super registerNotificationObservers];
-	
+
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [notifyCenter addObserver : self
                      selector : @selector(listLockChanged:)
@@ -264,11 +268,8 @@
 
 - (void) rampItemAdded:(NSNotification*)aNote
 {
-	NSLog(@"received\n");
-
 	ORRampItem* aRampItem = [[aNote userInfo] objectForKey:@"RampItem"];
 	[self addRampItem:aRampItem];
-	NSLog(@"processed\n");
 
 }
 

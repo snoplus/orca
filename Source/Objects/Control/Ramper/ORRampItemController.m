@@ -159,6 +159,8 @@
 - (void) updateWindow
 {
 	[model setXAxisIgnoreMouse:NO];
+    [self scaleAction:nil];
+    [self miscAttributesChanged:nil];
 	[self parametersChanged:nil];
 	[self crateNumberChanged:nil];
 	[self cardNumberChanged:nil];
@@ -215,6 +217,7 @@
 	[visibleButton setState:[model visible]]; 
 	if([model visible]){
 		[self miscAttributesChanged:nil];
+        [self scaleAction:nil];
 		[model  checkTargetObject];
 	}
 }
@@ -297,7 +300,7 @@
 	
 	if(aNotification == nil || [aNotification object] == [owner yAxis]){
 		[model setMiscAttributes:[[owner yAxis] attributes] forKey:@"yAxis"];
-		[[owner yAxis] setLabel:[model parameterName]];
+		[[owner ramperView] setYLabel:[model parameterName]];
 	}
 }
 
@@ -376,6 +379,7 @@
 	[model setTargetName:[sender titleOfSelectedItem]];
 	[model loadProxyObjects];
 	[self miscAttributesChanged:nil];
+    [self scaleAction:nil];
 	[model  checkTargetObject];
 }
 
@@ -388,6 +392,7 @@
 	[model prepareForScaleChange];
 	[model loadParameterObject];
 	[self miscAttributesChanged:nil];
+    [self scaleAction:nil];
 }
 
 - (IBAction) insertRampItem:(id)sender
@@ -408,6 +413,7 @@
 	[self endEditing];
 	[[model owner] setSelectedRampItem:model];	
 	[self miscAttributesChanged:nil];
+    [self scaleAction:nil];
 	[model  checkTargetObject];
 }
 

@@ -81,7 +81,7 @@
 	float bugPadWidth = [rightTargetBug size].width;
 	float bugPadHeight = [rightTargetBug size].height+2;
 	[[NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1] set];
-	rampArea.size.width -= bugPadWidth;
+	rampArea.size.width -= bugPadWidth/2;
 		
  	if(!gradient){
 		NSColor* startingColor = [NSColor colorWithCalibratedRed:.75 green:.75 blue:.75 alpha:1];
