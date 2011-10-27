@@ -255,6 +255,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 			}
 		}
 	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListModelReloadTable object:self];    
 }
 
 - (NSString*) runStateName

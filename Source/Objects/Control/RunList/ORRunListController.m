@@ -242,12 +242,12 @@
 
 #pragma mark •••Actions
 
-- (void) lastFileTextFieldAction:(id)sender
+- (IBAction) lastFileTextFieldAction:(id)sender
 {
 	[model setLastFile:[sender stringValue]];	
 }
 
-- (void) randomizeAction:(id)sender
+- (IBAction) randomizeAction:(id)sender
 {
 	[model setRandomize:[sender intValue]];	
 }
@@ -317,6 +317,7 @@
                        didEndSelector:@selector(loadFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 #endif
+    
 }
 
 - (IBAction) saveFileAction:(id) sender
