@@ -52,6 +52,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) goToNextCommand;
 - (void) startTimeOut;
 - (void) checkCycle;
+- (void) processStatus:(NSString*)aString;
 @end
 
 @implementation ORMet237Model
@@ -381,6 +382,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
         [serialPort open];
+		[self universalSelect];
     }
     else [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -425,21 +427,21 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
 }
 
-- (void) sendAuto					{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"a"]; }
-- (void) sendManual					{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"b"]; }
-- (void) startCountingByComputer	{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"c"]; }
-- (void) startCountingByCounter		{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"d"]; }
-- (void) stopCounting				{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"e"]; }
-- (void) clearBuffer				{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"C"]; }
-- (void) getNumberRecords			{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"D"]; }
-- (void) getRevision				{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"E"]; }
-- (void) getMode					{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"M"]; }
-- (void) getModel					{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"T"]; }
-- (void) getRecord					{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"A"]; }
-- (void) resendRecord				{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"R"]; }
-- (void) goToStandbyMode			{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"h"]; }
-- (void) getToActiveMode			{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"g"]; }
-- (void) goToLocalMode				{ [self addCmdToQueue:@"U"]; [self addCmdToQueue:@"l"]; }
+- (void) sendAuto					{ [self addCmdToQueue:@"a"]; }
+- (void) sendManual					{ [self addCmdToQueue:@"b"]; }
+- (void) startCountingByComputer	{ [self addCmdToQueue:@"c"]; }
+- (void) startCountingByCounter		{ [self addCmdToQueue:@"d"]; }
+- (void) stopCounting				{ [self addCmdToQueue:@"e"]; }
+- (void) clearBuffer				{ [self addCmdToQueue:@"C"]; }
+- (void) getNumberRecords			{ [self addCmdToQueue:@"D"]; }
+- (void) getRevision				{ [self addCmdToQueue:@"E"]; }
+- (void) getMode					{ [self addCmdToQueue:@"M"]; }
+- (void) getModel					{ [self addCmdToQueue:@"T"]; }
+- (void) getRecord					{ [self addCmdToQueue:@"A"]; }
+- (void) resendRecord				{ [self addCmdToQueue:@"R"]; }
+- (void) goToStandbyMode			{ [self addCmdToQueue:@"h"]; }
+- (void) getToActiveMode			{ [self addCmdToQueue:@"g"]; }
+- (void) goToLocalMode				{ [self addCmdToQueue:@"l"]; }
 - (void) universalSelect			{ [self addCmdToQueue:@"U"]; }
 
 #pragma mark ***Polling and Cycles
@@ -469,6 +471,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[self setRunning:NO];
 		[self setCycleNumber:0];
 		[self stopCounting];
+		[self getRecord];
 	}
 }
 @end
@@ -482,7 +485,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		if([cycleWillEnd timeIntervalSinceDate:now] >= 0){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCycleWillEndChanged object:self];
 			[self getMode];
-			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:1];
+			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:10];
 		}
 		else {
 			int theCount = [self cycleNumber];
@@ -525,13 +528,58 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[serialPort writeString:[NSString stringWithFormat:@"%@\r",aCmd]];
 	}
 	if(!lastRequest){
-		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:1];
+		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:3];
 	}
 }
 
 - (void) process_response:(NSString*)theResponse
 {
-	if([theResponse hasPrefix:@"a"]){	//Auto Mode
+	NSLog(@"response: %@\n",theResponse);
+	if (recordComingIn){
+		if([theResponse rangeOfString:@"#"].location != NSNotFound){	//no records
+			recordComingIn = NO;
+		}
+		else {
+			[buffer appendString:theResponse];
+			[buffer autorelease];
+			buffer = [[[buffer componentsSeparatedByString:@"  "]componentsJoinedByString:@" "] mutableCopy] ;
+
+			NSArray* parts = [buffer componentsSeparatedByString:@" "];
+			if([parts count] >= 12){
+				NSString* datePart		= [parts objectAtIndex:1];
+				NSString* timePart		= [parts objectAtIndex:2];
+				NSString* size1Part		= [parts objectAtIndex:4];
+				NSString* count1Part	= [parts objectAtIndex:5];
+				NSString* size2Part		= [parts objectAtIndex:6];
+				NSString* count2Part	= [parts objectAtIndex:7];
+				if([datePart length] >= 6 && [timePart length] >= 6){
+					[self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
+											   [[datePart substringWithRange:NSMakeRange(0,2)]intValue],
+											   [[datePart substringWithRange:NSMakeRange(2,2)]intValue],
+											   [[datePart substringWithRange:NSMakeRange(4,2)]intValue],
+											   [[timePart substringWithRange:NSMakeRange(0,2)]intValue],
+											   [[timePart substringWithRange:NSMakeRange(2,2)]intValue],
+											   [[timePart substringWithRange:NSMakeRange(4,2)]intValue]
+											   ]];
+				}
+				
+				[self setSize1: [size1Part floatValue]];
+				[self setCount1: [count1Part intValue]];
+				[self setSize2: [size2Part floatValue]];
+				[self setCount2: [count2Part intValue]];
+				
+				recordComingIn = NO;
+			}
+		}
+	}
+	else if(statusComingIn){
+		[buffer appendString:theResponse];
+		if([buffer length] == 2){
+			[self processStatus:buffer];
+		}
+	}
+
+	else if([theResponse hasPrefix:@"a"]){	//Auto Mode
 	}
 	
 	else if([theResponse hasPrefix:@"b"]){	//Manual Mode
@@ -553,41 +601,22 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	}
 	
 	else if([theResponse hasPrefix:@"M"]){	//Mode Request
-		NSString* s = [theResponse substringWithRange:NSMakeRange(1,1)];
-		if([s isEqualToString:@"C"])	  [self setCountingMode:kMet237Counting];
-		else if([s isEqualToString:@"H"]) [self setCountingMode:kMet237Holding];
-		else if([s isEqualToString:@"S"]) [self setCountingMode:kMet237Stopped];
-	}
-	
-	else if([theResponse hasPrefix:@"R"]){	//Indentify Model
-	}
-	
-	else if([theResponse hasPrefix:@"A"]){	//Send record
-		NSArray* parts = [theResponse componentsSeparatedByString:@" "];
-		if([parts count] >= 8){
-			NSString* datePart		= [parts objectAtIndex:1];
-			NSString* timePart		= [parts objectAtIndex:2];
-			NSString* size1Part		= [parts objectAtIndex:4];
-			NSString* count1Part	= [parts objectAtIndex:5];
-			NSString* size2Part		= [parts objectAtIndex:6];
-			NSString* count2Part	= [parts objectAtIndex:7];
-			
-			[self setMeasurementDate: [NSString stringWithFormat:@"%02d/%02d/%02d %02d:%02d:%02d",
-									   [datePart substringWithRange:NSMakeRange(0,2)],
-									   [datePart substringWithRange:NSMakeRange(2,2)],
-									   [datePart substringWithRange:NSMakeRange(4,2)],
-									   [timePart substringWithRange:NSMakeRange(0,2)],
-									   [timePart substringWithRange:NSMakeRange(2,2)],
-									   [timePart substringWithRange:NSMakeRange(4,2)]
-									   ]];
-			 
-			 [self setSize1: [size1Part floatValue]];
-			 [self setCount1: [count1Part intValue]];
-			 [self setSize2: [size2Part floatValue]];
-			 [self setCount2: [count2Part intValue]];
-		
+		if([theResponse length]<2){
+			statusComingIn = YES;
+			[buffer release];
+			buffer = [[NSMutableString string] retain];
+			[buffer appendString:theResponse];	
 		}
+		else [self processStatus:theResponse];
 	}
+		
+	else if([theResponse hasPrefix:@"A"] | [theResponse hasPrefix:@"R"]){	//Send record
+		recordComingIn = YES;
+		[buffer release];
+		buffer = [[NSMutableString string] retain];
+		[buffer appendString:theResponse];	
+	}
+	
 			 
 	else if([theResponse hasPrefix:@"R"]){	//resend record
 	}
@@ -606,9 +635,18 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	}
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+	[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:3];
 
 	//NSLog(@"%@\n",theResponse);
+}
+
+- (void) processStatus:(NSString*)aString
+{
+	NSString* s = [aString substringWithRange:NSMakeRange(1,1)];
+	if([s isEqualToString:@"C"])	  [self setCountingMode:kMet237Counting];
+	else if([s isEqualToString:@"H"]) [self setCountingMode:kMet237Holding];
+	else if([s isEqualToString:@"S"]) [self setCountingMode:kMet237Stopped];
+	statusComingIn = NO;
 }
 
 - (void) startTimeOut

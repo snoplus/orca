@@ -49,6 +49,8 @@
 		NSDate* cycleStarted;
 		NSDate* cycleWillEnd;
 		int cycleNumber;
+		BOOL recordComingIn;
+		BOOL statusComingIn;
 }
 
 #pragma mark ***Initialization
