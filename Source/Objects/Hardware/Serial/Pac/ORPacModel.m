@@ -824,6 +824,99 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 	[s writeToFile:fullFileName atomically:NO encoding:NSASCIIStringEncoding error:nil];
 
 }
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting
+{
+	[self _stopPolling];
+    readOnce = NO;
+}
+
+- (void) processIsStopping
+{
+	[self _startPolling];
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{    
+    if(!readOnce){
+        @try { 
+            [self readAdcs]; 
+			readOnce = YES;
+        }
+		@catch(NSException* localException) { 
+			//catch this here to prevent it from falling thru, but nothing to do.
+        }
+    }
+}
+
+- (void) endProcessCycle
+{
+    readOnce = NO;
+}
+
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"Pac,%d",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+		theValue = 	[self convertedAdc:aChan];
+	}
+	return theValue;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+		theValue = (double)5.0; //just set to the max value for now
+	}
+	return theValue;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return 0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		*theLowLimit = -.001;
+		*theHighLimit =  5.0; //Is this really the max value
+	}		
+}
+
+- (BOOL) processValue:(int)channel
+{
+	BOOL r;
+	@synchronized(self){
+		r = YES;    //temp -- figure out what the process bool for this object should be.
+	}
+	return r;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do. not used in adcs. really shouldn't be in the protocol
+}
 
 @end
 
@@ -935,100 +1028,5 @@ NSString* ORPacModelQueCountChanged		= @"ORPacModelQueCountChanged";
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:nextTry];
 	}
 }
-
-#pragma mark •••Bit Processing Protocol
-- (void) processIsStarting
-{
-	[self _stopPolling];
-    readOnce = NO;
-}
-
-- (void) processIsStopping
-{
-	[self _startPolling];
-}
-
-//note that everything called by these routines MUST be threadsafe
-- (void) startProcessCycle
-{    
-    if(!readOnce){
-        @try { 
-            [self readAdcs]; 
-             readOnce = YES;
-        }
-		@catch(NSException* localException) { 
-			//catch this here to prevent it from falling thru, but nothing to do.
-        }
-    }
-}
-
-- (void) endProcessCycle
-{
-    readOnce = NO;
-}
-
-- (NSString*) identifier
-{
-	NSString* s;
- 	@synchronized(self){
-		s= [NSString stringWithFormat:@"Pac,%d",[self uniqueIdNumber]];
-	}
-	return s;
-}
-
-- (NSString*) processingTitle
-{
-	NSString* s;
- 	@synchronized(self){
-		s= [self identifier];
-	}
-	return s;
-}
-
-- (double) convertedValue:(int)aChan
-{
-	double theValue;
-	@synchronized(self){
-		theValue = 	[self convertedAdc:aChan];
-	}
-	return theValue;
-}
-
-- (double) maxValueForChan:(int)aChan
-{
-	double theValue;
-	@synchronized(self){
-		theValue = (double)5.0; //just set to the max value for now
-	}
-	return theValue;
-}
-
-- (double) minValueForChan:(int)aChan
-{
-	return 0;
-}
-
-- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
-{
-	@synchronized(self){
-		*theLowLimit = -.001;
-		*theHighLimit =  5.0; //Is this really the max value
-	}		
-}
-
-- (BOOL) processValue:(int)channel
-{
-	BOOL r;
-	@synchronized(self){
-		r = YES;    //temp -- figure out what the process bool for this object should be.
-	}
-	return r;
-}
-
-- (void) setProcessOutput:(int)channel value:(int)value
-{
-    //nothing to do. not used in adcs. really shouldn't be in the protocol
-}
-
 
 @end
