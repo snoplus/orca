@@ -18,6 +18,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+#import "ORAdcProcessing.h"
 
 @class ORSerialPort;
 @class ORTimeRate;
@@ -51,7 +52,7 @@
 #define kPacOkByte				0xf0
 #define kPacErrorByte			0x0f
 
-@interface ORPacModel : OrcaObject
+@interface ORPacModel : OrcaObject <ORAdcProcessing>
 {
     @private
         NSString*			portName;
@@ -80,13 +81,12 @@
 		unsigned long		readCount;
 		int					rdacDisplayType;
 		NSString*			lastRdacFile;
+        BOOL                readOnce;
 }
 
 #pragma mark •••Initialization
-
 - (id)   init;
 - (void) dealloc;
-
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
 
@@ -160,6 +160,19 @@
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (void) readRdacFile:(NSString*) aPath;
 - (void) saveRdacFile:(NSString*) aPath;
+
+#pragma mark •••Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+
 
 @end
 
