@@ -1030,14 +1030,7 @@
 		8444457D0E81311500A1440D /* ORIpeV4FLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 844445740E81311500A1440D /* ORIpeV4FLTDefs.h */; };
 		8444457E0E81311500A1440D /* ORIpeV4FLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844445750E81311500A1440D /* ORIpeV4FLTModel.h */; };
 		8444457F0E81311500A1440D /* ORIpeV4FLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 844445760E81311500A1440D /* ORIpeV4FLTModel.m */; };
-		844446070E815C0D00A1440D /* ORXYCom200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 844445FF0E815C0D00A1440D /* ORXYCom200Controller.h */; };
-		844446080E815C0D00A1440D /* ORXYCom200Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 844446000E815C0D00A1440D /* ORXYCom200Controller.m */; };
-		8444460B0E815C0D00A1440D /* ORXYCom200Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 844446030E815C0D00A1440D /* ORXYCom200Model.h */; };
-		8444460C0E815C0D00A1440D /* ORXYCom200Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 844446040E815C0D00A1440D /* ORXYCom200Model.m */; };
-		8444460D0E815C0D00A1440D /* XYCom200.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844446050E815C0D00A1440D /* XYCom200.nib */; };
-		8444460E0E815C0D00A1440D /* XYCom200Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844446060E815C0D00A1440D /* XYCom200Card.gif */; };
 		844484D10F8FB2B60013E933 /* ZupRampItem.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844484D00F8FB2B60013E933 /* ZupRampItem.nib */; };
-		844506DF0E896F5A005677E7 /* PISlashTChip.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844506DE0E896F5A005677E7 /* PISlashTChip.nib */; };
 		844514840674DF9600A19654 /* LC950Oscilloscope.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8445147C0674DF9500A19654 /* LC950Oscilloscope.gif */; };
 		844514850674DF9600A19654 /* ORLC950.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8445147D0674DF9500A19654 /* ORLC950.nib */; };
 		844514860674DF9600A19654 /* ORLC950Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8445147E0674DF9500A19654 /* ORLC950Controller.h */; };
@@ -2552,6 +2545,19 @@
 		9CF2C1B90CC195E2002B279B /* ORL8013CrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1AF0CC195E1002B279B /* ORL8013CrateController.m */; };
 		9CF2C1BA0CC195E2002B279B /* ORL8013CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF2C1B00CC195E1002B279B /* ORL8013CrateModel.h */; };
 		9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */; };
+		CE10F0111451674C0084C15D /* ORXYCom200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F005145167450084C15D /* ORXYCom200Controller.h */; };
+		CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F006145167460084C15D /* ORXYCom200Controller.m */; };
+		CE10F0131451674C0084C15D /* ORXYCom200Model.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F007145167460084C15D /* ORXYCom200Model.h */; };
+		CE10F0141451674C0084C15D /* ORXYCom200Model.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F008145167470084C15D /* ORXYCom200Model.m */; };
+		CE10F0151451674C0084C15D /* ORXYCom564Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F009145167470084C15D /* ORXYCom564Controller.h */; };
+		CE10F0161451674C0084C15D /* ORXYCom564Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F00A145167480084C15D /* ORXYCom564Controller.m */; };
+		CE10F0171451674C0084C15D /* ORXYCom564Model.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F00B145167490084C15D /* ORXYCom564Model.h */; };
+		CE10F0181451674C0084C15D /* ORXYCom564Model.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F00C145167490084C15D /* ORXYCom564Model.m */; };
+		CE10F0191451674C0084C15D /* PISlashTChip.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE10F00D1451674A0084C15D /* PISlashTChip.nib */; };
+		CE10F01A1451674C0084C15D /* XYCom200.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE10F00E1451674A0084C15D /* XYCom200.nib */; };
+		CE10F01B1451674C0084C15D /* XYCom200Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE10F00F1451674B0084C15D /* XYCom200Card.gif */; };
+		CE10F01C1451674C0084C15D /* XYCom564.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE10F0101451674B0084C15D /* XYCom564.nib */; };
+		CE10F01E145189510084C15D /* XYCom564Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE10F01D145189510084C15D /* XYCom564Card.gif */; };
 		CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
@@ -3532,16 +3538,9 @@
 		844445740E81311500A1440D /* ORIpeV4FLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeV4FLTDefs.h; sourceTree = "<group>"; };
 		844445750E81311500A1440D /* ORIpeV4FLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeV4FLTModel.h; sourceTree = "<group>"; };
 		844445760E81311500A1440D /* ORIpeV4FLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORIpeV4FLTModel.m; sourceTree = "<group>"; };
-		844445FF0E815C0D00A1440D /* ORXYCom200Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Controller.h; path = Source/Objects/Hardware/Vme/XYCom200/ORXYCom200Controller.h; sourceTree = SOURCE_ROOT; };
-		844446000E815C0D00A1440D /* ORXYCom200Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Controller.m; path = Source/Objects/Hardware/Vme/XYCom200/ORXYCom200Controller.m; sourceTree = SOURCE_ROOT; };
-		844446030E815C0D00A1440D /* ORXYCom200Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Model.h; path = Source/Objects/Hardware/Vme/XYCom200/ORXYCom200Model.h; sourceTree = SOURCE_ROOT; };
-		844446040E815C0D00A1440D /* ORXYCom200Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Model.m; path = Source/Objects/Hardware/Vme/XYCom200/ORXYCom200Model.m; sourceTree = SOURCE_ROOT; };
-		844446050E815C0D00A1440D /* XYCom200.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XYCom200.nib; path = Source/Objects/Hardware/Vme/XYCom200/XYCom200.nib; sourceTree = SOURCE_ROOT; };
-		844446060E815C0D00A1440D /* XYCom200Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XYCom200Card.gif; path = Source/Objects/Hardware/Vme/XYCom200/XYCom200Card.gif; sourceTree = SOURCE_ROOT; };
 		844484D00F8FB2B60013E933 /* ZupRampItem.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ZupRampItem.nib; path = Source/Objects/Hardware/Internet/ZupSupply/ZupRampItem.nib; sourceTree = SOURCE_ROOT; };
 		8444A5FB04BC8382005F64B1 /* ORDispatcherClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDispatcherClient.h; path = "Source/Objects/Data Processing/Dispatcher/ORDispatcherClient.h"; sourceTree = SOURCE_ROOT; };
 		8444A5FC04BC8382005F64B1 /* ORDispatcherClient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDispatcherClient.m; path = "Source/Objects/Data Processing/Dispatcher/ORDispatcherClient.m"; sourceTree = SOURCE_ROOT; };
-		844506DE0E896F5A005677E7 /* PISlashTChip.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PISlashTChip.nib; path = Source/Objects/Hardware/Vme/XYCom200/PISlashTChip.nib; sourceTree = SOURCE_ROOT; };
 		8445147C0674DF9500A19654 /* LC950Oscilloscope.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LC950Oscilloscope.gif; sourceTree = "<group>"; };
 		8445147D0674DF9500A19654 /* ORLC950.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ORLC950.nib; sourceTree = "<group>"; };
 		8445147E0674DF9500A19654 /* ORLC950Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORLC950Controller.h; sourceTree = "<group>"; };
@@ -5219,6 +5218,19 @@
 		9CF2C1AF0CC195E1002B279B /* ORL8013CrateController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateController.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateController.m"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B00CC195E1002B279B /* ORL8013CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL8013CrateModel.h; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.h"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
+		CE10F005145167450084C15D /* ORXYCom200Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Controller.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.h; sourceTree = SOURCE_ROOT; };
+		CE10F006145167460084C15D /* ORXYCom200Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Controller.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Controller.m; sourceTree = SOURCE_ROOT; };
+		CE10F007145167460084C15D /* ORXYCom200Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom200Model.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Model.h; sourceTree = SOURCE_ROOT; };
+		CE10F008145167470084C15D /* ORXYCom200Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom200Model.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom200Model.m; sourceTree = SOURCE_ROOT; };
+		CE10F009145167470084C15D /* ORXYCom564Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom564Controller.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom564Controller.h; sourceTree = SOURCE_ROOT; };
+		CE10F00A145167480084C15D /* ORXYCom564Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom564Controller.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom564Controller.m; sourceTree = SOURCE_ROOT; };
+		CE10F00B145167490084C15D /* ORXYCom564Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYCom564Model.h; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom564Model.h; sourceTree = SOURCE_ROOT; };
+		CE10F00C145167490084C15D /* ORXYCom564Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYCom564Model.m; path = Source/Objects/Hardware/Vme/XYCom/ORXYCom564Model.m; sourceTree = SOURCE_ROOT; };
+		CE10F00D1451674A0084C15D /* PISlashTChip.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PISlashTChip.nib; path = Source/Objects/Hardware/Vme/XYCom/PISlashTChip.nib; sourceTree = SOURCE_ROOT; };
+		CE10F00E1451674A0084C15D /* XYCom200.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XYCom200.nib; path = Source/Objects/Hardware/Vme/XYCom/XYCom200.nib; sourceTree = SOURCE_ROOT; };
+		CE10F00F1451674B0084C15D /* XYCom200Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XYCom200Card.gif; path = Source/Objects/Hardware/Vme/XYCom/XYCom200Card.gif; sourceTree = SOURCE_ROOT; };
+		CE10F0101451674B0084C15D /* XYCom564.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XYCom564.nib; path = Source/Objects/Hardware/Vme/XYCom/XYCom564.nib; sourceTree = SOURCE_ROOT; };
+		CE10F01D145189510084C15D /* XYCom564Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XYCom564Card.gif; path = Source/Objects/Hardware/Vme/XYCom/XYCom564Card.gif; sourceTree = SOURCE_ROOT; };
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
@@ -7158,19 +7170,25 @@
 			path = "Source/Objects/Hardware/IPE/IpeV4 FLT";
 			sourceTree = SOURCE_ROOT;
 		};
-		844445FE0E815C0D00A1440D /* XYCom200 */ = {
+		844445FE0E815C0D00A1440D /* XYCom */ = {
 			isa = PBXGroup;
 			children = (
-				844445FF0E815C0D00A1440D /* ORXYCom200Controller.h */,
-				844446000E815C0D00A1440D /* ORXYCom200Controller.m */,
-				844446030E815C0D00A1440D /* ORXYCom200Model.h */,
-				844446040E815C0D00A1440D /* ORXYCom200Model.m */,
-				844446050E815C0D00A1440D /* XYCom200.nib */,
-				844506DE0E896F5A005677E7 /* PISlashTChip.nib */,
-				844446060E815C0D00A1440D /* XYCom200Card.gif */,
+				CE10F005145167450084C15D /* ORXYCom200Controller.h */,
+				CE10F006145167460084C15D /* ORXYCom200Controller.m */,
+				CE10F007145167460084C15D /* ORXYCom200Model.h */,
+				CE10F008145167470084C15D /* ORXYCom200Model.m */,
+				CE10F009145167470084C15D /* ORXYCom564Controller.h */,
+				CE10F00A145167480084C15D /* ORXYCom564Controller.m */,
+				CE10F00B145167490084C15D /* ORXYCom564Model.h */,
+				CE10F00C145167490084C15D /* ORXYCom564Model.m */,
+				CE10F00D1451674A0084C15D /* PISlashTChip.nib */,
+				CE10F00E1451674A0084C15D /* XYCom200.nib */,
+				CE10F00F1451674B0084C15D /* XYCom200Card.gif */,
+				CE10F01D145189510084C15D /* XYCom564Card.gif */,
+				CE10F0101451674B0084C15D /* XYCom564.nib */,
 			);
-			name = XYCom200;
-			path = Source/Objects/Hardware/Vme/XYCom200;
+			name = XYCom;
+			path = Source/Objects/Hardware/Vme/XYCom;
 			sourceTree = SOURCE_ROOT;
 		};
 		8445147B0674DF9500A19654 /* Oscilloscope LC950 */ = {
@@ -11132,7 +11150,7 @@
 				84749D0A07D6526F001553EC /* MCarrier */,
 				845115E104030088005F64B1 /* IPCarrier */,
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
-				844445FE0E815C0D00A1440D /* XYCom200 */,
+				844445FE0E815C0D00A1440D /* XYCom */,
 				84E2063C11AD7841007D757F /* SIS3800 */,
 				8457BE2C11B0183500C4082D /* SIS3820 */,
 				84BAA29A0E92A81A00E19946 /* SIS3300 */,
@@ -11897,8 +11915,6 @@
 				8444457B0E81311500A1440D /* ORIpeV4FLTDecoder.h in Headers */,
 				8444457D0E81311500A1440D /* ORIpeV4FLTDefs.h in Headers */,
 				8444457E0E81311500A1440D /* ORIpeV4FLTModel.h in Headers */,
-				844446070E815C0D00A1440D /* ORXYCom200Controller.h in Headers */,
-				8444460B0E815C0D00A1440D /* ORXYCom200Model.h in Headers */,
 				84BA98FD0E91260600E19946 /* SNO.h in Headers */,
 				84BA99010E91279000E19946 /* SNOCmds.h in Headers */,
 				84BAA2A30E92A81A00E19946 /* ORSIS3300Controller.h in Headers */,
@@ -12249,6 +12265,10 @@
 				845CDF7B143DE531009FE5B9 /* ORComposite2DPlotView.h in Headers */,
 				845CE4D6143F2EF7009FE5B9 /* ORRamperView.h in Headers */,
 				845CE953143F550C009FE5B9 /* ORValueBarGroupView.h in Headers */,
+				CE10F0111451674C0084C15D /* ORXYCom200Controller.h in Headers */,
+				CE10F0131451674C0084C15D /* ORXYCom200Model.h in Headers */,
+				CE10F0151451674C0084C15D /* ORXYCom564Controller.h in Headers */,
+				CE10F0171451674C0084C15D /* ORXYCom564Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12742,9 +12762,6 @@
 				9C7CE7E50E2FC22500F63679 /* CV260Card.gif in Resources */,
 				844445770E81311500A1440D /* IpeV4FLT.nib in Resources */,
 				844445780E81311500A1440D /* IpeV4FLTCard.gif in Resources */,
-				8444460D0E815C0D00A1440D /* XYCom200.nib in Resources */,
-				8444460E0E815C0D00A1440D /* XYCom200Card.gif in Resources */,
-				844506DF0E896F5A005677E7 /* PISlashTChip.nib in Resources */,
 				84BAA2A90E92A81A00E19946 /* SIS3300.nib in Resources */,
 				84BAA2AA0E92A81A00E19946 /* SIS3300Card.gif in Resources */,
 				84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */,
@@ -13025,7 +13042,11 @@
 				847F948213D4AA31006B06B4 /* Rad7.tif in Resources */,
 				841C4DF5141FA72800F95B50 /* Met237.nib in Resources */,
 				841C4DF6141FA72800F95B50 /* Met237.tif in Resources */,
-				84AC47611454BE5F009D6F83 /* Bug.tif in Resources */,
+				CE10F0191451674C0084C15D /* PISlashTChip.nib in Resources */,
+				CE10F01A1451674C0084C15D /* XYCom200.nib in Resources */,
+				CE10F01B1451674C0084C15D /* XYCom200Card.gif in Resources */,
+				CE10F01C1451674C0084C15D /* XYCom564.nib in Resources */,
+				CE10F01E145189510084C15D /* XYCom564Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13595,8 +13616,6 @@
 				8444457A0E81311500A1440D /* ORIpeV4FLTController.m in Sources */,
 				8444457C0E81311500A1440D /* ORIpeV4FLTDecoder.m in Sources */,
 				8444457F0E81311500A1440D /* ORIpeV4FLTModel.m in Sources */,
-				844446080E815C0D00A1440D /* ORXYCom200Controller.m in Sources */,
-				8444460C0E815C0D00A1440D /* ORXYCom200Model.m in Sources */,
 				84BAA2A40E92A81A00E19946 /* ORSIS3300Controller.m in Sources */,
 				84BAA2A60E92A81A00E19946 /* ORSIS3300Decoders.m in Sources */,
 				84BAA2A80E92A81A00E19946 /* ORSIS3300Model.m in Sources */,
@@ -13906,6 +13925,10 @@
 				845CDF7C143DE531009FE5B9 /* ORComposite2DPlotView.m in Sources */,
 				845CE4D7143F2EF7009FE5B9 /* ORRamperView.m in Sources */,
 				845CE954143F550C009FE5B9 /* ORValueBarGroupView.m in Sources */,
+				CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */,
+				CE10F0141451674C0084C15D /* ORXYCom200Model.m in Sources */,
+				CE10F0161451674C0084C15D /* ORXYCom564Controller.m in Sources */,
+				CE10F0181451674C0084C15D /* ORXYCom564Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
