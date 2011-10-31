@@ -69,6 +69,8 @@
 	[aPlot1 setLineColor:[NSColor blueColor]];
 	[plotter0 addPlot: aPlot1];
 	[aPlot1 release];
+	
+	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 
 	[super awakeFromNib];
 }
