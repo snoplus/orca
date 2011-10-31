@@ -71,8 +71,11 @@ typedef enum {
 @interface ORXYCom564Model : ORVmeIOCard <ORAdcProcessing>
 {
     @protected
+    unsigned long          dataId;
     EXyCom564OperationMode operationMode;
     EXyCom564AutoscanMode  autoscanMode;
+    BOOL                   pollCard;
+    BOOL                   shipRecords;    
     NSTimeInterval         pollingState;
     BOOL                   pollRunning;
     NSMutableArray*        channelGains;
@@ -85,6 +88,8 @@ typedef enum {
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
 - (EXyCom564ReadoutMode)    readoutMode;
 - (void)                    setReadoutMode:(EXyCom564ReadoutMode) aMode;
 - (EXyCom564OperationMode) 	operationMode;
@@ -93,6 +98,8 @@ typedef enum {
 - (void)                    setAutoscanMode: (EXyCom564AutoscanMode) anIndex;
 - (NSTimeInterval)          pollingState;
 - (void)                    setPollingState:(NSTimeInterval)aState;
+- (BOOL)                    shipRecords;
+- (void)                    setShipRecords:(BOOL)ship;
 
 #pragma mark •••Hardware Access
 - (void) read:(uint8_t*) aval atRegisterIndex:(EXyCom564Registers)index; 
@@ -103,12 +110,15 @@ typedef enum {
 - (EXyCom564ChannelGain) getGain:(unsigned short) aChannel;
 - (void) readAllAdcChannels;
 - (uint16_t) getAdcValueAtChannel:(int)chan;
+- (BOOL) isPolling;
 
 - (void) initBoard;
 - (void) report;
 - (void) resetBoard;
 - (void) programGains;
 - (void) programReadoutMode;
+- (void) startPollingActivity;
+- (void) stopPollingActivity;
 
 #pragma mark ***Card qualities
 - (short) getNumberOfChannels;
@@ -124,10 +134,16 @@ typedef enum {
 - (NSString*) 		getAutoscanModeName: (EXyCom564AutoscanMode) aMode;
 - (NSString*) 		getChannelGainName: (EXyCom564ChannelGain) aMode;
 
+#pragma mark •••Data records
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherCard;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 @end
 
 #pragma mark •••External String Definitions
@@ -137,4 +153,6 @@ extern NSString* ORXYCom564OperationModeChanged;
 extern NSString* ORXYCom564AutoscanModeChanged;
 extern NSString* ORXYCom564ChannelGainChanged;
 extern NSString* ORXYCom564PollingStateChanged;
+extern NSString* ORXYCom564PollingActivityChanged;
 extern NSString* ORXYCom564ADCValuesChanged;
+extern NSString* ORXYCom564ShipRecordsChanged;

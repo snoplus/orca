@@ -20,6 +20,8 @@
 #pragma mark ***Imported Files
 #import "ORXYCom564Model.h"
 #import "ORVmeCrateModel.h"
+#import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
 
 #pragma mark ***Notification Strings
 NSString* ORXYCom564Lock					= @"ORXYCom564Lock";
@@ -29,7 +31,8 @@ NSString* ORXYCom564AutoscanModeChanged     = @"ORXYCom564AutoscanModeChanged";
 NSString* ORXYCom564ChannelGainChanged      = @"ORXYCom564ChannelGainChanged";
 NSString* ORXYCom564PollingStateChanged     = @"ORXYCom564PollingStateChanged";
 NSString* ORXYCom564ADCValuesChanged        = @"ORXYCom564ADCValuesChanged";
-
+NSString* ORXYCom564PollingActivityChanged  = @"ORXYCom564PollingActivityChanged"; 
+NSString* ORXYCom564ShipRecordsChanged      = @"ORXYCom564ShipRecordsChanged";
 
 @interface ORXYCom564Model (private)
 - (void) _setChannelGains:(NSMutableArray*)gains;
@@ -38,6 +41,7 @@ NSString* ORXYCom564ADCValuesChanged        = @"ORXYCom564ADCValuesChanged";
 - (void) _startPolling;
 - (void) _pollAllChannels;
 - (void) _setChannelADCValues:(NSMutableArray*)vals;
+- (void) _shipRawValues;
 @end
 
 @implementation ORXYCom564Model
@@ -111,9 +115,13 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
     [self setAddressModifier:0x29];
-    [[self undoManager] enableUndoRegistration];
     [self _setChannelGains:nil];
-    [self _setChannelADCValues:nil];    
+    [self _setChannelADCValues:nil];
+    [self setShipRecords:NO];
+    [self setOperationMode:kAutoscanning];
+    [self setAutoscanMode:k0to64];   
+    [self _stopPolling];
+    [[self undoManager] enableUndoRegistration];    
     return self;
 }
 
@@ -135,6 +143,14 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [self linkToController:@"ORXYCom564Controller"];
 }
 #pragma mark ***Accessors
+- (unsigned long) dataId 
+{
+    return dataId;
+}
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
 
 - (void) setReadoutMode:(EXyCom564ReadoutMode) aMode
 {
@@ -161,12 +177,6 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     
     pollingState = aState;
     
-    if (pollingState != 0) {        
-        [self performSelector:@selector(_startPolling) withObject:nil afterDelay:0.5];
-    } else {
-        [self performSelector:@selector(_stopPolling) withObject:nil afterDelay:0.5];
-    }
-    
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORXYCom564PollingStateChanged
 	 object: self];
@@ -175,6 +185,16 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 - (NSTimeInterval) pollingState
 {
     return pollingState;
+}
+
+- (void) startPollingActivity
+{
+    [self performSelector:@selector(_startPolling) withObject:nil afterDelay:0.5];    
+    
+}
+- (void) stopPollingActivity
+{
+    [self performSelector:@selector(_stopPolling) withObject:nil afterDelay:0.5];    
 }
 
 #pragma mark •••Hardware Access
@@ -430,6 +450,23 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	 postNotificationName:ORXYCom564AutoscanModeChanged
 	 object:self];    
 }
+
+- (BOOL) shipRecords
+{
+    return shipRecords;
+}
+
+- (void) setShipRecords:(BOOL)ship
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:[self shipRecords]];
+    
+    shipRecords = ship;
+    
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORXYCom564ShipRecordsChanged
+	 object:self];    
+}
+
 #pragma mark ***Readout
 
 - (void) readAllAdcChannels
@@ -518,6 +555,9 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
 	pollRunning = NO;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORXYCom564PollingActivityChanged
+	 object: self];    
 }
 
 - (void) _startPolling
@@ -545,12 +585,18 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
         if(verbose) NSLog(@"Not Polling XVME564,%d,%d\n",[self crateNumber],[self slot]);
     }
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORXYCom564PollingActivityChanged
+	 object: self];
 }
 
 - (void) _pollAllChannels
 {
     @try { 
         [self readAllAdcChannels]; 
+        if ([self shipRecords]) {
+            [self _shipRawValues];
+        }
     }
 	@catch(NSException* localException) { 
 		//catch this here to prevent it from falling thru, but nothing to do.
@@ -560,6 +606,75 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	if(pollingState!=0){
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
 	}
+}
+- (BOOL) isPolling
+{
+    return pollRunning;
+}
+
+#pragma mark •••Data records
+- (void) setDataIds:(id)assigner
+{
+    dataId          = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherCard
+{
+    [self setDataId:[anotherCard dataId]];
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];	
+    return objDictionary;
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"XyCom564"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"ORXYCom564Decoder",                                               @"decoder",
+                                 [NSNumber numberWithLong:dataId],@"dataId",
+                                 [NSNumber numberWithBool:YES],@"variable",
+                                 [NSNumber numberWithLong:-1],@"length",
+                                 nil];
+    [dataDictionary setObject:aDictionary forKey:@"XYCom564"];
+    
+    return dataDictionary;
+}
+- (void) _shipRawValues
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+	
+	if(!runInProgress) return;
+    int channelsToRead = kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);    
+    int headernumber = 3;
+    uint32_t data[headernumber+channelsToRead];
+    
+    data[1] = (([self crateNumber]&0x01e)<<21) |  ([self slot]&0xf);
+    
+    //get the time(UT!)
+    time_t	ut_time;
+    time(&ut_time);
+    data[2] = ut_time;	//seconds since 1970
+    int index = headernumber;
+    int i;
+    for(i=0;i<channelsToRead;i++){
+        uint16_t val = [self getAdcValueAtChannel:i];
+        data[index++] = (i&0xff)<<16 | val & 0xffff;
+    }
+    data[0] = dataId | index;
+    
+    if(index>3){
+        //the full record goes into the data stream via a notification
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+                                                            object:[NSData dataWithBytes:data length:sizeof(data[0])*index]];
+    }
 }
 
 #pragma mark •••Archival
@@ -577,7 +692,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     }
     [self setOperationMode:[decoder decodeIntForKey:@"kORXYCom564OperationMode"]];    
     [self setAutoscanMode:[decoder decodeIntForKey:@"kORXYCom564AutoscanMode"]];
-    [self setPollingState:[decoder decodeIntForKey:@"kORXYCom564PollingState"]];    
+    [self setPollingState:[decoder decodeIntForKey:@"kORXYCom564PollingState"]]; 
+    [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];     
     [[self undoManager] enableUndoRegistration];
 		
     return self;
@@ -590,14 +706,8 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [encoder encodeInt:[self operationMode] forKey:@"kORXYCom564OperationMode"];    
     [encoder encodeInt:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
     [encoder encodeInt:pollingState forKey:@"kORXYCom564PollingState"];        
-    [encoder encodeObject:chanADCVals forKey:@"kORXYCom564chanADCValues"];    
-}
-
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-{
-    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-	
-    return objDictionary;
+    [encoder encodeObject:chanADCVals forKey:@"kORXYCom564chanADCValues"]; 
+    [encoder encodeBool:shipRecords forKey:@"kORXYCom564ShipRecords"];
 }
 
 @end

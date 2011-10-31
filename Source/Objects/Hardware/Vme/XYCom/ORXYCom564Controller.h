@@ -54,6 +54,9 @@
 	IBOutlet NSButton*		resetBoardButton;    
 	IBOutlet NSButton*		reportButton;
     
+    IBOutlet NSButton*      shipRecordsButton;
+    IBOutlet NSButton*      pollButton;    
+    
     IBOutlet NSTableView*   adcCountsAndChannels;
     
     IBOutlet NSPopUpButton*	pollingState;
@@ -75,6 +78,8 @@
 - (void) channelGainsChanged:(NSNotification*) aNotification;
 - (void) displayRawChanged:(NSNotification*)aNote;
 - (void) pollingStateChanged:(NSNotification*)aNote;
+- (void) pollingActivityChanged:(NSNotification*)aNote;
+- (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) updateRegisterDescription:(short) aRegisterIndex;
 
 #pragma mark •••Actions
@@ -86,6 +91,8 @@
 - (IBAction) selectOperationModeAction:(id) aSender;
 - (IBAction) selectAutoscanModeAction:(id) aSender;
 - (IBAction) setPollingAction:(id)sender;
+- (IBAction) startPollingActivityAction:(id)sender;
+- (IBAction) setShipRecordsAction:(id)sender;
 
 - (IBAction) read: (id) pSender;
 - (IBAction) write: (id) pSender;

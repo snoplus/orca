@@ -104,6 +104,16 @@
 					 selector:@selector(displayRawChanged:)
 						 name:ORXYCom564ADCValuesChanged
 					   object:model];     
+    
+    [notifyCenter addObserver:self
+					 selector:@selector(pollingActivityChanged:)
+						 name:ORXYCom564PollingActivityChanged
+					   object:model];         
+    
+    [notifyCenter addObserver:self
+					 selector:@selector(shipRecordsChanged:)
+						 name:ORXYCom564ShipRecordsChanged
+					   object:model];         
 }
 
 
@@ -117,7 +127,8 @@
     [self operationModeChanged:nil];    
     [self autoscanModeChanged:nil];
     [self channelGainsChanged:nil]; 
-    [self displayRawChanged:nil];     
+    [self displayRawChanged:nil];
+    [self pollingActivityChanged:nil];    
 }
 #pragma mark •••Interface Management
 
@@ -203,6 +214,20 @@
         [self updatePopUpButton:[channelGainSettings cellAtRow:currentRow column:currentColumn] setting:[model getGain:index]];
     }
 	[self updatePopUpButton:autoscanModePopUp setting:index];
+}
+
+- (void) pollingActivityChanged:(NSNotification*)aNote
+{
+    if ([model isPolling]) {
+        [pollButton setTitle:@"Stop Polling"];
+    } else {
+        [pollButton setTitle:@"Start Polling"];        
+    }
+}
+
+- (void) shipRecordsChanged:(NSNotification*)aNote
+{
+    [shipRecordsButton setState:[model shipRecords]];
 }
 
 - (void) displayRawChanged:(NSNotification*)aNote
@@ -341,6 +366,19 @@
     }
 }
 
+- (IBAction) startPollingActivityAction:(id)sender
+{
+    if ([model isPolling]) {
+        [model stopPollingActivity];
+    } else {
+        [model startPollingActivity];        
+    }
+}
+
+- (IBAction) setShipRecordsAction:(id)sender
+{
+    [model setShipRecords:[sender state]];
+}
 
 #pragma mark ***Misc Helpers
 - (void) populatePopups
@@ -374,7 +412,7 @@
         NSInteger currentRow = i % rows;
         id cell = [channelLabels cellAtRow:currentRow column:currentColumn];
         [cell setTag:i];
-        [[channelLabels cellAtRow:currentRow column:currentColumn] setStringValue:[NSString stringWithFormat:@"%d :",i]];
+        [[channelLabels cellAtRow:currentRow column:currentColumn] setStringValue:[NSString stringWithFormat:@"%d:",i]];
         NSPopUpButtonCell* popCell = [channelGainSettings cellAtRow:currentRow column:currentColumn];
         [popCell setTag:i];
         [popCell removeAllItems];
@@ -404,7 +442,7 @@
     rowIndex += [aTableView tag];
     int chan = [[aTableView tableColumns] indexOfObject:aTableColumn]/2;
     chan = rowIndex + chan*[self numberOfRowsInTableView:aTableView];    
-	if([[aTableColumn identifier] isEqualToString:kXVME564ChannelKey]){
+	if([[aTableColumn identifier] hasPrefix:kXVME564ChannelKey]){
         return [NSString stringWithFormat:@"%d",chan];
 	} else {
         return [NSString stringWithFormat:@"%d",[model getAdcValueAtChannel:chan]];        
