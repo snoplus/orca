@@ -19,6 +19,7 @@
 
 #pragma mark ***Imported Files
 
+@class ORCompositeTimeLineView;
 
 @interface ORMet237Controller : OrcaObjectController
 {
@@ -45,6 +46,8 @@
 	IBOutlet NSTextField*	cycleWillEndField;
 	IBOutlet NSTextField*	cycleStartedField;
 	IBOutlet NSTextField*	runningTextField;
+	
+	IBOutlet ORCompositeTimeLineView*   plotter0;
 }
 
 #pragma mark ***Initialization
@@ -72,6 +75,9 @@
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNotification;
+- (void) scaleAction:(NSNotification*)aNotification;
+- (void) miscAttributesChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
 - (IBAction) lockAction:(id) sender;
@@ -86,6 +92,11 @@
 - (IBAction) cycleDurationAction:(id)sender;
 - (IBAction) startCycleAction:(id)sender;
 - (IBAction) stopCycleAction:(id)sender;
+
+
+#pragma mark ***Data Source
+- (int) numberPointsInPlot:(id)aPlotter;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 @end
 
 

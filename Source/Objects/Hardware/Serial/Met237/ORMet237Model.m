@@ -26,6 +26,7 @@
 #import "ORSerialPortAdditions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
+#import "ORTimeRate.h"
 
 #pragma mark ***External Strings
 NSString* ORMet237ModelCycleNumberChanged	= @"ORMet237ModelCycleNumberChanged";
@@ -81,6 +82,10 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     }
     [serialPort release];
 	
+	int i;
+	for(i=0;i<2;i++){
+		[timeRates[i] release];
+	}	
 	[super dealloc];
 }
 
@@ -151,6 +156,11 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 }
 
 #pragma mark ***Accessors
+
+- (ORTimeRate*)timeRate:(int)index
+{
+	return timeRates[index];
+}
 
 - (int) cycleNumber
 {
@@ -248,8 +258,12 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 
 - (void) setCount2:(int)aCount2
 {
-    count2 = aCount2;
+	//normalize to counts/ft^3
+	//flow for this model is .1 ft^3/min
+    count2 = aCount2*10/(float)cycleDuration;;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCount2Changed object:self];
+	if(timeRates[1] == nil) timeRates[1] = [[ORTimeRate alloc] init];
+	[timeRates[1] addDataToTimeAverage:count2];
 }
 
 - (int) count1
@@ -259,8 +273,12 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 
 - (void) setCount1:(int)aCount1
 {
-    count1 = aCount1;
+	//normalize to counts/ft^3
+	//flow for this model is .1 ft^3/min
+    count1 = aCount1*10/(float)cycleDuration;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCount1Changed object:self];
+	if(timeRates[0] == nil) timeRates[0] = [[ORTimeRate alloc] init];
+	[timeRates[0] addDataToTimeAverage:count1];
 }
 
 - (float) size2
@@ -383,6 +401,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[serialPort setDataBits:8];
         [serialPort open];
 		[self universalSelect];
+		if(wasRunning)[self startCycle];
     }
     else [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -394,10 +413,17 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	wasRunning = [decoder decodeBoolForKey:@"wasRunning"];
 	[self setCycleDuration:		[decoder decodeIntForKey:@"cycleDuration"]];
 	[self setPortWasOpen:		[decoder decodeBoolForKey:	@"ORMet237ModelPortWasOpen"]];
     [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
 	[[self undoManager] enableUndoRegistration];
+
+	int i; 
+	for(i=0;i<2;i++){
+		timeRates[i] = [[ORTimeRate alloc] init];
+	}
+	
 	
     [self registerNotificationObservers];
 
@@ -409,6 +435,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     [encoder encodeInt:cycleDuration forKey:@"cycleDuration"];
     [encoder encodeBool:	portWasOpen		forKey:	@"ORMet237ModelPortWasOpen"];
     [encoder encodeObject:	portName		forKey: @"portName"];
+    [encoder encodeBool:	wasRunning		forKey:	@"wasRunning"];
 }
 
 #pragma mark *** Commands
@@ -461,6 +488,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[self clearBuffer];
 		[self startCountingByComputer];
 		[self checkCycle];
+		[self getMode];
 	}
 }
 
@@ -471,9 +499,105 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[self setRunning:NO];
 		[self setCycleNumber:0];
 		[self stopCounting];
+		[self getMode];
 		[self getRecord];
 	}
 }
+
+#pragma mark •••Bit Processing Protocol
+- (void) processIsStarting
+{
+	if(!running){
+		wasRunning = NO;
+		[self startCycle];
+	}
+}
+
+- (void) processIsStopping
+{
+	if(!wasRunning){
+		[self stopCycle];
+	}
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{    
+	@try { 
+	}
+	@catch(NSException* localException) { 
+		//catch this here to prevent it from falling thru, but nothing to do.
+	}
+}
+
+- (void) endProcessCycle
+{
+}
+
+- (NSString*) identifier
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [NSString stringWithFormat:@"Met237,%d",[self uniqueIdNumber]];
+	}
+	return s;
+}
+
+- (NSString*) processingTitle
+{
+	NSString* s;
+ 	@synchronized(self){
+		s= [self identifier];
+	}
+	return s;
+}
+
+- (double) convertedValue:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+		if(aChan==0) theValue = [self count1];
+		else		 theValue = [self count2];
+	}
+	return theValue;
+}
+
+- (double) maxValueForChan:(int)aChan
+{
+	double theValue;
+	@synchronized(self){
+		theValue = (double)100.0; //just set the max value for now
+	}
+	return theValue;
+}
+
+- (double) minValueForChan:(int)aChan
+{
+	return 0;
+}
+
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		*theLowLimit = -.001;
+		*theHighLimit =  100.0; //Is this really the max value
+	}		
+}
+
+- (BOOL) processValue:(int)channel
+{
+	BOOL r;
+	@synchronized(self){
+		r = YES;    //temp -- figure out what the process bool for this object should be.
+	}
+	return r;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do. not used in adcs. really shouldn't be in the protocol
+}
+
 @end
 
 @implementation ORMet237Model (private)
@@ -484,21 +608,26 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		NSDate* now = [NSDate date];
 		if([cycleWillEnd timeIntervalSinceDate:now] >= 0){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCycleWillEndChanged object:self];
-			[self getMode];
-			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:10];
+			//[self getMode];
+			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:2];
 		}
 		else {
-			int theCount = [self cycleNumber];
-			[self setCycleNumber:theCount+1];
+			//time to end this cycle
 			[self stopCounting];
 			[self getRecord];
-			[self startCountingByComputer];
+
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 
-            NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
+			NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
 #else
-            NSDate* endTime = [now addTimeInterval:[self cycleDuration]*60];
+			NSDate* endTime = [now addTimeInterval:[self cycleDuration]*60];
 #endif
-            [self setCycleWillEnd:endTime]; 
+			
+			[self setCycleStarted:now];
+			[self setCycleWillEnd:endTime]; 
+			[self startCountingByComputer];
+			int theCount = [self cycleNumber];
+			[self setCycleNumber:theCount+1];
+			[self performSelector:@selector(checkCycle) withObject:nil afterDelay:1];
 		}
 	}
 }
@@ -508,6 +637,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	NSLogError(@"Met237",@"command timeout",nil);
 	[cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
+	[self universalSelect];
 }
 
 - (void) goToNextCommand
@@ -525,7 +655,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	
 	if(aCmd){
 		[self startTimeOut];
-		[serialPort writeString:[NSString stringWithFormat:@"%@\r",aCmd]];
+		[serialPort writeString:[NSString stringWithFormat:@"%@",aCmd]];
 	}
 	if(!lastRequest){
 		[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:3];
@@ -534,7 +664,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 
 - (void) process_response:(NSString*)theResponse
 {
-	NSLog(@"response: %@\n",theResponse);
+	//NSLog(@"response: %@\n",theResponse);
 	if (recordComingIn){
 		if([theResponse rangeOfString:@"#"].location != NSNotFound){	//no records
 			recordComingIn = NO;
@@ -634,8 +764,10 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 												//do nothing
 	}
 	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:3];
+	if(!recordComingIn && !statusComingIn){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+		[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:1];
+	}
 
 	//NSLog(@"%@\n",theResponse);
 }

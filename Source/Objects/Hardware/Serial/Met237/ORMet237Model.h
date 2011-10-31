@@ -18,13 +18,16 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ORAdcProcessing.h"
 
 @class ORSerialPort;
+@class ORTimeRate;
+
 #define kMet237Counting  0
 #define kMet237Holding   1
 #define kMet237Stopped   2
 
-@interface ORMet237Model : OrcaObject
+@interface ORMet237Model : OrcaObject <ORAdcProcessing>
 {
     @private
         NSString*       portName;
@@ -51,6 +54,8 @@
 		int cycleNumber;
 		BOOL recordComingIn;
 		BOOL statusComingIn;
+		ORTimeRate*			timeRates[2];
+		BOOL	wasRunning;
 }
 
 #pragma mark ***Initialization
@@ -60,6 +65,7 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (ORTimeRate*)timeRate:(int)index;
 - (int) cycleNumber;
 - (void) setCycleNumber:(int)aCycleNumber;
 - (NSDate*) cycleWillEnd;
@@ -118,7 +124,20 @@
 - (void) goToStandbyMode;			
 - (void) getToActiveMode;			
 - (void) goToLocalMode;				
-- (void) universalSelect;			
+- (void) universalSelect;
+
+#pragma mark •••Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+
 @end
 
 extern NSString* ORMet237ModelCycleNumberChanged;

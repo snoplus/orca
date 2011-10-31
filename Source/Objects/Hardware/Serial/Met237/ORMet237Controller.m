@@ -23,6 +23,10 @@
 #import "ORMet237Model.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
+#import "ORTimeLinePlot.h"
+#import "ORCompositePlotView.h"
+#import "ORTimeAxis.h"
+#import "ORTimeRate.h"
 
 @interface ORMet237Controller (private)
 - (void) populatePortListPopup;
@@ -47,6 +51,30 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];
+
+	[self populatePortListPopup];
+    [[plotter0 yAxis] setRngLow:0.0 withHigh:100.];
+	[[plotter0 yAxis] setRngLimitsLow:0 withHigh:1000. withMinRng:5];
+	
+    [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
+	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+	
+	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor redColor]];
+	[aPlot setName:@"0.5 µm"];
+	[aPlot release];
+
+	aPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
+	[plotter0 addPlot: aPlot];
+	[aPlot setLineColor:[NSColor blueColor]];
+	[aPlot setName:@"5 µm"];
+	[aPlot release];
+	
+	[plotter0 setYLabel:@"Counts/Ft^3/Min"];
+	[plotter0 setShowLegend:YES];
+
+	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 
 	[super awakeFromNib];
 }
@@ -138,6 +166,21 @@
                          name : ORMet237ModelCycleNumberChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+					 selector : @selector(scaleAction:)
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTimePlot:)
+						 name : ORRateAverageChangedNotification
+					   object : nil];
+	
 }
 
 - (void) updateWindow
@@ -157,6 +200,50 @@
 	[self cycleStartedChanged:nil];
 	[self cycleWillEndChanged:nil];
 	[self cycleNumberChanged:nil];
+	[self updateTimePlot:nil];
+    [self miscAttributesChanged:nil];
+}
+
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	if(aNotification == nil || [aNotification object] == [plotter0 xAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 xAxis]attributes] forKey:@"XAttributes0"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter0 yAxis]){
+		[model setMiscAttributes:[(ORAxis*)[plotter0 yAxis]attributes] forKey:@"YAttributes0"];
+	};
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+	
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
+		if(attrib){
+			[(ORAxis*)[plotter0 xAxis] setAttributes:attrib];
+			[plotter0 setNeedsDisplay:YES];
+			[[plotter0 xAxis] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
+		if(attrib){
+			[(ORAxis*)[plotter0 yAxis] setAttributes:attrib];
+			[plotter0 setNeedsDisplay:YES];
+			[[plotter0 yAxis] setNeedsDisplay:YES];
+		}
+	}
+}
+
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+	if(!aNote || ([aNote object] == [model timeRate:1])){
+		[plotter0 setNeedsDisplay:YES];
+	}
 }
 
 - (void) cycleStartedChanged:(NSNotification*)aNote
@@ -253,6 +340,8 @@
 		[startCycleButton setEnabled:NO];
 		[stopCycleButton setEnabled:NO];
 	}
+	[cycleDurationPU setEnabled:![model running] && !locked];
+
 	if([model running]){
 		NSDate* now = [NSDate date];
 		NSDate* timeCycleWillEnd = [model cycleWillEnd];
@@ -368,6 +457,21 @@
 
 - (IBAction) clearBufferAction:(id)sender
 {
+}
+
+#pragma mark •••Data Source
+- (int) numberPointsInPlot:(id)aPlotter
+{
+	return [[model timeRate:[aPlotter tag]]   count];
+}
+
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
+{
+	int set = [aPlotter tag];
+	int count = [[model timeRate:set] count];
+	int index = count-i-1;
+	*yValue = [[model timeRate:set] valueAtIndex:index];
+	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 }
 
 @end
