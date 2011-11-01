@@ -2158,6 +2158,15 @@
 		84C4CB830FB0725800725AC3 /* M927.rbf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84C4CB6E0FB071BC00725AC3 /* M927.rbf */; };
 		84C5332A0652BA6B00E4731F /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84C533280652BA6B00E4731F /* MainMenu.nib */; };
 		84C859050665624C00FBAF9C /* Bugs.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84C859040665624C00FBAF9C /* Bugs.tif */; };
+		84CA8AFB14608A180072BB24 /* ObjWithHistoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CA8AF714608A180072BB24 /* ObjWithHistoryController.h */; };
+		84CA8AFC14608A180072BB24 /* ObjWithHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CA8AF814608A180072BB24 /* ObjWithHistoryController.m */; };
+		84CA8AFD14608A180072BB24 /* ObjWithHistoryModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CA8AF914608A180072BB24 /* ObjWithHistoryModel.h */; };
+		84CA8AFE14608A180072BB24 /* ObjWithHistoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CA8AFA14608A180072BB24 /* ObjWithHistoryModel.m */; };
+		84CA8B0414608A340072BB24 /* TimeRoi.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CA8AFF14608A340072BB24 /* TimeRoi.nib */; };
+		84CA8B0514608A340072BB24 /* ORTimeRoi.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CA8B0014608A340072BB24 /* ORTimeRoi.m */; };
+		84CA8B0614608A340072BB24 /* ORTimeRoi.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CA8B0114608A340072BB24 /* ORTimeRoi.h */; };
+		84CA8B0714608A340072BB24 /* ORTimeRoiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CA8B0214608A340072BB24 /* ORTimeRoiController.m */; };
+		84CA8B0814608A340072BB24 /* ORTimeRoiController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CA8B0314608A340072BB24 /* ORTimeRoiController.h */; };
 		84CC16CD0FAF157000CEE642 /* MCA927.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CC16C60FAF157000CEE642 /* MCA927.nib */; };
 		84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84CC16C70FAF157000CEE642 /* MCA927.tif */; };
 		84CC16D00FAF157000CEE642 /* ORMCA927Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CC16C90FAF157000CEE642 /* ORMCA927Controller.h */; };
@@ -4779,6 +4788,15 @@
 		84C5FD20050E740A005F64B1 /* ORTimeRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTimeRate.h; sourceTree = "<group>"; };
 		84C5FD21050E740A005F64B1 /* ORTimeRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimeRate.m; sourceTree = "<group>"; };
 		84C859040665624C00FBAF9C /* Bugs.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Bugs.tif; path = Source/Preferences/Bugs.tif; sourceTree = SOURCE_ROOT; };
+		84CA8AF714608A180072BB24 /* ObjWithHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjWithHistoryController.h; path = Source/Objects/OrcaObject/ObjWithHistoryController.h; sourceTree = SOURCE_ROOT; };
+		84CA8AF814608A180072BB24 /* ObjWithHistoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ObjWithHistoryController.m; path = Source/Objects/OrcaObject/ObjWithHistoryController.m; sourceTree = SOURCE_ROOT; };
+		84CA8AF914608A180072BB24 /* ObjWithHistoryModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjWithHistoryModel.h; path = Source/Objects/OrcaObject/ObjWithHistoryModel.h; sourceTree = SOURCE_ROOT; };
+		84CA8AFA14608A180072BB24 /* ObjWithHistoryModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ObjWithHistoryModel.m; path = Source/Objects/OrcaObject/ObjWithHistoryModel.m; sourceTree = SOURCE_ROOT; };
+		84CA8AFF14608A340072BB24 /* TimeRoi.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TimeRoi.nib; path = Source/Widgets/Plotting/AnalysisSupport/TimeRoi.nib; sourceTree = SOURCE_ROOT; };
+		84CA8B0014608A340072BB24 /* ORTimeRoi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTimeRoi.m; path = Source/Widgets/Plotting/AnalysisSupport/ORTimeRoi.m; sourceTree = SOURCE_ROOT; };
+		84CA8B0114608A340072BB24 /* ORTimeRoi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTimeRoi.h; path = Source/Widgets/Plotting/AnalysisSupport/ORTimeRoi.h; sourceTree = SOURCE_ROOT; };
+		84CA8B0214608A340072BB24 /* ORTimeRoiController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTimeRoiController.m; path = Source/Widgets/Plotting/AnalysisSupport/ORTimeRoiController.m; sourceTree = SOURCE_ROOT; };
+		84CA8B0314608A340072BB24 /* ORTimeRoiController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTimeRoiController.h; path = Source/Widgets/Plotting/AnalysisSupport/ORTimeRoiController.h; sourceTree = SOURCE_ROOT; };
 		84CC16C60FAF157000CEE642 /* MCA927.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MCA927.nib; path = Source/Objects/Hardware/USB/MCA927/MCA927.nib; sourceTree = SOURCE_ROOT; };
 		84CC16C70FAF157000CEE642 /* MCA927.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MCA927.tif; path = Source/Objects/Hardware/USB/MCA927/MCA927.tif; sourceTree = SOURCE_ROOT; };
 		84CC16C90FAF157000CEE642 /* ORMCA927Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Controller.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Controller.h; sourceTree = SOURCE_ROOT; };
@@ -7926,6 +7944,11 @@
 				84761FD4118CD53C00016A8D /* 1dRoi.nib */,
 				84761FD5118CD53C00016A8D /* 2dRoi.nib */,
 				84761FD6118CD53C00016A8D /* FFT.nib */,
+				84CA8AFF14608A340072BB24 /* TimeRoi.nib */,
+				84CA8B0014608A340072BB24 /* ORTimeRoi.m */,
+				84CA8B0114608A340072BB24 /* ORTimeRoi.h */,
+				84CA8B0214608A340072BB24 /* ORTimeRoiController.m */,
+				84CA8B0314608A340072BB24 /* ORTimeRoiController.h */,
 				84761FD7118CD53C00016A8D /* OR1dFit.h */,
 				84761FD8118CD53C00016A8D /* OR1dFit.m */,
 				84761FD9118CD53C00016A8D /* OR1dFitController.h */,
@@ -11227,6 +11250,10 @@
 				F51E69EC03AE4776015F64B1 /* OrcaObject.m */,
 				F51E69ED03AE4776015F64B1 /* OrcaObjectController.h */,
 				F51E69EE03AE4776015F64B1 /* OrcaObjectController.m */,
+				84CA8AF714608A180072BB24 /* ObjWithHistoryController.h */,
+				84CA8AF814608A180072BB24 /* ObjWithHistoryController.m */,
+				84CA8AF914608A180072BB24 /* ObjWithHistoryModel.h */,
+				84CA8AFA14608A180072BB24 /* ObjWithHistoryModel.m */,
 				84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */,
 				84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */,
 				F51E69EF03AE4776015F64B1 /* OrcaObjectFactory.h */,
@@ -12275,6 +12302,10 @@
 				CE10F0151451674C0084C15D /* ORXYCom564Controller.h in Headers */,
 				CE10F0171451674C0084C15D /* ORXYCom564Model.h in Headers */,
 				CE20A5C3145EE1CD00B8862D /* ORXYCom564Decoder.h in Headers */,
+				84CA8AFB14608A180072BB24 /* ObjWithHistoryController.h in Headers */,
+				84CA8AFD14608A180072BB24 /* ObjWithHistoryModel.h in Headers */,
+				84CA8B0614608A340072BB24 /* ORTimeRoi.h in Headers */,
+				84CA8B0814608A340072BB24 /* ORTimeRoiController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13053,6 +13084,7 @@
 				CE10F01B1451674C0084C15D /* XYCom200Card.gif in Resources */,
 				CE10F01C1451674C0084C15D /* XYCom564.nib in Resources */,
 				CE10F01E145189510084C15D /* XYCom564Card.gif in Resources */,
+				84CA8B0414608A340072BB24 /* TimeRoi.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13936,6 +13968,10 @@
 				CE10F0161451674C0084C15D /* ORXYCom564Controller.m in Sources */,
 				CE10F0181451674C0084C15D /* ORXYCom564Model.m in Sources */,
 				CE20A5C4145EE1CD00B8862D /* ORXYCom564Decoder.m in Sources */,
+				84CA8AFC14608A180072BB24 /* ObjWithHistoryController.m in Sources */,
+				84CA8AFE14608A180072BB24 /* ObjWithHistoryModel.m in Sources */,
+				84CA8B0514608A340072BB24 /* ORTimeRoi.m in Sources */,
+				84CA8B0714608A340072BB24 /* ORTimeRoiController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
