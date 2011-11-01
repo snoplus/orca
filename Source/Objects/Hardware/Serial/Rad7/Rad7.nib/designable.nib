@@ -12,6 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="1902"/>
 			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
@@ -3046,12 +3047,12 @@
 			</object>
 			<object class="NSDrawer" id="344588379">
 				<nil key="NSNextResponder"/>
-				<string key="NSContentSize">{265, 200}</string>
-				<string key="NSMinContentSize">{265, 200}</string>
-				<string key="NSMaxContentSize">{600, 400}</string>
-				<int key="NSPreferredEdge">2</int>
-				<double key="NSLeadingOffset">5</double>
-				<double key="NSTrailingOffset">15</double>
+				<string key="NSContentSize">{257, 111}</string>
+				<string key="NSMinContentSize">{257, 111}</string>
+				<string key="NSMaxContentSize">{257, 120}</string>
+				<int key="NSPreferredEdge">1</int>
+				<double key="NSLeadingOffset">85</double>
+				<double key="NSTrailingOffset">85</double>
 				<nil key="NSParentWindow"/>
 				<nil key="NSDelegate"/>
 			</object>
@@ -3060,26 +3061,16 @@
 				<int key="NSvFlags">276</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<object class="NSCustomView" id="828463913">
-						<reference key="NSNextResponder" ref="730733848"/>
-						<int key="NSvFlags">269</int>
-						<string key="NSFrame">{{28, 42}, {257, 155}}</string>
-						<reference key="NSSuperview" ref="730733848"/>
-						<reference key="NSWindow"/>
-						<string key="NSClassName">NSView</string>
-					</object>
 					<object class="NSCustomView" id="902865628">
 						<reference key="NSNextResponder" ref="730733848"/>
 						<int key="NSvFlags">269</int>
-						<string key="NSFrame">{{28, 194}, {257, 113}}</string>
+						<string key="NSFrame">{{0, -2}, {257, 113}}</string>
 						<reference key="NSSuperview" ref="730733848"/>
-						<reference key="NSWindow"/>
 						<string key="NSClassName">NSView</string>
 					</object>
 				</object>
-				<string key="NSFrameSize">{285, 307}</string>
+				<string key="NSFrameSize">{257, 111}</string>
 				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<object class="NSMutableString" key="NSClassName">
 					<characters key="NS.bytes">NSView</characters>
 				</object>
@@ -6058,16 +6049,10 @@
 						<reference key="object" ref="730733848"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="828463913"/>
 							<reference ref="902865628"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">analysisDrawerContent</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1901</int>
-						<reference key="object" ref="828463913"/>
-						<reference key="parent" ref="730733848"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1902</int>
@@ -6511,8 +6496,8 @@
 					<string>1900.IBEditorWindowLastContentRect</string>
 					<string>1900.IBPluginDependency</string>
 					<string>1900.ImportedFromIB2</string>
-					<string>1901.IBPluginDependency</string>
 					<string>1902.IBPluginDependency</string>
+					<string>1902.IBViewBoundsToFrameTransform</string>
 					<string>1906.IBAttributePlaceholdersKey</string>
 					<string>1906.IBPluginDependency</string>
 					<string>1906.IBViewBoundsToFrameTransform</string>
@@ -7264,11 +7249,13 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
-					<string>{{484, 265}, {285, 307}}</string>
+					<string>{{484, 461}, {257, 111}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">AUHgAABBiAAAA</bytes>
+					</object>
 					<object class="NSMutableDictionary">
 						<string key="NS.key.0">ToolTip</string>
 						<object class="IBToolTipAttribute" key="NS.object.0">
@@ -7283,9 +7270,9 @@
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{487, 229}, {428, 863}}</string>
+					<string>{{549, 527}, {428, 863}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{487, 229}, {428, 863}}</string>
+					<string>{{549, 527}, {428, 863}}</string>
 					<boolean value="YES"/>
 					<boolean value="YES"/>
 					<string>{213, 107}</string>
