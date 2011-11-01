@@ -18,11 +18,13 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ObjWithHistoryController.h"
 
 @class ORCompositePlotView;
+@class ORTimeRoiController;
 
-@interface ORRad7Controller : OrcaObjectController
-{
+@interface ORRad7Controller : ObjWithHistoryController
+{	
 	IBOutlet NSTextField*	alarmLimitTextField;
 	IBOutlet NSTextField*	maxRadonTextField;
 	IBOutlet NSButton*		makeFileCB;
@@ -48,7 +50,6 @@
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      updateSettingsButton;
     IBOutlet NSTextField*   timeField;
-	IBOutlet ORCompositePlotView*    plotter0;
 	
 	IBOutlet NSButton*		startTestButton;
 	IBOutlet NSButton*		stopTestButton;
@@ -88,8 +89,6 @@
 	IBOutlet NSTextField*   userThoronField;
 	IBOutlet NSTextField*   useCycleField;
 	IBOutlet NSTextField*   userRecycleField;
-
-	
 }
 
 #pragma mark ***Initialization
@@ -167,7 +166,6 @@
 - (double) plotterStartTime:(id)aPlotter;
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
-
 @end
 
 

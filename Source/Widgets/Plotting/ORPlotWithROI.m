@@ -47,7 +47,10 @@
 	if(roi){
 		NSArray* rois =  [dataSource roiArrayForPlotter:self];
 		int index = [rois indexOfObject:roi];
-		[roi setLabel:[NSString stringWithFormat:@"Roi %d of %d",index+1,[rois count]]];
+		NSString* s;
+		if([[self name] length]>0)s = [self name];
+		else s = [NSString stringWithFormat:@"Plot %1",tag+1];;
+		[roi setLabel:[NSString stringWithFormat:@"%@ Roi %d of %d",s,index+1,[rois count]]];
 	}
 }
 

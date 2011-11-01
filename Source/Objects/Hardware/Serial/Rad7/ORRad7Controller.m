@@ -59,19 +59,30 @@
     [[plotter0 xAxis] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 
-	ORTimeSeriesPlot* aPlot;
-	aPlot= [[ORTimeSeriesPlot alloc] initWithTag:0 andDataSource:self];
-	[plotter0 addPlot: aPlot];
-	[aPlot release];
 
 	ORTimeSeriesPlot* aPlot1;
-	aPlot1= [[ORTimeSeriesPlot alloc] initWithTag:1 andDataSource:self];
-	[aPlot1 setLineColor:[NSColor blueColor]];
+	aPlot1= [[ORTimeSeriesPlot alloc] initWithTag:0 andDataSource:self];
+	[aPlot1 setLineColor:[NSColor redColor]];
 	[plotter0 addPlot: aPlot1];
+	[aPlot1 setName:@"Radon"];
 	[aPlot1 release];
 	
-	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	ORTimeSeriesPlot* aPlot2;
+	aPlot2 = [[ORTimeSeriesPlot alloc] initWithTag:1 andDataSource:self];
+	[aPlot2 setLineColor:[NSColor blueColor]];
+	[plotter0 addPlot: aPlot2];
+	[aPlot2 setName:@"RH"];
+	[aPlot2 release];
 
+	[plotter0 setShowLegend:YES];
+
+	int i;
+	for(i=0;i<2;i++){
+		[[plotter0 plot:i] setRoi: [[model rois:i] objectAtIndex:0]];
+	}
+	
+	[(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+	
 	[super awakeFromNib];
 }
 
@@ -227,7 +238,8 @@
                      selector : @selector(alarmLimitChanged:)
                          name : ORRad7ModelAlarmLimitChanged
 						object: model];
-
+	
+	
 }
 
 - (void) updateWindow
@@ -836,7 +848,13 @@
 	[model printDataInProgress];
 }
 
+- (IBAction)doAnalysis:(NSToolbarItem*)item
+{
+	[analysisDrawer toggle:self];
+}
+
 #pragma mark ***Data Source
+
 - (int) numberPointsInPlot:(id)aPlot
 {
 	return [model numPoints];

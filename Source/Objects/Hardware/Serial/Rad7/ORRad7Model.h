@@ -19,6 +19,7 @@
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
+#import "ObjWithHistoryModel.h"
 
 @class ORRad7DataPt;
 @class ORSerialPort;
@@ -102,7 +103,7 @@
 
 @class ORRad7DataPt;
 
-@interface ORRad7Model : OrcaObject <ORAdcProcessing>
+@interface ORRad7Model : ObjWithHistoryModel <ORAdcProcessing>
 {
     @private
         NSString*       portName;

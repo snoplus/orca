@@ -221,6 +221,25 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(pollTime){
 		[self pollHardware];
 	}
+	//temp for testing
+	if(!dataPointArray){
+		int i;
+		for(i=0;i<100;i++){
+			if(!dataPointArray){
+				[self setDataPointArray:[NSMutableArray array]];
+			}
+			ORRad7DataPt* aPt = [[[ORRad7DataPt alloc] init] autorelease];
+			NSDate *date = [NSDate date];  
+			NSTimeInterval t1 = [date timeIntervalSince1970]+i;
+			
+			[aPt setTime:t1];
+			[aPt setValue:random_range(30,100)];
+			[aPt setRh:   random_range(10,30)];
+			[dataPointArray addObject:aPt];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
+																object:self];
+		}
+	}
 }
 
 - (void) setUpImage
@@ -1141,6 +1160,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
     //nothing to do
 }
+
 
 @end
 

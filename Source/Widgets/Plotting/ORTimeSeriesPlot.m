@@ -22,6 +22,7 @@
 #import "ORPlotView.h"
 #import "ORTimeLine.h"
 #import "ORPlotAttributeStrings.h"
+#import "ORTimeRoi.h"
 
 @implementation ORTimeSeriesPlot
 
@@ -36,17 +37,28 @@
 	dataSource = ds;
 }
 
+- (id) newRoiAtPoint:(NSPoint)aPoint
+{
+	NSPoint plotPoint = [self convertFromWindowToPlot:aPoint];
+	long mouseChannel  = plotPoint.x;
+	ORAxis* mXScale = [plotView xScale];
+	
+	long aMinChannel = MAX([mXScale minLimit],mouseChannel-3);
+	long aMaxChannel = MIN([mXScale maxLimit],mouseChannel+3);
+	return [[[ORTimeRoi alloc] initWithMin:aMinChannel max:aMaxChannel] autorelease];
+}
+
 #pragma mark ***Drawing
 - (void) drawData
 {
 	NSAssert([NSThread mainThread],@"ORTimeSeriesPlot drawing from non-gui thread");
 
+	int numPoints = [dataSource numberPointsInPlot:self];
+    //if(numPoints == 0) return;
+
 	ORAxis*    mXScale = [plotView xScale];
 	ORAxis*    mYScale = [plotView yScale];
-	
-	int numPoints = [dataSource numberPointsInPlot:self];
-    if(numPoints == 0) return;
-			
+				
     NSTimeInterval startTime = [dataSource plotterStartTime:self];
 	[(ORTimeLine*)mXScale setStartTime: startTime];
     NSBezierPath* theDataPath = [NSBezierPath bezierPath];
@@ -54,10 +66,56 @@
 	BOOL aLog = [mYScale isLog];
 	BOOL aInt = [mYScale integer];
 	double aMinPad = [mYScale minPad];
-	
+	double aMinPadx = [mXScale minPad];
+	float width		= [plotView bounds].size.width;
+	float height	= [plotView bounds].size.height;
+	float chanWidth = width / [mXScale valueRange];
+
 	int i;
 	double xValue;
 	double yValue;    
+	float xl = 0;
+	float yl = 0;
+	double x,y;
+	BOOL roiVisible;
+	if([dataSource respondsToSelector:@selector(plotterShouldShowRoi:)]){
+		roiVisible = [dataSource plotterShouldShowRoi:self] && ([plotView topPlot] == self);
+	}
+	else {
+		roiVisible = NO;
+	}
+	
+	//fill in the roi area
+	if(roi && roiVisible){
+		
+		[roi analyzeData];
+		
+		long minChan = MAX(0,[roi minChannel]);
+		long maxChan = MIN([roi maxChannel],numPoints-1);
+		NSColor* fillColor = [[self lineColor] highlightWithLevel:.7];
+		fillColor = [fillColor colorWithAlphaComponent:.3];
+		[fillColor set];
+		
+		x	= [mXScale getPixAbs:minChan]-chanWidth/2.;
+		xl	= x;
+		double xValue,yValue;
+		[dataSource plotter:self index:minChan x:&xValue y:&yValue];
+		yl	= [mYScale getPixAbs:yValue];
+		long ix;
+		for (ix=minChan; ix<=maxChan+1;++ix) {
+			if(ix > numPoints)break;
+			double xValue;
+			double yValue;
+			[dataSource plotter:self index:ix x:&xValue y:&yValue];
+			
+			x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx] - chanWidth/2.;
+			y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
+			[NSBezierPath fillRect:NSMakeRect(xl,1,x-xl+1,yl)];
+			xl = x;
+			yl = y;
+		}	
+	}
+
 	for (i=0; i<numPoints;++i) {
 		[dataSource plotter:self index:i x:&xValue y:&yValue];
 		float y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
@@ -71,6 +129,22 @@
 
 	[theDataPath setLineWidth:[self lineWidth]];
 	[theDataPath stroke];
+	
+	//draw the roi bounds
+	if(roi && roiVisible){
+		long minChan = MAX(0,[roi minChannel]);
+		long maxChan = MIN([roi maxChannel],[mXScale maxLimit]);
+		
+		[[NSColor blackColor] set];
+		[NSBezierPath setDefaultLineWidth:.5];
+		float x1 = [mXScale getPixAbsFast:minChan log:NO integer:YES minPad:aMinPadx];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,0) toPoint:NSMakePoint(x1, height)];
+		float x2 = [mXScale getPixAbsFast:maxChan log:NO integer:YES minPad:aMinPadx];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(x2,0) toPoint:NSMakePoint(x2, height)];
+		
+		[[roi fit] drawFit:plotView];
+	}
+	
 }
 
 - (void) drawExtras 
