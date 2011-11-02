@@ -45,7 +45,6 @@
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
 int32_t writeBuffer(SBC_Packet* aPacket);
-int32_t sis3300CurrentBank[32];
 
 extern char needToSwap;
 extern int32_t  dataIndex;
