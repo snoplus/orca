@@ -12,8 +12,8 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="1902"/>
 			<integer value="6"/>
+			<integer value="1902"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3017,7 +3017,7 @@
 						<object class="NSButton" id="933801869">
 							<reference key="NSNextResponder" ref="18859626"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{32, 1}, {90, 28}}</string>
+							<string key="NSFrame">{{318, 1}, {90, 28}}</string>
 							<reference key="NSSuperview" ref="18859626"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="273273035">
@@ -3026,6 +3026,29 @@
 								<string key="NSContents">Analyze...</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="933801869"/>
+								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags2">1</int>
+								<reference key="NSAlternateImage" ref="14838453"/>
+								<string key="NSAlternateContents"/>
+								<object class="NSMutableString" key="NSKeyEquivalent">
+									<characters key="NS.bytes"/>
+								</object>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
+						<object class="NSButton" id="823190781">
+							<reference key="NSNextResponder" ref="18859626"/>
+							<int key="NSvFlags">256</int>
+							<string key="NSFrame">{{4, 1}, {112, 28}}</string>
+							<reference key="NSSuperview" ref="18859626"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="181636294">
+								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Delete History...</string>
+								<reference key="NSSupport" ref="26"/>
+								<reference key="NSControlView" ref="823190781"/>
 								<int key="NSButtonFlags">-2038284033</int>
 								<int key="NSButtonFlags2">1</int>
 								<reference key="NSAlternateImage" ref="14838453"/>
@@ -3649,22 +3672,6 @@
 					<int key="connectionID">1812</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="349119044"/>
-						<reference key="destination" ref="898754966"/>
-					</object>
-					<int key="connectionID">1828</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">plotter0</string>
-						<reference key="source" ref="898754966"/>
-						<reference key="destination" ref="349119044"/>
-					</object>
-					<int key="connectionID">1829</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">printDataInProgress:</string>
 						<reference key="source" ref="898754966"/>
@@ -3856,6 +3863,38 @@
 					</object>
 					<int key="connectionID">1912</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">deleteHistoryButton</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="823190781"/>
+					</object>
+					<int key="connectionID">1916</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">deleteHistory:</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="823190781"/>
+					</object>
+					<int key="connectionID">1917</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="349119044"/>
+						<reference key="destination" ref="898754966"/>
+					</object>
+					<int key="connectionID">1918</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">plotter0</string>
+						<reference key="source" ref="898754966"/>
+						<reference key="destination" ref="349119044"/>
+					</object>
+					<int key="connectionID">1919</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -3922,8 +3961,9 @@
 							<reference ref="127167770"/>
 							<reference ref="349119044"/>
 							<reference ref="1051123762"/>
-							<reference ref="933801869"/>
 							<reference ref="531674729"/>
+							<reference ref="823190781"/>
+							<reference ref="933801869"/>
 						</object>
 						<reference key="parent" ref="242372686"/>
 					</object>
@@ -6073,6 +6113,20 @@
 						<reference key="object" ref="273273035"/>
 						<reference key="parent" ref="933801869"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1913</int>
+						<reference key="object" ref="823190781"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="181636294"/>
+						</object>
+						<reference key="parent" ref="18859626"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1914</int>
+						<reference key="object" ref="181636294"/>
+						<reference key="parent" ref="823190781"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -6503,6 +6557,11 @@
 					<string>1906.IBViewBoundsToFrameTransform</string>
 					<string>1906.ImportedFromIB2</string>
 					<string>1907.IBPluginDependency</string>
+					<string>1913.IBAttributePlaceholdersKey</string>
+					<string>1913.IBPluginDependency</string>
+					<string>1913.IBViewBoundsToFrameTransform</string>
+					<string>1913.ImportedFromIB2</string>
+					<string>1914.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
@@ -7266,7 +7325,21 @@
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABCsgAAwdgAAA</bytes>
+						<bytes key="NSTransformStruct">P4AAAL+AAABDRwAAwdgAAA</bytes>
+					</object>
+					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSMutableDictionary">
+						<string key="NS.key.0">ToolTip</string>
+						<object class="IBToolTipAttribute" key="NS.object.0">
+							<string key="name">ToolTip</string>
+							<reference key="object" ref="823190781"/>
+							<string key="toolTip">Save the current settings into the User protocol.</string>
+						</object>
+					</object>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<object class="NSAffineTransform">
+						<bytes key="NSTransformStruct">P4AAAL+AAABDkoAAwdgAAA</bytes>
 					</object>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -7330,7 +7403,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1912</int>
+			<int key="maxID">1919</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -9152,14 +9225,35 @@
 					<string key="className">ObjWithHistoryController</string>
 					<string key="superclassName">OrcaObjectController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">doAnalysis:</string>
-						<string key="NS.object.0">NSToolbarItem</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>deleteHistory:</string>
+							<string>doAnalysis:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>NSToolbarItem</string>
+						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">doAnalysis:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">doAnalysis:</string>
-							<string key="candidateClassName">NSToolbarItem</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>deleteHistory:</string>
+							<string>doAnalysis:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">deleteHistory:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">doAnalysis:</string>
+								<string key="candidateClassName">NSToolbarItem</string>
+							</object>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
@@ -9168,6 +9262,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>analysisDrawer</string>
 							<string>analyzeButton</string>
+							<string>deleteHistoryButton</string>
 							<string>plotter0</string>
 							<string>roiView</string>
 						</object>
@@ -9175,7 +9270,8 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSDrawer</string>
 							<string>NSButton</string>
-							<string>ORCompositeTimeLineView</string>
+							<string>NSButton</string>
+							<string>ORCompositePlotView</string>
 							<string>NSView</string>
 						</object>
 					</object>
@@ -9185,6 +9281,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>analysisDrawer</string>
 							<string>analyzeButton</string>
+							<string>deleteHistoryButton</string>
 							<string>plotter0</string>
 							<string>roiView</string>
 						</object>
@@ -9199,8 +9296,12 @@
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">deleteHistoryButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">plotter0</string>
-								<string key="candidateClassName">ORCompositeTimeLineView</string>
+								<string key="candidateClassName">ORCompositePlotView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">roiView</string>
