@@ -56,6 +56,9 @@ NSString* ORRad7ModelUpdatePlot			= @"ORRad7ModelUpdatePlot";
 
 NSString* ORRad7Lock = @"ORRad7Lock";
 
+#define kMaxNumInHistory 1500
+
+
 @interface ORRad7Model (private)
 - (void) timeout;
 - (void) processOneCommandFromQueue;
@@ -221,7 +224,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(pollTime){
 		[self pollHardware];
 	}
-
 }
 
 - (void) setUpImage
@@ -761,6 +763,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	return statusDictionary;
 }
 
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -813,6 +816,24 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [encoder encodeInt:		pollTime		forKey:	@"ORRad7ModelPollTime"];
     [encoder encodeBool:	portWasOpen		forKey:	@"ORRad7ModelPortWasOpen"];
     [encoder encodeObject:	portName		forKey: @"portName"];
+}
+
+- (id) history
+{
+	//our base class calls history when saving this object's history
+	return dataPointArray;
+}
+
+- (void) setHistory:(id)someHistory
+{
+	//our base class calls setHistory when loading this object's history
+	[self setDataPointArray:someHistory];
+}
+
+- (void) deleteHistory
+{
+	[super deleteHistory];
+	[self setDataPointArray:nil];
 }
 
 #pragma mark *** Commands
@@ -1031,6 +1052,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(pollTime){
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 	}
+	
 }
 
 - (int) numPoints
@@ -1405,6 +1427,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		//[aPt setCounts:[[parts objectAtIndex:6] doubleValue]];
 		[aPt setRh:[[parts objectAtIndex:15] doubleValue]];
 		[dataPointArray addObject:aPt];
+		if([dataPointArray count]>kMaxNumInHistory)[dataPointArray removeObjectsInRange:NSMakeRange(0,500)];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
 															object:self];
 	}
@@ -1540,8 +1563,11 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 							[aPt setValue:lastRadon];
 							[aPt setRh:    [[self statusForKey:kRad7RH] floatValue]];
 							[dataPointArray addObject:aPt];
+							if([dataPointArray count]>kMaxNumInHistory)[dataPointArray removeObjectsInRange:NSMakeRange(0,500)];
+
 							[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
 																				object:self];
+							[self saveHistory];
 						}
 					}
 					[statusDictionary setObject:[parts objectAtIndex:2]  forKey:kRad7LastRadonUnits];
@@ -1664,4 +1690,29 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 @implementation ORRad7DataPt
 @synthesize value,time,rh;
+#pragma mark ***Archival
+- (id) initWithCoder:(NSCoder*)decoder
+{	
+	@try {
+		[self setTime:		[decoder decodeDoubleForKey:@"time"]];
+		[self setValue:		[decoder decodeDoubleForKey:@"value"]];
+		[self setRh:		[decoder decodeDoubleForKey:@"rh"]];
+	}
+	@catch (NSException* e) {
+		NSLog(@"Exception storing the Rad7 Data History. %@\n",e);
+	}
+	return self;
+}
+
+- (void) encodeWithCoder:(NSCoder*)encoder
+{
+	@try {
+		[encoder encodeDouble:	time	forKey:@"time"];
+		[encoder encodeDouble:	value	forKey:@"value"];
+		[encoder encodeDouble:	rh		forKey:@"rh"];
+	}
+	@catch (NSException* e) {
+		NSLog(@"Exception loading the Rad7 Data History. %@\n",e);
+	}
+}
 @end

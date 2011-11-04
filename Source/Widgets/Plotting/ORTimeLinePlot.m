@@ -23,6 +23,7 @@
 #import "ORTimeLine.h"
 #import "ORTimeAxis.h"
 #import "ORPlotAttributeStrings.h"
+#import "ORTimeRoi.h"
 
 @implementation ORTimeLinePlot
 
@@ -59,23 +60,24 @@
 	BOOL aLog = [mYScale isLog];
 	BOOL aInt = [mYScale integer];
 	double aMinPad = [mYScale minPad];
+	double aMinPadx = [mXScale minPad];
 	
 	float width		= [plotView bounds].size.width;
+	float height	= [plotView bounds].size.height;
 	float chanWidth = width / [mXScale valueRange];
-	
-	
-	NSBezierPath* theDataPath = [NSBezierPath bezierPath];
 	float xl = 0;
 	float yl = 0;
+	float x,y;
 	double xValue,yValue;
-	long i;
+	
+
+	NSBezierPath* theDataPath = [NSBezierPath bezierPath];
+	int i;
 	for (i=0; i<numPoints;++i) {
 		[dataSource plotter:self index:i x:&xValue y:&yValue];
-		float y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
-		float x = [mXScale getPixAbs:startTime - xValue]-chanWidth/2.;
+		y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
+		x = [mXScale getPixAbs:startTime - xValue]+chanWidth/2.;
 		if(i!=0){
-			[theDataPath moveToPoint:NSMakePoint(xl,yl)];
-			[theDataPath lineToPoint:NSMakePoint(xl,y)];
 			[theDataPath lineToPoint:NSMakePoint(x,y)];
 			xl = x;
 			yl = y;
@@ -90,6 +92,34 @@
 	[[self lineColor] set];
 	[theDataPath setLineWidth:[self lineWidth]];
 	[theDataPath stroke];
+	
+	BOOL roiVisible;
+	if([dataSource respondsToSelector:@selector(plotterShouldShowRoi:)]){
+		roiVisible = [dataSource plotterShouldShowRoi:self] && ([plotView topPlot] == self);
+	}
+	else {
+		roiVisible = NO;
+	}	
+	if(roi && roiVisible){
+		[roi analyzeData];
+		long minChan = MAX(0,[roi minChannel]);
+		long maxChan = MIN([roi maxChannel],[mXScale maxLimit]);
+		float x1 = [mXScale getPixAbsFast:minChan log:NO integer:YES minPad:aMinPadx];
+		float x2 = [mXScale getPixAbsFast:maxChan log:NO integer:YES minPad:aMinPadx];
+		
+		NSColor* fillColor = [[self lineColor] highlightWithLevel:.7];
+		fillColor = [fillColor colorWithAlphaComponent:.3];
+		[fillColor set];
+		[NSBezierPath fillRect:NSMakeRect(x1,0,x2-x1,height)];
+		
+		[[NSColor blackColor] set];
+		[NSBezierPath setDefaultLineWidth:.5];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,0) toPoint:NSMakePoint(x1, height)];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(x2,0) toPoint:NSMakePoint(x2, height)];
+		
+		[[roi fit] drawFit:plotView];
+	}
+	
 }
 
 - (void) drawExtras 

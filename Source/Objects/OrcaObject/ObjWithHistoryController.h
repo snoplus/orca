@@ -18,9 +18,9 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ORCompositePlotView.h"
 
 @class ORTimeRoiController;
-@class ORCompositeTimeLineView;
 
 @interface ObjWithHistoryController : OrcaObjectController
 {
@@ -28,7 +28,8 @@
 	IBOutlet NSView*		roiView;
     IBOutlet NSDrawer*		analysisDrawer;
     IBOutlet NSButton*		analyzeButton;
-    IBOutlet ORCompositeTimeLineView*		plotter0;
+	IBOutlet NSButton*		deleteHistoryButton;
+	IBOutlet ORCompositePlotView*				plotter0;
 }
 
 #pragma mark ***Initialization
@@ -49,6 +50,7 @@
 
 #pragma mark ***Actions
 - (IBAction) doAnalysis:(NSToolbarItem*)item;
+- (IBAction) deleteHistory:(id)sender;
 
 #pragma mark ***Data Source
 - (void) plotOrderDidChange:(id)aPlotView;

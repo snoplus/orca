@@ -179,7 +179,7 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 					}
 					else if ((nthTick % 3) == 0) {
 						double theValue = val;
-						NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime-theValue];
+						NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-theValue];
 						axisNumberString = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
 						nthTick = 0;
 					}
@@ -231,7 +231,7 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 		float val = [self getPixAbs:[markerNumber floatValue]];
 		
 		float markerValue = [markerNumber floatValue];
-		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime-markerValue];
+		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-markerValue];
 		NSString* label = [aDate descriptionWithCalendarFormat:@"%H:%M:%S"];
 		
 		if([self isXAxis]){

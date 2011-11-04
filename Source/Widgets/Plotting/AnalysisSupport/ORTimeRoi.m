@@ -19,7 +19,9 @@
 //-------------------------------------------------------------
 
 #import "ORTimeRoi.h"
-#import "ORPlot.h"
+#import "ORCompositePlotView.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeLine.h"
 #import "OR1dFit.h"
 #import "ORPlotAttributeStrings.h"
 #import "ORFFT.h"
@@ -123,39 +125,46 @@ NSString* ORTimeRoiCurveFitChanged = @"ORTimeRoiCurveFitChanged";
 	id aPlotView = [dataSource plotView];
 	if(![aPlotView respondsToSelector:@selector(topPlot)])return;
 	id aPlot = [aPlotView topPlot];
-	
-	//init some values
-	double sumY		= 0.0;
-	long xStart		= [self minChannel];
-	long xEnd		= [self maxChannel];
-	long numPts     = fabs(xEnd-xStart);
+	double yDummy;
+	double startingTime;
+	[dataSource plotter:aPlot index:0 x:&startingTime y:&yDummy];
+
+	double sumY				 = 0.0;
+	long startTimeOffset	 = [self minChannel];
+	long endTimeOffset		 = [self maxChannel];
+	NSTimeInterval startTime = startingTime - startTimeOffset;
+	NSTimeInterval endTime	 = startingTime - endTimeOffset;
+	long numPts				 = fabs(endTimeOffset-startTimeOffset);
+											  
 	long count = 0;
 	double minY = 9.9E99;
 	double maxY = -9.9E99;
 	if(numPts){
 		
-		long x = xStart;
+		double timeStamp,y;
+		long x = 0;
 		do {
-			double xDummy,y;
-			[dataSource plotter:aPlot index:x x:&xDummy y:&y];
-			sumY	+= y;
-			
-			if (y < minY) minY = y;
-			if (y > maxY) maxY = y;
+			[dataSource plotter:aPlot index:x x:&timeStamp y:&y];
+			if(timeStamp >= endTime && timeStamp <= startTime) {
+				sumY	+= y;
+				if (y < minY) minY = y;
+				if (y > maxY) maxY = y;
+				++count;
+			}
 			++x;
-			++count;
-		} while(x<=xEnd);
+		} while(x<numPts);
 		
 		if(count){
 			average = sumY / (double)count;
 			double diffSum = 0;
-			x = xStart;
+			x = 0;
 			do {
-				double xDummy,y;
-				[dataSource plotter:aPlot index:x x:&xDummy y:&y];
-				diffSum += (y - average)*(y - average);
+				if(timeStamp >= endTime && timeStamp <= startTime) {
+					[dataSource plotter:aPlot index:x x:&timeStamp y:&y];
+					diffSum += (y - average)*(y - average);
+				}
 				++x;
-			} while(x<=xEnd);
+			} while(x<numPts);
 			if(count>=2)standardDeviation = sqrtf((1/(double)(count-1)) * diffSum);
 			else standardDeviation = 0;
 		}

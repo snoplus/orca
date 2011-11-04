@@ -25,6 +25,10 @@
 #import "ORCompositePlotView.h"
 #import "ORTimeSeriesPlot.h"
 
+@interface ObjWithHistoryController (private)
+- (void) _deleteHistorySheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+@end
+
 @implementation ObjWithHistoryController
 
 #pragma mark ***Initialization
@@ -137,5 +141,26 @@
 {
 	[analysisDrawer close];
 }
+
+- (IBAction) deleteHistory:(id)sender
+{
+    NSBeginAlertSheet(@"Clear History",
+                      @"Cancel",
+                      @"Yes/Clear History",
+                      nil,[self window],
+                      self,
+                      @selector(_deleteHistorySheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Really clear history? You will not be able to undo this.");
+}
+
 @end
 
+@implementation ObjWithHistoryController (private)
+- (void) _deleteHistorySheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [model deleteHistory];
+    }
+}
+@end

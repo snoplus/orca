@@ -54,7 +54,8 @@
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	roiSet					  = [[decoder decodeObjectForKey:@"roiSet"] retain];
+	roiSet	= [[decoder decodeObjectForKey:@"roiSet"] retain];
+	[self loadHistory];
 	[[self undoManager] enableUndoRegistration];
 	
 	return self;
@@ -66,5 +67,67 @@
 	[encoder encodeObject:roiSet forKey:@"roiSet"];
 }
 
+- (NSString*) historyName
+{
+	return [self fullID];
+}
+
+- (NSString*) historyPath
+{
+	NSString* folder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
+	return [folder stringByAppendingPathComponent:[self historyName]];
+}
+
+- (void) saveHistory
+{
+	id historyToSave = [self history];
+	if(historyToSave){
+		NSMutableData *theData = [NSMutableData data];
+		NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:theData];
+		[archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
+		NSString* historyPath = [self historyPath];
+		NSFileManager* fm = [NSFileManager defaultManager];
+		if([fm fileExistsAtPath:historyPath])[fm removeItemAtPath:historyPath error:nil];
+		[archiver encodeObject:historyToSave forKey:@"ObjHistory"];
+		[archiver finishEncoding];
+		[archiver release];
+		[fm createFileAtPath:historyPath contents:theData attributes:nil];
+	}
+}
+
+- (void) loadHistory
+{
+	NSData *theData = [NSData dataWithContentsOfFile:[self historyPath]];
+	if([theData length]){
+		NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:theData];
+		id theHistory = [unarchiver decodeObjectForKey:@"ObjHistory"];
+		[self setHistory:theHistory];
+	}
+}
+
+- (void) deleteHistory
+{
+	NSString* historyPath = [self historyPath];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:historyPath]){
+		[fm removeItemAtPath:historyPath error:nil];
+		[self setHistory:nil];
+	}
+}
+
+// Subclasses should override the following methods and call saveHistory whenever they want a snapshot of 
+// their history stored to disk. LoadHistory will be called automatically whenever the object is reloaded, 
+// but subclasses can call it if they wish.
+- (id) history
+{
+	//subclasses should override
+	return nil;
+}
+
+- (void) setHistory:(id)someHistory
+{
+	//subclasses should override
+	return;
+}
 @end
 

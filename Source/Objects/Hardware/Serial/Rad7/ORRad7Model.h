@@ -143,6 +143,7 @@
 		BOOL			runEnded;
 		unsigned long	maxRadon;
 		unsigned long	alarmLimit;
+	float testValue;
 }
 
 #pragma mark ***Initialization
@@ -287,6 +288,10 @@ extern NSString* ORRad7ModelUpdatePlot;
 	double value;
 	double rh;
 }
+
+- (id) initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @property (assign) NSTimeInterval time;
 @property (assign) double value;
 @property (assign) double rh;

@@ -116,7 +116,7 @@
 		
 		ORTimeLine* axis = (ORTimeLine*)[[ds plotView] xAxis];
 		NSTimeInterval startTime = [axis startTime];
-		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime-[model minChannel]];
+		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-[model minChannel]];
 		NSString* s = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
 		[roiMinField setStringValue: s];
 	}
@@ -133,7 +133,7 @@
 		
 		ORTimeLine* axis = (ORTimeLine*)[[ds plotView] xAxis];
 		NSTimeInterval startTime = [axis startTime];
-		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime-[model maxChannel]];
+		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-[model maxChannel]];
 		NSString* s = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
 		[roiMaxField setStringValue: s];
 	}
@@ -146,14 +146,14 @@
 {
 	if(model){
 		[labelField		setStringValue:	[model label]];
-		[averageField	setIntValue:	[model average]];
+		[averageField	setFloatValue:	[model average]];
 		[minValueField	setFloatValue:	[model minValue]];
 		[maxValueField	setFloatValue:	[model maxValue]];
 		[standardDeviationField setFloatValue: [model standardDeviation]];
 	}
 	else {
 		[labelField		setStringValue:@"--"];
-		[averageField	setIntValue:0];
+		[averageField	setFloatValue:0];
 		[minValueField	setFloatValue:0];
 		[maxValueField	setFloatValue:0];
 		[standardDeviationField setFloatValue: 0];

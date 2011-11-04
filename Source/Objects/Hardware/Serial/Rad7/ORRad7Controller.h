@@ -20,7 +20,6 @@
 #pragma mark ***Imported Files
 #import "ObjWithHistoryController.h"
 
-@class ORCompositePlotView;
 @class ORTimeRoiController;
 
 @interface ORRad7Controller : ObjWithHistoryController
@@ -163,7 +162,6 @@
 - (IBAction) printDataInProgress:(id)sender;
 
 #pragma mark ***Data Source
-- (double) plotterStartTime:(id)aPlotter;
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 @end

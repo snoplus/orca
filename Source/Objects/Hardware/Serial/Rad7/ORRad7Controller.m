@@ -21,8 +21,7 @@
 
 #import "ORRad7Controller.h"
 #import "ORRad7Model.h"
-#import "ORTimeSeriesPlot.h"
-#import "ORCompositePlotView.h"
+#import "ORTimeLinePlot.h"
 #import "ORTimeAxis.h"
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
@@ -60,15 +59,15 @@
 	[[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 
 
-	ORTimeSeriesPlot* aPlot1;
-	aPlot1= [[ORTimeSeriesPlot alloc] initWithTag:0 andDataSource:self];
+	ORTimeLinePlot* aPlot1;
+	aPlot1= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[aPlot1 setLineColor:[NSColor redColor]];
 	[plotter0 addPlot: aPlot1];
 	[aPlot1 setName:@"Radon"];
 	[aPlot1 release];
 	
-	ORTimeSeriesPlot* aPlot2;
-	aPlot2 = [[ORTimeSeriesPlot alloc] initWithTag:1 andDataSource:self];
+	ORTimeLinePlot* aPlot2;
+	aPlot2 = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
 	[aPlot2 setLineColor:[NSColor blueColor]];
 	[plotter0 addPlot: aPlot2];
 	[aPlot2 setName:@"RH"];
@@ -455,6 +454,7 @@
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
+    [deleteHistoryButton setEnabled:!locked];
     
 
 	//int opState = [model operationState];
@@ -854,23 +854,19 @@
 }
 
 #pragma mark ***Data Source
-
 - (int) numberPointsInPlot:(id)aPlot
 {
 	return [model numPoints];
 }
 
-- (double) plotterStartTime:(id)aPlot
-{
-	return [model radonTime:0];
-}
-
 - (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue
 {
 	int theTag = [aPlot tag];
-	*xValue = [model radonTime:i];
-	if(theTag == 0)		 *yValue = [model radonValue:i];
-	else                 *yValue = [model rhValue:i];
+	int count = [model numPoints];
+	int index = count-i-1;
+	*xValue = [model radonTime:index];
+	if(theTag == 0) *yValue = [model radonValue:index];
+	else            *yValue = [model rhValue:index];
 }
 
 @end

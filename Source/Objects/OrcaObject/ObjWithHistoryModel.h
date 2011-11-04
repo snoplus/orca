@@ -29,5 +29,11 @@
 
 #pragma mark ***Accessors
 - (NSMutableArray*) rois:(int)index;
-
+- (NSString*) historyName;
+- (NSString*) historyPath;
+- (void) saveHistory;
+- (void) loadHistory;
+- (void) deleteHistory;
+- (id) history;
+- (void) setHistory:(id)someHistory;
 @end
