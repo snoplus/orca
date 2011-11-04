@@ -7619,7 +7619,6 @@
 			children = (
 				845CD44F143B33C8009FE5B9 /* ORCompositePlotView.h */,
 				845CD450143B33C8009FE5B9 /* ORCompositePlotView.m */,
-				84E348F70438E8A9005F64B1 /* Circular Buffer */,
 				845CDF79143DE531009FE5B9 /* ORComposite2DPlotView.h */,
 				845CDF7A143DE531009FE5B9 /* ORComposite2DPlotView.m */,
 				845CE951143F550C009FE5B9 /* ORValueBarGroupView.h */,
@@ -9855,6 +9854,7 @@
 			isa = PBXGroup;
 			children = (
 				845CD44E143B33C8009FE5B9 /* CompositeObjects */,
+				84E348F70438E8A9005F64B1 /* Circular Buffer */,
 				84662A63070A3231001CDA7E /* BiStateView */,
 				84B7DF9C04E1C53D005F64B1 /* Bar Graph */,
 				84761FCF118CD53C00016A8D /* Plotting */,
@@ -10390,9 +10390,8 @@
 				84E348F80438E8CE005F64B1 /* ORQueueView.h */,
 				84E348F90438E8CE005F64B1 /* ORQueueView.m */,
 			);
-			name = "Circular Buffer";
-			path = "Source/Widgets/Circular Buffer";
-			sourceTree = SOURCE_ROOT;
+			path = "Circular Buffer";
+			sourceTree = "<group>";
 		};
 		84E427D6054EFFCA0057208F /* ReplayData */ = {
 			isa = PBXGroup;
