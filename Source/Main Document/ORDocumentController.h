@@ -65,7 +65,8 @@
 - (IBAction) alarmMaster:(NSToolbarItem*)item;
 - (IBAction) openCatalog:(NSToolbarItem*)item;
 - (IBAction) openHWWizard:(NSToolbarItem*)item;
-- (IBAction) openPreferences:(NSToolbarItem*)item; 
+- (IBAction) openPreferences:(NSToolbarItem*)item;
+- (IBAction) hardwareFinder:(NSToolbarItem*)item;
 - (IBAction) documentLockAction:(id)sender;
 - (IBAction) scaleFactorAction:(id)sender;
 - (IBAction) lockAllAction:(id)sender;

@@ -32,6 +32,7 @@
 #import "ORReadOutList.h"
 #import "ORTemplates.h"
 #import "ORArchive.h"
+#import "ORVXI11HardwareFinderController.h"
 
 int sortListUpFunc(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
 int sortListDnFunc(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
@@ -317,6 +318,11 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 - (IBAction) openORCARootService:(NSToolbarItem*)item 
 {
     [[NSApp  delegate] showORCARootServiceController:self];
+}
+
+- (IBAction) hardwareFinder:(NSToolbarItem*)item
+{
+    [[ORVXI11HardwareFinderController sharedVXI11HardwareFinderController] showWindow:self];
 }
 
 - (IBAction) printDocument:(id)sender

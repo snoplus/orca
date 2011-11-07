@@ -13,9 +13,19 @@
 		<string>NSToolbarPrintItem</string>
 		<string>NSToolbarFlexibleSpaceItem</string>
 		<string>NSToolbarCustomizeToolbarItem</string>
+		<string>hardwareFinder</string>
 	</array>
 	<key>Items</key>
 	<dict>
+		<key>hardwareFinder</key>
+		<dict>
+			<key>ToolTip</key>
+			<string>Open Hardware Finder</string>
+			<key>Label</key>
+			<string>Hardware Finder</string>
+			<key>Action</key>
+			<string>hardwareFinder:</string>
+		</dict>
 		<key>AutoTester</key>
 		<dict>
 			<key>Action</key>
