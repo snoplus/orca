@@ -181,6 +181,16 @@
 						 name : ORRateAverageChangedNotification
 					   object : nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(maxCountsChanged:)
+                         name : ORMet237ModelMaxCountsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(countAlarmLimitChanged:)
+                         name : ORMet237ModelCountAlarmLimitChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -202,6 +212,18 @@
 	[self cycleNumberChanged:nil];
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
+	[self maxCountsChanged:nil];
+	[self countAlarmLimitChanged:nil];
+}
+
+- (void) countAlarmLimitChanged:(NSNotification*)aNote
+{
+	[countAlarmLimitTextField setFloatValue: [model countAlarmLimit]];
+}
+
+- (void) maxCountsChanged:(NSNotification*)aNote
+{
+	[maxCountsTextField setFloatValue: [model maxCounts]];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -400,6 +422,16 @@
 
 
 #pragma mark ***Actions
+
+- (void) countAlarmLimitTextFieldAction:(id)sender
+{
+	[model setCountAlarmLimit:[sender floatValue]];	
+}
+
+- (void) maxCountsTextFieldAction:(id)sender
+{
+	[model setMaxCounts:[sender floatValue]];	
+}
 - (IBAction) startCycleAction:(id)sender
 {
 	[model startCycle];	

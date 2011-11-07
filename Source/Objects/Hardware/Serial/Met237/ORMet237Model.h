@@ -56,6 +56,8 @@
 		BOOL statusComingIn;
 		ORTimeRate*			timeRates[2];
 		BOOL	wasRunning;
+    float maxCounts;
+    float countAlarmLimit;
 }
 
 #pragma mark ***Initialization
@@ -65,6 +67,10 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
+- (float) countAlarmLimit;
+- (void) setCountAlarmLimit:(float)aCountAlarmLimit;
+- (float) maxCounts;
+- (void) setMaxCounts:(float)aMaxCounts;
 - (ORTimeRate*)timeRate:(int)index;
 - (int) cycleNumber;
 - (void) setCycleNumber:(int)aCycleNumber;
@@ -140,6 +146,8 @@
 
 @end
 
+extern NSString* ORMet237ModelCountAlarmLimitChanged;
+extern NSString* ORMet237ModelMaxCountsChanged;
 extern NSString* ORMet237ModelCycleNumberChanged;
 extern NSString* ORMet237ModelCycleWillEndChanged;
 extern NSString* ORMet237ModelCycleStartedChanged;

@@ -24,6 +24,8 @@
 @interface ORMet237Controller : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
+	IBOutlet   NSTextField* countAlarmLimitTextField;
+	IBOutlet   NSTextField* maxCountsTextField;
 	IBOutlet   NSTextField* countingModeTextField;
 	IBOutlet   NSTextField* count2TextField;
 	IBOutlet   NSTextField* count1TextField;
@@ -60,6 +62,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) countAlarmLimitChanged:(NSNotification*)aNote;
+- (void) maxCountsChanged:(NSNotification*)aNote;
 - (void) cycleNumberChanged:(NSNotification*)aNote;
 - (void) cycleWillEndChanged:(NSNotification*)aNote;
 - (void) cycleStartedChanged:(NSNotification*)aNote;
@@ -80,6 +84,8 @@
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
+- (IBAction) countAlarmLimitTextFieldAction:(id)sender;
+- (IBAction) maxCountsTextFieldAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;

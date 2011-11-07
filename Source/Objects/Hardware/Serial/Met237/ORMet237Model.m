@@ -29,6 +29,8 @@
 #import "ORTimeRate.h"
 
 #pragma mark ***External Strings
+NSString* ORMet237ModelCountAlarmLimitChanged = @"ORMet237ModelCountAlarmLimitChanged";
+NSString* ORMet237ModelMaxCountsChanged = @"ORMet237ModelMaxCountsChanged";
 NSString* ORMet237ModelCycleNumberChanged	= @"ORMet237ModelCycleNumberChanged";
 NSString* ORMet237ModelCycleWillEndChanged	= @"ORMet237ModelCycleWillEndChanged";
 NSString* ORMet237ModelCycleStartedChanged	= @"ORMet237ModelCycleStartedChanged";
@@ -64,6 +66,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
 	self = [super init];
     [self registerNotificationObservers];
+	[self setMaxCounts:1000];
+	[self setCountAlarmLimit:800];
 	return self;
 }
 
@@ -156,6 +160,32 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 }
 
 #pragma mark ***Accessors
+
+- (float) countAlarmLimit
+{
+    return countAlarmLimit;
+}
+
+- (void) setCountAlarmLimit:(float)aCountAlarmLimit
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCountAlarmLimit:countAlarmLimit];
+    countAlarmLimit = aCountAlarmLimit;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelCountAlarmLimitChanged object:self];
+}
+
+- (float) maxCounts
+{
+    return maxCounts;
+}
+
+- (void) setMaxCounts:(float)aMaxCounts
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxCounts:maxCounts];
+    
+    maxCounts = aMaxCounts;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMet237ModelMaxCountsChanged object:self];
+}
 
 - (ORTimeRate*)timeRate:(int)index
 {
@@ -417,6 +447,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 	[self setCycleDuration:		[decoder decodeIntForKey:@"cycleDuration"]];
 	[self setPortWasOpen:		[decoder decodeBoolForKey:	@"ORMet237ModelPortWasOpen"]];
     [self setPortName:			[decoder decodeObjectForKey:@"portName"]];
+	[self setCountAlarmLimit:	[decoder decodeFloatForKey:@"countAlarmLimit"]];
+	[self setMaxCounts:			[decoder decodeFloatForKey:@"maxCounts"]];
 	[[self undoManager] enableUndoRegistration];
 
 	int i; 
@@ -432,7 +464,9 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:cycleDuration forKey:@"cycleDuration"];
+    [encoder encodeFloat:	countAlarmLimit forKey:@"countAlarmLimit"];
+    [encoder encodeFloat:	maxCounts		forKey:@"maxCounts"];
+    [encoder encodeInt:		cycleDuration	forKey:@"cycleDuration"];
     [encoder encodeBool:	portWasOpen		forKey:	@"ORMet237ModelPortWasOpen"];
     [encoder encodeObject:	portName		forKey: @"portName"];
     [encoder encodeBool:	wasRunning		forKey:	@"wasRunning"];
@@ -566,7 +600,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
 	double theValue;
 	@synchronized(self){
-		theValue = (double)100.0; //just set the max value for now
+		theValue = (double)[self maxCounts]; 
 	}
 	return theValue;
 }
@@ -580,7 +614,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 {
 	@synchronized(self){
 		*theLowLimit = -.001;
-		*theHighLimit =  100.0; //Is this really the max value
+		*theHighLimit =  [self countAlarmLimit]; 
 	}		
 }
 
