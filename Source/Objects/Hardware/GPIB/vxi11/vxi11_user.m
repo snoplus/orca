@@ -317,6 +317,9 @@ int     vxi11_close_device(const char *ip, CLINK *clink) {
 		 * AND client) */
 		else {
 			ret = _vxi11_close_device(ip, clink->client, clink->link);
+            // Make sure to zero out the address.
+            VXI11_IP_ADDRESS[device_no][0] = '\0';
+            if (device_no == VXI11_DEVICE_NO-1) VXI11_DEVICE_NO--;
 		}
 	}
 	return ret;
@@ -425,7 +428,7 @@ long	vxi11_send_and_receive(CLINK *clink, const char *cmd, char *buf, unsigned l
 	int	ret;
 	long	bytes_returned;
 	do {
-		ret = vxi11_send(clink, cmd,buf_len);
+		ret = vxi11_send(clink, cmd, strlen(cmd));
 		if (ret != 0) {
 			if (ret != -VXI11_NULL_WRITE_RESP) {
 				NSLog(@"Error: vxi11_send_and_receive: could not send cmd.\n");
@@ -445,7 +448,7 @@ long	vxi11_send_and_receive(CLINK *clink, const char *cmd, char *buf, unsigned l
 			else NSLog(@"(Info: VXI11_NULL_READ_RESP in vxi11_send_and_receive, resending query)\n");
 		}
 	} while (bytes_returned == -VXI11_NULL_READ_RESP || ret == -VXI11_NULL_WRITE_RESP);
-	return 0;
+	return bytes_returned;
 }
 
 
@@ -563,7 +566,7 @@ int	_vxi11_close_link(const char *inputip, CLIENT *client, VXI11_LINK *link) {
 #else
 	if (destroy_link_1(&link->lid, &dev_error, client) != RPC_SUCCESS) {
 #endif
-		clnt_perror(client,ip);
+//		clnt_perror(client,ip);
 		return -1;
 	}
 	
