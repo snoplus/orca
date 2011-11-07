@@ -1256,9 +1256,6 @@
 		846B8F130E15972A00C41F9D /* ORICS8065Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F0C0E15972A00C41F9D /* ORICS8065Controller.m */; };
 		846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 846B8F0D0E15972A00C41F9D /* ORICS8065Model.h */; };
 		846B8F150E15972A00C41F9D /* ORICS8065Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F0E0E15972A00C41F9D /* ORICS8065Model.m */; };
-		846B8F1C0E15973500C41F9D /* vxi11.h in Headers */ = {isa = PBXBuildFile; fileRef = 846B8F170E15973500C41F9D /* vxi11.h */; };
-		846B8F1D0E15973500C41F9D /* vxi11_clnt.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F180E15973500C41F9D /* vxi11_clnt.m */; };
-		846B8F200E15973500C41F9D /* vxi11_xdr.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F1B0E15973500C41F9D /* vxi11_xdr.m */; };
 		846F4B95098FDA7B00BF0031 /* ORRunVetoController.h in Headers */ = {isa = PBXBuildFile; fileRef = 846F4B8D098FDA7B00BF0031 /* ORRunVetoController.h */; };
 		846F4B96098FDA7B00BF0031 /* ORRunVetoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 846F4B8E098FDA7B00BF0031 /* ORRunVetoController.m */; };
 		846F4B97098FDA7B00BF0031 /* ORRunVetoModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 846F4B8F098FDA7B00BF0031 /* ORRunVetoModel.h */; };
@@ -2569,6 +2566,14 @@
 		CE20A5C3145EE1CD00B8862D /* ORXYCom564Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = CE20A5C1145EE1CC00B8862D /* ORXYCom564Decoder.h */; };
 		CE20A5C4145EE1CD00B8862D /* ORXYCom564Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = CE20A5C2145EE1CD00B8862D /* ORXYCom564Decoder.m */; };
 		CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */; };
+		CE6CCDCE14672BD80099238D /* patch_vxi11_clnt.sh in Resources */ = {isa = PBXBuildFile; fileRef = CE6CCDCC14672BD80099238D /* patch_vxi11_clnt.sh */; };
+		CE6CCDCF14672BD80099238D /* patch_vxi11_h.sh in Resources */ = {isa = PBXBuildFile; fileRef = CE6CCDCD14672BD80099238D /* patch_vxi11_h.sh */; };
+		CE6CCDD314672C670099238D /* vxi11_user.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6CCDD014672C670099238D /* vxi11_user.h */; };
+		CE6CCDD514672C670099238D /* vxi11.x in Resources */ = {isa = PBXBuildFile; fileRef = CE6CCDD214672C670099238D /* vxi11.x */; };
+		CE6CCDDE146732D90099238D /* vxi11_clnt.c in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDD9146732D80099238D /* vxi11_clnt.c */; };
+		CE6CCDE1146732D90099238D /* vxi11_xdr.c in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDDC146732D90099238D /* vxi11_xdr.c */; };
+		CE6CCDE2146732D90099238D /* vxi11.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6CCDDD146732D90099238D /* vxi11.h */; };
+		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
 		EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; };
@@ -3805,9 +3810,6 @@
 		846B8F0C0E15972A00C41F9D /* ORICS8065Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORICS8065Controller.m; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065Controller.m; sourceTree = SOURCE_ROOT; };
 		846B8F0D0E15972A00C41F9D /* ORICS8065Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORICS8065Model.h; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065Model.h; sourceTree = SOURCE_ROOT; };
 		846B8F0E0E15972A00C41F9D /* ORICS8065Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORICS8065Model.m; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065Model.m; sourceTree = SOURCE_ROOT; };
-		846B8F170E15973500C41F9D /* vxi11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vxi11.h; path = Source/Objects/Hardware/GPIB/vxi11/vxi11.h; sourceTree = SOURCE_ROOT; };
-		846B8F180E15973500C41F9D /* vxi11_clnt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vxi11_clnt.m; path = Source/Objects/Hardware/GPIB/vxi11/vxi11_clnt.m; sourceTree = SOURCE_ROOT; };
-		846B8F1B0E15973500C41F9D /* vxi11_xdr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vxi11_xdr.m; path = Source/Objects/Hardware/GPIB/vxi11/vxi11_xdr.m; sourceTree = SOURCE_ROOT; };
 		846E0278052A2F8E005F64B1 /* VME_eCPU_Config.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VME_eCPU_Config.h; path = "Source/Objects/Hardware/Vme/Vme Base Classes/VME_eCPU_Config.h"; sourceTree = SOURCE_ROOT; };
 		846F4B8D098FDA7B00BF0031 /* ORRunVetoController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRunVetoController.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/ORRunVetoController.h; sourceTree = SOURCE_ROOT; };
 		846F4B8E098FDA7B00BF0031 /* ORRunVetoController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRunVetoController.m; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/ORRunVetoController.m; sourceTree = SOURCE_ROOT; };
@@ -5253,6 +5255,15 @@
 		CE20A5C1145EE1CC00B8862D /* ORXYCom564Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXYCom564Decoder.h; sourceTree = "<group>"; };
 		CE20A5C2145EE1CD00B8862D /* ORXYCom564Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXYCom564Decoder.m; sourceTree = "<group>"; };
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
+		CE6CCDCC14672BD80099238D /* patch_vxi11_clnt.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = patch_vxi11_clnt.sh; sourceTree = "<group>"; };
+		CE6CCDCD14672BD80099238D /* patch_vxi11_h.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = patch_vxi11_h.sh; sourceTree = "<group>"; };
+		CE6CCDD014672C670099238D /* vxi11_user.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vxi11_user.h; sourceTree = "<group>"; };
+		CE6CCDD214672C670099238D /* vxi11.x */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vxi11.x; sourceTree = "<group>"; };
+		CE6CCDD9146732D80099238D /* vxi11_clnt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vxi11_clnt.c; sourceTree = "<group>"; };
+		CE6CCDDC146732D90099238D /* vxi11_xdr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vxi11_xdr.c; sourceTree = "<group>"; };
+		CE6CCDDD146732D90099238D /* vxi11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vxi11.h; sourceTree = "<group>"; };
+		CE8626971467337900EF6466 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		CEB1A5C414673AB6001381E6 /* vxi11_user.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vxi11_user.m; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
 		EF37879112DFFF81003C814E /* YAJL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YAJL.framework; path = Frameworks/YAJL.framework; sourceTree = "<group>"; };
@@ -7733,9 +7744,15 @@
 		846B8F160E15973500C41F9D /* vxi11 */ = {
 			isa = PBXGroup;
 			children = (
-				846B8F170E15973500C41F9D /* vxi11.h */,
-				846B8F180E15973500C41F9D /* vxi11_clnt.m */,
-				846B8F1B0E15973500C41F9D /* vxi11_xdr.m */,
+				CE8626971467337900EF6466 /* Makefile */,
+				CE6CCDD9146732D80099238D /* vxi11_clnt.c */,
+				CEB1A5C414673AB6001381E6 /* vxi11_user.m */,
+				CE6CCDDC146732D90099238D /* vxi11_xdr.c */,
+				CE6CCDDD146732D90099238D /* vxi11.h */,
+				CE6CCDCC14672BD80099238D /* patch_vxi11_clnt.sh */,
+				CE6CCDCD14672BD80099238D /* patch_vxi11_h.sh */,
+				CE6CCDD014672C670099238D /* vxi11_user.h */,
+				CE6CCDD214672C670099238D /* vxi11.x */,
 			);
 			name = vxi11;
 			path = Source/Objects/Hardware/GPIB/vxi11;
@@ -11936,7 +11953,6 @@
 				8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */,
 				846B8F120E15972A00C41F9D /* ORICS8065Controller.h in Headers */,
 				846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */,
-				846B8F1C0E15973500C41F9D /* vxi11.h in Headers */,
 				9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */,
 				9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */,
 				9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */,
@@ -12305,6 +12321,8 @@
 				84CA8AFD14608A180072BB24 /* ObjWithHistoryModel.h in Headers */,
 				84CA8B0614608A340072BB24 /* ORTimeRoi.h in Headers */,
 				84CA8B0814608A340072BB24 /* ORTimeRoiController.h in Headers */,
+				CE6CCDD314672C670099238D /* vxi11_user.h in Headers */,
+				CE6CCDE2146732D90099238D /* vxi11.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13084,6 +13102,9 @@
 				CE10F01C1451674C0084C15D /* XYCom564.nib in Resources */,
 				CE10F01E145189510084C15D /* XYCom564Card.gif in Resources */,
 				84CA8B0414608A340072BB24 /* TimeRoi.nib in Resources */,
+				CE6CCDCE14672BD80099238D /* patch_vxi11_clnt.sh in Resources */,
+				CE6CCDCF14672BD80099238D /* patch_vxi11_h.sh in Resources */,
+				CE6CCDD514672C670099238D /* vxi11.x in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13643,8 +13664,6 @@
 				8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */,
 				846B8F130E15972A00C41F9D /* ORICS8065Controller.m in Sources */,
 				846B8F150E15972A00C41F9D /* ORICS8065Model.m in Sources */,
-				846B8F1D0E15973500C41F9D /* vxi11_clnt.m in Sources */,
-				846B8F200E15973500C41F9D /* vxi11_xdr.m in Sources */,
 				9C8846870E2D8D960099B98E /* ORHP4405AController.m in Sources */,
 				9C88468B0E2D8D960099B98E /* ORHP4405AModel.m in Sources */,
 				9C7CE7E70E2FC22500F63679 /* ORCaen260Controller.m in Sources */,
@@ -13971,6 +13990,9 @@
 				84CA8AFE14608A180072BB24 /* ObjWithHistoryModel.m in Sources */,
 				84CA8B0514608A340072BB24 /* ORTimeRoi.m in Sources */,
 				84CA8B0714608A340072BB24 /* ORTimeRoiController.m in Sources */,
+				CE6CCDDE146732D90099238D /* vxi11_clnt.c in Sources */,
+				CE6CCDE1146732D90099238D /* vxi11_xdr.c in Sources */,
+				CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -231,7 +231,7 @@ int	VXI11_LINK_COUNT[VXI11_MAX_CLIENTS];
 
 /* Use this function from user land to open a device and create a link. Can be
  * used multiple times for the same device (the library will keep track).*/
-int	vxi11_open_device(char *ip, CLINK *clink, char *device) {
+int	vxi11_open_device(const char *ip, CLINK *clink, char *device) {
 	int	ret;
 	int	l;
 	int	device_no=-1;
@@ -276,7 +276,7 @@ int	vxi11_open_device(char *ip, CLINK *clink, char *device) {
 		/* Copy the client pointer address. Just establish a new link
 		 * (not a new client). Add one to the link count */
 		clink->client = VXI11_CLIENT_ADDRESS[device_no];
-		ret = vxi11_open_link(ip, &(clink->client), &(clink->link), device);
+		ret = _vxi11_open_link(ip, &(clink->client), &(clink->link), device);
 		//		NSLog(@"Found an ip address, copying client from VXI11_CLIENT_ADDRESS[%d]\n",device_no);
 		VXI11_LINK_COUNT[device_no]++;
 		//		NSLog(@"Have just incremented VXI11_LINK_COUNT[%d], it's now %d\n",device_no,VXI11_LINK_COUNT[device_no]);
@@ -291,7 +291,7 @@ int	vxi11_open_device(char *ip, CLINK *clink, char *device) {
 
 /* Use this function from user land to close a device and/or sever a link. Can
  * be used multiple times for the same device (the library will keep track).*/
-int     vxi11_close_device(char *ip, CLINK *clink) {
+int     vxi11_close_device(const char *ip, CLINK *clink) {
 	int     l,ret;
 	int     device_no = -1;
 	
@@ -329,7 +329,7 @@ int     vxi11_close_device(char *ip, CLINK *clink) {
 
 /* We still need the version of the function where the length is set explicitly
  * though, for when we are sending fixed length data blocks. */
-int	vxi11_send(CLINK *clink, char *cmd, unsigned long len) {
+int	vxi11_send(CLINK *clink, const char *cmd, unsigned long len) {
 	return _vxi11_send(clink->client, clink->link, cmd, len);
 }
 
@@ -350,7 +350,7 @@ long	vxi11_receive(CLINK *clink, char *buffer, unsigned long len, unsigned long 
 
 /* SEND FIXED LENGTH DATA BLOCK FUNCTION *
  * ===================================== */
-int	vxi11_send_data_block(CLINK *clink, char *cmd, char *buffer, unsigned long len) {
+int	vxi11_send_data_block(CLINK *clink, const char *cmd, char *buffer, unsigned long len) {
 	char	*out_buffer;
 	int	cmd_len=strlen(cmd);
 	int	ret;
@@ -421,7 +421,7 @@ long	vxi11_receive_data_block(CLINK *clink, char *buffer, unsigned long len, uns
 
 /* This is mainly a useful function for the overloaded vxi11_obtain_value()
  * fn's, but is also handy and useful for user and library use */
-long	vxi11_send_and_receive(CLINK *clink, char *cmd, char *buf, unsigned long buf_len, unsigned long timeout) {
+long	vxi11_send_and_receive(CLINK *clink, const char *cmd, char *buf, unsigned long buf_len, unsigned long timeout) {
 	int	ret;
 	long	bytes_returned;
 	do {
@@ -451,7 +451,7 @@ long	vxi11_send_and_receive(CLINK *clink, char *cmd, char *buf, unsigned long bu
 
 /* FUNCTIONS TO RETURN A LONG INTEGER VALUE SENT AS RESPONSE TO A QUERY *
  * ==================================================================== */
-long	vxi11_obtain_long_value(CLINK *clink, char *cmd, unsigned long timeout) {
+long	vxi11_obtain_long_value(CLINK *clink, const char *cmd, unsigned long timeout) {
 	char	buf[50]; /* 50=arbitrary length... more than enough for one number in ascii */
 	memset(buf, 0, 50);
 	if (vxi11_send_and_receive(clink, cmd, buf, 50, timeout) != 0) {
@@ -464,7 +464,7 @@ long	vxi11_obtain_long_value(CLINK *clink, char *cmd, unsigned long timeout) {
 
 /* FUNCTIONS TO RETURN A DOUBLE FLOAT VALUE SENT AS RESPONSE TO A QUERY *
  * ==================================================================== */
-double	vxi11_obtain_double_value(CLINK *clink, char *cmd, unsigned long timeout) {
+double	vxi11_obtain_double_value(CLINK *clink, const char *cmd, unsigned long timeout) {
 	char	buf[50]; /* 50=arbitrary length... more than enough for one number in ascii */
 	double	val;
 	memset(buf, 0, 50);
@@ -484,9 +484,15 @@ double	vxi11_obtain_double_value(CLINK *clink, char *cmd, unsigned long timeout)
 
 /* OPEN FUNCTIONS *
  * ============== */
-int	_vxi11_open_device(char *ip, CLIENT **client, VXI11_LINK **link, char *device) {
-	
-	*client = clnt_create(ip, DEVICE_CORE, DEVICE_CORE_VERSION, "tcp");
+int	_vxi11_open_device(const char *inputip, CLIENT **client, VXI11_LINK **link, char *device) {
+#ifdef __APPLE__
+	char ip[strlen(inputip)];
+	strcpy(ip, inputip);
+#else
+	const char *ip = inputip;
+#endif
+        char tmp_tcp[] = "tcp";
+	*client = clnt_create(ip, DEVICE_CORE, DEVICE_CORE_VERSION, tmp_tcp);
 	
 	if (*client == NULL) {
 		clnt_pcreateerror(ip);
@@ -496,10 +502,17 @@ int	_vxi11_open_device(char *ip, CLIENT **client, VXI11_LINK **link, char *devic
 	return _vxi11_open_link(ip, client, link, device);
 }
 
-int	_vxi11_open_link(char *ip, CLIENT **client, VXI11_LINK **link, char *device) {
+int	_vxi11_open_link(const char *inputip, CLIENT **client, VXI11_LINK **link, char *device) {
 	
 	Create_LinkParms link_parms;
-	
+#ifdef __APPLE__
+	char ip[strlen(inputip)];
+	strcpy(ip, inputip);
+#else
+	const char *ip = inputip;
+#endif
+
+
 	/* Set link parameters */
 	link_parms.clientId	= (long) *client;
 	link_parms.lockDevice	= 0;
@@ -507,32 +520,49 @@ int	_vxi11_open_link(char *ip, CLIENT **client, VXI11_LINK **link, char *device)
 	link_parms.device	= device;
 	
 	*link = (Create_LinkResp *) calloc(1, sizeof(Create_LinkResp));
-	
+#ifdef __APPLE__
+	Create_LinkResp * tmp;
+	if ((tmp = create_link_1(&link_parms, *client)) == NULL) {
+#else
 	if (create_link_1(&link_parms, *link, *client) != RPC_SUCCESS) {
+#endif
 		clnt_perror(*client, ip);
 		return -2;
 	}
+#ifdef __APPLE__
+	memcpy(*link, tmp, sizeof(*tmp));
+#endif
 	return 0;
 }
 
 
 /* CLOSE FUNCTIONS *
  * =============== */
-int	_vxi11_close_device(char *ip, CLIENT *client, VXI11_LINK *link) {
+int	_vxi11_close_device(const char *ip, CLIENT *client, VXI11_LINK *link) {
 	int	ret;
 	
-	ret = vxi11_close_link(ip, client, link);
+	ret = _vxi11_close_link(ip, client, link);
 	
 	clnt_destroy(client);
 	
 	return ret;
 }
 
-int	vxi11_close_link(char *ip, CLIENT *client, VXI11_LINK *link) {
+int	_vxi11_close_link(const char *inputip, CLIENT *client, VXI11_LINK *link) {
 	Device_Error dev_error;
+#ifdef __APPLE__
+	char ip[strlen(inputip)];
+	strcpy(ip, inputip);
+#else
+	const char *ip = inputip;
+#endif
 	memset(&dev_error, 0, sizeof(dev_error)); 
 	
+#ifdef __APPLE__
+	if (destroy_link_1(&link->lid, client) == NULL) {
+#else
 	if (destroy_link_1(&link->lid, &dev_error, client) != RPC_SUCCESS) {
+#endif
 		clnt_perror(client,ip);
 		return -1;
 	}
@@ -546,7 +576,7 @@ int	vxi11_close_link(char *ip, CLIENT *client, VXI11_LINK *link) {
 
 /* We still need the version of the function where the length is set explicitly
  * though, for when we are sending fixed length data blocks. */
-int	_vxi11_send(CLIENT *client, VXI11_LINK *link, char *cmd, unsigned long len) {
+int	_vxi11_send(CLIENT *client, VXI11_LINK *link, const char *cmd, unsigned long len) {
 	Device_WriteParms write_parms;
 	int	bytes_left = (int)len;
 	
@@ -568,15 +598,23 @@ int	_vxi11_send(CLIENT *client, VXI11_LINK *link, char *cmd, unsigned long len) 
 			write_parms.flags		= 0;
 			write_parms.data.data_len	= link->maxRecvSize;
 		}
-		write_parms.data.data_val	= cmd + (len - bytes_left);
+		write_parms.data.data_val	= (char *)cmd + (len - bytes_left);
 		
+#ifdef __APPLE__
+		Device_WriteResp *tmp;
+		if((tmp = device_write_1(&write_parms, client)) == NULL) {
+#else
 		if(device_write_1(&write_parms, &write_resp, client) != RPC_SUCCESS) {
+#endif
 			return -VXI11_NULL_WRITE_RESP; /* The instrument did not acknowledge the write, just completely
 			 dropped it. There was no vxi11 comms error as such, the 
 			 instrument is just being rude. Usually occurs when the instrument
 			 is busy. If we don't check this first, then the following 
 			 line causes a seg fault */
 		}
+#ifdef __APPLE__
+		memcpy(&write_resp, tmp, sizeof(*tmp));
+#endif
 		if (write_resp . error != 0) {
 			NSLog(@"vxi11_user: write error: %d\n",write_resp . error);
 			return -(write_resp . error);
@@ -610,14 +648,23 @@ long _vxi11_receive(CLIENT *client, VXI11_LINK *link, char *buffer, unsigned lon
 	do {
 		memset(&read_resp, 0, sizeof(read_resp));
 		
-		read_resp.data.data_val = buffer + curr_pos;
 		read_parms.requestSize = len    - curr_pos;	// Never request more total data than originally specified in len
-		
+#ifdef __APPLE__
+		Device_ReadResp *tmp;
+		if((tmp = device_read_1(&read_parms, client)) == NULL) {
+#else
+		read_resp.data.data_val = buffer + curr_pos;
 		if(device_read_1(&read_parms, &read_resp, client) != RPC_SUCCESS) {
+#endif
+	
 			return -VXI11_NULL_READ_RESP; /* there is nothing to read. Usually occurs after sending a query
 			 which times out on the instrument. If we don't check this first,
 			 then the following line causes a seg fault */
 		}
+#ifdef __APPLE__
+		memcpy(&read_resp, tmp, sizeof(*tmp));
+                memcpy(buffer + curr_pos, read_resp.data.data_val, read_resp.data.data_len);
+#endif
  		if (read_resp . error != 0) {
 			/* Read failed for reason specified in error code.
 			 *  0     no error

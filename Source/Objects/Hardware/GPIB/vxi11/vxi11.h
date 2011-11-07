@@ -6,43 +6,47 @@
 #ifndef _VXI11_H_RPCGEN
 #define _VXI11_H_RPCGEN
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
-#define rpc_uint unsigned long
-#endif
-
 #define RPCGEN_VERSION	199506
 
-#include <rpc/rpc.h>
+#include <rpc/rpc.h>                                               
 
-#define VXI_OK           0   /* no error */
-#define VXI_SYNERR       1   /* syntax error */
-#define VXI_NOACCESS     3   /* device not accessible */
-#define VXI_INVLINK      4   /* invalid link identifier */
-#define VXI_PARAMERR     5   /* parameter error */
-#define VXI_NOCHAN       6   /* channel not established */
-#define VXI_NOTSUPP      8   /* operation not supported */
-#define VXI_NORES        9   /* out of resources */
-#define VXI_DEVLOCK      11  /* device locked by another link */
-#define VXI_NOLOCK       12  /* no lock held by this link */
-#define VXI_IOTIMEOUT    15  /* I/O timeout */
-#define VXI_IOERR        17  /* I/O error */
-#define VXI_INVADDR      21  /* invalid address */
-#define VXI_ABORT        23  /* abort */
-#define VXI_CHANEXIST    29  /* channel already established */
+#define VXI_OK           0   /* no error */                                         
+#define VXI_SYNERR       1   /* syntax error */                                     
+#define VXI_NOACCESS     3   /* device not accessible */                            
+#define VXI_INVLINK      4   /* invalid link identifier */                          
+#define VXI_PARAMERR     5   /* parameter error */                                  
+#define VXI_NOCHAN       6   /* channel not established */                          
+#define VXI_NOTSUPP      8   /* operation not supported */                          
+#define VXI_NORES        9   /* out of resources */                                 
+#define VXI_DEVLOCK      11  /* device locked by another link */                    
+#define VXI_NOLOCK       12  /* no lock held by this link */                        
+#define VXI_IOTIMEOUT    15  /* I/O timeout */                                      
+#define VXI_IOERR        17  /* I/O error */                                        
+#define VXI_INVADDR      21  /* invalid address */                                  
+#define VXI_ABORT        23  /* abort */                                            
+#define VXI_CHANEXIST    29  /* channel already established */                      
+                                                                                    
+/* VXI-11 flags  */                                                                 
+                                                                                    
+#define VXI_WAITLOCK     1   /* block the operation on a locked device */           
+#define VXI_ENDW         8   /* device_write: mark last char with END indicator */  
+#define VXI_TERMCHRSET   128 /* device_read: stop on termination character */       
+                                                                                    
+/* VXI-11 read termination reasons */                                               
+                                                                                    
+#define VXI_REQCNT       1   /* requested # of bytes have been transferred */       
+#define VXI_CHR          2   /* termination character matched */                    
+#define VXI_ENDR         4   /* END indicator read */                               
 
-/* VXI-11 flags  */
 
-#define VXI_WAITLOCK     1   /* block the operation on a locked device */
-#define VXI_ENDW         8   /* device_write: mark last char with END indicator */
-#define VXI_TERMCHRSET   128 /* device_read: stop on termination character */
 
-/* VXI-11 read termination reasons */
+                                         
+#ifdef __LP64__                                                          
+typedef int Device_Link;                                                 
+#else                                                                    
+typedef long Device_Link;                                                
+#endif                                                                   
 
-#define VXI_REQCNT       1   /* requested # of bytes have been transferred */
-#define VXI_CHR          2   /* termination character matched */
-#define VXI_ENDR         4   /* END indicator read */
-
-typedef long Device_Link;
 #ifdef __cplusplus
 extern "C" bool_t xdr_Device_Link(XDR *, Device_Link*);
 #elif __STDC__
@@ -66,7 +70,13 @@ bool_t xdr_Device_AddrFamily();
 #endif /* Old Style C */
 
 
-typedef long Device_Flags;
+                                        
+#ifdef __LP64__                                                          
+typedef int Device_Flags;                                                
+#else                                                                    
+typedef long Device_Flags;                                               
+#endif                                                                   
+
 #ifdef __cplusplus
 extern "C" bool_t xdr_Device_Flags(XDR *, Device_Flags*);
 #elif __STDC__
@@ -76,7 +86,13 @@ bool_t xdr_Device_Flags();
 #endif /* Old Style C */
 
 
-typedef long Device_ErrorCode;
+                                    
+#ifdef __LP64__                                                          
+typedef int Device_ErrorCode;                                            
+#else                                                                    
+typedef long Device_ErrorCode;                                           
+#endif                                                                   
+
 #ifdef __cplusplus
 extern "C" bool_t xdr_Device_ErrorCode(XDR *, Device_ErrorCode*);
 #elif __STDC__
@@ -100,9 +116,21 @@ bool_t xdr_Device_Error();
 
 
 struct Create_LinkParms {
-	long clientId;
+                                          
+#ifdef __LP64__                                                          
+	int clientId;                                                                
+#else                                                                    
+	long clientId;                                                               
+#endif                                                                   
+
 	bool_t lockDevice;
-	u_long lock_timeout;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int lock_timeout;                                                       
+#else                                                                    
+	u_long lock_timeout;                                                             
+#endif                                                                   
+
 	char *device;
 };
 typedef struct Create_LinkParms Create_LinkParms;
@@ -119,7 +147,13 @@ struct Create_LinkResp {
 	Device_ErrorCode error;
 	Device_Link lid;
 	u_short abortPort;
-	u_long maxRecvSize;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int maxRecvSize;                                                       
+#else                                                                    
+	u_long maxRecvSize;                                                             
+#endif                                                                   
+
 };
 typedef struct Create_LinkResp Create_LinkResp;
 #ifdef __cplusplus
@@ -133,8 +167,20 @@ bool_t xdr_Create_LinkResp();
 
 struct Device_WriteParms {
 	Device_Link lid;
-	u_long io_timeout;
-	u_long lock_timeout;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int io_timeout;                                                       
+#else                                                                    
+	u_long io_timeout;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int lock_timeout;                                                       
+#else                                                                    
+	u_long lock_timeout;                                                             
+#endif                                                                   
+
 	Device_Flags flags;
 	struct {
 		u_int data_len;
@@ -153,7 +199,13 @@ bool_t xdr_Device_WriteParms();
 
 struct Device_WriteResp {
 	Device_ErrorCode error;
-	u_long size;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int size;                                                       
+#else                                                                    
+	u_long size;                                                             
+#endif                                                                   
+
 };
 typedef struct Device_WriteResp Device_WriteResp;
 #ifdef __cplusplus
@@ -167,9 +219,27 @@ bool_t xdr_Device_WriteResp();
 
 struct Device_ReadParms {
 	Device_Link lid;
-	u_long requestSize;
-	u_long io_timeout;
-	u_long lock_timeout;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int requestSize;                                                       
+#else                                                                    
+	u_long requestSize;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int io_timeout;                                                       
+#else                                                                    
+	u_long io_timeout;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int lock_timeout;                                                       
+#else                                                                    
+	u_long lock_timeout;                                                             
+#endif                                                                   
+
 	Device_Flags flags;
 	char termChar;
 };
@@ -185,7 +255,13 @@ bool_t xdr_Device_ReadParms();
 
 struct Device_ReadResp {
 	Device_ErrorCode error;
-	long reason;
+                                          
+#ifdef __LP64__                                                          
+	int reason;                                                                
+#else                                                                    
+	long reason;                                                               
+#endif                                                                   
+
 	struct {
 		u_int data_len;
 		char *data_val;
@@ -218,8 +294,20 @@ bool_t xdr_Device_ReadStbResp();
 struct Device_GenericParms {
 	Device_Link lid;
 	Device_Flags flags;
-	u_long lock_timeout;
-	u_long io_timeout;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int lock_timeout;                                                       
+#else                                                                    
+	u_long lock_timeout;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int io_timeout;                                                       
+#else                                                                    
+	u_long io_timeout;                                                             
+#endif                                                                   
+
 };
 typedef struct Device_GenericParms Device_GenericParms;
 #ifdef __cplusplus
@@ -232,10 +320,34 @@ bool_t xdr_Device_GenericParms();
 
 
 struct Device_RemoteFunc {
-	u_long hostAddr;
-	u_long hostPort;
-	u_long progNum;
-	u_long progVers;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int hostAddr;                                                       
+#else                                                                    
+	u_long hostAddr;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int hostPort;                                                       
+#else                                                                    
+	u_long hostPort;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int progNum;                                                       
+#else                                                                    
+	u_long progNum;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int progVers;                                                       
+#else                                                                    
+	u_long progVers;                                                             
+#endif                                                                   
+
 	Device_AddrFamily progFamily;
 };
 typedef struct Device_RemoteFunc Device_RemoteFunc;
@@ -269,7 +381,13 @@ bool_t xdr_Device_EnableSrqParms();
 struct Device_LockParms {
 	Device_Link lid;
 	Device_Flags flags;
-	u_long lock_timeout;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int lock_timeout;                                                       
+#else                                                                    
+	u_long lock_timeout;                                                             
+#endif                                                                   
+
 };
 typedef struct Device_LockParms Device_LockParms;
 #ifdef __cplusplus
@@ -284,11 +402,35 @@ bool_t xdr_Device_LockParms();
 struct Device_DocmdParms {
 	Device_Link lid;
 	Device_Flags flags;
-	u_long io_timeout;
-	u_long lock_timeout;
-	long cmd;
+                                              
+#ifdef __LP64__                                                          
+	unsigned int io_timeout;                                                       
+#else                                                                    
+	u_long io_timeout;                                                             
+#endif                                                                   
+
+                                              
+#ifdef __LP64__                                                          
+	unsigned int lock_timeout;                                                       
+#else                                                                    
+	u_long lock_timeout;                                                             
+#endif                                                                   
+
+                                          
+#ifdef __LP64__                                                          
+	int cmd;                                                                
+#else                                                                    
+	long cmd;                                                               
+#endif                                                                   
+
 	bool_t network_order;
-	long datasize;
+                                          
+#ifdef __LP64__                                                          
+	int datasize;                                                                
+#else                                                                    
+	long datasize;                                                               
+#endif                                                                   
+
 	struct {
 		u_int data_in_len;
 		char *data_in_val;
