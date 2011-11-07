@@ -2573,6 +2573,11 @@
 		CE6CCDDE146732D90099238D /* vxi11_clnt.c in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDD9146732D80099238D /* vxi11_clnt.c */; };
 		CE6CCDE1146732D90099238D /* vxi11_xdr.c in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDDC146732D90099238D /* vxi11_xdr.c */; };
 		CE6CCDE2146732D90099238D /* vxi11.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6CCDDD146732D90099238D /* vxi11.h */; };
+		CE7328AE1466EEDE00A50AE9 /* ORVXI11HardwareFinder.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7328A91466EEDE00A50AE9 /* ORVXI11HardwareFinder.h */; };
+		CE7328AF1466EEDE00A50AE9 /* ORVXI11HardwareFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7328AA1466EEDE00A50AE9 /* ORVXI11HardwareFinder.m */; };
+		CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */; };
+		CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */; };
+		CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */; };
 		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
@@ -5262,6 +5267,11 @@
 		CE6CCDD9146732D80099238D /* vxi11_clnt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vxi11_clnt.c; sourceTree = "<group>"; };
 		CE6CCDDC146732D90099238D /* vxi11_xdr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vxi11_xdr.c; sourceTree = "<group>"; };
 		CE6CCDDD146732D90099238D /* vxi11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vxi11.h; sourceTree = "<group>"; };
+		CE7328A91466EEDE00A50AE9 /* ORVXI11HardwareFinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVXI11HardwareFinder.h; sourceTree = "<group>"; };
+		CE7328AA1466EEDE00A50AE9 /* ORVXI11HardwareFinder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVXI11HardwareFinder.m; sourceTree = "<group>"; };
+		CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVXI11HardwareFinderController.h; sourceTree = "<group>"; };
+		CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVXI11HardwareFinderController.m; sourceTree = "<group>"; };
+		CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = VXI11HardwareFinder.nib; sourceTree = "<group>"; };
 		CE8626971467337900EF6466 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		CEB1A5C414673AB6001381E6 /* vxi11_user.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vxi11_user.m; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
@@ -10917,6 +10927,18 @@
 			name = PlugIns;
 			sourceTree = "<group>";
 		};
+		CE7328A81466EEDC00A50AE9 /* HardwareFinder */ = {
+			isa = PBXGroup;
+			children = (
+				CE7328A91466EEDE00A50AE9 /* ORVXI11HardwareFinder.h */,
+				CE7328AA1466EEDE00A50AE9 /* ORVXI11HardwareFinder.m */,
+				CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */,
+				CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */,
+				CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */,
+			);
+			path = HardwareFinder;
+			sourceTree = "<group>";
+		};
 		EF7722B111E813120064A1CF /* XL3 */ = {
 			isa = PBXGroup;
 			children = (
@@ -11033,6 +11055,7 @@
 		F51E695A03AE4775015F64B1 /* Main Dialogs */ = {
 			isa = PBXGroup;
 			children = (
+				CE7328A81466EEDC00A50AE9 /* HardwareFinder */,
 				84EBBE631282E2B700234313 /* Archive */,
 				84D8CB4410447492005585C5 /* AutoTester */,
 				843CDEBA03BE2B2D00C39F5F /* Preferences */,
@@ -12321,6 +12344,8 @@
 				84CA8AFD14608A180072BB24 /* ObjWithHistoryModel.h in Headers */,
 				84CA8B0614608A340072BB24 /* ORTimeRoi.h in Headers */,
 				84CA8B0814608A340072BB24 /* ORTimeRoiController.h in Headers */,
+				CE7328AE1466EEDE00A50AE9 /* ORVXI11HardwareFinder.h in Headers */,
+				CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */,
 				CE6CCDD314672C670099238D /* vxi11_user.h in Headers */,
 				CE6CCDE2146732D90099238D /* vxi11.h in Headers */,
 			);
@@ -13102,6 +13127,7 @@
 				CE10F01C1451674C0084C15D /* XYCom564.nib in Resources */,
 				CE10F01E145189510084C15D /* XYCom564Card.gif in Resources */,
 				84CA8B0414608A340072BB24 /* TimeRoi.nib in Resources */,
+				CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */,
 				CE6CCDCE14672BD80099238D /* patch_vxi11_clnt.sh in Resources */,
 				CE6CCDCF14672BD80099238D /* patch_vxi11_h.sh in Resources */,
 				CE6CCDD514672C670099238D /* vxi11.x in Resources */,
@@ -13990,6 +14016,8 @@
 				84CA8AFE14608A180072BB24 /* ObjWithHistoryModel.m in Sources */,
 				84CA8B0514608A340072BB24 /* ORTimeRoi.m in Sources */,
 				84CA8B0714608A340072BB24 /* ORTimeRoiController.m in Sources */,
+				CE7328AF1466EEDE00A50AE9 /* ORVXI11HardwareFinder.m in Sources */,
+				CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */,
 				CE6CCDDE146732D90099238D /* vxi11_clnt.c in Sources */,
 				CE6CCDE1146732D90099238D /* vxi11_xdr.c in Sources */,
 				CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */,
