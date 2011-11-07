@@ -80,6 +80,7 @@
 - (IBAction) showAutoTester:(id)sender;
 - (IBAction) restoreToCmdOneSet:(id)sender;
 - (IBAction) showArchive:(id)sender;
+- (IBAction) showHardwareFinder:(id)sender;
 
 #pragma mark ¥¥¥Accessors
 - (id) document;

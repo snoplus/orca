@@ -42,6 +42,7 @@
 #import "OrcaObjectController.h"
 #import "ORWindowSaveSet.h"
 #import "ORArchive.h"
+#import "ORVXI11HardwareFinderController.h"
 
 #import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
@@ -246,6 +247,11 @@ NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 - (IBAction) showArchive:(id)sender
 {
     [[ORArchive sharedArchive] showWindow:self];
+}
+
+- (IBAction) showHardwareFinder:(id)sender
+{
+    [[ORVXI11HardwareFinderController sharedVXI11HardwareFinderController] showWindow:self];
 }
 
 - (IBAction) restoreToCmdOneSet:(id)sender
